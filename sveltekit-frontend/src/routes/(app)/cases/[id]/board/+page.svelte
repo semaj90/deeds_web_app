@@ -229,13 +229,17 @@
 
 	// Fuse.js fuzzy search for evidence sidebar
 	let searchQuery = $state('');
-	let placementFilter = $state<'all' | 'unplaced' | 'placed'>('all');
+	let placementFilter = $state<'all' | 'images' | 'unplaced' | 'placed'>('all');
 	const fuseOptions = { keys: ['title', 'description', 'type', 'location', 'fileType'], threshold: 0.4, ignoreLocation: true };
 	let fuse = $derived(new Fuse(evidenceItems, fuseOptions));
+	let evidenceThumbnails = $derived(Object.fromEntries(
+		evidenceItems.filter((item: any) => item.thumbnail).map((item: any) => [item.id, item.thumbnail])
+	));
 	let filteredEvidence = $derived.by(() => {
 		const base = searchQuery.trim()
 			? fuse.search(searchQuery).map((r: any) => r.item)
 			: evidenceItems;
+		if (placementFilter === 'images') return base.filter((it: any) => isEvidenceImage(it.fileType));
 		if (placementFilter === 'unplaced') return base.filter((it: any) => !placedEvidenceIds.has(it.id));
 		if (placementFilter === 'placed') return base.filter((it: any) => placedEvidenceIds.has(it.id));
 		return base;
@@ -271,7 +275,8 @@
 				item.title,
 				originX + col * (nodeW + gap),
 				originY + row * (nodeH + gap),
-				item.fileType
+				item.fileType,
+				item.thumbnail
 			);
 		}
 		notificationStore.add({
@@ -350,7 +355,7 @@
 			board.addMarker(world.x, world.y);
 			activeTool = 'select';
 		} else if (activeTool === 'evidence' && board && selectedEvidence) {
-			board.addEvidenceNode(selectedEvidence.id, selectedEvidence.title, world.x, world.y, selectedEvidence.fileType);
+			board.addEvidenceNode(selectedEvidence.id, selectedEvidence.title, world.x, world.y, selectedEvidence.fileType, selectedEvidence.thumbnail);
 			activeTool = 'select';
 		}
 	}
@@ -489,7 +494,7 @@
 		if (n.kind === 'note') {
 			board.addNote(n.x + 40, n.y + 40, n.title, n.body);
 		} else if (n.kind === 'evidence' && n.evidenceId) {
-			board.addEvidenceNode(n.evidenceId, n.title ?? 'Untitled', n.x + 40, n.y + 40, n.fileType);
+			board.addEvidenceNode(n.evidenceId, n.title ?? 'Untitled', n.x + 40, n.y + 40, n.fileType, evidenceThumbnails[n.evidenceId]);
 		}
 		closeContextMenu();
 	}
@@ -562,7 +567,7 @@
 					// Restore cached viewport/nodes via board methods
 					for (const n of cached.nodes) {
 						if (n.evidenceId) {
-							board.addEvidenceNode(n.evidenceId, n.title ?? 'Untitled', n.x, n.y);
+							board.addEvidenceNode(n.evidenceId, n.title ?? 'Untitled', n.x, n.y, undefined, evidenceThumbnails[n.evidenceId]);
 						}
 					}
 					board.zoomToFit();
@@ -684,7 +689,8 @@
 					placedTitle,
 					center.x - 140 + jitter,
 					center.y - 80 + jitter,
-					selectedEvidence.fileType
+					selectedEvidence.fileType,
+					selectedEvidence.thumbnail
 				);
 				// Brief flash + toast to confirm placement
 				if (newId) {
@@ -847,7 +853,7 @@
 				// Convert percentage to canvas coordinates
 				const posX = (x / 100) * canvasWidth;
 				const posY = (y / 100) * canvasHeight;
-				board.addEvidenceNode(item.id, item.title, posX, posY);
+				board.addEvidenceNode(item.id, item.title, posX, posY, item.fileType, item.thumbnail);
 			}
 		});
 
@@ -1210,6 +1216,16 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 				</button>
 				<button
 					class="placement-filter-btn"
+					class:active={placementFilter === 'images'}
+					onclick={() => (placementFilter = 'images')}
+					role="tab"
+					aria-selected={placementFilter === 'images'}
+					title="Show image evidence"
+				>
+					Images ({evidenceItems.filter((it: any) => isEvidenceImage(it.fileType)).length})
+				</button>
+				<button
+					class="placement-filter-btn"
 					class:active={placementFilter === 'unplaced'}
 					onclick={() => (placementFilter = 'unplaced')}
 					role="tab"
@@ -1253,6 +1269,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 					{@const typeIcon = isAudio ? 'headphones' : isVideo ? 'video' : isImage ? 'image' : isPdf ? 'file-text' : 'file'}
 					<div
 						class="evidence-card"
+						data-evidence-id={item.id}
 						class:selected={selectedEvidence?.id === item.id}
 						class:on-board={placedEvidenceIds.has(item.id)}
 						role="button"
@@ -1322,6 +1339,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 						{activeTool}
 						snapToGrid={snapOn}
 						{caseId}
+						evidenceThumbnails={evidenceThumbnails}
 					/>
 				{/key}
 				<BoardTopToolbar

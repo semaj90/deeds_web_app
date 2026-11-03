@@ -5,7 +5,7 @@
 
 	export interface BoardNode {
 		id: string;
-		kind: 'note' | 'evidence' | 'document';
+		kind: 'note' | 'evidence' | 'document' | 'marker';
 		x: number;
 		y: number;
 		w: number;
@@ -61,9 +61,10 @@
 	// Props
 	interface Props {
 		caseId: string;
+		evidenceThumbnails?: Record<string, string>;
 		initialSnapshot?: BoardSnapshot | null;
 		readonly?: boolean;
-		activeTool?: 'select' | 'evidence' | 'connection' | 'note';
+		activeTool?: 'select' | 'evidence' | 'connection' | 'note' | 'marker';
 		snapToGrid?: boolean;
 		onDirtyChange?: ((dirty: boolean) => void) | null;
 		onCanvasClick?: ((world: Vec2) => void) | null;
@@ -75,6 +76,7 @@
 
 	let {
 		caseId,
+		evidenceThumbnails = {},
 		initialSnapshot = null,
 		readonly = false,
 		activeTool = 'select',
@@ -475,6 +477,34 @@
 		for (const n of nodes) {
 			const isSelected = selected.has(n.id);
 			const isHovered = hoveredId === n.id;
+
+			// Marker: numbered pin with optional label, not a card
+			if (n.kind === 'marker') {
+				const r = (n.w / 2);
+				const cx = n.x + r;
+				const cy = n.y + r;
+				ctx.beginPath();
+				ctx.arc(cx, cy, r, 0, Math.PI * 2);
+				ctx.fillStyle = 'rgba(234, 179, 8, 0.92)';
+				ctx.fill();
+				ctx.strokeStyle = isSelected ? 'rgba(255,255,255,0.9)' : isHovered ? 'rgba(255,255,255,0.6)' : 'rgba(20,20,20,0.7)';
+				ctx.lineWidth = (isSelected ? 3 : 2) * inv;
+				ctx.stroke();
+				ctx.fillStyle = '#1a1405';
+				ctx.font = `bold ${14 * inv}px system-ui`;
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				ctx.fillText(String(n.body || '?'), cx, cy + 1 * inv);
+				if (n.title) {
+					ctx.font = `600 ${12 * inv}px system-ui`;
+					ctx.textAlign = 'left';
+					ctx.fillStyle = 'rgba(255,255,255,0.85)';
+					ctx.fillText(n.title, n.x + n.w + 6 * inv, cy);
+				}
+				ctx.textAlign = 'start';
+				ctx.textBaseline = 'alphabetic';
+				continue;
+			}
 			const isConnectionSource = connectionSourceId === n.id;
 
 			ctx.beginPath();
@@ -509,6 +539,7 @@
 
 			// Media content area (thumbnail, waveform, or play button)
 			if (n.kind === 'evidence') {
+				const thumbnailUrl = n.thumbnailUrl ?? (n.evidenceId ? evidenceThumbnails[n.evidenceId] : undefined);
 				const contentX = n.x + 10 * inv;
 				const contentY = n.y + 38 * inv;
 				const contentW = n.w - 20 * inv;
@@ -527,8 +558,8 @@
 					if (typeof ctx.roundRect === 'function') ctx.roundRect(contentX, contentY, contentW, contentH, 6 * inv);
 					else ctx.rect(contentX, contentY, contentW, contentH);
 					ctx.fill();
-					if (n.thumbnailUrl) {
-						const img = loadImage(n.thumbnailUrl);
+					if (thumbnailUrl) {
+						const img = loadImage(thumbnailUrl);
 						if (img) {
 							ctx.save();
 							ctx.beginPath();
@@ -543,9 +574,9 @@
 						}
 					}
 					drawPlayButton(ctx, n.x + n.w / 2, contentY + contentH / 2, 18 * inv, inv, false);
-				} else if (n.thumbnailUrl) {
+				} else if (thumbnailUrl) {
 					// Image/PDF thumbnail with aspect-ratio-preserving draw
-					const img = loadImage(n.thumbnailUrl);
+					const img = loadImage(thumbnailUrl);
 					if (img) {
 						ctx.save();
 						ctx.beginPath();
@@ -618,7 +649,7 @@
 		if (isPanning || spaceDown) return 'grab';
 		if (isMarqueeSelecting) return 'crosshair';
 		if (activeTool === 'connection') return connectionSourceId ? 'crosshair' : 'cell';
-		if (activeTool === 'note') return 'cell';
+		if (activeTool === 'note' || activeTool === 'marker') return 'cell';
 		if (activeTool === 'evidence') return 'copy';
 		if (hoveredId) return 'pointer';
 		return 'default';
@@ -862,6 +893,15 @@
 		return nodeId;
 	}
 
+	/** Numbered marker pin. `body` holds the display number so renumbering is a plain update. */
+	export function addMarker(x: number, y: number, label?: string): string {
+		const nodeId = `marker_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+		const next = nodes.filter((n) => n.kind === 'marker').length + 1;
+		nodes.push({ id: nodeId, kind: 'marker', x: snap(x), y: snap(y), w: 32, h: 32, title: label ?? '', body: String(next) });
+		setDirty(true); scheduleDraw();
+		return nodeId;
+	}
+
 	export function updateNodeBody(nodeId: string, body: string) {
 		nodes = nodes.map(n => n.id === nodeId ? { ...n, body } : n);
 		setDirty(true);
@@ -872,9 +912,9 @@
 		setDirty(true);
 	}
 
-	export function addEvidenceNode(evidenceId: string, title: string, x: number, y: number, fileType?: string) {
+	export function addEvidenceNode(evidenceId: string, title: string, x: number, y: number, fileType?: string, thumbnailUrl?: string) {
 		const nodeId = `ev_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-		nodes.push({ id: nodeId, kind: 'evidence', x: snap(x), y: snap(y), w: 280, h: 160, title, evidenceId, fileType, body: '' });
+		nodes.push({ id: nodeId, kind: 'evidence', x: snap(x), y: snap(y), w: 280, h: 160, title, evidenceId, fileType, thumbnailUrl, body: '' });
 		setDirty(true); scheduleDraw();
 		return nodeId;
 	}
@@ -944,6 +984,19 @@
 	/** Finds an existing node by evidenceId (useful for detecting duplicates). */
 	export function findNodeByEvidenceId(evidenceId: string): BoardNode | null {
 		return nodes.find((n) => n.evidenceId === evidenceId) ?? null;
+	}
+
+	/** Zoom about the visible centre by `factor`, clamped to the same 0.1-2 range as zoom-to-fit. */
+	export function zoomBy(factor: number) {
+		if (!canvasEl) return;
+		const cw = canvasEl.clientWidth, ch = canvasEl.clientHeight;
+		const z = viewport.zoom;
+		const nz = Math.max(0.1, Math.min(2, z * factor));
+		if (nz === z) return;
+		const wx = cw / (2 * z) - viewport.pan.x;
+		const wy = ch / (2 * z) - viewport.pan.y;
+		viewport = { zoom: nz, pan: { x: cw / (2 * nz) - wx, y: ch / (2 * nz) - wy } };
+		scheduleDraw();
 	}
 
 	export function zoomToFit() {
@@ -1159,6 +1212,10 @@
 		{:else if activeTool === 'note'}
 			<div class="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-none px-3 py-1 rounded-full bg-black/60 text-white/70 text-xs font-mono">
 				Click canvas to place a note
+			</div>
+		{:else if activeTool === 'marker'}
+			<div class="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-none px-3 py-1 rounded-full bg-black/60 text-white/70 text-xs font-mono">
+				Click canvas to drop a numbered marker
 			</div>
 		{:else if activeTool === 'evidence'}
 			<div class="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-none px-3 py-1 rounded-full bg-black/60 text-white/70 text-xs font-mono">

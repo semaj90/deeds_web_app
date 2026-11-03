@@ -29,9 +29,9 @@ function parseByteRange(header: string | null, size: number): { start: number; e
 function extractObjectKey(fileUrl: string): { bucket: string; key: string } | null {
   if (!fileUrl) return null;
 
-  // minio://bucket-name/path/to/file.pdf
-  if (fileUrl.startsWith('minio://')) {
-    const rest = fileUrl.slice('minio://'.length);
+  // seaweed://bucket-name/path/to/file.pdf (legacy minio:// rows share the same layout)
+  if (fileUrl.startsWith('seaweed://') || fileUrl.startsWith('minio://')) {
+    const rest = fileUrl.slice(fileUrl.indexOf('://') + 3);
     const slashIdx = rest.indexOf('/');
     if (slashIdx === -1) return null;
     return { bucket: rest.slice(0, slashIdx), key: rest.slice(slashIdx + 1) };
@@ -175,14 +175,29 @@ export const GET: RequestHandler = async ({ params, locals, url, request }) => {
     // Convert Node readable stream to Web ReadableStream
     const webStream = new ReadableStream({
       start(controller) {
+        // Node emits stream events outside any try block. If the client disconnects,
+        // enqueue/close/error throw ERR_INVALID_STATE there and crash the whole process,
+        // so every controller call is guarded and the source is torn down once closed.
+        let closed = false;
+        const finish = () => { closed = true; };
         stream.on('data', (chunk: Buffer) => {
-          controller.enqueue(new Uint8Array(chunk));
+          if (closed) return;
+          try {
+            controller.enqueue(new Uint8Array(chunk));
+          } catch {
+            finish();
+            stream.destroy();
+          }
         });
         stream.on('end', () => {
-          controller.close();
+          if (closed) return;
+          finish();
+          try { controller.close(); } catch { /* already closed by the client */ }
         });
         stream.on('error', (err: Error) => {
-          controller.error(err);
+          if (closed) return;
+          finish();
+          try { controller.error(err); } catch { /* already closed by the client */ }
         });
       },
       cancel() {

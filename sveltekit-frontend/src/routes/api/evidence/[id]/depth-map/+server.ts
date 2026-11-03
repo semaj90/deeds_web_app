@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import { createHash } from 'node:crypto';
 import type { RequestHandler } from './$types';
 import { and, eq, or } from 'drizzle-orm';
 import { db } from '$lib/server/db/client';
@@ -8,6 +9,17 @@ import { isUuid } from '$lib/server/validation.js';
 
 const MAX_DEPTH_BYTES = 32 * 1024 * 1024;
 const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+
+function parseDepthArtifactLocation(value: unknown): { bucket: string; key: string } | null {
+	if (typeof value !== 'string') return null;
+	const separator = value.indexOf('://');
+	if (separator < 0) return null;
+	const scheme = value.slice(0, separator);
+	if (scheme !== 'seaweed' && scheme !== 'minio') return null;
+	const [bucket, ...keyParts] = value.slice(separator + 3).split('/');
+	const key = keyParts.join('/');
+	return bucket && key ? { bucket, key } : null;
+}
 
 export const GET: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -56,18 +68,42 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		}
 
 		const storedUrl = depthAnalysis.depthMapUrl;
-		if (typeof storedUrl !== 'string' || !storedUrl.startsWith('minio://')) {
+		const artifactLocation = parseDepthArtifactLocation(storedUrl);
+		if (!artifactLocation) {
 			return json({ error: 'Depth map location is invalid' }, { status: 404 });
 		}
-		const [bucket, ...keyParts] = storedUrl.slice('minio://'.length).split('/');
-		const key = keyParts.join('/');
-		const expectedKey = `evidence/${item.caseId ?? 'default'}/${item.id}-depth.png`;
+		const { bucket, key } = artifactLocation;
+
+		const recordedSha = depthAnalysis.depthSha256;
+		if (recordedSha === undefined || recordedSha === null) {
+			return json({ error: 'A verified depth map is unavailable' }, { status: 404 });
+		}
+		if (typeof recordedSha !== 'string' || !/^[a-f0-9]{64}$/.test(recordedSha)) {
+			return json({ error: 'Depth map digest record is invalid' }, { status: 422 });
+		}
+		// Digest-keyed objects are immutable: a regenerated depth map gets a new key.
+		const expectedKey = `evidence/${item.caseId ?? 'default'}/${item.id}-depth-${recordedSha}.png`;
 		if (!bucket || key !== expectedKey) return json({ error: 'Depth map binding is invalid' }, { status: 404 });
+		const expectedWidth = depthAnalysis.width;
+		const expectedHeight = depthAnalysis.height;
+		if (typeof expectedWidth !== 'number' || !Number.isInteger(expectedWidth) || expectedWidth <= 0 ||
+			typeof expectedHeight !== 'number' || !Number.isInteger(expectedHeight) || expectedHeight <= 0) {
+			return json({ error: 'Depth map dimensions are invalid' }, { status: 422 });
+		}
 
 		const bytes = await getSeaweedFile(bucket, key);
 		if (bytes.length > MAX_DEPTH_BYTES) return json({ error: 'Depth map too large' }, { status: 413 });
-		if (bytes.length < PNG_SIGNATURE.length || !bytes.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE)) {
+		if (bytes.length < 24 || !bytes.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE) || bytes.toString('ascii', 12, 16) !== 'IHDR') {
 			return json({ error: 'Depth map is not a valid PNG' }, { status: 422 });
+		}
+		const actualWidth = bytes.readUInt32BE(16);
+		const actualHeight = bytes.readUInt32BE(20);
+		if (actualWidth !== expectedWidth || actualHeight !== expectedHeight) {
+			return json({ error: 'Depth map dimensions do not match its manifest' }, { status: 422 });
+		}
+		const actualSha = createHash('sha256').update(bytes).digest('hex');
+		if (actualSha !== recordedSha) {
+			return json({ error: 'Depth map failed digest verification' }, { status: 422 });
 		}
 
 		return new Response(new Uint8Array(bytes), {
@@ -75,6 +111,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				'Content-Type': 'image/png',
 				'Cache-Control': 'private, no-store',
 				'X-Content-Type-Options': 'nosniff',
+				'X-Depth-Verification': 'sha256-verified',
 			},
 		});
 	} catch (cause) {

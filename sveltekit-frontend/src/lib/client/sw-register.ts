@@ -27,7 +27,7 @@ function isVscodeWebviewContext(): boolean {
 }
 
 export async function registerServiceWorker() {
-	if (!browser || !('serviceWorker' in navigator)) return;
+	if (!browser || !('serviceWorker' in navigator) || typeof navigator.serviceWorker?.register !== 'function') return;
 	if (isVscodeWebviewContext()) {
 		console.info('SW: Skipping registration in VS Code webview context.');
 		return;
@@ -37,6 +37,7 @@ export async function registerServiceWorker() {
 		const registration = await navigator.serviceWorker.register('/sw.js', {
 			scope: '/'
 		});
+		if (!registration) return;
 		console.log('SW: Registered with scope:', registration.scope);
 
 		// Handle updates — Phase D (2026-05-10): also broadcast `sw:update-available`

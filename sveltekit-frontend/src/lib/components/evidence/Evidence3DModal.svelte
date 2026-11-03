@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { Dialog } from 'bits-ui';
-	import { browser } from '$app/environment';
-	import * as THREE from 'three';
-	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+	import DepthReliefViewer, { type DepthSourceMode, type AnnotationScreenPositions } from './DepthReliefViewer.svelte';
 	import { analyzeStoredEvidenceImage, requestEvidenceUpscale } from './evidence-image-tools.js';
-	import { buildReliefGrid, heightAt, resampleDepth, sampleDepthGrid, type ReliefGrid } from './relief-grid.js';
 
 	let {
 		open = $bindable(false),
@@ -24,18 +21,13 @@
 	const effectiveUrl = $derived(upscaledUrl ?? imageUrl);
 	type EvidenceMarker = { id: string; number: number; x: number; y: number; label: string; note: string };
 	let toolMode = $state<'orbit' | 'marker'>('orbit');
+	let markerMotion = $state(true);
 	let markers = $state<EvidenceMarker[]>([]);
 	let selectedMarkerId = $state<string | null>(null);
 	let markerScreenPositions = $state<Record<string, { left: number; top: number }>>({});
-	let clearScenePins: (() => void) | null = null;
-	let applySelectedMarker: ((id: string | null) => void) | null = null;
-	let applyToolMode: ((mode: 'orbit' | 'marker') => void) | null = null;
-	let placeSceneMarker: ((clientX: number, clientY: number) => void) | null = null;
-	let moveScenePin: ((id: string, clientX: number, clientY: number) => void) | null = null;
 	let draggingMarkerId = $state<string | null>(null);
 	// What the relief is actually built from. Never describe a brightness guess as stored depth.
-	type DepthMode = 'STORED_MONOCULAR_DEPTH' | 'BRIGHTNESS_PREVIEW' | 'DEPTH_UNAVAILABLE';
-	let depthMode = $state<DepthMode>('DEPTH_UNAVAILABLE');
+	let depthMode = $state<DepthSourceMode>('DEPTH_UNAVAILABLE');
 	const depthLabel = $derived(
 		depthMode === 'STORED_MONOCULAR_DEPTH'
 			? 'Relief from a stored monocular depth estimate bound to this source file. Derived 2.5D, not a measurement.'
@@ -43,7 +35,6 @@
 				? 'Preview only: depth is guessed from image brightness, not stored or measured. Treat it as a visual aid.'
 				: 'Depth unavailable; the image is shown flat.'
 	);
-	let webglFailed = $state(false);
 	// Bumped on close/reset so a late analyze/upscale response cannot land in a closed or different viewer.
 	let actionToken = 0;
 	const selectedMarker = $derived(markers.find((marker) => marker.id === selectedMarkerId) ?? null);
@@ -74,7 +65,6 @@
 		markers = markers.filter((marker) => marker.id !== id);
 		if (selectedMarkerId === id) selectedMarkerId = markers.at(-1)?.id ?? null;
 		markerScreenPositions = Object.fromEntries(Object.entries(markerScreenPositions).filter(([markerId]) => markerId !== id));
-		removeScenePin?.(id);
 	}
 
 	/** Undo the most recent marker (history-style), distinct from removing a selected one. */
@@ -83,13 +73,10 @@
 		if (last) removeMarker(last.id);
 	}
 
-	let removeScenePin: ((id: string) => void) | null = null;
-
 	function clearMarkers() {
 		markers = [];
 		selectedMarkerId = null;
 		markerScreenPositions = {};
-		clearScenePins?.();
 	}
 
 	function chooseMarkerTool(mode: 'orbit' | 'marker') {
@@ -104,25 +91,33 @@
 		(event.currentTarget as HTMLButtonElement).setPointerCapture(event.pointerId);
 	}
 
-	function dragMarker(event: PointerEvent) {
-		if (!draggingMarkerId) return;
-		event.preventDefault();
-		moveScenePin?.(draggingMarkerId, event.clientX, event.clientY);
-	}
-
 	function stopMarkerDrag() {
 		draggingMarkerId = null;
 	}
 
-	function handleStageClick(event: MouseEvent) {
-		if (toolMode !== 'marker' || event.button !== 0) return;
-		event.preventDefault();
-		placeSceneMarker?.(event.clientX, event.clientY);
+	function handleDepthSource(mode: DepthSourceMode) {
+		depthMode = mode;
+	}
+
+	function handleViewerLoadState(state: 'loading' | 'ready' | 'error') {
+		status = state;
+	}
+
+	function handleViewerShortcut(key: 'marker' | 'orbit' | 'delete' | 'deselect') {
+		if (key === 'marker') chooseMarkerTool('marker');
+		else if (key === 'orbit') chooseMarkerTool('orbit');
+		else if (key === 'delete' && selectedMarkerId) removeMarker(selectedMarkerId);
+		else if (key === 'deselect') selectedMarkerId = null;
+	}
+
+	function handleMarkerMove(id: string, x: number, y: number) {
+		markers = markers.map((marker) => marker.id === id ? { ...marker, x, y } : marker);
 	}
 
 	function resetResults() {
 		actionToken++;
 		depthMode = 'DEPTH_UNAVAILABLE';
+		status = 'idle';
 		if (upscaledUrl) URL.revokeObjectURL(upscaledUrl);
 		upscaledUrl = null;
 		upscaleInfo = '';
@@ -174,356 +169,47 @@
 		}
 	}
 
-	let host = $state<HTMLDivElement | null>(null);
 	let depthScale = $state(0.35);
 	let wire = $state(false);
 	let status = $state<'idle' | 'loading' | 'ready' | 'error'>('idle');
-	let note = $state('');
-
-	// Handles updated live without rebuilding the scene.
-	let applyScale: ((v: number) => void) | null = null;
-	let applyWire: ((v: boolean) => void) | null = null;
-
-	$effect(() => applyScale?.(depthScale));
-	$effect(() => applyWire?.(wire));
-	$effect(() => applySelectedMarker?.(selectedMarkerId));
-	$effect(() => applyToolMode?.(toolMode));
-
-	/** Smooth pseudo-depth from luminance. Heavy blur keeps it a surface, not noise. */
-	function buildDepth(img: HTMLImageElement): HTMLCanvasElement {
-		const w = 256;
-		const h = Math.max(16, Math.round((256 * img.naturalHeight) / img.naturalWidth));
-		const c = document.createElement('canvas');
-		c.width = w;
-		c.height = h;
-		const ctx = c.getContext('2d')!;
-		ctx.filter = 'grayscale(1) blur(6px) contrast(1.15)';
-		ctx.drawImage(img, 0, 0, w, h);
-		ctx.filter = 'none';
-		// Gentle radial falloff so edges recede and the subject reads as a relief.
-		const g = ctx.createRadialGradient(w / 2, h / 2, h * 0.2, w / 2, h / 2, w * 0.75);
-		g.addColorStop(0, 'rgba(255,255,255,0.18)');
-		g.addColorStop(1, 'rgba(0,0,0,0.45)');
-		ctx.globalCompositeOperation = 'overlay';
-		ctx.fillStyle = g;
-		ctx.fillRect(0, 0, w, h);
-		return c;
-	}
-
-	function loadImage(url: string): Promise<HTMLImageElement> {
-		return new Promise((resolve, reject) => {
-			const img = new Image();
-			img.crossOrigin = 'anonymous';
-			img.onload = () => resolve(img);
-			img.onerror = () => reject(new Error('image load failed'));
-			img.src = url;
-		});
-	}
-
-	$effect(() => {
-		if (!browser || !open || !host || !effectiveUrl) return;
-		const el = host;
-		const url = effectiveUrl;
-		let disposed = false;
-		let raf = 0;
-		status = 'loading';
-		note = '';
-
-		let renderer: THREE.WebGLRenderer;
-		try {
-			renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-		} catch {
-			webglFailed = true;
-			status = 'error';
-			note = 'WebGL is unavailable; showing the flat evidence image instead.';
-			return;
-		}
-		webglFailed = false;
-		renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-		el.appendChild(renderer.domElement);
-		const onContextLost = (event: Event) => {
-			event.preventDefault();
-			if (disposed) return;
-			webglFailed = true;
-			status = 'error';
-			note = 'The GPU context was lost; close and reopen the viewer.';
-		};
-		renderer.domElement.addEventListener('webglcontextlost', onContextLost);
-		let surface: { mesh: THREE.Mesh; grid: ReliefGrid; W: number; H: number } | null = null;
-		let currentScale = 0;
-		/** World position of a marker: ON the displaced surface at image coords (u,v), nudged out along +z. */
-		function pinWorldPosition(u: number, v: number): THREE.Vector3 {
-			if (!surface) return new THREE.Vector3();
-			const z = heightAt(surface.grid, u, v, currentScale) + 0.02;
-			return surface.mesh.localToWorld(new THREE.Vector3((u - 0.5) * surface.W, (0.5 - v) * surface.H, z));
-		}
-		const scene = new THREE.Scene();
-		const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 50);
-		camera.position.set(0, 0, 3.2);
-
-		const controls = new OrbitControls(camera, renderer.domElement);
-		controls.enableDamping = true;
-		controls.enablePan = false;
-		controls.minDistance = 1.8;
-		controls.maxDistance = 5;
-		controls.minPolarAngle = Math.PI * 0.3;
-		controls.maxPolarAngle = Math.PI * 0.7;
-		controls.minAzimuthAngle = -Math.PI * 0.35;
-		controls.maxAzimuthAngle = Math.PI * 0.35;
-		const disposables: { dispose(): void }[] = [renderer, controls];
-		applyToolMode = (mode) => {
-			controls.enabled = mode === 'orbit';
-			renderer.domElement.style.cursor = mode === 'marker' ? 'crosshair' : 'grab';
-		};
-		applyToolMode(toolMode);
-
-		const raycaster = new THREE.Raycaster();
-		const pointer = new THREE.Vector2();
-		const pinGeometry = new THREE.TorusGeometry(0.04, 0.006, 8, 28);
-		const pinDotGeometry = new THREE.SphereGeometry(0.012, 12, 8);
-		const pinGroups = new Map<string, { group: THREE.Group; ring: THREE.Mesh; ringMaterial: THREE.MeshBasicMaterial; u: number; v: number }>();
-		const goldPinMaterial = new THREE.MeshBasicMaterial({ color: 0xc59e2b, transparent: true, opacity: 0.95, depthTest: false });
-		const dotMaterial = new THREE.MeshBasicMaterial({ color: 0xfff6df, depthTest: false });
-		disposables.push(pinGeometry, pinDotGeometry, goldPinMaterial, dotMaterial);
-
-		function createPin(marker: EvidenceMarker, mesh: THREE.Mesh, width: number, height: number) {
-			if (pinGroups.has(marker.id)) return;
-			const group = new THREE.Group();
-			const ringMaterial = goldPinMaterial.clone();
-			const ring = new THREE.Mesh(pinGeometry, ringMaterial);
-			ring.renderOrder = 10;
-			if (marker.id === selectedMarkerId) {
-				ringMaterial.color.set(0x7ee7ff);
-				ring.scale.setScalar(1.2);
-			}
-			const dot = new THREE.Mesh(pinDotGeometry, dotMaterial);
-			dot.renderOrder = 11;
-			group.add(ring, dot);
-			group.position.copy(pinWorldPosition(marker.x, marker.y));
-			scene.add(group);
-			pinGroups.set(marker.id, { group, ring, ringMaterial, u: marker.x, v: marker.y });
-		}
-		clearScenePins = () => {
-			for (const { group, ringMaterial } of pinGroups.values()) {
-				scene.remove(group);
-				ringMaterial.dispose();
-			}
-			pinGroups.clear();
-		};
-		removeScenePin = (id) => {
-			const pin = pinGroups.get(id);
-			if (!pin) return;
-			scene.remove(pin.group);
-			pin.ringMaterial.dispose();
-			pinGroups.delete(id);
-		};
-		applySelectedMarker = (id) => {
-			for (const [markerId, pin] of pinGroups) {
-				pin.ringMaterial.color.set(markerId === id ? 0x7ee7ff : 0xc59e2b);
-				pin.ring.scale.setScalar(markerId === id ? 1.2 : 1);
-			}
-		};
-
-		scene.add(new THREE.HemisphereLight(0xffffff, 0x223344, 1.1));
-		const key = new THREE.DirectionalLight(0xfff2dd, 1.6);
-		key.position.set(-2, 2.5, 3);
-		scene.add(key);
-
-		function resize() {
-			const w = el.clientWidth || 1;
-			const h = el.clientHeight || 1;
-			renderer.setSize(w, h, false);
-			camera.aspect = w / h;
-			camera.updateProjectionMatrix();
-		}
-		const ro = new ResizeObserver(resize);
-		ro.observe(el);
-		resize();
-
-		(async () => {
-			try {
-				const img = await loadImage(url);
-				if (disposed) return;
-				const aspect = img.naturalWidth / img.naturalHeight;
-				const W = aspect >= 1 ? 2 : 2 * aspect;
-				const H = aspect >= 1 ? 2 / aspect : 2;
-
-				const tex = new THREE.Texture(img);
-				tex.colorSpace = THREE.SRGBColorSpace;
-				tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-				tex.needsUpdate = true;
-
-				const cols = 160;
-				const rows = Math.max(2, Math.round(cols / aspect));
-				let samples: Float32Array | null = null;
-				let mode: DepthMode = 'DEPTH_UNAVAILABLE';
-				if (depthUrl) {
-					try {
-						const sourceBoundDepth = await loadImage(depthUrl);
-						if (disposed) { tex.dispose(); return; }
-						const depthAspect = sourceBoundDepth.naturalWidth / sourceBoundDepth.naturalHeight;
-						if (Math.abs(depthAspect - aspect) > 0.015) throw new Error('Depth map aspect does not match source image');
-						samples = sampleDepthGrid(sourceBoundDepth, cols, rows);
-						mode = 'STORED_MONOCULAR_DEPTH';
-						note = 'Source-revision-bound monocular depth · derived 2.5D, not measured 3D.';
-					} catch {
-						note = 'Source-bound depth map unavailable; showing estimated visual relief.';
-					}
-				}
-				if (disposed) { tex.dispose(); return; }
-				if (!samples) {
-					if (!depthUrl) note = 'No source-bound depth map; relief is estimated from image brightness.';
-					try {
-						samples = sampleDepthGrid(buildDepth(img), cols, rows);
-						mode = 'BRIGHTNESS_PREVIEW';
-					} catch {
-						note = 'Pixel access unavailable; depth relief is disabled.';
-					}
-				}
-				depthMode = mode;
-				const flat = !samples;
-				const fineDepth = samples ?? new Float32Array((cols + 1) * (rows + 1)).fill(0.5);
-				currentScale = flat ? 0 : depthScale;
-
-				// One CPU-displaced geometry is rendered, lit AND raycast, so markers/picking match the visible surface.
-				const grid = buildReliefGrid(W, H, cols, rows, fineDepth);
-				grid.apply(currentScale);
-				const mat = new THREE.MeshStandardMaterial({
-					map: tex,
-					roughness: 0.85,
-					metalness: 0.0,
-					side: THREE.DoubleSide
-				});
-				const mesh = new THREE.Mesh(grid.geometry, mat);
-				scene.add(mesh);
-				surface = { mesh, grid, W, H };
-				for (const marker of markers) createPin(marker, mesh, W, H);
-				placeSceneMarker = (clientX, clientY) => {
-					const rect = renderer.domElement.getBoundingClientRect();
-					pointer.set(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
-					raycaster.setFromCamera(pointer, camera);
-					const hit = raycaster.intersectObject(mesh, false)[0];
-					if (!hit) return;
-					const local = mesh.worldToLocal(hit.point.clone());
-					const x = THREE.MathUtils.clamp(local.x / W + 0.5, 0, 1);
-					const y = THREE.MathUtils.clamp(0.5 - local.y / H, 0, 1);
-					addMarker(x, y, (marker) => createPin(marker, mesh, W, H));
-				};
-				moveScenePin = (id, clientX, clientY) => {
-					const rect = renderer.domElement.getBoundingClientRect();
-					pointer.set(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
-					raycaster.setFromCamera(pointer, camera);
-					const hit = raycaster.intersectObject(mesh, false)[0];
-					if (!hit) return;
-					const local = mesh.worldToLocal(hit.point.clone());
-					const x = THREE.MathUtils.clamp(local.x / W + 0.5, 0, 1);
-					const y = THREE.MathUtils.clamp(0.5 - local.y / H, 0, 1);
-					markers = markers.map((marker) => marker.id === id ? { ...marker, x, y } : marker);
-					const pin = pinGroups.get(id);
-					if (pin) { pin.u = x; pin.v = y; pin.group.position.copy(pinWorldPosition(x, y)); }
-				};
-
-				// Thin coarse wireframe overlay (lines, not dots) displaced by the same map.
-				const wcols = 18;
-				const wrows = Math.max(2, Math.round(wcols / aspect));
-				const wgrid = buildReliefGrid(W, H, wcols, wrows, resampleDepth(fineDepth, cols, rows, wcols, wrows), 0.004);
-				wgrid.apply(currentScale);
-				const wmat = new THREE.MeshStandardMaterial({
-					color: 0x000000,
-					emissive: 0xe8f4ff,
-					wireframe: true,
-					transparent: true,
-					opacity: 0.22
-				});
-				const wmesh = new THREE.Mesh(wgrid.geometry, wmat);
-				wmesh.visible = wire;
-				scene.add(wmesh);
-
-				disposables.push(grid.geometry, mat, wgrid.geometry, wmat, tex);
-
-				applyScale = (v) => {
-					currentScale = flat ? 0 : v;
-					grid.apply(currentScale);
-					wgrid.apply(currentScale);
-					for (const pin of pinGroups.values()) pin.group.position.copy(pinWorldPosition(pin.u, pin.v));
-				};
-				applyWire = (v) => (wmesh.visible = v);
-				status = 'ready';
-
-				let screenUpdateTick = 0;
-				const tick = () => {
-					if (disposed) return;
-					controls.update();
-					renderer.render(scene, camera);
-					if (pinGroups.size && ++screenUpdateTick % 2 === 0) {
-						const positions: Record<string, { left: number; top: number }> = {};
-						for (const [id, pin] of pinGroups) {
-							const projected = pin.group.position.clone().project(camera);
-							if (projected.z >= -1 && projected.z <= 1) {
-								positions[id] = { left: ((projected.x + 1) / 2) * 100, top: ((1 - projected.y) / 2) * 100 };
-							}
-						}
-						markerScreenPositions = positions;
-					}
-					raf = requestAnimationFrame(tick);
-				};
-				tick();
-			} catch {
-				if (!disposed) status = 'error';
-			}
-		})();
-
-		return () => {
-			disposed = true;
-			cancelAnimationFrame(raf);
-			renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
-			ro.disconnect();
-			applyScale = null;
-			applyWire = null;
-			clearScenePins?.();
-			clearScenePins = null;
-			removeScenePin = null;
-			applySelectedMarker = null;
-			applyToolMode = null;
-			placeSceneMarker = null;
-			moveScenePin = null;
-			disposables.forEach((d) => d.dispose());
-			renderer.domElement.remove();
-			status = 'idle';
-		};
-	});
 </script>
 
 {#snippet reliefWorkspace()}
 			<div class="e3d-annotation-bar" role="toolbar" aria-label="Image annotation tools">
-				<button class="e3d-btn" class:active={toolMode === 'orbit'} aria-pressed={toolMode === 'orbit'} onclick={() => chooseMarkerTool('orbit')}>Orbit image</button>
-				<button class="e3d-btn" class:active={toolMode === 'marker'} aria-pressed={toolMode === 'marker'} onclick={() => chooseMarkerTool('marker')}>Place marker</button>
-				<span class="e3d-marker-count">{markers.length} markers · temporary</span>
-				<button class="e3d-btn" disabled={markers.length === 0} onclick={undoMarker}>Undo marker</button>
-				<button class="e3d-btn" disabled={markers.length === 0} onclick={clearMarkers}>Clear all</button>
-			</div>
-			{#if toolMode === 'marker'}<p class="e3d-instruction" aria-live="polite">Click the image to place a source marker.</p>{/if}
-			{#if selectedMarker}
-				<div class="e3d-marker-editor" aria-label="Selected marker details">
-					<label>Marker {selectedMarker.number}<input aria-label="Marker label" value={selectedMarker.label} oninput={(event) => updateSelectedMarker('label', (event.currentTarget as HTMLInputElement).value)} /></label>
-					<label>Note<input aria-label="Marker note" value={selectedMarker.note} oninput={(event) => updateSelectedMarker('note', (event.currentTarget as HTMLInputElement).value)} /></label>
-					<button class="e3d-btn" data-testid="e3d-remove-marker" onclick={() => removeMarker(selectedMarker.id)}>Remove</button>
+				<div class="e3d-tool-group" aria-label="Canvas tools">
+					<button class="e3d-btn" aria-label="Orbit" class:active={toolMode === 'orbit'} aria-pressed={toolMode === 'orbit'} title="Orbit and inspect the relief (O)" onclick={() => chooseMarkerTool('orbit')}>Orbit <kbd aria-hidden="true">O</kbd></button>
+					<button class="e3d-btn" aria-label="Place marker" class:active={toolMode === 'marker'} aria-pressed={toolMode === 'marker'} title="Place a pin on the relief (M)" onclick={() => chooseMarkerTool('marker')}>＋ Place marker <kbd aria-hidden="true">M</kbd></button>
 				</div>
-			{/if}
-
-			<div class="e3d-stage" bind:this={host} data-status={status} onclick={handleStageClick}>
+				<span class="e3d-marker-count" aria-live="polite"><span class="e3d-count-dot"></span>{markers.length} {markers.length === 1 ? 'marker' : 'markers'} <span>· temporary</span></span>
+				<div class="e3d-tool-group" aria-label="Marker history">
+					<button class="e3d-btn" disabled={markers.length === 0} title="Remove the most recently placed pin" onclick={undoMarker}>Undo</button>
+					<button class="e3d-btn" disabled={markers.length === 0} title="Clear all temporary pins" onclick={clearMarkers}>Clear pins</button>
+				</div>
+				<button class="e3d-btn e3d-motion-toggle" aria-label="Animate marker pins" aria-pressed={markerMotion} title="Toggle the marker pulse animation" onclick={() => (markerMotion = !markerMotion)}>
+					{markerMotion ? 'Pin motion on' : 'Pin motion off'}
+				</button>
+				{#if toolMode === 'marker'}<span class="e3d-instruction" aria-live="polite">Click surface to pin · Enter to place · drag a pin to reposition · Del removes selection</span>{/if}
+			</div>
+			<div class="e3d-stage" data-status={status}>
+				{#if selectedMarker}
+					<div class="e3d-marker-editor" aria-label="Selected marker details">
+						<label>Marker {selectedMarker.number}<input aria-label="Marker label" value={selectedMarker.label} oninput={(event) => updateSelectedMarker('label', (event.currentTarget as HTMLInputElement).value)} /></label>
+						<label>Note<input aria-label="Marker note" value={selectedMarker.note} oninput={(event) => updateSelectedMarker('note', (event.currentTarget as HTMLInputElement).value)} /></label>
+						<button class="e3d-btn" data-testid="e3d-remove-marker" onclick={() => removeMarker(selectedMarker.id)}>Remove</button>
+					</div>
+				{/if}
 				<div class="e3d-marker-overlay" aria-label="Image source markers">
 					{#each markers as marker (marker.id)}
 						{#if markerScreenPositions[marker.id]}
 							<button
 								class="e3d-pin-label"
 								class:selected={selectedMarkerId === marker.id}
+								class:motion-disabled={!markerMotion}
 								style={`left:${markerScreenPositions[marker.id].left}%;top:${markerScreenPositions[marker.id].top}%;`}
 								aria-label={`Select ${marker.label || `Marker ${marker.number}`}`}
 								aria-pressed={selectedMarkerId === marker.id}
 				title={`${marker.note || marker.label} · drag to reposition`}
 				onpointerdown={(event) => startMarkerDrag(event, marker.id)}
-				onpointermove={dragMarker}
 				onpointerup={stopMarkerDrag}
 				onpointercancel={stopMarkerDrag}
 								onclick={() => (selectedMarkerId = marker.id)}
@@ -531,9 +217,27 @@
 						{/if}
 					{/each}
 				</div>
+				{#if effectiveUrl}
+					{#key `${effectiveUrl}:${depthUrl ?? ''}`}
+						<DepthReliefViewer
+							imageUrl={effectiveUrl}
+							{depthUrl}
+							relief={depthScale}
+							wireframe={wire}
+							showToolbar={false}
+							annotations={markers.map(({ id, x, y }) => ({ id, x, y }))}
+							placementEnabled={toolMode === 'marker'}
+							draggingAnnotationId={draggingMarkerId}
+							onDepthSource={handleDepthSource}
+							onLoadState={handleViewerLoadState}
+							onAnnotationPositions={(positions: AnnotationScreenPositions) => (markerScreenPositions = positions)}
+							onPlaceAnnotation={(x: number, y: number) => addMarker(x, y)}
+							onMoveAnnotation={handleMarkerMove}
+							onToolShortcut={handleViewerShortcut}
+						/>
+					{/key}
+				{/if}
 				{#if status === 'loading'}<p class="e3d-msg">Building relief…</p>{/if}
-				{#if webglFailed && effectiveUrl}<img class="e3d-flat" src={effectiveUrl} alt="Evidence (flat view; 3D relief unavailable)" />{/if}
-				{#if status === 'error'}<p class="e3d-msg">{webglFailed ? note : 'Could not load this image.'}</p>{/if}
 			</div>
 
 			<footer class="e3d-foot">
@@ -555,7 +259,6 @@
 						Upscale 4x
 					</button>
 				{/if}
-				{#if note}<span class="e3d-note">{note}</span>{/if}
 			</footer>
 			{#if actionError}<p class="e3d-result e3d-err" data-testid="e3d-error">{actionError}</p>{/if}
 			{#if upscaleInfo}<p class="e3d-result" data-testid="e3d-upscale-info">Upscaled to {upscaleInfo}</p>{/if}
@@ -563,7 +266,7 @@
 		{/snippet}
 
 		{#if embedded}
-			<section class="e3d-content e3d-embedded" role="region" aria-label="Evidence relief workspace">
+			<section class="e3d-content e3d-embedded" aria-label="Evidence relief workspace">
 				<header class="e3d-head">
 					<h2 class="e3d-title">{title}</h2>
 					<p class="e3d-sub">{depthLabel}</p>
@@ -648,17 +351,70 @@
 		position: relative;
 		flex: 1;
 		min-height: 0;
+		overflow: hidden;
 		background: radial-gradient(ellipse at center, #1a2030 0%, #07090e 100%);
 	}
-	.e3d-annotation-bar,
+	.e3d-annotation-bar {
+		position: relative;
+		z-index: 5;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		flex-wrap: wrap;
+		flex: 0 0 auto;
+		min-height: 54px;
+		padding: 8px 14px;
+		border-bottom: 1px solid rgba(212, 199, 163, 0.2);
+		background: linear-gradient(180deg, rgba(31, 36, 47, 0.98), rgba(18, 22, 31, 0.98));
+		box-shadow: 0 5px 18px rgba(0, 0, 0, 0.22);
+	}
+	.e3d-tool-group {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 3px;
+		border: 1px solid rgba(255, 255, 255, 0.09);
+		border-radius: 9px;
+		background: rgba(3, 7, 13, 0.38);
+	}
+	.e3d-annotation-bar .e3d-btn {
+		min-height: 32px;
+		padding: 6px 10px;
+		border-color: transparent;
+		border-radius: 6px;
+		background: transparent;
+		white-space: nowrap;
+	}
+	.e3d-annotation-bar .e3d-btn:hover:not(:disabled) {
+		background: rgba(255, 255, 255, 0.08);
+		border-color: rgba(255, 255, 255, 0.12);
+	}
+	.e3d-annotation-bar .e3d-btn.active {
+		color: #fff4d1;
+		border-color: rgba(232, 194, 92, 0.52);
+		background: linear-gradient(180deg, rgba(154, 116, 33, 0.42), rgba(103, 76, 22, 0.34));
+		box-shadow: inset 0 1px rgba(255, 244, 209, 0.12), 0 1px 5px rgba(0, 0, 0, 0.2);
+	}
+	.e3d-annotation-bar .e3d-tool-group[aria-label="Marker history"] .e3d-btn {
+		color: #c7ccd6;
+	}
+	.e3d-motion-toggle[aria-pressed="true"] { color: #f0d58a; border-color: rgba(212, 181, 104, 0.3); }
+	.e3d-motion-toggle[aria-pressed="false"] { color: #aeb5c2; }
 	.e3d-marker-editor {
+		position: absolute;
+		left: 12px;
+		bottom: 12px;
+		z-index: 4;
 		display: flex;
 		align-items: center;
 		gap: 8px;
 		flex-wrap: wrap;
 		padding: 8px 14px;
-		background: #111722;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		max-width: calc(100% - 24px);
+		border: 1px solid rgba(212, 199, 163, 0.22);
+		border-radius: 10px;
+		background: rgba(10, 15, 24, 0.9);
+		backdrop-filter: blur(12px);
 	}
 	.e3d-annotation-bar .active,
 	.e3d-pin-label.selected {
@@ -670,10 +426,17 @@
 		font-size: 11px;
 		color: #c8b991;
 	}
+	.e3d-marker-count { display: inline-flex; align-items: center; gap: 7px; min-height: 30px; padding: 0 11px; border: 1px solid rgba(212, 199, 163, 0.16); border-radius: 999px; background: rgba(255, 255, 255, 0.045); font-variant-numeric: tabular-nums; }
+	.e3d-marker-count > span:last-child { opacity: 0.65; }
+	.e3d-count-dot { width: 7px; height: 7px; border-radius: 50%; background: #c59e2b; box-shadow: 0 0 9px rgba(197, 158, 43, 0.75); }
+	kbd { display: inline-grid; min-width: 17px; height: 17px; place-items: center; padding: 0 4px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px; background: rgba(0, 0, 0, 0.2); color: #e6d8b7; font: 10px ui-monospace, monospace; }
 	.e3d-instruction {
-		margin: 0;
-		padding: 5px 16px;
-		background: #171d28;
+		margin-left: auto;
+		padding: 6px 10px;
+		border: 1px solid rgba(197, 158, 43, 0.3);
+		border-radius: 7px;
+		background: rgba(197, 158, 43, 0.09);
+		line-height: 1.35;
 	}
 	.e3d-marker-editor {
 		background: #171d28;
@@ -702,22 +465,48 @@
 	}
 	.e3d-pin-label {
 		position: absolute;
-		width: 28px;
-		height: 28px;
-		transform: translate(-50%, -50%);
-		border: 1px solid #f0c85e;
+		width: 34px;
+		height: 34px;
+		transform: translate(-50%, calc(-100% - 14px));
+		border: 1px solid #f4d477;
 		border-radius: 50%;
-		color: #111722;
-		background: #f0c85e;
+		color: #fff8df;
+		background: radial-gradient(circle at 35% 28%, #735829, #241e14 72%);
 		font-size: 12px;
 		font-weight: 700;
 		cursor: pointer;
 		pointer-events: auto;
-		animation: evidence-pin-pulse 2.2s ease-in-out infinite;
+		box-shadow: 0 0 0 3px rgba(240, 200, 94, 0.18), 0 0 18px rgba(240, 200, 94, 0.42), inset 0 0 0 2px rgba(240, 200, 94, 0.28);
+		animation: evidence-pin-pulse 2.4s ease-in-out infinite;
+	}
+	.e3d-pin-label.motion-disabled { animation: none; }
+	.e3d-pin-label::after {
+		content: '';
+		position: absolute;
+		left: 50%;
+		top: 100%;
+		width: 2px;
+		height: 15px;
+		transform: translateX(-50%);
+		background: linear-gradient(#f4d477, rgba(244, 212, 119, 0.18));
+		filter: drop-shadow(0 0 3px rgba(240, 200, 94, 0.7));
+	}
+	.e3d-pin-label::before {
+		content: '';
+		position: absolute;
+		left: 50%;
+		bottom: -19px;
+		width: 8px;
+		height: 8px;
+		transform: translateX(-50%);
+		border: 1px solid rgba(255, 242, 199, 0.95);
+		border-radius: 50%;
+		background: #f4d477;
+		box-shadow: 0 0 9px rgba(240, 200, 94, 0.85);
 	}
 	@keyframes evidence-pin-pulse {
-		0%, 100% { box-shadow: 0 0 0 0 rgba(240, 200, 94, 0.42); }
-		50% { box-shadow: 0 0 0 7px rgba(240, 200, 94, 0); }
+		0%, 100% { box-shadow: 0 0 0 3px rgba(240, 200, 94, 0.18), 0 0 18px rgba(240, 200, 94, 0.32), inset 0 0 0 2px rgba(240, 200, 94, 0.28); }
+		50% { box-shadow: 0 0 0 8px rgba(240, 200, 94, 0), 0 0 22px rgba(240, 200, 94, 0.52), inset 0 0 0 2px rgba(240, 200, 94, 0.4); }
 	}
 	@media (prefers-reduced-motion: reduce) {
 		.e3d-pin-label { animation: none; }
@@ -758,6 +547,19 @@
 		border: 1px solid rgba(255, 255, 255, 0.18);
 		border-radius: 6px;
 		cursor: pointer;
+		transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+	}
+	.e3d-btn:hover:not(:disabled) { background: rgba(197, 158, 43, 0.16); border-color: rgba(212, 199, 163, 0.5); }
+	.e3d-btn:active:not(:disabled) { transform: translateY(1px); }
+	.e3d-btn:focus-visible, .e3d-pin-label:focus-visible { outline: 2px solid #7ee7ff; outline-offset: 2px; }
+	.e3d-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+	@media (max-width: 680px) {
+		.e3d-annotation-bar { gap: 7px; padding: 7px 9px; }
+		.e3d-tool-group { gap: 2px; }
+		.e3d-annotation-bar .e3d-btn { padding-inline: 8px; }
+		.e3d-instruction { flex-basis: 100%; margin-left: 0; }
+		.e3d-marker-count { margin-left: auto; }
+		.e3d-foot { flex-wrap: wrap; gap: 10px; }
 	}
 	.e3d-btn:disabled {
 		opacity: 0.5;
@@ -773,10 +575,5 @@
 	}
 	.e3d-err {
 		color: #ff9b9b;
-	}
-	.e3d-flat { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-	.e3d-note {
-		opacity: 0.55;
-		margin-left: auto;
 	}
 </style>

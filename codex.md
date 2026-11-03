@@ -284,3 +284,11 @@ The `.okf/indexes/feature-intelligence.yaml` policy defines PostgreSQL authority
 ## Production hardening: service-lifecycle gates (2026-11-01)
 
 - Service lifecycle is human-only until `ops.*` auth is real: no MCP/TRACE tool may stop/start/restart `:8090`, Ollama, Docker or any datastore (`requireToken` accepts any non-empty string). Agents may add read-only status tools or write a request record for a human. Embedding seed/backfill scripts must fail closed (no placeholder/hash vectors); normalize `OLLAMA_HOST=0.0.0.0` to `127.0.0.1:11434`. Full rule: `CLAUDE.md` § Production hardening.
+
+## svelte-check upgrade and fast-check lanes (2026-11-03)
+
+- `sveltekit-frontend` `svelte-check` upgraded 4.3.4 → 4.7.8; it now supports `--incremental` (disk cache of svelte2tsx output in `.svelte-kit`/`.svelte-check`) and `--tsgo`. 4.3.4 had neither flag.
+- Lanes: `npm run check` stays the authoritative full gate. `npm run check:fast` (`svelte-check --incremental`, ~62 s warm / 344 s cold, covers `.svelte`, 0 errors) is the default smoke lane; `tsgo --noEmit` (`typecheck:native`, ~67 s) is TS/JS only in `scripts/verify/smoke-validation.mjs`; set `SMOKE_FULL_CHECK=1` for the full `svelte-check` (480 s timeout). Receipt lane values: `FAST_CHECK_PASSED` / `FULL_CHECK_PASSED`.
+- Benchmark (full tsconfig): `--incremental` cold 344 s / warm 62 s; `--tsgo` 96 s; identical diagnostics. Upgrade surfaced 3 latent errors, fixed: Field.svelte (`Snippet<[{ id }]>`, `$props()` annotation), DetectiveBoard.svelte (installed `svelte-dnd-action`, store import path, replaced `.subscribe` with rune mirror).
+- Evidence3DModal.svelte is unified with DepthReliefViewer.svelte (single renderer; displaced-surface raycasting, draggable pins, Orbit/Place/Undo/Clear toolbar, revision-matched depth guards; 20/20 unit tests, 0 svelte-check errors).
+- Open items: Playwright E2E (`tests/e2e/evidence-relief-actions-diagnostic.spec.ts`) was blocked by a `localhost:5173` timeout; depth route still lacks byte-level SHA-256 verification against `depth_sha256`; 3D pins are session-local (temporary) and must not be persisted to Postgres/board state until the E2E diagnostic passes. Do not kill backend services (turbo, bifrost, llama-server) when recovering Vite.

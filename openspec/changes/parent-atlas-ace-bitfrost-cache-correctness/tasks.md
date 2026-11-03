@@ -501,6 +501,17 @@ applied by the coordinating session afterward, not by the fork itself).
   canonical packet/source evidence, or close `CACHE-RETRIEVAL-IDENTITY-03` / ContextManifest
   readback.
 
+## DOCKER-DISK-PRESSURE-01 handoff — 2026-11-02 (read-only review; nothing deleted or moved)
+
+- **State:** C: fell 9.1 → 5.64 GB free during the session after a forced Docker Desktop/WSL restart (5:54 PM). `docker_data.vhdx` 153.9 GB (does not auto-shrink; `sparseVhd=true` does not apply to it). Live WSL swap `Temp\996E1DA5-…\swap.vhdx` 3.2 GB is LOCKED/in use (`.wslconfig` swap=8GB cap, can grow ~5 GB more). Do not touch it.
+- **Unlocked `Temp\40C59BDA-…\swap.vhdx` (7.75 GB, last write 2026-11-01 01:13):** not locked, predates the restart, owner NOT confirmed. Candidate only.
+- **Four UnoCSS temp copies (~8.4 GB; clean-ci 3.81, sparse 2.05, full-tree 1.54, isolated 0.96):** no file exists only in a copy. Evidence: path classification vs main worktree (`pathclass.json`: exact / CRLF-only / content-differs / git-history-only; 0 copy-only) and comparison vs base commit `fb7e679` (`basecheck.json`: 3 / 4 / 5 modified files in isolated / full-tree / sparse, every one EXACT in main or a CRLF/truncated-prefix variant; `package-lock.json` differs only by CRLF + an npm install artifact; the lineage-backfill report copy is a byte-exact truncated prefix of the repo file). Scratch outputs are in the session scratchpad (not repo).
+- **`clean-ci` is a registered git worktree (detached `fb7e679`, `git status` clean).** Remove with `git worktree remove`, never by hand-deleting. `git worktree list` shows ~20 worktrees; `Temp\main-merge` and `Temp\wt-val` and the `.claude/worktrees/agent-*` ones were not examined.
+- **Caveats:** `node_modules` (52,182 files in sparse) and `.git` were skipped; an object-store match does not prove a file is on a current branch (history-only files: `temp_upload.svelte`, `test-errors*.svelte`, two mangled `c:Users…` junk `.md`).
+- **Stray untracked junk in repo root (shell-quoting leftovers):** `$$$BODY`, `--since 2h`, `cUsersjames.claudeprojectsc--…MEMORY.md`. Not removed.
+- **Open operator decisions (none executed):** (1) `git worktree remove` for clean-ci; (2) other three copies: move to another drive with manifest (archive-not-delete; frees nothing on C:) vs delete; (3) unlocked 7.75 GB swap after owner check; (4) `docker builder prune -f` (~13.5 GB) then `docker image prune -a` (~21.7 GB), then elevated diskpart compact with Docker stopped; never prune volumes; (5) `package.json` `atlas:centroids:cache:dry` hardcodes `DB_PASSWORD`/`REDIS_PASSWORD` inline — move to `.env.local`.
+- Still blocked per the 2026-09-15 entry below: no indexing, embedding, cache warming or fanout until headroom is healthy.
+
 ## Storage and packet-artifact reconciliation — 2026-09-15
 
 - **DOCKER-DISK-PRESSURE-01 remains open and mutation-blocking:** read-only host census found

@@ -1,0 +1,117 @@
+{
+  "schema": "repo-archive-manifest-v1",
+  "generated_at": "2026-11-03T09:45:00-08:00",
+  "status": "PROPOSED_NOT_APPLIED",
+  "mutation_performed": false,
+  "policy": "Archive, never delete. Nothing in this manifest has been moved. Apply only items the operator approves, via a bounded script, with readback.",
+  "notes": [
+    "All six candidates are untracked by git (tracked_files = 0), so git cannot restore them.",
+    "Python venvs hard-code absolute paths and are not relocatable; the safe rollback is to recreate from the recorded Python version, not to move back.",
+    "A same-volume move frees no space. Space is only reclaimed by archiving to a different volume; only C: was visible when measured (5.5 GB free).",
+    "referenced_by lists only non-doc files outside node_modules/.git/.tmp. Hits are todo notes, archive snapshots, reports and generated JSON; no Dockerfile, compose file, script or task entry was found referencing these paths. Not verified against live container builds.",
+    "Reconciled 2026-11-03 with the parallel session manifest: sveltekit-frontend/.venv downgraded to keep (script reference). Only the two review candidates (~6.4 GB) remain."
+  ],
+  "candidates": [
+    {
+      "path": "docker/langgraph-synthesis/.venv",
+      "kind": "venv",
+      "python": "3.13.5",
+      "files": 48415,
+      "bytes": 6665871411,
+      "gb": 6.21,
+      "last_toplevel_mtime": "2026-04-16T20:52:51",
+      "tracked_files": 0,
+      "pyvenv_cfg_sha256": "66124C3AD5AD4A530FCB38220E70A13B634375F1A87AEF85FC950D89997C1040",
+      "reference_kinds": [
+        "todo notes",
+        "archive snapshots",
+        "profile-card data"
+      ],
+      "recommendation": "review",
+      "precheck": "docker/langgraph-synthesis/.dockerignore:1 excludes .venv from the image build context, so the image does not depend on it. Local manual use is not ruled out."
+    },
+    {
+      "path": "sveltekit-frontend/.venv",
+      "kind": "venv",
+      "python": "3.9.2",
+      "files": 11202,
+      "bytes": 1344966239,
+      "gb": 1.25,
+      "last_toplevel_mtime": "2026-05-26T20:02:55",
+      "tracked_files": 0,
+      "pyvenv_cfg_sha256": "B95B8C343EE59DE8183A240AE0B474DB79101F8F80014BA584C76FE856A20474",
+      "reference_kinds": [
+        "todo notes",
+        "classifier/vector datasets",
+        "frozen graph snapshot",
+        "archive snapshots"
+      ],
+      "recommendation": "keep",
+      "precheck": "scripts/convert-embeddinggemma-to-gguf.ps1:62 lists this interpreter as a Python fallback. Windows launcher points at /usr/bin (broken on Windows); WSL usage unchecked."
+    },
+    {
+      "path": ".tmp/langextract-1.6-probe",
+      "kind": "venv",
+      "python": "3.13.5",
+      "files": 10212,
+      "bytes": 195576672,
+      "gb": 0.18,
+      "last_toplevel_mtime": "2026-08-26T12:06:41",
+      "tracked_files": 0,
+      "pyvenv_cfg_sha256": "F0B7C6CF6B1A8C254D8D3BF44D8C42C26B96C3534E5F576EE31C3BF6F831AFB7",
+      "reference_kinds": [
+        "openspec generated reports"
+      ],
+      "recommendation": "review",
+      "precheck": "Contents not reviewed file by file."
+    },
+    {
+      "path": ".venv/nlp-chunker-test",
+      "kind": "venv",
+      "python": "3.13.5",
+      "files": 5951,
+      "bytes": 328501453,
+      "gb": 0.31,
+      "last_toplevel_mtime": "2026-08-02T14:08:47",
+      "tracked_files": 0,
+      "pyvenv_cfg_sha256": "736F2B90E90548E3F6E40BF660645A45771373964D0448C83B2E03789430CFB4",
+      "reference_kinds": [
+        "stale codebase map backup",
+        "gpu smoke artifact index"
+      ],
+      "recommendation": "keep-with-parent",
+      "precheck": "Nested inside the active root .venv; review with its parent."
+    },
+    {
+      "path": "sveltekit-frontend/sveltekit-frontend/node_modules",
+      "kind": "node_modules",
+      "files": 1,
+      "bytes": 1465,
+      "gb": 0,
+      "tracked_files": 0,
+      "reference_kinds": [],
+      "recommendation": "low-value",
+      "precheck": "Holds ~1.4 KB of .vite cache; not worth archiving for space."
+    },
+    {
+      "path": "sveltekit-frontend/src/node_modules",
+      "kind": "node_modules",
+      "files": 1,
+      "bytes": 1465,
+      "gb": 0,
+      "tracked_files": 0,
+      "reference_kinds": [
+        "tmp/phase110-ts-resolution.log"
+      ],
+      "recommendation": "low-value",
+      "precheck": "Holds ~1.4 KB of .vite cache; not worth archiving for space."
+    }
+  ],
+  "totals": {
+    "candidates": 6,
+    "files": 75782,
+    "bytes": 8534918705,
+    "gb": 7.95
+  },
+  "reconciled_with": "docs/reports/atlas/space-reclaim-candidate-manifest-20261103.json"
+}

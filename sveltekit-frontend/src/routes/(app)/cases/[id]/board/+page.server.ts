@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/client';
-import { canvasStates, evidence, evidenceBoardConnections } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { cases, canvasStates, evidence, evidenceBoardConnections } from '$lib/server/db/schema';
+import { and, eq, or } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { clientKey, TTL } from '$lib/server/cache-keys.js';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
@@ -8,25 +8,46 @@ import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
 const safe = <T>(p: Promise<T>, fb: T): Promise<T> =>
 	Promise.race([p, new Promise<T>((r) => setTimeout(() => r(fb), 5000))]).catch(() => fb);
 
+const EMPTY_BOARD = (id: string) => ({
+  caseId: id,
+  initialState: null,
+  evidence: [],
+  connections: [],
+});
+
+// Same rule as api/evidence/[id]/depth-map: the case owner or assigned attorney.
+async function canReadCase(caseId: string, userId: number): Promise<boolean> {
+  const [row] = await db
+    .select({ id: cases.id })
+    .from(cases)
+    .where(and(
+      eq(cases.id, caseId),
+      or(eq(cases.userId, userId), eq(cases.assignedAttorney, userId)),
+    ))
+    .limit(1);
+  return Boolean(row);
+}
+
 export const load: PageServerLoad = async ({ params, locals }) => {
   const { id } = params;
-  const userId = locals.user?.id ?? 'anon';
 
   // Validate UUID format (for test resilience)
   const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 
   // Return empty data for invalid UUIDs (e.g., test-id) instead of DB error
-  if (!isValidUuid) {
-    return {
-      caseId: id,
-      initialState: null,
-      evidence: [],
-      connections: [],
-    };
+  if (!isValidUuid) return EMPTY_BOARD(id);
+
+  // Authorize before any cache read or evidence query. Unauthenticated and
+  // non-member requests get the same empty shape, so existence is not leaked.
+  const rawUserId = locals.user?.id;
+  const numericUserId = rawUserId === undefined ? NaN : Number(rawUserId);
+  if (!Number.isInteger(numericUserId) || !(await canReadCase(id, numericUserId).catch(() => false))) {
+    return EMPTY_BOARD(id);
   }
+  const userId = numericUserId;
 
   // Client view cache check
-  const vKey = clientKey.view(userId, id, 'board-v2');
+  const vKey = clientKey.view(String(userId), id, 'board-v2');
   const memHit = getFromMemoryCache(vKey);
   if (memHit.found && memHit.value) return memHit.value as any;
   try {

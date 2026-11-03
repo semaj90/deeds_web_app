@@ -1,6 +1,6 @@
 <script lang="ts">
  // Svelte 5 runes mode
- type Snippet<T = any> = (args: T) => any;
+ import type { Snippet } from 'svelte';
 
  let {
  label,
@@ -10,14 +10,14 @@
  required = false,
  // caller provides the actual control via a snippet, we pass id into it
  control
- } = $props<{
+ }: {
  label: string;
  id?: string;
  hint?: string;
  error?: string;
  required?: boolean;
-	control: Snippet<{ id: string }>;
- }>();
+	control: Snippet<[{ id: string }]>;
+ } = $props();
 
  let autoId = $derived(
  id ?? `f_${label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+ : _+$/g, "")}`);

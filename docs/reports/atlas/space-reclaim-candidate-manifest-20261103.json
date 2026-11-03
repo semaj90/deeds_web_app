@@ -1,0 +1,89 @@
+{
+  "schema": "parent-atlas.space-reclaim-candidate-manifest.v1",
+  "createdAt": "2026-11-03",
+  "operation": "READ_ONLY_INVENTORY_ONLY",
+  "sourceFreeSpace": {
+    "reportedBytesApproximate": 5905580032,
+    "reportedValue": "about 5.5 GiB; copied from the supplied audit, not refreshed"
+  },
+  "checksumScope": "SHA-256 fingerprints cover pyvenv.cfg only. Full-tree checksums were not computed; this is not sufficient to verify an archive copy.",
+  "candidates": [
+    {
+      "path": "docker/langgraph-synthesis/.venv",
+      "kind": "Windows Python virtual environment",
+      "fileCount": 48415,
+      "bytes": 6665871411,
+      "rootLastWriteTime": "2026-04-16T20:52:51",
+      "pythonVersion": "3.13.5",
+      "pyvenvConfigSha256": "66124C3AD5AD4A530FCB38220E70A13B634375F1A87AEF85FC950D89997C1040",
+      "references": "No runtime source references found in the searched code/config paths; no matching active Windows Python process found.",
+      "buildContext": "The LangGraph Dockerfile installs from requirements.txt; its .dockerignore excludes .venv/.",
+      "disposition": "REVIEW_CANDIDATE_NOT_APPROVED",
+      "rollbackNote": "No move performed; the original directory remains in place. If later archived, restore it to this exact path before any local-run workflow."
+    },
+    {
+      "path": "sveltekit-frontend/.venv",
+      "kind": "Linux-style Python virtual environment",
+      "fileCount": 11202,
+      "bytes": 1344966239,
+      "rootLastWriteTime": "2026-05-26T19:22:23",
+      "pythonVersion": "3.9.2",
+      "pyvenvConfigSha256": "B95B8C343EE59DE8183A240AE0B474DB79101F8F80014BA584C76FE856A20474",
+      "references": "Referenced as a Python fallback by scripts/convert-embeddinggemma-to-gguf.ps1. Its Scripts/python.exe fails on Windows because pyvenv.cfg points to /usr/bin; possible WSL use was not checked.",
+      "disposition": "PRESERVE_PENDING_WSL_AND_LAUNCHER_REVIEW",
+      "rollbackNote": "Do not move while the conversion launcher references it or before verifying the WSL workflow."
+    },
+    {
+      "path": ".tmp/langextract-1.6-probe",
+      "kind": "Temporary Python 3.13.5 virtual environment",
+      "fileCount": 10212,
+      "bytes": 195576672,
+      "rootLastWriteTime": "2026-08-26T12:06:41",
+      "pyvenvConfigSha256": "F0B7C6CF6B1A8C254D8D3BF44D8C42C26B96C353E5F576EE31C3BF6F831AFB7",
+      "references": "No direct references found in the searched source/config paths; probe contents were not inspected file-by-file.",
+      "disposition": "REVIEW_CANDIDATE_NOT_APPROVED",
+      "rollbackNote": "No move performed. Preserve the probe directory and its exact original path until its contents and any associated receipts are reviewed."
+    },
+    {
+      "path": ".venv/nlp-chunker-test",
+      "kind": "Nested Python 3.13.5 test virtual environment",
+      "fileCount": 5951,
+      "bytes": 328501453,
+      "rootLastWriteTime": "2026-08-02T14:08:47",
+      "pyvenvConfigSha256": "736F2B90E90548E3F6E40BF660645A45771373964D0448C83B2E03789430CFB4",
+      "references": "Nested inside the root .venv, which the earlier audit marked in use. No direct source reference was found in the searched paths.",
+      "disposition": "PRESERVE_WITH_PARENT_VENV_PENDING_REVIEW",
+      "rollbackNote": "Do not move this nested environment independently while its parent .venv remains active."
+    },
+    {
+      "path": "sveltekit-frontend/sveltekit-frontend/node_modules",
+      "kind": "Vite cache directory only",
+      "fileCount": 1,
+      "bytes": 1465,
+      "rootLastWriteTime": "2026-09-07T09:46:07",
+      "contents": [".vite"],
+      "disposition": "NO_MATERIAL_SPACE_RECOVERY; LEAVE_IN_PLACE"
+    },
+    {
+      "path": "sveltekit-frontend/src/node_modules",
+      "kind": "Vite cache directory only",
+      "fileCount": 1,
+      "bytes": 1465,
+      "rootLastWriteTime": "2026-10-28T21:31:43",
+      "contents": [".vite"],
+      "disposition": "NO_MATERIAL_SPACE_RECOVERY; LEAVE_IN_PLACE"
+    }
+  ],
+  "safety": {
+    "movesPerformed": false,
+    "deletionsPerformed": false,
+    "archiveApproved": false,
+    "fullTreeChecksumsAvailable": false,
+    "notes": [
+      "The Docker LangGraph image is built from its Dockerfile and requirements.txt; this does not prove nobody runs the host venv manually.",
+      "The frontend venv is explicitly listed by a conversion launcher and may be used under WSL despite failing as a Windows interpreter.",
+      "The nested nlp-chunker-test environment is included under the active root .venv and should not be counted as independent reclaim until reviewed.",
+      "The 5.5 GiB free-space figure is user-supplied historical context, not a fresh measurement."
+    ]
+  }
+}

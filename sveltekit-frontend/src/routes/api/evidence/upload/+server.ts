@@ -394,7 +394,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     uploadedObjectKey = objectKey;
 
-    const storageUrl = `minio://${BUCKET}/${objectKey}`;
+    const storageUrl = `seaweed://${BUCKET}/${objectKey}`;
 
     // 4. Insert into PostgreSQL via Drizzle ORM
     updateJob(jobId, { step: 'db-insert', progress: 50, message: 'Saving to database...' });
@@ -955,7 +955,13 @@ async function processAndEmbed(
   const diagnostics = createProcessingDiagnostics();
   let depthAnalysis: {
     depthMapUrl: string;
+    depthSha256: string;
     sourceRevision: string;
+    modelId: string;
+    modelRevision: string;
+    modelRevisionStatus: 'VERIFIED' | 'UNVERIFIED';
+    modelLicense: string;
+    depthType: string;
     width: number;
     height: number;
     processingTimeMs: number;
@@ -1763,16 +1769,34 @@ async function processAndEmbed(
 
         // Store the generated depth map in SeaweedFS S3.
         const depthBuffer = Buffer.from(data.depth_base64, 'base64');
-        const depthKey = `evidence/${caseId ?? 'default'}/${evidenceId}-depth.png`;
+        const depthSha256 = crypto.createHash('sha256').update(depthBuffer).digest('hex');
+        // Digest-keyed so a regenerated depth map is written to a new object, never over the old one.
+        const depthKey = `evidence/${caseId ?? 'default'}/${evidenceId}-depth-${depthSha256}.png`;
         await uploadFile(BUCKET, depthKey, depthBuffer, {
           'Content-Type': 'image/png',
           'X-Evidence-Id': evidenceId,
           'X-Analysis-Type': 'depth_map',
+          'X-Depth-Sha256': depthSha256,
         });
 
         return {
-          depthMapUrl: `minio://${BUCKET}/${depthKey}`,
+          depthMapUrl: `seaweed://${BUCKET}/${depthKey}`,
+          depthSha256,
           sourceRevision: formatEvidenceSourceRevisionV1(fileHash),
+          modelId: typeof data.model_id === 'string' ? data.model_id : 'unknown',
+          modelRevision: typeof data.model_revision === 'string' && data.model_revision.length > 0
+            ? data.model_revision
+            : 'UNVERIFIED',
+          modelRevisionStatus: data.model_revision_status === 'VERIFIED' &&
+            typeof data.model_revision === 'string' && /^[a-f0-9]{40}$/i.test(data.model_revision)
+            ? 'VERIFIED'
+            : 'UNVERIFIED',
+          modelLicense: data.model_license === 'Apache-2.0' &&
+            data.model_id === 'depth-anything/Depth-Anything-V2-Small-hf' &&
+            data.model_revision_status === 'VERIFIED'
+            ? 'Apache-2.0'
+            : 'UNVERIFIED',
+          depthType: data.depth_type === 'relative_monocular' ? 'relative_monocular' : 'UNVERIFIED',
           width: data.width,
           height: data.height,
           processingTimeMs: data.processing_time_ms,

@@ -92,6 +92,16 @@ describe('evidence upscale route', () => {
 		expect(mocks.getFile).not.toHaveBeenCalled();
 	});
 
+	it('rejects an oversized image after authorized storage read and before decoding', async () => {
+		mocks.limit.mockResolvedValue([{ fileUrl: 'evidence/case/large.png', mimeType: 'image/png' }]);
+		mocks.getFile.mockResolvedValue(Buffer.alloc(40 * 1024 * 1024 + 1));
+
+		const response = await POST(event({ user }));
+		expect(response.status).toBe(413);
+		expect(await response.json()).toEqual({ error: 'Image too large' });
+		expect(mocks.getFile).toHaveBeenCalledWith('seaweed-evidence', 'evidence/case/large.png');
+	});
+
 	it('reads an authorized source from SeaweedFS and returns a non-persisted Lanczos PNG preview', async () => {
 		mocks.limit.mockResolvedValue([{ fileUrl: 'evidence/case/source.png', mimeType: 'image/png' }]);
 		const response = await POST(event({ user, body: { scale: 2 } }));
