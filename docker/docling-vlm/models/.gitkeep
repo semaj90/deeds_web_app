@@ -1,4 +1,4 @@
-# Place large YOLO .pt model files here (e.g. yolov8x.pt, yolov8l.pt)
+# Place YOLOX .pth checkpoints here (e.g. yolox_x.pth, yolox_tiny.pth; Apache-2.0)
 # Then set YOLO_MODEL_PATH=/models/<filename>.pt in docker/.env
 # and YOLO_MODELS_DIR=./docker/docling-vlm/models in root .env
 

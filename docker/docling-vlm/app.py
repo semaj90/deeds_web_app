@@ -33,10 +33,13 @@ from pydantic import BaseModel
 LLAMA_SERVER_URL = os.environ.get("LLAMA_SERVER_URL", "http://host.docker.internal:8090").rstrip("/")
 VLM_MODEL = os.environ.get("VLM_MODEL", "ornith-1.5-9b")
 ORNITH_MMPROJ_PATH = os.environ.get("ORNITH_MMPROJ_PATH", "")
-# Primary GPU model — set to /models/yolov8x.pt for the full 131MB model
-YOLO_MODEL_PATH = os.environ.get("YOLO_MODEL_PATH", "yolov8x.pt")
-# CPU fallback — nano stays as TurboQuant / ONNX fallback path
-YOLO_CPU_FALLBACK_PATH = os.environ.get("YOLO_CPU_FALLBACK_PATH", "yolov8n.pt")
+# Detector: YOLOX (Apache-2.0). Replaces Ultralytics YOLOv8 (AGPL-3.0).
+# Primary GPU weights — official YOLOX-X checkpoint (COCO classes, same label set as YOLOv8)
+YOLO_MODEL_PATH = os.environ.get("YOLO_MODEL_PATH", "/models/yolox_x.pth")
+YOLOX_GPU_EXP = os.environ.get("YOLOX_GPU_EXP", "yolox-x")
+# CPU fallback — YOLOX-Tiny
+YOLO_CPU_FALLBACK_PATH = os.environ.get("YOLO_CPU_FALLBACK_PATH", "/models/yolox_tiny.pth")
+YOLOX_CPU_EXP = os.environ.get("YOLOX_CPU_EXP", "yolox-tiny")
 MAX_IMAGE_LONG_EDGE = int(os.environ.get("MAX_IMAGE_LONG_EDGE", "1536"))
 OCR_TEMPERATURE = float(os.environ.get("OCR_TEMPERATURE", "0.1"))
 OCR_NUM_CTX = int(os.environ.get("OCR_NUM_CTX", "8192"))
@@ -210,20 +213,64 @@ def get_whisper_model():
     return whisper_model
 
 
+class YoloxDetector:
+    """YOLOX (Apache-2.0) detector. detect() returns plain dicts:
+    {"class": str, "confidence": float, "bbox": [x1, y1, x2, y2]} in input-image pixels."""
+
+    def __init__(self, exp_name: str, weights_path: str, device: str):
+        import torch
+        from yolox.exp import get_exp
+        from yolox.data.data_augment import ValTransform
+        from yolox.data.datasets.coco_classes import COCO_CLASSES
+
+        self.exp = get_exp(exp_name=exp_name)
+        self.model = self.exp.get_model()
+        ckpt = torch.load(weights_path, map_location="cpu")
+        self.model.load_state_dict(ckpt["model"])
+        self.device = device
+        self.model.eval().to(device)
+        self.test_size = tuple(self.exp.test_size)
+        self.num_classes = self.exp.num_classes
+        self.nms_thre = self.exp.nmsthre
+        self.names = dict(enumerate(COCO_CLASSES))
+        self._preproc = ValTransform(legacy=False)
+
+    def detect(self, image, conf: float):
+        import numpy as np
+        import torch
+        from yolox.utils import postprocess
+
+        bgr = np.asarray(image.convert("RGB"))[:, :, ::-1].copy()  # YOLOX expects BGR
+        ratio = min(self.test_size[0] / bgr.shape[0], self.test_size[1] / bgr.shape[1])
+        img, _ = self._preproc(bgr, None, self.test_size)
+        tensor = torch.from_numpy(img).unsqueeze(0).float().to(self.device)
+        with torch.no_grad():
+            out = postprocess(self.model(tensor), self.num_classes, conf, self.nms_thre, class_agnostic=False)[0]
+        if out is None:
+            return []
+        out = out.cpu().numpy()
+        dets = []
+        for row in out:
+            x1, y1, x2, y2 = (row[0:4] / ratio).tolist()
+            cls_id = int(row[6])
+            dets.append({
+                "class": self.names.get(cls_id, str(cls_id)),
+                "confidence": float(row[4] * row[5]),
+                "bbox": [x1, y1, x2, y2],
+            })
+        return dets
+
+
 def get_yolo_model():
     """
-    Lazy load YOLO model with GPU → CPU-fallback tier:
+    Lazy load YOLOX detector with GPU → CPU-fallback tier:
 
-    Tier 1: YOLO_MODEL_PATH (default: yolov8x.pt) — GPU, 131MB, full accuracy
-    Tier 2: YOLO_CPU_FALLBACK_PATH (default: yolov8n.pt) — CPU/TurboQuant ONNX fallback
-
-    The nano fallback is intentionally kept lightweight so TurboQuant can also
-    load it as an ONNX export without pulling the full 131MB weights.
+    Tier 1: YOLO_MODEL_PATH (default: yolox_x.pth, exp YOLOX_GPU_EXP) — GPU
+    Tier 2: YOLO_CPU_FALLBACK_PATH (default: yolox_tiny.pth, exp YOLOX_CPU_EXP) — CPU
     """
     global yolo_model, yolo_model_name
     if yolo_model is None:
         try:
-            from ultralytics import YOLO
             import torch
 
             cuda_available = torch.cuda.is_available()
@@ -231,22 +278,22 @@ def get_yolo_model():
             if cuda_available:
                 # Tier 1: full GPU model
                 try:
-                    yolo_model = YOLO(YOLO_MODEL_PATH)
+                    yolo_model = YoloxDetector(YOLOX_GPU_EXP, YOLO_MODEL_PATH, "cuda")
                     yolo_model_name = YOLO_MODEL_PATH
-                    print(f"✅ YOLO GPU model loaded: {YOLO_MODEL_PATH}")
+                    print(f"✅ YOLOX GPU model loaded: {YOLO_MODEL_PATH}")
                     return yolo_model
                 except Exception as e:
-                    print(f"⚠️ GPU YOLO load failed ({YOLO_MODEL_PATH}): {e} — trying CPU fallback")
+                    print(f"⚠️ GPU YOLOX load failed ({YOLO_MODEL_PATH}): {e} — trying CPU fallback")
 
-            # Tier 2: nano CPU fallback (also used by TurboQuant ONNX path)
-            yolo_model = YOLO(YOLO_CPU_FALLBACK_PATH)
+            # Tier 2: tiny CPU fallback
+            yolo_model = YoloxDetector(YOLOX_CPU_EXP, YOLO_CPU_FALLBACK_PATH, "cpu")
             yolo_model_name = YOLO_CPU_FALLBACK_PATH
-            print(f"✅ YOLO CPU fallback loaded: {YOLO_CPU_FALLBACK_PATH} (cuda={cuda_available})")
+            print(f"✅ YOLOX CPU fallback loaded: {YOLO_CPU_FALLBACK_PATH} (cuda={cuda_available})")
 
         except ImportError as e:
-            print(f"⚠️ YOLO not available: {e}")
+            print(f"⚠️ YOLOX not available: {e}")
         except Exception as e:
-            print(f"⚠️ YOLO model load failed: {e}")
+            print(f"⚠️ YOLOX model load failed: {e}")
     return yolo_model
 
 
@@ -511,7 +558,7 @@ async def detect_objects(
 ):
     """
     Detect objects in image using YOLO.
-    Model loaded from YOLO_MODEL_PATH env (default: yolov8n.pt).
+    Model loaded from YOLO_MODEL_PATH env (default: yolox_x.pth, YOLOX-X).
     Supports: PNG, JPG, BMP, WEBP.
     """
     start_time = time.time()
@@ -523,19 +570,8 @@ async def detect_objects(
     content = await file.read()
     image = Image.open(io.BytesIO(content))
 
-    results = model(image, conf=confidence)[0]
-
-    detections = []
-    classes = set()
-    for box in results.boxes:
-        cls_id = int(box.cls[0])
-        cls_name = model.names[cls_id]
-        classes.add(cls_name)
-        detections.append({
-            "class": cls_name,
-            "confidence": float(box.conf[0]),
-            "bbox": box.xyxy[0].tolist(),
-        })
+    detections = model.detect(image, confidence)
+    classes = {d["class"] for d in detections}
 
     return VisionResult(
         detections=detections,
@@ -688,13 +724,10 @@ async def ocr_yolo_vlm(
 
     # Stage 1: YOLO detection
     image = Image.open(io.BytesIO(content)).convert("RGB")
-    yolo_results = yolo(image, conf=confidence)[0]
-
     boxes = []
-    for box in yolo_results.boxes:
-        x1, y1, x2, y2 = [int(v) for v in box.xyxy[0].tolist()]
-        cls_name = yolo.names[int(box.cls[0])]
-        boxes.append({"bbox": (x1, y1, x2, y2), "class": cls_name, "conf": float(box.conf[0])})
+    for det in yolo.detect(image, confidence):
+        x1, y1, x2, y2 = [int(v) for v in det["bbox"]]
+        boxes.append({"bbox": (x1, y1, x2, y2), "class": det["class"], "conf": det["confidence"]})
 
     # Sort regions top-left → bottom-right (reading order)
     boxes.sort(key=lambda b: (b["bbox"][1] // 50, b["bbox"][0]))

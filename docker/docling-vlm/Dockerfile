@@ -1,5 +1,5 @@
 # Docling + VLM Python Service
-# Consolidates: docling-parse, ultralytics, whisper
+# Consolidates: docling-parse, YOLOX, whisper
 # VLM inference is NOT hosted in this container. It calls the workstation
 # Ornith 1.5 llama.cpp server on :8090 through app_ornith.py.
 FROM python:3.11-slim-bookworm@sha256:528257d48c1da0dcecc2e725d1ae34498d60c965f1241e39cd6a85a8859bdf84 AS base
@@ -26,7 +26,13 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# YOLOX's source distribution builds a small C++ evaluation extension on Linux.
+# Keep compiler tools in this build layer only; model inference uses Python/PyTorch.
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential ninja-build \
+    && pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir --no-deps yolox==0.3.0 \
+    && apt-get purge -y --auto-remove build-essential ninja-build \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy application code. app.py is retained for the document/YOLO/Whisper
 # implementation; app_ornith.py replaces its historical Ollama VLM globals

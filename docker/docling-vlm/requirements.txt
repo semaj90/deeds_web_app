@@ -11,8 +11,17 @@ httpx==0.28.1
 docling-parse==7.0.0
 pypdf2==3.0.1
 
-# === Vision / YOLO ===
-ultralytics==8.4.80
+# === Vision / YOLOX (Apache-2.0) ===
+# yolox==0.3.0 is installed with --no-deps in the Dockerfile (its onnx pins conflict).
+# YOLOX 0.3.0 inference and extension-build dependencies; onnx/export extras are omitted.
+loguru
+tabulate
+pycocotools>=2.0.2
+thop
+tqdm
+psutil
+ninja
+torchvision==0.27.1
 opencv-python-headless==4.13.0.92
 Pillow==12.2.0
 

@@ -632,8 +632,8 @@ services:
       retries: 3
       start_period: 10s
 
-  # Docling VLM — Document understanding + YOLO object detection + Whisper transcription
-  # FastAPI service consolidating: docling-parse, ultralytics, whisper
+  # Docling VLM — Document understanding + YOLOX object detection + Whisper transcription
+  # FastAPI service consolidating: docling-parse, YOLOX, whisper
   docling-vlm:
     image: deeds-web-app-docling-vlm:latest
     build:
@@ -665,15 +665,15 @@ services:
       MINIO_ENDPOINT: minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
-      # YOLO GPU model — drop yolov8x.pt in docker/docling-vlm/models/ and set YOLO_MODELS_DIR
-      YOLO_MODEL_PATH: ${YOLO_MODEL_PATH:-yolov8x.pt}
+      # YOLOX (Apache-2.0) GPU model — drop yolox_x.pth in docker/docling-vlm/models/ and set YOLO_MODELS_DIR
+      YOLO_MODEL_PATH: ${YOLO_MODEL_PATH:-/models/yolox_x.pth}
       # YOLO CPU fallback — nano stays as TurboQuant / ONNX export target
-      YOLO_CPU_FALLBACK_PATH: ${YOLO_CPU_FALLBACK_PATH:-yolov8n.pt}
+      YOLO_CPU_FALLBACK_PATH: ${YOLO_CPU_FALLBACK_PATH:-/models/yolox_tiny.pth}
       MAX_IMAGE_LONG_EDGE: ${MAX_IMAGE_LONG_EDGE:-1536}
       PRELOAD_MODELS: ${PRELOAD_MODELS:-false}
     volumes:
       # Mount directory containing large YOLO .pt model files
-      # Set YOLO_MODEL_PATH=/models/<filename>.pt in .env to use
+      # Set YOLO_MODEL_PATH=/models/<filename>.pth in .env to use
       - ${YOLO_MODELS_DIR:-./docker/docling-vlm/models}:/models:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
