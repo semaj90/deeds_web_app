@@ -81,7 +81,13 @@ async function fetchChatDocumentContext(sessionId: string, userId: number, caseI
   try {
     // Query chat_document_attachments for this session
     const attachments = await db
-      .select()
+      .select({
+        file_name: chatDocumentAttachments.file_name,
+        file_size: chatDocumentAttachments.file_size,
+        embedding_status: chatDocumentAttachments.embedding_status,
+        qdrant_id: chatDocumentAttachments.qdrant_id,
+        document_id: chatDocumentAttachments.document_id,
+      })
       .from(chatDocumentAttachments)
       .innerJoin(yorhaChatSessions, eq(chatDocumentAttachments.chat_session_id, yorhaChatSessions.id))
       .where(and(
@@ -97,7 +103,7 @@ async function fetchChatDocumentContext(sessionId: string, userId: number, caseI
 
     // Retrieve document chunks from Qdrant chat_documents collection
     const documentChunks = await Promise.all(
-      attachments.map(async ({ chat_document_attachments: attachment }) => {
+      attachments.map(async (attachment) => {
         if (!attachment.qdrant_id || attachment.embedding_status !== 'completed') {
           // Document not yet indexed or failed
           return {
@@ -696,6 +702,9 @@ async function retrieveAttachmentContext(
   limit = RAG_MAX_CHUNKS
 ): Promise<ContextDoc[]> {
   try {
+    // A source hash is not a tenancy credential. Keep generic chat's existing
+    // preview path but do not retrieve shared legal_documents without case provenance.
+    if (!caseUuid) return [];
     const vector = await embedSemanticQuery(query);
     if (!vector) return [];
 
