@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema';
-import { eq, desc, sql } from 'drizzle-orm';
+import { and, eq, desc, sql, isNull } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import {
   getChatModelKeepAlive,
@@ -37,7 +37,8 @@ import { logInference } from '$lib/server/observability/inference-log.js';
 import { logToolTrace } from '$lib/server/observability/tool-trace.js';
 import { queryHash as computeQueryHash, recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { authorityChainExpansion, type EmbedFn } from '$lib/server/retrieval/authority-chain.js';
-import { chatDocumentAttachments } from '$lib/server/db/schema-postgres.js';
+import { chatDocumentAttachments, yorhaChatSessions } from '$lib/server/db/schema-postgres.js';
+import { requireOwnedCaseId, scopedChatCaseId } from '$lib/server/cases/owned-case.js';
 import { streamLLM as streamTrtLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
 import {
   streamLLM as streamTritonLLM,
@@ -73,13 +74,21 @@ function isMissingRelationError(err: unknown): boolean {
 /**
  * Fetch uploaded documents for chat session and retrieve chunks from Qdrant
  */
-async function fetchChatDocumentContext(sessionId: string): Promise<string | null> {
+async function fetchChatDocumentContext(sessionId: string, userId: number, caseId: string | null): Promise<string | null> {
+  // Attachment rows reference a UUID YoRHa session, not a board-/case- chat id.
+  // Never query an attachment without proving its session owner and case scope.
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionId)) return null;
   try {
     // Query chat_document_attachments for this session
     const attachments = await db
       .select()
       .from(chatDocumentAttachments)
-      .where(eq(chatDocumentAttachments.chat_session_id, sessionId))
+      .innerJoin(yorhaChatSessions, eq(chatDocumentAttachments.chat_session_id, yorhaChatSessions.id))
+      .where(and(
+        eq(yorhaChatSessions.id, sessionId),
+        eq(yorhaChatSessions.user_id, userId),
+        ...(caseId ? [eq(yorhaChatSessions.case_id, caseId)] : [])
+      ))
       .limit(5);
 
     if (attachments.length === 0) {
@@ -88,7 +97,7 @@ async function fetchChatDocumentContext(sessionId: string): Promise<string | nul
 
     // Retrieve document chunks from Qdrant chat_documents collection
     const documentChunks = await Promise.all(
-      attachments.map(async (attachment) => {
+      attachments.map(async ({ chat_document_attachments: attachment }) => {
         if (!attachment.qdrant_id || attachment.embedding_status !== 'completed') {
           // Document not yet indexed or failed
           return {
@@ -229,8 +238,8 @@ const CORRECTIVE_RAG_THRESHOLD = 0.5;
 // Keep it opt-in here; other non-interactive routes can still use self-eval directly.
 const ACE_SELF_EVAL_ENABLED = (process.env?.ACE_CHAT_SELF_EVAL_ENABLED ?? 'false') === 'true';
 
-// Strict caseId format: "case-" followed by a UUID
-const CASE_ID_PATTERN = /^case-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
+// Case and board conversation IDs are both resolved by scopedChatCaseId.
+// This keeps existing IndexedDB board history identifiers unchanged.
 
 /**
  * Map a URL pathname to a human-readable page description for LLM context.
@@ -970,9 +979,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     enableTools,
   } = parsed.data;
 
-  // Extract case UUID from conversationId (format: "case-{uuid}")
-  const caseIdMatch = conversationId.match(CASE_ID_PATTERN);
-  const caseUuidForDb = caseIdMatch ? caseIdMatch[1] : undefined;
+  const chatUserId = Number(locals.user.id);
+  if (!Number.isSafeInteger(chatUserId) || chatUserId <= 0) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  // Never treat a client-controlled conversation prefix as proof of membership.
+  const caseUuidForDb = scopedChatCaseId(conversationId) ?? undefined;
+  if (/^(?:case|board)-/i.test(conversationId) && !caseUuidForDb) {
+    return json({ error: 'Invalid case conversation' }, { status: 400 });
+  }
+  if (caseUuidForDb && !(await requireOwnedCaseId(caseUuidForDb, chatUserId))) {
+    return json({ error: 'Case not found' }, { status: 404 });
+  }
 
   // Fire-and-forget: record into hot-query analytics ring buffer (feeds search-patterns API)
   recordSearchQuery({ query: message, pipeline: 'ace', cacheHit: false, userId: locals.user.id });
@@ -983,6 +1001,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     await db.insert(chatMessages).values({
       id: userMessageId,
       chatId: conversationId,
+      userId: chatUserId,
       role: 'user',
       content: message,
       ...(caseUuidForDb ? { caseId: caseUuidForDb } : {}),
@@ -1011,7 +1030,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const historyRows = await db
       .select({ role: chatMessages.role, content: chatMessages.content })
       .from(chatMessages)
-      .where(eq(chatMessages.chatId, conversationId))
+      .where(and(
+        eq(chatMessages.chatId, conversationId),
+        eq(chatMessages.userId, chatUserId),
+        ...(caseUuidForDb
+          ? [sql`(${chatMessages.caseId} = ${caseUuidForDb} OR ${chatMessages.caseId} IS NULL)`]
+          : [isNull(chatMessages.caseId)])
+      ))
       .orderBy(desc(chatMessages.timestamp))
       .limit(CONVERSATION_HISTORY_LIMIT + 1); // +1 because we just inserted the current message
 
@@ -1121,9 +1146,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // Cache case context per caseId (10min TTL) — identical for every
       // message in a conversation, saves 1 DB query + 2 evidence/citation queries
       let caseContext: string | null = null;
-      const caseMatch = conversationId.match(CASE_ID_PATTERN);
+      const caseMatch = caseUuidForDb ? [conversationId, caseUuidForDb] : null;
       if (caseMatch) {
-        const caseGlyphKey = `glyph:case:${caseMatch[1]}`;
+        const caseGlyphKey = `glyph:case:${chatUserId}:${caseMatch[1]}`;
         caseContext = getFragment(caseGlyphKey);
         if (caseContext) {
           console.log(`[Glyph L0.5] Case context HIT (${caseContext.length} chars)`);
@@ -1704,7 +1729,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       }
 
       // Inject uploaded document context from chat attachments
-      const documentContext = await fetchChatDocumentContext(conversationId);
+      const documentContext = await fetchChatDocumentContext(conversationId, chatUserId, caseUuidForDb ?? null);
       if (documentContext) {
         systemPrompt += `\n\n${documentContext}`;
       }
@@ -2023,6 +2048,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           await db.insert(chatMessages).values({
             id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
             chatId: conversationId,
+            userId: chatUserId,
             role: 'assistant',
             content: fullResponse,
             metadata: assistantMetadata,
@@ -2562,6 +2588,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           await db.insert(chatMessages).values({
             id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
             chatId: conversationId,
+            userId: chatUserId,
             role: 'assistant',
             content: fullResponse,
             metadata: assistantMetadata,
