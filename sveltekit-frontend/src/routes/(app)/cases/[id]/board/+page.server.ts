@@ -1,6 +1,8 @@
 import { db } from '$lib/server/db/client';
 import { canvasStates, evidence, evidenceBoardConnections } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { and, eq, or } from 'drizzle-orm';
+import { cases } from '$lib/server/db/schema-postgres.js';
+import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { clientKey, TTL } from '$lib/server/cache-keys.js';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
@@ -10,20 +12,17 @@ const safe = <T>(p: Promise<T>, fb: T): Promise<T> =>
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const { id } = params;
-  const userId = locals.user?.id ?? 'anon';
+  if (!locals.user) throw redirect(302, '/login');
+  const userId = Number(locals.user.id);
+  if (!Number.isInteger(userId) || userId <= 0) throw error(401, 'Unauthorized');
+  const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  if (!isValidUuid) throw error(400, 'Invalid case ID format');
 
-  // Validate UUID format (for test resilience)
-  const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
-  // Return empty data for invalid UUIDs (e.g., test-id) instead of DB error
-  if (!isValidUuid) {
-    return {
-      caseId: id,
-      initialState: null,
-      evidence: [],
-      connections: [],
-    };
-  }
+  // Check membership before any cached response or case-scoped data access.
+  const [authorizedCase] = await db.select({ id: cases.id }).from(cases)
+    .where(and(eq(cases.id, id), or(eq(cases.userId, userId), eq(cases.assignedAttorney, userId))))
+    .limit(1);
+  if (!authorizedCase) throw error(404, 'Case not found');
 
   // Client view cache check
   const vKey = clientKey.view(userId, id, 'board-v2');
