@@ -12,7 +12,7 @@
     color: [number, number, number, number];
   }
 
-  let { nodes = [], width = 800, height = 600, onSelectNode } = $props<{
+  let { nodes = [], width = 800, height = 600, onSelectNode = () => {} } = $props<{
     nodes: Node[];
     width?: number;
     height?: number;

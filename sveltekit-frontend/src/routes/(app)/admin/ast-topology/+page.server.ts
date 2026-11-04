@@ -16,6 +16,10 @@ export const load: PageServerLoad = async ({ fetch }) => {
     total: 0,
     embedded: 0,
     fixed: 0,
+    fixedToday: 0,
+    inProgress: 0,
+    confidence: 0,
+    change: 0,
     sources: [] as { source: string, count: number; embedded: number }[]
   };
 
@@ -55,6 +59,10 @@ export const load: PageServerLoad = async ({ fetch }) => {
         total: Number(data.error_nodes ?? 0),
         embedded: Number(data.error_embeddings ?? 0),
         fixed: 0,
+        fixedToday: 0,
+        inProgress: 0,
+        confidence: 0,
+        change: 0,
         sources: []
       };
     }

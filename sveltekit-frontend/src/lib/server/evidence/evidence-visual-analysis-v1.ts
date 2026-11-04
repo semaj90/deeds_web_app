@@ -84,8 +84,8 @@ const defaultDependencies: EvidenceVisualAnalysisDependenciesV1 = {
 		const { analyzeEvidenceImage } = await import('$lib/server/analysis/vlm-evidence-analyzer.js');
 		return analyzeEvidenceImage(input);
 	},
-	getDepthConfig: () => ENV.IMAGE_SYNTHESIS_URL && (ENV.SEAWEED_S3_BUCKET || ENV.MINIO_EVIDENCE_BUCKET)
-		? { endpoint: ENV.IMAGE_SYNTHESIS_URL, bucket: ENV.SEAWEED_S3_BUCKET || ENV.MINIO_EVIDENCE_BUCKET }
+	getDepthConfig: () => ENV.IMAGE_SYNTHESIS_URL && ENV.SEAWEED_ARTIFACTS_BUCKET
+		? { endpoint: ENV.IMAGE_SYNTHESIS_URL, bucket: ENV.SEAWEED_ARTIFACTS_BUCKET }
 		: null,
 	fetchDepth: async (url, imageBase64) => {
 		const response = await fetch(url, {

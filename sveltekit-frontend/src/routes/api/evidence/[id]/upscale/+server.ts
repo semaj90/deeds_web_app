@@ -14,7 +14,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
 
-const EVIDENCE_BUCKET = ENV.SEAWEED_S3_BUCKET || ENV.MINIO_EVIDENCE_BUCKET;
+const EVIDENCE_BUCKET = ENV.SEAWEED_EVIDENCE_BUCKET;
 const MAX_SIDE = 8192;
 const MAX_INPUT_BYTES = 40 * 1024 * 1024;
 
@@ -22,8 +22,8 @@ const bodySchema = z.object({ scale: z.union([z.literal(2), z.literal(3), z.lite
 
 function extractObjectKey(fileUrl: string): { bucket: string; key: string } | null {
 	if (!fileUrl) return null;
-	if (fileUrl.startsWith('minio://')) {
-		const rest = fileUrl.slice('minio://'.length);
+	if (fileUrl.startsWith('seaweed://') || fileUrl.startsWith('minio://')) {
+		const rest = fileUrl.slice(fileUrl.indexOf('://') + 3);
 		const i = rest.indexOf('/');
 		return i === -1 ? null : { bucket: rest.slice(0, i), key: rest.slice(i + 1) };
 	}

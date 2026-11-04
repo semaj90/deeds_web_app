@@ -2,6 +2,13 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/scene_markers.sql",
+      "status": "active_candidate",
+      "reason": "Evidence-board marker persistence: scene_markers, scene_events (command_id idempotency), scene_event_outbox. Rehearsed on a disposable PostgreSQL 18 database only; NOT applied to the live database.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
       "file": "manual/20261101_atlas_tool_manifest_vectors_v1.sql",
       "status": "active_candidate",
       "reason": "Dedicated pgvector table atlas_tool_manifest_vectors_v1 for MCP tool manifests and exact/HNSW vector cosine tool selection (AFC-E2E-97).",

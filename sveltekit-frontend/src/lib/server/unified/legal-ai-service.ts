@@ -74,7 +74,7 @@ export interface HealthStatus {
 
 // --- Service ---
 
-const EVIDENCE_BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
+const EVIDENCE_BUCKET = ENV.SEAWEED_EVIDENCE_BUCKET;
 
 export class UnifiedLegalAIService {
   /**
@@ -93,7 +93,7 @@ export class UnifiedLegalAIService {
       'Content-Type': upload.contentType,
     });
 
-    const fileUrl = `minio://${EVIDENCE_BUCKET}/${objectKey}`;
+    const fileUrl = `seaweed://${EVIDENCE_BUCKET}/${objectKey}`;
 
     await db.execute(sql`
 			INSERT INTO evidence (case_id, evidence_number, title, type, description,

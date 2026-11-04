@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 const digestSchema = z.string().regex(/^sha256:[a-f0-9]{64}$/);
 
@@ -17,9 +18,11 @@ export function buildEvidenceReprocessJobV1(input: {
 	const sourceSha256 = digestSchema.parse(input.sourceSha256);
 	const uploadedBy = z.number().int().positive().parse(input.uploadedBy);
 	const fileUrl = z.string().min(1).parse(input.fileUrl);
-	const objectKey = fileUrl.startsWith('minio://legal-evidence/')
-		? fileUrl.slice('minio://legal-evidence/'.length)
-		: fileUrl;
+	const objectPrefix = /^(?:minio|seaweed):\/\/([^/]+)\/(.*)$/.exec(fileUrl);
+	if (objectPrefix && objectPrefix[1] !== ENV.SEAWEED_EVIDENCE_BUCKET) {
+		throw new Error('EVIDENCE_SOURCE_OBJECT_REFERENCE_INVALID');
+	}
+	const objectKey = objectPrefix ? objectPrefix[2] : fileUrl;
 	if (
 		!objectKey.startsWith('evidence/') ||
 		objectKey.includes('\\') ||
@@ -36,7 +39,7 @@ export function buildEvidenceReprocessJobV1(input: {
 			evidenceId,
 			caseId,
 			objectKey,
-			object_bucket: 'legal-evidence',
+			object_bucket: ENV.SEAWEED_EVIDENCE_BUCKET,
 			sourceSha256,
 			fileName,
 			contentType: input.contentType ?? 'application/octet-stream',

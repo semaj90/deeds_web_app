@@ -18,7 +18,7 @@ vi.mock('$lib/server/db/schema-postgres.js', () => ({
 	},
 }));
 vi.mock('$lib/server/seaweed-client.js', () => ({ getSeaweedFile: (...args: unknown[]) => mocks.getFile(...args) }));
-vi.mock('$lib/server/env.server.js', () => ({ ENV: { SEAWEED_S3_BUCKET: 'seaweed-evidence', MINIO_EVIDENCE_BUCKET: 'legacy-evidence' } }));
+vi.mock('$lib/server/env.server.js', () => ({ ENV: { SEAWEED_EVIDENCE_BUCKET: 'seaweed-evidence' } }));
 vi.mock('$lib/server/validation.js', () => ({ isUuid: (value: string) => /^[0-9a-f-]{36}$/i.test(value) }));
 vi.mock('drizzle-orm', () => ({
 	and: (...conditions: unknown[]) => ({ and: conditions }),

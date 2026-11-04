@@ -15,7 +15,7 @@ import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
 import { getVlmState, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
 
-const EVIDENCE_BUCKET = ENV.SEAWEED_S3_BUCKET || ENV.MINIO_EVIDENCE_BUCKET;
+const EVIDENCE_BUCKET = ENV.SEAWEED_EVIDENCE_BUCKET;
 
 function extractObjectKey(fileUrl: string): { bucket: string; key: string } | null {
   if (!fileUrl) return null;

@@ -5822,6 +5822,7 @@ import { promisify } from 'node:util';
 import { readFileSync as _readFileSync } from 'node:fs';
 import { resolve as _resolvePath } from 'node:path';
 import { verifyMcpOperatorToken } from './operator-token-verifier.js';
+import { withOperatorTokenGate } from './operator-token-gate.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -7137,18 +7138,22 @@ const TOOL_CONTRACT_REGISTRY: Record<string, {
     optional_inputs: [{ name: 'context_lines', type: 'integer(5-200)' }],
     side_effect_class: 'READ',
     target_kind: 'NONE',
-    requires_authorization: false,
+    requires_authorization: true,
     supports_dry_run: false,
   },
   'ops.record_fix_attempt': {
     required_inputs: [
       { name: 'operator_token', type: 'string', nullable: false },
-      { name: 'filePath', type: 'string', nullable: false },
-      { name: 'errorHash', type: 'string', nullable: false },
-      { name: 'fixDiff', type: 'string', nullable: false },
-      { name: 'outcome', type: 'enum(pass|fail|partial)', nullable: false },
+      { name: 'fix_type', type: 'string', nullable: false },
+      { name: 'fix_description', type: 'string', nullable: false },
     ],
-    optional_inputs: [{ name: 'notes', type: 'string' }],
+    optional_inputs: [
+      { name: 'fix_diff', type: 'string' },
+      { name: 'files_affected', type: 'integer' },
+      { name: 'errors_resolved', type: 'integer' },
+      { name: 'success', type: 'boolean' },
+      { name: 'metadata', type: 'object' },
+    ],
     side_effect_class: 'WRITE',
     target_kind: 'DATABASE',
     requires_authorization: true,
@@ -7157,9 +7162,9 @@ const TOOL_CONTRACT_REGISTRY: Record<string, {
   'ops.run_targeted_test': {
     required_inputs: [
       { name: 'operator_token', type: 'string', nullable: false },
-      { name: 'testFile', type: 'string', nullable: false },
+      { name: 'test_file', type: 'string', nullable: false },
     ],
-    optional_inputs: [{ name: 'timeoutMs', type: 'integer' }],
+    optional_inputs: [{ name: 'timeout_ms', type: 'integer' }],
     side_effect_class: 'EXEC',
     target_kind: 'PROCESS',
     requires_authorization: true,
@@ -7169,9 +7174,77 @@ const TOOL_CONTRACT_REGISTRY: Record<string, {
     required_inputs: [
       { name: 'operator_token', type: 'string', nullable: false },
     ],
-    optional_inputs: [{ name: 'targetFile', type: 'string' }],
+    optional_inputs: [
+      { name: 'gate', type: 'enum(tsc|vitest-all)' },
+      { name: 'timeout_ms', type: 'integer' },
+    ],
     side_effect_class: 'EXEC',
     target_kind: 'PROCESS',
+    requires_authorization: true,
+    supports_dry_run: false,
+  },
+  'ops.fixer_pattern_store': {
+    required_inputs: [
+      { name: 'operator_token', type: 'string', nullable: false },
+      { name: 'errorHash', type: 'string', nullable: false },
+      { name: 'fixTemplate', type: 'string', nullable: false },
+      { name: 'outcome', type: 'enum(success|failure)', nullable: false },
+      { name: 'runId', type: 'string', nullable: false },
+      { name: 'file', type: 'string', nullable: false },
+    ],
+    optional_inputs: [
+      { name: 'errorCode', type: 'string' },
+      { name: 'fixKind', type: 'enum(instruction|diff|regex)' },
+      { name: 'tags', type: 'string[]' },
+      { name: 'topFiles', type: 'string[]' },
+      { name: 'queryEmbedding', type: 'number[]' },
+      { name: 'linesChanged', type: 'integer' },
+      { name: 'durationMs', type: 'integer' },
+      { name: 'langfuseTraceId', type: 'string' },
+    ],
+    side_effect_class: 'WRITE',
+    target_kind: 'DATABASE',
+    requires_authorization: true,
+    supports_dry_run: false,
+  },
+  'ops.gpu_attention': {
+    required_inputs: [
+      { name: 'operator_token', type: 'string', nullable: false },
+      { name: 'query', type: 'number[]', nullable: false },
+      { name: 'keys', type: 'number[]', nullable: false },
+      { name: 'n', type: 'integer', nullable: false },
+      { name: 'dim', type: 'integer', nullable: false },
+    ],
+    optional_inputs: [],
+    side_effect_class: 'WRITE',
+    target_kind: 'DATABASE',
+    requires_authorization: true,
+    supports_dry_run: false,
+  },
+  'ops.gpu_pagerank': {
+    required_inputs: [
+      { name: 'operator_token', type: 'string', nullable: false },
+      { name: 'adj', type: 'number[]', nullable: false },
+      { name: 'n', type: 'integer', nullable: false },
+    ],
+    optional_inputs: [
+      { name: 'damping', type: 'number' },
+      { name: 'iters', type: 'integer' },
+    ],
+    side_effect_class: 'WRITE',
+    target_kind: 'DATABASE',
+    requires_authorization: true,
+    supports_dry_run: false,
+  },
+  'ops.gpu_topk': {
+    required_inputs: [
+      { name: 'operator_token', type: 'string', nullable: false },
+      { name: 'scores', type: 'number[]', nullable: false },
+      { name: 'k', type: 'integer', nullable: false },
+    ],
+    optional_inputs: [],
+    side_effect_class: 'WRITE',
+    target_kind: 'DATABASE',
     requires_authorization: true,
     supports_dry_run: false,
   },
@@ -7863,6 +7936,7 @@ server.registerTool(
     description:
       '[OPERATOR-GATED] Stores a fix attempt outcome to the 3-layer fixer memory. Increments success/failure counts, upserts to Qdrant fixer_memory_768 (GPU-indexed) when embedding provided.',
     inputSchema: z.object({
+      operator_token: z.string().min(1).describe('Configured TRACE operator secret'),
       errorHash: z.string(),
       errorCode: z.string().optional(),
       fixTemplate: z.string().max(4000),
@@ -7878,7 +7952,7 @@ server.registerTool(
       langfuseTraceId: z.string().optional(),
     }),
   },
-  async (opts) => {
+  withOperatorTokenGate(async ({ operator_token: _operatorToken, ...opts }) => {
     try {
       const { storeFixerPattern, ensureFixerMemoryCollection } = await import(
         '../lib/server/fixer/fixer-memory.js'
@@ -7920,7 +7994,7 @@ server.registerTool(
         isError: true,
       };
     }
-  }
+  })
 );
 
 // ── context.prefetch_feature_context ─────────────────────────────────────────
@@ -8957,18 +9031,18 @@ async function handleMcp(req: http.IncomingMessage, res: http.ServerResponse) {
 server.registerTool(
   'ops.gpu_attention',
   {
-    description: 'GPU scaled dot-product attention over a flat key matrix. ' +
-      'Returns softmax attention weights per key. ' +
-      'Results are Redis-cached 300 s by shape+input hash (CUDA Graph replay emulation). ' +
-      'Use for ACE chunk reranking, evidence scoring, or any query-vs-corpus weighting.',
+    description: '[OPERATOR-GATED] GPU/CPU scaled dot-product attention over a flat key matrix. ' +
+      'Returns softmax attention weights per key and records resource telemetry. ' +
+      'Use for ACE chunk reranking, evidence scoring, or query-vs-corpus weighting.',
     inputSchema: z.object({
+      operator_token: z.string().min(1).describe('Configured TRACE operator secret'),
       query: z.array(z.number()).max(768).describe('Query vector (dim floats)'),
       keys:  z.array(z.number()).max(1_000_000).describe('Flat key matrix [n × dim] row-major'),
       n:     z.number().int().min(1).max(2048),
       dim:   z.number().int().min(1).max(768),
     }),
   },
-  async ({ query, keys, n, dim }) => {
+  withOperatorTokenGate(async ({ operator_token: _operatorToken, query, keys, n, dim }) => {
     try {
       const { pipelineAttention } = await import('../lib/server/gpu/gpu-pipeline.js');
       const q = new Float32Array(query);
@@ -8982,24 +9056,24 @@ server.registerTool(
     } catch (err) {
       return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 300) }) }], isError: true };
     }
-  }
+  })
 );
 
 // ── ops.gpu_pagerank ──────────────────────────────────────────────────────────
 server.registerTool(
   'ops.gpu_pagerank',
   {
-    description: 'GPU power-iteration PageRank on a flat adjacency matrix. ' +
-      'Returns normalised rank scores (sum to 1.0). ' +
-      'Cached 300 s by shape+input hash.',
+    description: '[OPERATOR-GATED] GPU/CPU power-iteration PageRank on a flat adjacency matrix. ' +
+      'Returns normalised rank scores (sum to 1.0) and records resource telemetry.',
     inputSchema: z.object({
+      operator_token: z.string().min(1).describe('Configured TRACE operator secret'),
       adj:     z.array(z.number()).max(1_000_000).describe('Flat n×n adjacency matrix row-major'),
       n:       z.number().int().min(2).max(512),
       damping: z.number().min(0).max(1).default(0.85),
       iters:   z.number().int().min(1).max(200).default(50),
     }),
   },
-  async ({ adj, n, damping, iters }) => {
+  withOperatorTokenGate(async ({ operator_token: _operatorToken, adj, n, damping, iters }) => {
     try {
       const { pipelinePageRank } = await import('../lib/server/gpu/gpu-pipeline.js');
       const { scores, source } = await pipelinePageRank(new Float32Array(adj), n, damping, iters);
@@ -9010,21 +9084,22 @@ server.registerTool(
     } catch (err) {
       return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 300) }) }], isError: true };
     }
-  }
+  })
 );
 
 // ── ops.gpu_topk ──────────────────────────────────────────────────────────────
 server.registerTool(
   'ops.gpu_topk',
   {
-    description: 'GPU top-k index selection. Returns k indices of highest-scoring candidates ' +
-      'in descending order. Use after pipelineAttention to get the top chunk indices.',
+    description: '[OPERATOR-GATED] GPU/CPU top-k index selection. Returns k indices of highest-scoring candidates ' +
+      'in descending order and records resource telemetry.',
     inputSchema: z.object({
+      operator_token: z.string().min(1).describe('Configured TRACE operator secret'),
       scores: z.array(z.number()).max(4096).describe('Score array (float per candidate)'),
       k:      z.number().int().min(1).max(100),
     }),
   },
-  async ({ scores, k }) => {
+  withOperatorTokenGate(async ({ operator_token: _operatorToken, scores, k }) => {
     try {
       const { pipelineTopK } = await import('../lib/server/gpu/gpu-pipeline.js');
       const n = scores.length;
@@ -9037,15 +9112,15 @@ server.registerTool(
     } catch (err) {
       return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 300) }) }], isError: true };
     }
-  }
+  })
 );
 
 // ── ops.gpu_pipeline_stats ────────────────────────────────────────────────────
 server.registerTool(
   'ops.gpu_pipeline_stats',
   {
-    description: 'Returns GPU pipeline diagnostics: active stream slots, pending queue depth, ' +
-      'cache hit rate over last 50 ops, and device config.',
+    description: 'Returns GPU pipeline diagnostics: active host-task slots, pending queue depth, ' +
+      'recent operation telemetry, and device config. Legacy numeric result caching is disabled.',
     inputSchema: z.object({}),
   },
   async () => {
@@ -11507,10 +11582,10 @@ if (isDirectRun && MCP_TRANSPORT === 'stdio') {
     console.log('       image.search_by_text (text→embed→Qdrant, no file upload),');
     console.log('       image.caption (VLM describe only, no search),');
     console.log('       image.enrich_tags (VLM→tags→setPayload PATCH, merge dedup)');
-    console.log('       ops.gpu_attention (stream-queued attn, Redis shape-cache),');
-    console.log('       ops.gpu_pagerank (stream-queued PageRank, Redis shape-cache),');
-    console.log('       ops.gpu_topk (GPU top-k index selection),');
-    console.log('       ops.gpu_pipeline_stats (device config, queue depth, cache hit rate)');
+    console.log('       ops.gpu_attention (operator-gated attention with persisted resource telemetry),');
+    console.log('       ops.gpu_pagerank (operator-gated PageRank with persisted resource telemetry),');
+    console.log('       ops.gpu_topk (operator-gated top-k with persisted resource telemetry),');
+    console.log('       ops.gpu_pipeline_stats (device config, queue depth, recent operations)');
     console.log('       ace.compact_search (token-budgeted hybrid search → compact context tree, Redis TTL 300s)');
   });
 }

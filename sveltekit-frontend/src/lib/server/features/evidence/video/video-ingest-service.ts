@@ -130,7 +130,7 @@ export async function ingestVideoEvidence(request: VideoIngestRequest, ownerId: 
     const checksum = sha256(originalBuffer);
     const sourceRevision = formatEvidenceSourceRevisionV1(checksum);
     const evidenceId = crypto.randomUUID();
-    const bucket = ENV.MINIO_EVIDENCE_BUCKET;
+    const bucket = ENV.SEAWEED_EVIDENCE_BUCKET;
     const objectName = buildObjectName(request.caseId, evidenceId, jobId, originalFileName);
     const uploadedOriginalUri = storageUri(bucket, objectName);
 

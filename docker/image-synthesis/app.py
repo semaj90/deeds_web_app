@@ -55,7 +55,7 @@ WAN_MODEL_ID   = os.environ.get("WAN_MODEL_ID",   "Wan-AI/Wan2.1-T2V-1.3B")
 # FLUX.1-schnell (keyframe) — Black Forest Labs, Apache 2.0, ~4-6GB VRAM NF4
 FLUX_MODEL_ID  = os.environ.get("FLUX_MODEL_ID",  "black-forest-labs/FLUX.1-schnell")
 
-# DepthAnything v2 Large — HKU + TikTok, ~1.3GB VRAM
+# DepthAnything v2 Small — Apache-2.0 model weights, lower-memory depth estimator
 DEPTH_MODEL_ID = os.environ.get("DEPTH_MODEL_ID", "depth-anything/Depth-Anything-V2-Small-hf")  # Apache-2.0; Base/Large are CC-BY-NC-4.0
 
 # Generation params
@@ -264,7 +264,7 @@ def get_flux_pipe():
 
 
 def get_depth_pipe():
-    """Lazy load DepthAnything v2 Large."""
+    """Lazy load the configured DepthAnything v2 model."""
     global _depth_pipe
     if _depth_pipe is None:
         try:

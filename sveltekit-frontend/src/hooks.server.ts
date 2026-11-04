@@ -23,7 +23,7 @@ import { pool } from '$lib/server/db/client';
 import { cacheExport } from '$lib/server/cache/pdf-export-cache.js';
 import { storeCachedResponse } from '$lib/server/ai/llm-cache.js';
 import { ENV } from '$lib/server/env.server.js';
-import { isAdminRole } from '$lib/server/auth-utils.js';
+import { evaluateApiRouteAccess, isPublicApiPath } from '$lib/server/auth/api-route-access.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { auditBuffer } from '$lib/server/audit/api-audit-buffer';
@@ -823,76 +823,16 @@ export const handle: Handle = async ({ event, resolve }) => {
   if (event.url.pathname.startsWith('/api/')) {
     const path = event.url.pathname;
 
-    // Public routes (no auth needed) — explicitly allowlisted
-    // NOTE: /api/system, /api/ollama moved to ADMIN_ONLY (Sprint 3 — infra recon + model pull risk)
-    // NOTE: /api/kb, /api/precedents moved to auth-required (Sprint 3 — access Qdrant/case data)
-    const PUBLIC = [
-      '/api/health',
-      '/api/auth',
-      '/api/metrics',
-      '/api/ping',
-      '/api/infrastructure',
-      '/api/docs',
-      '/api/glossary',
-      '/api/statutes',
-      '/api/opencode-dispatch',
-    ];
-
-    // Admin-only routes (require admin role)
-    const ADMIN_ONLY = [
-      '/api/admin',
-      '/api/codebase-index',
-      '/api/codebase',
-      '/api/phase89',
-      '/api/phase72',
-      '/api/phase82',
-      '/api/error-brain',
-      '/api/errors',
-      '/api/internal',
-      '/api/cache',
-      '/api/consolidation',
-      '/api/gpu',
-      '/api/gpu-wasm',
-      '/api/indexing',
-      '/api/pipeline',
-      '/api/qlora',
-      '/api/rabbitmq',
-      '/api/security',
-      '/api/topology',
-      '/api/worker',
-      '/api/generate-cluster',
-      '/api/tools',
-      '/api/system',
-      '/api/ollama',
-      '/api/test',
-      '/api/graph/hypergraph',
-      '/api/mcp',
-      '/api/atlas',
-    ];
-
-    const isPublic = PUBLIC.some((p) => path.startsWith(p));
-
     if (path.includes('runtime-cache')) {
-      console.log('[DEBUG] runtime-cache check:', { path, isPublic, PUBLIC_COUNT: PUBLIC.length });
+      console.log('[DEBUG] runtime-cache check:', { path, isPublic: isPublicApiPath(path) });
     }
 
-    if (!isPublic) {
-      // Deny-by-default: ALL non-public API routes require authentication
-      if (!event.locals.user) {
-        return new Response(JSON.stringify({ error: 'Authentication required' }), {
-          status: 401,
-          headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId },
-        });
-      }
-
-      // Admin-only routes additionally require admin role
-      const needsAdmin = ADMIN_ONLY.some((p) => path.startsWith(p));
-      if (needsAdmin && !isAdminRole(event.locals.user?.role)) {
-        return new Response(JSON.stringify({ error: 'Admin access required' }), {
-          status: 403,
-          headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId },
-        });
-      }
+    const accessDenial = evaluateApiRouteAccess(path, event.locals.user);
+    if (accessDenial) {
+      return new Response(JSON.stringify({ error: accessDenial.error }), {
+        status: accessDenial.status,
+        headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId },
+      });
     }
   }
 

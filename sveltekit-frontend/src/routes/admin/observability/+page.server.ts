@@ -12,9 +12,9 @@ export const load: PageServerLoad = async (event) => {
     event.fetch('/api/admin/ace-metrics?since_days=1'),
   ]);
 
-  let obsData = { success: false };
-  let vlmData = { success: false };
-  let aceMetrics = { success: false };
+  let obsData: Record<string, any> = { success: false };
+  let vlmData: Record<string, any> = { success: false };
+  let aceMetrics: Record<string, any> = { success: false };
 
   if (obsRes.ok) {
     obsData = await obsRes.json();

@@ -310,6 +310,7 @@
 										embedded
 										title={doc.title ?? fileName ?? 'Evidence relief'}
 										{evidenceId}
+										caseId={caseId}
 										imageUrl={previewUrl}
 										depthUrl={depthMapUrl}
 									/>

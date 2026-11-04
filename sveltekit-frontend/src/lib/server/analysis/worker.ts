@@ -13,6 +13,13 @@ import {
 	updateAnalysisJob,
 	completeAnalysisJob,
 	failAnalysisJob,
+	markEvidenceUploadProcessingV1,
+	MAX_EVIDENCE_UPLOAD_ATTEMPTS_V1,
+	classifyEvidenceUploadFailureV1,
+	shouldRetryEvidenceUploadFailureV1,
+	requeueEvidenceUploadJobV1,
+	completeEvidenceUploadJobV1,
+	failEvidenceUploadJobV1,
 	resetStaleJobs,
 	ANALYSIS_JOBS_NOTIFY_CHANNEL,
 	type JobType,
@@ -427,6 +434,7 @@ async function pollOnce(): Promise<void> {
 				gated(cfg.gate, async () => {
 					const t0 = Date.now();
 					const startedAt = new Date(t0).toISOString();
+					let evidenceAttemptCount = 0;
 					const heartbeat = setInterval(() => {
 						void updateAnalysisJob(job.id, { progress: '10' }).catch((error) => {
 							console.warn(`[Worker] ${jobType}/${job.id} heartbeat failed:`, error);
@@ -435,6 +443,12 @@ async function pollOnce(): Promise<void> {
 					heartbeat.unref?.();
 					try {
 						await updateAnalysisJob(job.id, { progress: '10' });
+						if (jobType === 'upload_pipeline') {
+							evidenceAttemptCount = await markEvidenceUploadProcessingV1(job.evidenceId, job.id);
+							if (evidenceAttemptCount > MAX_EVIDENCE_UPLOAD_ATTEMPTS_V1) {
+								throw new Error('EVIDENCE_UPLOAD_RETRY_LIMIT_EXCEEDED');
+							}
+						}
 						const jobResult = job.result as Record<string, unknown>;
 						const result = await executeAnalysisJobStageV1(
 							jobType,
@@ -442,7 +456,14 @@ async function pollOnce(): Promise<void> {
 							job.result as Record<string, unknown>,
 							job.id,
 						);
-						if (jobType === 'lexical_feature_registry' || jobType === 'upload_pipeline') {
+						if (jobType === 'upload_pipeline') {
+							await completeEvidenceUploadJobV1(job.id, job.evidenceId, {
+								...result,
+								durationMs: Date.now() - t0,
+							});
+							return;
+						}
+						if (jobType === 'lexical_feature_registry') {
 							await completeAnalysisJob(job.id, { ...result, durationMs: Date.now() - t0 });
 							return;
 						}
@@ -542,7 +563,30 @@ async function pollOnce(): Promise<void> {
 						console.log(`[Worker] ${jobType}/${job.id} done in ${Date.now() - t0}ms`);
 					} catch (err) {
 						console.error(`[Worker] ${jobType}/${job.id} failed:`, err);
-						await failAnalysisJob(job.id, String(err)).catch((failureError) => {
+						let failureStatus: Promise<unknown>;
+						if (jobType === 'upload_pipeline') {
+							const failureCode = classifyEvidenceUploadFailureV1(err);
+						const retryEligible = shouldRetryEvidenceUploadFailureV1(failureCode, evidenceAttemptCount);
+						failureStatus = (async () => {
+							if (retryEligible) {
+								try {
+									const requeued = await requeueEvidenceUploadJobV1(
+										job.id, job.evidenceId, evidenceAttemptCount, err
+									);
+									if (requeued) {
+										console.warn(`[Worker] ${jobType}/${job.id} requeued after transient storage failure (attempt ${evidenceAttemptCount}/${MAX_EVIDENCE_UPLOAD_ATTEMPTS_V1})`);
+										return;
+									}
+								} catch (requeueError) {
+									console.error(`[Worker] ${jobType}/${job.id} retry could not be persisted; finalizing failure:`, requeueError);
+								}
+							}
+							await failEvidenceUploadJobV1(job.id, job.evidenceId, err);
+						})();
+						} else {
+							failureStatus = failAnalysisJob(job.id, String(err));
+						}
+						await failureStatus.catch((failureError) => {
 							console.error(`[Worker] ${jobType}/${job.id} failure status could not be persisted:`, failureError);
 						});
 					} finally {

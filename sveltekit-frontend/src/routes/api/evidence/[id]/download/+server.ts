@@ -13,7 +13,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { isUuid } from '$lib/server/validation.js';
 import { probeObservedMime } from '$lib/server/ingest/upload-classification-v1.js';
 
-const EVIDENCE_BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
+const EVIDENCE_BUCKET = ENV.SEAWEED_EVIDENCE_BUCKET;
 
 function parseByteRange(header: string | null, size: number): { start: number; end: number } | null | 'invalid' {
   if (!header) return null;

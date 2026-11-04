@@ -8,5 +8,5 @@
 <DocumentDetails 
 	documentId={id} 
 	isVisible={true} 
-	onClose={onClose} 
+	 onClose={() => onClose()} 
 />

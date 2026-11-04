@@ -31,7 +31,7 @@ export async function processEvidenceDocumentCanonicalV1(input: {
   const objectName = metadata.object_name;
 
   if (!sourceBytes && (bucket !== undefined || objectName !== undefined)) {
-    if (bucket !== 'legal-evidence' || typeof objectName !== 'string' || !objectName.startsWith('evidence/')) {
+    if (bucket !== ENV.SEAWEED_EVIDENCE_BUCKET || typeof objectName !== 'string' || !objectName.startsWith('evidence/')) {
       throw new Error('EVIDENCE_OBJECT_REFERENCE_INVALID');
     }
     sourceBytes = await getSeaweedFile(bucket, objectName);

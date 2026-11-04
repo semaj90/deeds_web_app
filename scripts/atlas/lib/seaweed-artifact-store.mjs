@@ -38,7 +38,8 @@ import { dirname, basename, resolve } from 'node:path';
 import { loadRepoEnv, REPO_ROOT } from '../connection-config.mjs';
 
 const env = loadRepoEnv(process.env);
-const BUCKET = env.SEAWEED_S3_BUCKET || 'atlas-artifacts';
+const BUCKET = env.SEAWEED_ARTIFACTS_BUCKET || 'atlas-artifacts';
+const EVIDENCE_BUCKET = env.SEAWEED_EVIDENCE_BUCKET || 'legal-evidence';
 const ENDPOINT = env.SEAWEED_S3_ENDPOINT || `http://${env.SEAWEED_ENDPOINT || 'localhost'}:${env.SEAWEED_S3_PORT || '8333'}`;
 
 const client = new S3Client({
@@ -55,12 +56,20 @@ function sha256Hex(buf) {
   return createHash('sha256').update(buf).digest('hex');
 }
 
+/** Refuse to put derived artifacts in the evidence originals bucket or any unconfigured bucket. */
+export function assertArtifactBucket(bucket = BUCKET) {
+  if (bucket === EVIDENCE_BUCKET || bucket !== BUCKET) {
+    throw new Error(`ARTIFACT_BUCKET_MISMATCH: expected ${BUCKET}, got ${bucket}`);
+  }
+}
+
 /**
  * Uploads a local file to atlas-artifacts, keyed by remoteKey (defaults to the
  * basename). Returns the SHA-256 of the uploaded bytes and the S3 ETag, so a
  * caller can independently verify the round-trip rather than trusting success.
  */
 export async function backupArtifact(localPath, remoteKey, { bucket = BUCKET, metadata = {} } = {}) {
+  assertArtifactBucket(bucket);
   const absPath = resolve(REPO_ROOT, localPath);
   const bytes = readFileSync(absPath);
   const key = remoteKey || basename(absPath);
@@ -76,6 +85,7 @@ export async function backupArtifact(localPath, remoteKey, { bucket = BUCKET, me
 
 /** Downloads an object from atlas-artifacts to a local path. Verifies SHA-256 if metadata carries one. */
 export async function restoreArtifact(remoteKey, localPath, { bucket = BUCKET } = {}) {
+  assertArtifactBucket(bucket);
   const response = await client.send(new GetObjectCommand({ Bucket: bucket, Key: remoteKey }));
   const chunks = [];
   for await (const chunk of response.Body) chunks.push(chunk);
@@ -90,11 +100,13 @@ export async function restoreArtifact(remoteKey, localPath, { bucket = BUCKET } 
 }
 
 export async function listArtifacts(prefix = '', { bucket = BUCKET } = {}) {
+  assertArtifactBucket(bucket);
   const response = await client.send(new ListObjectsV2Command({ Bucket: bucket, Prefix: prefix }));
   return (response.Contents ?? []).map((o) => ({ key: o.Key, size: o.Size, lastModified: o.LastModified }));
 }
 
 export async function headArtifact(remoteKey, { bucket = BUCKET } = {}) {
+  assertArtifactBucket(bucket);
   const response = await client.send(new HeadObjectCommand({ Bucket: bucket, Key: remoteKey }));
   return { contentLength: response.ContentLength ?? 0, metadata: response.Metadata ?? {}, etag: response.ETag ?? null };
 }

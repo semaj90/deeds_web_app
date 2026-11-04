@@ -52,7 +52,7 @@ vi.mock('$lib/server/seaweed-client.js', () => ({
 	statSeaweedObject: mocks.statObject,
 }));
 
-vi.mock('$lib/server/env.server.js', () => ({ ENV: { MINIO_EVIDENCE_BUCKET: 'legal-evidence' } }));
+vi.mock('$lib/server/env.server.js', () => ({ ENV: { SEAWEED_EVIDENCE_BUCKET: 'legal-evidence' } }));
 vi.mock('$lib/server/validation.js', () => ({ isUuid: () => true }));
 vi.mock('$lib/server/ingest/upload-classification-v1.js', () => ({ probeObservedMime: () => mocks.observedMime }));
 

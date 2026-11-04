@@ -2,15 +2,23 @@
 	import { Dialog } from 'bits-ui';
 	import DepthReliefViewer, { type DepthSourceMode, type AnnotationScreenPositions } from './DepthReliefViewer.svelte';
 	import { analyzeStoredEvidenceImage, requestEvidenceUpscale } from './evidence-image-tools.js';
+	import { createActor } from 'xstate';
+	import {
+		createMarkerSaveMachine,
+		fetchSavedMarkers,
+		makeClientMarkerSaver,
+		type MarkerSaveCommand
+	} from '$lib/machines/marker-save-machine.js';
 
 	let {
 		open = $bindable(false),
 		imageUrl,
 		depthUrl = null,
 		evidenceId = null,
+		caseId = null,
 		title = 'Evidence',
 		embedded = false
-	}: { open?: boolean; imageUrl: string | null; depthUrl?: string | null; evidenceId?: string | null; title?: string; embedded?: boolean } = $props();
+	}: { open?: boolean; imageUrl: string | null; depthUrl?: string | null; evidenceId?: string | null; caseId?: string | null; title?: string; embedded?: boolean } = $props();
 
 	// Upscaled result replaces the source for the relief view (blob URL, never persisted).
 	let upscaledUrl = $state<string | null>(null);
@@ -19,7 +27,7 @@
 	let busy = $state<'' | 'analyze' | 'upscale'>('');
 	let actionError = $state('');
 	const effectiveUrl = $derived(upscaledUrl ?? imageUrl);
-	type EvidenceMarker = { id: string; number: number; x: number; y: number; label: string; note: string };
+	type EvidenceMarker = { id: string; number: number; x: number; y: number; label: string; note: string; revision: number | null };
 	let toolMode = $state<'orbit' | 'marker'>('orbit');
 	let markerMotion = $state(true);
 	let markers = $state<EvidenceMarker[]>([]);
@@ -39,6 +47,105 @@
 	let actionToken = 0;
 	const selectedMarker = $derived(markers.find((marker) => marker.id === selectedMarkerId) ?? null);
 
+	// Durable persistence is on only when the case and exhibit are both known. Otherwise
+	// markers stay temporary, as before. One save runs at a time, in order (queue).
+	const persistenceOn = $derived(Boolean(caseId && evidenceId));
+	let saveStatus = $state('');
+	let saveFailed = $state(false);
+	let dragOrigin: { x: number; y: number } | null = null;
+	let lastAppliedCommit: unknown = null;
+	const saveQueue: { kind: 'create' | 'move'; markerId: string }[] = [];
+	const saveActor = createActor(createMarkerSaveMachine(makeClientMarkerSaver()));
+
+	function pumpSaves() {
+		if (!persistenceOn || saveActor.getSnapshot().value !== 'idle') return;
+		while (saveQueue.length > 0) {
+			const next = saveQueue.shift()!;
+			const marker = markers.find((m) => m.id === next.markerId);
+			if (!marker) continue; // removed on screen before it was saved
+			const command: MarkerSaveCommand = {
+				kind: next.kind,
+				caseId: caseId!,
+				sceneKey: `evidence:${evidenceId}`,
+				markerId: marker.id,
+				evidenceId: evidenceId!,
+				commandId: crypto.randomUUID(),
+				expectedRevision: marker.revision ?? 1,
+				position: { x: marker.x, y: marker.y, z: 0 },
+				label: marker.label
+			};
+			saveActor.send({ type: 'DROP', command });
+			return;
+		}
+	}
+
+	function enqueueSave(kind: 'create' | 'move', markerId: string) {
+		if (!persistenceOn) return;
+		saveQueue.push({ kind, markerId });
+		saveStatus = 'Saving…';
+		pumpSaves();
+	}
+
+	/** Hydration: restore saved markers on open. Merges by id, so it never clobbers local work. */
+	async function hydrateSavedMarkers() {
+		if (!persistenceOn || !caseId || !evidenceId) return;
+		try {
+			const saved = await fetchSavedMarkers(caseId, `evidence:${evidenceId}`);
+			const known = new Set(markers.map((m) => m.id));
+			let number = markers.reduce((max, m) => Math.max(max, m.number), 0);
+			const added: EvidenceMarker[] = [];
+			for (const s of saved) {
+				if (known.has(s.markerId)) continue;
+				number += 1;
+				added.push({
+					id: s.markerId,
+					number,
+					x: s.position.x,
+					y: s.position.y,
+					label: s.label ?? `Marker ${number}`,
+					note: '',
+					revision: s.revision
+				});
+			}
+			if (added.length) markers = [...markers, ...added];
+			saveStatus = saved.length ? `Loaded ${saved.length} saved marker${saved.length === 1 ? '' : 's'}` : '';
+		} catch {
+			saveStatus = 'Could not load saved markers. New markers will still save.';
+		}
+	}
+
+	$effect(() => {
+		saveActor.start();
+		void hydrateSavedMarkers();
+		const sub = saveActor.subscribe((snap) => {
+			saveFailed = snap.value === 'failed';
+			if (snap.value === 'conflict') {
+				saveQueue.length = 0;
+				saveStatus = 'Conflict: this marker changed elsewhere. Reload the exhibit to see the saved position.';
+				return;
+			}
+			if (snap.value === 'failed') {
+				saveStatus = `Not saved: ${snap.context.error ?? 'unknown error'}. Retry, or reset to discard.`;
+				return;
+			}
+			const committed = snap.context.committed;
+			if (snap.value === 'idle' && committed && committed !== lastAppliedCommit) {
+				lastAppliedCommit = committed;
+				markers = markers.map((m) => (m.id === committed.markerId ? { ...m, revision: committed.revision } : m));
+				if (saveQueue.length === 0) saveStatus = `Saved (revision ${committed.revision})`;
+				pumpSaves();
+			}
+		});
+		return () => {
+			sub.unsubscribe();
+			saveActor.stop();
+		};
+	});
+
+	function retrySave() {
+		saveActor.send({ type: 'RETRY' });
+	}
+
 	function addMarker(x: number, y: number, place?: (marker: EvidenceMarker) => void) {
 		const number = markers.reduce((max, marker) => Math.max(max, marker.number), 0) + 1;
 		const marker: EvidenceMarker = {
@@ -47,11 +154,13 @@
 			x,
 			y,
 			label: `Marker ${number}`,
-			note: ''
+			note: '',
+			revision: null
 		};
 		markers = [...markers, marker];
 		selectedMarkerId = marker.id;
 		place?.(marker);
+		enqueueSave('create', marker.id);
 	}
 
 	function updateSelectedMarker(field: 'label' | 'note', value: string) {
@@ -63,6 +172,7 @@
 	function removeMarker(id: string) {
 		if (!markers.some((marker) => marker.id === id)) return;
 		markers = markers.filter((marker) => marker.id !== id);
+		if (persistenceOn) saveStatus = 'Removed on screen only: server delete is not implemented, so a saved marker remains.';
 		if (selectedMarkerId === id) selectedMarkerId = markers.at(-1)?.id ?? null;
 		markerScreenPositions = Object.fromEntries(Object.entries(markerScreenPositions).filter(([markerId]) => markerId !== id));
 	}
@@ -88,11 +198,21 @@
 		event.stopPropagation();
 		selectedMarkerId = markerId;
 		draggingMarkerId = markerId;
+		const start = markers.find((marker) => marker.id === markerId);
+		dragOrigin = start ? { x: start.x, y: start.y } : null;
 		(event.currentTarget as HTMLButtonElement).setPointerCapture(event.pointerId);
 	}
 
+	/** Release is the only durable write: one move command per drag, and only if it moved. */
 	function stopMarkerDrag() {
+		const id = draggingMarkerId;
+		const moved = id !== null && dragOrigin !== null;
+		if (id !== null && moved) {
+			const now = markers.find((marker) => marker.id === id);
+			if (now && (now.x !== dragOrigin!.x || now.y !== dragOrigin!.y)) enqueueSave('move', id);
+		}
 		draggingMarkerId = null;
+		dragOrigin = null;
 	}
 
 	function handleDepthSource(mode: DepthSourceMode) {
@@ -180,7 +300,8 @@
 					<button class="e3d-btn" aria-label="Orbit" class:active={toolMode === 'orbit'} aria-pressed={toolMode === 'orbit'} title="Orbit and inspect the relief (O)" onclick={() => chooseMarkerTool('orbit')}>Orbit <kbd aria-hidden="true">O</kbd></button>
 					<button class="e3d-btn" aria-label="Place marker" class:active={toolMode === 'marker'} aria-pressed={toolMode === 'marker'} title="Place a pin on the relief (M)" onclick={() => chooseMarkerTool('marker')}>＋ Place marker <kbd aria-hidden="true">M</kbd></button>
 				</div>
-				<span class="e3d-marker-count" aria-live="polite"><span class="e3d-count-dot"></span>{markers.length} {markers.length === 1 ? 'marker' : 'markers'} <span>· temporary</span></span>
+				<span class="e3d-marker-count" aria-live="polite"><span class="e3d-count-dot"></span>{markers.length} {markers.length === 1 ? 'marker' : 'markers'} <span>{persistenceOn ? '· saved to case' : '· temporary'}</span></span>
+				{#if saveStatus}<span class="e3d-save-status" role="status" data-testid="e3d-save-status">{saveStatus}{#if saveFailed} <button class="e3d-btn" onclick={retrySave}>Retry</button>{/if}</span>{/if}
 				<div class="e3d-tool-group" aria-label="Marker history">
 					<button class="e3d-btn" disabled={markers.length === 0} title="Remove the most recently placed pin" onclick={undoMarker}>Undo</button>
 					<button class="e3d-btn" disabled={markers.length === 0} title="Clear all temporary pins" onclick={clearMarkers}>Clear pins</button>
@@ -203,6 +324,7 @@
 						{#if markerScreenPositions[marker.id]}
 							<button
 								class="e3d-pin-label"
+								data-marker-id={marker.id}
 								class:selected={selectedMarkerId === marker.id}
 								class:motion-disabled={!markerMotion}
 								style={`left:${markerScreenPositions[marker.id].left}%;top:${markerScreenPositions[marker.id].top}%;`}

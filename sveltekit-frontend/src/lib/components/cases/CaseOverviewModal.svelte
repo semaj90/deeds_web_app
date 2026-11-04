@@ -45,7 +45,7 @@
 
 			<!-- Close Button -->
 			<Dialog.Close
-				onclick={onClose}
+				onclick={() => onClose()}
 				class="case-overview-close"
 				aria-label="Close modal"
 			>
@@ -65,7 +65,7 @@
 						<p class="text-xs text-sand/70 font-mono mt-1">{error}</p>
 					</div>
 					<button 
-						onclick={onClose}
+						onclick={() => onClose()}
 						type="button"
 						class="mt-4 px-6 py-2 rounded bg-black/40 hover:bg-black/60 border border-sand/30 hover:border-sand/60 transition-colors text-white text-xs font-mono uppercase"
 					>

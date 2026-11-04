@@ -19,7 +19,7 @@ vi.mock('$lib/server/db/schema-postgres.js', () => ({
 	},
 }));
 vi.mock('$lib/server/seaweed-client.js', () => ({ getSeaweedFile: (...args: unknown[]) => mocks.getFile(...args) }));
-vi.mock('$lib/server/env.server.js', () => ({ ENV: { MINIO_EVIDENCE_BUCKET: 'evidence' } }));
+vi.mock('$lib/server/env.server.js', () => ({ ENV: { SEAWEED_EVIDENCE_BUCKET: 'evidence' } }));
 vi.mock('$lib/server/validation.js', () => ({ isUuid: (value: string) => /^[0-9a-f-]{36}$/i.test(value) }));
 vi.mock('$lib/server/inference/vlm-lifecycle.js', () => ({
 	getVlmState: (...args: unknown[]) => mocks.getVlmState(...args),

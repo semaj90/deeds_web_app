@@ -19,13 +19,17 @@ describe.runIf(Boolean(DB_URL))('failEvidenceUploadJobV1 (scratch database)', ()
 	let db: ReturnType<typeof drizzle>;
 	let evidenceId: string;
 	let otherEvidenceId: string;
-	let evidenceSnapshots: Array<{ id: string; status: string | null; ai_analysis: unknown }> = [];
+	let createdEvidenceIds: string[] = [];
 	let createdJobIds: string[] = [];
 
 	beforeAll(async () => {
 		const target = new URL(DB_URL);
-		if (target.pathname !== '/scene_marker_full_002952') {
-			throw new Error('FAIL07_TEST_DATABASE_MISMATCH: expected scene_marker_full_002952');
+		if (
+			target.hostname !== '127.0.0.1' ||
+			target.port !== '5434' ||
+			target.pathname !== '/scene_marker_full_002952'
+		) {
+			throw new Error('FAIL07_TEST_DATABASE_MISMATCH: expected 127.0.0.1:5434/scene_marker_full_002952');
 		}
 		pool = new pg.Pool({ connectionString: DB_URL, max: 2 });
 		const identity = await pool.query('SELECT current_database() AS database');
@@ -35,18 +39,14 @@ describe.runIf(Boolean(DB_URL))('failEvidenceUploadJobV1 (scratch database)', ()
 	});
 
 	beforeEach(async () => {
+		// One connection for fixture setup, the finalizer and every assertion.
 		client = await pool.connect();
 		db = drizzle(client);
+		createdEvidenceIds = [];
 		createdJobIds = [];
-		const rows = await db.execute(sql`SELECT id, status, ai_analysis FROM evidence ORDER BY id LIMIT 2`);
-		if (rows.rows.length < 2) {
-			client.release();
-			client = undefined;
-			throw new Error('FAIL07_TEST_FIXTURE_MISSING: expected two scratch evidence rows');
-		}
-		evidenceSnapshots = rows.rows as Array<{ id: string; status: string | null; ai_analysis: unknown }>;
-		evidenceId = evidenceSnapshots[0].id;
-		otherEvidenceId = evidenceSnapshots[1].id;
+		// Disposable, uniquely titled evidence rows. Existing scratch rows are never touched.
+		evidenceId = await createEvidence();
+		otherEvidenceId = await createEvidence();
 	});
 
 	afterEach(async () => {
@@ -57,12 +57,8 @@ describe.runIf(Boolean(DB_URL))('failEvidenceUploadJobV1 (scratch database)', ()
 			if (createdJobIds.length > 0) {
 				await cleanupClient.query('DELETE FROM analysis_jobs WHERE id = ANY($1::uuid[])', [createdJobIds]);
 			}
-			for (const row of evidenceSnapshots) {
-				const aiAnalysis = row.ai_analysis == null ? null : JSON.stringify(row.ai_analysis);
-				await cleanupClient.query(
-					'UPDATE evidence SET status = $1, ai_analysis = $2::jsonb WHERE id = $3::uuid',
-					[row.status, aiAnalysis, row.id]
-				);
+			if (createdEvidenceIds.length > 0) {
+				await cleanupClient.query('DELETE FROM evidence WHERE id = ANY($1::uuid[])', [createdEvidenceIds]);
 			}
 			await cleanupClient.query('COMMIT');
 		} catch (error) {
@@ -78,6 +74,16 @@ describe.runIf(Boolean(DB_URL))('failEvidenceUploadJobV1 (scratch database)', ()
 		await pool?.end();
 	});
 
+	async function createEvidence(status = 'pending'): Promise<string> {
+		const id = randomUUID();
+		await db.execute(sql`
+			INSERT INTO evidence (id, title, evidence_type, canvas_position, status, ai_analysis)
+			VALUES (${id}::uuid, ${`fail07 fixture ${id}`}, 'document', '{}'::jsonb, ${status}, '{}'::jsonb)
+		`);
+		createdEvidenceIds.push(id);
+		return id;
+	}
+
 	async function job(forEvidenceId = evidenceId): Promise<string> {
 		const id = randomUUID();
 		await db.execute(sql`
@@ -88,11 +94,27 @@ describe.runIf(Boolean(DB_URL))('failEvidenceUploadJobV1 (scratch database)', ()
 		return id;
 	}
 
+	async function evidenceState(): Promise<Record<string, unknown>> {
+		const r = await db.execute(sql`SELECT ai_analysis FROM evidence WHERE id = ${evidenceId}::uuid`);
+		return ((r.rows[0] as { ai_analysis: Record<string, unknown> | null }).ai_analysis ?? {}) as Record<
+			string,
+			unknown
+		>;
+	}
+
+	async function evidenceStatus(): Promise<string> {
+		const r = await db.execute(sql`SELECT status FROM evidence WHERE id = ${evidenceId}::uuid`);
+		return (r.rows[0] as { status: string }).status;
+	}
+
+	/** Full evidence + job state, used to compare before and after a rolled-back finalization. */
+	async function snapshot(jobId: string): Promise<string> {
+		const e = await db.execute(sql`SELECT status, ai_analysis FROM evidence WHERE id = ${evidenceId}::uuid`);
+		const j = await db.execute(sql`SELECT status, error, completed_at IS NOT NULL AS completed FROM analysis_jobs WHERE id = ${jobId}::uuid`);
+		return JSON.stringify({ evidence: e.rows[0], job: j.rows[0] });
+	}
+
 	it('completion replay is idempotent and rejects a mismatched evidence link', async () => {
-		await db.execute(sql`
-			UPDATE evidence SET status = 'pending', ai_analysis = '{}'::jsonb
-			WHERE id IN (${evidenceId}::uuid, ${otherEvidenceId}::uuid)
-		`);
 		const jobId = await job();
 		const receipt = {
 			status: 'processed', sourceRevision: `sha256:${'b'.repeat(64)}`,
@@ -113,21 +135,7 @@ describe.runIf(Boolean(DB_URL))('failEvidenceUploadJobV1 (scratch database)', ()
 		expect((other.rows[0] as { status: string }).status).toBe('pending');
 	});
 
-	async function evidenceState(): Promise<Record<string, unknown>> {
-		const r = await db.execute(sql`SELECT ai_analysis FROM evidence WHERE id = ${evidenceId}::uuid`);
-		return ((r.rows[0] as { ai_analysis: Record<string, unknown> | null }).ai_analysis ?? {}) as Record<
-			string,
-			unknown
-		>;
-	}
-
-	async function evidenceStatus(): Promise<string> {
-		const r = await db.execute(sql`SELECT status FROM evidence WHERE id = ${evidenceId}::uuid`);
-		return (r.rows[0] as { status: string }).status;
-	}
-
 	it('a missing source marks both the job and evidence source_missing', async () => {
-		await db.execute(sql`UPDATE evidence SET status = 'pending', ai_analysis = '{}'::jsonb WHERE id = ${evidenceId}::uuid`);
 		const jobId = await job();
 		const missingSource = Object.assign(new Error('NoSuchKey: scratch source missing'), {
 			name: 'NoSuchKey',
@@ -145,7 +153,6 @@ describe.runIf(Boolean(DB_URL))('failEvidenceUploadJobV1 (scratch database)', ()
 	});
 
 	it('duplicate failure finalization is idempotent for job and evidence state', async () => {
-		await db.execute(sql`UPDATE evidence SET status = 'pending', ai_analysis = '{}'::jsonb WHERE id = ${evidenceId}::uuid`);
 		const jobId = await job();
 		await failEvidenceUploadJobV1(jobId, evidenceId, 'first failure', db as never);
 		await failEvidenceUploadJobV1(jobId, evidenceId, 'first failure', db as never);
@@ -155,17 +162,25 @@ describe.runIf(Boolean(DB_URL))('failEvidenceUploadJobV1 (scratch database)', ()
 		expect(ev.extractionStatus).toBe('failed');
 	});
 
-	it('rolls back evidence changes when terminal job finalization fails inside the transaction', async () => {
-		await db.execute(sql`UPDATE evidence SET status = 'pending', ai_analysis = '{}'::jsonb WHERE id = ${evidenceId}::uuid`);
+	it('rolls back evidence and job changes when finalization fails after the evidence update', async () => {
 		const jobId = await job();
+		// Baseline is read on the same connection the finalizer uses, after the disposable fixture is set up.
+		const before = await snapshot(jobId);
+		expect(await evidenceStatus()).toBe('pending');
+
 		let executions = 0;
+		let injectedAfterStatement: number | null = null;
 		const failingExecutor = {
 			transaction: (callback: (tx: { execute: (query: Parameters<typeof db.execute>[0]) => Promise<unknown> }) => Promise<unknown>) =>
 				db.transaction(async (realTx) => callback({
 					execute: async (query) => {
 						executions += 1;
 						const result = await realTx.execute(query);
-						if (executions === 2) throw new Error('INJECTED_AFTER_EVIDENCE_UPDATE');
+						// Execution 2 is the evidence UPDATE inside persistEvidenceUploadStateV1.
+						if (executions === 2) {
+							injectedAfterStatement = executions;
+							throw new Error('INJECTED_AFTER_EVIDENCE_UPDATE');
+						}
 						return result;
 					},
 				})),
@@ -173,14 +188,12 @@ describe.runIf(Boolean(DB_URL))('failEvidenceUploadJobV1 (scratch database)', ()
 
 		await expect(failEvidenceUploadJobV1(jobId, evidenceId, 'injected rollback', failingExecutor as never))
 			.rejects.toThrow('INJECTED_AFTER_EVIDENCE_UPDATE');
-		expect(await evidenceStatus()).toBe('pending');
-		expect((await evidenceState()).extractionStatus).toBeUndefined();
-		const jobRow = await db.execute(sql`SELECT status FROM analysis_jobs WHERE id = ${jobId}::uuid`);
-		expect((jobRow.rows[0] as { status: string }).status).toBe('running');
+		expect(injectedAfterStatement).toBe(2);
+		// The complete state, not only the status, must match the pre-test baseline.
+		expect(await snapshot(jobId)).toBe(before);
 	});
 
 	it('bounds transient retries and increments attempts for the same durable job', async () => {
-		await db.execute(sql`UPDATE evidence SET status = 'pending', ai_analysis = '{}'::jsonb WHERE id = ${evidenceId}::uuid`);
 		const jobId = await job();
 		const firstAttempt = await markEvidenceUploadProcessingV1(evidenceId, jobId, db as never);
 		expect(firstAttempt).toBe(1);

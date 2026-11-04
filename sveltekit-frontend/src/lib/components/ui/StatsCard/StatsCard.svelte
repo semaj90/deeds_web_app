@@ -1,6 +1,6 @@
 <script lang="ts">
  import type { Snippet } from 'svelte';
- let { children, title = '', value = undefined, subtitle = undefined } = $props<{
+ let { children = undefined, title = '', value = undefined, subtitle = undefined } = $props<{
  children?: Snippet;
  title?: string;
  value?: string | number;
@@ -14,7 +14,9 @@
  {#if subtitle}
  <div class="card-sub">{ subtitle }</div>
  {/if}
- {@render children?.()}
+ {#if children}
+ {@render children()}
+ {/if}
 </article>
 
 <style>
