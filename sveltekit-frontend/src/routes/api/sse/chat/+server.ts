@@ -597,7 +597,8 @@ async function searchCollection(
 async function retrieveContext(
   query: string,
   limit = RAG_MAX_CHUNKS,
-  graphFilter?: Record<string, unknown>
+  graphFilter?: Record<string, unknown>,
+  authorizedCaseId?: string
 ): Promise<ContextDoc[]> {
   try {
     const vector = await embedSemanticQuery(query);
@@ -605,10 +606,18 @@ async function retrieveContext(
     const embeddingDims = vector.length;
     const embeddingModel = EMBEDDING_MODEL;
 
-    // 2. Search tiered: KB corpus (no graph filter) + Case evidence (graph-filtered)
+    // Case evidence is private: graph should-hints are not a security filter.
+    // Restrict broadly shared legal_documents/case_chunks until their
+    // provenance and tenancy contracts are proven separately.
+    const publicCollections = ['court_opinions', 'legal_canon_chunks'] as const;
+    const caseFilter = authorizedCaseId
+      ? { must: [{ key: 'case_id', match: { value: authorizedCaseId } }] }
+      : null;
     const [kbHits, caseHits] = await Promise.all([
-      Promise.all(KB_COLLECTIONS.map((col) => searchCollection(col, vector, limit))),
-      Promise.all(CASE_COLLECTIONS.map((col) => searchCollection(col, vector, limit, graphFilter))),
+      Promise.all(publicCollections.map((col) => searchCollection(col, vector, limit))),
+      caseFilter
+        ? Promise.all(CASE_COLLECTIONS.map((col) => searchCollection(col, vector, limit, caseFilter)))
+        : Promise.resolve([]),
     ]);
     const merged = [...kbHits.flat(), ...caseHits.flat()];
 
@@ -667,11 +676,12 @@ async function retrieveContextWithBudget(
   query: string,
   limit = RAG_MAX_CHUNKS,
   timeoutMs = PRELUDE_RAG_TIMEOUT_MS,
-  graphFilter?: Record<string, unknown>
+  graphFilter?: Record<string, unknown>,
+  authorizedCaseId?: string
 ): Promise<ContextDoc[]> {
   try {
     return await Promise.race([
-      retrieveContext(query, limit, graphFilter),
+      retrieveContext(query, limit, graphFilter, authorizedCaseId),
       new Promise<ContextDoc[]>((resolve) => setTimeout(() => resolve([]), timeoutMs)),
     ]);
   } catch {
@@ -1269,10 +1279,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // ── L0.5 Intercept: RAG Retrieval Cache (P2f) ──
       // Cache Qdrant retrieval results by (query, case) to skip embedding + search
       // on repeated queries within 2 minutes. Invalidated on new evidence upload.
-      const ragGlyphKey = `glyph:rag:${createHash('md5')
-        .update(message + (caseUuid ?? ''))
+      const ragGlyphKey = `glyph:rag:v2:${createHash('sha256')
+        .update(JSON.stringify([chatUserId, caseUuid ?? null, message]))
         .digest('hex')
-        .slice(0, 12)}`;
+        .slice(0, 20)}`;
       let ragGlyphHit = false;
       let cachedRagDocs: ContextDoc[] | null = null;
       if (!attachmentScopedDocs.length && !hasInlineAttachmentSource) {
@@ -1309,7 +1319,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                   message,
                   RAG_MAX_CHUNKS,
                   PRELUDE_RAG_TIMEOUT_MS,
-                  preRetrievalFilter
+                  preRetrievalFilter,
+                  caseUuid
                 ),
         wantsCode && !codeGlyphHit
           ? loadCodebaseContext(message).catch(() => null)
