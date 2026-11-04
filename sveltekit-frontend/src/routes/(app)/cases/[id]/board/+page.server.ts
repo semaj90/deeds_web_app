@@ -1,32 +1,33 @@
+import { error } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { canvasStates, evidence, evidenceBoardConnections } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { clientKey, TTL } from '$lib/server/cache-keys.js';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
+import { requireOwnedCaseId } from '$lib/server/cases/owned-case.js';
 
 const safe = <T>(p: Promise<T>, fb: T): Promise<T> =>
 	Promise.race([p, new Promise<T>((r) => setTimeout(() => r(fb), 5000))]).catch(() => fb);
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const { id } = params;
-  const userId = locals.user?.id ?? 'anon';
+  const userId = Number(locals.user?.id);
+  if (!locals.user || !Number.isSafeInteger(userId) || userId <= 0) {
+    throw error(401, 'Unauthorized');
+  }
 
   // Validate UUID format (for test resilience)
   const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 
-  // Return empty data for invalid UUIDs (e.g., test-id) instead of DB error
-  if (!isValidUuid) {
-    return {
-      caseId: id,
-      initialState: null,
-      evidence: [],
-      connections: [],
-    };
+  // Authorize BEFORE any cache access, canvas read, evidence read, or graph read.
+  // A cache key containing userId is not an authorization check.
+  if (!isValidUuid || !(await requireOwnedCaseId(id, userId))) {
+    throw error(404, 'Case not found');
   }
 
   // Client view cache check
-  const vKey = clientKey.view(userId, id, 'board-v2');
+  const vKey = clientKey.view(String(userId), id, 'board-v2');
   const memHit = getFromMemoryCache(vKey);
   if (memHit.found && memHit.value) return memHit.value as any;
   try {
