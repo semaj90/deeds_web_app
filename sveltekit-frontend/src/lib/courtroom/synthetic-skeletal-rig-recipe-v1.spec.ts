@@ -2,11 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
   toCourtroomRestRig,
   validateSyntheticSkeletalRigRecipeV1,
+  type SyntheticSkeletalRigRecipeV1,
 } from './synthetic-skeletal-rig-recipe-v1.js';
 
 const IDENTITY = [0, 0, 0, 1] as const;
 
-function originalFixture() {
+function originalFixture(): SyntheticSkeletalRigRecipeV1 {
   return {
     schema: 'atlas.synthetic-skeletal-rig-recipe.v1',
     assetKind: 'synthetic_fixture',
@@ -110,9 +111,8 @@ describe('synthetic skeletal rig recipe v1', () => {
 
   it('admits explicit root translation but rejects translation of child bones', () => {
     const moving = originalFixture();
-    const clip: Record<string, unknown> = moving.clips[0];
-    clip.rootMotion = 'explicit_root_translation';
-    const movingClip = clip as { tracks: unknown[] };
+    const movingClip = moving.clips[0];
+    movingClip.rootMotion = 'explicit_root_translation';
     movingClip.tracks.push({
       channel: 'translation',
       bone: 'root',
@@ -133,7 +133,7 @@ describe('synthetic skeletal rig recipe v1', () => {
     };
     expect(validateSyntheticSkeletalRigRecipeV1(moving).success).toBe(false);
 
-    clip.rootMotion = 'in_place';
+    movingClip.rootMotion = 'in_place';
     movingClip.tracks[1] = {
       channel: 'translation',
       bone: 'root',
