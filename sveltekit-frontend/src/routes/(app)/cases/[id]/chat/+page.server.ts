@@ -1,8 +1,9 @@
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db/client';
-import { cases, evidence, documents, caseNotes, citations } from '$lib/server/db/schema-postgres.js';
+import { evidence, documents, caseNotes, citations } from '$lib/server/db/schema-postgres.js';
 import { eq, desc } from 'drizzle-orm';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -24,25 +25,20 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		};
 	}
 
-	const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
+	const actorId = Number(locals.user.id);
+	if (!Number.isInteger(actorId) || actorId <= 0) throw error(404, 'Case not found');
 
-	const [caseRow] = await safe(db.select().from(cases).where(eq(cases.id, caseId)).limit(1), [null]);
-	const evidenceRows = await safe(
+	// Reuse the canonical owner/assigned-attorney rule before reading any case records.
+	const caseRow = await getAuthorizedCase(caseId, actorId);
+	if (!caseRow) throw error(404, 'Case not found');
+
+	// Let query failures reach the route error state instead of presenting them as empty case data.
+	const [evidenceRows, docRows, noteRows, citationRows] = await Promise.all([
 		db.select().from(evidence).where(eq(evidence.caseId, caseId)).orderBy(desc(evidence.createdAt)),
-		[]
-	);
-	const docRows = await safe(
 		db.select().from(documents).where(eq(documents.caseId, caseId)).orderBy(desc(documents.createdAt)),
-		[]
-	);
-	const noteRows = await safe(
 		db.select().from(caseNotes).where(eq(caseNotes.caseId, caseId)).orderBy(desc(caseNotes.createdAt)),
-		[]
-	);
-	const citationRows = await safe(
-		db.select().from(citations).where(eq(citations.caseId, caseId)),
-		[]
-	);
+		db.select().from(citations).where(eq(citations.caseId, caseId))
+	]);
 
 	return {
 		caseData: caseRow,
@@ -50,6 +46,6 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		documentsList: docRows,
 		notesList: noteRows,
 		citationsList: citationRows,
-		loadError: caseRow ? null : 'Case not found in PostgreSQL 18'
+		loadError: null
 	};
 };

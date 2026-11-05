@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { Dialog } from 'bits-ui';
-	import DepthReliefViewer, { type DepthSourceMode, type AnnotationScreenPositions } from './DepthReliefViewer.svelte';
+	import DepthReliefViewer, { type DepthSourceMode, type AnnotationScreenPositions, type ReliefSamplingMode } from './DepthReliefViewer.svelte';
+	import EvidenceSpzViewer from './EvidenceSpzViewer.svelte';
 	import { analyzeStoredEvidenceImage, requestEvidenceUpscale } from './evidence-image-tools.js';
 	import { createActor } from 'xstate';
+	import type { ChatMessage } from '$lib/models/ChatSession.svelte.js';
 	import {
 		createMarkerSaveMachine,
 		fetchSavedMarkers,
@@ -17,8 +19,12 @@
 		evidenceId = null,
 		caseId = null,
 		title = 'Evidence',
-		embedded = false
-	}: { open?: boolean; imageUrl: string | null; depthUrl?: string | null; evidenceId?: string | null; caseId?: string | null; title?: string; embedded?: boolean } = $props();
+		embedded = false,
+		chatMessages = [],
+		chatStatus = 'idle',
+		onAskAssistant,
+		assistantInitiallyExpanded = false
+	}: { open?: boolean; imageUrl: string | null; depthUrl?: string | null; evidenceId?: string | null; caseId?: string | null; title?: string; embedded?: boolean; chatMessages?: ChatMessage[]; chatStatus?: string; onAskAssistant?: (prompt: string) => void | Promise<void>; assistantInitiallyExpanded?: boolean } = $props();
 
 	// Upscaled result replaces the source for the relief view (blob URL, never persisted).
 	let upscaledUrl = $state<string | null>(null);
@@ -29,8 +35,17 @@
 	const effectiveUrl = $derived(upscaledUrl ?? imageUrl);
 	type EvidenceMarker = { id: string; number: number; x: number; y: number; label: string; note: string; revision: number | null };
 	let toolMode = $state<'orbit' | 'marker'>('orbit');
+	let sceneView = $state<'relief' | 'spz'>('relief');
+	let samplingMode = $state<ReliefSamplingMode>('native');
 	let markerMotion = $state(true);
+	let assistantExpanded = $state(false);
+	let assistantDraft = $state('');
+	let assistantSending = $state(false);
 	let markers = $state<EvidenceMarker[]>([]);
+
+	$effect(() => {
+		if (open) assistantExpanded = assistantInitiallyExpanded;
+	});
 	let selectedMarkerId = $state<string | null>(null);
 	let markerScreenPositions = $state<Record<string, { left: number; top: number }>>({});
 	let draggingMarkerId = $state<string | null>(null);
@@ -230,6 +245,18 @@
 		else if (key === 'deselect') selectedMarkerId = null;
 	}
 
+	async function askAssistant(prompt = assistantDraft) {
+		const question = prompt.trim();
+		if (!question || !caseId || !evidenceId || !onAskAssistant || assistantSending || chatStatus !== 'idle') return;
+		assistantSending = true;
+		assistantDraft = '';
+		try {
+			await onAskAssistant(question);
+		} finally {
+			assistantSending = false;
+		}
+	}
+
 	function handleMarkerMove(id: string, x: number, y: number) {
 		markers = markers.map((marker) => marker.id === id ? { ...marker, x, y } : marker);
 	}
@@ -296,9 +323,21 @@
 
 {#snippet reliefWorkspace()}
 			<div class="e3d-annotation-bar" role="toolbar" aria-label="Image annotation tools">
+				{#if persistenceOn}
+					<div class="e3d-tool-group" role="group" aria-label="Evidence scene view">
+						<button class="e3d-btn" aria-pressed={sceneView === 'relief'} onclick={() => (sceneView = 'relief')}>Image relief</button>
+						<button class="e3d-btn" aria-pressed={sceneView === 'spz'} onclick={() => (sceneView = 'spz')}>3D SPZ</button>
+					</div>
+				{/if}
 				<div class="e3d-tool-group" aria-label="Canvas tools">
 					<button class="e3d-btn" aria-label="Orbit" class:active={toolMode === 'orbit'} aria-pressed={toolMode === 'orbit'} title="Orbit and inspect the relief (O)" onclick={() => chooseMarkerTool('orbit')}>Orbit <kbd aria-hidden="true">O</kbd></button>
 					<button class="e3d-btn" aria-label="Place marker" class:active={toolMode === 'marker'} aria-pressed={toolMode === 'marker'} title="Place a pin on the relief (M)" onclick={() => chooseMarkerTool('marker')}>＋ Place marker <kbd aria-hidden="true">M</kbd></button>
+				</div>
+				<div class="e3d-tool-group" role="group" aria-label="Display sampling">
+					<span class="e3d-sampling-label">Display</span>
+					<button class="e3d-btn" aria-pressed={samplingMode === 'native'} onclick={() => (samplingMode = 'native')}>Native</button>
+					<button class="e3d-btn" aria-pressed={samplingMode === 'half'} onclick={() => (samplingMode = 'half')}>Half</button>
+					<button class="e3d-btn" aria-pressed={samplingMode === 'retro'} title="Lower display resolution with nearest-neighbor sampling; visual preview only" onclick={() => (samplingMode = 'retro')}>Retro</button>
 				</div>
 				<span class="e3d-marker-count" aria-live="polite"><span class="e3d-count-dot"></span>{markers.length} {markers.length === 1 ? 'marker' : 'markers'} <span>{persistenceOn ? '· saved to case' : '· temporary'}</span></span>
 				{#if saveStatus}<span class="e3d-save-status" role="status" data-testid="e3d-save-status">{saveStatus}{#if saveFailed} <button class="e3d-btn" onclick={retrySave}>Retry</button>{/if}</span>{/if}
@@ -312,6 +351,9 @@
 				{#if toolMode === 'marker'}<span class="e3d-instruction" aria-live="polite">Click surface to pin · Enter to place · drag a pin to reposition · Del removes selection</span>{/if}
 			</div>
 			<div class="e3d-stage" data-status={status}>
+				{#if sceneView === 'spz' && caseId && evidenceId}
+					<EvidenceSpzViewer {caseId} {evidenceId} />
+				{:else}
 				{#if selectedMarker}
 					<div class="e3d-marker-editor" aria-label="Selected marker details">
 						<label>Marker {selectedMarker.number}<input aria-label="Marker label" value={selectedMarker.label} oninput={(event) => updateSelectedMarker('label', (event.currentTarget as HTMLInputElement).value)} /></label>
@@ -330,15 +372,56 @@
 								style={`left:${markerScreenPositions[marker.id].left}%;top:${markerScreenPositions[marker.id].top}%;`}
 								aria-label={`Select ${marker.label || `Marker ${marker.number}`}`}
 								aria-pressed={selectedMarkerId === marker.id}
-				title={`${marker.note || marker.label} · drag to reposition`}
-				onpointerdown={(event) => startMarkerDrag(event, marker.id)}
-				onpointerup={stopMarkerDrag}
-				onpointercancel={stopMarkerDrag}
+					title={`${marker.note || marker.label} · drag to reposition`}
+					onpointerdown={(event) => startMarkerDrag(event, marker.id)}
+					onpointerup={stopMarkerDrag}
+					onpointercancel={stopMarkerDrag}
 								onclick={() => (selectedMarkerId = marker.id)}
-							>{marker.number}</button>
+							>
+								<span class="e3d-pin-glyph" aria-hidden="true">
+									<svg viewBox="0 0 32 32" focusable="false">
+										<path d="M16 5v21M12 27h8M13 25h6M8 8l16 3M16 5l-2 4h4l-2-4Z" />
+										<path d="m8 8-4 11m4-11 4 12m12-9-4 9m4-9 4 8" />
+										<path d="M2.5 19c1.2 3 8.3 3.2 10 0m5.5-1c1.2 3 8.3 3.2 10 0" />
+										<path class="e3d-pin-touch" d="M30 15h-3.1c-.9 0-1.4.7-1.1 1.5l.7 2.1m-2.6-1.4-.7-1.6m2.1 4.3-.1 1.2" />
+									</svg>
+								</span>
+								<span class="e3d-pin-number" aria-hidden="true">{marker.number}</span>
+							</button>
 						{/if}
 					{/each}
 				</div>
+				{#if caseId && evidenceId && onAskAssistant}
+					<aside class="e3d-context-assistant" class:expanded={assistantExpanded} aria-label="Case contextual assistant">
+						<div class="e3d-context-assistant-head">
+							<div><strong>Scene assistant</strong><small>Case context · exhibit-linked</small></div>
+							<button class="e3d-btn" aria-expanded={assistantExpanded} onclick={() => (assistantExpanded = !assistantExpanded)}>{assistantExpanded ? 'Collapse' : 'Ask'}</button>
+						</div>
+						{#if assistantExpanded}
+							<div class="e3d-context-suggestions" aria-label="Suggested questions">
+								<button class="e3d-context-chip" onclick={() => askAssistant('Summarize this exhibit and identify what the source does not establish.')}>Summarize exhibit</button>
+								<button class="e3d-context-chip" onclick={() => askAssistant('What should I verify next from this exhibit? Cite the supporting case evidence.')}>What should I verify?</button>
+								<button class="e3d-context-chip" onclick={() => askAssistant('Draft a scene hypothesis from the authorized case evidence and timeline. Separate sourced facts from inferred beats, cite the source evidence, and list what remains unknown. Do not invent measurements, GPS coordinates, or unseen geometry.')}>Draft scene hypothesis</button>
+							</div>
+							<div class="e3d-context-messages" aria-live="polite">
+								{#each chatMessages.slice(-4) as message, index (`${message.timestamp ?? ''}-${index}`)}
+										{#if message.role !== 'system'}
+											<p class:assistant={message.role === 'assistant'}><b>{message.role === 'assistant' ? 'Assistant' : 'You'}:</b> {message.content}</p>
+											{#if message.role === 'assistant' && message.metadata?.extractedCitations?.length}
+												<p class="e3d-context-citations">Sources: {message.metadata.extractedCitations.map((citation) => citation.documentId).join(', ')}</p>
+											{/if}
+										{/if}
+								{/each}
+								{#if chatStatus === 'thinking' || chatStatus === 'streaming' || assistantSending}<p class="e3d-context-wait" role="status">Reviewing case context…</p>{/if}
+							</div>
+							<form class="e3d-context-form" onsubmit={(event) => { event.preventDefault(); void askAssistant(); }}>
+								<textarea bind:value={assistantDraft} rows="2" placeholder="Ask about this exhibit…" aria-label="Ask the case assistant" onkeydown={(event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); void askAssistant(); } }}></textarea>
+								<button class="e3d-btn" type="submit" disabled={!assistantDraft.trim() || assistantSending || chatStatus !== 'idle'}>Send</button>
+							</form>
+							<p class="e3d-context-note">Chat proposals do not create or save scene geometry. This relief is a visual aid, not a measured reconstruction.</p>
+						{/if}
+					</aside>
+				{/if}
 				{#if effectiveUrl}
 					{#key `${effectiveUrl}:${depthUrl ?? ''}`}
 						<DepthReliefViewer
@@ -347,6 +430,7 @@
 							relief={depthScale}
 							wireframe={wire}
 							showToolbar={false}
+							samplingMode={samplingMode}
 							annotations={markers.map(({ id, x, y }) => ({ id, x, y }))}
 							placementEnabled={toolMode === 'marker'}
 							draggingAnnotationId={draggingMarkerId}
@@ -360,6 +444,7 @@
 					{/key}
 				{/if}
 				{#if status === 'loading'}<p class="e3d-msg">Building relief…</p>{/if}
+				{/if}
 			</div>
 
 			<footer class="e3d-foot">
@@ -499,6 +584,7 @@
 		border-radius: 9px;
 		background: rgba(3, 7, 13, 0.38);
 	}
+	.e3d-sampling-label { padding: 0 5px; color: #b9b2a3; font-size: 11px; }
 	.e3d-annotation-bar .e3d-btn {
 		min-height: 32px;
 		padding: 6px 10px;
@@ -517,6 +603,7 @@
 		background: linear-gradient(180deg, rgba(154, 116, 33, 0.42), rgba(103, 76, 22, 0.34));
 		box-shadow: inset 0 1px rgba(255, 244, 209, 0.12), 0 1px 5px rgba(0, 0, 0, 0.2);
 	}
+	.e3d-tool-group[aria-label="Display sampling"] .e3d-btn[aria-pressed="true"] { color: #9bf0ff; border-color: rgba(126,231,255,.45); background: rgba(126,231,255,.1); }
 	.e3d-annotation-bar .e3d-tool-group[aria-label="Marker history"] .e3d-btn {
 		color: #c7ccd6;
 	}
@@ -539,7 +626,7 @@
 		backdrop-filter: blur(12px);
 	}
 	.e3d-annotation-bar .active,
-	.e3d-pin-label.selected {
+	.e3d-pin-label.selected .e3d-pin-glyph {
 		border-color: #7ee7ff;
 		box-shadow: 0 0 0 2px rgba(126, 231, 255, 0.24), 0 0 18px rgba(126, 231, 255, 0.36);
 	}
@@ -585,21 +672,79 @@
 		pointer-events: none;
 		overflow: hidden;
 	}
+	.e3d-context-assistant {
+		position: absolute;
+		right: 14px;
+		bottom: 14px;
+		z-index: 7;
+		width: min(330px, calc(100% - 28px));
+		border: 1px solid rgba(212, 199, 163, 0.3);
+		border-radius: 12px;
+		color: #f2ead7;
+		background: rgba(10, 15, 24, 0.94);
+		box-shadow: 0 12px 38px rgba(0, 0, 0, 0.4);
+		backdrop-filter: blur(12px);
+		pointer-events: auto;
+	}
+	.e3d-context-assistant-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; }
+	.e3d-context-assistant-head strong, .e3d-context-assistant-head small { display: block; }
+	.e3d-context-assistant-head strong { font-size: 12px; }
+	.e3d-context-assistant-head small { margin-top: 2px; color: #b8b2a3; font-size: 10px; }
+	.e3d-context-suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 10px 8px; }
+	.e3d-context-chip { min-height: 32px; padding: 5px 8px; border: 1px solid rgba(212, 199, 163, 0.22); border-radius: 8px; color: #eee5d2; background: rgba(255, 255, 255, 0.05); font-size: 10px; cursor: pointer; }
+	.e3d-context-messages { display: grid; gap: 6px; max-height: 150px; overflow: auto; padding: 0 11px 8px; font-size: 11px; line-height: 1.4; }
+	.e3d-context-messages p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+	.e3d-context-messages p.assistant { color: #f1dfb6; }
+	.e3d-context-messages p.e3d-context-citations { color: #a9d8e8; font-size: 10px; }
+	.e3d-context-wait { color: #e4c86d; }
+	.e3d-context-form { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 7px; padding: 8px 10px; border-top: 1px solid rgba(212, 199, 163, 0.15); }
+	.e3d-context-form textarea { min-height: 42px; max-height: 86px; resize: vertical; padding: 7px 8px; border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 8px; color: #f2ead7; background: rgba(0, 0, 0, 0.26); font: inherit; font-size: 11px; }
+	.e3d-context-note { margin: 0; padding: 0 11px 9px; color: #aaa494; font-size: 9px; line-height: 1.35; }
 	.e3d-pin-label {
 		position: absolute;
-		width: 34px;
-		height: 34px;
+		width: 44px;
+		height: 44px;
 		transform: translate(-50%, calc(-100% - 14px));
-		border: 1px solid #f4d477;
+		display: grid;
+		place-items: center;
+		border: 0;
 		border-radius: 50%;
-		color: #fff8df;
-		background: radial-gradient(circle at 35% 28%, #735829, #241e14 72%);
-		font-size: 12px;
-		font-weight: 700;
+		color: #fff3c7;
+		background: transparent;
 		cursor: pointer;
 		pointer-events: auto;
-		box-shadow: 0 0 0 3px rgba(240, 200, 94, 0.18), 0 0 18px rgba(240, 200, 94, 0.42), inset 0 0 0 2px rgba(240, 200, 94, 0.28);
 		animation: evidence-pin-pulse 2.4s ease-in-out infinite;
+	}
+	.e3d-pin-glyph {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		width: 24px;
+		height: 24px;
+		place-items: center;
+		border: 1px solid #f4d477;
+		border-radius: 50%;
+		color: #ffe7a0;
+		background: radial-gradient(circle at 35% 28%, #735829, #241e14 72%);
+		box-shadow: 0 0 0 2px rgba(240, 200, 94, 0.17), 0 0 12px rgba(240, 200, 94, 0.32), inset 0 0 0 1px rgba(240, 200, 94, 0.28);
+		transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+	}
+	.e3d-pin-glyph svg { width: 18px; height: 18px; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.45; stroke-linecap: round; stroke-linejoin: round; }
+	.e3d-pin-glyph .e3d-pin-touch { stroke-width: 1.8; }
+	.e3d-pin-number {
+		position: absolute;
+		right: 1px;
+		bottom: -2px;
+		z-index: 2;
+		min-width: 13px;
+		height: 13px;
+		padding: 0 2px;
+		border: 1px solid #f8e7b0;
+		border-radius: 999px;
+		color: #18140c;
+		background: #f4d477;
+		font: 700 8px/11px system-ui, sans-serif;
+		font-variant-numeric: tabular-nums;
 	}
 	.e3d-pin-label.motion-disabled { animation: none; }
 	.e3d-pin-label::after {
@@ -607,8 +752,8 @@
 		position: absolute;
 		left: 50%;
 		top: 100%;
-		width: 2px;
-		height: 15px;
+		width: 1px;
+		height: 12px;
 		transform: translateX(-50%);
 		background: linear-gradient(#f4d477, rgba(244, 212, 119, 0.18));
 		filter: drop-shadow(0 0 3px rgba(240, 200, 94, 0.7));
@@ -617,9 +762,9 @@
 		content: '';
 		position: absolute;
 		left: 50%;
-		bottom: -19px;
-		width: 8px;
-		height: 8px;
+		bottom: -16px;
+		width: 6px;
+		height: 6px;
 		transform: translateX(-50%);
 		border: 1px solid rgba(255, 242, 199, 0.95);
 		border-radius: 50%;
@@ -627,8 +772,8 @@
 		box-shadow: 0 0 9px rgba(240, 200, 94, 0.85);
 	}
 	@keyframes evidence-pin-pulse {
-		0%, 100% { box-shadow: 0 0 0 3px rgba(240, 200, 94, 0.18), 0 0 18px rgba(240, 200, 94, 0.32), inset 0 0 0 2px rgba(240, 200, 94, 0.28); }
-		50% { box-shadow: 0 0 0 8px rgba(240, 200, 94, 0), 0 0 22px rgba(240, 200, 94, 0.52), inset 0 0 0 2px rgba(240, 200, 94, 0.4); }
+		0%, 100% { filter: drop-shadow(0 0 5px rgba(240, 200, 94, 0.3)); }
+		50% { filter: drop-shadow(0 0 9px rgba(240, 200, 94, 0.58)); }
 	}
 	@media (prefers-reduced-motion: reduce) {
 		.e3d-pin-label { animation: none; }

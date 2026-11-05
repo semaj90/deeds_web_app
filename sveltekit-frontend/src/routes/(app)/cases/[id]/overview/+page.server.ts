@@ -22,6 +22,7 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
   }
 
   const id = params.id;
+  const { caseData: caseRow } = await parent();
   const userId = locals.user.id;
 
   // Client view cache check (user-scoped, case-versioned)
@@ -42,8 +43,7 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
   }
 
   // caseRow from layout; evidence + persons fetched here in parallel.
-  const [{ caseData: caseRow }, evidenceRows, personRows] = await Promise.all([
-    parent(),
+  const [evidenceRows, personRows] = await Promise.all([
     safe(db.select().from(evidence).where(eq(evidence.caseId, id)).limit(50), []),
     safe(
       db
@@ -54,23 +54,6 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
       []
     ),
   ]);
-
-  if (!caseRow) {
-    return {
-      user: locals.user,
-      caseId: id,
-      caseData: null,
-      evidence: [],
-      persons: [] as Array<{
-        id: string;
-        name: string;
-        role: string;
-        riskScore: string;
-        aiSummary: string | null;
-      }>,
-      loadError: 'Case not found or database unavailable',
-    };
-  }
 
   // Build WHO from client + opposing party + linked persons
   const whoParts: string[] = [];

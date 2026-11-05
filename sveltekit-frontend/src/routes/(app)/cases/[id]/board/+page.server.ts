@@ -1,32 +1,28 @@
 import { db } from '$lib/server/db/client';
-import { cases, canvasStates, evidence, evidenceBoardConnections } from '$lib/server/db/schema';
-import { and, eq, or } from 'drizzle-orm';
+import { canvasStates, evidence, evidenceBoardConnections } from '$lib/server/db/schema';
+import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { clientKey, TTL } from '$lib/server/cache-keys.js';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
 
-const safe = <T>(p: Promise<T>, fb: T): Promise<T> =>
-	Promise.race([p, new Promise<T>((r) => setTimeout(() => r(fb), 5000))]).catch(() => fb);
+const withTimeout = <T>(promise: Promise<T>): Promise<T> => {
+	let timer: ReturnType<typeof setTimeout>;
+	return Promise.race([
+		promise,
+		new Promise<T>((_, reject) => {
+			timer = setTimeout(() => reject(new Error('Board query timed out')), 5000);
+		})
+	]).finally(() => clearTimeout(timer));
+};
 
 const EMPTY_BOARD = (id: string) => ({
   caseId: id,
   initialState: null,
   evidence: [],
   connections: [],
+  loadError: null,
 });
-
-// Same rule as api/evidence/[id]/depth-map: the case owner or assigned attorney.
-async function canReadCase(caseId: string, userId: number): Promise<boolean> {
-  const [row] = await db
-    .select({ id: cases.id })
-    .from(cases)
-    .where(and(
-      eq(cases.id, caseId),
-      or(eq(cases.userId, userId), eq(cases.assignedAttorney, userId)),
-    ))
-    .limit(1);
-  return Boolean(row);
-}
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const { id } = params;
@@ -41,7 +37,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   // non-member requests get the same empty shape, so existence is not leaked.
   const rawUserId = locals.user?.id;
   const numericUserId = rawUserId === undefined ? NaN : Number(rawUserId);
-  if (!Number.isInteger(numericUserId) || !(await canReadCase(id, numericUserId).catch(() => false))) {
+  if (!Number.isInteger(numericUserId) || !(await getAuthorizedCase(id, numericUserId).catch(() => null))) {
     return EMPTY_BOARD(id);
   }
   const userId = numericUserId;
@@ -49,13 +45,13 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   // Client view cache check
   const vKey = clientKey.view(String(userId), id, 'board-v2');
   const memHit = getFromMemoryCache(vKey);
-  if (memHit.found && memHit.value) return memHit.value as any;
+  if (memHit.found && memHit.value) return { ...(memHit.value as object), loadError: null } as any;
   try {
     const { getRedis } = await import('$lib/server/redis.js');
     const hit = await getRedis().get(vKey);
     if (hit) {
       const p = JSON.parse(hit);
-      if (p) return p;
+      if (p) return { ...p, loadError: null };
     }
   } catch {
     /* miss */
@@ -64,23 +60,20 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   try {
     // Load canvas state, evidence, and connections in parallel
     const [savedState, evidenceItems, connections] = await Promise.all([
-      safe(
+      withTimeout<Awaited<ReturnType<typeof db.query.canvasStates.findFirst>>>(
         db.query.canvasStates.findFirst({
           where: eq(canvasStates.caseId, id),
-        }),
-        null
+        })
       ),
-      safe(
+      withTimeout<(typeof evidence.$inferSelect)[]>(
         db.query.evidence.findMany({
           where: eq(evidence.caseId, id),
           orderBy: (evidence, { desc }) => [desc(evidence.uploadedAt)],
           limit: 100,
-        }),
-        []
+        })
       ),
-      safe(
-        db.select().from(evidenceBoardConnections).where(eq(evidenceBoardConnections.caseId, id)),
-        []
+      withTimeout<(typeof evidenceBoardConnections.$inferSelect)[]>(
+        db.select().from(evidenceBoardConnections).where(eq(evidenceBoardConnections.caseId, id))
       ),
     ]);
 
@@ -123,6 +116,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
         strength: c.strength,
         isVisible: c.isVisible,
       })),
+      loadError: null,
     };
 
     // Persist to client view cache (non-blocking)
@@ -131,10 +125,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   } catch (e) {
     console.error('Failed to load board data:', e);
     return {
-      caseId: id,
-      initialState: null,
-      evidence: [],
-      connections: [],
+      ...EMPTY_BOARD(id),
+      loadError: 'Could not load this case’s evidence board. Try again in a moment.'
     };
   }
 };

@@ -35,6 +35,7 @@
 		confidence?: number;
 		keywords?: string[];
 		suggestions?: string[];
+		sourceRefs?: Array<{ sourceRef: string; label: string }>;
 	}
 
 	let isOpen = $state(false);
@@ -355,9 +356,20 @@
 				model: String(data.model || 'ornith-1.5-9b'),
 				modality: String(data.modality || 'ornith-screen-recon'),
 				latencyMs: Number(data.latencyMs || 0),
-				confidence: Number(data.acePacket?.ConfidenceScore ?? 0.9),
+				confidence:
+					typeof data.acePacket?.ConfidenceScore === 'number' &&
+					Number.isFinite(data.acePacket.ConfidenceScore)
+						? data.acePacket.ConfidenceScore
+					: undefined,
 				keywords: Array.isArray(data.keywords) ? data.keywords : [],
-				suggestions: Array.isArray(data.suggestions) ? data.suggestions : []
+				suggestions: Array.isArray(data.suggestions) ? data.suggestions : [],
+				sourceRefs: Array.isArray(data.sourceRefs)
+					? data.sourceRefs.filter((ref: unknown): ref is { sourceRef: string; label: string } =>
+						typeof ref === 'object' && ref !== null &&
+						typeof (ref as { sourceRef?: unknown }).sourceRef === 'string' &&
+						typeof (ref as { label?: unknown }).label === 'string'
+					)
+					: []
 			};
 
 			turns = [...turns, assistantTurn];
@@ -655,7 +667,8 @@
 									: 'CONTEXTUAL LEGAL AI COUNSEL'}
 							</p>
 							<p class="dock-empty-desc">
-								Grounded on live <strong>{statusState.model}</strong> (`:8090`), active PostgreSQL 18 case state, and ACE screen context packets.
+								{statusState.ok ? `Connected to ${statusState.model} (:8090).` : 'Assistant connection status is not verified.'}
+								 Case records or screen context are not evidence-grounded unless a response includes retrieved source references.
 							</p>
 
 							<div class="dock-quick-grid">
@@ -729,6 +742,14 @@
 							{#if turn.role === 'assistant'}
 								<div class="dock-turn-footer">
 									<span>{turn.model ?? 'ornith-1.5-9b'}</span>
+					<span>{turn.sourceRefs?.length
+						? `Source references returned (${turn.sourceRefs.length})`
+						: caseId && turn.mode === 'chat'
+							? 'Case context supplied · no source citations returned'
+							: 'General guidance · no case sources cited'}</span>
+					{#each turn.sourceRefs ?? [] as source (source.sourceRef)}
+						<span title={source.sourceRef}>{source.label}</span>
+					{/each}
 									{#if turn.confidence}
 										<span>ACE {(turn.confidence * 100).toFixed(0)}%</span>
 									{/if}

@@ -39,6 +39,7 @@ import { promisify } from 'node:util';
 // callbacks. Normalize it to the Promise API used by the audit gates.
 const glob = promisify(globPackage);
 import { verifyBatch, summarise, getCacheStats } from './lib/reference-verifier.mjs';
+import { buildDeepAuditSourceInventoryV1 } from './lib/deep-audit-source-inventory-v1.mjs';
 
 const ROOT       = process.cwd();
 const GRAPH_PATH = resolve(ROOT, 'docs/graph/codebase-graph.json');
@@ -48,6 +49,7 @@ const OUT_MD     = resolve(ROOT, 'docs/graph/deep-audit-ast.md');
 const args = new Set(process.argv.slice(2));
 const QUIET   = args.has('--quiet');
 const STRICT  = args.has('--strict');
+const INVENTORY_ONLY = args.has('--inventory-only');
 const GATE_ARG = process.argv.find((a) => a.startsWith('--gate'));
 const ONLY_GATES = GATE_ARG
   ? new Set(GATE_ARG.split('=')[1]?.split(',').map((s) => s.trim().toUpperCase()) ?? [])
@@ -866,6 +868,12 @@ const GATES = [
 ];
 
 async function main() {
+  if (INVENTORY_ONLY) {
+    const inventory = await buildDeepAuditSourceInventoryV1({ frontendRoot: ROOT });
+    // Emit only to stdout. This mode does not write the canonical graph or audit artifacts.
+    process.stdout.write(`${JSON.stringify(inventory, null, 2)}\n`);
+    return;
+  }
   log('🔍 Deep AST audit — loading graphify graph…');
   const files = await loadGraph();
   log(`   ${files.length} files in graph`);

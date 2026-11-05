@@ -16,35 +16,43 @@ You are running a comprehensive codebase audit using the **47-gate audit system*
 
 ### Scope resolution
 
-- `all` → audit the entire `sveltekit-frontend/src/` tree using `docs/graph/codebase-graph.json` as the file inventory.
+- `all` → use the source-only inventory for the live `sveltekit-frontend/src/` cohort. Use `docs/graph/codebase-graph.json` only for historical comparison unless currentness and admission are proven.
 - `<dir-path>` → only audit files under that path (e.g. `src/routes/api/ace`).
-- `<file-path>` → audit a single file plus its 1-hop neighbors from the graph.
+- `<file-path>` → audit a single file; add 1-hop graph neighbors only when the graph is current and admitted, otherwise label neighbor coverage `BLOCKED`.
 - `route:<path>` → resolve to the matching `+server.ts` (e.g. `route:/api/ace/agent` → `src/routes/api/ace/agent/+server.ts`).
-- `cluster:<id>` → load files from `clusterIds:<id>` in the graph (GPU k-means cluster).
-- `som:<r>:<c>` → load files at SOM grid position `(r, c)` from Qdrant `codebase_chunks_768` payload.
+- `cluster:<id>` → load graph cluster membership only from a current admitted graph; stale/unadmitted results are historical candidates.
+- `som:<r>:<c>` → load SOM membership only from an explicitly qualified projection revision; otherwise report `BLOCKED`.
 
-For SOM/cluster scopes, query Redis `code:index:gate-stats` and the graph JSON `files[].clusterId` / `files[].somBmuRow,Col` (when present).
+For SOM/cluster scopes, require an explicitly qualified projection revision and current admitted graph. Source-only mode does not query Redis or Qdrant; without those receipts, report the projection scope `BLOCKED`.
 
-## Pre-flight: load the index
+## Pre-flight: establish currentness before using the index
 
-Before running gates, **always load the cached index** (do NOT re-scan):
+The canonical graph path is `sveltekit-frontend/docs/graph/codebase-graph.json` (from the repository root), or `docs/graph/codebase-graph.json` when the command runs in `sveltekit-frontend`. A missing or stale graph must never be used to produce current `PASS` results, and do not run `graphify:daily` as an audit preflight.
+
+First obtain a read-only, source-scoped inventory. This scans tracked and non-ignored untracked live source files, computes per-file hashes, compares paths with the cached graph, and writes nothing:
 
 ```bash
-test -f sveltekit-frontend/docs/graph/codebase-graph.json || \
-  (cd sveltekit-frontend && npm run index:codebase:fast)
+cd sveltekit-frontend && node scripts/deep-audit-ast.mjs --inventory-only
 ```
 
-The graph JSON has every per-file flag the gates need:
-`hasAuth`, `hasZod`, `parsesBody`, `routeHandlers`, `ssrUnsafe`, `sv4Legacy`, `localhostRefs`, `hasPairedTest`, `drizzleRefs`, `dynImports`, `clusterId`, `somBmuRow`, `somBmuCol`.
+The inventory reports `PROVISIONAL`; the graph reports `STALE` if older than 24 hours, `BLOCKED` if missing, and otherwise remains `PROVISIONAL` until an explicitly identified admitted snapshot receipt matches its hash and source revision. A timestamp alone never establishes admission. Preserve this inventory as a run-scoped receipt if needed; do not overwrite the canonical graph.
 
-If the JSON is older than 24h, prompt the user to regenerate (`npm run graphify:daily`) before continuing.
+Use these claim states consistently:
+
+- `CURRENT`: source revision and graph hash match an explicitly admitted producer receipt.
+- `STALE`: graph age exceeds policy or graph source identity does not match current source.
+- `PROVISIONAL`: read-only live source scan without canonical graph admission.
+- `BLOCKED`: required source identity, authorization, or admission evidence is unavailable.
+
+The graph JSON may contain per-file flags, but those flags are candidate evidence, not proof:
+`hasAuth`, `hasZod`, `parsesBody`, `routeHandlers`, `ssrUnsafe`, `sv4Legacy`, `localhostRefs`, `hasPairedTest`, `drizzleRefs`, `dynImports`, `clusterId`, `somBmuRow`, `somBmuCol`.
 
 ## Gate selection
 
 Read **CLAUDE.md** for the complete gate definitions. Below is the dispatch table — invoke each gate by reading the JSON, NOT by re-grepping.
 
 ### Tier code (G1–G26) — code connectivity + Svelte 5 + tests
-Read flags directly from `graph.files[]`:
+Use graph flags only for triage and historical comparison. For live gates, filter to the exact source inventory and inspect the route handler, inherited hooks/route-group guards, and validation owner. Report `VERIFIED_PASS`, `VERIFIED_FAIL`, or `NEEDS_MANUAL_REVIEW` with exact path and guard/validator references. Never convert a stale graph candidate directly to a security failure or auto-patch it.
 - **G1** static imports → `f.imports`
 - **G2** dynamic imports → `f.dynImports`
 - **G3** barrel re-exports → `f.reExports`
@@ -86,10 +94,12 @@ Read-only organisation checks. Nothing here deletes, moves, or writes. Any clean
 - **G62 DAG prefill and decode:** confirm the owners exist and each one's OpenSpec status. Check the prefill and decode files, then count checked and open tasks in `sveltekit-frontend/openspec/changes/parent-atlas-ace-json-dag-prefill-pipeline/tasks.md`. Report counts by status. Do not treat a checked task as proof.
 - **Archive rule:** if a gate finds an unused file, record it as a candidate with its path and `git log` entry. Never remove it in this audit.
 
-### Tier ID (G63) — stale model identity in chat paths (added 2026-10-28, read-only)
-- **G63 model-label drift:** the live chat/synthesis model is Ornith 1.5 on `:8090`; the only browser/WebGPU model is the client ONNX `gemma3_270m_onnx`. Probe first: `curl -s http://127.0.0.1:8090/props` and read `model_alias` (do not assume; if `:8090` is down, report `BLOCKED`, not pass). Then list files whose path, comment, log label or error string says `gemma4` on a chat/synthesis path: `rg -n "gemma4" sveltekit-frontend/src/routes/api sveltekit-frontend/src/lib/server/ai scripts/atlas scripts/startup --glob "!*.md" --glob "!*.gguf"`. For each hit, classify: `STALE_LABEL` (calls llama-server through the resolver, so the name is wrong but behaviour is right), `REAL_GEMMA4_ARTIFACT` (VLM `:8085`, `gemma4:e4b`, stored provenance, cache identity, historical record: keep), or `HARDCODED_MODEL_ID` (a literal sent as the `model` field: a real bug, fix through `llama-server-model-resolver.ts` / `SERVER_CHAT_MODEL`). Report counts per class. Never blanket-rename: a route path or script argument is a live contract, so add an alias and migrate callers first. Known `STALE_LABEL`: `api/llm/gemma4-chat-clean` (callers: `summarize-indexed-packets-dual-llm.mjs`, `phase-c-dual-summarization-startup.mjs`, `(app)/admin/onnx-gpu-test`). Same route is open in H1/H2: no auth, raw body forwarded.
+### Tier ID (G63) — model identity classification (read-only)
+- Scan the exact live source cohort. Classify each `gemma4` reference as `STALE_LABEL`, `REAL_GEMMA4_ARTIFACT`, `HARDCODED_MODEL_ID`, or `NEEDS_MANUAL_REVIEW`; retain the exact file and matching source reference. Do not query a running model as part of a source-only audit. Resolver behavior is a separate live verification and must be reported separately. Never blanket-rename: route paths and script arguments may be compatibility contracts; preserve historical artifacts and provenance.
 
 ## Parallel execution (policy, 2026-10-21; mirrors CLAUDE.md and codex.md)
+
+**G4/G5/G63** use `node scripts/tests/audit-gates.mjs --gate=G4 --summary` (repeat with `G5` and `G63`) for source-scoped classification. Counts include the denominator and remain `PROVISIONAL` until source/currentness and admission are proven. G4 may count inherited protection only when the global hook and deny-by-default access policy are both inspected and linked; otherwise leave `NEEDS_MANUAL_REVIEW`. G5 recognizes local schemas and imported validators only when the handler calls the imported function and its module exposes schema parsing. Keep unproven router-wide contracts such as a catch-all tRPC adapter in manual review. Never auto-fix from counts.
 
 For Parent Atlas production-readiness work, also follow `.codex/skills/parent-atlas-production-hardening-audit/SKILL.md` and the existing `graphify-pipeline-gap-audit` skill. That audit skill augments these gate instructions; it does not authorize mutations or replace the owning OpenSpec ledger.
 
@@ -104,10 +114,10 @@ For Parent Atlas production-readiness work, also follow `.codex/skills/parent-at
 
 ## Output format (mode=report)
 
-Print a **single concise table** plus an action list. Do NOT dump the full file lists unless the user asks; cap each gate's bullet to top 5 with `(+N more)` suffix.
+Print a **single concise table** plus an action list. Do NOT dump the full file lists unless the user asks; cap each gate's bullet to top 5 with `(+N more)` suffix. The example below is historical format only, not a current audit result. Every live report must include denominators and reconcile `attempted = passed + warned + failed + not_run`; manual-review candidates belong under `warned`, never under `failed`.
 
 ```
-## Deep Audit — scope: src/lib/server/ace, gates: code
+## Deep Audit — example format only (historical counts)
 
 | Gate | Status | Failures |
 |------|--------|----------|
@@ -119,8 +129,8 @@ Print a **single concise table** plus an action list. Do NOT dump the full file 
 | G20  | ✓      | 0 |
 
 ### Top remediation (priority order)
-1. **G4 fix** — add auth to `ace-internal/+server.ts` (1 line, low risk)
-2. **G16 fill** — generate test stubs: `npm run audit:test-stubs --filter ace`
+1. **G4 review** — inspect the route and inherited guard before deciding whether a fix is needed
+2. **G16 review** — treat missing-pair results as candidates; follow the repository's actual test discovery convention
 3. _(no other gates fail)_
 
 ### Recap
@@ -133,11 +143,11 @@ Print a **single concise table** plus an action list. Do NOT dump the full file 
 
 ## Output format (mode=fix or dry-fix)
 
-For each fail, propose the **smallest possible fix** as a unified diff. In `fix` mode, apply via the Edit tool. In `dry-fix`, only print the diff.
+For each independently verified fail, propose the **smallest possible fix** as a unified diff. A provisional/manual-review candidate cannot be auto-fixed. In `fix` mode, preserve normal authorization and test expectations; if inherited protection or side effects are uncertain, stop at a review note. In `dry-fix`, only print the diff.
 
 Match the canonical patterns:
-- **G4 fix**: prepend `if (!locals.user) return json({...empty defaults..., error: 'Unauthorized'}, {status:401});`
-- **G5 fix**: import `z`, define schema, replace bare `request.json()` with `safeParse`
+- **G4 fix**: only after verifying the actual authorization contract and handler ordering; reuse the existing case/admin access owner.
+- **G5 fix**: only after checking local schema, router-level Zod input, and validated-wrapper owners.
 - **G11 fix**: replace `'http://localhost:N'` with `ENV.SERVICE_URL ?? 'http://localhost:N'`
 - **G15 fix**: wrap in `if (typeof window !== 'undefined')` or move into `$effect`/`onMount`
 - **G16 fix**: run `npm run audit:test-stubs` (don't write tests by hand)
@@ -155,10 +165,10 @@ G15 (0)      → no action
 ## Constructor mapping (data sources)
 
 ```
-[scope]    →  filter graph.files[] by rel-prefix or clusterId/somBmu
+[scope]    →  source inventory filter by canonical src-relative path; use graph scope only if current/admitted
 [gates]    →  select which g*() function to run from CLAUDE.md gate suite
 [mode]     →  report | fix | dry-fix | wire
-graph      →  sveltekit-frontend/docs/graph/codebase-graph.json
+graph      →  sveltekit-frontend/docs/graph/codebase-graph.json (historical unless admitted/current)
 KAG        →  Redis wiki:note:dir:* (per-directory context, AGENTS.md source)
 gateStats  →  Redis code:index:gate-stats (last full audit summary)
 agents.md  →  walk up from any failure file to find nearest AGENTS.md, append its

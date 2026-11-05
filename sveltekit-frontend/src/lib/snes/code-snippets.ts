@@ -8,7 +8,14 @@ export const svelteUsage = `<script lang="ts">
   sublabel="RECONCILING DRIZZLE & FEATURE GRIMOIRE..."
   showControls={true}
   telemetry={undefined}
+  progress={null}
+  query={null}
+  stage={null}
 />
+
+<!-- Search mode: progress 0-100 sets the texture level of detail; query shows a glyph line; stage names the step. -->
+<!-- <SnesBookLoader progress={42} query="negligence duty of care" stage="SEARCHING STATUTES" /> -->
+
 `;
 
 export const htmlMini = `<!doctype html>

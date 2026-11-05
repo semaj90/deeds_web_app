@@ -246,6 +246,65 @@ export async function moveMarker(
 	}
 }
 
+export type DeleteMarkerCommand = Omit<MoveMarkerCommand, 'position'>;
+
+/** Soft-delete a marker and append its event/outbox row atomically. */
+export async function deleteMarker(
+	db: TransactionalDb,
+	cmd: DeleteMarkerCommand
+): Promise<MoveMarkerResult> {
+	const attemptDelete = () => db.transaction(async (tx) => {
+		const [prior] = await tx.select().from(sceneEvents).where(eq(sceneEvents.commandId, cmd.commandId)).limit(1);
+		if (prior) {
+			if (prior.markerId !== cmd.markerId || prior.caseId !== cmd.caseId || prior.sceneKey !== cmd.sceneKey || prior.eventType !== 'MARKER_DELETED') {
+				throw new CommandReuseError();
+			}
+			const payload = prior.payload as { position: MarkerPosition };
+			return { markerId: cmd.markerId, revision: prior.aggregateRevision, position: payload.position, replayed: true };
+		}
+
+		const [marker] = await tx.select().from(sceneMarkers).where(and(
+			eq(sceneMarkers.id, cmd.markerId),
+			eq(sceneMarkers.caseId, cmd.caseId),
+			eq(sceneMarkers.sceneKey, cmd.sceneKey),
+			isNull(sceneMarkers.deletedAt)
+		)).limit(1);
+		if (!marker) throw new MarkerNotFoundError();
+		if (marker.evidenceId !== cmd.evidenceId) throw new EvidenceMismatchError();
+		if (marker.revision !== cmd.expectedRevision) throw new MarkerConflictError(marker.revision);
+
+		const nextRevision = cmd.expectedRevision + 1;
+		const [updated] = await tx.update(sceneMarkers).set({
+			deletedAt: sql`now()`,
+			revision: nextRevision,
+			updatedAt: sql`now()`
+		}).where(and(
+			eq(sceneMarkers.id, cmd.markerId),
+			eq(sceneMarkers.caseId, cmd.caseId),
+			eq(sceneMarkers.sceneKey, cmd.sceneKey),
+			eq(sceneMarkers.revision, cmd.expectedRevision),
+			isNull(sceneMarkers.deletedAt)
+		)).returning();
+		if (!updated) throw new MarkerConflictError(null);
+
+		const [event] = await tx.insert(sceneEvents).values({
+			caseId: cmd.caseId,
+			sceneKey: cmd.sceneKey,
+			commandId: cmd.commandId,
+			eventType: 'MARKER_DELETED',
+			markerId: cmd.markerId,
+			aggregateRevision: nextRevision,
+			payload: { position: { x: marker.posX, y: marker.posY, z: marker.posZ }, evidenceId: marker.evidenceId },
+			createdBy: cmd.userId
+		}).returning({ id: sceneEvents.id });
+		await tx.insert(sceneEventOutbox).values({ eventId: event.id });
+		return { markerId: cmd.markerId, revision: nextRevision, position: { x: marker.posX, y: marker.posY, z: marker.posZ }, replayed: false };
+	});
+
+	try { return await attemptDelete(); }
+	catch (err) { if (isUniqueViolation(err)) return attemptDelete(); throw err; }
+}
+
 export type SavedMarker = {
 	markerId: string;
 	evidenceId: string;

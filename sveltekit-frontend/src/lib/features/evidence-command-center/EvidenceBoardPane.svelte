@@ -9,7 +9,7 @@
 		ai_summary?: string | null;
 		ai_tags?: string[];
 		tags?: string[];
-		file_url?: string | null;
+		hasFile?: boolean;
 	}
 
 	interface Props {
@@ -37,9 +37,15 @@
 
 		<div class="flex-1 overflow-auto pr-1">
 			{#if evidenceRows.length === 0}
-				<p class="text-[11px] text-[#ccc] italic">
-					No evidence yet. Upload evidence from the upload page.
-				</p>
+				<div class="flex flex-col items-start gap-2 text-[11px] text-[#ccc]">
+					<p>No evidence has been added to this case yet.</p>
+					<a
+						href={`/cases/${encodeURIComponent(caseId)}/evidence/upload`}
+						class="rounded border border-[#ffdf6b] px-3 py-2 text-[#ffdf6b] hover:bg-[#ffdf6b]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffdf6b]"
+					>
+						Upload evidence
+					</a>
+				</div>
 			{:else}
 				<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
 					{#each evidenceRows as ev}
@@ -103,9 +109,9 @@
 								</div>
 							{/if}
 
-							{#if ev.file_url}
+							{#if ev.hasFile}
 								<a
-									href={ev.file_url}
+									href={`/api/evidence/${encodeURIComponent(ev.id)}/download?inline=1&caseId=${encodeURIComponent(caseId)}`}
 									target="_blank"
 									rel="noreferrer"
 									class="mt-1 text-[9px] text-[#6bffdf] underline underline-offset-2"

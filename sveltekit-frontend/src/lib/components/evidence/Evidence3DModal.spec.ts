@@ -22,4 +22,39 @@ describe('Evidence3DModal annotation toolbar', () => {
 		expect(markerButton.getAttribute('aria-pressed')).toBe('true');
 		expect(motionButton.getAttribute('aria-pressed')).toBe('false');
 	});
+
+	it('exposes native, half-resolution, and retro sampling choices in the evidence workspace', async () => {
+		const { default: Evidence3DModal } = await import('./Evidence3DModal.svelte');
+		render(Evidence3DModal, { props: { imageUrl: null, embedded: true } });
+
+		const sampling = screen.getByRole('group', { name: 'Display sampling' });
+		const native = screen.getByRole('button', { name: 'Native' });
+		const half = screen.getByRole('button', { name: 'Half' });
+		const retro = screen.getByRole('button', { name: 'Retro' });
+		expect(sampling).toBeTruthy();
+		expect(native.getAttribute('aria-pressed')).toBe('true');
+
+		await fireEvent.click(half);
+		expect(half.getAttribute('aria-pressed')).toBe('true');
+		expect(native.getAttribute('aria-pressed')).toBe('false');
+		await fireEvent.click(retro);
+		expect(retro.getAttribute('aria-pressed')).toBe('true');
+		expect(half.getAttribute('aria-pressed')).toBe('false');
+	});
+
+	it('offers the case SPZ viewer only for a case-linked exhibit and switches back to image relief', async () => {
+		const { default: Evidence3DModal } = await import('./Evidence3DModal.svelte');
+		render(Evidence3DModal, { props: { imageUrl: null, embedded: true, caseId: 'case-1', evidenceId: 'evidence-1' } });
+
+		const spzButton = screen.getByRole('button', { name: '3D SPZ' });
+		expect(spzButton.getAttribute('aria-pressed')).toBe('false');
+		await fireEvent.click(spzButton);
+		expect(screen.getByRole('region', { name: 'Case evidence Gaussian splat viewer' })).toBeTruthy();
+		expect(screen.getByText(/3D markers are saved to the case and keyed to the verified SPZ source hash/)).toBeTruthy();
+		expect(spzButton.getAttribute('aria-pressed')).toBe('true');
+
+		await fireEvent.click(screen.getByRole('button', { name: 'Image relief' }));
+		expect(screen.queryByRole('region', { name: 'Case evidence Gaussian splat viewer' })).toBeNull();
+		expect(spzButton.getAttribute('aria-pressed')).toBe('false');
+	});
 });

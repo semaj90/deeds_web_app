@@ -1779,6 +1779,7 @@
     "express": "5.1.0",
     "fastmcp": "4.21.2",
     "form-data": "4.0.6",
+    "fzstd": "0.1.1",
     "idb": "8.0.3",
     "idb-keyval": "6.2.1",
     "ioredis": "^5.0.0",

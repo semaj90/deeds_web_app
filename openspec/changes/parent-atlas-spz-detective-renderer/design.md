@@ -122,6 +122,19 @@ The local code search found no SHARP or Flash3D product runner, model integratio
 
 Workstation preflight on 2026-11-04 found no globally installed `splat-transform` command and no `.spz`, `.sog`, `.rad`, `.radc`, or `.ply` fixture under the app's source, public, or test directories. Task 2.5 was then verified using an ephemeral, exact-version `npm exec` of `@playcanvas/splat-transform@3.10.3` and synthetic scratch assets: PLY → SPZ v4 → PLY → four LOD PLYs → Streamed SOG. Readback returned `lodCounts: [1024, 512, 256, 102]`; hashes and byte counts are recorded in `.tmp/atlas/spz-sog-preflight-2026-11-04/receipt.json`. No dependency was added to the project, and no browser renderer, service, database, storage bucket, or case evidence was used. This closes the format-generation/readback fixture task only; it does not establish browser streaming, visual quality, performance, or product eligibility.
 
+## Chat Analysis Flow (proposed 2026-11-04, not started)
+
+Ornith is the reasoning layer. It does not process geometry, and it never receives raw splats or BVH nodes.
+
+- **Worker (offline, `analysis_jobs`):** decode SPZ, build the BVH, compute bounds and marker-to-geometry relations, and write a bounded analysis artifact with a SHA-256. PostgreSQL holds job state and eligibility.
+- **Web worker (browser):** ray picking and nearest-marker queries against a transferable BVH buffer. It keeps clicks responsive and is not the chat engine.
+- **llama-server `:8090` (Ornith 1.5):** chat and tool calling, always `stream: true`, through the existing tool loop.
+- **Tools:** typed, read-only, bounded JSON results such as `scene_nearest_markers(radius)`, `scene_ray_pick`, `scene_bounds`, and `evidence_card(id)`.
+- **Transport:** SvelteKit 2 `+server.ts` routes (or tRPC for typed browser calls), with Zod validation, authorization through `locals`, and a stable GET shape on failure.
+- **Output:** answers cite evidence IDs and source revisions. Inferred claims are labeled HYPOTHESIS. Raw model output and rejected citations are preserved.
+
+Mastra is not used. The repo already has an orchestration owner, and adding a second orchestrator would duplicate it.
+
 ## Open Questions
 
 - What fixed view set and quality measures (for example, PSNR/SSIM/LPIPS plus expert review) are acceptable for each profile?

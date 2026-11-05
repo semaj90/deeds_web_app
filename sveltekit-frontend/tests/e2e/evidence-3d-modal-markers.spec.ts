@@ -104,3 +104,18 @@ test('3D relief modal: honest depth label, targeted marker delete, slider, close
 	const unexpected = errors.filter((e) => !KNOWN.test(e) && !/^\s+at /.test(e));
 	expect(unexpected, unexpected.join('\n')).toEqual([]);
 });
+
+test('3D relief modal: evidence frame projects around the rendered relief', async ({ page }) => {
+	await page.goto('/demos/depth-relief');
+	const relief = page.getByTestId('depth-relief');
+	await expect(relief).not.toHaveAttribute('data-backend', 'none', { timeout: 30_000 });
+	await page.getByRole('button', { name: 'Evidence frame' }).click();
+	const frame = relief.locator('svg.evidence-bounds');
+	await expect(frame).toBeVisible();
+	await expect(frame.locator('polygon.evidence-bounds-face')).toHaveCount(6);
+	await expect(frame.locator('line.evidence-bounds-edge')).toHaveCount(12);
+	await page.screenshot({
+		path: process.env.RELIEF_FRAME_SHOT ?? test.info().outputPath('evidence-frame.png'),
+		fullPage: false
+	});
+});

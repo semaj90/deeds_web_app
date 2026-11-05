@@ -1,8 +1,6 @@
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import { db } from '$lib/server/db/client';
-import { cases } from '$lib/server/db/schema-postgres.js';
-import { eq } from 'drizzle-orm';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -15,10 +13,8 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
  * that only need {id, title, status, jurisdiction} still work; sub-routes that
  * need more fields (caseNumber, practiceArea, etc.) no longer have to re-query.
  *
- * Companion to branch 4 (commit eb9575f5eb): /cases/[id]/+page.server.ts also
- * fetches the case but exposes it as `case` (not via parent()). That fetch is
- * redundant with this layout load but harmless — kept for backward-compat with
- * any direct consumer of [id]/+page.svelte.
+ * Every case-specific child must await this parent before reading case data or
+ * consulting a cache so membership is established first.
  */
 export const load: LayoutServerLoad = async ({ locals, params }) => {
 	if (!locals.user) {
@@ -27,15 +23,16 @@ export const load: LayoutServerLoad = async ({ locals, params }) => {
 
 	// UUID guard prevents noisy 400s on malformed IDs.
 	if (!UUID_RE.test(params.id)) {
-		return { caseData: null, loadError: 'Invalid case ID format' };
+		throw error(404, 'Case not found');
 	}
 
-	const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
-	const caseRows = await safe(db.select().from(cases).where(eq(cases.id, params.id)).limit(1), []);
-	const caseRow = caseRows[0] ?? null;
+	const actorId = Number(locals.user.id);
+	if (!Number.isInteger(actorId) || actorId <= 0) throw error(404, 'Case not found');
+	const caseRow = await getAuthorizedCase(params.id, actorId);
+	if (!caseRow) throw error(404, 'Case not found');
 
 	return {
 		caseData:  caseRow,
-		loadError: caseRow ? null : 'Case not found or database unavailable',
+		loadError: null,
 	};
 };

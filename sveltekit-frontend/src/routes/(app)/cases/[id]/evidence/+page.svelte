@@ -30,7 +30,7 @@
 			description:    ev.ai_summary ?? undefined,
 			evidenceType:   ev.evidence_type ?? 'document',
 			fileName:       ev.file_name ?? undefined,
-			fileUrl:        ev.file_url ?? undefined,
+			fileUrl:        ev.hasFile ? `/api/evidence/${encodeURIComponent(ev.id)}/download?inline=1&caseId=${encodeURIComponent(caseId)}` : undefined,
 			canvasPosition: { x: 0, y: 0 },
 			uploadedAt:     ev.uploaded_at ?? new Date().toISOString(),
 			updatedAt:      ev.uploaded_at ?? new Date().toISOString(),
@@ -50,7 +50,9 @@
 <svelte:window onkeydown={handleKeydown} />
 
 <CommandCenterShell {caseId} {caseTitle}>
-	{#if evidenceCommandCenter.activeView === 'board'}
+	{#if data.loadError}
+		<p class="m-4 rounded border border-red-400/50 bg-red-950/30 p-3 text-sm text-red-100" role="alert">{data.loadError}</p>
+	{:else if evidenceCommandCenter.activeView === 'board'}
 		{#if useRichBoard}
 			<EvidenceBoardRich {caseId} initialNodes={richNodes} />
 		{:else}

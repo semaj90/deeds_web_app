@@ -30,6 +30,14 @@
       "command": "node",
       "args": ["./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"]
     },
+    "blender-models": {
+      "command": "node",
+      "args": ["./sveltekit-frontend/scripts/mcp/blender-model-mcp.mjs"],
+      "env": {
+        "BLENDER_EXECUTABLE": "C:/Program Files/Blender Foundation/Blender 4.3/blender.exe",
+        "BLENDER_MCP_WORKSPACE": "C:/Users/james/Videos/deeds-web-app/.tmp/blender-mcp-workspace"
+      }
+    },
     "socraticode": {
       "command": "node",
       "args": ["C:/Users/james/AppData/Local/npm-cache/_npx/39052607b6e520af/node_modules/socraticode/dist/index.js", "mcp"],

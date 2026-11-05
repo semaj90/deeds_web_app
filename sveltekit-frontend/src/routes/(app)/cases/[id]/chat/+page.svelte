@@ -57,13 +57,21 @@
 		fileSizeKb?: number;
 		savedEvidenceId?: string;
 		isSaving?: boolean;
+		sourceRefs?: Array<{ sourceRef: string; label: string }>;
 	}
+
+	const caseRecordCount = $derived(
+		evidenceList.length +
+		(data.documentsList?.length ?? 0) +
+		(data.notesList?.length ?? 0) +
+		(data.citationsList?.length ?? 0)
+	);
 
 	let messages = $state<ChatTurn[]>([
 		{
 			id: 'init-1',
 			role: 'assistant',
-			content: '**Contextual AI Counsel Initialized.** Grounded on PostgreSQL 18 case ledger. Ready to examine case exhibits, documents, citations, and draft strategic pleadings.',
+			content: '**Contextual AI Counsel is ready.** I can offer general guidance and help examine this case’s records. Answers are not source-verified unless supporting records are shown with the response.',
 			timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 		}
 	]);
@@ -260,12 +268,31 @@
 			});
 
 			const data = await res.json().catch(() => ({}));
+			if (!res.ok || data.ok === false) {
+				messages = [
+					...messages,
+					{
+						id: `err_${Date.now()}`,
+						role: 'assistant',
+						content: data.error || `Counsel could not load a response (${res.status}). No analysis was completed.`,
+						timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+					}
+				];
+				return;
+			}
 
 			const assistantTurn: ChatTurn = {
 				id: `a_${Date.now()}`,
 				role: 'assistant',
-				content: data.answer || data.response || 'Legal synthesis completed.',
-				timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+				content: data.answer || data.response || 'Counsel returned no answer.',
+				timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+				sourceRefs: Array.isArray(data.sourceRefs)
+					? data.sourceRefs.filter((ref: unknown): ref is { sourceRef: string; label: string } =>
+						typeof ref === 'object' && ref !== null &&
+						typeof (ref as { sourceRef?: unknown }).sourceRef === 'string' &&
+						typeof (ref as { label?: unknown }).label === 'string'
+					)
+					: []
 			};
 
 			messages = [...messages, assistantTurn];
@@ -335,7 +362,7 @@
 			<div class="flex items-center gap-2">
 				<div class="chat-tel-pill">
 					<span class="chat-pulse-dot"></span>
-					<span>ORNITH 1.5 9B (:8090) ACTIVE</span>
+					<span>LOCAL AI ENDPOINT · :8090</span>
 				</div>
 				<span class="chat-badge-stat">
 					{evidenceList.length} Exhibits
@@ -590,13 +617,27 @@
 						<div class="chat-turn-body">
 							{turn.content}
 						</div>
+						{#if turn.role === 'assistant'}
+							<div class="mt-2 flex flex-wrap gap-x-2 text-[10px] uppercase tracking-wide text-[#B8AA93]" aria-label="Answer source status">
+								{#if turn.sourceRefs?.length}
+									<span>Source references returned</span>
+									{#each turn.sourceRefs as source (source.sourceRef)}
+										<span title={source.sourceRef}>{source.label}</span>
+									{/each}
+								{:else if caseRecordCount > 0}
+									<span>Case records available · no sources cited for this answer</span>
+								{:else}
+									<span>General guidance · no case sources cited</span>
+								{/if}
+							</div>
+						{/if}
 					</div>
 				{/each}
 
 				{#if isBusy}
 					<div class="chat-busy-row">
 						<span class="chat-pulse-dot"></span>
-						<span class="font-mono text-xs text-[#FFE59A]">Ornith 1.5 9B synthesizing against PostgreSQL 18 case context…</span>
+						<span class="font-mono text-xs text-[#FFE59A]">Counsel response in progress…</span>
 					</div>
 				{/if}
 			</div>

@@ -12,6 +12,7 @@ import { sceneEventOutbox, sceneEvents, sceneMarkers } from '../db/schema/scene-
 import {
 	CommandReuseError,
 	createMarker,
+	deleteMarker,
 	EvidenceMismatchError,
 	listSceneMarkers,
 	MarkerConflictError,
@@ -186,5 +187,28 @@ describe.runIf(Boolean(url))('moveMarker (scratch database)', () => {
 		expect(moved!.evidenceId).toBe(EVIDENCE_ID);
 		const other = await listSceneMarkers(db as never, CASE_ID, 'some-other-scene');
 		expect(other).toHaveLength(0);
+	});
+
+	it('soft-deletes transactionally, records MARKER_DELETED and replays idempotently', async () => {
+		const newId = randomUUID();
+		const createCommandId = randomUUID();
+		await createMarker(db as never, {
+			caseId: CASE_ID, sceneKey: scene, markerId: newId, evidenceId: EVIDENCE_ID,
+			commandId: createCommandId, position: { x: 3, y: 2, z: 1 }, label: 'delete fixture', userId: 1,
+		});
+		const commandId = randomUUID();
+		const cmd = { caseId: CASE_ID, sceneKey: scene, markerId: newId, evidenceId: EVIDENCE_ID, commandId, expectedRevision: 1, userId: 1 };
+		const first = await deleteMarker(db as never, cmd);
+		const replay = await deleteMarker(db as never, cmd);
+		expect(first).toMatchObject({ revision: 2, replayed: false, position: { x: 3, y: 2, z: 1 } });
+		expect(replay).toMatchObject({ revision: 2, replayed: true });
+		const [row] = await db.select().from(sceneMarkers).where(eq(sceneMarkers.id, newId));
+		expect(row.deletedAt).toBeInstanceOf(Date);
+		expect(row.revision).toBe(2);
+		const [event] = await db.select().from(sceneEvents).where(eq(sceneEvents.commandId, commandId));
+		expect(event.eventType).toBe('MARKER_DELETED');
+		const outbox = await db.select().from(sceneEventOutbox).where(eq(sceneEventOutbox.eventId, event.id));
+		expect(outbox).toHaveLength(1);
+		expect(await listSceneMarkers(db as never, CASE_ID, scene)).not.toContainEqual(expect.objectContaining({ markerId: newId }));
 	});
 });

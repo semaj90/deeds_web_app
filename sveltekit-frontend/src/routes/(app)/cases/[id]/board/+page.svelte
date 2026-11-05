@@ -49,6 +49,7 @@
 	let selectedEvidence = $state<any>(null);
 	let showEvidenceViewer = $state(false);
 	let evidenceViewerInitialView = $state<'original' | 'relief'>('original');
+	let openSceneAssistantOnViewer = $state(false);
 	let showAddEvidence = $state(false);
 	let activeTool = $state<'select' | 'evidence' | 'connection' | 'note' | 'marker'>('select');
 	let showAIChat = $state(false);
@@ -390,6 +391,13 @@
 
 	function openEvidenceViewer(view: 'original' | 'relief' = 'original') {
 		evidenceViewerInitialView = view;
+		openSceneAssistantOnViewer = false;
+		showEvidenceViewer = true;
+	}
+
+	function openDetectiveMode() {
+		evidenceViewerInitialView = 'relief';
+		openSceneAssistantOnViewer = true;
 		showEvidenceViewer = true;
 	}
 
@@ -923,6 +931,21 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		}, 100);
 	}
 
+	async function askFromScene(question: string) {
+		if (!chatSession || chatSession.status !== 'idle') return;
+		const exhibit = selectedEvidence;
+		const groundedPrompt = [
+			`The user is inspecting case ${caseId} in Detective Mode.`,
+			exhibit ? `Selected exhibit: ${exhibit.title} (evidence ID ${exhibit.id}).` : '',
+			exhibit?.keyPoints?.length ? `Existing exhibit summary points: ${exhibit.keyPoints.join('; ')}` : '',
+			'The displayed relief is a derived visual aid, not measured 3D geometry. Do not infer unseen dimensions or locations from it.',
+			'Answer from authorized case context, distinguish sourced facts from hypotheses, and name the evidence items supporting factual claims.',
+			`User question: ${question}`
+		].filter(Boolean).join('\n');
+		await chatSession.sendMessage(groundedPrompt, { forceServer: true, caseId, enableTools: false });
+		await saveChatToDatabase();
+	}
+
 	// Save chat history to database
 	async function saveChatToDatabase() {
 		if (!chatSession || chatSession.messages.length === 0 || !isValidCaseId) return;
@@ -1259,6 +1282,18 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			{/if}
 
 			<div class="evidence-list">
+				{#if data.loadError}
+					<p class="px-3 py-4 text-sm text-red-200" role="alert">{data.loadError}</p>
+				{:else if evidenceItems.length === 0}
+					<div class="px-3 py-4 text-sm text-[#d0c3ae]">
+						<p>No evidence has been added to this case yet.</p>
+						<a class="mt-3 inline-flex rounded border border-[#ffdf6b] px-3 py-2 text-[#ffdf6b] focus-visible:outline focus-visible:outline-2" href={`/cases/${encodeURIComponent(caseId)}/evidence/upload`}>
+							Upload evidence
+						</a>
+					</div>
+				{:else if filteredEvidence.length === 0}
+					<p class="px-3 py-4 text-sm text-[#d0c3ae]">No evidence matches these filters.</p>
+				{:else}
 				{#each filteredEvidence as item (item.id)}
 					{@const ft = (item.fileType || '').toLowerCase()}
 					{@const isAudio = ft.startsWith('audio') || ft === 'mp3' || ft === 'wav' || ft === 'ogg'}
@@ -1319,6 +1354,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 						</div>
 					</div>
 				{/each}
+				{/if}
 			</div>
 		</aside>
 
@@ -1696,9 +1732,10 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 							AI Summary
 						</button>
 						{#if isEvidenceImage(selectedEvidence.fileType)}
-			<button class="action-btn" onclick={() => openEvidenceViewer('relief')}>
-								3D Relief View
+			<button class="action-btn" onclick={openDetectiveMode}>
+								Set the scene
 							</button>
+						<p class="related-info">Opens this image’s 2.5D relief and case assistant. Room-scale reconstruction is not available yet.</p>
 						{/if}
 					</div>
 
@@ -1925,8 +1962,12 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		bind:open={showEvidenceViewer}
 		evidenceId={selectedEvidence?.id ?? null}
 		{caseId}
+		chatMessages={chatSession?.messages ?? []}
+		chatStatus={chatSession?.status ?? 'idle'}
+		onAskAssistant={askFromScene}
+		assistantInitiallyExpanded={openSceneAssistantOnViewer}
 		initialView={evidenceViewerInitialView}
-		onClose={() => (showEvidenceViewer = false)}
+		onClose={() => { showEvidenceViewer = false; openSceneAssistantOnViewer = false; }}
 	/>
 
 	<!-- Celestial Legal-AI Modal for Graph Documentation & Node Edits -->

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockDbExecute = vi.fn();
+const mockGetAuthorizedCase = vi.fn();
 const mockRedisSet = vi.fn().mockResolvedValue('OK');
 const mockGetActiveLocalVlmModel = vi.fn();
 const mockGetLlamaSessionDescriptor = vi.fn();
@@ -9,6 +10,7 @@ vi.mock('$lib/server/db/client.js', () => ({
 	db: { execute: (...args: unknown[]) => mockDbExecute(...args) },
 	pgRows: (res: unknown) => (Array.isArray(res) ? res : ((res as { rows?: unknown[] })?.rows ?? []))
 }));
+vi.mock('$lib/server/case-access.js', () => ({ getAuthorizedCase: (...args: unknown[]) => mockGetAuthorizedCase(...args) }));
 
 vi.mock('$lib/server/redis.js', () => ({
 	getRedis: () => ({ set: mockRedisSet })
@@ -44,6 +46,7 @@ describe('/api/ai/screen-analysis route contract', () => {
 				}
 			]
 		});
+		mockGetAuthorizedCase.mockResolvedValue({ id: '986b5214-1962-43b2-aff9-c132cdf21e69' });
 	});
 
 	afterEach(() => {
@@ -79,12 +82,26 @@ describe('/api/ai/screen-analysis route contract', () => {
 
 		const res = await POST({
 			request: req,
-			locals: { user: { id: 'u-1' } }
+			locals: { user: { id: '1' } }
 		} as never);
 
 		expect(res.status).toBe(400);
 		const body = await res.json();
 		expect(body.ok).toBe(false);
+	});
+
+	it('POST denies an unrelated case user before reading case context', async () => {
+		mockGetAuthorizedCase.mockResolvedValueOnce(null);
+		const req = new Request('http://localhost/api/screen-analysis', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ mode: 'chat', message: 'Summarize the case.', caseId: '986b5214-1962-43b2-aff9-c132cdf21e69' })
+		});
+
+		const res = await POST({ request: req, locals: { user: { id: '99' } } } as never);
+		expect(res.status).toBe(404);
+		expect(mockGetAuthorizedCase).toHaveBeenCalledWith('986b5214-1962-43b2-aff9-c132cdf21e69', 99);
+		expect(mockDbExecute).not.toHaveBeenCalled();
 	});
 
 	it('POST sends multimodal image_url when :8090 vision projector is loaded, strips <think>, and writes ACE packet', async () => {
@@ -135,7 +152,7 @@ describe('/api/ai/screen-analysis route contract', () => {
 
 		const res = await POST({
 			request: req,
-			locals: { user: { id: 'u-1' } }
+			locals: { user: { id: '1' } }
 		} as never);
 
 		expect(res.status).toBe(200);

@@ -8,12 +8,14 @@
 		vertices: number;
 	}
 	export type DepthSourceMode = 'STORED_MONOCULAR_DEPTH' | 'BRIGHTNESS_PREVIEW' | 'DEPTH_UNAVAILABLE';
+	export type ReliefSamplingMode = 'native' | 'half' | 'retro';
 	export interface ReliefAnnotationPoint { id: string; x: number; y: number; }
 	export type AnnotationScreenPositions = Record<string, { left: number; top: number }>;
 </script>
 
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { Slider } from 'bits-ui';
 	import Icon from '$lib/components/ui/Icon.svelte';
 
 	/**
@@ -32,6 +34,7 @@
 		backend?: 'auto' | 'webgpu' | 'webgl';
 		wireframe?: boolean;
 		showToolbar?: boolean;
+		samplingMode?: ReliefSamplingMode;
 		annotations?: ReliefAnnotationPoint[];
 		placementEnabled?: boolean;
 		draggingAnnotationId?: string | null;
@@ -54,6 +57,7 @@
 		backend = 'auto',
 		wireframe,
 		showToolbar = true,
+		samplingMode,
 		annotations = [],
 		placementEnabled = false,
 		draggingAnnotationId = null,
@@ -74,12 +78,23 @@
 	let error = $state<string | null>(null);
 	let loading = $state(true);
 	let localWireframe = $state(false);
+	let showEvidenceBounds = $state(true);
+	let localSamplingMode = $state<ReliefSamplingMode>('native');
+	const activeSamplingMode = $derived(samplingMode ?? localSamplingMode);
+	let applySampling: ((mode: ReliefSamplingMode) => void) | null = null;
+	let evidenceBoundsSegments = $state<Array<[number, number, number, number]>>([]);
+	let evidenceBoundsFaces = $state<string[]>([]);
+	let evidenceBoundsHandles = $state<Array<[number, number]>>([]);
+	let zoomPercent = $state(100);
+	let setCameraZoom: ((value: number) => void) | null = null;
+	function changeCameraZoom(value: number) { setCameraZoom?.(value); }
 	const debugWireframe = $derived(wireframe ?? localWireframe);
 	let updateRelief: ((value: number) => void) | null = null;
 	let status = $state<ViewerStatus>({ backend: 'none', vendor: 'unknown', tier: 'medium', lod: 0, vertices: 0 });
 	let sourceMode = $state<DepthSourceMode>('DEPTH_UNAVAILABLE');
 
 	$effect(() => updateRelief?.(relief));
+	$effect(() => applySampling?.(activeSamplingMode));
 
 	async function detectGpu(): Promise<{ vendor: string; tier: Tier; hasWebGPU: boolean }> {
 		const gpu = (navigator as any).gpu;
@@ -119,6 +134,8 @@
 				if (resourcesReleased) return;
 				resourcesReleased = true;
 				renderer?.setAnimationLoop(null);
+				setCameraZoom = null;
+				applySampling = null;
 				updateRelief = null;
 				observer?.disconnect();
 				interactionCleanup?.();
@@ -191,17 +208,23 @@
 				if (disposed) return;
 				const tier: Tier = quality === 'auto' ? gpuInfo.tier : quality;
 
-				// Color texture from the real source pixels.
-				const colorCanvas = document.createElement('canvas');
-				colorCanvas.width = Math.min(1536, colorBitmap.width);
-				colorCanvas.height = Math.round(colorCanvas.width / imageAspect);
-				const cctx = colorCanvas.getContext('2d');
-				if (!cctx) throw new Error('Color canvas unavailable');
-				cctx.drawImage(colorBitmap, 0, 0, colorCanvas.width, colorCanvas.height);
-				const texture = new THREE.CanvasTexture(colorCanvas);
-				textures.push(texture);
-				texture.colorSpace = THREE.SRGBColorSpace;
-				texture.anisotropy = tier === 'high' ? 8 : 4;
+				// Build three source-faithful texture levels alongside the geometry LODs.
+				// These are lower-resolution samples of the same evidence image, not generated detail.
+				const textureWidth = Math.min(1536, colorBitmap.width);
+				const textureLevels = [0, 1, 2].map((level) => {
+					const colorCanvas = document.createElement('canvas');
+					colorCanvas.width = Math.max(64, Math.round(textureWidth / 2 ** level));
+					colorCanvas.height = Math.max(64, Math.round(colorCanvas.width / imageAspect));
+					const cctx = colorCanvas.getContext('2d');
+					if (!cctx) throw new Error('Color texture LOD canvas unavailable');
+					cctx.drawImage(colorBitmap, 0, 0, colorCanvas.width, colorCanvas.height);
+					const texture = new THREE.CanvasTexture(colorCanvas);
+					texture.colorSpace = THREE.SRGBColorSpace;
+					texture.anisotropy = tier === 'high' && level === 0 ? 8 : 4;
+					textures.push(texture);
+					return texture;
+				});
+				const texture = textureLevels[0]!;
 
 				const width = 2;
 				const height = width / imageAspect;
@@ -316,6 +339,7 @@
 						for (let i = 0; i < lod.z.length; i++) positions.setZ(i, lod.z[i] * value);
 						positions.needsUpdate = true;
 						lod.geometry.computeVertexNormals();
+						lod.geometry.computeBoundingBox();
 					}
 					backPlane.position.z = -Math.abs(value) * 0.5 - 0.045;
 				};
@@ -323,14 +347,24 @@
 				controls = new OrbitControls(camera, renderer.domElement);
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.075;
-				controls.enablePan = false;
-				controls.minDistance = 2.0;
-				controls.maxDistance = 5.0;
+				controls.enablePan = true;
+				controls.screenSpacePanning = true;
+				controls.minDistance = 0.85;
+				controls.maxDistance = 14;
 				// Never orbit behind a single-view surface and reveal invented geometry.
 				controls.minAzimuthAngle = -Math.PI / 5;
 				controls.maxAzimuthAngle = Math.PI / 5;
 				controls.minPolarAngle = Math.PI / 2 - Math.PI / 5;
 				controls.maxPolarAngle = Math.PI / 2 + Math.PI / 5;
+				const defaultCameraDistance = camera.position.distanceTo(controls.target);
+				setCameraZoom = (value: number) => {
+					const nextZoom = THREE.MathUtils.clamp(value, 25, 400);
+					const direction = camera.position.clone().sub(controls.target).normalize();
+					const distance = THREE.MathUtils.clamp(defaultCameraDistance * (100 / nextZoom), controls.minDistance, controls.maxDistance);
+					camera.position.copy(controls.target).addScaledVector(direction, distance);
+					zoomPercent = Math.round((defaultCameraDistance / distance) * 100);
+					controls.update();
+				};
 
 				const resize = () => {
 					if (!host) return;
@@ -339,12 +373,27 @@
 					camera.updateProjectionMatrix();
 					renderer.setSize(w, h, false);
 				};
+				const applySamplingMode = (mode: ReliefSamplingMode) => {
+					const scale = mode === 'native' ? 1 : mode === 'half' ? 0.5 : 0.35;
+					renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, PIXEL_RATIO[tier]) * scale);
+					renderer.domElement.style.imageRendering = mode === 'retro' ? 'pixelated' : '';
+					for (const levelTexture of textureLevels) {
+						levelTexture.magFilter = mode === 'retro' ? THREE.NearestFilter : THREE.LinearFilter;
+						levelTexture.minFilter = mode === 'retro' ? THREE.NearestFilter : THREE.LinearMipmapLinearFilter;
+						levelTexture.generateMipmaps = mode !== 'retro';
+						levelTexture.needsUpdate = true;
+					}
+					resize();
+				};
+				applySampling = applySamplingMode;
+				applySamplingMode(activeSamplingMode);
 				observer = new ResizeObserver(resize);
 				observer.observe(host);
 				resize();
 
 				let currentLod = -1;
 				let projectionTick = 0;
+				let boundsTick = 0;
 				const raycaster = new THREE.Raycaster();
 				const pointer = new THREE.Vector2();
 				function pickImagePoint(clientX: number, clientY: number) {
@@ -392,12 +441,45 @@
 				renderer.setAnimationLoop(() => {
 					controls.enabled = !placementEnabled && !draggingAnnotationId;
 					controls.update();
+					const cameraZoom = THREE.MathUtils.clamp(Math.round((defaultCameraDistance / camera.position.distanceTo(controls.target)) * 100), 25, 400);
+					if (cameraZoom !== zoomPercent) zoomPercent = cameraZoom;
 					const lod = pickLod(camera.position.distanceTo(controls.target));
 					if (lod !== currentLod) {
 						lods.forEach((l, i) => (l.mesh.visible = i === lod));
+						material.map = textureLevels[lod] ?? textureLevels[2];
+						material.needsUpdate = true;
 						currentLod = lod;
 						status = { backend: activeBackend, vendor: gpuInfo.vendor, tier, lod, vertices: lods[lod].vertices };
 						onStatus?.(status);
+					}
+					if (showEvidenceBounds && host && ++boundsTick % 2 === 0) {
+						// This encloses the whole image-derived relief mesh. It is not an object detector box.
+						const bounds = new THREE.Box3().setFromObject(lods[currentLod].mesh);
+						bounds.expandByScalar(Math.max(width, height) * 0.008);
+						const corners = [
+							new THREE.Vector3(bounds.min.x, bounds.min.y, bounds.min.z),
+							new THREE.Vector3(bounds.max.x, bounds.min.y, bounds.min.z),
+							new THREE.Vector3(bounds.max.x, bounds.max.y, bounds.min.z),
+							new THREE.Vector3(bounds.min.x, bounds.max.y, bounds.min.z),
+							new THREE.Vector3(bounds.min.x, bounds.min.y, bounds.max.z),
+							new THREE.Vector3(bounds.max.x, bounds.min.y, bounds.max.z),
+							new THREE.Vector3(bounds.max.x, bounds.max.y, bounds.max.z),
+							new THREE.Vector3(bounds.min.x, bounds.max.y, bounds.max.z)
+						];
+						const projected = corners.map((point) => point.project(camera));
+						const screen = projected.map((point) => [
+							((point.x + 1) / 2) * host!.clientWidth,
+							((1 - point.y) / 2) * host!.clientHeight
+						] as const);
+						const edges: Array<[number, number]> = [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]];
+						const faces: number[][] = [[0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4], [3, 2, 6, 7], [0, 3, 7, 4], [1, 2, 6, 5]];
+						evidenceBoundsSegments = edges.map(([a, b]) => [screen[a][0], screen[a][1], screen[b][0], screen[b][1]] as [number, number, number, number]);
+						evidenceBoundsFaces = faces.map((face) => face.map((index) => `${screen[index][0]},${screen[index][1]}`).join(' '));
+						evidenceBoundsHandles = [0, 2, 4, 6].map((index) => [screen[index][0], screen[index][1]] as [number, number]);
+					} else if (!showEvidenceBounds && evidenceBoundsSegments.length) {
+						evidenceBoundsSegments = [];
+						evidenceBoundsFaces = [];
+						evidenceBoundsHandles = [];
 					}
 					if (onAnnotationPositions && ++projectionTick % 3 === 0) {
 						const positions: AnnotationScreenPositions = {};
@@ -455,6 +537,27 @@
 	data-depth-source={sourceMode}
 >
 	<div bind:this={host} class="scene"></div>
+	{#if showEvidenceBounds && evidenceBoundsSegments.length}
+		<svg class="evidence-bounds" aria-hidden="true">
+			{#each evidenceBoundsFaces as face, index (`face-${index}`)}<polygon class="evidence-bounds-face" points={face} />{/each}
+			{#each evidenceBoundsSegments as segment, index (`edge-${index}`)}<line class="evidence-bounds-edge" x1={segment[0]} y1={segment[1]} x2={segment[2]} y2={segment[3]} />{/each}
+			{#each evidenceBoundsHandles as handle, index (`handle-${index}`)}<rect class="evidence-bounds-handle" x={handle[0] - 4} y={handle[1] - 4} width="8" height="8" rx="1" />{/each}
+		</svg>
+	{/if}
+	<div class="canvas-controls" role="group" aria-label="Evidence canvas navigation">
+		<button type="button" aria-label="Zoom out" title="Zoom out" onclick={() => changeCameraZoom(zoomPercent - 20)}>−</button>
+		<Slider.Root type="single" min={25} max={400} step={5} value={zoomPercent} onValueChange={changeCameraZoom} aria-label="Canvas zoom" class="canvas-zoom-slider">
+			{#snippet children({ thumbItems })}
+				<span class="canvas-zoom-track"><Slider.Range class="canvas-zoom-range" /></span>
+				{#each thumbItems as thumb (thumb.index)}<Slider.Thumb index={thumb.index} class="canvas-zoom-thumb" aria-label="Canvas zoom" />{/each}
+			{/snippet}
+		</Slider.Root>
+		<output aria-live="off">{zoomPercent}%</output>
+		<button type="button" aria-label="Zoom in" title="Zoom in" onclick={() => changeCameraZoom(zoomPercent + 20)}>+</button>
+		<button type="button" aria-label="Reset canvas view" title="Reset view" onclick={() => changeCameraZoom(100)}>⌂</button>
+		<button type="button" aria-pressed={showEvidenceBounds} title="Toggle source surface bounds" aria-label="Toggle source surface bounds" onclick={() => (showEvidenceBounds = !showEvidenceBounds)}>□</button>
+		<span class="canvas-hint">Scroll to zoom · right-drag to pan</span>
+	</div>
 	{#if loading}<div class="message">Building textured depth surface…</div>{/if}
 	{#if error}
 		<!-- Final fallback: flat evidence image so the panel is never blank. -->
@@ -474,6 +577,15 @@
 			<Icon name="yorha-network" size={16} />
 			{debugWireframe ? 'Photo surface' : 'Wireframe'}
 		</button>
+		<div class="sampling-group" role="group" aria-label="Display sampling">
+			{#each [{ id: 'native', label: 'Native' }, { id: 'half', label: 'Half' }, { id: 'retro', label: 'Retro' }] as mode (mode.id)}
+				<button type="button" aria-pressed={activeSamplingMode === mode.id} onclick={() => (localSamplingMode = mode.id as ReliefSamplingMode)}>{mode.label}</button>
+			{/each}
+		</div>
+		<button type="button" aria-pressed={showEvidenceBounds} onclick={() => (showEvidenceBounds = !showEvidenceBounds)} title="Show the bounds of the complete image-derived relief">
+			<Icon name="yorha-network" size={16} />
+			{showEvidenceBounds ? 'Hide evidence frame' : 'Evidence frame'}
+		</button>
 	</div>
 	{/if}
 </div>
@@ -482,8 +594,28 @@
 	.relief { position: relative; width: 100%; height: 100%; min-height: 340px; overflow: hidden; border-radius: 12px; background: #0c1220; border: 1px solid rgba(125, 211, 252, 0.3); }
 	.scene { position: absolute; inset: 0; }
 	.scene :global(canvas) { display: block; width: 100%; height: 100%; touch-action: none; }
+	.evidence-bounds { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+	.evidence-bounds-face { fill: rgba(85, 216, 255, 0.035); stroke: none; }
+	.evidence-bounds-edge { fill: none; stroke: #7ee7ff; stroke-width: 1.5; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 3px rgba(77, 224, 255, 0.92)); animation: evidence-bounds-glow 2.2s ease-in-out infinite; }
+	.evidence-bounds-handle { fill: #07111e; stroke: #9bf0ff; stroke-width: 1.5; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 4px rgba(77, 224, 255, 0.9)); }
+	@keyframes evidence-bounds-glow { 0%, 100% { stroke-opacity: 0.48; filter: drop-shadow(0 0 2px rgba(77, 224, 255, 0.58)); } 50% { stroke-opacity: 1; filter: drop-shadow(0 0 7px rgba(77, 224, 255, 0.98)); } }
+	@media (prefers-reduced-motion: reduce) { .evidence-bounds-edge { animation: none; stroke-opacity: 0.8; } }
+	.canvas-controls { position: absolute; z-index: 4; top: 12px; right: 12px; display: flex; align-items: center; gap: 7px; padding: 6px 8px; border: 1px solid rgba(212,199,163,.25); border-radius: 9px; color: #f4e8c8; background: rgba(8,13,22,.86); backdrop-filter: blur(10px); font: 11px system-ui,sans-serif; }
+	.canvas-controls button { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid rgba(212,199,163,.28); border-radius: 6px; color: inherit; background: rgba(255,255,255,.06); cursor: pointer; }
+	.canvas-controls button:hover { border-color: #7ee7ff; color: #9bf0ff; }
+	.canvas-controls button:focus-visible { outline: 2px solid #7ee7ff; outline-offset: 2px; }
+	.canvas-controls output { min-width: 38px; text-align: center; font-variant-numeric: tabular-nums; }
+	.sampling-group { display: inline-flex; align-items: center; gap: 3px; }
+	.sampling-group button { min-height: 28px; padding: 0 7px; border: 1px solid rgba(212,199,163,.28); border-radius: 6px; color: inherit; background: rgba(255,255,255,.06); cursor: pointer; }
+	.sampling-group button[aria-pressed="true"] { border-color: #7ee7ff; color: #9bf0ff; background: rgba(126,231,255,.1); }
+	.canvas-zoom-slider { position: relative; display: flex; width: 96px; height: 24px; align-items: center; touch-action: none; user-select: none; }
+	.canvas-zoom-track { position: relative; display: block; width: 100%; height: 4px; overflow: hidden; border-radius: 9px; background: #384052; }
+	.canvas-zoom-range { position: absolute; height: 100%; background: linear-gradient(90deg,#c59e2b,#7ee7ff); }
+	.canvas-zoom-thumb { display: block; width: 13px; height: 13px; border: 2px solid #7ee7ff; border-radius: 50%; background: #f8f1df; box-shadow: 0 0 8px #7ee7ff; }
+	.canvas-hint { padding-left: 5px; color: #b9b2a3; white-space: nowrap; }
+	@media (max-width: 680px) { .canvas-controls { gap: 4px; padding: 5px; } .canvas-hint { display: none; } .canvas-zoom-slider { width: 64px; } }
 	.flat { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.85; }
-	.toolbar { position: absolute; bottom: 12px; left: 12px; right: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #e5ebf6; font: 12px system-ui, sans-serif; pointer-events: none; }
+	.toolbar { position: absolute; bottom: 12px; left: 12px; right: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; color: #e5ebf6; font: 12px system-ui, sans-serif; pointer-events: none; }
 	.note { display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; background: rgba(12, 18, 32, 0.78); border: 1px solid rgba(197, 154, 43, 0.5); border-radius: 6px; }
 	.toolbar button { pointer-events: auto; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; background: #1b2940; color: #fff; border: 1px solid rgba(125, 211, 252, 0.45); padding: 7px 11px; border-radius: 8px; }
 	.toolbar button[aria-pressed='true'] { background: #2a3f5e; border-color: #c59a2b; }

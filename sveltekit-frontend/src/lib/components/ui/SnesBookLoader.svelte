@@ -32,6 +32,19 @@
     initialEngine?: Engine;
     /** 0-100 for a determinate progress bar; leave null/undefined for the original indeterminate animation. */
     progress?: number | null;
+    /** Search term shown as a glyph line while a search is running. */
+    query?: string | null;
+    /** Current pipeline stage label, e.g. "SEARCHING STATUTES". */
+    stage?: string | null;
+    /**
+     * Real request/job status. Omit (null) for the timer-driven demo. When set, the animation runs only while
+     * queued or running, and stops on complete or error.
+     */
+    status?: 'queued' | 'running' | 'complete' | 'error' | null;
+    /** Shown when status is 'error'. */
+    errorMessage?: string | null;
+    /** When provided, a CANCEL button shows while running. The parent must abort its own request. */
+    onCancel?: (() => void) | null;
   };
 
   let {
@@ -40,17 +53,30 @@
     telemetry = undefined,
     showControls = true,
     initialEngine = 'canvas',
-    progress = null
+    progress = null,
+    query = null,
+    stage = null,
+    status = null,
+    errorMessage = null,
+    onCancel = null
   }: Props = $props();
+
+  /** Animation runs for the demo (status null) and while the real request is queued or running. */
+  const animating = $derived(status === null || status === 'queued' || status === 'running');
+  let paintFn: (() => void) | null = null;
 
   const determinate = $derived(typeof progress === 'number' && Number.isFinite(progress));
   const pct = $derived(determinate ? Math.min(100, Math.max(0, progress as number)) : 100);
+  /** Level of detail for the bar texture: coarse blocks at low progress, fine blocks near completion. */
+  const lodLevel = $derived(!determinate ? 2 : pct < 34 ? 0 : pct < 67 ? 1 : 2);
 
   let canvas: HTMLCanvasElement;
+  // svelte-ignore state_referenced_locally -- initialEngine and sublabel seed local state once, by design
   let engine = $state<Engine>(initialEngine);
   let bookMode = $state<BookMode>('auto');
   let currentFrame = $state<FrameType>('closed');
   let frameLabel = $state('STATE: BOOK CLOSED');
+  // svelte-ignore state_referenced_locally -- initialEngine and sublabel seed local state once, by design
   let flavorText = $state(sublabel);
   let hudVisible = $state(true);
   let crtEnabled = $state(true);
@@ -72,7 +98,6 @@
   onMount(() => {
     const ctx = canvas.getContext('2d');
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let interval: ReturnType<typeof setInterval> | undefined;
 
     function paint() {
       const frame = frameAt(bookMode, tick);
@@ -94,20 +119,26 @@
       tick += 1;
     }
 
+    paintFn = paint;
     const configureMotion = () => {
-      if (interval) clearInterval(interval);
       reducedMotion = media.matches;
       paint();
-      if (!reducedMotion) interval = setInterval(paint, 135);
     };
     configureMotion();
     media.addEventListener('change', configureMotion);
 
     return () => {
-      if (interval) clearInterval(interval);
       if (copyTimer) clearTimeout(copyTimer);
       media.removeEventListener('change', configureMotion);
+      paintFn = null;
     };
+  });
+
+  // The frame timer runs only while animating and motion is allowed. It stops on complete or error.
+  $effect(() => {
+    if (!animating || reducedMotion) return;
+    const id = setInterval(() => paintFn?.(), 135);
+    return () => clearInterval(id);
   });
 
   async function copySnippet(): Promise<void> {
@@ -226,14 +257,29 @@
     <div class="mb-4 border border-purple-400/50 bg-[#180b30]/95 px-3 py-2 text-[9px] tracking-wider text-purple-300 shadow-[2px_2px_0_#090314]">
       {frameLabel}
     </div>
+    {#if status === 'complete'}
+      <p role="status" class="mb-3 text-center text-[9px] tracking-wider text-emerald-300">COMPLETE</p>
+    {:else if status === 'error'}
+      <p role="alert" class="mb-3 max-w-full text-center text-[9px] tracking-wider text-rose-300">{errorMessage ?? 'FAILED'}</p>
+    {:else if status === 'running' && onCancel}
+      <button type="button" class="snes-btn mb-3 text-[9px]" onclick={() => onCancel?.()}>CANCEL</button>
+    {/if}
 
+    {#if query}
+      <p class="search-glyph mb-3 max-w-full truncate text-center text-[9px] tracking-wider text-yellow-200" aria-live="polite">
+        SEARCHING: <span class="text-purple-100">{query}</span><span class="search-caret" aria-hidden="true">_</span>
+      </p>
+    {/if}
+    {#if stage}
+      <p class="mb-2 text-center text-[8px] tracking-wider text-emerald-300" aria-live="polite">{stage}</p>
+    {/if}
     <div class="w-full max-w-[380px] px-2">
       <div class="snes-frame relative h-[40px] w-full p-[5px]">
         <span class="snes-corner tl"></span><span class="snes-corner tr"></span>
         <span class="snes-corner bl"></span><span class="snes-corner br"></span>
         <div
           class:stepped-anim={stepped}
-          class="snes-bar-fill h-full"
+          class={`snes-bar-fill h-full lod-${lodLevel}`}
           style:width="{pct}%"
           style:transition={determinate ? 'width 240ms steps(8, end)' : 'none'}
           role="progressbar"
@@ -352,7 +398,13 @@
   .snes-text-shadow { text-shadow: 2px 2px #2e1065,-2px -2px #2e1065,2px -2px #2e1065,-2px 2px #2e1065,0 4px #090314; }
   .dot-bounce { display: inline-block; animation: dot-jump 1.2s steps(2,end) infinite; }
   .dot-bounce:nth-child(2) { animation-delay: .2s; } .dot-bounce:nth-child(3) { animation-delay: .4s; }
-  .snes-slider { background: linear-gradient(#3b0764,#3b0764) center / 100% 6px no-repeat; touch-action: none; }
+  :global(.snes-slider) { background: linear-gradient(#3b0764,#3b0764) center / 100% 6px no-repeat; touch-action: none; }
+  /* NES-style level-of-detail textures: coarse blocks at low progress, fine blocks near completion */
+  .snes-bar-fill.lod-0 { background-size: 48px 48px; }
+  .snes-bar-fill.lod-1 { background-size: 24px 24px; }
+  .snes-bar-fill.lod-2 { background-size: 12px 12px; }
+  .search-caret { display: inline-block; animation: caret-blink 1s steps(2, end) infinite; }
+  @keyframes caret-blink { 50% { opacity: 0; } }
   .css-pixel-book { transform-style: preserve-3d; }
   .css-book-spine { position: absolute; z-index: 5; top: 2px; left: 50%; width: 12px; height: 74px; transform: translateX(-50%); background: #581c87; border-top: 4px solid #facc15; border-bottom: 4px solid #eab308; box-shadow: inset 2px 0 #a855f7,inset -2px 0 #3b0764,0 4px #1e1b4b; }
   .css-book-side { position: absolute; top: 0; width: 50px; height: 74px; background: #7e22ce; border: 4px solid #3b0764; box-shadow: 0 6px #4c1d95,0 10px #1e1b4b; transition: transform .15s steps(3,end); }

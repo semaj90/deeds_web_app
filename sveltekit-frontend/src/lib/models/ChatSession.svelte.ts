@@ -143,6 +143,9 @@ export interface SendMessageOptions {
   forceLocal?: boolean;
   attachment?: File | null;
   attachmentSourceHash?: string;
+  /** Case context requested by a case-scoped UI; the server must authorize it. */
+  caseId?: string;
+  enableTools?: boolean;
 }
 
 function shouldDebugLogChunkStream(): boolean {
@@ -999,6 +1002,8 @@ export class ChatSession {
           emotionPrompt: emotionPrompt || undefined,
           emotionMood: emotionState.composite.mood,
           attachmentSourceHash: options?.attachmentSourceHash || undefined,
+          caseId: options?.caseId || undefined,
+          enableTools: options?.enableTools,
           ...(this.currentRoute ? { currentRoute: this.currentRoute } : {}),
         }),
         signal: this.abortController.signal,

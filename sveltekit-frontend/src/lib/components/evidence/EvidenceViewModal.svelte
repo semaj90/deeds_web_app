@@ -10,6 +10,10 @@
 	let {
 		evidenceId,
 		caseId = null,
+		chatMessages = [],
+		chatStatus = 'idle',
+		onAskAssistant,
+		assistantInitiallyExpanded = false,
 		open = $bindable(false),
 		initialView = 'original',
 		onClose = () => {},
@@ -18,6 +22,10 @@
 	}: {
 		evidenceId: string | null;
 		caseId?: string | null;
+		chatMessages?: import('$lib/models/ChatSession.svelte.js').ChatMessage[];
+		chatStatus?: string;
+		onAskAssistant?: (prompt: string) => void | Promise<void>;
+		assistantInitiallyExpanded?: boolean;
 		open?: boolean;
 		initialView?: 'original' | 'relief';
 		onClose?: () => void;
@@ -311,6 +319,10 @@
 										title={doc.title ?? fileName ?? 'Evidence relief'}
 										{evidenceId}
 										caseId={caseId}
+										{chatMessages}
+										{chatStatus}
+										{onAskAssistant}
+									{assistantInitiallyExpanded}
 										imageUrl={previewUrl}
 										depthUrl={depthMapUrl}
 									/>
