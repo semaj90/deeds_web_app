@@ -5,9 +5,10 @@ import { db } from '$lib/server/db/client';
 import { cases } from '$lib/server/db/schema-postgres.js';
 import { chatMessages } from '$lib/server/db/schema-postgres';
 import { chatMetadata } from '$lib/server/db/schema-chat';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, or, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
+import { requireOwnedCaseId } from '$lib/server/cases/owned-case.js';
 
 const chatMessageItemSchema = z.object({
 	role: z.enum(['user', 'assistant', 'system']),
@@ -38,13 +39,8 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 			return json({ error: 'Invalid case ID format' }, { status: 400 });
 		}
 
-		const [targetCase] = await db
-      .select({ id: cases.id })
-      .from(cases)
-      .where(and(eq(cases.id, id), eq(cases.userId, Number(user.id))))
-      .limit(1);
-
-    if (!targetCase) {
+		const targetCaseId = await requireOwnedCaseId(id, Number(user.id));
+    if (!targetCaseId) {
       return json({ error: 'Case not found' }, { status: 404 });
     }
 
@@ -54,6 +50,9 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
 		const { chatId, messages, metadata } = parsed.data;
+		if (chatId !== `board-${id}` && chatId !== `case-${id}`) {
+			return json({ error: 'Chat does not belong to this case' }, { status: 400 });
+		}
 
 		// Save each message to the database
 		const savedMessages = [];
@@ -64,6 +63,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
         .values({
           id: msgId,
           userId: Number(user.id),
+          caseId: id,
           chatId,
           role: msg.role,
           content: msg.content,
@@ -123,23 +123,25 @@ export const GET: RequestHandler = async ({ params, locals, url, request }) => {
 			return json({ error: 'Invalid case ID format' }, { status: 400 });
 		}
 
-		const [targetCase] = await db
-      .select({ id: cases.id })
-      .from(cases)
-      .where(and(eq(cases.id, id), eq(cases.userId, Number(user.id))))
-      .limit(1);
-
-    if (!targetCase) {
+		const targetCaseId = await requireOwnedCaseId(id, Number(user.id));
+    if (!targetCaseId) {
       return json({ error: 'Case not found' }, { status: 404 });
     }
 
 		const chatId = url.searchParams.get('chatId') || `board-${id}`;
+		if (chatId !== `board-${id}` && chatId !== `case-${id}`) {
+			return json({ error: 'Chat does not belong to this case' }, { status: 400 });
+		}
 
 		// Fetch messages for this chat
 		const rawMessages = await db
       .select()
       .from(chatMessages)
-      .where(and(eq(chatMessages.chatId, chatId), eq(chatMessages.userId, Number(user.id))))
+      .where(and(
+        eq(chatMessages.chatId, chatId),
+        eq(chatMessages.userId, Number(user.id)),
+        or(eq(chatMessages.caseId, id), isNull(chatMessages.caseId))
+      ))
       .orderBy(chatMessages.timestamp);
 
 		// Parse metadata JSON strings
