@@ -62,7 +62,7 @@ export async function initWebGPU(options: WebGPUInitOptions = {}): Promise<WebGP
 
     // Log adapter info in development
     if (import.meta.env.DEV) {
-      const info = await adapter.requestAdapterInfo();
+      const info = adapter.info;
       console.log('[WebGPU] Adapter:', {
         vendor: info.vendor,
         architecture: info.architecture,

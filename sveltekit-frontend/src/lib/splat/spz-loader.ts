@@ -29,6 +29,8 @@ export class SpzError extends Error {
 export const SPZ_DEFAULT_MAX_POINTS = 5_000_000;
 /** Hard compressed-input cap applied before hashing or decompression. Override only with a reviewed memory budget. */
 export const SPZ_DEFAULT_MAX_SOURCE_BYTES = 64 * 1024 * 1024;
+/** Hard decoded typed-array cap, checked from the SPZ header before any Zstandard stream is decompressed. */
+export const SPZ_DEFAULT_MAX_DECODED_BYTES = 512 * 1024 * 1024;
 
 const SPZ_MAGIC = 0x5053474e; // bytes "NGSP" in file order, read as little-endian uint32
 const SPZ_VERSION = 4;
@@ -64,6 +66,7 @@ export interface SpzData {
 export interface SpzParseOptions {
 	maxPoints?: number;
 	maxSourceBytes?: number;
+	maxDecodedBytes?: number;
 }
 
 /** fzstd (0.1.1) supports back-reference distances up to 2^25 bytes. README: larger windows may fail. */
@@ -107,10 +110,27 @@ export function shCoeffsForDegree(degree: number): number {
 	return (degree + 1) * (degree + 1) - 1;
 }
 
+/** Predict the total decoded Float32Array payload from the fixed SPZ v4 header. */
+export function estimateSpzDecodedByteLength(bytes: Uint8Array, maxPoints = SPZ_DEFAULT_MAX_POINTS): number {
+	if (bytes.length < HEADER_BYTES) throw new SpzError('SPZ_TRUNCATED_HEADER');
+	const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+	if (dv.getUint32(0, true) !== SPZ_MAGIC) throw new SpzError('SPZ_BAD_MAGIC');
+	const version = dv.getUint32(4, true);
+	if (version !== SPZ_VERSION) throw new SpzError('SPZ_VERSION_UNSUPPORTED', `version ${version}`);
+	const numPoints = dv.getUint32(8, true);
+	const shDegree = bytes[12];
+	if (numPoints > maxPoints) throw new SpzError('SPZ_TOO_MANY_POINTS', `${numPoints} > ${maxPoints}`);
+	if (shDegree > 4) throw new SpzError('SPZ_SH_DEGREE_INVALID', `degree ${shDegree}`);
+	// positions(3), alpha(1), colors(3), scales(3), rotations(4), SH(3 * coeffs), all Float32.
+	const floatComponentsPerPoint = 14 + 3 * shCoeffsForDegree(shDegree);
+	return numPoints * floatComponentsPerPoint * Float32Array.BYTES_PER_ELEMENT;
+}
+
 /** Decode SPZ v4 bytes. Throws SpzError on anything outside the verified subset. */
 export function parseSpz(bytes: Uint8Array, options: SpzParseOptions = {}): SpzData {
 	const maxPoints = options.maxPoints ?? SPZ_DEFAULT_MAX_POINTS;
 	const maxSourceBytes = options.maxSourceBytes ?? SPZ_DEFAULT_MAX_SOURCE_BYTES;
+	const maxDecodedBytes = options.maxDecodedBytes ?? SPZ_DEFAULT_MAX_DECODED_BYTES;
 	if (bytes.byteLength > maxSourceBytes) {
 		throw new SpzError('SPZ_SOURCE_TOO_LARGE', `${bytes.byteLength} > ${maxSourceBytes}`);
 	}
@@ -135,6 +155,8 @@ export function parseSpz(bytes: Uint8Array, options: SpzParseOptions = {}): SpzD
 
 	if (numPoints > maxPoints) throw new SpzError('SPZ_TOO_MANY_POINTS', `${numPoints} > ${maxPoints}`);
 	if (shDegree > 4) throw new SpzError('SPZ_SH_DEGREE_INVALID', `degree ${shDegree}`);
+	const decodedByteLength = estimateSpzDecodedByteLength(bytes, maxPoints);
+	if (decodedByteLength > maxDecodedBytes) throw new SpzError('SPZ_DECODED_TOO_LARGE', `${decodedByteLength} > ${maxDecodedBytes}`);
 	if (flags & FLAG_HAS_EXTENSIONS) throw new SpzError('SPZ_EXTENSIONS_UNSUPPORTED');
 	// The reference writer omits zero-size streams, so degree 0 has no SH stream (verified against
 	// ply_to_spz output from Niantic's official C++ encoder: numStreams = 5 for shDegree 0).

@@ -2,13 +2,17 @@
 	import { onMount } from 'svelte';
 	import { createSpzDecodeClient, type SpzDecodeClient } from '$lib/splat/spz-decode-client.js';
 	import { workerPayloadToGaussianGeometry } from '$lib/splat/worker-three-geometry.js';
-	import { createSceneDocumentV1 } from '$lib/splat/scene-document-v1.js';
+	import { createSceneDocumentV1, createSceneQualityReceiptV1, type SurfaceMarkerV1 } from '$lib/splat/scene-document-v1.js';
+	import { fetchSceneAssetV1, fetchSceneRevisionV1, saveSceneRevisionV1 } from '$lib/splat/scene-persistence-client-v1.js';
 	import { sha256Hex } from '$lib/splat/spz-loader.js';
+	import { interpolateTrianglePointV1, triangleBarycentricV1 } from '$lib/splat/surface-marker-v1.js';
+	import StreamedSogPlayCanvasViewer from '$lib/components/evidence/StreamedSogPlayCanvasViewer.svelte';
 	import fixtureUrl from '$lib/splat/fixtures/niantic-official-degree0-5pt.spz?url';
 
 	type Backend = 'webgpu' | 'webgl2';
 	type DecodeMode = 'worker' | 'three-loader';
 	type SamplingMode = 'native' | 'half' | 'retro';
+	type SurfaceMarkerDraft = Omit<SurfaceMarkerV1, 'meshAssetSha256'> & { meshAssetSha256?: string };
 	let canvas: HTMLCanvasElement;
 	let status = $state('Fixture not loaded');
 	let error = $state('');
@@ -20,6 +24,7 @@
 	let pickStatus = $state('Click a splat to test picking');
 	let samplingMode = $state<SamplingMode>('native');
 	let busy = $state(false);
+	let showStreamedSog = $state(false);
 	let renderer: any = null;
 	let decodeClient: SpzDecodeClient | null = null;
 	let controls: any = null;
@@ -37,12 +42,21 @@
 	let selectedAnimation = $state('');
 	let animationPlaying = $state(false);
 	let transformControls: any = null;
-	let animationMixer: any = null;
+	let animationMixer: any = $state.raw(null);
 	let animationRoot: any = null;
 	let animationClips: any[] = [];
 	let animationClock: any = null;
-	let sceneId = '';
-	let sceneRevision = 0;
+	let sceneId = $state('');
+	let caseId = $state<string | null>(null);
+	let linkedEvidenceId = $state<string | null>(null);
+	let linkedEvidenceRevision = $state<string | null>(null);
+	let sceneRevision = $state(0);
+	let surfaceMarkers = $state<SurfaceMarkerDraft[]>([]);
+	let markerLabel = $state('Evidence anchor');
+	let placingSurfaceMarker = $state(false);
+	let surfaceMarkerStatus = $state('Markers require a linked exhibit and a loaded static mesh.');
+	let markerOverlayRoot: any = null;
+	let markerOverlayAnchors: { visual: any; object: any; localPoint: any }[] = [];
 	let sceneDirty = $state(false);
 	let parentManifestSha256: string | null = null;
 	let sourceAssetSha256: string | null = null;
@@ -66,6 +80,11 @@
 		}
 	}
 
+	function toggleStreamedSog() {
+		if (!showStreamedSog) disposeScene();
+		showStreamedSog = !showStreamedSog;
+	}
+
 	function disposeScene() {
 		generation++;
 		try { animationMixer?.stopAllAction(); } catch { /* mixer may already be stopped */ }
@@ -80,6 +99,9 @@
 		sceneId = '';
 		sceneRevision = 0;
 		sceneDirty = false;
+		surfaceMarkers = [];
+		placingSurfaceMarker = false;
+		disposeSurfaceMarkerOverlays();
 		parentManifestSha256 = null;
 		sourceAssetSha256 = null;
 		sourceAssetBytes = 0;
@@ -153,25 +175,68 @@
 
 	async function downloadEditedGlb() {
 		if (!editableRoot || !loadedModel || busy) return;
+		if (caseId && linkedEvidenceId && !linkedEvidenceRevision) {
+			error = 'This exhibit has no canonical SHA-256 source revision; the scene cannot be saved as source-linked.';
+			return;
+		}
 		busy = true;
 		error = '';
 		try {
 			const { GLTFExporter } = await import('three/addons/exporters/GLTFExporter.js');
+			// Assign stable Atlas IDs before exporting so the GLB extras and manifest agree.
+			const manifestObjects = collectSceneObjects();
 			const buffer = await new GLTFExporter().parseAsync(editableRoot, { binary: true, animations: animationClips });
 			if (!(buffer instanceof ArrayBuffer)) throw new Error('The GLB exporter did not return a binary asset.');
 			if (buffer.byteLength > 64 * 1024 * 1024) throw new Error('The derived GLB exceeds the 64 MiB local export limit.');
 			const outputHash = await sha256Hex(new Uint8Array(buffer));
+			if (caseId) {
+				if (!sceneId) sceneId = crypto.randomUUID();
+				const qualityReceipt = createSceneQualityReceiptV1({ derivedAssetBytes: buffer.byteLength, triangleCount: countTriangles() });
+				const saved = await saveSceneRevisionV1({
+					caseId,
+					sceneId,
+					expectedRevision: sceneRevision,
+					commandId: crypto.randomUUID(),
+					glb: buffer,
+					createManifest: (asset) => createSceneDocumentV1({
+						schema: 'parent-atlas.scene-document.v1',
+						sceneId,
+						caseId,
+						status: 'HYPOTHESIS',
+						revision: sceneRevision + 1,
+						parentManifestSha256,
+						createdAt: new Date().toISOString(),
+						coordinateFrame,
+						objects: manifestObjects.map((object) => ({ ...object, assetSha256: asset.sha256 })),
+						animations: animationClips.map((clip) => ({ clipId: crypto.randomUUID(), name: clip.name || 'Unnamed animation', durationSeconds: Number(clip.duration) || 0, frameRate: null })),
+						evidenceBindings: linkedEvidenceId && linkedEvidenceRevision ? [{ evidenceId: linkedEvidenceId, sourceRevision: linkedEvidenceRevision }] : [],
+						surfaceMarkers: surfaceMarkers.map((marker) => ({ ...marker, meshAssetSha256: asset.sha256 })),
+						assets: [{ assetId: asset.assetId, format: 'GLB', sha256: asset.sha256, bytes: asset.bytes, role: 'DERIVED' }],
+						quality: qualityReceipt
+					})
+				});
+				sceneRevision = saved.revision.revision;
+				surfaceMarkers = surfaceMarkers.map((marker) => ({ ...marker, meshAssetSha256: saved.asset.sha256 }));
+				parentManifestSha256 = saved.revision.manifestSha256;
+				sceneDirty = false;
+				manifestStatus = `Case hypothesis revision ${sceneRevision} saved · verified manifest ${parentManifestSha256.slice(0, 16)}…`;
+				meshEditStatus = `Derived GLB and hypothesis manifest saved · ${qualityReceipt.derivedAssetByteStatus} (${buffer.byteLength.toLocaleString()} / ${qualityReceipt.derivedAssetByteBudget.toLocaleString()} bytes)`;
+				const currentUrl = new URL(window.location.href);
+				currentUrl.searchParams.set('sceneId', sceneId);
+				window.history.replaceState(window.history.state, '', currentUrl);
+				return;
+			}
 			const manifest = createSceneDocumentV1({
 				schema: 'parent-atlas.scene-document.v1',
 				sceneId: sceneId || crypto.randomUUID(), caseId: null, status: 'FIXTURE', revision: sceneRevision + 1,
 				parentManifestSha256, createdAt: new Date().toISOString(), coordinateFrame,
-				objects: collectSceneObjects(),
+				objects: manifestObjects,
 				animations: animationClips.map((clip) => ({ clipId: crypto.randomUUID(), name: clip.name || 'Unnamed animation', durationSeconds: Number(clip.duration) || 0, frameRate: null })),
 				assets: [
 					...(sourceAssetSha256 ? [{ assetId: crypto.randomUUID(), format: 'GLB', sha256: sourceAssetSha256, bytes: sourceAssetBytes, role: 'SOURCE' }] : []),
 					{ assetId: crypto.randomUUID(), format: 'GLB', sha256: outputHash, bytes: buffer.byteLength, role: 'DERIVED' }
 				],
-				quality: { triangleBudget: 100_000, triangleCount: countTriangles(), textureBytes: null, status: 'NOT_ASSESSED' }
+				quality: createSceneQualityReceiptV1({ derivedAssetBytes: buffer.byteLength, triangleCount: countTriangles() })
 			});
 			const manifestText = `${JSON.stringify(manifest, null, 2)}\n`;
 			parentManifestSha256 = await sha256Hex(new TextEncoder().encode(manifestText));
@@ -191,7 +256,7 @@
 			manifestAnchor.download = `${loadedModelName.split(' · ')[0].replace(/\.glb$/i, '')}-scene-r${sceneRevision}.json`;
 			manifestAnchor.click();
 			window.setTimeout(() => URL.revokeObjectURL(manifestUrl), 1000);
-			manifestStatus = `Fixture manifest revision ${sceneRevision} exported · SHA-256 ${parentManifestSha256.slice(0, 16)}… · local downloads only`;
+			manifestStatus = `Fixture manifest revision ${sceneRevision} exported · ${manifest.quality.derivedAssetByteStatus} (${buffer.byteLength.toLocaleString()} / ${manifest.quality.derivedAssetByteBudget.toLocaleString()} bytes) · SHA-256 ${parentManifestSha256.slice(0, 16)}… · local downloads only`;
 			meshEditStatus = 'Edited GLB and revisioned fixture manifest downloaded; source file and case records were not changed.';
 		} catch (cause) {
 			error = cause instanceof Error ? cause.message : String(cause);
@@ -230,6 +295,104 @@
 
 	function countTriangles() {
 		return collectSceneObjects().reduce((sum, object) => sum + (object.geometry?.triangleCount ?? 0), 0);
+	}
+
+	function disposeSurfaceMarkerOverlays() {
+		try { if (markerOverlayRoot && scene) scene.remove(markerOverlayRoot); } catch { /* renderer may already be disposed */ }
+		markerOverlayRoot?.traverse?.((object: any) => {
+			object.geometry?.dispose?.();
+			object.material?.dispose?.();
+		});
+		markerOverlayRoot = null;
+		markerOverlayAnchors = [];
+	}
+
+	function findMarkerMesh(objectId: string) {
+		let found: any = null;
+		editableRoot?.traverse?.((object: any) => {
+			if (!found && (object.isMesh || object.isSkinnedMesh) && object.userData.atlasObjectId === objectId) found = object;
+		});
+		return found;
+	}
+
+	function readTriangle(mesh: any, triangleIndex: number) {
+		const positions = mesh.geometry?.getAttribute?.('position');
+		if (!positions || !Number.isInteger(triangleIndex) || triangleIndex < 0) throw new Error('Surface marker target triangle is unavailable.');
+		const index = mesh.geometry.index;
+		const vertexIndices = [0, 1, 2].map((corner) => index ? index.getX(triangleIndex * 3 + corner) : triangleIndex * 3 + corner);
+		if (vertexIndices.some((vertex) => vertex >= positions.count)) throw new Error('Surface marker triangle index is outside the mesh geometry.');
+		return vertexIndices.map((vertex) => [positions.getX(vertex), positions.getY(vertex), positions.getZ(vertex)] as const) as [[number, number, number], [number, number, number], [number, number, number]];
+	}
+
+	function refreshSurfaceMarkerOverlays() {
+		disposeSurfaceMarkerOverlays();
+		if (!scene || !three || !editableRoot || !surfaceMarkers.length) return;
+		markerOverlayRoot = new three.Group();
+		markerOverlayRoot.name = 'Atlas mesh-relative marker overlays';
+		scene.add(markerOverlayRoot);
+		for (const marker of surfaceMarkers) {
+			if (marker.sourceRevision !== linkedEvidenceRevision || (marker.meshAssetSha256 && marker.meshAssetSha256 !== sourceAssetSha256)) continue;
+			const object = findMarkerMesh(marker.meshObjectId);
+			if (!object || object.isSkinnedMesh || object.skeleton?.bones?.length) continue;
+			try {
+				const [a, b, c] = readTriangle(object, marker.triangleIndex);
+				const point = interpolateTrianglePointV1(a, b, c, marker.barycentric);
+				const position = new three.Vector3(...point);
+				const normal = new three.Vector3(...b).sub(new three.Vector3(...a)).cross(new three.Vector3(...c).sub(new three.Vector3(...a))).normalize();
+				position.addScaledVector(normal, 0.006);
+				const visual = new three.Mesh(new three.OctahedronGeometry(0.025, 0), new three.MeshBasicMaterial({ color: '#f4c95d', depthWrite: false, toneMapped: false }));
+				visual.name = `surface-marker:${marker.markerId}`;
+				markerOverlayRoot.add(visual);
+				markerOverlayAnchors.push({ visual, object, localPoint: position });
+			} catch {
+				// Invalid/stale anchors remain in the manifest but are not projected onto a different surface.
+			}
+		}
+		updateSurfaceMarkerOverlays();
+	}
+
+	function updateSurfaceMarkerOverlays() {
+		for (const anchor of markerOverlayAnchors) {
+			anchor.object.updateWorldMatrix(true, false);
+			anchor.visual.position.copy(anchor.object.localToWorld(anchor.localPoint.clone()));
+		}
+	}
+
+	function removeSurfaceMarker(markerId: string) {
+		surfaceMarkers = surfaceMarkers.filter((marker) => marker.markerId !== markerId);
+		sceneDirty = true;
+		refreshSurfaceMarkerOverlays();
+	}
+
+	function placeSurfaceMarker(event: MouseEvent, pointer: any, raycaster: any): boolean {
+		if (!placingSurfaceMarker) return false;
+		if (!caseId || !linkedEvidenceId || !linkedEvidenceRevision || !editableRoot || animationPlaying) {
+			surfaceMarkerStatus = 'Placement needs a case, revision-qualified exhibit, and a stopped static mesh.';
+			return true;
+		}
+		collectSceneObjects();
+		raycaster.setFromCamera(pointer, camera);
+		const intersections = raycaster.intersectObject(editableRoot, true);
+		const hit = intersections.find((intersection: any) => intersection.object?.isMesh && !intersection.object?.isSkinnedMesh && !intersection.object?.skeleton?.bones?.length && Number.isInteger(intersection.faceIndex));
+		if (!hit) {
+			surfaceMarkerStatus = 'No static mesh triangle was hit. Skinned or non-mesh geometry cannot anchor this marker.';
+			return true;
+		}
+		const mesh = hit.object;
+		const [a, b, c] = readTriangle(mesh, hit.faceIndex);
+		const localHit = mesh.worldToLocal(hit.point.clone());
+		const barycentric = triangleBarycentricV1([localHit.x, localHit.y, localHit.z], a, b, c);
+		const label = markerLabel.trim().slice(0, 200) || `Evidence anchor ${surfaceMarkers.length + 1}`;
+		const marker: SurfaceMarkerDraft = {
+			markerId: crypto.randomUUID(), evidenceId: linkedEvidenceId, sourceRevision: linkedEvidenceRevision,
+			meshObjectId: mesh.userData.atlasObjectId, triangleIndex: hit.faceIndex, barycentric, label
+		};
+		surfaceMarkers = [...surfaceMarkers, marker];
+		placingSurfaceMarker = false;
+		sceneDirty = true;
+		surfaceMarkerStatus = `Placed “${label}” on ${mesh.name || 'mesh'} · mesh-relative hypothesis anchor; not survey-calibrated.`;
+		refreshSurfaceMarkerOverlays();
+		return true;
 	}
 
 	function playSelectedAnimation() {
@@ -432,6 +595,7 @@
 			renderer.setAnimationLoop(() => {
 				controls?.update();
 				if (animationPlaying && animationMixer && animationClock) animationMixer.update(animationClock.getDelta());
+				updateSurfaceMarkerOverlays();
 				renderer?.render(scene, camera);
 			});
 			pointCount = geometry.getAttribute('position')?.count ?? 0;
@@ -480,6 +644,8 @@
 			sourceAssetBytes = buffer.byteLength;
 			coordinateFrame = 'GLTF_Y_UP_METERS';
 			sceneDirty = false;
+			surfaceMarkers = [];
+			refreshSurfaceMarkerOverlays();
 			editableRoot.add(gltf.scene);
 			scene.add(editableRoot);
 			animationClips = Array.isArray(gltf.animations) ? gltf.animations : [];
@@ -506,15 +672,16 @@
 		}
 	}
 
-	function pick(event: PointerEvent) {
-		if (!renderer || !camera || !splat) return;
+	function pick(event: MouseEvent) {
+		if (!renderer || !camera || (!splat && !editableRoot)) return;
 		const THREE = three;
 		if (!THREE) return;
 		const rect = canvas.getBoundingClientRect();
 		const pointer = new THREE.Vector2((event.clientX - rect.left) / rect.width * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
 		const raycaster = new THREE.Raycaster();
+		if (placeSurfaceMarker(event, pointer, raycaster)) return;
 		raycaster.setFromCamera(pointer, camera);
-		const hit = raycaster.intersectObject(splat, false)[0];
+		const hit = splat ? raycaster.intersectObject(splat, false)[0] : null;
 		pickStatus = hit ? `Picked splat ${hit.index ?? 'surface'} at ${hit.distance.toFixed(3)} scene units` : 'No splat intersected at this point';
 	}
 
@@ -523,7 +690,65 @@
 		status = 'Scene disposed; the fixture can be loaded again.';
 	}
 
+	function caseApiJson<T>(value: unknown): T {
+		if (!value || typeof value !== 'object') throw new Error('Saved scene manifest is invalid.');
+		return value as T;
+	}
+
+	async function loadSavedCaseScene() {
+		if (!caseId || !sceneId || busy) return;
+		busy = true;
+		error = '';
+		try {
+			const saved = await fetchSceneRevisionV1({ caseId, sceneId });
+			if (!saved) throw new Error('This case scene has no saved revision yet.');
+			const manifest = caseApiJson<any>(saved.manifest);
+			if (manifest.caseId !== caseId || manifest.sceneId !== sceneId || manifest.status !== 'HYPOTHESIS') throw new Error('Saved scene scope or status does not match this case.');
+			if (linkedEvidenceId) {
+				const sourceBinding = manifest.evidenceBindings?.find((binding: any) => binding.evidenceId === linkedEvidenceId);
+				if (!sourceBinding) throw new Error('Saved scene is not bound to the selected exhibit.');
+				if (linkedEvidenceRevision && sourceBinding.sourceRevision !== linkedEvidenceRevision) throw new Error('The selected exhibit revision differs from the saved scene source.');
+			}
+			const asset = manifest.assets.find((candidate: any) => candidate.role === 'DERIVED' && candidate.format === 'GLB');
+			if (!asset) throw new Error('Saved scene has no derived GLB asset.');
+			const savedMarkers = Array.isArray(manifest.surfaceMarkers) ? manifest.surfaceMarkers as SurfaceMarkerV1[] : [];
+			if (savedMarkers.some((marker) => marker.meshAssetSha256 !== asset.sha256 || !manifest.objects.some((object: any) => object.objectId === marker.meshObjectId && object.kind === 'MESH' && object.geometry && marker.triangleIndex < object.geometry.triangleCount))) {
+				throw new Error('A saved marker does not match a mesh and GLB asset in this scene revision.');
+			}
+			const glb = await fetchSceneAssetV1({ caseId, sceneId, assetId: asset.assetId, expectedSha256: asset.sha256, expectedBytes: asset.bytes });
+			busy = false;
+			await loadLocalBlenderGlb(new File([glb], `case-scene-${saved.revision}.glb`, { type: 'model/gltf-binary' }));
+			if (!loadedModel) throw new Error('Saved GLB could not be loaded into the scene editor.');
+			sceneId = manifest.sceneId;
+			sceneRevision = saved.revision;
+			parentManifestSha256 = saved.manifestSha256;
+			coordinateFrame = manifest.coordinateFrame;
+			surfaceMarkers = savedMarkers;
+			refreshSurfaceMarkerOverlays();
+			sceneDirty = false;
+			manifestStatus = `Case hypothesis revision ${sceneRevision} loaded · SHA-256 verified`;
+			meshEditStatus = 'Saved case scene loaded with its editable GLB revision.';
+		} catch (cause) {
+			error = cause instanceof Error ? cause.message : String(cause);
+			manifestStatus = 'Case scene load failed; inspect the message before continuing.';
+		} finally {
+			busy = false;
+		}
+	}
+
 	onMount(() => {
+		const params = new URLSearchParams(window.location.search);
+		const requestedCaseId = params.get('caseId');
+		const requestedSceneId = params.get('sceneId');
+		const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+		if (requestedCaseId && uuidPattern.test(requestedCaseId)) caseId = requestedCaseId;
+		if (requestedSceneId && uuidPattern.test(requestedSceneId)) sceneId = requestedSceneId;
+		const requestedEvidenceId = params.get('evidenceId');
+		const requestedEvidenceRevision = params.get('sourceRevision');
+		if (requestedEvidenceId && uuidPattern.test(requestedEvidenceId)) {
+			linkedEvidenceId = requestedEvidenceId;
+			if (requestedEvidenceRevision && /^sha256:[a-f0-9]{64}$/.test(requestedEvidenceRevision)) linkedEvidenceRevision = requestedEvidenceRevision;
+		}
 		return () => disposeScene();
 	});
 </script>
@@ -536,11 +761,13 @@
 <main class="spz-page">
 	<header>
 		<div>
-			<p class="eyebrow">PARENT ATLAS · DETECTIVE MODE · FIXTURE ONLY</p>
+			<p class="eyebrow">PARENT ATLAS · DETECTIVE MODE · {caseId ? 'CASE SCENE HYPOTHESIS' : 'FIXTURE ONLY'}</p>
 			<h1>SPZ renderer qualification</h1>
-			<p class="intro">Synthetic Niantic SPZ v4 fixture. This page does not load a case, write evidence, or represent a measured reconstruction.</p>
+			<p class="intro">{caseId ? 'Case-linked scene editor. Saved assets and manifests are explicitly labeled reconstruction hypotheses; originals remain evidence.' : 'Synthetic Niantic SPZ v4 fixture. This page does not load a case, write evidence, or represent a measured reconstruction.'}</p>
+			{#if linkedEvidenceId}<p class="intro" data-testid="scene-evidence-binding">Linked exhibit {linkedEvidenceId}{linkedEvidenceRevision ? ` · source revision ${linkedEvidenceRevision.slice(0, 23)}…` : ' · canonical source hash unavailable; linked save disabled'}</p>{/if}
 		</div>
 		<div class="actions">
+			<button onclick={toggleStreamedSog} aria-pressed={showStreamedSog} data-testid="streamed-sog-toggle">{showStreamedSog ? 'Return to Three.js editor' : 'Compare Streamed SOG (PlayCanvas)'}</button>
 			<button onclick={() => loadFixture('webgpu', 'worker')} disabled={busy} aria-pressed={requestedBackend === 'webgpu'}>Worker decode + WebGPU</button>
 			<button onclick={() => loadFixture('webgpu', 'three-loader')} disabled={busy}>Three.js loader + WebGPU</button>
 			<button onclick={() => loadFixture('webgl2')} disabled={busy} aria-pressed={requestedBackend === 'webgl2'}>Force WebGL2</button>
@@ -555,10 +782,26 @@
 			{#each ['box', 'sphere', 'cylinder', 'cone', 'torus'] as kind}
 				<button onclick={() => addPrimitive(kind as 'box' | 'sphere' | 'cylinder' | 'cone' | 'torus')} disabled={busy} aria-label={`Add ${kind}`}>+ {kind}</button>
 			{/each}
-			<button onclick={downloadEditedGlb} disabled={!loadedModel || busy}>Download edited GLB</button>
+			{#if caseId}<button onclick={downloadEditedGlb} disabled={!loadedModel || busy}>Save case scene revision</button>{#if sceneId}<button onclick={loadSavedCaseScene} disabled={busy}>Reload saved scene</button>{/if}{:else}<button onclick={downloadEditedGlb} disabled={!loadedModel || busy}>Download edited GLB</button>{/if}
 			<button onclick={disposeForUser} disabled={!backend || busy}>Dispose</button>
 		</div>
 	</header>
+	<section class="marker-tools" aria-label="Case scene mesh anchors">
+		<label for="surface-marker-label">Mesh-relative evidence marker</label>
+		<input id="surface-marker-label" bind:value={markerLabel} maxlength="200" disabled={!caseId || !linkedEvidenceId || busy} />
+		<button onclick={() => { placingSurfaceMarker = !placingSurfaceMarker; surfaceMarkerStatus = placingSurfaceMarker ? 'Click a static mesh triangle to place an asset-local anchor.' : 'Marker placement cancelled.'; }} disabled={!caseId || !linkedEvidenceId || !linkedEvidenceRevision || !loadedModel || busy || animationPlaying} aria-pressed={placingSurfaceMarker}>
+			{placingSurfaceMarker ? 'Cancel placement' : 'Place marker on mesh'}
+		</button>
+		<span role="status" data-testid="surface-marker-status">{surfaceMarkerStatus}</span>
+		{#if surfaceMarkers.length}
+			<ul aria-label="Scene hypothesis markers">
+				{#each surfaceMarkers as marker (marker.markerId)}
+					<li><span>{marker.label}</span><small>triangle {marker.triangleIndex} · mesh-relative</small><button type="button" aria-label={`Remove ${marker.label}`} onclick={() => removeSurfaceMarker(marker.markerId)}>Remove</button></li>
+				{/each}
+			</ul>
+		{/if}
+		<p>Markers are attached by mesh object, triangle, and barycentric coordinates. They remain reconstruction hypotheses and are not survey-calibrated.</p>
+	</section>
 	<nav class="sampling" aria-label="Render sampling preview">
 		<span class="label">Render sampling</span>
 		<button onclick={() => setSamplingMode('native')} aria-pressed={samplingMode === 'native'}>Native</button>
@@ -567,10 +810,14 @@
 		<span class="sampling-note">Display sampling preview only · no DLSS or quality claim</span>
 	</nav>
 	<section class="viewer" aria-label="Synthetic Gaussian splat fixture">
-		<canvas bind:this={canvas} onclick={pick} data-testid="spz-fixture-canvas" aria-label="Interactive synthetic SPZ scene; drag to orbit, scroll to zoom, click to test splat picking"></canvas>
-		<div class="controls-hint" aria-hidden="true">Drag to orbit · scroll to zoom · click a splat to inspect</div>
-		{#if !backend && !busy}<div class="empty">Load the synthetic fixture to begin the renderer check.</div>{/if}
-		{#if busy}<div class="overlay-status" role="status">{status}</div>{/if}
+		{#if showStreamedSog}
+			<StreamedSogPlayCanvasViewer />
+		{:else}
+			<canvas bind:this={canvas} onclick={pick} data-testid="spz-fixture-canvas" aria-label="Interactive synthetic SPZ scene; drag to orbit, scroll to zoom, click to test splat picking"></canvas>
+			<div class="controls-hint" aria-hidden="true">Drag to orbit · scroll to zoom · {placingSurfaceMarker ? 'click a mesh triangle to anchor evidence' : 'click a splat to inspect'}</div>
+			{#if !backend && !busy}<div class="empty">Load the synthetic fixture to begin the renderer check.</div>{/if}
+			{#if busy}<div class="overlay-status" role="status">{status}</div>{/if}
+		{/if}
 	</section>
 	<footer>
 		<div><span class="label">Local mesh editor</span><span data-testid="spz-mesh-edit-status" role="status">{meshEditStatus}</span></div>
@@ -597,6 +844,16 @@
 	.intro { margin: .35rem 0 0; color: #b6b5b3; font-size: .85rem; }
 	.actions { display:flex; gap:.5rem; flex-wrap:wrap; }
 	.sampling { display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; border:1px solid #403724; border-radius:.65rem; padding:.6rem .8rem; background:#11141b; }
+	.marker-tools { display:flex; align-items:center; gap:.55rem; flex-wrap:wrap; border:1px solid #665126; border-radius:.65rem; padding:.65rem .8rem; background:#141720; }
+	.marker-tools > label { color:#e7c978; font-size:.78rem; font-weight:600; }
+	.marker-tools input { min-width:12rem; border:1px solid #594a2f; border-radius:.4rem; padding:.5rem .65rem; background:#0b101b; color:#eee7d8; }
+	.marker-tools input:focus-visible { outline:2px solid #70dbef; outline-offset:2px; }
+	.marker-tools span { color:#c8c2b5; font-size:.76rem; }
+	.marker-tools p { flex-basis:100%; margin:0; color:#a7a198; font-size:.72rem; }
+	.marker-tools ul { display:flex; flex-basis:100%; flex-wrap:wrap; gap:.45rem; margin:0; padding:0; list-style:none; }
+	.marker-tools li { display:flex; align-items:center; gap:.45rem; border:1px solid #403724; border-radius:.45rem; padding:.3rem .45rem; }
+	.marker-tools small { color:#aaa49a; }
+	.marker-tools li button { padding:.3rem .45rem; }
 	.sampling-note { color:#aaa49a; font-size:.72rem; margin-left:auto; }
 	button { border:1px solid #9b7535; border-radius:.45rem; padding:.55rem .8rem; background:#171d29; color:#f3d27f; cursor:pointer; }
 	button[aria-pressed="true"] { background:#453719; box-shadow:0 0 14px #d7a84255; }

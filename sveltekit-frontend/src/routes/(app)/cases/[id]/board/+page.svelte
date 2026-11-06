@@ -1735,7 +1735,8 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			<button class="action-btn" onclick={openDetectiveMode}>
 								Set the scene
 							</button>
-						<p class="related-info">Opens this image’s 2.5D relief and case assistant. Room-scale reconstruction is not available yet.</p>
+			<a class="action-btn" href={`/demos/spz-renderer?caseId=${encodeURIComponent(caseId)}&evidenceId=${encodeURIComponent(selectedEvidence.id)}${selectedEvidence.sourceRevision ? `&sourceRevision=${encodeURIComponent(selectedEvidence.sourceRevision)}` : ''}`}>Open scene studio for this exhibit</a>
+			<p class="related-info">The scene manifest records this exhibit and its source revision when available. Generated geometry remains a reconstruction hypothesis.</p>
 						{/if}
 					</div>
 

@@ -1798,6 +1798,7 @@
     "pdf-lib": "1.17.1",
     "pdf-parse": "2.4.5",
     "pg": "^8.0.0",
+    "playcanvas": "2.23.3",
     "playwright": "1.55.0",
     "postcss-preset-env": "11.5.1",
     "postgres": "3.4.7",

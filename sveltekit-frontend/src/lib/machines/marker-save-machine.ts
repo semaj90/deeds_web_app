@@ -32,6 +32,15 @@ export type MarkerSaveResult = {
 	replayed?: boolean;
 };
 
+export type MarkerDeleteCommand = {
+	caseId: string;
+	sceneKey: string;
+	markerId: string;
+	evidenceId: string;
+	commandId: string;
+	expectedRevision: number;
+};
+
 export class MarkerSaveError extends Error {
 	constructor(
 		public readonly status: number,
@@ -187,6 +196,33 @@ export function makeClientMarkerSaver(fetchFn: typeof fetch = fetch): MarkerSave
 }
 
 export { createActor };
+
+/** Persist a marker removal through the case-authorized scene-marker endpoint. */
+export async function deleteSavedMarker(
+	command: MarkerDeleteCommand,
+	fetchFn: typeof fetch = fetch
+): Promise<MarkerSaveResult> {
+	const url = `/api/cases/${encodeURIComponent(command.caseId)}` +
+		`/scenes/${encodeURIComponent(command.sceneKey)}/markers/${encodeURIComponent(command.markerId)}`;
+	const response = await fetchFn(url, {
+		method: 'DELETE',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify({
+			commandId: command.commandId,
+			evidenceId: command.evidenceId,
+			expectedRevision: command.expectedRevision
+		})
+	});
+	const body = (await response.json().catch(() => null)) as {
+		data?: MarkerSaveResult | { currentRevision?: number | null } | null;
+		message?: string;
+	} | null;
+	if (!response.ok || !body?.data || !('revision' in body.data)) {
+		const currentRevision = body?.data && 'currentRevision' in body.data ? body.data.currentRevision ?? null : null;
+		throw new MarkerSaveError(response.status, currentRevision, body?.message ?? `Marker delete failed: ${response.status}`);
+	}
+	return body.data;
+}
 
 export type SavedMarkerView = {
 	markerId: string;

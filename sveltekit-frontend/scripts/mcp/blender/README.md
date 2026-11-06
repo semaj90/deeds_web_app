@@ -26,6 +26,20 @@ registered as `blender-models` in the repository root `.mcp.json`.
   launching Blender.
 - `blender_create_model`: create a new scene from up to 100 cubes, UV spheres,
   cylinders, cones, or toruses, with transforms and base colors.
+- `blender_synthesize_scene_dag`: validate and instantiate a bounded, typed
+  primitive recipe DAG in stable parent-before-dependent order. Cycles,
+  duplicate/missing IDs, invalid transforms, and triangle-budget violations are
+  rejected before scene files are written. It emits a `.blend` plus a matching
+  `.glb`, reporting measured triangles, bytes, SHA-256, and the default 8 MiB
+  target result. Dependency IDs are retained as Blender/glTF extras; recipe
+  dependencies do not silently become Blender transform parenting. An
+  optional bounded skeleton recipes create up to 32 named, parented bones and
+  rigidly bind declared primitive meshes with vertex weights. Optional object
+  and bone transform tracks export as GLB animation clips. The skeleton path
+  was round-tripped through Blender 4.3.2 on a synthetic three-bone fixture;
+  this does not provide Mixamo retargeting, automatic weight painting,
+  character-rig compatibility, or evidence chronology. Output is synthetic,
+  not evidence; visual quality is not assessed.
 - `blender_create_mesh`: create one bounded custom mesh with up to 5,000
   vertices and 5,000 triangle/quad faces.
 - `blender_create_memory_fabric`: create a synthetic hot/warm/cold cache scene
@@ -60,6 +74,19 @@ registered as `blender-models` in the repository root `.mcp.json`.
   asset for Three.js.
 - `blender_import_gltf`: import an edited `.glb` from the isolated workspace and
   save it as a new `.blend` scene (64 MiB input cap; no overwrite).
+- `blender_import_model`: import a workspace-local `.glb`, `.gltf`, `.fbx`, or
+  `.obj` into Blender, then save a new editable `.blend` and a Three.js-ready
+  `.glb`. The source is read-only, input is capped at 64 MiB, triangles are
+  bounded, and the 8 MiB GLB target is reported separately from visual quality.
+  Rig/clip retention depends on the source and exporter; this is format
+  conversion, not Mixamo retargeting. This local asset conversion does not
+  establish case provenance or make the output evidence.
+  Run `node scripts/mcp/blender/import-model-smoke.mjs` to create a synthetic
+  OBJ, static FBX, and a generated one-bone animated/skinned FBX, and exercise
+  the repository's animated GLB through the real stdio MCP and Blender process.
+  It verifies rig/clip readback after FBX-to-GLB and GLB-to-Blender round trips,
+  leaves uniquely named proof outputs in the isolated workspace, and checks
+  that source files remain unchanged.
 - `blender_add_primitive`: add a primitive to an input scene.
 - `blender_generate_mesh_lod`: create a new decimated copy of a `.blend` scene,
   export a separate `.glb`, and report actual triangle count, bytes, SHA-256,

@@ -33,6 +33,15 @@ export const sceneMarkers = pgTable(
 		evidenceId: uuid('evidence_id')
 			.notNull()
 			.references(() => evidence.id, { onDelete: 'restrict' }),
+		sourceRevision: text('source_revision'),
+		sourceSha256: text('source_sha256'),
+		anchorKind: text('anchor_kind'),
+		anchorU: doublePrecision('anchor_u'),
+		anchorV: doublePrecision('anchor_v'),
+		meshId: text('mesh_id'),
+		triangleIndex: integer('triangle_index'),
+		barycentric: jsonb('barycentric').$type<[number, number, number] | null>(),
+		anchorStatus: text('anchor_status').notNull().default('DRAFT'),
 		posX: doublePrecision('pos_x').notNull(),
 		posY: doublePrecision('pos_y').notNull(),
 		posZ: doublePrecision('pos_z').notNull(),
@@ -49,7 +58,19 @@ export const sceneMarkers = pgTable(
 			.on(t.caseId, t.sceneKey)
 			.where(sql`${t.deletedAt} is null`),
 		index('scene_markers_evidence_idx').on(t.evidenceId),
-		check('scene_markers_revision_check', sql`${t.revision} >= 1`)
+		index('scene_markers_source_revision_idx').on(t.caseId, t.sourceRevision).where(sql`${t.sourceRevision} IS NOT NULL`),
+		check('scene_markers_revision_check', sql`${t.revision} >= 1`),
+		check('scene_markers_anchor_kind_check', sql`${t.anchorKind} IS NULL OR ${t.anchorKind} IN ('IMAGE_UV', 'MESH_SURFACE')`),
+		check('scene_markers_image_uv_check', sql`${t.anchorKind} IS DISTINCT FROM 'IMAGE_UV' OR (
+			${t.anchorU} IS NOT NULL AND ${t.anchorV} IS NOT NULL
+			AND ${t.anchorU} NOT IN ('NaN'::float8, 'Infinity'::float8, '-Infinity'::float8)
+			AND ${t.anchorV} NOT IN ('NaN'::float8, 'Infinity'::float8, '-Infinity'::float8)
+			AND ${t.anchorU} BETWEEN 0 AND 1 AND ${t.anchorV} BETWEEN 0 AND 1)`),
+		check('scene_markers_mesh_anchor_check', sql`${t.anchorKind} IS DISTINCT FROM 'MESH_SURFACE' OR (
+			${t.meshId} IS NOT NULL AND ${t.triangleIndex} IS NOT NULL AND ${t.triangleIndex} >= 0
+			AND ${t.barycentric} IS NOT NULL AND jsonb_typeof(${t.barycentric}) = 'array'
+			AND jsonb_array_length(${t.barycentric}) = 3)`),
+		check('scene_markers_anchor_status_check', sql`${t.anchorStatus} IN ('DRAFT', 'PROPOSED', 'REVIEWED')`)
 	]
 );
 

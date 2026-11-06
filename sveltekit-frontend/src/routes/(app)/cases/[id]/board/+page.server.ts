@@ -92,6 +92,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
         );
         return {
           id: item.id,
+          sourceRevision,
           title: item.title || 'Untitled Evidence',
           type: item.evidenceType || 'document',
           date: item.uploadedAt?.split('T')[0] || '',

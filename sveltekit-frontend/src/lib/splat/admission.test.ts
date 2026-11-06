@@ -58,6 +58,13 @@ describe('admitSpzSource', () => {
 		).rejects.toMatchObject({ code: 'ADMISSION_SHA256_MISMATCH' });
 	});
 
+	it('checks the trusted source hash before attempting to decode malformed bytes', async () => {
+		const garbage = new Uint8Array(64).fill(9);
+		await expect(admitSpzSource({ ...(await baseInput()), bytes: garbage })).rejects.toMatchObject({
+			code: 'ADMISSION_SHA256_MISMATCH'
+		});
+	});
+
 	it('rejects bytes that are not a valid SPZ, using the format code', async () => {
 		const garbage = new Uint8Array(64).fill(9);
 		const { sha256Hex } = await import('./spz-loader.js');

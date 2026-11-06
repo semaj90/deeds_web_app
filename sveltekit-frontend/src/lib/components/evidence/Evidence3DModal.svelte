@@ -7,6 +7,7 @@
 	import type { ChatMessage } from '$lib/models/ChatSession.svelte.js';
 	import {
 		createMarkerSaveMachine,
+		deleteSavedMarker,
 		fetchSavedMarkers,
 		makeClientMarkerSaver,
 		type MarkerSaveCommand
@@ -184,10 +185,29 @@
 	}
 
 	/** Targeted delete: removes exactly the marker with this id, whichever one is selected. */
-	function removeMarker(id: string) {
-		if (!markers.some((marker) => marker.id === id)) return;
-		markers = markers.filter((marker) => marker.id !== id);
-		if (persistenceOn) saveStatus = 'Removed on screen only: server delete is not implemented, so a saved marker remains.';
+	async function removeMarker(id: string) {
+		const marker = markers.find((candidate) => candidate.id === id);
+		if (!marker) return;
+		if (persistenceOn && marker.revision !== null) {
+			saveStatus = 'Removing saved marker…';
+			try {
+				const result = await deleteSavedMarker({
+					caseId: caseId!, sceneKey: `evidence:${evidenceId}`, markerId: marker.id,
+					evidenceId: evidenceId!, commandId: crypto.randomUUID(), expectedRevision: marker.revision
+				});
+				saveStatus = `Marker removed (revision ${result.revision})`;
+			} catch (cause) {
+				saveStatus = `Marker was not removed: ${cause instanceof Error ? cause.message : String(cause)}`;
+				return;
+			}
+		} else if (persistenceOn && saveActor.getSnapshot().context.command?.markerId === id) {
+			// A create request is already in flight. Keep the pin until its revision is known,
+			// then issue the delete against that committed revision.
+			saveStatus = 'Marker is being saved; remove it again after the save finishes.';
+			return;
+		}
+		markers = markers.filter((candidate) => candidate.id !== id);
+		saveQueue.splice(0, saveQueue.length, ...saveQueue.filter((queued) => queued.markerId !== id));
 		if (selectedMarkerId === id) selectedMarkerId = markers.at(-1)?.id ?? null;
 		markerScreenPositions = Object.fromEntries(Object.entries(markerScreenPositions).filter(([markerId]) => markerId !== id));
 	}
@@ -199,9 +219,18 @@
 	}
 
 	function clearMarkers() {
-		markers = [];
-		selectedMarkerId = null;
-		markerScreenPositions = {};
+		const active = saveActor.getSnapshot().context.command;
+		const inFlightCreateId = active?.kind === 'create' ? active.markerId : null;
+		const temporaryIds = new Set(markers.filter((marker) => marker.revision === null && marker.id !== inFlightCreateId).map((marker) => marker.id));
+		markers = markers.filter((marker) => marker.revision !== null || marker.id === inFlightCreateId);
+		for (let index = saveQueue.length - 1; index >= 0; index--) {
+			if (temporaryIds.has(saveQueue[index].markerId)) saveQueue.splice(index, 1);
+		}
+		if (selectedMarkerId && temporaryIds.has(selectedMarkerId)) selectedMarkerId = markers.at(-1)?.id ?? null;
+		markerScreenPositions = Object.fromEntries(Object.entries(markerScreenPositions).filter(([markerId]) => !temporaryIds.has(markerId)));
+		if (inFlightCreateId) saveStatus = 'A marker save is already in flight; that pin was kept and may finish saving.';
+		else if (temporaryIds.size && markers.length) saveStatus = 'Temporary pins cleared; saved case markers were kept.';
+		else if (temporaryIds.size) saveStatus = 'Temporary pins cleared.';
 	}
 
 	function chooseMarkerTool(mode: 'orbit' | 'marker') {
@@ -271,7 +300,10 @@
 		analysisText = '';
 		actionError = '';
 		busy = '';
-		clearMarkers();
+		markers = [];
+		selectedMarkerId = null;
+		markerScreenPositions = {};
+		saveQueue.length = 0;
 		toolMode = 'orbit';
 		draggingMarkerId = null;
 	}

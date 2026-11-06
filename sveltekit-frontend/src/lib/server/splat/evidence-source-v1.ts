@@ -23,7 +23,7 @@ export function verifySpzEvidenceSourceV1(input: {
 	mimeType: string | null;
 	expectedSha256: string | null;
 	bytes: Uint8Array;
-}): { sourceSha256: string; byteLength: number; pointCount: number; shDegree: number } {
+}): { sourceSha256: string; byteLength: number; decodedByteLength: number; pointCount: number; shDegree: number } {
 	if (!input.fileName?.toLowerCase().endsWith('.spz')) {
 		throw new SpzEvidenceSourceError('EVIDENCE_SOURCE_NOT_SPZ');
 	}
@@ -43,9 +43,11 @@ export function verifySpzEvidenceSourceV1(input: {
 	}
 	try {
 		const decoded = parseSpz(input.bytes, { maxPoints: Math.min(SPZ_DEFAULT_MAX_POINTS, SPZ_EVIDENCE_SOURCE_MAX_POINTS) });
+		const decodedByteLength = decoded.positions.byteLength + decoded.alphas.byteLength + decoded.colors.byteLength + decoded.scales.byteLength + decoded.rotations.byteLength + decoded.sh.byteLength;
 		return {
 			sourceSha256,
 			byteLength: input.bytes.byteLength,
+			decodedByteLength,
 			pointCount: decoded.numPoints,
 			shDegree: decoded.shDegree,
 		};

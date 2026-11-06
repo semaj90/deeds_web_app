@@ -39,7 +39,7 @@ export const GET: RequestHandler = async ({ locals, params }) => {
 		return json({ success: false, data: null, message: 'Invalid identifiers' }, { status: 400 });
 	}
 	const [owner] = await db
-		.select({ userId: cases.userId })
+		.select({ userId: cases.userId, assignedAttorney: cases.assignedAttorney })
 		.from(cases)
 		.where(eq(cases.id, caseId.data))
 		.limit(1);
@@ -47,7 +47,7 @@ export const GET: RequestHandler = async ({ locals, params }) => {
 		return json({ success: false, data: null, message: 'Case not found' }, { status: 404 });
 	}
 	const userId = Number(locals.user.id);
-	if (locals.user.role !== 'admin' && (Number.isNaN(userId) || owner.userId !== userId)) {
+	if (locals.user.role !== 'admin' && (Number.isNaN(userId) || (owner.userId !== userId && owner.assignedAttorney !== userId))) {
 		return json({ success: false, data: null, message: 'Forbidden' }, { status: 403 });
 	}
 	try {
@@ -85,7 +85,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 	}
 
 	const [owner] = await db
-		.select({ userId: cases.userId })
+		.select({ userId: cases.userId, assignedAttorney: cases.assignedAttorney })
 		.from(cases)
 		.where(eq(cases.id, caseId.data))
 		.limit(1);
@@ -95,7 +95,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 
 	const userId = Number(locals.user.id);
 	const isAdmin = locals.user.role === 'admin';
-	if (!isAdmin && (Number.isNaN(userId) || owner.userId !== userId)) {
+	if (!isAdmin && (Number.isNaN(userId) || (owner.userId !== userId && owner.assignedAttorney !== userId))) {
 		return json({ success: false, data: null, message: 'Forbidden' }, { status: 403 });
 	}
 

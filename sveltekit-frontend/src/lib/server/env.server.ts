@@ -306,6 +306,7 @@ export const ENV = Object.freeze({
   SEAWEED_ARTIFACTS_BUCKET: resolvedStorageBuckets.artifacts,
   SEAWEED_EVIDENCE_BUCKET: resolvedStorageBuckets.evidence,
   SEAWEED_S3_BUCKET: privateEnv.SEAWEED_S3_BUCKET,
+  SCENE_PERSISTENCE_ENABLED: parseBoolean(privateEnv.SCENE_PERSISTENCE_ENABLED, false),
   SEAWEED_S3_ENDPOINT: privateEnv.SEAWEED_S3_ENDPOINT,
   SEAWEED_S3_PORT: privateEnv.SEAWEED_S3_PORT,
   SEAWEED_S3_REGION: privateEnv.SEAWEED_S3_REGION,

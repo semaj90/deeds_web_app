@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 
 test.use({
 	serviceWorkers: 'block',
@@ -47,7 +47,7 @@ test('synthetic SPZ fixture decodes, renders, samples and disposes without write
 	expect(consoleErrors, consoleErrors.join('\n')).toEqual([]);
 });
 
-test('Blender MCP transformed GLB imports into Three.js and copy exports', async ({ page }, testInfo) => {
+test('synthetic Streamed SOG package verifies and loads through PlayCanvas without writes', async ({ page }, testInfo) => {
 	const pageErrors: string[] = [];
 	const nonReadRequests: string[] = [];
 	page.on('pageerror', (error) => pageErrors.push(error.message));
@@ -55,6 +55,35 @@ test('Blender MCP transformed GLB imports into Three.js and copy exports', async
 		if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method())) nonReadRequests.push(`${request.method()} ${request.url()}`);
 	});
 	await page.route('**/api/analytics/events', (route) => route.fulfill({ status: 204, body: '' }));
+	await page.route('**/api/errors/client-report', (route) => route.fulfill({ status: 204, body: '' }));
+
+	await page.goto('/demos/spz-renderer');
+	await page.getByTestId('streamed-sog-toggle').click();
+	const status = page.getByTestId('streamed-sog-status');
+	await expect(status).toContainText(/Rendering verified synthetic SOG/, { timeout: 30_000 });
+	await expect(status).toContainText(/WebGPU|WebGL2 fallback/);
+	await expect(page.getByLabel(/Synthetic Streamed SOG comparison canvas/)).toBeVisible();
+	await page.screenshot({ path: testInfo.outputPath('synthetic-streamed-sog-playcanvas.png'), fullPage: true });
+	await page.screenshot({ path: resolve(process.cwd(), '../.tmp/atlas/streamed-sog-playcanvas-2026-11-05.png'), fullPage: true });
+
+	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
+	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events') && !request.includes('/api/errors/client-report'))).toEqual([]);
+});
+
+test('Blender MCP transformed GLB imports into Three.js and copy exports', async ({ page }, testInfo) => {
+	const pageErrors: string[] = [];
+	const nonReadRequests: string[] = [];
+	const clientErrorReports: string[] = [];
+	page.on('pageerror', (error) => pageErrors.push(error.message));
+	page.on('request', (request) => {
+		if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method())) nonReadRequests.push(`${request.method()} ${request.url()}`);
+	});
+	await page.route('**/api/analytics/events', (route) => route.fulfill({ status: 204, body: '' }));
+	// The application error reporter persists events and may enqueue work; capture it locally so this fixture stays DB-free.
+	await page.route('**/api/errors/client-report', async (route) => {
+		clientErrorReports.push(route.request().postData() ?? '');
+		await route.fulfill({ status: 204, body: '' });
+	});
 	await page.goto('/demos/spz-renderer');
 	await page.locator('input[type="file"][accept=".glb,model/gltf-binary"]').setInputFiles(resolve(process.cwd(), '../.tmp/blender-mcp-workspace/smoke/codex-transform-proof.glb'));
 	await expect(page.getByText(/Blender-authored GLB loaded into the Three\.js fixture viewer/)).toBeVisible({ timeout: 30_000 });
@@ -89,8 +118,9 @@ test('Blender MCP transformed GLB imports into Three.js and copy exports', async
 	expect(download.suggestedFilename()).toMatch(/codex-transform-proof-edited\.glb$/i);
 	expect(await stat(editedPath).then((file) => file.size)).toBeGreaterThan(20);
 	expect(editedBytes.subarray(0, 4).toString('ascii')).toBe('glTF');
-	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events'))).toEqual([]);
 	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
+	expect(clientErrorReports, clientErrorReports.join('\n')).toEqual([]);
+	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events') && !request.includes('/api/errors/client-report'))).toEqual([]);
 	await page.getByRole('button', { name: 'Dispose' }).click();
 	await expect(transformReadout).toHaveText('No local transform loaded');
 });
@@ -137,7 +167,19 @@ test('synthetic playground creates, selects and exports multiple editable meshes
 	expect(new Set(manifest.objects.map((object: any) => object.objectId)).size).toBe(manifest.objects.length);
 	expect(manifest.assets[0].sha256).toMatch(/^[a-f0-9]{64}$/);
 	expect(manifest.quality.status).toBe('NOT_ASSESSED');
+	expect(manifest.quality.derivedAssetBytes).toBe(manifest.assets.filter((asset: any) => ['DERIVED', 'LOD'].includes(asset.role)).reduce((sum: number, asset: any) => sum + asset.bytes, 0));
+	expect(manifest.quality.derivedAssetByteBudget).toBe(8 * 1024 * 1024);
+	expect(manifest.quality.derivedAssetByteStatus).toBe(manifest.quality.derivedAssetBytes <= manifest.quality.derivedAssetByteBudget ? 'WITHIN_BUDGET' : 'BUDGET_NOT_MET');
 	expect(await page.getByTestId('spz-scene-manifest-status').textContent()).toContain('revision 1 exported');
+	const meshIds = manifest.objects.filter((object: any) => object.kind === 'MESH').map((object: any) => object.objectId).sort();
+	await page.locator('input[type="file"][accept=".glb,model/gltf-binary"]').setInputFiles(outputPath);
+	await expect(page.getByText(/Blender-authored GLB loaded into the Three\.js fixture viewer/)).toBeVisible({ timeout: 30_000 });
+	await page.getByRole('button', { name: 'Download edited GLB' }).click();
+	await expect.poll(() => downloads.length).toBe(4);
+	const roundTripManifestPath = testInfo.outputPath(downloads[3].suggestedFilename());
+	await downloads[3].saveAs(roundTripManifestPath);
+	const roundTripManifest = JSON.parse(await readFile(roundTripManifestPath, 'utf8'));
+	expect(roundTripManifest.objects.filter((object: any) => object.kind === 'MESH').map((object: any) => object.objectId).sort()).toEqual(meshIds);
 	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events'))).toEqual([]);
 	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
 });
@@ -172,6 +214,62 @@ test('local Mixamo-derived GLB clip can be previewed without changing case data'
 	expect(manifest.assets).toHaveLength(2);
 	expect(manifest.assets[0].role).toBe('SOURCE');
 	expect(manifest.assets[1].role).toBe('DERIVED');
+	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events'))).toEqual([]);
+	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
+});
+
+test('generated primitive transform animation plays in the Three.js playground without writes', async ({ page }, testInfo) => {
+	const pageErrors: string[] = [];
+	const nonReadRequests: string[] = [];
+	const clientErrorReports: string[] = [];
+	page.on('pageerror', (error) => pageErrors.push(error.message));
+	page.on('request', (request) => {
+		if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method())) nonReadRequests.push(`${request.method()} ${request.url()}`);
+	});
+	await page.route('**/api/analytics/events', (route) => route.fulfill({ status: 204, body: '' }));
+	await page.route('**/api/errors/client-report', async (route) => {
+		clientErrorReports.push(route.request().postData() ?? '');
+		await route.fulfill({ status: 204, body: '' });
+	});
+	await page.goto('/demos/spz-renderer');
+	await page.locator('input[type="file"][accept=".glb,model/gltf-binary"]').setInputFiles(resolve(process.cwd(), '../.tmp/blender-mcp-workspace/smoke/codex-animation-mcp-20261105.glb'));
+	await expect(page.getByText(/Blender-authored GLB loaded into the Three\.js fixture viewer/)).toBeVisible({ timeout: 30_000 });
+	await expect(page.getByTestId('spz-animation-status')).toContainText('local clip(s) available');
+	const animation = page.getByRole('combobox', { name: 'Select animation clip' });
+	const clips = await animation.locator('option').allTextContents();
+	expect(clips.some((clip) => /marker-pulse/i.test(clip)), `Expected generated marker-pulse clip; got ${clips.join(', ')}`).toBe(true);
+	await animation.selectOption({ label: clips.find((clip) => /marker-pulse/i.test(clip))! });
+	await page.getByRole('button', { name: 'Play animation' }).click();
+	await expect(page.getByTestId('spz-mesh-edit-status')).toContainText('Playback is illustrative');
+	await page.screenshot({ path: resolve(process.cwd(), '../.tmp/atlas/blender-primitive-animation-playground-2026-11-05.png') });
+	await page.getByRole('button', { name: 'Stop animation' }).click();
+	expect(clientErrorReports, clientErrorReports.join('\n')).toEqual([]);
+	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events') && !request.includes('/api/errors/client-report'))).toEqual([]);
+	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
+});
+
+test('Blender scene-recipe GLB opens in the Three.js playground without case writes', async ({ page }, testInfo) => {
+	const fixturePath = process.env.SCENE_RECIPE_GLB_PATH;
+	test.skip(!fixturePath, 'Set SCENE_RECIPE_GLB_PATH to a GLB produced by blender_synthesize_scene_dag.');
+	const pageErrors: string[] = [];
+	const nonReadRequests: string[] = [];
+	page.on('pageerror', (error) => pageErrors.push(error.message));
+	page.on('request', (request) => {
+		if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method())) nonReadRequests.push(`${request.method()} ${request.url()}`);
+	});
+	await page.route('**/api/analytics/events', (route) => route.fulfill({ status: 204, body: '' }));
+	await page.goto('/demos/spz-renderer');
+	await page.locator('input[type="file"][accept=".glb,model/gltf-binary"]').setInputFiles(resolve(fixturePath!));
+	await expect(page.getByText(/Blender-authored GLB loaded into the Three\.js fixture viewer/)).toBeVisible({ timeout: 30_000 });
+	const objects = page.getByRole('combobox', { name: 'Select scene object' });
+	await expect(objects.locator('option')).toHaveCount(2);
+	const objectNames = await objects.locator('option').allTextContents();
+	expect(objectNames).toEqual(expect.arrayContaining(['ground', 'marker']));
+	await objects.selectOption('marker');
+	await expect(page.getByTestId('spz-mesh-transform')).toContainText('position');
+	const screenshotPath = resolve(process.cwd(), '../.tmp/atlas/scene-recipe-three-playground-2026-11-05.png');
+	await (await import('node:fs/promises')).mkdir(dirname(screenshotPath), { recursive: true });
+	await page.screenshot({ path: screenshotPath, fullPage: true });
 	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events'))).toEqual([]);
 	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
 });

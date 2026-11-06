@@ -2,9 +2,23 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/scene_document_revisions.sql",
+      "status": "active_candidate",
+      "reason": "Append-only case scene manifest revisions and a distinct immutable case-scene asset registry. Candidate SQL only; not rehearsed or applied to any database. GLB asset routes stay disabled until schema and bucket admission.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
       "file": "manual/scene_markers.sql",
       "status": "active_candidate",
       "reason": "Evidence-board marker persistence: scene_markers, scene_events (command_id idempotency), scene_event_outbox. Rehearsed on a disposable PostgreSQL 18 database only; NOT applied to the live database.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/scene_markers_anchor.sql",
+      "status": "active_candidate",
+      "reason": "Additive source revision/hash and image or mesh anchor metadata for scene markers. Candidate SQL only; not applied or freshly rehearsed against scratch or live databases. SPZ surface anchors are not represented by these anchor kinds yet.",
       "appliedBy": "not-applied",
       "requiresJournalEntry": false
     },

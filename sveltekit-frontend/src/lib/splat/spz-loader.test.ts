@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import * as zlib from 'node:zlib';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { parseSpz, SpzError, sha256Hex, shCoeffsForDegree, zstdWindowSize } from './spz-loader.js';
+import { estimateSpzDecodedByteLength, parseSpz, SpzError, sha256Hex, shCoeffsForDegree, zstdWindowSize } from './spz-loader.js';
 
 // Node 22.15+ ships ZSTD in zlib, but the installed @types/node does not declare it yet.
 const zstdCompressSync = (zlib as unknown as { zstdCompressSync: (d: Uint8Array) => Buffer }).zstdCompressSync;
@@ -149,7 +149,7 @@ describe('parseSpz: valid synthetic v4 file', () => {
 });
 
 describe('parseSpz: fail-closed cases', () => {
-	const expectCode = (bytes: Uint8Array, code: string, opts?: { maxPoints?: number }) => {
+	const expectCode = (bytes: Uint8Array, code: string, opts?: { maxPoints?: number; maxDecodedBytes?: number }) => {
 		try {
 			parseSpz(bytes, opts);
 		} catch (e) {
@@ -190,6 +190,11 @@ describe('parseSpz: fail-closed cases', () => {
 
 	it('rejects a point count above the operator cap', () => {
 		expectCode(buildSpz({ streams: validStreams() }), 'SPZ_TOO_MANY_POINTS', { maxPoints: 2 });
+	});
+
+	it('rejects decoded output above its byte cap before decompressing any stream', () => {
+		const bytes = buildSpz({ streams: validStreams(), numPoints: 3 });
+		expectCode(bytes, 'SPZ_DECODED_TOO_LARGE', { maxDecodedBytes: 275 });
 	});
 
 	it('rejects truncated input', () => {
@@ -398,5 +403,10 @@ describe('ZSTD window guard (fzstd 2^25 back-reference limit)', () => {
 describe('shCoeffsForDegree', () => {
 	it('matches the reference dimForDegree for degrees 0-4', () => {
 		expect([0, 1, 2, 3, 4].map(shCoeffsForDegree)).toEqual([0, 3, 8, 15, 24]);
+	});
+
+	it('estimates the decoded Float32 payload from the SPZ v4 header', () => {
+		const bytes = new Uint8Array(readFileSync(resolve(process.cwd(), 'src/lib/splat/fixtures/niantic-official-degree1-3pt.spz')));
+		expect(estimateSpzDecodedByteLength(bytes)).toBe(3 * 23 * Float32Array.BYTES_PER_ELEMENT);
 	});
 });

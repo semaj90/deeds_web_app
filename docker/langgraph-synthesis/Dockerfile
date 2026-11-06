@@ -8,9 +8,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl git libpq-dev libgomp1 python3-pip python3-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# ── Remove system cryptography + PyJWT (conflict with pip versions) ───────────
-# Ubuntu 24.04 ships cryptography 41.x with Rust pyo3 bindings that panic when
-# pip-installed PyJWT 2.x tries to import them. Remove both, let pip install clean.
+# ── Remove distro cryptography + PyJWT packages before installing pip versions ─
+# Keep the Python packages from the pinned application environment instead of
+# mixing them with distro-managed modules.
 RUN apt-get update && apt-get remove -y python3-jwt python3-cryptography 2>/dev/null; \
     rm -rf /usr/lib/python3/dist-packages/jwt* \
            /usr/lib/python3/dist-packages/PyJWT* \

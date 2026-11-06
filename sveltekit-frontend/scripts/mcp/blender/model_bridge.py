@@ -58,10 +58,26 @@ def finite_vector(value, label):
     return numbers
 
 
+def finite_quaternion_xyzw(value):
+    if not isinstance(value, list) or len(value) != 4:
+        raise ValueError("rotationQuaternion must be a 4-number [x, y, z, w] array")
+    numbers = [float(part) for part in value]
+    if not all(math.isfinite(part) for part in numbers):
+        raise ValueError("rotationQuaternion contains a non-finite value")
+    norm = math.sqrt(sum(part * part for part in numbers))
+    if abs(norm - 1.0) > 1e-3:
+        raise ValueError("rotationQuaternion must be normalized")
+    return [part / norm for part in numbers]
+
+
 def apply_transform(obj, spec):
     if "location" in spec:
         obj.location = finite_vector(spec["location"], "location")
-    if "rotation" in spec:
+    if "rotationQuaternion" in spec:
+        x, y, z, w = finite_quaternion_xyzw(spec["rotationQuaternion"])
+        obj.rotation_mode = "QUATERNION"
+        obj.rotation_quaternion = (w, x, y, z)
+    elif "rotation" in spec:
         obj.rotation_euler = finite_vector(spec["rotation"], "rotation")
     if "scale" in spec:
         scale = finite_vector(spec["scale"], "scale")
@@ -106,6 +122,10 @@ def create_object(spec):
     obj.name = name
     obj.data.name = name + "_Mesh"
     apply_transform(obj, spec)
+    if "dagParentIds" in spec:
+        obj["atlas_dag_parent_ids"] = json.dumps(spec["dagParentIds"], separators=(",", ":"))
+    if spec.get("boneId"):
+        obj["atlas_bone_id"] = spec["boneId"]
     obj.data.materials.append(create_material(name, spec.get("color", [0.72, 0.55, 0.2, 1])))
     return obj
 
@@ -132,6 +152,170 @@ def create_mesh(spec):
     apply_transform(obj, spec)
     obj.data.materials.append(create_material(name, spec.get("color", [0.72, 0.55, 0.2, 1])))
     return obj
+
+
+def create_skeleton(spec):
+    """Create a bounded armature from validated parent-first bone recipes."""
+    if not spec:
+        return None
+    bones = spec.get("bones")
+    if not isinstance(bones, list) or not 1 <= len(bones) <= 32:
+        raise ValueError("Skeleton must contain 1 to 32 bones")
+    bpy.ops.object.select_all(action="DESELECT")
+    bpy.ops.object.armature_add(enter_editmode=True, location=(0, 0, 0))
+    armature = bpy.context.object
+    armature.name = "Atlas_Skeleton"
+    armature.data.name = "Atlas_Skeleton_Data"
+    edit_bones = armature.data.edit_bones
+    for existing in list(edit_bones):
+        edit_bones.remove(existing)
+    created = {}
+    for spec_bone in bones:
+        bone_id = spec_bone.get("boneId")
+        parent_id = spec_bone.get("parentBoneId")
+        head = finite_vector(spec_bone.get("head"), "bone head")
+        tail = finite_vector(spec_bone.get("tail"), "bone tail")
+        if not isinstance(bone_id, str) or not bone_id or bone_id in created:
+            raise ValueError("Bone IDs must be unique non-empty strings")
+        bone = edit_bones.new(bone_id)
+        bone.head = head
+        bone.tail = tail
+        if parent_id:
+            parent = created.get(parent_id)
+            if parent is None:
+                raise ValueError("Bone recipes must be ordered parent-first")
+            bone.parent = parent
+        created[bone_id] = bone
+    bpy.ops.object.mode_set(mode="OBJECT")
+    armature["atlas_rig_schema"] = "parent-atlas.scene-recipe-rig.v1"
+    return armature
+
+
+def bind_objects_to_skeleton(objects, armature):
+    """Rigidly skin each declared primitive to one named bone using vertex weights."""
+    if not armature:
+        return 0
+    bone_names = {bone.name for bone in armature.data.bones}
+    bound = 0
+    for obj in objects:
+        bone_id = obj.get("atlas_bone_id")
+        if not bone_id:
+            continue
+        if bone_id not in bone_names:
+            raise ValueError("Primitive references a bone missing from the armature")
+        group = obj.vertex_groups.new(name=bone_id)
+        vertices = [vertex.index for vertex in obj.data.vertices]
+        if vertices:
+            group.add(vertices, 1.0, "REPLACE")
+        modifier = obj.modifiers.new(name="Atlas_Armature", type="ARMATURE")
+        modifier.object = armature
+        obj["atlas_bone_id"] = bone_id
+        bound += 1
+    return bound
+
+
+def apply_transform_animation(animation, objects, armature=None):
+    """Apply bounded object and bone keyframes to an exported GLB clip."""
+    if not animation:
+        return 0
+    if not isinstance(animation, dict) or not isinstance(animation.get("tracks"), list):
+        raise ValueError("Animation must contain a track list")
+    by_name = {obj.name: obj for obj in objects}
+    name = animation.get("name")
+    fps = animation.get("fps")
+    if not isinstance(name, str) or not name or isinstance(fps, bool) or not isinstance(fps, int) or not 1 <= fps <= 120:
+        raise ValueError("Animation name or frame rate is invalid")
+    tracks = animation.get("tracks", [])
+    bone_tracks = animation.get("boneTracks", [])
+    if not isinstance(tracks, list) or not isinstance(bone_tracks, list) or not tracks and not bone_tracks or len(tracks) > 100 or len(bone_tracks) > 32:
+        raise ValueError("Animation must contain bounded object or bone tracks")
+    seen = set()
+    final_frame = 0
+    for track in tracks:
+        node_id = track.get("nodeId")
+        if node_id not in by_name or node_id in seen:
+            raise ValueError("Animation track references an unknown or duplicate node")
+        seen.add(node_id)
+        keyframes = track.get("keyframes")
+        if not isinstance(keyframes, list) or not 2 <= len(keyframes) <= 120:
+            raise ValueError("Each animation track must contain 2 to 120 keyframes")
+        frames = set()
+        obj = by_name[node_id]
+        for keyframe in keyframes:
+            frame = keyframe.get("frame")
+            if isinstance(frame, bool) or not isinstance(frame, int) or not 0 <= frame <= 100000 or frame in frames:
+                raise ValueError("Animation keyframe index is invalid or duplicated")
+            frames.add(frame)
+            final_frame = max(final_frame, frame)
+            channels = 0
+            if "location" in keyframe:
+                obj.location = finite_vector(keyframe["location"], "animation location")
+                obj.keyframe_insert(data_path="location", frame=frame, group=name)
+                channels += 1
+            if "rotationQuaternion" in keyframe:
+                x, y, z, w = finite_quaternion_xyzw(keyframe["rotationQuaternion"])
+                obj.rotation_mode = "QUATERNION"
+                obj.rotation_quaternion = (w, x, y, z)
+                obj.keyframe_insert(data_path="rotation_quaternion", frame=frame, group=name)
+                channels += 1
+            if "scale" in keyframe:
+                scale = finite_vector(keyframe["scale"], "animation scale")
+                if not all(0 < part <= 1000 for part in scale):
+                    raise ValueError("Animation scale values must be positive and <= 1000")
+                obj.scale = scale
+                obj.keyframe_insert(data_path="scale", frame=frame, group=name)
+                channels += 1
+            if channels == 0:
+                raise ValueError("Each animation keyframe must animate a transform channel")
+        if obj.animation_data and obj.animation_data.action:
+            obj.animation_data.action.name = name
+    animated_bones = set()
+    if bone_tracks and not armature:
+        raise ValueError("Bone animation requires a skeleton")
+    for track in bone_tracks:
+        bone_id = track.get("boneId")
+        if not isinstance(bone_id, str) or bone_id in animated_bones:
+            raise ValueError("Bone animation tracks must reference unique bones")
+        pose_bone = armature.pose.bones.get(bone_id)
+        if pose_bone is None:
+            raise ValueError("Bone animation references an unknown bone")
+        animated_bones.add(bone_id)
+        keyframes = track.get("keyframes")
+        if not isinstance(keyframes, list) or not 2 <= len(keyframes) <= 120:
+            raise ValueError("Each bone animation track must contain 2 to 120 keyframes")
+        frames = set()
+        for keyframe in keyframes:
+            frame = keyframe.get("frame")
+            if isinstance(frame, bool) or not isinstance(frame, int) or not 0 <= frame <= 100000 or frame in frames:
+                raise ValueError("Bone keyframe index is invalid or duplicated")
+            frames.add(frame)
+            final_frame = max(final_frame, frame)
+            channels = 0
+            if "location" in keyframe:
+                pose_bone.location = finite_vector(keyframe["location"], "bone animation location")
+                pose_bone.keyframe_insert(data_path="location", frame=frame, group=name)
+                channels += 1
+            if "rotationQuaternion" in keyframe:
+                x, y, z, w = finite_quaternion_xyzw(keyframe["rotationQuaternion"])
+                pose_bone.rotation_mode = "QUATERNION"
+                pose_bone.rotation_quaternion = (w, x, y, z)
+                pose_bone.keyframe_insert(data_path="rotation_quaternion", frame=frame, group=name)
+                channels += 1
+            if "scale" in keyframe:
+                scale = finite_vector(keyframe["scale"], "bone animation scale")
+                if not all(0 < part <= 1000 for part in scale):
+                    raise ValueError("Bone animation scale values must be positive and <= 1000")
+                pose_bone.scale = scale
+                pose_bone.keyframe_insert(data_path="scale", frame=frame, group=name)
+                channels += 1
+            if channels == 0:
+                raise ValueError("Each bone keyframe must animate a transform channel")
+        if armature.animation_data and armature.animation_data.action:
+            armature.animation_data.action.name = name
+    bpy.context.scene.render.fps = fps
+    bpy.context.scene.frame_end = max(final_frame, 1)
+    bpy.context.scene["atlas_animation_name"] = name
+    return {"objectTrackCount": len(tracks), "boneTrackCount": len(bone_tracks)}
 
 
 def create_memory_block(block, domain, tier_index, tier_counts):
@@ -600,13 +784,20 @@ def create_memory_fabric(spec, glb_path):
 def object_record(obj):
     obj.update_tag()
     dimensions = [round(float(value), 6) for value in obj.dimensions]
+    rotation = obj.rotation_quaternion if obj.rotation_mode == "QUATERNION" else obj.rotation_euler.to_quaternion()
+    try:
+        dag_parent_ids = json.loads(obj.get("atlas_dag_parent_ids", "[]"))
+    except (TypeError, ValueError):
+        dag_parent_ids = []
     return {
         "name": obj.name,
         "type": obj.type,
         "location": [round(float(value), 6) for value in obj.location],
         "rotation": [round(float(value), 6) for value in obj.rotation_euler],
+        "rotationQuaternion": [round(float(rotation.x), 6), round(float(rotation.y), 6), round(float(rotation.z), 6), round(float(rotation.w), 6)],
         "scale": [round(float(value), 6) for value in obj.scale],
         "dimensions": dimensions,
+        "dagParentIds": dag_parent_ids,
     }
 
 
@@ -634,8 +825,47 @@ def main():
         specs = payload.get("objects", [])
         if not specs or len(specs) > 100:
             raise ValueError("create_model requires 1 to 100 objects")
+        armature = create_skeleton(payload.get("skeleton"))
         created = [create_object(spec) for spec in specs]
+        bound_mesh_count = bind_objects_to_skeleton(created, armature)
+        animation_result = apply_transform_animation(payload.get("animation"), created, armature)
         result = {"operation": operation, "objects": [object_record(obj) for obj in created], "objectCount": len(created)}
+        if armature:
+            result["skeleton"] = {"boneCount": len(armature.data.bones), "boundMeshCount": bound_mesh_count, "rigging": "RIGID_VERTEX_GROUP_WEIGHTS"}
+        if animation_result["objectTrackCount"] or animation_result["boneTrackCount"]:
+            result["animation"] = {
+                "name": payload["animation"]["name"],
+                "fps": payload["animation"]["fps"],
+                **animation_result,
+                "frameEnd": bpy.context.scene.frame_end,
+                "kind": "SKELETAL_AND_OBJECT_TRANSFORM_KEYFRAMES" if animation_result["boneTrackCount"] else "OBJECT_TRANSFORM_KEYFRAMES",
+            }
+        glb_path = payload.get("glbOutputPath")
+        if glb_path is not None:
+            max_triangles = payload.get("maxTriangles")
+            max_glb_bytes = payload.get("maxGlbBytes")
+            if not isinstance(glb_path, str) or not glb_path.lower().endswith(".glb") or os.path.exists(glb_path):
+                raise ValueError("Recipe GLB output must be a new .glb path")
+            if isinstance(max_triangles, bool) or not isinstance(max_triangles, int) or max_triangles < 1:
+                raise ValueError("Recipe triangle budget must be a positive integer")
+            if isinstance(max_glb_bytes, bool) or not isinstance(max_glb_bytes, int) or max_glb_bytes < 1:
+                raise ValueError("Recipe GLB byte target must be a positive integer")
+            geometry = scene_geometry_stats()
+            if geometry["triangleCount"] > max_triangles:
+                raise ValueError("Recipe exceeds its declared triangle budget")
+            os.makedirs(os.path.dirname(glb_path), exist_ok=True)
+            bpy.ops.export_scene.gltf(filepath=glb_path, export_format="GLB", use_selection=False, export_extras=True, export_animations=True)
+            glb_bytes = os.path.getsize(glb_path)
+            result.update({
+                **geometry,
+                "glbOutputPath": glb_path,
+                "glbBytes": glb_bytes,
+                "triangleBudget": max_triangles,
+                "triangleBudgetStatus": "WITHIN_BUDGET",
+                "byteTarget": max_glb_bytes,
+                "byteTargetStatus": "WITHIN_BUDGET" if glb_bytes <= max_glb_bytes else "BUDGET_NOT_MET",
+                "qualityStatus": "NOT_ASSESSED",
+            })
     elif operation == "create_mesh":
         bpy.ops.object.select_all(action="SELECT")
         bpy.ops.object.delete(use_global=False)
@@ -727,6 +957,62 @@ def main():
             "objectCount": len(imported),
             "objects": [object_record(obj) for obj in imported],
             **scene_geometry_stats(),
+        }
+    elif operation == "import_model":
+        source_path = payload.get("sourcePath")
+        source_format = payload.get("sourceFormat")
+        glb_path = payload.get("glbOutputPath")
+        max_triangles = payload.get("maxTriangles")
+        max_glb_bytes = payload.get("maxGlbBytes")
+        allowed_formats = {"GLB", "GLTF", "FBX", "OBJ"}
+        if not isinstance(source_path, str) or not os.path.isfile(source_path):
+            raise ValueError("Model import requires an existing source file")
+        if source_format not in allowed_formats or not source_path.lower().endswith("." + source_format.lower()):
+            raise ValueError("Model import format must match a supported file extension")
+        if not isinstance(glb_path, str) or not glb_path.lower().endswith(".glb") or os.path.exists(glb_path):
+            raise ValueError("Model import requires a new .glb output path")
+        if isinstance(max_triangles, bool) or not isinstance(max_triangles, int) or max_triangles < 1:
+            raise ValueError("Model import triangle ceiling must be a positive integer")
+        if isinstance(max_glb_bytes, bool) or not isinstance(max_glb_bytes, int) or max_glb_bytes < 1:
+            raise ValueError("Model import byte target must be a positive integer")
+        bpy.ops.object.select_all(action="SELECT")
+        bpy.ops.object.delete(use_global=False)
+        if source_format in ("GLB", "GLTF"):
+            bpy.ops.import_scene.gltf(filepath=source_path)
+        elif source_format == "FBX":
+            bpy.ops.import_scene.fbx(filepath=source_path)
+        else:
+            obj_import = getattr(bpy.ops.wm, "obj_import", None)
+            if obj_import is not None:
+                obj_import(filepath=source_path)
+            else:
+                bpy.ops.import_scene.obj(filepath=source_path)
+        imported = sorted(bpy.context.scene.objects, key=lambda obj: obj.name)
+        if not imported:
+            raise ValueError("The model import produced an empty Blender scene")
+        geometry = scene_geometry_stats()
+        if geometry["triangleCount"] > max_triangles:
+            raise ValueError("Imported model exceeds its declared triangle ceiling")
+        bpy.ops.export_scene.gltf(filepath=glb_path, export_format="GLB", use_selection=False, export_extras=True, export_animations=True)
+        glb_bytes = os.path.getsize(glb_path)
+        result = {
+            "operation": operation,
+            "sourcePath": source_path,
+            "sourceFormat": source_format,
+            "objectCount": len(imported),
+            "objects": [object_record(obj) for obj in imported],
+            **geometry,
+            "glbOutputPath": glb_path,
+            "glbBytes": glb_bytes,
+            "triangleBudget": max_triangles,
+            "triangleBudgetStatus": "WITHIN_BUDGET",
+            "byteTarget": max_glb_bytes,
+            "byteTargetStatus": "WITHIN_BUDGET" if glb_bytes <= max_glb_bytes else "BUDGET_NOT_MET",
+            "qualityStatus": "NOT_ASSESSED",
+            "animationClipCount": len(bpy.data.actions),
+            "animationClipNames": sorted(action.name for action in bpy.data.actions),
+            "armatureCount": sum(1 for obj in imported if obj.type == "ARMATURE"),
+            "boneCount": sum(len(obj.data.bones) for obj in imported if obj.type == "ARMATURE"),
         }
     else:
         raise ValueError("Unsupported Blender MCP operation")

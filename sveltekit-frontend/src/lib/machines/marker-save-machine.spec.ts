@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createActor } from 'xstate';
 import {
 	createMarkerSaveMachine,
+	deleteSavedMarker,
 	MarkerSaveError,
 	type MarkerSaveCommand,
 	type MarkerSaveResult
@@ -25,6 +26,47 @@ function flush() {
 }
 
 describe('marker-save machine', () => {
+	it('soft-deletes a saved marker through the case-scoped endpoint', async () => {
+		const fetchFn = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+			success: true,
+			data: { markerId: command.markerId, revision: 4, position: command.position },
+			message: 'Deleted'
+		}), { status: 200, headers: { 'content-type': 'application/json' } }));
+		const result = await deleteSavedMarker({
+			caseId: command.caseId,
+			sceneKey: command.sceneKey,
+			markerId: command.markerId,
+			evidenceId: command.evidenceId,
+			commandId: command.commandId,
+			expectedRevision: 3
+		}, fetchFn);
+
+		expect(result.revision).toBe(4);
+		expect(fetchFn).toHaveBeenCalledWith(
+			`/api/cases/${command.caseId}/scenes/${command.sceneKey}/markers/${command.markerId}`,
+			expect.objectContaining({ method: 'DELETE' })
+		);
+		expect(JSON.parse(fetchFn.mock.calls[0][1].body as string)).toEqual({
+			commandId: command.commandId,
+			evidenceId: command.evidenceId,
+			expectedRevision: 3
+		});
+	});
+
+	it('preserves the saved marker when delete reports a stale revision', async () => {
+		const fetchFn = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+			success: false, data: { currentRevision: 5 }, message: 'MARKER_CONFLICT'
+		}), { status: 409, headers: { 'content-type': 'application/json' } }));
+		await expect(deleteSavedMarker({
+			caseId: command.caseId,
+			sceneKey: command.sceneKey,
+			markerId: command.markerId,
+			evidenceId: command.evidenceId,
+			commandId: command.commandId,
+			expectedRevision: 3
+		}, fetchFn)).rejects.toMatchObject({ status: 409, currentRevision: 5 });
+	});
+
 	it('commits a drop and returns to idle with the server result', async () => {
 		const save = vi.fn().mockResolvedValue(ok);
 		const actor = createActor(createMarkerSaveMachine(save)).start();

@@ -1091,7 +1091,8 @@ services:
     restart: unless-stopped
 
   # ═══════════════════════════════════════════════════════════════════
-  # GPU PROFILE — LangGraph Synthesis (RAG + KAG + LangChain + LibTorch)
+  # CPU-only LangGraph orchestration. The `gpu` profile is a legacy grouping;
+  # model inference and GPU execution remain in their external provider services.
   # Usage: docker compose --profile gpu up -d langgraph-synthesis
   # Port: 8091 (REST + SSE)   Endpoints: /synthesize  /synthesize/stream  /health
   # ═══════════════════════════════════════════════════════════════════

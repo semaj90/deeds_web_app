@@ -3857,7 +3857,7 @@
       "detail": "Run 3-tier cache validation: TurboQuant cold (~17s) → Bifrost L2 (~3-5s) → Redis L1 (<100ms). Expects 170-340× speedup."
     },
     {
-      "label": "🧠 LangGraph: Build + Start (Docker GPU)",
+      "label": "🧠 LangGraph: Build + Start (Docker, CPU orchestration)",
       "type": "shell",
       "command": "docker compose --profile gpu up -d --build langgraph-synthesis",
       "options": {
@@ -3870,7 +3870,7 @@
         "clear": true
       },
       "problemMatcher": [],
-      "detail": "Build and start LangGraph synthesis service with CUDA GPU access on :8091"
+      "detail": "Build and start CPU-only LangGraph orchestration on :8091; inference runs in external provider services"
     },
     {
       "label": "🧠 LangGraph: Start (no rebuild)",
@@ -5732,7 +5732,7 @@
       "problemMatcher": []
     },
     {
-      "label": "🧠 LangGraph: Build + Start (GPU profile)",
+      "label": "🧠 LangGraph: Build + Start (CPU orchestration)",
       "type": "shell",
       "command": "docker compose --profile gpu up --build langgraph-synthesis",
       "options": {

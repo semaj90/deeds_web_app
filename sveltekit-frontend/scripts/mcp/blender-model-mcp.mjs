@@ -17,6 +17,7 @@ import { mkdir, mkdtemp, open, readFile, realpath, rm, stat, lstat, unlink, writ
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { embeddingPayloadBytes } from './blender/embedding-payload-formats.mjs';
+import { SceneRecipeDAGV1Schema, sceneRecipeAnimationToBlenderV1, sceneRecipeSkeletonToBlenderV1, sceneRecipeToBlenderObjectsV1 } from './blender/scene-recipe-dag-v1.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, '../../..');
@@ -34,8 +35,10 @@ const objectSpec = z.object({
 	primitive,
 	location: vector3.default([0, 0, 0]),
 	rotation: vector3.default([0, 0, 0]),
+	rotationQuaternion: z.tuple([z.number().finite(), z.number().finite(), z.number().finite(), z.number().finite()]).optional(),
 	scale: vector3.refine((v) => v.every((n) => n > 0 && n <= 1000), 'Scale values must be positive and <= 1000').default([1, 1, 1]),
 	color: z.tuple([z.number().min(0).max(1), z.number().min(0).max(1), z.number().min(0).max(1), z.number().min(0).max(1)]).default([0.72, 0.55, 0.2, 1]),
+	dagParentIds: z.array(z.string().min(1).max(64)).max(100).optional(),
 }).strict();
 const meshSpec = z.object({
 	name: z.string().min(1).max(64).regex(/^[\w .-]+$/),
@@ -174,16 +177,17 @@ async function sha256File(file) {
 	return hash.digest('hex');
 }
 
-function workspacePath(input, { mustExist = false, extension = '.blend' } = {}) {
+function workspacePath(input, { mustExist = false, extension = '.blend', extensions = null } = {}) {
 	if (typeof input !== 'string' || input.length < 1 || input.length > 240 || path.isAbsolute(input) || input.includes(':')) {
-		throw new Error('Use a relative .blend path inside the configured Blender workspace.');
+		throw new Error('Use a relative path inside the configured Blender workspace.');
 	}
 	const resolved = path.resolve(WORKSPACE_REAL, input);
 	const relative = path.relative(WORKSPACE_REAL, resolved);
 	if (!relative || relative.startsWith(`..${path.sep}`) || relative === '..' || path.isAbsolute(relative)) {
 		throw new Error('Path must remain inside the configured Blender workspace.');
 	}
-	if (path.extname(resolved).toLowerCase() !== extension) throw new Error(`Expected a ${extension} file.`);
+	const accepted = extensions ?? [extension];
+	if (!accepted.includes(path.extname(resolved).toLowerCase())) throw new Error(`Expected one of: ${accepted.join(', ')}.`);
 	return resolved;
 }
 
@@ -274,6 +278,23 @@ server.tool('blender_create_model', 'Create a new Blender scene from allow-liste
 	return { content: [{ type: 'text', text: JSON.stringify(result) }] };
 });
 
+server.tool('blender_synthesize_scene_dag', 'Validate a bounded primitive recipe DAG and create a new Blender scene plus a matching GLB for the Three.js playground. Rejects missing dependencies, duplicate IDs, invalid quaternions, cycles, rig references, and triangle-budget violations before writing scene files. Optional skeletons use explicit bone-parent recipes and rigid vertex-group weights; optional object and bone transform clips are exported in the GLB. This creates generic rigging, not Mixamo retargeting. Dependency IDs are preserved as Blender custom properties; output is synthetic, not an evidence reconstruction.', {
+	outputPath: z.string().min(1).max(240).regex(/\.blend$/i).describe('New relative .blend path under BLENDER_MCP_WORKSPACE'),
+	maxTriangles: z.number().int().min(1).max(1_000_000).default(100_000),
+	maxGlbBytes: z.number().int().min(1).max(64 * 1024 * 1024).default(8 * 1024 * 1024),
+	recipe: SceneRecipeDAGV1Schema,
+	}, async ({ outputPath, maxTriangles, maxGlbBytes, recipe }) => {
+	// Complete graph validation and ordering before allocating an output path or launching Blender.
+	const objects = sceneRecipeToBlenderObjectsV1(recipe);
+	const output = await newOutputPath(outputPath, '.blend');
+	const glbOutput = await newOutputPath(outputPath.replace(/\.blend$/i, '.glb'), '.glb');
+	const result = await runBlender({ operation: 'create_model', outputPath: output, payload: { objects, skeleton: sceneRecipeSkeletonToBlenderV1(recipe), animation: sceneRecipeAnimationToBlenderV1(recipe), glbOutputPath: glbOutput, maxTriangles, maxGlbBytes } });
+	const glbInfo = await stat(glbOutput).catch(() => null);
+	if (!glbInfo?.isFile() || glbInfo.size === 0) throw new Error('Blender did not produce a non-empty recipe GLB.');
+	const glbSha256 = await sha256File(glbOutput);
+	return { content: [{ type: 'text', text: JSON.stringify({ ...result, exportedGlbPath: glbOutput, exportedGlbBytes: glbInfo.size, glbSha256, recipeSchema: recipe.schema, topologicalNodeOrder: objects.map((object) => object.name), provenance: 'SYNTHETIC_RECIPE' }) }] };
+});
+
 server.tool('blender_create_mesh', 'Create a bounded triangle/quad mesh in a new Blender scene and save a new .blend file. Vertex and face arrays are validated; no Python or Blender operators are accepted from the caller.', {
 	outputPath: z.string().min(1).max(240).describe('New relative .blend path under BLENDER_MCP_WORKSPACE'),
 	mesh: meshSpec,
@@ -329,6 +350,25 @@ server.tool('blender_import_gltf', 'Import a local GLB from the isolated Blender
 	const output = await newOutputPath(outputPath);
 	const result = await runBlender({ operation: 'import_gltf', outputPath: output, payload: { gltfPath: input } });
 	return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+});
+
+server.tool('blender_import_model', 'Import a workspace-local GLB, glTF, FBX, or OBJ with Blender, then write a new editable .blend and a Three.js-ready .glb copy. Source assets are read-only; both outputs must be new. Enforces a 64 MiB source cap, triangle ceiling, and 8 MiB GLB byte target. Rig/clip preservation depends on the input format and Blender exporter; this does not retarget Mixamo animations or establish evidence provenance.', {
+	inputPath: z.string().min(1).max(240).describe('Relative source .glb, .gltf, .fbx, or .obj inside BLENDER_MCP_WORKSPACE'),
+	outputPath: z.string().min(1).max(240).regex(/\.blend$/i).describe('New .blend output path; matching .glb is also created'),
+	maxTriangles: z.number().int().min(1).max(1_000_000).default(100_000),
+	maxGlbBytes: z.number().int().min(1).max(64 * 1024 * 1024).default(8 * 1024 * 1024)
+}, async ({ inputPath, outputPath, maxTriangles, maxGlbBytes }) => {
+	const extensions = ['.glb', '.gltf', '.fbx', '.obj'];
+	const input = workspacePath(inputPath, { extensions });
+	await assertInputFile(input, { maxBytes: 64 * 1024 * 1024, description: extensions.join('/') });
+	const blendOutput = await newOutputPath(outputPath, '.blend');
+	const glbOutput = await newOutputPath(outputPath.replace(/\.blend$/i, '.glb'), '.glb');
+	const sourceFormat = path.extname(input).slice(1).toUpperCase();
+	const result = await runBlender({ operation: 'import_model', outputPath: blendOutput, payload: { sourcePath: input, sourceFormat, glbOutputPath: glbOutput, maxTriangles, maxGlbBytes } });
+	const glbInfo = await stat(glbOutput).catch(() => null);
+	if (!glbInfo?.isFile() || glbInfo.size === 0) throw new Error('Blender did not produce a non-empty imported-model GLB.');
+	const glbSha256 = await sha256File(glbOutput);
+	return { content: [{ type: 'text', text: JSON.stringify({ ...result, sourceFormat, exportedGlbPath: glbOutput, exportedGlbBytes: glbInfo.size, glbSha256, provenance: 'USER_SUPPLIED_LOCAL_MODEL' }) }] };
 });
 
 server.tool('blender_generate_mesh_lod', 'Create a new derived Blender/GLB copy with a bounded Decimate modifier applied to mesh objects. Reports measured triangle and GLB byte counts against explicit budgets; it does not modify the source or claim visual quality.', {
