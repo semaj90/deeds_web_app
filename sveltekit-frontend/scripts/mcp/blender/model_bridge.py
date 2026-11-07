@@ -6,10 +6,12 @@ not evaluate user-provided Python and writes results to a new .blend file.
 import json
 import math
 import os
+import re
 import sys
 import traceback
 
 import bpy
+from mathutils import Vector
 
 
 def embedding_payload_bytes(representation, dimensions):
@@ -46,6 +48,32 @@ def scene_geometry_stats():
         "vertexCount": vertices,
         "polygonCount": polygons,
         "triangleCount": triangles,
+    }
+
+
+def scene_mesh_bounds():
+    """Return an axis-aligned world-space bound in Blender scene units."""
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    corners = []
+    mesh_count = 0
+    for obj in bpy.context.scene.objects:
+        if obj.type != "MESH":
+            continue
+        evaluated = obj.evaluated_get(depsgraph)
+        if not evaluated.bound_box:
+            continue
+        mesh_count += 1
+        corners.extend(evaluated.matrix_world @ Vector(corner) for corner in evaluated.bound_box)
+    if not corners:
+        return None
+    minimum = [min(float(point[axis]) for point in corners) for axis in range(3)]
+    maximum = [max(float(point[axis]) for point in corners) for axis in range(3)]
+    return {
+        "coordinateUnits": "BLENDER_SCENE_UNITS",
+        "meshObjectCount": mesh_count,
+        "min": [round(value, 6) for value in minimum],
+        "max": [round(value, 6) for value in maximum],
+        "extent": [round(maximum[axis] - minimum[axis], 6) for axis in range(3)],
     }
 
 
@@ -101,6 +129,64 @@ def create_material(name, rgba):
     return material
 
 
+def add_generated_checker_texture(obj, spec):
+    """Create a bounded, packed checker texture for synthetic recipe props."""
+    if spec is None:
+        return None
+    if not isinstance(spec, dict) or spec.get("kind") != "CHECKER":
+        raise ValueError("Only the CHECKER synthetic texture recipe is supported")
+    resolution = spec.get("resolution")
+    cells = spec.get("cells")
+    if isinstance(resolution, bool) or not isinstance(resolution, int) or not 32 <= resolution <= 128:
+        raise ValueError("Checker texture resolution must be between 32 and 128 pixels")
+    if isinstance(cells, bool) or not isinstance(cells, int) or not 2 <= cells <= 16:
+        raise ValueError("Checker texture cells must be between 2 and 16")
+    colors = [spec.get("colorA"), spec.get("colorB")]
+    for color in colors:
+        if not isinstance(color, list) or len(color) != 4 or not all(
+            isinstance(value, (int, float)) and not isinstance(value, bool)
+            and math.isfinite(value) and 0 <= value <= 1
+            for value in color
+        ):
+            raise ValueError("Checker texture colors must be finite RGBA values in [0, 1]")
+
+    if obj.data.uv_layers.active is None:
+        bpy.ops.object.select_all(action="DESELECT")
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.mode_set(mode="EDIT")
+        bpy.ops.mesh.select_all(action="SELECT")
+        bpy.ops.uv.smart_project(island_margin=0.02)
+        bpy.ops.object.mode_set(mode="OBJECT")
+    if obj.data.uv_layers.active is None:
+        raise ValueError("Blender could not create a UV map for the generated checker texture")
+
+    image = bpy.data.images.new(
+        name=f"{obj.name}_GeneratedChecker", width=resolution, height=resolution,
+        alpha=True, float_buffer=False,
+    )
+    pixels = []
+    for y in range(resolution):
+        for x in range(resolution):
+            cell = ((x * cells) // resolution + (y * cells) // resolution) & 1
+            pixels.extend(colors[cell])
+    image.pixels.foreach_set(pixels)
+    image.pack()
+
+    material = obj.data.materials[-1]
+    nodes = material.node_tree.nodes
+    bsdf = nodes.get("Principled BSDF")
+    if bsdf is None:
+        raise ValueError("Generated material has no Principled BSDF node")
+    uv_node = nodes.new("ShaderNodeUVMap")
+    uv_node.uv_map = obj.data.uv_layers.active.name
+    texture_node = nodes.new("ShaderNodeTexImage")
+    texture_node.image = image
+    material.node_tree.links.new(uv_node.outputs["UV"], texture_node.inputs["Vector"])
+    material.node_tree.links.new(texture_node.outputs["Color"], bsdf.inputs["Base Color"])
+    return image
+
+
 def create_object(spec):
     name = spec["name"]
     kind = spec["primitive"]
@@ -116,6 +202,24 @@ def create_object(spec):
         bpy.ops.mesh.primitive_cone_add(vertices=32, radius1=0.5, radius2=0, depth=1)
     elif kind == "torus":
         bpy.ops.mesh.primitive_torus_add(major_segments=48, minor_segments=12)
+    elif kind in ("billboard", "sam_billboard"):
+        width = 1.0
+        height = 1.8
+        half_w = width * 0.5
+        verts = [
+            Vector((-half_w, 0.0, 0.0)),
+            Vector((half_w, 0.0, 0.0)),
+            Vector((half_w, 0.0, height)),
+            Vector((-half_w, 0.0, height))
+        ]
+        faces = [(0, 1, 2, 3)]
+        mesh = bpy.data.meshes.new(name + "_Mesh")
+        mesh.from_pydata(verts, [], faces)
+        mesh.update()
+        obj = bpy.data.objects.new(name, mesh)
+        bpy.context.scene.collection.objects.link(obj)
+        bpy.context.view_layer.objects.active = obj
+        obj.select_set(True)
     else:
         raise ValueError("Unsupported primitive")
     obj = bpy.context.object
@@ -126,7 +230,25 @@ def create_object(spec):
         obj["atlas_dag_parent_ids"] = json.dumps(spec["dagParentIds"], separators=(",", ":"))
     if spec.get("boneId"):
         obj["atlas_bone_id"] = spec["boneId"]
+    if spec.get("rigMode"):
+        obj["atlas_rig_mode"] = spec["rigMode"]
+    metadata = spec.get("metadata", {})
+    if not isinstance(metadata, dict) or len(metadata) > 16:
+        raise ValueError("Primitive metadata must contain at most 16 scalar properties")
+    for key, value in metadata.items():
+        if not isinstance(key, str) or not re.fullmatch(r"[A-Za-z][A-Za-z0-9._-]{0,31}", key):
+            raise ValueError("Primitive metadata key is invalid")
+        if isinstance(value, bool):
+            pass
+        elif isinstance(value, str) and len(value) <= 256:
+            pass
+        elif isinstance(value, (int, float)) and math.isfinite(value) and abs(value) <= 1e12:
+            pass
+        else:
+            raise ValueError("Primitive metadata values must be bounded strings, finite numbers, or booleans")
+        obj[f"atlas_meta_{key}"] = value
     obj.data.materials.append(create_material(name, spec.get("color", [0.72, 0.55, 0.2, 1])))
+    add_generated_checker_texture(obj, spec.get("texture"))
     return obj
 
 
@@ -159,8 +281,8 @@ def create_skeleton(spec):
     if not spec:
         return None
     bones = spec.get("bones")
-    if not isinstance(bones, list) or not 1 <= len(bones) <= 32:
-        raise ValueError("Skeleton must contain 1 to 32 bones")
+    if not isinstance(bones, list) or not 1 <= len(bones) <= 64:
+        raise ValueError("Skeleton must contain 1 to 64 bones")
     bpy.ops.object.select_all(action="DESELECT")
     bpy.ops.object.armature_add(enter_editmode=True, location=(0, 0, 0))
     armature = bpy.context.object
@@ -192,24 +314,48 @@ def create_skeleton(spec):
 
 
 def bind_objects_to_skeleton(objects, armature):
-    """Rigidly skin each declared primitive to one named bone using vertex weights."""
+    """Rigidly or gradated skin each declared primitive to named bones using vertex weights."""
     if not armature:
         return 0
     bone_names = {bone.name for bone in armature.data.bones}
     bound = 0
     for obj in objects:
         bone_id = obj.get("atlas_bone_id")
-        if not bone_id:
+        rig_mode = obj.get("atlas_rig_mode", "rigid")
+        if not bone_id and rig_mode != "gradient_2bone":
             continue
-        if bone_id not in bone_names:
+        if bone_id and bone_id not in bone_names:
             raise ValueError("Primitive references a bone missing from the armature")
-        group = obj.vertex_groups.new(name=bone_id)
-        vertices = [vertex.index for vertex in obj.data.vertices]
-        if vertices:
-            group.add(vertices, 1.0, "REPLACE")
+
+        if rig_mode == "gradient_2bone" and len(armature.data.bones) >= 2:
+            bone0 = armature.data.bones[0].name
+            bone1 = armature.data.bones[1].name
+            g0 = obj.vertex_groups.new(name=bone0)
+            g1 = obj.vertex_groups.new(name=bone1)
+            zs = [vertex.co.z for vertex in obj.data.vertices]
+            min_z = min(zs) if zs else 0.0
+            max_z = max(zs) if zs else 1.0
+            range_z = max(1e-5, max_z - min_z)
+            for vertex in obj.data.vertices:
+                t = (vertex.co.z - min_z) / range_z
+                g0.add([vertex.index], 1.0 - t, "REPLACE")
+                g1.add([vertex.index], t, "REPLACE")
+        else:
+            group = obj.vertex_groups.new(name=bone_id)
+            vertices = [vertex.index for vertex in obj.data.vertices]
+            if vertices:
+                group.add(vertices, 1.0, "REPLACE")
+
         modifier = obj.modifiers.new(name="Atlas_Armature", type="ARMATURE")
         modifier.object = armature
-        obj["atlas_bone_id"] = bone_id
+        bpy.context.view_layer.update()
+        world_matrix = obj.matrix_world.copy()
+        obj.parent = armature
+        obj.matrix_parent_inverse = armature.matrix_world.inverted()
+        obj.matrix_world = world_matrix
+        bpy.context.view_layer.update()
+        if bone_id:
+            obj["atlas_bone_id"] = bone_id
         bound += 1
     return bound
 
@@ -217,7 +363,7 @@ def bind_objects_to_skeleton(objects, armature):
 def apply_transform_animation(animation, objects, armature=None):
     """Apply bounded object and bone keyframes to an exported GLB clip."""
     if not animation:
-        return 0
+        return {"objectTrackCount": 0, "boneTrackCount": 0}
     if not isinstance(animation, dict) or not isinstance(animation.get("tracks"), list):
         raise ValueError("Animation must contain a track list")
     by_name = {obj.name: obj for obj in objects}
@@ -706,6 +852,16 @@ def create_memory_fabric(spec, glb_path):
         gpu_label["profile"] = "RTX_3060_TI_8GB"
         gpu_label["total_vram_gib"] = 8
         gpu_label["free_vram_measured"] = False
+    # The glTF exporter turns Blender FONT objects into meshes. Convert them
+    # before measuring so the triangle/mesh receipts and the declared budget
+    # include exactly the geometry that the exported GLB will contain.
+    font_objects = [obj for obj in scene.objects if obj.type == "FONT"]
+    for font_obj in font_objects:
+        bpy.ops.object.select_all(action="DESELECT")
+        font_obj.select_set(True)
+        bpy.context.view_layer.objects.active = font_obj
+        bpy.ops.object.convert(target="MESH")
+    text_object_conversion_count = len(font_objects)
     mesh_objects = [obj for obj in scene.objects if obj.type == "MESH"]
     vertex_count = sum(len(obj.data.vertices) for obj in mesh_objects)
     polygon_count = sum(len(obj.data.polygons) for obj in mesh_objects)
@@ -717,6 +873,7 @@ def create_memory_fabric(spec, glb_path):
     scene["live_cache_read"] = False
     scene["mesh_triangle_count"] = triangle_count
     scene["mesh_triangle_budget"] = max_triangles
+    scene["text_objects_converted_for_export"] = text_object_conversion_count
     scene["cache_move_count"] = len(cache_moves)
     scene["index_build_count"] = len(index_builds)
     scene["gpu_profile"] = gpu_profile or "UNSPECIFIED"
@@ -754,14 +911,18 @@ def create_memory_fabric(spec, glb_path):
             }
             for move in sorted(cache_moves, key=lambda value: value["sequence"])
         ],
+        # glTF export can split Blender vertices at attribute seams. Keep the
+        # Blender-side count explicit and report re-import counts separately.
+        "blenderSceneVertexCount": vertex_count,
         "vertexCount": vertex_count,
         "polygonCount": polygon_count,
         "triangleCount": triangle_count,
         "triangleBudget": max_triangles,
         "triangleBudgetStatus": "WITHIN_BUDGET",
         "meshObjectCount": len(mesh_objects),
+        "textObjectsConvertedForExport": text_object_conversion_count,
         "simtGpuExecutionMeasured": False,
-        "gpuPerformanceNote": "Triangle and vertex counts describe exported geometry only; GPU occupancy, warp scheduling, vertex throughput, and frame time are not measured.",
+        "gpuPerformanceNote": "Geometry totals are measured in the Blender scene before export; glTF may split vertices at attribute seams. GPU occupancy, warp scheduling, vertex throughput, and frame time are not measured.",
         "tierCounts": {tier: sum(1 for block in blocks if block["tier"] == tier) for tier in ("hot", "warm", "cold")},
         "blockIds": list(block_by_id.keys()),
         "blockResidencies": [
@@ -803,7 +964,7 @@ def object_record(obj):
 
 def inspect_scene():
     objects = sorted((object_record(obj) for obj in bpy.context.scene.objects), key=lambda item: item["name"])
-    return {"operation": "inspect_scene", "objects": objects, "objectCount": len(objects), **scene_geometry_stats()}
+    return {"operation": "inspect_scene", "objects": objects, "objectCount": len(objects), **scene_geometry_stats(), "bounds": scene_mesh_bounds()}
 
 
 def main():
@@ -947,7 +1108,14 @@ def main():
             raise ValueError("Import requires an existing binary .glb file")
         bpy.ops.object.select_all(action="SELECT")
         bpy.ops.object.delete(use_global=False)
-        bpy.ops.import_scene.gltf(filepath=gltf_path)
+        # Blender's default armature display creates a hidden Icosphere helper
+        # for bone custom shapes. It is not part of the GLB and inflates scene
+        # mesh/triangle counts, so keep the bone heuristic but disable helpers.
+        bpy.ops.import_scene.gltf(
+            filepath=gltf_path,
+            bone_heuristic="BLENDER",
+            disable_bone_shape=True,
+        )
         imported = sorted(bpy.context.scene.objects, key=lambda obj: obj.name)
         if not imported:
             raise ValueError("The GLB import produced an empty Blender scene")
@@ -978,7 +1146,14 @@ def main():
         bpy.ops.object.select_all(action="SELECT")
         bpy.ops.object.delete(use_global=False)
         if source_format in ("GLB", "GLTF"):
-            bpy.ops.import_scene.gltf(filepath=source_path)
+            # Blender's default armature display adds an auxiliary Icosphere
+            # bone shape to imported skinned GLBs. Exclude that helper from
+            # scene geometry and triangle receipts; it is not source content.
+            bpy.ops.import_scene.gltf(
+                filepath=source_path,
+                bone_heuristic="BLENDER",
+                disable_bone_shape=True,
+            )
         elif source_format == "FBX":
             bpy.ops.import_scene.fbx(filepath=source_path)
         else:

@@ -1,4 +1,17 @@
 import { sceneDocumentV1Schema, stableStringifySceneDocumentV1, type SceneDocumentV1 } from './scene-document-v1.js';
+import { sha256Hex } from './spz-loader.js';
+
+/** Stable UUIDv8 namespace identity for the revisioned scene attached to one case exhibit. */
+export async function evidenceSceneIdV1(caseId: string, evidenceId: string): Promise<string> {
+	const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+	if (!uuid.test(caseId) || !uuid.test(evidenceId)) throw new Error('CASE_AND_EVIDENCE_IDS_MUST_BE_UUIDS');
+	const digest = await sha256Hex(new TextEncoder().encode(`parent-atlas:evidence-scene:v1:${caseId.toLowerCase()}:${evidenceId.toLowerCase()}`));
+	const bytes = new Uint8Array(digest.match(/.{2}/g)!.slice(0, 16).map((byte) => Number.parseInt(byte, 16)));
+	bytes[6] = (bytes[6] & 0x0f) | 0x80;
+	bytes[8] = (bytes[8] & 0x3f) | 0x80;
+	const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+	return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
 
 export interface SceneAssetReceiptV1 {
 	assetId: string;
@@ -72,13 +85,42 @@ export async function saveSceneRevisionV1(input: {
 		throw new Error('Scene asset upload returned an invalid receipt.');
 	}
 	const asset = candidate as SceneAssetReceiptV1;
+	const revision = await saveSceneManifestRevisionV1({
+		caseId: input.caseId,
+		sceneId: input.sceneId,
+		expectedRevision: input.expectedRevision,
+		commandId: input.commandId,
+		manifest: input.createManifest(asset),
+		fetcher
+	});
+	return { asset, revision };
+}
+
+/** Append a manifest revision that references assets already registered for this case/scene. */
+export async function saveSceneManifestRevisionV1(input: {
+	caseId: string;
+	sceneId: string;
+	expectedRevision: number;
+	commandId: string;
+	manifest: unknown;
+	fetcher?: typeof fetch;
+}): Promise<SceneRevisionReceiptV1> {
+	const parsedManifest = sceneDocumentV1Schema.parse(input.manifest);
+	if (parsedManifest.caseId !== input.caseId || parsedManifest.sceneId !== input.sceneId || parsedManifest.revision !== input.expectedRevision + 1) {
+		throw new Error('Scene revision manifest scope or expected revision did not match.');
+	}
+	if (parsedManifest.assets.length === 0 && parsedManifest.evidenceSources.length === 0 && (parsedManifest.evidenceBindings?.length ?? 0) === 0) {
+		throw new Error('Scene revision must reference a registered asset or a revision-qualified evidence source.');
+	}
+	const fetcher = input.fetcher ?? fetch;
+	const base = `/api/cases/${encodeURIComponent(input.caseId)}/scenes/${encodeURIComponent(input.sceneId)}`;
 	const revisionResponse = await fetcher(`${base}/revisions`, {
 		method: 'POST',
 		headers: { 'content-type': 'application/json' },
 		body: JSON.stringify({
 			commandId: input.commandId,
 			expectedRevision: input.expectedRevision,
-			manifest: input.createManifest(asset)
+			manifest: parsedManifest
 		})
 	});
 	const revisionEnvelope = await readJson(revisionResponse);
@@ -86,11 +128,7 @@ export async function saveSceneRevisionV1(input: {
 		throw new Error(typeof revisionEnvelope.message === 'string' ? revisionEnvelope.message : `Scene revision save failed (${revisionResponse.status})`);
 	}
 	const revision = revisionEnvelope.data as Record<string, unknown>;
-	const verifiedRevision = await verifyRevisionReceiptV1(revision, { caseId: input.caseId, sceneId: input.sceneId, replayed: revision.replayed === true });
-	return {
-		asset,
-		revision: verifiedRevision
-	};
+	return verifyRevisionReceiptV1(revision, { caseId: input.caseId, sceneId: input.sceneId, replayed: revision.replayed === true });
 }
 
 export async function fetchSceneRevisionV1(input: {

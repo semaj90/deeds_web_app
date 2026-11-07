@@ -17,6 +17,9 @@
 	import { onMount } from 'svelte';
 	import { Slider } from 'bits-ui';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import { create2DDepthReliefGaussianCloud, serializeSpz } from '$lib/splat/spz-serializer.js';
+	import { parseSpz } from '$lib/splat/spz-loader.js';
+	import { createLocalSpzSession } from '$lib/splat/local-spz-session.js';
 
 	/**
 	 * Estimated 2.5D relief from ONE image + its depth map (both MUST describe the same frame).
@@ -92,6 +95,7 @@
 	let updateRelief: ((value: number) => void) | null = null;
 	let status = $state<ViewerStatus>({ backend: 'none', vendor: 'unknown', tier: 'medium', lod: 0, vertices: 0 });
 	let sourceMode = $state<DepthSourceMode>('DEPTH_UNAVAILABLE');
+	let exportSpz = $state<(() => void) | null>(null);
 
 	$effect(() => updateRelief?.(relief));
 	$effect(() => applySampling?.(activeSamplingMode));
@@ -126,6 +130,7 @@
 			let controls: any = null;
 			let observer: ResizeObserver | null = null;
 			let interactionCleanup: (() => void) | null = null;
+			let spzSession: any = null;
 			const geometries: Array<{ dispose(): void }> = [];
 			const materials: Array<{ dispose(): void }> = [];
 			const textures: Array<{ dispose(): void }> = [];
@@ -137,6 +142,9 @@
 				setCameraZoom = null;
 				applySampling = null;
 				updateRelief = null;
+				spzSession?.cancel();
+				spzSession = null;
+				exportSpz = null;
 				observer?.disconnect();
 				interactionCleanup?.();
 				interactionCleanup = null;
@@ -225,6 +233,49 @@
 					return texture;
 				});
 				const texture = textureLevels[0]!;
+
+				// Retain offscreen sampling canvas for SPZ export
+				const spzSampleW = 128;
+				const spzSampleH = Math.max(16, Math.min(256, Math.round(spzSampleW / imageAspect)));
+				const spzColorCanvas = document.createElement('canvas');
+				spzColorCanvas.width = spzSampleW;
+				spzColorCanvas.height = spzSampleH;
+				const spzColorCtx = spzColorCanvas.getContext('2d');
+				if (spzColorCtx) spzColorCtx.drawImage(colorBitmap, 0, 0, spzSampleW, spzSampleH);
+
+				const spzDepthCanvas = document.createElement('canvas');
+				spzDepthCanvas.width = spzSampleW;
+				spzDepthCanvas.height = spzSampleH;
+				const spzDepthCtx = spzDepthCanvas.getContext('2d');
+				if (spzDepthCtx && depthBitmap) spzDepthCtx.drawImage(depthBitmap, 0, 0, spzSampleW, spzSampleH);
+
+				spzSession = createLocalSpzSession({
+					serialize: (cloud) => serializeSpz(cloud),
+					decode: (bytes) => parseSpz(bytes),
+					decodedPointCount: (decoded) => decoded.positions.length / 3
+				});
+
+				exportSpz = async () => {
+					if (!spzColorCtx || !spzDepthCtx) return;
+					const cPixels = spzColorCtx.getImageData(0, 0, spzSampleW, spzSampleH).data;
+					const dPixels = spzDepthCtx.getImageData(0, 0, spzSampleW, spzSampleH).data;
+					const rgb = new Uint8Array(spzSampleW * spzSampleH * 3);
+					const depthArr = new Float32Array(spzSampleW * spzSampleH);
+					for (let i = 0; i < spzSampleW * spzSampleH; i++) {
+						rgb[i * 3] = cPixels[i * 4];
+						rgb[i * 3 + 1] = cPixels[i * 4 + 1];
+						rgb[i * 3 + 2] = cPixels[i * 4 + 2];
+						depthArr[i] = dPixels[i * 4] / 255;
+					}
+					const cloud = create2DDepthReliefGaussianCloud(spzSampleW, spzSampleH, rgb, depthArr, {
+						step: 1,
+						depthScale: relief,
+					});
+					const sessionResult = await spzSession.process(cloud);
+					if (sessionResult) {
+						sessionResult.download(`evidence-relief-${sessionResult.sha256.slice(0, 8)}.spz`);
+					}
+				};
 
 				const width = 2;
 				const height = width / imageAspect;
@@ -586,6 +637,12 @@
 			<Icon name="yorha-network" size={16} />
 			{showEvidenceBounds ? 'Hide evidence frame' : 'Evidence frame'}
 		</button>
+		{#if exportSpz}
+		<button type="button" onclick={exportSpz} title="Export 2.5D depth relief as standard Niantic SPZ v4 Gaussian splat file">
+			<Icon name="yorha-evidence" size={16} />
+			Export .SPZ
+		</button>
+		{/if}
 	</div>
 	{/if}
 </div>
@@ -608,12 +665,12 @@
 	.sampling-group { display: inline-flex; align-items: center; gap: 3px; }
 	.sampling-group button { min-height: 28px; padding: 0 7px; border: 1px solid rgba(212,199,163,.28); border-radius: 6px; color: inherit; background: rgba(255,255,255,.06); cursor: pointer; }
 	.sampling-group button[aria-pressed="true"] { border-color: #7ee7ff; color: #9bf0ff; background: rgba(126,231,255,.1); }
-	.canvas-zoom-slider { position: relative; display: flex; width: 96px; height: 24px; align-items: center; touch-action: none; user-select: none; }
-	.canvas-zoom-track { position: relative; display: block; width: 100%; height: 4px; overflow: hidden; border-radius: 9px; background: #384052; }
-	.canvas-zoom-range { position: absolute; height: 100%; background: linear-gradient(90deg,#c59e2b,#7ee7ff); }
-	.canvas-zoom-thumb { display: block; width: 13px; height: 13px; border: 2px solid #7ee7ff; border-radius: 50%; background: #f8f1df; box-shadow: 0 0 8px #7ee7ff; }
+	:global(.canvas-zoom-slider) { position: relative; display: flex; width: 96px; height: 24px; align-items: center; touch-action: none; user-select: none; }
+	:global(.canvas-zoom-track) { position: relative; display: block; width: 100%; height: 4px; overflow: hidden; border-radius: 9px; background: #384052; }
+	:global(.canvas-zoom-range) { position: absolute; height: 100%; background: linear-gradient(90deg,#c59e2b,#7ee7ff); }
+	:global(.canvas-zoom-thumb) { display: block; width: 13px; height: 13px; border: 2px solid #7ee7ff; border-radius: 50%; background: #f8f1df; box-shadow: 0 0 8px #7ee7ff; }
 	.canvas-hint { padding-left: 5px; color: #b9b2a3; white-space: nowrap; }
-	@media (max-width: 680px) { .canvas-controls { gap: 4px; padding: 5px; } .canvas-hint { display: none; } .canvas-zoom-slider { width: 64px; } }
+	@media (max-width: 680px) { .canvas-controls { gap: 4px; padding: 5px; } .canvas-hint { display: none; } :global(.canvas-zoom-slider) { width: 64px; } }
 	.flat { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.85; }
 	.toolbar { position: absolute; bottom: 12px; left: 12px; right: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; color: #e5ebf6; font: 12px system-ui, sans-serif; pointer-events: none; }
 	.note { display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; background: rgba(12, 18, 32, 0.78); border: 1px solid rgba(197, 154, 43, 0.5); border-radius: 6px; }

@@ -93,7 +93,7 @@ export async function handleAtlasIdentityAudit(
       .select()
       .from(atlasPackets)
       .limit(input.packet_limit)
-      .then((rows) =>
+      .then((rows: any[]) =>
         rows.map((row: any) => ({
           packet_key: row.packet_key as string,
           source_ref: row.source_ref as string,

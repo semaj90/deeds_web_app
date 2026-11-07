@@ -71,6 +71,27 @@ describe('case board loader authorization boundary', () => {
 		expect(mocks.evidenceFindMany).not.toHaveBeenCalled();
 	});
 
+	it('only creates inline board thumbnails for image MIME types the download route supports', async () => {
+		mocks.getAuthorizedCase.mockResolvedValue({ id: CASE_ID });
+		mocks.canvasFindFirst.mockResolvedValue(null);
+		mocks.evidenceFindMany.mockResolvedValue([
+			{ id: 'png-evidence', mimeType: 'image/png', fileType: 'image/png', title: 'Photo', uploadedAt: '2026-11-06T00:00:00.000Z' },
+			{ id: 'pdf-evidence', mimeType: 'application/pdf', fileType: 'application/pdf', title: 'Report', uploadedAt: '2026-11-06T00:00:00.000Z' },
+			{ id: 'unknown-evidence', mimeType: 'application/octet-stream', fileType: 'document', title: 'Unknown', uploadedAt: '2026-11-06T00:00:00.000Z' },
+		]);
+		mocks.connectionsFindMany.mockResolvedValue([]);
+		const { load } = await import('./+page.server.js');
+		const result = await load({ params: { id: CASE_ID }, locals: { user: { id: 1 } } } as never);
+
+		expect(result.evidence[0]).toMatchObject({
+			id: 'png-evidence',
+			thumbnail: `/api/evidence/png-evidence/download?inline=1&caseId=${CASE_ID}`,
+		});
+		expect(result.evidence[1]).toMatchObject({ id: 'pdf-evidence', thumbnail: undefined });
+		expect(result.evidence[2]).toMatchObject({ id: 'unknown-evidence', thumbnail: undefined });
+		expect(mocks.setCache).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ evidence: result.evidence }), expect.any(Number));
+	});
+
 	it('reports a board read failure instead of returning it as an empty case', async () => {
 		mocks.getAuthorizedCase.mockResolvedValue({ id: CASE_ID });
 		mocks.canvasFindFirst.mockRejectedValue(new Error('database unavailable'));

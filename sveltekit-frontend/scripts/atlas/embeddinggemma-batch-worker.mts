@@ -69,7 +69,7 @@ const LIMIT = Number(args.get('limit') ?? process.env.LIMIT ?? 100);
 const BATCH_SIZE = Number(args.get('batch-size') ?? process.env.BATCH_SIZE ?? 20);
 const CONCURRENCY = Math.max(1, Number(args.get('concurrency') ?? process.env.CONCURRENCY ?? 1));
 
-const repoEnv = loadRepoEnv(process.env);
+const repoEnv: Record<string, string | undefined> = loadRepoEnv(process.env);
 Object.assign(process.env, repoEnv);
 const DATABASE_URL = resolveDatabaseUrl(repoEnv);
 

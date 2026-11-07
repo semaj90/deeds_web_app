@@ -278,7 +278,7 @@ server.tool('blender_create_model', 'Create a new Blender scene from allow-liste
 	return { content: [{ type: 'text', text: JSON.stringify(result) }] };
 });
 
-server.tool('blender_synthesize_scene_dag', 'Validate a bounded primitive recipe DAG and create a new Blender scene plus a matching GLB for the Three.js playground. Rejects missing dependencies, duplicate IDs, invalid quaternions, cycles, rig references, and triangle-budget violations before writing scene files. Optional skeletons use explicit bone-parent recipes and rigid vertex-group weights; optional object and bone transform clips are exported in the GLB. This creates generic rigging, not Mixamo retargeting. Dependency IDs are preserved as Blender custom properties; output is synthetic, not an evidence reconstruction.', {
+server.tool('blender_synthesize_scene_dag', 'Validate a bounded primitive recipe DAG and create a new Blender scene plus a matching GLB for the Three.js playground. Rejects missing dependencies, duplicate IDs, invalid quaternions, cycles, rig references, and triangle-budget violations before writing scene files. Primitive nodes support bounded scalar metadata extras and optional generated checker textures with UV maps. Optional skeletons use explicit bone-parent recipes and rigid vertex-group weights; optional object and bone transform clips are exported in the GLB. This creates generic rigging, not Mixamo retargeting. Output is synthetic, not an evidence reconstruction.', {
 	outputPath: z.string().min(1).max(240).regex(/\.blend$/i).describe('New relative .blend path under BLENDER_MCP_WORKSPACE'),
 	maxTriangles: z.number().int().min(1).max(1_000_000).default(100_000),
 	maxGlbBytes: z.number().int().min(1).max(64 * 1024 * 1024).default(8 * 1024 * 1024),

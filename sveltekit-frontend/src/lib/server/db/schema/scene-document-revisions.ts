@@ -21,7 +21,7 @@ export const sceneDocumentRevisions = pgTable(
 	(table) => [
 		uniqueIndex('scene_document_revisions_case_scene_revision_uq').on(table.caseId, table.sceneId, table.revision),
 		uniqueIndex('scene_document_revisions_command_uq').on(table.commandId),
-		index('scene_document_revisions_head_idx').on(table.caseId, table.sceneId, table.revision),
+		index('scene_document_revisions_head_idx').on(table.caseId, table.sceneId, table.revision.desc()),
 		check('scene_document_revisions_revision_check', sql`${table.revision} >= 1`),
 		check('scene_document_revisions_manifest_sha_check', sql`${table.manifestSha256} ~ '^[0-9a-f]{64}$'`),
 		check('scene_document_revisions_parent_sha_check', sql`${table.parentManifestSha256} is null or ${table.parentManifestSha256} ~ '^[0-9a-f]{64}$'`)

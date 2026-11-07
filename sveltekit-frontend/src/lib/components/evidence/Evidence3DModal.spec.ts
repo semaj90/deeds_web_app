@@ -42,15 +42,21 @@ describe('Evidence3DModal annotation toolbar', () => {
 		expect(half.getAttribute('aria-pressed')).toBe('false');
 	});
 
-	it('offers the case SPZ viewer only for a case-linked exhibit and switches back to image relief', async () => {
+	it('does not offer the SPZ source route for a case-linked image exhibit', async () => {
 		const { default: Evidence3DModal } = await import('./Evidence3DModal.svelte');
-		render(Evidence3DModal, { props: { imageUrl: null, embedded: true, caseId: 'case-1', evidenceId: 'evidence-1' } });
+		render(Evidence3DModal, { props: { imageUrl: null, embedded: true, caseId: 'case-1', evidenceId: 'image-evidence-1' } });
+		expect(screen.queryByRole('button', { name: '3D SPZ' })).toBeNull();
+	});
+
+	it('offers the case SPZ viewer only for a verified SPZ source and switches back to image relief', async () => {
+		const { default: Evidence3DModal } = await import('./Evidence3DModal.svelte');
+		render(Evidence3DModal, { props: { imageUrl: null, embedded: true, caseId: 'case-1', evidenceId: 'evidence-1', spzSourceEligible: true } });
 
 		const spzButton = screen.getByRole('button', { name: '3D SPZ' });
 		expect(spzButton.getAttribute('aria-pressed')).toBe('false');
 		await fireEvent.click(spzButton);
 		expect(screen.getByRole('region', { name: 'Case evidence Gaussian splat viewer' })).toBeTruthy();
-		expect(screen.getByText(/3D markers are saved to the case and keyed to the verified SPZ source hash/)).toBeTruthy();
+		expect(screen.getByText(/source-frame hypothesis anchors keyed to the verified SPZ hash/)).toBeTruthy();
 		expect(spzButton.getAttribute('aria-pressed')).toBe('true');
 
 		await fireEvent.click(screen.getByRole('button', { name: 'Image relief' }));

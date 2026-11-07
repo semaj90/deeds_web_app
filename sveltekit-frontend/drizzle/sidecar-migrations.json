@@ -2,9 +2,23 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20261106_atlas_spatial_keyframes_v1.sql",
+      "status": "active_candidate",
+      "reason": "Proposed case-scoped PostgreSQL 18 keyframe packet table with 256-bit occupancy masks, packed 64-byte transforms and cluster metadata. Composite identity includes case, scene and revision. Candidate only; not applied to live database.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261106_atlas_render_material_presets_v1.sql",
+      "status": "active_candidate",
+      "reason": "Proposed non-canonical typed PBR preset metadata table, separate from atlas_nes_lut_v1 taxonomy bytes and shader_cache_entries. Candidate only; no database rehearsal, apply, or preset rows.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
       "file": "manual/scene_document_revisions.sql",
       "status": "active_candidate",
-      "reason": "Append-only case scene manifest revisions and a distinct immutable case-scene asset registry. Candidate SQL only; not rehearsed or applied to any database. GLB asset routes stay disabled until schema and bucket admission.",
+      "reason": "Append-only case scene manifest revisions and a distinct immutable case-scene asset registry, including revision-qualified GLB roots and Streamed SOG package members. Candidate SQL only; not rehearsed or applied to any database. Asset routes remain disabled until schema and bucket admission.",
       "appliedBy": "not-applied",
       "requiresJournalEntry": false
     },

@@ -666,7 +666,8 @@
     "atlas-tools",
     "socraticode",
     "trace",
-    "ldr-research"
+    "ldr-research",
+    "blender-models"
   ],
   "disabledMcpjsonServers": [
     "atlas-task-kernel",

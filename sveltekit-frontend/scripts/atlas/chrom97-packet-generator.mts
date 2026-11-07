@@ -31,6 +31,7 @@ Object.assign(process.env, repoEnv);
 const DATABASE_URL = resolveDatabaseUrl(repoEnv);
 
 interface FeatureEnvelope {
+  summary?: string;
   packet_key: string;
   feature_id: string;
   feature_label: string;

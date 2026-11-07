@@ -1,17 +1,22 @@
 <script lang="ts">
 	import HybridBoard from '$lib/components/canvas/HybridBoard.svelte';
+	import { replaceEvidenceThumbnailUrls } from '$lib/components/canvas/evidence-thumbnail-policy.js';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { ChatSession } from '$lib/models/ChatSession.svelte.js';
 	import TypewriterResponse from '$lib/components/ai/TypewriterResponse.svelte';
 	import AISummaryMiniModal from '$lib/components/legal/AISummaryMiniModal.svelte';
 	import EvidenceViewModal from '$lib/components/evidence/EvidenceViewModal.svelte';
+	import EvidenceUploadModal from '$lib/components/evidence/EvidenceUploadModal.svelte';
 	import ModalLight from '$lib/components/ui/ModalLight.svelte';
 	import BoardTopToolbar from '$lib/components/evidence/BoardTopToolbar.svelte';
+	import DetectiveModeCanvas from '$lib/components/evidence/DetectiveModeCanvas.svelte';
+	import InvestigativeCanvasStar from '$lib/components/evidence/InvestigativeCanvasStar.svelte';
 	import { boardHistory } from '$lib/components/evidence/board-history.svelte.js';
 	import {
 		scheduleSave,
 		flushSave,
 		scheduleServerSave,
+		saveServerSnapshot,
 		flushServerSave,
 		loadLayout,
 		type BoardLayout,
@@ -45,8 +50,9 @@
 		}
 		placedEvidenceIds = next;
 	}
-	let activeView = $state<'wall' | 'line' | 'file' | 'list'>('wall');
+	let activeView = $state<'investigative' | 'detective' | 'wall' | 'line' | 'file' | 'list'>('investigative');
 	let selectedEvidence = $state<any>(null);
+	let linkedSceneId = $state('');
 	let showEvidenceViewer = $state(false);
 	let evidenceViewerInitialView = $state<'original' | 'relief'>('original');
 	let openSceneAssistantOnViewer = $state(false);
@@ -539,6 +545,19 @@
 	}
 
 	onMount(() => {
+		const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+		const sceneLinkParams = new URLSearchParams(window.location.search);
+		const requestedSceneId = sceneLinkParams.get('sceneId') ?? '';
+		const requestedEvidenceId = sceneLinkParams.get('evidenceId') ?? '';
+		const requestedView = sceneLinkParams.get('view');
+		if (requestedView && ['investigative', 'detective', 'wall', 'line', 'file', 'list'].includes(requestedView)) {
+			activeView = requestedView as any;
+		}
+		if (uuidPattern.test(requestedSceneId)) linkedSceneId = requestedSceneId;
+		if (uuidPattern.test(requestedEvidenceId)) {
+			selectedEvidence = evidenceItems.find((item: any) => item.id === requestedEvidenceId) ?? null;
+		}
+
 		// Initialize chat session with case context
 		chatSession = new ChatSession(`board-${caseId}`, [], true);
 
@@ -548,55 +567,72 @@
 		// Load case list for the case switcher (non-blocking)
 		loadCaseList();
 
-		// Initial scan of placed evidence (after board mounts + initialState hydrates)
-		queueMicrotask(refreshPlacedIds);
-
-		// Seed board edges from DB connections (after board mounts)
-		if (board && dbConnections.length > 0) {
-			const existingNodes = board.getNodes();
-			const nodeByEvidenceId = new Map(
-				existingNodes.filter((n: any) => n.evidenceId).map((n: any) => [n.evidenceId, n.id])
-			);
-
-			for (const conn of dbConnections) {
-				const fromNodeId = nodeByEvidenceId.get(conn.fromEvidenceId);
-				const toNodeId = nodeByEvidenceId.get(conn.toEvidenceId);
-				if (fromNodeId && toNodeId) {
-					board.addEdge(fromNodeId, toNodeId, conn.label ?? conn.connectionType ?? undefined, 'solid', conn.connectionType ?? 'related', conn.strength ?? 1.0);
+		// Hydrate cached nodes and database relationships through a non-dirty path.
+		// Normal board methods are intentionally user-edit methods and autosave.
+		const validId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId);
+		void (async () => {
+			if (!board) return;
+			let snapshot = board.serialize();
+			if (!initialState && validId) {
+				const cached = await loadLayout(caseId);
+				if (cached?.nodes?.length) {
+					const cachedEvidenceNodes = cached.nodes
+						.filter((node: any) => typeof node.evidenceId === 'string' && Number.isFinite(node.x) && Number.isFinite(node.y))
+						.map((node: any) => ({
+							...node,
+							id: typeof node.id === 'string' ? node.id : `ev_${node.evidenceId}`,
+							kind: 'evidence' as const,
+							w: Number.isFinite(node.w) ? node.w : 280,
+							h: Number.isFinite(node.h) ? node.h : 160,
+							thumbnailUrl: evidenceThumbnails[node.evidenceId]
+						}));
+					if (cachedEvidenceNodes.length) snapshot = { ...snapshot, nodes: cachedEvidenceNodes };
 				}
 			}
-		}
+			snapshot = { ...snapshot, nodes: replaceEvidenceThumbnailUrls(snapshot.nodes, evidenceThumbnails) };
 
-		// Load cached layout from IndexedDB if no server state
-		const validId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId);
-		if (!initialState && board && validId) {
-			loadLayout(caseId).then((cached) => {
-				if (cached && cached.nodes?.length > 0) {
-					// Restore cached viewport/nodes via board methods
-					for (const n of cached.nodes) {
-						if (n.evidenceId) {
-							board.addEvidenceNode(n.evidenceId, n.title ?? 'Untitled', n.x, n.y, undefined, evidenceThumbnails[n.evidenceId]);
-						}
-					}
-					board.zoomToFit();
-				}
-			});
-		}
+			const nodeByEvidenceId = new Map<string, string>(
+				snapshot.nodes
+					.filter((node: any) => typeof node.evidenceId === 'string')
+					.map((node: any) => [node.evidenceId as string, node.id as string])
+			);
+			const seededEdges = [...snapshot.edges];
+			for (const conn of dbConnections) {
+				const fromId = nodeByEvidenceId.get(conn.fromEvidenceId);
+				const toId = nodeByEvidenceId.get(conn.toEvidenceId);
+				if (!fromId || !toId) continue;
+				const duplicate = seededEdges.some((edge: any) => edge.fromId === fromId && edge.toId === toId && edge.connectionType === (conn.connectionType ?? 'related'));
+				if (duplicate) continue;
+				seededEdges.push({
+					id: `db-${fromId}-${toId}-${conn.connectionType ?? 'related'}`,
+					fromId,
+					toId,
+					style: 'solid' as const,
+					label: conn.label ?? conn.connectionType ?? undefined,
+					connectionType: conn.connectionType ?? 'related',
+					strength: conn.strength ?? 1.0
+				});
+			}
+
+			if (seededEdges.length !== snapshot.edges.length) snapshot = { ...snapshot, edges: seededEdges };
+			await board.restoreSnapshot(snapshot);
+			refreshPlacedIds();
+		})();
 
 		// Flush pending saves on page unload.
 		// flushSave() writes to IndexedDB (local); flushServerSave() uses
 		// navigator.sendBeacon so the POST survives page teardown.
 		const onBeforeUnload = () => {
-			flushSave();
-			flushServerSave();
+			flushSave(caseId);
+			flushServerSave(caseId);
 		};
 		window.addEventListener('beforeunload', onBeforeUnload);
 
 		return () => {
 			chatSession?.destroy();
 			boardHistory.clear();
-			flushSave();
-			flushServerSave();
+			flushSave(caseId);
+			flushServerSave(caseId);
 			window.removeEventListener('beforeunload', onBeforeUnload);
 		};
 	});
@@ -1059,20 +1095,14 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 		try {
 			const snapshot = board.serialize();
-			// Manual save flushes any pending debounced server save first to
-			// avoid a double-POST + give the user accurate "saved at" feedback.
-			flushServerSave();
-			const res = await fetch(`/api/cases/${caseId}/canvas`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(snapshot),
-				signal: AbortSignal.timeout(30_000)
-			});
-			if (!res.ok) {
-				console.error('Failed to save', await res.json());
+			const saved = await saveServerSnapshot(caseId, snapshot);
+			if (!saved) {
 				notificationStore.add({ type: 'error', title: 'Save failed', message: 'Failed to save board state.' });
 			} else {
-				isDirty = false;
+				const current = board.serialize();
+				const sameState = JSON.stringify({ viewport: current.viewport, nodes: current.nodes, edges: current.edges }) ===
+					JSON.stringify({ viewport: snapshot.viewport, nodes: snapshot.nodes, edges: snapshot.edges });
+				if (sameState) isDirty = false;
 			}
 		} catch (e) {
 			console.error('Save error', e);
@@ -1135,6 +1165,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 				<Icon name="message-circle" />
 				Chat
 			</button>
+			<a class="action-btn" href={`/demos/spz-renderer?mode=preflight&returnCaseId=${encodeURIComponent(caseId)}`} title="Preview local 3D assets or create an image-derived relief before case admission" data-testid="scene-preflight-link">3D / image preflight</a>
 			<button class="action-btn" title="Active Investigation">
 				<Icon name="activity" />
 			</button>
@@ -1147,6 +1178,22 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 	<!-- View Tabs -->
 	<div class="view-tabs">
+		<button
+			class="tab"
+			class:active={activeView === 'investigative'}
+			onclick={() => (activeView = 'investigative')}
+		>
+			<Icon name="compass" />
+			INVESTIGATIVE
+		</button>
+		<button
+			class="tab"
+			class:active={activeView === 'detective'}
+			onclick={() => (activeView = 'detective')}
+		>
+			<Icon name="scan" />
+			DETECTIVE
+		</button>
 		<button
 			class="tab"
 			class:active={activeView === 'wall'}
@@ -1195,8 +1242,33 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 	<!-- Top Tools Toolbar relocated to bottom floating dock -->
 
-	<!-- Main Content Area -->
-	<div class="board-content">
+	{#if activeView === 'investigative'}
+		<div class="investigative-fullscreen-wrap h-[calc(100vh-140px)] w-full overflow-hidden">
+			<InvestigativeCanvasStar
+				caseId={caseId}
+				docketNumber={data?.caseNumber || `#${caseId.slice(0, 8).toUpperCase()}`}
+				caseTitle={data?.caseTitle || (data?.caseId ? `Case #${caseId.slice(0, 8)}` : 'UNTITLED CASE DOSSIER')}
+				evidenceItems={evidenceItems}
+				onOpenModal={(item) => {
+					selectedEvidence = item;
+					showEvidenceViewer = true;
+				}}
+				onOpenUpload={() => (showAddEvidence = true)}
+			/>
+		</div>
+	{:else if activeView === 'detective'}
+		<div class="detective-fullscreen-wrap h-[calc(100vh-140px)] w-full overflow-hidden">
+			<DetectiveModeCanvas
+				caseId={caseId}
+				caseTitle={data?.caseId ? `State v. Johnson - Case #${caseId.slice(0, 8)}` : 'State v. Johnson - Fraud Investigation'}
+				evidenceItems={evidenceItems}
+				onOpen3DViewer={(item) => openEvidenceViewer('relief')}
+				onOpenDocEditor={(node) => openDocumentationModal(node)}
+			/>
+		</div>
+	{:else}
+		<!-- Main Content Area -->
+		<div class="board-content">
 		<!-- Left Sidebar - Evidence List -->
 		<aside class="evidence-sidebar">
 			<div class="sidebar-header">
@@ -1735,7 +1807,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			<button class="action-btn" onclick={openDetectiveMode}>
 								Set the scene
 							</button>
-			<a class="action-btn" href={`/demos/spz-renderer?caseId=${encodeURIComponent(caseId)}&evidenceId=${encodeURIComponent(selectedEvidence.id)}${selectedEvidence.sourceRevision ? `&sourceRevision=${encodeURIComponent(selectedEvidence.sourceRevision)}` : ''}`}>Open scene studio for this exhibit</a>
+			<a class="action-btn" href={`/demos/spz-renderer?caseId=${encodeURIComponent(caseId)}${linkedSceneId ? `&sceneId=${encodeURIComponent(linkedSceneId)}` : ''}&evidenceId=${encodeURIComponent(selectedEvidence.id)}${selectedEvidence.sourceRevision ? `&sourceRevision=${encodeURIComponent(selectedEvidence.sourceRevision)}` : ''}`} data-testid="exhibit-scene-studio-link">Open scene studio for this exhibit</a>
 			<p class="related-info">The scene manifest records this exhibit and its source revision when available. Generated geometry remains a reconstruction hypothesis.</p>
 						{/if}
 					</div>
@@ -1766,6 +1838,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			</aside>
 		{/if}
 	</div>
+	{/if}
 
 	<!-- Timeline View (enriched: who/what/why/how) -->
 	<div class="timeline-section">
@@ -1969,6 +2042,21 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		assistantInitiallyExpanded={openSceneAssistantOnViewer}
 		initialView={evidenceViewerInitialView}
 		onClose={() => { showEvidenceViewer = false; openSceneAssistantOnViewer = false; }}
+	/>
+
+	<EvidenceUploadModal
+		{caseId}
+		isOpen={showAddEvidence}
+		onClose={() => (showAddEvidence = false)}
+		onSuccess={() => {
+			showAddEvidence = false;
+			notificationStore.add({
+				type: 'success',
+				title: 'Evidence Uploaded',
+				message: 'Evidence successfully ingested into SeaweedFS and registered to case.'
+			});
+			window.location.reload();
+		}}
 	/>
 
 	<!-- Celestial Legal-AI Modal for Graph Documentation & Node Edits -->

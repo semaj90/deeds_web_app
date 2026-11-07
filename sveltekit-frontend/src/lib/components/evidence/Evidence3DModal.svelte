@@ -19,13 +19,14 @@
 		depthUrl = null,
 		evidenceId = null,
 		caseId = null,
+		spzSourceEligible = false,
 		title = 'Evidence',
 		embedded = false,
 		chatMessages = [],
 		chatStatus = 'idle',
 		onAskAssistant,
 		assistantInitiallyExpanded = false
-	}: { open?: boolean; imageUrl: string | null; depthUrl?: string | null; evidenceId?: string | null; caseId?: string | null; title?: string; embedded?: boolean; chatMessages?: ChatMessage[]; chatStatus?: string; onAskAssistant?: (prompt: string) => void | Promise<void>; assistantInitiallyExpanded?: boolean } = $props();
+	}: { open?: boolean; imageUrl: string | null; depthUrl?: string | null; evidenceId?: string | null; caseId?: string | null; spzSourceEligible?: boolean; title?: string; embedded?: boolean; chatMessages?: ChatMessage[]; chatStatus?: string; onAskAssistant?: (prompt: string) => void | Promise<void>; assistantInitiallyExpanded?: boolean } = $props();
 
 	// Upscaled result replaces the source for the relief view (blob URL, never persisted).
 	let upscaledUrl = $state<string | null>(null);
@@ -355,7 +356,7 @@
 
 {#snippet reliefWorkspace()}
 			<div class="e3d-annotation-bar" role="toolbar" aria-label="Image annotation tools">
-				{#if persistenceOn}
+				{#if persistenceOn && spzSourceEligible}
 					<div class="e3d-tool-group" role="group" aria-label="Evidence scene view">
 						<button class="e3d-btn" aria-pressed={sceneView === 'relief'} onclick={() => (sceneView = 'relief')}>Image relief</button>
 						<button class="e3d-btn" aria-pressed={sceneView === 'spz'} onclick={() => (sceneView = 'spz')}>3D SPZ</button>

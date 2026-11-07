@@ -30,7 +30,7 @@ const EvidenceSchema = z.object({
   source_ref: z.string(),
   query_id: z.string().uuid(),
   evidence_type: z.enum(['ast', 'route', 'schema', 'test', 'semantic']),
-  evidence_detail: z.record(z.unknown()),
+  evidence_detail: z.record(z.string(), z.unknown()),
   extractor_version: z.string(),
   extractor_name: z.string(),
   confidence: z.number().min(0).max(1),

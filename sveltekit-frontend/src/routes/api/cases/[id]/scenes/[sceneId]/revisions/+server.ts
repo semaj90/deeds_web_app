@@ -17,7 +17,12 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 	const scope = parseScope(params.id, params.sceneId);
 	if (!scope) return json({ success: false, data: null, message: 'Invalid identifiers' }, { status: 400 });
 	const actorId = Number(locals.user.id);
-	const authorized = await getAuthorizedCase(scope.caseId, actorId);
+	let authorized: Awaited<ReturnType<typeof getAuthorizedCase>>;
+	try {
+		authorized = await getAuthorizedCase(scope.caseId, actorId);
+	} catch {
+		return json({ success: false, data: null, message: 'Case authorization failed' }, { status: 500 });
+	}
 	if (!authorized) return json({ success: false, data: null, message: 'Case not found' }, { status: 404 });
 	if (!ENV.SCENE_PERSISTENCE_ENABLED) return json({ success: false, data: null, message: 'Scene persistence is disabled pending schema admission' }, { status: 503 });
 	const revisionParam = url.searchParams.get('revision');
@@ -38,7 +43,12 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 	const scope = parseScope(params.id, params.sceneId);
 	if (!scope) return json({ success: false, data: null, message: 'Invalid identifiers' }, { status: 400 });
 	const actorId = Number(locals.user.id);
-	const authorized = await getAuthorizedCase(scope.caseId, actorId);
+	let authorized: Awaited<ReturnType<typeof getAuthorizedCase>>;
+	try {
+		authorized = await getAuthorizedCase(scope.caseId, actorId);
+	} catch {
+		return json({ success: false, data: null, message: 'Case authorization failed' }, { status: 500 });
+	}
 	if (!authorized) return json({ success: false, data: null, message: 'Case not found' }, { status: 404 });
 	if (!ENV.SCENE_PERSISTENCE_ENABLED) return json({ success: false, data: null, message: 'Scene persistence is disabled pending schema admission' }, { status: 503 });
 	let body: unknown;

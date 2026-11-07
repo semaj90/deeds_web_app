@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { calibrate, type CalibrationAnchor } from './calibration.js';
 
 const finite = z.number().finite();
 const digest = z.string().regex(/^[a-f0-9]{64}$/i, 'Expected SHA-256 hex');
@@ -44,6 +45,9 @@ export const surfaceMarkerV1Schema = z.object({
 	markerId: z.string().uuid(),
 	evidenceId: z.string().uuid(),
 	sourceRevision,
+	// Optional for legacy compatibility. New editable-scene anchors must state
+	// explicitly that they are analyst hypotheses on reconstruction geometry.
+	anchorKind: z.literal('MESH_SURFACE_HYPOTHESIS').optional(),
 	meshObjectId: z.string().uuid(),
 	meshAssetSha256: digest,
 	triangleIndex: z.number().int().nonnegative(),
@@ -56,10 +60,73 @@ export const surfaceMarkerV1Schema = z.object({
 		context.addIssue({ code: 'custom', message: 'Barycentric weights must be within the triangle and sum to one', path: ['barycentric'] });
 	}
 });
+
+const calibrationAnchorV1Schema = z.object({
+	id: z.string().min(1).max(100),
+	splat: z.tuple([finite, finite, finite]),
+	worldM: z.tuple([finite, finite, finite])
+}).strict();
+
+const calibrationTransformV1Schema = z.object({
+	scale: finite.positive(),
+	yawRad: finite,
+	translation: z.tuple([finite, finite, finite])
+}).strict();
+
+export const sceneCalibrationV1Schema = z.object({
+	sourceSha256: digest,
+	sourceCoordinateSystem: z.literal('RUB'),
+	targetCoordinateSystem: z.literal('GLTF_Y_UP_METERS'),
+	anchors: z.array(calibrationAnchorV1Schema).min(3).max(16),
+	toleranceM: finite.positive().max(0.5),
+	transform: calibrationTransformV1Schema,
+	maxResidualM: finite.nonnegative()
+}).strict().superRefine((calibration, context) => {
+	const ids = new Set<string>();
+	for (const [index, anchor] of calibration.anchors.entries()) {
+		if (ids.has(anchor.id)) context.addIssue({ code: 'custom', message: 'Calibration anchor IDs must be unique', path: ['anchors', index, 'id'] });
+		ids.add(anchor.id);
+	}
+	try {
+		const result = calibrate(calibration.anchors as unknown as CalibrationAnchor[], calibration.toleranceM);
+		const actual = result.transform;
+		const targetTrans = calibration.transform.translation as readonly number[];
+		const valuesMatch = Math.abs(actual.scale - calibration.transform.scale) <= 1e-8
+			&& Math.abs(actual.yawRad - calibration.transform.yawRad) <= 1e-8
+			&& actual.translation.every((value, index) => {
+				const expected = targetTrans[index] ?? 0;
+				return Math.abs(value - expected) <= 1e-8;
+			});
+		if (!valuesMatch) context.addIssue({ code: 'custom', message: 'Calibration transform must match the anchor-derived transform', path: ['transform'] });
+		if (!result.pass) context.addIssue({ code: 'custom', message: 'Calibration anchor residual exceeds tolerance', path: ['toleranceM'] });
+		if (Math.abs(result.maxResidualM - calibration.maxResidualM) > 1e-8) context.addIssue({ code: 'custom', message: 'Calibration residual receipt must match recomputed anchors', path: ['maxResidualM'] });
+	} catch {
+		context.addIssue({ code: 'custom', message: 'Calibration anchors do not define a valid transform', path: ['anchors'] });
+	}
+});
+
+export function createSceneCalibrationV1(input: {
+	sourceSha256: string;
+	anchors: readonly CalibrationAnchor[];
+	toleranceM: number;
+}) {
+	const result = calibrate(input.anchors, input.toleranceM);
+	if (!result.pass) throw new Error('SCENE_CALIBRATION_RESIDUAL_EXCEEDS_TOLERANCE');
+	return sceneCalibrationV1Schema.parse({
+		sourceSha256: input.sourceSha256,
+		sourceCoordinateSystem: 'RUB',
+		targetCoordinateSystem: 'GLTF_Y_UP_METERS',
+		anchors: input.anchors,
+		toleranceM: input.toleranceM,
+		transform: result.transform,
+		maxResidualM: result.maxResidualM
+	});
+}
 export type SurfaceMarkerV1 = {
 	markerId: string;
 	evidenceId: string;
 	sourceRevision: string;
+	anchorKind?: 'MESH_SURFACE_HYPOTHESIS';
 	meshObjectId: string;
 	meshAssetSha256: string;
 	triangleIndex: number;
@@ -72,6 +139,9 @@ export const sceneDocumentV1Schema = z.object({
 	sceneId: z.string().uuid(),
 	caseId: z.string().uuid().nullable(),
 	status: z.enum(['FIXTURE', 'HYPOTHESIS', 'MEASURED']),
+	// Additive classification keeps old v1 manifest hashes readable while new
+	// revisions label the evidentiary meaning of their geometry explicitly.
+	sceneClassification: z.enum(['MEASURED_MULTI_IMAGE', 'SINGLE_IMAGE_HYPOTHESIS', 'SYNTHETIC_FIXTURE']).optional(),
 	revision: z.number().int().positive(),
 	parentManifestSha256: digest.nullable(),
 	createdAt: z.string().datetime(),
@@ -89,8 +159,11 @@ export const sceneDocumentV1Schema = z.object({
 		decoderRevision: z.string().min(1).max(100),
 		representationRevision: z.string().min(1).max(100)
 	}).strict()).max(10_000).default([]),
+	// Optional to preserve hashes of existing v1 manifests. Calibration maps SPZ RUB
+	// coordinates into the scene's GLTF-compatible Y-up meter frame, not GPS coordinates.
+	calibration: sceneCalibrationV1Schema.optional(),
 	assets: z.array(z.object({
-		assetId: z.string().uuid(), format: z.enum(['GLB', 'SPZ', 'SOG', 'RAD', 'RADC']), sha256: digest,
+		assetId: z.string().uuid(), format: z.enum(['GLB', 'OBJ', 'FBX', 'SPZ', 'SOG', 'RAD', 'RADC', 'IMAGE_JPEG', 'IMAGE_PNG', 'IMAGE_GIF', 'IMAGE_WEBP']), sha256: digest,
 		bytes: z.number().int().positive(), role: z.enum(['SOURCE', 'DERIVED', 'PREVIEW', 'LOD']),
 		derivation: z.object({
 			parentAssetSha256: digest,
@@ -110,6 +183,21 @@ export const sceneDocumentV1Schema = z.object({
 		status: z.enum(['NOT_ASSESSED', 'PASSED', 'FAILED'])
 	}).strict()
 }).strict().superRefine((document, context) => {
+	if (document.sceneClassification === 'SYNTHETIC_FIXTURE' && document.status !== 'FIXTURE') {
+		context.addIssue({ code: 'custom', message: 'Synthetic fixture classification requires FIXTURE lifecycle status', path: ['sceneClassification'] });
+	}
+	if (document.sceneClassification === 'SINGLE_IMAGE_HYPOTHESIS' && document.status !== 'HYPOTHESIS') {
+		context.addIssue({ code: 'custom', message: 'Single-image hypothesis classification requires HYPOTHESIS lifecycle status', path: ['sceneClassification'] });
+	}
+	if (document.sceneClassification === 'MEASURED_MULTI_IMAGE') {
+		const distinctSources = new Set([
+			...(document.evidenceBindings ?? []).map((binding) => binding.evidenceId),
+			...document.evidenceSources.map((source) => source.evidenceId)
+		]);
+		if (document.status !== 'MEASURED' || distinctSources.size < 2) {
+			context.addIssue({ code: 'custom', message: 'Measured multi-image classification requires MEASURED status and at least two distinct evidence sources', path: ['sceneClassification'] });
+		}
+	}
 	const measuredDerivedBytes = document.assets.reduce((sum, asset) => sum + (asset.role === 'DERIVED' || asset.role === 'LOD' ? asset.bytes : 0), 0);
 	if (document.quality.derivedAssetBytes !== measuredDerivedBytes) {
 		context.addIssue({ code: 'custom', message: 'Derived asset byte receipt must equal the measured DERIVED and LOD asset bytes', path: ['quality', 'derivedAssetBytes'] });
@@ -134,6 +222,11 @@ export const sceneDocumentV1Schema = z.object({
 	const admittedSourceHashes = new Set(document.assets.map((asset) => asset.sha256));
 	for (const binding of (document.evidenceBindings ?? [])) admittedSourceHashes.add(binding.sourceRevision.slice('sha256:'.length));
 	for (const source of document.evidenceSources) admittedSourceHashes.add(source.sourceRevision.slice('sha256:'.length));
+	if (document.calibration) {
+		if (document.coordinateFrame !== 'GLTF_Y_UP_METERS') context.addIssue({ code: 'custom', message: 'Splat calibration target requires GLTF_Y_UP_METERS scene coordinates', path: ['coordinateFrame'] });
+		const calibratedEvidenceSource = document.evidenceSources.some((source) => source.format === 'SPZ' && source.coordinateSystem === 'RUB' && source.sourceRevision === `sha256:${document.calibration?.sourceSha256}`);
+		if (!calibratedEvidenceSource) context.addIssue({ code: 'custom', message: 'Calibration source hash must match an SPZ evidence source revision', path: ['calibration', 'sourceSha256'] });
+	}
 	for (const [index, asset] of document.assets.entries()) {
 		if (asset.role === 'LOD') {
 			if (!asset.derivation) {
@@ -148,6 +241,9 @@ export const sceneDocumentV1Schema = z.object({
 	for (const [index, marker] of (document.surfaceMarkers ?? []).entries()) {
 		if (markersById.has(marker.markerId)) context.addIssue({ code: 'custom', message: 'Duplicate surface marker ID', path: ['surfaceMarkers', index, 'markerId'] });
 		markersById.add(marker.markerId);
+		if (document.sceneClassification === 'SINGLE_IMAGE_HYPOTHESIS' && marker.anchorKind !== 'MESH_SURFACE_HYPOTHESIS') {
+			context.addIssue({ code: 'custom', message: 'Hypothesis-scene anchors must be explicitly classified as mesh-surface hypotheses', path: ['surfaceMarkers', index, 'anchorKind'] });
+		}
 		if (sourceRevisions.get(marker.evidenceId) !== marker.sourceRevision) {
 			context.addIssue({ code: 'custom', message: 'Surface marker must match a manifest evidence source revision', path: ['surfaceMarkers', index, 'sourceRevision'] });
 		}
@@ -180,10 +276,27 @@ export const sceneDocumentV1Schema = z.object({
 		if (state === 1) return;
 		visitState.set(objectId, 1);
 		const index = objectIndexById.get(objectId);
-		const parentId = index === undefined ? null : document.objects[index].parentObjectId;
+		if (
+			index === undefined ||
+			!Number.isInteger(index) ||
+			index < 0 ||
+			index >= document.objects.length
+		) {
+			context.addIssue({
+				code: 'custom',
+				message: 'Scene object index is invalid or out of range',
+				path: ['objects']
+			});
+			return;
+		}
+		const parentId = document.objects[index].parentObjectId;
 		if (parentId && objectIndexById.has(parentId)) {
 			if (visitState.get(parentId) === 1) {
-				context.addIssue({ code: 'custom', message: 'Scene object parent hierarchy contains a cycle', path: ['objects', index, 'parentObjectId'] });
+				context.addIssue({
+					code: 'custom',
+					message: 'Scene object parent hierarchy contains a cycle',
+					path: ['objects', index, 'parentObjectId']
+				});
 			} else {
 				visitParentChain(parentId);
 			}
@@ -194,6 +307,13 @@ export const sceneDocumentV1Schema = z.object({
 });
 
 export type SceneDocumentV1 = z.infer<typeof sceneDocumentV1Schema>;
+
+/** Resolve calibration only for the exact exhibit source revision admitted by this manifest. */
+export function calibrationForEvidenceV1(document: SceneDocumentV1, evidenceId: string, sourceRevision: string) {
+	const source = document.evidenceSources.find((candidate) => candidate.evidenceId === evidenceId && candidate.sourceRevision === sourceRevision);
+	if (!source || source.format !== 'SPZ' || source.coordinateSystem !== 'RUB' || !document.calibration) return null;
+	return document.calibration.sourceSha256 === sourceRevision.slice('sha256:'.length) ? document.calibration : null;
+}
 
 /** Canonical JSON encoding shared by the scene server and browser readback verifier. */
 export function stableStringifySceneDocumentV1(value: unknown): string {

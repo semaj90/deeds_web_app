@@ -1,7 +1,7 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { createHash } from 'crypto';
 import { promises as fs } from 'fs';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+import { detectEnvironment } from '$lib/types/enhanced-svelte5-types.js';
 import { ENV } from '$lib/server/env.server.js';
 import { getQdrantClient } from './qdrant-singleton.js';
 import {
@@ -47,10 +47,10 @@ export { generateSparseVector, type SparseVector };
 
 /** Shared return shape for all search methods (hybridSearch, _denseSearch, sectionFilteredSearch, sparseHybridSearch). */
 export interface QdrantSearchResult {
-  results: { id: string | number; score: number; payload?: Record<string, unknown> }[];
+  results: { id: string | number; score: number; payload?: Record<string, unknown> | null }[];
   metadata: {
     query: string;
-    collection: string;
+    collection?: string;
     responseTime: number;
     total_results: number;
     cached: boolean;
@@ -723,7 +723,7 @@ export class QdrantManager {
         } catch (err) {
           if (!params.suppressObservability) console.debug(
             '[qdrant] multiQuerySearch dedupe failed, falling back:',
-            err?.message ?? err
+            (err as any)?.message ?? String(err)
           );
         }
 
@@ -1102,7 +1102,7 @@ export class QdrantManager {
         } catch (e) {
           if (!params.suppressObservability) console.debug(
             '[qdrant] denseSearch dedupe failed, continuing without dedupe:',
-            e?.message ?? e
+            (e as any)?.message ?? String(e)
           );
         }
 
@@ -1312,7 +1312,7 @@ export class QdrantManager {
   }
 
   async batchUpsert(params: {
-    collection: keyof typeof this.collections | (typeof this.collections)[keyof typeof this.collections] | string;
+    collection: string;
     points: any[];
     batchSize?: number;
   }) {
@@ -1448,7 +1448,7 @@ export class QdrantManager {
    * Centralizes scroll usage so we can add tracing, dedupe, and consistent headers.
    */
   async scroll(params: {
-    collection: keyof typeof this.collections | string;
+    collection: string;
     limit?: number;
     offset?: any;
     filter?: any;
@@ -1528,7 +1528,7 @@ export class QdrantManager {
    * the payload exceeds batchSize, and performs cache invalidation.
    */
   async upsert(params: {
-    collection: keyof typeof this.collections | string;
+    collection: string;
     points: any[];
     wait?: boolean;
     batchSize?: number;

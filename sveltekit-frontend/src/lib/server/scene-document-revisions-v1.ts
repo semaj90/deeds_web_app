@@ -20,6 +20,34 @@ export function hashSceneDocumentV1(manifest: SceneDocumentV1): string {
 	return createHash('sha256').update(stableStringifySceneDocumentV1(manifest), 'utf8').digest('hex');
 }
 
+type SceneRevisionReadbackRowV1 = Pick<
+	typeof sceneDocumentRevisions.$inferSelect,
+	'caseId' | 'sceneId' | 'revision' | 'parentManifestSha256' | 'manifestSha256' | 'manifest'
+>;
+
+/** Revalidate database JSONB and its revision bindings before exposing a saved document. */
+export function verifySceneDocumentRevisionReadbackV1(input: {
+	caseId: string;
+	sceneId: string;
+	row: SceneRevisionReadbackRowV1;
+}): SceneRevisionReadbackRowV1 & { manifest: SceneDocumentV1 } {
+	const parsed = sceneDocumentV1Schema.safeParse(input.row.manifest);
+	if (!parsed.success) throw new Error('SCENE_REVISION_READBACK_MANIFEST_INVALID');
+	const manifest = parsed.data;
+	if (
+		input.row.caseId !== input.caseId ||
+		input.row.sceneId !== input.sceneId ||
+		manifest.caseId !== input.caseId ||
+		manifest.sceneId !== input.sceneId ||
+		manifest.revision !== input.row.revision ||
+		manifest.parentManifestSha256 !== input.row.parentManifestSha256 ||
+		hashSceneDocumentV1(manifest) !== input.row.manifestSha256
+	) {
+		throw new Error('SCENE_REVISION_READBACK_INTEGRITY_MISMATCH');
+	}
+	return { ...input.row, manifest };
+}
+
 export function validateSceneRevisionBindingV1(input: {
 	caseId: string;
 	sceneId: string;
@@ -88,7 +116,8 @@ export async function appendSceneDocumentRevisionV1(input: {
 			if (replay.caseId !== input.caseId || replay.sceneId !== input.sceneId || replay.manifestSha256 !== binding.manifestSha256) {
 				throw new Error('SCENE_REVISION_COMMAND_REUSE');
 			}
-			return { replayed: true, revision: replay.revision, manifestSha256: replay.manifestSha256, manifest: replay.manifest };
+			const verified = verifySceneDocumentRevisionReadbackV1({ caseId: input.caseId, sceneId: input.sceneId, row: replay });
+			return { replayed: true, revision: verified.revision, manifestSha256: verified.manifestSha256, manifest: verified.manifest };
 		}
 
 		const [head] = await tx.select().from(sceneDocumentRevisions)
@@ -127,7 +156,8 @@ export async function appendSceneDocumentRevisionV1(input: {
 			createdBy: input.actorId
 		}).returning();
 		if (!saved) throw new Error('SCENE_REVISION_INSERT_READBACK_FAILED');
-		return { replayed: false, revision: saved.revision, manifestSha256: saved.manifestSha256, manifest: saved.manifest };
+		const verified = verifySceneDocumentRevisionReadbackV1({ caseId: input.caseId, sceneId: input.sceneId, row: saved });
+		return { replayed: false, revision: verified.revision, manifestSha256: verified.manifestSha256, manifest: verified.manifest };
 	});
 }
 
@@ -136,5 +166,5 @@ export async function readSceneDocumentRevisionV1(input: { caseId: string; scene
 	const [row] = input.revision === undefined
 		? await db.select().from(sceneDocumentRevisions).where(and(...conditions)).orderBy(desc(sceneDocumentRevisions.revision)).limit(1)
 		: await db.select().from(sceneDocumentRevisions).where(and(...conditions, eq(sceneDocumentRevisions.revision, input.revision))).limit(1);
-	return row ?? null;
+	return row ? verifySceneDocumentRevisionReadbackV1({ caseId: input.caseId, sceneId: input.sceneId, row }) : null;
 }

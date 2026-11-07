@@ -204,7 +204,7 @@ export default defineConfig(({ mode }) => {
         'Cross-Origin-Embedder-Policy': 'require-corp',
       },
       // Pre-transform frequently imported modules on dev server start
-      warmup: {
+      warmup: process.env.VITEST ? undefined : {
         clientFiles: [
           'src/lib/components/ui/**/*.svelte',
           'src/lib/components/layout/**/*.svelte',

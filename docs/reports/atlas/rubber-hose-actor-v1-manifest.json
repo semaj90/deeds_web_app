@@ -1,0 +1,60 @@
+{
+  "$schema": "scene.recipe.v1",
+  "template": "rubber_hose_actor",
+  "name": "1928 Rubber-Hose Performer (YoRHa Law Vintage Edition)",
+  "version": "1.0.0",
+  "classification": "SYNTHETIC_FIXTURE",
+  "licensing": "Public Domain (1928 Steamboat Willie Character Concept) / MIT / CC0 Implementation",
+  "palette": {
+    "obsidian": "#1A1A1A",
+    "oxblood": "#5B1414",
+    "taupe": "#8C7D70",
+    "blush": "#D89D8B",
+    "ivory": "#F5F0E6",
+    "gold": "#C8A253"
+  },
+  "rig": "RubberHoseRig_v1",
+  "bones_count": 23,
+  "parts": [
+    { "id": "head", "primitive": "uv_sphere", "segments": [12, 8], "material": "ivory", "bone": "head" },
+    { "id": "snout", "primitive": "uv_sphere", "segments": [8, 6], "material": "blush", "bone": "head" },
+    { "id": "eyes", "primitive": "uv_sphere", "segments": [8, 6], "material": "obsidian", "bone": "head" },
+    { "id": "ears", "primitive": "uv_sphere", "segments": [8, 6], "material": "obsidian", "bones": ["ear.L", "ear.R"] },
+    { "id": "torso_chest", "primitive": "uv_sphere", "segments": [10, 8], "material": "obsidian", "bone": "chest" },
+    { "id": "torso_spine", "primitive": "uv_sphere", "segments": [10, 8], "material": "obsidian", "bone": "spine" },
+    { "id": "buttons", "primitive": "uv_sphere", "segments": [6, 4], "material": "gold", "bone": "chest" },
+    { "id": "upper_arms", "primitive": "cylinder", "segments": [8, 1], "material": "obsidian", "bones": ["upper_arm.L", "upper_arm.R"] },
+    { "id": "forearms", "primitive": "cylinder", "segments": [8, 1], "material": "obsidian", "bones": ["forearm.L", "forearm.R"] },
+    { "id": "gloves", "primitive": "uv_sphere", "segments": [8, 6], "material": "ivory", "bones": ["hand.L", "hand.R"] },
+    { "id": "glove_cuffs", "primitive": "uv_sphere", "segments": [6, 4], "material": "taupe", "bones": ["hand.L", "hand.R"] },
+    { "id": "upper_legs", "primitive": "cylinder", "segments": [8, 1], "material": "obsidian", "bones": ["upper_leg.L", "upper_leg.R"] },
+    { "id": "lower_legs", "primitive": "cylinder", "segments": [8, 1], "material": "obsidian", "bones": ["lower_leg.L", "lower_leg.R"] },
+    { "id": "clown_shoes", "primitive": "uv_sphere", "segments": [10, 6], "material": "oxblood", "bones": ["foot.L", "foot.R"] },
+    { "id": "shoe_soles", "primitive": "uv_sphere", "segments": [8, 4], "material": "taupe", "bones": ["toe.L", "toe.R"] }
+  ],
+  "clips": [
+    { "name": "Idle", "durationSeconds": 2.0, "fps": 24, "type": "squash_and_stretch_loop" },
+    { "name": "Walk", "durationSeconds": 2.0, "fps": 24, "type": "marching_stride_loop" },
+    { "name": "Wave", "durationSeconds": 2.0, "fps": 24, "type": "cheerful_greeting" },
+    { "name": "Point", "durationSeconds": 2.0, "fps": 24, "type": "detective_accusation" },
+    { "name": "RestPose", "durationSeconds": 0.08, "fps": 24, "type": "calibration_rest" }
+  ],
+  "limits": {
+    "triangles": 1672,
+    "maxTriangles": 2500,
+    "bytes": 344252,
+    "maxGlbBytes": 8388608,
+    "within_triangle_budget": true,
+    "within_byte_budget": true
+  },
+  "artifact": {
+    "path": "static/models/rubber-hose-actor-v1.glb",
+    "sha256": "d2b5c955cb25646e3c2495de886590b3d5ad8718a48016899c71b5049c815afb"
+  },
+  "database_readiness": {
+    "live_database_tables_present": false,
+    "inspection_query": "SELECT name, to_regclass('public.' || name) FROM ( VALUES ('scene_asset_templates'), ('scene_asset_versions'), ('scene_documents'), ('scene_revisions'), ('scene_markers'), ('scene_assets') ) AS t(name);",
+    "result": "All 6 tables returned null in legal_ai_db (PostgreSQL 18.4, port 5434).",
+    "recommendation": "Maintain strict separation between synthetic illustrative fixtures and evidential records. Rehearse schema migrations in isolated scratch database before enabling live persistence."
+  }
+}

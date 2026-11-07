@@ -13,3 +13,5 @@ export default neo4j_singleton;
 
 // Fallback export as 'neo4j' for phase109a-inverse-lookup.ts
 export const neo4j_fallback = neo4j_singleton;
+
+export { getNeo4jDriver, closeNeo4jDriver };

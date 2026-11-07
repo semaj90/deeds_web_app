@@ -62,7 +62,7 @@ Mode: ${DRY_RUN ? "DRY-RUN" : "APPLY"}
       sql`
         SELECT packet_key, payload, file_path
         FROM atlas_packets
-        WHERE packet_key = ANY(${sql.raw(`ARRAY[${sampleKeys.map((k) => `'${k}'`).join(",")}]`)})
+        WHERE packet_key = ANY(${sql.raw(`ARRAY[${sampleKeys.map((k: string) => `'${k}'`).join(",")}]`)})
         LIMIT 3
       `
     ) as any;

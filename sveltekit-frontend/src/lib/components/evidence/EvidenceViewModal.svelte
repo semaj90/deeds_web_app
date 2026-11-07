@@ -5,6 +5,7 @@
 	import TagInput from '$lib/components/ui/TagInput.svelte';
 	import DoclingExtractionViewer from './DoclingExtractionViewer.svelte';
 	import Evidence3DModal from './Evidence3DModal.svelte';
+	import EvidenceSpzViewer from './EvidenceSpzViewer.svelte';
 	import { formatFileSize, formatDate, getIcon, getTypeLabel } from './evidence-utils.js';
 
 	let {
@@ -76,6 +77,10 @@
 	let fileType = $derived(doc?.fileType ?? doc?.file_type ?? doc?.mimeType ?? doc?.mime_type ?? '');
 	let fileName = $derived(doc?.fileName ?? doc?.file_name ?? '');
 	let isImage = $derived(fileType.startsWith('image/'));
+	let isSpzEvidence = $derived.by(() => {
+		const mime = fileType.split(';', 1)[0].trim().toLowerCase();
+		return fileName.toLowerCase().endsWith('.spz') && (!mime || ['model/x-spz', 'application/vnd.spz', 'application/octet-stream'].includes(mime));
+	});
 	let isPdf = $derived(fileType.includes('pdf'));
 	let isAudio = $derived(fileType.startsWith('audio/'));
 	let isVideo = $derived(fileType.startsWith('video/'));
@@ -305,7 +310,13 @@
 					</div>
 				{:else if doc}
 					<!-- File preview (images with lightbox) -->
-					{#if isImage && previewUrl}
+					{#if isSpzEvidence}
+						{#if caseId && evidenceId}
+							<EvidenceSpzViewer {caseId} {evidenceId} />
+						{:else}
+							<p role="status">Open this SPZ exhibit from its case to verify its source and authorization before viewing.</p>
+						{/if}
+					{:else if isImage && previewUrl}
 						<div class="preview-wrap">
 							<div class="evidence-preview-modes" role="group" aria-label="Evidence view mode">
 								<button type="button" aria-pressed={!showRelief} onclick={() => (showRelief = false)}>Original</button>

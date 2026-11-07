@@ -14,6 +14,7 @@
 		{ slug: 'overview', label: 'Overview' },
 		{ slug: 'notes', label: 'Notes' },
 		{ slug: 'canvas', label: 'Evidence Canvas' },
+		{ slug: 'board', label: 'Evidence Board' },
 		{ slug: 'reports', label: 'Reports' }
 	];
 </script>

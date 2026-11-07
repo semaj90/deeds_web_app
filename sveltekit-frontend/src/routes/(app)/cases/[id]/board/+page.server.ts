@@ -24,6 +24,14 @@ const EMPTY_BOARD = (id: string) => ({
   loadError: null,
 });
 
+const BOARD_INLINE_IMAGE_MIMES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+function boardPreviewMime(item: { mimeType?: string | null; fileType?: string | null }): string | null {
+  const candidates = [item.mimeType, item.fileType]
+    .filter((value): value is string => typeof value === 'string')
+    .map((value) => value.trim().toLowerCase());
+  return candidates.find((value) => BOARD_INLINE_IMAGE_MIMES.has(value)) ?? null;
+}
+
 export const load: PageServerLoad = async ({ params, locals }) => {
   const { id } = params;
 
@@ -43,7 +51,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   const userId = numericUserId;
 
   // Client view cache check
-  const vKey = clientKey.view(String(userId), id, 'board-v2');
+  const vKey = clientKey.view(String(userId), id, 'board-v3');
   const memHit = getFromMemoryCache(vKey);
   if (memHit.found && memHit.value) return { ...(memHit.value as object), loadError: null } as any;
   try {
@@ -97,12 +105,19 @@ export const load: PageServerLoad = async ({ params, locals }) => {
           type: item.evidenceType || 'document',
           date: item.uploadedAt?.split('T')[0] || '',
           location: meta.location || '',
-          thumbnail: `/api/evidence/${encodeURIComponent(item.id)}/download?inline=1&caseId=${encodeURIComponent(id)}`,
+          mimeType: item.mimeType || null,
+          // The canvas thumbnail is rendered through Image(), so only request
+          // media that can be safely displayed as an image. Documents and
+          // unsupported MIME types stay selectable without triggering an
+          // expected inline-preview 415 on every board hydration.
+          thumbnail: boardPreviewMime(item)
+            ? `/api/evidence/${encodeURIComponent(item.id)}/download?inline=1&caseId=${encodeURIComponent(id)}`
+            : undefined,
           depthMapUrl: hasSourceBoundDepth
             ? `/api/evidence/${encodeURIComponent(item.id)}/depth-map`
             : null,
           description: item.description || '',
-          fileType: item.fileType || '',
+          fileType: item.fileType || item.mimeType || '',
           confidence: meta.confidence || 0,
           keyPoints: (analysis.keyPoints as string[]) ?? [],
         };

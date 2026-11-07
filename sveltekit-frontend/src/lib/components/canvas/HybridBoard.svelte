@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { tick } from 'svelte';
+
 	// Type definitions
 	interface Vec2 { x: number; y: number; }
 	interface BoardViewport { pan: Vec2; zoom: number; }
@@ -107,6 +109,8 @@
 	let selected = $state<Set<string>>(new Set());
 	let hoveredId = $state<string | null>(null);
 	let dirty = $state(false);
+	let hasTrackedInitialState = false;
+	let suppressNextDirtyEffect = false;
 
 	// Interaction modes
 	let spaceDown = $state(false);
@@ -618,7 +622,22 @@
 	}
 
 	$effect(() => { viewport; nodes; edges; selected; hoveredId; connectionSourceId; connectionPreviewEnd; isMarqueeSelecting; marqueeEnd; scheduleDraw(); drawMinimap(); });
-	$effect(() => { nodes; edges; viewport; if (!readonly) setDirty(true); });
+	$effect(() => {
+		nodes;
+		edges;
+		viewport;
+		if (readonly) return;
+		// The first reactive run observes the server-provided snapshot; it is not an edit.
+		if (!hasTrackedInitialState) {
+			hasTrackedInitialState = true;
+			return;
+		}
+		if (suppressNextDirtyEffect) {
+			suppressNextDirtyEffect = false;
+			return;
+		}
+		setDirty(true);
+	});
 
 	function selectedBounds(): { x: number; y: number; w: number; h: number } | null {
 		const ids = [...selected];
@@ -884,6 +903,21 @@
 	// External API
 	export function serialize(): BoardSnapshot {
 		return { version: initialSnapshot?.version ?? 1, viewport, nodes, edges, updatedAt: new Date().toISOString() };
+	}
+
+	/** Apply server/IndexedDB/relationship state without treating hydration as a user edit. */
+	export async function restoreSnapshot(snapshot: BoardSnapshot): Promise<boolean> {
+		if (dirty) return false;
+		suppressNextDirtyEffect = true;
+		viewport = { ...snapshot.viewport, pan: { ...snapshot.viewport.pan } };
+		nodes = snapshot.nodes.map((node) => ({ ...node }));
+		edges = snapshot.edges.map((edge) => ({ ...edge }));
+		setDirty(false);
+		scheduleDraw();
+		await tick();
+		// If Svelte had no reactive change to flush, don't suppress the next edit.
+		suppressNextDirtyEffect = false;
+		return true;
 	}
 
 	export function addNote(x: number, y: number, title?: string, body?: string): string {

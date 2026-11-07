@@ -33,7 +33,13 @@ registered as `blender-models` in the repository root `.mcp.json`.
   `.glb`, reporting measured triangles, bytes, SHA-256, and the default 8 MiB
   target result. Dependency IDs are retained as Blender/glTF extras; recipe
   dependencies do not silently become Blender transform parenting. An
-  optional bounded skeleton recipes create up to 32 named, parented bones and
+  optional `metadata` object preserves up to 16 bounded scalar key/value
+  properties on each primitive as `atlas_meta_*` Blender custom properties
+  and GLB extras. These are descriptive recipe metadata, not case evidence or
+  authorization fields. Primitive materials support base colors and an
+  optional bounded generated checker texture with a generated UV map; arbitrary
+  source-image textures and texture baking are not part of this recipe boundary. Optional
+  bounded skeleton recipes create up to 32 named, parented bones and
   rigidly bind declared primitive meshes with vertex weights. Optional object
   and bone transform tracks export as GLB animation clips. The skeleton path
   was round-tripped through Blender 4.3.2 on a synthetic three-bone fixture;
@@ -81,6 +87,8 @@ registered as `blender-models` in the repository root `.mcp.json`.
   Rig/clip retention depends on the source and exporter; this is format
   conversion, not Mixamo retargeting. This local asset conversion does not
   establish case provenance or make the output evidence.
+  Run `node scripts/mcp/blender/rigged-glb-readback-smoke.mjs` for the focused
+  two-pass Blender MCP import/readback check of the synthetic textured rig.
   Run `node scripts/mcp/blender/import-model-smoke.mjs` to create a synthetic
   OBJ, static FBX, and a generated one-bone animated/skinned FBX, and exercise
   the repository's animated GLB through the real stdio MCP and Blender process.

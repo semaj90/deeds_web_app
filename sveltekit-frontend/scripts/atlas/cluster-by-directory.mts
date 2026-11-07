@@ -52,7 +52,7 @@ Fetching packets...`);
 
   // Write clusters.jsonl
   const jsonlPath = path.join(EXPORT_DIR, "clusters.jsonl");
-  const lines = clusters.map((c) => JSON.stringify(c));
+  const lines = clusters.map((c: any) => JSON.stringify(c));
   await fs.writeFile(jsonlPath, lines.join("\n"));
 
   // Write Python script
@@ -101,7 +101,7 @@ print(f"✓ {OUTPUT_FILE}")
 
 📁 Directory: ${EXPORT_DIR}
 📊 Clusters: ${clusters.length}
-📦 Total packets: ${clusters.reduce((s, c) => s + c.packet_count, 0)}
+📦 Total packets: ${clusters.reduce((s: number, c: any) => s + c.packet_count, 0)}
 
 Files to upload:
   • clusters.jsonl

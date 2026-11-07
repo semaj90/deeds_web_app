@@ -31,7 +31,7 @@ import { resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { randomUUID } from 'node:crypto';
 import { DuckDBResultReader, type DuckDBConnection } from '@duckdb/node-api';
-import { createAtlasDuckDB } from '../../packages/atlas-duckdb/src/index.js';
+import { createAtlasDuckDB } from '../../../packages/atlas-duckdb/src/index.js';
 import {
 	buildGraphSnapshotParityTables,
 	hashGraphSnapshotParityRows,

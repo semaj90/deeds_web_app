@@ -1810,10 +1810,12 @@
     "sveltekit-superforms": "^2.0.0",
     "tesseract.js": "6.0.1",
     "three": "0.186.1",
+    "three-mesh-bvh": "0.9.18",
     "tree-sitter": "0.25.1",
     "tree-sitter-go": "0.25.0",
     "tree-sitter-python": "0.25.0",
     "web-push": "3.6.7",
+    "xstate": "5.24.0",
     "yaml": "2.9.0",
     "youtube-transcript": "1.2.1",
     "zod": "4.4.3"

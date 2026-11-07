@@ -10,6 +10,7 @@ import {
 
 const KEYS = [
 	'OTEL_ENABLED',
+	'OTEL_SDK_DISABLED',
 	'OTEL_EXPORT_ENABLED',
 	'OTEL_EXPORTER_OTLP_ENDPOINT',
 	'OTEL_EXPORTER_OTLP_TRACES_ENDPOINT',
@@ -35,6 +36,13 @@ describe('OpenTelemetry startup configuration', () => {
 	it('stays disabled by default: no telemetry environment means no SDK and no exporter', async () => {
 		expect(isOpenTelemetryEnabled()).toBe(false);
 		expect(resolveOtlpTracesUrl()).toBeNull();
+		await expect(ensureOpenTelemetry()).resolves.toEqual({ started: false, sdk: null });
+	});
+
+	it('honors the standard SDK disable switch even when an exporter is configured', async () => {
+		process.env.OTEL_SDK_DISABLED = 'true';
+		process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://127.0.0.1:4318/v1/traces';
+		expect(isOpenTelemetryEnabled()).toBe(false);
 		await expect(ensureOpenTelemetry()).resolves.toEqual({ started: false, sdk: null });
 	});
 

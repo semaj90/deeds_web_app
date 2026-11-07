@@ -1,6 +1,6 @@
 # Postgres Contract Mirrors Report
 
-Generated: 2026-10-29T00:28:48.156Z
+Generated: 2026-11-07T06:29:41.554Z
 
 ## Summary
 
@@ -28,7 +28,7 @@ Generated: 2026-10-29T00:28:48.156Z
 - static indexes: idx_kanban_tasks_workspace_id, kanban_ready_idx, kanban_running_heartbeat_idx
 - live columns: task_id, feature_id, feature_label, source_refs, lane, status, validation_command, assignee, priority, claim_token, claim_expires_at, last_heartbeat_at, current_run_id, attempt_count, failure_count, max_retries, started_at, completed_at, idempotency_key, created_at, updated_at, workspace_id, source_url, source_revision
 - live indexes: idx_kanban_tasks_workspace_id, kanban_ready_idx, kanban_running_heartbeat_idx, kanban_tasks_pkey
-- live rows: 167
+- live rows: 4514
 
 ## feature_registry
 
@@ -168,7 +168,7 @@ Generated: 2026-10-29T00:28:48.156Z
 - static indexes: idx_route_runtime_packets_community_confidence_idx, idx_route_runtime_packets_community_id_idx, idx_route_runtime_packets_community_source_idx, idx_route_runtime_packets_domain_class_idx, idx_route_runtime_packets_feature_id, idx_route_runtime_packets_feature_id_idx, idx_route_runtime_packets_feature_ids_gin, idx_route_runtime_packets_feature_label_idx, idx_route_runtime_packets_kmeans_cluster_idx, idx_route_runtime_packets_ledger_type_idx, idx_route_runtime_packets_lineage_version_idx, idx_route_runtime_packets_metadata_gin, idx_route_runtime_packets_packet_key_idx, idx_route_runtime_packets_raw_gin, idx_route_runtime_packets_som_col_idx, idx_route_runtime_packets_som_index_idx, idx_route_runtime_packets_som_row_idx, idx_route_runtime_packets_source_ref, idx_route_runtime_packets_source_ref_idx, idx_route_runtime_packets_source_refs_gin, idx_route_runtime_packets_tags_gin, idx_route_runtime_packets_tree_node_id, idx_rrp_captured_at, idx_rrp_cluster_id, idx_rrp_feature_cluster, idx_rrp_feature_ids_gin, idx_rrp_git_sha, idx_rrp_packet_version, idx_rrp_raw_domain, idx_rrp_raw_feature_id, idx_rrp_raw_gin, idx_rrp_route, idx_rrp_source_ref_quality, idx_rrp_source_refs_gin, idx_rrp_superseded_by, route_runtime_packets_packet_uuid_uq, rrp_feature_idx, rrp_packet_uuid_uidx, rrp_raw_gin, rrp_state_idx
 - live columns: id, captured_at, route, query_hash, query_preview, packet_key, source_ref, feature_label, community_id, community_confidence, community_source, domain_class, ledger_type, lineage_version, metadata, tags, canonical, payload_backfilled_at, som_row, som_col, som_index, kmeans_cluster, summary, source_refs, feature_ids, lane_ids, cluster_id, som_cluster, qdrant_hits, redis_hot_keys, latency_ms, cache_hit, cache_tier, user_id, session_id, response_tokens, raw, packet_version, source_ref_quality, packet_uuid, feature_id, git_diff_rank, git_sha, prompt_hash, repair_method, repair_reason, reward, route_state, superseded_by, supersedes_packet_uuid, tree_node_id
 - live indexes: idx_route_runtime_packets_community_confidence_idx, idx_route_runtime_packets_community_id_idx, idx_route_runtime_packets_community_source_idx, idx_route_runtime_packets_domain_class_idx, idx_route_runtime_packets_feature_label_idx, idx_route_runtime_packets_kmeans_cluster_idx, idx_route_runtime_packets_ledger_type_idx, idx_route_runtime_packets_lineage_version_idx, idx_route_runtime_packets_metadata_gin, idx_route_runtime_packets_packet_key_idx, idx_route_runtime_packets_som_col_idx, idx_route_runtime_packets_som_index_idx, idx_route_runtime_packets_som_row_idx, idx_route_runtime_packets_source_ref, idx_route_runtime_packets_source_ref_idx, idx_route_runtime_packets_tags_gin, idx_rrp_captured_at, idx_rrp_cluster_id, idx_rrp_feature_ids_gin, idx_rrp_packet_version, idx_rrp_raw_gin, idx_rrp_route, idx_rrp_source_ref_quality, idx_rrp_source_refs_gin, route_runtime_packets_packet_uuid_uq, route_runtime_packets_pkey
-- live rows: 11
+- live rows: 35
 
 ## Blockers
 

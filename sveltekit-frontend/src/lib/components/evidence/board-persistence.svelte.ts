@@ -44,14 +44,16 @@ function getDB(): Promise<IDBPDatabase> {
 	return dbPromise;
 }
 
-export async function saveLayout(layout: BoardLayout): Promise<void> {
+export async function saveLayout(layout: BoardLayout): Promise<boolean> {
 	try {
 		const snapshot = toPlainBoardLayout(layout);
 		const db = await getDB();
 		await db.put(STORE_NAME, { ...snapshot, timestamp: Date.now() });
 		updateLokiCache(snapshot);
+		return true;
 	} catch (err) {
 		console.error('[board-persistence] IndexedDB save failed:', err);
+		return false;
 	}
 }
 
@@ -135,28 +137,39 @@ function removeLokiCache(caseId: string): void {
 
 // ── Debounced Auto-Save (IndexedDB) ────────────────────────────
 
-let saveTimer: ReturnType<typeof setTimeout> | null = null;
-let pendingLayout: BoardLayout | null = null;
+const saveTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const pendingLayouts = new Map<string, BoardLayout>();
 
 export function scheduleSave(layout: BoardLayout): void {
-	pendingLayout = toPlainBoardLayout(layout);
+	if (!layout.caseId) return;
+	const pending = toPlainBoardLayout(layout);
+	pendingLayouts.set(layout.caseId, pending);
 	// Update LokiJS immediately for fast reads
-	updateLokiCache(pendingLayout);
+	updateLokiCache(pending);
 
-	if (saveTimer) clearTimeout(saveTimer);
-	saveTimer = setTimeout(async () => {
-		if (pendingLayout) {
-			await saveLayout(pendingLayout);
-			pendingLayout = null;
-		}
+	const priorTimer = saveTimers.get(layout.caseId);
+	if (priorTimer) clearTimeout(priorTimer);
+	const timer = setTimeout(async () => {
+		saveTimers.delete(layout.caseId);
+		const latest = pendingLayouts.get(layout.caseId);
+		if (!latest) return;
+		const saved = await saveLayout(latest);
+		if (saved && pendingLayouts.get(layout.caseId) === latest) pendingLayouts.delete(layout.caseId);
 	}, 2000);
+	saveTimers.set(layout.caseId, timer);
 }
 
-export function flushSave(): void {
-	if (saveTimer) clearTimeout(saveTimer);
-	if (pendingLayout) {
-		saveLayout(pendingLayout);
-		pendingLayout = null;
+export function flushSave(caseId?: string): void {
+	const caseIds = caseId ? [caseId] : [...pendingLayouts.keys()];
+	for (const id of caseIds) {
+		const timer = saveTimers.get(id);
+		if (timer) clearTimeout(timer);
+		saveTimers.delete(id);
+		const pending = pendingLayouts.get(id);
+		if (!pending) continue;
+		void saveLayout(pending).then((saved) => {
+			if (saved && pendingLayouts.get(id) === pending) pendingLayouts.delete(id);
+		});
 	}
 }
 
@@ -178,8 +191,13 @@ interface ServerSnapshot {
 	updatedAt?: string;
 }
 
-let serverSaveTimer: ReturnType<typeof setTimeout> | null = null;
-let pendingServerSave: { caseId: string; snapshot: ServerSnapshot } | null = null;
+interface PendingServerSave {
+	caseId: string;
+	snapshot: ServerSnapshot;
+}
+
+const serverSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const pendingServerSaves = new Map<string, PendingServerSave>();
 
 /**
  * Post the board snapshot to /api/cases/{caseId}/canvas. Intended shape is
@@ -188,52 +206,81 @@ let pendingServerSave: { caseId: string; snapshot: ServerSnapshot } | null = nul
  */
 export function scheduleServerSave(caseId: string, snapshot: ServerSnapshot): void {
 	if (!caseId) return;
-	pendingServerSave = { caseId, snapshot };
+	const pending = { caseId, snapshot };
+	pendingServerSaves.set(caseId, pending);
 
-	if (serverSaveTimer) clearTimeout(serverSaveTimer);
-	serverSaveTimer = setTimeout(async () => {
-		if (pendingServerSave) {
-			await postSnapshotToServer(pendingServerSave.caseId, pendingServerSave.snapshot);
-			pendingServerSave = null;
-		}
+	const priorTimer = serverSaveTimers.get(caseId);
+	if (priorTimer) clearTimeout(priorTimer);
+	const timer = setTimeout(async () => {
+		serverSaveTimers.delete(caseId);
+		const latest = pendingServerSaves.get(caseId);
+		if (!latest) return;
+		const saved = await postSnapshotToServer(latest.caseId, latest.snapshot);
+		if (saved && pendingServerSaves.get(caseId) === latest) pendingServerSaves.delete(caseId);
 	}, 4000);
+	serverSaveTimers.set(caseId, timer);
 }
 
-export function flushServerSave(): void {
-	if (serverSaveTimer) clearTimeout(serverSaveTimer);
-	if (!pendingServerSave) return;
-	const { caseId, snapshot } = pendingServerSave;
-	pendingServerSave = null;
+/** Save the current snapshot once, replacing any queued debounce for this case. */
+export async function saveServerSnapshot(caseId: string, snapshot: ServerSnapshot): Promise<boolean> {
+	if (!caseId) return false;
+	const timer = serverSaveTimers.get(caseId);
+	if (timer) clearTimeout(timer);
+	serverSaveTimers.delete(caseId);
+	const pending = { caseId, snapshot };
+	pendingServerSaves.set(caseId, pending);
+	const saved = await postSnapshotToServer(caseId, snapshot);
+	if (saved && pendingServerSaves.get(caseId) === pending) pendingServerSaves.delete(caseId);
+	return saved;
+}
 
-	// sendBeacon survives beforeunload; falls back to fetch in other contexts.
-	if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
-		try {
-			const blob = new Blob([JSON.stringify(snapshot)], {
-				type: 'application/json',
-			});
-			const ok = navigator.sendBeacon(`/api/cases/${caseId}/canvas`, blob);
-			if (ok) return;
-		} catch {
-			/* fall through to fetch */
+export function flushServerSave(caseId?: string): void {
+	const caseIds = caseId ? [caseId] : [...pendingServerSaves.keys()];
+	for (const id of caseIds) {
+		const timer = serverSaveTimers.get(id);
+		if (timer) clearTimeout(timer);
+		serverSaveTimers.delete(id);
+		const pending = pendingServerSaves.get(id);
+		if (!pending) continue;
+
+		// sendBeacon survives beforeunload; falls back to fetch in other contexts.
+		if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+			try {
+				const blob = new Blob([JSON.stringify(pending.snapshot)], { type: 'application/json' });
+				if (navigator.sendBeacon(`/api/cases/${id}/canvas`, blob)) {
+					if (pendingServerSaves.get(id) === pending) pendingServerSaves.delete(id);
+					continue;
+				}
+			} catch {
+				/* fall through to fetch */
+			}
 		}
+		void postSnapshotToServer(id, pending.snapshot).then((saved) => {
+			if (saved && pendingServerSaves.get(id) === pending) pendingServerSaves.delete(id);
+		});
 	}
-	// Fallback: fire-and-forget fetch. Await is pointless here — page may unload.
-	void postSnapshotToServer(caseId, snapshot);
 }
 
 async function postSnapshotToServer(
 	caseId: string,
 	snapshot: ServerSnapshot,
-): Promise<void> {
+): Promise<boolean> {
 	try {
-		await fetch(`/api/cases/${caseId}/canvas`, {
+		const response = await fetch(`/api/cases/${caseId}/canvas`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(snapshot),
 			// Avoid cancellation on navigate
 			keepalive: true,
+		signal: AbortSignal.timeout(30_000),
 		});
+		if (!response.ok) {
+			console.warn(`[board-persistence] server save rejected (${response.status}) for case ${caseId}`);
+			return false;
+		}
+		return true;
 	} catch (err) {
 		console.warn('[board-persistence] server save failed:', (err as Error)?.message);
+		return false;
 	}
 }

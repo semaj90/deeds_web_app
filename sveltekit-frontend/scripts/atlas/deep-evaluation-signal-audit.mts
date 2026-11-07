@@ -92,7 +92,7 @@ async function main() {
       metric: 'Candidates per query',
       value: `${(state.total_pairs / state.unique_queries).toFixed(1)} avg`,
       interpretation:
-        (state.total_pairs / state.unique_queries).toFixed(1) < 20
+        (state.total_pairs / state.unique_queries) < 20
           ? 'LOW: Need ≥20 candidates per query to capture ranking patterns.'
           : 'GOOD: Sufficient candidates for rank learning.',
       impact: 'high',

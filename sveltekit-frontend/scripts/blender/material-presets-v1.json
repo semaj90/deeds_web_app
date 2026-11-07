@@ -1,0 +1,11 @@
+{
+  "schema": "atlas.render-material-presets.v1",
+  "classification": "SYNTHETIC_DEMONSTRATIVE_PRESET",
+  "colorEncoding": "SRGB_8BIT",
+  "presets": [
+    { "id": "hypothesis-amber", "name": "Hypothesis Amber", "baseColorSrgb": "#F59E0B", "alpha": 1, "metallic": 0, "roughness": 0.78 },
+    { "id": "synthetic-cyan", "name": "Synthetic Cyan", "baseColorSrgb": "#22D3EE", "alpha": 1, "metallic": 0, "roughness": 0.62 },
+    { "id": "neutral-clay", "name": "Neutral Clay", "baseColorSrgb": "#9CA3AF", "alpha": 1, "metallic": 0, "roughness": 0.9 },
+    { "id": "review-red", "name": "Review Red", "baseColorSrgb": "#EF4444", "alpha": 1, "metallic": 0, "roughness": 0.7 }
+  ]
+}

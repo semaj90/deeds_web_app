@@ -126,3 +126,141 @@ export function aliceBoneForAnyClipNode(name: string): string | null {
 	return aliceBoneForClipNode(name) ?? MIXAMO_TO_ALICE_BONE[name] ?? null;
 }
 
+/**
+ * Canonical VRM 1.0 Humanoid semantic bone identifiers (camelCase).
+ * Standardized across VRM 0.x / 1.0 humanoid specification.
+ */
+export const VRM_HUMANOID_BONES = [
+	'hips',
+	'spine',
+	'chest',
+	'upperChest',
+	'neck',
+	'head',
+	'leftEye',
+	'rightEye',
+	'jaw',
+	'leftShoulder',
+	'rightShoulder',
+	'leftUpperArm',
+	'rightUpperArm',
+	'leftLowerArm',
+	'rightLowerArm',
+	'leftHand',
+	'rightHand',
+	'leftUpperLeg',
+	'rightUpperLeg',
+	'leftLowerLeg',
+	'rightLowerLeg',
+	'leftFoot',
+	'rightFoot',
+	'leftToes',
+	'rightToes'
+] as const;
+
+export type VrmHumanoidBone = (typeof VRM_HUMANOID_BONES)[number];
+
+/** Canonical VRM 1.0 semantic names mapped to Alice/VRoid J_Bip_* bones. */
+export const VRM_TO_ALICE_BONE: Readonly<Record<VrmHumanoidBone, string>> = {
+	hips: 'J_Bip_C_Hips',
+	spine: 'J_Bip_C_Spine',
+	chest: 'J_Bip_C_Chest',
+	upperChest: 'J_Bip_C_UpperChest',
+	neck: 'J_Bip_C_Neck',
+	head: 'J_Bip_C_Head',
+	leftEye: 'J_Adj_L_FaceEye',
+	rightEye: 'J_Adj_R_FaceEye',
+	jaw: 'J_Bip_C_Jaw',
+	leftShoulder: 'J_Bip_L_Shoulder',
+	rightShoulder: 'J_Bip_R_Shoulder',
+	leftUpperArm: 'J_Bip_L_UpperArm',
+	rightUpperArm: 'J_Bip_R_UpperArm',
+	leftLowerArm: 'J_Bip_L_LowerArm',
+	rightLowerArm: 'J_Bip_R_LowerArm',
+	leftHand: 'J_Bip_L_Hand',
+	rightHand: 'J_Bip_R_Hand',
+	leftUpperLeg: 'J_Bip_L_UpperLeg',
+	rightUpperLeg: 'J_Bip_R_UpperLeg',
+	leftLowerLeg: 'J_Bip_L_LowerLeg',
+	rightLowerLeg: 'J_Bip_R_LowerLeg',
+	leftFoot: 'J_Bip_L_Foot',
+	rightFoot: 'J_Bip_R_Foot',
+	leftToes: 'J_Bip_L_ToeBase',
+	rightToes: 'J_Bip_R_ToeBase'
+};
+
+/** Alice/VRoid J_Bip_* bones inverted to canonical VRM 1.0 semantic names. */
+export const ALICE_TO_VRM_BONE: Readonly<Record<string, VrmHumanoidBone>> = Object.freeze(
+	Object.fromEntries(
+		Object.entries(VRM_TO_ALICE_BONE).map(([vrm, alice]) => [alice, vrm as VrmHumanoidBone])
+	)
+);
+
+/**
+ * Fallback hierarchy for optional humanoid bones when an armature lacks them.
+ * e.g., upperChest -> chest -> spine.
+ */
+export const VRM_OPTIONAL_BONE_FALLBACKS: Readonly<Partial<Record<VrmHumanoidBone, VrmHumanoidBone>>> = {
+	upperChest: 'chest',
+	chest: 'spine',
+	leftShoulder: 'leftUpperArm',
+	rightShoulder: 'rightUpperArm',
+	leftToes: 'leftFoot',
+	rightToes: 'rightFoot'
+};
+
+/**
+ * Resolves any bone identifier (canonical VRM, Alice J_Bip_*, Mixamo, or mocap clip name)
+ * into its canonical VRM 1.0 semantic bone name.
+ */
+export function resolveCanonicalBone(name: string): VrmHumanoidBone | null {
+	if ((VRM_HUMANOID_BONES as readonly string[]).includes(name)) {
+		return name as VrmHumanoidBone;
+	}
+	if (name in ALICE_TO_VRM_BONE) {
+		return ALICE_TO_VRM_BONE[name];
+	}
+	const alice = aliceBoneForAnyClipNode(name);
+	if (alice && alice in ALICE_TO_VRM_BONE) {
+		return ALICE_TO_VRM_BONE[alice];
+	}
+	return null;
+}
+
+/**
+ * Resolves any bone identifier into the Alice J_Bip_* bone identifier.
+ */
+export function resolveAliceBone(name: string): string | null {
+	if (name in VRM_TO_ALICE_BONE) {
+		return VRM_TO_ALICE_BONE[name as VrmHumanoidBone];
+	}
+	if (name.startsWith('J_Bip_') || name.startsWith('J_Adj_')) {
+		return name;
+	}
+	return aliceBoneForAnyClipNode(name);
+}
+
+/**
+ * Resolves a bone on a target armature, applying canonical humanoid fallbacks
+ * (e.g., upperChest -> chest -> spine) if the exact bone is absent.
+ */
+export function resolveBoneWithFallback(
+	name: string,
+	availableBones: Set<string> | string[]
+): string | null {
+	const boneSet = availableBones instanceof Set ? availableBones : new Set(availableBones);
+	if (boneSet.has(name)) return name;
+
+	const targetAlice = resolveAliceBone(name);
+	if (targetAlice && boneSet.has(targetAlice)) return targetAlice;
+
+	let canonical = resolveCanonicalBone(name);
+	while (canonical) {
+		const aliceTarget = VRM_TO_ALICE_BONE[canonical];
+		if (aliceTarget && boneSet.has(aliceTarget)) return aliceTarget;
+		if (boneSet.has(canonical)) return canonical;
+		canonical = VRM_OPTIONAL_BONE_FALLBACKS[canonical] ?? null;
+	}
+
+	return null;
+}

@@ -97,7 +97,7 @@ export function makeIdlePose(rig: Rig, glbBones: readonly GlbBone[], options: Id
 		armDelta.set(upper, qFromAxisAngle(axis, Math.min(o.armDownDegrees * RAD, toDown)));
 	}
 
-	const bones = [...armDelta.keys(), ...breathBones.map(([n]) => n)];
+	const bones = Array.from(armDelta.keys()).concat(breathBones.map(([n]) => n));
 	const breathHz = o.breathsPerMinute / 60;
 
 	return {

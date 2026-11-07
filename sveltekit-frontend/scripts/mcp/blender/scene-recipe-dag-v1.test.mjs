@@ -28,6 +28,26 @@ test('orders recipes parent-first and maps validated primitive codes to Blender 
 	]);
 });
 
+test('preserves bounded primitive key-value metadata for Blender and GLB extras', () => {
+	const recipe = dag([{
+		...node('evidence-box'),
+		metadata: { role: 'demonstrative-prop', layer: 'evidence', visibleByDefault: true, sourceOrdinal: 3 },
+	}]);
+	assert.deepEqual(sceneRecipeToBlenderObjectsV1(recipe)[0].metadata, recipe.nodes[0].metadata);
+	assert.throws(() => orderSceneRecipeDAGV1(dag([{ ...node('bad-key'), metadata: { 'unsafe key': 'value' } }])), /Invalid/);
+	assert.throws(() => orderSceneRecipeDAGV1(dag([{ ...node('bad-value'), metadata: { nested: { not: 'scalar' } } }])), /Invalid/);
+	assert.throws(() => orderSceneRecipeDAGV1(dag([{ ...node('too-many'), metadata: Object.fromEntries(Array.from({ length: 17 }, (_, index) => [`k${index}`, index])) }])), /at most 16/);
+});
+
+test('maps bounded generated checker textures and rejects unsupported texture recipes', () => {
+	const texture = { kind: 'CHECKER', colorA: [0.1, 0.2, 0.3, 1], colorB: [0.8, 0.7, 0.6, 1], cells: 8, resolution: 64 };
+	const recipe = dag([{ ...node('textured-prop'), texture }]);
+	assert.deepEqual(sceneRecipeToBlenderObjectsV1(recipe)[0].texture, texture);
+	assert.throws(() => orderSceneRecipeDAGV1(dag([{ ...node('large-texture'), texture: { ...texture, resolution: 4096 } }])), /less than or equal to 128/);
+	assert.throws(() => orderSceneRecipeDAGV1(dag([{ ...node('bad-color'), texture: { ...texture, colorA: [2, 0, 0, 1] } }])), /too_big|less than or equal/i);
+	assert.throws(() => orderSceneRecipeDAGV1(dag([{ ...node('unsupported'), texture: { ...texture, kind: 'IMAGE_PATH' } }])), /Invalid literal value/);
+});
+
 test('rejects missing, duplicate, and self dependencies before Blender is invoked', () => {
 	assert.throws(() => orderSceneRecipeDAGV1(dag([node('child', ['missing'])])), /SCENE_RECIPE_MISSING_DEPENDENCY/);
 	assert.throws(() => orderSceneRecipeDAGV1(dag([node('same'), node('same')])), /SCENE_RECIPE_DUPLICATE_NODE/);
@@ -106,4 +126,58 @@ test('rejects rig cycles, missing parents, unknown node bones, and unknown anima
 	const badTrack = withSkeleton([bone('root')]);
 	badTrack.animation = { name: 'bad', tracks: [], boneTracks: [{ boneId: 'missing', keyframes: [{ frame: 0, rotationQuaternion: [0, 0, 0, 1] }, { frame: 1, rotationQuaternion: [0, 0, 0, 1] }] }] };
 	assert.throws(() => sceneRecipeToBlenderObjectsV1(badTrack), /SCENE_ANIMATION_UNKNOWN_BONE/);
+});
+
+test('auto-rigs SAM 2D cutout billboard with 2-bone gradient or 52-bone humanoid skeleton', () => {
+	const samCutout = {
+		...node('evidence-billboard'),
+		primitiveOpCode: 7, // sam_billboard
+		boneId: 'cutout_root',
+		rigMode: 'gradient_2bone',
+		metadata: { exhibit: 'E-002', segmented_by: 'SAM-2' }
+	};
+	// 52-bone humanoid rig
+	const bones52 = [
+		{ boneId: 'cutout_root', parentBoneId: null, head: [0, 0, 0], tail: [0, 0.1, 0] },
+		{ boneId: 'cutout_sway', parentBoneId: 'cutout_root', head: [0, 0.1, 0], tail: [0, 1.8, 0] },
+		...Array.from({ length: 50 }, (_, i) => ({
+			boneId: `bone_${i + 2}`,
+			parentBoneId: i === 0 ? 'cutout_sway' : `bone_${i + 1}`,
+			head: [0, 1.8 + i * 0.02, 0],
+			tail: [0, 1.8 + (i + 1) * 0.02, 0]
+		}))
+	];
+	assert.equal(bones52.length, 52);
+
+	const recipe = {
+		...dag([samCutout]),
+		skeleton: { bones: bones52 }
+	};
+
+	const objects = sceneRecipeToBlenderObjectsV1(recipe);
+	assert.equal(objects.length, 1);
+	assert.equal(objects[0].primitive, 'sam_billboard');
+	assert.equal(objects[0].boneId, 'cutout_root');
+	assert.equal(objects[0].rigMode, 'gradient_2bone');
+	assert.equal(objects[0].metadata.segmented_by, 'SAM-2');
+
+	const skeleton = sceneRecipeSkeletonToBlenderV1(recipe);
+	assert.equal(skeleton.bones.length, 52);
+	assert.equal(skeleton.bones[0].boneId, 'cutout_root');
+	assert.equal(skeleton.bones[1].boneId, 'cutout_sway');
+});
+
+test('rejects skeletons with more than 64 bones', () => {
+	const bones65 = [
+		{ boneId: 'b_0', parentBoneId: null, head: [0, 0, 0], tail: [0, 1, 0] },
+		...Array.from({ length: 64 }, (_, i) => ({
+			boneId: `b_${i + 1}`,
+			parentBoneId: `b_${i}`,
+			head: [0, i + 1, 0],
+			tail: [0, i + 2, 0]
+		}))
+	];
+	assert.equal(bones65.length, 65);
+	const recipe = { ...dag([node('n')]), skeleton: { bones: bones65 } };
+	assert.throws(() => sceneRecipeSkeletonToBlenderV1(recipe));
 });

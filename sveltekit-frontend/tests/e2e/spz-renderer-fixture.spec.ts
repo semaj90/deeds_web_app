@@ -31,13 +31,35 @@ test('synthetic SPZ fixture decodes, renders, samples and disposes without write
 	const backend = await page.locator('[data-testid="renderer-backend"]').textContent().catch(() => null);
 	const backendLabel = backend ?? (await page.locator('body').innerText()).match(/BACKEND\s+([^\n]+)/)?.[1];
 	expect(backendLabel).toMatch(/webgpu|webgl2/i);
+	const samplingDiagnostics = page.getByTestId('render-sampling-diagnostics');
+	const readBackingBuffer = async () => {
+		const text = await samplingDiagnostics.textContent();
+		const match = text?.match(/measured drawing buffer (\d+)×(\d+)px/);
+		expect(match, text ?? 'missing sampling diagnostics').not.toBeNull();
+		return { width: Number(match?.[1]), height: Number(match?.[2]) };
+	};
+	await expect(samplingDiagnostics).toContainText(/HIGH · native/);
+	const highBuffer = await readBackingBuffer();
+	const highReadout = await samplingDiagnostics.textContent();
 
 	const half = page.getByRole('button', { name: 'Half resolution' });
 	await half.click();
 	await expect(half).toHaveAttribute('aria-pressed', 'true');
+	await expect(samplingDiagnostics).toContainText(/MEDIUM · half · CSS \d+×\d+px · measured drawing buffer [1-9]\d*×[1-9]\d*px/);
+	await expect(samplingDiagnostics).toContainText('antialias requested ON; actual sample count unmeasured');
+	const mediumBuffer = await readBackingBuffer();
+	const mediumReadout = await samplingDiagnostics.textContent();
+	expect(mediumBuffer.width / highBuffer.width).toBeCloseTo(0.5, 2);
+	expect(mediumBuffer.height / highBuffer.height).toBeCloseTo(0.5, 2);
 	const retro = page.getByRole('button', { name: 'Retro pixels' });
 	await retro.click();
 	await expect(retro).toHaveAttribute('aria-pressed', 'true');
+	await expect(samplingDiagnostics).toContainText(/LOW · retro/);
+	const lowBuffer = await readBackingBuffer();
+	const lowReadout = await samplingDiagnostics.textContent();
+	expect(lowBuffer.width / mediumBuffer.width).toBeCloseTo(0.5, 2);
+	expect(lowBuffer.height / mediumBuffer.height).toBeCloseTo(0.5, 2);
+	console.log(`[render-sampling-readback] ${JSON.stringify({ high: highReadout, medium: mediumReadout, low: lowReadout })}`);
 	await page.screenshot({ path: testInfo.outputPath('spz-fixture-rendered.png'), fullPage: true });
 
 	await page.getByRole('button', { name: 'Dispose' }).click();
@@ -184,7 +206,28 @@ test('synthetic playground creates, selects and exports multiple editable meshes
 	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
 });
 
-test('local Mixamo-derived GLB clip can be previewed without changing case data', async ({ page }, testInfo) => {
+test('case scene navigation preserves the scene and exhibit IDs across the editor return link', async ({ page }) => {
+	const caseId = '11111111-1111-4111-8111-111111111111';
+	const sceneId = '22222222-2222-4222-8222-222222222222';
+	const evidenceId = '33333333-3333-4333-8333-333333333333';
+	const nonReadRequests: string[] = [];
+	const pageErrors: string[] = [];
+	page.on('request', (request) => {
+		if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method())) nonReadRequests.push(`${request.method()} ${request.url()}`);
+	});
+	page.on('pageerror', (error) => pageErrors.push(error.message));
+	await page.route('**/api/analytics/events', (route) => route.fulfill({ status: 204, body: '' }));
+	await page.route('**/api/errors/client-report', (route) => route.fulfill({ status: 204, body: '' }));
+	await page.goto(`/demos/spz-renderer?caseId=${caseId}&sceneId=${sceneId}&evidenceId=${evidenceId}`);
+	const returnLink = page.getByTestId('return-to-evidence-board');
+	await expect(returnLink).toBeVisible();
+	await expect(returnLink).toHaveAttribute('href', `/cases/${caseId}/board?sceneId=${sceneId}&evidenceId=${evidenceId}`);
+	await expect(page.getByRole('button', { name: 'Save case scene revision' })).toBeDisabled();
+	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events') && !request.includes('/api/errors/client-report'))).toEqual([]);
+	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
+});
+
+test('Mixamo motion retargets on the pre-case character without changing case data', async ({ page }, testInfo) => {
 	const pageErrors: string[] = [];
 	const nonReadRequests: string[] = [];
 	page.on('pageerror', (error) => pageErrors.push(error.message));
@@ -192,28 +235,28 @@ test('local Mixamo-derived GLB clip can be previewed without changing case data'
 		if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method())) nonReadRequests.push(`${request.method()} ${request.url()}`);
 	});
 	await page.route('**/api/analytics/events', (route) => route.fulfill({ status: 204, body: '' }));
-	await page.goto('/demos/spz-renderer');
-	await page.locator('input[type="file"][accept=".glb,model/gltf-binary"]').setInputFiles(resolve(process.cwd(), 'static/models/courtroom/walk_normal.glb'));
-	await expect(page.getByText(/Blender-authored GLB loaded into the Three\.js fixture viewer/)).toBeVisible({ timeout: 30_000 });
-	await expect(page.getByTestId('spz-animation-status')).toContainText('local clip(s) available');
-	const play = page.getByRole('button', { name: 'Play animation' });
-	await expect(play).toBeEnabled();
-	await play.click();
-	await expect(page.getByText(/Previewing .* locally\. Playback is illustrative/)).toBeVisible();
-	await page.getByRole('button', { name: 'Stop animation' }).click();
-	const downloads: any[] = [];
-	page.on('download', (download) => downloads.push(download));
-	await page.getByRole('button', { name: 'Download edited GLB' }).click();
-	await expect.poll(() => downloads.length).toBe(2);
-	const { readFile } = await import('node:fs/promises');
-	const manifestPath = testInfo.outputPath(downloads[1].suggestedFilename());
-	await downloads[1].saveAs(manifestPath);
-	const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
-	expect(manifest.coordinateFrame).toBe('GLTF_Y_UP_METERS');
-	expect(manifest.animations.length).toBeGreaterThan(0);
-	expect(manifest.assets).toHaveLength(2);
-	expect(manifest.assets[0].role).toBe('SOURCE');
-	expect(manifest.assets[1].role).toBe('DERIVED');
+	await page.route('**/api/errors/client-report', (route) => route.fulfill({ status: 204, body: '' }));
+	await page.goto('/demos/spz-renderer?mode=preflight');
+	await page.getByTestId('local-asset-file-input').setInputFiles(resolve(process.cwd(), 'static/models/courtroom/character_alice.glb'));
+	await expect(page.getByText(/GLB loaded into the local Three\.js editor/)).toBeVisible({ timeout: 30_000 });
+	const syntheticSplatVisibility = page.getByTestId('synthetic-splat-visibility');
+	await expect(syntheticSplatVisibility).toBeChecked();
+	await syntheticSplatVisibility.uncheck();
+	await expect(syntheticSplatVisibility).not.toBeChecked();
+	await page.getByTestId('frame-editable-scene').click();
+	await page.getByTestId('retarget-motion-input').setInputFiles(resolve(process.cwd(), 'static/models/courtroom/objection_dramatic.glb'));
+	await expect(page.getByTestId('retarget-status')).toContainText('52 bones mapped', { timeout: 30_000 });
+	await page.getByTestId('retarget-play').click();
+	await expect(page.getByTestId('retarget-status')).toContainText('Playing');
+	await expect(page.getByTestId('retarget-bone-updates')).not.toHaveText('0 target bone rotations applied');
+	await expect(page.getByTestId('retarget-bone-changes')).not.toHaveText('0 target bones differ from rest pose');
+	const viewportBounds = await page.getByTestId('spz-fixture-canvas').boundingBox();
+	expect(viewportBounds?.height).toBeGreaterThanOrEqual(160);
+	await testInfo.attach('mixamo-retarget-active-pose.png', { body: await page.screenshot(), contentType: 'image/png' });
+	await page.getByTestId('retarget-stop').click();
+	await expect(page.getByTestId('retarget-status')).toContainText('character rest pose restored');
+	await expect(page.getByTestId('retarget-bone-updates')).toHaveText('0 target bone rotations applied');
+	await expect(page.getByTestId('retarget-bone-changes')).toHaveText('0 target bones differ from rest pose');
 	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events'))).toEqual([]);
 	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
 });
@@ -231,9 +274,12 @@ test('generated primitive transform animation plays in the Three.js playground w
 		clientErrorReports.push(route.request().postData() ?? '');
 		await route.fulfill({ status: 204, body: '' });
 	});
-	await page.goto('/demos/spz-renderer');
-	await page.locator('input[type="file"][accept=".glb,model/gltf-binary"]').setInputFiles(resolve(process.cwd(), '../.tmp/blender-mcp-workspace/smoke/codex-animation-mcp-20261105.glb'));
-	await expect(page.getByText(/Blender-authored GLB loaded into the Three\.js fixture viewer/)).toBeVisible({ timeout: 30_000 });
+	await page.goto('/demos/spz-renderer?mode=preflight');
+	await page.getByTestId('local-asset-file-input').setInputFiles(resolve(process.cwd(), '../.tmp/blender-mcp-workspace/smoke/codex-animation-mcp-20261105.glb'));
+	await expect(page.getByText(/GLB loaded into the local Three\.js editor/)).toBeVisible({ timeout: 30_000 });
+	const syntheticSplatVisibility = page.getByTestId('synthetic-splat-visibility');
+	if (await syntheticSplatVisibility.isChecked()) await syntheticSplatVisibility.uncheck();
+	await page.getByTestId('frame-editable-scene').click();
 	await expect(page.getByTestId('spz-animation-status')).toContainText('local clip(s) available');
 	const animation = page.getByRole('combobox', { name: 'Select animation clip' });
 	const clips = await animation.locator('option').allTextContents();
@@ -272,4 +318,102 @@ test('Blender scene-recipe GLB opens in the Three.js playground without case wri
 	await page.screenshot({ path: screenshotPath, fullPage: true });
 	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events'))).toEqual([]);
 	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
+});
+
+test('rounded Blender primitive keeps its PBR material and UVs in pre-case Three.js', async ({ page }, testInfo) => {
+	const fixturePath = process.env.MATERIAL_CUBE_GLB_PATH;
+	test.skip(!fixturePath, 'Set MATERIAL_CUBE_GLB_PATH to a GLB produced by tessellated-cube-material-v1.py.');
+	const pageErrors: string[] = [];
+	const nonReadRequests: string[] = [];
+	page.on('pageerror', (error) => pageErrors.push(error.message));
+	page.on('request', (request) => {
+		if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method())) nonReadRequests.push(`${request.method()} ${request.url()}`);
+	});
+	await page.route('**/api/analytics/events', (route) => route.fulfill({ status: 204, body: '' }));
+	await page.route('**/api/errors/client-report', (route) => route.fulfill({ status: 204, body: '' }));
+	await page.goto('/demos/spz-renderer?mode=preflight');
+	await page.getByTestId('local-asset-file-input').setInputFiles(resolve(fixturePath!));
+	await expect(page.getByTestId('preflight-file')).toContainText('rounded-grid-cube.glb', { timeout: 30_000 });
+	await expect(page.getByTestId('preflight-geometry')).toContainText('2 meshes');
+	await expect(page.getByTestId('preflight-uv-textures')).toHaveText(/^[1-9]\d* UV channels? · 0 textures/);
+	await expect(page.getByTestId('preflight-material-count')).toContainText('2 materials');
+	await page.getByText('Inspect material values').click();
+	await expect(page.getByTestId('preflight-material-list')).toContainText('Hypothesis Amber');
+	await expect(page.getByTestId('preflight-material-list')).toContainText('MeshStandardMaterial');
+	await expect(page.getByTestId('preflight-material-list')).toContainText('base #f59e0b');
+	await expect(page.getByTestId('preflight-material-list')).toContainText('roughness 0.78');
+	await expect(page.getByTestId('preflight-report')).toContainText('MiB geometry buffers');
+	await expect(page.getByTestId('preflight-report')).toContainText('decoded RGBA texture estimate');
+	await page.getByTestId('primitive-detail').selectOption('retro');
+	await page.getByRole('button', { name: 'Add sphere' }).click();
+	await expect(page.getByTestId('preflight-geometry')).toContainText('3 meshes');
+	await page.getByTestId('material-mode-phong').click();
+	await expect(page.getByTestId('material-mode-phong')).toHaveAttribute('aria-pressed', 'true');
+	await page.getByTestId('material-mode-source').click();
+	await expect(page.getByTestId('material-mode-source')).toHaveAttribute('aria-pressed', 'true');
+	await page.getByTestId('shader-source-file-input').setInputFiles({ name: 'demo.wgsl', mimeType: 'text/plain', buffer: Buffer.from('@fragment fn main() -> @location(0) vec4f { return vec4f(1.0); }') });
+	await expect(page.getByTestId('shader-source-name')).toHaveText('demo.wgsl');
+	await expect(page.getByTestId('shader-source-hash')).toHaveText(/^[a-f0-9]{64}$/);
+	await expect(page.getByTestId('shader-source-receipt')).toContainText('local inventory only');
+	await expect(page.getByTestId('preflight-source-hash')).toContainText(/SHA-256: [a-f0-9]{64}/);
+	await expect(page.getByText(/Confirm baking in Blender/)).toBeVisible();
+	const canvasBox = await page.getByTestId('spz-fixture-canvas').boundingBox();
+	expect(canvasBox?.height ?? 0).toBeGreaterThan(160);
+	await page.screenshot({ path: testInfo.outputPath('rounded-grid-cube-preflight.png'), fullPage: true });
+	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
+	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events') && !request.includes('/api/errors/client-report'))).toEqual([]);
+});
+
+test('Blender material preset swatches load in pre-case Three.js without case writes', async ({ page }, testInfo) => {
+	const fixturePath = process.env.MATERIAL_PRESETS_GLB_PATH;
+	test.skip(!fixturePath, 'Set MATERIAL_PRESETS_GLB_PATH to a GLB produced by material-preset-swatch-v1.py.');
+	const pageErrors: string[] = [];
+	const nonReadRequests: string[] = [];
+	page.on('pageerror', (error) => pageErrors.push(error.message));
+	page.on('request', (request) => {
+		if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method())) nonReadRequests.push(`${request.method()} ${request.url()}`);
+	});
+	await page.route('**/api/analytics/events', (route) => route.fulfill({ status: 204, body: '' }));
+	await page.route('**/api/errors/client-report', (route) => route.fulfill({ status: 204, body: '' }));
+	await page.addInitScript(() => {
+		const readArrayBuffer = Blob.prototype.arrayBuffer;
+		Blob.prototype.arrayBuffer = async function (this: Blob) {
+			if ((this as File).name === 'cancel-import.glb') await new Promise((resolve) => setTimeout(resolve, 1000));
+			return readArrayBuffer.call(this);
+		};
+	});
+	await page.goto('/demos/spz-renderer?mode=preflight');
+	await page.getByTestId('local-asset-file-input').setInputFiles(resolve(fixturePath!));
+	await expect(page.getByTestId('preflight-file')).toContainText('material-presets-v1.glb', { timeout: 30_000 });
+	await expect(page.getByTestId('asset-import-state')).toHaveText('Import: ready');
+	await expect(page.getByTestId('preflight-geometry')).toContainText('5 meshes');
+	await expect(page.getByTestId('preflight-material-count')).toContainText('5 materials');
+	await page.getByText('Inspect material values').click();
+	const materialList = page.getByTestId('preflight-material-list');
+	for (const name of ['Hypothesis Amber', 'Synthetic Cyan', 'Neutral Clay', 'Review Red']) {
+		await expect(materialList).toContainText(name);
+	}
+	const canvasBox = await page.getByTestId('spz-fixture-canvas').boundingBox();
+	expect(canvasBox?.height ?? 0).toBeGreaterThan(160);
+	await page.getByTestId('local-asset-file-input').setInputFiles({
+		name: 'cancel-import.glb',
+		mimeType: 'model/gltf-binary',
+		buffer: Buffer.alloc(64)
+	});
+	const cancelImport = page.getByTestId('cancel-asset-import');
+	await expect(cancelImport).toBeVisible({ timeout: 5_000 });
+	await cancelImport.click();
+	await expect(page.getByTestId('asset-import-state')).toHaveText('Import: idle');
+	await page.waitForTimeout(1_100);
+	await expect(page.getByTestId('preflight-file')).toContainText('material-presets-v1.glb');
+	await expect(page.getByTestId('preflight-geometry')).toContainText('5 meshes');
+	await page.getByTestId('local-asset-file-input').setInputFiles({ name: 'invalid.glb', mimeType: 'model/gltf-binary', buffer: Buffer.alloc(64) });
+	await expect(page.getByTestId('asset-import-state')).toHaveText('Import: failed', { timeout: 10_000 });
+	await expect(page.getByTestId('preflight-file')).toContainText('material-presets-v1.glb');
+	await page.getByTestId('local-asset-file-input').setInputFiles(resolve(fixturePath!));
+	await expect(page.getByTestId('asset-import-state')).toHaveText('Import: ready', { timeout: 30_000 });
+	await expect(page.getByTestId('preflight-geometry')).toContainText('5 meshes');
+	await page.screenshot({ path: testInfo.outputPath('blender-material-presets-threejs-preflight.png'), fullPage: true });
+	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
+	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events') && !request.includes('/api/errors/client-report'))).toEqual([]);
 });

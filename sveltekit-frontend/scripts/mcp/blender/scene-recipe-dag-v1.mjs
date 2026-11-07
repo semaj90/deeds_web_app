@@ -7,6 +7,8 @@ export const SCENE_PRIMITIVES_V1 = Object.freeze({
 	3: 'cylinder',
 	4: 'cone',
 	5: 'torus',
+	6: 'billboard',
+	7: 'sam_billboard',
 });
 
 const finite3 = z.tuple([
@@ -21,6 +23,18 @@ const rgba = z.tuple([
 	z.number().finite().min(0).max(1), z.number().finite().min(0).max(1),
 	z.number().finite().min(0).max(1), z.number().finite().min(0).max(1),
 ]);
+const recipeMetadataValue = z.union([
+	z.string().max(256),
+	z.number().finite().min(-1e12).max(1e12),
+	z.boolean(),
+]);
+const checkerTexture = z.object({
+	kind: z.literal('CHECKER'),
+	colorA: rgba,
+	colorB: rgba,
+	cells: z.number().int().min(2).max(16).default(8),
+	resolution: z.number().int().min(32).max(128).default(64),
+}).strict();
 const transformKeyframe = z.object({
 	frame: z.number().int().min(0).max(100_000),
 	location: finite3.optional(),
@@ -48,7 +62,7 @@ const boneAnimationTrack = z.object({
 
 export const SceneRecipeNodeV1Schema = z.object({
 	nodeId: z.string().min(1).max(64).regex(/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/),
-	primitiveOpCode: z.number().int().min(1).max(5),
+	primitiveOpCode: z.number().int().min(1).max(7),
 	parentIds: z.array(z.string().min(1).max(64)).max(SCENE_RECIPE_MAX_NODES),
 	localOffset: finite3,
 	scale: z.tuple([
@@ -60,18 +74,24 @@ export const SceneRecipeNodeV1Schema = z.object({
 	rotationQuaternion: quatXyzw,
 	color: rgba.optional(),
 	boneId: z.string().min(1).max(64).regex(/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/).optional(),
+	rigMode: z.enum(['rigid', 'gradient_2bone']).optional(),
+	/** Small typed custom properties exported as GLB extras; never evidence authority. */
+	metadata: z.record(z.string().min(1).max(32).regex(/^[a-zA-Z][a-zA-Z0-9._-]*$/), recipeMetadataValue)
+		.refine((metadata) => Object.keys(metadata).length <= 16, 'Primitive metadata allows at most 16 properties').optional(),
+	/** Generated low-resolution texture; never a substitute for source-image evidence. */
+	texture: checkerTexture.optional(),
 }).strict();
 
 export const SceneRecipeDAGV1Schema = z.object({
 	schema: z.literal('parent-atlas.scene-recipe-dag.v1'),
 	nodes: z.array(SceneRecipeNodeV1Schema).min(1).max(SCENE_RECIPE_MAX_NODES),
-	skeleton: z.object({ bones: z.array(boneRecipe).min(1).max(32) }).strict().optional(),
+	skeleton: z.object({ bones: z.array(boneRecipe).min(1).max(64) }).strict().optional(),
 	/** Bounded object and optional bone transform animation; not Mixamo retargeting or evidence chronology. */
 	animation: z.object({
 		name: z.string().min(1).max(64).regex(/^[\w .-]+$/),
 		fps: z.number().int().min(1).max(120).default(24),
 		tracks: z.array(animationTrack).max(SCENE_RECIPE_MAX_NODES).default([]),
-		boneTracks: z.array(boneAnimationTrack).max(32).optional(),
+		boneTracks: z.array(boneAnimationTrack).max(64).optional(),
 	}).strict().optional().refine((animation) => !animation || animation.tracks.length + (animation.boneTracks?.length ?? 0) > 0, 'Animation needs at least one object or bone track'),
 }).strict();
 
@@ -175,6 +195,9 @@ export function sceneRecipeToBlenderObjectsV1(input) {
 		color: node.color ?? [0.72, 0.55, 0.2, 1],
 		dagParentIds: node.parentIds,
 		boneId: node.boneId ?? null,
+		rigMode: node.rigMode ?? 'rigid',
+		metadata: node.metadata ?? {},
+		texture: node.texture ?? null,
 	}));
 	return objects;
 }

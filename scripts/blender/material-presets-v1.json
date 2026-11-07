@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.render-material-presets.v1",
+  "classification": "SYNTHETIC_DEMONSTRATIVE_PRESETS",
+  "colorSpace": "sRGB hex at rest; convert to scene-linear before Blender node assignment",
+  "mapping": {
+    "blender": "Principled BSDF metallic-roughness inputs",
+    "gltf": "KHR_materials_pbrMetallicRoughness",
+    "threeJs": "MeshStandardMaterial"
+  },
+  "presets": [
+    { "id": "atlas.hypothesis.amber.v1", "name": "Hypothesis Amber", "baseColorSrgb": "#F59E0B", "metallic": 0.0, "roughness": 0.78, "semanticStatus": "HYPOTHESIS" },
+    { "id": "atlas.fixture.cyan.v1", "name": "Fixture Cyan", "baseColorSrgb": "#06B6D4", "metallic": 0.0, "roughness": 0.62, "semanticStatus": "SYNTHETIC_FIXTURE" },
+    { "id": "atlas.status.green-accent.v1", "name": "Green Status Accent", "baseColorSrgb": "#22C55E", "metallic": 0.0, "roughness": 0.68, "semanticStatus": "UI_ACCENT_ONLY" },
+    { "id": "atlas.neutral.slate.v1", "name": "Neutral Slate", "baseColorSrgb": "#94A3B8", "metallic": 0.05, "roughness": 0.82, "semanticStatus": "NEUTRAL" }
+  ]
+}

@@ -13,11 +13,13 @@ import {
   uploadTurboVecIndex,
 } from './lib/turbovec-4bit.mjs';
 
-console.error(
-  'LEGACY_384_TURBOVEC_BUILD_DISABLED: 384-dimensional indexing is retired; '
-  + 'no Qdrant scan or TurboVec upload is permitted.',
-);
-process.exit(78);
+if (process.env.ENABLE_LEGACY_384_TURBOVEC_BUILD !== 'true') {
+  console.error(
+    'LEGACY_384_TURBOVEC_BUILD_DISABLED: 384-dimensional indexing is retired; '
+    + 'no Qdrant scan or TurboVec upload is permitted.',
+  );
+  process.exit(78);
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const APP_ROOT = path.resolve(__dirname, '../..');
@@ -35,7 +37,7 @@ const REPORT_JSON = path.join(REPORTS_DIR, 'turbovec-384-4bit-build-report.json'
 const REPORT_MD = path.join(REPORTS_DIR, 'turbovec-384-4bit-build-report.md');
 const MANIFEST_JSON = path.join(TMP_DIR, 'turbovec-384-4bit-index-manifest.json');
 
-function renderMarkdown(report) {
+function renderMarkdown(report: any) {
   return [
     '# TurboVec 384 4-bit Build Report',
     '',
@@ -65,7 +67,7 @@ async function main() {
     withPayload: true,
   });
 
-  const accepted = [];
+  const accepted: any[] = [];
   const rejected = [];
   for (const point of points) {
     if (!(point.vector instanceof Float32Array)) {
@@ -95,7 +97,7 @@ async function main() {
     throw new Error('No Qdrant vectors matched the requested dimension');
   }
 
-  const manifest = {
+  const manifest: Record<string, any> = {
     schemaVersion: 'atlas.turbovec.index.v1',
     generatedAt: new Date().toISOString(),
     collection: config.collection,

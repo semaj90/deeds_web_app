@@ -39,7 +39,20 @@ const STREAM_COUNT = 6;
 const FLAG_ANTIALIASED = 0x1;
 const FLAG_HAS_EXTENSIONS = 0x2;
 const SQRT1_2 = 0.707106781186547524401;
-const COLOR_SCALE = 0.15;
+export const COLOR_SCALE = 0.15;
+export const SPZ_COLOR_SCALE = 0.15;
+/** Spherical Harmonics degree-0 DC basis coefficient Y_0^0 = 1 / (2 * sqrt(pi)) ~= 0.2820947918 */
+export const SH_C0 = 0.28209479177387814;
+
+/** Convert Spherical Harmonics degree-0 DC coefficient to Display RGB [0, 1]. */
+export function shDcToRgb(shDc: number): number {
+	return Math.max(0, Math.min(1, shDc * SH_C0 + 0.5));
+}
+
+/** Convert Display RGB [0, 1] to Spherical Harmonics degree-0 DC coefficient. */
+export function rgbToShDc(rgb: number): number {
+	return (rgb - 0.5) / SH_C0;
+}
 
 export interface SpzData {
 	numPoints: number;

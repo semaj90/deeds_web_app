@@ -215,31 +215,32 @@ $effect(() => {
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
 
   :global(.vector-confidence-high) {
-    @apply text-green-600 border-green-200 bg-green-50;
+    color: rgb(22 163 74); border-color: rgb(187 247 208); background-color: rgb(240 253 244);
   }
 
   :global(.dark .vector-confidence-high) {
-    @apply text-green-400 border-green-800 bg-green-950/30;
+    color: rgb(74 222 128); border-color: rgb(22 101 52); background-color: rgba(5, 46, 22, 0.3);
   }
 
   :global(.vector-confidence-medium) {
-    @apply text-yellow-600 border-yellow-200 bg-yellow-50;
+    color: rgb(202 138 4); border-color: rgb(254 240 138); background-color: rgb(254 252 232);
   }
 
   :global(.dark .vector-confidence-medium) {
-    @apply text-yellow-400 border-yellow-800 bg-yellow-950/30;
+    color: rgb(250 204 21); border-color: rgb(133 77 14); background-color: rgba(66, 32, 6, 0.3);
   }
 
   :global(.vector-confidence-low) {
-    @apply text-slate-600 border-slate-200 bg-slate-50;
+    color: rgb(71 85 105); border-color: rgb(226 232 240); background-color: rgb(248 250 252);
   }
 
   :global(.dark .vector-confidence-low) {
-    @apply text-slate-400 border-slate-800 bg-slate-950/30;
+    color: rgb(148 163 184); border-color: rgb(30 41 59); background-color: rgba(15, 23, 42, 0.3);
   }
 </style>

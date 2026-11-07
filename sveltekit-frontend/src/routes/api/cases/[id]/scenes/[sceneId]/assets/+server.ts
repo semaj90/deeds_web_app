@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import { getAuthorizedCase } from '$lib/server/case-access.js';
 import { ENV } from '$lib/server/env.server.js';
-import { readSceneGlbV1, storeSceneGlbV1 } from '$lib/server/scene-assets-v1.js';
+import { readSceneGlbV1, readSceneSogPackageManifestV1, storeSceneGlbV1 } from '$lib/server/scene-assets-v1.js';
 import type { RequestHandler } from './$types';
 
 const uuid = z.uuid();
@@ -16,7 +16,12 @@ async function authorize(locals: App.Locals, scope: { caseId: string; sceneId: s
 	if (!locals.user?.id) return { response: json({ success: false, data: null, message: 'Unauthorized' }, { status: 401 }) };
 	const actorId = Number(locals.user.id);
 	if (!Number.isSafeInteger(actorId) || actorId <= 0) return { response: json({ success: false, data: null, message: 'Unauthorized' }, { status: 401 }) };
-	const authorized = await getAuthorizedCase(scope.caseId, actorId);
+	let authorized: Awaited<ReturnType<typeof getAuthorizedCase>>;
+	try {
+		authorized = await getAuthorizedCase(scope.caseId, actorId);
+	} catch {
+		return { response: json({ success: false, data: null, message: 'Case authorization failed' }, { status: 500 }) };
+	}
 	if (!authorized) return { response: json({ success: false, data: null, message: 'Case not found' }, { status: 404 }) };
 	return { actorId };
 }
@@ -50,6 +55,11 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 	const parsedAssetId = uuid.safeParse(url.searchParams.get('assetId'));
 	if (!parsedAssetId.success) return json({ success: false, data: null, message: 'Invalid assetId' }, { status: 400 });
 	try {
+		if (url.searchParams.get('manifest') === '1') {
+			const manifest = await readSceneSogPackageManifestV1({ ...scope, assetId: parsedAssetId.data });
+			if (!manifest) return json({ success: false, data: null, message: 'Streamed SOG package not found' }, { status: 404 });
+			return json({ success: true, data: manifest, message: 'Package manifest verified' }, { headers: { 'cache-control': 'private, no-store' } });
+		}
 		const result = await readSceneGlbV1({ ...scope, assetId: parsedAssetId.data });
 		if (!result) return json({ success: false, data: null, message: 'Scene asset not found' }, { status: 404 });
 		return new Response(new Uint8Array(result.bytes), { headers: {

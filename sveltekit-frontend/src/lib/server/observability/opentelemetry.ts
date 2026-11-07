@@ -21,6 +21,7 @@ function isTruthy(value: string | undefined): boolean {
 }
 
 export function isOpenTelemetryEnabled(): boolean {
+	if (isTruthy(process.env.OTEL_SDK_DISABLED)) return false;
 	return (
 		isTruthy(process.env.OTEL_ENABLED) ||
 		isTruthy(process.env.OTEL_EXPORT_ENABLED) ||

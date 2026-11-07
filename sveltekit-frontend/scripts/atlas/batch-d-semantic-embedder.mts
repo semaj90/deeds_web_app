@@ -373,7 +373,7 @@ async function executeBatchD(): Promise<void> {
     console.error(`[Batch D] FATAL ERROR: ${(err as Error).message}`);
     process.exit(1);
   } finally {
-    if (redis && redis.isOpen) {
+    if (redis && (redis as any).isOpen) {
       await redis.quit();
     }
     await pool.end();

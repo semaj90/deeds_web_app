@@ -4,18 +4,19 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { db } from '../../src/lib/server/db/client.js';
-import { engramCards } from '../../src/lib/server/db/schema.js';
+import { engramCards } from '../../src/lib/server/db/schema/memory-registry.js';
 import { searchNotecards } from '../../src/lib/server/kb/search-logic.js';
 import { generateText } from 'ai';
 // Assuming we have access to the local Ollama/TurboQuant models
-import { createOpenAI } from '@ai-sdk/openai';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const root = path.resolve(__dirname, '../..');
 
 // Uses the 8090 turboquant instance as configured in opencode.json
-const localAi = createOpenAI({
+const localAi = createOpenAICompatible({
+  name: 'local-turboquant',
   baseURL: 'http://127.0.0.1:8090/v1',
   apiKey: 'local',
 });

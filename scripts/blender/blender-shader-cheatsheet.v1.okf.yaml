@@ -1,0 +1,74 @@
+schema_id: atlas.blender_shader_cheatsheet
+schema_version: 1
+status: LOCAL_REFERENCE_NOT_CANONICAL
+generated_at_utc: "2026-11-06T23:48:09Z"
+scope:
+  purpose: "Map Blender material authoring to the supported Parent Atlas browser material subset."
+  classification: "AUTHORING_GUIDANCE_ONLY"
+  evidence_use: "Materials are presentation presets; color never establishes a forensic measurement or conclusion."
+  training_use: "No training, inference, case upload, or database indexing is performed by this reference."
+source_capture:
+  method: "Firecrawl search and scrape"
+  fetched_sources:
+    - title: "Principled BSDF - Blender Manual"
+      url: "https://docs.blender.org/manual/en/latest/render/shader_nodes/shader/principled.html"
+      accessed_at_utc: "2026-11-06T22:35:00Z"
+      supports:
+        - "Principled BSDF exposes base color, roughness, metallic, alpha, IOR, transmission, coat, sheen, and emission controls."
+        - "The current manual describes Principled BSDF as based on OpenPBR Surface; similarly named PBR controls do not guarantee identical renderer output."
+        - "Higher-level node effects require baking or a target-specific implementation when the target renderer does not support them."
+    - title: "Material Output Node - Blender 5.2 LTS Manual"
+      url: "https://docs.blender.org/manual/en/latest/render/shader_nodes/output/material.html"
+      supports:
+        - "Blender can use renderer-specific material output setups; matching node names do not guarantee identical renderer output."
+    - title: "Three.js MeshStandardMaterial"
+      url: "https://threejs.org/docs/pages/MeshStandardMaterial.html"
+      supports:
+        - "Browser-side metallic-roughness material for the interoperable GLTF subset."
+    - title: "Three.js Raycaster"
+      url: "https://threejs.org/docs/pages/Raycaster.html"
+      supports:
+        - "Raycasting is geometric intersection and picking, separate from illumination and path tracing."
+    - title: "NVIDIA NGX Programming Guide"
+      url: "https://docs.nvidia.com/ngx/latest/pdf/Programming-Guide.pdf"
+      supports:
+        - "DLSS/NGX requires an eligible native NVIDIA integration; it is not a Blender material node, generic browser WebGPU mode, or raycaster."
+renderer_mapping:
+  blender_authoring:
+    node: "Principled BSDF"
+    subset: ["Base Color", "Metallic", "Roughness", "Alpha"]
+    model_note: "The current Blender manual identifies Principled BSDF with OpenPBR Surface; Parent Atlas uses only the explicit glTF metallic-roughness subset for interchange."
+    color_rule: "Store palette inputs as sRGB bytes/hex; convert color to Blender's scene-linear node value before assignment."
+  gltf_interchange:
+    model: "KHR_materials_pbrMetallicRoughness"
+    carries: ["baseColorFactor", "metallicFactor", "roughnessFactor", "baseColorTexture", "metallicRoughnessTexture"]
+    caveat: "Arbitrary Blender node graphs, compositor settings, simulation effects, and Cycles-only behavior are not represented as equivalent GLTF materials. Bake textures or implement a qualified browser equivalent."
+  threejs_runtime:
+    material: "MeshStandardMaterial"
+    caveat: "Viewer output also depends on color management, lighting/environment, texture color spaces, and renderer configuration."
+  blender_rendering:
+    eevee: "Fast interactive raster preview; use for the synthetic swatch proof, not as Cycles parity evidence."
+    cycles: "Offline path-traced reference render; image output can be retained as a demonstrative reference but its node graph does not execute in Three.js."
+  separate_techniques:
+    raycasting_bvh: "CPU geometry query for selecting a mesh/collision proxy. It does not shade pixels."
+    path_tracing: "Lighting integration technique; Blender Cycles and Three.js path-tracer projects are separate renderer implementations."
+    dlss: "Native NVIDIA super-resolution integration with required inputs/runtime; do not label browser sampling or Halton jitter as DLSS."
+palette_policy:
+  colors_are_standard: false
+  current_examples:
+    - { id: "atlas.hypothesis.amber.v1", hex_srgb: "#F59E0B", semantic: "HYPOTHESIS" }
+    - { id: "atlas.fixture.cyan.v1", hex_srgb: "#06B6D4", semantic: "SYNTHETIC_FIXTURE" }
+    - { id: "atlas.status.green-accent.v1", hex_srgb: "#22C55E", semantic: "UI_ACCENT_ONLY" }
+    - { id: "atlas.neutral.slate.v1", hex_srgb: "#94A3B8", semantic: "NEUTRAL" }
+  rule: "These are Parent Atlas UI/presentation choices, not industry forensic color standards or calibration values."
+storage:
+  taxonomy_lut: "atlas_nes_lut_v1 remains retrieval taxonomy/routing metadata; do not store shader/material palette semantics in it."
+  material_registry: "atlas_render_material_presets_v1 is a separate candidate table for small typed PBR values and source hashes; currently unapplied."
+  source_index: ".tmp/atlas/shader-source-index-v1.json stores standalone shader source hashes plus heuristic shader-host module markers and hashes. It is not a semantic index, compiler result, or runtime qualification."
+  binary_assets: "Keep shader source files, textures, baked outputs, and compiled artifacts in versioned files/object storage with hashes; do not place large byte payloads in JSONB or pgvector."
+promotion_gates:
+  - "Rehearse the candidate DDL and Drizzle contract against an isolated PostgreSQL 18 scratch database; never apply to legal_ai_db as part of this fixture task."
+  - "Add stable seed/upsert semantics and review ownership before admitting material presets to any shared database."
+  - "Compare Blender GLB material readback with Three.js browser rendering under recorded color-management and lighting settings."
+  - "Compile and device-test WGSL separately; source inventory is not shader compilation proof."
+  - "Treat DLSS, Cycles parity, and browser WebGPU as independent renderer qualification gates."
