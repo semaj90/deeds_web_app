@@ -35,10 +35,19 @@ const MEMBERS_PATH = path.join(ROOT, '.tmp/atlas/openspec-cohort-6527-members-v1
 const BIN_PATH = path.join(ROOT, '.tmp/atlas/openspec-task-lowrank-keyframes.embeddinggemma.latent64.f32le.bin');
 const OUT_REPORT = path.join(ROOT, 'docs/reports/milestone2-32-task-canary-receipt-v1.json');
 
-const SCRATCH_URL = process.env.SCRATCH_DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_live_integration_scratch';
-const REDIS_HOST = process.env.REDIS_HOST || '127.0.0.1';
-const REDIS_PORT = Number(process.env.REDIS_PORT || 6379);
-const REDIS_PASSWORD = process.env.REDIS_PASSWORD || 'redis';
+// No credentials in code: SCRATCH_DATABASE_URL, else the repo-resolved DATABASE_URL/DB_PASSWORD (.env/.env.local) with only the database name swapped.
+const REPO_ENV = loadRepoEnv(process.env);
+function resolveScratchUrl() {
+  if (process.env.SCRATCH_DATABASE_URL) return process.env.SCRATCH_DATABASE_URL;
+  const u = new URL(resolveDatabaseUrl(REPO_ENV));
+  u.pathname = '/legal_ai_live_integration_scratch';
+  return u.toString();
+}
+const SCRATCH_URL = resolveScratchUrl();
+const REDIS_HOST = REPO_ENV.REDIS_HOST || '127.0.0.1';
+const REDIS_PORT = Number(REPO_ENV.REDIS_PORT || 6379);
+const REDIS_PASSWORD = REPO_ENV.REDIS_PASSWORD;
+if (!REDIS_PASSWORD) throw new Error('REDIS_PASSWORD not configured: set it in the environment or .env.local (no default is allowed)');
 
 const TARGET_COMMUNITIES = [21, 1, 2, 10];
 const TASKS_PER_COMMUNITY = 8; // 8 * 4 = 32 tasks
