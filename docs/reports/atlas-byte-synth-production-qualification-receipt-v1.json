@@ -1,0 +1,116 @@
+{
+  "schema": "atlas.byte-synth-production-qualification-receipt.v1",
+  "generatedAt": "2026-11-08T04:08:00.000Z",
+  "status": "PROVEN_QUALIFIED",
+  "workspaceRevision": "rev:deeds:20261108",
+  "branch": "session/2026-11-08-verified-context-live-shadow",
+  "abiVersion": 2001,
+  "artifacts": {
+    "binary": {
+      "path": "simd-bridge/cpp/atlas_byte_synth.dll",
+      "sha256": "sha256:2b72af7b6aa4805fa1fec532ce028a369598dd7f741c151314981a04e29d5720",
+      "byteLength": 17408,
+      "compiler": "MSVC 19.42.34436.0 (x64)",
+      "standard": "C++20",
+      "dependencies": [
+        "KERNEL32.dll",
+        "MSVCP140.dll",
+        "VCRUNTIME140.dll",
+        "VCRUNTIME140_1.dll"
+      ],
+      "libtorchLinked": false,
+      "cudaLinked": false
+    },
+    "header": {
+      "path": "simd-bridge/cpp/atlas_byte_synth_core.h",
+      "sha256": "sha256:cd409f9b7bda81d51ff9b57a4a371254b4073b71ffa5a0a99b492e395fc25de8"
+    },
+    "source": {
+      "path": "simd-bridge/cpp/atlas_byte_synth_core.cpp",
+      "sha256": "sha256:10df210cf9fac9a01e6ad8e4bfdfad0311b787f5788eba812d0b9e6881b97b10"
+    },
+    "pythonBridge": {
+      "path": "scripts/atlas/c_abi_byte_synth_bridge.py",
+      "sha256": "sha256:180ce5621f2ca311d918f6eb51f74bff6939ca5f326c943b6c73695f4ee2b372"
+    },
+    "testSuite": {
+      "path": "scripts/atlas/test_c_abi_byte_synth_bridge.py",
+      "sha256": "sha256:3a785faafe9869a92dbdd90c87473d194885628aa467364275cffb3ccd5e046f"
+    }
+  },
+  "gates": {
+    "gate1_canonicalRecordIdentity": {
+      "status": "PASSED",
+      "mechanism": "atlas_morton_permutation_v2",
+      "invariantPreserved": "record.ordinal === rowIndex && latent64 row mapping intact",
+      "cohortTested": {
+        "records": 6527,
+        "byteLength": 417728,
+        "sha256": "sha256:a40abeb1f5f6ec953cf2cc4b05c80b82f85b174f763429e3ae9ba634c2b91bee",
+        "permutationVerified": true,
+        "underlyingDataModified": false
+      }
+    },
+    "gate2_byteEncodingCorrectness": {
+      "status": "PASSED",
+      "ulidMaxVector": "7ZZZZZZZZZZZZZZZZZZZZZZZZZ",
+      "ulidMinVector": "00000000000000000000000000",
+      "firstCharStrictlyIn0To7": true,
+      "crockfordAliasingVerified": true,
+      "overflowRejectionVerified": true,
+      "roundtripDecoded": true
+    },
+    "gate3_safeCAbi": {
+      "status": "PASSED",
+      "exports": [
+        "atlas_byte_synth_abi_version",
+        "atlas_morton_permutation_v2",
+        "atlas_radix_sort_v2_records",
+        "atlas_synthesize_lsb0_bitset",
+        "atlas_encode_hex",
+        "atlas_encode_crockford_base32",
+        "atlas_encode_ulid128",
+        "atlas_decode_ulid128",
+        "atlas_encode_base64"
+      ],
+      "statusEnum": "AtlasStatus",
+      "structAssertions": "sizeof(AtlasLowRankRecordV2_64B) == 64 and all 7 field offsets verified at compile time",
+      "exceptionBoundary": "try/catch with ATLAS_ERR_INTERNAL at extern C"
+    },
+    "gate4_nativeExecutionProof": {
+      "status": "PASSED",
+      "testsTotal": 17,
+      "testsPassed": 17,
+      "testsFailed": 0,
+      "durationSeconds": 0.016,
+      "testClasses": [
+        "TestNativeByteSynthBridge",
+        "TestFallbackByteSynthBridge",
+        "TestNativeRequiredRejection"
+      ]
+    },
+    "gate5_buildAndTransport": {
+      "status": "PASSED",
+      "cmakeTarget": "atlas_byte_synth",
+      "packageJsonRoot": "atlas:byte-synth:test",
+      "packageJsonFrontend": "atlas:byte-synth:test"
+    },
+    "gate6_kagPrefillRegression": {
+      "status": "PASSED",
+      "testScript": "scripts/atlas/test-kag-prefill-router-v1.py",
+      "testsPassed": 9,
+      "unroutedPreserved": true
+    },
+    "gate7_svelteCheck": {
+      "status": "PASSED",
+      "errorsFound": 0,
+      "warningsFound": 5
+    }
+  },
+  "safetyBoundaries": {
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "liveDbMutated": false,
+    "llamaServerRestarted": false
+  }
+}
