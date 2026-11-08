@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.next-steps-recommendation-proof.v1",
+  "generatedAt": "2026-11-08T18:14:20.856Z",
+  "targetDoc": "next_steps/turbovecquant.md",
+  "subjectId": "next_steps:turbovecquant",
+  "workspaceRevision": "3bd8c8e3861c0d8228128291af575e05a194b563",
+  "databaseTableTarget": "public.recommendation_log (EXISTING - NO NEW TABLE NEEDED)",
+  "valkeyCacheKey": "ace:packet:next_steps:turbovecquant:3bd8c8e3861c0d8228128291af575e05a194b563",
+  "recommendation": {
+    "id": "84b8d684-d1be-44fe-8985-dfda0eab9a53",
+    "workspaceId": "default",
+    "revisionId": "3bd8c8e3861c0d8228128291af575e05a194b563",
+    "subjectId": "next_steps:turbovecquant",
+    "proposedAction": "Deploy 4-bit LSB quantized storage buffer alongside 256x408 FP32 texture reference",
+    "inferenceExplanation": "Evaluation on 6,527 vectors proved 8x memory compression with 0.9984 cosine retention and 93.6% Recall@100",
+    "evidenceIds": [
+      "docs/llms/generated/cuda.llms-full.txt",
+      "sveltekit-frontend/src/lib/server/gpu/task-vector-texture-adapter.ts:buildTaskVectorTexture",
+      "sveltekit-frontend/src/lib/server/gpu/quantized-feature-block-v1.ts:packCodes",
+      "ace:packet:next_steps:turbovecquant:3bd8c8e3861c0d8228128291af575e05a194b563"
+    ],
+    "evidenceConfidence": 0.95,
+    "validationCriteria": "npx tsx scripts/atlas/verify-quantized-feature-block-cross-language.mjs && node scripts/atlas/evaluate-embedding-isoquant-so4-v1.mjs",
+    "expectedImpact": "Reduces vector texture transit bandwidth by 8x while preserving 99.8% semantic cosine fidelity",
+    "rollbackPlan": "Fallback to uncompressed FP32 DataTexture buffer (1,671,168 bytes)",
+    "rollbackVerification": "node scripts/atlas/test-task-vector-texture-adapter.mjs",
+    "status": "PROPOSED",
+    "createdBy": "agentic-parent-atlas-v1",
+    "createdAt": "2026-11-08T18:14:20.855Z",
+    "lifecycleState": "ACTIVE"
+  },
+  "openCodeContract": {
+    "likely_cause": "TurboVecQuant inference architecture requires quantized feature block streaming without creating redundant database tables.",
+    "evidence": [
+      "docs/llms/generated/cuda.llms-full.txt",
+      "sveltekit-frontend/src/lib/server/gpu/task-vector-texture-adapter.ts:buildTaskVectorTexture",
+      "sveltekit-frontend/src/lib/server/gpu/quantized-feature-block-v1.ts:packCodes",
+      "ace:packet:next_steps:turbovecquant:3bd8c8e3861c0d8228128291af575e05a194b563"
+    ],
+    "patch_targets": [
+      "sveltekit-frontend/src/lib/server/gpu/quantized-feature-block-v1.ts"
+    ],
+    "safe_next_command": "npx tsx scripts/atlas/verify-quantized-feature-block-cross-language.mjs",
+    "smoke_command": "node scripts/atlas/test-task-vector-texture-adapter.mjs",
+    "report_path": "docs/reports/next-steps-recommendation-proof-v1.json"
+  }
+}

@@ -520,6 +520,7 @@ config/environment/.env*
 ########################################
 dist/
 build/
+simd-bridge/cpp/build*/
 .svelte-kit/
 .vite/
 .vercel/
