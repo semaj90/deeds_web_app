@@ -1,6 +1,6 @@
 {
   "schema": "atlas.kanban-cohort-6527-authority-bridge.v1",
-  "generatedAt": "2026-11-08T07:20:26.164Z",
+  "generatedAt": "2026-11-08T08:25:00.851Z",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "sidecarMigration": {
@@ -173,8 +173,8 @@
     "adv_04_expired_lease_reclaim_and_event_correlation": {
       "passed": true,
       "reclaimedBy": "worker-bravo",
-      "attemptId": "182",
-      "eventId": "4842",
+      "attemptId": "188",
+      "eventId": "4848",
       "joinedPrefillRowsCount": 8
     }
   },
