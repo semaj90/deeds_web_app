@@ -105,11 +105,17 @@ describe('kanban-dag-prefill-v1', () => {
       expect(() => decodeTaskRecordsAndLatents(new Uint8Array(64).buffer, badLat.buffer, 1)).toThrow(/LATENT_NON_FINITE:0/);
     });
 
-    it('decodes real 6,527 records if fixture exists', () => {
+    it('decodes real 6,527 records if fixture exists', (ctx) => {
       const repoRoot = path.resolve(process.cwd(), '..');
       const recPath = path.join(repoRoot, '.tmp', 'atlas', 'openspec-task-lowrank-keyframes.bin');
       const latPath = path.join(repoRoot, '.tmp', 'atlas', 'openspec-task-lowrank-keyframes.latent64.f32le.bin');
-      if (!fs.existsSync(recPath) || !fs.existsSync(latPath)) return; // fixtures are gitignored
+      if (!fs.existsSync(recPath) || !fs.existsSync(latPath)) {
+        // Fixtures are gitignored. The gate sets ATLAS_REQUIRE_FIXTURES=1 so a missing fixture is a hard failure,
+        // never a silent pass; a plain local run reports the test as skipped (not passed).
+        if (process.env.ATLAS_REQUIRE_FIXTURES === '1') throw new Error('BLOCKED_FIXTURE_MISSING: lowrank keyframes/latent64 under .tmp/atlas');
+        ctx.skip();
+        return;
+      }
       const records = decodeTaskRecordsAndLatents(fs.readFileSync(recPath), fs.readFileSync(latPath), 6527);
       expect(records.length).toBe(6527);
       expect(records[0]!.taskOrdinal).toBe(0);

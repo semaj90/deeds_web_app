@@ -147,6 +147,7 @@ Invoke-Stage 'LowRankNegative' 'v2 low-rank task RPC: Node negative-case tests' 
 Invoke-Stage 'Vitest' 'Kanban prefill + candidate-feature GPU pack specs (lane-contracts config)' {
     Push-Location sveltekit-frontend
     try {
+        $env:ATLAS_REQUIRE_FIXTURES = '1'
         npx vitest run --config vitest.lane-contracts.config.ts src/lib/server/atlas/kanban/kanban-dag-prefill-v1.spec.ts src/lib/server/atlas/features/candidate-feature-gpu-pack-v1.spec.ts
     } finally { Pop-Location }
 }

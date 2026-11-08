@@ -167,7 +167,7 @@ def main():
     # 1. Deterministic Instruction Tokenization & Semantic Vector Seeding
     # Seed embeddings: shape (N, 768)
     # Using PyTorch ATen on CPU for deterministic MRL slicing
-    print("Computing Matryoshka Representation Learning (MRL) 64-D low-rank representations...")
+    print("Computing synthetic 64-D test vectors (first 64 coordinates of hash-seeded 768-D; NOT an MRL embedding)...")
     embeddings_768 = np.zeros((num_tasks, 768), dtype=np.float32)
 
     # Compute task instruction overlap scores
@@ -229,7 +229,7 @@ def main():
 
     # 2. PyTorch ATen MRL Slicing + L2 Renormalization
     t_emb = torch.from_numpy(embeddings_768)  # CPU tensor
-    # Slice first 64 dimensions (standard Matryoshka representation)
+    # Slice first 64 dimensions of the synthetic vector (a shape/serialization fixture, not a validated MRL prefix)
     t_slice64 = t_emb[:, :64]
     # L2-renormalize
     t_latent64 = F.normalize(t_slice64, p=2, dim=1)
@@ -338,11 +338,15 @@ def main():
         "packetChecksumSha256": packet_sha,
         "workspaceRevision": "rev:deeds:20261107",
         "candidateSnapshotRevision": "snap:openspec:6527",
-        "representationId": "semantic_mrl_prefix_64",
-        "representationFamily": "EMBEDDINGGEMMA_MRL",
-        "projectionKind": "MRL_PREFIX_TRUNCATION",
-        "sourceRepresentationId": "semantic_768",
-        "projectionRevision": "rev:mrl:prefix-truncation-v1",
+        # The vectors are md5-seeded random numbers, NOT EmbeddingGemma output, so they must not carry an
+        # EmbeddingGemma/MRL identity. They exist to exercise shapes, serialization, Morton order and RPC decoding.
+        "representationId": "synthetic_test_vector_64",
+        "representationFamily": "SYNTHETIC_TEST_VECTOR",
+        "projectionKind": "SYNTHETIC_PREFIX_SLICE",
+        "sourceRepresentationId": "synthetic_test_vector_768",
+        "projectionRevision": "rev:synthetic-prefix-slice-v1",
+        "retrievalEligible": False,
+        "embeddingModelPinned": None,
         "totalEvaluatedCandidates": num_tasks,
         "survivingCandidates": num_tasks,
         "topCandidateIds": canonical_ids[:10],
