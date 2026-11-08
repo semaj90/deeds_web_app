@@ -2143,7 +2143,7 @@ Milestone: `HANDOFF_PUSHED — REVIEW_REQUIRED` (not `PRODUCTION_READY`). No che
 - Binding receipt recorded: returns `RecommendationBindingReceiptV1` (`status: 'VERIFIED'`) with covered ordinals, request ID, bundle checksum, and verification timestamp in `SearchRuntimeTopKExecutionResultV1`.
 - Receipt-persistence gap: binding is returned in the execution result but is not yet plumbed into `AlgorithmExecutionReceiptRowV1` (`receiptRow`).
 - Cohort scope: conditional multi-source check verifies `bundle.sourceRevision` against candidates matching `subjectRef` rather than every external file across the cohort (bundle attests the subject, not every file in a multi-file cohort).
-- Caller status: advisory bundle is currently optional and no production caller supplies it yet.
+- Caller status: `VerifiedContextRequestV1` (`verified-context-service-v1.ts`) now accepts an optional `recommendationEvidence` and forwards it into `executeSearchRuntimeTopKV1`; a rejected bundle refuses with `RECOMMENDATION_EVIDENCE_REJECTED` (boundary `RECOMMENDATION_BINDING`, reason only, bundle contents never echoed). Still open: no upstream route or agent supplies a bundle, and the receipt is not folded into the verified-context receipt or persisted.
 
 **Open decisions**
 1. `ae:train` is hard-gated (`TRAINING_AUTHORITY_PROVEN = False`); only legacy checkpoints exist. Evaluate the 768-D, MRL-256 and legacy lanes before any retraining.

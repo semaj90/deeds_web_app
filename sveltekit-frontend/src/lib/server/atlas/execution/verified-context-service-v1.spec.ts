@@ -4,6 +4,7 @@ import { materializeCandidateOrdinalMap } from '../features/canonical-candidate-
 import { admitCurrentCandidateFeatureSnapshotV1 } from '../features/candidate-feature-snapshot-v1.js';
 import { materializeCandidateFeatureColumnar, CANDIDATE_SCALAR_FEATURES } from '../features/candidate-feature-columnar-v1.js';
 import { sourceRevisionOfBytes } from './topk-evidence-fetch-v1.js';
+import { compileRecommendationEvidenceBundleV1 } from '../recommendations/recommendation-evidence-bundle-v1.js';
 import { createVerifiedContextServiceV1, type VerifiedContextServicePortsV1, verifyVerifiedContextMastraReadbackV1 } from './verified-context-service-v1.js';
 
 const sourceRef = 'repo/src/example.ts';
@@ -142,6 +143,42 @@ describe('VerifiedContextServiceV1', () => {
       return { ...valid, verification: { ...valid.verification, status: 'VERIFIED_FAIL' } } as typeof valid;
     } })).execute('7', request);
     expect(result).toMatchObject({ status: 'REFUSED', refusalCode: 'TOPK_RECEIPT_INVALID', firstFailingBoundary: 'TOPK_RECEIPT' });
+  });
+
+  async function bundleForFixture(overrides: Record<string, unknown> = {}) {
+    const { executeSearchRuntimeTopKV1 } = await import('./search-runtime-topk-caller-v1.js');
+    let captured: Parameters<typeof executeSearchRuntimeTopKV1>[0] | undefined;
+    await createVerifiedContextServiceV1(fixturePorts({ executeTopK: (input) => { captured = input; return executeSearchRuntimeTopKV1(input); } })).execute('7', request);
+    if (!captured) throw new Error('FIXTURE_INPUT_NOT_CAPTURED');
+    return compileRecommendationEvidenceBundleV1({
+      schema: 'atlas.recommendation-evidence-bundle.v1', requestId: request.requestId, subjectRef: sourceRef,
+      workspaceRevision, sourceRevision, graphRevision: 'graph:fixture-v1', representationId: 'semantic_768',
+      representationRevision: 'semantic:fixture-v1', semanticChecksum: 'a'.repeat(64),
+      ordinalMapChecksum: captured.ordinalMap.ordinalMapChecksum, candidateOrdinals: [0], sample: null, graph: [], knn: null,
+      domain: [], okfSchemaRevision: 'okf-r1', okfFeatureIds: ['domain.fit'],
+      parameters: { topK: 1, graphHops: 0, sampleRank: 0, synthesisBudgetTokens: 128 },
+      canonicalWritesAllowed: false, retrievalVoteAdded: false, identityAuthority: false, ...overrides,
+    } as never);
+  }
+
+  it('admits a request that carries a matching recommendation evidence bundle', async () => {
+    const bundle = await bundleForFixture();
+    const result = await createVerifiedContextServiceV1(fixturePorts()).execute('7', { ...request, recommendationEvidence: bundle });
+    expect(result.status).toBe('ADMITTED');
+  });
+
+  it('refuses a recommendation bundle bound to a different request, with an explainable reason', async () => {
+    const bundle = await bundleForFixture({ requestId: 'request:someone-else' });
+    const result = await createVerifiedContextServiceV1(fixturePorts()).execute('7', { ...request, recommendationEvidence: bundle });
+    expect(result).toMatchObject({ status: 'REFUSED', refusalCode: 'RECOMMENDATION_EVIDENCE_REJECTED', firstFailingBoundary: 'RECOMMENDATION_BINDING' });
+    expect(JSON.stringify(result)).toContain('RECOMMENDATION_BINDING_REQUEST_MISMATCH');
+  });
+
+  it('refuses a malformed recommendation bundle without leaking its contents', async () => {
+    const result = await createVerifiedContextServiceV1(fixturePorts()).execute('7', { ...request, recommendationEvidence: { not: 'a bundle', secret: 'do-not-echo' } });
+    expect(result).toMatchObject({ status: 'REFUSED', refusalCode: 'RECOMMENDATION_EVIDENCE_REJECTED' });
+    expect(JSON.stringify(result)).toContain('BUNDLE_SCHEMA_INVALID');
+    expect(JSON.stringify(result)).not.toContain('do-not-echo');
   });
 
   it('rejects a manifest whose identity checksum cannot be verified', async () => {

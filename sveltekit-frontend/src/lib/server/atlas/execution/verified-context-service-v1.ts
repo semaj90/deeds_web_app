@@ -13,6 +13,8 @@ export const VerifiedContextRequestV1Schema = z.object({
   requestId: z.string().trim().min(1).max(128),
   query: z.string().trim().min(1).max(16_000),
   topK: z.number().int().min(1).max(10).default(5),
+  /** Optional received recommendation evidence bundle. External input: verified and bound inside executeSearchRuntimeTopKV1, fail closed. */
+  recommendationEvidence: z.unknown().optional(),
 }).strict();
 
 const VerifiedContextAdmittedResponseV1Schema = z.object({
@@ -183,8 +185,19 @@ export function createVerifiedContextServiceV1(ports: VerifiedContextServicePort
       }
 
       let result: SearchRuntimeTopKExecutionResultV1;
-      try { result = (ports.executeTopK ?? executeSearchRuntimeTopKV1)({ ...input, snapshot: featureAdmission.snapshot, k: request.topK }); }
-      catch { return blocked(request.requestId, 'TOPK_EXECUTION_FAILED', 'TOPK_EXECUTION'); }
+      try {
+        result = (ports.executeTopK ?? executeSearchRuntimeTopKV1)({
+          ...input, snapshot: featureAdmission.snapshot, k: request.topK,
+          ...(request.recommendationEvidence != null ? { recommendationEvidence: request.recommendationEvidence } : {}),
+        });
+      } catch (error) {
+        // A rejected evidence bundle is a distinct, explainable refusal, not a generic execution failure.
+        const message = error instanceof Error ? error.message : '';
+        if (request.recommendationEvidence != null && (message.startsWith('RECOMMENDATION_') || (error instanceof Error && error.name === 'ZodError'))) {
+          return blocked(request.requestId, 'RECOMMENDATION_EVIDENCE_REJECTED', 'RECOMMENDATION_BINDING', { reason: error instanceof Error && error.name === 'ZodError' ? 'BUNDLE_SCHEMA_INVALID' : message.slice(0, 120) });
+        }
+        return blocked(request.requestId, 'TOPK_EXECUTION_FAILED', 'TOPK_EXECUTION');
+      }
       if (result.verification.status !== 'VERIFIED_PASS' || result.execution.requestId !== request.requestId
         || result.execution.ordinalMapDigest !== ordinalMap.ordinalMapChecksum
         || result.execution.representationRevision !== featureAdmission.featureRevision
