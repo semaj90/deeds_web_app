@@ -20,7 +20,7 @@ const OUTPUT = argOf('--output') ? path.resolve(argOf('--output')) : path.join(R
 let TOP_LEVEL = ['api', 'auth', 'cache', 'compiler', 'database', 'devops', 'error-handling', 'frontend', 'gpu', 'graph', 'machine-learning', 'retrieval', 'test'];
 let CHILDREN = ['database.postgresql', 'devops.env-config', 'devops.process-mgmt', 'frontend.sveltekit'];
 if (PALETTE_MODE) {
-  const palettePath = path.join(ROOT, 'scripts/atlas/data/nes-domain-palette-v1.json');
+  const palettePath = argOf('--palette-file') ? path.resolve(argOf('--palette-file')) : path.join(ROOT, 'scripts/atlas/data/nes-domain-palette-v1.json'); // default v1; --palette-file selects another revision (e.g. the proposed v2)
   const palette = JSON.parse(fs.readFileSync(palettePath, 'utf8'));
   const { checksum, ...body } = palette;
   const actual = 'sha256:' + createHash('sha256').update(JSON.stringify(body)).digest('hex');

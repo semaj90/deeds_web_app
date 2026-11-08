@@ -87,9 +87,9 @@ function main() {
   const here = path.dirname(fileURLToPath(import.meta.url));
   const argOf = (n) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : null; };
   const crosswalk = argOf('--crosswalk');
-  if (!crosswalk) { console.error('usage: --crosswalk <crosswalk.jsonl> [--root <repo>] [--out-dir <dir>] [--seed <s>]'); process.exit(1); }
+  if (!crosswalk) { console.error('usage: --crosswalk <crosswalk.jsonl> [--root <repo>] [--out-dir <dir>] [--seed <s>] [--palette <palette.json>; default v1]'); process.exit(1); }
   const root = path.resolve(argOf('--root') ?? path.join(here, '..', '..'));
-  const palette = JSON.parse(fs.readFileSync(path.join(here, 'data', 'nes-domain-palette-v1.json'), 'utf8'));
+  const palette = JSON.parse(fs.readFileSync(argOf('--palette') ? path.resolve(argOf('--palette')) : path.join(here, 'data', 'nes-domain-palette-v1.json'), 'utf8'));
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
   const outDir = path.resolve(argOf('--out-dir') ?? path.join(root, '.tmp', 'atlas', `tier-b-task-draft-${stamp}`));
   const raw = fs.readFileSync(path.resolve(crosswalk));
