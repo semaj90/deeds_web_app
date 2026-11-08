@@ -1,0 +1,26 @@
+# EXAMPLE RESEARCH-ACQUISITION MANIFEST - separate from strict keyword-corpus.yaml
+# Adapt to python/atlas_okf_docs_pipeline.py's existing manifest schema before execution.
+# This is intentionally NOT executable as-is or an authorized crawl.
+schema: atlas.okf.research-source-plan.example.v1
+status: PROPOSAL_ONLY
+sources:
+  - id: nvidia-cuda-programming-guide
+    url: https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html
+    allowed_domains: [docs.nvidia.com]
+    pages:
+      - https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html
+    maximum_pages: 1
+    maximum_depth: 0
+    follow_sitemap: false
+    destination: docs/.okf/dev/
+    admission: reference_only
+  - id: pytorch-gru-reference
+    url: https://docs.pytorch.org/docs/stable/generated/torch.nn.GRU.html
+    allowed_domains: [docs.pytorch.org]
+    pages:
+      - https://docs.pytorch.org/docs/stable/generated/torch.nn.GRU.html
+    maximum_pages: 1
+    maximum_depth: 0
+    follow_sitemap: false
+    destination: docs/.okf/dev/
+    admission: reference_only
