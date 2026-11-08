@@ -2122,7 +2122,7 @@ Next steps
 
 ## Handoff 2026-11-08 (parity harnesses, simdjson wrapper, recommendation bindings)
 
-No checkbox changed; `LIBTORCH-PARITY-01` stays OPEN. Branch `session/2026-11-07-parity-harnesses-and-lane-hardening` (4 commits ahead of `handoff/working-tree-2026-10-25`).
+Milestone: `HANDOFF_PUSHED — REVIEW_REQUIRED` (not `PRODUCTION_READY`). No checkbox changed; `LIBTORCH-PARITY-01` stays OPEN. Branch `session/2026-11-07-parity-harnesses-and-lane-hardening` (5 commits ahead of `handoff/working-tree-2026-10-25`).
 
 **LibTorch parity evidence** (`scripts/atlas/libtorch-parity-harness-v1.mjs`)
 - 6 of 16 `libtorch_cuda` exports covered with seeded CPU references and shape sweeps: `batchCosineSimilarity`, `attentionScoreGPU`, `kmeansWithCentroids`, `softmaxGPU`, `topKIndicesGPU`, `rewardScoreGPU`. 23/23 cases pass; max error about 8e-8; `topKIndicesGPU` matches exactly.
@@ -2136,9 +2136,14 @@ No checkbox changed; `LIBTORCH-PARITY-01` stays OPEN. Branch `session/2026-11-07
 - The wrapper routes `-0`, surrogate escapes and BOM to V8, confirms a native `validate` false with `JSON.parse`, and prefers the non-GPU release build (`build-x64-fallback`). The native path is kept because specs assert it.
 - Benchmark (one 4.5 MB document, one machine): native parse plus `JSON.parse` 68-72 ms, plain `JSON.parse` 45-55 ms, `simdJsonValidate` about 10 ms, the Rust addon 117 ms. Native object materialization is slower than V8; validation and extraction are where native wins.
 - Eight `tensorrt_bridge.node` copies exist; the app had been loading the June 2 build. Vendored C++ simdjson is 4.5.0 (upstream reported 5.1.1) and Rust `simd-json` is locked at 0.17.3 (0.19.0 reported); both upstream figures are from web search and unverified.
-- The `packages/parent-atlas-retrieval` copy of the wrapper carries the same guard but was not verified here.
+- The `packages/parent-atlas-retrieval` copy of the wrapper carries the same guard and V8 fidelity routing.
 
-**Recommendation evidence**: `verifyRecommendationEvidenceBundleV1`, an ingress check in the classification control plane, and a fail-closed binding in `executeSearchRuntimeTopKV1`. No production caller supplies a bundle; the binding is not recorded in the result; its source-revision check assumes a single-source bundle.
+**Recommendation evidence** (`verifyRecommendationEvidenceBundleV1`, `search-runtime-topk-caller-v1.ts`)
+- Ingress check in classification control plane, and fail-closed binding in `executeSearchRuntimeTopKV1`.
+- Binding receipt recorded: returns `RecommendationBindingReceiptV1` (`status: 'VERIFIED'`) with covered ordinals, request ID, bundle checksum, and verification timestamp in `SearchRuntimeTopKExecutionResultV1`.
+- Receipt-persistence gap: binding is returned in the execution result but is not yet plumbed into `AlgorithmExecutionReceiptRowV1` (`receiptRow`).
+- Cohort scope: conditional multi-source check verifies `bundle.sourceRevision` against candidates matching `subjectRef` rather than every external file across the cohort (bundle attests the subject, not every file in a multi-file cohort).
+- Caller status: advisory bundle is currently optional and no production caller supplies it yet.
 
 **Open decisions**
 1. `ae:train` is hard-gated (`TRAINING_AUTHORITY_PROVEN = False`); only legacy checkpoints exist. Evaluate the 768-D, MRL-256 and legacy lanes before any retraining.

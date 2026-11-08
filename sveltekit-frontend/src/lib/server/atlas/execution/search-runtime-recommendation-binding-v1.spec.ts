@@ -199,6 +199,23 @@ describe('SearchRuntime top-K recommendation evidence binding', () => {
     expect(withBundle.execution.selected).toEqual(baseline.execution.selected);
   });
 
+  it('documents that a multi-source cohort with no subject match skips the per-candidate source-revision check', () => {
+    // Deliberate rule: the bundle attests its subject, not every file in a multi-file cohort.
+    // Workspace, ordinal-map, representation and ordinal coverage are still enforced.
+    const { input, ordinalMap, appRev, pkgRev } = buildFixture();
+    const bundle = bundleFor(ordinalMap, {
+      subjectRef: 'src/not-in-cohort.ts',
+      sourceRevision: appRev === pkgRev ? 'sha256:' + '0'.repeat(64) : pkgRev,
+      candidateOrdinals: [0, 1],
+    });
+    const result = executeSearchRuntimeTopKV1({ ...input, candidateOrdinals: [0, 1], recommendationEvidence: bundle });
+    expect(result.recommendationBinding?.status).toBe('VERIFIED');
+    // Coverage is still required: dropping an ordinal fails closed even with no subject match.
+    const partial = bundleFor(ordinalMap, { subjectRef: 'src/not-in-cohort.ts', candidateOrdinals: [0] });
+    expect(() => executeSearchRuntimeTopKV1({ ...input, candidateOrdinals: [0, 1], recommendationEvidence: partial }))
+      .toThrow('RECOMMENDATION_BINDING_ORDINAL_NOT_COVERED:1');
+  });
+
   it('supports multi-source cohort coverage when subject source revision matches', () => {
     const { input, ordinalMap, appRev } = buildFixture();
     const multiBundle = bundleFor(ordinalMap, {
