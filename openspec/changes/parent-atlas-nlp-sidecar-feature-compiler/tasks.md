@@ -2365,3 +2365,30 @@ All facts below were read or run on 2026-11-08; scratch = `legal_ai_live_integra
 **Deferred (not before R1-R6):** PCA/SVD and multi-BVH alignment; AVX2/AVX-512 simdjson packing beyond the existing 2/3/4-bit packer; QLoRA build; EmbeddingGemma two-pass document analysis of `next_steps`; NES LOD palette training and `ae:train` for 4,096 / LOD levels 1-20 (definition not yet recorded). Each needs an owner gate and an evaluation set first.
 
 **Open decisions (operator):** the vector source and K for "4096"; the single outcome-receipt writer; whether `next_steps` tasks live in `kanban_tasks` (recommended) or a doc-only index.
+
+## HANDOFF 2026-11-08 (end of session): next move for RECOMMENDATIONS-E2E-01
+
+**State.** Session branch `session/2026-11-08-verified-context-live-shadow` is pushed. R1 done (dry-run, 3,105 tasks: 2,479 open / 626 done). R2 applied to SCRATCH only (`legal_ai_live_integration_scratch`: 2,479 `nextsteps:` rows in `kanban_tasks`, idempotent, read back); live `legal_ai_db` has 0 `nextsteps:` rows (4,514 `kanban_tasks`). R3 root cause found (opt-in gate, below). Nothing applied to live.
+
+**Verified 2026-11-08 (read-only).**
+- The proposer and the snapshot hard-code `featureId` as `/^openspec:[a-z0-9][a-z0-9-]*$/`: `sveltekit-frontend/src/mcp/kanban-dag-prefill-recommendation.ts:11` and `sveltekit-frontend/src/mcp/kanban-dag-snapshot.ts:10`. A `nextsteps:` id fails Zod validation.
+- `record_outcome` (`sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs`, dispatched to `recordOutcome(args)`) writes an NDJSON ledger and Neo4j, not Postgres; `atlas_recommendation_outcome_receipts` has 0 rows in live and scratch.
+- `build_recommendation` echoes its input as `likely_cause` and returns a generic `npm run ingest:pipeline` (template only).
+- Valkey has 0 `atlas:centroid:*` / `centroid:*` / `bitfrost:*` keys; `gpu_cluster_centroids` 64 rows, `qdrant_centroid_clusters` 202.
+
+**Two problems the first draft of the next move overlooked (do not skip).**
+1. Patching the `featureId` regex alone will not return results: the proposer reads TRACE/PostgreSQL, which is believed to be the LIVE database, where `nextsteps:` has 0 rows (the tasks exist only in scratch). NOT yet verified which database the proposer connects to. The closed-loop rehearsal needs the proposer pointed at scratch (a scratch switch).
+2. `record_outcome` cannot simply be wired to the receipts writer: its arguments (`intent`, `tool`, `sourceRefs`, `recommendationAccepted`, `reward`) lack what a receipt needs (`recommendation_id`, `selected_action_id`, `resulting_execution_key`). That is a mapping design decision, not a one-line call. The existing writer is `createRecommendationOutcomePostgresRepository` (packages/parent-atlas), reached via `persistTemporalRecommendationOutcomeFromPostgres`; it is idle because `persist_outcome_receipt` defaults to false and no non-test code sets it.
+
+**Ordered next steps (smallest safe first).**
+- [ ] N1 Extend the `featureId` pattern in BOTH files to accept `nextsteps:` (e.g. `/^(openspec:[a-z0-9][a-z0-9-]*|nextsteps:[a-z0-9_.-]+)$/`) with a Zod test that accepts `nextsteps:` ids and still rejects malformed ones. Pure code, no datastore. In the same step, confirm which database the proposer/snapshot read.
+- [ ] N2 If the proposer is live-only, add an explicit scratch switch (env, fail-closed, never default) so a rehearsal can target `legal_ai_live_integration_scratch`.
+- [ ] N3 One-task closed-loop rehearsal on SCRATCH only: recommend a prefill task for a `nextsteps:` feature (e.g. `nextsteps:next-steps-turbovecquant`), record its outcome through the existing repository with a real `recommendation_id`, verify the first durable row in scratch `atlas_recommendation_outcome_receipts`, then roll back or keep per approval.
+- [ ] N4 Decide the `record_outcome` -> receipt field mapping (who supplies `recommendation_id` / `selected_action_id` / `resulting_execution_key`) before binding it; bind to the existing boundary, never a second writer.
+- [ ] N5 Make `build_recommendation` consume real retrieval evidence (R5).
+
+**Not started, needs an operator decision first.** R4: define "4,096" (over the ~274k chunk vectors, or a hierarchical codebook such as 64 x 64); K=4,096 over the 6,527-task cohort is about 1.6 points per cluster. Live promotion of the prefill sidecar, the representation draft and the `nextsteps:` tasks (approval and pre-image). The repair PR for `origin/main` (branch `session/2026-11-08-prefill-provenance-port`, 2 commits above `d42fffb5788`) or cherry-picking it into the other session's `session/2026-11-09-fix-main-merge-breakage`.
+
+**Deferred behind N1-N5 (unchanged).** PCA/SVD, multi-BVH alignment, AVX2/AVX-512 native packing and the Node-API addon build, the WebGPU shader decode of the packed 4-bit buffers, QLoRA, EmbeddingGemma two-pass doc analysis, NES LOD palette training and `ae:train`. Not verified here: the claimed 0.9984 cosine retention for the SO(4) rotation.
+
+**Loose ends.** Another process left `scripts/atlas/generate-next-steps-recommendation.mjs` and `docs/reports/next-steps-recommendation-proof-v1.json` untracked: it wrote a live Valkey key (`ace:packet:next_steps:turbovecquant:<rev>`, TTL'd), its proof claims a `recommendation_log` row that does not exist (437 rows unchanged), it has a `REDIS_PASSWORD || 'redis'` fallback and uses a git commit SHA as `WORKSPACE_REVISION`. The old scratch password is still in git history (rotation is an operator decision). Local branches: 19 deleted with archive tags `archive/2026-11-08/*`, 6 more tagged but kept; none of that is pushed.
