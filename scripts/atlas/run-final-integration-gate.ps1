@@ -1,38 +1,209 @@
 # scripts/atlas/run-final-integration-gate.ps1
-$ErrorActionPreference = "Stop"
-Write-Host "=== [STAGE 0] P0 Credential & Worktree Guard ===" -ForegroundColor Cyan
-# Ensure no hardcoded fallback passwords exist in rehearsal scripts before testing
-$credHits = Select-String -Path "scripts/atlas/*rehearse*" -Pattern "postgres://.*:.*@" -ErrorAction SilentlyContinue
-if ($credHits) {
-    Write-Error "[GATE 1 BLOCKED] Plaintext connection URI pattern detected in rehearsal scripts. Scrub before proceeding."
+#
+# Final integration gate. Runs each stage, records the real exit code and a short output tail, and writes ONE
+# exclusive-create receipt under .tmp/atlas/. It never claims more than it ran:
+#   - a stage that did not run is NOT_RUN (and a failed stage stops the later ones),
+#   - the type-check lane is named in the receipt (fast incremental svelte-check vs. a focused tsconfig),
+#   - the receipt records the commit SHA and which gate inputs have uncommitted edits (PASS_DIRTY_INPUTS).
+# Exit code: 0 = every selected stage passed, 1 = a stage failed, 2 = nothing ran (e.g. an unknown -Only name).
+#
+# Usage (from the repo root):
+#   powershell -File scripts/atlas/run-final-integration-gate.ps1
+#   powershell -File scripts/atlas/run-final-integration-gate.ps1 -Only Credentials,Router
+#   powershell -File scripts/atlas/run-final-integration-gate.ps1 -TypeCheck Focused
+param(
+    [string[]]$Only = @(),
+    [ValidateSet('Fast', 'Focused', 'None')][string]$TypeCheck = 'Fast',
+    [string[]]$ScanRoots = @('scripts/atlas', 'sveltekit-frontend/src/lib/server/atlas'),
+    [switch]$StrictCredentials,
+    [switch]$WriteCredentialBaseline
+)
+$ErrorActionPreference = 'Stop'
+# `powershell -File` passes 'A,B' as ONE string; split so -Only / -ScanRoots behave the same under -File and dot-sourcing.
+$Only = @($Only | ForEach-Object { $_ -split ',' } | Where-Object { $_ })
+$ScanRoots = @($ScanRoots | ForEach-Object { $_ -split ',' } | Where-Object { $_ })
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+Set-Location $repoRoot
+
+# Obviously fake passwords that appear in test fixtures. Anything else inside a postgres(ql)://user:password@ URI is flagged.
+$fakePasswords = @('a', 'b', 'p', 'pass', 'password', 'secret', 'test', 's3cr3t-pw')
+$credRegex = 'postgres(?:ql)?://([^:/\s''"@]+):([^@\s''"]+)@'
+
+$gateInputs = @(
+    'scripts/atlas/run-final-integration-gate.ps1',
+    'scripts/atlas/test-kag-prefill-router-v1.py',
+    'scripts/atlas/kag_prefill_router_v1.py',
+    'scripts/atlas/verify_lowrank_task_rpc_v2_py.py',
+    'scripts/atlas/verify-lowrank-task-rpc-v1.mjs',
+    'scripts/atlas/verify-lowrank-task-rpc-v1.test.mjs',
+    'sveltekit-frontend/src/lib/server/atlas/kanban/kanban-dag-prefill-v1.ts',
+    'sveltekit-frontend/src/lib/server/atlas/kanban/kanban-dag-prefill-v1.spec.ts',
+    'sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-pack-v1.spec.ts'
+)
+
+$results = New-Object System.Collections.ArrayList
+$script:stopped = $false
+
+function Invoke-Stage {
+    param([string]$Name, [string]$Title, [scriptblock]$Body)
+    if ($Only.Count -gt 0 -and ($Only -notcontains $Name)) { return }
+    Write-Host ("`n=== [{0}] {1} ===" -f $Name, $Title) -ForegroundColor Cyan
+    $entry = [ordered]@{ name = $Name; title = $Title; status = 'NOT_RUN'; exitCode = $null; durationMs = 0; tail = @() }
+    if ($script:stopped) { [void]$results.Add($entry); return }
+    $sw = [System.Diagnostics.Stopwatch]::StartNew()
+    $lines = New-Object System.Collections.ArrayList
+    # Native tools (python unittest, npm) write progress to stderr; with 'Stop' that would become an exception and hide the real
+    # output and exit code. Judge the stage by its exit code only.
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        & $Body 2>&1 | ForEach-Object { $text = "$_"; Write-Host $text; [void]$lines.Add($text) }
+        $code = $LASTEXITCODE
+        if ($null -eq $code) { $code = 0 }
+        $entry.exitCode = $code
+        $entry.status = if ($code -eq 0) { 'PASS' } else { 'FAIL' }
+    } catch {
+        $entry.exitCode = 1
+        $entry.status = 'FAIL'
+        [void]$lines.Add("EXCEPTION: $($_.Exception.Message)")
+    }
+    $ErrorActionPreference = $prevEap
+    $sw.Stop()
+    $entry.durationMs = [int]$sw.ElapsedMilliseconds
+    $entry.tail = @($lines | Select-Object -Last 8)
+    if ($entry.status -ne 'PASS') { $script:stopped = $true }
+    [void]$results.Add($entry)
 }
 
-Write-Host "`n=== [STAGE 1] C-ABI Byte Synthesizer (Radix, LSB0 Bitset, Base32/64/Hex) ===" -ForegroundColor Cyan
-npm run atlas:byte-synth:test
-if ($LASTEXITCODE -ne 0) { throw "Stage 1 (atlas:byte-synth:test) failed." }
-
-Write-Host "`n=== [STAGE 2] Pinned KAG Prefill Router (47 Louvain Communities, Stamp 20261107T192448Z) ===" -ForegroundColor Cyan
-py -3.13 scripts/atlas/test-kag-prefill-router-v1.py
-if ($LASTEXITCODE -ne 0) { throw "Stage 2 (test-kag-prefill-router-v1.py) failed." }
-
-Write-Host "`n=== [STAGE 3] Cross-Language v2 Low-Rank RPC Binary Parity (Python + JS + Negative Cases) ===" -ForegroundColor Cyan
-py -3.13 scripts/atlas/verify_lowrank_task_rpc_v2_py.py
-if ($LASTEXITCODE -ne 0) { throw "Stage 3a (Python v2 decoder) failed." }
-
-node scripts/atlas/verify-lowrank-task-rpc-v1.mjs
-if ($LASTEXITCODE -ne 0) { throw "Stage 3b (Node v2 verifier) failed." }
-
-node --test scripts/atlas/verify-lowrank-task-rpc-v1.test.mjs
-if ($LASTEXITCODE -ne 0) { throw "Stage 3c (Node v2 negative tests) failed." }
-
-Write-Host "`n=== [STAGE 4] Memory-Bounded Svelte-Check (OTEL Disabled, Focused Scene Studio Config) ===" -ForegroundColor Cyan
-Push-Location sveltekit-frontend
-try {
-    $env:OTEL_SDK_DISABLED = 'true'
-    npm exec svelte-check -- --workspace . --tsconfig .tmp/tsconfig.scene-studio-focused.json --threshold error --output machine
-    if ($LASTEXITCODE -ne 0) { throw "Stage 4 (focused svelte-check) failed." }
-} finally {
-    Pop-Location
+Invoke-Stage 'Credentials' 'P0 plaintext connection-string guard (postgres/postgresql URIs, recursive, baseline-aware)' {
+    $global:LASTEXITCODE = 0
+    $baselinePath = Join-Path $repoRoot 'scripts/atlas/credential-uri-baseline-v1.json'
+    $counts = @{}
+    foreach ($root in $ScanRoots) {
+        if (-not (Test-Path $root)) { continue }
+        Get-ChildItem -Path $root -Recurse -File -Include *.mjs, *.mts, *.js, *.ts, *.py, *.ps1, *.sql |
+            Where-Object { $_.FullName -notmatch '[\\/](node_modules|\.tmp)[\\/]' } |
+            ForEach-Object {
+                $file = $_
+                $key = $file.FullName
+                if ($key.StartsWith($repoRoot)) { $key = $key.Substring($repoRoot.Length).TrimStart([char]92, [char]47) }
+                $key = $key.Replace([string][char]92, '/')
+                Select-String -Path $file.FullName -Pattern $credRegex -AllMatches | ForEach-Object {
+                    foreach ($m in $_.Matches) {
+                        if ($fakePasswords -notcontains $m.Groups[2].Value) {
+                            if ($counts.ContainsKey($key)) { $counts[$key] = $counts[$key] + 1 } else { $counts[$key] = 1 }
+                        }
+                    }
+                }
+            }
+    }
+    $total = 0; foreach ($v in $counts.Values) { $total += $v }
+    if ($WriteCredentialBaseline) {
+        $ordered = [ordered]@{}
+        foreach ($k in ($counts.Keys | Sort-Object)) { $ordered[$k] = $counts[$k] }
+        $doc = [ordered]@{ schema = 'atlas.credential-uri-baseline.v1'; note = 'Tolerated existing debt: file -> count of hardcoded connection-string passwords. Passwords are never stored here. The gate fails on any new file or higher count. Shrink this file as credentials move to env.'; files = $ordered }
+        $doc | ConvertTo-Json -Depth 4 | Set-Content -Path $baselinePath -Encoding UTF8
+        Write-Output ("baseline written: {0} files, {1} URIs" -f $counts.Count, $total)
+        return
+    }
+    $baseline = @{}
+    if (-not $StrictCredentials -and (Test-Path $baselinePath)) {
+        $doc = Get-Content $baselinePath -Raw | ConvertFrom-Json
+        foreach ($prop in $doc.files.PSObject.Properties) { $baseline[$prop.Name] = [int]$prop.Value }
+    }
+    $new = @()
+    foreach ($k in ($counts.Keys | Sort-Object)) {
+        $allowed = 0
+        if ($baseline.ContainsKey($k)) { $allowed = $baseline[$k] }
+        if ($counts[$k] -gt $allowed) { $new += ("{0}: {1} hardcoded connection-string password(s), baseline allows {2} (values not shown)" -f $k, $counts[$k], $allowed) }
+    }
+    Write-Output ("tolerated existing debt: {0} URIs in {1} files (baseline {2}); strict={3}" -f $total, $counts.Count, $(if ($baseline.Count -gt 0) { 'loaded' } else { 'absent or ignored' }), [bool]$StrictCredentials)
+    if ($new.Count -gt 0) {
+        $new | ForEach-Object { Write-Output "NEW_CREDENTIAL_URI: $_" }
+        $global:LASTEXITCODE = 1
+    }
 }
 
-Write-Host "`n[PASS] All 4 integration stages and P0 guards completed cleanly." -ForegroundColor Green
+Invoke-Stage 'ByteSynth' 'C-ABI byte synthesizer (npm run atlas:byte-synth:test)' {
+    npm run atlas:byte-synth:test
+}
+
+Invoke-Stage 'Router' 'Pinned KAG prefill router' {
+    py -3.13 scripts/atlas/test-kag-prefill-router-v1.py
+}
+
+Invoke-Stage 'LowRankPython' 'v2 low-rank task RPC: Python decoder parity' {
+    py -3.13 scripts/atlas/verify_lowrank_task_rpc_v2_py.py
+}
+
+Invoke-Stage 'LowRankNode' 'v2 low-rank task RPC: Node verifier' {
+    node scripts/atlas/verify-lowrank-task-rpc-v1.mjs
+}
+
+Invoke-Stage 'LowRankNegative' 'v2 low-rank task RPC: Node negative-case tests' {
+    node --test scripts/atlas/verify-lowrank-task-rpc-v1.test.mjs
+}
+
+Invoke-Stage 'Vitest' 'Kanban prefill + candidate-feature GPU pack specs (lane-contracts config)' {
+    Push-Location sveltekit-frontend
+    try {
+        npx vitest run --config vitest.lane-contracts.config.ts src/lib/server/atlas/kanban/kanban-dag-prefill-v1.spec.ts src/lib/server/atlas/features/candidate-feature-gpu-pack-v1.spec.ts
+    } finally { Pop-Location }
+}
+
+if ($TypeCheck -ne 'None') {
+    Invoke-Stage 'TypeCheck' ("svelte-check, lane '{0}'" -f $TypeCheck) {
+        Push-Location sveltekit-frontend
+        try {
+            $env:OTEL_SDK_DISABLED = 'true'
+            if ($TypeCheck -eq 'Fast') {
+                npm run check:fast
+            } else {
+                $cfg = '.tmp/tsconfig.scene-studio-focused.json'
+                if (-not (Test-Path $cfg)) { Write-Output "focused tsconfig missing: $cfg (gitignored, not reproducible)"; $global:LASTEXITCODE = 1 }
+                else { npm exec svelte-check -- --workspace . --tsconfig $cfg --threshold error --output machine }
+            }
+        } finally { Pop-Location }
+    }
+}
+
+# --- receipt ---
+$sha = (git rev-parse HEAD).Trim()
+$dirtyAll = @(git status --porcelain)
+$dirtyInputs = @()
+foreach ($f in $gateInputs) {
+    $s = git status --porcelain -- $f
+    if ($s) { $dirtyInputs += $f }
+}
+$ran = @($results | Where-Object { $_.status -ne 'NOT_RUN' })
+$failed = @($results | Where-Object { $_.status -eq 'FAIL' })
+$status = 'PASS'
+if ($failed.Count -gt 0) { $status = 'FAIL' }
+elseif ($ran.Count -eq 0) { $status = 'NOT_RUN' }
+elseif ($dirtyInputs.Count -gt 0) { $status = 'PASS_DIRTY_INPUTS' }
+
+$receipt = [ordered]@{
+    schema = 'atlas.final-integration-gate-receipt.v1'
+    generatedAt = (Get-Date).ToUniversalTime().ToString('o')
+    commit = $sha
+    branch = (git rev-parse --abbrev-ref HEAD).Trim()
+    workingTreeEntries = $dirtyAll.Count
+    gateInputsWithUncommittedEdits = $dirtyInputs
+    typeCheckLane = $TypeCheck
+    onlyStages = $Only
+    status = $status
+    stages = $results
+    note = 'A pass here covers only the listed stages. It is not production-readiness, a live-database proof, or a full-workspace type-check unless typeCheckLane is Fast and that stage passed.'
+}
+$dir = Join-Path $repoRoot '.tmp/atlas'
+New-Item -ItemType Directory -Force $dir | Out-Null
+$stamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
+$path = Join-Path $dir ("final-integration-gate-v1.{0}.json" -f $stamp)
+$json = $receipt | ConvertTo-Json -Depth 6
+$fs = [System.IO.File]::Open($path, [System.IO.FileMode]::CreateNew, [System.IO.FileAccess]::Write)
+try { $bytes = [System.Text.Encoding]::UTF8.GetBytes($json); $fs.Write($bytes, 0, $bytes.Length) } finally { $fs.Close() }
+
+$color = switch ($status) { 'PASS' { 'Green' } 'PASS_DIRTY_INPUTS' { 'Yellow' } 'NOT_RUN' { 'Yellow' } default { 'Red' } }
+Write-Host ("`n[{0}] {1} stage(s) run, {2} failed. Receipt: {3}" -f $status, $ran.Count, $failed.Count, $path) -ForegroundColor $color
+if ($dirtyInputs.Count -gt 0) { Write-Host ("Uncommitted edits in gate inputs: {0}" -f ($dirtyInputs -join ', ')) -ForegroundColor Yellow }
+if ($status -eq 'FAIL') { exit 1 } elseif ($status -eq 'NOT_RUN') { exit 2 } else { exit 0 }
