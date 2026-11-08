@@ -51,6 +51,17 @@ const VALID_FIXED = ['0', '-0', '1e5', '1E+2', '0.5', '1234567890123456789012345
 const INVALID = ['', ' ', '{', '[1,]', '{"a":1,}', "{'a':1}", '{a:1}', 'NaN', 'Infinity', '01', '1.', '.5', '+1',
   '{} x', '"unterminated', '"\n"', '﻿{}', '[1 2]', '{"a" 1}', '// c\n{}', '[1]]', 'tru', '"\\x"', '"\\u12"', '-', '--1'];
 
+// Documented simdjson-vs-JSON.parse differences (4.5.0 vendored build), identical across all four builds tested
+// on 2026-11-08. The app's wrapper routes these shapes to V8 (simdjson-bridge.ts). Any divergence NOT listed fails.
+// Keys are `${kind}:${doc}` exactly as recorded in the divergence entries.
+const KNOWN_DIVERGENCES = new Set([
+  'valid-corpus:-0',                                   // sign of negative zero lost
+  'valid-corpus:123456789012345678901234567890',       // integer beyond 64 bits: native rejects, JS accepts
+  'valid-corpus:"\\ud800"',                            // lone surrogate escape becomes U+FFFD
+  'valid-corpus:1e400',                                // number out of range: native rejects, JS gives Infinity
+  'invalid:"﻿{}"',                                // BOM-prefixed input accepted by native, rejected by JS
+]);
+
 const jsParse = (s) => { try { return { ok: true, value: JSON.parse(s) }; } catch { return { ok: false }; } };
 const nativeTry = (fn) => { try { return { ok: true, value: fn() }; } catch { return { ok: false }; } };
 
@@ -87,8 +98,14 @@ function checkParseValidate(addon, rng) {
     if (js.ok === false && nativeAccepts) cases.push({ kind: 'invalid', doc: JSON.stringify(doc).slice(0, 60), note: 'UNSAFE_ACCEPT: JS rejects, native accepts' });
     if (js.ok === true && !nativeAccepts) cases.push({ kind: 'invalid', doc: JSON.stringify(doc).slice(0, 60), note: 'JS accepts, native rejects' });
   }
-  return { name: 'simdJsonParse+simdJsonValidate', documents: docs.length + INVALID.length, divergences: cases,
-    status: cases.length === 0 ? 'PASS' : 'FAIL' };
+  const known = cases.filter((c) => KNOWN_DIVERGENCES.has(`${c.kind}:${c.doc}`));
+  const unexpected = cases.filter((c) => !KNOWN_DIVERGENCES.has(`${c.kind}:${c.doc}`));
+  const observed = new Set(known.map((c) => `${c.kind}:${c.doc}`));
+  return { name: 'simdJsonParse+simdJsonValidate', documents: docs.length + INVALID.length, divergences: unexpected,
+    knownDivergences: known,
+    // Listed but no longer seen: a simdjson upgrade may have fixed them. Informational, never a failure.
+    knownDivergencesNotObserved: [...KNOWN_DIVERGENCES].filter((k) => !observed.has(k)),
+    status: unexpected.length === 0 ? 'PASS' : 'FAIL' };
 }
 
 // RFC 6901 reference: returns Float64Array of finite numbers, or throws.
@@ -191,7 +208,9 @@ function finish(receipt) {
   console.log(`  addon: ${receipt.addonPath}`);
   if (receipt.selfTest) console.log(`  self-test: ${receipt.selfTest.allFaultsDetected ? 'all faults detected' : 'MISSED FAULTS'}`);
   for (const r of receipt.results) {
-    console.log(`  ${r.status} ${r.name} (${r.documents ?? r.cases} cases, ${r.divergences.length} divergences)`);
+    console.log(`  ${r.status} ${r.name} (${r.documents ?? r.cases} cases, ${r.divergences.length} unexpected divergences`
+      + `${r.knownDivergences ? ', ' + r.knownDivergences.length + ' known' : ''})`);
+    if (r.knownDivergencesNotObserved?.length) console.log(`     known but not observed: ${r.knownDivergencesNotObserved.length}`);
     for (const d of r.divergences.slice(0, 8)) console.log(`     - ${JSON.stringify(d)}`);
   }
   process.exitCode = receipt.status === 'PASS' ? 0 : 1;
