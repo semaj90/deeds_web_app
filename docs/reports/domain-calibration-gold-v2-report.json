@@ -1,0 +1,140 @@
+{
+  "schema": "atlas.domain-classifier-eval.v1",
+  "producerRevision": "atlas-domain-classifier-eval-v1",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "rowsConsidered": 455,
+  "goldRows": 455,
+  "unverifiedReviewRows": 0,
+  "doubleReviewedGoldRows": 46,
+  "doubleReviewCoverage": 0.1010989010989011,
+  "minimumDoubleReviewRows": 46,
+  "reviewedNonGoldRows": {},
+  "revisionQualifiedOnly": false,
+  "warnings": [
+    "Predictor returns no confidence; ECE and floor sweep skipped."
+  ],
+  "metrics": {
+    "accuracy": 0.1010989010989011,
+    "macro_f1": 0.14408376958457422,
+    "per_class": {
+      "api": {
+        "precision": 0.4375,
+        "recall": 0.2,
+        "f1": 0.27450980392156865,
+        "support": 35
+      },
+      "auth": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 35
+      },
+      "cache": {
+        "precision": 0.9411764705882353,
+        "recall": 0.45714285714285713,
+        "f1": 0.6153846153846154,
+        "support": 35
+      },
+      "compiler": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 35
+      },
+      "database": {
+        "precision": 0.5263157894736842,
+        "recall": 0.2857142857142857,
+        "f1": 0.37037037037037035,
+        "support": 35
+      },
+      "devops": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 35
+      },
+      "documentation": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      },
+      "error-handling": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 35
+      },
+      "error_fixing": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      },
+      "frontend": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 35
+      },
+      "gpu": {
+        "precision": 0.8333333333333334,
+        "recall": 0.14285714285714285,
+        "f1": 0.2439024390243902,
+        "support": 35
+      },
+      "graph": {
+        "precision": 0.3333333333333333,
+        "recall": 0.08571428571428572,
+        "f1": 0.13636363636363638,
+        "support": 35
+      },
+      "machine-learning": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 35
+      },
+      "model_runtime": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      },
+      "retrieval": {
+        "precision": 0.625,
+        "recall": 0.14285714285714285,
+        "f1": 0.23255813953488372,
+        "support": 35
+      },
+      "test": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 35
+      },
+      "testing": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      },
+      "training": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      }
+    }
+  },
+  "top3_recall": null,
+  "ece": null,
+  "status": "SCORED",
+  "weakLabelAgreementDiagnostic": {
+    "rows": 455,
+    "agreement": 0.08571428571428572,
+    "meaning": "NOT accuracy: the weak label shares lineage with the classifier under test."
+  },
+  "inputChecksum": "35fe5fb86709d36b5037387deddc756272582a03d05fccbb5a783ed6ccf98707"
+}

@@ -44,6 +44,14 @@ COMMUNITY_ROUTING_TABLE: Dict[int, Dict[str, Any]] = {
         "okf_profile": "atlas.okf-reconciliation-by-cause.v1",
         "validation_cmd": "python scripts/atlas/openspec-task-extract-v1.py --top 10",
     },
+    2: {
+        "domain": "Ontology Linked Tuples & GraphRAG Admission",
+        "label": "ontology admission graphrag qdrant tuple",
+        "llms_txt": ["docs/llms/generated/postgres.llms-full.txt", "docs/llms/generated/drizzle.llms-full.txt"],
+        "okf_profile": "atlas.okf-reconciliation-by-cause.v1",
+        "validation_cmd": "python scripts/atlas/test-kag-prefill-router-v1.py",
+        "gate_status": "ROUTED_ACTIVE",
+    },
     6: {
         "domain": "GPU / sm_86 / Tile Kernels",
         "label": "tile rtx gpu proof",
@@ -59,12 +67,20 @@ COMMUNITY_ROUTING_TABLE: Dict[int, Dict[str, Any]] = {
         "validation_cmd": "npm run audit:drizzle",
     },
     10: {
-        "domain": "Tree-sitter / LangExtract AST",
+        "domain": "Tree-sitter / LangExtract AST & OKF Docs",
         "label": "ast langextract symbol evidence",
         "llms_txt": ["docs/llms/generated/sveltekit.llms-full.txt"],
         "okf_profile": ".okf/schemas/okf-concept-gap-v1.schema.json",
-        "validation_cmd": None,  # script does not exist; gate unavailable, not a dead path
-        "gate_status": "UNAVAILABLE_SCRIPT_MISSING",
+        "validation_cmd": "node scripts/atlas/validate-crawled-okf-docs-v1.mjs",
+        "gate_status": "ROUTED_ACTIVE",
+    },
+    18: {
+        "domain": "GPU / cuVS CAGRA & RAPIDS Resource Parity",
+        "label": "gpu cuvs cugraph parity rapids",
+        "llms_txt": ["docs/llms/generated/cuda.llms-full.txt", "docs/llms/generated/webgpu.llms-full.txt"],
+        "okf_profile": "atlas.okf-reconciliation-by-cause.v1",
+        "validation_cmd": "python scripts/retrieval/embeddinggemma2_shadow_parity_gate.py",
+        "gate_status": "ROUTED_ACTIVE",
     },
     21: {
         "domain": "GPU / cuVS CAGRA Vector Index",

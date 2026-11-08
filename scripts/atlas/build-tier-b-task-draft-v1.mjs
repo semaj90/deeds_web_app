@@ -35,7 +35,7 @@ export const V2_EXTENSION_LEXICON = {
   devops: ['docker', 'compose', 'wsl2', 'service', 'systemd', 'caddy', 'healthcheck', 'ci', 'actions', 'deploy', 'k8s', 'powershell', 'environment'],
   'error-handling': ['recovery', 'circuit-breaker', 'retry', 'fallback', 'exception', 'panic', 'fail-closed', 'unhandled', 'rollback', 'reconcile', 'quarantine', 'diagnose'],
   test: ['vitest', 'playwright', 'unittest', 'assert', 'fixture', 'mock', 'rehearsal', 'smoke', 'benchmark', 'spec.ts', 'test.mjs', 'test.py', 'eval'],
-  general: ['overview', 'briefing', 'general', 'meeting', 'notes', 'cleanup', 'todo', 'housekeeping', 'readme', 'documentation'],
+  general: ['overview', 'briefing', 'general', 'meeting', 'notes', 'cleanup', 'todo', 'housekeeping', 'readme', 'documentation', 'blocked', 'gate', 'governance', 'policy', 'coordination'],
 };
 
 export function proposeDomain(text, options = {}) {

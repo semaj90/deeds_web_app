@@ -1,0 +1,218 @@
+{
+  "runId": "graphify_dag_1794126741504",
+  "startedAt": "2026-11-08T08:32:21.522Z",
+  "flags": {
+    "DRY_RUN": true,
+    "VERBOSE": false
+  },
+  "stages": {
+    "freeze_corpus": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T08:32:31.481Z",
+      "recordCount": 61718,
+      "latestSnapshot": "2026-10-29T17:32:08.005Z",
+      "duration": 9955,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "find_dirty_identities": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T08:32:31.845Z",
+      "recordCount": 0,
+      "dirtyIdentities": [],
+      "totalDirtyRefs": 0,
+      "duration": 362,
+      "failedIdentities": [],
+      "warnings": [
+        "No dirty identities found in last 24h"
+      ]
+    },
+    "validate_source_refs": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T08:32:33.253Z",
+      "recordCount": 61718,
+      "validSourceRefs": 61718,
+      "orphanedCount": 0,
+      "duration": 1407,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "parse_changed_files": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T08:32:33.462Z",
+      "recordCount": "053925168568",
+      "parsedByLanguage": {
+        "sql": "539",
+        "python": "2516",
+        "typescript": "8568"
+      },
+      "duration": 209,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "materialize_ast_facts": {
+      "status": "FAIL",
+      "timestamp": "2026-11-08T08:32:33.467Z",
+      "error": "column \"tree_node_ids\" does not exist",
+      "duration": 4
+    },
+    "resolve_symbol_references": {
+      "status": "FAIL",
+      "timestamp": "2026-11-08T08:32:33.516Z",
+      "error": "column \"imports\" does not exist",
+      "duration": 49
+    },
+    "build_edge_list": {
+      "status": "FAIL",
+      "timestamp": "2026-11-08T08:32:33.546Z",
+      "error": "column \"imports\" does not exist",
+      "duration": 30
+    },
+    "validate_edges": {
+      "status": "FAIL",
+      "timestamp": "2026-11-08T08:32:33.580Z",
+      "error": "column \"imports\" does not exist",
+      "duration": 33
+    },
+    "derive_community_projection": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T08:32:33.736Z",
+      "recordCount": 12050,
+      "communitiesFound": 12050,
+      "duration": 155,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "compute_graph_analytics": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T08:32:35.791Z",
+      "recordCount": 209496,
+      "pageRankComputed": 209496,
+      "algorithmVersion": "pagerank_authority_v1",
+      "duration": 2054,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "write_canonical_features": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T08:32:36.525Z",
+      "recordCount": 0,
+      "featuresWritten": 0,
+      "duration": 733,
+      "failedIdentities": [],
+      "warnings": [
+        "No features written"
+      ]
+    },
+    "project_neo4j_topology": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T08:32:36.811Z",
+      "recordCount": 61718,
+      "topologyProjected": 61718,
+      "neo4jEdgeTypes": [
+        "IMPORTS",
+        "CALLS",
+        "BELONGS_TO_CLUSTER",
+        "SIMILAR_TOPOLOGY"
+      ],
+      "duration": 286,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "update_qdrant_metadata": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T08:32:46.601Z",
+      "recordCount": 57243,
+      "qdrantUpdated": 57243,
+      "payloadFields": [
+        "packet_key",
+        "source_ref",
+        "domain",
+        "community_id",
+        "page_rank"
+      ],
+      "duration": 9789,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "invalidate_redis_caches": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T08:32:46.602Z",
+      "recordCount": 4,
+      "invalidatedPatterns": [
+        "bitfrost:packet:*",
+        "bitfrost:cluster:*",
+        "karpathy:scores",
+        "centroid:*"
+      ],
+      "duration": 0,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "generate_recommendations": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T08:32:46.627Z",
+      "recordCount": 6171,
+      "recommendationsGenerated": 6171,
+      "types": [
+        "missing_test",
+        "dead_code",
+        "missing_spec",
+        "stale_embedding",
+        "high_centrality"
+      ],
+      "duration": 25,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "retrieval_smoke_test": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T08:32:46.628Z",
+      "recordCount": 5,
+      "testsPassed": 5,
+      "testResults": {
+        "dense_search": {
+          "passed": true,
+          "latency": 23
+        },
+        "sparse_search": {
+          "passed": true,
+          "latency": 15
+        },
+        "exact_match": {
+          "passed": true,
+          "latency": 8
+        },
+        "ast_lookup": {
+          "passed": true,
+          "latency": 12
+        },
+        "graph_traversal": {
+          "passed": true,
+          "latency": 34
+        }
+      },
+      "duration": 1,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "publish_evidence": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T08:32:46.648Z",
+      "recordCount": 61718,
+      "dashboardUpdated": true,
+      "evidencePublished": true,
+      "duration": 20,
+      "failedIdentities": [],
+      "warnings": []
+    }
+  },
+  "artifacts": {},
+  "summary": {
+    "totalStages": 17,
+    "passedStages": 13,
+    "failedStages": 4,
+    "status": "PARTIAL_FAILURE"
+  },
+  "completedAt": "2026-11-08T08:32:46.648Z"
+}

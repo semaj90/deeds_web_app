@@ -1,6 +1,6 @@
 {
   "schema": "atlas.okf-crawled-docs-validation.v1",
-  "generatedAt": "2026-10-05T18:35:26.668Z",
+  "generatedAt": "2026-11-08T08:37:29.427Z",
   "live": false,
   "canonicalAuthority": false,
   "writes": {
@@ -89,7 +89,7 @@
         "fetchers": [
           "BEAUTIFULSOUP_HTTP"
         ],
-        "thinPagesUnder1KB": 2,
+        "thinPagesUnder1KB": 1,
         "chromeChunks": 0,
         "languageLessFences": 3,
         "leadingLanguageLabelInBody": 0,
