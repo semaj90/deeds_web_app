@@ -4,16 +4,30 @@
 // The sheet exports reviewed rows as JSONL in the same schema the eval harness reads
 // (python/atlas_domain_classifier_eval_v1.py --input <exported file>).
 import fs from 'node:fs';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const argOf = (n) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : null; };
 const INPUT = argOf('--input') ? path.resolve(argOf('--input')) : path.join(ROOT, 'docs/reports/domain-calibration-draft-v1.jsonl');
-const OUTPUT = argOf('--output') ? path.resolve(argOf('--output')) : path.join(ROOT, 'docs/reports/domain-review-sheet-v1.html');
+// --palette: label directly in the NES palette domains (scripts/atlas/data/nes-domain-palette-v1.json) instead of the 13-group ontology.
+// No automatic ontology->palette translation exists (see docs/reports/domain-ontology-to-nes-palette-mapping-proposal-v1.json, PROPOSAL_ONLY),
+// so reviewers choose a palette domain themselves and the export feeds export-okf-reviewed-domain-examples-v1.mjs unchanged.
+const PALETTE_MODE = process.argv.includes('--palette');
+const OUTPUT = argOf('--output') ? path.resolve(argOf('--output')) : path.join(ROOT, PALETTE_MODE ? 'docs/reports/domain-review-sheet-palette-v1.html' : 'docs/reports/domain-review-sheet-v1.html');
 
-const TOP_LEVEL = ['api', 'auth', 'cache', 'compiler', 'database', 'devops', 'error-handling', 'frontend', 'gpu', 'graph', 'machine-learning', 'retrieval', 'test'];
-const CHILDREN = ['database.postgresql', 'devops.env-config', 'devops.process-mgmt', 'frontend.sveltekit'];
+let TOP_LEVEL = ['api', 'auth', 'cache', 'compiler', 'database', 'devops', 'error-handling', 'frontend', 'gpu', 'graph', 'machine-learning', 'retrieval', 'test'];
+let CHILDREN = ['database.postgresql', 'devops.env-config', 'devops.process-mgmt', 'frontend.sveltekit'];
+if (PALETTE_MODE) {
+  const palettePath = path.join(ROOT, 'scripts/atlas/data/nes-domain-palette-v1.json');
+  const palette = JSON.parse(fs.readFileSync(palettePath, 'utf8'));
+  const { checksum, ...body } = palette;
+  const actual = 'sha256:' + createHash('sha256').update(JSON.stringify(body)).digest('hex');
+  if (actual !== checksum) { console.error(`PALETTE_CHECKSUM_MISMATCH: expected ${checksum}, got ${actual}`); process.exit(3); }
+  TOP_LEVEL = Object.keys(palette.domains);
+  CHILDREN = [];
+}
 const NON_GOLD = ['AMBIGUOUS', 'NOT_A_DOMAIN', 'SKIP'];
 const TRUST_TOTAL = 200;
 const TRUST_PER_CLASS = 30;
@@ -21,7 +35,8 @@ const TRUST_PER_CLASS = 30;
 const rows = fs.readFileSync(INPUT, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
 const qualified = rows.filter((r) => r.sourceRevision);
 const needs = TOP_LEVEL.map((g) => {
-  const have = qualified.filter((r) => r.proposedOntologyGroup === g).length;
+  // In palette mode the draft's proposedOntologyGroup is a different vocabulary, so no per-class proposal count is claimed.
+  const have = PALETTE_MODE ? 0 : qualified.filter((r) => r.proposedOntologyGroup === g).length;
   return { group: g, revisionQualifiedRowsProposed: have, target: TRUST_PER_CLASS, shortBy: Math.max(0, TRUST_PER_CLASS - have) };
 });
 const payload = {
