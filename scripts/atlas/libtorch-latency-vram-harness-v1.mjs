@@ -248,6 +248,7 @@ async function main() {
   poller.stop();
   receipt.vram.allocatorNote = 'LibTorch caching allocator keeps memory across cases, so per-case VRAM figures are cumulative card-level readings, not per-export peaks. Trust only the run-level peak and the retained delta.';
   receipt.vram.runPeakUsedMiB = Math.max(...receipt.results.map((r) => r.vram?.peakUsedMiB ?? 0));
+  receipt.timingScope = 'End-to-end per native call. Verified in libtorch_graph_impl.cpp (batchCosineSimilarity): inputs are uploaded host-to-device on every call and the result is returned through a blocking result.to(torch::kCPU), so each timing includes upload, compute, download and the stream sync. It is NOT kernel time; at small shapes it is transfer-bound, and a GPU-resident corpus would look very different.';
   receipt.timingNote = 'Single run. Repeat runs of the same case differed by up to ~2x (shared GPU with :8090, clocks, first-run effects); treat p50 as indicative, not a stable benchmark.';
   const finalUsed = smiUsedMiB();
   receipt.vram.usedAfterMiB = finalUsed;
