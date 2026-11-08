@@ -35,6 +35,7 @@ export interface UpsertReceiptV1 {
 }
 
 const TABLE = 'public.atlas_kanban_dag_prefill_v1';
+const STABLE_KEY_RE = /^[^#\s]+#[0-9a-f]{16}$/;
 const SCRATCH_DB_RE = /^[a-z0-9_]+_scratch$/;
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]']);
 const MIN_SERVER_VERSION_NUM = 180000;
@@ -157,24 +158,78 @@ export interface UpsertOptionsV1 {
   env?: NodeJS.ProcessEnv;
 }
 
+/** One row of the cohort members file (identity + routing facts produced by the cohort reconciliation pipeline). */
+export interface CohortMemberV1 {
+  task_ordinal: number;
+  canonical_task_key: string;
+  change_id: string;
+  community_id: number;
+  routing_active_bit: boolean;
+  /** NES palette domain byte; 0 = UNRESOLVED when absent. The palette stays the only owner of these bytes. */
+  domain_id?: number;
+  /** The three below have no defined source in the binary records, so they must come from the member row: nothing is defaulted. */
+  priority_score?: number;
+  umap_xyz?: number[];
+  rot_6d?: number[];
+}
+
+/** A row exactly as atlas_kanban_dag_prefill_v1 (20261108 candidate DDL) stores it. `status` is not here: it is insert-only and always UNVERIFIED. */
+export interface PrefillRowV1 {
+  taskId: string; canonicalTaskKey: string; cohortOrdinal: number; changeId: string; communityId: number; domainId: number;
+  mortonCode: number; priorityScore: number; finalScore: number; routingActiveBit: boolean;
+  umapXyz: [number, number, number]; rot6d: [number, number, number, number, number, number]; latent64d: number[];
+}
+
+const finiteVec = (v: unknown, n: number): v is number[] => Array.isArray(v) && v.length === n && v.every((x) => typeof x === 'number' && Number.isFinite(x));
+
 /**
- * Stages the decoded records into the scratch table. `taskIds` must be supplied one-to-one (no invented ids).
- * `execution_status` is inserted as 'UNROUTED' for new rows and is never overwritten on conflict, so a re-run
- * cannot clobber state written by another producer.
+ * Joins cohort members (identity, community, routing bit) with the decoded binary records by ordinal. Fail closed: the ordinal must
+ * line up on both sides, the key must be a workboard stableKey (`<change>#<16 hex>`, never `task:ordinal:*`), and priority_score,
+ * umap_xyz and rot_6d must be supplied by the member row. The binary position is the first three latent coordinates, not a UMAP
+ * embedding, so it is never relabelled as umap_xyz.
+ */
+export function buildPrefillRows(members: readonly CohortMemberV1[], records: readonly DecodedTaskRecordV2[]): PrefillRowV1[] {
+  if (members.length !== records.length) throw new Error(`COHORT_SIZE_MISMATCH:${members.length}!=${records.length}`);
+  const seen = new Set<string>();
+  return members.map((m, i) => {
+    const rec = records[i]!;
+    if (m.task_ordinal !== i || rec.taskOrdinal !== i) throw new Error(`ORDINAL_MISMATCH:${i}`);
+    const key = m.canonical_task_key;
+    if (typeof key !== 'string' || /^task:ordinal:/.test(key) || !STABLE_KEY_RE.test(key)) throw new Error(`KEY_INVALID:${i}`);
+    if (key.slice(0, key.indexOf('#')) !== m.change_id) throw new Error(`CHANGE_ID_MISMATCH:${i}`);
+    if (seen.has(key)) throw new Error(`KEY_DUPLICATE:${i}`);
+    seen.add(key);
+    if (typeof m.routing_active_bit !== 'boolean') throw new Error(`ROUTING_BIT_INVALID:${i}`);
+    if (!Number.isInteger(m.community_id)) throw new Error(`COMMUNITY_ID_INVALID:${i}`);
+    const domainId = m.domain_id ?? 0;
+    if (!Number.isInteger(domainId) || domainId < 0 || domainId > 255) throw new Error(`DOMAIN_ID_INVALID:${i}`);
+    if (typeof m.priority_score !== 'number' || !Number.isFinite(m.priority_score)) throw new Error(`PRIORITY_SCORE_MISSING:${i}`);
+    if (!finiteVec(m.umap_xyz, 3)) throw new Error(`UMAP_XYZ_MISSING:${i}`);
+    if (!finiteVec(m.rot_6d, 6)) throw new Error(`ROT_6D_MISSING:${i}`);
+    return {
+      taskId: key, canonicalTaskKey: key, cohortOrdinal: i, changeId: m.change_id, communityId: m.community_id, domainId,
+      mortonCode: rec.mortonCode, priorityScore: m.priority_score, finalScore: rec.finalScore, routingActiveBit: m.routing_active_bit,
+      umapXyz: m.umap_xyz as [number, number, number], rot6d: m.rot_6d as PrefillRowV1['rot6d'], latent64d: Array.from(rec.latent64),
+    };
+  });
+}
+
+/**
+ * Stages rows into atlas_kanban_dag_prefill_v1 on a scratch database. `status` is inserted as UNVERIFIED and never overwritten on
+ * conflict (task completion belongs to the kanban tables, never to a routing score); `routing_status` follows `routing_active_bit`.
  */
 export async function upsertKanbanDagPrefill(
   poolOrUri: Pool | string,
-  records: DecodedTaskRecordV2[],
-  taskIds: string[],
+  rows: readonly PrefillRowV1[],
   options: UpsertOptionsV1 = {}
 ): Promise<UpsertReceiptV1> {
   const t0 = performance.now();
   const env = options.env ?? process.env;
   const mode: PrefillModeV1 = options.mode ?? 'rehearse';
 
-  if (taskIds.length !== records.length) throw new Error('TASK_ID_COUNT_MISMATCH');
+  const taskIds = rows.map((r) => r.taskId);
   if (new Set(taskIds).size !== taskIds.length) throw new Error('TASK_ID_DUPLICATE');
-  if (taskIds.some((id) => typeof id !== 'string' || id.length === 0 || id.length > 256)) throw new Error('TASK_ID_INVALID');
+  if (taskIds.some((id) => typeof id !== 'string' || id.length === 0 || id.length > 256 || /^task:ordinal:/.test(id) || !STABLE_KEY_RE.test(id))) throw new Error('TASK_ID_INVALID');
   assertWritesOptedIn(env);
 
   let dbHost = 'pool';
@@ -190,12 +245,7 @@ export async function upsertKanbanDagPrefill(
   }
 
   const hasher = createHash('sha256');
-  let committed = false;
-  let rolledBack = false;
-  let dbName = '';
-  let failReason: string | null = null;
-  let independentlyVerified = false;
-
+  let committed = false, rolledBack = false, dbName = '', failReason: string | null = null, independentlyVerified = false;
   try {
     const before = await snapshotRows(pool, taskIds);
     const client = await pool.connect();
@@ -203,44 +253,31 @@ export async function upsertKanbanDagPrefill(
     try {
       await client.query('BEGIN;');
       dbName = await readBackIdentity(client);
-
-      for (let i = 0; i < records.length; i++) {
-        const rec = records[i]!;
-        const taskId = taskIds[i]!;
-        const latent = Buffer.from(rec.latent64.buffer, rec.latent64.byteOffset, rec.latent64.byteLength);
+      for (const r of rows) {
         await client.query(
           `INSERT INTO ${TABLE} (
-              task_id, sequence_id, procedure_id, morton_code, task_ordinal,
-              cluster_id, position_x, position_y, position_z, final_score,
-              latent64, execution_status, canonical_authority
-           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'UNROUTED', false)
+              task_id, canonical_task_key, cohort_ordinal, change_id, status, routing_status, community_id, domain_id, morton_code,
+              priority_score, final_score, routing_active_bit, umap_xyz, rot_6d, latent_64d, canonical_authority
+           ) VALUES ($1, $2, $3, $4, 'UNVERIFIED', $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, false)
            ON CONFLICT (task_id) DO UPDATE SET
-              sequence_id  = EXCLUDED.sequence_id,
-              procedure_id = EXCLUDED.procedure_id,
-              morton_code  = EXCLUDED.morton_code,
-              cluster_id   = EXCLUDED.cluster_id,
-              position_x   = EXCLUDED.position_x,
-              position_y   = EXCLUDED.position_y,
-              position_z   = EXCLUDED.position_z,
-              final_score  = EXCLUDED.final_score,
-              latent64     = EXCLUDED.latent64,
-              updated_at   = clock_timestamp()`,
-          [taskId, i + 1, `proc:comm:${rec.clusterId}:task:${rec.taskOrdinal}`, rec.mortonCode, rec.taskOrdinal,
-            rec.clusterId, rec.position[0], rec.position[1], rec.position[2], rec.finalScore, latent],
+              canonical_task_key = EXCLUDED.canonical_task_key, cohort_ordinal = EXCLUDED.cohort_ordinal, change_id = EXCLUDED.change_id,
+              routing_status = EXCLUDED.routing_status, community_id = EXCLUDED.community_id, domain_id = EXCLUDED.domain_id,
+              morton_code = EXCLUDED.morton_code, priority_score = EXCLUDED.priority_score, final_score = EXCLUDED.final_score,
+              routing_active_bit = EXCLUDED.routing_active_bit, umap_xyz = EXCLUDED.umap_xyz, rot_6d = EXCLUDED.rot_6d,
+              latent_64d = EXCLUDED.latent_64d, updated_at = NOW()`,
+          [r.taskId, r.canonicalTaskKey, r.cohortOrdinal, r.changeId, r.routingActiveBit ? 'ROUTED_ACTIVE' : 'UNROUTED', r.communityId, r.domainId,
+            r.mortonCode, r.priorityScore, r.finalScore, r.routingActiveBit, r.umapXyz, r.rot6d, r.latent64d],
         );
-        hasher.update(`${taskId}\t${rec.taskOrdinal}\t${rec.finalScore}\n`);
+        hasher.update(`${r.taskId}\t${r.cohortOrdinal}\t${r.finalScore}\n`);
       }
-
       if (mode === 'apply') { await client.query('COMMIT;'); committed = true; }
       else { await client.query('ROLLBACK;'); rolledBack = true; }
     } catch (err) {
       try { await client.query('ROLLBACK;'); rolledBack = true; } catch { broken = true; }
       throw err;
     } finally {
-      client.release(broken ? true : undefined); // discard a connection whose rollback failed
+      client.release(broken ? true : undefined);
     }
-
-    // Independent readback on a fresh checkout of the pool.
     const after = await snapshotRows(pool, taskIds);
     if (mode === 'rehearse') {
       independentlyVerified = after.n === before.n && after.digest === before.digest;
@@ -254,18 +291,8 @@ export async function upsertKanbanDagPrefill(
   }
 
   return {
-    schema: 'atlas.kanban-dag-prefill-receipt.v1',
-    status: independentlyVerified && failReason === null ? 'PASS' : 'FAIL',
-    mode,
-    rowsStaged: records.length,
-    committed,
-    rolledBack,
-    independentlyVerified,
-    failReason,
-    dbName,
-    dbHost,
-    durationMs: Number((performance.now() - t0).toFixed(2)),
-    sha256Digest: hasher.digest('hex'),
-    canonicalAuthority: false,
+    schema: 'atlas.kanban-dag-prefill-receipt.v1', status: independentlyVerified && failReason === null ? 'PASS' : 'FAIL', mode,
+    rowsStaged: rows.length, committed, rolledBack, independentlyVerified, failReason, dbName, dbHost,
+    durationMs: Number((performance.now() - t0).toFixed(2)), sha256Digest: hasher.digest('hex'), canonicalAuthority: false,
   };
 }

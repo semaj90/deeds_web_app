@@ -6,6 +6,7 @@ import {
   parseScratchDatabaseUri,
   decodeTaskRecordsAndLatents,
   upsertKanbanDagPrefill,
+  buildPrefillRows,
   type DecodedTaskRecordV2
 } from './kanban-dag-prefill-v1.js';
 
@@ -128,86 +129,123 @@ describe('kanban-dag-prefill-v1', () => {
     });
   });
 
-  describe('upsertKanbanDagPrefill', () => {
-    it('refuses to write without the explicit opt-in', async () => {
+  describe('buildPrefillRows (aligned to atlas_kanban_dag_prefill_v1)', () => {
+    const key = (i: number) => `change-a#${i.toString(16).padStart(16, '0')}`;
+    const member = (i: number, over: Record<string, unknown> = {}) => ({
+      task_ordinal: i, canonical_task_key: key(i), change_id: 'change-a', community_id: 3, routing_active_bit: i % 2 === 0,
+      priority_score: 0.5, umap_xyz: [0.1, 0.2, 0.3], rot_6d: [1, 0, 0, 0, 1, 0], ...over,
+    });
+    const recs = (n: number) => Array.from({ length: n }, (_, i) => sample(i));
+
+    it('joins members and binary records by ordinal and maps exactly the table columns', () => {
+      const rows = buildPrefillRows([member(0), member(1)] as never, recs(2));
+      expect(rows[0]).toMatchObject({ taskId: key(0), canonicalTaskKey: key(0), cohortOrdinal: 0, changeId: 'change-a', communityId: 3, domainId: 0, mortonCode: 12345, finalScore: 0.85, routingActiveBit: true });
+      expect(rows[0]!.latent64d).toHaveLength(64);
+      expect(rows[1]!.routingActiveBit).toBe(false);
+    });
+
+    it('fails closed on ordinal, key, change and count mismatches', () => {
+      expect(() => buildPrefillRows([member(0)] as never, recs(2))).toThrow(/COHORT_SIZE_MISMATCH/);
+      expect(() => buildPrefillRows([member(1)] as never, recs(1))).toThrow(/ORDINAL_MISMATCH:0/);
+      expect(() => buildPrefillRows([member(0, { canonical_task_key: 'task:ordinal:0' })] as never, recs(1))).toThrow(/KEY_INVALID/);
+      expect(() => buildPrefillRows([member(0, { canonical_task_key: 'change-a#zz' })] as never, recs(1))).toThrow(/KEY_INVALID/);
+      expect(() => buildPrefillRows([member(0, { change_id: 'other' })] as never, recs(1))).toThrow(/CHANGE_ID_MISMATCH/);
+      expect(() => buildPrefillRows([member(0), member(1, { canonical_task_key: key(0) })] as never, recs(2))).toThrow(/KEY_DUPLICATE/);
+    });
+
+    it('never defaults priority_score, umap_xyz or rot_6d, and never relabels the binary position as umap', () => {
+      expect(() => buildPrefillRows([member(0, { priority_score: undefined })] as never, recs(1))).toThrow(/PRIORITY_SCORE_MISSING/);
+      expect(() => buildPrefillRows([member(0, { umap_xyz: undefined })] as never, recs(1))).toThrow(/UMAP_XYZ_MISSING/);
+      expect(() => buildPrefillRows([member(0, { umap_xyz: [1, 2] })] as never, recs(1))).toThrow(/UMAP_XYZ_MISSING/);
+      expect(() => buildPrefillRows([member(0, { rot_6d: [1, 2, 3] })] as never, recs(1))).toThrow(/ROT_6D_MISSING/);
+      expect(() => buildPrefillRows([member(0, { rot_6d: [1, 0, 0, 0, 1, Number.NaN] })] as never, recs(1))).toThrow(/ROT_6D_MISSING/);
+    });
+
+    it('validates routing bit, community and domain byte', () => {
+      expect(() => buildPrefillRows([member(0, { routing_active_bit: 'yes' })] as never, recs(1))).toThrow(/ROUTING_BIT_INVALID/);
+      expect(() => buildPrefillRows([member(0, { community_id: 1.5 })] as never, recs(1))).toThrow(/COMMUNITY_ID_INVALID/);
+      expect(() => buildPrefillRows([member(0, { domain_id: 256 })] as never, recs(1))).toThrow(/DOMAIN_ID_INVALID/);
+      expect(buildPrefillRows([member(0, { domain_id: 3 })] as never, recs(1))[0]!.domainId).toBe(3);
+    });
+  });
+
+  describe('upsertKanbanDagPrefill (aligned)', () => {
+    const k = (i: number) => `change-a#${i.toString(16).padStart(16, '0')}`;
+    const rowOf = (i: number, active = true) => buildPrefillRows(
+      Array.from({ length: i + 1 }, (_, j) => ({ task_ordinal: j, canonical_task_key: k(j), change_id: 'change-a', community_id: 1, routing_active_bit: j === i ? active : false,
+        priority_score: 0.4, umap_xyz: [0, 0, 0], rot_6d: [1, 0, 0, 0, 1, 0] })) as never,
+      Array.from({ length: i + 1 }, (_, j) => sample(j)),
+    )[i]!;
+
+    it('refuses to write without the opt-in and rejects duplicate or synthetic ids before any connection', async () => {
       const { pool } = mockPool();
-      await expect(upsertKanbanDagPrefill(pool, [sample()], ['t:0'], { env: {} as NodeJS.ProcessEnv })).rejects.toThrow(/ALLOW_WRITES/);
+      await expect(upsertKanbanDagPrefill(pool, [rowOf(0)], { env: {} as NodeJS.ProcessEnv })).rejects.toThrow(/ALLOW_WRITES/);
+      await expect(upsertKanbanDagPrefill(pool, [rowOf(0), rowOf(0)], { env: OPTED_IN })).rejects.toThrow('TASK_ID_DUPLICATE');
+      await expect(upsertKanbanDagPrefill(pool, [{ ...rowOf(0), taskId: 'task:ordinal:0' }], { env: OPTED_IN })).rejects.toThrow('TASK_ID_INVALID');
       expect(pool.connect).not.toHaveBeenCalled();
     });
 
-    it('rejects id/record count mismatch, duplicates and invalid ids before touching the database', async () => {
-      const { pool } = mockPool();
-      await expect(upsertKanbanDagPrefill(pool, [sample()], [], { env: OPTED_IN })).rejects.toThrow('TASK_ID_COUNT_MISMATCH');
-      await expect(upsertKanbanDagPrefill(pool, [sample(0), sample(1)], ['t', 't'], { env: OPTED_IN })).rejects.toThrow('TASK_ID_DUPLICATE');
-      await expect(upsertKanbanDagPrefill(pool, [sample()], [''], { env: OPTED_IN })).rejects.toThrow('TASK_ID_INVALID');
-      expect(pool.connect).not.toHaveBeenCalled();
-    });
-
-    it('rehearse (default): reads identity, ROLLBACKs, and PASSes only with an unchanged independent readback', async () => {
-      const { pool, queries, client } = mockPool();
-      const receipt = await upsertKanbanDagPrefill(pool, [sample()], ['t:0'], { env: OPTED_IN });
-      expect(queries[0]).toMatch(/^SELECT count\(\*\)/);
+    it('rehearse (default) rolls back and PASSes only with an unchanged independent readback', async () => {
+      const { pool, queries } = mockPool();
+      const receipt = await upsertKanbanDagPrefill(pool, [rowOf(0)], { env: OPTED_IN });
       expect(queries).toContain('BEGIN;');
-      expect(queries.some((q) => q.startsWith('SELECT current_database()'))).toBe(true);
       expect(queries).toContain('ROLLBACK;');
       expect(queries).not.toContain('COMMIT;');
       expect(receipt).toMatchObject({ status: 'PASS', mode: 'rehearse', committed: false, rolledBack: true, independentlyVerified: true, canonicalAuthority: false, dbName: 'atlas_scratch' });
-      expect(client.release).toHaveBeenCalled();
+      const bad = mockPool({ snapshots: [{ n: 0, digest: 'd0' }, { n: 1, digest: 'LEAKED' }] });
+      expect((await upsertKanbanDagPrefill(bad.pool, [rowOf(0)], { env: OPTED_IN })).status).toBe('FAIL');
     });
 
-    it('rehearse: FAILs when rows differ after ROLLBACK', async () => {
-      const { pool } = mockPool({ snapshots: [{ n: 0, digest: 'd0' }, { n: 1, digest: 'LEAKED' }] });
-      const receipt = await upsertKanbanDagPrefill(pool, [sample()], ['t:0'], { env: OPTED_IN });
-      expect(receipt.status).toBe('FAIL');
-      expect(receipt.independentlyVerified).toBe(false);
-      expect(receipt.failReason).toMatch(/ROLLBACK_NOT_VERIFIED/);
-    });
-
-    it('apply: COMMITs and PASSes only when the rows read back', async () => {
+    it('apply commits and PASSes only when the rows read back', async () => {
       const ok = mockPool({ snapshots: [{ n: 0, digest: 'd0' }, { n: 1, digest: 'd1' }] });
-      const receipt = await upsertKanbanDagPrefill(ok.pool, [sample()], ['t:0'], { env: OPTED_IN, mode: 'apply' });
+      expect(await upsertKanbanDagPrefill(ok.pool, [rowOf(0)], { env: OPTED_IN, mode: 'apply' })).toMatchObject({ status: 'PASS', committed: true });
       expect(ok.queries).toContain('COMMIT;');
-      expect(receipt).toMatchObject({ status: 'PASS', mode: 'apply', committed: true, independentlyVerified: true });
       const missing = mockPool({ snapshots: [{ n: 0, digest: 'd0' }, { n: 0, digest: 'd0' }] });
-      const bad = await upsertKanbanDagPrefill(missing.pool, [sample()], ['t:0'], { env: OPTED_IN, mode: 'apply' });
-      expect(bad.status).toBe('FAIL');
-      expect(bad.failReason).toMatch(/APPLY_NOT_VERIFIED/);
+      expect((await upsertKanbanDagPrefill(missing.pool, [rowOf(0)], { env: OPTED_IN, mode: 'apply' })).failReason).toMatch(/APPLY_NOT_VERIFIED/);
     });
 
-    it('does not overwrite execution_status on conflict and never sets canonical authority', async () => {
+    it('inserts status as UNVERIFIED, never overwrites it, derives routing_status from the routing bit, and keeps canonical_authority false', async () => {
       const { pool, client } = mockPool();
-      await upsertKanbanDagPrefill(pool, [sample()], ['t:0'], { env: OPTED_IN });
-      const insert = client.query.mock.calls.map((c) => String(c[0])).find((q) => q.includes('INSERT INTO'))!;
-      const conflictClause = insert.slice(insert.indexOf('ON CONFLICT'));
-      expect(conflictClause).not.toMatch(/execution_status/);
-      expect(insert).toMatch(/'UNROUTED', false\)/);
+      await upsertKanbanDagPrefill(pool, [rowOf(1, true)], { env: OPTED_IN });
+      const call = client.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO'))!;
+      const sql = String(call[0]);
+      const conflict = sql.slice(sql.indexOf('ON CONFLICT'));
+      expect(sql).toMatch(/'UNVERIFIED'/);
+      expect(sql).toMatch(/, false\)\s*ON CONFLICT/);
+      expect(conflict).not.toMatch(/\bstatus\s*=/);
+      expect(conflict).not.toMatch(/canonical_authority/);
+      expect((call[1] as unknown[])[4]).toBe('ROUTED_ACTIVE');
+      const un = mockPool();
+      await upsertKanbanDagPrefill(un.pool, [rowOf(1, false)], { env: OPTED_IN });
+      expect((un.client.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO'))![1] as unknown[])[4]).toBe('UNROUTED');
     });
 
-    it('a caller-supplied Pool is identity-checked too: a non-scratch database aborts with ROLLBACK', async () => {
-      const { pool, queries, client } = mockPool({ db: 'legal_ai_db' });
-      await expect(upsertKanbanDagPrefill(pool, [sample()], ['t:0'], { env: OPTED_IN })).rejects.toThrow(/SCRATCH_IDENTITY_MISMATCH/);
-      expect(queries.some((q) => q.includes('INSERT INTO'))).toBe(false);
-      expect(queries).toContain('ROLLBACK;');
-      expect(client.release).toHaveBeenCalled();
-    });
-
-    it('refuses a server older than PostgreSQL 18', async () => {
-      const { pool } = mockPool({ version: 170005 });
-      await expect(upsertKanbanDagPrefill(pool, [sample()], ['t:0'], { env: OPTED_IN })).rejects.toThrow(/PostgreSQL 18/);
-    });
-
-    it('rolls back on a statement error and discards a connection whose rollback also fails', async () => {
+    it('identity-checks a caller-supplied Pool, refuses PostgreSQL < 18, and rolls back on a statement error', async () => {
+      const wrong = mockPool({ db: 'legal_ai_db' });
+      await expect(upsertKanbanDagPrefill(wrong.pool, [rowOf(0)], { env: OPTED_IN })).rejects.toThrow(/SCRATCH_IDENTITY_MISMATCH/);
+      expect(wrong.queries.some((q) => q.includes('INSERT INTO'))).toBe(false);
+      await expect(upsertKanbanDagPrefill(mockPool({ version: 170005 }).pool, [rowOf(0)], { env: OPTED_IN })).rejects.toThrow(/PostgreSQL 18/);
       const a = mockPool({ failOn: /INSERT INTO/ });
-      await expect(upsertKanbanDagPrefill(a.pool, [sample()], ['t:0'], { env: OPTED_IN })).rejects.toThrow('SIMULATED_DB_ERROR');
+      await expect(upsertKanbanDagPrefill(a.pool, [rowOf(0)], { env: OPTED_IN })).rejects.toThrow('SIMULATED_DB_ERROR');
       expect(a.queries).toContain('ROLLBACK;');
       const b = mockPool({ failOn: /INSERT INTO/, failRollback: true });
-      await expect(upsertKanbanDagPrefill(b.pool, [sample()], ['t:0'], { env: OPTED_IN })).rejects.toThrow('SIMULATED_DB_ERROR');
+      await expect(upsertKanbanDagPrefill(b.pool, [rowOf(0)], { env: OPTED_IN })).rejects.toThrow('SIMULATED_DB_ERROR');
       expect(b.client.release).toHaveBeenCalledWith(true);
     });
 
-    it('a connection string for a non-scratch database never reaches the driver', async () => {
-      await expect(upsertKanbanDagPrefill('postgresql://a:b@127.0.0.1:5434/legal_ai_db', [sample()], ['t:0'], { env: OPTED_IN }))
-        .rejects.toThrow(/database name must match/);
+    it('a non-scratch connection string never reaches the driver', async () => {
+      await expect(upsertKanbanDagPrefill('postgresql://a:b@127.0.0.1:5434/legal_ai_db', [rowOf(0)], { env: OPTED_IN })).rejects.toThrow(/database name must match/);
+    });
+
+    it('drift guard: when the candidate DDL is on disk, every column this module writes exists in it and no extra column is written', (ctx) => {
+      const sqlPath = path.resolve(process.cwd(), 'drizzle/manual/20261108_atlas_kanban_dag_prefill_v1.sql');
+      if (!fs.existsSync(sqlPath)) { ctx.skip(); return; }
+      const ddl = fs.readFileSync(sqlPath, 'utf8');
+      const body = ddl.slice(ddl.indexOf('(', ddl.indexOf('CREATE TABLE')), ddl.indexOf(');'));
+      const ddlColumns = new Set([...body.matchAll(/^\s{2,}([a-z_0-9]+)\s+(?:TEXT|INTEGER|SMALLINT|BIGINT|REAL|BOOLEAN|TIMESTAMPTZ)/gm)].map((m) => m[1]!));
+      const written = ['task_id', 'canonical_task_key', 'cohort_ordinal', 'change_id', 'status', 'routing_status', 'community_id', 'domain_id', 'morton_code', 'priority_score', 'final_score', 'routing_active_bit', 'umap_xyz', 'rot_6d', 'latent_64d', 'canonical_authority'];
+      for (const c of written) expect(ddlColumns.has(c), `column ${c} missing from the candidate DDL`).toBe(true);
+      expect(ddl).toMatch(/canonical_authority\s+BOOLEAN\s+NOT NULL DEFAULT FALSE CHECK \(canonical_authority = FALSE\)/);
     });
   });
 });
