@@ -1,0 +1,92 @@
+{
+  "schema": "atlas.verified-ace-task-batch.v1",
+  "generatedAt": "2026-11-08T09:20:19.698Z",
+  "targetCommunities": [
+    21,
+    1,
+    2,
+    10
+  ],
+  "tasksProcessed": 8,
+  "tasks": [
+    {
+      "canonicalTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#a870cee7088e7268",
+      "communityId": 21,
+      "taskOrdinal": 0,
+      "taskCode": "CANARY-PR-01",
+      "cacheKey": "ace:packet:parent-atlas-ace-rlm-bitfrost-integration#a870cee7088e7268:3bd8c8e3861c0d8228128291af575e05a194b563",
+      "ttl": 3600,
+      "status": "VERIFIED_CACHED"
+    },
+    {
+      "canonicalTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#2e57a67dae020f1a",
+      "communityId": 21,
+      "taskOrdinal": 16,
+      "taskCode": "CANARY-KMEANS-01",
+      "cacheKey": "ace:packet:parent-atlas-ace-rlm-bitfrost-integration#2e57a67dae020f1a:3bd8c8e3861c0d8228128291af575e05a194b563",
+      "ttl": 3600,
+      "status": "VERIFIED_CACHED"
+    },
+    {
+      "canonicalTaskKey": "parent-atlas-neural-prefill-encoder#69819ca12c07d127",
+      "communityId": 2,
+      "taskOrdinal": 41,
+      "taskCode": "COMM-2-TASK-41",
+      "cacheKey": "ace:packet:parent-atlas-neural-prefill-encoder#69819ca12c07d127:3bd8c8e3861c0d8228128291af575e05a194b563",
+      "ttl": 3600,
+      "status": "VERIFIED_CACHED"
+    },
+    {
+      "canonicalTaskKey": "parent-atlas-ontology-kernel#c38f39296ea2af88",
+      "communityId": 2,
+      "taskOrdinal": 48,
+      "taskCode": "OAK-HYPERGRAPH-01",
+      "cacheKey": "ace:packet:parent-atlas-ontology-kernel#c38f39296ea2af88:3bd8c8e3861c0d8228128291af575e05a194b563",
+      "ttl": 3600,
+      "status": "VERIFIED_CACHED"
+    },
+    {
+      "canonicalTaskKey": "parent-atlas-document-governance-master-index#b33086b0da9bda2e",
+      "communityId": 10,
+      "taskOrdinal": 88,
+      "taskCode": "DOC-GOV-TOC-CHECK-01",
+      "cacheKey": "ace:packet:parent-atlas-document-governance-master-index#b33086b0da9bda2e:3bd8c8e3861c0d8228128291af575e05a194b563",
+      "ttl": 3600,
+      "status": "VERIFIED_CACHED"
+    },
+    {
+      "canonicalTaskKey": "parent-atlas-best-fit-score-fabric#11765372d9b41b61",
+      "communityId": 1,
+      "taskOrdinal": 94,
+      "taskCode": "CURRENT-GRAPH-EDGE-ORDINAL-PROOF-03",
+      "cacheKey": "ace:packet:parent-atlas-best-fit-score-fabric#11765372d9b41b61:3bd8c8e3861c0d8228128291af575e05a194b563",
+      "ttl": 3600,
+      "status": "VERIFIED_CACHED"
+    },
+    {
+      "canonicalTaskKey": "parent-atlas-best-fit-score-fabric#56890ac1cfbfe498",
+      "communityId": 1,
+      "taskOrdinal": 108,
+      "taskCode": "COMM-1-TASK-108",
+      "cacheKey": "ace:packet:parent-atlas-best-fit-score-fabric#56890ac1cfbfe498:3bd8c8e3861c0d8228128291af575e05a194b563",
+      "ttl": 3600,
+      "status": "VERIFIED_CACHED"
+    },
+    {
+      "canonicalTaskKey": "parent-atlas-candidate-feature-execution-fabric#5f430ad04c8bcb37",
+      "communityId": 10,
+      "taskOrdinal": 139,
+      "taskCode": "COMM-10-TASK-139",
+      "cacheKey": "ace:packet:parent-atlas-candidate-feature-execution-fabric#5f430ad04c8bcb37:3bd8c8e3861c0d8228128291af575e05a194b563",
+      "ttl": 3600,
+      "status": "VERIFIED_CACHED"
+    }
+  ],
+  "negativeInvariants": {
+    "zeroRawVectorsPersisted": true,
+    "zeroHiddenThoughts": true,
+    "zeroChainOfThought": true,
+    "zeroTensorPersisted": true
+  },
+  "status": "BATCH_PASS"
+}
