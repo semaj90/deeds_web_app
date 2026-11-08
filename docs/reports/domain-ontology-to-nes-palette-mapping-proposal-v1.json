@@ -1,6 +1,6 @@
 {
   "schema": "atlas.domain-ontology-to-nes-palette-mapping-proposal.v1",
-  "status": "PROPOSAL_ONLY",
+  "status": "PARTIALLY_APPROVED_NOT_APPLIED",
   "canonicalAuthority": false,
   "generatedAt": "2026-11-08T06:26:37.960Z",
   "paletteRevision": "nes-domain-palette-v1",
@@ -10,7 +10,8 @@
     "ontologyGroups": 13,
     "exactName": 5,
     "proposed": 4,
-    "noPaletteFit": 4
+    "noPaletteFit": 4,
+    "approved": 4
   },
   "rows": [
     {
@@ -58,32 +59,44 @@
       "nesDomain": "ui",
       "lutByte": 2,
       "tier": "PROPOSED",
-      "approved": false,
-      "note": "palette ui is DOM_UI_SVELTE5_RUNES; server-side SvelteKit routes under frontend may belong to network/api, so a human must confirm per row"
+      "approved": true,
+      "note": "palette ui is DOM_UI_SVELTE5_RUNES; server-side SvelteKit routes under frontend may belong to network/api, so a human must confirm per row",
+      "approvedBy": "operator",
+      "approvedOn": "2026-11-08",
+      "approvalNote": "operator chose \"Approve all four\" via AskUserQuestion"
     },
     {
       "ontologyGroup": "machine-learning",
       "nesDomain": "ml",
       "lutByte": 9,
       "tier": "PROPOSED",
-      "approved": false,
-      "note": "palette ml is DOM_ML_ATEN_TENSORRT_GEMM"
+      "approved": true,
+      "note": "palette ml is DOM_ML_ATEN_TENSORRT_GEMM",
+      "approvedBy": "operator",
+      "approvedOn": "2026-11-08",
+      "approvalNote": "operator chose \"Approve all four\" via AskUserQuestion"
     },
     {
       "ontologyGroup": "gpu",
       "nesDomain": "ml",
       "lutByte": 9,
       "tier": "PROPOSED_LOSSY",
-      "approved": false,
-      "note": "many-to-one with machine-learning; CUDA/kernel work and model work become indistinguishable"
+      "approved": true,
+      "note": "many-to-one with machine-learning; CUDA/kernel work and model work become indistinguishable",
+      "approvedBy": "operator",
+      "approvedOn": "2026-11-08",
+      "approvalNote": "operator chose \"Approve all four\" via AskUserQuestion"
     },
     {
       "ontologyGroup": "api",
       "nesDomain": "network",
       "lutByte": 4,
       "tier": "PROPOSED",
-      "approved": false,
-      "note": "palette network is DOM_NETWORK_HTTP_TRPC; api rows that are really auth or retrieval need their own label"
+      "approved": true,
+      "note": "palette network is DOM_NETWORK_HTTP_TRPC; api rows that are really auth or retrieval need their own label",
+      "approvedBy": "operator",
+      "approvedOn": "2026-11-08",
+      "approvalNote": "operator chose \"Approve all four\" via AskUserQuestion"
     },
     {
       "ontologyGroup": "devops",
@@ -91,7 +104,9 @@
       "lutByte": 0,
       "tier": "NO_PALETTE_FIT",
       "approved": false,
-      "note": "no palette domain covers build/process/env work; keep UNRESOLVED (0x00) rather than forcing general"
+      "note": "no palette domain covers build/process/env work; keep UNRESOLVED (0x00) rather than forcing general",
+      "operatorDirection": "ADD_PALETTE_DOMAIN",
+      "directionStatus": "REQUESTED_NOT_APPLIED"
     },
     {
       "ontologyGroup": "compiler",
@@ -99,7 +114,9 @@
       "lutByte": 0,
       "tier": "NO_PALETTE_FIT",
       "approved": false,
-      "note": "no palette domain; keep UNRESOLVED"
+      "note": "no palette domain; keep UNRESOLVED",
+      "operatorDirection": "ADD_PALETTE_DOMAIN",
+      "directionStatus": "REQUESTED_NOT_APPLIED"
     },
     {
       "ontologyGroup": "error-handling",
@@ -107,7 +124,9 @@
       "lutByte": 0,
       "tier": "NO_PALETTE_FIT",
       "approved": false,
-      "note": "cross-cutting; keep UNRESOLVED"
+      "note": "cross-cutting; keep UNRESOLVED",
+      "operatorDirection": "ADD_PALETTE_DOMAIN",
+      "directionStatus": "REQUESTED_NOT_APPLIED"
     },
     {
       "ontologyGroup": "test",
@@ -115,12 +134,39 @@
       "lutByte": 0,
       "tier": "NO_PALETTE_FIT",
       "approved": false,
-      "note": "cross-cutting; keep UNRESOLVED"
+      "note": "cross-cutting; keep UNRESOLVED",
+      "operatorDirection": "ADD_PALETTE_DOMAIN",
+      "directionStatus": "REQUESTED_NOT_APPLIED"
     }
   ],
   "paletteDomainsWithoutSource": {
     "agent": "NO_ONTOLOGY_SOURCE: the review sheet can never produce an agent label",
     "general": "FALLBACK_ONLY: not a target class for supervised training"
   },
-  "recommendation": "Label directly in the 10 palette domains (a palette-domain review sheet) for training data; use this mapping only as a pre-fill hint and for read-only reporting, never as automatic labels."
+  "recommendation": "Label directly in the 10 palette domains (a palette-domain review sheet) for training data; use this mapping only as a pre-fill hint and for read-only reporting, never as automatic labels.",
+  "decisions": {
+    "recordedOn": "2026-11-08",
+    "approvedMappings": [
+      "frontend->ui",
+      "machine-learning->ml",
+      "gpu->ml",
+      "api->network"
+    ],
+    "exactNameRows": "unchanged, still approved:false (not covered by this decision)",
+    "paletteExtension": {
+      "status": "REQUESTED_NOT_APPLIED",
+      "groups": [
+        "compiler",
+        "devops",
+        "error-handling",
+        "test"
+      ],
+      "open": "Palette owner must mint lutByte (11+) and nesHex for each new domain, update checksum, and reconcile with python/parent_atlas_learning/ace_compiler.py NES_LUT_PALETTES. No bytes minted here; until then these groups stay UNRESOLVED (0x00)."
+    },
+    "agent": {
+      "status": "TARGETED_CANDIDATES_ONLY",
+      "note": "no source group; Tier B draft keyword candidates, human reviewed"
+    },
+    "schemaCrosswalkStatus": "still PROPOSAL_NOT_APPLIED in .okf/domains/atlas-domain-taxonomy.yaml (snapshot is generated; not edited here)"
+  }
 }
