@@ -141,6 +141,11 @@ describe('SearchRuntime top-K recommendation evidence binding', () => {
     const result = executeSearchRuntimeTopKV1({ ...input, candidateOrdinals: [0], recommendationEvidence: bundle });
     expect(result.writesPerformed).toBe(false);
     expect(result.canonicalAuthority).toBe(false);
+    expect(result.recommendationBinding).not.toBeNull();
+    expect(result.recommendationBinding?.status).toBe('VERIFIED');
+    expect(result.receiptRow.manifest.recommendationBinding).toEqual(result.recommendationBinding);
+    expect(result.verification.status).toBe('VERIFIED_PASS');
+    expect(result.verification.checks.find((c) => c.name === 'recommendation_binding_valid')?.ok).toBe(true);
   });
 
   it('rejects a tampered bundle before any compute', () => {

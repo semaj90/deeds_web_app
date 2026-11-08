@@ -277,8 +277,12 @@ export function executeSearchRuntimeTopKV1(
   });
   const timing: TopKTimingV1 = { durationNs: (process.hrtime.bigint() - startHrTime).toString() };
 
-  // 4. Format receipt row
-  const receiptRow: AlgorithmExecutionReceiptRowV1 = toAlgorithmExecutionReceiptRowV1(execution, timing);
+  // 4. Format receipt row (plumbing recommendationBinding into the persisted manifest)
+  const receiptRow: AlgorithmExecutionReceiptRowV1 = toAlgorithmExecutionReceiptRowV1(
+    execution,
+    timing,
+    recommendationBinding,
+  );
 
   // 5. Independently replay and verify execution from the receipt row
   const verification: TopKVerificationV1 = verifyTopKExecutionReceiptV1({

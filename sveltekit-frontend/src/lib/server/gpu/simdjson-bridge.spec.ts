@@ -24,22 +24,25 @@ describe('simdjson bridge parse cache', () => {
 		expect(secondResult.value).not.toEqual(firstResult.value);
 	});
 
-	it('keeps the byte budget correct when replacing a colliding cache key', () => {
+	it('reuses the cache entry for identical JSON input and differentiates distinct payloads under SHA-256', () => {
 		const firstInput = JSON.stringify({ payload: 'a'.repeat(1024) });
 		const secondInput = `${firstInput.slice(0, 65)}b${firstInput.slice(66)}`;
 
-		fastJsonParseWithBackend(firstInput);
+		const firstResult = fastJsonParseWithBackend(firstInput);
 		const firstStats = getSimdjsonCacheStats();
-		fastJsonParseWithBackend(secondInput);
-		const secondStats = getSimdjsonCacheStats();
-		fastJsonParseWithBackend(firstInput);
-		const replacementStats = getSimdjsonCacheStats();
-
 		expect(firstStats.entries).toBe(1);
-		expect(secondStats.entries).toBe(1);
-		expect(replacementStats.entries).toBe(1);
-		expect(secondStats.budgetUsedBytes).toBe(firstStats.budgetUsedBytes);
-		expect(replacementStats.budgetUsedBytes).toBe(firstStats.budgetUsedBytes);
+
+		// Re-parsing firstInput hits cache (no new entry)
+		const cachedResult = fastJsonParseWithBackend(firstInput);
+		expect(cachedResult.backend).toBe('CACHE');
+		expect(getSimdjsonCacheStats().entries).toBe(1);
+
+		// Parsing secondInput creates a second distinct entry under SHA-256
+		const secondResult = fastJsonParseWithBackend(secondInput);
+		expect(secondResult.backend).not.toBe('CACHE');
+		const secondStats = getSimdjsonCacheStats();
+		expect(secondStats.entries).toBe(2);
+		expect(secondStats.budgetUsedBytes).toBeGreaterThan(firstStats.budgetUsedBytes);
 	});
 
 	it('matches JSON.parse for multiline JSON containing Unicode and counts UTF-8 bytes', () => {

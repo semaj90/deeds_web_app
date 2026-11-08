@@ -47,6 +47,10 @@ function getSimdJsonAddon(): SimdJsonAddon | null {
 	}
 
 	const paths = [
+		// Non-GPU release build (cuda_compiled 0, libtorch_built 0); parity-checked against older builds.
+		resolve(process.cwd(), '../../simd-bridge/cpp/build-x64-fallback/Release/tensorrt_bridge.node'),
+		resolve(process.cwd(), '../simd-bridge/cpp/build-x64-fallback/Release/tensorrt_bridge.node'),
+		resolve(process.cwd(), 'simd-bridge/cpp/build-x64-fallback/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
@@ -190,6 +194,11 @@ export function utf8ByteLength(input: string): number {
  * Results cached with 8 MB byte-budget LRU for 30 s.
  * Inputs > 64 MB throw RangeError to prevent OOM.
  */
+const V8_FIDELITY_RE = /-0(?![.\deE])|\\u[dD][89a-fA-F][0-9a-fA-F]{2}/;
+function needsV8Fidelity(input: string): boolean {
+	return input.charCodeAt(0) === 0xfeff || V8_FIDELITY_RE.test(input);
+}
+
 export function fastJsonParse<T = unknown>(input: string): T {
 	// Buffer.byteLength does not materialize the encoded bytes -- cheap to call
 	// before deciding whether the input is even small enough to proceed.
@@ -215,7 +224,7 @@ export function fastJsonParse<T = unknown>(input: string): T {
 	stats.totalBytesParsed += inputBytes;
 
 	let result: T;
-	const native = inputBytes >= MIN_NATIVE_BYTES ? getSimdJsonAddon() : null;
+	const native = inputBytes >= MIN_NATIVE_BYTES && !needsV8Fidelity(input) ? getSimdJsonAddon() : null;
 
 	if (native) {
 		const start = performance.now();
@@ -248,7 +257,7 @@ export function fastJsonValidate(input: string): boolean {
 	const native = getSimdJsonAddon();
 	if (native) {
 		try {
-			return native.simdJsonValidate(input);
+			if (native.simdJsonValidate(input)) return input.charCodeAt(0) !== 0xfeff;
 		} catch {
 			// fall through
 		}
