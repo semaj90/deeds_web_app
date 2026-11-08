@@ -8,6 +8,8 @@
 
 One index for every tracked doc in the three `next_steps` folders. "Updated" is the last git commit that touched the file (not when its plan was last true). "Status" is the doc's own `Status:` line when it has one, else blank — a blank is not "done". Nothing was moved, so existing links into these folders still resolve.
 
+See also [`CATEGORIZED_INDEX.md`](./CATEGORIZED_INDEX.md): the same markdown docs grouped by a keyword-based 14-domain proposal (unreviewed, `canonicalAuthority:false`).
+
 **Regenerate**: `git ls-files -- next_steps sveltekit-frontend/next_steps docs/next_steps`; date = newest `git log` entry per file; title = first heading in the first 40 lines; status = first `Status:` line in the first 40 lines.
 
 ## Folders
