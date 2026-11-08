@@ -15,6 +15,19 @@ const INPUT = argOf('--input') ? path.resolve(argOf('--input')) : path.join(ROOT
 // No automatic ontology->palette translation exists (see docs/reports/domain-ontology-to-nes-palette-mapping-proposal-v1.json, PROPOSAL_ONLY),
 // so reviewers choose a palette domain themselves and the export feeds export-okf-reviewed-domain-examples-v1.mjs unchanged.
 const PALETTE_MODE = process.argv.includes('--palette');
+const OUTPUT = argOf('--output') ? path.resolve(argOf('--output')) : path.join(ROOT, PALETTE_MODE ? 'docs/reports/domain-review-sheet-palette-v1.html' : 'docs/reports/domain-review-sheet-v1.html');
+
+let TOP_LEVEL = ['api', 'auth', 'cache', 'compiler', 'database', 'devops', 'error-handling', 'frontend', 'gpu', 'graph', 'machine-learning', 'retrieval', 'test'];
+let CHILDREN = ['database.postgresql', 'devops.env-config', 'devops.process-mgmt', 'frontend.sveltekit'];
+if (PALETTE_MODE) {
+  const palettePath = argOf('--palette-file') ? path.resolve(argOf('--palette-file')) : path.join(ROOT, 'scripts/atlas/data/nes-domain-palette-v1.json'); // default v1; --palette-file selects another revision (e.g. the proposed v2)
+  const palette = JSON.parse(fs.readFileSync(palettePath, 'utf8'));
+  const { checksum, ...body } = palette;
+  const actual = 'sha256:' + createHash('sha256').update(JSON.stringify(body)).digest('hex');
+  if (actual !== checksum) { console.error(`PALETTE_CHECKSUM_MISMATCH: expected ${checksum}, got ${actual}`); process.exit(3); }
+  TOP_LEVEL = Object.keys(palette.domains);
+  CHILDREN = [];
+}
 let paletteChecksum = null;
 let TOP_LEVEL = ['api', 'auth', 'cache', 'compiler', 'database', 'devops', 'error-handling', 'frontend', 'gpu', 'graph', 'machine-learning', 'retrieval', 'test'];
 let CHILDREN = ['database.postgresql', 'devops.env-config', 'devops.process-mgmt', 'frontend.sveltekit'];
@@ -68,6 +81,8 @@ const storageKey = IS_TIER_B
 
 const qualified = rows.filter((r) => r.sourceRevision);
 const needs = TOP_LEVEL.map((g) => {
+  // In palette mode the draft's proposedOntologyGroup is a different vocabulary, so no per-class proposal count is claimed.
+  const have = PALETTE_MODE ? 0 : qualified.filter((r) => r.proposedOntologyGroup === g).length;
   const have = PALETTE_MODE
     ? qualified.filter((r) => (r.proposedDomain ?? r.proposedOntologyGroup) === g).length
     : qualified.filter((r) => r.proposedOntologyGroup === g).length;
