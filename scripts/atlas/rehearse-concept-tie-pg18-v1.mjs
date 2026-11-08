@@ -16,7 +16,27 @@ import { writeFile, mkdir } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import pg from 'pg';
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+function getSecureScratchPgUrl() {
+  const url = (process.env.ATLAS_SCRATCH_PG18_URL || '').trim();
+  if (!url) {
+    console.error('[Security Gate P0] ERROR: ATLAS_SCRATCH_PG18_URL environment variable is missing. Refusing execution.');
+    process.exit(1);
+  }
+
+  // Guardrail against accidental production connection
+  const forbidden = ['legal_ai_db', 'production', 'live', 'main_db'];
+  const lowerUrl = url.toLowerCase();
+  for (const f of forbidden) {
+    if (lowerUrl.includes(f)) {
+      console.error(`[Security Gate P0] FATAL: Target URL contains forbidden production token '${f}'. Aborting.`);
+      process.exit(1);
+    }
+  }
+
+  return url;
+}
+
+const DATABASE_URL = getSecureScratchPgUrl();
 
 async function main() {
   console.log('[PG18 Rehearsal] Connecting to PostgreSQL 18 legal_ai_db (:5434)...');
