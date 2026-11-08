@@ -26,6 +26,7 @@ const SHAPES = {
   topKIndicesGPU: [[100, 10], [33, 33], [1000, 1], [4096, 64]],
   rewardScoreGPU: [[64, 64], [33, 768], [1, 16]],
   pcaProject: [[64, 32, 8], [33, 768, 64], [1, 16, 16]],
+  batchCosineTopK: [[256, 64, 10], [33, 64, 33], [1000, 16, 1], [64, 768, 8]],
 };
 
 const COUNTER_KEYS = ['cuda_execution', 'cpu_fallback', 'stub_invocation', 'cuda_error_fallback', 'oom_fallback'];
@@ -252,6 +253,25 @@ function checkPca(addon, rng, [n, dim, k]) {
     status: out.length === n * k && diff <= tol ? 'PASS' : 'FAIL' };
 }
 
+function checkCosineTopK(addon, rng, [n, dim, k]) {
+  const query = randomMatrix(rng, 1, dim);
+  const corpus = randomMatrix(rng, n, dim);
+  const res = addon.batchCosineTopK(query, corpus, n, dim, k);
+  const sims = cpuCosine(query, dim, corpus, n);
+  const order = Array.from({ length: n }, (_, i) => i).sort((a, b) => sims[b] - sims[a] || a - b);
+  const expectedIdx = order.slice(0, k);
+  const expectedScores = expectedIdx.map((i) => sims[i]);
+  const scoreDiff = maxAbsDiff(res.scores, expectedScores);
+  // Compare as a set plus score values: equal-score ties may legitimately reorder.
+  const gotSet = new Set(Array.from(res.indices));
+  const setMatch = gotSet.size === k && expectedIdx.every((i) => gotSet.has(i));
+  const returnedScoresMatchOwnIndices = Array.from(res.indices).every((idx, j) => Math.abs(sims[idx] - res.scores[j]) <= TOL_COSINE);
+  const backendOk = res.backend === 'cuda_cublas';
+  return { name: 'batchCosineTopK', n, dim, k, scoreMaxAbsDiff: scoreDiff, setMatch, returnedScoresMatchOwnIndices,
+    reportedBackend: res.backend, tolerance: TOL_COSINE,
+    status: setMatch && returnedScoresMatchOwnIndices && scoreDiff <= TOL_COSINE && backendOk ? 'PASS' : 'FAIL' };
+}
+
 const CHECKS = [
   ['batchCosineSimilarity', checkBatchCosine],
   ['attentionScoreGPU', checkAttention],
@@ -260,6 +280,7 @@ const CHECKS = [
   ['topKIndicesGPU', checkTopK],
   ['rewardScoreGPU', checkReward],
   ['pcaProject', checkPca],
+  ['batchCosineTopK', checkCosineTopK],
 ];
 
 // Faulty wrappers: the harness must report FAIL for each. Proves the checks can fail.
