@@ -22,6 +22,9 @@ const SHAPES = {
   batchCosineSimilarity: [[256, 64], [33, 64], [1, 64], [64, 768], [1000, 16]],
   attentionScoreGPU: [[128, 64], [33, 64], [1, 64], [64, 768]],
   kmeansWithCentroids: [[200, 16, 4], [201, 16, 5], [64, 8, 2]],
+  softmaxGPU: [[1], [33], [1000], [4096]],
+  topKIndicesGPU: [[100, 10], [33, 33], [1000, 1], [4096, 64]],
+  rewardScoreGPU: [[64, 64], [33, 768], [1, 16]],
 };
 
 const COUNTER_KEYS = ['cuda_execution', 'cpu_fallback', 'stub_invocation', 'cuda_error_fallback', 'oom_fallback'];
@@ -178,10 +181,58 @@ function checkKmeans(addon, rng, [n, dim, k]) {
     status: shapeOk && rangeOk && nearestViolations === 0 && meanOk ? 'PASS' : 'FAIL' };
 }
 
+function checkSoftmax(addon, rng, [n]) {
+  const logits = randomMatrix(rng, 1, n).map((v) => v * 8);
+  const out = addon.softmaxGPU(logits, n);
+  let max = -Infinity;
+  for (const v of logits) if (v > max) max = v;
+  const ref = new Float64Array(n);
+  let sum = 0;
+  for (let i = 0; i < n; i++) { ref[i] = Math.exp(logits[i] - max); sum += ref[i]; }
+  for (let i = 0; i < n; i++) ref[i] /= sum;
+  let outSum = 0;
+  for (const v of out) outSum += v;
+  const diff = maxAbsDiff(out, ref);
+  const sumToOne = Math.abs(outSum - 1) <= 1e-5;
+  return { name: 'softmaxGPU', n, maxAbsDiff: diff, sumToOne, tolerance: TOL_ATTENTION,
+    status: out.length === n && diff <= TOL_ATTENTION && sumToOne ? 'PASS' : 'FAIL' };
+}
+
+// Distinct scores (strictly decreasing permutation) so the expected ordering is unique, no tie ambiguity.
+function checkTopK(addon, rng, [n, k]) {
+  const order = Array.from({ length: n }, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+  const scores = new Float32Array(n);
+  order.forEach((idx, rank) => { scores[idx] = 1 - rank / (n + 1); });
+  const out = addon.topKIndicesGPU(scores, n, k);
+  const expected = Array.from({ length: n }, (_, i) => i).sort((a, b) => scores[b] - scores[a]).slice(0, k);
+  const got = Array.from(out);
+  const exact = got.length === k && got.every((v, i) => v === expected[i]);
+  return { name: 'topKIndicesGPU', n, k, exactOrderMatch: exact, status: exact ? 'PASS' : 'FAIL' };
+}
+
+function checkReward(addon, rng, [n, dim]) {
+  const gen = randomMatrix(rng, n, dim);
+  const ref = randomMatrix(rng, n, dim);
+  const out = addon.rewardScoreGPU(gen, ref, n, dim);
+  const expected = new Float64Array(n);
+  for (let i = 0; i < n; i++) {
+    let dot = 0, gn = 0, rn = 0;
+    for (let d = 0; d < dim; d++) { const g = gen[i * dim + d], r = ref[i * dim + d]; dot += g * r; gn += g * g; rn += r * r; }
+    expected[i] = dot / (Math.sqrt(gn) * Math.sqrt(rn));
+  }
+  const diff = maxAbsDiff(out, expected);
+  return { name: 'rewardScoreGPU', n, dim, maxAbsDiff: diff, tolerance: TOL_COSINE,
+    status: out.length === n && diff <= TOL_COSINE ? 'PASS' : 'FAIL' };
+}
+
 const CHECKS = [
   ['batchCosineSimilarity', checkBatchCosine],
   ['attentionScoreGPU', checkAttention],
   ['kmeansWithCentroids', checkKmeans],
+  ['softmaxGPU', checkSoftmax],
+  ['topKIndicesGPU', checkTopK],
+  ['rewardScoreGPU', checkReward],
 ];
 
 // Faulty wrappers: the harness must report FAIL for each. Proves the checks can fail.
@@ -201,6 +252,23 @@ function faultyAddon(real, mode) {
       const r = real.kmeansWithCentroids(e, n, dim, k, it);
       if (mode === 'perturb-output') r.centroids[0] += 0.5;
       return r;
+    },
+    softmaxGPU(l, n) {
+      const w = real.softmaxGPU(l, n);
+      if (mode === 'perturb-output') w[0] += 1e-3;
+      return w;
+    },
+    topKIndicesGPU(s, n, k) {
+      const r = real.topKIndicesGPU(s, n, k);
+      if (mode === 'perturb-output' && r.length > 1) { const t = r[0]; r[0] = r[1]; r[1] = t; }
+      // k = 1 cannot swap two entries, so corrupt the single index instead.
+      if (mode === 'perturb-output' && r.length === 1) r[0] = (r[0] + 1) % n;
+      return r;
+    },
+    rewardScoreGPU(g, rf, n, dim) {
+      const o = real.rewardScoreGPU(g, rf, n, dim);
+      if (mode === 'perturb-output') o[0] += 1e-3;
+      return o;
     },
     // 'no-cuda-counter' simulates a silent fallback: the counter never advances.
     getExecutionCounters: mode === 'no-cuda-counter' ? () => ({ cuda_execution: 0, cpu_fallback: 0 }) : () => real.getExecutionCounters(),
