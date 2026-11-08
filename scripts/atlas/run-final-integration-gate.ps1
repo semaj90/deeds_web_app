@@ -16,7 +16,9 @@ param(
     [ValidateSet('Fast', 'Focused', 'None')][string]$TypeCheck = 'Fast',
     [string[]]$ScanRoots = @('scripts/atlas', 'sveltekit-frontend/src/lib/server/atlas'),
     [switch]$StrictCredentials,
-    [switch]$WriteCredentialBaseline
+    [switch]$WriteCredentialBaseline,
+    [switch]$IncludeNotebook,
+    [string]$CohortRows = $env:ATLAS_COHORT_ROWS
 )
 $ErrorActionPreference = 'Stop'
 # `powershell -File` passes 'A,B' as ONE string; split so -Only / -ScanRoots behave the same under -File and dot-sourcing.
@@ -38,7 +40,15 @@ $gateInputs = @(
     'scripts/atlas/verify-lowrank-task-rpc-v1.test.mjs',
     'sveltekit-frontend/src/lib/server/atlas/kanban/kanban-dag-prefill-v1.ts',
     'sveltekit-frontend/src/lib/server/atlas/kanban/kanban-dag-prefill-v1.spec.ts',
-    'sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-pack-v1.spec.ts'
+    'sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-pack-v1.spec.ts',
+    'scripts/atlas/lib/dedup-huffman-v1.mjs',
+    'scripts/atlas/crosswalk-lowrank-cohort-to-tasks-v1.mjs',
+    'scripts/atlas/crosswalk-delta-v1.mjs',
+    'scripts/atlas/export-okf-reviewed-domain-examples-v1.mjs',
+    'scripts/atlas/synthesize-lowrank-task-rpc-v1.py',
+    'scripts/atlas/run-okf-notebook-smoke-v1.py',
+    'docs/reports/openspec-lowrank-task-rpc-receipt-v1.json',
+    'python/atlas_okf_learning_colab/Parent_Atlas_OKF_GRU_Shadow_Colab_v2.ipynb'
 )
 
 $results = New-Object System.Collections.ArrayList
@@ -150,6 +160,50 @@ Invoke-Stage 'Vitest' 'Kanban prefill + candidate-feature GPU pack specs (lane-c
         $env:ATLAS_REQUIRE_FIXTURES = '1'
         npx vitest run --config vitest.lane-contracts.config.ts src/lib/server/atlas/kanban/kanban-dag-prefill-v1.spec.ts src/lib/server/atlas/features/candidate-feature-gpu-pack-v1.spec.ts
     } finally { Pop-Location }
+}
+
+Invoke-Stage 'LowRankReceipt' 'Tracked low-rank receipt does not present synthetic vectors as an EmbeddingGemma/MRL representation' {
+    $global:LASTEXITCODE = 0
+    $r = Get-Content 'docs/reports/openspec-lowrank-task-rpc-receipt-v1.json' -Raw | ConvertFrom-Json
+    $problems = @()
+    if ($r.packet.embeddingSource -match 'NOT_MODEL_EMBEDDING') {
+        if ($r.envelope.representationFamily -ne 'SYNTHETIC_TEST_VECTOR') { $problems += "representationFamily is $($r.envelope.representationFamily), expected SYNTHETIC_TEST_VECTOR" }
+        if ($r.envelope.retrievalEligible -ne $false) { $problems += 'retrievalEligible is not false' }
+    }
+    if ($r.packet.canonicalAuthority -ne $false -or $r.envelope.canonicalAuthority -ne $false) { $problems += 'packet/envelope canonicalAuthority is not false' }
+    if ($problems.Count -gt 0) { $problems | ForEach-Object { Write-Output "RECEIPT_PROVENANCE: $_" }; $global:LASTEXITCODE = 1 } else { Write-Output 'receipt labels synthetic vectors as SYNTHETIC_TEST_VECTOR, retrievalEligible=false' }
+}
+
+Invoke-Stage 'ToolTests' 'Huffman codec, crosswalk, crosswalk delta and reviewed-label exporter (node --test)' {
+    node --test scripts/atlas/lib/dedup-huffman-v1.test.mjs scripts/atlas/crosswalk-lowrank-cohort-to-tasks-v1.test.mjs scripts/atlas/crosswalk-delta-v1.test.mjs scripts/atlas/export-okf-reviewed-domain-examples-v1.test.mjs
+}
+
+Invoke-Stage 'CrosswalkRun' 'End to end: cohort -> crosswalk (+packed columns) -> delta self-check; BLOCKED_FIXTURE_MISSING if the cohort file is absent' {
+    $global:LASTEXITCODE = 0
+    $rows = $CohortRows
+    if (-not $rows) { $rows = 'docs/reports/openspec-task-concept-tie-v2.20261107T214110Z.rows.jsonl' }
+    if (-not (Test-Path $rows)) { Write-Output "BLOCKED_FIXTURE_MISSING: cohort rows file not found ($rows). It is untracked; set ATLAS_COHORT_ROWS or -CohortRows."; $global:LASTEXITCODE = 1; return }
+    $stampX = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
+    $outDir = Join-Path $repoRoot (".tmp/atlas/gate-crosswalk-" + $stampX)
+    node scripts/atlas/crosswalk-lowrank-cohort-to-tasks-v1.mjs --rows $rows --out-dir $outDir --pack | Out-Host
+    # exit 2 only means "some rows are unresolved" (a reported finding, not an integrity failure); anything else non-zero is a real failure.
+    if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 2) { return }
+    $rc = Get-Content (Join-Path $outDir 'crosswalk-receipt.json') -Raw | ConvertFrom-Json
+    $bad = @()
+    if ($rc.duplicateStableKeys -ne 0) { $bad += "duplicateStableKeys=$($rc.duplicateStableKeys)" }
+    if (-not $rc.packed.sources.roundTripVerified -or -not $rc.packed.statuses.roundTripVerified) { $bad += 'packed columns not round-trip verified' }
+    node scripts/atlas/crosswalk-delta-v1.mjs --prev (Join-Path $outDir 'crosswalk.jsonl') --next (Join-Path $outDir 'crosswalk.jsonl') --out-dir (Join-Path $outDir 'delta-selfcheck') | Out-Host
+    if ($LASTEXITCODE -ne 0) { $bad += 'delta self-check failed' }
+    $dr = Get-Content (Join-Path $outDir 'delta-selfcheck/crosswalk-delta-receipt.json') -Raw | ConvertFrom-Json
+    if ($dr.opTotal -ne 0 -or -not $dr.applyVerifiedAgainstNext) { $bad += "delta self-check not empty/verified (ops=$($dr.opTotal))" }
+    Write-Output ("crosswalk: {0}/{1} resolved to a stableKey, {2} unresolved (reported, not a gate failure)" -f $rc.resolvedToStableKey, $rc.cohortRows, $rc.unresolved)
+    if ($bad.Count -gt 0) { $bad | ForEach-Object { Write-Output "CROSSWALK_INTEGRITY: $_" }; $global:LASTEXITCODE = 1 } else { $global:LASTEXITCODE = 0 }
+}
+
+if ($IncludeNotebook) {
+    Invoke-Stage 'NotebookSmoke' 'OKF learning notebook v2 smoke run (CPU, new empty directory, synthetic data => DEMO_ONLY)' {
+        py -3.13 scripts/atlas/run-okf-notebook-smoke-v1.py
+    }
 }
 
 if ($TypeCheck -ne 'None') {

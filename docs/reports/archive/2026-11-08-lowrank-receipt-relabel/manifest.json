@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.archive-manifest.v1",
+  "archived": "2026-11-08",
+  "entries": [
+    {
+      "path": "docs/reports/openspec-lowrank-task-rpc-receipt-v1.json",
+      "archivedAs": "docs/reports/archive/2026-11-08-lowrank-receipt-relabel/openspec-lowrank-task-rpc-receipt-v1.pre-relabel.json",
+      "sha256": "sha256:f4e961473113de997f936f2b0835cfd5b6bd413d66f791bfa84c1e2d8c6a538d",
+      "reason": "Superseded: the 768-D vectors are md5-seeded random numbers but the envelope labelled them EMBEDDINGGEMMA_MRL (semantic_mrl_prefix_64). Regenerated as SYNTHETIC_TEST_VECTOR; binaries are byte-identical (keyframes a40abeb1f5f6ec95, latent64 cbb9b04fb0014d70, bitset 34eb75b37f777baf).",
+      "recovery": "cp the archivedAs file back over the original path; verify sha256."
+    }
+  ]
+}
