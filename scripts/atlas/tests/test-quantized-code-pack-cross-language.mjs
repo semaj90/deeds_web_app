@@ -33,3 +33,17 @@ test('Node and Python produce byte-identical packed output', () => {
     assert.equal(pyHex, nodeHex, `${bits}b x ${n}`);
   }
 });
+
+// C++ leg: runs only when ATLAS_QPACK_EXE points at a binary compiled from scripts/atlas/native-reference/quantized_code_pack_v1.cpp
+// (standalone, e.g. `cl /EHsc /O2 /std:c++17`); skipped otherwise so clean checkouts need no native toolchain.
+test('C++ reference produces byte-identical packed output', { skip: process.env.ATLAS_QPACK_EXE ? false : 'ATLAS_QPACK_EXE not set (C++ leg NOT_RUN)' }, () => {
+  for (const bits of BITS) for (const n of [64, 128, 256, 512]) {
+    const codes = codesFor(n, bits, 99 + bits * n);
+    const r = spawnSync(process.env.ATLAS_QPACK_EXE, [String(bits), Array.from(codes).join(',')], { encoding: 'utf8' });
+    assert.equal(r.status, 0, `exit ${r.status} for ${bits}b x ${n}`);
+    assert.equal(r.stdout.trim(), Buffer.from(packCodes(codes, bits)).toString('hex'), `${bits}b x ${n}`);
+  }
+  const bad = spawnSync(process.env.ATLAS_QPACK_EXE, ['2', '4'], { encoding: 'utf8' });
+  assert.equal(bad.status, 3);
+  assert.equal(spawnSync(process.env.ATLAS_QPACK_EXE, ['5', '1'], { encoding: 'utf8' }).status, 2);
+});
