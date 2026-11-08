@@ -46,9 +46,32 @@ CREATE TABLE IF NOT EXISTS public.atlas_kanban_dag_prefill_v1 (
     umap_xyz            REAL[3] NOT NULL,
     rot_6d              REAL[6] NOT NULL,
     latent_64d          REAL[64],
+    cohort_revision          TEXT,
+    source_revision          TEXT,
+    source_sha256            TEXT,
+    workspace_revision       TEXT,
+    representation_family    TEXT,
+    representation_revision  TEXT,
+    embedding_model_digest   TEXT,
+    vector_artifact_ref      TEXT,
+    vector_artifact_sha256   TEXT,
+    fusion_packet_schema     TEXT,
+    fusion_packet_sha256     TEXT,
+    nes_palette_checksum     TEXT,
+    glyph_schema             TEXT,
+    glyph_instance64         BYTEA,
     canonical_authority BOOLEAN NOT NULL DEFAULT FALSE CHECK (canonical_authority = FALSE),
     CONSTRAINT atlas_kanban_dag_prefill_v1_no_synthetic_ordinal_chk
         CHECK (task_id !~ '^task:ordinal:' AND canonical_task_key !~ '^task:ordinal:'),
+    CONSTRAINT atlas_kanban_dag_prefill_v1_array_shape_chk
+        CHECK (array_length(umap_xyz, 1) = 3 AND array_length(rot_6d, 1) = 6
+               AND (latent_64d IS NULL OR array_length(latent_64d, 1) = 64)),
+    CONSTRAINT atlas_kanban_dag_prefill_v1_provenance_format_chk
+        CHECK ((source_sha256 IS NULL OR source_sha256 ~ '^sha256:[0-9a-f]{64}$')
+               AND (vector_artifact_sha256 IS NULL OR vector_artifact_sha256 ~ '^sha256:[0-9a-f]{64}$')
+               AND (fusion_packet_sha256 IS NULL OR fusion_packet_sha256 ~ '^sha256:[0-9a-f]{64}$')
+               AND (workspace_revision IS NULL OR workspace_revision ~ '^sha256:[0-9a-f]{64}$')
+               AND (glyph_instance64 IS NULL OR octet_length(glyph_instance64) = 64)),
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -60,6 +83,9 @@ CREATE INDEX IF NOT EXISTS idx_atlas_kanban_dag_prefill_v1_community_score
 
 CREATE INDEX IF NOT EXISTS idx_atlas_kanban_dag_prefill_v1_morton
     ON public.atlas_kanban_dag_prefill_v1 (morton_code);
+
+CREATE INDEX IF NOT EXISTS idx_atlas_kanban_dag_prefill_v1_cohort
+    ON public.atlas_kanban_dag_prefill_v1 (cohort_revision, cohort_ordinal);
 `.trim();
 
 const FORBIDDEN_PRODUCTION_TOKENS = ['legal_ai_db', 'production', 'live', 'main_db'] as const;

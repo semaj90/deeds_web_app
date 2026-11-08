@@ -1,0 +1,182 @@
+{
+  "schema": "atlas.kanban-cohort-6527-authority-bridge.v1",
+  "generatedAt": "2026-11-08T08:25:00.851Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "sidecarMigration": {
+    "file": "sveltekit-frontend/drizzle/manual/20261108_atlas_kanban_dag_prefill_v1.sql",
+    "sha256": "sha256:6cab1c8ba9d4dba79d4f7945a57920c64599f53db812db0c05f8f85b8744781e",
+    "registeredStatus": "active_candidate",
+    "appliedBy": "not-applied"
+  },
+  "cohortAuthorityJoin": {
+    "cohortOrdinalsTotal": 6527,
+    "uniqueCanonicalTaskKeys": 6527,
+    "syntheticTaskOrdinalIds": 0,
+    "crosswalkExactWorkboardMatches": 5418,
+    "matchedInLiveKanbanTasks": 4303,
+    "unseededSecondaryOrNewTasks": 2224,
+    "readyActionableZeroUnmetDeps": 1296,
+    "liveKanbanBreakdown": {
+      "lane_todo": 4300,
+      "lane_in_progress": 0,
+      "lane_done": 3,
+      "status_pending": 4300,
+      "status_active": 0,
+      "status_completed": 3,
+      "status_failed": 0
+    }
+  },
+  "transactionalRehearsal": {
+    "mode": "PG_TEMP_ISOLATED_BEGIN_ROLLBACK_ZERO_PERSISTENCE",
+    "optionASchemaParityVerified": true,
+    "publicTablesMutatedDuringRehearsal": 0,
+    "baselineCounts": {
+      "kanban_tasks_count": 4514,
+      "kanban_deps_count": 3031,
+      "kanban_events_count": 4806,
+      "kanban_attempts_count": 149,
+      "prefill_table_before": null
+    },
+    "postRollbackCounts": {
+      "kanban_tasks_count": 4514,
+      "kanban_deps_count": 3031,
+      "kanban_events_count": 4806,
+      "kanban_attempts_count": 149,
+      "prefill_table_after": null
+    },
+    "zeroPersistentMutation": true,
+    "sampleBridgeJoinedRows": [
+      {
+        "canonical_task_key": "parent-atlas-governed-compute-fabric#0043a825d1a1c80b",
+        "cohort_ordinal": 1300,
+        "prefill_status": "UNVERIFIED",
+        "routing_status": "UNROUTED",
+        "community_id": 24,
+        "final_score": 0.82,
+        "canonical_authority": false,
+        "kanban_lane": "in_progress",
+        "kanban_status": "active",
+        "assignee": "worker-bravo",
+        "attempt_count": 2
+      },
+      {
+        "canonical_task_key": "parent-atlas-neural-prefill-encoder#de50c4a49c895ba7",
+        "cohort_ordinal": 1412,
+        "prefill_status": "UNVERIFIED",
+        "routing_status": "ROUTED_ACTIVE",
+        "community_id": 14,
+        "final_score": 0.82,
+        "canonical_authority": false,
+        "kanban_lane": "todo",
+        "kanban_status": "pending",
+        "assignee": null,
+        "attempt_count": 0
+      },
+      {
+        "canonical_task_key": "parent-atlas-neural-prefill-encoder#070d8ba1c176ecf9",
+        "cohort_ordinal": 1477,
+        "prefill_status": "UNVERIFIED",
+        "routing_status": "ROUTED_ACTIVE",
+        "community_id": 25,
+        "final_score": 0.82,
+        "canonical_authority": false,
+        "kanban_lane": "todo",
+        "kanban_status": "pending",
+        "assignee": null,
+        "attempt_count": 0
+      },
+      {
+        "canonical_task_key": "local-llm-offload-ownership#2c8f006c058c5e94",
+        "cohort_ordinal": 1752,
+        "prefill_status": "UNVERIFIED",
+        "routing_status": "UNROUTED",
+        "community_id": 20,
+        "final_score": 0.82,
+        "canonical_authority": false,
+        "kanban_lane": "todo",
+        "kanban_status": "pending",
+        "assignee": null,
+        "attempt_count": 0
+      }
+    ],
+    "sampleReadyCandidates": [
+      {
+        "task_id": "parent-atlas-governed-compute-fabric#0043a825d1a1c80b",
+        "feature_id": "openspec:parent-atlas-governed-compute-fabric",
+        "feature_label": "Tasks — Parent Atlas Governed Compute Fabric",
+        "lane": "todo",
+        "status": "pending",
+        "priority": 80,
+        "source_revision": null,
+        "attempt_count": 0
+      },
+      {
+        "task_id": "parent-atlas-governed-compute-fabric#5d121f5439ac5a17",
+        "feature_id": "openspec:parent-atlas-governed-compute-fabric",
+        "feature_label": "Tasks — Parent Atlas Governed Compute Fabric",
+        "lane": "todo",
+        "status": "pending",
+        "priority": 80,
+        "source_revision": null,
+        "attempt_count": 0
+      },
+      {
+        "task_id": "parent-atlas-governed-compute-fabric#634bfdfcb8eafad8",
+        "feature_id": "openspec:parent-atlas-governed-compute-fabric",
+        "feature_label": "Tasks — Parent Atlas Governed Compute Fabric",
+        "lane": "todo",
+        "status": "pending",
+        "priority": 80,
+        "source_revision": null,
+        "attempt_count": 0
+      },
+      {
+        "task_id": "parent-atlas-governed-compute-fabric#7314f1ce7aeedaa3",
+        "feature_id": "openspec:parent-atlas-governed-compute-fabric",
+        "feature_label": "Tasks — Parent Atlas Governed Compute Fabric",
+        "lane": "todo",
+        "status": "pending",
+        "priority": 80,
+        "source_revision": null,
+        "attempt_count": 0
+      },
+      {
+        "task_id": "parent-atlas-governed-compute-fabric#cee7dedbdff78c99",
+        "feature_id": "openspec:parent-atlas-governed-compute-fabric",
+        "feature_label": "Tasks — Parent Atlas Governed Compute Fabric",
+        "lane": "todo",
+        "status": "pending",
+        "priority": 80,
+        "source_revision": null,
+        "attempt_count": 0
+      }
+    ]
+  },
+  "adversarialProbes": {
+    "adv_01_synthetic_ordinal_rejected": {
+      "passed": true,
+      "constraint": "atlas_kanban_dag_prefill_v1_no_synthetic_ordinal_chk",
+      "errorMessage": "new row for relation \"atlas_kanban_dag_prefill_v1\" violates check constraint \"atlas_kanban_dag_prefill_v1_no_synthetic_ordinal_chk\""
+    },
+    "adv_02_canonical_authority_true_rejected": {
+      "passed": true,
+      "constraint": "atlas_kanban_dag_prefill_v1_canonical_authority_check",
+      "errorMessage": "new row for relation \"atlas_kanban_dag_prefill_v1\" violates check constraint \"atlas_kanban_dag_prefill_v1_canonical_authority_check\""
+    },
+    "adv_03_duplicate_concurrent_claim_rejected": {
+      "passed": true,
+      "targetTaskId": "parent-atlas-governed-compute-fabric#0043a825d1a1c80b",
+      "workerAClaimedRows": 1,
+      "competingWorkerBClaimedRows": 0
+    },
+    "adv_04_expired_lease_reclaim_and_event_correlation": {
+      "passed": true,
+      "reclaimedBy": "worker-bravo",
+      "attemptId": "188",
+      "eventId": "4848",
+      "joinedPrefillRowsCount": 8
+    }
+  },
+  "status": "PASS"
+}

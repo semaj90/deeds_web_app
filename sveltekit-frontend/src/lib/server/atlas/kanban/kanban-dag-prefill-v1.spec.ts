@@ -26,7 +26,16 @@ describe('kanban-dag-prefill-v1 (Option A unified contract)', () => {
         "status              TEXT NOT NULL CHECK (status IN ('UNVERIFIED', 'IN_PROGRESS', 'COMPLETED', 'BLOCKED'))",
         "routing_status      TEXT NOT NULL CHECK (routing_status IN ('ROUTED_ACTIVE', 'UNROUTED'))",
         'canonical_authority BOOLEAN NOT NULL DEFAULT FALSE CHECK (canonical_authority = FALSE)',
-        'CONSTRAINT atlas_kanban_dag_prefill_v1_no_synthetic_ordinal_chk'
+        'CONSTRAINT atlas_kanban_dag_prefill_v1_no_synthetic_ordinal_chk',
+        // provenance extension (nullable, non-canonical)
+        'cohort_revision          TEXT,',
+        'workspace_revision       TEXT,',
+        'vector_artifact_sha256   TEXT,',
+        'fusion_packet_sha256     TEXT,',
+        'glyph_instance64         BYTEA,',
+        'CONSTRAINT atlas_kanban_dag_prefill_v1_array_shape_chk',
+        'CONSTRAINT atlas_kanban_dag_prefill_v1_provenance_format_chk',
+        'idx_atlas_kanban_dag_prefill_v1_cohort'
       ]) {
         expect(KANBAN_DAG_PREFILL_V1_DDL).toContain(requiredToken);
         expect(sqlText).toContain(requiredToken);
