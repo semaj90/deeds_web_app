@@ -1,0 +1,126 @@
+{
+  "schema": "atlas.domain-ontology-to-nes-palette-mapping-proposal.v1",
+  "status": "PROPOSAL_ONLY",
+  "canonicalAuthority": false,
+  "generatedAt": "2026-11-08T06:26:37.960Z",
+  "paletteRevision": "nes-domain-palette-v1",
+  "paletteChecksum": "sha256:e1b8ccdc6661a3faed3316cf276f01dd16a1edf80a9aba2d465def40461b9b0f",
+  "note": "Nothing here is approved or applied. Each row needs an explicit human decision. The palette stays the only owner of lutByte/nesHex; no new bytes are minted.",
+  "counts": {
+    "ontologyGroups": 13,
+    "exactName": 5,
+    "proposed": 4,
+    "noPaletteFit": 4
+  },
+  "rows": [
+    {
+      "ontologyGroup": "auth",
+      "nesDomain": "auth",
+      "lutByte": 1,
+      "tier": "EXACT_NAME",
+      "approved": false,
+      "note": "same name"
+    },
+    {
+      "ontologyGroup": "cache",
+      "nesDomain": "cache",
+      "lutByte": 6,
+      "tier": "EXACT_NAME",
+      "approved": false,
+      "note": "same name"
+    },
+    {
+      "ontologyGroup": "database",
+      "nesDomain": "database",
+      "lutByte": 5,
+      "tier": "EXACT_NAME",
+      "approved": false,
+      "note": "same name"
+    },
+    {
+      "ontologyGroup": "graph",
+      "nesDomain": "graph",
+      "lutByte": 8,
+      "tier": "EXACT_NAME",
+      "approved": false,
+      "note": "same name"
+    },
+    {
+      "ontologyGroup": "retrieval",
+      "nesDomain": "retrieval",
+      "lutByte": 3,
+      "tier": "EXACT_NAME",
+      "approved": false,
+      "note": "same name"
+    },
+    {
+      "ontologyGroup": "frontend",
+      "nesDomain": "ui",
+      "lutByte": 2,
+      "tier": "PROPOSED",
+      "approved": false,
+      "note": "palette ui is DOM_UI_SVELTE5_RUNES; server-side SvelteKit routes under frontend may belong to network/api, so a human must confirm per row"
+    },
+    {
+      "ontologyGroup": "machine-learning",
+      "nesDomain": "ml",
+      "lutByte": 9,
+      "tier": "PROPOSED",
+      "approved": false,
+      "note": "palette ml is DOM_ML_ATEN_TENSORRT_GEMM"
+    },
+    {
+      "ontologyGroup": "gpu",
+      "nesDomain": "ml",
+      "lutByte": 9,
+      "tier": "PROPOSED_LOSSY",
+      "approved": false,
+      "note": "many-to-one with machine-learning; CUDA/kernel work and model work become indistinguishable"
+    },
+    {
+      "ontologyGroup": "api",
+      "nesDomain": "network",
+      "lutByte": 4,
+      "tier": "PROPOSED",
+      "approved": false,
+      "note": "palette network is DOM_NETWORK_HTTP_TRPC; api rows that are really auth or retrieval need their own label"
+    },
+    {
+      "ontologyGroup": "devops",
+      "nesDomain": null,
+      "lutByte": 0,
+      "tier": "NO_PALETTE_FIT",
+      "approved": false,
+      "note": "no palette domain covers build/process/env work; keep UNRESOLVED (0x00) rather than forcing general"
+    },
+    {
+      "ontologyGroup": "compiler",
+      "nesDomain": null,
+      "lutByte": 0,
+      "tier": "NO_PALETTE_FIT",
+      "approved": false,
+      "note": "no palette domain; keep UNRESOLVED"
+    },
+    {
+      "ontologyGroup": "error-handling",
+      "nesDomain": null,
+      "lutByte": 0,
+      "tier": "NO_PALETTE_FIT",
+      "approved": false,
+      "note": "cross-cutting; keep UNRESOLVED"
+    },
+    {
+      "ontologyGroup": "test",
+      "nesDomain": null,
+      "lutByte": 0,
+      "tier": "NO_PALETTE_FIT",
+      "approved": false,
+      "note": "cross-cutting; keep UNRESOLVED"
+    }
+  ],
+  "paletteDomainsWithoutSource": {
+    "agent": "NO_ONTOLOGY_SOURCE: the review sheet can never produce an agent label",
+    "general": "FALLBACK_ONLY: not a target class for supervised training"
+  },
+  "recommendation": "Label directly in the 10 palette domains (a palette-domain review sheet) for training data; use this mapping only as a pre-fill hint and for read-only reporting, never as automatic labels."
+}
