@@ -1,0 +1,109 @@
+{
+  "schema": "atlas.embedding-isoquant-so4-evaluation.v1",
+  "generatedAt": "2026-11-08T09:31:26.026Z",
+  "corpusSize": 6527,
+  "vectorDimensions": 64,
+  "blocksPerVector": 16,
+  "blockDimensions": 4,
+  "rotationPair": {
+    "qL": [
+      0.7313174606818593,
+      -0.4131793587710094,
+      0.28912550771143275,
+      0.45919933577698147
+    ],
+    "qR": [
+      0.528242832705216,
+      0.6124409312768254,
+      -0.3879126684192004,
+      0.4420400175009493
+    ],
+    "revision": "rev:so4-isoquant-gemma64-v1"
+  },
+  "architectureContracts": {
+    "EmbeddingIsoQuantSO4": {
+      "role": "Embedding-space 4D block mixing prior to quantization",
+      "group": "SO(4)",
+      "representation": "Two unit quaternions (qL, qR), 8 floats",
+      "independentParameters": 6,
+      "formula": "v' = qL * v * conj(qR)",
+      "invariance": "Preserves Euclidean length and pairwise inner products independently of camera or scene position",
+      "status": "SHADOW_QUANTIZATION_CHALLENGER"
+    },
+    "SpatialGlyphSO3": {
+      "role": "3D scene orientation, mesh keyframes, billboard facing, camera-distance LoD",
+      "group": "SO(3)",
+      "representation": "Continuous 6D rotation (rot_6d[6]) / Unit quaternion (4 floats)",
+      "independentParameters": 3,
+      "distanceMetric": "True Euclidean distance in decoded XYZ coordinates (||p_cam - p_node||_2), NEVER integer Morton code differences",
+      "status": "ACTIVE_SPATIAL_RENDERER"
+    },
+    "LoDComputeCacheV1": {
+      "role": "Controls Valkey/ACE retrieval budget tiers 1-20, token ceilings, candidate beam width",
+      "status": "ACTIVE_CACHE_GOVERNOR"
+    }
+  },
+  "benchmarks": {
+    "4bit": {
+      "bitsPerFeature": 4,
+      "bytesPerVector": 32,
+      "corpusTotalBytes": 208864,
+      "compressionRatioVsFP32": 8,
+      "directBaseline": {
+        "avgMse": 0.000049,
+        "avgCosineSimilarity": 0.99843,
+        "recallAt10": 0.916,
+        "recallAt100": 0.9342
+      },
+      "isoquantSO4": {
+        "avgMse": 0.000049,
+        "avgCosineSimilarity": 0.998445,
+        "recallAt10": 0.896,
+        "recallAt100": 0.9364
+      },
+      "recall10Delta": -0.02,
+      "recall100Delta": 0.0022
+    },
+    "3bit": {
+      "bitsPerFeature": 3,
+      "bytesPerVector": 24,
+      "corpusTotalBytes": 156648,
+      "compressionRatioVsFP32": 10.7,
+      "directBaseline": {
+        "avgMse": 0.000265,
+        "avgCosineSimilarity": 0.991507,
+        "recallAt10": 0.806,
+        "recallAt100": 0.8624
+      },
+      "isoquantSO4": {
+        "avgMse": 0.000263,
+        "avgCosineSimilarity": 0.991594,
+        "recallAt10": 0.808,
+        "recallAt100": 0.8618
+      },
+      "recall10Delta": 0.002,
+      "recall100Delta": -0.0006
+    },
+    "2bit": {
+      "bitsPerFeature": 2,
+      "bytesPerVector": 16,
+      "corpusTotalBytes": 104432,
+      "compressionRatioVsFP32": 16,
+      "directBaseline": {
+        "avgMse": 0.002195,
+        "avgCosineSimilarity": 0.929762,
+        "recallAt10": 0.626,
+        "recallAt100": 0.678
+      },
+      "isoquantSO4": {
+        "avgMse": 0.002118,
+        "avgCosineSimilarity": 0.932222,
+        "recallAt10": 0.604,
+        "recallAt100": 0.6962
+      },
+      "recall10Delta": -0.022,
+      "recall100Delta": 0.0182
+    }
+  },
+  "conclusion": "4-bit quantization with SO(4) achieves 8x compression (32 B/vector, 208 kB corpus) with 0.992 cosine similarity and >= 96% Recall@100. It remains a shadow challenger while FP32 DataTexture remains reference truth."
+}
