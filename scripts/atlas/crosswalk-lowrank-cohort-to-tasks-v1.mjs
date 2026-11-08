@@ -78,7 +78,7 @@ export function buildCrosswalk({ cohortRows, workboard, readLines }) {
   };
 }
 
-function main() {
+async function main() {
   const here = path.dirname(fileURLToPath(import.meta.url));
   const argOf = (n) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : null; };
   const root = path.resolve(argOf('--root') ?? path.join(here, '..', '..'));
@@ -113,6 +113,20 @@ function main() {
     canonicalAuthority: false, writesPerformed: false, localArtifactsWritten: true,
   };
   fs.mkdirSync(outDir, { recursive: true });
+  if (process.argv.includes('--pack')) {
+    // Optional compact columns (deduplicated string table + canonical Huffman). Lossless: each column is unpacked and compared before it is kept.
+    const { packStrings, unpackStrings } = await import('./lib/dedup-huffman-v1.mjs');
+    const columns = { sources: rows.map((r) => r.source ?? ''), statuses: rows.map((r) => r.status) };
+    receipt.packed = {};
+    for (const [name, values] of Object.entries(columns)) {
+      const bytes = packStrings(values);
+      const back = unpackStrings(bytes);
+      if (back.length !== values.length || back.some((v, i) => v !== values[i])) throw new Error(`PACK_ROUNDTRIP_MISMATCH:${name}`);
+      fs.writeFileSync(path.join(outDir, `crosswalk.${name}.hfd`), bytes, { flag: 'wx' });
+      receipt.packed[name] = { bytes: bytes.length, rawJsonBytes: Buffer.byteLength(JSON.stringify(values)), roundTripVerified: true, sha256: `sha256:${sha256Hex(bytes)}` };
+    }
+    receipt.packedNote = 'Only the sources and statuses columns are packed; stableKey, line and workboardState stay in crosswalk.jsonl. Ordinal is the row index.';
+  }
   fs.writeFileSync(path.join(outDir, 'crosswalk.jsonl'), rows.map((r) => JSON.stringify(r)).join('\n') + '\n', { flag: 'wx' });
   fs.writeFileSync(path.join(outDir, 'crosswalk-receipt.json'), JSON.stringify(receipt, null, 2) + '\n', { flag: 'wx' });
   console.log(`crosswalk: ${summary.resolvedToStableKey}/${summary.cohortRows} resolved to a stableKey -> ${outDir}`);
@@ -120,4 +134,4 @@ function main() {
   process.exit(summary.unresolved === 0 && summary.duplicateStableKeys === 0 ? 0 : 2);
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();
