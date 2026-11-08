@@ -25,6 +25,7 @@ const SHAPES = {
   softmaxGPU: [[1], [33], [1000], [4096]],
   topKIndicesGPU: [[100, 10], [33, 33], [1000, 1], [4096, 64]],
   rewardScoreGPU: [[64, 64], [33, 768], [1, 16]],
+  pcaProject: [[64, 32, 8], [33, 768, 64], [1, 16, 16]],
 };
 
 const COUNTER_KEYS = ['cuda_execution', 'cpu_fallback', 'stub_invocation', 'cuda_error_fallback', 'oom_fallback'];
@@ -226,6 +227,31 @@ function checkReward(addon, rng, [n, dim]) {
     status: out.length === n && diff <= TOL_COSINE ? 'PASS' : 'FAIL' };
 }
 
+function checkPca(addon, rng, [n, dim, k]) {
+  const data = randomMatrix(rng, n, dim);
+  const mean = randomMatrix(rng, 1, dim);
+  const comps = randomMatrix(rng, k, dim);
+  const out = addon.pcaProject(data, n, dim, mean, comps, k);
+  // Component layout is not documented in the wrapper, so accept either row-major k x dim or dim x k,
+  // and record which one matched. A layout that matches neither fails.
+  const expected = (rowMajorKxDim) => {
+    const e = new Float64Array(n * k);
+    for (let i = 0; i < n; i++) for (let j = 0; j < k; j++) {
+      let acc = 0;
+      for (let d = 0; d < dim; d++) acc += (data[i * dim + d] - mean[d]) * (rowMajorKxDim ? comps[j * dim + d] : comps[d * k + j]);
+      e[i * k + j] = acc;
+    }
+    return e;
+  };
+  const dA = maxAbsDiff(out, expected(true));
+  const dB = maxAbsDiff(out, expected(false));
+  const layout = dA <= dB ? 'k_x_dim' : 'dim_x_k';
+  const diff = Math.min(dA, dB);
+  const tol = 1e-4; // FP32 accumulation over up to 768 terms
+  return { name: 'pcaProject', n, dim, k, layoutMatched: layout, maxAbsDiff: diff, tolerance: tol,
+    status: out.length === n * k && diff <= tol ? 'PASS' : 'FAIL' };
+}
+
 const CHECKS = [
   ['batchCosineSimilarity', checkBatchCosine],
   ['attentionScoreGPU', checkAttention],
@@ -233,6 +259,7 @@ const CHECKS = [
   ['softmaxGPU', checkSoftmax],
   ['topKIndicesGPU', checkTopK],
   ['rewardScoreGPU', checkReward],
+  ['pcaProject', checkPca],
 ];
 
 // Faulty wrappers: the harness must report FAIL for each. Proves the checks can fail.

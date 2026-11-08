@@ -2125,10 +2125,10 @@ Next steps
 Milestone: `HANDOFF_PUSHED — REVIEW_REQUIRED` (not `PRODUCTION_READY`). No checkbox changed; `LIBTORCH-PARITY-01` stays OPEN. Branch `session/2026-11-07-parity-harnesses-and-lane-hardening` (5 commits ahead of `handoff/working-tree-2026-10-25`).
 
 **LibTorch parity evidence** (`scripts/atlas/libtorch-parity-harness-v1.mjs`)
-- 6 of 16 `libtorch_cuda` exports covered with seeded CPU references and shape sweeps: `batchCosineSimilarity`, `attentionScoreGPU`, `kmeansWithCentroids`, `softmaxGPU`, `topKIndicesGPU`, `rewardScoreGPU`. 23/23 cases pass; max error about 8e-8; `topKIndicesGPU` matches exactly.
+- 7 of 16 `libtorch_cuda` exports covered with seeded CPU references and shape sweeps: `batchCosineSimilarity`, `attentionScoreGPU`, `kmeansWithCentroids`, `softmaxGPU`, `topKIndicesGPU`, `rewardScoreGPU`, `pcaProject`. 26/26 cases pass; max error about 8e-8 (`pcaProject` 5.6e-6 under a 1e-4 FP32-accumulation tolerance, components laid out k x dim, CUDA counter advanced, no fallback); `topKIndicesGPU` matches exactly.
 - Each call is checked against the addon's execution counters (CUDA execution advanced, zero CPU/stub/OOM fallback). A self-test with deliberately faulty wrappers proves the checks can fail.
 - Correctness only: debug build (`build_type: debug_or_unoptimized`), no latency or VRAM numbers, which this task still requires.
-- Not covered (10): `pageRankGPU`, `trainSOM`, `autoencoderEncode`/`autoencoderDecode`, `graphSimilarity`/`graphSimilarityHalf`, `clusterEmbeddings`, the FP16 variants, `batchCosineTopK`, `graphCandidateGatherGPU`, `pcaProject`.
+- Not covered (9): `pageRankGPU`, `trainSOM`, `autoencoderEncode`/`autoencoderDecode`, `graphSimilarity`/`graphSimilarityHalf`, `clusterEmbeddings`, the FP16 variants, `batchCosineTopK`, `graphCandidateGatherGPU`.
 - The addon's `per_export_backend` map: `atlasPageRank`, `slerpEmbeddings`, `manifoldInterpolate4D` are `cpu_reference` (not LibTorch); `somCache` is a plain CUDA kernel; `graphSimilarity*` and `clusterEmbeddings` classify `cpu_fallback` before execution (runtime backend unconfirmed).
 
 **simdjson** (`scripts/atlas/simdjson-parity-harness-v1.mjs`, `sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts`)
