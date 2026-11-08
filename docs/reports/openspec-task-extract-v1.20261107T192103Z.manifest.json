@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.openspec-task-extract.v1",
+  "generatedAt": "2026-11-07T19:21:09.219175+00:00",
+  "canonicalAuthority": false,
+  "params": {
+    "root": ".",
+    "top": 0,
+    "pageSize": 100,
+    "pagerankDamping": 0.85,
+    "pagerankMaxIter": 200,
+    "pagerankTol": 1e-10,
+    "excludePattern": "(archive|phase-110|phase_|/v2/|^v2/|parent_atlas_tensor_residency_integration_v2)",
+    "rankBy": "pagerank desc, in_degree desc, id asc"
+  },
+  "inputs": {
+    "tasksMdFiles": 142
+  },
+  "counts": {
+    "rows": 15060,
+    "open": 6527,
+    "done": 8533,
+    "graphNodes": 15060,
+    "graphEdges": 855,
+    "withTaskCode": 4093,
+    "topWritten": 6527,
+    "pages": 66
+  },
+  "outputs": {
+    "openspec-task-extract-v1.20261107T192103Z.all.jsonl": "75e231d9463b0b77935582d8775f28c3f295f6a18212afdcde046b2c71c89e31",
+    "openspec-task-extract-v1.20261107T192103Z.all-open.jsonl": "d6b1c9aceb7431cc181b770be9169304b2fe03c01d9ffef97561a2cc7dc1acb8"
+  }
+}

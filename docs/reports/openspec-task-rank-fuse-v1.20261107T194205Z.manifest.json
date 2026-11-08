@@ -1,0 +1,268 @@
+{
+  "schema": "atlas.openspec-task-rank-fuse.v1",
+  "generatedAt": "2026-11-07T19:42:23.663381+00:00",
+  "canonicalAuthority": false,
+  "source": "docs/reports/openspec-task-extract-v1.20261107T194205Z.all-open.jsonl",
+  "params": {
+    "rrfK": 60,
+    "knnK": 10,
+    "knnMetric": "cosine over TF-IDF (log tf, smoothed idf, df>=2 and df<N)",
+    "knnPagerankDamping": 0.85,
+    "themesSource": "scripts/atlas/rank-open-tasks-v1.mjs#THEMES (imported)",
+    "pageSize": 100
+  },
+  "counts": {
+    "openTasks": 6527,
+    "vocab": 4681,
+    "pages": 66,
+    "tasksWithAnyTheme": 2693,
+    "tasksWithCitationIn": 287,
+    "knnMeanTopSim": 0.4711
+  },
+  "outputs": {
+    "openspec-task-rank-fuse-v1.20261107T194205Z.jsonl": "fe0008a1cad80add5d74783a4c9b28fc64cab52b88012bbf561fc08093445a13"
+  },
+  "communities": {
+    "algorithm": "networkx louvain_communities (seed 0, resolution 1.0) on undirected kNN graph, weight=cosine",
+    "count": 47,
+    "kNNEdgesUndirected": 44889,
+    "modularity": 0.710838,
+    "summary": [
+      {
+        "community": 1,
+        "size": 651,
+        "label": "current source recheck packet graphify snapshot"
+      },
+      {
+        "community": 2,
+        "size": 285,
+        "label": "ontology classifier domain recheck tuple existing"
+      },
+      {
+        "community": 3,
+        "size": 284,
+        "label": "graph cugraph pagerank parity networkx neo4j"
+      },
+      {
+        "community": 4,
+        "size": 281,
+        "label": "qdrant daily graphify run retention storage"
+      },
+      {
+        "community": 5,
+        "size": 260,
+        "label": "ace arrow analysis turbovec packet graph"
+      },
+      {
+        "community": 6,
+        "size": 258,
+        "label": "tile rtx tensorrt gpu proof challenger"
+      },
+      {
+        "community": 7,
+        "size": 241,
+        "label": "session test integration harness telemetry discovery"
+      },
+      {
+        "community": 8,
+        "size": 235,
+        "label": "xgboost nlp agentic reranker sidecar workstation"
+      },
+      {
+        "community": 9,
+        "size": 221,
+        "label": "migration postgresql drizzle audit live apply"
+      },
+      {
+        "community": 10,
+        "size": 217,
+        "label": "ast langextract source enrichment symbol evidence"
+      },
+      {
+        "community": 11,
+        "size": 217,
+        "label": "phase lane retrieval evidence canonical awm"
+      },
+      {
+        "community": 12,
+        "size": 209,
+        "label": "ace recheck live cache ornith context"
+      },
+      {
+        "community": 13,
+        "size": 185,
+        "label": "gs1 qas contracts audit evidence separate"
+      },
+      {
+        "community": 14,
+        "size": 172,
+        "label": "som kmeans centroid e2e ctx knn"
+      },
+      {
+        "community": 15,
+        "size": 171,
+        "label": "abi skill backend libtorch acceptance ladder"
+      },
+      {
+        "community": 16,
+        "size": 159,
+        "label": "index dir sparse bm25 lexical heads"
+      },
+      {
+        "community": 17,
+        "size": 149,
+        "label": "paac kanban boundary compiler context cascade"
+      },
+      {
+        "community": 18,
+        "size": 147,
+        "label": "documentation cpu classification domain source existing"
+      },
+      {
+        "community": 19,
+        "size": 135,
+        "label": "ordinal lineage scope manifest graph preview"
+      },
+      {
+        "community": 20,
+        "size": 129,
+        "label": "trace mcp heval envelope caller live"
+      },
+      {
+        "community": 21,
+        "size": 127,
+        "label": "cuvs ann cagra exact gates semantic_768"
+      },
+      {
+        "community": 22,
+        "size": 116,
+        "label": "afc e2e tournament workboard sched only"
+      },
+      {
+        "community": 23,
+        "size": 115,
+        "label": "adapter qlora stage fine tuning unsloth"
+      },
+      {
+        "community": 24,
+        "size": 114,
+        "label": "end acp a2a acceptance p22 reproducibility"
+      },
+      {
+        "community": 25,
+        "size": 114,
+        "label": "top topk file recall ranking source"
+      },
+      {
+        "community": 26,
+        "size": 108,
+        "label": "evaluation scene detective code evidence intelligence"
+      },
+      {
+        "community": 27,
+        "size": 102,
+        "label": "worker browser ops only read wave"
+      },
+      {
+        "community": 28,
+        "size": 98,
+        "label": "latent representation blocked topology recheck promotion"
+      },
+      {
+        "community": 29,
+        "size": 89,
+        "label": "kafka gap append review queue langfuse"
+      },
+      {
+        "community": 30,
+        "size": 84,
+        "label": "concept refresh master end t20 fix"
+      },
+      {
+        "community": 31,
+        "size": 82,
+        "label": "symbol resolve crossencoder apply atlasrerankerv1 session"
+      },
+      {
+        "community": 32,
+        "size": 70,
+        "label": "fabric studio plane search rollout control"
+      },
+      {
+        "community": 33,
+        "size": 69,
+        "label": "board quality integrity decoder promotion golden"
+      },
+      {
+        "community": 34,
+        "size": 69,
+        "label": "archive backup patterns build ollama backups"
+      },
+      {
+        "community": 35,
+        "size": 67,
+        "label": "ordered eng implementation gepa gates dspy"
+      },
+      {
+        "community": 36,
+        "size": 65,
+        "label": "deferred hardening production gates simdjson simd"
+      },
+      {
+        "community": 37,
+        "size": 60,
+        "label": "summary what ga8 cei current enriched"
+      },
+      {
+        "community": 38,
+        "size": 57,
+        "label": "opencode next mcp sps steps verification"
+      },
+      {
+        "community": 39,
+        "size": 47,
+        "label": "t15 fitting decoder kernel offline slice"
+      },
+      {
+        "community": 40,
+        "size": 43,
+        "label": "ary fanout hardening graph identity source"
+      },
+      {
+        "community": 41,
+        "size": 41,
+        "label": "hop gpu exp tiling offload expansion"
+      },
+      {
+        "community": 42,
+        "size": 41,
+        "label": "src level highest priority duplication patterns"
+      },
+      {
+        "community": 43,
+        "size": 35,
+        "label": "hyperrag fill multihop prerequisite pf13 incidence"
+      },
+      {
+        "community": 44,
+        "size": 34,
+        "label": "pass pf4 rewritten third durable pf4b"
+      },
+      {
+        "community": 45,
+        "size": 30,
+        "label": "know knowledge code typed capability projection"
+      },
+      {
+        "community": 46,
+        "size": 24,
+        "label": "cbm codebase second memory optional structural"
+      },
+      {
+        "community": 47,
+        "size": 20,
+        "label": "identity canonical discriminants mandatory convergence pointer"
+      }
+    ]
+  }
+}

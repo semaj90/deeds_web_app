@@ -61,3 +61,26 @@ test('detects a matching file digest but changed task text', () => {
 		assert.equal(result.rows[0].status, 'SOURCE_LINE_OR_TASK_TEXT_MISMATCH');
 	} finally { rmSync(input.repoRoot, { recursive: true, force: true }); }
 });
+
+test('accepts secondary sveltekit-frontend/openspec/changes/<change>/tasks.md root while rejecting traversal', () => {
+	const input = fixture();
+	try {
+		const secondarySource = 'sveltekit-frontend/openspec/changes/secondary-change/tasks.md';
+		const secondaryPath = path.join(input.repoRoot, ...secondarySource.split('/'));
+		mkdirSync(path.dirname(secondaryPath), { recursive: true });
+		const bytes = Buffer.from('# Secondary\n- [ ] Secondary root task.\n');
+		writeFileSync(secondaryPath, bytes);
+		const rev = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+		input.workboard.sourceFileHashes[secondarySource] = rev;
+		input.workboard.taskInventory.push({
+			taskKey: 'secondary-change:2',
+			source: secondarySource,
+			line: 2,
+			text: 'Secondary root task.',
+		});
+		const result = auditWorkboardSourceBindingsV1(input);
+		assert.equal(result.status, 'VERIFIED');
+		assert.equal(result.rows.length, 2);
+		assert.equal(result.rows[1].status, 'SOURCE_REFERENCE_CURRENT');
+	} finally { rmSync(input.repoRoot, { recursive: true, force: true }); }
+});

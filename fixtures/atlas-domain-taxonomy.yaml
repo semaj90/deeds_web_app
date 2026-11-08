@@ -1,0 +1,111 @@
+# Parent Atlas OKF domain definition (generated from the checksummed snapshot; edit via the snapshot, not by hand)
+version: 1
+domain_id: atlas.domain-taxonomy
+name: Parent Atlas domain taxonomy (reference snapshot)
+status: reference_snapshot
+owner: parent-atlas
+purpose: Closed vocabulary of top-level and child domain group IDs that tags, classifiers, MCP query parameters and registries
+  must validate against.
+canonical_authority:
+  ontology_source: postgresql18.atlas_domain_ontology
+  rule: PostgreSQL atlas_domain_ontology is the owner. This file is a schema-validated snapshot for vocabulary checks only;
+    it never overrides the database.
+  canonical: false
+snapshot:
+  source_file: scripts/atlas/taxonomy/taxonomy-groups-snapshot-2026-10-13.json
+  source_checksum: sha256:6a7b71393d25ffb56fd1c697beb0cd6e29b789583fb8a3372d3ba0d53b9161a5
+  captured_at: '2026-10-13'
+matching_policy: exact_group_id_only; no fuzzy or case-insensitive matching; unresolved values stay unresolved
+ordinals:
+  status: UNASSIGNED
+  rule: NES LUT or glyph ordinals come only from a versioned registry approved after the legacy-label crosswalk; never from
+    list position or UTF-8 bytes.
+legacy_label_crosswalk:
+  status: PROPOSAL_NOT_APPLIED
+  ref: docs/reports/domain-crosswalk-proposal-v1.json
+groups:
+- group_id: api
+  label: API Design & Integration
+  parent_group_id: null
+  taxonomy_level: 0
+  description: REST, gRPC, and service communication
+- group_id: auth
+  label: Authentication & Authorization
+  parent_group_id: null
+  taxonomy_level: 0
+  description: User authentication, sessions, and permissions
+- group_id: cache
+  label: Caching
+  parent_group_id: null
+  taxonomy_level: 0
+  description: Hot-path caching layers (Redis/Valkey/BitFrost), distinct from canonical storage.
+- group_id: compiler
+  label: Compiler & Language Tooling
+  parent_group_id: null
+  taxonomy_level: 0
+  description: Parsers, ASTs, type checkers, and build/compile tooling.
+- group_id: database
+  label: Database & Persistence
+  parent_group_id: null
+  taxonomy_level: 0
+  description: Relational storage, ORM layers, and vector-capable extensions.
+- group_id: database.postgresql
+  label: PostgreSQL
+  parent_group_id: database
+  taxonomy_level: 1
+  description: PostgreSQL specifically, including pgvector and Drizzle-managed schema.
+- group_id: devops
+  label: DevOps & Infrastructure
+  parent_group_id: null
+  taxonomy_level: 0
+  description: Deployment, monitoring, and operational tasks
+- group_id: devops.env-config
+  label: Environment Configuration
+  parent_group_id: devops
+  taxonomy_level: 1
+  description: Configuration management and environment setup
+- group_id: devops.process-mgmt
+  label: Process Management
+  parent_group_id: devops
+  taxonomy_level: 1
+  description: Running, monitoring, and orchestrating processes
+- group_id: error-handling
+  label: Error Handling & Recovery
+  parent_group_id: null
+  taxonomy_level: 0
+  description: Error detection, logging, and recovery strategies
+- group_id: frontend
+  label: Frontend & UI
+  parent_group_id: null
+  taxonomy_level: 0
+  description: 'Client-side application code: components, styling, client state, browser rendering.'
+- group_id: frontend.sveltekit
+  label: SvelteKit / Svelte
+  parent_group_id: frontend
+  taxonomy_level: 1
+  description: SvelteKit routing, load functions, Svelte 5 runes-based components.
+- group_id: gpu
+  label: GPU & CUDA Acceleration
+  parent_group_id: null
+  taxonomy_level: 0
+  description: 'CUDA/GPU-accelerated compute: tensor ops, RAPIDS, LibTorch bridges.'
+- group_id: graph
+  label: Graph & Topology
+  parent_group_id: null
+  taxonomy_level: 0
+  description: Graph algorithms, graph databases, and topology mirrors.
+- group_id: machine-learning
+  label: Machine Learning
+  parent_group_id: null
+  taxonomy_level: 0
+  description: Embeddings, autoencoders, clustering, and model training/inference.
+- group_id: retrieval
+  label: Information Retrieval
+  parent_group_id: null
+  taxonomy_level: 0
+  description: Search, indexing, and retrieval strategies
+- group_id: test
+  label: Testing
+  parent_group_id: null
+  taxonomy_level: 0
+  description: 'Automated test suites: unit, integration, and end-to-end.'

@@ -59,7 +59,7 @@
     "workspaceRevision": "rev:deeds:20261107",
     "candidateSnapshotRevision": "snap:openspec:6527",
     "representationId": "semantic_mrl_prefix_64",
-    "representationFamily": "EMBEDDINGGEMMA_MRL",
+    "representationFamily": "SYNTHETIC_TEST_VECTOR",
     "projectionKind": "MRL_PREFIX_TRUNCATION",
     "sourceRepresentationId": "semantic_768",
     "projectionRevision": "rev:mrl:prefix-truncation-v1",

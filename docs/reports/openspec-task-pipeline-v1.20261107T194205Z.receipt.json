@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.openspec-task-pipeline.receipt.v1",
+  "generatedAt": "2026-11-07T19:42:29.788424+00:00",
+  "stamp": "20261107T194205Z",
+  "status": "OK",
+  "canonicalAuthority": false,
+  "params": {
+    "k": 10,
+    "pageSize": 100,
+    "rrfK": 60,
+    "topMode": "all-open"
+  },
+  "steps": [
+    {
+      "step": "extract",
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "step": "fuse",
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "step": "domain",
+      "ok": true,
+      "stderr": ""
+    }
+  ],
+  "outputs": {
+    "docs/reports/openspec-task-domain-fanout-v1.20261107T194205Z.fanout.json": "sha256:03161954317c014b0d042d3ab3ef38b545c828fa8e95d4fa84c4396143ca0239",
+    "docs/reports/openspec-task-domain-fanout-v1.20261107T194205Z.jsonl": "sha256:bf9cc70111eda72e0e2b135d197db0546c8d741d2200c360b5bec991e07c987b",
+    "docs/reports/openspec-task-domain-fanout-v1.20261107T194205Z.manifest.json": "sha256:2437839f8b7203981806f04f6f602fabf4f47df3dea5a7ff6e541fb0f636bf0b",
+    "docs/reports/openspec-task-extract-v1.20261107T194205Z.all-open.jsonl": "sha256:d6b1c9aceb7431cc181b770be9169304b2fe03c01d9ffef97561a2cc7dc1acb8",
+    "docs/reports/openspec-task-extract-v1.20261107T194205Z.all.jsonl": "sha256:75e231d9463b0b77935582d8775f28c3f295f6a18212afdcde046b2c71c89e31",
+    "docs/reports/openspec-task-extract-v1.20261107T194205Z.manifest.json": "sha256:467c7f9cdb4293e83ee679b187505cff5d328e4d5e3b631804d0723ba0f4b9e7",
+    "docs/reports/openspec-task-rank-fuse-v1.20261107T194205Z.jsonl": "sha256:fe0008a1cad80add5d74783a4c9b28fc64cab52b88012bbf561fc08093445a13",
+    "docs/reports/openspec-task-rank-fuse-v1.20261107T194205Z.manifest.json": "sha256:6ea5e423d6bd624df40bc0f0a200d5dde3a329870ce8cc534919867e86877049"
+  },
+  "writes": "new report files only; no PostgreSQL, Valkey, Qdrant, Neo4j, or source edits"
+}

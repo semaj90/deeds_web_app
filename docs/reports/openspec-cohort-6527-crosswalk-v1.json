@@ -1,0 +1,136 @@
+{
+  "schema": "atlas.openspec-cohort-6527-crosswalk.v1",
+  "generatedAt": "2026-11-08T07:20:10.776Z",
+  "cohortRevision": "rev:openspec-rank-fuse:20261107T192448Z",
+  "fuseSourceSha256": "fe0008a1cad80add5d74783a4c9b28fc64cab52b88012bbf561fc08093445a13",
+  "workboardGeneratedAt": "2026-11-02T02:19:52.274Z",
+  "workboardSummary": {
+    "completedTasks": 8014,
+    "openTasks": 5605,
+    "actionableTasks": 4394,
+    "waitingTasks": 1091,
+    "supersededTasks": 0,
+    "reviewRequiredTasks": 118,
+    "totalTasks": 13619,
+    "progressFraction": 0.588442616932227,
+    "progressBar": "[######----]",
+    "eta": {
+      "status": "UNKNOWN",
+      "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+    },
+    "invariantOpenTasks": 2
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "invariants": {
+    "zeroSyntheticOrdinalIdsMinted": true,
+    "primaryKeyUniqueCount": 6527,
+    "canonicalTaskKeyUniqueCount": 6527,
+    "routingBitNeverImpliesTaskCompletion": true
+  },
+  "reconciliationStats": {
+    "totalCohortOrdinals": 6527,
+    "exactSourceLineJoin": 5418,
+    "shiftedLineStableKeyJoin": 150,
+    "secondaryOpenSpecRoot": 825,
+    "newSinceWorkboardSnapshot": 134,
+    "disambiguatedDuplicateTitles": 21,
+    "diskCheckedStateCount": 1,
+    "diskOpenStateCount": 6526,
+    "routingActiveBitSetCount": 3312,
+    "communityStatusCounts": {
+      "CONFIGURED": 1327,
+      "UNAVAILABLE_SCRIPT_MISSING": 217,
+      "UNROUTED": 4983
+    },
+    "workboardExecutionStates": {
+      "ACTIONABLE": 4427,
+      "WAITING_ON_DEPENDENCY": 1116,
+      "OPEN_UNRECONCILED": 955,
+      "DONE": 27,
+      "INVARIANT": 2
+    }
+  },
+  "membersArtifact": {
+    "path": ".tmp/atlas/openspec-cohort-6527-members-v1.jsonl",
+    "rowCount": 6527,
+    "sha256": "68ed2a803f3df7428e0decf1455f7bc847f44153c7c5512ee4e848c140d43fec"
+  },
+  "sampleMembers": [
+    {
+      "cohort_revision": "rev:openspec-rank-fuse:20261107T192448Z",
+      "task_ordinal": 0,
+      "canonical_task_key": "parent-atlas-ace-rlm-bitfrost-integration#a870cee7088e7268",
+      "source_claim_hash": "sha256:1563e94001790c2f7f4a68abb7d359c77de213d2e77bc20e74f0689bbe908909",
+      "source_ref": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16352",
+      "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+      "task_code": "CANARY-PR-01",
+      "workboard_join_status": "EXACT_SOURCE_LINE_MATCH",
+      "workboard_execution_state": "ACTIONABLE",
+      "disk_checkbox_state": "OPEN",
+      "community_id": 21,
+      "route_status": "CONFIGURED",
+      "routing_active_bit": true
+    },
+    {
+      "cohort_revision": "rev:openspec-rank-fuse:20261107T192448Z",
+      "task_ordinal": 1,
+      "canonical_task_key": "parent-atlas-ace-rlm-bitfrost-integration#aa282dbb4ecc954d",
+      "source_claim_hash": "sha256:3daea8279833d176c7f44e6f0788bc72467c9869fa74cd7f9dec9ddc05244adc",
+      "source_ref": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L15279",
+      "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+      "task_code": "GPU-PARITY-01",
+      "workboard_join_status": "EXACT_SOURCE_LINE_MATCH",
+      "workboard_execution_state": "WAITING_ON_DEPENDENCY",
+      "disk_checkbox_state": "OPEN",
+      "community_id": 18,
+      "route_status": "UNROUTED",
+      "routing_active_bit": true
+    },
+    {
+      "cohort_revision": "rev:openspec-rank-fuse:20261107T192448Z",
+      "task_ordinal": 2,
+      "canonical_task_key": "parent-atlas-workstation-domain-classifier#2f3bb7515e9cf9ef",
+      "source_claim_hash": "sha256:b66718a7f8ec05ee5155c6e5b03602bd2fcfa820bebef283884689d03f9286d6",
+      "source_ref": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L1255",
+      "change_id": "parent-atlas-workstation-domain-classifier",
+      "task_code": "CLASS-INDEX-07",
+      "workboard_join_status": "EXACT_SOURCE_LINE_MATCH",
+      "workboard_execution_state": "ACTIONABLE",
+      "disk_checkbox_state": "OPEN",
+      "community_id": 18,
+      "route_status": "UNROUTED",
+      "routing_active_bit": true
+    },
+    {
+      "cohort_revision": "rev:openspec-rank-fuse:20261107T192448Z",
+      "task_ordinal": 3,
+      "canonical_task_key": "parent-atlas-repair-candidate-feature-matrix#d95fdfcfe99c784b",
+      "source_claim_hash": "sha256:8d58eac775809329db1df707ebd4918743e22c0d19f4625adb77ff264cdd6d0e",
+      "source_ref": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L282",
+      "change_id": "parent-atlas-repair-candidate-feature-matrix",
+      "task_code": "CEI-21",
+      "workboard_join_status": "EXACT_SOURCE_LINE_MATCH",
+      "workboard_execution_state": "ACTIONABLE",
+      "disk_checkbox_state": "CHECKED",
+      "community_id": 13,
+      "route_status": "UNROUTED",
+      "routing_active_bit": true
+    },
+    {
+      "cohort_revision": "rev:openspec-rank-fuse:20261107T192448Z",
+      "task_ordinal": 4,
+      "canonical_task_key": "parent-atlas-retrieval-staging-planes#1ba281f040c9e74c",
+      "source_claim_hash": "sha256:3384e1c15d299f8c23264c01f54d9c83b9730d85777b9991b5cf4a83080fd16c",
+      "source_ref": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L382",
+      "change_id": "parent-atlas-retrieval-staging-planes",
+      "task_code": "DIM-03",
+      "workboard_join_status": "SECONDARY_OPENSPEC_ROOT",
+      "workboard_execution_state": "OPEN_UNRECONCILED",
+      "disk_checkbox_state": "OPEN",
+      "community_id": 21,
+      "route_status": "CONFIGURED",
+      "routing_active_bit": true
+    }
+  ]
+}

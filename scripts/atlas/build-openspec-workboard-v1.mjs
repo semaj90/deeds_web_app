@@ -15,8 +15,10 @@ import { buildArchitectureOverlay, buildProgramGates, buildProgramHierarchy, bui
 // Repo root is owned by this script's location, not by process.cwd() (running from scripts/atlas wrote to a nonexistent scripts/atlas/docs path).
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const changesRoot = join(root, 'openspec', 'changes');
+const secondaryChangesRoot = join(root, 'sveltekit-frontend', 'openspec', 'changes');
+const includeSecondaryRoots = process.argv.includes('--include-secondary-roots');
 const taskSnapshotMode = process.argv.includes('--task-snapshot-stdout');
-const positionalArgs = process.argv.slice(2).filter((argument) => argument !== '--task-snapshot-stdout');
+const positionalArgs = process.argv.slice(2).filter((argument) => argument !== '--task-snapshot-stdout' && argument !== '--include-secondary-roots');
 // Optional output overrides allow isolated audits to build a fresh snapshot
 // without replacing the shared projection while another session edits it.
 const reportPath = taskSnapshotMode ? null : positionalArgs[0]
@@ -94,17 +96,19 @@ const priorityFor = (text) => {
 const sourceFileHashes = {};
 
 const taskFiles = [];
-if (existsSync(changesRoot)) {
-  for (const change of readdirSync(changesRoot, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-    if (!change.isDirectory()) continue;
-    const file = join(changesRoot, change.name, 'tasks.md');
-    if (existsSync(file)) taskFiles.push(file);
+const activeChangesRoots = includeSecondaryRoots ? [changesRoot, secondaryChangesRoot] : [changesRoot];
+for (const activeRoot of activeChangesRoots) {
+  if (existsSync(activeRoot)) {
+    for (const change of readdirSync(activeRoot, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      if (!change.isDirectory()) continue;
+      const file = join(activeRoot, change.name, 'tasks.md');
+      if (existsSync(file)) taskFiles.push({ file, change: change.name });
+    }
   }
 }
 
 const tasks = [];
-for (const file of taskFiles) {
-  const change = relative(changesRoot, file).split(sep)[0];
+for (const { file, change } of taskFiles) {
   const fileText = readFileSync(file, 'utf8');
   sourceFileHashes[pathOf(file)] = sha256(fileText);
   const lines = fileText.split(/\r?\n/);
@@ -194,9 +198,10 @@ if (schedulerSelection) {
 }
 const completedTasks = tasks.length - openTasks.length;
 const actionableTasks = openTasks.filter((task) => task.executionState === 'ACTIONABLE' && task.supersessionReviewState !== 'REVIEW_REQUIRED');
-const waitingTasks = openTasks.filter((task) => task.executionState === 'WAITING_ON_DEPENDENCY');
-const supersededTasks = openTasks.filter((task) => task.executionState === 'SUPERSEDED_OR_HISTORICAL');
+const waitingTasks = openTasks.filter((task) => task.executionState === 'WAITING_ON_DEPENDENCY' && task.supersessionReviewState !== 'REVIEW_REQUIRED');
+const supersededTasks = openTasks.filter((task) => task.executionState === 'SUPERSEDED_OR_HISTORICAL' && task.supersessionReviewState !== 'REVIEW_REQUIRED');
 const reviewRequiredTasks = openTasks.filter((task) => task.supersessionReviewState === 'REVIEW_REQUIRED');
+const invariantOpenTasks = openTasks.filter((task) => task.executionState === 'INVARIANT' && task.supersessionReviewState !== 'REVIEW_REQUIRED');
 const byPriority = [...actionableTasks].sort((a, b) => a.priority - b.priority || b.lastUpdatedAt.localeCompare(a.lastUpdatedAt) || a.change.localeCompare(b.change) || a.line - b.line);
 const openByPriority = [...openTasks].sort((a, b) => a.priority - b.priority || b.lastUpdatedAt.localeCompare(a.lastUpdatedAt) || a.change.localeCompare(b.change) || a.line - b.line);
 const frontierTasks = [...byPriority.reduce((frontier, task) => {
@@ -525,7 +530,7 @@ const result = {
   hierarchyContractVersion: 'v2',
   generatedAt,
   source: 'openspec/changes/*/tasks.md',
-  summary: { completedTasks, openTasks: openTasks.length, actionableTasks: actionableTasks.length, waitingTasks: waitingTasks.length, supersededTasks: supersededTasks.length, reviewRequiredTasks: reviewRequiredTasks.length, totalTasks: tasks.length, progressFraction: tasks.length ? completedTasks / tasks.length : null, progressBar: progressBar(tasks.length ? completedTasks / tasks.length : null), eta: { status: 'UNKNOWN', method: 'NO_RECEIPT_LINKED_THROUGHPUT' } },
+  summary: { completedTasks, openTasks: openTasks.length, actionableTasks: actionableTasks.length, waitingTasks: waitingTasks.length, supersededTasks: supersededTasks.length, reviewRequiredTasks: reviewRequiredTasks.length, invariantOpenTasks: invariantOpenTasks.length, totalTasks: tasks.length, progressFraction: tasks.length ? completedTasks / tasks.length : null, progressBar: progressBar(tasks.length ? completedTasks / tasks.length : null), eta: { status: 'UNKNOWN', method: 'NO_RECEIPT_LINKED_THROUGHPUT' } },
   schedulerPolicy: {
     rule: 'READY_NEVER_IMPLIES_SELECTED; COMPLETION_PERCENTAGE_NEVER_IMPLIES_PRIORITY; ONLY_EXPLICIT_SELECTION_FILE_GRANTS_SELECTION_PERMISSION',
     selectionSource: selectionFile ? pathOf(selectionFile) : null,

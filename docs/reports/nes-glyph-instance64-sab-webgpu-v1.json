@@ -1,0 +1,244 @@
+{
+  "schema": "atlas.nes-glyph-instance64-sab-webgpu-proof.v1",
+  "generatedAt": "2026-11-08T07:20:39.252Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "glyphWireContract": {
+    "schemaId": "atlas.glyph-instance-64b.v1",
+    "magicHex": "0x474c5931",
+    "codecVersion": 1,
+    "recordBytes": 64,
+    "headerBytes": 64,
+    "wgslVec4AlignmentBytes": 16,
+    "fieldOffsets": {
+      "taskOrdinal": "0..3 (u32)",
+      "domainByte": "4..7 (u32, 0x00 unresolved, 0x01..0x0A NES LUT domain)",
+      "statusFlags": "8..11 (u32)",
+      "paletteIndex": "12..15 (u32, independent NES color hex e.g. 0x2A for ui)",
+      "positionScale": "16..31 (vec4<f32>, 16-byte aligned)",
+      "rotationA": "32..47 (vec4<f32>, rot_6d[0..3], 16-byte aligned)",
+      "rotationB": "48..63 (vec4<f32>, rot_6d[4..5] + 2 zero pad floats, 16-byte aligned)"
+    }
+  },
+  "nesLutCrossLayerParity": {
+    "paletteChecksum": "sha256:e1b8ccdc6661a3faed3316cf276f01dd16a1edf80a9aba2d465def40461b9b0f",
+    "unresolvedByte": 0,
+    "domainCount": 10,
+    "allDomainBytesIndependentFromPaletteHex": true,
+    "uiDomainExample": {
+      "domain": "ui",
+      "lutByte": 2,
+      "nesHex": "0x2A",
+      "nesColorByte": 42,
+      "independentFromLutByte": true,
+      "label": "DOM_UI_SVELTE5_RUNES"
+    },
+    "postgresLutTableCheck": {
+      "tableExists": true,
+      "rowCount": 10
+    },
+    "domains": [
+      {
+        "domain": "auth",
+        "lutByte": 1,
+        "nesHex": "0x16",
+        "nesColorByte": 22,
+        "independentFromLutByte": true,
+        "label": "DOM_AUTH_GUARD"
+      },
+      {
+        "domain": "ui",
+        "lutByte": 2,
+        "nesHex": "0x2A",
+        "nesColorByte": 42,
+        "independentFromLutByte": true,
+        "label": "DOM_UI_SVELTE5_RUNES"
+      },
+      {
+        "domain": "retrieval",
+        "lutByte": 3,
+        "nesHex": "0x21",
+        "nesColorByte": 33,
+        "independentFromLutByte": true,
+        "label": "DOM_RETRIEVAL_ANN_RRF"
+      },
+      {
+        "domain": "network",
+        "lutByte": 4,
+        "nesHex": "0x2C",
+        "nesColorByte": 44,
+        "independentFromLutByte": true,
+        "label": "DOM_NETWORK_HTTP_TRPC"
+      },
+      {
+        "domain": "database",
+        "lutByte": 5,
+        "nesHex": "0x12",
+        "nesColorByte": 18,
+        "independentFromLutByte": true,
+        "label": "DOM_PG18_DRIZZLE"
+      },
+      {
+        "domain": "cache",
+        "lutByte": 6,
+        "nesHex": "0x27",
+        "nesColorByte": 39,
+        "independentFromLutByte": true,
+        "label": "DOM_VALKEY_BITFROST_LRU"
+      },
+      {
+        "domain": "agent",
+        "lutByte": 7,
+        "nesHex": "0x24",
+        "nesColorByte": 36,
+        "independentFromLutByte": true,
+        "label": "DOM_AGENT_OAK_RLM_DSPY"
+      },
+      {
+        "domain": "graph",
+        "lutByte": 8,
+        "nesHex": "0x1A",
+        "nesColorByte": 26,
+        "independentFromLutByte": true,
+        "label": "DOM_GRAPH_CUGRAPH_PAGERANK"
+      },
+      {
+        "domain": "ml",
+        "lutByte": 9,
+        "nesHex": "0x14",
+        "nesColorByte": 20,
+        "independentFromLutByte": true,
+        "label": "DOM_ML_ATEN_TENSORRT_GEMM"
+      },
+      {
+        "domain": "general",
+        "lutByte": 10,
+        "nesHex": "0x0F",
+        "nesColorByte": 15,
+        "independentFromLutByte": true,
+        "label": "DOM_GENERAL_FALLBACK"
+      }
+    ]
+  },
+  "sharedArrayBufferWorkerExecution": {
+    "mode": "SHARED_ARRAY_BUFFER",
+    "cohortTasksEncoded": 6527,
+    "totalSharedBytes": 417792,
+    "workerStatus": "WORKER_SAB_READY",
+    "atomicGenerationCounter": 2,
+    "checksumFnv1a32": 4225840986,
+    "sampleDecodedGlyphs": [
+      {
+        "taskOrdinal": 0,
+        "domainByte": 1,
+        "statusFlags": 17,
+        "paletteIndex": 22,
+        "positionScale": [
+          -0.4195399880409241,
+          0.43647998571395874,
+          0.041439998894929886,
+          1
+        ],
+        "rotation6d": [
+          0.8029099702835083,
+          0.5925899744033813,
+          0.06452000141143799,
+          -0.5915799736976624,
+          0.8054500222206116,
+          -0.03581999987363815
+        ]
+      },
+      {
+        "taskOrdinal": 1,
+        "domainByte": 2,
+        "statusFlags": 16,
+        "paletteIndex": 42,
+        "positionScale": [
+          -0.6971399784088135,
+          -0.155349999666214,
+          -0.07389000058174133,
+          1
+        ],
+        "rotation6d": [
+          0.850130021572113,
+          -0.13161000609397888,
+          -0.5098599791526794,
+          0.07355999946594238,
+          0.9884499907493591,
+          -0.13248999416828156
+        ]
+      },
+      {
+        "taskOrdinal": 2,
+        "domainByte": 3,
+        "statusFlags": 17,
+        "paletteIndex": 33,
+        "positionScale": [
+          0.3074899911880493,
+          -0.3020400106906891,
+          0.2644500136375427,
+          1
+        ],
+        "rotation6d": [
+          0.9811000227928162,
+          -0.08206000179052353,
+          0.1752299964427948,
+          0.09773000329732895,
+          0.9917700290679932,
+          -0.08275000005960464
+        ]
+      }
+    ]
+  },
+  "webgpuRowPitchAndDeviceLossFallback": {
+    "testWidthPx": 300,
+    "testHeightPx": 128,
+    "unpaddedRowBytes": 1200,
+    "alignedBytesPerRow": 1280,
+    "webgpuRender": {
+      "backendUsed": "WEBGPU_PITCHED_TEXTURE_BUFFER",
+      "widthPx": 300,
+      "heightPx": 128,
+      "unpaddedRowBytes": 1200,
+      "webgpuPitchedBytesPerRow": 1280,
+      "totalBufferBytes": 163840,
+      "pixelSha256": "sha256:87c3aecad5cd1a7d03a258da9b23cc8f0c97a2a247a65cdbf4ba3ea35b7684f7"
+    },
+    "cpuFallbackRender": {
+      "backendUsed": "CPU_FALLBACK_AFTER_DEVICE_LOSS",
+      "widthPx": 300,
+      "heightPx": 128,
+      "unpaddedRowBytes": 1200,
+      "webgpuPitchedBytesPerRow": 1280,
+      "totalBufferBytes": 163840,
+      "pixelSha256": "sha256:87c3aecad5cd1a7d03a258da9b23cc8f0c97a2a247a65cdbf4ba3ea35b7684f7"
+    }
+  },
+  "adversarialProbes": {
+    "adv_01_task_rpc_magic_rejected_by_glyph_decoder": {
+      "passed": true,
+      "error": "GLYPH_WIRE_SCHEMA_COLLISION_FORBIDDEN: expected 0x474c5931, got 0x54534b31"
+    },
+    "adv_02_torn_write_generation_mismatch_rejected": {
+      "passed": true,
+      "error": "GLYPH_BUFFER_NOT_READY_OR_TORN_GENERATION: state=1, gen=3"
+    },
+    "adv_03_unaligned_webgpu_row_pitch_rejected": {
+      "passed": true,
+      "error": "WEBGPU_BYTES_PER_ROW_ALIGNMENT_VIOLATION: 1200 is not a positive multiple of 256",
+      "alignedPitchForWidth300": 1280
+    },
+    "adv_04_device_loss_triggers_cpu_rgba_fallback_parity": {
+      "passed": true,
+      "webgpuPixelSha256": "sha256:87c3aecad5cd1a7d03a258da9b23cc8f0c97a2a247a65cdbf4ba3ea35b7684f7",
+      "cpuFallbackPixelSha256": "sha256:87c3aecad5cd1a7d03a258da9b23cc8f0c97a2a247a65cdbf4ba3ea35b7684f7",
+      "pitchedBytesPerRow": 1280
+    },
+    "adv_05_non_isolated_context_uses_transferable_fallback": {
+      "passed": true,
+      "fallbackMode": "TRANSFERABLE_ARRAY_BUFFER_FALLBACK",
+      "fallbackBytes": 1088
+    }
+  },
+  "status": "PASS"
+}

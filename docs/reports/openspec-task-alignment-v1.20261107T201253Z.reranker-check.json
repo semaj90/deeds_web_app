@@ -1,0 +1,270 @@
+{
+  "isGoldMetric": false,
+  "tasksTotal": 6527,
+  "tasksWithTaskCode": 2572,
+  "definitions": {
+    "strict": "task code appears in code/architecture paths only (sveltekit-frontend src/scripts/tests, scripts, python, packages, docs/architecture)",
+    "broad": "strict, plus planning docs in OTHER OpenSpec change folders (own change folder excluded; docs/reports never searched)"
+  },
+  "strict": {
+    "tasksAligned": 255,
+    "overallAlignmentPct": 3.91,
+    "alignmentPctOfTaskCodeTasks": 9.91,
+    "perRankBucket": [
+      {
+        "ranks": "1-100",
+        "tasks": 100,
+        "aligned": 20,
+        "alignmentPct": 20.0
+      },
+      {
+        "ranks": "101-500",
+        "tasks": 400,
+        "aligned": 33,
+        "alignmentPct": 8.25
+      },
+      {
+        "ranks": "501-1000",
+        "tasks": 500,
+        "aligned": 49,
+        "alignmentPct": 9.8
+      },
+      {
+        "ranks": "1001-3000",
+        "tasks": 2000,
+        "aligned": 48,
+        "alignmentPct": 2.4
+      },
+      {
+        "ranks": "3001-6527",
+        "tasks": 3527,
+        "aligned": 105,
+        "alignmentPct": 2.98
+      }
+    ],
+    "top100VsRestLift": 5.47,
+    "topChanges": [
+      {
+        "change_id": "parent-atlas-code-ingestion-pipeline",
+        "tasks": 9,
+        "aligned": 6,
+        "alignmentPct": 66.67
+      },
+      {
+        "change_id": "parent-atlas-grounded-knowledge-fabric",
+        "tasks": 11,
+        "aligned": 5,
+        "alignmentPct": 45.45
+      },
+      {
+        "change_id": "parent-atlas-runtime-log-remediation",
+        "tasks": 18,
+        "aligned": 6,
+        "alignmentPct": 33.33
+      },
+      {
+        "change_id": "parent-atlas-observation-routing-fabric",
+        "tasks": 7,
+        "aligned": 2,
+        "alignmentPct": 28.57
+      },
+      {
+        "change_id": "parent-atlas-repair-candidate-feature-matrix",
+        "tasks": 50,
+        "aligned": 14,
+        "alignmentPct": 28.0
+      },
+      {
+        "change_id": "parent-atlas-kafka-projection-initiative",
+        "tasks": 33,
+        "aligned": 7,
+        "alignmentPct": 21.21
+      },
+      {
+        "change_id": "legal-corpus-california-codes",
+        "tasks": 45,
+        "aligned": 8,
+        "alignmentPct": 17.78
+      },
+      {
+        "change_id": "parent-atlas-gpu-compute-lanes-consolidation",
+        "tasks": 54,
+        "aligned": 9,
+        "alignmentPct": 16.67
+      },
+      {
+        "change_id": "parent-atlas-retrieval-staging-planes",
+        "tasks": 63,
+        "aligned": 10,
+        "alignmentPct": 15.87
+      },
+      {
+        "change_id": "parent-atlas-capability-owner-matrix-v1",
+        "tasks": 13,
+        "aligned": 2,
+        "alignmentPct": 15.38
+      },
+      {
+        "change_id": "parent-atlas-agentic-diagnostic-repair-v1",
+        "tasks": 46,
+        "aligned": 6,
+        "alignmentPct": 13.04
+      },
+      {
+        "change_id": "parent-atlas-agentic-file-compiler",
+        "tasks": 82,
+        "aligned": 10,
+        "alignmentPct": 12.2
+      },
+      {
+        "change_id": "parent-atlas-versioned-doc-intelligence",
+        "tasks": 41,
+        "aligned": 5,
+        "alignmentPct": 12.2
+      },
+      {
+        "change_id": "parent-atlas-prefill-routing-residency-convergence",
+        "tasks": 44,
+        "aligned": 5,
+        "alignmentPct": 11.36
+      },
+      {
+        "change_id": "parent-atlas-gpu-sidecar-patch-tournament",
+        "tasks": 112,
+        "aligned": 12,
+        "alignmentPct": 10.71
+      }
+    ]
+  },
+  "broad": {
+    "tasksAligned": 286,
+    "overallAlignmentPct": 4.38,
+    "alignmentPctOfTaskCodeTasks": 11.12,
+    "perRankBucket": [
+      {
+        "ranks": "1-100",
+        "tasks": 100,
+        "aligned": 21,
+        "alignmentPct": 21.0
+      },
+      {
+        "ranks": "101-500",
+        "tasks": 400,
+        "aligned": 36,
+        "alignmentPct": 9.0
+      },
+      {
+        "ranks": "501-1000",
+        "tasks": 500,
+        "aligned": 54,
+        "alignmentPct": 10.8
+      },
+      {
+        "ranks": "1001-3000",
+        "tasks": 2000,
+        "aligned": 57,
+        "alignmentPct": 2.85
+      },
+      {
+        "ranks": "3001-6527",
+        "tasks": 3527,
+        "aligned": 118,
+        "alignmentPct": 3.35
+      }
+    ],
+    "top100VsRestLift": 5.093,
+    "topChanges": [
+      {
+        "change_id": "parent-atlas-observation-routing-fabric",
+        "tasks": 7,
+        "aligned": 5,
+        "alignmentPct": 71.43
+      },
+      {
+        "change_id": "parent-atlas-code-ingestion-pipeline",
+        "tasks": 9,
+        "aligned": 6,
+        "alignmentPct": 66.67
+      },
+      {
+        "change_id": "parent-atlas-grounded-knowledge-fabric",
+        "tasks": 11,
+        "aligned": 5,
+        "alignmentPct": 45.45
+      },
+      {
+        "change_id": "parent-atlas-capability-owner-matrix-v1",
+        "tasks": 13,
+        "aligned": 5,
+        "alignmentPct": 38.46
+      },
+      {
+        "change_id": "parent-atlas-repair-candidate-feature-matrix",
+        "tasks": 50,
+        "aligned": 17,
+        "alignmentPct": 34.0
+      },
+      {
+        "change_id": "parent-atlas-runtime-log-remediation",
+        "tasks": 18,
+        "aligned": 6,
+        "alignmentPct": 33.33
+      },
+      {
+        "change_id": "parent-atlas-kafka-projection-initiative",
+        "tasks": 33,
+        "aligned": 7,
+        "alignmentPct": 21.21
+      },
+      {
+        "change_id": "parent-atlas-retrieval-staging-planes",
+        "tasks": 63,
+        "aligned": 12,
+        "alignmentPct": 19.05
+      },
+      {
+        "change_id": "legal-corpus-california-codes",
+        "tasks": 45,
+        "aligned": 8,
+        "alignmentPct": 17.78
+      },
+      {
+        "change_id": "parent-atlas-gpu-compute-lanes-consolidation",
+        "tasks": 54,
+        "aligned": 9,
+        "alignmentPct": 16.67
+      },
+      {
+        "change_id": "parent-atlas-workstation-domain-classifier",
+        "tasks": 86,
+        "aligned": 13,
+        "alignmentPct": 15.12
+      },
+      {
+        "change_id": "parent-atlas-agentic-diagnostic-repair-v1",
+        "tasks": 46,
+        "aligned": 6,
+        "alignmentPct": 13.04
+      },
+      {
+        "change_id": "parent-atlas-agentic-file-compiler",
+        "tasks": 82,
+        "aligned": 10,
+        "alignmentPct": 12.2
+      },
+      {
+        "change_id": "parent-atlas-versioned-doc-intelligence",
+        "tasks": 41,
+        "aligned": 5,
+        "alignmentPct": 12.2
+      },
+      {
+        "change_id": "parent-atlas-prefill-routing-residency-convergence",
+        "tasks": 44,
+        "aligned": 5,
+        "alignmentPct": 11.36
+      }
+    ]
+  },
+  "note": "Lift > 1 means top-ranked tasks are more often evidenced. This is a diagnostic, not precision: no reviewed labels exist, and a code match is not proof of completion."
+}

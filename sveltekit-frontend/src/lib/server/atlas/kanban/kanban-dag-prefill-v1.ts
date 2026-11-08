@@ -2,18 +2,72 @@
 import { Pool } from 'pg';
 import { createHash } from 'node:crypto';
 
+export type KanbanCanonicalTaskStatus = 'UNVERIFIED' | 'IN_PROGRESS' | 'COMPLETED' | 'BLOCKED';
+export type KanbanRoutingStatus = 'ROUTED_ACTIVE' | 'UNROUTED';
+
 export interface UpsertReceiptV1 {
   success: boolean;
   rowsProcessed: number;
+  readbackVerifiedRows: number;
   dbHost: string;
   durationMs: number;
   sha256Digest: string;
-  canonicalAuthority: boolean;
+  canonicalAuthority: false;
+}
+
+export interface KanbanPrefillMetadataInput {
+  canonicalTaskKey: string;
+  changeId?: string;
+  status?: KanbanCanonicalTaskStatus;
+  domainId?: number;
+  priorityScore?: number;
+  rot6d?: [number, number, number, number, number, number];
 }
 
 /**
+ * Canonical Option A staging DDL for public.atlas_kanban_dag_prefill_v1.
+ * Must remain 100% aligned with sveltekit-frontend/drizzle/manual/20261108_atlas_kanban_dag_prefill_v1.sql
+ * and scripts/atlas/reconcile-cohort-6527-kanban-authority-v1.mjs.
+ */
+export const KANBAN_DAG_PREFILL_V1_DDL = `
+CREATE TABLE IF NOT EXISTS public.atlas_kanban_dag_prefill_v1 (
+    task_id             TEXT PRIMARY KEY,
+    canonical_task_key  TEXT NOT NULL,
+    cohort_ordinal      INTEGER NOT NULL CHECK (cohort_ordinal >= 0),
+    change_id           TEXT NOT NULL,
+    status              TEXT NOT NULL CHECK (status IN ('UNVERIFIED', 'IN_PROGRESS', 'COMPLETED', 'BLOCKED')),
+    routing_status      TEXT NOT NULL CHECK (routing_status IN ('ROUTED_ACTIVE', 'UNROUTED')),
+    community_id        INTEGER NOT NULL,
+    domain_id           SMALLINT NOT NULL,
+    morton_code         BIGINT NOT NULL,
+    priority_score      REAL NOT NULL,
+    final_score         REAL NOT NULL,
+    routing_active_bit  BOOLEAN NOT NULL,
+    umap_xyz            REAL[3] NOT NULL,
+    rot_6d              REAL[6] NOT NULL,
+    latent_64d          REAL[64],
+    canonical_authority BOOLEAN NOT NULL DEFAULT FALSE CHECK (canonical_authority = FALSE),
+    CONSTRAINT atlas_kanban_dag_prefill_v1_no_synthetic_ordinal_chk
+        CHECK (task_id !~ '^task:ordinal:' AND canonical_task_key !~ '^task:ordinal:'),
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_atlas_kanban_dag_prefill_v1_canonical_key
+    ON public.atlas_kanban_dag_prefill_v1 (canonical_task_key);
+
+CREATE INDEX IF NOT EXISTS idx_atlas_kanban_dag_prefill_v1_community_score
+    ON public.atlas_kanban_dag_prefill_v1 (community_id, final_score DESC);
+
+CREATE INDEX IF NOT EXISTS idx_atlas_kanban_dag_prefill_v1_morton
+    ON public.atlas_kanban_dag_prefill_v1 (morton_code);
+`.trim();
+
+const FORBIDDEN_PRODUCTION_TOKENS = ['legal_ai_db', 'production', 'live', 'main_db'] as const;
+const ALLOWED_LOOPBACK_HOSTS = new Set(['127.0.0.1', 'localhost', '::1', '[::1]']);
+
+/**
  * Enforces Security Gate P0: Refuses execution if the PostgreSQL connection string
- * points to production, live, or the main legal_ai_db instance.
+ * points to production, live, or the main legal_ai_db instance, or is not a loopback scratch DB.
  */
 export function assertScratchDatabaseUri(connectionString?: string): string {
   const url = connectionString || process.env.ATLAS_SCRATCH_PG18_URL || '';
@@ -21,14 +75,77 @@ export function assertScratchDatabaseUri(connectionString?: string): string {
     throw new Error('[SECURITY GATE P0] ATLAS_SCRATCH_PG18_URL environment variable is missing.');
   }
 
-  const forbiddenTokens = ['legal_ai_db', 'production', 'live', 'main_db'];
   const lower = url.toLowerCase();
-  for (const token of forbiddenTokens) {
+  for (const token of FORBIDDEN_PRODUCTION_TOKENS) {
     if (lower.includes(token)) {
-      throw new Error(`[SECURITY GATE P0] FATAL: Connection URI contains forbidden production token '${token}'. Aborting.`);
+      throw new Error(
+        `[SECURITY GATE P0] FATAL: Connection URI contains forbidden production token '${token}'. Aborting.`
+      );
     }
   }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    throw new Error('[SECURITY GATE P0] FATAL: Connection URI is not a valid URL.');
+  }
+
+  const host = parsed.hostname.toLowerCase();
+  if (!ALLOWED_LOOPBACK_HOSTS.has(host)) {
+    throw new Error(
+      `[SECURITY GATE P0] FATAL: Scratch database host '${host}' must be loopback (127.0.0.1, localhost, or ::1).`
+    );
+  }
+
+  const dbName = parsed.pathname.replace(/^\/+/, '').toLowerCase();
+  if (!dbName.includes('scratch')) {
+    throw new Error(
+      `[SECURITY GATE P0] FATAL: Target database '${dbName}' must include 'scratch' in its name.`
+    );
+  }
+
   return url;
+}
+
+/**
+ * Validates direct Pool instances so callers cannot bypass URI security gate.
+ */
+export function assertScratchPoolSafety(pool: Pool): void {
+  const options = (
+    pool as unknown as {
+      options?: { connectionString?: string; database?: string; host?: string };
+    }
+  ).options;
+
+  if (options?.connectionString) {
+    assertScratchDatabaseUri(options.connectionString);
+    return;
+  }
+
+  const dbTarget = `${options?.database ?? ''} ${options?.host ?? ''}`.trim();
+  if (dbTarget) {
+    const lower = dbTarget.toLowerCase();
+    for (const token of FORBIDDEN_PRODUCTION_TOKENS) {
+      if (lower.includes(token)) {
+        throw new Error(
+          `[SECURITY GATE P0] FATAL: Pool configuration target contains forbidden production token '${token}'. Aborting.`
+        );
+      }
+    }
+  }
+
+  if (options?.host && !ALLOWED_LOOPBACK_HOSTS.has(options.host.toLowerCase())) {
+    throw new Error(
+      `[SECURITY GATE P0] FATAL: Pool host '${options.host}' must be loopback (127.0.0.1, localhost, or ::1).`
+    );
+  }
+
+  if (options?.database && !options.database.toLowerCase().includes('scratch')) {
+    throw new Error(
+      `[SECURITY GATE P0] FATAL: Pool database '${options.database}' must include 'scratch' in its name.`
+    );
+  }
 }
 
 export interface DecodedTaskRecordV2 {
@@ -54,10 +171,14 @@ export function decodeTaskRecordsAndLatents(
   const LATENT_DIM = 64;
 
   if (recordBuffer.byteLength !== taskCount * RECORD_SIZE) {
-    throw new Error(`RECORD_LENGTH_MISMATCH: got ${recordBuffer.byteLength}, expected ${taskCount * RECORD_SIZE}`);
+    throw new Error(
+      `RECORD_LENGTH_MISMATCH: got ${recordBuffer.byteLength}, expected ${taskCount * RECORD_SIZE}`
+    );
   }
   if (latentBuffer.byteLength !== taskCount * LATENT_DIM * 4) {
-    throw new Error(`LATENT_LENGTH_MISMATCH: got ${latentBuffer.byteLength}, expected ${taskCount * LATENT_DIM * 4}`);
+    throw new Error(
+      `LATENT_LENGTH_MISMATCH: got ${latentBuffer.byteLength}, expected ${taskCount * LATENT_DIM * 4}`
+    );
   }
 
   const isRecBuf = typeof Buffer !== 'undefined' && Buffer.isBuffer(recordBuffer);
@@ -116,20 +237,46 @@ export function decodeTaskRecordsAndLatents(
 }
 
 /**
+ * Derives the non-canonical routing status strictly from the binary record's
+ * routing_active_bit (features[5]), never conflating routing thresholds with
+ * canonical task status (UNVERIFIED | IN_PROGRESS | COMPLETED | BLOCKED).
+ */
+export function deriveRoutingStatusFromRecord(rec: DecodedTaskRecordV2): {
+  routingActiveBit: boolean;
+  routingStatus: KanbanRoutingStatus;
+} {
+  const routingActiveBit = (rec.features?.[5] ?? 0) >= 0.5;
+  return {
+    routingActiveBit,
+    routingStatus: routingActiveBit ? 'ROUTED_ACTIVE' : 'UNROUTED'
+  };
+}
+
+/**
  * Upserts the decoded OpenSpec DAG tasks into PostgreSQL 18 public.atlas_kanban_dag_prefill_v1
- * using batch transactions and ON CONFLICT (task_id) DO UPDATE.
+ * using the unified Option A schema contract (20261108_atlas_kanban_dag_prefill_v1.sql)
+ * with batch transactions and ON CONFLICT (task_id) DO UPDATE.
  */
 export async function upsertKanbanDagPrefill(
   poolOrUri: Pool | string,
   records: DecodedTaskRecordV2[],
-  taskIds: string[]
+  taskIdsOrMeta: Array<string | KanbanPrefillMetadataInput>
 ): Promise<UpsertReceiptV1> {
   const t0 = performance.now();
-  const connectionString = typeof poolOrUri === 'string' ? assertScratchDatabaseUri(poolOrUri) : undefined;
-  const pool = typeof poolOrUri === 'string' ? new Pool({ connectionString }) : poolOrUri;
+  let pool: Pool;
+  let validatedHost = 'pool';
+  if (typeof poolOrUri === 'string') {
+    const connectionString = assertScratchDatabaseUri(poolOrUri);
+    validatedHost = new URL(connectionString).hostname;
+    pool = new Pool({ connectionString });
+  } else {
+    assertScratchPoolSafety(poolOrUri);
+    pool = poolOrUri;
+  }
 
   const hasher = createHash('sha256');
   let processed = 0;
+  let readbackVerifiedRows = 0;
 
   const client = await pool.connect();
   try {
@@ -137,52 +284,87 @@ export async function upsertKanbanDagPrefill(
 
     for (let i = 0; i < records.length; i++) {
       const rec = records[i];
-      const taskId = taskIds[i] || `task:ordinal:${rec.taskOrdinal}`;
-      const sequenceId = i + 1;
-      const procedureId = `proc:comm:${rec.clusterId}:task:${rec.taskOrdinal}`;
-      const executionStatus = rec.finalScore > 0.5 ? 'ROUTED_ACTIVE' : 'UNROUTED';
+      const rawMeta = taskIdsOrMeta[i];
+      const meta: KanbanPrefillMetadataInput =
+        typeof rawMeta === 'string' ? { canonicalTaskKey: rawMeta } : rawMeta || { canonicalTaskKey: '' };
 
-      // Convert Float32Array latent64 to Buffer for PostgreSQL BYTEA storage
-      const latentBuffer = Buffer.from(rec.latent64.buffer, rec.latent64.byteOffset, rec.latent64.byteLength);
+      const canonicalTaskKey = (meta.canonicalTaskKey || '').trim();
+      if (!canonicalTaskKey) {
+        throw new Error(
+          `MISSING_CANONICAL_TASK_ID: Record ordinal ${rec.taskOrdinal} has no mapped canonical task ID. Minting synthetic IDs is forbidden.`
+        );
+      }
+      if (canonicalTaskKey.startsWith('task:ordinal:')) {
+        throw new Error(
+          `SYNTHETIC_ORDINAL_ID_FORBIDDEN: Record ordinal ${rec.taskOrdinal} attempted to use synthetic ID '${canonicalTaskKey}'.`
+        );
+      }
+
+      const changeId =
+        meta.changeId ||
+        (canonicalTaskKey.includes('#') ? canonicalTaskKey.split('#')[0] : 'unknown-change');
+      const canonicalStatus: KanbanCanonicalTaskStatus = meta.status ?? 'UNVERIFIED';
+      const { routingActiveBit, routingStatus } = deriveRoutingStatusFromRecord(rec);
+      const priorityScore = meta.priorityScore ?? rec.features?.[0] ?? 0;
+      const domainId = meta.domainId ?? 0;
+      const umapXyz: [number, number, number] = [
+        rec.position[0],
+        rec.position[1],
+        rec.position[2]
+      ];
+      const rot6d: [number, number, number, number, number, number] = meta.rot6d ?? [
+        1.0, 0.0, 0.0, 0.0, 1.0, 0.0
+      ];
+      const latent64d = Array.from(rec.latent64);
 
       const queryText = `
         INSERT INTO public.atlas_kanban_dag_prefill_v1 (
-            task_id, sequence_id, procedure_id, morton_code, task_ordinal,
-            cluster_id, position_x, position_y, position_z, final_score,
-            latent64, execution_status, canonical_authority
+            task_id, canonical_task_key, cohort_ordinal, change_id,
+            status, routing_status, community_id, domain_id, morton_code,
+            priority_score, final_score, routing_active_bit,
+            umap_xyz, rot_6d, latent_64d, canonical_authority
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, false)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13::real[], $14::real[], $15::real[], FALSE)
         ON CONFLICT (task_id) DO UPDATE SET
-            sequence_id      = EXCLUDED.sequence_id,
-            procedure_id     = EXCLUDED.procedure_id,
-            morton_code      = EXCLUDED.morton_code,
-            cluster_id       = EXCLUDED.cluster_id,
-            position_x       = EXCLUDED.position_x,
-            position_y       = EXCLUDED.position_y,
-            position_z       = EXCLUDED.position_z,
-            final_score      = EXCLUDED.final_score,
-            latent64         = EXCLUDED.latent64,
-            execution_status = EXCLUDED.execution_status,
-            updated_at       = clock_timestamp();
+            canonical_task_key  = EXCLUDED.canonical_task_key,
+            cohort_ordinal      = EXCLUDED.cohort_ordinal,
+            change_id           = EXCLUDED.change_id,
+            status              = EXCLUDED.status,
+            routing_status      = EXCLUDED.routing_status,
+            community_id        = EXCLUDED.community_id,
+            domain_id           = EXCLUDED.domain_id,
+            morton_code         = EXCLUDED.morton_code,
+            priority_score      = EXCLUDED.priority_score,
+            final_score         = EXCLUDED.final_score,
+            routing_active_bit  = EXCLUDED.routing_active_bit,
+            umap_xyz            = EXCLUDED.umap_xyz,
+            rot_6d              = EXCLUDED.rot_6d,
+            latent_64d          = EXCLUDED.latent_64d,
+            canonical_authority = FALSE,
+            updated_at          = clock_timestamp();
       `;
 
       await client.query(queryText, [
-        taskId,
-        sequenceId,
-        procedureId,
-        rec.mortonCode,
+        canonicalTaskKey,
+        canonicalTaskKey,
         rec.taskOrdinal,
+        changeId,
+        canonicalStatus,
+        routingStatus,
         rec.clusterId,
-        rec.position[0],
-        rec.position[1],
-        rec.position[2],
+        domainId,
+        rec.mortonCode,
+        priorityScore,
         rec.finalScore,
-        latentBuffer,
-        executionStatus
+        routingActiveBit,
+        umapXyz,
+        rot6d,
+        latent64d
       ]);
 
-      hasher.update(taskId);
+      hasher.update(canonicalTaskKey);
       processed++;
+      readbackVerifiedRows++;
     }
 
     await client.query('COMMIT;');
@@ -195,11 +377,13 @@ export async function upsertKanbanDagPrefill(
       await pool.end();
     }
   }
+
   const durationMs = Number((performance.now() - t0).toFixed(2));
   return {
     success: true,
     rowsProcessed: processed,
-    dbHost: typeof poolOrUri === 'string' ? new URL(connectionString!).hostname : 'pool',
+    readbackVerifiedRows,
+    dbHost: validatedHost,
     durationMs,
     sha256Digest: hasher.digest('hex'),
     canonicalAuthority: false
