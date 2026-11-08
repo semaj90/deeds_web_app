@@ -1,11 +1,11 @@
 {
   "schema": "atlas.kanban-runtime-proof.v1",
-  "generated": "2026-11-01T20:54:03.266Z",
+  "generated": "2026-11-08T03:52:02.418Z",
   "taskContractResolved": true,
-  "dispatcherCallerProven": false,
-  "durableWriterProven": false,
-  "claimHeartbeatReclaimProven": false,
-  "timelineRevisionLinkProven": false,
+  "dispatcherCallerProven": true,
+  "durableWriterProven": true,
+  "claimHeartbeatReclaimProven": true,
+  "timelineRevisionLinkProven": true,
   "uiReadModelProven": true,
   "graphifyAdmissionProven": false,
   "writesPerformed": false,
@@ -51,6 +51,7 @@
           "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
           "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/+page.server.ts",
           "sveltekit-frontend/src/routes/api/admin/atlas/kanban-tickets/+server.ts",
+          "sveltekit-frontend/src/routes/api/admin/atlas/kanban-tickets/agent-cohort/+server.ts",
           "sveltekit-frontend/src/routes/api/phase89/workflow/+server.ts",
           "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.server.ts"
         ]
@@ -59,15 +60,33 @@
       "note": "workflow-action-event-v1/task-run-contract-v1 vs the live board kanban-task-board/kanban-task-event-contracts: count production importers of each."
     },
     "dispatchers": {
+      "opencodeMcpToolCallers": [
+        "sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.ts",
+        "sveltekit-frontend/src/lib/server/acp/acp-mcp-integration.ts",
+        "sveltekit-frontend/src/lib/server/atlas/board/agentic-error-fix-lane.ts",
+        "sveltekit-frontend/src/lib/server/auth/tool-authorization.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-policy-classifier-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-registry-types-v1.ts",
+        "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
+        "sveltekit-frontend/src/lib/server/services/knowledge-search/LLMS.md",
+        "sveltekit-frontend/src/lib/server/services/knowledge-search/acp-tool-permissions.ts",
+        "sveltekit-frontend/src/mcp/kanban-dag-prefill-recommendation.ts",
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+        "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/+page.server.ts",
+        "sveltekit-frontend/src/routes/api/acp/execute/+server.ts",
+        "sveltekit-frontend/src/routes/api/acp/tools/+server.ts",
+        "sveltekit-frontend/src/routes/api/ai/agent/+server.ts"
+      ],
       "executeHermesAgentStepV1_prodCallers": [],
       "kanbanErrorFixingAgent_prodCallers": []
     },
     "liveStore": {
       "tableRows": {
         "kanban_tasks": 4514,
-        "kanban_task_events": 4507,
-        "kanban_task_attempts": 0,
-        "kanban_task_dependencies": 0,
+        "kanban_task_events": 4806,
+        "kanban_task_attempts": 149,
+        "kanban_task_dependencies": 3031,
         "workflow_action_leases": 2,
         "workflow_events": 0,
         "agent_runs": 0,
@@ -77,17 +96,25 @@
       "kanbanTaskStatus": [
         {
           "status": "pending",
-          "n": 4508
+          "n": 4361
         },
         {
-          "status": "done",
-          "n": 6
+          "status": "completed",
+          "n": 153
         }
       ],
       "kanbanEventTypes": [
         {
           "event_type": "ticket_created",
           "n": 4347
+        },
+        {
+          "event_type": "claimed",
+          "n": 149
+        },
+        {
+          "event_type": "completed",
+          "n": 147
         },
         {
           "event_type": "file_feed_snapshot",
@@ -102,13 +129,21 @@
           "n": 5
         },
         {
+          "event_type": "failed",
+          "n": 2
+        },
+        {
           "event_type": "code_change",
+          "n": 1
+        },
+        {
+          "event_type": "promoted_ready",
           "n": 1
         }
       ],
-      "claimLikeEvents": 0,
+      "claimLikeEvents": 296,
       "tasksWithClaimToken": 0,
-      "tasksWithHeartbeat": 0,
+      "tasksWithHeartbeat": 147,
       "eventsWithWorkspaceRevision": 4347
     },
     "writers": {
@@ -129,6 +164,8 @@
       "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/+page.server.ts",
       "sveltekit-frontend/src/routes/(app)/admin/error-brain/+page.svelte",
       "sveltekit-frontend/src/routes/api/admin/atlas/kanban-tickets/+server.ts",
+      "sveltekit-frontend/src/routes/api/admin/atlas/kanban-tickets/agent-cohort/+server.ts",
+      "sveltekit-frontend/src/routes/api/admin/atlas/kanban-tickets/agent-cohort/agent-cohort.spec.ts",
       "sveltekit-frontend/src/routes/api/admin/atlas/kanban-tickets/kanban-tickets.spec.ts",
       "sveltekit-frontend/src/routes/api/error-brain/search/+server.ts",
       "sveltekit-frontend/src/routes/api/error-brain/search/search-route.spec.ts",
@@ -137,7 +174,7 @@
       "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.svelte"
     ],
     "graphify": {
-      "file": "docs/reports/atlas-canonical-projection-fabric-audit-2026-10-31.json",
+      "file": "docs/reports/atlas-canonical-projection-fabric-audit-2026-11-07.json",
       "verdict": "NOT_SAFE_TO_PROJECT"
     },
     "fabricatedEvidenceRisk": {

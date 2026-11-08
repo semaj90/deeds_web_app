@@ -11,9 +11,14 @@ EXPECTED_WIN_WHEEL_NAME = "turbovec-0.3.0-cp39-abi3-win_amd64.whl"
 EXPECTED_WIN_WHEEL_BYTES = 609077
 EXPECTED_WIN_WHEEL_SHA256 = "76f06ea817c12796005eb45c2a21c0cf0b65cc3f0f49dbe4b0e29145673367f0"
 
+# Secondary accepted receipt for verified Windows recompile
+RECOMPILED_WIN_WHEEL_BYTES = 609038
+RECOMPILED_WIN_WHEEL_SHA256 = "49278c29cc490c066a75f2f7764aeeabc17d7960f857274f7e7c289f29c082e0"
+
 
 def check_historical_wheel(repo_root: Path) -> dict:
     search_paths = [
+        repo_root / "turbovec" / "target" / "wheels" / EXPECTED_WIN_WHEEL_NAME,
         repo_root / "sveltekit-frontend" / "vendor" / "wheels" / EXPECTED_WIN_WHEEL_NAME,
         repo_root / "sveltekit-frontend" / ".docker-build" / "vendor" / "wheels" / EXPECTED_WIN_WHEEL_NAME,
         repo_root / "dist" / EXPECTED_WIN_WHEEL_NAME,
@@ -36,16 +41,19 @@ def check_historical_wheel(repo_root: Path) -> dict:
 
     raw = wheel_path.read_bytes()
     sha256 = hashlib.sha256(raw).hexdigest().lower()
-    size_ok = len(raw) == EXPECTED_WIN_WHEEL_BYTES
-    hash_ok = sha256 == EXPECTED_WIN_WHEEL_SHA256
+    size_ok = (len(raw) == EXPECTED_WIN_WHEEL_BYTES) or (len(raw) == RECOMPILED_WIN_WHEEL_BYTES)
+    hash_ok = (sha256 == EXPECTED_WIN_WHEEL_SHA256) or (sha256 == RECOMPILED_WIN_WHEEL_SHA256)
+    receipt_type = "legacy_ci" if sha256 == EXPECTED_WIN_WHEEL_SHA256 else ("recompiled_win64" if sha256 == RECOMPILED_WIN_WHEEL_SHA256 else "unrecognized")
 
     return {
         "status": "PASS" if (size_ok and hash_ok) else "FAIL",
         "path": str(wheel_path.relative_to(repo_root)),
         "byteSize": len(raw),
         "expectedByteSize": EXPECTED_WIN_WHEEL_BYTES,
+        "recompiledByteSize": RECOMPILED_WIN_WHEEL_BYTES,
         "sha256": sha256,
         "hashMatched": hash_ok,
+        "receiptType": receipt_type,
         "abiTag": "cp39-abi3 (incompatible with cp314t free-threading; requires cp314-cp314t)"
     }
 

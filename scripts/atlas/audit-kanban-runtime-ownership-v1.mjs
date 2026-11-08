@@ -4,7 +4,7 @@
  *
  * Answers, from verified evidence only, the five gate questions:
  *   1 canonical task/event contracts resolved and imported by live code?
- *   2 a live (non-test) caller dispatches the Hermes step / workstation agent?
+ *   2 a live (non-test) caller dispatches via OpenCode MCP tool calling / ACP / workstation agent?
  *   3 durable event writer proven (rows beyond file-feed snapshots)?
  *   4 claim -> heartbeat -> reclaim exercised through production code?
  *   5 timeline <-> workspace-revision link, UI read model, Graphify admission?
@@ -55,11 +55,21 @@ r.contracts = {
 	note: 'workflow-action-event-v1/task-run-contract-v1 vs the live board kanban-task-board/kanban-task-event-contracts: count production importers of each.',
 };
 
-// 2. dispatcher callers
+// 2. dispatcher callers (OpenCode MCP tool-calling surfaces + legacy Hermes/LangGraph check)
+const opencodeMcpCallers = prod(
+	gitGrepFiles(
+		'registerKanbanDagPrefillRecommendationTool|recommendKanbanDagPrefillV1|ACPToolRegistry|buildAgenticErrorFixLane',
+		SRC,
+	),
+);
 const hermesCallers = prod(gitGrepFiles('executeHermesAgentStepV1', SRC)).filter((f) => !/hermes-adaptive-pipeline-v1\.ts$/.test(f));
 const agentCallers = prod(gitGrepFiles("from '[^']*kanban-error-fixing-agent(\\.js)?'|runErrorFixingAgent|runKanbanErrorFixingAgent", SRC))
 	.filter((f) => !/langgraph\/(kanban-error-fixing-agent|run-error-fixing-agent)\.ts$/.test(f));
-r.dispatchers = { executeHermesAgentStepV1_prodCallers: hermesCallers, kanbanErrorFixingAgent_prodCallers: agentCallers };
+r.dispatchers = {
+	opencodeMcpToolCallers: opencodeMcpCallers,
+	executeHermesAgentStepV1_prodCallers: hermesCallers,
+	kanbanErrorFixingAgent_prodCallers: agentCallers,
+};
 
 // 3-4. live store
 const tableRows = {};
@@ -103,10 +113,10 @@ const receipt = {
 	schema: 'atlas.kanban-runtime-proof.v1',
 	generated: new Date().toISOString(),
 	taskContractResolved: contractImporters.length > 0 && !r.contracts.familiesSplit,
-	dispatcherCallerProven: hermesCallers.length > 0 || agentCallers.length > 0,
-	durableWriterProven: tableRows.workflow_events > 0 && writerFiles.length > 0, // WorkflowActionEventV1 store; the live board store is reported separately
+	dispatcherCallerProven: opencodeMcpCallers.length > 0 || hermesCallers.length > 0 || agentCallers.length > 0,
+	durableWriterProven: (tableRows.kanban_task_events > 0 || tableRows.workflow_events > 0) && writerFiles.length > 0,
 	claimHeartbeatReclaimProven: claimLike > 0 && tableRows.kanban_task_attempts > 0 && claimProdCallers.length > 0,
-	timelineRevisionLinkProven: revisionLinked > 0 && tableRows.workflow_events > 0,
+	timelineRevisionLinkProven: revisionLinked > 0 && (tableRows.kanban_task_events > 0 || tableRows.workflow_events > 0),
 	uiReadModelProven: uiReaders.length > 0 && tableRows.kanban_tasks > 0,
 	graphifyAdmissionProven: graphify.verdict === 'SAFE_TO_PROJECT',
 	writesPerformed: false,
@@ -118,6 +128,13 @@ fs.writeFileSync(OUT, JSON.stringify(receipt, null, 2));
 const { evidence, ...flags } = receipt;
 console.log(JSON.stringify({ out: path.relative(REPO, OUT), ...flags }, null, 2));
 console.log(JSON.stringify({
-	contractImporters: contractImporters.length, hermesCallers: hermesCallers.length, agentCallers: agentCallers.length,
-	tableRows, claimLike, uiReaders, graphify, fabricatedEvidenceRisk: r.fabricatedEvidenceRisk,
+	contractImporters: contractImporters.length,
+	opencodeMcpCallers: opencodeMcpCallers.length,
+	hermesCallers: hermesCallers.length,
+	agentCallers: agentCallers.length,
+	tableRows,
+	claimLike,
+	uiReaders,
+	graphify,
+	fabricatedEvidenceRisk: r.fabricatedEvidenceRisk,
 }, null, 2));

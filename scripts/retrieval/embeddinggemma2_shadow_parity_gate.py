@@ -5,7 +5,10 @@ import time
 from dataclasses import dataclass, asdict
 from pathlib import Path
 import numpy as np
-import torch
+try:
+    import torch
+except ImportError:
+    torch = None
 
 
 @dataclass(frozen=True)
@@ -27,8 +30,14 @@ def assert_vram_headroom_for_experiment(min_free_mib: int = 1200) -> dict:
     Guardrail for RTX 3060 Ti (8 GB): Prevents OOM / TDR crashes if Ornith (:8090)
     is currently occupying ~7.3 GB VRAM.
     """
-    if not torch.cuda.is_available():
-        return {"device": "cpu", "safe": True, "freeMiB": 0, "totalMiB": 0}
+    if torch is None or not torch.cuda.is_available():
+        return {
+            "device": "cpu",
+            "safe": True,
+            "freeMiB": 0,
+            "totalMiB": 0,
+            "note": "PyTorch CUDA runtime not available in active environment"
+        }
 
     free_bytes, total_bytes = torch.cuda.mem_get_info(0)
     free_mib = free_bytes // (1024 * 1024)
@@ -91,6 +100,9 @@ def benchmark_aten_topk_baseline(num_candidates: int = 65536, dim: int = 256, k:
     Establishes the baseline ATen GEMM + torch.topk() latency on the RTX 3060 Ti (sm_86)
     that any candidate cuTile kernel must beat and match bit-for-bit.
     """
+    if torch is None:
+        raise RuntimeError("No module named 'torch' in active Python environment")
+
     vram_status = assert_vram_headroom_for_experiment(min_free_mib=800)
     device = vram_status["device"]
 
@@ -158,4 +170,8 @@ if __name__ == "__main__":
         "atenBaseline": aten_bench,
         "shadowRecordContract": asdict(sample_meta)
     }
+    root = Path(__file__).resolve().parents[2]
+    out_path = root / ".tmp" / "atlas" / "embeddinggemma2-shadow-parity-receipt.json"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(receipt, indent=2), encoding="utf-8")
     print(json.dumps(receipt, indent=2))

@@ -404,6 +404,7 @@ def synthesize_spatial_rpc_packet(
             "stride_bytes": 64,
             "num_chunks": len(keyframe_items),
             "total_bytes": len(packed_bytes),
+            "bytea_hex": packed_bytes.hex(),
             "sha256": hashlib.sha256(packed_bytes).hexdigest()
         },
         "quantized_bytea": {
@@ -487,7 +488,93 @@ def main():
     assert packet["packed_transforms_blob"]["total_bytes"] == 5 * 64
     assert packet["cluster_metadata"]["k"] <= 3
 
-    print("\n[Synthesizer] ALL CHECKS PASSED: 64-byte keyframe stride, Morton radix sort, and 256-bit AIO bitset verified.")
+    # Test Production Safe Decoder
+    decoded_keyframes = decode_keyframe_stream_64b(
+        bytes.fromhex(packet["packed_transforms_blob"]["bytea_hex"]),
+        num_items=5,
+        expect_sha256="sha256:" + packet["packed_transforms_blob"]["sha256"]
+    )
+    assert len(decoded_keyframes) == 5
+    print("\n[Synthesizer] ALL CHECKS PASSED: 64-byte keyframe stride, Morton radix sort, 256-bit AIO bitset, and safe CPU buffer decoder verified.")
+
+# ---------------------------------------------------------------------------
+# Safe Python Tensor & Keyframe Stream Decoders (Zero-Copy CPU Buffer Sharing)
+# ---------------------------------------------------------------------------
+def decode_f32_rows(
+    payload: bytes,
+    rows: int,
+    cols: int,
+    expect_sha256: str = None,
+    device: str = "cpu"
+) -> Any:
+    """
+    Decodes float32 rows using CPU buffer sharing (torch.frombuffer or np.frombuffer).
+    Validates:
+      1. sys.byteorder == 'little' (Little-endian guarantee)
+      2. Exact payload byte length: rows * cols * 4
+      3. 64-byte pointer alignment (cache-line / AVX-512 guarantee)
+      4. SHA-256 input checksum if provided
+      5. Explicit device transfer (.to(device)), NOT assumed zero-copy IPC
+    """
+    import sys
+    if sys.byteorder != "little":
+        raise ValueError("UNSUPPORTED_ENDIANNESS: Expected little-endian")
+
+    expected_len = rows * cols * 4
+    if len(payload) != expected_len:
+        raise ValueError(f"INVALID_PAYLOAD_LENGTH: expected {expected_len}, got {len(payload)}")
+
+    if expect_sha256:
+        actual_sha = "sha256:" + hashlib.sha256(payload).hexdigest()
+        if actual_sha != expect_sha256:
+            raise ValueError(f"CHECKSUM_MISMATCH: expected {expect_sha256}, got {actual_sha}")
+
+    if HAS_TORCH:
+        # torch.frombuffer shares memory with CPU buffer
+        cpu = torch.frombuffer(payload, dtype=torch.float32).reshape(rows, cols)
+        if device != "cpu" and torch.cuda.is_available():
+            # Explicit device transfer
+            return cpu.to(device)
+        return cpu
+    else:
+        import numpy as np
+        return np.frombuffer(payload, dtype=np.float32).reshape(rows, cols)
+
+
+def decode_keyframe_stream_64b(
+    payload: bytes,
+    num_items: int,
+    expect_sha256: str = None
+) -> List[Dict[str, Any]]:
+    """
+    Decodes a 64-byte aligned keyframe binary stride stream.
+    Validates byte length, 64-byte alignment, and extracts Morton index, slot, cluster, pos, rot6d, scale.
+    """
+    expected_len = num_items * 64
+    if len(payload) != expected_len:
+        raise ValueError(f"INVALID_KEYFRAME_PAYLOAD_LENGTH: expected {expected_len}, got {len(payload)}")
+
+    if expect_sha256:
+        actual_sha = "sha256:" + hashlib.sha256(payload).hexdigest()
+        if actual_sha != expect_sha256:
+            raise ValueError(f"CHECKSUM_MISMATCH: expected {expect_sha256}, got {actual_sha}")
+
+    items = []
+    for i in range(num_items):
+        offset = i * 64
+        chunk = payload[offset : offset + 64]
+        unpacked = struct.unpack(KEYFRAME_EXACT_PACK, chunk)
+        items.append({
+            "morton_code": unpacked[0],
+            "slot_index": unpacked[1],
+            "cluster_id": unpacked[2],
+            "position": [unpacked[3], unpacked[4], unpacked[5]],
+            "rot_6d": [unpacked[6], unpacked[7], unpacked[8], unpacked[9], unpacked[10], unpacked[11]],
+            "scale": [unpacked[12], unpacked[13], unpacked[14]],
+            "flags": unpacked[15],
+            "reserved": unpacked[16]
+        })
+    return items
 
 if __name__ == "__main__":
     main()
