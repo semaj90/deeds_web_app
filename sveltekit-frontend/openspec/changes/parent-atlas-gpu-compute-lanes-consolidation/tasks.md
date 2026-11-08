@@ -2119,3 +2119,28 @@ Next steps
 6. Confirm whether the workboard builder had an uncommitted change that was lost.
 7. Move the NES ingest password to `.env` and rotate it.
 8. Connect a production server-owned RBAC grant provider before enabling live workspace-authorized L2 promotion.
+
+## Handoff 2026-11-08 (parity harnesses, simdjson wrapper, recommendation bindings)
+
+No checkbox changed; `LIBTORCH-PARITY-01` stays OPEN. Branch `session/2026-11-07-parity-harnesses-and-lane-hardening` (4 commits ahead of `handoff/working-tree-2026-10-25`).
+
+**LibTorch parity evidence** (`scripts/atlas/libtorch-parity-harness-v1.mjs`)
+- 6 of 16 `libtorch_cuda` exports covered with seeded CPU references and shape sweeps: `batchCosineSimilarity`, `attentionScoreGPU`, `kmeansWithCentroids`, `softmaxGPU`, `topKIndicesGPU`, `rewardScoreGPU`. 23/23 cases pass; max error about 8e-8; `topKIndicesGPU` matches exactly.
+- Each call is checked against the addon's execution counters (CUDA execution advanced, zero CPU/stub/OOM fallback). A self-test with deliberately faulty wrappers proves the checks can fail.
+- Correctness only: debug build (`build_type: debug_or_unoptimized`), no latency or VRAM numbers, which this task still requires.
+- Not covered (10): `pageRankGPU`, `trainSOM`, `autoencoderEncode`/`autoencoderDecode`, `graphSimilarity`/`graphSimilarityHalf`, `clusterEmbeddings`, the FP16 variants, `batchCosineTopK`, `graphCandidateGatherGPU`, `pcaProject`.
+- The addon's `per_export_backend` map: `atlasPageRank`, `slerpEmbeddings`, `manifoldInterpolate4D` are `cpu_reference` (not LibTorch); `somCache` is a plain CUDA kernel; `graphSimilarity*` and `clusterEmbeddings` classify `cpu_fallback` before execution (runtime backend unconfirmed).
+
+**simdjson** (`scripts/atlas/simdjson-parity-harness-v1.mjs`, `sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts`)
+- Five documented divergences from `JSON.parse`, identical on all four builds tested: `-0` loses its sign, integers beyond 64 bits and `1e400` are rejected, lone surrogate escapes become U+FFFD, BOM-prefixed input is accepted. The harness exits 0 on exactly these and fails on any other.
+- The wrapper routes `-0`, surrogate escapes and BOM to V8, confirms a native `validate` false with `JSON.parse`, and prefers the non-GPU release build (`build-x64-fallback`). The native path is kept because specs assert it.
+- Benchmark (one 4.5 MB document, one machine): native parse plus `JSON.parse` 68-72 ms, plain `JSON.parse` 45-55 ms, `simdJsonValidate` about 10 ms, the Rust addon 117 ms. Native object materialization is slower than V8; validation and extraction are where native wins.
+- Eight `tensorrt_bridge.node` copies exist; the app had been loading the June 2 build. Vendored C++ simdjson is 4.5.0 (upstream reported 5.1.1) and Rust `simd-json` is locked at 0.17.3 (0.19.0 reported); both upstream figures are from web search and unverified.
+- The `packages/parent-atlas-retrieval` copy of the wrapper carries the same guard but was not verified here.
+
+**Recommendation evidence**: `verifyRecommendationEvidenceBundleV1`, an ingress check in the classification control plane, and a fail-closed binding in `executeSearchRuntimeTopKV1`. No production caller supplies a bundle; the binding is not recorded in the result; its source-revision check assumes a single-source bundle.
+
+**Open decisions**
+1. `ae:train` is hard-gated (`TRAINING_AUTHORITY_PROVEN = False`); only legacy checkpoints exist. Evaluate the 768-D, MRL-256 and legacy lanes before any retraining.
+2. The EmbeddingGemma 2 evaluation is PLAN_ONLY and needs human-judged queries; the shadow parity gate runs on random vectors and is not evidence. Canonical stays `embeddinggemma:latest` `semantic_768`.
+3. Stale live `workflow_outbox` fixture row (see `route-import-infra-isolation`) and the scratch database `legal_ai_live_integration_scratch`.
