@@ -405,6 +405,15 @@
   ],
   "tasks": [
     {
+      "label": "🔧 C++: clang++ current file (VS 2022 env)",
+      "type": "shell",
+      "command": "${workspaceFolder}\\scripts\\dev\\clang-vs.bat",
+      "args": ["${file}", "${fileDirname}\\${fileBasenameNoExtension}.exe"],
+      "group": { "kind": "build", "isDefault": false },
+      "problemMatcher": ["$gcc"],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
       "label": "🤖 LangGraph NATS Worker",
       "type": "shell",
       "command": "node scripts/startup/ensure-nats-langgraph.mjs",
