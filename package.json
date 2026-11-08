@@ -20,6 +20,7 @@
     "atlas:lowrank:verify": "node scripts/atlas/verify-lowrank-task-rpc-v1.mjs",
     "atlas:lowrank:verify:test": "node --test scripts/atlas/verify-lowrank-task-rpc-v1.test.mjs",
     "atlas:lowrank:decode:test": "py -3.13 scripts/atlas/test-lowrank-task-rpc-decode-v1.py",
+    "atlas:byte-synth:test": "py -3.13 scripts/atlas/test_c_abi_byte_synth_bridge.py",
     "atlas:semantic-768:writer-ownership": "node scripts/atlas/audit-semantic-768-writer-ownership-v1.mjs",
     "atlas:simdjson:jsonl:benchmark": "npx tsx scripts/atlas/benchmark-simdjson-jsonl-v1.mts",
     "atlas:hgrag:oak:owners:audit": "node scripts/atlas/audit-hgrag-oak-owner-map-v1.mjs",

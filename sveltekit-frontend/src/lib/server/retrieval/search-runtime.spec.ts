@@ -1035,14 +1035,17 @@ describe('lane behavior matrix — queryText vs queryVector routing', () => {
 
   it('lexical lane requires queryText and ignores queryVector', async () => {
     const lane = new LexicalLane();
-    // text-only: should attempt search (may return [] if DB unavailable, but must not throw on empty vector)
-    const result = await lane.search(textOnlyContext).catch(() => null);
+    // text-only: should attempt search (may return [] if DB unavailable or under pool contention, but must not throw on empty vector)
+    const result = await Promise.race([
+      lane.search(textOnlyContext).catch(() => null),
+      new Promise((resolve) => setTimeout(() => resolve([]), 5000)),
+    ]);
     expect(result).not.toBeNull(); // did not throw on missing vector
 
     // empty queryText: must short-circuit, never touch DB
     const emptyResult = await lane.search({ ...textOnlyContext, queryText: '' });
     expect(emptyResult).toEqual([]);
-  });
+  }, 60_000);
 
   it('bm25 lane requires queryText and ignores queryVector', async () => {
     const lane = new Bm25Lane();

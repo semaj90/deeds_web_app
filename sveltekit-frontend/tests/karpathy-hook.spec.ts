@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { generateChunkId, generateFileId } from '../src/lib/server/indexer/chunk-id.js';
 import { processKarpathyHook, type KarpathyHookInput } from '../src/lib/server/indexer/karpathy-hook.js';
 
@@ -30,7 +30,7 @@ describe('Karpathy Hook', () => {
 		expect(id1).not.toBe(id3);
 	});
 
-	it('processes file evidence into multi-backend exports', async () => {
+	it('processes file evidence into canonical PostgreSQL 18 pgvector rows and multi-backend exports', async () => {
 		const input: KarpathyHookInput = {
 			repoRoot: '/app',
 			runId: 'test-run',
@@ -50,9 +50,23 @@ describe('Karpathy Hook', () => {
 
 		expect(output.stats.filesSeen).toBe(1);
 		expect(output.stats.chunksCreated).toBe(1);
+		expect(output.stats.pgvectorRows).toBe(1);
+		expect(output.pgvectorRows[0]).toMatchObject({
+			chunkId: output.chunks[0].id,
+			filePath: 'src/lib/server/ai/ace.ts',
+			pgTable: 'codebase_chunk_index',
+			pgColumn: 'content_embedding_768',
+			drizzleType: 'vector(768)',
+			representation: 'semantic_768',
+			vectorDim: 768,
+			nesLutHex: '0x09',
+			domainKey: 'AGENT_ORNITH_RAG_GPU'
+		});
 		expect(output.neo4jEdges.length).toBeGreaterThan(0);
 		expect(output.qdrantPayloads[0].payload.path).toBe('src/lib/server/ai/ace.ts');
+		expect(output.qdrantPayloads[0].payload.nesLutHex).toBe('0x09');
 		expect(output.libtorchRows[0].stableKey).toBe(output.chunks[0].id);
+		expect(output.libtorchRows[0].nesLutHex).toBe('0x09');
 		
 		// Verify Tier 2 summary trigger for high PageRank
 		expect(output.stats.summariesCreated).toBe(3);

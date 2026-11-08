@@ -65,12 +65,17 @@ describe('board fabric gpu benchmark receipt', () => {
 		});
 
 		expect(receipt.schemaVersion).toBe('atlas.board-fabric-gpu-benchmark.v1');
+		expect(receipt.workspaceRevision).toMatch(/^sha256:[a-f0-9]{64}$/);
 		expect(receipt.jsonRows).toHaveLength(1);
 		expect(receipt.jsonRows[0]?.taskId).toBe('rank_signals');
 		expect(receipt.jsonRows[0]?.packetKey).toBe('packet:rrf-rank-signals');
+		expect(receipt.jsonRows[0]?.routingBitmask).toBeGreaterThan(0);
+		expect(receipt.jsonRows[0]?.landingAreaGroupId).toBe('retrieval');
 		expect(receipt.cuvsRequest.representationId).toBe('semantic_768');
 		expect(receipt.cuvsRequest.packetKeys).toEqual(['packet:rrf-rank-signals']);
 		expect(receipt.lowRankFeatureBlock.featureRevision).toBe('atlas.board-fabric-gpu-benchmark.v1');
+		expect(receipt.lowRankFeatureBlock.sourceRevision).toMatch(/^sha256:[a-f0-9]{64}$/);
+		expect(receipt.vramFootprintEstimate.totalRequiredBytes).toBeGreaterThan(0);
 		expect(receipt.jsonl).toContain('rank_signals');
 		expect(receipt.matrix[0]?.length).toBe(6);
 	});
