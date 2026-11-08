@@ -263,7 +263,7 @@
 		<section class="flex items-center gap-3">
 			{#if isModal}
 				<button
-					onclick={onClose}
+					onclick={() => onClose()}
 					class="w-10 h-10 flex items-center justify-center hover:bg-white/5 rounded-xl transition-all text-sand/40 hover:text-sand border border-transparent hover:border-sand/10"
 					aria-label="Close"
 				>

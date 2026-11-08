@@ -1,9 +1,12 @@
 import { createHash } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
+import { promisify } from 'node:util';
 import { describe, expect, it } from 'vitest';
+
+const execFileAsync = promisify(execFile);
 
 function findRepoRoot(start: string): string {
 	let current = resolve(start);
@@ -36,13 +39,15 @@ const pagerankFixture = resolve(
 type Score = { nodeKey: string; pagerankRaw: number };
 type Witness = Record<string, number | string>;
 
-function run(command: string, args: string[]): string {
-	return execFileSync(command, args, {
+// Async on purpose: the WSL/Python/Neo4j subprocesses take ~95 s together. execFileSync blocked the Vitest
+// worker for that long and surfaced as 'Timeout calling "onTaskUpdate"' (an unhandled worker error, exit 1).
+async function run(command: string, args: string[]): Promise<string> {
+	const { stdout } = await execFileAsync(command, args, {
 		cwd: repoRoot,
 		encoding: 'utf8',
-		stdio: ['ignore', 'pipe', 'pipe'],
 		maxBuffer: 1024 * 1024 * 50,
-	}).trim();
+	});
+	return stdout.trim();
 }
 
 // NetworkX is the CPU parity oracle. It lives in the WSL RAPIDS env, not in Windows Python
@@ -55,19 +60,19 @@ function toWslPath(windowsPath: string): string {
 	return windowsPath.replace(/^([A-Za-z]):[\\/]/, (_match, drive: string) => `/mnt/${drive.toLowerCase()}/`).replace(/\\/g, '/');
 }
 
-function runNetworkxOracle(): string {
+async function runNetworkxOracle(): Promise<string> {
 	if (networkxPython?.startsWith('wsl:')) {
 		return run('wsl', ['-e', networkxPython.slice('wsl:'.length), toWslPath(pythonOracle), '--fixture', toWslPath(pagerankFixture)]);
 	}
 	return run(networkxPython ?? 'python', [pythonOracle, '--fixture', pagerankFixture]);
 }
 
-function readWitness(): Witness {
-	const postgres = JSON.parse(run('docker', [
+async function readWitness(): Promise<Witness> {
+	const postgres = JSON.parse(await run('docker', [
 		'exec', 'legal-ai-postgres', 'psql', '-U', 'legal_admin', '-d', 'legal_ai_db', '-Atc',
 		"SELECT json_build_object('row_count', COUNT(*), 'pagerank_score_sum', COALESCE(SUM(pagerank_score),0), 'authority_sum', COALESCE(SUM(authority_score),0), 'page_rank_score_sum', COALESCE(SUM(page_rank_score),0))::text FROM atlas_packets;"
 	]));
-	const karpathy = run('docker', ['exec', 'legal-ai-valkey', 'valkey-cli', '--no-auth-warning', '-a', 'redis', '--raw', 'HGETALL', 'gpu:karpathy:scores']);
+	const karpathy = await run('docker', ['exec', 'legal-ai-valkey', 'valkey-cli', '--no-auth-warning', '-a', 'redis', '--raw', 'HGETALL', 'gpu:karpathy:scores']);
 	return {
 		...postgres,
 		karpathy_sha256: createHash('sha256').update(karpathy).digest('hex'),
@@ -111,12 +116,12 @@ function spearman(left: readonly Score[], right: readonly Score[]): number {
 describe('Parent Atlas NetworkX and Neo4j GDS fixture parity', () => {
 	it('proves parity without modifying production score surfaces', async () => {
 
-		const before = readWitness();
-		const networkx = JSON.parse(runNetworkxOracle());
+		const before = await readWitness();
+		const networkx = JSON.parse(await runNetworkxOracle());
 		expect(networkx.status).toBe('NETWORKX_REFERENCE_PROVEN');
 
-		const gds = JSON.parse(run('node', [gdsRunner, '--fixture', pagerankFixture, '--json']));
-		const after = readWitness();
+		const gds = JSON.parse(await run('node', [gdsRunner, '--fixture', pagerankFixture, '--json']));
+		const after = await readWitness();
 		expect(after).toEqual(before);
 
 		const runnerSource = await readFile(gdsRunner, 'utf8');

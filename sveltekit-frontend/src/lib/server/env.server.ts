@@ -17,9 +17,11 @@
  * "not configured", not attempt a connection with an invented target.
  */
 
-import { assertLangGraphProductionAuthV1 } from '$lib/server/config/langgraph-auth-v1.js';
+import { assertLangGraphProductionAuthV1 } from './config/langgraph-auth-v1.js';
+import { resolveStorageBuckets } from './storage/storage-buckets.js';
 
 const privateEnv: NodeJS.ProcessEnv = process.env;
+const resolvedStorageBuckets = resolveStorageBuckets(privateEnv);
 
 function parseBoolean(value: string | undefined, defaultValue = false): boolean {
   if (!value?.trim()) return defaultValue;
@@ -301,7 +303,14 @@ export const ENV = Object.freeze({
   SDXL_SERVICE_URL: privateEnv.SDXL_SERVICE_URL,
   SEARXNG_URL: privateEnv.SEARXNG_URL,
   SEAWEED_ACCESS_KEY: privateEnv.SEAWEED_ACCESS_KEY,
+  SEAWEED_ARTIFACTS_BUCKET: resolvedStorageBuckets.artifacts,
+  SEAWEED_EVIDENCE_BUCKET: resolvedStorageBuckets.evidence,
+  SEAWEED_LEGAL_CORPUS_BUCKET: resolvedStorageBuckets.legalCorpus,
+  SEAWEED_FEDERAL_LAW_BUCKET: resolvedStorageBuckets.federalLaw,
+  SEAWEED_STATE_LAW_BUCKET: resolvedStorageBuckets.stateLaw,
+  SEAWEED_LOCAL_LAW_BUCKET: resolvedStorageBuckets.localLaw,
   SEAWEED_S3_BUCKET: privateEnv.SEAWEED_S3_BUCKET,
+  SCENE_PERSISTENCE_ENABLED: parseBoolean(privateEnv.SCENE_PERSISTENCE_ENABLED, false),
   SEAWEED_S3_ENDPOINT: privateEnv.SEAWEED_S3_ENDPOINT,
   SEAWEED_S3_PORT: privateEnv.SEAWEED_S3_PORT,
   SEAWEED_S3_REGION: privateEnv.SEAWEED_S3_REGION,

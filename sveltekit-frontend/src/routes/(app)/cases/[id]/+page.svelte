@@ -38,6 +38,7 @@ import CaseEvidenceOrganizer from '$lib/components/evidence/CaseEvidenceOrganize
 import EvidenceUploadButton from '$lib/components/evidence/EvidenceUploadButton.svelte';
 import type { SimilarCase, CaseSummary } from '$lib/types/case-summary';
 import type { BoardSnapshotSchema } from '$lib/schemas/board';
+import type { PageData } from './$types.js';
  import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
  import { Tooltip } from 'bits-ui';
 
@@ -52,7 +53,7 @@ import type { BoardSnapshotSchema } from '$lib/schemas/board';
  }
 
  let { data } = $props<{
-   data?: {
+   data: PageData & {
      caseData?: { id: string; title: string; caseNumber?: string | null; createdAt?: string | Date | null; description?: string | null; jurisdiction?: string | null; status?: string | null } | null;
      case?: { id: string; title: string; caseNumber?: string | null; createdAt?: string | Date | null; description?: string | null; jurisdiction?: string | null; status?: string | null } | null;
    };

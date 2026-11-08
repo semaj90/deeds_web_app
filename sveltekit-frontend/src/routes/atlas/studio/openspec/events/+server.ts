@@ -1,7 +1,16 @@
 import type { RequestHandler } from './$types';
 import { computeOpenSpecReportFingerprint } from '$lib/server/atlas/openspec-board/report-reader';
 
-export const GET: RequestHandler = async ({ request }) => {
+export const GET: RequestHandler = async ({ request, locals }) => {
+  // This stream belongs to the authenticated OpenSpec studio. Do not compute or
+  // expose report fingerprints to anonymous callers.
+  if (!locals.user) {
+    return new Response('Unauthorized', {
+      status: 401,
+      headers: { 'cache-control': 'no-store' }
+    });
+  }
+
   const encoder = new TextEncoder();
   let closed = false;
   let timer: ReturnType<typeof setInterval> | null = null;
@@ -24,8 +33,9 @@ export const GET: RequestHandler = async ({ request }) => {
           } else {
             send('heartbeat', { ok: true });
           }
-        } catch (error) {
-          send('error', { message: error instanceof Error ? error.message : String(error) });
+        } catch {
+          // Keep filesystem/report-reader details out of the event stream.
+          send('error', { code: 'OPENSPEC_REPORT_UNAVAILABLE' });
         }
       }, 3000);
 

@@ -60,7 +60,7 @@ describe('MBVH4 128-byte SoA Packer & Stackless Bitmask Traversal', () => {
     expect(u32[29]).toBe(0b0111);
   });
 
-  it('traverses stacklessly using a single 32-bit nibble bitstack and hits the nearest courtroom leaf', () => {
+  it('traverses stacklessly using the two-word nibble bitstack and hits the nearest courtroom leaf', () => {
     // Ray aimed through prosecution table (z = 0, y = 0.4) toward evidence stand (z = -1.5):
     // Prosecution table (~2) is closer (t = 4.25) than evidence stand (~3, t = 6.4)
     const origin: Vec3 = [3.5, 0.4, 5.0];
@@ -79,6 +79,43 @@ describe('MBVH4 128-byte SoA Packer & Stackless Bitmask Traversal', () => {
     expect(hit.hitLeafId).toBe(3);
     expect(hit.closestT).toBeCloseTo(6.4, 5);
     expect(hit.promotedLodTier).toBe(0);
+  });
+
+  const makeDeepTree = (internalDepth: number): MBVH4NodeInput[] =>
+    Array.from({ length: internalDepth }, (_, index) => ({
+      bminX: [-1, -1, 0, 0] as const,
+      bmaxX: [1, 1, 0, 0] as const,
+      bminY: [-1, -1, 0, 0] as const,
+      bmaxY: [1, 1, 0, 0] as const,
+      bminZ: [-1, -1, 0, 0] as const,
+      bmaxZ: [1, 1, 0, 0] as const,
+      childIndices: [index + 1 < internalDepth ? index + 1 : ~900, ~(100 + index), -1, -1] as const,
+      parentIndex: index === 0 ? 0 : index - 1,
+      validChildMask: 0b0011,
+      lodTier: 0,
+    }));
+
+  it('traverses the full sixteen-level two-word sibling bitstack', () => {
+    const tree = makeDeepTree(16);
+    const hit = traverseMbvh4Stackless(tree, [0, 0, 2], [0, 0, -1], 0, 10);
+    // Equal-distance candidates resolve to the last visited root sibling; the deepest leaf
+    // must still be visited, proving that the high eight nibbles were retained.
+    expect(hit.allHitLeaves).toContain(900);
+    expect(hit.allHitLeaves).toHaveLength(17);
+    expect(hit.nodesVisited).toBe(16);
+  });
+
+  it('rejects a seventeenth internal level before traversal', () => {
+    expect(() => traverseMbvh4Stackless(makeDeepTree(17), [0, 0, 2], [0, 0, -1], 0, 10))
+      .toThrow('MBVH4_MAX_DEPTH_EXCEEDED:16');
+  });
+
+  it('rejects cycles and invalid parent links before traversal', () => {
+    const cyclic = makeDeepTree(2).map((node, index) => index === 1
+      ? { ...node, childIndices: [0, ~101, -1, -1] as const, parentIndex: 0 }
+      : node);
+    expect(() => traverseMbvh4Stackless(cyclic, [0, 0, 2], [0, 0, -1], 0, 10))
+      .toThrow('MBVH4_CYCLE_DETECTED');
   });
 
   it('traverses Phase 14 4-Wide 64-D TurboVec manifold nodes stacklessly and promotes LOD tiers', () => {

@@ -49,7 +49,9 @@ export async function startOutboxPublisherWithRabbit(): Promise<void> {
 
   conn.on('close', () => {
     console.warn('[outbox-boot] AMQP connection closed — publisher stopped');
+    const stopPublisher = _stopPublisher;
     _stopPublisher = null;
+    stopPublisher?.();
   });
   conn.on('error', (err: Error) => {
     console.warn('[outbox-boot] AMQP connection error:', err.message);

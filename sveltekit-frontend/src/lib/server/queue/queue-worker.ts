@@ -17,6 +17,7 @@
  *   await worker.start();
  */
 import type { EvidenceSynthesisResultV1 } from '../evidence/synthesis/evidence-synthesis-v1.js';
+import { ENV } from '$lib/server/env.server.js';
 
 type QueueName =
 	| 'cache.invalidate'
@@ -495,11 +496,11 @@ export class EvidenceProcessWorker extends QueueWorker<{
 			undefined;
 		const bucket =
 			(typeof meta.object_bucket === 'string' && meta.object_bucket) ||
-			'legal-evidence';
+			ENV.SEAWEED_EVIDENCE_BUCKET;
 
 		if (objectKey) {
 			if (
-				bucket !== 'legal-evidence' ||
+				bucket !== ENV.SEAWEED_EVIDENCE_BUCKET ||
 				!objectKey.startsWith('evidence/') ||
 				objectKey.includes('\\') ||
 				objectKey.split('/').some((segment) => segment === '.' || segment === '..')
@@ -509,17 +510,24 @@ export class EvidenceProcessWorker extends QueueWorker<{
 
 			const { getSeaweedFile } = await import('$lib/server/seaweed-client.js');
 			const { processDocument } = await import('$lib/server/document-processor.js');
-			const { createHash } = await import('node:crypto');
+			const { checkSourceSha256 } = await import('$lib/server/evidence/source-sha256-check.js');
 
 			if (!expectedSourceSha256 || !/^sha256:[a-f0-9]{64}$/.test(expectedSourceSha256)) {
 				throw new Error('EVIDENCE_SOURCE_SHA256_REQUIRED');
 			}
 
-			sourceBytes = await getSeaweedFile(bucket, objectKey);
-			const computedSha256 = 'sha256:' + createHash('sha256').update(sourceBytes).digest('hex');
-			if (computedSha256 !== expectedSourceSha256) {
+			const { withBoundedRetry } = await import('$lib/server/evidence/transient-retry.js');
+			sourceBytes = await withBoundedRetry(() => getSeaweedFile(bucket, objectKey), {
+				attempts: 3,
+				baseDelayMs: 500
+			});
+			const sourceCheck = checkSourceSha256(sourceBytes, expectedSourceSha256);
+			if (!sourceCheck.ok) {
+				const failed = sourceCheck as { code: string; computed: string };
 				throw new Error(
-					'EVIDENCE_SOURCE_SHA256_MISMATCH: expected ' + expectedSourceSha256 + ', got ' + computedSha256
+					failed.code === 'EVIDENCE_SOURCE_SHA256_MISMATCH'
+						? `EVIDENCE_SOURCE_SHA256_MISMATCH: expected ${expectedSourceSha256}, got ${failed.computed}`
+						: failed.code
 				);
 			}
 			const extracted = await processDocument({

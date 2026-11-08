@@ -113,7 +113,73 @@ function sha256(value: unknown): string {
 export function compileRecommendationEvidenceBundleV1(input: Omit<RecommendationEvidenceBundleV1, 'bundleChecksum'>): RecommendationEvidenceBundleV1 {
   const parsed = RecommendationEvidenceBundleV1Schema.parse({ ...input, bundleChecksum: '0'.repeat(64) });
   const bundleChecksum = sha256(parsed);
-  return RecommendationEvidenceBundleV1Schema.parse({ ...parsed, bundleChecksum });
+  const result = RecommendationEvidenceBundleV1Schema.parse({ ...parsed, bundleChecksum });
+  verifyRecommendationEvidenceBundleV1(result);
+  return result;
+}
+
+/**
+ * Independently verifies a deserialized recommendation evidence envelope.
+ * Does NOT prove external provider receipts, source-column lineage, or GPU execution;
+ * those remain the responsibilities of the original producers and admission gates.
+ *
+ * Hash compatibility: v1's composer hashes the complete object with its
+ * bundleChecksum temporarily set to 64 zeroes. Preserve this existing rule.
+ */
+export function verifyRecommendationEvidenceBundleV1(input: RecommendationEvidenceBundleV1): void {
+  const bundle = RecommendationEvidenceBundleV1Schema.parse(input);
+  const expectedChecksum = sha256({ ...bundle, bundleChecksum: '0'.repeat(64) });
+  if (expectedChecksum !== bundle.bundleChecksum) {
+    throw new Error('RECOMMENDATION_BUNDLE_CHECKSUM_MISMATCH');
+  }
+  const ordinalSet = new Set(bundle.candidateOrdinals);
+  if (ordinalSet.size !== bundle.candidateOrdinals.length) {
+    throw new Error('RECOMMENDATION_BUNDLE_DUPLICATE_ORDINAL');
+  }
+  if (bundle.sample && bundle.sample.ordinalMapChecksum !== bundle.ordinalMapChecksum) {
+    throw new Error('RECOMMENDATION_BUNDLE_SAMPLE_ORDINAL_DRIFT');
+  }
+
+  const assertReceiptBinding = (receipt: z.infer<typeof RecommendationEvidenceReceiptV1Schema>, kind: string) => {
+    if (receipt.workspaceRevision !== bundle.workspaceRevision) {
+      throw new Error(`RECOMMENDATION_${kind}_WORKSPACE_REVISION_MISMATCH`);
+    }
+    if (receipt.sourceRevision !== bundle.sourceRevision) {
+      throw new Error(`RECOMMENDATION_${kind}_SOURCE_REVISION_MISMATCH`);
+    }
+    if (receipt.representationRevision !== bundle.representationRevision) {
+      throw new Error(`RECOMMENDATION_${kind}_REPRESENTATION_REVISION_MISMATCH`);
+    }
+    if (receipt.graphRevision !== null && bundle.graphRevision !== null && receipt.graphRevision !== bundle.graphRevision) {
+      throw new Error(`RECOMMENDATION_${kind}_GRAPH_REVISION_MISMATCH`);
+    }
+  };
+
+  if (bundle.knn) {
+    assertReceiptBinding(bundle.knn, 'KNN');
+    if (bundle.knn.hits.length > bundle.knn.topK) {
+      throw new Error('RECOMMENDATION_KNN_TOPK_EXCEEDED');
+    }
+    const ranks = new Set<number>();
+    const ordinals = new Set<number>();
+    for (const hit of bundle.knn.hits) {
+      if (hit.rank > bundle.knn.topK || ranks.has(hit.rank) || ordinals.has(hit.candidateOrdinal)) {
+        throw new Error('RECOMMENDATION_KNN_DUPLICATE_OR_INVALID_RANK');
+      }
+      ranks.add(hit.rank);
+      ordinals.add(hit.candidateOrdinal);
+    }
+  }
+
+  for (const receipt of bundle.graph) {
+    assertReceiptBinding(receipt, 'GRAPH');
+    if (new Set(receipt.candidateOrdinals).size !== receipt.candidateOrdinals.length) {
+      throw new Error('RECOMMENDATION_GRAPH_DUPLICATE_ORDINAL');
+    }
+  }
+  for (const receipt of bundle.domain) {
+    assertReceiptBinding(receipt, 'DOMAIN');
+  }
 }
 
 export function recommendationEvidenceFeatureWeightV1(input: RecommendationEvidenceBundleV1): number {

@@ -10,6 +10,8 @@
 
 export const MBVH4_NODE_STRIDE_BYTES = 128 as const;
 export const MBVH4_NODE_WORDS_32 = 32 as const;
+/** Two u32 words hold sixteen 4-bit sibling masks. */
+export const MBVH4_MAX_SUPPORTED_DEPTH = 16 as const;
 
 export type Vec3 = readonly [number, number, number];
 export type Vec4 = readonly [number, number, number, number];
@@ -64,6 +66,58 @@ export function firstLeadingBitU32(x: number): number {
   const u = x >>> 0;
   if (u === 0) return 32;
   return 31 - Math.clz32(u);
+}
+
+/** Validate the rooted internal-node tree before either CPU or GPU traversal. */
+export function assertMbvh4SupportedDepth(nodes: readonly MBVH4NodeInput[]): void {
+  if (nodes.length === 0) return;
+  const active = new Set<number>();
+  const seen = new Set<number>();
+  const visit = (nodeIndex: number, depth: number): void => {
+    if (!Number.isInteger(nodeIndex) || nodeIndex < 0 || nodeIndex >= nodes.length) {
+      throw new RangeError(`MBVH4_INVALID_CHILD_INDEX:${nodeIndex}`);
+    }
+    if (active.has(nodeIndex)) throw new Error(`MBVH4_CYCLE_DETECTED:${nodeIndex}`);
+    if (seen.has(nodeIndex)) throw new Error(`MBVH4_MULTIPLE_PARENTS:${nodeIndex}`);
+    if (depth >= MBVH4_MAX_SUPPORTED_DEPTH) {
+      throw new RangeError(`MBVH4_MAX_DEPTH_EXCEEDED:${MBVH4_MAX_SUPPORTED_DEPTH}`);
+    }
+    active.add(nodeIndex);
+    seen.add(nodeIndex);
+    const node = nodes[nodeIndex]!;
+    for (let lane = 0; lane < 4; lane++) {
+      if ((node.validChildMask & (1 << lane)) === 0) continue;
+      const child = node.childIndices[lane]!;
+      if (child >= 0) {
+        if (active.has(child)) throw new Error(`MBVH4_CYCLE_DETECTED:${child}`);
+        if (nodes[child]?.parentIndex !== nodeIndex) {
+          throw new Error(`MBVH4_PARENT_LINK_MISMATCH:${nodeIndex}->${child}`);
+        }
+        visit(child, depth + 1);
+      }
+    }
+    active.delete(nodeIndex);
+  };
+  visit(0, 0);
+}
+
+function getSiblingMask(stack: readonly [number, number], depth: number): number {
+  const word = depth < 8 ? stack[0] : stack[1];
+  const shift = (depth % 8) * 4;
+  return (word >>> shift) & 0x0f;
+}
+
+function setSiblingMask(stack: [number, number], depth: number, mask: number): void {
+  const wordIndex = depth < 8 ? 0 : 1;
+  const shift = (depth % 8) * 4;
+  const word = stack[wordIndex]!;
+  stack[wordIndex] = ((word & ~(0x0f << shift)) | ((mask & 0x0f) << shift)) >>> 0;
+}
+
+function highestSiblingDepth(stack: readonly [number, number]): number {
+  if (stack[1] !== 0) return 8 + Math.floor(firstLeadingBitU32(stack[1]) / 4);
+  if (stack[0] !== 0) return Math.floor(firstLeadingBitU32(stack[0]) / 4);
+  return -1;
 }
 
 /**
@@ -151,7 +205,7 @@ export function intersectMbvh4Node(
 }
 
 /**
- * Stackless 4-bit Nibble-Bitmask Traversal (`bitstack: u32`) over an `MBVH4NodeInput[]` hierarchy.
+ * Stackless 4-bit Nibble-Bitmask Traversal (`bitstack: vec2<u32>`) over an `MBVH4NodeInput[]` hierarchy.
  * Uses zero per-ray array stack allocations.
  */
 export function traverseMbvh4Stackless(
@@ -170,6 +224,7 @@ export function traverseMbvh4Stackless(
       allHitLeaves: [],
     };
   }
+  assertMbvh4SupportedDepth(nodes);
 
   const rayInvDir: Vec3 = [
     1 / (Math.abs(rayDir[0]) < 1e-12 ? (rayDir[0] >= 0 ? 1e-12 : -1e-12) : rayDir[0]),
@@ -184,7 +239,7 @@ export function traverseMbvh4Stackless(
   const allHitLeaves: number[] = [];
 
   let depth = 0;
-  let bitstack = 0 >>> 0;
+  const bitstack: [number, number] = [0, 0];
   let nodeIdx = 0;
 
   while (true) {
@@ -196,9 +251,7 @@ export function traverseMbvh4Stackless(
       const firstChildLane = firstTrailingBitU32(hit.mask);
       const remainingSiblings = (hit.mask & (hit.mask - 1)) >>> 0;
 
-      const levelShift = depth * 4;
-      bitstack =
-        ((bitstack & ~(0x0f << levelShift)) | (remainingSiblings << levelShift)) >>> 0;
+      setSiblingMask(bitstack, depth, remainingSiblings);
 
       const nextId = node.childIndices[firstChildLane]!;
       if (nextId >= 0) {
@@ -219,22 +272,19 @@ export function traverseMbvh4Stackless(
 
     // Backtrack using bitstack alone (zero array stack reads)
     let descendedToInternal = false;
-    while (bitstack !== 0) {
-      const highestBit = firstLeadingBitU32(bitstack);
-      const targetDepth = Math.floor(highestBit / 4);
+    while (bitstack[0] !== 0 || bitstack[1] !== 0) {
+      const targetDepth = highestSiblingDepth(bitstack);
 
       while (depth > targetDepth) {
         nodeIdx = nodes[nodeIdx]!.parentIndex;
         depth--;
       }
 
-      const levelShift = depth * 4;
-      const levelMask = (bitstack >>> levelShift) & 0x0f;
+      const levelMask = getSiblingMask(bitstack, depth);
       const siblingLane = firstTrailingBitU32(levelMask);
 
       const clearedLevelMask = levelMask & (levelMask - 1);
-      bitstack =
-        ((bitstack & ~(0x0f << levelShift)) | (clearedLevelMask << levelShift)) >>> 0;
+      setSiblingMask(bitstack, depth, clearedLevelMask);
 
       const parentNode = nodes[nodeIdx]!;
       const siblingId = parentNode.childIndices[siblingLane]!;
@@ -258,7 +308,7 @@ export function traverseMbvh4Stackless(
       }
     }
 
-    if (!descendedToInternal && bitstack === 0) {
+    if (!descendedToInternal && bitstack[0] === 0 && bitstack[1] === 0) {
       break;
     }
   }

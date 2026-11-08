@@ -2119,3 +2119,33 @@ Next steps
 6. Confirm whether the workboard builder had an uncommitted change that was lost.
 7. Move the NES ingest password to `.env` and rotate it.
 8. Connect a production server-owned RBAC grant provider before enabling live workspace-authorized L2 promotion.
+
+## Handoff 2026-11-08 (parity harnesses, simdjson wrapper, recommendation bindings)
+
+Milestone: `HANDOFF_PUSHED — REVIEW_REQUIRED` (not `PRODUCTION_READY`). No checkbox changed; `LIBTORCH-PARITY-01` stays OPEN. Branch `session/2026-11-07-parity-harnesses-and-lane-hardening` (5 commits ahead of `handoff/working-tree-2026-10-25`).
+
+**LibTorch parity evidence** (`scripts/atlas/libtorch-parity-harness-v1.mjs`)
+- 8 of 16 `libtorch_cuda` exports covered with seeded CPU references and shape sweeps: `batchCosineSimilarity`, `attentionScoreGPU`, `kmeansWithCentroids`, `softmaxGPU`, `topKIndicesGPU`, `rewardScoreGPU`, `pcaProject`, `batchCosineTopK` (set and score match, backend reported `cuda_cublas`). 30/30 cases pass; max error about 8e-8 (`pcaProject` 5.6e-6 under a 1e-4 FP32-accumulation tolerance, components laid out k x dim, CUDA counter advanced, no fallback); `topKIndicesGPU` matches exactly.
+- Each call is checked against the addon's execution counters (CUDA execution advanced, zero CPU/stub/OOM fallback). A self-test with deliberately faulty wrappers proves the checks can fail.
+- Correctness only: debug build (`build_type: debug_or_unoptimized`), no latency or VRAM numbers, which this task still requires.
+- Not covered (8): `pageRankGPU`, `trainSOM`, `autoencoderEncode`/`autoencoderDecode`, `graphSimilarity`/`graphSimilarityHalf`, `clusterEmbeddings`, the FP16 variants, `graphCandidateGatherGPU`.
+- The addon's `per_export_backend` map: `atlasPageRank`, `slerpEmbeddings`, `manifoldInterpolate4D` are `cpu_reference` (not LibTorch); `somCache` is a plain CUDA kernel; `graphSimilarity*` and `clusterEmbeddings` classify `cpu_fallback` before execution (runtime backend unconfirmed).
+
+**simdjson** (`scripts/atlas/simdjson-parity-harness-v1.mjs`, `sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts`)
+- Five documented divergences from `JSON.parse`, identical on all four builds tested: `-0` loses its sign, integers beyond 64 bits and `1e400` are rejected, lone surrogate escapes become U+FFFD, BOM-prefixed input is accepted. The harness exits 0 on exactly these and fails on any other.
+- The wrapper routes `-0`, surrogate escapes and BOM to V8, confirms a native `validate` false with `JSON.parse`, and prefers the non-GPU release build (`build-x64-fallback`). The native path is kept because specs assert it.
+- Benchmark (one 4.5 MB document, one machine): native parse plus `JSON.parse` 68-72 ms, plain `JSON.parse` 45-55 ms, `simdJsonValidate` about 10 ms, the Rust addon 117 ms. Native object materialization is slower than V8; validation and extraction are where native wins.
+- Eight `tensorrt_bridge.node` copies exist; the app had been loading the June 2 build. Vendored C++ simdjson is 4.5.0 (upstream reported 5.1.1) and Rust `simd-json` is locked at 0.17.3 (0.19.0 reported); both upstream figures are from web search and unverified.
+- The `packages/parent-atlas-retrieval` copy of the wrapper carries the same guard and V8 fidelity routing.
+
+**Recommendation evidence** (`verifyRecommendationEvidenceBundleV1`, `search-runtime-topk-caller-v1.ts`)
+- Ingress check in classification control plane, and fail-closed binding in `executeSearchRuntimeTopKV1`.
+- Binding receipt recorded: returns `RecommendationBindingReceiptV1` (`status: 'VERIFIED'`) with covered ordinals, request ID, bundle checksum, and verification timestamp in `SearchRuntimeTopKExecutionResultV1`.
+- Receipt-persistence gap: binding is returned in the execution result but is not yet plumbed into `AlgorithmExecutionReceiptRowV1` (`receiptRow`).
+- Cohort scope: conditional multi-source check verifies `bundle.sourceRevision` against candidates matching `subjectRef` rather than every external file across the cohort (bundle attests the subject, not every file in a multi-file cohort).
+- Caller status: `VerifiedContextRequestV1` (`verified-context-service-v1.ts`) now accepts an optional `recommendationEvidence` and forwards it into `executeSearchRuntimeTopKV1`; a rejected bundle refuses with `RECOMMENDATION_EVIDENCE_REJECTED` (boundary `RECOMMENDATION_BINDING`, reason only, bundle contents never echoed). Still open: no upstream route or agent supplies a bundle, and the receipt is not folded into the verified-context receipt or persisted.
+
+**Open decisions**
+1. `ae:train` is hard-gated (`TRAINING_AUTHORITY_PROVEN = False`); only legacy checkpoints exist. Evaluate the 768-D, MRL-256 and legacy lanes before any retraining.
+2. The EmbeddingGemma 2 evaluation is PLAN_ONLY and needs human-judged queries; the shadow parity gate runs on random vectors and is not evidence. Canonical stays `embeddinggemma:latest` `semantic_768`.
+3. Stale live `workflow_outbox` fixture row (see `route-import-infra-isolation`) and the scratch database `legal_ai_live_integration_scratch`.

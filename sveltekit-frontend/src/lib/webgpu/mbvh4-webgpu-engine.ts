@@ -15,6 +15,7 @@
 
 import {
   MBVH4_NODE_STRIDE_BYTES,
+  assertMbvh4SupportedDepth,
   packMbvh4Nodes,
   traverseMbvh4Stackless,
   type MBVH4NodeInput,
@@ -121,6 +122,29 @@ struct HitMask4 {
 @group(0) @binding(1) var<storage, read> rays: array<RayQuery>;
 @group(0) @binding(2) var<storage, read_write> results: array<RayHitResult>;
 
+fn stack_mask(stack: vec2<u32>, depth: u32) -> u32 {
+    if (depth < 8u) { return (stack.x >> (depth * 4u)) & 0xFu; }
+    return (stack.y >> ((depth - 8u) * 4u)) & 0xFu;
+}
+
+fn stack_set(stack_in: vec2<u32>, depth: u32, mask: u32) -> vec2<u32> {
+    var stack = stack_in;
+    if (depth < 8u) {
+        let shift = depth * 4u;
+        stack.x = (stack.x & ~(0xFu << shift)) | ((mask & 0xFu) << shift);
+    } else {
+        let shift = (depth - 8u) * 4u;
+        stack.y = (stack.y & ~(0xFu << shift)) | ((mask & 0xFu) << shift);
+    }
+    return stack;
+}
+
+fn stack_top_depth(stack: vec2<u32>) -> i32 {
+    if (stack.y != 0u) { return 8 + i32(firstLeadingBit(stack.y) / 4u); }
+    if (stack.x != 0u) { return i32(firstLeadingBit(stack.x) / 4u); }
+    return -1;
+}
+
 fn intersect_mbvh4_node(
     node: MBVH4Node,
     ray_origin: vec3<f32>,
@@ -168,7 +192,8 @@ fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
     var visited: u32 = 0u;
 
     var depth: u32 = 0u;
-    var bitstack: u32 = 0u;
+    // 2 x u32 stores sixteen 4-bit sibling masks (depth 0..15).
+    var bitstack = vec2<u32>(0u, 0u);
     var node_idx: u32 = 0u;
 
     loop {
@@ -180,8 +205,7 @@ fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
             let first_child_lane = firstTrailingBit(hit.mask);
             let remaining_siblings = hit.mask & (hit.mask - 1u);
 
-            let level_shift = depth * 4u;
-            bitstack = (bitstack & ~(0xFu << level_shift)) | (remaining_siblings << level_shift);
+            bitstack = stack_set(bitstack, depth, remaining_siblings);
 
             let next_id = node.child_indices[first_child_lane];
             if (next_id >= 0) {
@@ -200,21 +224,19 @@ fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
         }
 
         var descended_to_internal: bool = false;
-        while (bitstack != 0u) {
-            let highest_bit = firstLeadingBit(bitstack);
-            let target_depth = highest_bit / 4u;
+        while (bitstack.x != 0u || bitstack.y != 0u) {
+            let target_depth = u32(stack_top_depth(bitstack));
 
             while (depth > target_depth) {
                 node_idx = mbvh_nodes[node_idx].meta.x;
                 depth -= 1u;
             }
 
-            let level_shift = depth * 4u;
-            let level_mask = (bitstack >> level_shift) & 0xFu;
+            let level_mask = stack_mask(bitstack, depth);
             let sibling_lane = firstTrailingBit(level_mask);
 
             let cleared_level_mask = level_mask & (level_mask - 1u);
-            bitstack = (bitstack & ~(0xFu << level_shift)) | (cleared_level_mask << level_shift);
+            bitstack = stack_set(bitstack, depth, cleared_level_mask);
 
             let parent_node = mbvh_nodes[node_idx];
             let sibling_id = parent_node.child_indices[sibling_lane];
@@ -237,7 +259,7 @@ fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
             }
         }
 
-        if (!descended_to_internal && bitstack == 0u) {
+        if (!descended_to_internal && bitstack.x == 0u && bitstack.y == 0u) {
             break;
         }
     }
@@ -288,6 +310,8 @@ export class Mbvh4WebGpuEngine {
     if (rays.length === 0 || nodes.length === 0) {
       return [];
     }
+
+    assertMbvh4SupportedDepth(nodes);
 
     const hasGpu = await this.init();
     if (!hasGpu || !this.device) {

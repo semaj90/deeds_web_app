@@ -13,7 +13,7 @@
  * When LANGFUSE_ENABLED=false (default), all trace functions are no-ops — zero overhead.
  */
 import { ENV } from '../env.server.js';
-import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
+import { SERVER_CHAT_MODEL } from '../../ai/model-ids.js';
 
 // Lazy singleton — only created when LANGFUSE_ENABLED=true
 let _langfuse: any = null;

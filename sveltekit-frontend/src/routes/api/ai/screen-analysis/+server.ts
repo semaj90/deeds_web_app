@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { sql } from 'drizzle-orm';
 import { db, pgRows } from '$lib/server/db/client.js';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
 import { getRedis } from '$lib/server/redis.js';
 import {
 	LLAMA_SERVER_BASE_URL,
@@ -167,6 +168,23 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const { mode, message, caseId, currentRoute, imageBase64, uiSnapshot, history } = parsed.data;
 	const t0 = Date.now();
+	if (caseId) {
+		if (!UUID_RE.test(caseId)) {
+			return json({ ok: false, error: 'Invalid case ID format', answer: '' }, { status: 400 });
+		}
+		const actorId = Number(locals.user?.id);
+		if (!Number.isInteger(actorId) || actorId <= 0) {
+			return json({ ok: false, error: 'Case not found', answer: '' }, { status: 404 });
+		}
+		try {
+			const authorizedCase = await getAuthorizedCase(caseId, actorId);
+			if (!authorizedCase) {
+				return json({ ok: false, error: 'Case not found', answer: '' }, { status: 404 });
+			}
+		} catch {
+			return json({ ok: false, error: 'Unable to verify case access', answer: '' }, { status: 503 });
+		}
+	}
 
 	// 1. Canonical PostgreSQL 18 case + exhibit context
 	let caseContextSummary = '';
@@ -207,10 +225,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					caseContextSummary += `\nLogged Exhibits: 0 exhibits currently attached.`;
 				}
 			} else {
-				caseContextSummary = `Staging Case Dossier #${caseId.slice(0, 8).toUpperCase()}: Record is currently in local staging (not yet committed to PostgreSQL 18 cases table; 0 committed exhibits).`;
+				return json({ ok: false, error: 'Case not found', answer: '' }, { status: 404 });
 			}
 		} catch {
-			caseContextSummary = `Case ID in route: ${caseId}`;
+			return json({ ok: false, error: 'Unable to load authorized case context', answer: '' }, { status: 503 });
 		}
 	}
 
@@ -245,7 +263,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const acePacket = {
 		sourceRef,
 		ConceptID: mode === 'screen' ? 'vlm_screen_reconnaissance' : 'contextual_legal_counsel',
-		ConfidenceScore: caseContextSummary ? 0.94 : 0.86,
 		ContextBlob: contextBlob.slice(0, 3600)
 	};
 
@@ -273,8 +290,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const systemPrompt =
 		mode === 'screen'
-			? `You are YoRHa Legal Counsel powered by Ornith (:8090). Analyze the user's live legal application screen concisely using crisp markdown bullets (**Posture**, **Visible Telemetry & Gaps**, **Recommended Next Actions**). Ground every observation strictly in the provided ACE Screen Context Packet${useMultimodalVision ? ' and attached screen frame' : ''}. Keep response under 220 words.`
-			: `You are YoRHa Contextual Legal Counsel powered by Ornith (:8090). Provide precise, grounded legal and workflow guidance using the active ACE Screen & PostgreSQL 18 Context Packet. Use concise markdown headings or bullets where helpful. Keep response under 260 words.\n\n[ACE CONTEXT PACKET]\n${acePacket.ContextBlob}`;
+			? `You are YoRHa Legal Counsel powered by Ornith (:8090). Analyze the user's live legal application screen concisely using crisp markdown bullets (**Posture**, **Visible Telemetry & Gaps**, **Recommended Next Actions**). Distinguish visible observations from conclusions, and do not claim source verification unless specific source references are provided.${useMultimodalVision ? ' Consider the attached screen frame as user-provided context.' : ''} Keep response under 220 words.`
+			: `You are YoRHa Contextual Legal Counsel powered by Ornith (:8090). Use the supplied context snapshot carefully, distinguish general guidance from case-specific facts, and do not claim source verification unless specific source references are provided. Use concise markdown headings or bullets where helpful. Keep response under 260 words.\n\n[CONTEXT SNAPSHOT]\n${acePacket.ContextBlob}`;
 
 	const priorMessages = history.slice(-8).map((turn) => ({
 		role: turn.role,
@@ -358,8 +375,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 						],
 			acePacket: {
 				sourceRef: acePacket.sourceRef,
-				ConceptID: acePacket.ConceptID,
-				ConfidenceScore: acePacket.ConfidenceScore
+				ConceptID: acePacket.ConceptID
 			}
 		});
 	} catch (err) {
@@ -372,8 +388,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				modality,
 				acePacket: {
 					sourceRef: acePacket.sourceRef,
-					ConceptID: acePacket.ConceptID,
-					ConfidenceScore: acePacket.ConfidenceScore
+					ConceptID: acePacket.ConceptID
 				}
 			},
 			{ status: 503 }

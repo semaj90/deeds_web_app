@@ -55,8 +55,8 @@ WAN_MODEL_ID   = os.environ.get("WAN_MODEL_ID",   "Wan-AI/Wan2.1-T2V-1.3B")
 # FLUX.1-schnell (keyframe) — Black Forest Labs, Apache 2.0, ~4-6GB VRAM NF4
 FLUX_MODEL_ID  = os.environ.get("FLUX_MODEL_ID",  "black-forest-labs/FLUX.1-schnell")
 
-# DepthAnything v2 Large — HKU + TikTok, ~1.3GB VRAM
-DEPTH_MODEL_ID = os.environ.get("DEPTH_MODEL_ID", "depth-anything/Depth-Anything-V2-Large-hf")
+# DepthAnything v2 Small — Apache-2.0 model weights, lower-memory depth estimator
+DEPTH_MODEL_ID = os.environ.get("DEPTH_MODEL_ID", "depth-anything/Depth-Anything-V2-Small-hf")  # Apache-2.0; Base/Large are CC-BY-NC-4.0
 
 # Generation params
 IMAGE_WIDTH    = int(os.environ.get("IMAGE_WIDTH",   "512"))
@@ -264,7 +264,7 @@ def get_flux_pipe():
 
 
 def get_depth_pipe():
-    """Lazy load DepthAnything v2 Large."""
+    """Lazy load the configured DepthAnything v2 model."""
     global _depth_pipe
     if _depth_pipe is None:
         try:
@@ -280,6 +280,33 @@ def get_depth_pipe():
         except Exception as e:
             print(f"⚠️ DepthAnything v2 load failed: {e}")
     return _depth_pipe
+
+
+def get_depth_model_provenance() -> dict[str, str]:
+    """Expose the loaded immutable snapshot revision when Transformers provides it."""
+    model = getattr(_depth_pipe, "model", None) if _depth_pipe is not None else None
+    config = getattr(model, "config", None)
+    revision = getattr(config, "_commit_hash", None)
+    loaded_model_id = getattr(config, "_name_or_path", None)
+    revision_verified = isinstance(revision, str) and len(revision) == 40 and all(
+        character in "0123456789abcdefABCDEF" for character in revision
+    )
+    if revision_verified:
+        model_id_verified = loaded_model_id == DEPTH_MODEL_ID
+        return {
+            "model_id": DEPTH_MODEL_ID,
+            "model_revision": revision.lower(),
+            "model_revision_status": "VERIFIED",
+            "model_license": "Apache-2.0" if model_id_verified and DEPTH_MODEL_ID == "depth-anything/Depth-Anything-V2-Small-hf" else "UNVERIFIED",
+            "depth_type": "relative_monocular",
+        }
+    return {
+        "model_id": DEPTH_MODEL_ID,
+        "model_revision": "UNVERIFIED",
+        "model_revision_status": "UNVERIFIED",
+        "model_license": "UNVERIFIED",
+        "depth_type": "relative_monocular",
+    }
 
 
 # ── Scene Prompt Expansion ────────────────────────────────────────────────────
@@ -924,6 +951,7 @@ async def depth_endpoint(req: DepthRequest):
         "width": depth.shape[1],
         "height": depth.shape[0],
         "processing_time_ms": int((time.time() - t0) * 1000),
+        **get_depth_model_provenance(),
     }
 
 
@@ -994,6 +1022,8 @@ async def reconstruct(req: ReconstructRequest):
         try:
             depth = await loop.run_in_executor(None, estimate_depth, mid_frame)
             result["depth_base64"] = _img_to_b64(Image.fromarray(depth))
+            # The exact frame the depth was computed from, so clients can pair colour+depth safely.
+            result["frame_base64"] = _img_to_b64(mid_frame)
             timings["depth_ms"] = int((time.time() - t1) * 1000)
 
             if req.include_pointcloud:
@@ -1079,6 +1109,8 @@ async def reconstruct_stream(req: ReconstructRequest):
                 depth_b64 = _img_to_b64(Image.fromarray(depth))
                 payload: dict = {"stage": "depth", "status": "done",
                                  "depth_base64": depth_b64}
+                # Same `mid` object the depth was estimated from: colour and depth are one frame.
+                payload["frame_base64"] = _img_to_b64(mid)
                 if req.include_pointcloud:
                     points = await loop.run_in_executor(
                         None, depth_to_pointcloud, mid, depth, 4

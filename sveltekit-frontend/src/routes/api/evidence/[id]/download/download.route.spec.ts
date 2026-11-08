@@ -52,7 +52,7 @@ vi.mock('$lib/server/seaweed-client.js', () => ({
 	statSeaweedObject: mocks.statObject,
 }));
 
-vi.mock('$lib/server/env.server.js', () => ({ ENV: { MINIO_EVIDENCE_BUCKET: 'legal-evidence' } }));
+vi.mock('$lib/server/env.server.js', () => ({ ENV: { SEAWEED_EVIDENCE_BUCKET: 'legal-evidence' } }));
 vi.mock('$lib/server/validation.js', () => ({ isUuid: () => true }));
 vi.mock('$lib/server/ingest/upload-classification-v1.js', () => ({ probeObservedMime: () => mocks.observedMime }));
 
@@ -114,6 +114,32 @@ describe('GET /api/evidence/[id]/download', () => {
 
 		expect(response.status).toBe(200);
 		expect(response.headers.get('content-disposition')).toContain('attachment;');
+	});
+
+	it('does not throw when source events arrive after the client cancels', async () => {
+		const handlers: Record<string, (value?: Buffer | Error) => void> = {};
+		const destroy = vi.fn();
+		mocks.stream = {
+			on(event: string, callback: (value?: Buffer | Error) => void) {
+				handlers[event] = callback;
+				return this;
+			},
+			destroy,
+		};
+		mocks.getStream.mockResolvedValue(mocks.stream);
+		const { GET } = await import('./+server.js');
+		const response = await GET({
+			params: { id: mocks.row.id },
+			locals: { user: { id: 2 } },
+			url: new URL('http://localhost/api/evidence/example/download'),
+			request: new Request('http://localhost/api/evidence/example/download'),
+		} as any);
+
+		await response.body?.cancel();
+		expect(destroy).toHaveBeenCalledOnce();
+		expect(() => handlers.error(new Error('source closed after cancel'))).not.toThrow();
+		expect(() => handlers.data(Buffer.from('late chunk'))).not.toThrow();
+		expect(() => handlers.end()).not.toThrow();
 	});
 
 	it('serves a valid byte range for media seeking', async () => {

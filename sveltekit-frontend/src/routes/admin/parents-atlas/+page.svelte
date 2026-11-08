@@ -8,24 +8,10 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import AgenticWorkflowProposalBoard from '$lib/components/atlas/AgenticWorkflowProposalBoard.svelte';
+import type { PageData } from './$types.js';
 
 	// Server Page Props (from load function)
-	const { data } = $props<{
-		data: {
-			pagerankScores: Array<{ path: string; score: number }>;
-			cartridgeCount: number;
-			totalChunks: number;
-			compressionReport: any;
-			routingTraces: Array<{
-				id: string;
-				query: string;
-				signals: { semantic: number; lexical: number; graph: number; temporal: number };
-				dispatch: string;
-				expected: string;
-				status: string;
-			}>;
-		};
-	}>();
+	const { data } = $props<{ data: PageData }>();
 
 	// State Runes
 	let activeTab = $state<'pipeline' | 'hyperrag' | 'topology' | 'graphrag' | 'wiki' | 'proposals'>('pipeline');

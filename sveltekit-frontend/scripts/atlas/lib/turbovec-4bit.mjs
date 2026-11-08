@@ -229,6 +229,19 @@ export async function probeTurboVecHealth(url) {
   return response.json();
 }
 
+/**
+ * @param {{
+ *   buildUrl?: string;
+ *   buildPort?: number;
+ *   pythonExe?: string;
+ *   pythonScript?: string;
+ *   collection?: string;
+ *   dimension?: number;
+ *   bits?: number;
+ *   timeoutMs?: number;
+ *   logPrefix?: string;
+ * }} [options]
+ */
 export async function ensureTurboVecSidecar({
   buildUrl,
   buildPort,
@@ -279,6 +292,12 @@ export async function ensureTurboVecSidecar({
   throw new Error(`TurboVec sidecar at ${buildUrl} did not become healthy within ${timeoutMs}ms`);
 }
 
+/**
+ * @param {{
+ *   buildUrl?: string;
+ *   vectors?: any[];
+ * }} [options]
+ */
 export async function uploadTurboVecIndex({
   buildUrl,
   vectors = [],

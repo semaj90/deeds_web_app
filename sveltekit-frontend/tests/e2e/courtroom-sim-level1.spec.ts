@@ -13,7 +13,6 @@ const SIZES = [
 	{ width: 1280, height: 720 },
 	{ width: 1920, height: 1080 }
 ];
-const TERMINAL = ['finished', 'interrupted', 'timeout', 'unavailable'];
 
 test.setTimeout(300_000);
 
@@ -50,6 +49,8 @@ for (const size of SIZES) {
 		const panel = page.getByTestId('level1-panel');
 		await expect(panel).toBeVisible();
 		await expect(panel.locator('[data-receipt="SCENE_READY"]')).toHaveAttribute('data-earned', 'true');
+		const tutorial = page.getByTestId('courtroom-demo-tutorial');
+		if (await tutorial.isVisible()) await page.getByRole('button', { name: 'Close tutorial' }).click();
 
 		// Camera presets: the exposed camera state follows each control.
 		for (const view of ['witness', 'judge', 'wide']) {
@@ -59,29 +60,31 @@ for (const size of SIZES) {
 			await page.waitForTimeout(700); // let the 0.5 s transition finish before the next request
 		}
 
-		// Station movement: exactly one terminal receipt, with a final position, from the real scene.
-		await page.getByTestId('move-judge').click();
+		// The witness currently occupies the center stand slot, so the adapter must choose the nearest free side slot.
+		await page.getByTestId('move-witness').click();
 		const receipt = page.getByTestId('movement-receipt');
 		await expect(receipt).toHaveCount(1, { timeout: 90_000 });
 		const move = page.getByTestId('level1-move');
-		await expect(move).toContainText('judge:', { timeout: 90_000 });
+		await expect(move).toContainText('witness: finished at ', { timeout: 90_000 });
 		const text = ((await move.textContent()) ?? '').replace(/\s+/g, ' ').trim();
-		const outcome = TERMINAL.find((o) => text.includes(`judge: ${o}`));
-		expect(outcome, `a terminal outcome in "${text}"`).toBeTruthy();
-		if (outcome === 'finished') expect(text, 'finished carries a final position').toMatch(/at -?\d+\.\d, -?\d+\.\d/);
+		const outcome = 'finished';
+		expect(text, 'finished carries a final position').toMatch(/witness: finished at -?\d+\.\d, -?\d+\.\d/);
+		const [, finalX] = text.match(/witness: finished at (-?\d+\.\d), -?\d+\.\d/) ?? [];
+		expect([1.2, 2.8], 'the occupied center slot routes to one of its two free side slots').toContain(Number(finalX));
 		const verified = (await panel.locator('[data-receipt="MOVE_VERIFIED"]').getAttribute('data-earned')) === 'true';
-		// Verified must agree with the outcome: never earned from anything but a finished move at the station.
-		if (outcome !== 'finished') expect(verified).toBe(false);
+		expect(verified, 'arrival at the selected free witness slot earns the movement receipt').toBe(true);
+		await expect(panel).toHaveAttribute('data-level-complete', 'true');
 		await page.waitForTimeout(1500);
 		await expect(receipt, 'still exactly one terminal receipt').toHaveCount(1);
 
 		// Renderer identification (not a performance claim).
 		const renderer = await page.evaluate(() => {
+			const activeRenderer = document.querySelector('.overlay-fps')?.textContent?.trim() ?? 'unknown';
 			const c = document.createElement('canvas');
 			const gl = (c.getContext('webgl2') ?? c.getContext('webgl')) as WebGLRenderingContext | null;
-			if (!gl) return { api: 'none', renderer: null };
+			if (!gl) return { activeRenderer, api: 'none', renderer: null };
 			const ext = gl.getExtension('WEBGL_debug_renderer_info');
-			return { api: typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext ? 'webgl2' : 'webgl', renderer: ext ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)) : null };
+			return { activeRenderer, api: typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext ? 'webgl2' : 'webgl', renderer: ext ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)) : null };
 		});
 		const software = /swiftshader|llvmpipe|software/i.test(renderer.renderer ?? '');
 

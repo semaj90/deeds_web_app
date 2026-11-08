@@ -380,6 +380,13 @@ under a prefixed name before removing anything.
 `docker/clickhouse-mirror` (no compose service, no container, no caller; source edited) need a rebuild or, more likely, an archive decision (A0-A5 above).
 None of the converted scripts was executed against a live llama-server; only parse-checked. `constitution-pipeline.mjs` vision path untested.
 
+## Docling VLM YOLOX health lifecycle hardening (2026-11-03)
+
+- [x] `/live` is a model-free liveness probe; Docker health checks use it. `/ready` and the backward-compatible `/health` inspect already-loaded model state and use the bounded Ornith health probe; they never call model-loading getters. Readiness returns HTTP 503 when the required VLM is unavailable.
+- [x] Uvicorn is configured for one worker so YOLOX/Whisper model state is not duplicated across two worker processes.
+- [x] Focused health regression tests pass 3/3 in `docker/docling-vlm/tests/test_health.py` using the existing `docker/langgraph-synthesis/.venv`; no dependencies installed.
+- [ ] Docker image rebuild/runtime health, `/ocr/yolo-vlm` route, and CUDA YOLOX-X remain unverified. The Parent Atlas frontend `npm run build` was stopped after reaching 8.34 GiB RSS and leaving about 0.75 GiB system RAM; it emitted periodic ConsoleMetricExporter dumps during the build.
+
 **Open decisions for the operator.** (1) streaming route for the browser chat component; (2) archive vs rebuild `image-synthesis` (measure VRAM first) and archive
 `clickhouse-mirror`; (3) `LLMSelector.svelte` entry still `provider:'ollama'`; (4) `semantic-health/+server.ts` checks the chat model against Ollama `/api/tags`;
 (5) `modelQuant: 'iq4_xs'` in ACE cache keys is stale (Ornith quant unconfirmed); (6) derive `SERVER_CHAT_MODEL` from `LLAMA_SERVER_MODEL`/the live resolver instead of a constant.

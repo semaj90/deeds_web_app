@@ -2,7 +2,8 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema';
-import { eq, desc, sql } from 'drizzle-orm';
+import { cases } from '$lib/server/db/schema-postgres.js';
+import { and, eq, desc, or, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import {
   getChatModelKeepAlive,
@@ -187,6 +188,7 @@ const sseChatSchema = z.object({
   emotionPrompt: z.string().max(5000).optional(),
   emotionMood: z.string().max(100).optional(),
   attachmentSourceHash: z.string().max(64).optional(),
+  caseId: z.string().uuid().optional(),
   currentRoute: z.string().max(500).optional(),
   enableTools: z.boolean().optional(),
 });
@@ -966,13 +968,32 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     emotionPrompt,
     emotionMood,
     attachmentSourceHash,
+    caseId: requestedCaseId,
     currentRoute,
     enableTools,
   } = parsed.data;
 
   // Extract case UUID from conversationId (format: "case-{uuid}")
-  const caseIdMatch = conversationId.match(CASE_ID_PATTERN);
-  const caseUuidForDb = caseIdMatch ? caseIdMatch[1] : undefined;
+  const conversationCaseMatch = conversationId.match(CASE_ID_PATTERN);
+  if (requestedCaseId && conversationCaseMatch && requestedCaseId !== conversationCaseMatch[1]) {
+    return json({ error: 'Case context does not match conversation' }, { status: 400 });
+  }
+  const caseUuidForDb = requestedCaseId ?? conversationCaseMatch?.[1];
+  if (caseUuidForDb) {
+    const actorId = Number(locals.user.id);
+    const [authorizedCase] = await db
+      .select({ id: cases.id })
+      .from(cases)
+      .where(
+        and(
+          eq(cases.id, caseUuidForDb),
+          or(eq(cases.userId, actorId), eq(cases.assignedAttorney, actorId))
+        )
+      )
+      .limit(1);
+    if (!authorizedCase) return json({ error: 'Case not found' }, { status: 404 });
+  }
+  const caseMatch = caseUuidForDb ? { 1: caseUuidForDb } : null;
 
   // Fire-and-forget: record into hot-query analytics ring buffer (feeds search-patterns API)
   recordSearchQuery({ query: message, pipeline: 'ace', cacheHit: false, userId: locals.user.id });
@@ -1121,7 +1142,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // Cache case context per caseId (10min TTL) — identical for every
       // message in a conversation, saves 1 DB query + 2 evidence/citation queries
       let caseContext: string | null = null;
-      const caseMatch = conversationId.match(CASE_ID_PATTERN);
       if (caseMatch) {
         const caseGlyphKey = `glyph:case:${caseMatch[1]}`;
         caseContext = getFragment(caseGlyphKey);

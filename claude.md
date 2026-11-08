@@ -650,13 +650,15 @@ See `memory/ide-linter-workarounds.md` for full details.
 - **Forms**: sveltekit-superforms v2 + Zod validation
 - **Local Cache**: IndexedDB + Loki.js
 - **Server Cache**: Valkey (`valkey/valkey-bundle:8` — AGPL-free Redis Stack drop-in with valkey-json + valkey-search; bind `127.0.0.1:6379`; zero ioredis code changes)
-- **Database**: PostgreSQL 18.4 + Drizzle ORM 0.44 + pgvector
+- **Database**: PostgreSQL 18.4 + Drizzle ORM 0.45.2 (drizzle-kit 0.31.10) + pgvector 0.8.3 (verified 2026-11-04 on `legal-ai-postgres`; the older "0.44" references are stale)
+- **Native addons**: C++ N-API (`node-addon-api` 6.1.0, `simd-bridge/cpp/binding.gyp`) and a Rust addon (`simd-bridge/rust-simdjson`). Toolchain verified 2026-11-04: clang/clang++ 20.1.2, CMake 4.0.0, Ninja 1.13.1, node-gyp, Visual Studio present.
 - **Vector DB**: Qdrant (GPU-accelerated)
 - **AI Models**:
     - **Embeddings Lane**: Ollama (`embeddinggemma:latest` via `/api/embed`)
     - **Generation Lane**: `Gemma4` / `Qwen` via `llama-server` (TurboQuant + Bitfrost)
     - **Vision**: `gemma4-rotorquant:latest` (unified text+vision, GRPO legal LoRA merged)
 - **Client AI**: ONNX Runtime (WebGPU → WASM SIMD → CPU) + gemma 270M quantized
+- **Renderer ownership (proposed 2026-11-04, one engine per viewer surface; not yet an operator-approved decision)**: Three.js (`three` 0.186.1) is the primary evidence viewer: photo depth relief, OBJ/GLB inspection, draggable evidence markers, scene picking and experimental splat rendering (`Evidence3DModal.svelte`, `DepthReliefViewer.svelte`). Babylon.js (`@babylonjs/core` 9.23.0, WebGPU with WebGL fallback) owns the courtroom simulation and animated reconstructions (actor movement, camera controls and timeline playback are proven on it, so do not replace it). PlayCanvas SuperSplat is an optional offline splat-preparation tool, not a runtime viewer. MapLibre GL JS is the map and globe pane. Do not run two of these engines in one modal. The earlier wording that made Three.js comparison-only for the case board is superseded by this split. Engine-agnostic splat code: `sveltekit-frontend/src/lib/splat/calibration.ts` (similarity transform, metric marker sizing) and `spz-loader.ts` (SPZ v4 decoder, `fzstd` 0.1.1 for ZSTD). The loader rejects legacy gzip, extension records and any file that fails size checks. Real-file conformance against a Niantic-produced v4 file is still open. Tasks: `openspec/changes/courtroom-upload-story-pipeline/tasks.md` §13 (SCENE-12 to SCENE-15).
 - **Real-Time**: Server-Sent Events (SSE)
 - **State Machines**: XState v5 (client orchestration) + RabbitMQ (server async)
 - **Message Queue**: RabbitMQ (7 queues, 5 exchanges)
@@ -1287,7 +1289,7 @@ Verbatim original (architecture diagram, simdjson/LibTorch bridge APIs, N-API bu
 
 ---
 
-## Drizzle ORM 0.44 (PostgreSQL 18.4 + pgvector)
+## Drizzle ORM 0.45 (PostgreSQL 18.4 + pgvector; installed 0.45.2, verified 2026-11-04)
 
 **Main schema**: `src/lib/server/db/schema-postgres.ts` (70+ tables, 14 enums)
 
@@ -1332,7 +1334,7 @@ const results = await db.select({
   .orderBy(asc(cosineDistance(items.embedding, queryVec)))
   .limit(10);
 
-// HNSW index (Drizzle 0.44 native — but keep manual SQL convention for production)
+// HNSW index (Drizzle 0.45 native — but keep manual SQL convention for production)
 index('embedding_hnsw_idx')
   .using('hnsw', table.embedding.op('vector_cosine_ops'))
   .with({ m: 16, ef_construction: 64 }),
@@ -2002,3 +2004,11 @@ Open:
 - `scripts/atlas/embedding-validity-guard-v1.mjs` (read-only, ~42 s): `NO_PLACEHOLDER_SIGNATURE_FOUND` on 274,428 embedded chunks: 0 wrong dims, 0 zero/non-unit norm, 6,231 exact-duplicate vector groups all benign (same trimmed text), re-embed parity 40/40 cosine >= 0.99996 via `:8097`. It detects specific signatures only; it is not proof of validity.
 - Live counts (supersede the 219,998 / 560 figures above): 274,465 chunks; 274,428 embedded; 40,306 summarized; 234,159 embedded and unsummarized. 219,239 embedded rows have no `embedding_version`. `embedding_eligible` (true for 52,379) is a lineage-stamp flag, not a validity signal.
 - `scripts/atlas/summary-work-queue-dryrun-v1.mjs` (read-only): the revision-qualified summary queue is EMPTY: 0 of 234,159 eligible chunks have `source_revision`. No ranking exists (weights unset; `token_count`, `enriched_at` empty). Blocked on `source_revision` backfill, deferred until after Phase 20.
+
+## svelte-check upgrade and fast-check lanes (2026-11-03)
+
+- `sveltekit-frontend` `svelte-check` upgraded 4.3.4 → 4.7.8; it now supports `--incremental` (disk cache of svelte2tsx output in `.svelte-kit`/`.svelte-check`) and `--tsgo`. 4.3.4 had neither flag.
+- Lanes: `npm run check` stays the authoritative full gate. `npm run check:fast` (`svelte-check --incremental`, ~62 s warm / 344 s cold, covers `.svelte`, 0 errors) is the default smoke lane; `tsgo --noEmit` (`typecheck:native`, ~67 s) is TS/JS only in `scripts/verify/smoke-validation.mjs`; set `SMOKE_FULL_CHECK=1` for the full `svelte-check` (480 s timeout). Receipt lane values: `FAST_CHECK_PASSED` / `FULL_CHECK_PASSED`.
+- Benchmark (full tsconfig): `--incremental` cold 344 s / warm 62 s; `--tsgo` 96 s; identical diagnostics. Upgrade surfaced 3 latent errors, fixed: Field.svelte (`Snippet<[{ id }]>`, `$props()` annotation), DetectiveBoard.svelte (installed `svelte-dnd-action`, store import path, replaced `.subscribe` with rune mirror).
+- Evidence3DModal.svelte is unified with DepthReliefViewer.svelte (single renderer; displaced-surface raycasting, draggable pins, Orbit/Place/Undo/Clear toolbar, revision-matched depth guards; 20/20 unit tests, 0 svelte-check errors).
+- Open items: Playwright E2E (`tests/e2e/evidence-relief-actions-diagnostic.spec.ts`) was blocked by a `localhost:5173` timeout; depth route still lacks byte-level SHA-256 verification against `depth_sha256`; 3D pins are session-local (temporary) and must not be persisted to Postgres/board state until the E2E diagnostic passes. Do not kill backend services (turbo, bifrost, llama-server) when recovering Vite.

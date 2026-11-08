@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-29T00:28:48.156Z",
+  "generatedAt": "2026-11-07T06:29:41.554Z",
   "liveReachable": true,
   "liveError": null,
   "summary": {
@@ -168,7 +168,7 @@
           "kanban_running_heartbeat_idx",
           "kanban_tasks_pkey"
         ],
-        "rowCount": 167,
+        "rowCount": 4514,
         "columnDiffs": {
           "onlyInA": [],
           "onlyInB": []
@@ -3321,7 +3321,7 @@
           "route_runtime_packets_packet_uuid_uq",
           "route_runtime_packets_pkey"
         ],
-        "rowCount": 11,
+        "rowCount": 35,
         "columnDiffs": {
           "onlyInA": [],
           "onlyInB": []

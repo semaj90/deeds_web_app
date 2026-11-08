@@ -15,12 +15,12 @@ import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
 import { getVlmState, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
 
-const EVIDENCE_BUCKET = ENV.SEAWEED_S3_BUCKET || ENV.MINIO_EVIDENCE_BUCKET;
+const EVIDENCE_BUCKET = ENV.SEAWEED_EVIDENCE_BUCKET;
 
 function extractObjectKey(fileUrl: string): { bucket: string; key: string } | null {
   if (!fileUrl) return null;
-  if (fileUrl.startsWith('minio://')) {
-    const rest = fileUrl.slice('minio://'.length);
+  if (fileUrl.startsWith('seaweed://') || fileUrl.startsWith('minio://')) {
+    const rest = fileUrl.slice(fileUrl.indexOf('://') + 3);
     const slashIdx = rest.indexOf('/');
     if (slashIdx === -1) return null;
     return { bucket: rest.slice(0, slashIdx), key: rest.slice(slashIdx + 1) };

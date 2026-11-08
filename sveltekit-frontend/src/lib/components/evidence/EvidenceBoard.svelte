@@ -927,7 +927,7 @@
 
 		// Save on beforeunload
 		const handleBeforeUnload = () => {
-			flushSave();
+			flushSave(caseId);
 			collaborationStore.disconnect();
 		};
 		window.addEventListener('beforeunload', handleBeforeUnload);

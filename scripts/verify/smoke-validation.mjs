@@ -221,7 +221,7 @@ async function main() {
     report.checks.typescript = {
       status: full ? 'PASS' : 'PARTIAL',
       lane: full ? 'FULL_CHECK_PASSED' : 'FAST_CHECK_PARTIAL',
-      detail: full ? 'svelte-check completed without errors' : 'tsgo --noEmit completed without errors (.svelte not covered)',
+      detail: full ? 'svelte-check completed without errors' : 'svelte-check --incremental completed without errors',
       errors: [],
     };
     console.log(`  ${full ? '✅' : '⚠️'} TypeScript check ${full ? 'passed' : 'partial'} (${full ? 'full svelte-check' : 'fast tsgo; .svelte not covered'}).`);

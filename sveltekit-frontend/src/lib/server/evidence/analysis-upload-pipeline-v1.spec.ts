@@ -10,6 +10,7 @@ const sourceSha256 = `sha256:${'a'.repeat(64)}`;
 const metadata = {
 	evidenceId,
 	caseId: null,
+	object_bucket: 'legal-evidence',
 	objectKey: 'evidence/5/case-file.pdf',
 	sourceSha256,
 	fileName: 'case-file.pdf',
@@ -44,6 +45,9 @@ describe('DB-backed evidence upload pipeline contract', () => {
 		expect(() => buildAnalysisUploadEvidencePayloadV1({
 			evidenceId, analysisJobId, metadata: { ...metadata, evidenceId: analysisJobId },
 		})).toThrow('ANALYSIS_UPLOAD_EVIDENCE_ID_MISMATCH');
+		expect(() => buildAnalysisUploadEvidencePayloadV1({
+			evidenceId, analysisJobId, metadata: { ...metadata, object_bucket: 'atlas-artifacts' },
+		})).toThrow('ANALYSIS_UPLOAD_BUCKET_MISMATCH');
 	});
 
 	it('reports processed only after the canonical worker resolves', async () => {

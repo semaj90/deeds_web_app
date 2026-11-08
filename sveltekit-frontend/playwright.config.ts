@@ -152,9 +152,9 @@ export default defineConfig({
 
   // Web server: auto-start in CI, reuse existing locally
   webServer: {
-    command: 'npm run dev',
+    command: process.env.SCENE_MARKER_E2E === 'true' ? 'npm run dev -- --port 5174' : 'npm run dev',
     url: PORTS.APP_BASE,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !process.env.CI && process.env.SCENE_MARKER_E2E !== 'true',
     timeout: 120000,
   },
 

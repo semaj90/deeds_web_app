@@ -1,5 +1,6 @@
 <script lang="ts">
-	let { children, class: className = '' } = $props<{ children?: any, class?: string }>();
+	import type { Snippet } from 'svelte';
+	let { children, class: className = '' } = $props<{ children: Snippet; class?: string }>();
 </script>
 
 <h3 class="text-2xl font-semibold leading-none tracking-tight {className}">

@@ -30,9 +30,9 @@
  { label: 'Command Center', href: '/command-center', icon: '⚙️' },
  { label: 'Active Cases', href: '/cases', icon: '📋' },
  { label: 'Evidence', href: '/evidence-board', icon: '🔍' },
- { label: 'Laws & Statutes', href: '/laws', icon: '📚' },
+ { label: 'Laws & Statutes', href: '/citations/law', icon: '📚' },
  { label: 'Analysis', href: '/analysis-center', icon: '📊' },
- { label: 'AI Chat', href: '/aichat', icon: '💬' }];
+ { label: 'AI Chat', href: '/chat', icon: '💬' }];
 </script>
 
 <div class="legal-ai-layout">

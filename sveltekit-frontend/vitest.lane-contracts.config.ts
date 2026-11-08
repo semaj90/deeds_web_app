@@ -48,6 +48,7 @@ export default defineConfig({
       'src/lib/server/graph/**/*.spec.ts',
       'src/lib/server/hyperrag/**/*.spec.ts',
       'src/lib/server/ml/phase17-provider-admission.spec.ts',
+      'src/lib/server/gpu/**/*.spec.ts',
       'src/routes/api/admin/atlas/**/*.spec.ts',
       'src/lib/server/evidence/**/*.spec.ts',
       'src/lib/server/agentic/**/*.spec.ts',
@@ -57,7 +58,17 @@ export default defineConfig({
       'src/lib/ai/edge/**/*.spec.ts',
       'src/lib/ai/*.spec.ts',
     ],
-    exclude: ['node_modules/**'],
+    exclude: [
+      'node_modules/**',
+      // Imports timeline-engine.svelte.ts, which uses $state. This Node-only lane has no Svelte transform,
+      // so the spec fails here with "$state is not defined". It runs (2/2) under vitest.config.ts instead.
+      'src/lib/courtroom/timeline-engine.spec.ts',
+      // Live integration tests requiring active RabbitMQ / Docker / WSL daemons:
+      // run in dedicated integration passes rather than isolated unit lane contracts.
+      'src/lib/server/queue/task-outbox-confirm-channel-live.spec.ts',
+      'src/lib/server/queue/code-evidence-outbox.spec.ts',
+      'src/lib/server/atlas/graph/pagerank-parity.spec.ts',
+    ],
     globals: false,
     isolate: true,
     testTimeout: 30_000,

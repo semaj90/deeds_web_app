@@ -22,6 +22,7 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
   }
 
   const caseId = params.id;
+  const { caseData } = await parent();
   const userId = locals.user.id;
 
   // Client view cache check
@@ -40,9 +41,7 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
   }
 
   // caseData from layout via parent(); reports fetched here
-  const [{ caseData }, reportRows] = await Promise.all([
-    parent(),
-    safe(
+  const reportRows = await safe(
       db
         .select()
         .from(reports)
@@ -50,8 +49,7 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
         .orderBy(desc(reports.createdAt))
         .limit(20),
       []
-    ),
-  ]);
+    );
 
   const result = {
     user: locals.user,

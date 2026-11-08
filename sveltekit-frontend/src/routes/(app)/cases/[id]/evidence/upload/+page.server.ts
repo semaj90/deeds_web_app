@@ -1,30 +1,17 @@
-import { db } from '$lib/server/db/client';
-import { cases } from '$lib/server/db/schema-postgres';
 import { fail, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types.js';
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params, locals, parent }) => {
   if (!locals.user) {
     throw redirect(302, '/auth/login');
   }
 
   const caseId = params.id;
-  const safe = <T>(p: Promise<T>, fb: T): Promise<T> => p.catch(() => fb);
-
-  const caseRecord = await safe(db.select().from(cases).where(eq(cases.id, caseId)).limit(1), []);
-
-  if (!caseRecord || caseRecord.length === 0) {
-    return {
-      caseId,
-      caseTitle: 'Unknown Case',
-      loadError: 'Case not found or database unavailable',
-    };
-  }
+  const { caseData } = await parent();
 
   return {
     caseId,
-    caseTitle: caseRecord[0].title,
+    caseTitle: caseData.title,
     loadError: null,
   };
 };

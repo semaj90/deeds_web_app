@@ -519,6 +519,38 @@ export function extractMetadataBatch(
 
 // ── Persist helpers ───────────────────────────────────────────────────────────
 
+function getDatabaseErrorDetails(error: unknown) {
+  let current = error;
+  const visited = new Set<unknown>();
+
+  while (
+    current instanceof Error &&
+    current.cause !== undefined &&
+    !visited.has(current.cause)
+  ) {
+    visited.add(current);
+    current = current.cause;
+  }
+
+  if (!current || typeof current !== 'object') {
+    return { message: String(current) };
+  }
+
+  const details = current as Record<string, unknown>;
+  return {
+    name: current instanceof Error ? current.name : undefined,
+    code: details.code,
+    severity: details.severity,
+    message: details.message ?? (current instanceof Error ? current.message : undefined),
+    detail: details.detail,
+    hint: details.hint,
+    schema: details.schema,
+    table: details.table,
+    column: details.column,
+    constraint: details.constraint,
+  };
+}
+
 export async function persistFileFeature(meta: WorkspaceFileMetadata): Promise<void> {
   await db.insert(astFileFeatures).values({
     repoId: meta.repoId, filePath: meta.relativePath, language: meta.language,
@@ -576,7 +608,12 @@ export async function persistFileFeatureBatch(metas: WorkspaceFileMetadata[]): P
         },
       });
     } catch (err) {
-      console.warn(`[workspace-metadata-extractor] batch upsert failed for chunk ${i}-${i + slice.length}:`, (err as Error).message);
+      console.error('[workspace-metadata-extractor] batch upsert failed', {
+        firstRow: i,
+        endRow: i + slice.length,
+        rowCount: slice.length,
+        databaseError: getDatabaseErrorDetails(err),
+      });
     }
   }
 }

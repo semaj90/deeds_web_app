@@ -1,5 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
 
+const fixturePng = Buffer.from(
+	'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+	'base64',
+);
+
 /**
  * Diagnostic for the board 3D Relief modal (EVIDENCE-3D-UNIFY-01, P0):
  *  - the header states what depth is (never claims stored depth for a brightness guess)
@@ -11,11 +16,31 @@ import { test, expect, type Page } from '@playwright/test';
  */
 const KNOWN = /ERR_UNKNOWN_URL_SCHEME @ minio:\/\/|\[board-persistence\] IndexedDB save failed/;
 
+test.use({ serviceWorkers: 'block' });
+
 async function openModal(page: Page) {
-	await page.goto('/cases');
-	const link = page.locator('a[href^="/cases/"]').filter({ hasNot: page.locator('[href$="/new"]') }).first();
-	await expect(link).toBeVisible({ timeout: 30_000 });
-	const id = ((await link.getAttribute('href')) ?? '').split('/').filter(Boolean)[1];
+	await page.route(/\/api\/cases\/[^/]+\/canvas$/, async (route) => {
+		if (route.request().method() !== 'POST') return route.continue();
+		return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true }) });
+	});
+	await page.route(/\/api\/evidence\/[^/]+\/download(?:\?.*)?$/, (route) => route.fulfill({
+		status: 200,
+		contentType: 'image/png',
+		body: fixturePng,
+	}));
+	await page.route(/\/api\/evidence\/[^/]+\/depth-map$/, (route) => route.fulfill({
+		status: 200,
+		contentType: 'image/png',
+		body: fixturePng,
+	}));
+	// RELIEF_TEST_CASE_ID pins a case the test user owns; the board only loads for owners and assigned attorneys.
+	let id = process.env.RELIEF_TEST_CASE_ID ?? '';
+	if (!id) {
+		await page.goto('/cases');
+		const link = page.locator('a[href^="/cases/"]').filter({ hasNot: page.locator('[href$="/new"]') }).first();
+		await expect(link).toBeVisible({ timeout: 30_000 });
+		id = ((await link.getAttribute('href')) ?? '').split('/').filter(Boolean)[1];
+	}
 	await page.goto(`/cases/${id}/board`);
 	const card = page.locator('.evidence-card').filter({ hasText: /\.png|\.jpe?g|screenshot|fugitivedex/i }).first();
 	await expect(card, 'needs an image evidence card on the board').toBeVisible({ timeout: 30_000 });
@@ -23,15 +48,14 @@ async function openModal(page: Page) {
 	await page.getByRole('button', { name: /3D Relief View/i }).click();
 	const dialog = page.locator('.e3d-content');
 	await expect(dialog).toBeVisible({ timeout: 30_000 });
-	await expect(dialog.locator('.e3d-stage canvas')).toBeVisible({ timeout: 30_000 });
-	// The canvas exists before the image/depth finish loading. The footer note is set in the same synchronous step
-	// that builds the surface and registers the marker listener, so waiting for it means the viewer is ready.
-	await expect(dialog.locator('.e3d-note')).toBeVisible({ timeout: 30_000 });
+	await expect(dialog.locator('.e3d-stage')).toHaveAttribute('data-status', 'ready', { timeout: 30_000 });
+	await expect(dialog.getByRole('application', { name: /Interactive source-bound depth relief/i })).toBeVisible();
 	await expect(dialog.locator('.e3d-msg')).toHaveCount(0);
 	return dialog;
 }
 
 test('3D relief modal: honest depth label, targeted marker delete, slider, close/reopen', async ({ page }) => {
+	test.skip(!process.env.RELIEF_TEST_CASE_ID, 'Set RELIEF_TEST_CASE_ID to an authorized case with image evidence');
 	const errors: string[] = [];
 	page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
 	page.on('console', (m) => { if (m.type() === 'error') errors.push(`console.error: ${m.text()} @ ${m.location().url}`); });
@@ -55,7 +79,7 @@ test('3D relief modal: honest depth label, targeted marker delete, slider, close
 	await expect(pins).toHaveText(['1', '2', '3']);
 
 	// Select marker 2 and Remove: must delete marker 2, leaving 1 and 3 (not 1 and 2).
-	await dialog.getByRole('button', { name: 'Orbit image' }).click();
+	await dialog.getByRole('button', { name: 'Orbit', exact: true }).click();
 	await pins.filter({ hasText: /^2$/ }).click();
 	await expect(dialog.getByTestId('e3d-remove-marker')).toBeVisible();
 	await dialog.getByTestId('e3d-remove-marker').click();
@@ -79,4 +103,19 @@ test('3D relief modal: honest depth label, targeted marker delete, slider, close
 
 	const unexpected = errors.filter((e) => !KNOWN.test(e) && !/^\s+at /.test(e));
 	expect(unexpected, unexpected.join('\n')).toEqual([]);
+});
+
+test('3D relief modal: evidence frame projects around the rendered relief', async ({ page }) => {
+	await page.goto('/demos/depth-relief');
+	const relief = page.getByTestId('depth-relief');
+	await expect(relief).not.toHaveAttribute('data-backend', 'none', { timeout: 30_000 });
+	await page.getByRole('button', { name: 'Evidence frame' }).click();
+	const frame = relief.locator('svg.evidence-bounds');
+	await expect(frame).toBeVisible();
+	await expect(frame.locator('polygon.evidence-bounds-face')).toHaveCount(6);
+	await expect(frame.locator('line.evidence-bounds-edge')).toHaveCount(12);
+	await page.screenshot({
+		path: process.env.RELIEF_FRAME_SHOT ?? test.info().outputPath('evidence-frame.png'),
+		fullPage: false
+	});
 });

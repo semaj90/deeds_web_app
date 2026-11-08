@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.concept-seed-alias-collision-resolution-proposal.v1",
+  "status": "APPROVED_BY_OPERATOR",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "source": "docs/reports/concept-seed-dry-v1.json#aliasCollisions",
+  "rule": "The primary concept is the one whose name equals a top-level group_id in .okf/domains/atlas-domain-taxonomy.yaml. The other concept becomes ALIAS_OF it. No concept is deleted.",
+  "resolutions": [
+    {
+      "label": "retrieval",
+      "primaryConceptId": "concept:domain:retrieval",
+      "aliasOfConceptIds": [
+        "concept:ontology-domain:atlas:RetrievalDomain"
+      ],
+      "relation": "ALIAS_OF",
+      "basis": "retrieval is a top-level group_id in the taxonomy"
+    },
+    {
+      "label": "database",
+      "primaryConceptId": "concept:domain:database",
+      "aliasOfConceptIds": [
+        "concept:ontology-domain:atlas:DatabaseDomain"
+      ],
+      "relation": "ALIAS_OF",
+      "basis": "database is a top-level group_id in the taxonomy"
+    },
+    {
+      "label": "graph",
+      "primaryConceptId": "concept:domain:graph",
+      "aliasOfConceptIds": [
+        "concept:ontology-domain:atlas:GraphDomain"
+      ],
+      "relation": "ALIAS_OF",
+      "basis": "graph is a top-level group_id in the taxonomy"
+    },
+    {
+      "label": "cache",
+      "primaryConceptId": "concept:domain:cache",
+      "aliasOfConceptIds": [
+        "concept:ontology-domain:atlas:CacheDomain"
+      ],
+      "relation": "ALIAS_OF",
+      "basis": "cache is a top-level group_id in the taxonomy"
+    }
+  ],
+  "gateEffect": "Once approved and applied to the seed, the three aliasCollisions no longer block the seed gate. Nothing is applied by this file.",
+  "requiresApprovalFor": [
+    "accepting the primary concept choices",
+    "applying the ALIAS_OF relations to concept-seed-dry-v1.json"
+  ],
+  "alternatives": [
+    "keep all three as ambiguous (current state)",
+    "make the ontology-domain concept primary instead"
+  ],
+  "approvedAt": "2026-11-07",
+  "approvalNote": "operator said yes continue after proposal",
+  "protocolDecision": {
+    "label": "protocol",
+    "status": "NOT_RESOLVED",
+    "reason": "no top-level taxonomy group_id matches protocol, so the group_id rule gives no primary; no resolution invented"
+  }
+}

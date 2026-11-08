@@ -5,7 +5,12 @@ import type { PageServerLoad } from './$types.js';
 import { pgRows } from '$lib/server/db/client';
 
 export const load: PageServerLoad = async () => {
-	const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
+	let loadFailed = false;
+	const safe = <T>(p: Promise<T>, fallback: T): Promise<T> =>
+		p.catch(() => {
+			loadFailed = true;
+			return fallback;
+		});
 
 	const [recentStatutes, glossaryTerms, stats] = await Promise.all([
 		safe(
@@ -62,5 +67,10 @@ export const load: PageServerLoad = async () => {
 		),
 	]);
 
-	return { recentStatutes, glossaryTerms, stats, loadError: null };
+	return {
+		recentStatutes,
+		glossaryTerms,
+		stats,
+		loadError: loadFailed ? 'Some legal corpus data could not be loaded. Refresh to try again.' : null
+	};
 };

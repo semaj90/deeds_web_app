@@ -275,3 +275,84 @@ const ROLE_TO_VIEW: Record<string, string> = {
 	witness: 'witness',
 	narrator: 'wide',
 };
+
+
+export interface CaseNarrativeEvent {
+	eventId: string;
+	timestamp?: string;
+	timeMs: number;
+	actor: string;
+	action: 'enter' | 'inspect' | 'present_evidence' | 'objection' | 'swear_oath' | 'mark_evidence' | 'walk' | 'exit';
+	who: string;
+	what: string;
+	why?: string;
+	how?: string;
+	location: [number, number, number];
+	headingDeg?: number;
+	targetExhibitId?: string;
+	markerId?: number;
+}
+
+/**
+ * Parses timeline narrative events from the case dossier ("Who, What, Why, How")
+ * into timestamped 3D scene keyframe actions for interactive reconstruction.
+ */
+export function parseCaseNarrativeDossier(events: CaseNarrativeEvent[]): TimelineKeyframe[] {
+	const keyframes: TimelineKeyframe[] = [];
+
+	for (const ev of events) {
+		let animType = 'idle';
+		let effect: string | null = null;
+		let cameraView = 'wide';
+
+		switch (ev.action) {
+			case 'inspect':
+			case 'mark_evidence':
+				animType = 'forensic_inspect';
+				effect = ev.action === 'mark_evidence' ? 'marker_placed' : null;
+				cameraView = 'crime_scene_focus';
+				break;
+			case 'present_evidence':
+				animType = 'present_evidence';
+				cameraView = 'evidence_close_up';
+				break;
+			case 'objection':
+				animType = 'objection';
+				effect = 'screen_flash';
+				cameraView = 'action_emphasis';
+				break;
+			case 'swear_oath':
+				animType = 'witness_oath';
+				cameraView = 'witness';
+				break;
+			case 'walk':
+			case 'enter':
+				animType = 'walking';
+				cameraView = 'tracking';
+				break;
+			case 'exit':
+				animType = 'walking';
+				cameraView = 'wide';
+				break;
+			default:
+				animType = 'idle';
+		}
+
+		keyframes.push({
+			id: `narrative_${ev.eventId}`,
+			timeMs: ev.timeMs,
+			characterRole: ev.actor,
+			animType,
+			posX: ev.location[0],
+			posY: ev.location[1],
+			posZ: ev.location[2],
+			rotY: ev.headingDeg !== undefined ? (ev.headingDeg * Math.PI) / 180 : 0,
+			cameraView,
+			effect,
+			evidenceUrl: ev.targetExhibitId ? `/api/evidence/${ev.targetExhibitId}` : null,
+			phase: ev.what
+		});
+	}
+
+	return keyframes.sort((a, b) => a.timeMs - b.timeMs);
+}

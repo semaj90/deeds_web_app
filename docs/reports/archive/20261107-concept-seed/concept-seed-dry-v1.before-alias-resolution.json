@@ -1,0 +1,773 @@
+{
+  "schema": "atlas.concept-seed-dry.v1",
+  "generatedAt": "2026-09-03T18:20:54.806Z",
+  "writesPerformed": false,
+  "proposalCount": 41,
+  "conceptCount": 41,
+  "aliasCount": 26,
+  "canonicalConceptProposals": 9,
+  "aliasProposals": 26,
+  "structuralMappingProposals": 11,
+  "domainMappingProposals": 7,
+  "relationPredicateProposals": 14,
+  "namespaces": [
+    "domain",
+    "meta",
+    "ontology-domain",
+    "predicate"
+  ],
+  "sourceOwners": [
+    "drizzle/schema.ts::atlasOntologyConcepts (concept_type CHECK constraint)",
+    "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+    "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+    "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts::CANONICAL_DOMAINS"
+  ],
+  "duplicates": [],
+  "aliasCollisions": [
+    "alias/label \"retrieval\" is claimed by 2 concepts: concept:domain:retrieval, concept:ontology-domain:atlas:RetrievalDomain — ambiguous, not auto-resolved",
+    "alias/label \"database\" is claimed by 2 concepts: concept:domain:database, concept:ontology-domain:atlas:DatabaseDomain — ambiguous, not auto-resolved",
+    "alias/label \"graph\" is claimed by 2 concepts: concept:domain:graph, concept:ontology-domain:atlas:GraphDomain — ambiguous, not auto-resolved"
+  ],
+  "missingDefinitions": [],
+  "missingOwners": [
+    "representation-registry (semantic_768/latent_256/etc.) — not mechanically extracted this pass",
+    "retrieval-contracts (exact KNN/ANN/Top-K/RRF/lexical/semantic lanes) — not mechanically extracted this pass",
+    "evidence-contracts (citation evidence concepts) — not mechanically extracted this pass"
+  ],
+  "missingEvidence": [],
+  "ambiguousMappings": [],
+  "populationChecksum": "sha256:3ef7567a0cfb45b99ecb6c9d9abb95dc3c1ebc3d65af5d09b2c631f69e3edcc3",
+  "proposalChecksum": "sha256:e507727f2384a8d6ba2e94a12c5ca36cc8dc39d9e5d40471400becfd7f4e9e14",
+  "proposals": [
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:domain:auth",
+      "canonicalLabel": "auth",
+      "definition": "Coarse source-code domain \"auth\" per domain-taxonomy.ts's 9-domain keyword/path classifier.",
+      "conceptType": "domain",
+      "namespace": "domain",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts::CANONICAL_DOMAINS",
+      "evidenceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:1c6a264c4455a72d3a1c445275f92b5d15694b97a239b32f44c5cdfd5480c96e"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:domain:ui",
+      "canonicalLabel": "ui",
+      "definition": "Coarse source-code domain \"ui\" per domain-taxonomy.ts's 9-domain keyword/path classifier.",
+      "conceptType": "domain",
+      "namespace": "domain",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts::CANONICAL_DOMAINS",
+      "evidenceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:3f0ecc650f7a3707b14eeb6f8f73d60948025835af6e36b34aa853a8cf9540a3"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:domain:retrieval",
+      "canonicalLabel": "retrieval",
+      "definition": "Coarse source-code domain \"retrieval\" per domain-taxonomy.ts's 9-domain keyword/path classifier.",
+      "conceptType": "domain",
+      "namespace": "domain",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts::CANONICAL_DOMAINS",
+      "evidenceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:4f5720020000b3ac8fc2d68dffda0127847d0900e73a42aa0add9e8f4758d1d0"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:domain:network",
+      "canonicalLabel": "network",
+      "definition": "Coarse source-code domain \"network\" per domain-taxonomy.ts's 9-domain keyword/path classifier.",
+      "conceptType": "domain",
+      "namespace": "domain",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts::CANONICAL_DOMAINS",
+      "evidenceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:8edd303d04e11391c7af596de2729820a9cb55feb001fce7fb4c1e07b06b77fc"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:domain:database",
+      "canonicalLabel": "database",
+      "definition": "Coarse source-code domain \"database\" per domain-taxonomy.ts's 9-domain keyword/path classifier.",
+      "conceptType": "domain",
+      "namespace": "domain",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts::CANONICAL_DOMAINS",
+      "evidenceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:31f3e643e05835ee9aef00b21956397b39bbb76b2f1b19ed5c58d58ca48dd6ca"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:domain:cache",
+      "canonicalLabel": "cache",
+      "definition": "Coarse source-code domain \"cache\" per domain-taxonomy.ts's 9-domain keyword/path classifier.",
+      "conceptType": "domain",
+      "namespace": "domain",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts::CANONICAL_DOMAINS",
+      "evidenceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:7e3432640d1f7b954566ca21bffecf9ce358bb6beec48a36d2d2fde73dfa6863"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:domain:agent",
+      "canonicalLabel": "agent",
+      "definition": "Coarse source-code domain \"agent\" per domain-taxonomy.ts's 9-domain keyword/path classifier.",
+      "conceptType": "domain",
+      "namespace": "domain",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts::CANONICAL_DOMAINS",
+      "evidenceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:ea468fe568baff5ce9349c10a83228db5515df506f2951a628cc9befddbad712"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:domain:graph",
+      "canonicalLabel": "graph",
+      "definition": "Coarse source-code domain \"graph\" per domain-taxonomy.ts's 9-domain keyword/path classifier.",
+      "conceptType": "domain",
+      "namespace": "domain",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts::CANONICAL_DOMAINS",
+      "evidenceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:686151566d6878d465dfbe4cb53951c9bafc3aa7dd5c8f82c6a20048af742a77"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:domain:ml",
+      "canonicalLabel": "ml",
+      "definition": "Coarse source-code domain \"ml\" per domain-taxonomy.ts's 9-domain keyword/path classifier.",
+      "conceptType": "domain",
+      "namespace": "domain",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts::CANONICAL_DOMAINS",
+      "evidenceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:e6b4dc09a29b1957399eccf28dab663ffba1d121560122ef6c581d52d2a5384a"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:ontology-domain:atlas:RetrievalDomain",
+      "canonicalLabel": "retrieval",
+      "definition": "Ontology-admission domain class \"atlas:RetrievalDomain\" for classify-domain-ontology.mjs label admission (minimumConfidence=0).",
+      "conceptType": "domain",
+      "namespace": "ontology-domain",
+      "aliases": [
+        "search",
+        "rag_retrieval"
+      ],
+      "schemaVersion": 1,
+      "sourceOwner": "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+      "evidenceRefs": [
+        "python/parent_atlas_ontology/domain_mapping.py"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:9fc11ad538d6d0d2d679e50b42322bcdcda6dafd876eaaed0220d91c7f215cb6"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:ontology-domain:atlas:DatabaseDomain",
+      "canonicalLabel": "database",
+      "definition": "Ontology-admission domain class \"atlas:DatabaseDomain\" for classify-domain-ontology.mjs label admission (minimumConfidence=0).",
+      "conceptType": "domain",
+      "namespace": "ontology-domain",
+      "aliases": [
+        "postgres",
+        "storage",
+        "cache_layer",
+        "memory_optimization",
+        "evidence_upload_storage"
+      ],
+      "schemaVersion": 1,
+      "sourceOwner": "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+      "evidenceRefs": [
+        "python/parent_atlas_ontology/domain_mapping.py"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:12393a42d017a11c2a4f37ee026402204dfe2eb9b59a167336bf1a7319766ad1"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:ontology-domain:atlas:CodeDomain",
+      "canonicalLabel": "code",
+      "definition": "Ontology-admission domain class \"atlas:CodeDomain\" for classify-domain-ontology.mjs label admission (minimumConfidence=0).",
+      "conceptType": "domain",
+      "namespace": "ontology-domain",
+      "aliases": [
+        "source",
+        "programming"
+      ],
+      "schemaVersion": 1,
+      "sourceOwner": "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+      "evidenceRefs": [
+        "python/parent_atlas_ontology/domain_mapping.py"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:621a25ca97d04eb1a8b8fb1317a0ab251c4982b4208cd02f763a1e13cefabdb1"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:ontology-domain:atlas:GraphDomain",
+      "canonicalLabel": "graph",
+      "definition": "Ontology-admission domain class \"atlas:GraphDomain\" for classify-domain-ontology.mjs label admission (minimumConfidence=0).",
+      "conceptType": "domain",
+      "namespace": "ontology-domain",
+      "aliases": [
+        "topology",
+        "graph_topology"
+      ],
+      "schemaVersion": 1,
+      "sourceOwner": "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+      "evidenceRefs": [
+        "python/parent_atlas_ontology/domain_mapping.py"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:dce25b6dc1be3ca19c57956e4cd8a0b9400e0798c09ac61339cfea4defcb886d"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:ontology-domain:atlas:ModelDomain",
+      "canonicalLabel": "model",
+      "definition": "Ontology-admission domain class \"atlas:ModelDomain\" for classify-domain-ontology.mjs label admission (minimumConfidence=0).",
+      "conceptType": "domain",
+      "namespace": "ontology-domain",
+      "aliases": [
+        "embedding",
+        "inference",
+        "embedding_indexing",
+        "cluster_analysis"
+      ],
+      "schemaVersion": 1,
+      "sourceOwner": "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+      "evidenceRefs": [
+        "python/parent_atlas_ontology/domain_mapping.py"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:9ef894ccd74bc04c8e781d6c92e74291ed595b5e89ac6ce61467ef443e306074"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:ontology-domain:atlas:WorkflowDomain",
+      "canonicalLabel": "workflow",
+      "definition": "Ontology-admission domain class \"atlas:WorkflowDomain\" for classify-domain-ontology.mjs label admission (minimumConfidence=0).",
+      "conceptType": "domain",
+      "namespace": "ontology-domain",
+      "aliases": [
+        "pipeline",
+        "dag",
+        "agent_orchestration",
+        "repair_workflow",
+        "trace_mcp",
+        "auth_login_register",
+        "case_management"
+      ],
+      "schemaVersion": 1,
+      "sourceOwner": "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+      "evidenceRefs": [
+        "python/parent_atlas_ontology/domain_mapping.py"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:4321f160c48127a5bc5723965cf18842cd8ffd1c07e337d095ed63e6c54ab398"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:ontology-domain:atlas:DocumentationDomain",
+      "canonicalLabel": "documentation",
+      "definition": "Ontology-admission domain class \"atlas:DocumentationDomain\" for classify-domain-ontology.mjs label admission (minimumConfidence=0).",
+      "conceptType": "domain",
+      "namespace": "ontology-domain",
+      "aliases": [
+        "docs",
+        "document_processing",
+        "citation_engine",
+        "legal_reports"
+      ],
+      "schemaVersion": 1,
+      "sourceOwner": "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+      "evidenceRefs": [
+        "python/parent_atlas_ontology/domain_mapping.py"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:4b5ae2b2a38dc2856b29456d66ac66ab779d2a8bafcfe2a16a375d30c0bbe422"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:type:concept",
+      "canonicalLabel": "concept",
+      "definition": "Concept-type vocabulary entry \"concept\", already enforced by atlas_ontology_concepts's live (empty) CHECK constraint.",
+      "conceptType": "category",
+      "namespace": "meta",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyConcepts (concept_type CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:01e93fc299ad41bd1edb30783703875aedad4a4ad0bbfd516f59a1fccd186b5f"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:type:alias",
+      "canonicalLabel": "alias",
+      "definition": "Concept-type vocabulary entry \"alias\", already enforced by atlas_ontology_concepts's live (empty) CHECK constraint.",
+      "conceptType": "category",
+      "namespace": "meta",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyConcepts (concept_type CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:c302ddd9127f5ed022c780ad6824a1a7ba4ba9fb3bc9da9238b237b0325c5d23"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:type:instance",
+      "canonicalLabel": "instance",
+      "definition": "Concept-type vocabulary entry \"instance\", already enforced by atlas_ontology_concepts's live (empty) CHECK constraint.",
+      "conceptType": "category",
+      "namespace": "meta",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyConcepts (concept_type CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:e693a1d0dc40318c35383dca7deee07cb812fa2493693d6f43fa1074de72d34f"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:type:category",
+      "canonicalLabel": "category",
+      "definition": "Concept-type vocabulary entry \"category\", already enforced by atlas_ontology_concepts's live (empty) CHECK constraint.",
+      "conceptType": "category",
+      "namespace": "meta",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyConcepts (concept_type CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:33234932b47c38bed21e0da944ed77db4c9b0dcebdd5314b7a2335b5cde6758c"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:type:capability",
+      "canonicalLabel": "capability",
+      "definition": "Concept-type vocabulary entry \"capability\", already enforced by atlas_ontology_concepts's live (empty) CHECK constraint.",
+      "conceptType": "category",
+      "namespace": "meta",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyConcepts (concept_type CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:ddc492a72ce2972e5d6ed62397cd3852e6ecc6e258e7ab9427f0b7c13a8695c7"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:type:operation",
+      "canonicalLabel": "operation",
+      "definition": "Concept-type vocabulary entry \"operation\", already enforced by atlas_ontology_concepts's live (empty) CHECK constraint.",
+      "conceptType": "category",
+      "namespace": "meta",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyConcepts (concept_type CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:807e4e599deaa724e627f568ae9a12a725bfd24c60aecf95864bbcc243fa0715"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:type:storage_system",
+      "canonicalLabel": "storage_system",
+      "definition": "Concept-type vocabulary entry \"storage_system\", already enforced by atlas_ontology_concepts's live (empty) CHECK constraint.",
+      "conceptType": "category",
+      "namespace": "meta",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyConcepts (concept_type CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:6285cb8e8b6e52c0e2297fe20c35ca859e69462d82f87992e08b0ffb4563b4c1"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:type:protocol",
+      "canonicalLabel": "protocol",
+      "definition": "Concept-type vocabulary entry \"protocol\", already enforced by atlas_ontology_concepts's live (empty) CHECK constraint.",
+      "conceptType": "category",
+      "namespace": "meta",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyConcepts (concept_type CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:34b6c5e5a9a9ffeb441a505197a428663c567a5847fa8af5e22c0ddfdf6e0c30"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:type:artifact",
+      "canonicalLabel": "artifact",
+      "definition": "Concept-type vocabulary entry \"artifact\", already enforced by atlas_ontology_concepts's live (empty) CHECK constraint.",
+      "conceptType": "category",
+      "namespace": "meta",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyConcepts (concept_type CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:21a1a13d6a809d572ff789164ad90e497a09848a7706ba57ab01320eeb3adf7e"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:type:domain",
+      "canonicalLabel": "domain",
+      "definition": "Concept-type vocabulary entry \"domain\", already enforced by atlas_ontology_concepts's live (empty) CHECK constraint.",
+      "conceptType": "category",
+      "namespace": "meta",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyConcepts (concept_type CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:95f8208779b1d884b19864d726a84eb2aeb21e3ea7bbcb4e74d0e70a40924dfe"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:type:relationship",
+      "canonicalLabel": "relationship",
+      "definition": "Concept-type vocabulary entry \"relationship\", already enforced by atlas_ontology_concepts's live (empty) CHECK constraint.",
+      "conceptType": "category",
+      "namespace": "meta",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyConcepts (concept_type CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:39bd4dd49bcc3f167f5d969ec79a77051a0dd86e974deec726108c757a2c39db"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:predicate:IS_A",
+      "canonicalLabel": "IS_A",
+      "definition": "Relation predicate \"IS_A\", already enforced by atlas_ontology_relations's live (empty) CHECK constraint.",
+      "conceptType": "relationship",
+      "namespace": "predicate",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:ba5bd93779fd1f3678f53549af72818f38b6c47547bb481f612bd3924bd30dfe"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:predicate:INSTANCE_OF",
+      "canonicalLabel": "INSTANCE_OF",
+      "definition": "Relation predicate \"INSTANCE_OF\", already enforced by atlas_ontology_relations's live (empty) CHECK constraint.",
+      "conceptType": "relationship",
+      "namespace": "predicate",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:b7d780a2e19550d7f4d270f16d000782ea92177bf4bcc6e1ba37dd6f8ae138f7"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:predicate:ALIAS_OF",
+      "canonicalLabel": "ALIAS_OF",
+      "definition": "Relation predicate \"ALIAS_OF\", already enforced by atlas_ontology_relations's live (empty) CHECK constraint.",
+      "conceptType": "relationship",
+      "namespace": "predicate",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:92d6111ccf599fbfe323cdcba928d8ecb05e4d8b8317627e313ebd6b20a7163d"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:predicate:IMPLEMENTS",
+      "canonicalLabel": "IMPLEMENTS",
+      "definition": "Relation predicate \"IMPLEMENTS\", already enforced by atlas_ontology_relations's live (empty) CHECK constraint.",
+      "conceptType": "relationship",
+      "namespace": "predicate",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:86db13bc04319914dfdfc5194bbcbf47d2462b58d43f3727670177e52958d0da"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:predicate:USES_SYSTEM",
+      "canonicalLabel": "USES_SYSTEM",
+      "definition": "Relation predicate \"USES_SYSTEM\", already enforced by atlas_ontology_relations's live (empty) CHECK constraint.",
+      "conceptType": "relationship",
+      "namespace": "predicate",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:6c7baeda02383e48788ef00f6ef00e41c08a8fd3a462815581d611f3a8cab1da"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:predicate:CALLS",
+      "canonicalLabel": "CALLS",
+      "definition": "Relation predicate \"CALLS\", already enforced by atlas_ontology_relations's live (empty) CHECK constraint.",
+      "conceptType": "relationship",
+      "namespace": "predicate",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:fd0c80800efdee4b062cf5877344663050419cc49c39ee59bba7d6891ee8b1e8"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:predicate:FOLLOWS",
+      "canonicalLabel": "FOLLOWS",
+      "definition": "Relation predicate \"FOLLOWS\", already enforced by atlas_ontology_relations's live (empty) CHECK constraint.",
+      "conceptType": "relationship",
+      "namespace": "predicate",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:8ea11e53f0222b5b9ef67e560259583e999f51df297701930d220328abb940a6"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:predicate:IMPROVES",
+      "canonicalLabel": "IMPROVES",
+      "definition": "Relation predicate \"IMPROVES\", already enforced by atlas_ontology_relations's live (empty) CHECK constraint.",
+      "conceptType": "relationship",
+      "namespace": "predicate",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:4a7e1a77180b93a7c46f6f74d7f222ed77049ed1df9cab9fd37a8580211f9271"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:predicate:DEPENDS_ON",
+      "canonicalLabel": "DEPENDS_ON",
+      "definition": "Relation predicate \"DEPENDS_ON\", already enforced by atlas_ontology_relations's live (empty) CHECK constraint.",
+      "conceptType": "relationship",
+      "namespace": "predicate",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:381f8b30a2f62a8ca987d196f943d0ac66c535e9773e2856191c793649ed217c"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:predicate:PART_OF",
+      "canonicalLabel": "PART_OF",
+      "definition": "Relation predicate \"PART_OF\", already enforced by atlas_ontology_relations's live (empty) CHECK constraint.",
+      "conceptType": "relationship",
+      "namespace": "predicate",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:2e048ecb939669870bdb8b638e92418539c8e6ad7f600a1cd4dafa0d6e73b397"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:predicate:PRODUCES",
+      "canonicalLabel": "PRODUCES",
+      "definition": "Relation predicate \"PRODUCES\", already enforced by atlas_ontology_relations's live (empty) CHECK constraint.",
+      "conceptType": "relationship",
+      "namespace": "predicate",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:24bd6633f4f1b93cc4420ef1f5c3db7913422df951f686778110a2f2aca988a6"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:predicate:CONSUMES",
+      "canonicalLabel": "CONSUMES",
+      "definition": "Relation predicate \"CONSUMES\", already enforced by atlas_ontology_relations's live (empty) CHECK constraint.",
+      "conceptType": "relationship",
+      "namespace": "predicate",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:bf6cefc4ae7c650cd0ce33d32243c57778e15524a1d54d89ad9e088c44e5f892"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:predicate:STORES_IN",
+      "canonicalLabel": "STORES_IN",
+      "definition": "Relation predicate \"STORES_IN\", already enforced by atlas_ontology_relations's live (empty) CHECK constraint.",
+      "conceptType": "relationship",
+      "namespace": "predicate",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:154ddf71e6fad100b31275743c1db63085920d885881eff13bb08b97830c90e7"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:predicate:READS_FROM",
+      "canonicalLabel": "READS_FROM",
+      "definition": "Relation predicate \"READS_FROM\", already enforced by atlas_ontology_relations's live (empty) CHECK constraint.",
+      "conceptType": "relationship",
+      "namespace": "predicate",
+      "aliases": [],
+      "schemaVersion": 1,
+      "sourceOwner": "drizzle/schema.ts::atlasOntologyRelations (predicate CHECK constraint)",
+      "evidenceRefs": [
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:996c0554b4511659b8778398ff8542fc01bbb2985f94243acc7964a6c59f1ae1"
+    }
+  ]
+}

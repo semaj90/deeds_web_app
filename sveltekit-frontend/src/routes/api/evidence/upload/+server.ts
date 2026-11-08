@@ -1,7 +1,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import crypto from 'crypto';
-import { deleteSeaweedFile as deleteFile, uploadSeaweedFile as uploadFile } from '$lib/server/seaweed-client.js';
+import { deleteSeaweedFile as deleteFile } from '$lib/server/seaweed-client.js';
+import { putFileToSeaweed } from '$lib/server/storage/seaweed.js';
+import { assertArtifactBucket, assertEvidenceBucket } from '$lib/server/storage/storage-buckets.js';
 import { db } from '$lib/server/db/client';
 import { eq, sql } from 'drizzle-orm';
 import { evidence } from '$lib/server/db/schema-postgres.js';
@@ -42,6 +44,7 @@ import {
 } from '$lib/server/workflows/pdf-ocr-workflow.js';
 
 import { ENV } from '$lib/server/env.server.js';
+import { resolveEvidenceUploaderId } from '$lib/server/evidence/evidence-upload-identity.js';
 import { z } from 'zod';
 import { getRedis } from '$lib/server/redis.js';
 import { classifyDocument } from '$lib/server/nlp/analyzer.js';
@@ -71,7 +74,8 @@ const evidenceUploadSchema = z.object({
   evidenceType: insertEvidenceSchema.shape.evidenceType,
 });
 
-const BUCKET = ENV.SEAWEED_S3_BUCKET || ENV.MINIO_EVIDENCE_BUCKET;
+const BUCKET = ENV.SEAWEED_EVIDENCE_BUCKET;
+const DERIVED_ARTIFACT_BUCKET = ENV.SEAWEED_ARTIFACTS_BUCKET;
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
 
 async function updateUploadProgress(jobId: string, update: Parameters<typeof updateJob>[1]): Promise<void> {
@@ -258,11 +262,10 @@ async function setCachedExtraction(
  * Pipeline: SeaweedFS S3 → PostgreSQL → text extraction (pdf-parse + OCR fallback) → chunk → embed → pgvector + Qdrant
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
-  const devBypass = ENV.DEV_BYPASS_AUTH;
-  const uploaderUserId =
-    locals.user?.id ?? (devBypass ? '00000000-0000-0000-0000-000000000001' : null);
+  const uploaderUserId = resolveEvidenceUploaderId(locals.user?.id);
 
-  // Auth guard: reject unauthenticated uploads unless dev bypass is enabled
+  // The centralized dev bypass populates locals.user in development. Never
+  // invent an uploader identity here; uploads must remain attributable.
   if (!uploaderUserId) {
     return json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
@@ -394,7 +397,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     uploadedObjectKey = objectKey;
 
-    const storageUrl = `minio://${BUCKET}/${objectKey}`;
+    const storageUrl = `seaweed://${BUCKET}/${objectKey}`;
 
     // 4. Insert into PostgreSQL via Drizzle ORM
     updateJob(jobId, { step: 'db-insert', progress: 50, message: 'Saving to database...' });
@@ -469,9 +472,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       bucket: BUCKET,
       storageBackend: 'seaweed',
       upload: async ({ objectKey, bytes, contentType }) => {
-        await uploadFile(BUCKET, objectKey, Buffer.from(bytes), {
-          'Content-Type': contentType,
-          'X-Evidence-Hash': fileHash,
+        assertEvidenceBucket(BUCKET);
+        await putFileToSeaweed({
+          bucket: BUCKET,
+          objectKey,
+          bytes: Buffer.from(bytes),
+          contentType,
+          metadata: { 'X-Evidence-Hash': fileHash },
         });
       },
       metadata: {
@@ -955,7 +962,13 @@ async function processAndEmbed(
   const diagnostics = createProcessingDiagnostics();
   let depthAnalysis: {
     depthMapUrl: string;
+    depthSha256: string;
     sourceRevision: string;
+    modelId: string;
+    modelRevision: string;
+    modelRevisionStatus: 'VERIFIED' | 'UNVERIFIED';
+    modelLicense: string;
+    depthType: string;
     width: number;
     height: number;
     processingTimeMs: number;
@@ -1763,16 +1776,40 @@ async function processAndEmbed(
 
         // Store the generated depth map in SeaweedFS S3.
         const depthBuffer = Buffer.from(data.depth_base64, 'base64');
-        const depthKey = `evidence/${caseId ?? 'default'}/${evidenceId}-depth.png`;
-        await uploadFile(BUCKET, depthKey, depthBuffer, {
-          'Content-Type': 'image/png',
-          'X-Evidence-Id': evidenceId,
-          'X-Analysis-Type': 'depth_map',
+        const depthSha256 = crypto.createHash('sha256').update(depthBuffer).digest('hex');
+        // Digest-keyed so a regenerated depth map is written to a new object, never over the old one.
+        const depthKey = `evidence/${caseId ?? 'default'}/${evidenceId}-depth-${depthSha256}.png`;
+        assertArtifactBucket(DERIVED_ARTIFACT_BUCKET);
+        await putFileToSeaweed({
+          bucket: DERIVED_ARTIFACT_BUCKET,
+          objectKey: depthKey,
+          bytes: depthBuffer,
+          contentType: 'image/png',
+          metadata: {
+            'X-Evidence-Id': evidenceId,
+            'X-Analysis-Type': 'depth_map',
+            'X-Depth-Sha256': depthSha256,
+          },
         });
 
         return {
-          depthMapUrl: `minio://${BUCKET}/${depthKey}`,
+          depthMapUrl: `seaweed://${DERIVED_ARTIFACT_BUCKET}/${depthKey}`,
+          depthSha256,
           sourceRevision: formatEvidenceSourceRevisionV1(fileHash),
+          modelId: typeof data.model_id === 'string' ? data.model_id : 'unknown',
+          modelRevision: typeof data.model_revision === 'string' && data.model_revision.length > 0
+            ? data.model_revision
+            : 'UNVERIFIED',
+          modelRevisionStatus: data.model_revision_status === 'VERIFIED' &&
+            typeof data.model_revision === 'string' && /^[a-f0-9]{40}$/i.test(data.model_revision)
+            ? ('VERIFIED' as const)
+            : ('UNVERIFIED' as const),
+          modelLicense: data.model_license === 'Apache-2.0' &&
+            data.model_id === 'depth-anything/Depth-Anything-V2-Small-hf' &&
+            data.model_revision_status === 'VERIFIED'
+            ? 'Apache-2.0'
+            : 'UNVERIFIED',
+          depthType: data.depth_type === 'relative_monocular' ? 'relative_monocular' : 'UNVERIFIED',
           width: data.width,
           height: data.height,
           processingTimeMs: data.processing_time_ms,
@@ -2276,11 +2313,25 @@ async function processAndEmbed(
 
   const highSeverity = forensicFlags.filter((f) => f.severity === 'high');
 
-  // Mark evidence as complete (was staying 'pending' forever)
+  // Record the real embedding state. A failed or partial embedding must not read as complete.
+  const embeddingState =
+    legalChunks.length === 0
+      ? 'no_text'
+      : vectorStoreFailures === 0 && embeddedCount === legalChunks.length
+        ? 'complete'
+        : 'embedding_failed';
+  if (embeddingState === 'embedding_failed') {
+    console.warn(
+      `[Upload] Evidence ${evidenceId}: ${embeddedCount}/${legalChunks.length} chunks embedded, ${vectorStoreFailures} failure(s)`
+    );
+  }
   try {
     await db.execute(sql`
       UPDATE evidence
       SET ai_analysis = COALESCE(ai_analysis, '{}'::jsonb) || ${JSON.stringify({
+        extractionStatus: embeddingState,
+        totalChunks: legalChunks.length,
+        embeddingFailures: vectorStoreFailures,
         chunkCount: embeddedCount,
         entityCount: entities.length,
         forensicFlagCount: forensicFlags.length,

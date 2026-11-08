@@ -296,7 +296,10 @@ describe('Courtroom Story Store (IndexedDB v2)', () => {
 
 		const retrievedChunk1 = loadedAlphaChunks.find((c) => c.id === 'chunk-1');
 		expect(retrievedChunk1).toBeDefined();
-		expect(retrievedChunk1?.vector).toBeInstanceOf(Float32Array);
+		// IndexedDB structured cloning may materialize a typed array from another realm.
+		// Check the binary view and values, not the current realm's instanceof identity.
+		expect(ArrayBuffer.isView(retrievedChunk1?.vector)).toBe(true);
+		expect(Object.prototype.toString.call(retrievedChunk1?.vector)).toBe('[object Float32Array]');
 		expect(Array.from(retrievedChunk1!.vector!)).toEqual(Array.from(vectorA));
 
 		// Invariant: no hidden reasoning or KV cache stored

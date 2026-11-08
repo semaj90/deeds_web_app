@@ -17,7 +17,7 @@ function log(msg: string) {
 }
 
 async function saveACEContext() {
-  const redis = new Redis({
+  const redis = new (Redis as any)({
     host: REDIS_HOST,
     port: REDIS_PORT,
     password: REDIS_PASSWORD,

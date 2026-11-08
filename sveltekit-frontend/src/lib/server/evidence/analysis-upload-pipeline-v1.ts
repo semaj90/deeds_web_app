@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 import { EvidenceProcessPayloadV1Schema } from './evidence-process-payload-v1.js';
 import type { EvidenceSynthesisResultV1 } from './synthesis/evidence-synthesis-v1.js';
 
@@ -7,6 +8,7 @@ const sha256Schema = z.string().regex(/^sha256:[a-f0-9]{64}$/);
 const AnalysisUploadMetadataV1Schema = z.object({
 	evidenceId: z.string().uuid().optional(),
 	caseId: z.string().uuid().nullable().optional(),
+	object_bucket: z.string().trim().min(1).max(63),
 	objectKey: z.string().min(1).max(1024).refine((value) =>
 		value.startsWith('evidence/') &&
 		!value.includes('\\') &&
@@ -29,6 +31,9 @@ export function buildAnalysisUploadEvidencePayloadV1(input: {
 	if (metadata.evidenceId && metadata.evidenceId !== evidenceId) {
 		throw new Error('ANALYSIS_UPLOAD_EVIDENCE_ID_MISMATCH');
 	}
+	if (metadata.object_bucket !== ENV.SEAWEED_EVIDENCE_BUCKET) {
+		throw new Error('ANALYSIS_UPLOAD_BUCKET_MISMATCH');
+	}
 	const fileType = metadata.contentType || 'application/octet-stream';
 
 	return EvidenceProcessPayloadV1Schema.parse({
@@ -41,7 +46,7 @@ export function buildAnalysisUploadEvidencePayloadV1(input: {
 			...metadata,
 			fileName: metadata.fileName,
 			fileType,
-			object_bucket: 'legal-evidence',
+			object_bucket: metadata.object_bucket,
 			objectKey: metadata.objectKey,
 			object_name: metadata.objectKey,
 			source_revision: metadata.sourceSha256,

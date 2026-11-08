@@ -59,3 +59,109 @@ Neo4j Mirror   (Port :7474)  -->  legal-ai-neo4j (Healthy, 165k context nodes, 0
 Tree-sitter    (Port :8095)  -->  provenance-v2 (Healthy, Ornith-1.5-9b, AST-grep 0.45.3)
 GPU Accelerator              -->  RTX 3060 Ti 8GB (CUDA 13.0, LibTorch cu130, RAPIDS cuVS)
 ```
+
+## svelte-check upgrade and fast-check lanes (2026-11-03)
+
+- `sveltekit-frontend` `svelte-check` upgraded 4.3.4 → 4.7.8; it now supports `--incremental` (disk cache of svelte2tsx output in `.svelte-kit`/`.svelte-check`) and `--tsgo`. 4.3.4 had neither flag.
+- Lanes: `npm run check` stays the authoritative full gate. `npm run check:fast` (`svelte-check --incremental`, ~62 s warm / 344 s cold, covers `.svelte`, 0 errors) is the default smoke lane; `tsgo --noEmit` (`typecheck:native`, ~67 s) is TS/JS only in `scripts/verify/smoke-validation.mjs`; set `SMOKE_FULL_CHECK=1` for the full `svelte-check` (480 s timeout). Receipt lane values: `FAST_CHECK_PASSED` / `FULL_CHECK_PASSED`.
+- Benchmark (full tsconfig): `--incremental` cold 344 s / warm 62 s; `--tsgo` 96 s; identical diagnostics. Upgrade surfaced 3 latent errors, fixed: Field.svelte (`Snippet<[{ id }]>`, `$props()` annotation), DetectiveBoard.svelte (installed `svelte-dnd-action`, store import path, replaced `.subscribe` with rune mirror).
+- Evidence3DModal.svelte is unified with DepthReliefViewer.svelte (single renderer; displaced-surface raycasting, draggable pins, Orbit/Place/Undo/Clear toolbar, revision-matched depth guards; 20/20 unit tests, 0 svelte-check errors).
+- Open items: Playwright E2E (`tests/e2e/evidence-relief-actions-diagnostic.spec.ts`) was blocked by a `localhost:5173` timeout; depth route still lacks byte-level SHA-256 verification against `depth_sha256`; 3D pins are session-local (temporary) and must not be persisted to Postgres/board state until the E2E diagnostic passes. Do not kill backend services (turbo, bifrost, llama-server) when recovering Vite.
+
+---
+
+## 5. Detective Mode Scene Assistance & Reusable 3D Composition (`DETECTIVE-SCENE-COMPOSER-V1`)
+
+> [!IMPORTANT]
+> **Operational Boundary**: We are building a scene-assistance system for Parent Atlas Detective Mode, **NOT** training an AI model. The user provides a photograph, optional GPS coordinates, and a description. Parent Atlas searches its existing object catalog, places reusable 3D assets, and provides 6-DoF transformation controls via Three.js and BVH raycasting.
+
+### 5.1 Google Earth & 3D Tiles Licensing Invariant
+* **Permitted Actions**: Viewing, annotating, and displaying attributed map context. Overlaying independently created 3D objects on photorealistic 3D Tiles is permitted by Google's 3D Tiles policies, provided those objects are not extracted or derived from the tiles.
+* **Prohibited Actions (Hard Block)**:
+  - Do **NOT** extract or scrape Google imagery to reconstruct, derive, or save competing GLB/SPZ models.
+  - Do **NOT** train machine learning models or neural representations on Google Earth / Maps imagery.
+* **Georeference Scope**: User-entered or EXIF GPS coordinates locate the scene geographically. They do **NOT** infer internal room dimensions, furniture placement, or camera calibration.
+
+### 5.2 Storage Separation: PostgreSQL 18 vs SeaweedFS
+The scene composition stores references and lightweight transforms, never duplicated geometry:
+
+| Component | Authoritative Storage | Schema / Path |
+| :--- | :--- | :--- |
+| **Original Evidence Photograph** | Private evidence object in SeaweedFS | `legal-evidence/photos/{sha256}.jpg` |
+| **Reusable Catalog Assets (chairs, doors, stairs, cameras)** | PostgreSQL catalog metadata; GLB bytes in SeaweedFS | PostgreSQL `scene_assets` / SeaweedFS `case-assets/catalog/` |
+| **Optional GPS & Accuracy** | Case scene metadata JSONB | `location: { latitude, longitude, source, verified }` |
+| **Object Transforms & Composition** | Scene revision JSONB | `atlas.detective-scene-composition.v1` (`scene_document_revisions`) |
+| **Evidence Markers & Sightlines** | Revisioned annotations in PostgreSQL | `scene-markers` / `SurfaceMarkerV1` |
+| **Background SPZ / Streamed SOG** | Immutable derived asset object in SeaweedFS | `legal-evidence/splats/{sha256}.spz` |
+| **Scene BVH Collision Trees** | In-browser transient cache | `SpatialBvhManagerV1` (`ObjectBVH` + `MeshBVH`) |
+| **Procedural Destruction Fragments** | Separate derived demonstrative GLBs | SeaweedFS `case-assets/fragments/{sha256}.glb` |
+
+### 5.3 Reference-Based Composition Contract (`atlas.detective-scene-composition.v1`)
+Validated via [`sveltekit-frontend/src/lib/types/detective-scene-composition.ts`](file:///c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/types/detective-scene-composition.ts):
+```json
+{
+  "schema": "atlas.detective-scene-composition.v1",
+  "classification": "DEMONSTRATIVE",
+  "location": {
+    "latitude": null,
+    "longitude": null,
+    "source": "USER_OPTIONAL",
+    "verified": false
+  },
+  "objects": [
+    {
+      "objectId": "scene-chair-01",
+      "catalogKey": "furniture.chair.standard",
+      "assetRevision": "fixture-v1",
+      "position": [1.2, 0, -2.4],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1]
+    }
+  ],
+  "calibration": "UNVERIFIED",
+  "admission": "LOCAL_PREFLIGHT"
+}
+```
+
+### 5.4 Blender Python RNA Memory Safety Invariant
+> [!CAUTION]
+> **RNA Pointer Reinterpretation Hazard**: Never treat `mesh.vertices[0].as_pointer()` as a contiguous `float*` XYZ buffer. Blender's RNA pointer is not guaranteed to be a flat, densely packed array; direct casting crashes Blender or corrupts geometry.
+> **Mandatory Extraction Pattern**: Use `mesh.vertices.foreach_get("co", coords)`:
+> ```python
+> import bpy
+> from array import array
+>
+> obj = bpy.context.active_object
+> assert obj and obj.type == "MESH"
+> mesh = obj.data
+> coords = array("f", [0.0]) * (len(mesh.vertices) * 3)
+> mesh.vertices.foreach_get("co", coords)
+> ```
+> Procedural bisecting (`bmesh.ops.bisect_plane()`) is an optional demonstrative helper and requires explicit cap generation and boundary validation before creating separate closed fragment meshes.
+
+### 5.5 Implementation Matrix & Verified Components (`DETECTIVE-SCENE-COMPOSER-V1`)
+
+| Capability | Current State | Verification Authority |
+| :--- | :--- | :--- |
+| **User photo → 2.5D relief → GLB** | **PROVEN** | `DepthReliefViewer.svelte` / Chromium preflight passed 1/1 |
+| **SPZ v4 / Streamed SOG Rendering** | **PROVEN** | Synthetic 5-splat fixture & PlayCanvas LOD passed 1/1 |
+| **MeshBVH / Skinned BVH Picking** | **PROVEN** | `SpatialBvhManagerV1` 4/4 Vitest + Chromium rigged pick 1/1 |
+| **Blender MCP Primitives & Rigging** | **PROVEN** | `rubber_hose_character_v1.py` & procedural cube 3/3 passed |
+| **PyTorch ATen Morton Radix Sort & AIO Bitset** | **PROVEN** | `pytorch_aten_spatial_keyframes.py` & 22/22 Vitest passed |
+| **Pure Isomorphic SIMD & 30-Bit Morton Engine** | **PROVEN** | `src/lib/spatial/spatial-simd-morton.ts` 5/5 Vitest passed |
+| **Server Route Spatial Enhancer & Valkey Cache** | **PROVEN** | `src/lib/server/api/route-spatial-enhancer.ts` 5/5 Vitest passed |
+| **Reusable Object Catalog (5 Forensic Assets)** | **PROVEN** | `src/lib/scene-composer/detective-scene-composer.ts` 5/5 Vitest passed |
+| **Keyframe Server Endpoint & Stable JSON Shape** | **PROVEN** | `/api/cases/[id]/scenes/[sceneId]/keyframes` HTTP 200/400 verified |
+| **Authoritative Scene Persistence (Gate B)**| **BLOCKED (503)** | Guarded by feature gate pending isolated scratch DB approval |
+
+### 5.6 Detective Scene Composer Architecture (`DETECTIVE-SCENE-COMPOSER-V1`)
+1. **Catalog Primitives**: 5 calibrated assets (`catalog:stairwell-concrete`, `catalog:office-chair-mesh`, `catalog:security-door-heavy`, `catalog:surveillance-camera-cctv`, `catalog:evidence-marker-tent`).
+2. **SIMD & Memory Alignment**:
+   - `ALIGNED_KEYFRAME_CHUNK_SIZE = 64` bytes.
+   - AVX2: 2 vector instructions (256-bit SIMD / 32 bytes) process 1 keyframe chunk.
+   - AVX-512: 1 vector instruction (512-bit SIMD / 64 bytes) ingests 1 keyframe chunk in a single `__m512` register cycle.
+   - 30-bit Morton Code: Radix sort along the Z-order curve ensures L1/L2 cache locality prior to SIMD copy.
+3. **Storage Split**:
+   - PostgreSQL 18: `atlas_spatial_keyframes_v1` owns `BIT(256)` active slot masks, `packed_transforms_blob` (bytea), and `jsonb` cluster metadata.
+   - Valkey (`:6379`): Transient sub-millisecond packet caching (`setCachedSpatialPacket`).
+   - SeaweedFS: Immutable multi-bucket S3 object store (`legal-evidence`, `legal-corpus`, `federal-law`, `state-law`, `local-law`).

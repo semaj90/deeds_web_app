@@ -18,7 +18,7 @@ vi.mock('$lib/server/db/schema-postgres.js', () => ({
 	},
 }));
 vi.mock('$lib/server/seaweed-client.js', () => ({ getSeaweedFile: (...args: unknown[]) => mocks.getFile(...args) }));
-vi.mock('$lib/server/env.server.js', () => ({ ENV: { SEAWEED_S3_BUCKET: 'seaweed-evidence', MINIO_EVIDENCE_BUCKET: 'legacy-evidence' } }));
+vi.mock('$lib/server/env.server.js', () => ({ ENV: { SEAWEED_EVIDENCE_BUCKET: 'seaweed-evidence' } }));
 vi.mock('$lib/server/validation.js', () => ({ isUuid: (value: string) => /^[0-9a-f-]{36}$/i.test(value) }));
 vi.mock('drizzle-orm', () => ({
 	and: (...conditions: unknown[]) => ({ and: conditions }),
@@ -90,6 +90,16 @@ describe('evidence upscale route', () => {
 		const response = await POST(event({ user }));
 		expect(response.status).toBe(415);
 		expect(mocks.getFile).not.toHaveBeenCalled();
+	});
+
+	it('rejects an oversized image after authorized storage read and before decoding', async () => {
+		mocks.limit.mockResolvedValue([{ fileUrl: 'evidence/case/large.png', mimeType: 'image/png' }]);
+		mocks.getFile.mockResolvedValue(Buffer.alloc(40 * 1024 * 1024 + 1));
+
+		const response = await POST(event({ user }));
+		expect(response.status).toBe(413);
+		expect(await response.json()).toEqual({ error: 'Image too large' });
+		expect(mocks.getFile).toHaveBeenCalledWith('seaweed-evidence', 'evidence/case/large.png');
 	});
 
 	it('reads an authorized source from SeaweedFS and returns a non-persisted Lanczos PNG preview', async () => {

@@ -1015,6 +1015,25 @@
 	.reader-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
 	.reader-page :global(input), .reader-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
 	.reader-page :global(.panel), .reader-page :global(.card), .reader-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
+	/* The reader mixes a dark canvas with parchment cards. Keep card copy dark at
+	   every browser zoom level; inherited gold text becomes unreadable on parchment. */
+	.reader-page :global(.yorha-card) {
+		background: #f8f5ed;
+		border-color: rgba(42, 37, 32, 0.16);
+		color: #2a2520;
+	}
+	.reader-page :global(.yorha-card h1),
+	.reader-page :global(.yorha-card h2),
+	.reader-page :global(.yorha-card h3),
+	.reader-page :global(.yorha-card h4),
+	.reader-page :global(.yorha-card p),
+	.reader-page :global(.yorha-card li) {
+		color: #2a2520;
+	}
+	.reader-page :global(.yorha-card a),
+	.reader-page :global(.yorha-card button) {
+		color: #3b3329;
+	}
 
 	/* ── Error State ── */
 	.error-center {

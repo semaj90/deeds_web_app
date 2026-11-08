@@ -28,7 +28,7 @@ function loadEnv(file) {
 }
 const env = { ...loadEnv(path.join(root, 'sveltekit-frontend/.env')), ...process.env };
 for (const k of ['SEAWEED_ACCESS_KEY', 'SEAWEED_SECRET_KEY']) if (!env[k]) { console.error(`MISSING_ENV ${k}`); process.exit(2); }
-if (BUCKET === env.SEAWEED_S3_BUCKET) { console.error('REFUSED: target bucket equals the configured evidence bucket'); process.exit(2); }
+if (BUCKET === (env.SEAWEED_EVIDENCE_BUCKET || 'legal-evidence')) { console.error('REFUSED: target bucket equals the configured evidence bucket'); process.exit(2); }
 let endpoint = env.SEAWEED_S3_ENDPOINT || env.SEAWEED_ENDPOINT || '127.0.0.1';
 if (!/^https?:\/\//.test(endpoint)) endpoint = `http://${endpoint}`;
 if (!/:\d+$/.test(endpoint)) endpoint = `${endpoint}:${env.SEAWEED_S3_PORT || '8333'}`;

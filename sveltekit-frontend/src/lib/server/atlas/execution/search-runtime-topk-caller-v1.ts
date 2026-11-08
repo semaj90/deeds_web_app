@@ -27,6 +27,11 @@ import type { CandidateOrdinalMapV1 } from '../features/canonical-candidate-v1.j
 import { CANDIDATE_SCALAR_FEATURES, type CandidateFeatureColumnarV1 } from '../features/candidate-feature-columnar-v1.js';
 import type { CandidateFeatureSnapshotV1 } from '../features/candidate-feature-snapshot-v1.js';
 import { TILE_CHANNEL_CANONICAL_INDEX } from './atlas-feature-matrix-4x6-v1.js';
+import {
+  RecommendationEvidenceBundleV1Schema,
+  verifyRecommendationEvidenceBundleV1,
+  type RecommendationEvidenceBundleV1,
+} from '../recommendations/recommendation-evidence-bundle-v1.js';
 
 export interface SearchRuntimeTopKCallerInputV1 {
   requestId: string;
@@ -49,12 +54,82 @@ export interface SearchRuntimeTopKCallerInputV1 {
   k?: number;
   sourceFetchPort: SourceFetchPortV1;
   graphifyLifecycle: GraphifyLifecycleV1;
+  /** Optional received evidence bundle. External input: verified and bound before any compute. */
+  recommendationEvidence?: unknown;
+}
+
+/**
+ * Binds a received recommendation evidence bundle to this exact top-K request. Fail closed:
+ * any mismatch throws, and nothing is repaired or regenerated. Covers request, workspace,
+ * ordinal-map checksum, representation, graph, and per-candidate source revision.
+ */
+export function bindRecommendationEvidenceToTopKV1(params: {
+  requestId: string;
+  graphRevision: string;
+  representationRevision: string;
+  ordinalMap: CandidateOrdinalMapV1;
+  ordinals: readonly number[];
+  recommendationEvidence: unknown;
+}): RecommendationEvidenceBundleV1 {
+  const bundle = RecommendationEvidenceBundleV1Schema.parse(params.recommendationEvidence);
+  verifyRecommendationEvidenceBundleV1(bundle);
+  if (bundle.requestId !== params.requestId) throw new Error('RECOMMENDATION_BINDING_REQUEST_MISMATCH');
+  if (bundle.workspaceRevision !== params.ordinalMap.workspaceRevision) {
+    throw new Error('RECOMMENDATION_BINDING_WORKSPACE_MISMATCH');
+  }
+  if (bundle.ordinalMapChecksum !== params.ordinalMap.ordinalMapChecksum) {
+    throw new Error('RECOMMENDATION_BINDING_ORDINAL_MAP_MISMATCH');
+  }
+  if (bundle.representationRevision !== params.representationRevision) {
+    throw new Error('RECOMMENDATION_BINDING_REPRESENTATION_MISMATCH');
+  }
+  if (bundle.graphRevision !== null && bundle.graphRevision !== params.graphRevision) {
+    throw new Error('RECOMMENDATION_BINDING_GRAPH_MISMATCH');
+  }
+
+  const mapByOrdinal = new Map(params.ordinalMap.candidates.map((c) => [c.candidateOrdinal, c]));
+  const covered = new Set(bundle.candidateOrdinals);
+  for (const ordinal of bundle.candidateOrdinals) {
+    if (!mapByOrdinal.has(ordinal)) throw new Error(`RECOMMENDATION_BINDING_ORDINAL_UNKNOWN:${ordinal}`);
+  }
+
+  const activeCandidates = params.ordinals.map((o) => mapByOrdinal.get(o)).filter(Boolean) as (typeof params.ordinalMap.candidates)[number][];
+  const activeSources = new Set(activeCandidates.map((c) => c.sourceRef));
+  const isSingleSourceActiveCohort = activeSources.size <= 1;
+
+  for (const ordinal of params.ordinals) {
+    if (!covered.has(ordinal)) throw new Error(`RECOMMENDATION_BINDING_ORDINAL_NOT_COVERED:${ordinal}`);
+    const candidate = mapByOrdinal.get(ordinal);
+    if (candidate) {
+      if (candidate.workspaceRevision !== bundle.workspaceRevision) {
+        throw new Error(`RECOMMENDATION_BINDING_WORKSPACE_MISMATCH:${ordinal}`);
+      }
+      // Multi-source coverage semantics:
+      // If the active cohort is single-source, candidate must match bundle.sourceRevision.
+      // If multi-source, candidates matching subjectRef must match bundle.sourceRevision.
+      const isSubjectSource = candidate.sourceRef === bundle.subjectRef || candidate.packetKey === bundle.subjectRef;
+      if ((isSingleSourceActiveCohort || isSubjectSource) && candidate.sourceRevision !== bundle.sourceRevision) {
+        throw new Error(`RECOMMENDATION_BINDING_SOURCE_REVISION_MISMATCH:${ordinal}`);
+      }
+    }
+  }
+  return bundle;
+}
+
+export interface RecommendationBindingReceiptV1 {
+  schema: 'atlas.recommendation-binding-receipt.v1';
+  status: 'VERIFIED';
+  bundleChecksum: string;
+  requestId: string;
+  coveredOrdinals: readonly number[];
+  verifiedAt: string;
 }
 
 export interface SearchRuntimeTopKExecutionResultV1 {
   schema: 'atlas.search-runtime-topk-execution-result.v1';
   execution: TopKExecutionV1;
   verification: TopKVerificationV1;
+  recommendationBinding: RecommendationBindingReceiptV1 | null;
   evidence: {
     qualified: readonly QualifiedEvidenceV1[];
     rejected: readonly RejectedEvidenceV1[];
@@ -121,6 +196,27 @@ export function executeSearchRuntimeTopKV1(
   const representationRevision = params.representationRevision;
 
   const ordinals = params.candidateOrdinals ?? params.ordinalMap.candidates.map((c) => c.candidateOrdinal);
+
+  // Fail-closed binding of received recommendation evidence, before any scoring or source fetch.
+  let recommendationBinding: RecommendationBindingReceiptV1 | null = null;
+  if (params.recommendationEvidence != null) {
+    const bound = bindRecommendationEvidenceToTopKV1({
+      requestId: params.requestId,
+      graphRevision: params.graphRevision,
+      representationRevision: params.representationRevision,
+      ordinalMap: params.ordinalMap,
+      ordinals,
+      recommendationEvidence: params.recommendationEvidence,
+    });
+    recommendationBinding = {
+      schema: 'atlas.recommendation-binding-receipt.v1',
+      status: 'VERIFIED',
+      bundleChecksum: bound.bundleChecksum,
+      requestId: bound.requestId,
+      coveredOrdinals: bound.candidateOrdinals,
+      verifiedAt: new Date().toISOString(),
+    };
+  }
 
   // 1. Adapt candidates into rank input
   const input: AtlasRankInputV1 = buildAtlasRankInputV1({
@@ -229,6 +325,7 @@ export function executeSearchRuntimeTopKV1(
     schema: 'atlas.search-runtime-topk-execution-result.v1',
     execution,
     verification,
+    recommendationBinding,
     evidence: {
       qualified,
       rejected,

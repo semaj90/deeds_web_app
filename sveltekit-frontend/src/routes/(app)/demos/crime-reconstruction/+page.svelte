@@ -82,6 +82,22 @@
   let sceneObjects = $state<SceneObject[]>([]);
   let selectedId   = $state<string | null>(null);
 
+  // These prompts stay in the browser session; they do not write case facts or evidence.
+  const storyBeats = [
+    { id: 'arrival', number: '01', title: 'Establish the scene', prompt: 'What is directly visible in the source evidence?' },
+    { id: 'evidence', number: '02', title: 'Place evidence', prompt: 'Which exhibit should be examined beside this scene?' },
+    { id: 'sequence', number: '03', title: 'Compare accounts', prompt: 'What changes when the timeline and scene are viewed together?' }
+  ];
+  let activeStoryBeat = $state('arrival');
+  let storyDraft = $state('');
+  let sessionStoryNote = $state('');
+  const selectedStoryBeat = $derived(storyBeats.find((beat) => beat.id === activeStoryBeat) ?? storyBeats[0]);
+
+  function saveStoryDraft() {
+    const draft = storyDraft.trim();
+    if (draft) sessionStoryNote = draft;
+  }
+
   // ── Service URL ───────────────────────────────────────────────────────────
   const IMAGE_SVC = publicEnv.PUBLIC_IMAGE_SVC_URL ?? 'http://localhost:8092';
 
@@ -538,10 +554,25 @@
 
 <svelte:head><title>Crime Scene Reconstruction — WebGPU</title></svelte:head>
 
-<div class="flex h-screen bg-[#0d0e10] text-[#e8dcc8] overflow-hidden">
+<div class="detective-story-shell">
+  <div class="story-shell-app">
+    <header class="story-chrome">
+      <div class="story-mark" aria-hidden="true">PA</div>
+      <div class="story-title">
+        <span>Parent Atlas <i>·</i> Detective Mode</span>
+        <h1>Scene story room</h1>
+      </div>
+      <div class="story-case-state">
+        <span>Case workspace</span>
+        <strong>VISUAL HYPOTHESIS</strong>
+      </div>
+      <a class="story-return" href="/cases">Return to cases</a>
+    </header>
+
+    <div class="story-workspace">
 
   <!-- ── Left panel: inputs ──────────────────────────────────────────────── -->
-  <aside class="w-72 flex flex-col gap-3 p-4 border-r border-[#2a2a2a] overflow-y-auto shrink-0">
+  <aside class="story-inputs w-72 flex flex-col gap-3 p-4 border-r border-[#2a2a2a] overflow-y-auto shrink-0">
     <h2 class="text-sm font-bold tracking-widest text-[#c4a35a] uppercase">Scene Inputs</h2>
 
     {#each [
@@ -659,7 +690,7 @@
   </aside>
 
   <!-- ── Main: WebGPU viewport ───────────────────────────────────────────── -->
-  <main class="flex-1 flex flex-col">
+  <main class="story-scene flex-1 flex flex-col">
     <!-- Viewport -->
     <div class="flex-1 relative"
       role="region"
@@ -778,4 +809,267 @@
     </div>
   </main>
 
+      <aside class="story-thread" aria-label="Detective story prompts">
+        <div class="story-thread-head">
+          <span>STORY THREAD</span>
+          <span class="story-draft-tag">DRAFT ONLY</span>
+        </div>
+        <p class="story-kicker">SCENE QUESTION</p>
+        <h2>{selectedStoryBeat.title}</h2>
+        <p class="story-question">{selectedStoryBeat.prompt}</p>
+
+        <nav class="story-beats" aria-label="Story beats">
+          {#each storyBeats as beat}
+            <button
+              type="button"
+              class:active={activeStoryBeat === beat.id}
+              aria-pressed={activeStoryBeat === beat.id}
+              onclick={() => {
+                activeStoryBeat = beat.id;
+                storyDraft = beat.prompt;
+              }}
+            >
+              <span>{beat.number}</span>
+              <span>{beat.title}</span>
+              <Icon name="chevron-right" class="w-3 h-3" />
+            </button>
+          {/each}
+        </nav>
+
+        <label class="story-note-label" for="story-session-note">Ask about this scene</label>
+        <textarea
+          id="story-session-note"
+          bind:value={storyDraft}
+          placeholder="Write a question or a reconstruction prompt…"
+          rows="4"
+        ></textarea>
+        <button class="story-save-draft" type="button" onclick={saveStoryDraft} disabled={!storyDraft.trim()}>
+          Keep session draft
+        </button>
+
+        {#if sessionStoryNote}
+          <div class="story-session-note" role="status">
+            <span>SESSION DRAFT · NOT SAVED TO CASE</span>
+            <p>{sessionStoryNote}</p>
+          </div>
+        {/if}
+
+        <div class="story-provenance">
+          <Icon name="yorha-evidence" size={16} />
+          <p>Generated geometry is a reconstruction hypothesis. Original evidence stays separate and unchanged.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <div class="story-frame" aria-hidden="true"></div>
 </div>
+
+<style>
+  .detective-story-shell {
+    position: relative;
+    box-sizing: border-box;
+    height: calc(100dvh - 46px);
+    min-height: 560px;
+    overflow: hidden;
+    padding: 18px;
+    color: #eee5d3;
+    background: #080a12;
+  }
+  .story-shell-app {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid rgba(204, 166, 91, 0.38);
+    background: #0c0e17;
+    box-shadow: 0 0 36px rgba(0, 0, 0, 0.48), inset 0 0 22px rgba(178, 137, 57, 0.035);
+  }
+  .story-frame {
+    position: absolute;
+    z-index: 5;
+    inset: 0;
+    pointer-events: none;
+    background: url('/images/detective-story-frame.png') center / 100% 100% no-repeat;
+    opacity: 0.32;
+  }
+  .story-chrome {
+    display: flex;
+    flex: 0 0 66px;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+    padding: 0 26px;
+    border-bottom: 1px solid rgba(204, 166, 91, 0.28);
+    background: linear-gradient(90deg, #11131d 0%, #171521 55%, #10121a 100%);
+  }
+  .story-mark {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border: 1px solid #c19b52;
+    border-radius: 50%;
+    color: #f2d48a;
+    font: 600 11px/1 Georgia, serif;
+    box-shadow: 0 0 16px rgba(201, 161, 81, 0.22);
+  }
+  .story-title { min-width: 0; }
+  .story-title > span, .story-case-state > span {
+    display: block;
+    color: #bfa76e;
+    font-size: 9px;
+    letter-spacing: 0.19em;
+    text-transform: uppercase;
+  }
+  .story-title i { color: #76c6c0; font-style: normal; }
+  .story-title h1 {
+    margin: 3px 0 0;
+    color: #f0e5cd;
+    font: 500 17px/1.1 Georgia, 'Times New Roman', serif;
+    letter-spacing: 0.035em;
+  }
+  .story-case-state { margin-left: auto; text-align: right; }
+  .story-case-state strong {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 4px 8px;
+    border: 1px solid rgba(102, 199, 188, 0.42);
+    border-radius: 2px;
+    color: #9ce1d7;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+  }
+  .story-return {
+    margin-left: 12px;
+    padding: 8px 10px;
+    border: 1px solid rgba(205, 169, 97, 0.36);
+    color: #e1cfaa;
+    font-size: 10px;
+    text-decoration: none;
+  }
+  .story-return:hover, .story-return:focus-visible { border-color: #e1bd69; color: #ffe2a1; }
+  .story-workspace {
+    display: grid;
+    flex: 1;
+    grid-template-columns: minmax(212px, 255px) minmax(0, 1fr) minmax(238px, 286px);
+    min-height: 0;
+  }
+  .story-inputs {
+    width: auto !important;
+    min-width: 0;
+    border-color: rgba(204, 166, 91, 0.2) !important;
+    background: linear-gradient(180deg, #12141d, #0c0e15) !important;
+  }
+  .story-scene { min-width: 0; min-height: 0; background: #090b12; }
+  .story-thread {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 12px;
+    overflow: auto;
+    padding: 19px 16px;
+    border-left: 1px solid rgba(204, 166, 91, 0.25);
+    background: linear-gradient(180deg, rgba(20, 20, 29, 0.97), rgba(11, 13, 21, 0.99));
+  }
+  .story-thread-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .story-thread-head > span:first-child, .story-kicker {
+    color: #c9a85f;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+  }
+  .story-draft-tag {
+    padding: 4px 6px;
+    border: 1px solid rgba(115, 205, 193, 0.35);
+    color: #8ed0c6;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+  }
+  .story-kicker { margin: 15px 0 -7px; color: #789d9c; }
+  .story-thread h2 { margin: 0; color: #eee4d0; font: 500 19px/1.2 Georgia, 'Times New Roman', serif; }
+  .story-question { min-height: 48px; margin: 0; color: #b7b7bd; font-size: 12px; line-height: 1.6; }
+  .story-beats { display: grid; gap: 6px; }
+  .story-beats button {
+    display: grid;
+    grid-template-columns: 26px 1fr 14px;
+    align-items: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 7px 8px;
+    border: 1px solid rgba(190, 164, 112, 0.16);
+    background: rgba(255, 255, 255, 0.018);
+    color: #c6c1b7;
+    cursor: pointer;
+    text-align: left;
+    font-size: 10px;
+  }
+  .story-beats button > span:first-child { color: #80bdb6; font-size: 9px; }
+  .story-beats button.active { border-color: rgba(206, 171, 99, 0.7); background: rgba(184, 145, 69, 0.1); color: #f0dfbb; }
+  .story-beats button:hover { border-color: rgba(206, 171, 99, 0.55); }
+  .story-note-label { margin-top: 4px; color: #d4c5a3; font-size: 10px; letter-spacing: 0.05em; }
+  .story-thread textarea {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
+    padding: 10px;
+    border: 1px solid rgba(190, 164, 112, 0.25);
+    outline: none;
+    background: #0a0c13;
+    color: #eee4d0;
+    font: inherit;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .story-thread textarea:focus { border-color: #bda05f; }
+  .story-thread textarea::placeholder { color: #777782; }
+  .story-save-draft {
+    min-height: 36px;
+    border: 1px solid #9d7d3f;
+    background: linear-gradient(100deg, #c3a05a, #90703a);
+    color: #11121a;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .story-save-draft:disabled { cursor: not-allowed; opacity: 0.45; }
+  .story-session-note { padding: 10px; border-left: 2px solid #77bfb4; background: rgba(102, 182, 172, 0.08); }
+  .story-session-note span { color: #8bd0c5; font-size: 8px; letter-spacing: 0.12em; }
+  .story-session-note p { margin: 6px 0 0; color: #d4d0c8; font-size: 11px; line-height: 1.5; }
+  .story-provenance {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+    padding: 10px 8px;
+    border-top: 1px solid rgba(204, 166, 91, 0.2);
+    color: #c3ad7b;
+  }
+  .story-provenance :global(svg) { flex: 0 0 auto; margin-top: 1px; }
+  .story-provenance p { margin: 0; color: #9a9ba3; font-size: 9px; line-height: 1.55; }
+  @media (max-width: 1120px) {
+    .detective-story-shell { padding: 10px; }
+    .story-workspace { grid-template-columns: minmax(190px, 220px) minmax(0, 1fr) 238px; }
+    .story-thread { padding: 14px 11px; }
+    .story-chrome { padding: 0 17px; }
+  }
+  @media (max-width: 860px) {
+    .detective-story-shell { height: auto; min-height: 100dvh; overflow: visible; padding: 8px; }
+    .story-shell-app { height: auto; min-height: calc(100dvh - 16px); overflow: visible; }
+    .story-chrome { min-height: 62px; flex-basis: auto; padding: 8px 12px; }
+    .story-case-state { display: none; }
+    .story-workspace { grid-template-columns: minmax(0, 1fr); }
+    .story-inputs { max-height: 380px; border-right: 0 !important; border-bottom: 1px solid rgba(204, 166, 91, 0.2); }
+    .story-scene { min-height: 62vh; }
+    .story-thread { border-top: 1px solid rgba(204, 166, 91, 0.25); border-left: 0; }
+    .story-frame { opacity: 0.3; }
+  }
+  @media (max-width: 480px) {
+    .story-return { margin-left: auto; padding: 7px; font-size: 9px; }
+    .story-title h1 { font-size: 15px; }
+    .story-mark { width: 30px; height: 30px; }
+    .story-frame { background-size: auto 100%; background-position: center; }
+  }
+</style>

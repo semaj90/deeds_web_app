@@ -1,0 +1,44 @@
+schema: atlas.blender-shader-cheatsheet.v1
+status: REFERENCE_ONLY
+updated: 2026-11-06
+purpose: >-
+  Explain how Parent Atlas presentation materials map from Blender authoring to
+  GLB and Three.js. This is a technical reference, not a forensic color standard
+  or evidence measurement protocol.
+color:
+  storage: SRGB_8BIT source swatches; convert to linear values for shader inputs
+  app_palette: custom demonstrative colors; no universal forensic material colors are asserted
+  gltf: metallic-roughness base color, metallic, roughness, alpha, and supported textures
+blender:
+  authoring_node: Principled BSDF
+  material_output: Surface
+  render_examples:
+    - Eevee for fast preview
+    - Cycles for path-traced offline reference renders
+  caveat: Renderer settings, lighting, color management, and unsupported nodes can change GLB appearance.
+threejs:
+  pbr_mapping: MeshStandardMaterial for glTF metallic-roughness materials
+  custom_shaders: ShaderMaterial is a separate renderer-specific implementation and is not exported as a portable GLB shader
+  raycasting: three-mesh-bvh accelerates CPU triangle picking; it does not shade pixels
+  path_tracing: Offline Cycles reference only in this workflow; browser path tracing is a separate renderer
+  dlss: Not provided by Three.js WebGL/WebGPU material export; requires a qualified native NVIDIA integration
+database:
+  nes_lut: atlas_nes_lut_v1 remains retrieval taxonomy/routing bytes and is not a color palette
+  render_materials: atlas_render_material_presets_v1 is a separate candidate metadata registry
+  binary_assets: Keep shader source, compiled artifacts, and image textures outside PostgreSQL rows
+  migration: Candidate sidecar is unapplied until PostgreSQL 18 scratch rehearsal
+sources:
+  - title: Blender Principled BSDF manual
+    url: https://docs.blender.org/manual/en/latest/render/shader_nodes/shader/principled.html
+  - title: Blender glTF 2.0 exporter materials
+    url: https://docs.blender.org/manual/en/latest/addons/import_export/scene_gltf2.html#materials
+  - title: Three.js MeshStandardMaterial
+    url: https://threejs.org/docs/#api/en/materials/MeshStandardMaterial
+  - title: three-mesh-bvh API
+    url: https://github.com/gkjohnson/three-mesh-bvh/blob/master/API.md
+  - title: NVIDIA DLSS developer overview
+    url: https://developer.nvidia.com/dlss
+limits:
+  - Indexing source paths and hashes does not compile or execute shaders.
+  - Blender screenshots and exported GLBs are demonstrative fixtures, not evidence-grounded measurements.
+  - Do not use a render preset to label or interpret forensic traces.

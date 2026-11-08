@@ -1,7 +1,8 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
+  import type { PageData } from './$types.js';
 
-  let { data } = $props<{ data: { card: any } }>();
+  let { data } = $props<{ data: PageData }>();
   let card = $derived(data.card);
 
   function pct(val: number | null): string {

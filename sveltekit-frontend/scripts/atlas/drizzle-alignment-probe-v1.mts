@@ -24,6 +24,8 @@ const attempt = async (name: string, fn: () => Promise<unknown>) => {
 
 await attempt('task_semantic_packets insert ... returning() (as POST /api/tasks/packets)', async () => {
   await db.insert(taskSemanticPackets).values({
+    // @ts-expect-error probe values testing partial insert
+
     point_kind: 'task_summary', feature_id: 'probe.feature', source_ref: 'probe://alignment', file_path: 'probe://alignment',
     summary_llm: 'alignment probe', next_action: 'none', confidence: '0.5', status: 'open', agent_pickup_ready: false,
   }).returning();

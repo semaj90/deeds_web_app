@@ -36,8 +36,9 @@ const REPRESENTATION_BINDINGS = [
   { representationId: 'semantic_mrl_512', family: 'EMBEDDINGGEMMA_MRL', dimensions: 512, projectionKind: 'MRL_PREFIX_TRUNCATION', sourceRepresentationId: 'semantic_768', promotionRole: 'SHORTLIST_CHALLENGER' },
   { representationId: 'semantic_mrl_256', family: 'EMBEDDINGGEMMA_MRL', dimensions: 256, projectionKind: 'MRL_PREFIX_TRUNCATION', sourceRepresentationId: 'semantic_768', promotionRole: 'SHORTLIST_CHALLENGER' },
   { representationId: 'semantic_mrl_128', family: 'EMBEDDINGGEMMA_MRL', dimensions: 128, projectionKind: 'MRL_PREFIX_TRUNCATION', sourceRepresentationId: 'semantic_768', promotionRole: 'SHORTLIST_CHALLENGER' },
-  { representationId: 'latent_128', family: 'LEARNED_LATENT', dimensions: 128, projectionKind: 'LEARNED_AUTOENCODER', sourceRepresentationId: 'semantic_768', promotionRole: 'CHALLENGER_PENDING_TRAINING' },
-  { representationId: 'latent_64', family: 'LEARNED_LATENT', dimensions: 64, projectionKind: 'LEARNED_AUTOENCODER', sourceRepresentationId: 'semantic_768', promotionRole: 'CHALLENGER_PENDING_TRAINING' },
+  { representationId: 'latent_256', family: 'LEARNED_LATENT', dimensions: 256, projectionKind: 'LEARNED_AUTOENCODER', sourceRepresentationId: 'semantic_768', promotionRole: 'CHALLENGER_PENDING_TRAINING' },
+  { representationId: 'latent_128', family: 'LEARNED_LATENT', dimensions: 128, projectionKind: 'NESTED_PREFIX_L2_RENORMALIZE', sourceRepresentationId: 'latent_256', promotionRole: 'CHALLENGER_PENDING_TRAINING' },
+  { representationId: 'latent_64', family: 'LEARNED_LATENT', dimensions: 64, projectionKind: 'NESTED_PREFIX_L2_RENORMALIZE', sourceRepresentationId: 'latent_256', promotionRole: 'CHALLENGER_PENDING_TRAINING' },
 ];
 const DRY_RUN = process.argv.includes('--dry-run');
 const LIMIT = Math.max(1, Number(process.argv.find((arg) => arg.startsWith('--limit='))?.split('=')[1] ?? config.limit));
@@ -46,7 +47,7 @@ const REPORT_JSON = path.join(REPORTS_DIR, 'turbovec-768-4bit-build-report.json'
 const REPORT_MD = path.join(REPORTS_DIR, 'turbovec-768-4bit-build-report.md');
 const MANIFEST_JSON = path.join(TMP_DIR, 'turbovec-768-4bit-index-manifest.json');
 
-function renderMarkdown(report) {
+function renderMarkdown(report: any) {
   return [
     '# TurboVec 768 4-bit Build Report',
     '',
@@ -100,7 +101,7 @@ async function main() {
     withPayload: true,
   });
 
-  const accepted = [];
+  const accepted: any[] = [];
   const rejected = [];
   for (const point of points) {
     if (!(point.vector instanceof Float32Array)) {
@@ -138,7 +139,7 @@ async function main() {
     throw new Error('No Qdrant vectors matched the requested dimension');
   }
 
-  const manifest = {
+  const manifest: Record<string, any> = {
     schemaVersion: 'atlas.turbovec.index.v1',
     generatedAt: new Date().toISOString(),
     collection: config.collection,

@@ -1,7 +1,7 @@
 # LAYER 2 Feature Tracking Integration into Master Feature Map
 
-**Status**: Architecture blueprint for wiring Phase 2A/2B/2C/2D into canonical feature tracking  
-**Date**: July 5, 2026 (Session 109 Continuation)  
+**Status**: Architecture blueprint for wiring Phase 2A/2B/2C/2D into canonical feature tracking
+**Date**: July 5, 2026 (Session 109 Continuation)
 **Target**: Unify ast_symbols, lexical_features, entities, used_concepts extraction into master atlas
 
 ---
@@ -287,7 +287,7 @@ async function stageTwoJoin(
     LEFT JOIN atlas_packets USING (packet_key)
     WHERE codebase_chunk_index.id = ANY($1)
   `, [qdrantCandidates.map(c => c.qdrant_point_id)]);
-  
+
   return fullRows.map(row => ({
     ...row,
     retrieval_lanes: {
@@ -334,14 +334,14 @@ async function stageThreeBlendWithLayer2(
 
 ```yaml
 collection: codebase_chunks_768
-  vector_size: 384  # Canonical dimension
-  
+  vector_size: 768, mrl 512, 256, 128, latent256, latent128, latent64? qdrant rff?  # Canonical dimension
+
   named_vectors:
     content:        # 768-orig, downsampled to 384
-      size: 384
+      size: 768, 512, 256, 128
       distance: Cosine
       index: HNSW
-      
+
     signature:      # Sparse metadata filter
       size: 32
       distance: Cosine
@@ -352,7 +352,7 @@ collection: codebase_chunks_768
     feature_id: Keyword
     packet_key: Keyword
     directory_path: Keyword
-    
+
     # Features (LAYER 2)
     ast_symbols: Array[String]         # Phase 2A
     lexical_features: Array[String]    # Phase 2B
@@ -360,13 +360,13 @@ collection: codebase_chunks_768
     used_concepts: Array[String]       # Phase 2C
     domain_class: Keyword
     domain_score: Float                # Naive Bayes confidence
-    
+
     # Topology (Phase 2B)
     topolog_cluster: Integer
     topolog_confidence: Float
     som_row: Integer
     som_col: Integer
-    
+
     # Audit
     created_at: Integer
     updated_at: Integer
@@ -477,7 +477,7 @@ npm run atlas:layer2:verify:coverage
 
 ### 3. Multi-Vector Embedding Hierarchy
 - Tier 1: 768-dim (transient)
-- Tier 2: 384-dim (canonical search vector, Postgres pgvector, Qdrant named_vector)
+- Tier 2: 768-dim mrl 512 256 128 latent256 latent128 latent64 (canonical search vector, Postgres pgvector, Qdrant named_vector)
 - Tier 3: 64-dim (K-means clustering, SOM routing — NOT for search)
 
 ### 4. RRF Blend Extension
@@ -494,14 +494,14 @@ npm run atlas:layer2:verify:coverage
 
 ## Success Criteria (Session 110)
 
-✅ Phase 2A apply: 6,827 packets with ast_symbols  
-✅ Phase 2B apply: 6,827 packets with lexical_features + topolog_cluster  
-✅ Phase 2C apply: Naive Bayes trained + entities extracted  
-✅ Phase 2D apply: imports, exports, functions, classes, routes, permissions populated  
-✅ Qdrant sync: All payloads updated with LAYER 2 features  
-✅ Coverage: >80% across all 9 fields  
-✅ Master Feature Map: layer2-feature-extraction entry active  
-✅ Retrieval integration: HyperRAG RPC using LAYER 2 signals in RRF blend  
+✅ Phase 2A apply: 6,827 packets with ast_symbols
+✅ Phase 2B apply: 6,827 packets with lexical_features + topolog_cluster
+✅ Phase 2C apply: Naive Bayes trained + entities extracted
+✅ Phase 2D apply: imports, exports, functions, classes, routes, permissions populated
+✅ Qdrant sync: All payloads updated with LAYER 2 features
+✅ Coverage: >80% across all 9 fields
+✅ Master Feature Map: layer2-feature-extraction entry active
+✅ Retrieval integration: HyperRAG RPC using LAYER 2 signals in RRF blend
 
 ---
 

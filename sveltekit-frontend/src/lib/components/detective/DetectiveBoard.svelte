@@ -16,7 +16,7 @@ import UploadZone from "$lib/components/detective/UploadZone.svelte";
 // GPU and message queue services - lazy loaded when available
 const gpuService: any = null;
 const rabbitmqService: any = null;
-import { evidenceStore } from "$lib/stores/unified/evidence-store";
+import { evidenceStore } from "$lib/stores/unified/evidence-store.svelte.js";
 const EvidenceCardAny = EvidenceCard as any;
 
 // Svelte 5 Runes
@@ -66,8 +66,9 @@ let openContextMenuId = $state<string | null>(null);
 
 // Effects
 $effect(() => {
-  const unsubscribe = evidenceStore.subscribe(v => { evidenceStoreState = v });
-  return () => unsubscribe();
+  evidenceStoreState.evidence = evidenceStore.evidence;
+  evidenceStoreState.isLoading = evidenceStore.isLoading;
+  evidenceStoreState.error = evidenceStore.error;
 });
 
 $effect(() => {

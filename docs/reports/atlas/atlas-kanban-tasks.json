@@ -331,6 +331,68 @@
       "blockedBy": []
     },
     {
+      "id": "err-fix:sha256:18dd00781741be8c",
+      "priority": "P1",
+      "label": "[Codebase index database diagnostics] sveltekit-frontend/src/lib/server/indexer/workspace-metadata-extractor.ts: Surface the wrapped PostgreSQL cause and per-batch persistence outcome; identify the SQLSTATE before retrying.",
+      "status": "PROPOSED",
+      "mutationAllowed": false,
+      "canonicalAuthority": false,
+      "dispatchable": false,
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": "sveltekit-frontend/src/lib/server/indexer/workspace-metadata-extractor.ts",
+      "evidence_refs": [
+        "Observed ast_file_features batch upsert failure for rows 0-200; pasted log contains Drizzle SQL but omits the underlying PostgreSQL code/message.",
+        "The batch writer now logs the unwrapped database cause without bound SQL parameters; persistence may be partial because batches are independent. Do not retry until the cause and readback are reviewed."
+      ],
+      "reason_codes": [
+        "DATABASE_WRITE_FAILURE",
+        "PARTIAL_BATCH_PERSISTENCE",
+        "ROOT_CAUSE_UNRESOLVED"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:7720b96b83b62bf5",
+      "priority": "P1",
+      "label": "[Codebase index memory profile] sveltekit-frontend/src/routes/api/codebase-index/graph/+server.ts: Attribute the elevated Node heap to graph assembly, Qdrant paging, or metadata extraction and establish bounded-memory evidence.",
+      "status": "PROPOSED",
+      "mutationAllowed": false,
+      "canonicalAuthority": false,
+      "dispatchable": false,
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": "sveltekit-frontend/src/routes/api/codebase-index/graph/+server.ts",
+      "evidence_refs": [
+        "Pasted runtime sample reports heapUsed about 2.61 GB and RSS about 2.60 GB.",
+        "Attached graph export is about 3.19 MB with 2,000 nodes and 18,166 edges; tileAtlas reports a 328,348-point Qdrant source count, not an embedded tile array. The payload alone does not attribute the heap."
+      ],
+      "reason_codes": [
+        "MEMORY_PROFILE_REQUIRED",
+        "QDRANT_GRAPH_PROJECTION",
+        "BOUNDED_EXECUTION_UNPROVEN"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:b49977802e579bbf",
+      "priority": "P2",
+      "label": "[Codebase index SIMDJSON parity] sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts: Verify parser parity and fallback on the graph payload; keep SIMDJSON classified as a performance lane, not the database-error cause.",
+      "status": "PROPOSED",
+      "mutationAllowed": false,
+      "canonicalAuthority": false,
+      "dispatchable": false,
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": "sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts",
+      "evidence_refs": [
+        "The graph endpoint calls fastJsonParse; the pasted batch upsert failure contains no SIMDJSON parse error.",
+        "Add or reuse parity coverage for graph-shaped input and verify fallback behavior before changing parser routing."
+      ],
+      "reason_codes": [
+        "PARSER_PARITY_UNVERIFIED",
+        "PERFORMANCE_HYPOTHESIS_ONLY"
+      ],
+      "blockedBy": []
+    },
+    {
       "id": "err-fix:sha256:96986df3a83e069f",
       "priority": "P1",
       "label": "[Graphify lifecycle authority] scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs: Resolve this gate from authoritative lifecycle receipts and the current repository revision; do not start Graphify o",

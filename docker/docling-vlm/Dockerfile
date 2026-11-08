@@ -57,7 +57,7 @@ EXPOSE 8085
 # authority to be healthy. app_ornith.py verifies :8090 /props reports
 # model_alias=ornith-1.5-* and modalities.vision=true.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8085/health || exit 1
+    CMD curl -f http://localhost:8085/live || exit 1
 
 # Run the Ornith-owned wrapper, not the legacy Ollama/Gemma4 entrypoint.
-CMD ["uvicorn", "app_ornith:app", "--host", "0.0.0.0", "--port", "8085", "--workers", "2"]
+CMD ["uvicorn", "app_ornith:app", "--host", "0.0.0.0", "--port", "8085", "--workers", "1"]

@@ -219,6 +219,13 @@
 
 		<!-- CORPUS TAB -->
 		<Tabs.Content value="corpus" class="tab-content">
+			{#if data.loadError}
+				<div class="load-warning" role="alert">
+					<Icon name="circle-alert" />
+					<span>{data.loadError}</span>
+					<a href="/legal-corpus">Refresh corpus</a>
+				</div>
+			{/if}
 			<div class="corpus-layout">
 				<!-- Filters sidebar -->
 				<aside class="sidebar">
@@ -311,7 +318,7 @@
 								{#if filteredStatutes.length === 0}
 									<div class="empty">
 										<Icon name="book-open" />
-										<p>No statutes found. Use search or seed the database.</p>
+										<p>{data.loadError ? 'Statutes could not be loaded.' : 'No statutes found. Use search or seed the database.'}</p>
 									</div>
 								{:else}
 									<div class="card-grid">
@@ -602,6 +609,29 @@
 		padding: 1.5rem 2rem;
 		background: var(--t-bg, #0a0a1a);
 		color: var(--t-text, #e0e0e0);
+	}
+	.load-warning {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		margin: 0 0 1rem;
+		padding: 0.75rem 1rem;
+		border: 1px solid rgba(245, 158, 11, 0.45);
+		border-radius: 0.5rem;
+		background: rgba(245, 158, 11, 0.1);
+		color: #fcd34d;
+		font-size: 0.875rem;
+	}
+	.load-warning a {
+		margin-left: auto;
+		color: #fde68a;
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		white-space: nowrap;
+	}
+	@media (max-width: 520px) {
+		.load-warning { align-items: flex-start; flex-wrap: wrap; }
+		.load-warning a { margin-left: 1.5rem; }
 	}
 
 	/* Header */

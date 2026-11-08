@@ -1,8 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import type { PageData } from './$types.js';
 
   // Svelte 5 Props Rune
-  let { data } = $props<{ data: { obsData: any; vlmData: any; aceMetrics?: any } }>();
+  let { data } = $props<{ data: PageData }>();
 
   // Svelte 5 State Runes
   let switchingMode = $state(false);

@@ -1,4 +1,5 @@
 import { db } from '$lib/server/db/client.js';
+import { ENV } from '$lib/server/env.server.js';
 import { cases, evidence, analysisJobs, type NewAnalysisJob } from '$lib/server/db/schema-postgres.js';
 import {
   ANALYSIS_JOBS_NOTIFY_CHANNEL,
@@ -192,7 +193,7 @@ export const actions: Actions = {
       const fileExt = file.name.split('.').pop() ?? 'bin';
       const objectName = `evidence/${actorId}/${randomUUID()}.${fileExt}`;
 
-      await uploadFile('legal-evidence', objectName, buffer, {
+      await uploadFile(ENV.SEAWEED_EVIDENCE_BUCKET, objectName, buffer, {
         'Content-Type': classification.observedMime ?? file.type,
         'Original-Filename': file.name,
       });
@@ -276,7 +277,7 @@ export const actions: Actions = {
       let previewUrl = '';
       try {
         const client = getMinioClient();
-        previewUrl = await client.presignedGetObject('legal-evidence', objectName, 24 * 60 * 60);
+        previewUrl = await client.presignedGetObject(ENV.SEAWEED_EVIDENCE_BUCKET, objectName, 24 * 60 * 60);
       } catch (err) {
         console.warn('[evidence/upload] Failed to generate preview URL (non-fatal):', err);
       }

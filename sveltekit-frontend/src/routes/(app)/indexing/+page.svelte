@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import SnesBookLoader from '$lib/components/ui/SnesBookLoader.svelte';
 
 	interface IndexingStatus {
 		success: boolean;
@@ -295,6 +296,11 @@
 						{/if}
 					</Button>
 				</div>
+				{#if indexing}
+					<div class="index-section">
+						<SnesBookLoader label="INDEXING CODEBASE" sublabel="SYNCHRONOUS RUN - NO PROGRESS FEED" status="running" progress={null} showControls={false} />
+					</div>
+				{/if}
 
 				<div class="index-section">
 					<h2>Index Error Patterns</h2>

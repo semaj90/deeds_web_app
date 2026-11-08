@@ -2,6 +2,41 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20261106_atlas_spatial_keyframes_v1.sql",
+      "status": "active_candidate",
+      "reason": "Proposed case-scoped PostgreSQL 18 keyframe packet table with 256-bit occupancy masks, packed 64-byte transforms and cluster metadata. Composite identity includes case, scene and revision. Candidate only; not applied to live database.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261106_atlas_render_material_presets_v1.sql",
+      "status": "active_candidate",
+      "reason": "Proposed non-canonical typed PBR preset metadata table, separate from atlas_nes_lut_v1 taxonomy bytes and shader_cache_entries. Candidate only; no database rehearsal, apply, or preset rows.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/scene_document_revisions.sql",
+      "status": "active_candidate",
+      "reason": "Append-only case scene manifest revisions and a distinct immutable case-scene asset registry, including revision-qualified GLB roots and Streamed SOG package members. Candidate SQL only; not rehearsed or applied to any database. Asset routes remain disabled until schema and bucket admission.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/scene_markers.sql",
+      "status": "active_candidate",
+      "reason": "Evidence-board marker persistence: scene_markers, scene_events (command_id idempotency), scene_event_outbox. Rehearsed on a disposable PostgreSQL 18 database only; NOT applied to the live database.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/scene_markers_anchor.sql",
+      "status": "active_candidate",
+      "reason": "Additive source revision/hash and image or mesh anchor metadata for scene markers. Candidate SQL only; not applied or freshly rehearsed against scratch or live databases. SPZ surface anchors are not represented by these anchor kinds yet.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
       "file": "manual/20261101_atlas_tool_manifest_vectors_v1.sql",
       "status": "active_candidate",
       "reason": "Dedicated pgvector table atlas_tool_manifest_vectors_v1 for MCP tool manifests and exact/HNSW vector cosine tool selection (AFC-E2E-97).",
@@ -989,6 +1024,11 @@
       "appliedAt": "2026-10-31",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db -c '\\d public.evidence_vector_projection_outbox'"
+    },
+    {
+      "file": "manual/20261107_atlas_concept_tie_v2.sql",
+      "status": "applied",
+      "reason": "Applied 2026-11-07 after explicit operator approval. Creates public.atlas_concept_tie_v2, a non-canonical staging table for concept-tie v2 lanes (canonical_authority fixed false; JSONB unknown_reason and proposal; 5 indexes plus PK and unique). Empty at apply; no rows loaded."
     }
   ]
 }

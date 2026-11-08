@@ -10,6 +10,10 @@
     const id = setInterval(() => { progress = (progress ?? 0) >= 100 ? 0 : (progress ?? 0) + 5; }, 400);
     return () => clearInterval(id);
   });
+
+  // Demo only: search-mode stage labels driven by the same fake sweep.
+  const stages = ['PARSING QUERY', 'SEARCHING STATUTES', 'RANKING CASE LAW', 'BUILDING CITATIONS'];
+  const stage = $derived(stages[Math.min(stages.length - 1, Math.floor((progress ?? 0) / 25))]);
 </script>
 
 <svelte:head>
@@ -23,5 +27,7 @@
     sublabel="READ-ONLY PRESENTATION DEMO"
     telemetry={undefined}
     {progress}
+    query="negligence duty of care"
+    stage={progress === null ? null : stage}
   />
 </main>

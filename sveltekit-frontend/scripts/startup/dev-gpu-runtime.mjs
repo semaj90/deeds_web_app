@@ -22,7 +22,7 @@ import { spawn } from 'node:child_process';
 import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
+import { appendFileSync, createWriteStream, existsSync, mkdirSync } from 'node:fs';
 import { loadRepoEnv } from '../../../scripts/atlas/connection-config.mjs';
 import { isMiniforgeNlpRunning } from './miniforge-nlp-health.mjs';
 import { isGraphifyStartupEnabled } from './graphify-startup-gate.mjs';
@@ -266,14 +266,27 @@ function runChecked(command, args, options = {}) {
 
 function spawnForeground(command, args, options = {}) {
   console.log(`[dev:gpu] ${command} ${args.join(' ')}`);
+  // Optional tee: copy the child's output to a log file while still showing it in
+  // this terminal. Interactive Vite keys (r, q, h) do not work when output is piped.
+  let logStream = null;
+  if (options.logPath) {
+    mkdirSync(path.dirname(options.logPath), { recursive: true });
+    logStream = createWriteStream(options.logPath, { flags: 'a' });
+    console.log(`[dev:gpu] Dev server output is also written to ${options.logPath}`);
+  }
   const child = spawn(command, args, {
     cwd: options.cwd ?? FRONTEND_ROOT,
     env: options.env ?? mergedEnv(),
-    stdio: 'inherit',
+    stdio: logStream ? ['inherit', 'pipe', 'pipe'] : 'inherit',
     shell: process.platform === 'win32',  // Use shell on Windows for .cmd resolution
     windowsHide: false,
   });
+  if (logStream) {
+    child.stdout.on('data', (chunk) => { process.stdout.write(chunk); logStream.write(chunk); });
+    child.stderr.on('data', (chunk) => { process.stderr.write(chunk); logStream.write(chunk); });
+  }
   child.on('exit', (code, signal) => {
+    logStream?.end();
     if (signal) process.kill(process.pid, signal);
     process.exit(code ?? 0);
   });
@@ -702,21 +715,35 @@ async function main() {
 
   // Start the NLP sidecar unless already running on :8095
   const nlpPort = parseInt(process.env.MINIFORGE_SIDECAR_PORT ?? '8095', 10);
+  const allowMissingNlpSidecar = ['1', 'true', 'yes'].includes(
+    (process.env.DEV_GPU_ALLOW_MISSING_NLP_SIDECAR
+      ?? envFromFiles.DEV_GPU_ALLOW_MISSING_NLP_SIDECAR
+      ?? '').toLowerCase(),
+  );
+  let nlpSidecarStatus = 'unavailable';
   if (await isMiniforgeNlpRunning(nlpPort)) {
     console.log(`[dev:gpu] ✅ NLP sidecar already running on :${nlpPort} — skipping launch`);
+    nlpSidecarStatus = 'healthy';
   } else {
     const launcherScript = path.win32.join(REPO_ROOT, 'scripts', 'launch-miniforge-nlp-sidecar.ps1');
-    await runChecked('pwsh', [
-      '-NoProfile',
-      '-ExecutionPolicy',
-      'Bypass',
-      '-File',
-      launcherScript,
-      '-Detached',
-      '-Port',
-      String(nlpPort),
-    ], { cwd: REPO_ROOT, env: runtimeEmbeddingEnv({ MINIFORGE_SIDECAR_PORT: String(nlpPort) }) });
-    console.log(`[dev:gpu] ✅ NLP sidecar started on :${nlpPort}`);
+    try {
+      await runChecked('pwsh', [
+        '-NoProfile',
+        '-ExecutionPolicy',
+        'Bypass',
+        '-File',
+        launcherScript,
+        '-Detached',
+        '-Port',
+        String(nlpPort),
+      ], { cwd: REPO_ROOT, env: runtimeEmbeddingEnv({ MINIFORGE_SIDECAR_PORT: String(nlpPort) }) });
+      console.log(`[dev:gpu] ✅ NLP sidecar started on :${nlpPort}`);
+      nlpSidecarStatus = 'healthy';
+    } catch (error) {
+      if (!allowMissingNlpSidecar) throw error;
+      console.warn(`[dev:gpu] ⚠️ NLP sidecar unavailable on :${nlpPort}; continuing in degraded mode because DEV_GPU_ALLOW_MISSING_NLP_SIDECAR is enabled.`);
+      console.warn('[dev:gpu] NLP extraction and structural-analysis features requiring :8095 will not work until the sidecar is available.');
+    }
   }
 
   console.log('[dev:gpu] --- GPU Runtime Ready ---');
@@ -739,7 +766,7 @@ async function main() {
     console.log('[dev:gpu]   Execution provider: Ollama-managed (on-demand runner, unloads on idle)');
     console.log('[dev:gpu]                   Set EMBEDDING_BACKEND=llama_cpp_gguf to enable the dedicated :8081 server');
   }
-  console.log(`[dev:gpu] NLP sidecar:     http://127.0.0.1:${nlpPort} (LangExtract + treesitter-chunker + ast-grep; runtime=launcher-selected, Docker provenance-v2 by default)`);
+  console.log(`[dev:gpu] NLP sidecar:     http://127.0.0.1:${nlpPort} (${nlpSidecarStatus}; LangExtract + treesitter-chunker + ast-grep; Docker provenance-v2 by default)`);
 
   const desiredVitePort = parseInt(process.env.VITE_PORT ?? '5173', 10);
   const vitePort = await findFreePort(desiredVitePort);
@@ -821,9 +848,14 @@ async function main() {
 
   // Launch Vite dev server in foreground
   const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+  const viteLogPath = path.join(
+    FRONTEND_ROOT, 'logs', 'startup',
+    `vite-${new Date().toISOString().replace(/[:.]/g, '-')}.log`,
+  );
   spawnForeground(npx, ['vite', 'dev', '--port', String(vitePort)], {
     cwd: FRONTEND_ROOT,
     env: runtimeEmbeddingEnv({ VITE_PORT: String(vitePort) }),
+    logPath: viteLogPath,
   });
 }
 

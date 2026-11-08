@@ -15,7 +15,7 @@ import { bindCohortToLedgerV1, buildTaskCardCohortV1, locatorKey } from './lib/t
 export const RANK_SCHEMA = 'atlas.open-task-ranking.v1';
 export const TASK_CARD_RANK_SCHEMA = 'atlas.openspec-task-card-ranking.v1';
 const SAFE_MUTATION = new Set(['CODE_ONLY', 'READ_ONLY']);
-const THEMES = {
+export const THEMES = {
   nlp: /\bnlp\b|langextract|taxonom|ontolog|classif/i,
   centroid: /centroid|kmeans|k-means|cluster/i,
   valkey: /valkey|redis|bitfrost|bifrost/i,

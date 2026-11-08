@@ -10,7 +10,8 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('$lib/server/db/client.js', () => ({ db: {} }));
 vi.mock('$lib/server/env.server.js', () => ({
-  ENV: { LANGEXTRACT_ENABLED: true, EMBEDDING_STRICT_BASE_URL: 'http://embedding.invalid' },
+  // SEAWEED_EVIDENCE_BUCKET must match the fixture's object_bucket; the production check stays fail-closed.
+  ENV: { LANGEXTRACT_ENABLED: true, EMBEDDING_STRICT_BASE_URL: 'http://embedding.invalid', SEAWEED_EVIDENCE_BUCKET: 'legal-evidence' },
 }));
 vi.mock('$lib/server/seaweed-client.js', () => ({ getSeaweedFile: mocks.getSeaweedFile }));
 vi.mock('$lib/server/document-processor.js', () => ({ processDocument: mocks.processDocument }));

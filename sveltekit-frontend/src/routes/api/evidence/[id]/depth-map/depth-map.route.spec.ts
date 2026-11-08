@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ select: vi.fn(), from: vi.fn(), leftJoin: vi.fn(), where: vi.fn(), limit: vi.fn(), getFile: vi.fn() }));
@@ -22,7 +23,13 @@ import { GET } from './+server.js';
 
 const evidenceId = '6b2749f6-03d8-42b7-a4e0-93983c62cc1d';
 const sourceRevision = `sha256:${'a'.repeat(64)}`;
-const png = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 1]);
+const png = Buffer.alloc(24);
+Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]).copy(png);
+png.writeUInt32BE(13, 8);
+Buffer.from('IHDR').copy(png, 12);
+png.writeUInt32BE(1, 16);
+png.writeUInt32BE(1, 20);
+const depthSha256 = createHash('sha256').update(png).digest('hex');
 
 function event(user?: { id: string }) {
 	return { params: { id: evidenceId }, locals: user ? { user } : {} } as never;
@@ -37,8 +44,11 @@ function evidenceRow(overrides: Record<string, unknown> = {}) {
 		fileType: 'image/png',
 		aiAnalysis: {
 			depthAnalysis: {
-				depthMapUrl: `minio://evidence/evidence/4fe33e08-dc1e-47dd-9da5-37b4cc81a9fc/${evidenceId}-depth.png`,
+				depthMapUrl: `seaweed://evidence/evidence/4fe33e08-dc1e-47dd-9da5-37b4cc81a9fc/${evidenceId}-depth-${depthSha256}.png`,
 				sourceRevision,
+				depthSha256,
+				width: 1,
+				height: 1,
 			},
 		},
 		...overrides,
@@ -90,7 +100,97 @@ describe('evidence depth-map route', () => {
 		expect(response.status).toBe(200);
 		expect(response.headers.get('content-type')).toBe('image/png');
 		expect(response.headers.get('cache-control')).toBe('private, no-store');
-		expect(mocks.getFile).toHaveBeenCalledWith('evidence', `evidence/4fe33e08-dc1e-47dd-9da5-37b4cc81a9fc/${evidenceId}-depth.png`);
+		expect(mocks.getFile).toHaveBeenCalledWith('evidence', `evidence/4fe33e08-dc1e-47dd-9da5-37b4cc81a9fc/${evidenceId}-depth-${depthSha256}.png`);
 		expect(Buffer.from(await response.arrayBuffer())).toEqual(png);
+	});
+
+	it('continues to read legacy minio-scheme records through the SeaweedFS adapter', async () => {
+		const legacyRow = evidenceRow({
+			aiAnalysis: {
+				depthAnalysis: {
+					depthMapUrl: `minio://evidence/evidence/4fe33e08-dc1e-47dd-9da5-37b4cc81a9fc/${evidenceId}-depth-${depthSha256}.png`,
+					sourceRevision,
+					depthSha256,
+					width: 1,
+					height: 1,
+				},
+			},
+		});
+		mocks.limit.mockResolvedValue([legacyRow]);
+
+		const response = await GET(event({ id: '42' }));
+
+		expect(response.status).toBe(200);
+		expect(mocks.getFile).toHaveBeenCalledWith('evidence', `evidence/4fe33e08-dc1e-47dd-9da5-37b4cc81a9fc/${evidenceId}-depth-${depthSha256}.png`);
+	});
+
+	it('serves a recorded-digest artifact whose bytes match the stored SHA-256', async () => {
+		mocks.limit.mockResolvedValue([evidenceRow({
+			aiAnalysis: { depthAnalysis: { depthMapUrl: `seaweed://evidence/evidence/4fe33e08-dc1e-47dd-9da5-37b4cc81a9fc/${evidenceId}-depth-${depthSha256}.png`, sourceRevision, depthSha256, width: 1, height: 1 } },
+		})]);
+
+		const response = await GET(event({ id: '42' }));
+
+		expect(response.status).toBe(200);
+		expect(response.headers.get('x-depth-verification')).toBe('sha256-verified');
+	});
+
+	it('rejects legacy depth metadata without a byte digest or dimensions before object retrieval', async () => {
+		mocks.limit.mockResolvedValue([evidenceRow({
+			aiAnalysis: { depthAnalysis: { depthMapUrl: `minio://evidence/evidence/4fe33e08-dc1e-47dd-9da5-37b4cc81a9fc/${evidenceId}-depth-${depthSha256}.png`, sourceRevision } },
+		})]);
+
+		const response = await GET(event({ id: '42' }));
+
+		expect(response.status).toBe(404);
+		expect(mocks.getFile).not.toHaveBeenCalled();
+	});
+
+	it('rejects artifact dimensions that differ from the depth manifest', async () => {
+		mocks.limit.mockResolvedValue([evidenceRow({
+			aiAnalysis: { depthAnalysis: { depthMapUrl: `seaweed://evidence/evidence/4fe33e08-dc1e-47dd-9da5-37b4cc81a9fc/${evidenceId}-depth-${depthSha256}.png`, sourceRevision, depthSha256, width: 2, height: 1 } },
+		})]);
+
+		const response = await GET(event({ id: '42' }));
+
+		expect(response.status).toBe(422);
+		expect(await response.json()).toEqual({ error: 'Depth map dimensions do not match its manifest' });
+	});
+
+	it('fails closed when recorded-digest bytes do not match the stored SHA-256', async () => {
+		mocks.limit.mockResolvedValue([evidenceRow({
+			aiAnalysis: { depthAnalysis: { depthMapUrl: `seaweed://evidence/evidence/4fe33e08-dc1e-47dd-9da5-37b4cc81a9fc/${evidenceId}-depth-${'b'.repeat(64)}.png`, sourceRevision, depthSha256: 'b'.repeat(64), width: 1, height: 1 } },
+		})]);
+
+		const response = await GET(event({ id: '42' }));
+
+		expect(response.status).toBe(422);
+		expect(await response.json()).toEqual({ error: 'Depth map failed digest verification' });
+	});
+
+	it('fails closed on a malformed recorded digest', async () => {
+		mocks.limit.mockResolvedValue([evidenceRow({
+			aiAnalysis: { depthAnalysis: { depthMapUrl: `seaweed://evidence/evidence/4fe33e08-dc1e-47dd-9da5-37b4cc81a9fc/${evidenceId}-depth-${depthSha256}.png`, sourceRevision, depthSha256: 'not-a-digest', width: 1, height: 1 } },
+		})]);
+
+		const response = await GET(event({ id: '42' }));
+
+		expect(response.status).toBe(422);
+	});
+
+	it('rejects non-SeaweedFS and non-legacy storage schemes', async () => {
+		mocks.limit.mockResolvedValue([evidenceRow({
+			aiAnalysis: {
+				depthAnalysis: {
+					depthMapUrl: `https://storage.invalid/evidence/4fe33e08-dc1e-47dd-9da5-37b4cc81a9fc/${evidenceId}-depth-${depthSha256}.png`,
+					sourceRevision,
+				},
+			},
+		})]);
+
+		const response = await GET(event({ id: '42' }));
+
+		expect(response.status).toBe(404);
+		expect(mocks.getFile).not.toHaveBeenCalled();
 	});
 });

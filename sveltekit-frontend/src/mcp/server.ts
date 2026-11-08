@@ -56,26 +56,39 @@ function checkAuth(request: any): void {
 
 // ─────────────────────────────────────────────────────────────────────
 // SeaweedFS S3 helper — single place for client creation + file fetch through
-// the legacy MinIO-compatible client.
+// the S3-compatible client library.
 // ─────────────────────────────────────────────────────────────────────
-let _mcpMinioClient: any = null;
-async function getMcpMinioClient() {
-  if (!_mcpMinioClient) {
+let _mcpSeaweedS3Client: any = null;
+async function getMcpSeaweedS3Client() {
+  if (!_mcpSeaweedS3Client) {
+    const endpoint = ENV.SEAWEED_S3_ENDPOINT;
+    const accessKey = ENV.SEAWEED_ACCESS_KEY;
+    const secretKey = ENV.SEAWEED_SECRET_KEY;
+    if (!accessKey || !secretKey) {
+      throw new Error('SeaweedFS S3 credentials are not configured');
+    }
+
+    const endpointUrl = endpoint ? new URL(endpoint) : null;
     const { Client } = await import('minio');
-    _mcpMinioClient = new Client({
-      endPoint: ENV.SEAWEED_ENDPOINT?.split(':')[0] || ENV.MINIO_ENDPOINT?.split(':')[0] || '127.0.0.1',
-      port: parseInt(ENV.MINIO_PORT || '9000', 10),
-      useSSL: ENV.MINIO_USE_SSL === 'true',
-      accessKey: ENV.MINIO_ACCESS_KEY || 'minioadmin',
-      secretKey: ENV.MINIO_SECRET_KEY || 'minioadmin',
+    _mcpSeaweedS3Client = new Client({
+      endPoint: endpointUrl?.hostname || ENV.SEAWEED_ENDPOINT || '127.0.0.1',
+      port: endpointUrl?.port
+        ? Number(endpointUrl.port)
+        : Number(ENV.SEAWEED_S3_PORT || (endpointUrl?.protocol === 'https:' ? 443 : 8333)),
+      useSSL: endpointUrl ? endpointUrl.protocol === 'https:' : false,
+      accessKey,
+      secretKey,
     });
   }
-  return _mcpMinioClient;
+  return _mcpSeaweedS3Client;
 }
 
 async function mcpGetFile(objectKey: string, bucket?: string): Promise<Buffer> {
-  const client = await getMcpMinioClient();
-  const bucketName = bucket || process.env.MINIO_EVIDENCE_BUCKET || process.env.SEAWEED_S3_BUCKET || 'evidence';
+  const client = await getMcpSeaweedS3Client();
+  const bucketName = bucket || ENV.SEAWEED_EVIDENCE_BUCKET;
+  if (!bucketName) {
+    throw new Error('SEAWEED_EVIDENCE_BUCKET is not configured');
+  }
   const chunks: Buffer[] = [];
   const stream = await client.getObject(bucketName, objectKey);
   for await (const chunk of stream) {
@@ -244,7 +257,7 @@ export function setupToolHandlers() {
           type: 'object',
           properties: {
             evidenceId: { type: 'string', description: 'Evidence record ID in PostgreSQL' },
-            audioUrl: { type: 'string', description: 'MinIO object key or URL for the audio file' },
+            audioUrl: { type: 'string', description: 'SeaweedFS object key or URL for the audio file' },
           },
           required: ['evidenceId', 'audioUrl'],
         },
@@ -271,7 +284,7 @@ export function setupToolHandlers() {
           type: 'object',
           properties: {
             evidenceId: { type: 'string', description: 'Evidence record ID in PostgreSQL' },
-            fileUrl: { type: 'string', description: 'MinIO object key or URL for evidence file' },
+            fileUrl: { type: 'string', description: 'SeaweedFS object key or URL for evidence file' },
             evidenceType: {
               type: 'string',
               enum: ['image', 'video', 'audio'],
@@ -304,7 +317,7 @@ export function setupToolHandlers() {
           type: 'object',
           properties: {
             evidenceId: { type: 'string', description: 'Evidence record ID' },
-            imageUrl: { type: 'string', description: 'MinIO object key or URL for image' },
+            imageUrl: { type: 'string', description: 'SeaweedFS object key or URL for image' },
             confidenceThreshold: {
               type: 'number',
               description: 'Min detection confidence (0.0-1.0)',
@@ -324,7 +337,7 @@ export function setupToolHandlers() {
             evidenceId: { type: 'string', description: 'Evidence record ID' },
             audioUrl: {
               type: 'string',
-              description: 'MinIO object key or URL for audio/video file',
+              description: 'SeaweedFS object key or URL for audio/video file',
             },
             language: {
               type: 'string',
@@ -2880,7 +2893,7 @@ export function setupToolHandlers() {
           };
         }
 
-        // Fetch audio from MinIO
+        // Fetch audio from SeaweedFS
         const audioBuffer = await mcpGetFile(audioUrl);
 
         // Detect MIME from extension
@@ -2961,7 +2974,7 @@ export function setupToolHandlers() {
         } = args;
         const FASTAPI_URL = ENV.FASTAPI_URL;
 
-        // Fetch file from MinIO
+        // Fetch file from SeaweedFS
         const fileBuffer = await mcpGetFile(fileUrl);
 
         // Call FastAPI multimodal endpoint
@@ -2996,7 +3009,7 @@ export function setupToolHandlers() {
         const { evidenceId, imageUrl, confidenceThreshold } = args;
         const FASTAPI_URL = ENV.FASTAPI_URL;
 
-        // Fetch image from MinIO
+        // Fetch image from SeaweedFS
         const imageBuffer = await mcpGetFile(imageUrl);
 
         // Call FastAPI vision endpoint
@@ -3026,7 +3039,7 @@ export function setupToolHandlers() {
         const { evidenceId, audioUrl, language, wordTimestamps } = args;
         const FASTAPI_URL = ENV.FASTAPI_URL;
 
-        // Fetch audio from MinIO
+        // Fetch audio from SeaweedFS
         const audioBuffer = await mcpGetFile(audioUrl);
 
         // Call FastAPI audio endpoint

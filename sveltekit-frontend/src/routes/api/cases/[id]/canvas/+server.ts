@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { canvasStates } from '$lib/server/db/schema';
 import { cases } from '$lib/server/db/schema-postgres.js';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { boardSnapshotSchema } from '$lib/schemas/board';
 import { verifyCanvasStatesTable } from '$lib/server/db/verify-canvas-table';
 import { isUuid } from '$lib/server/validation.js';
@@ -41,27 +41,41 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
         }
         const state = result.data;
 
-        // Upsert
-        const existing = await db.query.canvasStates.findFirst({
-            where: eq(canvasStates.caseId, id)
+        const writeResult = await db.transaction(async (tx) => {
+            // Serialize board writers even when no row exists yet. The deployed
+            // table has no unique case key, so this lock also prevents two
+            // concurrent first saves through this endpoint from creating twins.
+            await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${`canvas-state-v1:${id}`}, 0))`);
+            const existing = await tx.select({ id: canvasStates.id })
+                .from(canvasStates)
+                .where(eq(canvasStates.caseId, id))
+                .limit(2);
+
+            if (existing.length > 1) return 'AMBIGUOUS' as const;
+            if (existing.length === 1) {
+                const updated = await tx.update(canvasStates)
+                    .set({ stateData: state, updatedAt: new Date() })
+                    .where(eq(canvasStates.id, existing[0].id))
+                    .returning({ id: canvasStates.id });
+                if (updated.length !== 1) throw new Error('CANVAS_STATE_UPDATE_READBACK_FAILED');
+                return 'SAVED' as const;
+            }
+
+            const inserted = await tx.insert(canvasStates)
+                .values({ caseId: id, stateData: state })
+                .returning({ id: canvasStates.id });
+            if (inserted.length !== 1) throw new Error('CANVAS_STATE_INSERT_READBACK_FAILED');
+            return 'SAVED' as const;
         });
 
-        if (existing) {
-            await db.update(canvasStates)
-                .set({
-                    stateData: state,
-                    updatedAt: new Date(),
-                })
-                .where(eq(canvasStates.caseId, id));
-        } else {
-            await db.insert(canvasStates).values({
-                caseId: id,
-                stateData: state,
-                // createdBy: locals.user?.id
-            });
+        if (writeResult === 'AMBIGUOUS') {
+            return json({
+                error: 'Multiple canvas snapshots exist for this case; refusing an ambiguous save',
+                code: 'AMBIGUOUS_CANVAS_STATE'
+            }, { status: 409 });
         }
 
-        return json({ success: true });
+        return json({ success: true, data: { caseId: id } });
     } catch (e: unknown) {
         console.error('Error saving canvas:', e);
         return json({ error: 'Internal Server Error' }, { status: 500 });

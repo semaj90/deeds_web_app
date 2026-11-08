@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import type { TaskSemanticPacketBundle } from './semantic-packets';
+import type { TaskSemanticPacketBundle } from './semantic-packets.js';
 
 export type TaskSemanticPacketTuple = readonly [
   workspaceId: string | null,

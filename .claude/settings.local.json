@@ -648,7 +648,15 @@
       "Bash(git -C .. log -1 --format=%cd -- sveltekit-frontend/docs/graph)",
       "Skill(atlas-tools-mcp)",
       "Bash(ls -d */ .*/)",
-      "Bash(ls -la)"
+      "Bash(ls -la)",
+      "Bash(grep -nE '\"sharp\"' package.json)",
+      "Bash(ls node_modules/sharp/package.json)",
+      "PowerShell(cd C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\sveltekit-frontend; node -e \"for \\(const p of ['minio','@aws-sdk/client-s3']\\) { try { require.resolve\\(p\\); console.log\\(p,'OK'\\) } catch { console.log\\(p,'MISSING'\\) } }\"; Select-String -Path .env -Pattern \"^SEAWEED_\\(S3_ENDPOINT|S3_BUCKET|S3_REGION|ENDPOINT|S3_PORT\\)=\" | ForEach-Object { $_.Line.Split\\('='\\)[0] + '=' + $_.Line.Split\\('=',2\\)[1] })",
+      "PowerShell(New-Item *)",
+      "PowerShell(Select-String -Path \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\sveltekit-frontend\\\\.env\" -Pattern \"^IMAGE_SYNTHESIS_URL=\" | ForEach-Object { $_.Line }; docker ps --format \"{{.Names}} {{.Ports}}\" | Select-String -Pattern \"synth|image|8100|8099|8088\" | ForEach-Object { $_.Line }; docker ps --format \"{{.Names}}\" | Select-String -Pattern \"image\" | ForEach-Object { \"container: $\\($_.Line\\)\" })",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:5173/api/health\" -UseBasicParsing -TimeoutSec 20; \"5173 -> $\\($r.StatusCode\\)\" } catch { \"5173 -> \" + $_.Exception.Message }; Select-String -Path \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\.tmp-pw-3d-rerun.txt\" -Pattern \"ECONN|Error|error\" | Select-Object -First 5 | ForEach-Object { $_.Line }; Get-Content \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\sveltekit-frontend\\\\logs\\\\task-output\\\\dev-gpu-restart.log\" -Tail 6)",
+      "Bash(ls playwright.config.*)",
+      "Bash(grep -n \"baseURL\\\\|webServer\\\\|port\" playwright.config.*)"
     ],
     "deny": [],
     "ask": []
@@ -658,7 +666,8 @@
     "atlas-tools",
     "socraticode",
     "trace",
-    "ldr-research"
+    "ldr-research",
+    "blender-models"
   ],
   "disabledMcpjsonServers": [
     "atlas-task-kernel",

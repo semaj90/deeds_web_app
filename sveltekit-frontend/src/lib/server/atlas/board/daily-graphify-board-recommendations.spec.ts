@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { AdmittedSourceRevisionV1 } from '../identity/admitted-source-revision-resolver-v1.js';
 
 import {
@@ -6,7 +6,10 @@ import {
 	buildDailyGraphifyBoardRecommendations,
 } from './daily-graphify-board-recommendations.js';
 
-describe('daily graphify board recommendations', () => {
+// ~5 s alone, but it exceeded the lane's 30 s limit under full-suite load (contention, not a hang).
+vi.setConfig({ testTimeout: 90_000 });
+
+describe('daily graphify board recommendations', { timeout: 90_000 }, () => {
 	it('ranks board tasks into validated kanban recommendations', async () => {
 		const board = {
 			generated: '2026-08-12T00:00:00.000Z',
