@@ -243,6 +243,13 @@ export function createVerifiedContextServiceV1(ports: VerifiedContextServicePort
       }
       const packet = { requestId: request.requestId, manifestChecksum: manifest.identityChecksum, aceContextPacket: rendered.aceContextPacket, promptPlan: rendered.promptPlan };
       const contextPacketDigest = sha(packet);
+      const recommendationBindingAttachment = result.recommendationBinding ? {
+        schema: 'atlas.verified-context-recommendation-attachment.v1' as const,
+        topKExecutionId: result.execution.executionId,
+        bundleChecksum: result.recommendationBinding.bundleChecksum,
+        coveredOrdinals: [...result.recommendationBinding.coveredOrdinals],
+        verifiedAt: result.recommendationBinding.verifiedAt,
+      } : null;
       const receiptBody = {
         schema: 'atlas.verified-context-receipt.v1', requestId: request.requestId,
         workspaceRevision: authority.workspaceRevision, authorityRef: scope.authorityRef,
@@ -252,7 +259,9 @@ export function createVerifiedContextServiceV1(ports: VerifiedContextServicePort
         sourceEvidence: result.evidence.qualified.map((item) => ({ canonicalId: item.canonicalId, sourceRef: item.sourceRef, sourceRevision: item.sourceRevision, byteStart: item.byteStart, byteEnd: item.byteEnd, spanChecksum: item.spanChecksum, evidenceRefs: item.evidenceRefs })),
         featureSnapshotRevision: featureAdmission.candidateSnapshotRevision, featureRevision: featureAdmission.featureRevision,
         featureSnapshotChecksum: featureAdmission.snapshot.snapshotChecksum, contextManifestChecksum: manifest.identityChecksum,
-        promptPlanChecksum: rendered.promptPlan.checksumSha256, contextPacketDigest, mastraReadback: 'NOT_INVOKED',
+        promptPlanChecksum: rendered.promptPlan.checksumSha256, contextPacketDigest,
+        ...(recommendationBindingAttachment ? { recommendationBinding: recommendationBindingAttachment } : {}),
+        mastraReadback: 'NOT_INVOKED',
         canonicalAuthority: false, writesPerformed: false,
       };
       const receipt = { ...receiptBody, receiptChecksum: sha(receiptBody) };
@@ -287,6 +296,14 @@ export function verifyVerifiedContextMastraReadbackV1(result: VerifiedContextRes
     || originalReceiptBody.canonicalAuthority !== false
     || originalReceiptBody.writesPerformed !== false) {
     return blocked(result.requestId, 'VERIFIED_CONTEXT_RECEIPT_BINDING_MISMATCH', 'MASTRA_READBACK');
+  }
+  if (originalReceiptBody.recommendationBinding) {
+    const rb = originalReceiptBody.recommendationBinding as Record<string, unknown>;
+    if (rb.schema !== 'atlas.verified-context-recommendation-attachment.v1'
+      || rb.topKExecutionId !== originalReceiptBody.retrievalExecutionId
+      || typeof rb.bundleChecksum !== 'string' || !/^[a-f0-9]{64}$/.test(rb.bundleChecksum)) {
+      return blocked(result.requestId, 'VERIFIED_CONTEXT_RECEIPT_BINDING_MISMATCH', 'MASTRA_READBACK');
+    }
   }
   let plan;
   try { plan = PromptPlanV1Schema.parse(result.promptPlan); }

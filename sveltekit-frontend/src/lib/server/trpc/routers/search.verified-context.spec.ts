@@ -23,6 +23,41 @@ describe('search.verifiedContext', () => {
     });
   });
 
+  it('forwards optional recommendationEvidence to the verifiedContextService with server requestId', async () => {
+    const execute = vi.fn(async (_actorId: string | null, request: unknown) => ({
+      schema: 'atlas.verified-context-result.v1' as const,
+      status: 'ADMITTED' as const,
+      requestId: (request as { requestId: string }).requestId,
+      contextPacketRef: 'verified-context:sha256:abcd',
+      contextPacketDigest: 'a'.repeat(64),
+      contextManifestChecksum: 'b'.repeat(64),
+      promptPlanChecksum: 'c'.repeat(64),
+      promptPlan: {},
+      receipt: { requestId: (request as { requestId: string }).requestId },
+      canonicalAuthority: false as const,
+      writesPerformed: false as const,
+    }));
+    const fakeBundle = { schema: 'atlas.recommendation-evidence-bundle.v1', bundleChecksum: 'f'.repeat(64) };
+    const caller = searchRouter.createCaller({
+      userId: 42,
+      sessionId: 'session-1',
+      requestId: 'server-request-rec',
+      verifiedContextService: { execute },
+    } as never);
+    const result = await caller.verifiedContext({
+      query: 'Drizzle route helpers',
+      topK: 5,
+      recommendationEvidence: fakeBundle,
+    });
+    expect(execute).toHaveBeenCalledWith('42', {
+      requestId: 'server-request-rec',
+      query: 'Drizzle route helpers',
+      topK: 5,
+      recommendationEvidence: fakeBundle,
+    });
+    expect(result.status).toBe('ADMITTED');
+  });
+
   it('refuses cleanly until a server-side service is registered', async () => {
     const caller = searchRouter.createCaller({ userId: 42, sessionId: null, requestId: 'server-request-2' } as never);
     await expect(caller.verifiedContext({ query: 'source search', topK: 5 })).resolves.toMatchObject({

@@ -365,6 +365,8 @@ set(ADDON_SOURCES
   native_execution_counters.cpp
   tensor_bridge.cc
   simdjson_bridge.cc
+  spatial_packet_synthesizer.cpp
+  atlas_byte_synth_core.cpp
   lstm_bridge.cc
   cuvs_bridge.cc
   graph_search.cc
@@ -388,6 +390,14 @@ endif()
 
 add_library(tensorrt_bridge SHARED ${ADDON_SOURCES})
 set_target_properties(tensorrt_bridge PROPERTIES PREFIX "" SUFFIX ".node")
+
+# Standalone Zero-Dependency C-ABI Shared Library
+add_library(atlas_byte_synth SHARED atlas_byte_synth_core.cpp)
+set_target_properties(atlas_byte_synth PROPERTIES
+  CXX_STANDARD 20
+  CXX_STANDARD_REQUIRED ON
+)
+target_include_directories(atlas_byte_synth PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
 # ── Compile definitions ───────────────────────────────────────────────
 target_compile_definitions(tensorrt_bridge PRIVATE
