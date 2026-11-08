@@ -1024,6 +1024,11 @@
       "appliedAt": "2026-10-31",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db -c '\\d public.evidence_vector_projection_outbox'"
+    },
+    {
+      "file": "manual/20261107_atlas_concept_tie_v2.sql",
+      "status": "applied",
+      "reason": "Applied 2026-11-07 after explicit operator approval. Creates public.atlas_concept_tie_v2, a non-canonical staging table for concept-tie v2 lanes (canonical_authority fixed false; JSONB unknown_reason and proposal; 5 indexes plus PK and unique). Empty at apply; no rows loaded."
     }
   ]
 }

@@ -32,6 +32,7 @@
  */
 import { execFileSync } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -41,6 +42,7 @@ import {
   validateNoAliasCollisions,
   type ConceptDefinitionV1,
 } from '../../sveltekit-frontend/src/lib/server/atlas/contracts/concept-fabric-v1.js';
+import { auditCollisionResolutions } from './lib/concept-seed-resolution-audit-v1.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -204,6 +206,25 @@ async function main(): Promise<void> {
   const duplicates = [...conceptIdCounts.entries()].filter(([, n]) => n > 1).map(([id]) => id);
 
   const aliasCollisionIssues = validateNoAliasCollisions(allProposals);
+  // Operator-approved ALIAS_OF resolutions (docs/reports/concept-seed-alias-collision-resolution-proposal-v1.json).
+  // Honoured only when the file's status is APPROVED_BY_OPERATOR; the generated seed is never hand-edited.
+  const resolutionFile = fileURLToPath(new URL('../../docs/reports/concept-seed-alias-collision-resolution-proposal-v1.json', import.meta.url));
+  const resolutionDoc = existsSync(resolutionFile) ? JSON.parse(readFileSync(resolutionFile, 'utf8')) : null;
+  const approvedResolutions = resolutionDoc?.status === 'APPROVED_BY_OPERATOR' ? resolutionDoc.resolutions : [];
+  // The audit module is the single owner of collision decisions. Fail closed: an approval that the audit
+  // rejects (third claimant, unauthorized alias, wrong namespace, no matching collision) aborts the build.
+  const collisionResolutionAudit: any = resolutionDoc?.status === 'APPROVED_BY_OPERATOR'
+    ? auditCollisionResolutions(allProposals, resolutionDoc)
+    : null;
+  const resolvedLabels = new Set<string>((collisionResolutionAudit?.resolved ?? []).map((r: { label: string }) => r.label));
+  const claimantPattern = /^alias\/label "([^"]+)" is claimed by \d+ concepts: /;
+  const resolvedAliasCollisions: string[] = [];
+  const unresolvedAliasCollisions: string[] = [];
+  for (const issue of aliasCollisionIssues) {
+    const match = claimantPattern.exec(issue.message);
+    const label = match ? match[1].trim().toLowerCase() : '';
+    (resolvedLabels.has(label) ? resolvedAliasCollisions : unresolvedAliasCollisions).push(issue.message);
+  }
 
   // missingDefinitions: PROPOSED concepts are allowed empty status-gating (they're not ACTIVE),
   // but a truly empty definition string is still worth flagging as a proposal-quality signal.
@@ -251,7 +272,19 @@ async function main(): Promise<void> {
     namespaces,
     sourceOwners,
     duplicates,
-    aliasCollisions: aliasCollisionIssues.map((i) => i.message),
+    aliasCollisionsRaw: aliasCollisionIssues.map((i) => i.message),
+    aliasCollisions: unresolvedAliasCollisions,
+    aliasCollisionsResolved: resolvedAliasCollisions,
+    aliasCollisionResolutionSource: resolutionDoc ? { file: 'docs/reports/concept-seed-alias-collision-resolution-proposal-v1.json', status: resolutionDoc.status, appliedRelations: approvedResolutions.length } : null,
+    aliasCollisionResolutionAudit: collisionResolutionAudit ? {
+      schema: collisionResolutionAudit.schema,
+      rawCollisionChecksum: collisionResolutionAudit.rawCollisionChecksum,
+      approvalPairsChecksum: collisionResolutionAudit.approvalPairsChecksum,
+      resolvedCount: collisionResolutionAudit.resolved.length,
+      unresolvedCount: collisionResolutionAudit.unresolved.length,
+      resolved: collisionResolutionAudit.resolved,
+      unresolved: collisionResolutionAudit.unresolved,
+    } : null,
     missingDefinitions,
     missingOwners,
     missingEvidence,

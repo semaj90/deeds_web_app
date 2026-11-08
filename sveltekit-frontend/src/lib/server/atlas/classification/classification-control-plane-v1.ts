@@ -5,7 +5,11 @@ import { compileClassificationCandidateFeaturesV1 } from './classification-candi
 import { classificationObservationsToHmmV1 } from './classification-hmm-bridge-v1.js';
 import { escalateAmbiguousCandidatesV1, type CrossEncoderEscalationCandidateV1 } from './cross-encoder-escalation-v1.js';
 import type { ClassificationObservationV1, ClassificationTaskV1 } from './classification-observation-v1.js';
-import type { RecommendationEvidenceBundleV1 } from '../recommendations/recommendation-evidence-bundle-v1.js';
+import {
+  RecommendationEvidenceBundleV1Schema,
+  verifyRecommendationEvidenceBundleV1,
+  type RecommendationEvidenceBundleV1,
+} from '../recommendations/recommendation-evidence-bundle-v1.js';
 
 export interface ClassificationControlPlaneCandidateV1 {
   candidate: CandidateProjectionInput;
@@ -40,8 +44,23 @@ export async function runClassificationControlPlaneV1(input: {
   queryPolicy?: MrlClassifierPolicyV1;
   candidates: readonly ClassificationControlPlaneCandidateV1[];
   maxCrossEncoderCandidates?: number;
-  recommendationEvidence?: RecommendationEvidenceBundleV1;
+  recommendationEvidence?: unknown; // External input: validate before forwarding.
 }): Promise<ClassificationControlPlaneResultV1> {
+  // Validate before any classification/reranking work. A TypeScript type on
+  // deserialized JSON is not runtime authentication or proof of integrity.
+  const recommendationEvidence = input.recommendationEvidence == null
+    ? null
+    : RecommendationEvidenceBundleV1Schema.parse(input.recommendationEvidence);
+  if (recommendationEvidence !== null) {
+    verifyRecommendationEvidenceBundleV1(recommendationEvidence);
+    if (recommendationEvidence.requestId !== input.requestId) {
+      throw new Error('RECOMMENDATION_EVIDENCE_REQUEST_MISMATCH');
+    }
+    if (recommendationEvidence.workspaceRevision !== input.workspaceRevision) {
+      throw new Error('RECOMMENDATION_EVIDENCE_WORKSPACE_MISMATCH');
+    }
+  }
+
   const queryClassification = input.queryVector768 && input.queryPrototypes?.length
     ? classifyEmbeddingGemmaMrlV1({
         requestId: input.requestId,
@@ -101,6 +120,6 @@ export async function runClassificationControlPlaneV1(input: {
     rerank,
     canonicalWritesAllowed: false,
     retrievalVoteAdded: false,
-    recommendationEvidence: input.recommendationEvidence ?? null,
+    recommendationEvidence,
   };
 }

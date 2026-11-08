@@ -46,6 +46,9 @@ function getSimdJsonAddon(): SimdJsonAddon | null {
 	}
 
 	const paths = [
+		// Non-GPU release build (cuda_compiled 0, libtorch_built 0); parity-checked against the older builds.
+		resolve(process.cwd(), '../simd-bridge/cpp/build-x64-fallback/Release/tensorrt_bridge.node'),
+		resolve(process.cwd(), 'simd-bridge/cpp/build-x64-fallback/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/cpp/build/tensorrt_bridge.node'),
@@ -210,6 +213,17 @@ function utf8InputByteLength(input: string): number {
 /** Minimum payload size for native simdjson path (V8 is faster for small strings) */
 const MIN_NATIVE_BYTES = 1024;
 
+/**
+ * Inputs where simdjson's minified output can differ from V8 JSON.parse (found by
+ * scripts/atlas/simdjson-parity-harness-v1.mjs): negative zero (sign lost), surrogate escapes
+ * (lone surrogate becomes U+FFFD) and a leading BOM (accepted by simdjson, rejected by V8).
+ * Conservative: a false positive only routes the input to V8, which is always correct.
+ */
+const V8_FIDELITY_RE = /-0(?![.\deE])|\\u[dD][89a-fA-F][0-9a-fA-F]{2}/;
+function needsV8Fidelity(input: string): boolean {
+	return input.charCodeAt(0) === 0xfeff || V8_FIDELITY_RE.test(input);
+}
+
 // ── Public API ─────────────────────────────────────────────────────────────────
 
 /**
@@ -239,7 +253,7 @@ export function fastJsonParseWithBackend<T = unknown>(input: string): { value: T
 	stats.totalBytesParsed += inputBytes;
 
 	let result: T;
-	const native = inputBytes >= MIN_NATIVE_BYTES ? getSimdJsonAddon() : null;
+	const native = inputBytes >= MIN_NATIVE_BYTES && !needsV8Fidelity(input) ? getSimdJsonAddon() : null;
 
 	if (native) {
 		const start = performance.now();
@@ -279,7 +293,9 @@ export function fastJsonValidate(input: string): boolean {
 	const native = getSimdJsonAddon();
 	if (native) {
 		try {
-			return native.simdJsonValidate(input);
+			// A BOM is accepted by simdjson but rejected by JSON.parse; keep JSON.parse semantics.
+			if (native.simdJsonValidate(input)) return input.charCodeAt(0) !== 0xfeff;
+			// simdjson rejects some inputs V8 accepts (integers beyond 64 bits, 1e400): confirm with V8 below.
 		} catch {
 			// fall through
 		}

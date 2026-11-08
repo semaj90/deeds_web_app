@@ -1,14 +1,14 @@
 {
   "schema": "atlas.concept-seed-dry.v1",
-  "generatedAt": "2026-09-03T18:20:54.806Z",
+  "generatedAt": "2026-11-07T22:54:38.173Z",
   "writesPerformed": false,
-  "proposalCount": 41,
-  "conceptCount": 41,
-  "aliasCount": 26,
+  "proposalCount": 48,
+  "conceptCount": 48,
+  "aliasCount": 47,
   "canonicalConceptProposals": 9,
-  "aliasProposals": 26,
+  "aliasProposals": 47,
   "structuralMappingProposals": 11,
-  "domainMappingProposals": 7,
+  "domainMappingProposals": 14,
   "relationPredicateProposals": 14,
   "namespaces": [
     "domain",
@@ -23,11 +23,85 @@
     "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts::CANONICAL_DOMAINS"
   ],
   "duplicates": [],
-  "aliasCollisions": [
+  "aliasCollisionsRaw": [
     "alias/label \"retrieval\" is claimed by 2 concepts: concept:domain:retrieval, concept:ontology-domain:atlas:RetrievalDomain — ambiguous, not auto-resolved",
     "alias/label \"database\" is claimed by 2 concepts: concept:domain:database, concept:ontology-domain:atlas:DatabaseDomain — ambiguous, not auto-resolved",
+    "alias/label \"cache\" is claimed by 2 concepts: concept:domain:cache, concept:ontology-domain:atlas:CacheDomain — ambiguous, not auto-resolved",
+    "alias/label \"graph\" is claimed by 2 concepts: concept:domain:graph, concept:ontology-domain:atlas:GraphDomain — ambiguous, not auto-resolved",
+    "alias/label \"protocol\" is claimed by 2 concepts: concept:ontology-domain:atlas:ProtocolDomain, concept:type:protocol — ambiguous, not auto-resolved"
+  ],
+  "aliasCollisions": [
+    "alias/label \"protocol\" is claimed by 2 concepts: concept:ontology-domain:atlas:ProtocolDomain, concept:type:protocol — ambiguous, not auto-resolved"
+  ],
+  "aliasCollisionsResolved": [
+    "alias/label \"retrieval\" is claimed by 2 concepts: concept:domain:retrieval, concept:ontology-domain:atlas:RetrievalDomain — ambiguous, not auto-resolved",
+    "alias/label \"database\" is claimed by 2 concepts: concept:domain:database, concept:ontology-domain:atlas:DatabaseDomain — ambiguous, not auto-resolved",
+    "alias/label \"cache\" is claimed by 2 concepts: concept:domain:cache, concept:ontology-domain:atlas:CacheDomain — ambiguous, not auto-resolved",
     "alias/label \"graph\" is claimed by 2 concepts: concept:domain:graph, concept:ontology-domain:atlas:GraphDomain — ambiguous, not auto-resolved"
   ],
+  "aliasCollisionResolutionSource": {
+    "file": "docs/reports/concept-seed-alias-collision-resolution-proposal-v1.json",
+    "status": "APPROVED_BY_OPERATOR",
+    "appliedRelations": 4
+  },
+  "aliasCollisionResolutionAudit": {
+    "schema": "atlas.concept-seed-resolution-audit.v2",
+    "rawCollisionChecksum": "sha256:5b8b644d3e192547620362496d4d89a60f7ce4e8b392f61d3eb374144c4913ae",
+    "approvalPairsChecksum": "sha256:dc47142d383e55c9bde3d19205813705274c7c5915b8b572ae63a58b33060963",
+    "resolvedCount": 4,
+    "unresolvedCount": 1,
+    "resolved": [
+      {
+        "label": "cache",
+        "primaryConceptId": "concept:domain:cache",
+        "aliasConceptId": "concept:ontology-domain:atlas:CacheDomain",
+        "predicate": "ALIAS_OF",
+        "subjectConceptId": "concept:ontology-domain:atlas:CacheDomain",
+        "objectConceptId": "concept:domain:cache",
+        "relationStatus": "PROPOSED_NOT_PERSISTED",
+        "approval": "HUMAN_APPROVED"
+      },
+      {
+        "label": "database",
+        "primaryConceptId": "concept:domain:database",
+        "aliasConceptId": "concept:ontology-domain:atlas:DatabaseDomain",
+        "predicate": "ALIAS_OF",
+        "subjectConceptId": "concept:ontology-domain:atlas:DatabaseDomain",
+        "objectConceptId": "concept:domain:database",
+        "relationStatus": "PROPOSED_NOT_PERSISTED",
+        "approval": "HUMAN_APPROVED"
+      },
+      {
+        "label": "graph",
+        "primaryConceptId": "concept:domain:graph",
+        "aliasConceptId": "concept:ontology-domain:atlas:GraphDomain",
+        "predicate": "ALIAS_OF",
+        "subjectConceptId": "concept:ontology-domain:atlas:GraphDomain",
+        "objectConceptId": "concept:domain:graph",
+        "relationStatus": "PROPOSED_NOT_PERSISTED",
+        "approval": "HUMAN_APPROVED"
+      },
+      {
+        "label": "retrieval",
+        "primaryConceptId": "concept:domain:retrieval",
+        "aliasConceptId": "concept:ontology-domain:atlas:RetrievalDomain",
+        "predicate": "ALIAS_OF",
+        "subjectConceptId": "concept:ontology-domain:atlas:RetrievalDomain",
+        "objectConceptId": "concept:domain:retrieval",
+        "relationStatus": "PROPOSED_NOT_PERSISTED",
+        "approval": "HUMAN_APPROVED"
+      }
+    ],
+    "unresolved": [
+      {
+        "label": "protocol",
+        "claimants": [
+          "concept:ontology-domain:atlas:ProtocolDomain",
+          "concept:type:protocol"
+        ]
+      }
+    ]
+  },
   "missingDefinitions": [],
   "missingOwners": [
     "representation-registry (semantic_768/latent_256/etc.) — not mechanically extracted this pass",
@@ -36,8 +110,8 @@
   ],
   "missingEvidence": [],
   "ambiguousMappings": [],
-  "populationChecksum": "sha256:3ef7567a0cfb45b99ecb6c9d9abb95dc3c1ebc3d65af5d09b2c631f69e3edcc3",
-  "proposalChecksum": "sha256:e507727f2384a8d6ba2e94a12c5ca36cc8dc39d9e5d40471400becfd7f4e9e14",
+  "populationChecksum": "sha256:a9a5483423f3cbca9297a88ec86909e7081416db7e6d566ba33347b6e9e81b23",
+  "proposalChecksum": "sha256:247a3ad4f74e93d8ddd5843e9e7ba2c6fe593f44af352c7048d94e26f0d9baba",
   "proposals": [
     {
       "schema": "atlas.concept-definition.v1",
@@ -343,6 +417,153 @@
       "status": "PROPOSED",
       "canonicalAuthority": true,
       "definitionRevision": "sha256:4b5ae2b2a38dc2856b29456d66ac66ab779d2a8bafcfe2a16a375d30c0bbe422"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:ontology-domain:atlas:GpuComputeDomain",
+      "canonicalLabel": "gpu",
+      "definition": "Ontology-admission domain class \"atlas:GpuComputeDomain\" for classify-domain-ontology.mjs label admission (minimumConfidence=0).",
+      "conceptType": "domain",
+      "namespace": "ontology-domain",
+      "aliases": [
+        "gpu_compute",
+        "cuda",
+        "tensor_core"
+      ],
+      "schemaVersion": 1,
+      "sourceOwner": "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+      "evidenceRefs": [
+        "python/parent_atlas_ontology/domain_mapping.py"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:8dbe0d29a0f23ae902ded3b5b0c7dede2a7c9f275c74c791d49fd97b1b9d1d37"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:ontology-domain:atlas:TrainingDomain",
+      "canonicalLabel": "training",
+      "definition": "Ontology-admission domain class \"atlas:TrainingDomain\" for classify-domain-ontology.mjs label admission (minimumConfidence=0).",
+      "conceptType": "domain",
+      "namespace": "ontology-domain",
+      "aliases": [
+        "qlora",
+        "lora",
+        "fine_tuning"
+      ],
+      "schemaVersion": 1,
+      "sourceOwner": "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+      "evidenceRefs": [
+        "python/parent_atlas_ontology/domain_mapping.py"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:0dd4c2617a7686111af6c193c72e3303720c5eaed02a4d433e6ee33b475824a1"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:ontology-domain:atlas:ModelRuntimeDomain",
+      "canonicalLabel": "model_runtime",
+      "definition": "Ontology-admission domain class \"atlas:ModelRuntimeDomain\" for classify-domain-ontology.mjs label admission (minimumConfidence=0).",
+      "conceptType": "domain",
+      "namespace": "ontology-domain",
+      "aliases": [
+        "inference_runtime",
+        "llama_server",
+        "kv_cache"
+      ],
+      "schemaVersion": 1,
+      "sourceOwner": "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+      "evidenceRefs": [
+        "python/parent_atlas_ontology/domain_mapping.py"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:003eb699cfd88a152107032564d6241382be5c83d4804ab9d9f9a9bf777f1747"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:ontology-domain:atlas:CacheDomain",
+      "canonicalLabel": "cache",
+      "definition": "Ontology-admission domain class \"atlas:CacheDomain\" for classify-domain-ontology.mjs label admission (minimumConfidence=0).",
+      "conceptType": "domain",
+      "namespace": "ontology-domain",
+      "aliases": [
+        "redis",
+        "valkey",
+        "bitfrost"
+      ],
+      "schemaVersion": 1,
+      "sourceOwner": "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+      "evidenceRefs": [
+        "python/parent_atlas_ontology/domain_mapping.py"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:0f835e869fb159683f489743b921ea133858d551ce0c8720740ef74b63c42395"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:ontology-domain:atlas:ProtocolDomain",
+      "canonicalLabel": "protocol",
+      "definition": "Ontology-admission domain class \"atlas:ProtocolDomain\" for classify-domain-ontology.mjs label admission (minimumConfidence=0).",
+      "conceptType": "domain",
+      "namespace": "ontology-domain",
+      "aliases": [
+        "mcp",
+        "acp",
+        "a2a",
+        "grpc"
+      ],
+      "schemaVersion": 1,
+      "sourceOwner": "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+      "evidenceRefs": [
+        "python/parent_atlas_ontology/domain_mapping.py"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:aea80b8e3e03a98bcffd1ca15ee7fdbecd9e043265258e04a28b0be53ef5df0e"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:ontology-domain:atlas:TestingDomain",
+      "canonicalLabel": "testing",
+      "definition": "Ontology-admission domain class \"atlas:TestingDomain\" for classify-domain-ontology.mjs label admission (minimumConfidence=0).",
+      "conceptType": "domain",
+      "namespace": "ontology-domain",
+      "aliases": [
+        "test",
+        "validator",
+        "benchmark"
+      ],
+      "schemaVersion": 1,
+      "sourceOwner": "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+      "evidenceRefs": [
+        "python/parent_atlas_ontology/domain_mapping.py"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:96bd91e42f09796d4f56bf85cf883b4f49bcb056fbae884a023cf1de61ac16be"
+    },
+    {
+      "schema": "atlas.concept-definition.v1",
+      "conceptId": "concept:ontology-domain:atlas:ApiDomain",
+      "canonicalLabel": "api",
+      "definition": "Ontology-admission domain class \"atlas:ApiDomain\" for classify-domain-ontology.mjs label admission (minimumConfidence=0).",
+      "conceptType": "domain",
+      "namespace": "ontology-domain",
+      "aliases": [
+        "endpoint",
+        "sdk"
+      ],
+      "schemaVersion": 1,
+      "sourceOwner": "python/parent_atlas_ontology/domain_mapping.py::_DEFAULT_MAPPINGS",
+      "evidenceRefs": [
+        "python/parent_atlas_ontology/domain_mapping.py"
+      ],
+      "status": "PROPOSED",
+      "canonicalAuthority": true,
+      "definitionRevision": "sha256:e9d39574de462f61ea6788e127ca7509fe3e019b267201116eb77be21e009f0f"
     },
     {
       "schema": "atlas.concept-definition.v1",

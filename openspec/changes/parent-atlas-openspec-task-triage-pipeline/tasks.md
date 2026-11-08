@@ -200,3 +200,14 @@ The model receipt does not block NLP extraction; NLP does not wait on semantic i
 - `projectGroundedNlpFactToOntologyTupleV1()` now maps the grounded fact into the existing `OntologyLinkedTupleV1` owner. The tuple carries source and workspace revisions, byte-span evidence, extractor provenance, and gated/non-authoritative status; extractor-to-label-source mapping is explicit and rejects unsupported extractors. The tuple provenance schema accepts optional `workspaceRevision` for backward compatibility. This is a pure projection fixture only: no tuple table write, migration, live current-corpus run, or OaK function execution occurred.
 - `scripts/atlas/audit-current-task-evidence-card-join-v1.mjs` now builds a current read-only join census under `.tmp/`, refuses output outside `.tmp/` and overwrites, binds TaskCard source hashes plus the EvidenceCard inputs, checks workspace/head stability, and independently verifies the serialized checksum. A current replay found 10,779 active root TaskCards, all joinable to exactly one current evidence-task/card; 11,553 total EvidenceCards comprise 10,779 active root cards, 43 explicitly archived root cards, and 731 other-scope cards. Active-card cardinalities are ZERO=0 / ONE=10,779 / MANY=0; total proof-usable cards remain 0 and census status is `DIAGNOSTIC_ONLY_NOT_PROMOTABLE`. Two consecutive builds produced the same checksum. This is not an NLP classification run and proves no source-byte grounding, `:8095` output, tuple persistence, or OaK runtime execution.
 - Keep `NLP-GROUNDING_CRITICAL_PATH_PROVEN` open pending a bounded revision-qualified grounded-fact producer, ontology-tuple projection over those facts, and a read-only `oak.find_failure_context` receipt using admitted evidence.
+
+## Handoff 2026-11-07 (task ranking pipeline)
+
+Status: advisory analysis, canonicalAuthority false. Nothing applied to tasks.md, the workboard, or canonical stores.
+
+- Pipeline: `scripts/atlas/openspec-task-pipeline-v1.py` (extract -> fuse -> domain fanout), receipt in docs/reports/openspec-task-pipeline-v1.*.receipt.json.
+- Ranking: 6,527 open tasks, RRF over citation PageRank, theme, and kNN PageRank, plus Louvain communities. Newest fused output `docs/reports/openspec-task-rank-fuse-v1.20261107T204016Z.jsonl`. Field renamed to `distinctTaskIds`.
+- Alignment (diagnostic, not precision): independent code evidence 3.9% overall, top-100 lift about 5.5x. Blind 200-row gold sheet exists and is EMPTY: no reviewer labels yet.
+- Domain tags: lexicon, 53% unresolved (precision-first). NB/LR proposals on unknowns are circular, consistency only.
+- Open: reviewer labels; accept or widen lexicon; decide whether top-50 tool mapping (docs/reports/openspec-top50-tool-mapping-v1.*.json, 10 low-confidence matches) is reviewed.
+- Test status: FSM and NES reconciliation specs pass (7/7). Not verified: any gold-label accuracy.

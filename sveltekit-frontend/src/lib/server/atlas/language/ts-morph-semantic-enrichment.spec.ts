@@ -1,6 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { extractAstGrepStructuralCandidates } from './ast-grep-structural-topk.js';
 import { enrichAstCandidateWithTsMorph } from './ts-morph-semantic-enrichment.js';
+
+// TypeScript project loading costs ~5-9 s per test alone; full-suite load pushed it past the 30 s lane limit.
+vi.setConfig({ testTimeout: 90_000 });
 
 async function candidateFor(code: string, name: string) {
   const candidates = await extractAstGrepStructuralCandidates({
@@ -18,7 +21,7 @@ async function candidateFor(code: string, name: string) {
   return candidate;
 }
 
-describe('ts-morph semantic enrichment bridge', () => {
+describe('ts-morph semantic enrichment bridge', { timeout: 90_000 }, () => {
   it('enriches a structural function candidate with compiler type and return type', async () => {
     const code = `
       export function scoreCandidate(value: number): number {
