@@ -1,0 +1,167 @@
+{
+  "schema": "atlas.domain-ontology-nes-crosswalk.v2-candidate",
+  "status": "CANDIDATE_NOT_APPLIED",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "sourceTaxonomyYamlSha256": "sha256:65ec852af38ca0d1fa78664ee4fbe1822a712f65196a32c8ad60eee0c95ed0d9",
+  "paletteRevision": "nes-domain-palette-v2-candidate",
+  "paletteChecksum": "sha256:9aa054b012ff29a5a9a050533b25db86b8dfafca0a469569c043b466b42a1334",
+  "decision": {
+    "approvedRollups": [
+      "frontend->ui",
+      "machine-learning->ml",
+      "gpu->ml",
+      "api->network"
+    ],
+    "requestedNewDomains": [
+      "compiler",
+      "devops",
+      "error-handling",
+      "test"
+    ],
+    "agent": "TARGETED_REVIEW_CANDIDATES_ONLY",
+    "unknown": "UNRESOLVED_0x00_NOT_GENERAL",
+    "note": "Operator decisions captured as candidate; exact group names are vocabulary matches, not human-reviewed row labels."
+  },
+  "rows": [
+    {
+      "groupId": "api",
+      "domain": "network",
+      "lutByte": 4,
+      "nesHex": "0x2C",
+      "mappingReason": "OPERATOR_APPROVED_ROLLUP",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "auth",
+      "domain": "auth",
+      "lutByte": 1,
+      "nesHex": "0x16",
+      "mappingReason": "EXACT_NAME",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "cache",
+      "domain": "cache",
+      "lutByte": 6,
+      "nesHex": "0x27",
+      "mappingReason": "EXACT_NAME",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "compiler",
+      "domain": "compiler",
+      "lutByte": 11,
+      "nesHex": "0x17",
+      "mappingReason": "NEW_DOMAIN_CANDIDATE",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "database",
+      "domain": "database",
+      "lutByte": 5,
+      "nesHex": "0x12",
+      "mappingReason": "EXACT_NAME",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "database.postgresql",
+      "domain": "database",
+      "lutByte": 5,
+      "nesHex": "0x12",
+      "mappingReason": "PARENT_INHERITED",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "devops",
+      "domain": "devops",
+      "lutByte": 12,
+      "nesHex": "0x28",
+      "mappingReason": "NEW_DOMAIN_CANDIDATE",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "devops.env-config",
+      "domain": "devops",
+      "lutByte": 12,
+      "nesHex": "0x28",
+      "mappingReason": "PARENT_INHERITED",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "devops.process-mgmt",
+      "domain": "devops",
+      "lutByte": 12,
+      "nesHex": "0x28",
+      "mappingReason": "PARENT_INHERITED",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "error-handling",
+      "domain": "error-handling",
+      "lutByte": 13,
+      "nesHex": "0x26",
+      "mappingReason": "NEW_DOMAIN_CANDIDATE",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "frontend",
+      "domain": "ui",
+      "lutByte": 2,
+      "nesHex": "0x2A",
+      "mappingReason": "OPERATOR_APPROVED_ROLLUP",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "frontend.sveltekit",
+      "domain": "ui",
+      "lutByte": 2,
+      "nesHex": "0x2A",
+      "mappingReason": "PARENT_INHERITED",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "gpu",
+      "domain": "ml",
+      "lutByte": 9,
+      "nesHex": "0x14",
+      "mappingReason": "OPERATOR_APPROVED_LOSSY",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "graph",
+      "domain": "graph",
+      "lutByte": 8,
+      "nesHex": "0x1A",
+      "mappingReason": "EXACT_NAME",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "machine-learning",
+      "domain": "ml",
+      "lutByte": 9,
+      "nesHex": "0x14",
+      "mappingReason": "OPERATOR_APPROVED_ROLLUP",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "retrieval",
+      "domain": "retrieval",
+      "lutByte": 3,
+      "nesHex": "0x21",
+      "mappingReason": "EXACT_NAME",
+      "authoritativeLabel": false
+    },
+    {
+      "groupId": "test",
+      "domain": "test",
+      "lutByte": 14,
+      "nesHex": "0x2B",
+      "mappingReason": "NEW_DOMAIN_CANDIDATE",
+      "authoritativeLabel": false
+    }
+  ],
+  "sourceGroupCount": 17,
+  "paletteDomainCount": 14,
+  "checksum": "sha256:acaabe48aa833986f84cb37741a9f72ec04933358594678379e45ef0922cb77f"
+}

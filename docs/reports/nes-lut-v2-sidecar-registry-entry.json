@@ -1,0 +1,7 @@
+{
+  "file": "manual/20261108_atlas_nes_lut_v2_candidate.sql",
+  "status": "active_candidate",
+  "reason": "Additive candidate only: stage 14 versioned NES LUT routing metadata rows under atlas.nes-lut.v2-candidate in the existing atlas_nes_lut_v1 table. Preserves v1 records; scratch-only gated rehearsal/apply required, no live migration or ontology updates.",
+  "appliedBy": "not-applied",
+  "requiresJournalEntry": false
+}
