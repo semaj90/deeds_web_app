@@ -247,7 +247,10 @@
 			pgColumn: 'embedding',
 			vectorDim: 768,
 			drizzleType: 'vector(768)',
-			representation: 'semantic_768'
+			representation: 'semantic_768',
+			nesLutHex: '0x02',
+			pillar: 'WHAT',
+			paletteHex: '#8b1e22'
 		},
 		{
 			id: 'kag-02',
@@ -263,7 +266,10 @@
 			pgColumn: 'embedding',
 			vectorDim: 768,
 			drizzleType: 'vector(768)',
-			representation: 'semantic_768'
+			representation: 'semantic_768',
+			nesLutHex: '0x03',
+			pillar: 'WHY',
+			paletteHex: '#e5a93c'
 		},
 		{
 			id: 'kag-03',
@@ -279,7 +285,10 @@
 			pgColumn: 'content_embedding_768',
 			vectorDim: 768,
 			drizzleType: 'vector(768)',
-			representation: 'semantic_768'
+			representation: 'semantic_768',
+			nesLutHex: '0x06',
+			pillar: 'DATA',
+			paletteHex: '#888277'
 		}
 	];
 
@@ -1021,6 +1030,11 @@
 								</div>
 								{#if hit.pgTable}
 									<div class="khi-canonical">
+										{#if hit.nesLutHex}
+											<span class="khi-lut" style="border-color: {hit.paletteHex}; color: {hit.paletteHex};">
+												{hit.nesLutHex} • {hit.pillar}
+											</span>
+										{/if}
 										<span class="khi-pg">PG18: {hit.pgTable}.{hit.pgColumn}</span>
 										<span>{hit.drizzleType} • {hit.representation}</span>
 									</div>
@@ -4726,13 +4740,23 @@
 	.khi-status { font-weight: 700; color: #dc2626; }
 	.khi-canonical {
 		display: flex;
+		align-items: center;
 		justify-content: space-between;
+		gap: 4px;
 		font-size: 8.5px;
 		color: #475569;
 		margin-top: 3px;
 		padding-top: 3px;
 		border-top: 1px dashed #e2e8f0;
 		font-family: monospace;
+	}
+	.khi-lut {
+		padding: 1px 4px;
+		border: 1px solid;
+		border-radius: 3px;
+		font-weight: 700;
+		font-size: 8px;
+		letter-spacing: 0.02em;
 	}
 	.khi-pg { color: #7c3aed; font-weight: 600; }
 </style>

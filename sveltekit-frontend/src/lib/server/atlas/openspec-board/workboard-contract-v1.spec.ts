@@ -32,8 +32,9 @@ describe('OpenSpecWorkboardContractV1 against the live canonical artifact', () =
     expect(tasks.filter((t) => t.executionState === 'DONE').length).toBe(workboard.summary.completedTasks);
     expect(tasks.filter((t) => t.state === 'OPEN').length).toBe(workboard.summary.openTasks);
     expect(tasks.filter((t) => t.executionState === 'ACTIONABLE' && t.supersessionReviewState !== 'REVIEW_REQUIRED').length).toBe(workboard.summary.actionableTasks);
-    expect(tasks.filter((t) => t.executionState === 'WAITING_ON_DEPENDENCY').length).toBe(workboard.summary.waitingTasks);
-    expect(tasks.filter((t) => t.executionState === 'SUPERSEDED_OR_HISTORICAL').length).toBe(workboard.summary.supersededTasks);
+    expect(tasks.filter((t) => t.executionState === 'WAITING_ON_DEPENDENCY' && t.supersessionReviewState !== 'REVIEW_REQUIRED').length).toBe(workboard.summary.waitingTasks);
+    expect(tasks.filter((t) => t.executionState === 'SUPERSEDED_OR_HISTORICAL' && t.supersessionReviewState !== 'REVIEW_REQUIRED').length).toBe(workboard.summary.supersededTasks);
+    expect(workboard.summary.completedTasks + workboard.summary.actionableTasks + workboard.summary.waitingTasks + workboard.summary.supersededTasks + (workboard.summary.reviewRequiredTasks ?? 0) + ((workboard.summary as any).invariantOpenTasks ?? 0)).toBe(workboard.summary.totalTasks);
   });
 
   it('no duplicate stableKey across the whole artifact (the reliable canonical identity)', async () => {

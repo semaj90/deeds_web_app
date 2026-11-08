@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.openspec-task-concept-tie.v1",
+  "generatedAt": "2026-11-07T21:09:55.136767+00:00",
+  "status": "PROPOSAL",
+  "canonicalAuthority": false,
+  "sources": {
+    "fused": "docs/reports/openspec-task-rank-fuse-v1.20261107T204016Z.jsonl",
+    "alignment": "docs/reports/openspec-task-alignment-v1.20261107T201253Z.rows.jsonl"
+  },
+  "rule": {
+    "tokens": "meaningful lowercase tokens, stopwords removed",
+    "concept": "primaryDomain + Louvain community label",
+    "featureLabel": "section header from alignment rows",
+    "tie": "shared tokens and Jaccard >= 0.15"
+  },
+  "counts": {
+    "tasks": 6527,
+    "tied": 129,
+    "unknown": 6398,
+    "tiedPct": 1.98
+  },
+  "classifierHeldOutOnTied": {
+    "naiveBayes": 0.6154,
+    "logisticRegression": 0.8077,
+    "heldOutRows": 26
+  },
+  "unknownProposalsWritten": 6398,
+  "unknownNbLrAgreement": 0.7082,
+  "circularity": "concept topic and lexicon come from the same graph/lexicon; classifier scores measure consistency, not accuracy",
+  "outputs": {
+    "openspec-task-concept-tie-v1.20261107T210954Z.rows.jsonl": "sha256:13f3bb7bb71860a14fac89749e21f7c537751566e7a83dbd14949697d24fd142"
+  }
+}

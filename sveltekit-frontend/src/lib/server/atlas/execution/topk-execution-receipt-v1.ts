@@ -74,6 +74,15 @@ export type TopKExecutionV1 = z.infer<typeof TopKExecutionSchema>;
 /** Timing is observational and is excluded from every checksum so a re-run is idempotent. */
 export interface TopKTimingV1 { durationNs: string }
 
+export interface AlgorithmReceiptRecommendationBindingV1 {
+  schema: 'atlas.recommendation-binding-receipt.v1';
+  status: 'VERIFIED';
+  bundleChecksum: string;
+  requestId: string;
+  coveredOrdinals: readonly number[];
+  verifiedAt: string;
+}
+
 export interface AlgorithmExecutionReceiptRowV1 {
   execution_id: string;
   workflow_id: string | null;
@@ -96,7 +105,11 @@ export interface AlgorithmExecutionReceiptRowV1 {
   input_checksum: string;
   output_checksum: string | null;
   manifest_checksum: string;
-  manifest: { execution: TopKExecutionV1; timing: TopKTimingV1 };
+  manifest: {
+    execution: TopKExecutionV1;
+    timing: TopKTimingV1;
+    recommendationBinding?: AlgorithmReceiptRecommendationBindingV1 | null;
+  };
 }
 
 /** Minimal DB client: satisfied by `pg.Pool`, `pg.PoolClient`, and the in-memory test double. */
@@ -229,7 +242,11 @@ export function topKInputChecksumV1(execution: TopKExecutionV1): string {
 }
 
 /** Maps the execution to the EXISTING table columns (no new columns). */
-export function toAlgorithmExecutionReceiptRowV1(execution: TopKExecutionV1, timing: TopKTimingV1): AlgorithmExecutionReceiptRowV1 {
+export function toAlgorithmExecutionReceiptRowV1(
+  execution: TopKExecutionV1,
+  timing: TopKTimingV1,
+  recommendationBinding?: AlgorithmReceiptRecommendationBindingV1 | null,
+): AlgorithmExecutionReceiptRowV1 {
   return {
     execution_id: execution.executionId,
     workflow_id: null,
@@ -252,7 +269,11 @@ export function toAlgorithmExecutionReceiptRowV1(execution: TopKExecutionV1, tim
     input_checksum: topKInputChecksumV1(execution),
     output_checksum: execution.outputDigest,
     manifest_checksum: topKManifestChecksumV1(execution),
-    manifest: { execution, timing },
+    manifest: {
+      execution,
+      timing,
+      ...(recommendationBinding ? { recommendationBinding } : {}),
+    },
   };
 }
 
@@ -358,6 +379,19 @@ export function verifyTopKExecutionReceiptV1(params: {
     row.source_snapshot_revision === execution.candidateSnapshotRevision
     && row.representation_revision === execution.representationRevision
     && row.graph_snapshot_revision === execution.graphRevision);
+
+  if (row.manifest?.recommendationBinding) {
+    const rb = row.manifest.recommendationBinding;
+    push(
+      'recommendation_binding_valid',
+      rb.schema === 'atlas.recommendation-binding-receipt.v1' &&
+        rb.status === 'VERIFIED' &&
+        typeof rb.bundleChecksum === 'string' &&
+        rb.bundleChecksum.length > 0 &&
+        typeof rb.requestId === 'string' &&
+        rb.requestId.length > 0,
+    );
+  }
 
   let replayOk = false;
   try {

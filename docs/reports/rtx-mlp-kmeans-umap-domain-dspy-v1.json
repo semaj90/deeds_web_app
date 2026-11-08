@@ -1,0 +1,713 @@
+{
+  "schema": "atlas.rtx-mlp-kmeans-umap-domain-dspy.v1",
+  "generatedAt": "2026-11-08T06:52:09.840428+00:00",
+  "status": "RTX_TENSOR_ANALYSIS_PROVEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "liveDbMutated": false,
+  "ornith8090Disturbed": false,
+  "hardware": {
+    "device": "cuda:0",
+    "gpuName": "NVIDIA GeForce RTX 3060 Ti",
+    "smCapability": [
+      8,
+      6
+    ],
+    "torchVersion": "2.8.0+cu128",
+    "vramTotalMiB": 8191.5,
+    "vramFreeBeforeMiB": 6787.62,
+    "vramFreeAfterMiB": 6527.5,
+    "peakTensorAllocationMiB": 80.712,
+    "vramBudgetCapMiB": 96.0,
+    "withinVramBudget": true,
+    "elapsedMs": 2723.08
+  },
+  "provenance": {
+    "cohortRows": 6527,
+    "binaryChunkSha256": "sha256:a40abeb1f5f6ec953cf2cc4b05c80b82f85b174f763429e3ae9ba634c2b91bee",
+    "latent64Sha256": "sha256:cbb9b04fb0014d700565e23a09b0380b7b5068f4f0080b4325a6bdc3bfd47e9d",
+    "crosswalkMembersSha256": "sha256:68ed2a803f3df7428e0decf1455f7bc847f44153c7c5512ee4e848c140d43fec",
+    "nesPaletteChecksum": "sha256:e1b8ccdc6661a3faed3316cf276f01dd16a1edf80a9aba2d465def40461b9b0f",
+    "representationFamily": "SYNTHETIC_TEST_VECTOR",
+    "representationWarning": "Input 64-D vectors in rehearsal fixture are SYNTHETIC_TEST_VECTOR (MD5-seeded). Domain/cluster/UMAP outputs are PROPOSAL_ONLY and never promoted to canonical stores.",
+    "zeroSyntheticOrdinalIdsMinted": true
+  },
+  "contextualMlpDomainHead": {
+    "architecture": "Linear(82->64)+LayerNorm+SiLU -> Linear(64->32)+LayerNorm+SiLU -> Linear(32->10) + ResidualLexicalProj(10->10)",
+    "temperature": 0.75,
+    "domainDistribution": {
+      "auth": 2,
+      "ui": 239,
+      "retrieval": 825,
+      "network": 22,
+      "database": 221,
+      "cache": 70,
+      "agent": 1996,
+      "graph": 852,
+      "ml": 532,
+      "general": 1768
+    },
+    "meanTop1Confidence": 0.58127,
+    "meanPredictiveEntropy": 1.46964,
+    "weakLexicalAgreementDiagnostic": 0.99648,
+    "note": "Weak lexical agreement is a non-accuracy diagnostic per CLASSIFICATION-GATE-01; human reviewedGroup gold is required for accuracy."
+  },
+  "adaptiveSphericalKMeans": {
+    "selectedAdaptiveK": 64,
+    "selectedCompositeScore": 0.39849,
+    "louvainCommunityComparisonK": 47,
+    "perK": [
+      {
+        "k": 16,
+        "inertiaCosine": 2581.8489,
+        "meanCentroidCosine": 0.60444,
+        "meanTop2Margin": 0.05133,
+        "cosineSilhouetteProxy": 0.11169,
+        "compositeAdaptiveScore": 0.3827,
+        "emptyClusters": 0,
+        "clusterSize": {
+          "min": 288,
+          "median": 398,
+          "max": 542
+        },
+        "marginQuantiles": {
+          "p10": 0.01011,
+          "p50": 0.04218,
+          "p90": 0.10544
+        },
+        "centroidCosineQuantiles": {
+          "p10": 0.53719,
+          "p50": 0.61257,
+          "p90": 0.66086
+        },
+        "ambiguousShareMarginBelow0_02": 0.23962
+      },
+      {
+        "k": 32,
+        "inertiaCosine": 2468.7444,
+        "meanCentroidCosine": 0.62176,
+        "meanTop2Margin": 0.04419,
+        "cosineSilhouetteProxy": 0.10219,
+        "compositeAdaptiveScore": 0.38796,
+        "emptyClusters": 0,
+        "clusterSize": {
+          "min": 144,
+          "median": 204,
+          "max": 272
+        },
+        "marginQuantiles": {
+          "p10": 0.01089,
+          "p50": 0.03707,
+          "p90": 0.08671
+        },
+        "centroidCosineQuantiles": {
+          "p10": 0.56338,
+          "p50": 0.62864,
+          "p90": 0.67327
+        },
+        "ambiguousShareMarginBelow0_02": 0.24743
+      },
+      {
+        "k": 47,
+        "inertiaCosine": 2407.814,
+        "meanCentroidCosine": 0.6311,
+        "meanTop2Margin": 0.04351,
+        "cosineSilhouetteProxy": 0.10324,
+        "compositeAdaptiveScore": 0.39356,
+        "emptyClusters": 0,
+        "clusterSize": {
+          "min": 77,
+          "median": 142,
+          "max": 195
+        },
+        "marginQuantiles": {
+          "p10": 0.01184,
+          "p50": 0.03619,
+          "p90": 0.08483
+        },
+        "centroidCosineQuantiles": {
+          "p10": 0.57226,
+          "p50": 0.63753,
+          "p90": 0.68078
+        },
+        "ambiguousShareMarginBelow0_02": 0.22966
+      },
+      {
+        "k": 64,
+        "inertiaCosine": 2359.3784,
+        "meanCentroidCosine": 0.63852,
+        "meanTop2Margin": 0.04337,
+        "cosineSilhouetteProxy": 0.10512,
+        "compositeAdaptiveScore": 0.39849,
+        "emptyClusters": 0,
+        "clusterSize": {
+          "min": 43,
+          "median": 101,
+          "max": 153
+        },
+        "marginQuantiles": {
+          "p10": 0.01188,
+          "p50": 0.03713,
+          "p90": 0.08188
+        },
+        "centroidCosineQuantiles": {
+          "p10": 0.58414,
+          "p50": 0.64423,
+          "p90": 0.68632
+        },
+        "ambiguousShareMarginBelow0_02": 0.21373
+      }
+    ]
+  },
+  "spectralGraphRegularizedUmap": {
+    "outDim": 3,
+    "nNeighbors": 12,
+    "epochs": 25,
+    "neighborhoodRecallAt3K": 0.13574,
+    "morton30BitUniqueCount": 6527,
+    "sampleManifoldRows": [
+      {
+        "task_ordinal": 0,
+        "canonical_task_key": "parent-atlas-ace-rlm-bitfrost-integration#a870cee7088e7268",
+        "community_id": 21,
+        "mlp_domain": "ml",
+        "mlp_confidence": 0.27657,
+        "adaptive_cluster_id": 11,
+        "cluster_margin": 0.03096,
+        "umap_xyz": [
+          -0.41954,
+          0.43648,
+          0.04144
+        ],
+        "quaternion_xyzw": [
+          -0.00695,
+          -0.03626,
+          0.31181,
+          0.94943
+        ],
+        "rot_6d": [
+          0.80291,
+          0.59259,
+          0.06452,
+          -0.59158,
+          0.80545,
+          -0.03582
+        ],
+        "morton_code_30bit": 826861456
+      },
+      {
+        "task_ordinal": 1,
+        "canonical_task_key": "parent-atlas-ace-rlm-bitfrost-integration#aa282dbb4ecc954d",
+        "community_id": 18,
+        "mlp_domain": "agent",
+        "mlp_confidence": 0.39443,
+        "adaptive_cluster_id": 3,
+        "cluster_margin": 0.01351,
+        "umap_xyz": [
+          -0.69714,
+          -0.15535,
+          -0.07389
+        ],
+        "quaternion_xyzw": [
+          -0.05405,
+          0.26848,
+          -0.05342,
+          0.96028
+        ],
+        "rot_6d": [
+          0.85013,
+          -0.13161,
+          -0.50986,
+          0.07356,
+          0.98845,
+          -0.13249
+        ],
+        "morton_code_30bit": 116488716
+      },
+      {
+        "task_ordinal": 2,
+        "canonical_task_key": "parent-atlas-workstation-domain-classifier#2f3bb7515e9cf9ef",
+        "community_id": 18,
+        "mlp_domain": "general",
+        "mlp_confidence": 0.68959,
+        "adaptive_cluster_id": 48,
+        "cluster_margin": 0.02234,
+        "umap_xyz": [
+          0.30749,
+          -0.30204,
+          0.26445
+        ],
+        "quaternion_xyzw": [
+          -0.04553,
+          -0.08605,
+          -0.04521,
+          0.99422
+        ],
+        "rot_6d": [
+          0.9811,
+          -0.08206,
+          0.17523,
+          0.09773,
+          0.99177,
+          -0.08275
+        ],
+        "morton_code_30bit": 715723746
+      },
+      {
+        "task_ordinal": 3,
+        "canonical_task_key": "parent-atlas-repair-candidate-feature-matrix#d95fdfcfe99c784b",
+        "community_id": 13,
+        "mlp_domain": "general",
+        "mlp_confidence": 0.67823,
+        "adaptive_cluster_id": 60,
+        "cluster_margin": 0.01178,
+        "umap_xyz": [
+          0.54132,
+          -0.32542,
+          -0.06323
+        ],
+        "quaternion_xyzw": [
+          0.00863,
+          0.02254,
+          -0.04227,
+          0.99881
+        ],
+        "rot_6d": [
+          0.99541,
+          -0.08404,
+          -0.04576,
+          0.08482,
+          0.99628,
+          0.01534
+        ],
+        "morton_code_30bit": 261651814
+      },
+      {
+        "task_ordinal": 4,
+        "canonical_task_key": "parent-atlas-retrieval-staging-planes#1ba281f040c9e74c",
+        "community_id": 21,
+        "mlp_domain": "retrieval",
+        "mlp_confidence": 0.43849,
+        "adaptive_cluster_id": 46,
+        "cluster_margin": 0.00424,
+        "umap_xyz": [
+          0.34872,
+          0.58607,
+          0.20187
+        ],
+        "quaternion_xyzw": [
+          -0.20852,
+          0.13239,
+          -0.02399,
+          0.96872
+        ],
+        "rot_6d": [
+          0.9638,
+          -0.1017,
+          -0.24649,
+          -0.00872,
+          0.91189,
+          -0.41034
+        ],
+        "morton_code_30bit": 976459059
+      }
+    ]
+  },
+  "quaternionAndRot6dKinematics": {
+    "maxUnitNormError": 1e-07,
+    "maxSo3OrthogonalityError": 2e-07,
+    "wireSchemaSeparation": {
+      "lowRankTaskRpcSchemaId": "atlas.lowrank-task-rpc-record-64b.v1",
+      "lowRankTaskRpcBytes24To63": "bytes 24..31 finalScore (float64) + bytes 32..63 features8 (float32[8]) \u2014 UNTOUCHED",
+      "sceneKeyframeSchemaId": "atlas.aligned-keyframe-chunk-64b.v1",
+      "sceneKeyframeBytes20To43": "AlignedKeyframeChunk64B.rot_6d[6] (bytes 20..43) \u2014 separate scene-animation struct, never overwrites task RPC records",
+      "crossDecodeCollisionBlocked": true
+    },
+    "mathematicalSpaceDistinction": {
+      "rot6dZhouEtAl": "Continuous 6D representation of 3D SO(3) graphics/pose rotations via Gram-Schmidt column orthonormalization.",
+      "isoquantQuaternionRotor": "Double-sided 4D Hamilton quaternion SO(4) isoclinic rotation T(v) = q_L * v * conj(q_R) for full-attention K/V head blocks (see docs/reports/ornith-hybrid-ssm-isoquant-kv-v1.json)."
+    },
+    "retargetBridge": "sveltekit-frontend/src/lib/character-animation/rest-pose-retarget-v1.ts"
+  },
+  "valkeyCentroidProposals": {
+    "namespace": "atlas:centroid:v1",
+    "kmeansCentroidKeyCount": 64,
+    "domainCentroidKeyCount": 10,
+    "sampleKmeansKeys": [
+      "atlas:centroid:v1:kmeans:fscbb9b04fb001:m87b198024665:k000",
+      "atlas:centroid:v1:kmeans:fscbb9b04fb001:m87b198024665:k001",
+      "atlas:centroid:v1:kmeans:fscbb9b04fb001:m87b198024665:k002",
+      "atlas:centroid:v1:kmeans:fscbb9b04fb001:m87b198024665:k003"
+    ],
+    "sampleDomainKeys": [
+      "atlas:centroid:v1:domain:fscbb9b04fb001:me1b8ccdc6661:auth",
+      "atlas:centroid:v1:domain:fscbb9b04fb001:me1b8ccdc6661:ui",
+      "atlas:centroid:v1:domain:fscbb9b04fb001:me1b8ccdc6661:retrieval",
+      "atlas:centroid:v1:domain:fscbb9b04fb001:me1b8ccdc6661:network"
+    ],
+    "sampleDescriptors": [
+      {
+        "schema": "atlas.centroid-descriptor.v1",
+        "key": "atlas:centroid:v1:kmeans:fscbb9b04fb001:m87b198024665:k000",
+        "family": "kmeans",
+        "cellId": "k000",
+        "dim": 64,
+        "memberCount": 80,
+        "centroidDigest": "sha256:97ec046eb74a46ba49c2083f890bed29641745824daeafd1ce7fd62125e00e9b",
+        "status": "PROPOSAL_ONLY",
+        "canonicalAuthority": false
+      },
+      {
+        "schema": "atlas.centroid-descriptor.v1",
+        "key": "atlas:centroid:v1:kmeans:fscbb9b04fb001:m87b198024665:k001",
+        "family": "kmeans",
+        "cellId": "k001",
+        "dim": 64,
+        "memberCount": 71,
+        "centroidDigest": "sha256:c2783bf786b9aadf834798b099a84e0ca1c7963b02900af24325d998e6508136",
+        "status": "PROPOSAL_ONLY",
+        "canonicalAuthority": false
+      },
+      {
+        "schema": "atlas.centroid-descriptor.v1",
+        "key": "atlas:centroid:v1:kmeans:fscbb9b04fb001:m87b198024665:k002",
+        "family": "kmeans",
+        "cellId": "k002",
+        "dim": 64,
+        "memberCount": 139,
+        "centroidDigest": "sha256:92080d05e36197bf061d2815c5fb4c771a934a81a9e234799473375ef44ef50b",
+        "status": "PROPOSAL_ONLY",
+        "canonicalAuthority": false
+      },
+      {
+        "schema": "atlas.centroid-descriptor.v1",
+        "key": "atlas:centroid:v1:domain:fscbb9b04fb001:me1b8ccdc6661:auth",
+        "family": "domain",
+        "cellId": "auth",
+        "dim": 64,
+        "memberCount": 2,
+        "centroidDigest": "sha256:0f7d27b8edf2ab40c9c4d1c58251777b1c2c788b09fb948ba632b8d214bfec54",
+        "status": "PROPOSAL_ONLY",
+        "canonicalAuthority": false
+      },
+      {
+        "schema": "atlas.centroid-descriptor.v1",
+        "key": "atlas:centroid:v1:domain:fscbb9b04fb001:me1b8ccdc6661:ui",
+        "family": "domain",
+        "cellId": "ui",
+        "dim": 64,
+        "memberCount": 239,
+        "centroidDigest": "sha256:4013b9077472412d392236f753491d3a31c992cbe4fac2c4212f6e6a49a4550e",
+        "status": "PROPOSAL_ONLY",
+        "canonicalAuthority": false
+      },
+      {
+        "schema": "atlas.centroid-descriptor.v1",
+        "key": "atlas:centroid:v1:domain:fscbb9b04fb001:me1b8ccdc6661:retrieval",
+        "family": "domain",
+        "cellId": "retrieval",
+        "dim": 64,
+        "memberCount": 825,
+        "centroidDigest": "sha256:df70249e38e90b056a404255c8b3baa7b68994afa36f77bc061b720c79d11c74",
+        "status": "PROPOSAL_ONLY",
+        "canonicalAuthority": false
+      }
+    ],
+    "valkeyWritesPerformed": 0,
+    "canonicalAuthority": false
+  },
+  "yarnSsmCutileKvFsm": {
+    "activeSynthesisModel": "ornith-1.5-9b",
+    "ssmRecurrentStateStatus": "HYBRID_MIRA_TITANS_SURPRISE_GATE_POLICY_REHEARSAL_NOT_EXTERNAL_RUNTIME_MUTATION",
+    "yarnContextExtension": {
+      "baseContextTokens": 4096,
+      "extendedContextTokens": 32768,
+      "scaleFactorS": 8.0,
+      "yarnSqrtInvTemperature": 1.207944,
+      "yarnAttentionTemperature": 0.68534,
+      "verificationScope": "FORMULA_CALCULATION_ONLY_LIVE_8090_CLI_INSPECTED_SEPARATELY"
+    },
+    "cutileKvFsm": {
+      "cutileKernelAvailable": false,
+      "copyBackendUsed": "PYTORCH_CPU_INDEX_COPY_FALLBACK",
+      "s2StageMode": "STATE_TRANSITION_ONLY_NO_MMAP_PERFORMED",
+      "s2HostPinnedVerified": false,
+      "s4PolicyMode": "BOOLEAN_POLICY_DECISION_ONLY_NOT_EXTERNAL_RUNTIME_MUTATION",
+      "cudaStreamSynchronized": false,
+      "visitedStates": [
+        "S0_BIFROST_LOOKUP",
+        "S1_TURBOVEC_PREFILTER",
+        "S2_MMAP_HOST_STAGE",
+        "S3_CUTILE_BLOCK_INSERT",
+        "S4_MIRAS_EVICT_OR_PERSIST"
+      ],
+      "copiedKvBlocks": 16,
+      "persistedByMirasGate": true,
+      "evictedByMirasGate": false
+    },
+    "candidatesEvaluated": 6527
+  },
+  "dspyGraphRagHelpers": {
+    "validatedCommunityProposalsCount": 8,
+    "allEvidenceRefsSubsetVerified": true,
+    "proposals": [
+      {
+        "community_id": 1,
+        "community_fingerprint": "comm_fp_1_5435cdd438bbb168dc68530c",
+        "route_status": "CONFIGURED",
+        "routed_domain": "Task / Workboard Execution",
+        "mlp_dominant_domain": "graph",
+        "mlp_domain_confidence": 0.53204,
+        "nes_lut_hex": "0x1A",
+        "adaptive_kmeans_dominant_cluster": 37,
+        "mean_cluster_margin": 0.0437,
+        "umap_centroid_3d": [
+          0.35584,
+          0.06236,
+          -0.40733
+        ],
+        "representative_morton_code": 433493176,
+        "member_count": 651,
+        "sample_canonical_task_keys": [
+          "parent-atlas-retrieval-lineage-dag-convergence#af7f54c684866eb4",
+          "parent-atlas-retrieval-lineage-dag-convergence#56f3ffbc4401055a",
+          "parent-atlas-retrieval-lineage-dag-convergence#f487161280be4a1a"
+        ],
+        "cited_evidence_refs": [
+          "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L11879",
+          "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L12385",
+          "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L12621",
+          "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L13833"
+        ],
+        "dspy_signature_name": "LabelCommunity+DomainGraphRagProposalV1",
+        "proposal_status": "PROPOSAL_ONLY",
+        "canonical_authority": false
+      },
+      {
+        "community_id": 6,
+        "community_fingerprint": "comm_fp_6_fd73f175a16fa3cdf20bd94a",
+        "route_status": "CONFIGURED",
+        "routed_domain": "GPU / sm_86 / Tile Kernels",
+        "mlp_dominant_domain": "ml",
+        "mlp_domain_confidence": 0.38332,
+        "nes_lut_hex": "0x14",
+        "adaptive_kmeans_dominant_cluster": 46,
+        "mean_cluster_margin": 0.0414,
+        "umap_centroid_3d": [
+          0.06797,
+          0.47848,
+          -0.32831
+        ],
+        "representative_morton_code": 508863352,
+        "member_count": 258,
+        "sample_canonical_task_keys": [
+          "parent-atlas-ml-graph-retrieval-convergence#8ac759ad6e097ee0",
+          "parent-atlas-candidate-feature-execution-fabric#7b515c391a7b0723",
+          "parent-atlas-ml-graph-retrieval-convergence#8e011088744379bd"
+        ],
+        "cited_evidence_refs": [
+          "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md#L1831",
+          "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L185",
+          "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L289",
+          "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L290"
+        ],
+        "dspy_signature_name": "LabelCommunity+DomainGraphRagProposalV1",
+        "proposal_status": "PROPOSAL_ONLY",
+        "canonical_authority": false
+      },
+      {
+        "community_id": 9,
+        "community_fingerprint": "comm_fp_9_f88f410772c7b862fbf1bfd3",
+        "route_status": "CONFIGURED",
+        "routed_domain": "Drizzle / PostgreSQL 18 Drift",
+        "mlp_dominant_domain": "database",
+        "mlp_domain_confidence": 0.5551,
+        "nes_lut_hex": "0x12",
+        "adaptive_kmeans_dominant_cluster": 56,
+        "mean_cluster_margin": 0.04922,
+        "umap_centroid_3d": [
+          -0.50256,
+          0.41082,
+          0.20966
+        ],
+        "representative_morton_code": 808440787,
+        "member_count": 221,
+        "sample_canonical_task_keys": [
+          "parent-atlas-code-ingestion-pipeline#5b5024b9ca720c2e",
+          "parent-atlas-candidate-feature-execution-fabric#2a549b19f422ce03",
+          "manual-migration-reconciliation#a33205b2e3cca9ef"
+        ],
+        "cited_evidence_refs": [
+          "openspec/changes/atlas-feature-intelligence/tasks.md#L130",
+          "openspec/changes/manual-migration-reconciliation/tasks.md#L172",
+          "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md#L711",
+          "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md#L94"
+        ],
+        "dspy_signature_name": "LabelCommunity+DomainGraphRagProposalV1",
+        "proposal_status": "PROPOSAL_ONLY",
+        "canonical_authority": false
+      },
+      {
+        "community_id": 10,
+        "community_fingerprint": "comm_fp_10_9293b4263488992d3134255f",
+        "route_status": "UNAVAILABLE_SCRIPT_MISSING",
+        "routed_domain": "Tree-sitter / LangExtract AST",
+        "mlp_dominant_domain": "agent",
+        "mlp_domain_confidence": 0.66167,
+        "nes_lut_hex": "0x24",
+        "adaptive_kmeans_dominant_cluster": 14,
+        "mean_cluster_margin": 0.04346,
+        "umap_centroid_3d": [
+          -0.7988,
+          0.08969,
+          -0.01242
+        ],
+        "representative_morton_code": 344106067,
+        "member_count": 217,
+        "sample_canonical_task_keys": [
+          "parent-atlas-document-governance-master-index#b33086b0da9bda2e",
+          "parent-atlas-candidate-feature-execution-fabric#ada45b351b5d624f",
+          "parent-atlas-candidate-feature-execution-fabric#5f430ad04c8bcb37"
+        ],
+        "cited_evidence_refs": [
+          "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md#L1929",
+          "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md#L1958",
+          "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md#L1991",
+          "openspec/changes/parent-atlas-document-governance-master-index/tasks.md#L177"
+        ],
+        "dspy_signature_name": "LabelCommunity+DomainGraphRagProposalV1",
+        "proposal_status": "PROPOSAL_ONLY",
+        "canonical_authority": false
+      },
+      {
+        "community_id": 21,
+        "community_fingerprint": "comm_fp_21_3f66492e14194c3b35ddae5f",
+        "route_status": "CONFIGURED",
+        "routed_domain": "GPU / cuVS CAGRA Vector Index",
+        "mlp_dominant_domain": "ml",
+        "mlp_domain_confidence": 0.31775,
+        "nes_lut_hex": "0x14",
+        "adaptive_kmeans_dominant_cluster": 27,
+        "mean_cluster_margin": 0.04688,
+        "umap_centroid_3d": [
+          0.14641,
+          0.5352,
+          -0.17801
+        ],
+        "representative_morton_code": 826861456,
+        "member_count": 127,
+        "sample_canonical_task_keys": [
+          "parent-atlas-ace-rlm-bitfrost-integration#a870cee7088e7268",
+          "parent-atlas-retrieval-staging-planes#1ba281f040c9e74c",
+          "parent-atlas-ace-rlm-bitfrost-integration#2e57a67dae020f1a"
+        ],
+        "cited_evidence_refs": [
+          "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16351",
+          "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16352",
+          "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L382",
+          "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L398"
+        ],
+        "dspy_signature_name": "LabelCommunity+DomainGraphRagProposalV1",
+        "proposal_status": "PROPOSAL_ONLY",
+        "canonical_authority": false
+      },
+      {
+        "community_id": 32,
+        "community_fingerprint": "comm_fp_32_cd8cf8bd97274b6208d835e2",
+        "route_status": "CONFIGURED",
+        "routed_domain": "Svelte 5 Runes / UI Carousels",
+        "mlp_dominant_domain": "ui",
+        "mlp_domain_confidence": 0.52106,
+        "nes_lut_hex": "0x2A",
+        "adaptive_kmeans_dominant_cluster": 55,
+        "mean_cluster_margin": 0.05539,
+        "umap_centroid_3d": [
+          0.32618,
+          0.16645,
+          0.54163
+        ],
+        "representative_morton_code": 969151197,
+        "member_count": 70,
+        "sample_canonical_task_keys": [
+          "parent-atlas-retrieval-logic-convergence#75fdab688d2cac4c",
+          "parent-atlas-nlp-sidecar-feature-compiler#dafcfc7dc5b0b792",
+          "parent-atlas-gpu-compute-lanes-consolidation#44f3f55b22fd3374"
+        ],
+        "cited_evidence_refs": [
+          "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L1043",
+          "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L618",
+          "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L628",
+          "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1871"
+        ],
+        "dspy_signature_name": "LabelCommunity+DomainGraphRagProposalV1",
+        "proposal_status": "PROPOSAL_ONLY",
+        "canonical_authority": false
+      },
+      {
+        "community_id": 2,
+        "community_fingerprint": "comm_fp_2_c6a37fc1ce6bca699ac9121a",
+        "route_status": "UNROUTED",
+        "routed_domain": "UNROUTED",
+        "mlp_dominant_domain": "general",
+        "mlp_domain_confidence": 0.42292,
+        "nes_lut_hex": "0x0F",
+        "adaptive_kmeans_dominant_cluster": 13,
+        "mean_cluster_margin": 0.03861,
+        "umap_centroid_3d": [
+          0.09102,
+          -0.27595,
+          0.0527
+        ],
+        "representative_morton_code": 959590968,
+        "member_count": 285,
+        "sample_canonical_task_keys": [
+          "parent-atlas-ontology-kernel#a23a1fb0c771a775",
+          "parent-atlas-ontology-kernel#da9fa6cb6d4472e6",
+          "parent-atlas-ontology-kernel#a49c538e608cc3b1"
+        ],
+        "cited_evidence_refs": [
+          "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L3847",
+          "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4034",
+          "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4226",
+          "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4308"
+        ],
+        "dspy_signature_name": "LabelCommunity+DomainGraphRagProposalV1",
+        "proposal_status": "PROPOSAL_ONLY",
+        "canonical_authority": false
+      },
+      {
+        "community_id": 3,
+        "community_fingerprint": "comm_fp_3_0aaedbec38da367e924782fd",
+        "route_status": "UNROUTED",
+        "routed_domain": "UNROUTED",
+        "mlp_dominant_domain": "agent",
+        "mlp_domain_confidence": 0.25225,
+        "nes_lut_hex": "0x24",
+        "adaptive_kmeans_dominant_cluster": 35,
+        "mean_cluster_margin": 0.04738,
+        "umap_centroid_3d": [
+          -0.01613,
+          0.03465,
+          -0.15922
+        ],
+        "representative_morton_code": 345976180,
+        "member_count": 284,
+        "sample_canonical_task_keys": [
+          "parent-atlas-ace-rlm-bitfrost-integration#c06b5ca4800ac13c",
+          "atlas-feature-intelligence#4f969240dbb9b190",
+          "parent-atlas-ontology-kernel#46368fcd69df15e4"
+        ],
+        "cited_evidence_refs": [
+          "openspec/changes/atlas-feature-intelligence/tasks.md#L167",
+          "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L15277",
+          "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md#L1775",
+          "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L5527"
+        ],
+        "dspy_signature_name": "LabelCommunity+DomainGraphRagProposalV1",
+        "proposal_status": "PROPOSAL_ONLY",
+        "canonical_authority": false
+      }
+    ]
+  },
+  "receiptChecksumSha256": "sha256:6a1a6c8cea3c91ca05c4f6794ee3538f8af548545f002c03e41c4f1b9dd60dd7"
+}

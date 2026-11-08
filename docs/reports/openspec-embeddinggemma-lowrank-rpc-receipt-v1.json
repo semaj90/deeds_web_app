@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.openspec-embeddinggemma-lowrank-rpc.v1",
+  "status": "REAL_MODEL_EMBEDDING_COMPLETE",
+  "canonicalAuthority": false,
+  "representationFamily": "EMBEDDINGGEMMA_PREFIX64_EXPERIMENTAL",
+  "model": "embeddinggemma:latest",
+  "modelDigest": "sha256:82f094e4c0e19bc4208c692996d4f1ecf14e82a8dee579ee1d2ca1175260058e",
+  "modelParameters": "307.58M",
+  "modelQuantization": "BF16",
+  "endpoint": "http://127.0.0.1:11434",
+  "numTasks": 6527,
+  "embeddingDim": 768,
+  "prefixDim": 64,
+  "dtype": "float32-le",
+  "totalBytes": 1670912,
+  "binarySha256": "sha256:2b2e07dd5fcad65c8e170ffa95311bf276e937db2c643543b136ff4e41d8ec0b",
+  "binaryPath": ".tmp/atlas/openspec-task-lowrank-keyframes.embeddinggemma.latent64.f32le.bin",
+  "finiteValuesVerified": true,
+  "normRange": [
+    1.0,
+    1.0
+  ],
+  "durationMs": 97539,
+  "notes": "Normalized prefix projection of 768-D EmbeddingGemma (experimental prefilter). Official documented MRL dimensions are 128, 256, 512, 768.",
+  "generatedAt": "2026-11-08T08:50:10.889Z"
+}

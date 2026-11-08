@@ -1203,8 +1203,8 @@ if ($TurboDraftModel -and -not $draftRequiresAtomicBot) {
       '--spec-draft-n-max', '3',
       '--spec-draft-n-min', '0',
       '--spec-draft-ngl', '99',
-      '-ctkd', 'turbo3',
-      '-ctvd', 'turbo3'
+      '-ctkd', $(if ($binaryAcceptsTurbo) { 'turbo3' } else { 'q8_0' }),
+      '-ctvd', $(if ($binaryAcceptsTurbo) { 'turbo3' } else { 'q8_0' })
     )
   } else {
     $baseArgs = $baseArgs + @(

@@ -165,6 +165,51 @@ describe('VerifiedContextServiceV1', () => {
     const bundle = await bundleForFixture();
     const result = await createVerifiedContextServiceV1(fixturePorts()).execute('7', { ...request, recommendationEvidence: bundle });
     expect(result.status).toBe('ADMITTED');
+    if (result.status !== 'ADMITTED') throw new Error('FIXTURE_NOT_ADMITTED');
+    const receipt = result.receipt as {
+      retrievalExecutionId: string;
+      recommendationBinding?: {
+        schema: string;
+        topKExecutionId: string;
+        bundleChecksum: string;
+        coveredOrdinals: number[];
+      };
+    };
+    expect(receipt.recommendationBinding).toBeDefined();
+    expect(receipt.recommendationBinding?.schema).toBe('atlas.verified-context-recommendation-attachment.v1');
+    expect(receipt.recommendationBinding?.topKExecutionId).toBe(receipt.retrievalExecutionId);
+    expect(receipt.recommendationBinding?.bundleChecksum).toBe(bundle.bundleChecksum);
+    expect(receipt.recommendationBinding?.coveredOrdinals).toEqual([0]);
+
+    const mastraReadback = verifyVerifiedContextMastraReadbackV1(result);
+    expect(mastraReadback.status).toBe('ADMITTED');
+  });
+
+  it('rejects a recommendation binding attachment with mismatched topKExecutionId during readback', async () => {
+    const bundle = await bundleForFixture();
+    const result = await createVerifiedContextServiceV1(fixturePorts()).execute('7', { ...request, recommendationEvidence: bundle });
+    if (result.status !== 'ADMITTED') throw new Error('FIXTURE_NOT_ADMITTED');
+    const { canonicalSha256V1 } = await import('../prefill/canonical-hash-v1.js');
+    const tamperedReceipt = {
+      ...(result.receipt as Record<string, unknown>),
+      recommendationBinding: {
+        ...((result.receipt as Record<string, unknown>).recommendationBinding as Record<string, unknown>),
+        topKExecutionId: 'topk:forged',
+      },
+    };
+    delete tamperedReceipt.receiptChecksum;
+    const tampered = {
+      ...result,
+      receipt: {
+        ...tamperedReceipt,
+        receiptChecksum: canonicalSha256V1(tamperedReceipt),
+      },
+    };
+    expect(verifyVerifiedContextMastraReadbackV1(tampered)).toMatchObject({
+      status: 'REFUSED',
+      refusalCode: 'VERIFIED_CONTEXT_RECEIPT_BINDING_MISMATCH',
+      firstFailingBoundary: 'MASTRA_READBACK',
+    });
   });
 
   it('refuses a recommendation bundle bound to a different request, with an explainable reason', async () => {

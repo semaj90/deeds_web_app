@@ -1,0 +1,158 @@
+{
+  "schema": "atlas.openspec-task-rank-fuse.v1",
+  "generatedAt": "2026-11-07T19:25:04.954248+00:00",
+  "canonicalAuthority": false,
+  "source": "docs/reports/openspec-task-extract-v1.20261107T192103Z.all-open.jsonl",
+  "params": {
+    "rrfK": 60,
+    "knnK": 10,
+    "knnMetric": "cosine over TF-IDF (log tf, smoothed idf, df>=2 and df<N)",
+    "knnPagerankDamping": 0.85,
+    "themesSource": "scripts/atlas/rank-open-tasks-v1.mjs#THEMES (imported)",
+    "pageSize": 100
+  },
+  "counts": {
+    "openTasks": 6527,
+    "vocab": 4681,
+    "pages": 66,
+    "tasksWithAnyTheme": 2693,
+    "tasksWithCitationIn": 287,
+    "knnMeanTopSim": 0.4711
+  },
+  "outputs": {
+    "openspec-task-rank-fuse-v1.20261107T192448Z.jsonl": "fe0008a1cad80add5d74783a4c9b28fc64cab52b88012bbf561fc08093445a13"
+  },
+  "communities": {
+    "algorithm": "networkx louvain_communities (seed 0, resolution 1.0) on undirected kNN graph, weight=cosine",
+    "count": 47,
+    "kNNEdgesUndirected": 44889,
+    "modularity": 0.710838,
+    "summary": [
+      {
+        "community": 1,
+        "size": 651,
+        "label": "current source recheck packet graphify snapshot"
+      },
+      {
+        "community": 2,
+        "size": 285,
+        "label": "ontology classifier domain recheck tuple existing"
+      },
+      {
+        "community": 3,
+        "size": 284,
+        "label": "graph cugraph pagerank parity networkx neo4j"
+      },
+      {
+        "community": 4,
+        "size": 281,
+        "label": "qdrant daily graphify run retention storage"
+      },
+      {
+        "community": 5,
+        "size": 260,
+        "label": "ace arrow analysis turbovec packet graph"
+      },
+      {
+        "community": 6,
+        "size": 258,
+        "label": "tile rtx tensorrt gpu proof challenger"
+      },
+      {
+        "community": 7,
+        "size": 241,
+        "label": "session test integration harness telemetry discovery"
+      },
+      {
+        "community": 8,
+        "size": 235,
+        "label": "xgboost nlp agentic reranker sidecar workstation"
+      },
+      {
+        "community": 9,
+        "size": 221,
+        "label": "migration postgresql drizzle audit live apply"
+      },
+      {
+        "community": 10,
+        "size": 217,
+        "label": "ast langextract source enrichment symbol evidence"
+      },
+      {
+        "community": 11,
+        "size": 217,
+        "label": "phase lane retrieval evidence canonical awm"
+      },
+      {
+        "community": 12,
+        "size": 209,
+        "label": "ace recheck live cache ornith context"
+      },
+      {
+        "community": 13,
+        "size": 185,
+        "label": "gs1 qas contracts audit evidence separate"
+      },
+      {
+        "community": 14,
+        "size": 172,
+        "label": "som kmeans centroid e2e ctx knn"
+      },
+      {
+        "community": 15,
+        "size": 171,
+        "label": "abi skill backend libtorch acceptance ladder"
+      },
+      {
+        "community": 16,
+        "size": 159,
+        "label": "index dir sparse bm25 lexical heads"
+      },
+      {
+        "community": 17,
+        "size": 149,
+        "label": "paac kanban boundary compiler context cascade"
+      },
+      {
+        "community": 18,
+        "size": 147,
+        "label": "documentation cpu classification domain source existing"
+      },
+      {
+        "community": 19,
+        "size": 135,
+        "label": "ordinal lineage scope manifest graph preview"
+      },
+      {
+        "community": 20,
+        "size": 129,
+        "label": "trace mcp heval envelope caller live"
+      },
+      {
+        "community": 21,
+        "size": 127,
+        "label": "cuvs ann cagra exact gates semantic_768"
+      },
+      {
+        "community": 22,
+        "size": 116,
+        "label": "afc e2e tournament workboard sched only"
+      },
+      {
+        "community": 23,
+        "size": 115,
+        "label": "adapter qlora stage fine tuning unsloth"
+      },
+      {
+        "community": 24,
+        "size": 114,
+        "label": "end acp a2a acceptance p22 reproducibility"
+      },
+      {
+        "community": 25,
+        "size": 114,
+        "label": "top topk file recall ranking source"
+      }
+    ]
+  }
+}

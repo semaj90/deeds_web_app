@@ -1,0 +1,110 @@
+{
+  "schema": "atlas.ace.task-context.v1",
+  "canonicalTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#a870cee7088e7268",
+  "cohortOrdinal": 0,
+  "workspaceRevision": "3bd8c8e3861c0d8228128291af575e05a194b563",
+  "sourceRevision": "sha256:65d345ca9bcfcb7348c10f11337dec4b88a77b331b9b62304eda1f08c5ccac20",
+  "taskSource": {
+    "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16352",
+    "taskCode": "CANARY-PR-01",
+    "taskText": "CANARY-PR-01 PageRank is precomputed authority (Neo4j GDS table; NetworkX = CPU parity oracle, stock `nx.pagerank` alpha 0.85), not a per-query traversal. HNSW is a similarity graph walked greedily by distance; it is not BFS and not PageRank. Add authority-blend weights as a sweep dimension over the candidate set; never compute PageRank per query.",
+    "governingRules": "PageRank is precomputed authority; never compute per-query; maintain authority=false until promotion receipt."
+  },
+  "representation": {
+    "family": "EMBEDDINGGEMMA_PREFIX64_EXPERIMENTAL",
+    "modelDigest": "sha256:82f094e4c0e19bc4208c692996d4f1ecf14e82a8dee579ee1d2ca1175260058e",
+    "artifactSha256": "sha256:2b2e07dd5fcad65c8e170ffa95311bf276e937db2c643543b136ff4e41d8ec0b",
+    "vectorDim": 768,
+    "prefixDim": 64
+  },
+  "retrieval": {
+    "topK": 6,
+    "evidence": [
+      {
+        "sourceRef": "docs/llms/generated/postgres.llms-full.txt",
+        "kind": "GROUNDING_SILO",
+        "rank": 1,
+        "score": 0.95
+      },
+      {
+        "sourceRef": "src/lib/server/graph/couchdb-pagerank.ts",
+        "kind": "AST_SYMBOL_PROOF",
+        "symbol": "couchdb-pagerank.ts",
+        "nodeKind": "file",
+        "lineSpan": [
+          0,
+          0
+        ],
+        "rank": 2
+      },
+      {
+        "sourceRef": "src/lib/server/retrieval/legal-pagerank.ts",
+        "kind": "AST_SYMBOL_PROOF",
+        "symbol": "legal-pagerank.ts",
+        "nodeKind": "file",
+        "lineSpan": [
+          0,
+          0
+        ],
+        "rank": 3
+      },
+      {
+        "sourceRef": "src/routes/api/codebase-index/couchdb-pagerank/+server.ts",
+        "kind": "AST_SYMBOL_PROOF",
+        "symbol": "+server.ts",
+        "nodeKind": "file",
+        "lineSpan": [
+          0,
+          0
+        ],
+        "rank": 4
+      },
+      {
+        "sourceRef": "contains:0000d010-2455-4211-ada9-b396cf4af177:b401debc-6fdd-4d73-8536-6a08942ee382",
+        "kind": "GRAPH_EDGE_PROOF",
+        "edgeType": "CONTAINS",
+        "rank": 5
+      },
+      {
+        "sourceRef": "contains:0001383a-0e6f-434d-955c-1a597ff543e5:94b0c823-75f5-46a2-92d8-b692d92e8e55",
+        "kind": "GRAPH_EDGE_PROOF",
+        "edgeType": "CONTAINS",
+        "rank": 6
+      },
+      {
+        "sourceRef": "contains:0006d130-a1a8-4277-9756-7afbeb56185e:ff4737d4-c1c1-4208-9de0-27693ea09a35",
+        "kind": "GRAPH_EDGE_PROOF",
+        "edgeType": "CONTAINS",
+        "rank": 7
+      }
+    ]
+  },
+  "contextBudgetTokens": {
+    "taskIdentityAndRules": 600,
+    "dagFrontier": 450,
+    "okfOntologyAndConstraints": 650,
+    "astSymbolsAndExactSpans": 900,
+    "hybridTopKEvidence": 1000,
+    "acceptanceTests": 300,
+    "safetyReserve": 196,
+    "totalBudget": 4096
+  },
+  "acceptance": {
+    "requiredTests": [
+      "C:\\Python313\\python.exe scripts/atlas/test-kag-prefill-router-v1.py",
+      "node scripts/atlas/prove-nes-glyph-instance64-sab-webgpu-v1.mjs"
+    ],
+    "independentReadback": true
+  },
+  "visualGlyph": {
+    "taskOrdinal": 0,
+    "lutByte": 8,
+    "nesHex": "0x1A",
+    "label": "DOM_GRAPH_CUGRAPH_PAGERANK",
+    "recordStrideBytes": 64
+  },
+  "executionStatus": "PROPOSED",
+  "mutationAuthorized": false,
+  "canonicalAuthority": false,
+  "generatedAt": "2026-11-08T09:03:42.927Z"
+}

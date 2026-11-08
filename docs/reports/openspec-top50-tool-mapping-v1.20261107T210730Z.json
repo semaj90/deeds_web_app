@@ -1,0 +1,633 @@
+{
+ "schema": "atlas.openspec-top50-tool-mapping.v1",
+ "generatedAt": "2026-11-07T21:07:30.513477+00:00",
+ "canonicalAuthority": false,
+ "writesPerformed": false,
+ "source": {
+  "rank": "docs/reports\\openspec-task-rank-fuse-v1.20261107T204016Z.jsonl",
+  "alignment": "docs/reports\\openspec-task-alignment-v1.20261107T201253Z.rows.jsonl"
+ },
+ "method": "task code search in alignment evidence (code paths only); a script/test counts only if its path names scripts, python, tests or spec",
+ "limits": [
+  "a code reference is not proof the script implements the task",
+  "no MCP tool matching was done: tool names were not joined to task text",
+  "tasks without a task code cannot be matched by this method"
+ ],
+ "summary": {
+  "tasks": 50,
+  "scriptOrTestCandidate": 10,
+  "docReferenceOnly": 1,
+  "noTool": 39,
+  "unmappableNoTaskCode": 20
+ },
+ "items": [
+  {
+   "rank": 1,
+   "id": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16352",
+   "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+   "task_code": "CANARY-PR-01",
+   "text": "CANARY-PR-01 PageRank is precomputed authority (Neo4j GDS table; NetworkX = CPU parity oracle, stock `nx.pagerank` alpha 0.85), not a per-query traversal. HNSW ",
+   "codeEvidenceFiles": [
+    "scripts/atlas/dspy_agentic_error_fixer.py"
+   ],
+   "runnableCandidates": [
+    "scripts/atlas/dspy_agentic_error_fixer.py"
+   ],
+   "mapping": "SCRIPT_OR_TEST_FOUND",
+   "confidence": "LOW_CODE_REFERENCE_NOT_VERIFIED"
+  },
+  {
+   "rank": 2,
+   "id": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L15279",
+   "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+   "task_code": "GPU-PARITY-01",
+   "text": "**GPU-PARITY-01** Only after CPU parity and explicit resource admission, compare the same frozen tensors/graph on supported PyTorch/CUDA, cuGraph/cuVS, and SIMT",
+   "codeEvidenceFiles": [
+    "scripts/atlas/dspy_agentic_error_fixer.py"
+   ],
+   "runnableCandidates": [
+    "scripts/atlas/dspy_agentic_error_fixer.py"
+   ],
+   "mapping": "SCRIPT_OR_TEST_FOUND",
+   "confidence": "LOW_CODE_REFERENCE_NOT_VERIFIED"
+  },
+  {
+   "rank": 3,
+   "id": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L1255",
+   "change_id": "parent-atlas-workstation-domain-classifier",
+   "task_code": "CLASS-INDEX-07",
+   "text": "CLASS-INDEX-07 Keep DuckDB, worker pools, SIMDJSON/N-API, RAPIDS/cuGraph/cuVS, and GPU",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 4,
+   "id": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L282",
+   "change_id": "parent-atlas-repair-candidate-feature-matrix",
+   "task_code": "CEI-21",
+   "text": "**CEI-21** Fuller ACE JSON packet for BitFrost/Valkey warming, centroid alignment, KV-cache synthesis and agentic dense search: EXTEND the existing owners, do n",
+   "codeEvidenceFiles": [
+    "scripts/atlas/apply-chunk-summary-admission-v1.mjs",
+    "scripts/atlas/lib/chunk-summary-admission-writer-v1.mjs"
+   ],
+   "runnableCandidates": [
+    "scripts/atlas/apply-chunk-summary-admission-v1.mjs",
+    "scripts/atlas/lib/chunk-summary-admission-writer-v1.mjs"
+   ],
+   "mapping": "SCRIPT_OR_TEST_FOUND",
+   "confidence": "LOW_CODE_REFERENCE_NOT_VERIFIED"
+  },
+  {
+   "rank": 5,
+   "id": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L382",
+   "change_id": "parent-atlas-retrieval-staging-planes",
+   "task_code": "DIM-03",
+   "text": "DIM-03 Verify Go `/search/codebase` hits and TurboVec results state their representation (`semantic_768` vs `latent_64`) and never mix them in one fused score.",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 6,
+   "id": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L15277",
+   "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+   "task_code": "GRAPH-CPU-01",
+   "text": "**GRAPH-CPU-01** On one admitted frozen packet/ordinal snapshot, build the existing role-preserving tuple incidence projection and compare bounded NetworkX trav",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 7,
+   "id": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L14700",
+   "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+   "task_code": "GPU-PROJ-01",
+   "text": "GPU-PROJ-01 stage 2 Extend `parent-atlas-gpu-compute-lanes-consolidation` (no parallel change): classify centroid/KMeans/PCA/pgvector HNSW/cuVS/CAGRA/",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 8,
+   "id": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L15375",
+   "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+   "task_code": null,
+   "text": "Consider PyTorch CPU and then GPU/cuGraph/cuVS/cuTile/SIMT challengers only after the same",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 9,
+   "id": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L3847",
+   "change_id": "parent-atlas-ontology-kernel",
+   "task_code": null,
+   "text": "Keep ontology admission and GraphRAG/Qdrant fanout blocked until the",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 10,
+   "id": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L188",
+   "change_id": "parent-atlas-repair-candidate-feature-matrix",
+   "task_code": "CEI-05",
+   "text": "**CEI-05** Summary integration (Codex is producing summaries — do NOT generate summaries or embeddings from this change).",
+   "codeEvidenceFiles": [
+    "scripts/atlas/freeze-current-summary-regen-cohort-v1.mjs"
+   ],
+   "runnableCandidates": [
+    "scripts/atlas/freeze-current-summary-regen-cohort-v1.mjs"
+   ],
+   "mapping": "SCRIPT_OR_TEST_FOUND",
+   "confidence": "LOW_CODE_REFERENCE_NOT_VERIFIED"
+  },
+  {
+   "rank": 11,
+   "id": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L16175",
+   "change_id": "parent-atlas-retrieval-lineage-dag-convergence",
+   "task_code": "CANONICAL-IDENTITY-V1-SPEC-01",
+   "text": "CANONICAL-IDENTITY-V1-SPEC-01 (2026-09-21) — SPEC-ONLY DRAFT for operator sign-off; no code, schema or data changed. Purpose: one owner for canonical object ide",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 12,
+   "id": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L1596",
+   "change_id": "parent-atlas-versioned-doc-intelligence",
+   "task_code": "DOC-GPU-08",
+   "text": "**DOC-GPU-08** Compare cuVS/cuGraph/RAPIDS or LibTorch CUDA with the same CPU-qualified candidate/graph snapshot only after GPU resource admission and numerical",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 13,
+   "id": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L16182",
+   "change_id": "parent-atlas-retrieval-lineage-dag-convergence",
+   "task_code": "CANONICAL-IDENTITY-V1-SPEC-01",
+   "text": "CANONICAL-IDENTITY-V1-SPEC-01 REVISION (2026-09-21) — spec-only, folds operator-supplied refinements into the earlier draft entry; no code, schema or data chang",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 14,
+   "id": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4226",
+   "change_id": "parent-atlas-ontology-kernel",
+   "task_code": null,
+   "text": "Keep tuple admission and GraphRAG/Qdrant fanout blocked; no ontology or",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 15,
+   "id": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L11879",
+   "change_id": "parent-atlas-retrieval-lineage-dag-convergence",
+   "task_code": null,
+   "text": "Keep structural lineage blocked; no packet, chunk, or source identity was",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 16,
+   "id": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L315",
+   "change_id": "parent-atlas-repair-candidate-feature-matrix",
+   "task_code": "SUM-04",
+   "text": "**SUM-04** 12-row canary apply, atomic 12/12 for this first proof (prevalidate all 12, one transaction, readback + recompute summaryDigest, ROLLBACK on any diff",
+   "codeEvidenceFiles": [
+    "scripts/atlas/run-sum04-summary-canary-v1.mts"
+   ],
+   "runnableCandidates": [
+    "scripts/atlas/run-sum04-summary-canary-v1.mts"
+   ],
+   "mapping": "SCRIPT_OR_TEST_FOUND",
+   "confidence": "LOW_CODE_REFERENCE_NOT_VERIFIED"
+  },
+  {
+   "rank": 17,
+   "id": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16351",
+   "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+   "task_code": "CANARY-KMEANS-01",
+   "text": "CANARY-KMEANS-01 cuML/cuVS KMeans centroid routing (prefilter by cluster) as a sweep dimension; CPU-oracle parity first.",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 18,
+   "id": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4034",
+   "change_id": "parent-atlas-ontology-kernel",
+   "task_code": null,
+   "text": "Keep ontology tuple admission and GraphRAG/Qdrant fanout blocked until",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 19,
+   "id": "openspec/changes/legal-corpus-california-codes/tasks.md#L326",
+   "change_id": "legal-corpus-california-codes",
+   "task_code": "SEARCH-GOLDEN-01",
+   "text": "SEARCH-GOLDEN-01 DRAFT (2026-10-17, read-only, CREATED) `scripts/atlas/build_golden_query_candidates_v1.py` -> `docs/reports/golden-query-candidates-v1.jsonl` (",
+   "codeEvidenceFiles": [
+    "docs/architecture/_qdrant_ann_pipeline_toc.md",
+    "scripts/atlas/build_golden_legal_candidates_v1.py",
+    "scripts/atlas/build_golden_query_candidates_v1.py",
+    "scripts/atlas/kmeans_raw768_nprobe_sweep_v1.py"
+   ],
+   "runnableCandidates": [
+    "scripts/atlas/build_golden_legal_candidates_v1.py",
+    "scripts/atlas/build_golden_query_candidates_v1.py",
+    "scripts/atlas/kmeans_raw768_nprobe_sweep_v1.py"
+   ],
+   "mapping": "SCRIPT_OR_TEST_FOUND",
+   "confidence": "LOW_CODE_REFERENCE_NOT_VERIFIED"
+  },
+  {
+   "rank": 20,
+   "id": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4308",
+   "change_id": "parent-atlas-ontology-kernel",
+   "task_code": null,
+   "text": "Keep ontology tuple admission and GraphRAG/Qdrant fanout blocked until",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 21,
+   "id": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L12621",
+   "change_id": "parent-atlas-retrieval-lineage-dag-convergence",
+   "task_code": null,
+   "text": "Keep the terminal execution gate blocked until the exact execution",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 22,
+   "id": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L398",
+   "change_id": "parent-atlas-retrieval-staging-planes",
+   "task_code": "FEAT-LIVE-01",
+   "text": "FEAT-LIVE-01-RECONCILE (2026-09-20, from a parallel session's report; verified only that the remote branch and diff exist): DRAFT PR #99 `Parent Atlas: bound li",
+   "codeEvidenceFiles": [
+    "sveltekit-frontend/scripts/atlas/dry-run-search-runtime-normalizer-v1.mts",
+    "sveltekit-frontend/src/lib/server/atlas/features/search-runtime-candidate-normalizer-v1.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/features/search-runtime-candidate-normalizer-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-live-feature-join-v1.ts"
+   ],
+   "runnableCandidates": [
+    "sveltekit-frontend/scripts/atlas/dry-run-search-runtime-normalizer-v1.mts",
+    "sveltekit-frontend/src/lib/server/atlas/features/search-runtime-candidate-normalizer-v1.spec.ts"
+   ],
+   "mapping": "SCRIPT_OR_TEST_FOUND",
+   "confidence": "LOW_CODE_REFERENCE_NOT_VERIFIED"
+  },
+  {
+   "rank": 23,
+   "id": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L307",
+   "change_id": "parent-atlas-gpu-sidecar-patch-tournament",
+   "task_code": "KNN-TOPK-02",
+   "text": "**KNN-TOPK-02 Tie-break rule (blocking).** The source now uses a shared deterministic final ordering: higher-is-better score descending or cuVS distance ascendi",
+   "codeEvidenceFiles": [
+    "python/atlas_rapids_sidecar.py"
+   ],
+   "runnableCandidates": [
+    "python/atlas_rapids_sidecar.py"
+   ],
+   "mapping": "SCRIPT_OR_TEST_FOUND",
+   "confidence": "LOW_CODE_REFERENCE_NOT_VERIFIED"
+  },
+  {
+   "rank": 24,
+   "id": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4053",
+   "change_id": "parent-atlas-ontology-kernel",
+   "task_code": null,
+   "text": "Keep ontology tuple admission, OAK fanout, GraphRAG, and Qdrant plans",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 25,
+   "id": "openspec/changes/atlas-directory-first-analysis-v1/tasks.md#L70",
+   "change_id": "atlas-directory-first-analysis-v1",
+   "task_code": null,
+   "text": "3.4 Measure end-to-end parsing and clustering cost, including JSON decode, host/device transfer, memory, and CPU baseline; evaluate SIMDJSON versus GPJSON befor",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 26,
+   "id": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L3805",
+   "change_id": "parent-atlas-ontology-kernel",
+   "task_code": null,
+   "text": "Keep ontology tuple admission and GraphRAG fanout blocked until exact",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 27,
+   "id": "openspec/changes/atlas-feature-intelligence/tasks.md#L167",
+   "change_id": "atlas-feature-intelligence",
+   "task_code": null,
+   "text": "FI-16I Add query-conditioned PPR executor over relationship/incidence candidates and write revisioned receipts. **The existing deterministic CPU PPR executor is",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 28,
+   "id": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L342",
+   "change_id": "parent-atlas-retrieval-staging-planes",
+   "task_code": "DIM-06",
+   "text": "DIM-06 (finding 2026-09-20, read-only; operator remark 'we copied over / replaced content_embedding_384 with 768' checked against live data) The 768 lane is SPL",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 29,
+   "id": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L88",
+   "change_id": "parent-atlas-gpu-sidecar-patch-tournament",
+   "task_code": "GPU-26",
+   "text": "GPU-26 metric equivalence for float32 `semantic_768` cosine ranking.",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 30,
+   "id": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L721",
+   "change_id": "parent-atlas-gpu-sidecar-patch-tournament",
+   "task_code": "TOUR-COMPUTE-01",
+   "text": "TOUR-COMPUTE-01 Use bounded CPU workers and deterministic ranking on a qualified frozen candidate map first. Benchmark parsing/embedding/traversal separately; S",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 31,
+   "id": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L15873",
+   "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+   "task_code": "GRAPH-GPU-07",
+   "text": "**GRAPH-GPU-07** Only after CPU parity, immutable mmap/Arrow artifact checksums,",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 32,
+   "id": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L210",
+   "change_id": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+   "task_code": "LOD-01",
+   "text": "**LOD-01** Produce a read-only memory census with separate measurements for canonical FP32 bytes, Python/NumPy RSS, Rust N-API RSS if built, Arrow/mmap virtual ",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 33,
+   "id": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L12385",
+   "change_id": "parent-atlas-retrieval-lineage-dag-convergence",
+   "task_code": null,
+   "text": "Obtain a snapshot-native terminal Graphify execution with V2 immutable",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 34,
+   "id": "openspec/changes/legal-corpus-california-codes/tasks.md#L361",
+   "change_id": "legal-corpus-california-codes",
+   "task_code": "TP-7",
+   "text": "TP-7 SIMT / cuTile: only for TENSOR work that is a measured bottleneck after the above (for example nearest-centroid assignment, top-k, normalisation); the embe",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 35,
+   "id": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4176",
+   "change_id": "parent-atlas-ontology-kernel",
+   "task_code": null,
+   "text": "Keep tuple admission and downstream GraphRAG/Qdrant fanout blocked; no",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 36,
+   "id": "openspec/changes/legal-corpus-california-codes/tasks.md#L327",
+   "change_id": "legal-corpus-california-codes",
+   "task_code": "SEARCH-GOLDEN-01",
+   "text": "SEARCH-GOLDEN-01 LEGAL DRAFT (2026-10-17, read-only, CREATED) Located the statute corpus: `legal_chunks` (60,432 rows, 60,431 with `embedding vector(768)`, `tsv",
+   "codeEvidenceFiles": [
+    "docs/architecture/_qdrant_ann_pipeline_toc.md",
+    "scripts/atlas/build_golden_legal_candidates_v1.py",
+    "scripts/atlas/build_golden_query_candidates_v1.py",
+    "scripts/atlas/kmeans_raw768_nprobe_sweep_v1.py"
+   ],
+   "runnableCandidates": [
+    "scripts/atlas/build_golden_legal_candidates_v1.py",
+    "scripts/atlas/build_golden_query_candidates_v1.py",
+    "scripts/atlas/kmeans_raw768_nprobe_sweep_v1.py"
+   ],
+   "mapping": "SCRIPT_OR_TEST_FOUND",
+   "confidence": "LOW_CODE_REFERENCE_NOT_VERIFIED"
+  },
+  {
+   "rank": 37,
+   "id": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L439",
+   "change_id": "parent-atlas-graph-retrieval-proof",
+   "task_code": null,
+   "text": "**Not started**: the full PAW1-PAW14 ledger across capability groups A-L (active/git-diff context, recommendation supersession, validation receipts, hot/warm/co",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 38,
+   "id": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L618",
+   "change_id": "parent-atlas-retrieval-logic-convergence",
+   "task_code": "SEARCH-FABRIC-05",
+   "text": "**SEARCH-FABRIC-05 — pgvector HNSW parity vs exact oracle.** Reuse ONE of the two existing scripts",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 39,
+   "id": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L13833",
+   "change_id": "parent-atlas-retrieval-lineage-dag-convergence",
+   "task_code": null,
+   "text": "Bind a future terminal Graphify execution to this exact admitted",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 40,
+   "id": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4527",
+   "change_id": "parent-atlas-ontology-kernel",
+   "task_code": null,
+   "text": "Keep ontology admission blocked; no tuple, alias, source, or graph",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 41,
+   "id": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L958",
+   "change_id": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+   "task_code": "P24-LINEAGE-01",
+   "text": "**P24-LINEAGE-01 — Reconcile the live function identity chain.** Repair the producer/materializer contract so each `atlas_callable_search` candidate resolves to",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 42,
+   "id": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L17892",
+   "change_id": "parent-atlas-neural-prefill-encoder",
+   "task_code": null,
+   "text": "NE-23N6 Executor-role proof: for one frozen read-only fixture, prove decode (`NODE_JSON`/`SIMDJSON`), domain classification (NB/LR only when artifacts are TRAIN",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 43,
+   "id": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L66",
+   "change_id": "parent-atlas-gpu-compute-lanes-consolidation",
+   "task_code": "DEPENDENCY-CAPABILITY-GUARD-01",
+   "text": "**DEPENDENCY-CAPABILITY-GUARD-01 follow-up** `docker/atlas-gpu-8098/Dockerfile` builds from full `rapidsai/base` but only imports `cudf`/`cugraph`; `graph.jacca",
+   "codeEvidenceFiles": [
+    "docs/architecture/PARENT-ATLAS-STUDIO-AWARENESS-TOURNAMENT.md"
+   ],
+   "runnableCandidates": [],
+   "mapping": "CODE_REFERENCE_ONLY",
+   "confidence": "DOC_REFERENCE_ONLY"
+  },
+  {
+   "rank": 44,
+   "id": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L1046",
+   "change_id": "parent-atlas-nlp-sidecar-feature-compiler",
+   "task_code": "PGVECTOR-06",
+   "text": "PGVECTOR-06 CONSUMER STREAMS: FeatureMatrix / KMeans / KNN read chunks through the same keyset/cursor stream into Arrow/mmap artifacts keyed by CandidateOrdinal",
+   "codeEvidenceFiles": [
+    "scripts/atlas/audit-postgres-index-capability-v1.mjs"
+   ],
+   "runnableCandidates": [
+    "scripts/atlas/audit-postgres-index-capability-v1.mjs"
+   ],
+   "mapping": "SCRIPT_OR_TEST_FOUND",
+   "confidence": "LOW_CODE_REFERENCE_NOT_VERIFIED"
+  },
+  {
+   "rank": 45,
+   "id": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4212",
+   "change_id": "parent-atlas-ontology-kernel",
+   "task_code": null,
+   "text": "Keep OAK resolution, tuple admission, and GraphRAG/Qdrant fanout closed",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 46,
+   "id": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L890",
+   "change_id": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+   "task_code": "PIPE-E2E-06",
+   "text": "**PIPE-E2E-06 — Prove graph/GPU challenger parity.** Use the same frozen graph/vector snapshot and revision-qualified ordinal mapping for NetworkX/CPU and optio",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 47,
+   "id": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L1015",
+   "change_id": "parent-atlas-ace-bitfrost-cache-correctness",
+   "task_code": null,
+   "text": "11D-CENTROID-COSINE-INDEX-01 — reuse `CentroidManifestV1`/`CentroidArtifactV1` to build a deterministic cosine-ranked centroid list and `centroidId` lookup dict",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  },
+  {
+   "rank": 48,
+   "id": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L343",
+   "change_id": "parent-atlas-retrieval-staging-planes",
+   "task_code": "DIM-07",
+   "text": "DIM-07 (finding 2026-09-20, read-only; follows DIM-06) Qdrant 768 collections vs Postgres columns — sample parity check (scratch script in the session scratchpa",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 49,
+   "id": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L5453",
+   "change_id": "parent-atlas-ontology-kernel",
+   "task_code": "OAK-HYPERGRAPH-01",
+   "text": "OAK-HYPERGRAPH-01 Reuse the role-preserving `OntologyLinkedTupleV1`/NetworkX projection and existing HyperGraphRAG owners for typed traversal; PageRank and cosi",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "NONE"
+  },
+  {
+   "rank": 50,
+   "id": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L1016",
+   "change_id": "parent-atlas-ace-bitfrost-cache-correctness",
+   "task_code": null,
+   "text": "11D-CENTROID-CANDIDATE-CROSSWALK-01 — resolve `CentroidCardV1.exemplarOrdinals` only through an integrity-checked `CandidateOrdinalMapV1` whose workspace revisi",
+   "codeEvidenceFiles": [],
+   "runnableCandidates": [],
+   "mapping": "NO_TOOL_FOUND",
+   "confidence": "UNMAPPABLE_NO_TASK_CODE"
+  }
+ ]
+}

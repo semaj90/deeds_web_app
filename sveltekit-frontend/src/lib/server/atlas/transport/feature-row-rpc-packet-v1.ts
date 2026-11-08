@@ -468,3 +468,263 @@ export function paginateTopkRecommendationsFromPacketV1(
 		items,
 	};
 }
+
+export const FEATURE_ROW_RPC_RESULT_ENVELOPE_SCHEMA_V1 = 'atlas.feature-row-rpc-result-envelope.v1' as const;
+
+export const FeatureRowRpcResultEnvelopeV1Schema = z
+	.object({
+		schema: z.literal(FEATURE_ROW_RPC_RESULT_ENVELOPE_SCHEMA_V1),
+		inputPacketChecksumSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+		ordinalBindingChecksumSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/).nullable().optional(),
+		workspaceRevision: z.string().min(1),
+		modelRevision: z.string().min(1),
+		rankingAlgorithm: z.string().min(1),
+		selectedOrdinals: z.array(z.number().int().nonnegative()),
+		selectedCanonicalIds: z.array(z.string().min(1)),
+		scores: z.array(z.number()),
+		executionReceiptSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+		artifactRef: z.string().nullable().optional(),
+		checksumSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+		canonicalAuthority: z.literal(false),
+		writesPerformed: z.literal(false),
+	})
+	.strict()
+	.superRefine((env, ctx) => {
+		if (env.selectedOrdinals.length !== env.selectedCanonicalIds.length) {
+			ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'SELECTED_ORDINALS_CANONICAL_IDS_LENGTH_MISMATCH' });
+		}
+		if (env.selectedOrdinals.length !== env.scores.length) {
+			ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'SELECTED_ORDINALS_SCORES_LENGTH_MISMATCH' });
+		}
+	});
+
+export type FeatureRowRpcResultEnvelopeV1 = z.infer<typeof FeatureRowRpcResultEnvelopeV1Schema>;
+
+export function createFeatureRowRpcResultEnvelopeV1(input: {
+	inputPacket: FeatureRowRpcPacketV1;
+	ordinalBinding?: FeatureRowRpcOrdinalBindingV1 | null;
+	modelRevision: string;
+	rankingAlgorithm: string;
+	selectedOrdinals: number[];
+	selectedCanonicalIds: string[];
+	scores: number[];
+	executionReceiptSha256: string;
+	artifactRef?: string | null;
+}): FeatureRowRpcResultEnvelopeV1 {
+	FeatureRowRpcPacketV1Schema.parse(input.inputPacket);
+	if (input.ordinalBinding) {
+		FeatureRowRpcOrdinalBindingV1Schema.parse(input.ordinalBinding);
+		if (input.ordinalBinding.packetChecksumSha256 !== input.inputPacket.checksumSha256) {
+			throw new Error('FEATURE_ROW_RPC_RESULT_ORDINAL_BINDING_MISMATCH');
+		}
+	}
+	if (
+		input.selectedOrdinals.length !== input.selectedCanonicalIds.length ||
+		input.selectedOrdinals.length !== input.scores.length
+	) {
+		throw new Error('FEATURE_ROW_RPC_RESULT_LENGTH_MISMATCH');
+	}
+
+	const base = {
+		schema: FEATURE_ROW_RPC_RESULT_ENVELOPE_SCHEMA_V1,
+		inputPacketChecksumSha256: input.inputPacket.checksumSha256,
+		ordinalBindingChecksumSha256: input.ordinalBinding?.checksumSha256 ?? null,
+		workspaceRevision: input.inputPacket.workspaceRevision,
+		modelRevision: input.modelRevision,
+		rankingAlgorithm: input.rankingAlgorithm,
+		selectedOrdinals: [...input.selectedOrdinals],
+		selectedCanonicalIds: [...input.selectedCanonicalIds],
+		scores: [...input.scores],
+		executionReceiptSha256: input.executionReceiptSha256,
+		artifactRef: input.artifactRef ?? null,
+		canonicalAuthority: false as const,
+		writesPerformed: false as const,
+	};
+	const checksumSha256 = sha256(JSON.stringify(base));
+	return FeatureRowRpcResultEnvelopeV1Schema.parse({
+		...base,
+		checksumSha256,
+	});
+}
+
+export function verifyFeatureRowRpcResultEnvelopeV1(
+	envelope: FeatureRowRpcResultEnvelopeV1,
+	expectedInputPacket: FeatureRowRpcPacketV1,
+): boolean {
+	const parsedEnv = FeatureRowRpcResultEnvelopeV1Schema.parse(envelope);
+	const parsedPacket = FeatureRowRpcPacketV1Schema.parse(expectedInputPacket);
+
+	if (parsedEnv.inputPacketChecksumSha256 !== parsedPacket.checksumSha256) {
+		return false;
+	}
+	if (parsedEnv.workspaceRevision !== parsedPacket.workspaceRevision) {
+		return false;
+	}
+	const { checksumSha256, ...base } = parsedEnv;
+	return checksumSha256 === sha256(JSON.stringify(base));
+}
+
+// ============================================================================
+// Phase 17: Low-Rank Keyframe Chunk (v2, 64-Byte) & TurboVec 24B SIMT Mappings
+// ============================================================================
+
+export const LOWRANK_KEYFRAME_CHUNK_SIZE_V2 = 64 as const;
+export const TURBOVEC_FEATURE_ROW_SIZE_24B = 24 as const;
+
+export interface LowRankKeyframeChunk64BV2 {
+	morton: number;
+	ordinal: number;
+	cluster: number;
+	reserved: number;
+	pos: [number, number, number];
+	finalScore: number;
+	feature: [number, number, number, number, number, number, number, number];
+}
+
+export interface TurboVecFeatureRow24B {
+	lexical: number;
+	dense: number;
+	sparse: number;
+	pagerank: number;
+	clusterId: number;
+	flags: number;
+	ordinal: number;
+}
+
+/**
+ * Decodes contiguous 64-byte keyframe chunks (v2 layout):
+ * u32 morton | u32 ordinal | u16 cluster | u16 reserved (0) |
+ * f32 pos[3] | f64 finalScore | f32 feature[8]
+ */
+export function decodeLowRankKeyframeChunks64BV2(
+	bytes: Uint8Array | ArrayBuffer,
+	expectedCount?: number,
+): LowRankKeyframeChunk64BV2[] {
+	const buf = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+	if (buf.byteLength % LOWRANK_KEYFRAME_CHUNK_SIZE_V2 !== 0) {
+		throw new Error(
+			`CHUNK_BUFFER_MISALIGNED: byteLength ${buf.byteLength} is not a multiple of ${LOWRANK_KEYFRAME_CHUNK_SIZE_V2}`,
+		);
+	}
+	const count = buf.byteLength / LOWRANK_KEYFRAME_CHUNK_SIZE_V2;
+	if (expectedCount !== undefined && count !== expectedCount) {
+		throw new Error(`CHUNK_COUNT_MISMATCH: expected ${expectedCount}, got ${count}`);
+	}
+	const view = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+	const records: LowRankKeyframeChunk64BV2[] = new Array(count);
+
+	for (let i = 0; i < count; i++) {
+		const offset = i * LOWRANK_KEYFRAME_CHUNK_SIZE_V2;
+		const ordinal = view.getUint32(offset + 4, true);
+		const reserved = view.getUint16(offset + 10, true);
+		if (reserved !== 0) {
+			throw new Error(`RESERVED_NONZERO_AT_INDEX_${i}: got ${reserved}`);
+		}
+		records[i] = {
+			morton: view.getUint32(offset, true),
+			ordinal,
+			cluster: view.getUint16(offset + 8, true),
+			reserved,
+			pos: [
+				view.getFloat32(offset + 12, true),
+				view.getFloat32(offset + 16, true),
+				view.getFloat32(offset + 20, true),
+			],
+			finalScore: view.getFloat64(offset + 24, true),
+			feature: [
+				view.getFloat32(offset + 32, true),
+				view.getFloat32(offset + 36, true),
+				view.getFloat32(offset + 40, true),
+				view.getFloat32(offset + 44, true),
+				view.getFloat32(offset + 48, true),
+				view.getFloat32(offset + 52, true),
+				view.getFloat32(offset + 56, true),
+				view.getFloat32(offset + 60, true),
+			],
+		};
+	}
+	return records;
+}
+
+/**
+ * Encodes keyframe chunks into contiguous 64-byte little-endian records.
+ */
+export function encodeLowRankKeyframeChunks64BV2(chunks: LowRankKeyframeChunk64BV2[]): Uint8Array {
+	const out = new Uint8Array(chunks.length * LOWRANK_KEYFRAME_CHUNK_SIZE_V2);
+	const view = new DataView(out.buffer, out.byteOffset, out.byteLength);
+
+	for (let i = 0; i < chunks.length; i++) {
+		const offset = i * LOWRANK_KEYFRAME_CHUNK_SIZE_V2;
+		const c = chunks[i];
+		view.setUint32(offset, c.morton, true);
+		view.setUint32(offset + 4, c.ordinal, true);
+		view.setUint16(offset + 8, c.cluster, true);
+		view.setUint16(offset + 10, 0, true);
+		view.setFloat32(offset + 12, c.pos[0], true);
+		view.setFloat32(offset + 16, c.pos[1], true);
+		view.setFloat32(offset + 20, c.pos[2], true);
+		view.setFloat64(offset + 24, c.finalScore, true);
+		for (let k = 0; k < 8; k++) {
+			view.setFloat32(offset + 32 + 4 * k, c.feature[k] ?? 0, true);
+		}
+	}
+	return out;
+}
+
+/**
+ * Decodes contiguous 24-byte TurboVec feature rows:
+ * f32 lexical | f32 dense | f32 sparse | f32 pagerank | u16 clusterId | u16 flags | u32 ordinal
+ */
+export function decodeTurboVecFeatureRows24B(
+	bytes: Uint8Array | ArrayBuffer,
+	expectedCount?: number,
+): TurboVecFeatureRow24B[] {
+	const buf = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+	if (buf.byteLength % TURBOVEC_FEATURE_ROW_SIZE_24B !== 0) {
+		throw new Error(
+			`TURBOVEC_BUFFER_MISALIGNED: byteLength ${buf.byteLength} is not a multiple of ${TURBOVEC_FEATURE_ROW_SIZE_24B}`,
+		);
+	}
+	const count = buf.byteLength / TURBOVEC_FEATURE_ROW_SIZE_24B;
+	if (expectedCount !== undefined && count !== expectedCount) {
+		throw new Error(`TURBOVEC_ROW_COUNT_MISMATCH: expected ${expectedCount}, got ${count}`);
+	}
+	const view = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+	const rows: TurboVecFeatureRow24B[] = new Array(count);
+
+	for (let i = 0; i < count; i++) {
+		const offset = i * TURBOVEC_FEATURE_ROW_SIZE_24B;
+		rows[i] = {
+			lexical: view.getFloat32(offset, true),
+			dense: view.getFloat32(offset + 4, true),
+			sparse: view.getFloat32(offset + 8, true),
+			pagerank: view.getFloat32(offset + 12, true),
+			clusterId: view.getUint16(offset + 16, true),
+			flags: view.getUint16(offset + 18, true),
+			ordinal: view.getUint32(offset + 20, true),
+		};
+	}
+	return rows;
+}
+
+/**
+ * Encodes 24-byte TurboVec feature rows into a contiguous Uint8Array.
+ */
+export function encodeTurboVecFeatureRows24B(rows: TurboVecFeatureRow24B[]): Uint8Array {
+	const out = new Uint8Array(rows.length * TURBOVEC_FEATURE_ROW_SIZE_24B);
+	const view = new DataView(out.buffer, out.byteOffset, out.byteLength);
+
+	for (let i = 0; i < rows.length; i++) {
+		const offset = i * TURBOVEC_FEATURE_ROW_SIZE_24B;
+		const r = rows[i];
+		view.setFloat32(offset, r.lexical, true);
+		view.setFloat32(offset + 4, r.dense, true);
+		view.setFloat32(offset + 8, r.sparse, true);
+		view.setFloat32(offset + 12, r.pagerank, true);
+		view.setUint16(offset + 16, r.clusterId, true);
+		view.setUint16(offset + 18, r.flags, true);
+		view.setUint32(offset + 20, r.ordinal, true);
+	}
+	return out;
+}
+

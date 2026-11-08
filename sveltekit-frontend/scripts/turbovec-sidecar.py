@@ -319,6 +319,117 @@ def load_from_qdrant():
 
     return len(ids)
 
+# ── Shared search + MCP surface ──────────────────────────────────────────────
+def run_search(vec, k, wanted):
+    """Single search owner for POST /search and POST /mcp (turbovec_search).
+
+    Returns (http_status, payload). Read-only: never mutates the index and never
+    mints identity. Output is a CHALLENGER_ONLY ANN prefilter result.
+    """
+    with index_lock:
+        if ann_index is None or not TURBOVEC_OK:
+            return 200, {"ids": [], "scores": [], "fallback": True}
+        if len(vec) > DIM:
+            vec = project(vec[:FULL_DIM])
+            if vec is None:
+                return 400, {"error": "zero-norm query prefix"}
+        q = np.array([vec], dtype=np.float32)
+        allowed = None
+        if wanted and ann_domain is not None:
+            allowed = {domain_ordinals[d] for d in wanted if d in domain_ordinals}
+        fetch = min(len(ann_ids), k * 12) if allowed is not None else min(k, len(ann_ids))
+        scores, indices = ann_index.search(q, k=fetch)
+        if allowed is not None:
+            keep = [j for j, i in enumerate(indices[0])
+                    if i < len(ann_ids) and int(ann_domain[i]) in allowed][:k]
+            indices = np.array([[indices[0][j] for j in keep]])
+            scores = np.array([[scores[0][j] for j in keep]])
+        result_ids = [ann_ids[i] for i in indices[0] if i < len(ann_ids)]
+        result_scores = [float(s) for s in scores[0][:len(result_ids)]]
+        result_candidates = []
+        for rank, (idx, score) in enumerate(zip(indices[0], scores[0])):
+            if idx >= len(ann_ids):
+                continue
+            candidate = {
+                "id": ann_ids[idx],
+                "score": float(score),
+                "cluster": 0,
+                "rank": rank,
+            }
+            identity = ann_identity[idx] if idx < len(ann_identity) else {}
+            if identity:
+                candidate["identity"] = identity
+            result_candidates.append(candidate)
+        return 200, {
+            "ids": result_ids,
+            "scores": result_scores,
+            "candidates": result_candidates,
+            "indexed": len(ann_ids),
+        }
+
+MCP_PROTOCOL_VERSION = "2025-03-26"
+MCP_TOOLS = [{
+    "name": "turbovec_search",
+    "description": ("Read-only CHALLENGER_ONLY ANN prefilter over the MRL-128 TurboVec index. "
+                    "Returns candidate ids and scores only; never identity, never a retrieval vote. "
+                    "Rescore exactly against 768-d canonical vectors before use."),
+    "inputSchema": {
+        "type": "object",
+        "properties": {
+            "vector": {"type": "array", "items": {"type": "number"}, "minItems": 1},
+            "k": {"type": "integer", "minimum": 1, "maximum": 1000},
+            "domains": {"type": "array", "items": {"type": "string"}},
+        },
+        "required": ["vector"],
+    },
+}]
+
+def _is_number_list(v):
+    return (isinstance(v, list) and len(v) > 0 and
+            all(isinstance(x, (int, float)) and not isinstance(x, bool) for x in v))
+
+def mcp_dispatch(msg):
+    """JSON-RPC 2.0 over stateless HTTP. Returns a response dict, or None for notifications."""
+    if not isinstance(msg, dict) or msg.get("jsonrpc") != "2.0":
+        return {"jsonrpc": "2.0", "id": None, "error": {"code": -32600, "message": "invalid request"}}
+    mid = msg.get("id")
+    method = msg.get("method")
+    params = msg.get("params") or {}
+    if mid is None:
+        return None  # notification, e.g. notifications/initialized: no response body
+    if method == "initialize":
+        return {"jsonrpc": "2.0", "id": mid, "result": {
+            "protocolVersion": MCP_PROTOCOL_VERSION,
+            "capabilities": {"tools": {}},
+            "serverInfo": {"name": "turbovec-sidecar", "version": "1"},
+        }}
+    if method == "tools/list":
+        return {"jsonrpc": "2.0", "id": mid, "result": {"tools": MCP_TOOLS}}
+    if method == "tools/call":
+        if params.get("name") != "turbovec_search":
+            return {"jsonrpc": "2.0", "id": mid, "error": {"code": -32602, "message": "unknown tool"}}
+        a = params.get("arguments") or {}
+        vec = a.get("vector")
+        if not _is_number_list(vec):
+            return {"jsonrpc": "2.0", "id": mid, "result": {
+                "content": [{"type": "text", "text": json.dumps({"error": "vector must be a non-empty number array"})}],
+                "isError": True}}
+        try:
+            k = min(max(int(a.get("k", DEFAULT_K)), 1), 1000)
+        except (TypeError, ValueError):
+            k = DEFAULT_K
+        wanted = a.get("domains")
+        if wanted is not None and not (isinstance(wanted, list) and all(isinstance(d, str) for d in wanted)):
+            return {"jsonrpc": "2.0", "id": mid, "result": {
+                "content": [{"type": "text", "text": json.dumps({"error": "domains must be a string array"})}],
+                "isError": True}}
+        status, payload = run_search(vec, k, wanted)
+        return {"jsonrpc": "2.0", "id": mid, "result": {
+            "content": [{"type": "text", "text": json.dumps(payload)}],
+            "isError": status != 200}}
+    return {"jsonrpc": "2.0", "id": mid, "error": {"code": -32601, "message": f"method not found: {method}"}}
+
+
 # ── HTTP Handler ─────────────────────────────────────────────────────────────
 class SidecarHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
@@ -355,6 +466,12 @@ class SidecarHandler(BaseHTTPRequestHandler):
             # Trigger async reindex
             threading.Thread(target=load_index, daemon=True).start()
             self.send_json(202, {"status": "reindexing"})
+        elif self.path == '/mcp':
+            # Streamable HTTP MCP is POST-only in this stateless server
+            self.send_response(405)
+            self.send_header('Allow', 'POST')
+            self.send_header('Content-Length', '0')
+            self.end_headers()
         else:
             self.send_json(404, {"error": "not found"})
 
@@ -363,59 +480,34 @@ class SidecarHandler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-Length", 0))
         body = self.rfile.read(length)
 
+        if self.path == '/mcp':
+            try:
+                msg = json.loads(body)
+            except Exception as e:
+                self.send_json(400, {"jsonrpc": "2.0", "id": None,
+                                     "error": {"code": -32700, "message": f"parse error: {e}"}})
+                return
+            try:
+                resp = mcp_dispatch(msg)
+            except Exception as e:
+                traceback.print_exc()
+                resp = {"jsonrpc": "2.0", "id": msg.get("id") if isinstance(msg, dict) else None,
+                        "error": {"code": -32603, "message": str(e)}}
+            if resp is None:
+                self.send_response(202)
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+            else:
+                self.send_json(200, resp)
+            return
+
         if self.path == '/search':
             try:
                 req = json.loads(body)
                 vec = req.get("vector", [])
                 k   = min(int(req.get("k", DEFAULT_K)), 1000)
-
-                with index_lock:
-                    if ann_index is None or not TURBOVEC_OK:
-                        self.send_json(200, {"ids": [], "scores": [], "fallback": True})
-                        return
-
-                    # Project to index dim if needed
-                    if len(vec) > DIM:
-                        vec = project(vec[:FULL_DIM])
-                        if vec is None:
-                            self.send_json(400, {"error": "zero-norm query prefix"})
-                            return
-                    
-                    q = np.array([vec], dtype=np.float32)
-                    wanted = req.get("domains")
-                    allowed = None
-                    if wanted and ann_domain is not None:
-                        allowed = {domain_ordinals[d] for d in wanted if d in domain_ordinals}
-                    fetch = min(len(ann_ids), k * 12) if allowed is not None else min(k, len(ann_ids))
-                    scores, indices = ann_index.search(q, k=fetch)
-                    if allowed is not None:
-                        keep = [j for j, i in enumerate(indices[0])
-                                if i < len(ann_ids) and int(ann_domain[i]) in allowed][:k]
-                        indices = np.array([[indices[0][j] for j in keep]])
-                        scores = np.array([[scores[0][j] for j in keep]])
-                    result_ids = [ann_ids[i] for i in indices[0] if i < len(ann_ids)]
-                    result_scores = [float(s) for s in scores[0][:len(result_ids)]]
-                    result_candidates = []
-                    for rank, (idx, score) in enumerate(zip(indices[0], scores[0])):
-                        if idx >= len(ann_ids):
-                            continue
-                        candidate = {
-                            "id": ann_ids[idx],
-                            "score": float(score),
-                            "cluster": 0,
-                            "rank": rank,
-                        }
-                        identity = ann_identity[idx] if idx < len(ann_identity) else {}
-                        if identity:
-                            candidate["identity"] = identity
-                        result_candidates.append(candidate)
-
-                self.send_json(200, {
-                    "ids": result_ids,
-                    "scores": result_scores,
-                    "candidates": result_candidates,
-                    "indexed": len(ann_ids),
-                })
+                status, payload = run_search(vec, k, req.get("domains"))
+                self.send_json(status, payload)
             except Exception as e:
                 traceback.print_exc()
                 self.send_json(500, {"error": str(e)})

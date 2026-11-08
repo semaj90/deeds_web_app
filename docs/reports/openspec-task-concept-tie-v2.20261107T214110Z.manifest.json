@@ -1,0 +1,117 @@
+{
+  "schema": "atlas.openspec-task-concept-tie.v2",
+  "generatedAt": "2026-11-07T21:41:21.233717+00:00",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "catalog": {
+    "sources": [
+      "docs/reports/concept-seed-dry-v1.json",
+      ".okf/corpora/keyword-corpus.yaml"
+    ],
+    "status": "DRY_SEED_AND_OKF_REFERENCE_NOT_CANONICAL",
+    "exactCanonicalPhrases": 178,
+    "exactAliasTerms": 16,
+    "coarseDomainTerms": 16,
+    "excludedMetaOrPredicateTerms": 30,
+    "sourceRefBindings": 84
+  },
+  "genericTerms": [
+    "agent",
+    "alias",
+    "artifact",
+    "audit",
+    "capability",
+    "card",
+    "category",
+    "check",
+    "client",
+    "code",
+    "concept",
+    "data",
+    "domain",
+    "file",
+    "index",
+    "instance",
+    "lane",
+    "layer",
+    "model",
+    "module",
+    "operation",
+    "packet",
+    "page",
+    "protocol",
+    "query",
+    "relationship",
+    "route",
+    "schema",
+    "server",
+    "service",
+    "source",
+    "state",
+    "system",
+    "table",
+    "type",
+    "workflow"
+  ],
+  "coarseSingleWordDomains": [
+    "auth",
+    "cache",
+    "compiler",
+    "database",
+    "devops",
+    "docs",
+    "documentation",
+    "embedding",
+    "frontend",
+    "gpu",
+    "graph",
+    "inference",
+    "network",
+    "pipeline",
+    "postgres",
+    "programming",
+    "retrieval",
+    "search",
+    "security",
+    "storage",
+    "testing",
+    "topology"
+  ],
+  "lanes": {
+    "COARSE_DOMAIN_LEXICAL": {
+      "count": 1065,
+      "pct": 16.32
+    },
+    "EXACT_ALIAS": {
+      "count": 228,
+      "pct": 3.49
+    },
+    "EXACT_CANONICAL": {
+      "count": 3084,
+      "pct": 47.25
+    },
+    "GENERIC_ALIAS_EXCLUDED": {
+      "count": 1016,
+      "pct": 15.57
+    },
+    "UNKNOWN": {
+      "count": 1134,
+      "pct": 17.37
+    }
+  },
+  "classifier": {
+    "status": "FITTED_ON_DETERMINISTIC_SPECIFIC_TIES",
+    "trainingRows": 3302,
+    "distinctClasses": 16,
+    "heldOutTestSize": 662,
+    "nbHeldOutAccuracy": 0.6737,
+    "lrHeldOutAccuracy": 0.6208,
+    "proposalsAttached": 3215,
+    "nbLrAgreementCount": 1873,
+    "nbLrAgreementPct": 58.26
+  },
+  "tableDraft": "sveltekit-frontend/drizzle/manual/20261107_atlas_concept_tie_v2_DRAFT.sql (not applied)",
+  "outputs": {
+    "openspec-task-concept-tie-v2.20261107T214110Z.rows.jsonl": "sha256:65c0645111dfac2150ab7d5c8ea4150974bbc91356f3c821661f7dfbb76baf34"
+  }
+}

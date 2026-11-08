@@ -27,10 +27,27 @@ export type KarpathyHookInput = {
 	}>;
 };
 
+export type KarpathyPgVectorRow = {
+	chunkId: string;
+	fileId: string;
+	filePath: string;
+	contentHash: string;
+	pgTable: 'codebase_chunk_index';
+	pgColumn: 'content_embedding_768';
+	drizzleType: 'vector(768)';
+	representation: 'semantic_768';
+	vectorDim: 768;
+	nesLutHex: string;
+	domainKey: string;
+	summary: string;
+	tags: string[];
+};
+
 export type KarpathyHookOutput = {
 	runId: string;
 	chunks: any[];
 	summaries: any[];
+	pgvectorRows: KarpathyPgVectorRow[];
 	qdrantPayloads: any[];
 	neo4jEdges: any[];
 	libtorchRows: any[];
@@ -39,6 +56,7 @@ export type KarpathyHookOutput = {
 		filesSeen: number;
 		chunksCreated: number;
 		summariesCreated: number;
+		pgvectorRows: number;
 		qdrantPayloads: number;
 		neo4jEdges: number;
 		wikiNotes: number;
@@ -46,15 +64,48 @@ export type KarpathyHookOutput = {
 	};
 };
 
+function classifyKarpathyNesLut(filePath: string, content: string): { nesLutHex: string; domainKey: string } {
+	const corpus = `${filePath} ${content.slice(0, 600)}`.toLowerCase();
+	if (/auth|session|user|person|witness|biometric|guard/.test(corpus)) {
+		return { nesLutHex: '0x01', domainKey: 'WHO_IDENTITY_AUTH' };
+	}
+	if (/statut|u\.s\.c|corpus|glossary|indictment|citation|clause/.test(corpus)) {
+		return { nesLutHex: '0x02', domainKey: 'WHAT_STATUTE_CORPUS' };
+	}
+	if (/ledger|wire|financial|audit|telemetry|metric|otel|receipt/.test(corpus)) {
+		return { nesLutHex: '0x03', domainKey: 'WHY_LEDGER_MOTIVE' };
+	}
+	if (/glb|blender|mesh|rig|bone|mixamo|primitive|caliper|obb|three\.js|shader/.test(corpus)) {
+		return { nesLutHex: '0x04', domainKey: 'HOW_SCENE_3D_GLB' };
+	}
+	if (/seaweed|bucket|s3|upload|multipart|sha-?256|mime|blob/.test(corpus)) {
+		return { nesLutHex: '0x05', domainKey: 'STORAGE_SEAWEED_S3' };
+	}
+	if (/postgres|drizzle|pgvector|qdrant|sql|migration|schema|bytea|bitset|jsonb/.test(corpus)) {
+		return { nesLutHex: '0x06', domainKey: 'DATA_PG18_DRIZZLE' };
+	}
+	if (/bvh|raycast|tlas|blas|n64|arena|slot|fsm|xstate|stride/.test(corpus)) {
+		return { nesLutHex: '0x07', domainKey: 'ENGINE_BVH_N64_ARENA' };
+	}
+	if (/\bspz\b|\bsog\b|splat|playcanvas|lod|supersplat|gaussian/.test(corpus)) {
+		return { nesLutHex: '0x08', domainKey: 'SPLAT_SPZ_SOG_LOD' };
+	}
+	if (/ornith|gemma|llm|dspy|turbovec|cuda|aten|onnx|tensorrt|cuvs|knn|pagerank|ace|ai/.test(corpus)) {
+		return { nesLutHex: '0x09', domainKey: 'AGENT_ORNITH_RAG_GPU' };
+	}
+	return { nesLutHex: '0x0A', domainKey: 'UI_SVELTE5_BOARD' };
+}
+
 /**
  * Karpathy Hook: The bridge between raw search and structured memory.
- * Orchestrates metadata envelopes, vector payloads, graph edges, and GPU topology.
+ * Orchestrates metadata envelopes, canonical PostgreSQL 18 pgvector rows, Qdrant payloads, graph edges, and GPU topology.
  */
 export async function processKarpathyHook(input: KarpathyHookInput): Promise<KarpathyHookOutput> {
 	const output: KarpathyHookOutput = {
 		runId: input.runId,
 		chunks: [],
 		summaries: [],
+		pgvectorRows: [],
 		qdrantPayloads: [],
 		neo4jEdges: [],
 		libtorchRows: [],
@@ -63,6 +114,7 @@ export async function processKarpathyHook(input: KarpathyHookInput): Promise<Kar
 			filesSeen: 0,
 			chunksCreated: 0,
 			summariesCreated: 0,
+			pgvectorRows: 0,
 			qdrantPayloads: 0,
 			neo4jEdges: 0,
 			wikiNotes: 0,
@@ -137,7 +189,27 @@ export async function processKarpathyHook(input: KarpathyHookInput): Promise<Kar
 		output.chunks.push(chunk);
 		output.stats.chunksCreated++;
 
-		// 4. Qdrant Payload
+		const { nesLutHex, domainKey } = classifyKarpathyNesLut(file.filePath, file.content);
+
+		// 3.5 Canonical PostgreSQL 18 pgvector Row (Parent Atlas authority: codebase_chunk_index.content_embedding_768)
+		output.pgvectorRows.push({
+			chunkId: chunk.id,
+			fileId,
+			filePath: file.filePath,
+			contentHash: file.contentHash,
+			pgTable: 'codebase_chunk_index',
+			pgColumn: 'content_embedding_768',
+			drizzleType: 'vector(768)',
+			representation: 'semantic_768',
+			vectorDim: 768,
+			nesLutHex,
+			domainKey,
+			summary: cheapSummary,
+			tags: chunk.tags
+		});
+		output.stats.pgvectorRows++;
+
+		// 4. Qdrant Payload (Rebuildable projection of semantic_768)
 		output.qdrantPayloads.push({
 			id: chunk.id,
 			vector_type: 'chunk',
@@ -147,7 +219,9 @@ export async function processKarpathyHook(input: KarpathyHookInput): Promise<Kar
 				tags: chunk.tags,
 				hash: file.contentHash,
 				tier: 1,
-				summary: cheapSummary
+				summary: cheapSummary,
+				nesLutHex,
+				domainKey
 			}
 		});
 		output.stats.qdrantPayloads++;
@@ -160,7 +234,9 @@ export async function processKarpathyHook(input: KarpathyHookInput): Promise<Kar
 			directoryPath: dirPath,
 			tags: chunk.tags,
 			manifold4: tensor?.manifold4,
-			topoByte: tensor?.topoByte
+			topoByte: tensor?.topoByte,
+			nesLutHex,
+			domainKey
 		});
 		output.stats.libtorchRows++;
 

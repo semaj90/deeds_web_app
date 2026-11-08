@@ -9,7 +9,18 @@ import {
 	float32ToFloat16Bytes,
 	quantizeFloat32ToInt8,
 	paginateTopkRecommendationsFromPacketV1,
+	createFeatureRowRpcResultEnvelopeV1,
+	verifyFeatureRowRpcResultEnvelopeV1,
+	FEATURE_ROW_RPC_RESULT_ENVELOPE_SCHEMA_V1,
 	FEATURE_ROW_NUMERIC_COLS,
+	decodeLowRankKeyframeChunks64BV2,
+	encodeLowRankKeyframeChunks64BV2,
+	decodeTurboVecFeatureRows24B,
+	encodeTurboVecFeatureRows24B,
+	LOWRANK_KEYFRAME_CHUNK_SIZE_V2,
+	TURBOVEC_FEATURE_ROW_SIZE_24B,
+	type LowRankKeyframeChunk64BV2,
+	type TurboVecFeatureRow24B,
 } from './feature-row-rpc-packet-v1.js';
 
 describe('feature-row-rpc-packet-v1', () => {
@@ -230,5 +241,147 @@ describe('feature-row-rpc-packet-v1', () => {
 			binding: { ...binding, candidateOrdinals: [1] },
 			ordinalMap,
 		})).toThrow('FEATURE_ROW_RPC_ORDINAL_BINDING_MISMATCH');
+	});
+
+	it('creates and verifies a qualified FeatureRowRpcResultEnvelopeV1', () => {
+		const row = makeRow('item-env', 0.88);
+		const packet = buildFeatureRowRpcPacketV1([row]);
+
+		const receiptHash = 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+		const envelope = createFeatureRowRpcResultEnvelopeV1({
+			inputPacket: packet,
+			modelRevision: 'model-gemma-v1',
+			rankingAlgorithm: 'RRF_FUSION_V1',
+			selectedOrdinals: [0],
+			selectedCanonicalIds: [row.canonicalId],
+			scores: [0.88],
+			executionReceiptSha256: receiptHash,
+		});
+
+		expect(envelope.schema).toBe(FEATURE_ROW_RPC_RESULT_ENVELOPE_SCHEMA_V1);
+		expect(envelope.inputPacketChecksumSha256).toBe(packet.checksumSha256);
+		expect(envelope.workspaceRevision).toBe(packet.workspaceRevision);
+		expect(envelope.modelRevision).toBe('model-gemma-v1');
+		expect(envelope.selectedOrdinals).toEqual([0]);
+		expect(envelope.selectedCanonicalIds).toEqual([row.canonicalId]);
+		expect(envelope.scores).toEqual([0.88]);
+		expect(envelope.executionReceiptSha256).toBe(receiptHash);
+		expect(envelope.canonicalAuthority).toBe(false);
+		expect(envelope.writesPerformed).toBe(false);
+
+		expect(verifyFeatureRowRpcResultEnvelopeV1(envelope, packet)).toBe(true);
+
+		// Tampered packet should fail verification
+		const otherRow = makeRow('item-other', 0.5);
+		const otherPacket = buildFeatureRowRpcPacketV1([otherRow]);
+		expect(verifyFeatureRowRpcResultEnvelopeV1(envelope, otherPacket)).toBe(false);
+
+		// Length mismatch should throw on creation
+		expect(() =>
+			createFeatureRowRpcResultEnvelopeV1({
+				inputPacket: packet,
+				modelRevision: 'model-gemma-v1',
+				rankingAlgorithm: 'RRF_FUSION_V1',
+				selectedOrdinals: [0, 1],
+				selectedCanonicalIds: [row.canonicalId],
+				scores: [0.88],
+				executionReceiptSha256: receiptHash,
+			}),
+		).toThrow('FEATURE_ROW_RPC_RESULT_LENGTH_MISMATCH');
+	});
+
+	it('encodes and decodes v2 64-byte keyframe chunks with ordinal and reserved validation', () => {
+		const chunk1: LowRankKeyframeChunk64BV2 = {
+			morton: 1024,
+			ordinal: 0,
+			cluster: 3,
+			reserved: 0,
+			pos: [0.125, -0.5, 0.875],
+			finalScore: 0.91234567,
+			feature: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8],
+		};
+		const chunk2: LowRankKeyframeChunk64BV2 = {
+			morton: 2048,
+			ordinal: 1,
+			cluster: 7,
+			reserved: 0,
+			pos: [-0.25, 0.5, -0.75],
+			finalScore: 0.45678912,
+			feature: [0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1],
+		};
+
+		const encoded = encodeLowRankKeyframeChunks64BV2([chunk1, chunk2]);
+		expect(encoded.byteLength).toBe(2 * LOWRANK_KEYFRAME_CHUNK_SIZE_V2);
+
+		const decoded = decodeLowRankKeyframeChunks64BV2(encoded, 2);
+		expect(decoded.length).toBe(2);
+		expect(decoded[0].ordinal).toBe(0);
+		expect(decoded[0].cluster).toBe(3);
+		expect(decoded[0].reserved).toBe(0);
+		expect(decoded[0].morton).toBe(1024);
+		expect(decoded[0].pos[0]).toBeCloseTo(0.125, 5);
+		expect(decoded[0].finalScore).toBeCloseTo(0.91234567, 7);
+		expect(decoded[0].feature[7]).toBeCloseTo(0.8, 5);
+
+		expect(decoded[1].ordinal).toBe(1);
+		expect(decoded[1].cluster).toBe(7);
+
+		// Misaligned buffer rejected
+		expect(() => decodeLowRankKeyframeChunks64BV2(encoded.subarray(0, 100))).toThrow(
+			/CHUNK_BUFFER_MISALIGNED/,
+		);
+
+		// Count mismatch rejected
+		expect(() => decodeLowRankKeyframeChunks64BV2(encoded, 1)).toThrow(/CHUNK_COUNT_MISMATCH/);
+
+		// Nonzero reserved rejected
+		const corrupted = new Uint8Array(encoded);
+		corrupted[10] = 0x01; // set reserved byte
+		expect(() => decodeLowRankKeyframeChunks64BV2(corrupted)).toThrow(/RESERVED_NONZERO_AT_INDEX_0/);
+	});
+
+	it('encodes and decodes 24-byte TurboVec feature rows with field accuracy', () => {
+		const row1: TurboVecFeatureRow24B = {
+			lexical: 0.95,
+			dense: 0.88,
+			sparse: 0.45,
+			pagerank: 0.72,
+			clusterId: 12,
+			flags: 0x0003,
+			ordinal: 42,
+		};
+		const row2: TurboVecFeatureRow24B = {
+			lexical: 0.35,
+			dense: 0.62,
+			sparse: 0.15,
+			pagerank: 0.55,
+			clusterId: 4,
+			flags: 0x0001,
+			ordinal: 43,
+		};
+
+		const encoded = encodeTurboVecFeatureRows24B([row1, row2]);
+		expect(encoded.byteLength).toBe(2 * TURBOVEC_FEATURE_ROW_SIZE_24B);
+
+		const decoded = decodeTurboVecFeatureRows24B(encoded, 2);
+		expect(decoded.length).toBe(2);
+		expect(decoded[0].ordinal).toBe(42);
+		expect(decoded[0].clusterId).toBe(12);
+		expect(decoded[0].flags).toBe(0x0003);
+		expect(decoded[0].lexical).toBeCloseTo(0.95, 5);
+		expect(decoded[0].dense).toBeCloseTo(0.88, 5);
+		expect(decoded[0].sparse).toBeCloseTo(0.45, 5);
+		expect(decoded[0].pagerank).toBeCloseTo(0.72, 5);
+
+		expect(decoded[1].ordinal).toBe(43);
+		expect(decoded[1].clusterId).toBe(4);
+
+		// Misaligned buffer rejected
+		expect(() => decodeTurboVecFeatureRows24B(encoded.subarray(0, 30))).toThrow(
+			/TURBOVEC_BUFFER_MISALIGNED/,
+		);
+
+		// Count mismatch rejected
+		expect(() => decodeTurboVecFeatureRows24B(encoded, 5)).toThrow(/TURBOVEC_ROW_COUNT_MISMATCH/);
 	});
 });

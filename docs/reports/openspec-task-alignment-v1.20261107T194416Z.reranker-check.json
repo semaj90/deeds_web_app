@@ -1,0 +1,135 @@
+{
+  "metric": "alignment % = share of tasks with code-side evidence (ripgrep, outside tasks.md)",
+  "isGoldMetric": false,
+  "tasksTotal": 6527,
+  "tasksWithTaskCode": 2572,
+  "tasksWithCodeEvidence": 0,
+  "overallAlignmentPct": 0.0,
+  "alignmentPctOfTaskCodeTasks": 0.0,
+  "perRankBucket": [
+    {
+      "ranks": "1-100",
+      "tasks": 100,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "ranks": "101-500",
+      "tasks": 400,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "ranks": "501-1000",
+      "tasks": 500,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "ranks": "1001-3000",
+      "tasks": 2000,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "ranks": "3001-6527",
+      "tasks": 3527,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    }
+  ],
+  "top100VsRestLift": null,
+  "topChangesByAlignment": [
+    {
+      "change_id": "parent-atlas-neural-prefill-encoder",
+      "tasks": 692,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+      "tasks": 627,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "change_id": "parent-atlas-retrieval-lineage-dag-convergence",
+      "tasks": 323,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "change_id": "parent-atlas-best-fit-score-fabric",
+      "tasks": 292,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "change_id": "parent-atlas-ml-graph-retrieval-convergence",
+      "tasks": 182,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "change_id": "parent-atlas-governed-compute-fabric",
+      "tasks": 178,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "change_id": "parent-atlas-tensor-residency-integration",
+      "tasks": 169,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "change_id": "parent-atlas-candidate-feature-execution-fabric",
+      "tasks": 160,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "change_id": "parent-atlas-ontology-kernel",
+      "tasks": 160,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "change_id": "parent-atlas-pass-fabric",
+      "tasks": 148,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "change_id": "parent-atlas-agentic-completion",
+      "tasks": 146,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "change_id": "parent-atlas-graph-retrieval-proof",
+      "tasks": 128,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "change_id": "parent-atlas-gpu-sidecar-patch-tournament",
+      "tasks": 112,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "change_id": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "tasks": 97,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    },
+    {
+      "change_id": "parent-atlas-kv-cache-adaptation-research",
+      "tasks": 95,
+      "aligned": 0,
+      "alignmentPct": 0.0
+    }
+  ],
+  "note": "Lift > 1 means top-ranked tasks are more often code-evidenced. Not precision; no reviewed labels."
+}

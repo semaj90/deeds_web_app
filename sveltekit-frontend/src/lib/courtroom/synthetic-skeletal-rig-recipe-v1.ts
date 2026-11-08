@@ -17,7 +17,7 @@ const boundedMeters = z.number().finite().min(-50).max(50);
 const vec3 = z.tuple([boundedMeters, boundedMeters, boundedMeters]);
 const quaternion = z
   .tuple([z.number().finite(), z.number().finite(), z.number().finite(), z.number().finite()])
-  .refine((q) => Math.abs(q.reduce((sum, n) => sum + n * n, 0) - 1) <= 0.01, {
+  .refine((q) => Math.abs((q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]) - 1) <= 0.01, {
     message: 'Quaternion must have unit length (x, y, z, w)',
   });
 const boneName = z.string().min(1).max(100).regex(/^[A-Za-z0-9_.:-]+$/);
@@ -155,7 +155,7 @@ export function toCourtroomRestRig(recipe: SyntheticSkeletalRigRecipeV1): Rig {
   return recipe.skeleton.bones.map((bone) => ({
     name: bone.name,
     parent: bone.parent,
-    restLocal: bone.restLocalRotation,
+    restLocal: bone.restLocalRotation as [number, number, number, number],
   }));
 }
 

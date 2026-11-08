@@ -68,7 +68,7 @@ class KvFsmContext:
     """State context for the 5-State KV-Cache Swap FSM."""
     state: KvSwapState
     prefix_key: str
-    domain_id: int               # 0..8 canonical domain
+    domain_id: int               # 0..9 canonical domain
     lod_tier: int                # 1..20 ($1-$20 compute/token LoD budget)
     bifrost_hit: bool = False
     candidate_keys: List[str] = None
@@ -77,6 +77,14 @@ class KvFsmContext:
     retention_alpha: float = 1.0
     evicted: bool = False
     persisted: bool = False
+    # Honest execution & ownership metadata (never imply S2/S4 mutate external llama-server memory)
+    copy_backend_used: str = "NONE"
+    s2_stage_mode: str = "STATE_TRANSITION_ONLY"
+    s2_host_pinned_verified: bool = False
+    s4_policy_mode: str = "BOOLEAN_POLICY_DECISION_ONLY_NOT_EXTERNAL_RUNTIME_MUTATION"
+    cuda_stream_synchronized: bool = False
+    fence_epoch: int = 1
+    lease_expires_at_ms: Optional[int] = None
 
     def __post_init__(self):
         if self.candidate_keys is None:
@@ -95,14 +103,36 @@ def launch_kv_block_insert(
     lod_tier: int = 1,     # 1..20 ($1-$20 LoD cap on active blocks)
     *,
     use_cutile: bool = False,
+    require_pinned_host: bool = False,
+    synchronize: bool = True,
+    lease_expires_at_ms: Optional[int] = None,
+    now_ms: Optional[int] = None,
+    expected_fence_epoch: Optional[int] = None,
+    observed_fence_epoch: Optional[int] = None,
 ) -> int:
-    """Copies LoD-capped KV blocks from pinned mmap host memory into TRT-LLM paged device memory.
+    """Copies LoD-capped KV blocks from host memory into paged device memory.
     
     Uses an explicitly requested CUDA Tile scatter path when available;
-    otherwise uses PyTorch non-blocking transfer and index_copy_.
+    otherwise uses PyTorch transfer and index_copy_ fallback.
+    Enforces page bounds, uniqueness, dtype/shape parity, optional pinned-host check,
+    lease/epoch fencing, and stream synchronization on BOTH paths.
     """
     if not HAVE_TORCH or host_pinned_kv is None or device_paged_kv is None:
         return 0
+
+    if (
+        expected_fence_epoch is not None
+        and observed_fence_epoch is not None
+        and observed_fence_epoch < expected_fence_epoch
+    ):
+        raise ValueError("KV_STALE_FENCE_EPOCH_REJECTED")
+
+    if (
+        lease_expires_at_ms is not None
+        and now_ms is not None
+        and now_ms >= lease_expires_at_ms
+    ):
+        raise ValueError("KV_LEASE_EXPIRED_REJECTED")
 
     clamped_lod = min(max(lod_tier, 1), 20)
     # Scale active block count by LoD tier: LoD 1 = 4 blocks, LoD 20 = 80 blocks
@@ -117,6 +147,9 @@ def launch_kv_block_insert(
         raise ValueError("KV_BLOCK_SHAPE_MISMATCH")
     if host_pinned_kv.dtype != device_paged_kv.dtype:
         raise ValueError("KV_BLOCK_DTYPE_MISMATCH")
+    if require_pinned_host:
+        if host_pinned_kv.is_cuda or not bool(host_pinned_kv.is_pinned()):
+            raise ValueError("KV_HOST_TENSOR_MUST_BE_PINNED_CPU_MEMORY")
 
     active_blocks = min(
         int(host_pinned_kv.shape[0]),
@@ -127,6 +160,13 @@ def launch_kv_block_insert(
         return 0
 
     target_pages = page_table_map[:active_blocks]
+    # Validate bounds and uniqueness unconditionally for both cuTile and PyTorch paths
+    page_ids = target_pages.detach().to(device="cpu", dtype=torch.int64).tolist()
+    max_pages = int(device_paged_kv.shape[0])
+    if any(page_id < 0 or page_id >= max_pages for page_id in page_ids):
+        raise ValueError("CUTILE_KV_PAGE_ID_OUT_OF_RANGE")
+    if len(page_ids) != len(set(page_ids)):
+        raise ValueError("CUTILE_KV_PAGE_IDS_MUST_BE_UNIQUE")
 
     if use_cutile:
         if not CUTILE_AVAILABLE:
@@ -135,11 +175,6 @@ def launch_kv_block_insert(
             raise ValueError("CUTILE_KV_INSERT_REQUIRES_CUDA_DESTINATION")
         if not host_pinned_kv.is_contiguous() or not device_paged_kv.is_contiguous():
             raise ValueError("CUTILE_KV_INSERT_REQUIRES_CONTIGUOUS_TENSORS")
-        page_ids = target_pages.detach().to(device="cpu", dtype=torch.int64).tolist()
-        if any(page_id < 0 or page_id >= int(device_paged_kv.shape[0]) for page_id in page_ids):
-            raise ValueError("CUTILE_KV_PAGE_ID_OUT_OF_RANGE")
-        if len(page_ids) != len(set(page_ids)):
-            raise ValueError("CUTILE_KV_PAGE_IDS_MUST_BE_UNIQUE")
         src_slice = host_pinned_kv[:active_blocks].to(device_paged_kv.device, non_blocking=True).contiguous()
         device_pages = target_pages.to(device=device_paged_kv.device, dtype=torch.int32, non_blocking=True)
         source_flat = src_slice.view(-1)
@@ -148,21 +183,28 @@ def launch_kv_block_insert(
         total_elements = active_blocks * page_size
         tile_size = 256
         grid = ((total_elements + tile_size - 1) // tile_size, 1, 1)
+        stream = torch.cuda.current_stream(device_paged_kv.device)
         ct.launch(
-            torch.cuda.current_stream(device_paged_kv.device),
+            stream,
             grid,
             _scatter_kv_pages_cutile,
             (source_flat, destination_flat, device_pages, total_elements, page_size, tile_size),
         )
+        if synchronize:
+            stream.synchronize()
         return active_blocks
 
-    # PyTorch non-blocking H2D DMA copy
+    # PyTorch index_copy_ fallback path
     target_pages = target_pages.to(device=device_paged_kv.device, dtype=torch.int64, non_blocking=True)
     if device_paged_kv.is_cuda:
-        src_slice = host_pinned_kv[:active_blocks].to(device_paged_kv.device, non_blocking=True)
+        src_slice = host_pinned_kv[:active_blocks].to(
+            device_paged_kv.device,
+            non_blocking=bool(host_pinned_kv.is_pinned()),
+        )
         device_paged_kv.index_copy_(0, target_pages, src_slice)
+        if synchronize:
+            torch.cuda.current_stream(device_paged_kv.device).synchronize()
     else:
-        # CPU test / fallback path
         src_slice = host_pinned_kv[:active_blocks]
         device_paged_kv.index_copy_(0, target_pages, src_slice)
 
@@ -182,6 +224,12 @@ def step_kv_swap_fsm(
     page_table_map: Any = None,
     surprise_tau: float = 0.5,
     evict_tau: float = 0.3,
+    *,
+    use_cutile: bool = False,
+    require_pinned_host: bool = False,
+    synchronize: bool = True,
+    now_ms: Optional[int] = None,
+    expected_fence_epoch: Optional[int] = None,
 ) -> KvFsmContext:
     """Executes a single state transition or full cycle of the KV-cache swap FSM."""
     
@@ -198,7 +246,7 @@ def step_kv_swap_fsm(
             ctx.state = KvSwapState.S1_TURBOVEC_PREFILTER
         return ctx
 
-    # State 1: TurboVec Prefilter + Exact 768 Rescore
+    # State 1: TurboVec Prefilter
     elif ctx.state == KvSwapState.S1_TURBOVEC_PREFILTER:
         if turbovec_search_fn:
             ctx.candidate_keys = turbovec_search_fn(ctx.prefix_key, ctx.domain_id, top_k=200)
@@ -207,12 +255,22 @@ def step_kv_swap_fsm(
         ctx.state = KvSwapState.S2_MMAP_HOST_STAGE
         return ctx
 
-    # State 2: LoD ($1-$20) Slicing & Host MMap Staging
+    # State 2: Host Staging Inspection (honestly records whether a pinned host buffer was supplied)
     elif ctx.state == KvSwapState.S2_MMAP_HOST_STAGE:
+        if host_pinned_kv is not None and HAVE_TORCH and hasattr(host_pinned_kv, "is_pinned"):
+            ctx.s2_host_pinned_verified = bool(not host_pinned_kv.is_cuda and host_pinned_kv.is_pinned())
+            ctx.s2_stage_mode = (
+                "PINNED_HOST_TENSOR_VERIFIED"
+                if ctx.s2_host_pinned_verified
+                else "UNPINNED_HOST_TENSOR_SUPPLIED"
+            )
+        else:
+            ctx.s2_host_pinned_verified = False
+            ctx.s2_stage_mode = "STATE_TRANSITION_ONLY_NO_MMAP_PERFORMED"
         ctx.state = KvSwapState.S3_CUTILE_BLOCK_INSERT
         return ctx
 
-    # State 3: cuTile / DMA Block Insert
+    # State 3: cuTile / PyTorch Fallback Block Insert
     elif ctx.state == KvSwapState.S3_CUTILE_BLOCK_INSERT:
         if host_pinned_kv is not None and device_paged_kv is not None and page_table_map is not None:
             ctx.active_blocks = launch_kv_block_insert(
@@ -220,16 +278,34 @@ def step_kv_swap_fsm(
                 device_paged_kv=device_paged_kv,
                 page_table_map=page_table_map,
                 lod_tier=ctx.lod_tier,
+                use_cutile=use_cutile,
+                require_pinned_host=require_pinned_host,
+                synchronize=synchronize,
+                lease_expires_at_ms=ctx.lease_expires_at_ms,
+                now_ms=now_ms,
+                expected_fence_epoch=expected_fence_epoch,
+                observed_fence_epoch=ctx.fence_epoch,
             )
+            ctx.copy_backend_used = (
+                "CUTILE_KERNEL"
+                if use_cutile
+                else (
+                    "PYTORCH_CUDA_INDEX_COPY_FALLBACK"
+                    if device_paged_kv.is_cuda
+                    else "PYTORCH_CPU_INDEX_COPY_FALLBACK"
+                )
+            )
+            ctx.cuda_stream_synchronized = bool(synchronize and device_paged_kv.is_cuda)
+        else:
+            ctx.copy_backend_used = "NO_BUFFERS_SUPPLIED"
         ctx.state = KvSwapState.S4_MIRAS_EVICT_OR_PERSIST
         return ctx
 
-    # State 4: Google Titans Surprise & MIRAS Retention Gate Update
+    # State 4: Policy threshold evaluation (does NOT mutate external llama-server process KV cache)
     elif ctx.state == KvSwapState.S4_MIRAS_EVICT_OR_PERSIST:
-        # High surprise blocks (||dL/dM|| > tau) are persisted into host mmap long-term memory
+        ctx.s4_policy_mode = "BOOLEAN_POLICY_DECISION_ONLY_NOT_EXTERNAL_RUNTIME_MUTATION"
         if ctx.surprise_score > surprise_tau:
             ctx.persisted = True
-        # Low retention blocks (alpha_t < evict_tau) trigger eviction / weight offloading
         if ctx.retention_alpha < evict_tau:
             ctx.evicted = True
         return ctx

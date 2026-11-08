@@ -8,6 +8,32 @@ import { ENV } from '../../env.server.js';
 import type { DailyGraphifyBoardData } from './daily-graphify-board.js';
 import type { Phase89WorkflowPlan } from './phase89-workflow.js';
 import { ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID } from '../retrieval/qdrant-semantic-projection.js';
+import { encodeTaskDomains } from '../taxonomy/task-domain-lut-reconciliation-v1.js';
+import {
+	classifyCodebaseLandingAreaV1,
+	type CodebaseLandingAreaV1,
+} from '../routing/task-routing-okf-kag-prefill-v1.js';
+import { measureCagraMemoryFootprintV1 } from '../gpu/vram-cagra-pipeline-fsm-v1.js';
+
+const LANDING_AREA_TO_DOMAIN_CODE: Readonly<Partial<Record<CodebaseLandingAreaV1, number>>> = Object.freeze({
+	auth: 1,
+	retrieval: 2,
+	cache: 3,
+	compiler: 4,
+	graph: 4,
+	api: 5,
+	devops: 5,
+	'devops.env-config': 5,
+	'devops.process-mgmt': 5,
+	database: 6,
+	'database.postgresql': 6,
+	gpu: 7,
+	'machine-learning': 9,
+	'error-handling': 9,
+	test: 9,
+	frontend: 10,
+	'frontend.sveltekit': 10,
+});
 
 const BenchmarkRowSchema = z
 	.object({
@@ -25,6 +51,8 @@ const BenchmarkRowSchema = z
 		evidenceCount: z.number().int().nonnegative(),
 		reasonCount: z.number().int().nonnegative(),
 		blockedCount: z.number().int().nonnegative(),
+		routingBitmask: z.number().int().min(0).max(1023),
+		landingAreaGroupId: z.string().min(1),
 	})
 	.strict();
 
@@ -35,6 +63,7 @@ export const BoardGpuBenchmarkReceiptSchema = z
 		schemaVersion: z.literal('atlas.board-fabric-gpu-benchmark.v1'),
 		workflowId: z.string().min(1),
 		collection: z.string().min(1),
+		workspaceRevision: z.string().regex(/^sha256:[a-f0-9]{64}$/),
 		fabricLaneManifest: z.custom<FabricLaneManifest>(),
 		latentManifest: z.object({
 			representationId: z.string().min(1),
@@ -56,6 +85,13 @@ export const BoardGpuBenchmarkReceiptSchema = z
 			blockId: z.string().min(1),
 			packetKey: z.string().min(1),
 			featureRevision: z.string().min(1),
+			sourceRevision: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+		}),
+		vramFootprintEstimate: z.object({
+			dataBytes: z.number().int().positive(),
+			graphBytes: z.number().int().positive(),
+			workspaceBytes: z.number().int().positive(),
+			totalRequiredBytes: z.number().int().positive(),
 		}),
 	})
 	.strict();
@@ -127,6 +163,11 @@ function buildBenchmarkRows(board: DailyGraphifyBoardData, plan: Phase89Workflow
 		const workloadSignal = normalizedSignal(3 - priorityWeight(task.priority), 3);
 		const lowRankSignal = Math.max(0, Math.min(1, (semanticSignal * 0.45) + (graphSignal * 0.35) + (workloadSignal * 0.2) - (blockedCount * 0.05)));
 
+		const combinedText = `${task.label ?? ''} ${task.script ?? ''} ${task.source_ref ?? ''}`.trim();
+		const landingArea = classifyCodebaseLandingAreaV1(combinedText);
+		const domainCode = LANDING_AREA_TO_DOMAIN_CODE[landingArea.label];
+		const routingBitmask = domainCode ? encodeTaskDomains([domainCode]) : 0;
+
 		return BenchmarkRowSchema.parse({
 			taskId: task.id,
 			packetKey: task.packet_key ?? plan.packetKey ?? null,
@@ -142,6 +183,8 @@ function buildBenchmarkRows(board: DailyGraphifyBoardData, plan: Phase89Workflow
 			evidenceCount,
 			reasonCount,
 			blockedCount,
+			routingBitmask,
+			landingAreaGroupId: landingArea.label,
 		});
 	});
 
@@ -152,6 +195,7 @@ export function buildBoardGpuBenchmarkReceipt(input: {
 	board: DailyGraphifyBoardData;
 	plan: Phase89WorkflowPlan;
 	fabricLaneManifest: FabricLaneManifest;
+	workspaceRevision?: string | null;
 }): BoardGpuBenchmarkReceipt {
 	const jsonRows = buildBenchmarkRows(input.board, input.plan);
 	const jsonl = jsonRows.map((row) => JSON.stringify(row)).join('\n');
@@ -163,9 +207,20 @@ export function buildBoardGpuBenchmarkReceipt(input: {
 		row.evidenceCount / 10,
 		row.blockedCount / 10,
 	]);
+
+	const resolvedWorkspaceRevision =
+		typeof input.workspaceRevision === 'string' && /^sha256:[a-f0-9]{64}$/.test(input.workspaceRevision)
+			? input.workspaceRevision
+			: `sha256:${sha256Hex(stableJson({
+					collection: input.board.collection,
+					generated: input.board.generated,
+					workflowId: input.plan.workflowId,
+					taskIds: jsonRows.map((row) => row.taskId),
+				}))}`;
+
 	const latentManifest = buildLatentRepresentationManifest({
 		representationId: 'latent_128',
-		representationRevision: `latent_128:${input.board.generated}`,
+		representationRevision: `latent_128:${resolvedWorkspaceRevision}`,
 		latentDimension: 128,
 		kind: 'LOW_RANK',
 		fidelity: 'INT8_WARM',
@@ -180,14 +235,14 @@ export function buildBoardGpuBenchmarkReceipt(input: {
 	const lowRankFeatureBlock = buildLowRankFeatureBlock({
 		packetKey: input.plan.packetKey ?? input.fabricLaneManifest.packetKey,
 		sourceRef: input.plan.sourceRef ?? input.fabricLaneManifest.sourceRef,
-		sourceRevision: input.board.generated,
+		sourceRevision: resolvedWorkspaceRevision,
 		sourceRepresentationRevision: input.fabricLaneManifest.representationRevision,
 		latentManifest,
 		approximationMethod: 'EWIN_TANG',
 		rank: Math.max(1, jsonRows.length),
 		seed: 17,
 		producerId: 'atlas-phase89-gpu-benchmark',
-		producerRevision: input.board.generated,
+		producerRevision: resolvedWorkspaceRevision,
 		featureRevision: 'atlas.board-fabric-gpu-benchmark.v1',
 		inputDigest: `input:${sha256Hex(stableJson({ board: input.board.collection, rows: jsonRows }))}`,
 		outputDigest: `output:${sha256Hex(jsonl)}`,
@@ -201,10 +256,19 @@ export function buildBoardGpuBenchmarkReceipt(input: {
 		},
 	});
 
+	const vramFootprint = measureCagraMemoryFootprintV1({
+		rowCount: Math.max(1, jsonRows.length),
+		vectorDim: 768,
+		cagraGraphDegree: 32,
+		cagraIntermediateGraphDegree: 64,
+		cagraItopkSize: 64,
+	});
+
 	return BoardGpuBenchmarkReceiptSchema.parse({
 		schemaVersion: 'atlas.board-fabric-gpu-benchmark.v1',
 		workflowId: input.plan.workflowId,
 		collection: input.board.collection,
+		workspaceRevision: resolvedWorkspaceRevision,
 		fabricLaneManifest: input.fabricLaneManifest,
 		latentManifest: {
 			representationId: latentManifest.representationId,
@@ -224,6 +288,13 @@ export function buildBoardGpuBenchmarkReceipt(input: {
 			blockId: lowRankFeatureBlock.blockId,
 			packetKey: lowRankFeatureBlock.packetKey,
 			featureRevision: lowRankFeatureBlock.featureRevision,
+			sourceRevision: resolvedWorkspaceRevision,
+		},
+		vramFootprintEstimate: {
+			dataBytes: vramFootprint.dataBytes,
+			graphBytes: vramFootprint.graphBytes,
+			workspaceBytes: vramFootprint.workspaceBytes,
+			totalRequiredBytes: vramFootprint.totalRequiredBytes,
 		},
 	});
 }

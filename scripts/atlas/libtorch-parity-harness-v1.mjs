@@ -27,6 +27,11 @@ const SHAPES = {
   rewardScoreGPU: [[64, 64], [33, 768], [1, 16]],
   pcaProject: [[64, 32, 8], [33, 768, 64], [1, 16, 16]],
   batchCosineTopK: [[256, 64, 10], [33, 64, 33], [1000, 16, 1], [64, 768, 8]],
+  pageRankGPU: [[16, 30], [33, 40], [64, 50]],
+  autoencoderEncode: [[64, 64, 16], [33, 768, 64], [1, 16, 4]],
+  autoencoderDecode: [[64, 16, 64], [33, 64, 768], [1, 4, 16]],
+  trainSOM: [[100, 16, 4, 4, 30], [50, 8, 3, 3, 20]],
+  graphCandidateGatherGPU: [[128, 64, 32, 8], [33, 768, 20, 5], [64, 16, 16, 1]],
 };
 
 const COUNTER_KEYS = ['cuda_execution', 'cpu_fallback', 'stub_invocation', 'cuda_error_fallback', 'oom_fallback'];
@@ -272,6 +277,189 @@ function checkCosineTopK(addon, rng, [n, dim, k]) {
     status: setMatch && returnedScoresMatchOwnIndices && scoreDiff <= TOL_COSINE && backendOk ? 'PASS' : 'FAIL' };
 }
 
+function cpuPageRank(adj, n, damping, iters) {
+  const rowSum = new Float64Array(n);
+  for (let i = 0; i < n; i++) {
+    let s = 0;
+    for (let j = 0; j < n; j++) s += adj[i * n + j];
+    rowSum[i] = s;
+  }
+  const isDangling = new Uint8Array(n);
+  for (let i = 0; i < n; i++) {
+    if (rowSum[i] < 1e-8) isDangling[i] = 1;
+  }
+  let r = new Float64Array(n);
+  r.fill(1.0 / n);
+  const teleport = (1.0 - damping) / n;
+
+  for (let iter = 0; iter < iters; iter++) {
+    let danglingMass = 0;
+    for (let i = 0; i < n; i++) {
+      if (isDangling[i]) danglingMass += r[i];
+    }
+    const nextR = new Float64Array(n);
+    for (let j = 0; j < n; j++) {
+      let pDot = 0;
+      for (let i = 0; i < n; i++) {
+        if (!isDangling[i]) {
+          pDot += (adj[i * n + j] / rowSum[i]) * r[i];
+        }
+      }
+      nextR[j] = damping * (pDot + danglingMass / n) + teleport;
+    }
+    r = nextR;
+  }
+  return r;
+}
+
+function checkPageRank(addon, rng, [n, iters, damping = 0.85]) {
+  const adj = new Float32Array(n * n);
+  for (let i = 0; i < adj.length; i++) {
+    const v = rng();
+    adj[i] = v > 0.6 ? v : 0;
+  }
+  const out = addon.pageRankGPU(adj, n, damping, iters);
+  const ref = cpuPageRank(adj, n, damping, iters);
+  const diff = maxAbsDiff(out, ref);
+  let sum = 0;
+  for (const v of out) sum += v;
+  const sumToOne = Math.abs(sum - 1) <= 1e-4;
+  const tol = 1e-4;
+  return {
+    name: 'pageRankGPU', n, iters, damping, maxAbsDiff: diff, sumToOne, tolerance: tol,
+    status: out.length === n && diff <= tol && sumToOne ? 'PASS' : 'FAIL',
+  };
+}
+
+function cpuAeEncode(input, n, inputDim, W, b, hidden) {
+  const out = new Float64Array(n * hidden);
+  for (let i = 0; i < n; i++) {
+    for (let h = 0; h < hidden; h++) {
+      let dot = 0;
+      for (let d = 0; d < inputDim; d++) {
+        dot += input[i * inputDim + d] * W[h * inputDim + d];
+      }
+      out[i * hidden + h] = Math.tanh(dot + b[h]);
+    }
+  }
+  return out;
+}
+
+function checkAeEncode(addon, rng, [n, inputDim, hidden]) {
+  const input = randomMatrix(rng, n, inputDim);
+  const W = randomMatrix(rng, hidden, inputDim);
+  const b = randomMatrix(rng, 1, hidden);
+  const out = addon.autoencoderEncode(input, n, inputDim, W, b, hidden);
+  const ref = cpuAeEncode(input, n, inputDim, W, b, hidden);
+  const diff = maxAbsDiff(out, ref);
+  const tol = 1e-4;
+  return {
+    name: 'autoencoderEncode', n, inputDim, hidden, maxAbsDiff: diff, tolerance: tol,
+    status: out.length === n * hidden && diff <= tol ? 'PASS' : 'FAIL',
+  };
+}
+
+function cpuAeDecode(encoded, n, hidden, W, b, outputDim) {
+  const out = new Float64Array(n * outputDim);
+  for (let i = 0; i < n; i++) {
+    for (let d = 0; d < outputDim; d++) {
+      let dot = 0;
+      for (let h = 0; h < hidden; h++) {
+        dot += encoded[i * hidden + h] * W[d * hidden + h];
+      }
+      out[i * outputDim + d] = Math.tanh(dot + b[d]);
+    }
+  }
+  return out;
+}
+
+function checkAeDecode(addon, rng, [n, hidden, outputDim]) {
+  const encoded = randomMatrix(rng, n, hidden);
+  const W = randomMatrix(rng, outputDim, hidden);
+  const b = randomMatrix(rng, 1, outputDim);
+  const out = addon.autoencoderDecode(encoded, n, hidden, W, b, outputDim);
+  const ref = cpuAeDecode(encoded, n, hidden, W, b, outputDim);
+  const diff = maxAbsDiff(out, ref);
+  const tol = 1e-4;
+  return {
+    name: 'autoencoderDecode', n, hidden, outputDim, maxAbsDiff: diff, tolerance: tol,
+    status: out.length === n * outputDim && diff <= tol ? 'PASS' : 'FAIL',
+  };
+}
+
+function checkTrainSom(addon, rng, [n, dim, gridW, gridH, iters]) {
+  const data = randomMatrix(rng, n, dim);
+  const neurons = gridW * gridH;
+  const res = addon.trainSOM(data, n, dim, gridW, gridH, iters, 0.1, 0.01, Math.max(gridW, gridH) / 2, 1.0);
+  const { weights, bmu } = res;
+  const shapeOk = weights.length === neurons * dim && bmu.length === n;
+  const rangeOk = Array.from(bmu).every((idx) => Number.isInteger(idx) && idx >= 0 && idx < neurons);
+  let finiteOk = true;
+  for (let i = 0; i < weights.length; i++) {
+    if (!Number.isFinite(weights[i])) { finiteOk = false; break; }
+  }
+  let bmuViolations = 0;
+  for (let i = 0; i < n && shapeOk && rangeOk; i++) {
+    const d2 = (j) => {
+      let s = 0;
+      for (let d = 0; d < dim; d++) {
+        const diff = data[i * dim + d] - weights[j * dim + d];
+        s += diff * diff;
+      }
+      return s;
+    };
+    let best = Infinity;
+    for (let j = 0; j < neurons; j++) best = Math.min(best, d2(j));
+    if (d2(bmu[i]) - best > 1e-4) bmuViolations++;
+  }
+  return {
+    name: 'trainSOM', n, dim, gridW, gridH, iters, shapeOk, rangeOk, finiteOk, bmuViolations,
+    status: shapeOk && rangeOk && finiteOk && bmuViolations === 0 ? 'PASS' : 'FAIL',
+  };
+}
+
+function checkCandidateGather(addon, rng, [numNodes, dim, candCount, topK]) {
+  const embeddings = randomMatrix(rng, numNodes, dim);
+  const query = randomMatrix(rng, 1, dim);
+  const pool = Array.from({ length: numNodes }, (_, i) => i);
+  for (let i = numNodes - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  const candIndices = new Int32Array(pool.slice(0, candCount));
+
+  const res = addon.graphCandidateGatherGPU({
+    candidateIndices: candIndices,
+    embeddings,
+    numNodes,
+    dim,
+    query,
+    topK,
+  });
+
+  let gatherDiff = 0;
+  for (let i = 0; i < candCount; i++) {
+    const nodeIdx = candIndices[i];
+    for (let d = 0; d < dim; d++) {
+      gatherDiff = Math.max(gatherDiff, Math.abs(res.gatheredEmbeddings[i * dim + d] - embeddings[nodeIdx * dim + d]));
+    }
+  }
+
+  const cpuScores = cpuCosine(query, dim, res.gatheredEmbeddings, candCount);
+  const order = Array.from({ length: candCount }, (_, i) => i).sort((a, b) => cpuScores[b] - cpuScores[a] || a - b);
+  const expectedTopKIdx = order.slice(0, topK);
+  const expectedScores = expectedTopKIdx.map((i) => cpuScores[i]);
+  const scoreDiff = maxAbsDiff(res.scores, expectedScores);
+
+  const gotSet = new Set(Array.from(res.topKIndices));
+  const setMatch = gotSet.size === topK && expectedTopKIdx.every((i) => gotSet.has(i));
+  const ordinalsMatch = Array.from(res.topKIndices).every((idx, j) => res.candidateOrdinals[j] === candIndices[idx]);
+  const backendOk = res.telemetry?.backend === 'cuda_libtorch';
+
+  return {
+    name: 'graphCandidateGatherGPU', numNodes, dim, candCount, topK,
+    gatherDiff, scoreDiff, setMatch, ordinalsMatch, backendOk,
+    status: gatherDiff <= 1e-6 && scoreDiff <= TOL_COSINE && setMatch && ordinalsMatch && backendOk ? 'PASS' : 'FAIL',
+  };
+}
+
 const CHECKS = [
   ['batchCosineSimilarity', checkBatchCosine],
   ['attentionScoreGPU', checkAttention],
@@ -281,6 +469,11 @@ const CHECKS = [
   ['rewardScoreGPU', checkReward],
   ['pcaProject', checkPca],
   ['batchCosineTopK', checkCosineTopK],
+  ['pageRankGPU', checkPageRank],
+  ['autoencoderEncode', checkAeEncode],
+  ['autoencoderDecode', checkAeDecode],
+  ['trainSOM', checkTrainSom],
+  ['graphCandidateGatherGPU', checkCandidateGather],
 ];
 
 // Faulty wrappers: the harness must report FAIL for each. Proves the checks can fail.
@@ -318,8 +511,43 @@ function faultyAddon(real, mode) {
       if (mode === 'perturb-output') o[0] += 1e-3;
       return o;
     },
+    pcaProject(data, n, dim, mean, comps, k) {
+      const o = real.pcaProject(data, n, dim, mean, comps, k);
+      if (mode === 'perturb-output') o[0] += 1e-3;
+      return o;
+    },
+    batchCosineTopK(q, c, n, dim, k) {
+      const r = real.batchCosineTopK(q, c, n, dim, k);
+      if (mode === 'perturb-output') r.scores[0] += 1e-3;
+      return r;
+    },
+    pageRankGPU(adj, n, damping, iters) {
+      const o = real.pageRankGPU(adj, n, damping, iters);
+      if (mode === 'perturb-output') o[0] += 1e-3;
+      return o;
+    },
+    autoencoderEncode(input, n, inDim, W, b, hidden) {
+      const o = real.autoencoderEncode(input, n, inDim, W, b, hidden);
+      if (mode === 'perturb-output') o[0] += 1e-3;
+      return o;
+    },
+    autoencoderDecode(enc, n, hidden, W, b, outDim) {
+      const o = real.autoencoderDecode(enc, n, hidden, W, b, outDim);
+      if (mode === 'perturb-output') o[0] += 1e-3;
+      return o;
+    },
+    trainSOM(data, n, dim, gw, gh, iters, lrI, lrF, rI, rF) {
+      const r = real.trainSOM(data, n, dim, gw, gh, iters, lrI, lrF, rI, rF);
+      if (mode === 'perturb-output') r.bmu[0] = (r.bmu[0] + 1) % (gw * gh);
+      return r;
+    },
+    graphCandidateGatherGPU(opts) {
+      const r = real.graphCandidateGatherGPU(opts);
+      if (mode === 'perturb-output' && r.scores) r.scores[0] += 1e-3;
+      return r;
+    },
     // 'no-cuda-counter' simulates a silent fallback: the counter never advances.
-    getExecutionCounters: mode === 'no-cuda-counter' ? () => ({ cuda_execution: 0, cpu_fallback: 0 }) : () => real.getExecutionCounters(),
+    getExecutionCounters: mode === 'no-cuda-counter' ? () => ({ cuda_execution: 0, cpu_fallback: 0, stub_invocation: 0, cuda_error_fallback: 0, oom_fallback: 0 }) : () => real.getExecutionCounters(),
   };
 }
 

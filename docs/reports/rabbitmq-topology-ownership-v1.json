@@ -1,6 +1,6 @@
 {
   "schema": "atlas.rabbitmq-topology-ownership.v1",
-  "generatedAt": "2026-09-23T04:21:28.452Z",
+  "generatedAt": "2026-11-07T23:59:28.444Z",
   "mode": "READ_ONLY_SOURCE_AUDIT",
   "status": "TWO_ACTIVE_DISJOINT_STARTUP_DOMAINS; UNUSED_CORE_COPY_CONFLICTS_IF_ACTIVATED",
   "owners": {
@@ -138,5 +138,5 @@
   "canonicalAuthority": false,
   "writesPerformed": false,
   "brokerTouched": false,
-  "evidenceChecksum": "sha256:6b027d78862b38dce1476d6e1dda25c3c959bceacf553459c145b4aa819c48be"
+  "evidenceChecksum": "sha256:7104cc1afaa27054a22c29797a3f8b15462ed35e4152e565529998eb0a1146e8"
 }

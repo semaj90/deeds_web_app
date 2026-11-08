@@ -1,0 +1,61 @@
+{
+  "schema": "atlas.openspec-task-unknown-classifier.v1",
+  "generatedAt": "2026-11-07T20:45:19.773803+00:00",
+  "status": "PROPOSAL",
+  "canonicalAuthority": false,
+  "source": "docs/reports/openspec-task-domain-fanout-v1.20261107T194205Z.jsonl",
+  "circularity": "training labels = lexicon tags; held-out score = agreement with lexicon, NOT accuracy",
+  "accuracy": "UNMEASURED against truth; needs reviewer-labelled gold",
+  "counts": {
+    "labelledRows": 3064,
+    "unknownRows": 3463,
+    "trainClasses": 17,
+    "heldOutRows": 613
+  },
+  "heldOutAgreementWithLexicon": {
+    "naiveBayes": 0.5188,
+    "logisticRegression": 0.7879
+  },
+  "unknownPairwiseNbLrAgreement": 0.659,
+  "unknownPredictedClassCounts": {
+    "nb": {
+      "retrieval": 1331,
+      "machine-learning": 1027,
+      "gpu": 372,
+      "cache": 333,
+      "graph": 170,
+      "database": 136,
+      "test": 59,
+      "error-handling": 20,
+      "compiler": 10,
+      "api": 5
+    },
+    "lr": {
+      "machine-learning": 1068,
+      "retrieval": 957,
+      "graph": 360,
+      "cache": 290,
+      "gpu": 245,
+      "database": 136,
+      "test": 134,
+      "error-handling": 106,
+      "compiler": 106,
+      "api": 27,
+      "devops": 12,
+      "devops.process-mgmt": 10,
+      "auth": 6,
+      "frontend.sveltekit": 3,
+      "frontend": 2,
+      "database.postgresql": 1
+    }
+  },
+  "params": {
+    "seed": 7,
+    "tfidfMinDf": 2,
+    "nbAlpha": 0.5,
+    "lrC": 4.0
+  },
+  "outputs": {
+    "openspec-task-unknown-classifier-v1.20261107T204516Z.proposals.jsonl": "sha256:4bee0526b35b24afd660005479df13ac5405e6f266514826f5e0b34cb1e9a795"
+  }
+}

@@ -69,6 +69,26 @@ class TestNesLutPaletteV1(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "NES_LUT_PALETTE_CHECKSUM_MISMATCH"):
                 load_nes_lut_palette(tampered_path)
 
+    def test_proposed_v2_palette_loads_and_verifies_14_domains(self):
+        v2_path = REPO_ROOT / "scripts" / "atlas" / "data" / "nes-domain-palette-v2-PROPOSED.json"
+        if not v2_path.exists():
+            self.skipTest("nes-domain-palette-v2-PROPOSED.json not present")
+        palette_v2 = load_nes_lut_palette(v2_path)
+        self.assertEqual(palette_v2["schema"], "atlas.nes-domain-palette.v1")
+        self.assertEqual(palette_v2["revision"], "nes-domain-palette-v2-PROPOSED")
+        self.assertEqual(palette_v2["unresolved"]["lutByte"], 0)
+        self.assertEqual(palette_v2["domains"]["general"]["lutByte"], 10)
+        self.assertEqual(len(palette_v2["domains"]), 14)
+        ordinals = [row["lutByte"] for row in palette_v2["domains"].values()]
+        self.assertEqual(len(ordinals), 14)
+        self.assertEqual(len(set(ordinals)), 14)
+        self.assertNotIn(0, ordinals)
+        # Verify the four new proposed domains exist with their confirmed hex values
+        self.assertEqual(palette_v2["domains"]["compiler"]["nesHex"], "0x19")
+        self.assertEqual(palette_v2["domains"]["devops"]["nesHex"], "0x28")
+        self.assertEqual(palette_v2["domains"]["error-handling"]["nesHex"], "0x06")
+        self.assertEqual(palette_v2["domains"]["test"]["nesHex"], "0x2B")
+
 
 if __name__ == "__main__":
     unittest.main()

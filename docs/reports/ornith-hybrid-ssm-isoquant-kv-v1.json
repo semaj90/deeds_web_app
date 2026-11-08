@@ -1,0 +1,242 @@
+{
+  "schema": "atlas.ornith-hybrid-ssm-isoquant-kv-proof.v1",
+  "generatedAt": "2026-11-08T07:20:29.474749+00:00",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "kvCachePersisted": false,
+  "ornith8090Disturbed": false,
+  "device": {
+    "type": "cuda",
+    "name": "NVIDIA GeForce RTX 3060 Ti",
+    "torchVersion": "2.8.0+cu128",
+    "peakCudaAllocatedMiB": 18.633,
+    "vramBudgetCapMiB": 32.0,
+    "withinVramBudget": true,
+    "elapsedMs": 342.89
+  },
+  "terminologyDisambiguation": {
+    "quaterionLibrary": "Qdrant Python similarity-learning / metric fine-tuning library (pip package 'quaterion'); NOT a KV-cache rotor library.",
+    "isoquantQuaternionRotors": "4D Hamilton quaternion / double-sided SO(4) isoclinic rotation T(v) = q_L * v * conj(q_R) applied to full-attention K/V head blocks (head_dim=256 -> 64 4D blocks)."
+  },
+  "liveOrnith8090ReadonlyProbe": {
+    "endpoint": "http://127.0.0.1:8090",
+    "reachable": true,
+    "serviceRestarted": false,
+    "propsSummary": {
+      "modelAlias": "ornith-1.5-9b",
+      "totalSlots": 1,
+      "nCtx": 65536
+    },
+    "slotsSummary": {
+      "slotCount": 1,
+      "slot0NCtx": 65536,
+      "isProcessing": false
+    },
+    "yarnEvidence": "UNVERIFIED_FROM_HTTP_PROPS_ALONE"
+  },
+  "hybridMemoryBudget": {
+    "architecture": "Qwen3.5-9B Hybrid (Ornith 1.5)",
+    "totalLayers": 32,
+    "fullAttentionLayerCount": 8,
+    "fullAttentionLayerIndices": [
+      3,
+      7,
+      11,
+      15,
+      19,
+      23,
+      27,
+      31
+    ],
+    "gatedDeltaNetSsmLayerCount": 24,
+    "gatedDeltaNetSsmLayerIndices": [
+      0,
+      1,
+      2,
+      4,
+      5,
+      6,
+      8,
+      9,
+      10,
+      12,
+      13,
+      14,
+      16,
+      17,
+      18,
+      20,
+      21,
+      22,
+      24,
+      25,
+      26,
+      28,
+      29,
+      30
+    ],
+    "nHeadKv": 4,
+    "headDim": 256,
+    "quaternionBlocksPerHead": 64,
+    "fullAttentionFp16BytesPerToken": 32768,
+    "gatedDeltaNetFixedStateTotalMiB": 12.75,
+    "contextScalingProfiles": [
+      {
+        "contextTokens": 4096,
+        "hybrid8LayerFullAttnFp16MiB": 128.0,
+        "hybrid8LayerIsoQuantInt8MiB": 64.0,
+        "hybrid8LayerIsoQuantInt4MiB": 32.0,
+        "gatedDeltaNet24LayerFixedStateMiB": 12.75,
+        "hypothetical32LayerPureAttnFp16MiB": 512.0,
+        "rtx3060Ti8GiBFeasibilityWith5p2GiBWeights": "FEASIBLE_FP16"
+      },
+      {
+        "contextTokens": 16384,
+        "hybrid8LayerFullAttnFp16MiB": 512.0,
+        "hybrid8LayerIsoQuantInt8MiB": 256.0,
+        "hybrid8LayerIsoQuantInt4MiB": 128.0,
+        "gatedDeltaNet24LayerFixedStateMiB": 12.75,
+        "hypothetical32LayerPureAttnFp16MiB": 2048.0,
+        "rtx3060Ti8GiBFeasibilityWith5p2GiBWeights": "FEASIBLE_FP16"
+      },
+      {
+        "contextTokens": 32768,
+        "hybrid8LayerFullAttnFp16MiB": 1024.0,
+        "hybrid8LayerIsoQuantInt8MiB": 512.0,
+        "hybrid8LayerIsoQuantInt4MiB": 256.0,
+        "gatedDeltaNet24LayerFixedStateMiB": 12.75,
+        "hypothetical32LayerPureAttnFp16MiB": 4096.0,
+        "rtx3060Ti8GiBFeasibilityWith5p2GiBWeights": "FEASIBLE_FP16"
+      },
+      {
+        "contextTokens": 65536,
+        "hybrid8LayerFullAttnFp16MiB": 2048.0,
+        "hybrid8LayerIsoQuantInt8MiB": 1024.0,
+        "hybrid8LayerIsoQuantInt4MiB": 512.0,
+        "gatedDeltaNet24LayerFixedStateMiB": 12.75,
+        "hypothetical32LayerPureAttnFp16MiB": 8192.0,
+        "rtx3060Ti8GiBFeasibilityWith5p2GiBWeights": "FEASIBLE_FP16"
+      },
+      {
+        "contextTokens": 131072,
+        "hybrid8LayerFullAttnFp16MiB": 4096.0,
+        "hybrid8LayerIsoQuantInt8MiB": 2048.0,
+        "hybrid8LayerIsoQuantInt4MiB": 1024.0,
+        "gatedDeltaNet24LayerFixedStateMiB": 12.75,
+        "hypothetical32LayerPureAttnFp16MiB": 16384.0,
+        "rtx3060Ti8GiBFeasibilityWith5p2GiBWeights": "FEASIBLE_WITH_ISOQUANT_OR_CUTILE_SWAP"
+      },
+      {
+        "contextTokens": 262144,
+        "hybrid8LayerFullAttnFp16MiB": 8192.0,
+        "hybrid8LayerIsoQuantInt8MiB": 4096.0,
+        "hybrid8LayerIsoQuantInt4MiB": 2048.0,
+        "gatedDeltaNet24LayerFixedStateMiB": 12.75,
+        "hypothetical32LayerPureAttnFp16MiB": 32768.0,
+        "rtx3060Ti8GiBFeasibilityWith5p2GiBWeights": "FEASIBLE_WITH_ISOQUANT_OR_CUTILE_SWAP"
+      }
+    ]
+  },
+  "isoquantAttentionKvBenchmark": {
+    "tensorShape": [
+      1,
+      4,
+      256,
+      256
+    ],
+    "bijectiveRotationMaxError": 5.7220458984375e-06,
+    "outlierCrestFactorBeforeRotation": 8.5411,
+    "outlierCrestFactorAfterRotation": 4.5783,
+    "clippedQuantizationComparison": {
+      "clipThreshold99p9": 9.2067,
+      "naiveScalarInt8Mse": 6.2e-05,
+      "isoquantRotatedInt8Mse": 1.9e-05,
+      "int8MseReductionRatio": 3.18,
+      "naiveScalarInt4Mse": 0.014595,
+      "isoquantRotatedInt4Mse": 0.006495,
+      "int4MseReductionRatio": 2.25,
+      "attentionLogitMseNaiveInt8": 1e-05,
+      "attentionLogitMseIsoQuantInt8": 3e-06,
+      "attentionLogitMseNaiveInt4": 0.002364,
+      "attentionLogitMseIsoQuantInt4": 0.001049
+    },
+    "admitted8FullAttentionLayers": [
+      {
+        "layerIdx": 3,
+        "int8BlockMse": 1.94e-05,
+        "int8BlockCosine": 0.9999976,
+        "int4BlockMse": 0.0064953,
+        "int4BlockCosine": 0.9992059
+      },
+      {
+        "layerIdx": 7,
+        "int8BlockMse": 1.94e-05,
+        "int8BlockCosine": 0.9999976,
+        "int4BlockMse": 0.0064953,
+        "int4BlockCosine": 0.9992059
+      },
+      {
+        "layerIdx": 11,
+        "int8BlockMse": 1.94e-05,
+        "int8BlockCosine": 0.9999976,
+        "int4BlockMse": 0.0064953,
+        "int4BlockCosine": 0.9992059
+      },
+      {
+        "layerIdx": 15,
+        "int8BlockMse": 1.94e-05,
+        "int8BlockCosine": 0.9999976,
+        "int4BlockMse": 0.0064953,
+        "int4BlockCosine": 0.9992059
+      },
+      {
+        "layerIdx": 19,
+        "int8BlockMse": 1.94e-05,
+        "int8BlockCosine": 0.9999976,
+        "int4BlockMse": 0.0064953,
+        "int4BlockCosine": 0.9992059
+      },
+      {
+        "layerIdx": 23,
+        "int8BlockMse": 1.94e-05,
+        "int8BlockCosine": 0.9999976,
+        "int4BlockMse": 0.0064953,
+        "int4BlockCosine": 0.9992059
+      },
+      {
+        "layerIdx": 27,
+        "int8BlockMse": 1.94e-05,
+        "int8BlockCosine": 0.9999976,
+        "int4BlockMse": 0.0064953,
+        "int4BlockCosine": 0.9992059
+      },
+      {
+        "layerIdx": 31,
+        "int8BlockMse": 1.94e-05,
+        "int8BlockCosine": 0.9999976,
+        "int4BlockMse": 0.0064953,
+        "int4BlockCosine": 0.9992059
+      }
+    ]
+  },
+  "adversarialProbes": {
+    "adv_01_ssm_deltanet_tensor_rejected": {
+      "passed": true,
+      "error": "SSM_STATE_QUATERNION_ROTATION_FORBIDDEN: layer_idx=0 layer_kind=GATED_DELTANET_SSM is a Gated DeltaNet recurrent/conv state and must never be quaternion-rotated."
+    },
+    "adv_02_non_divisible_by_4_head_dim_rejected": {
+      "passed": true,
+      "error": "HEAD_DIM_MUST_BE_MULTIPLE_OF_4_FOR_QUATERNION_BLOCKS: got shape (1, 4, 16, 250)"
+    },
+    "adv_03_non_unit_rotor_rejected": {
+      "passed": true,
+      "error": "NON_UNIT_QUATERNION_ROTOR_FORBIDDEN: max norm error q_L=1.500e+00, q_R=1.192e-07"
+    },
+    "adv_04_deltanet_recurrent_state_checksum_immutability": {
+      "passed": true,
+      "sha256Before": "sha256:ca9f8dac18608915bbc1fd265010bba2b3c0993ab5514d4710cb3af8989a823b",
+      "sha256After": "sha256:ca9f8dac18608915bbc1fd265010bba2b3c0993ab5514d4710cb3af8989a823b"
+    }
+  },
+  "status": "PASS"
+}

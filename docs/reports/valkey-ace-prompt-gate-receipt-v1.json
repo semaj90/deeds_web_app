@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.valkey-ace-prompt-gate-receipt.v1",
+  "generatedAt": "2026-11-08T09:40:19.241Z",
+  "valkey": {
+    "host": "127.0.0.1",
+    "port": 6379,
+    "cacheKey": "ace:packet:parent-atlas-ace-rlm-bitfrost-integration#a870cee7088e7268:3bd8c8e3861c0d8228128291af575e05a194b563",
+    "ttlSecondsConfigured": 3600,
+    "ttlSecondsVerified": 3600,
+    "status": "VERIFIED_ACTIVE"
+  },
+  "canonicalTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#a870cee7088e7268",
+  "workspaceRevision": "3bd8c8e3861c0d8228128291af575e05a194b563",
+  "budgetAudit": {
+    "totalBudget": 4096,
+    "totalEstimatedTokens": 700,
+    "safetyReserveUnused": 3396,
+    "sections": [
+      {
+        "section": "taskIdentityAndRules",
+        "estimatedTokens": 228,
+        "budgetTokens": 600,
+        "passed": true
+      },
+      {
+        "section": "dagFrontier",
+        "estimatedTokens": 52,
+        "budgetTokens": 450,
+        "passed": true
+      },
+      {
+        "section": "okfOntologyAndConstraints",
+        "estimatedTokens": 114,
+        "budgetTokens": 650,
+        "passed": true
+      },
+      {
+        "section": "astSymbolsAndExactSpans",
+        "estimatedTokens": 90,
+        "budgetTokens": 900,
+        "passed": true
+      },
+      {
+        "section": "hybridTopKEvidence",
+        "estimatedTokens": 145,
+        "budgetTokens": 1000,
+        "passed": true
+      },
+      {
+        "section": "acceptanceTests",
+        "estimatedTokens": 69,
+        "budgetTokens": 300,
+        "passed": true
+      }
+    ],
+    "allSectionsWithinBudget": true
+  },
+  "negativeInvariants": {
+    "zeroRawVectorsInPrompt": true,
+    "zeroHiddenThoughts": true,
+    "zeroChainOfThoughtPersisted": true,
+    "zeroTensorPersisted": true
+  },
+  "promptPreviewHead": "# TASK CONTEXT: parent-atlas-ace-rlm-bitfrost-integration#a870cee7088e7268\nTask Code: CANARY-PR-01\nSource: openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16352\nWorkspace Revision: 3bd8c8e3861c0d8228128291af575e05a194b563\nRepresentation: EMBEDDINGGEMMA_PREFIX64_EXPERIMENTAL (dig..."
+}

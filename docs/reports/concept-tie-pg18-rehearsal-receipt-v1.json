@@ -1,0 +1,44 @@
+{
+  "receiptId": "rcpt:pg18-rehearsal:1794109950877",
+  "schemaVersion": "atlas.agentic-repair-receipt.v1",
+  "generatedAt": "2026-11-08T03:52:30.877Z",
+  "dryRun": true,
+  "liveDbMutated": false,
+  "seaweedOverwrites": 0,
+  "status": "REHEARSAL_PROVEN_ROLLED_BACK",
+  "rehearsalMetrics": {
+    "baselineRows": 6527,
+    "trialUpdatedCount": 50,
+    "postRollbackRows": 6527,
+    "trialRowsRemainingAfterRollback": 0,
+    "checkConstraintEnforced": true,
+    "writesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "stages": {
+    "1_VERIFIED_CLAIM": {
+      "completed": true,
+      "claim": "Rehearse atlas_concept_tie_v2 batch mutations and verify canonical_authority check constraint in rolled-back transaction"
+    },
+    "2_KERNEL_DAG_CANDIDATE": {
+      "completed": true,
+      "candidateId": "cand:concept-tie-pg18:1794109950877",
+      "mutationAuthorized": false
+    },
+    "3_SCHEMA_LINEAGE_ADMISSION": {
+      "completed": true,
+      "okfProfile": "atlas.okf-reconciliation-by-cause.v1",
+      "admissionStatus": "REHEARSAL_ADMITTED_NO_PERSIST"
+    },
+    "4_BOUNDED_EXECUTION": {
+      "completed": true,
+      "rowsRehearsed": 50,
+      "transactionDisposition": "ROLLED_BACK"
+    },
+    "5_INDEPENDENT_READBACK": {
+      "completed": true,
+      "verificationExitCode": 0,
+      "baselinePreserved": true
+    }
+  }
+}

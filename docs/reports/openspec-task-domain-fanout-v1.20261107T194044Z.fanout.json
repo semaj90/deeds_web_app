@@ -1,0 +1,525 @@
+{
+  "groups": [
+    {
+      "group_id": "api",
+      "label": "API Design & Integration",
+      "parent": null,
+      "tasks": 158,
+      "primary": 140,
+      "changeFolders": 55,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-transport-memory-boundaries",
+          "tasks": 13
+        },
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 10
+        },
+        {
+          "change_id": "parent-atlas-neural-prefill-encoder",
+          "tasks": 9
+        },
+        {
+          "change_id": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+          "tasks": 7
+        },
+        {
+          "change_id": "parent-atlas-governed-compute-fabric",
+          "tasks": 7
+        }
+      ]
+    },
+    {
+      "group_id": "auth",
+      "label": "Authentication & Authorization",
+      "parent": null,
+      "tasks": 104,
+      "primary": 82,
+      "changeFolders": 43,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 15
+        },
+        {
+          "change_id": "parent-atlas-agent-framework-integration-hardening",
+          "tasks": 10
+        },
+        {
+          "change_id": "parent-atlas-agentic-file-compiler",
+          "tasks": 7
+        },
+        {
+          "change_id": "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+          "tasks": 6
+        },
+        {
+          "change_id": "parent-atlas-ontology-kernel",
+          "tasks": 5
+        }
+      ]
+    },
+    {
+      "group_id": "cache",
+      "label": "Caching",
+      "parent": null,
+      "tasks": 346,
+      "primary": 300,
+      "changeFolders": 61,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 43
+        },
+        {
+          "change_id": "parent-atlas-kv-cache-adaptation-research",
+          "tasks": 20
+        },
+        {
+          "change_id": "parent-atlas-ace-bitfrost-cache-correctness",
+          "tasks": 19
+        },
+        {
+          "change_id": "parent-atlas-gpu-sidecar-patch-tournament",
+          "tasks": 14
+        },
+        {
+          "change_id": "parent-atlas-neural-prefill-encoder",
+          "tasks": 13
+        }
+      ]
+    },
+    {
+      "group_id": "compiler",
+      "label": "Compiler & Language Tooling",
+      "parent": null,
+      "tasks": 186,
+      "primary": 156,
+      "changeFolders": 50,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-candidate-feature-execution-fabric",
+          "tasks": 12
+        },
+        {
+          "change_id": "atlas-directory-first-analysis-v1",
+          "tasks": 10
+        },
+        {
+          "change_id": "parent-atlas-graph-retrieval-proof",
+          "tasks": 10
+        },
+        {
+          "change_id": "parent-atlas-versioned-doc-intelligence",
+          "tasks": 8
+        },
+        {
+          "change_id": "parent-atlas-ml-graph-retrieval-convergence",
+          "tasks": 8
+        }
+      ]
+    },
+    {
+      "group_id": "database",
+      "label": "Database & Persistence",
+      "parent": null,
+      "tasks": 347,
+      "primary": 240,
+      "changeFolders": 67,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 30
+        },
+        {
+          "change_id": "parent-atlas-neural-prefill-encoder",
+          "tasks": 30
+        },
+        {
+          "change_id": "manual-migration-reconciliation",
+          "tasks": 16
+        },
+        {
+          "change_id": "parent-atlas-retrieval-lineage-dag-convergence",
+          "tasks": 14
+        },
+        {
+          "change_id": "parent-atlas-ml-graph-retrieval-convergence",
+          "tasks": 13
+        }
+      ]
+    },
+    {
+      "group_id": "database.postgresql",
+      "label": "PostgreSQL",
+      "parent": "database",
+      "tasks": 148,
+      "primary": 68,
+      "changeFolders": 46,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-neural-prefill-encoder",
+          "tasks": 24
+        },
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 13
+        },
+        {
+          "change_id": "parent-atlas-retrieval-staging-planes",
+          "tasks": 10
+        },
+        {
+          "change_id": "parent-atlas-nlp-sidecar-feature-compiler",
+          "tasks": 8
+        },
+        {
+          "change_id": "parent-atlas-ml-graph-retrieval-convergence",
+          "tasks": 6
+        }
+      ]
+    },
+    {
+      "group_id": "devops",
+      "label": "DevOps & Infrastructure",
+      "parent": null,
+      "tasks": 132,
+      "primary": 80,
+      "changeFolders": 46,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-ml-graph-retrieval-convergence",
+          "tasks": 17
+        },
+        {
+          "change_id": "parent-atlas-neural-prefill-encoder",
+          "tasks": 10
+        },
+        {
+          "change_id": "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+          "tasks": 9
+        },
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 7
+        },
+        {
+          "change_id": "parent-atlas-nlp-sidecar-feature-compiler",
+          "tasks": 7
+        }
+      ]
+    },
+    {
+      "group_id": "devops.env-config",
+      "label": "Environment Configuration",
+      "parent": "devops",
+      "tasks": 22,
+      "primary": 13,
+      "changeFolders": 16,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-tensor-residency-integration",
+          "tasks": 3
+        },
+        {
+          "change_id": "parent-atlas-graph-retrieval-proof",
+          "tasks": 3
+        },
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 2
+        },
+        {
+          "change_id": "parent-atlas-ml-graph-retrieval-convergence",
+          "tasks": 2
+        },
+        {
+          "change_id": "parent-atlas-retrieval-staging-planes",
+          "tasks": 1
+        }
+      ]
+    },
+    {
+      "group_id": "devops.process-mgmt",
+      "label": "Process Management",
+      "parent": "devops",
+      "tasks": 91,
+      "primary": 53,
+      "changeFolders": 37,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 12
+        },
+        {
+          "change_id": "parent-atlas-retrieval-lineage-dag-convergence",
+          "tasks": 10
+        },
+        {
+          "change_id": "parent-atlas-kv-cache-adaptation-research",
+          "tasks": 8
+        },
+        {
+          "change_id": "parent-atlas-agentic-completion",
+          "tasks": 4
+        },
+        {
+          "change_id": "parent-atlas-graphify-recovery-proof-ladder",
+          "tasks": 4
+        }
+      ]
+    },
+    {
+      "group_id": "error-handling",
+      "label": "Error Handling & Recovery",
+      "parent": null,
+      "tasks": 245,
+      "primary": 177,
+      "changeFolders": 66,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-neural-prefill-encoder",
+          "tasks": 18
+        },
+        {
+          "change_id": "parent-atlas-gpu-sidecar-patch-tournament",
+          "tasks": 15
+        },
+        {
+          "change_id": "parent-atlas-ml-graph-retrieval-convergence",
+          "tasks": 15
+        },
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 13
+        },
+        {
+          "change_id": "parent-atlas-candidate-feature-execution-fabric",
+          "tasks": 10
+        }
+      ]
+    },
+    {
+      "group_id": "frontend",
+      "label": "Frontend & UI",
+      "parent": null,
+      "tasks": 36,
+      "primary": 20,
+      "changeFolders": 23,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-agent-framework-integration-hardening",
+          "tasks": 4
+        },
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 3
+        },
+        {
+          "change_id": "parent-atlas-ontology-kernel",
+          "tasks": 3
+        },
+        {
+          "change_id": "parent-atlas-agentic-diagnostic-repair-v1",
+          "tasks": 3
+        },
+        {
+          "change_id": "courtroom-upload-story-pipeline",
+          "tasks": 2
+        }
+      ]
+    },
+    {
+      "group_id": "frontend.sveltekit",
+      "label": "SvelteKit / Svelte",
+      "parent": "frontend",
+      "tasks": 109,
+      "primary": 51,
+      "changeFolders": 49,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-ontology-kernel",
+          "tasks": 11
+        },
+        {
+          "change_id": "legal-corpus-california-codes",
+          "tasks": 6
+        },
+        {
+          "change_id": "parent-atlas-neural-prefill-encoder",
+          "tasks": 6
+        },
+        {
+          "change_id": "parent-atlas-agent-framework-integration-hardening",
+          "tasks": 6
+        },
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 5
+        }
+      ]
+    },
+    {
+      "group_id": "gpu",
+      "label": "GPU & CUDA Acceleration",
+      "parent": null,
+      "tasks": 561,
+      "primary": 400,
+      "changeFolders": 75,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 37
+        },
+        {
+          "change_id": "parent-atlas-gpu-sidecar-patch-tournament",
+          "tasks": 36
+        },
+        {
+          "change_id": "parent-atlas-neural-prefill-encoder",
+          "tasks": 36
+        },
+        {
+          "change_id": "parent-atlas-ml-graph-retrieval-convergence",
+          "tasks": 34
+        },
+        {
+          "change_id": "parent-atlas-tensor-residency-integration",
+          "tasks": 33
+        }
+      ]
+    },
+    {
+      "group_id": "graph",
+      "label": "Graph & Topology",
+      "parent": null,
+      "tasks": 409,
+      "primary": 274,
+      "changeFolders": 66,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-neural-prefill-encoder",
+          "tasks": 34
+        },
+        {
+          "change_id": "parent-atlas-retrieval-lineage-dag-convergence",
+          "tasks": 27
+        },
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 26
+        },
+        {
+          "change_id": "parent-atlas-candidate-feature-execution-fabric",
+          "tasks": 25
+        },
+        {
+          "change_id": "parent-atlas-ontology-kernel",
+          "tasks": 24
+        }
+      ]
+    },
+    {
+      "group_id": "machine-learning",
+      "label": "Machine Learning",
+      "parent": null,
+      "tasks": 617,
+      "primary": 435,
+      "changeFolders": 73,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-best-fit-score-fabric",
+          "tasks": 75
+        },
+        {
+          "change_id": "parent-atlas-neural-prefill-encoder",
+          "tasks": 48
+        },
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 45
+        },
+        {
+          "change_id": "parent-atlas-ml-graph-retrieval-convergence",
+          "tasks": 28
+        },
+        {
+          "change_id": "parent-atlas-candidate-feature-execution-fabric",
+          "tasks": 26
+        }
+      ]
+    },
+    {
+      "group_id": "retrieval",
+      "label": "Information Retrieval",
+      "parent": null,
+      "tasks": 789,
+      "primary": 397,
+      "changeFolders": 93,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-neural-prefill-encoder",
+          "tasks": 94
+        },
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 63
+        },
+        {
+          "change_id": "parent-atlas-retrieval-lineage-dag-convergence",
+          "tasks": 39
+        },
+        {
+          "change_id": "parent-atlas-gpu-sidecar-patch-tournament",
+          "tasks": 29
+        },
+        {
+          "change_id": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+          "tasks": 27
+        }
+      ]
+    },
+    {
+      "group_id": "test",
+      "label": "Testing",
+      "parent": null,
+      "tasks": 375,
+      "primary": 178,
+      "changeFolders": 64,
+      "topChanges": [
+        {
+          "change_id": "parent-atlas-agentic-file-compiler",
+          "tasks": 59
+        },
+        {
+          "change_id": "parent-atlas-ace-rlm-bitfrost-integration",
+          "tasks": 45
+        },
+        {
+          "change_id": "parent-atlas-retrieval-lineage-dag-convergence",
+          "tasks": 25
+        },
+        {
+          "change_id": "parent-atlas-ml-graph-retrieval-convergence",
+          "tasks": 24
+        },
+        {
+          "change_id": "parent-atlas-candidate-feature-execution-fabric",
+          "tasks": 17
+        }
+      ]
+    }
+  ],
+  "unresolvedTasks": 3463,
+  "domainsPerTaskHistogram": {
+    "0": 3463,
+    "1": 1942,
+    "2": 770,
+    "3": 253,
+    "4": 70,
+    "5": 22,
+    "6": 5,
+    "7": 2
+  }
+}

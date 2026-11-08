@@ -55,17 +55,25 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual(pkt.prefill_context_slice, "")
         self.assertIsNone(pkt.prefill_sha256)
 
-    def test_community_10_gate_is_unavailable_not_a_dead_path(self):
+    def test_community_10_gate_is_wired_to_validator(self):
         pkt = self._packet(10)
-        self.assertIsNone(pkt.hyperedge.remediation_test_cmd)
+        self.assertEqual(pkt.hyperedge.remediation_test_cmd, "node scripts/atlas/validate-crawled-okf-docs-v1.mjs")
         self.assertNotIn("index-okf-dev-corpus", str(pkt.ontology_tuples))
 
+    def test_community_2_and_18_are_routed(self):
+        pkt2 = self._packet(2)
+        self.assertIsNotNone(pkt2.hyperedge.remediation_test_cmd)
+        self.assertIn("docs/llms/generated/postgres.llms-full.txt", pkt2.hyperedge.llms_txt_refs)
+        pkt18 = self._packet(18)
+        self.assertIsNotNone(pkt18.hyperedge.remediation_test_cmd)
+        self.assertIn("docs/llms/generated/cuda.llms-full.txt", pkt18.hyperedge.llms_txt_refs)
+
     def test_mutation_never_authorized(self):
-        for comm in (1, 6, 10, 99):
+        for comm in (1, 2, 6, 10, 18, 99):
             self.assertFalse(self._packet(comm).mutation_authorized)
 
     def test_no_tuple_is_canonical_and_no_verified_predicate(self):
-        for comm in (1, 6, 99):
+        for comm in (1, 2, 6, 10, 18, 99):
             for t in self._packet(comm).ontology_tuples:
                 self.assertFalse(t.canonical_authority)
                 self.assertNotEqual(t.predicate, "VERIFIED_BY_GATE_CMD")

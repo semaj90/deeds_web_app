@@ -46,7 +46,7 @@ if (proposals.length !== expectRows) die(`EXPECTED_${expectRows}_ROWS_GOT_${prop
 if (new Set(proposals.map((p) => p.chunkRowId)).size !== proposals.length) die('DUPLICATE_CHUNK_ROW_IN_CANARY');
 if (new Set(proposals.map((p) => p.workspaceRevision)).size !== 1) die('MIXED_WORKSPACE_REVISIONS_IN_CANARY');
 
-const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, connectionTimeoutMillis: 5000 });
+const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 2, connectionTimeoutMillis: 5000 });
 const outer = await pool.connect();
 // The kernel/adapter open their own BEGIN/COMMIT; route them all onto one outer serializable transaction.
 const sharedPool = {

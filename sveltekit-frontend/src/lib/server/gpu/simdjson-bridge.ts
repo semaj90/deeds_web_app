@@ -19,6 +19,7 @@
  * - Do NOT use fastJsonParse on gRPC streams, Protobuf buffers, or tensor TypedArrays.
  */
 
+import { createHash } from 'node:crypto';
 import { resolve } from 'path';
 import { existsSync } from 'fs';
 import { createRequire } from 'module';
@@ -82,7 +83,6 @@ const LRU_TTL_MS       = 30_000;           // 30 s
 const MAX_ENTRY_BYTES  = 8 * 1024 * 1024;  // skip caching single entries > 8 MB
 
 interface CacheEntry {
-	input: string;
 	value: unknown;
 	expiresAt: number;
 	sizeBytes: number;  // approximate serialized size
@@ -92,37 +92,11 @@ const lruCache   = new Map<string, CacheEntry>();
 let   cacheBytes = 0;
 
 /**
- * FNV-1a 32-bit hash — L1-cache-friendly: reads first 64 bytes + stride-sampled tail.
- * Keeps hot path (< 64 chars) entirely within a single L1 cache line.
+ * SHA-256 hash — collision-immune full-payload key matching packages/parent-atlas-retrieval.
+ * Eliminates input string retention on heap in CacheEntry.
  */
-function fnv1aKey(input: string): string {
-	const len = input.length;
-	let hash = 0x811c9dc5 >>> 0;
-
-	// First 64 chars (≤ 256 bytes in UTF-16, fits in L1 D-cache)
-	const head = Math.min(len, 64);
-	for (let i = 0; i < head; i++) {
-		hash ^= input.charCodeAt(i);
-		hash = Math.imul(hash, 0x01000193) >>> 0;
-	}
-
-	// Stride-sample the tail (every 32 chars) to catch length + content variation
-	if (len > 64) {
-		const stride = Math.max(32, Math.floor((len - 64) / 8));
-		for (let i = 64; i < len; i += stride) {
-			hash ^= input.charCodeAt(i);
-			hash = Math.imul(hash, 0x01000193) >>> 0;
-		}
-		// Always include the last char (catches trailing-diff strings)
-		hash ^= input.charCodeAt(len - 1);
-		hash = Math.imul(hash, 0x01000193) >>> 0;
-	}
-
-	// Mix in length to differentiate same-prefix strings
-	hash ^= (len & 0xffff);
-	hash = Math.imul(hash, 0x01000193) >>> 0;
-
-	return hash.toString(36);
+function sha256Key(input: string): string {
+	return createHash('sha256').update(input).digest('hex');
 }
 
 function approximateSize(value: unknown): number {
@@ -143,10 +117,9 @@ function lruEvictExpired(): void {
 	}
 }
 
-function lruGet(key: string, input: string): unknown | undefined {
+function lruGet(key: string): unknown | undefined {
 	const entry = lruCache.get(key);
 	if (!entry) return undefined;
-	if (entry.input !== input) return undefined;
 	if (Date.now() > entry.expiresAt) {
 		cacheBytes -= entry.sizeBytes;
 		lruCache.delete(key);
@@ -159,8 +132,8 @@ function lruGet(key: string, input: string): unknown | undefined {
 	return entry.value;
 }
 
-function lruSet(key: string, input: string, value: unknown): void {
-	const sizeBytes = input.length * 2 + approximateSize(value);
+function lruSet(key: string, value: unknown): void {
+	const sizeBytes = approximateSize(value);
 
 	// Skip caching huge entries — they'd blow the budget on a single item
 	if (sizeBytes > MAX_ENTRY_BYTES) return;
@@ -182,7 +155,7 @@ function lruSet(key: string, input: string, value: unknown): void {
 		lruCache.delete(oldest);
 	}
 
-	lruCache.set(key, { input, value, expiresAt: Date.now() + LRU_TTL_MS, sizeBytes });
+	lruCache.set(key, { value, expiresAt: Date.now() + LRU_TTL_MS, sizeBytes });
 	cacheBytes += sizeBytes;
 }
 
@@ -245,8 +218,8 @@ export function fastJsonParseWithBackend<T = unknown>(input: string): { value: T
 	}
 
 	// Check LRU cache (hash computed over L1-friendly prefix)
-	const cacheKey = fnv1aKey(input);
-	const cached = lruGet(cacheKey, input);
+	const cacheKey = sha256Key(input);
+	const cached = lruGet(cacheKey);
 	if (cached !== undefined) return { value: cached as T, backend: 'CACHE' };
 
 	stats.misses++;
@@ -263,18 +236,18 @@ export function fastJsonParseWithBackend<T = unknown>(input: string): { value: T
 			result = JSON.parse(validated) as T;
 			stats.nativeParses++;
 			stats.nativeTimeMs += (performance.now() - start);
-			lruSet(cacheKey, input, result);
+			lruSet(cacheKey, result);
 			return { value: result, backend: 'SIMDJSON_NAPI' };
 		} catch {
 			stats.fallbackParses++;
 			result = JSON.parse(input) as T;
-			lruSet(cacheKey, input, result);
+			lruSet(cacheKey, result);
 			return { value: result, backend: 'V8_JSON_PARSE' };
 		}
 	} else {
 		stats.fallbackParses++;
 		result = JSON.parse(input) as T;
-		lruSet(cacheKey, input, result);
+		lruSet(cacheKey, result);
 		return { value: result, backend: 'V8_JSON_PARSE' };
 	}
 }
