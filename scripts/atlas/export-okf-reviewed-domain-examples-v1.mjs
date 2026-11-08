@@ -46,7 +46,7 @@ function resolveSource(root, sourceRef) {
 }
 
 /** Pure core: returns { rows, receipt }. No file writes. */
-export function buildReviewedExport({ inputRows, palette, root, allowUnverifiedSource = false, inputSha256 = null }) {
+export function buildReviewedExport({ inputRows, palette, root, allowUnverifiedSource = false, requireAllDomains = true, inputSha256 = null }) {
   const domains = new Set(Object.keys(palette.domains));
   const rejected = {};
   const nonGold = {};
@@ -102,9 +102,13 @@ export function buildReviewedExport({ inputRows, palette, root, allowUnverifiedS
   for (const a of rows) bump(perDomain, a.domain);
   for (const d of Object.keys(perDomain)) groupsPerDomain[d] = new Set(rows.filter((a) => a.domain === d).map((a) => a.source_group)).size;
 
+  // Every governed palette domain must be represented (unless the caller relaxes it, and the receipt records that). With 10 domains the per-class floor
+  // of 30 already implies 300 rows; the separate 200-row minimum is a lower bound, not the binding constraint.
+  const requiredDomains = requireAllDomains ? [...domains] : Object.keys(perDomain);
+  const missingDomains = requiredDomains.filter((d) => !perDomain[d]);
   let status;
   if (rows.length === 0) status = 'BLOCKED_NO_REVIEWED_INPUT';
-  else if (rows.length < MIN_ROWS || Object.keys(perDomain).length < 2 || Math.min(...Object.values(perDomain)) < MIN_PER_CLASS || Math.min(...Object.values(groupsPerDomain)) < MIN_GROUPS_PER_DOMAIN) status = 'INSUFFICIENT_DATA';
+  else if (rows.length < MIN_ROWS || missingDomains.length > 0 || Math.min(...Object.values(perDomain)) < MIN_PER_CLASS || Math.min(...Object.values(groupsPerDomain)) < MIN_GROUPS_PER_DOMAIN) status = 'INSUFFICIENT_DATA';
   else status = 'READY_FOR_HELD_OUT_EVAL';
 
   const receipt = {
@@ -118,7 +122,7 @@ export function buildReviewedExport({ inputRows, palette, root, allowUnverifiedS
     droppedConflictingGroups: [...conflicted],
     paletteRevision: palette.revision, paletteChecksum: palette.checksum,
     sourceVerification: allowUnverifiedSource ? 'SKIPPED_BY_FLAG' : 'SOURCE_BYTES_HASHED',
-    gate: { minRows: MIN_ROWS, minPerClass: MIN_PER_CLASS, minGroupsPerDomain: MIN_GROUPS_PER_DOMAIN, minClasses: 2 },
+    gate: { minRows: MIN_ROWS, minPerClass: MIN_PER_CLASS, minGroupsPerDomain: MIN_GROUPS_PER_DOMAIN, requireAllDomains, missingDomains, impliedMinimumRows: requireAllDomains ? MIN_PER_CLASS * domains.size : MIN_ROWS },
     canonicalAuthority: false, writesPerformed: false, localArtifactsWritten: true,
   };
   return { rows, receipt };
@@ -139,7 +143,7 @@ function main() {
 
   const raw = fs.readFileSync(path.resolve(input));
   const inputRows = raw.toString('utf8').split('\n').filter((l) => l.trim()).map((l, i) => { try { return JSON.parse(l); } catch { console.error(`input line ${i + 1} is not JSON`); process.exit(1); } });
-  const { rows, receipt } = buildReviewedExport({ inputRows, palette, root, allowUnverifiedSource: process.argv.includes('--allow-unverified-source'), inputSha256: `sha256:${sha256Hex(raw)}` });
+  const { rows, receipt } = buildReviewedExport({ inputRows, palette, root, allowUnverifiedSource: process.argv.includes('--allow-unverified-source'), requireAllDomains: !process.argv.includes('--allow-missing-domains'), inputSha256: `sha256:${sha256Hex(raw)}` });
 
   fs.mkdirSync(outDir, { recursive: true });
   if (rows.length) fs.writeFileSync(path.join(outDir, 'atlas_reviewed_training_examples.jsonl'), rows.map((r) => JSON.stringify(r)).join('\n') + '\n', { flag: 'wx' });

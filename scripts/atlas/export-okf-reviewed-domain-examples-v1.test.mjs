@@ -110,28 +110,38 @@ test('palette checksum verifies the real palette and detects tampering', () => {
   assert.equal(verifyPaletteChecksum(tampered).ok, false);
 });
 
-test('size gate: enough reviewed rows across domains and groups is READY_FOR_HELD_OUT_EVAL', () => {
-  const rows = [];
-  const files = [];
-  for (const d of ['auth', 'database']) {
-    for (let g = 0; g < 6; g++) {
+const manyRows = (domainList, groups, perGroup) => {
+  const out = [];
+  for (const d of domainList) {
+    for (let g = 0; g < groups; g++) {
       const ref = `src/${d}-${g}.ts`;
-      const bytes = Buffer.from(`// ${d} ${g}\n`, 'utf8');
+      const bytes = Buffer.from(`// ${d} ${g}
+`, 'utf8');
       fs.writeFileSync(path.join(root, ref), bytes);
-      files.push(ref);
       const r = `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`;
-      for (let k = 0; k < 6; k++) rows.push(good({ sourceRef: ref, sourceRevision: r, reviewedGroup: d, textEvidence: `${d} ${g} item ${k}` }));
+      for (let k = 0; k < perGroup; k++) out.push(good({ sourceRef: ref, sourceRevision: r, reviewedGroup: d, textEvidence: `${d} ${g} item ${k}` }));
     }
   }
-  const out = buildReviewedExport({ inputRows: rows, palette, root });
-  assert.equal(out.rows.length, 72);
-  assert.equal(out.receipt.status, 'INSUFFICIENT_DATA'); // 72 rows is below the 200-row floor
-  assert.equal(out.receipt.groupsPerDomain.auth, 6);
-  const many = [];
-  for (let rep = 0; rep < 3; rep++) for (const r of rows) many.push({ ...r, textEvidence: `${r.textEvidence} v${rep}` });
-  const ready = buildReviewedExport({ inputRows: many, palette, root });
-  assert.equal(ready.rows.length, 216);
+  return out;
+};
+
+test('size gate: every one of the 10 governed domains with >= 30 rows and >= 5 groups is READY (so at least 300 rows)', () => {
+  const all = Object.keys(palette.domains);
+  const ready = buildReviewedExport({ inputRows: manyRows(all, 5, 6), palette, root });
+  assert.equal(ready.rows.length, 300);
   assert.equal(ready.receipt.status, 'READY_FOR_HELD_OUT_EVAL');
+  assert.equal(ready.receipt.gate.impliedMinimumRows, 300);
+  assert.deepEqual(ready.receipt.gate.missingDomains, []);
+});
+
+test('size gate: two well-populated domains are NOT enough (the 200-row minimum alone no longer passes a 2-class set)', () => {
+  const two = buildReviewedExport({ inputRows: manyRows(['auth', 'database'], 6, 20), palette, root });
+  assert.equal(two.rows.length, 240);
+  assert.equal(two.receipt.status, 'INSUFFICIENT_DATA');
+  assert.equal(two.receipt.gate.missingDomains.length, 8);
+  const relaxed = buildReviewedExport({ inputRows: manyRows(['auth', 'database'], 6, 20), palette, root, requireAllDomains: false });
+  assert.equal(relaxed.receipt.status, 'READY_FOR_HELD_OUT_EVAL');
+  assert.equal(relaxed.receipt.gate.requireAllDomains, false);
 });
 
 test('CLI: exits 2 and writes only a receipt when nothing is reviewed; exits 1 without --input; never overwrites', () => {
