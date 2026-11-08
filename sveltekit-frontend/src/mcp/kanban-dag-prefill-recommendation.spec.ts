@@ -35,6 +35,7 @@ const task = (taskId: string, lane = 'todo', status = 'pending') => ({
 describe('Kanban DAG prefill recommendation MCP tool', () => {
   it('validates a strict bounded feature cohort', () => {
     expect(KanbanDagPrefillRecommendationInputV1Schema.safeParse({ featureId: 'openspec:sample' }).success).toBe(true);
+    expect(KanbanDagPrefillRecommendationInputV1Schema.safeParse({ featureId: 'nextsteps:sample-plan_v1' }).success).toBe(true);
     expect(KanbanDagPrefillRecommendationInputV1Schema.safeParse({ featureId: 'sample', extra: true }).success).toBe(false);
     expect(KanbanDagPrefillRecommendationInputV1Schema.safeParse({
       featureId: 'openspec:sample',

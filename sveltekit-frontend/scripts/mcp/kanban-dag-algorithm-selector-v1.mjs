@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const SNAPSHOT_SCHEMA = 'atlas.kanban-task-dag-snapshot.v1';
 const RESULT_SCHEMA = 'atlas.kanban-dag-prefill-algorithm-recommendation.v1';
-const FEATURE_ID_PATTERN = /^openspec:[a-z0-9][a-z0-9-]*$/;
+const FEATURE_ID_PATTERN = /^(openspec:[a-z0-9][a-z0-9-]*|nextsteps:[a-z0-9_.-]+)$/;
 const SNAPSHOT_HASH_PATTERN = /^[a-f0-9]{64}$/;
 
 const taskSchema = z.object({

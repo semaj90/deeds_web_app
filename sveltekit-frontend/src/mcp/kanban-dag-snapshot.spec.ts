@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { readKanbanDagSnapshotV1 } from './kanban-dag-snapshot.js';
+import { KanbanDagSnapshotInputV1Schema, readKanbanDagSnapshotV1 } from './kanban-dag-snapshot.js';
 
 const featureId = 'openspec:parent-atlas-agentic-file-compiler';
 
@@ -31,6 +31,12 @@ function taskRows() {
 }
 
 describe('read-only Kanban DAG snapshot', () => {
+  it('validates featureId accepting both openspec: and nextsteps: namespaces', () => {
+    expect(KanbanDagSnapshotInputV1Schema.safeParse({ featureId: 'openspec:sample' }).success).toBe(true);
+    expect(KanbanDagSnapshotInputV1Schema.safeParse({ featureId: 'nextsteps:sample-doc_v1' }).success).toBe(true);
+    expect(KanbanDagSnapshotInputV1Schema.safeParse({ featureId: 'sample' }).success).toBe(false);
+  });
+
   it('reads a bounded cohort and same-cohort edges inside one rolled-back read-only snapshot', async () => {
     const pool = fakePool([
       { rows: [{ snapshot_at: new Date('2026-11-02T00:00:00.000Z') }] },
