@@ -1,0 +1,128 @@
+{
+  "schema": "atlas.quantized-feature-block-cross-language-receipt.v1",
+  "generatedAt": "2026-11-08T17:04:49.821Z",
+  "schemaReference": "atlas.quantized-feature-block.v1",
+  "dimensionsTested": [
+    64,
+    128,
+    256,
+    512
+  ],
+  "bitWidthsTested": [
+    2,
+    3,
+    4
+  ],
+  "totalConfigurations": 12,
+  "allParityPassed": true,
+  "results": [
+    {
+      "dim": 64,
+      "bits": 2,
+      "packedByteLength": 16,
+      "idealBits": 128,
+      "allocatedBytes": 16,
+      "sha256": "sha256:13a2683315db328a450d74ab0df42abfd15150856adeb5f9ec8f1332865d72f5",
+      "nodePythonParity": true
+    },
+    {
+      "dim": 64,
+      "bits": 3,
+      "packedByteLength": 24,
+      "idealBits": 192,
+      "allocatedBytes": 24,
+      "sha256": "sha256:6fbc9368541657f1e9e286e014385ab9e8cf66c4d6f30e5285c115a99b61ea8f",
+      "nodePythonParity": true
+    },
+    {
+      "dim": 64,
+      "bits": 4,
+      "packedByteLength": 32,
+      "idealBits": 256,
+      "allocatedBytes": 32,
+      "sha256": "sha256:23957b31ed2927b86b3efe0e082e34261b75e2add08dd55de96ad4d5cd3fe0c3",
+      "nodePythonParity": true
+    },
+    {
+      "dim": 128,
+      "bits": 2,
+      "packedByteLength": 32,
+      "idealBits": 256,
+      "allocatedBytes": 32,
+      "sha256": "sha256:3a160a4ca54ae773196af242dd01ee2af8012567cb2df3d49bffd1522fb1884b",
+      "nodePythonParity": true
+    },
+    {
+      "dim": 128,
+      "bits": 3,
+      "packedByteLength": 48,
+      "idealBits": 384,
+      "allocatedBytes": 48,
+      "sha256": "sha256:f0b7cc451098c1ac676bb5d0787611d09c5163013a37b04475cd5fc00b985c8c",
+      "nodePythonParity": true
+    },
+    {
+      "dim": 128,
+      "bits": 4,
+      "packedByteLength": 64,
+      "idealBits": 512,
+      "allocatedBytes": 64,
+      "sha256": "sha256:43bfb94a813072a043331f6b1f145058a18f53c84fd9017f446d06a45e745178",
+      "nodePythonParity": true
+    },
+    {
+      "dim": 256,
+      "bits": 2,
+      "packedByteLength": 64,
+      "idealBits": 512,
+      "allocatedBytes": 64,
+      "sha256": "sha256:c2e7878caa5281655cfb83e413c43b820a7073000d7f08eb047635fff44a2a79",
+      "nodePythonParity": true
+    },
+    {
+      "dim": 256,
+      "bits": 3,
+      "packedByteLength": 96,
+      "idealBits": 768,
+      "allocatedBytes": 96,
+      "sha256": "sha256:7a41da4ea8b28649b5ef91a75c8559e59a918765ce0554e54ec7d5f6d4285a0d",
+      "nodePythonParity": true
+    },
+    {
+      "dim": 256,
+      "bits": 4,
+      "packedByteLength": 128,
+      "idealBits": 1024,
+      "allocatedBytes": 128,
+      "sha256": "sha256:a0efb563138c50e79094b0188d2e30c3cfcedfe47076ae45acefefe4079b681a",
+      "nodePythonParity": true
+    },
+    {
+      "dim": 512,
+      "bits": 2,
+      "packedByteLength": 128,
+      "idealBits": 1024,
+      "allocatedBytes": 128,
+      "sha256": "sha256:65ad427eee50d3aba913fc91ec6fbe7d869bddb7995c665e9acdcea61c6f4133",
+      "nodePythonParity": true
+    },
+    {
+      "dim": 512,
+      "bits": 3,
+      "packedByteLength": 192,
+      "idealBits": 1536,
+      "allocatedBytes": 192,
+      "sha256": "sha256:96eccabc449d94b07e5a1e59cbe25fbb6b04841ca9efe02b359b589cb45297a6",
+      "nodePythonParity": true
+    },
+    {
+      "dim": 512,
+      "bits": 4,
+      "packedByteLength": 256,
+      "idealBits": 2048,
+      "allocatedBytes": 256,
+      "sha256": "sha256:2da6bfdb7a457d48bf108d9f29faa599a5730103e654f04351f8ffeac8540361",
+      "nodePythonParity": true
+    }
+  ]
+}
