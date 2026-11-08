@@ -16,6 +16,11 @@ const CHECKBOX = /^\s*[-*]\s*\[[ xX]\]\s*/;
 const RESOLVED = new Set(['MATCHED_EXACT', 'RESOLVED_BY_TEXT']);
 
 // Advisory keyword lexicon per palette domain (words only; not an authority). `general` is the fallback when nothing matches.
+const RESOLVED = new Set(['MATCHED_EXACT', 'RESOLVED_BY_TEXT', 'EXACT_SOURCE_LINE_MATCH', 'FILE_MATCHED_LINE_SEARCH']);
+
+// Advisory keyword lexicon per palette domain (words only; not an authority). `general` is the fallback when nothing matches in v1.
+export const V1_DOMAINS = ['auth', 'ui', 'retrieval', 'network', 'database', 'cache', 'agent', 'graph', 'ml', 'general'];
+
 export const LEXICON = {
   auth: ['auth', 'login', 'session', 'token', 'permission', 'rbac', 'oauth', 'credential', 'csrf', 'password'],
   ui: ['svelte', 'component', 'modal', 'css', 'unocss', 'layout', 'button', 'rune', 'page', 'viewer', 'webgpu', 'render'],
@@ -35,11 +40,37 @@ export function proposeDomain(text) {
     const score = words.reduce((n, w) => n + (t.includes(w) ? 1 : 0), 0);
     if (score > bestScore) { best = domain; bestScore = score; }
   }
+export const V2_EXTENSION_LEXICON = {
+  compiler: ['compiler', 'tree-sitter', 'cst', 'ast', 'ast-grep', 'parser', 'grammar', 'lexer', 'token', 'codegen', 'syntax', 'cmake', 'llvm', 'nvcc', 'transpile'],
+  devops: ['docker', 'compose', 'wsl2', 'service', 'systemd', 'caddy', 'healthcheck', 'ci', 'actions', 'deploy', 'k8s', 'powershell', 'environment'],
+  'error-handling': ['recovery', 'circuit-breaker', 'retry', 'fallback', 'exception', 'panic', 'fail-closed', 'unhandled', 'rollback', 'reconcile', 'quarantine', 'diagnose'],
+  test: ['vitest', 'playwright', 'unittest', 'assert', 'fixture', 'mock', 'rehearsal', 'smoke', 'benchmark', 'spec.ts', 'test.mjs', 'test.py', 'eval'],
+  general: ['overview', 'briefing', 'general', 'meeting', 'notes', 'cleanup', 'todo', 'housekeeping', 'readme', 'documentation', 'blocked', 'gate', 'governance', 'policy', 'coordination'],
+};
+
+export function proposeDomain(text, options = {}) {
+  const t = text.toLowerCase();
+  const isV2 = Boolean(options.v2 || (Array.isArray(options.domains) && options.domains.length > 10));
+  const activeLexicon = isV2 ? { ...LEXICON, ...V2_EXTENSION_LEXICON } : LEXICON;
+
+  let best = null, bestScore = 0;
+  for (const [domain, words] of Object.entries(activeLexicon)) {
+    if (domain === 'general' && !isV2) continue; // In v1, general is fallback
+    const score = words.reduce((n, w) => n + (t.includes(w) ? 1 : 0), 0);
+    if (score > bestScore) { best = domain; bestScore = score; }
+  }
+
+  if (isV2) {
+    if (bestScore === 0) return 'UNRESOLVED_CANDIDATE';
+    return best;
+  }
   return best ?? 'general';
 }
 
 /** Pure core. `readBytes(sourceRef)` returns the exact file bytes or null. */
 export function buildTierBDraft({ crosswalkRows, readBytes, seed = 'tier-b-v1', perDomain = 55, reservePerDomain = 15, domains }) {
+export function buildTierBDraft({ crosswalkRows, readBytes, seed = 'tier-b-v1', perDomain = 55, reservePerDomain = 15, domains = V1_DOMAINS }) {
+  const isV2 = domains.length > 10;
   const cache = new Map();
   const load = (ref) => { if (!cache.has(ref)) { const b = readBytes(ref); cache.set(ref, b ? { bytes: b, sha: `sha256:${sha256Hex(b)}`, lines: b.toString('utf8').split('\n') } : null); } return cache.get(ref); };
   const skipped = {};
@@ -51,6 +82,20 @@ export function buildTierBDraft({ crosswalkRows, readBytes, seed = 'tier-b-v1', 
     const f = load(r.source);
     if (!f) { bySkip('SOURCE_UNREADABLE'); continue; }
     const rawLine = f.lines[r.line - 1];
+  const seenKeys = new Set();
+
+  for (const r of crosswalkRows) {
+    const status = r.status || r.workboard_join_status;
+    const stableKey = r.stableKey || r.canonical_task_key;
+    const source = r.source || (r.source_ref ? r.source_ref.split('#')[0] : null);
+    const line = r.line ?? (r.source_ref ? parseInt(r.source_ref.split('#L')[1], 10) : null);
+
+    if (!RESOLVED.has(status) || !stableKey || !source || typeof line !== 'number' || isNaN(line)) { bySkip('NOT_RESOLVED'); continue; }
+    if (seenKeys.has(stableKey)) { bySkip('DUPLICATE_STABLE_KEY'); continue; }
+    seenKeys.add(stableKey);
+    const f = load(source);
+    if (!f) { bySkip('SOURCE_UNREADABLE'); continue; }
+    const rawLine = f.lines[line - 1];
     if (rawLine === undefined || !CHECKBOX.test(rawLine)) { bySkip('LINE_NOT_A_TASK'); continue; }
     const lineText = rawLine.replace(/\r$/, '');
     const text = lineText.replace(CHECKBOX, '').trim();
@@ -64,6 +109,19 @@ export function buildTierBDraft({ crosswalkRows, readBytes, seed = 'tier-b-v1', 
     byDomain[domain].push({
       id: `${r.stableKey}`, tier: 'B', stableKey: r.stableKey, sourceRef: r.source, sourceGroup: r.source,
       featureLabel: r.stableKey.slice(0, r.stableKey.indexOf('#')), textEvidence: text,
+    const before = Buffer.byteLength(f.lines.slice(0, line - 1).map((l) => `${l}\n`).join(''), 'utf8');
+    const byteStart = before;
+    const byteEnd = before + Buffer.byteLength(lineText, 'utf8');
+    if (f.bytes.subarray(byteStart, byteEnd).toString('utf8') !== lineText) { bySkip('SPAN_MISMATCH'); continue; }
+    let domain = proposeDomain(text, { v2: isV2, domains });
+    if (domain === 'UNRESOLVED_CANDIDATE') { bySkip('UNMATCHED_V2_TEXT'); continue; }
+    if (!byDomain[domain]) {
+      if (isV2) { bySkip('UNMAPPED_DOMAIN'); continue; }
+      domain = 'general';
+    }
+    byDomain[domain].push({
+      id: `${stableKey}`, tier: 'B', stableKey, sourceRef: source, sourceGroup: source,
+      featureLabel: stableKey.slice(0, stableKey.indexOf('#')), textEvidence: text,
       sourceRevision: f.sha, evidenceSpan: { byteStart, byteEnd }, proposedDomain: domain,
       reviewStatus: 'PROPOSED', canonical_authority: false,
       // deliberately no workspaceRevision: tasks have no admitted workspace snapshot (Tier B)

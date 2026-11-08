@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.openspec-task-rank-fuse.v1",
+  "generatedAt": "2026-11-07T19:22:45.386934+00:00",
+  "canonicalAuthority": false,
+  "source": "docs/reports/openspec-task-extract-v1.20261107T192103Z.all-open.jsonl",
+  "params": {
+    "rrfK": 60,
+    "knnK": 10,
+    "knnMetric": "cosine over TF-IDF (log tf, smoothed idf, df>=2 and df<N)",
+    "knnPagerankDamping": 0.85,
+    "themesSource": "scripts/atlas/rank-open-tasks-v1.mjs#THEMES (imported)",
+    "pageSize": 100
+  },
+  "counts": {
+    "openTasks": 6527,
+    "vocab": 4681,
+    "pages": 66,
+    "tasksWithAnyTheme": 2693,
+    "tasksWithCitationIn": 287,
+    "knnMeanTopSim": 0.4711
+  },
+  "outputs": {
+    "openspec-task-rank-fuse-v1.20261107T192237Z.jsonl": "dc83e4beb1b609c48c0aa707783c31ae9e2a641be38d15896c22294561062e44"
+  }
+}

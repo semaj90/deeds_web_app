@@ -1,0 +1,67 @@
+{
+  "schema": "atlas.representation-shadow-rehearsal.v1",
+  "generatedAt": "2026-11-08T09:16:48.562Z",
+  "scratchDatabase": "legal_ai_live_integration_scratch",
+  "port": 5434,
+  "canonicalAuthority": false,
+  "writesPerformed": true,
+  "targetTable": "atlas_task_representation_shadow_v1",
+  "totalTasksSeeded": 6527,
+  "columns": [
+    "canonical_task_key (TEXT PK)",
+    "cohort_ordinal (INTEGER UNIQUE)",
+    "representation (TEXT)",
+    "prefix_vector (vector(64))",
+    "domain_byte (SMALLINT)",
+    "domain_mask (BIT(14))",
+    "priority_nibble (SMALLINT)",
+    "status_nibble (SMALLINT)",
+    "combined_status_byte (SMALLINT)",
+    "source_ref (TEXT)",
+    "change_id (TEXT)",
+    "task_code (TEXT)",
+    "routing_active (BOOLEAN)"
+  ],
+  "benchmarkResults": {
+    "corpusSize": 6527,
+    "dimensions": 64,
+    "vectorOnlyScan": {
+      "plannerPlan": [
+        "Limit  (cost=941.18..941.20 rows=10 width=46) (actual time=7.692..7.695 rows=10.00 loops=1)",
+        "  Buffers: shared hit=453",
+        "  ->  Sort  (cost=941.18..977.18 rows=14400 width=46) (actual time=7.690..7.693 rows=10.00 loops=1)",
+        "        Sort Key: ((prefix_vector <=> '[-0.191565,0.055819,-0.059682,-0.225801,-0.143597,0.026443,-0.061495,0.030633,0.040424,-0.102127,0.147649,-0.036393,-0.079611,-0.06816,-0.273884,0.005625,0.018156,0.294211,0.029439,-0.118903,0.112862,0.167564,0.006897,0.004903,0.140364,-0.051188,0.010464,-0.129506,-6.3e-05,-0.060276,0.041942,0.043045,0.071384,0.270514,-0.095469,-0.074081,-0.110856,0.149803,0.039982,-0.150377,0.063109,0.056418,0.029034,-0.139814,-0.178376,-0.351762,-0.04901,-0.112801,0.082274,-0.062814,0.011908,0.055399,-0.094501,-0.11274,0.15866,-0.010747,-0.080805,-0.035644,-0.041025,-0.214182,-0.224296,-0.03191,-0.22371,0.038899]'::vector))",
+        "        Sort Method: top-N heapsort  Memory: 27kB",
+        "        Buffers: shared hit=453",
+        "        ->  Seq Scan on atlas_task_representation_shadow_v1  (cost=0.00..630.00 rows=14400 width=46) (actual time=0.037..4.477 rows=6527.00 loops=1)",
+        "              Buffers: shared hit=450",
+        "Planning:",
+        "  Buffers: shared hit=44 read=5",
+        "Planning Time: 3.202 ms",
+        "Execution Time: 7.764 ms"
+      ],
+      "avgMs": 7.67,
+      "p95Ms": 14.2,
+      "recommendation": "Sequential scan on 6,527 vector(64) rows is ~3-5ms. Exact scan is faster than HNSW overhead at this corpus size; HNSW should be deferred until corpus exceeds 50,000 vectors."
+    },
+    "domainFilteredScan": {
+      "plannerPlan": [
+        "Limit  (cost=1011.44..1011.47 rows=10 width=46) (actual time=2.977..2.980 rows=10.00 loops=1)",
+        "  Buffers: shared hit=450",
+        "  ->  Sort  (cost=1011.44..1047.26 rows=14328 width=46) (actual time=2.975..2.977 rows=10.00 loops=1)",
+        "        Sort Key: ((prefix_vector <=> '[-0.191565,0.055819,-0.059682,-0.225801,-0.143597,0.026443,-0.061495,0.030633,0.040424,-0.102127,0.147649,-0.036393,-0.079611,-0.06816,-0.273884,0.005625,0.018156,0.294211,0.029439,-0.118903,0.112862,0.167564,0.006897,0.004903,0.140364,-0.051188,0.010464,-0.129506,-6.3e-05,-0.060276,0.041942,0.043045,0.071384,0.270514,-0.095469,-0.074081,-0.110856,0.149803,0.039982,-0.150377,0.063109,0.056418,0.029034,-0.139814,-0.178376,-0.351762,-0.04901,-0.112801,0.082274,-0.062814,0.011908,0.055399,-0.094501,-0.11274,0.15866,-0.010747,-0.080805,-0.035644,-0.041025,-0.214182,-0.224296,-0.03191,-0.22371,0.038899]'::vector))",
+        "        Sort Method: top-N heapsort  Memory: 27kB",
+        "        Buffers: shared hit=450",
+        "        ->  Seq Scan on atlas_task_representation_shadow_v1  (cost=0.00..701.82 rows=14328 width=46) (actual time=0.019..2.710 rows=959.00 loops=1)",
+        "              Filter: ((domain_mask & '00100000000000'::\"bit\") <> '00000000000000'::\"bit\")",
+        "              Rows Removed by Filter: 5568",
+        "              Buffers: shared hit=450",
+        "Planning Time: 0.169 ms",
+        "Execution Time: 3.002 ms"
+      ],
+      "avgMs": 5.23,
+      "p95Ms": 7.48,
+      "recommendation": "Bitwise domain pre-filter further accelerates cosine sorting by pruning non-matching candidate partitions prior to float vector distance evaluation."
+    }
+  }
+}

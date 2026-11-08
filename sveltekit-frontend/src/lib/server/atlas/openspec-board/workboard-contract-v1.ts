@@ -580,8 +580,8 @@ export function projectTask(task: OpenSpecWorkboardTaskV1): OpenSpecTaskProjecti
     supersessionReviewState: typeof task.supersessionReviewState === 'string' ? task.supersessionReviewState : null,
     priority: task.priority,
     actionable: task.executionState === 'ACTIONABLE' && task.supersessionReviewState !== 'REVIEW_REQUIRED',
-    waiting: task.executionState === 'WAITING_ON_DEPENDENCY',
-    superseded: task.executionState === 'SUPERSEDED_OR_HISTORICAL',
+    waiting: task.executionState === 'WAITING_ON_DEPENDENCY' && task.supersessionReviewState !== 'REVIEW_REQUIRED',
+    superseded: task.executionState === 'SUPERSEDED_OR_HISTORICAL' && task.supersessionReviewState !== 'REVIEW_REQUIRED',
     lane: task.lane ?? null,
     sourceLine: task.line,
   };

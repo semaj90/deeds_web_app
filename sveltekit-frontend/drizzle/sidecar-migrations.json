@@ -1029,6 +1029,22 @@
       "file": "manual/20261107_atlas_concept_tie_v2.sql",
       "status": "applied",
       "reason": "Applied 2026-11-07 after explicit operator approval. Creates public.atlas_concept_tie_v2, a non-canonical staging table for concept-tie v2 lanes (canonical_authority fixed false; JSONB unknown_reason and proposal; 5 indexes plus PK and unique). Empty at apply; no rows loaded."
+    },
+    {
+      "file": "manual/20261108_atlas_kanban_dag_prefill_v1.sql",
+      "status": "active_candidate",
+      "reason": "Prepared non-canonical prefill/routing projection table public.atlas_kanban_dag_prefill_v1 bridged to public.kanban_tasks via canonical_task_key (<change>#<16-hex-sha256>). Enforces canonical_authority=false, forbids synthetic task:ordinal:* IDs, and separates routing_status (ROUTED_ACTIVE|UNROUTED) from canonical task status. Rehearsed in a rolled-back transaction against PostgreSQL 18 legal_ai_db; not applied.",
+      "appliedBy": "not-applied",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/reconcile-cohort-6527-kanban-authority-v1.mjs"
+    },
+    {
+      "file": "manual/20261108_atlas_nes_lut_v2_candidate.sql",
+      "status": "active_candidate",
+      "reason": "Additive candidate only: stage 14 versioned NES LUT routing metadata rows under atlas.nes-lut.v2-candidate in the existing atlas_nes_lut_v1 table. Preserves v1 records; scratch-only gated rehearsal/apply required, no live migration or ontology updates.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
     }
   ]
 }

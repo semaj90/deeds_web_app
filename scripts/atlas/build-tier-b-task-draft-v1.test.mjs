@@ -59,3 +59,19 @@ test('the keyword proposal is advisory: unmatched text falls back to general', (
   assert.equal(proposeDomain('verify session token permissions'), 'auth');
   assert.equal(proposeDomain('write overview notes for the team'), 'general');
 });
+
+test('v2 mode: advisory keywords propose 14 classes; unmatched text is UNRESOLVED_CANDIDATE', () => {
+  const v2Opts = { v2: true, domains: [...DOMAINS, 'compiler', 'devops', 'error-handling', 'test'] };
+  assert.equal(proposeDomain('build tree-sitter parser cst rules', v2Opts), 'compiler');
+  assert.equal(proposeDomain('verify docker compose wsl2 service', v2Opts), 'devops');
+  assert.equal(proposeDomain('panic fallback error recovery handling', v2Opts), 'error-handling');
+  assert.equal(proposeDomain('execute vitest playwright smoke test harness', v2Opts), 'test');
+  assert.equal(proposeDomain('complete general meeting housekeeping', v2Opts), 'general');
+  assert.equal(proposeDomain('xylophone zephyr quartz', v2Opts), 'UNRESOLVED_CANDIDATE');
+});
+
+test('duplicate stableKeys are detected and skipped', () => {
+  const dupes = [row('openspec/changes/c/tasks.md', 3, 1), row('openspec/changes/c/tasks.md', 3, 1)];
+  const { summary } = buildTierBDraft({ crosswalkRows: dupes, readBytes, domains: DOMAINS });
+  assert.equal(summary.skipped.DUPLICATE_STABLE_KEY, 1);
+});

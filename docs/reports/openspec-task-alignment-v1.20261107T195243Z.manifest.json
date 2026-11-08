@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.openspec-task-alignment.v1",
+  "generatedAt": "2026-11-07T19:54:33.479291+00:00",
+  "canonicalAuthority": false,
+  "source": "docs/reports/openspec-task-rank-fuse-v1.20261107T195111Z.jsonl",
+  "params": {
+    "sample": 200,
+    "seed": 7,
+    "rgPaths": [
+      "sveltekit-frontend/src",
+      "sveltekit-frontend/scripts",
+      "sveltekit-frontend/tests",
+      "scripts",
+      "python",
+      "packages",
+      "docs/architecture",
+      "docs/reports",
+      "openspec",
+      "sveltekit-frontend/openspec",
+      "docs"
+    ],
+    "rgGlobs": [
+      "!**/tasks.md",
+      "!docs/reports/openspec-task-*",
+      "!docs/reports/openspec-workboard*",
+      "!scripts/atlas/openspec-task-*",
+      "!**/*.bak",
+      "!**/node_modules/**",
+      "!**/dist/**",
+      "!**/build/**"
+    ]
+  },
+  "accuracy": "UNMEASURED: no reviewed gold labels exist yet; the blind sheet is unreviewed",
+  "gold": {
+    "sheet": "openspec-task-alignment-v1.20261107T195243Z.gold-sheet-blind.jsonl",
+    "key": "openspec-task-alignment-v1.20261107T195243Z.gold-key.jsonl",
+    "sheetRows": 200,
+    "keyRule": "key must not be shown to reviewers"
+  },
+  "outputs": {
+    "openspec-task-alignment-v1.20261107T195243Z.rows.jsonl": "sha256:b529bc113e80aafa7b19044c57bf0dbe10fbc4ecf9600dd4d43b4b658ad0210d",
+    "openspec-task-alignment-v1.20261107T195243Z.gold-sheet-blind.jsonl": "sha256:90069fbf392e1bb94f691ab15eea0d7becc39730bbfd2724b5149ffa96f6aab5",
+    "openspec-task-alignment-v1.20261107T195243Z.gold-key.jsonl": "sha256:3d3dbcce40c175e3a83ffd0698f4b70606881512c12863be001f773532fb6bde",
+    "openspec-task-alignment-v1.20261107T195243Z.reranker-check.json": "sha256:4fb68b8dd5e00d70eb51d996d9d33f7e0dffbcf9bce0bc70ea282fe97ff78bcd"
+  }
+}

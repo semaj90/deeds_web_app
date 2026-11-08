@@ -1,0 +1,81 @@
+{
+  "schema": "atlas.sum04-canary-receipt.v1",
+  "generatedAt": "2026-11-08T03:54:30.234Z",
+  "mode": "REHEARSAL",
+  "manifest": ".tmp\\atlas\\ornith-summary-proposals-v1\\20260926T045015Z\\manifest.json",
+  "manifestRoot": "sha256:15ea5470bbad6e01419fea8240049c5eb864022e3df7807427db2bf1f26a94e2",
+  "requested": 12,
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "results": [
+    {
+      "chunkRowId": "f8551f68-2e40-423e-8ceb-3e8d52ac1b79",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "9bcb5014-daba-4180-ac53-9da8b4ba3b1c",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "8e9947c4-fbb0-420a-beec-a8f48df1f62c",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "18a9ca71-6bfe-4363-ae25-4ee14d0176e2",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "d3ae61f1-0b64-4374-a8c5-8dd829c0ad65",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "b65d4287-d66e-4ea2-9fe2-b87d4fff8f3e",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "e033a553-722e-472f-852c-be1ca022c1ea",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "6752d8f9-d734-416a-ada5-c26923f0ba9d",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "0d6cb0eb-b1a3-4ffe-b404-aa0a2ddb5b49",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "66ca0224-05e6-4185-9ac0-f12585b7fe79",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "8d0260ce-bd73-4bd6-a04e-b3b349ad04fc",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "6f7fc3af-d554-4c82-a732-6e46829cb70e",
+      "status": "ADMITTED",
+      "reasons": []
+    }
+  ],
+  "checks": {
+    "unexpectedExisting": 0,
+    "readbackMatched": 12,
+    "summaryDigestRecomputedMatched": 12,
+    "legacySummaryColumnsUnchanged": true,
+    "rowsStillEmptyAfterRollback": true
+  },
+  "status": "REHEARSAL_PROVEN_ROLLED_BACK",
+  "failure": null,
+  "committed": false
+}

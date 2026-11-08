@@ -3,7 +3,7 @@
   "status": "CANDIDATE_NOT_APPLIED",
   "canonicalAuthority": false,
   "writesPerformed": false,
-  "sourceTaxonomyYamlSha256": "sha256:65ec852af38ca0d1fa78664ee4fbe1822a712f65196a32c8ad60eee0c95ed0d9",
+  "sourceTaxonomyYamlSha256": "sha256:6f464aa21eb43d9ac63318cf8a4b3b577e6810cd657a7f902ae8e181d64463e9",
   "paletteRevision": "nes-domain-palette-v2-candidate",
   "paletteChecksum": "sha256:9aa054b012ff29a5a9a050533b25db86b8dfafca0a469569c043b466b42a1334",
   "decision": {
@@ -163,5 +163,5 @@
   ],
   "sourceGroupCount": 17,
   "paletteDomainCount": 14,
-  "checksum": "sha256:acaabe48aa833986f84cb37741a9f72ec04933358594678379e45ef0922cb77f"
+  "checksum": "sha256:0d15c14909754b4d1976ebd35318ba785fe20a7434ba335d7e0cf5d9bb43fc49"
 }

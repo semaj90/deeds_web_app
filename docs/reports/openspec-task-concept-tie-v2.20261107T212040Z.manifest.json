@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.openspec-task-concept-tie.v2",
+  "generatedAt": "2026-11-07T21:20:41.429773+00:00",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "catalog": {
+    "source": "docs/reports/concept-seed-dry-v1.json",
+    "status": "DRY_SEED_NOT_CANONICAL",
+    "canonicalTerms": 36,
+    "aliasTerms": 25
+  },
+  "genericTerms": [
+    "agent",
+    "card",
+    "code",
+    "concept",
+    "data",
+    "domain",
+    "file",
+    "index",
+    "lane",
+    "layer",
+    "model",
+    "module",
+    "packet",
+    "page",
+    "route",
+    "service",
+    "source",
+    "system",
+    "type",
+    "workflow"
+  ],
+  "lanes": {
+    "EXACT_ALIAS": {
+      "count": 456,
+      "pct": 6.99
+    },
+    "EXACT_CANONICAL": {
+      "count": 2891,
+      "pct": 44.29
+    },
+    "GENERIC_ALIAS_EXCLUDED": {
+      "count": 411,
+      "pct": 6.3
+    },
+    "UNKNOWN": {
+      "count": 2769,
+      "pct": 42.42
+    }
+  },
+  "tableDraft": "sveltekit-frontend/drizzle/manual/20261107_atlas_concept_tie_v2_DRAFT.sql (not applied)",
+  "outputs": {
+    "openspec-task-concept-tie-v2.20261107T212040Z.rows.jsonl": "sha256:f5ee27fd3d9442404023b71f06d6282e2d2b02c4cdd608cabfd42c7154d60e23"
+  }
+}

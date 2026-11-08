@@ -28,19 +28,70 @@ if (PALETTE_MODE) {
   TOP_LEVEL = Object.keys(palette.domains);
   CHILDREN = [];
 }
-const NON_GOLD = ['AMBIGUOUS', 'NOT_A_DOMAIN', 'SKIP'];
-const TRUST_TOTAL = 200;
-const TRUST_PER_CLASS = 30;
+let paletteChecksum = null;
+let TOP_LEVEL = ['api', 'auth', 'cache', 'compiler', 'database', 'devops', 'error-handling', 'frontend', 'gpu', 'graph', 'machine-learning', 'retrieval', 'test'];
+let CHILDREN = ['database.postgresql', 'devops.env-config', 'devops.process-mgmt', 'frontend.sveltekit'];
 
-const rows = fs.readFileSync(INPUT, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
+if (PALETTE_MODE) {
+  const palettePath = argOf('--palette-file') ? path.resolve(argOf('--palette-file')) : path.join(ROOT, 'scripts/atlas/data/nes-domain-palette-v1.json');
+  const palette = JSON.parse(fs.readFileSync(palettePath, 'utf8'));
+  const { checksum, ...body } = palette;
+  const actual = 'sha256:' + createHash('sha256').update(JSON.stringify(body)).digest('hex');
+  if (actual !== checksum) { console.error(`PALETTE_CHECKSUM_MISMATCH: expected ${checksum}, got ${actual}`); process.exit(3); }
+  paletteChecksum = checksum;
+  TOP_LEVEL = Object.keys(palette.domains);
+  CHILDREN = [];
+}
+
+const inputBytes = fs.readFileSync(INPUT);
+const inputSha256 = 'sha256:' + createHash('sha256').update(inputBytes).digest('hex');
+const rows = inputBytes.toString('utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
+const IS_TIER_B = rows.some((r) => r.tier === 'B' || r.stableKey);
+
+if (IS_TIER_B && !argOf('--output')) {
+  console.error('TIER_B_EXPLICIT_OUTPUT_REQUIRED: Tier B review sheet requires explicit --output to avoid clobbering Tier A review sheets');
+  process.exit(1);
+}
+
+const OUTPUT = argOf('--output') ? path.resolve(argOf('--output')) : path.join(ROOT, PALETTE_MODE ? 'docs/reports/domain-review-sheet-palette-v1.html' : 'docs/reports/domain-review-sheet-v1.html');
+
+// Validate Tier B keys: must have stableKey, no duplicates
+if (IS_TIER_B) {
+  const seenStableKeys = new Set();
+  for (const r of rows) {
+    if (!r.stableKey) {
+      console.error('TIER_B_MISSING_STABLE_KEY: Tier B row missing stableKey');
+      process.exit(1);
+    }
+    if (seenStableKeys.has(r.stableKey)) {
+      console.error(`TIER_B_DUPLICATE_STABLE_KEY: duplicate stableKey ${r.stableKey}`);
+      process.exit(1);
+    }
+    seenStableKeys.add(r.stableKey);
+  }
+}
+
+const NON_GOLD = ['AMBIGUOUS', 'NOT_A_DOMAIN', 'SKIP'];
+const TRUST_PER_CLASS = 30;
+const TRUST_TOTAL = Math.max(200, TOP_LEVEL.length * TRUST_PER_CLASS);
+
+const storageKey = IS_TIER_B
+  ? `domainReview_tierB_${(paletteChecksum || 'v1').slice(7, 19)}_${inputSha256.slice(7, 19)}`
+  : 'domainReviewV1';
+
 const qualified = rows.filter((r) => r.sourceRevision);
 const needs = TOP_LEVEL.map((g) => {
   // In palette mode the draft's proposedOntologyGroup is a different vocabulary, so no per-class proposal count is claimed.
   const have = PALETTE_MODE ? 0 : qualified.filter((r) => r.proposedOntologyGroup === g).length;
+  const have = PALETTE_MODE
+    ? qualified.filter((r) => (r.proposedDomain ?? r.proposedOntologyGroup) === g).length
+    : qualified.filter((r) => r.proposedOntologyGroup === g).length;
   return { group: g, revisionQualifiedRowsProposed: have, target: TRUST_PER_CLASS, shortBy: Math.max(0, TRUST_PER_CLASS - have) };
 });
 const payload = {
   generatedAt: new Date().toISOString(),
+  tier: IS_TIER_B ? 'B' : 'A',
+  storageKey,
   topLevel: TOP_LEVEL, children: CHILDREN, nonGold: NON_GOLD,
   trust: { total: TRUST_TOTAL, perClass: TRUST_PER_CLASS },
   needs, rows,
@@ -110,13 +161,21 @@ button.p{background:var(--acc);color:#fff;border-color:var(--acc)}
 <script id="d" type="application/json">${data}</script>
 <script>
 const D = JSON.parse(document.getElementById('d').textContent);
-const KEY = 'domainReviewV1';
+const KEY = D.storageKey || 'domainReviewV1';
+const kOf = (r) => r.stableKey || r.packetKey || r.id;
 let saved = {}; try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch { saved = {}; }
 const opts = [...D.topLevel, ...D.children, ...D.nonGold];
 const $ = (id) => document.getElementById(id);
 const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch {} };
 const isGold = (v) => v && !D.nonGold.includes(v);
 const rq = (r) => !!r.sourceRevision;
+
+if (D.tier === 'B') {
+  const banner = document.createElement('div');
+  banner.style.cssText = 'background:#fff3cd;color:#856404;border:1px solid #ffeeba;padding:10px 14px;margin:10px 0;border-radius:4px;font-weight:600;font-size:13px;';
+  banner.textContent = 'Tier B: Evaluation Only — Tasks have no admitted workspace revision and cannot acquire model-training authority.';
+  $('stat').before(banner);
+}
 
 function el(tag, attrs, ...kids) {
   const e = document.createElement(tag);
@@ -127,7 +186,7 @@ function el(tag, attrs, ...kids) {
 function needsTable() {
   const t = el('table'); t.append(el('tr', {}, ...['Group', 'Revision-qualified rows in draft', 'Reviewed so far (gold)', 'Target', 'Short by'].map((h) => el('th', {}, h))));
   for (const n of D.needs) {
-    const got = D.rows.filter((r) => rq(r) && saved[r.packetKey] && saved[r.packetKey].g === n.group).length;
+    const got = D.rows.filter((r) => rq(r) && saved[kOf(r)] && saved[kOf(r)].g === n.group).length;
     t.append(el('tr', {}, el('td', {}, n.group), el('td', {}, String(n.revisionQualifiedRowsProposed)), el('td', {}, String(got)), el('td', {}, String(n.target)), el('td', {}, String(Math.max(0, n.target - got)))));
   }
   $('needs').replaceChildren(t);
@@ -136,21 +195,28 @@ function render() {
   const q = $('q').value.toLowerCase(), fq = $('fq').value, fs = $('fs').value, fg = $('fg').value, blind = $('blind').checked;
   const list = D.rows.filter((r) => {
     if (fq === 'rq' && !rq(r)) return false; if (fq === 'un' && rq(r)) return false;
-    const done = !!saved[r.packetKey]; if (fs === 'todo' && done) return false; if (fs === 'done' && !done) return false;
-    if (fg && r.proposedOntologyGroup !== fg) return false;
-    if (q && !(r.sourceRef + ' ' + r.featureLabel + ' ' + r.originalLabel + ' ' + r.proposedOntologyGroup + ' ' + r.textEvidence).toLowerCase().includes(q)) return false;
+    const rKey = kOf(r);
+    const done = !!saved[rKey]; if (fs === 'todo' && done) return false; if (fs === 'done' && !done) return false;
+    const propDomain = r.proposedDomain ?? r.proposedOntologyGroup ?? '';
+    if (fg && propDomain !== fg) return false;
+    if (q && !(r.sourceRef + ' ' + (r.featureLabel || '') + ' ' + (r.originalLabel || '') + ' ' + propDomain + ' ' + r.textEvidence).toLowerCase().includes(q)) return false;
     return true;
   }).sort((a, b) => Number(rq(b)) - Number(rq(a)));
   const root = $('list'); root.replaceChildren();
   for (const r of list) {
-    const s = saved[r.packetKey];
+    const rKey = kOf(r);
+    const s = saved[rKey];
     const sel = el('select', { 'aria-label': 'Reviewed group' }, el('option', { value: '' }, '- choose -'), ...opts.map((o) => el('option', { value: o }, o)));
     sel.value = s ? s.g : '';
-    sel.onchange = () => { if (sel.value) saved[r.packetKey] = { g: sel.value, by: $('rev').value || '', at: new Date().toISOString() }; else delete saved[r.packetKey]; persist(); needsTable(); stat(); render(); };
+    sel.onchange = () => { if (sel.value) saved[rKey] = { g: sel.value, by: $('rev').value || '', at: new Date().toISOString() }; else delete saved[rKey]; persist(); needsTable(); stat(); render(); };
     const revealed = !blind || !!s;
+    const propDomain = r.proposedDomain ?? r.proposedOntologyGroup ?? 'none';
+    const weakLabel = r.originalLabel ? ' | weak label: ' + r.originalLabel : '';
+    const mapKind = r.mappingKind ? ' (' + r.mappingKind + ')' : '';
+    const keyLabel = r.stableKey ? 'task ' + r.stableKey : 'packet ' + r.packetKey;
     const row = el('div', { class: 'row' + (s ? ' done' : '') },
       el('div', {}, el('span', { class: 'tag ' + (rq(r) ? 'q' : 'u') }, rq(r) ? 'revision-qualified' : 'unresolved'), el('b', {}, r.sourceRef)),
-      el('div', { class: 'meta' }, 'packet ' + r.packetKey + (revealed ? ' | weak label: ' + r.originalLabel + ' | proposed: ' + r.proposedOntologyGroup + ' (' + r.mappingKind + ')' : ' | labels hidden (blind mode)')),
+      el('div', { class: 'meta' }, keyLabel + (revealed ? weakLabel + ' | proposed: ' + propDomain + mapKind : ' | labels hidden (blind mode)')),
       el('div', { class: 'ev' }, r.textEvidence || '(no evidence text)'),
       el('div', {}, sel));
     root.append(row);
@@ -159,19 +225,26 @@ function render() {
 }
 function stat() {
   const all = Object.values(saved), gold = all.filter((v) => isGold(v.g)).length;
-  const goldRq = D.rows.filter((r) => rq(r) && saved[r.packetKey] && isGold(saved[r.packetKey].g)).length;
+  const goldRq = D.rows.filter((r) => rq(r) && saved[kOf(r)] && isGold(saved[kOf(r)].g)).length;
   document.title = 'Domain Review Sheet - ' + all.length + ' reviewed';
   $('stat').dataset.summary = all.length + ' reviewed, ' + gold + ' gold (' + goldRq + ' revision-qualified) of trust floor ' + D.trust.total;
 }
 function exportJsonl() {
-  const out = D.rows.filter((r) => saved[r.packetKey]).map((r) => {
-    const s = saved[r.packetKey];
-    return JSON.stringify({ ...r, reviewStatus: 'REVIEWED', reviewedGroup: s.g, reviewer: s.by || $('rev').value || null, reviewedAt: s.at });
+  const out = D.rows.filter((r) => saved[kOf(r)]).map((r) => {
+    const s = saved[kOf(r)];
+    const exported = { ...r, reviewStatus: 'REVIEWED', reviewedGroup: s.g, reviewer: s.by || $('rev').value || null, reviewedAt: s.at };
+    if (D.tier === 'B') {
+      delete exported.workspaceRevision;
+      exported.tier = 'B';
+      exported.canonical_authority = false;
+    }
+    return JSON.stringify(exported);
   });
   const blob = new Blob([out.join('\\n') + '\\n'], { type: 'application/x-ndjson' });
-  const a = el('a', { href: URL.createObjectURL(blob), download: 'domain-calibration-reviewed-v1.jsonl' }); a.click();
+  const filename = D.tier === 'B' ? 'tier-b-task-reviewed-v1.jsonl' : 'domain-calibration-reviewed-v1.jsonl';
+  const a = el('a', { href: URL.createObjectURL(blob), download: filename }); a.click();
 }
-const groups = [...new Set(D.rows.map((r) => r.proposedOntologyGroup))].sort();
+const groups = [...new Set(D.rows.map((r) => r.proposedDomain ?? r.proposedOntologyGroup).filter(Boolean))].sort();
 for (const g of groups) $('fg').append(el('option', { value: g }, g));
 ['q', 'fq', 'fs', 'fg', 'blind'].forEach((id) => $(id).addEventListener('input', render));
 $('exp').onclick = exportJsonl;

@@ -1,0 +1,131 @@
+{
+  "schema": "atlas.nes-domain-palette.v1",
+  "revision": "nes-domain-palette-v2-PROPOSED",
+  "unresolved": {
+    "lutByte": 0,
+    "status": "UNRESOLVED"
+  },
+  "domains": {
+    "auth": {
+      "lutByte": 1,
+      "nesHex": "0x16",
+      "label": "DOM_AUTH_GUARD",
+      "priorWeight": 0.9
+    },
+    "ui": {
+      "lutByte": 2,
+      "nesHex": "0x2A",
+      "label": "DOM_UI_SVELTE5_RUNES",
+      "priorWeight": 0.85
+    },
+    "retrieval": {
+      "lutByte": 3,
+      "nesHex": "0x21",
+      "label": "DOM_RETRIEVAL_ANN_RRF",
+      "priorWeight": 0.95
+    },
+    "network": {
+      "lutByte": 4,
+      "nesHex": "0x2C",
+      "label": "DOM_NETWORK_HTTP_TRPC",
+      "priorWeight": 0.8
+    },
+    "database": {
+      "lutByte": 5,
+      "nesHex": "0x12",
+      "label": "DOM_PG18_DRIZZLE",
+      "priorWeight": 0.95
+    },
+    "cache": {
+      "lutByte": 6,
+      "nesHex": "0x27",
+      "label": "DOM_VALKEY_BITFROST_LRU",
+      "priorWeight": 0.88
+    },
+    "agent": {
+      "lutByte": 7,
+      "nesHex": "0x24",
+      "label": "DOM_AGENT_OAK_RLM_DSPY",
+      "priorWeight": 0.92
+    },
+    "graph": {
+      "lutByte": 8,
+      "nesHex": "0x1A",
+      "label": "DOM_GRAPH_CUGRAPH_PAGERANK",
+      "priorWeight": 0.9
+    },
+    "ml": {
+      "lutByte": 9,
+      "nesHex": "0x14",
+      "label": "DOM_ML_ATEN_TENSORRT_GEMM",
+      "priorWeight": 0.94
+    },
+    "general": {
+      "lutByte": 10,
+      "nesHex": "0x0F",
+      "label": "DOM_GENERAL_FALLBACK",
+      "priorWeight": 0.4
+    },
+    "compiler": {
+      "lutByte": 11,
+      "nesHex": "0x19",
+      "label": "DOM_COMPILER_TOOLING",
+      "priorWeight": 0.7,
+      "proposed": true
+    },
+    "devops": {
+      "lutByte": 12,
+      "nesHex": "0x28",
+      "label": "DOM_DEVOPS_PROCESS",
+      "priorWeight": 0.6,
+      "proposed": true
+    },
+    "error-handling": {
+      "lutByte": 13,
+      "nesHex": "0x06",
+      "label": "DOM_ERROR_RECOVERY",
+      "priorWeight": 0.6,
+      "proposed": true
+    },
+    "test": {
+      "lutByte": 14,
+      "nesHex": "0x2B",
+      "label": "DOM_TEST_HARNESS",
+      "priorWeight": 0.5,
+      "proposed": true
+    }
+  },
+  "subLabels": {
+    "svelte5_runes": {
+      "domain": "ui",
+      "nesHex": "0x2A"
+    }
+  },
+  "supersedes": "nes-domain-palette-v1",
+  "status": "PROPOSED_NOT_APPLIED",
+  "note": "v1 domains unchanged (same lutByte/nesHex). lutByte 11-14 and nesHex values for the four new domains are PROPOSED by the assistant; operator may change them before apply. general keeps lutByte 10.",
+  "derivedUuid": {
+    "algorithm": "uuidv5",
+    "namespace": "7e18b58b-ea73-54ac-b947-66f71112efda",
+    "name": "<revision>|<domain_key>|<lutByte>|<nesHex>",
+    "canonicalIdentity": false,
+    "note": "lookup key only; never replaces domain_key/lut_byte"
+  },
+  "domainUuids": {
+    "auth": "693ef070-e1ed-5dd4-94d0-47fac5cd0111",
+    "ui": "844bf1d7-ab71-5034-bdfc-4f7744f37cd4",
+    "retrieval": "cb952b96-b235-51df-857a-511c765fe820",
+    "network": "215b571c-9402-5bf4-b622-523e53a47d1c",
+    "database": "782c6ac3-2548-59d3-918c-1c75ce953fe3",
+    "cache": "c1df8034-3008-5fd8-b83a-d6384dede647",
+    "agent": "fcdf7e5c-1dcf-5d7d-b5aa-833b0fcfafc6",
+    "graph": "2c105d34-a306-5bd7-8542-593bd477455d",
+    "ml": "c69e0471-69d5-54a5-bb93-3ca8ffe903e7",
+    "general": "c82edf18-dac2-54a2-8832-b550b35286ee",
+    "compiler": "6aaa25b0-898e-519a-b2cf-810d2c5fde8b",
+    "devops": "cc6da69e-b7d0-5b5c-bbb7-4948c7d57b06",
+    "error-handling": "39f98c66-4aa3-507e-ac0a-2881e7c8d390",
+    "test": "89fb3b7c-6e42-5eb8-84c5-49f307123fd5"
+  },
+  "checksum": "sha256:90c41f031770e615c76c776d1b6e34bd95244a198834dfd07a2aeab14b643f5f"
+}

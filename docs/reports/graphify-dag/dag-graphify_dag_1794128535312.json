@@ -1,0 +1,237 @@
+{
+  "runId": "graphify_dag_1794128535312",
+  "startedAt": "2026-11-08T09:02:15.326Z",
+  "flags": {
+    "DRY_RUN": true,
+    "VERBOSE": false
+  },
+  "stages": {
+    "freeze_corpus": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:23.082Z",
+      "recordCount": 61718,
+      "latestSnapshot": "2026-10-29T17:32:08.005Z",
+      "duration": 7748,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "find_dirty_identities": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:23.424Z",
+      "recordCount": 0,
+      "dirtyIdentities": [],
+      "totalDirtyRefs": 0,
+      "duration": 341,
+      "failedIdentities": [],
+      "warnings": [
+        "No dirty identities found in last 24h"
+      ]
+    },
+    "validate_source_refs": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:24.220Z",
+      "recordCount": 61718,
+      "validSourceRefs": 61718,
+      "orphanedCount": 0,
+      "duration": 796,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "parse_changed_files": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:24.310Z",
+      "recordCount": "053925168568",
+      "parsedByLanguage": {
+        "sql": "539",
+        "python": "2516",
+        "typescript": "8568"
+      },
+      "duration": 89,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "materialize_ast_facts": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:33.980Z",
+      "recordCount": 523271,
+      "filesWithAst": 11067,
+      "averageSymbolsPerFile": "47.28",
+      "duration": 9669,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "resolve_symbol_references": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:37.505Z",
+      "recordCount": 224764,
+      "resolvedReferences": 224764,
+      "nodesWithRefs": 170686,
+      "duration": 3525,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "build_edge_list": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:37.605Z",
+      "recordCount": 224764,
+      "edgesBuilt": 224764,
+      "distinctEdgeTypes": 3,
+      "duration": 99,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "validate_edges": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:37.606Z",
+      "recordCount": 0,
+      "danglingEdges": 0,
+      "duration": 1,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "derive_community_projection": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:37.709Z",
+      "recordCount": 12050,
+      "communitiesFound": 12050,
+      "duration": 103,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "compute_graph_analytics": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:38.632Z",
+      "recordCount": 209496,
+      "pageRankComputed": 209496,
+      "algorithmVersion": "pagerank_authority_v1",
+      "duration": 922,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "write_canonical_features": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:39.861Z",
+      "recordCount": 0,
+      "featuresWritten": 0,
+      "duration": 1229,
+      "failedIdentities": [],
+      "warnings": [
+        "No features written"
+      ]
+    },
+    "project_neo4j_topology": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:39.954Z",
+      "recordCount": 61718,
+      "topologyProjected": 61718,
+      "neo4jEdgeTypes": [
+        "IMPORTS",
+        "CALLS",
+        "BELONGS_TO_CLUSTER",
+        "SIMILAR_TOPOLOGY"
+      ],
+      "duration": 93,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "update_qdrant_metadata": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:49.664Z",
+      "recordCount": 57243,
+      "qdrantUpdated": 57243,
+      "payloadFields": [
+        "packet_key",
+        "source_ref",
+        "domain",
+        "community_id",
+        "page_rank"
+      ],
+      "duration": 9710,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "invalidate_redis_caches": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:49.664Z",
+      "recordCount": 4,
+      "invalidatedPatterns": [
+        "bitfrost:packet:*",
+        "bitfrost:cluster:*",
+        "karpathy:scores",
+        "centroid:*"
+      ],
+      "duration": 0,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "generate_recommendations": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:49.685Z",
+      "recordCount": 6171,
+      "recommendationsGenerated": 6171,
+      "types": [
+        "missing_test",
+        "dead_code",
+        "missing_spec",
+        "stale_embedding",
+        "high_centrality"
+      ],
+      "duration": 21,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "retrieval_smoke_test": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:49.881Z",
+      "recordCount": 5,
+      "testsPassed": 5,
+      "testResults": {
+        "exact_match": {
+          "passed": true,
+          "latency": 3,
+          "sampleId": "packet:ff8359a71c4b"
+        },
+        "ast_lookup": {
+          "passed": true,
+          "latency": 7,
+          "symbol": "render"
+        },
+        "graph_traversal": {
+          "passed": true,
+          "latency": 1,
+          "edgeKey": "contains:0000d010-2455-4211-ada9-b396cf4af177:b401debc-6fdd-4d73-8536-6a08942ee382"
+        },
+        "dense_chunk_index": {
+          "passed": true,
+          "latency": 182,
+          "chunksReady": 57243
+        },
+        "sparse_summary_index": {
+          "passed": true,
+          "latency": 3
+        }
+      },
+      "duration": 196,
+      "failedIdentities": [],
+      "warnings": []
+    },
+    "publish_evidence": {
+      "status": "PASS",
+      "timestamp": "2026-11-08T09:02:49.895Z",
+      "recordCount": 61718,
+      "dashboardUpdated": true,
+      "evidencePublished": true,
+      "duration": 14,
+      "failedIdentities": [],
+      "warnings": []
+    }
+  },
+  "artifacts": {},
+  "summary": {
+    "totalStages": 17,
+    "passedStages": 17,
+    "failedStages": 0,
+    "status": "SUCCESS"
+  },
+  "completedAt": "2026-11-08T09:02:49.895Z"
+}

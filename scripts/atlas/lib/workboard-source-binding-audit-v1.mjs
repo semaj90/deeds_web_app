@@ -9,10 +9,12 @@ function sha256(bytes) {
 	return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
 }
 
+const ALLOWED_OPENSPEC_TASK_PATH = /^(?:sveltekit-frontend\/)?openspec\/changes\/[^/]+\/tasks\.md$/;
+
 function safeSourcePath(root, source) {
 	if (typeof source !== 'string' || source.includes('\\') || path.posix.isAbsolute(source)) return null;
 	const parts = source.split('/');
-	if (parts.includes('..') || parts.includes('.') || !/^openspec\/changes\/[^/]+\/tasks\.md$/.test(source)) return null;
+	if (parts.includes('..') || parts.includes('.') || !ALLOWED_OPENSPEC_TASK_PATH.test(source)) return null;
 	const resolved = path.resolve(root, ...parts);
 	const relative = path.relative(root, resolved);
 	return relative.startsWith('..') || path.isAbsolute(relative) ? null : resolved;

@@ -5,6 +5,7 @@
   import type { PageData } from './$types';
   import OpenSpecAwarenessPanel from '$lib/components/atlas/OpenSpecAwarenessPanel.svelte';
   import CapabilityCensusPanel from '$lib/components/atlas/CapabilityCensusPanel.svelte';
+  import CommunityOrbitPanel from '$lib/components/atlas/CommunityOrbitPanel.svelte';
 
   let { data }: { data: PageData } = $props();
   let streamState = $state<'connecting' | 'live' | 'reconnecting'>('connecting');
@@ -160,6 +161,7 @@
       <Tabs.Trigger value="topics">Topics</Tabs.Trigger>
       <Tabs.Trigger value="changes">Changes</Tabs.Trigger>
       <Tabs.Trigger value="reports">Reports</Tabs.Trigger>
+      <Tabs.Trigger value="orbit">Community Orbit</Tabs.Trigger>
     </Tabs.List>
 
     <Tabs.Content value="actionable" class="panel tab-panel">
@@ -215,6 +217,9 @@
         {/each}
       </div>
       <div class="contract"><strong>Persistence contract</strong><p>{data.persistence.authority}; {data.persistence.postgresRole}. Browser writes: {data.persistence.writesPerformed ? 'enabled' : 'disabled'}.</p><p>Referenced source files discovered from current task rows: {data.referencedFileCount}.</p></div>
+    </Tabs.Content>
+      <Tabs.Content value="orbit" class="tab-panel">
+      <CommunityOrbitPanel />
     </Tabs.Content>
   </Tabs.Root>
 

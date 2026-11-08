@@ -343,20 +343,20 @@ async function stage5_materializeAstFacts() {
   log(`→ Stage: ${stageName}`, 'stage');
 
   try {
-    // Count AST symbols from tree_node_ids JSONB
+    // Count AST symbols from canonical atlas_ast_nodes
     const result = await pool.query(
-      `SELECT COUNT(*) as packets_with_ast,
-              SUM(CASE WHEN tree_node_ids IS NOT NULL THEN array_length(tree_node_ids, 1) ELSE 0 END) as total_symbols
-       FROM atlas_packets`
+      `SELECT COUNT(*) as total_symbols,
+              COUNT(DISTINCT relative_path) as files_with_ast
+       FROM atlas_ast_nodes`
     );
 
-    const packetsWithAst = parseInt(result.rows[0].packets_with_ast || 0, 10);
     const totalSymbols = parseInt(result.rows[0].total_symbols || 0, 10);
+    const filesWithAst = parseInt(result.rows[0].files_with_ast || 0, 10);
 
     const manifest = {
       recordCount: totalSymbols,
-      packetsWithAst,
-      averageSymbolsPerPacket: packetsWithAst > 0 ? (totalSymbols / packetsWithAst).toFixed(2) : 0,
+      filesWithAst,
+      averageSymbolsPerFile: filesWithAst > 0 ? (totalSymbols / filesWithAst).toFixed(2) : 0,
       duration: Date.now() - stageStartTime,
       failedIdentities: [],
       warnings: totalSymbols === 0 ? ['No AST symbols materialized'] : [],
@@ -383,22 +383,24 @@ async function stage6_resolveSymbolReferences() {
   log(`→ Stage: ${stageName}`, 'stage');
 
   try {
-    // Count import/call references
+    // Count symbol reference edges from atlas_graph_edges_v2
     const result = await pool.query(
-      `SELECT COUNT(DISTINCT source_ref) as files_with_refs
-       FROM atlas_packets
-       WHERE (imports IS NOT NULL AND array_length(imports, 1) > 0)
-          OR (exports IS NOT NULL AND array_length(exports, 1) > 0)`
+      `SELECT COUNT(*) as total_references,
+              COUNT(DISTINCT source_node_key) as nodes_with_references
+       FROM atlas_graph_edges_v2
+       WHERE edge_type IN ('CONTAINS', 'MATERIALIZES', 'DERIVED_FROM')`
     );
 
-    const filesWithRefs = parseInt(result.rows[0].files_with_refs || 0, 10);
+    const totalReferences = parseInt(result.rows[0].total_references || 0, 10);
+    const nodesWithRefs = parseInt(result.rows[0].nodes_with_references || 0, 10);
 
     const manifest = {
-      recordCount: filesWithRefs,
-      resolvedReferences: filesWithRefs,
+      recordCount: totalReferences,
+      resolvedReferences: totalReferences,
+      nodesWithRefs,
       duration: Date.now() - stageStartTime,
       failedIdentities: [],
-      warnings: filesWithRefs === 0 ? ['No import/export references resolved'] : [],
+      warnings: totalReferences === 0 ? ['No symbol references resolved'] : [],
     };
 
     logStage(stageName, 'PASS', manifest);
@@ -422,19 +424,20 @@ async function stage7_buildEdgeList() {
   log(`→ Stage: ${stageName}`, 'stage');
 
   try {
-    // Build canonical directed edge list (this would come from Neo4j)
+    // Build canonical directed edge list from atlas_graph_edges_v2
     const result = await pool.query(
-      `SELECT COUNT(*) as edge_count FROM (
-         SELECT DISTINCT source_ref FROM atlas_packets
-         WHERE imports IS NOT NULL AND array_length(imports, 1) > 0
-       ) as edges`
+      `SELECT COUNT(*) as edge_count,
+              COUNT(DISTINCT edge_type) as distinct_edge_types
+       FROM atlas_graph_edges_v2`
     );
 
     const edgeCount = parseInt(result.rows[0].edge_count || 0, 10);
+    const distinctEdgeTypes = parseInt(result.rows[0].distinct_edge_types || 0, 10);
 
     const manifest = {
       recordCount: edgeCount,
       edgesBuilt: edgeCount,
+      distinctEdgeTypes,
       duration: Date.now() - stageStartTime,
       failedIdentities: [],
       warnings: edgeCount === 0 ? ['No edges in canonical list'] : [],
@@ -461,16 +464,11 @@ async function stage8_validateEdges() {
   log(`→ Stage: ${stageName}`, 'stage');
 
   try {
-    // Validate no dangling edges (all endpoints exist in atlas_packets)
+    // Validate edge consistency (check for edges with null endpoints)
     const result = await pool.query(
       `SELECT COUNT(*) as dangling_count
-       FROM atlas_packets p
-       WHERE imports IS NOT NULL
-         AND array_length(imports, 1) > 0
-         AND NOT EXISTS (
-           SELECT 1 FROM atlas_packets p2
-           WHERE p2.source_ref = ANY(p.imports)
-         )`
+       FROM atlas_graph_edges_v2
+       WHERE source_node_key IS NULL OR target_node_key IS NULL`
     );
 
     const danglingCount = parseInt(result.rows[0].dangling_count || 0, 10);
@@ -479,8 +477,8 @@ async function stage8_validateEdges() {
       recordCount: danglingCount,
       danglingEdges: danglingCount,
       duration: Date.now() - stageStartTime,
-      failedIdentities: danglingCount > 0 ? ['<dangling_imports>'] : [],
-      warnings: danglingCount > 0 ? [`${danglingCount} packets with dangling imports`] : [],
+      failedIdentities: danglingCount > 0 ? ['<dangling_edges>'] : [],
+      warnings: danglingCount > 0 ? [`${danglingCount} edges with NULL endpoints`] : [],
     };
 
     logStage(stageName, 'PASS', manifest);
@@ -587,8 +585,11 @@ async function stage11_writeCanonicalFeatures() {
       await pool.query(
         `UPDATE atlas_packets
          SET updated_at = NOW()
-         WHERE updated_at IS NOT NULL
-         LIMIT 1000` // Update sample in dry-run
+         WHERE packet_id IN (
+           SELECT packet_id FROM atlas_packets
+           WHERE updated_at IS NOT NULL
+           LIMIT 1000
+         )`
       );
     }
 
@@ -786,14 +787,51 @@ async function stage16_retrievalSmokeTest() {
   log(`→ Stage: ${stageName}`, 'stage');
 
   try {
-    // Run smoke tests against retrieval pipeline
-    // This would test: dense search, sparse search, exact match, AST lookup, graph traversal
-    const testResults = {
-      dense_search: { passed: true, latency: 23 },
-      sparse_search: { passed: true, latency: 15 },
-      exact_match: { passed: true, latency: 8 },
-      ast_lookup: { passed: true, latency: 12 },
-      graph_traversal: { passed: true, latency: 34 },
+    // Run real live probe tests against retrieval & database pipeline
+    const testResults = {};
+
+    // 1. Exact match probe
+    const t0Exact = Date.now();
+    const exactRes = await pool.query(`SELECT packet_id, source_ref FROM atlas_packets WHERE source_ref LIKE '%sveltekit%' LIMIT 1`);
+    testResults.exact_match = {
+      passed: exactRes.rows.length > 0,
+      latency: Date.now() - t0Exact,
+      sampleId: exactRes.rows[0]?.packet_id,
+    };
+
+    // 2. AST symbol lookup probe
+    const t0Ast = Date.now();
+    const astRes = await pool.query(`SELECT tree_node_id, qualified_symbol FROM atlas_ast_nodes WHERE node_kind = 'function' LIMIT 1`);
+    testResults.ast_lookup = {
+      passed: astRes.rows.length > 0,
+      latency: Date.now() - t0Ast,
+      symbol: astRes.rows[0]?.qualified_symbol,
+    };
+
+    // 3. Graph traversal probe
+    const t0Graph = Date.now();
+    const graphRes = await pool.query(`SELECT edge_key, source_node_key, target_node_key FROM atlas_graph_edges_v2 WHERE edge_type = 'CONTAINS' LIMIT 1`);
+    testResults.graph_traversal = {
+      passed: graphRes.rows.length > 0,
+      latency: Date.now() - t0Graph,
+      edgeKey: graphRes.rows[0]?.edge_key,
+    };
+
+    // 4. Dense chunk table probe
+    const t0Dense = Date.now();
+    const denseRes = await pool.query(`SELECT count(*) as count FROM codebase_chunk_index WHERE content_embedding IS NOT NULL`);
+    testResults.dense_chunk_index = {
+      passed: parseInt(denseRes.rows[0]?.count || 0, 10) > 0,
+      latency: Date.now() - t0Dense,
+      chunksReady: parseInt(denseRes.rows[0]?.count || 0, 10),
+    };
+
+    // 5. Sparse lexical probe
+    const t0Sparse = Date.now();
+    const sparseRes = await pool.query(`SELECT packet_id FROM atlas_packets WHERE summary IS NOT NULL LIMIT 1`);
+    testResults.sparse_summary_index = {
+      passed: sparseRes.rows.length > 0,
+      latency: Date.now() - t0Sparse,
     };
 
     const passedCount = Object.values(testResults).filter(r => r.passed).length;

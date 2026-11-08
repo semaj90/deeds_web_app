@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.dag-prefill-bitfrost-ace-synthesis-proof.v1",
+  "generatedAt": "2026-11-08T07:37:22.257Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "dagPrefillParameters": {
+    "canonicalTaskKey": "GAP-P5",
+    "cohortOrdinal": 0,
+    "mortonCode": 1024,
+    "communityId": 6,
+    "domainId": 1,
+    "priorityScore": 0.85,
+    "finalScore": 0.89,
+    "routingStatus": "ROUTED_ACTIVE",
+    "umapXyz": [
+      0.12,
+      0.45,
+      0.78
+    ],
+    "rot6d": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0
+    ]
+  },
+  "acePacket": {
+    "acePacketId": "ace:packet:synthesis_dag_1794123440463",
+    "sourceRef": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md#P5-GAP",
+    "ConceptID": "concept:openspec:GAP-P5",
+    "ConfidenceScore": 0.874,
+    "contextBlobByteLength": 1621,
+    "admittedHitsCount": 3
+  },
+  "valkeyIntegration": {
+    "host": "127.0.0.1",
+    "port": 6379,
+    "packetKey": "ace:packet:synthesis_dag_1794123440463",
+    "ttlSeconds": 3600,
+    "readbackVerified": true,
+    "forbiddenTensorsPersisted": false,
+    "zeroPersistentStateAfterCleanup": true
+  },
+  "synthesisProbe": {
+    "mode": "LIVE_ORNITH_8090",
+    "model": "ornith-1.5-9b",
+    "content": "I notice this message appears to be a structured task packet, but I don't have any context about what \"GAP-P5\" refers to, what the task objective is, or what the ACE Packet system is.\n\nCould you help "
+  },
+  "status": "PASS"
+}

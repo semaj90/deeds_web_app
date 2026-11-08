@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.openspec-task-domain-fanout.v1",
+  "generatedAt": "2026-11-07T19:39:01.552139+00:00",
+  "status": "PROPOSAL",
+  "canonicalAuthority": false,
+  "accuracy": "UNMEASURED: no reviewed gold set; trust floor 200 rows and 30 per class not met",
+  "source": "docs/reports/openspec-task-rank-fuse-v1.20261107T192448Z.jsonl",
+  "taxonomy": {
+    "path": ".okf/domains/atlas-domain-taxonomy.yaml",
+    "groups": 17,
+    "topLevel": 13
+  },
+  "method": "lexicon regex hits per group; score = distinct terms hit; primary = max score, tie by taxonomy order",
+  "counts": {
+    "tasks": 6527,
+    "unresolved": 2038,
+    "domainsPerTaskHistogram": {
+      "0": 2038,
+      "1": 2262,
+      "2": 1236,
+      "3": 556,
+      "4": 277,
+      "5": 102,
+      "6": 43,
+      "7": 8,
+      "8": 3,
+      "9": 1,
+      "12": 1
+    }
+  },
+  "outputs": {
+    "openspec-task-domain-fanout-v1.20261107T193857Z.jsonl": "sha256:7d0f8b6fa143438d59930f05ff6de76efc9fc5d4ade1fb42d9759724f44e2225",
+    "openspec-task-domain-fanout-v1.20261107T193857Z.fanout.json": "sha256:e616fc09f6358efe1fa44bde460124f7455428673f9c17894ff1e82a811ea322"
+  }
+}

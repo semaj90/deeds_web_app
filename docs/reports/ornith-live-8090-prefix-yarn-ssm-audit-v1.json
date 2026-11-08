@@ -1,0 +1,202 @@
+{
+  "schema": "atlas.ornith-live-8090-prefix-yarn-ssm-audit.v1",
+  "generatedAt": "2026-11-08T07:20:38.498Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "serviceRestarted": false,
+  "worktreeState": {
+    "headCommit": "fdd5c4970d409b664318ab7e45cc433261a0e368",
+    "branch": "session/2026-11-08-verified-context-live-shadow",
+    "fileInventory": [
+      {
+        "path": "scripts/atlas/prove-rtx-mlp-kmeans-umap-domain-dspy-v1.py",
+        "existsOnDisk": true,
+        "gitPorcelainStatus": "?? scripts/atlas/prove-rtx-mlp-kmeans-umap-domain-dspy-v1.py",
+        "verificationTier": "LOCAL_WORKTREE_TESTED_UNCOMMITTED",
+        "sha256": "sha256:561293b48d86b3b6ea2773e9e27a0a6c61b04a6b5bc03f120f259b8b5fb856fc"
+      },
+      {
+        "path": "scripts/atlas/test_rtx_mlp_kmeans_umap_domain_dspy_v1.py",
+        "existsOnDisk": true,
+        "gitPorcelainStatus": "?? scripts/atlas/test_rtx_mlp_kmeans_umap_domain_dspy_v1.py",
+        "verificationTier": "LOCAL_WORKTREE_TESTED_UNCOMMITTED",
+        "sha256": "sha256:c538bc13bc124f0d1f8cc067629ed1e770f58f551be13f434b7c2e0ef99213ce"
+      },
+      {
+        "path": "scripts/atlas/reconcile-cohort-6527-kanban-authority-v1.mjs",
+        "existsOnDisk": true,
+        "gitPorcelainStatus": "?? scripts/atlas/reconcile-cohort-6527-kanban-authority-v1.mjs",
+        "verificationTier": "LOCAL_WORKTREE_TESTED_UNCOMMITTED",
+        "sha256": "sha256:b3f803b597b02888982bdf5ba4375552dc87bf60c68887a0748e0aac7a7d26b1"
+      },
+      {
+        "path": "scripts/atlas/reconcile-cohort-6527-kanban-authority-v1.test.mjs",
+        "existsOnDisk": true,
+        "gitPorcelainStatus": "?? scripts/atlas/reconcile-cohort-6527-kanban-authority-v1.test.mjs",
+        "verificationTier": "LOCAL_WORKTREE_TESTED_UNCOMMITTED",
+        "sha256": "sha256:36a49a02ea94c614416366b6b2542b94b6e666d9f46801f0c24e6962ab4db844"
+      },
+      {
+        "path": "scripts/atlas/prove-ornith-hybrid-ssm-isoquant-kv-v1.py",
+        "existsOnDisk": true,
+        "gitPorcelainStatus": "?? scripts/atlas/prove-ornith-hybrid-ssm-isoquant-kv-v1.py",
+        "verificationTier": "LOCAL_WORKTREE_TESTED_UNCOMMITTED",
+        "sha256": "sha256:70c439b099341f3ff73d96f3fc58e86dbc1dc7fdc4e7589ad44a5d1da4217e3a"
+      },
+      {
+        "path": "scripts/atlas/test_ornith_hybrid_ssm_isoquant_kv_v1.py",
+        "existsOnDisk": true,
+        "gitPorcelainStatus": "?? scripts/atlas/test_ornith_hybrid_ssm_isoquant_kv_v1.py",
+        "verificationTier": "LOCAL_WORKTREE_TESTED_UNCOMMITTED",
+        "sha256": "sha256:8ea6803ec6d7989c1a6e4f026d16e1151b02616136e53de70bce00a96ed9f3b5"
+      },
+      {
+        "path": "scripts/atlas/prove-okf-dspy-rlm-kanban-e2e-v1.mjs",
+        "existsOnDisk": true,
+        "gitPorcelainStatus": "?? scripts/atlas/prove-okf-dspy-rlm-kanban-e2e-v1.mjs",
+        "verificationTier": "LOCAL_WORKTREE_TESTED_UNCOMMITTED",
+        "sha256": "sha256:1b89a18a507f92e83162c99aef33fcdaedf9cf76584d86184cfbf9129384d937"
+      },
+      {
+        "path": "scripts/atlas/prove-okf-dspy-rlm-kanban-e2e-v1.test.mjs",
+        "existsOnDisk": true,
+        "gitPorcelainStatus": "?? scripts/atlas/prove-okf-dspy-rlm-kanban-e2e-v1.test.mjs",
+        "verificationTier": "LOCAL_WORKTREE_TESTED_UNCOMMITTED",
+        "sha256": "sha256:ea4e3ad06f75d4595a6fa61ff333d9e948832b2699b38bc0fd9fefb7d4b700b5"
+      },
+      {
+        "path": "python/atlas_compute/cutile_kv_block_swap.py",
+        "existsOnDisk": true,
+        "gitPorcelainStatus": "M python/atlas_compute/cutile_kv_block_swap.py",
+        "verificationTier": "LOCAL_WORKTREE_TESTED_UNCOMMITTED",
+        "sha256": "sha256:c0463ac8cb74b3a9afc6186d9ad5e10239f7751f456fdb7e0476d50d81430424"
+      },
+      {
+        "path": "sveltekit-frontend/src/lib/server/atlas/kanban/kanban-dag-prefill-v1.ts",
+        "existsOnDisk": true,
+        "gitPorcelainStatus": "M sveltekit-frontend/src/lib/server/atlas/kanban/kanban-dag-prefill-v1.ts",
+        "verificationTier": "LOCAL_WORKTREE_TESTED_UNCOMMITTED",
+        "sha256": "sha256:93a9abf8d5d97f6624d63712a6ab1f8a32736074de6b950539b7759eef375e23"
+      },
+      {
+        "path": "sveltekit-frontend/drizzle/manual/20261108_atlas_kanban_dag_prefill_v1.sql",
+        "existsOnDisk": true,
+        "gitPorcelainStatus": "?? sveltekit-frontend/drizzle/manual/20261108_atlas_kanban_dag_prefill_v1.sql",
+        "verificationTier": "LOCAL_WORKTREE_TESTED_UNCOMMITTED",
+        "sha256": "sha256:6cab1c8ba9d4dba79d4f7945a57920c64599f53db812db0c05f8f85b8744781e"
+      },
+      {
+        "path": "docs/reports/openspec-lowrank-task-rpc-receipt-v1.json",
+        "existsOnDisk": true,
+        "gitPorcelainStatus": "M docs/reports/openspec-lowrank-task-rpc-receipt-v1.json",
+        "verificationTier": "LOCAL_WORKTREE_TESTED_UNCOMMITTED",
+        "sha256": "sha256:50cc91fd73bfa83be8bc4a12561160d0199b0c4931230910af3abd82d4a68e8f"
+      },
+      {
+        "path": "docs/reports/rtx-mlp-kmeans-umap-domain-dspy-v1.json",
+        "existsOnDisk": true,
+        "gitPorcelainStatus": "?? docs/reports/rtx-mlp-kmeans-umap-domain-dspy-v1.json",
+        "verificationTier": "LOCAL_WORKTREE_TESTED_UNCOMMITTED",
+        "sha256": "sha256:b87f0b63cd87d930b52f24ff0291968bcb3463fb1f9510adb9fb4b3f425796f8"
+      }
+    ]
+  },
+  "workboard13619Vs13655Reconciliation": {
+    "available": true,
+    "totalTasks": 13619,
+    "completedTasks": 8014,
+    "openTasks": 5605,
+    "partitionIdentityVerified": true,
+    "openSubcategories": {
+      "actionableTasks": 4394,
+      "waitingTasks": 1091,
+      "reviewRequiredTasks": 118,
+      "supersededTasks": 0,
+      "invariantOpenTasks": 2,
+      "openSubcategorySum": 5605
+    },
+    "disjointPortfolioSum": 13619,
+    "discrepancyDelta": 0,
+    "rootCauseResolution": "Fixed in build-openspec-workboard-v1.mjs and docs/reports/openspec-workboard-v1.json: previously 38 open tasks with both executionState='WAITING_ON_DEPENDENCY' and supersessionReviewState='REVIEW_REQUIRED' were double-counted in waitingTasks (1,129 -> 1,091) and reviewRequiredTasks (118), while 2 open INVARIANT tasks were omitted (+38 - 2 = +36). Now completedTasks (8014) + actionableTasks (4394) + waitingTasks (1091) + reviewRequiredTasks (118) + supersededTasks (0) + invariantOpenTasks (2) = 13619 = totalTasks (13619), discrepancyDelta = 0."
+  },
+  "hostRuntime": {
+    "gpuMemory": {
+      "gpuName": "NVIDIA GeForce RTX 3060 Ti",
+      "totalMiB": 8192,
+      "usedMiB": 7334,
+      "freeMiB": 691
+    },
+    "llamaProcess": {
+      "pid": 56816,
+      "commandLine": "\"C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe\" -m C:\\Users\\james\\Videos\\deeds-web-app\\models\\ornith-1_5-9b-ad-q5_k-q4_k\\hforf.gguf --host 127.0.0.1 --port 8090 -ngl 99 -fa on -ctk q8_0 -ctv q8_0 -c 65536 -t 6 --alias ornith-1.5-9b --parallel 1 --reasoning off --chat-template-file C:\\Users\\james\\Videos\\deeds-web-app\\models\\ornith-1_5-9b-ad-q5_k-q4_k\\chat_template.jinja --jinja --cache-prompt --cache-reuse 256 --metrics --perf --batch-size 512 --ubatch-size 128 --threads-batch 8",
+      "hasExplicitYarnCliFlags": false,
+      "yarnCliAssessment": "NO_YARN_CLI_FLAGS_PASSED_USES_MODEL_NATIVE_ROPE_CONTEXT"
+    }
+  },
+  "ornith8090LiveProbe": {
+    "endpoint": "http://127.0.0.1:8090",
+    "reachable": true,
+    "serviceRestarted": false,
+    "modelsEndpoint": [
+      {
+        "id": "ornith-1.5-9b",
+        "nVocab": 248320,
+        "nCtxTrain": 262144,
+        "nEmbd": 4096,
+        "nParams": 8953803264
+      }
+    ],
+    "propsSummary": {
+      "modelAlias": "ornith-1.5-9b",
+      "modelPath": "hforf.gguf",
+      "totalSlots": 1,
+      "nCtx": 65536
+    },
+    "slotsSummary": {
+      "slotCount": 1,
+      "slot0NCtx": 65536,
+      "isProcessing": false
+    },
+    "prefixCacheReuseProbe": {
+      "coldCacheN": 7,
+      "coldPromptN": 132,
+      "coldPromptMs": 400.74,
+      "warmCacheN": 7,
+      "warmPromptN": 133,
+      "warmPromptMs": 167.79,
+      "prefixCacheHitProven": true
+    },
+    "distinctSubsystemVerdicts": {
+      "modelIdentityAndArchitecture": "PROVEN_LIVE_HTTP",
+      "serverPromptPrefixReuse": "PROVEN_LIVE_VIA_TIMINGS_CACHE_N",
+      "yarnCliConfiguration": "NO_YARN_CLI_FLAGS_PASSED_USES_MODEL_NATIVE_ROPE_CONTEXT",
+      "cutileKvPageSwappingInLlamaCpp": "NOT_CONNECTED_LOCAL_PYTORCH_REHEARSAL_ONLY",
+      "deltanetRecurrentStateExternalRestore": "NOT_CONNECTED_INTERNAL_TO_LLAMA_SERVER_SLOT",
+      "titansGradientSurpriseMemory": "POLICY_THRESHOLD_DEMO_ONLY_NO_GRADIENT_COMPUTED"
+    }
+  },
+  "valkeyCentroidAndAutoencoderAdmission": {
+    "centroidContractVerified": true,
+    "sampleCanonicalKey": "atlas:centroid:v1:kmeans:fsaaaaaaaaaaaa:mbbbbbbbbbbbb:k007",
+    "fallbackLookupKeys": [
+      "atlas:centroid:kmeans:7",
+      "centroid:som:7",
+      "taxonomy:clusters:gpu:7"
+    ],
+    "descriptorStatus": "PROPOSAL_ONLY",
+    "expirationFieldPresent": true,
+    "negativeGates": {
+      "notSafeToProjectBlocked": true,
+      "unadmittedWorkspaceBlocked": true
+    },
+    "domainClassifierAndAutoencoderAdmissionGate": {
+      "numCanonicalDomains": 10,
+      "minReviewedExamplesPerClass": 30,
+      "requiredMinimumReviewedGoldExamples": 300,
+      "legacy200ThresholdSuperseded": true,
+      "trainingAuthorityProven": false,
+      "promotionStatus": "ADVISORY_PROPOSAL_ONLY_UNTIL_300_REVIEWED_GOLD_AND_REAL_EMBEDDING_PROVENANCE"
+    }
+  },
+  "status": "PASS"
+}

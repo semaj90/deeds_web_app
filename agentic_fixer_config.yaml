@@ -1,0 +1,38 @@
+# agentic_fixer_config.yaml
+# Master Parameter Specification for Prosecutor Legal-AI Agentic Repair Pipeline
+
+pagerank_and_dag:
+  pagerank_damping: 0.85
+  pagerank_tol: 1.0e-10
+  max_iter: 200
+  dag_leaf_first_boost: 1.35
+
+nes_lut_and_5w1h:
+  nes_lut_domain_byte: "uint8 (0x01..0x0A)"
+  palette_color_byte: "uint8 (0x00..0x07)"
+  codes:
+    0x01: { domain_key: "WHO_IDENTITY_AUTH", pillar: "WHO", palette_hex: "#d4a59a" }
+    0x02: { domain_key: "WHAT_STATUTE_ACT", pillar: "WHAT", palette_hex: "#8b1e22" }
+    0x03: { domain_key: "WHY_MOTIVE_LEDGER", pillar: "WHY", palette_hex: "#e5a93c" }
+    0x04: { domain_key: "HOW_SPATIAL_3D", pillar: "HOW", palette_hex: "#38bdf8" }
+    0x05: { domain_key: "SEAWEED_S3_INGEST", pillar: "INGEST", palette_hex: "#97cfac" }
+    0x06: { domain_key: "DRIZZLE_PG18_AIO", pillar: "DATA", palette_hex: "#888277" }
+    0x07: { domain_key: "BVH_N64_ARENA", pillar: "ENGINE", palette_hex: "#38bdf8" }
+    0x08: { domain_key: "SPZ_SOG_STREAM", pillar: "RENDER", palette_hex: "#121316" }
+    0x09: { domain_key: "ORNITH_COUNSEL", pillar: "AGENT", palette_hex: "#e5a93c" }
+    0x0A: { domain_key: "SVELTE5_BITS_UI", pillar: "UI", palette_hex: "#f7f5ee" }
+
+embedding_and_low_rank_cuda:
+  target_gpu: "RTX 3060 Ti (sm_86, 8 GiB)"
+  compute_dtype: "torch.bfloat16 / torch.float32"
+  fp16_allowed: false # FP16 strictly forbidden per EmbeddingGemma activation stability
+  error_bound_max: 2.0e-6
+  mrl_tiers: [768, 512, 256, 128]
+  svd_low_rank_r: 32
+
+llms_txt_and_dspy:
+  llms_txt_path: "sveltekit-frontend/static/llms.txt"
+  llms_txt_slot_id: 0
+  cache_prompt: true
+  api_base: "http://127.0.0.1:8090/v1"
+  model: "openai/ornith-1.5-9b"

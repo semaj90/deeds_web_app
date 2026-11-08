@@ -1,0 +1,136 @@
+{
+  "metric": "alignment % = share of tasks whose task code appears in code/docs OUTSIDE their own OpenSpec change folder (independent evidence; ripgrep, outside tasks.md)",
+  "alignedIncludingOwnChangePct": 31.16,
+  "isGoldMetric": false,
+  "tasksTotal": 6527,
+  "tasksWithTaskCode": 2572,
+  "tasksWithCodeEvidence": 2034,
+  "overallAlignmentPct": 31.16,
+  "alignmentPctOfTaskCodeTasks": 79.08,
+  "perRankBucket": [
+    {
+      "ranks": "1-100",
+      "tasks": 100,
+      "aligned": 49,
+      "alignmentPct": 49.0
+    },
+    {
+      "ranks": "101-500",
+      "tasks": 400,
+      "aligned": 207,
+      "alignmentPct": 51.75
+    },
+    {
+      "ranks": "501-1000",
+      "tasks": 500,
+      "aligned": 252,
+      "alignmentPct": 50.4
+    },
+    {
+      "ranks": "1001-3000",
+      "tasks": 2000,
+      "aligned": 642,
+      "alignmentPct": 32.1
+    },
+    {
+      "ranks": "3001-6527",
+      "tasks": 3527,
+      "aligned": 884,
+      "alignmentPct": 25.06
+    }
+  ],
+  "top100VsRestLift": 1.587,
+  "topChangesByAlignment": [
+    {
+      "change_id": "parent-atlas-ml-graph-retrieval-convergence",
+      "tasks": 182,
+      "aligned": 182,
+      "alignmentPct": 100.0
+    },
+    {
+      "change_id": "parent-atlas-prefill-routing-residency-convergence",
+      "tasks": 44,
+      "aligned": 44,
+      "alignmentPct": 100.0
+    },
+    {
+      "change_id": "parent-atlas-runtime-log-remediation",
+      "tasks": 18,
+      "aligned": 18,
+      "alignmentPct": 100.0
+    },
+    {
+      "change_id": "parent-atlas-retire-384-lane",
+      "tasks": 14,
+      "aligned": 14,
+      "alignmentPct": 100.0
+    },
+    {
+      "change_id": "parent-atlas-grounded-knowledge-fabric",
+      "tasks": 11,
+      "aligned": 11,
+      "alignmentPct": 100.0
+    },
+    {
+      "change_id": "parent-atlas-code-ingestion-pipeline",
+      "tasks": 9,
+      "aligned": 9,
+      "alignmentPct": 100.0
+    },
+    {
+      "change_id": "parent-atlas-nlp-sidecar-okf-alignment",
+      "tasks": 8,
+      "aligned": 8,
+      "alignmentPct": 100.0
+    },
+    {
+      "change_id": "parent-atlas-graph-pagerank-okf-fanout-hardening",
+      "tasks": 4,
+      "aligned": 4,
+      "alignmentPct": 100.0
+    },
+    {
+      "change_id": "parent-atlas-adaptive-dag-fabric",
+      "tasks": 1,
+      "aligned": 1,
+      "alignmentPct": 100.0
+    },
+    {
+      "change_id": "parent-atlas-retrieval-staging-planes",
+      "tasks": 63,
+      "aligned": 62,
+      "alignmentPct": 98.41
+    },
+    {
+      "change_id": "parent-atlas-retrieval-logic-convergence",
+      "tasks": 42,
+      "aligned": 41,
+      "alignmentPct": 97.62
+    },
+    {
+      "change_id": "parent-atlas-semantic-512-canonicalization",
+      "tasks": 8,
+      "aligned": 7,
+      "alignmentPct": 87.5
+    },
+    {
+      "change_id": "parent-atlas-workspace-snapshot-runtime",
+      "tasks": 43,
+      "aligned": 36,
+      "alignmentPct": 83.72
+    },
+    {
+      "change_id": "parent-atlas-tensor-residency-integration",
+      "tasks": 169,
+      "aligned": 133,
+      "alignmentPct": 78.7
+    },
+    {
+      "change_id": "parent-atlas-transport-memory-boundaries",
+      "tasks": 62,
+      "aligned": 46,
+      "alignmentPct": 74.19
+    }
+  ],
+  "note": "Lift > 1 means top-ranked tasks are more often code-evidenced. Not precision; no reviewed labels."
+}

@@ -105,7 +105,9 @@ extern "C" int batchCosineSimilarity(const float* query, int dim, const float* c
 
   try {
     torch::NoGradGuard ng;
-    auto opts_cpu  = torch::TensorOptions().dtype(torch::kFloat32).device(torch::kCPU).pinned_memory(true);
+    // Note: torch::from_blob wraps caller V8 Float32Array memory without cudaHostRegister;
+    // do not pass .pinned_memory(true) on unpinned host pointers. Latency = H2D + L2 norm + SGEMM + D2H.
+    auto opts_cpu  = torch::TensorOptions().dtype(torch::kFloat32).device(torch::kCPU);
     auto opts_cuda = torch::TensorOptions().dtype(torch::kFloat32).device(torch::kCUDA);
 
     // Wrap host buffers into pinned tensors (zero-copy if already pinned; one
@@ -115,8 +117,8 @@ extern "C" int batchCosineSimilarity(const float* query, int dim, const float* c
     auto c_pinned = torch::from_blob(const_cast<float*>(corpus), {n, dim}, opts_cpu);
 
     // Async H2D on the default CUDA stream.
-    auto q_gpu = q_pinned.to(opts_cuda, /*non_blocking=*/true);   // [1, dim]
-    auto c_gpu = c_pinned.to(opts_cuda, /*non_blocking=*/true);   // [n, dim]
+    auto q_gpu = q_pinned.to(opts_cuda);   // [1, dim] H2D transfer
+    auto c_gpu = c_pinned.to(opts_cuda);   // [n, dim] H2D transfer
 
     // L2-normalise each row on-device (avoids separate norm pass after GEMM).
     auto q_norm = torch::nn::functional::normalize(q_gpu, torch::nn::functional::NormalizeFuncOptions().p(2).dim(1)); // [1, dim]

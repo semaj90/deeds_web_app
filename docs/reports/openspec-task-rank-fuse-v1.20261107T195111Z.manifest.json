@@ -1,0 +1,3348 @@
+{
+  "schema": "atlas.openspec-task-rank-fuse.v1",
+  "generatedAt": "2026-11-07T19:51:40.217343+00:00",
+  "canonicalAuthority": false,
+  "source": "docs/reports/openspec-task-extract-v1.20261107T192103Z.all-open.jsonl",
+  "params": {
+    "rrfK": 60,
+    "knnK": 10,
+    "knnMetric": "cosine over TF-IDF (log tf, smoothed idf, df>=2 and df<N)",
+    "knnPagerankDamping": 0.85,
+    "themesSource": "scripts/atlas/rank-open-tasks-v1.mjs#THEMES (imported)",
+    "pageSize": 100,
+    "louvainResolution": 2.5
+  },
+  "counts": {
+    "openTasks": 6527,
+    "vocab": 4681,
+    "pages": 66,
+    "tasksWithAnyTheme": 2693,
+    "tasksWithCitationIn": 287,
+    "knnMeanTopSim": 0.4711
+  },
+  "outputs": {
+    "openspec-task-rank-fuse-v1.20261107T195111Z.jsonl": "aeed1903df03f2ba244e15b8dbcc4fea3753adf470ab2456bbf58788d16e45a0"
+  },
+  "communities": {
+    "algorithm": "networkx louvain_communities (seed 0, resolution 2.5) on undirected kNN graph, weight=cosine",
+    "count": 100,
+    "kNNEdgesUndirected": 44889,
+    "modularity": 0.699523,
+    "resolutionSweep": [
+      {
+        "resolution": 1.0,
+        "communityCount": 47,
+        "maxCommunitySize": 651,
+        "modularity": 0.710838
+      },
+      {
+        "resolution": 2.0,
+        "communityCount": 84,
+        "maxCommunitySize": 266,
+        "modularity": 0.703398
+      },
+      {
+        "resolution": 2.5,
+        "communityCount": 100,
+        "maxCommunitySize": 195,
+        "modularity": 0.699523
+      },
+      {
+        "resolution": 3.0,
+        "communityCount": 111,
+        "maxCommunitySize": 172,
+        "modularity": 0.698253
+      }
+    ],
+    "summary": [
+      {
+        "community": 1,
+        "size": 195,
+        "label": "graphify snapshot execution recheck terminal current"
+      },
+      {
+        "community": 2,
+        "size": 170,
+        "label": "graph cugraph pagerank networkx parity neo4j"
+      },
+      {
+        "community": 3,
+        "size": 162,
+        "label": "packet chunk current recheck writer lineage"
+      },
+      {
+        "community": 4,
+        "size": 139,
+        "label": "paac kanban boundary compiler context cascade"
+      },
+      {
+        "community": 5,
+        "size": 132,
+        "label": "arrow turbovec lod mmap backlog artifact"
+      },
+      {
+        "community": 6,
+        "size": 124,
+        "label": "migration postgresql mirror surface indexing live"
+      },
+      {
+        "community": 7,
+        "size": 122,
+        "label": "qdrant census identity collection projection upgrade"
+      },
+      {
+        "community": 8,
+        "size": 120,
+        "label": "dir index sparse bm25 lexical invalidation"
+      },
+      {
+        "community": 9,
+        "size": 119,
+        "label": "ordinal map graph align audit only"
+      },
+      {
+        "community": 10,
+        "size": 114,
+        "label": "ontology tuple recheck source revision blocked"
+      },
+      {
+        "community": 11,
+        "size": 112,
+        "label": "session test harness integration telemetry opencode"
+      },
+      {
+        "community": 12,
+        "size": 111,
+        "label": "python dag journal state run tournament"
+      },
+      {
+        "community": 13,
+        "size": 103,
+        "label": "daily graphify run apply reconciliation canary"
+      },
+      {
+        "community": 14,
+        "size": 103,
+        "label": "documentation langextract classification domain agentic doc"
+      },
+      {
+        "community": 15,
+        "size": 102,
+        "label": "trace mcp heval disabled live search"
+      },
+      {
+        "community": 16,
+        "size": 101,
+        "label": "phase retrieval evidence canonical identity admission"
+      },
+      {
+        "community": 17,
+        "size": 100,
+        "label": "lineage scope manifest policy ast coverage"
+      },
+      {
+        "community": 18,
+        "size": 96,
+        "label": "agentic workstation error repair master progress"
+      },
+      {
+        "community": 19,
+        "size": 95,
+        "label": "adapter qlora fine tuning unsloth evaluation"
+      },
+      {
+        "community": 20,
+        "size": 95,
+        "label": "scene detective evidence mode case source"
+      },
+      {
+        "community": 21,
+        "size": 94,
+        "label": "xgboost reranker sidecar label feature missing"
+      },
+      {
+        "community": 22,
+        "size": 94,
+        "label": "ace cache recheck context readiness blocked"
+      },
+      {
+        "community": 23,
+        "size": 93,
+        "label": "ast sitter symbol tree structural grep"
+      },
+      {
+        "community": 24,
+        "size": 92,
+        "label": "gs1 commands derivation only acquisition validation"
+      },
+      {
+        "community": 25,
+        "size": 90,
+        "label": "semantic cohort lineage recheck current owner"
+      },
+      {
+        "community": 26,
+        "size": 88,
+        "label": "current graph resolve edge missing reconciliation"
+      },
+      {
+        "community": 27,
+        "size": 87,
+        "label": "classifier namespace recheck source features current"
+      },
+      {
+        "community": 28,
+        "size": 86,
+        "label": "abi backend libtorch node api flight"
+      },
+      {
+        "community": 29,
+        "size": 85,
+        "label": "summary what validation cei testing spot"
+      },
+      {
+        "community": 30,
+        "size": 84,
+        "label": "hgr simdjson audit hypergraphrag only alignment"
+      },
+      {
+        "community": 31,
+        "size": 84,
+        "label": "skill ladder acceptance gates kernel python"
+      },
+      {
+        "community": 32,
+        "size": 82,
+        "label": "phase deliverables package environment validation gpu0"
+      },
+      {
+        "community": 33,
+        "size": 80,
+        "label": "deferred hardening production gates valkey ace"
+      },
+      {
+        "community": 34,
+        "size": 80,
+        "label": "ace graph analysis align alignment proposal"
+      },
+      {
+        "community": 35,
+        "size": 77,
+        "label": "rpc packet hidden gpu tensor quic"
+      },
+      {
+        "community": 36,
+        "size": 75,
+        "label": "qas contracts separate conditioned gs1 provenance"
+      },
+      {
+        "community": 37,
+        "size": 72,
+        "label": "archive backup patterns build backups svelte"
+      },
+      {
+        "community": 38,
+        "size": 68,
+        "label": "som kmeans knn staged bitfrost only"
+      },
+      {
+        "community": 39,
+        "size": 68,
+        "label": "end acp a2a acceptance paac mcp"
+      },
+      {
+        "community": 40,
+        "size": 68,
+        "label": "worker ops wave owns only read"
+      },
+      {
+        "community": 41,
+        "size": 68,
+        "label": "rrf caller migration envelope lane recheck"
+      },
+      {
+        "community": 42,
+        "size": 67,
+        "label": "nlp rollout control router pytorch plane"
+      },
+      {
+        "community": 43,
+        "size": 66,
+        "label": "tournament recommendation workboard contextual status only"
+      },
+      {
+        "community": 44,
+        "size": 66,
+        "label": "ordered eng implementation gepa gates dspy"
+      },
+      {
+        "community": 45,
+        "size": 66,
+        "label": "afc e2e sched ordered gate phase"
+      },
+      {
+        "community": 46,
+        "size": 65,
+        "label": "recall source p24 exact ndcg governed"
+      },
+      {
+        "community": 47,
+        "size": 65,
+        "label": "cuvs ann cagra exact trace recall"
+      },
+      {
+        "community": 48,
+        "size": 65,
+        "label": "session discovery subagent implementation runbook a2a"
+      },
+      {
+        "community": 49,
+        "size": 64,
+        "label": "latent representation recheck blocked promotion enc"
+      },
+      {
+        "community": 50,
+        "size": 61,
+        "label": "retention storage docker image reproducibility dependency"
+      },
+      {
+        "community": 51,
+        "size": 61,
+        "label": "kafka append queue gemma4 langfuse review"
+      },
+      {
+        "community": 52,
+        "size": 60,
+        "label": "tensorrt rtx challenger trt isolated cuda"
+      },
+      {
+        "community": 53,
+        "size": 57,
+        "label": "opencode next mcp sps steps verification"
+      },
+      {
+        "community": 54,
+        "size": 57,
+        "label": "gs1 slice patch clustering pass seam"
+      },
+      {
+        "community": 55,
+        "size": 56,
+        "label": "awm phase freeze p20 source_revision graph"
+      },
+      {
+        "community": 56,
+        "size": 55,
+        "label": "domain topic taxonomy ast okf existing"
+      },
+      {
+        "community": 57,
+        "size": 53,
+        "label": "analysis decomposition feature existing proposal openspec"
+      },
+      {
+        "community": 58,
+        "size": 52,
+        "label": "index rff linked phase tuples structural"
+      },
+      {
+        "community": 59,
+        "size": 51,
+        "label": "browser pgvector model align gemma onnx"
+      },
+      {
+        "community": 60,
+        "size": 50,
+        "label": "temporal canary deep audit sequences hyperparameter"
+      },
+      {
+        "community": 61,
+        "size": 50,
+        "label": "residency unified current refresh cpu admission"
+      },
+      {
+        "community": 62,
+        "size": 50,
+        "label": "ornith gap runtime missed lctx longctx"
+      },
+      {
+        "community": 63,
+        "size": 49,
+        "label": "lane telemetry breadth low rank event"
+      },
+      {
+        "community": 64,
+        "size": 48,
+        "label": "quality decoder integrity encoder judgment document"
+      },
+      {
+        "community": 65,
+        "size": 47,
+        "label": "tile gpu candidatetilev1 avx2 consumer cache"
+      },
+      {
+        "community": 66,
+        "size": 46,
+        "label": "feature matrix dag promotion exact live"
+      },
+      {
+        "community": 67,
+        "size": 45,
+        "label": "fabric studio search mapped trcf owners"
+      },
+      {
+        "community": 68,
+        "size": 44,
+        "label": "ctx e2e centroid engineering findings order"
+      },
+      {
+        "community": 69,
+        "size": 44,
+        "label": "stage isoquant lowrank norm boundary workflow"
+      },
+      {
+        "community": 70,
+        "size": 43,
+        "label": "receipt gpu execution graph lookup checklist"
+      },
+      {
+        "community": 71,
+        "size": 43,
+        "label": "ary fanout hardening graph identity source"
+      },
+      {
+        "community": 72,
+        "size": 42,
+        "label": "t15 fitting decoder kernel offline slice"
+      },
+      {
+        "community": 73,
+        "size": 38,
+        "label": "dim semantic_768 supersedes backfill now steps"
+      },
+      {
+        "community": 74,
+        "size": 38,
+        "label": "hop exp gpu tiling offload expansion"
+      },
+      {
+        "community": 75,
+        "size": 37,
+        "label": "board golden review promotion relevance reconcile"
+      },
+      {
+        "community": 76,
+        "size": 37,
+        "label": "hypergraphrag live kag rlm adoption ace"
+      },
+      {
+        "community": 77,
+        "size": 35,
+        "label": "hyperrag fill multihop prerequisite pf13 incidence"
+      },
+      {
+        "community": 78,
+        "size": 35,
+        "label": "topk top file ranking mcp table"
+      },
+      {
+        "community": 79,
+        "size": 33,
+        "label": "pass pf4 rewritten third durable pf4b"
+      },
+      {
+        "community": 80,
+        "size": 30,
+        "label": "know knowledge code typed capability projection"
+      },
+      {
+        "community": 81,
+        "size": 28,
+        "label": "throughput sem768 plan intake embed prefix"
+      },
+      {
+        "community": 82,
+        "size": 28,
+        "label": "identity canonical session discriminants operational handoff"
+      },
+      {
+        "community": 83,
+        "size": 28,
+        "label": "crossencoder atlasrerankerv1 augmented symbol session feature"
+      },
+      {
+        "community": 84,
+        "size": 28,
+        "label": "ga8 substrate green geometry gpu phase"
+      },
+      {
+        "community": 85,
+        "size": 26,
+        "label": "mmr1 tier drizzle manual tables sql"
+      },
+      {
+        "community": 86,
+        "size": 25,
+        "label": "heads learning retrieval mrl derived truncated"
+      },
+      {
+        "community": 87,
+        "size": 25,
+        "label": "concept end onto classifier integration alignment"
+      },
+      {
+        "community": 88,
+        "size": 24,
+        "label": "p22 end wsf policy p25 crosswalk"
+      },
+      {
+        "community": 89,
+        "size": 24,
+        "label": "t20 refresh goal fix projection repair"
+      },
+      {
+        "community": 90,
+        "size": 24,
+        "label": "cbm codebase second memory optional structural"
+      },
+      {
+        "community": 91,
+        "size": 23,
+        "label": "level duplication src cleanup top cutile"
+      },
+      {
+        "community": 92,
+        "size": 23,
+        "label": "topology latent update topo read audit"
+      },
+      {
+        "community": 93,
+        "size": 18,
+        "label": "ownership ast persistence gph lifecycle supersession"
+      },
+      {
+        "community": 94,
+        "size": 18,
+        "label": "highest priority patterns src tree scoping"
+      },
+      {
+        "community": 95,
+        "size": 17,
+        "label": "xgboost_gpu_runtime_proven synthetic matrix dependency trace proof"
+      },
+      {
+        "community": 96,
+        "size": 16,
+        "label": "stores enrichment writer census follow tests"
+      },
+      {
+        "community": 97,
+        "size": 15,
+        "label": "ollama swap archive embeddings gemma4 out"
+      },
+      {
+        "community": 98,
+        "size": 13,
+        "label": "code intelligence eval external evaluation tool"
+      },
+      {
+        "community": 99,
+        "size": 12,
+        "label": "oaklib tooling docs morph trpc grep"
+      },
+      {
+        "community": 100,
+        "size": 11,
+        "label": "warming bucket paac bitfrost redis warm"
+      }
+    ]
+  },
+  "domainTaxonomy": {
+    "primaryCounts": {
+      "UI_SVELTE5_BOARD": 2344,
+      "AGENT_ORNITH_RAG_GPU": 1144,
+      "WHY_LEDGER_MOTIVE": 926,
+      "WHO_IDENTITY_AUTH": 799,
+      "DATA_PG18_DRIZZLE": 678,
+      "STORAGE_SEAWEED_S3": 257,
+      "WHAT_STATUTE_CORPUS": 249,
+      "SPLAT_SPZ_SOG_LOD": 96,
+      "ENGINE_BVH_N64_ARENA": 22,
+      "HOW_SCENE_3D_GLB": 12
+    },
+    "fanoutCounts": {
+      "UI_SVELTE5_BOARD": 2595,
+      "AGENT_ORNITH_RAG_GPU": 1928,
+      "WHY_LEDGER_MOTIVE": 1419,
+      "WHO_IDENTITY_AUTH": 1065,
+      "DATA_PG18_DRIZZLE": 1060,
+      "STORAGE_SEAWEED_S3": 401,
+      "WHAT_STATUTE_CORPUS": 330,
+      "SPLAT_SPZ_SOG_LOD": 158,
+      "ENGINE_BVH_N64_ARENA": 45,
+      "HOW_SCENE_3D_GLB": 32
+    }
+  },
+  "pageIndexTreeTop25": [
+    {
+      "changeId": "parent-atlas-ace-rlm-bitfrost-integration",
+      "totalOpenTasks": 627,
+      "sectionCount": 268,
+      "maxRrf": 0.028236,
+      "sections": [
+        {
+          "section": "Retrieval canary registry + hyperparameter sequences (2026-10-18)",
+          "openTaskCount": 10,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16352",
+          "maxRrf": 0.028236,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 60
+        },
+        {
+          "section": "2026-10-11 \u2014 repository decomposition, analysis, and execution sequencing (proposal; no promotion)",
+          "openTaskCount": 12,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L15279",
+          "maxRrf": 0.023692,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 61
+        },
+        {
+          "section": "Context engineering / agentic retrieval E2E \u2014 gate order and findings (2026-10-05, follow-up)",
+          "openTaskCount": 17,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L14700",
+          "maxRrf": 0.017171,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 68
+        },
+        {
+          "section": "Phase 17/18 implementation sequence refresh (2026-10-11)",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L15375",
+          "maxRrf": 0.017142,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 61
+        },
+        {
+          "section": "Graph-analysis \u2192 ACE execution plan (2026-10-13; proposal, not wired)",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L15873",
+          "maxRrf": 0.01497,
+          "primaryDomain": "STORAGE_SEAWEED_S3",
+          "dominantCommunity": 34
+        },
+        {
+          "section": "Versioned domain join + population reconciliation (2026-10-18)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16407",
+          "maxRrf": 0.012928,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 43
+        },
+        {
+          "section": "Policy/value + verified-receipt plan: audit before building (2026-10-18; read-only, no code changed)",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16493",
+          "maxRrf": 0.012637,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 19
+        },
+        {
+          "section": "DOC-ANALYSIS-TABLES-01 \u2014 what exists, what was created, what is missing (2026-10-18; catalog audit of `legal_ai_db`, then one additive table)",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16748",
+          "maxRrf": 0.012545,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 78
+        },
+        {
+          "section": "VALKEY-REVISION-QUALIFICATION-01 \u2014 design gate (2026-09-08)",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L3492",
+          "maxRrf": 0.012405,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 33
+        },
+        {
+          "section": "DOC-ANALYSIS-TABLES-02 \u2014 Top-K execution receipt, independent replay verification and exact Top-10 source fetch (2026-10-18; CPU path on frozen fixtures; nothing persisted to the real table)",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16805",
+          "maxRrf": 0.012331,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 78
+        },
+        {
+          "section": "LOWRANK-NORM-01 stage 1 \u2014 precise definition (2026-10-18; definition only, no code, no kernels, no training)",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16827",
+          "maxRrf": 0.012244,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 69
+        },
+        {
+          "section": "ACE-CONTEXT-READINESS-RECHECK-2026-09-11",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L7711",
+          "maxRrf": 0.012146,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 22
+        },
+        {
+          "section": "RAPIDS-CUVS-READINESS-RECHECK-2026-09-11T18",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L7696",
+          "maxRrf": 0.012029,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 22
+        },
+        {
+          "section": "GPU-ACE-ORNITH-READINESS-RECHECK-2026-09-12",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L9024",
+          "maxRrf": 0.012016,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 22
+        },
+        {
+          "section": "TurboVec extension seams (2026-10-18) \u2014 room for DSPy/GEPA, self-prompting agentic error fixing, ACP/A2A, daily Kanban + Parent Atlas admin page",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16334",
+          "maxRrf": 0.011816,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 60
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-workstation-domain-classifier",
+      "totalOpenTasks": 86,
+      "sectionCount": 30,
+      "maxRrf": 0.019144,
+      "sections": [
+        {
+          "section": "Domain classification, documentation, and agentic retrieval implementation gates (2026-10-12)",
+          "openTaskCount": 11,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L1255",
+          "maxRrf": 0.019144,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 14
+        },
+        {
+          "section": "Classifier contract recheck (2026-09-11)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L222",
+          "maxRrf": 0.008379,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 27
+        },
+        {
+          "section": "OKF-DOMAIN-KEYWORD-BITMAP-ALIGNMENT-01 implementation audit (2026-10-24)",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L1454",
+          "maxRrf": 0.007279,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 9
+        },
+        {
+          "section": "Revision-qualified AST domain annotation gates (2026-09-30)",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L983",
+          "maxRrf": 0.002242,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 56
+        },
+        {
+          "section": "TAXONOMY-CROSSWALK-01 \u2014 reviewed legacy vocabulary reconciliation (2026-10-17)",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L66",
+          "maxRrf": 0.002138,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 56
+        },
+        {
+          "section": "Preferred replacement: EmbeddingGemma, FastAPI NLP, then PyTorch (2026-09-30)",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L1116",
+          "maxRrf": 0.00211,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 42
+        },
+        {
+          "section": "Migration-owner classification (2026-09-17)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L754",
+          "maxRrf": 0.001705,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 6
+        },
+        {
+          "section": "Live Drizzle/PostgreSQL mirror audit (2026-09-17)",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L712",
+          "maxRrf": 0.001528,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 6
+        },
+        {
+          "section": "2. Revision-qualified export and training readiness",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L1027",
+          "maxRrf": 0.001402,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 27
+        },
+        {
+          "section": "Latest reconciliation (2026-09-17)",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L943",
+          "maxRrf": 0.001394,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "Classification export proof recheck (2026-09-11)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L49",
+          "maxRrf": 0.001357,
+          "primaryDomain": "WHAT_STATUTE_CORPUS",
+          "dominantCommunity": 27
+        },
+        {
+          "section": "Revision-qualified classification export (2026-08-20)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L24",
+          "maxRrf": 0.001296,
+          "primaryDomain": "WHAT_STATUTE_CORPUS",
+          "dominantCommunity": 27
+        },
+        {
+          "section": "Read-only lineage recheck (2026-09-09)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L208",
+          "maxRrf": 0.001242,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "Embedding representation spot-check (2026-10-24)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L1465",
+          "maxRrf": 0.001139,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 29
+        },
+        {
+          "section": "N-ary evidence lineage hardening (2026-09-16)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L349",
+          "maxRrf": 0.001048,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 76
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-repair-candidate-feature-matrix",
+      "totalOpenTasks": 50,
+      "sectionCount": 12,
+      "maxRrf": 0.019059,
+      "sections": [
+        {
+          "section": "HANDOFF: compaction checkpoint 2 (2026-09-27, end of session)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L282",
+          "maxRrf": 0.019059,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 35
+        },
+        {
+          "section": "CEI Current enriched-index cohort + summary integration (2026-09-25)",
+          "openTaskCount": 15,
+          "topTaskId": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L188",
+          "maxRrf": 0.017106,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 29
+        },
+        {
+          "section": "SUM Canonical summary admission tranche (2026-09-25)",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L315",
+          "maxRrf": 0.016495,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 29
+        },
+        {
+          "section": "REC-ENGINE-DAILY-01 \u2014 feature recommendation index, summaries, daily Graphify, Kanban (2026-10-29)",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L1558",
+          "maxRrf": 0.010663,
+          "primaryDomain": "STORAGE_SEAWEED_S3",
+          "dominantCommunity": 13
+        },
+        {
+          "section": "Multi-hop execution correction (2026-09-27)",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L1416",
+          "maxRrf": 0.006022,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 74
+        },
+        {
+          "section": "ACE3 Revision-qualified ACE packet family (ledger only, 2026-09-25; nothing implemented)",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L291",
+          "maxRrf": 0.002376,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 38
+        },
+        {
+          "section": "Worktree extraction \u2014 2026-10-31",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L1573",
+          "maxRrf": 0.002366,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 9
+        },
+        {
+          "section": "ACE-PACKET-ORDINAL-BINDING-01 (2026-09-27; code-only; no datastore access)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L950",
+          "maxRrf": 0.002324,
+          "primaryDomain": "STORAGE_SEAWEED_S3",
+          "dominantCommunity": 9
+        },
+        {
+          "section": "RF-04 Tournament producer admission",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L152",
+          "maxRrf": 0.001019,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 1
+        },
+        {
+          "section": "Downstream alignment handoff (2026-09-26; procedural, incremental)",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L646",
+          "maxRrf": 0.000872,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 23
+        },
+        {
+          "section": "RF-01 Contract",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L13",
+          "maxRrf": 0.00083,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 66
+        },
+        {
+          "section": "HANDOFF \u2014 compaction checkpoint (2026-09-26, end of session)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L737",
+          "maxRrf": 0.000818,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 64
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-retrieval-staging-planes",
+      "totalOpenTasks": 63,
+      "sectionCount": 11,
+      "maxRrf": 0.017839,
+      "sections": [
+        {
+          "section": "NEXT STEPS \u2014 semantic_768 representation gates (ordered, 2026-09-20; supersedes the 'backfill now' plan in DIM-08)",
+          "openTaskCount": 31,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L382",
+          "maxRrf": 0.017839,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 73
+        },
+        {
+          "section": "Embedding-dimension gate for every follow-up above (operator direction 2026-09-20)",
+          "openTaskCount": 5,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L342",
+          "maxRrf": 0.015257,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 73
+        },
+        {
+          "section": "Errors found",
+          "openTaskCount": 1,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L512",
+          "maxRrf": 0.004701,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 5
+        },
+        {
+          "section": "Pipeline build-state audit \u2014 registry \u2192 packet builders \u2192 Go retrieval \u2192 offline (2026-09-20)",
+          "openTaskCount": 6,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L314",
+          "maxRrf": 0.003551,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 30
+        },
+        {
+          "section": "Fix TODO (ordered; each item states whether it needs approval)",
+          "openTaskCount": 6,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L532",
+          "maxRrf": 0.000891,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 18
+        },
+        {
+          "section": "Latent encoding alignment (LATENT-ENC-01, added 2026-10-12)",
+          "openTaskCount": 3,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L459",
+          "maxRrf": 0.00082,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 49
+        },
+        {
+          "section": "SOURCE-V17 ADMISSION GATES \u2014 status record (2026-10-12)",
+          "openTaskCount": 5,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L655",
+          "maxRrf": 0.000787,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "Remediation TODO (status and gate)",
+          "openTaskCount": 2,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L608",
+          "maxRrf": 0.000734,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 18
+        },
+        {
+          "section": "LEXICAL-LABEL-SPLIT-01 \u2014 postgres_fts vs postgres_trigram (2026-10-12)",
+          "openTaskCount": 2,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L639",
+          "maxRrf": 0.000705,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 39
+        },
+        {
+          "section": "Dynamic OpenSpec workboard + recommendations \u2014 ACP / A2A alignment (2026-09-20 audit)",
+          "openTaskCount": 1,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L422",
+          "maxRrf": 0.000474,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 39
+        },
+        {
+          "section": "RUNTIME-EVENT-WIRE-01 \u2014 logger sink hook (2026-10-12)",
+          "openTaskCount": 1,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md#L699",
+          "maxRrf": 0.000463,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 40
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-ontology-kernel",
+      "totalOpenTasks": 160,
+      "sectionCount": 71,
+      "maxRrf": 0.017139,
+      "sections": [
+        {
+          "section": "ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-13",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L3847",
+          "maxRrf": 0.017139,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-11",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4226",
+          "maxRrf": 0.016612,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-10T21",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4034",
+          "maxRrf": 0.016368,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-10T23",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4308",
+          "maxRrf": 0.015889,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-12",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4053",
+          "maxRrf": 0.015668,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "CORE-LANE-RECHECK-2026-09-10T2",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L3805",
+          "maxRrf": 0.015452,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "ONTOLOGY-CURRENT-COHORT-AUDIT-HARDENING-2026-09-13",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4527",
+          "maxRrf": 0.014624,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "Feature decomposition, NLP, and HyperGraphRAG integration follow-up",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L5453",
+          "maxRrf": 0.014132,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 57
+        },
+        {
+          "section": "ONTOLOGY-CURRENT-COHORT-FRAME-RECHECK-2026-09-13-R1",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4358",
+          "maxRrf": 0.013557,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "Next steps (ordered, updated 2026-10-17)",
+          "openTaskCount": 17,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L5515",
+          "maxRrf": 0.013507,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 9
+        },
+        {
+          "section": "FEATURE-ONTOLOGY-PACKET-LINEAGE-RECHECK-2026-09-13",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4375",
+          "maxRrf": 0.011972,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "ONTOLOGY-FRESH-PRODUCER-SELECTION-RECHECK-2026-09-12",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L4097",
+          "maxRrf": 0.011852,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "Current-workspace ontology recheck \u2014 2026-09-14",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L3868",
+          "maxRrf": 0.010646,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "Implementation sequencing for repository decomposition (2026-10-11)",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L5503",
+          "maxRrf": 0.010429,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 9
+        },
+        {
+          "section": "ONTOLOGY-REVISION-OWNER-RECHECK-2026-09-12-R2",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L3987",
+          "maxRrf": 0.009672,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 10
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-retrieval-lineage-dag-convergence",
+      "totalOpenTasks": 323,
+      "sectionCount": 201,
+      "maxRrf": 0.016885,
+      "sections": [
+        {
+          "section": "RECOMMENDATION-TOURNAMENT-01 \u2014 workboard challenger tournament status (2026-09-20)",
+          "openTaskCount": 19,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L16175",
+          "maxRrf": 0.016885,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 43
+        },
+        {
+          "section": "CURRENT-PACKET-CHUNK-JOIN-01 recheck (2026-09-10)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L11879",
+          "maxRrf": 0.016531,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "GRAPHIFY-CURRENT-TERMINAL-OWNER-RECHECK-01 \u2014 2026-09-11",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L12621",
+          "maxRrf": 0.015784,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 1
+        },
+        {
+          "section": "GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02 recheck \u2014 2026-09-14",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L12385",
+          "maxRrf": 0.014893,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 1
+        },
+        {
+          "section": "CURRENT-GRAPHIFY-SNAPSHOT-AUTHORITY-RECHECK-2026-09-14",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L13833",
+          "maxRrf": 0.014679,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 1
+        },
+        {
+          "section": "CURRENT-PACKET-CHUNK-JOIN-RECHECK-2026-09-10T21",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L11910",
+          "maxRrf": 0.014101,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "CURRENT-WORKSPACE-PACKET-CHUNK-JOIN-RECHECK-01 \u2014 2026-09-11",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L13473",
+          "maxRrf": 0.013729,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "5. Packet<->chunk lineage (historical reconstruction + future capture)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L1885",
+          "maxRrf": 0.01369,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "Packet-to-chunk bridge recheck (2026-09-10)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L11464",
+          "maxRrf": 0.013063,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "GRAPHIFY-SNAPSHOT-BINDING-READBACK-01 \u2014 native execution recheck (2026-09-14)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L12361",
+          "maxRrf": 0.012595,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 1
+        },
+        {
+          "section": "CURRENT-PACKET-QDRANT-BRIDGE-RECHECK-2026-09-13",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L13756",
+          "maxRrf": 0.012299,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "CURRENT-GRAPHIFY-RUN-OWNER-01 explicit revision recheck (2026-09-10)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L11853",
+          "maxRrf": 0.012167,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 1
+        },
+        {
+          "section": "GRAPHIFY-SNAPSHOT-BINDING-RECHECK-2026-09-10T21",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L12913",
+          "maxRrf": 0.011892,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 1
+        },
+        {
+          "section": "Graphify snapshot-binding recheck (2026-09-09)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L11184",
+          "maxRrf": 0.011395,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 1
+        },
+        {
+          "section": "Current-source cohort lineage recheck (2026-09-10)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L11528",
+          "maxRrf": 0.011273,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 25
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-versioned-doc-intelligence",
+      "totalOpenTasks": 41,
+      "sectionCount": 9,
+      "maxRrf": 0.016737,
+      "sections": [
+        {
+          "section": "2026-10-12 domain classification and agentic indexing gates (tests paused)",
+          "openTaskCount": 10,
+          "topTaskId": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L1596",
+          "maxRrf": 0.016737,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 14
+        },
+        {
+          "section": "Phase H \u2014 Operations",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L1001",
+          "maxRrf": 0.005311,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 16
+        },
+        {
+          "section": "Phase G \u2014 Acceleration (optional, only after corpus is stable)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L996",
+          "maxRrf": 0.004182,
+          "primaryDomain": "WHAT_STATUTE_CORPUS",
+          "dominantCommunity": 68
+        },
+        {
+          "section": "Phase F \u2014 Agentic retrieval and repair loop",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L897",
+          "maxRrf": 0.003382,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 18
+        },
+        {
+          "section": "Post-index documentation execution batch",
+          "openTaskCount": 15,
+          "topTaskId": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L1543",
+          "maxRrf": 0.002875,
+          "primaryDomain": "STORAGE_SEAWEED_S3",
+          "dominantCommunity": 14
+        },
+        {
+          "section": "Tooling docs corpus: oaklib / ast-grep / ts-morph / trpc \u2014 2026-10-05",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L1480",
+          "maxRrf": 0.002429,
+          "primaryDomain": "WHAT_STATUTE_CORPUS",
+          "dominantCommunity": 99
+        },
+        {
+          "section": "Phase E \u2014 Graph relationships",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L875",
+          "maxRrf": 0.00091,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 2
+        },
+        {
+          "section": "Phase D \u2014 Semantic extraction (LangExtract/Ornith, source-grounded only)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L682",
+          "maxRrf": 0.000813,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 14
+        },
+        {
+          "section": "Repository-driven documentation demand planning",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L1519",
+          "maxRrf": 0.000529,
+          "primaryDomain": "WHAT_STATUTE_CORPUS",
+          "dominantCommunity": 14
+        }
+      ]
+    },
+    {
+      "changeId": "legal-corpus-california-codes",
+      "totalOpenTasks": 45,
+      "sectionCount": 8,
+      "maxRrf": 0.016354,
+      "sections": [
+        {
+          "section": "HANDOFF ADDENDUM (final, 2026-10-17)",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/legal-corpus-california-codes/tasks.md#L326",
+          "maxRrf": 0.016354,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 75
+        },
+        {
+          "section": "SEM768 / KMEANS-V2 plan intake and throughput plan (2026-10-18) \u2014 PLANNED, nothing below is implemented unless marked",
+          "openTaskCount": 18,
+          "topTaskId": "openspec/changes/legal-corpus-california-codes/tasks.md#L361",
+          "maxRrf": 0.014844,
+          "primaryDomain": "WHAT_STATUTE_CORPUS",
+          "dominantCommunity": 81
+        },
+        {
+          "section": "2026-10-17 late session: provenance, crosswalk, QUERY-LIFECYCLE-01 (all advisory; nothing committed)",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/legal-corpus-california-codes/tasks.md#L220",
+          "maxRrf": 0.00861,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 56
+        },
+        {
+          "section": "2026-10-17 late: KMeans provenance correction + gate order (supersedes the \"centroids not stored\" part of KM-01)",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/legal-corpus-california-codes/tasks.md#L242",
+          "maxRrf": 0.008589,
+          "primaryDomain": "WHAT_STATUTE_CORPUS",
+          "dominantCommunity": 7
+        },
+        {
+          "section": "Embedding coverage / lineage follow-ups (2026-10-17, read-only findings; nothing applied)",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/legal-corpus-california-codes/tasks.md#L210",
+          "maxRrf": 0.008335,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 43
+        },
+        {
+          "section": "Tasks: legal-corpus-california-codes",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/legal-corpus-california-codes/tasks.md#L5",
+          "maxRrf": 0.008021,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 47
+        },
+        {
+          "section": "Error retrieval and contextual fields (2026-10-17, answered from evidence)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/legal-corpus-california-codes/tasks.md#L158",
+          "maxRrf": 0.002564,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 9
+        },
+        {
+          "section": "RH-15 progress and a correction (2026-10-17)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/legal-corpus-california-codes/tasks.md#L164",
+          "maxRrf": 0.002561,
+          "primaryDomain": "WHAT_STATUTE_CORPUS",
+          "dominantCommunity": 9
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-gpu-sidecar-patch-tournament",
+      "totalOpenTasks": 112,
+      "sectionCount": 16,
+      "maxRrf": 0.01567,
+      "sections": [
+        {
+          "section": "Part B1a \u2014 KNN top-k validation gate (blocks ROUTE-02 KMeans and ROUTE-03 20\u00d720 SOM)",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L307",
+          "maxRrf": 0.01567,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 38
+        },
+        {
+          "section": "Deferred production-hardening gates",
+          "openTaskCount": 30,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L88",
+          "maxRrf": 0.015222,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 33
+        },
+        {
+          "section": "2026-10-12 domain classification, document indexing, and agentic retrieval gates",
+          "openTaskCount": 9,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L721",
+          "maxRrf": 0.015112,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 14
+        },
+        {
+          "section": "Part E \u2014 simdjson chunking / streaming AUDIT HELPERS and tournament alignment (added 2026-09-20; docs + read-only helpers, no native build changes)",
+          "openTaskCount": 10,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L425",
+          "maxRrf": 0.012579,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 30
+        },
+        {
+          "section": "Architecture review \u2014 2026-08-14",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L300",
+          "maxRrf": 0.009162,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 5
+        },
+        {
+          "section": "Open tournament gates",
+          "openTaskCount": 15,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L466",
+          "maxRrf": 0.009016,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 61
+        },
+        {
+          "section": "Part B2 \u2014 routing and hot/warm/cold evaluation backlog",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L353",
+          "maxRrf": 0.004896,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 5
+        },
+        {
+          "section": "Track C \u2014 Phase 1 deterministic tournament evaluation and gates (2026-10-23)",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L27",
+          "maxRrf": 0.004414,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 19
+        },
+        {
+          "section": "Part A \u2014 RAPIDS/PageRank verification",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L241",
+          "maxRrf": 0.003144,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 2
+        },
+        {
+          "section": "Linkage to prefill DAG and NES palette (2026-10-23)",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L41",
+          "maxRrf": 0.001655,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 5
+        },
+        {
+          "section": "Symbol TOC and query-routing implementation plan",
+          "openTaskCount": 7,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L534",
+          "maxRrf": 0.001626,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 14
+        },
+        {
+          "section": "Tournament admission recheck (2026-09-09)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L396",
+          "maxRrf": 0.001367,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 1
+        },
+        {
+          "section": "Part C \u2014 Patch Tournament (Phase 1: deterministic tournament only) \u2014 GS1.41 SEAM ACCEPTED",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L388",
+          "maxRrf": 0.001239,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 54
+        },
+        {
+          "section": "RESUME POINT (2026-08-03, updated \u2014 WSL2 smoke test independently re-verified this turn)",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L209",
+          "maxRrf": 0.001215,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 70
+        },
+        {
+          "section": "CUDA 13.4 SIMT/cuTile challenger gate (2026-10-16)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L52",
+          "maxRrf": 0.001179,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 91
+        }
+      ]
+    },
+    {
+      "changeId": "atlas-directory-first-analysis-v1",
+      "totalOpenTasks": 38,
+      "sectionCount": 6,
+      "maxRrf": 0.01564,
+      "sections": [
+        {
+          "section": "3. Gate Optional Embedding and GPU",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/atlas-directory-first-analysis-v1/tasks.md#L70",
+          "maxRrf": 0.01564,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 39
+        },
+        {
+          "section": "1. Reconcile Existing Owners",
+          "openTaskCount": 12,
+          "topTaskId": "openspec/changes/atlas-directory-first-analysis-v1/tasks.md#L31",
+          "maxRrf": 0.009488,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 24
+        },
+        {
+          "section": "2. Build Source-Bound Directory Planner",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/atlas-directory-first-analysis-v1/tasks.md#L63",
+          "maxRrf": 0.009455,
+          "primaryDomain": "STORAGE_SEAWEED_S3",
+          "dominantCommunity": 23
+        },
+        {
+          "section": "4. Define Separate Transport, Cache, and Artifact Adapters",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/atlas-directory-first-analysis-v1/tasks.md#L75",
+          "maxRrf": 0.004487,
+          "primaryDomain": "STORAGE_SEAWEED_S3",
+          "dominantCommunity": 35
+        },
+        {
+          "section": "5. Prove Qualified Retrieval and Prefill",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/atlas-directory-first-analysis-v1/tasks.md#L102",
+          "maxRrf": 0.003983,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 16
+        },
+        {
+          "section": "6. Compaction handoff (2026-10-27, appended; earlier sections untouched)",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/atlas-directory-first-analysis-v1/tasks.md#L121",
+          "maxRrf": 0.003467,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 17
+        }
+      ]
+    },
+    {
+      "changeId": "atlas-feature-intelligence",
+      "totalOpenTasks": 55,
+      "sectionCount": 12,
+      "maxRrf": 0.015399,
+      "sections": [
+        {
+          "section": "P1 \u2014 N-ary retrieval / HyperGraphRAG",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/atlas-feature-intelligence/tasks.md#L167",
+          "maxRrf": 0.015399,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 2
+        },
+        {
+          "section": "P0 execution owner crosswalk \u2014 navigation only",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/atlas-feature-intelligence/tasks.md#L22",
+          "maxRrf": 0.012574,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "P1 \u2014 Feature evidence graph",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/atlas-feature-intelligence/tasks.md#L153",
+          "maxRrf": 0.009126,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 2
+        },
+        {
+          "section": "Acceptance gates",
+          "openTaskCount": 11,
+          "topTaskId": "openspec/changes/atlas-feature-intelligence/tasks.md#L259",
+          "maxRrf": 0.00897,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 2
+        },
+        {
+          "section": "P2 \u2014 Current repository reconciliation",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/atlas-feature-intelligence/tasks.md#L203",
+          "maxRrf": 0.008918,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 18
+        },
+        {
+          "section": "P0 \u2014 Canonical boundary",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/atlas-feature-intelligence/tasks.md#L130",
+          "maxRrf": 0.008495,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 6
+        },
+        {
+          "section": "2026-09-15 \u2014 Runtime fusion adoption slice",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/atlas-feature-intelligence/tasks.md#L309",
+          "maxRrf": 0.005252,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 82
+        },
+        {
+          "section": "2026-09-05 \u2014 Feature ontology projection alignment",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/atlas-feature-intelligence/tasks.md#L102",
+          "maxRrf": 0.004875,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "P1 \u2014 Retrieval reconciliation",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/atlas-feature-intelligence/tasks.md#L176",
+          "maxRrf": 0.004588,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 63
+        },
+        {
+          "section": "P0 \u2014 Evidence ingestion",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/atlas-feature-intelligence/tasks.md#L141",
+          "maxRrf": 0.004584,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 32
+        },
+        {
+          "section": "P1 \u2014 Derived feature matrix / model-routing projections",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/atlas-feature-intelligence/tasks.md#L189",
+          "maxRrf": 0.004567,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 63
+        },
+        {
+          "section": "P1 \u2014 State and Kanban",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/atlas-feature-intelligence/tasks.md#L199",
+          "maxRrf": 0.003067,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 4
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "totalOpenTasks": 97,
+      "sectionCount": 20,
+      "maxRrf": 0.0149,
+      "sections": [
+        {
+          "section": "T7 \u2014 Rust SIMD/TurboVec and bounded LOD residency \u2014 audit before integration",
+          "openTaskCount": 10,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L210",
+          "maxRrf": 0.0149,
+          "primaryDomain": "SPLAT_SPZ_SOG_LOD",
+          "dominantCommunity": 5
+        },
+        {
+          "section": "Phase 24 \u2014 source-qualified function recommendations and governed edits \u2014 2026-10-14",
+          "openTaskCount": 10,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L958",
+          "maxRrf": 0.01457,
+          "primaryDomain": "SPLAT_SPZ_SOG_LOD",
+          "dominantCommunity": 46
+        },
+        {
+          "section": "Ingestion \u2192 retrieval \u2192 agent integration handoff \u2014 2026-10-14",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L890",
+          "maxRrf": 0.014235,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 46
+        },
+        {
+          "section": "TurboVec LOD refinement \u2014 2026-08-14",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L256",
+          "maxRrf": 0.008272,
+          "primaryDomain": "SPLAT_SPZ_SOG_LOD",
+          "dominantCommunity": 5
+        },
+        {
+          "section": "AST language dispatch and sidecar evidence \u2014 2026-10-15",
+          "openTaskCount": 13,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L854",
+          "maxRrf": 0.00766,
+          "primaryDomain": "SPLAT_SPZ_SOG_LOD",
+          "dominantCommunity": 46
+        },
+        {
+          "section": "Function recall and Atlas tensor-LOD wiring \u2014 2026-10-15",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L912",
+          "maxRrf": 0.007507,
+          "primaryDomain": "SPLAT_SPZ_SOG_LOD",
+          "dominantCommunity": 35
+        },
+        {
+          "section": "DAG-4 / Query Adaptive Synthesis (QAS) bounded seam",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L429",
+          "maxRrf": 0.006007,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 36
+        },
+        {
+          "section": "T5 \u2014 Domains 6\u20139 (vector/ANN, quantization, storage residency) \u2014 blocked, GPU-adjacent",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L182",
+          "maxRrf": 0.003509,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 47
+        },
+        {
+          "section": "Review corrections \u2014 2026-08-14",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L289",
+          "maxRrf": 0.002538,
+          "primaryDomain": "SPLAT_SPZ_SOG_LOD",
+          "dominantCommunity": 5
+        },
+        {
+          "section": "DAG-5 / live feature matrix and exact promotion",
+          "openTaskCount": 9,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L547",
+          "maxRrf": 0.002418,
+          "primaryDomain": "SPLAT_SPZ_SOG_LOD",
+          "dominantCommunity": 66
+        },
+        {
+          "section": "T2 \u2014 Domain 10 (evaluation harness) \u2014 the one domain safe to start now",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L139",
+          "maxRrf": 0.002305,
+          "primaryDomain": "SPLAT_SPZ_SOG_LOD",
+          "dominantCommunity": 11
+        },
+        {
+          "section": "T3 \u2014 Domains 1\u20135 architecture change",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L166",
+          "maxRrf": 0.002269,
+          "primaryDomain": "SPLAT_SPZ_SOG_LOD",
+          "dominantCommunity": 41
+        },
+        {
+          "section": "Open (all unchecked; none authorized yet)",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L809",
+          "maxRrf": 0.002243,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 5
+        },
+        {
+          "section": "Implementation checkpoint \u2014 2026-08-14",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L351",
+          "maxRrf": 0.002238,
+          "primaryDomain": "SPLAT_SPZ_SOG_LOD",
+          "dominantCommunity": 5
+        },
+        {
+          "section": "LOD \u2192 ACE \u2192 residency implementation handoff \u2014 2026-10-14",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L869",
+          "maxRrf": 0.002195,
+          "primaryDomain": "SPLAT_SPZ_SOG_LOD",
+          "dominantCommunity": 69
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-graph-retrieval-proof",
+      "totalOpenTasks": 128,
+      "sectionCount": 41,
+      "maxRrf": 0.014797,
+      "sections": [
+        {
+          "section": "GS1.22 - Parent Atlas Workstation Implementation Truth Audit \u2014 proposed, NOT executed (2026-08-02)",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L439",
+          "maxRrf": 0.014797,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 76
+        },
+        {
+          "section": "GS1.28 - Session error-repair summary (2026-08-02, this pass)",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L618",
+          "maxRrf": 0.008774,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 54
+        },
+        {
+          "section": "GS1.10 - Separate identity contracts",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L62",
+          "maxRrf": 0.008235,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 36
+        },
+        {
+          "section": "GS1.13 - Evidence-based audit contract",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L146",
+          "maxRrf": 0.003271,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 24
+        },
+        {
+          "section": "GS1.39 - Patch Tournament spec received, NOT started (2026-08-02)",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L829",
+          "maxRrf": 0.003075,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 54
+        },
+        {
+          "section": "GS1.36 - Item 4: PageRank script duplication inventory (classification only, no execution) (2026-08-02)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L784",
+          "maxRrf": 0.002991,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 2
+        },
+        {
+          "section": "GS1.12 - Read-only identity derivation audit",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L136",
+          "maxRrf": 0.002612,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 24
+        },
+        {
+          "section": "GS1.11 - Parser manifest vs runtime proof",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L125",
+          "maxRrf": 0.002064,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 24
+        },
+        {
+          "section": "GS1.21 - Bounded symbol identity + exact KNN proof slice (2026-08-02)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L396",
+          "maxRrf": 0.00173,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 47
+        },
+        {
+          "section": "GS1.18 - Crawl/LDR/source-validation runtime audit (concurrent session, verified via rg 2026-08-02)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L267",
+          "maxRrf": 0.001699,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 24
+        },
+        {
+          "section": "GS1.41 - Patch tournament seam: bounded generate-test-select loop (2026-08-03)",
+          "openTaskCount": 7,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L854",
+          "maxRrf": 0.001661,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 54
+        },
+        {
+          "section": "GS1.31 - Pivot: cuVS/PageRank/GPU integration (2026-08-02)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L675",
+          "maxRrf": 0.001581,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 24
+        },
+        {
+          "section": "RF4 - Canonical candidate identity contract",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L112",
+          "maxRrf": 0.001291,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 24
+        },
+        {
+          "section": "GS1.14 - Central evidence pipeline",
+          "openTaskCount": 7,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L155",
+          "maxRrf": 0.001291,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 54
+        },
+        {
+          "section": "GS1.38 - Step 3: minimal RAPIDS sidecar, health + capabilities only (2026-08-02)",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L818",
+          "maxRrf": 0.00129,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 24
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-retrieval-logic-convergence",
+      "totalOpenTasks": 42,
+      "sectionCount": 11,
+      "maxRrf": 0.01473,
+      "sections": [
+        {
+          "section": "Remaining search/cache/DAG/Studio tasks mapped to existing owners \u2014 2026-09-20 (docs only)",
+          "openTaskCount": 12,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L618",
+          "maxRrf": 0.01473,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 67
+        },
+        {
+          "section": "Search-fabric contract tranche \u2014 2026-09-21",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L503",
+          "maxRrf": 0.003329,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 67
+        },
+        {
+          "section": "Storage retention review \u2014 2026-09-12",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L73",
+          "maxRrf": 0.00232,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 50
+        },
+        {
+          "section": "Topology, classifier, graph, and ontology as features",
+          "openTaskCount": 7,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L261",
+          "maxRrf": 0.001397,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 27
+        },
+        {
+          "section": "Context/prefill handoff and quality",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L335",
+          "maxRrf": 0.001052,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 64
+        },
+        {
+          "section": "SEARCH-REINTEGRATION-05 receipt + trace MCP note (2026-09-20)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L470",
+          "maxRrf": 0.000835,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 15
+        },
+        {
+          "section": "Optional/future designs \u2014 not active implementation",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L360",
+          "maxRrf": 0.000797,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 16
+        },
+        {
+          "section": "Stable pagination and runtime adoption",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L326",
+          "maxRrf": 0.000728,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 76
+        },
+        {
+          "section": "Candidate universe, feature matrix, and ranking",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L310",
+          "maxRrf": 0.000622,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 44
+        },
+        {
+          "section": "File and directory aggregation",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L223",
+          "maxRrf": 0.000601,
+          "primaryDomain": "WHAT_STATUTE_CORPUS",
+          "dominantCommunity": 23
+        },
+        {
+          "section": "Semantic representation normalization",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L236",
+          "maxRrf": 0.000546,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 25
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-neural-prefill-encoder",
+      "totalOpenTasks": 692,
+      "sectionCount": 334,
+      "maxRrf": 0.014549,
+      "sections": [
+        {
+          "section": "NE-23N Agents: moves, domain classification, Pokedex loading and the NB / logistic-regression classifiers \u2014 alignment (recorded 2026-10-06; plan, extends NE-25)",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L17892",
+          "maxRrf": 0.014549,
+          "primaryDomain": "STORAGE_SEAWEED_S3",
+          "dominantCommunity": 27
+        },
+        {
+          "section": "LATENT-REPRESENTATION-IDENTITY-RECHECK-2026-09-12-R2",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L16634",
+          "maxRrf": 0.010707,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 49
+        },
+        {
+          "section": "LATENT-REPRESENTATION-IDENTITY-RECHECK-2026-09-12",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L16682",
+          "maxRrf": 0.010603,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 49
+        },
+        {
+          "section": "LATENT-REPRESENTATION-IDENTITY-RECHECK-2026-09-13",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L16581",
+          "maxRrf": 0.009849,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 49
+        },
+        {
+          "section": "P1 \u2014 Retrieval and learning heads",
+          "openTaskCount": 18,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L2956",
+          "maxRrf": 0.009797,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 86
+        },
+        {
+          "section": "GPU graph execution receipt (2026-08-24)",
+          "openTaskCount": 30,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L3469",
+          "maxRrf": 0.009627,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 70
+        },
+        {
+          "section": "AE precision and derived-recommendation gates (2026-10-12)",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L17936",
+          "maxRrf": 0.008255,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 44
+        },
+        {
+          "section": "LATENT-REPRESENTATION-NEXT-GATES-2026-09-13",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L17485",
+          "maxRrf": 0.008088,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 49
+        },
+        {
+          "section": "AUTOENCODER-DATASET-READINESS-RECHECK-2026-09-12",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L16222",
+          "maxRrf": 0.007355,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "P0 \u2014 Contracts and provenance",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L2505",
+          "maxRrf": 0.007162,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 36
+        },
+        {
+          "section": "Latent representation identity recheck (2026-09-10)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L14912",
+          "maxRrf": 0.006466,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 49
+        },
+        {
+          "section": "FEATURE-MATRIX-OWNER-READBACK-2026-09-12",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L15023",
+          "maxRrf": 0.006361,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 66
+        },
+        {
+          "section": "Repository-first package policy",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L232",
+          "maxRrf": 0.006226,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 32
+        },
+        {
+          "section": "LATENT-REPRESENTATION-IDENTITY-AUDIT-RECHECK-2026-09-14",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L17435",
+          "maxRrf": 0.00524,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 49
+        },
+        {
+          "section": "GRAPH-ORDINAL-03: ordinal-map owner discovery (2026-08-27)",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L11689",
+          "maxRrf": 0.005032,
+          "primaryDomain": "WHAT_STATUTE_CORPUS",
+          "dominantCommunity": 9
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-gpu-compute-lanes-consolidation",
+      "totalOpenTasks": 54,
+      "sectionCount": 16,
+      "maxRrf": 0.014451,
+      "sections": [
+        {
+          "section": "Dependency guard",
+          "openTaskCount": 1,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L66",
+          "maxRrf": 0.014451,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 50
+        },
+        {
+          "section": "Control-plane routing / observation lifecycle \u2014 reported work and next tranche (recorded 2026-10-06)",
+          "openTaskCount": 5,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1871",
+          "maxRrf": 0.011528,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 42
+        },
+        {
+          "section": "Authority closure: new gates, dependency spine, stop rules (2026-10-04)",
+          "openTaskCount": 5,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L938",
+          "maxRrf": 0.010983,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 77
+        },
+        {
+          "section": "13. Valkey centroid index for hashes + pgvector/EmbeddingGemma ranking + SearXNG searches \u2014 lane design (2026-10-03; design/tasks only, nothing written)",
+          "openTaskCount": 5,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L348",
+          "maxRrf": 0.007047,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 33
+        },
+        {
+          "section": "Radix / cuTile",
+          "openTaskCount": 2,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L49",
+          "maxRrf": 0.005066,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 91
+        },
+        {
+          "section": "9. Viterbi (\"vibreti\") MCP-tool selection from query + NLP pass helpers \u2014 have vs need (2026-10-03, rg census)",
+          "openTaskCount": 5,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L183",
+          "maxRrf": 0.003743,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 53
+        },
+        {
+          "section": "LibTorch dependency",
+          "openTaskCount": 3,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L61",
+          "maxRrf": 0.001968,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 28
+        },
+        {
+          "section": "Retrieval / graph (GPU-MINI-FABRIC-01)",
+          "openTaskCount": 3,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L45",
+          "maxRrf": 0.001093,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 47
+        },
+        {
+          "section": "TRITON-CHALLENGER-01 (2026-10-18): fused remap + tiled GEMM + bit-FSM kernel recorded as a challenger only (paper entry; no code, no install, no GPU run)",
+          "openTaskCount": 8,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1897",
+          "maxRrf": 0.000808,
+          "primaryDomain": "ENGINE_BVH_N64_ARENA",
+          "dominantCommunity": 52
+        },
+        {
+          "section": "BitFrost L2",
+          "openTaskCount": 1,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L53",
+          "maxRrf": 0.000695,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 52
+        },
+        {
+          "section": "NX-CUGRAPH-BACKEND-01 (2026-10-17): NetworkX dispatch to nx-cugraph, one bounded fixture",
+          "openTaskCount": 1,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1884",
+          "maxRrf": 0.000694,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 2
+        },
+        {
+          "section": "KERNEL-REAL-02 follow-up (2026-10-05): blockers 1-4 fixed, policy propagated; live proof and ownership wording STILL OPEN",
+          "openTaskCount": 2,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1845",
+          "maxRrf": 0.000681,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 26
+        },
+        {
+          "section": "CUDA lanes",
+          "openTaskCount": 3,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L56",
+          "maxRrf": 0.000521,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 28
+        },
+        {
+          "section": "11. Gemma4 \u2192 Ornith naming: policy, census, migration lanes (2026-10-03, `git grep` over tracked files)",
+          "openTaskCount": 5,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L290",
+          "maxRrf": 0.000493,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 51
+        },
+        {
+          "section": "GSP-5 FROZEN as a named task: replay-safe `graphify_edges` persistence (operator-confirmed ownership 2026-10-04; groundwork built, NO DB change)",
+          "openTaskCount": 4,
+          "topTaskId": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1229",
+          "maxRrf": 0.000482,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 77
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-nlp-sidecar-feature-compiler",
+      "totalOpenTasks": 67,
+      "sectionCount": 19,
+      "maxRrf": 0.014295,
+      "sections": [
+        {
+          "section": "Runtime route correction (2026-09-30)",
+          "openTaskCount": 12,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L1046",
+          "maxRrf": 0.014295,
+          "primaryDomain": "STORAGE_SEAWEED_S3",
+          "dominantCommunity": 38
+        },
+        {
+          "section": "15. Docker dependency reproducibility audit (2026-09-10)",
+          "openTaskCount": 15,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L692",
+          "maxRrf": 0.008064,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 50
+        },
+        {
+          "section": "Bounded inventory-to-retrieval worklist and storage follow-up (2026-10-25)",
+          "openTaskCount": 9,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L2284",
+          "maxRrf": 0.002756,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 23
+        },
+        {
+          "section": "14. `dev:gpu` sidecar-lane audit (2026-09-19, read-only \u2014 no code changed)",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L955",
+          "maxRrf": 0.002599,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 9
+        },
+        {
+          "section": "Required convergence gates",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L2222",
+          "maxRrf": 0.00258,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 2
+        },
+        {
+          "section": "0. Pre-flight (do this before any pass-registry code)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L200",
+          "maxRrf": 0.001656,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 28
+        },
+        {
+          "section": "SESSION-206e \u2014 SYMBOL-WIRE-02: registry classification against real Postgres data (2026-09-22)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L1485",
+          "maxRrf": 0.001188,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 83
+        },
+        {
+          "section": "SESSION-206f -- SYMBOL-KIND-LIVE-SIDECAR-COVERAGE-01 + SYMBOL-PROMOTED-UNKNOWN-01 (2026-09-22)",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L1598",
+          "maxRrf": 0.001163,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 83
+        },
+        {
+          "section": "10. LangExtract gating (NLP8)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L513",
+          "maxRrf": 0.00115,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 14
+        },
+        {
+          "section": "SESSION-206c \u2014 external review correction + SESSION-206b re-sequenced (2026-09-22)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L1354",
+          "maxRrf": 0.001149,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 83
+        },
+        {
+          "section": "SESSION-206b \u2014 \"is function a symbol?\" is already answered; the real gap is coverage + linking (2026-09-22)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L1263",
+          "maxRrf": 0.00109,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 83
+        },
+        {
+          "section": "14.6 Deep-audit results (2026-09-20, TRACE MCP + stale probe; read-only)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L977",
+          "maxRrf": 0.00106,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 60
+        },
+        {
+          "section": "SESSION-206h \u2014 SYMBOL-WRITER-OWNER-01 canonical owner census (2026-09-22, READ-ONLY, zero writes)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L1707",
+          "maxRrf": 0.001006,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 83
+        },
+        {
+          "section": "SESSION-206g \u2014 SYMBOL-REGISTRY-POPULATION-PREVIEW-01 (2026-09-22, READ-ONLY, zero writes)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L1656",
+          "maxRrf": 0.001005,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 83
+        },
+        {
+          "section": "3. Linguistic pass (NLP-adjacent, spaCy)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L382",
+          "maxRrf": 0.000975,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 42
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-ace-bitfrost-cache-correctness",
+      "totalOpenTasks": 53,
+      "sectionCount": 23,
+      "maxRrf": 0.014196,
+      "sections": [
+        {
+          "section": "Phase 11D\u201311F cache, recommendation, and routing alignment (2026-10-06)",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L1015",
+          "maxRrf": 0.014196,
+          "primaryDomain": "STORAGE_SEAWEED_S3",
+          "dominantCommunity": 68
+        },
+        {
+          "section": "Consolidated from CLAUDE.md \u2014 2026-10-03 (have vs need)",
+          "openTaskCount": 9,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L972",
+          "maxRrf": 0.013853,
+          "primaryDomain": "STORAGE_SEAWEED_S3",
+          "dominantCommunity": 33
+        },
+        {
+          "section": "Exact prompt cache follow-up \u2014 2026-09-05",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L127",
+          "maxRrf": 0.009841,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 22
+        },
+        {
+          "section": "Retrieval cache identity follow-up \u2014 2026-09-07",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L406",
+          "maxRrf": 0.00954,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 22
+        },
+        {
+          "section": "Run Receipts",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L936",
+          "maxRrf": 0.008904,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 82
+        },
+        {
+          "section": "Current lineage recheck \u2014 2026-09-15",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L723",
+          "maxRrf": 0.008843,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 22
+        },
+        {
+          "section": "Ontology tuple cache identity and projection revisions (2026-09-30)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L940",
+          "maxRrf": 0.007939,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 10
+        },
+        {
+          "section": "Explicit packet-digest bridge recheck \u2014 2026-09-15",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L863",
+          "maxRrf": 0.007902,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "Taxonomy-aware RLM cache handoff \u2014 2026-09-06",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L14",
+          "maxRrf": 0.007741,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 22
+        },
+        {
+          "section": "PostgreSQL index and Drizzle mirror status \u2014 2026-09-15",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L810",
+          "maxRrf": 0.007319,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 6
+        },
+        {
+          "section": "Live cache and caller recheck \u2014 2026-09-15",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L698",
+          "maxRrf": 0.005327,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 22
+        },
+        {
+          "section": "ACE production-caller recheck \u2014 2026-09-15",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L876",
+          "maxRrf": 0.004138,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 22
+        },
+        {
+          "section": "Strict stream-cache isolation \u2014 2026-09-15",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L734",
+          "maxRrf": 0.003828,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 22
+        },
+        {
+          "section": "Indexing audit availability recheck \u2014 2026-09-15",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L907",
+          "maxRrf": 0.003719,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 6
+        },
+        {
+          "section": "Fresh live indexing and ACE reconciliation \u2014 2026-09-15",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L832",
+          "maxRrf": 0.003618,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 6
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-best-fit-score-fabric",
+      "totalOpenTasks": 292,
+      "sectionCount": 145,
+      "maxRrf": 0.013993,
+      "sections": [
+        {
+          "section": "Packet digest bridge live read-only recheck (2026-10-11)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L6002",
+          "maxRrf": 0.013993,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "Stage 4 semantic cohort admission scaffold (2026-09-15)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L6180",
+          "maxRrf": 0.013818,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 61
+        },
+        {
+          "section": "Explicit packet-to-chunk join readback (2026-09-15)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L4788",
+          "maxRrf": 0.013362,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "Snapshot binding and terminal execution recheck (2026-09-15)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L4877",
+          "maxRrf": 0.013206,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 1
+        },
+        {
+          "section": "Stage 7 latent representation lineage scaffold (2026-09-15)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L5510",
+          "maxRrf": 0.012894,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 49
+        },
+        {
+          "section": "Bounded packet digest bridge recheck (2026-09-15)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L5403",
+          "maxRrf": 0.012212,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "Still-missing blockers after the 2026-09-14 route and authority audit",
+          "openTaskCount": 11,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L3715",
+          "maxRrf": 0.012125,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 26
+        },
+        {
+          "section": "Explicit packet/chunk join result (2026-09-14)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L4165",
+          "maxRrf": 0.011515,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "Current packet/chunk identity recheck (2026-09-15)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L6123",
+          "maxRrf": 0.011359,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "Bounded packet/chunk auditor readback (2026-09-15)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L5422",
+          "maxRrf": 0.010848,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "Current Graphify packet-bridge recheck (2026-09-15)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L4487",
+          "maxRrf": 0.010303,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "Packet schema/current-writer correction (2026-09-15)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L5902",
+          "maxRrf": 0.009928,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "Stage 3 current source/chunk ordinal admission scaffold (2026-09-15)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L5463",
+          "maxRrf": 0.009856,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 61
+        },
+        {
+          "section": "P0 \u2014 revision-qualified evidence and consumer admission",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L3451",
+          "maxRrf": 0.009517,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 26
+        },
+        {
+          "section": "Current execution-owned source/packet/chunk recheck (2026-09-14)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L4237",
+          "maxRrf": 0.009208,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 3
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-kafka-projection-initiative",
+      "totalOpenTasks": 33,
+      "sectionCount": 15,
+      "maxRrf": 0.013993,
+      "sections": [
+        {
+          "section": "Readiness and contract gates",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L27",
+          "maxRrf": 0.013993,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 51
+        },
+        {
+          "section": "Proposed: event workboard integration (2026-10-13)",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L58",
+          "maxRrf": 0.010776,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 51
+        },
+        {
+          "section": "Proposed: inventory findings for LUTs, caches and acceleration (2026-10-13)",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L74",
+          "maxRrf": 0.006873,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 30
+        },
+        {
+          "section": "Safety boundary",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L37",
+          "maxRrf": 0.001157,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 27
+        },
+        {
+          "section": "Event source and dependency gate recheck (2026-10-13)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L320",
+          "maxRrf": 0.000943,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 76
+        },
+        {
+          "section": "Controller and event-bridge recheck (2026-10-13; read-only)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L100",
+          "maxRrf": 0.000898,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 51
+        },
+        {
+          "section": "Checked-task proof-state correction (2026-10-13)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L234",
+          "maxRrf": 0.000874,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 76
+        },
+        {
+          "section": "Dependency topology recheck (2026-10-13; read-only)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L247",
+          "maxRrf": 0.000837,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 92
+        },
+        {
+          "section": "Event-envelope hardening and status correction (2026-10-13)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L148",
+          "maxRrf": 0.000832,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 76
+        },
+        {
+          "section": "Local transition-diff adapter (2026-10-13; partial, no durable delivery)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L136",
+          "maxRrf": 0.000819,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 51
+        },
+        {
+          "section": "KAFKA-09 snapshot-diff correction (2026-10-13; local test only)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L434",
+          "maxRrf": 0.000783,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 51
+        },
+        {
+          "section": "Fresh task snapshot and receipt-join recheck (2026-10-13)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L270",
+          "maxRrf": 0.000768,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "Current task/evidence join and controller replay (2026-10-13; scratch-only)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L368",
+          "maxRrf": 0.000764,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "Controller receipt-admission bridge (2026-10-13)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L291",
+          "maxRrf": 0.000746,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 3
+        },
+        {
+          "section": "Canonical task/evidence event seam audit (2026-10-13; read-only)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L192",
+          "maxRrf": 0.00074,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 23
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-code-ingestion-pipeline",
+      "totalOpenTasks": 9,
+      "sectionCount": 1,
+      "maxRrf": 0.013708,
+      "sections": [
+        {
+          "section": "Graphify hardening lifecycle \u2014 AST ownership and supersession",
+          "openTaskCount": 9,
+          "topTaskId": "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md#L94",
+          "maxRrf": 0.013708,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 93
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-workboard-feature-utility-fabric",
+      "totalOpenTasks": 42,
+      "sectionCount": 18,
+      "maxRrf": 0.013322,
+      "sections": [
+        {
+          "section": "Data labeler \u2192 KMeans \u2192 XGBoost \u2192 RL (recorded direction, not started)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L436",
+          "maxRrf": 0.013322,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 38
+        },
+        {
+          "section": "WFU-09 \u2014 WorkboardFeatureVectorV1 (blocker)",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L141",
+          "maxRrf": 0.005093,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 43
+        },
+        {
+          "section": "WFU-11 \u2014 ACE / BitFrost admission",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L234",
+          "maxRrf": 0.002077,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 34
+        },
+        {
+          "section": "WFU-06 \u2014 Postgres topic/domain schema",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L129",
+          "maxRrf": 0.000882,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 85
+        },
+        {
+          "section": "LangGraph process graph (after WFU-09/10)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L433",
+          "maxRrf": 0.000869,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 43
+        },
+        {
+          "section": "NS-8A/8B identity + NS-7A shadow scheduler (2026-09-20, operator design review applied)",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L380",
+          "maxRrf": 0.000858,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 23
+        },
+        {
+          "section": "REGISTRY-COVERAGE-01 result (2026-09-20, read-only, no writes)",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L274",
+          "maxRrf": 0.000802,
+          "primaryDomain": "STORAGE_SEAWEED_S3",
+          "dominantCommunity": 58
+        },
+        {
+          "section": "Crawler / external docs (WFU-04b, after WFU-05)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L430",
+          "maxRrf": 0.000779,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 14
+        },
+        {
+          "section": "WFU-04 \u2014 AST/rg evidence adapter",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L121",
+          "maxRrf": 0.000778,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 23
+        },
+        {
+          "section": "WFU-05 \u2014 OKF vocabulary adapter",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L125",
+          "maxRrf": 0.000747,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 56
+        },
+        {
+          "section": "\"Forest\" \u2014 two meanings, corrected (2026-09-20)",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L347",
+          "maxRrf": 0.000659,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 22
+        },
+        {
+          "section": "WFU-07 \u2014 Indexed retrieval + EXPLAIN proof",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L133",
+          "maxRrf": 0.000602,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 92
+        },
+        {
+          "section": "TOURNAMENT-FEATURES-01 \u2014 derive the features from tasks.md (2026-09-20, read-only, advisory)",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L191",
+          "maxRrf": 0.000594,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 43
+        },
+        {
+          "section": "WFU-12 \u2014 Parent Atlas Studio UI",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L238",
+          "maxRrf": 0.000565,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 67
+        },
+        {
+          "section": "WFU-02 \u2014 LanguageRegistryV1",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L114",
+          "maxRrf": 0.000547,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 23
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-ml-graph-retrieval-convergence",
+      "totalOpenTasks": 182,
+      "sectionCount": 33,
+      "maxRrf": 0.013122,
+      "sections": [
+        {
+          "section": "Four missing proof components \u2014 2026-10-08",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L290",
+          "maxRrf": 0.013122,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 12
+        },
+        {
+          "section": "AST/CST \u2192 FastAPI NLP/SLM \u2192 Graphify fanout \u2192 DAG state closure (2026-10-07)",
+          "openTaskCount": 11,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L185",
+          "maxRrf": 0.009245,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 12
+        },
+        {
+          "section": "Async worker / stale tournament event gates",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L197",
+          "maxRrf": 0.008793,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 12
+        },
+        {
+          "section": "2026-10-08 crash/idempotency, Graphify snapshot and GPU proof",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L311",
+          "maxRrf": 0.00869,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 12
+        },
+        {
+          "section": "Gate E \u2014 synthesis evidence",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L45",
+          "maxRrf": 0.00653,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 16
+        },
+        {
+          "section": "Decision tree / HMM / supersession / KMeans alignment",
+          "openTaskCount": 8,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L208",
+          "maxRrf": 0.006408,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 46
+        },
+        {
+          "section": "Durable journal owner discovered \u2014 use before any new DAG state table",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L233",
+          "maxRrf": 0.004716,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 12
+        },
+        {
+          "section": "Gate D \u2014 projection, GPU and C++ acceleration",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L41",
+          "maxRrf": 0.004232,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 2
+        },
+        {
+          "section": "V2 feature / RTX parity addendum",
+          "openTaskCount": 7,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L98",
+          "maxRrf": 0.00416,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 12
+        },
+        {
+          "section": "PostgreSQL 18 rollback fixture / bitmap / agent cache (2026-10-08)",
+          "openTaskCount": 9,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L272",
+          "maxRrf": 0.003168,
+          "primaryDomain": "DATA_PG18_DRIZZLE",
+          "dominantCommunity": 12
+        },
+        {
+          "section": "N-ary NetworkX / RAPIDS alignment increment",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L146",
+          "maxRrf": 0.00306,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 2
+        },
+        {
+          "section": "Transactional DAG port implementation increment",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L223",
+          "maxRrf": 0.002949,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 12
+        },
+        {
+          "section": "Graph tensor / ATen / Boost / rendering separation",
+          "openTaskCount": 7,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L109",
+          "maxRrf": 0.002925,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 2
+        },
+        {
+          "section": "CRUD proposal / incremental AST search subhelpers",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L173",
+          "maxRrf": 0.002866,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 2
+        },
+        {
+          "section": "2026-10-08 source vs snapshot feature lineage policy correction",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L336",
+          "maxRrf": 0.002856,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 1
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+      "totalOpenTasks": 86,
+      "sectionCount": 15,
+      "maxRrf": 0.012488,
+      "sections": [
+        {
+          "section": "Ordered follow-up checklist",
+          "openTaskCount": 9,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L324",
+          "maxRrf": 0.012488,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 44
+        },
+        {
+          "section": "Ranking, prompt optimization, and CPU/GPU follow-up",
+          "openTaskCount": 7,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L694",
+          "maxRrf": 0.009877,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 2
+        },
+        {
+          "section": "Execute in order; retain all checkboxes OPEN until actual receipts",
+          "openTaskCount": 13,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L526",
+          "maxRrf": 0.009793,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 30
+        },
+        {
+          "section": "2026-10-10 read-only execution and admission boundaries",
+          "openTaskCount": 14,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L568",
+          "maxRrf": 0.009556,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 30
+        },
+        {
+          "section": "Agentic repair evidence admission \u2014 2026-10-07",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L358",
+          "maxRrf": 0.003332,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 18
+        },
+        {
+          "section": "Product feature decomposition runtime integration (2026-10-09)",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L606",
+          "maxRrf": 0.001718,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 57
+        },
+        {
+          "section": "Three proof waves \u2014 sequencing correction (2026-10-07)",
+          "openTaskCount": 6,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L395",
+          "maxRrf": 0.001478,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 57
+        },
+        {
+          "section": "PA-GEPA-01 \u2014 baseline -> optimized program comparison",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L240",
+          "maxRrf": 0.001446,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 44
+        },
+        {
+          "section": "Planning update: recommendation, self-prompting, tool calling, migrations, UI (2026-10-24)",
+          "openTaskCount": 7,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L959",
+          "maxRrf": 0.001379,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 74
+        },
+        {
+          "section": "PA-TRAIN-LATER \u2014 reranker/QLoRA follow-up (blocked)",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L255",
+          "maxRrf": 0.001373,
+          "primaryDomain": "AGENT_ORNITH_RAG_GPU",
+          "dominantCommunity": 19
+        },
+        {
+          "section": "OAK-AGENT-PYDANTIC-01 \u2014 isolated proposal boundary (GitHub branch implementation; validation pending)",
+          "openTaskCount": 4,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L498",
+          "maxRrf": 0.001352,
+          "primaryDomain": "ENGINE_BVH_N64_ARENA",
+          "dominantCommunity": 57
+        },
+        {
+          "section": "Source authority / TRACE / agentic tool integration \u2014 audit handoff (2026-10-09)",
+          "openTaskCount": 7,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L642",
+          "maxRrf": 0.00135,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 18
+        },
+        {
+          "section": "LANGEXTRACT-CUSTOM-ATTRIBUTES-01 \u2014 versioned cross-language preservation (OPEN)",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L1177",
+          "maxRrf": 0.00132,
+          "primaryDomain": "WHO_IDENTITY_AUTH",
+          "dominantCommunity": 30
+        },
+        {
+          "section": "PA-COMPUTE-01 \u2014 content-addressed computation receipts",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L152",
+          "maxRrf": 0.000924,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 93
+        },
+        {
+          "section": "Agent plan-to-execution loop guard audit \u2014 2026-10-07",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L375",
+          "maxRrf": 0.000887,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 1
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-document-governance-master-index",
+      "totalOpenTasks": 20,
+      "sectionCount": 10,
+      "maxRrf": 0.012236,
+      "sections": [
+        {
+          "section": "Next steps \u2014 TOC check drift and disk-bounded verification (2026-10-11)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md#L177",
+          "maxRrf": 0.012236,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 7
+        },
+        {
+          "section": "9. Validation and smoke",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md#L108",
+          "maxRrf": 0.001492,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 32
+        },
+        {
+          "section": "Master Feature TODO reconciliation \u2014 2026-08-31",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md#L129",
+          "maxRrf": 0.001409,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 18
+        },
+        {
+          "section": "10. First bounded apply",
+          "openTaskCount": 3,
+          "topTaskId": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md#L122",
+          "maxRrf": 0.001084,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 13
+        },
+        {
+          "section": "Master phase-gate inventory refresh (2026-10-16; review projection only)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md#L157",
+          "maxRrf": 0.000961,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 16
+        },
+        {
+          "section": "Bounded source-read replay follow-up (2026-10-13)",
+          "openTaskCount": 5,
+          "topTaskId": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md#L186",
+          "maxRrf": 0.000938,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 7
+        },
+        {
+          "section": "5. Supersession, smoke, validation, and archive gates",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md#L71",
+          "maxRrf": 0.000936,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 37
+        },
+        {
+          "section": "6. Master TOC generation",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md#L80",
+          "maxRrf": 0.000909,
+          "primaryDomain": "UI_SVELTE5_BOARD",
+          "dominantCommunity": 56
+        },
+        {
+          "section": "Full master reference inspection (2026-10-16; review projection)",
+          "openTaskCount": 1,
+          "topTaskId": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md#L169",
+          "maxRrf": 0.000873,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 16
+        },
+        {
+          "section": "4. Agentic workflow receipts, progress, and ETA",
+          "openTaskCount": 2,
+          "topTaskId": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md#L61",
+          "maxRrf": 0.000871,
+          "primaryDomain": "WHY_LEDGER_MOTIVE",
+          "dominantCommunity": 18
+        }
+      ]
+    }
+  ]
+}
