@@ -45,7 +45,7 @@ Ordering is dependency-driven: query-seed identity → entity/evidence admission
   fallback and inspect actual consumers before closing this task. No new
   `title_id` semantics, registry, LUT, cache, or write path is introduced.
 
-- [ ] **PACKET-ROUTING-INDEX-01** After `FI-TITLE-ADDRESS-01` and a frozen,
+- [ ] **PACKET-ROUTING-INDEX-01** After `FI-TITLE-ADDRESS-01` and a frozen, <!-- wfu: depends=FI-TITLE-ADDRESS-01 -->
   revision-qualified packet/ordinal snapshot pass, specify and fixture-test a
   derived compact routing projection. Keep `DomainTitleRegistryV1` taxonomy
   revision/checksum-bound and give compact addresses a distinct name (never

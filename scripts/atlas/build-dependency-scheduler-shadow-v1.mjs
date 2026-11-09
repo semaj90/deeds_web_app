@@ -14,8 +14,12 @@ import { compareDependencyShadow } from './lib/wfu-metadata.mjs';
 
 const reportsDir = path.resolve(process.argv[2] ?? 'docs/reports');
 const outputPath = path.resolve(process.argv[3] ?? path.join(reportsDir, 'dependency-scheduler-shadow-v1.json'));
-const controller = JSON.parse(fs.readFileSync(path.join(reportsDir, 'openspec-execution-controller-v1.json'), 'utf8'));
+const controllerPath = path.join(reportsDir, 'openspec-execution-controller-v1.json');
+const controller = JSON.parse(fs.readFileSync(controllerPath, 'utf8'));
 const rows = Array.isArray(controller.allTasks) ? controller.allTasks : [];
+const sha256File = (filePath) => crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
+const generatorPath = path.resolve(process.argv[1]);
+const metadataHelperPath = path.resolve('scripts/atlas/lib/wfu-metadata.mjs');
 
 const result = compareDependencyShadow(rows);
 const identityBasis = {};
@@ -26,7 +30,13 @@ for (const r of rows.filter((x) => x.state === 'OPEN')) {
 const report = {
   schema: 'atlas.dependency-scheduler-shadow.v1',
   stage: 'NS-7A_DECLARED_DEPENDENCY_SHADOW',
-  generatedFrom: { controllerGeneratedAt: controller.generatedAt ?? null, controllerRows: rows.length },
+  generatedFrom: {
+    controllerGeneratedAt: controller.generatedAt ?? null,
+    controllerRows: rows.length,
+    controllerInput: { path: path.relative(process.cwd(), controllerPath).replaceAll('\\', '/'), sha256: sha256File(controllerPath) },
+    generator: { path: path.relative(process.cwd(), generatorPath).replaceAll('\\', '/'), sha256: sha256File(generatorPath) },
+    dependencyHelper: { path: path.relative(process.cwd(), metadataHelperPath).replaceAll('\\', '/'), sha256: sha256File(metadataHelperPath) },
+  },
   behaviorChanged: false,
   controllerAuthorityUnchanged: true,
   canonicalAuthority: false,

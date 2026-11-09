@@ -57,6 +57,7 @@ FEATURES: list[tuple[str, int]] = [
     ("externalDependencyRisk", -1),
     ("downstreamBlockedCount", 1),
 ]
+TASK_HISTORY_FEATURES: list[tuple[str, int]] = [("taskBlockAgeSeconds", -1)]
 QUALIFIED_BASIS = {"OBSERVED", "DERIVED"}
 MIN_PRESENT_FRACTION = 0.9
 # A feature whose non-modal values cover fewer than this fraction of present tasks is effectively constant:
@@ -77,12 +78,16 @@ def _cell(task: dict, name: str) -> dict:
     return feature if isinstance(feature, dict) else {"present": False, "value": 0, "basis": "ABSENT"}
 
 
-def _select_features(tasks: list[dict], allowed_basis: set[str]) -> tuple[list[dict], list[dict]]:
+def _select_features(
+    tasks: list[dict],
+    allowed_basis: set[str],
+    features: list[tuple[str, int]] = FEATURES,
+) -> tuple[list[dict], list[dict]]:
     """Return (usable feature descriptors, rejected feature descriptors with reasons)."""
     usable: list[dict] = []
     rejected: list[dict] = []
     total = len(tasks)
-    for name, sign in FEATURES:
+    for name, sign in features:
         cells = [_cell(task, name) for task in tasks]
         present = [c for c in cells if c.get("present") is True]
         bases = sorted({str(c.get("basis")) for c in present})
@@ -117,6 +122,11 @@ def main() -> int:
     parser.add_argument("--rank", type=int, default=3)
     parser.add_argument("--seed", type=int, default=0xA71A5)
     parser.add_argument(
+        "--include-task-history",
+        action="store_true",
+        help="include the unvalidated task-block-age ranking signal for shadow experiments only",
+    )
+    parser.add_argument(
         "--include-weak-basis",
         action="store_true",
         help="also admit PROXY/HEURISTIC/TEXT_DERIVED-basis features (default: OBSERVED/DERIVED only)",
@@ -131,7 +141,8 @@ def main() -> int:
     allowed_basis = set(QUALIFIED_BASIS)
     if args.include_weak_basis:
         allowed_basis |= WEAK_BASIS
-    usable, rejected = _select_features(tasks, allowed_basis)
+    candidate_features = FEATURES + (TASK_HISTORY_FEATURES if args.include_task_history else [])
+    usable, rejected = _select_features(tasks, allowed_basis, candidate_features)
     # A low-rank ordering needs at least two varying qualified columns; with one it is just a sort on
     # that column and would masquerade as an independent challenger. Emit an explicit degenerate report
     # (no ordering) so the tournament cannot report a false comparison.

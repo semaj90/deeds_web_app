@@ -1,0 +1,142 @@
+{
+  "schema": "atlas.dependency-scheduler-shadow.v1",
+  "stage": "NS-7A_DECLARED_DEPENDENCY_SHADOW",
+  "generatedFrom": {
+    "controllerGeneratedAt": "2026-11-09T19:27:54.881Z",
+    "controllerRows": 13951,
+    "controllerInput": {
+      "path": ".tmp/atlas/wfu09-ns9-adoption-expanded/reports/openspec-execution-controller-v1.json",
+      "sha256": "fe5b880298cf98c546466a5e2fca75efa9d31612287ac64b356c1e1a7f273bc3"
+    },
+    "generator": {
+      "path": "scripts/atlas/build-dependency-scheduler-shadow-v1.mjs",
+      "sha256": "92ce8e03fcf0ba045f71dafcc635399afcaf34ca8c5dfdc70d75a5cea2bff59e"
+    },
+    "dependencyHelper": {
+      "path": "scripts/atlas/lib/wfu-metadata.mjs",
+      "sha256": "9d09320225fc990934b7739501aa5a8fa3e5569e9215693a662b19b618b821d3"
+    }
+  },
+  "behaviorChanged": false,
+  "controllerAuthorityUnchanged": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "rule": "depends=none is an observed empty set; a task with no wfu comment is missingMetadata and stays on the incumbent controller rules.",
+  "openConsidered": 5728,
+  "actionableConsidered": 4103,
+  "counts": {
+    "sameDecision": 23,
+    "incumbentReadyOnly": 0,
+    "dependencyReadyOnly": 0,
+    "unresolvedDependency": 0,
+    "ambiguousDependency": 0,
+    "cycleDetected": 0,
+    "missingMetadata": 4984
+  },
+  "examples": {
+    "missingMetadata": [
+      "agent-branch-review-fanout-ace-centroid-aug22:3.3",
+      "agent-branch-review-fanout-ace-centroid-aug22:3.4",
+      "agent-branch-review-fanout-ace-centroid-aug22:4.3",
+      "atlas-directory-first-analysis-v1:1.1",
+      "atlas-directory-first-analysis-v1:1.2"
+    ],
+    "sameDecision": [
+      "atlas-feature-intelligence:PACKET-ROUTING-INDEX-01",
+      "parent-atlas-ace-rlm-bitfrost-integration:SYSTEM-PROMPT-01",
+      "parent-atlas-agentic-file-compiler:AFC-E2E-02",
+      "parent-atlas-code-intel-e2e:CODE-IMPACT-01",
+      "parent-atlas-code-intel-e2e:MCP-CODE-INTEL-01"
+    ]
+  },
+  "receiptReadiness": {
+    "unprovenDependencyTaskCount": 22,
+    "unprovenDependencyTasks": [
+      {
+        "taskKey": "atlas-feature-intelligence:PACKET-ROUTING-INDEX-01",
+        "unprovenTaskKeys": [
+          "atlas-feature-intelligence:FI-TITLE-ADDRESS-01"
+        ]
+      },
+      {
+        "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:SYSTEM-PROMPT-01",
+        "unprovenTaskKeys": [
+          "parent-atlas-ace-rlm-bitfrost-integration:CTX-E2E-01"
+        ]
+      },
+      {
+        "taskKey": "parent-atlas-agentic-file-compiler:AFC-E2E-02",
+        "unprovenTaskKeys": [
+          "parent-atlas-agentic-file-compiler:AFC-E2E-01"
+        ]
+      },
+      {
+        "taskKey": "parent-atlas-code-intel-e2e:CODE-IMPACT-01",
+        "unprovenTaskKeys": [
+          "parent-atlas-code-intel-e2e:AST-LIVE-JOIN-01",
+          "parent-atlas-code-intel-e2e:SOURCE-SYMBOL-AUTHORITY-01"
+        ]
+      },
+      {
+        "taskKey": "parent-atlas-code-intel-e2e:MCP-CODE-INTEL-01",
+        "unprovenTaskKeys": [
+          "parent-atlas-code-intel-e2e:CODE-IMPACT-01"
+        ]
+      }
+    ],
+    "preservedNonDependencyBlockerCount": 721,
+    "preservedNonDependencyBlockerExamples": [
+      "atlas-directory-first-analysis-v1:1.6",
+      "atlas-directory-first-analysis-v1:1.7",
+      "atlas-directory-first-analysis-v1:1.12",
+      "atlas-directory-first-analysis-v1:1.13",
+      "atlas-directory-first-analysis-v1:1.14"
+    ]
+  },
+  "criteria": {
+    "dependencyMetadataCoverageOfActionable": {
+      "value": 0.0002,
+      "required": 0.95,
+      "met": false
+    },
+    "ambiguousEdges": {
+      "value": 0,
+      "required": 0,
+      "met": true
+    },
+    "unresolvedRequiredEdges": {
+      "value": 0,
+      "required": 0,
+      "met": true
+    },
+    "cycles": {
+      "value": 0,
+      "required": 0,
+      "met": true
+    },
+    "logicalTaskIdentityStable": {
+      "value": true,
+      "required": true,
+      "met": true
+    },
+    "logicalKeyCoverageOfActionable": {
+      "value": 0.6117,
+      "required": 0.95,
+      "met": false
+    },
+    "noRegressionOfRequiredGates": {
+      "value": 0,
+      "required": 0,
+      "met": true
+    }
+  },
+  "admissionEligible": false,
+  "openTaskIdentityBasis": {
+    "DECLARED_ID": 3182,
+    "MIGRATION_TITLE_HASH": 2508,
+    "AMBIGUOUS_DECLARED_ID": 67,
+    "DECLARED_ID_SECTION_QUALIFIED": 118
+  },
+  "nextGate": "NOT_ELIGIBLE: unmet criteria remain; stay on incumbent controller rules",
+  "semanticChecksum": "eda6938e5cc50cda591b6f17c3ca6616cecb1cfd481a8ff68f317e134c0eebeb"
+}

@@ -152,8 +152,8 @@ if (resolved.length > 0) {
              start_byte, end_byte, workspace_id::text AS workspace_id
       FROM public.atlas_ast_nodes
       WHERE tree_node_id = ANY($1::text[]) AND workspace_id = $2
-        AND lower(source_revision) = lower($3) AND lower(source_content_hash) = lower($3)
-    `, [ids, workspaceId, sourceRevision]);
+        AND lower(source_revision) = lower($3) AND lower(source_content_hash) = lower($4)
+    `, [ids, workspaceId, sourceRevision, sourceDigest]);
     const got = new Map(readback.rows.map((row: any) => [row.tree_node_id, row]));
     const mismatches = resolved.filter((result) => {
       const row: any = got.get(result.treeNodeId!);

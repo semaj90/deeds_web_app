@@ -229,7 +229,7 @@ another.
   emit `dist`. The workstation kit remains private, so public package-consumer
   resolution is intentionally deferred to PKG-07's workspace integration
   verification rather than implied here.
-- [ ] **PKG-07 — Workstation integration proof.** Re-run the package checks
+- [ ] **PKG-07 — Workstation integration proof.** Re-run the package checks <!-- wfu: depends=PKG-03,PKG-04,PKG-05,PKG-06 -->
   through the supported root/workspace toolchain after PKG-03 through PKG-06
   are resolved, then verify the package exports used by SvelteKit, Graphify,
   retrieval, MCP, and ACP. Do not mark the workstation complete from package
@@ -3224,7 +3224,7 @@ or report path back for the next pass.
   independently blocked and must not invalidate canonical graph identity.
 - [ ] G-07 Memory/runtime budget: report WSL2 GPU free VRAM, host RAM, CPU
   worker limit, and whether the runtime silently falls back from CUDA.
-- [ ] G-08 Acceptance receipt: after G-01 through G-07, run the bounded
+- [ ] G-08 Acceptance receipt: after G-01 through G-07, run the bounded <!-- wfu: depends=G-01,G-02,G-03,G-04,G-05,G-06,G-07 -->
   preflight and attach `docs/reports/atlas-neural-prefill-validation-v1.json`.
 
 ### Read-only preflight evidence (2026-08-24)

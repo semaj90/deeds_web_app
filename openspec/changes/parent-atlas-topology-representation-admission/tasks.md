@@ -474,7 +474,7 @@
   `canonical_id` to be omitted. The helper now rejects such payloads, but this
   path remains `LEGACY_UNPROVEN`, not the established semantic_768 writer. Do
   not use it to backfill existing points or claim TOPO-11.
-- [ ] TOPO-11A Prove exact PostgreSQL pgvector-to-Qdrant `content` vector
+- [ ] TOPO-11A Prove exact PostgreSQL pgvector-to-Qdrant `content` vector <!-- wfu: depends=TOPO-11 -->
   parity after TOPO-11 identity parity. Read back only the bounded admitted
   cohort and compare canonical chunk identity, workspace/source revisions,
   representation (`semantic_768`), dimensions (768), and vector digest or

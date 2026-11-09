@@ -1,0 +1,76 @@
+{
+  "schema": "atlas.wfu09-ns9-first-dependency-adoption.v1",
+  "generatedAt": "2026-11-09T18:56:15.915Z",
+  "workspaceRevision": "ef1e28f984d8dbcf5bd07bb3c2629c537135fc73",
+  "status": "PASS_DECLARATION_PROPAGATED_BLOCKED_ON_RECEIPT",
+  "authority": "SOURCE_BOUND_DEPENDENCY_PROPAGATION_CHECK",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "taskSourceMutationPerformedByVerifier": false,
+  "task": {
+    "logicalTaskKey": "parent-atlas-ontology-kernel:NEXT-23",
+    "taskKey": "parent-atlas-ontology-kernel:5529",
+    "sourceRef": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+    "sourceLine": 5529,
+    "sourceFileSha256": "a26ebac0c07de905b99ee2db26dc4484a1b4fb4548a02e2a8ade1d5d38009bcf",
+    "sourceBlockSha256": "sha256:45f46fd65a3205de75dc501a507ba6715130fee587a0ca227d715640c192eaff",
+    "taskRevision": "sha256:45f46fd65a3205de75dc501a507ba6715130fee587a0ca227d715640c192eaff",
+    "declaredDependsOn": [
+      "NEXT-22"
+    ],
+    "resolvedDependsOnTaskKeys": [
+      "parent-atlas-ontology-kernel:5527"
+    ]
+  },
+  "prerequisite": {
+    "logicalTaskKey": "parent-atlas-ontology-kernel:NEXT-22",
+    "taskKey": "parent-atlas-ontology-kernel:5527",
+    "controllerState": "ACTIONABLE"
+  },
+  "observedGate": {
+    "controllerState": "WAITING_ON_DEPENDENCY",
+    "blockerKey": "DECLARED_TASK_DEPENDENCY",
+    "dependencyReadiness": {
+      "ready": false,
+      "unresolvedTaskKeys": [],
+      "unprovenTaskKeys": [
+        "parent-atlas-ontology-kernel:5527"
+      ],
+      "cyclic": false
+    },
+    "actionableAdapterContainsTask": false
+  },
+  "checks": {
+    "exactSourcePath": true,
+    "sourceBlockRevisionParity": true,
+    "authoredDependencyOnly": true,
+    "exactExistingTaskResolution": true,
+    "missingPrerequisiteReceiptBlocksTask": true,
+    "blockedTaskExcludedFromActionableAdapter": true,
+    "noCanonicalWrites": true
+  },
+  "failedChecks": [],
+  "inputs": {
+    "workboard": {
+      "path": ".tmp/atlas/wfu09-ns9-adoption-v1/openspec-workboard-v1.json",
+      "sha256": "dd885ea2a6f5e5cdab4e003bd4f074d8e234b877ff5f1c2bba60ba54c099cd46"
+    },
+    "controller": {
+      "path": ".tmp/atlas/wfu09-ns9-adoption-v1/reports/openspec-execution-controller-v1.json",
+      "sha256": "06024a99573b8987e59fb4eaf1fcd74e23bc08e7a7e892267e5c03be91c5ae9f"
+    },
+    "actionableAdapter": {
+      "path": ".tmp/atlas/wfu09-ns9-adoption-v1/actionable-workboard-v3.json",
+      "sha256": "f7616749de64189c8d91319d207b0c1c7dda74495e4a7d295f03e167925be03d"
+    },
+    "verifier": {
+      "path": "scripts/atlas/verify-wfu09-ns9-dependency-adoption-v1.mjs",
+      "sha256": "831d324163f2c89ef29cd5e8e081a77d59e3f795f0b5fd41d33252852a97bc26"
+    }
+  },
+  "limitations": [
+    "This verifies one task declaration and its current DAG gate only.",
+    "It does not authorize scheduler admission, execution, task completion, a database write, or changes to other task ledgers.",
+    "NEXT-23 remains blocked until NEXT-22 has current independently admitted proof evidence."
+  ]
+}

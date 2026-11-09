@@ -1,0 +1,119 @@
+{
+  "schema": "atlas.wfu09-feature-history-tournament.v1",
+  "generatedAt": "2026-11-09T19:49:35.517Z",
+  "workspaceRevision": "ef1e28f984d8dbcf5bd07bb3c2629c537135fc73",
+  "mode": "SHADOW_ONLY_CPU",
+  "canonicalAuthority": false,
+  "eligibleForAuthority": false,
+  "writesPerformed": {
+    "database": false,
+    "cache": false,
+    "taskState": false
+  },
+  "cohort": {
+    "tasks": 4077,
+    "logicalTaskKeyRows": 2488,
+    "logicalTaskKeyCoverage": 0.610253
+  },
+  "historyFeature": {
+    "exactSourceBoundRows": 4077,
+    "exactBlockMatches": 4077,
+    "cleanManifestBoundRows": 2642,
+    "coverage": 0.6480255089526613,
+    "distinctAgeValues": 196,
+    "sourceBindingFailures": 0,
+    "gitHistoryFailures": 0,
+    "rankerRejectedReason": "PRESENT_ON_TOO_FEW_TASKS",
+    "rankerObservedCoverage": 2642,
+    "rankerMinimumCoverage": 0.9
+  },
+  "ranker": {
+    "device": "cpu",
+    "baselineFeatures": [
+      "goalRank",
+      "selectionEligible"
+    ],
+    "historyFeatures": [
+      "goalRank",
+      "selectionEligible"
+    ],
+    "baselineOutputChecksum": "sha256:229225f3c94573870b0c571644d8a07a9055652806fb2faa72ab2b05b323b150",
+    "historyOutputChecksum": "sha256:229225f3c94573870b0c571644d8a07a9055652806fb2faa72ab2b05b323b150",
+    "outputsIdentical": true
+  },
+  "tournament": {
+    "baseline": {
+      "comparisons": 4077,
+      "meanAbsoluteRankDelta": 532.75,
+      "topKOverlap": {
+        "10": 4,
+        "50": 18,
+        "200": 87,
+        "500": 219
+      }
+    },
+    "history": {
+      "comparisons": 4077,
+      "meanAbsoluteRankDelta": 532.75,
+      "topKOverlap": {
+        "10": 4,
+        "50": 18,
+        "200": 87,
+        "500": 219
+      }
+    },
+    "semanticChecksumsEqual": true,
+    "rankingsIdentical": true
+  },
+  "interpretation": "Source history is revision-bound but covers only 64.8% of actionable tasks; the ranker requires at least 90%, so it excluded the feature. The current history-enabled result is byte-identical in output checksum and tournament ordering to baseline. Ordering comparison is not ranking-quality evidence; no human-reviewed outcome labels exist.",
+  "inputs": {
+    "workboard": {
+      "path": ".tmp/atlas/wfu09-ns9-final-refresh2/openspec-workboard-v1.json",
+      "sha256": "75b1023f25135f8144e810593075a4ec7d2a463eb440687c1e7a33d7f156782a"
+    },
+    "controller": {
+      "path": ".tmp/atlas/wfu09-ns9-final-refresh2/reports/openspec-execution-controller-v1.json",
+      "sha256": "a14f471fe1be2517c212cbadecf2b9ca1da5fde7dca455261935fbf8ad02d0e6"
+    },
+    "authorityReview": {
+      "path": ".tmp/atlas/wfu09-ns9-final-refresh2/reports/openspec-authority-text-review-v1.json",
+      "sha256": "a9e4c103df9af5465b2ec01c30c7ca9876cd7a5fe90675ce9daabf8b2130e8f6"
+    },
+    "adapterBaseline": {
+      "path": ".tmp/atlas/wfu09-ns9-final-refresh2/reports/actionable-workboard-v3.json",
+      "sha256": "854b0ccfe03158512fc5ac9c676956f95fa2356a2764e1aacc6a6dd23a3d7a35"
+    },
+    "adapterHistory": {
+      "path": ".tmp/atlas/wfu09-ns9-final-refresh2/reports/actionable-workboard-history-v3.json",
+      "sha256": "684c670539fe368b3b5d42846ec4c8c9a12a3adcddc0eb20a5c4fa7cf8f93184"
+    },
+    "historyAudit": {
+      "path": ".tmp/atlas/wfu09-ns9-final-refresh2/reports/task-block-history-feature-audit-v1.json",
+      "sha256": "d65050fa32808743a08bbcef8f050a56372583abafe75d30a74a5b86c19bc995"
+    },
+    "ranker": {
+      "path": "python/build_low_rank_task_recommendation_v2.py",
+      "sha256": "2d1cb2cadf1ac43371f762b69df5ceb52179bbf3eb29c0783b013e6e4e126a82"
+    },
+    "baselineRanker": {
+      "path": ".tmp/atlas/wfu09-ns9-final-refresh2/reports/low-rank-baseline-v2.json",
+      "sha256": "fe3cbde86dd455206fae32858828641a2eab709c6a915b7e53c9608f2cc433c9"
+    },
+    "historyRanker": {
+      "path": ".tmp/atlas/wfu09-ns9-final-refresh2/reports/low-rank-history-v2.json",
+      "sha256": "3344cdde859077dc0a026304b1d80f8d2943f9c6e94bf5164c950d0eb2205aac"
+    },
+    "baselineTournament": {
+      "path": ".tmp/atlas/wfu09-ns9-final-refresh2/tournament-baseline/report.json",
+      "sha256": "1f8cb5ef329a187fada5c835b4c88dbf57446ca9a9d88612348189cf4ddaf177"
+    },
+    "historyTournament": {
+      "path": ".tmp/atlas/wfu09-ns9-final-refresh2/tournament-history/report.json",
+      "sha256": "d648e1c3a21998a75981cb3381393e765954800e2f6ad75bbf5cf1366841b011"
+    },
+    "tournamentBuilder": {
+      "path": "scripts/atlas/build-openspec-challenger-tournament-v1.mjs",
+      "sha256": "f639c4594fb980688c480559305dac78f12893ea465bc7ebde37480a3d8390a0"
+    }
+  }
+}

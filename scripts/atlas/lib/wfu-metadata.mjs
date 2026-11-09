@@ -192,22 +192,48 @@ export const summarizeDeclared = (tasks) => ({
  * NS-7A: DECLARED_DEPENDENCY_SHADOW. Compute actionability twice for OPEN tasks and record the disagreement; it never
  * changes controller behavior. `rows` are controller rows (ledger fields spread + controller.state).
  *   incumbent  : controller.state ACTIONABLE = ready; WAITING_ON_DEPENDENCY / WAITING_ON_AUTHORITY = waiting
- *   challenger : declared depends= edges — ready when remainingRequiredGates === 0, waiting when > 0
+ *   challenger : declared depends= edges — ready only when every exact dependency row is PROVEN by admitted evidence
  * Absence is NOT `depends=none`: a task with no declaration is `missingMetadata` and stays on the incumbent.
+ * A checked source box is not completion evidence; `remainingRequiredGates` is not used as proof.
  */
 export function compareDependencyShadow(rows) {
   const open = rows.filter((r) => r.state === 'OPEN' && ['ACTIONABLE', 'WAITING_ON_DEPENDENCY', 'WAITING_ON_AUTHORITY'].includes(r.controller?.state));
   const counts = { sameDecision: 0, incumbentReadyOnly: 0, dependencyReadyOnly: 0, unresolvedDependency: 0, ambiguousDependency: 0, cycleDetected: 0, missingMetadata: 0 };
   const examples = {};
   const note = (kind, r) => { counts[kind]++; (examples[kind] ??= []).length < 5 && examples[kind].push(r.logicalTaskKey ?? r.stableKey ?? r.taskKey); };
+  const byTaskKey = new Map(rows.filter((r) => r.taskKey).map((r) => [r.taskKey, r]));
+  let unprovenDependencyTaskCount = 0;
+  let preservedNonDependencyBlockerCount = 0;
+  const unprovenDependencyTasks = [];
+  const preservedNonDependencyBlockerExamples = [];
   for (const r of open) {
     const d = r.declared;
     const incumbentReady = r.controller.state === 'ACTIONABLE';
+    // Dependency scheduling may not bypass authorization or any other non-dependency blocker.
+    if (r.controller.state === 'WAITING_ON_AUTHORITY'
+      || (r.controller.state === 'WAITING_ON_DEPENDENCY' && r.controller.blockerKey !== 'DECLARED_TASK_DEPENDENCY')) {
+      preservedNonDependencyBlockerCount++;
+      if (preservedNonDependencyBlockerExamples.length < 5) preservedNonDependencyBlockerExamples.push(r.logicalTaskKey ?? r.stableKey ?? r.taskKey);
+      continue;
+    }
     if (!d || d.dependsOn == null) { note('missingMetadata', r); continue; }
     if (d.dependencyState === 'CYCLE_OR_DOWNSTREAM_OF_CYCLE') { note('cycleDetected', r); continue; }
     if (d.ambiguousDepends?.length) { note('ambiguousDependency', r); continue; }
     if (d.unresolvedDepends?.length) { note('unresolvedDependency', r); continue; }
-    const dependencyReady = r.remainingRequiredGates === 0;
+    if (!Array.isArray(r.dependsOnTaskIds)) { note('unresolvedDependency', r); continue; }
+    const dependencyRows = r.dependsOnTaskIds.map((key) => byTaskKey.get(key));
+    if (dependencyRows.some((dependency) => !dependency)) { note('unresolvedDependency', r); continue; }
+    const unproven = dependencyRows.filter((dependency) => dependency.controller?.state !== 'PROVEN');
+    if (unproven.length > 0) {
+      unprovenDependencyTaskCount++;
+      if (unprovenDependencyTasks.length < 5) {
+        unprovenDependencyTasks.push({
+          taskKey: r.logicalTaskKey ?? r.stableKey ?? r.taskKey,
+          unprovenTaskKeys: unproven.map((dependency) => dependency.logicalTaskKey ?? dependency.stableKey ?? dependency.taskKey),
+        });
+      }
+    }
+    const dependencyReady = unproven.length === 0;
     if (incumbentReady === dependencyReady) note('sameDecision', r);
     else if (incumbentReady) note('incumbentReadyOnly', r);
     else note('dependencyReadyOnly', r);
@@ -230,5 +256,18 @@ export function compareDependencyShadow(rows) {
     })(),
     noRegressionOfRequiredGates: { value: counts.incumbentReadyOnly, required: 0, met: counts.incumbentReadyOnly === 0 }
   };
-  return { openConsidered: open.length, actionableConsidered: actionable.length, counts, examples, criteria, admissionEligible: Object.values(criteria).every((c) => c.met) };
+  return {
+    openConsidered: open.length,
+    actionableConsidered: actionable.length,
+    counts,
+    examples,
+    receiptReadiness: {
+      unprovenDependencyTaskCount,
+      unprovenDependencyTasks,
+      preservedNonDependencyBlockerCount,
+      preservedNonDependencyBlockerExamples,
+    },
+    criteria,
+    admissionEligible: Object.values(criteria).every((c) => c.met)
+  };
 }

@@ -47,6 +47,30 @@ Everything below was measured on this host (RTX 3060 Ti, sm_86, 8 GiB). Status w
 
 ### Radix / cuTile
 - [ ] **ACE-RADIX-01 cuTile half** re-run on a CUDA 13.2+ host (WSL cutile venv is a candidate); do not cite cuTile eligibility until then.
+- [ ] **CUTILE-VENV-RERUN-01** re-run the cuTile owner probe in the existing WSL venv `/home/james/.venvs/atlas-cutile-cu132` (torch 2.14.0+cu132, cuda-tile 1.5.0, nvidia-cuda-tileiras 13.2.78). Last passing receipt: `.tmp/atlas/cutile-owner-probe-receipt-v1.json` (2026-10-13). Do NOT create a new conda env and do NOT move cuTile into `atlas-rapids-cu13` (that would change torch to 2.13+cu130; decide only after this passes).
+  - **Human steps (agents must not stop `:8090`):** (1) `gpu_vram_status` (read-only) and confirm `allSlotsIdle: true`; (2) run VS Code `🧮 GPU: Prepare cuVS KMeans` or `🧹 Free GPU VRAM`; (3) confirm `nvidia-smi` shows `:8090` gone and free VRAM ≥ 6 GiB.
+  - **Run (agent may run once the human confirms step 3):** `MSYS_NO_PATHCONV=1 wsl -d Ubuntu --exec /home/james/.venvs/atlas-cutile-cu132/bin/python python/atlas_cuda_cutile_simt_probe_v1.py` from the repo root in WSL (the Windows path is mounted under `/mnt/c/Users/james/Videos/deeds-web-app`). Keep the probe's own `writes: false` contract.
+  - **Receipt:** the probe takes no arguments and prints its JSON to stdout (checked 2026-11-09, `python/atlas_cuda_cutile_simt_probe_v1.py:51,75`). Capture it with a shell redirect to a new dated file `.tmp/atlas/cutile-owner-probe-receipt-<YYYYMMDD>.json`. Do not overwrite the 2026-10-13 receipt. WSL path `/mnt/c/Users/james/Videos/deeds-web-app/python/atlas_cuda_cutile_simt_probe_v1.py` verified readable (2026-11-09). The `tileiras` binary is at `/home/james/.venvs/atlas-cutile-cu132/lib/python3.14/site-packages/nvidia/cu13/bin/tileiras` (found 2026-11-09; not on the venv `bin/` PATH).
+  - **Pass gate:** `cuTileVectorAdd.finiteAndCorrect == true`, `simtTorchFp16Gemm.finite == true`, `cudaAvailable == true`, `writes == false`, and `tileCompiler` and `torch` recorded.
+  - **Restore:** human runs `⚡ TurboQuant: Start (vision, CPU projector, :8090)` and checks `gpu_vram_status` shows `allSlotsIdle` and `reachable: true`. Record the restore result in the receipt or next to it.
+  - **Non-goals:** no parity claim, no eligibility claim, no change to the 13.0 native lane. A pass only proves the venv still runs cuTile on this host.
+- [ ] **OPS-LIFECYCLE-AUTH-01** decision task: conditions under which an agent-callable tool may stop, start or restart `:8090` (or any service). Until every condition below is met, agents get read-only status tools and request records only (`gpu_vram_status`, `gpu_request_vram_release`).
+  1. Real authentication: a token checked against a stored secret, not presence. `requireToken` (accepts any non-empty string) must be replaced.
+  2. A typed, single-purpose tool per action. No generic shell or Docker control.
+  3. Idle precheck: `/slots` reports all slots idle before any stop. Busy means refuse.
+  4. PID scoping: act only on the process listening on the exact port, owned by the expected command line.
+  5. Audit receipt with `writesPerformed`, written before and after.
+  6. Negative tests: a fake token is refused; a busy slot is refused; a wrong-PID target is refused.
+  - **Open finding (unverified):** TRACE tools `llama_server_unload` and `llama_server_start` appear in the tool list, but a repo search (excluding `.tmp/` and `docs/archive/`) found no definition. Before any agent uses them, find their implementation and confirm whether they stop `:8090`. Until then, treat them as not agent-callable.
+  - **Non-goal:** this task does not build the lifecycle tool. It records the decision and its test plan.
+- [ ] **GPU-PACKET-PASS-01** manual (not startup) GPU pass over ACE packets for dedup and validation, feeding a later BitFrost warm. Blocked on: `BITFROST-LIVE-WARM-01` (admitted packet identity plus a bounded write/readback/expiry canary), and on a packet admission rule that defines "valid" and "duplicate". Steps, in order:
+  1. **Dry-run first (read-only):** read packets from the canonical source, check `packet_key`, `source_ref` and revision, and report counts. Writes nothing and touches no cache.
+  2. **Dedup pass:** group exact duplicates by content checksum, and record near-duplicates separately. Keep the serial CPU result as the oracle; any GPU result needs CPU parity before it counts.
+  3. **Validation gate:** fail closed on any missing identity or revision field. No default or coerced values.
+  4. **Receipt:** counts, duplicate rate, checksums and the executor used, written to a dated `.tmp/atlas/` file.
+  5. **Huffman coding is out of scope for now.** JSON stays the packet wire format. Coding is a separate change that needs a decode-parity receipt matching the JSON packets exactly.
+  - **Startup:** not wired to folder-open or `:8090` startup. Runs only as an explicit operator task, and only after `:8090` is idle and stopped via the documented task when GPU is needed.
+  - **Warm step:** Valkey/BitFrost writes stay blocked until `BITFROST-LIVE-WARM-01` passes. Postgres stays the truth; Valkey is a rebuildable cache.
 - [ ] **CUTILE-ACE-PERF-01** (optional) L2 two-SIMT-kernels vs L3 fused Tile: kernel/e2e latency, launch count, H2D/D2H, peak VRAM, warm vs cold. A slower-but-exact result is valid.
 
 ### BitFrost L2
