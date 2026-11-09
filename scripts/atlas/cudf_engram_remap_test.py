@@ -69,5 +69,54 @@ class DomainBucketTable(unittest.TestCase):
                 m.load_domain_buckets(bad)
 
 
+class EngramTokenDescriptor(unittest.TestCase):
+    GOOD_REV = "sha256:" + "a" * 64
+    GOOD = {
+        "packetKey": "ace:packet:auth:001",
+        "sourceRef": "src/lib/server/auth.ts",
+        "sourceRevision": "sha256:" + "a" * 64,
+        "workspaceRevision": "sha256:" + "b" * 64,
+        "somRow": 0, "somCol": 0, "domainBucket": 0,
+    }
+
+    def test_resolved_descriptor_carries_token_and_no_authority(self):
+        d = m.build_engram_token_descriptor(dict(self.GOOD))
+        self.assertEqual(d["status"], "RESOLVED")
+        self.assertEqual(d["engramTokenId"], 0)
+        self.assertEqual(d["reasons"], [])
+        self.assertFalse(d["canonicalAuthority"])
+        self.assertEqual(d["schema"], m.ENGRAM_DESCRIPTOR_SCHEMA)
+
+    def test_missing_identity_is_rejected_never_defaulted(self):
+        for field, reason in [("packetKey", "MISSING_PACKET_KEY"), ("sourceRef", "MISSING_SOURCE_REF"),
+                              ("sourceRevision", "SOURCE_REVISION_NOT_SHA256"),
+                              ("workspaceRevision", "WORKSPACE_REVISION_NOT_ADMITTED")]:
+            rec = dict(self.GOOD)
+            rec.pop(field)
+            d = m.build_engram_token_descriptor(rec)
+            self.assertEqual(d["status"], "REJECTED", field)
+            self.assertIn(reason, d["reasons"])
+            self.assertIsNone(d["engramTokenId"])
+
+    def test_zero_or_malformed_revisions_rejected(self):
+        for bad in ["0", "sha256:0", "sha256:ABC", "a" * 64]:
+            rec = dict(self.GOOD, sourceRevision=bad, workspaceRevision=bad)
+            d = m.build_engram_token_descriptor(rec)
+            self.assertEqual(d["status"], "REJECTED", bad)
+
+    def test_unresolved_axis_is_unresolved_not_zero(self):
+        rec = dict(self.GOOD, domainBucket=None)
+        d = m.build_engram_token_descriptor(rec)
+        self.assertEqual(d["status"], "UNRESOLVED")
+        self.assertIsNone(d["engramTokenId"])
+        self.assertIn("ENGRAM_AXIS_UNRESOLVED", d["reasons"])
+
+    def test_descriptor_is_bounded_scalars_only(self):
+        d = m.build_engram_token_descriptor(dict(self.GOOD, embedding=[0.1] * 768))
+        self.assertNotIn("embedding", d)
+        for v in d.values():
+            self.assertFalse(isinstance(v, (list, dict)) and v != d["reasons"])
+
+
 if __name__ == "__main__":
     unittest.main()

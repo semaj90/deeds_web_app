@@ -1,0 +1,150 @@
+{
+  "schema": "atlas.openspec-cohort-6527-scratch-reconciliation.v1",
+  "generatedAt": "2026-11-09T00:54:39.166Z",
+  "status": "PASS_READONLY_SCRATCH_RECONCILIATION",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "database": {
+    "database": "legal_ai_live_integration_scratch",
+    "server_version_num": 180004,
+    "server_port": 5432,
+    "clientPort": 5434
+  },
+  "sourceBindingRevision": "sha256:de32847bda8bee924335d1354da03e2361267abc0cdef31fefc115dcd1265f84",
+  "sourceBindingRows": 6527,
+  "inventory": {
+    "source_rows": 6527,
+    "unique_source_keys": 6527,
+    "exact_kanban_task_id_matches": 0,
+    "unmatched_kanban_tasks": 6527,
+    "exact_prefill_task_id_matches": 6527,
+    "prefill_key_matches": 6527,
+    "prefill_ordinal_matches": 6527,
+    "prefill_rank_cohort_revision_matches": 0,
+    "prefill_source_revision_matches": 0,
+    "prefill_source_sha256_matches": 0,
+    "noncanonical_prefill_rows": 6527,
+    "kanban_source_revision_matches": 0,
+    "kanban_completed_or_done_rows": 0
+  },
+  "tables": [
+    "atlas_kanban_dag_prefill_v1",
+    "kanban_task_dependencies",
+    "kanban_tasks"
+  ],
+  "kanbanTaskColumns": [
+    {
+      "column_name": "task_id",
+      "data_type": "text"
+    },
+    {
+      "column_name": "feature_id",
+      "data_type": "text"
+    },
+    {
+      "column_name": "feature_label",
+      "data_type": "text"
+    },
+    {
+      "column_name": "source_refs",
+      "data_type": "jsonb"
+    },
+    {
+      "column_name": "lane",
+      "data_type": "text"
+    },
+    {
+      "column_name": "status",
+      "data_type": "text"
+    },
+    {
+      "column_name": "validation_command",
+      "data_type": "text"
+    },
+    {
+      "column_name": "assignee",
+      "data_type": "text"
+    },
+    {
+      "column_name": "priority",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "claim_token",
+      "data_type": "text"
+    },
+    {
+      "column_name": "claim_expires_at",
+      "data_type": "timestamp with time zone"
+    },
+    {
+      "column_name": "last_heartbeat_at",
+      "data_type": "timestamp with time zone"
+    },
+    {
+      "column_name": "current_run_id",
+      "data_type": "text"
+    },
+    {
+      "column_name": "attempt_count",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "failure_count",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "max_retries",
+      "data_type": "integer"
+    },
+    {
+      "column_name": "started_at",
+      "data_type": "timestamp with time zone"
+    },
+    {
+      "column_name": "completed_at",
+      "data_type": "timestamp with time zone"
+    },
+    {
+      "column_name": "idempotency_key",
+      "data_type": "text"
+    },
+    {
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone"
+    },
+    {
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone"
+    },
+    {
+      "column_name": "workspace_id",
+      "data_type": "character varying"
+    },
+    {
+      "column_name": "source_url",
+      "data_type": "text"
+    },
+    {
+      "column_name": "source_revision",
+      "data_type": "text"
+    }
+  ],
+  "boardInventory": {
+    "total_tasks": 2479,
+    "openspec_namespace_tasks": 0,
+    "nextsteps_namespace_tasks": 2479,
+    "hash_keyed_task_ids": 2479
+  },
+  "sourceRefCandidateAudit": {
+    "unique_source_ref_candidates": 0,
+    "ambiguous_source_ref_candidates": 0,
+    "unmatched_source_refs": 6527,
+    "candidate_examples": []
+  },
+  "dependencies": {
+    "cohort_dependency_rows": 0,
+    "missing_dependency_targets": 0,
+    "external_dependency_targets": 0
+  }
+}

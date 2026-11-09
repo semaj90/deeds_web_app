@@ -12,11 +12,15 @@ export interface UpsertReceiptV1 {
   dbHost: string;
   durationMs: number;
   sha256Digest: string;
+  cohortRevision: string;
+  sourceRevisions: string[];
   canonicalAuthority: false;
 }
 
 export interface KanbanPrefillMetadataInput {
   canonicalTaskKey: string;
+  sourceRevision: string;
+  cohortRevision: string;
   changeId?: string;
   status?: KanbanCanonicalTaskStatus;
   domainId?: number;
@@ -88,7 +92,7 @@ CREATE INDEX IF NOT EXISTS idx_atlas_kanban_dag_prefill_v1_cohort
     ON public.atlas_kanban_dag_prefill_v1 (cohort_revision, cohort_ordinal);
 `.trim();
 
-const FORBIDDEN_PRODUCTION_TOKENS = ['legal_ai_db', 'production', 'live', 'main_db'] as const;
+const FORBIDDEN_PRODUCTION_TOKENS = ['legal_ai_db', 'production', 'main_db'] as const;
 const ALLOWED_LOOPBACK_HOSTS = new Set(['127.0.0.1', 'localhost', '::1', '[::1]']);
 
 /**
@@ -130,6 +134,9 @@ export function assertScratchDatabaseUri(connectionString?: string): string {
       `[SECURITY GATE P0] FATAL: Target database '${dbName}' must include 'scratch' in its name.`
     );
   }
+  if (Number(parsed.port || 5432) !== 5434) {
+    throw new Error('[SECURITY GATE P0] Scratch database must use the isolated PostgreSQL port 5434.');
+  }
 
   return url;
 }
@@ -140,11 +147,15 @@ export function assertScratchDatabaseUri(connectionString?: string): string {
 export function assertScratchPoolSafety(pool: Pool): void {
   const options = (
     pool as unknown as {
-      options?: { connectionString?: string; database?: string; host?: string };
+      options?: { connectionString?: string; database?: string; host?: string; port?: number };
     }
   ).options;
 
-  if (options?.connectionString) {
+  if (!options) {
+    throw new Error('[SECURITY GATE P0] Injected Pool must expose verifiable scratch connection options.');
+  }
+
+  if (options.connectionString) {
     assertScratchDatabaseUri(options.connectionString);
     return;
   }
@@ -161,16 +172,19 @@ export function assertScratchPoolSafety(pool: Pool): void {
     }
   }
 
-  if (options?.host && !ALLOWED_LOOPBACK_HOSTS.has(options.host.toLowerCase())) {
+  if (!options.host || !ALLOWED_LOOPBACK_HOSTS.has(options.host.toLowerCase())) {
     throw new Error(
       `[SECURITY GATE P0] FATAL: Pool host '${options.host}' must be loopback (127.0.0.1, localhost, or ::1).`
     );
   }
 
-  if (options?.database && !options.database.toLowerCase().includes('scratch')) {
+  if (options.database?.toLowerCase() !== 'legal_ai_live_integration_scratch') {
     throw new Error(
-      `[SECURITY GATE P0] FATAL: Pool database '${options.database}' must include 'scratch' in its name.`
+      `[SECURITY GATE P0] FATAL: Pool database '${options.database}' must be the exact authorized scratch database.`
     );
+  }
+  if (Number(options.port ?? 5432) !== 5434) {
+    throw new Error('[SECURITY GATE P0] Injected Pool must target isolated PostgreSQL port 5434.');
   }
 }
 
@@ -271,11 +285,47 @@ export function deriveRoutingStatusFromRecord(rec: DecodedTaskRecordV2): {
   routingActiveBit: boolean;
   routingStatus: KanbanRoutingStatus;
 } {
-  const routingActiveBit = (rec.features?.[5] ?? 0) >= 0.5;
+  const encodedBit = rec.features?.[5] ?? 0;
+  if (encodedBit !== 0 && encodedBit !== 1) {
+    throw new Error('PREFILL_ROUTING_ACTIVE_BIT_MUST_BE_EXPLICIT_BINARY');
+  }
+  const routingActiveBit = encodedBit === 1;
   return {
     routingActiveBit,
     routingStatus: routingActiveBit ? 'ROUTED_ACTIVE' : 'UNROUTED'
   };
+}
+
+function digestPrefillPayload(row: Record<string, unknown>): string {
+  const pick = (snake: string, camel: string): unknown => row[snake] ?? row[camel];
+  const vector = (snake: string, camel: string): number[] => {
+    const value = pick(snake, camel);
+    if (!Array.isArray(value) && !(value instanceof Float32Array)) {
+      throw new Error(`PREFILL_READBACK_VECTOR_MISSING:${snake}`);
+    }
+    return Array.from(value as ArrayLike<number>, (item) => Math.fround(Number(item)));
+  };
+  const payload = {
+    taskId: String(pick('task_id', 'taskId')),
+    canonicalTaskKey: String(pick('canonical_task_key', 'canonicalTaskKey')),
+    cohortOrdinal: Number(pick('cohort_ordinal', 'cohortOrdinal')),
+    changeId: String(pick('change_id', 'changeId')),
+    status: String(row.status),
+    routingStatus: String(pick('routing_status', 'routingStatus')),
+    communityId: Number(pick('community_id', 'communityId')),
+    domainId: Number(pick('domain_id', 'domainId')),
+    mortonCode: Number(pick('morton_code', 'mortonCode')),
+    priorityScore: Math.fround(Number(pick('priority_score', 'priorityScore'))),
+    finalScore: Math.fround(Number(pick('final_score', 'finalScore'))),
+    routingActiveBit: Boolean(pick('routing_active_bit', 'routingActiveBit')),
+    cohortRevision: String(pick('cohort_revision', 'cohortRevision')),
+    sourceRevision: String(pick('source_revision', 'sourceRevision')),
+    sourceSha256: String(pick('source_sha256', 'sourceSha256')),
+    umapXyz: vector('umap_xyz', 'umapXyz'),
+    rot6d: vector('rot_6d', 'rot6d'),
+    latent64d: vector('latent_64d', 'latent64d'),
+  };
+  return createHash('sha256').update(JSON.stringify(payload)).digest('hex');
 }
 
 /**
@@ -286,8 +336,19 @@ export function deriveRoutingStatusFromRecord(rec: DecodedTaskRecordV2): {
 export async function upsertKanbanDagPrefill(
   poolOrUri: Pool | string,
   records: DecodedTaskRecordV2[],
-  taskIdsOrMeta: Array<string | KanbanPrefillMetadataInput>
+  taskIdsOrMeta: KanbanPrefillMetadataInput[],
 ): Promise<UpsertReceiptV1> {
+  if (records.length === 0 || records.length !== taskIdsOrMeta.length) {
+    throw new Error('PREFILL_INPUT_CARDINALITY_MISMATCH: records and metadata must be non-empty and one-to-one.');
+  }
+  const metadataKeys = taskIdsOrMeta.map((meta) => meta?.canonicalTaskKey?.trim() ?? '');
+  if (metadataKeys.some((key) => !key) || new Set(metadataKeys).size !== metadataKeys.length) {
+    throw new Error('PREFILL_TASK_IDENTITY_INVALID: task identities must be present and unique.');
+  }
+  const cohortRevisions = new Set(taskIdsOrMeta.map((meta) => meta?.cohortRevision?.trim() ?? ''));
+  if (cohortRevisions.size !== 1) {
+    throw new Error('PREFILL_COHORT_REVISION_MISMATCH: one upsert batch must use one cohort revision.');
+  }
   const t0 = performance.now();
   let pool: Pool;
   let validatedHost = 'pool';
@@ -303,16 +364,26 @@ export async function upsertKanbanDagPrefill(
   const hasher = createHash('sha256');
   let processed = 0;
   let readbackVerifiedRows = 0;
+  const sourceRevisions = new Set<string>();
+  const expectedRows = new Map<string, string>();
 
   const client = await pool.connect();
+  let transactionCommitted = false;
+  let clientReleased = false;
   try {
     await client.query('BEGIN;');
 
+    const identity = (await client.query(`
+      SELECT current_database() AS database_name,
+             current_setting('server_version_num')::int AS server_version_num
+    `)).rows?.[0] as { database_name?: string; server_version_num?: number } | undefined;
+    if (identity?.database_name !== 'legal_ai_live_integration_scratch' || Number(identity.server_version_num) < 180000) {
+      throw new Error('[SECURITY GATE P0] Expected the exact PostgreSQL 18 scratch database before upsert.');
+    }
+
     for (let i = 0; i < records.length; i++) {
       const rec = records[i];
-      const rawMeta = taskIdsOrMeta[i];
-      const meta: KanbanPrefillMetadataInput =
-        typeof rawMeta === 'string' ? { canonicalTaskKey: rawMeta } : rawMeta || { canonicalTaskKey: '' };
+      const meta = taskIdsOrMeta[i];
 
       const canonicalTaskKey = (meta.canonicalTaskKey || '').trim();
       if (!canonicalTaskKey) {
@@ -325,6 +396,12 @@ export async function upsertKanbanDagPrefill(
           `SYNTHETIC_ORDINAL_ID_FORBIDDEN: Record ordinal ${rec.taskOrdinal} attempted to use synthetic ID '${canonicalTaskKey}'.`
         );
       }
+      const sourceRevision = String(meta.sourceRevision ?? '').trim();
+      const cohortRevision = String(meta.cohortRevision ?? '').trim();
+      if (!/^sha256:[0-9a-f]{64}$/.test(sourceRevision) || !/^sha256:[0-9a-f]{64}$/.test(cohortRevision)) {
+        throw new Error(`SOURCE_OR_COHORT_REVISION_NOT_SHA256: ${canonicalTaskKey}`);
+      }
+      sourceRevisions.add(sourceRevision);
 
       const changeId =
         meta.changeId ||
@@ -347,10 +424,10 @@ export async function upsertKanbanDagPrefill(
         INSERT INTO public.atlas_kanban_dag_prefill_v1 (
             task_id, canonical_task_key, cohort_ordinal, change_id,
             status, routing_status, community_id, domain_id, morton_code,
-            priority_score, final_score, routing_active_bit,
+            priority_score, final_score, routing_active_bit, cohort_revision, source_revision, source_sha256,
             umap_xyz, rot_6d, latent_64d, canonical_authority
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13::real[], $14::real[], $15::real[], FALSE)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16::real[], $17::real[], $18::real[], FALSE)
         ON CONFLICT (task_id) DO UPDATE SET
             canonical_task_key  = EXCLUDED.canonical_task_key,
             cohort_ordinal      = EXCLUDED.cohort_ordinal,
@@ -363,6 +440,9 @@ export async function upsertKanbanDagPrefill(
             priority_score      = EXCLUDED.priority_score,
             final_score         = EXCLUDED.final_score,
             routing_active_bit  = EXCLUDED.routing_active_bit,
+            cohort_revision     = EXCLUDED.cohort_revision,
+            source_revision     = EXCLUDED.source_revision,
+            source_sha256       = EXCLUDED.source_sha256,
             umap_xyz            = EXCLUDED.umap_xyz,
             rot_6d              = EXCLUDED.rot_6d,
             latent_64d          = EXCLUDED.latent_64d,
@@ -383,22 +463,89 @@ export async function upsertKanbanDagPrefill(
         priorityScore,
         rec.finalScore,
         routingActiveBit,
+        cohortRevision,
+        sourceRevision,
+        sourceRevision,
         umapXyz,
         rot6d,
         latent64d
       ]);
 
-      hasher.update(canonicalTaskKey);
+      const payloadDigest = digestPrefillPayload({
+        taskId: canonicalTaskKey,
+        canonicalTaskKey,
+        cohortOrdinal: rec.taskOrdinal,
+        changeId,
+        status: canonicalStatus,
+        routingStatus,
+        communityId: rec.clusterId,
+        domainId,
+        mortonCode: rec.mortonCode,
+        priorityScore,
+        finalScore: rec.finalScore,
+        routingActiveBit,
+        cohortRevision,
+        sourceRevision,
+        sourceSha256: sourceRevision,
+        umapXyz,
+        rot6d,
+        latent64d,
+      });
+      expectedRows.set(canonicalTaskKey, payloadDigest);
+      hasher.update(payloadDigest);
       processed++;
-      readbackVerifiedRows++;
     }
 
+    const verifyPersistedRows = (rows: Record<string, unknown>[]): void => {
+      const actualById = new Map(rows.map((row) => [String(row.task_id), row]));
+      const mismatches = [...expectedRows].filter(([taskId, expectedDigest]) => {
+        const row = actualById.get(taskId);
+        return !row || row.canonical_authority !== false || digestPrefillPayload(row) !== expectedDigest;
+      });
+      if (mismatches.length > 0 || actualById.size !== expectedRows.size) {
+        throw new Error(`PREFILL_POST_UPSERT_READBACK_MISMATCH:${mismatches[0]?.[0] ?? 'row_count'}`);
+      }
+    };
+
+    const transactionalReadback = await client.query(`
+      SELECT task_id, canonical_task_key, cohort_ordinal, change_id, status, routing_status,
+             community_id, domain_id, morton_code, priority_score, final_score, routing_active_bit,
+             cohort_revision, source_revision, source_sha256, umap_xyz, rot_6d, latent_64d,
+             canonical_authority
+        FROM public.atlas_kanban_dag_prefill_v1
+       WHERE task_id = ANY($1::text[])
+    `, [[...expectedRows.keys()]]);
+    verifyPersistedRows(transactionalReadback.rows ?? []);
+
     await client.query('COMMIT;');
+    transactionCommitted = true;
+    client.release();
+    clientReleased = true;
+
+    // Verify committed state from a fresh connection, independent of the upsert transaction.
+    const readbackClient = await pool.connect();
+    let readbackRows: Record<string, unknown>[];
+    try {
+      const readback = await readbackClient.query(`
+      SELECT task_id, canonical_task_key, cohort_ordinal, change_id, status, routing_status,
+             community_id, domain_id, morton_code, priority_score, final_score, routing_active_bit,
+             cohort_revision, source_revision, source_sha256, umap_xyz, rot_6d, latent_64d,
+             canonical_authority
+        FROM public.atlas_kanban_dag_prefill_v1
+       WHERE task_id = ANY($1::text[])
+      `, [[...expectedRows.keys()]]);
+      readbackRows = readback.rows ?? [];
+    } finally {
+      readbackClient.release();
+    }
+    verifyPersistedRows(readbackRows);
+    readbackVerifiedRows = expectedRows.size;
+
   } catch (err) {
-    await client.query('ROLLBACK;');
+    if (!transactionCommitted) await client.query('ROLLBACK;');
     throw err;
   } finally {
-    client.release();
+    if (!clientReleased) client.release();
     if (typeof poolOrUri === 'string') {
       await pool.end();
     }
@@ -412,6 +559,8 @@ export async function upsertKanbanDagPrefill(
     dbHost: validatedHost,
     durationMs,
     sha256Digest: hasher.digest('hex'),
+    cohortRevision: taskIdsOrMeta[0]?.cohortRevision ?? '',
+    sourceRevisions: [...sourceRevisions].sort(),
     canonicalAuthority: false
   };
 }

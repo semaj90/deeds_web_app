@@ -417,3 +417,48 @@ test('Blender material preset swatches load in pre-case Three.js without case wr
 	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
 	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events') && !request.includes('/api/errors/client-report'))).toEqual([]);
 });
+
+test('synthetic OBJ upload parses through OBJLoader into the local editor without writes', async ({ page }) => {
+	const pageErrors: string[] = [];
+	const consoleErrors: string[] = [];
+	const nonReadRequests: string[] = [];
+	page.on('pageerror', (error) => pageErrors.push(error.message));
+	page.on('console', (message) => {
+		if (message.type() === 'error') consoleErrors.push(message.text());
+	});
+	page.on('request', (request) => {
+		if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method())) nonReadRequests.push(`${request.method()} ${request.url()}`);
+	});
+	await page.route('**/api/analytics/events', (route) => route.fulfill({ status: 204, body: '' }));
+	await page.route('**/api/errors/client-report', (route) => route.fulfill({ status: 204, body: '' }));
+
+	// Two named objects (two OBJLoader meshes), one triangle each. Synthetic text only.
+	const objText = [
+		'# synthetic two-object OBJ fixture (no evidence content)',
+		'o Evidence_A',
+		'v 0 0 0',
+		'v 1 0 0',
+		'v 0 1 0',
+		'f 1 2 3',
+		'o Evidence_B',
+		'v 0 0 1',
+		'v 1 0 1',
+		'v 0 1 1',
+		'f 4 5 6',
+		'',
+	].join('\n');
+
+	await page.goto('/demos/spz-renderer');
+	await page.getByTestId('local-asset-file-input').setInputFiles({
+		name: 'synthetic-two-object.obj',
+		mimeType: 'text/plain',
+		buffer: Buffer.from(objText, 'utf8'),
+	});
+	await expect(page.getByText(/OBJ loaded into the local Three\.js editor/)).toBeVisible({ timeout: 30_000 });
+	await expect(page.getByTestId('spz-mesh-edit-status')).toContainText(/Imported OBJ with 2 editable mesh object\(s\)/);
+	await expect(page.getByRole('button', { name: 'Download edited GLB' })).toBeEnabled();
+
+	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
+	expect(consoleErrors, consoleErrors.join('\n')).toEqual([]);
+	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events') && !request.includes('/api/errors/client-report')), 'OBJ import must not issue case/evidence/scene writes').toEqual([]);
+});

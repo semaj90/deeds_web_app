@@ -501,3 +501,14 @@ design questions before building it, so it isn't guessed into existence:
 
 None of these three were resolved or implemented — flagged per this repo's "record what you found,
 even when you don't fix it" rule, not silently deferred.
+
+## 12. Document Batch GPU Ranking, LSP UTF-16/8, DSPy RLM, & RTX Array RPC Fabric (2026-11-08)
+
+### Taxonomy & Label Architecture for Workboard Kanban Taskboard
+- [x] **[LSP-UTF16-8-TRANS]** Canonical coordinate translation helper: scripts/atlas/lib/lsp-utf16-utf8-coordinate-v1.mjs (+ test suite lsp-utf16-utf8-coordinate-v1.test.mjs 4/4 passed). Bridges LSP line & UTF-16 code units with Tree-sitter CST and SIMD/CSR UTF-8 byte spans without surrogate pair split hazards.
+- [x] **[DSPY-RLM-PROMPT]** DSPy / RLM prompt compilation helper: scripts/atlas/lib/dspy-rlm-prompt-packet-v1.mjs (+ test suite 3/3 passed). Binds retrieved ACE cards, source spans, and conversation turns into schema-bound prompts (tlas.dspy-compiled-prompt.v1).
+- [x] **[RTX-RPC-LL]** Linked-list index node and 64-byte aligned RTX array RPC descriptor synthesis (tlas.rtx-rpc-packet-descriptor.v1) for zero-copy SharedArrayBuffer / CSR byte streaming.
+- [x] **[ORNITH-8090-ROUTER]** Slot busy and health detector (probeLlamaServerBusyStatus) checking http://127.0.0.1:8090/slots for active Ornith 1.5-9b generation.
+- [ ] **[DOC-BATCH-GPU-RANK]** Document batch GPU-accelerated ranking & editing: batch scoring of ingested legal document candidates through cuVS / CAGRA or PyTorch CUDA kernels (Ampere sm_86).
+- [ ] **[GPU-FALLBACK-LANGEXTRACT]** Overflow routing gate: when :8090 is busy or local 8 GB VRAM is constrained, fall back to LangExtract sidecar (:8095) or remote Colab / Kaggle notebook GPU workers for heavy Firecrawl LDR document batch ingestion.
+- [ ] **[CHAT-SSM-RERANK]** Self-updating reranking contextual AI chat memory: sliding context window maintaining DeltaNet recurrent state and recent KV cache blocks with low-rank centroid citations.

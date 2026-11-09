@@ -24,6 +24,7 @@ export const KanbanTaskSchema = z.object({
   featureId: z.string().min(1),
   featureLabel: z.string().min(1),
   sourceRefs: z.array(z.string().min(1)),
+  sourceRevision: z.string().regex(/^sha256:[0-9a-f]{64}$/).nullable().optional(),
   lane: KanbanTaskLaneSchema,
   status: KanbanTaskStatusSchema,
   validationCommand: z.string().nullable(),
@@ -70,6 +71,7 @@ export const KanbanTaskShowInputSchema = z.object({
 
 export const KanbanTaskClaimInputSchema = z.object({
   taskId: z.string().min(1),
+  expectedSourceRevision: z.string().regex(/^sha256:[0-9a-f]{64}$/).optional(),
   workerId: z.string().min(1).optional(),
   runId: z.string().min(1).optional(),
   claimToken: z.string().min(1).optional(),
@@ -126,6 +128,7 @@ export const KanbanTaskCreateInputSchema = z.object({
   featureId: z.string().min(1),
   featureLabel: z.string().min(1),
   sourceRefs: z.array(z.string().min(1)).default([]),
+  sourceRevision: z.string().regex(/^sha256:[0-9a-f]{64}$/).nullable().optional(),
   lane: KanbanTaskLaneSchema.default('todo'),
   priority: z.number().int().min(0).max(100).default(0),
   validationCommand: z.string().min(1).optional(),
@@ -265,6 +268,7 @@ function normalizeRow(row: Record<string, unknown>): KanbanTask {
     featureId: String(pick('feature_id', 'featureId') ?? ''),
     featureLabel: String(pick('feature_label', 'featureLabel') ?? ''),
     sourceRefs: Array.isArray(sourceRefs) ? sourceRefs.map((item) => String(item)) : [],
+    sourceRevision: str('source_revision', 'sourceRevision'),
     lane: String(row.lane ?? 'todo'),
     status: String(row.status ?? 'pending'),
     validationCommand: str('validation_command', 'validationCommand'),
@@ -560,6 +564,9 @@ export async function claimKanbanTask(input: z.infer<typeof KanbanTaskClaimInput
           eq(kanbanTasks.lane, 'todo'),
           eq(kanbanTasks.status, 'pending'),
           isNull(kanbanTasks.claimToken),
+          ...(parsed.expectedSourceRevision
+            ? [eq(kanbanTasks.sourceRevision, parsed.expectedSourceRevision)]
+            : []),
           sql`NOT EXISTS (
             SELECT 1
             FROM kanban_task_dependencies d
@@ -793,6 +800,7 @@ export async function createKanbanTask(input: z.infer<typeof KanbanTaskCreateInp
         featureId: parsed.featureId,
         featureLabel: parsed.featureLabel,
         sourceRefs: parsed.sourceRefs,
+        sourceRevision: parsed.sourceRevision ?? null,
         lane: parsed.lane,
         status: 'pending',
         priority: parsed.priority,
@@ -814,6 +822,7 @@ export async function createKanbanTask(input: z.infer<typeof KanbanTaskCreateInp
         featureId: parsed.featureId,
         featureLabel: parsed.featureLabel,
         sourceRefs: parsed.sourceRefs,
+        sourceRevision: parsed.sourceRevision ?? null,
         priority: parsed.priority,
         workspaceRevision: parsed.workspaceRevision ?? null,
         graphifyRevision: parsed.graphifyRevision ?? null,

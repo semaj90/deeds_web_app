@@ -386,6 +386,12 @@ every `scripts/atlas/` implementation that passed smoke/eval is mirrored into `p
 `packages/` file is back-ported or explicitly recorded as divergent. Track each pending mirror in the owning
 change's `tasks.md`; do not leave the two sides silently diverged.
 
+**Canonical order (operator direction, 2026-11-08):** the main repo is canonical; `packages/` follows it. For any new Atlas owner, descriptor, or helper:
+1. Build and test in the main repo (`scripts/atlas/`, `sveltekit-frontend/src/lib/server/`). Do not start a new file in `packages/` first.
+2. Mirror into `packages/parent-atlas` / `packages/atlas-core` only after the main-repo version passes its tests and the owning eval. Record the mirror in the owning `tasks.md`.
+3. If `packages/` already has a newer copy, back-port it to the main repo before any mirror, or record the divergence. Never let `packages/` become the only home of a capability.
+Example: the engram token descriptor (`build_engram_token_descriptor` in `scripts/atlas/cudf_feature_json_ingest.py`) lives only in the main repo; its `packages/` mirror waits for the dense-search eval.
+
 ---
 
 ## 🚫 Duplication Prevention — Audit Before You Build (HARD RULE, condensed)

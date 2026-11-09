@@ -76,6 +76,8 @@ import { recordToolCallBegin } from '../lib/server/telemetry/tool-call-recorder.
 import { asUuid, buildTraceDynamicContextRecommendation } from '../lib/server/mcp/trace-dynamic-context-audit.js';
 import { parseTraceMcpEnv } from '../lib/server/config/trace-mcp-env.js';
 import { ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID } from '../lib/server/atlas/retrieval/qdrant-semantic-projection.js';
+import { searchQdrantCodeStrictV1 } from '../lib/server/search/qdrant-search.js';
+import { normalizeSemanticSearchHitsV1 } from '../../../scripts/atlas/lib/semantic-search-hits-v1.mjs';
 import {
   acpKanbanErrorTaskInputV1Schema,
   acpKanbanErrorTaskV1Schema,
@@ -3393,16 +3395,17 @@ server.registerTool(
 
       const embedPromise = getOrComputeEmbedding(query, 'unprompted_legacy');
 
-      const qdrantPromise = embedPromise.then(({ embedding }) => {
-        if (!embedding.length) return { results: [] };
-        return fetch(`${SVELTEKIT}/api/code-intel/search`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query, embedding, limit: limit * 2, topoClass: topo_class }),
-          signal: AbortSignal.timeout(10_000),
-        })
-          .then((r) => r.json())
-          .catch(() => ({ results: [] }));
+      const qdrantPromise = embedPromise.then(async ({ embedding }) => {
+        if (embedding.length !== 768) return { results: [], error: 'SEMANTIC_EMBEDDING_DIMENSION_MISMATCH' };
+        try {
+          // Use the canonical v2 collection + Postgres hydration owner. The
+          // code-intel HTTP route requires a user session and cannot serve this
+          // standalone MCP caller; its lean Qdrant projection also has no text.
+          const rows = await searchQdrantCodeStrictV1(embedding, limit * 2, { topoClass: topo_class });
+          return { results: normalizeSemanticSearchHitsV1(rows), error: null };
+        } catch (error) {
+          return { results: [], error: String(error?.code ?? 'QDRANT_SEMANTIC_QUERY_FAILED') };
+        }
       });
 
       const [pgRes, qdrantRes, embedResult] = await Promise.all([
@@ -3423,8 +3426,7 @@ server.registerTool(
           final_score: Number(r.lexical_score ?? 0) * 0.45,
         });
       }
-      for (const r of ((qdrantRes as { results?: Record<string, unknown>[] }).results ??
-        []) as Record<string, unknown>[]) {
+      for (const r of qdrantRes.results as Record<string, unknown>[]) {
         const key = String(r.stable_key ?? r.file_path);
         const ex = merged.get(key);
         if (ex) {
@@ -3451,6 +3453,9 @@ server.registerTool(
                 mode,
                 embedding_used: embedding.length > 0,
                 embed_cache_hit: embedCached,
+                semantic_query_ok: qdrantRes.error === null,
+                semantic_result_count: qdrantRes.results.length,
+                semantic_failure: qdrantRes.error,
               },
               null,
               2

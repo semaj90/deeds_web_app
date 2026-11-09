@@ -66,8 +66,17 @@ async function main() {
     if (ident.db !== dbName || !SCRATCH_DB_RE.test(ident.db)) {
       throw new Error(`DATABASE_IDENTITY_MISMATCH: expected ${dbName}, got ${ident.db}`);
     }
+    if (Number(ident.v) < 180000) {
+      throw new Error(`POSTGRES_18_REQUIRED: connected server_version_num=${ident.v}`);
+    }
 
-    console.log(`[Rehearsal] Connected to verified scratch DB: ${ident.db} (PostgreSQL version: ${ident.v})`);
+    console.log(`[Rehearsal] Connected to verified scratch DB: ${ident.db} (PostgreSQL ${Math.floor(Number(ident.v) / 10000)})`);
+
+    const before = (await client.query(`SELECT
+      (SELECT count(*)::int FROM public.atlas_recommendation_outcome_receipts) AS receipts,
+      (SELECT count(*)::int FROM public.kanban_tasks) AS tasks,
+      (SELECT count(*)::int FROM public.kanban_task_attempts) AS attempts,
+      (SELECT count(*)::int FROM public.kanban_task_events) AS events`)).rows[0];
 
     // 1. Proposer Recommendation
     console.log(`[Rehearsal] 1. Requesting prefill recommendation for ${TARGET_FEATURE_ID}...`);
@@ -80,6 +89,9 @@ async function main() {
     if (recommendation.status !== 'PROPOSED') {
       throw new Error(`PREFILL_RECOMMENDATION_FAILED: ${recommendation.status} (reason: ${recommendation.reasonCode})`);
     }
+    if (recommendation.writesPerformed !== false || recommendation.canonicalAuthority !== false) {
+      throw new Error('PREFILL_MUST_REMAIN_READ_ONLY_NONCANONICAL');
+    }
 
     console.log(`✓ Prefill recommendation status: ${recommendation.status}`);
     console.log(`  Algorithm: ${recommendation.algorithm}`);
@@ -91,8 +103,25 @@ async function main() {
       throw new Error('NO_TASKS_RECOMMENDED');
     }
 
-    // 2. Synthesize Action Execution & Recommendation Receipt
-    const actionKeyHex = crypto.createHash('sha256').update(`action:prefill:${targetTaskId}`, 'utf8').digest('hex');
+    const taskReadback = await client.query(
+      `SELECT task_id, feature_id, status, lane, source_revision, source_refs
+         FROM public.kanban_tasks
+        WHERE task_id = $1 AND feature_id = $2`,
+      [targetTaskId, TARGET_FEATURE_ID],
+    );
+    if (taskReadback.rowCount !== 1) throw new Error('RECOMMENDED_TASK_IDENTITY_READBACK_FAILED');
+    const task = taskReadback.rows[0];
+    if (!task.source_revision || !Array.isArray(task.source_refs) || task.source_refs.length === 0) {
+      throw new Error('RECOMMENDED_TASK_SOURCE_PROVENANCE_MISSING');
+    }
+    if (task.status !== 'pending' || task.lane !== 'todo') {
+      throw new Error(`RECOMMENDED_TASK_NOT_PENDING:${task.task_id}`);
+    }
+
+    // 2. Build an explicitly simulated, non-executed outcome bound to this task revision.
+    const observedAt = new Date().toISOString();
+    const actionKeyHex = crypto.createHash('sha256')
+      .update(`simulation-only:${targetTaskId}:${task.source_revision}`, 'utf8').digest('hex');
     const recommendationId = `rec:nextsteps:${targetTaskId.split('#')[1] || Date.now()}`;
     const candidateActionId = `candidate:execute:${targetTaskId}`;
 
@@ -113,7 +142,7 @@ async function main() {
           evidence_refs: [`task:${targetTaskId}`],
         },
       ],
-      created_at: new Date().toISOString(),
+      created_at: observedAt,
       producer_revision: 'nextsteps-proposer:v1',
     };
 
@@ -121,10 +150,15 @@ async function main() {
       recommendation: recommendationPayload,
       selected_action_id: candidateActionId,
       resulting_execution_key: actionKeyHex,
-      downstream_success: true,
-      outcome: null,
-      evidence_refs: [`feature:${TARGET_FEATURE_ID}`],
-      observed_at: new Date().toISOString(),
+      downstream_success: false,
+      outcome: 'NO_RESULT',
+      evidence_refs: [
+        `feature:${TARGET_FEATURE_ID}`,
+        `task:${targetTaskId}`,
+        `source_revision:${task.source_revision}`,
+        'SIMULATION_ONLY_NO_TASK_CLAIM_ATTEMPT_OR_COMPLETION',
+      ],
+      observed_at: observedAt,
       producer_revision: 'nextsteps-prefill-rehearsal:v1',
     });
 
@@ -140,7 +174,7 @@ async function main() {
 
     // 4. Readback Verification from DB
     const readback = await client.query(
-      `SELECT receipt_checksum, recommendation_id, resulting_execution_key, downstream_success, observed_at, persisted_at
+      `SELECT receipt_checksum, recommendation_id, resulting_execution_key, downstream_success, outcome, observed_at, persisted_at, receipt_json
        FROM public.atlas_recommendation_outcome_receipts
        WHERE receipt_checksum = $1`,
       [append1.receipt_checksum]
@@ -151,6 +185,13 @@ async function main() {
     }
 
     const row = readback.rows[0];
+    if (row.downstream_success !== false || row.outcome !== 'NO_RESULT') {
+      throw new Error('SIMULATED_OUTCOME_READBACK_MISMATCH');
+    }
+    if (!row.receipt_json.evidence_refs.includes(`task:${targetTaskId}`)
+      || !row.receipt_json.evidence_refs.includes(`source_revision:${task.source_revision}`)) {
+      throw new Error('OUTCOME_RECEIPT_TASK_PROVENANCE_MISMATCH');
+    }
     console.log(`✓ Direct Readback verified:`);
     console.log(`  receipt_checksum: ${row.receipt_checksum}`);
     console.log(`  recommendation_id: ${row.recommendation_id}`);
@@ -162,18 +203,36 @@ async function main() {
     const totalRows = totalCountRes.rows[0].count;
     console.log(`✓ Total rows now in scratch atlas_recommendation_outcome_receipts: ${totalRows}`);
 
+    const after = (await client.query(`SELECT
+      (SELECT count(*)::int FROM public.atlas_recommendation_outcome_receipts) AS receipts,
+      (SELECT count(*)::int FROM public.kanban_tasks) AS tasks,
+      (SELECT count(*)::int FROM public.kanban_task_attempts) AS attempts,
+      (SELECT count(*)::int FROM public.kanban_task_events) AS events`)).rows[0];
+    if (after.tasks !== before.tasks || after.attempts !== before.attempts || after.events !== before.events) {
+      throw new Error('KANBAN_STATE_CHANGED_DURING_OUTCOME_REHEARSAL');
+    }
+
     Object.assign(summary, {
       status: 'PASS',
       recommendation: {
         algorithm: recommendation.algorithm,
         readyTaskIdsCount: recommendation.readyTaskIds.length,
         selectedTaskId: targetTaskId,
+        sourceRevision: task.source_revision,
+        sourceRefs: task.source_refs,
+        prefillWritesPerformed: recommendation.writesPerformed,
       },
       outcomeReceipt: {
         receiptChecksum: append1.receipt_checksum,
         firstAppendInserted: append1.inserted,
         secondAppendInserted: append2.inserted,
         downstreamSuccess: row.downstream_success,
+        outcome: row.outcome,
+        simulated: true,
+        taskClaimed: false,
+        taskCompleted: false,
+        kanbanCountsBefore: before,
+        kanbanCountsAfter: after,
         totalScratchOutcomeReceiptRows: totalRows,
       },
     });

@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.openspec-cohort-6527-current-source-bindings.v1",
+  "status": "PASS_CURRENT_SOURCE_BINDING",
+  "canonicalAuthority": false,
+  "taskCompletionAuthorized": false,
+  "databaseAccessed": false,
+  "cohortRevision": "rev:openspec-rank-fuse:20261107T192448Z",
+  "sourceBindingRevision": "sha256:de32847bda8bee924335d1354da03e2361267abc0cdef31fefc115dcd1265f84",
+  "sourceBindings": {
+    "path": ".tmp/atlas/openspec-cohort-6527-current-source-bindings-v1.jsonl",
+    "rowCount": 6527,
+    "sha256": "de32847bda8bee924335d1354da03e2361267abc0cdef31fefc115dcd1265f84"
+  },
+  "sourceMatchCounts": {
+    "EXACT": 6524,
+    "CHECKBOX_STATE_UPDATED": 2,
+    "LOCATOR_RECOVERED": 1
+  },
+  "staleCheckboxStateRows": 2,
+  "priorLocatorRecoveries": 1,
+  "readbackVerified": true,
+  "uniqueTaskKeys": 6527,
+  "generatedAt": "2026-11-09T02:34:38.459Z"
+}

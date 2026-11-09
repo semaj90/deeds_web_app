@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.openspec-cohort-6527-current-source-audit.v1",
+  "status": "FAIL_SOURCE_STATUS_SNAPSHOT_STALE",
+  "canonicalAuthority": false,
+  "databaseAccessed": false,
+  "cohortRevision": "rev:openspec-rank-fuse:20261107T192448Z",
+  "crosswalkReportSha256": "97feaf9e39eaf9db17f513b9e94add59e587a46f3034d4d1eedc1bf144e675dc",
+  "membersArtifactSha256": "68ed2a803f3df7428e0decf1455f7bc847f44153c7c5512ee4e848c140d43fec",
+  "summary": {
+    "total": 6527,
+    "exactSourceContent": 6524,
+    "staleLocatorExactContentFound": 1,
+    "statusOnlyDrift": 2,
+    "sourceContentMismatch": 0,
+    "missingSourceFile": 0,
+    "lineOutOfRange": 0,
+    "sourceLineNotTask": 0,
+    "duplicateTaskKeys": 0
+  },
+  "examples": [
+    {
+      "taskKey": "parent-atlas-nes-lut-single-owner#217846eb35414f6e",
+      "sourceRef": "openspec/changes/parent-atlas-nes-lut-single-owner/tasks.md#L27",
+      "issue": "CHECKBOX_STATE_DRIFT",
+      "snapshotCheckboxState": "OPEN",
+      "currentCheckboxState": "[~]",
+      "sourceClaimHash": "sha256:eae5a6316a8421262544bb7096adb85f61b23f28cb1dba8b105f11d7d42acfc3",
+      "currentTaskBlockHash": "sha256:73601c505c542f807aaf33e96fdfd1b46eeaef27c13eb1c3f768a88c966017b0"
+    },
+    {
+      "taskKey": "parent-atlas-nes-lut-single-owner#6bbfde54b63ee20e",
+      "sourceRef": "openspec/changes/parent-atlas-nes-lut-single-owner/tasks.md#L26",
+      "issue": "CHECKBOX_STATE_DRIFT",
+      "snapshotCheckboxState": "OPEN",
+      "currentCheckboxState": "[x]",
+      "sourceClaimHash": "sha256:0e59b8774086727f6f5d7cf7e21cdde57a0ff712095bc3b74c7a8ec7e444e9d1",
+      "currentTaskBlockHash": "sha256:4cfae5521e59fa0fd670bf6b3236c68cea2a069dfa54f8c4cea387a364f52adf"
+    },
+    {
+      "taskKey": "parent-atlas-spz-detective-renderer#25aa06211ed69c22",
+      "sourceRef": "openspec/changes/parent-atlas-spz-detective-renderer/tasks.md#L404",
+      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
+      "candidateSourceRefs": [
+        "openspec/changes/parent-atlas-spz-detective-renderer/tasks.md#L406"
+      ]
+    }
+  ],
+  "generatedAt": "2026-11-09T02:34:38.380Z",
+  "currentSourceBindingsReport": "docs/reports/openspec-cohort-6527-current-source-bindings-v1.json",
+  "currentSourceBindingsRevision": "sha256:de32847bda8bee924335d1354da03e2361267abc0cdef31fefc115dcd1265f84"
+}

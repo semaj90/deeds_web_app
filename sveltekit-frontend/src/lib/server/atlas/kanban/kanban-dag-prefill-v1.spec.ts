@@ -57,9 +57,10 @@ describe('kanban-dag-prefill-v1 (Option A unified contract)', () => {
         'postgresql://admin:pass@live.db.internal:5432/scratch',
         'postgresql://admin:pass@127.0.0.1:5432/main_db'
       ];
-      for (const uri of forbidden) {
+      for (const uri of forbidden.slice(0, 2).concat(forbidden.slice(3))) {
         expect(() => assertScratchDatabaseUri(uri)).toThrow(/contains forbidden production token/);
       }
+      expect(() => assertScratchDatabaseUri(forbidden[2])).toThrow(/must be loopback/);
     });
 
     it('rejects non-loopback hosts and non-scratch database names', () => {
@@ -72,8 +73,10 @@ describe('kanban-dag-prefill-v1 (Option A unified contract)', () => {
     });
 
     it('accepts valid loopback scratch database URL', () => {
-      const cleanUri = 'postgresql://admin:pass@127.0.0.1:5434/atlas_scratch_test_db';
+      const cleanUri = 'postgresql://admin:pass@127.0.0.1:5434/legal_ai_live_integration_scratch';
       expect(assertScratchDatabaseUri(cleanUri)).toBe(cleanUri);
+      expect(assertScratchDatabaseUri('postgresql://admin:pass@127.0.0.1:5434/legal_ai_live_integration_scratch'))
+        .toContain('/legal_ai_live_integration_scratch');
     });
 
     it('assertScratchPoolSafety throws error if pool targets production or non-scratch database', () => {
@@ -88,6 +91,11 @@ describe('kanban-dag-prefill-v1 (Option A unified contract)', () => {
         options: { database: 'atlas_scratch_db', host: '192.168.1.50' }
       } as any;
       expect(() => assertScratchPoolSafety(remotePool)).toThrow(/must be loopback/);
+
+      const wrongScratchPool = {
+        options: { database: 'another_scratch', host: '127.0.0.1', port: 5434 }
+      } as any;
+      expect(() => assertScratchPoolSafety(wrongScratchPool)).toThrow(/exact authorized scratch database/);
     });
   });
 
@@ -116,6 +124,19 @@ describe('kanban-dag-prefill-v1 (Option A unified contract)', () => {
         routingActiveBit: true,
         routingStatus: 'ROUTED_ACTIVE'
       });
+    });
+
+    it('rejects a score-like non-binary routing feature instead of thresholding it', () => {
+      const record: DecodedTaskRecordV2 = {
+        mortonCode: 10,
+        taskOrdinal: 1,
+        clusterId: 4,
+        position: [0, 0, 0],
+        finalScore: 0.99,
+        features: [0, 0, 0, 0, 0, 0.75, 0, 0],
+        latent64: new Float32Array(64)
+      };
+      expect(() => deriveRoutingStatusFromRecord(record)).toThrow(/MUST_BE_EXPLICIT_BINARY/);
     });
   });
 
@@ -164,17 +185,51 @@ describe('kanban-dag-prefill-v1 (Option A unified contract)', () => {
   });
 
   describe('upsertKanbanDagPrefill mock transaction', () => {
+    const sourceRevision = `sha256:${'a'.repeat(64)}`;
+    const cohortRevision = `sha256:${'b'.repeat(64)}`;
+    const metadata = (canonicalTaskKey: string): { canonicalTaskKey: string; sourceRevision: string; cohortRevision: string } => ({
+      canonicalTaskKey,
+      sourceRevision,
+      cohortRevision,
+    });
+
     it('executes atomic batch transaction using Option A schema columns', async () => {
       const mockQueries: Array<{ text: string; values?: unknown[] }> = [];
       const mockClient = {
         query: vi.fn(async (text: string, values?: unknown[]) => {
           mockQueries.push({ text: text.trim(), values });
-          return { rowCount: 1 };
+          if (text.includes('SELECT current_database()')) {
+            return { rowCount: 1, rows: [{ database_name: 'legal_ai_live_integration_scratch', server_version_num: 180004 }] };
+          }
+          if (text.includes('SELECT task_id, canonical_task_key')) {
+            return { rowCount: 1, rows: [{
+              task_id: 'ast-grep-lsp#0123456789abcdef',
+              canonical_task_key: 'ast-grep-lsp#0123456789abcdef',
+              cohort_ordinal: 0,
+              change_id: 'ast-grep-lsp',
+              status: 'UNVERIFIED',
+              routing_status: 'ROUTED_ACTIVE',
+              community_id: 6,
+              domain_id: 0,
+              morton_code: 12345,
+              priority_score: 0.75,
+              final_score: 0.85,
+              routing_active_bit: true,
+              cohort_revision: cohortRevision,
+              source_revision: sourceRevision,
+              source_sha256: sourceRevision,
+              umap_xyz: [1, 2, 3],
+              rot_6d: [1, 0, 0, 0, 1, 0],
+              latent_64d: new Array(64).fill(Math.fround(0.1)),
+              canonical_authority: false,
+            }] };
+          }
+          return { rowCount: 1, rows: [] };
         }),
         release: vi.fn()
       };
       const mockPool = {
-        options: { database: 'atlas_scratch_test_db', host: '127.0.0.1' },
+        options: { database: 'legal_ai_live_integration_scratch', host: '127.0.0.1', port: 5434 },
         connect: vi.fn(async () => mockClient)
       } as any;
 
@@ -189,28 +244,37 @@ describe('kanban-dag-prefill-v1 (Option A unified contract)', () => {
       };
 
       const receipt = await upsertKanbanDagPrefill(mockPool, [sampleRecord], [
-        'ast-grep-lsp#0123456789abcdef'
+        metadata('ast-grep-lsp#0123456789abcdef')
       ]);
       expect(receipt.success).toBe(true);
       expect(receipt.rowsProcessed).toBe(1);
       expect(receipt.canonicalAuthority).toBe(false);
+      expect(receipt.readbackVerifiedRows).toBe(1);
+      expect(receipt.cohortRevision).toBe(cohortRevision);
       expect(mockQueries[0].text).toBe('BEGIN;');
-      expect(mockQueries[1].text).toContain('canonical_task_key, cohort_ordinal, change_id');
-      expect(mockQueries[1].values?.[0]).toBe('ast-grep-lsp#0123456789abcdef');
-      expect(mockQueries[1].values?.[3]).toBe('ast-grep-lsp');
-      expect(mockQueries[1].values?.[4]).toBe('UNVERIFIED');
-      expect(mockQueries[1].values?.[5]).toBe('ROUTED_ACTIVE');
-      expect(mockQueries[mockQueries.length - 1].text).toBe('COMMIT;');
+      expect(mockQueries[2].text).toContain('canonical_task_key, cohort_ordinal, change_id');
+      expect(mockQueries[2].text).toContain('cohort_revision, source_revision, source_sha256');
+      expect(mockQueries[2].values?.[0]).toBe('ast-grep-lsp#0123456789abcdef');
+      expect(mockQueries[2].values?.[3]).toBe('ast-grep-lsp');
+      expect(mockQueries[2].values?.[4]).toBe('UNVERIFIED');
+      expect(mockQueries[2].values?.[5]).toBe('ROUTED_ACTIVE');
+      expect(mockQueries[2].values?.[12]).toBe(cohortRevision);
+      expect(mockQueries[2].values?.[13]).toBe(sourceRevision);
+      expect(mockQueries[mockQueries.length - 2].text).toBe('COMMIT;');
+      expect(mockQueries[mockQueries.length - 1].text).toContain('WHERE task_id = ANY');
+      expect(mockPool.connect).toHaveBeenCalledTimes(2);
       expect(mockClient.release).toHaveBeenCalled();
     });
 
     it('rejects records missing a mapped canonical task ID or using synthetic task:ordinal:* IDs', async () => {
       const mockClient = {
-        query: vi.fn(async () => ({ rowCount: 1 })),
+        query: vi.fn(async (text: string) => text.includes('SELECT current_database()')
+          ? ({ rowCount: 1, rows: [{ database_name: 'legal_ai_live_integration_scratch', server_version_num: 180004 }] })
+          : ({ rowCount: 1, rows: [] })),
         release: vi.fn()
       };
       const mockPool = {
-        options: { database: 'atlas_scratch_test_db', host: '127.0.0.1' },
+        options: { database: 'legal_ai_live_integration_scratch', host: '127.0.0.1', port: 5434 },
         connect: vi.fn(async () => mockClient)
       } as any;
 
@@ -220,17 +284,34 @@ describe('kanban-dag-prefill-v1 (Option A unified contract)', () => {
         clusterId: 3,
         position: [1.0, 2.0, 3.0],
         finalScore: 0.85,
-        features: [1, 2, 3, 4, 5, 6, 7, 8],
+        features: [1, 2, 3, 4, 5, 1, 7, 8],
         latent64: new Float32Array(64)
       };
 
-      await expect(upsertKanbanDagPrefill(mockPool, [sampleRecord], [''])).rejects.toThrow(
-        /MISSING_CANONICAL_TASK_ID: Record ordinal 42/
-      );
+      await expect(upsertKanbanDagPrefill(mockPool, [sampleRecord], [metadata('')]))
+        .rejects.toThrow(/PREFILL_TASK_IDENTITY_INVALID/);
 
       await expect(
-        upsertKanbanDagPrefill(mockPool, [sampleRecord], ['task:ordinal:42'])
+        upsertKanbanDagPrefill(mockPool, [sampleRecord], [metadata('task:ordinal:42')])
       ).rejects.toThrow(/SYNTHETIC_ORDINAL_ID_FORBIDDEN/);
+    });
+
+    it('rejects duplicate task identities and metadata cardinality mismatch before connecting', async () => {
+      const connect = vi.fn();
+      const mockPool = {
+        options: { database: 'legal_ai_live_integration_scratch', host: '127.0.0.1', port: 5434 },
+        connect,
+      } as any;
+      const sampleRecord: DecodedTaskRecordV2 = {
+        mortonCode: 1, taskOrdinal: 0, clusterId: 1, position: [0, 0, 0],
+        finalScore: 0, features: [0, 0, 0, 0, 0, 0], latent64: new Float32Array(64),
+      };
+      await expect(upsertKanbanDagPrefill(mockPool, [sampleRecord], []))
+        .rejects.toThrow(/PREFILL_INPUT_CARDINALITY_MISMATCH/);
+      await expect(upsertKanbanDagPrefill(mockPool, [sampleRecord, sampleRecord], [
+        metadata('same#task'), metadata('same#task'),
+      ])).rejects.toThrow(/PREFILL_TASK_IDENTITY_INVALID/);
+      expect(connect).not.toHaveBeenCalled();
     });
 
     it('rolls back on client query error', async () => {
@@ -241,12 +322,15 @@ describe('kanban-dag-prefill-v1 (Option A unified contract)', () => {
           if (text.includes('INSERT INTO')) {
             throw new Error('SIMULATED_DB_ERROR');
           }
-          return { rowCount: 1 };
+          if (text.includes('SELECT current_database()')) {
+            return { rowCount: 1, rows: [{ database_name: 'legal_ai_live_integration_scratch', server_version_num: 180004 }] };
+          }
+          return { rowCount: 1, rows: [] };
         }),
         release: vi.fn()
       };
       const mockPool = {
-        options: { database: 'atlas_scratch_test_db', host: '127.0.0.1' },
+        options: { database: 'legal_ai_live_integration_scratch', host: '127.0.0.1', port: 5434 },
         connect: vi.fn(async () => mockClient)
       } as any;
 
@@ -256,15 +340,72 @@ describe('kanban-dag-prefill-v1 (Option A unified contract)', () => {
         clusterId: 3,
         position: [1.0, 2.0, 3.0],
         finalScore: 0.85,
-        features: [1, 2, 3, 4, 5, 6, 7, 8],
+        features: [1, 2, 3, 4, 5, 1, 7, 8],
         latent64: new Float32Array(64)
       };
 
       await expect(
-        upsertKanbanDagPrefill(mockPool, [sampleRecord], ['change-a#0123456789abcdef'])
+        upsertKanbanDagPrefill(mockPool, [sampleRecord], [metadata('change-a#0123456789abcdef')])
       ).rejects.toThrow('SIMULATED_DB_ERROR');
       expect(mockQueries).toContain('ROLLBACK;');
       expect(mockClient.release).toHaveBeenCalled();
+    });
+
+    it('aborts before any upsert when current_database() is not the exact expected scratch target', async () => {
+      const calls: string[] = [];
+      const mockClient = {
+        query: vi.fn(async (text: string) => {
+          calls.push(text.trim());
+          return text.includes('SELECT current_database()')
+            ? { rowCount: 1, rows: [{ database_name: 'legal_ai_db', server_version_num: 180004 }] }
+            : { rowCount: 1, rows: [] };
+        }),
+        release: vi.fn(),
+      };
+      const mockPool = { options: { database: 'legal_ai_live_integration_scratch', host: '127.0.0.1', port: 5434 }, connect: vi.fn(async () => mockClient) } as any;
+      const sampleRecord: DecodedTaskRecordV2 = {
+        mortonCode: 1, taskOrdinal: 0, clusterId: 1, position: [0, 0, 0],
+        finalScore: 0, features: [0, 0, 0, 0, 0, 0], latent64: new Float32Array(64),
+      };
+
+      await expect(upsertKanbanDagPrefill(mockPool, [sampleRecord], [metadata('change-a#one')]))
+        .rejects.toThrow(/exact PostgreSQL 18 scratch database/);
+      expect(calls).toContain('ROLLBACK;');
+      expect(calls.some((sql) => sql.includes('INSERT INTO'))).toBe(false);
+    });
+
+    it('rolls back instead of counting a row when revision-bound readback digest mismatches', async () => {
+      const calls: string[] = [];
+      const mockClient = {
+        query: vi.fn(async (text: string) => {
+          calls.push(text.trim());
+          if (text.includes('SELECT current_database()')) {
+            return { rowCount: 1, rows: [{ database_name: 'legal_ai_live_integration_scratch', server_version_num: 180004 }] };
+          }
+          if (text.includes('SELECT task_id, canonical_task_key')) {
+            return { rowCount: 1, rows: [{
+              task_id: 'change-a#one', canonical_task_key: 'change-a#one', cohort_ordinal: 0,
+              change_id: 'change-a', status: 'UNVERIFIED', routing_status: 'UNROUTED',
+              community_id: 1, domain_id: 0, morton_code: 1, priority_score: 0,
+              final_score: 0, routing_active_bit: false, cohort_revision: cohortRevision,
+              source_revision: `sha256:${'c'.repeat(64)}`, source_sha256: sourceRevision,
+              umap_xyz: [0, 0, 0], rot_6d: [1, 0, 0, 0, 1, 0], latent_64d: new Array(64).fill(0),
+              canonical_authority: false,
+            }] };
+          }
+          return { rowCount: 1, rows: [] };
+        }),
+        release: vi.fn(),
+      };
+      const mockPool = { options: { database: 'legal_ai_live_integration_scratch', host: '127.0.0.1', port: 5434 }, connect: vi.fn(async () => mockClient) } as any;
+      const sampleRecord: DecodedTaskRecordV2 = {
+        mortonCode: 1, taskOrdinal: 0, clusterId: 1, position: [0, 0, 0],
+        finalScore: 0, features: [0, 0, 0, 0, 0, 0], latent64: new Float32Array(64),
+      };
+
+      await expect(upsertKanbanDagPrefill(mockPool, [sampleRecord], [metadata('change-a#one')]))
+        .rejects.toThrow(/PREFILL_POST_UPSERT_READBACK_MISMATCH/);
+      expect(calls.at(-1)).toBe('ROLLBACK;');
     });
   });
 });

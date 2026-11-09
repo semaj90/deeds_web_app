@@ -9,12 +9,19 @@ function sha256(bytes) {
 	return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
 }
 
-const ALLOWED_OPENSPEC_TASK_PATH = /^(?:sveltekit-frontend\/)?openspec\/changes\/[^/]+\/tasks\.md$/;
+const ALLOWED_OPENSPEC_TASK_PATHS = [
+	/^(?:sveltekit-frontend\/)?openspec\/changes\/[^/]+\/tasks\.md$/,
+	/^openspec\/specs\/openspec\/changes\/[^/]+\/tasks\.md$/,
+	/^parent-atlas-qas-bundle\/openspec\/changes\/[^/]+\/tasks\.md$/,
+	/^parent-atlas-tensor-residency-integration\/openspec\/changes\/[^/]+\/tasks\.md$/,
+	/^parent-atlas-rtx-gpu-lab\/openspec\/tasks\.md$/,
+	/^parent-atlas-graph-runtime-enhancement\/openspec\/tasks\.md$/,
+];
 
 function safeSourcePath(root, source) {
 	if (typeof source !== 'string' || source.includes('\\') || path.posix.isAbsolute(source)) return null;
 	const parts = source.split('/');
-	if (parts.includes('..') || parts.includes('.') || !ALLOWED_OPENSPEC_TASK_PATH.test(source)) return null;
+	if (parts.includes('..') || parts.includes('.') || !ALLOWED_OPENSPEC_TASK_PATHS.some((pattern) => pattern.test(source))) return null;
 	const resolved = path.resolve(root, ...parts);
 	const relative = path.relative(root, resolved);
 	return relative.startsWith('..') || path.isAbsolute(relative) ? null : resolved;
@@ -92,9 +99,13 @@ export function verifyWorkboardTaskSourceBindingV1({ repoRoot, task, sourceFileH
 	}
 
 	const sourceLine = file.lines[task.line - 1];
-	const match = typeof sourceLine === 'string' ? /^\s*-\s*\[([ xX])\]\s+(.*)$/.exec(sourceLine) : null;
+	const match = typeof sourceLine === 'string' ? /^\s*[-*+]\s*\[([ xX~])\]\s+(.*)$/.exec(sourceLine) : null;
 	if (!match || stripWfuComment(match[2].trim()) !== task.text) {
 		return { ...base, status: 'SOURCE_LINE_OR_TASK_TEXT_MISMATCH', sourceRevision: expectedRevision };
+	}
+	const checkboxState = match[1] === '~' ? 'IN_PROGRESS' : match[1].toLowerCase() === 'x' ? 'DONE' : 'OPEN';
+	if (task.sourceCheckboxState != null && task.sourceCheckboxState !== checkboxState) {
+		return { ...base, status: 'SOURCE_CHECKBOX_STATE_MISMATCH', sourceRevision: expectedRevision, expectedCheckboxState: task.sourceCheckboxState, observedCheckboxState: checkboxState };
 	}
 
 	const sourceTaskText = stripWfuComment(match[2].trim());
@@ -106,5 +117,6 @@ export function verifyWorkboardTaskSourceBindingV1({ repoRoot, task, sourceFileH
 		sourceLine: task.line,
 		taskTextSha256: sha256(Buffer.from(task.text, 'utf8')),
 		sourceTaskTextSha256: sha256(Buffer.from(sourceTaskText, 'utf8')),
+		sourceCheckboxState: checkboxState,
 	};
 }

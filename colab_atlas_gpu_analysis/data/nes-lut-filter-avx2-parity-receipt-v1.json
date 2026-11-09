@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.nes-lut-filter-avx2-parity.v1",
+  "generatedAt": "2026-11-08T23:59:20.221Z",
+  "status": "PASS",
+  "gate": "NLUT-07 / CPU-AVX2-01",
+  "hardware": {
+    "cpuArch": "x64 (AVX2 + BMI2 + FMA)",
+    "compiler": "MSVC 19.42 /std:c++20 /O2 /arch:AVX2",
+    "gpuClaim": false
+  },
+  "invariants": {
+    "bitExactParity": true,
+    "failClosedZeroByte": true,
+    "failClosedOutOfBounds": true,
+    "scalarFallbackExercised": true,
+    "frozenCohortTested": [
+      1,
+      31,
+      32,
+      33,
+      64,
+      100,
+      6527
+    ]
+  },
+  "benchmarkSummary": {
+    "cohort6527SingleDomainScalarUs": 12,
+    "cohort6527SingleDomainAvx2Us": 0.8,
+    "cohort6527SingleDomainSpeedup": "15.0x",
+    "cohort6527MultiDomainScalarUs": 16,
+    "cohort6527MultiDomainAvx2Us": 2,
+    "cohort6527MultiDomainSpeedup": "8.0x"
+  },
+  "sourceFiles": [
+    "simd-bridge/cpp/nes_lut_filter_avx2.h",
+    "simd-bridge/cpp/nes_lut_filter_avx2.cpp",
+    "simd-bridge/cpp/test_nes_lut_filter_avx2.cpp"
+  ]
+}

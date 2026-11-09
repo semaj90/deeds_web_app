@@ -24,7 +24,9 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import Ajv from 'ajv';
 import neo4j from 'neo4j-driver';
+import pg from 'pg';
 import { normalizeSourceRef } from '../../../scripts/atlas/lib/normalize-source-ref.mjs';
+import { buildGroundedRecommendationV1 } from '../../../scripts/atlas/lib/grounded-recommendation-v1.mjs';
 import { selectKanbanDagPrefillAlgorithm } from './kanban-dag-algorithm-selector-v1.mjs';
 
 const log =(...a) => process.stderr.write('[atlas-tools] ' + a.join(' ') + '\n');
@@ -204,7 +206,7 @@ const TOOLS = [
   {
     name: 'record_outcome',
     description:
-      'Record the outcome of a RAG query or code-repair task. Writes trace details to a local NDJSON ledger and creates behavioral relationships in Neo4j.',
+      'Record an outcome. When a frozen temporalAlternativeSelection is supplied, persist its outcome through the SvelteKit temporal recommendation boundary to the explicitly configured loopback scratch PostgreSQL database. This does not complete a Kanban task. Calls without a temporal selection retain the legacy NDJSON/Neo4j observation behavior.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -231,6 +233,16 @@ const TOOLS = [
           type: 'string',
           description: 'Optional error description if the recommendation failed.',
         },
+        temporalAlternativeSelection: {
+          type: 'object',
+          description: 'A complete checksum-bound atlas.temporal-alternative-boundary-result.v1 produced by the temporal selection boundary.',
+          additionalProperties: true,
+        },
+        downstreamSuccess: { type: 'boolean', description: 'Terminal downstream result; must come from the workflow finalization owner.' },
+        authoritativeOutcome: { type: 'string', description: 'Optional ActionOutcomeV1 from the authoritative action event owner.' },
+        evidenceRefs: { type: 'array', items: { type: 'string' }, description: 'Evidence references to attach to the immutable outcome receipt.' },
+        observedAt: { type: 'string', description: 'Stable ISO timestamp from the finalization owner; reuse unchanged on retries for receipt idempotency.' },
+        producerRevision: { type: 'string', description: 'Versioned producer identity for this finalization boundary.' },
       },
       required: ['intent', 'tool', 'sourceRefs', 'recommendationAccepted', 'reward'],
       additionalProperties: false,
@@ -325,8 +337,8 @@ const TOOLS = [
       properties: {
         featureId: {
           type: 'string',
-          pattern: '^openspec:[a-z0-9][a-z0-9-]*$',
-          description: 'Exact Kanban cohort feature ID, for example openspec:parent-atlas-agentic-file-compiler.',
+          pattern: '^(openspec:[a-z0-9][a-z0-9-]*|nextsteps:[a-z0-9][a-z0-9_.-]*)$',
+          description: 'Exact Kanban cohort feature ID in the openspec: or nextsteps: namespace.',
         },
         maxPrefillTasks: {
           type: 'integer',
@@ -982,9 +994,9 @@ export function buildAgenticRagContext({
 }
 
 // ── Live, query-specific context (KERNEL-PATCH-03) ────────────────────────────────────────────────
-// `atlas_context` ranks live through TRACE `atlas.query` (a ranked chunk search whose result set varies with the
+// `atlas_context` ranks live through TRACE `search.hybrid` (PostgreSQL FTS + semantic Qdrant; query-specific)
 // query, unlike the static packet) and binds each hit's path to packet identity through `atlas.packet_search`.
-// Candidates are NOT admitted evidence: no source revision is available, so proofUsable stays false.
+// Candidates remain unadmitted retrieval context; proofUsable stays false even when a source revision binds.
 // Any TRACE failure falls back to the labelled static packet. ATLAS_CONTEXT_LIVE=0 forces the static packet.
 const TRACE_MCP_URL = process.env.ATLAS_TRACE_MCP_URL || 'http://127.0.0.1:8788/mcp';
 const LIVE_CONTEXT_DISABLED = /^(0|false|no)$/i.test(process.env.ATLAS_CONTEXT_LIVE ?? '');
@@ -1060,22 +1072,38 @@ export async function buildLiveAtlasContext(
   const queryText = String(query ?? '').slice(0, 512);
   const cap = Math.max(1, Math.min(LIVE_HIT_CAP, Number(maxCards) || LIVE_HIT_CAP));
   const payloadBudget = Math.max(4096, Math.min(65536, Number(maxPayloadBytes) || 24576));
-  const raw = await trace('atlas.query', { query: queryText, limit: cap });
+  const raw = await trace('search.hybrid', { query: queryText, limit: cap, mode: 'hybrid' });
   const hits = Array.isArray(raw) ? raw : (raw?.results ?? raw?.hits ?? []);
 
   // One card per file: best score, best snippet, every chunk id kept.
   const byFile = new Map();
   for (const hit of hits) {
-    const display = workspaceRelativeDisplay(hit?.path);
-    const canonical = canonicalWorkspaceRef(hit?.path);
+    const sourcePath = hit?.path ?? hit?.file_path ?? hit?.filePath;
+    const display = workspaceRelativeDisplay(sourcePath);
+    const canonical = canonicalWorkspaceRef(sourcePath);
     if (!canonical) continue;
     const entry = byFile.get(canonical);
-    const score = Number.isFinite(Number(hit.score)) ? Number(hit.score) : 0;
+    const scoreValue = hit.score ?? hit.final_score ?? hit.finalScore;
+    const score = Number.isFinite(Number(scoreValue)) ? Number(scoreValue) : 0;
     if (!entry) {
-      byFile.set(canonical, { canonical, display, score, snippet: String(hit.content ?? ''), chunkIds: hit.id ? [hit.id] : [] });
+      const chunkId = hit.id ?? hit.chunk_id ?? hit.chunkId ?? hit.stable_key ?? hit.stableKey;
+      byFile.set(canonical, {
+        canonical, display, score,
+        snippet: String(hit.content ?? hit.chunk_text ?? hit.chunkText ?? hit.snippet ?? ''),
+        chunkIds: chunkId ? [String(chunkId)] : [],
+        retrievalSources: Array.isArray(hit.sources) ? hit.sources.filter((source) => typeof source === 'string').slice(0, 4) : [],
+      });
     } else {
-      if (hit.id) entry.chunkIds.push(hit.id);
-      if (score > entry.score) Object.assign(entry, { score, snippet: String(hit.content ?? '') });
+      const chunkId = hit.id ?? hit.chunk_id ?? hit.chunkId ?? hit.stable_key ?? hit.stableKey;
+      if (chunkId) entry.chunkIds.push(String(chunkId));
+      entry.retrievalSources = [...new Set([
+        ...(entry.retrievalSources ?? []),
+        ...(Array.isArray(hit.sources) ? hit.sources.filter((source) => typeof source === 'string').slice(0, 4) : []),
+      ])].slice(0, 4);
+      if (score > entry.score) Object.assign(entry, {
+        score,
+        snippet: String(hit.content ?? hit.chunk_text ?? hit.chunkText ?? hit.snippet ?? ''),
+      });
     }
   }
   const files = [...byFile.values()].sort((a, b) => b.score - a.score || a.canonical.localeCompare(b.canonical));
@@ -1084,15 +1112,17 @@ export async function buildLiveAtlasContext(
   const bindings = await mapWithConcurrency(files, LIVE_BIND_CONCURRENCY, async (file) => {
     try {
       const found = await trace('atlas.packet_search', { source_ref: file.display, limit: 5 });
-      const packets = (found?.packets ?? []).filter((p) => canonicalWorkspaceRef(p.source_ref) === file.canonical);
-      return { packets, error: null };
+      const matchingPackets = (found?.packets ?? []).filter((p) => canonicalWorkspaceRef(p.source_ref) === file.canonical);
+      // Qdrant chunk locators (identity_lane=qdrant_chunk) are retrieval identities, not canonical source owners.
+      const packets = matchingPackets.filter((p) => (p.identity_lane ?? p.identityLane) === 'canonical');
+      return { packets, matchingPacketCount: matchingPackets.length, error: null };
     } catch (error) {
-      return { packets: [], error: error.code ?? 'BIND_FAILED' };
+      return { packets: [], matchingPacketCount: 0, error: error.code ?? 'BIND_FAILED' };
     }
   });
 
   let cards = files.map((file, index) => {
-    const { packets, error } = bindings[index];
+    const { packets, matchingPacketCount, error } = bindings[index];
     const packetKeys = [...new Set(packets.map((p) => p.packet_key).filter(Boolean))];
     const identityBound = packetKeys.length === 1;
     const identityConflict = packetKeys.length > 1;
@@ -1111,7 +1141,7 @@ export async function buildLiveAtlasContext(
     const rejectionReasons = [
       'NON_CANONICAL',
       ...(sourceRevisionKnown ? [] : ['MISSING_SOURCE_REVISION']),
-      ...(identityBound ? [] : [identityConflict ? 'IDENTITY_CONFLICT' : 'IDENTITY_UNBOUND']),
+      ...(identityBound ? [] : [identityConflict ? 'IDENTITY_CONFLICT' : matchingPacketCount > 0 ? 'NO_CANONICAL_PACKET' : 'IDENTITY_UNBOUND']),
     ];
     return {
       title: file.display.slice(0, 240),
@@ -1125,11 +1155,14 @@ export async function buildLiveAtlasContext(
       packetKey: identityBound ? packetKeys[0] : null,
       packetKeys,
       packetBindings,
+      matchingPacketCount,
+      canonicalPacketCount: packets.length,
       featureId: packets[0]?.feature_id ?? null,
       identityBound,
       identityConflict,
       identityLookupError: error,
       retrievalUsable: true,
+      retrievalSources: file.retrievalSources ?? [],
       proofUsable: false,
       rejectionReasons,
     };
@@ -1173,7 +1206,7 @@ export async function buildLiveAtlasContext(
     candidateSetBasis: 'LIVE_TRACE_RANKED_SEARCH',
     contextSource: {
       kind: 'TRACE_MCP_LIVE',
-      rankingTool: 'atlas.query',
+      rankingTool: 'search.hybrid',
       identityTool: 'atlas.packet_search',
       hitCount: hits.length,
       fileCount: files.length,
@@ -1239,45 +1272,47 @@ export async function buildAgenticRagContextLive(args, deps = {}) {
   }
 }
 
-function buildRecommendation({
+export async function buildRecommendation({
   intent,
   domain,
   errorSummary,
-  evidenceLines,
-  patchTargets,
-  proposedFix,
-}) {
-  const safeNextCommand =
-    intent === 'repair' && patchTargets.length > 0
-      ? `node --check ${patchTargets[0]}`
-      : intent === 'repair'
-        ? 'npm run svelte-check 2>&1 | head -30'
-        : domain === 'retrieval'
-          ? 'npm run ingest:pipeline'
-          : domain === 'atlas-lane'
-            ? 'npm run atlas:phase-lanes'
-            : 'npm run smoke:opencode';
-
-  const doNotDo = [];
-  if (intent === 'repair') {
-    doNotDo.push('Do not run drizzle-kit push without operator review');
-    doNotDo.push('Do not delete or archive files without checking G1-G9 import gates');
-  }
-  if (domain === 'retrieval') {
-    doNotDo.push('Do not clear Redis ace:packet:latest without running ingest:pipeline first');
-  }
-  doNotDo.push('Do not assume the fix succeeded — re-run the validator after patching');
-
-  return {
-    likely_cause: errorSummary,
-    evidence: evidenceLines,
-    patch_targets: patchTargets,
-    proposed_fix: proposedFix ?? null,
-    safe_next_command: safeNextCommand,
-    do_not_do: doNotDo,
+}, deps = {}) {
+  const context = await buildAgenticRagContextLive({
+    query: String(errorSummary ?? '').slice(0, 2048),
+    maxCards: 12,
+    domainFilter: domain,
+  }, deps);
+  const recommendation = buildGroundedRecommendationV1({
     intent,
     domain,
+    cards: context.ok === true && context.canonicalAuthority === false ? context.cards : [],
+  });
+  return {
+    ...recommendation,
+    retrievalStatus: context.ok === true ? context.admissionStatus ?? context.freshnessStatus : 'LIVE_RETRIEVAL_UNAVAILABLE',
+    retrievalWarnings: Array.isArray(context.warnings) ? context.warnings : ['LIVE_RETRIEVAL_UNAVAILABLE'],
   };
+}
+
+export function assertOutcomeReceiptScratchUrl(databaseUrl) {
+  if (typeof databaseUrl !== 'string' || databaseUrl.length === 0) {
+    throw new Error('OUTCOME_RECEIPT_DATABASE_URL_REQUIRED');
+  }
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(databaseUrl);
+  } catch {
+    throw new Error('OUTCOME_RECEIPT_DATABASE_URL_INVALID');
+  }
+  const databaseName = decodeURIComponent(parsedUrl.pathname.replace(/^\/+/, ''));
+  if (
+    !['127.0.0.1', 'localhost', '::1', '[::1]'].includes(parsedUrl.hostname.toLowerCase()) ||
+    parsedUrl.port !== '5434' ||
+    databaseName !== 'legal_ai_live_integration_scratch'
+  ) {
+    throw new Error('OUTCOME_RECEIPT_DATABASE_MUST_BE_LOOPBACK_SCRATCH');
+  }
+  return { databaseUrl: parsedUrl.toString(), databaseName };
 }
 
 async function recordOutcome(args) {
@@ -1298,6 +1333,53 @@ async function recordOutcome(args) {
       mock: true,
       sourceRefs: sourceRefs ?? [],
     };
+  }
+
+  if (args.temporalAlternativeSelection !== undefined) {
+    if (typeof args.downstreamSuccess !== 'boolean' || !args.producerRevision || !args.observedAt) {
+      throw new Error('TEMPORAL_OUTCOME_FINALIZATION_FIELDS_REQUIRED');
+    }
+    const observedAt = new Date(args.observedAt);
+    if (!Number.isFinite(observedAt.getTime()) || observedAt.toISOString() !== args.observedAt) {
+      throw new Error('TEMPORAL_OUTCOME_OBSERVED_AT_MUST_BE_CANONICAL_ISO');
+    }
+    const databaseUrl = process.env.ATLAS_OUTCOME_RECEIPT_DATABASE_URL;
+    if (!databaseUrl) {
+      throw new Error('OUTCOME_RECEIPT_DATABASE_URL_REQUIRED: configure an explicit loopback *_scratch PostgreSQL URL.');
+    }
+    const { databaseUrl: validatedDatabaseUrl, databaseName } = assertOutcomeReceiptScratchUrl(databaseUrl);
+
+    const pool = new pg.Pool({ connectionString: validatedDatabaseUrl, max: 1, connectionTimeoutMillis: 5000 });
+    try {
+      const identity = (await pool.query("SELECT current_database() AS database_name, current_setting('server_version_num')::int AS server_version_num")).rows[0];
+      if (identity?.database_name !== databaseName || Number(identity?.server_version_num) < 180000) {
+        throw new Error('OUTCOME_RECEIPT_DATABASE_IDENTITY_OR_VERSION_MISMATCH');
+      }
+      const { register } = await import('tsx/esm/api');
+      register();
+      const boundary = await import('../../src/lib/server/atlas/temporal/temporal-recommendation-outcome-boundary.ts');
+      const persisted = await boundary.persistTemporalRecommendationOutcomeFromPostgres({
+        selection: args.temporalAlternativeSelection,
+        downstream_success: args.downstreamSuccess,
+        outcome: args.authoritativeOutcome ?? null,
+        evidence_refs: args.evidenceRefs ?? [],
+        observed_at: args.observedAt,
+        producer_revision: args.producerRevision,
+      }, { pool });
+      return {
+        ok: true,
+        id: persisted.receipt.recommendation_id,
+        persistedToPostgres: true,
+        database: identity.database_name,
+        postgresMajor: Math.floor(Number(identity.server_version_num) / 10000),
+        appendReceipt: persisted.append_receipt,
+        canonicalAuthority: false,
+        kanbanTaskCompleted: false,
+        writesPerformed: true,
+      };
+    } finally {
+      await pool.end();
+    }
   }
 
   const outcomeRecord = {
@@ -1788,7 +1870,7 @@ export async function dispatch(method, params, id) {
       let result;
       if (name === 'classify_intent') result = classifyIntent(args);
       else if (name === 'build_agentic_rag_context') result = await buildAgenticRagContextLive(args);
-      else if (name === 'build_recommendation') result = buildRecommendation(args);
+      else if (name === 'build_recommendation') result = await buildRecommendation(args);
       else if (name === 'record_outcome') result = await recordOutcome(args);
       else if (name === 'find_dependencies') result = await findDependencies(args);
       else if (name === 'trace_database') result = await traceDatabase(args);

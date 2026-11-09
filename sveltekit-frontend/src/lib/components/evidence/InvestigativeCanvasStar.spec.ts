@@ -6,6 +6,7 @@ describe('InvestigativeCanvasStar (Screenshot 1 Dossier Alignment)', () => {
 	it('renders Docket banner and center hypothesis H-01', () => {
 		render(InvestigativeCanvasStar, {
 			props: {
+				demoMode: true,
 				docketNumber: '#986B5214',
 				caseTitle: 'UNTITLED CASE DOSSIER'
 			}
@@ -19,7 +20,7 @@ describe('InvestigativeCanvasStar (Screenshot 1 Dossier Alignment)', () => {
 	});
 
 	it('renders all 6 canonical exhibits with their relationship pills', () => {
-		render(InvestigativeCanvasStar);
+		render(InvestigativeCanvasStar, { props: { demoMode: true } });
 
 		// Sidebar and canvas contain exhibits E-001 to E-006
 		expect(screen.getAllByText(/Trace Residue \(Footprint\)/i).length).toBeGreaterThanOrEqual(1);
@@ -39,7 +40,7 @@ describe('InvestigativeCanvasStar (Screenshot 1 Dossier Alignment)', () => {
 	});
 
 	it('renders Evidence Inspector with calipers and analysis checklist for E-001 by default', () => {
-		render(InvestigativeCanvasStar);
+		render(InvestigativeCanvasStar, { props: { demoMode: true } });
 
 		expect(screen.getByText(/EVIDENCE INSPECTOR/i)).toBeInTheDocument();
 		expect(screen.getByText(/42\.23"/i)).toBeInTheDocument();
@@ -50,7 +51,7 @@ describe('InvestigativeCanvasStar (Screenshot 1 Dossier Alignment)', () => {
 	});
 
 	it('updates selected exhibit when clicking a card', async () => {
-		render(InvestigativeCanvasStar);
+		render(InvestigativeCanvasStar, { props: { demoMode: true } });
 
 		const witnessNodes = screen.getAllByText(/Witness Statement/i);
 		await fireEvent.click(witnessNodes[0]);
@@ -60,15 +61,58 @@ describe('InvestigativeCanvasStar (Screenshot 1 Dossier Alignment)', () => {
 		expect(screen.getByText(/Corroborates hallway arrival window/i)).toBeInTheDocument();
 	});
 
+	it('supports keyboard selection and opening exhibit details', async () => {
+		const onOpenModal = vi.fn();
+		render(InvestigativeCanvasStar, { props: { demoMode: true, onOpenModal } });
+
+		const witnessCard = screen.getAllByRole('button', { name: /Select Witness Statement/i })[0];
+		await fireEvent.keyDown(witnessCard, { key: 'Enter' });
+
+		expect(onOpenModal).toHaveBeenCalledTimes(1);
+		expect(onOpenModal).toHaveBeenCalledWith(expect.objectContaining({ title: 'Witness Statement' }));
+		expect(screen.getAllByText(/E-002/i).length).toBeGreaterThanOrEqual(1);
+
+		const canvas = screen.getByRole('button', { name: /Interactive investigative canvas/i });
+		await fireEvent.keyDown(canvas, { key: 'ArrowRight' });
+		expect(document.querySelector('.canvas-transform-layer')?.getAttribute('style')).toContain('32px');
+	});
+
 	it('invokes onOpenUpload when ADD EVIDENCE button is clicked', async () => {
 		const onOpenUpload = vi.fn();
 		render(InvestigativeCanvasStar, {
-			props: { onOpenUpload }
+			props: { demoMode: true, onOpenUpload }
 		});
 
 		const addBtn = screen.getByText(/ADD EVIDENCE/i);
 		await fireEvent.click(addBtn);
 
 		expect(onOpenUpload).toHaveBeenCalledTimes(1);
+	});
+
+	it('keeps empty case boards free of seeded exhibits and hypotheses', () => {
+		render(InvestigativeCanvasStar, { props: { docketNumber: '#EMPTY', evidenceItems: [] } });
+
+		expect(screen.getByText('NO CASE EVIDENCE LOADED')).toBeInTheDocument();
+		expect(screen.getByText(/Select or add a case exhibit/i)).toBeInTheDocument();
+		expect(screen.queryByText(/PRIMARY HYPOTHESIS/i)).not.toBeInTheDocument();
+		expect(screen.queryByText(/Witness Statement/i)).not.toBeInTheDocument();
+		expect(screen.queryByText(/Strongly corroborates subject presence/i)).not.toBeInTheDocument();
+	});
+
+	it('uses neutral placeholders for missing case evidence metadata', () => {
+		render(InvestigativeCanvasStar, {
+			props: {
+				docketNumber: '#CASE-1',
+				evidenceItems: [{ id: 'evidence-uuid-1', title: 'Lab photograph', mimeType: 'image/png' }]
+			}
+		});
+
+		expect(screen.getAllByText('Lab photograph').length).toBeGreaterThan(0);
+		expect(screen.getByText('Not recorded')).toBeInTheDocument();
+		expect(screen.getByText('Not provided')).toBeInTheDocument();
+		expect(screen.getByText('No reviewed conclusion recorded.')).toBeInTheDocument();
+		expect(screen.queryByText(/PRIMARY HYPOTHESIS/i)).not.toBeInTheDocument();
+		expect(screen.queryByText(/Linked to H-01/i)).not.toBeInTheDocument();
+		expect(screen.queryByText(/Spatial alignment to E-005/i)).not.toBeInTheDocument();
 	});
 });

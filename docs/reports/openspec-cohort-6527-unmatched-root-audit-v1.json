@@ -1,0 +1,59 @@
+{
+  "schema": "atlas.openspec-cohort-6527-unmatched-root-audit.v1",
+  "generatedAt": "2026-11-09T02:50:38.971Z",
+  "canonicalAuthority": false,
+  "taskCompletionAuthorized": false,
+  "writesPerformed": false,
+  "inputCrosswalkSha256": "9bf8bf8d1311d0d02ed84ed918af1cc43943f188e53fb714c8842fcd03c8138b",
+  "inputSourceBindingRevision": "sha256:de32847bda8bee924335d1354da03e2361267abc0cdef31fefc115dcd1265f84",
+  "sourceRowsChecked": 268,
+  "counts": {
+    "existingTrackedAndCurrent": 268,
+    "missingFile": 0,
+    "untrackedFile": 0,
+    "staleBlockHash": 0
+  },
+  "roots": {
+    "openspec/specs": {
+      "sourceRows": 145,
+      "uniqueFiles": 1,
+      "missingFiles": 0,
+      "untrackedFiles": 0,
+      "exactCurrentBlockHashes": 145,
+      "staleBlockHashes": 0
+    },
+    "parent-atlas-graph-runtime-enhancement": {
+      "sourceRows": 27,
+      "uniqueFiles": 1,
+      "missingFiles": 0,
+      "untrackedFiles": 0,
+      "exactCurrentBlockHashes": 27,
+      "staleBlockHashes": 0
+    },
+    "parent-atlas-qas-bundle": {
+      "sourceRows": 47,
+      "uniqueFiles": 1,
+      "missingFiles": 0,
+      "untrackedFiles": 0,
+      "exactCurrentBlockHashes": 47,
+      "staleBlockHashes": 0
+    },
+    "parent-atlas-rtx-gpu-lab": {
+      "sourceRows": 38,
+      "uniqueFiles": 1,
+      "missingFiles": 0,
+      "untrackedFiles": 0,
+      "exactCurrentBlockHashes": 38,
+      "staleBlockHashes": 0
+    },
+    "parent-atlas-tensor-residency-integration": {
+      "sourceRows": 11,
+      "uniqueFiles": 1,
+      "missingFiles": 0,
+      "untrackedFiles": 0,
+      "exactCurrentBlockHashes": 11,
+      "staleBlockHashes": 0
+    }
+  },
+  "examples": []
+}

@@ -68,6 +68,38 @@ describe('recommendation outcome postgres repository', () => {
     expect(result.inserted).toBe(false);
   });
 
+  it('makes retry idempotency depend on replaying the exact finalized receipt, including observed_at', async () => {
+    const finalized = receipt();
+    const stored = new Map<string, typeof finalized>();
+    const db = {
+      async query(text: string, values: unknown[] = []) {
+        if (text.includes('INSERT INTO atlas_recommendation_outcome_receipts')) {
+          const [checksum, , , , , , , , , json] = values as [string, ...unknown[]];
+          if (stored.has(checksum)) return { rowCount: 0, rows: [] };
+          stored.set(checksum, JSON.parse(String(json)) as typeof finalized);
+          return { rowCount: 1, rows: [{ receipt_checksum: checksum }] };
+        }
+        const checksum = String(values[0]);
+        const value = stored.get(checksum);
+        return value
+          ? { rowCount: 1, rows: [{ receipt_checksum: checksum, receipt_json: value }] }
+          : { rowCount: 0, rows: [] };
+      },
+    } as any;
+    const repository = createRecommendationOutcomePostgresRepository(db);
+
+    const first = await repository.append(finalized, 'repo-retry:v1');
+    const replay = await repository.append(finalized, 'repo-retry:v1');
+    expect(first.inserted).toBe(true);
+    expect(replay.inserted).toBe(false);
+    expect(replay.receipt_checksum).toBe(first.receipt_checksum);
+    expect(replay.readback_checksum).toBe(first.readback_checksum);
+    expect(stored.size).toBe(1);
+
+    const newObservation = { ...finalized, observed_at: '2026-08-21T20:01:01.000Z' };
+    expect(temporalActionChecksum(newObservation)).not.toBe(first.receipt_checksum);
+  });
+
   it('rejects tampered receipt JSON on readback', async () => {
     const value = receipt();
     const receiptChecksum = temporalActionChecksum(value);

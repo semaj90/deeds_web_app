@@ -1,0 +1,91 @@
+{
+  "schema": "atlas.nextsteps-kanban-prefill-integrity.v1",
+  "observedAt": "2026-11-08",
+  "status": "PARTIAL",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "canonicalFirst": true,
+  "databaseTarget": "legal_ai_live_integration_scratch",
+  "databaseWriteTest": "NOT_RUN",
+  "prefillWriter": {
+    "source": "sveltekit-frontend/src/lib/server/atlas/kanban/kanban-dag-prefill-v1.ts",
+    "requiresSourceAndCohortSha256": true,
+    "requiresUniqueMappedTaskIds": true,
+    "requiresSingleCohortRevisionPerBatch": true,
+    "databaseGuard": "exact database name + PostgreSQL 18 + loopback port 5434",
+    "readback": "full payload digest before commit and from a fresh connection after commit"
+  },
+  "scratchInventory": {
+    "nextstepsTaskRows": 2479,
+    "exactPrefillTaskIdMatches": 0,
+    "validationCommands": 0,
+    "dependencyRows": 0,
+    "outcomeReceiptRows": 8,
+    "receiptsWithClaimLeaseAndSourceRevision": 0,
+    "receiptsWithVerificationCommandAndExitCode": 0
+  },
+  "focusedTest": {
+    "command": "npm exec -- vitest run src/lib/server/atlas/kanban/kanban-dag-prefill-v1.spec.ts",
+    "result": "PASS",
+    "passed": 15,
+    "failed": 0,
+    "scope": "mock contract tests; no database integration"
+  },
+  "executionBridge": {
+    "source": "scripts/atlas/execute-kanban-task-bridge-v1.mjs",
+    "claimOwner": "sveltekit-frontend/src/lib/server/atlas/kanban-task-board.ts::claimKanbanTask",
+    "dryRunCommand": "node --import tsx/esm scripts/atlas/execute-kanban-task-bridge-v1.mjs --feature-id=nextsteps:turbovecquant",
+    "dryRunResult": "NO_READY_TASKS_CLAIMABLE",
+    "databaseVersion": 180004,
+    "candidateCount": 0,
+    "writesPerformed": false,
+    "claimApply": "NOT_RUN",
+    "secondDryRun": {
+      "featureId": "nextsteps:sveltekit-frontend-next-steps-plans-bitfrost-turboquant-turbovec-production-todo",
+      "status": "PROPOSED",
+      "boundedReadyCandidates": 5,
+      "blockedCandidates": 5,
+      "allHaveSourceRevision": true,
+      "allHaveRevisionBoundPrefill": false,
+      "allHaveCohortRevision": false,
+      "allHaveRunnableValidation": false,
+      "allHaveZeroUnmetDependencies": true,
+      "writesPerformed": false,
+      "receipt": ".tmp/atlas/kanban-task-bridge-20261109T002152Z.json"
+    }
+  },
+  "identityCrosswalk": {
+    "command": "node scripts/atlas/audit-nextsteps-openspec-cohort-identity-v1.mjs",
+    "status": "PASS_SEPARATE_IDENTITY_COHORTS",
+    "openspecRows": 6527,
+    "openspecUniqueIds": 6527,
+    "nextstepsRows": 3105,
+    "nextstepsUniqueIds": 3105,
+    "exactMatches": 0,
+    "sharedHashSuffixes": 0,
+    "databaseAccessed": false,
+    "report": "docs/reports/nextsteps-openspec-prefill-identity-crosswalk-v1.json"
+  },
+  "claimOwnerTest": {
+    "command": "npm exec -- vitest run src/lib/server/atlas/kanban-task-board.test.ts",
+    "result": "PASS",
+    "passed": 13,
+    "failed": 0,
+    "scope": "mock lifecycle contract including source-revision claim fence"
+  },
+  "openGates": [
+    "Resolve source-qualified task identities to actual Kanban task IDs.",
+    "Bind prefill rows to the reconciled source and cohort revisions.",
+    "Find a source-qualified task ID that matches its prefill row and source revision.",
+    "Provide a reviewed verification command for that exact task.",
+    "Require an independent successful task attempt and test receipt before completion.",
+    "Rehearse one exact mapped task on scratch and independently read back task, attempt, event, and outcome records."
+  ],
+  "reports": [
+    ".tmp/atlas/nextsteps-scratch-readiness-v1.json",
+    ".tmp/atlas/nextsteps-prefill-readonly-v1.json",
+    ".tmp/atlas/kanban-task-bridge-20261109T001956Z.json",
+    ".tmp/atlas/kanban-task-bridge-20261109T002152Z.json",
+    "docs/reports/nextsteps-openspec-prefill-identity-crosswalk-v1.json"
+  ]
+}
