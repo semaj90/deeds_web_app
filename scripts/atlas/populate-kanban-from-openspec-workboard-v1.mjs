@@ -28,6 +28,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createRequire } from 'node:module';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { verifyWorkboardTaskSourceBindingV1 } from './lib/workboard-source-binding-audit-v1.mjs';
@@ -200,18 +201,24 @@ async function main() {
   if (dupIds > 0) throw new Error('DUPLICATE_TASK_IDS_IN_PLAN: refusing');
   if (!APPLY) { console.log('DRY-RUN: nothing written. Canary apply requires --apply --task-id=<stableKey> --limit=1.'); return; }
 
-  const { createKanbanTask } = await import(pathToFileURL(path.join(FE, 'src', 'lib', 'server', 'atlas', 'kanban-task-board.ts')).href);
+  const { createKanbanTaskOnScratchDatabase } = await import(pathToFileURL(path.join(FE, 'src', 'lib', 'server', 'atlas', 'kanban-task-board.ts')).href);
+  const requireFromFrontend = createRequire(path.join(FE, 'package.json'));
+  const { drizzle } = requireFromFrontend('drizzle-orm/node-postgres');
+  const taskSchema = await import(pathToFileURL(path.join(FE, 'src', 'lib', 'server', 'db', 'schema', 'kanban-tasks.ts')).href);
+  const scratchDb = drizzle(pool, { schema: { kanbanTasks: taskSchema.kanbanTasks, kanbanTaskEvents: taskSchema.kanbanTaskEvents } });
+  const canonicalDbModule = await import(pathToFileURL(path.join(FE, 'src', 'lib', 'server', 'db', 'client.ts')).href);
+  canonicalPoolToClose = canonicalDbModule.pool;
   const created = [];
   const failed = [];
   for (const p of toCreate) {
     try {
-      await createKanbanTask({
+      await createKanbanTaskOnScratchDatabase({
         taskId: p.taskId, featureId: p.featureId, featureLabel: p.featureLabel, sourceRefs: p.sourceRefs,
         sourceRevision: p.sourceBinding.sourceRevision,
         lane: p.lane, priority: p.priority, idempotencyKey: p.idempotencyKey,
         workspaceRevision: null, graphifyRevision: null, featureRevision: null, permissionMode: 'proposal_only',
         ...(p.analysisProposal ? { analysisProposal: p.analysisProposal } : {}),
-      });
+      }, scratchDb);
       created.push(p.taskId);
     } catch (e) {
       failed.push({ taskId: p.taskId, error: String(e.message ?? e).slice(0, 200) });
@@ -233,4 +240,8 @@ async function main() {
   if (after !== created.length || evAfter !== created.length || failed.length) process.exitCode = 1;
 }
 
-try { await main(); } finally { await pool.end(); }
+let canonicalPoolToClose = null;
+try { await main(); } finally {
+  await pool.end();
+  await canonicalPoolToClose?.end?.();
+}

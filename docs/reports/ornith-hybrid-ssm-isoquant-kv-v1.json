@@ -1,18 +1,25 @@
 {
   "schema": "atlas.ornith-hybrid-ssm-isoquant-kv-proof.v1",
-  "generatedAt": "2026-11-08T07:20:29.474749+00:00",
+  "generatedAt": "2026-11-09T05:25:06.033088+00:00",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "kvCachePersisted": false,
   "ornith8090Disturbed": false,
+  "evidenceScope": {
+    "inputTensorsSynthetic": true,
+    "llamaCppKvCacheIntegration": false,
+    "servingPromptLogitParityMeasured": false,
+    "recurrentStateEditedOrRotated": false,
+    "provesCodecMathAndSyntheticQuantizationOnly": true
+  },
   "device": {
-    "type": "cuda",
-    "name": "NVIDIA GeForce RTX 3060 Ti",
-    "torchVersion": "2.8.0+cu128",
-    "peakCudaAllocatedMiB": 18.633,
+    "type": "cpu",
+    "name": "cpu",
+    "torchVersion": "2.13.0+cu130",
+    "peakCudaAllocatedMiB": 0.0,
     "vramBudgetCapMiB": 32.0,
     "withinVramBudget": true,
-    "elapsedMs": 342.89
+    "elapsedMs": 918.93
   },
   "terminologyDisambiguation": {
     "quaterionLibrary": "Qdrant Python similarity-learning / metric fine-tuning library (pip package 'quaterion'); NOT a KV-cache rotor library.",
@@ -20,19 +27,12 @@
   },
   "liveOrnith8090ReadonlyProbe": {
     "endpoint": "http://127.0.0.1:8090",
-    "reachable": true,
+    "reachable": false,
     "serviceRestarted": false,
-    "propsSummary": {
-      "modelAlias": "ornith-1.5-9b",
-      "totalSlots": 1,
-      "nCtx": 65536
-    },
-    "slotsSummary": {
-      "slotCount": 1,
-      "slot0NCtx": 65536,
-      "isProcessing": false
-    },
-    "yarnEvidence": "UNVERIFIED_FROM_HTTP_PROPS_ALONE"
+    "propsSummary": null,
+    "slotsSummary": null,
+    "yarnEvidence": "UNVERIFIED_FROM_HTTP_PROPS_ALONE",
+    "error": "<urlopen error [Errno 111] Connection refused>"
   },
   "hybridMemoryBudget": {
     "architecture": "Qwen3.5-9B Hybrid (Ornith 1.5)",
@@ -164,58 +164,58 @@
       {
         "layerIdx": 3,
         "int8BlockMse": 1.94e-05,
-        "int8BlockCosine": 0.9999976,
+        "int8BlockCosine": 1.0000011,
         "int4BlockMse": 0.0064953,
-        "int4BlockCosine": 0.9992059
+        "int4BlockCosine": 0.9992095
       },
       {
         "layerIdx": 7,
         "int8BlockMse": 1.94e-05,
-        "int8BlockCosine": 0.9999976,
+        "int8BlockCosine": 1.0000011,
         "int4BlockMse": 0.0064953,
-        "int4BlockCosine": 0.9992059
+        "int4BlockCosine": 0.9992095
       },
       {
         "layerIdx": 11,
         "int8BlockMse": 1.94e-05,
-        "int8BlockCosine": 0.9999976,
+        "int8BlockCosine": 1.0000011,
         "int4BlockMse": 0.0064953,
-        "int4BlockCosine": 0.9992059
+        "int4BlockCosine": 0.9992095
       },
       {
         "layerIdx": 15,
         "int8BlockMse": 1.94e-05,
-        "int8BlockCosine": 0.9999976,
+        "int8BlockCosine": 1.0000011,
         "int4BlockMse": 0.0064953,
-        "int4BlockCosine": 0.9992059
+        "int4BlockCosine": 0.9992095
       },
       {
         "layerIdx": 19,
         "int8BlockMse": 1.94e-05,
-        "int8BlockCosine": 0.9999976,
+        "int8BlockCosine": 1.0000011,
         "int4BlockMse": 0.0064953,
-        "int4BlockCosine": 0.9992059
+        "int4BlockCosine": 0.9992095
       },
       {
         "layerIdx": 23,
         "int8BlockMse": 1.94e-05,
-        "int8BlockCosine": 0.9999976,
+        "int8BlockCosine": 1.0000011,
         "int4BlockMse": 0.0064953,
-        "int4BlockCosine": 0.9992059
+        "int4BlockCosine": 0.9992095
       },
       {
         "layerIdx": 27,
         "int8BlockMse": 1.94e-05,
-        "int8BlockCosine": 0.9999976,
+        "int8BlockCosine": 1.0000011,
         "int4BlockMse": 0.0064953,
-        "int4BlockCosine": 0.9992059
+        "int4BlockCosine": 0.9992095
       },
       {
         "layerIdx": 31,
         "int8BlockMse": 1.94e-05,
-        "int8BlockCosine": 0.9999976,
+        "int8BlockCosine": 1.0000011,
         "int4BlockMse": 0.0064953,
-        "int4BlockCosine": 0.9992059
+        "int4BlockCosine": 0.9992095
       }
     ]
   },
@@ -234,9 +234,9 @@
     },
     "adv_04_deltanet_recurrent_state_checksum_immutability": {
       "passed": true,
-      "sha256Before": "sha256:ca9f8dac18608915bbc1fd265010bba2b3c0993ab5514d4710cb3af8989a823b",
-      "sha256After": "sha256:ca9f8dac18608915bbc1fd265010bba2b3c0993ab5514d4710cb3af8989a823b"
+      "sha256Before": "sha256:d6fd468310c92279c60ba29c630257110ebcbb55dedd7acfb68b83b1afc52dc2",
+      "sha256After": "sha256:d6fd468310c92279c60ba29c630257110ebcbb55dedd7acfb68b83b1afc52dc2"
     }
   },
-  "status": "PASS"
+  "status": "PASS_SYNTHETIC_CODEC_ONLY"
 }

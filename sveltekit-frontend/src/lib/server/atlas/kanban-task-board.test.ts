@@ -61,6 +61,7 @@ import {
   claimKanbanTask,
   createChildKanbanTask,
   createKanbanTask,
+  createKanbanTaskOnScratchDatabase,
   completeKanbanTask,
   formatKanbanTaskSummary,
   heartbeatKanbanTask,
@@ -148,6 +149,52 @@ describe('kanban-task-board', () => {
     expect(task.sourceRevision).toBe(sourceRevision);
     expect(dbState.insertValues[1]?.eventType).toBe('ticket_created');
     expect((dbState.insertValues[1]?.payload as Record<string, unknown>)?.sourceRevision).toBe(sourceRevision);
+  });
+
+  it('creates a task through an injected scratch database only after identity and version checks', async () => {
+    const sourceRevision = `sha256:${'d'.repeat(64)}`;
+    dbState.executeResults.push([{ database_name: 'legal_ai_live_integration_scratch', server_version_num: 180004 }]);
+    dbState.insertResults.push([
+      {
+        task_id: 'scratch-bound-task',
+        feature_id: 'openspec:sample-change',
+        feature_label: 'Sample Change',
+        source_refs: ['openspec/changes/sample-change/tasks.md#L1'],
+        source_revision: sourceRevision,
+        lane: 'todo',
+        status: 'pending',
+        validation_command: null,
+        created_at: '2026-11-09T00:00:00.000Z',
+        updated_at: '2026-11-09T00:00:00.000Z',
+      },
+      {},
+    ]);
+
+    const task = await createKanbanTaskOnScratchDatabase({
+      taskId: 'scratch-bound-task',
+      featureId: 'openspec:sample-change',
+      featureLabel: 'Sample Change',
+      sourceRefs: ['openspec/changes/sample-change/tasks.md#L1'],
+      sourceRevision,
+    }, dbState.db as never);
+
+    expect(dbState.db.execute).toHaveBeenCalledOnce();
+    expect(task.taskId).toBe('scratch-bound-task');
+    expect(dbState.insertValues[0]?.sourceRevision).toBe(sourceRevision);
+    expect(dbState.insertValues[1]?.eventType).toBe('ticket_created');
+  });
+
+  it('rejects a non-scratch injected database before task or event writes', async () => {
+    dbState.executeResults.push([{ database_name: 'legal_ai_db', server_version_num: 180004 }]);
+
+    await expect(createKanbanTaskOnScratchDatabase({
+      taskId: 'must-not-write',
+      featureId: 'openspec:sample-change',
+      featureLabel: 'Sample Change',
+      sourceRefs: ['openspec/changes/sample-change/tasks.md#L1'],
+    }, dbState.db as never)).rejects.toThrow('KANBAN_SCRATCH_CREATOR_DATABASE_IDENTITY_MISMATCH');
+
+    expect(dbState.db.insert).not.toHaveBeenCalled();
   });
 
   it('compiles cohort filtering and fail-closed dependency readiness into the task query', async () => {

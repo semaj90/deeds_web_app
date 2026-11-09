@@ -2,17 +2,16 @@
 """
 scripts/atlas/synthesize-lowrank-task-rpc-v1.py
 
-Synthesizes OpenSpec Workboard Tasks into a Low-Rank (MRL 64-D) Instruction RPC Packet:
-1. Loads 6,527 OpenSpec tasks from the verified concept tie report:
+Produces a source-bound low-rank diagnostic artifact from admitted task rows:
+1. Reads candidate rows (the default concept-tie report is advisory only):
    docs/reports/openspec-task-concept-tie-v2.20261107T214110Z.rows.jsonl
 2. Extracts instructions and keywords from .okf/corpora/keyword-corpus.yaml (Firecrawled API docs).
-3. Computes Matryoshka Representation Learning (MRL) 64-D low-rank vectors (PyTorch ATen / CPU):
-   latent_64 = L2_normalize(embedding[:, :64])
+3. Consumes a separately generated, revision-bound learned latent_64 vector.
 4. Computes 30-bit Morton radix codes for spatial / cache-coherent radix sort.
 5. Packs categorical priority and status into 4-bit nibbles (pack_int4_nibbles).
 6. Encodes 256-bit bitset occupancy mask (BIT(256) AIO storage match).
-7. Synthesizes contiguous 10-column float32-le feature matrix (FeatureRowRpcPacketV1 schema).
-8. Produces a Qualified Result Envelope with cryptographic SHA-256 integrity digest.
+7. Packs caller-supplied, source-bound 10-column feature rows.
+8. Produces a local diagnostic receipt with SHA-256 integrity digests.
 9. Emits audit report with canonicalAuthority: false, writesPerformed: false.
 """
 
@@ -28,16 +27,14 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 import numpy as np
-import torch
-import torch.nn.functional as F
 import yaml
+from lowrank_task_binding_v1 import validate_bound_task_rows
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 
-# Schema constants aligned with sveltekit-frontend/src/lib/server/atlas/transport/feature-row-rpc-packet-v1.ts
-FEATURE_ROW_RPC_PACKET_SCHEMA_V1 = "atlas.feature-row-rpc-packet.v1"
-FEATURE_ROW_RPC_RESULT_ENVELOPE_SCHEMA_V1 = "atlas.feature-row-rpc-result-envelope.v1"
+# This script does not encode the canonical FeatureRowRpcPacketV1 MessagePack envelope.
+LOWRANK_ARTIFACT_SCHEMA_V1 = "atlas.openspec-lowrank-task-rpc.v3"
 FEATURE_ROW_NUMERIC_COLS = 10  # [lexical, exact, dense, sparse, rrf, pagerank, community, pprAffinity, crossEncoder, finalScore]
 
 
@@ -118,7 +115,7 @@ def load_openspec_tasks(rows_path: Path, limit: int = 0) -> List[Dict[str, Any]]
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Synthesize OpenSpec tasks into Low-Rank RPC packet")
+    parser = argparse.ArgumentParser(description="Build source-bound low-rank diagnostic artifacts")
     parser.add_argument(
         "--rows-path",
         default="docs/reports/openspec-task-concept-tie-v2.20261107T214110Z.rows.jsonl",
@@ -152,22 +149,24 @@ def main():
     out_receipt = ROOT / args.out_receipt
     out_binary = ROOT / args.out_binary
 
-    out_binary.parent.mkdir(parents=True, exist_ok=True)
-    out_receipt.parent.mkdir(parents=True, exist_ok=True)
-
     print(f"Loading OpenSpec tasks from: {rows_path}")
     tasks = load_openspec_tasks(rows_path, args.limit)
     num_tasks = len(tasks)
     print(f"Loaded {num_tasks} tasks.")
 
+    # Admission happens before creating output directories or writing artifacts.
+    # The concept-tie report is advisory and currently lacks these bindings.
+    tasks = validate_bound_task_rows(tasks)
+
+    out_binary.parent.mkdir(parents=True, exist_ok=True)
+    out_receipt.parent.mkdir(parents=True, exist_ok=True)
+
     print(f"Loading OKF keyword corpus from: {corpus_path}")
     vocab = load_okf_keywords(corpus_path)
     print(f"Loaded {len(vocab)} vocabulary concepts.")
 
-    # 1. Deterministic Instruction Tokenization & Semantic Vector Seeding
-    # Seed embeddings: shape (N, 768)
-    # Using PyTorch ATen on CPU for deterministic MRL slicing
-    print("Computing Matryoshka Representation Learning (MRL) 64-D low-rank representations...")
+    # Consume admitted source data; never manufacture identities, scores, or embeddings.
+    print("Loading source-bound semantic_768 vectors and feature rows...")
     embeddings_768 = np.zeros((num_tasks, 768), dtype=np.float32)
 
     # Compute task instruction overlap scores
@@ -180,60 +179,16 @@ def main():
     evidence_refs = []
 
     for i, t in enumerate(tasks):
-        tid = t.get("task_id", f"task:{i}")
-        cid = t.get("concept_id") or "concept:unassigned"
-        lane = t.get("tie_lane", "UNKNOWN")
-        score = float(t.get("score") or 0.5)
+        canonical_ids.append(t["canonical_task_key"])
+        candidate_packet_keys.append(t["candidate_packet_key"])
+        source_refs.append(t["source_ref"])
+        source_revisions.append(t["source_revision"])
+        evidence_refs.append(t["evidence_refs"])
+        embeddings_768[i] = np.asarray(t["semantic_embedding_768"], dtype=np.float32)
+        feature_matrix[i] = np.asarray(t["feature_row"], dtype=np.float32)
 
-        canonical_ids.append(tid)
-        candidate_packet_keys.append(f"packet:{tid}")
-        source_refs.append(tid.split("#")[0] if "#" in tid else tid)
-        source_revisions.append("rev:openspec:20261107")
-        evidence_refs.append([f"evidence:{cid}", f"lane:{lane}"])
-
-        # Tokenize task ID and matched term
-        text_tokens = re_tokenize(tid + " " + (t.get("matched_term") or ""))
-        
-        # Pseudo-dense projection from token hash seeds
-        rng = np.random.RandomState(int(hashlib.md5(tid.encode("utf-8")).hexdigest()[:8], 16))
-        vec_768 = rng.randn(768).astype(np.float32)
-        # Normalize 768-D
-        norm_768 = np.linalg.norm(vec_768)
-        if norm_768 > 0:
-            vec_768 /= norm_768
-        embeddings_768[i] = vec_768
-
-        # Populate 10-column feature row:
-        # [0:lexical, 1:exact, 2:dense, 3:sparse, 4:rrf, 5:pagerank, 6:community, 7:pprAffinity, 8:crossEncoder, 9:finalScore]
-        lexical = score if lane in ("EXACT_CANONICAL", "EXACT_ALIAS") else 0.4
-        exact = 1.0 if lane == "EXACT_CANONICAL" else (0.8 if lane == "EXACT_ALIAS" else 0.0)
-        dense = score
-        sparse = 0.5
-        rrf = (lexical + dense) / 2.0
-        pagerank = float(1.0 / (1.0 + float(t.get("rank") or 100)))
-        community = float((i % 16)) / 15.0
-        ppr = score * 0.9
-        cross_encoder = score * 1.05
-        final_score = (lexical * 0.3) + (dense * 0.4) + (pagerank * 0.3)
-
-        feature_matrix[i, 0] = lexical
-        feature_matrix[i, 1] = exact
-        feature_matrix[i, 2] = dense
-        feature_matrix[i, 3] = sparse
-        feature_matrix[i, 4] = rrf
-        feature_matrix[i, 5] = pagerank
-        feature_matrix[i, 6] = community
-        feature_matrix[i, 7] = ppr
-        feature_matrix[i, 8] = cross_encoder
-        feature_matrix[i, 9] = final_score
-
-    # 2. PyTorch ATen MRL Slicing + L2 Renormalization
-    t_emb = torch.from_numpy(embeddings_768)  # CPU tensor
-    # Slice first 64 dimensions (standard Matryoshka representation)
-    t_slice64 = t_emb[:, :64]
-    # L2-renormalize
-    t_latent64 = F.normalize(t_slice64, p=2, dim=1)
-    latent64_np = t_latent64.numpy()
+    # Use a separately revision-bound learned latent. Never call a 64-D prefix native MRL.
+    latent64_np = np.asarray([t["latent_vector_64"] for t in tasks], dtype=np.float32)
 
     # 3. 30-Bit Morton Radix Sort Encoding from top 3 latent coordinates
     morton_codes = np.zeros(num_tasks, dtype=np.uint32)
@@ -303,20 +258,26 @@ def main():
 
     # 8. Qualified Result Envelope
     packet_meta = {
-        "schema": FEATURE_ROW_RPC_PACKET_SCHEMA_V1,
+        "schema": LOWRANK_ARTIFACT_SCHEMA_V1,
         "rows": num_tasks,
         "cols": FEATURE_ROW_NUMERIC_COLS,
-        "workspaceRevision": "rev:deeds:20261107",
-        "featureRevision": "feat:openspec-lowrank:v1",
-        "graphRevision": "graph:openspec-concept:v2",
-        "semanticRevision": "sem:mrl-64:v1",
+        "workspaceRevision": tasks[0]["workspace_revision"],
+        "candidateSnapshotRevision": tasks[0]["candidate_snapshot_revision"],
+        "sourceBindings": [{"taskKey": t["canonical_task_key"], "packetKey": t["candidate_packet_key"],
+                            "sourceRef": t["source_ref"], "sourceRevision": t["source_revision"],
+                            "candidateOrdinal": t["candidate_ordinal"],
+                            "ordinalMapChecksum": t["ordinal_map_checksum"],
+                            "bindingReceiptSha256": t["binding_receipt_sha256"]} for t in tasks],
+        "featureRevision": tasks[0]["feature_revision"],
+        "graphRevision": tasks[0]["graph_revision"],
+        "semanticRevision": tasks[0]["semantic_representation_revision"],
         "numericEncoding": "float32-le",
         "presenceMaskBitOrder": "lsb0",
         "numericByteLength": len(numeric_buffer_bytes),
         "binaryChunkByteLength": len(binary_payload),
         "binaryChunkSha256": binary_sha,
         "packedNibbleByteLength": len(packed_nibbles),
-        "schema": "atlas.openspec-lowrank-task-rpc.v2",
+        "artifactSchema": "atlas.openspec-lowrank-task-rpc.v3",
         "recordFormat": "<IIH2x3fd8f",
         "recordStrideBytes": 64,
         "recordEndianness": "little",
@@ -324,8 +285,10 @@ def main():
         "taskOrdinalIdentity": "index into the ordered OpenSpec task list (unique, 0-based)",
         "latent64File": {"path": str(latent_path), "sha256": sha256_bytes(latent_bytes), "byteLength": len(latent_bytes), "dtype": "float32-le", "shape": [num_tasks, 64]},
         "occupancyFile": {"path": str(occupancy_path), "sha256": sha256_bytes(bitset_bytes), "byteLength": len(bitset_bytes), "bitOrder": "lsb0", "bitCount": num_tasks, "storageEncoding": "raw-bytes (BYTEA/BLOB-ready)"},
-        "embeddingSource": "DETERMINISTIC_HASH_SEEDED_RANDOM_NOT_MODEL_EMBEDDING",
-        "embeddingWarning": "768-D vectors are seeded from md5(task_id); they are not EmbeddingGemma output. MRL quality is unmeasured.",
+        "embeddingSource": "INPUT_BOUND_SEMANTIC_768_AND_LEARNED_LATENT_64",
+        "latentRepresentationId": tasks[0]["latent_representation_id"],
+        "latentRepresentationRevision": tasks[0]["latent_representation_revision"],
+        "embeddingWarning": "Identity validation is not proof of embedding lineage; latent vectors remain a noncanonical projection.",
         "canonicalAuthority": False,
         "localArtifactsWritten": True,
         "databaseWritesPerformed": False,
@@ -334,27 +297,26 @@ def main():
     }
 
     envelope = {
-        "schema": FEATURE_ROW_RPC_RESULT_ENVELOPE_SCHEMA_V1,
+        "schema": "atlas.openspec-lowrank-result-envelope.v1",
         "packetChecksumSha256": packet_sha,
-        "workspaceRevision": "rev:deeds:20261107",
-        "candidateSnapshotRevision": "snap:openspec:6527",
-        "representationId": "semantic_mrl_prefix_64",
-        "representationFamily": "EMBEDDINGGEMMA_MRL",
-        "projectionKind": "MRL_PREFIX_TRUNCATION",
+        "workspaceRevision": tasks[0]["workspace_revision"],
+        "candidateSnapshotRevision": tasks[0]["candidate_snapshot_revision"],
+        "representationId": tasks[0]["latent_representation_id"],
+        "representationFamily": "LEARNED_LATENT",
+        "projectionKind": "INPUT_BOUND_LATENT",
         "sourceRepresentationId": "semantic_768",
-        "projectionRevision": "rev:mrl:prefix-truncation-v1",
+        "projectionRevision": tasks[0]["latent_representation_revision"],
         "totalEvaluatedCandidates": num_tasks,
         "survivingCandidates": num_tasks,
         "topCandidateIds": canonical_ids[:10],
         "topCandidateScores": [float(feature_matrix[i, 9]) for i in range(10)],
-        "mrlLowRankDimension": 64,
-        "mrlBaseDimension": 768,
+        "latentDimension": 64,
         "mortonRadixBits": 30,
         "chunkStrideBytes": 64,
         "canonicalAuthority": False,
         "databaseWritesPerformed": False,
         "generatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
-        "status": "REHEARSAL_PROVEN_RPC_SYNTHESIZED",
+        "status": "SOURCE_BOUND_DIAGNOSTIC_ARTIFACT",
     }
 
     envelope_sha = sha256_str(json.dumps(envelope, sort_keys=True))
@@ -376,7 +338,7 @@ def main():
     print(json.dumps({
         "status": "SUCCESS",
         "tasks": num_tasks,
-        "mrlDimension": 64,
+        "latentDimension": 64,
         "packetSha256": packet_sha,
         "binaryChunkSha256": binary_sha,
         "envelopeSha256": envelope_sha,

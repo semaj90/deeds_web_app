@@ -37,10 +37,27 @@ export function decodeRecords(buf, taskCount) {
 async function main() {
   const receiptPath = resolve('docs/reports/openspec-lowrank-task-rpc-receipt-v1.json');
   const receipt = JSON.parse(await readFile(receiptPath, 'utf8'));
-  if (receipt.packet?.schema !== 'atlas.openspec-lowrank-task-rpc.v2') {
-    throw new Error(`SCHEMA_VERSION_UNSUPPORTED: ${receipt.packet?.schema}`);
+  const artifactSchema = receipt.packet?.artifactSchema ?? receipt.packet?.schema;
+  if (!['atlas.openspec-lowrank-task-rpc.v2', 'atlas.openspec-lowrank-task-rpc.v3'].includes(artifactSchema)) {
+    throw new Error(`SCHEMA_VERSION_UNSUPPORTED: ${artifactSchema}`);
   }
   const n = receipt.taskCount;
+  if (artifactSchema === 'atlas.openspec-lowrank-task-rpc.v3') {
+    const bindings = receipt.packet.sourceBindings;
+    if (!Array.isArray(bindings) || bindings.length !== n) throw new Error('SOURCE_BINDING_COUNT_MISMATCH');
+    const seen = new Set();
+    for (let i = 0; i < bindings.length; i++) {
+      const b = bindings[i];
+      if (!b?.taskKey || !b?.packetKey || !b?.sourceRef || !b?.sourceRevision || b.candidateOrdinal !== i) {
+        throw new Error(`SOURCE_BINDING_INVALID_AT_${i}`);
+      }
+      if (seen.has(b.taskKey)) throw new Error(`DUPLICATE_SOURCE_TASK_KEY_AT_${i}`);
+      seen.add(b.taskKey);
+    }
+    if (receipt.envelope?.status !== 'SOURCE_BOUND_DIAGNOSTIC_ARTIFACT' || receipt.packet.canonicalAuthority !== false) {
+      throw new Error('V3_AUTHORITY_OR_STATUS_INVALID');
+    }
+  }
   const recBuf = await readFile(resolve(receipt.binaryOutput));
   if (sha256(recBuf) !== receipt.packet.binaryChunkSha256) throw new Error('RECORD_HASH_MISMATCH');
   const records = decodeRecords(recBuf, n);

@@ -224,8 +224,8 @@ export const KanbanTaskEventSchema = z.object({
 
 export type KanbanTaskEvent = z.infer<typeof KanbanTaskEventSchema>;
 
-async function withKanbanTransaction<T>(fn: (tx: KanbanDb) => Promise<T>): Promise<T> {
-  const dbAny = db as unknown as {
+async function withKanbanTransactionOn<T>(database: KanbanDb, fn: (tx: KanbanDb) => Promise<T>): Promise<T> {
+  const dbAny = database as unknown as {
     transaction?: <U>(fn: (tx: KanbanDb) => Promise<U>) => Promise<U>;
   };
 
@@ -233,7 +233,11 @@ async function withKanbanTransaction<T>(fn: (tx: KanbanDb) => Promise<T>): Promi
     return dbAny.transaction(fn);
   }
 
-  return fn(db);
+  return fn(database);
+}
+
+async function withKanbanTransaction<T>(fn: (tx: KanbanDb) => Promise<T>): Promise<T> {
+  return withKanbanTransactionOn(db, fn);
 }
 
 function toIso(value: unknown): string {
@@ -789,9 +793,12 @@ export async function heartbeatKanbanTask(input: z.infer<typeof KanbanTaskHeartb
   });
 }
 
-export async function createKanbanTask(input: z.infer<typeof KanbanTaskCreateInputSchema>): Promise<KanbanTask> {
+async function createKanbanTaskOnDatabase(
+  input: z.infer<typeof KanbanTaskCreateInputSchema>,
+  database: KanbanDb,
+): Promise<KanbanTask> {
   const parsed = KanbanTaskCreateInputSchema.parse(input);
-  return withKanbanTransaction(async (tx) => {
+  return withKanbanTransactionOn(database, async (tx) => {
     const now = new Date();
     const [created] = await tx
       .insert(kanbanTasks)
@@ -834,6 +841,28 @@ export async function createKanbanTask(input: z.infer<typeof KanbanTaskCreateInp
 
     return normalizeRow(created as Record<string, unknown>);
   });
+}
+
+export async function createKanbanTask(input: z.infer<typeof KanbanTaskCreateInputSchema>): Promise<KanbanTask> {
+  return createKanbanTaskOnDatabase(input, db);
+}
+
+/** Scratch-only creation entry point for isolated rehearsals. The caller must
+ * additionally enforce the loopback :5434 URL before constructing scratchDb. */
+export async function createKanbanTaskOnScratchDatabase(
+  input: z.infer<typeof KanbanTaskCreateInputSchema>,
+  scratchDb: typeof db,
+): Promise<KanbanTask> {
+  const identity = await scratchDb.execute(sql`
+    SELECT current_database() AS database_name,
+           current_setting('server_version_num')::int AS server_version_num
+  `) as { rows?: Array<{ database_name?: string; server_version_num?: number | string }> };
+  const row = identity.rows?.[0];
+  if (row?.database_name !== 'legal_ai_live_integration_scratch'
+    || Number(row.server_version_num) < 180000) {
+    throw new Error('KANBAN_SCRATCH_CREATOR_DATABASE_IDENTITY_MISMATCH');
+  }
+  return createKanbanTaskOnDatabase(input, scratchDb);
 }
 
 export async function createChildKanbanTask(input: z.infer<typeof KanbanTaskCreateChildInputSchema>): Promise<KanbanTask> {

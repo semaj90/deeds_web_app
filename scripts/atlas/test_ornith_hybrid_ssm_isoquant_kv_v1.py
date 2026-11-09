@@ -58,11 +58,17 @@ class TestOrnithHybridSsmIsoQuantKvV1(unittest.TestCase):
         self.assertTrue(probes["adv_04_deltanet_recurrent_state_checksum_immutability"]["passed"])
 
     def test_04_vram_budget_and_safety_flags(self) -> None:
-        self.assertEqual(self.report["status"], "PASS")
+        self.assertEqual(self.report["status"], "PASS_SYNTHETIC_CODEC_ONLY")
         self.assertFalse(self.report["canonicalAuthority"])
         self.assertFalse(self.report["writesPerformed"])
         self.assertFalse(self.report["kvCachePersisted"])
         self.assertFalse(self.report["ornith8090Disturbed"])
+        scope = self.report["evidenceScope"]
+        self.assertTrue(scope["inputTensorsSynthetic"])
+        self.assertFalse(scope["llamaCppKvCacheIntegration"])
+        self.assertFalse(scope["servingPromptLogitParityMeasured"])
+        self.assertFalse(scope["recurrentStateEditedOrRotated"])
+        self.assertTrue(scope["provesCodecMathAndSyntheticQuantizationOnly"])
         self.assertTrue(self.report["device"]["withinVramBudget"])
         self.assertLessEqual(self.report["device"]["peakCudaAllocatedMiB"], 32.0)
 
