@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import Skeleton from '$lib/components/ui/Skeleton.svelte';
-	import Icon from '$lib/components/ui/Icon.svelte';
+	import Icon from '$lib/components/cases/CaseIcon.svelte';
 	import SearchBar from '$lib/components/SearchBar.svelte';
 	import CaseCard from '$lib/components/cases/CaseCard.svelte';
 	import CaseViewModal from '$lib/components/cases/CaseViewModal.svelte';
@@ -536,7 +536,7 @@
 
 			<!-- CARDS VIEW -->
 			{:else if viewMode === 'cards'}
-				<div class="cs-grid">
+				<div class="cs-grid" class:cs-grid-single={filteredCases.length === 1}>
 					{#each filteredCases as caseItem (caseItem.id)}
 						<div class="cs-card" class:cs-card-selected={selectedCases.has(caseItem.id)}>
 							<!-- Selection Checkbox -->
@@ -819,28 +819,57 @@
 <style>
 	/* ── Page Layout — Theme-Aware ── */
 	.cases-page {
+		--t-bg: #f4f6fc;
+		--t-bg-elevated: #ffffff;
+		--t-panel: #ffffff;
+		--t-panel-2: #eef2fb;
+		--t-text: #202938;
+		--t-text-muted: #63718a;
+		--t-border: #e1e7f1;
+		--t-accent: #1769c2;
+		--t-accent-2: #536b96;
+		--t-shadow: rgba(30, 48, 82, 0.08);
+		--t-focus-ring: #1769c2;
 		display: flex;
 		flex-direction: column;
-		min-height: 100vh;
+		flex: 1;
+		min-width: 0;
+		width: 100%;
 		background: var(--t-bg, #0e0d0b);
-		margin: -2.5rem;
 		color: var(--t-text, rgba(212, 199, 163, 0.85));
+	}
+
+	:global(body:has(.cases-page)) {
+		color-scheme: light;
+		--t-bg: #f4f6fc;
+		--t-bg-elevated: #ffffff;
+		--t-panel: #ffffff;
+		--t-panel-2: #eef2fb;
+		--t-text: #202938;
+		--t-text-muted: #63718a;
+		--t-border: #e1e7f1;
+		--t-accent: #1769c2;
+		--t-accent-2: #536b96;
+		--t-shadow: rgba(30, 48, 82, 0.08);
+		--t-focus-ring: #1769c2;
+		background: #f4f6fc;
+		color: #202938;
 	}
 
 	.cases-page :global(h1),
 	.cases-page :global(h2),
 	.cases-page :global(h3),
-	.cases-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
-	.cases-page :global(a) { color: inherit; border-bottom: none; }
-	.cases-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
-	.cases-page :global(input), .cases-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
-	.cases-page :global([class*="panel"]), .cases-page :global(.card) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
+	.cases-page :global(p) { text-transform: none; letter-spacing: normal; }
+	.cases-page :global(a.cs-action-icon) { color: inherit; border-bottom: none; text-decoration: none; }
 
 	/* ── Header ── */
 	.cases-header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		gap: 1rem;
+		min-width: 0;
+		flex-wrap: wrap;
 		padding: 1rem 1.5rem;
 		border-bottom: 1px solid var(--t-border, rgba(212, 199, 163, 0.08));
 		background: var(--t-bg-elevated, rgba(0, 0, 0, 0.4));
@@ -851,12 +880,17 @@
 		display: flex;
 		align-items: flex-start;
 		gap: 0.875rem;
+		min-width: 0;
 	}
 
 	.cases-header-right {
 		display: flex;
 		align-items: center;
+		justify-content: flex-end;
+		flex-wrap: wrap;
 		gap: 0.75rem;
+		min-width: 0;
+		margin-left: auto;
 	}
 
 	.cases-icon-badge {
@@ -901,6 +935,7 @@
 	.cases-new-btn {
 		display: inline-flex;
 		align-items: center;
+		white-space: nowrap;
 		gap: 0.375rem;
 		padding: 0.5rem 1rem;
 		font-size: 0.8125rem;
@@ -969,11 +1004,11 @@
 	.stat-value { font-weight: 700; font-size: 0.875rem; }
 	.stat-label { color: inherit; opacity: 0.7; }
 
-	.stat-open { border-color: rgba(52, 211, 153, 0.3); color: #34d399; background: rgba(52, 211, 153, 0.06); }
-	.stat-inprogress { border-color: rgba(96, 165, 250, 0.3); color: #60a5fa; background: rgba(96, 165, 250, 0.06); }
-	.stat-pending { border-color: rgba(251, 191, 36, 0.3); color: #fbbf24; background: rgba(251, 191, 36, 0.06); }
-	.stat-high { border-color: rgba(248, 113, 113, 0.3); color: #f87171; background: rgba(248, 113, 113, 0.06); }
-	.stat-closed { border-color: rgba(148, 163, 184, 0.25); color: #94a3b8; background: rgba(148, 163, 184, 0.05); }
+	.stat-open { border-color: #a8dfbd; color: #187344; background: #edf8f1; }
+	.stat-inprogress { border-color: #b7cef4; color: #245da8; background: #eff5ff; }
+	.stat-pending { border-color: #f0d59c; color: #94600a; background: #fff8e8; }
+	.stat-high { border-color: #f1b9b9; color: #a62d2d; background: #fff1f1; }
+	.stat-closed { border-color: #d4dbe6; color: #596579; background: #f3f5f8; }
 
 	/* ── Shared Inputs ── */
 	.cs-input {
@@ -1214,28 +1249,53 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 1.75rem;
-		height: 1.75rem;
-		border-radius: 0.25rem;
-		color: var(--t-text-muted, rgba(212, 199, 163, 0.4));
+		width: 2rem;
+		height: 2rem;
+		border: 1px solid var(--t-border, rgba(212, 199, 163, 0.12));
+		border-radius: 0.375rem;
+		color: var(--t-text-muted, rgba(212, 199, 163, 0.62));
 		cursor: pointer;
-		transition: all 0.15s;
+		transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 		text-decoration: none;
-		background: none;
-		border: none;
+		background: color-mix(in srgb, var(--t-panel, #111) 72%, transparent);
 		padding: 0;
 	}
-	.cs-action-icon:hover { color: var(--t-accent, #34d399); background: color-mix(in srgb, var(--t-accent, #34d399) 8%, transparent); }
+	.cs-action-icon:hover {
+		color: var(--t-accent, #34d399);
+		border-color: color-mix(in srgb, var(--t-accent, #34d399) 36%, transparent);
+		background: color-mix(in srgb, var(--t-accent, #34d399) 10%, var(--t-panel, #111));
+	}
+	.cs-action-icon:focus-visible {
+		outline: 2px solid var(--t-accent, #34d399);
+		outline-offset: 2px;
+	}
 	.cs-action-icon:disabled { opacity: 0.4; cursor: not-allowed; }
 
 	.cs-checkbox, .cs-checkbox-head {
+		appearance: none;
+		display: grid;
+		place-content: center;
 		width: 1rem;
 		height: 1rem;
-		border-radius: 0.25rem;
-		border: 1px solid var(--t-border, rgba(212, 199, 163, 0.2));
-		background: color-mix(in srgb, var(--t-bg, #000) 80%, transparent);
+		margin: 0;
+		border-radius: 0.3rem;
+		border: 1px solid var(--t-border, rgba(212, 199, 163, 0.34));
+		background: color-mix(in srgb, var(--t-bg, #000) 82%, white 4%);
 		cursor: pointer;
-		accent-color: var(--t-accent, #34d399);
+		transition: background 0.15s ease, border-color 0.15s ease;
+	}
+	.cs-checkbox:checked, .cs-checkbox-head:checked {
+		border-color: var(--t-accent, #34d399);
+		background: var(--t-accent, #34d399);
+	}
+	.cs-checkbox:checked::after, .cs-checkbox-head:checked::after {
+		content: '';
+		width: 0.3rem;
+		height: 0.55rem;
+		border: solid #08110e;
+		border-width: 0 2px 2px 0;
+		transform: rotate(45deg);
+		margin-top: -0.1rem;
 	}
 
 	/* ── Fictional Badge ── */
@@ -1264,20 +1324,24 @@
 		display: grid;
 		gap: 1rem;
 	}
+	.cs-grid.cs-grid-single { grid-template-columns: minmax(0, min(100%, 52rem)); }
 	@media (min-width: 768px) { .cs-grid { grid-template-columns: repeat(2, 1fr); } }
 	@media (min-width: 1280px) { .cs-grid { grid-template-columns: repeat(3, 1fr); } }
+	@media (min-width: 768px) { .cs-grid.cs-grid-single { grid-template-columns: minmax(0, min(100%, 52rem)); } }
 
 	.cs-card {
 		position: relative;
 		border-radius: 0.75rem;
-		border: 1px solid var(--t-border, rgba(212, 199, 163, 0.08));
+		border: 1px solid color-mix(in srgb, var(--t-border, #3a3a3a) 78%, transparent);
 		background: var(--t-panel, rgba(0, 0, 0, 0.25));
 		padding: 1.25rem;
-		transition: all 0.2s ease;
+		box-shadow: 0 0.5rem 1.5rem color-mix(in srgb, var(--t-shadow, #000) 38%, transparent);
+		transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 	}
 	.cs-card:hover {
 		border-color: color-mix(in srgb, var(--t-accent, #34d399) 30%, transparent);
 		background: color-mix(in srgb, var(--t-panel, #000) 90%, var(--t-accent, #34d399));
+		box-shadow: 0 0.75rem 2rem color-mix(in srgb, var(--t-shadow, #000) 55%, transparent);
 	}
 	.cs-card-selected { border-color: color-mix(in srgb, var(--t-accent, #34d399) 40%, transparent); }
 
@@ -1353,17 +1417,17 @@
 		text-transform: capitalize;
 	}
 
-	.cs-badge-open { border-color: rgba(52, 211, 153, 0.4); background: rgba(52, 211, 153, 0.12); color: rgba(52, 211, 153, 0.9); }
-	.cs-badge-inprogress { border-color: rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.12); color: rgba(96, 165, 250, 0.9); }
-	.cs-badge-pending { border-color: rgba(251, 191, 36, 0.4); background: rgba(251, 191, 36, 0.12); color: rgba(251, 191, 36, 0.9); }
-	.cs-badge-closed { border-color: rgba(148, 163, 184, 0.3); background: rgba(148, 163, 184, 0.1); color: rgba(148, 163, 184, 0.8); }
-	.cs-badge-archived { border-color: rgba(107, 114, 128, 0.3); background: rgba(107, 114, 128, 0.1); color: rgba(107, 114, 128, 0.7); }
-	.cs-badge-critical { border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.12); color: rgba(239, 68, 68, 0.9); }
-	.cs-badge-urgent { border-color: rgba(249, 115, 22, 0.4); background: rgba(249, 115, 22, 0.12); color: rgba(249, 115, 22, 0.9); }
-	.cs-badge-high { border-color: rgba(234, 179, 8, 0.4); background: rgba(234, 179, 8, 0.12); color: rgba(234, 179, 8, 0.9); }
-	.cs-badge-medium { border-color: rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.12); color: rgba(96, 165, 250, 0.9); }
-	.cs-badge-low { border-color: rgba(52, 211, 153, 0.4); background: rgba(52, 211, 153, 0.12); color: rgba(52, 211, 153, 0.9); }
-	.cs-badge-default { border-color: rgba(148, 163, 184, 0.3); background: rgba(148, 163, 184, 0.1); color: rgba(148, 163, 184, 0.7); }
+	.cs-badge-open { border-color: #a8dfbd; background: #edf8f1; color: #187344; }
+	.cs-badge-inprogress { border-color: #b7cef4; background: #eff5ff; color: #245da8; }
+	.cs-badge-pending { border-color: #f0d59c; background: #fff8e8; color: #94600a; }
+	.cs-badge-closed { border-color: #d4dbe6; background: #f3f5f8; color: #596579; }
+	.cs-badge-archived { border-color: #d4dbe6; background: #f3f5f8; color: #475569; }
+	.cs-badge-critical { border-color: #efb7b7; background: #fff1f1; color: #a62d2d; }
+	.cs-badge-urgent { border-color: #f3c4a7; background: #fff4ed; color: #a54216; }
+	.cs-badge-high { border-color: #f0d59c; background: #fff8e8; color: #94600a; }
+	.cs-badge-medium { border-color: #b7cef4; background: #eff5ff; color: #245da8; }
+	.cs-badge-low { border-color: #a8dfbd; background: #edf8f1; color: #187344; }
+	.cs-badge-default { border-color: #d4dbe6; background: #f3f5f8; color: #596579; }
 
 	/* ── Card Metadata ── */
 	.cs-card-meta {
@@ -1499,8 +1563,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(0, 0, 0, 0.7);
-		backdrop-filter: blur(4px);
+		background: rgba(30, 42, 66, 0.22);
+		backdrop-filter: blur(7px);
 		padding: 1rem;
 	}
 
@@ -1510,7 +1574,7 @@
 		border-radius: 0.75rem;
 		border: 1px solid var(--t-border, rgba(212, 199, 163, 0.1));
 		background: var(--t-bg-elevated, rgba(19, 21, 25, 0.98));
-		box-shadow: 0 24px 80px -20px rgba(0, 0, 0, 0.6);
+		box-shadow: 0 24px 64px -24px rgba(31, 45, 72, 0.3);
 	}
 
 	.cs-analysis-modal {
@@ -1522,7 +1586,7 @@
 		border-radius: 0.75rem;
 		border: 1px solid var(--t-border, rgba(212, 199, 163, 0.1));
 		background: var(--t-bg-elevated, rgba(19, 21, 25, 0.98));
-		box-shadow: 0 24px 80px -20px rgba(0, 0, 0, 0.6);
+		box-shadow: 0 24px 64px -24px rgba(31, 45, 72, 0.3);
 	}
 
 	.cs-modal-header {

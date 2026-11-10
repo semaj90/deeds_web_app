@@ -156,9 +156,20 @@
 			formData.append('title', selectedFile.name);
 			formData.append('evidenceType', isImageFile(selectedFile) ? 'photo' : 'document');
 
-			const res = await fetch('/api/evidence/upload', { method: 'POST', body: formData });
+			const res = await fetch('/api/evidence/upload', {
+				method: 'POST',
+				body: formData,
+				credentials: 'same-origin',
+				headers: { Accept: 'application/json' }
+			});
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+				if (res.status === 401) {
+					throw new Error('Your sign-in session is unavailable for this upload. Refresh the page, sign in again, and retry; your selected file is still here.');
+				}
+				if (res.status === 403 && /evidence-owner identity/i.test(err.error || '')) {
+					throw new Error('This account is missing a valid evidence-owner ID. No file was accepted; contact an administrator to repair the account mapping.');
+				}
 				throw new Error(err.error || err.message || `Upload could not be completed (${res.status})`);
 			}
 			const data = await res.json();
@@ -221,6 +232,7 @@
 			<!-- Header -->
 			<div class="upload-modal-header">
 				<div>
+					<p class="upload-modal-kicker">CASE EVIDENCE · SECURE INTAKE</p>
 					<h2 class="text-lg font-semibold text-sand">Upload Evidence</h2>
 					<p class="text-xs text-sand/50 mt-0.5">Processing status appears after the evidence record is accepted.</p>
 				</div>
@@ -315,7 +327,7 @@
 
 					<!-- Error -->
 					{#if uploadError}
-						<div class="flex items-center gap-2 bg-red-900/10 border border-red-800/20 rounded-lg p-3 text-sm text-red-400 mt-3">
+						<div class="upload-modal-error flex items-center gap-2 rounded-lg p-3 text-sm mt-3" role="alert">
 							<Icon name="circle-alert" size={16} class="shrink-0" />
 							<span class="font-medium">Upload issue:</span>
 							<span>{uploadError}</span>
@@ -621,32 +633,75 @@
 			flex-direction: column-reverse;
 		}
 	}
-	.upload-modal-card {
-		background: linear-gradient(155deg, #fffdf8 0%, #f5ead6 100%);
-		border: 1px solid #d8c39a;
-		box-shadow: 0 24px 64px rgba(36, 26, 20, 0.28), inset 0 1px 0 #fff;
-		color: #342621;
+	.upload-modal-overlay {
+		background: rgba(21, 25, 33, 0.62);
+		backdrop-filter: blur(10px) saturate(0.88);
 	}
-	.upload-modal-card :global(.text-sand) { color: #342621; }
-	.upload-modal-card :global(.text-sand\/80) { color: #514138; }
-	.upload-modal-card :global(.text-sand\/70) { color: #66554a; }
+	.upload-modal-card {
+		background: linear-gradient(155deg, #fffefa 0%, #f4eee4 100%);
+		border: 1px solid #b9cbbb;
+		border-radius: 20px;
+		box-shadow: 0 28px 80px rgba(24, 28, 37, 0.34), inset 0 1px 0 #fff;
+		color: #222936;
+	}
+	.upload-modal-card :global(.text-sand) { color: #202734; }
+	.upload-modal-card :global(.text-sand\/80) { color: #4d5562; }
+	.upload-modal-card :global(.text-sand\/70) { color: #5c626d; }
 	.upload-modal-card :global(.text-sand\/50),
-	.upload-modal-card :global(.text-sand\/40) { color: #796b5d; }
-	.upload-modal-header, .upload-modal-footer { border-color: #e0d1b7; }
+	.upload-modal-card :global(.text-sand\/40) { color: #73747a; }
+	.upload-modal-card :global(.text-sand\/30) { color: #9a865c; }
+	.upload-modal-header, .upload-modal-footer { border-color: #e4dac8; }
+	.upload-modal-kicker {
+		margin: 0 0 0.35rem;
+		color: #52745b;
+		font-size: 0.64rem;
+		font-weight: 700;
+		letter-spacing: 0.16em;
+	}
 	.upload-modal-close, .upload-modal-change, .upload-modal-secondary {
-		background: #fffaf0;
-		border-color: #ddcdb3;
-		color: #5e4b3e;
+		background: #fffdf8;
+		border: 1px solid #d9cdb9;
+		color: #333b48;
 	}
 	.upload-modal-zone {
-		border-color: #cbb789;
-		background: radial-gradient(circle at 92% 8%, rgba(190, 154, 86, 0.12), transparent 34%), linear-gradient(180deg, #fffdf8, #f6eddc);
-		box-shadow: 0 12px 28px rgba(77, 49, 32, 0.08), inset 0 1px 0 #fff;
+		border-color: #b7cbb7;
+		border-radius: 16px;
+		background: radial-gradient(circle at 92% 8%, rgba(86, 126, 91, 0.09), transparent 34%), linear-gradient(180deg, #fffefa, #f4f6ef);
+		box-shadow: 0 12px 28px rgba(55, 46, 32, 0.07), inset 0 1px 0 #fff;
 	}
-	.upload-modal-zone:hover, .upload-modal-zone.dragging { border-color: #8c3335; background: linear-gradient(180deg, #fffaf0, #f2e3c9); }
-	.upload-modal-select, .upload-modal-primary { background: linear-gradient(135deg, #812a30, #5b1f27); border-color: #6a2026; color: #fff8e9; }
-	.upload-modal-hint { color: #796b5d; }
-	.upload-modal-file-card { background: linear-gradient(180deg, #fffdf7, #f3ead7); border-color: #d6bd8d; box-shadow: inset 0 1px 0 #fff; }
-	.upload-modal-secondary:hover:not(:disabled), .upload-modal-change:hover { background: #f5ead6; border-color: #c9ae7b; color: #67272d; }
-	.upload-modal-close:hover { background: #f5ead6; border-color: #c9ae7b; color: #67272d; }
+	.upload-modal-zone:hover, .upload-modal-zone.dragging {
+		border-color: #628267;
+		background: linear-gradient(180deg, #fffefa, #edf3e9);
+	}
+	.upload-modal-zone:focus-visible { outline-color: #628267; }
+	.upload-modal-select, .upload-modal-primary {
+		background: linear-gradient(135deg, #52745b, #355a40);
+		border: 1px solid #3e6248;
+		color: #fffefa;
+		box-shadow: 0 8px 18px rgba(49, 82, 58, 0.18);
+	}
+	.upload-modal-select:hover, .upload-modal-primary:hover:not(:disabled) { filter: brightness(1.08); }
+	.upload-modal-hint { color: #77716a; }
+	.upload-modal-file-card {
+		background: linear-gradient(180deg, #fffefa, #f1eadc);
+		border-color: #d7c69e;
+		box-shadow: inset 0 1px 0 #fff;
+	}
+	.upload-modal-secondary:hover:not(:disabled), .upload-modal-change:hover, .upload-modal-close:hover {
+		background: #edf3e9;
+		border-color: #a9c1a7;
+		color: #355a40;
+	}
+	.upload-modal-error {
+		border: 1px solid #d8b7a7;
+		background: #fff1e9;
+		color: #813b32;
+	}
+	.upload-modal-card :global(.bg-green-900\/10) {
+		border-color: #b9d5c4;
+		background: #edf7f0;
+		color: #263b30;
+	}
+	.upload-modal-card :global(.text-green-400) { color: #286044; }
+	.upload-modal-card :global(.text-red-700) { color: #8b3036; }
 </style>

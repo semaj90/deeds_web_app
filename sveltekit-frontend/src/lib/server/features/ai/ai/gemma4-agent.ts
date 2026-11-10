@@ -1071,6 +1071,11 @@ interface ToolResult {
   tool: string;
   result: unknown;
   errorMsg?: string;
+  rankingMode?: string;
+  topologyStatus?: string;
+  fallbackReason?: string | null;
+  identityJoin?: { matched: number; unmatched: number } | null;
+  errorCode?: string;
 }
 
 type GoHit = { clusterKey?: string; topoClass?: string; path?: string; score?: number };
@@ -1257,17 +1262,24 @@ async function dispatchTool(
       const somCluster = args.somCluster != null ? Number(args.somCluster) : undefined;
 
       const result = await queryTopology(query, { radius, limit, somCluster });
-      if (!result) {
+      if (!result.ok) {
         return {
           tool: name,
           result: [],
-          errorMsg:
-            'Topology search engine unavailable (port 8101). Run: node scripts/topology-search-server.mjs',
+          rankingMode: result.rankingMode,
+          topologyStatus: result.topologyStatus,
+          fallbackReason: result.fallbackReason ?? null,
+          errorCode: result.errorCode ?? 'TOPOLOGY_SEARCH_UNAVAILABLE',
+          errorMsg: result.error ?? 'Topology search is unavailable',
         };
       }
 
       return {
         tool: name,
+        rankingMode: result.rankingMode,
+        topologyStatus: result.topologyStatus,
+        fallbackReason: result.fallbackReason ?? null,
+        identityJoin: result.identityJoin ?? null,
         result: {
           center: result.center,
           radius: result.radius,
@@ -1275,6 +1287,12 @@ async function dispatchTool(
           durationMs: result.durationMs,
           hits: (result.hits ?? []).slice(0, limit).map((h) => ({
             path: h.path,
+            stableKey: h.stableKey,
+            sourceRef: h.sourceRef ?? null,
+            sourceRevision: h.sourceRevision ?? null,
+            contentHash: h.contentHash ?? null,
+            representationRevision: h.representationRevision ?? null,
+            topologySnapshotRevision: h.topologySnapshotRevision ?? null,
             topoClass: h.topoClass,
             topoHex: h.topoHex,
             somCluster: h.somCluster,

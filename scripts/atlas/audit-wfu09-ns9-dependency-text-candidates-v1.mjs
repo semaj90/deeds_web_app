@@ -31,14 +31,23 @@ for (const row of controller.allTasks ?? []) {
   if (sep < 1) continue;
   const change = logical.slice(0, sep);
   const id = logical.slice(sep + 1);
+  const baseId = id.split('@', 1)[0];
   (byLogical.get(logical) ?? byLogical.set(logical, []).get(logical)).push(row);
-  const localKey = `${change}:${id}`;
-  (byChangeAndId.get(localKey) ?? byChangeAndId.set(localKey, []).get(localKey)).push(row);
-  (byId.get(id) ?? byId.set(id, []).get(id)).push(row);
+  for (const candidateId of new Set([id, baseId])) {
+    const globalKey = `${candidateId}`;
+    (byId.get(globalKey) ?? byId.set(globalKey, []).get(globalKey)).push(row);
+    const scopedKey = `${change}:${candidateId}`;
+    (byChangeAndId.get(scopedKey) ?? byChangeAndId.set(scopedKey, []).get(scopedKey)).push(row);
+  }
 }
 
 const cue = /(?:\bdepends?\s+on\b|\brequires?\b|\bafter\b|\bblocked\s+by\b|\bonly\s+after\b|\bprerequisite\s+for\b|\bgated?\s+(?:behind|on|by)\b)/ig;
-const taskId = /\b(?:WFU-\d+[a-z]?|NS-\d+[a-z]?|TOPO-\d+[a-z]?|[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d+[a-z]?)\b/g;
+const taskId = /\b(?:WFU-\d+[a-z]?|NS-\d+[a-z]?|TOPO-\d+[a-z]?|[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d+[a-z]?)(?:\/\d+[a-z]?)*\b/g;
+const expandIdToken = (token) => {
+  const [first, ...suffixes] = token.split('/');
+  const prefix = first.replace(/-\d+[a-z]?$/i, '-');
+  return [first, ...suffixes.map((suffix) => `${prefix}${suffix}`)];
+};
 // These labels can occur in checkbox text and satisfy the broad legacy ID
 // shape, but they name encodings/checksums rather than work items.
 const nonTaskIdLabels = new Set(['SHA-256', 'UTF-8', 'UTF-16']);
@@ -71,41 +80,64 @@ for (const inventoryTask of inventory.tasks ?? []) {
       continue;
     }
     const text = block.join('\n');
-    const sourceChange = inventoryTask.logicalTaskKey?.split(':')[0];
+    const sourceChange = inventoryTask.logicalTaskKey?.split(':')[0]
+      ?? /^openspec\/changes\/([^/]+)\/tasks\.md$/.exec(sourceRef)?.[1]
+      ?? null;
     const found = new Map();
     for (const cueMatch of text.matchAll(cue)) {
+      const contextBeforeCue = text.slice(Math.max(0, cueMatch.index - 48), cueMatch.index);
+      if (/\b(?:does|do|did)\s+not\s*$/i.test(contextBeforeCue)) continue;
+      if (/^after$/i.test(cueMatch[0]) && /\bno\s+live\s+consumer\s*$/i.test(contextBeforeCue)) continue;
       const cueEnd = cueMatch.index + cueMatch[0].length;
       const tail = text.slice(cueEnd, cueEnd + 56);
       for (const refMatch of tail.matchAll(taskId)) {
-        const id = refMatch[0];
-        if (nonTaskIdLabels.has(id)) continue;
-        if (id === inventoryTask.logicalTaskKey?.split(':').slice(1).join(':')) continue;
         const prefix = tail.slice(0, refMatch.index);
         if (/[.!?;\n]/.test(prefix)) break;
         if (/\b(?:candidates?|files?|generated|changed|list|baseline|report)\b/i.test(prefix)) continue;
-        const local = byChangeAndId.get(`${sourceChange}:${id}`) ?? [];
-        const global = byId.get(id) ?? [];
-        const resolved = local.length === 1 ? local : local.length > 1 ? local : global;
-        const resolution = resolved.length === 1 ? 'UNIQUE_CANDIDATE'
-          : resolved.length > 1 ? 'AMBIGUOUS_CANDIDATE' : 'UNRESOLVED_CANDIDATE';
-        const start = Math.max(0, cueMatch.index - 56);
-        const idEnd = cueEnd + refMatch.index + id.length;
-        const end = Math.min(text.length, idEnd + 56);
-        const key = `${cueMatch.index}:${id}`;
-        found.set(key, {
-          referencedId: id,
-          cue: cueMatch[0],
-          resolution,
-          candidateTaskKeys: resolved.slice(0, 8).map((row) => row.taskKey).sort(),
-          sourceQuote: text.slice(start, end).replace(/\s+/g, ' ').trim(),
-          sourceRef,
-          sourceLine: inventoryTask.sourceLine,
-          sourceBlockHash: observedBlockHash,
-          sourceFileSha256: source.sha256,
-          decision: null,
-          reviewerNotes: null,
-          executable: false,
-        });
+        if (/^\s*(?:closing|completing|completion\s+of)\b/i.test(prefix)
+          && /^prerequisite\s+for$/i.test(cueMatch[0])) continue;
+        const ids = expandIdToken(refMatch[0]);
+        for (const id of ids) {
+          if (nonTaskIdLabels.has(id)) continue;
+          if (id === inventoryTask.logicalTaskKey?.split(':').slice(1).join(':')) continue;
+          const local = sourceChange ? byChangeAndId.get(`${sourceChange}:${id}`) ?? [] : [];
+          const localSuffix = !local.length && sourceChange
+            ? (controller.allTasks ?? []).filter((row) => {
+              const logical = typeof row.logicalTaskKey === 'string' ? row.logicalTaskKey : '';
+              const separator = logical.indexOf(':');
+              if (separator < 1 || logical.slice(0, separator) !== sourceChange) return false;
+              const taskIdValue = logical.slice(separator + 1).split('@', 1)[0];
+              return taskIdValue.endsWith(`-${id}`);
+            })
+            : [];
+          const global = byId.get(id) ?? [];
+          const resolved = local.length === 1 ? local
+            : local.length > 1 ? local
+              : localSuffix.length ? localSuffix : global;
+          const resolution = resolved.length === 1 ? 'UNIQUE_CANDIDATE'
+            : resolved.length > 1 ? 'AMBIGUOUS_CANDIDATE' : 'UNRESOLVED_CANDIDATE';
+          const resolutionScope = local.length ? 'SAME_CHANGE'
+            : localSuffix.length ? 'SAME_CHANGE_SUFFIX' : 'GLOBAL_FALLBACK';
+          const start = Math.max(0, cueMatch.index - 56);
+          const idEnd = cueEnd + refMatch.index + refMatch[0].length;
+          const end = Math.min(text.length, idEnd + 56);
+          const key = `${cueMatch.index}:${id}`;
+          found.set(key, {
+            referencedId: id,
+            cue: cueMatch[0],
+            resolution,
+            resolutionScope,
+            candidateTaskKeys: resolved.slice(0, 8).map((row) => row.taskKey).sort(),
+            sourceQuote: text.slice(start, end).replace(/\s+/g, ' ').trim(),
+            sourceRef,
+            sourceLine: inventoryTask.sourceLine,
+            sourceBlockHash: observedBlockHash,
+            sourceFileSha256: source.sha256,
+            decision: null,
+            reviewerNotes: null,
+            executable: false,
+          });
+        }
       }
     }
     if (found.size) candidates.push({ taskKey: inventoryTask.taskKey, logicalTaskKey: inventoryTask.logicalTaskKey, candidates: [...found.values()] });
@@ -137,6 +169,7 @@ const report = {
     uniquelyResolvable: refs.filter((row) => row.resolution === 'UNIQUE_CANDIDATE').length,
     ambiguous: refs.filter((row) => row.resolution === 'AMBIGUOUS_CANDIDATE').length,
     unresolved: refs.filter((row) => row.resolution === 'UNRESOLVED_CANDIDATE').length,
+    sameChangeResolved: refs.filter((row) => ['SAME_CHANGE', 'SAME_CHANGE_SUFFIX'].includes(row.resolutionScope) && row.resolution === 'UNIQUE_CANDIDATE').length,
     failures: failures.length,
   },
   rule: 'A cue plus an ID mention is only a review candidate. It is not a declared dependency and cannot affect scheduling, ranking, readiness, or task execution until a human approves and the owning task ledger receives a source-backed wfu declaration.',

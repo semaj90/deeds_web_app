@@ -18,6 +18,7 @@
 	let isGenerating = $state(false);
 	let isExporting = $state(false);
 	let isPublishing = $state(false);
+	let reportError = $state('');
 
 	function openResume(report: any) {
 		selectedReport = report;
@@ -25,6 +26,7 @@
 	}
 
 	function openEditor(report?: any) {
+		reportError = '';
 		if (report) {
 			selectedReport = report;
 			editorContent = report.content || '';
@@ -42,6 +44,7 @@
 		if (!caseData?.id) return;
 
 		isGenerating = true;
+		reportError = '';
 		try {
 			const res = await fetch('/api/reports/generate', {
 				method: 'POST',
@@ -51,14 +54,17 @@
 			});
 			const responseData = await res.json();
 
-			if (responseData.success && responseData.report) {
+			if (res.ok && responseData.success && responseData.report) {
 				selectedReport = responseData.report;
 				editorContent = responseData.report.content || '';
 				editorTitle = responseData.report.title || 'Charging Memo';
 				showEditor = true;
+			} else {
+				reportError = responseData.error || 'The report draft could not be generated.';
 			}
 		} catch (error) {
 			console.error('Failed to generate charging memo:', error);
+			reportError = 'The report draft could not be generated. Try again.';
 		} finally {
 			isGenerating = false;
 		}
@@ -66,6 +72,7 @@
 
 	async function saveReport() {
 		isSaving = true;
+		reportError = '';
 		try {
 			if (selectedReport?.id) {
 				const res = await fetch('/api/reports/save', {
@@ -79,9 +86,8 @@
 					signal: AbortSignal.timeout(30_000)
 				});
 				const responseData = await res.json();
-				if (responseData.success) {
-					selectedReport = responseData.report;
-				}
+				if (!res.ok || !responseData.success) throw new Error(responseData.error || 'Report could not be saved.');
+				selectedReport = responseData.report;
 			} else {
 				const res = await fetch('/api/reports', {
 					method: 'POST',
@@ -95,13 +101,13 @@
 					signal: AbortSignal.timeout(30_000)
 				});
 				const responseData = await res.json();
-				if (responseData.success && responseData.data) {
-					selectedReport = responseData.data;
-				}
+				if (!res.ok || !responseData.success || !responseData.data) throw new Error(responseData.error || 'Report could not be saved.');
+				selectedReport = responseData.data;
 			}
 			await invalidateAll();
 		} catch (error) {
 			console.error('Failed to save report:', error);
+			reportError = error instanceof Error ? error.message : 'Report could not be saved. Try again.';
 		} finally {
 			isSaving = false;
 		}
@@ -295,6 +301,7 @@
 								class="cr-title-input"
 								bind:value={editorTitle}
 								placeholder="Report Title"
+								aria-label="Report title"
 							/>
 						</div>
 						<div class="cr-editor-actions">
@@ -328,6 +335,9 @@
 							</button>
 						</div>
 					</header>
+					{#if reportError}
+						<p class="cr-report-error" role="alert">{reportError}</p>
+					{/if}
 
 					<Dialog.Description class="sr-only">
 						Edit the report content using the rich text editor below.
@@ -620,5 +630,110 @@
 		flex: 1;
 		overflow: auto;
 		min-height: 0;
+	}
+	:global(.cr-modal) {
+		border: 1px solid #b9cbbb;
+		border-radius: 1rem;
+		background: #fffdf8;
+		box-shadow: 0 28px 80px rgba(21, 29, 31, 0.3), inset 0 1px 0 #fff;
+		color: #25302d;
+	}
+	:global(.cr-overlay) { background: rgba(20, 28, 31, 0.58); backdrop-filter: blur(8px); }
+	.cr-modal-editor {
+		max-width: min(76rem, calc(100vw - 2rem));
+		height: min(88vh, 58rem);
+		padding: 1.25rem 1.5rem 1rem;
+		gap: 0.8rem;
+	}
+	.cr-editor-header {
+		padding: 0.25rem 0 0.9rem;
+		border-bottom: 1px solid #dbe4d8;
+	}
+	:global(.cr-modal-label) { color: #52745b; letter-spacing: 0.18em; }
+	.cr-title-input {
+		max-width: 46rem;
+		color: #202b2b;
+		border-bottom-color: #c5d3c4;
+		font-size: clamp(1rem, 1.35vw, 1.25rem);
+	}
+	.cr-title-input:focus { border-bottom-color: #4e7758; }
+	.cr-editor-actions { flex-wrap: wrap; justify-content: flex-end; }
+	:global(.cr-modal .cr-pill-btn) {
+		min-height: 2.25rem;
+		padding: 0.4rem 0.85rem;
+		border-color: #cbd8ca;
+		background: #fffefa;
+		color: #36443d;
+		font-size: 0.75rem;
+	}
+	:global(.cr-modal .cr-pill-btn:hover:not(:disabled)) { background: #edf4ec; border-color: #96b29a; }
+	:global(.cr-modal .cr-pill-btn.primary),
+	:global(.cr-modal .cr-pill-btn.success) { background: #3f6d4d; border-color: #3f6d4d; color: #fff; }
+	:global(.cr-modal .cr-pill-btn.primary:hover:not(:disabled)),
+	:global(.cr-modal .cr-pill-btn.success:hover:not(:disabled)) { background: #31583e; }
+	.cr-editor-body { padding-top: 0.15rem; }
+	:global(.cr-modal-editor .report-editor-shell) {
+		min-height: 0;
+		border: 0;
+		border-radius: 0.75rem;
+		background: #fffdf8;
+		box-shadow: none;
+	}
+	:global(.cr-modal-editor .editor-toolbar) {
+		gap: 0.3rem;
+		padding: 0.65rem 0.25rem;
+		border-bottom: 1px solid #e1e7dd;
+		background: #f6f7f1;
+	}
+	:global(.cr-modal-editor .toolbar-button) {
+		min-width: 2.35rem;
+		padding: 0.35rem 0.55rem;
+		border: 1px solid transparent;
+		border-radius: 0.45rem;
+		color: #34443a;
+		font-size: 0.76rem;
+	}
+	:global(.cr-modal-editor .toolbar-button:hover),
+	:global(.cr-modal-editor .toolbar-button:focus-visible),
+	:global(.cr-modal-editor .toolbar-button-active) {
+		background: #e6efe4 !important;
+		border-color: #c5d8c4;
+		color: #315b3d !important;
+	}
+	:global(.cr-modal-editor .editor-toolbar > .flex-1) { min-width: 1rem; }
+	:global(.cr-modal-editor .relative.flex-1) { background: #fffdf8; }
+	:global(.cr-modal-editor .ProseMirror) {
+		width: min(100%, 72ch);
+		min-height: 100%;
+		margin: 0 auto;
+		padding: 2.25rem clamp(1rem, 5vw, 4.5rem);
+		color: #26312e;
+		font-family: Georgia, 'Times New Roman', serif;
+		font-size: 1rem;
+		line-height: 1.75;
+		text-align: left;
+		overflow-wrap: anywhere;
+		word-break: normal;
+	}
+	:global(.cr-modal-editor .ProseMirror p) { margin: 0 0 1em; }
+	:global(.cr-modal-editor .ProseMirror h1),
+	:global(.cr-modal-editor .ProseMirror h2) { color: #25382d; line-height: 1.25; }
+	:global(.cr-modal-editor .ProseMirror ul),
+	:global(.cr-modal-editor .ProseMirror ol) { padding-left: 1.65rem; margin: 0.75rem 0 1rem; }
+	:global(.cr-modal-editor .editor-toolbar + .relative + div) { border-color: #e1e7dd; background: #f6f7f1; }
+	.cr-report-error {
+		margin: 0;
+		padding: 0.65rem 0.8rem;
+		border: 1px solid #dfb8aa;
+		border-radius: 0.55rem;
+		background: #fff2ec;
+		color: #843d31;
+		font-size: 0.8rem;
+	}
+	@media (max-width: 760px) {
+		.cr-modal-editor { height: 94vh; padding: 0.85rem; }
+		.cr-editor-header { align-items: stretch; flex-direction: column; }
+		.cr-editor-actions { justify-content: flex-start; }
+		:global(.cr-modal-editor .ProseMirror) { padding: 1.25rem 1rem; }
 	}
 </style>

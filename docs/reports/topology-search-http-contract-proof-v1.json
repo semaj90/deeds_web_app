@@ -1,0 +1,81 @@
+{
+  "schema": "atlas.topology-search-http-contract-proof.v1",
+  "generatedAt": "2026-11-10T05:24:52.768Z",
+  "status": "CONTRACT_TESTED_PARTIAL",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "serviceLifecycleActions": false,
+  "databaseOrProjectionWrites": false,
+  "sourceFileHashes": {
+    "sveltekit-frontend/scripts/topology-search-server.mjs": "sha256:0e0d77e61a4ae6f3923c134084f507099bbbcfae622c5d2d12b7ff82b4bba716",
+    "sveltekit-frontend/scripts/topology-search-http.mjs": "sha256:5d0b0863c7b765f5c5bf2affd42150026ee471800b56ebe7069a46c6ad682f8e",
+    "sveltekit-frontend/scripts/topology-search-contract.mjs": "sha256:89ad229fed588633fc79e75c4b7b2c99f99607534459b0ef485a63c08d0c1de3",
+    "sveltekit-frontend/scripts/topology-search-contract.test.mjs": "sha256:52e06b99d2f1391ca31d0a243a4f499a45725c00a41b93a1bf146072d472a937",
+    "sveltekit-frontend/scripts/topology-search-http.test.mjs": "sha256:0c0123bc38d7ad2e7c2c935a0d7660c212aece7c1c1d4f424cfb4c420e17ef91",
+    "sveltekit-frontend/src/lib/server/retrieval/topology-search-client.ts": "sha256:707cf3d95befe229dcea59e16f0cbe803730030e6042b74f9971348341494993",
+    "sveltekit-frontend/src/lib/server/retrieval/topology-search-client.spec.ts": "sha256:abfc06a321086724d50d9b66c507d968e02e23bf03a97c20d2e8246c0395b3c7",
+    "sveltekit-frontend/src/mcp/tools/topology-search.tool.ts": "sha256:9d9446113e3748d71891182ee4fd8b833db173d36c723f6b1e61049920acf6ab",
+    "sveltekit-frontend/src/mcp/tools/trace-kag.tool.ts": "sha256:a46f506e4d1334098cb2aef4c868570e5f1773e7defbf37e6ef4a49d988e419e",
+    "sveltekit-frontend/src/lib/server/features/ai/ai/gemma4-agent.ts": "sha256:fa4b3cf880ff5374ab0ae66de2966fbe3d3820d4949010e0179ecc8b55854603"
+  },
+  "verification": {
+    "nodeSyntax": "PASS",
+    "nodeContractAndHttpTests": {
+      "command": "node --test scripts/topology-search-contract.test.mjs scripts/topology-search-http.test.mjs",
+      "passed": 14,
+      "failed": 0
+    },
+    "clientTests": {
+      "command": "npm exec -- vitest run src/lib/server/retrieval/topology-search-client.spec.ts",
+      "passed": 3,
+      "failed": 0
+    },
+    "targetedLint": {
+      "command": "npm exec -- eslint src/lib/server/retrieval/topology-search-client.ts src/lib/server/retrieval/topology-search-client.spec.ts src/mcp/tools/trace-kag.tool.ts src/mcp/tools/topology-search.tool.ts",
+      "result": "PASS"
+    },
+    "fullSvelteCheck": {
+      "command": "npm run check",
+      "result": "NOT_CONFIRMED",
+      "note": "First completed run found an unrelated browser-generation type error and adapter typing errors that were corrected. A subsequent full run produced no diagnostics before it was interrupted after prolonged no-output execution."
+    },
+    "broadGemmaLint": {
+      "result": "EXISTING_FAILURES",
+      "count": 10,
+      "note": "Lint errors are in gemma4-agent.ts at unrelated pre-existing locations; no lint error was reported in the other changed adapters."
+    },
+    "diffCheck": "PASS"
+  },
+  "scope": {
+    "httpTestsUse": "OS-assigned ephemeral loopback port and injected mock handlers",
+    "liveDatabaseQdrantEmbedding": "NOT_TESTED",
+    "listener8101": "NOT_STARTED_OR_RESTARTED",
+    "topologyJoinIdentity": [
+      "stableKey",
+      "sourceRef",
+      "sourceRevision",
+      "contentHash",
+      "representationRevision or topologySnapshotRevision"
+    ],
+    "pathOnlyJoin": "REJECTED",
+    "hybridWeights": {
+      "cosine": 0.6,
+      "topology": 0.4,
+      "changed": false
+    },
+    "cpuOracleCases": [
+      "current identity",
+      "stale revision",
+      "duplicate path",
+      "unmatched topology identity",
+      "ambiguous duplicate identity"
+    ]
+  },
+  "openGates": [
+    "Live database and Qdrant schema/data readiness is unknown.",
+    "Actual source/revision/representation identity population and cross-store correspondence are unverified.",
+    "No end-to-end request against a live topology service has been admitted.",
+    "No retrieval-quality comparison against live fixed-corpus CPU oracle was run.",
+    "The server remains optional and unadmitted; deployed process revision is unknown."
+  ]
+}

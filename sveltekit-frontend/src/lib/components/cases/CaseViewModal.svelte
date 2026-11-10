@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Dialog } from 'bits-ui';
-	import Icon from '$lib/components/ui/Icon.svelte';
+	import Icon from '$lib/components/cases/CaseIcon.svelte';
 	import { goto } from '$app/navigation';
 
 	let {
@@ -19,9 +19,16 @@
 	let isLoading = $state(false);
 	let loadError = $state<string | null>(null);
 
+	function isUsableCaseId(value: unknown): value is string {
+		return typeof value === 'string' && value.trim().length > 0 && !/^(null|undefined)$/i.test(value.trim());
+	}
+
 	$effect(() => {
-		if (open && caseId) {
+		if (open && isUsableCaseId(caseId)) {
 			loadCase(caseId);
+		} else if (open) {
+			caseData = null;
+			loadError = 'This case does not have a valid record ID.';
 		} else if (!open) {
 			setTimeout(() => { caseData = null; loadError = null; }, 200);
 		}
@@ -43,14 +50,14 @@
 		}
 	}
 
-	function close() {
-		open = false;
-		onClose();
+	function handleOpenChange(nextOpen: boolean) {
+		open = nextOpen;
+		if (!nextOpen) onClose();
 	}
 
 	function openFullCase() {
-		if (caseId) {
-			close();
+		if (isUsableCaseId(caseId) && isUsableCaseId(caseData?.id)) {
+			handleOpenChange(false);
 			goto(`/cases/${caseId}`);
 		}
 	}
@@ -63,22 +70,22 @@
 	}
 
 	const STATUS_COLOR: Record<string, string> = {
-		open: '#34d399',
-		in_progress: '#60a5fa',
-		pending_review: '#fbbf24',
-		closed: '#94a3b8',
-		archived: '#64748b'
+		open: '#53694f',
+		in_progress: '#536887',
+		pending_review: '#8a6841',
+		closed: '#625d57',
+		archived: '#756d64'
 	};
 	const PRIORITY_COLOR: Record<string, string> = {
-		critical: '#f87171',
-		urgent: '#fb923c',
-		high: '#facc15',
-		medium: '#60a5fa',
-		low: '#4ade80'
+		critical: '#741b17',
+		urgent: '#96502d',
+		high: '#8a6841',
+		medium: '#536887',
+		low: '#53694f'
 	};
 </script>
 
-<Dialog.Root bind:open onOpenChange={(v) => { if (!v) close(); }}>
+<Dialog.Root open={open} onOpenChange={handleOpenChange}>
 	<Dialog.Portal>
 		<Dialog.Overlay class="case-modal-backdrop" />
 		<Dialog.Content class="case-modal-panel">
@@ -108,7 +115,7 @@
 						{/if}
 					</div>
 				</div>
-				<Dialog.Close class="modal-close" onclick={close} aria-label="Close">✕</Dialog.Close>
+				<Dialog.Close class="modal-close" aria-label="Close">✕</Dialog.Close>
 			</div>
 
 			<!-- Body -->
@@ -206,10 +213,10 @@
 			<!-- Footer -->
 			{#if caseData && !isLoading}
 				<div class="case-modal-footer">
-					<button type="button" class="footer-btn ghost" onclick={close}>Close</button>
+					<button type="button" class="footer-btn ghost" onclick={() => handleOpenChange(false)}>Close</button>
 					<div class="footer-actions">
 						{#if onEdit}
-							<button type="button" class="footer-btn secondary" onclick={() => { onEdit?.(caseData.id); close(); }}>
+							<button type="button" class="footer-btn secondary" onclick={() => { if (isUsableCaseId(caseData.id)) { onEdit?.(caseData.id); handleOpenChange(false); } }}>
 								<Icon name="pencil" class="w-3.5 h-3.5" />
 								Edit
 							</button>
@@ -233,8 +240,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(3, 6, 12, 0.85);
-		backdrop-filter: blur(12px) saturate(1.15);
+		background: rgba(19, 27, 38, 0.56);
+		backdrop-filter: blur(9px) saturate(0.82);
 		padding: 1rem;
 		animation: caseModalFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 	}
@@ -249,13 +256,12 @@
 		max-height: 90vh;
 		display: flex;
 		flex-direction: column;
-		background: linear-gradient(180deg, rgba(19, 27, 42, 0.98) 0%, rgba(8, 12, 20, 0.99) 100%);
-		border: 1px solid rgba(243, 212, 113, 0.3);
-		border-radius: 10px;
+		background: linear-gradient(155deg, #fffdf9 0%, #f5eee4 72%, #e9dfd1 100%);
+		border: 1px solid #c8b28d;
+		border-radius: 14px;
 		box-shadow:
-			0 0 0 1px rgba(243, 212, 113, 0.08),
-			0 24px 64px rgba(0, 0, 0, 0.85),
-			0 0 35px rgba(243, 212, 113, 0.1);
+			0 0 0 1px rgba(255, 252, 245, 0.9),
+			0 24px 64px rgba(17, 24, 33, 0.34);
 		overflow: hidden;
 		animation: caseModalScale 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 	}
@@ -266,7 +272,7 @@
 		left: 1.5rem;
 		right: 1.5rem;
 		height: 1px;
-		background: linear-gradient(90deg, transparent, rgba(243, 212, 113, 0.9), rgba(126, 231, 255, 0.6), transparent);
+		background: linear-gradient(90deg, transparent, rgba(231, 201, 126, 0.92), rgba(180, 128, 87, 0.64), transparent);
 		pointer-events: none;
 		z-index: 2;
 	}
@@ -278,10 +284,10 @@
 		pointer-events: none;
 		z-index: 3;
 	}
-	.hud-notch-tl { top: -1px; left: -1px; border-top: 2px solid #f3d471; border-left: 2px solid #f3d471; }
-	.hud-notch-tr { top: -1px; right: -1px; border-top: 2px solid #f3d471; border-right: 2px solid #f3d471; }
-	.hud-notch-bl { bottom: -1px; left: -1px; border-bottom: 2px solid #f3d471; border-left: 2px solid #f3d471; }
-	.hud-notch-br { bottom: -1px; right: -1px; border-bottom: 2px solid #f3d471; border-right: 2px solid #f3d471; }
+	.hud-notch-tl { top: -1px; left: -1px; border-top: 2px solid #d8b968; border-left: 2px solid #d8b968; }
+	.hud-notch-tr { top: -1px; right: -1px; border-top: 2px solid #d8b968; border-right: 2px solid #d8b968; }
+	.hud-notch-bl { bottom: -1px; left: -1px; border-bottom: 2px solid #bd8c6a; border-left: 2px solid #bd8c6a; }
+	.hud-notch-br { bottom: -1px; right: -1px; border-bottom: 2px solid #bd8c6a; border-right: 2px solid #bd8c6a; }
 
 	.case-modal-header {
 		display: flex;
@@ -289,8 +295,8 @@
 		justify-content: space-between;
 		gap: 1rem;
 		padding: 1.25rem 1.5rem;
-		border-bottom: 1px solid rgba(243, 212, 113, 0.2);
-		background: rgba(0, 0, 0, 0.35);
+		border-bottom: 1px solid rgba(231, 201, 126, 0.4);
+		background: linear-gradient(115deg, #202b38 0%, #171f29 100%);
 		flex-shrink: 0;
 		position: relative;
 		z-index: 1;
@@ -305,7 +311,7 @@
 	:global(.header-icon) {
 		width: 1.25rem;
 		height: 1.25rem;
-		color: #f3d471;
+		color: #e8c873;
 		flex-shrink: 0;
 		margin-top: 3px;
 	}
@@ -316,7 +322,7 @@
 	:global(.case-title) {
 		font-size: 1.125rem;
 		font-weight: 700;
-		color: #f3d471;
+		color: #fffaf1;
 		margin: 0 0 0.2rem;
 		line-height: 1.3;
 		word-break: break-word;
@@ -324,18 +330,18 @@
 	}
 	.case-number {
 		font-size: 0.75rem;
-		color: rgba(212, 199, 163, 0.6);
+		color: #d7c8ae;
 		font-family: var(--font-mono, monospace);
 	}
 	.loading-text {
 		font-size: 1rem;
-		color: rgba(212, 199, 163, 0.5);
+		color: #6d5a48;
 	}
 	:global(.modal-close) {
 		flex-shrink: 0;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(243, 212, 113, 0.25);
-		color: rgba(212, 199, 163, 0.6);
+		background: rgba(255, 250, 241, 0.1);
+		border: 1px solid rgba(231, 201, 126, 0.42);
+		color: #fffaf1;
 		cursor: pointer;
 		font-size: 0.875rem;
 		width: 1.875rem;
@@ -347,9 +353,9 @@
 		transition: all 0.15s ease;
 	}
 	:global(.modal-close:hover) {
-		color: #f3d471;
-		background: rgba(243, 212, 113, 0.15);
-		border-color: rgba(243, 212, 113, 0.5);
+		color: #202b38;
+		background: #fffaf1;
+		border-color: #e8c873;
 	}
 
 	.case-modal-body {
@@ -364,22 +370,22 @@
 		width: 6px;
 	}
 	.case-modal-body::-webkit-scrollbar-thumb {
-		background: rgba(243, 212, 113, 0.18);
+		background: #c8b28d;
 		border-radius: 3px;
 	}
 	.loading-state {
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
-		color: rgba(212, 199, 163, 0.5);
+		color: #6d5a48;
 		font-size: 0.875rem;
 		padding: 2rem 0;
 	}
 	.spinner {
 		width: 1.25rem;
 		height: 1.25rem;
-		border: 2px solid rgba(243, 212, 113, 0.2);
-		border-top-color: #f3d471;
+		border: 2px solid #e7d8c2;
+		border-top-color: #741b17;
 		border-radius: 50%;
 		animation: spin 0.7s linear infinite;
 	}
@@ -388,10 +394,10 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		color: #f87171;
+		color: #741b17;
 		font-size: 0.875rem;
-		background: rgba(248, 113, 113, 0.08);
-		border: 1px solid rgba(248, 113, 113, 0.2);
+		background: rgba(116, 27, 23, 0.08);
+		border: 1px solid rgba(116, 27, 23, 0.2);
 		border-radius: 6px;
 		padding: 0.75rem 1rem;
 	}
@@ -413,7 +419,7 @@
 	}
 	.case-description {
 		font-size: 0.875rem;
-		color: rgba(212, 199, 163, 0.8);
+		color: #3a332d;
 		line-height: 1.6;
 		margin: 0;
 		white-space: pre-wrap;
@@ -432,22 +438,22 @@
 		font-size: 0.7rem;
 		text-transform: uppercase;
 		letter-spacing: 0.07em;
-		color: rgba(212, 199, 163, 0.45);
+		color: #826f56;
 		font-weight: 600;
 	}
 	.detail-value {
 		font-size: 0.875rem;
-		color: rgba(212, 199, 163, 0.85);
+		color: #292521;
 	}
-	.due-date { color: #fbbf24; }
+	.due-date { color: #741b17; }
 
 	.case-modal-footer {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		padding: 1rem 1.5rem;
-		border-top: 1px solid rgba(243, 212, 113, 0.15);
-		background: rgba(0, 0, 0, 0.35);
+		border-top: 1px solid #d5c4a8;
+		background: rgba(232, 220, 201, 0.46);
 		flex-shrink: 0;
 	}
 	.footer-actions {
@@ -469,29 +475,29 @@
 	}
 	.footer-btn.ghost {
 		background: transparent;
-		border-color: rgba(212, 199, 163, 0.25);
-		color: rgba(212, 199, 163, 0.7);
+		border-color: #bdac91;
+		color: #5e5143;
 	}
 	.footer-btn.ghost:hover {
-		background: rgba(212, 199, 163, 0.1);
-		color: #f3d471;
+		background: #e9dfd1;
+		color: #741b17;
 	}
 	.footer-btn.secondary {
-		background: rgba(212, 199, 163, 0.08);
-		border-color: rgba(212, 199, 163, 0.3);
-		color: rgba(212, 199, 163, 0.9);
+		background: #eee5d8;
+		border-color: #c8b28d;
+		color: #332c27;
 	}
 	.footer-btn.secondary:hover {
-		background: rgba(212, 199, 163, 0.16);
+		background: #e2d1b2;
 	}
 	.footer-btn.primary {
-		background: rgba(243, 212, 113, 0.15);
-		border-color: rgba(243, 212, 113, 0.5);
-		color: #f3d471;
+		background: #67140f;
+		border-color: #67140f;
+		color: #fff8ec;
 	}
 	.footer-btn.primary:hover {
-		background: rgba(243, 212, 113, 0.25);
-		box-shadow: 0 0 12px rgba(243, 212, 113, 0.2);
+		background: #4f100c;
+		box-shadow: 0 4px 12px rgba(103, 20, 15, 0.24);
 	}
 
 	@keyframes caseModalFade {

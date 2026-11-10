@@ -388,6 +388,17 @@ self.addEventListener('fetch', (event) => {
   // Skip cross-origin
   if (!req.url.startsWith(self.location.origin)) return;
 
+  // Vite's development modules and optimized dependency chunks are revisioned
+  // independently during HMR. Never serve them from the app's static cache:
+  // an old chunk can otherwise reference exports that no longer exist.
+  if (
+    url.pathname.startsWith('/@vite/') ||
+    url.pathname.startsWith('/src/') ||
+    url.pathname.startsWith('/node_modules/.vite/')
+  ) {
+    return;
+  }
+
   // Phase D: analytics POST interception (default-deny, allowlist of 2 URLs).
   // Online → pass through. Offline OR 5xx → enqueue + synthetic 202.
   if (shouldInterceptAnalytics(req, url)) {

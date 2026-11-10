@@ -65,7 +65,7 @@
     "sveltekit-frontend/drizzle/manual/workflow_orchestration_tables.sql": "sha256:af148c6cdc60c3183ba2e993101e6d576437a853f0930049b2b22e823685bdef",
     "sveltekit-frontend/src/lib/server/db/schema-postgres.ts": "sha256:021e0a7bcc1747abcfd11899bc29a1006b5eddfefaa92824f4b0ce2f74a19ff7",
     "sveltekit-frontend/src/lib/server/db/schema/kanban-tasks.ts": "sha256:44c0eb6f9616e4a123ab736b765d9900b05ff34ca2bd3c913d5338fd5a00c870",
-    "sveltekit-frontend/src/lib/server/trpc/routers/agent.ts": "sha256:788f51d25b22ace3f3fe05f04c7110efdaf53d853fea70403577b3e969f63d12",
+    "sveltekit-frontend/src/lib/server/trpc/routers/agent.ts": "sha256:b2a86baf197dd8fec74ee317ec574420711758063d2796e4b099b6fdbf866a5d",
     "sveltekit-frontend/src/lib/server/trpc/agent-run-service.ts": "sha256:ad8a8140ba698c8e6190da802a5a7355f8130bbbaad2f8b2cb9ed4131614ac32",
     "sveltekit-frontend/src/lib/server/trpc/routers/workflow.ts": "sha256:50241a12ad2a8316652101d4bf3226271b5111d21c470b7267bd76aa07b75873",
     "sveltekit-frontend/scripts/phase79-agentic-repair.mts": "sha256:4298f7b7ff36005d7e81019b8f9bae50a9dcd8a9542d5e9621038cd36959129c",
@@ -236,7 +236,7 @@
       "object": "artifacts",
       "disposition": "UNVERIFIED",
       "tracePresence": "UNKNOWN",
-      "callerFinding": "The previous artifacts SQL subquery was removed from agent.runs.get; the registered procedure now returns a stable empty artifactIds array. No other active direct caller was established in the scoped source review. The migration's proposed relation therefore has no currently verified application requirement. Its owner and the intended artifact behavior remain unresolved; do not recreate the table unless a concrete consumer is established.",
+      "callerFinding": "agent.runs.get no longer queries the legacy artifacts relation; it returns artifactIds=null with artifactStatus=UNAVAILABLE_NO_VERIFIED_ARTIFACT_OWNER. No other active direct caller was established in the scoped review. The migration's proposed relation has no currently verified application requirement; its owner and intended behavior remain unresolved.",
       "sourceRefs": [
         "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql",
         "sveltekit-frontend/src/lib/server/trpc/routers/agent.ts",
