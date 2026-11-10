@@ -19,3 +19,9 @@
 ## Completion rule
 
 The first tranche is complete when AGENT-01 through AGENT-08A remain proven by focused tests and current receipts. AGENT-08 through AGENT-10 are explicitly deferred and cannot be inferred complete from the current API smoke.
+
+## HANDOFF 2026-11-10 (no checkboxes changed)
+
+- AGENT-09 stays open. Blocker from its own text: needs an admitted source frame and separately authorized isolated candidate execution. The owner audit still reports candidate generation and isolated worktree execution as `MISSING_OR_NOT_WIRED`.
+- Next step needs explicit operator authorization for isolated candidate execution. Fixture planning (`.tmp/atlas/patch-tournament-replay-20260923T035721Z.json`) is not a substitute.
+- No code or database writes were made in this handoff.

@@ -45,6 +45,7 @@ describe('browser generation evaluation contract (injected fakes only)', () => {
 		expect(receipt.runs[0].fixtureSha256).toBe(receipt.runs[1].fixtureSha256);
 		expect(receipt.runs[0].model.runtimeId).toBe('transformers-webgpu-test');
 		expect(receipt.runs.every((run) => /^[a-f0-9]{64}$/.test(run.receiptSha256))).toBe(true);
+		expect(receipt.runs.every((run) => /^[a-f0-9]{64}$/.test(run.outputSha256 ?? ''))).toBe(true);
 		expect(/^[a-f0-9]{64}$/.test(receipt.receiptSha256)).toBe(true);
 		expect(receipt.mode).toBe('INJECTED_CONTRACT_ONLY');
 		expect(receipt.canonicalAuthority).toBe(false);

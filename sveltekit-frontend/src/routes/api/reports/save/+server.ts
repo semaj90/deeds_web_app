@@ -55,7 +55,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			changes: updates,
 			request,
 		});
-		await invalidateReportCache(updated.id, 'report_update', locals.user.id)
+		await invalidateReportCache(updated.id, 'report_update', locals.user.id, updated.caseId ?? undefined)
 			.catch((error) => console.warn('[Reports] Cache invalidation failed:', error));
 
 		return json({

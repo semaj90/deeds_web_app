@@ -4,7 +4,10 @@ import readline from 'node:readline';
 import { randomUUID } from 'node:crypto';
 import pg from 'pg';
 
-const pool = new pg.Pool({ connectionString: 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db' });
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) throw new Error('DATABASE_URL must be configured before ingestion.');
+
+const pool = new pg.Pool({ connectionString: databaseUrl });
 
 (async () => {
   console.log('📥 Reading NDJSON...');

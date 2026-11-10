@@ -352,3 +352,9 @@ implied when `atlas/research/*` looked like the live planner substrate.
   identity/endpoint smoke proof, not a quality/parity benchmark; no canonical
   writes, classifier promotion, Graphify execution, or hidden-state persistence
   is implied.
+
+## HANDOFF 2026-11-10 (no checkboxes changed)
+
+- NATS-EVENT-01 stays open. The section is headed "deferred, explicitly not started", and its text makes this shadow-only and dependent on RabbitMQ's work-dispatch role being settled first.
+- Creating the `PARENT_ATLAS_EVENTS` stream is a service configuration change and needs operator approval. NATS (`legal-ai-nats`) is running; no stream was created.
+- No code or service changes were made in this handoff.

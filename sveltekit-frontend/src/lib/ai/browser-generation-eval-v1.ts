@@ -143,7 +143,7 @@ export async function runBrowserGenerationEvaluationV1(input: {
 							outputByteLength = 0;
 						} else {
 						status = 'PASS';
-						outputSha256 = sha256(generated.text);
+						outputSha256 = await sha256(generated.text);
 					}
 					} finally {
 					if (timer) clearTimeout(timer);

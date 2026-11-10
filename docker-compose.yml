@@ -496,8 +496,8 @@ services:
       - NEO4J_PLUGINS=["apoc", "graph-data-science"]
       - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
       - NEO4J_dbms_security_procedures_allowlist=apoc.*,gds.*
-      - NEO4J_dbms_memory_heap_initial__size=2g
-      - NEO4J_dbms_memory_heap_max__size=4g
+      - NEO4J_dbms_memory_heap_initial__size=1g
+      - NEO4J_dbms_memory_heap_max__size=2g
       - NEO4J_dbms_memory_pagecache_size=1g
       # Browser is not an execution dependency. Keeping only API modules avoids
       # Neo4j repeatedly expanding the bundled Browser archive into /tmp.

@@ -68,3 +68,10 @@ This closes palette definition and local routing/ACE parameter emission only. It
 Canonical implementation and harness work remains in the monorepo. Fixed `TestResult.name` ownership in `simd-bridge/cpp/test_nes_lut_filter_avx2.cpp`; the previous `const char*` retained pointers to a reused stack label buffer, causing all ten frozen domain labels to display as `0x0A`. The receipt verifier now recompiles current sources, parses the actual harness output, records source/binary/output SHA-256 values, and labels the result `PASS_STANDALONE_HARNESS` with acceptance `PARTIAL`; timings are explicitly diagnostic-only. `node scripts/atlas/verify-nes-lut-filter-avx2-receipt-v1.mjs` passed 23/23 native cases on an AVX2 host, including forced-scalar dispatch, auto AVX2 selection, zero/out-of-range fail-closed cases, and 6,527-byte cohort cases. The separate `scripts/dev/clang-vs.bat` build plus `py -3.13 python/tests/test_nes_lut_filter_v1.py` passed 5/5 Python-to-C++ scalar/AVX2 bitmask parity tests. Receipt: `docs/reports/nes-lut-filter-avx2-parity-receipt-v1.json`.
 
 This does **not** close CPU-AVX2-01: the standalone executable is compiled with `/arch:AVX2`, so it does not prove a portable baseline binary on a CPU/OS without AVX2 state support; the production `tensorrt_bridge.node` dispatch path and exact KNN numerical/order parity are also untested. No binding/build files, database, GPU runtime, or package implementation were changed.
+
+## HANDOFF 2026-11-10 (no checkboxes changed)
+
+- NLUT-07 stays `[~]` PARTIAL. Standalone harness evidence: `docs/reports/nes-lut-filter-avx2-parity-receipt-v1.json` (23/23 native cases; 5/5 Python-to-C++ parity).
+- Still open, per the task text: CPU-AVX2-01 (owned by `parent-atlas-retrieval-lod-algorithm-taxonomy`). Gaps: a portable non-AVX2 baseline binary, the production `tensorrt_bridge.node` dispatch path, and exact KNN order parity.
+- Closing the dispatch gap touches native build files, which are out of scope for quick-hit work; that needs a separate, explicitly scoped change.
+- No code, build, or database changes were made in this handoff.

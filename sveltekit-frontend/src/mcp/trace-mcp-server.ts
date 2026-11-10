@@ -2907,11 +2907,9 @@ server.registerTool(
 
 // == trace.system_health =======================================================
 
-// Services whose outage is reported but does not degrade the system. `rerank` is the optional
-// TensorRT-LLM accelerator (docker-compose 8099 -> 8096); the model registry lists it as future.
-// `topology_search` (:8101) has no implementation in this repo (only the TOPOLOGY_SEARCH_URL
-// config value exists), so it is optional until a server owner is identified.
-const OPTIONAL_HEALTH_SERVICES: ReadonlySet<string> = new Set(['rerank', 'topology_search']);
+// `rerank` is an optional TensorRT-LLM accelerator (docker-compose 8099 -> 8096).
+// Topology search has active retrieval/tool callers, so its outage must degrade health.
+const OPTIONAL_HEALTH_SERVICES: ReadonlySet<string> = new Set(['rerank']);
 
 server.registerTool(
   'trace.system_health',
@@ -2951,7 +2949,7 @@ server.registerTool(
         })(),
         (async () => {
           console.log('[mcp] probe: topology');
-          const r = await probeUrl('topology_search', `${TOPO_URL}/health`);
+          const r = await probeUrl('topology_search', `${TOPO_URL}/ready`);
           console.log('[mcp] probe: topology done');
           return r;
         })(),

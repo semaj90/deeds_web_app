@@ -656,7 +656,8 @@
       "PowerShell(Select-String -Path \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\sveltekit-frontend\\\\.env\" -Pattern \"^IMAGE_SYNTHESIS_URL=\" | ForEach-Object { $_.Line }; docker ps --format \"{{.Names}} {{.Ports}}\" | Select-String -Pattern \"synth|image|8100|8099|8088\" | ForEach-Object { $_.Line }; docker ps --format \"{{.Names}}\" | Select-String -Pattern \"image\" | ForEach-Object { \"container: $\\($_.Line\\)\" })",
       "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:5173/api/health\" -UseBasicParsing -TimeoutSec 20; \"5173 -> $\\($r.StatusCode\\)\" } catch { \"5173 -> \" + $_.Exception.Message }; Select-String -Path \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\.tmp-pw-3d-rerun.txt\" -Pattern \"ECONN|Error|error\" | Select-Object -First 5 | ForEach-Object { $_.Line }; Get-Content \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\sveltekit-frontend\\\\logs\\\\task-output\\\\dev-gpu-restart.log\" -Tail 6)",
       "Bash(ls playwright.config.*)",
-      "Bash(grep -n \"baseURL\\\\|webServer\\\\|port\" playwright.config.*)"
+      "Bash(grep -n \"baseURL\\\\|webServer\\\\|port\" playwright.config.*)",
+      "Bash(cd *)"
     ],
     "deny": [],
     "ask": []

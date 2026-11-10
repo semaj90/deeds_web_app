@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidateAll } from '$app/navigation';
 	import HybridBoard from '$lib/components/canvas/HybridBoard.svelte';
 	import { replaceEvidenceThumbnailUrls } from '$lib/components/canvas/evidence-thumbnail-policy.js';
 	import Icon from '$lib/components/ui/Icon.svelte';
@@ -2061,14 +2062,14 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		{caseId}
 		isOpen={showAddEvidence}
 		onClose={() => (showAddEvidence = false)}
-		onSuccess={() => {
+		onSuccess={async () => {
 			showAddEvidence = false;
 			notificationStore.add({
 				type: 'success',
 				title: 'Evidence Uploaded',
 				message: 'Evidence successfully ingested into SeaweedFS and registered to case.'
 			});
-			window.location.reload();
+			await invalidateAll();
 		}}
 	/>
 

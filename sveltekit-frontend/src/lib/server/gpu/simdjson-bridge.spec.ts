@@ -6,6 +6,7 @@ import {
 	fastJsonValidate,
 	getSimdStats,
 	getSimdjsonCacheStats,
+	isSimdJsonAvailable,
 } from './simdjson-bridge.js';
 
 describe('simdjson bridge parse cache', () => {
@@ -68,6 +69,17 @@ describe('simdjson bridge parse cache', () => {
 		expect(parsed).toEqual(lines.map((line) => JSON.parse(line)));
 		expect(() => fastJsonParse('{"id":3,}')).toThrow();
 		expect(fastJsonValidate('{"id":3,}')).toBe(false);
+	});
+
+	it('counts native parse failures before falling back to V8 when the addon is available', () => {
+		if (!isSimdJsonAvailable()) return;
+
+		clearSimdjsonCache();
+		const before = getSimdStats().nativeParseErrors;
+		const malformedLargeJson = `{"payload":"${'x'.repeat(1100)}",}`;
+
+		expect(() => fastJsonParseWithBackend(malformedLargeJson)).toThrow();
+		expect(getSimdStats().nativeParseErrors - before).toBe(1);
 	});
 
 	it('enforces the input cap in UTF-8 bytes, not UTF-16 code units', () => {

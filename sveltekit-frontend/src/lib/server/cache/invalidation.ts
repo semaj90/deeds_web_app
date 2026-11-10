@@ -28,6 +28,7 @@ export const CACHE_PATTERNS = {
 
   // Cases
   CASE: (caseId: string) => `case:${caseId}*`,
+  CASE_VIEWS: (caseId: string) => `user:*:case:${caseId}:view:*`,
   CASE_LIST: 'cases:list*',
   CASE_STATS: 'cases:stats*',
 
@@ -308,14 +309,17 @@ export const cacheInvalidation = new CacheInvalidationService();
 export const invalidateReportCache = async (
   reportId: string,
   type: InvalidationType,
-  userId?: string
+  userId?: string,
+  caseId?: string
 ) => {
+  const patterns = [
+    CACHE_PATTERNS.REPORT(reportId),
+    CACHE_PATTERNS.REPORT_EXPORT(reportId),
+    CACHE_PATTERNS.REPORT_PREVIEW(reportId),
+  ];
+  if (caseId) patterns.push(CACHE_PATTERNS.REPORT_LIST(caseId), CACHE_PATTERNS.CASE_VIEWS(caseId));
   return cacheInvalidation.invalidateMultiple(
-    [
-      CACHE_PATTERNS.REPORT(reportId),
-      CACHE_PATTERNS.REPORT_EXPORT(reportId),
-      CACHE_PATTERNS.REPORT_PREVIEW(reportId),
-    ],
+    patterns,
     { type, userId }
   );
 };
@@ -331,6 +335,7 @@ export const invalidateCaseCache = async (
   return cacheInvalidation.invalidateMultiple(
     [
       CACHE_PATTERNS.CASE(caseId),
+      CACHE_PATTERNS.CASE_VIEWS(caseId),
       CACHE_PATTERNS.CASE_LIST,
       CACHE_PATTERNS.CASE_STATS,
       CACHE_PATTERNS.DASHBOARD_STATS,
@@ -353,6 +358,7 @@ export const invalidateEvidenceCache = async (
   if (caseId) {
     patterns.push(CACHE_PATTERNS.EVIDENCE_LIST(caseId));
     patterns.push(CACHE_PATTERNS.CASE(caseId)); // Case evidence list cached
+    patterns.push(CACHE_PATTERNS.CASE_VIEWS(caseId));
     bumpCaseVersion(caseId).catch((err) => console.warn('[CacheInvalidation] bumpCaseVersion failed:', (err as Error).message ?? err));
   }
 

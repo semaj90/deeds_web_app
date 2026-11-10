@@ -131,10 +131,11 @@ test('server refuses to start without operator-provided PostgreSQL configuration
     SystemRoot: process.env.SystemRoot,
     NODE_ENV: 'test',
     TOPOLOGY_SEARCH_PORT: '0',
+    DATABASE_URL_DEV: 'postgresql://ignored.invalid/test',
   };
   const result = spawnSync(process.execPath, [serverPath], { env, encoding: 'utf8', timeout: 5_000 });
 
   assert.equal(result.status, 1);
-  assert.match(result.stderr, /DATABASE_URL or DATABASE_URL_DEV must be configured/);
+  assert.match(result.stderr, /DATABASE_URL must be configured/);
   assert.doesNotMatch(result.stderr, /123456|legal_admin/);
 });
