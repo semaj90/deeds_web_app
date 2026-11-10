@@ -360,10 +360,11 @@ const TOOLS = [
   {
     name: 'gpu_request_vram_release',
     description:
-      'Records a REQUEST for a human to free VRAM (appends one line to .tmp/atlas/gpu-vram-release-requests.ndjson). Does NOT stop any process; a human runs the VS Code task "GPU: Prepare cuVS KMeans".',
+      'Records an unauthenticated, request-only notice for a human to free VRAM. A caller-supplied requestId makes retries idempotent. Does NOT stop any process; a human runs the VS Code task "GPU: Prepare cuVS KMeans".',
     inputSchema: {
       type: 'object',
       properties: {
+        requestId: { type: 'string', minLength: 1, maxLength: 128 },
         reason: { type: 'string', minLength: 3, maxLength: 500 },
         neededMiB: { type: 'integer', minimum: 256, maximum: 8192 },
       },
@@ -380,54 +381,125 @@ const GPU_REQUESTS_PATH = path.resolve(
   '../../../.tmp/atlas/gpu-vram-release-requests.ndjson',
 );
 
-async function gpuVramStatus() {
-  const out = { vram: null, llamaServer8090: null, canonicalAuthority: false, writesPerformed: false };
-  try {
+function persistGpuRequestRecord(outPath, record) {
+  // This MCP process handles calls on one event loop. The synchronous read/append
+  // pair makes requestId replay idempotent within that process and keeps each
+  // newline-delimited record intact under concurrent tool calls.
+  if (fs.existsSync(outPath)) {
+    const lines = fs.readFileSync(outPath, 'utf8').split(/\r?\n/);
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      let existing;
+      try {
+        existing = JSON.parse(line);
+      } catch {
+        // Preserve historical lines; malformed lines do not match an idempotency key.
+        continue;
+      }
+      if (existing.requestId !== record.requestId) continue;
+      const sameRequest = existing.operation === record.operation &&
+        existing.reason === record.reason && existing.neededMiB === record.neededMiB &&
+        JSON.stringify(existing.targetScope) === JSON.stringify(record.targetScope);
+      if (!sameRequest) throw new Error('GPU_REQUEST_ID_REUSED_WITH_DIFFERENT_PAYLOAD');
+      return { record: existing, replayed: true };
+    }
+  }
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  fs.appendFileSync(outPath, JSON.stringify(record) + '\n', 'utf8');
+  return { record, replayed: false };
+}
+
+export function createGpuVramHandlers({
+  requestPath = GPU_REQUESTS_PATH,
+  now = () => new Date(),
+  makeRequestId = () => crypto.randomUUID(),
+  persistRequest = (record) => persistGpuRequestRecord(requestPath, record),
+  readVram = () => {
     const raw = execFileSync(
       'nvidia-smi',
       ['--query-gpu=name,memory.used,memory.total', '--format=csv,noheader,nounits'],
       { encoding: 'utf8', timeout: 5000 },
     ).trim().split(/\r?\n/)[0];
     const [name, used, total] = raw.split(',').map((v) => v.trim());
-    out.vram = { name, usedMiB: Number(used), totalMiB: Number(total), freeMiB: Number(total) - Number(used) };
-  } catch (e) {
-    out.vram = { error: `nvidia-smi unavailable: ${e.message}` };
-  }
-  try {
+    return { name, usedMiB: Number(used), totalMiB: Number(total), freeMiB: Number(total) - Number(used) };
+  },
+  readSlots = async () => {
     const res = await fetch('http://127.0.0.1:8090/slots', { signal: AbortSignal.timeout(3000) });
     const slots = res.ok ? await res.json() : null;
     const list = Array.isArray(slots) ? slots : [];
-    out.llamaServer8090 = {
+    return {
       reachable: res.ok,
       slotCount: list.length,
       allSlotsIdle: list.length > 0 && list.every((s) => s.is_processing === false),
     };
-  } catch (e) {
-    out.llamaServer8090 = { reachable: false, error: e.message };
-  }
-  out.howToFree =
-    'Human only: VS Code task "GPU: Prepare cuVS KMeans" (requires idle slots). This tool never stops anything.';
-  return out;
+  },
+  testOnly = false,
+} = {}) {
+  return {
+    async gpuVramStatus() {
+      const out = { vram: null, llamaServer8090: null, canonicalAuthority: false, writesPerformed: false };
+      try {
+        out.vram = readVram();
+      } catch (e) {
+        out.vram = { error: `nvidia-smi unavailable: ${e.message}` };
+      }
+      try {
+        out.llamaServer8090 = await readSlots();
+      } catch (e) {
+        out.llamaServer8090 = { reachable: false, error: e.message };
+      }
+      out.howToFree =
+        'Human only: VS Code task "GPU: Prepare cuVS KMeans" (requires idle slots). This tool never stops anything.';
+      return out;
+    },
+    gpuRequestVramRelease(args) {
+      const requestId = typeof args.requestId === 'string' && args.requestId.trim()
+        ? args.requestId.trim()
+        : makeRequestId();
+      const record = {
+        schema: 'atlas.gpu-vram-release-request.v1',
+        requestId,
+        requestedAt: now().toISOString(),
+        actorContext: {
+          actor: 'mcp-client',
+          authenticated: false,
+          principal: null,
+          authorizationScope: 'request-only',
+        },
+        operation: 'request_vram_release',
+        targetScope: { service: 'llama-server', port: 8090 },
+        reason: String(args.reason),
+        neededMiB: Number(args.neededMiB),
+        status: 'PENDING_HUMAN',
+        writesPerformed: true,
+      };
+      // Keep the production request record shape free of a test/dry-run marker.
+      // The isolated test factory can opt in to an explicit fixture-only marker.
+      if (testOnly) record.testOnly = true;
+      const persisted = persistRequest(record);
+      const storedRecord = persisted?.record ?? record;
+      return {
+        ...storedRecord,
+        requestFile: path.relative(process.cwd(), requestPath),
+        replayed: Boolean(persisted?.replayed),
+        processStopped: false,
+        canonicalAuthority: false,
+        writesPerformed: true,
+        note: 'Request record only. A human must run the VS Code task to free VRAM.',
+      };
+    },
+  };
 }
 
-function gpuRequestVramRelease(args) {
-  const record = {
-    schema: 'atlas.gpu-vram-release-request.v1',
-    requestedAt: new Date().toISOString(),
-    reason: String(args.reason),
-    neededMiB: Number(args.neededMiB),
-    status: 'PENDING_HUMAN',
-  };
-  fs.mkdirSync(path.dirname(GPU_REQUESTS_PATH), { recursive: true });
-  fs.appendFileSync(GPU_REQUESTS_PATH, JSON.stringify(record) + '\n', 'utf8');
-  return {
-    ...record,
-    requestFile: path.relative(process.cwd(), GPU_REQUESTS_PATH),
-    processStopped: false,
-    canonicalAuthority: false,
-    writesPerformed: true,
-    note: 'Request record only. A human must run the VS Code task to free VRAM.',
-  };
+const gpuVramHandlers = createGpuVramHandlers();
+
+async function gpuVramStatus() {
+  return gpuVramHandlers.gpuVramStatus();
+}
+
+export function gpuRequestVramRelease(args, outPath = GPU_REQUESTS_PATH) {
+  if (outPath === GPU_REQUESTS_PATH) return gpuVramHandlers.gpuRequestVramRelease(args);
+  return createGpuVramHandlers({ requestPath: outPath }).gpuRequestVramRelease(args);
 }
 
 const toolArgumentAjv = new Ajv({ allErrors: true, strict: false });

@@ -1390,3 +1390,129 @@ Not done: no producer writes rows yet (table is empty, so the tool returns an em
 - Applied `20261027_atlas_graphify_scope_repository_map_v1_DRAFT.sql` then `20261027_atlas_packet_identity_registry_v1_source_guard_DRAFT.sql` in one transaction after the operator's explicit instruction. Rehearsed first (rolled back) on live PG18: valid ROOT_SCOPE/LOGICAL_SUBSCOPE mapping and valid alias accepted; wrong source authority, nested kind on a ROOT identity, missing identity, bad digest, alias source_ref mismatch, missing storage/registry rows and alias UPDATE rejected.
 - Readback: `atlas_graphify_scope_repository_map_v1` constraints include `_pkey`, `_repository_id_fkey`, `_root_scope_kind_check`, `_scope_repository_key` (the four names `build-packet-key-v2-admission-manifest-v1.mts` checks); `atlas_packet_identity_registry_v1_scope_repository_fk` present; triggers `trg_atlas_graphify_scope_repository_map_v1_guard` and `trg_atlas_packet_identity_aliases_v1_guard` enabled; 0 rows in scope map, registry and aliases_v1.
 - Not done: no scope mapping seeded (needs evidence_ref/digest), no registry/alias rows, Graphify execution owner decision still open. No rollback script; with all three tables empty the rollback is dropping the two triggers/functions, the registry FK and the scope map table.
+
+### Update 2026-11-10 — 0101/0102 application-caller review (read-only)
+- Reviewed the two proposed sidecar migrations against current application callers, Drizzle owners, and the existing `0038_deep_research_tables.sql` definitions. Source-qualified summary: `docs/reports/sidecar-migration-caller-review-v1.json`.
+- `0101_spec_control_plane_phase1.sql` is not safe to admit as written. `agent_runs` and `workflow_events` already have active Drizzle owners and `action-writer.ts` callers, but the migration's `CREATE TABLE IF NOT EXISTS` definitions use incompatible columns; that clause would silently leave the existing schema unreconciled. Its separate `tasks` table also conflicts with the canonical `kanban_tasks` workboard authority. No active direct application caller was found for `agent_definitions`, `agent_run_steps`, or `feature_requirements` in the scoped scan; this is not proof of non-use. The `workflow_events_immutable` trigger precedes its function definition, and the `specs_current_revision_fk` addition is unconditional.
+- `0102_feature_statistics_and_potentials.sql` has no active direct caller found for `packet_potentials`, `packet_promotion_log`, or `fallback_routing_audit` in the scoped scan. The promotion-log FK is invalid: `packet_potentials` is keyed by `(packet_key, title_id)`, but the FK references only `packet_key`. Its index statements also lack rerun guards. Do not choose a replacement FK until packet identity and promotion grain are reconciled with the canonical registry.
+- PostgreSQL catalog access to `legal_ai_live_integration_scratch` remains unauthenticated (`28P01`); live schema equivalence and execution history are unverified. No SQL, manifest, database, or task state was changed. Next gate: approved read-only scratch catalog comparison and migration-history evidence; only then prepare corrected SQL for disposable rehearsal.
+
+### Update 2026-11-10 — deferred migration source review (read-only)
+- Reviewed the 5 parser-unclassified SQL files against their current text and bound them to source hashes in `docs/reports/stale-migration-deferred-source-review-v1.json`: `0053` is five `evaluation_queries` seed INSERTs; `0102_restore_weight_column` alters/updates `code_feature_edges.weight`; `0116` adds recommendation supersession behavior and writes lifecycle events; `0117` adds `recommendation_log.updated_by`; `0118` replaces the lifecycle-state constraint.
+- Replay risks are now explicit: `0053` has no `ON CONFLICT`; `0116` has a mutating function/event path; `0118` drops then re-adds a check, so safety depends on transaction behavior and existing rows. Migration comments are claims, not live schema evidence.
+- The 19 `PARTIAL` presence snapshots remain unadmitted because their capture target is `UNKNOWN_DATABASE_AND_SERVER_IDENTITY`; authentication to the requested scratch catalog failed with `28P01`. The observed counts do not justify DDL, sidecar manifest edits, or applied-status changes. No database, SQL, manifest, service, or task state was changed.
+- The read-only database-usage graph returned `UNRESOLVED`, no graph revision, and no evidence refs for the queried migration relations. This projection absence is not proof of no application callers.
+- A broader source scan did find callers for several other partial migration relations: promotion outbox/promotion policy, identity audit, encoder provenance, semantic lifecycle events, and tool-call/outcome/execution-review paths. `atlas_packet_features`/`atlas_packet_metrics` and ontology/vector-bundle references are also used by repository scripts. These callers make owner/shape reconciliation more important; they do not prove current DB state. Evaluation references mostly target `evaluation_relevance_corrected`, not the migration's `evaluation_relevance` name.
+- New concrete conflict: the two `0152_atlas_representations_registry*.sql` files define overlapping relation names but have different object inventories (25 vs 27) and divergent `atlas_representations` contracts (`schema_version`/`artifact_digest`/prompt-template revision versus required `model_revision`/`model_source`/`tokenizer_digest`; the output-dimension checks also differ). The scoped Drizzle DB-schema scan found no table owner file. Treat them as mutually exclusive proposals pending owner and history review. Details and source refs are in `docs/reports/stale-migration-deferred-source-review-v1.json`.
+
+### Update 2026-11-10 — 0101/0102 object disposition pass
+- Added an 18-object disposition matrix in `docs/reports/sidecar-migration-object-disposition-v1.json`. It separates source requirements from transcript-reported presence and from migration history. User-provided TRACE output is recorded as `PRESENT_REPORTED`, not as a fresh schema-equivalence check.
+- Active source confirms `agent_runs` and `workflow_events` are required under the current Drizzle/action-writer contract and are already defined by migration 0038; 0101's definitions are incompatible. `tasks` is superseded by `kanban_tasks`. `artifacts` has a direct router read (`id`, `run_id`, `created_at`) but 0101 defines a different shape; its owner remains unresolved. No direct callers were found for the proposed 0102 potentials, promotion log, or fallback audit tables.
+- The available TRACE tools in this session do not expose PostgreSQL catalog introspection; `atlas_tools.trace_database` reads a Neo4j projection. Prior scratch authentication failed with `28P01`. Accordingly, no object was classified as confirmed missing, no manifest diff was proposed, and no SQL candidate or database mutation was made. Corrected candidates remain gated on identity-bound schema readback, migration-history evidence, artifact ownership, and packet-promotion grain.
+- Next gate: obtain approved read-only access to the exact scratch database and inspect relation definitions/history; then rehearse reviewed candidates on empty and partial-schema disposable fixtures with rollback proof.
+
+## LIVE-SHAPE-CHECK-01 (2026-11-09, read-only, TRACE db_table_inspect)
+
+Receipts: `.tmp/atlas/sidecar-live-shape-check-20261109.json`, `.tmp/atlas/sidecar-live-shape-check-20261109-part2.json`. Names and shapes only; no row data read; no DDL.
+
+| Table | Migration | Live result |
+|---|---|---|
+| `proposed_tool_calls` | 0112 | SHAPE_MISMATCH: same name, different columns (live has `selected_tool_name`, `candidate_tools`, `confidence_score`; lacks `tool_name`, `executed`, `approval_required`, `schema_valid`, `created_at`). Migration indexes absent. |
+| `execution_reviews` | 0114 | SHAPE_MISMATCH: no `trace_id` column; migration index on it would fail. |
+| `semantic_lifecycle_events` | 0110 | Table present; live index names differ from migration names. Columns not compared. |
+| `tool_execution_log` | 0020 (not 0111) | Present live. Earlier classifier's "not observed" was wrong. |
+| `agent_tasks` | 0111 | Columns match; `idx_at_session` absent. |
+| `tool_call_events` | 0111 | SUPERSET_DRIFT: 13 extra columns; migration FK `trace_id -> agent_traces` absent; `idx_tce_trace_id` absent. |
+| `outcome_ledger` | 0111 | SUPERSET_DRIFT: 14 extra columns; three migration FKs absent; `idx_ol_task_id` absent. |
+
+- The correct fix is not a re-run: `CREATE ... IF NOT EXISTS` skips existing tables and leaves drift in place.
+- Restoring the FKs on `tool_call_events` and `outcome_ledger` needs an orphan-row check first (row data, needs an approved read-only connection).
+- Open decisions: canonical shape per table (wider live shape vs migration file); whether `proposed_tool_calls` and `execution_reviews` live shapes are in use.
+- No DDL, manifest, or database change was made.
+
+### Update 2026-11-10 — proposed ten-object adoption review
+- Decision: do not create the ten proposed relations as a bundle. Reuse an existing canonical owner only where its contract matches; otherwise defer until an active caller and owning change establish the need.
+- `tasks` is superseded by `kanban_tasks`. Existing `agent_run_actions` and `agent_action_results` are real Drizzle/action-writer owners, but are not established as schema-equivalent replacements for `agent_run_steps`. `workflow_approvals`/`recordApproval()` is a reuse candidate, not blanket approval for the migration's generic `approvals` shape.
+- No direct callers were found for `feature_requirements`, `agent_definitions`, `validation_results`, `packet_potentials`, `packet_promotion_log`, or `fallback_routing_audit`; `validation_gates` matches JSON/telemetry names, not the proposed relation. These remain deferred, not declared unused.
+- `agent.runs.get` is a registered protected procedure containing an `artifacts` SQL read. No in-repository client call was found, but external clients may invoke the exposed procedure, so `artifacts` remains unresolved rather than being treated as dead code.
+- Evidence and per-object recommendations are recorded in `docs/reports/sidecar-migration-object-disposition-v1.json`. No SQL, sidecar manifest, or database was changed. Creation still requires a concrete caller/owner, reviewed identity and lifecycle contract, database-bound schema/history readback, and clean/partial scratch rehearsal with rollback and readback.
+- Registry check: neither `0101_spec_control_plane_phase1.sql` nor `0102_feature_statistics_and_potentials.sql` appears in the current `drizzle/sidecar-migrations.json` or `drizzle/meta/_journal.json`. This is repository metadata only and does not prove either file was never executed. The sidecar manifest already had unrelated uncommitted changes; they were preserved and its observed hash is recorded in the report.
+- `scripts/atlas/drizzle-sidecar-policy.mjs` classifies unjournaled SQL absent from the sidecar manifest as `stale_migration`; Drizzle Kit skips it. This describes repository tooling only. It does not authorize registration or application, and execution history remains unknown.
+
+### Update 2026-11-10 — refreshed 63-file source provenance classification
+- Ran `scripts/atlas/audit-stale-migration-provenance-v1.mjs` against the saved 2026-11-09 inputs, with a unique output `.tmp/atlas/stale-migration-provenance-classification-20261110-v1.json`. It hashed all 63 current SQL sources and classified 14 `NONE_PRESENT`, 25 `ALL_PRESENT`, 19 `PARTIAL`, and 5 `NO_OBJECTS_PARSED`.
+- The output confirms 0 schema-equivalence checks and 0 verified execution histories. The saved presence evidence targets an unknown database/server identity; the read-only scratch catalog attempt remains `28P01`. Thus these categories are source/presence triage only, not verified current scratch or live schema state.
+- The existing deferred source review identifies manual SQL targets for all five parser-unclassified files. Do not infer absent objects from `NO_OBJECTS_PARSED`, or generate DDL/manifest edits from presence counts. Next gate remains database-identity-bound read-only schema and migration-history evidence, followed by isolated scratch rehearsal only for owner-approved candidates.
+
+## OBJECT-DISPOSITION-01 (2026-11-09, read-only; no DDL, no database writes)
+
+Disposition of the eleven objects named by the stale-migration review (0101, 0102). Receipts in `.tmp/atlas/`.
+
+| Object | Migration | Decision | Evidence |
+|---|---|---|---|
+| `feature_requirements` | 0101 | DROP from plan | No caller. Requirements belong to OpenSpec `tasks.md`. |
+| `tasks` | 0101 | DROP from plan | No caller. Duplicates the Kanban owner `kanban_tasks`. |
+| `agent_definitions` | 0101 | DEFER | No owner found. No Drizzle table. |
+| `agent_run_steps` | 0101 | CANDIDATE ONLY: `agent_run_actions` is a live owner but not a proven replacement for the 0101 step contract; `agent_action_results` also exists | Live Drizzle table (`schema-postgres.ts:5598`), written by `action-writer.ts`, called by `scripts/phase79-agentic-repair.mts:1005`. Mapping and gaps in `.tmp/atlas/agent-run-steps-owner-check-20261109.json`; callers in `agent-run-actions-caller-check-20261109.json`. |
+| `validation_gates` | 0101 | DEFER to new OpenSpec change | No owner. `gpu_eligibility_gate` and `gan_validation_registry` checked and rejected (`validation-gate-candidate-check-20261109.json`). |
+| `validation_results` | 0101 | DEFER with `validation_gates` | Same as above. |
+| `approvals` | 0101 | DEFER | No owner for the feature-scoped table. `workflow_approvals` (run-scoped) may cover some needs; confirm its contract first. |
+| `artifacts` | 0101 | REMOVE the reference, do not create | Only reader is the subquery in `sveltekit-frontend/src/lib/server/trpc/routers/agent.ts:42` (`agent.runs.get`). No client caller found. Code change, not DDL. |
+| `packet_potentials` | 0102 | DEFER | No owner found. |
+| `packet_promotion_log` | 0102 | FIX BEFORE CREATE | Foreign key references `packet_key` alone; parent key is `(packet_key, title_id)`. Needs a composite key. |
+| `fallback_routing_audit` | 0102 | DEFER | No owner or caller. Stores a 768-d query embedding per row; check against the no-raw-vectors-in-audit rule before use. |
+
+Live-shape drift from the earlier checks (`LIVE-SHAPE-CHECK-01`) still stands: `proposed_tool_calls` and `execution_reviews` have a different shape from their migrations; `tool_call_events` and `outcome_ledger` are wider than their migrations and lack foreign keys.
+
+Open decisions (human):
+- Confirm the DROP and REMOVE actions above.
+- Start a new OpenSpec change for the six DEFER objects, or retire them.
+- Choose the canonical shape for the drifted tables.
+- Approve a read-only database connection for orphan-row checks before any foreign key is restored.
+
+Nothing in this section applies DDL, changes the manifest, or marks any checkbox complete.
+
+## OBJECT-DISPOSITION-02 (2026-11-09, read-only verification of two owner candidates)
+
+- `workflow_approvals`: live (TRACE `db_table_inspect`; columns `run_id`, `approval_id`, `decision`, `note`, `decided_by` integer, `decided_at`; unique `(run_id, approval_id)`; FK `run_id -> workflow_runs.id`). Written by `recordApproval()` in `sveltekit-frontend/src/lib/server/trpc/agent-run-service.ts:222` and called from `sveltekit-frontend/src/lib/server/trpc/routers/workflow.ts:127`. It is a real, active owner for run-scoped approve/reject decisions. It is NOT equivalent to 0101 `approvals` (feature-scoped, `approval_type`, `revoked` status), so do not reuse it for that table without a contract change.
+- `agent_action_results`: Drizzle definition only (`schema-postgres.ts:5621`). No non-test reader or writer in `src`. It is NOT an active owner and is NOT a replacement for `agent_run_steps`.
+- Still open: `artifacts` reference in `routers/agent.ts:42`; no client caller found for `agent.runs.get`, but the procedure is registered.
+- No DDL, manifest, or database change.
+
+## ARTIFACTS-REFERENCE-REMOVE-01 (2026-11-09, code change, not DDL)
+
+- `sveltekit-frontend/src/lib/server/trpc/routers/agent.ts` (`agent.runs.get`): replaced the `FROM artifacts` correlated subquery with a literal `'[]'::jsonb AS "artifactIds"`. The key stays so the response shape is unchanged. The table is not in the live schema.
+- Verified: no `FROM artifacts` remains in that file; `git diff --check` clean. Full `tsc` run was started in the background and its result was not captured in this session.
+- No client caller of `agent.runs.get` was found. Restoring real artifact ids needs an artifact owner first.
+
+### Disposition report correction (2026-11-10)
+- The 0101/0102 report now reflects the current router source: `agent.runs.get` returns `[]` for `artifactIds` and no longer queries `artifacts`. The migration's `artifacts` table is `UNVERIFIED` because there is no current verified consumer; the report no longer claims an active artifacts read.
+- `agent_run_actions` is written by `sveltekit-frontend/scripts/phase79-agentic-repair.mts`. The compiler package barrel exposes an adapter, but the scoped caller search found no non-test request-path invocation. `agent_action_results` has no active non-test reader/writer. Do not describe these as a proven general runtime replacement for `agent_run_steps`.
+- Report source hashes were refreshed for the changed router and the reviewed action-writer/caller files. No database access or DDL occurred.
+
+### Update — caller requirements for drifted telemetry schemas (2026-11-10)
+- Reviewed the current SQL callers for `proposed_tool_calls`, `execution_reviews`, `tool_call_events`, and `outcome_ledger`. Their used columns are captured in `applicationCallerShapeReview` in the disposition report, with source hashes for the route, recorder, receipt store, and execution-review module.
+- The current execution route/review code uses the wider proposal/event/outcome fields reported by the saved TRACE receipts. The `execution_reviews` writer does not supply `trace_id`; the migration's trace index therefore has no source caller requirement and is incompatible with the reported live table shape.
+- These source facts support preserving the current caller contracts, but do not independently prove full live schema parity, canonical index definitions, FK safety, or migration execution history. The 0111 FK/index repair remains blocked on approved identity-bound catalog readback and orphan checks. No DDL or database access occurred.
+
+### Update — 0110 semantic lifecycle caller review (2026-11-10)
+- `semantic_lifecycle_events` is source-required: the phase109a MCP module reads signal history through the Drizzle owner, and migration 0116's `supersede_recommendation()` inserts recommendation transition events.
+- Current Drizzle shape differs from 0110 SQL in nullability (`previous_state` required in Drizzle; `reason` nullable in Drizzle) and index names. 0118 widens `new_state` for recommendation lifecycle values, so 0110 alone is not the complete source contract. The saved TRACE receipt only checked presence/index names; it did not compare columns or constraints.
+- Do not rerun 0110, which replaces triggers/views and does not match current source. Resolve live columns, constraints, indexes, and 0110/0116/0118 execution history with identity-bound catalog evidence before any repair proposal. No database access or DDL occurred.
+- The source-registered phase109a `supersede` tool calls `supersede_recommendation()` from 0116; `promote` calls `promote_recommendation()` and 0118 widens the lifecycle check for its recommendation states. All three migration files are absent from the current journal and sidecar manifest. This makes their migration status `STALE_MIGRATION_UNREGISTERED`, but execution history is still unknown—not proof that the runtime functions/constraint are absent.
+- 0118 drops and re-adds its check without explicit transaction control; a repair candidate must make this atomic and validate the live check/state values first. 0116 includes an ALTER plus function replacement and also needs an atomic rehearsal. No migration was run.
+
+## CANONICAL-SHAPE-DECISION-01 (2026-11-09, operator)
+
+- `tool_call_events` and `outcome_ledger`: CANONICAL = the wider live shape. Migration files (0111) are the stale side. Restoring the missing foreign keys and indexes is a separate step, gated on the orphan-row check.
+- `proposed_tool_calls` (0112) and `execution_reviews` (0114): NOT DECIDED. Live shapes differ from the migrations; awaiting operator choice of canonical shape.
+- No DDL, no manifest change, no database change.
+
+### Update — scratch catalog readback and rolled-back 0111 rehearsal (2026-11-09)
+- Confirmed the connection target as `legal_ai_live_integration_scratch`, PostgreSQL 18.4. Catalog and orphan queries used read-only transactions. This is scratch evidence only; it does not refresh or establish TRACE/production parity.
+- Current scratch shapes confirm `proposed_tool_calls` has the selected-tool/candidate/confidence contract, while 0112's `tool_name`, `executed`, `approval_required`, and `schema_valid` columns are absent. `execution_reviews` has no `trace_id`; its active writer does not use it. Do not rerun 0112 or 0114 against these shapes.
+- `tool_call_events` and `outcome_ledger` use the wider current caller contract. Four nullable 0111 relationships had zero orphan rows. A transaction added and validated the four foreign keys and created `idx_tce_trace_id` plus `idx_ol_task_id`; rollback completed. A separate read-only query confirmed zero persisted candidate constraints/indexes afterward. This is a rolled-back scratch rehearsal, not a persistent repair.
+- `agent_tasks` exists with the current 14-column shape; `idx_at_session` is absent. `semantic_lifecycle_events` matches current Drizzle nullability/index names; the union state constraint and `promote_recommendation`, `supersede_recommendation`, and `supersede_semantic_signal` are present. This proves current scratch object presence/shape, not which migration created them.
+- The independent Drizzle-history audit confirmed scratch DB identity/version, zero migration-ledger rows, 41 journal entries, 147 sidecar records, and 57 manifest rows marked applied. The empty ledger does not establish whether unregistered SQL was executed manually; migration execution history remains UNKNOWN.
+- Evidence: `docs/reports/sidecar-migration-object-disposition-v1.json`, `.tmp/atlas/sidecar-scratch-catalog-readback-20261109.json`, and `.tmp/atlas/readonly-audit-output/DeedsWebApp/inventory/drizzle-history-readonly-latest.json`.
+- No persistent database changes, migration executions, manifest edits, or task status changes occurred in this step. Production/TRACE verification and any persistent repair remain separate admission gates.

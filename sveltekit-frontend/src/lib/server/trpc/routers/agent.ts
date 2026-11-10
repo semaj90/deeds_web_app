@@ -37,11 +37,9 @@ export const agentRouter = router({
               FROM workflow_tasks t
               WHERE t.run_id = r.id
             ) AS "taskIds",
-            (
-              SELECT COALESCE(jsonb_agg(a.id ORDER BY a.created_at), '[]'::jsonb)
-              FROM artifacts a
-              WHERE a.run_id = r.id
-            ) AS "artifactIds"
+            -- artifacts table is not in the live schema (see sidecar migration review);
+            -- keep the key so the response shape is stable, until an artifact owner exists.
+            '[]'::jsonb AS "artifactIds"
           FROM workflow_runs r
           WHERE r.id = ${input.runId}::uuid
             AND r.user_id = ${ctx.userId}

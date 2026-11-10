@@ -2907,6 +2907,12 @@ server.registerTool(
 
 // == trace.system_health =======================================================
 
+// Services whose outage is reported but does not degrade the system. `rerank` is the optional
+// TensorRT-LLM accelerator (docker-compose 8099 -> 8096); the model registry lists it as future.
+// `topology_search` (:8101) has no implementation in this repo (only the TOPOLOGY_SEARCH_URL
+// config value exists), so it is optional until a server owner is identified.
+const OPTIONAL_HEALTH_SERVICES: ReadonlySet<string> = new Set(['rerank', 'topology_search']);
+
 server.registerTool(
   'trace.system_health',
   {
@@ -2994,8 +3000,13 @@ server.registerTool(
             type: 'text',
             text: JSON.stringify(
               {
-                ok: checks.every((check) => check.ok),
-                degraded: checks.some((check) => !check.ok),
+                // `rerank` (TensorRT-LLM, :8099) is an optional accelerator: its outage is
+                // reported in optionalDown but does not mark the system ok=false / degraded.
+                ok: checks.every((check) => check.ok || OPTIONAL_HEALTH_SERVICES.has(check.name)),
+                degraded: checks.some((check) => !check.ok && !OPTIONAL_HEALTH_SERVICES.has(check.name)),
+                optionalDown: checks
+                  .filter((check) => !check.ok && OPTIONAL_HEALTH_SERVICES.has(check.name))
+                  .map((check) => check.name),
                 checkedAt: new Date().toISOString(),
                 services: checks,
                 notes: [

@@ -444,3 +444,20 @@ See also [`CATEGORIZED_INDEX.md`](./CATEGORIZED_INDEX.md): the same markdown doc
 | [2026-10-31_vlm_2d_to_3d_comfyui_handoff.md](../docs/next_steps/2026-10-31_vlm_2d_to_3d_comfyui_handoff.md) | 2026-11-01 | Canonical & Audited | Handoff: Ornith 1.5 VLM, 2D-to-3D Reconstruction, ComfyUI Flow & 384 Audit |
 | [litert-conversion-pathway.md](../docs/next_steps/litert-conversion-pathway.md) | 2026-07-20 | DEFERRED | Priority: P3 (nice-to-have op | LiteRT.js Conversion Pathway (Optional Post-Phase 106) |
 
+<!-- openspec-document-crosswalk:start -->
+## OpenSpec workboard references (review only)
+
+Fresh workboard snapshot: `.tmp/atlas/openspec-workboard-nextsteps-alignment-v1.json` (1d8bd7cfdedf7ab01654ec768efacaf044985dda96497a1ded2ba1aea8570b19).
+
+The index contains no checkbox task rows and has no task identity. The 5 links below are explicit document references from current, block-hash-verified OpenSpec tasks. They are navigation links only; they do not approve ID equivalence, ownership, dependency, or completion.
+
+| next_steps document | OpenSpec workboard task | Source binding |
+|---|---|---|
+| [`next_steps/10_3_26.md`](10_3_26.md) | `parent-atlas-openspec-tasks-audit-fabric:127` · stable `parent-atlas-openspec-tasks-audit-fabric#5f6cd4b79b4ac1b8` | `openspec/changes/parent-atlas-openspec-tasks-audit-fabric/tasks.md#L127` · `sha256:84887e0b347d1ab1750801cc44f7da3eb67c0f83262e601665e36b56d5ee0a4b` |
+| [`next_steps/active/2026-05-09_gemma4-mcp-synthesis-loop.md`](active/2026-05-09_gemma4-mcp-synthesis-loop.md) | `local-llm-offload-ownership:194` · stable `local-llm-offload-ownership#9a58d68d138e3ade` | `openspec/changes/local-llm-offload-ownership/tasks.md#L194` · `sha256:84394c963aeec47550d35b3ebc99a464794eabdfd3f7546fd9aa37ce7f7df03a` |
+| [`next_steps/active/2026-05-29_reconstruction-lanes-map.md`](active/2026-05-29_reconstruction-lanes-map.md) | `courtroom-upload-story-pipeline:101` · stable `courtroom-upload-story-pipeline#20d4db32fa213291` | `openspec/changes/courtroom-upload-story-pipeline/tasks.md#L101` · `sha256:e8945acb60093bcc3c00c2b92e8a2cca0bf74bc4d4dbf8f43c22bf5a5cb76540` |
+| [`next_steps/active/2026-09-12_promotion-board-real-work.md`](active/2026-09-12_promotion-board-real-work.md) | `parent-atlas-ace-rlm-bitfrost-integration:7832` · stable `parent-atlas-ace-rlm-bitfrost-integration#bff3cf8e009381bd` | `openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L7832` · `sha256:acbc8b61e45320fc9937738999224ae4123d9be834fb1d844757db12e1a82a20` |
+| [`next_steps/active/2026-09-14_gpu-mini-fabric-cutile-level3-and-tests.md`](active/2026-09-14_gpu-mini-fabric-cutile-level3-and-tests.md) | `parent-atlas-tensor-residency-integration:1542` · stable `parent-atlas-tensor-residency-integration#3b0325e7495a7bd2` | `openspec/changes/parent-atlas-tensor-residency-integration/tasks.md#L1542` · `sha256:a02148fac962bc94d3d092fa11c88e55d974e33fbb9558cd2218b41c5fdee400` |
+
+Machine-readable source and document hashes: [crosswalk report](../docs/reports/nextsteps-openspec-document-crosswalk-v1.json).
+<!-- openspec-document-crosswalk:end -->

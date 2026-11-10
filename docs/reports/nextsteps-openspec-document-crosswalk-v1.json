@@ -1,0 +1,102 @@
+{
+  "schema": "atlas.nextsteps-openspec-document-crosswalk.v1",
+  "generatedAt": "2026-11-09T23:13:00.554Z",
+  "canonicalAuthority": false,
+  "taskCompletionAuthorized": false,
+  "kanbanWritesPerformed": false,
+  "taskIdsRewritten": false,
+  "input": {
+    "workboardSnapshot": ".tmp/atlas/openspec-workboard-nextsteps-alignment-v1.json",
+    "workboardSnapshotSha256": "1d8bd7cfdedf7ab01654ec768efacaf044985dda96497a1ded2ba1aea8570b19",
+    "generatedAt": "2026-11-09T22:46:27.027Z",
+    "taskRows": 14234
+  },
+  "sourceValidation": {
+    "currentTaskBlocks": 14234,
+    "staleOrMissingTaskBlocks": 0,
+    "invalidTaskReferences": 0
+  },
+  "nextStepsIndex": {
+    "path": "next_steps/INDEX.md",
+    "hasCheckboxTaskRows": false,
+    "hasTaskIdentity": false
+  },
+  "relationshipSemantics": "An explicit path mention links an OpenSpec task to a document for navigation only. It does not assert task identity equivalence, ownership, dependency, or completion.",
+  "counts": {
+    "explicitTrackedDocumentLinks": 5,
+    "distinctDocuments": 5,
+    "reviewRequired": 5
+  },
+  "links": [
+    {
+      "workboardTaskKey": "parent-atlas-openspec-tasks-audit-fabric:127",
+      "stableKey": "parent-atlas-openspec-tasks-audit-fabric#5f6cd4b79b4ac1b8",
+      "logicalTaskKey": "parent-atlas-openspec-tasks-audit-fabric:5.5",
+      "change": "parent-atlas-openspec-tasks-audit-fabric",
+      "taskSource": "openspec/changes/parent-atlas-openspec-tasks-audit-fabric/tasks.md",
+      "taskLine": 127,
+      "taskBlockSha256": "sha256:84887e0b347d1ab1750801cc44f7da3eb67c0f83262e601665e36b56d5ee0a4b",
+      "taskSourceFileSha256": "ff98466aad311c0e236e910ded841af6553f55bbee6d8d2518bb935c12785f75",
+      "referencedDocument": "next_steps/10_3_26.md",
+      "referencedDocumentSha256": "e8128c2e4905cec41a62f105cd0f6d9a31d5a3a675884a36d283b85a2ed5411c",
+      "relationship": "EXPLICIT_DOCUMENT_REFERENCE_ONLY",
+      "identityApproval": "REVIEW_REQUIRED"
+    },
+    {
+      "workboardTaskKey": "local-llm-offload-ownership:194",
+      "stableKey": "local-llm-offload-ownership#9a58d68d138e3ade",
+      "logicalTaskKey": null,
+      "change": "local-llm-offload-ownership",
+      "taskSource": "openspec/changes/local-llm-offload-ownership/tasks.md",
+      "taskLine": 194,
+      "taskBlockSha256": "sha256:84394c963aeec47550d35b3ebc99a464794eabdfd3f7546fd9aa37ce7f7df03a",
+      "taskSourceFileSha256": "8c098822d850de1d6dd3575f3c19dbfd9d5821bb4394b93f64c35bad195d6a5d",
+      "referencedDocument": "next_steps/active/2026-05-09_gemma4-mcp-synthesis-loop.md",
+      "referencedDocumentSha256": "0f0d256658e2f9bff9197929cb3bd6c8d79fb2df6627515c0a11023b28a7251a",
+      "relationship": "EXPLICIT_DOCUMENT_REFERENCE_ONLY",
+      "identityApproval": "REVIEW_REQUIRED"
+    },
+    {
+      "workboardTaskKey": "courtroom-upload-story-pipeline:101",
+      "stableKey": "courtroom-upload-story-pipeline#20d4db32fa213291",
+      "logicalTaskKey": "courtroom-upload-story-pipeline:CSP-102",
+      "change": "courtroom-upload-story-pipeline",
+      "taskSource": "openspec/changes/courtroom-upload-story-pipeline/tasks.md",
+      "taskLine": 101,
+      "taskBlockSha256": "sha256:e8945acb60093bcc3c00c2b92e8a2cca0bf74bc4d4dbf8f43c22bf5a5cb76540",
+      "taskSourceFileSha256": "95009e996ba19db3a80474f42eee5009eefebfdd6207ad79c91c64db44ba07d1",
+      "referencedDocument": "next_steps/active/2026-05-29_reconstruction-lanes-map.md",
+      "referencedDocumentSha256": "76678d9889df9ff63ca75009a8e09a4db436ca646a8b7e8392e6319130dc1050",
+      "relationship": "EXPLICIT_DOCUMENT_REFERENCE_ONLY",
+      "identityApproval": "REVIEW_REQUIRED"
+    },
+    {
+      "workboardTaskKey": "parent-atlas-ace-rlm-bitfrost-integration:7832",
+      "stableKey": "parent-atlas-ace-rlm-bitfrost-integration#bff3cf8e009381bd",
+      "logicalTaskKey": "parent-atlas-ace-rlm-bitfrost-integration:QDRANT-LEGACY-PAYLOAD-BACKFILL-01",
+      "change": "parent-atlas-ace-rlm-bitfrost-integration",
+      "taskSource": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+      "taskLine": 7832,
+      "taskBlockSha256": "sha256:acbc8b61e45320fc9937738999224ae4123d9be834fb1d844757db12e1a82a20",
+      "taskSourceFileSha256": "5aad37703e62b37f4f300795920da6a83adcfa15a245940f1c9c1b1f8d00d650",
+      "referencedDocument": "next_steps/active/2026-09-12_promotion-board-real-work.md",
+      "referencedDocumentSha256": "46755928dbe4a16697df90671735d70cf271afd63547c177fbd364463a865094",
+      "relationship": "EXPLICIT_DOCUMENT_REFERENCE_ONLY",
+      "identityApproval": "REVIEW_REQUIRED"
+    },
+    {
+      "workboardTaskKey": "parent-atlas-tensor-residency-integration:1542",
+      "stableKey": "parent-atlas-tensor-residency-integration#3b0325e7495a7bd2",
+      "logicalTaskKey": "parent-atlas-tensor-residency-integration:UNIFIED-RESIDENCY-CURRENT-CANDIDATE-MATERIALIZATION-01",
+      "change": "parent-atlas-tensor-residency-integration",
+      "taskSource": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
+      "taskLine": 1542,
+      "taskBlockSha256": "sha256:a02148fac962bc94d3d092fa11c88e55d974e33fbb9558cd2218b41c5fdee400",
+      "taskSourceFileSha256": "49906a496bcad2b834bd1cbabb71f20da92f6f500a3f30c8753260cbbed69352",
+      "referencedDocument": "next_steps/active/2026-09-14_gpu-mini-fabric-cutile-level3-and-tests.md",
+      "referencedDocumentSha256": "c82c5604d6846dcfa2217560e9c93d8590a67fdc4d91f7f03a2eba8541de5e26",
+      "relationship": "EXPLICIT_DOCUMENT_REFERENCE_ONLY",
+      "identityApproval": "REVIEW_REQUIRED"
+    }
+  ]
+}

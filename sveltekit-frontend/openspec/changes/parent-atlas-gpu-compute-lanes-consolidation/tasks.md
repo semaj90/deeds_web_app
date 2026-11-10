@@ -24,7 +24,7 @@ Everything below was measured on this host (RTX 3060 Ti, sm_86, 8 GiB). Status w
 | Phase B CAGRA | PARTIAL_PROVEN | N=16K PASS (.9746); N=64K default FAIL (.8289); build isolation: ivf_pq .8391 vs nn_descent .998 (VRAM-pressure hypothesis falsified); itopk 64/256/512 → .8347/.9805/.998 |
 | Phase B3 real semantic_768 | PASS | 55,169 rows read-only: .9905 default, .9995 itopk=512; one query 0.0 recall@16 at default (unexplained) |
 | Phase D graph | PASS | BFS exact (INT32_MAX unreached sentinel); PageRank corr .99992, topK overlap .98; dangling no-op: no measurable divergence at 0.8% dangling; `GraphExecutionSemanticsV1` gate precedes every PageRank compare |
-| ACE-RADIX-01 | CUB half DRY_RUN_PROVEN; cuTile half ENVIRONMENT_BLOCKED | N=256..64000 exact vs CPU `std::sort`; CUDA 13.0 ships only `crt/cuda_tile.h` stub |
+| ACE-RADIX-01 | CUB half DRY_RUN_PROVEN; Python cuTile fixtures separately DRY_RUN_PROVEN; optional C++ cuTile path toolchain-blocked | CUB and Python cuTile proofs are distinct. The Python proof uses the isolated `/home/james/.venvs/atlas-cutile-cu132` environment; the CUDA 13.0 C++ attempt found only the `crt/cuda_tile.h` stub. No current rerun or production promotion is implied. |
 | CUTILE-ACE-01 L2 (SIMT) | DRY_RUN_PROVEN | `GlyphScoreV1` + ResidencySortKey pack exact at N=256/1000/4000 |
 | CUTILE-ACE-01 L3 (Tile, Python `cuda.tile` 1.5.0) | DRY_RUN_PROVEN | exact at N=256/1000/4000 + 26-row boundary fixture; signed-div workaround range-proven (uint16 ≪ INT32_MAX) |
 | CUTILE-ACE-01 L3 C++ | PROVEN_BLOCKED (`BLOCKED_TOOLCHAIN_VERSION_SKEW`) | 13.3 header/cicc vs 13.2 `tileiras`; optional, not reopened |
@@ -55,7 +55,7 @@ Everything below was measured on this host (RTX 3060 Ti, sm_86, 8 GiB). Status w
   - **Restore:** human runs `⚡ TurboQuant: Start (vision, CPU projector, :8090)` and checks `gpu_vram_status` shows `allSlotsIdle` and `reachable: true`. Record the restore result in the receipt or next to it.
   - **Non-goals:** no parity claim, no eligibility claim, no change to the 13.0 native lane. A pass only proves the venv still runs cuTile on this host.
 - [ ] **OPS-LIFECYCLE-AUTH-01** decision task: conditions under which an agent-callable tool may stop, start or restart `:8090` (or any service). Until every condition below is met, agents get read-only status tools and request records only (`gpu_vram_status`, `gpu_request_vram_release`).
-  1. Real authentication: a token checked against a stored secret, not presence. `requireToken` (accepts any non-empty string) must be replaced.
+  1. Real authentication: source now delegates to `verifyMcpOperatorToken`, which compares against `TRACE_MCP_OPERATOR_TOKEN` and fails closed when unconfigured. Local verifier/gate tests pass; the recorded running TRACE process refused a fake token as unconfigured. Positive comparison under a configured process secret remains unverified; never print or retrieve that secret.
   2. A typed, single-purpose tool per action. No generic shell or Docker control.
   3. Idle precheck: `/slots` reports all slots idle before any stop. Busy means refuse.
   4. PID scoping: act only on the process listening on the exact port, owned by the expected command line.
@@ -63,6 +63,30 @@ Everything below was measured on this host (RTX 3060 Ti, sm_86, 8 GiB). Status w
   6. Negative tests: a fake token is refused; a busy slot is refused; a wrong-PID target is refused.
   - **Open finding (unverified):** TRACE tools `llama_server_unload` and `llama_server_start` appear in the tool list, but a repo search (excluding `.tmp/` and `docs/archive/`) found no definition. Before any agent uses them, find their implementation and confirm whether they stop `:8090`. Until then, treat them as not agent-callable.
   - **Non-goal:** this task does not build the lifecycle tool. It records the decision and its test plan.
+  - **Handoff (2026-11-09), MCP tool-calling status:**
+    | Item | Status | Evidence |
+    |---|---|---|
+    | `gpu_vram_status` (read-only) | PASS | Live calls returned `writesPerformed: false`. Last reading 7,873 of 8,192 MiB used, 319 MiB free, `:8090` reachable, slot idle. |
+    | `gpu_request_vram_release` | CONTRACT PASS 8/8 in the currently present focused suite; live request NOT TESTED | `scripts/mcp/atlas-tools-mcp.vram-request-contract.test.mjs` (8): temporary paths only; bounded schema, production/test shape, replay/conflict, and no-lifecycle behavior checked. A second `gpu-request-vram-release.test.mjs` suite cited by an earlier 14/14 report is absent from the current worktree, so that aggregate count is not verified. The real request file `.tmp/atlas/gpu-vram-release-requests.ndjson` remained absent after the focused test. |
+    | Auth verifier and operator-tool tests | LOCAL PASS 37/37; live fake-token denial only | `tests/mcp-operator-tools.spec.ts` imports the real verifier; verifier and gate specs bring the focused run to 37/37. The live fake-token call returned `OPERATOR_TOKEN_ENV_UNCONFIGURED` before token comparison. No secret was read or printed; configured-token comparison and scoped lifecycle authorization remain unverified. |
+    | `llama_server_unload` / `llama_server_start` (TRACE) | UNVERIFIED | Listed in the tool surface; no definition found in repo search (excluding `.tmp/` and `docs/archive/`). Treat as not agent-callable. |
+    | `CUTILE-VENV-RERUN-01` | BLOCKED on human | Run only after the operator confirms `:8090` is idle, uses the approved VS Code GPU release task, and independently confirms at least 6 GiB free. Restore `:8090` through its approved VS Code task afterward. |
+    | `wfu-metadata.test.mjs` | PASS 20/20 | `node --test`, read-only. |
+    | `audit-runtime-ownership.test.mjs` | PASS 1/1 | `node --test`, read-only. The "16/16" figure from an earlier paste is not supported by this file. |
+  - **Next (agent-doable, no GPU or service changes):**
+    1. **Done (2026-11-09, rechecked):** the extant focused request contract suite passes 8/8; all test writes were to temporary directories, and the real request file remained absent. The earlier 14/14 aggregate included a second suite that is absent from the current worktree and is not claimed here.
+    2. **Done (2026-11-09, rechecked):** operator-tools, verifier, and gate specs pass 37/37 against the real verifier. The recorded live negative call refused a fake token because the process secret was unconfigured; no positive comparison test was run.
+    2a. **Historical process observation (2026-11-09; not authorization):** TRACE listener PID 61492 was observed on `:8788`; timestamps suggested it loaded the then-current verifier. A later live fake-token call returned `OPERATOR_TOKEN_ENV_UNCONFIGURED`, so process timing is not treated as authentication proof. An earlier PID 14196 attribution was incorrect; it was an unrelated `cmd.exe`/Vite process.
+    2b. **Latest live auth result (2026-11-09):** fake-token call to read-only `ops.propose_patch` was refused with `OPERATOR_TOKEN_ENV_UNCONFIGURED` before comparison; nothing executed. This proves fail-closed refusal only. A correct-token test requires the operator to configure the secret in the approved TRACE launcher and restart TRACE using the human-operated procedure. Never retrieve, print, or accept the secret in an agent-visible prompt.
+    2c. **Done (2026-11-09; supersedes earlier 33/33 count; authentication scope only):** `tests/mcp-operator-tools.spec.ts` imports the real `verifyMcpOperatorToken`; the `requireToken` wrapper is a thin adapter. The operator-tools, verifier, and gate specs pass 37/37 together. No configured-secret live comparison was tested. This auth test result does not define the separate VRAM request-record schema in 2d.
+    2d. **Resolved (2026-11-09):** the v1 request record includes `requestId` (idempotent retry key), `actorContext`, `operation`, and `targetScope`. `testOnly` is emitted only when the isolated handler is explicitly constructed with the test-only option; the normal production request record omits it. The 8-test contract suite passes with temporary sinks, including production-shape exclusion and replay/conflict behavior. No live request canary was run or authorized. Receipt: `.tmp/atlas/mcp-vram-request-contract-20261109.json`.
+    2e. **WIRED, runtime confirmation pending (2026-11-09):** `trace.system_health` classifies both `rerank` (:8099) and `topology_search` (:8101) as optional for general health and lists either outage in `optionalDown`; those outages alone do not set `ok=false` or `degraded=true`. This health classification does not make topology capability available to workflows that require it. Source is `sveltekit-frontend/src/mcp/trace-mcp-server.ts`; this records source wiring only. A TRACE restart and live health response are still required to prove deployed behavior. No service was restarted.
+    3. **Done (2026-11-09; source search only):** repo-wide search (excluding `node_modules`, `docs/archive/`, `.tmp/`) found no source definition of `llama_server_unload`, `llama_server_start` or `llama_server_status`. Their presence in a live tool list does not establish a safe implementation; do not call them until the running build is identified and reviewed.
+    4. **Done (2026-11-09, read-only runtime-plan audit):** `atlas-rapids-cu13` metadata reports Python 3.14.6, PyTorch 2.13.0 and ONNX Runtime 1.31.0; the separate `atlas-cutile-cu132` venv reports PyTorch 2.14.0+cu132, cuTile 1.5.0 and tileiras 13.2.78. Frontend packages are `onnxruntime-node/web` 1.29.0 and LangGraph 1.4.7; root LangGraph is 1.3.2. No GPU/provider probe or install was performed. `dev:gpu` is a service-starting app command; its ONNX DirectML path caps intra-op threads at 4 by default, not 4–8 independent workers. Keep the CUDA 13.0 RAPIDS and cuTile lanes separate; CUDA 13.4 / TensorRT-RTX 1.7 is not approved by the frozen rules.
+  - **Sub-gate 1A — PROVEN (2026-11-09, read-only):** existing suites `src/mcp/operator-token-verifier.spec.ts` (5) and `src/mcp/operator-token-gate.spec.ts` (4) pass 9/9 under vitest. Receipt: `.tmp/atlas/ops-lifecycle-auth-vitest-receipt-20261109.json` (`success: true`, 0 failed). Reuses existing specs; no new tests.
+  - **Sub-gate 1B — PARTIAL (2026-11-09, read-only):** source SHA-256 recorded in `.tmp/atlas/ops-lifecycle-trace-deployment-check-20261109.json` (`trace-mcp-server.ts` `4a9bfa17…a116`, `operator-token-verifier.ts` `ee44bc89…2a37`, `operator-token-gate.ts` `2b0838cd…47fb`). The running TRACE listener is PID 61492 (`node --loader …node-ts-loader.mjs …trace-mcp-server.ts`). Not proven: the process's loaded module hash, because a read-only check cannot read it. Live behaviour shows `TRACE_MCP_OPERATOR_TOKEN` unset in that process (fake token → `OPERATOR_TOKEN_ENV_UNCONFIGURED`). The env var name is `TRACE_MCP_OPERATOR_TOKEN`, not `MCP_OPERATOR_TOKEN` as the handoff text said. Configured-secret comparison is untested.
+  - **Sub-gate 2 — NOT STARTED:** typed single-purpose tool, idle-slot precheck, exact port-to-PID scoping, pre/post audit receipt. Stays BLOCKED with lifecycle tools uncalled.
+  - **Human steps (not agent):** configure TRACE's shared secret in the approved launcher and restart TRACE; perform wrong-token then correct-token checks against a non-writing tool without exposing the secret; for cuTile, confirm idle slots, run the approved GPU release VS Code task, verify ≥6 GiB free, and restore `:8090` through its approved VS Code task. The agent must not stop/start/restart services, read the secret, or write a live request canary. Keep lifecycle tools disabled until every `OPS-LIFECYCLE-AUTH-01` condition is proven.
 - [ ] **GPU-PACKET-PASS-01** manual (not startup) GPU pass over ACE packets for dedup and validation, feeding a later BitFrost warm. Blocked on: `BITFROST-LIVE-WARM-01` (admitted packet identity plus a bounded write/readback/expiry canary), and on a packet admission rule that defines "valid" and "duplicate". Steps, in order:
   1. **Dry-run first (read-only):** read packets from the canonical source, check `packet_key`, `source_ref` and revision, and report counts. Writes nothing and touches no cache.
   2. **Dedup pass:** group exact duplicates by content checksum, and record near-duplicates separately. Keep the serial CPU result as the oracle; any GPU result needs CPU parity before it counts.
@@ -1126,7 +1150,7 @@ Free VRAM by state (this host, `nvidia-smi`): Ornith vision server up ~0.2-0.3 G
 | cuVS KMeans (`atlas-rapids-cu13`): `HASHCENT-02`, `atlas_summary_hint_cuvs_compare_v1.py`, `run_cuvs_soft_kmeans` | **Measured** 2026-10-04: 5,000x768 K=32 added ~0.2 GiB (peak 1.5 GiB total with desktop); 20,000x768 K=64 added ~0.33 GiB. **Arithmetic only (not measured):** raw fp32 matrix 162 MiB for the 55k `content_embedding` rows, 642 MiB for all 219k; `streaming_batch_size>0` keeps the source on the host. | Small fixtures: probably not by size, but 0.2 GiB free leaves no margin; **corpus-scale: yes** until re-measured. |
 | cuVS CAGRA / exact ANN (`graph_ann_01/02/03`, `retrieval_01l_08a_cuvs_exact_v1`, `semantic_exact_parity_01`, `semantic_topk_01_real_canary`) | no VRAM figure recorded in the ledger; inputs up to 64K x 768 (192 MiB raw) plus graph/index | unmeasured; assume yes for N >= 64K |
 | cuGraph BFS / PageRank (`graph_struct_01/02`, `graph_pagerank_02_dangling`, `graph_snapshot_parity_cugraph_oracle`; 162,234 nodes / 108,156 edges parity) | no VRAM figure recorded | unmeasured |
-| cuTile / SIMT ACE-RADIX fixtures (`ace-radix-01/*`, `/home/james/.venvs/atlas-cutile-cu132`, N <= 64,000) | tiny buffers; no figure recorded | probably no, unmeasured; the cuTile half is blocked by the CUDA toolchain, not VRAM |
+| cuTile / SIMT ACE-RADIX fixtures (`ace-radix-01/*`, `/home/james/.venvs/atlas-cutile-cu132`, N <= 64,000) | tiny buffers; no figure recorded | prior Python fixtures ran, but current admission still requires ≥6 GiB free by policy; C++ toolchain status is separate from VRAM |
 | `BITFROST-L2-01` rerun | reference needs ~1 GiB streaming buffer + persist/set-aside carve-outs | **yes** (ledger already says: isolated GPU or record null) |
 | `LIBTORCH-PARITY-01`, `CUDA-LIBTORCH-132-01`, `TRT-RTX-1.6-CUDA134-01` | native **Windows** CUDA/LibTorch lanes, not WSL2 | n/a for WSL; a parity run beside Ornith competes the same way |
 | Docker `atlas-gpu-8098` (RAPIDS image) | built from full `rapidsai/base`; not WSL conda | decision pending (retire or slim) |
@@ -2173,3 +2197,119 @@ Milestone: `HANDOFF_PUSHED — REVIEW_REQUIRED` (not `PRODUCTION_READY`). No che
 1. `ae:train` is hard-gated (`TRAINING_AUTHORITY_PROVEN = False`); only legacy checkpoints exist. Evaluate the 768-D, MRL-256 and legacy lanes before any retraining.
 2. The EmbeddingGemma 2 evaluation is PLAN_ONLY and needs human-judged queries; the shadow parity gate runs on random vectors and is not evidence. Canonical stays `embeddinggemma:latest` `semantic_768`.
 3. Stale live `workflow_outbox` fixture row (see `route-import-infra-isolation`) and the scratch database `legal_ai_live_integration_scratch`.
+
+**NAME-POLICY-01 artifact inventory correction (2026-11-09):** The focused guard initially flagged `src/routes/(app)/demos/gemma4-mtp/+page.svelte`, which inventories local GGUF/MTP artifact paths for display. Inspection confirmed `gemma4-legal-iq4xs-direct.gguf` is an artifact path, not a chat request model ID. Reclassified this file in `ALLOWED_GEMMA_ARTIFACT_FILES` with an explicit reason; `KNOWN_LITERAL_FILES` remains empty. The combined NAME-POLICY-01, HASHCENT-01 lookup, and GSP-5.2 replay-identity suites pass 17/17. This verifies those focused contracts, not live Valkey writes, graph projection, or the historical GPU parity receipt.
+
+## MCP registry + evidence audit (2026-11-09, read-only; supersedes conflicting earlier wording above)
+
+Scope: source-qualified audit of the MCP registry and the five-factor task evidence. No writes to PostgreSQL, Redis/Valkey, Qdrant, Neo4j, SeaweedFS, Kanban state or production request ledgers. No write-capable or operator-gated tool called; no service touched. Evidence in `.tmp/atlas/` (dated) and the cited reports.
+
+| Item | Status | Evidence (source, not prose) |
+|---|---|---|
+| VRAM request record (2c/2d) | RESOLVED | The approved option 1 keeps `requestId`, `actorContext`, `operation`, and `targetScope`; `testOnly` is isolated to test handlers. Ledger item 2d now records this production shape. |
+| Idempotency and conflict | PASS, process-local | Identical retries return the stored record. Reuse with changed `operation`, `reason`, `neededMiB`, or `targetScope` fails with `GPU_REQUEST_ID_REUSED_WITH_DIFFERENT_PAYLOAD`; cross-process idempotency is not claimed. |
+| Contract tests | PASS 8/8 | `node --test scripts/mcp/atlas-tools-mcp.vram-request-contract.test.mjs` (temporary sinks; reason and neededMiB collision cases; no production request log created). |
+| TRACE `rerank` optional | SOURCE ONLY; live PENDING | `src/mcp/trace-mcp-server.ts` `OPTIONAL_HEALTH_SERVICES` (`rerank`), `optionalDown` output; `topology_search` still required. Running listener PID 61492 predates the change; restart is operator-controlled. |
+| Operator-token verifier | SOURCE PASS; live config UNVERIFIED | `src/mcp/operator-token-verifier.ts`: defaults to `TRACE_MCP_OPERATOR_TOKEN`, SHA-256 digests, `timingSafeEqual`, fails closed when unset. `operator-token-gate.ts` delegates to it. Live: unset in the running process (fake token -> `OPERATOR_TOKEN_ENV_UNCONFIGURED`). Configured-secret comparison NOT tested. |
+| `ops.fixer_pattern_store` | DISCREPANCY CONFIRMED | Declared `[OPERATOR-GATED]` (`trace-mcp-server.ts` ~L7948) and wrapped by `withOperatorTokenGate`. Implementation writes Redis (`storeFixerPattern`), Postgres pool, and Qdrant `fixer_memory_768` (`ensureFixerMemoryCollection`). `docs/TRACE-MCP-TOOLS-AUDIT.json` lists it beside read-only `ops.*` tools. Actual side effect = WRITE. Registry label left unchanged pending owner correction. |
+| `ops.record_fix_attempt`, `ops.propose_patch`, `ops.run_targeted_test` | DECLARED OPERATOR-GATED | Registered in `trace-mcp-server.ts` with `operator_token`. `propose_patch` self-describes as read-only preview; `run_targeted_test` spawns a process. Not called in this audit. |
+| `ops.fixer_semantic_recall`, `ops.search_tools`, `ops.inspect_tool_contract`, `ops.validate_tool_call` | REGISTERED | `trace-mcp-server.ts`; not called in this audit. Side effects not traced to completion. |
+| `atlas.materialize_feature_evidence_tuples` | REGISTERED; WRITE-LIKELY by name | `trace-mcp-server.ts` ~L10609; bounded per `read-tool-bounds.spec.ts`. Writes not traced; do not call until traced. |
+| `atlas_keyword_corpus_search` | NOT FOUND as a registered name | Source: `src/mcp/atlas-keyword-corpus-tools.ts` (read-only `.okf` vocabulary search, reference-only); its registered name was not located in this pass. |
+| `trace.kag_search`, `graph.expand_neighborhood`, `atlas.graph.pagerank` | REGISTERED (many call sites) | Not traced to side effects in this pass. |
+| `atlas.backend_info`, `atlas.exact_topk_oracle`, `atlas.parity_report`, `atlas.simdjson_tensor_metrics` | REGISTERED | `src/mcp/native-acceleration-tools.ts` (+ spec). Read/compute only per names; not called. |
+| `ops.gpu_topk`, `ops.gpu_pagerank`, `ops.gpu_attention` | REGISTERED, operator-gated | `trace-mcp-server.ts`; GPU work NOT run. |
+| `recommend_kanban_dag_prefill_algorithm` | REGISTERED (atlas-tools) | Proposal-only per description; not called. |
+| `gpu_vram_status`, `gpu_request_vram_release` | REGISTERED (atlas-tools) | `scripts/mcp/atlas-tools-mcp.mjs`; status read-only; release = request record only. |
+| Viterbi callable tool | NOT FOUND | No registration in `src/mcp` or `scripts/mcp`. Challenger only; keep pending `VITERBI-EVAL-01`. |
+
+**Five-factor evidence score** (weights 30/25/20/15/10; `.tmp/atlas/five-factor-task-evidence-20261109.json`, built from `.tmp/atlas/gpu-compute-lanes-task-evidence-score-20261109.json`, which `scripts/atlas/audit-openspec-task-evidence-scores-v1.mjs` produced read-only):
+- 62 task rows; 5 checkbox-done; 0 independently proven; 0 with an admitted proof receipt; evidence-verified completion 0%.
+- Acceptance evidence: UNSCORABLE for all 62 (no structured acceptance field).
+- Source binding: current block hash present for all 62 (25 points each).
+- Independent verification and reproducibility: 0 for all 62 (no receipts).
+- Dependency closure: 10 points for 46 rows with no declared blocker; 16 rows blocked.
+- Maximum verifiable score is 35/100 per row, and that is evidence-support only. It is not completion. A 100 never completes a task.
+
+**WFU-09 4,077/4,077 claim reconciled**: `docs/reports/wfu09-ns9-actionable-dependency-candidates-v1.json` (SHA-256 `9cccbd39...a3cf`) reports `sourceTasksChecked 4077`, `failures 0`, `textReferenceCandidates 18`, `uniquelyResolvable 7`, `ambiguous 2`, `unresolved 9`. Matches the ledger. The 7/2/9 remain review findings; no dependency edges inferred; no scheduler admission enabled.
+
+**Open, needs human action**: configure the operator secret and restart TRACE (live token comparison and `rerank` health); correct the `ops.fixer_pattern_store` classification; trace the write side effects of `atlas.materialize_feature_evidence_tuples` before any call; cuTile probe and `:8090` stop remain human-operated.
+
+## HANDOFF 2026-11-09 (end of session; read this first in a fresh session)
+
+Scope: MCP/TRACE auth, VRAM request contract, health checks, DAG/manifest audit. No service was started, stopped or restarted by an agent. No Kanban, DB, cache or production request writes.
+
+| Item | State | Evidence / next |
+|---|---|---|
+| Operator-token suites | PASS 9/9 (source) | `src/mcp/operator-token-verifier.spec.ts` + `operator-token-gate.spec.ts`; receipt `.tmp/atlas/ops-lifecycle-auth-vitest-receipt-20261109.json` |
+| Live fake-token refusal | PASS (running build) | `OPERATOR_TOKEN_ENV_UNCONFIGURED`; secret NOT configured in running process |
+| Live wrong/correct-token comparison | PENDING (human) | Needs `TRACE_MCP_OPERATOR_TOKEN` (>=16 chars) set in the TRACE launch environment, then TRACE restart. Use `ops.propose_patch` (read-only preview). Do not read or print the secret. |
+| VRAM request contract | PASS 8/8 (mocked sinks) | `scripts/mcp/atlas-tools-mcp.vram-request-contract.test.mjs`. Production record includes requestId, actorContext, operation, targetScope; testOnly is isolated. Same-ID changes to reason or neededMiB are rejected; no live request was written. |
+| Ledger 2c / 2d | RESOLVED | 2c is the separate authentication test result; 2d records the approved expanded production request shape. No “shape unchanged” claim remains authoritative. |
+| TRACE health (source) | EDITED, NOT LIVE | `OPTIONAL_HEALTH_SERVICES` = `rerank`, `topology_search`; `optionalDown` output. esbuild parse PASS. Needs TRACE restart + live probe. |
+| `:8101` topology service | CLIENTS PRESENT; BACKEND OWNER UNRESOLVED | `topology-search-client.ts` and `topology-search.tool.ts` call the configured remote server; no tracked server implementation or launcher found. Optional for general health only; workflows needing topology must remain capability-gated. Owner decision pending. |
+| `:8099` rerank | DOWN, not running | Client `packages/parent-atlas-retrieval/src/crossencoder/crossencoder-client.ts` names mixedbread-ai/mxbai-rerank-base-v2; TRT-LLM not installed (registry `trtllm` = future). Decide: run sidecar or leave off. |
+| `:8090` llama-server | UP, slot idle | VRAM ~7.6/8 GiB. cuTile probe BLOCKED until human stops `:8090` via VS Code task. |
+| `:8121` neural decoder | UP, degraded | checkpoint not loaded (lazy load). One encode approval needed. |
+| `:8095` NLP sidecar | UP, CPU only | torch=false; not on RTX. |
+| ops.fixer_pattern_store | DISCREPANCY PRESERVED | Declared operator-gated; implementation writes Redis+Postgres+Qdrant. Registry label wrong; owner correction pending. |
+| atlas.materialize_feature_evidence_tuples | UNTRACED | Name suggests write; do not call until side effects traced. |
+| Viterbi callable tool | NOT FOUND | Challenger only (`VITERBI-EVAL-01`). |
+| Evidence scoring | 62 rows; 0 receipts; 0% verified | Acceptance UNSCORABLE for all; max verifiable 35/100 (not completion). Report `.tmp/atlas/five-factor-task-evidence-20261109.json`. |
+| WFU-09 4,077/4,077 | CONFIRMED | `docs/reports/wfu09-ns9-actionable-dependency-candidates-v1.json`; 7 unique / 2 ambiguous / 9 unresolved kept as review findings. |
+| Error-fix DAG + contract audit | RUN, single bucket | Previous outputs archived under `docs/reports/archive/2026-11-09-error-fix-dag/`. 63 medium stale_migration findings. |
+| sidecar-migrations.json | +25 entries (presence observed) | status `documented_presence_observed`; appliedBy "unknown (applier not proven)". Pre-edit copy archived in same folder. 38 medium remain: 19 partial, 14 none-present, 5 unparsed. |
+| Prefill copies | UNTESTED, UNWIRED | `scripts/atlas/lib/contextual-prefill-fabric.ts`, `prefill-cache-runtime.ts` (byte-identical to packages/parent-atlas originals). No live caller found for packages copy. |
+
+### Next steps (in order)
+1. Human: set `TRACE_MCP_OPERATOR_TOKEN` (>=16 chars) in TRACE's launch env (or approved `.env.local` path, verify TRACE loads it); restart TRACE via documented procedure. Then agent: `trace.system_health` probe (expect `optionalDown` = rerank, topology_search, `degraded` false), wrong-token refusal, correct-token acceptance via `ops.propose_patch`.
+2. Decide: topology `:8101` owner (find or retire). Decide: reranker path (sidecar port or off).
+3. Agent after the operator restart: verify live health and wrong-token refusal. The configured correct-token comparison remains operator-run.
+4. Partial 19 / none-present 14 / unparsed 5 sidecar migrations: per-object review before any registration beyond the 25.
+5. Correct `ops.fixer_pattern_store` registry classification at its owner.
+
+**Sidecar migration source recheck (2026-11-10):** Refreshed the existing root audit into `.tmp/atlas/stale-migration-provenance-recheck-20261110-v4.json`. All 63 SQL source files are present; all 38 deferred files' current SHA-256 values match the preceding review. The audit counts executable DML/comment/grant/DO statements after stripping comments, and drops parser tokens `on`, `for`, and `to` from object candidates while retaining them in `parserNoiseDropped`. The five `NO_OBJECTS_PARSED` files contain SQL operations (0053 inserts evaluation rows; 0102 alters/backfills `code_feature_edges`; 0116 alters `recommendation_log`, defines a function, and writes lifecycle events; 0117 contains an `ALTER TABLE` only; 0118 drops/adds a constraint on `semantic_lifecycle_events`). Their target inventories remain unparsed and require manual source review. The read-only scratch catalog check still fails authentication (`28P01`); schema equivalence and execution history remain unverified. No manifest changes, SQL execution, or database writes.
+
+### Do NOT
+- Stop/start/restart Ollama, Docker or any datastore from an agent. TRACE (`:8788`) and `:8090` are eligible only for the explicitly approved path in `OPS-LIFECYCLE-DECISION-01`, after every gate in `CLAUDE.md` § Production hardening passes.
+- Call `llama_server_unload`/`llama_server_start` (no source in repo), `gpu_request_vram_release` live, or any write-capable `ops.*` tool. The presence of similarly named runtime tools is not proof of an approved implementation.
+- Read, print or paste the operator secret or any session token.
+- Run cuTile/GPU work without the human VRAM-release procedure.
+- Treat scores, checkboxes or registry labels as completion or identity.
+
+## OPS-LIFECYCLE-DECISION-01 (2026-11-09, operator decision)
+
+- **Decision:** the agent may restart TRACE (`:8788`) and llama-server (`:8090`) only through the documented procedure after all seven gates in `CLAUDE.md` § Production hardening pass. Ollama, Docker and datastores stay human-only. This supersedes the earlier "Do NOT" list entries about `llama_server_start`/`llama_server_unload` for the operator-approved path only; those tools still need explicit per-call approval (`confirm=true`).
+- **Verified 2026-11-09 23:58Z (read-only):** `llama_server_status` on `:8090`: RUNNING, PID 34928, healthy, model `ornith-1.5-9b`, slot 0 idle (`is_processing:false`), VRAM 7536/8192 MiB used, 489 MiB free. `serviceMutationPerformed:false`.
+- **TRACE health gate (2026-11-09 23:54Z):** still NOT PASSED. Listener PID 61492 started 13:51, source `trace-mcp-server.ts` last written 15:43, so the running process predates the health change. `optionalDown` absent; `rerank` and `topology_search` report as failures; `degraded:true`.
+- **Negative auth gate:** fake token returned `OPERATOR_TOKEN_ENV_UNCONFIGURED`, meaning the TRACE process has no `TRACE_MCP_OPERATOR_TOKEN`. Not the required `INVALID_OPERATOR_TOKEN` result. Still blocked on the operator.
+- **Verified 2026-11-10 00:05Z (read-only `trace.system_health`):** TRACE `:8788` and llama-server `:8090` returned healthy; `rerank :8099` and `topology_search :8101` were unreachable; overall `degraded:true`. This confirms the optional-health source change is not reflected as healthy live services. No restart or service mutation was performed. The configured-secret/fake-token comparison remains unverified in this probe.
+- **Not done:** no restart, no unload, no start. No correct-token check run by the agent.
+
+## STATUS UPDATE 2026-11-09 (evening; supersedes the handoff table where they differ)
+
+| Gate | Status | Evidence / next action |
+|---|---|---|
+| TRACE restart with operator secret | OPEN (human) | Listener PID 61492 started 13:51; source last edited 15:43. Restart with `TRACE_MCP_OPERATOR_TOKEN` set, then re-run health and fake-token checks. |
+| Health: `optionalDown` / `degraded` | NOT VERIFIED LIVE | Source has `OPTIONAL_HEALTH_SERVICES = rerank, topology_search`. Live process predates it. |
+| Fake-token refusal | NOT VERIFIED LIVE | Last result `OPERATOR_TOKEN_ENV_UNCONFIGURED` (secret not set in running process). Expected after restart: `INVALID_OPERATOR_TOKEN`. |
+| Correct-token check | OPEN (operator runs it) | Agent does not handle the secret. |
+| `:8090` status | RUNNING, idle, read-only check only | `llama_server_status` 2026-11-09 23:58Z: PID 34928, slot idle, 7536/8192 MiB used. No start/stop performed. |
+| VRAM request record (2c/2d) | RESOLVED | Wording reconciled; contract tests 8/8 pass. |
+| VRAM conflict check | RESOLVED in code | Compares `operation`, `reason`, `neededMiB`, `targetScope`; fails closed with `GPU_REQUEST_ID_REUSED_WITH_DIFFERENT_PAYLOAD`. |
+| `agent.runs.get` `artifacts` reference | RESOLVED (code) | Replaced with `'[]'::jsonb AS "artifactIds"` in `routers/agent.ts`; see `manual-migration-reconciliation` ARTIFACTS-REFERENCE-REMOVE-01. Full `tsc` on that file: 0 errors. |
+| Sidecar objects (11) | DISPOSITION RECORDED, no DDL | `manual-migration-reconciliation` OBJECT-DISPOSITION-01/02 and LIVE-SHAPE-CHECK-01. |
+| Drifted table shapes | OPEN (decision) | `proposed_tool_calls`, `execution_reviews` (live shape differs from migration); `tool_call_events`, `outcome_ledger` (live wider, FKs missing). |
+| Orphan-row checks before FK restore | BLOCKED (needs read-only DB connection; `28P01` on current login) | Not attempted. |
+| Topology `:8101` owner | OPEN | No server in repo. |
+| Reranker `:8099` | DOWN, optional | Decide whether to deploy. |
+| Lifecycle policy | UPDATED (2026-11-09) | `CLAUDE.md` § Production hardening: agent may restart TRACE and `:8090` only after seven gates; secret stays human-supplied. |
+
+Do not treat any row above as passed until the live check is run after the restart.
+
+## STATUS UPDATE 2026-11-09 (late; restart check)
+
+- Operator reported "restart done" twice. Verified by listener on `:8788`: PID 61492, started 2026-11-09 13:51:35; `sveltekit-frontend/src/mcp/trace-mcp-server.ts` last written 15:43:15. The running process predates the source change, so no restart is verified.
+- Live health and fake-token checks NOT RUN. Running them against PID 61492 would test the old code.
+- Gate status is unchanged from the table above: TRACE restart OPEN, health NOT VERIFIED LIVE, fake-token NOT VERIFIED LIVE.
+- To close: restart the process that owns `:8788` with `TRACE_MCP_OPERATOR_TOKEN` set, then re-check that the listener start time is later than 15:43:15 before running the checks.

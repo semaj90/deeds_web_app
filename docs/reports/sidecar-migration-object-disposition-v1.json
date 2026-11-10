@@ -1,0 +1,657 @@
+{
+  "schema": "atlas.sidecar-migration-object-disposition.v1",
+  "reviewedAt": "2026-11-10",
+  "repositoryHead": "ceddbc97bb98bd17d6374da0a870b177cc406d37",
+  "canonicalFirst": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "migrationHistory": "UNVERIFIED",
+  "traceSchemaInspection": {
+    "status": "SCRATCH_CATALOG_REPROBED_FOR_SCOPED_RELATIONS",
+    "reason": "A direct PostgreSQL 18.4 read-only catalog query was run against legal_ai_live_integration_scratch. It does not refresh the separately reported TRACE database and does not establish production schema or migration history.",
+    "catalogAuthentication": "SCRATCH_READ_ONLY_CONNECTION_SUCCEEDED",
+    "transcriptReportedPresent": [
+      "projects",
+      "specs",
+      "spec_revisions",
+      "features",
+      "workflow_events",
+      "feature_statistics",
+      "semantic_lifecycle_events"
+    ],
+    "transcriptReportedAsAppearing": [
+      "representation-related tables"
+    ],
+    "interpretation": "These are user-provided transcript observations, not independently refreshed table/column/constraint/index readbacks. They do not establish migration execution history."
+  },
+  "scratchCatalogReadback": {
+    "receipt": ".tmp/atlas/sidecar-scratch-catalog-readback-20261109.json",
+    "database": "legal_ai_live_integration_scratch",
+    "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
+    "transactionMode": "READ ONLY for catalog and orphan queries; DDL rehearsal rolled back",
+    "scope": "proposed_tool_calls, execution_reviews, tool_call_events, outcome_ledger, agent_tasks, agent_traces, semantic_lifecycle_events, relevant lifecycle functions and constraints",
+    "findings": [
+      "proposed_tool_calls has the reported current caller-facing selected_tool_name/candidate_tools/confidence_score shape; migration 0112 fields tool_name/executed/approval_required/schema_valid are absent. Current indexes are primary key and unique decision_id only.",
+      "execution_reviews has no trace_id; its unique execution_id and primary key are present. The 0114 trace_id index/FK do not fit this live shape.",
+      "tool_call_events has 27 columns, including the current execution/event fields; 0111 trace_id FK and idx_tce_trace_id are absent.",
+      "outcome_ledger has 26 columns, including wider receipt/state fields; all three 0111 foreign keys and idx_ol_task_id are absent.",
+      "agent_tasks has the existing 14-column table and idx_at_session is absent.",
+      "semantic_lifecycle_events matches the current Drizzle nullability and named indexes; valid_lifecycle_states includes the recommendation states. promote_recommendation, supersede_recommendation, and supersede_semantic_signal are present. This confirms current shape/function presence, not which migration created them."
+    ],
+    "orphanCounts": {
+      "tool_call_events.trace_id_to_agent_traces": 0,
+      "outcome_ledger.task_id_to_agent_tasks": 0,
+      "outcome_ledger.trace_id_to_agent_traces": 0,
+      "outcome_ledger.tool_call_id_to_tool_call_events": 0
+    },
+    "scratchDdlRehearsal": {
+      "candidate": "0111 tool_call_events/outcome_ledger nullable foreign keys plus idx_tce_trace_id and idx_ol_task_id",
+      "constraintsValidatedInsideTransaction": 4,
+      "indexesPresentInsideTransaction": 2,
+      "rollback": "COMPLETED",
+      "postRollbackConstraintsPresent": 0,
+      "postRollbackIndexesPresent": 0
+    },
+    "canonicalDatabaseWrites": false,
+    "executionHistory": "UNKNOWN",
+    "receiptSha256": "sha256:6b1f9961fe5df8425c219a31f9e4e946f2a7905960d28d76f157dd807a2432da",
+    "drizzleHistoryAuditReceipt": ".tmp/atlas/readonly-audit-output/DeedsWebApp/inventory/drizzle-history-readonly-latest.json",
+    "drizzleHistoryAuditSha256": "sha256:e841366d30f172e0e0c4e2e98ea0c65abab754b780c9687070ec8ffaeeed9d43"
+  },
+  "sourceSha256": {
+    "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql": "sha256:fa568fc61bebfd8c4b2a0c446b7ffab4a005dcf6f568219e0d3f3c2190bb30e6",
+    "sveltekit-frontend/drizzle/0102_feature_statistics_and_potentials.sql": "sha256:e4075b07368b0890298cdaafcdb3b437e043124223056e5d3d70b1a42a6cccf0",
+    "sveltekit-frontend/drizzle/0038_deep_research_tables.sql": "sha256:3c7a85961e38a47691cff9b5280f61b82a4303ba2f8dec10dc99b7fe7d1ceb1c",
+    "sveltekit-frontend/drizzle/manual/workflow_orchestration_tables.sql": "sha256:af148c6cdc60c3183ba2e993101e6d576437a853f0930049b2b22e823685bdef",
+    "sveltekit-frontend/src/lib/server/db/schema-postgres.ts": "sha256:021e0a7bcc1747abcfd11899bc29a1006b5eddfefaa92824f4b0ce2f74a19ff7",
+    "sveltekit-frontend/src/lib/server/db/schema/kanban-tasks.ts": "sha256:44c0eb6f9616e4a123ab736b765d9900b05ff34ca2bd3c913d5338fd5a00c870",
+    "sveltekit-frontend/src/lib/server/trpc/routers/agent.ts": "sha256:788f51d25b22ace3f3fe05f04c7110efdaf53d853fea70403577b3e969f63d12",
+    "sveltekit-frontend/src/lib/server/trpc/agent-run-service.ts": "sha256:ad8a8140ba698c8e6190da802a5a7355f8130bbbaad2f8b2cb9ed4131614ac32",
+    "sveltekit-frontend/src/lib/server/trpc/routers/workflow.ts": "sha256:50241a12ad2a8316652101d4bf3226271b5111d21c470b7267bd76aa07b75873",
+    "sveltekit-frontend/scripts/phase79-agentic-repair.mts": "sha256:4298f7b7ff36005d7e81019b8f9bae50a9dcd8a9542d5e9621038cd36959129c",
+    "sveltekit-frontend/src/lib/server/agent/action-writer.ts": "sha256:bd9e4e0575edf3c6f736a701c35940fa4e25f516c02a979abf08bd7c618651b3",
+    "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/index.ts": "sha256:47e3375fa10e8f27e16ed6be066f4edca6cbdb4a3651b4e3591fbd9574d5f1b3",
+    "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/workflow-action-event-writer.ts": "sha256:c912310babd620bc8eb196920a47d2814352234675e904cdfe1d702a9a31a75f",
+    "sveltekit-frontend/drizzle/0111_tool_call_runtime_contract.sql": "sha256:4ae678ff5acdf940da5afe683b2d7cc93d404b3743c4feca9ee8179f5080567e",
+    "sveltekit-frontend/drizzle/0112_proposed_tool_calls.sql": "sha256:baf50a25e055a581607da490b2d90b3659191fa4a727beaff146a8f1da52c7fe",
+    "sveltekit-frontend/drizzle/0114_execution_reviews.sql": "sha256:24b1aaece2e70f6e59dbd0e4243d372962536d11009d9f152ab28fb23b02fbeb",
+    "sveltekit-frontend/src/lib/server/agent/execution-review.ts": "sha256:79409e70e5832d06af23efdefc7b92ab934de9c3cd06c888696a364749cb2ccf",
+    "sveltekit-frontend/src/lib/server/telemetry/tool-call-recorder.ts": "sha256:9837a509173e47edeef11a8f125ee7b3be36c146553c8503677897257236c5a1",
+    "sveltekit-frontend/src/lib/server/observability/agent-work-receipt-store-v1.ts": "sha256:92c7c79c4d476d38be8c20da1596a29d6fb74fc75d44dde3cdcf69a969f2c7b1",
+    "sveltekit-frontend/src/routes/api/agent/execute/+server.ts": "sha256:254fba89e5792fc21985a12109f0b1dd364e2136b406c2e74899ec597ffd27a3",
+    "sveltekit-frontend/drizzle/0110_phase109a_audit_trail.sql": "sha256:cdab857c67fee196f0f446b3cadd1ab72e725cd161aaa521411b2cdf348a44f1",
+    "sveltekit-frontend/drizzle/0116_phase109a_recommendation_supersession.sql": "sha256:873d1589e8d8dc5c9d1edf54b252f0f8de910b718eb74ae5542c18ec69d32245",
+    "sveltekit-frontend/drizzle/0118_semantic_lifecycle_events_recommendation_status.sql": "sha256:ef6ed6c9d6063a327077de5cb0341c296f0a3807444dc7cd34fd06d89143fb44",
+    "sveltekit-frontend/src/lib/server/mcp/phase109a-mcp-tools.ts": "sha256:0ca7ec21dc1c507a2c562bdbec1c1bea263af03f5d0bd4c9a865e0426dcf55a7",
+    "sveltekit-frontend/src/mcp/trace-mcp-server.ts": "sha256:9e9819edc75f9344feff7a7ae40b0446a52d3734c74aa83f9e8aeb9362ff3429",
+    "sveltekit-frontend/src/mcp/server.ts": "sha256:fd16b5ad2fd1a0b5def0798f8418a5fe76078420557e14f463db67f40da90ef7",
+    "sveltekit-frontend/drizzle/0109_phase109a_semantic_signals_repair.sql": "sha256:6f1fb300f332bed65353c98eaaa18f0449ac0a5ccf06d5e601cbcf0bb9a926cb",
+    "sveltekit-frontend/drizzle/0111_phase109a_soft_delete_safeguards.sql": "sha256:7b9c8ab4efd1cdbe8dc50faa765a2eee62b92c142be862e7bd014d05899f6fc1",
+    ".tmp/atlas/sidecar-live-shape-check-20261109.json": "sha256:77da8275819e8fcf14aa24801013002b82d59bc27a62da706b93905e21cb20cb",
+    ".tmp/atlas/sidecar-live-shape-check-20261109-part2.json": "sha256:60ac12a473205a42579cd13ebbe0b1bcf3ddf2656912bc146cd24ea8f8d2638c",
+    "sveltekit-frontend/drizzle/sidecar-migrations.json": "sha256:ac4767d9cec8ca95d24ff054cdf9a1a867c53e6592d72d6c2b96a7300d21dfaa",
+    "sveltekit-frontend/drizzle/meta/_journal.json": "sha256:98e36fe4a2e1a34ee058c4676fe6cb875607f2cef50cd3246abc1ece1d79dc39",
+    "scripts/atlas/drizzle-sidecar-policy.mjs": "sha256:ccd8468b6efc9ad69c8fae442ad9b0f5a59df75b1d59feecb866c936a2c13d46",
+    "sveltekit-frontend/scripts/validate/full-system.mjs": "sha256:363bb85d052868ea0acd8b3a6eb2ab75c16e1c1f5631de33bb982577802f63ba",
+    "packages/atlas-core/src/langgraph/types.ts": "sha256:b3f94f8c03a28502e3c11ea1ffa48ace63f03315c0758ccc8d96aeb00c3d5e26",
+    "sveltekit-frontend/src/lib/server/atlas/feature-resolution-adapter-v1.ts": "sha256:2b231ff8534ef122620a1fe06915e1b56e803854e261f3e3f1bce870041f720e",
+    "sveltekit-frontend/src/lib/server/vector/encoder-provenance-schema.ts": "sha256:2a8dc359b6a36e816062e8c17a974b941a8c2b82c2acb00f1f38b06214ac12eb",
+    "sveltekit-frontend/src/lib/server/retrieval/qdrant-payload-enricher.ts": "sha256:d97f93142f7f71330a752d335754fff4dc0402d64181c05d52aaaadbe8c88636",
+    ".tmp/atlas/sidecar-scratch-catalog-readback-20261109.json": "sha256:6b1f9961fe5df8425c219a31f9e4e946f2a7905960d28d76f157dd807a2432da",
+    ".tmp/atlas/readonly-audit-output/DeedsWebApp/inventory/drizzle-history-readonly-latest.json": "sha256:e841366d30f172e0e0c4e2e98ea0c65abab754b780c9687070ec8ffaeeed9d43"
+  },
+  "objects": [
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "object": "projects",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "PRESENT_REPORTED",
+      "callerFinding": "No exact active SQL/Drizzle relation caller found in the scoped source scan.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql"
+      ]
+    },
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "object": "specs",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "PRESENT_REPORTED",
+      "callerFinding": "No exact active SQL/Drizzle relation caller found in the scoped source scan.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql"
+      ]
+    },
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "object": "spec_revisions",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "PRESENT_REPORTED",
+      "callerFinding": "No exact active SQL/Drizzle relation caller found in the scoped source scan.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql"
+      ]
+    },
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "object": "features",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "PRESENT_REPORTED",
+      "callerFinding": "No exact active SQL/Drizzle relation caller found; similarly named feature registries and feature keys are different relations.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql",
+        "sveltekit-frontend/src/lib/server/atlas/feature-resolution-adapter-v1.ts"
+      ]
+    },
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "object": "feature_requirements",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "UNKNOWN",
+      "callerFinding": "No active direct SQL or Drizzle caller found in the scoped source scan.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql"
+      ]
+    },
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "object": "tasks",
+      "disposition": "SUPERSEDED",
+      "tracePresence": "UNKNOWN",
+      "callerFinding": "Canonical workboard task owner is public.kanban_tasks; no active direct caller for this proposed tasks relation was found.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql",
+        "sveltekit-frontend/src/lib/server/db/schema/kanban-tasks.ts"
+      ]
+    },
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "object": "agent_definitions",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "UNKNOWN",
+      "callerFinding": "A static AGENT_DEFINITIONS configuration exists in LangGraph types, but no database-table caller was found.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql",
+        "packages/atlas-core/src/langgraph/types.ts"
+      ]
+    },
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "object": "agent_runs",
+      "disposition": "REQUIRED",
+      "tracePresence": "UNKNOWN",
+      "callerFinding": "Active Drizzle owner and action-writer callers exist. The canonical run_id/workflow_name/workflow_version/tenant_id/initiated_by/state shape differs from this migration's id/agent_definition_id/feature_id/status/input/output/error shape.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql",
+        "sveltekit-frontend/drizzle/0038_deep_research_tables.sql",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/agent/action-writer.ts"
+      ]
+    },
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "object": "agent_run_steps",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "UNKNOWN",
+      "callerFinding": "No active direct SQL or Drizzle caller found in the scoped source scan.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql"
+      ]
+    },
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "object": "workflow_events",
+      "disposition": "REQUIRED",
+      "tracePresence": "PRESENT_REPORTED",
+      "callerFinding": "Active Drizzle owner and action-writer callers exist. Current run/action/event/sequence/payload fields differ from the migration's feature/state/actor/evidence fields.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql",
+        "sveltekit-frontend/drizzle/0038_deep_research_tables.sql",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/agent/action-writer.ts"
+      ]
+    },
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "object": "validation_gates",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "UNKNOWN",
+      "callerFinding": "No active table caller found; validation_gates occurrences are JSON fields/contracts, not this relation.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql",
+        "sveltekit-frontend/src/lib/server/vector/encoder-provenance-schema.ts"
+      ]
+    },
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "object": "validation_results",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "UNKNOWN",
+      "callerFinding": "No active direct SQL or Drizzle caller found in the scoped source scan.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql"
+      ]
+    },
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "object": "artifacts",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "UNKNOWN",
+      "callerFinding": "The previous artifacts SQL subquery was removed from agent.runs.get; the registered procedure now returns a stable empty artifactIds array. No other active direct caller was established in the scoped source review. The migration's proposed relation therefore has no currently verified application requirement. Its owner and the intended artifact behavior remain unresolved; do not recreate the table unless a concrete consumer is established.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql",
+        "sveltekit-frontend/src/lib/server/trpc/routers/agent.ts",
+        "sveltekit-frontend/drizzle/manual/workflow_orchestration_tables.sql"
+      ]
+    },
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "object": "approvals",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "UNKNOWN",
+      "callerFinding": "No active direct SQL or Drizzle caller found in the scoped source scan.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql"
+      ]
+    },
+    {
+      "migration": "0102_feature_statistics_and_potentials.sql",
+      "object": "feature_statistics",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "PRESENT_REPORTED",
+      "callerFinding": "A source comment mentions this relation, but no direct active SQL/Drizzle caller was found in the scoped scan.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0102_feature_statistics_and_potentials.sql",
+        "sveltekit-frontend/src/lib/server/retrieval/qdrant-payload-enricher.ts"
+      ]
+    },
+    {
+      "migration": "0102_feature_statistics_and_potentials.sql",
+      "object": "packet_potentials",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "UNKNOWN",
+      "callerFinding": "No active direct SQL or Drizzle caller found in the scoped source scan.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0102_feature_statistics_and_potentials.sql"
+      ]
+    },
+    {
+      "migration": "0102_feature_statistics_and_potentials.sql",
+      "object": "packet_promotion_log",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "UNKNOWN",
+      "callerFinding": "No active direct SQL or Drizzle caller found; no promotion grain is established for choosing a corrected foreign key.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0102_feature_statistics_and_potentials.sql"
+      ]
+    },
+    {
+      "migration": "0102_feature_statistics_and_potentials.sql",
+      "object": "fallback_routing_audit",
+      "disposition": "UNVERIFIED",
+      "tracePresence": "UNKNOWN",
+      "callerFinding": "No active direct SQL or Drizzle caller found in the scoped source scan.",
+      "sourceRefs": [
+        "sveltekit-frontend/drizzle/0102_feature_statistics_and_potentials.sql"
+      ]
+    }
+  ],
+  "applicationCallerShapeReview": {
+    "reviewedAt": "2026-11-10",
+    "authority": "SOURCE_CALLER_REQUIREMENTS plus current scratch PostgreSQL 18.4 column/constraint/index readback; not a production/TRACE schema claim",
+    "receipts": [
+      ".tmp/atlas/sidecar-live-shape-check-20261109.json",
+      ".tmp/atlas/sidecar-live-shape-check-20261109-part2.json",
+      ".tmp/atlas/sidecar-scratch-catalog-readback-20261109.json"
+    ],
+    "objects": [
+      {
+        "table": "proposed_tool_calls",
+        "callers": [
+          "sveltekit-frontend/src/routes/api/agent/execute/+server.ts",
+          "sveltekit-frontend/src/lib/server/agent/execution-review.ts"
+        ],
+        "applicationColumns": [
+          "id",
+          "trace_id",
+          "decision_id",
+          "query",
+          "previous_state",
+          "selected_tool_name",
+          "selected_tool_namespace",
+          "candidate_tools",
+          "confidence_score",
+          "created_at"
+        ],
+        "migrationColumnsThatDoNotMatchCurrentCallers": [
+          "proposal_id",
+          "tool_name",
+          "arguments",
+          "schema_valid",
+          "executed",
+          "approval_required",
+          "updated_at",
+          "created_by",
+          "otel_span_id",
+          "otel_trace_id"
+        ],
+        "savedLiveShapeCompatibility": "SCRATCH_READBACK_CONFIRMS_CURRENT_COLUMNS_AND_INDEXES; not a production claim",
+        "recommendation": "Treat migration 0112 as stale relative to current application contract; do not rerun it or add its missing indexes blindly. Any future schema repair must preserve caller-required fields and reconcile the live indexes first."
+      },
+      {
+        "table": "execution_reviews",
+        "callers": [
+          "sveltekit-frontend/src/lib/server/agent/execution-review.ts"
+        ],
+        "applicationColumns": [
+          "execution_id",
+          "proposal_matched",
+          "permission_passed",
+          "tool_executed",
+          "exit_code_valid",
+          "evidence_complete",
+          "file_modifications_allowed",
+          "decision",
+          "issues",
+          "evidence_refs",
+          "recommendation",
+          "reviewed_at"
+        ],
+        "migrationOnlyOrUnusedColumns": [
+          "trace_id",
+          "created_at"
+        ],
+        "savedLiveShapeCompatibility": "SCRATCH_READBACK_CONFIRMS_TRACE_ID_ABSENT; application insert does not use trace_id",
+        "recommendation": "The source does not require trace_id. Do not add the migration's trace_id index against the reported live shape. Preserve the currently used review fields and inspect exact live constraints/indexes before a repair."
+      },
+      {
+        "table": "tool_call_events",
+        "callers": [
+          "sveltekit-frontend/src/routes/api/agent/execute/+server.ts",
+          "sveltekit-frontend/src/lib/server/telemetry/tool-call-recorder.ts",
+          "sveltekit-frontend/src/lib/server/agent/execution-review.ts"
+        ],
+        "applicationColumns": [
+          "trace_id",
+          "execution_id",
+          "tool_name",
+          "tool_namespace",
+          "arguments",
+          "status",
+          "start_time",
+          "end_time",
+          "duration_ms",
+          "result_class",
+          "result_count",
+          "source_ref_count",
+          "source_refs",
+          "error_message",
+          "from_server",
+          "event_json",
+          "created_at"
+        ],
+        "savedLiveShapeCompatibility": "RECEIPT_REPORTS_LIVE_SUPERSET_WITH_13_EXTRA_COLUMNS; required columns used by application paths",
+        "migrationDifference": "0111 omits execution outcome/context columns; its trace_id foreign key/index are absent in the scratch readback",
+        "recommendation": "Keep the application-required wider contract; do not rerun CREATE IF NOT EXISTS. The four nullable FK relationships and two missing indexes passed a rolled-back scratch rehearsal after zero-orphan readback; persistent repair still requires a separate reviewed migration/admission."
+      },
+      {
+        "table": "outcome_ledger",
+        "callers": [
+          "sveltekit-frontend/src/routes/api/agent/execute/+server.ts",
+          "sveltekit-frontend/src/lib/server/telemetry/tool-call-recorder.ts",
+          "sveltekit-frontend/src/lib/server/observability/agent-work-receipt-store-v1.ts",
+          "sveltekit-frontend/src/lib/server/agent/execution-review.ts"
+        ],
+        "applicationColumns": [
+          "trace_id",
+          "previous_state",
+          "next_state",
+          "tool_name",
+          "execution_id",
+          "result_class",
+          "recovery_attempted",
+          "final_state",
+          "final_outcome",
+          "total_duration_ms",
+          "created_at",
+          "outcome_type",
+          "reward",
+          "metadata"
+        ],
+        "savedLiveShapeCompatibility": "RECEIPT_REPORTS_LIVE_SUPERSET_WITH_14_EXTRA_COLUMNS; current writers/readers use extended outcome fields",
+        "migrationDifference": "0111's task/trace/tool-call foreign keys and idx_ol_task_id are absent in the scratch readback",
+        "recommendation": "Keep the application-required wider contract; do not rerun CREATE IF NOT EXISTS. The four nullable FK relationships and two missing indexes passed a rolled-back scratch rehearsal after zero-orphan readback; persistent repair still requires a separate reviewed migration/admission."
+      }
+    ],
+    "writesPerformed": false
+  },
+  "semanticLifecycleEventsReview": {
+    "reviewedAt": "2026-11-10",
+    "sources": [
+      "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "sveltekit-frontend/src/lib/server/mcp/phase109a-mcp-tools.ts",
+      "sveltekit-frontend/drizzle/0110_phase109a_audit_trail.sql",
+      "sveltekit-frontend/drizzle/0116_phase109a_recommendation_supersession.sql",
+      "sveltekit-frontend/drizzle/0118_semantic_lifecycle_events_recommendation_status.sql"
+    ],
+    "activeUse": [
+      "phase109a-mcp-tools.ts reads semantic_lifecycle_events through the Drizzle semanticLifecycleEvents owner for signal history and exposes supersede/promote tools.",
+      "trace-mcp-server.ts registers phase109a tools; the MCP server dispatches them by tool name.",
+      "0116 supersede_recommendation() inserts recommendation transition events into this relation; phase109a_mcp_tools invokes it.",
+      "The promote tool calls promote_recommendation(); 0118's expanded check permits the recommendation-state values written by that function."
+    ],
+    "sourceContractDifferences": [
+      "Drizzle requires previous_state but allows reason to be null; 0110 SQL allows previous_state null but requires reason non-null.",
+      "Drizzle index names are idx_semantic_lifecycle_events_actor/entity/created_at; saved TRACE receipt reports different live index names, and the 0110 migration uses idx_lifecycle_events_actor_id/entity_id/created_at.",
+      "0118 widens the new_state check for recommendation lifecycle states, so 0110 alone is not the complete current source contract."
+    ],
+    "migrationSafetyNotes": [
+      "0116 adds superseded_by and replaces a function; source says additive, but partial execution remains possible if the statements are not run transactionally.",
+      "0118 drops and re-adds valid_lifecycle_states in separate statements without an explicit BEGIN/COMMIT. A reviewed repair must run atomically and compare all current new_state values and the existing constraint definition first."
+    ],
+    "runtimeDependency": "The registered phase109a supersede tool invokes supersede_recommendation(); the promote tool invokes promote_recommendation(). Function/constraint presence must be verified before treating either path as live-ready.",
+    "liveEvidence": "Scratch PostgreSQL 18.4 catalog readback confirms columns, constraints, indexes, recommendation-state check, and the three lifecycle function definitions are present. The table's relevant columns/indexes match current Drizzle, while 0110's nullability and index names differ. Execution history and production parity remain UNKNOWN.",
+    "registryStatus": [
+      {
+        "migration": "0110_phase109a_audit_trail.sql",
+        "journalEntry": false,
+        "sidecarEntry": false
+      },
+      {
+        "migration": "0116_phase109a_recommendation_supersession.sql",
+        "journalEntry": false,
+        "sidecarEntry": false
+      },
+      {
+        "migration": "0118_semantic_lifecycle_events_recommendation_status.sql",
+        "journalEntry": false,
+        "sidecarEntry": false
+      }
+    ],
+    "executionHistory": "UNKNOWN; missing registry entries do not establish that the functions or constraint were not applied manually.",
+    "recommendation": "Treat the relation as source-required and shared by signal/recommendation flows. The scratch schema currently matches Drizzle, not 0110's original nullability/index naming, and the union state check plus lifecycle functions are present. Do not rerun 0110; migration execution history remains UNKNOWN and must be reconciled independently.",
+    "writesPerformed": false
+  },
+  "confirmedSourceDefects": [
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "defect": "workflow_events_immutable trigger is declared before raise_immutability_error() is defined.",
+      "repairCandidate": "Move function creation before trigger creation in a future reviewed migration or scratch candidate; do not edit the historical source in place."
+    },
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "defect": "ALTER TABLE specs ADD CONSTRAINT specs_current_revision_fk is unconditional.",
+      "repairCandidate": "Guard constraint creation by schema-qualified catalog identity and exact definition in a future reviewed candidate."
+    },
+    {
+      "migration": "0102_feature_statistics_and_potentials.sql",
+      "defect": "packet_promotion_log references packet_potentials(packet_key), but the declared primary key is (packet_key, title_id).",
+      "repairCandidate": "No FK candidate selected: first establish whether promotion is per packet or per packet/title and bind the corresponding source identity."
+    }
+  ],
+  "requestedTenObjectAdoptionAssessment": {
+    "reviewedAt": "2026-11-10",
+    "decision": "DO_NOT_CREATE_AS_A_BUNDLE; REUSE_CANONICAL_OWNERS_WHERE_EXACT; DEFER_UNOWNED_OBJECTS",
+    "canonicalAuthority": false,
+    "databaseWrites": false,
+    "objects": [
+      {
+        "object": "feature_requirements",
+        "recommendation": "DEFER",
+        "basis": "No active direct relation caller found; no need or ownership contract established."
+      },
+      {
+        "object": "tasks",
+        "recommendation": "REUSE_EXISTING_OWNER",
+        "owner": "public.kanban_tasks",
+        "basis": "Canonical task/workboard owner; do not create a duplicate tasks table."
+      },
+      {
+        "object": "agent_definitions",
+        "recommendation": "DEFER",
+        "basis": "Static LangGraph configuration exists, but no database-table caller or need for persisted definitions was established."
+      },
+      {
+        "object": "agent_run_steps",
+        "recommendation": "DO_NOT_TREAT_AS_DROP_IN_REPLACEMENT",
+        "candidateExistingOwner": "public.agent_run_actions; agent_action_results has no active non-test caller",
+        "sourceRefs": [
+          "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+          "sveltekit-frontend/src/lib/server/agent/action-writer.ts",
+          "sveltekit-frontend/scripts/phase79-agentic-repair.mts",
+          "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/index.ts",
+          "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/workflow-action-event-writer.ts"
+        ],
+        "basis": "The action writer is invoked by the phase79 repair CLI. The compiler barrel re-exports an adapter, but no non-test application request-path caller was found. Its action fields differ from ordered step output/evidence fields, and action results have no active non-test reader/writer. Treat this as a repair-ledger candidate only, not a generally active runtime replacement for agent_run_steps."
+      },
+      {
+        "object": "validation_gates",
+        "recommendation": "DEFER",
+        "basis": "Observed occurrences are JSON contracts/telemetry, not callers of this proposed relation."
+      },
+      {
+        "object": "validation_results",
+        "recommendation": "DEFER",
+        "basis": "No active direct relation caller found; no persistence requirement established."
+      },
+      {
+        "object": "approvals",
+        "recommendation": "REUSE_FOR_RUN_APPROVALS_ONLY; GENERIC_MIGRATION_OBJECT_UNRESOLVED",
+        "candidateExistingOwner": "workflow_approvals via trpc/routers/workflow.ts and agent-run-service.ts::recordApproval()",
+        "sourceRefs": [
+          "sveltekit-frontend/drizzle/manual/workflow_orchestration_tables.sql",
+          "sveltekit-frontend/src/lib/server/trpc/agent-run-service.ts",
+          "sveltekit-frontend/src/lib/server/trpc/routers/workflow.ts"
+        ],
+        "basis": "A registered workflow approval route calls recordApproval(), which writes run-scoped approved/rejected decisions with idempotency. This does not establish equivalence to 0101's generic project/spec approval relation; do not create that relation until its caller and contract are identified."
+      },
+      {
+        "object": "packet_potentials",
+        "recommendation": "DEFER",
+        "basis": "No active direct caller found; identity and lifecycle owner not established."
+      },
+      {
+        "object": "packet_promotion_log",
+        "recommendation": "DEFER",
+        "basis": "No active direct caller found; packet versus packet/title promotion grain unresolved and migration FK is invalid as written."
+      },
+      {
+        "object": "fallback_routing_audit",
+        "recommendation": "DEFER",
+        "basis": "No active direct caller found; no audit event owner or retention contract established."
+      }
+    ],
+    "requiredBeforeCreation": [
+      "A concrete active caller and owning OpenSpec change for each proposed relation.",
+      "Exact identity, lifecycle, retention, and revision-binding contract.",
+      "Current database columns, constraints, indexes, and migration history from a database-identity-bound readback.",
+      "Corrected migration candidate rehearsed on clean and partial scratch schemas with rollback and independent readback."
+    ]
+  },
+  "migrationRegistryCheck": {
+    "checkedAt": "2026-11-10",
+    "files": [
+      "sveltekit-frontend/drizzle/sidecar-migrations.json",
+      "sveltekit-frontend/drizzle/meta/_journal.json"
+    ],
+    "findings": [
+      {
+        "migration": "0101_spec_control_plane_phase1.sql",
+        "sidecarManifestEntry": false,
+        "drizzleJournalEntry": false,
+        "policyClassification": "STALE_MIGRATION_UNREGISTERED"
+      },
+      {
+        "migration": "0102_feature_statistics_and_potentials.sql",
+        "sidecarManifestEntry": false,
+        "drizzleJournalEntry": false,
+        "policyClassification": "STALE_MIGRATION_UNREGISTERED"
+      },
+      {
+        "migration": "0110_phase109a_audit_trail.sql",
+        "sidecarManifestEntry": false,
+        "drizzleJournalEntry": false,
+        "policyClassification": "STALE_MIGRATION_UNREGISTERED"
+      },
+      {
+        "migration": "0116_phase109a_recommendation_supersession.sql",
+        "sidecarManifestEntry": false,
+        "drizzleJournalEntry": false,
+        "policyClassification": "STALE_MIGRATION_UNREGISTERED"
+      },
+      {
+        "migration": "0118_semantic_lifecycle_events_recommendation_status.sql",
+        "sidecarManifestEntry": false,
+        "drizzleJournalEntry": false,
+        "policyClassification": "STALE_MIGRATION_UNREGISTERED"
+      }
+    ],
+    "interpretation": "Neither migration is registered in the current sidecar manifest or current Drizzle journal. Repository policy classifies unjournaled, undocumented SQL as stale_migration; drizzle-kit migrate skips it. This does not establish whether SQL was executed manually or by another mechanism, and does not authorize adding either file to a registry or applying it.",
+    "policySourceRefs": [
+      "scripts/atlas/drizzle-sidecar-policy.mjs",
+      "sveltekit-frontend/scripts/validate/full-system.mjs"
+    ],
+    "sidecarManifestWorktreeState": "MODIFIED_BEFORE_THIS_CHECK; concurrent changes preserved; observed hash is recorded in sourceSha256",
+    "writesPerformed": false,
+    "scratchLedgerReadback": {
+      "receipt": ".tmp/atlas/readonly-audit-output/DeedsWebApp/inventory/drizzle-history-readonly-latest.json",
+      "database": "legal_ai_live_integration_scratch",
+      "serverVersion": "18.4",
+      "ledgerRows": 0,
+      "journalEntries": 41,
+      "sidecarRows": 147,
+      "manifestAppliedSidecars": 57,
+      "journalRequiredSidecarsMissingEntry": 0,
+      "interpretation": "No DB migration ledger rows were observed. This does not prove whether unregistered SQL ran manually or by another mechanism."
+    }
+  },
+  "proposedSidecarManifestDiff": {
+    "additions": [],
+    "removals": [],
+    "reason": "No missing object is independently confirmed by catalog introspection, and no migration execution history is verified."
+  },
+  "scratchCandidate": {
+    "status": "ROLLED_BACK_REHEARSAL_ONLY",
+    "reason": "The nullable 0111 foreign keys and two absent indexes were rehearsed against the verified scratch schema after zero-orphan checks; all four constraints validated and both indexes existed inside the transaction, then rollback and independent post-rollback readback showed zero persisted additions. No standalone repair migration has been prepared.",
+    "databaseWrites": false,
+    "rollbackTest": "PASS_ROLLED_BACK_FK_INDEX_REHEARSAL",
+    "reviewOnlySql": [
+      "ALTER TABLE public.tool_call_events ADD CONSTRAINT tool_call_events_trace_id_fkey FOREIGN KEY (trace_id) REFERENCES public.agent_traces(trace_id) ON DELETE SET NULL NOT VALID;",
+      "ALTER TABLE public.outcome_ledger ADD CONSTRAINT outcome_ledger_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.agent_tasks(id) ON DELETE SET NULL NOT VALID;",
+      "ALTER TABLE public.outcome_ledger ADD CONSTRAINT outcome_ledger_trace_id_fkey FOREIGN KEY (trace_id) REFERENCES public.agent_traces(trace_id) ON DELETE SET NULL NOT VALID;",
+      "ALTER TABLE public.outcome_ledger ADD CONSTRAINT outcome_ledger_tool_call_id_fkey FOREIGN KEY (tool_call_id) REFERENCES public.tool_call_events(id) ON DELETE SET NULL NOT VALID;",
+      "ALTER TABLE public.tool_call_events VALIDATE CONSTRAINT tool_call_events_trace_id_fkey;",
+      "ALTER TABLE public.outcome_ledger VALIDATE CONSTRAINT outcome_ledger_task_id_fkey;",
+      "ALTER TABLE public.outcome_ledger VALIDATE CONSTRAINT outcome_ledger_trace_id_fkey;",
+      "ALTER TABLE public.outcome_ledger VALIDATE CONSTRAINT outcome_ledger_tool_call_id_fkey;",
+      "CREATE INDEX idx_tce_trace_id ON public.tool_call_events(trace_id);",
+      "CREATE INDEX idx_ol_task_id ON public.outcome_ledger(task_id);"
+    ]
+  },
+  "requiredGates": [
+    "Establish migration execution history independently from object presence.",
+    "Reopen artifact persistence only if an active caller and response contract are established.",
+    "Resolve the packet-promotion relationship grain.",
+    "Only then draft and rehearse a corrected candidate on clean and partial scratch schemas with rollback and independent readback.",
+    "Confirm whether the scratch schema is an acceptable rehearsal target for a future reviewed migration candidate; do not extrapolate these findings to production/TRACE."
+  ]
+}

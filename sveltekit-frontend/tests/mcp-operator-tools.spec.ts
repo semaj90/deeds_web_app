@@ -14,12 +14,16 @@
 
 import { describe, it, expect } from 'vitest';
 
-// ── Inline the helper functions under test (copied from trace-mcp-server.ts) ──
+import { verifyMcpOperatorToken } from '../src/mcp/operator-token-verifier.js';
 
-function requireToken(token: unknown): string | null {
-  if (!token || typeof token !== 'string' || token.trim() === '') return 'operator_token required';
-  return null;
+// Same shape as requireToken in src/mcp/trace-mcp-server.ts. The expected secret is passed
+// explicitly so the test never depends on TRACE_MCP_OPERATOR_TOKEN in the environment.
+function requireToken(token: unknown, expectedToken: string): string | null {
+  const verdict = verifyMcpOperatorToken(token, expectedToken);
+  return verdict.authorized ? null : verdict.reason;
 }
+
+const CONFIGURED_SECRET = 'trace-test-secret-0123456789';
 
 function clampNumber(value: unknown, min: number, max: number, fallback = 0): number {
   const n = Number(value);
@@ -41,26 +45,33 @@ function normalizeJsonFilter(input: unknown): Record<string, unknown> | undefine
 
 // ── requireToken ──────────────────────────────────────────────────────────────
 
-describe('requireToken', () => {
+describe('requireToken (real verifier)', () => {
   it('returns error string for undefined', () => {
-    expect(requireToken(undefined)).toBeTruthy();
+    expect(requireToken(undefined, CONFIGURED_SECRET)).toBeTruthy();
   });
 
   it('returns error string for empty string', () => {
-    expect(requireToken('')).toBeTruthy();
+    expect(requireToken('', CONFIGURED_SECRET)).toBeTruthy();
   });
 
   it('returns error string for whitespace-only string', () => {
-    expect(requireToken('   ')).toBeTruthy();
+    expect(requireToken('   ', CONFIGURED_SECRET)).toBeTruthy();
   });
 
-  it('returns null for a non-empty string', () => {
-    expect(requireToken('my-token')).toBeNull();
+  it('rejects short tokens such as "approve"', () => {
+    expect(requireToken('approve', CONFIGURED_SECRET)).toBe('MISSING_OR_SHORT_OPERATOR_TOKEN');
   });
 
-  it('returns null for any truthy string', () => {
-    expect(requireToken('approve')).toBeNull();
-    expect(requireToken('operator-2026')).toBeNull();
+  it('rejects arbitrary long non-empty tokens that are not the configured secret', () => {
+    expect(requireToken('operator-2026-not-the-secret', CONFIGURED_SECRET)).toBe('INVALID_OPERATOR_TOKEN');
+  });
+
+  it('accepts the configured secret', () => {
+    expect(requireToken(CONFIGURED_SECRET, CONFIGURED_SECRET)).toBeNull();
+  });
+
+  it('fails closed when no secret is configured', () => {
+    expect(requireToken(CONFIGURED_SECRET, '')).toBe('OPERATOR_TOKEN_ENV_UNCONFIGURED');
   });
 });
 
@@ -68,13 +79,11 @@ describe('requireToken', () => {
 
 describe('ops.propose_patch — input guards', () => {
   it('rejects missing operator_token', () => {
-    const err = requireToken(undefined);
-    expect(err).toContain('operator_token');
+    expect(requireToken(undefined, CONFIGURED_SECRET)).toBe('MISSING_OR_SHORT_OPERATOR_TOKEN');
   });
 
   it('rejects empty operator_token', () => {
-    const err = requireToken('');
-    expect(err).toContain('operator_token');
+    expect(requireToken('', CONFIGURED_SECRET)).toBe('MISSING_OR_SHORT_OPERATOR_TOKEN');
   });
 
   it('strips path traversal from file_path', () => {
@@ -126,8 +135,8 @@ describe('ops.run_targeted_test — input guards', () => {
 
 describe('ops.record_fix_attempt — input guards', () => {
   it('requires operator_token to be non-empty', () => {
-    expect(requireToken('')).toBeTruthy();
-    expect(requireToken(null)).toBeTruthy();
+    expect(requireToken('', CONFIGURED_SECRET)).toBe('MISSING_OR_SHORT_OPERATOR_TOKEN');
+    expect(requireToken(null, CONFIGURED_SECRET)).toBe('MISSING_OR_SHORT_OPERATOR_TOKEN');
   });
 
   it('truncates fix_type to 100 chars', () => {
