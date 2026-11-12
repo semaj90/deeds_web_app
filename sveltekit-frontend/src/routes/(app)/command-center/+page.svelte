@@ -463,7 +463,7 @@
 	.command-shell {
 		position: relative;
 		min-height: 100vh;
-		margin: -2.5rem;
+		margin: 0;
 		padding: 1.25rem;
 		background:
 			radial-gradient(circle at top, rgba(22, 101, 52, 0.14), transparent 24%),

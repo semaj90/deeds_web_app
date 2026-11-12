@@ -600,7 +600,7 @@
 		position: relative;
 		min-height: 100vh;
 		background: var(--t-bg);
-		margin: -2.5rem;
+		margin: 0;
 		padding: 2.5rem;
 	}
 

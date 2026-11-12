@@ -243,7 +243,7 @@
 <style>
 	.ai-lab-surface {
 		min-height: 100vh;
-		margin: -2.5rem;
+		margin: 0;
 		padding: 2.5rem;
 		background:
 			radial-gradient(circle at top left, rgba(245, 158, 11, 0.09), transparent 30%),

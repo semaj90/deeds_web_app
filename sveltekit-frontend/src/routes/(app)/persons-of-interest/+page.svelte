@@ -705,7 +705,7 @@
 		background: #131519;
 		font-family: 'JetBrains Mono', 'Courier New', monospace;
 		color: rgba(212, 199, 163, 0.9);
-		margin: -2.5rem;
+		margin: -1rem;
 	}
 	.yorha-page :global(h1), .yorha-page :global(h2), .yorha-page :global(h3), .yorha-page :global(h4), .yorha-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
 	.yorha-page :global(a) { color: inherit; border-bottom: none; }

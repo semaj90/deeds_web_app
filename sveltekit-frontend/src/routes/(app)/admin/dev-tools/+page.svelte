@@ -991,7 +991,7 @@
 	.dt-dark {
 		min-height: 100vh;
 		background: #0e0d0b;
-		margin: -2.5rem;
+		margin: 0;
 		padding: 2.5rem;
 		color: rgb(212 199 163);
 	}

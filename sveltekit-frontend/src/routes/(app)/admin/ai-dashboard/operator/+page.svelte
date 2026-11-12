@@ -345,7 +345,7 @@
 <style>
 	.ai-surface {
 		min-height: 100vh;
-		margin: -2.5rem;
+		margin: -1rem;
 		padding: 2.5rem;
 		background:
 			radial-gradient(circle at top left, rgba(34, 197, 94, 0.08), transparent 30%),
