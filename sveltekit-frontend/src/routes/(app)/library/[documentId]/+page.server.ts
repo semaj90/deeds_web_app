@@ -42,7 +42,7 @@ export const load: PageServerLoad = async ({ params }) => {
 				corpusType: row.corpus_type,
 				processingStatus: row.processing_status,
 				pageCount: row.page_count,
-				wordCount: row.word_count,
+				wordCount: null, // library_documents has no word_count column; the UI hides a null count
 				chunkCount: row.chunk_count,
 				nodeCount: row.node_count,
 				isOfficial: row.is_official,
