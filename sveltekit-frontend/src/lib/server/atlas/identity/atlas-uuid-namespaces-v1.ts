@@ -18,3 +18,11 @@ export const TITLE_NAMESPACE_V1 = '78600f05-a8b4-54d4-aa02-43edb0fdc70c';
  * Frozen like the others; the derivation is asserted in unknown-resolution-v1.spec.ts.
  */
 export const UNKNOWN_RESOLUTION_NAMESPACE_V1 = '5628bdfd-fe4c-537c-917e-a217b088a9f0';
+/**
+ * Added 2026-11-12 (additive; the values above are untouched). Derived from the Atlas root:
+ * v5('atlas:chat-attachment-session:v1', ATLAS_ROOT_NAMESPACE_V1). Namespace for the deterministic
+ * uuid lookup key that maps a free-form chat id onto `chat_document_attachments.chat_session_id`
+ * (a uuid column). A lookup key only: ownership stays with `chat_metadata`. Frozen like the others;
+ * the derivation is asserted in chat-session-owner-v1.spec.ts.
+ */
+export const CHAT_ATTACHMENT_SESSION_NAMESPACE_V1 = '9864b884-63f5-5575-b82d-788b14fdb0bd';

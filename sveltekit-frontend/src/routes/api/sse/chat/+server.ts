@@ -63,7 +63,11 @@ import {
   streamCachedResponse,
 } from '$lib/server/ai/cached-stream.js';
 import { getAuthorizedCase } from '$lib/server/case-access.js';
-import { ChatSessionOwnerErrorV1, ensureChatSessionOwnerV1 } from '$lib/server/chat/chat-session-owner-v1.js';
+import {
+  ChatSessionOwnerErrorV1,
+  chatAttachmentSessionUuidV1,
+  ensureChatSessionOwnerV1,
+} from '$lib/server/chat/chat-session-owner-v1.js';
 
 /** Returns true when a Postgres error is 42P01 (undefined_table). */
 function isMissingRelationError(err: unknown): boolean {
@@ -78,11 +82,13 @@ function isMissingRelationError(err: unknown): boolean {
  */
 async function fetchChatDocumentContext(sessionId: string): Promise<string | null> {
   try {
-    // Query chat_document_attachments for this session
+    // chat ids are free-form strings but chat_session_id is a uuid column: look up by the
+    // deterministic key. Callers must already have passed ensureChatSessionOwnerV1 for this id
+    // (the POST handler does so before streaming); the uuid is a lookup key, not authorization.
     const attachments = await db
       .select()
       .from(chatDocumentAttachments)
-      .where(eq(chatDocumentAttachments.chat_session_id, sessionId))
+      .where(eq(chatDocumentAttachments.chat_session_id, chatAttachmentSessionUuidV1(sessionId)))
       .limit(5);
 
     if (attachments.length === 0) {
@@ -512,6 +518,18 @@ const CASE_COLLECTIONS = [
 const RAG_COLLECTIONS = [...KB_COLLECTIONS, ...CASE_COLLECTIONS] as const;
 
 /**
+ * Scope for the shared `legal_documents` collection, which mixes public knowledge documents with
+ * case-tagged uploads. Qdrant `is_empty` also matches a missing key. A case chat sees public documents
+ * plus its own case; a non-case chat sees public documents only. These points carry no `user_id`, so
+ * ownership cannot be filtered by user here: the caller must already have authorized `caseUuid`.
+ */
+function legalDocumentsScopeFilter(caseUuid?: string): Record<string, unknown> {
+  return caseUuid
+    ? { should: [{ is_empty: { key: 'case_id' } }, { key: 'case_id', match: { value: caseUuid } }] }
+    : { must: [{ is_empty: { key: 'case_id' } }] };
+}
+
+/**
  * Search a single Qdrant collection. Returns raw hits or empty array on failure.
  */
 // buildVectorPayload imported from $lib/server/config/vector-config.js (single source of truth)
@@ -592,7 +610,8 @@ async function searchCollection(
 async function retrieveContext(
   query: string,
   limit = RAG_MAX_CHUNKS,
-  graphFilter?: Record<string, unknown>
+  graphFilter?: Record<string, unknown>,
+  caseUuid?: string
 ): Promise<ContextDoc[]> {
   try {
     const vector = await embedSemanticQuery(query);
@@ -602,7 +621,16 @@ async function retrieveContext(
 
     // 2. Search tiered: KB corpus (no graph filter) + Case evidence (graph-filtered)
     const [kbHits, caseHits] = await Promise.all([
-      Promise.all(KB_COLLECTIONS.map((col) => searchCollection(col, vector, limit))),
+      Promise.all(
+        KB_COLLECTIONS.map((col) =>
+          searchCollection(
+            col,
+            vector,
+            limit,
+            col === 'legal_documents' ? legalDocumentsScopeFilter(caseUuid) : undefined
+          )
+        )
+      ),
       Promise.all(CASE_COLLECTIONS.map((col) => searchCollection(col, vector, limit, graphFilter))),
     ]);
     const merged = [...kbHits.flat(), ...caseHits.flat()];
@@ -662,11 +690,12 @@ async function retrieveContextWithBudget(
   query: string,
   limit = RAG_MAX_CHUNKS,
   timeoutMs = PRELUDE_RAG_TIMEOUT_MS,
-  graphFilter?: Record<string, unknown>
+  graphFilter?: Record<string, unknown>,
+  caseUuid?: string
 ): Promise<ContextDoc[]> {
   try {
     return await Promise.race([
-      retrieveContext(query, limit, graphFilter),
+      retrieveContext(query, limit, graphFilter, caseUuid),
       new Promise<ContextDoc[]>((resolve) => setTimeout(() => resolve([]), timeoutMs)),
     ]);
   } catch {
@@ -688,7 +717,11 @@ async function retrieveAttachmentContext(
     const filter = {
       must: [
         { key: 'source_hash', match: { value: attachmentSourceHash } },
-        ...(shouldFilterCase ? [{ key: 'case_id', match: { value: caseUuid } }] : []),
+        // A hash alone is content-addressed across users: a case chat is limited to its own case and a
+        // non-case chat to documents that carry no case.
+        shouldFilterCase
+          ? { key: 'case_id', match: { value: caseUuid } }
+          : { is_empty: { key: 'case_id' } },
       ],
     };
 
@@ -763,7 +796,8 @@ async function lookupCachedResponseWithBudget(params: {
  */
 async function correctiveRetrieval(
   originalQuery: string,
-  originalDocs: ContextDoc[]
+  originalDocs: ContextDoc[],
+  caseUuid?: string
 ): Promise<{ docs: ContextDoc[]; reformulated: boolean; newQuery?: string }> {
   if (originalDocs.length === 0) {
     return { docs: originalDocs, reformulated: false };
@@ -819,7 +853,7 @@ async function correctiveRetrieval(
     );
 
     // Second retrieval pass with reformulated query
-    const newDocs = await retrieveContext(newQuery);
+    const newDocs = await retrieveContext(newQuery, undefined, undefined, caseUuid);
     const newTopScore = newDocs.length > 0 ? Math.max(...newDocs.map((d) => d.similarity)) : 0;
 
     // Use reformulated results only if they're better
@@ -1342,7 +1376,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                   message,
                   RAG_MAX_CHUNKS,
                   PRELUDE_RAG_TIMEOUT_MS,
-                  preRetrievalFilter
+                  preRetrievalFilter,
+                  caseUuid
                 ),
         wantsCode && !codeGlyphHit
           ? loadCodebaseContext(message).catch(() => null)
@@ -1452,7 +1487,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         docs: correctedDocs,
         reformulated,
         newQuery,
-      } = await correctiveRetrieval(message, rawContextDocs);
+      } = await correctiveRetrieval(message, rawContextDocs, caseUuid);
       const correctiveDuration = performance.now() - correctiveStart;
 
       logToolTrace({

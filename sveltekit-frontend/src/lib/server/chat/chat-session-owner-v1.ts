@@ -1,3 +1,20 @@
+import { v5 as uuidv5 } from 'uuid';
+import { CHAT_ATTACHMENT_SESSION_NAMESPACE_V1 } from '$lib/server/atlas/identity/atlas-uuid-namespaces-v1.js';
+
+/**
+ * Deterministic uuid for `chat_document_attachments.chat_session_id`, derived from the exact chat id
+ * (case-sensitive, no normalization). Chat ids are free-form strings (`chat_<ts>_<rand>`,
+ * `board-<case uuid>`, `terminal-N`, ...) and the column is a uuid, so the raw id can never be stored
+ * or compared there. This is a lookup key only, never ownership: callers must have passed
+ * `ensureChatSessionOwnerV1` for the same chat id before reading or writing attachments.
+ */
+export function chatAttachmentSessionUuidV1(chatId: string): string {
+	if (typeof chatId !== 'string' || chatId.length === 0 || chatId.length > 200) {
+		throw new Error('CHAT_ATTACHMENT_SESSION_CHAT_ID_INVALID');
+	}
+	return uuidv5(chatId, CHAT_ATTACHMENT_SESSION_NAMESPACE_V1);
+}
+
 export interface ChatSessionOwnerV1 {
 	userId: number;
 	caseId: string | null;

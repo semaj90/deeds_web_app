@@ -31,6 +31,7 @@ import { eq } from 'drizzle-orm';
 import { isUuid } from '$lib/server/validation.js';
 import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
 
 const MODEL = LLM_MODEL_ID;
 const MAX_CONTEXT_CHARS = 8_000; // cap extractedText to keep the prompt bounded
@@ -75,7 +76,8 @@ Keep the analysis under 400 words. Do not invent facts not present in the eviden
 }
 
 export const GET: RequestHandler = async ({ params, locals }) => {
-	if (!locals.user) {
+	const actorId = Number(locals.user?.id);
+	if (!locals.user || !Number.isSafeInteger(actorId) || actorId <= 0) {
 		return new Response('Unauthorized', { status: 401 });
 	}
 	if (!isUuid(params.id)) {
@@ -92,6 +94,9 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			mimeType: evidence.mimeType,
 			fileType: evidence.fileType,
 			extractedText: evidence.extractedText,
+			caseId: evidence.caseId,
+			userId: evidence.userId,
+			uploadedBy: evidence.uploadedBy,
 		})
 		.from(evidence)
 		.where(eq(evidence.id, params.id))
@@ -102,6 +107,16 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		return new Response('Evidence not found', { status: 404 });
 	}
 	const item = rows[0];
+
+	// Authorization: case-linked evidence needs case access (owner or assigned attorney);
+	// evidence with no case is limited to its owner/uploader. Denial is indistinguishable
+	// from a missing row so evidence IDs cannot be probed.
+	const allowed = item.caseId
+		? Boolean(await getAuthorizedCase(item.caseId, actorId).catch(() => null))
+		: item.userId === actorId || item.uploadedBy === actorId;
+	if (!allowed) {
+		return new Response('Evidence not found', { status: 404 });
+	}
 	const callerUserId = locals.user.id;
 	const startedAt = Date.now();
 

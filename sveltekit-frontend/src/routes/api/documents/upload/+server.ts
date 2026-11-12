@@ -16,11 +16,27 @@ const documentUploadFieldsSchema = z.object({
 import { documents, chatDocumentAttachments } from '$lib/server/db/schema-postgres';
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed';
 import { getSeaweedClient as getMinioClient } from '$lib/server/seaweed-client.js';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
+import {
+  ChatSessionOwnerErrorV1,
+  chatAttachmentSessionUuidV1,
+  ensureChatSessionOwnerV1,
+} from '$lib/server/chat/chat-session-owner-v1.js';
+import { chatSessionOwnerDepsV1 } from '$lib/server/chat/chat-session-owner-db-v1.js';
+import { formatAcpKanbanErrorLineV1 } from '$lib/server/atlas/kanban-acp-dag-contracts.js';
+
+class AttachmentLinkError extends Error {
+  constructor(readonly cause: unknown) {
+    super('ATTACHMENT_LINK_FAILED');
+    this.name = 'AttachmentLinkError';
+  }
+}
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   try {
     // Auth check
-    if (!locals.user) {
+    const actorId = Number(locals.user?.id);
+    if (!locals.user || !Number.isSafeInteger(actorId) || actorId <= 0) {
       return json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -45,6 +61,33 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
     const { sessionId } = fieldsParsed.data;
     const caseId = fieldsParsed.data.caseId ?? null;
+
+    // A supplied caseId must be a case the actor owns or is assigned to; checked before
+    // any file is read or written so an unauthorized case tag never reaches storage or the queue.
+    if (caseId && !(await getAuthorizedCase(caseId, actorId))) {
+      return json({ error: 'Case not found' }, { status: 404 });
+    }
+
+    // sessionId is a chat id (chat_metadata is the session owner). Bind or verify it for this actor
+    // before any storage or queue work: an upload before the first message claims the session,
+    // an existing session must belong to the actor (and match the case), legacy chats with history
+    // but no owner row are refused. Same rule and status mapping as api/sse/chat.
+    try {
+      await ensureChatSessionOwnerV1(
+        { chatId: sessionId, userId: actorId, caseId },
+        chatSessionOwnerDepsV1()
+      );
+    } catch (error) {
+      if (error instanceof ChatSessionOwnerErrorV1) {
+        const legacy = error.code === 'CHAT_SESSION_LEGACY_OWNER_UNKNOWN';
+        return json(
+          { error: legacy ? 'Legacy chat requires account recovery' : 'Conversation not found' },
+          { status: legacy ? 409 : 404 }
+        );
+      }
+      console.error('[documents/upload] Could not verify conversation ownership:', error);
+      return json({ error: 'Conversation authorization unavailable' }, { status: 503 });
+    }
 
     // Validate file type
     const allowedTypes = [
@@ -107,50 +150,82 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       await writeFile(filePath, buffer);
     }
 
-    // Insert document record
-    const [documentRecord] = await db
-      .insert(documents)
-      .values({
-        id: documentId,
-        title: fileName.replace(/\.[^.]+$/, ''), // Remove extension
-        filePath: filePath,
-        fileSize: fileSize,
-        mimeType: file.type,
-        originalName: fileName,
-        status: 'pending',
-        metadata: {
-          uploadedBy: Number(locals.user.id),
-          uploadedAt: new Date().toISOString(),
-          sessionId,
-        },
-      })
-      .returning();
-
-    // Insert chat attachment record (optional — skip if session doesn't exist)
-    let attachmentId: string | null = null;
+    // Insert the document record and its chat attachment in ONE transaction. The session is already
+    // owned by this actor (verified above), so a missing link is a real fault, not an expected state:
+    // a failed attachment insert rolls the document row back, fails the request and skips the queue
+    // publish. chat_session_id is a uuid column, so it holds the deterministic lookup key for the chat
+    // id; the real chat id is kept in metadata.
+    let attachmentId: string;
     try {
-      const [attachmentRecord] = await db
-        .insert(chatDocumentAttachments)
-        .values({
-          chat_session_id: sessionId,
-          document_id: documentId,
-          file_name: fileName,
-          file_size: fileSize,
-          file_type: file.type,
-          minio_path: filePath,
-          embedding_status: 'pending',
-          metadata: {
-            caseId,
-            uploadedBy: Number(locals.user.id),
+      attachmentId = await db.transaction(async (tx) => {
+        await tx
+          .insert(documents)
+          .values({
+            id: documentId,
+            title: fileName.replace(/\.[^.]+$/, ''), // Remove extension
+            filePath: filePath,
+            fileSize: fileSize,
+            mimeType: file.type,
+            originalName: fileName,
+            status: 'pending',
+            metadata: {
+              uploadedBy: Number(locals.user.id),
+              uploadedAt: new Date().toISOString(),
+              sessionId,
+            },
+          })
+          .returning();
+
+        try {
+          const [attachmentRecord] = await tx
+            .insert(chatDocumentAttachments)
+            .values({
+              chat_session_id: chatAttachmentSessionUuidV1(sessionId),
+              document_id: documentId,
+              file_name: fileName,
+              file_size: fileSize,
+              file_type: file.type,
+              minio_path: filePath,
+              embedding_status: 'pending',
+              metadata: {
+                caseId,
+                chatId: sessionId,
+                uploadedBy: Number(locals.user.id),
+              },
+            })
+            .returning();
+          return attachmentRecord.id as string;
+        } catch (attachErr) {
+          throw new AttachmentLinkError(attachErr);
+        }
+      });
+    } catch (txErr) {
+      if (!(txErr instanceof AttachmentLinkError)) throw txErr;
+      const cause = txErr.cause as { code?: string; message?: string } | undefined;
+      // Printed for the agentic error-fixing path (ACP / A2A -> Kanban). Nothing is written here; the
+      // object stored above is now unreferenced and is NOT deleted (archive-not-delete): its key is
+      // in the context so a reconciler or the fixing agent can find it.
+      console.error(
+        formatAcpKanbanErrorLineV1(
+          {
+            relativePath: 'src/routes/api/documents/upload/+server.ts',
+            errorSignature: `ATTACHMENT_LINK_FAILED: ${String(cause?.message ?? cause ?? 'unknown').slice(0, 300)}`,
           },
-        })
-        .returning();
-      attachmentId = attachmentRecord.id;
-    } catch (attachErr) {
-      // Non-fatal: attachment record links to a chat session; if session doesn't exist yet, skip
-      console.warn(
-        'Document attachment insert skipped (session may not exist yet):',
-        (attachErr as Error).message
+          {
+            route: 'POST /api/documents/upload',
+            pgCode: cause?.code ?? null,
+            chatId: sessionId,
+            caseId,
+            documentId,
+            orphanedObject: { bucket: BUCKET, key: objectName, localFallbackPath: filePath === objectName ? null : filePath },
+            rolledBack: ['documents', 'chat_document_attachments'],
+            published: false,
+          }
+        )
+      );
+      return json(
+        { error: 'Failed to link the document to the chat session', code: 'ATTACHMENT_LINK_FAILED' },
+        { status: 500 }
       );
     }
 
@@ -169,6 +244,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       success: true,
       documentId,
       attachmentId,
+      attachmentLinked: true,
       message: 'Document uploaded and queued for embedding',
     });
   } catch (err) {
