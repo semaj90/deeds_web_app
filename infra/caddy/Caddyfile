@@ -10,6 +10,15 @@ https://localhost:8443 {
 	encode zstd gzip
 
 	# SvelteKit OpenAI-compatible facade
+	# Evidence job SSE: explicit streaming route for this multi-segment endpoint.
+	handle /api/cases/*/evidence/jobs/*/events {
+		reverse_proxy host.docker.internal:5173 {
+			header_up Host {host}
+			header_up X-Forwarded-Proto {scheme}
+			header_up X-Forwarded-For {remote_host}
+		}
+	}
+
 	handle /api/* {
 		reverse_proxy host.docker.internal:5173 {
 			flush_interval -1

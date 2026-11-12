@@ -143,8 +143,10 @@ type AtlasRequestContextV2 struct {
 	WorkspaceRevision string                 `protobuf:"bytes,4,opt,name=workspace_revision,json=workspaceRevision,proto3" json:"workspace_revision,omitempty"`
 	PacketKey         string                 `protobuf:"bytes,5,opt,name=packet_key,json=packetKey,proto3" json:"packet_key,omitempty"`
 	PacketRevision    string                 `protobuf:"bytes,6,opt,name=packet_revision,json=packetRevision,proto3" json:"packet_revision,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// Optional exact source revision scope; empty preserves broad retrieval.
+	SourceRevision string `protobuf:"bytes,7,opt,name=source_revision,json=sourceRevision,proto3" json:"source_revision,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *AtlasRequestContextV2) Reset() {
@@ -219,6 +221,13 @@ func (x *AtlasRequestContextV2) GetPacketRevision() string {
 	return ""
 }
 
+func (x *AtlasRequestContextV2) GetSourceRevision() string {
+	if x != nil {
+		return x.SourceRevision
+	}
+	return ""
+}
+
 // AtlasToolReceipt is an observation projection, not a canonical write owner.
 type AtlasToolReceiptV2 struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
@@ -240,8 +249,10 @@ type AtlasToolReceiptV2 struct {
 	WritesPerformed     bool                   `protobuf:"varint,16,opt,name=writes_performed,json=writesPerformed,proto3" json:"writes_performed,omitempty"`
 	ReceiptId           string                 `protobuf:"bytes,17,opt,name=receipt_id,json=receiptId,proto3" json:"receipt_id,omitempty"`
 	ReceiptChecksum     string                 `protobuf:"bytes,18,opt,name=receipt_checksum,json=receiptChecksum,proto3" json:"receipt_checksum,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// Echoes the requested source revision when the request was revision-scoped.
+	SourceRevision string `protobuf:"bytes,19,opt,name=source_revision,json=sourceRevision,proto3" json:"source_revision,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *AtlasToolReceiptV2) Reset() {
@@ -400,6 +411,13 @@ func (x *AtlasToolReceiptV2) GetReceiptChecksum() string {
 	return ""
 }
 
+func (x *AtlasToolReceiptV2) GetSourceRevision() string {
+	if x != nil {
+		return x.SourceRevision
+	}
+	return ""
+}
+
 // ArtifactRef is a pointer to a file written under memory/runs/<run_id>/
 type ArtifactRef struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -501,7 +519,7 @@ const file_shared_ids_proto_rawDesc = "" +
 	"error_hash\x18\x05 \x01(\tR\terrorHash\x12!\n" +
 	"\fcontent_hash\x18\x06 \x01(\tR\vcontentHash\x12'\n" +
 	"\x0fembedding_model\x18\a \x01(\tR\x0eembeddingModel\x12#\n" +
-	"\rembedding_dim\x18\b \x01(\x05R\fembeddingDim\"\xea\x01\n" +
+	"\rembedding_dim\x18\b \x01(\x05R\fembeddingDim\"\x93\x02\n" +
 	"\x15AtlasRequestContextV2\x12 \n" +
 	"\ftool_call_id\x18\x01 \x01(\tR\n" +
 	"toolCallId\x12\x15\n" +
@@ -510,7 +528,8 @@ const file_shared_ids_proto_rawDesc = "" +
 	"\x12workspace_revision\x18\x04 \x01(\tR\x11workspaceRevision\x12\x1d\n" +
 	"\n" +
 	"packet_key\x18\x05 \x01(\tR\tpacketKey\x12'\n" +
-	"\x0fpacket_revision\x18\x06 \x01(\tR\x0epacketRevision\"\xfa\x05\n" +
+	"\x0fpacket_revision\x18\x06 \x01(\tR\x0epacketRevision\x12'\n" +
+	"\x0fsource_revision\x18\a \x01(\tR\x0esourceRevision\"\xa3\x06\n" +
 	"\x12AtlasToolReceiptV2\x12\x16\n" +
 	"\x06schema\x18\x01 \x01(\tR\x06schema\x12 \n" +
 	"\ftool_call_id\x18\x02 \x01(\tR\n" +
@@ -534,7 +553,8 @@ const file_shared_ids_proto_rawDesc = "" +
 	"\x10writes_performed\x18\x10 \x01(\bR\x0fwritesPerformed\x12\x1d\n" +
 	"\n" +
 	"receipt_id\x18\x11 \x01(\tR\treceiptId\x12)\n" +
-	"\x10receipt_checksum\x18\x12 \x01(\tR\x0freceiptChecksumB\x17\n" +
+	"\x10receipt_checksum\x18\x12 \x01(\tR\x0freceiptChecksum\x12'\n" +
+	"\x0fsource_revision\x18\x13 \x01(\tR\x0esourceRevisionB\x17\n" +
 	"\x15_retrieval_confidenceB\x12\n" +
 	"\x10_output_checksumB\r\n" +
 	"\v_error_code\"\xcb\x01\n" +
