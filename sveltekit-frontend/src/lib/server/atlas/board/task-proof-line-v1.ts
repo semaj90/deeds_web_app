@@ -11,16 +11,18 @@ import { resolveTaskReceiptsV1 } from '../cache/receipt-dictionary-v1';
  *   targetedTestsPassed  a committed, VERIFIED TEST_EXECUTION receipt says passed at the CURRENT source revision
  *   independentReadback  a VERIFIER_RESULT receipt says VERIFIED_PASS at the same source revision
  *   completionAuthorized the caller's explicit grant AND both of the above AND an unambiguous binding
- * featureLabel is PROPOSED (canonicalAuthority false) unless an ADMITTED binding with a checksum is supplied.
+ * featureLabel is always a proposal here; canonical feature authority belongs to the feature registry.
  */
 
 export const TASK_PROOF_LINE_SCHEMA = 'atlas.task-proof-line.v1' as const;
-const SHA256 = /^sha256:[a-f0-9]{64}$/;
-
 export interface WorkboardTaskRefV1 {
   readonly stableKey: string;
   readonly sourceCheckboxState: 'DONE' | 'OPEN' | string;
   readonly blockHash: string;
+  /** Direct, opt-in receipt reference parsed from the task's WFU `proof:` declaration. */
+  readonly proofReceiptId?: string | null;
+  /** Shape emitted by the existing workboard parser for a task's WFU declaration. */
+  readonly declared?: { readonly proofReceiptId?: string | null } | null;
 }
 
 export interface FeatureBindingV1 {
@@ -67,8 +69,8 @@ export interface TaskProofLineV1 {
   readonly warnings: readonly string[];
   readonly featureLabel: {
     readonly value: string | null;
-    readonly status: 'PROPOSED' | 'ADMITTED';
-    readonly canonicalAuthority: boolean;
+    readonly status: 'PROPOSED';
+    readonly canonicalAuthority: false;
   };
 }
 
@@ -80,16 +82,27 @@ export function projectTaskProofLineV1(input: TaskProofLineInputV1): TaskProofLi
   const warnings: string[] = [];
   if (input.blockHashGroupSize > 1) warnings.push('AMBIGUOUS_BLOCK_HASH');
 
-  const binding = input.featureBinding;
-  const admitted = !!binding && binding.status === 'ADMITTED' && SHA256.test(binding.bindingChecksum ?? '');
+  // Labels remain descriptive proposals here. This proof projection is not the feature registry authority.
   const featureLabel = Object.freeze({
     value: input.featureLabel,
-    status: admitted ? ('ADMITTED' as const) : ('PROPOSED' as const),
-    canonicalAuthority: admitted,
+    status: 'PROPOSED' as const,
+    canonicalAuthority: false,
   });
 
   const checked = task.sourceCheckboxState === 'DONE';
-  const resolved = resolveTaskReceiptsV1({ taskStableKey: task.stableKey, mapping: input.mapping });
+  const mapped = resolveTaskReceiptsV1({ taskStableKey: task.stableKey, mapping: input.mapping });
+  const proofReceiptId = (task.proofReceiptId ?? task.declared?.proofReceiptId)?.trim() || null;
+  // `proof:` is the exact task-authored edge. Keep existing explicit mapping for a separate verifier receipt,
+  // but never substitute a filename-derived or blockHash-derived test receipt for the declared id.
+  const mappedVerifierIds = mapped.status === 'RESOLVED'
+    ? mapped.receiptIds.filter((id) => input.receipts.some((item) => usable(item)?.receiptId === id && usable(item)?.receiptKind === 'VERIFIER_RESULT'))
+    : [];
+  const receiptIds = proofReceiptId
+    ? [...new Set([proofReceiptId, ...mappedVerifierIds])]
+    : mapped.receiptIds;
+  const resolved = receiptIds.length > 0
+    ? { status: 'RESOLVED' as const, receiptIds }
+    : { status: 'UNRESOLVED_TASK_MAPPING' as const, receiptIds: [] as readonly [] };
   const finish = (status: ProofLineStatusV1, tests = false, readback = false, authorized = false): TaskProofLineV1 =>
     Object.freeze({
       schema: TASK_PROOF_LINE_SCHEMA,

@@ -235,6 +235,7 @@
 		<div class="progress-container">
 			<EvidenceUploadProgress
 				jobId={currentJobId}
+				caseId={completedCaseId}
 				filename={currentFileName ?? undefined}
 				onComplete={handleUploadComplete}
 				onError={handleUploadError}

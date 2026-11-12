@@ -1,10 +1,40 @@
 import { describe, expect, it } from 'vitest';
 import {
 	buildEvidenceProcessingCompletionV1,
+	formatEvidenceAnalysisProgressSseV1,
+	formatEvidenceSseRetryV1,
 	formatEvidenceProgressSseEventV1,
+	parseEvidenceEventCursorV1,
 } from './evidence-progress-sse-v1.js';
 
 describe('evidence progress SSE framing', () => {
+	it('sends a bounded retry hint and supports jitter without changing the event cursor', () => {
+		expect(formatEvidenceSseRetryV1(() => 0)).toBe('retry: 2500\n\n');
+		expect(formatEvidenceSseRetryV1(() => 0.5)).toBe('retry: 3750\n\n');
+		expect(formatEvidenceSseRetryV1(() => 1)).toBe('retry: 5000\n\n');
+	});
+
+	it('supports stable monotonic resume cursors and rejects malformed or overflowing IDs', () => {
+		expect(parseEvidenceEventCursorV1(null)).toBe(0n);
+		expect(parseEvidenceEventCursorV1('41')).toBe(41n);
+		expect(parseEvidenceEventCursorV1('-1')).toBeNull();
+		expect(parseEvidenceEventCursorV1('1;data: forged')).toBeNull();
+		expect(parseEvidenceEventCursorV1('9223372036854775808')).toBeNull();
+	});
+
+	it('emits source-qualified job state with a stable event ID and transport cursor', () => {
+		expect(formatEvidenceAnalysisProgressSseV1(41n, {
+			eventId: 'e24f9ad7-75b5-4f7c-9a40-1f305b6f0c51',
+			jobId: 'e24f9ad7-75b5-4f7c-9a40-1f305b6f0c51',
+			evidenceId: '1c7a1bdc-8a1f-41f4-9c72-c9b4cfad8434',
+			caseId: '89317a13-5ec2-4919-8795-1128bb01fdce',
+			stage: 'running',
+			status: 'running',
+			sourceRevision: 'sha256:0123456789abcdef',
+			progress: 25,
+		})).toBe('id: 41\nevent: analysis-progress\ndata: {"eventId":"e24f9ad7-75b5-4f7c-9a40-1f305b6f0c51","jobId":"e24f9ad7-75b5-4f7c-9a40-1f305b6f0c51","evidenceId":"1c7a1bdc-8a1f-41f4-9c72-c9b4cfad8434","caseId":"89317a13-5ec2-4919-8795-1128bb01fdce","stage":"running","status":"running","sourceRevision":"sha256:0123456789abcdef","progress":25}\n\n');
+	});
+
 	it('emits named events consumed by EventSource listeners', () => {
 		expect(formatEvidenceProgressSseEventV1('progress', {
 			jobId: 'job-1',

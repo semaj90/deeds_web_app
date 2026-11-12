@@ -98,4 +98,20 @@ describe('DB-backed evidence upload pipeline contract', () => {
 			evidenceId, analysisJobId, metadata, processEvidence,
 		})).rejects.toThrow('ANALYSIS_UPLOAD_CANONICAL_RECEIPT_INVALID');
 	});
+
+	it('forwards source-processing stage updates without changing the canonical receipt', async () => {
+		const stages = ['source_fetch', 'text_extraction', 'content_analysis', 'canonical_indexing'] as const;
+		const onProgress = vi.fn();
+		const processEvidence = vi.fn(async (_payload, reportProgress) => {
+			for (const stage of stages) await reportProgress?.(stage);
+			return { chunkCount: 1, persistedCount: 1, sourceRevision: sourceSha256 };
+		});
+
+		const result = await executeAnalysisUploadPipelineV1({
+			evidenceId, analysisJobId, metadata, processEvidence, onProgress,
+		});
+
+		expect(onProgress.mock.calls.map(([stage]) => stage)).toEqual(stages);
+		expect(result).toMatchObject({ status: 'processed', sourceRevision: sourceSha256 });
+	});
 });

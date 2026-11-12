@@ -8,6 +8,9 @@ const sub = vi.hoisted(() => ({
 }));
 const readTokenStream = vi.hoisted(() => vi.fn());
 const produceTokenChunk = vi.hoisted(() => vi.fn());
+const select = vi.hoisted(() => vi.fn());
+const ownershipQuery = vi.hoisted(() => ({ from: vi.fn(), where: vi.fn(), limit: vi.fn() }));
+const getAuthorizedCase = vi.hoisted(() => vi.fn());
 
 class FakeSubscriber {
 	status = 'ready';
@@ -21,6 +24,8 @@ class FakeSubscriber {
 // The route builds its subscriber from the shared client (options-based), not from REDIS_URL.
 vi.mock('$lib/server/redis.js', () => ({ getRedis: () => ({ duplicate: () => new FakeSubscriber() }) }));
 vi.mock('$lib/server/redis-streams.js', () => ({ readTokenStream, produceTokenChunk }));
+vi.mock('$lib/server/db/client.js', () => ({ db: { select } }));
+vi.mock('$lib/server/case-access.js', () => ({ getAuthorizedCase }));
 
 import { GET } from './+server';
 
@@ -73,6 +78,12 @@ beforeEach(() => {
 	produceTokenChunk.mockReset();
 	sub.subscribe.mockClear();
 	sub.unsubscribe.mockClear();
+	select.mockReturnValue(ownershipQuery);
+	ownershipQuery.from.mockReturnValue(ownershipQuery);
+	ownershipQuery.where.mockReturnValue(ownershipQuery);
+	ownershipQuery.limit.mockResolvedValue([{ chatId: CHAT, caseId: null }]);
+	getAuthorizedCase.mockReset();
+	getAuthorizedCase.mockResolvedValue({ id: 'a2b6d51c-5595-4ccd-a86b-ff89c0d349cc' });
 });
 afterEach(async () => {
 	await reader?.cancel();
@@ -82,7 +93,37 @@ afterEach(async () => {
 describe('/api/sse/[id] resumable delivery', () => {
 	it('rejects unauthenticated and malformed requests', async () => {
 		expect((await call({ user: null })).status).toBe(401);
+		expect((await call({ user: { id: 'not-a-user' } })).status).toBe(401);
 		expect((await call({ id: 'not valid!' })).status).toBe(400);
+	});
+
+	it('does not subscribe to or replay a chat without an owner row for the actor', async () => {
+		ownershipQuery.limit.mockResolvedValueOnce([]);
+		getAuthorizedCase.mockResolvedValueOnce(null);
+		const response = await call();
+		expect(response.status).toBe(404);
+		expect(sub.subscribe).not.toHaveBeenCalled();
+		expect(readTokenStream).not.toHaveBeenCalled();
+	});
+
+	it('allows a direct case collaboration stream only after current case access succeeds', async () => {
+		ownershipQuery.limit.mockResolvedValueOnce([]);
+		const response = await call({ id: 'a2b6d51c-5595-4ccd-a86b-ff89c0d349cc' });
+		expect(response.status).toBe(200);
+		expect(getAuthorizedCase).toHaveBeenCalledWith('a2b6d51c-5595-4ccd-a86b-ff89c0d349cc', 1);
+		expect(sub.subscribe).toHaveBeenCalled();
+		reader = new Reader(response);
+	});
+
+	it('rechecks case access before opening a case-linked chat stream', async () => {
+		const caseId = 'a2b6d51c-5595-4ccd-a86b-ff89c0d349cc';
+		ownershipQuery.limit.mockResolvedValueOnce([{ chatId: CHAT, caseId }]);
+		getAuthorizedCase.mockResolvedValueOnce(null);
+		const response = await call();
+		expect(response.status).toBe(404);
+		expect(getAuthorizedCase).toHaveBeenCalledWith(caseId, 1);
+		expect(sub.subscribe).not.toHaveBeenCalled();
+		expect(readTokenStream).not.toHaveBeenCalled();
 	});
 
 	it('sends the stream ID as the SSE id for live deltas and never appends from the subscriber', async () => {

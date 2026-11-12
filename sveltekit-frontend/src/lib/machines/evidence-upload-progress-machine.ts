@@ -15,6 +15,7 @@ export type EvidenceUploadProgressEvent =
 	| { type: 'PROGRESS'; progress: number; step: string; message: string; evidenceId?: string | null }
 	| { type: 'COMPLETE'; message: string; evidenceId?: string | null }
 	| { type: 'FAILED'; message: string }
+	| { type: 'STREAM_ENDED'; message: string }
 	| { type: 'RECONNECT' };
 
 export const evidenceUploadProgressMachine = setup({
@@ -49,6 +50,12 @@ export const evidenceUploadProgressMachine = setup({
 			message: event.message,
 			error: event.message,
 		} : {}),
+		applyStreamEnded: assign(({ event }) => event.type === 'STREAM_ENDED' ? {
+			step: 'status-unavailable',
+			message: event.message,
+			connected: false,
+			error: null,
+		} : {}),
 	},
 }).createMachine({
 	id: 'evidence-upload-progress-v1',
@@ -61,6 +68,7 @@ export const evidenceUploadProgressMachine = setup({
 				PROGRESS: { target: 'processing', actions: 'applyProgress' },
 				COMPLETE: { target: 'complete', actions: 'applyCompletion' },
 				FAILED: { target: 'failed', actions: 'applyFailure' },
+				STREAM_ENDED: { target: 'unavailable', actions: 'applyStreamEnded' },
 				CONNECTION_LOST: { actions: 'setDisconnected' },
 			},
 		},
@@ -69,11 +77,13 @@ export const evidenceUploadProgressMachine = setup({
 				PROGRESS: { actions: 'applyProgress' },
 				COMPLETE: { target: 'complete', actions: 'applyCompletion' },
 				FAILED: { target: 'failed', actions: 'applyFailure' },
+				STREAM_ENDED: { target: 'unavailable', actions: 'applyStreamEnded' },
 				CONNECTION_LOST: { target: 'connecting', actions: 'setDisconnected' },
 				CONNECTED: { actions: 'setConnected' },
 			},
 		},
 		complete: { type: 'final' },
+		unavailable: { type: 'final' },
 		failed: {
 			on: {
 				RECONNECT: { target: 'connecting', actions: assign({ error: null, connected: false }) },

@@ -61,7 +61,7 @@
 	});
 
 	function handleUploadAccepted(evidenceId: string, jobId: string, fileName: string, fileSize: number, startedAt: number) {
-		const upload = { evidenceId, jobId, fileName, fileSize, startedAt };
+		const upload = { evidenceId, jobId, fileName, fileSize, startedAt, caseId: activeCaseId || null };
 		activeEvidenceUpload = upload;
 		void saveActiveEvidenceUpload(uploadStorageUserId, upload).catch((error) => {
 			console.warn('[Evidence] Could not save upload resume pointer:', error);
@@ -393,6 +393,7 @@
 		<div class="progress-bar">
 			<EvidenceUploadProgress
 				jobId={activeEvidenceUpload.jobId}
+				caseId={activeEvidenceUpload.caseId ?? (activeCaseId || data.caseId || null)}
 				filename={activeEvidenceUpload.fileName}
 				fileSize={activeEvidenceUpload.fileSize}
 				userId={uploadStorageUserId}

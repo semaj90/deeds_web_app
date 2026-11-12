@@ -16,6 +16,7 @@ import type { Actions, PageServerLoad } from './$types.js';
 import { createJob, updateJob } from '$lib/server/evidence-progress.js';
 import { isEvidenceVectorOutboxAvailableV1 } from '$lib/server/evidence/evidence-vector-outbox-readiness-v1.js';
 import { classifyUploadedBytes } from '$lib/server/ingest/upload-classification-v1.js';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
 import {
   evidenceUploadSchema,
   evidenceDeleteSchema,
@@ -39,17 +40,11 @@ function requireCanonicalActorId(locals: App.Locals): number {
 }
 
 /**
- * 2. Server-Side Case ACL Check: Verify the authenticated actor owns the target caseId.
+ * 2. Server-Side Case ACL Check: Use the shared owner/assigned-attorney case policy.
  */
-async function assertActorOwnsCase(actorId: number, caseId: string | null | undefined): Promise<void> {
+async function assertActorCanAccessCase(actorId: number, caseId: string | null | undefined): Promise<void> {
   if (!caseId) return;
-  const [matchedCase] = await db
-    .select({ id: cases.id })
-    .from(cases)
-    .where(and(eq(cases.id, caseId), eq(cases.userId, actorId)))
-    .limit(1);
-
-  if (!matchedCase) {
+  if (!(await getAuthorizedCase(caseId, actorId))) {
     throw new Error('EVIDENCE_CASE_ACCESS_DENIED');
   }
 }
@@ -72,7 +67,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 
   if (caseId) {
     try {
-      await assertActorOwnsCase(actorId, caseId);
+      await assertActorCanAccessCase(actorId, caseId);
     } catch {
       return {
         evidence: [],
@@ -161,7 +156,7 @@ export const actions: Actions = {
     try {
       const { title, description, caseId } = form.data;
       if (caseId) {
-        await assertActorOwnsCase(actorId, caseId);
+        await assertActorCanAccessCase(actorId, caseId);
       }
 
       if (!(await isEvidenceVectorOutboxAvailableV1())) {

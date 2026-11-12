@@ -14,6 +14,7 @@ import {
 	listKanbanTasks,
 	reclaimStaleKanbanTask,
 	retryKanbanTask,
+	showKanbanTask,
 } from '$lib/server/atlas/kanban-task-board.js';
 import {
 	projectRecommendationToKanbanV1,
@@ -31,6 +32,7 @@ const CreateTicketActionSchema = z.object({
 	acceptanceCriteria: z.array(z.string().min(1)).min(1).default(['Pass targeted validation command']),
 	validationCommand: z.string().min(1),
 	permissionMode: z.enum(['read_only', 'proposal_only', 'patch_allowed']).default('proposal_only'),
+	sourceRevision: z.string().regex(/^sha256:[0-9a-f]{64}$/).nullable().optional(),
 	workspaceRevision: z.string().min(1).nullable().optional(),
 	graphifyRevision: z.string().min(1).default('graphify:pending-revision'),
 	featureRevision: z.string().min(1).default('feature:pending-revision'),
@@ -119,6 +121,7 @@ function mapPriorityToInteger(priority: 'low' | 'medium' | 'high' | 'critical'):
 }
 
 export const GET: RequestHandler = async ({ url, locals }) => {
+	const headers = { 'Cache-Control': 'private, no-store' };
 	const stableEmpty = {
 		ok: false,
 		tasks: [] as unknown[],
@@ -130,10 +133,37 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	};
 
 	if (locals.user?.role !== 'admin') {
-		return json({ ...stableEmpty, error: 'ADMIN_ONLY' }, { status: 403 });
+		return json({ ...stableEmpty, error: 'ADMIN_ONLY' }, { status: 403, headers });
 	}
 
 	try {
+		const rawTaskId = url.searchParams.get('taskId');
+		if (rawTaskId !== null) {
+			const parsedTaskId = z.string().trim().min(1).max(512).safeParse(rawTaskId);
+			if (!parsedTaskId.success) {
+				return json({ ...stableEmpty, error: 'INVALID_TASK_ID' }, { status: 400, headers });
+			}
+
+			const taskId = parsedTaskId.data;
+			const [task, taskEvents] = await Promise.all([
+				showKanbanTask({ taskId }),
+				listKanbanTaskEvents({ taskId, limit: 25 }),
+			]);
+			if (!task) {
+				return json({ ...stableEmpty, error: 'TASK_NOT_FOUND' }, { status: 404, headers });
+			}
+
+			return json({
+				ok: true,
+				tasks: [task],
+				total: 1,
+				events: taskEvents,
+				invalidTasks: [],
+				canonicalAuthority: false as const,
+				error: null,
+			}, { headers });
+		}
+
 		const rawLane = url.searchParams.get('lane') ?? undefined;
 		const rawStatus = url.searchParams.get('status') ?? undefined;
 		const rawLimit = Number(url.searchParams.get('limit') ?? '50');
@@ -154,20 +184,20 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			invalidTasks: board.invalid,
 			canonicalAuthority: false as const,
 			error: null,
-		});
+		}, { headers });
 	} catch (error) {
 		return json(
 			{
 				...stableEmpty,
 				error: error instanceof Error ? error.message : String(error),
 			},
-			{ status: 200 },
+			{ status: 200, headers },
 		);
 	}
 };
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (locals.user?.role !== 'admin') {
+	if (locals.user?.role !== 'admin' || locals.session?.id === 'dev-bypass-session') {
 		return json(
 			{
 				ok: false,
@@ -261,6 +291,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					featureId: data.featureId,
 					featureLabel: data.featureLabel,
 					sourceRefs: data.sourceRefs,
+					sourceRevision: data.sourceRevision ?? null,
 					lane: 'todo',
 					priority: mapPriorityToInteger(data.priority),
 					validationCommand: data.validationCommand,

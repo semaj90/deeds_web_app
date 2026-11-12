@@ -5933,6 +5933,7 @@ server.registerTool(
         .optional()
         .describe('Max wait in ms (default 30000)'),
     }),
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
   },
   async ({ operator_token, test_file, timeout_ms }) => {
     const tokenErr = requireToken(operator_token);
@@ -6049,6 +6050,7 @@ server.registerTool(
         .optional()
         .describe('Extra context (e.g. test result, issue ID)'),
     }),
+    annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
   },
   async ({
     operator_token,
@@ -7965,6 +7967,7 @@ server.registerTool(
       durationMs: z.number().int().optional(),
       langfuseTraceId: z.string().optional(),
     }),
+    annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
   },
   withOperatorTokenGate(async ({ operator_token: _operatorToken, ...opts }) => {
     try {

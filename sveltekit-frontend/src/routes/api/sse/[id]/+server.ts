@@ -16,13 +16,17 @@ import { json } from '@sveltejs/kit';
  *  - If history cannot be replayed we send `event: resync` so the client fetches a snapshot
  *    instead of assuming the missing tokens were delivered.
  *
- * SECURITY (deferred, tracked in CLAUDE.md G4/G5): this route does not verify that the user owns
- * the chat/case in `params.id` before subscribing or replaying. Do not rely on the ID being secret.
+ * SECURITY: resolve each stream to an owned chat_metadata row before subscribing or replaying.
+ * Case-linked chats also recheck current case access.
  */
 
 import type IORedis from 'ioredis';
 
 import { getRedis } from '$lib/server/redis.js';
+import { db } from '$lib/server/db/client.js';
+import { chatMetadata } from '$lib/server/db/schema.js';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
+import { and, eq } from 'drizzle-orm';
 import { readTokenStream } from '$lib/server/redis-streams.js';
 import { sseFormat, sseHeaders } from '$lib/server/streaming/sse-utils.js';
 import { compareStreamIds, isStreamId, parseResumeCursor } from '$lib/server/streaming/sse-cursor.js';
@@ -81,11 +85,26 @@ async function unsubscribeChannel(channel: string, cb: (message: string) => void
 }
 
 export const GET: RequestHandler = async ({ params, request, locals, url }) => {
-  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  const actorId = Number(locals.user?.id);
+  if (!Number.isSafeInteger(actorId) || actorId <= 0) return json({ error: 'Unauthorized' }, { status: 401 });
   const chatId = params.id;
 
   if (!isUuid(chatId) && !isValidSafeId(chatId)) {
     return new Response('Invalid ID format', { status: 400 });
+  }
+
+  const [session] = await db
+    .select({ chatId: chatMetadata.chatId, caseId: chatMetadata.caseId })
+    .from(chatMetadata)
+    .where(and(eq(chatMetadata.chatId, chatId), eq(chatMetadata.userId, actorId)))
+    .limit(1);
+  // Case collaboration streams use the case UUID directly as the stream key;
+  // they have no chat_metadata row, so authorize that identifier as a case.
+  if (!session && !(isUuid(chatId) && (await getAuthorizedCase(chatId, actorId)))) {
+    return json({ error: 'Conversation not found' }, { status: 404 });
+  }
+  if (session?.caseId && !(await getAuthorizedCase(session.caseId, actorId))) {
+    return json({ error: 'Conversation not found' }, { status: 404 });
   }
 
   // Resume cursor: a validated stream ID, or null for a fresh connection.

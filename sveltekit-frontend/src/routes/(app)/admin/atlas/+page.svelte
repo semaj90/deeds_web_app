@@ -1586,6 +1586,7 @@
 					{/each}
 				</div>
 				<a href='/admin/atlas/task-sources' class="border border-[#5c594c] px-2 py-1 text-[0.62rem] font-bold uppercase tracking-wider text-[#a39f90] hover:border-[#8b9dbb] hover:text-[#efede4]">Task source index</a>
+				<a href='/admin/atlas/taskboard' class="border border-[#5c594c] px-2 py-1 text-[0.62rem] font-bold uppercase tracking-wider text-[#a39f90] hover:border-[#8b9dbb] hover:text-[#efede4]">Review taskboard</a>
 				{#if activeTab === 'graph' && nodes.length > 0}
 					<div class="flex items-center gap-3 text-xs">
 						<span class="text-[#a39f90] font-bold">{nodes.length} NODES · {edges.length} EDGES</span>

@@ -21,6 +21,8 @@ const mocks = vi.hoisted(() => {
 		updateJob: vi.fn(),
 		isOutboxAvailable: vi.fn(),
 		classify: vi.fn(),
+		getAuthorizedCase: vi.fn(),
+		formData: vi.fn(),
 	};
 });
 
@@ -37,9 +39,10 @@ vi.mock('$lib/server/evidence-progress.js', () => ({ createJob: mocks.createJob,
 vi.mock('$lib/server/evidence/evidence-vector-outbox-readiness-v1.js', () => ({
 	isEvidenceVectorOutboxAvailableV1: mocks.isOutboxAvailable,
 }));
+vi.mock('$lib/server/case-access.js', () => ({ getAuthorizedCase: mocks.getAuthorizedCase }));
 vi.mock('$lib/server/ingest/upload-classification-v1.js', () => ({ classifyUploadedBytes: mocks.classify }));
 vi.mock('sveltekit-superforms/server', () => ({
-	superValidate: vi.fn(async () => ({ valid: true, data: { title: 'Test evidence', description: '', caseId: undefined } })),
+	superValidate: vi.fn(async () => ({ valid: true, data: mocks.formData() })),
 }));
 vi.mock('sveltekit-superforms/adapters', () => ({ zod4: vi.fn() }));
 
@@ -59,6 +62,12 @@ describe('evidence form upload durable job ownership', () => {
 		mocks.execute.mockResolvedValue(undefined);
 		mocks.uploadFile.mockResolvedValue(undefined);
 		mocks.isOutboxAvailable.mockResolvedValue(true);
+		mocks.getAuthorizedCase.mockImplementation(async (id: string) => ({ id }));
+		mocks.formData.mockReturnValue({
+			title: 'Test evidence',
+			description: '',
+			caseId: '89317a13-5ec2-4919-8795-1128bb01fdce',
+		});
 		mocks.classify.mockReturnValue({
 			isQuarantined: false,
 			sourceRevision: `sha256:${'a'.repeat(64)}`,
@@ -84,12 +93,18 @@ describe('evidence form upload durable job ownership', () => {
 
 		expect(result.success).toBe(true);
 		expect(mocks.uploadFile).toHaveBeenCalledWith('legal-evidence', expect.stringMatching(/^evidence\/7\//), expect.any(Buffer), expect.any(Object));
+		expect(mocks.getAuthorizedCase).toHaveBeenCalledWith('89317a13-5ec2-4919-8795-1128bb01fdce', 7);
 		expect(mocks.transaction).toHaveBeenCalledOnce();
 		expect(mocks.insert).toHaveBeenCalledTimes(2);
 		expect(mocks.values).toHaveBeenCalledWith(expect.objectContaining({
 			evidenceId: mocks.evidenceRow.id,
+			caseId: '89317a13-5ec2-4919-8795-1128bb01fdce',
 			jobType: 'upload_pipeline',
 			status: 'queued',
+			result: expect.objectContaining({
+				caseId: '89317a13-5ec2-4919-8795-1128bb01fdce',
+				sourceSha256: `sha256:${'a'.repeat(64)}`,
+			}),
 		}));
 		expect(mocks.execute).toHaveBeenCalledOnce();
 	});

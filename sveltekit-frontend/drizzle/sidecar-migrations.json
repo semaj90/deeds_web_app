@@ -1220,6 +1220,13 @@
       "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
       "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
       "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261111_analysis_job_event_history_v1.sql",
+      "status": "proposal_only",
+      "reason": "Unapplied additive event-history proposal for resumable evidence-job SSE. Rehearse in a disposable transaction before any operator-controlled application.",
+      "appliedBy": "none",
+      "requiresJournalEntry": false
     }
   ]
 }

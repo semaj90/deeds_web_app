@@ -1,11 +1,11 @@
 import { db } from '$lib/server/db/client.js';
 import { invalidateCaseCache } from '$lib/server/cache/invalidation.js';
-import { cases } from '$lib/server/db/schema';
+import { cases } from '$lib/server/db/schema.js';
 import { json } from '@sveltejs/kit';
-import { and, eq, isNull, or, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { syncCaseToGraph } from '$lib/server/graph/pg-neo4j-sync.js';
-import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
+import { authorizedCaseFilter, getAuthorizedCase } from '$lib/server/case-access.js';
 
 import { insertCaseSchema } from '$lib/server/db/zod-schemas.js';
 
@@ -22,49 +22,39 @@ const isUuid = (s: string) =>
 	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
 
 function buildCaseWriteFilter(id: string, user: App.Locals['user'] | undefined) {
-	const devBypass = process.env.DEV_BYPASS_AUTH === 'true';
-	const numericUserId = user?.id ? Number(user.id) : NaN;
-	if (devBypass || user?.role === 'admin' || Number.isNaN(numericUserId)) {
-		return eq(cases.id, id);
-	}
-	return and(eq(cases.id, id), or(eq(cases.userId, numericUserId), isNull(cases.userId)));
+	if (!user) return null;
+	return authorizedCaseFilter(id, Number(user.id));
 }
 
 /**
  * GET /api/cases/[id]
  * Fetch a single case by ID (stable top-level JSON shape: { success, data }).
  */
-export const GET: RequestHandler = async ({ locals, params, request }) => {
+export const GET: RequestHandler = async ({ locals, params }) => {
+	const headers = { 'cache-control': 'private, no-store' };
 	try {
 		const id = params.id;
-		const devBypass = process.env.DEV_BYPASS_AUTH === 'true';
 
 		if (!id || !isUuid(id)) {
-			return json({ success: false, data: null, message: 'Invalid case id' }, { status: 400 });
+			return json({ success: false, data: null, message: 'Invalid case id' }, { status: 400, headers });
 		}
 
-		if (!locals.user && !devBypass) {
-			return json({ success: false, data: null, message: 'Unauthorized' }, { status: 401 });
+		if (!locals.user) {
+			return json({ success: false, data: null, message: 'Unauthorized' }, { status: 401, headers });
 		}
 
-		const caseData = await db.select().from(cases).where(eq(cases.id, id)).limit(1);
+		const caseData = await getAuthorizedCase(id, Number(locals.user.id));
 
-		if (caseData.length === 0) {
-			return json({ success: false, data: null, message: 'Case not found' }, { status: 404 });
+		if (!caseData) {
+			return json({ success: false, data: null, message: 'Case not found' }, { status: 404, headers });
 		}
 
-		const responseData = { success: true, data: caseData[0] };
-		const { etag, isMatch } = checkETag(responseData, request.headers);
-		if (isMatch) return notModified(etag);
-
-		return json(responseData, {
-			headers: { ...cacheControl.private, ETag: etag }
-		});
+		return json({ success: true, data: caseData }, { headers });
 	} catch (err) {
 		console.error('[api/cases/[id]] GET failed:', err);
 		return json(
-			{ success: false, data: null, _degraded: true },
-			{ headers: cacheControl.private }
+			{ success: false, data: null, message: 'Case details are temporarily unavailable' },
+			{ status: 503, headers }
 		);
 	}
 };
@@ -76,15 +66,16 @@ export const GET: RequestHandler = async ({ locals, params, request }) => {
 export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 	try {
 		const id = params.id;
-		const devBypass = process.env.DEV_BYPASS_AUTH === 'true';
 
 		if (!id || !isUuid(id)) {
 			return json({ message: 'Invalid case id' }, { status: 400 });
 		}
 
-		if (!locals.user && !devBypass) {
+		if (!locals.user) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
+		const writeFilter = buildCaseWriteFilter(id, locals.user);
+		if (!writeFilter) return json({ message: 'Unauthorized' }, { status: 401 });
 
 		let raw: unknown;
 		try {
@@ -112,7 +103,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 				...updates,
 				updatedAt: sql`NOW()`
 			})
-			.where(buildCaseWriteFilter(id, locals.user))
+			.where(writeFilter)
 			.returning();
 
 		if (updated.length === 0) {
@@ -146,15 +137,16 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 export const DELETE: RequestHandler = async ({ locals, params }) => {
 	try {
 		const id = params.id;
-		const devBypass = process.env.DEV_BYPASS_AUTH === 'true';
 
 		if (!id || !isUuid(id)) {
 			return json({ message: 'Invalid case id' }, { status: 400 });
 		}
 
-		if (!locals.user && !devBypass) {
+		if (!locals.user) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
+		const writeFilter = buildCaseWriteFilter(id, locals.user);
+		if (!writeFilter) return json({ message: 'Unauthorized' }, { status: 401 });
 
 		const archived = await db
 			.update(cases)
@@ -162,7 +154,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 				status: 'archived',
 				updatedAt: sql`NOW()`
 			})
-			.where(buildCaseWriteFilter(id, locals.user))
+			.where(writeFilter)
 			.returning();
 
 		if (archived.length === 0) {

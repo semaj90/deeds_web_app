@@ -365,6 +365,25 @@ export const analysisJobs = pgTable('analysis_jobs', {
 export type AnalysisJob = typeof analysisJobs.$inferSelect;
 export type NewAnalysisJob = typeof analysisJobs.$inferInsert;
 
+/** Append-only status history emitted by the analysis_jobs database trigger. */
+export const analysisJobEvents = pgTable('analysis_job_events', {
+	eventSeq: bigserial('event_seq', { mode: 'bigint' }).primaryKey().notNull(),
+	eventId: uuid('event_id').default(sql`gen_random_uuid()`).notNull(),
+	jobId: uuid('job_id').notNull(),
+	evidenceId: uuid('evidence_id').notNull(),
+	caseId: uuid('case_id').notNull(),
+	stage: varchar('stage', { length: 64 }).notNull(),
+	status: varchar('status', { length: 32 }).notNull(),
+	progress: varchar('progress', { length: 32 }),
+	sourceRevision: text('source_revision'),
+	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => ({
+	eventIdUnique: uniqueIndex('analysis_job_events_event_id_uidx').on(t.eventId),
+	jobSequenceIdx: index('analysis_job_events_job_sequence_idx').on(t.jobId, t.eventSeq),
+}));
+
+export type AnalysisJobEvent = typeof analysisJobEvents.$inferSelect;
+
 // === INTENT SYNTHESIS (ACE captures non-blocking synthesis records) ===
 export const intentSynthesis = pgTable('intent_synthesis', {
   id: uuid('id')

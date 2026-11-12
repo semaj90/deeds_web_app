@@ -40,6 +40,10 @@ import type { AnalysisPassLedgerInput } from '$lib/server/db/schema/analysis-pas
 import type { ExtractedFeature } from './ast-langextract-bridge.js';
 import { classifyPostgresError } from '$lib/server/db/readiness.js';
 import { getDatabaseUrl as getConfiguredDatabaseUrl } from '$lib/config/env.server.js';
+import {
+	recordAnalysisJobProgressStageV1,
+	type AnalysisJobProgressStageV1,
+} from './analysis-job-progress-events-v1.js';
 
 // --- Stage executors (lazy-imported to avoid circular deps) ---
 
@@ -324,7 +328,14 @@ const stageConfig: Record<string, AnalysisStageConfig> = {
 				evidenceId,
 				analysisJobId,
 				metadata,
-				processEvidence: (payload) => processor.processCanonical(payload),
+				processEvidence: (payload, onProgress) => processor.processCanonical(payload, onProgress),
+				onProgress: async (stage: AnalysisJobProgressStageV1) => {
+					try {
+						await recordAnalysisJobProgressStageV1(analysisJobId, stage);
+					} catch {
+						// Progress telemetry is optional; it must not fail canonical ingestion.
+					}
+				},
 			});
 		},
 	},

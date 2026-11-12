@@ -27,6 +27,7 @@ type RetrievalLane = 'DENSE' | 'SPARSE' | 'GRAPH' | 'SYMBOL' | 'TEMPORAL' | 'CEN
 interface EvidenceRef {
   packetKey: string;
   sourceRef: string;
+  sourceRevision: string;
   contentHash: string;
   denseScore?: number;
   sparseScore?: number;
@@ -133,6 +134,7 @@ export async function retrieveFromGo(
             workspaceRevision: runtime.workspaceRevision,
             packetKey: runtime.packetKey,
             packetRevision: runtime.packetRevision,
+            sourceRevision: runtime.sourceRevision ?? '',
           },
         },
         metadata,
@@ -152,6 +154,7 @@ export async function retrieveFromGo(
       workspace_revision: receipt.workspaceRevision,
       packet_key: receipt.packetKey,
       packet_revision: receipt.packetRevision,
+      source_revision: receipt.sourceRevision,
       succeeded: receipt.succeeded,
       error_code: receipt.errorCode,
       retrieval_confidence: receipt.retrievalConfidence,
@@ -168,6 +171,7 @@ export async function retrieveFromGo(
       typeof chunk.contentHash === 'string' && chunk.contentHash.trim().length > 0 &&
       chunk.workspaceRevision === runtime.workspaceRevision &&
       typeof chunk.sourceRevision === 'string' && chunk.sourceRevision.trim().length > 0 &&
+      (runtime.sourceRevision === undefined || runtime.sourceRevision === '' || chunk.sourceRevision === runtime.sourceRevision) &&
       typeof chunk.candidateId === 'string' && chunk.candidateId.trim().length > 0
     ));
     if (response.receipt?.validationStatus !== 'PASS') {
@@ -189,6 +193,7 @@ export async function retrieveFromGo(
       evidence: evidence.map((chunk: Record<string, any>): EvidenceRef => ({
         packetKey: chunk.packetKey,
         sourceRef: chunk.sourceRef,
+        sourceRevision: chunk.sourceRevision,
         contentHash: chunk.contentHash,
         denseScore: typeof chunk.score === 'number' ? chunk.score : undefined,
       })),
@@ -235,6 +240,7 @@ interface GoCodebaseChunkHttp {
   file_path: string;
   score: number;
   packet_key?: string;
+  source_revision?: string;
   source_ref?: string;
   content_hash?: string;
 }
@@ -253,6 +259,7 @@ interface GoToolReceiptV2Http {
   workspace_revision?: string;
   packet_key?: string;
   packet_revision?: string;
+  source_revision?: string;
   succeeded?: boolean;
   retrieval_confidence?: number;
   evidence_count?: number;
@@ -278,6 +285,7 @@ function mapGoReceiptV2(receipt: GoToolReceiptV2Http | undefined): RuntimeToolRe
     packetKey: receipt.packet_key,
     workspaceRevision: receipt.workspace_revision,
     packetRevision: receipt.packet_revision,
+    sourceRevision: receipt.source_revision || null,
     succeeded: receipt.succeeded,
     errorCode: receipt.error_code ?? null,
     retrievalConfidence: receipt.retrieval_confidence ?? null,
@@ -323,6 +331,7 @@ async function retrieveFromGoHttp(
         workspace_revision: runtime.workspaceRevision,
         packet_key: runtime.packetKey,
         packet_revision: runtime.packetRevision,
+        source_revision: runtime.sourceRevision ?? '',
       },
       workspace_revision: runtime.workspaceRevision,
       packet_revision: runtime.packetRevision,
@@ -344,7 +353,9 @@ async function retrieveFromGoHttp(
   const qualifiedChunks = chunks.filter((c) => (
     typeof c.packet_key === 'string' && c.packet_key.trim().length > 0 &&
     typeof c.source_ref === 'string' && c.source_ref.trim().length > 0 &&
-    typeof c.content_hash === 'string' && c.content_hash.trim().length > 0
+    typeof c.content_hash === 'string' && c.content_hash.trim().length > 0 &&
+    typeof c.source_revision === 'string' && c.source_revision.trim().length > 0 &&
+    (runtime.sourceRevision === undefined || runtime.sourceRevision === '' || c.source_revision === runtime.sourceRevision)
   ));
 
   return {
@@ -353,6 +364,7 @@ async function retrieveFromGoHttp(
     evidence: qualifiedChunks.map((c): EvidenceRef => ({
       packetKey: c.packet_key!,
       sourceRef: c.source_ref!,
+      sourceRevision: c.source_revision!,
       contentHash: c.content_hash!,
       denseScore: c.score,
     })),

@@ -6,6 +6,7 @@ import {
   type ReceiptLookupResultV1,
 } from '../cache/receipt-dictionary-v1';
 import { projectTaskProofLineV1, type TaskProofLineInputV1 } from './task-proof-line-v1';
+import workboardFixture from './task-proof-workboard-snapshot-v1.fixture.json';
 
 const REV = 'sha256:' + 'a'.repeat(64);
 const OLD = 'sha256:' + 'b'.repeat(64);
@@ -67,7 +68,7 @@ const base = (over: Partial<TaskProofLineInputV1> = {}): TaskProofLineInputV1 =>
 
 describe('constructed verified fixture', () => {
   it('authorizes completion only when tests, readback, revision, binding and the grant all hold', () => {
-    const line = projectTaskProofLineV1(base());
+    const line = projectTaskProofLineV1(base({ task: { ...FIXTURE_TASK, proofReceiptId: 'rcpt-1' } }));
     expect(line).toMatchObject({
       status: 'COMPLETION_AUTHORIZED',
       checked: true,
@@ -148,6 +149,20 @@ describe('negative cases', () => {
     expect(projectTaskProofLineV1(base({ task: DUP_GROUP_MEMBER, mapping: byHash, blockHashGroupSize: 13 })).status).toBe('UNRESOLVED_TASK_MAPPING');
   });
 
+  it('uses an explicit proof receipt id directly and keeps the verifier link separate', () => {
+    const line = projectTaskProofLineV1(base({
+      task: { ...FIXTURE_TASK, proofReceiptId: 'rcpt-1' },
+      mapping: new Map([[FIXTURE_TASK.stableKey, ['rcpt-2']]]),
+    }));
+    expect(line).toMatchObject({
+      status: 'COMPLETION_AUTHORIZED',
+      receiptIds: ['rcpt-1', 'rcpt-2'],
+      targetedTestsPassed: true,
+      independentReadback: true,
+      completionAuthorized: true,
+    });
+  });
+
   it('real unresolved task from the snapshot has no mapping and claims nothing', () => {
     expect(projectTaskProofLineV1(base({ task: REAL_OPEN, mapping: null, receipts: [] }))).toMatchObject({
       stableKey: REAL_OPEN.stableKey,
@@ -177,12 +192,12 @@ describe('featureLabel authority', () => {
     }
   });
 
-  it('is ADMITTED only with an admitted binding and a well-formed checksum, and never alters completion', () => {
+  it('stays a non-canonical proposal even when an admitted binding is supplied to this projection', () => {
     const featureBinding = { status: 'ADMITTED' as const, bindingChecksum: receiptChecksumV1(rec()) };
     expect(projectTaskProofLineV1(base({ featureBinding })).featureLabel).toEqual({
       value: 'Authentication Sessions',
-      status: 'ADMITTED',
-      canonicalAuthority: true,
+      status: 'PROPOSED',
+      canonicalAuthority: false,
     });
     expect(projectTaskProofLineV1(base({ mapping: null, featureBinding })).completionAuthorized).toBe(false);
   });

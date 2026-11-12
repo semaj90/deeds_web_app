@@ -1,19 +1,20 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms/client';
 	import { goto } from '$app/navigation';
+	import { deserialize } from '$app/forms';
 	import { zod4Client as zodClient } from 'sveltekit-superforms/adapters';
 	import { intakeCaseSchema } from './schema.js';
-	import type { PageData } from './$types';
+	import type { PageProps } from './$types';
 	import LegalCaseForm from '$lib/components/forms/LegalCaseForm.svelte';
 	import EnhancedCaseForm from '$lib/components/forms/EnhancedCaseForm.svelte';
 	import AutoPopulatedCaseForm from '$lib/components/ui/AutoPopulatedCaseForm.svelte';
 	import { toast } from 'svelte-sonner';
 
-	let { data }: { data: PageData } = $props();
+	let { data, form: actionData }: PageProps = $props();
 
 	// Superforms v2 — case creation form with Zod validation
 	// svelte-ignore state_referenced_locally
-	const { form, errors, enhance, submitting, delayed } = superForm(data.form, {
+	const { form, errors, message, enhance, submitting, delayed } = superForm(actionData?.form ?? data.form, {
 		validators: zodClient(intakeCaseSchema as any),
 		resetForm: false,
 		invalidateAll: false,
@@ -74,20 +75,29 @@
 
 			const res = await fetch('?/analyze', {
 				method: 'POST',
+				headers: { accept: 'application/json', 'x-sveltekit-action': 'true' },
 				body: formData,
 				signal: AbortSignal.timeout(120_000)
 			});
 
-			const result = await res.json();
+			const result = deserialize(await res.text());
 
 			if (result.type === 'failure') {
 				analysisError =
-					result.data?.analysisError ?? 'AI analysis failed. Create the case manually.';
+					(result.data as { analysisError?: string } | undefined)?.analysisError ??
+					'AI analysis failed. Create the case manually.';
+				return;
+			}
+			if (result.type === 'redirect') {
+				await goto(result.location);
+				return;
+			}
+			if (result.type === 'error') {
+				analysisError = 'AI analysis failed. Create the case manually.';
 				return;
 			}
 
-			// Handle SvelteKit action response format
-			const actionResult = result.data;
+			const actionResult = result.data as { extraction?: typeof extraction };
 			if (actionResult?.extraction) {
 				extraction = actionResult.extraction;
 
@@ -100,6 +110,8 @@
 				if (extraction?.severityLevel) {
 					$form.priority = severityToPriority(extraction.severityLevel) as any;
 				}
+			} else {
+				analysisError = 'The analysis returned no case details.';
 			}
 		} catch {
 			analysisError = 'Network error. Is the server running?';
@@ -187,6 +199,16 @@
 	<div class="intake-layout">
 		<!-- Left: Intake Form -->
 		<form method="POST" action="?/create" use:enhance class="intake-form">
+			{#if actionData?.error || $message}
+				<p class="field-error" role="alert">{actionData?.error ?? $message}</p>
+			{:else if Object.keys($errors).length}
+				<p class="field-error" role="alert">Please correct the highlighted case fields.</p>
+			{/if}
+			{#snippet intakeErrors(field: keyof typeof data.form.data)}
+				{#if $errors[field]?.length}
+					<p id={`intake-${field}-error`} class="field-error">{$errors[field]?.join(' ')}</p>
+				{/if}
+			{/snippet}
 			<!-- Case Title -->
 			<div class="form-section">
 				<label for="title">
@@ -201,10 +223,9 @@
 					placeholder="State v. Doe — Armed Robbery at 7-Eleven"
 					class="title-input"
 					aria-invalid={$errors.title ? 'true' : undefined}
+					aria-describedby={$errors.title ? 'intake-title-error' : undefined}
 				/>
-				{#if $errors.title}
-					<p class="field-error">{$errors.title}</p>
-				{/if}
+				{@render intakeErrors('title')}
 			</div>
 
 			<!-- Main narrative -->
@@ -220,7 +241,10 @@
 					placeholder="On March 15, 2024, Officer Smith responded to a robbery at 7-Eleven on Main St..."
 					rows="8"
 					class="narrative-box"
+					aria-invalid={!!$errors.narrative?.length}
+					aria-describedby={$errors.narrative?.length ? 'intake-narrative-error' : undefined}
 				></textarea>
+				{@render intakeErrors('narrative')}
 
 				<!-- File upload -->
 				<div
@@ -271,37 +295,55 @@
 				<div class="prompt-group">
 					<label for="who"><strong>WHO</strong> — Who is involved?</label>
 					<input id="who" name="who" type="text" bind:value={$form.who}
+						aria-invalid={!!$errors.who?.length}
+						aria-describedby={$errors.who?.length ? 'intake-who-error' : undefined}
 						placeholder="Suspect: John Doe. Victim: Jane Smith. Witness: Officer Johnson." />
+					{@render intakeErrors('who')}
 				</div>
 
 				<div class="prompt-group">
 					<label for="what"><strong>WHAT</strong> — What happened?</label>
 					<input id="what" name="what" type="text" bind:value={$form.what}
+						aria-invalid={!!$errors.what?.length}
+						aria-describedby={$errors.what?.length ? 'intake-what-error' : undefined}
 						placeholder="Armed robbery of convenience store" />
+					{@render intakeErrors('what')}
 				</div>
 
 				<div class="prompt-group">
 					<label for="when"><strong>WHEN</strong> — When did it happen?</label>
 					<input id="when" name="when" type="text" bind:value={$form.when}
+						aria-invalid={!!$errors.when?.length}
+						aria-describedby={$errors.when?.length ? 'intake-when-error' : undefined}
 						placeholder="March 15, 2024, approximately 11:30 PM" />
+					{@render intakeErrors('when')}
 				</div>
 
 				<div class="prompt-group">
 					<label for="where"><strong>WHERE</strong> — Where did it happen?</label>
 					<input id="where" name="where" type="text" bind:value={$form.where}
+						aria-invalid={!!$errors.where?.length}
+						aria-describedby={$errors.where?.length ? 'intake-where-error' : undefined}
 						placeholder="7-Eleven, 456 Main St, Springfield" />
+					{@render intakeErrors('where')}
 				</div>
 
 				<div class="prompt-group">
 					<label for="why"><strong>WHY</strong> — Why is this conduct criminal?</label>
 					<input id="why" name="why" type="text" bind:value={$form.why}
+						aria-invalid={!!$errors.why?.length}
+						aria-describedby={$errors.why?.length ? 'intake-why-error' : undefined}
 						placeholder="Suspect needed money for drug habit" />
+					{@render intakeErrors('why')}
 				</div>
 
 				<div class="prompt-group">
 					<label for="how"><strong>HOW</strong> — How did the suspect act?</label>
 					<input id="how" name="how" type="text" bind:value={$form.how}
+						aria-invalid={!!$errors.how?.length}
+						aria-describedby={$errors.how?.length ? 'intake-how-error' : undefined}
 						placeholder="Displayed firearm, demanded cash, fled in vehicle" />
+					{@render intakeErrors('how')}
 				</div>
 			</div>
 
@@ -315,6 +357,7 @@
 					<option value="critical">Critical</option>
 					<option value="urgent">Urgent</option>
 				</select>
+				{@render intakeErrors('priority')}
 			</div>
 
 			<!-- AI Analyze Button -->
@@ -324,7 +367,7 @@
 				</button>
 				<p class="ai-hint">Extracts persons of interest, suggests title, identifies statutes and severity.</p>
 				{#if analysisError}
-					<p class="field-error">{analysisError}</p>
+					<p class="field-error" role="alert">{analysisError}</p>
 				{/if}
 			</div>
 

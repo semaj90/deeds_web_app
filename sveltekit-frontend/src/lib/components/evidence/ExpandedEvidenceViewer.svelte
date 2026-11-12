@@ -173,7 +173,7 @@
 								{:else if exhibit.previewUrl && exhibit.mimeType === 'application/pdf'}
 									<div class="asset-preview-stage"><iframe src={exhibit.previewUrl} title={`PDF preview: ${exhibit.title}`} loading="lazy"></iframe></div>
 								{:else if exhibit.previewUrl && exhibit.mimeType.startsWith('video/')}
-									<div class="asset-preview-stage"><video controls preload="metadata" src={exhibit.previewUrl}>Video preview unavailable.</video></div>
+									<div class="asset-preview-stage"><video controls preload="metadata" src={exhibit.previewUrl}><track kind="captions" />Video preview unavailable.</video></div>
 								{:else if exhibit.previewUrl && exhibit.mimeType.startsWith('audio/')}
 									<div class="asset-preview-stage audio-preview-stage"><audio controls preload="metadata" src={exhibit.previewUrl}>Audio preview unavailable.</audio></div>
 								{:else if exhibit.previewUrl}
