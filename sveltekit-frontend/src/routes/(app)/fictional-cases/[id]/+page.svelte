@@ -209,7 +209,7 @@
 	.fcd-page {
 		min-height: 100vh;
 		background: var(--t-bg, #0e0d0b);
-		margin: -2.5rem;
+		margin: 0;
 		color: var(--t-text, rgba(212, 199, 163, 0.85));
 	}
 

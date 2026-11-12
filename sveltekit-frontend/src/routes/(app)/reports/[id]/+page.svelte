@@ -236,7 +236,7 @@
 		min-height: 100vh;
 		background: #0e0d0b;
 		color: #d4c7a3;
-		margin: -2.5rem;
+		margin: -1rem;
 		padding: 0 2.5rem;
 	}
 	.report-view-page :global(h1), .report-view-page :global(h2), .report-view-page :global(h3), .report-view-page :global(h4), .report-view-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; }
