@@ -1,0 +1,69 @@
+{
+  "schema": "atlas.cohort-routing-discrepancies.v1",
+  "generatedOn": "2026-11-11",
+  "taskId": "COHORT-ROUTING-AUTHORITY-03",
+  "mode": "READ_ONLY_NO_PRODUCTION_WRITES",
+  "canonicalAuthority": false,
+  "productionWritesPerformed": false,
+  "databaseWritesPerformed": false,
+  "status": "BLOCKED_REVIEW_REQUIRED",
+  "frozenCohort": {
+    "path": ".tmp/atlas/openspec-cohort-6527-members-v1.jsonl",
+    "rows": 6527,
+    "sha256": "sha256:68ed2a803f3df7428e0decf1455f7bc847f44153c7c5512ee4e848c140d43fec",
+    "cohortRevision": "rev:openspec-rank-fuse:20261107T192448Z"
+  },
+  "currentSourceAudit": {
+    "path": "docs/reports/openspec-cohort-6527-current-source-audit-v1.json",
+    "generatedAt": "2026-11-09T22:40:11.133Z",
+    "status": "FAIL_SOURCE_COHORT_STALE_OR_INVALID",
+    "freshFor2026-11-11": false,
+    "counts": {
+      "total": 6527,
+      "exactSourceContent": 6409,
+      "staleLocatorExactContentFound": 95,
+      "statusOnlyDrift": 2,
+      "sourceContentMismatch": 20,
+      "missingSourceFile": 0,
+      "lineOutOfRange": 0,
+      "sourceLineNotTask": 1,
+      "duplicateTaskKeys": 0
+    }
+  },
+  "currentBridge": {
+    "path": "docs/reports/kanban-cohort-6527-authority-bridge-v1.json",
+    "generatedAt": "2026-11-11T19:36:57.391Z",
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "cohortCount": 6527,
+    "crosswalkExactWorkboardMatches": 5418,
+    "matchedInKanban": 4303,
+    "unseededSecondaryOrNew": 2224,
+    "readyActionableZeroUnmetDeps": 1296,
+    "routeStatusValuesIncludeROUTED_ACTIVE": true
+  },
+  "scopeCoverage": {
+    "nextStepsSourceRefsInFrozenCohort": 0,
+    "nextStepsCrosswalk": {
+      "path": "docs/reports/nextsteps-openspec-document-crosswalk-v1.json",
+      "explicitTrackedDocumentLinks": 5,
+      "reviewRequired": 5,
+      "taskCompletionAuthorized": false
+    },
+    "agenticErrorFixTaskCount": 119,
+    "agenticErrorFixChanges": {
+      "parent-atlas-agentic-diagnostic-repair-v1": 46,
+      "parent-atlas-agentic-repair-bundle-integration": 66,
+      "parent-atlas-agentic-repair-fabric": 7
+    },
+    "existingErrorFixBoardBridge": "ERR-FIX-KANBAN-BRIDGE-01 marked done; this does not prove cohort route authority or claim eligibility"
+  },
+  "discrepancies": [
+    "The Nov 9 current-source audit is stale and failed; do not treat its matching rows as current proof.",
+    "The current bridge derives ROUTED_ACTIVE from routing_active_bit, which is an occupancy bit and must not grant route authority.",
+    "The prior crosswalk is partial: 821 unmatched, 4 source/hash drift, 112 shifted-locator matches, and 5590 exact matches; it predates the failed Nov 9 source audit.",
+    "No exact current Kanban task/source-revision binding is established for claim admission."
+  ],
+  "safeClaimableTaskCount": 0,
+  "reason": "Current-source reconciliation, command/dependency validation, reviewed alias resolution, and exact task/source-revision Kanban binding are not all proven."
+}

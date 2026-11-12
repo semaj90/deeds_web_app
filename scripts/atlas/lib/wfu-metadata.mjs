@@ -15,7 +15,7 @@
 import { createHash } from 'node:crypto';
 
 export const WFU_COMMENT = /<!--\s*wfu:\s*([\s\S]*?)\s*-->/i;
-export const WFU_KEYS = new Set(['depends', 'est', 'reads', 'writes']);
+export const WFU_KEYS = new Set(['depends', 'est', 'reads', 'writes', 'proof']);
 // Named ids are UPPERCASE segments joined by hyphens and must contain a digit somewhere (WFU-09a, TOPO-04,
 // MICRO-04-TRAIN-SMOKE); numeric ids are dotted (14.6a). A sentence start such as "Re-run" is NOT an id.
 export const WFU_ID = /^(?:\*\*)?`?((?=[A-Z0-9-]*\d)[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+[a-z]?|\d+(?:\.\d+)+[a-z]?)`?\b/;
@@ -63,12 +63,22 @@ export function parseWfu(blockText) {
   const m = withoutCodeSpans(blockText).match(WFU_COMMENT);
   if (!m) return null;
   const out = { convention: 'wfu-v1', dependsOn: null, est: null, reads: null, writes: null, warnings: [] };
+  let proofSeen = false;
   for (const part of m[1].split(';').map((p) => p.trim()).filter(Boolean)) {
-    const eq = part.indexOf('=');
-    if (eq < 1) { out.warnings.push(`MALFORMED:${part.slice(0, 40)}`); continue; }
-    const key = part.slice(0, eq).trim().toLowerCase();
-    const value = part.slice(eq + 1).trim();
+    const separator = part.includes('=') ? '=' : (part.startsWith('proof:') ? ':' : -1);
+    if (separator < 1) { out.warnings.push(`MALFORMED:${part.slice(0, 40)}`); continue; }
+    const key = part.slice(0, part.indexOf(separator)).trim().toLowerCase();
+    const value = part.slice(part.indexOf(separator) + 1).trim();
     if (!WFU_KEYS.has(key)) { out.warnings.push(`UNKNOWN_KEY:${key}`); continue; }
+    if (key === 'proof') {
+      if (proofSeen) {
+        delete out.proofReceiptId;
+        out.warnings.push('PROOF_DUPLICATE');
+      } else if (/^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/.test(value)) out.proofReceiptId = value;
+      else out.warnings.push(`PROOF_INVALID:${value.slice(0, 32)}`);
+      proofSeen = true;
+      continue;
+    }
     if (key === 'est') {
       const n = Number(value);
       if (Number.isInteger(n) && n >= 1 && n <= 10080) out.est = n; else out.warnings.push(`EST_INVALID:${value.slice(0, 20)}`);

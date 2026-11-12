@@ -1,0 +1,274 @@
+{
+  "schema": "atlas.okf-dspy-rlm-kanban-e2e-proof.v1",
+  "generatedAt": "2026-11-08T07:20:33.090Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "workspaceRevision": "git:fdd5c4970d409b664318ab7e45cc433261a0e368",
+  "okfCorpusSummary": {
+    "sourcesLoaded": [
+      "oaklib",
+      "ast-grep",
+      "ts-morph",
+      "trpc"
+    ],
+    "verifiedChunksTotal": 717,
+    "checksumMismatches": 0,
+    "canonicalAuthorityTrueCount": 0
+  },
+  "primaryTaskContextAndPromptPlan": {
+    "contextManifestV2": {
+      "schema": "atlas.context-manifest.v2",
+      "manifestId": "manifest:v2:fbbf46dc4c5d3e4d2e0f7f2d",
+      "workspaceRevision": "git:fdd5c4970d409b664318ab7e45cc433261a0e368",
+      "taskId": "parent-atlas-governed-compute-fabric#0043a825d1a1c80b",
+      "featureId": "openspec:parent-atlas-governed-compute-fabric",
+      "communityId": 24,
+      "admittedSourceRefs": [
+        "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md#L495",
+        "docs/.okf/oaklib/chunks.jsonl#doc:oaklib:d704414534ab8cec:109",
+        "docs/.okf/trpc/chunks.jsonl#doc:trpc:a3ca80239a127315:7",
+        "docs/.okf/trpc/chunks.jsonl#doc:trpc:a3ca80239a127315:8",
+        "docs/.okf/oaklib/chunks.jsonl#doc:oaklib:9864353b8fca9618:0"
+      ],
+      "admittedChunkIds": [
+        "doc:oaklib:d704414534ab8cec:109",
+        "doc:trpc:a3ca80239a127315:7",
+        "doc:trpc:a3ca80239a127315:8",
+        "doc:oaklib:9864353b8fca9618:0"
+      ],
+      "okfEvidenceCount": 4,
+      "evidenceDigest": "sha256:fbbf46dc4c5d3e4d2e0f7f2da59cfdfa08453e824fcde304c0207cdbf6f21705",
+      "canonicalAuthority": false
+    },
+    "promptPlanV1": {
+      "schema": "atlas.rlm-prompt-plan.v1",
+      "promptPlanId": "prompt-plan:v1:ee71f125b35649bb46743c42",
+      "valkeyCacheKey": "atlas:rlm:prompt-plan:v1:ee71f125b35649bb46743c42a52df9c9db1105d6f6eb7b1f517a994654a12adc",
+      "valkeyWritesPerformed": 0,
+      "modelId": "ornith-1.5-9b",
+      "adapterRevision": "none",
+      "promptTemplateHash": "sha256:c7a0f09479d2205eee90f1c2c838ddbeca865726133c164bd153559f24ef7e21",
+      "evidenceDigest": "sha256:fbbf46dc4c5d3e4d2e0f7f2da59cfdfa08453e824fcde304c0207cdbf6f21705",
+      "tokenBudget": {
+        "maxPromptTokens": 4096,
+        "observedPromptTokens": 565,
+        "maxCompletionTokensPerTurn": 256,
+        "withinTokenBudget": true
+      },
+      "toolBudget": {
+        "maxToolCalls": 4,
+        "consumedToolCalls": 3,
+        "remainingToolCalls": 1
+      },
+      "retryBudget": {
+        "maxRetries": 2,
+        "retryCount": 0
+      }
+    },
+    "ornithTurn3Probe": {
+      "mode": "LIVE_ORNITH_8090_GROUNDED",
+      "model": "ornith-1.5-9b",
+      "excerpt": "Chunk doc:oaklib:d704414534ab8cec:109."
+    },
+    "sequentialTurns": [
+      {
+        "turn": 1,
+        "role": "PLANNER",
+        "taskId": "parent-atlas-governed-compute-fabric#0043a825d1a1c80b",
+        "manifestId": "manifest:v2:5f9eb418bb9e4b4fa2b81fd3",
+        "plannedSteps": [
+          "verify_dependency_readiness",
+          "retrieve_okf_and_source_evidence",
+          "propose_grounded_patch_contract",
+          "run_independent_verifier_gate"
+        ]
+      },
+      {
+        "turn": 2,
+        "role": "RETRIEVAL_HELPER",
+        "taskId": "parent-atlas-governed-compute-fabric#0043a825d1a1c80b",
+        "okfChunkIds": [
+          "doc:ast-grep:08b5943965022827:1",
+          "doc:ast-grep:08b5943965022827:2",
+          "doc:ast-grep:08b5943965022827:3"
+        ],
+        "okfChecksumsVerified": true,
+        "sourceRefs": [
+          "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md#L495",
+          "docs/.okf/ast-grep/chunks.jsonl#doc:ast-grep:08b5943965022827:1",
+          "docs/.okf/ast-grep/chunks.jsonl#doc:ast-grep:08b5943965022827:2",
+          "docs/.okf/ast-grep/chunks.jsonl#doc:ast-grep:08b5943965022827:3"
+        ]
+      },
+      {
+        "turn": 3,
+        "role": "PATCH_PROPOSER",
+        "taskId": "parent-atlas-governed-compute-fabric#0043a825d1a1c80b",
+        "citedOkfChunkIds": [
+          "doc:ast-grep:08b5943965022827:1"
+        ],
+        "citedSourceRefs": [
+          "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md#L495"
+        ],
+        "validationCommand": "node --test scripts/atlas/reconcile-cohort-6527-kanban-authority-v1.test.mjs",
+        "synthesisMode": "LIVE_ORNITH_8090_GROUNDED"
+      },
+      {
+        "turn": 4,
+        "role": "INDEPENDENT_VERIFIER",
+        "taskId": "parent-atlas-governed-compute-fabric#0043a825d1a1c80b",
+        "citationsGrounded": true,
+        "workspaceRevisionMatched": true,
+        "verifiedPass": true,
+        "receiptId": "receipt:rlm-canary:1:5f9eb418bb9e4b4f"
+      }
+    ]
+  },
+  "fiveTaskCanaryExecutionRehearsal": {
+    "mode": "PG_TEMP_ISOLATED_BEGIN_ROLLBACK_ZERO_PERSISTENCE",
+    "publicTablesMutatedDuringRehearsal": 0,
+    "canaryTasksCompletedInTx": 5,
+    "zeroPersistentMutation": true,
+    "baselineCounts": {
+      "completed_count": 153,
+      "attempts_count": 149,
+      "events_count": 4806
+    },
+    "postRollbackCounts": {
+      "completed_count": 153,
+      "attempts_count": 149,
+      "events_count": 4806
+    },
+    "trajectories": [
+      {
+        "canaryIndex": 1,
+        "taskId": "parent-atlas-governed-compute-fabric#0043a825d1a1c80b",
+        "taskOrdinal": 1300,
+        "communityId": 24,
+        "manifestId": "manifest:v2:5f9eb418bb9e4b4fa2b81fd3",
+        "promptPlanId": "prompt-plan:v1:8ef623a52530b594a7998a43",
+        "valkeyCacheKey": "atlas:rlm:prompt-plan:v1:8ef623a52530b594a7998a430e1be2c264b4fd4d20333ff0a1d6266d822d34ce",
+        "receiptId": "receipt:rlm-canary:1:5f9eb418bb9e4b4f",
+        "kanbanFinalStatusInTx": "completed",
+        "rlReward": {
+          "rewardEligible": true,
+          "invalidationReason": null,
+          "reward": 0.89482,
+          "components": {
+            "verifiedTestRatio": 1,
+            "validatedCompletion": 1,
+            "normalizedTokenCost": 0.1035,
+            "regressionsCount": 0
+          }
+        }
+      },
+      {
+        "canaryIndex": 2,
+        "taskId": "parent-atlas-governed-compute-fabric#5d121f5439ac5a17",
+        "taskOrdinal": 1967,
+        "communityId": 15,
+        "manifestId": "manifest:v2:0efe84ca329c20f18cd98184",
+        "promptPlanId": "prompt-plan:v1:a903fd6a8a78ec425d0ff318",
+        "valkeyCacheKey": "atlas:rlm:prompt-plan:v1:a903fd6a8a78ec425d0ff3187aea312d90e4aafadb1972929b73a28f13d008b3",
+        "receiptId": "receipt:rlm-canary:2:0efe84ca329c20f1",
+        "kanbanFinalStatusInTx": "completed",
+        "rlReward": {
+          "rewardEligible": true,
+          "invalidationReason": null,
+          "reward": 0.89482,
+          "components": {
+            "verifiedTestRatio": 1,
+            "validatedCompletion": 1,
+            "normalizedTokenCost": 0.1035,
+            "regressionsCount": 0
+          }
+        }
+      },
+      {
+        "canaryIndex": 3,
+        "taskId": "parent-atlas-governed-compute-fabric#634bfdfcb8eafad8",
+        "taskOrdinal": 4171,
+        "communityId": 35,
+        "manifestId": "manifest:v2:0c836a60be4f2e4407d3a137",
+        "promptPlanId": "prompt-plan:v1:797fda058036722c3e3e9702",
+        "valkeyCacheKey": "atlas:rlm:prompt-plan:v1:797fda058036722c3e3e97020e82b908c8675fcb3be54385c38e1dbb5eccb96d",
+        "receiptId": "receipt:rlm-canary:3:0c836a60be4f2e44",
+        "kanbanFinalStatusInTx": "completed",
+        "rlReward": {
+          "rewardEligible": true,
+          "invalidationReason": null,
+          "reward": 0.89482,
+          "components": {
+            "verifiedTestRatio": 1,
+            "validatedCompletion": 1,
+            "normalizedTokenCost": 0.1035,
+            "regressionsCount": 0
+          }
+        }
+      },
+      {
+        "canaryIndex": 4,
+        "taskId": "parent-atlas-governed-compute-fabric#7314f1ce7aeedaa3",
+        "taskOrdinal": 2205,
+        "communityId": 24,
+        "manifestId": "manifest:v2:79a1c3641f1a77c0e776f67f",
+        "promptPlanId": "prompt-plan:v1:b29351731dfa2e72876e6116",
+        "valkeyCacheKey": "atlas:rlm:prompt-plan:v1:b29351731dfa2e72876e61162bfda9c58b599cec6eff9d3989468750fbb58ea3",
+        "receiptId": "receipt:rlm-canary:4:79a1c3641f1a77c0",
+        "kanbanFinalStatusInTx": "completed",
+        "rlReward": {
+          "rewardEligible": true,
+          "invalidationReason": null,
+          "reward": 0.89482,
+          "components": {
+            "verifiedTestRatio": 1,
+            "validatedCompletion": 1,
+            "normalizedTokenCost": 0.1035,
+            "regressionsCount": 0
+          }
+        }
+      },
+      {
+        "canaryIndex": 5,
+        "taskId": "parent-atlas-governed-compute-fabric#cee7dedbdff78c99",
+        "taskOrdinal": 4001,
+        "communityId": 35,
+        "manifestId": "manifest:v2:7681306df704faf9b7303eb9",
+        "promptPlanId": "prompt-plan:v1:b2280c99ba288f98dace6b5e",
+        "valkeyCacheKey": "atlas:rlm:prompt-plan:v1:b2280c99ba288f98dace6b5e617aac0385a066cccf008f1edceea1c373a9f248",
+        "receiptId": "receipt:rlm-canary:5:7681306df704faf9",
+        "kanbanFinalStatusInTx": "completed",
+        "rlReward": {
+          "rewardEligible": true,
+          "invalidationReason": null,
+          "reward": 0.89482,
+          "components": {
+            "verifiedTestRatio": 1,
+            "validatedCompletion": 1,
+            "normalizedTokenCost": 0.1035,
+            "regressionsCount": 0
+          }
+        }
+      }
+    ]
+  },
+  "adversarialProbes": {
+    "adv_01_unverified_turn4_blocks_completion": {
+      "passed": true,
+      "invalidationReason": "TURN4_INDEPENDENT_VERIFIER_REJECTED"
+    },
+    "adv_02_hallucinated_okf_citation_rejected": {
+      "passed": true,
+      "error": "UNAUTHORIZED_OKF_CHUNK_CITATION: okf:hallucinated:chunk:999999 is not in ContextManifestV2.admittedChunkIds"
+    },
+    "adv_03_token_budget_overflow_rejected": {
+      "passed": true,
+      "error": "TOKEN_BUDGET_EXCEEDED: observedTokens=565 > maxPromptTokens=32"
+    },
+    "adv_04_workspace_revision_drift_invalidates_rl_reward": {
+      "passed": true,
+      "invalidationReason": "WORKSPACE_REVISION_DRIFT_DETECTED"
+    }
+  },
+  "status": "PASS"
+}

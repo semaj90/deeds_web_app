@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.task-proof-line-implementation-report.v1",
+  "status": "TEST_PROVEN_ADVISORY_ONLY",
+  "snapshot": {
+    "path": "docs/reports/openspec-workboard-v1.json",
+    "generatedAt": "2026-11-12T00:45:10.402Z",
+    "taskCount": 13974,
+    "duplicateBlockHashGroups": 16,
+    "duplicateBlockHashRows": 44,
+    "sha256": "d65c1438e43690aa2850dffc6d71b18fe2006c57fc30742e63f9a8a2af3bb48e"
+  },
+  "realUnresolvedTask": {
+    "stableKey": "agent-branch-review-fanout-ace-centroid-aug22#16f4feb094087a07",
+    "result": "UNRESOLVED_TASK_MAPPING"
+  },
+  "checks": {
+    "taskProofAndReceiptDictionarySpecs": "28/28 PASS",
+    "wfuMetadataSpecs": "21/21 PASS",
+    "frontendTypeCheck": "PENDING",
+    "databaseOrCacheWrites": false,
+    "canonicalStatusesChanged": false
+  },
+  "patchTargets": [
+    "sveltekit-frontend/src/lib/server/atlas/board/task-proof-line-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/board/task-proof-line-v1.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/board/task-proof-line-v1.snapshot.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/board/task-proof-workboard-snapshot-v1.fixture.json",
+    "scripts/atlas/lib/wfu-metadata.mjs",
+    "scripts/atlas/lib/wfu-metadata.test.mjs",
+    "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md"
+  ],
+  "featureLabelAuthority": "PROPOSED_ONLY",
+  "receiptDictionaryReuse": true,
+  "completionAuthorized": "separate projection state; no canonical task status mutated"
+}

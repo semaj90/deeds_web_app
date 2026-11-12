@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.cohort-source-checkbox-conflicts.v1",
+  "generatedOn": "2026-11-11",
+  "taskId": "COHORT-ROUTING-AUTHORITY-03",
+  "mode": "READ_ONLY_NO_PRODUCTION_WRITES",
+  "canonicalAuthority": false,
+  "productionWritesPerformed": false,
+  "status": "BLOCKED_IDENTITY_RECHECK_REQUIRED",
+  "cohort": {
+    "path": ".tmp/atlas/openspec-cohort-6527-members-v1.jsonl",
+    "rows": 6527,
+    "sha256": "sha256:68ed2a803f3df7428e0decf1455f7bc847f44153c7c5512ee4e848c140d43fec",
+    "frozenCheckboxDistribution": {
+      "CHECKED": 1,
+      "OPEN": 6526
+    }
+  },
+  "priorSourceAudit": {
+    "path": "docs/reports/openspec-cohort-6527-current-source-audit-v1.json",
+    "generatedAt": "2026-11-09T22:40:11.133Z",
+    "status": "FAIL_SOURCE_COHORT_STALE_OR_INVALID",
+    "sourceContentMismatch": 20,
+    "staleLocatorExactContentFound": 95,
+    "statusOnlyCheckboxDrift": 2,
+    "sourceLineNotTask": 1,
+    "missingSourceFile": 0
+  },
+  "currentComparison": "NOT_RECOMPUTED; the available source audit predates this run and fails current-source reconciliation.",
+  "disposition": {
+    "sourceContentMismatch": "BLOCKED_IDENTITY",
+    "staleLocatorExactContentFound": "REVIEW_REQUIRED; candidate recovery is not exact current locator binding",
+    "statusOnlyCheckboxDrift": "REVIEW_REQUIRED",
+    "sourceLineNotTask": "BLOCKED_IDENTITY",
+    "safeToPromoteAnyState": false
+  },
+  "workboardComparison": {
+    "bridgeGeneratedAt": "2026-11-11T19:36:57.391Z",
+    "kanbanCompleted": 3,
+    "frozenDiskChecked": 1,
+    "interpretation": "Snapshot disagreement requiring a fresh source/block-hash and checkbox comparison; do not infer which side is current from counts alone."
+  }
+}

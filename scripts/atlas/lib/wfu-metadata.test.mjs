@@ -23,6 +23,16 @@ test('parses depends / est / reads / writes', () => {
   assert.deepEqual(d.warnings, []);
 });
 
+test('parses one explicit receipt proof reference and rejects duplicate or malformed proof declarations', () => {
+  const parsed = parseWfu('<!-- wfu: reads=packages/parent-atlas/test/example.spec.ts; proof: exec:fixture-001 -->');
+  assert.equal(parsed.proofReceiptId, 'exec:fixture-001');
+  assert.deepEqual(parsed.reads, ['packages/parent-atlas/test/example.spec.ts']);
+  assert.equal(parseWfu('<!-- wfu: proof: not allowed -->').proofReceiptId, undefined);
+  const duplicate = parseWfu('<!-- wfu: proof: exec:first; proof: exec:second -->');
+  assert.equal(duplicate.proofReceiptId, undefined);
+  assert.ok(duplicate.warnings.includes('PROOF_DUPLICATE'));
+});
+
 test('no comment -> no declaration (absent, not empty)', () => {
   assert.equal(parseWfu('**A-1 x** plain task'), null);
 });

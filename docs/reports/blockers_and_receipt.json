@@ -1,0 +1,85 @@
+{
+  "schema": "atlas.cohort-routing-authority-blockers.v1",
+  "generatedOn": "2026-11-11",
+  "taskId": "COHORT-ROUTING-AUTHORITY-03",
+  "mode": "READ_ONLY_NO_PRODUCTION_WRITES",
+  "canonicalAuthority": false,
+  "productionWritesPerformed": false,
+  "databaseWritesPerformed": false,
+  "sourceCodeChangesPerformed": false,
+  "overallStatus": "PARTIAL_PRIOR_WORK_ONLY; CURRENT_AUTHORITY_AUDIT_BLOCKED",
+  "priorWork": {
+    "cohortBridge": {
+      "path": "docs/reports/kanban-cohort-6527-authority-bridge-v1.json",
+      "generatedAt": "2026-11-11T19:36:57.391Z",
+      "status": "PASS",
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "caveat": "Uses occupancy-derived ROUTED_ACTIVE values; not authority or current source/block-hash proof."
+    },
+    "fiveTaskE2E": {
+      "path": "docs/reports/archive/2026-11-11-cohort-6527-rehearsal/okf-dspy-rlm-kanban-e2e-v1.json",
+      "generatedAt": "2026-11-08T07:20:33.090Z",
+      "taskScope": "Five parent-atlas-governed-compute-fabric tasks; not next_steps or agentic-repair cohort coverage.",
+      "mode": "PG_TEMP_ISOLATED_BEGIN_ROLLBACK_ZERO_PERSISTENCE",
+      "persistentWrites": 0,
+      "disposableDatabaseIdentity": "NOT_ESTABLISHED_FOR_THIS_AUTHORITY_TASK"
+    },
+    "nextStepsCrosswalk": {
+      "path": "docs/reports/nextsteps-openspec-document-crosswalk-v1.json",
+      "generatedAt": "2026-11-09T23:13:00.554Z",
+      "explicitLinks": 5,
+      "reviewRequired": 5,
+      "cohortMembersFromNextSteps": 0
+    },
+    "agenticErrorFixing": {
+      "existingBridgeTask": "ERR-FIX-KANBAN-BRIDGE-01 marked done; only candidate surfacing is proven",
+      "cohortMembers": 119,
+      "authorityClaim": "Not proven by this bridge or prior five-task canary"
+    }
+  },
+  "requestedSteps": {
+    "currentSourceReconciliation": "BLOCKED_STALE_SOURCE_AUDIT; existing audit generated Nov 9 and fails",
+    "occupancyFieldRename": "NOT_APPLIED because this is a read-only audit; source currently names routing_active_bit",
+    "safeClaimCount": 0,
+    "disposablePostgresClaimRehearsal": "NOT_RUN; existing reconciliation utility connects using repo DATABASE_URL and pg_temp, not a positively verified disposable database target",
+    "independentReadback": "NOT_RUN_FOR_THIS_TASK; only historical pg_temp rollback count check exists",
+    "outputFiles": [
+      "docs/reports/cohort_routing_discrepancies.json",
+      "docs/reports/source_checkbox_state_conflicts.json",
+      "docs/reports/community_route_parity.json",
+      "docs/reports/kanban_claim_eligibility.json",
+      "docs/reports/blockers_and_receipt.json"
+    ]
+  },
+  "receipt": {
+    "verifier": "read-only source/artifact reconciliation",
+    "sourceAuditPath": "docs/reports/openspec-cohort-6527-current-source-audit-v1.json",
+    "sourceAuditStatus": "FAIL_SOURCE_COHORT_STALE_OR_INVALID",
+    "currentBridgePath": "docs/reports/kanban-cohort-6527-authority-bridge-v1.json",
+    "currentBridgeCanonicalAuthority": false,
+    "routeParity": "MISMATCH",
+    "promotionEligible": false,
+    "claimEligible": false,
+    "databaseWritesPerformed": false
+  },
+  "grpcProtoWiringReview": {
+    "proto": "proto/active/retrieval.proto",
+    "declaredRpcMethods": ["SearchCodebase", "StreamCodebase", "SearchEvidence", "StreamEvidence"],
+    "sharedContextProto": "proto/shared_ids.proto#AtlasRequestContextV2",
+    "sourceRevisionFieldExists": true,
+    "sourceRevisionFieldNumber": 7,
+    "svelteKitClient": "sveltekit-frontend/src/lib/server/atlas/go-retrieval-grpc-client.ts",
+    "clientCalls": ["SearchCodebase"],
+    "clientPopulatesSourceRevision": false,
+    "goServerImplementsStreaming": true,
+    "streamCodebaseBehavior": "Calls SearchCodebase to completion, then sends the resulting chunks; not progressive retrieval computation.",
+    "grpcNodeDependencies": {
+      "grpc-js": "resolves locally but is not declared in sveltekit-frontend/package.json",
+      "proto-loader": "resolves locally but is not declared in sveltekit-frontend/package.json",
+      "grpcWeb": "not declared or locally resolved"
+    },
+    "browserNativeGrpc": false,
+    "protocolInterop": "NOT_LIVE_PROVEN"
+  }
+}

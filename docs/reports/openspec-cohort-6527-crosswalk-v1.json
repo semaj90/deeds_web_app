@@ -1,24 +1,24 @@
 {
   "schema": "atlas.openspec-cohort-6527-crosswalk.v1",
-  "generatedAt": "2026-11-08T07:20:10.776Z",
+  "generatedAt": "2026-11-12T04:07:25.799Z",
   "cohortRevision": "rev:openspec-rank-fuse:20261107T192448Z",
   "fuseSourceSha256": "fe0008a1cad80add5d74783a4c9b28fc64cab52b88012bbf561fc08093445a13",
-  "workboardGeneratedAt": "2026-11-02T02:19:52.274Z",
+  "workboardGeneratedAt": "2026-11-12T00:45:10.402Z",
   "workboardSummary": {
-    "completedTasks": 8014,
-    "openTasks": 5605,
-    "actionableTasks": 4394,
-    "waitingTasks": 1091,
+    "completedTasks": 8076,
+    "openTasks": 5898,
+    "actionableTasks": 4656,
+    "waitingTasks": 1121,
     "supersededTasks": 0,
-    "reviewRequiredTasks": 118,
-    "totalTasks": 13619,
-    "progressFraction": 0.588442616932227,
+    "reviewRequiredTasks": 119,
+    "invariantOpenTasks": 2,
+    "totalTasks": 13974,
+    "progressFraction": 0.5779304422498927,
     "progressBar": "[######----]",
     "eta": {
       "status": "UNKNOWN",
       "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-    },
-    "invariantOpenTasks": 2
+    }
   },
   "canonicalAuthority": false,
   "writesPerformed": false,
@@ -30,13 +30,13 @@
   },
   "reconciliationStats": {
     "totalCohortOrdinals": 6527,
-    "exactSourceLineJoin": 5418,
-    "shiftedLineStableKeyJoin": 150,
+    "exactSourceLineJoin": 5677,
+    "shiftedLineStableKeyJoin": 20,
     "secondaryOpenSpecRoot": 825,
-    "newSinceWorkboardSnapshot": 134,
-    "disambiguatedDuplicateTitles": 21,
-    "diskCheckedStateCount": 1,
-    "diskOpenStateCount": 6526,
+    "newSinceWorkboardSnapshot": 5,
+    "disambiguatedDuplicateTitles": 9,
+    "diskCheckedStateCount": 8,
+    "diskOpenStateCount": 6519,
     "routingActiveBitSetCount": 3312,
     "communityStatusCounts": {
       "CONFIGURED": 1327,
@@ -44,17 +44,17 @@
       "UNROUTED": 4983
     },
     "workboardExecutionStates": {
-      "ACTIONABLE": 4427,
-      "WAITING_ON_DEPENDENCY": 1116,
-      "OPEN_UNRECONCILED": 955,
-      "DONE": 27,
+      "ACTIONABLE": 4557,
+      "WAITING_ON_DEPENDENCY": 1130,
+      "DONE": 12,
+      "OPEN_UNRECONCILED": 826,
       "INVARIANT": 2
     }
   },
   "membersArtifact": {
     "path": ".tmp/atlas/openspec-cohort-6527-members-v1.jsonl",
     "rowCount": 6527,
-    "sha256": "68ed2a803f3df7428e0decf1455f7bc847f44153c7c5512ee4e848c140d43fec"
+    "sha256": "1a854ef98699400d6325b7041ed517a2b1c2cd1b4ca9c4099aa1ee671001f578"
   },
   "sampleMembers": [
     {
@@ -105,13 +105,13 @@
     {
       "cohort_revision": "rev:openspec-rank-fuse:20261107T192448Z",
       "task_ordinal": 3,
-      "canonical_task_key": "parent-atlas-repair-candidate-feature-matrix#d95fdfcfe99c784b",
+      "canonical_task_key": "parent-atlas-repair-candidate-feature-matrix#dc184fd49a3abe0d",
       "source_claim_hash": "sha256:8d58eac775809329db1df707ebd4918743e22c0d19f4625adb77ff264cdd6d0e",
       "source_ref": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L282",
       "change_id": "parent-atlas-repair-candidate-feature-matrix",
       "task_code": "CEI-21",
       "workboard_join_status": "EXACT_SOURCE_LINE_MATCH",
-      "workboard_execution_state": "ACTIONABLE",
+      "workboard_execution_state": "DONE",
       "disk_checkbox_state": "CHECKED",
       "community_id": 13,
       "route_status": "UNROUTED",

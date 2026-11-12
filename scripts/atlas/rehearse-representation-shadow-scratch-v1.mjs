@@ -19,7 +19,8 @@ const ROOT = process.cwd();
 const MEMBERS_PATH = path.join(ROOT, '.tmp/atlas/openspec-cohort-6527-members-v1.jsonl');
 const BIN_PATH = path.join(ROOT, '.tmp/atlas/openspec-task-lowrank-keyframes.embeddinggemma.latent64.f32le.bin');
 const REPORT_PATH = path.join(ROOT, 'docs/reports/representation-shadow-scratch-rehearsal-v1.json');
-const SCRATCH_URL = process.env.SCRATCH_DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_live_integration_scratch';
+const SCRATCH_URL = process.env.SCRATCH_DATABASE_URL;
+if (!SCRATCH_URL) throw new Error('SCRATCH_DATABASE_URL_REQUIRED');
 
 const DOMAIN_TO_BYTE = {
   auth: 1,

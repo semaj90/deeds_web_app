@@ -99,6 +99,7 @@ registries:
       - nary-fact-proposal-v1.schema.json
       - feature-relationships-v1.schema.json
       - language-profile-v1.schema.json
+      - hmm-api-recommendation-procedure-v1.schema.json
       - pca-projection-experiment-v1.schema.json
 
   pipelines:
@@ -106,6 +107,7 @@ registries:
     description: Bounded, evidence-qualified data and execution pipelines
     schemas:
       - ast-entity-prefill.yaml
+      - hmm-api-recommendation-v1.yaml
 
   indexes:
     path: indexes/
