@@ -16,6 +16,10 @@ import type { GpuAdmissionDecision } from './gpu-memory-admission-v1.js';
  * 1,000 frozen queries, `python/atlas_retrieval_canary_v1.py run-precision`):
  *   docs/reports/precision-tiers-v1-20261111.json       sha256 bd834b83a4379e6164dd62868d4a8485d4d544178680d42efae36ff1b2a2f70f
  *   docs/reports/precision-tiers-v1-k1000-20261111.json sha256 30931f3403e7283a1b3ce8f02c5aeedf1e87272d38d6ea7c8fe99112ac6c70cf
+ *   docs/reports/pg-rescore-latency-v1-20261111.json   sha256 ec30e27601a72532d2c06ec4299bc44596055ff56f67964f3a2854cd406134ac
+ * Rescore latency is NOT linear in K (a large fixed cost dominates), so the policy uses measured latency per K,
+ * not a per-row cost. Those figures are warm-cache loopback wall clock to the Docker PostgreSQL 18.4; a colder
+ * first run was much slower (p95 over 2 s) and is not receipt-backed, so a budget is a warm-cache budget.
  * The measurement is valid for THIS corpus and metric only; `measurementStale` flags a corpus that has
  * drifted. INT8/INT4 are software storage formats here, not hardware execution claims.
  */
@@ -46,6 +50,17 @@ export const MEASURED_TIERS: readonly MeasuredTier[] = Object.freeze([
   { fidelity: 'FP32_REFERENCE', bytesPerVector: 3072, recall: { 0: 1.0 } }, // exact by definition; rescore K is irrelevant
 ]);
 
+export type RescoreMethod = 'server_side_scores' | 'client_fetch_vectors';
+export type LatencyStat = 'p50' | 'p95';
+
+/** Measured fp32 rescore latency in ms by method and K (K=0 costs nothing). Missing K = not measured. */
+export const MEASURED_RESCORE_LATENCY_MS: Readonly<
+  Record<RescoreMethod, Readonly<Partial<Record<100 | 1000, Readonly<Record<LatencyStat, number>>>>>>
+> = Object.freeze({
+  server_side_scores: { 100: { p50: 48.04, p95: 77.7 }, 1000: { p50: 76.4, p95: 90.96 } },
+  client_fetch_vectors: { 100: { p50: 11.78, p95: 17.67 }, 1000: { p50: 143.13, p95: 211.19 } },
+});
+
 export type TierExecutor = 'gpu' | 'cpu-pool' | 'cpu-main';
 
 export interface TierRequestV1 {
@@ -54,10 +69,12 @@ export interface TierRequestV1 {
   /** Existing GPU admission decision for the dense-scoring job; anything but ADMIT keeps work off the GPU. */
   readonly gpuAdmission: GpuAdmissionDecision | 'UNKNOWN';
   readonly cpuWorkersFree: number;
-  /** Latency budget for the rescore fetch in ms. Omit for no budget. */
+  /** Latency budget for the fp32 rescore in ms. Omit for no budget. K=0 (no rescore) always fits. */
   readonly rescoreBudgetMs?: number;
-  /** Measured or assumed cost of fetching one fp32 row for rescore. Required when a budget is given. */
-  readonly rescoreCostMsPerRow?: number;
+  /** Which measured rescore path the budget refers to. Default 'server_side_scores' (scores only, no vector transfer). */
+  readonly rescoreMethod?: RescoreMethod;
+  /** Which measured statistic is compared with the budget. Default 'p95' (conservative). */
+  readonly latencyStat?: LatencyStat;
   /** Serve the 16-byte LOD0 bitset first and rescore later. Allowed to return approximate results. */
   readonly quickHit?: boolean;
   /** Current corpus size, used only to flag stale measurements. */
@@ -74,6 +91,8 @@ export interface TierDecisionV1 {
   /** True when the measured recall at this point is exactly 1 (rescored to fp32 exactness on the frozen set). */
   readonly exactOnMeasuredSet: boolean;
   readonly approximate: boolean;
+  /** Measured rescore latency for this point under the requested method and statistic; 0 when no rescore. */
+  readonly expectedRescoreLatencyMs: number;
   readonly measurementStale: boolean;
   readonly reason: string;
 }
@@ -94,17 +113,23 @@ export function selectPrecisionTierV1(req: TierRequestV1): TierDecisionV1 {
   assertFinite('cpu_workers_free', req.cpuWorkersFree, 0);
   if (req.rescoreBudgetMs !== undefined) {
     assertFinite('rescore_budget_ms', req.rescoreBudgetMs, 0);
-    if (req.rescoreCostMsPerRow === undefined) throw new Error('PRECISION_TIER_RESCORE_COST_REQUIRED_WITH_BUDGET');
   }
-  if (req.rescoreCostMsPerRow !== undefined) assertFinite('rescore_cost_ms_per_row', req.rescoreCostMsPerRow, 0);
   if (req.corpusRows !== undefined) assertFinite('corpus_rows', req.corpusRows, 1);
 
   const stale =
     req.corpusRows !== undefined &&
     Math.abs(req.corpusRows - MEASURED_CORPUS_ROWS) / MEASURED_CORPUS_ROWS > STALE_CORPUS_FRACTION;
   const executor = chooseExecutor(req);
-  const within = (k: RescoreK): boolean =>
-    req.rescoreBudgetMs === undefined || k * (req.rescoreCostMsPerRow ?? 0) <= req.rescoreBudgetMs;
+  const method: RescoreMethod = req.rescoreMethod ?? 'server_side_scores';
+  const stat: LatencyStat = req.latencyStat ?? 'p95';
+  const latencyOf = (k: RescoreK): number | undefined =>
+    k === 0 ? 0 : MEASURED_RESCORE_LATENCY_MS[method][k as 100 | 1000]?.[stat];
+  // A budget only admits points whose latency was measured; an unmeasured latency is never assumed to fit.
+  const within = (k: RescoreK): boolean => {
+    if (req.rescoreBudgetMs === undefined) return true;
+    const ms = latencyOf(k);
+    return ms !== undefined && ms <= req.rescoreBudgetMs;
+  };
 
   const make = (tier: MeasuredTier, k: RescoreK, reason: string): TierDecisionV1 => {
     const recall = tier.recall[k] as number;
@@ -117,6 +142,7 @@ export function selectPrecisionTierV1(req: TierRequestV1): TierDecisionV1 {
       expectedRecall: recall,
       exactOnMeasuredSet: recall === 1,
       approximate: recall < 1,
+      expectedRescoreLatencyMs: latencyOf(k) ?? 0,
       measurementStale: stale,
       reason,
     });
