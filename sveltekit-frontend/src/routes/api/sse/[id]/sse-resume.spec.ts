@@ -9,19 +9,18 @@ const sub = vi.hoisted(() => ({
 const readTokenStream = vi.hoisted(() => vi.fn());
 const produceTokenChunk = vi.hoisted(() => vi.fn());
 
-vi.mock('ioredis', () => ({
-	default: class {
-		status = 'ready';
-		on(event: string, fn: (channel: string, message: string) => void) {
-			sub.handlers[event] = fn;
-			return this;
-		}
-		subscribe = sub.subscribe;
-		unsubscribe = sub.unsubscribe;
-	},
-}));
+class FakeSubscriber {
+	status = 'ready';
+	on(event: string, fn: (channel: string, message: string) => void) {
+		sub.handlers[event] = fn;
+		return this;
+	}
+	subscribe = sub.subscribe;
+	unsubscribe = sub.unsubscribe;
+}
+// The route builds its subscriber from the shared client (options-based), not from REDIS_URL.
+vi.mock('$lib/server/redis.js', () => ({ getRedis: () => ({ duplicate: () => new FakeSubscriber() }) }));
 vi.mock('$lib/server/redis-streams.js', () => ({ readTokenStream, produceTokenChunk }));
-vi.mock('$lib/server/env.server.js', () => ({ ENV: { REDIS_URL: 'redis://test' } }));
 
 import { GET } from './+server';
 

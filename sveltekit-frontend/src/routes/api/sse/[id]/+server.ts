@@ -20,16 +20,14 @@ import { json } from '@sveltejs/kit';
  * the chat/case in `params.id` before subscribing or replaying. Do not rely on the ID being secret.
  */
 
-import IORedis from 'ioredis';
+import type IORedis from 'ioredis';
 
+import { getRedis } from '$lib/server/redis.js';
 import { readTokenStream } from '$lib/server/redis-streams.js';
 import { sseFormat, sseHeaders } from '$lib/server/streaming/sse-utils.js';
 import { compareStreamIds, isStreamId, parseResumeCursor } from '$lib/server/streaming/sse-cursor.js';
 import type { RequestHandler } from './$types';
 import { isUuid, isValidSafeId } from '$lib/server/validation.js';
-import { ENV } from '$lib/server/env.server.js';
-
-const REDIS_URL = ENV.REDIS_URL;
 
 const REPLAY_PAGE_SIZE = 100;
 // 20 pages x 100 = 2000 entries, the stream's MAXLEN cap, so this is the whole retained history.
@@ -44,11 +42,10 @@ const channelCallbacks = new Map<string, Set<(message: string) => void>>();
 
 function getSharedSubscriber(): IORedis {
   if (!sharedSubscriber || sharedSubscriber.status === 'end') {
-    sharedSubscriber = new IORedis(REDIS_URL, {
-      maxRetriesPerRequest: 2,
-      enableReadyCheck: true,
-      lazyConnect: false,
-    });
+    // Dedicated subscriber connection duplicated from the shared client: same host/port/password
+    // options as every other server-side Redis use. Do not build it from REDIS_URL: .env.local can
+    // override it with a URL that has no password, which Valkey rejects with NOAUTH.
+    sharedSubscriber = getRedis().duplicate({ maxRetriesPerRequest: 2 });
     sharedSubscriber.on('message', (channel: string, message: string) => {
       const cbs = channelCallbacks.get(channel);
       if (cbs) {
