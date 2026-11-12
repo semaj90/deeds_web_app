@@ -1,6 +1,15 @@
 -- Additive, unapplied migration for resumable evidence-job progress.
 -- Rehearse in a disposable database/transaction before any operator applies it.
 -- analysis_jobs remains the durable job owner; this table is its append-only event history.
+--
+-- Review notes (2026-11-12):
+-- * The history trigger is fail-open: an unknown job status or a non-sha256 evidence hash skips the
+--   event row instead of aborting the canonical analysis_jobs write. Only a case/evidence mismatch
+--   still raises, because that is an integrity violation, not telemetry.
+-- * event_seq is a global bigserial. Replay is per job and one worker advances a job sequentially, so
+--   out-of-order commits are benign in v1; do not reuse the cursor for cross-job ordering.
+-- * Retention is deferred: nothing prunes this table yet. The delete trigger records the per-job
+--   watermark for the future pruner.
 
 CREATE TABLE IF NOT EXISTS public.analysis_job_events (
   event_seq bigserial PRIMARY KEY,
@@ -59,6 +68,14 @@ BEGIN
 
   -- Non-case analysis jobs are outside this case-authorized SSE contract.
   IF v_case_id IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  -- Fail open for telemetry: never abort the canonical job write for an unrecognised status or an
+  -- evidence hash that is not sha256:<64 lowercase hex> (same rule as the TypeScript stage writer).
+  IF NEW.status NOT IN ('queued', 'running', 'completed', 'failed')
+     OR v_source_revision IS NULL
+     OR v_source_revision !~ '^sha256:[0-9a-f]{64}$' THEN
     RETURN NEW;
   END IF;
 
