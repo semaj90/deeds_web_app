@@ -1,0 +1,6 @@
+{"archivedOn":"2026-11-08","reason":"superseded by the adopted parent_atlas_nes_v2_parity_checked package (single v2 owner); runner stops on competing candidates","files":[
+{"file":"build-nes-lut-palette-v2-proposed-v1.mjs","sha256":"9cdad7ee58d49a019a1fc49d3a8eed125e5cf19d8c0aa2221cb7de3cdaf8cece"},
+{"file":"DRAFT-atlas-nes-lut-v2-derived-uuid.sql","sha256":"bcd851d3b332a013732c5fca6c2e188122f27218c1fde7893581963aca6e75f9"},
+{"file":"manifest.json","sha256":"2286975c8c7443dee85794f19311bf6ffe631596ea8109cfb4bc13b0b14cae5e"},
+{"file":"nes-domain-palette-v2-PROPOSED.json","sha256":"ad6651a5090675acf5ea706cfb4f573c0fdf57cc5d254e29565fb9957e0ebb3b"},
+{"file":"test_nes_lut_palette_v2_proposed.py","sha256":"ef9901c2fe2db9743318697b1cf082c99fea3d02194a57b01979b7c5e81fb09a"}]}
