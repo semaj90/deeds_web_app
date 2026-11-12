@@ -172,7 +172,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
     // Invalidate report list and case cache
     await Promise.all([
-      invalidateReportCache(newReport[0].id, 'report_create', locals.user.id),
+      invalidateReportCache(newReport[0].id, 'report_create', locals.user.id, body.caseId),
       invalidateCaseCache(body.caseId, 'report_create', locals.user.id),
     ]).catch((err) => console.warn('[Reports] Cache invalidation failed:', err));
 
@@ -249,7 +249,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 
 		// Invalidate cache for all updated reports
 		await Promise.all(
-			updated.map(report => invalidateReportCache(report.id, 'report_update', locals.user.id))
+			updated.map(report => invalidateReportCache(report.id, 'report_update', locals.user.id, report.caseId ?? undefined))
 		).catch(err => console.warn('[Reports] Cache invalidation failed:', err));
 
 		return json({
@@ -305,7 +305,7 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 
 		// Invalidate cache for all deleted reports
 		await Promise.all(
-			deleted.map(report => invalidateReportCache(report.id, 'report_delete', locals.user.id))
+			deleted.map(report => invalidateReportCache(report.id, 'report_delete', locals.user.id, report.caseId ?? undefined))
 		).catch(err => console.warn('[Reports] Cache invalidation failed:', err));
 
 		return json({

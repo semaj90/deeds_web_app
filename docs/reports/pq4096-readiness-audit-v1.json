@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.pq4096-readiness-audit.v1",
+  "generatedAt": "2026-11-09T02:25:54.458Z",
+  "database": "legal_ai_live_integration_scratch",
+  "targetMode": "SCRATCH_READ_ONLY",
+  "postgresMajor": 18,
+  "canonicalVectorContract": "public.codebase_chunk_index.content_embedding_768 (semantic_768, 768 dimensions)",
+  "proposal": {
+    "coarseK": 64,
+    "residualKPerCoarse": 64,
+    "leafCount": 4096,
+    "status": "CANDIDATE_NOT_TRAINED"
+  },
+  "semanticChunks": {
+    "tablePresent": true,
+    "totalRows": 0,
+    "vectors768": 0,
+    "provenance": {
+      "sourceRevisionRows": 0,
+      "workspaceRevisionRows": 0,
+      "representationRevisionRows": 0,
+      "embeddingModelRows": 0,
+      "allRequiredFieldsPresent": 0
+    },
+    "modelRevisions": []
+  },
+  "centroids": {
+    "tablePresent": true,
+    "byType": [],
+    "vectorDimensions": []
+  },
+  "qdrantCentroidRows": 0,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "conclusion": "BLOCKED_NO_CANONICAL_768D_VECTORS_IN_SCRATCH"
+}

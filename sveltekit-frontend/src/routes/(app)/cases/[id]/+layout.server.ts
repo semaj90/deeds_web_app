@@ -16,7 +16,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
  * Every case-specific child must await this parent before reading case data or
  * consulting a cache so membership is established first.
  */
-export const load: LayoutServerLoad = async ({ locals, params }) => {
+export const load: LayoutServerLoad = async ({ locals, params, depends }) => {
 	if (!locals.user) {
 		throw redirect(302, '/login');
 	}
@@ -28,6 +28,7 @@ export const load: LayoutServerLoad = async ({ locals, params }) => {
 
 	const actorId = Number(locals.user.id);
 	if (!Number.isInteger(actorId) || actorId <= 0) throw error(404, 'Case not found');
+	depends(`app:case-detail:${params.id}`);
 	const caseRow = await getAuthorizedCase(params.id, actorId);
 	if (!caseRow) throw error(404, 'Case not found');
 

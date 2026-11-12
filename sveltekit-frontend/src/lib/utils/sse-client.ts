@@ -20,6 +20,8 @@
  * ```
  */
 
+import { createEventDeduper, reconnectDelayMs } from './reconnect-backoff';
+
 export interface ChatMessage {
 	id: string;
 	role: 'user' | 'assistant' | 'system';
@@ -38,6 +40,11 @@ export class ChatSSEClient {
 	private messageHandlers: ((msg: ChatMessage) => void)[] = [];
 	private errorHandlers: ((error: Error) => void)[] = [];
 	private connected = false;
+	private reconnectAttempts = 0;
+	private static readonly MAX_RECONNECT_ATTEMPTS = 10;
+	private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+	// Applied-once guard: a replayed message (after a reconnect) must not be shown twice.
+	private deduper = createEventDeduper();
 
 	constructor(sessionId: string) {
 		this.sessionId = sessionId;
@@ -59,12 +66,14 @@ export class ChatSSEClient {
 		this.eventSource.addEventListener('connected', (event: any) => {
 			console.log('SSE connected:', JSON.parse(event.data));
 			this.connected = true;
+			this.reconnectAttempts = 0;
 		});
 
 		// Handle messages
 		this.eventSource.addEventListener('message', (event: any) => {
 			try {
 				const message = JSON.parse(event.data) as ChatMessage;
+				if (this.deduper.isDuplicate(message.id)) return;
 				this.messageHandlers.forEach((handler: any) => handler(message));
 			} catch (error) {
 				console.error('Failed to parse SSE message:', error);
@@ -77,14 +86,12 @@ export class ChatSSEClient {
 			const error = new Error('SSE connection error');
 			this.errorHandlers.forEach((handler: any) => handler(error));
 
-			// Auto-reconnect after 3 seconds
-			setTimeout(() => {
-				if (!this.connected) {
-					console.log('Attempting to reconnect...');
-					this.connect();
-				}
-			},
-	3000);
+			// A native EventSource retries by itself (and resends Last-Event-ID) while it is CONNECTING.
+			// Only retry manually once it has given up (CLOSED), with jittered backoff and a cap.
+			if (this.eventSource?.readyState === EventSource.CLOSED) {
+				this.connected = false;
+				this.scheduleReconnect();
+			}
 		});
 
 		// Handle ping (keep-alive)
@@ -135,7 +142,28 @@ export class ChatSSEClient {
 	/**
 	 * Disconnect from SSE stream
 	 */
+	private scheduleReconnect(): void {
+		if (this.reconnectTimer) return;
+		if (this.reconnectAttempts >= ChatSSEClient.MAX_RECONNECT_ATTEMPTS) {
+			this.errorHandlers.forEach((handler: any) => handler(new Error('SSE reconnect attempts exhausted')));
+			return;
+		}
+		const delay = reconnectDelayMs(this.reconnectAttempts++);
+		this.reconnectTimer = setTimeout(() => {
+			this.reconnectTimer = null;
+			this.eventSource?.close();
+			this.eventSource = null;
+			void this.connect();
+		}, delay);
+	}
+
 	disconnect(): void {
+		if (this.reconnectTimer) {
+			clearTimeout(this.reconnectTimer);
+			this.reconnectTimer = null;
+		}
+		this.reconnectAttempts = 0;
+		this.deduper.clear();
 		if (this.eventSource) {
 			this.eventSource.close();
 			this.eventSource = null;

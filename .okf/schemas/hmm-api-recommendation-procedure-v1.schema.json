@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atlas.okf.hmm-api-recommendation-procedure.v1",
+  "title": "Parent Atlas HMM API Recommendation Procedure V1",
+  "description": "A non-authoritative procedure binding API contract observations, language relations, feature labels, and shadow policy recommendations. It does not authorize execution or task completion.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "procedure_id",
+    "status",
+    "owner",
+    "authority",
+    "runtime_contracts",
+    "feature_label_policy",
+    "relation_policy",
+    "policy_model",
+    "recommendation_policy",
+    "language_profiles"
+  ],
+  "properties": {
+    "schema": { "const": "atlas.okf.hmm-api-recommendation-procedure.v1" },
+    "version": { "const": 1 },
+    "procedure_id": { "type": "string", "pattern": "^[a-z][a-z0-9._-]+$" },
+    "status": { "enum": ["SHADOW_ONLY", "BLOCKED"] },
+    "owner": { "const": "parent-atlas" },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canonical_authority", "writes_allowed", "tool_execution_allowed", "task_completion_allowed"],
+      "properties": {
+        "canonical_authority": { "const": false },
+        "writes_allowed": { "const": false },
+        "tool_execution_allowed": { "const": false },
+        "task_completion_allowed": { "const": false }
+      }
+    },
+    "runtime_contracts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["api_observation", "api_relation_proposal", "feature_label_registry", "policy_pattern_input", "policy_emission", "policy_training_row"],
+      "properties": {
+        "api_observation": { "$ref": "#/$defs/sourceContract" },
+        "api_relation_proposal": { "$ref": "#/$defs/sourceContract" },
+        "feature_label_registry": { "$ref": "#/$defs/sourceContract" },
+        "policy_pattern_input": { "$ref": "#/$defs/sourceContract" },
+        "policy_emission": { "$ref": "#/$defs/sourceContract" },
+        "policy_training_row": { "$ref": "#/$defs/sourceContract" }
+      }
+    },
+    "feature_label_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registry_ref", "descriptive_only", "numeric_tensor_input_allowed", "identity_or_authority_allowed"],
+      "properties": {
+        "registry_ref": { "type": "string", "minLength": 1 },
+        "descriptive_only": { "const": true },
+        "numeric_tensor_input_allowed": { "const": false },
+        "identity_or_authority_allowed": { "const": false }
+      }
+    },
+    "relation_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registry_ref", "registered_predicates", "candidate_relation_disposition", "candidate_relation_kinds", "minimum_evidence_refs", "require_source_revision", "path_only_join_allowed"],
+      "properties": {
+        "registry_ref": { "type": "string", "minLength": 1 },
+        "registered_predicates": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]+$" }
+        },
+        "candidate_relation_disposition": { "const": "PROPOSAL_ONLY" },
+        "candidate_relation_kinds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]+$" }
+        },
+        "minimum_evidence_refs": { "type": "integer", "minimum": 1 },
+        "require_source_revision": { "const": true },
+        "path_only_join_allowed": { "const": false }
+      }
+    },
+    "policy_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state_vocabulary_ref", "emission_ref", "transition_model_ref", "fit_status", "training_dataset_ref", "training_dataset_snapshot"],
+      "properties": {
+        "state_vocabulary_ref": { "type": "string", "minLength": 1 },
+        "emission_ref": { "type": "string", "minLength": 1 },
+        "transition_model_ref": { "type": ["string", "null"] },
+        "fit_status": { "enum": ["NOT_FIT", "FITTED_SHADOW", "REVIEWED"] },
+        "training_dataset_ref": { "type": "string", "minLength": 1 },
+        "training_dataset_snapshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["row_count", "distinct_states", "distinct_actions", "distinct_outcomes", "distinct_source_revision_values", "known_source_revision_rows", "distinct_feature_revisions", "all_rows_executed", "all_rows_have_source_refs"],
+          "properties": {
+            "row_count": { "type": "integer", "minimum": 0 },
+            "distinct_states": { "type": "integer", "minimum": 0 },
+            "distinct_actions": { "type": "integer", "minimum": 0 },
+            "distinct_outcomes": { "type": "integer", "minimum": 0 },
+            "distinct_source_revision_values": { "type": "integer", "minimum": 0 },
+            "known_source_revision_rows": { "type": "integer", "minimum": 0 },
+            "distinct_feature_revisions": { "type": "integer", "minimum": 0 },
+            "all_rows_executed": { "type": "boolean" },
+            "all_rows_have_source_refs": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "recommendation_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "hmm_enabled", "candidate_limit", "abstain_when_unqualified", "confidence_calibrated", "fallback"],
+      "properties": {
+        "mode": { "const": "DETERMINISTIC_SHADOW" },
+        "hmm_enabled": { "const": false },
+        "candidate_limit": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "abstain_when_unqualified": { "const": true },
+        "confidence_calibrated": { "const": false },
+        "fallback": { "const": "EXISTING_DETERMINISTIC_POLICY" }
+      }
+    },
+    "language_profiles": {
+      "type": "array",
+      "minItems": 23,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["language", "profile_ref", "mode", "relations", "feature_labels"],
+        "properties": {
+          "language": { "type": "string", "minLength": 1 },
+          "profile_ref": { "type": "string", "pattern": "^\\.okf/languages/[a-z0-9_-]+\\.yaml$" },
+          "mode": { "enum": ["STRUCTURAL", "CONTRACT", "DOCUMENTATION", "CONFIGURATION", "ABSTAIN"] },
+          "relations": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+          "feature_labels": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sourceContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_ref", "runtime_schema_id"],
+      "properties": {
+        "source_ref": { "type": "string", "minLength": 1 },
+        "runtime_schema_id": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

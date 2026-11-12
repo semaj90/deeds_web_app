@@ -330,11 +330,11 @@
     },
     "cutile_kernel_challenger": {
       "owner": {
-        "classification": "OPTIONAL_CHALLENGER_NOT_INSTALLED",
-        "path": "wsl::/home/james/miniforge3/envs/atlas-rapids-cu13",
-        "evidence": "The existing WSL environment has PyTorch/CUDA and RAPIDS/cuVS/cuGraph GPU capability, but importlib reports that cuda.tile is not installed. cuTile is a future fused-kernel pilot, not a current retrieval or decoder owner."
+        "classification": "OPTIONAL_CHALLENGER",
+        "path": "wsl::/home/james/.venvs/atlas-cutile-cu132",
+        "evidence": "Read-only WSL metadata check on 2026-11-09 found Python 3.14.6, PyTorch 2.14.0+cu132, cuda-tile 1.5.0 and tileiras 13.2.78 in this separate venv. The prior docs/reports/cutile-ace-level3-results.json records bounded SM86 Python cuTile fixture proof. This is optional challenger capability, not production retrieval or decoder ownership; current GPU rerun remains gated on operator-controlled VRAM release."
       },
-      "current_runtime_owner": "WSL atlas-rapids-cu13 for diagnostic experiments only",
+      "current_runtime_owner": "WSL atlas-cutile-cu132 venv for optional cuTile kernel experiments only",
       "required_for_current_stack": false,
       "status": "DEFERRED_OPTIONAL_PILOT",
       "cache_scope": "disposable compiled cubin cache only",

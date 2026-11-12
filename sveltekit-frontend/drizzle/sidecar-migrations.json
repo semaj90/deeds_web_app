@@ -1045,6 +1045,188 @@
       "reason": "Additive candidate only: stage 14 versioned NES LUT routing metadata rows under atlas.nes-lut.v2-candidate in the existing atlas_nes_lut_v1 table. Preserves v1 records; scratch-only gated rehearsal/apply required, no live migration or ontology updates.",
       "appliedBy": "not-applied",
       "requiresJournalEntry": false
+    },
+    {
+      "file": "0019_bm25_search_vector.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0023_vector_index_registry.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0035_create_atlas_feature_packets.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0042_unified_registry_enrichment_projections.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0043_atlas_packet_features_schema.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0043_feature_extraction_tables.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0044_phase_107_feature_layer_schema.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0046_phase_109_unknown_packets.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0052_evaluation_corpus.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0054_evaluation_corpora.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0055_evaluation_results.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0056_evaluation_evidence.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0058_evaluation_relevance_corrected.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0059_qdrant_point_id_backfill_tables.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0060_feature_envelope_column.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0100_atlas_feature_vectors.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0102_packet_source_features.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0103_add_topology_and_noun_summaries.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0103_unified_packet_source_features.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0109_phase109a_semantic_signals.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0109_phase109a_semantic_signals_repair.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0112_parent_atlas_graph_v2.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0114_semantic_topk_rerank_ledger.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0153_atlas_context_manifests.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0999_cluster_cards.sql",
+      "status": "documented_presence_observed",
+      "reason": "Object-presence check 2026-11-09 (read-only): every CREATE TABLE/INDEX name parsed from this file exists in the live legal_ai_db. Presence only; the applier was not proven and this file is not a journal entry.",
+      "appliedBy": "unknown (object presence observed 2026-11-09; applier not proven)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261111_analysis_job_event_history_v1.sql",
+      "status": "proposal_only",
+      "reason": "Unapplied additive event-history proposal for resumable evidence-job SSE. Rehearse in a disposable transaction before any operator-controlled application.",
+      "appliedBy": "none",
+      "requiresJournalEntry": false
     }
   ]
 }

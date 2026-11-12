@@ -34,6 +34,20 @@ test('verifies exact task line against workboard source digest', () => {
 	} finally { rmSync(input.repoRoot, { recursive: true, force: true }); }
 });
 
+test('preserves an in-progress [~] source marker without treating it as done', () => {
+	const input = fixture();
+	try {
+		const bytes = Buffer.from('# Tasks\n- [~] Verify the task reference. <!-- wfu: est=10 -->\n');
+		writeFileSync(input.sourcePath, bytes);
+		input.workboard.sourceFileHashes[input.source] = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+		input.workboard.taskInventory[0].sourceCheckboxState = 'IN_PROGRESS';
+		const result = auditWorkboardSourceBindingsV1(input);
+		assert.equal(result.status, 'VERIFIED');
+		assert.equal(result.rows[0].status, 'SOURCE_REFERENCE_CURRENT');
+		assert.equal(result.rows[0].sourceCheckboxState, 'IN_PROGRESS');
+	} finally { rmSync(input.repoRoot, { recursive: true, force: true }); }
+});
+
 test('reports a stale source-file digest without treating it as current', () => {
 	const input = fixture();
 	try {
@@ -82,5 +96,36 @@ test('accepts secondary sveltekit-frontend/openspec/changes/<change>/tasks.md ro
 		assert.equal(result.status, 'VERIFIED');
 		assert.equal(result.rows.length, 2);
 		assert.equal(result.rows[1].status, 'SOURCE_REFERENCE_CURRENT');
+	} finally { rmSync(input.repoRoot, { recursive: true, force: true }); }
+});
+
+test('verifies exact task bindings in the five additional cohort roots and all supported checklist markers', () => {
+	const input = fixture();
+	try {
+		const rows = [
+			['openspec/specs/openspec/changes/spec-mirror/tasks.md', '* [ ] Spec-root task.'],
+			['parent-atlas-qas-bundle/openspec/changes/qas/tasks.md', '+ [ ] QAS-root task.'],
+			['parent-atlas-rtx-gpu-lab/openspec/tasks.md', '- [ ] RTX-root task.'],
+			['parent-atlas-tensor-residency-integration/openspec/changes/tensor/tasks.md', '* [ ] Tensor-root task.'],
+			['parent-atlas-graph-runtime-enhancement/openspec/tasks.md', '+ [ ] Graph-root task.'],
+		];
+		for (const [source, taskLine] of rows) {
+			const filePath = path.join(input.repoRoot, ...source.split('/'));
+			mkdirSync(path.dirname(filePath), { recursive: true });
+			const bytes = Buffer.from(`# Root\n${taskLine}\n`);
+			writeFileSync(filePath, bytes);
+			input.workboard.sourceFileHashes[source] = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+			input.workboard.taskInventory.push({
+				taskKey: `${path.basename(path.dirname(filePath))}:2`,
+				source,
+				line: 2,
+				text: taskLine.replace(/^\s*[-*+]\s*\[[ xX~]\]\s+/, ''),
+				sourceCheckboxState: 'OPEN',
+			});
+		}
+		const result = auditWorkboardSourceBindingsV1(input);
+		assert.equal(result.status, 'VERIFIED');
+		assert.equal(result.rows.length, rows.length + 1);
+		assert.ok(result.rows.every((row) => row.status === 'SOURCE_REFERENCE_CURRENT'));
 	} finally { rmSync(input.repoRoot, { recursive: true, force: true }); }
 });

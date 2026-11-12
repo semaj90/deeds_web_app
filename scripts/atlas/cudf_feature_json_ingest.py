@@ -14,6 +14,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -227,6 +228,54 @@ def ingest_feature_records(records: list[dict[str, Any]], use_gpu: bool = True) 
         "total_token_budget": total_budget,
         "total_allocated_tokens": total_allocated,
         "elapsed_ms": elapsed_ms,
+    }
+
+
+ENGRAM_DESCRIPTOR_SCHEMA = "atlas.engram-token-descriptor.v1"
+_SHA256_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
+
+
+def build_engram_token_descriptor(record: dict[str, Any]) -> dict[str, Any]:
+    """Bounded JSON descriptor for one record's engram token. Descriptor only, never identity.
+
+    Fails closed: a missing or malformed packetKey, sourceRef, sourceRevision or workspaceRevision
+    yields status REJECTED with reasons, never a defaulted value. An unresolved SOM cell or
+    domain bucket yields UNRESOLVED (engramTokenId None). Carries no vectors or bulk arrays.
+    canonicalAuthority is always False.
+    """
+    reasons: list[str] = []
+    packet_key = record.get("packetKey")
+    source_ref = record.get("sourceRef")
+    source_rev = record.get("sourceRevision")
+    workspace_rev = record.get("workspaceRevision")
+    if not isinstance(packet_key, str) or not packet_key.strip():
+        reasons.append("MISSING_PACKET_KEY")
+    if not isinstance(source_ref, str) or not source_ref.strip():
+        reasons.append("MISSING_SOURCE_REF")
+    if not isinstance(source_rev, str) or not _SHA256_RE.match(source_rev):
+        reasons.append("SOURCE_REVISION_NOT_SHA256")
+    if not isinstance(workspace_rev, str) or not workspace_rev.strip() or workspace_rev.strip() in ("0", "sha256:0"):
+        reasons.append("WORKSPACE_REVISION_NOT_ADMITTED")
+
+    token = engram_token_id(record.get("somRow"), record.get("somCol"), record.get("domainBucket"))
+    if reasons:
+        status = "REJECTED"
+    elif token is None:
+        status = "UNRESOLVED"
+        reasons.append("ENGRAM_AXIS_UNRESOLVED")
+    else:
+        status = "RESOLVED"
+    return {
+        "schema": ENGRAM_DESCRIPTOR_SCHEMA,
+        "status": status,
+        "reasons": reasons,
+        "packetKey": packet_key if isinstance(packet_key, str) else None,
+        "sourceRef": source_ref if isinstance(source_ref, str) else None,
+        "sourceRevision": source_rev if isinstance(source_rev, str) else None,
+        "workspaceRevision": workspace_rev if isinstance(workspace_rev, str) else None,
+        "engramTokenId": token if status == "RESOLVED" else None,
+        "engramTokenCount": ENGRAM_TOKEN_COUNT,
+        "canonicalAuthority": False,
     }
 
 

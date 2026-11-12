@@ -9,10 +9,12 @@ import {
   buildAgenticRagContext,
   buildAgenticRagContextLive,
   buildLiveAtlasContext,
+  buildRecommendation,
   callTraceTool,
   buildCodebaseFileLookupKeys,
   collapseDependencyRows,
   findDependencies,
+  assertOutcomeReceiptScratchUrl,
   recommendKanbanDagPrefillAlgorithm,
   validateToolCallArguments,
   dispatch,
@@ -39,6 +41,30 @@ test('MCP call arguments are validated against the exact schema advertised by to
   }, 2);
   assert.equal(validCall.isError, undefined);
   assert.equal(JSON.parse(validCall.content[0].text).intent, 'repair');
+});
+
+test('outcome receipt persistence accepts only an explicit loopback scratch database', () => {
+  assert.equal(
+    assertOutcomeReceiptScratchUrl('postgresql://atlas:secret@127.0.0.1:5434/legal_ai_live_integration_scratch').databaseName,
+    'legal_ai_live_integration_scratch',
+  );
+  assert.throws(
+    () => assertOutcomeReceiptScratchUrl('postgresql://atlas:secret@127.0.0.1:5434/legal_ai_db'),
+    /OUTCOME_RECEIPT_DATABASE_MUST_BE_LOOPBACK_SCRATCH/,
+  );
+  assert.throws(
+    () => assertOutcomeReceiptScratchUrl('postgresql://atlas:secret@127.0.0.1:5434/another_scratch'),
+    /OUTCOME_RECEIPT_DATABASE_MUST_BE_LOOPBACK_SCRATCH/,
+  );
+  assert.throws(
+    () => assertOutcomeReceiptScratchUrl('postgresql://atlas:secret@127.0.0.1:5432/legal_ai_live_integration_scratch'),
+    /OUTCOME_RECEIPT_DATABASE_MUST_BE_LOOPBACK_SCRATCH/,
+  );
+  assert.throws(
+    () => assertOutcomeReceiptScratchUrl('postgresql://atlas:secret@example.test:5434/legal_ai_scratch'),
+    /OUTCOME_RECEIPT_DATABASE_MUST_BE_LOOPBACK_SCRATCH/,
+  );
+  assert.throws(() => assertOutcomeReceiptScratchUrl(''), /OUTCOME_RECEIPT_DATABASE_URL_REQUIRED/);
 });
 
 test('Kanban DAG recommender fetches the exact bounded OpenSpec cohort and returns proposal-only selection', async () => {
@@ -86,6 +112,12 @@ test('Kanban DAG recommender tool rejects non-cohort scope and appears in the ad
   assert.equal(validateToolCallArguments('recommend_kanban_dag_prefill_algorithm', {
     featureId: 'openspec:parent-atlas-agentic-file-compiler',
     maxPrefillTasks: 33,
+  }).valid, false);
+  assert.equal(validateToolCallArguments('recommend_kanban_dag_prefill_algorithm', {
+    featureId: 'nextsteps:sveltekit-frontend-next-steps-plans-bitfrost-turboquant-turbovec-production-todo',
+  }).valid, true);
+  assert.equal(validateToolCallArguments('recommend_kanban_dag_prefill_algorithm', {
+    featureId: 'nextsteps:../legal_ai_db',
   }).valid, false);
   const listed = await dispatch('tools/list', {}, 1);
   assert.ok(listed.tools.some((tool) => tool.name === 'recommend_kanban_dag_prefill_algorithm'));
@@ -323,12 +355,12 @@ function fakeTrace(script) {
   trace.calls = calls;
   return trace;
 }
-const hit = (id, p, score, content = 'snippet text') => ({ id, path: p, score, content, lenses: [] });
-const packet = (key, ref, sha) => ({ packet_key: key, source_ref: ref, feature_id: 'f', sha256: sha ?? null });
+const hit = (id, p, score, content = 'snippet text', sources = []) => ({ id, path: p, score, content, sources, lenses: [] });
+const packet = (key, ref, sha) => ({ packet_key: key, source_ref: ref, feature_id: 'f', sha256: sha ?? null, identity_lane: 'canonical' });
 
 test('live cards are query-specific, deduplicated per file, ordered by score and bound to packet identity', async () => {
   const trace = fakeTrace({
-    'atlas.query': () => [hit('c1', 'src/a.ts', 0.4, 'a one'), hit('c2', 'sveltekit-frontend/src/b.ts', 0.9, 'b best'), hit('c3', 'src/a.ts', 0.7, 'a better')],
+    'search.hybrid': () => ({ results: [hit('c1', 'src/a.ts', 0.4, 'a one'), hit('c2', 'sveltekit-frontend/src/b.ts', 0.9, 'b best'), hit('c3', 'src/a.ts', 0.7, 'a better')] }),
     'atlas.packet_search': ({ source_ref }) => ({ packets: source_ref === 'src/a.ts' ? [packet('packet:aaa', 'src/a.ts')] : [packet('packet:b1', 'src/b.ts'), packet('ace:packet:b2', 'sveltekit-frontend/src/b.ts')] }),
   });
   const result = await buildLiveAtlasContext({ query: 'who owns persistence', maxCards: 10 }, { trace });
@@ -355,9 +387,65 @@ test('live cards are query-specific, deduplicated per file, ordered by score and
   assert.match(result.promptPacket, /packet: unbound/);
 });
 
+test('live cards retain Qdrant provenance when a lower-scoring semantic hit follows an FTS hit', async () => {
+  const trace = fakeTrace({
+    'search.hybrid': () => ({ results: [
+      hit('fts-1', 'scripts/atlas/owner.mjs', 0.9, 'lexical snippet', ['postgres_fts']),
+      hit('packet:semantic-1', 'scripts/atlas/owner.mjs', 0.6, 'semantic snippet', ['qdrant']),
+    ] }),
+    'atlas.packet_search': ({ source_ref }) => ({ packets: [{
+      packet_key: 'packet:owner', source_ref, source_revision: `sha256:${'c'.repeat(64)}`, identity_lane: 'canonical',
+    }] }),
+  });
+  const result = await buildLiveAtlasContext({ query: 'owner' }, { trace });
+  assert.equal(result.cards.length, 1);
+  assert.equal(result.cards[0].score, 0.9);
+  assert.deepEqual(result.cards[0].retrievalSources, ['postgres_fts', 'qdrant']);
+  assert.equal(result.cards[0].identityBound, true);
+});
+
+test('build_recommendation queries live retrieval and only returns revision-bound source targets', async () => {
+  const trace = fakeTrace({
+    'search.hybrid': ({ query }) => ({ results: [hit('chunk-1', 'scripts/atlas/owner.mjs', 0.91, `evidence for ${query}`, ['postgres_fts', 'qdrant'])] }),
+    'atlas.packet_search': ({ source_ref }) => ({ packets: [{
+      packet_key: 'packet:grounded1', source_ref, source_revision: 'sha256:' + 'a'.repeat(64),
+      workspace_revision: 'sha256:' + 'b'.repeat(64), sha256: 'a'.repeat(64),
+      identity_lane: 'canonical',
+    }] }),
+  });
+  const result = await buildRecommendation({
+    intent: 'repair', domain: 'retrieval', errorSummary: 'repair lookup',
+    evidenceLines: ['caller supplied unverified claim'], patchTargets: ['../../invented.ts'], proposedFix: 'untrusted',
+  }, { trace });
+  assert.equal(trace.calls[0].name, 'search.hybrid');
+  assert.deepEqual(result.patch_targets, ['scripts/atlas/owner.mjs']);
+  assert.equal(result.evidence[0].source_revision, 'sha256:' + 'a'.repeat(64));
+  assert.equal(result.evidence[0].source_sha256, 'a'.repeat(64));
+  assert.deepEqual(result.evidence[0].retrieval_sources, ['postgres_fts', 'qdrant']);
+  assert.equal(result.proposed_fix, null);
+  assert.equal(result.canonicalAuthority, false);
+  assert.ok(!JSON.stringify(result).includes('caller supplied unverified claim'));
+});
+
+test('live binding ignores Qdrant chunk locators when one exact canonical packet is present', async () => {
+  const canonical = { ...packet('packet:canonical', 'src/owner.ts', 'a'.repeat(64)), source_revision: `sha256:${'a'.repeat(64)}` };
+  const retrievalLocator = { packet_key: 'ace:packet:qdrant', source_ref: 'src/owner.ts', identity_lane: 'qdrant_chunk' };
+  const trace = fakeTrace({
+    'search.hybrid': () => ({ results: [hit('qdrant:chunk-1', 'src/owner.ts', 0.9, 'hybrid hit', ['qdrant'])] }),
+    'atlas.packet_search': () => ({ packets: [retrievalLocator, canonical] }),
+  });
+  const result = await buildLiveAtlasContext({ query: 'owner', maxCards: 1 }, { trace });
+  assert.equal(result.cards[0].identityBound, true);
+  assert.equal(result.cards[0].canonicalPacketCount, 1);
+  assert.equal(result.cards[0].matchingPacketCount, 2);
+  assert.deepEqual(result.cards[0].packetKeys, ['packet:canonical']);
+  assert.deepEqual(result.cards[0].retrievalSources, ['qdrant']);
+  assert.ok(!result.cards[0].rejectionReasons.includes('IDENTITY_CONFLICT'));
+});
+
 test('different queries produce different candidate sets (the 01B failure no longer reproduces)', async () => {
   const trace = fakeTrace({
-    'atlas.query': ({ query }) => (/hearsay/.test(query) ? [hit('l1', 'src/evidence-rules.ts', 0.8)] : [hit('g1', 'src/graphify-writer.ts', 0.8)]),
+    'search.hybrid': ({ query }) => ({ results: [/hearsay/.test(query) ? hit('l1', 'src/evidence-rules.ts', 0.8) : hit('g1', 'src/graphify-writer.ts', 0.8)] }),
     'atlas.packet_search': () => ({ packets: [] }),
   });
   const legal = await buildLiveAtlasContext({ query: 'hearsay admissibility' }, { trace });
@@ -367,7 +455,7 @@ test('different queries produce different candidate sets (the 01B failure no lon
 
 test('a failed identity lookup leaves that card unbound but keeps it; a missing packet is IDENTITY_UNBOUND', async () => {
   const trace = fakeTrace({
-    'atlas.query': () => [hit('c1', 'src/a.ts', 0.5), hit('c2', 'src/b.ts', 0.4)],
+    'search.hybrid': () => ({ results: [hit('c1', 'src/a.ts', 0.5), hit('c2', 'src/b.ts', 0.4)] }),
     'atlas.packet_search': ({ source_ref }) => {
       if (source_ref === 'src/a.ts') throw Object.assign(new Error('timeout'), { code: 'TRACE_TIMEOUT' });
       return { packets: [] };
@@ -382,7 +470,7 @@ test('a failed identity lookup leaves that card unbound but keeps it; a missing 
 });
 
 test('a packet content checksum does not satisfy source revision, and proofUsable stays false', async () => {
-  const trace = fakeTrace({ 'atlas.query': () => [hit('c1', 'src/a.ts', 0.5)], 'atlas.packet_search': () => ({ packets: [packet('packet:aaa', 'src/a.ts', 'abc123')] }) });
+  const trace = fakeTrace({ 'search.hybrid': () => ({ results: [hit('c1', 'src/a.ts', 0.5)] }), 'atlas.packet_search': () => ({ packets: [packet('packet:aaa', 'src/a.ts', 'abc123')] }) });
   const result = await buildLiveAtlasContext({ query: 'q' }, { trace });
   assert.ok(result.cards[0].rejectionReasons.includes('MISSING_SOURCE_REVISION'));
   assert.equal(result.cards[0].proofUsable, false);
@@ -398,7 +486,7 @@ test('only an explicit source revision field removes MISSING_SOURCE_REVISION', a
     byte_start: 12,
     byte_end: 32,
   };
-  const trace = fakeTrace({ 'atlas.query': () => [hit('c1', 'src/a.ts', 0.5)], 'atlas.packet_search': () => ({ packets: [sourcePacket] }) });
+  const trace = fakeTrace({ 'search.hybrid': () => ({ results: [hit('c1', 'src/a.ts', 0.5)] }), 'atlas.packet_search': () => ({ packets: [sourcePacket] }) });
   const result = await buildLiveAtlasContext({ query: 'q' }, { trace });
   assert.ok(!result.cards[0].rejectionReasons.includes('MISSING_SOURCE_REVISION'));
   assert.deepEqual(result.cards[0].packetBindings, [{
@@ -413,7 +501,7 @@ test('only an explicit source revision field removes MISSING_SOURCE_REVISION', a
 });
 
 test('no hits is a successful live answer with a warning, a domain filter is reported as not applied', async () => {
-  const trace = fakeTrace({ 'atlas.query': () => [], 'atlas.packet_search': () => ({ packets: [] }) });
+  const trace = fakeTrace({ 'search.hybrid': () => ({ results: [] }), 'atlas.packet_search': () => ({ packets: [] }) });
   const result = await buildLiveAtlasContext({ query: 'nothing matches', domainFilter: 'legal' }, { trace });
   assert.equal(result.ok, true);
   assert.equal(result.totalCards, 0);
@@ -425,7 +513,7 @@ test('no hits is a successful live answer with a warning, a domain filter is rep
 
 test('the payload budget truncates cards and says so', async () => {
   const many = Array.from({ length: 20 }, (_, i) => hit(`c${i}`, `src/file-${i}.ts`, 1 - i / 100, 'x'.repeat(400)));
-  const trace = fakeTrace({ 'atlas.query': () => many, 'atlas.packet_search': () => ({ packets: [] }) });
+  const trace = fakeTrace({ 'search.hybrid': () => ({ results: many }), 'atlas.packet_search': () => ({ packets: [] }) });
   const result = await buildLiveAtlasContext({ query: 'q', maxPayloadBytes: 4096 }, { trace });
   assert.equal(result.payloadTruncated, true);
   assert.ok(result.payloadBytes <= 4096);
@@ -486,7 +574,7 @@ test('when live search fails it returns no static fallback evidence and names th
 
 test('disableLive returns no evidence without calling TRACE, and live success is explicitly non-fallback', async () => {
   let called = 0;
-  const trace = async (name) => { called += 1; return name === 'atlas.query' ? [hit('c1', 'src/a.ts', 0.5)] : { packets: [] }; };
+  const trace = async (name) => { called += 1; return name === 'search.hybrid' ? { results: [hit('c1', 'src/a.ts', 0.5)] } : { packets: [] }; };
   const disabled = await withPacketCwd(() => {}, () => buildAgenticRagContextLive({ query: 'q' }, { trace, disableLive: true }));
   assert.equal(called, 0);
   assert.equal(disabled.liveRetrieval.failure, 'LIVE_DISABLED');

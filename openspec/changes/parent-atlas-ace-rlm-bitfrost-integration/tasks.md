@@ -14696,7 +14696,7 @@ TOOL-SELECT-01 is gated by TOOL-MANIFEST-01, PIPE-DENSE-01 = MEM-DENSE-01 plus t
   with `routingEnabled=false`; deterministic manifest/ordinal/embedding-input checksums reproduced twice; resolve canonical registry identity first;
   NO Qdrant write in this gate. Only after the real runtime path above is known.
 - [ ] SYSTEM-PROMPT-01 Replace the stale "Gemma4 Legal-AI Code Agent" identity in `.opencode/system.md` with Ornith (after CTX-E2E-01, so the baseline is
-  not disturbed mid-measurement).
+  not disturbed mid-measurement). <!-- wfu: depends=CTX-E2E-01 -->
 - [ ] GPU-PROJ-01 stage 2 Extend `parent-atlas-gpu-compute-lanes-consolidation` (no parallel change): classify centroid/KMeans/PCA/pgvector HNSW/cuVS/CAGRA/
   cuBLASLt/CUTLASS/TensorRT implementations; reuse CandidateOrdinalMap, representation DAG, graph snapshot, SOM coordinate and GPU residency owners; only then
   define missing typed projection/execution receipts.

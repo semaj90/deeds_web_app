@@ -17,6 +17,7 @@
  *   await worker.start();
  */
 import type { EvidenceSynthesisResultV1 } from '../evidence/synthesis/evidence-synthesis-v1.js';
+import type { AnalysisJobProgressStageV1 } from '$lib/server/analysis/analysis-job-progress-events-v1.js';
 import { ENV } from '$lib/server/env.server.js';
 
 type QueueName =
@@ -474,7 +475,7 @@ export class EvidenceProcessWorker extends QueueWorker<{
 		metadata?: Record<string, unknown>;
 		sourceRevision?: string;
 		skipEmbedding?: boolean;
-	}): Promise<{ chunkCount: number; persistedCount: number; sourceRevision: string; synthesis?: EvidenceSynthesisResultV1 } | null> {
+	}, onProgress?: (stage: AnalysisJobProgressStageV1) => Promise<void> | void): Promise<{ chunkCount: number; persistedCount: number; sourceRevision: string; synthesis?: EvidenceSynthesisResultV1 } | null> {
 		let processedText = data.text;
 		let sourceBytes: Buffer | undefined;
 		let extractionMethod: string | undefined;
@@ -499,6 +500,7 @@ export class EvidenceProcessWorker extends QueueWorker<{
 			ENV.SEAWEED_EVIDENCE_BUCKET;
 
 		if (objectKey) {
+			await onProgress?.('source_fetch');
 			if (
 				bucket !== ENV.SEAWEED_EVIDENCE_BUCKET ||
 				!objectKey.startsWith('evidence/') ||
@@ -530,6 +532,7 @@ export class EvidenceProcessWorker extends QueueWorker<{
 						: failed.code
 				);
 			}
+			await onProgress?.('text_extraction');
 			const extracted = await processDocument({
 				buffer: sourceBytes,
 				fileName:
@@ -563,6 +566,7 @@ export class EvidenceProcessWorker extends QueueWorker<{
 
     const { extractEntities } = await import('$lib/server/analysis/entity-extraction.js');
     const { detectForensicPatterns } = await import('$lib/server/analysis/forensics.js');
+		await onProgress?.('content_analysis');
 
     const [entities, forensics] = await Promise.all([
       extractEntities(processedText).catch(() => []),
@@ -575,6 +579,7 @@ export class EvidenceProcessWorker extends QueueWorker<{
     const { processEvidenceDocumentCanonicalV1 } = await import(
       '$lib/server/evidence/process-evidence-document-v1.js'
     );
+		await onProgress?.('canonical_indexing');
 		const safeMetadata = { ...meta };
 		delete safeMetadata.objectKey;
 		delete safeMetadata.object_name;

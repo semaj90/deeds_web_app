@@ -1,0 +1,101 @@
+{
+  "schema": "atlas.wfu09-task-block-history-feature-ranker-eval.v1",
+  "generatedAt": "2026-11-09T18:28:23.671Z",
+  "workspaceRevision": "ef1e28f984d8dbcf5bd07bb3c2629c537135fc73",
+  "canonicalAuthority": false,
+  "rankingQualityProven": false,
+  "gpuUsed": false,
+  "execution": {
+    "python": "/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python",
+    "pythonVersion": "3.14.6",
+    "pytorchVersion": "2.13.0+cu130",
+    "cudaRuntime": "13.0",
+    "cudaVisibleDevices": "-1",
+    "device": "cpu"
+  },
+  "feature": {
+    "name": "taskBlockAgeSeconds",
+    "basis": "DERIVED_FROM_GIT_BLAME_COMMITTER_TIME",
+    "coverage": 0.9938935026868588,
+    "present": 4069,
+    "actionable": 4094,
+    "distinctValues": 255,
+    "missing": 25,
+    "orientation": {
+      "rankerSign": -1,
+      "meaning": "The advisory ranker currently favors smaller taskBlockAgeSeconds values (more recent task-block edits). This preference is an unvalidated policy assumption, not an outcome finding."
+    }
+  },
+  "comparison": {
+    "baseline": {
+      "features": [
+        "goalRank",
+        "selectionEligible"
+      ],
+      "n": 4094,
+      "meanAbsoluteRankDelta": 534.48,
+      "topKOverlap": {
+        "10": 4,
+        "50": 17,
+        "200": 88,
+        "500": 220
+      },
+      "eligibleForAuthority": false,
+      "semanticChecksum": "aa51c0259b1912166848d977287c9740efbdc066007859772022f3709d9bf83a"
+    },
+    "withHistoryFeature": {
+      "features": [
+        "goalRank",
+        "selectionEligible",
+        "taskBlockAgeSeconds"
+      ],
+      "n": 4094,
+      "meanAbsoluteRankDelta": 923.3,
+      "topKOverlap": {
+        "10": 0,
+        "50": 1,
+        "200": 23,
+        "500": 112
+      },
+      "eligibleForAuthority": false,
+      "semanticChecksum": "9083487f482654a7504a43a5982244fa2a55e776c279c79888abd0ac78bf4b15"
+    },
+    "interpretation": "The history feature creates a materially different advisory ordering and reduces overlap with deterministic rank. Without reviewed task outcomes or relevance labels this is not evidence of better or worse task quality; it remains non-authoritative."
+  },
+  "inputs": {
+    "docs/reports/wfu09-task-block-history-feature-audit-v1.json": "55667cdc96df3a1b3b5cfaf3543a96f22208c99baa203c0b4a2fae3e44401d6c",
+    "scripts/atlas/audit-task-block-history-feature-v1.mjs": "eff745c6391b2cd66b3b7828426b8eb4e78a8415f251fba66651105830d72754",
+    "scripts/atlas/adapt-openspec-controller-to-ranker-v3.mjs": "bf02a31ac19812f9635badf0318837d609b14647b399f6c73a3f864cbf3db7fb",
+    "python/build_low_rank_task_recommendation_v2.py": "4f763279664a3ce086141a4fc9aae5032a2f98b0ac40f194e38cfd1ac0d3de1f",
+    ".tmp/atlas/wfu09-history-baseline-v1/actionable-workboard-v3.json": "f3ce5fe28b4487b1e9fa6257530c0ecc377e8bf093cd4f79485874da82ae9cf0",
+    ".tmp/atlas/wfu09-history-actionable-v3.json": "a51c258531b37ee7e4c0059cea05b5d7e525d634ebbe0432c97a399abaf80354",
+    ".tmp/atlas/wfu09-history-baseline-v1/low-rank-task-recommendation-v2.json": "2760ab116236509a4b511aa0d0705fa606afff436cf88c7c87ee55ad7adc0410",
+    ".tmp/atlas/wfu09-history-tournament-v1/low-rank-task-recommendation-v2.json": "8d8383cd3b684726ab3254ac53d729b7a8310ddee0096e4d81f27c3ef1de0fd4",
+    ".tmp/atlas/wfu09-history-baseline-v1/openspec-challenger-tournament-v1.json": "31151994feaa81a0653b14e41df0476cccb247cbd7c4c270ea51fac9c54d21ff",
+    ".tmp/atlas/wfu09-history-tournament-v1/openspec-challenger-tournament-v1.json": "7a0e459e318743b58c64744fe6c7f6ca7c3e7302b67afdfc0af8cdb59978d648"
+  },
+  "writes": {
+    "canonicalStores": false,
+    "database": 0,
+    "cache": 0,
+    "gpu": 0,
+    "canonicalTaskState": 0,
+    "localArtifactsCreated": 10,
+    "temporaryRankingArtifacts": 8,
+    "durableReportsCreated": 2
+  },
+  "independenceDiagnostics": {
+    "cohortRows": 4069,
+    "pearsonWithGoalRank": 0.1519,
+    "spearmanWithGoalRank": 0.1506,
+    "spearmanWithDeterministicRank": 0.1532,
+    "interpretation": "Weak positive association; this shows the signal is not a copy of priority/rank but does not establish usefulness."
+  },
+  "structuralParity": {
+    "taskCount": 4094,
+    "legacyTaskFieldMismatches": 0,
+    "rankChanges": 0,
+    "taskIdSetChanges": 0,
+    "featureVectorAdditive": true
+  }
+}

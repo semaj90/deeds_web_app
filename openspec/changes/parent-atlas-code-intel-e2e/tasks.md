@@ -224,14 +224,14 @@ dependency chain (source → symbol → AST/LSP → graph → retrieval → Cont
       authority (parser/LSP observation ≠ canonical identity, per the Parent Atlas Frozen Identity
       Contract). Depends on AST-LIVE-JOIN-01 existing as a comparison baseline.
 
-- [ ] **CODE-IMPACT-01** — For one bounded symbol, return: definition, references, callers,
+- [ ] **CODE-IMPACT-01** — For one bounded symbol, return: definition, references, callers, <!-- wfu: depends=SOURCE-SYMBOL-AUTHORITY-01,AST-LIVE-JOIN-01 -->
       callees, imports/includes, semantic neighbors — each with exact evidence refs (source_ref +
       source_revision + byte_start/byte_end, not inferred). Depends on SOURCE-SYMBOL-AUTHORITY-01
       and AST-LIVE-JOIN-01. Before implementing: check `parent-atlas-graph-retrieval-proof` and
       `parent-atlas-unified-symbol-ranking` (already closed) for reusable pieces — do not rebuild a
       call/reference graph traversal that already exists.
 
-- [ ] **MCP-CODE-INTEL-01** — Expose `CODE-IMPACT-01`'s result through one existing MCP tool owner
+- [ ] **MCP-CODE-INTEL-01** — Expose `CODE-IMPACT-01`'s result through one existing MCP tool owner <!-- wfu: depends=CODE-IMPACT-01 -->
       (do not add a new MCP server — this repo already has 108+ registered TRACE MCP tools; extend
       one, per this file's own Duplication Prevention rule #5: "new agent-facing capabilities
       register in ACP, not just HTTP"). Depends on CODE-IMPACT-01.

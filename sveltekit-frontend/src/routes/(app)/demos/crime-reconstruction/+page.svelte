@@ -45,7 +45,8 @@
   }
 
   // ── WebGPU state ──────────────────────────────────────────────────────────
-  let canvas: HTMLCanvasElement;
+  let canvas: HTMLCanvasElement | null = null;
+  let disposed = false;
   let gpuDevice: GPUDevice | null = null;
   let gpuContext: GPUCanvasContext | null = null;
   let renderPipeline: GPURenderPipeline | null = null;
@@ -110,6 +111,7 @@
 
     const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
     if (!adapter) { gpuError = 'No WebGPU adapter'; return; }
+    if (disposed || !canvas?.isConnected) return;
 
     gpuDevice = await adapter.requestDevice({
       requiredLimits: {
@@ -117,8 +119,14 @@
         maxBufferSize: adapter.limits.maxBufferSize,
       },
     });
+    if (disposed || !canvas?.isConnected) {
+      gpuDevice.destroy();
+      gpuDevice = null;
+      return;
+    }
 
     gpuContext = canvas.getContext('webgpu') as GPUCanvasContext;
+    if (!gpuContext) { gpuError = 'Could not initialize the WebGPU canvas'; return; }
     const format = navigator.gpu.getPreferredCanvasFormat() as GPUTextureFormat;
     gpuContext.configure({ device: gpuDevice, format, alphaMode: 'premultiplied' });
 
@@ -129,6 +137,7 @@
     });
 
     await buildPointCloudPipeline(format);
+    if (disposed || !canvas?.isConnected || !gpuDevice) return;
     gpuReady = true;
     scheduleRender();
   }
@@ -175,16 +184,23 @@
   let depthTexture: GPUTexture | null = null;
 
   function scheduleRender() {
+    if (disposed || !canvas?.isConnected) return;
     animFrame = requestAnimationFrame(renderFrame);
   }
 
   function renderFrame() {
+    // Route navigation can destroy the bound canvas while async WebGPU setup is
+    // still resolving. Stop the loop before reading canvas dimensions or textures.
+    if (disposed || !canvas?.isConnected) return;
     if (!gpuDevice || !gpuContext || !pointCloudPipeline || !cameraBuffer) {
       scheduleRender(); return;
     }
 
     const w = canvas.width;
     const h = canvas.height;
+    if (w <= 0 || h <= 0) {
+      scheduleRender(); return;
+    }
 
     // Rebuild depth texture if canvas resized
     if (!depthTexture || depthTexture.width !== w || depthTexture.height !== h) {
@@ -525,12 +541,16 @@
   // ─────────────────────────────────────────────────────────────────────────
 
   onMount(() => {
+    if (!canvas) return;
     canvas.width  = canvas.clientWidth  * devicePixelRatio;
     canvas.height = canvas.clientHeight * devicePixelRatio;
-    initWebGPU();
+    void initWebGPU().catch((error) => {
+      if (!disposed) gpuError = error instanceof Error ? error.message : String(error);
+    });
   });
 
   onDestroy(() => {
+    disposed = true;
     cancelAnimationFrame(animFrame);
     clearInterval(playTimer);
     revokeSample?.();

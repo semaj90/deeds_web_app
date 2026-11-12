@@ -44,6 +44,9 @@ test('a real case board opens local image and mesh preflight without writing cas
 	await expect(page.getByTestId('preflight-uv-textures')).toContainText('1 generated UV channel');
 	await expect(page.getByTestId('preflight-uv-textures')).toContainText('1 original-image texture attached · not atlas-baked');
 	await expect(page.getByTestId('preflight-file-path')).toContainText('test-poi-photo.png');
+	await expect(page.getByText(/Single-image relief is a 2\.5D demonstrative hypothesis/)).toBeVisible();
+	await expect(page.getByText(/original color image is attached through generated UVs; this is not a newly baked texture atlas/)).toBeVisible();
+	await expect(page.getByText(/visual quality and case provenance need separate review/)).toBeVisible();
 	const preflightFile = (await page.getByTestId('preflight-file').textContent()) ?? '';
 	const preflightFilePath = (await page.getByTestId('preflight-file-path').textContent()) ?? '';
 	const preflightUvTextures = (await page.getByTestId('preflight-uv-textures').textContent()) ?? '';
@@ -69,8 +72,10 @@ test('a real case board opens local image and mesh preflight without writing cas
 	expect(glbBytes.subarray(0, 4).toString('ascii')).toBe('glTF');
 	const exportedGlbBytes = (await stat(glbPath)).size;
 	expect(exportedGlbBytes).toBeGreaterThan(20);
+	expect(exportedGlbBytes).toBeLessThanOrEqual(8 * 1024 * 1024);
 	expect(manifest.objects.filter((object: { kind: string }) => object.kind === 'MESH')).toHaveLength(2);
 	expect(manifest.quality.status).toBe('NOT_ASSESSED');
+	await expect(page.getByTestId('preflight-export')).toContainText('GLB SHA-256');
 	expect(manifest.assets.some((asset: { role: string }) => ['DERIVED', 'LOD'].includes(asset.role))).toBe(true);
 	const receipt = {
 		schema: 'parent-atlas.board-precase-preflight-receipt.v1',
@@ -105,7 +110,8 @@ test('a real case board opens local image and mesh preflight without writing cas
 			unexpectedNonReadRequests: nonReadRequests.filter((request) => !request.includes('/api/analytics/events') && !request.includes('/api/errors/client-report')).length
 		}
 	};
-	const receiptPath = resolve(process.cwd(), '../.tmp/atlas/board-precase-preflight-2026-11-07.json');
+	const receiptDate = receipt.createdAt.slice(0, 10);
+	const receiptPath = resolve(process.cwd(), `../.tmp/atlas/board-precase-preflight-${receiptDate}.json`);
 	await mkdir(dirname(receiptPath), { recursive: true });
 	await writeFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
 	await testInfo.attach('board-precase-preflight-receipt.json', { path: receiptPath, contentType: 'application/json' });

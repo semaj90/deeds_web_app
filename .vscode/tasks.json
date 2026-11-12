@@ -405,6 +405,15 @@
   ],
   "tasks": [
     {
+      "label": "🔧 C++: clang++ current file (VS 2022 env)",
+      "type": "shell",
+      "command": "${workspaceFolder}\\scripts\\dev\\clang-vs.bat",
+      "args": ["${file}", "${fileDirname}\\${fileBasenameNoExtension}.exe"],
+      "group": { "kind": "build", "isDefault": false },
+      "problemMatcher": ["$gcc"],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
       "label": "🤖 LangGraph NATS Worker",
       "type": "shell",
       "command": "node scripts/startup/ensure-nats-langgraph.mjs",
@@ -2454,7 +2463,7 @@
     {
       "label": "🧪 Startup: GPU Bridge Probe (G18)",
       "type": "shell",
-      "command": "node scripts/startup-gpu-bridge-probe.mjs 2>&1 | Tee-Object -FilePath logs/task-output/gpu-bridge-probe-startup.log; if ($LASTEXITCODE -eq 0) { Write-Host '🧪 GPU bridge: addon live + CUDA active' } else { Write-Host '⚠️  GPU bridge: running in CPU fallback — check .tmp/gpu-bridge-probe.json' }",
+      "command": "node scripts/startup-gpu-bridge-probe.mjs 2>&1 | Tee-Object -FilePath logs/task-output/gpu-bridge-probe-startup.log; $probeExit = $LASTEXITCODE; if (Test-Path '.tmp/gpu-bridge-probe.json') { $probe = Get-Content '.tmp/gpu-bridge-probe.json' -Raw | ConvertFrom-Json; $total = $probe.functions.PSObject.Properties.Count; Write-Host \"🧪 GPU bridge probe: $($probe.backend_proven_count)/$total backend-proven; CUDA available=$($probe.cuda_available)\" } else { Write-Host '⚠️  GPU bridge probe report missing' }; if ($probeExit -ne 0) { Write-Host '⚠️  GPU bridge probe reported all-stub or execution failure' }; exit $probeExit",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -2469,7 +2478,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "G18 audit gate: loads tensorrt_bridge.node and checks that ≥10 functions return live results (not NO_LIBTORCH -99 stubs). Writes .tmp/gpu-bridge-probe.json. Exit 0 = CUDA active, exit 1 = CPU-fallback mode. Non-blocking — GPU degradation is a warning, not a blocker."
+      "detail": "Loads tensorrt_bridge.node and reports backend-proven count, shape-only count, stub count, and CUDA availability in .tmp/gpu-bridge-probe.json. Exit 0 means the probe did not find an all-stub bridge; it does not mean CUDA is active or that any minimum function count is proven. Non-blocking — GPU degradation is a warning, not a blocker."
     },
     {
       "label": "🩺 Atlas Smoke: Manual Run (force, foreground)",

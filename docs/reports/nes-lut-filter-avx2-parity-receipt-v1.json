@@ -1,0 +1,135 @@
+{
+  "schema": "atlas.nes-lut-filter-avx2-parity.v1",
+  "generatedAt": "2026-11-09T02:31:12.418Z",
+  "status": "PASS_STANDALONE_HARNESS",
+  "gate": "NLUT-07 / CPU-AVX2-01",
+  "acceptanceStatus": "PARTIAL",
+  "scope": "Standalone scalar/AVX2 filtering and dispatcher harness; does not exercise tensorrt_bridge.node or exact KNN.",
+  "hardware": {
+    "cpuArch": "x64",
+    "avx2Supported": true,
+    "compiler": "MSVC cl.exe /std:c++20 /O2 /arch:AVX2",
+    "gpuClaim": false
+  },
+  "execution": {
+    "command": "cl.exe /nologo /std:c++20 /O2 /arch:AVX2 /EHsc /Fe:simd-bridge\\cpp\\test_nes_lut_filter_avx2.exe simd-bridge\\cpp\\nes_lut_filter_avx2.cpp simd-bridge\\cpp\\test_nes_lut_filter_avx2.cpp; execute test_nes_lut_filter_avx2.exe",
+    "exitCode": 0,
+    "outputSha256": "6baab097a62f0cc1c6ab219478f233806f1111da5e37f791f9daa651fb8dda0c",
+    "binarySha256": "36ca5df6e0b3fe67d74e05631ea6b4bb4a77a1bf0c00b12606d60f29a4d74e4f",
+    "sourceSha256": {
+      "simd-bridge/cpp/nes_lut_filter_avx2.h": "b85bc39c7d00311a3e8f0c2c1ab75521951b425627351d12b7634e57b7dbab6d",
+      "simd-bridge/cpp/nes_lut_filter_avx2.cpp": "f75a9d1d769dfe621301196b2d68f010ef88a67d54efc79d05740e4dadd49b0b",
+      "simd-bridge/cpp/test_nes_lut_filter_avx2.cpp": "ee87145622af5fb30b44701462a015585c7ee6fd125012bbeb125be50be4c34f"
+    }
+  },
+  "invariants": {
+    "bitExactParity": true,
+    "failClosedZeroByte": true,
+    "failClosedOutOfBounds": true,
+    "scalarFallbackExercised": true,
+    "dispatcherVerified": true,
+    "testCasesPassed": 23,
+    "frozenCohortSizesTested": [
+      1,
+      31,
+      32,
+      33,
+      64,
+      100,
+      128,
+      6527
+    ]
+  },
+  "benchmarkSummary": {
+    "diagnosticOnly": true,
+    "note": "Single local run; timings are noisy and are not acceptance-grade performance evidence.",
+    "cohort6527SingleDomainRuns": [
+      {
+        "name": "Cohort 6527 Domain 0x01                 ",
+        "count": 6527,
+        "scalarUs": 11.21,
+        "avx2Us": 0.72,
+        "speedup": 15.55
+      },
+      {
+        "name": "Cohort 6527 Domain 0x02                 ",
+        "count": 6527,
+        "scalarUs": 15.82,
+        "avx2Us": 2.92,
+        "speedup": 5.41
+      },
+      {
+        "name": "Cohort 6527 Domain 0x03                 ",
+        "count": 6527,
+        "scalarUs": 14.77,
+        "avx2Us": 0.72,
+        "speedup": 20.37
+      },
+      {
+        "name": "Cohort 6527 Domain 0x04                 ",
+        "count": 6527,
+        "scalarUs": 15.84,
+        "avx2Us": 0.67,
+        "speedup": 23.56
+      },
+      {
+        "name": "Cohort 6527 Domain 0x05                 ",
+        "count": 6527,
+        "scalarUs": 9.96,
+        "avx2Us": 0.67,
+        "speedup": 14.79
+      },
+      {
+        "name": "Cohort 6527 Domain 0x06                 ",
+        "count": 6527,
+        "scalarUs": 11.78,
+        "avx2Us": 1.57,
+        "speedup": 7.51
+      },
+      {
+        "name": "Cohort 6527 Domain 0x07                 ",
+        "count": 6527,
+        "scalarUs": 7.43,
+        "avx2Us": 0.64,
+        "speedup": 11.56
+      },
+      {
+        "name": "Cohort 6527 Domain 0x08                 ",
+        "count": 6527,
+        "scalarUs": 9.68,
+        "avx2Us": 0.96,
+        "speedup": 10.04
+      },
+      {
+        "name": "Cohort 6527 Domain 0x09                 ",
+        "count": 6527,
+        "scalarUs": 7.93,
+        "avx2Us": 0.5,
+        "speedup": 15.83
+      },
+      {
+        "name": "Cohort 6527 Domain 0x0A                 ",
+        "count": 6527,
+        "scalarUs": 17.9,
+        "avx2Us": 0.58,
+        "speedup": 30.86
+      }
+    ],
+    "cohort6527SingleDomainMeanScalarUs": 12.232000000000003,
+    "cohort6527SingleDomainMeanAvx2Us": 0.9949999999999999,
+    "cohort6527MultiDomainRuns": [
+      {
+        "name": "Cohort 6527 Multi-Domain Mask {0x01, 0x02, 0x03}",
+        "count": 6527,
+        "scalarUs": 20.77,
+        "avx2Us": 1.41,
+        "speedup": 14.77
+      }
+    ]
+  },
+  "sourceFiles": [
+    "simd-bridge/cpp/nes_lut_filter_avx2.h",
+    "simd-bridge/cpp/nes_lut_filter_avx2.cpp",
+    "simd-bridge/cpp/test_nes_lut_filter_avx2.cpp"
+  ]
+}

@@ -6,6 +6,7 @@ export interface ActiveEvidenceUploadV1 {
 	fileName: string;
 	fileSize: number;
 	startedAt: number;
+	caseId?: string | null;
 }
 
 const keyFor = (userId: string) => `atlas:evidence-upload:active:v1:${userId}`;

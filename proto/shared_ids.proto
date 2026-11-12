@@ -50,6 +50,8 @@ message AtlasRequestContextV2 {
   string workspace_revision = 4;
   string packet_key = 5;
   string packet_revision = 6;
+  // Optional exact source revision scope; empty preserves broad retrieval.
+  string source_revision = 7;
 }
 
 // AtlasToolReceipt is an observation projection, not a canonical write owner.
@@ -72,6 +74,8 @@ message AtlasToolReceiptV2 {
   bool writes_performed = 16;
   string receipt_id = 17;
   string receipt_checksum = 18;
+  // Echoes the requested source revision when the request was revision-scoped.
+  string source_revision = 19;
 }
 
 // ArtifactRef is a pointer to a file written under memory/runs/<run_id>/

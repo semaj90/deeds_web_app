@@ -9,6 +9,7 @@ const boardMocks = vi.hoisted(() => ({
   },
   listKanbanTasks: vi.fn(),
   listKanbanTaskEvents: vi.fn(),
+  showKanbanTask: vi.fn(),
   createKanbanTask: vi.fn(),
   claimKanbanTask: vi.fn(),
   heartbeatKanbanTask: vi.fn(),
@@ -25,6 +26,7 @@ import { GET, POST } from './+server.js';
 function makeEvent(options: {
   role?: string;
   userId?: string;
+  sessionId?: string;
   url?: string;
   body?: unknown;
 }) {
@@ -32,6 +34,7 @@ function makeEvent(options: {
   return {
     url,
     locals: {
+      session: options.sessionId ? { id: options.sessionId } : null,
       user: options.role
         ? { id: options.userId ?? 'admin-1', role: options.role }
         : null,
@@ -61,6 +64,18 @@ describe('/api/admin/atlas/kanban-tickets', () => {
       canonicalAuthority: false,
       error: 'ADMIN_ONLY',
     });
+  });
+
+  it('denies Kanban writes from the synthetic development admin', async () => {
+    const res = await POST(makeEvent({
+      role: 'admin',
+      sessionId: 'dev-bypass-session',
+      body: { action: 'agent_dispatch', taskId: 'task-1', workerId: 'worker-1' },
+    }));
+    expect(res.status).toBe(403);
+    expect(await res.json()).toMatchObject({ ok: false, error: 'ADMIN_ONLY' });
+    expect(boardMocks.claimKanbanTask).not.toHaveBeenCalled();
+    expect(boardMocks.completeKanbanTask).not.toHaveBeenCalled();
   });
 
   it('lists kanban tasks and recent events for admin GET', async () => {
@@ -100,6 +115,36 @@ describe('/api/admin/atlas/kanban-tickets', () => {
     expect(body.canonicalAuthority).toBe(false);
   });
 
+  it('looks up one exact ticket and its events without listing or mutating the board', async () => {
+    boardMocks.showKanbanTask.mockResolvedValue({ taskId: 'openspec:topk#abc123' });
+    boardMocks.listKanbanTaskEvents.mockResolvedValue([{ id: 'event-1', taskId: 'openspec:topk#abc123' }]);
+
+    const res = await GET(makeEvent({ role: 'admin', url: 'http://localhost/api/admin/atlas/kanban-tickets?taskId=openspec%3Atopk%23abc123' }));
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('private, no-store');
+    expect(await res.json()).toMatchObject({
+      ok: true,
+      total: 1,
+      tasks: [{ taskId: 'openspec:topk#abc123' }],
+      events: [{ taskId: 'openspec:topk#abc123' }],
+      canonicalAuthority: false,
+    });
+    expect(boardMocks.showKanbanTask).toHaveBeenCalledWith({ taskId: 'openspec:topk#abc123' });
+    expect(boardMocks.listKanbanTasks).not.toHaveBeenCalled();
+    expect(boardMocks.createKanbanTask).not.toHaveBeenCalled();
+  });
+
+  it('rejects malformed exact ticket lookups and reports missing tickets distinctly', async () => {
+    const invalid = await GET(makeEvent({ role: 'admin', url: 'http://localhost/api/admin/atlas/kanban-tickets?taskId=%20%20' }));
+    expect(invalid.status).toBe(400);
+    expect(await invalid.json()).toMatchObject({ ok: false, tasks: [], error: 'INVALID_TASK_ID' });
+
+    boardMocks.showKanbanTask.mockResolvedValue(null);
+    const missing = await GET(makeEvent({ role: 'admin', url: 'http://localhost/api/admin/atlas/kanban-tickets?taskId=not-found' }));
+    expect(missing.status).toBe(404);
+    expect(await missing.json()).toMatchObject({ ok: false, tasks: [], error: 'TASK_NOT_FOUND' });
+  });
+
   it('creates a revision-bound ticket via projectRecommendationToKanbanV1 + createKanbanTask', async () => {
     boardMocks.createKanbanTask.mockResolvedValue({
       taskId: 'ticket-oaklib-1',
@@ -126,6 +171,7 @@ describe('/api/admin/atlas/kanban-tickets', () => {
           sourceRefs: ['scripts/atlas/prove_oaklib_ontology_tuple_to_pytorch_loading_v1.py'],
           validationCommand: 'py -3.13 -m pytest python/tests/test_oaklib_ontology_tuple_to_pytorch_loading_v1.py -v',
           permissionMode: 'proposal_only',
+          sourceRevision: `sha256:${'a'.repeat(64)}`,
           workspaceRevision: 'sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5',
           graphifyRevision: 'graphify:23413763',
           featureRevision: 'feature:oaklib-v1',
@@ -146,9 +192,28 @@ describe('/api/admin/atlas/kanban-tickets', () => {
         featureId: 'feat:oaklib-tuple-gate',
         lane: 'todo',
         priority: 75,
+        sourceRevision: `sha256:${'a'.repeat(64)}`,
         workspaceRevision: 'sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5',
       }),
     );
+  });
+
+  it('rejects malformed source revisions before creating a ticket', async () => {
+    const res = await POST(makeEvent({
+      role: 'admin',
+      body: {
+        action: 'create_ticket',
+        taskId: 'ticket-invalid-revision',
+        featureId: 'feat:test',
+        featureLabel: 'Invalid revision test',
+        sourceRefs: ['openspec/changes/sample/tasks.md#L1'],
+        validationCommand: 'node --version',
+        sourceRevision: 'sha256:not-a-hash',
+      },
+    }));
+
+    expect(res.status).toBe(400);
+    expect(boardMocks.createKanbanTask).not.toHaveBeenCalled();
   });
 
   it('supports claim and review_decision actions', async () => {

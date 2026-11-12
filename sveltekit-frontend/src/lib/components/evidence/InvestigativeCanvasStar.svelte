@@ -8,6 +8,7 @@
 		docketNumber?: string;
 		caseTitle?: string;
 		evidenceItems?: any[];
+		demoMode?: boolean;
 		onOpenModal?: (item: any) => void;
 		onOpenUpload?: () => void;
 	}
@@ -17,6 +18,7 @@
 		docketNumber = '#986B5214',
 		caseTitle = 'UNTITLED CASE DOSSIER',
 		evidenceItems = [],
+		demoMode = false,
 		onOpenModal,
 		onOpenUpload
 	}: Props = $props();
@@ -217,7 +219,7 @@
 		}
 	];
 
-	let exhibits = $state<StarExhibit[]>(DEFAULT_STAR_EXHIBITS);
+	let exhibits = $state<StarExhibit[]>([]);
 
 	$effect(() => {
 		if (evidenceItems && evidenceItems.length > 0) {
@@ -241,20 +243,15 @@
 					pillColor: isDoc || isAnalysis ? 'mint' : 'amber',
 					type: item.fileType || item.mimeType || 'Image (Scene)',
 					subtitle: `${item.fileType || 'FILE'} · ${item.fileSize ? `${Math.round(item.fileSize / 1024)} KB` : 'EXHIBIT'}`,
-					relation: idx === 0 ? 'PLACES SUBJECT' : idx === 1 ? 'REPORTS PRESENCE' : idx === 2 ? 'CORROBORATES' : idx === 3 ? 'ESTABLISHES MOTIVE' : idx === 4 ? 'SPATIAL MATCH' : 'LINKS ENTITY',
-					collected: item.uploadedAt ? new Date(item.uploadedAt).toLocaleString() : 'Mar 14, 2024 14:02:18',
-					location: item.location || 'North Corridor, L1',
-					chainOfCustody: 'View (3 entries) >',
-					verified: Boolean(item.hash),
-					sha256: item.hash || 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-					caliper1: '42.23"',
-					caliper2: '0.287 m',
-					checklist: [
-						{ text: 'File hash verified against ledger', checked: true },
-						{ text: 'Corroborates evidence stream in primary hypothesis', checked: true }
-					],
-					verdict: 'Corroborates subject presence at the scene.',
-					supports: 'H-01',
+					relation: typeof item.relation === 'string' ? item.relation : 'UNLINKED',
+					collected: item.uploadedAt || item.date || 'Not recorded',
+					location: item.location || 'Not provided',
+					chainOfCustody: item.chainOfCustodyLabel || 'Not loaded',
+					verified: false,
+					sha256: typeof item.sourceRevision === 'string' ? item.sourceRevision : typeof item.hash === 'string' ? item.hash : '',
+					checklist: Array.isArray(item.reviewChecklist) ? item.reviewChecklist : [],
+					verdict: typeof item.reviewedConclusion === 'string' ? item.reviewedConclusion : 'No reviewed conclusion recorded.',
+					supports: typeof item.supports === 'string' ? item.supports : '—',
 					position: { x: posX, y: posY }
 				};
 			});
@@ -263,7 +260,7 @@
 				selectedId = mapped[0].id;
 			}
 		} else {
-			exhibits = DEFAULT_STAR_EXHIBITS;
+			exhibits = demoMode ? DEFAULT_STAR_EXHIBITS : [];
 		}
 	});
 
@@ -315,6 +312,19 @@
 	function handleCanvasMouseUp() {
 		isPanning = false;
 	}
+	function handleCanvasKeydown(e: KeyboardEvent) {
+		if (e.target !== e.currentTarget && e.target instanceof HTMLElement && e.target.closest('button, input, textarea, select, [contenteditable="true"]')) {
+			return;
+		}
+		const step = 32;
+		if (e.key === 'ArrowLeft') pan = { ...pan, x: pan.x - step };
+		else if (e.key === 'ArrowRight') pan = { ...pan, x: pan.x + step };
+		else if (e.key === 'ArrowUp') pan = { ...pan, y: pan.y - step };
+		else if (e.key === 'ArrowDown') pan = { ...pan, y: pan.y + step };
+		else if (e.key === 'Home') resetZoom();
+		else return;
+		e.preventDefault();
+	}
 
 	// File upload trigger
 	let fileInputRef: HTMLInputElement | null = null;
@@ -333,7 +343,7 @@
 		const file = files[0];
 
 		// Calculate SHA-256 in browser
-		let sha256 = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+		let sha256 = '';
 		try {
 			const buf = await file.arrayBuffer();
 			const hashBuf = await crypto.subtle.digest('SHA-256', buf);
@@ -352,18 +362,15 @@
 			pillColor: 'mint',
 			type: file.type || 'Upload (Evidence)',
 			subtitle: `${(file.size / 1024 / 1024).toFixed(1)} MB · UPLOADED`,
-			relation: 'SUPPORTS H-01',
+			relation: 'LOCAL PREVIEW',
 			collected: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-			location: 'Uploaded Asset',
-			chainOfCustody: 'View (1 entry) >',
-			verified: true,
+			location: 'Not recorded',
+			chainOfCustody: 'Not in case ledger',
+			verified: false,
 			sha256,
-			checklist: [
-				{ text: `Cryptographic SHA-256 verified (${sha256.slice(0, 12)}...)`, checked: true },
-				{ text: 'Ingested to SeaweedFS [legal-evidence]', checked: true }
-			],
-			verdict: 'Newly admitted evidentiary item pending forensic alignment.',
-			supports: 'H-01',
+			checklist: [],
+			verdict: 'Local preview only; not added to the case or evidence ledger.',
+			supports: '—',
 			position: { x: (Math.random() - 0.5) * 400, y: (Math.random() - 0.5) * 300 }
 		};
 
@@ -371,6 +378,8 @@
 		selectedId = newEx.id;
 	}
 </script>
+
+<svelte:window onmousemove={handleCanvasMouseMove} onmouseup={handleCanvasMouseUp} />
 
 <div class="star-canvas-container flex flex-col h-full w-full bg-[#fbf9f5] select-none text-[#2b2b2b] overflow-hidden font-sans">
 	<!-- Hidden File Input for Direct Ingest -->
@@ -446,8 +455,18 @@
 					<div
 						class="sidebar-card flex items-center gap-3 p-2.5 rounded-lg border transition-all cursor-pointer"
 						class:selected={selectedId === item.id}
+						role="button"
+						tabindex="0"
+						aria-label={`Select ${item.title}; press Enter to open details`}
 						onclick={() => (selectedId = item.id)}
 						ondblclick={() => onOpenModal?.(item)}
+						onkeydown={(event) => {
+							if (event.key === 'Enter' || event.key === ' ') {
+								event.preventDefault();
+								selectedId = item.id;
+								if (event.key === 'Enter') onOpenModal?.(item);
+							}
+						}}
 					>
 						<!-- Thumbnail Box -->
 						<div class="thumb-box w-12 h-12 rounded bg-[#1e2025] border border-[#d6ccbb] flex items-center justify-center shrink-0 overflow-hidden relative shadow-sm">
@@ -522,12 +541,14 @@
 		</aside>
 
 		<!-- CENTER: INVESTIGATIVE CANVAS (RADIAL HYPOTHESIS GRAPH) -->
-		<main
-			class="center-investigative-canvas flex-1 relative bg-[#fcfaf6] overflow-hidden"
-			onmousedown={handleCanvasMouseDown}
-			onmousemove={handleCanvasMouseMove}
-			onmouseup={handleCanvasMouseUp}
-		>
+		<main class="center-investigative-canvas flex-1 relative bg-[#fcfaf6] overflow-hidden">
+			<button
+				type="button"
+				class="canvas-input-surface absolute inset-0"
+				aria-label="Interactive investigative canvas. Use arrow keys to pan, Home to reset."
+				onmousedown={handleCanvasMouseDown}
+				onkeydown={handleCanvasKeydown}
+			></button>
 			<!-- Subtle Grid Pattern Background -->
 			<div class="canvas-grid-bg absolute inset-0 pointer-events-none opacity-40"></div>
 
@@ -589,7 +610,7 @@
 						{@const isSelected = selectedId === item.id}
 						{@const midX = item.position.x * 0.48}
 						{@const midY = item.position.y * 0.48}
-						<g>
+						{#if demoMode}<g>
 							<!-- Curved Bezier or Straight Line to Exhibit -->
 							<line
 								x1="0"
@@ -607,12 +628,12 @@
 									{item.relation}
 								</div>
 							</foreignObject>
-						</g>
+						</g>{/if}
 					{/each}
 				</svg>
 
 				<!-- CENTER NODE: H-01 PRIMARY HYPOTHESIS -->
-				<div
+				{#if demoMode}<div
 					class="center-hypothesis-card absolute z-20 w-[240px] p-4 rounded-xl bg-[#20232a] text-white border-2 border-[#d4af37] shadow-2xl text-center transform -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-105"
 				>
 					<div class="h-badge inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#30343f] border border-[#e5c158]/40 text-[#e5c158] text-[9px] font-mono font-bold uppercase mb-2">
@@ -627,7 +648,14 @@
 					<p class="text-[11px] leading-relaxed text-[#a8b0c0] font-sans">
 						{hypothesis.description}
 					</p>
-				</div>
+				</div>{/if}
+
+				{#if exhibits.length === 0}
+					<div class="case-canvas-empty-state absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[#ded6c7] bg-white/95 px-6 py-5 text-center shadow-md" role="status">
+						<div class="text-xs font-mono font-bold tracking-wider text-[#5f6470]">NO CASE EVIDENCE LOADED</div>
+						<p class="mt-2 max-w-xs text-xs text-[#737985]">Add evidence to this case to place it on the investigative canvas. No sample exhibits or conclusions are shown here.</p>
+					</div>
+				{/if}
 
 				<!-- RADIAL EXHIBIT NODES -->
 				{#each exhibits as item (item.id)}
@@ -635,8 +663,18 @@
 					<div
 						class="radial-exhibit-node absolute z-10 w-[210px] p-2.5 rounded-xl bg-white border transition-all cursor-pointer shadow-md hover:shadow-lg transform -translate-x-1/2 -translate-y-1/2 {isSelected ? 'border-[#c59e2b] ring-2 ring-[#c59e2b]/50' : 'border-[#ded6c7]'}"
 						style="left: calc(50% + {item.position.x}px); top: calc(50% + {item.position.y}px);"
+						role="button"
+						tabindex="0"
+						aria-label={`Select ${item.title}; press Enter to open details`}
 						onclick={() => (selectedId = item.id)}
 						ondblclick={() => onOpenModal?.(item)}
+						onkeydown={(event) => {
+							if (event.key === 'Enter' || event.key === ' ') {
+								event.preventDefault();
+								selectedId = item.id;
+								if (event.key === 'Enter') onOpenModal?.(item);
+							}
+						}}
 					>
 						<div class="flex items-center gap-2.5">
 							<!-- Thumbnail -->
@@ -728,10 +766,11 @@
 				</button>
 			</div>
 
+			{#if selectedExhibit}
 			<div class="insp-body p-4 space-y-4 flex-1">
 				<!-- High-Res Graphic Caliper Viewer Box -->
 				<div class="caliper-preview-box rounded-xl bg-[#1a1c22] border border-[#d6ccbb] p-2 relative overflow-hidden shadow-inner flex flex-col items-center justify-center min-h-[170px]">
-					{#if selectedExhibit.id === 'e-001'}
+					{#if demoMode && selectedExhibit.id === 'e-001'}
 						<!-- Calibrated Footprint Graphic with Calipers (Screenshot 1) -->
 						<div class="relative w-full h-[160px] flex items-center justify-center">
 							<!-- Soil Mud Background Graphic -->
@@ -825,7 +864,7 @@
 				</div>
 
 				<!-- Accordion: RELATIONSHIPS (4) -->
-				<div class="border-t border-[#ece5d8] pt-2">
+				{#if demoMode}<div class="border-t border-[#ece5d8] pt-2">
 					<button
 						class="w-full flex items-center justify-between py-1.5 text-xs font-mono font-bold text-[#1e2025] uppercase"
 						onclick={() => (isRelationshipsOpen = !isRelationshipsOpen)}
@@ -849,7 +888,7 @@
 							</div>
 						</div>
 					{/if}
-				</div>
+				</div>{:else}<div class="border-t border-[#ece5d8] pt-3 text-xs text-[#737985]">No case-linked relationships are recorded for this exhibit.</div>{/if}
 
 				<!-- Accordion: NOTES -->
 				<div class="border-t border-[#ece5d8] pt-2 pb-6">
@@ -870,11 +909,28 @@
 					{/if}
 				</div>
 			</div>
+			{:else}
+				<div class="insp-empty-state m-4 rounded-lg border border-[#e8e2d4] bg-white p-4 text-xs text-[#737985]" role="status">
+					Select or add a case exhibit to inspect its recorded metadata.
+				</div>
+			{/if}
 		</aside>
 	</div>
 </div>
 
 <style>
+	.canvas-input-surface {
+		z-index: 0;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		color: inherit;
+		cursor: crosshair;
+	}
+	.canvas-input-surface:focus-visible {
+		outline: 2px solid #c59e2b;
+		outline-offset: -3px;
+	}
 	/* Canvas Grid Pattern matching Screenshot 1 */
 	.canvas-grid-bg {
 		background-image:

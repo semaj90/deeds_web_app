@@ -58,6 +58,11 @@
 	}
 
 	# ───── SSE / Streaming routes (disable buffering) ─────
+	handle /api/cases/*/evidence/jobs/*/events {
+		reverse_proxy {$SVELTEKIT_UPSTREAM:host.docker.internal:5173} {
+			import proxy_headers
+		}
+	}
 	handle /api/sse/* {
 		reverse_proxy {$SVELTEKIT_UPSTREAM:host.docker.internal:5173} {
 			flush_interval -1

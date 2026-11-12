@@ -1,8 +1,10 @@
 <!-- Enhanced Document Uploader with AI Processing and Real-time Status -->
 <!-- Native <dialog> replaces bits-ui Dialog to avoid $props() TDZ in Svelte 5.46.0 -->
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Progress from '$lib/components/ui/Progress.svelte';
+	import { admitEvidenceProgressEventV1, caseEvidenceProgressEventUrlV1, parseEvidenceProgressControlCodeV1 } from '$lib/components/evidence/evidence-progress-event-client-v1.js';
 	// Types
 	interface UploadFile {
 		id: string;
@@ -81,6 +83,12 @@
 	let fileInput = $state<HTMLInputElement | undefined>(undefined);
 	let dropZone = $state<HTMLDivElement | undefined>(undefined);
 	let metadataDialogEl: HTMLDialogElement | undefined = $state(undefined);
+	const activeEventSources = new Set<EventSource>();
+
+	onDestroy(() => {
+		for (const eventSource of activeEventSources) eventSource.close();
+		activeEventSources.clear();
+	});
 
 	// Sync showMetadata with native dialog
 	$effect(() => {
@@ -266,36 +274,17 @@
 			// automatically in the background via the evidence upload pipeline
 			updateFileStatus(uploadFile.id, 'processing', 50);
 
-			// Poll job progress via SSE
+			// Use the case-authorized event stream for case uploads.
 			try {
-				const evtSource = new EventSource(`/api/evidence/realtime?jobId=${uploadResult.jobId}`);
-				evtSource.onmessage = (event) => {
-					const data = JSON.parse(event.data);
-					if (data.step === 'complete') {
-						updateFileStatus(uploadFile.id, 'completed', 100);
-						onFileProcessed?.({ fileId: uploadFile.id, result: { summary: data.message, chunks: 0 } });
-						onFilesUpdated?.({
-							files: [{
-								id: uploadFile.id,
-								documentId: uploadResult.id,
-								filename: uploadResult.fileName,
-								size: uploadFile.file.size,
-								type: uploadFile.file.type
-							}]
-						});
-						evtSource.close();
-					} else if (data.step === 'error') {
-						updateFileStatus(uploadFile.id, 'error', 0, data.message);
-						onUploadError?.({ fileId: uploadFile.id, error: data.message });
-						evtSource.close();
-					} else if (data.progress) {
-						updateFileStatus(uploadFile.id, 'processing', data.progress);
-					}
-				};
-				evtSource.onerror = () => {
-					// SSE connection lost — mark complete (upload already succeeded)
-					evtSource.close();
+				const caseScoped = Boolean(caseId);
+				const evtSource = new EventSource(caseScoped
+					? caseEvidenceProgressEventUrlV1(caseId, uploadResult.jobId)
+					: `/api/evidence/realtime?jobId=${encodeURIComponent(uploadResult.jobId)}`);
+				activeEventSources.add(evtSource);
+				let lastSequence = 0n;
+				const completeUpload = (summary?: string) => {
 					updateFileStatus(uploadFile.id, 'completed', 100);
+					onFileProcessed?.({ fileId: uploadFile.id, result: { summary: summary ?? 'Evidence processing completed.', chunks: 0 } });
 					onFilesUpdated?.({
 						files: [{
 							id: uploadFile.id,
@@ -305,10 +294,59 @@
 							type: uploadFile.file.type
 						}]
 					});
+					activeEventSources.delete(evtSource);
+					evtSource.close();
+				};
+				const failUpload = (message: string) => {
+					updateFileStatus(uploadFile.id, 'error', 0, message);
+					onUploadError?.({ fileId: uploadFile.id, error: message });
+					activeEventSources.delete(evtSource);
+					evtSource.close();
+				};
+				if (caseScoped) {
+					const handleControlEvent = (eventName: 'stream-error' | 'stream-ended', event: Event) => {
+						const control = parseEvidenceProgressControlCodeV1(eventName, (event as MessageEvent<string>).data);
+						const message = control === 'EVENT_HISTORY_GAP'
+							? 'Progress history is incomplete. Refresh the case to verify the current status.'
+							: control === 'AUTHORIZATION_REVOKED'
+								? 'Access to this case’s progress stream ended.'
+								: 'Evidence was accepted, but processing status could not be verified.';
+						failUpload(message);
+					};
+					evtSource.addEventListener('stream-error', (event) => handleControlEvent('stream-error', event));
+					evtSource.addEventListener('stream-ended', (event) => handleControlEvent('stream-ended', event));
+					evtSource.addEventListener('analysis-progress', (event) => {
+						const result = admitEvidenceProgressEventV1({
+							lastEventId: (event as MessageEvent<string>).lastEventId,
+							data: (event as MessageEvent<string>).data,
+							jobId: uploadResult.jobId,
+							caseId,
+							lastSequence,
+						});
+						if (!result.accepted) return;
+						lastSequence = result.sequence;
+						const data = result.envelope;
+						updateFileStatus(uploadFile.id, 'processing', data.progress);
+						if (data.status === 'completed') completeUpload('Evidence processing completed.');
+						else if (data.status === 'failed') failUpload('Evidence processing failed.');
+					});
+				} else {
+					for (const type of ['progress', 'complete', 'error'] as const) {
+						evtSource.addEventListener(type, (event) => {
+							let data: { progress?: number; message?: string; error?: string };
+							try { data = JSON.parse((event as MessageEvent<string>).data); } catch { return; }
+							if (type === 'progress') updateFileStatus(uploadFile.id, 'processing', Number(data.progress) || 0);
+							else if (type === 'complete') completeUpload(data.message);
+							else failUpload(data.error ?? data.message ?? 'Evidence processing failed.');
+						});
+					}
+				}
+				evtSource.onerror = () => {
+					// Browser EventSource reconnects with Last-Event-ID; never infer processing success from disconnect.
 				};
 			} catch {
-				// SSE unavailable — mark complete after delay
-				setTimeout(() => updateFileStatus(uploadFile.id, 'completed', 100), 2000);
+				// The upload was accepted, but processing is not verified without a terminal event.
+				updateFileStatus(uploadFile.id, 'processing', 50, 'Upload accepted; processing status is unavailable.');
 			}
 		} catch (err: unknown) {
 			const errMsg = err instanceof Error ? err.message : String(err);

@@ -175,6 +175,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
+    <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-cuda\atlas_byte_synth.vcxproj">
+      <Project>{6756B084-5F25-37E2-9F3A-92183ACBAB01}</Project>
+      <Name>atlas_byte_synth</Name>
+    </ProjectReference>
     <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-cuda\atlas_core\atlas_core.vcxproj">
       <Project>{D6E53FDF-D966-336A-AFE1-9C2A914229A8}</Project>
       <Name>atlas_core</Name>

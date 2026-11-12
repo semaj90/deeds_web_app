@@ -166,9 +166,12 @@ const stats = {
 	misses:           0,
 	nativeParses:     0,
 	fallbackParses:   0,
+	nativeParseErrors: 0,
 	totalBytesParsed: 0,
 	nativeTimeMs:     0,
 };
+
+let lastNativeParseWarningAt = 0;
 
 /** Return current simdjson bridge metrics. Useful for D18 audit gates. */
 export function getSimdStats() {
@@ -238,8 +241,16 @@ export function fastJsonParseWithBackend<T = unknown>(input: string): { value: T
 			stats.nativeTimeMs += (performance.now() - start);
 			lruSet(cacheKey, result);
 			return { value: result, backend: 'SIMDJSON_NAPI' };
-		} catch {
+		} catch (error) {
+			stats.nativeParseErrors++;
 			stats.fallbackParses++;
+			// Keep payloads and parser messages out of logs; they may contain user data.
+			const now = Date.now();
+			if (now - lastNativeParseWarningAt >= 60_000) {
+				lastNativeParseWarningAt = now;
+				const errorName = error instanceof Error ? error.name : 'UnknownError';
+				console.warn(`[simdjson-bridge] Native parse failed; using V8 fallback (count=${stats.nativeParseErrors}, error=${errorName}).`);
+			}
 			result = JSON.parse(input) as T;
 			lruSet(cacheKey, result);
 			return { value: result, backend: 'V8_JSON_PARSE' };

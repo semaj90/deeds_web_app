@@ -3,8 +3,8 @@
 
 	const { data }: { data: any } = $props();
 	const caseData = $derived(data?.caseData);
-	const caseId = $derived(caseData?.id ?? '2007b040-8b33-4613-8fb8-72f90c8c5317');
-	const caseTitle = $derived(caseData?.title ?? 'State v. Johnson - Fraud Investigation');
+	const caseId = $derived(caseData?.id ?? '');
+	const caseTitle = $derived(caseData?.title ?? 'Case unavailable');
 </script>
 
 <svelte:head>
@@ -12,9 +12,11 @@
 </svelte:head>
 
 <div class="h-[calc(100vh-100px)] w-full overflow-hidden">
-	<DetectiveModeCanvas
-		{caseId}
-		{caseTitle}
-		evidenceItems={data?.evidence ?? []}
-	/>
+	{#if caseId}
+		<DetectiveModeCanvas {caseId} {caseTitle} evidenceItems={data?.evidence ?? []} />
+	{:else}
+		<div class="m-6 rounded-xl border border-stone-300 bg-stone-50 p-6 text-stone-700" role="status">
+			This case is unavailable. Return to the case list and open an authorized case.
+		</div>
+	{/if}
 </div>

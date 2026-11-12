@@ -5,6 +5,8 @@
  * Replaces writable/derived pattern with class-based reactive store.
  */
 
+import { reconnectDelayMs } from '$lib/utils/reconnect-backoff';
+
 export interface SSEConnectionState {
 	isConnected: boolean;
 	isConnecting: boolean;
@@ -54,7 +56,7 @@ class SSEStatusStore {
 			return;
 		}
 
-		const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts);
+		const delay = reconnectDelayMs(this.reconnectAttempts, { baseMs: this.reconnectDelay });
 		console.log(
 			`[SSE] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`,
 		);
@@ -74,6 +76,8 @@ class SSEStatusStore {
 		this.error = null;
 
 		try {
+			// Never leave the previous connection open: it would keep retrying on its own.
+			this.eventSource?.close();
 			this.eventSource = new EventSource(endpoint);
 
 			this.eventSource.addEventListener('open', () => {
@@ -88,7 +92,10 @@ class SSEStatusStore {
 				this.isConnected = false;
 				this.isConnecting = false;
 				this.error = 'Connection lost';
-				this.reconnect(endpoint, token);
+				// While CONNECTING the browser retries by itself; take over only when it has given up.
+				if (this.eventSource?.readyState === EventSource.CLOSED) {
+					this.reconnect(endpoint, token);
+				}
 			});
 
 			return this.eventSource;

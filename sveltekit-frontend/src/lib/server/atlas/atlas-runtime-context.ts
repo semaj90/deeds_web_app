@@ -28,6 +28,7 @@ export interface AtlasRuntimeContext {
   workspaceRevision: string;   // caller-owned snapshot/head revision, not a timestamp
   packetKey: string;           // Current packet identity (atlas:packet:...)
   packetRevision: string;      // caller-owned packet/source lineage revision
+  sourceRevision?: string;     // Optional exact retrieval scope; preserve caller value verbatim
 
   // State machine
   state: AtlasState;
@@ -88,6 +89,7 @@ export const RuntimeToolReceiptV1Schema = z.object({
   packetKey: z.string().min(1),
   workspaceRevision: z.string().min(1),
   packetRevision: z.string().min(1),
+  sourceRevision: z.string().min(1).nullable().optional(),
   succeeded: z.boolean(),
   errorCode: z.string().min(1).nullable(),
   retrievalConfidence: z.number().min(0).max(1).nullable(),
@@ -192,6 +194,7 @@ export function createAtlasRuntimeContext(init: {
   packetKey: string;
   workspaceRevision?: string;
   packetRevision?: string;
+  sourceRevision?: string;
   initialState?: AtlasState;
   tokenBudget?: number;
 }): AtlasRuntimeContext {
@@ -205,6 +208,7 @@ export function createAtlasRuntimeContext(init: {
     workspaceRevision: init.workspaceRevision ?? '',
     packetKey: init.packetKey,
     packetRevision: init.packetRevision ?? '',
+    ...(init.sourceRevision !== undefined ? { sourceRevision: init.sourceRevision } : {}),
     state: init.initialState ?? AtlasState.DISCOVER,
     confidence: 0.5,
     tokenBudget: {

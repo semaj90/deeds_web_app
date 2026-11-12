@@ -1,0 +1,83 @@
+{
+  "schema": "atlas.sidecar-migration-caller-review.v1",
+  "reviewedAt": "2026-11-10",
+  "repositoryHead": "ceddbc97bb98bd17d6374da0a870b177cc406d37",
+  "canonicalFirst": true,
+  "canonicalAuthority": false,
+  "taskCompletionAuthorized": false,
+  "writesPerformed": false,
+  "scope": [
+    "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql",
+    "sveltekit-frontend/drizzle/0102_feature_statistics_and_potentials.sql"
+  ],
+  "sourceSha256": {
+    "sveltekit-frontend/drizzle/0101_spec_control_plane_phase1.sql": "FA568FC61BEBFD8C4B2A0C446B7FFAB4A005DCF6F568219E0D3F3C2190BB30E6",
+    "sveltekit-frontend/drizzle/0102_feature_statistics_and_potentials.sql": "E4075B07368B0890298CDAAFCDB3B437E043124223056E5D3D70B1A42A6CCCF0",
+    "sveltekit-frontend/src/lib/server/agent/action-writer.ts": "BD9E4E0575EDF3C6F736A701C35940FA4E25F516C02A979ABF08BD7C618651B3",
+    "sveltekit-frontend/src/lib/server/db/schema-postgres.ts": "021E0A7BCC1747ABCFD11899BC29A1006B5EDDFEFAA92824F4B0CE2F74A19FF7",
+    "sveltekit-frontend/src/lib/server/db/schema/kanban-tasks.ts": "44C0EB6F9616E4A123AB736B765D9900B05FF34CA2BD3C913D5338FD5A00C870"
+  },
+  "findings": [
+    {
+      "migration": "0101_spec_control_plane_phase1.sql",
+      "status": "DO_NOT_ADMIT_PENDING_OWNER_AND_SCHEMA_RECONCILIATION",
+      "callerReview": {
+        "agent_runs": "Active Drizzle owner and application caller exist. Migration defines incompatible columns (id, agent_definition_id, feature_id, status, input/output/error) versus active run_id/workflow_name/workflow_version/tenant_id/initiated_by/state contract.",
+        "workflow_events": "Active Drizzle owner and action-writer caller exist. Migration defines feature/state/actor/evidence columns; active contract is run_id/action_id/event_type/sequence_no/payload/occurred_at/recorded_at.",
+        "tasks": "No active direct caller found in scoped application scan. The product already has kanban_tasks as the canonical task/workboard owner; do not create a parallel task authority.",
+        "agent_definitions_agent_run_steps_feature_requirements": "No active direct caller found in scoped application scan; absence of a source hit is not proof of non-use.",
+        "projects_specs_features": "No canonical application caller or Drizzle table owner established in this scoped pass; ownership remains unresolved."
+      },
+      "defects": [
+        "workflow_events_immutable trigger is declared before raise_immutability_error() is defined.",
+        "ALTER TABLE specs ADD CONSTRAINT specs_current_revision_fk is unconditional and not rerun-safe.",
+        "CREATE TABLE IF NOT EXISTS would not reconcile existing tables to the migration's incompatible expected shape."
+      ],
+      "repairDirection": "Reconcile against the live Drizzle schema and canonical workboard ownership first; then draft a corrected additive migration and test it on a disposable baseline. No SQL changes made."
+    },
+    {
+      "migration": "0102_feature_statistics_and_potentials.sql",
+      "status": "DO_NOT_ADMIT_PENDING_IDENTITY_AND_SCHEMA_RECONCILIATION",
+      "callerReview": {
+        "packet_potentials_packet_promotion_log_fallback_routing_audit": "No active direct application caller found in scoped source scan; no canonical owner or live catalog equivalence established."
+      },
+      "defects": [
+        "packet_potentials primary key is (packet_key, title_id), but packet_promotion_log references packet_key alone; the referenced key is not unique, so the FK definition is invalid.",
+        "The migration's unguarded index statements are not rerun-safe."
+      ],
+      "repairDirection": "Resolve the packet identity and promotion grain with the canonical packet registry before selecting a composite FK or different parent key. No SQL changes made."
+    }
+  ],
+  "existingOwners": [
+    {
+      "relation": "agent_runs",
+      "owner": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "caller": "sveltekit-frontend/src/lib/server/agent/action-writer.ts",
+      "migration": "sveltekit-frontend/drizzle/0038_deep_research_tables.sql"
+    },
+    {
+      "relation": "workflow_events",
+      "owner": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "caller": "sveltekit-frontend/src/lib/server/agent/action-writer.ts",
+      "migration": "sveltekit-frontend/drizzle/0038_deep_research_tables.sql"
+    },
+    {
+      "relation": "kanban_tasks",
+      "owner": "sveltekit-frontend/src/lib/server/db/schema/kanban-tasks.ts",
+      "caller": "kanban task board services"
+    }
+  ],
+  "databaseEvidence": {
+    "target": "legal_ai_live_integration_scratch on loopback :5434",
+    "catalogRead": "NOT_VERIFIED_AUTHENTICATION_FAILED_28P01",
+    "schemaEquivalence": "UNVERIFIED",
+    "executionHistory": "UNVERIFIED",
+    "liveDatabaseAccessThisReview": false
+  },
+  "scopeLimitations": [
+    "Caller search was a static source scan over application, package, service, and script trees with test/spec, migration, and archive files excluded.",
+    "No authenticated PostgreSQL catalog evidence was available; source ownership does not establish live table state or migration execution history.",
+    "The pre-existing 63-file report remains a separate inventory; this focused review does not reclassify all 63 migrations."
+  ],
+  "nextGate": "Obtain approved read-only catalog access to the exact scratch database, compare relation columns/constraints to Drizzle, and separately establish migration execution history before drafting any corrected SQL."
+}

@@ -3,6 +3,7 @@
 	import { onDestroy } from 'svelte';
 	import { CacheInvalidation } from '$lib/cache/cache-invalidation';
 	import { detectSensitiveInfo, type SensitiveInfoHit } from '$lib/utils/sensitive-info-detector.js';
+	import { admitEvidenceProgressEventV1, caseEvidenceProgressEventUrlV1 } from '$lib/components/evidence/evidence-progress-event-client-v1.js';
 
 	interface UploadProgress {
 		fileName: string;
@@ -158,21 +159,14 @@
 				if (xhr.status === 200 || xhr.status === 201) {
 					try {
 						const result = JSON.parse(xhr.responseText);
+						if (typeof result.jobId !== 'string') throw new Error('Upload accepted without a processing job ID.');
 						uploads[index].status = 'processing';
 						uploads[index].progress = 60;
 						uploads = [...uploads];
-
-						// Connect SSE for embedding progress
-						if (result.jobId) {
-							connectSSE(result.jobId, index);
-						} else {
-							uploads[index].status = 'completed';
-							uploads[index].progress = 100;
-							uploads = [...uploads];
-						}
-					} catch {
-						uploads[index].status = 'completed';
-						uploads[index].progress = 100;
+						connectSSE(result.jobId, index);
+					} catch (error) {
+						uploads[index].status = 'error';
+						uploads[index].error = error instanceof Error ? error.message : 'Upload response was invalid.';
 						uploads = [...uploads];
 					}
 
@@ -200,40 +194,66 @@
 	}
 
 	function connectSSE(jobId: string, index: number) {
-		const es = new EventSource(`/api/evidence/realtime?jobId=${jobId}`);
+		let lastSequence = 0n;
+		let streamUrl: string;
+		try {
+			streamUrl = caseEvidenceProgressEventUrlV1(caseId, jobId);
+		} catch {
+			uploads[index].status = 'error';
+			uploads[index].error = 'The case or processing job identity is invalid.';
+			uploads = [...uploads];
+			return;
+		}
+		const es = new EventSource(streamUrl);
 		activeSources.push(es);
 
-		es.onmessage = (event) => {
-			try {
-				const data = JSON.parse(event.data);
-				if (data.type === 'progress') {
-					uploads[index].progress = data.progress ?? uploads[index].progress;
-					uploads[index].status = 'processing';
-					uploads = [...uploads];
-				}
-				if (data.type === 'complete') {
-					uploads[index].status = 'completed';
-					uploads[index].progress = 100;
-					uploads = [...uploads];
-					es.close();
-				}
-				if (data.type === 'error') {
-					uploads[index].status = 'error';
-					uploads[index].error = data.message ?? 'Processing error';
-					uploads = [...uploads];
-					es.close();
-				}
-			} catch {
-				// Ignore parse errors (keep-alive comments)
+		es.addEventListener('analysis-progress', (event) => {
+			const admitted = admitEvidenceProgressEventV1({
+				lastEventId: (event as MessageEvent<string>).lastEventId,
+				data: (event as MessageEvent<string>).data,
+				jobId,
+				caseId,
+				lastSequence,
+			});
+			if (!admitted.accepted) return;
+
+			lastSequence = admitted.sequence;
+			const { status, progress } = admitted.envelope;
+			uploads[index].progress = status === 'completed' ? 100 : progress;
+			if (status === 'completed') {
+				uploads[index].status = 'completed';
+				uploads = [...uploads];
+				es.close();
+			} else if (status === 'failed') {
+				uploads[index].status = 'error';
+				uploads[index].error = 'Evidence processing failed.';
+				uploads = [...uploads];
+				es.close();
+			} else {
+				uploads[index].status = 'processing';
+				uploads = [...uploads];
 			}
-		};
+		});
+
+		es.addEventListener('stream-ended', () => {
+			uploads[index].status = 'error';
+			uploads[index].error = 'Case access changed or progress history is unavailable.';
+			uploads = [...uploads];
+			es.close();
+		});
+
+		es.addEventListener('stream-error', () => {
+			uploads[index].status = 'error';
+			uploads[index].error = 'Evidence progress could not be verified.';
+			uploads = [...uploads];
+			es.close();
+		});
 
 		es.onerror = () => {
-			// SSE dropped — mark as completed (upload already succeeded)
-			es.close();
-			if (uploads[index].status === 'processing') {
-				uploads[index].status = 'completed';
-				uploads[index].progress = 100;
+			// Preserve native EventSource reconnect and Last-Event-ID while connecting.
+			if (es.readyState === EventSource.CLOSED && uploads[index].status === 'processing') {
+				uploads[index].status = 'error';
+				uploads[index].error = 'Progress connection closed before completion was verified.';
 				uploads = [...uploads];
 			}
 		};

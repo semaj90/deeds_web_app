@@ -2092,7 +2092,8 @@
       ],
       "identity_fields": [],
       "writes_to": [
-        "postgres"
+        "process",
+        "engram"
       ],
       "required_permissions": "read_write",
       "input_schema_keys": [
@@ -2111,7 +2112,7 @@
       "identity_fields": [],
       "writes_to": [
         "postgres",
-        "kanban"
+        "engram"
       ],
       "required_permissions": "read_write",
       "input_schema_keys": [
@@ -2474,8 +2475,13 @@
         "ops"
       ],
       "identity_fields": [],
-      "writes_to": [],
-      "required_permissions": "read_only",
+      "writes_to": [
+        "postgres",
+        "redis",
+        "qdrant",
+        "engram"
+      ],
+      "required_permissions": "read_write",
       "input_schema_keys": [
         "errorHash",
         "errorCode",

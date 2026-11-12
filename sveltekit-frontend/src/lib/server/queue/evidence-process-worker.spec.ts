@@ -49,6 +49,7 @@ describe('EvidenceProcessWorker canonical vector path', () => {
 		const bytes = Buffer.from('uploaded legal source');
 		const digest = sourceRevision(bytes);
 		const worker = new EvidenceProcessWorker();
+		const stages: string[] = [];
 
 		await worker.processCanonical({
 			evidenceId: 'evidence-1',
@@ -62,7 +63,14 @@ describe('EvidenceProcessWorker canonical vector path', () => {
 				sourceSha256: digest,
 				source_revision: digest,
 			},
-		});
+		}, (stage) => { stages.push(stage); });
+
+		expect(stages).toEqual([
+			'source_fetch',
+			'text_extraction',
+			'content_analysis',
+			'canonical_indexing',
+		]);
 
 		expect(mocks.getSeaweedFile).toHaveBeenCalledWith('legal-evidence', 'evidence/1/file.pdf');
 		expect(mocks.processEvidenceDocumentCanonicalV1).toHaveBeenCalledWith(expect.objectContaining({

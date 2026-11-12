@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { EvidenceProcessPayloadV1Schema } from './evidence-process-payload-v1.js';
 import type { EvidenceSynthesisResultV1 } from './synthesis/evidence-synthesis-v1.js';
+import type { AnalysisJobProgressStageV1 } from '$lib/server/analysis/analysis-job-progress-events-v1.js';
 
 const sha256Schema = z.string().regex(/^sha256:[a-f0-9]{64}$/);
 
@@ -56,19 +57,25 @@ export function buildAnalysisUploadEvidencePayloadV1(input: {
 	});
 }
 
+type AnalysisUploadReceiptV1 = {
+	chunkCount: number;
+	persistedCount: number;
+	sourceRevision: string;
+	synthesis?: EvidenceSynthesisResultV1;
+} | null;
+
 export async function executeAnalysisUploadPipelineV1(input: {
 	evidenceId: string;
 	analysisJobId: string;
 	metadata: unknown;
-	processEvidence: (payload: ReturnType<typeof buildAnalysisUploadEvidencePayloadV1>) => Promise<{
-		chunkCount: number;
-		persistedCount: number;
-		sourceRevision: string;
-		synthesis?: EvidenceSynthesisResultV1;
-	} | null>;
+	processEvidence: (
+		payload: ReturnType<typeof buildAnalysisUploadEvidencePayloadV1>,
+		onProgress?: (stage: AnalysisJobProgressStageV1) => Promise<void> | void,
+	) => Promise<AnalysisUploadReceiptV1>;
+	onProgress?: (stage: AnalysisJobProgressStageV1) => Promise<void> | void;
 }): Promise<Record<string, unknown>> {
 	const payload = buildAnalysisUploadEvidencePayloadV1(input);
-	const receipt = await input.processEvidence(payload);
+	const receipt = await input.processEvidence(payload, input.onProgress);
 	if (
 		!receipt ||
 		!Number.isSafeInteger(receipt.chunkCount) ||

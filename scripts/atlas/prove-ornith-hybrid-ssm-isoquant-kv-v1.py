@@ -467,6 +467,13 @@ def run_isoquant_vs_deltanet_ssm_proof() -> dict[str, Any]:
         "writesPerformed": False,
         "kvCachePersisted": False,
         "ornith8090Disturbed": False,
+        "evidenceScope": {
+            "inputTensorsSynthetic": True,
+            "llamaCppKvCacheIntegration": False,
+            "servingPromptLogitParityMeasured": False,
+            "recurrentStateEditedOrRotated": False,
+            "provesCodecMathAndSyntheticQuantizationOnly": True,
+        },
         "device": {
             "type": device.type,
             "name": torch.cuda.get_device_name(device) if device.type == "cuda" else "cpu",
@@ -504,7 +511,7 @@ def run_isoquant_vs_deltanet_ssm_proof() -> dict[str, Any]:
         },
         "adversarialProbes": adversarial_probes,
         "status": (
-            "PASS"
+            "PASS_SYNTHETIC_CODEC_ONLY"
             if (all_adv_passed and quality_improved and within_vram and bijective_max_err < 1e-5)
             else "FAIL"
         ),

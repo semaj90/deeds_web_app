@@ -149,6 +149,12 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
 });
 
 self.addEventListener('fetch', (event: FetchEvent) => {
+	const url = new URL(event.request.url);
+	if (url.origin === self.location.origin && [
+		'/cases', '/active-cases', '/api/cases', '/admin/atlas/taskboard', '/api/admin/atlas/kanban-tickets'
+	].some(
+		(prefix) => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`)
+	)) return;
 	event.respondWith(handleAPIRequest(event.request));
 });
 

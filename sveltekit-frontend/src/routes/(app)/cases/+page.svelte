@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import { SvelteSet } from 'svelte/reactivity';
 	import Skeleton from '$lib/components/ui/Skeleton.svelte';
-	import Icon from '$lib/components/ui/Icon.svelte';
+	import Icon from '$lib/components/cases/CaseIcon.svelte';
 	import SearchBar from '$lib/components/SearchBar.svelte';
 	import CaseCard from '$lib/components/cases/CaseCard.svelte';
 	import CaseViewModal from '$lib/components/cases/CaseViewModal.svelte';
@@ -11,13 +12,31 @@
 
 	let { data, form }: PageProps = $props();
 
+	// SvelteKit's generated ActionData is a union of named-action results. Narrow the
+	// create action's Superforms result at runtime instead of asserting that every result
+	// has a `form` member.
+	type CreateFormResult = { form: typeof data.form };
+	function isRecord(value: unknown): value is Record<string, unknown> {
+		return typeof value === 'object' && value !== null;
+	}
+	function isCreateFormResult(value: unknown): value is CreateFormResult {
+		if (!isRecord(value) || !isRecord(value.form)) return false;
+		return (
+			typeof value.form.valid === 'boolean' &&
+			isRecord(value.form.data) &&
+			isRecord(value.form.errors)
+		);
+	}
+	const createForm = $derived(isCreateFormResult(form) ? form.form : undefined);
+
 	// View mode + display
 	let viewMode = $state<'list' | 'cards' | 'rich'>('cards');
-	let showNewCaseModal = $state(false);
+	let newCaseModalOverride = $state<boolean | null>(null);
+	let showNewCaseModal = $derived(newCaseModalOverride ?? !!createForm);
 	let statusFilter = $state('all');
 	let priorityFilter = $state('');
 	let searchQuery = $state('');
-	let selectedCases = $state<Set<string>>(new Set());
+	const selectedCases = new SvelteSet<string>();
 	let searchInputEl = $state<HTMLInputElement | null>(null);
 
 	// Case detail view modal
@@ -93,7 +112,7 @@
 
 		const urlParams = new URLSearchParams(window.location.search);
 		if (urlParams.get('create') === 'true') {
-			showNewCaseModal = true;
+			openNewCase();
 			window.history.replaceState({}, '', '/cases');
 		}
 	});
@@ -105,8 +124,8 @@
 		}
 	});
 
-	function openNewCase() { showNewCaseModal = true; }
-	function closeModal() { showNewCaseModal = false; }
+	function openNewCase() { newCaseModalOverride = true; }
+	function closeModal() { newCaseModalOverride = false; }
 
 	function priorityClass(priority: string): string {
 		switch (priority) {
@@ -369,7 +388,7 @@
 				</span>
 				<form method="POST" action="?/updateStatus" use:enhance class="cs-bulk-form">
 					{#each Array.from(selectedCases) as caseId}
-						<input type="hidden" name="caseIds" value={caseId} />
+						<input type="hidden" name="caseId" value={caseId} />
 					{/each}
 					<select name="status" bind:value={bulkStatus} class="cs-bulk-select">
 						<option value="">Update Status...</option>
@@ -401,6 +420,12 @@
 			{#if form?.success}
 				<div class="cs-alert cs-alert-success">
 					{form.message}
+				</div>
+			{/if}
+
+			{#if form?.error && !showNewCaseModal}
+				<div class="cs-alert cs-alert-error" role="alert">
+					{form.error}
 				</div>
 			{/if}
 
@@ -536,7 +561,7 @@
 
 			<!-- CARDS VIEW -->
 			{:else if viewMode === 'cards'}
-				<div class="cs-grid">
+				<div class="cs-grid" class:cs-grid-single={filteredCases.length === 1}>
 					{#each filteredCases as caseItem (caseItem.id)}
 						<div class="cs-card" class:cs-card-selected={selectedCases.has(caseItem.id)}>
 							<!-- Selection Checkbox -->
@@ -545,6 +570,8 @@
 								checked={selectedCases.has(caseItem.id)}
 								onchange={() => toggleCaseSelection(caseItem.id)}
 								class="cs-checkbox cs-checkbox-card"
+								aria-label={`Select case: ${caseItem.title ?? 'Untitled'}`}
+								title="Select case"
 							/>
 
 							{#if isFictional(caseItem)}
@@ -606,7 +633,8 @@
 								<button
 									onclick={() => analyzeCase(caseItem.id, caseItem.title ?? 'Untitled')}
 									class="cs-action-icon"
-									title="AI Analysis"
+									aria-label={`Analyze case: ${caseItem.title ?? 'Untitled'}`}
+									title="Analyze case"
 									disabled={analyzingCaseId === caseItem.id}
 								>
 									{#if analyzingCaseId === caseItem.id}
@@ -615,10 +643,10 @@
 										<Icon name="brain" />
 									{/if}
 								</button>
-								<a href="/cases/{caseItem.id}/board" class="cs-action-icon" title="Open evidence board">
+								<a href="/cases/{caseItem.id}/board" class="cs-action-icon" title="Evidence board" aria-label={`Open evidence board for case: ${caseItem.title ?? 'Untitled'}`}>
 									<Icon name="layout-grid" />
 								</a>
-								<a href="/cases/{caseItem.id}" class="cs-action-icon" title="Open full case">
+								<a href="/cases/{caseItem.id}" class="cs-action-icon" title="Open case" aria-label={`Open case: ${caseItem.title ?? 'Untitled'}`}>
 									<Icon name="arrow-right" />
 								</a>
 							</div>
@@ -684,50 +712,68 @@
 
 			<form method="POST" action="?/create" use:enhance class="cs-modal-form">
 				{#if form?.error}
-					<div class="cs-alert cs-alert-error">
+					<div class="cs-alert cs-alert-error" role="alert">
 						{form.error}
 					</div>
 				{/if}
+
+				{#snippet fieldErrors(field: keyof typeof data.form.data)}
+					{#if createForm?.errors?.[field]?.length}
+						<p id={`case-create-${field}-error`} class="cs-field-error">
+							{createForm?.errors[field]?.join(' ')}
+						</p>
+					{/if}
+				{/snippet}
 
 				<div class="cs-field">
 					<label for="title" class="cs-label">
 						Case Title <span class="cs-required">*</span>
 					</label>
-					<input type="text" id="title" name="title" required class="cs-input" placeholder="e.g., State v. Smith" />
+					<input type="text" id="title" name="title" required class="cs-input" placeholder="e.g., State v. Smith"
+						value={createForm?.data.title ?? ''} aria-invalid={!!createForm?.errors.title?.length}
+						aria-describedby={createForm?.errors.title?.length ? 'case-create-title-error' : undefined} />
+					{@render fieldErrors('title')}
 				</div>
 
 				<div class="cs-field">
 					<label for="description" class="cs-label">
 						Description <span class="cs-required">*</span>
 					</label>
-					<textarea id="description" name="description" required rows="4" class="cs-textarea" placeholder="Brief overview of the case..."></textarea>
+					<textarea id="description" name="description" required rows="4" class="cs-textarea" placeholder="Brief overview of the case..."
+						value={createForm?.data.description ?? ''} aria-invalid={!!createForm?.errors.description?.length}
+						aria-describedby={createForm?.errors.description?.length ? 'case-create-description-error' : undefined}></textarea>
+					{@render fieldErrors('description')}
 				</div>
 
 				<div class="cs-field-grid">
 					<div class="cs-field">
 						<label for="priority" class="cs-label">Priority</label>
-						<select id="priority" name="priority" class="cs-select">
+						<select id="priority" name="priority" class="cs-select" value={createForm?.data.priority ?? 'medium'}>
 							<option value="low">Low</option>
-							<option value="medium" selected>Medium</option>
+							<option value="medium">Medium</option>
 							<option value="high">High</option>
 							<option value="urgent">Urgent</option>
 							<option value="critical">Critical</option>
 						</select>
+						{@render fieldErrors('priority')}
 					</div>
 					<div class="cs-field">
 						<label for="caseNumber" class="cs-label">Case Number</label>
-						<input type="text" id="caseNumber" name="caseNumber" class="cs-input" placeholder="e.g., 2026-CR-0042" />
+						<input type="text" id="caseNumber" name="caseNumber" class="cs-input" placeholder="e.g., 2026-CR-0042" value={createForm?.data.caseNumber ?? ''} />
+						{@render fieldErrors('caseNumber')}
 					</div>
 				</div>
 
 				<div class="cs-field-grid">
 					<div class="cs-field">
 						<label for="practiceArea" class="cs-label">Practice Area</label>
-						<input type="text" id="practiceArea" name="practiceArea" class="cs-input" placeholder="e.g., Criminal Law" />
+						<input type="text" id="practiceArea" name="practiceArea" class="cs-input" placeholder="e.g., Criminal Law" value={createForm?.data.practiceArea ?? ''} />
+						{@render fieldErrors('practiceArea')}
 					</div>
 					<div class="cs-field">
 						<label for="jurisdiction" class="cs-label">Jurisdiction</label>
-						<input type="text" id="jurisdiction" name="jurisdiction" class="cs-input" placeholder="e.g., Federal District Court" />
+						<input type="text" id="jurisdiction" name="jurisdiction" class="cs-input" placeholder="e.g., Federal District Court" value={createForm?.data.jurisdiction ?? ''} />
+						{@render fieldErrors('jurisdiction')}
 					</div>
 				</div>
 
@@ -812,6 +858,7 @@
 <CaseViewModal
 	bind:open={showViewModal}
 	caseId={viewCaseId}
+	initialCase={data.cases?.find((caseItem) => caseItem.id === viewCaseId) ?? null}
 	onClose={() => { showViewModal = false; viewCaseId = null; }}
 	onEdit={(id) => goto(`/cases/${id}?edit=true`)}
 />
@@ -819,28 +866,69 @@
 <style>
 	/* ── Page Layout — Theme-Aware ── */
 	.cases-page {
+		--t-bg: #f3efe6;
+		--t-bg-elevated: #fffdf8;
+		--t-panel: #fffdf8;
+		--t-panel-2: #f7f2e8;
+		--t-text: #2b2521;
+		--t-text-muted: #4f5f72;
+		--t-text-heading: #2d3b4f;
+		--t-text-link: #245f9e;
+		--t-surface-blue: #f1f5f9;
+		--t-success: #187344;
+		--t-success-surface: #eaf3ed;
+		--t-border: #ddd2c2;
+		--t-accent: #741f1b;
+		--t-accent-2: #8a704d;
+		--t-gold: #9a7837;
+		--t-shadow: rgba(54, 39, 27, 0.12);
+		--t-focus-ring: #8a704d;
 		display: flex;
 		flex-direction: column;
-		min-height: 100vh;
+		flex: 1;
+		min-width: 0;
+		width: 100%;
 		background: var(--t-bg, #0e0d0b);
-		margin: -2.5rem;
 		color: var(--t-text, rgba(212, 199, 163, 0.85));
+	}
+
+	:global(body:has(.cases-page)) {
+		color-scheme: light;
+		--t-bg: #f3efe6;
+		--t-bg-elevated: #fffdf8;
+		--t-panel: #fffdf8;
+		--t-panel-2: #f7f2e8;
+		--t-text: #2b2521;
+		--t-text-muted: #4f5f72;
+		--t-text-heading: #2d3b4f;
+		--t-text-link: #245f9e;
+		--t-surface-blue: #f1f5f9;
+		--t-success: #187344;
+		--t-success-surface: #eaf3ed;
+		--t-border: #ddd2c2;
+		--t-accent: #741f1b;
+		--t-accent-2: #8a704d;
+		--t-gold: #9a7837;
+		--t-shadow: rgba(54, 39, 27, 0.12);
+		--t-focus-ring: #8a704d;
+		background: #f3efe6;
+		color: #2b2521;
 	}
 
 	.cases-page :global(h1),
 	.cases-page :global(h2),
 	.cases-page :global(h3),
-	.cases-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
-	.cases-page :global(a) { color: inherit; border-bottom: none; }
-	.cases-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
-	.cases-page :global(input), .cases-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
-	.cases-page :global([class*="panel"]), .cases-page :global(.card) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
+	.cases-page :global(p) { text-transform: none; letter-spacing: normal; }
+	.cases-page :global(a.cs-action-icon) { color: inherit; border-bottom: none; text-decoration: none; }
 
 	/* ── Header ── */
 	.cases-header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		gap: 1rem;
+		min-width: 0;
+		flex-wrap: wrap;
 		padding: 1rem 1.5rem;
 		border-bottom: 1px solid var(--t-border, rgba(212, 199, 163, 0.08));
 		background: var(--t-bg-elevated, rgba(0, 0, 0, 0.4));
@@ -851,12 +939,17 @@
 		display: flex;
 		align-items: flex-start;
 		gap: 0.875rem;
+		min-width: 0;
 	}
 
 	.cases-header-right {
 		display: flex;
 		align-items: center;
+		justify-content: flex-end;
+		flex-wrap: wrap;
 		gap: 0.75rem;
+		min-width: 0;
+		margin-left: auto;
 	}
 
 	.cases-icon-badge {
@@ -876,7 +969,7 @@
 	.cases-title {
 		font-size: 1.25rem;
 		font-weight: 700;
-		color: var(--t-text, rgba(212, 199, 163, 0.95));
+		color: var(--t-text-heading, #2d3b4f);
 		margin: 0;
 		line-height: 1.3;
 	}
@@ -901,6 +994,7 @@
 	.cases-new-btn {
 		display: inline-flex;
 		align-items: center;
+		white-space: nowrap;
 		gap: 0.375rem;
 		padding: 0.5rem 1rem;
 		font-size: 0.8125rem;
@@ -969,11 +1063,11 @@
 	.stat-value { font-weight: 700; font-size: 0.875rem; }
 	.stat-label { color: inherit; opacity: 0.7; }
 
-	.stat-open { border-color: rgba(52, 211, 153, 0.3); color: #34d399; background: rgba(52, 211, 153, 0.06); }
-	.stat-inprogress { border-color: rgba(96, 165, 250, 0.3); color: #60a5fa; background: rgba(96, 165, 250, 0.06); }
-	.stat-pending { border-color: rgba(251, 191, 36, 0.3); color: #fbbf24; background: rgba(251, 191, 36, 0.06); }
-	.stat-high { border-color: rgba(248, 113, 113, 0.3); color: #f87171; background: rgba(248, 113, 113, 0.06); }
-	.stat-closed { border-color: rgba(148, 163, 184, 0.25); color: #94a3b8; background: rgba(148, 163, 184, 0.05); }
+	.stat-open { border-color: #a8dfbd; color: #187344; background: #edf8f1; }
+	.stat-inprogress { border-color: #b7cef4; color: #245da8; background: #eff5ff; }
+	.stat-pending { border-color: #f0d59c; color: #94600a; background: #fff8e8; }
+	.stat-high { border-color: #f1b9b9; color: #a62d2d; background: #fff1f1; }
+	.stat-closed { border-color: #d4dbe6; color: #596579; background: #f3f5f8; }
 
 	/* ── Shared Inputs ── */
 	.cs-input {
@@ -1197,7 +1291,7 @@
 		cursor: pointer;
 		padding: 0;
 		text-align: left;
-		transition: color 0.15s;
+		transition: color 0.15s ease;
 	}
 	.cs-row-title:hover { color: var(--t-accent, #34d399); }
 
@@ -1214,28 +1308,102 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 1.75rem;
-		height: 1.75rem;
-		border-radius: 0.25rem;
-		color: var(--t-text-muted, rgba(212, 199, 163, 0.4));
+		width: 2.5rem;
+		height: 2.5rem;
+		border: 1px solid var(--t-border, rgba(212, 199, 163, 0.12));
+		border-radius: 0.375rem;
+		color: var(--t-text-muted, rgba(212, 199, 163, 0.62));
 		cursor: pointer;
-		transition: all 0.15s;
+		transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 		text-decoration: none;
-		background: none;
-		border: none;
+		background: color-mix(in srgb, var(--t-panel, #111) 72%, transparent);
 		padding: 0;
 	}
-	.cs-action-icon:hover { color: var(--t-accent, #34d399); background: color-mix(in srgb, var(--t-accent, #34d399) 8%, transparent); }
+	.cs-action-icon:hover {
+		color: var(--t-accent, #34d399);
+		border-color: color-mix(in srgb, var(--t-accent, #34d399) 36%, transparent);
+		background: color-mix(in srgb, var(--t-accent, #34d399) 10%, var(--t-panel, #111));
+	}
+	.cs-action-icon:focus-visible {
+		outline: 2px solid var(--t-focus-ring, #8a704d);
+		outline-offset: 2px;
+	}
 	.cs-action-icon:disabled { opacity: 0.4; cursor: not-allowed; }
 
 	.cs-checkbox, .cs-checkbox-head {
+		appearance: none;
+		display: grid;
+		place-content: center;
 		width: 1rem;
 		height: 1rem;
-		border-radius: 0.25rem;
-		border: 1px solid var(--t-border, rgba(212, 199, 163, 0.2));
-		background: color-mix(in srgb, var(--t-bg, #000) 80%, transparent);
+		margin: 0;
+		border-radius: 0.3rem;
+		border: 1px solid var(--t-border, rgba(212, 199, 163, 0.34));
+		background: color-mix(in srgb, var(--t-bg, #f3efe6) 82%, var(--t-panel, #fffdf8) 18%);
 		cursor: pointer;
-		accent-color: var(--t-accent, #34d399);
+		transition: background 0.15s ease, border-color 0.15s ease;
+	}
+	.cs-checkbox:checked, .cs-checkbox-head:checked {
+		border-color: var(--t-accent, #34d399);
+		background: var(--t-accent, #34d399);
+	}
+	.cs-checkbox:hover, .cs-checkbox-head:hover {
+		border-color: var(--t-gold, #9a7837);
+	}
+	.cs-checkbox:checked::after, .cs-checkbox-head:checked::after {
+		content: '';
+		width: 0.3rem;
+		height: 0.55rem;
+		border: solid #fffdf8;
+		border-width: 0 2px 2px 0;
+		transform: rotate(45deg);
+		margin-top: -0.1rem;
+	}
+	.cs-checkbox:focus-visible {
+		outline: 2px solid var(--t-focus-ring, #8a704d);
+		outline-offset: 2px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.cs-card,
+		.cs-card-title,
+		.cs-action-icon,
+		.cs-checkbox { transition: none; }
+		.cs-card:hover { transform: none; }
+	}
+
+	@media (max-width: 640px) {
+		.cases-header {
+			align-items: stretch;
+			padding: 0.875rem 1rem;
+		}
+		.cases-header-right {
+			width: 100%;
+			justify-content: space-between;
+			margin-left: 0;
+			gap: 0.5rem;
+		}
+		.stats-row {
+			flex-wrap: nowrap;
+			overflow-x: auto;
+			padding-inline: 1rem;
+			scrollbar-width: thin;
+		}
+		.stat-chip { flex: 0 0 auto; }
+		.cs-filter-bar { padding: 0.75rem 1rem; }
+		.cs-filter-row {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 0.625rem;
+		}
+		.cs-search-wrap { grid-column: 1 / -1; min-width: 0; }
+		.cs-select { width: 100%; min-width: 0; }
+		.cs-clear-filters-btn,
+		.cs-match-count { grid-column: 1 / -1; }
+		.cs-grid,
+		.cs-grid.cs-grid-single { grid-template-columns: minmax(0, 1fr); }
+		.cs-card { padding: 1rem; }
+		.cs-card-actions { gap: 0.5rem; }
 	}
 
 	/* ── Fictional Badge ── */
@@ -1264,22 +1432,31 @@
 		display: grid;
 		gap: 1rem;
 	}
+	.cs-grid.cs-grid-single { grid-template-columns: minmax(0, min(100%, 52rem)); }
 	@media (min-width: 768px) { .cs-grid { grid-template-columns: repeat(2, 1fr); } }
 	@media (min-width: 1280px) { .cs-grid { grid-template-columns: repeat(3, 1fr); } }
+	@media (min-width: 768px) { .cs-grid.cs-grid-single { grid-template-columns: minmax(0, min(100%, 52rem)); } }
 
 	.cs-card {
 		position: relative;
 		border-radius: 0.75rem;
-		border: 1px solid var(--t-border, rgba(212, 199, 163, 0.08));
+		border: 1px solid var(--t-border, #ddd2c2);
 		background: var(--t-panel, rgba(0, 0, 0, 0.25));
 		padding: 1.25rem;
-		transition: all 0.2s ease;
+		box-shadow: 0 2px 8px rgba(54, 39, 27, 0.045);
+		transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 	}
 	.cs-card:hover {
-		border-color: color-mix(in srgb, var(--t-accent, #34d399) 30%, transparent);
-		background: color-mix(in srgb, var(--t-panel, #000) 90%, var(--t-accent, #34d399));
+		border-color: var(--t-gold, #9a7837);
+		background: color-mix(in srgb, var(--t-panel, #fffdf8) 88%, var(--t-surface-blue, #f1f5f9));
+		box-shadow: 0 10px 24px rgba(54, 39, 27, 0.1), 0 0 0 1px color-mix(in srgb, var(--t-gold, #9a7837) 22%, transparent);
+		transform: translateY(-1px);
 	}
 	.cs-card-selected { border-color: color-mix(in srgb, var(--t-accent, #34d399) 40%, transparent); }
+	.cs-card:focus-within {
+		border-color: var(--t-focus-ring, #8a704d);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--t-focus-ring, #8a704d) 20%, transparent), 0 8px 20px rgba(54, 39, 27, 0.08);
+	}
 
 	.cs-checkbox-card {
 		position: absolute;
@@ -1299,24 +1476,31 @@
 	}
 
 	.cs-card-title {
-		font-size: 1.0625rem;
-		font-weight: 600;
-		color: var(--t-accent, rgba(52, 211, 153, 0.9));
+		font-size: 1.125rem;
+		font-weight: 650;
+		color: var(--t-text-heading, #2d3b4f);
 		margin-bottom: 0.5rem;
 		padding-right: 2rem;
+		line-height: 1.35;
 		transition: color 0.15s;
 	}
-	.cs-card:hover .cs-card-title { color: var(--t-accent, rgba(52, 211, 153, 1)); }
+	.cs-card:hover .cs-card-title { color: var(--t-accent, #741f1b); }
+	.cs-card-body:focus-visible {
+		outline: 3px solid var(--t-focus-ring, #8a704d);
+		outline-offset: 5px;
+		border-radius: 0.25rem;
+	}
 
 	.cs-card-number {
-		font-size: 0.75rem;
+		font-size: 0.8125rem;
 		color: var(--t-text-muted, rgba(212, 199, 163, 0.35));
 		margin-bottom: 0.75rem;
 	}
 
 	.cs-card-desc {
-		font-size: 0.875rem;
+		font-size: 0.9375rem;
 		color: var(--t-text-muted, rgba(212, 199, 163, 0.55));
+		line-height: 1.55;
 		margin-bottom: 1rem;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
@@ -1353,21 +1537,21 @@
 		text-transform: capitalize;
 	}
 
-	.cs-badge-open { border-color: rgba(52, 211, 153, 0.4); background: rgba(52, 211, 153, 0.12); color: rgba(52, 211, 153, 0.9); }
-	.cs-badge-inprogress { border-color: rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.12); color: rgba(96, 165, 250, 0.9); }
-	.cs-badge-pending { border-color: rgba(251, 191, 36, 0.4); background: rgba(251, 191, 36, 0.12); color: rgba(251, 191, 36, 0.9); }
-	.cs-badge-closed { border-color: rgba(148, 163, 184, 0.3); background: rgba(148, 163, 184, 0.1); color: rgba(148, 163, 184, 0.8); }
-	.cs-badge-archived { border-color: rgba(107, 114, 128, 0.3); background: rgba(107, 114, 128, 0.1); color: rgba(107, 114, 128, 0.7); }
-	.cs-badge-critical { border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.12); color: rgba(239, 68, 68, 0.9); }
-	.cs-badge-urgent { border-color: rgba(249, 115, 22, 0.4); background: rgba(249, 115, 22, 0.12); color: rgba(249, 115, 22, 0.9); }
-	.cs-badge-high { border-color: rgba(234, 179, 8, 0.4); background: rgba(234, 179, 8, 0.12); color: rgba(234, 179, 8, 0.9); }
-	.cs-badge-medium { border-color: rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.12); color: rgba(96, 165, 250, 0.9); }
-	.cs-badge-low { border-color: rgba(52, 211, 153, 0.4); background: rgba(52, 211, 153, 0.12); color: rgba(52, 211, 153, 0.9); }
-	.cs-badge-default { border-color: rgba(148, 163, 184, 0.3); background: rgba(148, 163, 184, 0.1); color: rgba(148, 163, 184, 0.7); }
+	.cs-badge-open { border-color: #b8d4c1; background: var(--t-success-surface, #eaf3ed); color: var(--t-success, #187344); }
+	.cs-badge-inprogress { border-color: #b7cef4; background: #eff5ff; color: #245da8; }
+	.cs-badge-pending { border-color: #f0d59c; background: #fff8e8; color: #94600a; }
+	.cs-badge-closed { border-color: #d4dbe6; background: #f3f5f8; color: #596579; }
+	.cs-badge-archived { border-color: #d4dbe6; background: #f3f5f8; color: #475569; }
+	.cs-badge-critical { border-color: #efb7b7; background: #fff1f1; color: #a62d2d; }
+	.cs-badge-urgent { border-color: #f3c4a7; background: #fff4ed; color: #a54216; }
+	.cs-badge-high { border-color: #f0d59c; background: #fff8e8; color: #94600a; }
+	.cs-badge-medium { border-color: #b7cef4; background: #eff5ff; color: #245da8; }
+	.cs-badge-low { border-color: #b8d4c1; background: var(--t-success-surface, #eaf3ed); color: var(--t-success, #187344); }
+	.cs-badge-default { border-color: #d4dbe6; background: #f3f5f8; color: #596579; }
 
 	/* ── Card Metadata ── */
 	.cs-card-meta {
-		font-size: 0.75rem;
+		font-size: 0.8125rem;
 		color: var(--t-text-muted, rgba(212, 199, 163, 0.35));
 		display: flex;
 		flex-direction: column;
@@ -1499,8 +1683,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(0, 0, 0, 0.7);
-		backdrop-filter: blur(4px);
+		background: rgba(30, 42, 66, 0.22);
+		backdrop-filter: blur(7px);
 		padding: 1rem;
 	}
 
@@ -1510,7 +1694,7 @@
 		border-radius: 0.75rem;
 		border: 1px solid var(--t-border, rgba(212, 199, 163, 0.1));
 		background: var(--t-bg-elevated, rgba(19, 21, 25, 0.98));
-		box-shadow: 0 24px 80px -20px rgba(0, 0, 0, 0.6);
+		box-shadow: 0 24px 64px -24px rgba(31, 45, 72, 0.3);
 	}
 
 	.cs-analysis-modal {
@@ -1522,7 +1706,7 @@
 		border-radius: 0.75rem;
 		border: 1px solid var(--t-border, rgba(212, 199, 163, 0.1));
 		background: var(--t-bg-elevated, rgba(19, 21, 25, 0.98));
-		box-shadow: 0 24px 80px -20px rgba(0, 0, 0, 0.6);
+		box-shadow: 0 24px 64px -24px rgba(31, 45, 72, 0.3);
 	}
 
 	.cs-modal-header {
@@ -1556,6 +1740,7 @@
 	}
 
 	.cs-field { display: flex; flex-direction: column; }
+	.cs-field-error { margin: 0.375rem 0 0; color: #8b2725; font-size: 0.875rem; }
 
 	.cs-field-grid {
 		display: grid;

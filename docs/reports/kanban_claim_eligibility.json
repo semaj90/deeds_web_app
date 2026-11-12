@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.cohort-kanban-claim-eligibility.v1",
+  "generatedOn": "2026-11-11",
+  "taskId": "COHORT-ROUTING-AUTHORITY-03",
+  "mode": "READ_ONLY_NO_PRODUCTION_WRITES",
+  "canonicalAuthority": false,
+  "productionWritesPerformed": false,
+  "status": "NO_CLAIMS_ADMITTED",
+  "cohortCount": 6527,
+  "bridgeCandidateCounts": {
+    "matchedInKanban": 4303,
+    "unseededSecondaryOrNew": 2224,
+    "readyActionableZeroUnmetDeps": 1296
+  },
+  "safeClaimableTaskCount": 0,
+  "gates": {
+    "currentSourceAndTaskBlockHashes": "BLOCKED_IDENTITY; available Nov 9 audit has 20 content mismatches, 95 relocated candidates, 2 checkbox drifts, and 1 non-task locator",
+    "reviewedTaskKeyAliases": "REVIEW_REQUIRED; 241 identity-review decisions remain pending in the existing review sheet",
+    "routeCommandAndDependencyValidation": "NOT_PROVEN; configured labels and route_active occupancy do not establish validated commands/dependencies",
+    "exactKanbanTaskSourceRevisionBinding": "NOT_PROVEN; previous scratch review found 0 exact task-id and 0 exact source-ref matches for its 241-row review subset; broader current binding not rechecked",
+    "schedulerSelection": "NOT_SELECTED unless a current validated selection manifest proves otherwise",
+    "independentExecutionReceipt": "NOT_PRESENT_FOR_THIS_AUDIT"
+  },
+  "policy": "A ready/actionable count is a candidate count only. Claim eligibility requires exact current task identity, source revision, validated command, required dependency closure, and an independent receipt."
+}

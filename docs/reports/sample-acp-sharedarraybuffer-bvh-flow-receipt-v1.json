@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.sample-acp-sharedarraybuffer-bvh-flow.v1",
+  "generatedAt": "2026-11-08T19:58:38.860Z",
+  "status": "PASS",
+  "sharedArrayBuffer": {
+    "totalBytes": 16384,
+    "chunks": 256,
+    "chunkBytes": 64
+  },
+  "csrGraph": {
+    "nodes": 256,
+    "edges": 255
+  },
+  "aceContextPacket": {
+    "taskId": "nextsteps:sveltekit-frontend-next-steps-plans-bitfrost-turboquant-turbovec-production-todo#0670a95a5ede358a",
+    "tokensUsed": 1420,
+    "tokenLimit": 4096
+  },
+  "assistantTurn": {
+    "model": "ornith-1.5-9b",
+    "reply": "I notice that the ACE packet content you've provided contains only task metadata (task ID, domain, and CSR graph statistics) but no actual ACE packet with legal context, documents, or case information.\n\nTo provide an actionable recommendation, I would need the actual ACE packet contents, including:\n- The legal case or matter details\n- Relevant documents or evidence\n- The specific legal question or issue requiring analysis\n- Any deadlines or procedural requirements\n\nCould you please share the actual ACE packet content so I can synthesize a meaningful 2-sentence recommendation?",
+    "recommendationId": "c6a8ccda-d581-411d-82ad-ea76990af36d",
+    "actionExecutionKey": "451e7635fc7d9ad8c1dd1e0815690d3324a6bcd553b6bb2db618c2227cab247e"
+  },
+  "threeJsBvhScene": {
+    "webglTarget": "WebGL2 (backward compatible to WebGL 1.0 + OES_texture_float)",
+    "textureDimensions": {
+      "width": 256,
+      "height": 1,
+      "format": "RGBA32F",
+      "rowPitchBytes": 4096
+    },
+    "bvhHierarchy": {
+      "rootBounds": {
+        "min": [
+          -100,
+          -100,
+          0
+        ],
+        "max": [
+          100,
+          100,
+          128
+        ]
+      },
+      "nodeCount": 256,
+      "bvhMaxDepth": 8,
+      "storageType": "Float32BufferAttribute / SharedArrayBuffer zero-copy"
+    },
+    "streamingMethod": "DataTexture.uploadSubImage2D / texImage2D"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.cohort-community-route-parity.v1",
+  "generatedOn": "2026-11-11",
+  "taskId": "COHORT-ROUTING-AUTHORITY-03",
+  "mode": "READ_ONLY_NO_PRODUCTION_WRITES",
+  "canonicalAuthority": false,
+  "productionWritesPerformed": false,
+  "status": "PARITY_MISMATCH",
+  "owners": {
+    "javascript": {
+      "path": "scripts/atlas/build-cohort-6527-crosswalk-v1.mjs",
+      "communityIds": [1, 6, 9, 10, 21, 32],
+      "meaning": "Configured/unavailable display labels in the cohort crosswalk; commands are not validated there."
+    },
+    "python": {
+      "path": "scripts/atlas/kag_prefill_router_v1.py",
+      "communityIds": [1, 2, 6, 9, 10, 18, 21, 32],
+      "meaning": "Community-to-grounding route table with validation_cmd fields; route commands were not executed or verified in this audit."
+    }
+  },
+  "parity": {
+    "sharedCommunityIds": [1, 6, 9, 10, 21, 32],
+    "pythonOnlyCommunityIds": [2, 18],
+    "javascriptOnlyCommunityIds": [],
+    "community10StatusConflict": {
+      "javascript": "UNAVAILABLE_SCRIPT_MISSING",
+      "python": "ROUTED_ACTIVE",
+      "status": "REVIEW_REQUIRED"
+    },
+    "routeCommandParity": "NOT_PROVEN"
+  },
+  "occupancy": {
+    "sourceField": "routing_active_bit",
+    "cohortRowsWithBitSet": 3312,
+    "interpretation": "Occupancy only; not evidence that a validated community route is active.",
+    "currentBridgeMisuse": "The authority bridge maps the bit to ROUTED_ACTIVE; this must not be used for task admission."
+  },
+  "legacyCrosswalkTests": {
+    "path": "scripts/atlas/build-cohort-6527-crosswalk-v1.test.mjs",
+    "coverage": "Aggregate route-status totals only; no JS/Python parity assertion found."
+  },
+  "fieldRename": {
+    "status": "NOT_APPLIED_READ_ONLY_MODE",
+    "recommendedSemanticName": "community_occupancy_bit",
+    "authorityEffect": "None; occupancy must not imply route validation, claim permission, or active execution."
+  }
+}

@@ -19,9 +19,8 @@ export const agentRouter = router({
     get: protectedProcedure
       .input(z.object({ runId: z.string().uuid() }))
       .query(async ({ input, ctx }) => {
-        // Issue 8: correlated subqueries avoid the LEFT JOIN × LEFT JOIN
-        // Cartesian multiplication. Three tasks × four artifacts would
-        // previously produce twelve rows and duplicate every aggregate.
+        // Keep task IDs aggregated in a correlated subquery so task rows do not
+        // multiply the run row. Artifact identity has no verified owner yet.
         const rows = await db.execute(sql`
           SELECT
             r.id,
@@ -37,11 +36,10 @@ export const agentRouter = router({
               FROM workflow_tasks t
               WHERE t.run_id = r.id
             ) AS "taskIds",
-            (
-              SELECT COALESCE(jsonb_agg(a.id ORDER BY a.created_at), '[]'::jsonb)
-              FROM artifacts a
-              WHERE a.run_id = r.id
-            ) AS "artifactIds"
+            -- NULL means artifact identity is unavailable; do not misreport it as
+            -- a verified empty list until a canonical artifact owner is wired.
+            NULL::jsonb AS "artifactIds",
+            'UNAVAILABLE_NO_VERIFIED_ARTIFACT_OWNER'::text AS "artifactStatus"
           FROM workflow_runs r
           WHERE r.id = ${input.runId}::uuid
             AND r.user_id = ${ctx.userId}

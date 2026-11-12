@@ -196,6 +196,26 @@ class AtlasComputeReferenceTests(unittest.TestCase):
         self.assertEqual(opted["status"], "OK")
         self.assertEqual(set(opted["featuresUsed"]), {"goalRank", "sourceAgeSeconds", "mutationRisk"})
 
+    def test_task_block_history_is_shadow_only_until_quality_labels_exist(self) -> None:
+        tasks = [
+            self._feature_task(
+                i,
+                goalRank=((i % 5) * 10, "DERIVED"),
+                selectionEligible=(i % 2, "DERIVED"),
+                taskBlockAgeSeconds=((i * 97) % 4000, "DERIVED"),
+            )
+            for i in range(40)
+        ]
+        default = self._run_task_recommendation(tasks)
+        self.assertEqual(default["status"], "OK")
+        self.assertNotIn("taskBlockAgeSeconds", default["featuresUsed"])
+
+        shadow = self._run_task_recommendation(tasks, "--include-task-history")
+        self.assertEqual(shadow["status"], "OK")
+        self.assertIn("taskBlockAgeSeconds", shadow["featuresUsed"])
+        self.assertFalse(shadow["canonicalAuthority"])
+        self.assertFalse(shadow["eligibleForAuthority"])
+
     def test_task_recommendation_rejects_sparse_features(self) -> None:
         tasks = [
             self._feature_task(

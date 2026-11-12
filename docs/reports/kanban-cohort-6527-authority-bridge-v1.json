@@ -1,11 +1,11 @@
 {
   "schema": "atlas.kanban-cohort-6527-authority-bridge.v1",
-  "generatedAt": "2026-11-08T08:25:00.851Z",
+  "generatedAt": "2026-11-11T19:36:57.391Z",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "sidecarMigration": {
     "file": "sveltekit-frontend/drizzle/manual/20261108_atlas_kanban_dag_prefill_v1.sql",
-    "sha256": "sha256:6cab1c8ba9d4dba79d4f7945a57920c64599f53db812db0c05f8f85b8744781e",
+    "sha256": "sha256:18f570627b631c02e7ed798415f1ca66c443c5932c939a622839570a4879e947",
     "registeredStatus": "active_candidate",
     "appliedBy": "not-applied"
   },
@@ -173,8 +173,8 @@
     "adv_04_expired_lease_reclaim_and_event_correlation": {
       "passed": true,
       "reclaimedBy": "worker-bravo",
-      "attemptId": "188",
-      "eventId": "4848",
+      "attemptId": "193",
+      "eventId": "4853",
       "joinedPrefillRowsCount": 8
     }
   },

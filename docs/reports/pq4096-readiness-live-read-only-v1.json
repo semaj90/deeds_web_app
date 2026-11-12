@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.pq4096-readiness-audit.v1",
+  "generatedAt": "2026-11-08T23:14:53.822Z",
+  "database": "legal_ai_db",
+  "targetMode": "LIVE_READ_ONLY",
+  "postgresMajor": 18,
+  "canonicalVectorContract": "public.codebase_chunk_index.content_embedding_768 (semantic_768, 768 dimensions)",
+  "proposal": {
+    "coarseK": 64,
+    "residualKPerCoarse": 64,
+    "leafCount": 4096,
+    "status": "CANDIDATE_NOT_TRAINED"
+  },
+  "semanticChunks": {
+    "tablePresent": true,
+    "totalRows": 274465,
+    "vectors768": 274428,
+    "provenance": {
+      "sourceRevisionRows": 0,
+      "workspaceRevisionRows": 0,
+      "representationRevisionRows": 0,
+      "embeddingModelRows": 274428,
+      "allRequiredFieldsPresent": 0
+    },
+    "modelRevisions": [
+      {
+        "model": "embeddinggemma:latest",
+        "rows": 271774
+      },
+      {
+        "model": "embeddinggemma:latest:eg-task-prefix-v1",
+        "rows": 2654
+      }
+    ]
+  },
+  "centroids": {
+    "tablePresent": true,
+    "byType": [
+      {
+        "cluster_type": "kmeans_js",
+        "rows": 64
+      }
+    ],
+    "vectorDimensions": [
+      {
+        "dimensions": 768,
+        "rows": 64
+      }
+    ]
+  },
+  "qdrantCentroidRows": 202,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "conclusion": "NOT_READY_REVISION_AND_MODEL_PROVENANCE_INCOMPLETE"
+}

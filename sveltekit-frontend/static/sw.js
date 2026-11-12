@@ -5,7 +5,7 @@
 
 // v1.6.0 (2026-05-10): Phase D — analytics POST interception + IDB offline queue.
 // See next_steps/active/2026-05-10_service-worker-regex-tool-router.md §1.
-const CACHE_VERSION = 'v1.6.0';
+const CACHE_VERSION = 'v1.6.1';
 const SHELL_CACHE = `yorha-shell-${CACHE_VERSION}`;
 const STATIC_CACHE = `legal-ai-static-${CACHE_VERSION}`;
 const WASM_CACHE = `legal-ai-wasm-${CACHE_VERSION}`;
@@ -15,7 +15,6 @@ const WEBGPU_CACHE = `legal-ai-webgpu-${CACHE_VERSION}`;
 const SHELL = [
   '/',
   '/evidence',
-  '/cases',
   '/evidenceboard',
   '/chat',
   '/yorha',
@@ -36,6 +35,12 @@ const CRITICAL_RESOURCES = [
 const WASM_PATTERNS = [/\.wasm$/, /\/wasm\//, /webgpu/, /gpu-/, /simd/];
 const API_PATTERNS = [/\/api\/v1\//, /\/api\/evidence\//, /\/api\/chat/, /\/api\/search/];
 
+function isPrivateWorkspacePath(pathname) {
+  return ['/cases', '/active-cases', '/api/cases', '/admin/atlas/taskboard', '/api/admin/atlas/kanban-tickets'].some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  );
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     Promise.all([
@@ -55,8 +60,20 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) =>
-        Promise.all(
+      .then(async (keys) => {
+        // Old workers could persist private responses, including SvelteKit data requests.
+        await Promise.all(keys.map(async (key) => {
+          const cache = await caches.open(key);
+          const entries = await cache.keys();
+          await Promise.all(entries
+            .filter((entry) => {
+              const url = new URL(entry.url);
+              return url.origin === self.location.origin && isPrivateWorkspacePath(url.pathname);
+            })
+            .map((entry) => cache.delete(entry)));
+        }));
+
+        return Promise.all(
           keys
             .filter(
               (k) =>
@@ -67,8 +84,8 @@ self.addEventListener('activate', (event) => {
                 !k.startsWith('legal-ai-webgpu-')
             )
             .map((k) => caches.delete(k))
-        )
-      )
+        );
+      })
   );
   self.clients.claim();
 });
@@ -386,7 +403,21 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url);
 
   // Skip cross-origin
-  if (!req.url.startsWith(self.location.origin)) return;
+  if (url.origin !== self.location.origin) return;
+
+  // Private navigation, JSON data, and form actions use the authorized network path.
+  if (isPrivateWorkspacePath(url.pathname)) return;
+
+  // Vite's development modules and optimized dependency chunks are revisioned
+  // independently during HMR. Never serve them from the app's static cache:
+  // an old chunk can otherwise reference exports that no longer exist.
+  if (
+    url.pathname.startsWith('/@vite/') ||
+    url.pathname.startsWith('/src/') ||
+    url.pathname.startsWith('/node_modules/.vite/')
+  ) {
+    return;
+  }
 
   // Phase D: analytics POST interception (default-deny, allowlist of 2 URLs).
   // Online → pass through. Offline OR 5xx → enqueue + synthetic 202.

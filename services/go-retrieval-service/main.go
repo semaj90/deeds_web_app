@@ -2109,6 +2109,7 @@ func codebaseReceipt(ctx *sharedpb.AtlasRequestContextV2, succeeded bool, eviden
 		Schema: "atlas.tool-receipt.v2", ToolCallId: ctx.GetToolCallId(), ToolName: "atlas.retrieve",
 		RunId: ctx.GetRunId(), WorkspaceId: ctx.GetWorkspaceId(), WorkspaceRevision: ctx.GetWorkspaceRevision(),
 		PacketKey: ctx.GetPacketKey(), PacketRevision: ctx.GetPacketRevision(), Succeeded: succeeded,
+		SourceRevision: ctx.GetSourceRevision(),
 		EvidenceCount: int32(evidenceCount), ValidationStatus: validationStatus, CanonicalAuthority: false, WritesPerformed: false,
 	}
 	if confidence >= 0 && confidence <= 1 {
@@ -2123,7 +2124,7 @@ func codebaseReceipt(ctx *sharedpb.AtlasRequestContextV2, succeeded bool, eviden
 	receipt.ReceiptId = fmt.Sprintf("receipt:%s:%s", ctx.GetRunId(), ctx.GetToolCallId())
 	checksumInput := strings.Join([]string{
 		receipt.Schema, receipt.ReceiptId, receipt.ToolCallId, receipt.ToolName, receipt.RunId,
-		receipt.WorkspaceId, receipt.WorkspaceRevision, receipt.PacketKey, receipt.PacketRevision,
+		receipt.WorkspaceId, receipt.WorkspaceRevision, receipt.PacketKey, receipt.PacketRevision, receipt.SourceRevision,
 		strconv.FormatBool(receipt.Succeeded), strconv.Itoa(int(receipt.EvidenceCount)), receipt.ValidationStatus,
 		outputChecksum, errorCode,
 	}, "\x00")
@@ -2148,13 +2149,14 @@ func unavailableAtlasReceipt(ctx *sharedpb.AtlasRequestContextV2, toolName, erro
 		receipt.WorkspaceRevision = ctx.GetWorkspaceRevision()
 		receipt.PacketKey = ctx.GetPacketKey()
 		receipt.PacketRevision = ctx.GetPacketRevision()
+		receipt.SourceRevision = ctx.GetSourceRevision()
 	}
 	if receipt.RunId != "" || receipt.ToolCallId != "" {
 		receipt.ReceiptId = fmt.Sprintf("receipt:%s:%s", receipt.RunId, receipt.ToolCallId)
 	}
 	checksumInput := strings.Join([]string{
 		receipt.Schema, receipt.ReceiptId, receipt.ToolCallId, receipt.ToolName, receipt.RunId,
-		receipt.WorkspaceId, receipt.WorkspaceRevision, receipt.PacketKey, receipt.PacketRevision,
+		receipt.WorkspaceId, receipt.WorkspaceRevision, receipt.PacketKey, receipt.PacketRevision, receipt.SourceRevision,
 		strconv.FormatBool(receipt.Succeeded), strconv.Itoa(int(receipt.EvidenceCount)),
 		receipt.ValidationStatus, errorCode,
 	}, "\x00")
@@ -2208,6 +2210,13 @@ func codebaseOutputChecksum(chunks []qdrantChunk) string {
 	return fmt.Sprintf("sha256:%x", digest)
 }
 
+func codebaseSourceRevisionFilter(ctx *sharedpb.AtlasRequestContextV2) *qdrantclient.Condition {
+	if ctx == nil || strings.TrimSpace(ctx.GetSourceRevision()) == "" {
+		return nil
+	}
+	return qdrantclient.NewMatch("source_revision", ctx.GetSourceRevision())
+}
+
 func (s *retrievalServer) SearchCodebase(ctx context.Context, req *pb.CodebaseSearchRequest) (*pb.CodebaseSearchResponse, error) {
 	return s.searchCodebase(ctx, req, nil)
 }
@@ -2244,6 +2253,10 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 			return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason, Receipt: codebaseReceipt(req.GetAtlasContext(), false, 0, -1, "FAIL", "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE", "")}, nil
 		}
 		extraFilters = append(extraFilters, qdrantclient.NewMatchKeywords("packet_key", req.PacketKeys...))
+	}
+	if sourceFilter := codebaseSourceRevisionFilter(req.GetAtlasContext()); sourceFilter != nil {
+		// This narrows the projection query and does not replace canonical lineage checks.
+		extraFilters = append(extraFilters, sourceFilter)
 	}
 
 	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.Kinds, req.PathPrefixes, extraFilters, limit)

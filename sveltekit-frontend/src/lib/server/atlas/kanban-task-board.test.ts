@@ -7,6 +7,7 @@ const dbState = vi.hoisted(() => {
   const selectResults: Row[][] = [];
   const updateResults: Row[][] = [];
   const insertResults: Row[][] = [];
+  const insertValues: Row[] = [];
   const executeResults: Row[][] = [];
   const selectWhereConditions: unknown[] = [];
   const updateWhereConditions: unknown[] = [];
@@ -38,15 +39,18 @@ const dbState = vi.hoisted(() => {
       })),
     })),
     insert: vi.fn(() => ({
-      values: vi.fn(() => ({
+      values: vi.fn((values: Row) => {
+        insertValues.push(values);
+        return {
         returning: vi.fn(() => Promise.resolve(insertResults.shift() ?? [])),
-      })),
+        };
+      }),
     })),
     execute: vi.fn(() => Promise.resolve({ rows: executeResults.shift() ?? [] })),
     transaction: vi.fn(async (fn: (tx: typeof db) => Promise<unknown>) => fn(db as typeof db)),
   };
 
-  return { db, selectResults, updateResults, insertResults, executeResults, selectWhereConditions, updateWhereConditions };
+  return { db, selectResults, updateResults, insertResults, insertValues, executeResults, selectWhereConditions, updateWhereConditions };
 });
 
 vi.mock('$lib/server/db/client.js', () => ({
@@ -57,6 +61,7 @@ import {
   claimKanbanTask,
   createChildKanbanTask,
   createKanbanTask,
+  createKanbanTaskOnScratchDatabase,
   completeKanbanTask,
   formatKanbanTaskSummary,
   heartbeatKanbanTask,
@@ -82,6 +87,7 @@ describe('kanban-task-board', () => {
     dbState.selectResults.length = 0;
     dbState.updateResults.length = 0;
     dbState.insertResults.length = 0;
+    dbState.insertValues.length = 0;
     dbState.executeResults.length = 0;
     dbState.selectWhereConditions.length = 0;
     dbState.updateWhereConditions.length = 0;
@@ -113,6 +119,84 @@ describe('kanban-task-board', () => {
     expect(formatKanbanTaskSummary(result.tasks[0]!)).toContain('Feature A');
   });
 
+  it('persists a validated source revision on task creation', async () => {
+    const sourceRevision = `sha256:${'c'.repeat(64)}`;
+    dbState.insertResults.push([
+      {
+        task_id: 'source-bound-task',
+        feature_id: 'openspec:sample-change',
+        feature_label: 'Sample Change',
+        source_refs: ['openspec/changes/sample-change/tasks.md#L1'],
+        source_revision: sourceRevision,
+        lane: 'todo',
+        status: 'pending',
+        validation_command: null,
+        created_at: '2026-11-09T00:00:00.000Z',
+        updated_at: '2026-11-09T00:00:00.000Z',
+      },
+      {},
+    ]);
+
+    const task = await createKanbanTask({
+      taskId: 'source-bound-task',
+      featureId: 'openspec:sample-change',
+      featureLabel: 'Sample Change',
+      sourceRefs: ['openspec/changes/sample-change/tasks.md#L1'],
+      sourceRevision,
+    });
+
+    expect(dbState.insertValues[0]?.sourceRevision).toBe(sourceRevision);
+    expect(task.sourceRevision).toBe(sourceRevision);
+    expect(dbState.insertValues[1]?.eventType).toBe('ticket_created');
+    expect((dbState.insertValues[1]?.payload as Record<string, unknown>)?.sourceRevision).toBe(sourceRevision);
+  });
+
+  it('creates a task through an injected scratch database only after identity and version checks', async () => {
+    const sourceRevision = `sha256:${'d'.repeat(64)}`;
+    dbState.executeResults.push([{ database_name: 'legal_ai_live_integration_scratch', server_version_num: 180004 }]);
+    dbState.insertResults.push([
+      {
+        task_id: 'scratch-bound-task',
+        feature_id: 'openspec:sample-change',
+        feature_label: 'Sample Change',
+        source_refs: ['openspec/changes/sample-change/tasks.md#L1'],
+        source_revision: sourceRevision,
+        lane: 'todo',
+        status: 'pending',
+        validation_command: null,
+        created_at: '2026-11-09T00:00:00.000Z',
+        updated_at: '2026-11-09T00:00:00.000Z',
+      },
+      {},
+    ]);
+
+    const task = await createKanbanTaskOnScratchDatabase({
+      taskId: 'scratch-bound-task',
+      featureId: 'openspec:sample-change',
+      featureLabel: 'Sample Change',
+      sourceRefs: ['openspec/changes/sample-change/tasks.md#L1'],
+      sourceRevision,
+    }, dbState.db as never);
+
+    expect(dbState.db.execute).toHaveBeenCalledOnce();
+    expect(task.taskId).toBe('scratch-bound-task');
+    expect(dbState.insertValues[0]?.sourceRevision).toBe(sourceRevision);
+    expect(dbState.insertValues[1]?.eventType).toBe('ticket_created');
+  });
+
+  it('rejects a non-scratch injected database before task or event writes', async () => {
+    dbState.executeResults.push([{ database_name: 'legal_ai_db', server_version_num: 180004 }]);
+
+    await expect(createKanbanTaskOnScratchDatabase({
+      taskId: 'must-not-write',
+      featureId: 'openspec:sample-change',
+      featureLabel: 'Sample Change',
+      sourceRefs: ['openspec/changes/sample-change/tasks.md#L1'],
+    }, dbState.db as never)).rejects.toThrow('KANBAN_SCRATCH_CREATOR_DATABASE_IDENTITY_MISMATCH');
+
+    expect(dbState.db.insert).not.toHaveBeenCalled();
+  });
+
   it('compiles cohort filtering and fail-closed dependency readiness into the task query', async () => {
     dbState.selectResults.push([], [{ total: 0 }]);
 
@@ -135,12 +219,14 @@ describe('kanban-task-board', () => {
   });
 
   it('supports task lifecycle mutations', async () => {
+    const expectedSourceRevision = `sha256:${'a'.repeat(64)}`;
     dbState.updateResults.push([
       {
         task_id: 'task-b',
         feature_id: 'feature-b',
         feature_label: 'Feature B',
         source_refs: ['src/b.ts'],
+        source_revision: expectedSourceRevision,
         lane: 'in_progress',
         status: 'active',
         validation_command: 'claimed_by:worker-1',
@@ -148,17 +234,21 @@ describe('kanban-task-board', () => {
         updated_at: '2026-08-13T00:01:00.000Z',
       },
     ]);
-    const claimed = await claimKanbanTask({ taskId: 'task-b', workerId: 'worker-1' });
+    const claimed = await claimKanbanTask({ taskId: 'task-b', workerId: 'worker-1', expectedSourceRevision });
     expect(claimed.task.lane).toBe('in_progress');
     expect(claimed.task.validationCommand).toContain('claimed_by:worker-1');
     expect(claimed.claimToken).toContain('claim:');
     expect(claimed.runId).toContain('run:');
-    const claimPredicate = new PgDialect().sqlToQuery(dbState.updateWhereConditions[0] as never).sql;
+    const claimQuery = new PgDialect().sqlToQuery(dbState.updateWhereConditions[0] as never);
+    const claimPredicate = claimQuery.sql;
     expect(claimPredicate).toContain('NOT EXISTS');
     expect(claimPredicate).toContain('kanban_task_dependencies');
     expect(claimPredicate).toContain('parent.task_id IS NULL');
     expect(claimPredicate).toContain("parent.lane IS DISTINCT FROM 'done'");
     expect(claimPredicate).toContain("parent.status IS DISTINCT FROM 'completed'");
+    expect(claimPredicate).toContain('source_revision');
+    expect(claimQuery.params).toContain(expectedSourceRevision);
+    expect(claimed.task.sourceRevision).toBe(expectedSourceRevision);
 
     dbState.updateResults.push([
       {

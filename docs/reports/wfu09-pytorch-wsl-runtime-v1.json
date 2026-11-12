@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.wfu09-pytorch-wsl-runtime.v1",
+  "observedAt": "2026-11-09",
+  "status": "PASS_CPU_RANKER_RUNTIME",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "wsl": {
+    "distribution": "Ubuntu",
+    "environmentPath": "/home/james/miniforge3/envs/atlas-rapids-cu13",
+    "installedEnvironmentsUnderMiniforge": ["atlas-rapids-cu13"],
+    "atlasCutileCu132Present": false,
+    "python": "3.14.6",
+    "pytorch": "2.13.0+cu130",
+    "torchCudaRuntime": "13.0",
+    "cudaAvailableCapabilityProbe": true,
+    "cudaVisibleForRankerRun": false
+  },
+  "rankerRun": {
+    "command": "wsl -d Ubuntu --exec env CUDA_VISIBLE_DEVICES=-1 /home/james/miniforge3/envs/atlas-rapids-cu13/bin/python /mnt/c/Users/james/Videos/deeds-web-app/python/build_low_rank_task_recommendation_v2.py --input /mnt/c/Users/james/Videos/deeds-web-app/.tmp/atlas/wfu09-current-actionable-workboard-v3.json --output /mnt/c/Users/james/Videos/deeds-web-app/.tmp/atlas/wfu09-current-low-rank-recommendation-v2.json",
+    "exitCode": 0,
+    "taskCount": 4094,
+    "featuresUsed": ["goalRank", "selectionEligible"],
+    "rank": 2,
+    "device": "cpu",
+    "eligibleForAuthority": false,
+    "writesPerformed": false
+  },
+  "artifacts": {
+    "input": ".tmp/atlas/wfu09-current-actionable-workboard-v3.json",
+    "inputSha256": "f3ce5fe28b4487b1e9fa6257530c0ecc377e8bf093cd4f79485874da82ae9cf0",
+    "output": ".tmp/atlas/wfu09-current-low-rank-recommendation-v2.json",
+    "outputFileSha256": "cb6b9a6e90f5da80988e85c5dd3fe2a9010bec477651fdb2b7b061c9a408961e",
+    "outputChecksum": "sha256:5788e6e441e9907fabcbd95511bf4c72ffd58ae54ef344bb406fa802748dc2f4"
+  },
+  "limits": [
+    "CUDA availability is a capability check only; no GPU ranking or allocation was performed.",
+    "This runtime receipt does not qualify missing independent features or establish ranking quality.",
+    "Do not infer that atlas-cutile-cu132 exists from older environment notes."
+  ]
+}

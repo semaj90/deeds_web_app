@@ -2,7 +2,7 @@ import { db } from '$lib/server/db/client.js';
 import { cases } from '$lib/server/db/schema.js';
 import { verifySSRDatabaseConnection } from '$lib/server/db/ssr-health-check.js';
 import { invalidateCaseCache } from '$lib/server/cache/invalidation.js';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail, redirect, type ActionFailure } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
 import { and, desc, eq, inArray, like } from 'drizzle-orm';
@@ -13,16 +13,28 @@ import {
   caseBulkArchiveSchema,
 } from './schema.js';
 
+async function validateCreateForm(request: Request) {
+  return superValidate(request, zod(caseListCreateSchema));
+}
+type CreateForm = Awaited<ReturnType<typeof validateCreateForm>>;
+
+// Explicit failure type for the `create` action. Without it, TypeScript's inferred return type
+// subtype-reduces `fail(400, { error, form })` into `fail(401, { error })`, so SvelteKit's generated
+// ActionData loses `form` and the page cannot read `form?.form` without a cast.
+type CreateActionFailure = { error: string; form?: CreateForm };
+
 /**
  * SSR Load Function - Server-side data fetching for cases
  * Replaces client-side fetch('/api/cases')
  * Requirements: 5.2 - SSR database connection verification
  */
-export const load: PageServerLoad = async ({ locals, url }) => {
+export const load: PageServerLoad = async ({ locals, url, depends }) => {
   // Phase 79: Lucia v3 Authentication Guard
   if (!locals.user) {
     throw redirect(302, '/login');
   }
+
+  depends('app:cases-list');
 
   // Parse query parameters for filtering
   const limit = Number(url.searchParams.get('limit')) || 50;
@@ -59,8 +71,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         .where(and(...filters))
         .orderBy(desc(cases.updatedAt))
         .limit(limit)
-        .offset(offset)
-        .$withCache({ config: { ex: 300 } });
+        .offset(offset);
     },
     [] // Fallback to empty array if database unavailable
   );
@@ -97,14 +108,14 @@ export const actions: Actions = {
    * Create a new case
    * Usage: <form method="POST" action="?/create">
    */
-  create: async ({ request, locals }) => {
+  create: async ({ request, locals }): Promise<ActionFailure<CreateActionFailure>> => {
     if (!locals.user) {
       return fail(401, { error: 'Unauthorized' });
     }
 
-    const form = await superValidate(request, zod(caseListCreateSchema));
+    const form = await validateCreateForm(request);
     if (!form.valid) {
-      return fail(400, { form });
+      return fail(400, { error: 'Please correct the highlighted case fields and try again.', form });
     }
 
     const { title, description, priority, caseNumber, practiceArea, jurisdiction } = form.data;

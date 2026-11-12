@@ -806,5 +806,12 @@
     ],
     "archived": "2026-11-02T19:40:00Z",
     "reason": "Draft OpenSpec change folded into RECEIPT-WRITER-01 (parent-atlas-ace-rlm-bitfrost-integration/tasks.md) per operator direction to extend the existing task, not keep a duplicate plan. design.md was written into this folder by a concurrent session at 11:33; preserved unchanged. Restore by moving the folder back to openspec/changes/."
+  },
+  {
+    "path": "sveltekit-frontend/src/routes/(app)/admin/all-routes/$types.d.ts",
+    "archive_path": "docs/archive/2026-11-11/all-routes.types.d.ts.archived",
+    "sha256": "66ab1aefddb703edd7ef6a14b9f2d64c929726e4dd19bcf5e7f1aab61d6d7e4d",
+    "archived": "2026-11-11T21:00:00Z",
+    "reason": "Stale hand-placed SvelteKit route types (route id /(authenticated)/all-routes, May 2026; fields availableRoutes/routeInventory/serviceHealth no longer returned). SvelteKit never writes $types.d.ts into src; it shadowed the generated .svelte-kit/types file for TypeScript literal-path resolution, so `import type { PageLoad } from \"./$types\"` failed (TS2305). Last tracked in git at 6f212a1ded6. Restore by moving the file back to its path."
   }
 ]

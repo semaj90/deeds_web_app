@@ -63,11 +63,20 @@
 		const title = String(item.title ?? item.fileName ?? item.filename ?? item.originalName ?? `Evidence ${index + 1}`);
 		const mimeType = String(item.mimeType ?? item.fileType ?? item.contentType ?? 'application/octet-stream');
 		const lower = `${title} ${mimeType}`.toLowerCase();
+		const safeInlinePreview = new Set([
+			'application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+			'audio/wav', 'audio/mpeg', 'video/mp4'
+		]).has(mimeType.toLowerCase());
 		const type: EvidenceItem['type'] = /video|mp4|mov|webm/.test(lower) ? 'video'
 			: /audio|wav|flac|mp3/.test(lower) ? 'audio'
 			: /spz|sog|splat|glb|las|laz|point.?cloud/.test(lower) ? 'splat'
 			: /image|png|jpe?g|tiff|webp/.test(lower) ? 'forensic' : 'document';
 		const sha256 = item.sha256 ?? item.fileHash ?? item.hash;
+		const previewUrl = safeInlinePreview
+			? (typeof item.thumbnail === 'string'
+				? item.thumbnail
+				: `/api/evidence/${encodeURIComponent(id)}/download?inline=1&caseId=${encodeURIComponent(caseId)}`)
+			: `/api/evidence/${encodeURIComponent(id)}/download?caseId=${encodeURIComponent(caseId)}`;
 		return {
 			id,
 			exhibitNumber: String(item.exhibitNumber ?? item.evidenceNumber ?? `E-${String(index + 1).padStart(3, '0')}`),
@@ -75,6 +84,9 @@
 			type,
 			categoryBadge: String(item.category ?? item.evidenceType ?? mimeType),
 			mimeType,
+			previewUrl,
+			...(typeof item.extractedText === 'string' ? { extractedText: item.extractedText } : {}),
+			...(typeof item.sourceRef === 'string' ? { sourceRef: item.sourceRef } : {}),
 			...(typeof item.fileSize === 'number' ? { fileSize: `${(item.fileSize / 1024 / 1024).toFixed(1)} MB` } : {}),
 			...(typeof sha256 === 'string' && /^[a-f0-9]{64}$/i.test(sha256) ? { sha256 } : {}),
 			...(typeof (item.createdAt ?? item.date ?? item.timestamp) === 'string' ? { timestamp: String(item.createdAt ?? item.date ?? item.timestamp) } : {}),
@@ -125,6 +137,7 @@
 				categoryBadge: 'LOCAL PREVIEW ONLY',
 				badgeColor,
 				mimeType: file.type || 'application/octet-stream',
+				previewUrl: URL.createObjectURL(file),
 				fileSize: `${(file.size / 1024 / 1024).toFixed(1)} MB`,
 				timestamp: new Date().toUTCString(),
 				summary: 'Local preview draft only. File bytes have not been uploaded, admitted to this case, or added to chain of custody.'
@@ -133,6 +146,12 @@
 			selectedGalleryExhibitId = newExhibit.id;
 		}
 	}
+
+	onMount(() => () => {
+		for (const draft of localUploadDrafts) {
+			if (draft.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(draft.previewUrl);
+		}
+	});
 
 	let isVaultDragOver = $state(false);
 	let vaultFileInputEl = $state<HTMLInputElement | null>(null);

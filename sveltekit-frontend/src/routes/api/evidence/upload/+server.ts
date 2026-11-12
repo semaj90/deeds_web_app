@@ -8,6 +8,7 @@ import { db } from '$lib/server/db/client';
 import { eq, sql } from 'drizzle-orm';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { createJob, updateJob } from '$lib/server/evidence-progress';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
 import {
   admitEvidenceCaseV1,
   EvidenceCaseNotFoundError,
@@ -24,7 +25,8 @@ import { chunkLegalDocument, type LegalChunk } from '$lib/server/indexer/legal-c
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { summarizeDocument } from '$lib/server/analysis/summarizer.js';
-import { createAnalysisJob, enqueueJob, updateAnalysisJob, completeAnalysisJob, failAnalysisJob } from '$lib/server/analysis/analysis-jobs.js';
+import { createAnalysisJob, enqueueJob, getAnalysisJob, updateAnalysisJob, completeAnalysisJob, failAnalysisJob } from '$lib/server/analysis/analysis-jobs.js';
+import { registerPdfOcrFollowupAfterQueueV1 } from '$lib/server/evidence/evidence-upload-followup-v1.js';
 import { embedGate, entityGate, forensicsGate, summarizeGate, gated, EMBED_BATCH_SIZE } from '$lib/server/analysis/concurrency-gate.js';
 import { buildCodeFeatureRegistryEnqueueResult } from '$lib/server/analysis/code-feature-registry-enqueue.js';
 import { heavyRateLimiter } from '$lib/server/middleware/rate-limiter.js';
@@ -182,13 +184,7 @@ async function persistProcessingDiagnostics(
 async function resolveEvidenceCaseId(requestedCaseId: string | null, ownerId: number): Promise<string> {
   return admitEvidenceCaseV1(requestedCaseId, ownerId, {
     findOwnedCase: async (caseId, userId) => {
-      const row = getResultRows(await db.execute(sql`
-        SELECT id
-        FROM cases
-        WHERE id = ${caseId}
-          AND (user_id = ${userId} OR assigned_attorney = ${userId})
-        LIMIT 1
-      `))[0];
+      const row = await getAuthorizedCase(caseId, userId);
       return typeof row?.id === 'string' ? row.id : null;
     },
     findOwnedFallbackCase: async (userId) => {
@@ -300,6 +296,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const jobId = crypto.randomUUID();
   let uploadedObjectKey: string | null = null;
   let persistedEvidenceId: string | null = null;
+  let persistedCaseId: string | null = null;
+  let persistedFileName: string | null = null;
+  let persistedFileHash: string | null = null;
+  let persistedFileId: string | null = null;
 
   try {
     let formData: FormData;
@@ -355,6 +355,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       }
       throw err;
     }
+    persistedCaseId = caseId;
+    persistedFileName = file.name;
     const parseBooleanField = (key: string, defaultValue: boolean = false): boolean => {
       const val = formData.get(key);
       if (val === null) return defaultValue;
@@ -388,6 +390,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     // 2. Compute SHA-256 hash
     updateJob(jobId, { step: 'hashing', progress: 20, message: 'Computing file hash...' });
     const fileHash = crypto.createHash('sha256').update(buffer).digest('hex');
+    persistedFileHash = fileHash;
 
     // 3. Upload to SeaweedFS S3
     updateJob(jobId, { step: 'storing', progress: 30, message: 'Storing in SeaweedFS...' });
@@ -459,6 +462,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             enableSummarization,
           },
         },
+        userId: uploaderIntId,
         uploadedBy: uploaderIntId,
       })
       .returning({ id: evidence.id });
@@ -490,6 +494,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       allowInsertFailure: true,
     });
     const uploadedFileId = uploadedFile.file?.id ?? null;
+    persistedFileId = uploadedFileId;
 
     await enqueueJob({
       id: jobId,
@@ -514,13 +519,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       message: 'Document stored; durable processing job queued',
     });
 
-    if (enableOcr && evidenceType === 'PDF') {
-      await registerPdfOcrWorkflowRun({
+    const pdfOcrFollowup = await registerPdfOcrFollowupAfterQueueV1(
+      enableOcr && evidenceType === 'PDF',
+      () => registerPdfOcrWorkflowRun({
         workflowRunId: jobId,
         evidenceId,
         fileName: file.name,
         mimeType: file.type || 'application/pdf',
         ownerId: String(uploaderUserId),
+      }),
+    );
+    if (pdfOcrFollowup === 'FAILED') {
+      console.warn('[Upload] PDF OCR follow-up registration failed; upload_pipeline remains queued', {
+        jobId,
+        evidenceId,
       });
     }
 
@@ -589,6 +601,51 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       uploadedObjectKey,
       timestamp: new Date().toISOString(),
     });
+
+    // The INSERT may have committed even if the client lost its response. Read
+    // the existing durable owner before compensating, or cleanup could orphan
+    // a queued job by deleting its evidence row and object.
+    if (persistedEvidenceId && uploadedObjectKey) {
+      try {
+        const durableJob = await getAnalysisJob(jobId);
+        if (durableJob) {
+          const jobMatchesUpload =
+            durableJob.evidenceId === persistedEvidenceId &&
+            durableJob.caseId === persistedCaseId &&
+            durableJob.jobType === 'upload_pipeline';
+          if (!jobMatchesUpload) {
+            return json(
+              { success: false, error: 'UPLOAD_JOB_IDENTITY_UNCERTAIN', jobId, evidenceId: persistedEvidenceId, data: null },
+              { status: 503 },
+            );
+          }
+
+          const responseData = {
+            id: persistedEvidenceId,
+            evidenceId: persistedEvidenceId,
+            fileId: persistedFileId,
+            caseId: persistedCaseId,
+            jobId,
+            status: durableJob.status,
+            processingStatus: durableJob.status,
+            fileName: persistedFileName,
+            minioKey: uploadedObjectKey,
+            hash: persistedFileHash,
+          };
+          return json({ success: true, ...responseData, data: responseData }, { status: 202 });
+        }
+      } catch (readbackError) {
+        console.error('[Upload] Could not resolve durable job outcome; preserving upload artifacts:', {
+          jobId,
+          evidenceId: persistedEvidenceId,
+          error: readbackError instanceof Error ? readbackError.message : 'readback failed',
+        });
+        return json(
+          { success: false, error: 'UPLOAD_OUTCOME_UNCERTAIN', jobId, evidenceId: persistedEvidenceId, data: null },
+          { status: 503 },
+        );
+      }
+    }
 
     if (uploadedObjectKey) {
       await deleteFile(BUCKET, uploadedObjectKey).catch(() => false);

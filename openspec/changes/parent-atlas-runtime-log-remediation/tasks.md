@@ -33,7 +33,7 @@ Authority: this change does not own any canonical data. Fixes go through the exi
 
 ## Validation gates for this change
 
-- [ ] LOG-16 Re-run `trace_system_health` after LOG-09 and LOG-10 and record the result.
+- [ ] LOG-16 Re-run `trace_system_health` after LOG-09 and LOG-10 and record the result. <!-- wfu: depends=LOG-09,LOG-10 -->
 - [ ] LOG-17 Re-run the packet summary validator over all canonical packets and record the count of rejected summaries.
 - [ ] LOG-18 `openspec validate parent-atlas-runtime-log-remediation --strict` passes.
 

@@ -1,0 +1,211 @@
+schema: atlas.okf.hmm-api-recommendation-procedure.v1
+version: 1
+procedure_id: api-contract-feature-label-policy-shadow
+status: SHADOW_ONLY
+owner: parent-atlas
+
+authority:
+  canonical_authority: false
+  writes_allowed: false
+  tool_execution_allowed: false
+  task_completion_allowed: false
+
+runtime_contracts:
+  api_observation:
+    source_ref: sveltekit-frontend/src/lib/server/atlas/language/api-contract-observation-v1.ts
+    runtime_schema_id: atlas.api-contract-observation.v1
+  api_relation_proposal:
+    source_ref: sveltekit-frontend/src/lib/server/atlas/graph/api-contract-nary-proposal-v1.ts
+    runtime_schema_id: atlas.nary-fact-proposal.v1
+  feature_label_registry:
+    source_ref: sveltekit-frontend/src/lib/server/labels/feature-label-registry.shared.json
+    runtime_schema_id: atlas.feature-label-registry.v1
+  policy_pattern_input:
+    source_ref: sveltekit-frontend/src/lib/server/atlas/policy/policy-pattern-extractor.ts
+    runtime_schema_id: atlas.policy-pattern-input.v1
+  policy_emission:
+    source_ref: sveltekit-frontend/src/lib/server/atlas/policy/policy-pattern-extractor.ts
+    runtime_schema_id: atlas.policy-pattern-vector.v1
+  policy_training_row:
+    source_ref: sveltekit-frontend/src/lib/server/atlas/policy/policy-training.ts
+    runtime_schema_id: parent-atlas.policy-training-row.v1
+
+feature_label_policy:
+  registry_ref: sveltekit-frontend/src/lib/server/labels/feature-label-registry.shared.json
+  descriptive_only: true
+  numeric_tensor_input_allowed: false
+  identity_or_authority_allowed: false
+
+relation_policy:
+  registry_ref: .okf/predicates/feature-relationships.yaml
+  registered_predicates:
+    - depends_on
+    - implements
+    - specifies
+    - uses_table
+    - uses_column
+    - uses_concept
+    - auth_guards
+    - validates
+    - blocks
+    - observed_at_runtime
+    - authorized_resource_mutation
+  candidate_relation_disposition: PROPOSAL_ONLY
+  candidate_relation_kinds:
+    - API_CONTRACT_OBSERVED
+    - ROUTE_CALLS_SERVICE
+    - ROUTE_VALIDATES_WITH_SCHEMA
+    - ROUTE_GUARDED_BY_AUTH
+    - CLIENT_CALLS_OPERATION
+    - OPERATION_READS_STORE
+    - OPERATION_WRITES_STORE
+    - PRODUCER_EMITS_EVENT
+    - CONSUMER_SUBSCRIBES_EVENT
+    - DOCUMENTS_OPERATION
+    - CONFIGURES_SERVICE
+    - BUILDS_ABI_TARGET
+  minimum_evidence_refs: 1
+  require_source_revision: true
+  path_only_join_allowed: false
+
+policy_model:
+  state_vocabulary_ref: sveltekit-frontend/src/lib/server/atlas/policy/policy-types.ts#HMM_STATES
+  emission_ref: sveltekit-frontend/src/lib/server/atlas/policy/policy-pattern-extractor.ts#policyPatternAsHmmEmissions
+  transition_model_ref: null
+  fit_status: NOT_FIT
+  training_dataset_ref: memory/datasets/policy_training
+  training_dataset_snapshot:
+    row_count: 96
+    distinct_states: 1
+    distinct_actions: 1
+    distinct_outcomes: 1
+    distinct_source_revision_values: 1
+    known_source_revision_rows: 0
+    distinct_feature_revisions: 1
+    all_rows_executed: true
+    all_rows_have_source_refs: true
+
+recommendation_policy:
+  mode: DETERMINISTIC_SHADOW
+  hmm_enabled: false
+  candidate_limit: 5
+  abstain_when_unqualified: true
+  confidence_calibrated: false
+  fallback: EXISTING_DETERMINISTIC_POLICY
+
+language_profiles:
+  - language: bash
+    profile_ref: .okf/languages/bash.yaml
+    mode: STRUCTURAL
+    relations: [STARTS_SERVICE, DEPENDS_ON_HEALTH, USES_ENV_CONFIG]
+    feature_labels: [agent, api-route]
+  - language: binary
+    profile_ref: .okf/languages/binary.yaml
+    mode: ABSTAIN
+    relations: []
+    feature_labels: []
+  - language: c
+    profile_ref: .okf/languages/c.yaml
+    mode: STRUCTURAL
+    relations: [EXPORTS_ABI, CALLS_SYMBOL, ENCODES_FORMAT]
+    feature_labels: [symbol, retrieval]
+  - language: cmake
+    profile_ref: .okf/languages/cmake.yaml
+    mode: CONFIGURATION
+    relations: [BUILDS_ABI_TARGET, LINKS_DEPENDENCY]
+    feature_labels: [symbol, agent]
+  - language: cpp
+    profile_ref: .okf/languages/cpp.yaml
+    mode: STRUCTURAL
+    relations: [EXPORTS_ABI, CALLS_SYMBOL, ENCODES_FORMAT]
+    feature_labels: [symbol, retrieval]
+  - language: css
+    profile_ref: .okf/languages/css.yaml
+    mode: DOCUMENTATION
+    relations: [STYLES_COMPONENT_STATE]
+    feature_labels: [ui-component]
+  - language: glsl
+    profile_ref: .okf/languages/glsl.yaml
+    mode: ABSTAIN
+    relations: []
+    feature_labels: []
+  - language: go
+    profile_ref: .okf/languages/go.yaml
+    mode: STRUCTURAL
+    relations: [IMPLEMENTS_OPERATION, CALLS_SERVICE, READS_STORE, WRITES_STORE]
+    feature_labels: [api-route, retrieval, database]
+  - language: html
+    profile_ref: .okf/languages/html.yaml
+    mode: DOCUMENTATION
+    relations: [SUBMITS_TO_ROUTE, DISPLAYS_RESOURCE]
+    feature_labels: [ui-component, evidence]
+  - language: java
+    profile_ref: .okf/languages/java.yaml
+    mode: STRUCTURAL
+    relations: [IMPLEMENTS_OPERATION, CALLS_SERVICE]
+    feature_labels: [api-route, retrieval]
+  - language: json
+    profile_ref: .okf/languages/json.yaml
+    mode: CONTRACT
+    relations: [DECLARES_CONTRACT, CONFIGURES_SERVICE]
+    feature_labels: [api-route, agent, database]
+  - language: lua
+    profile_ref: .okf/languages/lua.yaml
+    mode: ABSTAIN
+    relations: []
+    feature_labels: []
+  - language: markdown
+    profile_ref: .okf/languages/markdown.yaml
+    mode: DOCUMENTATION
+    relations: [DOCUMENTS_OPERATION, DOCUMENTS_SYMBOL]
+    feature_labels: [general, api-route]
+  - language: ndjson
+    profile_ref: .okf/languages/ndjson.yaml
+    mode: CONTRACT
+    relations: [EMITS_EVENT, SUBSCRIBES_EVENT, VALIDATES_ENVELOPE]
+    feature_labels: [agent, svelte-realtime, retrieval]
+  - language: powershell
+    profile_ref: .okf/languages/powershell.yaml
+    mode: STRUCTURAL
+    relations: [STARTS_SERVICE, DEPENDS_ON_HEALTH, USES_ENV_CONFIG]
+    feature_labels: [agent, api-route]
+  - language: proto
+    profile_ref: .okf/languages/proto.yaml
+    mode: CONTRACT
+    relations: [DECLARES_METHOD, SHAPES_OPERATION]
+    feature_labels: [api-route, retrieval]
+  - language: python
+    profile_ref: .okf/languages/python.yaml
+    mode: STRUCTURAL
+    relations: [IMPLEMENTS_OPERATION, VALIDATES_WITH_SCHEMA, CALLS_PROVIDER]
+    feature_labels: [api-route, retrieval, agent, graph]
+  - language: rust
+    profile_ref: .okf/languages/rust.yaml
+    mode: STRUCTURAL
+    relations: [IMPLEMENTS_OPERATION, CONSUMES_SCHEMA]
+    feature_labels: [api-route, database, retrieval]
+  - language: sql
+    profile_ref: .okf/languages/sql.yaml
+    mode: STRUCTURAL
+    relations: [READS_STORE, WRITES_STORE, REFERENCES, SUPPORTS_QUERY]
+    feature_labels: [database, retrieval]
+  - language: text
+    profile_ref: .okf/languages/text.yaml
+    mode: DOCUMENTATION
+    relations: [DOCUMENTS_OPERATION]
+    feature_labels: [general]
+  - language: toml
+    profile_ref: .okf/languages/toml.yaml
+    mode: CONFIGURATION
+    relations: [CONFIGURES_SERVICE]
+    feature_labels: [agent, database, cache]
+  - language: typescript
+    profile_ref: .okf/languages/typescript.yaml
+    mode: STRUCTURAL
+    relations: [IMPLEMENTS_OPERATION, CALLS_SERVICE, VALIDATES_WITH_SCHEMA, GUARDED_BY_AUTH]
+    feature_labels: [api-route, ui-component, agent, database, retrieval]
+  - language: yaml
+    profile_ref: .okf/languages/yaml.yaml
+    mode: CONFIGURATION
+    relations: [DECLARES_CONTRACT, CONFIGURES_SERVICE]
+    feature_labels: [api-route, agent, database, cache]

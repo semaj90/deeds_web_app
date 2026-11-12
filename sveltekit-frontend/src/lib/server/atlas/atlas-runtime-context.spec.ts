@@ -31,4 +31,14 @@ describe('Atlas runtime revision boundary', () => {
     expect(isAtlasRuntimeRevisionQualified(runtime)).toBe(true);
     expect(() => assertAtlasRuntimeRevisionQualified(runtime)).not.toThrow();
   });
+
+  it('preserves an explicit source revision without synthesizing one', () => {
+    const runtime = createAtlasRuntimeContext({
+      ...base,
+      workspaceRevision: 'sha256:workspace',
+      packetRevision: 'sha256:packet',
+      sourceRevision: 'sha256:source',
+    });
+    expect(runtime.sourceRevision).toBe('sha256:source');
+  });
 });

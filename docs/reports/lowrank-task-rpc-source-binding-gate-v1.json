@@ -1,0 +1,81 @@
+{
+  "schema": "atlas.lowrank-task-rpc-source-binding-gate.v1",
+  "observedAt": "2026-11-08",
+  "status": "PARTIAL_FAIL_CLOSED",
+  "canonicalAuthority": false,
+  "canonicalFirst": true,
+  "runtimeWritesPerformed": false,
+  "databaseCacheGpuOrServiceWritesPerformed": false,
+  "rootOwner": "scripts/atlas/synthesize-lowrank-task-rpc-v1.py",
+  "input": "docs/reports/openspec-task-concept-tie-v2.20261107T214110Z.rows.jsonl",
+  "inputAdmission": {
+    "result": "REJECTED_AS_UNBOUND",
+    "probe": "--limit=1",
+    "missingFields": [
+      "canonical_task_key",
+      "candidate_packet_key",
+      "source_ref",
+      "source_revision",
+      "workspace_revision",
+      "candidate_snapshot_revision",
+      "ordinal_map_checksum",
+      "binding_receipt_sha256",
+      "semantic_representation_revision",
+      "feature_revision",
+      "graph_revision",
+      "candidate_ordinal",
+      "evidence_refs",
+      "semantic_embedding_768",
+      "latent_vector_64",
+      "latent_representation_id",
+      "latent_representation_revision",
+      "feature_row"
+    ],
+    "outputsCreatedByProbe": false
+  },
+  "implementation": {
+    "bindingValidator": "scripts/atlas/lowrank_task_binding_v1.py",
+    "requiresUniqueTaskAndCanonicalKeys": true,
+    "rejectsGeneratedPacketAndOrdinalKeys": true,
+    "requiresSha256SourceWorkspaceSnapshotAndBindingDigests": true,
+    "requiresSha256SemanticFeatureAndGraphRevisions": true,
+    "requiresContiguousSnapshotOrdinals": true,
+    "requiresEvidenceReferences": true,
+    "requiresSuppliedSemantic768AndLearnedLatent64": true,
+    "requiresInputFeatureRows": true,
+    "validatesReceiptAuthenticity": false,
+    "validatesEmbeddingLineage": false,
+    "outputFormat": "noncanonical local diagnostic; not FeatureRowRpcPacketV1 MessagePack"
+  },
+  "validation": [
+    {
+      "command": "python scripts/atlas/test_lowrank_task_binding_v1.py",
+      "result": "PASS",
+      "passed": 8,
+      "failed": 0
+    },
+    {
+      "command": "node --test scripts/atlas/verify-lowrank-task-rpc-v1.test.mjs",
+      "result": "PASS",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "command": "python -m py_compile scripts/atlas/lowrank_task_binding_v1.py scripts/atlas/test_lowrank_task_binding_v1.py scripts/atlas/synthesize-lowrank-task-rpc-v1.py",
+      "result": "PASS",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS",
+      "exitCode": 0
+    }
+  ],
+  "openGates": [
+    "Produce an authenticated task-to-packet/source binding artifact with stable candidate ordinals.",
+    "Verify binding receipts and all source/representation lineage against canonical owners.",
+    "Provide actual semantic_768, learned latent_64, and feature-row inputs with model and feature revisions.",
+    "Match canonical FeatureRowRpcPacketV1 schema and MessagePack transport with cross-language parity.",
+    "Connect derived centroids/bitmaps to existing cache and GPU FSM owners under measured memory limits."
+  ]
+}

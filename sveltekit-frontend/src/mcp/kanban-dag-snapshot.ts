@@ -7,7 +7,7 @@ const MAX_TASKS = 128;
 const MAX_DEPENDENCIES = 512;
 
 export const KanbanDagSnapshotInputV1Schema = z.object({
-  featureId: z.string().trim().regex(/^openspec:[a-z0-9][a-z0-9-]*$/),
+  featureId: z.string().trim().regex(/^(openspec:[a-z0-9][a-z0-9-]*|nextsteps:[a-z0-9_.-]+)$/),
   limit: z.number().int().min(1).max(MAX_TASKS).optional().default(64),
 }).strict();
 

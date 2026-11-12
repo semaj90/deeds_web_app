@@ -325,3 +325,69 @@ export function compareEncodingSizes(envelope: PacketTopologyEnvelope): {
     compression_ratio: msgpackBytes / jsonBytes,
   };
 }
+
+// ── NES LUT descriptor (NLUT-06) ─────────────────────────────────────────────
+// A small, fixed-shape descriptor for one NES domain assignment. It carries scalars only
+// (no embeddings, matrices or float arrays). Source of the palette values: the single-owner
+// artifact scripts/atlas/data/nes-domain-palette-v1.json. lutByte and nesHex are different fields.
+
+export const NES_LUT_DESCRIPTOR_SCHEMA = 'atlas.nes-lut-descriptor.v1' as const;
+
+export interface NesLutDescriptorV1 {
+  domain: string;
+  lutByte: number; // 0x00 = unresolved (fail-closed); 0x01..0x0A domain bytes
+  nesHex: string; // NES colour, e.g. "0x2A"
+  uuidRef: string; // UUID reference to the packet/evidence row
+  tierFlags: number; // 0..255 bit flags owned by the caller
+}
+
+const NES_HEX_RE = /^0x[0-9A-Fa-f]{2}$/;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function assertNesLutDescriptor(d: NesLutDescriptorV1): void {
+  if (typeof d.domain !== 'string' || d.domain.length === 0 || d.domain.length > 64) {
+    throw new Error('NES_LUT_DESCRIPTOR_DOMAIN_INVALID');
+  }
+  if (!Number.isInteger(d.lutByte) || d.lutByte < 0 || d.lutByte > 0xff) {
+    throw new Error('NES_LUT_DESCRIPTOR_LUT_BYTE_INVALID');
+  }
+  if (typeof d.nesHex !== 'string' || !NES_HEX_RE.test(d.nesHex)) {
+    throw new Error('NES_LUT_DESCRIPTOR_NES_HEX_INVALID');
+  }
+  if (typeof d.uuidRef !== 'string' || !UUID_RE.test(d.uuidRef)) {
+    throw new Error('NES_LUT_DESCRIPTOR_UUID_INVALID');
+  }
+  if (!Number.isInteger(d.tierFlags) || d.tierFlags < 0 || d.tierFlags > 0xff) {
+    throw new Error('NES_LUT_DESCRIPTOR_TIER_FLAGS_INVALID');
+  }
+}
+
+/** Encode one NES LUT descriptor to MsgPack. Throws on any invalid field (no defaults). */
+export function encodeNesLutDescriptorToMsgpack(d: NesLutDescriptorV1): Uint8Array {
+  assertNesLutDescriptor(d);
+  return encode({
+    s: NES_LUT_DESCRIPTOR_SCHEMA,
+    d: d.domain,
+    l: d.lutByte,
+    n: d.nesHex,
+    u: d.uuidRef,
+    t: d.tierFlags,
+  });
+}
+
+/** Decode and re-validate one NES LUT descriptor. Throws on schema mismatch or invalid fields. */
+export function decodeNesLutDescriptorFromMsgpack(bytes: Uint8Array): NesLutDescriptorV1 {
+  const raw = decode(bytes) as Record<string, unknown>;
+  if (!raw || raw.s !== NES_LUT_DESCRIPTOR_SCHEMA) {
+    throw new Error('NES_LUT_DESCRIPTOR_SCHEMA_MISMATCH');
+  }
+  const d: NesLutDescriptorV1 = {
+    domain: raw.d as string,
+    lutByte: raw.l as number,
+    nesHex: raw.n as string,
+    uuidRef: raw.u as string,
+    tierFlags: raw.t as number,
+  };
+  assertNesLutDescriptor(d);
+  return d;
+}

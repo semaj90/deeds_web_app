@@ -1,0 +1,417 @@
+{
+  "schema": "atlas.parent-atlas-mcp-agentic-workflow-review.v1",
+  "generatedAt": "2026-11-09T23:36:10.960Z",
+  "mode": "STATIC_SOURCE_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "mcpToolsInvoked": false,
+  "databasesCachesGpuAndServicesAccessed": false,
+  "sources": {
+    "sveltekit-frontend/src/mcp/trace-mcp-server.ts": {
+      "sha256": "sha256:4a9bfa17503ae51d7253f23852b3af9b464f09b13e41cabcaa5163dfff11a116"
+    },
+    "sveltekit-frontend/src/lib/server/fixer/fixer-memory.ts": {
+      "sha256": "sha256:4498505592eeb3e3c7044b1844dfbef5ece57fae12f1ff8ed954261367fb1261"
+    },
+    "sveltekit-frontend/src/lib/server/telemetry/gpu-telemetry.ts": {
+      "sha256": "sha256:a91d01d56d8ba05f0cba6dd2fd443aa95b9824f39e6f3e179ded35cd6ec16da4"
+    },
+    "sveltekit-frontend/src/lib/server/telemetry/packet-centric-telemetry.ts": {
+      "sha256": "sha256:4caaa3de6281b8ae3ccea5a961c2eb83983812945637940978994b3647dd0113"
+    },
+    "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts": {
+      "sha256": "sha256:4657ea35212b6f063cad2ca77ef980c0387575b9943454b944465b2f102e19df"
+    },
+    "sveltekit-frontend/src/mcp/native-acceleration-tools.ts": {
+      "sha256": "sha256:e3f91702bf6b2f1ceb43ffacb25de2824c58955ad975a85fb4efaaeb65f71022"
+    },
+    "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs": {
+      "sha256": "sha256:2d3fc6b0f59a276a8767a032a368818d20d48db46504a626f9808948dbc0c28a"
+    },
+    "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.vram-request-contract.test.mjs": {
+      "sha256": "sha256:0f0095fb75417b84ab8840a9457564b404a92cdd09b0c8ca70a3635872b3a8e3"
+    },
+    "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md": {
+      "sha256": "sha256:636ab357411ff3c417d0996c2b82204d363443fb681bf1cb5ff8ff8eb64486a7"
+    },
+    "sveltekit-frontend/src/mcp/kanban-dag-prefill-recommendation.ts": {
+      "sha256": "sha256:51c96298227f305408369507cd6535a589eabf1d4ccde433f0940cd632411571"
+    },
+    "docs/reports/mcp-tool-registry-index.json": {
+      "sha256": "sha256:211dd2131e17d16d6b2bfc7c90666e92daebfcac66fb15444ee71ac73ae4776e"
+    },
+    "sveltekit-frontend/src/mcp/atlas-keyword-corpus-tools.ts": {
+      "sha256": "sha256:986522e1ef71a91a2e59d8a05f3638324a0c4e740e413932e6552447eca993c3"
+    },
+    "sveltekit-frontend/src/mcp/operator-token-verifier.ts": {
+      "sha256": "sha256:ee44bc8933dc93855e8ee0e619c0e65503030fc3d5d88e138b04d64657d2a37c"
+    },
+    "sveltekit-frontend/src/mcp/operator-token-gate.ts": {
+      "sha256": "sha256:2b0838cd1053367dbc6fe2dd721bcf038832bbf74484b0315fd3b5adc16c47fb"
+    }
+  },
+  "toolInventory": [
+    {
+      "name": "ops.search_tools",
+      "declared": "READ",
+      "handler": "Bounded registry search; TRACE invocation wrapper also records an Engram observation.",
+      "auth": "No operator token required for discovery.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 7286,
+          "needle": "'ops.search_tools'"
+        }
+      ]
+    },
+    {
+      "name": "ops.inspect_tool_contract",
+      "declared": "READ",
+      "handler": "Reads in-memory contract metadata; TRACE invocation wrapper records an Engram observation.",
+      "auth": "No operator token required for discovery.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 7326,
+          "needle": "'ops.inspect_tool_contract'"
+        }
+      ]
+    },
+    {
+      "name": "ops.validate_tool_call",
+      "declared": "READ",
+      "handler": "Preflight validation only; TRACE invocation wrapper records an Engram observation.",
+      "auth": "No operator token required for preflight.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 7368,
+          "needle": "'ops.validate_tool_call'"
+        }
+      ]
+    },
+    {
+      "name": "ops.propose_patch",
+      "declared": "READ",
+      "handler": "Reads source and returns a patch preview; does not apply it. TRACE invocation wrapper persists an observation.",
+      "auth": "Operator token required by handler.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 5850,
+          "needle": "'ops.propose_patch'"
+        }
+      ]
+    },
+    {
+      "name": "ops.record_fix_attempt",
+      "declared": "WRITE",
+      "handler": "Inserts fix-attempt data into PostgreSQL; TRACE invocation wrapper also persists an observation.",
+      "auth": "Operator token required.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 7158,
+          "needle": "'ops.record_fix_attempt': {"
+        }
+      ]
+    },
+    {
+      "name": "ops.run_targeted_test",
+      "declared": "EXEC",
+      "handler": "Spawns Vitest for supplied target; tests may have their own side effects. TRACE invocation wrapper persists an observation.",
+      "auth": "Operator token required.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 7176,
+          "needle": "'ops.run_targeted_test': {"
+        }
+      ]
+    },
+    {
+      "name": "ops.fixer_semantic_recall",
+      "declared": "READ",
+      "handler": "Queries fixer-memory projections; TRACE invocation wrapper persists an observation.",
+      "auth": "No write authorization; inspect runtime token wrapper before calling.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 7881,
+          "needle": "'ops.fixer_semantic_recall'"
+        }
+      ]
+    },
+    {
+      "name": "ops.fixer_pattern_store",
+      "declared": "WRITE",
+      "handler": "Writes PostgreSQL fixer_patterns and fixer_run_log; may update Redis and Qdrant. Formal TRACE contract and implementation both classify it as storage-mutating.",
+      "auth": "Operator-token gate plus handler validation.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 7200,
+          "needle": "'ops.fixer_pattern_store': {"
+        },
+        {
+          "source": "sveltekit-frontend/src/lib/server/fixer/fixer-memory.ts",
+          "line": 200,
+          "needle": "INSERT INTO fixer_patterns"
+        },
+        {
+          "source": "docs/reports/mcp-tool-registry-index.json",
+          "line": 32,
+          "needle": "\"permissions\": \"read_only\""
+        },
+        {
+          "source": "sveltekit-frontend/src/mcp/operator-token-gate.ts",
+          "line": 4,
+          "needle": "verifyMcpOperatorToken(token, configuredSecret)"
+        }
+      ]
+    },
+    {
+      "name": "graph.expand_neighborhood",
+      "declared": "READ",
+      "handler": "Bounded graph neighborhood traversal; TRACE invocation wrapper persists an Engram observation.",
+      "auth": "Graph-read path; no task mutation authority.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 1457,
+          "needle": "'graph.expand_neighborhood'"
+        }
+      ]
+    },
+    {
+      "name": "trace.kag_search",
+      "declared": "READ",
+      "handler": "Retrieval cascade; TRACE invocation wrapper persists an Engram observation and retrieval subcalls may emit resource telemetry.",
+      "auth": "Read path; result must still pass ACE canonicalization before model context.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 3485,
+          "needle": "'trace.kag_search'"
+        }
+      ]
+    },
+    {
+      "name": "atlas.keyword_corpus_search",
+      "declared": "READ",
+      "handler": "Searches schema-validated .okf keyword corpus; reference-only output, not canonical admission. TRACE invocation wrapper applies when registered through the wrapped server.",
+      "auth": "Read-only corpus search.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/atlas-keyword-corpus-tools.ts",
+          "line": 8,
+          "needle": "'atlas.keyword_corpus_search'"
+        }
+      ]
+    },
+    {
+      "name": "atlas.materialize_feature_evidence_tuples",
+      "declared": "READ",
+      "handler": "Bounded canonical-source read and proposal materialization; TRACE invocation wrapper additionally persists an Engram observation.",
+      "auth": "Read-only query budget.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 10609,
+          "needle": "'atlas.materialize_feature_evidence_tuples'"
+        }
+      ]
+    },
+    {
+      "name": "atlas.graph.pagerank",
+      "declared": "READ",
+      "handler": "Authorized graph-projection read; returned ranks do not establish canonical identity. TRACE invocation wrapper persists an observation.",
+      "auth": "Scoped graph-read grant.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 10315,
+          "needle": "'atlas.graph.pagerank'"
+        }
+      ]
+    },
+    {
+      "name": "atlas.backend_info / atlas.exact_topk_oracle / atlas.parity_report / atlas.simdjson_tensor_metrics",
+      "declared": "READ",
+      "handler": "Native acceleration fixtures and backend metadata; registered before TRACE global invocation instrumentation. Fixture parity is not production corpus or GPU proof.",
+      "auth": "No mutation authority declared.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 702,
+          "needle": "registerNativeAccelerationTools(server, async () =>"
+        },
+        {
+          "source": "sveltekit-frontend/src/mcp/native-acceleration-tools.ts",
+          "line": 4,
+          "needle": "atlas.exact_topk_oracle"
+        }
+      ]
+    },
+    {
+      "name": "atlas.kanban_dag_prefill_recommendation",
+      "declared": "READ",
+      "handler": "Bounded snapshot and recommendation only; never claims, dispatches, or changes task state. TRACE invocation telemetry applies.",
+      "auth": "Proposal-only.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/kanban-dag-prefill-recommendation.ts",
+          "line": 34,
+          "needle": "atlas.kanban_dag_prefill_recommendation"
+        }
+      ]
+    },
+    {
+      "name": "recommend_kanban_dag_prefill_algorithm",
+      "declared": "READ",
+      "handler": "Separate atlas-tools MCP server; bounded snapshot proposal, no claim or status mutation.",
+      "auth": "No durable claim authorization.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
+          "line": 330,
+          "needle": "name: 'recommend_kanban_dag_prefill_algorithm'"
+        }
+      ]
+    },
+    {
+      "name": "classify_intent / build_recommendation",
+      "declared": "READ",
+      "handler": "Intent classification plus bounded live retrieval to ground a recommendation; not an execution command. The latter performs source retrieval.",
+      "auth": "No task-execution authority.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
+          "line": 112,
+          "needle": "name: 'classify_intent'"
+        },
+        {
+          "source": "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
+          "line": 1347,
+          "needle": "export async function buildRecommendation("
+        }
+      ]
+    },
+    {
+      "name": "record_outcome",
+      "declared": "WRITE",
+      "handler": "Can persist outcome records to the explicitly guarded loopback PostgreSQL scratch target and other configured outcome projections; not a verified task completion owner unless claim/lease/verification fields are validated.",
+      "auth": "Scratch URL and schema/runtime gates; write-capable.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
+          "line": 1390,
+          "needle": "async function recordOutcome(args)"
+        }
+      ]
+    },
+    {
+      "name": "gpu_vram_status",
+      "declared": "READ",
+      "handler": "Reads nvidia-smi and llama-server slots; does not stop services. Live runtime status is not queried by this audit.",
+      "auth": "Status only.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
+          "line": 355,
+          "needle": "name: 'gpu_vram_status'"
+        }
+      ]
+    },
+    {
+      "name": "gpu_request_vram_release",
+      "declared": "WRITE",
+      "handler": "Writes an idempotent request record to a local file; does not stop a process. Production record omits testOnly.",
+      "auth": "Unauthenticated request-only notice; human runs lifecycle task.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
+          "line": 455,
+          "needle": "gpuRequestVramRelease(args)"
+        },
+        {
+          "source": "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.vram-request-contract.test.mjs",
+          "line": 77,
+          "needle": "Object.hasOwn(stored, 'testOnly')"
+        }
+      ]
+    },
+    {
+      "name": "GPU compute tools (ops.gpu_topk / ops.gpu_pagerank / ops.gpu_attention)",
+      "declared": "WRITE in registry",
+      "handler": "Compute may use a native export or CPU reference; persisted resource telemetry is written through packet-centric PostgreSQL telemetry. Telemetry does not prove CUDA kernel execution.",
+      "auth": "Operator-gated contract; no GPU tool invoked.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 7224,
+          "needle": "'ops.gpu_attention': {"
+        },
+        {
+          "source": "sveltekit-frontend/src/lib/server/telemetry/gpu-telemetry.ts",
+          "line": 75,
+          "needle": "recordPacketCentricTelemetry"
+        },
+        {
+          "source": "sveltekit-frontend/src/lib/server/telemetry/packet-centric-telemetry.ts",
+          "line": 174,
+          "needle": "insert into phase_2_telemetry"
+        }
+      ]
+    },
+    {
+      "name": "trace.system_health",
+      "declared": "READ",
+      "handler": "Source marks rerank optional and topology_search required; deployed behavior still needs operator restart and live read.",
+      "auth": "Status only.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+          "line": 2912,
+          "needle": "new Set(['rerank'])"
+        }
+      ]
+    }
+  ],
+  "findings": {
+    "fixerPatternStoreClassification": "CONFIRMED_DISCREPANCY: generated docs/reports/mcp-tool-registry-index.json says permissions=read_only and writes_to=[], while TRACE formal registry says WRITE and the implementation mutates PostgreSQL, with optional Redis/Qdrant updates. Correct the generated index from the source owner before using it for routing or authorization.",
+    "traceInvocationPersistence": "Tools registered after the registerTool monkey-patch record observations in Engram (PostgreSQL-backed path); handler-level READ does not mean the overall invocation has no persistence side effect. Native acceleration tools are registered before this wrapper.",
+    "operatorToken": {
+      "finding": "The verifier rejects missing/short tokens and an unconfigured secret, then compares SHA-256 digests with timingSafeEqual. This is source inspection only; no secret was read and no live positive-token request was made.",
+      "refs": [
+        {
+          "source": "sveltekit-frontend/src/mcp/operator-token-verifier.ts",
+          "line": 29,
+          "needle": "timingSafeEqual(supplied, configured)"
+        },
+        {
+          "source": "sveltekit-frontend/src/mcp/operator-token-gate.ts",
+          "line": 4,
+          "needle": "verifyMcpOperatorToken(token, configuredSecret)"
+        }
+      ]
+    },
+    "viterbi": "No registered/callable Viterbi routing tool was established by this bounded source audit. Keep Viterbi as a challenger.",
+    "liveToolList": "NOT_RUN; static registration does not prove deployed process availability or loaded-source revision.",
+    "workflow": "Tool discovery and preflight exist. Evidence materialization, retrieval, recommendation, verification, and mutation are distinct. No complete execution proof is established without a revision-bound durable claim, authorized command, independent receipt, and Kanban readback.",
+    "dependencyReferences": {
+      "priorReportedWorkboardTasks": 4077,
+      "unique": 7,
+      "ambiguous": 2,
+      "unresolved": 9,
+      "status": "REVIEW_REQUIRED; no edges inferred or promoted by this audit"
+    }
+  },
+  "openGates": [
+    "TRACE token configured and positive/negative live comparison verified by operator without exposing the secret.",
+    "TRACE operator restart and live system_health response for optional rerank behavior.",
+    "Resolve any generated-registry discrepancy against the current tool owner and actual side effects.",
+    "Provide task-bound criterion evidence, exact verification command/result receipts, and dependency mappings before computing a total per-task evidence score.",
+    "Keep write-capable tools uncalled until a reviewed task, authorization, and execution receipt path are admitted."
+  ]
+}

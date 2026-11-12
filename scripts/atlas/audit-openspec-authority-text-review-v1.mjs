@@ -3,7 +3,9 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 
 const root = process.cwd();
-const reportsDir = path.resolve(root, 'docs/reports');
+const reportsDir = process.env.ATLAS_OPENSPEC_REPORTS_DIR
+  ? path.resolve(root, process.env.ATLAS_OPENSPEC_REPORTS_DIR)
+  : path.resolve(root, 'docs/reports');
 const controllerPath = path.resolve(reportsDir, 'openspec-execution-controller-v1.json');
 const fallbackPath = path.resolve(reportsDir, 'openspec-actionable-lane-audit-v2.json');
 const outputPath = path.resolve(reportsDir, 'openspec-authority-text-review-v1.json');

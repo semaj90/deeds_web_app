@@ -1,0 +1,399 @@
+{
+  "schema": "atlas.wfu09-ns9-dependency-text-candidates.v1",
+  "generatedAt": "2026-11-09T19:40:48.541Z",
+  "workspaceRevision": "ef1e28f984d8dbcf5bd07bb3c2629c537135fc73",
+  "authority": "HUMAN_REVIEW_TEXT_CANDIDATES_ONLY",
+  "canonicalAuthority": false,
+  "declarationsWritten": false,
+  "taskIdsCreatedOrReplaced": 0,
+  "writes": {
+    "database": 0,
+    "cache": 0,
+    "taskSource": 0,
+    "localReport": true
+  },
+  "scope": "CURRENT_ACTIONABLE_TASKS",
+  "inputs": {
+    "taskSourceInventory": {
+      "path": ".tmp/atlas/wfu09-ns9-final-refresh2/reports/current-actionable-source-review.json",
+      "sha256": "f1a39ec8148c81b0d01efe4259066cf604161d13109e788531e8964760c2e537"
+    },
+    "executionController": {
+      "path": ".tmp/atlas/wfu09-ns9-final-refresh2/reports/openspec-execution-controller-v1.json",
+      "sha256": "a14f471fe1be2517c212cbadecf2b9ca1da5fde7dca455261935fbf8ad02d0e6"
+    },
+    "generator": {
+      "path": "scripts/atlas/audit-wfu09-ns9-dependency-text-candidates-v1.mjs",
+      "sha256": "02cd2da4d2f3ee5c73d291ac6e2171ddd1fc2e1d50dc38e8ca7aa7318d6af568"
+    }
+  },
+  "counts": {
+    "sourceTasksChecked": 4077,
+    "sourceTasksWithDependencyCues": 14,
+    "textReferenceCandidates": 18,
+    "uniquelyResolvable": 7,
+    "ambiguous": 2,
+    "unresolved": 9,
+    "failures": 0
+  },
+  "rule": "A cue plus an ID mention is only a review candidate. It is not a declared dependency and cannot affect scheduling, ranking, readiness, or task execution until a human approves and the owning task ledger receives a source-backed wfu declaration.",
+  "failures": [],
+  "tasks": [
+    {
+      "taskKey": "parent-atlas-compute-rank-cache-eval-dspy-gepa:324",
+      "logicalTaskKey": "parent-atlas-compute-rank-cache-eval-dspy-gepa:GEPA-768-INPUT-01",
+      "candidates": [
+        {
+          "referencedId": "DSPY-SIDECAR-01",
+          "cue": "depend on",
+          "resolution": "UNRESOLVED_CANDIDATE",
+          "candidateTaskKeys": [],
+          "sourceQuote": "ad-only, without a live DSPy/GEPA runtime — it does not depend on `DSPY-SIDECAR-01`/ `GEPA-VERSION-01` passing first, but `GEPA-HELD",
+          "sourceRef": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md",
+          "sourceLine": 324,
+          "sourceBlockHash": "sha256:cb7a7a88a8a52c918ad6bdf7b0bf38546feb644f6be4155f65205f9c7af45464",
+          "sourceFileSha256": "9ce319d9100f487a52542a26d637b5ebf05d0535d984542731a475fe50e1920b",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:12857",
+      "logicalTaskKey": "parent-atlas-ace-rlm-bitfrost-integration:LIBDOC-10",
+      "candidates": [
+        {
+          "referencedId": "LIBDOC-09",
+          "cue": "After",
+          "resolution": "UNIQUE_CANDIDATE",
+          "candidateTaskKeys": [
+            "parent-atlas-ace-rlm-bitfrost-integration:12852"
+          ],
+          "sourceQuote": "- [ ] LIBDOC-10 After LIBDOC-09 only, run bounded supersession passes: generate enhance",
+          "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+          "sourceLine": 12857,
+          "sourceBlockHash": "sha256:38d2c4a3a48386aaa010b5173633b43ba6aecec5d4a78303fd13a92c1add7ee5",
+          "sourceFileSha256": "5aad37703e62b37f4f300795920da6a83adcfa15a245940f1c9c1b1f8d00d650",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:12967",
+      "logicalTaskKey": "parent-atlas-ace-rlm-bitfrost-integration:LCTX-06",
+      "candidates": [
+        {
+          "referencedId": "LCTX-01",
+          "cue": "only after",
+          "resolution": "UNIQUE_CANDIDATE",
+          "candidateTaskKeys": [
+            "parent-atlas-ace-rlm-bitfrost-integration:12946"
+          ],
+          "sourceQuote": "t before any beyond-native case; include 320K/400K/512K only after LCTX-01/02/03 pass and only with a matching extension policy.",
+          "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+          "sourceLine": 12967,
+          "sourceBlockHash": "sha256:fff5741cbefb33ca2766123710b0180ddd7be5693010aff30ecec03b568050a7",
+          "sourceFileSha256": "5aad37703e62b37f4f300795920da6a83adcfa15a245940f1c9c1b1f8d00d650",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "parent-atlas-ontology-kernel:954",
+      "logicalTaskKey": null,
+      "candidates": [
+        {
+          "referencedId": "OAK-02",
+          "cue": "depends\n  on",
+          "resolution": "UNRESOLVED_CANDIDATE",
+          "candidateTaskKeys": [],
+          "sourceQuote": "function patch → re-verify → re-evaluate). Not started, depends on OAK-02 through OAK-08.",
+          "sourceRef": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+          "sourceLine": 954,
+          "sourceBlockHash": "sha256:8fb8eeb8f9e9a2f62a98a366125dc7769ebae30e52f94144ffa56dced6d9dcf8",
+          "sourceFileSha256": "a26ebac0c07de905b99ee2db26dc4484a1b4fb4548a02e2a8ade1d5d38009bcf",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        },
+        {
+          "referencedId": "OAK-08",
+          "cue": "depends\n  on",
+          "resolution": "UNRESOLVED_CANDIDATE",
+          "candidateTaskKeys": [],
+          "sourceQuote": "function patch → re-verify → re-evaluate). Not started, depends on OAK-02 through OAK-08.",
+          "sourceRef": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+          "sourceLine": 954,
+          "sourceBlockHash": "sha256:8fb8eeb8f9e9a2f62a98a366125dc7769ebae30e52f94144ffa56dced6d9dcf8",
+          "sourceFileSha256": "a26ebac0c07de905b99ee2db26dc4484a1b4fb4548a02e2a8ade1d5d38009bcf",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "parent-atlas-ontology-kernel:995",
+      "logicalTaskKey": null,
+      "candidates": [
+        {
+          "referencedId": "OAK-00",
+          "cue": "depends on",
+          "resolution": "UNRESOLVED_CANDIDATE",
+          "candidateTaskKeys": [],
+          "sourceQuote": "nsfer to this codebase's task families. Not started — depends on OAK-00 through OAK-10 being real.",
+          "sourceRef": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+          "sourceLine": 995,
+          "sourceBlockHash": "sha256:0ac9cb8fdddb95cfc476c3f9967f12fe3862324a693e6339a281ce8051d38420",
+          "sourceFileSha256": "a26ebac0c07de905b99ee2db26dc4484a1b4fb4548a02e2a8ade1d5d38009bcf",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        },
+        {
+          "referencedId": "OAK-10",
+          "cue": "depends on",
+          "resolution": "UNRESOLVED_CANDIDATE",
+          "candidateTaskKeys": [],
+          "sourceQuote": "nsfer to this codebase's task families. Not started — depends on OAK-00 through OAK-10 being real.",
+          "sourceRef": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+          "sourceLine": 995,
+          "sourceBlockHash": "sha256:0ac9cb8fdddb95cfc476c3f9967f12fe3862324a693e6339a281ce8051d38420",
+          "sourceFileSha256": "a26ebac0c07de905b99ee2db26dc4484a1b4fb4548a02e2a8ade1d5d38009bcf",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "parent-atlas-ontology-kernel:5270",
+      "logicalTaskKey": "parent-atlas-ontology-kernel:HARNESS-05",
+      "candidates": [
+        {
+          "referencedId": "SPINE-04",
+          "cue": "After",
+          "resolution": "UNIQUE_CANDIDATE",
+          "candidateTaskKeys": [
+            "parent-atlas-ontology-kernel:5107"
+          ],
+          "sourceQuote": "S-05 — **Join execution, repair, and memory evidence.** After SPINE-04, join accepted DAG node IDs with existing MCP/too",
+          "sourceRef": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+          "sourceLine": 5270,
+          "sourceBlockHash": "sha256:7f87d214ead7e48f61288eade0a67bce059e30d1c6a9e4f595fdeb6e5c36528a",
+          "sourceFileSha256": "a26ebac0c07de905b99ee2db26dc4484a1b4fb4548a02e2a8ade1d5d38009bcf",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "parent-atlas-ontology-kernel:5513",
+      "logicalTaskKey": null,
+      "candidates": [
+        {
+          "referencedId": "NEXT-04",
+          "cue": "Prerequisite for",
+          "resolution": "AMBIGUOUS_CANDIDATE",
+          "candidateTaskKeys": [
+            "parent-atlas-ml-graph-retrieval-convergence:286",
+            "parent-atlas-ontology-kernel:5515"
+          ],
+          "sourceQuote": "ms, and which mint `ace:packet:` versus `packet:` keys. Prerequisite for NEXT-04: a constraint must not break a live writer.",
+          "sourceRef": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+          "sourceLine": 5513,
+          "sourceBlockHash": "sha256:2e0bdffc0155f6724278862850d6ff2f20c9569a8b90e7529decde340a977b1c",
+          "sourceFileSha256": "a26ebac0c07de905b99ee2db26dc4484a1b4fb4548a02e2a8ade1d5d38009bcf",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "parent-atlas-ontology-kernel:5527",
+      "logicalTaskKey": "parent-atlas-ontology-kernel:NEXT-22",
+      "candidates": [
+        {
+          "referencedId": "NEXT-08",
+          "cue": "after",
+          "resolution": "UNIQUE_CANDIDATE",
+          "candidateTaskKeys": [
+            "parent-atlas-ontology-kernel:5519"
+          ],
+          "sourceQuote": "- [ ] NEXT-22 READY after NEXT-08/09 - Implement a deterministic incidence builder from a",
+          "sourceRef": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+          "sourceLine": 5527,
+          "sourceBlockHash": "sha256:660e65e03d633090971394e058658b6cfa455fd2cc0850bc0e6e23596bfd9677",
+          "sourceFileSha256": "a26ebac0c07de905b99ee2db26dc4484a1b4fb4548a02e2a8ade1d5d38009bcf",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "local-llm-offload-ownership:582",
+      "logicalTaskKey": "local-llm-offload-ownership:OWN-5",
+      "candidates": [
+        {
+          "referencedId": "OWN-2",
+          "cue": "after",
+          "resolution": "UNIQUE_CANDIDATE",
+          "candidateTaskKeys": [
+            "local-llm-offload-ownership:576"
+          ],
+          "sourceQuote": "s/gemma4-legal-iq4xs-direct.gguf`) has no live consumer after OWN-2. Its removal or hardlink is gated on ALIGN-F3 in the",
+          "sourceRef": "openspec/changes/local-llm-offload-ownership/tasks.md",
+          "sourceLine": 582,
+          "sourceBlockHash": "sha256:b110273b2c5695d7401f8a72d263b4672112150df857a1c36579434d7b6adb7e",
+          "sourceFileSha256": "8c098822d850de1d6dd3575f3c19dbfd9d5821bb4394b93f64c35bad195d6a5d",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "parent-atlas-best-fit-score-fabric:5762",
+      "logicalTaskKey": "parent-atlas-best-fit-score-fabric:PACKET-FABRIC-INPUT-02",
+      "candidates": [
+        {
+          "referencedId": "INPUT-01",
+          "cue": "only after",
+          "resolution": "UNRESOLVED_CANDIDATE",
+          "candidateTaskKeys": [],
+          "sourceQuote": "** Select a server-owned, read-only shadow caller only after INPUT-01 passes. It must obtain revision values from their",
+          "sourceRef": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+          "sourceLine": 5762,
+          "sourceBlockHash": "sha256:8444bba772aff85dfe95b2af50d06a780e51e886935658df56d3ab1e24e5c4e5",
+          "sourceFileSha256": "044d6669abe12d9fdf642e039abd8cc996be340efc9760bd133e1a3106ed68cd",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:7593",
+      "logicalTaskKey": null,
+      "candidates": [
+        {
+          "referencedId": "MCP-FILE-TOPK-04",
+          "cue": "prerequisite for",
+          "resolution": "UNIQUE_CANDIDATE",
+          "candidateTaskKeys": [
+            "parent-atlas-neural-prefill-encoder:7537"
+          ],
+          "sourceQuote": "concurrent session's environment actually lives) is a prerequisite for closing `MCP-FILE-TOPK-04`'s live-proof gap, `MCP-FILE-TOPK-05`, and `MCP-FILE-",
+          "sourceRef": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+          "sourceLine": 7593,
+          "sourceBlockHash": "sha256:13dbfadad815cda14fd5e654a125a807835e3b891dae98c2abaea18140c8913f",
+          "sourceFileSha256": "f930fde94d32bec2848c96bf8e27075115f2a5b25ef2c1f65c3217cd623fcd21",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:14632",
+      "logicalTaskKey": "parent-atlas-neural-prefill-encoder:GPU-PROVIDER-PARITY-01",
+      "candidates": [
+        {
+          "referencedId": "FEAT-04",
+          "cue": "only after",
+          "resolution": "AMBIGUOUS_CANDIDATE",
+          "candidateTaskKeys": [
+            "parent-atlas-candidate-feature-execution-fabric:189",
+            "parent-atlas-prefill-routing-residency-convergence:134"
+          ],
+          "sourceQuote": "h ATen, cuTile, and SIMT on the frozen MRL tournament only after FEAT-04 input and residency proofs exist.",
+          "sourceRef": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+          "sourceLine": 14632,
+          "sourceBlockHash": "sha256:ef1ad5886083dadc4501d957e534b7ecefe2d04b1bce83249da1e6016323a401",
+          "sourceFileSha256": "f930fde94d32bec2848c96bf8e27075115f2a5b25ef2c1f65c3217cd623fcd21",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "parent-atlas-query-routing-classifier:217",
+      "logicalTaskKey": null,
+      "candidates": [
+        {
+          "referencedId": "NLP-3",
+          "cue": "Require",
+          "resolution": "UNRESOLVED_CANDIDATE",
+          "candidateTaskKeys": [],
+          "sourceQuote": "- [ ] Require NLP-3 through NLP-8 evidence.",
+          "sourceRef": "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+          "sourceLine": 217,
+          "sourceBlockHash": "sha256:457ac281d3fc234371ce7c6aed7e5436c8f9ce8a592eba47b10b2c0a6ee6b23f",
+          "sourceFileSha256": "82307fcdd2759ad21ad35a8a010a8c4e5e61131fab290848d1983e6a6cba230c",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        },
+        {
+          "referencedId": "NLP-8",
+          "cue": "Require",
+          "resolution": "UNRESOLVED_CANDIDATE",
+          "candidateTaskKeys": [],
+          "sourceQuote": "- [ ] Require NLP-3 through NLP-8 evidence.",
+          "sourceRef": "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+          "sourceLine": 217,
+          "sourceBlockHash": "sha256:457ac281d3fc234371ce7c6aed7e5436c8f9ce8a592eba47b10b2c0a6ee6b23f",
+          "sourceFileSha256": "82307fcdd2759ad21ad35a8a010a8c4e5e61131fab290848d1983e6a6cba230c",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "parent-atlas-versioned-doc-intelligence:1001",
+      "logicalTaskKey": "parent-atlas-versioned-doc-intelligence:DOC-26",
+      "candidates": [
+        {
+          "referencedId": "DOC-02",
+          "cue": "depends on",
+          "resolution": "UNIQUE_CANDIDATE",
+          "candidateTaskKeys": [
+            "parent-atlas-versioned-doc-intelligence:98"
+          ],
+          "sourceQuote": "the delta, never overwrite the prior version's rows (depends on DOC-02/DOC-27). - Read-only fixture added: `scripts/atlas/pr",
+          "sourceRef": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md",
+          "sourceLine": 1001,
+          "sourceBlockHash": "sha256:67b6c2a087cffa35efaad64fdcc2c6492bf62ff4c0c59f0ba295604b94824660",
+          "sourceFileSha256": "595fbf84025f395762f3dbf9b3e0b5c7e324f5e542a29ac2287edf2d09f40ac7",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        },
+        {
+          "referencedId": "DOC-27",
+          "cue": "depends on",
+          "resolution": "UNRESOLVED_CANDIDATE",
+          "candidateTaskKeys": [],
+          "sourceQuote": "the delta, never overwrite the prior version's rows (depends on DOC-02/DOC-27). - Read-only fixture added: `scripts/atlas/prove-doc",
+          "sourceRef": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md",
+          "sourceLine": 1001,
+          "sourceBlockHash": "sha256:67b6c2a087cffa35efaad64fdcc2c6492bf62ff4c0c59f0ba295604b94824660",
+          "sourceFileSha256": "595fbf84025f395762f3dbf9b3e0b5c7e324f5e542a29ac2287edf2d09f40ac7",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    }
+  ]
+}

@@ -163,14 +163,18 @@ return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 <Button variant="ghost" size="sm"
 class={`toolbar-button ${isActive.bold ? 'toolbar-button-active' : ''}`}
 onclick={() => editor?.chain().focus().toggleBold().run()}
+title="Bold"
+aria-label="Bold"
 >
-<span class="i-lucide-bold w-4 h-4 inline-block"></span>
+<strong>B</strong>
 </Button>
 <Button variant="ghost" size="sm"
 class={`toolbar-button ${isActive.italic ? 'toolbar-button-active' : ''}`}
 onclick={() => editor?.chain().focus().toggleItalic().run()}
+title="Italic"
+aria-label="Italic"
 >
-<span class="i-lucide-italic w-4 h-4 inline-block"></span>
+<em>I</em>
 </Button>
 
 <div class="mx-1 h-6 w-px bg-neutral-300"></div>
@@ -178,14 +182,18 @@ onclick={() => editor?.chain().focus().toggleItalic().run()}
 <Button variant="ghost" size="sm"
 class={`toolbar-button ${isActive.h1 ? 'toolbar-button-active' : ''}`}
 onclick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
+title="Heading 1"
+aria-label="Heading 1"
 >
-<span class="i-lucide-heading-1 w-4 h-4 inline-block"></span>
+H1
 </Button>
 <Button variant="ghost" size="sm"
 class={`toolbar-button ${isActive.h2 ? 'toolbar-button-active' : ''}`}
 onclick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+title="Heading 2"
+aria-label="Heading 2"
 >
-<span class="i-lucide-heading-2 w-4 h-4 inline-block"></span>
+H2
 </Button>
 
 <div class="mx-1 h-6 w-px bg-neutral-300"></div>
@@ -193,14 +201,18 @@ onclick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
 <Button variant="ghost" size="sm"
 class={`toolbar-button ${isActive.bullet ? 'toolbar-button-active' : ''}`}
 onclick={() => editor?.chain().focus().toggleBulletList().run()}
+title="Bulleted list"
+aria-label="Bulleted list"
 >
-<span class="i-lucide-list w-4 h-4 inline-block"></span>
+List
 </Button>
 <Button variant="ghost" size="sm"
 class={`toolbar-button ${isActive.ordered ? 'toolbar-button-active' : ''}`}
 onclick={() => editor?.chain().focus().toggleOrderedList().run()}
+title="Numbered list"
+aria-label="Numbered list"
 >
-<span class="i-lucide-list-ordered w-4 h-4 inline-block"></span>
+1. List
 </Button>
 
 <div class="flex-1"></div>

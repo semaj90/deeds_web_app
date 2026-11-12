@@ -16,6 +16,12 @@
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\simdjson_bridge.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\spatial_packet_synthesizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\atlas_byte_synth_core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\lstm_bridge.cc">
       <Filter>Source Files</Filter>
     </ClCompile>

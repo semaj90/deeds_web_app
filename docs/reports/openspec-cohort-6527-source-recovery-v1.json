@@ -1,0 +1,271 @@
+{
+  "schema": "atlas.openspec-cohort-6527-source-recovery.v1",
+  "generatedAt": "2026-11-09T05:58:31.906Z",
+  "status": "PASS_REMOTE_BLOB_AND_29_SOURCE_BINDINGS_MATCH",
+  "canonicalAuthority": false,
+  "reviewerDecisionsChanged": false,
+  "taskIdsReplaced": false,
+  "kanbanRowsCreated": false,
+  "databaseWritesPerformed": false,
+  "reviewSheet": {
+    "path": "docs/reports/openspec-cohort-6527-identity-review-sheet-v1.json",
+    "rows": 241,
+    "sourceBindingRevision": "sha256:de32847bda8bee924335d1354da03e2361267abc0cdef31fefc115dcd1265f84"
+  },
+  "remote": {
+    "provider": "GitHub contents file fetch",
+    "ref": "main",
+    "path": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+    "returnedContentFieldEmpty": true,
+    "reportedBlobSha": "a3e544b2e59d0d088e2dbee34126ef9a30b084fd",
+    "displayUrl": "https://github.com/semaj90/deeds_web_app/blob/main/openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md"
+  },
+  "local": {
+    "head": "c50a4964d659d6cd0e8ff21d91e74ca811d81f18",
+    "path": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+    "gitBlobSha": "a3e544b2e59d0d088e2dbee34126ef9a30b084fd",
+    "fileSha256": "sha256:65d345ca9bcfcb7348c10f11337dec4b88a77b331b9b62304eda1f08c5ccac20",
+    "bytes": 1606045,
+    "lines": 17710
+  },
+  "verification": {
+    "rowsChecked": 29,
+    "exactSourceLines": 29,
+    "exactTaskBlockHashes": 29,
+    "remoteBlobMatchesLocalGitBlob": true
+  },
+  "rows": [
+    {
+      "reviewIndex": 14,
+      "identityBasis": "DECLARED_ID_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16536",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#c0e8a9d69a657edf",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#9b19e4e22cda6fa0",
+      "blockSha256": "sha256:a92aeb5ad4a408bda62463536a253db1d754204e589936d8ce19c9792495d57c"
+    },
+    {
+      "reviewIndex": 16,
+      "identityBasis": "DECLARED_ID_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16637",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#ff0a3f89a32c0786",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#c2f456812e65cee0",
+      "blockSha256": "sha256:e1682895a2b4fb2babd6f2b34c825087fb4160c5a7bffa1db806c43d1ff2e45a"
+    },
+    {
+      "reviewIndex": 22,
+      "identityBasis": "DECLARED_ID_SECTION_QUALIFIED_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16537",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#b42a5e681bfa775a",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#2a7306edca196380",
+      "blockSha256": "sha256:4363d414505d2c03df6d9a081173d163056f11beae16ccf39dd9c5c6be64b41e"
+    },
+    {
+      "reviewIndex": 23,
+      "identityBasis": "DECLARED_ID_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16594",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#2ff7b12f464c6231",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#24732d482d43499c",
+      "blockSha256": "sha256:c56ecd54afce87beea8b9b2469351009068d1ecb6b4160b12aa5f3cc150dd47b"
+    },
+    {
+      "reviewIndex": 24,
+      "identityBasis": "DECLARED_ID_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16595",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#1d2a6917e7c9aa28",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#7ea2f8a240aa527d",
+      "blockSha256": "sha256:e37f0dec137c54a7ebf4c0dc551f8e9b700ca1f2b7cd03330eb94d7145d9da55"
+    },
+    {
+      "reviewIndex": 25,
+      "identityBasis": "DECLARED_ID_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16596",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#e79bee392af6d92c",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#9e4b3852d6a830d0",
+      "blockSha256": "sha256:e6209a9a63f987d2a0205ef9695a79c4ddfb08ae9152181c7e9c814ef231c00b"
+    },
+    {
+      "reviewIndex": 27,
+      "identityBasis": "DECLARED_ID_SECTION_QUALIFIED_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16598",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#d9266af1d85d8031",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#15ddec7e949f246d",
+      "blockSha256": "sha256:571f379316fa3c3de8e6f9d60f4517e6d0f26292857f5773a334b92fd880a616"
+    },
+    {
+      "reviewIndex": 29,
+      "identityBasis": "DECLARED_ID_SECTION_QUALIFIED_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16638",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#bf19020d87c92e33",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#9f6b4f061bad9e5b",
+      "blockSha256": "sha256:2f8839ee90f84ff85e550261066800d115fce7e7a9cf82238590a4852e3ab941"
+    },
+    {
+      "reviewIndex": 30,
+      "identityBasis": "DECLARED_ID_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16636",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#8dd9d9270babe04e",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#c363b50fd7964148",
+      "blockSha256": "sha256:dd4de52312ad6021fe3c4187ae710abdd9fb94699f42c3c5505a19eab450cf92"
+    },
+    {
+      "reviewIndex": 32,
+      "identityBasis": "DECLARED_ID_SECTION_QUALIFIED_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16607",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#d9266af1d85d8031~2",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#d9266af1d85d8031",
+      "blockSha256": "sha256:38fa99e01ccf5696fc845c093e25937f533f536f55f3b1bf5f251ad8bb72fce3"
+    },
+    {
+      "reviewIndex": 34,
+      "identityBasis": "DECLARED_ID_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16687",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#53bbb59ca3e6b4ac",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#a9bad90068f9de60",
+      "blockSha256": "sha256:aef5b69be5b5fb11103777b6f2452fe31d7d667d57e1455b5b26538222102857"
+    },
+    {
+      "reviewIndex": 35,
+      "identityBasis": "MIGRATION_TITLE_HASH_REQUIRES_REVIEW",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16688",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#84c81dcad045a445",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#26bbf576b071c17d",
+      "blockSha256": "sha256:162fc8d141bdb9f3dae090149ed0bc7f0248a30196bc1c123e09c35db0084ab7"
+    },
+    {
+      "reviewIndex": 36,
+      "identityBasis": "MIGRATION_TITLE_HASH_REQUIRES_REVIEW",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16646",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#ff0a3f89a32c0786~2",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#ff0a3f89a32c0786",
+      "blockSha256": "sha256:39b8d0c1443b443a8b3d7ad983d92fc3d5428c546488d873f748ff1c72371116"
+    },
+    {
+      "reviewIndex": 38,
+      "identityBasis": "DECLARED_ID_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16804",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#ac878022f5aa79b2",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#5edb519de8386b32",
+      "blockSha256": "sha256:e1ae6a3061509646b18222e22b61ad467b8c8e3833da5b0382fe7d58804cd6ce"
+    },
+    {
+      "reviewIndex": 40,
+      "identityBasis": "MIGRATION_TITLE_HASH_REQUIRES_REVIEW",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16838",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#c17789ec522aa871",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#283d9d929609972a",
+      "blockSha256": "sha256:e5c28c3fe69294dea9f5c51ef2065ea42918da126108dda5c97646e338b4893e"
+    },
+    {
+      "reviewIndex": 42,
+      "identityBasis": "MIGRATION_TITLE_HASH_REQUIRES_REVIEW",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16829",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#283d9d929609972a",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#ce7ca0515bf43896",
+      "blockSha256": "sha256:139366b2480beb381b7ba31459054a9d888847844d56a66b9ed48c3395b96be3"
+    },
+    {
+      "reviewIndex": 44,
+      "identityBasis": "MIGRATION_TITLE_HASH_REQUIRES_REVIEW",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L17703",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#99471ababc190d9f",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#e09456665592c0f5",
+      "blockSha256": "sha256:50f5c1109506cef73c3c56e42fb99538664f6d14d88f835bafcd9f7a66052d49"
+    },
+    {
+      "reviewIndex": 79,
+      "identityBasis": "DECLARED_ID_SECTION_QUALIFIED_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16627",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#c363b50fd7964148",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#9987ff9a2538f304",
+      "blockSha256": "sha256:87e2ff8897d8e556206e4dbc33494aa990f6ce7b62f1ef75aecdfaa50dbca43c"
+    },
+    {
+      "reviewIndex": 80,
+      "identityBasis": "DECLARED_ID_SECTION_QUALIFIED_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16704",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#45ddf459caf98390",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#982123aea78369f9",
+      "blockSha256": "sha256:565587b664a6251b747069576c63ff922a421db4e28aa46e9afeabcdc9f207b6"
+    },
+    {
+      "reviewIndex": 82,
+      "identityBasis": "DECLARED_ID_SECTION_QUALIFIED_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16606",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#151365c85610c037",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#a7d6d0c542cfad39",
+      "blockSha256": "sha256:6f8cff3aa56b6dbd841884518d50b081dd2c3b666d3d589961d88c343ecbe406"
+    },
+    {
+      "reviewIndex": 83,
+      "identityBasis": "MIGRATION_TITLE_HASH_REQUIRES_REVIEW",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16660",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#f6b0ced9f0b95a22",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#b180cce3820b81a1",
+      "blockSha256": "sha256:82a0302d66a142fa07d0d3ad294d5bf9f685e83578b3aff80324286636cd8a92"
+    },
+    {
+      "reviewIndex": 84,
+      "identityBasis": "DECLARED_ID_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16847",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#c17789ec522aa871~2",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#c17789ec522aa871",
+      "blockSha256": "sha256:bee2a8628bb2f6b8dd99bbd42e73d84f59087464aff6b3ef6574f79ce101b3a7"
+    },
+    {
+      "reviewIndex": 85,
+      "identityBasis": "MIGRATION_TITLE_HASH_REQUIRES_REVIEW",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L17647",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#d3a352960bddc45c",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#a4b4301621f9a19b",
+      "blockSha256": "sha256:5238e6d53c2cfef3d72a088c513c2ef6a8d2fb2844f4ea1581a244d90b430ed6"
+    },
+    {
+      "reviewIndex": 86,
+      "identityBasis": "DECLARED_ID_UNIQUE",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16703",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#4c58a5911293c4d8",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#69a456d9e00f32d8",
+      "blockSha256": "sha256:94924b3c7603b281b763f4118acf0e9f7a593fda4fe5f2509b22ecbb2f5ecdd0"
+    },
+    {
+      "reviewIndex": 88,
+      "identityBasis": "MIGRATION_TITLE_HASH_REQUIRES_REVIEW",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L17659",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#8a7545283034beec",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#32838ed5906da254",
+      "blockSha256": "sha256:7c7bdc413c72fbdad4b85f630dcd5b163a2714b67bc0570220c2f5fdab10d5aa"
+    },
+    {
+      "reviewIndex": 89,
+      "identityBasis": "MIGRATION_TITLE_HASH_REQUIRES_REVIEW",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L17660",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#7b3a99f46242e7eb",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#cf6065e7b0967567",
+      "blockSha256": "sha256:44e24450784c32ffe7d8e2fbd8503582b4bdd368fe4b01c19a8ec2cb8fb3db90"
+    },
+    {
+      "reviewIndex": 92,
+      "identityBasis": "MIGRATION_TITLE_HASH_REQUIRES_REVIEW",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L17670",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#07d04d4a178a94e4",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#551220840f815786",
+      "blockSha256": "sha256:4504abc04a9c0e94ab884753d219bd035ca478436a20dee64bd5c8447400cdb4"
+    },
+    {
+      "reviewIndex": 93,
+      "identityBasis": "MIGRATION_TITLE_HASH_REQUIRES_REVIEW",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L17658",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#6e00e6b0fa7bd474",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#3fab25805dc5b431",
+      "blockSha256": "sha256:5c2a5963b351707f0a94813b7cc58f39157e0403aa6f6b0e237468ac69800d07"
+    },
+    {
+      "reviewIndex": 94,
+      "identityBasis": "MIGRATION_TITLE_HASH_REQUIRES_REVIEW",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L17681",
+      "sourceTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#1fe8295821efc1d9",
+      "candidateTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#2f1cf549f9d43e26",
+      "blockSha256": "sha256:cded432e77eb0564b0502fcf0a64b31a62def44682929adff3749a358ccd9337"
+    }
+  ]
+}

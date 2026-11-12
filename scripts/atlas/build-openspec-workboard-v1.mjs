@@ -17,8 +17,9 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const changesRoot = join(root, 'openspec', 'changes');
 const secondaryChangesRoot = join(root, 'sveltekit-frontend', 'openspec', 'changes');
 const includeSecondaryRoots = process.argv.includes('--include-secondary-roots');
+const includeCohortSourceRoots = process.argv.includes('--include-cohort-source-roots');
 const taskSnapshotMode = process.argv.includes('--task-snapshot-stdout');
-const positionalArgs = process.argv.slice(2).filter((argument) => argument !== '--task-snapshot-stdout' && argument !== '--include-secondary-roots');
+const positionalArgs = process.argv.slice(2).filter((argument) => !['--task-snapshot-stdout', '--include-secondary-roots', '--include-cohort-source-roots'].includes(argument));
 // Optional output overrides allow isolated audits to build a fresh snapshot
 // without replacing the shared projection while another session edits it.
 const reportPath = taskSnapshotMode ? null : positionalArgs[0]
@@ -97,6 +98,13 @@ const sourceFileHashes = {};
 
 const taskFiles = [];
 const activeChangesRoots = includeSecondaryRoots ? [changesRoot, secondaryChangesRoot] : [changesRoot];
+if (includeCohortSourceRoots) {
+  activeChangesRoots.push(
+    join(root, 'openspec', 'specs', 'openspec', 'changes'),
+    join(root, 'parent-atlas-qas-bundle', 'openspec', 'changes'),
+    join(root, 'parent-atlas-tensor-residency-integration', 'openspec', 'changes'),
+  );
+}
 for (const activeRoot of activeChangesRoots) {
   if (existsSync(activeRoot)) {
     for (const change of readdirSync(activeRoot, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
@@ -104,6 +112,14 @@ for (const activeRoot of activeChangesRoots) {
       const file = join(activeRoot, change.name, 'tasks.md');
       if (existsSync(file)) taskFiles.push({ file, change: change.name });
     }
+  }
+}
+if (includeCohortSourceRoots) {
+  for (const [change, file] of [
+    ['parent-atlas-rtx-gpu-lab', join(root, 'parent-atlas-rtx-gpu-lab', 'openspec', 'tasks.md')],
+    ['parent-atlas-graph-runtime-enhancement', join(root, 'parent-atlas-graph-runtime-enhancement', 'openspec', 'tasks.md')],
+  ]) {
+    if (existsSync(file)) taskFiles.push({ file, change });
   }
 }
 
@@ -116,7 +132,7 @@ for (const { file, change } of taskFiles) {
   lines.forEach((line, index) => {
     const heading = /^#{1,6}\s+(.*)$/.exec(line);
     if (heading) currentSection = sectionSlug(heading[1]);
-    const match = line.match(/^\s*-\s*\[([ xX])\]\s+(.*)$/);
+    const match = line.match(/^\s*[-*+]\s*\[([ xX~])\]\s+(.*)$/);
     if (!match) return;
     const done = match[1].toLowerCase() === 'x';
     const block = taskBlock(lines, index);
@@ -129,6 +145,7 @@ for (const { file, change } of taskFiles) {
       line: index + 1,
       text,
       state: done ? 'DONE' : 'OPEN',
+      sourceCheckboxState: match[1] === '~' ? 'IN_PROGRESS' : done ? 'DONE' : 'OPEN',
       kind: classifyKind(text),
       executionState: classifyExecutionState(text, done ? 'DONE' : 'OPEN', classifyKind(text)),
       supersessionReviewState: !done && requiresSupersessionReview(text) ? 'REVIEW_REQUIRED' : null,

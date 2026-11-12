@@ -1,0 +1,131 @@
+{
+  "schema": "atlas.openspec-cohort-6527-identity-review-decisions.v1",
+  "canonicalAuthority": false,
+  "taskCreationAuthorized": false,
+  "taskCompletionAuthorized": false,
+  "databaseWritesPerformed": false,
+  "scratchDatabaseVerification": {
+    "status": "NO_REVIEW_COHORT_KANBAN_MATCHES",
+    "database": "legal_ai_live_integration_scratch",
+    "serverVersionNum": 180004,
+    "port": 5434,
+    "transaction": "READ ONLY",
+    "reviewSheetRowsChecked": 241,
+    "sourceAndProjectionTaskIdsChecked": 462,
+    "exactTaskIdMatchCount": 0,
+    "exactTaskIdMatches": [],
+    "exactSourceRefMatchCount": 0,
+    "exactSourceRefMatches": [],
+    "writesPerformed": false
+  },
+  "populationDryRun": {
+    "command": "node --env-file=.env --loader ./scripts/node-ts-loader.mjs ../scripts/atlas/populate-kanban-from-openspec-workboard-v1.mjs --task-id=local-llm-offload-ownership#f15b11daf3054aca --limit=1",
+    "exitCode": 1,
+    "status": "BLOCKED_STALE_WORKBOARD_SOURCE_REVISION",
+    "workboardGeneratedAt": "2026-11-02T02:19:52.274Z",
+    "sourceRef": "openspec/changes/local-llm-offload-ownership/tasks.md#L513",
+    "expectedSourceFileSha256": "sha256:d39fcd92e315a38e10d75a3c921b4d2b6b264a2933f9d6fbd76384dfe7333e81",
+    "observedSourceFileSha256": "sha256:8c098822d850de1d6dd3575f3c19dbfd9d5821bb4394b93f64c35bad195d6a5d",
+    "error": "KANBAN_SOURCE_BINDING_SOURCE_FILE_REVISION_MISMATCH",
+    "writesPerformed": false,
+    "nextAction": "Regenerate the workboard from current sources, rerun the identity audit, then repeat the one-task dry run."
+  },
+  "refreshedWorkboardCheck": {
+    "command": "node scripts/atlas/build-openspec-workboard-v1.mjs .tmp/atlas/openspec-workboard-current-v1.json .tmp/atlas/openspec-workboard-current-v1.md --include-cohort-source-roots",
+    "status": "PASS",
+    "generatedAt": "2026-11-09T05:40:05.046Z",
+    "taskRows": 14234,
+    "openRows": 6147,
+    "sourceFileRevision": "sha256:8c098822d850de1d6dd3575f3c19dbfd9d5821bb4394b93f64c35bad195d6a5d",
+    "candidateStableKey": "local-llm-offload-ownership#f15b11daf3054aca",
+    "candidateStatus": "OPEN_ACTIONABLE",
+    "candidateSourceRef": "openspec/changes/local-llm-offload-ownership/tasks.md#L513",
+    "candidateBlockSha256": "sha256:534d4e6d9643a466ca7e42c1b21729a78fdeb7ec8a44dde9a0f363c58cf25f58"
+  },
+  "refreshedSourceBindingAudit": {
+    "command": "node scripts/atlas/audit-workboard-source-bindings-readonly-v1.mjs --workboard=.tmp/atlas/openspec-workboard-current-v1.json --receipt=.tmp/atlas/openspec-workboard-current-source-bindings-v1.json",
+    "status": "VERIFIED",
+    "taskCount": 14234,
+    "sourceFileCount": 119,
+    "allRowsCurrent": true,
+    "writesPerformed": false,
+    "receipt": ".tmp/atlas/openspec-workboard-current-source-bindings-v1.json"
+  },
+  "refreshedDryRun": {
+    "command": "cd sveltekit-frontend; node --env-file=.env --loader ./scripts/node-ts-loader.mjs ../scripts/atlas/populate-kanban-from-openspec-workboard-v1.mjs --workboard=.tmp/atlas/openspec-workboard-current-v1.json --task-id=local-llm-offload-ownership#f15b11daf3054aca --limit=1",
+    "exitCode": 0,
+    "status": "ELIGIBLE_UNCREATED",
+    "target": "legal_ai_live_integration_scratch",
+    "candidateRowsToCreate": 1,
+    "sourceBinding": "SOURCE_REFERENCE_CURRENT",
+    "writesPerformed": false,
+    "claimOrCompletionPerformed": false
+  },
+  "applyAttempt": {
+    "command": "cd sveltekit-frontend; node --env-file=.env --loader ./scripts/node-ts-loader.mjs ../scripts/atlas/populate-kanban-from-openspec-workboard-v1.mjs --workboard=.tmp/atlas/openspec-workboard-current-v1.json --task-id=local-llm-offload-ownership#f15b11daf3054aca --limit=1 --apply",
+    "intendedTarget": "legal_ai_live_integration_scratch",
+    "canonicalCreatorTargetObserved": "legal_ai_db",
+    "status": "FAILED_NO_NEW_ROW",
+    "createdCount": 0,
+    "scratchReadbackTaskCount": 0,
+    "failureReceipt": ".tmp/atlas/kanban-populate-receipt-v1-1794202957384.json",
+    "canonicalWriterBypassedScratchGuard": true,
+    "canonicalReadOnlyCheck": {
+      "database": "legal_ai_db",
+      "serverVersionNum": 180004,
+      "serverPort": 5432,
+      "taskId": "local-llm-offload-ownership#f15b11daf3054aca",
+      "taskStatus": "pending",
+      "sourceRevision": null,
+      "sourceRefs": ["openspec/changes/local-llm-offload-ownership/tasks.md#L506"],
+      "taskCreatedAt": "2026-11-01T20:40:53.070Z",
+      "ticketCreatedEventAt": "2026-11-01T20:40:53.073Z",
+      "preexistingBeforeAttempt": true,
+      "readOnlyTransaction": true
+    },
+    "canonicalStateChangedByAttempt": false,
+    "retryAuthorized": false,
+    "nextAction": "Do not create a duplicate. Keep canonical data untouched; separately design an explicitly scratch-injected creator and reconcile the existing canonical row's stale source binding without mutating it."
+  },
+  "scratchWriterIsolationFix": {
+    "canonicalFiles": [
+      "sveltekit-frontend/src/lib/server/atlas/kanban-task-board.ts",
+      "scripts/atlas/populate-kanban-from-openspec-workboard-v1.mjs"
+    ],
+    "behavior": "Population apply injects its guarded scratch Pool into a scratch-specific Kanban creator that verifies current_database() and PostgreSQL 18 before transactional task and ticket_created event insertion. The one-shot script closes the shared canonical pool without using it.",
+    "focusedTests": {
+      "command": "npm exec -- vitest run src/lib/server/atlas/kanban-task-board.test.ts",
+      "passed": 16,
+      "failed": 0
+    },
+    "scriptSyntaxCommand": "node --check scripts/atlas/populate-kanban-from-openspec-workboard-v1.mjs",
+    "scriptSyntaxExitCode": 0,
+    "scratchDryRunExitCode": 0,
+    "scratchDryRunCandidateCount": 1,
+    "databaseWritesPerformed": false,
+    "sourceRevisionWriteGate": "DEFERRED_UNTIL_AFTER_WORKSTATION_P20_PER_CLAUDE_MD",
+    "applyRetried": false,
+    "canonicalAuthority": false
+  },
+  "decisions": [
+    {
+      "reviewIndex": 69,
+      "decision": "SOURCE_TO_WORKBOARD_IDENTITY_MATCH_CONFIRMED",
+      "approvedInConversation": true,
+      "source": {
+        "canonicalTaskKey": "local-llm-offload-ownership#9ac42e12c203b77a",
+        "sourceRef": "openspec/changes/local-llm-offload-ownership/tasks.md#L513",
+        "sourceBlockSha256": "sha256:534d4e6d9643a466ca7e42c1b21729a78fdeb7ec8a44dde9a0f363c58cf25f58"
+      },
+      "workboardCandidate": {
+        "existingProjectionKey": "local-llm-offload-ownership#f15b11daf3054aca",
+        "logicalTaskKeyHint": "local-llm-offload-ownership:BROWSER-GEN-EVAL-04",
+        "identityBasis": "DECLARED_ID_UNIQUE",
+        "sameSourceRef": true,
+        "sameBlockSha256": true
+      },
+      "postgresKanbanTaskId": null,
+      "scopeNote": "Confirms only that the source task and workboard projection refer to the same task. PostgreSQL 18 scratch readback found neither key nor the exact source reference in kanban_tasks, so no Kanban task mapping exists for this candidate."
+    }
+  ]
+}

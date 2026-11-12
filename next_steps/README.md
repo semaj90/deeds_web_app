@@ -1,5 +1,7 @@
 # Next Steps Index
 
+**Full index of all tracked docs** (`next_steps/`, `sveltekit-frontend/next_steps/`, `docs/next_steps/`, with last-commit date, Status line and title): [`INDEX.md`](./INDEX.md). The list below is a hand-picked short list.
+
 - [`turbovecquant.md`](./turbovecquant.md) - merged legal Gemma4 runtime, KV cache split, TurboVec, and request flow.
 - [`inference.md`](./inference.md) - path map, directory requirements, and KAG/contextual graph dependencies.
 - [`active\JEPA_DSPY_NEXT_STEPS.md`](./active/JEPA_DSPY_NEXT_STEPS.md) - JEPA evaluation gate, DSPy placement, and promotion criteria before any reranker wiring.

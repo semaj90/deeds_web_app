@@ -8,7 +8,7 @@ const MAX_TASKS = 128;
 const MAX_PREFILL_TASKS = 32;
 
 export const KanbanDagPrefillRecommendationInputV1Schema = z.object({
-  featureId: z.string().trim().regex(/^openspec:[a-z0-9][a-z0-9-]*$/),
+  featureId: z.string().trim().regex(/^(openspec:[a-z0-9][a-z0-9-]*|nextsteps:[a-z0-9_.-]+)$/),
   cohortLimit: z.number().int().min(1).max(MAX_TASKS).optional().default(64),
   maxPrefillTasks: z.number().int().min(1).max(MAX_PREFILL_TASKS).optional().default(16),
 }).strict();

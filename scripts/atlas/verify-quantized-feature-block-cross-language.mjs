@@ -32,6 +32,34 @@ function sha256Hex(buf) {
   return 'sha256:' + crypto.createHash('sha256').update(buf).digest('hex');
 }
 
+// C++ column: builds scripts/spatial/quantized_feature_block_cpp_check.cpp (includes the real simd-bridge/cpp header)
+// with clang++ through scripts/dev/clang-vs.bat (loads the VS 2022 environment), then runs it.
+// Windows-only; if the toolchain is unavailable the column is recorded as NOT_RUN (never silently PASS).
+const CPP_SRC = path.join(ROOT, 'scripts/spatial/quantized_feature_block_cpp_check.cpp');
+const CPP_EXE = path.join(ROOT, '.tmp/atlas/quantized_feature_block_cpp_check.exe');
+const CLANG_WRAPPER = path.join(ROOT, 'scripts/dev/clang-vs.bat');
+
+function runCppCheck() {
+  if (process.platform !== 'win32') return { status: 'NOT_RUN', reason: 'NON_WINDOWS_PLATFORM', rows: new Map() };
+  if (!fs.existsSync(CLANG_WRAPPER) || !fs.existsSync(CPP_SRC)) return { status: 'NOT_RUN', reason: 'WRAPPER_OR_SOURCE_MISSING', rows: new Map() };
+  fs.mkdirSync(path.dirname(CPP_EXE), { recursive: true });
+  const build = spawnSync('cmd.exe', ['/d', '/c', CLANG_WRAPPER, CPP_SRC, CPP_EXE], { encoding: 'utf8', cwd: ROOT });
+  if (build.status !== 0 || !fs.existsSync(CPP_EXE)) {
+    console.error('clang++ build failed:', build.stdout, build.stderr);
+    throw new Error('C++ parity check failed to build');
+  }
+  const run = spawnSync(CPP_EXE, [], { encoding: 'utf8', cwd: ROOT });
+  if (run.status !== 0) throw new Error('C++ parity check failed to run');
+  const rows = new Map();
+  let outOfRangeThrows = false;
+  for (const line of run.stdout.trim().split(/\r?\n/)) {
+    const p = line.trim().split(' ');
+    if (p[0] === 'OOR') { outOfRangeThrows = p[1] === '1'; continue; }
+    rows.set(`${p[0]}:${p[1]}`, { hex: p[2], roundTrip: p[3] === '1' });
+  }
+  return { status: 'RAN', compiler: 'clang++ (via scripts/dev/clang-vs.bat)', rows, outOfRangeThrows };
+}
+
 // Deterministic pseudorandom generator for reproducible test patterns
 function makeTestCodes(dim, bits, seed = 0x12345678) {
   const mask = (1 << bits) - 1;
@@ -50,6 +78,8 @@ async function main() {
   const DIMS = [64, 128, 256, 512];
   const BITS = [2, 3, 4];
   const testResults = [];
+  const cpp = runCppCheck();
+  console.log(`  C++ column: ${cpp.status}${cpp.reason ? ` (${cpp.reason})` : ''}`);
 
   for (const dim of DIMS) {
     for (const bits of BITS) {
@@ -93,6 +123,16 @@ print(json.dumps({
       assert.equal(nodeHash, pyHash, `Cross-language digest mismatch for dim=${dim}, bits=${bits}`);
       assert.equal(nodePacked.length, pyOutput.byteLength);
 
+      // 3b. C++ digest + round trip (only when the column ran)
+      let cppParity = null;
+      if (cpp.status === 'RAN') {
+        const row = cpp.rows.get(`${dim}:${bits}`);
+        assert.ok(row, `C++ output missing dim=${dim}, bits=${bits}`);
+        assert.equal(sha256Hex(Buffer.from(row.hex, 'hex')), nodeHash, `C++ digest mismatch for dim=${dim}, bits=${bits}`);
+        assert.equal(row.roundTrip, true, `C++ round-trip mismatch for dim=${dim}, bits=${bits}`);
+        cppParity = true;
+      }
+
       testResults.push({
         dim,
         bits,
@@ -101,6 +141,7 @@ print(json.dumps({
         allocatedBytes: Math.ceil((dim * bits) / 8),
         sha256: nodeHash,
         nodePythonParity: true,
+        cppParity, // true | null (null = C++ column NOT_RUN)
       });
 
       console.log(`  ✓ Dim ${dim.toString().padStart(3, ' ')} | ${bits}-bit | ${nodePacked.length.toString().padStart(3, ' ')} bytes | Digest: ${nodeHash.slice(0, 24)}... (Parity PASS)`);
@@ -114,6 +155,7 @@ print(json.dumps({
 
   const testBuf = new Uint8Array(4); // 32 bits total = sixteen 2-bit codes
   assert.throws(() => unpackCode(testBuf, 16, 2), /QUANT_INDEX_OUT_OF_RANGE/);
+  if (cpp.status === 'RAN') assert.equal(cpp.outOfRangeThrows, true, 'C++ pack_codes must throw on out-of-range code');
   console.log('✓ Bounds and range exceptions validated');
 
   // 5. Emit report
@@ -124,7 +166,15 @@ print(json.dumps({
     dimensionsTested: DIMS,
     bitWidthsTested: BITS,
     totalConfigurations: testResults.length,
-    allParityPassed: true,
+    allParityPassed: true, // Node<->Python always; C++ included only when cppCheck.status === 'RAN'
+    cppCheck: {
+      status: cpp.status,
+      reason: cpp.reason ?? null,
+      compiler: cpp.compiler ?? null,
+      source: 'scripts/spatial/quantized_feature_block_cpp_check.cpp',
+      outOfRangeThrows: cpp.status === 'RAN' ? cpp.outOfRangeThrows : null,
+      knownIssue: 'atlas::unpack_code reads in_bytes[byte_index + 1] unconditionally: a 1-byte out-of-bounds read at the last code (value masked off). The check pads its buffer; the header is unchanged.',
+    },
     results: testResults,
   };
 

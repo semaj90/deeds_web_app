@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
-import { chatMessages } from '$lib/server/db/schema';
+import { chatMessages, chatMetadata } from '$lib/server/db/schema';
 import { cases } from '$lib/server/db/schema-postgres.js';
 import { and, eq, desc, or, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
@@ -62,6 +62,8 @@ import {
   storeCachedStreamResponse,
   streamCachedResponse,
 } from '$lib/server/ai/cached-stream.js';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
+import { ChatSessionOwnerErrorV1, ensureChatSessionOwnerV1 } from '$lib/server/chat/chat-session-owner-v1.js';
 
 /** Returns true when a Postgres error is 42P01 (undefined_table). */
 function isMissingRelationError(err: unknown): boolean {
@@ -953,7 +955,8 @@ function graphBoostRerank(
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+  const actorId = Number(locals.user?.id);
+  if (!Number.isSafeInteger(actorId) || actorId <= 0) return json({ error: 'Unauthorized' }, { status: 401 });
   // GPU-accelerated JSON parsing via simdjson (5× faster for SSE request bodies)
   const rawText = await request.text();
   const raw = fastJsonParse<Record<string, unknown>>(rawText);
@@ -980,7 +983,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
   const caseUuidForDb = requestedCaseId ?? conversationCaseMatch?.[1];
   if (caseUuidForDb) {
-    const actorId = Number(locals.user.id);
     const [authorizedCase] = await db
       .select({ id: cases.id })
       .from(cases)
@@ -995,6 +997,41 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
   const caseMatch = caseUuidForDb ? { 1: caseUuidForDb } : null;
 
+  try {
+    await ensureChatSessionOwnerV1(
+      { chatId: conversationId, userId: actorId, caseId: caseUuidForDb ?? null },
+      {
+        findSession: async (chatId) => {
+          const [session] = await db
+            .select({ userId: chatMetadata.userId, caseId: chatMetadata.caseId })
+            .from(chatMetadata)
+            .where(eq(chatMetadata.chatId, chatId))
+            .limit(1);
+          return session ?? null;
+        },
+        hasMessages: async (chatId) => {
+          const [messageRow] = await db
+            .select({ id: chatMessages.id })
+            .from(chatMessages)
+            .where(eq(chatMessages.chatId, chatId))
+            .limit(1);
+          return Boolean(messageRow);
+        },
+        createIfAbsent: async ({ chatId, userId, caseId }) => {
+          await db.insert(chatMetadata).values({ chatId, userId, caseId }).onConflictDoNothing();
+        },
+        canAccessCase: async (caseId, userId) => Boolean(await getAuthorizedCase(caseId, userId)),
+      }
+    );
+  } catch (error) {
+    if (error instanceof ChatSessionOwnerErrorV1) {
+      const status = error.code === 'CHAT_SESSION_LEGACY_OWNER_UNKNOWN' ? 409 : 404;
+      return json({ error: status === 409 ? 'Legacy chat requires account recovery' : 'Conversation not found' }, { status });
+    }
+    console.error('[SSE Chat] Could not verify conversation ownership:', error);
+    return json({ error: 'Conversation authorization unavailable' }, { status: 503 });
+  }
+
   // Fire-and-forget: record into hot-query analytics ring buffer (feeds search-patterns API)
   recordSearchQuery({ query: message, pipeline: 'ace', cacheHit: false, userId: locals.user.id });
 
@@ -1004,6 +1041,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     await db.insert(chatMessages).values({
       id: userMessageId,
       chatId: conversationId,
+      userId: actorId,
       role: 'user',
       content: message,
       ...(caseUuidForDb ? { caseId: caseUuidForDb } : {}),
@@ -2043,6 +2081,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           await db.insert(chatMessages).values({
             id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
             chatId: conversationId,
+            userId: actorId,
             role: 'assistant',
             content: fullResponse,
             metadata: assistantMetadata,
@@ -2582,6 +2621,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           await db.insert(chatMessages).values({
             id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
             chatId: conversationId,
+            userId: actorId,
             role: 'assistant',
             content: fullResponse,
             metadata: assistantMetadata,

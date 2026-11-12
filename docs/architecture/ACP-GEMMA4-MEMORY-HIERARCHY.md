@@ -70,7 +70,7 @@ Value (in Redis-valkey centroid):
 Lookup time: 5–20ms
 ```
 
-**Result**: Gemma never runs. Response cache-hit.
+**Result**: ornith 1.5 llama-server 8090 never runs. Response cache-hit.
 
 ---
 
@@ -176,7 +176,7 @@ Gemma performs:
 - ❌ Tokenize the entire project
 - ❌ Retrieve from databases
 
-**Gemma only**:
+**ornith 1.5 llama-server 8090 Gemma only**:
 - ✅ Reads the packet bundle
 - ✅ Selects appropriate tools (via MCP)
 - ✅ Synthesizes an answer
@@ -261,7 +261,7 @@ Query 1: "Analyze gpu-reranker impact"
     workflow_summary: "GPU reranker impact analysis",
     tools_used: ["rg_search", "qdrant_retrieval", "postgres_schema", "gemma_synthesis"],
     tool_args: [...],
-    latencies: { rg: 120ms, qdrant: 450ms, postgres: 95ms, gemma: 2300ms },
+    latencies: { rg: 120ms, qdrant: 450ms, postgres: 95ms, ornith 1.5 llama-server 8090 gemma: 2300ms },
     packet_ids: ["packet:gpu-reranker:1", "packet:telemetry:1", ...],
     feature_ids: ["feature:gpu", "feature:telemetry"],
     source_refs: ["src/lib/server/gpu/libtorch-bridge.ts", ...],
@@ -429,7 +429,7 @@ ACP Router (decision tree)
   ├─ Text?
   │  └─ Codebase search (rg → Postgres → Qdrant)
   │     ↓ ACP retrieval + compaction
-  │     ↓ Gemma synthesis
+  │     ↓ ornith 1.5 llama-server 8090 Gemma synthesis
   │
   ├─ Image/PDF?
   │  ├─ Vision/OCR service (Claude Vision or local CLIP)
@@ -437,7 +437,7 @@ ACP Router (decision tree)
   │  ├─ Generate image embedding
   │  └─ Create packet with image + text
   │     ↓ ACP retrieval + compaction
-  │     ↓ Gemma synthesis (with image context)
+  │     ↓ ornith 1.5 llama-server 8090 Gemma synthesis (with image context)
   │
   ├─ Large codebase?
   │  ├─ rg search (recursive grep)
@@ -445,7 +445,7 @@ ACP Router (decision tree)
   │  ├─ Create ACE (atomic code element) packets
   │  └─ Compact + deduplicate
   │     ↓ ACP retrieval + compaction
-  │     ↓ Gemma synthesis
+  │     ↓ ornith 1.5 llama-server 8090 Gemma synthesis
   │
   └─ Graph traversal?
      ├─ Neo4j USED_CONCEPT edges
@@ -510,11 +510,11 @@ ACP Router (decision tree)
 ```
 User: "Wire telemetry into gpu-reranker.ts"
   ↓
-Gemma tokenizes entire /src/lib/server/gpu/ (8,000 tokens)
+ornith 1.5 llama-server 8090 Gemma tokenizes entire /src/lib/server/gpu/ (8,000 tokens)
   ↓
-Gemma tokenizes /docs/ (12,000 tokens)
+ornith 1.5 llama-server 8090 Gemma tokenizes /docs/ (12,000 tokens)
   ↓
-Gemma searches memory for "telemetry" (generates queries internally)
+ornith 1.5 llama-server 8090 Gemma searches memory for "telemetry" (generates queries internally)
   ↓
 Gemma tokenizes test files (4,000 tokens)
   ↓

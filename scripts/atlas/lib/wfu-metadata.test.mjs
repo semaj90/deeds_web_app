@@ -23,6 +23,16 @@ test('parses depends / est / reads / writes', () => {
   assert.deepEqual(d.warnings, []);
 });
 
+test('parses one explicit receipt proof reference and rejects duplicate or malformed proof declarations', () => {
+  const parsed = parseWfu('<!-- wfu: reads=packages/parent-atlas/test/example.spec.ts; proof: exec:fixture-001 -->');
+  assert.equal(parsed.proofReceiptId, 'exec:fixture-001');
+  assert.deepEqual(parsed.reads, ['packages/parent-atlas/test/example.spec.ts']);
+  assert.equal(parseWfu('<!-- wfu: proof: not allowed -->').proofReceiptId, undefined);
+  const duplicate = parseWfu('<!-- wfu: proof: exec:first; proof: exec:second -->');
+  assert.equal(duplicate.proofReceiptId, undefined);
+  assert.ok(duplicate.warnings.includes('PROOF_DUPLICATE'));
+});
+
 test('no comment -> no declaration (absent, not empty)', () => {
   assert.equal(parseWfu('**A-1 x** plain task'), null);
 });
@@ -179,19 +189,40 @@ test('shadow scheduler: absence is missingMetadata, never an inferred empty depe
   const mk = (over) => ({ state: 'OPEN', controller: { state: 'ACTIONABLE' }, ...over });
   const rows = [
     mk({ stableKey: 'k0' }),                                                           // no declaration
-    mk({ stableKey: 'k1', logicalTaskKey: 'c:A-1', declared: { dependsOn: [] }, remainingRequiredGates: 0 }),     // same (ready/ready)
-    mk({ stableKey: 'k2', logicalTaskKey: 'c:A-2', declared: { dependsOn: ['A-9'] }, remainingRequiredGates: 1 }), // incumbentReadyOnly
-    mk({ stableKey: 'k3', logicalTaskKey: 'c:A-3', controller: { state: 'WAITING_ON_DEPENDENCY' }, declared: { dependsOn: [] }, remainingRequiredGates: 0 }), // dependencyReadyOnly
+    mk({ taskKey: 'k1', stableKey: 'k1', logicalTaskKey: 'c:A-1', declared: { dependsOn: [] }, dependsOnTaskIds: [], remainingRequiredGates: 0 }), // same (ready/ready)
+    mk({ taskKey: 'k2', stableKey: 'k2', logicalTaskKey: 'c:A-2', declared: { dependsOn: ['A-9'] }, dependsOnTaskIds: ['upstream'], remainingRequiredGates: 1 }), // incumbentReadyOnly
+    mk({ taskKey: 'k3', stableKey: 'k3', logicalTaskKey: 'c:A-3', controller: { state: 'WAITING_ON_DEPENDENCY', blockerKey: 'DECLARED_TASK_DEPENDENCY' }, declared: { dependsOn: [] }, dependsOnTaskIds: [], remainingRequiredGates: 0 }), // dependencyReadyOnly
     mk({ stableKey: 'k4', declared: { dependsOn: ['X'], unresolvedDepends: ['X'] } }),
     mk({ stableKey: 'k5', declared: { dependsOn: ['X'], ambiguousDepends: ['X'], unresolvedDepends: [] } }),
     mk({ stableKey: 'k6', declared: { dependsOn: ['X'], dependencyState: 'CYCLE_OR_DOWNSTREAM_OF_CYCLE' } }),
+    { taskKey: 'upstream', stableKey: 'upstream', state: 'DONE', controller: { state: 'CHECKED_UNVERIFIED' } },
+    mk({ taskKey: 'k7', stableKey: 'k7', logicalTaskKey: 'c:A-7', controller: { state: 'WAITING_ON_AUTHORITY', blockerKey: 'CANONICAL_AUTHORIZATION' }, declared: { dependsOn: [] }, dependsOnTaskIds: [] }), // authority remains blocked
     { state: 'DONE', controller: { state: 'PROVEN' } }                                  // ignored
   ];
   const r = compareDependencyShadow(rows);
   assert.deepEqual(r.counts, { sameDecision: 1, incumbentReadyOnly: 1, dependencyReadyOnly: 1, unresolvedDependency: 1, ambiguousDependency: 1, cycleDetected: 1, missingMetadata: 1 });
+  assert.equal(r.receiptReadiness.unprovenDependencyTaskCount, 1);
+  assert.equal(r.receiptReadiness.unprovenDependencyTasks[0].taskKey, 'c:A-2');
+  assert.equal(r.receiptReadiness.preservedNonDependencyBlockerCount, 1);
+  assert.equal(r.receiptReadiness.preservedNonDependencyBlockerExamples[0], 'c:A-7');
   assert.equal(r.admissionEligible, false);
   assert.equal(r.criteria.dependencyMetadataCoverageOfActionable.met, false);
   assert.equal(r.criteria.noRegressionOfRequiredGates.met, false);
+});
+
+test('shadow scheduler requires admitted PROVEN evidence for each declared prerequisite', () => {
+  const rows = [
+    { taskKey: 'parent', logicalTaskKey: 'c:P-1', state: 'DONE', controller: { state: 'CHECKED_UNVERIFIED' } },
+    { taskKey: 'child', logicalTaskKey: 'c:C-1', state: 'OPEN', controller: { state: 'WAITING_ON_DEPENDENCY', blockerKey: 'DECLARED_TASK_DEPENDENCY' }, declared: { dependsOn: ['P-1'] }, dependsOnTaskIds: ['parent'], remainingRequiredGates: 0 },
+  ];
+  const shadow = compareDependencyShadow(rows);
+  assert.equal(shadow.counts.dependencyReadyOnly, 0);
+  assert.equal(shadow.counts.sameDecision, 1);
+  assert.equal(shadow.receiptReadiness.unprovenDependencyTaskCount, 1);
+  rows[0].controller.state = 'PROVEN';
+  const verified = compareDependencyShadow(rows);
+  assert.equal(verified.counts.dependencyReadyOnly, 1);
+  assert.equal(verified.receiptReadiness.unprovenDependencyTaskCount, 0);
 });
 
 test('a sentence start like "Re-run" is not a task id; real ids still match', async () => {

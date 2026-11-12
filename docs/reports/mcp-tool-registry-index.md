@@ -1,6 +1,6 @@
 # Parent Atlas MCP Tool Registry Index
 
-**Generated**: 2026-09-04T15:58:39.323Z
+**Generated**: 2026-11-11T23:37:29.393Z
 **Sources**: C:\Users\james\Videos\deeds-web-app\docs\reports\mcp-tool-ontology.json | C:\Users\james\Videos\deeds-web-app\docs\reports\mcp-tool-manifest-packets.json
 **Unique tools**: 337
 **Trace tools**: 173
@@ -22,7 +22,7 @@
 
 ## Executive Summary
 
-The Parent Atlas MCP tool registry contains 40 tools organized by category, primarily focused on codebase search, retrieval, and knowledge management. Most tools write to Postgres, with several reading from Redis, Qdrant, Neo4j, and other services. Search tools use hybrid approaches combining lexical ripgrep, dense vector embeddings in Qdrant, and graph metadata from Neo4j. Memory and caching tools leverage a three-tier system spanning Redis, Postgres, and Qdrant. Identity and audit tools validate data parity across services, while graph tools navigate SOM clusters and knowledge graphs. Additional tools handle legal research, GPU attention, image enrichment, and operational diagnostics, with several tools reading from multiple backing services to provide comprehensive context retrieval.
+Parent Atlas tool registry spans 337 tools across 11 active layers. TRACE MCP covers the live surface; manifest packets cover the broader MCP / gRPC registry.
 
 ## IDENTITY
 
@@ -142,7 +142,7 @@ Layer lexical contains 53 tools. 0 expose identity fields and 48 write surfaces.
 
 ## DENSE
 
-Layer dense contains 33 tools. 2 expose identity fields and 21 write surfaces. Top-ranked tools: atlas.packet_search, image.enrich_tags, wiki.explain_page, ldr_research, atlas.coverage.
+Layer dense contains 33 tools. 2 expose identity fields and 22 write surfaces. Top-ranked tools: atlas.packet_search, image.enrich_tags, wiki.explain_page, ldr_research, atlas.coverage.
 
 | Rank | Tool | Source | Score | Identity | Writes To | Summary |
 |------|------|--------|-------|----------|-----------|---------|
@@ -161,8 +161,8 @@ Layer dense contains 33 tools. 2 expose identity fields and 21 write surfaces. T
 | 62 | `TurboVecService.Upsert` | manifest-packets | 166 | — | postgres | gRPC RPC TurboVecService.Upsert: UpsertRequest → UpsertResponse (declared in proto/active/turbovec.proto). |
 | 80 | `embedding:generate` | manifest-packets | 154 | — | postgres | Generate 768-dim embeddings via gRPC direct (bypasses HTTP, ~50ms vs ~180ms). Falls back to Ollama HTTP if gRPC unavail… |
 | 81 | `EmbeddingService.GenerateEmbeddings` | manifest-packets | 154 | — | postgres | gRPC RPC EmbeddingService.GenerateEmbeddings: EmbeddingRequest → EmbeddingResponse (declared in proto/active/embedding.… |
-| 86 | `ops.fixer_pattern_store` | trace-mcp | 142 | — | — | [OPERATOR-GATED] Stores a fix attempt outcome to the 3-layer fixer memory. Increments success/failure counts, upserts t… |
-| 87 | `ops.trust_audit` | trace-mcp | 142 | — | — | Read-only audit of the trust-tier injection-detection system. Returns count of blocked content hashes and the most rece… |
+| 86 | `ops.trust_audit` | trace-mcp | 142 | — | — | Read-only audit of the trust-tier injection-detection system. Returns count of blocked content hashes and the most rece… |
+| 87 | `ops.fixer_pattern_store` | trace-mcp | 132 | — | postgres, redis, qdrant, engram | [OPERATOR-GATED] Stores a fix attempt outcome to the 3-layer fixer memory. Increments success/failure counts, upserts t… |
 | 114 | `atlas.embedding_all_tags` | trace-mcp | 88 | — | — | Comprehensive tag derivation for a packet embedding. Combines keywords, cluster tags, and neighbor query in parallel. R… |
 | 115 | `atlas.embedding_neighbors` | trace-mcp | 88 | — | — | Find semantically adjacent packets via Qdrant ANN search on a 768-dimensional embedding. Returns a query structure for … |
 | 117 | `evidence.search_by_image` | trace-mcp | 88 | — | — | Search evidence by uploading an image. The VLM describes the image, embeds it, and returns semantically similar evidenc… |
@@ -293,9 +293,9 @@ Layer ops contains 12 tools. 0 expose identity fields and 5 write surfaces. Top-
 | 219 | `ops.validate_tool_call` | trace-mcp | 58 | — | — | Pre-flight validation for any ops.* write tool call. Checks all required arguments are non-null non-empty strings, vali… |
 | 220 | `ops.execute_graphify` | trace-mcp | 54 | — | — | Executes an authorized graphify pipeline command. |
 | 224 | `ops.propose_patch` | trace-mcp | 48 | — | postgres, kanban | PROPOSES a patch for a file. READ-ONLY PREVIEW. Does NOT modify files. |
-| 225 | `ops.record_fix_attempt` | trace-mcp | 48 | — | postgres, kanban | Records a fix attempt and its outcome to the persistent audit log. |
+| 225 | `ops.record_fix_attempt` | trace-mcp | 48 | — | postgres, engram | Records a fix attempt and its outcome to the persistent audit log. |
 | 226 | `ops.run_quality_gate` | trace-mcp | 48 | — | postgres | Executes a project-wide quality gate (tsc or vitest-all). |
-| 227 | `ops.run_targeted_test` | trace-mcp | 48 | — | postgres | Executes a single Vitest test file and returns the outcome. |
+| 227 | `ops.run_targeted_test` | trace-mcp | 48 | — | process, engram | Executes a single Vitest test file and returns the outcome. |
 
 ## READ
 
@@ -527,8 +527,8 @@ Layer unknown contains 122 tools. 3 expose identity fields and 70 write surfaces
 | 83 | `ops.verify_write` | cache | trace-mcp | read_only | 150 |
 | 84 | `reports:generate_from_template` | lexical | manifest-packets | read_only | 150 |
 | 85 | `ops.gpu_pagerank` | graph | trace-mcp | read_only | 148 |
-| 86 | `ops.fixer_pattern_store` | dense | trace-mcp | read_only | 142 |
-| 87 | `ops.trust_audit` | dense | trace-mcp | read_only | 142 |
+| 86 | `ops.trust_audit` | dense | trace-mcp | read_only | 142 |
+| 87 | `ops.fixer_pattern_store` | dense | trace-mcp | read_write | 132 |
 | 88 | `trace.explain_retrieval` | unknown | trace-mcp, manifest-packets | read_only | 126 |
 | 89 | `clusters.kmeans_members` | unknown | trace-mcp, manifest-packets | read_only | 124 |
 | 90 | `topology.same_som_cluster` | unknown | trace-mcp, manifest-packets | read_only | 124 |

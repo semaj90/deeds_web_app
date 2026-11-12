@@ -6,7 +6,7 @@ import { redirect, fail } from '@sveltejs/kit';
 import { desc, eq } from 'drizzle-orm';
 import { extractCaseStructureWithGemma } from '$lib/server/llm/gemmaIntake.js';
 import type { Actions, PageServerLoad } from './$types';
-import { intakeCaseSchema } from './schema.js';
+import { intakeAnalysisSchema, intakeCaseSchema } from './schema.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) throw redirect(302, '/login');
@@ -79,16 +79,27 @@ export const actions = {
 
   // AI analysis — calls Gemma4-Legal to extract persons, title, statute from narrative
   analyze: async ({ request, locals }) => {
-    if (!locals.user) return fail(401, { error: 'Unauthorized' });
+    if (!locals.user) return fail(401, { analysisError: 'Sign in to analyze this case.' });
 
-    const formData = await request.formData();
-    const narrative = formData.get('narrative')?.toString() ?? '';
-    const who = formData.get('who')?.toString() ?? '';
-    const what = formData.get('what')?.toString() ?? '';
-    const when = formData.get('when')?.toString() ?? '';
-    const where = formData.get('where')?.toString() ?? '';
-    const why = formData.get('why')?.toString() ?? '';
-    const how = formData.get('how')?.toString() ?? '';
+    const formData = await request.formData().catch(() => null);
+    if (!formData) return fail(400, { analysisError: 'Invalid analysis form data.' });
+
+    const parsed = intakeAnalysisSchema.safeParse({
+      narrative: formData.get('narrative') ?? undefined,
+      who: formData.get('who') ?? undefined,
+      what: formData.get('what') ?? undefined,
+      when: formData.get('when') ?? undefined,
+      where: formData.get('where') ?? undefined,
+      why: formData.get('why') ?? undefined,
+      how: formData.get('how') ?? undefined,
+    });
+
+    if (!parsed.success) {
+      return fail(400, {
+        analysisError: 'Check the length and format of the narrative and guided answers before analyzing.',
+      });
+    }
+    const { narrative, who, what, when, where, why, how } = parsed.data;
 
     if (!narrative.trim() && !what.trim()) {
       return fail(400, {
@@ -111,7 +122,7 @@ export const actions = {
     } catch (error) {
       console.error('AI extraction failed:', error);
       return fail(500, {
-        analysisError: 'AI analysis unavailable — Ollama may be offline. Create the case manually.',
+        analysisError: 'AI analysis is temporarily unavailable. You can still create the case manually.',
       });
     }
   },

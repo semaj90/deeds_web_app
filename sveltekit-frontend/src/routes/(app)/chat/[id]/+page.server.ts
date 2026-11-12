@@ -14,6 +14,7 @@
 
 import { fail } from '@sveltejs/kit';
 import { getRedis } from '$lib/server/redis';
+import { publishStreamEvent, publishTokenDelta, setStreamTTL } from '$lib/server/redis-streams.js';
 import type { Actions, PageServerLoad } from './$types';
 import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
@@ -76,7 +77,7 @@ export const actions: Actions = {
 			await redis.publish(channel, JSON.stringify({ type: 'start' }));
 
 			// Generate AI response via llama-server (streaming)
-			const aiResponse = await streamLlamaServerResponse(userMessage.trim(), channel, redis);
+			const aiResponse = await streamLlamaServerResponse(userMessage.trim(), channel, chatId);
 
 			// Save to Redis history
 			try {
@@ -106,17 +107,13 @@ export const actions: Actions = {
 				await redis.set(redisKey, JSON.stringify(history));
 
 				// Publish final AI_REPLY event for SSE
-				await redis.publish(
-					channel,
-					JSON.stringify({
-						type: 'AI_REPLY',
-						content: aiResponse.content,
-						confidence: aiResponse.confidence,
-						citations: aiResponse.citations,
-						warnings: aiResponse.warnings,
-						timestamp: new Date().toISOString()
-					})
-				);
+				await publishStreamEvent(chatId, channel, 'AI_REPLY', {
+					content: aiResponse.content,
+					confidence: aiResponse.confidence,
+					citations: aiResponse.citations,
+					warnings: aiResponse.warnings,
+					timestamp: new Date().toISOString()
+				});
 			} catch (redisError) {
 				console.warn('Redis save failed:', redisError);
 			}
@@ -132,14 +129,10 @@ export const actions: Actions = {
 
 			// Publish error event
 			try {
-				await redis.publish(
-          channel,
-          JSON.stringify({
-            type: 'AI_ERROR',
-            error: 'Failed to generate response',
-            timestamp: new Date().toISOString(),
-          })
-        );
+				await publishStreamEvent(chatId, channel, 'AI_ERROR', {
+					error: 'Failed to generate response',
+					timestamp: new Date().toISOString()
+				});
 			} catch (e) {
 				console.warn('Failed to publish error event:', e);
 			}
@@ -155,9 +148,12 @@ export const actions: Actions = {
 async function streamLlamaServerResponse(
   message: string,
   channel: string,
-  redis: import('ioredis').Redis
+  chatId: string
 ): Promise<{ content: string; confidence: number; citations: string[]; warnings: string[] }> {
   let fullContent = '';
+  // Position of the next delta within this response. The replay cursor is the stream ID that
+  // publishTokenDelta returns, not this number.
+  let deltaSeq = 0;
 
   try {
     const target = await resolveLlamaInferenceTarget();
@@ -208,7 +204,9 @@ async function streamLlamaServerResponse(
         if (!trimmed.startsWith('data:')) continue;
         const payload = trimmed.slice(5).trim();
         if (payload === '[DONE]') {
-          await redis.publish(channel, JSON.stringify({ type: 'done' }));
+          await publishStreamEvent(chatId, channel, 'done');
+          // Start the replay window's expiry now that the response is complete.
+          await setStreamTTL(chatId).catch(() => {});
           continue;
         }
 
@@ -219,14 +217,8 @@ async function streamLlamaServerResponse(
           if (delta) {
             fullContent += delta;
 
-            // Publish delta to Redis for SSE
-            await redis.publish(
-              channel,
-              JSON.stringify({
-                type: 'delta',
-                content: delta,
-              })
-            );
+            // Append once to the replay stream, then publish with the stream ID as the SSE event id.
+            await publishTokenDelta(chatId, channel, deltaSeq++, delta);
           }
         } catch {
           // Skip malformed SSE line
@@ -250,8 +242,8 @@ async function streamLlamaServerResponse(
     console.error('llama-server streaming failed:', error);
 
     // Publish error and done
-    await redis.publish(channel, JSON.stringify({ type: 'error', error: String(error) }));
-    await redis.publish(channel, JSON.stringify({ type: 'done' }));
+    await publishStreamEvent(chatId, channel, 'error', { error: String(error) });
+    await publishStreamEvent(chatId, channel, 'done');
 
     throw error;
   }

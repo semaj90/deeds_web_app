@@ -13,19 +13,15 @@
  *   ace:engram:query-bmu:{hash16}  STRING  — "row:col" of the query's BMU (TTL 7d)
  */
 
-import crypto from 'node:crypto';
+import { qHash, recordEngramTransition as recordCanonicalEngramTransition } from '$lib/server/search/engram-bigram.js';
 import type { Redis } from 'ioredis';
 
 const QUERY_TTL    = 60 * 60 * 24 * 7;  // 7 days
 const BMU_TTL      = 60 * 60 * 24 * 7;
-const BIGRAM_TTL   = 60 * 60 * 24 * 14; // 14 days for transition memory
 
+/** Same normalization as the canonical writer (search/engram-bigram.ts) so keys never split. */
 export function hashQuery(query: string): string {
-  return crypto
-    .createHash('sha256')
-    .update(query.trim().toLowerCase())
-    .digest('hex')
-    .slice(0, 16);
+  return qHash(query);
 }
 
 export async function recordEngramTransition(
@@ -39,22 +35,20 @@ export async function recordEngramTransition(
 ): Promise<{ currentHash: string }> {
   const currentHash = hashQuery(args.currentQuery);
 
-  // Store text so DYM can recover the original query
-  await redis.set(`ace:engram:query:${currentHash}`, args.currentQuery, 'EX', QUERY_TTL);
+  // Canonical writer (search/engram-bigram.ts) owns the bigram + query-text keys and their TTL/trim policy.
+  if (args.previousQuery) {
+    await recordCanonicalEngramTransition(args.previousQuery, args.currentQuery);
+  } else {
+    // No transition to record: keep the current query text recoverable for DYM.
+    await redis.set(`ace:engram:query:${currentHash}`, args.currentQuery, 'EX', QUERY_TTL);
+  }
 
-  // Map query → BMU cell (spatial locality for DYM)
+  // Map query -> BMU cell (spatial locality for DYM). This is the only part unique to this module.
   if (Number.isFinite(args.somRow) && Number.isFinite(args.somCol)) {
     const bmuKey = `${args.somRow}:${args.somCol}`;
     await redis.set(`ace:engram:query-bmu:${currentHash}`, bmuKey, 'EX', BMU_TTL);
     await redis.zincrby(`ace:engram:bmu:${bmuKey}`, 1, currentHash);
     await redis.expire(`ace:engram:bmu:${bmuKey}`, BMU_TTL);
-  }
-
-  // Bigram: prev → current transition frequency
-  if (args.previousQuery) {
-    const prevHash = hashQuery(args.previousQuery);
-    await redis.zincrby(`ace:engram:bigram:${prevHash}`, 1, currentHash);
-    await redis.expire(`ace:engram:bigram:${prevHash}`, BIGRAM_TTL);
   }
 
   return { currentHash };

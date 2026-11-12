@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.topology-search-owner-audit-followup.v1",
+  "date": "2026-11-10",
+  "scope": "Source hygiene, health classification, existing contract tests, scorer and NS-9 review-only references.",
+  "correctedFindings": {
+    "topologyServerCredential": "No literal URL in current server source; removed DATABASE_URL_DEV fallback; DATABASE_URL is required.",
+    "rootIngestScripts": "Removed embedded database URLs from both root ingest scripts; each now requires DATABASE_URL.",
+    "traceHealth": "Only rerank remains optional; topology probes /ready and is required for healthy TRACE status.",
+    "topologyUnavailableBehavior": "Existing client and MCP adapters preserve explicit unavailable/error metadata.",
+    "databaseAudit": "Existing guarded read-only SQL already covers atlas_topology_index and tensor_analysis_cache; live catalog evidence not collected.",
+    "scorer": "Existing five-factor scorer remains owner; it does not accept a criterion-evidence map and keeps incomplete scores UNSCORABLE."
+  },
+  "ns9ReviewOnly": {
+    "inputSha256": "26816e99295b4a7d4b9d3c45b6cc3c8cbdca6f1fcc636f385d8879b756a388b1",
+    "rowCount": 90,
+    "logicalTaskKeyBoundCount": 88,
+    "sourceFileHashMatchCount": 90,
+    "dirtySourceFileCount": 0
+  },
+  "verification": {
+    "topologyNodeHttpAndContractTests": "PASS 14/14",
+    "topologyClientVitest": "PASS 3/3",
+    "nodeSyntaxChecks": "PASS for topology server and two root ingest scripts",
+    "scopedDiffCheck": "PASS (line-ending warnings only)",
+    "traceEslint": "41 findings elsewhere in the existing large file; no finding in edited health block"
+  },
+  "sideEffects": {
+    "databaseWrites": 0,
+    "cacheWrites": 0,
+    "gpuJobs": 0,
+    "serviceStartsOrRestarts": 0,
+    "kanbanMutations": 0
+  },
+  "openGates": [
+    "Rotate the removed embedded credential if it was valid; repository history is unchanged.",
+    "Operator-controlled TRACE restart and live auth/health verification.",
+    "Live topology /ready and approved read-only PostgreSQL catalog/row-coverage capture.",
+    "Human review before any candidate reference is admitted as evidence or any dependency is proposed."
+  ],
+  "sha256": {
+    "ingest-nes-chrom.mjs": "42fbe535a510a60db2aa337cda7ada9c4245b18d672f78e531c3fc17d303f527",
+    "ingest-nes-chrom-verbose.mjs": "e631dc2a6b965712f0894517905df44421692ba1d5ae493b84a5fa9c7a9bb7e8",
+    "sveltekit-frontend/scripts/topology-search-server.mjs": "6886982964623e34faf632078db16838bbee358515b929316b35c66e4c855b6b",
+    "sveltekit-frontend/scripts/topology-search-contract.test.mjs": "39e3b745a560544c91ac7a3393438f3bfb83dc0fa7b4579a8ac12a37eed4a8b2",
+    "sveltekit-frontend/src/mcp/trace-mcp-server.ts": "a6604ba993039a8b8c06405e9f3479efd52c1947d88148d6f022ba42cb12b370",
+    "sveltekit-frontend/src/lib/server/retrieval/topology-search-client.ts": "707cf3d95befe229dcea59e16f0cbe803730030e6042b74f9971348341494993",
+    "sveltekit-frontend/scripts/ensure-search-engine.mjs": "2bc7ee95990264aa9db3940c23fc90d0bf78848621e1ec74333e4af5256f964a",
+    "scripts/atlas/audit-topology-search-db-readonly-v1.sql": "7d85698e032b1cd0a04f6ee8599ff9c71e2553f6764a1a2dad14dcb4625bd73d",
+    "scripts/atlas/audit-openspec-task-evidence-scores-v1.mjs": "5c12781e6b451f510c8b8cc2f884eaf2da2c2fe573558334a7ca1c2c50e4b0aa",
+    "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md": "32bc191fe94f7362e34f8840934876314be9576b3ae445114b5f23bcd9bb7834",
+    ".tmp/atlas/ns9-top-five-logical-key-review-queue-v1.csv": "26816e99295b4a7d4b9d3c45b6cc3c8cbdca6f1fcc636f385d8879b756a388b1",
+    ".tmp/atlas/ns9-top-five-evidence-reference-proposals-v1.json": "d7cf69097b905ead0401ad6c9cd12e2e443bd9aab532ab17ad58b009ed200108"
+  }
+}

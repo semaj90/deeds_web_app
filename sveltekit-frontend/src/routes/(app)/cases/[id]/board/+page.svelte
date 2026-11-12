@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidateAll } from '$app/navigation';
 	import HybridBoard from '$lib/components/canvas/HybridBoard.svelte';
 	import { replaceEvidenceThumbnailUrls } from '$lib/components/canvas/evidence-thumbnail-policy.js';
 	import Icon from '$lib/components/ui/Icon.svelte';
@@ -157,6 +158,8 @@
 	// Case switcher (lets user jump between cases without leaving board)
 	interface CaseListItem { id: string; title: string; status: string; updatedAt?: string }
 	let caseList = $state<CaseListItem[]>([]);
+	let caseListLoading = $state(false);
+	let caseListError = $state('');
 	let showCaseSwitcher = $state(false);
 	let caseSwitcherQuery = $state('');
 	let filteredCases = $derived.by(() => {
@@ -208,19 +211,30 @@
 	}
 
 	async function loadCaseList() {
+		if (caseListLoading) return;
+		caseListLoading = true;
+		caseListError = '';
 		try {
-			const res = await fetch('/api/cases?limit=50', { signal: AbortSignal.timeout(30_000) });
-			if (res.ok) {
-				const data = await res.json();
-				caseList = (data.cases || []).map((c: any) => ({
-					id: c.id,
-					title: c.title || 'Untitled Case',
-					status: c.status || 'open',
-					updatedAt: c.updatedAt
-				}));
-			}
+			const res = await fetch('/api/cases?limit=50', {
+				credentials: 'same-origin',
+				cache: 'no-store',
+				headers: { Accept: 'application/json' },
+				signal: AbortSignal.timeout(30_000)
+			});
+			const payload = await res.json().catch(() => ({}));
+			if (!res.ok) throw new Error(res.status === 401 ? 'Your session needs refreshing. Sign in again and reopen the case switcher.' : 'Cases could not be loaded. Try again.');
+			const rows = payload?.data?.cases ?? payload?.cases;
+			if (!Array.isArray(rows)) throw new Error('The case list response was incomplete. Try again.');
+			caseList = rows.map((c: any) => ({
+				id: String(c.id),
+				title: c.title || 'Untitled Case',
+				status: c.status || 'open',
+				updatedAt: c.updatedAt
+			}));
 		} catch (e) {
-			console.error('Failed to load case list:', e);
+			caseListError = e instanceof Error ? e.message : 'Cases could not be loaded. Try again.';
+		} finally {
+			caseListLoading = false;
 		}
 	}
 
@@ -230,7 +244,7 @@
 			return;
 		}
 		showCaseSwitcher = false;
-		// Use SvelteKit's goto for client-side navigation
+		// Full navigation intentionally reruns the authorized SSR load for the new case.
 		window.location.href = `/cases/${targetId}/board`;
 	}
 
@@ -2048,14 +2062,14 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		{caseId}
 		isOpen={showAddEvidence}
 		onClose={() => (showAddEvidence = false)}
-		onSuccess={() => {
+		onSuccess={async () => {
 			showAddEvidence = false;
 			notificationStore.add({
 				type: 'success',
 				title: 'Evidence Uploaded',
 				message: 'Evidence successfully ingested into SeaweedFS and registered to case.'
 			});
-			window.location.reload();
+			await invalidateAll();
 		}}
 	/>
 
@@ -2205,14 +2219,16 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			class="case-switcher-backdrop"
 			onclick={() => (showCaseSwitcher = false)}
 			onkeydown={(e) => e.key === 'Escape' && (showCaseSwitcher = false)}
+			role="presentation"
 		>
 			<!-- svelte-ignore a11y_no_static_element_interactions, a11y_click_events_have_key_events -->
-			<div class="case-switcher-dropdown" onclick={(e) => e.stopPropagation()}>
+			<div class="case-switcher-dropdown" role="dialog" aria-modal="true" aria-label="Switch case" tabindex="-1" onclick={(e) => e.stopPropagation()}>
 				<div class="case-switcher-header">
 					<Icon name="search" />
 					<input
 						type="text"
 						placeholder="Search cases by title or ID..."
+						aria-label="Search cases by title or ID"
 						bind:value={caseSwitcherQuery}
 						class="case-switcher-search"
 					/>
@@ -2273,9 +2289,16 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 						</div>
 					{/if}
 
-					{#if filteredCases.length === 0 && !showCreateCaseForm}
+					{#if caseListLoading && caseList.length === 0 && !showCreateCaseForm}
+						<div class="case-switcher-empty" role="status">Loading cases…</div>
+					{:else if caseListError && caseList.length === 0 && !showCreateCaseForm}
+						<div class="case-switcher-empty case-switcher-error" role="alert">
+							<span>{caseListError}</span>
+							<button type="button" class="case-switcher-retry" onclick={loadCaseList}>Retry</button>
+						</div>
+					{:else if filteredCases.length === 0 && !showCreateCaseForm}
 						<div class="case-switcher-empty">
-							{caseList.length === 0 ? 'Loading cases...' : 'No matches — create one above'}
+							No matching cases. Create one above or adjust your search.
 						</div>
 					{:else if !showCreateCaseForm}
 						{#each filteredCases as c (c.id)}
@@ -4119,5 +4142,51 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		border-color: #ffffff;
 		transform: scale(1.25);
 		box-shadow: 0 0 8px var(--swatch-color);
+	}
+
+	/* Case switcher: paper surface, fine sage rules, readable case status. */
+	.case-switcher-backdrop { background: rgba(26, 32, 35, 0.42); backdrop-filter: blur(7px); }
+	.case-switcher-dropdown {
+		width: min(32rem, calc(100vw - 2rem));
+		max-height: min(72vh, 42rem);
+		border: 1px solid #bdcdbd;
+		border-radius: 1rem;
+		background: #fffdf8;
+		box-shadow: 0 26px 70px rgba(20, 29, 27, 0.28);
+		color: #26312e;
+	}
+	.case-switcher-header { padding: 0.8rem; border-bottom: 1px solid #dce5d9; }
+	.case-switcher-search {
+		min-height: 2.6rem;
+		border-color: #d4ddd0;
+		border-radius: 0.55rem;
+		background: #fffefa;
+		color: #25312d;
+		font-size: 0.875rem;
+	}
+	.case-switcher-search:focus { border-color: #668a6a; box-shadow: 0 0 0 3px rgba(89, 128, 94, 0.12); }
+	.case-switcher-item { min-height: 3.6rem; padding: 0.7rem 0.85rem; border-bottom-color: #e7ebe2; }
+	.case-switcher-item:hover { background: #f5f7f0; }
+	.case-switcher-item.active { background: #edf4eb; }
+	.case-switcher-title { color: #26312e; font-size: 0.875rem; }
+	.case-switcher-id { color: #707871; font-size: 0.7rem; }
+	.case-switcher-current { padding: 0.2rem 0.45rem; border-radius: 999px; background: #e3eee1; color: #386247; letter-spacing: 0.06em; }
+	.case-switcher-new { background: #f0f6ee; }
+	.case-switcher-new:hover { background: #e5f0e2; }
+	.case-switcher-new-icon, .case-switcher-btn-create { background: #4a7654; }
+	.case-switcher-btn-create:hover:not(:disabled) { background: #365f41; }
+	.case-switcher-create-form { gap: 0.65rem; border-bottom-color: #dce5d9; background: #f8f8f2; }
+	.case-switcher-input, .case-switcher-textarea { min-height: 2.6rem; border-color: #d4ddd0; border-radius: 0.5rem; color: #25312d; }
+	.case-switcher-input:focus, .case-switcher-textarea:focus { border-color: #668a6a; box-shadow: 0 0 0 3px rgba(89, 128, 94, 0.12); }
+	.case-switcher-empty { padding: 1.25rem; color: #657068; line-height: 1.55; }
+	.case-switcher-error { display: grid; justify-items: center; gap: 0.7rem; color: #813d31; }
+	.case-switcher-retry { border: 1px solid #a9c1a7; border-radius: 999px; padding: 0.4rem 0.8rem; background: #f3f7f0; color: #365f41; font-weight: 600; cursor: pointer; }
+	.case-switcher-retry:hover { background: #e4efe1; }
+	.case-switcher-footer { border-top: 1px solid #dce5d9; background: #f8f8f2; color: #707871; }
+	.case-switcher-btn-cancel { color: #526057; border-color: #d0d9ce; }
+	.case-switcher-btn-cancel:hover { background: #eef2eb; }
+	@media (max-width: 560px) {
+		.case-switcher-backdrop { align-items: flex-start; padding-top: max(4rem, 8vh); }
+		.case-switcher-dropdown { width: calc(100vw - 1.25rem); max-height: 82vh; }
 	}
 </style>

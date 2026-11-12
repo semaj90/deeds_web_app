@@ -25,4 +25,14 @@ describe('evidence upload progress presentation machine', () => {
 		expect(actor.getSnapshot().matches('connecting')).toBe(true);
 		actor.stop();
 	});
+
+	it('reports an unavailable progress stream without claiming the evidence job failed', () => {
+		const actor = createActor(evidenceUploadProgressMachine).start();
+		actor.send({ type: 'STREAM_ENDED', message: 'Progress history expired; refresh the status.' });
+		expect(actor.getSnapshot().matches('unavailable')).toBe(true);
+		expect(actor.getSnapshot().matches('failed')).toBe(false);
+		expect(actor.getSnapshot().context.message).toContain('Progress history expired');
+		expect(actor.getSnapshot().context.error).toBeNull();
+		actor.stop();
+	});
 });

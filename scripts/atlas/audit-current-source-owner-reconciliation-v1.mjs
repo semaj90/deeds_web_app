@@ -16,8 +16,19 @@ import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.
 import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs';
 
 const root = REPO_ROOT;
-const reportPath = path.join(root, 'docs/reports/current-source-owner-reconciliation-v1.json');
-const markdownPath = path.join(root, 'docs/reports/current-source-owner-reconciliation-v1.md');
+const outputDirArg = process.argv.find((value) => value.startsWith('--output-dir='))?.slice('--output-dir='.length);
+let reportDirectory = path.join(root, 'docs/reports');
+let reportBase = 'current-source-owner-reconciliation-v1';
+if (outputDirArg) {
+  reportDirectory = path.resolve(root, outputDirArg);
+  const relativeOutputDirectory = path.relative(path.join(root, '.tmp', 'atlas'), reportDirectory);
+  if (relativeOutputDirectory.startsWith('..') || path.isAbsolute(relativeOutputDirectory)) {
+    throw new Error('CUSTOM_REPORT_DIRECTORY_MUST_BE_UNDER_TMP_ATLAS');
+  }
+  reportBase = `current-source-owner-reconciliation-${new Date().toISOString().replace(/[:.]/g, '-')}`;
+}
+const reportPath = path.join(reportDirectory, `${reportBase}.json`);
+const markdownPath = path.join(reportDirectory, `${reportBase}.md`);
 const authorityPath = path.join(root, 'docs/reports/current-graphify-snapshot-authority-v1.json');
 const digest = (value) => `sha256:${crypto.createHash('sha256').update(value).digest('hex')}`;
 const git = (args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64 * 1024 * 1024 }).trim();

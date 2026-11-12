@@ -21,7 +21,7 @@
 	let {
 		open = $bindable(false),
 		exhibit = null,
-		theme = 'dark',
+		theme = 'light',
 		onClose,
 		onPinToCanvas,
 		onImpeach
@@ -108,8 +108,8 @@
 						<Dialog.Title class="eev-title">{exhibit.title}</Dialog.Title>
 						<span class="eev-type-tag">{exhibit.categoryBadge}</span>
 						<span class="eev-status-pill">
-							<span class="dot-green"></span>
-							{exhibit.chainOfCustody?.admissibilityStatus || 'AUTHENTICATED'}
+							<span class="status-dot" class:dot-green={exhibit.chainOfCustody?.admissibilityStatus === 'AUTHENTICATED'}></span>
+							{exhibit.chainOfCustody?.admissibilityStatus || 'LOCAL PREVIEW'}
 						</span>
 					</div>
 					<div class="eev-header-right">
@@ -168,7 +168,20 @@
 						<div class="eev-preview-layout">
 							<!-- Main Media/Document Stage -->
 							<div class="eev-media-stage">
-								{#if exhibit.type === 'document'}
+								{#if exhibit.previewUrl && /^image\/(png|jpeg|webp|gif)$/i.test(exhibit.mimeType)}
+									<div class="asset-preview-stage"><img src={exhibit.previewUrl} alt={`Preview of ${exhibit.title}`} loading="lazy" /></div>
+								{:else if exhibit.previewUrl && exhibit.mimeType === 'application/pdf'}
+									<div class="asset-preview-stage"><iframe src={exhibit.previewUrl} title={`PDF preview: ${exhibit.title}`} loading="lazy"></iframe></div>
+								{:else if exhibit.previewUrl && exhibit.mimeType.startsWith('video/')}
+									<div class="asset-preview-stage"><video controls preload="metadata" src={exhibit.previewUrl}><track kind="captions" />Video preview unavailable.</video></div>
+								{:else if exhibit.previewUrl && exhibit.mimeType.startsWith('audio/')}
+									<div class="asset-preview-stage audio-preview-stage"><audio controls preload="metadata" src={exhibit.previewUrl}>Audio preview unavailable.</audio></div>
+								{:else if exhibit.previewUrl}
+									<div class="asset-preview-stage unsupported-preview">
+										<p>Preview is not available for this file type.</p>
+										<a href={exhibit.previewUrl} target="_blank" rel="noopener noreferrer">Open original file</a>
+									</div>
+								{:else if exhibit.type === 'document'}
 									<!-- Document / PDF Inspection Stage -->
 									<div class="doc-viewer-container">
 										<div class="doc-controls-bar">
@@ -186,34 +199,12 @@
 										<ScrollArea.Root type="hover" class="doc-scroll-root">
 											<ScrollArea.Viewport class="doc-scroll-viewport">
 												<div class="legal-doc-page" style="transform: scale({docZoom / 100}); transform-origin: top center;">
-													<div class="doc-watermark">USDC EXHIBIT // EVIDENCE VAULT</div>
-													<div class="doc-header-stamp">
-														<span>CASE #986B5214 STATE v. JOHNSON</span>
-														<span>FILED UNDER SEAL: OCT 14, 2026</span>
-													</div>
-													<h3 class="doc-page-heading">{exhibit.title.toUpperCase()}</h3>
-													<p class="doc-preamble">
-														BE IT KNOWN that on this 14th day of October, 2026, the undersigned corporate officer executed the following binding dispatch authorization:
-													</p>
-													<div class="doc-clause-box discrepancy-highlight">
-														<div class="callout-badge">DISCREPANCY // 18 U.S.C. § 1001 FLAG</div>
-														<p class="clause-text">
-															{exhibit.extractedText || "ARTICLE 4.2: UNCONDITIONAL WIRE ROUTING AUTHORIZATION.\nThe undersigned Alexander Vance, Vice President of Infrastructure, hereby authorizes immediate manual dispatch of tranche A-9 capital reserves ($1,450,000 USD) to Arulian Cayman Trust without secondary board quorum.\nExecuted at 01:45:00 UTC.\n[PGP SIGNATURE: 0x9BF24A10C883]"}
-														</p>
-													</div>
-													<p class="doc-body-legal">
-														This document has been verified against the cold-storage immutable SeaweedFS S3 ledger. Cryptographic signature matches Subject Vance private key fingerprint <code>ED25519-SHA-F982-11A0</code>.
-													</p>
-													<div class="doc-signature-row">
-														<div class="sig-block">
-															<span class="sig-line">/s/ Alexander Vance</span>
-															<span class="sig-label">VP Infrastructure, Arulian Energy</span>
-														</div>
-														<div class="sig-stamp">
-															<span>NOTARIZED</span>
-															<span>OCT 14 01:45 UTC</span>
-														</div>
-													</div>
+												<h3 class="doc-page-heading">{exhibit.title}</h3>
+												{#if exhibit.extractedText}
+													<pre class="clause-text">{exhibit.extractedText}</pre>
+												{:else}
+													<p class="preview-empty">No extracted text is available for this file yet.</p>
+												{/if}
 												</div>
 											</ScrollArea.Viewport>
 										</ScrollArea.Root>
@@ -393,13 +384,13 @@
 									</h4>
 									<div class="db-meta-grid">
 										<span class="db-lbl">PGVECTOR TABLE:</span>
-										<span class="db-val">codebase_chunk_index</span>
+										<span class="db-val">{exhibit.chainOfCustody?.pgvectorIndexId || 'Not indexed'}</span>
 										<span class="db-lbl">INDEX BINDING:</span>
-										<span class="db-val">{exhibit.chainOfCustody?.pgvectorIndexId || 'PGVECTOR #8812'}</span>
+										<span class="db-val">{exhibit.chainOfCustody?.pgvectorIndexId || 'Not linked'}</span>
 										<span class="db-lbl">VECTOR DIMENSION:</span>
-										<span class="db-val">768-D dense</span>
+										<span class="db-val">{exhibit.chainOfCustody?.pgvectorIndexId ? '768-D dense' : 'Not available'}</span>
 										<span class="db-lbl">STORAGE BUCKET:</span>
-										<span class="db-val mono">{exhibit.chainOfCustody?.storageBucket || 'legal-evidence/exhibits'}</span>
+										<span class="db-val mono">{exhibit.chainOfCustody?.storageBucket || 'Private evidence storage'}</span>
 										<span class="db-lbl">FILE SIZE:</span>
 										<span class="db-val">{exhibit.fileSize || 'N/A'}</span>
 									</div>
@@ -429,12 +420,12 @@
 					<Tabs.Content value="ocr" class="eev-tab-content">
 						<div class="ocr-tab-container">
 							<div class="ocr-header-strip">
-								<span>EXTRACTED TEXT STREAM // DOCLING v2.4</span>
-								<span class="ocr-conf">CONFIDENCE: 99.8%</span>
+									<span>EXTRACTED TEXT</span>
+									<span class="ocr-conf">{exhibit.confidence != null ? `CONFIDENCE: ${exhibit.confidence}%` : 'NOT SCORED'}</span>
 							</div>
 							<ScrollArea.Root type="hover" class="ocr-scroll-root">
 								<ScrollArea.Viewport class="ocr-scroll-viewport">
-									<pre class="ocr-text-block">{exhibit.extractedText || exhibit.summary}</pre>
+										<pre class="ocr-text-block">{exhibit.extractedText || 'No extracted text is available for this file yet.'}</pre>
 								</ScrollArea.Viewport>
 							</ScrollArea.Root>
 						</div>
@@ -447,26 +438,18 @@
 								<div class="chain-step">
 									<div class="step-dot green"></div>
 									<div class="step-content">
-										<span class="step-time">{exhibit.timestamp || '2026-10-14 02:14:09 UTC'}</span>
-										<span class="step-action">ORIGIN TELEMETRY RECORDED</span>
-										<span class="step-agent">Hardware Node: {exhibit.sourceRef}</span>
+										<span class="step-time">{exhibit.timestamp || 'Time not recorded'}</span>
+										<span class="step-action">EVIDENCE RECORD</span>
+										<span class="step-agent">Source: {exhibit.sourceRef || 'Not provided'}</span>
 									</div>
 								</div>
 								<div class="chain-step">
 									<div class="step-dot blue"></div>
 									<div class="step-content">
-										<span class="step-time">{exhibit.chainOfCustody?.recordedAt || '2026-10-14 03:00:00 UTC'}</span>
-										<span class="step-action">INGESTION & SHA-256 LEDGER WRITE</span>
-										<span class="step-agent">Intake Officer: {exhibit.chainOfCustody?.intakeOfficer || 'Det. K. Miller'}</span>
-										<span class="step-hash">SHA-256: <code>{exhibit.sha256}</code></span>
-									</div>
-								</div>
-								<div class="chain-step">
-									<div class="step-dot cyan"></div>
-									<div class="step-content">
-										<span class="step-time">2026-10-14 03:05:12 UTC</span>
-										<span class="step-action">PGVECTOR 768-D EMBEDDING PERSISTED</span>
-										<span class="step-agent">EmbeddingGemma v2.4 • Table codebase_chunk_index</span>
+										<span class="step-time">{exhibit.chainOfCustody?.recordedAt || 'No custody receipt linked'}</span>
+										<span class="step-action">INGESTION RECORD</span>
+										<span class="step-agent">Intake officer: {exhibit.chainOfCustody?.intakeOfficer || 'Not recorded'}</span>
+										{#if exhibit.sha256}<span class="step-hash">SHA-256: <code>{exhibit.sha256}</code></span>{/if}
 									</div>
 								</div>
 							</div>
@@ -542,9 +525,9 @@
 	}
 
 	:global(.eev-modal-content.light-modal) {
-		background: #ffffff;
-		border: 1px solid #cbd5e1;
-		color: #0f172a;
+		background: #f8f4eb;
+		border: 1px solid #d8cbb7;
+		color: #29231e;
 	}
 
 	/* Top Accent Line */
@@ -554,7 +537,7 @@
 		left: 0;
 		right: 0;
 		height: 2px;
-		background: linear-gradient(90deg, #38bdf8 0%, #818cf8 50%, #f59e0b 100%);
+		background: linear-gradient(90deg, #574638 0%, #b89442 54%, #d8cbb7 100%);
 	}
 
 	/* Tactical Corner Notches */
@@ -565,10 +548,10 @@
 		pointer-events: none;
 		z-index: 10;
 	}
-	.hud-notch-tl { top: 0; left: 0; border-top: 2px solid #38bdf8; border-left: 2px solid #38bdf8; }
-	.hud-notch-tr { top: 0; right: 0; border-top: 2px solid #38bdf8; border-right: 2px solid #38bdf8; }
-	.hud-notch-bl { bottom: 0; left: 0; border-bottom: 2px solid #38bdf8; border-left: 2px solid #38bdf8; }
-	.hud-notch-br { bottom: 0; right: 0; border-bottom: 2px solid #38bdf8; border-right: 2px solid #38bdf8; }
+	.hud-notch-tl { top: 0; left: 0; border-top: 2px solid #b89442; border-left: 2px solid #b89442; }
+	.hud-notch-tr { top: 0; right: 0; border-top: 2px solid #b89442; border-right: 2px solid #b89442; }
+	.hud-notch-bl { bottom: 0; left: 0; border-bottom: 2px solid #b89442; border-left: 2px solid #b89442; }
+	.hud-notch-br { bottom: 0; right: 0; border-bottom: 2px solid #b89442; border-right: 2px solid #b89442; }
 
 	/* Header */
 	.eev-header {
@@ -765,8 +748,8 @@
 	}
 
 	:global(.light-modal .eev-tab-trigger[data-state='active']) {
-		color: #0284c7;
-		border-bottom-color: #0284c7;
+		color: #75591e;
+		border-bottom-color: #b89442;
 	}
 
 	:global(.eev-tab-content) {
@@ -785,6 +768,40 @@
 		overflow: hidden;
 	}
 
+	.asset-preview-stage {
+		flex: 1;
+		min-height: 0;
+		display: grid;
+		place-items: center;
+		padding: 18px;
+		background: #eee7da;
+		border: 1px solid #e4d8c7;
+		border-radius: 8px;
+		margin: 14px;
+		overflow: hidden;
+	}
+	.asset-preview-stage img,
+	.asset-preview-stage video {
+		max-width: 100%;
+		max-height: 100%;
+		object-fit: contain;
+		border-radius: 4px;
+		box-shadow: 0 8px 24px rgba(41, 35, 30, 0.14);
+	}
+	.asset-preview-stage iframe {
+		width: 100%;
+		height: 100%;
+		min-height: 340px;
+		border: 1px solid #d8cbb7;
+		border-radius: 4px;
+		background: #fff;
+	}
+	.audio-preview-stage audio { width: min(560px, 100%); }
+	.unsupported-preview { align-content: center; gap: 12px; color: #574638; }
+	.unsupported-preview a { color: #75591e; text-decoration: underline; text-underline-offset: 3px; }
+	.preview-empty { padding: 28px; color: #74685c; }
+	.status-dot { width: 6px; height: 6px; border-radius: 50%; background: #a78b70; }
+
 	.eev-media-stage {
 		border-right: 1px solid rgba(255, 255, 255, 0.08);
 		overflow: hidden;
@@ -794,8 +811,8 @@
 	}
 
 	:global(.light-modal) .eev-media-stage {
-		border-right-color: #e2e8f0;
-		background: #f8fafc;
+		border-right-color: #e4d8c7;
+		background: #fbf8f2;
 	}
 
 	.eev-sidebar {
@@ -808,8 +825,21 @@
 	}
 
 	:global(.light-modal) .eev-sidebar {
-		background: #ffffff;
+		background: #f8f4eb;
 	}
+
+	:global(.light-modal) .eev-header,
+	:global(.light-modal) .eev-tabs-list,
+	:global(.light-modal) .sidebar-box,
+	:global(.light-modal) .doc-controls-bar,
+	:global(.light-modal) .ocr-header-strip,
+	:global(.light-modal) .chain-step { border-color: #e4d8c7; }
+	:global(.light-modal) .eev-header { background: #f8f4eb; }
+	:global(.light-modal) .eev-tabs-list { background: #f2eadf; }
+	:global(.light-modal) .eev-tab-trigger:hover { color: #75591e; }
+	:global(.light-modal) .eev-action-btn:hover { color: #574638; border-color: #b89442; background: #f4ecd9; }
+	:global(.light-modal) .eev-status-pill { color: #386b54; background: #edf4ec; border-color: #c9dbc7; }
+	:global(.light-modal) .sidebar-box { background: #fffdf9; }
 
 	.sidebar-box {
 		background: rgba(17, 24, 39, 0.5);

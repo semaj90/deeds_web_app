@@ -15,7 +15,7 @@
 import { createHash } from 'node:crypto';
 
 export const WFU_COMMENT = /<!--\s*wfu:\s*([\s\S]*?)\s*-->/i;
-export const WFU_KEYS = new Set(['depends', 'est', 'reads', 'writes']);
+export const WFU_KEYS = new Set(['depends', 'est', 'reads', 'writes', 'proof']);
 // Named ids are UPPERCASE segments joined by hyphens and must contain a digit somewhere (WFU-09a, TOPO-04,
 // MICRO-04-TRAIN-SMOKE); numeric ids are dotted (14.6a). A sentence start such as "Re-run" is NOT an id.
 export const WFU_ID = /^(?:\*\*)?`?((?=[A-Z0-9-]*\d)[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+[a-z]?|\d+(?:\.\d+)+[a-z]?)`?\b/;
@@ -63,12 +63,22 @@ export function parseWfu(blockText) {
   const m = withoutCodeSpans(blockText).match(WFU_COMMENT);
   if (!m) return null;
   const out = { convention: 'wfu-v1', dependsOn: null, est: null, reads: null, writes: null, warnings: [] };
+  let proofSeen = false;
   for (const part of m[1].split(';').map((p) => p.trim()).filter(Boolean)) {
-    const eq = part.indexOf('=');
-    if (eq < 1) { out.warnings.push(`MALFORMED:${part.slice(0, 40)}`); continue; }
-    const key = part.slice(0, eq).trim().toLowerCase();
-    const value = part.slice(eq + 1).trim();
+    const separator = part.includes('=') ? '=' : (part.startsWith('proof:') ? ':' : -1);
+    if (separator < 1) { out.warnings.push(`MALFORMED:${part.slice(0, 40)}`); continue; }
+    const key = part.slice(0, part.indexOf(separator)).trim().toLowerCase();
+    const value = part.slice(part.indexOf(separator) + 1).trim();
     if (!WFU_KEYS.has(key)) { out.warnings.push(`UNKNOWN_KEY:${key}`); continue; }
+    if (key === 'proof') {
+      if (proofSeen) {
+        delete out.proofReceiptId;
+        out.warnings.push('PROOF_DUPLICATE');
+      } else if (/^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/.test(value)) out.proofReceiptId = value;
+      else out.warnings.push(`PROOF_INVALID:${value.slice(0, 32)}`);
+      proofSeen = true;
+      continue;
+    }
     if (key === 'est') {
       const n = Number(value);
       if (Number.isInteger(n) && n >= 1 && n <= 10080) out.est = n; else out.warnings.push(`EST_INVALID:${value.slice(0, 20)}`);
@@ -192,22 +202,48 @@ export const summarizeDeclared = (tasks) => ({
  * NS-7A: DECLARED_DEPENDENCY_SHADOW. Compute actionability twice for OPEN tasks and record the disagreement; it never
  * changes controller behavior. `rows` are controller rows (ledger fields spread + controller.state).
  *   incumbent  : controller.state ACTIONABLE = ready; WAITING_ON_DEPENDENCY / WAITING_ON_AUTHORITY = waiting
- *   challenger : declared depends= edges — ready when remainingRequiredGates === 0, waiting when > 0
+ *   challenger : declared depends= edges — ready only when every exact dependency row is PROVEN by admitted evidence
  * Absence is NOT `depends=none`: a task with no declaration is `missingMetadata` and stays on the incumbent.
+ * A checked source box is not completion evidence; `remainingRequiredGates` is not used as proof.
  */
 export function compareDependencyShadow(rows) {
   const open = rows.filter((r) => r.state === 'OPEN' && ['ACTIONABLE', 'WAITING_ON_DEPENDENCY', 'WAITING_ON_AUTHORITY'].includes(r.controller?.state));
   const counts = { sameDecision: 0, incumbentReadyOnly: 0, dependencyReadyOnly: 0, unresolvedDependency: 0, ambiguousDependency: 0, cycleDetected: 0, missingMetadata: 0 };
   const examples = {};
   const note = (kind, r) => { counts[kind]++; (examples[kind] ??= []).length < 5 && examples[kind].push(r.logicalTaskKey ?? r.stableKey ?? r.taskKey); };
+  const byTaskKey = new Map(rows.filter((r) => r.taskKey).map((r) => [r.taskKey, r]));
+  let unprovenDependencyTaskCount = 0;
+  let preservedNonDependencyBlockerCount = 0;
+  const unprovenDependencyTasks = [];
+  const preservedNonDependencyBlockerExamples = [];
   for (const r of open) {
     const d = r.declared;
     const incumbentReady = r.controller.state === 'ACTIONABLE';
+    // Dependency scheduling may not bypass authorization or any other non-dependency blocker.
+    if (r.controller.state === 'WAITING_ON_AUTHORITY'
+      || (r.controller.state === 'WAITING_ON_DEPENDENCY' && r.controller.blockerKey !== 'DECLARED_TASK_DEPENDENCY')) {
+      preservedNonDependencyBlockerCount++;
+      if (preservedNonDependencyBlockerExamples.length < 5) preservedNonDependencyBlockerExamples.push(r.logicalTaskKey ?? r.stableKey ?? r.taskKey);
+      continue;
+    }
     if (!d || d.dependsOn == null) { note('missingMetadata', r); continue; }
     if (d.dependencyState === 'CYCLE_OR_DOWNSTREAM_OF_CYCLE') { note('cycleDetected', r); continue; }
     if (d.ambiguousDepends?.length) { note('ambiguousDependency', r); continue; }
     if (d.unresolvedDepends?.length) { note('unresolvedDependency', r); continue; }
-    const dependencyReady = r.remainingRequiredGates === 0;
+    if (!Array.isArray(r.dependsOnTaskIds)) { note('unresolvedDependency', r); continue; }
+    const dependencyRows = r.dependsOnTaskIds.map((key) => byTaskKey.get(key));
+    if (dependencyRows.some((dependency) => !dependency)) { note('unresolvedDependency', r); continue; }
+    const unproven = dependencyRows.filter((dependency) => dependency.controller?.state !== 'PROVEN');
+    if (unproven.length > 0) {
+      unprovenDependencyTaskCount++;
+      if (unprovenDependencyTasks.length < 5) {
+        unprovenDependencyTasks.push({
+          taskKey: r.logicalTaskKey ?? r.stableKey ?? r.taskKey,
+          unprovenTaskKeys: unproven.map((dependency) => dependency.logicalTaskKey ?? dependency.stableKey ?? dependency.taskKey),
+        });
+      }
+    }
+    const dependencyReady = unproven.length === 0;
     if (incumbentReady === dependencyReady) note('sameDecision', r);
     else if (incumbentReady) note('incumbentReadyOnly', r);
     else note('dependencyReadyOnly', r);
@@ -230,5 +266,18 @@ export function compareDependencyShadow(rows) {
     })(),
     noRegressionOfRequiredGates: { value: counts.incumbentReadyOnly, required: 0, met: counts.incumbentReadyOnly === 0 }
   };
-  return { openConsidered: open.length, actionableConsidered: actionable.length, counts, examples, criteria, admissionEligible: Object.values(criteria).every((c) => c.met) };
+  return {
+    openConsidered: open.length,
+    actionableConsidered: actionable.length,
+    counts,
+    examples,
+    receiptReadiness: {
+      unprovenDependencyTaskCount,
+      unprovenDependencyTasks,
+      preservedNonDependencyBlockerCount,
+      preservedNonDependencyBlockerExamples,
+    },
+    criteria,
+    admissionEligible: Object.values(criteria).every((c) => c.met)
+  };
 }

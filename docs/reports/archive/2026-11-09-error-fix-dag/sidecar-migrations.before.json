@@ -1,0 +1,1050 @@
+{
+  "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
+  "sidecars": [
+    {
+      "file": "manual/20261106_atlas_spatial_keyframes_v1.sql",
+      "status": "active_candidate",
+      "reason": "Proposed case-scoped PostgreSQL 18 keyframe packet table with 256-bit occupancy masks, packed 64-byte transforms and cluster metadata. Composite identity includes case, scene and revision. Candidate only; not applied to live database.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261106_atlas_render_material_presets_v1.sql",
+      "status": "active_candidate",
+      "reason": "Proposed non-canonical typed PBR preset metadata table, separate from atlas_nes_lut_v1 taxonomy bytes and shader_cache_entries. Candidate only; no database rehearsal, apply, or preset rows.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/scene_document_revisions.sql",
+      "status": "active_candidate",
+      "reason": "Append-only case scene manifest revisions and a distinct immutable case-scene asset registry, including revision-qualified GLB roots and Streamed SOG package members. Candidate SQL only; not rehearsed or applied to any database. Asset routes remain disabled until schema and bucket admission.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/scene_markers.sql",
+      "status": "active_candidate",
+      "reason": "Evidence-board marker persistence: scene_markers, scene_events (command_id idempotency), scene_event_outbox. Rehearsed on a disposable PostgreSQL 18 database only; NOT applied to the live database.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/scene_markers_anchor.sql",
+      "status": "active_candidate",
+      "reason": "Additive source revision/hash and image or mesh anchor metadata for scene markers. Candidate SQL only; not applied or freshly rehearsed against scratch or live databases. SPZ surface anchors are not represented by these anchor kinds yet.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261101_atlas_tool_manifest_vectors_v1.sql",
+      "status": "active_candidate",
+      "reason": "Dedicated pgvector table atlas_tool_manifest_vectors_v1 for MCP tool manifests and exact/HNSW vector cosine tool selection (AFC-E2E-97).",
+      "appliedBy": "operator-approved-candidate",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261031_pgvector_mrl_latent_kmeans_knn.sql",
+      "status": "active_candidate",
+      "reason": "Lock PostgreSQL 18 pgvector to EmbeddingGemma 768 + MRL (512/256/128) + PyTorch Latent (256/128/64) + KMeans Centroid Top-K KNN routing.",
+      "appliedBy": "operator-approved-candidate",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "drizzle/0024_nebulous_mongoose.sql",
+      "status": "active_candidate",
+      "reason": "Drizzle journal migration 0024_nebulous_mongoose.sql defining evidence_board_edges, saved_citation_annotations, agent_progress_log, feature_registry, and feature_tasks. Live table feature_registry pending transactional apply.",
+      "appliedBy": "drizzle-journal",
+      "appliedAt": null,
+      "requiresJournalEntry": true
+    },
+    {
+      "file": "manual/20261025_route_packet_stub_tables_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25 after explicit approval: STUB tables route_packets, route_state_snapshots, route_packet_facts, route_packet_edges (packet_uuid key, columns limited to what ace/packets/+server.ts uses). Created empty; nothing backfilled. Rehearsed first in a ROLLBACK transaction. route_packet_source_refs and route_token_map were already present and were not touched by this step.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "manual/20261025_route_token_map_and_source_refs_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25: creates route_token_map and route_packet_source_refs tables with indexes and unique constraints for packet-reward-writer.ts. Rehearsed in a ROLLBACK transaction first.",
+      "appliedBy": "operator-approved, session 2026-10-25",
+      "appliedAt": "2026-10-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "SELECT table_name FROM information_schema.tables WHERE table_schema=public AND table_name IN (route_token_map, route_packet_source_refs);"
+    },
+    {
+      "file": "manual/20261025_route_runtime_packets_packet_uuid_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25 after explicit operator approval: nullable route_runtime_packets.packet_uuid with partial unique index route_runtime_packets_packet_uuid_uq (unique, valid, ready). Live readback confirms 11 legacy rows remain NULL; no backfill. The ACE route now persists and returns its generated UUID, and packet-reward-writer reads route_runtime_packets columns.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "manual/20261025_route_packet_rewards_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25 after explicit operator approval: route_packet_rewards with unique packet_uuid (indisunique=t, indisvalid=t, 0 rows). No foreign key to route_runtime_packets because its UUID index is partial; the writer checks packet existence before insertion. Live readback confirms the source-ref and token-map tables also exist and are empty.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "../../drizzle/manual/20261025_ace_chunks_upsert_unique_v1.sql",
+      "status": "applied",
+      "reason": "Live unique index ace_chunks_case_content_type_uq on (case_id, content_hash, chunk_type): verified indisunique=t, indisvalid=t, indisready=t on 2026-10-25. Created outside the session that wrote this entry; this session only rehearsed it (ROLLBACK). ace_chunks has 0 rows.",
+      "appliedBy": "created by another session; verified live 2026-10-25",
+      "appliedAt": "2026-10-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "SELECT indisunique, indisvalid FROM pg_index WHERE indexrelid = 'ace_chunks_case_content_type_uq'::regclass;"
+    },
+    {
+      "file": "../../drizzle/manual/20260507_retrieval_spine.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25 after explicit operator approval: creates retrieval_rank_cache, llm_summaries, tool_call_stats and their indexes. Rehearsed first in a ROLLBACK transaction (passed, 0 leftover tables). Previously never applied; tool-ranker.ts writes tool_call_stats.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "../../drizzle/manual/20261025_retrieval_ranking_index_enhancements_v1.sql",
+      "status": "applied",
+      "reason": "Cohort complete 2026-10-25 (indisvalid=t, indisready=t for all four). First applied: atlas_nes_lut_v1_inverse_idx and kag_dag_runs_query_hash_created_idx. Then, after 20260507_retrieval_spine.sql was admitted, re-run to create retrieval_rank_cache_created_at_idx and retrieval_rank_cache_chunk_id_idx. The first two were applied before the base-table dependency was resolved, against the advice in the 2026-10-25 review; the re-run made the cohort complete.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "../../drizzle/manual/20261024_pgvector_hnsw_ivfflat_remediation_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Remediates duplicate HNSW index on agent_observations (idx_agent_observations_hnsw), redundant IVFFlat index on cluster_summaries (idx_cluster_summaries_embedding_ivfflat), and builds concurrent HNSW index on chat_embeddings (idx_chat_embeddings_embedding_hnsw) per docs/reports/pgvector-hnsw-ivfflat-diskann-audit-v1.json. Requires approval.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "py -3.13 scripts/atlas/audit_pgvector_hnsw_ivfflat_diskann_v1.py"
+    },
+    {
+      "file": "../../drizzle/manual/20261017_reconcile_summary_768_and_vector_io_cleanup.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Drops obsolete idx_codebase_chunk_summary_embedding_384_hnsw (10 rows) and redundant IVFFlat summary index; stages partial HNSW indexes for summary_embedding halfvec(768) and error_embedding halfvec(768) to eliminate DataFileRead I/O bottlenecks during non-HOT updates. Requires approval.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-vector-indexes-io-bottleneck-v1.mjs"
+    },
+    {
+      "file": "../../drizzle/manual/20261017_codebase_chunk_index_hnsw.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Builds a distinct ef_construction=200 HNSW candidate concurrently for codebase_chunk_index.content_embedding_768. Existing ef_construction=64 index must remain until independent catalog validity, planner, storage, and exact-recall checks pass; any old-index drop is a separate authorized operation.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only PostgreSQL catalog check for indisvalid and pg_get_indexdef; compare exact-search and HNSW Recall@10 with ef_search 40, 64, and 80 before any replacement/drop."
+    },
+    {
+      "file": "manual/20261013_feature_registry_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Creates public.feature_registry (declared in feature-registry.ts, missing live per the 2026-10-14 contract audit). Rehearsed in a rolled-back transaction (15 columns in-transaction; table absent afterward). Does not include the workspace-event tables, which are owned by 20260916_workspace_event_head_v1.sql (requires disposable canary). Requires approval.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Rehearsal: run the draft with COMMIT replaced by ROLLBACK and a column count; confirm 0 tables afterward."
+    },
+    {
+      "file": "manual/20261013_atlas_packets_duplicate_indexes_DROP_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Drops 10 exact-duplicate indexes on atlas_packets (one per group; keeps the index with more scans). Archive: .tmp/atlas-packets-duplicate-indexes-manifest.json (20 definitions with sha256). Rehearsed in a rolled-back transaction: 94 indexes to 84 inside the transaction; 94 after rollback. Requires approval.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Rehearsal: run the draft with COMMIT replaced by ROLLBACK and a count query; confirm 94 after."
+    },
+    {
+      "file": "manual/20261013_atlas_packets_source_ref_pattern_indexes_DRAFT.sql",
+      "status": "applied",
+      "reason": "Two text_pattern_ops indexes on atlas_packets (lower(source_ref), source_ref) created with CREATE INDEX CONCURRENTLY (no write lock). Both indisvalid=true. Live planner uses bitmap index scans. Fixes atlas.packet_search statement-timeout errors.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-13",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: pg_index indisvalid for both indexes; EXPLAIN shows Bitmap Index Scan on them."
+    },
+    {
+      "file": "manual/20261013_diagnostic_analysis_tables_DRAFT.sql",
+      "status": "applied",
+      "reason": "Three analysis tables (diagnostic_ast_facts, diagnostic_dag_runs, diagnostic_recommendations) applied in one transaction to PostgreSQL 18.4 legal_ai_db after a rolled-back rehearsal. All tables empty; no writers exist yet.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-13",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: three diagnostic_* tables exist; row counts 0."
+    },
+    {
+      "file": "manual/20261018_atlas_receipt_verification_v1.sql",
+      "status": "applied",
+      "reason": "View atlas_receipt_verification_v1 over canonical atlas_test_execution_receipts for verified pass/fail verdicts and trainable outcomes.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-18",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: view atlas_receipt_verification_v1 exists and selects from atlas_test_execution_receipts."
+    },
+    {
+      "file": "manual/20261018_atlas_receipt_verifier_results_v1.sql",
+      "status": "applied",
+      "reason": "Additive verifier-written table atlas_receipt_verifier_results_v1 (canonical=false by CHECK; VERIFIED_PASS requires evidence_resolved) over atlas_test_execution_receipts. Applied after a rolled-back rehearsal that exercised all three CHECK/UNIQUE guards. 0 rows; no writer yet.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-18",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: to_regclass('atlas_receipt_verifier_results_v1') is not null; row count 0."
+    },
+    {
+      "file": "manual/20261018_atlas_learned_artifact_admission_v1.sql",
+      "status": "applied",
+      "reason": "Additive registry atlas_learned_artifact_admission_v1 (canonical=false by CHECK): admission state, evaluation evidence, stored-weights reference and verified-receipt-set digest for learned artifacts (logistic head, low-rank basis, policy/value net, PPO policy, GEPA prompt set, procedural-memory snapshot, XGBoost model). References only. Applied after a rolled-back rehearsal covering 3 valid and 8 rejected rows. 0 rows; no writer yet.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-18",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: to_regclass('atlas_learned_artifact_admission_v1') is not null; row count 0."
+    },
+    {
+      "file": "manual/20261001_openspec_task_identity_history_v1.sql",
+      "status": "design_unapplied",
+      "reason": "EVF stable identity/history companion: immutable canonical task keys, internal surrogate IDs, claim revision snapshots, and alias preservation. No rows are imported or source files mutated; apply only after deterministic identity parity and schema-owner authorization.",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-openspec-evidence-migration-v1.mjs"
+    },
+    {
+      "file": "manual/20261001_openspec_evidence_retrieval_v1.sql",
+      "status": "design_unapplied",
+      "reason": "EVF-09 retrieval companion: metadata indexes, task trigram search, and evidence-content FTS alongside the canonical semantic_768 HNSW lane. No rows are seeded or projected; requires ledger readback, embedding artifact receipt, and explicit authorization.",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-openspec-evidence-migration-v1.mjs"
+    },
+    {
+      "file": "manual/20261001_openspec_evidence_fabric_v2.sql",
+      "status": "design_unapplied",
+      "reason": "Additive EVF-02 through EVF-06 companion: task predicates, assertion rows, supersession declarations, explicit task_evidence_binding read view, and fail-closed current-state proof derivation. No rows are seeded or applied.",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-openspec-evidence-fabric-v1.mjs --check-only"
+    },
+    {
+      "file": "manual/20261001_openspec_evidence_fabric_v1.sql",
+      "status": "design_unapplied",
+      "reason": "Additive PostgreSQL 18 evidence registry and derived proof-state view for OpenSpec claims. No rows are seeded; application requires schema-owner review, read-only dry-run validation, and explicit operator authorization.",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-openspec-evidence-fabric-v1.mjs --check-only"
+    },
+    {
+      "file": "manual/20260925_codebase_chunk_summary_text_v1.sql",
+      "status": "applied",
+      "reason": "Added nullable summary_text to codebase_chunk_index; the legacy summary column remains untouched because Drizzle maps it as signature. Applied transactionally on PostgreSQL 18.4 with zero rows populated.",
+      "appliedBy": "operator-requested-run",
+      "appliedAt": "2026-09-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only PostgreSQL 18.4 readback: summary_text is nullable text, no default, 0 populated rows."
+    },
+    {
+      "file": "manual/20260925_codebase_chunk_summary_provenance_v1.sql",
+      "status": "applied",
+      "reason": "Operator-selected additive nullable summary-provenance JSONB envelope on codebase_chunk_index. Applied transactionally to PostgreSQL 18.4; no summary rows or metadata values were populated.",
+      "appliedBy": "operator-requested-run",
+      "appliedAt": "2026-09-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only PostgreSQL 18.4 information_schema and row-null census; summary_provenance is nullable JSONB and populated=0."
+    },
+    {
+      "file": "manual/20261013_error_logs_diagnostic_provenance_DRAFT.sql",
+      "status": "applied",
+      "reason": "Additive diagnostic provenance columns, a stored tsvector, and indexes on the existing error_logs table. Applied in one transaction to PostgreSQL 18.4 legal_ai_db after a rolled-back rehearsal. Row count 1 before and after; both views still return rows.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-13",
+      "requiresJournalEntry": false,
+      "validationCommand": "Rehearsal: sed the final COMMIT to ROLLBACK and run with psql ON_ERROR_STOP=1; then confirm error_logs has 19 columns."
+    },
+    {
+      "file": "manual/model_analysis_runs.sql",
+      "status": "applied",
+      "reason": "Additive model analysis run and result tables (model_analysis_runs, model_analysis_results) with indexes. Applied in one transaction to PostgreSQL 18.4 legal_ai_db; both tables created empty.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-13",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only information_schema check: model_analysis_results has sequence_id text and PK (run_id, sequence_id); row counts 0."
+    },
+    {
+      "file": "manual/20260916_workspace_event_head_v1.sql",
+      "status": "applied",
+      "reason": "Additive append-only workspace event, participant, and head tables for incremental Graphify. Applied inside transactional block with canary readback verification.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-10-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-workspace-event-head-schema-v1.mjs"
+    },
+    {
+      "file": "manual/20261017_workspace_event_provenance_v1_DRAFT.sql",
+      "status": "applied",
+      "reason": "Additive workspace event provenance, append-only observations, and worktree leases with monotonic fence_epoch and stream idempotency unique index. Applied inside transactional block with canary readback verification.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-10-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "node --env-file=sveltekit-frontend/.env -e \"const postgres = require('./sveltekit-frontend/node_modules/postgres'); const sql = postgres(process.env.DATABASE_URL); sql.unsafe('SELECT table_name FROM information_schema.tables WHERE table_schema = \\'public\\' AND table_name IN (\\'atlas_workspace_events\\', \\'worktree_leases\\', \\'atlas_workspace_heads\\', \\'atlas_workspace_event_observations\\')').then(r => console.log('Tables:', r));\""
+    },
+    {
+      "file": "manual/20260909_router_feature_revision_indexes.sql",
+      "status": "applied",
+      "reason": "Aligns the active observation-feature owner with nullable text workspace revisions and adds bounded router lookup indexes. No row backfill or feature-matrix table is created.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-09-09",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-pipeline-router-matrix-surfaces-v1.mjs"
+    },
+    {
+      "file": "manual/20260907_canonical_owner_revision_axes_v1.sql",
+      "status": "manual_sidecar",
+      "reason": "Additive packet source-content and concept definition revision fields for two-axis owner lineage. Unapplied; requires reviewed backfill, Graphify currentness, and independent readback before promotion.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-canonical-owner-schema-reconciliation-v1.mjs"
+    },
+    {
+      "file": "manual/20260906_ai_observability_contract_repair.sql",
+      "status": "applied",
+      "reason": "Additive repair for the facade's intent evaluation table and missing llm_synthesis_events routing_hints column. No drops, rewrites, or global Drizzle ledger repair.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-09-06",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -P pager=off -c \"SELECT table_name,column_name FROM information_schema.columns WHERE table_schema='public' AND table_name IN ('intent_eval_runs','llm_synthesis_events') ORDER BY table_name,ordinal_position;\""
+    },
+    {
+      "file": "manual/20260906_semantic_768_metadata_reconciliation.sql",
+      "status": "applied",
+      "reason": "Corrects the stale codebase_chunk_index embedding_dimension default from 384 to 768 and adds a NOT VALID future-write guard for the canonical content_embedding halfvec(768) lane. No row rewrite, vector backfill, legacy-column drop, or projection mutation.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-09-07",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -P pager=off -c \"SELECT column_name, column_default FROM information_schema.columns WHERE table_name='codebase_chunk_index' AND column_name='embedding_dimension';\"",
+      "postApplyVerification": "column_default now '768' (was '384'); constraint codebase_chunk_index_semantic_768_metadata_ck present with convalidated=false (NOT VALID, as intended); row counts unchanged (content_embedding populated=55169, content_embedding_768 populated=1386, total=55853, all matching pre-apply exactly)."
+    },
+    {
+      "file": "manual/20260903_graphify_execution_ledger_v1.sql",
+      "status": "applied",
+      "reason": "Additive Graphify execution identity, immutable execution-source membership, and stage lifecycle ledger. Historical graphify_runs remains compatibility state; apply only for the bounded coordinator canary before any broad run.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-09-04",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('graphify_executions','graphify_execution_files','graphify_execution_stages') ORDER BY table_name;\""
+    },
+    {
+      "file": "manual/20260903_graphify_symbols_edges_additive_v1.sql",
+      "status": "applied",
+      "reason": "Adds the missing Graphify structural symbol and edge projections behind the existing graphify_files owner. Guarded by graphify_files presence; no rows are backfilled and no lifecycle or source revisions are fabricated.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-09-03",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('graphify_symbols','graphify_edges') ORDER BY table_name;\""
+    },
+    {
+      "file": "manual/20260830_semantic_embedding_cache_v2.sql",
+      "status": "planned_sidecar",
+      "reason": "Additive revision-qualified semantic_768 cache. Legacy embedding_cache remains untouched; apply only after migration-ledger review and canonical caller cutover.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name='semantic_embedding_cache_v2';\""
+    },
+    {
+      "file": "manual/20260908_task_semantic_packets_writer_columns_only.sql",
+      "status": "applied",
+      "reason": "Minimal additive prerequisite for the active task-packet writer. Disposable PostgreSQL 18 column and insert/readback proof passes; unapplied pending explicit operator authorization.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-09-08",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/prove-task-semantic-packet-disposable-compatibility-v1.mjs"
+    },
+    {
+      "file": "manual/20260908_task_semantic_packets_production_indexes.sql",
+      "status": "applied",
+      "reason": "Small additive indexes for the admitted MCP/API read paths. Depends on the writer-column migration; unapplied pending EXPLAIN validation and explicit operator authorization.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-09-08",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -P pager=off -c \"SELECT indexname,indexdef FROM pg_indexes WHERE schemaname='public' AND tablename='task_semantic_packets' AND indexname IN ('idx_task_semantic_packets_workspace_task_created','idx_task_semantic_packets_status_feature','idx_task_semantic_packets_agent_pickup_ready');\""
+    },
+    {
+      "file": "0099_atlas_svg_glyphs.sql",
+      "status": "applied",
+      "reason": "Existing additive atlas_svg_glyphs table and lookup indexes were found live but were not registered in the sidecar manifest. Applied date is not inferred from current evidence.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -P pager=off -c \"SELECT to_regclass('public.atlas_svg_glyphs');\""
+    },
+    {
+      "file": "0999_fix-grpc-proto-alignment.sql",
+      "status": "manual_sidecar",
+      "reason": "Adds missing gRPC proto alignment indexes and metadata columns. The route_runtime_packets branch is guarded because the table is not present in the live schema.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-07-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexname IN ('idx_packets_source_feature_multi_hop','atlas_packets_metadata_gin_idx','idx_atlas_packets_payload_path','idx_atlas_packets_feature_id_composite','idx_packets_centroid_cache','idx_task_semantic_packets_metadata_gin','idx_concept_records_feature_ids_gin','idx_concept_records_metadata_gin');\""
+    },
+    {
+      "file": "0013_codeintel_indexes.sql",
+      "status": "manual_sidecar",
+      "reason": "Code-intelligence GIN/trgm and B-tree indexes. Drizzle ORM cannot express GIN trgm ops (USING gin(col gin_trgm_ops)) natively — must live outside the journal.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexname LIKE '%trgm%' LIMIT 5;\""
+    },
+    {
+      "file": "0016_codeintel_schema.sql",
+      "status": "manual_sidecar",
+      "reason": "Code-intelligence supplemental tables (codebase_chunk_index, ast_node_cache). Applied manually to avoid collision with drizzle-kit journal snapshot state at index 16.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name IN ('codebase_chunk_index','ast_node_cache');\""
+    },
+    {
+      "file": "0016_courtroom_3d_animation.sql",
+      "status": "manual_sidecar",
+      "reason": "Courtroom 3D animation tables (courtroom_models, courtroom_animations, courtroom_anim_type enum). Applied manually because drizzle-kit journal index 16 was already taken; enum creation requires sidecar pattern.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name IN ('courtroom_models','courtroom_animations');\""
+    },
+    {
+      "file": "0018_output_meta_manifold4.sql",
+      "status": "manual_sidecar",
+      "reason": "Adds manifold4 real[] column to research_summaries for SOM 4D coordinate storage. Applied manually alongside journal entry 18 to avoid snapshot regeneration.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='research_summaries' AND column_name='manifold4';\""
+    },
+    {
+      "file": "0019_llm_context_cache.sql",
+      "status": "manual_sidecar",
+      "reason": "LLM context cache table (llm_context_cache) with JSONB payload. Applied manually because drizzle-kit snapshot was not regenerated after this addition.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-10",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='llm_context_cache';\""
+    },
+    {
+      "file": "20260516_pgvector_repair.sql",
+      "status": "manual_sidecar",
+      "reason": "Repairs legacy text/jsonb columns to pgvector types to align with Drizzle schema. Covers evidence_vectors, legal_documents, and document_embeddings.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-16",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name, data_type FROM information_schema.columns WHERE table_name='legal_documents' AND column_name='content_embedding';\""
+    },
+    {
+      "file": "manual/20261029_duplicate_index_consolidation_v2.sql",
+      "status": "active_candidate",
+      "reason": "Prepared PostgreSQL 18 concurrent drops for reviewed duplicate indexes only. V2 remains unapplied; it passed a disposable PostgreSQL 18.4 drop-and-recreate fixture rehearsal with row counts preserved.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261029_evidence_vectors_semantic_768.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-30 after explicit operator instruction (\"do the migration first, ddl\"): evidence_vectors (0 rows, was vector(384)) is now vector(768) with chunk_index/content/analysis_type/metadata/source_revision, NOT NULL + CHECK constraints (sha256 source_revision, chunk_index>=0, embedding_type=evidence_text_semantic_768, source_field=canonical_evidence_text), HNSW index and partial unique index (evidence_id, source_revision, chunk_index). Empty-table guard held (0 rows before and after). Rehearsed earlier on a disposable PostgreSQL 18 (an earlier revision of the file; the CHECK/NOT NULL additions were added later by another session and were not separately rehearsed).",
+      "appliedBy": "operator-approved, session 2026-10-30",
+      "appliedAt": "2026-10-30",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261029_promotion_outbox_revision_dedupe_v1.sql",
+      "status": "active_candidate",
+      "reason": "Prepared PostgreSQL 18 source_revision column and concurrent partial-index replacement so pending promotion jobs deduplicate by exact source and content revisions. Not applied. Requires a coordinated pause/drain of all promotion enqueuers and workers, migration, matching application deployment, then resume; mixed old/new application instances are incompatible with the respective conflict targets.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "rollbackFile": "manual/20261029_promotion_outbox_revision_dedupe_v1.rollback.sql"
+    },
+    {
+      "file": "manual/20261029_atlas_stable_file_composite_primary_keys_v1.sql",
+      "status": "active_candidate",
+      "reason": "Unapplied PostgreSQL 18 proposal replacing the existing empty-relation composite UNIQUE constraints with semantically identical composite primary keys. Requires a disposable-database apply/readback/rollback rehearsal and operator approval; no production DDL is authorized.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "rollbackFile": "manual/20261029_atlas_stable_file_composite_primary_keys_v1.rollback.sql"
+    },
+    {
+      "file": "20260516_hnsw_indexes.sql",
+      "status": "manual_sidecar",
+      "reason": "Applies HNSW indexes to core vector tables for performance. CONCURRENTLY IF NOT EXISTS safe for live data.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-16",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexdef LIKE '%hnsw%';\""
+    },
+    {
+      "file": "20260516_production_reconciliation.sql",
+      "status": "manual_sidecar",
+      "reason": "Standardizes identity system on UUIDs and resolves high-severity type drifts (varchar/text, integer/bigint) to achieve full Drizzle parity.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-16",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT data_type FROM information_schema.columns WHERE table_name='users' AND column_name='id';\""
+    },
+    {
+      "file": "20260517_llm_synthesis_events.sql",
+      "status": "manual_sidecar",
+      "reason": "Durable LLM synthesis memory audit trail log table. Captures run_id, query, profile, ace_packet, tool_calls, source_refs, cache_keys, and model.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-17",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='llm_synthesis_events';\""
+    },
+    {
+      "file": "20260518_tool_traces.sql",
+      "status": "manual_sidecar",
+      "reason": "Tracks granular execution details for each step of the RAG pipeline. Captures args, result_summary, duration_ms, status, and error.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-18",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='tool_traces' AND column_name IN ('status','error');\""
+    },
+    {
+      "file": "20260506_code_retrieval_chunks.sql",
+      "status": "manual_sidecar",
+      "reason": "Defines code_retrieval_chunks table with FTS indexes, pgvector HNSW index, and search_code_hybrid_pg RRF function.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-21",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec 94823593eb8e_legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT proname FROM pg_proc WHERE proname='search_code_hybrid_pg';\""
+    },
+    {
+      "file": "20260521_summary_cards.sql",
+      "status": "manual_sidecar",
+      "reason": "Defines canonical summary_cards table for normalized codebase summary cards, top-N retrieval cards, and TOON packet rollups.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-21",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='summary_cards';\""
+    },
+    {
+      "file": "20260523_citation_annotation_flow.sql",
+      "status": "manual_sidecar",
+      "reason": "Adds saved_citation_annotations and evidence_board_edges to support citation -> annotation -> graph edge -> Redis packet flow.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-22",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name IN ('saved_citation_annotations','evidence_board_edges');\""
+    },
+    {
+      "file": "20260524_synthesis_cache_layer.sql",
+      "status": "manual_sidecar",
+      "reason": "Adds cache_layer_used column to synthesis_logs to support fast analytics filters on cache hitting.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-05-24",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='synthesis_logs' AND column_name='cache_layer_used';\""
+    },
+    {
+      "file": "20260525_agent_memory_observations.sql",
+      "status": "manual_sidecar",
+      "reason": "Mirrors Claude-Mem/OpenCode observations into Postgres as the durable Engram/ACE observation layer. SQLite remains an import source only.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='agent_memory_observations';\""
+    },
+    {
+      "file": "20260525_agent_memory_observations_embedding.sql",
+      "status": "manual_sidecar",
+      "reason": "Adds the pgvector embedding column and HNSW index for agent_memory_observations so worker API writes can persist embeddinggemma:latest vectors directly in Postgres.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name FROM information_schema.columns WHERE table_name='agent_memory_observations' AND column_name='embedding';\""
+    },
+    {
+      "file": "0102_graph_community_resolution_seeds.sql",
+      "status": "manual_sidecar",
+      "reason": "Adds durable Louvain unresolved-seed classification storage for live replay-safe packet reconciliation. The table is a proof-side audit ledger, not a canonical identity owner.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-11",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT to_regclass('public.graph_community_resolution_seeds');\""
+    },
+    {
+      "file": "9999_agent_observations.sql",
+      "status": "manual_sidecar",
+      "reason": "Migration adds agent_observations table for OpenCode / Claude-mem ingest.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-29",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='agent_observations';\""
+    },
+    {
+      "file": "20260530_phase19b_join_keys.sql",
+      "status": "manual_sidecar",
+      "reason": "Phase19B: Add card_source_refs mapping and nullable card_id columns for reliable sourceRef -> card joins; best-effort HNSW index for summary_cards.embedding.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='card_source_refs';\""
+    },
+    {
+      "file": "20260530_phase19d_scenario_cache.sql",
+      "status": "manual_sidecar",
+      "reason": "Phase19D: Add scenario_cache table to bypass preflight logic on exact match query hashes.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='scenario_cache';\""
+    },
+    {
+      "file": "20260606_nes_chrom_live_alignment.sql",
+      "status": "manual_sidecar",
+      "reason": "Additive live alignment for nes_chrom_packets and nes_chrom_kag_dag_hits contract mirrors. Repairs missing live indexes and the metadata column without changing intent.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-06-05",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexname IN ('idx_nes_chrom_packets_lane_ids_gin','nes_chrom_packets_embedding_hnsw','nes_chrom_kag_dag_hits_chunk_idx','nes_chrom_kag_dag_hits_source_ref_idx','nes_chrom_kag_dag_hits_node_key_idx','nes_chrom_kag_dag_hits_evidence_gin','nes_chrom_kag_dag_hits_metadata_gin');\""
+    },
+    {
+      "file": "manual/20260826_restore_nes_chrom_packets_v1.sql",
+      "status": "applied",
+      "reason": "Restores the proven NES/CHROM 768-D packet and KAG-hit projection contract additively after live-schema drift removed both tables. Creates missing tables/columns/indexes only; no deletes, truncates, rewrites, or backfills.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -P pager=off -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('nes_chrom_packets','nes_chrom_kag_dag_hits') ORDER BY table_name; SELECT indexname FROM pg_indexes WHERE schemaname='public' AND tablename='nes_chrom_packets' ORDER BY indexname;\""
+    },
+    {
+      "file": "9998_create_agent_pickup_queue.sql",
+      "status": "manual_sidecar",
+      "reason": "Drizzle migration for agent_pickup_queue table to support agent pickup loop.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='agent_pickup_queue';\""
+    },
+    {
+      "file": "9999_create_task_semantic_packets.sql",
+      "status": "manual_sidecar",
+      "reason": "Drizzle migration for task_semantic_packets table to support semantic packet generation and tracking.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-05-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='task_semantic_packets';\""
+    },
+    {
+      "file": "20260601_task_semantic_packets_v2.sql",
+      "status": "manual_sidecar",
+      "reason": "Expands the task semantic packet mirror with payload metadata, packet links, and queue lane fields.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-06-01",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT to_regclass('public.task_cluster_links');\""
+    },
+    {
+      "file": "20260611_atlas_packets_schema.sql",
+      "status": "manual_sidecar",
+      "reason": "Create atlas_packets table with pgvector, gin payload index, and composite indexes to index large packet payloads.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-06-11",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='atlas_packets';\""
+    },
+    {
+      "file": "20260612_packet_payload_expression_indexes.sql",
+      "status": "manual_sidecar",
+      "reason": "Creates expression indexes on payload->>'path' and payload->>'feature_id' for faster packet lookup.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-06-12",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexname IN ('idx_packet_payload_path', 'idx_packet_payload_feature');\""
+    },
+    {
+      "file": "manual/20260821_graphify_source_inventory.sql",
+      "status": "manual_sidecar",
+      "reason": "Unapplied Graphify source-inventory owner schema. It preserves legacy source_revision, records exact content_hash authority, and requires a non-production readback canary before row population or FANOUT admission.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "ATLAS_MIGRATION_ROLLBACK_PROOF=1 npx tsx scripts/atlas/prove-graphify-source-inventory-migration.mts"
+    },
+    {
+      "file": "manual/20260822_graph_snapshot_revision_owner_v1.sql",
+      "status": "manual_sidecar",
+      "reason": "Additive snapshot-level Graphify revision columns and nullable node source_revision. Unapplied; requires rollback proof and non-production readback before FANOUT admission.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "npx tsx scripts/atlas/audit-graph-snapshot-revision-migration-safety.mts"
+    },
+    {
+      "file": "20260819_atlas_graph_traversal_indexes.sql",
+      "status": "manual_sidecar",
+      "reason": "Unapplied snapshot-scoped graph traversal indexes. Read-only PostgreSQL catalog inspection found only base indexes; verify representative plans and obtain schema-owner approval before applying.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only PostgreSQL catalog check for atlas_graph_edges_v2_forward_typed_idx, atlas_graph_edges_v2_reverse_typed_idx, atlas_graph_nodes_v2_snapshot_type_node_idx, atlas_graph_nodes_v2_snapshot_source_ref_idx, and atlas_graph_relation_participants_v2_node_role_idx."
+    },
+    {
+      "file": "manual/20260822_graphify_revision_authority_v2.sql",
+      "status": "manual_sidecar",
+      "reason": "Additive Graphify workspace and code-source revision columns. Unapplied; preserves legacy repository/source revisions and does not backfill or promote rows.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "npx tsx scripts/atlas/audit-graphify-revision-migration-safety.mts"
+    },
+    {
+      "file": "manual/20261025_atlas_structural_reference_lineage_v1.sql",
+      "status": "manual_sidecar",
+      "reason": "Additive lineage columns for structural reference resolutions. Unapplied; preserves legacy rows with NULL lineage and does not backfill or admit structural facts.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only catalog check for new lineage columns and workspace/source index."
+    },
+    {
+      "file": "manual/20260818_atlas_symbol_registry_v1.sql",
+      "status": "applied",
+      "reason": "Creates the additive canonical symbol registry, aliases, revisioned symbol versions, and structural-reference resolution indexes. Applied and read back on PostgreSQL 18.4; no symbol rows were inserted.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-24",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name IN ('atlas_symbol_registry','atlas_symbol_aliases','atlas_symbol_versions','atlas_structural_reference_resolutions');\""
+    },
+    {
+      "file": "manual/20260824_graphify_file_search_bitmap_v1.sql",
+      "status": "manual_sidecar",
+      "reason": "Additive Graphify file search projection with PostgreSQL 18 tsvector/GIN, pgvector 768, JSONB metadata, concept arrays, and explicit candidate bitmap. Unapplied until export, schema, and rollback proofs pass.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/export-graphify-file-index-v1.mjs --limit=100 && node scripts/atlas/audit-atlas-indexing-surfaces.mjs"
+    },
+    {
+      "file": "manual/20260826_atlas_class_search_index_v1.sql",
+      "status": "applied",
+      "reason": "Class-level sibling of 20260824_graphify_file_search_bitmap_v1.sql, sourced from AST-grep class-node extraction (atlas_ast_nodes WHERE node_kind='class', 3,675 rows at authoring time). Deliberately fixes the sibling's latent bug (array_to_string() is STABLE not IMMUTABLE, so it cannot appear in a GENERATED ALWAYS AS ... STORED expression -- confirmed live against PostgreSQL 18.4) via a thin atlas_immutable_array_to_string() IMMUTABLE wrapper before reusing the same generated-tsvector pattern. Found applied and live (3,675 real rows) but absent from this tracking file during the 2026-09-07 HYPERGRAPH-NARY-EVIDENCE-SOURCE-SURVEY-01 / schema-validation deep audit (openspec/changes/parent-atlas-ontology-kernel/tasks.md) -- added retroactively to close that tracking gap; no schema or data change made by this entry.",
+      "appliedBy": "unknown (retroactively tracked 2026-09-07 by claude)",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT count(*), count(*) FILTER (WHERE class_bitmap <> B'0000000000000000') FROM atlas_class_search_index_v1;\""
+    },
+    {
+      "file": "manual/20260824_atlas_callable_search_v1.sql",
+      "status": "applied",
+      "reason": "Additive callable-search projection and nullable callable metadata columns. Preserves atlas_symbol_versions and creates an idempotent projection backfill with simple-token FTS, B-tree, array GIN, and JSONB path indexes.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-24",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT to_regclass('public.atlas_callable_search'), count(*) FROM atlas_callable_search;\""
+    },
+    {
+      "file": "manual/20260824_atlas_callable_enrichment_v1.sql",
+      "status": "applied",
+      "reason": "Additive domain, parent-container, inferred-use, taxonomy, and JSONB evidence fields on the rebuildable callable-search projection. No canonical identity writes or destructive operations.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-24",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/enrich-ast-callable-search.mjs"
+    },
+    {
+      "file": "manual/20260825_atlas_packet_runtime_view_v1.sql",
+      "status": "manual_sidecar",
+      "reason": "Additive canonical packet read model over atlas_packets plus decomposed feature/metric tables. Repoints PacketValidator reads away from atlas_packet_registry; no table writes or registry backfill.",
+      "appliedBy": "operator",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-atlas-migration-owners.mjs && npm --prefix packages/parent-atlas run test:packet-validator-materializer"
+    },
+    {
+      "file": "manual/20260825_graphify_files_compatibility_v1.sql",
+      "status": "applied",
+      "reason": "Applied additive compatibility migration for the existing legacy graphify_files table. Added nullable lineage metadata and indexes only; no rows were backfilled and canonical ownership was unchanged.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-atlas-migration-owners.mjs"
+    },
+    {
+      "file": "manual/20260819_atlas_observation_feature_rows.sql",
+      "status": "applied",
+      "reason": "Active ORF packet_key + feature_revision metadata/filter contract. Aligned with Drizzle schema, observation repository, materializer, and spectral exporter; semantic ANN remains owned by the 768 vector lane.",
+      "appliedBy": "operator",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-observation-feature-row-contract.mjs && node scripts/atlas/audit-atlas-migration-owners.mjs"
+    },
+    {
+      "file": "manual/20261008_atlas_observation_feature_lineage_v1.sql",
+      "status": "planned_sidecar",
+      "reason": "Proposed nullable source_revision and registry_revision on the active ORF table. Not applied; no backfill. Requires migration-owner review and explicit operator authorization.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-atlas-migration-owners.mjs"
+    },
+    {
+      "file": "manual/20260819_atlas_observation_feature_rows_v1.sql",
+      "status": "superseded_unapplied",
+      "reason": "Candidate ID/vector contract conflicts with the active packet-key ORF table. Preserved for historical review; never applied.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-observation-feature-row-contract.mjs"
+    },
+    {
+      "file": "manual/20260824_kag_contract_alignment_v1.sql",
+      "status": "applied",
+      "reason": "Additive alignment for existing atlas_hyperedges, atlas_hyperedge_members, and atlas_ontology_tuples. Adds contract IDs, packet/revision lineage, evidence arrays, lifecycle, provenance, and schema registry keys. No backfill or destructive operation.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-24",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-kag-persistence-v1.mjs"
+    },
+    {
+      "file": "manual/20260826_atlas_hyperedges_gate_alignment_v1.sql",
+      "status": "applied",
+      "reason": "Closes a gate-alignment gap found during KAG hyperedge review: atlas_hyperedges.checksum and .lifecycle had Zod-level invariants (HyperedgeV1Schema regex, OntologyLinkedTupleLifecycleSchema-equivalent enum) with no matching Postgres CHECK, unlike sibling atlas_ontology_linked_tuples which already enforces its lifecycle enum at the DB layer. Table had 0 rows at authoring time; additive, no backfill.",
+      "appliedBy": "claude",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT conname FROM pg_constraint WHERE conrelid = 'atlas_hyperedges'::regclass AND conname LIKE '%check%';\""
+    },
+    {
+      "file": "manual/20260826_atlas_taxonomy_assignment_candidates_v1.sql",
+      "status": "applied",
+      "reason": "New table for the taxonomy-assignment review surface (KAG wiring roadmap step 2): persists TaxonomyAssignmentCandidateV1 for review and tracks the proposed/review_required -> promoted/rejected transition, with promoted_hyperedge_id linking a promoted candidate to the atlas_hyperedges row it produced. Deliberately not a foreign key so a promoted-but-hyperedge-write-failed degraded state stays queryable. New table, zero pre-existing rows.",
+      "appliedBy": "claude",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "npx tsx scripts/atlas/kag-taxonomy-candidate-review-live-proof-v1.mts (run from sveltekit-frontend/)"
+    },
+    {
+      "file": "manual/20260817_atlas_feature_intelligence_v1.sql",
+      "status": "applied",
+      "reason": "REL-FI-01: Feature Intelligence canonical Postgres persistence (atlas_relationships/atlas_relationship_members/atlas_relationship_cardinality/atlas_relationship_evidence/atlas_relationship_embeddings/atlas_feature_embeddings/atlas_feature_state_receipts/atlas_dynamic_hyperedge_candidates, plus atlas_validate_relationship()). Originally named two tables atlas_features/atlas_feature_evidence that collided with unrelated pre-existing live tables (AST structural-feature facts from 20260716_atlas_knowledge_layer.sql; packet-level multi-modal evidence extraction) -- confirmed both collision tables empty (0 rows), no data at risk, renamed to atlas_fi_features/atlas_fi_evidence in this file and in packages/parent-atlas/src/core/feature-intelligence-repository.ts before applying. See openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md 'REL-FI-01' section for the full collision writeup.",
+      "appliedBy": "claude",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('atlas_fi_features','atlas_fi_evidence','atlas_relationships','atlas_relationship_members','atlas_relationship_cardinality','atlas_relationship_evidence','atlas_relationship_embeddings','atlas_feature_embeddings','atlas_feature_state_receipts','atlas_dynamic_hyperedge_candidates') ORDER BY table_name;\""
+    },
+    {
+      "file": "manual/20260818_atlas_dynamic_hyperedge_entities_v1.sql",
+      "status": "applied",
+      "reason": "Sibling migration to 20260817: query-time dynamic hyperedge support (atlas_evidence_entities, atlas_evidence_event_hyperedges view, atlas_dynamic_hyperedge_neighborhood()). No table-name collisions -- references only atlas_evidence, which does not collide. Applied in the same session as 20260817 once that migration's collision was resolved.",
+      "appliedBy": "claude",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name = 'atlas_evidence_entities';\""
+    },
+    {
+      "file": "manual/20260818_atlas_schema_object_registry_v1.sql",
+      "status": "applied",
+      "reason": "Auxiliary schema-object registry required by the Feature Intelligence proof. Applied additively and read back on PostgreSQL 18.4; no rows were backfilled.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('atlas_schema_object_registry','atlas_schema_object_aliases','atlas_schema_object_versions') ORDER BY table_name;\""
+    },
+    {
+      "file": "manual/20260818_atlas_test_registry_v1.sql",
+      "status": "applied",
+      "reason": "Auxiliary test registry and execution receipt tables required by the Feature Intelligence proof. Applied additively and read back on PostgreSQL 18.4; no rows were backfilled.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('atlas_test_registry','atlas_test_aliases','atlas_test_versions','atlas_test_execution_receipts') ORDER BY table_name;\""
+    },
+    {
+      "file": "manual/kanban_task_lifecycle_baseline.sql",
+      "status": "applied",
+      "reason": "Reviewed Kanban-only persistence slice. Applied transactionally and read back on PostgreSQL 18.4; no task rows were inserted.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name LIKE 'kanban_%' ORDER BY table_name;\""
+    },
+    {
+      "file": "manual/20260818_atlas_identity_alias_decisions_v1.sql",
+      "status": "applied",
+      "reason": "Reviewed identity-alias decision table required by the Feature Intelligence proof. Applied additively and read back on PostgreSQL 18.4; no rows were backfilled.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT to_regclass('public.atlas_identity_alias_decisions');\""
+    },
+    {
+      "file": "manual/20260818_atlas_assertion_registry_v1.sql",
+      "status": "applied",
+      "reason": "Auxiliary assertion registry tables required by the Feature Intelligence proof. Applied additively and read back on PostgreSQL 18.4; no rows were backfilled.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('atlas_assertion_registry','atlas_assertion_aliases','atlas_assertion_versions') ORDER BY table_name;\""
+    },
+    {
+      "file": "manual/20260818_atlas_algorithm_execution_receipts_v1.sql",
+      "status": "applied",
+      "reason": "Algorithm execution receipt table required by the Feature Intelligence proof. Applied additively and read back on PostgreSQL 18.4; no rows were backfilled.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT to_regclass('public.atlas_algorithm_execution_receipts');\""
+    },
+    {
+      "file": "manual/20260827_source_lineage_relations_v1.sql",
+      "status": "design_unapplied",
+      "reason": "Incubation schema for stable source aliases and workspace-scoped source-version bindings. Not applied; owner and producer approval remain required.",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/validate-source-lineage-relations-v1.mjs"
+    },
+    {
+      "file": "manual/20260909_graphify_execution_file_membership_v2.sql",
+      "status": "applied",
+      "reason": "Additive namespace-qualified execution membership for nested repositories; preserves append-only legacy evidence. Applied with zero seed rows and no writer cutover.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-09-09",
+      "requiresJournalEntry": false,
+      "validationCommand": "npm run atlas:graphify:source-population:delta"
+    },
+    {
+      "file": "manual/20260909_graphify_execution_file_membership_v2_immutability.sql",
+      "status": "applied",
+      "reason": "Enforces append-only UPDATE/DELETE rejection for repository-qualified execution membership v2.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-09-09",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT tgname FROM pg_trigger WHERE tgrelid='public.graphify_execution_file_membership_v2'::regclass AND NOT tgisinternal ORDER BY tgname;\""
+    },
+    {
+      "file": "manual/20260904_external_doc_intelligence_v1.sql",
+      "status": "applied",
+      "reason": "Canonical Postgres owner for external documentation pages/chunks (parent-atlas-versioned-doc-intelligence DOC-06/DOC-06b). Version-qualified identity (DocCoordinateV1), GIN tsvector + pgvector HNSW indexes expressed here because drizzle-kit cannot generate USING gin(...)/USING hnsw. No matching Drizzle TypeScript table definitions exist yet -- the app's read model (doc-intelligence-read-model.ts) queries these tables via an injected raw pg.Pool, not through Drizzle. Registered here (2026-09-27, EMB-PROV-01/docs-corpus follow-up) purely to close the audit gap this file exists to prevent -- no schema, data, or migration change made.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-09-04",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT count(*) FROM atlas_external_doc_pages; SELECT count(*) FROM atlas_external_doc_chunks;\""
+    },
+    {
+      "file": "manual/20261003_atlas_packet_incidence_v1.sql",
+      "status": "planned_sidecar",
+      "reason": "Dedicated immutable Graphify-to-packet incidence rows; taxonomy hyperedges remain untouched. Apply only after a reviewed 20-100-row exact-identity canary is eligible.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "SELECT to_regclass('public.atlas_packet_incidence') AS table_name;"
+    },
+    {
+      "file": "manual/20261012_atlas_context_manifest_v2_readbacks.sql",
+      "status": "design_unapplied",
+      "reason": "Append-only persistence/readback for the existing ContextManifestV2 builder output. Does not create a builder, admit evidence, or authorize synthesis. Apply only after schema-owner review and explicit operator approval; no rows are written by this design entry.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only schema census for atlas_context_manifest_v2_readbacks after separately authorized migration application."
+    },
+    {
+      "file": "manual/20261012_atlas_directories.sql",
+      "status": "applied_additive",
+      "reason": "atlas_directories directory tree table with unique (repo_id, directory_path) and parent index; additive IF NOT EXISTS; mirrors atlasDirectories in schema/atlas-ast-nodes.ts"
+    },
+    {
+      "file": "manual/20261015_atlas_packet_class_lut_validation_receipts_v1.sql",
+      "status": "applied_additive",
+      "reason": "Append-only validation evidence for derived PacketClassLutV1 artifacts. Includes source/workspace revision and outcome B-tree indexes plus GIN search indexes for repository-analysis text and bounded JSON evidence. Applied additively after rollback rehearsal; no receipts backfilled.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-10-15",
+      "requiresJournalEntry": false,
+      "validationCommand": "SELECT current_setting('server_version_num'), to_regclass('public.atlas_packet_class_lut_validation_receipts');"
+    },
+    {
+      "file": "manual/20261016_atlas_source_locations_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Creates public.atlas_source_locations (UNIQUE (source_namespace, source_ref), case-preserving, repo-namespace path-safety CHECK, sha256 revision shape CHECK, uuidv7 surrogate) and the append-only public.atlas_source_location_conflicts ledger, for SRCREF-UNIQUE-01 in parent-atlas-graphify-recovery-proof-ladder. Rehearsed in a rolled-back transaction on PostgreSQL 18.4: 2 tables and 10 columns in-transaction, 12/12 invalid rows rejected (duplicate, traversal, absolute, backslash, URL, drive, ./, //, blank, padded, upper-case namespace, bad revision), case-only twin and proto: id in its own namespace accepted, 0 tables afterward. Does NOT alter atlas_packets and does NOT decide namespaces or case folding (owner decisions).",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Rehearsal: run the draft with COMMIT removed, exercise the constraints, ROLLBACK, and confirm 0 tables afterward (script kept in the session scratchpad); production apply needs explicit operator approval, a backup, and CREATE ... IF NOT EXISTS re-run to prove idempotence."
+    },
+    {
+      "file": "manual/20261018_atlas_procedural_sequences_v1_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Versioned, non-executable procedure catalog keyed by (sequence_id, sequence_revision), searchable by feature_id and feature_label, with admission gated on source/workspace revisions and evidence references. No procedures seeded and MCP lookup is read-only.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Review DDL and test read-only MCP filter contract; apply only after explicit operator authorization, rollback rehearsal, and ownership review."
+    },
+    {
+      "file": "manual/20261018_openspec_task_source_index_v1.sql",
+      "status": "applied",
+      "reason": "Additive immutable source locator/search projection for 5,640 OpenSpec task lines in the latest post-commit readback. Source files remain authoritative; identity status is retained, source revisions remain deferred, and no executable Kanban or canonical task identity is written. Exact post-commit readback checksum recorded in .tmp/openspec-task-source-index-v1/receipt.json.",
+      "appliedBy": "operator-authorized-goal-run",
+      "appliedAt": "2026-10-18",
+      "requiresJournalEntry": false,
+      "validationCommand": "Recorded post-commit readback in .tmp/openspec-task-source-index-v1/receipt.json: 5,640 rows; 5,640 unique source refs; 0 invalid rows; 204 ambiguous identities retained; canonicalTaskPromotionCount=0; executableKanbanWrites=0; workspace snapshot sha256:72bf1846a8827d8ab0f6a128c550de2e4021f9a6f09ecdea30ed427070320536; row-manifest checksum sha256:aacb5bd18e6007449d10a76202335239202437707a38b4f21822d344e41a1cea."
+    },
+    {
+      "file": "manual/20261020_atlas_packet_identity_registry_v1_DRAFT.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-29 after explicit approval (file applied as drafted, one transaction): creates atlas_packet_identity_registry_v1 and atlas_packet_identity_aliases_v1, empty. Separates canonical PacketKeyV2 logical identities and evidence-backed legacy aliases from physical atlas_packets rows. Scope pinned to repo:root. No identities or aliases seeded; seeding, repository-scope widening, revision qualification and the 20261027 source-guard draft remain separately gated. Distinct from the older atlas_packet_identity_aliases table (3,294 rows, untouched).",
+      "appliedBy": "operator-approved, session 2026-10-29",
+      "appliedAt": "2026-10-29",
+      "requiresJournalEntry": false,
+      "validationCommand": "Run the packet-identity-registry-v1 Vitest suite and a disposable PostgreSQL 18 rollback rehearsal; do not apply to the live database without explicit operator authorization."
+    },
+    {
+      "file": "manual/20261029_atlas_todo_inverse_dag_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-29 after explicit approval: creates atlas_todo_inverse_dag_v1, a derived non-canonical inverse-DAG registry (input set behind each to-do recommendation; INVERSE-DAG-LOWRANK-01 / LR-01). Additive: one table, two indexes, no FKs. Created empty; nothing backfilled. Rehearsed first in a ROLLBACK transaction (8 of 8 bad inserts rejected; rollback script refuses to drop a table holding rows).",
+      "appliedBy": "operator-approved, session 2026-10-29",
+      "appliedAt": "2026-10-29",
+      "requiresJournalEntry": false,
+      "validationCommand": "Readback after apply: 14 columns, 18 constraints incl. canonical_chk, 3 indexes (pkey, edge_uidx, input_idx), 0 rows, table comment present. Rollback: manual/20261029_atlas_todo_inverse_dag_v1.rollback.sql (refuses when rows exist)."
+    },
+    {
+      "file": "manual/20261027_atlas_graphify_scope_repository_map_v1_DRAFT.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-30 after explicit instruction (\"apply the two 20261027 drafts\"), scope map first then aliases source guard, one transaction (psql -1, ON_ERROR_STOP). Supplemental to the applied packet identity registry v1: creates atlas_graphify_scope_repository_map_v1 (membership_repository_scope PK, repository_id, source_authority_repo_id, mapping_kind ROOT_SCOPE|NESTED_REPOSITORY|LOGICAL_SUBSCOPE, evidence ref/digest), a guard trigger that checks the persisted atlas_repository_identity row, and adds the registry composite scope/repository FK. No mappings seeded. This is the contract the Drizzle model, packet-identity-registry-postgres-v1.ts and build-packet-key-v2-admission-manifest-v1.mts expect. A duplicate 20261030 draft was archived to docs/reports/archive/2026-10-30-superseded-drafts/. Readback: scope map + registry composite FK + both guard triggers present; scope map, registry and aliases_v1 all 0 rows. No mappings seeded.",
+      "appliedBy": "operator-approved, session 2026-10-30",
+      "appliedAt": "2026-10-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "BEGIN..ROLLBACK rehearsal only; do not apply to the live database without explicit operator authorization."
+    },
+    {
+      "file": "manual/20261027_atlas_packet_identity_registry_v1_source_guard_DRAFT.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-30 after explicit instruction (\"apply the two 20261027 drafts\"), scope map first then aliases source guard, one transaction (psql -1, ON_ERROR_STOP). Supplemental to the applied packet identity registry v1: adds atlas_packet_identity_aliases_v1_guard_fn and trigger trg_atlas_packet_identity_aliases_v1_guard so an alias can only bind a registry row to a storage packet with the identical source_ref, and aliases are immutable. Rehearsed 2026-10-30 in a rolled-back transaction together with the 20261027 scope-map draft (valid alias accepted; source mismatch, missing storage packet, missing registry row and UPDATE rejected). Readback: scope map + registry composite FK + both guard triggers present; scope map, registry and aliases_v1 all 0 rows. No mappings seeded.",
+      "appliedBy": "operator-approved, session 2026-10-30",
+      "appliedAt": "2026-10-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "BEGIN..ROLLBACK rehearsal only; do not apply to the live database without explicit operator authorization."
+    },
+    {
+      "file": "manual/20261030_evidence_vector_projection_outbox_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-31 after explicit operator authorization. Creates public.evidence_vector_projection_outbox with lease, retry, completion, and cryptographic identity constraints, unblocking live evidence vector outbox persistence on legal-ai-postgres (PG 18.4).",
+      "appliedBy": "operator-approved, session 2026-10-31",
+      "appliedAt": "2026-10-31",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db -c '\\d public.evidence_vector_projection_outbox'"
+    },
+    {
+      "file": "manual/20261107_atlas_concept_tie_v2.sql",
+      "status": "applied",
+      "reason": "Applied 2026-11-07 after explicit operator approval. Creates public.atlas_concept_tie_v2, a non-canonical staging table for concept-tie v2 lanes (canonical_authority fixed false; JSONB unknown_reason and proposal; 5 indexes plus PK and unique). Empty at apply; no rows loaded."
+    },
+    {
+      "file": "manual/20261108_atlas_kanban_dag_prefill_v1.sql",
+      "status": "active_candidate",
+      "reason": "Prepared non-canonical prefill/routing projection table public.atlas_kanban_dag_prefill_v1 bridged to public.kanban_tasks via canonical_task_key (<change>#<16-hex-sha256>). Enforces canonical_authority=false, forbids synthetic task:ordinal:* IDs, and separates routing_status (ROUTED_ACTIVE|UNROUTED) from canonical task status. Rehearsed in a rolled-back transaction against PostgreSQL 18 legal_ai_db; not applied.",
+      "appliedBy": "not-applied",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/reconcile-cohort-6527-kanban-authority-v1.mjs"
+    },
+    {
+      "file": "manual/20261108_atlas_nes_lut_v2_candidate.sql",
+      "status": "active_candidate",
+      "reason": "Additive candidate only: stage 14 versioned NES LUT routing metadata rows under atlas.nes-lut.v2-candidate in the existing atlas_nes_lut_v1 table. Preserves v1 records; scratch-only gated rehearsal/apply required, no live migration or ontology updates.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    }
+  ]
+}

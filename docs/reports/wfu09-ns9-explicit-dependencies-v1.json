@@ -1,0 +1,696 @@
+{
+  "schema": "atlas.wfu09-ns9-explicit-dependencies.v1",
+  "generatedAt": "2026-11-09T19:28:09.749Z",
+  "workspaceRevision": "ef1e28f984d8dbcf5bd07bb3c2629c537135fc73",
+  "status": "PASS_EXPLICIT_DEPENDENCIES_PROPAGATED",
+  "authority": "SOURCE_BOUND_DEPENDENCY_PROPAGATION_CHECK",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "taskSourceMutationPerformedByVerifier": false,
+  "counts": {
+    "tasksChecked": 17,
+    "declaredEdges": 31,
+    "resolvedEdges": 31,
+    "blockedPendingProof": 17,
+    "failedTasks": 0
+  },
+  "inputs": {
+    "workboard": {
+      "path": ".tmp/atlas/wfu09-ns9-adoption-expanded/openspec-workboard-v1.json",
+      "sha256": "42efe3ab044fbf4e4bbe0c57b5e4c84de0ffb1d43a7832decaeb707aaef9d6e2"
+    },
+    "controller": {
+      "path": ".tmp/atlas/wfu09-ns9-adoption-expanded/reports/openspec-execution-controller-v1.json",
+      "sha256": "fe5b880298cf98c546466a5e2fca75efa9d31612287ac64b356c1e1a7f273bc3"
+    },
+    "actionableAdapter": {
+      "path": ".tmp/atlas/wfu09-ns9-adoption-expanded/actionable-workboard-v3.json",
+      "sha256": "cce12700598d8979f730ef5de352027cd22c4b3e7c092ed05f2c6466b34dd7b2"
+    },
+    "verifier": {
+      "path": "scripts/atlas/verify-wfu09-ns9-explicit-dependencies-v1.mjs",
+      "sha256": "3ec8a2d417364bd61c1901cc94bfbd973dc95ab8a2297c6957a3305d00a175e3"
+    }
+  },
+  "tasks": [
+    {
+      "logicalTaskKey": "parent-atlas-ontology-kernel:NEXT-23",
+      "taskKey": "parent-atlas-ontology-kernel:5529",
+      "sourceRef": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+      "sourceLine": 5529,
+      "sourceFileSha256": "a26ebac0c07de905b99ee2db26dc4484a1b4fb4548a02e2a8ade1d5d38009bcf",
+      "sourceBlockSha256": "sha256:45f46fd65a3205de75dc501a507ba6715130fee587a0ca227d715640c192eaff",
+      "taskRevision": "sha256:45f46fd65a3205de75dc501a507ba6715130fee587a0ca227d715640c192eaff",
+      "declaredDependsOn": [
+        "NEXT-22"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-ontology-kernel:5527"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-ontology-kernel:5527"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-versioned-doc-intelligence:DOC-BATCH-13",
+      "taskKey": "parent-atlas-versioned-doc-intelligence:1552",
+      "sourceRef": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md",
+      "sourceLine": 1552,
+      "sourceFileSha256": "595fbf84025f395762f3dbf9b3e0b5c7e324f5e542a29ac2287edf2d09f40ac7",
+      "sourceBlockSha256": "sha256:e9f95ac6856a8e90fd45586da91a353cea16577846e76963bbc5b802767ebe6f",
+      "taskRevision": "sha256:e9f95ac6856a8e90fd45586da91a353cea16577846e76963bbc5b802767ebe6f",
+      "declaredDependsOn": [
+        "DOC-BATCH-10",
+        "DOC-BATCH-11",
+        "DOC-BATCH-12"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-versioned-doc-intelligence:1549",
+        "parent-atlas-versioned-doc-intelligence:1550",
+        "parent-atlas-versioned-doc-intelligence:1551"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-versioned-doc-intelligence:1549",
+          "parent-atlas-versioned-doc-intelligence:1550",
+          "parent-atlas-versioned-doc-intelligence:1551"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-ace-rlm-bitfrost-integration:SYSTEM-PROMPT-01",
+      "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:14698",
+      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+      "sourceLine": 14698,
+      "sourceFileSha256": "5aad37703e62b37f4f300795920da6a83adcfa15a245940f1c9c1b1f8d00d650",
+      "sourceBlockSha256": "sha256:a83fb4b364e66565e218e1ef2234cac99721761fc03ca39614764314ec714537",
+      "taskRevision": "sha256:a83fb4b364e66565e218e1ef2234cac99721761fc03ca39614764314ec714537",
+      "declaredDependsOn": [
+        "CTX-E2E-01"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-ace-rlm-bitfrost-integration:14658"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-ace-rlm-bitfrost-integration:14658"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-topology-representation-admission:TOPO-11A",
+      "taskKey": "parent-atlas-topology-representation-admission:477",
+      "sourceRef": "openspec/changes/parent-atlas-topology-representation-admission/tasks.md",
+      "sourceLine": 477,
+      "sourceFileSha256": "4b791b21d90ccc06535409528dd3c8d4f912979b35565acb1b7e7cf076b114e8",
+      "sourceBlockSha256": "sha256:09481c64f93cb8724c4390c6af7a7f02c616449aaf2c2414b2bbf1a2f0b013b5",
+      "taskRevision": "sha256:09481c64f93cb8724c4390c6af7a7f02c616449aaf2c2414b2bbf1a2f0b013b5",
+      "declaredDependsOn": [
+        "TOPO-11"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-topology-representation-admission:457"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-topology-representation-admission:457"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-graphify-recovery-proof-ladder:SRCREF-RECONCILE-01",
+      "taskKey": "parent-atlas-graphify-recovery-proof-ladder:707",
+      "sourceRef": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md",
+      "sourceLine": 707,
+      "sourceFileSha256": "6e883adfae65911ed0c6fb2e21123668008d95cc387069f8db48fc9a1413d1a9",
+      "sourceBlockSha256": "sha256:4b62d248490dd91fc6f45e07b196c3b3ef1a1a4dddfb866f94c083504e6e03d6",
+      "taskRevision": "sha256:4b62d248490dd91fc6f45e07b196c3b3ef1a1a4dddfb866f94c083504e6e03d6",
+      "declaredDependsOn": [
+        "SRCREF-HARNESS-01"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-graphify-recovery-proof-ladder:679"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-graphify-recovery-proof-ladder:679"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-neural-prefill-encoder:PKG-07",
+      "taskKey": "parent-atlas-neural-prefill-encoder:232",
+      "sourceRef": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "sourceLine": 232,
+      "sourceFileSha256": "f930fde94d32bec2848c96bf8e27075115f2a5b25ef2c1f65c3217cd623fcd21",
+      "sourceBlockSha256": "sha256:c65a1b12f3ef74cf07d3978776afa71e79ba8cf4a93150b2d326dc7648d90ab1",
+      "taskRevision": "sha256:c65a1b12f3ef74cf07d3978776afa71e79ba8cf4a93150b2d326dc7648d90ab1",
+      "declaredDependsOn": [
+        "PKG-03",
+        "PKG-04",
+        "PKG-05",
+        "PKG-06"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-neural-prefill-encoder:191",
+        "parent-atlas-neural-prefill-encoder:198",
+        "parent-atlas-neural-prefill-encoder:216",
+        "parent-atlas-neural-prefill-encoder:223"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-neural-prefill-encoder:191",
+          "parent-atlas-neural-prefill-encoder:198",
+          "parent-atlas-neural-prefill-encoder:216",
+          "parent-atlas-neural-prefill-encoder:223"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-neural-prefill-encoder:G-08",
+      "taskKey": "parent-atlas-neural-prefill-encoder:3227",
+      "sourceRef": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "sourceLine": 3227,
+      "sourceFileSha256": "f930fde94d32bec2848c96bf8e27075115f2a5b25ef2c1f65c3217cd623fcd21",
+      "sourceBlockSha256": "sha256:34d89b93d2eb96ae9965566e1c1935c327bd43d8b8bb7c3b3f449380070ca5a2",
+      "taskRevision": "sha256:34d89b93d2eb96ae9965566e1c1935c327bd43d8b8bb7c3b3f449380070ca5a2",
+      "declaredDependsOn": [
+        "G-01",
+        "G-02",
+        "G-03",
+        "G-04",
+        "G-05",
+        "G-06",
+        "G-07"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-neural-prefill-encoder:3160",
+        "parent-atlas-neural-prefill-encoder:3173",
+        "parent-atlas-neural-prefill-encoder:3182",
+        "parent-atlas-neural-prefill-encoder:3198",
+        "parent-atlas-neural-prefill-encoder:3213",
+        "parent-atlas-neural-prefill-encoder:3220",
+        "parent-atlas-neural-prefill-encoder:3225"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-neural-prefill-encoder:3160",
+          "parent-atlas-neural-prefill-encoder:3173",
+          "parent-atlas-neural-prefill-encoder:3182",
+          "parent-atlas-neural-prefill-encoder:3198",
+          "parent-atlas-neural-prefill-encoder:3213",
+          "parent-atlas-neural-prefill-encoder:3220",
+          "parent-atlas-neural-prefill-encoder:3225"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-gpu-sidecar-patch-tournament:TOUR-QLORA-02",
+      "taskKey": "parent-atlas-gpu-sidecar-patch-tournament:469",
+      "sourceRef": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+      "sourceLine": 469,
+      "sourceFileSha256": "60b26f52f0a51e7575f7ddadb07fce370907586a14cf7bd29e76a14375206f3e",
+      "sourceBlockSha256": "sha256:fa26c63932581781300184fdfe8ec6ad587c69ea1222f6d739b10fb000e32840",
+      "taskRevision": "sha256:fa26c63932581781300184fdfe8ec6ad587c69ea1222f6d739b10fb000e32840",
+      "declaredDependsOn": [
+        "TOUR-QLORA-01"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-gpu-sidecar-patch-tournament:468"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-gpu-sidecar-patch-tournament:468"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-gpu-sidecar-patch-tournament:TOUR-QLORA-GATE-01",
+      "taskKey": "parent-atlas-gpu-sidecar-patch-tournament:33",
+      "sourceRef": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+      "sourceLine": 33,
+      "sourceFileSha256": "60b26f52f0a51e7575f7ddadb07fce370907586a14cf7bd29e76a14375206f3e",
+      "sourceBlockSha256": "sha256:b118dc127bc542b6d8930b5437fc66f36c9502611c571cddb24ba1d05414a56f",
+      "taskRevision": "sha256:b118dc127bc542b6d8930b5437fc66f36c9502611c571cddb24ba1d05414a56f",
+      "declaredDependsOn": [
+        "TOUR-P1-EVAL-01",
+        "TOUR-RECEIPT-01"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-gpu-sidecar-patch-tournament:23",
+        "parent-atlas-gpu-sidecar-patch-tournament:27"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-gpu-sidecar-patch-tournament:23",
+          "parent-atlas-gpu-sidecar-patch-tournament:27"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-retrieval-lod-algorithm-taxonomy:P24-TEST-LOCK-09",
+      "taskKey": "parent-atlas-retrieval-lod-algorithm-taxonomy:966",
+      "sourceRef": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+      "sourceLine": 966,
+      "sourceFileSha256": "8578ea22db325e373257124b607cd15d60a6419a08cb96561e117018ed2f6d22",
+      "sourceBlockSha256": "sha256:759119c7228b403b43e8f4727956d640f494dc683570a5b334dd73b9439c0a98",
+      "taskRevision": "sha256:759119c7228b403b43e8f4727956d640f494dc683570a5b334dd73b9439c0a98",
+      "declaredDependsOn": [
+        "P24-EXIT-08"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-retrieval-lod-algorithm-taxonomy:965"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-retrieval-lod-algorithm-taxonomy:965"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-code-intel-e2e:CODE-IMPACT-01",
+      "taskKey": "parent-atlas-code-intel-e2e:227",
+      "sourceRef": "openspec/changes/parent-atlas-code-intel-e2e/tasks.md",
+      "sourceLine": 227,
+      "sourceFileSha256": "93a637c111f9974b04c81b680fb68be751a4b4b109070014d60328c42fdc6ad7",
+      "sourceBlockSha256": "sha256:922678670c51b79055c19b9cc95d2f9c76ed33bb4a8b90c12230623323e926f5",
+      "taskRevision": "sha256:922678670c51b79055c19b9cc95d2f9c76ed33bb4a8b90c12230623323e926f5",
+      "declaredDependsOn": [
+        "SOURCE-SYMBOL-AUTHORITY-01",
+        "AST-LIVE-JOIN-01"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-code-intel-e2e:213",
+        "parent-atlas-code-intel-e2e:8"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-code-intel-e2e:213",
+          "parent-atlas-code-intel-e2e:8"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-code-intel-e2e:MCP-CODE-INTEL-01",
+      "taskKey": "parent-atlas-code-intel-e2e:234",
+      "sourceRef": "openspec/changes/parent-atlas-code-intel-e2e/tasks.md",
+      "sourceLine": 234,
+      "sourceFileSha256": "93a637c111f9974b04c81b680fb68be751a4b4b109070014d60328c42fdc6ad7",
+      "sourceBlockSha256": "sha256:b5c74ce0239c87124dd0cd9d3e74ab45f88f00a810e2c12568e94b576b5b30dc",
+      "taskRevision": "sha256:b5c74ce0239c87124dd0cd9d3e74ab45f88f00a810e2c12568e94b576b5b30dc",
+      "declaredDependsOn": [
+        "CODE-IMPACT-01"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-code-intel-e2e:227"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-code-intel-e2e:227"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-repair-candidate-feature-matrix:REC-04",
+      "taskKey": "parent-atlas-repair-candidate-feature-matrix:1547",
+      "sourceRef": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md",
+      "sourceLine": 1547,
+      "sourceFileSha256": "42a0840135c3c4f271d1813972e22fd174c003f21b5eb6d286f019d2aee1c9d9",
+      "sourceBlockSha256": "sha256:52264ecd997d6d88ce2728e402543ea52b6e015c259bedbdbeb59818b5d03fda",
+      "taskRevision": "sha256:52264ecd997d6d88ce2728e402543ea52b6e015c259bedbdbeb59818b5d03fda",
+      "declaredDependsOn": [
+        "REC-03"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-repair-candidate-feature-matrix:1546"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-repair-candidate-feature-matrix:1546"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-retrieval-logic-convergence:CACHE-FABRIC-03",
+      "taskKey": "parent-atlas-retrieval-logic-convergence:630",
+      "sourceRef": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
+      "sourceLine": 630,
+      "sourceFileSha256": "ded1189c7c8bf91a615884276088d4edbfcebdd1641a2990b08b7c97cb47a840",
+      "sourceBlockSha256": "sha256:8a0b80d37df66633df39da8d56e6863526aeaaa0b1f04b3be75909400c09a420",
+      "taskRevision": "sha256:8a0b80d37df66633df39da8d56e6863526aeaaa0b1f04b3be75909400c09a420",
+      "declaredDependsOn": [
+        "CACHE-FABRIC-02"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-retrieval-logic-convergence:628"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-retrieval-logic-convergence:628"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "atlas-feature-intelligence:PACKET-ROUTING-INDEX-01",
+      "taskKey": "atlas-feature-intelligence:48",
+      "sourceRef": "openspec/changes/atlas-feature-intelligence/tasks.md",
+      "sourceLine": 48,
+      "sourceFileSha256": "eefbaa001dfbf2e095b3b3bb251a195c367be83b357765e244aadd008bea14de",
+      "sourceBlockSha256": "sha256:d392d4425eee3fd63cb29b4f8024b14cb9e764d589003fc9be9628e6635fd2bd",
+      "taskRevision": "sha256:d392d4425eee3fd63cb29b4f8024b14cb9e764d589003fc9be9628e6635fd2bd",
+      "declaredDependsOn": [
+        "FI-TITLE-ADDRESS-01"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "atlas-feature-intelligence:22"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "atlas-feature-intelligence:22"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-agentic-file-compiler:AFC-E2E-02",
+      "taskKey": "parent-atlas-agentic-file-compiler:970",
+      "sourceRef": "openspec/changes/parent-atlas-agentic-file-compiler/tasks.md",
+      "sourceLine": 970,
+      "sourceFileSha256": "00f96e69ef66b8a5e499bfc9441c66c732a6ae5568ce013c6b93e41b7b51238d",
+      "sourceBlockSha256": "sha256:d6f6293bb14db2683365e5802d9c74384de9380327241e1aa38b28aaeb8b7e33",
+      "taskRevision": "sha256:d6f6293bb14db2683365e5802d9c74384de9380327241e1aa38b28aaeb8b7e33",
+      "declaredDependsOn": [
+        "AFC-E2E-01"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-agentic-file-compiler:969"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-agentic-file-compiler:969"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    },
+    {
+      "logicalTaskKey": "parent-atlas-runtime-log-remediation:LOG-16",
+      "taskKey": "parent-atlas-runtime-log-remediation:36",
+      "sourceRef": "openspec/changes/parent-atlas-runtime-log-remediation/tasks.md",
+      "sourceLine": 36,
+      "sourceFileSha256": "c371de0fcce15f7990e4ebc5eea0ed1df735ee7bf5834e05003123e5356c34da",
+      "sourceBlockSha256": "sha256:23a320c37537a58aead73f0fa70a7899b9141609be1ded5e4a0a564f8c7fbd8a",
+      "taskRevision": "sha256:23a320c37537a58aead73f0fa70a7899b9141609be1ded5e4a0a564f8c7fbd8a",
+      "declaredDependsOn": [
+        "LOG-09",
+        "LOG-10"
+      ],
+      "resolvedDependsOnTaskKeys": [
+        "parent-atlas-runtime-log-remediation:23",
+        "parent-atlas-runtime-log-remediation:24"
+      ],
+      "controllerState": "WAITING_ON_DEPENDENCY",
+      "blockerKey": "DECLARED_TASK_DEPENDENCY",
+      "dependencyReadiness": {
+        "ready": false,
+        "unresolvedTaskKeys": [],
+        "unprovenTaskKeys": [
+          "parent-atlas-runtime-log-remediation:23",
+          "parent-atlas-runtime-log-remediation:24"
+        ],
+        "cyclic": false
+      },
+      "checks": {
+        "exactSourcePath": true,
+        "sourceBlockRevisionParity": true,
+        "authoredDependencySetParity": true,
+        "allDependencyIdentitiesResolve": true,
+        "exactTaskKeyResolution": true,
+        "missingProofReceiptsKeepTaskBlocked": true,
+        "blockedTaskExcludedFromActionableAdapter": true
+      },
+      "failedChecks": [],
+      "status": "PASS_BLOCKED_PENDING_PROOF"
+    }
+  ],
+  "limitations": [
+    "This verifies two authored dependency sets only; it does not establish broad NS-9 metadata coverage.",
+    "Both dependent tasks remain blocked until their prerequisites have current independently admitted proof receipts.",
+    "No scheduler admission, task execution, database mutation, cache mutation, or completion is authorized by this report."
+  ]
+}

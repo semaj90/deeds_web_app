@@ -16,15 +16,33 @@ export const topologySearchTool = {
       limit: args.limit ?? 15,
       somCluster: args.somCluster,
     });
-    if (!result) return JSON.stringify({ error: 'Topology search engine unavailable. Run: npm run topology:search:ensure', hint: 'port 8101' });
+    if (!result.ok) return JSON.stringify({
+      query: args.query,
+      error: result.error ?? 'Topology search unavailable',
+      errorCode: result.errorCode ?? 'TOPOLOGY_SEARCH_UNAVAILABLE',
+      rankingMode: result.rankingMode,
+      topologyStatus: result.topologyStatus,
+      fallbackReason: result.fallbackReason,
+      hits: [],
+    });
     return JSON.stringify({
       query: args.query,
+      rankingMode: result.rankingMode,
+      topologyStatus: result.topologyStatus,
+      fallbackReason: result.fallbackReason ?? null,
+      identityJoin: result.identityJoin ?? null,
       center: result.center,
       radius: result.radius,
       totalFound: result.totalFound,
       durationMs: result.durationMs,
       hits: result.hits.map(h => ({
         path: h.path,
+          stableKey: h.stableKey,
+          sourceRef: h.sourceRef ?? null,
+          sourceRevision: h.sourceRevision ?? null,
+          contentHash: h.contentHash ?? null,
+          representationRevision: h.representationRevision ?? null,
+          topologySnapshotRevision: h.topologySnapshotRevision ?? null,
         topoClass: h.topoClass,
         topoHex: h.topoHex,
         somCluster: h.somCluster,
@@ -33,6 +51,7 @@ export const topologySearchTool = {
         graphAuthorityScore: h.graphAuthorityScore ?? null,
         summary: h.summary ?? h.contentPreview ?? '',
       })),
+      unmatchedTopologyHits: result.unmatchedTopologyHits ?? [],
     });
   },
 } as const;

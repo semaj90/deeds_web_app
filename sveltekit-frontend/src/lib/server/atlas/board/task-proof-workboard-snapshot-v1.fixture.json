@@ -1,0 +1,269 @@
+{
+  "schema": "atlas.task-proof-workboard-snapshot-fixture.v1",
+  "generatedAt": "2026-11-12T00:45:10.402Z",
+  "sourceReportSha256": "d65c1438e43690aa2850dffc6d71b18fe2006c57fc30742e63f9a8a2af3bb48e",
+  "taskCount": 13974,
+  "duplicateBlockHashGroups": [
+    {
+      "blockHash": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+      "rows": [
+        {
+          "stableKey": "atlas-feature-intelligence#ba82ae0bfd79cafc",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-ace-bitfrost-cache-correctness#747836b17a29085c",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-ace-rlm-bitfrost-integration#7ff21b0e7da990f1",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-candidate-feature-execution-fabric#0bcd5082a0dd1349",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-gpu-graph-vector-substrate#1242df88c6f7b0dd",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-native-acceleration-cabi#197a9cea823eba95",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-pca-svd-representation-baseline#647b5fd2058a891c",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-retrieval-executor-compatibility-convergence#1585eaa72fd14aa6",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-retrieval-fusion-reachability#4b73216c67149437",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-retrieval-logic-convergence#e90a6c1ba34b60e8",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-semantic-768-canonical-contract#46363aedf20dd552",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-topology-representation-admission#d5be1d2650c55880",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-transport-memory-boundaries#3805e95e9abf1fca",
+          "sourceCheckboxState": "OPEN"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:6a9d5f1fd80976c80b26a8d77495ac5eea8974639c8ed2e4efc91f90dea46ca4",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-ace-rlm-bitfrost-integration#845359061835351e",
+          "sourceCheckboxState": "DONE"
+        },
+        {
+          "stableKey": "parent-atlas-ace-rlm-bitfrost-integration#845359061835351e~2",
+          "sourceCheckboxState": "DONE"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:c0cefb06d31dcb1835586e637d17137f7841674a73df77cffad00b1d0056c1ef",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-ace-rlm-bitfrost-integration#22c4e7ee9839e843",
+          "sourceCheckboxState": "DONE"
+        },
+        {
+          "stableKey": "parent-atlas-ace-rlm-bitfrost-integration#22c4e7ee9839e843~2",
+          "sourceCheckboxState": "DONE"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:e40cd858f46a918b3fe598b3576a1731ed1994d0acc118bf0317ebe60fc23b1c",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-ace-rlm-bitfrost-integration#3188ce240caec570",
+          "sourceCheckboxState": "DONE"
+        },
+        {
+          "stableKey": "parent-atlas-ace-rlm-bitfrost-integration#3188ce240caec570~2",
+          "sourceCheckboxState": "DONE"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:a83d2fad2e7e12511e01b23520ae6ad1e6be0fdcaedf7fd9ce684da648283cdc",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-ace-rlm-bitfrost-integration#cf27c28a9294ecb9",
+          "sourceCheckboxState": "DONE"
+        },
+        {
+          "stableKey": "parent-atlas-ace-rlm-bitfrost-integration#cf27c28a9294ecb9~2",
+          "sourceCheckboxState": "DONE"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:3b535a885cfa0cc5e3166e77e36bcf21dfd8fcb38388bd1205f8739cf192fa4a",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-ace-rlm-bitfrost-integration#b073c8cb6fc3a49b",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-ace-rlm-bitfrost-integration#b073c8cb6fc3a49b~2",
+          "sourceCheckboxState": "OPEN"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:8a294561c3f312b07a32975e6b155a9a23227564b2334c1665bd5dcfce02c8f8",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-ace-rlm-bitfrost-integration#9c192cc607119b1c",
+          "sourceCheckboxState": "DONE"
+        },
+        {
+          "stableKey": "parent-atlas-ace-rlm-bitfrost-integration#9c192cc607119b1c~2",
+          "sourceCheckboxState": "DONE"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:68bc1e4c3ac96ba76be6b7192e2808b4e9c523e1ed093298b65853ac1af48430",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-graph-analysis-contract#6211bcc363172ec7",
+          "sourceCheckboxState": "DONE"
+        },
+        {
+          "stableKey": "parent-atlas-graph-analysis-contract#6211bcc363172ec7~2",
+          "sourceCheckboxState": "DONE"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:efe84159fd660f486f9e7b021c66deae3adaccc781019891b1ecfaa4a5df6fd2",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-neural-prefill-encoder#9d709eb2d9919ad0",
+          "sourceCheckboxState": "DONE"
+        },
+        {
+          "stableKey": "parent-atlas-qdrant-structural-payload-enrichment#84feb2307e7ea8ad",
+          "sourceCheckboxState": "DONE"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:797c9dd2b432cfa40685c838528e71d92494b90bc42e11a56f5054f94595b77e",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-ontology-kernel#48e6cfa3353f8a96",
+          "sourceCheckboxState": "DONE"
+        },
+        {
+          "stableKey": "parent-atlas-ontology-kernel#48e6cfa3353f8a96~2",
+          "sourceCheckboxState": "DONE"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:572b34337ce8b6edc50eec2a79f17d979309baa876a3f645007c2fcf9801aea5",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-ontology-kernel#3e2cca878f8d2d5e",
+          "sourceCheckboxState": "DONE"
+        },
+        {
+          "stableKey": "parent-atlas-ontology-kernel#3e2cca878f8d2d5e~2",
+          "sourceCheckboxState": "DONE"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:ca908aa189281ebb86501c57bd622bea33c9a65b384a2590f81f7b83a8174b8d",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-ontology-kernel#0d8744e8aa6b6bcb",
+          "sourceCheckboxState": "DONE"
+        },
+        {
+          "stableKey": "parent-atlas-ontology-kernel#0d8744e8aa6b6bcb~2",
+          "sourceCheckboxState": "DONE"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:9c60253da4c5e596816fb6bc9a1019c1cfea350320128f54fc80ad7d0f8987de",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-query-routing-classifier#69472154cd0554a4",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-query-routing-classifier#69472154cd0554a4~2",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-query-routing-classifier#69472154cd0554a4~3",
+          "sourceCheckboxState": "OPEN"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:374b887d8feeb11398553d4438f6f2142703fbdb2ef8e8dda14bd3920f5720c6",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-query-routing-classifier#1c52c5efabaf69cb",
+          "sourceCheckboxState": "OPEN"
+        },
+        {
+          "stableKey": "parent-atlas-query-routing-classifier#1c52c5efabaf69cb~2",
+          "sourceCheckboxState": "OPEN"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:c86641088c2c65ee4db2b6025e3d20c622ba5bef41e83cd265cd7a79e650be90",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-retrieval-lineage-dag-convergence#4852c1a0579f84fc",
+          "sourceCheckboxState": "DONE"
+        },
+        {
+          "stableKey": "parent-atlas-retrieval-lineage-dag-convergence#4852c1a0579f84fc~2",
+          "sourceCheckboxState": "DONE"
+        }
+      ]
+    },
+    {
+      "blockHash": "sha256:c782af96f0d860dfdff169cc927b617e66da9c252f95ee92892bc08d83a0342b",
+      "rows": [
+        {
+          "stableKey": "parent-atlas-search-classifier-sidecar#d20647f95bd97a30",
+          "sourceCheckboxState": "DONE"
+        },
+        {
+          "stableKey": "parent-atlas-search-classifier-sidecar#d20647f95bd97a30~2",
+          "sourceCheckboxState": "DONE"
+        }
+      ]
+    }
+  ],
+  "unresolvedTask": {
+    "stableKey": "agent-branch-review-fanout-ace-centroid-aug22#16f4feb094087a07",
+    "sourceCheckboxState": "OPEN",
+    "blockHash": "sha256:3eaefc9a0c8a860f9db37ff24232c2e5d6d48c8e711cf0a29ec86ca1fac8f801"
+  }
+}

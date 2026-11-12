@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Pool } from 'pg';
 
 import {
   actionOutcomeSchema,
@@ -59,13 +60,13 @@ export async function persistTemporalRecommendationOutcomeFromPostgres(input: {
   evidence_refs?: readonly string[];
   observed_at?: string;
   producer_revision: string;
-}): Promise<TemporalRecommendationOutcomeBoundaryResultV1> {
+}, options: { pool?: Pool } = {}): Promise<TemporalRecommendationOutcomeBoundaryResultV1> {
   id.parse(input.producer_revision);
   const receipt = buildTemporalRecommendationOutcome({
     ...input,
     observed_at: input.observed_at ?? new Date().toISOString(),
   });
-  const { pool } = await import('$lib/server/db/client.js');
+  const pool = options.pool ?? (await import('$lib/server/db/client.js')).pool;
   const repository = createRecommendationOutcomePostgresRepository(pool);
   const appendReceipt: RecommendationOutcomeAppendReceiptV1 = await repository.append(
     receipt,

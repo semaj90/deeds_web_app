@@ -1,7 +1,9 @@
 <!-- Smart Document Form — Upload documents for OCR + evidence pipeline processing -->
 <!-- Session 64: Rewritten from corrupted ocrService dep → wired to real MinIO/evidence API -->
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import { admitEvidenceProgressEventV1, caseEvidenceProgressEventUrlV1, parseEvidenceProgressControlCodeV1 } from '$lib/components/evidence/evidence-progress-event-client-v1.js';
 
 	interface FormField {
 		name: string;
@@ -49,6 +51,13 @@
 	let uploadJobId = $state('');
 	let uploadEvidenceId = $state('');
 	let uploadError = $state('');
+	let componentDestroyed = false;
+	const activeStreamCleanups = new Set<() => void>();
+	onDestroy(() => {
+		componentDestroyed = true;
+		for (const cleanup of activeStreamCleanups) cleanup();
+		activeStreamCleanups.clear();
+	});
 
 	// Extracted text from pipeline
 	let extractedText = $state('');
@@ -133,72 +142,116 @@
 			// Auto-populate form fields from extracted entities
 			autoPopulateFromEntities();
 
-			onocrresult?.({
-				evidenceId: uploadEvidenceId,
-				jobId: uploadJobId,
-				extractedText,
-				entities: extractedEntities
-			});
+			if (typeof onocrresult === 'function') {
+				onocrresult({
+					evidenceId: uploadEvidenceId,
+					jobId: uploadJobId,
+					extractedText,
+					entities: extractedEntities
+				});
+			}
 		} catch (error) {
-			console.error('Upload failed:', error);
-			uploadError = error instanceof Error ? error.message : 'Upload failed';
+			if (!componentDestroyed) {
+				console.error('Upload failed:', error);
+				uploadError = error instanceof Error ? error.message : 'Upload failed';
+			}
 		} finally {
 			isProcessing = false;
 		}
 	}
 
-	/** Track upload progress via SSE at /api/evidence/realtime */
+	/** Track upload progress using case-qualified events whenever a case is selected. */
 	async function trackUploadProgress(jobId: string): Promise<void> {
 		return new Promise((resolve, reject) => {
-			const evtSource = new EventSource(`/api/evidence/realtime?jobId=${jobId}`);
+			const caseScoped = Boolean(caseId);
+			let lastSequence = 0n;
+			const evtSource = new EventSource(caseScoped
+				? caseEvidenceProgressEventUrlV1(caseId, jobId)
+				: `/api/evidence/realtime?jobId=${encodeURIComponent(jobId)}`);
 			let resolved = false;
+			let timeout: ReturnType<typeof setTimeout>;
+			let cleanupOnDestroy = () => {};
+			const finish = (error?: Error) => {
+				if (resolved) return;
+				resolved = true;
+				clearTimeout(timeout);
+				activeStreamCleanups.delete(cleanupOnDestroy);
+				evtSource.close();
+				if (error) reject(error);
+				else fetchExtractedData(uploadEvidenceId).then(resolve, reject);
+			};
+			cleanupOnDestroy = () => finish(new Error('Evidence progress tracking was cancelled.'));
+			activeStreamCleanups.add(cleanupOnDestroy);
 
-			evtSource.onmessage = (event) => {
+			const handleLegacyEvent = (event: MessageEvent<string>, type: 'progress' | 'complete' | 'error') => {
 				try {
 					const data = JSON.parse(event.data);
 
-					if (data.type === 'progress') {
+					if (type === 'progress') {
 						uploadProgress = data.progress || 0;
 						uploadStep = data.step || '';
-					} else if (data.type === 'complete') {
+					} else if (type === 'complete') {
 						uploadProgress = 100;
 						uploadStep = 'complete';
 						uploadEvidenceId = data.evidenceId || uploadEvidenceId;
-						evtSource.close();
-						if (!resolved) {
-							resolved = true;
-							// Fetch extracted data after completion
-							fetchExtractedData(uploadEvidenceId).then(resolve);
-						}
-					} else if (data.type === 'error') {
+						finish();
+					} else if (type === 'error') {
 						uploadError = data.error || 'Processing failed';
-						evtSource.close();
-						if (!resolved) {
-							resolved = true;
-							reject(new Error(data.error));
-						}
+						finish(new Error(data.error || 'Processing failed'));
 					}
 				} catch {
 					// Ignore parse errors from keep-alive or malformed data
 				}
 			};
 
-			evtSource.onerror = () => {
-				evtSource.close();
-				if (!resolved) {
-					resolved = true;
-					// SSE failed — fall back to polling
-					pollUploadStatus(uploadEvidenceId).then(resolve).catch(reject);
+			if (caseScoped) {
+				const handleControlEvent = (eventName: 'stream-error' | 'stream-ended', event: Event) => {
+					const control = parseEvidenceProgressControlCodeV1(eventName, (event as MessageEvent<string>).data);
+					uploadError = control === 'EVENT_HISTORY_GAP'
+						? 'Progress history is incomplete. Refresh the case to verify the current status.'
+						: control === 'AUTHORIZATION_REVOKED'
+							? 'Access to this case’s progress stream ended.'
+							: 'Evidence was accepted, but processing status could not be verified.';
+					finish(new Error(uploadError));
+				};
+				evtSource.addEventListener('stream-error', (event) => handleControlEvent('stream-error', event));
+				evtSource.addEventListener('stream-ended', (event) => handleControlEvent('stream-ended', event));
+				evtSource.addEventListener('analysis-progress', (event) => {
+					const result = admitEvidenceProgressEventV1({
+						lastEventId: (event as MessageEvent<string>).lastEventId,
+						data: (event as MessageEvent<string>).data,
+						jobId,
+						caseId,
+						lastSequence,
+					});
+					if (!result.accepted) return;
+					lastSequence = result.sequence;
+					const data = result.envelope;
+					uploadProgress = data.progress;
+					uploadStep = data.stage;
+					uploadEvidenceId = data.evidenceId;
+					if (data.status === 'completed') {
+						uploadProgress = 100;
+						uploadStep = 'complete';
+						finish();
+					} else if (data.status === 'failed') {
+						uploadError = 'Processing failed';
+						finish(new Error(uploadError));
+					}
+				});
+			} else {
+				for (const type of ['progress', 'complete', 'error'] as const) {
+					evtSource.addEventListener(type, (event) => handleLegacyEvent(event as MessageEvent<string>, type));
 				}
+			}
+
+			evtSource.onerror = () => {
+				// EventSource reconnects automatically; a transport interruption is not a completed job.
 			};
 
 			// Safety timeout: 5 minutes
-			setTimeout(() => {
-				evtSource.close();
-				if (!resolved) {
-					resolved = true;
-					resolve();
-				}
+			timeout = setTimeout(() => {
+				if (!resolved) finish(new Error('Timed out waiting for evidence processing.'));
 			}, 300000);
 		});
 	}

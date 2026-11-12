@@ -27,7 +27,7 @@ function normalizeQuery(q: string): string {
   return q.toLowerCase().trim().replace(/\s+/g, ' ');
 }
 
-function qHash(q: string): string {
+export function qHash(q: string): string {
   return createHash('sha256')
     .update(normalizeQuery(q))
     .digest('hex')

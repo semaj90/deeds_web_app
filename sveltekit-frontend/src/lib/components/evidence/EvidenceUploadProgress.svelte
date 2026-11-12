@@ -8,10 +8,12 @@ import { onMount, onDestroy } from 'svelte';
 import { createActor, type ActorRefFrom } from 'xstate';
 import Icon from '$lib/components/ui/Icon.svelte';
 import { getEvidenceUploadDurationSamples, recordEvidenceUploadDuration } from './upload-progress-storage';
+import { admitEvidenceProgressEventV1, caseEvidenceProgressEventUrlV1 } from './evidence-progress-event-client-v1.js';
 import { evidenceUploadProgressMachine } from '$lib/machines/evidence-upload-progress-machine';
 
 interface Props {
 	jobId: string;
+	caseId?: string | null;
 	filename?: string;
 	fileSize?: number;
 	userId?: string;
@@ -21,7 +23,7 @@ interface Props {
 	showStages?: boolean;
 }
 
-let { jobId, filename = '', fileSize = 0, userId = 'anonymous', startedAt = Date.now(), onComplete, onError, showStages = true }: Props = $props();
+let { jobId, caseId = null, filename = '', fileSize = 0, userId = 'anonymous', startedAt = Date.now(), onComplete, onError, showStages = true }: Props = $props();
 
 // Progress state
 let progress = $state(0);
@@ -31,6 +33,7 @@ let error = $state<string | null>(null);
 let evidenceId = $state<string | null>(null);
 let isComplete = $state(false);
 let isFailed = $state(false);
+let isUnavailable = $state(false);
 let isConnected = $state(false);
 let elapsedMs = $state(0);
 let durationSamples = $state<number[]>([]);
@@ -38,6 +41,7 @@ let elapsedTimer: ReturnType<typeof setInterval> | undefined;
 
 // SSE connection
 let eventSource: EventSource | null = null;
+let lastEventSequence = 0n;
 let actor: ActorRefFrom<typeof evidenceUploadProgressMachine> | undefined;
 let actorSubscription: { unsubscribe: () => void } | undefined;
 
@@ -56,6 +60,7 @@ const STAGES = [
 	{ id: 'entity-extraction', label: 'Extracting Entities', icon: 'scale', color: '#7b2735' },
 	{ id: 'summarizing', label: 'Preparing Summary', icon: 'scroll', color: '#9a7037' },
 	{ id: 'complete', label: 'PostgreSQL Indexed', icon: 'badge-check', color: '#3c6b57' },
+	{ id: 'status-unavailable', label: 'Status unavailable', icon: 'clock-3', color: '#9a7037' },
 	{ id: 'error', label: 'Processing Issue', icon: 'circle-x', color: '#9a3540' }
 ] as const;
 
@@ -89,7 +94,15 @@ function connectSSE() {
 		eventSource.close();
 	}
 
-	const url = `/api/evidence/realtime?jobId=${encodeURIComponent(jobId)}`;
+	let url: string;
+	try {
+		url = caseId
+			? caseEvidenceProgressEventUrlV1(caseId, jobId, lastEventSequence)
+			: `/api/evidence/realtime?jobId=${encodeURIComponent(jobId)}`;
+	} catch {
+		actor?.send({ type: 'FAILED', message: 'The case or processing job identity is invalid.' });
+		return;
+	}
 	eventSource = new EventSource(url);
 
 	eventSource.onopen = () => {
@@ -111,6 +124,58 @@ function connectSSE() {
 			message: data.message ?? '',
 			evidenceId: data.evidenceId ?? null,
 		});
+	});
+
+	eventSource.addEventListener('analysis-progress', (e) => {
+		const result = admitEvidenceProgressEventV1({
+			lastEventId: (e as MessageEvent<string>).lastEventId,
+			data: (e as MessageEvent<string>).data,
+			jobId,
+			caseId: caseId ?? '',
+			lastSequence: lastEventSequence,
+		});
+		if (!result.accepted) return;
+		lastEventSequence = result.sequence;
+		const data = result.envelope;
+		const status = data.status;
+		const terminalStep = status === 'completed' ? 'complete' : status === 'failed' ? 'error' : null;
+		actor?.send({
+			type: 'PROGRESS',
+			progress: data.progress,
+			step: terminalStep ?? (status === 'queued' ? 'queued' : 'extracting'),
+			message: status === 'queued' ? 'Queued for durable processing.' : 'Processing evidence.',
+			evidenceId: data.evidenceId ?? null,
+		});
+		if (status === 'completed') {
+			actor?.send({ type: 'COMPLETE', message: 'Evidence processing completed.', evidenceId: data.evidenceId ?? null });
+			if (data.evidenceId) onComplete?.(data.evidenceId);
+			eventSource?.close();
+			eventSource = null;
+		} else if (status === 'failed') {
+			const errorMsg = 'Evidence processing failed.';
+			actor?.send({ type: 'FAILED', message: errorMsg });
+			onError?.(errorMsg);
+			eventSource?.close();
+			eventSource = null;
+		}
+	});
+
+	eventSource.addEventListener('stream-error', () => {
+		// The EventSource instance remains open; native reconnection resends Last-Event-ID.
+		actor?.send({ type: 'CONNECTION_LOST' });
+	});
+
+	eventSource.addEventListener('stream-ended', (e) => {
+		let code = 'STREAM_ENDED';
+		try { code = JSON.parse((e as MessageEvent<string>).data).code ?? code; } catch { /* use stable default */ }
+		const endedMessage = code === 'AUTHORIZATION_REVOKED'
+			? 'Case access changed. Reopen the case to continue tracking this upload.'
+			: code === 'EVENT_HISTORY_GAP'
+				? 'Some progress history has expired. Refresh the evidence status to continue.'
+			: 'The progress stream ended. Reopen the case to reconnect.';
+		actor?.send({ type: 'STREAM_ENDED', message: endedMessage });
+		eventSource?.close();
+		eventSource = null;
 	});
 
 	eventSource.addEventListener('complete', (e) => {
@@ -154,6 +219,7 @@ function connectSSE() {
 	});
 
 	eventSource.onerror = () => {
+		// Keep this EventSource alive so browser-managed reconnect preserves its cursor.
 		actor?.send({ type: 'CONNECTION_LOST' });
 	};
 }
@@ -177,6 +243,7 @@ onMount(() => {
 		error = snapshot.context.error;
 		isComplete = snapshot.matches('complete');
 		isFailed = snapshot.matches('failed');
+		isUnavailable = snapshot.matches('unavailable');
 	});
 	actor.start();
 	void getEvidenceUploadDurationSamples(userId, fileSize).then((samples) => { durationSamples = samples; }).catch(() => {});
@@ -209,7 +276,7 @@ onDestroy(() => {
 				<span class="connection-label">Live status</span>
 			{:else}
 				<span class="status-dot disconnected"></span>
-				<span class="connection-label">Reconnecting…</span>
+				<span class="connection-label">{isUnavailable ? 'Status unavailable' : 'Reconnecting…'}</span>
 			{/if}
 		</div>
 	</div>
@@ -243,7 +310,7 @@ onDestroy(() => {
 	</div>
 
 	<!-- Stage Timeline (if enabled) -->
-	{#if showStages && !isFailed}
+	{#if showStages && !isFailed && !isUnavailable}
 		<div class="stage-timeline">
 			{#each STAGES.filter((s) => s.id !== 'error') as stage, index (stage.id)}
 				{@const isCurrentStage = stage.id === step}

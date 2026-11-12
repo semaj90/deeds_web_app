@@ -1,0 +1,52 @@
+{
+ "schema": "atlas.precision-tiers.v1",
+ "queries": 1000,
+ "corpus_rows": 274428,
+ "frozen_query_order": "md5('canary'+id) ascending, self excluded",
+ "oracle": "fp32 exact cosine over loaded canonical content_embedding_768 rows; hit if sim >= 10th-best sim - eps",
+ "tie_eps": 1e-06,
+ "tie_queries_rank10_vs_11": 120,
+ "row_limit": null,
+ "comparable_to_canary_receipts": true,
+ "asymmetric": "query fp32, database quantized",
+ "emulated_formats": [
+  "int8_per_vector",
+  "int4_per_vector",
+  "nvfp4_emulated",
+  "sign128_lod0"
+ ],
+ "native_hardware_formats": [
+  "fp32",
+  "fp16",
+  "bf16"
+ ],
+ "notes": [
+  "nvfp4_emulated = E2M1 values + FP8(E4M3) per-16 block scale + fp32 per-vector scale; RTX 3060 Ti has no FP4 tensor cores, so storage and dequantize only",
+  "sign128_lod0 = 16-byte sign bitset of the first 128 dims, intended as a quick-hit tier followed by rescore"
+ ],
+ "load_seconds": 156.6,
+ "total_seconds": 183.0,
+ "results": [
+  {
+   "variant": "sign128_lod0",
+   "bytes_per_vector": 16,
+   "compression_vs_fp32": 192.0,
+   "recall_top10_tie_aware": 0.4401,
+   "recall_top10_after_fp32_rescore_of_top1000": 0.9362,
+   "mean_cosine_original_vs_dequantized": 0.351453,
+   "min_cosine_original_vs_dequantized": 0.266781,
+   "seconds": 8.8
+  },
+  {
+   "variant": "int4_per_vector",
+   "bytes_per_vector": 388,
+   "compression_vs_fp32": 7.92,
+   "recall_top10_tie_aware": 0.8309,
+   "recall_top10_after_fp32_rescore_of_top1000": 1.0,
+   "mean_cosine_original_vs_dequantized": 0.984581,
+   "min_cosine_original_vs_dequantized": 0.957084,
+   "seconds": 11.9
+  }
+ ],
+ "writesPerformed": false
+}

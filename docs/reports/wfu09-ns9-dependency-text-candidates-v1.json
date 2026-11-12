@@ -1,0 +1,119 @@
+{
+  "schema": "atlas.wfu09-ns9-dependency-text-candidates.v1",
+  "generatedAt": "2026-11-09T18:48:29.649Z",
+  "workspaceRevision": "ef1e28f984d8dbcf5bd07bb3c2629c537135fc73",
+  "authority": "HUMAN_REVIEW_TEXT_CANDIDATES_ONLY",
+  "canonicalAuthority": false,
+  "declarationsWritten": false,
+  "taskIdsCreatedOrReplaced": 0,
+  "writes": {
+    "database": 0,
+    "cache": 0,
+    "taskSource": 0,
+    "localReport": true
+  },
+  "inputs": {
+    "identityInventory": {
+      "path": "docs/reports/wfu09-ns9-identity-lane-metadata-review-v1.json",
+      "sha256": "d0064398c0e3dc4cc65da1d3f69c6e5dafc96fdf68d23008575f7996945e4da0"
+    },
+    "executionController": {
+      "path": ".tmp/atlas/wfu09-controller-refresh2/openspec-execution-controller-v1.json",
+      "sha256": "1a075973a8acc65cda85bc42a14f77d029170f8d606f8e4f010ba2ca6bc9e882"
+    },
+    "generator": {
+      "path": "scripts/atlas/audit-wfu09-ns9-dependency-text-candidates-v1.mjs",
+      "sha256": "5c9bf6ec0057b1e57529f4351c8408b766618eb057398fe3ee7fdc6abfe128fc"
+    }
+  },
+  "counts": {
+    "sourceTasksChecked": 546,
+    "sourceTasksWithDependencyCues": 3,
+    "textReferenceCandidates": 3,
+    "uniquelyResolvable": 3,
+    "ambiguous": 0,
+    "unresolved": 0,
+    "failures": 2
+  },
+  "rule": "A cue plus an ID mention is only a review candidate. It is not a declared dependency and cannot affect scheduling, ranking, readiness, or task execution until a human approves and the owning task ledger receives a source-backed wfu declaration.",
+  "failures": [
+    {
+      "taskKey": "parent-atlas-workboard-feature-utility-fabric:217",
+      "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md",
+      "reason": "SOURCE_FILE_REVISION_DRIFT"
+    },
+    {
+      "taskKey": "parent-atlas-workboard-feature-utility-fabric:218",
+      "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md",
+      "reason": "SOURCE_FILE_REVISION_DRIFT"
+    }
+  ],
+  "tasks": [
+    {
+      "taskKey": "parent-atlas-versioned-doc-intelligence:1552",
+      "logicalTaskKey": "parent-atlas-versioned-doc-intelligence:DOC-BATCH-13",
+      "candidates": [
+        {
+          "referencedId": "DOC-BATCH-10",
+          "cue": "after",
+          "resolution": "UNIQUE_CANDIDATE",
+          "candidateTaskKeys": [
+            "parent-atlas-versioned-doc-intelligence:1549"
+          ],
+          "sourceQuote": "C-BATCH-13` — close the packet-to-execution integration after DOC-BATCH-10..12: feed only independently read-back, admitted packet",
+          "sourceRef": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md",
+          "sourceLine": 1552,
+          "sourceBlockHash": "sha256:8002ac5e0e09e5929d1394d50158b1449955dd66103c20e54da7ffe7bbf66dce",
+          "sourceFileSha256": "d62432aea0583c66075363ffe4cab04b1ef733349e18e76c3f5c403c3d7cb5af",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:14698",
+      "logicalTaskKey": "parent-atlas-ace-rlm-bitfrost-integration:SYSTEM-PROMPT-01",
+      "candidates": [
+        {
+          "referencedId": "CTX-E2E-01",
+          "cue": "after",
+          "resolution": "UNIQUE_CANDIDATE",
+          "candidateTaskKeys": [
+            "parent-atlas-ace-rlm-bitfrost-integration:14658"
+          ],
+          "sourceQuote": "e Agent\" identity in `.opencode/system.md` with Ornith (after CTX-E2E-01, so the baseline is not disturbed mid-measurement).",
+          "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+          "sourceLine": 14698,
+          "sourceBlockHash": "sha256:07568fa7ea3b1b3b575977b36e4046bac5ea5b7a087e2762129383c41e5f2da9",
+          "sourceFileSha256": "65d345ca9bcfcb7348c10f11337dec4b88a77b331b9b62304eda1f08c5ccac20",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "taskKey": "parent-atlas-ontology-kernel:5529",
+      "logicalTaskKey": "parent-atlas-ontology-kernel:NEXT-23",
+      "candidates": [
+        {
+          "referencedId": "NEXT-22",
+          "cue": "after",
+          "resolution": "UNIQUE_CANDIDATE",
+          "candidateTaskKeys": [
+            "parent-atlas-ontology-kernel:5527"
+          ],
+          "sourceQuote": "- [ ] NEXT-23 READY after NEXT-22 - Build domain-class LUT postings/bitsets strictly as v",
+          "sourceRef": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+          "sourceLine": 5529,
+          "sourceBlockHash": "sha256:79e4104b0dd698c8c840abd1fa084fc6030e6b2d14c63330df54df7077e3c050",
+          "sourceFileSha256": "97959e2ccbdd87407e9bebee4a19804809a31662a2d318d1e8f87c0f9f4337cd",
+          "decision": null,
+          "reviewerNotes": null,
+          "executable": false
+        }
+      ]
+    }
+  ]
+}

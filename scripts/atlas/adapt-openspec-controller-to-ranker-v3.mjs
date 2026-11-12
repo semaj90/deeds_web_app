@@ -2,7 +2,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { classifyLaneV2 } from './lib/lane-taxonomy-v2.mjs';
+import { blockHash, taskBlock } from './lib/wfu-metadata.mjs';
 
 const reportsDir = path.resolve(process.argv[2] ?? 'docs/reports');
 const outputPath = path.resolve(process.argv[3] ?? path.join(reportsDir, 'actionable-workboard-v3.json'));
@@ -61,8 +63,13 @@ function buildFeatureVector(raw, ctx) {
       goalRank: observedGoalRank(raw),
       selectionEligible: ctx.hasAuthorityReview ? present(ctx.selectionEligible ? 1 : 0, 'DERIVED', { from: 'authority-text-review' }) : ABSENT,
       sourceAgeSeconds: sourceAgeSeconds(raw, ctx.generatedAt),
+      taskBlockAgeSeconds: ctx.taskBlockAgeSeconds == null
+        ? ABSENT
+        : present(ctx.taskBlockAgeSeconds, 'DERIVED', { from: 'revision-bound-git-blame-task-block' }),
       mutationRisk: mutation,
-      prerequisiteCount: observedCount(raw.dependsOnTaskIds ?? raw.depends_on_task_ids ?? raw.dependsOn),
+      // Only task-ledger dependency fields carry an observed per-task declaration. The controller's
+      // program-level `dependsOn` can be an empty projection array and must not turn unknown into zero.
+      prerequisiteCount: observedCount(raw.dependsOnTaskIds ?? raw.depends_on_task_ids),
       evidenceReceiptCount: observedCount(raw.requiresReceipts ?? raw.requires_receipts),
       affectedFileCount: (Array.isArray(raw.readSet) || Array.isArray(raw.writeSet)) ? present(arr(raw.readSet).length + arr(raw.writeSet).length, 'OBSERVED') : ABSENT,
       // remainingRequiredGates / unblocksGateCount are computed by the ledger from declared depends= edges (DERIVED);
@@ -81,14 +88,20 @@ function featureCoverage(tasks) {
   const out = {};
   for (const t of tasks) {
     for (const [name, f] of Object.entries(t.featureVector?.features ?? {})) {
-      const c = out[name] ??= { present: 0, absent: 0, basis: {}, distinctValues: new Set() };
-      if (f.present) { c.present++; c.basis[f.basis] = (c.basis[f.basis] ?? 0) + 1; c.distinctValues.add(f.value); }
+      const c = out[name] ??= { present: 0, absent: 0, basis: {}, distinctValues: new Set(), qualifiedDistinctValues: new Set() };
+      if (f.present) {
+        c.present++;
+        c.basis[f.basis] = (c.basis[f.basis] ?? 0) + 1;
+        c.distinctValues.add(f.value);
+        if (f.basis === 'OBSERVED' || f.basis === 'DERIVED') c.qualifiedDistinctValues.add(f.value);
+      }
       else c.absent++;
     }
   }
   return Object.fromEntries(Object.entries(out).map(([name, c]) => [name, {
     present: c.present, absent: c.absent, basis: c.basis, distinctValues: c.distinctValues.size,
-    qualifiedVarying: c.distinctValues.size > 1 && Object.keys(c.basis).some((b) => b === 'OBSERVED' || b === 'DERIVED')
+    qualifiedDistinctValues: c.qualifiedDistinctValues.size,
+    qualifiedVarying: c.qualifiedDistinctValues.size > 1
   }]));
 }
 
@@ -113,8 +126,51 @@ try {
 
 let source='openspec-execution-controller-v1.json';
 let input;
-try{input=JSON.parse(fs.readFileSync(controllerPath,'utf8'))}catch{source='openspec-actionable-work-v1.json';input=JSON.parse(fs.readFileSync(fallbackPath,'utf8'))}
+let controllerInputPath=controllerPath;
+try{input=JSON.parse(fs.readFileSync(controllerPath,'utf8'))}catch{source='openspec-actionable-work-v1.json';controllerInputPath=fallbackPath;input=JSON.parse(fs.readFileSync(fallbackPath,'utf8'))}
 const raw=Array.isArray(input?.allTasks)?input.allTasks:collect(input);
+const taskHistoryByKey = new Map();
+const taskHistoryPath = process.env.ATLAS_WFU_TASK_HISTORY_RECEIPT;
+if (taskHistoryPath) {
+  const receipt = JSON.parse(fs.readFileSync(path.resolve(taskHistoryPath), 'utf8'));
+  const inputSha256 = crypto.createHash('sha256').update(fs.readFileSync(controllerInputPath)).digest('hex');
+  const workspaceRevision = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+  const expectedGeneratorPath = path.resolve('scripts/atlas/audit-task-block-history-feature-v1.mjs');
+  const expectedGeneratorSha256 = crypto.createHash('sha256').update(fs.readFileSync(expectedGeneratorPath)).digest('hex');
+  if (receipt.schema !== 'atlas.wfu09-task-block-history-feature-audit.v1'
+      || receipt.canonicalAuthority !== false
+      || receipt.workspaceRevision !== workspaceRevision
+      || receipt.inputs?.controller?.sha256 !== inputSha256
+      || receipt.inputs?.generator?.sha256 !== expectedGeneratorSha256
+      || !Array.isArray(receipt.observations)) {
+    throw new Error('Task history receipt failed schema, workspace, controller, or generator revision binding.');
+  }
+  const rawByKey = new Map(raw.filter((row) => row?.taskKey).map((row) => [row.taskKey, row]));
+  const sourceCache = new Map();
+  for (const observation of receipt.observations) {
+    const row = rawByKey.get(observation.taskKey);
+    const sourceRef = String(observation.sourceRef ?? '').replaceAll('\\', '/');
+    const absoluteSource = path.resolve(sourceRef);
+    const relativeSource = path.relative(process.cwd(), absoluteSource);
+    if (!row || row.source?.replaceAll('\\', '/') !== sourceRef || row.blockHash !== observation.blockHash
+        || Number(row.line) !== Number(observation.line) || relativeSource.startsWith('..') || path.isAbsolute(relativeSource)
+        || taskHistoryByKey.has(observation.taskKey)
+        || !Number.isInteger(observation.taskBlockAgeSeconds) || observation.taskBlockAgeSeconds < 0) {
+      throw new Error(`Task history observation binding invalid for ${observation.taskKey}.`);
+    }
+    if (!sourceCache.has(sourceRef)) {
+      const text = fs.readFileSync(absoluteSource, 'utf8');
+      sourceCache.set(sourceRef, { text, sha256: crypto.createHash('sha256').update(text).digest('hex') });
+    }
+    const source = sourceCache.get(sourceRef);
+    const lines = source.text.split(/\r?\n/);
+    const observedBlockHash = blockHash(taskBlock(lines, Number(observation.line) - 1));
+    if (source.sha256 !== observation.sourceFileSha256 || observedBlockHash !== observation.blockHash) {
+      throw new Error(`Task history source digest or block hash drifted for ${observation.taskKey}.`);
+    }
+    taskHistoryByKey.set(observation.taskKey, observation.taskBlockAgeSeconds);
+  }
+}
 const tasks=[];const seen=new Set();
 for(const r of raw){
   const executionState=str(r.controller?.state)
@@ -157,7 +213,7 @@ for(const r of raw){
     readOnly,readSet:uniq(r.readSet),writeSet,
     reviewState: reviewStale ? 'REVIEW_STALE' : (advisoryReview ? 'REVIEWED_CURRENT' : 'NO_REVIEW_ROW'),
     taskIdentity: r.taskIdentity ?? null,
-    featureVector:buildFeatureVector(r,{readOnly,selectionEligible,hasAuthorityReview:authorityReviewLoaded&&Boolean(advisoryReview),generatedAt:input?.generatedAt}),
+    featureVector:buildFeatureVector(r,{readOnly,selectionEligible,hasAuthorityReview:authorityReviewLoaded&&Boolean(advisoryReview),generatedAt:input?.generatedAt,taskBlockAgeSeconds:taskHistoryByKey.get(id)}),
     resources:{cpu:num(r.resources?.cpu)??1,gpu:num(r.resources?.gpu)??0,llamaSlots:num(r.resources?.llamaSlots)??(/\b(llama|ornith|synthesis|prompt)\b/i.test(title)?1:0),dbWriters:num(r.resources?.dbWriters)??(readOnly?0:1)},
     warmHints:{bucketKeys:uniq([lanes.primary,changeId,...arr(r.warmHints?.bucketKeys)]),evidenceRefs:uniq(r.evidenceRefs??r.warmHints?.evidenceRefs),promptPrefixKey:str(r.warmHints?.promptPrefixKey)??`PARENT_ATLAS:${lanes.primary}:${changeId}`}
   });

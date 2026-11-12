@@ -7,8 +7,8 @@ const CASE_PRIORITY_VALUES = ['low', 'medium', 'high', 'critical', 'urgent'] as 
 // Case creation from /cases list page
 // (distinct from /cases/new/schema.ts which is the intake wizard)
 export const caseListCreateSchema = z.object({
-	title: z.string().min(1, 'Title is required').max(255),
-	description: z.string().min(1, 'Description is required').max(10000),
+	title: z.string().trim().min(1, 'Title is required').max(255),
+	description: z.string().trim().min(1, 'Description is required').max(10000),
 	priority: z.enum(CASE_PRIORITY_VALUES).default('medium'),
 	caseNumber: z.string().max(50).optional(),
 	practiceArea: z.string().max(100).optional(),

@@ -1,0 +1,209 @@
+{
+  "schema": "atlas.topology-search-owner-audit.v1",
+  "generatedAt": "2026-11-10T03:32:59.0651185Z",
+  "status": "PARTIAL_READ_ONLY",
+  "workspaceRevision": "161379bdd1de40ed81a65f60799ace839f6ef6b1",
+  "canonicalAuthority": false,
+  "canonicalStoreWritesPerformed": false,
+  "serviceLifecycleActionsPerformed": false,
+  "decision": "Do not start :8101 or change TRACE health classification from this audit.",
+  "topology": {
+    "configuredEndpoint": "TOPOLOGY_SEARCH_URL",
+    "defaultEndpoint": "http://127.0.0.1:8101",
+    "trackedHttpServer": "sveltekit-frontend/scripts/topology-search-server.mjs",
+    "serverUses": [
+      "PostgreSQL tensor_analysis_cache for manifold4 coordinates",
+      "Qdrant codebase_chunks_768 for cosine/hybrid retrieval"
+    ],
+    "serverDoesNotQuery": "atlas_topology_index",
+    "listener": "NO_LISTENER_8101",
+    "liveTraceHealth": {
+      "checkedAt": "2026-11-10T03:29:30.208Z",
+      "ok": false,
+      "degraded": true,
+      "topologySearch": "DOWN",
+      "rerank": "DOWN",
+      "responseIncludesOptionalDown": false
+    },
+    "sourceHealthClassification": "OPTIONAL_HEALTH_SERVICES contains rerank and topology_search",
+    "liveProcess": {
+      "port": 8788,
+      "pid": 61492,
+      "started": "2026-11-09T13:51:35.072364-08:00",
+      "sourceLastWrite": "2026-11-09T15:43:15.6253925-08:00"
+    },
+    "serverSafetyNote": "Tracked server source contains a default database connection URL with embedded credential material; do not launch until config is reviewed.",
+    "databaseProjection": {
+      "baseSchema": "drizzle/manual/0029_parent_atlas_complete_schema.sql",
+      "declaredColumns": [
+        "packet_key",
+        "x_cosine",
+        "y_graph",
+        "z_som",
+        "w_authority",
+        "som_row",
+        "som_col",
+        "som_cluster",
+        "community_id",
+        "feature_id",
+        "source_ref",
+        "updated_at"
+      ],
+      "revisionBindingColumnsInBaseDefinition": [],
+      "liveCatalogInspection": "ATTEMPTED_BUT_AUTHENTICATION_BLOCKED",
+      "rowCount": "UNKNOWN",
+      "liveColumns": "UNKNOWN",
+      "liveIndexes": "UNKNOWN",
+      "executionHistory": "UNKNOWN",
+      "connectionAttempts": [
+        {
+          "port": 5434,
+          "database": "legal_ai_live_integration_scratch",
+          "readiness": "accepting connections",
+          "result": "fe_sendauth: no password supplied",
+          "credentialsSearched": false
+        },
+        {
+          "port": 5432,
+          "database": "legal_ai_db",
+          "readiness": "accepting connections",
+          "result": "fe_sendauth: no password supplied",
+          "credentialsSearched": false
+        }
+      ],
+      "requiredReadOnlyQuery": "scripts/atlas/audit-topology-search-db-readonly-v1.sql",
+      "evidenceRequired": [
+        "Verified database name, PostgreSQL 18.x version, loopback address and port 5432, authenticated role, transaction_read_only=on.",
+        "Relation existence/kind/owner and estimated storage.",
+        "Exact atlas_topology_index row count; columns, data types, nullability, defaults, constraints and indexes.",
+        "Revision/provenance column names and per-column populated/null row counts.",
+        "Separate migration execution history; schema presence alone is not execution provenance."
+      ]
+    },
+    "ownershipConclusion": "A tracked standalone HTTP service and source-level MCP/SvelteKit callers exist; live request traffic was not measured. The pasted zero-caller/unbuilt-service Case B is unsupported. atlas_topology_index is not the queried backing table for this service. Runtime capability is unavailable while :8101 has no listener.",
+    "callers": [
+      "sveltekit-frontend/src/mcp/server.ts: topology_search registration and dispatch",
+      "sveltekit-frontend/src/mcp/tools/topology-search.tool.ts",
+      "sveltekit-frontend/src/mcp/tools/trace-kag.tool.ts",
+      "sveltekit-frontend/src/lib/server/features/ai/ai/gemma4-agent.ts",
+      "sveltekit-frontend/src/routes/api/health/inference/+server.ts",
+      "sveltekit-frontend/src/routes/(app)/admin/unified-indexing-studio/+page.server.ts",
+      "sveltekit-frontend/src/mcp/trace-mcp-server.ts health probe"
+    ],
+    "sourceLevelCallersFound": true,
+    "liveCallerTrafficObserved": false
+  },
+  "ns9": {
+    "inputReceipt": ".tmp/atlas/ns9-identity-owner-review-queue-current.json",
+    "inputReceiptSha256": "8b8e748f6a67d2ba6f15219eff958e9fb25aa4a5f7d29e174923d225092dd9b7",
+    "inputQueuePath": ".tmp/atlas/ns9-identity-owner-review-queue-current.csv",
+    "inputQueueSha256": "c46a417d6b42ed956195e9bd081e76922bf274167189c307848fc218a2247e3d",
+    "inputRows": 554,
+    "topFiveFileSubset": {
+      "files": [
+        "openspec/changes/parent-atlas-ast-summary-lineage-pipeline/tasks.md",
+        "openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/tasks.md",
+        "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md",
+        "openspec/changes/parent-atlas-pass-fabric/tasks.md",
+        "openspec/changes/parent-atlas-gate2-chunk-lineage-convergence/tasks.md"
+      ],
+      "rows": 90,
+      "uniqueTaskKeys": 90,
+      "rowsWithLogicalTaskKey": 88,
+      "rowsWithoutLogicalTaskKey": 2,
+      "coveragePct": 97.78,
+      "currentFileHashesMatchQueue": true,
+      "reviewerDecisionFieldsBlank": true,
+      "reviewerNotesBlank": true,
+      "reviewCsv": ".tmp/atlas/ns9-top-five-logical-key-review-queue-v1.csv",
+      "reviewCsvSha256": "26816e99295b4a7d4b9d3c45b6cc3c8cbdca6f1fcc636f385d8879b756a388b1"
+    },
+    "classification": "Review queue only; no wfu annotations, task IDs, dependencies, or decisions added.",
+    "inputReceiptPath": ".tmp/atlas/ns9-identity-owner-review-queue-current.json"
+  },
+  "scorer": {
+    "requestedImplementation": "scripts/atlas/score-task-evidence-completion-v1.mjs",
+    "present": false,
+    "existingAudit": "scripts/atlas/audit-openspec-task-evidence-scores-v1.mjs",
+    "assessment": "No new scorer implemented; existing five-factor totals remain unscorable absent criterion evidence mappings."
+  },
+  "sourceSha256": [
+    {
+      "path": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+      "sha256": "9e9819edc75f9344feff7a7ae40b0446a52d3734c74aa83f9e8aeb9362ff3429"
+    },
+    {
+      "path": "sveltekit-frontend/src/mcp/server.ts",
+      "sha256": "fd16b5ad2fd1a0b5def0798f8418a5fe76078420557e14f463db67f40da90ef7"
+    },
+    {
+      "path": "sveltekit-frontend/src/mcp/tools/topology-search.tool.ts",
+      "sha256": "8b31b3a160a6b9f3320f95029aacb39686c4c9f4c3baa3c43e6f029d4bcb6fc0"
+    },
+    {
+      "path": "sveltekit-frontend/src/mcp/tools/trace-kag.tool.ts",
+      "sha256": "b02030c51785e2e2857e86f1aaf541ba8ec291a64d0e0a7483d0177c3e8b7b27"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/features/ai/ai/gemma4-agent.ts",
+      "sha256": "ad3455b9e74cbab46c5ff45411a3b2166fa62742e57805aced029aad531e7468"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/topology-search-client.ts",
+      "sha256": "7bb6cf7b49769ac05fbc54476afcf56e3ebe28bb6f4872989eeed23ec16049aa"
+    },
+    {
+      "path": "sveltekit-frontend/src/routes/api/health/inference/+server.ts",
+      "sha256": "cc82a5ce73f6570e0c43164a02a717be1071f6827f0eb674c8cfc77ce00ce787"
+    },
+    {
+      "path": "sveltekit-frontend/scripts/topology-search-server.mjs",
+      "sha256": "c570ba86cf977ca7fc765e7da3f885ebce302922c3243fce58e0f442f49de457"
+    },
+    {
+      "path": "sveltekit-frontend/scripts/ensure-search-engine.mjs",
+      "sha256": "2bc7ee95990264aa9db3940c23fc90d0bf78848621e1ec74333e4af5256f964a"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/db/schema-kag.ts",
+      "sha256": "5fbafbad6c08236ba11017fa0cf6525f645df1de0819fe212a82801b772a0728"
+    },
+    {
+      "path": "drizzle/manual/0029_parent_atlas_complete_schema.sql",
+      "sha256": "9ba5dabfe1117827b1ec51abb806d2164f4f5ac8ab3c932098aacd593affd64e"
+    }
+  ],
+  "openGates": [
+    "Configure an approved least-privilege read-only connection outside chat for legal_ai_db on loopback:5432; do not send credentials to the agent.",
+    "Run scripts/atlas/audit-topology-search-db-readonly-v1.sql and preserve the JSON/text output with connection identity.",
+    "Review the topology server default database URL configuration before any launch.",
+    "Reconcile stale TRACE listener with current health source through the human-controlled lifecycle process; no restart performed.",
+    "Keep service-level topology capability marked unavailable while the endpoint is down.",
+    "Human review the 90-row NS-9 file subset before adding any wfu metadata."
+  ],
+  "postgresInspectionMcp": {
+    "source": "sveltekit-frontend/src/mcp/db-inspection-tools.ts",
+    "registeredBy": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+    "tools": [
+      {
+        "name": "db.schema_overview",
+        "returns": "public table list, column/index counts, approximate pg_class row estimates",
+        "readOnlyTransaction": true
+      },
+      {
+        "name": "db.table_inspect",
+        "returns": "one table columns, indexes, foreign keys, no row data",
+        "readOnlyTransaction": true
+      }
+    ],
+    "policy": "No raw SQL input; catalog queries only; 2 second statement timeout; sensitive defaults scrubbed.",
+    "exposedInCurrentAgentSession": false,
+    "directInvocationAttempt": "TOOL_NOT_EXPOSED_IN_THIS_SESSION",
+    "coverageGaps": [
+      "No exact row count.",
+      "No per-column non-null revision/provenance coverage counts.",
+      "No execution-history or migration-provenance result."
+    ],
+    "assessment": "Repository already contains and registers the schema inspection MCP tools. The current connected MCP tool inventory does not expose them, so they could not be called from this session."
+  }
+}

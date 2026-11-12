@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.nextsteps-openspec-prefill-identity-crosswalk.v1",
+  "generatedAt": "2026-11-09T00:26:01.406Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "inputs": {
+    "openspec": {
+      "path": ".tmp/atlas/openspec-cohort-6527-members-v1.jsonl",
+      "rows": 6527,
+      "uniqueIdentities": 6527,
+      "duplicateIdentityCount": 0,
+      "sha256": "sha256:68ed2a803f3df7428e0decf1455f7bc847f44153c7c5512ee4e848c140d43fec"
+    },
+    "nextsteps": {
+      "path": ".tmp/atlas/next-steps-task-extract-v1/20261108T181650Z/tasks.jsonl",
+      "rows": 3105,
+      "uniqueIdentities": 3105,
+      "duplicateIdentityCount": 0,
+      "namespaceViolations": 0,
+      "sha256": "sha256:83d6d4770e5f3181b4b2e85d437655d6ab985a0dc5647a5afb21be9bdd576ca3"
+    }
+  },
+  "crosswalk": {
+    "exactIdentityMatches": 0,
+    "sharedHashSuffixes": 0,
+    "sampleExactMatches": [],
+    "sampleSharedHashSuffixes": [],
+    "aliasInferencePerformed": false
+  },
+  "status": "PASS_SEPARATE_IDENTITY_COHORTS",
+  "interpretation": "No task identity mapping is established between these cohorts. Do not seed or claim nextsteps tasks from the OpenSpec prefill cohort using fuzzy, line-number, hash-suffix, ordinal, or generated aliases."
+}

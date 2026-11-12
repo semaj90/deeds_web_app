@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { chatMetadata } from '$lib/server/db/schema.js';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
 
 const createSessionSchema = z.object({
 	userId: z.string().min(1),
@@ -15,7 +16,10 @@ const createSessionSchema = z.object({
 
 /** POST /api/v1/chat/sessions — Create a new chat session */
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	const actorId = Number(locals.user?.id);
+	if (!Number.isSafeInteger(actorId) || actorId <= 0) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
 	try {
 		const raw = await request.json();
 		const parsed = createSessionSchema.safeParse(raw);
@@ -27,20 +31,26 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		const { userId, caseId, reportId, title, sessionMetadata } = parsed.data;
+		if (Number(userId) !== actorId) {
+			return json({ error: 'User identity does not match the authenticated actor' }, { status: 403 });
+		}
+		if (caseId && !(await getAuthorizedCase(caseId, actorId))) {
+			return json({ error: 'Case not found' }, { status: 404 });
+		}
 		const chatId = `chat_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
 		await db.insert(chatMetadata).values({
-      chatId,
-      userId: Number(userId),
-      caseId: caseId ?? null,
-      title: title ?? `Chat - ${new Date().toLocaleDateString()}`,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+			chatId,
+			userId: actorId,
+			caseId: caseId ?? null,
+			title: title ?? `Chat - ${new Date().toLocaleDateString()}`,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		});
 
 		return json({
 			id: chatId,
-			userId,
+			userId: String(actorId),
 			caseId: caseId ?? null,
 			reportId: reportId ?? null,
 			title: title ?? `Chat - ${new Date().toLocaleDateString()}`,

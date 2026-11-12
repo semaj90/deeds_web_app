@@ -29,7 +29,10 @@ const SKIPPED_FILE = /\.(spec|test)\.[a-z]+$/;
 const GEMMA_CHAT_LITERAL = /gemma4-rotorquant|gemma4-legal|gemma4:e4b/;
 
 /** Real Gemma4 artifacts that legitimately keep the name (reason required). */
-const ALLOWED_GEMMA_ARTIFACT_FILES: Record<string, string> = {};
+const ALLOWED_GEMMA_ARTIFACT_FILES: Record<string, string> = {
+	'src/routes/(app)/demos/gemma4-mtp/+page.svelte':
+		'The demo inventories local GGUF and MTP artifact paths for display; it does not send these paths as chat model IDs.',
+};
 
 /** Frozen 2026-10-03. Shrink only: migrate each file to the resolver, then delete its line. */
 const KNOWN_LITERAL_FILES: readonly string[] = [];

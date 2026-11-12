@@ -627,7 +627,7 @@ Qdrant v2 mirror matches neither). No canonical vector promotion until that and 
   from a frozen `CandidateOrdinalMapV1` with matching checksums. Ordinals are never canonical identity.
 - [ ] **CACHE-FABRIC-02 — Centroid/SOM `ResidencyHintV1`.** Existing owner `bifrost/residency-scheduler.ts`. Routing only: centroid/SOM cell/cluster/
   temperature never become packet identity; SOM revision provenance is still unsupplied (`SOM_REVISION_PROVENANCE_01`).
-- [ ] **CACHE-FABRIC-03 — BitFrost semantic prefetch.** Depends on CACHE-FABRIC-02; measure against next-query reuse and a graph-neighbor/LRU baseline;
+- [ ] **CACHE-FABRIC-03 — BitFrost semantic prefetch.** Depends on CACHE-FABRIC-02; measure against next-query reuse and a graph-neighbor/LRU baseline; <!-- wfu: depends=CACHE-FABRIC-02 -->
   cache holds pointers/state, not source facts.
 - [ ] **CACHE-FABRIC-04 — Immutable ACE packet caching by checksum.** Route through `AceBitfrostCacheIdentityV1` (see DIM-04/ACEPKT-02 in
   `parent-atlas-retrieval-staging-planes`: the TRACE `ace:packet:*` store is not revision-qualified and is blocked on honest revision inputs).

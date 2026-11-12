@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-04T15:58:39.323Z",
-  "content_revision": "sha256:f456fe6b6fe4cfc3da6548e95a41e94565dbdde218b73321de8c10cd5ff0fc4b",
-  "content_checksum": "sha256:f456fe6b6fe4cfc3da6548e95a41e94565dbdde218b73321de8c10cd5ff0fc4b",
+  "generated_at": "2026-11-11T23:37:29.393Z",
+  "content_revision": "sha256:bbe8ff611aced731a900322ed384163d628a979ff53a23a0a92c21bf521fa788",
+  "content_checksum": "sha256:bbe8ff611aced731a900322ed384163d628a979ff53a23a0a92c21bf521fa788",
   "sources": [
     "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\mcp-tool-ontology.json",
     "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\mcp-tool-manifest-packets.json"
@@ -3381,32 +3381,6 @@
         "rank": 81
       },
       {
-        "tool_name": "ops.fixer_pattern_store",
-        "namespace": "ops",
-        "description": "[OPERATOR-GATED] Stores a fix attempt outcome to the 3-layer fixer memory. Increments success/failure counts, upserts to Qdrant fixer_memory_768 (GPU-indexed) when embedding provided.",
-        "layers": [
-          "dense",
-          "ops"
-        ],
-        "identity_fields": [],
-        "writes_to": [],
-        "permissions": "read_only",
-        "packet_kind": "trace_tool",
-        "sources": [
-          "trace-mcp"
-        ],
-        "source_ref": "ops.fixer_pattern_store",
-        "examples": [],
-        "transport": null,
-        "domain": "unknown",
-        "ontology": [],
-        "service": null,
-        "method": null,
-        "primary_layer": "dense",
-        "score": 142,
-        "rank": 86
-      },
-      {
         "tool_name": "ops.trust_audit",
         "namespace": "ops",
         "description": "Read-only audit of the trust-tier injection-detection system. Returns count of blocked content hashes and the most recently blocked entries. Use for diagnostics only — cannot clear the block list.",
@@ -3430,6 +3404,37 @@
         "method": null,
         "primary_layer": "dense",
         "score": 142,
+        "rank": 86
+      },
+      {
+        "tool_name": "ops.fixer_pattern_store",
+        "namespace": "ops",
+        "description": "[OPERATOR-GATED] Stores a fix attempt outcome to the 3-layer fixer memory. Increments success/failure counts, upserts to Qdrant fixer_memory_768 (GPU-indexed) when embedding provided.",
+        "layers": [
+          "dense",
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "postgres",
+          "redis",
+          "qdrant",
+          "engram"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.fixer_pattern_store",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 132,
         "rank": 87
       },
       {
@@ -6428,7 +6433,7 @@
         "identity_fields": [],
         "writes_to": [
           "postgres",
-          "kanban"
+          "engram"
         ],
         "permissions": "read_write",
         "packet_kind": "trace_tool",
@@ -6482,7 +6487,8 @@
         ],
         "identity_fields": [],
         "writes_to": [
-          "postgres"
+          "process",
+          "engram"
         ],
         "permissions": "read_write",
         "packet_kind": "trace_tool",
@@ -10298,7 +10304,7 @@
     "memory": "Layer memory contains 2 tools. 0 expose identity fields and 1 write surfaces. Top-ranked tools: memory:prior_answer_lookup, engram.chat_memory_recent.",
     "cache": "Layer cache contains 28 tools. 0 expose identity fields and 14 write surfaces. Top-ranked tools: wiki.search, ace.compact_search, karpathy.attention_rank_files, wiki.status, ops.fixer_semantic_recall.",
     "lexical": "Layer lexical contains 53 tools. 0 expose identity fields and 48 write surfaces. Top-ranked tools: codebase:search, search.go_hybrid, kag.recall_similar_fix, kb.search_cards, chunk.lookup.",
-    "dense": "Layer dense contains 33 tools. 2 expose identity fields and 21 write surfaces. Top-ranked tools: atlas.packet_search, image.enrich_tags, wiki.explain_page, ldr_research, atlas.coverage.",
+    "dense": "Layer dense contains 33 tools. 2 expose identity fields and 22 write surfaces. Top-ranked tools: atlas.packet_search, image.enrich_tags, wiki.explain_page, ldr_research, atlas.coverage.",
     "graph": "Layer graph contains 40 tools. 3 expose identity fields and 18 write surfaces. Top-ranked tools: clusters.som_cell_lookup, wiki.refresh_directory, kag.feature_lookup, trace.graphrag_search, codebase:graph_traverse.",
     "rerank": "Layer rerank contains 6 tools. 0 expose identity fields and 4 write surfaces. Top-ranked tools: search.rerank, turbovec.rank_chunks, GpuBridgeService.AssignSom, GpuBridgeService.BatchCosine, GpuBridgeService.EncodeLatent.",
     "synthesis": "Layer synthesis contains 31 tools. 1 expose identity fields and 15 write surfaces. Top-ranked tools: atlas.populate_feature_documents, legal.build_timeline, legal.cross_examine, legal.issue_spotter, legal.mock_trial.",
@@ -10306,7 +10312,7 @@
     "read": "Layer read contains 5 tools. 0 expose identity fields and 2 write surfaces. Top-ranked tools: atlas.get_chunk, file.read_window, kb.wiki_note_lookup, db.schema_overview, db.table_inspect.",
     "unknown": "Layer unknown contains 122 tools. 3 expose identity fields and 70 write surfaces. Top-ranked tools: trace.kag_search, clusters.get_members, topology.search_near, search.dev_context, topology.search_4d."
   },
-  "overall_summary": "The Parent Atlas MCP tool registry contains 40 tools organized by category, primarily focused on codebase search, retrieval, and knowledge management. Most tools write to Postgres, with several reading from Redis, Qdrant, Neo4j, and other services. Search tools use hybrid approaches combining lexical ripgrep, dense vector embeddings in Qdrant, and graph metadata from Neo4j. Memory and caching tools leverage a three-tier system spanning Redis, Postgres, and Qdrant. Identity and audit tools validate data parity across services, while graph tools navigate SOM clusters and knowledge graphs. Additional tools handle legal research, GPU attention, image enrichment, and operational diagnostics, with several tools reading from multiple backing services to provide comprehensive context retrieval.",
+  "overall_summary": "Parent Atlas tool registry spans 337 tools across 11 active layers. TRACE MCP covers the live surface; manifest packets cover the broader MCP / gRPC registry.",
   "tools": [
     {
       "tool_name": "wiki.search",
@@ -13116,32 +13122,6 @@
       "rank": 85
     },
     {
-      "tool_name": "ops.fixer_pattern_store",
-      "namespace": "ops",
-      "description": "[OPERATOR-GATED] Stores a fix attempt outcome to the 3-layer fixer memory. Increments success/failure counts, upserts to Qdrant fixer_memory_768 (GPU-indexed) when embedding provided.",
-      "layers": [
-        "dense",
-        "ops"
-      ],
-      "identity_fields": [],
-      "writes_to": [],
-      "permissions": "read_only",
-      "packet_kind": "trace_tool",
-      "sources": [
-        "trace-mcp"
-      ],
-      "source_ref": "ops.fixer_pattern_store",
-      "examples": [],
-      "transport": null,
-      "domain": "unknown",
-      "ontology": [],
-      "service": null,
-      "method": null,
-      "primary_layer": "dense",
-      "score": 142,
-      "rank": 86
-    },
-    {
       "tool_name": "ops.trust_audit",
       "namespace": "ops",
       "description": "Read-only audit of the trust-tier injection-detection system. Returns count of blocked content hashes and the most recently blocked entries. Use for diagnostics only — cannot clear the block list.",
@@ -13165,6 +13145,37 @@
       "method": null,
       "primary_layer": "dense",
       "score": 142,
+      "rank": 86
+    },
+    {
+      "tool_name": "ops.fixer_pattern_store",
+      "namespace": "ops",
+      "description": "[OPERATOR-GATED] Stores a fix attempt outcome to the 3-layer fixer memory. Increments success/failure counts, upserts to Qdrant fixer_memory_768 (GPU-indexed) when embedding provided.",
+      "layers": [
+        "dense",
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres",
+        "redis",
+        "qdrant",
+        "engram"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.fixer_pattern_store",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 132,
       "rank": 87
     },
     {
@@ -17249,7 +17260,7 @@
       "identity_fields": [],
       "writes_to": [
         "postgres",
-        "kanban"
+        "engram"
       ],
       "permissions": "read_write",
       "packet_kind": "trace_tool",
@@ -17303,7 +17314,8 @@
       ],
       "identity_fields": [],
       "writes_to": [
-        "postgres"
+        "process",
+        "engram"
       ],
       "permissions": "read_write",
       "packet_kind": "trace_tool",

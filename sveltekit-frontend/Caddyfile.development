@@ -1,11 +1,8 @@
-# Development Caddy Configuration with QUIC/HTTP3
-# Caddy v2.8.4 - Legal AI Platform Development Setup
+# Development Caddy Configuration
+# These wildcard :port listeners are cleartext HTTP; they do not provide HTTP/3/QUIC.
 
 # Development SvelteKit server with relaxed QUIC settings
 :5178 {
-    # HTTP/3 with shorter cache times for dev
-    header Alt-Svc "h3=\":5178\"; ma=3600"
-
     # Development CORS headers (permissive for local dev)
     header Access-Control-Allow-Origin "*"
     header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, PATCH"
@@ -50,32 +47,37 @@
     }
 
     # SSE / streaming API routes (disable buffering)
+    handle /api/cases/*/evidence/jobs/*/events {
+        reverse_proxy localhost:5173 {
+        }
+    }
+
     handle /api/sse/* {
-        reverse_proxy localhost:5174 {
+        reverse_proxy localhost:5173 {
             flush_interval -1
         }
     }
 
     handle /api/ai/* {
-        reverse_proxy localhost:5174 {
+        reverse_proxy localhost:5173 {
             flush_interval -1
         }
     }
 
     handle /api/*/stream* {
-        reverse_proxy localhost:5174 {
+        reverse_proxy localhost:5173 {
             flush_interval -1
         }
     }
 
     handle /api/synthesis/* {
-        reverse_proxy localhost:5174 {
+        reverse_proxy localhost:5173 {
             flush_interval -1
         }
     }
 
     handle /api/detective/* {
-        reverse_proxy localhost:5174 {
+        reverse_proxy localhost:5173 {
             flush_interval -1
         }
     }
@@ -85,7 +87,7 @@
     # import Caddyfile.ws
 
     # Reverse proxy to Vite dev server
-    reverse_proxy localhost:5174 {
+    reverse_proxy localhost:5173 {
         # Development connection settings (more permissive)
         transport http {
             keepalive 10s
@@ -113,12 +115,10 @@
         level DEBUG
     }
 
-    # HTTP/3 enabled by default in modern Caddy
 }
 
 # Alternative dev server on different port for testing
 :5179 {
-    header Alt-Svc "h3=\":5179\"; ma=3600"
     header Access-Control-Allow-Origin "*"
 
     reverse_proxy localhost:5176 {
@@ -153,16 +153,14 @@
 
 # Development health check with detailed info
 :8082 {
-    header Alt-Svc "h3=\":8082\"; ma=3600"
-
     handle /health {
         respond 200 {
             body `{
                 "status": "healthy",
                 "environment": "development",
                 "service": "legal-ai-platform-dev",
-                "protocol": "QUIC/HTTP3",
-                "vite_server": "localhost:5177",
+                "protocol": "HTTP (non-TLS)",
+                "vite_server": "localhost:5173",
                 "caddy_proxy": "localhost:5178",
                 "minio": "localhost:9000",
                 "timestamp": "{time.now}",
@@ -177,13 +175,13 @@
             body `{
                 "development_urls": {
                     "frontend": "http://localhost:5178",
-                    "frontend_direct": "http://localhost:5177",
+                    "frontend_direct": "http://localhost:5173",
                     "minio_console": "http://localhost:9001",
                     "minio_api": "http://localhost:9000",
                     "redis_insight": "http://localhost:8001",
                     "health": "http://localhost:8082/health"
                 },
-                "quic_enabled": true,
+                "quic_enabled": false,
                 "cors_enabled": true,
                 "logging": "verbose"
             }`
@@ -192,7 +190,7 @@
     }
 
     # Default health response for dev
-    respond "QUIC/HTTP3 Development Server Ready 🚀" 200
+    respond "HTTP Development Server Ready" 200
 }
 
 # WebSocket proxy for HMR (Hot Module Replacement)

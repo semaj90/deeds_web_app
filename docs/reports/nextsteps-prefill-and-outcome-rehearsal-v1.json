@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.nextsteps-prefill-outcome-rehearsal.v1",
+  "generatedAt": "2026-11-08T23:05:57.777Z",
+  "database": "legal_ai_live_integration_scratch",
+  "featureId": "nextsteps:sveltekit-frontend-next-steps-plans-bitfrost-turboquant-turbovec-production-todo",
+  "canonicalAuthority": false,
+  "writesPerformed": true,
+  "status": "PASS",
+  "recommendation": {
+    "algorithm": "STABLE_READY_SET",
+    "readyTaskIdsCount": 16,
+    "selectedTaskId": "sveltekit-frontend-next-steps-plans-bitfrost-turboquant-turbovec-production-todo#0670a95a5ede358a",
+    "sourceRevision": "sha256:af8f1c3918506e1c446b7f9211ad6fcfe7f07e3f5e0c65405476ddc8a8798d55",
+    "sourceRefs": [
+      "sveltekit-frontend/next_steps/plans/bitfrost_turboquant_turbovec_production_todo.md#L1035"
+    ],
+    "prefillWritesPerformed": false
+  },
+  "outcomeReceipt": {
+    "receiptChecksum": "440b49ea33be5b4c482e4a78d5af7a8ed962a623a319e835da2005b156471ed1",
+    "firstAppendInserted": true,
+    "secondAppendInserted": false,
+    "downstreamSuccess": false,
+    "outcome": "NO_RESULT",
+    "simulated": true,
+    "taskClaimed": false,
+    "taskCompleted": false,
+    "kanbanCountsBefore": {
+      "receipts": 7,
+      "tasks": 2479,
+      "attempts": 0,
+      "events": 0
+    },
+    "kanbanCountsAfter": {
+      "receipts": 8,
+      "tasks": 2479,
+      "attempts": 0,
+      "events": 0
+    },
+    "totalScratchOutcomeReceiptRows": 8
+  }
+}
