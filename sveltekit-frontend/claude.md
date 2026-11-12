@@ -221,6 +221,47 @@ Never claim "production-ready" from dry-run evidence.
 - VS Code task labels: `Diagnostics Regression Slice`, `Diagnostics Regression Slice (Unit)`, and `Diagnostics Regression Slice (E2E)`.
 - Coverage includes evidence diagnostics rendering, `/api/evidence/[id]` metadata normalization and `404` handling, `/api/rag/search` diagnostics payloads, and the focused evidence upload Playwright flow.
 
+## Type-check gate + SvelteKit 2 route-type pitfalls (verified 2026-11-11)
+
+**Which checker is the gate.** Run `npx svelte-kit sync` first (neither script does it).
+
+| Command | Scope | Time seen | Use |
+|---|---|---|---|
+| `npm run check` | 16,702 files | 220-470 s | **Acceptance gate.** Use a >= 600 s timeout. |
+| `npx svelte-check-native --workspace .` | 2,109 files | 4-124 s (load-sensitive) | Fast pre-check. devDep 1.11.1, uses the project tsgo `7.0.0-dev.20260421.2`, supports SvelteKit 2, no sidecar/GPU. |
+| `npm run check:fast`, `svelte-check --tsgo` | 2,109 files | 30-130 s | Smoke only. Reported 0 errors while the gate had 13 (cases page). |
+
+**Pitfalls and fixes (each reproduced with a tsgo probe).**
+- **`fail()` shapes drop `form`.** TS subtype reduction merges `fail(401,{error})` with `fail(400,{error,form})` into `{error}`, so generated `ActionData` has no `form` key. Fix: give the action an explicit return type, e.g. `create: async (...): Promise<ActionFailure<{ error: string; form?: CreateForm }>>`, with `type CreateForm = Awaited<ReturnType<typeof helperThatCallsSuperValidate>>`. Reference: `src/routes/(app)/cases/+page.server.ts`. Do not paper over it in the page with `'form' in form` (TS widens the member to `form: unknown`).
+- **Untyped universal load hides server data.** `+page.ts` with `({ data }: { data?: Record<string, unknown> })` spreads no known keys. Type it `export const load: PageLoad` from `./$types`; keep the runtime guard as `(data ?? {}) as typeof data`. Reference: `src/routes/(app)/admin/all-routes/+page.ts`.
+- **Never put `$types.d.ts` under `src/routes`.** TS resolves the sibling file before the generated `.svelte-kit/types` one (editor shows TS2305 on `PageLoad`). The stale all-routes file is archived at `docs/archive/2026-11-11/all-routes.types.d.ts.archived` (manifest entry added).
+- **Config facts for Kit 2.59.1:** generated `types` is `["node"]`; `$app/types` and `node_modules/$app` are SvelteKit 3 only, so do not add them. Project `include` replaces the generated include (drops `ambient.d.ts`, `non-ambient.d.ts`, `types/**/$types.d.ts`); route types still resolve through `rootDirs`. Overrides `strict:false` and `verbatimModuleSyntax:false` are looser than SvelteKit's defaults and were left unchanged.
+- **Inspect a generated type:** write a scratch `tsconfig.json` (extends `../../tsconfig.json`, `include: ["probe.ts"]`) and `probe.ts` under `.svelte-kit/scratch-*`, import from `../types/src/routes/<route>/$types`, force an assignment error, run `npx --no-install tsgo -p <dir>/tsconfig.json --noErrorTruncation`. Move the probe out of `.svelte-kit/` afterward.
+
+**Tests for this fix.** `src/routes/(app)/cases/cases-page-create-form.spec.ts` renders the real page (`// @vitest-environment node` is required: the default jsdom compiles Svelte for the browser and `$effect` throws `effect_orphan`). A mutation check (forcing the modal closed) failed exactly the two failed-create tests.
+
+**Audit (2026-11-11, 16 routes with actions).** Only `cases` had `form` dropped from generated `ActionData`. Seven routes never put `form` in `fail()`; eight keep it (login, register, evidence, evidence/upload, cases/new, analysis-center, admin/document-search, persons-of-interest/create); none of those pages read `form.form`. Limits: it checks the route-level union, not per action, and matches `fail(status, {...})` by text (nested braces and variable data are missed). Re-run the probe technique above if a page starts reading a new `form` key.
+
+**Open.** No browser (Playwright) test of the Create Case modal exists yet. `cases/+page.svelte` also carries a runtime guard (`isCreateFormResult`) added by another session; harmless after the server-side fix.
+
+## SSE delivery, client reconnect, Caddy and HTTP/3 (verified 2026-11-11)
+
+**Resumable stream `/api/sse/[id]` (chat tokens, collaboration events).**
+- Producers append ONCE to the Valkey stream and publish the stream ID: `publishTokenDelta(requestId, channel, seq, content)` in `src/lib/server/redis-streams.ts`. The chat action (`(app)/chat/[id]/+page.server.ts`) uses it and sets the 2 h stream TTL on `[DONE]`. Before this, each subscriber invented a time-based `seq` and appended its own copy (two tabs = every token stored twice) and no `id:` was ever sent, so `Last-Event-ID` replay was unreachable.
+- The route sends the stream ID as SSE `id:`. Resume cursor = `Last-Event-ID` header (native EventSource) or `?lastEventId=` (manual reconnect), validated by `parseResumeCursor` (`src/lib/server/streaming/sse-cursor.ts`). Order: subscribe first (buffer up to 2000), replay `XRANGE (cursor` (exclusive) in 100-entry pages, flush the buffer dropping `eventId <= lastDelivered`, go live. `event: resync` is sent when replay fails or the buffer overflows. Messages without `eventId` (collaboration presence/cursor) are ephemeral and not replayable. Limit: an empty replay cannot tell "no new tokens" from "stream expired".
+- Tests: `src/routes/api/sse/[id]/sse-resume.spec.ts`, `src/lib/server/streaming/sse-cursor.spec.ts`, `src/lib/server/redis-streams.publish-delta.spec.ts`.
+- **Deferred (G4/G5, fix in the hardening pass, not inline while `DEV_BYPASS_AUTH` is on):** the route does not check that the user owns the chat/case in `params.id` before subscribing or replaying (`collaboration-store.svelte.ts` passes a caseId). A code comment marks it.
+- `redis-streams.ts` contains a Windows-1252 byte, so Edit/Write refuse it; patch it with a byte-preserving (`latin1`) script.
+
+**Client reconnect.** `src/lib/utils/reconnect-backoff.ts`: `reconnectDelayMs` (full jitter, 250 ms floor, 30 s cap) and `createEventDeduper` (bounded window). A native EventSource retries by itself and resends `Last-Event-ID` while CONNECTING; retry manually only when `readyState === EventSource.CLOSED`, close the old instance first, and cap attempts. Applied to `ChatSSEClient` (tested in `sse-client.reconnect.spec.ts`), `SSEStatusStore` and `WorkflowEventStream` (jitter and CLOSED-only retry; not separately tested). `subscribeEmbedding` closes on error ON PURPOSE: `/api/embed?docId=` starts an embedding job, so a reconnect would re-run it.
+
+**Caddy (`docker/caddy/Caddyfile`, stock `caddy:2.8-alpine`, digest-pinned).**
+- A `*` in a path pattern does not cross `/`: a throwaway Caddy probe showed 27 of 41 SSE route files do not match the `flush_interval -1` patterns (e.g. `/api/stream`, `/api/evidence/realtime`, every multi-segment `.../stream`). Caddy flushes `text/event-stream` responses immediately even without that override; probed default-route first-event delivery was about 100 ms through Caddy (direct to SvelteKit: about 320 ms). The dedicated case evidence route `/api/cases/*/evidence/jobs/*/events` therefore uses default flushing: Caddy documents that `flush_interval -1` prevents upstream cancellation after an early client disconnect. Other stream routes retain their existing settings until separately reviewed. This is configuration/source evidence; no authorized browser disconnect has been tested through the active Caddy process.
+- Probe method: `docker exec -i legal-ai-caddy sh -s` with a script that runs `caddy run --config /tmp/t.Caddyfile` (`admin off`, port 18081, labeled `respond` handles; Caddyfile blocks must be multi-line), `wget`s the URLs, then kills it. Do not touch the live config.
+- No load balancing: one upstream, `health_uri /api/health` only on the default route.
+
+**HTTP/3.** `protocols h1 h2 h3`, `5178/tcp+udp` published, `Alt-Svc` advertised. The certificate comes from Caddy's own local CA (`CN=Caddy Local Authority - ECC Intermediate`, auto-created in the `caddy_data` volume, short-lived leaf); no custom CA or Caddy build exists. Windows does not trust that root, so Chrome QUIC fails with `ERR_QUIC_CERT_ROOT_NOT_KNOWN`, and `--ignore-certificate-errors` does not apply to QUIC. Verified path: headless Chrome with `--enable-quic --origin-to-force-quic-on=localhost:5178 --ignore-certificate-errors-spki-list=<base64 sha256 of the leaf public key>` produced a Caddy access-log line with `"proto":"HTTP/3.0"`. Not tested: SSE streaming over HTTP/3. The Caddy to SvelteKit hop is HTTP/1.1. The local `curl` build has no HTTP/3.
+
 ## Current Situation (2026-01-11 21:00 PST)
 
 **Status:** RabbitMQ Integration + RAG/KAG/DAG Knowledge Base Updates

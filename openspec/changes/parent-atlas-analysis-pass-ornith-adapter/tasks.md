@@ -234,6 +234,14 @@
       of the shared `ace:engram:` prefix and `workflow_lesson` string). Do not build a fix for any
       of these until the operator picks a direction.
 
+      **Operator decision (2026-11-11, accepted as recommended; implementation NOT done, box above stays unticked until it is):**
+      - (a) `search/engram-bigram.ts` is the canonical `recordEngramTransition` writer (callers: `context-assembler.ts`, `api/sse/chat/+server.ts:1796`). Do NOT archive `ai/engram-memory.ts`: it is live (imported by `memory/local-engram-memory-adapter.ts`, `ai/engram-registry.ts`, dynamically by `search-analytics.ts`; registered in `phase-lane-registry.ts`). The only duplicate is its own `recordEngramTransition`: make it delegate to the canonical writer or remove it, after confirming the adapter has no call to it (the adapter methods were not read past their first lines).
+      - (b) A "validated lesson" for `recordWorkflowMemory` = an accepted agentic fix whose targeted test passes and whose independent readback succeeds. A finished graphify run is not enough.
+      - (c) Keep `scripts/atlas/sync-engram-memory.mjs` as a separate capability (workspace/cluster/feature memories). Move its Redis connection from `REDIS_URL` to separate host/port/password options and give its keys a distinct prefix, e.g. `ace:engram:sync:`.
+      - Related finding: `recordWorkflowMemory` has no production caller (only the adapter definition and a test mock), so (b) has no producer yet.
+
+      - **(a) implemented 2026-11-11:** `ai/engram-memory.ts` `recordEngramTransition` now delegates the bigram and query-text writes to `search/engram-bigram.ts` (canonical); it keeps only the SOM BMU links locally. `hashQuery` now uses the canonical `qHash` (exported) so writer and reader share one normalization (before: different hashes for queries with repeated whitespace on the same `ace:engram:bigram:` key prefix). Behavior changes for the adapter path: bigram TTL 14d to 7d, query-text TTL 7d to 3d, 200-entry trim, identical prev/cur skipped. 4 new specs (`ai/engram-memory.delegation.spec.ts`) + `engram-registry.spec.ts` pass 7/7; native check 0 errors. Existing Redis keys written under the old hash for multi-space queries are not migrated. (b) and (c) remain open, so the box above stays unticked.
+
 ## 4. `ORNITH-VLM-MMPROJ-01` — narrow gate: register the real Ornith projector, prove one profile
 
 Not another model architecture project. Web-verified 2026-09-05: Ornith 1.5 9B is upstream

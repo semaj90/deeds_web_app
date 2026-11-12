@@ -79,6 +79,64 @@ export async function produceTokenChunk(
 }
 
 /**
+ * Producer-owned, append-once delivery for one token delta: persist to the stream first, then
+ * publish the live message carrying the stream ID. That ID is the SSE `id:` and the replay cursor,
+ * so every subscriber and every reconnect sees the same identity for the same token.
+ * If persistence fails the delta is still published (live delivery must not depend on history),
+ * without an eventId, so it simply cannot be replayed.
+ */
+export async function publishTokenDelta(
+  requestId: string,
+  channel:   string,
+  seq:       number,
+  content:   string,
+  meta:      TokenMeta = {},
+): Promise<string | null> {
+  let eventId: string | null = null;
+  try {
+    eventId = (await produceTokenChunk(requestId, seq, content, meta)) || null;
+  } catch (err) {
+    console.warn('[redis-streams] token append failed; publishing without eventId:', (err as Error).message);
+  }
+  await getRedis().publish(
+    channel,
+    JSON.stringify({ type: 'delta', content, seq, ...(eventId ? { eventId } : {}) }),
+  );
+  return eventId;
+}
+
+/**
+ * Producer-owned, append-once delivery for a non-token event (done, error, AI_REPLY, ...).
+ * Same contract as publishTokenDelta: persist to the stream first, then publish the live message
+ * carrying the stream ID as `eventId`, so a client that reconnects after the response finished
+ * still receives the terminal events. `done` also sets meta.done so consumeTokenStream exits on it.
+ * `type` and `eventId` always win over same-named payload keys.
+ */
+export async function publishStreamEvent(
+  requestId: string,
+  channel:   string,
+  type:      string,
+  payload:   Record<string, unknown> = {},
+): Promise<string | null> {
+  let eventId: string | null = null;
+  try {
+    eventId = (await sr(getRedis()).xadd(
+      streamKey(requestId), 'MAXLEN', '~', 2000, '*',
+      'seq',   '0',
+      'chunk', '',
+      'meta',  JSON.stringify({ event: type, payload, ...(type === 'done' ? { done: true } : {}) }),
+    )) || null;
+  } catch (err) {
+    console.warn('[redis-streams] event append failed; publishing without eventId:', (err as Error).message);
+  }
+  await getRedis().publish(
+    channel,
+    JSON.stringify({ ...payload, type, ...(eventId ? { eventId } : {}) }),
+  );
+  return eventId;
+}
+
+/**
  * Write a final sentinel entry so consumers know the stream is complete.
  * Sets a 2-hour TTL on the stream key so it auto-expires after replay window.
  */

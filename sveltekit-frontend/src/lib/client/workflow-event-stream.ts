@@ -4,6 +4,8 @@
  * Rewritten Session 63: No svelte/store dependency
  */
 
+import { reconnectDelayMs } from '$lib/utils/reconnect-backoff';
+
 export type WorkflowEventType =
 	// Infrastructure
 	| 'SSE_CONNECTED'
@@ -139,7 +141,7 @@ export class WorkflowEventStream {
 
 		if (this.reconnectAttempts < this.maxReconnectAttempts) {
 			this.reconnectAttempts++;
-			const delay = this.reconnectDelay * Math.pow(1.5, this.reconnectAttempts - 1);
+			const delay = reconnectDelayMs(this.reconnectAttempts - 1, { baseMs: this.reconnectDelay });
 			setTimeout(() => this.connect(), delay);
 		} else {
 			this.emit('SSE_ERROR', {

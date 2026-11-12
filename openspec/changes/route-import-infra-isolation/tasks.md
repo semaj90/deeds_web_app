@@ -175,6 +175,10 @@ not applied, still needs explicit go-ahead given the blast radius)**:
 
 - [ ] Decide whether to fix `chrrom/predictor.ts`'s eager singleton (operator call — this pattern
       may be intentional for production warm-start behavior, needs review before changing).
+      **Audit note (2026-11-11, read-only; the checkbox above is NOT ticked, the decision stays with the operator):**
+      - `llm/runtime-contract.ts`: the import-time throw is a tested contract (`ai/ornith-llama-boundary.spec.ts:40` expects `ROTORQUANT_MODEL_PATH is required`). At least 20 route/server files use `LLM_MODEL_ID` at module scope (zod `.default(...)`, `const MODEL = ...`, `ollama-config.ts` computed key), so a lazy rewrite would touch every one. Test collection is already protected by the stub in `test-setup.ts` / `test-runtime-env-setup.ts`. Recommendation: keep it eager. The grep hit its time limit, so the importer list is partial.
+      - `chrrom/predictor.ts`: the singleton constructor starts `ensureRedis()` in the background; failure is caught and it degrades to in-memory. One real importer (`api/chrrom/events/+server.ts`). Recommendation: leave as is (plausibly an intentional Redis warm-start); if changed, lazy-init `initializeRedis()` on first use.
+
 - [x] Re-run the FULL 791-file `tests/routes/auto/**` tree (not just the 137-file repaired
       subtree) after G8 closes, to get a true updated baseline replacing the stale 674/117 number.
       Interim run 2026-09-21: `tests/routes/auto` (787 files found, not 791): first run 4,273 tests =

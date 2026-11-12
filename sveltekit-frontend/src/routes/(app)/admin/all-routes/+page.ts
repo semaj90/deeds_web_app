@@ -1,3 +1,5 @@
+import type { PageLoad } from './$types';
+
 const EMPTY_METADATA = {
   allEndpoints: [],
   activeAPI: [],
@@ -20,10 +22,15 @@ const EMPTY_METADATA = {
 
 export const ssr = true;
 
-export const load = async ({ data }: { data?: Record<string, unknown> }) => {
+// Typed with the generated PageLoad so `data` carries the server load's real shape
+// (routes, errorClusters, stats). The previous untyped `Record<string, unknown>` spread
+// contributed no known keys, so the page's reads of them had no static type.
+export const load: PageLoad = async ({ data }) => {
+  // Same runtime guard as before; the assertion keeps the server-data type instead of widening to `{}`.
+  const serverData = (data ?? {}) as typeof data;
   return {
-    ...(data ?? {}),
-    apiMetadata: (data?.apiMetadata as typeof EMPTY_METADATA) ?? EMPTY_METADATA,
+    ...serverData,
+    apiMetadata: ((data as { apiMetadata?: typeof EMPTY_METADATA } | undefined)?.apiMetadata) ?? EMPTY_METADATA,
   };
 };
 

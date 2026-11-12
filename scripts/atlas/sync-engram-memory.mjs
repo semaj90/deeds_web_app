@@ -21,7 +21,7 @@ const graph = loadCodebaseGraph(config);
 const routeMap = loadRouteMap(config);
 const aliases = loadClusterAliases(config);
 const adapter = WRITE 
-  ? createRedisEngramAdapter({ url: process.env.REDIS_URL })
+  ? createRedisEngramAdapter()
   : createNoopEngramPluginAdapter('atlas:engram:dry-run');
 
 function sanitizePayload(payload) {
