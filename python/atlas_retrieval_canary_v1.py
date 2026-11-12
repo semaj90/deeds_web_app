@@ -389,6 +389,186 @@ def cmd_run_tieaware(args: argparse.Namespace) -> int:
     return 0
 
 
+# ---- run-precision: storage-precision tiers vs fp32 exact (tie-aware, read-only, CPU-only) ----
+_E2M1_GRID = None
+
+
+def _q_fp16(x):
+    import numpy as np
+    return x.astype(np.float16).astype(np.float32)
+
+
+def _q_bf16(x):
+    import numpy as np
+    u = np.ascontiguousarray(x, dtype=np.float32).view(np.uint32)
+    rounded = (u + np.uint32(0x7FFF) + ((u >> np.uint32(16)) & np.uint32(1))) & np.uint32(0xFFFF0000)
+    return rounded.view(np.float32)
+
+
+def _q_int_sym(x, qmax):
+    import numpy as np
+    amax = np.abs(x).max(axis=1, keepdims=True)
+    amax[amax == 0] = 1.0
+    s = amax / qmax
+    return np.clip(np.rint(x / s), -qmax, qmax) * s
+
+
+def _round_e4m3(v):
+    """Round positive floats to the FP8 E4M3 grid (3 mantissa bits, exponent -6..8, max 448). Emulation only."""
+    import numpy as np
+    v = np.clip(v, 2.0 ** -9, 448.0)
+    e = np.clip(np.floor(np.log2(v)), -6, 8)
+    step = 2.0 ** (e - 3)
+    return np.minimum(np.rint(v / step) * step, 448.0)
+
+
+def _q_nvfp4_emulated(x, block=16):
+    """NVFP4 emulation: E2M1 values, FP8(E4M3) scale per 16-value block, fp32 scale per vector. Storage-only emulation."""
+    import numpy as np
+    global _E2M1_GRID
+    if _E2M1_GRID is None:
+        _E2M1_GRID = np.array([0.0, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0], dtype=np.float32)
+    mids = (_E2M1_GRID[1:] + _E2M1_GRID[:-1]) / 2.0
+    n, d = x.shape
+    xb = x.reshape(n, d // block, block)
+    vec_amax = np.abs(x).max(axis=1)
+    vec_amax[vec_amax == 0] = 1.0
+    tensor_scale = (vec_amax / (6.0 * 448.0)).reshape(n, 1, 1).astype(np.float32)
+    blk_amax = np.abs(xb).max(axis=2, keepdims=True)
+    raw = np.where(blk_amax > 0, blk_amax / 6.0 / tensor_scale, 1.0)
+    eff = (_round_e4m3(raw) * tensor_scale).astype(np.float32)
+    mag = np.abs(xb) / eff
+    idx = np.searchsorted(mids, mag)
+    deq = np.sign(xb) * _E2M1_GRID[idx] * eff
+    return deq.reshape(n, d).astype(np.float32)
+
+
+def _q_sign128(x):
+    """LOD0 quick-hit tier: 128 sign bits (16 bytes) of the first 128 dims; other dims zeroed."""
+    import numpy as np
+    out = np.zeros_like(x)
+    out[:, :128] = np.where(x[:, :128] >= 0, 1.0, -1.0)
+    return out
+
+
+# name -> (quantizer, bytes per 768-d vector)
+PRECISION_VARIANTS = {
+    "fp32": (lambda x: x, 768 * 4),
+    "fp16": (_q_fp16, 768 * 2),
+    "bf16": (_q_bf16, 768 * 2),
+    "int8_per_vector": (lambda x: _q_int_sym(x, 127), 768 + 4),
+    "int4_per_vector": (lambda x: _q_int_sym(x, 7), 768 // 2 + 4),
+    "nvfp4_emulated": (_q_nvfp4_emulated, 768 // 2 + 768 // 16 + 4),
+    "sign128_lod0": (_q_sign128, 16),
+}
+
+
+def _topk_merge(top_val, top_idx, sims, lo, k):
+    import numpy as np
+    cat_v = np.concatenate([top_val, sims], axis=1)
+    cat_i = np.concatenate([top_idx, np.arange(lo, lo + sims.shape[1])[None, :].repeat(sims.shape[0], 0)], axis=1)
+    part = np.argpartition(-cat_v, k - 1, axis=1)[:, :k]
+    return np.take_along_axis(cat_v, part, 1), np.take_along_axis(cat_i, part, 1)
+
+
+def cmd_run_precision(args: argparse.Namespace) -> int:
+    """Storage precision vs fp32 exact over the frozen hash-ordered query set. Queries stay fp32; only the database
+    side is quantized (asymmetric). Reports tie-aware recall@10 directly and after fp32 rescore of the top-K.
+    Read-only, CPU-only. Formats other than fp32/fp16/bf16 are software emulations (storage + dequantize)."""
+    import numpy as np
+    import psycopg2
+    t0 = time.time()
+    conn = psycopg2.connect(_dsn())
+    conn.set_session(readonly=True)
+    lim = f" LIMIT {int(args.limit_rows)}" if args.limit_rows else ""
+    with conn.cursor() as cur:
+        cur.execute("SELECT count(*) FROM (SELECT 1 FROM codebase_chunk_index WHERE content_embedding_768 IS NOT NULL" + lim + ") t")
+        n_rows = cur.fetchone()[0]
+    matrix = np.empty((n_rows, 768), dtype=np.float32)
+    ids = []
+    with conn.cursor(name="precision_load") as cur:
+        cur.itersize = 20000
+        cur.execute("SELECT id::text, content_embedding_768::text FROM codebase_chunk_index "
+                    "WHERE content_embedding_768 IS NOT NULL ORDER BY id" + lim)
+        for i, (cid, txt) in enumerate(cur):
+            ids.append(cid)
+            matrix[i] = np.fromstring(txt.strip("[]"), sep=",", dtype=np.float32)
+    conn.close()
+    norms = np.linalg.norm(matrix, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0
+    matrix /= norms
+    load_s = time.time() - t0
+    order = sorted(range(n_rows), key=lambda i: hashlib.md5(("canary" + ids[i]).encode()).hexdigest())[:args.queries]
+    nq = len(order)
+    Q = matrix[order].copy()
+    chunk = int(args.chunk)
+    spans = [(lo, min(lo + chunk, n_rows)) for lo in range(0, n_rows, chunk)]
+    order_arr = np.array(order)
+
+    def run_pass(quant, k):
+        top_val = np.full((nq, k), -np.inf, dtype=np.float32)
+        top_idx = np.zeros((nq, k), dtype=np.int64)
+        cos_sum, cos_min, cos_n = 0.0, 1.0, 0
+        for lo, hi in spans:
+            xc = matrix[lo:hi]
+            dq = quant(xc)
+            if dq is not xc:
+                c = (dq * xc).sum(axis=1) / np.maximum(np.linalg.norm(dq, axis=1), 1e-12)
+                cos_sum += float(c.sum())
+                cos_n += c.shape[0]
+                cos_min = min(cos_min, float(c.min()))
+            sims = Q @ dq.T
+            inrange = np.where((order_arr >= lo) & (order_arr < hi))[0]
+            sims[inrange, order_arr[inrange] - lo] = -np.inf
+            top_val, top_idx = _topk_merge(top_val, top_idx, sims, lo, k)
+        srt = np.argsort(-top_val, axis=1)
+        return (np.take_along_axis(top_val, srt, 1), np.take_along_axis(top_idx, srt, 1),
+                (cos_sum / cos_n) if cos_n else 1.0, cos_min)
+
+    ev, ei, _, _ = run_pass(lambda x: x, 11)
+    floor = ev[:, 9] - args.eps
+    ties = int((np.abs(ev[:, 9] - ev[:, 10]) < args.eps).sum())
+    rescore_k = int(args.rescore_k)
+    names = [v for v in args.variants.split(",") if v]
+    results = []
+    for name in names:
+        quant, nbytes = PRECISION_VARIANTS[name]
+        tv = time.time()
+        av, ai, cos_mean, cos_min = run_pass(quant, rescore_k)
+        hits_direct = hits_rescore = 0
+        for q in range(nq):
+            d10 = ai[q, :10]
+            hits_direct += int((matrix[d10] @ Q[q] >= floor[q]).sum())
+            exact = matrix[ai[q]] @ Q[q]
+            hits_rescore += int((np.sort(exact)[::-1][:10] >= floor[q]).sum())
+        results.append({"variant": name, "bytes_per_vector": nbytes,
+                        "compression_vs_fp32": round(768 * 4 / nbytes, 2),
+                        "recall_top10_tie_aware": round(hits_direct / (nq * 10), 4),
+                        f"recall_top10_after_fp32_rescore_of_top{rescore_k}": round(hits_rescore / (nq * 10), 4),
+                        "mean_cosine_original_vs_dequantized": round(cos_mean, 6),
+                        "min_cosine_original_vs_dequantized": round(cos_min, 6),
+                        "seconds": round(time.time() - tv, 1)})
+        print(json.dumps(results[-1]), flush=True)
+    receipt = {"schema": "atlas.precision-tiers.v1", "queries": nq, "corpus_rows": n_rows,
+               "frozen_query_order": "md5('canary'+id) ascending, self excluded",
+               "oracle": "fp32 exact cosine over loaded canonical content_embedding_768 rows; hit if sim >= 10th-best sim - eps",
+               "tie_eps": args.eps, "tie_queries_rank10_vs_11": ties,
+               "row_limit": args.limit_rows or None,
+               "comparable_to_canary_receipts": not args.limit_rows,
+               "asymmetric": "query fp32, database quantized",
+               "emulated_formats": ["int8_per_vector", "int4_per_vector", "nvfp4_emulated", "sign128_lod0"],
+               "native_hardware_formats": ["fp32", "fp16", "bf16"],
+               "notes": ["nvfp4_emulated = E2M1 values + FP8(E4M3) per-16 block scale + fp32 per-vector scale; RTX 3060 Ti has no FP4 tensor cores, so storage and dequantize only",
+                         "sign128_lod0 = 16-byte sign bitset of the first 128 dims, intended as a quick-hit tier followed by rescore"],
+               "load_seconds": round(load_s, 1), "total_seconds": round(time.time() - t0, 1),
+               "results": results, "writesPerformed": False}
+    if args.out:
+        with open(args.out, "w", encoding="utf-8") as fh:
+            json.dump(receipt, fh, indent=1)
+    return 0
+# ---- end run-precision ----
+
+
 def cmd_ingest(args: argparse.Namespace) -> int:
     receipt = json.loads(Path(args.receipt).read_text(encoding="utf-8"))
     rows = receipt_to_rows(receipt, args.executor)
@@ -480,6 +660,16 @@ def main(argv: Optional[List[str]] = None) -> int:
     pg.add_argument("--ef-search", default="40,100,200,400")
     pg.add_argument("--corpus-rows", type=int, required=True)
     pg.set_defaults(fn=cmd_run_pgvector)
+    pr = sub.add_parser("run-precision")
+    pr.add_argument("--queries", type=int, default=1000)
+    pr.add_argument("--chunk", type=int, default=20000)
+    pr.add_argument("--variants", default=",".join(PRECISION_VARIANTS))
+    pr.add_argument("--rescore-k", type=int, default=100)
+    pr.add_argument("--eps", type=float, default=1e-6)
+    pr.add_argument("--limit-rows", type=int, default=0, help="smoke test on the first N rows (not comparable to canary receipts)")
+    pr.add_argument("--out")
+    pr.set_defaults(fn=cmd_run_precision)
+
     i = sub.add_parser("ingest")
     i.add_argument("--receipt", required=True)
     i.add_argument("--truth", required=True)
