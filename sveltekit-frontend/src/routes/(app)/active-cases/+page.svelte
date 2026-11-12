@@ -415,7 +415,7 @@
 		color: #e0e0e0;
 		font-family: 'JetBrains Mono', 'Courier New', monospace;
 		padding: 0;
-		margin: -2.5rem;
+		margin: 0; /* app workspace is flush (no padding): the old -2.5rem hid 40px under the sidebar and clipped 40px at the right edge */
 	}
 	.terminal-page :global(h1), .terminal-page :global(h2), .terminal-page :global(h3), .terminal-page :global(h4), .terminal-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
 	.terminal-page :global(a) { color: inherit; border-bottom: none; }

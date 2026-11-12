@@ -1495,7 +1495,7 @@
 	.analytics-page {
 		min-height: 100vh;
 		background: #0e0d0b;
-		margin: -2.5rem;
+		margin: 0; /* app workspace is flush (no padding): the old -2.5rem hid 40px under the sidebar and clipped 40px at the right edge */
 		padding: 1.5rem max(1.5rem, calc(50% - 36rem));
 		display: flex;
 		flex-direction: column;

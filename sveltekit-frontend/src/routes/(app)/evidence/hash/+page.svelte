@@ -282,7 +282,7 @@
 		flex-direction: column;
 		min-height: 100vh;
 		background: #0e0d0b;
-		margin: -2.5rem;
+		margin: -1rem; /* cancels InvestigationShell .inv-canvas padding (1rem); -2.5rem overshot and clipped 24px per side */
 	}
 
 	.eh-page :global(h1), .eh-page :global(h2), .eh-page :global(h3), .eh-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }

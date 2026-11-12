@@ -657,7 +657,7 @@
   background: #0f172a;
   color: #f8fafc;
   font-family: 'Inter', system-ui, sans-serif;
-  margin: -2.5rem;
+  margin: 0; /* app workspace is flush (no padding): the old -2.5rem hid 40px under the sidebar and clipped 40px at the right edge */
   padding: 2rem max(1.5rem, calc(50% - 43.75rem));
   display: flex;
   flex-direction: column;

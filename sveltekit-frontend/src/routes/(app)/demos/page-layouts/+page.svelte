@@ -324,7 +324,7 @@
 	.layout-demo {
 		min-height: 100vh;
 		background: #0a0a1a;
-		margin: -2.5rem;
+		margin: 0; /* app workspace is flush (no padding): the old -2.5rem hid 40px under the sidebar and clipped 40px at the right edge */
 		padding: 2rem;
 		color: #e2e8f0;
 		font-family: 'Inter', system-ui, sans-serif;

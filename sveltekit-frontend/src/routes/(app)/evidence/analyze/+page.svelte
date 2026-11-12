@@ -376,7 +376,7 @@
 	.ea-page {
 		min-height: 100vh;
 		background: #0e0d0b;
-		margin: -2.5rem;
+		margin: -1rem; /* cancels InvestigationShell .inv-canvas padding (1rem); -2.5rem overshot and clipped 24px per side */
 		padding: 1.5rem max(1.5rem, calc(50% - 28rem));
 		display: flex;
 		flex-direction: column;

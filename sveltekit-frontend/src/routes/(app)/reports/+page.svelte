@@ -244,7 +244,7 @@
 	.reports-page {
 		min-height: 100vh;
 		background: #0e0d0b;
-		margin: -2.5rem;
+		margin: 0; /* app workspace is flush (no padding): the old -2.5rem hid 40px under the sidebar and clipped 40px at the right edge */
 		padding: 1.5rem 2.5rem;
 	}
 	.reports-page :global(h1), .reports-page :global(h2), .reports-page :global(h3), .reports-page :global(h4), .reports-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }

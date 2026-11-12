@@ -494,7 +494,7 @@
 <style>
 	.admin-overview {
 		min-height: 100vh;
-		margin: -2.5rem;
+		margin: 0; /* app workspace is flush (no padding): the old -2.5rem hid 40px under the sidebar and clipped 40px at the right edge */
 		padding: 2.5rem;
 		background:
 			radial-gradient(circle at top left, rgba(96, 165, 250, 0.08), transparent 32%),

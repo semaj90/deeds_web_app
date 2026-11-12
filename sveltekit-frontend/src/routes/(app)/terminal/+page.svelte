@@ -626,7 +626,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100vh;
-		margin: -2.5rem;
+		margin: 0; /* app workspace is flush (no padding): the old -2.5rem hid 40px under the sidebar and clipped 40px at the right edge */
 		font-family: 'JetBrains Mono', ui-monospace, monospace;
 		background: #0c0a09;
 		color: #e7e5e4;

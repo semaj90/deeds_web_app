@@ -272,7 +272,7 @@
 		flex-direction: column;
 		min-height: 100vh;
 		background: var(--t-bg, #0e0d0b);
-		margin: -2.5rem;
+		margin: 0; /* app workspace is flush (no padding): the old -2.5rem hid 40px under the sidebar and clipped 40px at the right edge */
 		color: var(--t-text, rgba(212, 199, 163, 0.85));
 	}
 

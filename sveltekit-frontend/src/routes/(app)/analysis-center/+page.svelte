@@ -750,11 +750,16 @@
 		color: #f0f6fc;
 		font-family: 'JetBrains Mono', 'Consolas', monospace;
 		position: relative;
-		margin: -2.5rem;
+		/* Cancel exactly the InvestigationShell canvas padding (.inv-canvas { padding: 1rem }).
+		   The old -2.5rem overshot by 1.5rem per side: content hid under the 56px sidebar,
+		   was clipped at the right edge, and the title slid under the sub-nav. */
+		margin: -1rem;
 	}
 	.analysis-center :global(h1), .analysis-center :global(h2), .analysis-center :global(h3), .analysis-center :global(h4), .analysis-center :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
 	.analysis-center :global(a) { color: inherit; border-bottom: none; }
-	.analysis-center :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
+	/* :where() keeps this reset at zero specificity so component rules (.tab-btn, search buttons, ...) win;
+	   as plain `button` it out-ranked them and stripped their padding, border and background. */
+	.analysis-center :global(:where(button)) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
 	.analysis-center :global(input), .analysis-center :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
 	.analysis-center :global(.panel), .analysis-center :global(.card), .analysis-center :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 

@@ -285,7 +285,7 @@
 		flex-direction: column;
 		min-height: 100vh;
 		background: #0e0d0b;
-		margin: -2.5rem;
+		margin: -1rem; /* cancels its parent's 1rem padding; the old -2.5rem clipped 24px per side */
 	}
 
 	.rt-page :global(h1), .rt-page :global(h2), .rt-page :global(h3), .rt-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }

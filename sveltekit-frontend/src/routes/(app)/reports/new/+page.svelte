@@ -292,7 +292,7 @@
 	.sqex-page {
 		position: relative;
 		min-height: 100vh;
-		margin: -2.5rem;
+		margin: 0; /* app workspace is flush (no padding): the old -2.5rem hid 40px under the sidebar and clipped 40px at the right edge */
 		padding: 0;
 		background:
 			radial-gradient(ellipse at 15% 5%, rgba(126, 231, 255, 0.06), transparent 45%),

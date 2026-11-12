@@ -499,7 +499,7 @@
 	.intake-container {
 		min-height: 100vh;
 		padding: 2rem 2.5rem;
-		margin: -2.5rem;
+		margin: 0; /* app workspace is flush (no padding): the old -2.5rem hid 40px under the sidebar and clipped 40px at the right edge */
 		background: var(--yorha-bg, #1a1a1a);
 		color: var(--yorha-ink, #d4c7a3);
 	}

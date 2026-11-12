@@ -265,7 +265,7 @@
 		min-height: 100vh;
 		background: #0e0d0b;
 		color: #d4c7a3;
-		margin: -2.5rem;
+		margin: -1rem; /* cancels InvestigationShell .inv-canvas padding (1rem); -2.5rem overshot and clipped 24px per side */
 		padding: 2rem max(1.5rem, calc(50% - 300px));
 	}
 	.upload-container :global(h1), .upload-container :global(h2), .upload-container :global(h3), .upload-container :global(h4), .upload-container :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
@@ -458,7 +458,7 @@
 		position: relative;
 		isolation: isolate;
 		min-height: calc(100vh - 4rem);
-		margin: -2.5rem;
+		margin: -1rem; /* same fix as above: matches the shell canvas padding */
 		padding: clamp(2rem, 6vw, 4.5rem) 1.25rem;
 		background:
 			radial-gradient(ellipse at 15% 10%, rgba(198, 165, 103, 0.18), transparent 33%),

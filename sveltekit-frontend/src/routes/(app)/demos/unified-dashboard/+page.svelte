@@ -418,7 +418,7 @@
 		display: grid;
 		grid-template-columns: 240px 1fr;
 		min-height: 100vh;
-		margin: -2.5rem;
+		margin: 0; /* app workspace is flush (no padding): the old -2.5rem hid 40px under the sidebar and clipped 40px at the right edge */
 		background: #0a0e1a;
 		font-family: 'Inter', -apple-system, system-ui, sans-serif;
 		transition: grid-template-columns 0.25s ease;

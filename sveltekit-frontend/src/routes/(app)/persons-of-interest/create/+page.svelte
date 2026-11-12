@@ -16,7 +16,7 @@
 <style>
 	.create-page {
 		padding: 2rem 2.5rem;
-		margin: -2.5rem;
+		margin: 0; /* app workspace is flush (no padding): the old -2.5rem hid 40px under the sidebar and clipped 40px at the right edge */
 		background: #0f0f23;
 		min-height: 100vh;
 	}

@@ -91,7 +91,7 @@
 <style>
 	.evidence-manage-page {
 		padding: 2rem 2.5rem;
-		margin: -2.5rem;
+		margin: -1rem; /* cancels InvestigationShell .inv-canvas padding (1rem); -2.5rem overshot and clipped 24px per side */
 		background: #0f0f23;
 		min-height: 100vh;
 		color: #e0e0e0;
