@@ -291,7 +291,7 @@
 		min-height: 100vh;
 		background: #0e0d0b;
 		color: #d4c7a3;
-		margin: -2.5rem;
+		margin: 0;
 		padding: 0 2.5rem;
 	}
 	.edit-report-page :global(h1), .edit-report-page :global(h2), .edit-report-page :global(h3), .edit-report-page :global(h4), .edit-report-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }

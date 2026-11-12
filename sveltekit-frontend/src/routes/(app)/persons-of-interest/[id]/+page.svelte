@@ -817,7 +817,7 @@
 {/if}
 
 <style>
-	.poi-detail-page { padding: 2rem 2.5rem; margin: -2.5rem; background: #0f0f23; min-height: 100vh; }
+	.poi-detail-page { padding: 2rem 2.5rem; margin: 0; background: #0f0f23; min-height: 100vh; }
 	.poi-detail-page :global(h1), .poi-detail-page :global(h2), .poi-detail-page :global(h3), .poi-detail-page :global(h4), .poi-detail-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
 	.poi-detail-page :global(a) { color: inherit; border-bottom: none; }
 	.poi-detail-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
