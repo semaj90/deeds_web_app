@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { chatMessages, chatMetadata, insertChatMessageSchema } from '$lib/server/db';
 import { eq } from 'drizzle-orm';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
 import { recordChatMessageForRecall } from '$lib/server/ace/chat-memory.js';
 
 const createMessageSchema = insertChatMessageSchema.extend({
@@ -18,7 +19,8 @@ const createMessageSchema = insertChatMessageSchema.extend({
 
 /** POST /api/v1/chat/messages — Save a chat message to a session */
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	const actorId = Number(locals.user?.id);
+	if (!Number.isSafeInteger(actorId) || actorId <= 0) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const raw = await request.json();
 		const parsed = createMessageSchema.safeParse(raw);
@@ -30,6 +32,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		const { sessionId, role, content, confidence, processingTime, aiMetadata } = parsed.data;
+		// Only the session owner may append. Unknown, ownerless (legacy) and foreign sessions all get the
+		// same non-disclosing 404, and a case-bound session also needs current case access.
+		const [session] = await db
+			.select({ userId: chatMetadata.userId, caseId: chatMetadata.caseId })
+			.from(chatMetadata)
+			.where(eq(chatMetadata.chatId, sessionId))
+			.limit(1);
+		if (!session || Number(session.userId) !== actorId) {
+			return json({ error: 'Chat session not found' }, { status: 404 });
+		}
+		if (session.caseId && !(await getAuthorizedCase(session.caseId, actorId))) {
+			return json({ error: 'Chat session not found' }, { status: 404 });
+		}
 		const msgId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
 		await db.insert(chatMessages).values({
