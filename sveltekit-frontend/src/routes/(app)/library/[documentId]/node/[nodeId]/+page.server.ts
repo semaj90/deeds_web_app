@@ -72,7 +72,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		// 1. Fetch the node and its document
 		const nodeRes = await pool.query(
 			`SELECT ln.*, ld.title as doc_title, ld.corpus_type, ld.effective_date, ld.official_url,
-			        ld.page_count, ld.word_count,
+			        ld.page_count, NULL::integer as word_count,
 			        j.code as jurisdiction_code, j.name as jurisdiction_name
 			 FROM legal_nodes ln
 			 JOIN library_documents ld ON ld.id = ln.document_id
