@@ -164,7 +164,7 @@
 			<div class="card-grid">
 				{#each filteredRoutes as route, idx (`${route.id ?? route.path}:${route.file ?? ''}:${idx}`)}
 					{@const icon = getCardIcon(route)}
-					<button class="route-card" class:card-broken={route.errorState === 'broken'} class:card-flaky={route.errorState === 'flaky'} onclick={() => openRoute(route)}>
+					<button class="route-card" data-unstyled class:card-broken={route.errorState === 'broken'} class:card-flaky={route.errorState === 'flaky'} onclick={() => openRoute(route)}>
 						<div class="card-icon-wrap">
 							{#if icon === 'endpoint'}
 								<svg class="card-svg" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="5" y="6" width="2" height="2" fill="currentColor"/><rect x="9" y="6" width="2" height="2" fill="currentColor"/><line x1="4" y1="10" x2="12" y2="10" stroke="currentColor" stroke-width="1"/></svg>
@@ -414,7 +414,7 @@
 
 	.card-kind {
 		font-size: 0.45rem;
-		color: #6060a0;
+		color: #8f8fd0; /* was #6060a0; 5.6:1 on #12122e */
 		text-transform: uppercase;
 		letter-spacing: 0.12em;
 	}
@@ -436,7 +436,7 @@
 
 	.card-group {
 		font-size: 0.4rem;
-		color: #4a4a7a;
+		color: #8f8fd0; /* was #4a4a7a; 5.6:1 on #12122e */
 	}
 
 	/* ── Empty State ── */

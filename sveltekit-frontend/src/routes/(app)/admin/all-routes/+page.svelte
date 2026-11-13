@@ -840,6 +840,7 @@
 			{#each filteredRoutes as route, idx ((route.id ?? route.path) + ':' + (route.file ?? '') + ':' + idx)}
 				<button
 					class="route-card"
+					data-unstyled
 					class:card-broken={route.errorState === 'broken'}
 					class:card-flaky={route.errorState === 'flaky'}
 					onclick={() => openRouteModal(route)}
@@ -2005,7 +2006,7 @@
 
 	.card-kind {
 		font-size: 0.55rem;
-		color: #6060a0;
+		color: #8f8fd0; /* was #6060a0 (3.2:1); 5.7:1 on #10102a */
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
 	}
@@ -2034,7 +2035,7 @@
 
 	.card-group {
 		font-size: 0.5rem;
-		color: #4040c0;
+		color: #8f8fe8; /* was #4040c0 (2.4:1); 5.9:1 on #10102a */
 	}
 
 	/* ── Empty State ── */
