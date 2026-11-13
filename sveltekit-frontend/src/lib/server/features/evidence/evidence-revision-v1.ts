@@ -77,7 +77,7 @@ export class EvidenceRevisionErrorV1 extends Error {
 
 export interface EvidenceRevisionPortsV1 {
   artifactBucket: string;
-  loadEvidence(evidenceId: string): Promise<{ id: string; caseId: string | null; hash: string | null } | null>;
+  loadEvidence(evidenceId: string): Promise<{ id: string; caseId: string | null; hash: string | null; deletedAt?: Date | string | null } | null>;
   findRevisionBySha256(evidenceId: string, sha256: string): Promise<{ id: string; version: number } | null>;
   putObject(args: { bucket: string; objectKey: string; bytes: Uint8Array; contentType: string; metadata: Record<string, string> }): Promise<void>;
   deleteObject(bucket: string, objectKey: string): Promise<void>;
@@ -130,7 +130,7 @@ export async function saveEvidenceMarkupRevisionV1(input: SaveEvidenceRevisionIn
   }
 
   const parent = await ports.loadEvidence(input.evidenceId);
-  if (!parent) throw new EvidenceRevisionErrorV1('EVIDENCE_NOT_FOUND', 'Evidence not found.');
+  if (!parent || parent.deletedAt) throw new EvidenceRevisionErrorV1('EVIDENCE_NOT_FOUND', 'Evidence not found.');
   if (parent.caseId !== input.caseId) throw new EvidenceRevisionErrorV1('EVIDENCE_CASE_MISMATCH', 'Evidence does not belong to the stated case.');
   const storedHash = normalizeSha256(parent.hash);
   if (!storedHash) throw new EvidenceRevisionErrorV1('PARENT_HASH_UNAVAILABLE', 'The source evidence has no stored SHA-256, so the parent cannot be verified.');
@@ -195,7 +195,7 @@ export async function createDrizzleRevisionPortsV1(): Promise<EvidenceRevisionPo
   return {
     artifactBucket: bucket,
     async loadEvidence(evidenceId) {
-      const [row] = await db.select({ id: evidence.id, caseId: evidence.caseId, hash: evidence.hash }).from(evidence).where(eq(evidence.id, evidenceId)).limit(1);
+      const [row] = await db.select({ id: evidence.id, caseId: evidence.caseId, hash: evidence.hash, deletedAt: evidence.deletedAt }).from(evidence).where(eq(evidence.id, evidenceId)).limit(1);
       return row ?? null;
     },
     async findRevisionBySha256(evidenceId, sha256) {

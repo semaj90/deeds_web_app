@@ -81,6 +81,8 @@ describe('evidence-revision-v1', () => {
     expect(await code(saveEvidenceMarkupRevisionV1(base(), fakePorts({ loadEvidence: async () => ({ id: EV_ID, caseId: CASE_ID, hash: null }) }).ports))).toBe('PARENT_HASH_UNAVAILABLE');
     expect(await code(saveEvidenceMarkupRevisionV1(base(), fakePorts({ loadEvidence: async () => ({ id: EV_ID, caseId: '33333333-3333-4333-8333-333333333333', hash: PARENT }) }).ports))).toBe('EVIDENCE_CASE_MISMATCH');
     expect(await code(saveEvidenceMarkupRevisionV1(base(), fakePorts({ loadEvidence: async () => null }).ports))).toBe('EVIDENCE_NOT_FOUND');
+    // soft-deleted evidence is not found (live: 800 of 829 rows have deleted_at set)
+    expect(await code(saveEvidenceMarkupRevisionV1(base(), fakePorts({ loadEvidence: async () => ({ id: EV_ID, caseId: CASE_ID, hash: PARENT, deletedAt: new Date() }) }).ports))).toBe('EVIDENCE_NOT_FOUND');
   });
 
   it('rejects empty, oversized, non-image and mis-declared images before any storage call', async () => {
