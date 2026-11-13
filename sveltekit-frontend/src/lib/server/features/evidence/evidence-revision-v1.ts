@@ -178,14 +178,16 @@ export async function saveEvidenceMarkupRevisionV1(input: SaveEvidenceRevisionIn
 }
 
 /** Production ports. Dynamic imports keep the pure logic above free of database and S3 side effects at import time. */
-export async function createDrizzleRevisionPortsV1(): Promise<EvidenceRevisionPortsV1> {
-  const [{ db }, schema, orm, seaweed, buckets] = await Promise.all([
-    import('$lib/server/db/client'),
+export async function createDrizzleRevisionPortsV1(override?: { db: (typeof import('$lib/server/db/client'))['db'] }): Promise<EvidenceRevisionPortsV1> {
+  // `override.db` lets a rehearsal drive these exact ports through a transaction it will roll back. Storage is imported lazily
+  // (only putObject/deleteObject need it) so a database-only rehearsal never touches SeaweedFS.
+  const [client, schema, orm, buckets] = await Promise.all([
+    override ? Promise.resolve(null) : import('$lib/server/db/client'),
     import('$lib/server/db/schema-postgres.js'),
     import('drizzle-orm'),
-    import('$lib/server/storage/seaweed.js'),
     import('$lib/server/storage/storage-buckets.js'),
   ]);
+  const db = override?.db ?? client!.db;
   const { evidence, evidenceVersions } = schema;
   const { eq, and, sql } = orm;
   const bucket = buckets.storageBuckets.artifacts;
@@ -204,10 +206,12 @@ export async function createDrizzleRevisionPortsV1(): Promise<EvidenceRevisionPo
     },
     async putObject(args) {
       buckets.assertArtifactBucket(args.bucket);
+      const seaweed = await import('$lib/server/storage/seaweed.js');
       await seaweed.putFileToSeaweed({ bucket: args.bucket, objectKey: args.objectKey, bytes: args.bytes, contentType: args.contentType, metadata: args.metadata });
     },
     async deleteObject(b, key) {
       buckets.assertArtifactBucket(b);
+      const seaweed = await import('$lib/server/storage/seaweed.js');
       await seaweed.deleteFileFromSeaweed(key, b);
     },
     async insertRevision({ evidenceId, sha256, metadata, changeReason }) {
