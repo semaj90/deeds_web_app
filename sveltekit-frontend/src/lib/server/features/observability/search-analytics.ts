@@ -23,6 +23,7 @@ import { ENV } from '$lib/server/env.server.js';
 // ── Types ──────────────────────────────────────────────────────────────────
 
 export type HitPipeline =
+  | 'library-search'
   | 'ace'
   | 'kag'
   | 'dag'

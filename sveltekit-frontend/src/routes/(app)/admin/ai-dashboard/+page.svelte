@@ -381,6 +381,7 @@
 					{#each data.agenticErrorFixTasks as task (task.id)}
 						<article class="runtime-error-card">
 							<div class="task-topline"><span>{task.id} · {task.priority}</span><span class="task-status">{task.status}</span></div>
+							{#if task.diagnosticResolution}<p>Diagnostic absent from clean native check ({task.diagnosticResolution.currentRunId}); proposal status remains unchanged.</p>{/if}
 							<h4>{task.label}</h4>
 							{#if task.sourceRef}<p>Source: {task.sourceRef}</p>{/if}
 							{#if task.gate}<p>Gate: {task.gate}</p>{/if}
@@ -623,7 +624,7 @@
 		--atlas-accent: #b66bff;
 		--atlas-accent-soft: rgba(168, 85, 247, 0.13);
 		min-height: 100vh;
-		margin: -2.5rem;
+		margin: 0;
 		padding: 2.5rem;
 		background:
 			radial-gradient(circle at top left, rgba(168, 85, 247, 0.15), transparent 34%),

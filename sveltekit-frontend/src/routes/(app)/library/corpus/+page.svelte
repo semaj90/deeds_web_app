@@ -47,13 +47,10 @@
 		uploadRunning = true;
 		uploadError = null;
 		try {
-			const fd = new FormData();
-			fd.append('file', uploadFile);
-			fd.append('title', `${uploadModal.stateName} Constitution`);
-			fd.append('corpusType', 'constitution');
-			fd.append('jurisdiction', uploadModal.stateCode);
-			fd.append('jurisdictionType', 'state');
-			const res = await fetch('/api/library/upload', { method: 'POST', body: fd, signal: AbortSignal.timeout(120_000) });
+			const { uploadLibraryFileV1 } = await import('$lib/library/library-upload-client-v1.js');
+			const res = await uploadLibraryFileV1(uploadFile, {
+				title: `${uploadModal.stateName} Constitution`, corpusType: 'constitution', jurisdiction: uploadModal.stateCode,
+			}, AbortSignal.timeout(120_000));
 			const d = await res.json();
 			if (!res.ok) {
 				uploadError = d.error ?? 'Upload failed';

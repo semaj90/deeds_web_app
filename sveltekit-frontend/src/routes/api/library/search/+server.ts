@@ -7,7 +7,7 @@
  * Fast-path: Go search service at GO_SEARCH_URL (4-way parallel fan-out).
  * Fallback:  Inline SQL (lexical + semantic, same as before).
  *
- * Both methods return { hits, results, total } — `results` is an alias of `hits`
+ * Both methods return { hits, results, total, meta } — `results` is an alias of `hits`
  * for backward-compat with pages that destructure `d.results`.
  */
 import { json } from '@sveltejs/kit';
@@ -18,6 +18,12 @@ import { ENV } from '$lib/server/env.server.js';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
+import {
+  authorizeLibraryDocumentV1,
+  filterVisibleLibraryDocumentIdsV1,
+  libraryVisibilityPredicateV1,
+  normalizeLibraryActorIdV1,
+} from '$lib/server/library/library-document-access-v1.js';
 
 const librarySearchSchema = z.object({
   q: z.string().min(2).max(1000),
@@ -37,6 +43,10 @@ const postBodySchema = z.object({
 });
 
 const GO_SEARCH_URL = ENV.GO_SEARCH_URL || '';
+// The Go executor currently returns unscoped library candidates. Keep this
+// route on its owner-filtered SQL path until the executor enforces the same
+// shared-or-uploader visibility predicate before retrieval and scoring.
+const GO_SEARCH_LIBRARY_VISIBILITY_SUPPORTED = false;
 
 interface SearchParams {
   q: string;
@@ -50,10 +60,20 @@ interface SearchParams {
 async function doSearch(p: SearchParams) {
   const { q, documentId, jurisdiction, corpusType, limit, userId } = p;
 
-  recordSearchQuery({ query: q, pipeline: 'kag', cacheHit: false, userId });
+  // Authorization BEFORE analytics, embedding, Go fan-out, or any SQL over chunks.
+  const actorId = normalizeLibraryActorIdV1(userId);
+  if (actorId === null) return { hits: [], results: [], total: 0, meta: { retrievalMethod: 'not_run', reason: 'invalid_actor' } };
+  if (documentId) {
+    const access = await authorizeLibraryDocumentV1({ documentId, actorId });
+    if (!access.allowed) return { hits: [], results: [], total: 0, meta: { retrievalMethod: 'not_run', reason: 'document_not_visible' } };
+  }
+
+  // Route-level analytics label: this endpoint may use Go, FTS-only, or
+  // PostgreSQL FTS + weighted pgvector fusion, so it is not necessarily KAG.
+  recordSearchQuery({ query: q, pipeline: 'library-search', cacheHit: false, userId });
 
   // Fast-path: Go search service (parallel fan-out: citation + FTS + pgvector + Qdrant)
-  if (GO_SEARCH_URL && !documentId) {
+  if (GO_SEARCH_URL && GO_SEARCH_LIBRARY_VISIBILITY_SUPPORTED && !documentId) {
     try {
       const goResp = await fetch(`${GO_SEARCH_URL}/search`, {
         method: 'POST',
@@ -69,8 +89,15 @@ async function doSearch(p: SearchParams) {
       });
       if (goResp.ok) {
         const data = await goResp.json();
-        const hits = (data.hits ?? []).map(formatGoHit);
-        return { hits, results: hits, total: data.total ?? 0, meta: { ...data.meta, source: 'go-search-service' } };
+        // The Go executor does not enforce uploader ownership: keep only visible documents.
+        const rawHits = (data.hits ?? []) as Record<string, unknown>[];
+        const visible = await filterVisibleLibraryDocumentIdsV1(
+          rawHits.map((h) => String(h.documentId ?? '')),
+          actorId,
+        );
+        const hits = rawHits.filter((h) => visible.has(String(h.documentId ?? ''))).map(formatGoHit);
+        // The executor's total is unscoped; do not expose it after post-filtering.
+        return { hits, results: hits, total: hits.length, meta: { ...data.meta, source: 'go-search-service', visibilityFilter: 'post-filtered-by-library-owner' } };
       }
       // Non-200 → fall through to inline SQL
     } catch {
@@ -87,8 +114,9 @@ async function doSearch(p: SearchParams) {
   }
 
   const filters: string[] = [];
-  const params: unknown[] = [q];
-  let paramIdx = 2;
+  const params: unknown[] = [q, actorId];
+  let paramIdx = 3;
+  filters.push(libraryVisibilityPredicateV1(2));
 
   if (documentId) {
     params.push(documentId);
@@ -106,7 +134,7 @@ async function doSearch(p: SearchParams) {
   const whereClause = filters.length ? `AND ${filters.join(' AND ')}` : '';
 
   if (queryEmbedding) {
-    // Hybrid: lexical rank + cosine, fused with RRF
+    // Hybrid: PostgreSQL FTS ts_rank (not BM25) + cosine, weighted 0.4/0.6 (not RRF)
     params.push(`[${queryEmbedding.join(',')}]`);
     const embeddingParam = paramIdx++;
     params.push(limit * 2); // Fetch more for reranking
@@ -179,7 +207,17 @@ async function doSearch(p: SearchParams) {
 
     const res = await pool.query(hybridQuery, params);
     const hits = res.rows.map(formatHit);
-    return { hits, results: hits, total: res.rowCount ?? 0 };
+    return {
+      hits,
+      results: hits,
+      total: res.rowCount ?? 0,
+      meta: {
+        retrievalMethod: 'postgres_fts_ts_rank_weighted_linear_fusion',
+        lexicalMethod: 'postgres_fts_ts_rank',
+        semanticMethod: 'pgvector_cosine',
+        weights: { lexical: 0.4, semantic: 0.6 },
+      },
+    };
   } else {
     // Lexical only
     params.push(limit);
@@ -203,12 +241,17 @@ async function doSearch(p: SearchParams) {
 
     const res = await pool.query(lexQuery, params);
     const hits = res.rows.map(formatHit);
-    return { hits, results: hits, total: res.rowCount ?? 0, meta: { source: 'inline-sql' } };
+    return {
+      hits,
+      results: hits,
+      total: res.rowCount ?? 0,
+      meta: { source: 'inline-sql', retrievalMethod: 'postgres_fts_ts_rank', lexicalMethod: 'postgres_fts_ts_rank', semanticMethod: null },
+    };
   }
 }
 
 export const GET: RequestHandler = async ({ url, locals }) => {
-  if (!locals.user?.id) return json({ hits: [], results: [], total: 0 }, { status: 401 });
+  if (!locals.user?.id) return json({ hits: [], results: [], total: 0, meta: { retrievalMethod: 'not_run', reason: 'unauthorized' } }, { status: 401 });
 
   const parsed = librarySearchSchema.safeParse({
     q: url.searchParams.get('q')?.trim() ?? '',
@@ -217,25 +260,27 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     documentId: url.searchParams.get('documentId'),
     limit: url.searchParams.get('limit') ?? undefined,
   });
-  if (!parsed.success) return json({ hits: [], results: [], total: 0 });
+  if (!parsed.success) return json({ hits: [], results: [], total: 0, meta: { retrievalMethod: 'not_run', reason: 'invalid_request' } });
 
   const { q, jurisdiction, corpusType, documentId, limit } = parsed.data;
   const result = await doSearch({ q, jurisdiction, corpusType, documentId, limit, userId: locals.user.id });
-  return json(result, { headers: cacheControl.short });
+  const status = 'reason' in result.meta && result.meta.reason === 'document_not_visible' ? 404 : 200;
+  return json(result, { status, headers: cacheControl.short });
 };
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-  if (!locals.user?.id) return json({ hits: [], results: [], total: 0 }, { status: 401 });
+  if (!locals.user?.id) return json({ hits: [], results: [], total: 0, meta: { retrievalMethod: 'not_run', reason: 'unauthorized' } }, { status: 401 });
 
   let body: unknown;
-  try { body = await request.json(); } catch { return json({ hits: [], results: [], total: 0 }); }
+  try { body = await request.json(); } catch { return json({ hits: [], results: [], total: 0, meta: { retrievalMethod: 'not_run', reason: 'invalid_json' } }); }
 
   const parsed = postBodySchema.safeParse(body);
-  if (!parsed.success) return json({ hits: [], results: [], total: 0 });
+  if (!parsed.success) return json({ hits: [], results: [], total: 0, meta: { retrievalMethod: 'not_run', reason: 'invalid_request' } });
 
   const { query: q, jurisdiction, corpusType, documentId, limit } = parsed.data;
   const result = await doSearch({ q, jurisdiction, corpusType, documentId, limit, userId: locals.user.id });
-  return json(result, { headers: cacheControl.short });
+  const status = 'reason' in result.meta && result.meta.reason === 'document_not_visible' ? 404 : 200;
+  return json(result, { status, headers: cacheControl.short });
 };
 
 /** Format a row from the Go search service response */

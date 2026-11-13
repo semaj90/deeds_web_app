@@ -7,18 +7,25 @@
 
 	let { data }: { data: PageData } = $props();
 
-	type Tab = 'text' | 'pdf' | 'summary' | 'search';
+	type Tab = 'text' | 'pdf' | 'image' | 'summary' | 'search';
+	let pdfPreviewDialog = $state<HTMLDialogElement>();
+	let pdfPreviewUrl = $state<string | null>(null);
 
-	// PDF viewer — lazy-loaded browser-only component
-	let PDFViewer: typeof import('$lib/components/legal/PDFViewer.svelte').default | null = $state(null);
-	let pdfTabActivated = $state(false);
+	const isPdf = (mimeType: string | null | undefined) =>
+		String(mimeType ?? '').split(';', 1)[0].trim().toLowerCase() === 'application/pdf';
+	const isRasterImage = (mimeType: string | null | undefined) =>
+		['image/jpeg', 'image/png', 'image/webp'].includes(String(mimeType ?? '').split(';', 1)[0].trim().toLowerCase());
+	const visibleTabs = $derived([
+		{ id: 'text' as const, label: 'Official Text' },
+		...(isPdf(data.document?.mimeType) ? [{ id: 'pdf' as const, label: 'Preview PDF' }] : []),
+		...(isRasterImage(data.document?.mimeType) ? [{ id: 'image' as const, label: 'Preview image' }] : []),
+		{ id: 'search' as const, label: 'Search' },
+		{ id: 'summary' as const, label: 'Summary' },
+	]);
 
-	async function activatePdfTab() {
-		pdfTabActivated = true;
-		if (!PDFViewer) {
-			const mod = await import('$lib/components/legal/PDFViewer.svelte');
-			PDFViewer = mod.default;
-		}
+	function openPdfPreview(documentId: string) {
+		pdfPreviewDialog?.showModal();
+		pdfPreviewUrl ??= `/api/library/documents/${documentId}/pdf`;
 	}
 
 	let activeTab = $state<Tab>('text');
@@ -183,13 +190,14 @@
 			<main class="lr-main">
 				<!-- Tab bar -->
 				<div class="lr-tab-bar">
-					{#each [['text', 'Official Text'], ['pdf', 'PDF'], ['search', 'Search'], ['summary', 'Summary']] as [tab, label]}
+					{#each visibleTabs as { id: tab, label }}
 						<button
 							onclick={() => {
-								if (tab === 'pdf') activatePdfTab();
-								else activeTab = tab as Tab;
-								if (tab !== 'pdf') activeTab = tab as Tab;
-								else activeTab = 'pdf';
+								if (tab === 'pdf') {
+									openPdfPreview(doc.id);
+									return;
+								}
+								activeTab = tab;
 							}}
 							class="lr-tab"
 							class:active={activeTab === tab}
@@ -225,15 +233,15 @@
 							/>
 						</div>
 
-					{:else if activeTab === 'pdf'}
-						<div class="lr-pdf-pane">
-							{#if pdfTabActivated && PDFViewer}
-								<PDFViewer documentId={doc.id} />
-							{:else if pdfTabActivated}
-								<div class="lr-pdf-loading">Loading PDF viewer…</div>
-							{:else}
-								<div class="lr-pdf-loading">Initializing…</div>
-							{/if}
+					{:else if activeTab === 'image'}
+						<div class="lr-image-preview">
+							<img
+								src={`/api/library/documents/${encodeURIComponent(doc.id)}/image`}
+								alt={`Original image: ${doc.title}`}
+								loading="lazy"
+								decoding="async"
+							/>
+							<p>{doc.title} · Original image</p>
 						</div>
 
 					{:else if activeTab === 'search'}
@@ -350,6 +358,19 @@
 		</div>
 	</div>
 
+	<dialog bind:this={pdfPreviewDialog} class="lr-pdf-dialog" aria-label="PDF preview">
+		<div class="lr-pdf-dialog-header">
+			<strong>{doc.title}</strong>
+			<a href={`/api/library/documents/${encodeURIComponent(data.document.id)}/pdf`} target="_blank" rel="noopener noreferrer">Open in new tab</a>
+			<a href={`/api/library/documents/${encodeURIComponent(data.document.id)}/pdf?download=1`} download>Download</a>
+			<button type="button" class="lr-pdf-dialog-close" onclick={() => pdfPreviewDialog?.close()} aria-label="Close PDF preview">Close</button>
+		</div>
+		{#if pdfPreviewUrl}
+			<iframe title={`PDF preview: ${doc.title}`} src={pdfPreviewUrl} class="lr-pdf-frame"></iframe>
+		{:else}
+			<div class="lr-pdf-empty">Opening PDF preview…</div>
+		{/if}
+	</dialog>
 	<CitationDrawer bind:open={drawerOpen} citation={activeCitation} />
 {/if}
 
@@ -357,21 +378,36 @@
 	/* ── Error ── */
 	.lr-error { padding: 2rem; text-align: center; color: #f87171; }
 
-	/* ── PDF pane ── */
-	.lr-pdf-pane {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		flex-direction: column;
+	/* The native dialog opens synchronously; the browser owns PDF decoding. */
+	.lr-pdf-dialog {
+		width: min(96vw, 1440px);
+		height: min(94dvh, 1000px);
+		max-width: none;
+		max-height: none;
+		padding: 0;
+		border: 0;
+		border-radius: 12px;
+		background: #25282b;
+		color: #f8fafc;
+		box-shadow: 0 24px 80px rgb(0 0 0 / 45%);
 	}
-	.lr-pdf-loading {
+	.lr-pdf-dialog::backdrop { background: rgb(0 0 0 / 68%); }
+	.lr-pdf-dialog-header {
+		height: 48px;
+		padding: 0 12px 0 18px;
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		height: 100%;
-		font-size: 0.85rem;
-		color: rgba(212, 199, 163, 0.35);
+		justify-content: space-between;
+		gap: 16px;
+		border-bottom: 1px solid rgb(255 255 255 / 12%);
 	}
+	.lr-pdf-dialog-header strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.lr-pdf-dialog-close { padding: 6px 12px; border: 1px solid rgb(255 255 255 / 20%); border-radius: 6px; color: inherit; background: transparent; cursor: pointer; }
+	.lr-pdf-frame { display: block; width: 100%; height: calc(100% - 48px); border: 0; background: #525659; }
+	.lr-pdf-empty { height: calc(100% - 48px); display: grid; place-items: center; color: #cbd5e1; }
+	.lr-image-preview { width: 100%; height: 100%; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem; overflow: auto; }
+	.lr-image-preview img { display: block; max-width: 100%; max-height: calc(100% - 2rem); object-fit: contain; }
+	.lr-image-preview p { color: rgba(212, 199, 163, 0.65); font-size: 0.75rem; }
 
 	/* ── Page ── */
 	.lr-page {

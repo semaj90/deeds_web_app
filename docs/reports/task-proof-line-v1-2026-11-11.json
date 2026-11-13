@@ -1,6 +1,8 @@
 {
   "schema": "atlas.task-proof-line-implementation-report.v1",
-  "status": "TEST_PROVEN_ADVISORY_ONLY",
+  "sourceStatus": "EXISTS",
+  "testStatus": "PROVEN_ADVISORY_ONLY",
+  "liveStatus": "NOT_PROVEN",
   "snapshot": {
     "path": "docs/reports/openspec-workboard-v1.json",
     "generatedAt": "2026-11-12T00:45:10.402Z",
@@ -14,11 +16,17 @@
     "result": "UNRESOLVED_TASK_MAPPING"
   },
   "checks": {
-    "taskProofAndReceiptDictionarySpecs": "28/28 PASS",
-    "wfuMetadataSpecs": "21/21 PASS",
-    "frontendTypeCheck": "PENDING",
+    "taskProofAndReceiptDictionaryVitest": "28/28 PASS",
+    "wfuMetadataNodeTests": "21/21 PASS",
+    "scopedStrictTypeScript": "PASS",
+    "fullSvelteCheck": "STOPPED_AT_APPROX_6.5_GB_RSS_NO_RESULT",
     "databaseOrCacheWrites": false,
     "canonicalStatusesChanged": false
+  },
+  "receiptCache": {
+    "owner": "sveltekit-frontend/src/lib/server/atlas/cache/receipt-dictionary-v1.ts",
+    "identityAndReadThrough": "EXISTS_AND_FOCUSED_TESTED",
+    "namedProductionConsumers": "NOT_FOUND_IN_SOURCE_AUDIT"
   },
   "patchTargets": [
     "sveltekit-frontend/src/lib/server/atlas/board/task-proof-line-v1.ts",
@@ -30,6 +38,5 @@
     "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md"
   ],
   "featureLabelAuthority": "PROPOSED_ONLY",
-  "receiptDictionaryReuse": true,
-  "completionAuthorized": "separate projection state; no canonical task status mutated"
+  "completionAuthorized": "SEPARATE_FROM_CHECKBOX_TEST_AND_READBACK_STATES"
 }

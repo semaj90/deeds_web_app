@@ -543,7 +543,7 @@
         }
       },
       "runOptions": {
-        "runOn": "folderOpen"
+        "runOn": "userRequest"
       },
       "group": "build",
       "problemMatcher": [],
@@ -577,9 +577,9 @@
       "detail": "Orchestrates: (1) npm run dev:gpu with LiteRT-LM backend (:8070), (2) Opens LiteRT.js-Mocap workspace in new VS Code window. Run manually from Command Palette."
     },
     {
-      "label": "🎯 EmbeddingGemma Summary Embeddings (startup bounded)",
+      "label": "🎯 EmbeddingGemma Backfill Admission Preview (startup)",
       "type": "shell",
-      "command": "node scripts/startup/run-detached.mjs worker:embedding:batch:startup",
+      "command": "node scripts/startup/run-detached.mjs worker:embedding:batch:dry",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -596,7 +596,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "AUTO-STARTS on folder open — runs a bounded 100-row EmbeddingGemma batch over atlas_summary_layers via Ollama /api/embed. Writes 768-dim pgvector embeddings and proof reports without mutating packet identity."
+      "detail": "AUTO-STARTS on folder open — runs the no-write admission preview only. The current p1-embedding-backfill entry point is fail-closed and reports missing source/workspace revisions, target-column reconciliation, and model/producer pins; it does not call Ollama or write embeddings."
     },
     {
       "label": "Dev Server (gRPC Retrieval)",
@@ -1998,7 +1998,7 @@
         }
       },
       "runOptions": {
-        "runOn": "folderOpen"
+        "runOn": "userRequest"
       },
       "isBackground": false,
       "dependsOn": "🔑 Startup: Valkey Semantic Index (create-index)",
@@ -2086,7 +2086,7 @@
         "cwd": "${workspaceFolder}"
       },
       "runOptions": {
-        "runOn": "folderOpen",
+        "runOn": "userRequest",
         "instanceLimit": 1
       },
       "isBackground": true,

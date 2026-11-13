@@ -153,16 +153,12 @@
 		uploadError = null;
 		uploadSuccess = null;
 
-		const fd = new FormData();
-		fd.append('file',         selectedFile!);
-		fd.append('title',        title.trim());
-		fd.append('corpusType',   corpusType);
-		fd.append('jurisdiction', jurisdiction.trim() || 'federal');
-		if (citation.trim())    fd.append('citation',    citation.trim());
-		if (officialUrl.trim()) fd.append('officialUrl', officialUrl.trim());
-
 		try {
-			const res  = await fetch('/api/library/upload', { method: 'POST', body: fd });
+			const { uploadLibraryFileV1 } = await import('$lib/library/library-upload-client-v1.js');
+			const res  = await uploadLibraryFileV1(selectedFile!, {
+				title: title.trim(), corpusType, jurisdiction: jurisdiction.trim() || 'federal',
+				officialUrl: officialUrl.trim() || undefined,
+			});
 			const data = await res.json();
 			if (!res.ok || !data.success) { uploadError = data.error ?? 'Upload failed'; return; }
 

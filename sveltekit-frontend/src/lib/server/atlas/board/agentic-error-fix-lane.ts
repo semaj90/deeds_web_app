@@ -4,6 +4,8 @@ export const AGENTIC_ERROR_FIX_ORIGIN = 'agentic_error_fixing_v1';
 
 export interface AgenticErrorFixTask {
 	id: string;
+	diagnosticFingerprint: string | null;
+	diagnosticResolution: DailyGraphifyTask['diagnostic_resolution'] | null;
 	priority: DailyGraphifyTask['priority'];
 	label: string;
 	status: string;
@@ -13,6 +15,7 @@ export interface AgenticErrorFixTask {
 	blockedBy: string[];
 	evidenceRefs: string[];
 	reasonCodes: string[];
+	openSpecTaskRef: DailyGraphifyTask['openspec_task_ref'] | null;
 }
 
 const PRIORITY_SCORE: Record<DailyGraphifyTask['priority'], number> = {
@@ -31,6 +34,8 @@ export function buildAgenticErrorFixLane(board: DailyGraphifyBoardData): Agentic
 		)
 		.map((task) => ({
 			id: task.id,
+			diagnosticFingerprint: task.diagnostic_fingerprint ?? null,
+			diagnosticResolution: task.diagnostic_resolution ?? null,
 			priority: task.priority,
 			label: task.label,
 			status: task.status ?? 'PROPOSED',
@@ -40,5 +45,6 @@ export function buildAgenticErrorFixLane(board: DailyGraphifyBoardData): Agentic
 			blockedBy: [...(task.blockedBy ?? [])],
 			evidenceRefs: [...(task.evidence_refs ?? [])],
 			reasonCodes: [...(task.reason_codes ?? [])],
+			openSpecTaskRef: task.openspec_task_ref ?? null,
 		}));
 }

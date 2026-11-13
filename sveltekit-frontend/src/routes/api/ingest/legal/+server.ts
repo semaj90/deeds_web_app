@@ -136,21 +136,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (body.action === 'document') {
 		const { documentId } = body;
 		try {
-			const { runIngestionPipeline } = await import('$lib/server/legal/ingestion-worker.js');
-
-			// Create a new job row
-			const jobRes = await pool.query(
-				`INSERT INTO ingestion_jobs (document_id, stage, progress)
-				 VALUES ($1, 'queued', 0)
-				 RETURNING id`,
-				[documentId]
-			);
-			const jobId = jobRes.rows[0]?.id as string;
-			if (!jobId) throw new Error('Failed to create ingestion job');
-
-			// Run in background
-			runIngestionPipeline({ documentId, jobId }).catch(() => {});
-			return json({ queued: true, documentId, jobId });
+			const { enqueueLibraryDocumentReingestionV1 } = await import('$lib/server/legal/ingestion-worker.js');
+			const queued = await enqueueLibraryDocumentReingestionV1(documentId);
+			if (!queued) return json({ queued: false, error: 'Document not found' }, { status: 404 });
+			return json({ queued: true, documentId, ...queued }, { status: queued.alreadyQueued ? 200 : 202 });
 		} catch (err) {
 			return json({ error: String(err) }, { status: 500 });
 		}

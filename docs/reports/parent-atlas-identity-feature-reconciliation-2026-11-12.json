@@ -1,0 +1,174 @@
+{
+  "schema": "parent-atlas.identity-feature-reconciliation.v1",
+  "status": "PARTIAL_UNADMITTED",
+  "generatedAt": "2026-11-12",
+  "source": {
+    "head": "709d41148c2cf53aab2820a16dc281357827bab7",
+    "requestedCommit": "8d01ce3a6cead9b7ae5895ee66356aaa616c0e1d",
+    "requestedCommitIsAncestor": true,
+    "worktreeDirtyEntriesAtAuditStart": 41,
+    "workboardProjection": "current worktree; stdout-only snapshot mode; no repo artifact replaced"
+  },
+  "database": {
+    "version": "PostgreSQL 18.4 (Debian 18.4-1)",
+    "readOnlyTransaction": true,
+    "writesPerformed": false,
+    "schemaChanges": false,
+    "openspecSnapshot": {
+      "snapshotId": "sha256:88c34023ae0a8a0a07920b939d9c6e7ea4b080f4d828db7393d5943d0eeb24ab",
+      "workspaceRevision": "sha256:030af2b51ccf27d9a8558082664e4a73e7ecd16b2c739f1f1c875ae38772bc69",
+      "createdAt": "2026-10-19T08:48:13.119Z",
+      "indexedRows": 5640,
+      "snapshotStatus": "COMPLETE"
+    }
+  },
+  "taskIdentity": {
+    "currentWorkboardTaskCount": 14000,
+    "currentStableKeyUniqueCount": 14000,
+    "currentStableKeyDuplicateGroups": 0,
+    "kanbanTaskCount": 4514,
+    "exactStableKeyToKanbanTaskIdMatches": 4337,
+    "kanbanRowsWithSourceRevision": 0,
+    "sourceIndexRows": 5640,
+    "sourceIndexCandidateRows": 5640,
+    "sourceIndexRowsWithExactCurrentSourceRef": 3678,
+    "sourceIndexRowsWithExactCurrentSourceRefAndTaskHash": 3128,
+    "sourceRefMatchesWithDifferentTaskHash": 550,
+    "currentStableKeySourceRefTaskHashAndKanbanMatches": 2467,
+    "uniqueCandidateIdsAmongThoseExactTriples": 2377,
+    "candidateIdsAmbiguousAcrossStableKeysAmongThoseExactTriples": 29,
+    "directSourceIndexCandidateToKanbanTaskIdMatches": 0,
+    "duplicateCandidateValuesAcrossSnapshot": 61,
+    "currentWorkboardTasksWithProofReceiptDeclaration": 0,
+    "admittedTaskIdentityLinks": 0,
+    "interpretation": "Partial exact crosswalk can be reconstructed for current task rows using sourceRef plus task block hash and then the generated stableKey; the stored source-index candidate field itself does not join Kanban task_id, and the snapshot is stale."
+  },
+  "sourceIndexRefreshDryRun": {
+    "staleCensusCliAttempt": {
+      "input": "docs/reports/openspec-evidence/20261111223944001-8fca8f04936d/census-v1.json",
+      "exitCode": 1,
+      "result": "WORKSPACE_SNAPSHOT_STALE",
+      "outputReceiptWritten": false
+    },
+    "currentInMemoryPlan": {
+      "gitCommit": "709d41148c2cf53aab2820a16dc281357827bab7",
+      "workspaceRevision": "sha256:d344ed63726d13f2d80c60c90fd09c35bfa82b578e2b734e64e75f10d8c09e59",
+      "censusStatus": "DIAGNOSTIC_ONLY_NOT_PROMOTABLE",
+      "censusTaskCount": 15068,
+      "uncheckedTaskCount": 6328,
+      "snapshotId": "sha256:820deda46cb7861cb4942fdccb3d777978c05d305573762ffb4ddc90842caf0a",
+      "rowManifestChecksum": "sha256:0398758565b065ba61465f75b1c60782e7c2e81dd1adf75f5a66ef754fa94a36",
+      "sourceIndexRows": 6328,
+      "invalidRows": 0,
+      "identityStates": {
+        "DECLARED_ID": 3564,
+        "DERIVED_ID": 2554,
+        "AMBIGUOUS": 210
+      },
+      "under10kApplyCap": true,
+      "writesPerformed": false
+    },
+    "currentExactCrosswalk": {
+      "workboardTasks": 14000,
+      "sourceIndexRowsWithExactSourceRef": 5770,
+      "sourceIndexRowsWithExactSourceRefAndBlockHash": 5770,
+      "sourceRefHashRowsAlsoMatchingKanbanStableKey": 4331,
+      "directCandidateToKanbanTaskIdMatches": 0,
+      "distinctCandidateIdsInExactTriple": 4246,
+      "ambiguousCandidateIdsInExactTriple": 47,
+      "uniqueCandidateIdsInExactTriple": 4199
+    },
+    "interpretation": "The in-memory plan has zero invalid rows and is below the indexer row cap, but the evidence census is diagnostic-only. It does not establish canonical identity; no database apply occurred."
+  },
+  "executionReceipts": {
+    "atlasTestExecutionReceiptRows": 45,
+    "strictVerifierRows": 32,
+    "strictVerifiedPassWithEvidence": 32,
+    "strictVerifierSourceRevisionMismatches": 0,
+    "strictVerifierDigestMatchesAfterRemovingSha256Prefix": 32,
+    "executionReceiptsWithoutStrictVerifier": 13,
+    "kanbanAttempts": 149,
+    "kanbanAttemptsWithReceiptReference": 147,
+    "kanbanAttemptReferencesMatchingAtlasTestReceipts": 0,
+    "receiptRowsContainTaskStableKeyOrOpenSpecTaskId": false,
+    "currentProofDeclarations": 0,
+    "admittedTaskToReceiptLinks": 0,
+    "interpretation": "The 32 strict verifier results validate their corresponding test receipts, not a Kanban task. Kanban attempt receipt IDs belong to a different or unresolved receipt family in this database view."
+  },
+  "featureAuthority": {
+    "contractExists": true,
+    "featureRegistrySpecExists": true,
+    "featureIdentityV2SqlExists": true,
+    "featureIdentityV2TablesPresent": false,
+    "featureRegistryTablePresent": false,
+    "atlasFiFeatureRows": 7,
+    "atlasFiFeaturesApprovedOrCanonicalRows": 0,
+    "atlasFiFeaturesWithSourceRevision": 0,
+    "domainVocabularyCrosswalkRows": 59,
+    "domainVocabularyCrosswalkCanonicalRows": 0,
+    "taskSemanticPacketRows": 2,
+    "taskSemanticPacketCanonicalRows": 0,
+    "admittedCanonicalFeatureBindings": 0,
+    "interpretation": "Existing feature tables are candidate/projection/domain vocabulary owners; none is a reviewed, revision-qualified canonical feature identity owner. Feature Identity V2 DDL is draft and unapplied."
+  },
+  "acceptance": {
+    "taskIdentity": "PARTIAL",
+    "executionReceiptVerification": "PASS_32_OF_32_VERIFIER_ROWS",
+    "taskToReceiptBinding": "UNVERIFIED",
+    "featureIdentityAdmission": "NOT_ADMITTED",
+    "runtimeAdmission": "NOT_PROVEN",
+    "overall": "NOT_ACCEPTED"
+  },
+  "verification": {
+    "focusedCommand": "npx vitest run src/lib/server/atlas/board/task-proof-line-v1.spec.ts src/lib/server/atlas/board/task-proof-line-v1.snapshot.spec.ts src/lib/server/atlas/cache/receipt-dictionary-v1.spec.ts",
+    "focusedExitCode": 0,
+    "focusedTests": 28,
+    "fullCheckCommand": "npm run check",
+    "fullCheckExitCode": 0,
+    "fullCheckOutput": "svelte-check found 0 errors and 0 warnings",
+    "sourceIndexOwnerTestCommand": "node --test scripts/atlas/index-openspec-task-sources-v1.test.mjs",
+    "sourceIndexOwnerTestExitCode": 0,
+    "sourceIndexOwnerTests": 6,
+    "databaseOperations": "read-only SELECTs only; all transactions rolled back"
+  },
+  "sqlQueries": {
+    "latestSnapshot": "SELECT snapshot_id, workspace_revision, input_checksum, source_row_count, snapshot_status, created_at FROM openspec_task_source_snapshots_v1 ORDER BY created_at DESC LIMIT 5;",
+    "sourceIndexRowsForWorkboardJoin": "SELECT source_ref, task_hash, canonical_task_key_candidate, identity_status FROM openspec_task_source_index_v1 WHERE snapshot_id = $1;",
+    "kanbanRowsForWorkboardJoin": "SELECT task_id, source_refs, source_revision FROM kanban_tasks;",
+    "candidateToKanban": "SELECT count(*) AS source_rows, count(*) FILTER (WHERE i.canonical_task_key_candidate IS NOT NULL) AS candidate_rows, count(*) FILTER (WHERE k.task_id IS NOT NULL) AS exact_matches, count(*) FILTER (WHERE i.canonical_task_key_candidate IS NOT NULL AND k.task_id IS NULL) AS unmatched FROM openspec_task_source_index_v1 i JOIN openspec_task_source_snapshots_v1 s USING (snapshot_id) LEFT JOIN kanban_tasks k ON k.task_id = i.canonical_task_key_candidate WHERE i.snapshot_id = 'sha256:88c34023ae0a8a0a07920b939d9c6e7ea4b080f4d828db7393d5943d0eeb24ab';",
+    "duplicateCandidateValues": "SELECT count(*) AS duplicate_candidate_values FROM (SELECT canonical_task_key_candidate FROM openspec_task_source_index_v1 WHERE canonical_task_key_candidate IS NOT NULL GROUP BY canonical_task_key_candidate HAVING count(*) > 1) d;",
+    "receiptVerifier": "SELECT count(*) AS joined, count(*) FILTER (WHERE v.verification_status = 'VERIFIED_PASS' AND v.evidence_resolved) AS verified_pass_with_evidence, count(*) FILTER (WHERE v.source_revision IS DISTINCT FROM r.source_revision) AS source_revision_mismatches, count(*) FILTER (WHERE replace(v.computed_digest, 'sha256:', '') = replace(r.report_checksum, 'sha256:', '')) AS digest_matches FROM atlas_test_execution_receipts r JOIN atlas_receipt_verifier_results_v1 v ON v.execution_receipt_id = r.execution_receipt_id;",
+    "kanbanAttemptToTestReceipt": "SELECT count(*) FILTER (WHERE a.execution_receipt_id IS NOT NULL) AS attempt_receipt_refs, count(*) FILTER (WHERE a.execution_receipt_id IS NOT NULL AND r.execution_receipt_id IS NOT NULL) AS exact_test_receipt_matches FROM kanban_task_attempts a LEFT JOIN atlas_test_execution_receipts r ON r.execution_receipt_id = a.execution_receipt_id;",
+    "featureCandidateCounts": "SELECT 'atlas_fi_features' AS owner, count(*) AS rows, count(*) FILTER (WHERE upper(status) IN ('APPROVED','CANONICAL','REVIEWED')) AS approved_or_canonical, count(DISTINCT feature_id) AS distinct_ids, count(DISTINCT source_revision) AS source_revisions FROM atlas_fi_features UNION ALL SELECT 'atlas_domain_vocabulary_crosswalk_v1', count(*), count(*) FILTER (WHERE canonical), count(DISTINCT source_value), count(DISTINCT crosswalk_version) FROM atlas_domain_vocabulary_crosswalk_v1 UNION ALL SELECT 'task_semantic_packets', count(*), count(*) FILTER (WHERE canonical), count(DISTINCT feature_id), count(DISTINCT validation_status) FROM task_semantic_packets;",
+    "featureIdentityV2Presence": "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('atlas_feature_concepts', 'atlas_feature_source_identities', 'atlas_feature_concept_crosswalk', 'atlas_feature_labels');"
+  },
+  "nextRequiredWork": [
+    "Refresh the OpenSpec task-source snapshot using the existing snapshot owner and pin it to a qualified source/workspace revision; retain the old snapshot.",
+    "Define an explicit, durable crosswalk between current workboard stableKey and source-index canonical task identity; reject duplicate or ambiguous candidate IDs.",
+    "Resolve the Kanban attempt receipt family to its authoritative receipt/verifier owner, then require exact receipt ID, task binding, and source revision equality.",
+    "Use the existing Feature Registry spec and Feature Identity V2 proposal as the design owner; review and admit only a small explicit set after the identity chain passes. No live DDL or rows were created here.",
+    "Add runtime admission only after current authorization, task/source revision, verified receipt, and reviewed feature binding are all joined without path/label heuristics."
+  ],
+  "likely_cause": "The workboard stableKey, OpenSpec source-index candidate ID, Kanban task ID, and test receipt ID are separate identity schemes with no fully revision-qualified persisted crosswalk between them.",
+  "evidence": [
+    "scripts/atlas/lib/wfu-metadata.mjs",
+    "scripts/atlas/build-openspec-workboard-v1.mjs --task-snapshot-stdout",
+    "sveltekit-frontend/src/lib/server/db/schema/openspec-task-source-index.ts",
+    "sveltekit-frontend/src/lib/server/db/schema/kanban-tasks.ts",
+    "sveltekit-frontend/src/lib/server/atlas/board/task-proof-line-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/cache/receipt-dictionary-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/contracts/feature-resolution-v1.ts",
+    "openspec/specs/atlas-feature-registry/spec.md",
+    "sveltekit-frontend/drizzle/manual/20261021_feature_identity_v2.sql",
+    "PostgreSQL 18.4 read-only catalog and exact-join results"
+  ],
+  "patchTargets": [
+    "docs/reports/parent-atlas-identity-feature-reconciliation-2026-11-12.md",
+    "docs/reports/parent-atlas-identity-feature-reconciliation-2026-11-12.json"
+  ],
+  "safeNextCommand": "Review the two reconciliation reports; then refresh only the OpenSpec source-index snapshot through its existing dry-run/snapshot owner.",
+  "smokeCommand": "cd sveltekit-frontend; npx vitest run src/lib/server/atlas/board/task-proof-line-v1.spec.ts src/lib/server/atlas/board/task-proof-line-v1.snapshot.spec.ts src/lib/server/atlas/cache/receipt-dictionary-v1.spec.ts",
+  "reportPath": "docs/reports/parent-atlas-identity-feature-reconciliation-2026-11-12.md",
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

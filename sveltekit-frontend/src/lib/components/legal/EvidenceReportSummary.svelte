@@ -507,11 +507,13 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 
 	.detail-grid {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
 		gap: 1.5rem;
 	}
 
 	.detail-card {
+		min-width: 0;
+		overflow-wrap: anywhere;
 		background: var(--color-panel, #1a1a2e);
 		border: 1px solid rgba(194, 178, 128, 0.2);
 		border-radius: 0.5rem;
@@ -544,6 +546,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 	.field-value {
 		color: rgba(194, 178, 128, 0.8);
 		margin: 0;
+		overflow-wrap: anywhere;
 	}
 	.field-list {
 		list-style: disc;

@@ -9,6 +9,9 @@ import {
 	estimateComputePayloadBytes,
 	MAX_SIMILARITY_CANDIDATES_PER_BATCH,
 	MAX_GPU_SIMILARITY_VALUES_PER_BATCH,
+	MAX_SOM_RADIX_CANDIDATES,
+	ComputePool,
+	validateSomRadixOrderInput,
 } from './compute-pool.js';
 
 /**
@@ -115,4 +118,60 @@ describe('bounded cosine-similarity batches', () => {
 		expect(() => computeSimilarityChunkSize(1, 0)).toThrow('SIMILARITY_SHAPE_INVALID');
 		expect(() => computeSimilarityChunkSize(Number.MAX_SAFE_INTEGER, 1)).not.toThrow();
 	});
+});
+
+describe('SOM radix ordering proposal admission', () => {
+	const validInput = () => ({
+		kmeansClusterIds: new Uint16Array([2, 1, 1]),
+		somBmuIds: new Uint16Array([3, 9, 2]),
+		candidateOrdinals: new Uint32Array([4, 8, 1]),
+	});
+
+	it('accepts empty and bounded typed-array batches', () => {
+		validateSomRadixOrderInput({
+			kmeansClusterIds: new Uint16Array(0),
+			somBmuIds: new Uint16Array(0),
+			candidateOrdinals: new Uint32Array(0),
+		});
+		validateSomRadixOrderInput(validInput());
+		expect(MAX_SOM_RADIX_CANDIDATES).toBe(65_536);
+	});
+
+	it('rejects mismatched lengths, out-of-range SOM cells, duplicate ordinals, and oversized batches', () => {
+		const mismatched = validInput();
+		mismatched.somBmuIds = new Uint16Array([1]);
+		expect(() => validateSomRadixOrderInput(mismatched)).toThrow('SOM_RADIX_ARRAY_LENGTH_MISMATCH');
+
+		const invalidCell = validInput();
+		invalidCell.somBmuIds[0] = 400;
+		expect(() => validateSomRadixOrderInput(invalidCell)).toThrow('SOM_BMU_ID_OUT_OF_RANGE');
+
+		const duplicateOrdinal = validInput();
+		duplicateOrdinal.candidateOrdinals[2] = duplicateOrdinal.candidateOrdinals[0];
+		expect(() => validateSomRadixOrderInput(duplicateOrdinal)).toThrow('SOM_RADIX_CANDIDATE_ORDINALS_MUST_BE_UNIQUE');
+
+		const count = MAX_SOM_RADIX_CANDIDATES + 1;
+		expect(() => validateSomRadixOrderInput({
+			kmeansClusterIds: new Uint16Array(count),
+			somBmuIds: new Uint16Array(count),
+			candidateOrdinals: Uint32Array.from({ length: count }, (_, i) => i),
+		})).toThrow('SOM_RADIX_CANDIDATE_LIMIT_EXCEEDED');
+	});
+
+	it.skipIf(!process.env.ATLAS_NATIVE_CORE_NODE_PATH)(
+		'calls the loaded Node-API radix export through a real ComputePool worker',
+		async () => {
+			const pool = new ComputePool(1);
+			try {
+				const result = await pool.runSomRadixOrderProposal(validInput());
+				expect(result.schema).toBe('atlas.som-radix-order.worker-result.v1');
+				expect(result.authority).toBe('PROPOSAL_ONLY');
+				expect(result.backend).toBe('NAPI_RADIX');
+				expect(Array.from(result.sourceIndices)).toEqual([2, 1, 0]);
+				expect(Array.from(result.sortedCandidateOrdinals)).toEqual([1, 8, 4]);
+			} finally {
+				await pool.dispose();
+			}
+		}
+	);
 });

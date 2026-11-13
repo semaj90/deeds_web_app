@@ -3,7 +3,7 @@
  * scripts/atlas/build-openspec-workboard-v1.mjs; kept here so they can be unit-tested.
  *
  * Syntax — an HTML comment, invisible when rendered, on the checkbox line or in its indented block:
- *   <!-- wfu: depends=ID,ID; est=MINUTES; reads=path,path; writes=path,path -->
+ *   <!-- wfu: depends=ID,ID; est=MINUTES; reads=path,path; writes=path,path; proof: EXECUTION_RECEIPT_ID -->
  *
  * - `depends=none` / `reads=none` / `writes=none` declare an EMPTY set (an observation, not an omission).
  * - A task with no comment declares nothing; its dependency/cost features stay ABSENT downstream.
@@ -20,7 +20,7 @@ export const WFU_KEYS = new Set(['depends', 'est', 'reads', 'writes', 'proof']);
 // MICRO-04-TRAIN-SMOKE); numeric ids are dotted (14.6a). A sentence start such as "Re-run" is NOT an id.
 export const WFU_ID = /^(?:\*\*)?`?((?=[A-Z0-9-]*\d)[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+[a-z]?|\d+(?:\.\d+)+[a-z]?)`?\b/;
 export const sectionSlug = (heading) => heading.replace(/[*`_]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
-export const WFU_SYNTAX = '<!-- wfu: depends=ID,ID; est=MINUTES; reads=path,path; writes=path,path -->';
+export const WFU_SYNTAX = '<!-- wfu: depends=ID,ID; est=MINUTES; reads=path,path; writes=path,path; proof: EXECUTION_RECEIPT_ID -->';
 const CODE_SPAN = /(`[^`\n]*`)/;
 
 export const sha256 = (value) => `sha256:${createHash('sha256').update(value).digest('hex')}`;

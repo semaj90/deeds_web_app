@@ -3,7 +3,11 @@ import {
   ObservationFeatureProjectionV1Schema,
   type ObservationFeatureProjectionV1,
 } from '../contracts/observation-feature-projection-v1.js';
-import type { ClusterFeatureProjectionV1 } from '../contracts/cluster-feature-projection-v1.js';
+import {
+  assertClusterFeatureProjectionBindingV1,
+  verifyClusterFeatureProjectionV1,
+  type ClusterFeatureProjectionV1,
+} from '../contracts/cluster-feature-projection-v1.js';
 
 export interface ObservationFeatureMaterializationReceiptV1 {
   schema: 'atlas.observation-feature-materialization-receipt.v1';
@@ -31,7 +35,7 @@ export async function materializeObservationFeatureProjectionV1(
   },
 ): Promise<ObservationFeatureMaterializationReceiptV1> {
   const projection = ObservationFeatureProjectionV1Schema.parse(projectionInput);
-  const cluster = options.cluster ?? null;
+  const cluster = options.cluster == null ? null : verifyClusterFeatureProjectionV1(options.cluster);
 
   if (!projection.sourceRevision || !/^sha256:[a-f0-9]{64}$/.test(projection.sourceRevision)) {
     throw new Error('ORF_SOURCE_REVISION_NOT_QUALIFIED');
@@ -42,8 +46,18 @@ export async function materializeObservationFeatureProjectionV1(
     throw new Error('ORF_SOURCE_EVIDENCE_REFS_REQUIRED');
   }
 
-  if (cluster && (cluster.packetKey !== projection.packetKey || cluster.sourceRef !== projection.sourceRef)) {
-    throw new Error('ORF_CLUSTER_IDENTITY_MISMATCH');
+  if (cluster) {
+    try {
+      assertClusterFeatureProjectionBindingV1(cluster, {
+        packetKey: projection.packetKey,
+        sourceRef: projection.sourceRef,
+        sourceVersionReceiptId: projection.sourceVersionReceiptId,
+        representationId: projection.representationId,
+        representationRevision: projection.representationRevision,
+      });
+    } catch (error) {
+      throw new Error(`ORF_CLUSTER_BINDING_REJECTED:${(error as Error).message}`);
+    }
   }
 
   const structuralFlags = {
@@ -75,6 +89,7 @@ export async function materializeObservationFeatureProjectionV1(
        ast_pattern_mask,
        structural_flags,
        evidence_refs,
+       cluster_feature_projection,
        kmeans_cluster_id,
        som_row,
        som_col,
@@ -85,8 +100,8 @@ export async function materializeObservationFeatureProjectionV1(
      ) VALUES (
        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
        $11::text[],$12::text[],$13::text[],$14::text[],
-       $15::jsonb,$16::jsonb,$17::jsonb,$18::text[],
-       $19,$20,$21,$22,$23,$24,now()
+       $15::jsonb,$16::jsonb,$17::jsonb,$18::text[],$19::jsonb,
+       $20,$21,$22,$23,$24,$25,now()
      )
      ON CONFLICT (packet_key, feature_revision)
      DO UPDATE SET
@@ -106,6 +121,7 @@ export async function materializeObservationFeatureProjectionV1(
        ast_pattern_mask = EXCLUDED.ast_pattern_mask,
        structural_flags = EXCLUDED.structural_flags,
        evidence_refs = EXCLUDED.evidence_refs,
+       cluster_feature_projection = EXCLUDED.cluster_feature_projection,
        kmeans_cluster_id = EXCLUDED.kmeans_cluster_id,
        som_row = EXCLUDED.som_row,
        som_col = EXCLUDED.som_col,
@@ -132,6 +148,7 @@ export async function materializeObservationFeatureProjectionV1(
       JSON.stringify(projection.astPatternMask),
       JSON.stringify(structuralFlags),
       projection.evidenceRefs,
+      cluster == null ? null : JSON.stringify(cluster),
       cluster?.kmeans.clusterId ?? null,
       cluster?.som.row ?? null,
       cluster?.som.col ?? null,

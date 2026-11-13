@@ -18,6 +18,34 @@ assert.throws(() => addon.radixSortSomCandidateIndicesV1(
 assert.throws(() => addon.radixSortSomCandidateIndicesV1(
   Uint16Array.from([1]), Uint16Array.from([1]), Uint16Array.from([0]),
 ), /Expected/);
+assert.deepEqual(Array.from(addon.radixSortSomCandidateIndicesV1(
+  Uint16Array.from([]), Uint16Array.from([]), Uint32Array.from([]),
+)), []);
+assert.deepEqual(Array.from(addon.radixSortSomCandidateIndicesV1(
+  Uint16Array.from([99, 1, 4, 4, 1]),
+  Uint16Array.from([399, 3, 2, 2, 0]),
+  Uint32Array.from([0xffffffff, 11, 7, 3, 9]),
+)), [4, 1, 3, 2, 0]);
+assert.throws(() => addon.radixSortSomCandidateIndicesV1(
+  Uint16Array.from([1, 1]), Uint16Array.from([2, 2]), Uint32Array.from([8, 8]),
+), /SOM_RADIX_CANDIDATE_ORDINALS_MUST_BE_UNIQUE/);
+
+// Exercise real N-API typed-array views with nonzero byte offsets.
+const clusterBacking = Uint16Array.from([1234, 1, 0, 1, 1234]);
+const somBacking = Uint16Array.from([1234, 2, 399, 2, 1234]);
+const ordinalBacking = Uint32Array.from([1234, 5, 2, 3, 1234]);
+const clusterView = clusterBacking.subarray(1, 4);
+const somView = somBacking.subarray(1, 4);
+const ordinalView = ordinalBacking.subarray(1, 4);
+assert.equal(clusterView.byteOffset > 0, true);
+assert.deepEqual(Array.from(addon.radixSortSomCandidateIndicesV1(clusterView, somView, ordinalView)), [1, 2, 0]);
+
+const radixCountLimit = 65536;
+assert.throws(() => addon.radixSortSomCandidateIndicesV1(
+  new Uint16Array(radixCountLimit + 1),
+  new Uint16Array(radixCountLimit + 1),
+  new Uint32Array(radixCountLimit + 1),
+), /SOM_RADIX_CANDIDATE_LIMIT_EXCEEDED/);
 const detection = addon.detectRfcOrLanguage('detect RFC7519 in session middleware');
 assert.equal(detection.matched, true);
 assert.equal(detection.rfcId, 'RFC-7519');

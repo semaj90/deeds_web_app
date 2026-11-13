@@ -87,12 +87,18 @@ class SomSvdRecommendationV1(StrictModel):
 
 def radix_sort_som_candidates(candidates: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
     rows = list(candidates)
+    if len(rows) > 65536:
+        raise ValueError("SOM_RADIX_CANDIDATE_LIMIT_EXCEEDED")
+    seen_ordinals: set[int] = set()
     for row in rows:
         keys = ("kmeans_cluster_id", "som_bmu_id", "candidate_ordinal")
         if any(type(row.get(key)) is not int or row[key] < 0 for key in keys):
             raise ValueError("SOM_RADIX_KEYS_MUST_BE_NONNEGATIVE_INTEGERS")
         if row["kmeans_cluster_id"] > 0xFFFF or row["som_bmu_id"] >= 400 or row["candidate_ordinal"] > 0xFFFFFFFF:
             raise ValueError("SOM_RADIX_KEY_OUT_OF_RANGE")
+        if row["candidate_ordinal"] in seen_ordinals:
+            raise ValueError("SOM_RADIX_CANDIDATE_ORDINALS_MUST_BE_UNIQUE")
+        seen_ordinals.add(row["candidate_ordinal"])
     try:
         from . import _atlas_native_core
     except ImportError:

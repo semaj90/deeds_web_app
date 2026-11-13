@@ -780,6 +780,40 @@
       "validationCommand": "node scripts/atlas/audit-atlas-migration-owners.mjs"
     },
     {
+      "file": "manual/20261112_library_ingestion_lease_v1.sql",
+      "status": "active_candidate",
+      "reason": "Adds bounded retry and lease fields to the existing library ingestion_jobs queue. Candidate only; not rehearsed or applied to any database.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261112_library_document_revision_binding_v1.sql",
+      "status": "planned_sidecar",
+      "reason": "Adds nullable SHA-256 bindings to ingestion jobs and document versions. Legacy rows are not inferred or backfilled. Candidate only; not applied to any database.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Review source-hash producer binding and rehearse only in a disposable PostgreSQL 18 database before approval."
+    },
+    {
+      "file": "manual/20261112_library_chunk_parser_revision_v1.sql",
+      "status": "planned_sidecar",
+      "reason": "Adds nullable chunk_hash, parser_revision, and char_offset_unit provenance columns. Existing rows remain NULL because their exact chunk bytes, extractor/chunker recipe, and offset units are unverified. Candidate only; not applied.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Review and rehearse in a disposable PostgreSQL 18 database before approval."
+    },
+    {
+      "file": "manual/20261112_orf_cluster_projection_provenance_v1.sql",
+      "status": "planned_sidecar",
+      "reason": "Proposes a nullable full ClusterFeatureProjectionV1 JSONB receipt beside existing scalar KMeans/SOM hints. Not applied; no backfill or live database writes. Required before persisted assignments can be admitted to the radix-order proposal bridge.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-atlas-migration-owners.mjs"
+    },
+    {
       "file": "manual/20260819_atlas_observation_feature_rows_v1.sql",
       "status": "superseded_unapplied",
       "reason": "Candidate ID/vector contract conflicts with the active packet-key ORF table. Preserved for historical review; never applied.",

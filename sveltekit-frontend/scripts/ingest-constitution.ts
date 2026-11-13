@@ -1,4 +1,4 @@
-import { uploadLibraryDocument, runIngestionPipeline } from '../src/lib/server/legal/ingestion-worker.js';
+import { uploadLibraryDocument } from '../src/lib/server/legal/ingestion-worker.js';
 import { promises as fs, existsSync } from 'fs';
 import path from 'path';
 
@@ -16,26 +16,24 @@ async function ingestConstitution() {
         console.log(`    Read ${fileBuffer.length} bytes.`);
 
         console.log(`[2] Uploading to MinIO & initializing records...`);
+        const actorId = process.env.LIBRARY_INGESTION_ACTOR_ID;
+        if (!actorId || !/^\\d+$/.test(actorId) || Number(actorId) <= 0) {
+            throw new Error('Set LIBRARY_INGESTION_ACTOR_ID to an authorized positive database user ID.');
+        }
         const { documentId, jobId } = await uploadLibraryDocument({
             fileBuffer,
             fileName: 'California_Constitution_2023-24.pdf',
             title: 'California Constitution 2023-24',
             corpusType: 'constitution',
             jurisdictionCode: 'CA',
-            userId: null as any // Allow null for system ingest
+            userId: actorId
         });
 
         console.log(`    Document ID: ${documentId}`);
         console.log(`    Job ID:      ${jobId}`);
 
-        console.log(`[3] Running complex chunker & embedding pipeline...`);
-        console.log(`    (This will take some time for 400+ pages)`);
-        const result = await runIngestionPipeline({ documentId, jobId });
-        
-        console.log("\n=================================================");
-        console.log("  ✅ Ingestion Complete!                         ");
-        console.log("=================================================");
-        console.log(JSON.stringify(result, null, 2));
+        console.log(`[3] Job ${jobId} is queued for the durable library worker.`);
+        console.log(JSON.stringify({ documentId, jobId, status: 'queued' }, null, 2));
 
     } catch (err) {
         console.error("\n❌ Ingestion Failed:", err);

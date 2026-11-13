@@ -1,9 +1,9 @@
 {
   "schemaVersion": "atlas.graphify-daily-workflow-receipt.v1",
   "workflowId": "graphify:daily:v1",
-  "runId": "640ec162-e1f3-4a6d-9082-49f8e24ab123",
-  "repositoryRevision": "b1a9afadc983ec6ecf2eef28b50548380cdf34a1",
-  "generatedAt": "2026-11-06T18:01:14.435Z",
+  "runId": "f8710445-bde6-439d-8dd4-d5e34ae216e8",
+  "repositoryRevision": "aee912f543e13286234c38ce82015149103cfbef",
+  "generatedAt": "2026-11-12T22:13:37.613Z",
   "readOnly": true,
   "canonicalWriteAttempted": false,
   "stages": {
@@ -11,8 +11,8 @@
       "status": "PROVEN",
       "totalFiles": 30327,
       "totalBytes": 528720368,
-      "currentRevision": "b1a9afadc983ec6ecf2eef28b50548380cdf34a1",
-      "priorRevision": "a9b6b757b3d705faea36a9c2d3721ec99a1161e4"
+      "currentRevision": "aee912f543e13286234c38ce82015149103cfbef",
+      "priorRevision": "b1a9afadc983ec6ecf2eef28b50548380cdf34a1"
     },
     "inventory": {
       "status": "PROVEN",

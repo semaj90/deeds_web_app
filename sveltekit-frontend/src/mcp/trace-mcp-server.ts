@@ -80,7 +80,7 @@ import { searchQdrantCodeStrictV1 } from '../lib/server/search/qdrant-search.js'
 import { normalizeSemanticSearchHitsV1 } from '../../../scripts/atlas/lib/semantic-search-hits-v1.mjs';
 import {
   acpKanbanErrorTaskInputV1Schema,
-  acpKanbanErrorTaskV1Schema,
+  buildAcpKanbanErrorTaskV1,
 } from '../lib/server/atlas/kanban-acp-dag-contracts.js';
 import { EngramMemoryBridge } from './memory-bridge.js';
 import type { LangGraphBridge } from './langgraph-bridge.js';
@@ -11506,27 +11506,10 @@ server.registerTool(
     inputSchema: acpKanbanErrorTaskInputV1Schema,
   },
   async ({ relativePath, errorSignature, targetAgent = 'a2a-error-fixer' }) => {
-    const taskPayload = acpKanbanErrorTaskV1Schema.parse({
-      schema: 'atlas.acp-kanban-error-task.v1',
-      taskId: `kanban-${Date.now()}`,
-      boardColumn: 'blocked',
-      sourceAgent: 'trace-mcp-8788',
-      targetAgent: targetAgent ?? 'a2a-error-fixer',
-      relativePath,
-      errorSignature,
-      sourceSha256: null,
-      sourceRevision: null,
-      status: 'BLOCKED_SOURCE_BYTES_UNAVAILABLE',
-      admission: 'PROPOSAL_ONLY',
-      extractionStatus: 'NOT_RUN',
-      extractedSpans: [],
-      dagPrefillNodes: [],
-      promptCards: [],
-      recommendedFixActions: [],
-      dbSchemaStatus: 'NOT_CHECKED',
-      canonicalAuthority: false,
-      writesPerformed: false,
-    });
+    const taskPayload = buildAcpKanbanErrorTaskV1(
+      { relativePath, errorSignature, targetAgent },
+      { sourceAgent: 'trace-mcp-8788' },
+    );
 
     return {
       content: [{ type: 'text' as const, text: JSON.stringify(taskPayload, null, 2) }],

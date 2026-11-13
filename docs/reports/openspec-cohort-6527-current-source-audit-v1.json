@@ -4,505 +4,300 @@
   "canonicalAuthority": false,
   "databaseAccessed": false,
   "cohortRevision": "rev:openspec-rank-fuse:20261107T192448Z",
-  "crosswalkReportSha256": "97feaf9e39eaf9db17f513b9e94add59e587a46f3034d4d1eedc1bf144e675dc",
-  "membersArtifactSha256": "68ed2a803f3df7428e0decf1455f7bc847f44153c7c5512ee4e848c140d43fec",
+  "crosswalkReportSha256": "e2c93c9681b0dd9e5612bb1605afe0de9258d2a9dd7ef029a8405ffb5bf18b02",
+  "membersArtifactSha256": "1a854ef98699400d6325b7041ed517a2b1c2cd1b4ca9c4099aa1ee671001f578",
   "summary": {
     "total": 6527,
-    "exactSourceContent": 6409,
-    "staleLocatorExactContentFound": 95,
-    "statusOnlyDrift": 2,
-    "sourceContentMismatch": 20,
+    "exactSourceContent": 6458,
+    "staleLocatorExactContentFound": 0,
+    "statusOnlyDrift": 0,
+    "sourceContentMismatch": 0,
     "missingSourceFile": 0,
     "lineOutOfRange": 0,
-    "sourceLineNotTask": 1,
+    "sourceLineNotTask": 69,
     "duplicateTaskKeys": 0
   },
   "examples": [
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#ba8da0312e31b266",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L66",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L113"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "  - **Handoff (2026-11-09), MCP tool-calling status:**",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-workboard-feature-utility-fabric#9c72c61995aca1cd",
       "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L436",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L437"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#44f3f55b22fd3374",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1871",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1918"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "  7. Prove the five flags (`querySpecific`, `identityBound`, `revisionQualified`, `evidenceLinked`, `proofUsable`): NOT MET; `revisionQualified`, `evidenceLinked` and `proofUsable`",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#8170504967ee521f",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L938",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L985"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#cad0877fadbfb96f",
-      "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L348",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L395"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-code-intel-e2e#21dcd0c89aed871e",
-      "sourceRef": "openspec/changes/parent-atlas-code-intel-e2e/tasks.md#L227",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:046563627f0959b9121dcc7cf0293d7d4241fb6b0599d6b6573a05a8dd175286",
-      "currentTaskBlockHash": "sha256:922678670c51b79055c19b9cc95d2f9c76ed33bb4a8b90c12230623323e926f5"
-    },
-    {
-      "taskKey": "parent-atlas-neural-prefill-encoder#d132653984e29ced",
-      "sourceRef": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L232",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:6b35765303fadd0b90c7e949344c76c6353f43c5d7c51adf16d5a8c0659127a5",
-      "currentTaskBlockHash": "sha256:c65a1b12f3ef74cf07d3978776afa71e79ba8cf4a93150b2d326dc7648d90ab1"
-    },
-    {
-      "taskKey": "parent-atlas-workboard-feature-utility-fabric#f384139815acec65",
-      "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L141",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:101130615c3a8d4153f0c49c445c019290f4aa5a7edc5adae96a9ba4722d0c5d",
-      "currentTaskBlockHash": "sha256:8e933e1f65ba23481c34fb5feb6568d3306dc722274f71b1f8ff633d9a77bcf4"
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "- **Classes** (`audit-embedding-direct-endpoints-v1.mjs`, 8 tests): `LIVE_DIRECT_CALLER`, `LIVE_WRAPPER` (an exported embed/vector/encode function holding the transport call), `TRA",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#11735d25b1e1e0d5",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L935",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L982"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "- **Commit hazard:** the new executor imports `embedding-execution-adapter-v1.ts` and `embedding-provider-v1.ts` contract types; the adapter and its specs are UNTRACKED work from t",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#b32e54656e618b8b",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1872",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1919"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "  8. Then CONTEXT-DEPTH-ALIGNMENT-01, ContextBudgetV1, continuations and the token benchmark (the measured result duplication, `promptPacket` repeating the cards, is the first savi",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#e532bbd2e8f9f09c",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L934",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L981"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "- **Deliberately NOT migrated yet:** `lib/server/retrieval/auto-backfill.ts`, `embedding-models.ts`, `lib/server/ace/*` and the other live files. Several are corpus WRITERS (strict",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#a4f7ecfd64362dbf",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L936",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L983"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "",
+      "candidateSourceRefs": []
     },
     {
-      "taskKey": "parent-atlas-retrieval-logic-convergence#b58e65112d25497c",
-      "sourceRef": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L630",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:2a0fe4d68e39fc7410d1843af9abcc9d5d0a38db29a3885bb7f58b231a663fa1",
-      "currentTaskBlockHash": "sha256:8a0b80d37df66633df39da8d56e6863526aeaaa0b1f04b3be75909400c09a420"
+      "taskKey": "courtroom-upload-story-pipeline#5ea5fc0b970c50fc",
+      "sourceRef": "openspec/changes/courtroom-upload-story-pipeline/tasks.md#L139",
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-graphify-recovery-proof-ladder#6c51f54d5d355b5e",
       "sourceRef": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L713",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L712"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#4f59d091c81441f6",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L183",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L230"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "**FastAPI helper services** (16 `FastAPI(` files): `python/{miniforge_nlp_sidecar,miniforge_nlp_sidecar_v2,miniforge_nlp_sidecar_oak,atlas_rapids_sidecar,atlas_rapids_sidecar_graph",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#73f52f4b9558ffcb",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1870",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1917"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "  6. NORMALIZE-SOURCE-REF-ABS-01: NOT STARTED (kernel-local workaround only).",
+      "candidateSourceRefs": []
     },
     {
-      "taskKey": "parent-atlas-ace-rlm-bitfrost-integration#6834cc266b0bbb2a",
-      "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L14698",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:07568fa7ea3b1b3b575977b36e4046bac5ea5b7a087e2762129383c41e5f2da9",
-      "currentTaskBlockHash": "sha256:a83fb4b364e66565e218e1ef2234cac99721761fc03ca39614764314ec714537"
-    },
-    {
-      "taskKey": "atlas-feature-intelligence#60a0f6e422d173cc",
-      "sourceRef": "openspec/changes/atlas-feature-intelligence/tasks.md#L48",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:d39a3f12ca731db45029691949b6a7a6c638b180fb56d575407cd19f002101dd",
-      "currentTaskBlockHash": "sha256:d392d4425eee3fd63cb29b4f8024b14cb9e764d589003fc9be9628e6635fd2bd"
-    },
-    {
-      "taskKey": "parent-atlas-nes-lut-single-owner#217846eb35414f6e",
-      "sourceRef": "openspec/changes/parent-atlas-nes-lut-single-owner/tasks.md#L27",
-      "issue": "CHECKBOX_STATE_DRIFT",
-      "snapshotCheckboxState": "OPEN",
-      "currentCheckboxState": "[~]",
-      "sourceClaimHash": "sha256:eae5a6316a8421262544bb7096adb85f61b23f28cb1dba8b105f11d7d42acfc3",
-      "currentTaskBlockHash": "sha256:73601c505c542f807aaf33e96fdfd1b46eeaef27c13eb1c3f768a88c966017b0"
-    },
-    {
-      "taskKey": "parent-atlas-ontology-kernel#10c944cb530dece6",
-      "sourceRef": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L5529",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:79e4104b0dd698c8c840abd1fa084fc6030e6b2d14c63330df54df7077e3c050",
-      "currentTaskBlockHash": "sha256:45f46fd65a3205de75dc501a507ba6715130fee587a0ca227d715640c192eaff"
+      "taskKey": "courtroom-upload-story-pipeline#e8d776760635680e",
+      "sourceRef": "openspec/changes/courtroom-upload-story-pipeline/tasks.md#L138",
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "Planned workflow, not built. Every item stays open until its gate has a receipt. Storage and worker prerequisites are in section 12 (FAIL-07, STORAGE-01f).",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-workboard-feature-utility-fabric#a8955cf065db717a",
       "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L234",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L235"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#fa296601e7f3da81",
-      "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L349",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L396"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#8ba55fe2333f2832",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L61",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L108"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-topology-representation-admission#d31f74d0da81d810",
-      "sourceRef": "openspec/changes/parent-atlas-topology-representation-admission/tasks.md#L477",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:2006933c32605a093baf157a86453ae8066e824226714631131446b8031020a5",
-      "currentTaskBlockHash": "sha256:09481c64f93cb8724c4390c6af7a7f02c616449aaf2c2414b2bbf1a2f0b013b5"
-    },
-    {
-      "taskKey": "parent-atlas-versioned-doc-intelligence#b495cf9c571eb32c",
-      "sourceRef": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L1552",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:8002ac5e0e09e5929d1394d50158b1449955dd66103c20e54da7ffe7bbf66dce",
-      "currentTaskBlockHash": "sha256:e9f95ac6856a8e90fd45586da91a353cea16577846e76963bbc5b802767ebe6f"
-    },
-    {
-      "taskKey": "parent-atlas-agentic-file-compiler#5d4dbbfb4b7ddb84",
-      "sourceRef": "openspec/changes/parent-atlas-agentic-file-compiler/tasks.md#L970",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:30f4a2530362441a0c0187b6249c1a28bcf43d7ea27bf24a27e4d11f2ed31639",
-      "currentTaskBlockHash": "sha256:d6f6293bb14db2683365e5802d9c74384de9380327241e1aa38b28aaeb8b7e33"
-    },
-    {
-      "taskKey": "parent-atlas-gpu-sidecar-patch-tournament#ee40e14c27aace46",
-      "sourceRef": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L469",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:f1b093f8a13e617a131982b73bf74232b3d5f3b21e38b41b349ce22993520e93",
-      "currentTaskBlockHash": "sha256:fa26c63932581781300184fdfe8ec6ad587c69ea1222f6d739b10fb000e32840"
-    },
-    {
-      "taskKey": "parent-atlas-graphify-recovery-proof-ladder#d480bc1e6f40155e",
-      "sourceRef": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L707",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:caaa43d422d46b3b8a442d281873d7d939f4290c98349f30dc5195647fbe735f",
-      "currentTaskBlockHash": "sha256:4b62d248490dd91fc6f45e07b196c3b3ef1a1a4dddfb866f94c083504e6e03d6"
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "  4. PID scoping: act only on the process listening on the exact port, owned by the expected command line.",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-graphify-recovery-proof-ladder#c6e4f2e656d69260",
       "sourceRef": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L722",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L721"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-graphify-recovery-proof-ladder#69d54ed28cf0eb2a",
-      "sourceRef": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L744",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L743"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-retrieval-lod-algorithm-taxonomy#296978798ed8b971",
-      "sourceRef": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L966",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:c0ed6eca40b2aa181b5353a2cca3a6d529bbb8de3a03f1b98fd35fab81c99e4d",
-      "currentTaskBlockHash": "sha256:759119c7228b403b43e8f4727956d640f494dc683570a5b334dd73b9439c0a98"
-    },
-    {
-      "taskKey": "parent-atlas-repair-candidate-feature-matrix#40741a87ce9db58f",
-      "sourceRef": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md#L1547",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:933ebb5a895060d6915a1bc36555e034271f26f22228bcc461d9576d2c090c93",
-      "currentTaskBlockHash": "sha256:52264ecd997d6d88ce2728e402543ea52b6e015c259bedbdbeb59818b5d03fda"
-    },
-    {
-      "taskKey": "parent-atlas-gpu-sidecar-patch-tournament#292b180d7aa9ef75",
-      "sourceRef": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L33",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:e01792a847a753a9327198e287700a7448406b80c75318d3dcf2b268c159b283",
-      "currentTaskBlockHash": "sha256:b118dc127bc542b6d8930b5437fc66f36c9502611c571cddb24ba1d05414a56f"
-    },
-    {
-      "taskKey": "parent-atlas-workboard-feature-utility-fabric#7f86a50bf4c2fe25",
-      "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L144",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L145"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-code-intel-e2e#1523aee507d3bada",
-      "sourceRef": "openspec/changes/parent-atlas-code-intel-e2e/tasks.md#L234",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:b6b7c8cf2c9d63322be70d43b7a747fae3de24349f39e59374af6d0ec06cde6b",
-      "currentTaskBlockHash": "sha256:b5c74ce0239c87124dd0cd9d3e74ab45f88f00a810e2c12568e94b576b5b30dc"
-    },
-    {
-      "taskKey": "parent-atlas-workboard-feature-utility-fabric#54b48f15e9a11208",
-      "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L129",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L130"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-workboard-feature-utility-fabric#004a2e5b171c0244",
       "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L433",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L434"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-workboard-feature-utility-fabric#664377865daf8fe2",
-      "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L380",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L381"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#d5bb18a82e573901",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1897",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1944"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "- **Executor:** the unified orchestrator's semantic lane now defaults to Postgres pgvector (`postgres_pgvector`, `content_embedding_768` only, no cross-recipe merge, shared reposit",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-workboard-feature-utility-fabric#64ae0a1cad5187d8",
       "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L274",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L275"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#fbfc21d3339cece0",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1899",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1946"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "- **Migration (applied, additive):** `drizzle/manual/20261005_lineage_join_indexes_v1.sql`: `idx_atlas_pcl_chunk_row_id_proven`, `idx_atlas_wsb_workspace_ref_digest`; rehearsed in ",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-workboard-feature-utility-fabric#b8b4ee0863dbaf1c",
       "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L430",
       "issue": "SOURCE_LINE_NOT_CHECKBOX",
-      "currentLine": "## Crawler / external docs (WFU-04b, after WFU-05)",
+      "currentLine": "",
       "candidateSourceRefs": []
-    },
-    {
-      "taskKey": "parent-atlas-workboard-feature-utility-fabric#43ebe216cdc6ca89",
-      "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L121",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:ec3f0e954652a483ebe62adcb489c62f53a6bc08cb31b3460e7e28713dc089b7",
-      "currentTaskBlockHash": "sha256:d8dcd7f51a33d1f4229bad5bf1a058630c31e948f40e16ab87f86aa5359c494f"
     },
     {
       "taskKey": "parent-atlas-workboard-feature-utility-fabric#19c6594f1b2d53be",
       "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L235",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L236"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-graphify-recovery-proof-ladder#407bb53aa899c239",
-      "sourceRef": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L741",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L740"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "### WFU-11 — ACE / BitFrost admission",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-graphify-recovery-proof-ladder#65b915514a03502d",
       "sourceRef": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L746",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L745"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#9496d3d3fbd5c979",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1873",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1920"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "- **Open operator decisions (unchanged, nothing assumed):** canonical `source_ref` form for the duplicate packets; whether to approve a Neo4j projection refresh (with a backup firs",
+      "candidateSourceRefs": []
     },
     {
-      "taskKey": "parent-atlas-workboard-feature-utility-fabric#9340553c35c5f433",
+      "taskKey": "parent-atlas-workboard-feature-utility-fabric#66f123cb615ad10d",
       "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L125",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L126"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#cf2439555fb4e9df",
-      "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L350",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L397"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-graphify-recovery-proof-ladder#71c1f29b641aa6cc",
-      "sourceRef": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L743",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L742"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "### WFU-05 — OKF vocabulary adapter",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#ee880628ca12cf68",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L351",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L398"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-graphify-recovery-proof-ladder#b1cce0e5174c18f7",
-      "sourceRef": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L742",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L741"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-graphify-recovery-proof-ladder#127b7d8d526ab10f",
-      "sourceRef": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L745",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L744"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "- Hard rules: never rename role B/C; never replace a literal with another literal; every rename carries a compat alias; the VLM lane (`:8085`) is not part of the chat switch.",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#d32c3e2a2590188c",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1869",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1916"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-neural-prefill-encoder#3e4ccacbcdeed311",
-      "sourceRef": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L3227",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:c8055cf847677d0ce6392b8f563914612f37162e850777b3ee1da4655f8e4b58",
-      "currentTaskBlockHash": "sha256:34d89b93d2eb96ae9965566e1c1935c327bd43d8b8bb7c3b3f449380070ca5a2"
-    },
-    {
-      "taskKey": "parent-atlas-runtime-log-remediation#39b8a7a68ecb6c58",
-      "sourceRef": "openspec/changes/parent-atlas-runtime-log-remediation/tasks.md#L36",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:8a67f0597367879a82a235b086c0f4a16676672e5b56118a9f4e6bf3facca613",
-      "currentTaskBlockHash": "sha256:23a320c37537a58aead73f0fa70a7899b9141609be1ded5e4a0a564f8c7fbd8a"
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "  5. Facade forwarding: PARTIAL (`maxRounds` is not applied but now declared as such with `maxRoundsApplied:false`; `atlas_inspect` now forwards `refs`; a regression test pins the ",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#e2e35c8b82844ef0",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L53",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L100"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "  - **Receipt:** the probe takes no arguments and prints its JSON to stdout (checked 2026-11-09, `python/atlas_cuda_cutile_simt_probe_v1.py:51,75`). Capture it with a shell redirec",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#cd6959cfcaf3c8b2",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1884",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1931"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "- **Blocker 5, contract gaps** (executor, `representationRevision`, `evidenceRef`, admission/proof flags, graph and ontology lanes) listed above; these can be closed by a normaliza",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#2bb189dc4bd78ace",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L182",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L229"
-      ]
-    },
-    {
-      "taskKey": "parent-atlas-nes-lut-single-owner#6bbfde54b63ee20e",
-      "sourceRef": "openspec/changes/parent-atlas-nes-lut-single-owner/tasks.md#L26",
-      "issue": "CHECKBOX_STATE_DRIFT",
-      "snapshotCheckboxState": "OPEN",
-      "currentCheckboxState": "[x]",
-      "sourceClaimHash": "sha256:0e59b8774086727f6f5d7cf7e21cdde57a0ff712095bc3b74c7a8ec7e444e9d1",
-      "currentTaskBlockHash": "sha256:4cfae5521e59fa0fd670bf6b3236c68cea2a069dfa54f8c4cea387a364f52adf"
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#f4ab936953e15744",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L62",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L109"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "  5. Audit receipt with `writesPerformed`, written before and after.",
+      "candidateSourceRefs": []
     },
     {
       "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#9adcffda98ff650a",
       "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1845",
-      "issue": "SOURCE_LOCATOR_STALE_EXACT_CONTENT_FOUND",
-      "candidateSourceRefs": [
-        "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1892"
-      ]
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "- **Next in the patch order:** step 3 remainder (`atlas_inspect` accepting paths/refs through packet identity, and `refs`/`depth`/`continuation` on the facade), then CONTEXT-DEPTH-",
+      "candidateSourceRefs": []
     },
     {
-      "taskKey": "parent-atlas-workboard-feature-utility-fabric#479786896944f258",
-      "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L143",
-      "issue": "TASK_CONTENT_HASH_MISMATCH",
-      "sourceClaimHash": "sha256:2c9444e362a464b2e14e7bd47d4b03f7e5b322814493fc4a4170376f6f8f27d5",
-      "currentTaskBlockHash": "sha256:d35ddf9583ee9d5c81609fd211528bf21d0ab178b904c41097f975b02899a191"
+      "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#b7a25b8555294f21",
+      "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1896",
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "### KERNEL-REAL-02 / KERNEL-REVISION-LINEAGE-01 update (2026-10-05, cross-reference only; canonical tracking belongs in parent-atlas-pass-fabric, which has uncommitted edits from a",
+      "candidateSourceRefs": []
+    },
+    {
+      "taskKey": "parent-atlas-workboard-feature-utility-fabric#7115a578b14d4060",
+      "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L347",
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "| cuVS | vector ANN / clustering only |",
+      "candidateSourceRefs": []
+    },
+    {
+      "taskKey": "parent-atlas-workboard-feature-utility-fabric#3dd4480813147f75",
+      "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L385",
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "",
+      "candidateSourceRefs": []
+    },
+    {
+      "taskKey": "parent-atlas-workboard-feature-utility-fabric#fe0baa12e205a3c0",
+      "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L133",
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "### WFU-07 — Indexed retrieval + EXPLAIN proof",
+      "candidateSourceRefs": []
+    },
+    {
+      "taskKey": "parent-atlas-workboard-feature-utility-fabric#e9a210a1d8c9ef73~2",
+      "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L377",
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "",
+      "candidateSourceRefs": []
+    },
+    {
+      "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#3cdedf5a28b0026c",
+      "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1903",
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "- TRACE comparison: `docs/reports/kernel-real-02-trace-vs-orchestrator-v1.json` (orchestrator better on identity; neither proof-usable).",
+      "candidateSourceRefs": []
+    },
+    {
+      "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#cfadf59ef48ed20d",
+      "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1898",
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "- **Identity binding:** packetKey/sourceRevision/evidenceRefs come from `atlas_packet_chunk_lineage` (PROVEN, `chunk_row_id = codebase_chunk_index.id`, 127,927 rows); workspaceRevi",
+      "candidateSourceRefs": []
+    },
+    {
+      "taskKey": "parent-atlas-gpu-compute-lanes-consolidation#d0e1521aa6fd2964",
+      "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1905",
+      "issue": "SOURCE_LINE_NOT_CHECKBOX",
+      "currentLine": "### cuTile tile-vs-block-vs-object mapping note (2026-10-06; design guidance, not verified code)",
+      "candidateSourceRefs": []
     }
   ],
-  "generatedAt": "2026-11-09T22:40:11.133Z"
+  "generatedAt": "2026-11-12T18:09:54.400Z"
 }

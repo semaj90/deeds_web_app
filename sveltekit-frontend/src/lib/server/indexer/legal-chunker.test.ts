@@ -114,6 +114,8 @@ phone metadata is unconstitutional. See Cal. Const. art. I, § 13; 42 U.S.C. § 
 
 describe('chunker keeps text that lives on a section heading line', () => {
 	const allText = (chunks: Array<{ text: string }>) => chunks.map((chunk) => chunk.text).join('\n');
+	const normalizedSourceSpan = (source: string, chunk: { startOffset: number; endOffset: number }) =>
+		source.slice(chunk.startOffset, chunk.endOffset).replace(/\s+/g, ' ').trim();
 
 	it('keeps an inline-body "Section N." line that is the last paragraph', () => {
 		const text =
@@ -130,6 +132,25 @@ describe('chunker keeps text that lives on a section heading line', () => {
 		expect(joined.indexOf('Late payments')).toBeGreaterThan(joined.indexOf('monthly rent'));
 	});
 
+	it('maps normalized chunk text to exact source offsets across CRLF and repeated whitespace', () => {
+		const text = 'Intro paragraph one with enough words to pass.\r\n\r\nSection 2. The monthly rent is due\r\n\t monthly.';
+		const chunks = chunkLegalDocument(text, { maxTokens: 512, overlap: 128 });
+		const rentChunk = chunks.find((chunk) => chunk.text.includes('monthly rent'));
+		expect(rentChunk).toBeDefined();
+		expect(text.slice(rentChunk!.startOffset, rentChunk!.endOffset)).toBe(rentChunk!.text);
+		expect(normalizedSourceSpan(text, rentChunk!)).toBe(rentChunk!.text.replace(/\s+/g, ' ').trim());
+	});
+
+	it('keeps UTF-16 source offsets after non-BMP characters before a headed clause', () => {
+		const text = 'Intro 👩🏽‍⚖️ material with enough words to pass.\r\n\r\nSection 2. Monthly rent must arrive each month.\r\nx';
+		const chunks = chunkLegalDocument(text, { maxTokens: 512, overlap: 128 });
+		const clause = chunks.find((chunk) => chunk.text.includes('Monthly rent'));
+		expect(clause).toBeDefined();
+		expect(clause!.startOffset).toBe(text.indexOf('Monthly rent'));
+		expect(text.slice(clause!.startOffset, clause!.endOffset)).toBe(clause!.text);
+		expect(normalizedSourceSpan(text, clause!)).toBe(clause!.text.replace(/\s+/g, ' ').trim());
+	});
+
 	it('does not turn a bare title heading with a tiny body into a chunk', () => {
 		const text = 'Intro paragraph one with enough words to pass.\n\nSection 2. Rent\n\nx\n';
 		const joined = allText(chunkLegalDocument(text, { maxTokens: 512, overlap: 128 }));
@@ -142,5 +163,16 @@ describe('chunker keeps text that lives on a section heading line', () => {
 		const joined = allText(chunkLegalDocument(text, { maxTokens: 512, overlap: 128 }));
 		expect(joined.split('Payment terms apply').length - 1).toBe(0);
 		expect(joined).toContain(body);
+	});
+});
+
+describe('simple chunk offsets preserve original source positions', () => {
+	it('maps every overlapping normalized window back to its exact source span', () => {
+		const text = Array.from({ length: 24 }, (_, index) => `token${index}${index % 3 === 0 ? '\n  ' : '    '}`).join('');
+		const chunks = chunkLegalDocument(text, { maxTokens: 6, overlap: 2 });
+		expect(chunks.length).toBeGreaterThan(1);
+		for (const chunk of chunks) {
+			expect(text.slice(chunk.startOffset, chunk.endOffset)).toBe(chunk.text);
+		}
 	});
 });

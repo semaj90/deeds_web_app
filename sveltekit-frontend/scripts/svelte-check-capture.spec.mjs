@@ -1,9 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import {
   buildKanbanPlan,
+  buildDiagnosticResolutionReceiptV1,
+  buildSvelteCheckScopeV1,
   buildReplayProposal,
   buildTodoList,
   buildWorkboardContext,
@@ -15,10 +19,186 @@ import {
   loadValidatedOkfVocabulary,
   parseMachineDiagnostic,
   parseSavedLog,
+  resolveOpenSpecDiagnosticTaskBindingsV1,
   resolveTsconfig,
+  verifyCaptureArtifactsV1,
+  resolveOpenSpecWorkboardTaskRefV1,
   SVELTE_DIAGNOSTIC_MCP_TOOL_POLICY,
   summarizeDiagnostics,
 } from './svelte-check-capture.mjs';
+
+test('resolution receipt requires complete same-scope native runs and never authorizes task completion', () => {
+  const scopeId = `sha256:${'a'.repeat(64)}`;
+  const fingerprint = `sha256:${'b'.repeat(64)}`;
+  const base = {
+    schema: 'atlas.svelte-check-capture.v1', checker: 'svelte-check-native',
+    checkerScope: { schema: 'atlas.svelte-check-scope.v1', scopeId },
+    timedOut: false, interrupted: false, signal: null,
+    outputs: { logSha256: `sha256:${'c'.repeat(64)}` },
+  };
+  const previousSummary = { ...base, runId: 'prior', gitRevision: 'rev-before', exitCode: 1, errors: 1, warnings: 0 };
+  const currentSummary = { ...base, runId: 'current', gitRevision: 'rev-after', exitCode: 0, errors: 0, warnings: 0 };
+  const previousTodos = {
+    schema: 'atlas.svelte-check-todo-list.v1', runId: 'prior', gitRevision: 'rev-before',
+    checker: 'svelte-check-native', checkerScope: base.checkerScope,
+    sourceLogSha256: base.outputs.logSha256,
+    tasks: [{ taskId: 'svelte-check:old', fingerprint, workboardTaskRef: null }],
+  };
+  const currentTodos = {
+    schema: 'atlas.svelte-check-todo-list.v1', runId: 'current', gitRevision: 'rev-after',
+    checker: 'svelte-check-native', checkerScope: base.checkerScope,
+    sourceLogSha256: base.outputs.logSha256, tasks: [],
+  };
+
+  const receipt = buildDiagnosticResolutionReceiptV1(
+    previousSummary, previousTodos, currentSummary, currentTodos,
+    { previousArtifactsVerified: true, currentArtifactsVerified: true },
+  );
+  assert.equal(receipt.status, 'CLEAN_RUN_RESOLUTION_CANDIDATES');
+  assert.deepEqual(receipt.resolvedDiagnosticFingerprints, [fingerprint]);
+  assert.equal(receipt.resolvedDiagnostics[0].taskId, 'svelte-check:old');
+  assert.equal(receipt.completionAuthorized, false);
+  assert.equal(receipt.boardWritesPerformed, false);
+  assert.equal(receipt.databaseWritesPerformed, false);
+
+  const changedScope = buildDiagnosticResolutionReceiptV1(
+    previousSummary, previousTodos,
+    { ...currentSummary, checkerScope: { ...base.checkerScope, scopeId: `sha256:${'d'.repeat(64)}` } },
+    { ...currentTodos, checkerScope: { ...base.checkerScope, scopeId: `sha256:${'d'.repeat(64)}` } },
+    { previousArtifactsVerified: true, currentArtifactsVerified: true },
+  );
+  assert.equal(changedScope.status, 'BLOCKED_CHECKER_SCOPE_CHANGED');
+  assert.deepEqual(changedScope.resolvedDiagnosticFingerprints, []);
+
+  const missingReadback = buildDiagnosticResolutionReceiptV1(
+    previousSummary, previousTodos, currentSummary, currentTodos,
+  );
+  assert.equal(missingReadback.status, 'BLOCKED_CAPTURE_ARTIFACT_READBACK');
+});
+
+test('native checker scope is repeatable and includes the tool, lockfile, and project configs', () => {
+  const tsconfig = resolveTsconfig();
+  const checkCli = path.resolve('node_modules/svelte-check-native/bin/svelte-check-native.js');
+  const args = ['--tsconfig', tsconfig.path, '--output', 'machine', '--no-color'];
+  const first = buildSvelteCheckScopeV1({ checker: 'svelte-check-native', checkCli, commandArgs: args, tsconfig });
+  const second = buildSvelteCheckScopeV1({ checker: 'svelte-check-native', checkCli, commandArgs: args, tsconfig });
+  assert.equal(first.scopeId, second.scopeId);
+  assert.equal(first.invocation, 'FULL_TSCONFIG_PROJECT');
+  assert.ok(first.configFiles.some((file) => file.path === 'package-lock.json'));
+  assert.ok(first.configFiles.some((file) => file.path === 'tsconfig.json'));
+  assert.match(first.checkerEntrySha256, /^sha256:[a-f0-9]{64}$/);
+});
+
+test('resolution artifact readback rejects tampered prior logs', () => {
+  const directory = mkdtempSync(path.join(process.cwd(), '.tmp', 'svelte-check-resolution-'));
+  try {
+    const files = {
+      log: path.join(directory, 'run.txt'),
+      diagnostics: path.join(directory, 'run.jsonl'),
+      todos: path.join(directory, 'run.todos.json'),
+      summary: path.join(directory, 'run.summary.json'),
+    };
+    const logBytes = Buffer.from('native check completed\n');
+    const diagnosticsBytes = Buffer.alloc(0);
+    const digest = (bytes) => `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+    writeFileSync(files.log, logBytes);
+    writeFileSync(files.diagnostics, diagnosticsBytes);
+    const todos = {
+      schema: 'atlas.svelte-check-todo-list.v1', runId: 'run-1', gitRevision: 'head-1',
+      checker: 'svelte-check-native', checkerScope: { scopeId: 'scope-1' }, sourceLogSha256: digest(logBytes), tasks: [],
+    };
+    const todosBytes = Buffer.from(JSON.stringify(todos));
+    writeFileSync(files.todos, todosBytes);
+    const summary = {
+      schema: 'atlas.svelte-check-capture.v1', runId: 'run-1', gitRevision: 'head-1', checker: 'svelte-check-native',
+      checkerScope: { scopeId: 'scope-1' },
+      total: 0, errors: 0, warnings: 0, uniqueFingerprints: 0,
+      outputs: {
+        log: path.relative(process.cwd(), files.log).replace(/\\/g, '/'),
+        diagnostics: path.relative(process.cwd(), files.diagnostics).replace(/\\/g, '/'),
+        todos: path.relative(process.cwd(), files.todos).replace(/\\/g, '/'),
+        summary: path.relative(process.cwd(), files.summary).replace(/\\/g, '/'),
+        logSha256: digest(logBytes), diagnosticsSha256: digest(diagnosticsBytes), todosSha256: digest(todosBytes),
+      },
+    };
+    const summaryBytes = Buffer.from(JSON.stringify(summary));
+    writeFileSync(files.summary, summaryBytes);
+    const summaryArtifact = { absolutePath: files.summary, value: summary, bytes: summaryBytes };
+    const todosArtifact = { absolutePath: files.todos, value: todos, bytes: todosBytes };
+
+    assert.equal(verifyCaptureArtifactsV1(summaryArtifact, todosArtifact), true);
+    writeFileSync(files.log, Buffer.from('tampered log\n'));
+    assert.equal(verifyCaptureArtifactsV1(summaryArtifact, todosArtifact), false);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test('resolves an explicitly selected current OpenSpec task and rejects stale or ambiguous identities', () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'atlas-workboard-ref-'));
+  try {
+    const sourceRef = 'openspec/changes/change-a/tasks.md';
+    const sourcePath = path.join(root, sourceRef);
+    mkdirSync(path.dirname(sourcePath), { recursive: true });
+    const sourceBytes = Buffer.from('- [ ] Verify exact task identity\n');
+    writeFileSync(sourcePath, sourceBytes);
+    const digest = (bytes) => `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+    const task = {
+      taskKey: 'change-a:7', state: 'OPEN', stableKey: 'change-a#0123456789abcdef', logicalTaskKey: null,
+      blockHash: digest(Buffer.from('task-block')), source: sourceRef,
+    };
+    const workboardPath = path.join(root, 'workboard.json');
+    const workboard = {
+      schema: 'atlas.openspec.workboard.v1', generatedAt: '2026-11-12T08:00:00.000Z',
+      taskInventory: [task], sourceFileHashes: { [sourceRef]: digest(sourceBytes) },
+    };
+    writeFileSync(workboardPath, JSON.stringify(workboard));
+    const resolved = resolveOpenSpecWorkboardTaskRefV1(task.stableKey, { root, workboardPath, currentHead: 'head-1' });
+
+    assert.equal(resolved.workboardTaskId, task.taskKey);
+    assert.equal(resolved.stableKey, task.stableKey);
+    assert.equal(resolved.status, 'CAPTURE_ASSERTED_SOURCE_CURRENT_LINK');
+    assert.equal(resolved.dispatchRevalidation, 'REQUIRED');
+    assert.equal(resolved.canonicalAuthority, false);
+    assert.equal(resolved.authority, 'PROPOSAL_REFERENCE_ONLY');
+    const diagnostic = {
+      severity: 'error', code: 'TS2345', file: 'src/example.ts', line: 1, column: 1,
+      message: 'Type mismatch', fingerprint: `sha256:${'d'.repeat(64)}`,
+    };
+    const secondDiagnostic = { ...diagnostic, line: 9, fingerprint: `sha256:${'e'.repeat(64)}` };
+    const bindings = resolveOpenSpecDiagnosticTaskBindingsV1([
+      { diagnosticFingerprint: diagnostic.fingerprint, taskKey: task.stableKey },
+    ], [diagnostic.fingerprint, secondDiagnostic.fingerprint], { root, workboardPath, currentHead: 'head-1' });
+    const todoList = buildTodoList([diagnostic, secondDiagnostic], { runId: 'run-1', gitRevision: 'head-1', logPath: 'check.txt' });
+    for (const todo of todoList.tasks) {
+      const reference = bindings.get(todo.fingerprint);
+      if (reference) todo.workboardTaskRef = reference;
+    }
+    const linkedPlan = buildKanbanPlan(todoList);
+    assert.equal(todoList.tasks[0].workboardTaskRef.workboardTaskId, task.taskKey);
+    assert.equal(linkedPlan.tasks[0].id, todoList.tasks[0].taskId);
+    assert.equal(linkedPlan.tasks[0].workboardLink.reference.stableKey, task.stableKey);
+    assert.equal(linkedPlan.tasks[0].mutationAllowed, false);
+    assert.equal(todoList.tasks[1].workboardTaskRef, undefined);
+    assert.equal(linkedPlan.tasks[1].workboardLink.status, 'NOT_LINKED_TO_OPEN_SPEC_TASK');
+    assert.throws(() => resolveOpenSpecDiagnosticTaskBindingsV1([
+      { diagnosticFingerprint: `sha256:${'f'.repeat(64)}`, taskKey: task.taskKey },
+    ], [diagnostic.fingerprint], { root, workboardPath }), /DIAGNOSTIC_TASK_BINDING_FINGERPRINT_NOT_IN_RUN/);
+    assert.throws(() => resolveOpenSpecDiagnosticTaskBindingsV1([
+      { diagnosticFingerprint: diagnostic.fingerprint, taskKey: task.taskKey },
+      { diagnosticFingerprint: diagnostic.fingerprint, taskKey: task.taskKey },
+    ], [diagnostic.fingerprint], { root, workboardPath }), /DIAGNOSTIC_TASK_BINDING_DUPLICATE_FINGERPRINT/);
+    assert.throws(() => resolveOpenSpecWorkboardTaskRefV1('missing-key', { root, workboardPath }), /WORKBOARD_TASK_KEY_NOT_FOUND/);
+
+    writeFileSync(sourcePath, Buffer.from('changed source\n'));
+    assert.throws(() => resolveOpenSpecWorkboardTaskRefV1(task.taskKey, { root, workboardPath }), /WORKBOARD_SOURCE_FILE_REVISION_MISMATCH/);
+    workboard.taskInventory.push({ ...task, taskKey: 'change-a:8' });
+    writeFileSync(workboardPath, JSON.stringify(workboard));
+    assert.throws(() => resolveOpenSpecWorkboardTaskRefV1(task.stableKey, { root, workboardPath }), /WORKBOARD_TASK_KEY_AMBIGUOUS/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
 
 test('binds captures to a regular in-frontend tsconfig and its checksum', () => {
   const config = resolveTsconfig();
@@ -272,7 +452,7 @@ test('runs saved-log enrichment through the real local MCP stdio server in mock 
   try {
     const inventory = await client.initialize();
     assert.equal(inventory.registryStatus, 'EXACT_REGISTRY_MATCH_AND_ALLOWED_SCHEMAS_VERIFIED');
-    assert.equal(inventory.registeredToolNames.length, 10);
+    assert.equal(inventory.registeredToolNames.length, 13);
     assert.deepEqual(
       SVELTE_DIAGNOSTIC_MCP_TOOL_POLICY.filter((tool) => tool.decision === 'ALLOW').map((tool) => tool.name).sort(),
       ['build_recommendation', 'classify_intent', 'find_dependencies', 'find_source_refs'],

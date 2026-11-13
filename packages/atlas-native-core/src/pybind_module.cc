@@ -40,8 +40,8 @@ PYBIND11_MODULE(_atlas_native_core, module) {
             kmeans_cluster_ids.size() != candidate_ordinals.size()) {
             throw py::value_error("SOM_RADIX_KEY_ARRAY_LENGTH_MISMATCH");
         }
-        if (candidate_ordinals.size() > UINT32_MAX) {
-            throw py::value_error("SOM_RADIX_CANDIDATE_COUNT_OUT_OF_RANGE");
+        if (candidate_ordinals.size() > atlas::native::MAX_SOM_RADIX_CANDIDATES_V1) {
+            throw py::value_error("SOM_RADIX_CANDIDATE_LIMIT_EXCEEDED");
         }
         std::vector<atlas::native::SomTileSortEntry> entries;
         entries.reserve(candidate_ordinals.size());

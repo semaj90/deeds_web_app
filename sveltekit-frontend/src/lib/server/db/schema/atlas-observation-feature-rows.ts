@@ -39,6 +39,7 @@ export const atlasObservationFeatureRows = pgTable(
     astPatternMask: jsonb('ast_pattern_mask').notNull(),
     structuralFlags: jsonb('structural_flags').notNull(),
     evidenceRefs: text('evidence_refs').array().notNull().default(sql`'{}'::text[]`),
+    clusterFeatureProjection: jsonb('cluster_feature_projection'),
 
     kmeansClusterId: integer('kmeans_cluster_id'),
     somRow: integer('som_row'),

@@ -47,6 +47,16 @@ export type BuildClusterFeatureProjectionV1Input = Omit<
   'schema' | 'evidenceAuthority' | 'projectionDigest'
 >;
 
+/** Stable across PostgreSQL jsonb key reordering and producer object construction order. */
+function canonicalJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  if (value !== null && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    return `{${Object.keys(record).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(record[key])}`).join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
 export function buildClusterFeatureProjectionV1(
   input: BuildClusterFeatureProjectionV1Input,
 ): ClusterFeatureProjectionV1 {
@@ -55,6 +65,47 @@ export function buildClusterFeatureProjectionV1(
     ...input,
     evidenceAuthority: false as const,
   };
-  const projectionDigest = createHash('sha256').update(JSON.stringify(base)).digest('hex');
+  const projectionDigest = createHash('sha256').update(canonicalJson(base)).digest('hex');
   return ClusterFeatureProjectionV1Schema.parse({ ...base, projectionDigest });
+}
+
+/** Recompute the content digest; schema validity alone does not bind the digest to the fields. */
+export function verifyClusterFeatureProjectionV1(value: unknown): ClusterFeatureProjectionV1 {
+  const projection = ClusterFeatureProjectionV1Schema.parse(value);
+  const {
+    schema: _schema,
+    evidenceAuthority: _evidenceAuthority,
+    projectionDigest,
+    ...input
+  } = projection;
+  const rebuilt = buildClusterFeatureProjectionV1(input);
+  if (rebuilt.projectionDigest !== projectionDigest) {
+    throw new Error('CLUSTER_FEATURE_PROJECTION_DIGEST_MISMATCH');
+  }
+  return projection;
+}
+
+/** Bind a cluster proposal to the exact packet and semantic representation row that produced it. */
+export function assertClusterFeatureProjectionBindingV1(
+  projection: ClusterFeatureProjectionV1,
+  expected: {
+    packetKey: string;
+    sourceRef: string;
+    sourceVersionReceiptId: string | null;
+    representationId: string | null;
+    representationRevision: string | null;
+  },
+): void {
+  if (projection.packetKey !== expected.packetKey || projection.sourceRef !== expected.sourceRef) {
+    throw new Error('CLUSTER_FEATURE_PROJECTION_IDENTITY_MISMATCH');
+  }
+  if (projection.sourceVersionReceiptId !== expected.sourceVersionReceiptId) {
+    throw new Error('CLUSTER_FEATURE_PROJECTION_SOURCE_RECEIPT_MISMATCH');
+  }
+  if (projection.sourceRepresentationId !== 'semantic_768' || expected.representationId !== 'semantic_768') {
+    throw new Error('CLUSTER_FEATURE_PROJECTION_REPRESENTATION_ID_MISMATCH');
+  }
+  if (!expected.representationRevision || projection.sourceRepresentationRevision !== expected.representationRevision) {
+    throw new Error('CLUSTER_FEATURE_PROJECTION_REPRESENTATION_REVISION_MISMATCH');
+  }
 }

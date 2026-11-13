@@ -94,6 +94,18 @@ export const GET: RequestHandler = ({ url }) => {
         outputModes: ['application/json'],
       },
       {
+        id: 'agentic-error-fix-proposal',
+        name: 'Agentic Error Fix Proposal',
+        description:
+          'Returns a deterministic, proposal-only repair candidate using the shared ACP/A2A contract. ' +
+          'It does not read source bytes, create a canonical task, mutate files, or execute tests. ' +
+          'Execution requires current task/source identity, authorization, approval, and independent verification.',
+        tags: ['agentic', 'error-fixing', 'proposal-only', 'acp', 'kanban'],
+        examples: ['Create a proposal for a TypeScript error in a repository file'],
+        inputModes: ['application/json'],
+        outputModes: ['application/json'],
+      },
+      {
         id: 'nlp-sidecar-analysis',
         name: 'NLP Sidecar Analysis',
         description:

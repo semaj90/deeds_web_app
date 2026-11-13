@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { uploadLibraryDocument, runIngestionPipeline } from '$lib/server/legal/ingestion-worker.js';
+import { uploadLibraryDocument } from '$lib/server/legal/ingestion-worker.js';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -23,22 +23,14 @@ export const GET: RequestHandler = async ({ locals }) => {
             title: 'California Constitution 2023-24',
             corpusType: 'constitution',
             jurisdictionCode: 'CA',
-            userId: null!
+            userId: String(locals.user.id)
         });
 
         console.log(`    Document ID: ${documentId}`);
         console.log(`    Job ID:      ${jobId}`);
 
-        console.log(`[3] Running complex chunker & embedding pipeline...`);
-        // We do not await this entirely so the request doesn't timeout,
-        // but we'll await it for the sake of logging the whole process here
-        // if the server timeout is long enough (1000s).
-        // Since it's a local script, we can just await it.
-        const result = await runIngestionPipeline({ documentId, jobId });
-
-        console.log('[ingest-constitution] Ingestion complete');
-
-        return json({ success: true, result });
+        console.log('[3] Ingestion job durably queued for the library worker.');
+        return json({ success: true, documentId, jobId, status: 'queued' }, { status: 202 });
     } catch (err) {
         console.error("\n❌ Ingestion Failed:", err);
         return json({ success: false, result: null });

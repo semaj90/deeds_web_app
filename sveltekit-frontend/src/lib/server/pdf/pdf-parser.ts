@@ -28,6 +28,8 @@ export class PdfParseError extends Error {
 export interface CanonicalPdfParseResult {
   /** Concatenated text across all parsed pages. */
   text: string;
+  /** Exact per-page text returned by pdf-parse, used to retain source page spans. */
+  pages: Array<{ pageNumber: number; text: string }>;
   /** Number of pages in the document (v1: `numpages`). */
   pageCount: number;
   /** PDF 'Info' dictionary (v1: `info`), or null when unavailable. */
@@ -53,6 +55,7 @@ export async function parsePdfBuffer(data: Buffer | Uint8Array): Promise<Canonic
 
     return {
       text: textResult.text,
+      pages: textResult.pages.map((page) => ({ pageNumber: page.num, text: page.text })),
       pageCount: textResult.total,
       info: (infoResult?.info as Record<string, unknown> | undefined) ?? null,
       metadata: (infoResult?.metadata as unknown as Record<string, unknown> | undefined) ?? null,

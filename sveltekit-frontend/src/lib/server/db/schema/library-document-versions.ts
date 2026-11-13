@@ -10,6 +10,7 @@ import { libraryDocuments } from './library-documents';
 export const libraryDocumentVersions = pgTable('library_document_versions', {
 	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 	documentId: uuid('document_id').notNull().references(() => libraryDocuments.id, { onDelete: 'cascade' }),
+	sourceHash: text('source_hash'), // SHA-256 snapshot this revision represents
 	versionLabel: text('version_label'),              // e.g. "2024 Amendment", "v1"
 	sourceDate: timestamp('source_date', { mode: 'date' }),
 	isCurrent: boolean('is_current').default(false),

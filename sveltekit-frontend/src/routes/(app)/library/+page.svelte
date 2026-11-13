@@ -80,7 +80,16 @@
 		uploadProgress = null;
 
 		try {
-			const res = await fetch('/api/library/upload', { method: 'POST', body: fd, signal: AbortSignal.timeout(120_000) });
+			const file = fd.get('file');
+			if (!(file instanceof File)) throw new Error('Choose a file to upload.');
+			const { uploadLibraryFileV1 } = await import('$lib/library/library-upload-client-v1.js');
+			const res = await uploadLibraryFileV1(file, {
+				title: String(fd.get('title') ?? file.name),
+				corpusType: String(fd.get('corpusType') ?? 'other'),
+				jurisdiction: String(fd.get('jurisdiction') ?? 'federal'),
+				officialUrl: String(fd.get('officialUrl') ?? '') || undefined,
+				effectiveDate: String(fd.get('effectiveDate') ?? '') || undefined,
+			}, AbortSignal.timeout(120_000));
 			const data = await res.json();
 			if (!res.ok || !data.success) throw new Error(data.error ?? 'Upload failed');
 			if (data.documentId && data.alreadyExists && !data.jobId) {

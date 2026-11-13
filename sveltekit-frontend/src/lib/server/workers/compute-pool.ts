@@ -26,7 +26,7 @@ export type TaskType =
   | 'chunk' | 'hash' | 'metadata' | 'qdrant_payload' | 'langextract.extract'
   | 'graph.bfs' | 'graph.bfs_extended' | 'graph.astar' | 'graph.greedy'
   | 'graph.ast_traverse' | 'tree.predict' | 'manifold.slerp' | 'manifold.interpolate4d'
-  | 'schema.encode' | 'hamming128.proposal';
+  | 'schema.encode' | 'hamming128.proposal' | 'som.radix-order.proposal';
 
 export interface RunOptions {
 	/** Soft-affinity key: same key → same worker (warm JIT, hot caches).
@@ -41,6 +41,45 @@ export const DEFAULT_MAX_QUEUED_COMPUTE_BYTES = 64 * 1024 * 1024;
 export const MAX_SIMILARITY_CANDIDATES_PER_BATCH = 500;
 export const MAX_SIMILARITY_BATCH_BYTES = 64 * 1024 * 1024;
 export const MAX_GPU_SIMILARITY_VALUES_PER_BATCH = 250_000;
+export const MAX_SOM_RADIX_CANDIDATES = 65_536;
+
+export interface SomRadixOrderInput {
+	kmeansClusterIds: Uint16Array;
+	somBmuIds: Uint16Array;
+	candidateOrdinals: Uint32Array;
+}
+
+export interface SomRadixOrderResult {
+	schema: 'atlas.som-radix-order.worker-result.v1';
+	authority: 'PROPOSAL_ONLY';
+	backend: 'NAPI_RADIX' | 'JS_REFERENCE' | 'EMPTY';
+	/** Input-local indices in deterministic KMeans, SOM, CandidateOrdinal order. */
+	sourceIndices: Uint32Array;
+	/** Original CandidateOrdinal values in the same output order. */
+	sortedCandidateOrdinals: Uint32Array;
+}
+
+export function validateSomRadixOrderInput(input: SomRadixOrderInput): void {
+	if (!(input?.kmeansClusterIds instanceof Uint16Array)
+		|| !(input?.somBmuIds instanceof Uint16Array)
+		|| !(input?.candidateOrdinals instanceof Uint32Array)) {
+		throw new Error('SOM_RADIX_ARRAY_TYPES_INVALID');
+	}
+	const count = input.kmeansClusterIds.length;
+	if (input.somBmuIds.length !== count || input.candidateOrdinals.length !== count) {
+		throw new Error('SOM_RADIX_ARRAY_LENGTH_MISMATCH');
+	}
+	if (count > MAX_SOM_RADIX_CANDIDATES) {
+		throw new Error('SOM_RADIX_CANDIDATE_LIMIT_EXCEEDED');
+	}
+	const seen = new Set<number>();
+	for (let i = 0; i < count; i += 1) {
+		if (input.somBmuIds[i] >= 400) throw new Error('SOM_BMU_ID_OUT_OF_RANGE');
+		const ordinal = input.candidateOrdinals[i];
+		if (seen.has(ordinal)) throw new Error('SOM_RADIX_CANDIDATE_ORDINALS_MUST_BE_UNIQUE');
+		seen.add(ordinal);
+	}
+}
 
 export function computeSimilarityChunkSize(candidateCount: number, dimensions: number): number {
 	if (!Number.isSafeInteger(candidateCount) || candidateCount < 0
@@ -384,6 +423,28 @@ export class ComputePool {
 				}
 			});
 		});
+	}
+
+	/**
+	 * Deterministically groups an already-qualified candidate batch by KMeans
+	 * cluster, 20x20 SOM cell, then canonical CandidateOrdinal. This is an
+	 * ordering proposal only: it does not score relevance or grant authority.
+	 */
+	async runSomRadixOrderProposal(
+		input: SomRadixOrderInput,
+		options: RunOptions = {}
+	): Promise<SomRadixOrderResult> {
+		validateSomRadixOrderInput(input);
+		if (input.candidateOrdinals.length === 0) {
+			return {
+				schema: 'atlas.som-radix-order.worker-result.v1',
+				authority: 'PROPOSAL_ONLY',
+				backend: 'EMPTY',
+				sourceIndices: new Uint32Array(0),
+				sortedCandidateOrdinals: new Uint32Array(0),
+			};
+		}
+		return this.run<SomRadixOrderResult>('som.radix-order.proposal', input, options);
 	}
 
 	private dispatch(

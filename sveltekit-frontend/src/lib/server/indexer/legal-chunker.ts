@@ -107,6 +107,8 @@ export interface LegalStructureSection {
    * body would otherwise drop this content entirely.
    */
   inlineText?: string;
+  /** Source offset where inline body text begins on the heading line. */
+  inlineTextOffset?: number;
 }
 
 export interface LegalChunkerOptions {
@@ -180,7 +182,7 @@ export function chunkLegalDocument(fullText: string, opts?: LegalChunkerOptions)
 
   // 2. If no structure found, fall back to simple windowing
   if (sections.length <= 1 && !sections[0]?.heading) {
-    return simpleChunk(fullText, maxTokens, overlap);
+    return bindChunksToExactSource(fullText, simpleChunk(fullText, maxTokens, overlap));
   }
 
   // 3. Flatten sections and chunk each one
@@ -191,8 +193,10 @@ export function chunkLegalDocument(fullText: string, opts?: LegalChunkerOptions)
   for (const section of flatSections) {
     // A short body must not silently erase the clause: when the heading line itself carries text, keep it.
     let sectionText = section.text;
+    let sectionBaseOffset = section.startOffset;
     if (sectionText.trim().length < minLen && section.inlineText) {
-      const combined = `${section.inlineText}\n${sectionText}`.trim();
+      sectionBaseOffset = section.inlineTextOffset ?? section.startOffset;
+      const combined = fullText.slice(sectionBaseOffset, section.endOffset).trim();
       if (combined.length >= minLen) sectionText = `${combined}\n`;
     }
     if (sectionText.trim().length < minLen) continue;
@@ -203,7 +207,7 @@ export function chunkLegalDocument(fullText: string, opts?: LegalChunkerOptions)
       overlap,
       section.path,
       section.heading,
-      section.startOffset,
+      sectionBaseOffset,
       globalChunkIndex
     );
 
@@ -213,7 +217,23 @@ export function chunkLegalDocument(fullText: string, opts?: LegalChunkerOptions)
     }
   }
 
-  return chunks;
+  return bindChunksToExactSource(fullText, chunks);
+}
+
+/** Keeps chunk text byte-for-byte equivalent to its canonical UTF-16 source span. */
+function bindChunksToExactSource(fullText: string, chunks: LegalChunk[]): LegalChunk[] {
+  return chunks.map((chunk) => {
+    if (
+      !Number.isSafeInteger(chunk.startOffset) ||
+      !Number.isSafeInteger(chunk.endOffset) ||
+      chunk.startOffset < 0 ||
+      chunk.endOffset <= chunk.startOffset ||
+      chunk.endOffset > fullText.length
+    ) {
+      throw new Error('LEGAL_CHUNK_SOURCE_SPAN_INVALID');
+    }
+    return { ...chunk, text: fullText.slice(chunk.startOffset, chunk.endOffset) };
+  });
 }
 
 // ── Section parsing ─────────────────────────────────────────────────────
@@ -226,7 +246,8 @@ export function parseSections(text: string): LegalStructureSection[] {
   let currentOffset = 0;
   let lineOffset = 0;
 
-  for (const line of lines) {
+  for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+    const line = lines[lineIndex] ?? '';
     const heading = detectHeading(line.trim());
 
     if (heading) {
@@ -253,11 +274,14 @@ export function parseSections(text: string): LegalStructureSection[] {
         level: heading.level,
         heading: heading.fullHeading,
         text: '',
-        startOffset: lineOffset,
-        endOffset: lineOffset,
+        startOffset: Math.min(text.length, lineOffset + line.length + (lineIndex < lines.length - 1 ? 1 : 0)),
+        endOffset: Math.min(text.length, lineOffset + line.length + (lineIndex < lines.length - 1 ? 1 : 0)),
         children: [],
         path: [],
         ...(heading.inlineText ? { inlineText: heading.inlineText } : {}),
+        ...(heading.inlineText
+          ? { inlineTextOffset: lineOffset + line.indexOf(heading.fullHeading) + heading.fullHeading.lastIndexOf(heading.inlineText) }
+          : {}),
       };
 
       // Pop stack until we find a parent with lower level
@@ -279,7 +303,7 @@ export function parseSections(text: string): LegalStructureSection[] {
       currentText += line + '\n';
     }
 
-    lineOffset += line.length + 1; // +1 for \n
+    lineOffset += line.length + (lineIndex < lines.length - 1 ? 1 : 0); // Count only source newlines.
   }
 
   // Close last section
@@ -339,7 +363,8 @@ function chunkSectionText(
   baseOffset: number,
   startIndex: number
 ): LegalChunk[] {
-  const words = text.split(/\s+/).filter(Boolean);
+  const wordMatches = [...text.matchAll(/\S+/g)];
+  const words = wordMatches.map((match) => match[0]);
   if (words.length === 0) return [];
 
   const citations = extractCitations(text);
@@ -352,8 +377,8 @@ function chunkSectionText(
         chunkIndex: startIndex,
         sectionPath,
         heading,
-        startOffset: baseOffset,
-        endOffset: baseOffset + text.length,
+        startOffset: baseOffset + (wordMatches[0]?.index ?? 0),
+        endOffset: baseOffset + (wordMatches.at(-1)?.index ?? 0) + (wordMatches.at(-1)?.[0].length ?? 0),
         tokenCount: words.length,
         citations,
         ...buildLegalMetadata(trimmed, heading, citations),
@@ -363,7 +388,6 @@ function chunkSectionText(
 
   const chunks: LegalChunk[] = [];
   let chunkIdx = startIndex;
-  let charOffset = 0;
 
   for (let i = 0; i < words.length; i += maxTokens - overlap) {
     const windowWords = words.slice(i, i + maxTokens);
@@ -375,14 +399,14 @@ function chunkSectionText(
       chunkIndex: chunkIdx,
       sectionPath,
       heading,
-      startOffset: baseOffset + charOffset,
-      endOffset: baseOffset + charOffset + chunkText.length,
+      startOffset: baseOffset + (wordMatches[i]?.index ?? 0),
+      endOffset: baseOffset + (wordMatches[Math.min(i + maxTokens, wordMatches.length) - 1]?.index ?? 0)
+        + (wordMatches[Math.min(i + maxTokens, wordMatches.length) - 1]?.[0].length ?? 0),
       tokenCount: windowWords.length,
       citations: chunkCitations,
       ...buildLegalMetadata(chunkText, heading, chunkCitations),
     });
 
-    charOffset += windowWords.slice(0, maxTokens - overlap).join(' ').length + 1;
     chunkIdx++;
 
     if (i + maxTokens >= words.length) break;
@@ -716,7 +740,8 @@ function buildSectionPath(headingText: string, currentPath: string[]): string[] 
 // ── Simple fallback chunker (no structure detected) ──────────────────────
 
 function simpleChunk(text: string, maxTokens: number, overlap: number): LegalChunk[] {
-	const words = text.split(/\s+/).filter(Boolean);
+	const wordMatches = [...text.matchAll(/\S+/g)];
+	const words = wordMatches.map((match) => match[0]);
 	if (words.length <= maxTokens) {
 		const trimmed = text.trim();
 		const citations = extractCitations(text);
@@ -725,8 +750,8 @@ function simpleChunk(text: string, maxTokens: number, overlap: number): LegalChu
 			chunkIndex: 0,
 			sectionPath: [],
 			heading: '',
-			startOffset: 0,
-			endOffset: text.length,
+			startOffset: wordMatches[0]?.index ?? 0,
+			endOffset: (wordMatches.at(-1)?.index ?? 0) + (wordMatches.at(-1)?.[0].length ?? 0),
 			tokenCount: words.length,
 			citations,
 			...buildLegalMetadata(trimmed, '', citations),
@@ -735,7 +760,6 @@ function simpleChunk(text: string, maxTokens: number, overlap: number): LegalChu
 
 	const chunks: LegalChunk[] = [];
 	let chunkIdx = 0;
-	let charOffset = 0;
 
 	for (let i = 0; i < words.length; i += maxTokens - overlap) {
 		const windowWords = words.slice(i, i + maxTokens);
@@ -747,14 +771,14 @@ function simpleChunk(text: string, maxTokens: number, overlap: number): LegalChu
 			chunkIndex: chunkIdx,
 			sectionPath: [],
 			heading: '',
-			startOffset: charOffset,
-			endOffset: charOffset + chunkText.length,
+			startOffset: wordMatches[i]?.index ?? 0,
+			endOffset: (wordMatches[Math.min(i + maxTokens, wordMatches.length) - 1]?.index ?? 0)
+				+ (wordMatches[Math.min(i + maxTokens, wordMatches.length) - 1]?.[0].length ?? 0),
 			tokenCount: windowWords.length,
 			citations: chunkCitations,
 			...buildLegalMetadata(chunkText, '', chunkCitations),
 		});
 
-		charOffset += windowWords.slice(0, maxTokens - overlap).join(' ').length + 1;
 		chunkIdx++;
 
 		if (i + maxTokens >= words.length) break;

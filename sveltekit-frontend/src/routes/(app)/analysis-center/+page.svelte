@@ -761,7 +761,7 @@
 	   as plain `button` it out-ranked them and stripped their padding, border and background. */
 	.analysis-center :global(:where(button)) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
 	.analysis-center :global(input), .analysis-center :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
-	.analysis-center :global(.panel), .analysis-center :global(.card), .analysis-center :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
+	.analysis-center :global(:where(.panel, .card, [class*="panel"])) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
 
 	.analysis-center::before {
 		content: '';
@@ -959,13 +959,15 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr 280px;
 		gap: 1rem;
-		min-height: calc(100vh - 180px);
+		min-height: clamp(24rem, 54vh, 40rem);
 		padding: 1rem;
 	}
 
 	.query-panel,
 	.results-panel,
 	.evidence-panel {
+		min-width: 0;
+		min-height: 0;
 		background: rgba(13, 17, 23, 0.9);
 		border: 1px solid #1e3a2a;
 		border-radius: 6px;
@@ -1371,15 +1373,25 @@
 	.tools-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
 	.tools-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; color: #10b981; }
 	.tools-count { font-size: 0.65rem; color: #6b7280; }
-	.tools-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; }
+	.tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: 0.5rem; }
 	.tool-card { display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem; padding: 0.6rem 0.75rem; background: rgba(16,185,129,0.04); border: 1px solid rgba(16,185,129,0.15); border-radius: 6px; cursor: pointer; text-align: left; transition: all 0.15s; }
 	.tool-card:hover { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.4); }
 	.tool-card.active { background: rgba(16,185,129,0.15); border-color: #10b981; }
 	.tool-icon-badge { font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; color: #10b981; }
 	.tool-label { font-size: 0.7rem; font-weight: 600; color: #e6edf3; }
 	.tool-desc { font-size: 0.6rem; color: #6b7280; }
-	.tool-expanded { margin: 1rem 1rem 0; border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; overflow: hidden; }
+	.tool-expanded { margin: 1rem 1rem 0; border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; overflow: auto; max-height: min(72vh, 52rem); }
 	.tool-expanded-header { display: flex; justify-content: flex-end; padding: 0.5rem 0.75rem; background: rgba(16,185,129,0.05); border-bottom: 1px solid rgba(16,185,129,0.15); }
 	.tool-close-btn { font-size: 0.7rem; color: #6b7280; cursor: pointer; background: none; border: none; padding: 0.2rem 0.5rem; border-radius: 4px; }
 	.tool-close-btn:hover { color: #10b981; background: rgba(16,185,129,0.1); }
+	@media (max-width: 1100px) {
+		.analysis-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 0; }
+		.evidence-panel { grid-column: 1 / -1; min-height: 14rem; }
+	}
+	@media (max-width: 680px) {
+		.analysis-layout { grid-template-columns: minmax(0, 1fr); padding: 0.75rem; }
+		.query-panel, .results-panel, .evidence-panel { min-height: 16rem; }
+		.tools-panel { margin: 1rem 0.75rem; }
+		.tool-expanded { margin: 0.75rem; max-height: 72vh; }
+	}
 </style>

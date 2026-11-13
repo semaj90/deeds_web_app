@@ -13,6 +13,9 @@
 #if defined(__GNUC__) || defined(__clang__)
 #include <immintrin.h>
 #endif
+#if defined(_MSC_VER)
+#include <intrin.h>
+#endif
 #endif
 
 namespace atlas::simd {
@@ -139,16 +142,42 @@ inline void hamming_distance_128_batch_avx512(
 
 inline bool hamming128_avx2_available() noexcept {
     static const bool supported = [] {
+#if defined(_MSC_VER)
+        int registers[4] = {};
+        __cpuidex(registers, 1, 0);
+        constexpr int osxsave = 1 << 27;
+        constexpr int avx = 1 << 28;
+        if ((registers[2] & (osxsave | avx)) != (osxsave | avx)) return false;
+        const auto xcr0 = _xgetbv(0);
+        if ((xcr0 & 0x6) != 0x6) return false;
+        __cpuidex(registers, 7, 0);
+        return (registers[1] & (1 << 5)) != 0;
+#else
         __builtin_cpu_init();
         return __builtin_cpu_supports("avx2");
+#endif
     }();
     return supported;
 }
 
 inline bool hamming128_avx512_vpopcnt_available() noexcept {
     static const bool supported = [] {
+#if defined(_MSC_VER)
+        int registers[4] = {};
+        __cpuidex(registers, 1, 0);
+        constexpr int osxsave = 1 << 27;
+        constexpr int avx = 1 << 28;
+        if ((registers[2] & (osxsave | avx)) != (osxsave | avx)) return false;
+        const auto xcr0 = _xgetbv(0);
+        if ((xcr0 & 0xE6) != 0xE6) return false;
+        __cpuidex(registers, 7, 0);
+        constexpr int avx512f = 1 << 16;
+        constexpr int avx512Vpopcntdq = 1 << 14;
+        return (registers[1] & avx512f) != 0 && (registers[2] & avx512Vpopcntdq) != 0;
+#else
         __builtin_cpu_init();
         return __builtin_cpu_supports("avx512f") && __builtin_cpu_supports("avx512vpopcntdq");
+#endif
     }();
     return supported;
 }

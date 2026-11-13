@@ -2,6 +2,27 @@ import { describe, expect, it } from 'vitest';
 import { summarizeDailyGraphifyBoard } from './daily-graphify-board.js';
 
 describe('daily graphify board', () => {
+	it('preserves an explicit revision-bound OpenSpec reference without changing the diagnostic board ID', () => {
+    const ref = {
+      schema: 'atlas.openspec-workboard-task-ref.v1' as const,
+      workboardTaskId: 'change-a:7', stableKey: 'change-a#0123456789abcdef', logicalTaskKey: null,
+      taskRevision: `sha256:${'a'.repeat(64)}`, sourceRef: 'openspec/changes/change-a/tasks.md',
+      sourceFileSha256: `sha256:${'b'.repeat(64)}`, workboardSnapshotSha256: `sha256:${'c'.repeat(64)}`,
+      workboardGeneratedAt: '2026-11-12T08:00:00.000Z', currentHead: 'head-1',
+      status: 'CAPTURE_ASSERTED_SOURCE_CURRENT_LINK' as const, dispatchRevalidation: 'REQUIRED' as const,
+      authority: 'PROPOSAL_REFERENCE_ONLY' as const,
+      canonicalAuthority: false as const,
+    };
+    const summary = summarizeDailyGraphifyBoard({
+      generated: '2026-11-12T08:00:00.000Z',
+      tasks: [{ id: 'err-fix:diag-123', priority: 'P1', label: 'Type error', origin: 'agentic_error_fixing_v1', openspec_task_ref: ref }],
+    }, null);
+    const task = summary.columns.flatMap((column) => column.tasks).find((candidate) => candidate.id === 'err-fix:diag-123');
+
+    expect(task?.id).toBe('err-fix:diag-123');
+    expect(task?.openspec_task_ref).toEqual(ref);
+  });
+
 	it('preserves error-fixing reason codes and diagnostic evidence for board cards', () => {
     const diagnostic = 'SEMANTIC_OWNER_PROVEN=PARTIAL_PROVEN row-level provenance is missing.';
     const summary = summarizeDailyGraphifyBoard({

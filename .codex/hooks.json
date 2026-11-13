@@ -1,0 +1,18 @@
+{
+  "description": "Parent Atlas evidence-first context and GAN proof reminders",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .codex/hooks/parent-atlas-validation-context.mjs",
+            "commandWindows": "node .codex/hooks/parent-atlas-validation-context.mjs",
+            "timeout": 3,
+            "statusMessage": "Loading Parent Atlas validation guidance"
+          }
+        ]
+      }
+    ]
+  }
+}

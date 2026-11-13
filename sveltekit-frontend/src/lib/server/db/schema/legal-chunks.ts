@@ -12,11 +12,14 @@ export const legalChunks = pgTable('legal_chunks', {
 	legalNodeId: uuid('legal_node_id').notNull().references(() => legalNodes.id, { onDelete: 'cascade' }),
 	chunkIndex: integer('chunk_index').notNull(),
 	chunkText: text('chunk_text').notNull(),
+	chunkHash: text('chunk_hash'), // SHA-256 of exact UTF-8 chunk_text bytes; NULL for unreconciled legacy rows
+	parserRevision: text('parser_revision'), // exact extractor/chunker recipe for the chunk bytes
 	tokenCount: integer('token_count'),
 	pageStart: integer('page_start'),
 	pageEnd: integer('page_end'),
 	charStart: integer('char_start'),
 	charEnd: integer('char_end'),
+	charOffsetUnit: text('char_offset_unit'), // offsets in chunk_text are measured in this unit
 	embedding: vector('embedding', { dimensions: 768 }),  // embeddinggemma:latest
 	summary: text('summary'),
 	qdrantPointId: text('qdrant_point_id'),

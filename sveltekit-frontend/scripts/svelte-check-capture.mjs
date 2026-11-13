@@ -10,6 +10,10 @@ import { finished } from 'node:stream/promises';
 import Ajv from 'ajv';
 import { parse as parseYaml } from 'yaml';
 import { resolveOkfDevPublishedCorpusV1 } from '../../scripts/docs-atlas/lib/okf-dev-publication-v1.mjs';
+import {
+  resolveOpenSpecDiagnosticTaskBindingsV1,
+  resolveOpenSpecWorkboardTaskRefV1,
+} from '../../scripts/atlas/lib/openspec-workboard-task-ref-v1.mjs';
 
 const frontendRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = path.resolve(frontendRoot, '..');
@@ -26,12 +30,68 @@ export const SVELTE_DIAGNOSTIC_MCP_TOOL_POLICY = Object.freeze([
   { name: 'find_source_refs', effect: 'READ_ONLY_BOUNDED_PACKET_AND_GRAPH_LOOKUP', decision: 'ALLOW' },
   { name: 'find_feature', effect: 'READ_ONLY_UNBOUNDED_GRAPH_LOOKUP', decision: 'EXCLUDE' },
   { name: 'find_route', effect: 'READ_ONLY_UNBOUNDED_GRAPH_LOOKUP', decision: 'EXCLUDE' },
+  { name: 'recommend_kanban_dag_prefill_algorithm', effect: 'READ_ONLY_BOUNDED_POSTGRES_PROPOSAL', decision: 'EXCLUDE' },
+  { name: 'gpu_vram_status', effect: 'READ_ONLY_RUNTIME_STATUS', decision: 'EXCLUDE' },
+  { name: 'gpu_request_vram_release', effect: 'REQUEST_RECORD_WRITE', decision: 'DENY' },
 ]);
 
 function option(name, fallback) {
   const index = args.indexOf(name);
   return index === -1 ? fallback : args[index + 1];
 }
+
+function optionValues(name) {
+  const values = [];
+  for (let index = 0; index < args.length; index += 1) {
+    if (args[index] === name) {
+      if (typeof args[index + 1] !== 'string' || args[index + 1].startsWith('--')) {
+        throw new Error(`${name.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}_VALUE_REQUIRED`);
+      }
+      values.push(args[index + 1]);
+      index += 1;
+    }
+  }
+  return values;
+}
+
+function resolveDiagnosticWorkboardBindings(tasks, currentHead) {
+  const explicitBindings = optionValues('--workboard-task-binding').map((value) => {
+    const separator = value.indexOf('=');
+    if (separator <= 0 || separator === value.length - 1) throw new Error('DIAGNOSTIC_TASK_BINDING_ARGUMENT_INVALID');
+    return { diagnosticFingerprint: value.slice(0, separator), taskKey: value.slice(separator + 1) };
+  });
+  const legacyTaskKey = option('--workboard-task-key', null);
+  if (legacyTaskKey && explicitBindings.length > 0) throw new Error('WORKBOARD_TASK_BINDING_OPTIONS_CONFLICT');
+  if (legacyTaskKey) {
+    if (tasks.length !== 1) throw new Error('WORKBOARD_TASK_KEY_REQUIRES_SINGLE_DIAGNOSTIC');
+    explicitBindings.push({ diagnosticFingerprint: tasks[0].fingerprint, taskKey: legacyTaskKey });
+  }
+  return resolveOpenSpecDiagnosticTaskBindingsV1(
+    explicitBindings,
+    tasks.map((task) => task.fingerprint),
+    { currentHead },
+  );
+}
+
+function attachDiagnosticWorkboardBindings(todoList, currentHead) {
+  const bindings = resolveDiagnosticWorkboardBindings(todoList.tasks, currentHead);
+  for (const task of todoList.tasks) {
+    const reference = bindings.get(task.fingerprint);
+    if (reference) task.workboardTaskRef = reference;
+  }
+  if (bindings.size > 0) {
+    todoList.workboardBindings = {
+      schema: 'atlas.svelte-check-diagnostic-task-bindings.v1',
+      mappingCount: bindings.size,
+      authority: 'EXPLICIT_PROPOSAL_REFERENCE_ONLY',
+      canonicalAuthority: false,
+    };
+    todoList.kanbanPlan = buildKanbanPlan(todoList, { replayWorkspaceRevision: currentHead });
+  }
+  return todoList;
+}
+
+export { resolveOpenSpecWorkboardTaskRefV1 };
 
 function resolveTsconfig(configPath = 'tsconfig.json', { root = frontendRoot } = {}) {
   const absolutePath = path.resolve(root, configPath);
@@ -52,6 +112,188 @@ function resolveTsconfig(configPath = 'tsconfig.json', { root = frontendRoot } =
   return {
     path: relativePath.replace(/\\/g, '/') || 'tsconfig.json',
     sha256: `sha256:${createHash('sha256').update(bytes).digest('hex')}`,
+  };
+}
+
+function fileSha256(filePath) {
+  return `sha256:${createHash('sha256').update(readFileSync(filePath)).digest('hex')}`;
+}
+
+function readJsonArtifactWithinRepo(inputPath) {
+  const absolutePath = path.resolve(frontendRoot, inputPath);
+  const relativePath = path.relative(repoRoot, absolutePath);
+  if (!relativePath || relativePath === '..' || relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) {
+    throw new Error('RESOLUTION_ARTIFACT_OUTSIDE_REPOSITORY');
+  }
+  if (lstatSync(absolutePath).isSymbolicLink() || !statSync(absolutePath).isFile()) {
+    throw new Error('RESOLUTION_ARTIFACT_MUST_BE_REGULAR_FILE');
+  }
+  const bytes = readFileSync(absolutePath);
+  return { absolutePath, value: JSON.parse(bytes.toString('utf8')), bytes };
+}
+
+function verifyCaptureArtifactsV1(summaryArtifact, todosArtifact) {
+  const summary = summaryArtifact.value;
+  const todos = todosArtifact.value;
+  if (summary?.schema !== 'atlas.svelte-check-capture.v1' || todos?.schema !== 'atlas.svelte-check-todo-list.v1') return false;
+  if (path.resolve(frontendRoot, summary.outputs?.summary ?? '') !== summaryArtifact.absolutePath) return false;
+  if (path.resolve(frontendRoot, summary.outputs?.todos ?? '') !== todosArtifact.absolutePath) return false;
+  if (!/^sha256:[a-f0-9]{64}$/.test(summary.outputs?.todosSha256 ?? '')
+    || !/^sha256:[a-f0-9]{64}$/.test(summary.outputs?.logSha256 ?? '')
+    || !/^sha256:[a-f0-9]{64}$/.test(summary.outputs?.diagnosticsSha256 ?? '')) return false;
+  if (`sha256:${createHash('sha256').update(todosArtifact.bytes).digest('hex')}` !== summary.outputs.todosSha256) return false;
+  const logPath = path.resolve(frontendRoot, summary.outputs.log ?? '');
+  const diagnosticsPath = path.resolve(frontendRoot, summary.outputs.diagnostics ?? '');
+  if (!logPath.startsWith(`${repoRoot}${path.sep}`) || !diagnosticsPath.startsWith(`${repoRoot}${path.sep}`)) return false;
+  if (fileSha256(logPath) !== summary.outputs.logSha256 || fileSha256(diagnosticsPath) !== summary.outputs.diagnosticsSha256) return false;
+  const diagnosticLines = readFileSync(diagnosticsPath, 'utf8').split(/\r?\n/).filter(Boolean);
+  let diagnostics;
+  try {
+    diagnostics = diagnosticLines.map((line) => JSON.parse(line));
+  } catch {
+    return false;
+  }
+  const errors = diagnostics.filter((diagnostic) => diagnostic.severity === 'error').length;
+  const warnings = diagnostics.filter((diagnostic) => diagnostic.severity === 'warning').length;
+  const fingerprints = [...new Set(diagnostics.map((diagnostic) => diagnostic.fingerprint))].sort();
+  const taskFingerprints = todos.tasks.map((task) => task.fingerprint).sort();
+  if (diagnostics.length !== summary.total || errors !== summary.errors || warnings !== summary.warnings
+    || fingerprints.length !== summary.uniqueFingerprints || JSON.stringify(fingerprints) !== JSON.stringify(taskFingerprints)) return false;
+  return todos.sourceLogSha256 === summary.outputs.logSha256
+    && todos.runId === summary.runId
+    && todos.gitRevision === summary.gitRevision
+    && todos.checkerScope?.scopeId === summary.checkerScope?.scopeId;
+}
+
+function buildSvelteCheckScopeV1({ checker, checkCli, commandArgs, tsconfig, root = frontendRoot }) {
+  const checkerPackageName = checker === 'svelte-check-native' ? 'svelte-check-native' : 'svelte-check';
+  const checkerPackagePath = path.join(root, 'node_modules', checkerPackageName, 'package.json');
+  const checkerPackage = JSON.parse(readFileSync(checkerPackagePath, 'utf8'));
+  const configRefs = [
+    'package.json', 'package-lock.json', 'svelte.config.js', 'vite.config.ts', tsconfig.path,
+  ];
+  const configFiles = [...new Set(configRefs)].map((file) => ({
+    path: file,
+    sha256: fileSha256(path.join(root, file)),
+  }));
+  const scope = {
+    schema: 'atlas.svelte-check-scope.v1',
+    checker,
+    checkerVersion: checkerPackage.version,
+    checkerPackageSha256: fileSha256(checkerPackagePath),
+    checkerEntrySha256: fileSha256(checkCli),
+    captureRunnerSha256: fileSha256(fileURLToPath(import.meta.url)),
+    invocation: 'FULL_TSCONFIG_PROJECT',
+    commandArgs,
+    tsconfig,
+    configFiles,
+  };
+  const scopeId = `sha256:${createHash('sha256').update(JSON.stringify(scope), 'utf8').digest('hex')}`;
+  return { ...scope, scopeId };
+}
+
+function buildDiagnosticResolutionReceiptV1(
+  previousSummary,
+  previousTodos,
+  currentSummary,
+  currentTodos,
+  { previousArtifactsVerified = false, currentArtifactsVerified = false } = {},
+) {
+  const validRun = (summary, todos, { clean = false } = {}) => Boolean(
+    summary?.schema === 'atlas.svelte-check-capture.v1'
+      && summary.checker === 'svelte-check-native'
+      && summary.checkerScope?.schema === 'atlas.svelte-check-scope.v1'
+      && /^sha256:[a-f0-9]{64}$/.test(summary.checkerScope.scopeId ?? '')
+      && Number.isInteger(summary.exitCode)
+      && [0, 1].includes(summary.exitCode)
+      && summary.timedOut === false
+      && summary.interrupted === false
+      && summary.signal === null
+      && Number.isInteger(summary.errors)
+      && Number.isInteger(summary.warnings)
+      && todos?.schema === 'atlas.svelte-check-todo-list.v1'
+      && todos.runId === summary.runId
+      && todos.gitRevision === summary.gitRevision
+      && todos.checker === summary.checker
+      && todos.checkerScope?.scopeId === summary.checkerScope.scopeId
+      && todos.sourceLogSha256 === summary.outputs?.logSha256
+      && Array.isArray(todos.tasks)
+      && todos.tasks.every((task) => /^sha256:[a-f0-9]{64}$/.test(task?.fingerprint ?? ''))
+      && new Set(todos.tasks.map((task) => task.fingerprint)).size === todos.tasks.length
+      && ((summary.errors + summary.warnings === 0) === (todos.tasks.length === 0))
+      && (!clean || (summary.exitCode === 0 && summary.errors === 0 && summary.warnings === 0 && todos.tasks.length === 0)),
+  );
+  if (!previousArtifactsVerified || !currentArtifactsVerified) {
+    return {
+      schema: 'atlas.svelte-check-diagnostic-resolution.v1',
+      status: 'BLOCKED_CAPTURE_ARTIFACT_READBACK',
+      resolvedDiagnosticFingerprints: [],
+      writesPerformed: false,
+      boardWritesPerformed: false,
+      completionAuthorized: false,
+    };
+  }
+  if (!validRun(previousSummary, previousTodos) || !validRun(currentSummary, currentTodos, { clean: true })) {
+    return {
+      schema: 'atlas.svelte-check-diagnostic-resolution.v1',
+      status: 'BLOCKED_RUN_OR_SCOPE_EVIDENCE_INVALID',
+      resolvedDiagnosticFingerprints: [],
+      writesPerformed: false,
+      boardWritesPerformed: false,
+      completionAuthorized: false,
+    };
+  }
+  if (previousSummary.checkerScope.scopeId !== currentSummary.checkerScope.scopeId) {
+    return {
+      schema: 'atlas.svelte-check-diagnostic-resolution.v1',
+      status: 'BLOCKED_CHECKER_SCOPE_CHANGED',
+      resolvedDiagnosticFingerprints: [],
+      previousScopeId: previousSummary.checkerScope.scopeId,
+      currentScopeId: currentSummary.checkerScope.scopeId,
+      writesPerformed: false,
+      boardWritesPerformed: false,
+      completionAuthorized: false,
+    };
+  }
+  const currentFingerprints = new Set(currentTodos.tasks.map((task) => task.fingerprint));
+  const previousFingerprints = [...new Set(previousTodos.tasks.map((task) => task.fingerprint))];
+  const invalidFingerprint = previousFingerprints.some((fingerprint) => !/^sha256:[a-f0-9]{64}$/.test(fingerprint));
+  if (invalidFingerprint) {
+    return {
+      schema: 'atlas.svelte-check-diagnostic-resolution.v1',
+      status: 'BLOCKED_DIAGNOSTIC_ID_INVALID',
+      resolvedDiagnosticFingerprints: [],
+      writesPerformed: false,
+      boardWritesPerformed: false,
+      completionAuthorized: false,
+    };
+  }
+  const resolvedDiagnosticFingerprints = previousFingerprints.filter((fingerprint) => !currentFingerprints.has(fingerprint)).sort();
+  const resolvedDiagnostics = previousTodos.tasks
+    .filter((task) => resolvedDiagnosticFingerprints.includes(task.fingerprint))
+    .map((task) => ({
+      taskId: task.taskId,
+      fingerprint: task.fingerprint,
+      workboardTaskRef: task.workboardTaskRef ?? null,
+    }))
+    .sort((a, b) => a.fingerprint.localeCompare(b.fingerprint));
+  return {
+    schema: 'atlas.svelte-check-diagnostic-resolution.v1',
+    status: 'CLEAN_RUN_RESOLUTION_CANDIDATES',
+    previousRunId: previousSummary.runId,
+    currentRunId: currentSummary.runId,
+    previousGitRevision: previousSummary.gitRevision,
+    currentGitRevision: currentSummary.gitRevision,
+    checkerScopeId: currentSummary.checkerScope.scopeId,
+    previousLogSha256: previousSummary.outputs.logSha256,
+    currentLogSha256: currentSummary.outputs.logSha256,
+    resolvedDiagnosticFingerprints,
+    resolvedDiagnostics,
+    resolvedCount: resolvedDiagnosticFingerprints.length,
+    writesPerformed: false,
+    boardWritesPerformed: false,
+    databaseWritesPerformed: false,
+    completionAuthorized: false,
   };
 }
 
@@ -131,7 +373,7 @@ function classifyDiagnostic(diagnostic) {
   return { category: 'UNCLASSIFIED', ownerHint: 'Manual owner review', nextStep: 'Resolve the source owner and diagnostic meaning before proposing a patch.' };
 }
 
-function buildTodoList(diagnostics, { runId, gitRevision, logPath, logSha256 = null }) {
+function buildTodoList(diagnostics, { runId, gitRevision, logPath, logSha256 = null, checker = null, checkerScope = null }) {
   const grouped = new Map();
   for (const diagnostic of diagnostics) {
     const existing = grouped.get(diagnostic.fingerprint);
@@ -165,6 +407,8 @@ function buildTodoList(diagnostics, { runId, gitRevision, logPath, logSha256 = n
     gitRevision,
     sourceLog: logPath,
     sourceLogSha256: logSha256,
+    checker,
+    checkerScope,
     authority: 'LOCAL_DIAGNOSTIC_PROJECTION',
     mutationAllowed: false,
     tasks,
@@ -365,7 +609,9 @@ function buildKanbanPlan(todoList, { replayWorkspaceRevision = null, sourceResol
         workingTreeState: source.workingTreeState,
         originalDiagnosticSourceMatch: 'NOT_PROVEN',
       },
-      workboardLink: { status: 'NOT_LINKED_TO_OPEN_SPEC_TASK', taskKey: null },
+      workboardLink: task.workboardTaskRef
+        ? { status: 'LINKED_PROPOSAL_ONLY', reference: task.workboardTaskRef }
+        : { status: 'NOT_LINKED_TO_OPEN_SPEC_TASK', taskKey: null },
       suggestedOwner: task.ownerHint,
       mutationAllowed: false,
       validationCommands: [],
@@ -394,6 +640,8 @@ function buildReplayProposal(parsed, { runId, logPath, replayWorkspaceRevision =
     gitRevision: parsed.summary.sourceGitRevision,
     logPath: logPath ?? parsed.summary.inputLog,
     logSha256: parsed.summary.inputLogSha256,
+    checker: parsed.summary.checker ?? null,
+    checkerScope: parsed.summary.checkerScope ?? null,
   });
   todoList.replay = {
     status: parsed.summary.status,
@@ -895,7 +1143,7 @@ function gitRevision() {
 
 async function main() {
   if (args.includes('--help')) {
-    process.stdout.write('Usage: npm run check:logged [-- --tsconfig <path> --output-dir <path> --timeout-ms <ms> --enhance --mcp-enrich]\n       npm run check:replay -- <saved-log.txt> [--enhance --mcp-enrich]\n');
+    process.stdout.write('Usage: npm run check:logged [-- --tsconfig <path> --output-dir <path> --timeout-ms <ms> --enhance --mcp-enrich]\n       npm run check:logged:native -- [--resolve-prior-summary <summary.json> --resolve-prior-todos <todos.json>] [--workboard-task-binding <fingerprint>=<task-key>]...\n       npm run check:replay -- <saved-log.txt> [--enhance --mcp-enrich]\n');
     return 0;
   }
 
@@ -936,6 +1184,7 @@ async function main() {
       logPath: relativeLogPath.replace(/\\/g, '/'),
       replayWorkspaceRevision: parsed.summary.replayWorkspaceRevision,
     });
+    attachDiagnosticWorkboardBindings(todoList, gitRevision());
     let enrichedTodoList = todoList;
     if (args.includes('--enhance') || args.includes('--mcp-enrich')) {
       enrichedTodoList = buildWorkboardContext(enrichWithOkfAndDocs(enrichedTodoList));
@@ -1004,9 +1253,19 @@ async function main() {
     diagnostics: path.join(outputDir, `svelte-check-${runId}.jsonl`),
     todos: path.join(outputDir, `svelte-check-${runId}.todos.json`),
     summary: path.join(outputDir, `svelte-check-${runId}.summary.json`),
+    resolution: path.join(outputDir, `svelte-check-${runId}.resolution.json`),
   };
-  const checkCli = path.join(frontendRoot, 'node_modules', 'svelte-check', 'bin', 'svelte-check');
+  const nativeCheck = args.includes('--native');
+  const previousSummaryArg = option('--resolve-prior-summary', null);
+  const previousTodosArg = option('--resolve-prior-todos', null);
+  if (Boolean(previousSummaryArg) !== Boolean(previousTodosArg)) throw new Error('RESOLUTION_REQUIRES_PRIOR_SUMMARY_AND_TODOS');
+  if (previousSummaryArg && !nativeCheck) throw new Error('DIAGNOSTIC_RESOLUTION_REQUIRES_NATIVE_CHECK');
+  const checkCli = nativeCheck
+    ? path.join(frontendRoot, 'node_modules', 'svelte-check-native', 'bin', 'svelte-check-native.js')
+    : path.join(frontendRoot, 'node_modules', 'svelte-check', 'bin', 'svelte-check');
   const commandArgs = ['--tsconfig', tsconfig.path, '--output', 'machine', '--no-color'];
+  const checker = nativeCheck ? 'svelte-check-native' : 'svelte-check';
+  const checkerScope = buildSvelteCheckScopeV1({ checker, checkCli, commandArgs, tsconfig });
   const logStream = createWriteStream(paths.log, { flags: 'wx' });
   const diagnosticsStream = createWriteStream(paths.diagnostics, { flags: 'wx' });
   const diagnostics = [];
@@ -1089,6 +1348,8 @@ async function main() {
   const completedAt = new Date();
   const summary = {
     schema: 'atlas.svelte-check-capture.v1',
+    checker,
+    checkerScope,
     runId,
     startedAt: startedAt.toISOString(),
     completedAt: completedAt.toISOString(),
@@ -1106,7 +1367,9 @@ async function main() {
       diagnostics: path.relative(frontendRoot, paths.diagnostics).replace(/\\/g, '/'),
       todos: path.relative(frontendRoot, paths.todos).replace(/\\/g, '/'),
       summary: path.relative(frontendRoot, paths.summary).replace(/\\/g, '/'),
+      ...(previousSummaryArg ? { resolution: path.relative(frontendRoot, paths.resolution).replace(/\\/g, '/') } : {}),
       logSha256: `sha256:${logHash.digest('hex')}`,
+      diagnosticsSha256: fileSha256(paths.diagnostics),
     },
     ...summarizeDiagnostics(diagnostics),
   };
@@ -1116,7 +1379,11 @@ async function main() {
     runId,
     gitRevision: summary.gitRevision,
     logPath: summary.outputs.log,
+    logSha256: summary.outputs.logSha256,
+    checker,
+    checkerScope,
   });
+  attachDiagnosticWorkboardBindings(todoList, summary.gitRevision);
   if (args.includes('--enhance') || args.includes('--mcp-enrich')) {
     todoList = enrichWithOkfAndDocs(todoList);
     todoList = buildWorkboardContext(todoList);
@@ -1149,8 +1416,36 @@ async function main() {
       }
     }
   }
-  writeFileSync(paths.todos, `${JSON.stringify(todoList, null, 2)}\n`, { flag: 'wx' });
+  const todosBytes = Buffer.from(`${JSON.stringify(todoList, null, 2)}\n`, 'utf8');
+  summary.outputs.todosSha256 = `sha256:${createHash('sha256').update(todosBytes).digest('hex')}`;
+  writeFileSync(paths.todos, todosBytes, { flag: 'wx' });
   writeFileSync(paths.summary, `${JSON.stringify(summary, null, 2)}\n`, { flag: 'wx' });
+  if (previousSummaryArg) {
+    const previousSummary = readJsonArtifactWithinRepo(previousSummaryArg);
+    const previousTodos = readJsonArtifactWithinRepo(previousTodosArg);
+    const currentSummary = readJsonArtifactWithinRepo(summary.outputs.summary);
+    const currentTodos = readJsonArtifactWithinRepo(summary.outputs.todos);
+    const previousArtifactsVerified = verifyCaptureArtifactsV1(previousSummary, previousTodos);
+    const currentArtifactsVerified = verifyCaptureArtifactsV1(currentSummary, currentTodos);
+    const resolutionReceipt = buildDiagnosticResolutionReceiptV1(
+      previousSummary.value,
+      previousTodos.value,
+      currentSummary.value,
+      currentTodos.value,
+      { previousArtifactsVerified, currentArtifactsVerified },
+    );
+    const artifactRefs = (summary) => Object.fromEntries(['summary', 'todos', 'diagnostics', 'log'].map((key) => [
+      key,
+      path.relative(repoRoot, path.resolve(frontendRoot, summary.outputs[key])).replace(/\\/g, '/'),
+    ]));
+    resolutionReceipt.artifacts = {
+      previous: artifactRefs(previousSummary.value),
+      current: artifactRefs(currentSummary.value),
+    };
+    writeFileSync(paths.resolution, `${JSON.stringify(resolutionReceipt, null, 2)}\n`, { flag: 'wx' });
+    summary.outputs.resolutionSha256 = fileSha256(paths.resolution);
+    writeFileSync(paths.summary, `${JSON.stringify(summary, null, 2)}\n`, { flag: 'w' });
+  }
   process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
 
   if (interrupted) return 130;
@@ -1160,6 +1455,8 @@ async function main() {
 
 export {
   buildReviewDag,
+  buildDiagnosticResolutionReceiptV1,
+  buildSvelteCheckScopeV1,
   buildKanbanPlan,
   buildReplayProposal,
   buildTodoList,
@@ -1174,7 +1471,9 @@ export {
   matchPublishedDocs,
   parseMachineDiagnostic,
   parseSavedLog,
+  resolveOpenSpecDiagnosticTaskBindingsV1,
   resolveTsconfig,
+  verifyCaptureArtifactsV1,
   summarizeDiagnostics,
 };
 

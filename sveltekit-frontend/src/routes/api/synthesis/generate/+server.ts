@@ -68,6 +68,15 @@ import {
   parseLangGraphSSE,
   type LangGraphSynthesizeResponse,
 } from '$lib/server/ai/langgraph-client.js';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
+import { normalizeLibraryActorIdV1 } from '$lib/server/library/library-document-access-v1.js';
+import {
+  createLibraryCitationContextManifestV1,
+  verifyLibraryCitationReferencesV1,
+  type LibraryCitationContextManifestV1,
+  type VerifiedLibraryCitationV1,
+} from '$lib/server/library/library-citation-provenance-v1.js';
+import type { ACEContext } from '$lib/server/ace/types.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 // ── Types ─────────────────────────────────────────────────────────────
@@ -78,6 +87,10 @@ interface SynthesisCitation {
   id: string;
   sourceTitle: string;
   quote: string;
+  lineageStatus: 'source_revision_verified' | 'unverified';
+  provenance?: VerifiedLibraryCitationV1;
+  candidateOrdinal?: number;
+  candidateChunkId?: string;
 }
 
 interface SynthesisEvaluation {
@@ -253,7 +266,7 @@ function buildCacheKey(userId: string, query: string, caseId?: string, persona?:
 
 function extractCitations(
   answerText: string,
-  ragChunks: import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[]
+  promptChunks: import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[]
 ): SynthesisCitation[] {
   const citations: SynthesisCitation[] = [];
   const refs = answerText.match(/\[Source\s+(\d+)[^\]]*\]/g) ?? [];
@@ -264,15 +277,64 @@ function extractCitations(
     if (match && !seen.has(match[1])) {
       seen.add(match[1]);
       const idx = parseInt(match[1], 10) - 1;
-      const chunk = ragChunks[idx];
+      const chunk = promptChunks[idx];
       citations.push({
         id: crypto.randomUUID(),
         sourceTitle: chunk?.sourceId ?? chunk?.id ?? `Source ${match[1]}`,
         quote: ref,
+        lineageStatus: 'unverified',
+        ...(chunk ? {
+          candidateOrdinal: idx + 1,
+          candidateChunkId: String(chunk.metadata?.['chunk_id'] ?? chunk.id),
+        } : {}),
       });
     }
   }
   return citations;
+}
+
+function promptCitationChunks(
+  context: ACEContext,
+  limits: { kbChunkCount: number; caseChunkCount: number; mergedChunkCount: number }
+): import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[] {
+  if (context.kbChunks.length > 0 || context.caseChunks.length > 0) {
+    return [
+      ...context.kbChunks.slice(0, limits.kbChunkCount),
+      ...context.caseChunks.slice(0, limits.caseChunkCount),
+    ];
+  }
+  return context.ragChunks.slice(0, limits.mergedChunkCount);
+}
+
+function citationCandidates(
+  chunks: import('$lib/server/types/retrieval.js').UnifiedRetrievalResult[]
+): Array<{ ordinal: number; chunkId: string }> {
+  return chunks.flatMap((chunk, index) => {
+    const chunkId = String(chunk.metadata?.['chunk_id'] ?? chunk.id ?? '');
+    return chunkId ? [{ ordinal: index + 1, chunkId }] : [];
+  });
+}
+
+async function verifyLibraryCitationLineage(
+  citations: SynthesisCitation[],
+  manifest: LibraryCitationContextManifestV1 | null,
+): Promise<SynthesisCitation[]> {
+  const references = citations
+    .filter((citation): citation is SynthesisCitation & { candidateOrdinal: number; candidateChunkId: string } =>
+      Number.isSafeInteger(citation.candidateOrdinal) && Boolean(citation.candidateChunkId))
+    .map((citation) => ({ ordinal: citation.candidateOrdinal, chunkId: citation.candidateChunkId }));
+  const verified = verifyLibraryCitationReferencesV1(manifest, references);
+  return citations.map((citation) => {
+    const provenance = citation.candidateOrdinal ? verified.get(citation.candidateOrdinal) : undefined;
+    if (!provenance) return { id: citation.id, sourceTitle: citation.sourceTitle, quote: citation.quote, lineageStatus: 'unverified' };
+    return {
+      id: citation.id,
+      sourceTitle: provenance.documentTitle || citation.sourceTitle,
+      quote: provenance.quote,
+      lineageStatus: 'source_revision_verified',
+      provenance,
+    };
+  });
 }
 
 function computeConfidence(
@@ -283,8 +345,9 @@ function computeConfidence(
   let score = 0.4;
   if (answerText.length > 100) score += 0.15;
   if (answerText.length > 300) score += 0.1;
-  if (citations.length > 0) score += 0.15;
-  if (citations.length >= 3) score += 0.1;
+  const verifiedCitationCount = citations.filter((citation) => citation.lineageStatus === 'source_revision_verified').length;
+  if (verifiedCitationCount > 0) score += 0.15;
+  if (verifiedCitationCount >= 3) score += 0.1;
   if (eval_ && eval_.quality > 0.7) score += 0.05;
   return Math.min(0.95, score);
 }
@@ -473,12 +536,21 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
                   });
                   break;
                 case 'done':
+                  // LangGraph stream citations carry display text but no canonical chunk
+                  // identity. Preserve them as explicitly unverified; do not let this
+                  // fast path bypass the provenance checks used by the local path.
+                  const unverifiedCitations: SynthesisCitation[] = (evt.citations ?? []).map((citation) => ({
+                    id: crypto.randomUUID(),
+                    sourceTitle: typeof citation.title === 'string' ? citation.title : 'Unverified source',
+                    quote: typeof citation.text === 'string' ? citation.text : '',
+                    lineageStatus: 'unverified',
+                  }));
                   sendEvent('synthesis_complete', { fullResponse, tokensUsed: Math.ceil(fullResponse.length / 4) });
                   sendEvent('complete', {
                     synthesisId: crypto.randomUUID(),
                     query,
                     answer: fullResponse,
-                    citations: evt.citations ?? [],
+                    citations: unverifiedCitations,
                     evaluation: null,
                     confidence: evt.confidence ?? 0.5,
                     model: MODEL,
@@ -543,6 +615,12 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
         // DAG-order RAG chunks so cited sources appear before citing sources
         context.ragChunks = dagOrderRAGChunks(context.ragChunks);
         const acePrompt = await buildACEPromptCached(context, query);
+        const promptChunks = promptCitationChunks(context, acePrompt.budgetProfile.limits);
+        const citationManifest = await createLibraryCitationContextManifestV1({
+          actorId: userId,
+          caseId: body.caseId,
+          candidates: citationCandidates(promptChunks),
+        });
         sendEvent('context_assembled', {
           ragChunks: context.ragChunks.length,
           kagNeighbors: context.kagNeighbors.length,
@@ -656,7 +734,8 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
           sendEvent('evaluation', evaluation);
         }
 
-        const citations = extractCitations(fullResponse, context.ragChunks);
+        const citationRefs = extractCitations(fullResponse, promptChunks);
+        const citations = await verifyLibraryCitationLineage(citationRefs, citationManifest);
         const confidence = computeConfidence(fullResponse, citations, evaluation);
         const totalMs = performance.now() - totalStart;
 
@@ -754,6 +833,14 @@ export const POST: RequestHandler = async (event) => {
   }
   const body = parsed.data;
 
+  // Case authorization BEFORE any cache read, retrieval, LangGraph or model call.
+  // Non-disclosing 404 for a case the actor neither owns nor is assigned to.
+  if (body.caseId) {
+    const actorId = normalizeLibraryActorIdV1(auth.user.id);
+    const authorizedCase = actorId === null ? null : await getAuthorizedCase(body.caseId, actorId).catch(() => null);
+    if (!authorizedCase) return json({ error: 'Case not found' }, { status: 404 });
+  }
+
   const {
     query,
     maxTokens = 2048,
@@ -830,6 +917,7 @@ export const POST: RequestHandler = async (event) => {
         id: crypto.randomUUID(),
         sourceTitle: c.title,
         quote: c.text,
+        lineageStatus: 'unverified',
       }));
       const lgConfidence = lgResult.confidence;
       const lgResponse: SynthesisResponse = {
@@ -939,6 +1027,12 @@ export const POST: RequestHandler = async (event) => {
       }
     }
     const acePrompt = await buildACEPromptCached(context, query);
+    const promptChunks = promptCitationChunks(context, acePrompt.budgetProfile.limits);
+    const citationManifest = await createLibraryCitationContextManifestV1({
+      actorId: auth.user.id,
+      caseId: body.caseId,
+      candidates: citationCandidates(promptChunks),
+    });
     const contextMs = performance.now() - ctxStart;
     timer.mark('ace-context-done');
 
@@ -972,7 +1066,8 @@ export const POST: RequestHandler = async (event) => {
       // Best-effort — skip on embedding service failure
     }
 
-    const citations = includeCitations ? extractCitations(answer, context.ragChunks) : [];
+    const citationRefs = includeCitations ? extractCitations(answer, promptChunks) : [];
+    const citations = await verifyLibraryCitationLineage(citationRefs, citationManifest);
 
     if (enableACE) {
       dispatchOrExecuteInline('ace.evaluate', {

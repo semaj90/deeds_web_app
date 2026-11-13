@@ -14,12 +14,15 @@
  *   node scripts/atlas/run-agentic-error-fixing-v1.mjs --findings reviewed-findings.json --offline
  *   node scripts/atlas/run-agentic-error-fixing-v1.mjs --file report.txt --validate
  *   node scripts/atlas/run-agentic-error-fixing-v1.mjs --file report.txt --synthesize
+ *   node scripts/atlas/run-agentic-error-fixing-v1.mjs --file report.txt --workboard-task-key <exact-open-task-key>
  */
 
 import { existsSync, readFileSync, realpathSync, mkdirSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
+import { resolveOpenSpecDiagnosticTaskBindingsV1 } from './lib/openspec-workboard-task-ref-v1.mjs';
+import { parseMachineDiagnostic } from '../../sveltekit-frontend/scripts/svelte-check-capture.mjs';
 
 const ROOT = process.cwd();
 const args = process.argv.slice(2);
@@ -175,6 +178,7 @@ function buildPlan(text) {
   const seen = new Set();
   for (const line of lines) {
     if (!/(error|fail|warn|TS\d{4}|exception|timeout|stale|does not exist|cannot find|blocked|unproven|partial_proven|not_proven|missing|ambiguous)/i.test(line)) continue;
+    const nativeDiagnostic = parseMachineDiagnostic(line);
     const kind = classify(line);
     const file = extractFile(line);
     const gateId = extractGateId(line);
@@ -183,6 +187,7 @@ function buildPlan(text) {
     seen.add(fingerprint);
     candidates.push({
       fingerprint,
+      ...(nativeDiagnostic ? { diagnosticFingerprint: nativeDiagnostic.fingerprint } : {}),
       errorCode: extractCode(line),
       gateId,
       kind,
@@ -371,6 +376,26 @@ const diagnostics = findingsFile
   ? readFileSync(path.resolve(ROOT, findingsFile), 'utf8')
   : readDiagnostics();
 const candidates = findingsFile ? buildReviewedSourceFindingsPlan(diagnostics) : buildPlan(diagnostics);
+const currentHeadResult = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8', windowsHide: true });
+const currentHead = currentHeadResult.status === 0 ? currentHeadResult.stdout.trim() : null;
+const workboardTaskBindings = args.flatMap((argument, index) => argument === '--workboard-task-binding'
+  ? [{ raw: args[index + 1] }]
+  : []).map(({ raw }) => {
+    const separator = typeof raw === 'string' ? raw.indexOf('=') : -1;
+    if (separator <= 0 || separator === raw.length - 1) throw new Error('DIAGNOSTIC_TASK_BINDING_ARGUMENT_INVALID');
+    return { diagnosticFingerprint: raw.slice(0, separator), taskKey: raw.slice(separator + 1) };
+  });
+const workboardTaskKey = getArg('--workboard-task-key');
+if (workboardTaskKey && workboardTaskBindings.length > 0) throw new Error('WORKBOARD_TASK_BINDING_OPTIONS_CONFLICT');
+if (workboardTaskKey) {
+  if (candidates.length !== 1) throw new Error('WORKBOARD_TASK_KEY_REQUIRES_SINGLE_DIAGNOSTIC');
+  workboardTaskBindings.push({ diagnosticFingerprint: candidates[0].fingerprint, taskKey: workboardTaskKey });
+}
+const workboardTaskRefs = resolveOpenSpecDiagnosticTaskBindingsV1(
+  workboardTaskBindings,
+  candidates.map((candidate) => candidate.fingerprint),
+  { currentHead },
+);
 const validation = validate ? runValidation() : null;
 const modelResolution = offline
   ? { status: 'SKIPPED_OFFLINE', configuredModel: null, runtimeModelId: null, reason: 'OFFLINE_MODE' }
@@ -380,7 +405,7 @@ const modelResolution = offline
 const deterministicBody = {
   schema: 'atlas.agentic-error-fixing.v1',
   inputChecksum: sha256(diagnostics),
-  candidates: candidates.map(({ findingId, fingerprint, errorCode, gateId, kind, file, sourceRevision, workspaceRevision, evidenceDigest, sourceSpan, evidenceRefs, verificationMethod, verificationRef, owner, diagnostic, proposedAction, recommendedMcpTools, status, mutationAllowed }) => ({ findingId, fingerprint, errorCode, gateId, kind, file, sourceRevision, workspaceRevision, evidenceDigest, sourceSpan, evidenceRefs, verificationMethod, verificationRef, owner, diagnostic, proposedAction, recommendedMcpTools, status, mutationAllowed })),
+  candidates: candidates.map(({ findingId, fingerprint, diagnosticFingerprint, errorCode, gateId, kind, file, sourceRevision, workspaceRevision, evidenceDigest, sourceSpan, evidenceRefs, verificationMethod, verificationRef, owner, diagnostic, proposedAction, recommendedMcpTools, status, mutationAllowed }) => ({ findingId, fingerprint, ...(diagnosticFingerprint ? { diagnosticFingerprint } : {}), errorCode, gateId, kind, file, sourceRevision, workspaceRevision, evidenceDigest, sourceSpan, evidenceRefs, verificationMethod, verificationRef, owner, diagnostic, proposedAction, recommendedMcpTools, status, mutationAllowed, ...(workboardTaskRefs.has(fingerprint) ? { workboardTaskRef: workboardTaskRefs.get(fingerprint) } : {}) })),
   validation: validation ? { command: validation.command, exitCode: validation.exitCode, timedOut: validation.timedOut, outputChecksum: validation.outputChecksum } : null,
   modelResolution: {
     status: modelResolution.status,

@@ -718,6 +718,13 @@ class CorpusHelpersTests(unittest.TestCase):
             radix_sort_som_candidates([{**rows[0], "som_bmu_id": 400}])
         with self.assertRaisesRegex(ValueError, "SOM_RADIX_KEYS_MUST_BE_NONNEGATIVE_INTEGERS"):
             radix_sort_som_candidates([{**rows[0], "candidate_ordinal": True}])
+        with self.assertRaisesRegex(ValueError, "SOM_RADIX_CANDIDATE_ORDINALS_MUST_BE_UNIQUE"):
+            radix_sort_som_candidates([rows[0], {**rows[0], "kmeans_cluster_id": 2}])
+        with self.assertRaisesRegex(ValueError, "SOM_RADIX_CANDIDATE_LIMIT_EXCEEDED"):
+            radix_sort_som_candidates([
+                {"kmeans_cluster_id": 0, "som_bmu_id": 0, "candidate_ordinal": ordinal}
+                for ordinal in range(65537)
+            ])
 
     def test_svd_som_uses_frozen_basis_and_returns_only_derived_cell(self):
         import numpy as np

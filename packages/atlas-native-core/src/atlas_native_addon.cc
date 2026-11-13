@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <memory>
 #include <new>
+#include <unordered_set>
 #include <vector>
 #include <cmath>
 #include <limits>
@@ -26,7 +27,6 @@
 
 namespace atlas::native {
 
-constexpr std::size_t MAX_SOM_RADIX_CANDIDATES_V1 = 65536;
 constexpr std::size_t MAX_HAMMING128_BATCH_CANDIDATES_V1 = 65536;
 
 struct AlignedExternalBufferOwner {
@@ -286,9 +286,15 @@ Napi::Value RadixSortSomCandidateIndicesNapi(const Napi::CallbackInfo& info) {
     }
 
     std::vector<SomTileSortEntry> entries(count);
+    std::unordered_set<std::uint32_t> seen_ordinals;
+    seen_ordinals.reserve(count);
     for (std::size_t index = 0; index < count; ++index) {
         if (som[index] >= 400) {
             Napi::RangeError::New(env, "SOM_BMU_ID_OUT_OF_RANGE").ThrowAsJavaScriptException();
+            return env.Null();
+        }
+        if (!seen_ordinals.insert(ordinals[index]).second) {
+            Napi::RangeError::New(env, "SOM_RADIX_CANDIDATE_ORDINALS_MUST_BE_UNIQUE").ThrowAsJavaScriptException();
             return env.Null();
         }
         entries[index] = SomTileSortEntry{

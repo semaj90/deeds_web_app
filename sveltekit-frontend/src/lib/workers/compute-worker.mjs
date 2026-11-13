@@ -46,14 +46,27 @@ let atlasNativeCoreLoadAttempted = false;
 function getAtlasNativeCore() {
 	if (atlasNativeCoreLoadAttempted) return atlasNativeCore;
 	atlasNativeCoreLoadAttempted = true;
-	const addonPath = process.env.ATLAS_NATIVE_CORE_NODE_PATH
-		?? resolve(__dirname, '../../../../packages/atlas-native-core/build/atlas_native_core.node');
-	if (!existsSync(addonPath)) return null;
-	try {
-		const addon = require(addonPath);
-		if (typeof addon.scoreHamming128Batch === 'function') atlasNativeCore = addon;
-	} catch {
-		atlasNativeCore = null;
+	const explicitPath = process.env.ATLAS_NATIVE_CORE_NODE_PATH;
+	const candidates = explicitPath
+		? [explicitPath]
+		: process.platform === 'win32'
+			? [
+				resolve(__dirname, '../../../../packages/atlas-native-core/build/Release/atlas_native_core.node'),
+				resolve(__dirname, '../../../../packages/atlas-native-core/build/atlas_native_core.node'),
+			]
+			: [resolve(__dirname, '../../../../packages/atlas-native-core/build/atlas_native_core.node')];
+	for (const addonPath of candidates) {
+		if (!existsSync(addonPath)) continue;
+		try {
+			const addon = require(addonPath);
+			if (typeof addon.scoreHamming128Batch === 'function'
+				|| typeof addon.radixSortSomCandidateIndicesV1 === 'function') {
+				atlasNativeCore = addon;
+				break;
+			}
+		} catch {
+			// Continue to the next platform-specific build location.
+		}
 	}
 	return atlasNativeCore;
 }
@@ -622,6 +635,60 @@ function runHamming128Proposal({ query, packedCandidates, candidateOrdinals }) {
 	};
 }
 
+function runSomRadixOrderProposal({ kmeansClusterIds, somBmuIds, candidateOrdinals }) {
+	if (!(kmeansClusterIds instanceof Uint16Array)
+		|| !(somBmuIds instanceof Uint16Array)
+		|| !(candidateOrdinals instanceof Uint32Array)) {
+		throw new Error('SOM_RADIX_ARRAY_TYPES_INVALID');
+	}
+	const count = kmeansClusterIds.length;
+	if (somBmuIds.length !== count || candidateOrdinals.length !== count) {
+		throw new Error('SOM_RADIX_ARRAY_LENGTH_MISMATCH');
+	}
+	if (count > 65_536) throw new Error('SOM_RADIX_CANDIDATE_LIMIT_EXCEEDED');
+	const seenOrdinals = new Set();
+	for (let index = 0; index < count; index += 1) {
+		if (somBmuIds[index] >= 400) throw new Error('SOM_BMU_ID_OUT_OF_RANGE');
+		if (seenOrdinals.has(candidateOrdinals[index])) {
+			throw new Error('SOM_RADIX_CANDIDATE_ORDINALS_MUST_BE_UNIQUE');
+		}
+		seenOrdinals.add(candidateOrdinals[index]);
+	}
+	const addon = getAtlasNativeCore();
+	let sourceIndices;
+	let backend = 'JS_REFERENCE';
+	if (typeof addon?.radixSortSomCandidateIndicesV1 === 'function') {
+		sourceIndices = addon.radixSortSomCandidateIndicesV1(kmeansClusterIds, somBmuIds, candidateOrdinals);
+		backend = 'NAPI_RADIX';
+	} else {
+		const indices = Array.from({ length: count }, (_, index) => index);
+		indices.sort((left, right) => kmeansClusterIds[left] - kmeansClusterIds[right]
+			|| somBmuIds[left] - somBmuIds[right]
+			|| candidateOrdinals[left] - candidateOrdinals[right]);
+		sourceIndices = Uint32Array.from(indices);
+	}
+	if (!(sourceIndices instanceof Uint32Array) || sourceIndices.length !== count) {
+		throw new Error('SOM_RADIX_NATIVE_RESULT_SHAPE_INVALID');
+	}
+	const resultSeen = new Uint8Array(count);
+	const sortedCandidateOrdinals = new Uint32Array(count);
+	for (let out = 0; out < count; out += 1) {
+		const sourceIndex = sourceIndices[out];
+		if (sourceIndex >= count || resultSeen[sourceIndex] !== 0) {
+			throw new Error('SOM_RADIX_NATIVE_RESULT_PERMUTATION_INVALID');
+		}
+		resultSeen[sourceIndex] = 1;
+		sortedCandidateOrdinals[out] = candidateOrdinals[sourceIndex];
+	}
+	return {
+		schema: 'atlas.som-radix-order.worker-result.v1',
+		authority: 'PROPOSAL_ONLY',
+		backend: count === 0 ? 'EMPTY' : backend,
+		sourceIndices,
+		sortedCandidateOrdinals,
+	};
+}
+
 /**
  * Extract lightweight metadata envelope from source text.
  * Regex-based (no AST) — runs ~1ms for a 1000-line file.
@@ -903,6 +970,7 @@ const HANDLERS = {
 	'graph.json_to_csr':      runJsonToCSR,
 	'schema.encode':          runSchemaEncode,
 	'hamming128.proposal':    runHamming128Proposal,
+	'som.radix-order.proposal': runSomRadixOrderProposal,
 };
 
 parentPort?.on('message', (msg) => {

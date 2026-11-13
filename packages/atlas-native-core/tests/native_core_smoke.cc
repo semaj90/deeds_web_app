@@ -6,6 +6,7 @@
 #include "turbovec_pack.hpp"
 
 #include <array>
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <limits>
@@ -13,6 +14,61 @@
 #include <vector>
 
 int main(int argc, char** argv) {
+    {
+        using atlas::native::SomTileSortEntry;
+        const std::array<std::array<std::uint32_t, 3>, 7> keys{{
+            {{4, 399, 0xFFFFFFFFu}},
+            {{0, 0, 9}},
+            {{4, 2, 7}},
+            {{1, 3, 11}},
+            {{4, 2, 3}},
+            {{0xFFFFu, 1, 5}},
+            {{1, 399, 0x80000000u}},
+        }};
+        std::vector<SomTileSortEntry> entries;
+        for (std::size_t index = 0; index < keys.size(); ++index) {
+            const auto cluster = static_cast<std::uint16_t>(keys[index][0]);
+            const auto cell = static_cast<std::uint16_t>(keys[index][1]);
+            const auto ordinal = keys[index][2];
+            entries.push_back({
+                atlas::native::pack_som_radix_key(cluster, cell, ordinal),
+                cluster,
+                cell,
+                ordinal,
+                static_cast<std::uint32_t>(index),
+            });
+        }
+        auto expected = entries;
+        std::stable_sort(expected.begin(), expected.end(), [](const auto& left, const auto& right) {
+            return left.composite_key < right.composite_key;
+        });
+        atlas::native::radix_sort_som_tiles(entries);
+        assert(entries.size() == expected.size());
+        for (std::size_t index = 0; index < entries.size(); ++index) {
+            assert(entries[index].composite_key == expected[index].composite_key);
+            assert(entries[index].source_index == expected[index].source_index);
+        }
+        std::vector<SomTileSortEntry> empty;
+        atlas::native::radix_sort_som_tiles(empty);
+        bool invalid_key_refused = false;
+        auto invalid = expected;
+        invalid.front().composite_key ^= 1u;
+        try {
+            atlas::native::radix_sort_som_tiles(invalid);
+        } catch (const std::invalid_argument& error) {
+            invalid_key_refused = std::string(error.what()) == "SOM_RADIX_COMPOSITE_KEY_MISMATCH";
+        }
+        assert(invalid_key_refused);
+        std::vector<SomTileSortEntry> over_limit(atlas::native::MAX_SOM_RADIX_CANDIDATES_V1 + 1);
+        bool over_limit_refused = false;
+        try {
+            atlas::native::radix_sort_som_tiles(over_limit);
+        } catch (const std::invalid_argument& error) {
+            over_limit_refused = std::string(error.what()) == "SOM_RADIX_CANDIDATE_LIMIT_EXCEEDED";
+        }
+        assert(over_limit_refused);
+    }
+
     constexpr char sha256_abc[] = "abc";
     assert(atlas::native::sha256_hex(reinterpret_cast<const std::uint8_t*>(sha256_abc), 3) ==
         "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");

@@ -1,0 +1,14 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": { "noEmit": true },
+	"files": [
+		"src/app.d.ts",
+		"src/lib/server/features/legal-corpus/legal/ingestion-worker.ts",
+		"src/lib/server/features/legal-corpus/legal/library-ingestion-queue-v1.ts",
+		"src/lib/server/features/legal-corpus/legal/library-ingestion-identity-v1.ts",
+		"scripts/library-ingestion-worker.mts",
+		"src/routes/api/library/upload/+server.ts",
+		"src/lib/server/db/schema-postgres.ts"
+	],
+	"include": []
+}

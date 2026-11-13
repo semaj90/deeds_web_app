@@ -43,4 +43,23 @@ describe('agentic error-fix lane', () => {
 		});
 		expect(task).not.toHaveProperty('execute');
 	});
+
+	it('carries the proposal-only OpenSpec reference through the daily error-fix lane', () => {
+		const ref = {
+			schema: 'atlas.openspec-workboard-task-ref.v1' as const,
+			workboardTaskId: 'change-a:7', stableKey: 'change-a#0123456789abcdef', logicalTaskKey: null,
+			taskRevision: `sha256:${'a'.repeat(64)}`, sourceRef: 'openspec/changes/change-a/tasks.md',
+			sourceFileSha256: `sha256:${'b'.repeat(64)}`, workboardSnapshotSha256: `sha256:${'c'.repeat(64)}`,
+			workboardGeneratedAt: '2026-11-12T08:00:00.000Z', currentHead: 'head-1',
+			status: 'CAPTURE_ASSERTED_SOURCE_CURRENT_LINK' as const, dispatchRevalidation: 'REQUIRED' as const,
+			authority: 'PROPOSAL_REFERENCE_ONLY' as const,
+			canonicalAuthority: false as const,
+		};
+		const fixture = board();
+		fixture.columns[0].tasks[1].openspec_task_ref = ref;
+		const task = buildAgenticErrorFixLane(fixture).find((candidate) => candidate.id === 'err-z');
+
+		expect(task?.id).toBe('err-z');
+		expect(task?.openSpecTaskRef).toEqual(ref);
+	});
 });

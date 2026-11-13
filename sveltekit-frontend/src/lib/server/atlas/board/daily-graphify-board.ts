@@ -19,6 +19,16 @@ const RawTaskSchema = z
     blockedBy: z.array(z.string().min(1)).default([]),
     status: z.string().min(1).optional(),
     origin: z.string().min(1).optional(),
+    diagnostic_fingerprint: z.string().regex(/^sha256:[a-f0-9]{64}$/).optional(),
+    diagnostic_resolution: z.object({
+      schema: z.literal('atlas.svelte-check-diagnostic-board-resolution.v1'),
+      status: z.literal('ABSENT_IN_CLEAN_CHECK'),
+      receiptSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+      previousRunId: z.string().min(1),
+      currentRunId: z.string().min(1),
+      checkerScopeId: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+      completionAuthorized: z.literal(false),
+    }).strict().optional(),
     recommendation_id: z.string().min(1).optional(),
     source_ref: z.string().nullable().optional(),
     sourceRef: z.string().nullable().optional(),
@@ -26,6 +36,22 @@ const RawTaskSchema = z
     treeNodeId: z.string().nullable().optional(),
     evidence_refs: z.array(z.string().min(1)).default([]),
     reason_codes: z.array(z.string().min(1)).default([]),
+    openspec_task_ref: z.object({
+      schema: z.literal('atlas.openspec-workboard-task-ref.v1'),
+      workboardTaskId: z.string().min(1),
+      stableKey: z.string().min(1),
+      logicalTaskKey: z.string().min(1).nullable(),
+      taskRevision: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+      sourceRef: z.string().min(1),
+      sourceFileSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+      workboardSnapshotSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+      workboardGeneratedAt: z.string().datetime(),
+      currentHead: z.string().nullable(),
+      status: z.literal('CAPTURE_ASSERTED_SOURCE_CURRENT_LINK'),
+      dispatchRevalidation: z.literal('REQUIRED'),
+      authority: z.literal('PROPOSAL_REFERENCE_ONLY'),
+      canonicalAuthority: z.literal(false),
+    }).strict().optional(),
   })
   .passthrough();
 
@@ -141,6 +167,16 @@ export interface DailyGraphifyTask {
   blockedBy?: string[];
   status?: string;
   origin?: string;
+  diagnostic_fingerprint?: string;
+  diagnostic_resolution?: {
+    schema: 'atlas.svelte-check-diagnostic-board-resolution.v1';
+    status: 'ABSENT_IN_CLEAN_CHECK';
+    receiptSha256: string;
+    previousRunId: string;
+    currentRunId: string;
+    checkerScopeId: string;
+    completionAuthorized: false;
+  };
   recommendation_id?: string;
   source_ref?: string | null;
   title_id?: string | null;
@@ -149,6 +185,22 @@ export interface DailyGraphifyTask {
   evidence_refs?: string[];
   reason_codes?: string[];
   confidence?: number | null;
+  openspec_task_ref?: {
+    schema: 'atlas.openspec-workboard-task-ref.v1';
+    workboardTaskId: string;
+    stableKey: string;
+    logicalTaskKey: string | null;
+    taskRevision: string;
+    sourceRef: string;
+    sourceFileSha256: string;
+    workboardSnapshotSha256: string;
+    workboardGeneratedAt: string;
+    currentHead: string | null;
+    status: 'CAPTURE_ASSERTED_SOURCE_CURRENT_LINK';
+    dispatchRevalidation: 'REQUIRED';
+    authority: 'PROPOSAL_REFERENCE_ONLY';
+    canonicalAuthority: false;
+  };
 }
 
 export interface DailyGraphifyTemporalRecommendation {
@@ -282,6 +334,8 @@ function normalizeTask(task: z.infer<typeof RawTaskSchema>, fallbackId: string, 
     blockedBy: task.blockedBy ?? [],
     status: task.status,
     origin: task.origin ?? origin,
+    diagnostic_fingerprint: task.diagnostic_fingerprint,
+    diagnostic_resolution: task.diagnostic_resolution,
     recommendation_id: task.recommendation_id,
     source_ref: typeof task.source_ref === 'string' ? task.source_ref : typeof task.sourceRef === 'string' ? task.sourceRef : null,
     title_id: typeof task.title_id === 'string' ? task.title_id : typeof task.titleId === 'string' ? task.titleId : null,
@@ -290,6 +344,13 @@ function normalizeTask(task: z.infer<typeof RawTaskSchema>, fallbackId: string, 
     evidence_refs: task.evidence_refs ?? [],
     reason_codes: task.reason_codes ?? [],
     confidence: typeof task.confidence === 'number' ? task.confidence : null,
+    openspec_task_ref: task.openspec_task_ref
+      ? {
+          ...task.openspec_task_ref,
+          logicalTaskKey: task.openspec_task_ref.logicalTaskKey ?? null,
+          currentHead: task.openspec_task_ref.currentHead ?? null,
+        }
+      : undefined,
   };
 }
 

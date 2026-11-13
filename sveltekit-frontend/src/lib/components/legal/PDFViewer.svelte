@@ -177,6 +177,9 @@
 			>
 				Open PDF ↗
 			</a>
+			<a href={`${pdfUrl}?download=1`} class="pv-open-btn" download title="Download original PDF">
+				Download ↓
+			</a>
 		</div>
 	{/if}
 
@@ -193,6 +196,9 @@
 				<p class="pv-error-detail">{loadError}</p>
 				<a href={pdfUrl} target="_blank" rel="noopener noreferrer" class="pv-open-btn pv-open-btn-lg">
 					Try opening directly ↗
+				</a>
+				<a href={`${pdfUrl}?download=1`} download class="pv-open-btn pv-open-btn-lg" data-testid="pdf-error-download">
+					Download original ↓
 				</a>
 			</div>
 		{:else}

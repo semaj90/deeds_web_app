@@ -15,6 +15,8 @@
 
 namespace atlas::native {
 
+constexpr std::size_t MAX_SOM_RADIX_CANDIDATES_V1 = 65536;
+
 struct SomTileSortEntry {
     std::uint64_t composite_key{0};
     std::uint16_t kmeans_cluster_id{0};
@@ -38,6 +40,9 @@ constexpr std::uint64_t pack_som_radix_key(
  * Runs in O(8 * N) with zero heap allocations beyond the single ping-pong buffer.
  */
 inline void radix_sort_som_tiles(std::vector<SomTileSortEntry>& entries) {
+    if (entries.size() > MAX_SOM_RADIX_CANDIDATES_V1) {
+        throw std::invalid_argument("SOM_RADIX_CANDIDATE_LIMIT_EXCEEDED");
+    }
     for (const auto& entry : entries) {
         if (entry.som_bmu_id >= 400) {
             throw std::invalid_argument("SOM_BMU_ID_OUT_OF_RANGE");

@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { pool } from '$lib/server/db/client';
+import { authorizeLibraryDocumentV1 } from '$lib/server/library/library-document-access-v1.js';
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
 	if (!locals.user?.id) throw redirect(303, '/login');
@@ -8,11 +9,18 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 	const { documentId } = params;
 	const selectedNodeId = url.searchParams.get('node') ?? null;
 
+	// Authorization BEFORE any metadata, TOC or chunk read. Non-disclosing: a denied
+	// document looks identical to a missing one.
+	const access = await authorizeLibraryDocumentV1({ documentId, actorId: locals.user.id });
+	if (!access.allowed) {
+		return { document: null, toc: [], initialChunks: [], selectedNodeId: null, loadError: 'Document not found' };
+	}
+
 	try {
 		// Document metadata
 		const docRes = await pool.query(
 			`SELECT ld.id, ld.title, ld.citation, ld.corpus_type, ld.processing_status,
-			        ld.page_count, ld.is_official, ld.official_url,
+			        ld.page_count, ld.is_official, ld.official_url, ld.mime_type,
 			        j.name AS jurisdiction_name, j.code AS jurisdiction_code
 			 FROM library_documents ld
 			 LEFT JOIN jurisdictions j ON j.id = ld.jurisdiction_id
@@ -75,6 +83,7 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 				pageCount: row.page_count,
 				isOfficial: row.is_official,
 				officialUrl: row.official_url,
+				mimeType: row.mime_type,
 				jurisdiction: row.jurisdiction_code
 					? { code: row.jurisdiction_code, name: row.jurisdiction_name }
 					: null,

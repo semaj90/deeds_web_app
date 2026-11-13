@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { buildClusterFeatureProjectionV1 } from './cluster-feature-projection-v1.js';
+import {
+  assertClusterFeatureProjectionBindingV1,
+  buildClusterFeatureProjectionV1,
+  verifyClusterFeatureProjectionV1,
+} from './cluster-feature-projection-v1.js';
 
 const BASE_INPUT = {
   packetKey: 'packet:cluster-test-1',
@@ -84,5 +88,40 @@ describe('ORF-4: ClusterFeatureProjectionV1', () => {
     expect(projection.sourceVersionReceiptId).toBeNull();
     expect(() => buildClusterFeatureProjectionV1({ ...BASE_INPUT, packetKey: '' })).toThrow();
     expect(() => buildClusterFeatureProjectionV1({ ...BASE_INPUT, sourceRef: '' })).toThrow();
+  });
+
+  it('verifies the content digest and exact semantic row binding before use', () => {
+    const projection = buildClusterFeatureProjectionV1(BASE_INPUT);
+    expect(verifyClusterFeatureProjectionV1(projection)).toEqual(projection);
+    assertClusterFeatureProjectionBindingV1(projection, {
+      packetKey: projection.packetKey,
+      sourceRef: projection.sourceRef,
+      sourceVersionReceiptId: projection.sourceVersionReceiptId,
+      representationId: 'semantic_768',
+      representationRevision: projection.sourceRepresentationRevision,
+    });
+
+    expect(() => verifyClusterFeatureProjectionV1({ ...projection, kmeans: { ...projection.kmeans, clusterId: 8 } }))
+      .toThrow('CLUSTER_FEATURE_PROJECTION_DIGEST_MISMATCH');
+    expect(() => assertClusterFeatureProjectionBindingV1(projection, {
+      packetKey: projection.packetKey,
+      sourceRef: projection.sourceRef,
+      sourceVersionReceiptId: projection.sourceVersionReceiptId,
+      representationId: 'latent_256',
+      representationRevision: projection.sourceRepresentationRevision,
+    })).toThrow('CLUSTER_FEATURE_PROJECTION_REPRESENTATION_ID_MISMATCH');
+  });
+
+  it('verifies the same digest after JSONB-style object key reordering', () => {
+    const projection = buildClusterFeatureProjectionV1(BASE_INPUT);
+    const reorderKeys = (value: unknown): unknown => {
+      if (Array.isArray(value)) return value.map(reorderKeys);
+      if (value !== null && typeof value === 'object') {
+        return Object.fromEntries(Object.entries(value).sort(([a], [b]) => b.localeCompare(a))
+          .map(([key, child]) => [key, reorderKeys(child)]));
+      }
+      return value;
+    };
+    expect(verifyClusterFeatureProjectionV1(reorderKeys(projection))).toEqual(projection);
   });
 });

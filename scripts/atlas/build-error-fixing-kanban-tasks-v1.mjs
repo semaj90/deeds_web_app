@@ -23,8 +23,12 @@
  */
 import { existsSync, readFileSync, realpathSync, mkdirSync, writeFileSync, renameSync } from 'node:fs';
 import { createHash, randomUUID } from 'node:crypto';
+import { createRequire } from 'node:module';
 import path from 'node:path';
-import { z } from 'zod';
+import { fileURLToPath } from 'node:url';
+
+const frontendPackage = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../sveltekit-frontend/package.json');
+const { z } = createRequire(frontendPackage)('zod');
 
 const ROOT = process.cwd();
 const args = process.argv.slice(2);
@@ -59,6 +63,23 @@ const KIND_PRIORITY = {
   UNKNOWN: 'P3',
 };
 
+const OpenSpecTaskRefSchema = z.object({
+  schema: z.literal('atlas.openspec-workboard-task-ref.v1'),
+  workboardTaskId: z.string().min(1).max(512),
+  stableKey: z.string().min(1).max(512),
+  logicalTaskKey: z.string().min(1).max(512).nullable(),
+  taskRevision: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+  sourceRef: z.string().min(1).max(1024),
+  sourceFileSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+  workboardSnapshotSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+  workboardGeneratedAt: z.string().datetime(),
+  currentHead: z.string().nullable(),
+  status: z.literal('CAPTURE_ASSERTED_SOURCE_CURRENT_LINK'),
+  dispatchRevalidation: z.literal('REQUIRED'),
+  authority: z.literal('PROPOSAL_REFERENCE_ONLY'),
+  canonicalAuthority: z.literal(false),
+}).strict();
+
 function readJson(filePath) {
   if (!existsSync(filePath)) return null;
   return JSON.parse(readFileSync(filePath, 'utf8'));
@@ -66,6 +87,7 @@ function readJson(filePath) {
 
 const CandidateSchema = z.object({
   fingerprint: z.string().regex(/^sha256:[a-f0-9]{16}$/),
+  diagnosticFingerprint: z.string().regex(/^sha256:[a-f0-9]{64}$/).optional(),
   kind: z.enum(Object.keys(KIND_PRIORITY)),
   gateId: z.string().regex(/^[A-Z][A-Z0-9_]*$/).nullable().optional(),
   errorCode: z.string().nullable().optional(),
@@ -81,6 +103,7 @@ const CandidateSchema = z.object({
     endByte: z.number().int().positive(),
   }).refine((span) => span.endByte > span.startByte).optional(),
   evidenceRefs: z.array(z.string().min(1).max(1000)).max(32).optional(),
+  workboardTaskRef: OpenSpecTaskRefSchema.optional(),
   status: z.literal('PROPOSED'),
   mutationAllowed: z.literal(false),
 }).passthrough().superRefine((candidate, context) => {
@@ -161,6 +184,8 @@ const mappedTasks = candidates.map((candidate) => ({
   evidence_digest: candidate.evidenceDigest ?? null,
   source_span: candidate.sourceSpan ?? null,
   diagnostic_plan_checksum: planFileChecksum,
+  ...(candidate.diagnosticFingerprint ? { diagnostic_fingerprint: candidate.diagnosticFingerprint } : {}),
+  ...(candidate.workboardTaskRef ? { openspec_task_ref: candidate.workboardTaskRef } : {}),
   origin: ERROR_FIXING_ORIGIN,
   source_ref: candidate.file ?? null,
   evidence_refs: [...new Set([...(candidate.evidenceRefs ?? []), candidate.diagnostic, candidate.proposedAction].filter(Boolean))],

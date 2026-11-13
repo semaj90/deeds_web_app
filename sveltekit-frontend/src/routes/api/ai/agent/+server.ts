@@ -26,6 +26,10 @@ import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
 import { getRedis }       from '$lib/server/redis.js';
 import { recordSearchQuery, type HitPipeline } from '$lib/server/features/observability/index.js';
 import { ENV } from '$lib/server/env.server.js';
+import {
+  a2aErrorFixProposalRequestV1Schema,
+  buildA2AErrorFixProposalResultV1,
+} from '$lib/server/atlas/kanban-acp-dag-contracts.js';
 import type { RequestHandler } from './$types';
 
 const RATE_LIMIT    = 20;
@@ -181,6 +185,18 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
   }
 
   const task = parsed.data;
+
+  // Shares ACP's proposal-only contract; it does not call the model or execute a repair.
+  if (task.metadata?.skill === 'agentic-error-fix-proposal') {
+    const errorFix = a2aErrorFixProposalRequestV1Schema.safeParse(task.metadata.errorFix);
+    if (!errorFix.success) {
+      return json(
+        { error: { code: -32602, message: 'Invalid agentic-error-fix-proposal input' } },
+        { status: 400 },
+      );
+    }
+    return json(buildA2AErrorFixProposalResultV1({ requestId: task.id, errorFix: errorFix.data }));
+  }
 
   // Extract text query from first text part
   const textPart = task.message.parts.find((p): p is { text: string } => 'text' in p);
