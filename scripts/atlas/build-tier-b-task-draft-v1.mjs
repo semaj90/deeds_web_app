@@ -13,6 +13,9 @@ import { fileURLToPath } from 'node:url';
 
 const sha256Hex = (b) => crypto.createHash('sha256').update(b).digest('hex');
 const CHECKBOX = /^\s*[-*]\s*\[[ xX]\]\s*/;
+const RESOLVED = new Set(['MATCHED_EXACT', 'RESOLVED_BY_TEXT']);
+
+// Advisory keyword lexicon per palette domain (words only; not an authority). `general` is the fallback when nothing matches.
 const RESOLVED = new Set(['MATCHED_EXACT', 'RESOLVED_BY_TEXT', 'EXACT_SOURCE_LINE_MATCH', 'FILE_MATCHED_LINE_SEARCH']);
 
 // Advisory keyword lexicon per palette domain (words only; not an authority). `general` is the fallback when nothing matches in v1.
@@ -30,6 +33,13 @@ export const LEXICON = {
   ml: ['model', 'train', 'tensor', 'cuda', 'gemm', 'quantiz', 'torch', 'classifier', 'gpu', 'kmeans', 'autoencoder'],
 };
 
+export function proposeDomain(text) {
+  const t = text.toLowerCase();
+  let best = null, bestScore = 0;
+  for (const [domain, words] of Object.entries(LEXICON)) {
+    const score = words.reduce((n, w) => n + (t.includes(w) ? 1 : 0), 0);
+    if (score > bestScore) { best = domain; bestScore = score; }
+  }
 export const V2_EXTENSION_LEXICON = {
   compiler: ['compiler', 'tree-sitter', 'cst', 'ast', 'ast-grep', 'parser', 'grammar', 'lexer', 'token', 'codegen', 'syntax', 'cmake', 'llvm', 'nvcc', 'transpile'],
   devops: ['docker', 'compose', 'wsl2', 'service', 'systemd', 'caddy', 'healthcheck', 'ci', 'actions', 'deploy', 'k8s', 'powershell', 'environment'],
@@ -58,6 +68,7 @@ export function proposeDomain(text, options = {}) {
 }
 
 /** Pure core. `readBytes(sourceRef)` returns the exact file bytes or null. */
+export function buildTierBDraft({ crosswalkRows, readBytes, seed = 'tier-b-v1', perDomain = 55, reservePerDomain = 15, domains }) {
 export function buildTierBDraft({ crosswalkRows, readBytes, seed = 'tier-b-v1', perDomain = 55, reservePerDomain = 15, domains = V1_DOMAINS }) {
   const isV2 = domains.length > 10;
   const cache = new Map();
@@ -65,6 +76,12 @@ export function buildTierBDraft({ crosswalkRows, readBytes, seed = 'tier-b-v1', 
   const skipped = {};
   const bySkip = (k) => { skipped[k] = (skipped[k] ?? 0) + 1; };
   const byDomain = Object.fromEntries(domains.map((d) => [d, []]));
+
+  for (const r of crosswalkRows) {
+    if (!RESOLVED.has(r.status) || !r.stableKey) { bySkip('NOT_RESOLVED'); continue; }
+    const f = load(r.source);
+    if (!f) { bySkip('SOURCE_UNREADABLE'); continue; }
+    const rawLine = f.lines[r.line - 1];
   const seenKeys = new Set();
 
   for (const r of crosswalkRows) {
@@ -83,6 +100,15 @@ export function buildTierBDraft({ crosswalkRows, readBytes, seed = 'tier-b-v1', 
     const lineText = rawLine.replace(/\r$/, '');
     const text = lineText.replace(CHECKBOX, '').trim();
     if (text.length < 12) { bySkip('TEXT_TOO_SHORT'); continue; }
+    const before = Buffer.byteLength(f.lines.slice(0, r.line - 1).map((l) => `${l}\n`).join(''), 'utf8');
+    const byteStart = before;
+    const byteEnd = before + Buffer.byteLength(lineText, 'utf8');
+    if (f.bytes.subarray(byteStart, byteEnd).toString('utf8') !== lineText) { bySkip('SPAN_MISMATCH'); continue; }
+    let domain = proposeDomain(text);
+    if (!byDomain[domain]) domain = 'general';
+    byDomain[domain].push({
+      id: `${r.stableKey}`, tier: 'B', stableKey: r.stableKey, sourceRef: r.source, sourceGroup: r.source,
+      featureLabel: r.stableKey.slice(0, r.stableKey.indexOf('#')), textEvidence: text,
     const before = Buffer.byteLength(f.lines.slice(0, line - 1).map((l) => `${l}\n`).join(''), 'utf8');
     const byteStart = before;
     const byteEnd = before + Buffer.byteLength(lineText, 'utf8');
