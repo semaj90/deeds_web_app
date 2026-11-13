@@ -8,7 +8,7 @@
  *   - fastJsonExtractField(json, key) → string | null  (single-field fast path)
  *
  * Memory optimizations:
- *   - Byte-budget LRU (8 MB cap) instead of count-only — prevents unbounded heap growth
+ *   - Byte-budget LRU (32 MB cap) instead of count-only — prevents unbounded heap growth
  *   - Input size guard (64 MB max) — prevents OOM from malicious/huge payloads
  *   - SIMD-friendly FNV-1a: samples 64-byte prefix + stride tail — stays in L1 cache
  *   - Payloads < 1 KB bypass native (V8 JIT faster for small strings)
@@ -19,10 +19,10 @@
  * - Do NOT use fastJsonParse on gRPC streams, Protobuf buffers, or tensor TypedArrays.
  */
 
+import { createHash } from 'node:crypto';
 import { resolve } from 'path';
 import { existsSync } from 'fs';
 import { createRequire } from 'module';
-import { createHash } from 'crypto';
 
 const esmRequire = createRequire(import.meta.url);
 
@@ -47,7 +47,7 @@ function getSimdJsonAddon(): SimdJsonAddon | null {
 	}
 
 	const paths = [
-		// Non-GPU release build (cuda_compiled 0, libtorch_built 0); parity-checked against older builds.
+		// Non-GPU release build (cuda_compiled 0, libtorch_built 0); parity-checked against the older builds.
 		resolve(process.cwd(), '../../simd-bridge/cpp/build-x64-fallback/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/cpp/build-x64-fallback/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), 'simd-bridge/cpp/build-x64-fallback/Release/tensorrt_bridge.node'),
@@ -94,14 +94,11 @@ const lruCache   = new Map<string, CacheEntry>();
 let   cacheBytes = 0;
 
 /**
- * Derive a collision-resistant cache key from the complete UTF-8 input.
- * A sampled/non-cryptographic key is unsafe here: a collision could return
- * the wrong parsed value while still looking like a successful cache hit.
- * Accepts a pre-encoded buffer so callers that already need UTF-8 byte
- * length (e.g. the OOM guard) can share one encode instead of two.
+ * SHA-256 hash — collision-immune full-payload key matching packages/parent-atlas-retrieval.
+ * Eliminates input string retention on heap in CacheEntry.
  */
-function fnv1aKey(inputUtf8: Buffer): string {
-	return createHash('sha256').update(inputUtf8).digest('hex');
+function sha256Key(input: string): string {
+	return createHash('sha256').update(input).digest('hex');
 }
 
 function approximateSize(value: unknown): number {
@@ -145,6 +142,11 @@ function lruSet(key: string, value: unknown): void {
 
 	// Evict expired entries first (free pass)
 	lruEvictExpired();
+	const existing = lruCache.get(key);
+	if (existing) {
+		cacheBytes -= existing.sizeBytes;
+		lruCache.delete(key);
+	}
 
 	// Evict LRU entries until budget allows insertion
 	while (cacheBytes + sizeBytes > LRU_BUDGET_BYTES && lruCache.size > 0) {
@@ -166,9 +168,12 @@ const stats = {
 	misses:           0,
 	nativeParses:     0,
 	fallbackParses:   0,
+	nativeParseErrors: 0,
 	totalBytesParsed: 0,
 	nativeTimeMs:     0,
 };
+
+let lastNativeParseWarningAt = 0;
 
 /** Return current simdjson bridge metrics. Useful for D18 audit gates. */
 export function getSimdStats() {
@@ -179,30 +184,37 @@ export function getSimdStats() {
 
 const MAX_INPUT_BYTES = 64 * 1024 * 1024; // 64 MB — beyond this, bail early
 
-/** Minimum payload size for native simdjson path (V8 is faster for small strings) */
-const MIN_NATIVE_BYTES = 1024;
-
-// ── Public API ─────────────────────────────────────────────────────────────────
-
-/** Return the UTF-8 byte length used by the native JSON boundary. */
+/** Return the UTF-8 byte length used by the native JSON boundary (public export of this package). */
 export function utf8ByteLength(input: string): number {
 	return Buffer.byteLength(input, 'utf8');
 }
+const utf8InputByteLength = utf8ByteLength;
+
+/** Minimum payload size for native simdjson path (V8 is faster for small strings) */
+const MIN_NATIVE_BYTES = 1024;
 
 /**
- * Parse JSON with simdjson (large payloads) or V8 JSON.parse (small/fallback).
- * Results cached with 8 MB byte-budget LRU for 30 s.
- * Inputs > 64 MB throw RangeError to prevent OOM.
+ * Inputs where simdjson's minified output can differ from V8 JSON.parse (found by
+ * scripts/atlas/simdjson-parity-harness-v1.mjs): negative zero (sign lost), surrogate escapes
+ * (lone surrogate becomes U+FFFD) and a leading BOM (accepted by simdjson, rejected by V8).
+ * Conservative: a false positive only routes the input to V8, which is always correct.
  */
 const V8_FIDELITY_RE = /-0(?![.\deE])|\\u[dD][89a-fA-F][0-9a-fA-F]{2}/;
 function needsV8Fidelity(input: string): boolean {
 	return input.charCodeAt(0) === 0xfeff || V8_FIDELITY_RE.test(input);
 }
 
-export function fastJsonParse<T = unknown>(input: string): T {
-	// Buffer.byteLength does not materialize the encoded bytes -- cheap to call
-	// before deciding whether the input is even small enough to proceed.
-	const inputBytes = utf8ByteLength(input);
+// ── Public API ─────────────────────────────────────────────────────────────────
+
+/**
+ * Parse JSON with simdjson (large payloads) or V8 JSON.parse (small/fallback).
+ * Results cached with 32 MB byte-budget LRU for 30 s.
+ * Inputs > 64 MB throw RangeError to prevent OOM.
+ */
+export type FastJsonParseBackend = 'SIMDJSON_NAPI' | 'V8_JSON_PARSE' | 'CACHE';
+
+export function fastJsonParseWithBackend<T = unknown>(input: string): { value: T; backend: FastJsonParseBackend } {
+	const inputBytes = utf8InputByteLength(input);
 
 	// OOM guard — bail before any allocation
 	if (inputBytes > MAX_INPUT_BYTES) {
@@ -212,13 +224,10 @@ export function fastJsonParse<T = unknown>(input: string): T {
 		);
 	}
 
-	// Single UTF-8 encode, reused for both the cache-key hash and (below) the
-	// simdjson native call -- previously this and the OOM-guard byte length
-	// were two independent encodes of the same input (finding #8).
-	const inputUtf8 = Buffer.from(input, 'utf8');
-	const cacheKey = fnv1aKey(inputUtf8);
+	// Check LRU cache (hash computed over L1-friendly prefix)
+	const cacheKey = sha256Key(input);
 	const cached = lruGet(cacheKey);
-	if (cached !== undefined) return cached as T;
+	if (cached !== undefined) return { value: cached as T, backend: 'CACHE' };
 
 	stats.misses++;
 	stats.totalBytesParsed += inputBytes;
@@ -234,17 +243,32 @@ export function fastJsonParse<T = unknown>(input: string): T {
 			result = JSON.parse(validated) as T;
 			stats.nativeParses++;
 			stats.nativeTimeMs += (performance.now() - start);
-		} catch {
+			lruSet(cacheKey, result);
+			return { value: result, backend: 'SIMDJSON_NAPI' };
+		} catch (error) {
+			stats.nativeParseErrors++;
 			stats.fallbackParses++;
+			// Keep payloads and parser messages out of logs; they may contain user data.
+			const now = Date.now();
+			if (now - lastNativeParseWarningAt >= 60_000) {
+				lastNativeParseWarningAt = now;
+				const errorName = error instanceof Error ? error.name : 'UnknownError';
+				console.warn(`[simdjson-bridge] Native parse failed; using V8 fallback (count=${stats.nativeParseErrors}, error=${errorName}).`);
+			}
 			result = JSON.parse(input) as T;
+			lruSet(cacheKey, result);
+			return { value: result, backend: 'V8_JSON_PARSE' };
 		}
 	} else {
 		stats.fallbackParses++;
 		result = JSON.parse(input) as T;
+		lruSet(cacheKey, result);
+		return { value: result, backend: 'V8_JSON_PARSE' };
 	}
+}
 
-	lruSet(cacheKey, result);
-	return result;
+export function fastJsonParse<T = unknown>(input: string): T {
+	return fastJsonParseWithBackend<T>(input).value;
 }
 
 /**
@@ -252,12 +276,14 @@ export function fastJsonParse<T = unknown>(input: string): T {
  * Falls back to try/catch JSON.parse if addon unavailable.
  */
 export function fastJsonValidate(input: string): boolean {
-	if (utf8ByteLength(input) > MAX_INPUT_BYTES) return false;
+	if (utf8InputByteLength(input) > MAX_INPUT_BYTES) return false;
 
 	const native = getSimdJsonAddon();
 	if (native) {
 		try {
+			// A BOM is accepted by simdjson but rejected by JSON.parse; keep JSON.parse semantics.
 			if (native.simdJsonValidate(input)) return input.charCodeAt(0) !== 0xfeff;
+			// simdjson rejects some inputs V8 accepts (integers beyond 64 bits, 1e400): confirm with V8 below.
 		} catch {
 			// fall through
 		}
@@ -272,11 +298,11 @@ export function fastJsonValidate(input: string): boolean {
 
 /**
  * Extract a numeric array at a JSON Pointer path directly into a Float64Array.
- * Zero-copy for embedding vectors — avoids full JS object allocation.
+ * Avoids full JS object allocation, but materializes a Float64Array copy; it is not zero-copy.
  * Returns null if addon unavailable or path not found.
  */
 export function fastJsonExtractNumbers(input: string, pointer: string): Float64Array | null {
-	if (utf8ByteLength(input) > MAX_INPUT_BYTES) return null;
+	if (utf8InputByteLength(input) > MAX_INPUT_BYTES) return null;
 	const native = getSimdJsonAddon();
 	if (!native) return null;
 	try {
@@ -292,7 +318,7 @@ export function fastJsonExtractNumbers(input: string, pointer: string): Float64A
  * Example: fastJsonExtractField('{"model":"gemma4","status":"ok"}', "status") → "ok"
  */
 export function fastJsonExtractField(input: string, key: string): string | null {
-	if (utf8ByteLength(input) > MAX_INPUT_BYTES) return null;
+	if (utf8InputByteLength(input) > MAX_INPUT_BYTES) return null;
 
 	// Fast regex — captures first occurrence of `"key": <value>`
 	const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
