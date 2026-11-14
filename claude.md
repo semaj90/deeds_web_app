@@ -867,6 +867,16 @@ import { Accordion, Dialog, Select, Checkbox, ScrollArea } from "bits-ui";
 - Local wrapper components are obsolete — import bits-ui directly
 - Use bits-ui component API, NOT melt-ui builders directly
 - `onOpenChange` callback available on Root components
+- Keep the app on Svelte 5 runes; do not enable global `compilerOptions.compatibility.componentApi: 4` in `svelte.config.js`. It applies the legacy Svelte 4 component-instance API to every component and has been reported to break Bits UI transition completion callbacks with `onOpenChangeComplete.current is not a function` ([upstream Bits UI discussion #1302](https://github.com/huntabyte/bits-ui/discussions/1302)).
+- The app's `dynamicCompileOptions` exception is scoped to `lucide-svelte`, the only dependency currently identified as needing Svelte 4 `$$props` behavior. Do not use a broad `node_modules` condition; keep Bits UI, `svelte-sonner`, SvelteKit internals, and other Svelte 5 dependencies on runes.
+- Do not spread an unvalidated caller prop named `onOpenChangeComplete` into Bits UI roots. Prefer `bind:open` / `onOpenChange`; validate completion callbacks as functions when a wrapper intentionally exposes one. Do not add a no-op callback as a workaround for a compiler-mode conflict.
+- Keep `src/lib/config/svelte-compile-options.spec.ts` covering both the absence of global `componentApi: 4` and the runes-mode exceptions. Run it after compiler-config changes.
+- Svelte compiler config changes require a SvelteKit/Vite restart: an already-running server or optimized `bits-ui` dependency can retain the old compiled callback shape. If the error remains after restart, inspect the effective config and optimized Bits UI bundle before editing individual dialog call sites.
+
+### Legal AI theme and icon assets
+
+- The dossier theme stylesheet is `sveltekit-frontend/src/lib/styles/dossier-global.css`; the evidence document modal has a separate imported stylesheet at `sveltekit-frontend/src/lib/styles/evidence-document-modal.css`.
+- Prefer the existing legal/Celestial icon pack in `sveltekit-frontend/src/lib/icons/yorha/` through `sveltekit-frontend/src/lib/components/ui/Icon.svelte` names such as `yorha-ai-assistant`, `yorha-law-book`, `yorha-citation`, and `yorha-evidence`. Other names use UnoCSS `i-lucide-*` icons. Keep icons on this Svelte 5 component path; do not broaden legacy compiler settings to change icon appearance.
 
 **Ambient type shadowing warning:** `src/types/bits-ui.d.ts` shadows bits-ui's own shipped types. bits-ui v2.16.2 ships complete `dist/index.d.ts` with proper compound namespaces. The ambient file was needed historically but may cause type mismatches with newer API features.
 

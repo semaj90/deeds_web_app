@@ -72,7 +72,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
  * 2. Generate thumbnail via Sharp → upload to object storage
  * 3. Insert DB record (returns immediately to client)
  * 4. Background: Ornith 1.5 VLM analysis via llama-server :8090 (caption + tags + forensics)
- * 5. Background: EmbeddingGemma → caption embedding → Qdrant
+ * 5. Background: EmbeddingGemma → caption embedding → PostgreSQL (canonical) → Qdrant (mirror)
  * 6. Background: Auto-tag + mirror to stores
  * 7. Background: LangExtract OCR for any text in image
  */
@@ -85,7 +85,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     // Verify POI exists (no createdBy check — matches page load behavior,
     // createdBy can be NULL for POIs created during dev bypass)
     const [poi] = await db
-      .select({ id: personsOfInterest.id, name: personsOfInterest.name })
+      .select({ id: personsOfInterest.id, name: personsOfInterest.name, caseId: personsOfInterest.caseId })
       .from(personsOfInterest)
       .where(eq(personsOfInterest.id, poiId))
       .limit(1);
@@ -160,7 +160,28 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       .returning();
     const compatibilityFields = buildObjectStorageCompatibilityFields(objectStorageKey);
 
-    // 4. Fire-and-forget: VLM analysis pipeline
+    // 4. When the person belongs to a case, admit the photo as case evidence. The durable
+    //    upload worker then runs detection and writes the EmbeddingGemma 2 image vector to
+    //    PostgreSQL (canonical); Qdrant is filled from the outbox afterwards. The photo itself
+    //    is already saved, so a failure here never fails the upload.
+    const { admitPoiPhotoAsCaseEvidenceV1 } = await import(
+      '$lib/server/evidence/poi-photo-evidence-admission-v1.js'
+    );
+    const evidenceLink = await admitPoiPhotoAsCaseEvidenceV1({
+      poiId,
+      poiName: poi.name ?? 'Unknown',
+      poiPhotoId: photo.id,
+      caseId: poi.caseId,
+      actorId: Number(locals.user.id),
+      fileName: file.name,
+      contentType: file.type,
+      bytes: buffer,
+    });
+    if (evidenceLink.status === 'failed') {
+      console.warn('[poi-photos] Case evidence admission failed (photo kept):', evidenceLink.reason);
+    }
+
+    // 5. Fire-and-forget: VLM analysis pipeline
     runVLMAnalysisPipeline(photo.id, poiId, buffer, poi.name ?? 'Unknown').catch((err) =>
       console.warn('[poi-photos] Background VLM pipeline failed:', err)
     );
@@ -173,6 +194,8 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
           objectStorageKey: compatibilityFields.objectStorageKey,
           minioKey: compatibilityFields.minioKey,
         },
+        // queued | already_registered | no_case | case_not_accessible | failed
+        evidenceLink,
       },
       { status: 201 }
     );
@@ -396,8 +419,36 @@ Return ONLY valid JSON.`;
     }
   }
 
-  // ── Step 4: Store caption embedding in Qdrant (evidence_items collection) ──
-  if (captionEmbedding.length === 768) {
+  // ── Step 4: Update the PostgreSQL record first (canonical) ──
+  // Qdrant is a rebuildable mirror: it is only written after this row is stored, so a
+  // mirror point can never exist without its PostgreSQL source.
+  let canonicalStored = false;
+  try {
+    const [updated] = await db
+      .update(poiPhotos)
+      .set({
+        aiCaption: aiCaption || null,
+        aiTags: aiTags.length > 0 ? aiTags : [],
+        forensicData: Object.keys(forensicData).length > 0 ? forensicData : null,
+        faceEmbedding: captionEmbedding.length === 768 ? captionEmbedding : null,
+      })
+      .where(eq(poiPhotos.id, photoId))
+      .returning();
+    if (!updated) {
+      console.error('[poi-photos] DB update failed: photo record not found');
+    } else {
+      canonicalStored = true;
+      console.log(`[poi-photos] DB updated: caption=${aiCaption.length}ch, tags=${aiTags.length}, embedding=${captionEmbedding.length}d`);
+    }
+  } catch (err) {
+    console.error('[poi-photos] DB update with analysis failed:', err);
+  }
+
+  // ── Step 5: Fan out the caption embedding to Qdrant (mirror; only after PostgreSQL succeeded) ──
+  if (captionEmbedding.length === 768 && !canonicalStored) {
+    console.warn('[poi-photos] Qdrant fan-out skipped: PostgreSQL record was not stored');
+  }
+  if (captionEmbedding.length === 768 && canonicalStored) {
     try {
       const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
       const qdrant = getQdrantClient();
@@ -453,7 +504,7 @@ Return ONLY valid JSON.`;
     }
   }
 
-  // ── Step 5: Auto-tag via existing tag pipeline (mirror to CouchDB + Qdrant + pgvector) ──
+  // ── Step 6: Auto-tag via existing tag pipeline (mirror to CouchDB + Qdrant + pgvector) ──
   if (aiTags.length > 0 || textToEmbed.length > 50) {
     try {
       const { autoTagDocument } = await import('$lib/server/ace/auto-tagger');
@@ -466,27 +517,6 @@ Return ONLY valid JSON.`;
     } catch (err) {
       console.warn('[poi-photos] Auto-tag failed (non-fatal):', err);
     }
-  }
-
-  // ── Step 6: Update DB record with analysis results ──
-  try {
-    const [updated] = await db
-      .update(poiPhotos)
-      .set({
-        aiCaption: aiCaption || null,
-        aiTags: aiTags.length > 0 ? aiTags : [],
-        forensicData: Object.keys(forensicData).length > 0 ? forensicData : null,
-        faceEmbedding: captionEmbedding.length === 768 ? captionEmbedding : null,
-      })
-      .where(eq(poiPhotos.id, photoId))
-      .returning();
-    if (!updated) {
-      console.error('[poi-photos] DB update failed: photo record not found');
-    } else {
-      console.log(`[poi-photos] DB updated: caption=${aiCaption.length}ch, tags=${aiTags.length}, embedding=${captionEmbedding.length}d`);
-    }
-  } catch (err) {
-    console.error('[poi-photos] DB update with analysis failed:', err);
   }
 
   // ── Step 7: GPU background analysis (fire-and-forget) ──

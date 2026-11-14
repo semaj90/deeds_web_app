@@ -21,22 +21,44 @@ export type DownloadedVideoSource = {
   sourceMetadata: Record<string, unknown>;
 };
 
-function spawnPromise(command: string, args: string[], cwd?: string): Promise<{ code: number; stdout: string; stderr: string }> {
+function spawnPromise(
+  command: string,
+  args: string[],
+  cwd?: string,
+  timeoutMs = 5 * 60 * 1000,
+): Promise<{ code: number; stdout: string; stderr: string }> {
   return new Promise((resolvePromise, reject) => {
-    const proc = spawn(command, args, { shell: false, cwd });
+    const proc = spawn(command, args, { shell: false, cwd, windowsHide: true });
     let stdout = '';
     let stderr = '';
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      proc.kill('SIGKILL');
+      reject(new Error(`${command} timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
 
     proc.stdout.on('data', (chunk) => {
-      stdout += chunk.toString();
+      if (stdout.length < 2 * 1024 * 1024) stdout += chunk.toString();
     });
 
     proc.stderr.on('data', (chunk) => {
-      stderr += chunk.toString();
+      if (stderr.length < 1024 * 1024) stderr += chunk.toString();
     });
 
-    proc.on('error', (error) => reject(error));
-    proc.on('close', (code) => resolvePromise({ code: code ?? -1, stdout, stderr }));
+    proc.on('close', (code) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolvePromise({ code: code ?? -1, stdout, stderr });
+    });
+    proc.on('error', (error) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      reject(error);
+    });
   });
 }
 
@@ -52,7 +74,7 @@ export async function downloadApprovedVideoSource(sourceUrl: string): Promise<Do
   const outputTemplate = join(cleanupDir, 'source.%(ext)s');
   const ytdlpPath = resolveYtDlpPath();
 
-  const command = await spawnPromise(ytdlpPath, ['--no-playlist', '--no-warnings', '-o', outputTemplate, '--print-json', sourceUrl]);
+  const command = await spawnPromise(ytdlpPath, ['--no-playlist', '--no-warnings', '-o', outputTemplate, '--print-json', sourceUrl], undefined, 15 * 60 * 1000);
   if (command.code !== 0) {
     await rm(cleanupDir, { recursive: true, force: true }).catch(() => {});
     throw new Error(`yt-dlp failed: ${command.stderr.slice(0, 500)}`);
@@ -84,7 +106,7 @@ export async function extractAudioTrack(videoPath: string, workDir?: string): Pr
   const ffmpegPath = ENV.FFMPEG_PATH || 'ffmpeg';
   const outputPath = join(workDir ?? dirname(videoPath), `${randomUUID()}.wav`);
 
-  const result = await spawnPromise(ffmpegPath, ['-i', videoPath, '-vn', '-ac', '1', '-ar', '16000', outputPath]);
+  const result = await spawnPromise(ffmpegPath, ['-i', videoPath, '-vn', '-ac', '1', '-ar', '16000', outputPath], workDir, 5 * 60 * 1000);
   if (result.code !== 0) {
     throw new Error(`ffmpeg audio extraction failed: ${result.stderr.slice(0, 500)}`);
   }

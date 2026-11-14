@@ -12,6 +12,7 @@
 	import { flip } from 'svelte/animate';
 import EvidenceUploadPreview from '$lib/components/evidence/EvidenceUploadPreview.svelte';
 import EvidenceViewModal from '$lib/components/evidence/EvidenceViewModal.svelte';
+import CourtroomEvidentiaryBriefModal from '$lib/components/courtroom/CourtroomEvidentiaryBriefModal.svelte';
 import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
 import WysiwygEditor from '$lib/components/editor/WysiwygEditor.svelte';
 import TipTapEditor from '$lib/components/TipTapEditor.svelte';
@@ -113,6 +114,7 @@ import type { PageData } from './$types.js';
  let showNotesPanel = $state(false);
  let showChatModal = $state(false);
  let isExportingPacket = $state(false);
+ let showCourtroomBrief = $state(false);
  let exportPacketError = $state('');
  let showDescriptionEditor = $state(false);
  let caseDescription = $state('');
@@ -912,6 +914,27 @@ function formatInferenceConfidence(value: number | null): string {
                 <button
                   {...props}
                   type="button"
+                  onclick={() => (showCourtroomBrief = true)}
+                  class="hud-toolbar-btn"
+                >
+                  <Icon name="yorha-integrity" size={13} class="shrink-0" />
+                  <span>Court Brief</span>
+                </button>
+              {/snippet}
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom" sideOffset={6} class="hud-tooltip-pop">
+                Preview Fed. R. Evid. 902(11) self-authenticating brief with CCTV spatial stills
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+
+          <Tooltip.Root delayDuration={180}>
+            <Tooltip.Trigger>
+              {#snippet child({ props })}
+                <button
+                  {...props}
+                  type="button"
                   onclick={() => (showNotesPanel = !showNotesPanel)}
                   class={['hud-toolbar-btn', showNotesPanel && 'hud-toolbar-btn-active']}
                 >
@@ -1114,6 +1137,7 @@ function formatInferenceConfidence(value: number | null): string {
               <span class="dossier-card-title">Case Brief &amp; Statement of Facts</span>
             </div>
             <div class="flex flex-wrap items-center gap-1.5">
+              <button type="button" onclick={() => (showCourtroomBrief = true)} class="dossier-mini-pill hover:border-[#D4AF37] hover:text-[#2A241E]">⚖ Evidentiary Brief Preview</button>
               <button type="button" onclick={() => (editorMode = 'tiptap')} class={['dossier-mini-pill', editorMode === 'tiptap' && 'dossier-mini-pill-active']}>✎ TipTap Editor</button>
               <button type="button" onclick={() => (editorMode = 'ai-tiptap')} class={['dossier-mini-pill', editorMode === 'ai-tiptap' && 'dossier-mini-pill-active']}>✦ AI Legal Assistant</button>
             </div>
@@ -1347,13 +1371,13 @@ function formatInferenceConfidence(value: number | null): string {
                 <p class="dossier-dropzone-title">
                   {isDragOver ? 'Release to Ingest Legal Artifact' : 'Drop Legal Artifact Here or Click to Browse'}
                 </p>
-                <p class="dossier-dropzone-meta">PDF · DOCX · JPG · PNG &bull; MIME Magic-Byte Gate Active</p>
+                <p class="dossier-dropzone-meta">PDF · DOCX · JPG · PNG · MP4 · GLB &bull; MIME Magic-Byte Gate Active</p>
                 <input
                   type="file"
                   onchange={handleFileUpload}
                   disabled={isUploading}
                   class="hidden"
-                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.mp4,.mov,.webm,.avi,.glb,.spz,video/*,image/*"
                 />
               </label>
 
@@ -1912,6 +1936,22 @@ function formatInferenceConfidence(value: number | null): string {
 		evidenceId={selectedEvidence?.id ?? null}
 		{caseId}
 		onClose={() => (showEvidenceViewer = false)}
+	/>
+
+	<CourtroomEvidentiaryBriefModal
+		open={showCourtroomBrief}
+		docketNumber={caseData?.caseNumber || caseId}
+		caseTitle={caseData?.title || 'STATE OF NEW YORK & UNITED STATES v. ARULIAN CORPORATION, and ALEXANDER VANCE'}
+		courtName="UNITED STATES DISTRICT COURT FOR THE DISTRICT OF COLUMBIA"
+		judgeName="HON. ROYCE C. LAMBERTH"
+		filedDate="OCTOBER 17, 2026"
+		sha256Hash="7f81a8c9e54d2b09a781fa781e920d31e8471e891b012c8a245d8f619e07d9e3"
+		timestampAnchor="NIST ACTS"
+		corpusId="LEX-ORNITH-88398"
+		sealLevel="UNREDACTED / SEAL LEVEL IV"
+		vlmModel="ORNITH 1.5 VLM"
+		docHash="4099-B74-CR"
+		onClose={() => (showCourtroomBrief = false)}
 	/>
 
  <!-- Statute Detail Modal -->

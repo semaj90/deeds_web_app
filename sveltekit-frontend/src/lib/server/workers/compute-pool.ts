@@ -26,7 +26,8 @@ export type TaskType =
   | 'chunk' | 'hash' | 'metadata' | 'qdrant_payload' | 'langextract.extract'
   | 'graph.bfs' | 'graph.bfs_extended' | 'graph.astar' | 'graph.greedy'
   | 'graph.ast_traverse' | 'tree.predict' | 'manifold.slerp' | 'manifold.interpolate4d'
-  | 'schema.encode' | 'hamming128.proposal' | 'som.radix-order.proposal';
+  | 'schema.encode' | 'hamming128.proposal' | 'som.radix-order.proposal'
+  | 'verifier.command.validate' | 'verifier.tier.classify';
 
 export interface RunOptions {
 	/** Soft-affinity key: same key → same worker (warm JIT, hot caches).
@@ -79,6 +80,111 @@ export function validateSomRadixOrderInput(input: SomRadixOrderInput): void {
 		if (seen.has(ordinal)) throw new Error('SOM_RADIX_CANDIDATE_ORDINALS_MUST_BE_UNIQUE');
 		seen.add(ordinal);
 	}
+}
+
+export type VerifierTierClassification =
+	| 'T0_RUNNABLE_VERIFIER'
+	| 'T1_SPEC_FILE_ON_DISK'
+	| 'T2_DIAGNOSE_ONLY'
+	| 'STALE_NON_CHECKBOX_LOCATOR';
+
+export interface VerifierCommandValidateInput {
+	command: string;
+}
+
+export interface VerifierCommandValidateResult {
+	schema: 'atlas.verifier-command-validate.v1';
+	valid: boolean;
+	command: string;
+	prefix: string | null;
+	reason: string;
+	canonicalWritesAllowed: false;
+}
+
+export interface VerifierTierClassifyInput {
+	taskKey: string;
+	text: string;
+	isCheckbox?: boolean;
+	runnableCommand?: string | null;
+	specFilesOnDisk?: string[];
+}
+
+export interface VerifierTierClassifyResult {
+	schema: 'atlas.verifier-tier-classify.v1';
+	taskKey: string;
+	tier: VerifierTierClassification;
+	verifierValid: boolean;
+	reason: string;
+	canonicalWritesAllowed: false;
+}
+
+export const ALLOWED_VERIFIER_COMMAND_PREFIXES = [
+	'npm exec -- vitest run',
+	'npx vitest run',
+	'node --test',
+	'node scripts/atlas/verify-',
+	'node scripts/atlas/audit-',
+	'npm run check',
+	'npm run test',
+	'pytest',
+	'ctest',
+] as const;
+
+export function validateVerifierCommandCpu(
+	input: VerifierCommandValidateInput
+): VerifierCommandValidateResult {
+	const command = typeof input?.command === 'string' ? input.command.trim() : '';
+	const makeRes = (valid: boolean, prefix: string | null, reason: string): VerifierCommandValidateResult => ({
+		schema: 'atlas.verifier-command-validate.v1',
+		valid,
+		command,
+		prefix,
+		reason,
+		canonicalWritesAllowed: false,
+	});
+	if (!command) return makeRes(false, null, 'EMPTY_VERIFIER_CMD');
+	if (/[;&|`$><\r\n]/.test(command)) return makeRes(false, null, 'SHELL_METACHARACTERS_FORBIDDEN');
+	if (/(?:^|\s)--(?:apply|write|execute|force|live)(?:\s|$)/i.test(command)) {
+		return makeRes(false, null, 'MUTATION_FLAG_FORBIDDEN');
+	}
+	if (/(?:^|\s)(?:-e|-c|--eval)(?:\s|$)/i.test(command)) {
+		return makeRes(false, null, 'INLINE_EXEC_FLAG_FORBIDDEN');
+	}
+	const prefix = ALLOWED_VERIFIER_COMMAND_PREFIXES.find((p) => command.startsWith(p)) ?? null;
+	if (!prefix) return makeRes(false, null, 'VERIFIER_RUNNER_NOT_ALLOWLISTED');
+	return makeRes(true, prefix, 'VALID_ALLOWLISTED_VERIFIER');
+}
+
+export function classifyVerifierTierCpu(
+	input: VerifierTierClassifyInput
+): VerifierTierClassifyResult {
+	const taskKey = typeof input?.taskKey === 'string' ? input.taskKey : '';
+	const isCheckbox = input?.isCheckbox !== false;
+	const makeRes = (
+		tier: VerifierTierClassification,
+		verifierValid: boolean,
+		reason: string
+	): VerifierTierClassifyResult => ({
+		schema: 'atlas.verifier-tier-classify.v1',
+		taskKey,
+		tier,
+		verifierValid,
+		reason,
+		canonicalWritesAllowed: false,
+	});
+	if (!isCheckbox) {
+		return makeRes('STALE_NON_CHECKBOX_LOCATOR', false, 'TARGET_LINE_NOT_A_MARKDOWN_CHECKBOX');
+	}
+	if (input?.runnableCommand) {
+		const cmdCheck = validateVerifierCommandCpu({ command: input.runnableCommand });
+		if (cmdCheck.valid) {
+			return makeRes('T0_RUNNABLE_VERIFIER', true, cmdCheck.reason);
+		}
+	}
+	if (Array.isArray(input?.specFilesOnDisk) && input.specFilesOnDisk.length > 0) {
+		return makeRes('T1_SPEC_FILE_ON_DISK', false, 'SPEC_FILE_EXISTS_WITHOUT_RUNNABLE_T0_COMMAND');
+	}
+	return makeRes('T2_DIAGNOSE_ONLY', false, 'NO_RUNNABLE_VERIFIER_OR_SPEC_TARGET');
 }
 
 export function computeSimilarityChunkSize(candidateCount: number, dimensions: number): number {
@@ -445,6 +551,20 @@ export class ComputePool {
 			};
 		}
 		return this.run<SomRadixOrderResult>('som.radix-order.proposal', input, options);
+	}
+
+	async runVerifierCommandValidate(
+		input: VerifierCommandValidateInput,
+		options: RunOptions = {}
+	): Promise<VerifierCommandValidateResult> {
+		return this.run<VerifierCommandValidateResult>('verifier.command.validate', input, options);
+	}
+
+	async runVerifierTierClassify(
+		input: VerifierTierClassifyInput,
+		options: RunOptions = {}
+	): Promise<VerifierTierClassifyResult> {
+		return this.run<VerifierTierClassifyResult>('verifier.tier.classify', input, options);
 	}
 
 	private dispatch(

@@ -7,10 +7,17 @@ import { describe, expect, it } from 'vitest';
 import config from '../../../svelte.config.js';
 
 type DynamicCompileOptions = (input: { filename: string }) => { runes?: boolean } | undefined;
-const dynamicCompileOptions = (config as { vitePlugin: { dynamicCompileOptions: DynamicCompileOptions } }).vitePlugin.dynamicCompileOptions;
+const svelteConfig = config as {
+	compilerOptions?: { compatibility?: { componentApi?: number } };
+	vitePlugin: { dynamicCompileOptions: DynamicCompileOptions };
+};
+const dynamicCompileOptions = svelteConfig.vitePlugin.dynamicCompileOptions;
 const NM = 'C:/repo/sveltekit-frontend/node_modules';
 
 describe('svelte.config.js dynamicCompileOptions', () => {
+  it('does not enable the legacy Svelte 4 component instance API globally', () => {
+    expect(svelteConfig.compilerOptions?.compatibility?.componentApi).not.toBe(4);
+  });
   it('does not force legacy mode on the SvelteKit default layout', () => {
     expect(dynamicCompileOptions({ filename: `${NM}/@sveltejs/kit/src/runtime/components/svelte-5/layout.svelte` })).toBeUndefined();
   });

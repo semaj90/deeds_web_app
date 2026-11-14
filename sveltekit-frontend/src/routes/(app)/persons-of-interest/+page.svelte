@@ -11,6 +11,7 @@
 	import POIPhotoModal from '$lib/components/POIPhotoModal.svelte';
 	import POIPhotoUploader from '$lib/client/ui/POIPhotoUploader.svelte';
 	import { analytics } from '$lib/stores/analytics.svelte';
+	import { page } from '$app/state';
 
 	// Toast notifications
 	let toasts = $state<{ id: number; message: string; type: 'success' | 'error' | 'info' }[]>([]);
@@ -28,6 +29,20 @@
 	let selectedStatus = $state('');
 	let selectedThreatLevel = $state('');
 	let showAddModal = $state(false);
+
+	// A case page can link here with ?caseId=<uuid>&add=1 to add a person to that case.
+	const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+	const linkedCaseId = $derived.by(() => {
+		const value = page.url.searchParams.get('caseId') ?? '';
+		return UUID_RE.test(value) ? value : null;
+	});
+	let addRequestHandled = false;
+	$effect(() => {
+		if (!addRequestHandled && page.url.searchParams.get('add') === '1') {
+			addRequestHandled = true;
+			showAddModal = true;
+		}
+	});
 	let editingPoi = $state<any>(null);
 	let showEditor = $state(false);
 	let viewMode = $state<'list' | 'detail-cards'>('list');
@@ -548,7 +563,7 @@
 	</div>
 
 	<!-- Register POI Modal (bits-ui Dialog) -->
-	<AddPoiModal bind:open={showAddModal} />
+	<AddPoiModal bind:open={showAddModal} caseId={linkedCaseId} />
 
 	<!-- Editor Modal (bits-ui Dialog) -->
 	<Dialog.Root bind:open={showEditor} onOpenChange={(v) => { if (!v) { editingPoi = null; } }}>

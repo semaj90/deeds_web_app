@@ -28,6 +28,13 @@ export interface VLMAnalysisResult {
 	suggestedTags: string[];
 	model: string;
 	cached: boolean;
+	/**
+	 * False when no model produced a usable answer. `summary` is then empty and
+	 * `model` is 'none'; callers must not store or display it as a finding.
+	 */
+	available?: boolean;
+	/** Machine-readable reason when `available` is false. */
+	unavailableReason?: 'VLM_UNREACHABLE' | 'VLM_EMPTY_ANSWER';
 	resizeMeta: {
 		resized: boolean;
 		originalWidth: number;
@@ -102,7 +109,22 @@ Respond in JSON format:
 {"summary": "...", "keyFindings": ["..."], "suggestedTags": ["..."]}`;
 }
 
-function parseVLMResponse(text: string): { summary: string; keyFindings: string[]; suggestedTags: string[] } {
+/**
+ * Remove model reasoning from an answer. Covers closed think/channel blocks and
+ * an unterminated opening block (everything after it is reasoning).
+ */
+export function stripModelReasoning(text: string): string {
+	return text
+		.replace(/<(think|thinking)>[\s\S]*?<\/\1>/gi, '')
+		.replace(/<\|think\|>[\s\S]*?<\|\/think\|>/gi, '')
+		.replace(/<\|channel\|?>\s*(analysis|thought|thinking)[\s\S]*?<\|(end|message_end|channel_end)\|>/gi, '')
+		.replace(/<(think|thinking)>[\s\S]*$/i, '')
+		.replace(/<\|think\|>[\s\S]*$/i, '')
+		.trim();
+}
+
+function parseVLMResponse(rawText: string): { summary: string; keyFindings: string[]; suggestedTags: string[] } {
+	const text = stripModelReasoning(rawText);
 	const fallback = {
 		summary: text.slice(0, 500),
 		keyFindings: [] as string[],
@@ -205,10 +227,10 @@ async function inferTurboQuantVLM(
 
 		if (!res.ok) return null;
 		const data = await res.json();
-		const msg = data.choices?.[0]?.message;
-		// Prefer content (final answer); only fall back to reasoning_content
-		// (chain-of-thought) when content is empty — hide thinking from consumers
-		return msg?.content || msg?.reasoning_content || null;
+		const content = data.choices?.[0]?.message?.content;
+		// Only the final answer is used. `reasoning_content` (chain-of-thought) is
+		// never returned: it must not be stored or shown as an evidence finding.
+		return typeof content === 'string' && content.trim() ? content : null;
 	} catch {
 		return null;
 	}
@@ -294,16 +316,31 @@ export async function analyzeEvidenceImage(input: VLMAnalysisInput): Promise<VLM
 	// 7. Parse structured response
 	if (!responseText) {
 		return {
-			summary: 'Image analysis unavailable — Triton and TurboQuant were unreachable',
+			summary: '',
 			keyFindings: [],
 			suggestedTags: [],
 			model: 'none',
 			cached: false,
+			available: false,
+			unavailableReason: 'VLM_UNREACHABLE',
 			resizeMeta,
 		};
 	}
 
 	const parsed = parseVLMResponse(responseText);
+	if (!parsed.summary.trim() && parsed.keyFindings.length === 0 && parsed.suggestedTags.length === 0) {
+		// The model answered with reasoning only (or nothing usable). Do not cache it.
+		return {
+			summary: '',
+			keyFindings: [],
+			suggestedTags: [],
+			model: 'none',
+			cached: false,
+			available: false,
+			unavailableReason: 'VLM_EMPTY_ANSWER',
+			resizeMeta,
+		};
+	}
 
 	// 8. Cache result
 	try {
@@ -320,6 +357,7 @@ export async function analyzeEvidenceImage(input: VLMAnalysisInput): Promise<VLM
 		...parsed,
 		model,
 		cached: false,
+		available: true,
 		resizeMeta,
 	};
 }

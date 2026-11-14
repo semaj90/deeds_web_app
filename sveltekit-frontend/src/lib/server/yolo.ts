@@ -2,6 +2,8 @@ import { spawn } from 'child_process';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import { tmpdir } from 'os';
+import { createHash } from 'node:crypto';
+import { mapYoloLetterboxBoxToSourceV1, validateYoloLetterboxTransformV1 } from './evidence/yolo-letterbox-v1.js';
 
 export interface YOLOResult {
 	text: string;
@@ -25,31 +27,49 @@ export interface YOLOResult {
 
 export interface YOLOConfig {
 	modelPath?: string;
+	/** Python executable with onnxruntime + numpy (+ cv2 or PIL). Defaults to YOLO_PYTHON, then 'python'. */
+	pythonPath?: string;
 	confidence?: number;
 	iouThreshold?: number;
 }
 
+/** Python executable for the detector subprocess: YOLO_PYTHON when set, otherwise 'python' on PATH. */
+export function resolveYoloPython(configured?: string): string {
+	return configured?.trim() || process.env.YOLO_PYTHON?.trim() || 'python';
+}
+
 /**
  * Resolve the best available YOLO ONNX model.
- * Priority: yolo-doc.onnx (document layout) > yolov8n.onnx (COCO 80-class)
+ * Priority:
+ *   1. yolo-doc.onnx (DocLayout-YOLO document extraction, Apache 2.0)
+ *   2. yolov10n.onnx / yolov10s.onnx (YOLOv10 Tsinghua/THU-MIG NMS-free, Apache 2.0)
+ *   3. yolov8n.onnx (COCO 80-class fallback)
  */
 async function resolveModelPath(): Promise<string> {
-	const modelsDir = path.join(process.cwd(), 'models');
-	const docModel = path.join(modelsDir, 'yolo-doc.onnx');
-	const cocoModel = path.join(modelsDir, 'yolov8n.onnx');
+	const searchDirs = [
+		path.join(process.cwd(), 'models'),
+		path.join(process.cwd(), 'sveltekit-frontend', 'models')
+	];
+	const candidateNames = [
+		'yolo-doc.onnx',
+		'yolov10n.onnx',
+		'yolov10s.onnx',
+		'yolov8n.onnx'
+	];
 
-	try {
-		await fs.access(docModel);
-		return docModel;
-	} catch {
-		// fall through
+	for (const dir of searchDirs) {
+		for (const name of candidateNames) {
+			const candidate = path.join(dir, name);
+			try {
+				await fs.access(candidate);
+				return candidate;
+			} catch {
+				// continue searching
+			}
+		}
 	}
-	try {
-		await fs.access(cocoModel);
-		return cocoModel;
-	} catch {
-		return docModel; // default (will fail isModelAvailable check)
-	}
+
+	return path.join(searchDirs[0], 'yolo-doc.onnx');
 }
 
 /**
@@ -91,7 +111,7 @@ export class YOLOService {
 			if (yoloData.error) {
 				throw new Error(yoloData.error);
 			}
-			const isCoco = modelPath.includes('yolov8n');
+			const isCoco = modelPath.includes('yolov8') || modelPath.includes('yolov10');
 			if (yoloData.skipped) {
 				console.info(`[YOLO] Skipped inference: ${yoloData.skipped}`);
 				return {
@@ -103,13 +123,22 @@ export class YOLOService {
 					modelType: isCoco ? 'coco' : 'doclayout',
 				};
 			}
+			const transform = validateYoloLetterboxTransformV1(yoloData.letterbox);
+			const regions = (yoloData.regions ?? []).map((region: { bbox: unknown }) => ({
+				...region,
+				bbox: mapYoloLetterboxBoxToSourceV1(region.bbox, transform),
+			}));
+			const objects = (yoloData.objects ?? []).map((object: { bbox: unknown }) => ({
+				...object,
+				bbox: mapYoloLetterboxBoxToSourceV1(object.bbox, transform),
+			}));
 
 			const processingTime = Date.now() - startTime;
 
 			return {
-				text: this.extractTextFromRegions(yoloData?.regions ?? []),
-				layout: { regions: yoloData?.regions ?? [] },
-				objects: yoloData?.objects ?? [],
+				text: this.extractTextFromRegions(regions),
+				layout: { regions },
+				objects,
 				processingTime,
 				method: 'yolo',
 				modelType: isCoco ? 'coco' : 'doclayout',
@@ -205,26 +234,48 @@ def run(image_path, model_path, output_path, conf_thresh, iou_thresh):
     out_shape = session.get_outputs()[0].shape  # e.g. [1, 84, 8400] for YOLOv8
 
     if has_cv2:
-        img = cv2.imread(image_path)
-        if img is None:
+        bgr = cv2.imread(image_path)
+        if bgr is None:
             raise ValueError(f'Could not read: {image_path}')
+        img = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
         oh, ow = img.shape[:2]
-        resized = cv2.resize(img, (640, 640))
+        ratio = min(640.0 / ow, 640.0 / oh)
+        resized_w, resized_h = int(round(ow * ratio)), int(round(oh * ratio))
+        pad_left, pad_top = (640 - resized_w) // 2, (640 - resized_h) // 2
+        pad_right, pad_bottom = 640 - resized_w - pad_left, 640 - resized_h - pad_top
+        resized = cv2.resize(img, (resized_w, resized_h), interpolation=cv2.INTER_LINEAR)
+        resized = cv2.copyMakeBorder(resized, pad_top, pad_bottom, pad_left, pad_right, cv2.BORDER_CONSTANT, value=(114, 114, 114))
         blob = resized.astype(np.float32) / 255.0
         blob = np.transpose(blob, (2, 0, 1))[np.newaxis]
     else:
         with Image.open(image_path) as im:
             im = im.convert('RGB')
             ow, oh = im.size
-            im_resized = im.resize((640, 640))
-            arr = np.array(im_resized, dtype=np.float32) / 255.0
+            ratio = min(640.0 / ow, 640.0 / oh)
+            resized_w, resized_h = int(round(ow * ratio)), int(round(oh * ratio))
+            pad_left, pad_top = (640 - resized_w) // 2, (640 - resized_h) // 2
+            pad_right, pad_bottom = 640 - resized_w - pad_left, 640 - resized_h - pad_top
+            im_resized = im.resize((resized_w, resized_h), Image.Resampling.BILINEAR)
+            canvas = Image.new('RGB', (640, 640), (114, 114, 114))
+            canvas.paste(im_resized, (pad_left, pad_top))
+            arr = np.array(canvas, dtype=np.float32) / 255.0
             blob = np.transpose(arr, (2, 0, 1))[np.newaxis]
+    letterbox = {
+        'sourceWidth': ow,
+        'sourceHeight': oh,
+        'scaleX': resized_w / ow,
+        'scaleY': resized_h / oh,
+        'padLeft': pad_left,
+        'padTop': pad_top,
+    }
 
     outputs = session.run(None, {inp.name: blob})
     pred = outputs[0]  # shape varies by model
 
     # Detect output format
     is_yolov8 = len(pred.shape) == 3 and pred.shape[1] < pred.shape[2]  # (1, 84, 8400)
+    is_yolov10 = (len(pred.shape) == 3 and pred.shape[2] == 6) or 'yolov10' in sys.argv[2].lower()
+
     if is_yolov8:
         # YOLOv8 native: (1, 84, 8400) -> transpose to (8400, 84)
         pred = pred[0].T  # (8400, 84)
@@ -239,8 +290,23 @@ def run(image_path, model_path, output_path, conf_thresh, iou_thresh):
         class_ids = class_ids[mask]
         class_names = COCO_NAMES if num_classes >= 80 else DOC_NAMES
         is_coco = num_classes >= 80
+        boxes_xyxy = xywh2xyxy(boxes_xywh)
+        keep = nms(boxes_xyxy, max_scores, iou_thresh)
+        boxes_xyxy = boxes_xyxy[keep]
+        max_scores = max_scores[keep]
+        class_ids = class_ids[keep]
+    elif is_yolov10:
+        # YOLOv10 native: (1, N, 6) = [x1, y1, x2, y2, score, class_id] with NMS built-in
+        pred = pred[0]
+        mask = pred[:, 4] > conf_thresh
+        pred = pred[mask]
+        boxes_xyxy = pred[:, :4].copy()
+        max_scores = pred[:, 4]
+        class_ids = pred[:, 5].astype(int)
+        class_names = COCO_NAMES
+        is_coco = True
     else:
-        # Legacy format: (1, N, 6) = [x,y,w,h,conf,class_id]
+        # DocLayout / Legacy format: (1, N, 6) = [x,y,w,h,conf,class_id]
         pred = pred[0]
         mask = pred[:, 4] > conf_thresh
         pred = pred[mask]
@@ -249,21 +315,16 @@ def run(image_path, model_path, output_path, conf_thresh, iou_thresh):
         class_ids = pred[:, 5].astype(int)
         class_names = DOC_NAMES
         is_coco = False
+        boxes_xyxy = xywh2xyxy(boxes_xywh)
+        keep = nms(boxes_xyxy, max_scores, iou_thresh)
+        boxes_xyxy = boxes_xyxy[keep]
+        max_scores = max_scores[keep]
+        class_ids = class_ids[keep]
 
-    if len(boxes_xywh) == 0:
-        json.dump({'regions': [], 'objects': []}, open(output_path, 'w'))
+    if len(boxes_xyxy) == 0:
+        json.dump({'regions': [], 'objects': [], 'letterbox': letterbox}, open(output_path, 'w'))
         print(json.dumps({'success': True}))
         return
-
-    boxes_xyxy = xywh2xyxy(boxes_xywh)
-    # Scale to original image
-    boxes_xyxy[:, [0, 2]] *= ow / 640.0
-    boxes_xyxy[:, [1, 3]] *= oh / 640.0
-
-    keep = nms(boxes_xyxy, max_scores, iou_thresh)
-    boxes_xyxy = boxes_xyxy[keep]
-    max_scores = max_scores[keep]
-    class_ids = class_ids[keep]
 
     regions, objects = [], []
     for box, score, cid in zip(boxes_xyxy, max_scores, class_ids):
@@ -277,7 +338,7 @@ def run(image_path, model_path, output_path, conf_thresh, iou_thresh):
             else:
                 objects.append(entry)
 
-    json.dump({'regions': regions, 'objects': objects}, open(output_path, 'w'))
+    json.dump({'regions': regions, 'objects': objects, 'letterbox': letterbox}, open(output_path, 'w'))
     print(json.dumps({'success': True}))
 
 if __name__ == '__main__':
@@ -291,7 +352,7 @@ if __name__ == '__main__':
 
 			fs.writeFile(tempScript, pythonScript)
 				.then(() => {
-					const python = spawn('python', [
+					const python = spawn(resolveYoloPython(this.config.pythonPath), [
 						tempScript,
 						imagePath,
 						modelPath,
@@ -341,20 +402,21 @@ if __name__ == '__main__':
 		return '';
 	}
 
-	private static runtimeAvailable: boolean | null = null;
+	/** Probe result per Python executable, so changing YOLO_PYTHON is not masked by an old result. */
+	private static runtimeAvailable = new Map<string, boolean>();
 
-	static async isRuntimeAvailable(): Promise<boolean> {
-		if (YOLOService.runtimeAvailable !== null) return YOLOService.runtimeAvailable;
+	static async isRuntimeAvailable(pythonPath?: string): Promise<boolean> {
+		const python = resolveYoloPython(pythonPath);
+		const known = YOLOService.runtimeAvailable.get(python);
+		if (known !== undefined) return known;
 		return new Promise((resolve) => {
-			const proc = spawn('python', ['-c', 'import onnxruntime, numpy']);
-			proc.on('close', (code) => {
-				YOLOService.runtimeAvailable = code === 0;
-				resolve(YOLOService.runtimeAvailable);
-			});
-			proc.on('error', () => {
-				YOLOService.runtimeAvailable = false;
-				resolve(false);
-			});
+			const done = (ok: boolean) => {
+				YOLOService.runtimeAvailable.set(python, ok);
+				resolve(ok);
+			};
+			const proc = spawn(python, ['-c', 'import onnxruntime, numpy']);
+			proc.on('close', (code) => done(code === 0));
+			proc.on('error', () => done(false));
 		});
 	}
 
@@ -362,10 +424,20 @@ if __name__ == '__main__':
 		try {
 			const modelPath = await this.getModelPath();
 			await fs.access(modelPath);
-			const hasRuntime = await YOLOService.isRuntimeAvailable();
+			const hasRuntime = await YOLOService.isRuntimeAvailable(this.config.pythonPath);
 			return hasRuntime;
 		} catch {
 			return false;
+		}
+	}
+
+	async getModelArtifactRevision(): Promise<string | null> {
+		try {
+			const modelPath = await this.getModelPath();
+			const bytes = await fs.readFile(modelPath);
+			return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+		} catch {
+			return null;
 		}
 	}
 }

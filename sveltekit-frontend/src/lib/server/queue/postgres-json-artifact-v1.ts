@@ -7,6 +7,8 @@ import {
   type ArtifactAddressV1,
 } from './artifact-work-item-v1.js';
 
+type SqlExecutor = { execute: typeof db.execute };
+
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonicalize);
   if (value && typeof value === 'object') {
@@ -31,7 +33,7 @@ export async function materializePostgresJsonArtifact(opts: {
   schemaId: string;
   payload: unknown;
   revisions: Record<string, string>;
-}): Promise<ArtifactAddressV1> {
+}, executor: SqlExecutor = db): Promise<ArtifactAddressV1> {
   const canonicalPayload = canonicalJson(opts.payload);
   const checksum = sha256Hex(canonicalPayload);
   const canonicalRevisions = canonicalJson(opts.revisions);
@@ -46,7 +48,7 @@ export async function materializePostgresJsonArtifact(opts: {
   const artifactId = `sha256:${artifactHash}`;
   const payloadByteLength = Buffer.byteLength(canonicalPayload, 'utf8');
 
-  await db.execute(sql`
+  await executor.execute(sql`
     INSERT INTO workflow_artifacts (
       artifact_id, artifact_hash, schema_id, checksum, revision_set_hash,
       revisions, payload, payload_byte_length, created_at
@@ -82,6 +84,7 @@ export async function materializePostgresJsonArtifact(opts: {
 
 export async function readPostgresJsonArtifact<T = unknown>(
   addressInput: ArtifactAddressV1,
+  executor: SqlExecutor = db,
 ): Promise<T> {
   const address = artifactAddressSchema.parse(addressInput);
   if (address.locator.storage !== 'POSTGRES' || address.locator.table !== 'workflow_artifacts') {
@@ -90,7 +93,7 @@ export async function readPostgresJsonArtifact<T = unknown>(
     );
   }
 
-  const result = await db.execute<{
+  const result = await executor.execute<{
     artifact_hash: string;
     schema_id: string;
     checksum: string;

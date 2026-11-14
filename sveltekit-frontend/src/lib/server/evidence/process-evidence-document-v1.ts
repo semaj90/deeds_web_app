@@ -12,7 +12,92 @@ import { createEvidenceEmbeddingProducer } from './evidence-embedding-producer.j
 import { persistEvidenceVectorForProjectionV1 } from './evidence-vector-persistence-v1.js';
 import { indexEvidenceDocumentCanonicalV1 } from './evidence-document-indexer-v1.js';
 import { analyzeEvidenceImageV1 } from './evidence-visual-analysis-v1.js';
+import {
+  EMBEDDINGGEMMA2_ONNX_REVISION_V1,
+  embedEvidenceTextWithEmbeddingGemma2OnnxV1,
+} from './embeddinggemma2-onnx-image-v1.js';
+import { persistEvidenceMultimodalVectorV1 } from './evidence-multimodal-vector-persistence-v1.js';
+import type { EvidenceDocumentIndexerDependenciesV1 } from './evidence-document-indexer-v1.js';
 import { synthesizeEvidenceClaimsV1, type EvidenceSynthesisResultV1 } from './synthesis/evidence-synthesis-v1.js';
+
+export type EvidenceTextEmbeddingLaneV1 = 'embeddinggemma2_onnx' | 'semantic_768_v1';
+
+/**
+ * Which model embeds evidence text chunks.
+ * - `embeddinggemma2_onnx`: local CPU ONNX model, same 768-D space as evidence image vectors; rows go to
+ *   evidence_multimodal_vectors (modality document_chunk). Needs no :8081 server, receipt or Ollama.
+ * - `semantic_768_v1`: the strict llama-server lane (evidence_vectors). The two spaces are not comparable.
+ * EVIDENCE_TEXT_EMBEDDING_LANE overrides; otherwise EmbeddingGemma 2 is used when its model directory is configured.
+ */
+export function resolveEvidenceTextEmbeddingLaneV1(
+  env: { lane?: string | null; modelDir?: string | null } = {
+    lane: process.env.EVIDENCE_TEXT_EMBEDDING_LANE,
+    modelDir: ENV.ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR,
+  },
+): EvidenceTextEmbeddingLaneV1 {
+  const requested = env.lane?.trim();
+  if (requested === 'embeddinggemma2_onnx' || requested === 'semantic_768_v1') return requested;
+  if (requested) throw new Error('EVIDENCE_TEXT_EMBEDDING_LANE_INVALID');
+  return env.modelDir?.trim() ? 'embeddinggemma2_onnx' : 'semantic_768_v1';
+}
+
+/** Indexer dependencies that embed chunks with EmbeddingGemma 2 and persist them to the multimodal table. */
+export function createEmbeddingGemma2TextIndexerDependenciesV1(options: {
+  caseId: string | null;
+  modelDir: string | null | undefined;
+  embed?: typeof embedEvidenceTextWithEmbeddingGemma2OnnxV1;
+  persist?: typeof persistEvidenceMultimodalVectorV1;
+  database?: Parameters<typeof persistEvidenceMultimodalVectorV1>[0];
+}): EvidenceDocumentIndexerDependenciesV1 {
+  const embedText = options.embed ?? embedEvidenceTextWithEmbeddingGemma2OnnxV1;
+  const persistVector = options.persist ?? persistEvidenceMultimodalVectorV1;
+  const produced = new Map<string, Awaited<ReturnType<typeof embedEvidenceTextWithEmbeddingGemma2OnnxV1>>>();
+  return {
+    embed: async (text) => {
+      if (!options.caseId) throw new Error('EVIDENCE_TEXT_CASE_ID_REQUIRED');
+      if (!options.modelDir?.trim()) throw new Error('EMBEDDINGGEMMA2_ONNX_MODEL_DIR_UNCONFIGURED');
+      const result = await embedText({ text, kind: 'document', modelDir: options.modelDir });
+      produced.set(result.outputSha256, result);
+      return {
+        vector: result.embedding,
+        model: result.model,
+        outputChecksum: result.outputSha256,
+        provenance: {
+          modelArtifactSha256: result.modelArtifactSha256,
+          modelReceipt: { provider: 'cpu', artifactIdentityBound: true, dimensionBound: true, runtimeReady: true },
+          inputRecipeRevision: result.preprocessingRevision,
+          inputSha256: result.inputSha256,
+        },
+      };
+    },
+    persist: async (persistInput) => {
+      const result = produced.get(persistInput.outputChecksum);
+      if (!result || !options.caseId) throw new Error('EVIDENCE_TEXT_EMBEDDING_NOT_PRODUCED_BY_THIS_RUN');
+      produced.delete(persistInput.outputChecksum);
+      const chunkMetadata = persistInput.metadata ?? {};
+      return persistVector(options.database ?? (db as unknown as Parameters<typeof persistEvidenceMultimodalVectorV1>[0]), {
+        evidenceId: persistInput.evidenceId,
+        caseId: options.caseId,
+        sourceRevision: persistInput.sourceRevision,
+        analysisRevision: `atlas.evidence-document-chunk.v1:${EMBEDDINGGEMMA2_ONNX_REVISION_V1}:${result.preprocessingRevision}`,
+        modality: 'document_chunk',
+        sourceLocator: {
+          kind: 'text_chunk',
+          chunkIndex: persistInput.chunkIndex,
+          startOffset: typeof chunkMetadata.startOffset === 'number' ? chunkMetadata.startOffset : null,
+          endOffset: typeof chunkMetadata.endOffset === 'number' ? chunkMetadata.endOffset : null,
+        },
+        embedding: persistInput.embedding,
+        model: result.model,
+        modelArtifactSha256: result.modelArtifactSha256,
+        preprocessingRevision: result.preprocessingRevision,
+        inputSha256: result.inputSha256,
+        outputSha256: result.outputSha256,
+        metadata: { ...chunkMetadata, content: persistInput.content, tokenCountEmbedded: result.tokenCount },
+      });
+    },
+  };
+}
 
 export async function processEvidenceDocumentCanonicalV1(input: {
   evidenceId: string;
@@ -21,6 +106,7 @@ export async function processEvidenceDocumentCanonicalV1(input: {
   fileName?: string;
   contentType?: string;
   metadata?: Record<string, unknown>;
+  visualAnalysis?: Awaited<ReturnType<typeof analyzeEvidenceImageV1>>;
 }): Promise<{ chunkCount: number; persistedCount: number; sourceRevision: string; synthesis: EvidenceSynthesisResultV1 }> {
   let sourceBytes: Buffer | undefined = input.sourceBytes;
   let text = input.text;
@@ -82,34 +168,50 @@ export async function processEvidenceDocumentCanonicalV1(input: {
             : /\.bmp$/i.test(fileName ?? '') ? 'image/bmp'
               : 'image/webp';
     const caseId = typeof metadata.caseId === 'string' ? metadata.caseId : undefined;
-    try {
-      visualAnalysis = await analyzeEvidenceImageV1({
-        evidenceId: input.evidenceId,
-        caseId,
-        fileName: fileName ?? 'evidence-image',
-        contentType: normalizedMime,
-        buffer: sourceBytes,
-        sourceRevision,
-      });
-    } catch (error) {
-      visualAnalysis = {
-        schema: 'atlas.evidence-visual-analysis.v1',
-        authority: 'OBSERVATION_ONLY',
-        sourceRevision,
-        status: 'UNAVAILABLE',
-        objectDetections: [],
-        layoutRegions: [],
-        visionSummary: null,
-        visionFindings: [],
-        visionTags: [],
-        depthMap: null,
-        stageErrors: [error instanceof Error ? error.message.slice(0, 300) : String(error).slice(0, 300)],
-      };
+    if (input.visualAnalysis?.sourceRevision === sourceRevision) {
+      visualAnalysis = input.visualAnalysis;
+    } else {
+      try {
+        visualAnalysis = await analyzeEvidenceImageV1({
+          evidenceId: input.evidenceId,
+          caseId,
+          fileName: fileName ?? 'evidence-image',
+          contentType: normalizedMime,
+          buffer: sourceBytes,
+          sourceRevision,
+        });
+      } catch (error) {
+        visualAnalysis = {
+          schema: 'atlas.evidence-visual-analysis.v1',
+          authority: 'OBSERVATION_ONLY',
+          sourceRevision,
+          status: 'UNAVAILABLE',
+          objectDetections: [],
+          layoutRegions: [],
+          visionSummary: null,
+          visionFindings: [],
+          visionTags: [],
+          depthMap: null,
+          stageErrors: [error instanceof Error ? error.message.slice(0, 300) : String(error).slice(0, 300)],
+        };
+      }
     }
   }
-  const embeddingBaseUrl = ENV.EMBEDDING_STRICT_BASE_URL;
-  if (!embeddingBaseUrl) throw new Error('EVIDENCE_EMBEDDING_ENDPOINT_NOT_CONFIGURED');
-  const embed = createEvidenceEmbeddingProducer(embeddingBaseUrl);
+  const textLane = resolveEvidenceTextEmbeddingLaneV1();
+  let dependencies: EvidenceDocumentIndexerDependenciesV1;
+  if (textLane === 'embeddinggemma2_onnx') {
+    dependencies = createEmbeddingGemma2TextIndexerDependenciesV1({
+      caseId: typeof metadata.caseId === 'string' ? metadata.caseId : null,
+      modelDir: ENV.ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR,
+    });
+  } else {
+    const embeddingBaseUrl = ENV.EMBEDDING_STRICT_BASE_URL;
+    if (!embeddingBaseUrl) throw new Error('EVIDENCE_EMBEDDING_ENDPOINT_NOT_CONFIGURED');
+    dependencies = {
+      embed: createEvidenceEmbeddingProducer(embeddingBaseUrl),
+      persist: (persistInput) => persistEvidenceVectorForProjectionV1(db, persistInput),
+    };
+  }
 
   const indexed = await indexEvidenceDocumentCanonicalV1({
     evidenceId: input.evidenceId,
@@ -122,11 +224,9 @@ export async function processEvidenceDocumentCanonicalV1(input: {
       fileName,
       source_bytes_sha256: sourceHash,
       visual_analysis: visualAnalysis ?? null,
+      text_embedding_lane: textLane,
     },
-    dependencies: {
-      embed,
-      persist: (persistInput) => persistEvidenceVectorForProjectionV1(db, persistInput),
-    },
+    dependencies,
   });
   return { ...indexed, sourceRevision, synthesis };
 }

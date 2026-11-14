@@ -7,6 +7,8 @@ const mocks = vi.hoisted(() => ({
 	extractEntities: vi.fn(),
 	detectForensicPatterns: vi.fn(),
 	processEvidenceDocumentCanonicalV1: vi.fn(),
+	processEvidenceImageCanonicalV1: vi.fn(),
+	processCanonicalVideoAnalysisV1: vi.fn(),
 }));
 
 vi.mock('$lib/server/seaweed-client.js', () => ({ getSeaweedFile: mocks.getSeaweedFile }));
@@ -15,6 +17,12 @@ vi.mock('$lib/server/analysis/entity-extraction.js', () => ({ extractEntities: m
 vi.mock('$lib/server/analysis/forensics.js', () => ({ detectForensicPatterns: mocks.detectForensicPatterns }));
 vi.mock('$lib/server/evidence/process-evidence-document-v1.js', () => ({
 	processEvidenceDocumentCanonicalV1: mocks.processEvidenceDocumentCanonicalV1,
+}));
+vi.mock('$lib/server/evidence/process-evidence-image-canonical-v1.js', () => ({
+	processEvidenceImageCanonicalV1: mocks.processEvidenceImageCanonicalV1,
+}));
+vi.mock('$lib/server/features/evidence/video/durable-video-analysis-v1.js', () => ({
+	processCanonicalVideoAnalysisV1: mocks.processCanonicalVideoAnalysisV1,
 }));
 
 import { EvidenceProcessWorker } from './queue-worker.js';
@@ -34,6 +42,27 @@ describe('EvidenceProcessWorker canonical vector path', () => {
 			chunkCount: 1,
 			persistedCount: 1,
 			sourceRevision: sourceRevision(Buffer.from('uploaded legal source')),
+		});
+		mocks.processEvidenceImageCanonicalV1.mockImplementation(async (input: { sourceRevision: string }) => ({
+			analysis: { schema: 'atlas.evidence-visual-analysis.v1', sourceRevision: input.sourceRevision },
+			vectorId: 'multimodal-vector-1',
+			qdrantPointId: 'projection-point-1',
+			outputSha256: `sha256:${'a'.repeat(64)}`,
+			chunkCount: 1 as const,
+			persistedCount: 1 as const,
+			sourceRevision: input.sourceRevision,
+			representationId: 'evidence_multimodal_semantic_768' as const,
+			canonicalStore: 'postgresql.evidence_multimodal_vectors' as const,
+		}));
+		mocks.processCanonicalVideoAnalysisV1.mockResolvedValue({
+			canonicalReceiptVerified: true,
+			chunkCount: 0,
+			persistedCount: 0,
+			sourceRevision: sourceRevision(Buffer.from('uploaded legal source')),
+			analysisRevision: 'video-analysis-v1:fixture',
+			representationId: 'video-analysis-v1',
+			canonicalStore: 'postgresql.evidence+audio_transcripts+whisper_segments',
+			analysis: { status: 'PARTIAL', transcriptionStatus: 'SKIPPED_NO_AUDIO', transcriptSegmentCount: 0, detectorStatus: 'UNAVAILABLE', frameCount: 0, coverage: 'BOUNDED_SAMPLE_NOT_FULL_VIDEO_COVERAGE' },
 		});
 	});
 
@@ -129,6 +158,7 @@ describe('EvidenceProcessWorker canonical vector path', () => {
 			evidenceId: 'evidence-image',
 			text: 'form placeholder',
 			contentType: 'document',
+			caseId: '00000000-0000-4000-8000-000000000001',
 			metadata: {
 				objectKey: 'evidence/1/image.png',
 				object_bucket: 'legal-evidence',
@@ -144,7 +174,82 @@ describe('EvidenceProcessWorker canonical vector path', () => {
 		expect(mocks.processEvidenceDocumentCanonicalV1).toHaveBeenCalledWith(expect.objectContaining({
 			sourceBytes: bytes,
 			contentType: 'image/png',
+			visualAnalysis: expect.objectContaining({ sourceRevision: digest }),
 		}));
+		expect(mocks.processEvidenceImageCanonicalV1).toHaveBeenCalledWith(expect.objectContaining({
+			evidenceId: 'evidence-image',
+			caseId: '00000000-0000-4000-8000-000000000001',
+			sourceRevision: digest,
+			bytes,
+		}));
+	});
+
+	it('indexes an image with no extracted text through the canonical multimodal vector owner', async () => {
+		const bytes = Buffer.from('image-only bytes');
+		const digest = sourceRevision(bytes);
+		mocks.getSeaweedFile.mockResolvedValue(bytes);
+		mocks.processDocument.mockResolvedValue({ rawText: '', extractionMethod: 'image-no-ocr' });
+		const worker = new EvidenceProcessWorker();
+
+		await expect(worker.processCanonical({
+			evidenceId: 'evidence-image-only',
+			text: 'Queued source file: photo.png',
+			contentType: 'document',
+			caseId: '00000000-0000-4000-8000-000000000002',
+			metadata: {
+				objectKey: 'evidence/1/photo.png',
+				object_bucket: 'legal-evidence',
+				fileName: 'photo.png',
+				fileType: 'image/png',
+				sourceSha256: digest,
+			},
+		})).resolves.toMatchObject({
+			chunkCount: 1,
+			persistedCount: 1,
+			sourceRevision: digest,
+			representationId: 'evidence_multimodal_semantic_768',
+			canonicalStore: 'postgresql.evidence_multimodal_vectors',
+		});
+		expect(mocks.processEvidenceDocumentCanonicalV1).not.toHaveBeenCalled();
+		expect(mocks.processEvidenceImageCanonicalV1).toHaveBeenCalledOnce();
+	});
+
+	it('routes verified video bytes through the durable video stage and skips document extraction', async () => {
+		const bytes = Buffer.from('uploaded legal source');
+		const digest = sourceRevision(bytes);
+		mocks.getSeaweedFile.mockResolvedValue(bytes);
+		const worker = new EvidenceProcessWorker();
+		const stages: string[] = [];
+
+		await expect(worker.processCanonical({
+			evidenceId: 'evidence-video',
+			text: 'Queued source file: security.mp4',
+			caseId: '00000000-0000-4000-8000-000000000003',
+			metadata: {
+				objectKey: 'evidence/1/security.mp4',
+				object_bucket: 'legal-evidence',
+				fileName: 'security.mp4',
+				fileType: 'video/mp4',
+				sourceSha256: digest,
+				uploadedBy: 12,
+				jobId: '00000000-0000-4000-8000-000000000004',
+			},
+		}, (stage) => { stages.push(stage); })).resolves.toMatchObject({
+			canonicalReceiptVerified: true,
+			analysis: { transcriptionStatus: 'SKIPPED_NO_AUDIO' },
+		});
+
+		expect(stages).toEqual(['source_fetch', 'text_extraction', 'content_analysis']);
+		expect(mocks.processCanonicalVideoAnalysisV1).toHaveBeenCalledWith(expect.objectContaining({
+			evidenceId: 'evidence-video',
+			caseId: '00000000-0000-4000-8000-000000000003',
+			analysisJobId: '00000000-0000-4000-8000-000000000004',
+			uploadedBy: 12,
+			sourceRevision: digest,
+			bytes,
+		}));
+		expect(mocks.processDocument).not.toHaveBeenCalled();
+		expect(mocks.processEvidenceDocumentCanonicalV1).not.toHaveBeenCalled();
 	});
 
 	it('fails closed when an object reference has no valid source digest', async () => {

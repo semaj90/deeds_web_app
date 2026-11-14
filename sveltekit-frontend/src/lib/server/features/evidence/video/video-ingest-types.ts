@@ -54,7 +54,17 @@ export interface VideoIngestResult {
   storageUri: string;
   transcriptCount: number;
   summary: string;
-  searchIndexStatus: 'indexed' | 'failed' | 'not_applicable';
+  searchIndexStatus: 'indexed' | 'failed' | 'deferred' | 'not_applicable';
+}
+
+export interface VideoAdmissionResultV1 {
+  ok: true;
+  evidenceId: string;
+  jobId: string;
+  status: 'queued';
+  sourceRevision: string;
+  fileName: string;
+  storageUri: string;
 }
 
 export interface QdrantEvidencePayload {

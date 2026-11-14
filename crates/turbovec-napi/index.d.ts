@@ -52,3 +52,11 @@ export interface TopKResult {
 export declare function hintExactCosineTopk(vectors: Float32Array, queries: Float32Array, dim: number, k: number): TopKResult
 /** Quantized turbovec top-k (challenger). Same layout and return shape as the exact oracle. */
 export declare function hintTurbovecTopk(vectors: Float32Array, queries: Float32Array, dim: number, bits: number, k: number): TopKResult
+/** Computes a 64-bit horizontal gradient dHash (9x8 grayscale) and returns a 16-char lowercase hex string. */
+export declare function computeDhash64(gray9X8: Uint8Array): string
+export interface HammingMatch {
+  index: number
+  distance: number
+}
+/** Hardware POPCNT(A ^ B) + 2-pass LSD radix sort over packed little-endian u64 bitsets (8 bytes per u64 word). */
+export declare function batchHammingSearchTopK(queryWordsLe: Uint8Array, corpusFlatWordsLe: Uint8Array, wordsPerVec: number, topK: number): Array<HammingMatch>

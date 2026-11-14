@@ -27,6 +27,10 @@ import { searchEvidenceVectorsPgvectorV1 } from '../retrieval/pgvector-semantic-
 import { digestSemantic768OutputV1, validateSemantic768OutputV1 } from '$lib/server/atlas/embedding/embedding-runtime-v1.js';
 import {
   assertEvidenceEmbeddingAdmitted,
+  decideEvidenceEmbedding,
+  EVIDENCE_INPUT_RECIPE_REVISION,
+  EVIDENCE_REVISION_SOURCE_FIELD,
+  evidenceInputSha256,
   evidenceQdrantPointId,
   looksLikePseudoVector,
 } from './evidence-embedding-contract.js';
@@ -103,6 +107,43 @@ describe('Evidence embedding E2E database safety gate', () => {
     'postgres://scratch:wrong@127.0.0.1:55441/evidence_e2e_disposable',
   ])('rejects non-disposable target %s before connecting', (databaseUrl) => {
     expect(() => assertDisposableEvidenceDatabaseUrl(databaseUrl)).toThrow(/dedicated evidence_e2e_disposable scratch identity/);
+  });
+
+  it('admits evidence_markup_revision_text sourceField and rejects unknown sourceField values', () => {
+    const content = 'V2 markup revision annotation: red sedan plate visible.';
+    const baseCandidate = {
+      evidenceId: EVIDENCE_ID,
+      sourceRevision: `sha256:${'a'.repeat(64)}`,
+      chunkIndex: 0,
+      content,
+      vector: deterministicUnitVector(content),
+      provenance: {
+        modelArtifactSha256: `sha256:${ARTIFACT_SHA}`,
+        modelReceipt: {
+          provider: 'llama-server' as const,
+          artifactIdentityBound: true,
+          dimensionBound: true,
+          runtimeReady: true,
+        },
+        inputRecipeRevision: EVIDENCE_INPUT_RECIPE_REVISION,
+        inputSha256: evidenceInputSha256(content),
+      },
+    };
+
+    const admitted = assertEvidenceEmbeddingAdmitted({
+      ...baseCandidate,
+      sourceField: EVIDENCE_REVISION_SOURCE_FIELD,
+    });
+    expect(admitted.sourceField).toBe('evidence_markup_revision_text');
+
+    const rejected = decideEvidenceEmbedding({
+      ...baseCandidate,
+      sourceField: 'unapproved_custom_field',
+    });
+    expect(rejected).toEqual({
+      ok: false,
+      reasons: ['SOURCE_FIELD_INVALID'],
+    });
   });
 });
 const SOURCE_REVISION = `sha256:${'a'.repeat(64)}`;

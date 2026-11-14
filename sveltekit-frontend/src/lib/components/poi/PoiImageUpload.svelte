@@ -8,6 +8,16 @@
 
 	let uploading = $state(false);
 	let error = $state<string | null>(null);
+	/** What happened to the photo beyond being saved: whether it joined the case evidence. */
+	let notice = $state<string | null>(null);
+
+	const EVIDENCE_NOTICES: Record<string, string> = {
+		queued: 'Photo saved and added to the case evidence. Analysis is queued.',
+		already_registered: 'Photo saved. It was already in the case evidence.',
+		no_case: 'Photo saved. This person is not linked to a case, so it was not added to case evidence.',
+		case_not_accessible: 'Photo saved, but you do not have access to the linked case, so it was not added to case evidence.',
+		failed: 'Photo saved, but it could not be added to the case evidence.',
+	};
 	let dragOver = $state(false);
 	let fileInput = $state<HTMLInputElement | null>(null);
 
@@ -29,6 +39,7 @@
 		}
 
 		error = null;
+		notice = null;
 		uploading = true;
 		try {
 			const formData = new FormData();
@@ -45,6 +56,7 @@
 			}
 
 			const payload = await res.json();
+			notice = EVIDENCE_NOTICES[payload?.evidenceLink?.status] ?? 'Photo saved.';
 			onuploaded?.(payload.photo ?? payload.data ?? payload);
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Upload failed';
@@ -107,11 +119,20 @@
 	{/if}
 
 	{#if error}
-		<p class="upload-error">{error}</p>
+		<p class="upload-error" role="alert">{error}</p>
+	{/if}
+	{#if notice && !error}
+		<p class="upload-notice" role="status">{notice}</p>
 	{/if}
 </div>
 
 <style>
+	.upload-notice {
+		margin: 0.75rem 0 0;
+		font-size: 0.8125rem;
+		font-weight: 500;
+		color: #166534;
+	}
 	.poi-upload {
 		padding: 1.5rem;
 		border: 2px dashed rgba(212, 199, 163, 0.3);

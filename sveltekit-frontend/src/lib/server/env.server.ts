@@ -191,6 +191,7 @@ export const ENV = Object.freeze({
   // 'ollama' (correct, for the unrelated /api/embed auto-DirectML-suppression
   // use in embedding-provider-v1.ts). See docs/reports/emb-prov-01-embedding-provenance-receipt.json.
   EMBEDDING_STRICT_BASE_URL: privateEnv.EMBEDDING_STRICT_BASE_URL ?? 'http://127.0.0.1:8081',
+  ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR: privateEnv.ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR,
   // EMBED-PROVIDER-CONVERGENCE-01: compatibility input only, consumed
   // exclusively by resolveEmbeddingProviderV1() (embedding-provider-v1.ts).
   // No other module should read this directly.

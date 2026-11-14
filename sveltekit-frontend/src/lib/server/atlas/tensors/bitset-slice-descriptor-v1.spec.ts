@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   assertBitsetSliceBindingV1,
   BitsetSliceDescriptorV1Schema,
+  convertPackedBitOrderV1,
   verifyBitsetSliceBytesV1,
   type BitsetSliceDescriptorV1,
 } from './bitset-slice-descriptor-v1.js';
@@ -118,5 +119,24 @@ describe('BitsetSliceDescriptorV1', () => {
       representationRevision: revision('f'),
       ordinalMapChecksum: value.ordinalMapChecksum,
     })).toThrow('BITSET_SLICE_BINDING_MISMATCH:representationRevision');
+  });
+
+  it('converts TurboVec MSB0 bytes to Atlas LSB0 without changing logical indices', () => {
+    const msb0 = new Uint8Array(16);
+    msb0[0] = 0b1000_0001; // bits 0 and 7
+    msb0[1] = 0b1000_0000; // bit 8
+    msb0[15] = 0b0000_0001; // bit 127
+    const lsb0 = convertPackedBitOrderV1(msb0, 128, 'MSB0', 'LSB0');
+    expect(Array.from(lsb0)).toEqual(expect.arrayContaining([0b1000_0001, 0b0000_0001]));
+    expect(lsb0[0]).toBe(0b1000_0001);
+    expect(lsb0[1]).toBe(0b0000_0001);
+    expect(lsb0[15]).toBe(0b1000_0000);
+    expect(convertPackedBitOrderV1(lsb0, 128, 'LSB0', 'MSB0')).toEqual(msb0);
+    expect(lsb0).not.toBe(msb0);
+  });
+
+  it('rejects nonzero tail padding in either bit order', () => {
+    expect(() => convertPackedBitOrderV1(Uint8Array.of(0b0000_0001), 1, 'MSB0', 'LSB0')).toThrow('BIT_ORDER_NONZERO_PADDING');
+    expect(() => convertPackedBitOrderV1(Uint8Array.of(0b1000_0000), 1, 'LSB0', 'MSB0')).toThrow('BIT_ORDER_NONZERO_PADDING');
   });
 });

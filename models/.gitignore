@@ -28,3 +28,6 @@
 
 # Vision projectors: the only live one is the Ornith 1.5 mmproj (llama-server :8090 vlm profile).
 mmproj*.gguf
+
+# EmbeddingGemma 2 Q8 ONNX export (pinned in embeddinggemma2-onnx-image-v1.ts): local weights, tokenizer and configs.
+/embeddinggemma2/onnx-q8/

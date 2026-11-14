@@ -122,7 +122,7 @@
 	<title>Legal Corpus Premium Preview</title>
 </svelte:head>
 
-<div class="showcase-shell">
+<div class="showcase-shell legal-corpus-navy">
 	<div class="browser-frame">
 		<div class="browser-chrome">
 			<div class="browser-leading">

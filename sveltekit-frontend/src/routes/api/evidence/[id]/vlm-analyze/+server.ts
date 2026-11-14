@@ -5,6 +5,7 @@
  * the 3-tier VLM pipeline (Triton → TurboQuant → Ollama).
  */
 import { json } from '@sveltejs/kit';
+import crypto from 'node:crypto';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
@@ -14,6 +15,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
 import { getVlmState, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
+import { createYOLOService, type YOLOResult } from '$lib/server/yolo.js';
 
 const EVIDENCE_BUCKET = ENV.SEAWEED_EVIDENCE_BUCKET;
 
@@ -41,19 +43,6 @@ function extractObjectKey(fileUrl: string): { bucket: string; key: string } | nu
 export const POST: RequestHandler = async ({ params, locals, request }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-  // Vision analysis requires mmproj — reject early if lifecycle is not in VISION mode
-  const vlmState = await getVlmState();
-  if (vlmState !== VlmMode.VISION) {
-    return json(
-      {
-        error: 'VLM not in VISION mode',
-        currentMode: vlmState,
-        hint: 'POST /api/vlm/switch-mode {"mode":"VISION"} then retry',
-      },
-      { status: 503 },
-    );
-  }
-
   const evidenceId = params.id;
   if (!isUuid(evidenceId)) return json({ error: 'Invalid evidence ID' }, { status: 400 });
 
@@ -65,6 +54,7 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
       fileName: evidence.fileName,
       mimeType: evidence.mimeType,
       title: evidence.title,
+      hash: evidence.hash,
     })
     .from(evidence)
     .leftJoin(cases, eq(evidence.caseId, cases.id))
@@ -82,6 +72,9 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
     .limit(1);
 
   if (!row) return json({ error: 'Evidence not found' }, { status: 404 });
+
+  const mimeType = (row.mimeType ?? '').split(';', 1)[0].trim().toLowerCase();
+  if (!mimeType.startsWith('image/')) return json({ error: 'Evidence is not an image' }, { status: 415 });
 
   const fileUrl = row.fileUrl ?? row.fileName;
   if (!fileUrl) return json({ error: 'No file associated with this evidence' }, { status: 400 });
@@ -112,30 +105,93 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 
   try {
     const buffer = await getFile(parsed.bucket, parsed.key);
+	const sourceHash = crypto.createHash('sha256').update(buffer).digest('hex');
+	const expectedHash = String(row.hash ?? '').replace(/^sha256:/i, '').toLowerCase();
+	if (/^[a-f0-9]{64}$/.test(expectedHash) && expectedHash !== sourceHash) {
+		return json({ error: 'Stored evidence bytes do not match the admitted source hash', code: 'SOURCE_HASH_MISMATCH' }, { status: 409 });
+	}
 
-    const { analyzeEvidenceImage } = await import('$lib/server/analysis/vlm-evidence-analyzer.js');
+	const boxes: Array<{ x: number; y: number; w: number; h: number; label: string; conf: number }> = [];
+	let detectorStatus: 'completed' | 'unavailable' | 'failed' = 'unavailable';
+	let detectorWarning: string | null = null;
+	try {
+		const detector = createYOLOService();
+		if (await detector.isModelAvailable()) {
+			const detected: YOLOResult = await detector.analyzeDocument(buffer, row.fileName ?? row.title ?? 'evidence-image');
+			for (const object of detected.objects ?? []) {
+				const [x1, y1, x2, y2] = object.bbox;
+				if ([x1, y1, x2, y2, object.confidence].every(Number.isFinite) && x2 > x1 && y2 > y1) {
+					boxes.push({ x: x1, y: y1, w: x2 - x1, h: y2 - y1, label: object.class, conf: object.confidence });
+				}
+			}
+			for (const region of detected.layout?.regions ?? []) {
+				const [x1, y1, x2, y2] = region.bbox;
+				if ([x1, y1, x2, y2, region.confidence].every(Number.isFinite) && x2 > x1 && y2 > y1) {
+					boxes.push({ x: x1, y: y1, w: x2 - x1, h: y2 - y1, label: region.type, conf: region.confidence });
+				}
+			}
+			detectorStatus = 'completed';
+		} else {
+			detectorWarning = 'No supported object-detection model is installed; visual description may still be available.';
+		}
+	} catch (error) {
+		detectorStatus = 'failed';
+		detectorWarning = error instanceof Error ? error.message.slice(0, 300) : 'Object detection failed';
+	}
 
-    const result = await analyzeEvidenceImage({
-      buffer,
-      fileName: row.fileName ?? row.title ?? 'evidence',
-      detectionContext,
-      promptOverride,
-      skipCache,
-    });
+	let vlmStatus: 'completed' | 'unavailable' | 'failed' = 'unavailable';
+	let analysis = { summary: '', keyFindings: [] as string[], suggestedTags: [] as string[] };
+	let vlmWarning: string | null = null;
+	let vlmState: VlmMode | null = null;
+	try { vlmState = await getVlmState(); } catch { vlmWarning = 'Vision model status is unavailable.'; }
+	if (vlmState === VlmMode.VISION) {
+		try {
+			const { analyzeEvidenceImage } = await import('$lib/server/analysis/vlm-evidence-analyzer.js');
+			const result = await analyzeEvidenceImage({
+				buffer,
+				fileName: row.fileName ?? row.title ?? 'evidence',
+				detectionContext: detectionContext ?? (boxes.map((box) => `${box.label} (${Math.round(box.conf * 100)}%)`).join(', ') || undefined),
+				promptOverride,
+				skipCache,
+			});
+			analysis = { summary: result.summary, keyFindings: result.keyFindings, suggestedTags: result.suggestedTags };
+			vlmStatus = 'completed';
+		} catch (error) {
+			vlmStatus = 'failed';
+			vlmWarning = error instanceof Error ? error.message.slice(0, 300) : 'Visual analysis failed';
+		}
+	} else if (!vlmWarning) {
+		vlmWarning = `Vision model is not ready (current mode: ${vlmState ?? 'unknown'}). Object detection can still be used when its model is available.`;
+	}
+
+	const result = {
+		...analysis,
+		sourceRevision: `sha256:${sourceHash}`,
+		objectDetections: boxes,
+		detectorStatus,
+		vlmStatus,
+		warnings: [detectorWarning, vlmWarning].filter((value): value is string => Boolean(value)),
+	};
 
     // Persist AI analysis to evidence record
-    await db
+    let updateQuery = db
       .update(evidence)
       .set({
         aiAnalysis: result as unknown as Record<string, unknown>,
         aiTags: result.suggestedTags,
         aiSummary: result.summary,
         updatedAt: new Date(),
-      })
-      .where(eq(evidence.id, evidenceId))
+      });
+    // Fence the derived write to the exact source revision analyzed above.
+    // If the source changed after the read, don't attach stale results to it.
+    const updateCondition = /^[a-f0-9]{64}$/.test(expectedHash)
+      ? and(eq(evidence.id, evidenceId), eq(evidence.hash, row.hash))
+      : eq(evidence.id, evidenceId);
+    await updateQuery
+      .where(updateCondition)
       .catch((err) => console.warn('[VLM] DB update failed:', err));
 
-    return json({ success: true, analysis: result });
+    return json({ success: true, analysis: result, boxes, sourceRevision: result.sourceRevision, detectorStatus, vlmStatus, warnings: result.warnings });
   } catch (err) {
     console.error('[VLM] Evidence analysis failed:', err);
     return json({ error: 'VLM analysis failed' }, { status: 500 });

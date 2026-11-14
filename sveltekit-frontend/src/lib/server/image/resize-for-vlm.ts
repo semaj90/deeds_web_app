@@ -42,10 +42,14 @@ export interface ResizeResult {
  */
 export async function resizeForVLM(input: Buffer): Promise<ResizeResult> {
 	const meta = await sharp(input).metadata();
-	const w = meta.width ?? 0;
-	const h = meta.height ?? 0;
+	const rawWidth = meta.width ?? 0;
+	const rawHeight = meta.height ?? 0;
+	const exifRotatesAxes = meta.orientation !== undefined && meta.orientation >= 5 && meta.orientation <= 8;
+	const w = exifRotatesAxes ? rawHeight : rawWidth;
+	const h = exifRotatesAxes ? rawWidth : rawHeight;
 
-	const alreadyFits = w <= GEMMA4_VLM_MAX_EDGE && h <= GEMMA4_VLM_MAX_EDGE;
+	const orientationIsCanonical = meta.orientation === undefined || meta.orientation === 1;
+	const alreadyFits = w <= GEMMA4_VLM_MAX_EDGE && h <= GEMMA4_VLM_MAX_EDGE && orientationIsCanonical;
 	const isJpeg = meta.format === 'jpeg';
 
 	if (alreadyFits && isJpeg) {
@@ -59,6 +63,7 @@ export async function resizeForVLM(input: Buffer): Promise<ResizeResult> {
 	}
 
 	const buffer = await sharp(input)
+		.rotate()
 		.resize(GEMMA4_VLM_MAX_EDGE, GEMMA4_VLM_MAX_EDGE, {
 			fit: 'contain',
 			background: { r: 127, g: 127, b: 127, alpha: 1 },

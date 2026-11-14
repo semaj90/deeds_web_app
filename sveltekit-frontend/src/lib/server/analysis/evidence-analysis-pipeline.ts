@@ -33,7 +33,109 @@ export interface LLMSynthesis {
 	triples?: Array<{ subject: string; predicate: string; object: string; context?: string }>;
 }
 
+export type EvidenceDetectorSource = 'service' | 'local' | 'cache' | 'none';
+
+export interface EvidenceDetectionOutcome {
+	result: YOLOResult | null;
+	source: Exclude<EvidenceDetectorSource, 'cache'>;
+	/** Why each detector that was tried did not produce a result. Empty on first-try success. */
+	errors: string[];
+}
+
+export interface EvidenceDetectionDeps {
+	/** Base URL of the docling-vlm detection service, or undefined when not configured. */
+	serviceUrl(): string | undefined;
+	detectViaService(buffer: Buffer): Promise<{
+		detections: Array<{ class: string; confidence: number; bbox: number[] }>;
+	}>;
+	localAvailable(): Promise<boolean>;
+	detectLocal(buffer: Buffer, fileName: string): Promise<YOLOResult>;
+}
+
+const defaultDetectionDeps: EvidenceDetectionDeps = {
+	serviceUrl: () => process.env.DOCLING_SERVICE_URL?.trim() || undefined,
+	detectViaService: async (buffer) => {
+		const { detectObjectsInImage } = await import('$lib/server/docling.js');
+		return detectObjectsInImage(buffer, 'application/octet-stream');
+	},
+	localAvailable: async () => {
+		const { createYOLOService } = await import('$lib/server/yolo.js');
+		return createYOLOService().isModelAvailable();
+	},
+	detectLocal: async (buffer, fileName) => {
+		const { createYOLOService } = await import('$lib/server/yolo.js');
+		return createYOLOService().analyzeDocument(buffer, fileName);
+	},
+};
+
+function shortError(error: unknown): string {
+	return (error instanceof Error ? error.message : String(error)).slice(0, 200);
+}
+
+/**
+ * Object detection for one evidence image.
+ * Order: docling-vlm service (YOLOX) when DOCLING_SERVICE_URL is set, then the
+ * local ONNX script. When neither produces a result the outcome says why;
+ * it never reports an empty detection list as if a detector had run.
+ */
+export async function detectEvidenceObjects(
+	buffer: Buffer,
+	fileName: string,
+	deps: EvidenceDetectionDeps = defaultDetectionDeps
+): Promise<EvidenceDetectionOutcome> {
+	const errors: string[] = [];
+	const started = Date.now();
+
+	if (deps.serviceUrl()) {
+		try {
+			const response = await deps.detectViaService(buffer);
+			if (!Array.isArray(response?.detections)) throw new Error('SERVICE_RESPONSE_INVALID');
+			const objects = response.detections.filter(
+				(d) =>
+					typeof d?.class === 'string' &&
+					d.class.length > 0 &&
+					Number.isFinite(d.confidence) &&
+					d.confidence >= 0 &&
+					d.confidence <= 1 &&
+					Array.isArray(d.bbox) &&
+					d.bbox.length === 4 &&
+					d.bbox.every((n) => Number.isFinite(n))
+			);
+			if (objects.length !== response.detections.length) throw new Error('SERVICE_DETECTION_INVALID');
+			return {
+				result: {
+					text: '',
+					layout: { regions: [] },
+					objects,
+					processingTime: Date.now() - started,
+					method: 'yolo',
+					modelType: 'coco',
+				},
+				source: 'service',
+				errors,
+			};
+		} catch (err) {
+			errors.push(`service:${shortError(err)}`);
+		}
+	} else {
+		errors.push('service:DOCLING_SERVICE_URL_NOT_CONFIGURED');
+	}
+
+	try {
+		if (await deps.localAvailable()) {
+			return { result: await deps.detectLocal(buffer, fileName), source: 'local', errors };
+		}
+		errors.push('local:PYTHON_ONNXRUNTIME_OR_MODEL_UNAVAILABLE');
+	} catch (err) {
+		errors.push(`local:${shortError(err)}`);
+	}
+
+	return { result: null, source: 'none', errors };
+}
+
 export interface AnalysisPipelineResult {
+	/** Which detector produced `yolo`, and why others did not. */
+	detector?: { source: EvidenceDetectorSource; errors: string[] };
 	yolo: YOLOResult | null;
 	yoloCacheHit: boolean;
 	llmSynthesis: LLMSynthesis | null;
@@ -72,6 +174,7 @@ export async function runEvidenceAnalysisPipeline(
 
 	let yoloResult: YOLOResult | null = null;
 	let yoloCacheHit = false;
+	let detector: { source: EvidenceDetectorSource; errors: string[] } = { source: 'none', errors: [] };
 	let llmSynthesis: LLMSynthesis | null = null;
 	let llmEscalated = false;
 	let graphConnectionsCreated = 0;
@@ -86,19 +189,23 @@ export async function runEvidenceAnalysisPipeline(
 			yoloResult = cached;
 			yoloCacheHit = true;
 			console.log(`[AnalysisPipeline] YOLO cache HIT for ${input.fileName} (${hash.slice(0, 8)})`);
+			detector = { source: 'cache', errors: [] };
 		} else {
-			const { createYOLOService } = await import('$lib/server/yolo.js');
-			const yolo = createYOLOService();
-			if (await yolo.isModelAvailable()) {
-				yoloResult = await yolo.analyzeDocument(input.buffer, input.fileName);
+			const outcome = await detectEvidenceObjects(input.buffer, input.fileName);
+			detector = { source: outcome.source, errors: outcome.errors };
+			if (outcome.result) {
+				yoloResult = outcome.result;
 				await setYoloCache(hash, yoloResult);
 				console.log(
-					`[AnalysisPipeline] YOLO: ${yoloResult.objects.length} objects, ${yoloResult.layout.regions.length} regions (${yoloResult.processingTime}ms)`
+					`[AnalysisPipeline] Detection (${outcome.source}): ${yoloResult.objects.length} objects, ${yoloResult.layout.regions.length} regions (${yoloResult.processingTime}ms)`
 				);
+			} else {
+				console.warn(`[AnalysisPipeline] No detector available: ${outcome.errors.join('; ')}`);
 			}
 		}
 	} catch (err) {
-		console.warn('[AnalysisPipeline] YOLO stage failed (non-fatal):', err);
+		detector = { source: 'none', errors: [`pipeline:${shortError(err)}`] };
+		console.warn('[AnalysisPipeline] Detection stage failed (non-fatal):', err);
 	}
 
 	// Collect tags from YOLO
@@ -181,6 +288,7 @@ export async function runEvidenceAnalysisPipeline(
 	}
 
 	return {
+		detector,
 		yolo: yoloResult,
 		yoloCacheHit,
 		llmSynthesis,

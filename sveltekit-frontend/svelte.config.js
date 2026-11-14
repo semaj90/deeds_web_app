@@ -18,9 +18,6 @@ const suppressedWarnings = new Set([
 const config = {
   compilerOptions: {
     runes: true,
-    compatibility: {
-      componentApi: 4,
-    },
   },
   // Use svelte-preprocess for safe defaults (TypeScript, PostCSS, scss, etc.)
   preprocess: vitePreprocess(),
@@ -41,16 +38,10 @@ const config = {
   vitePlugin: {
     inspector: false,
     dynamicCompileOptions({ filename }) {
-      // Svelte 4 legacy packages (lucide-svelte uses $$props) need runes disabled.
-      // svelte-sonner and bits-ui use $props() runes and must NOT be overridden.
-      // @sveltejs/kit's default layout (svelte-5/layout.svelte) also uses $props(); compiled with runes:false it throws
-      // "props is not defined" on routes whose layout level has a +layout.ts but no +layout.svelte (e.g. /demos/*).
-      if (
-        filename.includes('node_modules') &&
-        !filename.includes('svelte-sonner') &&
-        !filename.includes('bits-ui') &&
-        !filename.includes('@sveltejs/kit')
-      ) {
+      // lucide-svelte is the only known dependency here that needs the Svelte 4 $$props behavior.
+      // Keep every other dependency, especially Bits UI and SvelteKit internals, on Svelte 5 runes.
+      const normalizedFilename = filename.replace(/\\/g, '/');
+      if (normalizedFilename.includes('/node_modules/lucide-svelte/')) {
         return { runes: false };
       }
     },

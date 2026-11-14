@@ -87,7 +87,7 @@ const DOMAINS = {
   ],
   'evidence-imaging': [
     'evidence.image_feedback', 'evidence.link_image_graph', 'evidence.search_by_image',
-    'image.caption', 'image.enrich_tags', 'image.search_by_text'
+    'image.caption', 'image.detect_objects', 'image.enrich_tags', 'image.search_by_text'
   ],
   'tracing-diagnostics': [
     'trace.explain_retrieval', 'trace.validate_ace_hit', 'trace.system_health',

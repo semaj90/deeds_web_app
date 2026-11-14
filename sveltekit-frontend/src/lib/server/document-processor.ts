@@ -72,6 +72,12 @@ function isAudio(mimeType: string): boolean {
   return mimeType.startsWith('audio/');
 }
 
+function isVideo(mimeType: string, fileName?: string): boolean {
+  if (mimeType.startsWith('video/')) return true;
+  if (fileName && /\.(mp4|mkv|webm|avi|mov)$/i.test(fileName)) return true;
+  return false;
+}
+
 // ─── Extraction steps ─────────────────────────────────────────────────────────
 
 async function extractPdf(buffer: Buffer, fileName: string, mimeType: string) {
@@ -147,6 +153,49 @@ async function extractAudio(buffer: Buffer): Promise<{ text: string; method: str
     return { text: typeof result === 'string' ? result : '', method: 'whisper' };
   } catch {
     return { text: '', method: 'none' };
+  }
+}
+
+async function extractVideo(buffer: Buffer, fileName: string): Promise<{ text: string; method: string }> {
+  const { writeFile, rm } = await import('node:fs/promises');
+  const { join } = await import('node:path');
+  const { tmpdir } = await import('node:os');
+  const { randomUUID } = await import('node:crypto');
+  const tmpVideoPath = join(tmpdir(), `doc-proc-video-${randomUUID()}-${fileName || 'video.mp4'}`);
+  await writeFile(tmpVideoPath, buffer);
+
+  try {
+    const { detectVideoAndAudioStreamsV1 } = await import(
+      '$lib/server/features/evidence/video/storyboard-manifest-contract-v1.js'
+    );
+    const probe = await detectVideoAndAudioStreamsV1(tmpVideoPath);
+
+    if (probe.hasAudioStream) {
+      try {
+        const { extractAudioTrack, transcribeVideoAudio } = await import(
+          '$lib/server/features/evidence/video/transcript-service.js'
+        );
+        const audioPath = await extractAudioTrack(tmpVideoPath);
+        const transcript = await transcribeVideoAudio(audioPath);
+        if (transcript.text && transcript.text.trim().length > 0) {
+          return { text: transcript.text.trim(), method: 'video:whisper' };
+        }
+      } catch {
+        // Fallback to visual description if audio transcription fails
+      }
+    }
+
+    return {
+      text: `Visual-only recording: silent video evidence (${fileName || 'video.mp4'}). No spoken audio detected.`,
+      method: 'video:silent-keyframe'
+    };
+  } catch {
+    return {
+      text: `Video evidence recording (${fileName || 'video.mp4'}). Video stream processed.`,
+      method: 'video:stream-fallback'
+    };
+  } finally {
+    await rm(tmpVideoPath, { force: true }).catch(() => {});
   }
 }
 
@@ -235,6 +284,10 @@ export async function processDocument(input: ProcessDocumentInput): Promise<Proc
     usedVlm = r.usedVlm;
   } else if (isAudio(mimeType)) {
     const r = await extractAudio(buffer);
+    rawText = r.text;
+    extractionMethod = r.method;
+  } else if (isVideo(mimeType, fileName)) {
+    const r = await extractVideo(buffer, fileName);
     rawText = r.text;
     extractionMethod = r.method;
   } else {

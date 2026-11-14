@@ -289,3 +289,87 @@ These equations and layouts are design candidates for implementation review, not
 - [ ] Reconcile the existing PyTorch/gRPC request and response contracts before adding fields or message types. Reuse the canonical authorization context and request-ID/idempotency owner; enforce actor/case/grant/source revisions, deadlines, cancellation, bounded queues and maximum blob size. Prove CPU worker parity first; RTX admission remains a separate existing gate.
 - [ ] Add an integrity regression for any low-rank/tensor synthesis script: if it binds verified real vectors, the output must preserve or explicitly transform those vectors according to the declared algorithm and produce a checksum/readback receipt. Synthetic/hash-derived vectors must be fixture-only and labeled; a script that validates real input then overwrites its output with synthetic vectors fails the gate even if it compiles or emits a receipt.
 - [ ] Do not add packet tables, shader registries, or new cache namespaces until the existing PostgreSQL 18, evidence-vector, protobuf, and registry owners are reconciled and a measured workload proves the need. Any future DDL remains additive, Drizzle-owned, disposable-database rehearsed, and rollback-proven before separate live admission.
+
+### Addendum to section 16: two-stage video slice (Stage 1 frame/YOLO/readback/seek -> Stage 2 multimodal EmbeddingGemma 2 & Qdrant projection) (2026-11-13)
+This checklist captures the remaining integration gaps between existing in-repo contracts/models (`filmcraft-cli-adapter-v1.ts`, `atlas-video-wasm-v1.ts`, `packages/atlas-video-wasm`, `dhash-keyframe-filter-v1.ts`, `crates/turbovec-napi`, `yolo.ts`, `N64TextureLODSystem.ts`, `granite-docling-258M`, `models/embeddinggemma_300m`, `longform-video-speaker-ledger-v1.ts`, `multimodal-spatial-upload-contract-v1.ts`, `video-frame-detection-slice-v1.ts`) and live end-to-end execution. Browser frame-preview WASM (`packages/atlas-video-wasm` -> `sveltekit-frontend/static/wasm/atlas-video-wasm.wasm`, `15,686 bytes`) is `TEST_PROVEN` for local preview only (`EvidenceViewModal.svelte:513-531`). No new task-ID family or parallel registry is introduced; all items below remain unchecked (`OPEN`) until independently wired, tested, and live-proven.
+
+- [ ] **Stage 1A (Leased Video Worker & `ffprobe` Gate):** Move `sveltekit-frontend/src/lib/server/features/evidence/video/video-ingest-service.ts` off the inline upload HTTP path onto the leased PostgreSQL `analysis_jobs` (`upload_pipeline`) durable worker (`analysis-upload-pipeline-v1.ts` / `worker.ts`). Recheck case authorization and `sourceRevision` (`sha256:<64hex>`), inspect media via `ffprobe` (`hasAudioStream`, duration, dimensions, and `FILMCRAFT_TICKS_PER_SECOND_V1 = 254_016_000_000` tick mapping from `filmcraft-cli-adapter-v1.ts`) with a 15-second `AbortSignal` timeout before calling `extractAudioTrack()` in `transcript-service.ts`, and pass `ENV.WHISPER_PATH` with a bounded timeout so silent CCTV/dashcam MP4s skip Whisper gracefully and proceed to frame sampling.
+- [ ] **Stage 1B (FFmpeg 768px Frame Sampling + `9x8` dHash Deduplication + SeaweedFS):** Wire `sveltekit-frontend/src/lib/server/evidence/video/vision-service.ts` (`extractFrames` at `768px` width and `extractSceneCutDhashes` using FFmpeg `9x8` grayscale `RAW_GRAY9X8_FRAME_BYTES_V1 = 72` + `dhash-keyframe-filter-v1.ts` + `crates/turbovec-napi` `computeDhash64` / `batchHammingSearchTopK`) into the leased worker to store bounded selected frame derivatives (`<= 32`) in SeaweedFS (`evidence_media_assets` + `evidence_frames.storage_uri`) with exact `timestampMs` and `sourceRevision`. Treat `9x8` dHash strictly as a deduplication/scene-cut clue, never object detection or proof.
+- [ ] **Stage 1C (YOLO `640x640` Detections with Aspect-Ratio Check -> PostgreSQL `evidence_frames` Readback -> Authorized Viewer Seek):** Run `sveltekit-frontend/src/lib/server/yolo.ts` (`640x640` ONNX resize via OpenCV/Pillow) on selected keyframes using verified aspect-ratio/letterbox coordinate mapping (`video-frame-detection-slice-v1.ts`) back to source frame dimensions; keep COCO labels such as `'person'` strictly non-identifying (`identifiesPerson: false`). Commit timestamped detections and frame metadata to `evidence_frames` (`timestamp_ms`, `storage_uri`, `objects_json`, `tags_json`) and `evidence_media_assets`, verify PostgreSQL + SeaweedFS readback, fix the undefined `isScene` reference in `sveltekit-frontend/src/lib/components/evidence/EvidenceViewModal.svelte:718`, and wire authorized viewer seek to the cited frame/timecode before adding multimodal embeddings.
+- [ ] **Stage 1D (`granite-docling-258M` & VLM Keyframe OCR/Captioning):** Connect local `ibm-granite/granite-docling-258M` (`granite-docling-258M/model.safetensors`, Apache-2.0, `SigLIP2` `512x512` DocTags parser in `sveltekit-frontend/src/lib/server/analysis/granite-docling.ts`) and VLM frame analysis (`vision-service.ts`, gated behind the existing GPU resource policy) to selected `evidence_frames` rows for badge/timestamp/signage OCR (`ocr_text`) and captioning (`caption`) within the 8,000-token VLM budget.
+- [ ] **Stage 2A (Reconcile Text-Only `evidence_vectors` / Outbox Schema Before Multimodal Frame Embeddings):** Do NOT write image or video-frame vectors into `evidence_vectors` or `evidence_vector_projection_outbox` unchanged — `sveltekit-frontend/src/lib/server/db/schema-postgres.ts:1500-1501,1539` and `evidence-embedding-contract.ts` enforce text-only CHECK constraints (`embedding_type = 'evidence_text_semantic_768'`, `source_field = 'canonical_evidence_text'`, `projection_lane = 'evidence_semantic_768'`). Reconcile Drizzle schema and disposable PostgreSQL 18 rollback migrations first to add a separately identified multimodal representation (`embedding_type`, `source_field`, `projection_lane`, preprocessing recipe revision, and frame/window time references), and use EmbeddingGemma 2's own image preprocessing and 8,192-token combined budget settings (~58 raw frames consume the full budget by themselves) rather than assuming `resizeForVLM`'s `2048px` Sharp resize applies to embeddings.
+- [ ] **Stage 2B (Qdrant 1.20 `TurboQuant` vs. Repo `TurboVec` Challenger Benchmark & Storage Boundaries):** After Stage 2A's PostgreSQL commit/outbox -> Qdrant idempotent sync is proven, benchmark Qdrant 1.20's built-in quantization (`TurboQuant` / scalar / binary) against the repo's `TurboVec` challenger (`crates/turbovec-napi`, `turbovec-contract.ts`) on the same authorized candidate set using a measured Recall@K/MRR/latency fixture before enabling either for production. Keep CSR graphs strictly for relationships between evidence, frames, detections, and entities; store frames/thumbnails in SeaweedFS; keep Valkey limited to revision-keyed progress or small retrieval metadata; and keep Parquet strictly for offline analytics/export.
+- [ ] **Stage 2C (N64 4KB LOD Streaming, Labeled Upscale Boundary & Spatial Upload Wiring):** Connect `sharp` Lanczos3 resizing (`sveltekit-frontend/src/routes/api/evidence/[id]/upscale/+server.ts`, `evidence-image-tools.ts`) with `sveltekit-frontend/src/lib/webgpu/N64TextureLODSystem.ts` (`4 KB` `TMEM_SIZE` pages) and `sveltekit-frontend/src/lib/webgpu/mbvh4-accelerator.ts` (`lodTier` `0..3`), keeping any learned super-resolution labeled `HYPOTHESIS` and excluded from exhibit export (`SCENE-15`), and wire `multimodal-spatial-upload-contract-v1.ts` into `analysis-upload-pipeline-v1.ts` and `evidence-process-payload-v1.ts`.
+
+### Pointer: Stage 2 facts and next steps moved (2026-11-13)
+- Evidence-upload / image-video analysis status, Qdrant 1.20 TurboQuant and EmbeddingGemma 2 facts, and the ordered handoff now live in `openspec/changes/evidence-analysis-bdd-pipeline/tasks.md` ("Handoff — next steps"). This file is the courtroom-simulation lane; keep one status copy.
+
+### Addendum: authorized image/video findings browser acceptance
+- [ ] **17B.12 (Signed-in, case-bound source-context Playwright acceptance):** Implement the acceptance contract in `sveltekit-frontend/tests/e2e/evidence-findings-source-context.spec.ts` using an explicit authenticated `PW_EVIDENCE_STORAGE_STATE`, case ID, image/video evidence IDs, immutable source revisions, and video finding time. Prove the existing case board opens the selected original source and that durable findings load beside it; selecting an image finding must show a source-coordinate region plus model/preprocessing revisions, and selecting a video finding must seek the player to its source time while retaining revision and unreviewed-proposal state. Use `sveltekit-frontend/playwright.evidence-findings.config.ts` (no global setup or seeding). Keep this task open until the required finding/sidebar UI is wired and the test passes against an authorized disposable case with independent source/result readback; a skipped or mocked run is not proof.
+
+## 17. BDD Evidence Analysis Matrix (56 Scenarios across 4 Feature Suites)
+This matrix connects the 56 executable BDD scenario declarations in `sveltekit-frontend/tests/bdd/features/` directly to verification requirements, preventing drift between acceptance tests and pipeline execution.
+
+### Suite 17A: Durable Media Processing (`media-analysis-durable-pipeline.feature`, 18 scenarios)
+- [ ] 17A.1: Admission records verified source before analysis starts (`media-analysis-durable-pipeline.feature:10-20`).
+- [ ] 17A.2: Repeating admission request with idempotency key does not create duplicate evidence/jobs (`media-analysis-durable-pipeline.feature:21-26`).
+- [ ] 17A.3: Cross-case upload rejected before storage or processing (`media-analysis-durable-pipeline.feature:27-32`).
+- [ ] 17A.4: Worker rechecks authorization and source revision when claiming job (`media-analysis-durable-pipeline.feature:33-39`).
+- [ ] 17A.5: Media probe has bounded time and handles malformed input (`media-analysis-durable-pipeline.feature:40-46`).
+- [ ] 17A.6: Silent video skips audio extraction and continues visual analysis (`media-analysis-durable-pipeline.feature:47-53`).
+- [ ] 17A.7: Audio-bearing video produces source-timed transcript segments (`media-analysis-durable-pipeline.feature:54-60`).
+- [ ] 17A.8: Standalone audio produces transcript linked to original recording (`media-analysis-durable-pipeline.feature:61-67`).
+- [ ] 17A.9: Transcript correction preserves model output and audio locator (`media-analysis-durable-pipeline.feature:68-73`).
+- [ ] 17A.10: Unavailable analysis model cannot produce fabricated success (`media-analysis-durable-pipeline.feature:74-80`).
+- [ ] 17A.11: Transcription timeout does not stall other eligible video stages (`media-analysis-durable-pipeline.feature:81-87`).
+- [ ] 17A.12: Frame sampling is deterministic and stays within declared budget (`media-analysis-durable-pipeline.feature:88-94`).
+- [ ] 17A.13: Frame sampling cancellation records omissions and releases worker lease (`media-analysis-durable-pipeline.feature:95-100`).
+- [ ] 17A.14: Worker interruption recovers without duplicate findings or lost progress (`media-analysis-durable-pipeline.feature:101-106`).
+- [ ] 17A.15: Corrupt or unreadable frame is isolated without aborting entire video (`media-analysis-durable-pipeline.feature:107-112`).
+- [ ] 17A.16: Analysis failure preserves uploaded evidence and exposes actionable retry (`media-analysis-durable-pipeline.feature:113-118`).
+- [ ] 17A.17: Multi-item evidence bundle preserves per-item identity and processing isolation (`media-analysis-durable-pipeline.feature:119-125`).
+- [ ] 17A.18: Storage failure rolls back admission cleanly without dangling job references (`media-analysis-durable-pipeline.feature:126-137`).
+
+### Suite 17B: Image & Video Findings (`evidence-image-and-video-findings.feature`, 11 scenarios)
+- [ ] 17B.1: Image finding points to original image region (`evidence-image-and-video-findings.feature:10-16`).
+- [ ] 17B.2: Document citation resolves to exact page and text span (`evidence-image-and-video-findings.feature:17-23`).
+- [ ] 17B.3: Video detection maps box back to source-frame coordinates (`evidence-image-and-video-findings.feature:24-30`).
+- [ ] 17B.4: Generic person label does not identify a person (`evidence-image-and-video-findings.feature:31-36`).
+- [ ] 17B.5: Face detection does not perform identity matching (`evidence-image-and-video-findings.feature:37-43`).
+- [ ] 17B.6: dHash is shown only as a frame-similarity clue, never proof (`evidence-image-and-video-findings.feature:44-50`).
+- [ ] 17B.7: VLM OCR and captions remain reviewable proposals (`evidence-image-and-video-findings.feature:51-57`).
+- [ ] 17B.8: VLM frame selection respects combined input budget (`evidence-image-and-video-findings.feature:58-64`).
+- [ ] 17B.9: Reviewer decision is recorded separately from model output (accept/reject/correct) (`evidence-image-and-video-findings.feature:65-77`).
+- [ ] 17B.10: Behavioral annotations describe observable actions only (`evidence-image-and-video-findings.feature:78-83`).
+- [ ] 17B.11: Selecting timeline result seeks to source presentation time (`evidence-image-and-video-findings.feature:84-89`).
+
+### Suite 17C: Indexing & Readback (`evidence-analysis-indexing-and-readback.feature`, 13 scenarios)
+- [ ] 17C.1: Analysis metadata reconciled before multimodal vectors written (`evidence-analysis-indexing-and-readback.feature:9-15`).
+- [ ] 17C.2: Vector projection follows canonical database and outbox path (`evidence-analysis-indexing-and-readback.feature:16-22`).
+- [ ] 17C.3: Search returns only authorized current evidence with exact locators (`evidence-analysis-indexing-and-readback.feature:23-29`).
+- [ ] 17C.4: Rights-cleared exhibit traceable from admission to search (doc/img/audio/video) (`evidence-analysis-indexing-and-readback.feature:30-45`).
+- [ ] 17C.5: Unauthorized search does not disclose evidence or cached results (`evidence-analysis-indexing-and-readback.feature:46-51`).
+- [ ] 17C.6: Cached bundles isolated by source and analysis revision (`evidence-analysis-indexing-and-readback.feature:52-58`).
+- [ ] 17C.7: Search projections reject stale source and model revisions (`evidence-analysis-indexing-and-readback.feature:59-64`).
+- [ ] 17C.8: Approximate retrieval evaluated against exact source-grounded results (`evidence-analysis-indexing-and-readback.feature:65-71`).
+- [ ] 17C.9: TurboQuant and TurboVec candidates use same retrieval evaluation (`evidence-analysis-indexing-and-readback.feature:72-78`).
+- [ ] 17C.10: Dataset lineage required before evaluation or training use (`evidence-analysis-indexing-and-readback.feature:79-85`).
+- [ ] 17C.11: Behavioral-event model evaluation preserves held-out source separation (`evidence-analysis-indexing-and-readback.feature:86-92`).
+- [ ] 17C.12: Authorized initial state and later access revocation respected (`evidence-analysis-indexing-and-readback.feature:93-100`).
+- [ ] 17C.13: Re-indexing on model upgrade maintains dual-read availability without downtime (`evidence-analysis-indexing-and-readback.feature:101-108`).
+
+### Suite 17D: Case-to-Analysis Journey (`case-evidence-analysis.feature`, 14 scenarios)
+- [ ] 17D.1: Newly created case opens its overview (`case-evidence-analysis.feature:9-14`).
+- [ ] 17D.2: Empty case guides user to add evidence (`case-evidence-analysis.feature:15-20`).
+- [ ] 17D.3: Open analysis for uploaded exhibit (`case-evidence-analysis.feature:21-27`).
+- [ ] 17D.4: Processing progress survives page refresh (`case-evidence-analysis.feature:28-36`).
+- [ ] 17D.5: Processing progress resumes after stream disconnect (`case-evidence-analysis.feature:37-43`).
+- [ ] 17D.6: Silent video analyzed without starting transcription (`case-evidence-analysis.feature:44-50`).
+- [ ] 17D.7: Video findings and transcript navigate to source time (`case-evidence-analysis.feature:51-58`).
+- [ ] 17D.8: Object detections do not claim person identity (`case-evidence-analysis.feature:59-65`).
+- [ ] 17D.9: Investigator reviews model finding (`case-evidence-analysis.feature:66-72`).
+- [ ] 17D.10: Source revision change makes earlier analysis stale (`case-evidence-analysis.feature:73-79`).
+- [ ] 17D.11: Cached analysis cannot cross source revisions (`case-evidence-analysis.feature:80-85`).
+- [ ] 17D.12: Stored evidence remains available when analysis fails (`case-evidence-analysis.feature:86-93`).
+- [ ] 17D.13: Retry resumes safely after worker interruption (`case-evidence-analysis.feature:94-100`).
+- [ ] 17D.14: Case authorization enforced when opening analysis (`case-evidence-analysis.feature:101-105`).

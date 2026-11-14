@@ -17,6 +17,7 @@ import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { setACECursor, validateACECursor, type ACECursor } from '$lib/server/cache/ace-cursor-cache.js';
 export {
   assembleACEContext,
+  buildACEPrompt,
   buildACEPromptCached,
   fetchGlossaryMatches,
   fetchCachedACEChunks,

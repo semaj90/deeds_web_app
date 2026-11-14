@@ -64,3 +64,65 @@ describe('processEvidenceDocumentCanonicalV1 synthesis integration', () => {
     });
   });
 });
+
+describe('evidence text embedding lane', () => {
+  it('uses EmbeddingGemma 2 when its model directory is configured, v1 otherwise, and rejects unknown lanes', async () => {
+    const { resolveEvidenceTextEmbeddingLaneV1 } = await import('./process-evidence-document-v1.js');
+    expect(resolveEvidenceTextEmbeddingLaneV1({ lane: undefined, modelDir: 'C:/models/eg2' })).toBe('embeddinggemma2_onnx');
+    expect(resolveEvidenceTextEmbeddingLaneV1({ lane: undefined, modelDir: '  ' })).toBe('semantic_768_v1');
+    expect(resolveEvidenceTextEmbeddingLaneV1({ lane: 'semantic_768_v1', modelDir: 'C:/models/eg2' })).toBe('semantic_768_v1');
+    expect(() => resolveEvidenceTextEmbeddingLaneV1({ lane: 'ollama', modelDir: null })).toThrow('EVIDENCE_TEXT_EMBEDDING_LANE_INVALID');
+  });
+
+  it('persists an EmbeddingGemma 2 chunk as a document_chunk row bound to the case and source revision', async () => {
+    const { createEmbeddingGemma2TextIndexerDependenciesV1 } = await import('./process-evidence-document-v1.js');
+    const sha = (label: string) => 'sha256:' + createHash('sha256').update(label).digest('hex');
+    const produced = {
+      embedding: Array.from({ length: 768 }, (_, index) => (index === 0 ? 1 : 0)),
+      model: 'fixture-eg2',
+      modelArtifactSha256: sha('artifact'),
+      modelRevision: 'rev',
+      preprocessingRevision: 'atlas.embeddinggemma2.text-document-title-none-q8.v1',
+      inputSha256: sha('chunk'),
+      outputSha256: sha('output'),
+      tokenCount: 12,
+    };
+    const embed = vi.fn(async () => produced);
+    const persist = vi.fn(async () => ({ id: 'row', qdrantPointId: 'point', outputSha256: produced.outputSha256, sourceLocatorSha256: 'x' }));
+    const database = {} as never;
+    const deps = createEmbeddingGemma2TextIndexerDependenciesV1({ caseId: 'case-1', modelDir: 'C:/models/eg2', embed, persist, database });
+
+    const out = await deps.embed('chunk text');
+    expect(embed).toHaveBeenCalledWith({ text: 'chunk text', kind: 'document', modelDir: 'C:/models/eg2' });
+    await deps.persist({
+      evidenceId: 'evidence-1', sourceRevision: sha('source'), chunkIndex: 3, content: 'chunk text',
+      embedding: out.vector, model: out.model, outputChecksum: out.outputChecksum, provenance: out.provenance,
+      metadata: { startOffset: 10, endOffset: 20 },
+    });
+
+    expect(persist).toHaveBeenCalledTimes(1);
+    expect((persist.mock.calls[0] as unknown[])[1]).toMatchObject({
+      evidenceId: 'evidence-1',
+      caseId: 'case-1',
+      sourceRevision: sha('source'),
+      modality: 'document_chunk',
+      sourceLocator: { kind: 'text_chunk', chunkIndex: 3, startOffset: 10, endOffset: 20 },
+      modelArtifactSha256: produced.modelArtifactSha256,
+      outputSha256: produced.outputSha256,
+      metadata: { content: 'chunk text' },
+    });
+  });
+
+  it('fails closed without a case id or for a vector this run did not produce', async () => {
+    const { createEmbeddingGemma2TextIndexerDependenciesV1 } = await import('./process-evidence-document-v1.js');
+    const noCase = createEmbeddingGemma2TextIndexerDependenciesV1({ caseId: null, modelDir: 'C:/models/eg2', embed: vi.fn(), persist: vi.fn() });
+    await expect(noCase.embed('text')).rejects.toThrow('EVIDENCE_TEXT_CASE_ID_REQUIRED');
+    const persist = vi.fn();
+    const deps = createEmbeddingGemma2TextIndexerDependenciesV1({ caseId: 'case-1', modelDir: 'C:/models/eg2', embed: vi.fn(), persist });
+    await expect(deps.persist({
+      evidenceId: 'e', sourceRevision: 's', chunkIndex: 0, content: 'c', embedding: [], model: 'm', outputChecksum: 'sha256:unknown',
+      provenance: {} as never, metadata: {},
+    })).rejects.toThrow('EVIDENCE_TEXT_EMBEDDING_NOT_PRODUCED_BY_THIS_RUN');
+    expect(persist).not.toHaveBeenCalled();
+  });
+});

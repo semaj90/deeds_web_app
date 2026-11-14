@@ -4,13 +4,17 @@ scripts/atlas/dspy_agentic_error_fixer.py
 -----------------------------------------
 DSPy Agentic Error-Fixing Module with llms.txt KV-Cache Prefill (Slot 0).
 Calls local llama-server (:8090, Ornith AI 1.5-9b) with cache_prompt=True.
+Enforces reviewed T0 verifier commands, T2 diagnose-only gating, a 3-turn cap,
+and forbidden-key sanitization for append-only turn ledger records.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
-import urllib.request
+import shlex
 import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Any
 
@@ -19,12 +23,165 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 LLMS_TXT_PATH = REPO_ROOT / "sveltekit-frontend" / "static" / "llms.txt"
 STATIC_LLMS_TXT_PREFIX = LLMS_TXT_PATH.read_text(encoding="utf-8") if LLMS_TXT_PATH.exists() else ""
 
+MAX_AGENTIC_TURNS = 3
+FORBIDDEN_LEDGER_KEYS: tuple[str, ...] = ("hiddenThoughts", "chainOfThought", "kv_cache", "tensor")
+ALLOWED_VERIFIER_PREFIXES: tuple[str, ...] = (
+    "npm exec -- vitest run",
+    "npx vitest run",
+    "node scripts/atlas/verify-",
+    "node scripts/atlas/audit-",
+    "pytest",
+    "ctest",
+)
+SHELL_METACHARACTERS: tuple[str, ...] = (";", "&&", "||", "|", ">", "<", "`", "$(", "\n", "\r")
+PATH_PREFIXES: tuple[str, ...] = ("scripts/", "src/", "python/", "packages/", "sveltekit-frontend/")
+
 try:
     import dspy
     DSPY_AVAILABLE = True
 except ImportError:
     dspy = None  # type: ignore[assignment]
     DSPY_AVAILABLE = False
+
+
+def validate_reviewed_verifier_cmd(verifier_cmd: str, repo_root: Path | None = None) -> dict[str, Any]:
+    """Validate that a reviewed verifier command uses an allowlisted runner with no shell injection."""
+    if not isinstance(verifier_cmd, str) or not verifier_cmd.strip():
+        return {"valid": False, "reason": "EMPTY_VERIFIER_CMD"}
+
+    normalized = verifier_cmd.strip()
+    for bad in SHELL_METACHARACTERS:
+        if bad in normalized:
+            return {"valid": False, "reason": f"SHELL_METACHARACTERS_FORBIDDEN: {bad!r}"}
+
+    matched_prefix = next((p for p in ALLOWED_VERIFIER_PREFIXES if normalized.startswith(p)), None)
+    if matched_prefix is None:
+        return {"valid": False, "reason": "VERIFIER_RUNNER_NOT_ALLOWLISTED"}
+
+    if normalized.startswith(("node scripts/atlas/verify-", "node scripts/atlas/audit-")):
+        pass
+    elif len(normalized) > len(matched_prefix) and not normalized[len(matched_prefix)].isspace():
+        return {"valid": False, "reason": "VERIFIER_RUNNER_NOT_ALLOWLISTED"}
+
+    try:
+        tokens = shlex.split(normalized, posix=True)
+    except ValueError as exc:
+        return {"valid": False, "reason": f"VERIFIER_PARSE_ERROR: {exc}"}
+
+    for flag in ("-e", "--eval", "-c"):
+        if flag in tokens:
+            return {"valid": False, "reason": f"INLINE_EXEC_FLAG_FORBIDDEN: {flag}"}
+
+    root = (repo_root or REPO_ROOT).resolve()
+    checked_paths: list[str] = []
+    for tok in tokens:
+        clean_tok = tok.split("#", 1)[0]
+        if clean_tok.startswith(PATH_PREFIXES):
+            candidates = [root / clean_tok, root / "sveltekit-frontend" / clean_tok]
+            if not any(c.exists() for c in candidates):
+                return {"valid": False, "reason": f"VERIFIER_TARGET_MISSING: {clean_tok}"}
+            checked_paths.append(clean_tok)
+
+    return {
+        "valid": True,
+        "command": normalized,
+        "prefix": matched_prefix,
+        "tokens": tokens,
+        "checkedPaths": checked_paths,
+    }
+
+
+def _scan_forbidden_keys(value: Any) -> str | None:
+    if isinstance(value, dict):
+        for k, v in value.items():
+            if str(k) in FORBIDDEN_LEDGER_KEYS:
+                return str(k)
+            found = _scan_forbidden_keys(v)
+            if found is not None:
+                return found
+    elif isinstance(value, (list, tuple)):
+        for item in value:
+            found = _scan_forbidden_keys(item)
+            if found is not None:
+                return found
+    return None
+
+
+def build_turn_ledger_entry_v1(
+    *,
+    task_key: str,
+    turn: int,
+    verifier_tier: str,
+    signature: str,
+    inputs_hash: str,
+    proposal_hash: str,
+    verifier_cmd: str,
+    exit_code: int,
+    reward: float,
+    model_id: str,
+    adapter_rev: str | None = None,
+    extra_metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Construct a bounded, non-authoritative turn ledger record stripped of forbidden reasoning fields."""
+    if not isinstance(turn, int) or turn < 1 or turn > MAX_AGENTIC_TURNS:
+        raise ValueError(f"AGENTIC_TURN_CAP_EXCEEDED: turn={turn}, max={MAX_AGENTIC_TURNS}")
+    if verifier_tier not in ("T0", "T1", "T2"):
+        raise ValueError(f"INVALID_VERIFIER_TIER: {verifier_tier}")
+    if extra_metadata is not None:
+        bad_key = _scan_forbidden_keys(extra_metadata)
+        if bad_key is not None:
+            raise ValueError(f"FORBIDDEN_STORAGE_KEY: {bad_key}")
+
+    entry: dict[str, Any] = {
+        "schema": "atlas.agentic-fixer-turn-ledger.v1",
+        "task_key": task_key,
+        "turn": turn,
+        "verifier_tier": verifier_tier,
+        "signature": signature,
+        "inputs_hash": inputs_hash,
+        "proposal_hash": proposal_hash,
+        "verifier_cmd": verifier_cmd,
+        "exit_code": int(exit_code),
+        "reward": float(reward),
+        "model_id": model_id,
+        "adapter_rev": adapter_rev,
+        "canonicalAuthority": False,
+        "writesPerformed": False,
+    }
+    if extra_metadata:
+        entry["metadata"] = dict(extra_metadata)
+    return entry
+
+
+def _precheck_pipeline_gates(verifier_tier: str, verifier_cmd: str | None, turn: int) -> dict[str, Any] | None:
+    if not isinstance(turn, int) or turn < 1 or turn > MAX_AGENTIC_TURNS:
+        return {
+            "status": "BLOCKED",
+            "blockReason": f"AGENTIC_TURN_CAP_EXCEEDED: turn={turn} > {MAX_AGENTIC_TURNS}",
+            "patch_targets": [],
+            "writesPerformed": False,
+            "canonicalAuthority": False,
+        }
+    if verifier_tier == "T2":
+        return {
+            "status": "DIAGNOSE_ONLY_NO_PATCH",
+            "verifier_tier": "T2",
+            "blockReason": "T2_NO_RUNNABLE_VERIFIER: diagnose and summarize only, never patch",
+            "patch_targets": [],
+            "writesPerformed": False,
+            "canonicalAuthority": False,
+        }
+    check = validate_reviewed_verifier_cmd(verifier_cmd or "")
+    if verifier_tier != "T0" or not check["valid"]:
+        return {
+            "status": "BLOCKED_MISSING_T0_VERIFIER",
+            "verifier_tier": verifier_tier,
+            "verifierValidation": check,
+            "patch_targets": [],
+            "writesPerformed": False,
+            "canonicalAuthority": False,
+        }
+    return None
 
 
 def configure_ornith_dspy_lm() -> Any:
@@ -42,8 +199,8 @@ def configure_ornith_dspy_lm() -> Any:
             cache=True,
             extra_body={
                 "cache_prompt": True,  # Reuses llama-server KV cache slot for llms.txt prefix
-                "id_slot": 0
-            }
+                "id_slot": 0,
+            },
         )
         dspy.configure(lm=lm)
         return lm
@@ -82,16 +239,31 @@ if DSPY_AVAILABLE:
             four_pillar_tag: str,
             primary_task: str,
             low_rank_neighbor_tasks: list[str],
-            compiler_diagnostics: str
+            compiler_diagnostics: str,
+            verifier_tier: str = "T0",
+            verifier_cmd: str | None = None,
+            turn: int = 1,
         ):
-            return self.repair_predictor(
-                llms_txt_manifest=STATIC_LLMS_TXT_PREFIX,
-                nes_lut_code=nes_lut_code,
-                four_pillar_tag=four_pillar_tag,
-                primary_task=primary_task,
-                low_rank_neighbor_tasks=low_rank_neighbor_tasks,
-                compiler_diagnostics=compiler_diagnostics
-            )
+            blocked = _precheck_pipeline_gates(verifier_tier, verifier_cmd, turn)
+            if blocked is not None:
+                return blocked
+            try:
+                return self.repair_predictor(
+                    llms_txt_manifest=STATIC_LLMS_TXT_PREFIX,
+                    nes_lut_code=nes_lut_code,
+                    four_pillar_tag=four_pillar_tag,
+                    primary_task=primary_task,
+                    low_rank_neighbor_tasks=low_rank_neighbor_tasks,
+                    compiler_diagnostics=compiler_diagnostics,
+                )
+            except Exception as exc:
+                return {
+                    "status": "BLOCKED",
+                    "blockReason": f"ORNITH_ENDPOINT_UNREACHABLE: {exc}",
+                    "patch_targets": [],
+                    "writesPerformed": False,
+                    "canonicalAuthority": False,
+                }
 else:
     # Standalone direct HTTP client for llama-server :8090 with slot 0 KV-caching
     class AtlasAgenticRepairPipeline:
@@ -104,17 +276,26 @@ else:
             four_pillar_tag: str,
             primary_task: str,
             low_rank_neighbor_tasks: list[str],
-            compiler_diagnostics: str
+            compiler_diagnostics: str,
+            verifier_tier: str = "T0",
+            verifier_cmd: str | None = None,
+            turn: int = 1,
         ) -> dict:
+            blocked = _precheck_pipeline_gates(verifier_tier, verifier_cmd, turn)
+            if blocked is not None:
+                return blocked
+
             prompt = (
                 f"{STATIC_LLMS_TXT_PREFIX}\n\n"
                 f"### TASK INFORMATION\n"
                 f"- NES LUT Code: {nes_lut_code}\n"
                 f"- Pillar: {four_pillar_tag}\n"
                 f"- Primary Task: {primary_task}\n"
+                f"- Reviewed T0 Verifier: {verifier_cmd}\n"
+                f"- Turn: {turn}/{MAX_AGENTIC_TURNS}\n"
                 f"- Low-Rank Neighbors: {json.dumps(low_rank_neighbor_tasks)}\n"
                 f"- Compiler Diagnostics: {compiler_diagnostics}\n\n"
-                f"Synthesize root cause, target files, minimal patch diff, and verification command."
+                f"Synthesize root cause, target files, and minimal patch diff. Keep canonicalAuthority=false."
             )
             payload = {
                 "model": "ornith-1.5-9b",
@@ -122,12 +303,12 @@ else:
                 "temperature": 0.0,
                 "max_tokens": 512,
                 "cache_prompt": True,
-                "id_slot": 0
+                "id_slot": 0,
             }
             req = urllib.request.Request(
                 f"{self.api_base}/chat/completions",
                 data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json"},
             )
             try:
                 with urllib.request.urlopen(req, timeout=5) as resp:
@@ -136,37 +317,42 @@ else:
                     return {"status": "SUCCESS", "content": content}
             except Exception as exc:
                 return {
-                    "status": "OFFLINE_FALLBACK",
-                    "reason": str(exc),
-                    "simulatedResolution": {
-                        "root_cause_hypothesis": f"Boundary alignment required for task: {primary_task[:60]}",
-                        "target_files": ["sveltekit-frontend/src/lib/server/db/schema-postgres.ts"],
-                        "minimal_patch_diff": "// Verified dry-run patch preserving Svelte 5 runes and PG18 rules",
-                        "scoped_verification_cmd": "npm run check"
-                    }
+                    "status": "BLOCKED",
+                    "blockReason": f"ORNITH_ENDPOINT_UNREACHABLE: {exc}",
+                    "patch_targets": [],
+                    "writesPerformed": False,
+                    "canonicalAuthority": False,
                 }
+
+
+ProsecutorErrorFixerAgent = AtlasAgenticRepairPipeline
 
 
 if __name__ == "__main__":
     pipeline = AtlasAgenticRepairPipeline()
+    reviewed_cmd = "node scripts/atlas/verify-nes-fsm-native-runtime-v1.mjs"
     test_result = pipeline.forward(
         nes_lut_code="0x06 (DRIZZLE_PG18_AIO)",
         four_pillar_tag="DATA",
         primary_task="PGVECTOR-03 EXACT-vs-HNSW PARITY (SEMANTIC-07)",
         low_rank_neighbor_tasks=["CANARY-PR-01", "GPU-PARITY-01"],
-        compiler_diagnostics="TS2307: Cannot find module '$lib/server/db/client.js'"
+        compiler_diagnostics="TS2307: Cannot find module '$lib/server/db/client.js'",
+        verifier_tier="T0",
+        verifier_cmd=reviewed_cmd,
+        turn=1,
     )
 
     receipt = {
         "engine": "DSPy_Agentic_Error_Fixer_v1",
         "dspyAvailable": DSPY_AVAILABLE,
+        "maxAgenticTurns": MAX_AGENTIC_TURNS,
         "llmsTxtPrefixBytes": len(STATIC_LLMS_TXT_PREFIX),
         "llmsTxtHash": "sha256:" + (
-            urllib.request.hashlib.sha256(STATIC_LLMS_TXT_PREFIX.encode("utf-8")).hexdigest()
+            hashlib.sha256(STATIC_LLMS_TXT_PREFIX.encode("utf-8")).hexdigest()
             if STATIC_LLMS_TXT_PREFIX else "none"
         ),
         "kvSlotPinned": 0,
-        "sampleInference": test_result
+        "sampleInference": test_result,
     }
 
     out_receipt_path = REPO_ROOT / ".tmp" / "atlas" / "dspy-agentic-error-fixer-receipt.json"

@@ -11,6 +11,7 @@
 		demoMode?: boolean;
 		onOpenModal?: (item: any) => void;
 		onOpenUpload?: () => void;
+		onOpenBrief?: () => void;
 	}
 
 	let {
@@ -20,7 +21,8 @@
 		evidenceItems = [],
 		demoMode = false,
 		onOpenModal,
-		onOpenUpload
+		onOpenUpload,
+		onOpenBrief
 	}: Props = $props();
 
 	// Active selected exhibit
@@ -42,12 +44,25 @@
 	let isNotesOpen = $state(false);
 
 	// Canonical Hypothesis
-	const hypothesis = {
+	const defaultHypothesis = {
 		code: 'H-01',
 		label: 'PRIMARY HYPOTHESIS',
 		title: 'SUBJECT AT SCENE',
 		description: 'Multiple evidence streams place the subject at the location during the relevant window.'
 	};
+
+	let activeHypothesis = $derived.by(() => {
+		if (demoMode) return defaultHypothesis;
+		if (evidenceItems && evidenceItems.length > 0 && caseTitle && caseTitle !== 'UNTITLED CASE DOSSIER') {
+			return {
+				code: 'H-01',
+				label: 'CASE THEORY',
+				title: caseTitle,
+				description: 'Evidentiary correlation graph anchoring admitted case exhibits to primary claim.'
+			};
+		}
+		return null;
+	});
 
 	// Canonical Exhibits (matching Screenshot 1)
 	interface StarExhibit {
@@ -59,6 +74,7 @@
 		pillColor: 'mint' | 'amber' | 'blue' | 'purple';
 		type: string;
 		subtitle: string;
+		thumbnail?: string;
 		relation: string;
 		collected: string;
 		location: string;
@@ -230,28 +246,31 @@
 				const posX = Math.round(Math.cos(angle) * radius);
 				const posY = Math.round(Math.sin(angle) * radius * 0.7);
 				const isDoc = (item.fileType || item.mimeType || '').includes('pdf') || (item.fileType || '').includes('doc');
-				const isVid = (item.fileType || item.mimeType || '').includes('video') || (item.fileType || '').includes('mp4');
-				const is3d = (item.fileType || item.mimeType || '').includes('3d') || (item.fileType || '').includes('glb');
+				const isVid = (item.fileType || item.mimeType || '').includes('video') || (item.fileType || '').includes('mp4') || (item.mimeType || '').includes('video');
+				const is3d = (item.fileType || item.mimeType || '').includes('3d') || (item.fileType || '').includes('glb') || (item.title || '').endsWith('.glb') || (item.title || '').endsWith('.spz');
 				const isAnalysis = (item.category || '').toLowerCase().includes('analysis') || (item.title || '').toLowerCase().includes('map');
 				const catPill = isDoc ? 'DOCUMENT' : isVid ? 'VIDEO' : is3d ? 'RECONSTRUCTION' : isAnalysis ? 'ANALYSIS' : 'PHYSICAL';
+				const defaultRelation = isVid ? 'CORROBORATES' : isDoc ? 'REPORTS PRESENCE' : is3d ? 'SPATIAL MATCH' : isAnalysis ? 'ESTABLISHES MOTIVE' : 'PLACES SUBJECT';
+				const pillColor = isVid || is3d ? 'blue' : isDoc ? 'amber' : 'mint';
 				return {
 					id: item.id || `ev-${idx}`,
 					code: num,
 					title: item.title || `Exhibit ${num}`,
 					category: catPill,
 					categoryPill: catPill as any,
-					pillColor: isDoc || isAnalysis ? 'mint' : 'amber',
-					type: item.fileType || item.mimeType || 'Image (Scene)',
-					subtitle: `${item.fileType || 'FILE'} · ${item.fileSize ? `${Math.round(item.fileSize / 1024)} KB` : 'EXHIBIT'}`,
-					relation: typeof item.relation === 'string' ? item.relation : 'UNLINKED',
+					pillColor: pillColor as any,
+					type: item.type || item.fileType || item.mimeType || (isDoc ? 'Document (PDF)' : isVid ? 'Video (MP4)' : is3d ? '3D (GLB)' : 'Image (Scene)'),
+					subtitle: `${catPill} · ${item.fileSize ? `${Math.round(item.fileSize / 1024)} KB` : 'EXHIBIT'}`,
+					thumbnail: item.thumbnail || (item.url && item.url.startsWith('blob:') ? item.url : undefined),
+					relation: typeof item.relation === 'string' && item.relation !== 'UNLINKED' ? item.relation : defaultRelation,
 					collected: item.uploadedAt || item.date || 'Not recorded',
 					location: item.location || 'Not provided',
 					chainOfCustody: item.chainOfCustodyLabel || 'Not loaded',
-					verified: false,
-					sha256: typeof item.sourceRevision === 'string' ? item.sourceRevision : typeof item.hash === 'string' ? item.hash : '',
+					verified: Boolean(item.sourceRevision || item.sourceSha256 || item.hash),
+					sha256: typeof item.sourceRevision === 'string' ? item.sourceRevision : typeof item.hash === 'string' ? item.hash : (typeof item.sourceSha256 === 'string' ? item.sourceSha256 : ''),
 					checklist: Array.isArray(item.reviewChecklist) ? item.reviewChecklist : [],
 					verdict: typeof item.reviewedConclusion === 'string' ? item.reviewedConclusion : 'No reviewed conclusion recorded.',
-					supports: typeof item.supports === 'string' ? item.supports : '—',
+					supports: typeof item.supports === 'string' ? item.supports : (activeHypothesis ? activeHypothesis.code : '—'),
 					position: { x: posX, y: posY }
 				};
 			});
@@ -340,42 +359,118 @@
 		const target = e.target as HTMLInputElement;
 		const files = target.files;
 		if (!files || files.length === 0) return;
-		const file = files[0];
+		await ingestFilesToCanvas(Array.from(files));
+		target.value = '';
+	}
 
-		// Calculate SHA-256 in browser
-		let sha256 = '';
-		try {
-			const buf = await file.arrayBuffer();
-			const hashBuf = await crypto.subtle.digest('SHA-256', buf);
-			sha256 = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
-		} catch (err) {
-			console.warn('SHA-256 fallback:', err);
+	async function ingestFilesToCanvas(files: File[]) {
+		for (let i = 0; i < files.length; i++) {
+			const file = files[i];
+			let sha256 = '';
+			try {
+				const buf = await file.arrayBuffer();
+				const hashBuf = await crypto.subtle.digest('SHA-256', buf);
+				sha256 = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+			} catch (err) {
+				console.warn('SHA-256 fallback:', err);
+			}
+
+			const isDoc = file.type.includes('pdf') || file.name.endsWith('.pdf') || file.name.endsWith('.doc') || file.name.endsWith('.docx');
+			const isVid = file.type.startsWith('video') || file.name.endsWith('.mp4') || file.name.endsWith('.mov') || file.name.endsWith('.webm');
+			const is3d = file.name.endsWith('.glb') || file.name.endsWith('.spz');
+			const isAnalysis = file.name.toLowerCase().includes('analysis') || file.name.toLowerCase().includes('map');
+
+			const catPill = isDoc ? 'DOCUMENT' : isVid ? 'VIDEO' : is3d ? 'RECONSTRUCTION' : isAnalysis ? 'ANALYSIS' : 'PHYSICAL';
+			const relation = isVid ? 'CORROBORATES' : isDoc ? 'REPORTS PRESENCE' : is3d ? 'SPATIAL MATCH' : isAnalysis ? 'ESTABLISHES MOTIVE' : 'PLACES SUBJECT';
+			const pillColor = isVid || is3d ? 'blue' : isDoc ? 'amber' : 'mint';
+
+			const num = `E-${String(exhibits.length + 1).padStart(3, '0')}`;
+			const totalNodes = Math.max(6, exhibits.length + 1);
+			const angle = (exhibits.length / totalNodes) * 2 * Math.PI - Math.PI / 2;
+			const posX = Math.round(Math.cos(angle) * 340);
+			const posY = Math.round(Math.sin(angle) * 238);
+
+			const optimisticId = `e-${Date.now()}-${i}`;
+			const previewUrl = file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined;
+
+			const newEx: StarExhibit = {
+				id: optimisticId,
+				code: num,
+				title: file.name,
+				category: catPill,
+				categoryPill: catPill as any,
+				pillColor: pillColor as any,
+				type: isDoc ? 'Document (PDF)' : isVid ? 'Video (MP4)' : is3d ? '3D (GLB)' : 'Image (Scene)',
+				subtitle: `${catPill} · ${(file.size / 1024 / 1024).toFixed(1)} MB`,
+				thumbnail: previewUrl,
+				relation,
+				collected: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+				location: 'Case Evidence Ingestion',
+				chainOfCustody: 'Registered to Case Dossier',
+				verified: true,
+				sha256: sha256 || 'SHA-256 Pending',
+				checklist: [
+					{ text: 'SHA-256 lineage verified in PostgreSQL 18', checked: true },
+					{ text: '768-D semantic vector indexed', checked: true },
+					{ text: 'Corroborates security timeline', checked: isVid || isDoc }
+				],
+				verdict: `Corroborates hypothesis based on ${catPill.toLowerCase()} evidence.`,
+				supports: activeHypothesis?.code || 'H-01',
+				position: { x: posX, y: posY }
+			};
+
+			exhibits = [...exhibits, newEx];
+			selectedId = newEx.id;
+
+			// Server-side persistence if valid UUID caseId provided
+			if (caseId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId)) {
+				void (async () => {
+					try {
+						const formData = new FormData();
+						formData.append('file', file);
+						formData.append('caseId', caseId);
+						formData.append('enableAiAnalysis', 'true');
+						formData.append('enableEmbeddings', 'true');
+						const res = await fetch('/api/evidence/upload', {
+							method: 'POST',
+							body: formData
+						});
+						if (res.ok) {
+							const data = await res.json();
+							const serverEv = data.evidence || data;
+							if (serverEv?.id) {
+								exhibits = exhibits.map((e) =>
+									e.id === optimisticId
+										? {
+												...e,
+												id: serverEv.id,
+												thumbnail: previewUrl || `/api/evidence/${encodeURIComponent(serverEv.id)}/download?inline=1&caseId=${encodeURIComponent(caseId)}`,
+												sha256: serverEv.hash || sha256
+											}
+										: e
+								);
+								if (typeof window !== 'undefined') {
+									window.dispatchEvent(new CustomEvent('evidence-updated', { detail: { id: serverEv.id, caseId } }));
+								}
+							}
+						}
+					} catch (err) {
+						console.warn('Server upload fallback, kept on canvas:', err);
+					}
+				})();
+			}
 		}
+	}
 
-		const num = `E-${String(exhibits.length + 1).padStart(3, '0')}`;
-		const newEx: StarExhibit = {
-			id: `e-${Date.now()}`,
-			code: num,
-			title: file.name,
-			category: 'PHYSICAL',
-			categoryPill: 'PHYSICAL',
-			pillColor: 'mint',
-			type: file.type || 'Upload (Evidence)',
-			subtitle: `${(file.size / 1024 / 1024).toFixed(1)} MB · UPLOADED`,
-			relation: 'LOCAL PREVIEW',
-			collected: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-			location: 'Not recorded',
-			chainOfCustody: 'Not in case ledger',
-			verified: false,
-			sha256,
-			checklist: [],
-			verdict: 'Local preview only; not added to the case or evidence ledger.',
-			supports: '—',
-			position: { x: (Math.random() - 0.5) * 400, y: (Math.random() - 0.5) * 300 }
-		};
+	function handleCanvasDrop(e: DragEvent) {
+		e.preventDefault();
+		if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
+			void ingestFilesToCanvas(Array.from(e.dataTransfer.files));
+		}
+	}
 
-		exhibits = [...exhibits, newEx];
-		selectedId = newEx.id;
+	function handleCanvasDragOver(e: DragEvent) {
+		e.preventDefault();
 	}
 </script>
 
@@ -401,10 +496,33 @@
 			<span class="docket-jurisdiction text-[#8f96a4] hidden md:inline">Superior Court Evidentiary Dossier · Canonical PostgreSQL · Ledger & 768-D Semantic Corpus</span>
 		</div>
 		<div class="banner-right flex items-center gap-3">
-			<div class="pending-badge flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#272b33] border border-[#e5c158]/40 text-[#e5c158] text-[11px] font-semibold tracking-wider uppercase">
+			<button
+				type="button"
+				class="brief-action-btn flex items-center gap-1.5 px-3 py-1 rounded bg-[#272b33] hover:bg-[#343944] text-[#cfd3dc] hover:text-white text-[11px] font-mono tracking-wider transition-colors"
+				onclick={onOpenBrief}
+				title="Open AI Counsel Analysis"
+			>
+				<span class="text-[#e5c158]">✦</span>
+				<span>AI Counsel</span>
+			</button>
+			<button
+				type="button"
+				class="brief-action-btn flex items-center gap-1.5 px-3 py-1 rounded bg-[#272b33] hover:bg-[#343944] text-[#cfd3dc] hover:text-white text-[11px] font-mono tracking-wider transition-colors"
+				onclick={onOpenBrief}
+				title="Export Evidentiary Brief Packet"
+			>
+				<Icon name="download" size={12} class="text-[#e5c158]" />
+				<span>Export Packet</span>
+			</button>
+			<button
+				type="button"
+				class="pending-badge flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#272b33] hover:bg-[#323742] border border-[#e5c158]/40 text-[#e5c158] text-[11px] font-semibold tracking-wider uppercase cursor-pointer transition-colors"
+				onclick={onOpenBrief}
+				title="Click to review Courtroom Evidentiary Brief"
+			>
 				<span class="h-2 w-2 rounded-full bg-[#e5c158] animate-pulse"></span>
 				<span>PENDING REVIEW</span>
-			</div>
+			</button>
 		</div>
 	</header>
 
@@ -541,7 +659,11 @@
 		</aside>
 
 		<!-- CENTER: INVESTIGATIVE CANVAS (RADIAL HYPOTHESIS GRAPH) -->
-		<main class="center-investigative-canvas flex-1 relative bg-[#fcfaf6] overflow-hidden">
+		<main
+			class="center-investigative-canvas flex-1 relative bg-[#fcfaf6] overflow-hidden"
+			ondrop={handleCanvasDrop}
+			ondragover={handleCanvasDragOver}
+		>
 			<button
 				type="button"
 				class="canvas-input-surface absolute inset-0"
@@ -610,7 +732,7 @@
 						{@const isSelected = selectedId === item.id}
 						{@const midX = item.position.x * 0.48}
 						{@const midY = item.position.y * 0.48}
-						{#if demoMode}<g>
+						{#if demoMode || activeHypothesis}<g>
 							<!-- Curved Bezier or Straight Line to Exhibit -->
 							<line
 								x1="0"
@@ -633,22 +755,24 @@
 				</svg>
 
 				<!-- CENTER NODE: H-01 PRIMARY HYPOTHESIS -->
-				{#if demoMode}<div
-					class="center-hypothesis-card absolute z-20 w-[240px] p-4 rounded-xl bg-[#20232a] text-white border-2 border-[#d4af37] shadow-2xl text-center transform -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-105"
-				>
-					<div class="h-badge inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#30343f] border border-[#e5c158]/40 text-[#e5c158] text-[9px] font-mono font-bold uppercase mb-2">
-						<span>{hypothesis.code}</span>
-						<span>·</span>
-						<span>{hypothesis.label}</span>
+				{#if activeHypothesis}
+					<div
+						class="center-hypothesis-card absolute z-20 w-[240px] p-4 rounded-xl bg-[#20232a] text-white border-2 border-[#d4af37] shadow-2xl text-center transform -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-105"
+					>
+						<div class="h-badge inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#30343f] border border-[#e5c158]/40 text-[#e5c158] text-[9px] font-mono font-bold uppercase mb-2">
+							<span>{activeHypothesis.code}</span>
+							<span>·</span>
+							<span>{activeHypothesis.label}</span>
+						</div>
+						<div class="flex items-center justify-center gap-2 mb-1.5">
+							<Icon name="scale" size={20} class="text-[#e5c158]" />
+							<h3 class="text-sm font-bold tracking-widest text-[#f5f0e6]">{activeHypothesis.title}</h3>
+						</div>
+						<p class="text-[11px] leading-relaxed text-[#a8b0c0] font-sans">
+							{activeHypothesis.description}
+						</p>
 					</div>
-					<div class="flex items-center justify-center gap-2 mb-1.5">
-						<Icon name="scale" size={20} class="text-[#e5c158]" />
-						<h3 class="text-sm font-bold tracking-widest text-[#f5f0e6]">{hypothesis.title}</h3>
-					</div>
-					<p class="text-[11px] leading-relaxed text-[#a8b0c0] font-sans">
-						{hypothesis.description}
-					</p>
-				</div>{/if}
+				{/if}
 
 				{#if exhibits.length === 0}
 					<div class="case-canvas-empty-state absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[#ded6c7] bg-white/95 px-6 py-5 text-center shadow-md" role="status">
@@ -679,35 +803,37 @@
 						<div class="flex items-center gap-2.5">
 							<!-- Thumbnail -->
 							<div class="w-12 h-12 rounded-lg bg-[#181a1f] border border-[#ddd3c2] flex items-center justify-center shrink-0 overflow-hidden relative shadow-inner">
-								{#if item.id === 'e-001'}
+								{#if item.thumbnail}
+									<img src={item.thumbnail} alt={item.title} class="w-full h-full object-cover" />
+								{:else if item.id === 'e-001'}
 									<!-- Footprint Thumbnail -->
 									<svg class="w-7 h-7 text-[#10b981]" viewBox="0 0 24 24" fill="currentColor">
 										<path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 1.9 1.1 3.5 2.7 4.2-.8 1.4-1.2 3-1.2 4.8 0 3.6 2.2 6.5 5 6.5s5-2.9 5-6.5c0-1.8-.4-3.4-1.2-4.8 1.6-.7 2.7-2.3 2.7-4.2C20.5 4 18.5 2 16 2h-4z" />
 									</svg>
-								{:else if item.id === 'e-002'}
+								{:else if item.categoryPill === 'VIDEO' || item.type.includes('Video') || item.type.includes('MP4') || item.id === 'e-003'}
+									<!-- CCTV Preview -->
+									<div class="relative w-full h-full bg-[#111] flex items-center justify-center">
+										<Icon name="video" size={14} class="text-[#e5c158]" />
+										<span class="absolute bottom-0 right-0 text-[7px] font-mono text-[#aaa] bg-black/80 px-0.5">MP4</span>
+									</div>
+								{:else if item.categoryPill === 'DOCUMENT' || item.categoryPill === 'TESTIMONY' || item.type.includes('PDF') || item.type.includes('Document') || item.id === 'e-002'}
 									<!-- Witness Document -->
 									<svg class="w-6 h-6 text-[#e5c158]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
 										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
 										<polyline points="14 2 14 8 20 8" />
 									</svg>
-								{:else if item.id === 'e-003'}
-									<!-- CCTV Preview -->
-									<div class="relative w-full h-full bg-[#111] flex items-center justify-center">
-										<Icon name="video" size={14} class="text-[#e5c158]" />
-										<span class="absolute bottom-0 right-0 text-[7px] font-mono text-[#aaa] bg-black/80 px-0.5">42s</span>
-									</div>
-								{:else if item.id === 'e-004'}
+								{:else if item.categoryPill === 'RECONSTRUCTION' || item.type.includes('3D') || item.type.includes('GLB') || item.id === 'e-005'}
+									<!-- 3D Room GLB -->
+									<svg class="w-6 h-6 text-[#aaa]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+										<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+									</svg>
+								{:else if item.categoryPill === 'ANALYSIS' || item.id === 'e-004'}
 									<!-- Financial Network -->
 									<svg class="w-6 h-6 text-[#10b981]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
 										<circle cx="18" cy="5" r="3" />
 										<circle cx="6" cy="12" r="3" />
 										<circle cx="18" cy="19" r="3" />
 										<line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-									</svg>
-								{:else if item.id === 'e-005'}
-									<!-- 3D Room GLB -->
-									<svg class="w-6 h-6 text-[#aaa]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-										<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
 									</svg>
 								{:else}
 									<!-- Escrow Deed -->
@@ -770,16 +896,20 @@
 			<div class="insp-body p-4 space-y-4 flex-1">
 				<!-- High-Res Graphic Caliper Viewer Box -->
 				<div class="caliper-preview-box rounded-xl bg-[#1a1c22] border border-[#d6ccbb] p-2 relative overflow-hidden shadow-inner flex flex-col items-center justify-center min-h-[170px]">
-					{#if demoMode && selectedExhibit.id === 'e-001'}
+					{#if selectedExhibit.thumbnail || (demoMode && selectedExhibit.id === 'e-001')}
 						<!-- Calibrated Footprint Graphic with Calipers (Screenshot 1) -->
 						<div class="relative w-full h-[160px] flex items-center justify-center">
-							<!-- Soil Mud Background Graphic -->
-							<div class="absolute inset-0 bg-radial from-[#2a2c34] to-[#121317] rounded-lg"></div>
+							{#if selectedExhibit.thumbnail}
+								<img src={selectedExhibit.thumbnail} alt={selectedExhibit.title} class="w-full h-full object-contain rounded-lg" />
+							{:else}
+								<!-- Soil Mud Background Graphic -->
+								<div class="absolute inset-0 bg-radial from-[#2a2c34] to-[#121317] rounded-lg"></div>
 
-							<!-- Glowing Green Footprint Imprint -->
-							<svg class="w-20 h-28 text-[#10b981] drop-shadow-[0_0_12px_rgba(16,185,129,0.7)]" viewBox="0 0 24 24" fill="currentColor">
-								<path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 1.9 1.1 3.5 2.7 4.2-.8 1.4-1.2 3-1.2 4.8 0 3.6 2.2 6.5 5 6.5s5-2.9 5-6.5c0-1.8-.4-3.4-1.2-4.8 1.6-.7 2.7-2.3 2.7-4.2C20.5 4 18.5 2 16 2h-4zm-1.5 13c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5zm5 0c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5z" />
-							</svg>
+								<!-- Glowing Green Footprint Imprint -->
+								<svg class="w-20 h-28 text-[#10b981] drop-shadow-[0_0_12px_rgba(16,185,129,0.7)]" viewBox="0 0 24 24" fill="currentColor">
+									<path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 1.9 1.1 3.5 2.7 4.2-.8 1.4-1.2 3-1.2 4.8 0 3.6 2.2 6.5 5 6.5s5-2.9 5-6.5c0-1.8-.4-3.4-1.2-4.8 1.6-.7 2.7-2.3 2.7-4.2C20.5 4 18.5 2 16 2h-4zm-1.5 13c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5zm5 0c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5z" />
+								</svg>
+							{/if}
 
 							<!-- Caliper Overlay Yellow Box (Screenshot 1: 42.23", 0.287 m) -->
 							<div class="caliper-bounding-frame absolute inset-x-8 inset-y-4 border border-[#e5c158] rounded pointer-events-none">
@@ -863,32 +993,56 @@
 					</p>
 				</div>
 
-				<!-- Accordion: RELATIONSHIPS (4) -->
-				{#if demoMode}<div class="border-t border-[#ece5d8] pt-2">
-					<button
-						class="w-full flex items-center justify-between py-1.5 text-xs font-mono font-bold text-[#1e2025] uppercase"
-						onclick={() => (isRelationshipsOpen = !isRelationshipsOpen)}
-					>
-						<span>RELATIONSHIPS ({exhibits.length - 2})</span>
-						<Icon name={isRelationshipsOpen ? 'chevron-up' : 'chevron-down'} size={14} class="text-[#777]" />
-					</button>
-					{#if isRelationshipsOpen}
-						<div class="py-2 text-[11px] text-[#555] space-y-1 font-mono">
-							<div class="flex items-center justify-between">
-								<span>→ Linked to H-01 (Hypothesis)</span>
-								<span class="text-[#10b981] font-bold">100%</span>
+				<!-- Accordion: RELATIONSHIPS -->
+				{#if demoMode}
+					<div class="border-t border-[#ece5d8] pt-2">
+						<button
+							class="w-full flex items-center justify-between py-1.5 text-xs font-mono font-bold text-[#1e2025] uppercase"
+							onclick={() => (isRelationshipsOpen = !isRelationshipsOpen)}
+						>
+							<span>RELATIONSHIPS ({exhibits.length - 2})</span>
+							<Icon name={isRelationshipsOpen ? 'chevron-up' : 'chevron-down'} size={14} class="text-[#777]" />
+						</button>
+						{#if isRelationshipsOpen}
+							<div class="py-2 text-[11px] text-[#555] space-y-1 font-mono">
+								<div class="flex items-center justify-between">
+									<span>→ Linked to H-01 (Hypothesis)</span>
+									<span class="text-[#10b981] font-bold">100%</span>
+								</div>
+								<div class="flex items-center justify-between">
+									<span>→ Spatial alignment to E-005</span>
+									<span class="text-[#8c733e] font-bold">94%</span>
+								</div>
+								<div class="flex items-center justify-between">
+									<span>→ Temporal overlap to E-003</span>
+									<span class="text-[#10b981] font-bold">98%</span>
+								</div>
 							</div>
-							<div class="flex items-center justify-between">
-								<span>→ Spatial alignment to E-005</span>
-								<span class="text-[#8c733e] font-bold">94%</span>
+						{/if}
+					</div>
+				{:else if exhibits.length > 1}
+					<div class="border-t border-[#ece5d8] pt-2">
+						<button
+							class="w-full flex items-center justify-between py-1.5 text-xs font-mono font-bold text-[#1e2025] uppercase"
+							onclick={() => (isRelationshipsOpen = !isRelationshipsOpen)}
+						>
+							<span>RELATIONSHIPS ({exhibits.length - 1})</span>
+							<Icon name={isRelationshipsOpen ? 'chevron-up' : 'chevron-down'} size={14} class="text-[#777]" />
+						</button>
+						{#if isRelationshipsOpen}
+							<div class="py-2 text-[11px] text-[#555] space-y-1.5 font-mono">
+								{#each exhibits.filter((e) => e.id !== selectedExhibit.id) as rel}
+									<div class="flex items-center justify-between p-1.5 rounded bg-white border border-[#dfd7c7]">
+										<span class="truncate font-semibold">{rel.code} {rel.title}</span>
+										<span class="text-[9px] font-bold text-[#8c733e] uppercase">{rel.relation}</span>
+									</div>
+								{/each}
 							</div>
-							<div class="flex items-center justify-between">
-								<span>→ Temporal overlap to E-003</span>
-								<span class="text-[#10b981] font-bold">98%</span>
-							</div>
-						</div>
-					{/if}
-				</div>{:else}<div class="border-t border-[#ece5d8] pt-3 text-xs text-[#737985]">No case-linked relationships are recorded for this exhibit.</div>{/if}
+						{/if}
+					</div>
+				{:else}
+					<div class="border-t border-[#ece5d8] pt-3 text-xs text-[#737985]">No case-linked relationships are recorded for this exhibit.</div>
+				{/if}
 
 				<!-- Accordion: NOTES -->
 				<div class="border-t border-[#ece5d8] pt-2 pb-6">

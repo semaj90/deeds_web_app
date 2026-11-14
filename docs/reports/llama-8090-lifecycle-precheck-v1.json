@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.llama-8090-lifecycle-precheck.v1",
+  "generatedAt": "2026-11-14T00:32:07.456Z",
+  "writesPerformed": false,
+  "lifecycleActionExecuted": false,
+  "status": "BLOCKED_OPERATOR_GATES_UNMET",
+  "gates": {
+    "gate1_callerEnvTokenConfigured": false,
+    "gate1_running8788HasTokenConfigured": false,
+    "gate2_fakeTokenNegativeCheck": {
+      "reachable": true,
+      "httpStatus": 200,
+      "errorCode": "OPERATOR_TOKEN_ENV_UNCONFIGURED",
+      "passed": false
+    },
+    "gate3_8090SlotsIdleCheck": {
+      "listening": false,
+      "slotsIdle": true,
+      "note": "Port 8090 is not listening; safe to start once operator gates pass."
+    },
+    "gate4_portScopedPids": {
+      "port8788": {
+        "listening": true,
+        "pid": 20880,
+        "processName": "node",
+        "startTime": "2026-11-13T08:40:22.2511020-08:00"
+      },
+      "port8090": {
+        "listening": false,
+        "pid": null,
+        "startTime": null
+      }
+    },
+    "gate5_typedSinglePurposeToolOnly": true,
+    "gate6_auditReceiptWritten": "docs/reports/llama-8090-lifecycle-precheck-v1.json",
+    "gate7_8788StartNewerThanSource": {
+      "traceSourceFile": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+      "traceSourceMtime": "2026-11-12T18:05:57.151Z",
+      "traceProcessStartTime": "2026-11-13T08:40:22.2511020-08:00",
+      "passed": true
+    }
+  },
+  "blockingGates": [
+    "GATE_2_FAKE_TOKEN_REFUSAL_FAILED:OPERATOR_TOKEN_ENV_UNCONFIGURED",
+    "LLAMA_8090_NOT_LISTENING"
+  ],
+  "humanRemediation": [
+    "1. Configure TRACE_MCP_OPERATOR_TOKEN in the TRACE :8788 launch environment and restart TRACE if required so fake-token negative tests return INVALID_OPERATOR_TOKEN instead of OPERATOR_TOKEN_ENV_UNCONFIGURED.",
+    "2. Start or restart :8090 via VS Code Task: \"⚡ TurboQuant: Start (vision, CPU projector, :8090)\" and confirm via \"⚡ TurboQuant: Status\". Never use generic taskkill /IM llama-server.exe."
+  ]
+}

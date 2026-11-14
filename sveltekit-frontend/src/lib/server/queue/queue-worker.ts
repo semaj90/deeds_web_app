@@ -475,10 +475,23 @@ export class EvidenceProcessWorker extends QueueWorker<{
 		metadata?: Record<string, unknown>;
 		sourceRevision?: string;
 		skipEmbedding?: boolean;
-	}, onProgress?: (stage: AnalysisJobProgressStageV1) => Promise<void> | void): Promise<{ chunkCount: number; persistedCount: number; sourceRevision: string; synthesis?: EvidenceSynthesisResultV1 } | null> {
+	}, onProgress?: (stage: AnalysisJobProgressStageV1) => Promise<void> | void): Promise<{
+		chunkCount: number;
+		persistedCount: number;
+		sourceRevision: string;
+		synthesis?: EvidenceSynthesisResultV1;
+		representationId?: string;
+		canonicalStore?: string;
+		canonicalStores?: string[];
+		analysis?: unknown;
+		vectorId?: string;
+		qdrantPointId?: string;
+		outputSha256?: string;
+	} | null> {
 		let processedText = data.text;
 		let sourceBytes: Buffer | undefined;
 		let extractionMethod: string | undefined;
+		let imageResult: Awaited<ReturnType<typeof import('$lib/server/evidence/process-evidence-image-canonical-v1.js').processEvidenceImageCanonicalV1>> | null = null;
 		const meta = data.metadata ?? {};
 		const mimeType =
 			typeof meta.fileType === 'string' && meta.fileType.includes('/')
@@ -533,25 +546,65 @@ export class EvidenceProcessWorker extends QueueWorker<{
 				);
 			}
 			await onProgress?.('text_extraction');
-			const extracted = await processDocument({
-				buffer: sourceBytes,
-				fileName:
-					typeof meta.fileName === 'string' ? meta.fileName : 'evidence-file',
-				mimeType: mimeType ?? 'application/octet-stream',
-				evidenceId: data.evidenceId,
-				skipEmbedding: true,
-			});
-			extractionMethod = extracted.extractionMethod;
-			if (extracted.rawText && extracted.rawText.trim().length > 0) {
-				processedText = extracted.rawText;
+			const normalizedMime = mimeType?.trim().toLowerCase();
+			const isImage = !!normalizedMime && /^image\/(png|jpeg|tiff|bmp|webp)$/.test(normalizedMime);
+			const isVideo = !!normalizedMime && /^video\/(mp4|mov|webm|avi|mkv|quicktime)$/.test(normalizedMime) || (typeof meta.fileName === 'string' && /\.(mp4|mov|webm|avi|mkv)$/i.test(meta.fileName));
+			if (isVideo) {
+				const caseId = data.caseId ?? (typeof meta.caseId === 'string' ? meta.caseId : undefined);
+				if (!caseId) throw new Error('EVIDENCE_VIDEO_CASE_ID_REQUIRED');
+				await onProgress?.('content_analysis');
+				const { processCanonicalVideoAnalysisV1 } = await import(
+					'$lib/server/features/evidence/video/durable-video-analysis-v1.js'
+				);
+				return processCanonicalVideoAnalysisV1({
+					evidenceId: data.evidenceId,
+					caseId,
+					analysisJobId: String(meta.jobId ?? ''),
+					uploadedBy: Number(meta.uploadedBy),
+					sourceRevision: expectedSourceSha256,
+					fileName: typeof meta.fileName === 'string' ? meta.fileName : 'evidence-video.mp4',
+					bytes: sourceBytes,
+					onProgress,
+				});
 			} else {
-				throw new Error('EVIDENCE_TEXT_EXTRACTION_EMPTY');
+				const extracted = await processDocument({
+					buffer: sourceBytes,
+					fileName:
+						typeof meta.fileName === 'string' ? meta.fileName : 'evidence-file',
+					mimeType: mimeType ?? 'application/octet-stream',
+					evidenceId: data.evidenceId,
+					skipEmbedding: true,
+				});
+				extractionMethod = extracted.extractionMethod;
+				if (extracted.rawText && extracted.rawText.trim().length > 0) {
+					processedText = extracted.rawText;
+				} else if (isImage) {
+					processedText = '';
+				} else {
+					throw new Error('EVIDENCE_TEXT_EXTRACTION_EMPTY');
+				}
+			}
+			if (isImage && !data.skipEmbedding) {
+				const caseId = data.caseId ?? (typeof meta.caseId === 'string' ? meta.caseId : undefined);
+				if (!caseId) throw new Error('EVIDENCE_IMAGE_CASE_ID_REQUIRED');
+				await onProgress?.('content_analysis');
+				const { processEvidenceImageCanonicalV1 } = await import(
+					'$lib/server/evidence/process-evidence-image-canonical-v1.js'
+				);
+				imageResult = await processEvidenceImageCanonicalV1({
+					evidenceId: data.evidenceId,
+					caseId,
+					sourceRevision: expectedSourceSha256,
+					contentType: normalizedMime,
+					fileName: typeof meta.fileName === 'string' ? meta.fileName : 'evidence-image',
+					bytes: sourceBytes,
+				});
 			}
 		}
 
     // Granite-Docling enrichment: if text is short/empty and evidence is a document,
     // try to re-extract via Granite-Docling for better structure
-    if (data.contentType !== 'audio_transcription') {
+		if (data.contentType !== 'audio_transcription' && processedText.trim().length > 0) {
       try {
         const { isGraniteDoclingAvailable } = await import(
           '$lib/server/analysis/granite-docling.js'
@@ -566,15 +619,24 @@ export class EvidenceProcessWorker extends QueueWorker<{
 
     const { extractEntities } = await import('$lib/server/analysis/entity-extraction.js');
     const { detectForensicPatterns } = await import('$lib/server/analysis/forensics.js');
-		await onProgress?.('content_analysis');
+		if (!imageResult) await onProgress?.('content_analysis');
 
-    const [entities, forensics] = await Promise.all([
-      extractEntities(processedText).catch(() => []),
-      Promise.resolve(detectForensicPatterns(processedText)),
-    ]);
+		const [entities, forensics] = processedText.trim().length > 0
+			? await Promise.all([
+				extractEntities(processedText).catch(() => []),
+				Promise.resolve(detectForensicPatterns(processedText)),
+			])
+			: [[], []];
 
 		if (data.skipEmbedding) return null;
 		if (!objectKey) throw new Error('EVIDENCE_SOURCE_OBJECT_REFERENCE_REQUIRED');
+		if (!processedText.trim()) {
+			if (!imageResult) throw new Error('EVIDENCE_TEXT_EXTRACTION_EMPTY');
+			if (imageResult.sourceRevision !== expectedSourceSha256) {
+				throw new Error('EVIDENCE_CANONICAL_PERSISTENCE_RECEIPT_INVALID');
+			}
+			return imageResult;
+		}
 
     const { processEvidenceDocumentCanonicalV1 } = await import(
       '$lib/server/evidence/process-evidence-document-v1.js'
@@ -600,6 +662,7 @@ export class EvidenceProcessWorker extends QueueWorker<{
         forensics: { flags: forensics },
         contentType: data.contentType,
       },
+			...(imageResult ? { visualAnalysis: imageResult.analysis } : {}),
     });
 		if (
 			!Number.isSafeInteger(result.chunkCount) ||
@@ -609,7 +672,15 @@ export class EvidenceProcessWorker extends QueueWorker<{
 		) {
 			throw new Error('EVIDENCE_CANONICAL_PERSISTENCE_RECEIPT_INVALID');
 		}
-		return result;
+		if (!imageResult) return result;
+		return {
+			...result,
+			chunkCount: result.chunkCount + imageResult.chunkCount,
+			persistedCount: result.persistedCount + imageResult.persistedCount,
+			representationId: 'semantic_768+evidence_multimodal_semantic_768',
+			canonicalStore: 'postgresql.evidence_vectors+postgresql.evidence_multimodal_vectors',
+			canonicalStores: ['postgresql.evidence_vectors', 'postgresql.evidence_multimodal_vectors'],
+		};
 	}
 }
 

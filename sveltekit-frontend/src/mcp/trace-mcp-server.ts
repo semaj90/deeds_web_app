@@ -8657,14 +8657,20 @@ server.registerTool(
           {
             type: 'text' as const,
             text: JSON.stringify(
-              {
-                ok: true,
-                summary: result.summary,
-                suggestedTags: result.suggestedTags,
-                model: result.model,
-                cached: result.cached,
-                durationMs: Date.now() - t0,
-              },
+              result.available === false || result.model === 'none'
+                ? {
+                    ok: false,
+                    error: result.unavailableReason ?? 'VLM_UNAVAILABLE',
+                    durationMs: Date.now() - t0,
+                  }
+                : {
+                    ok: true,
+                    summary: result.summary,
+                    suggestedTags: result.suggestedTags,
+                    model: result.model,
+                    cached: result.cached,
+                    durationMs: Date.now() - t0,
+                  },
               null,
               2
             ),
@@ -8680,6 +8686,108 @@ server.registerTool(
           },
         ],
       };
+    }
+  }
+);
+
+// ── image.detect_objects ──────────────────────────────────────────────────────
+// Object detection on a local image file. Read-only: no database, cache, Qdrant
+// or object-store writes. Uses the same detector order as the evidence upload
+// path (docling-vlm service when DOCLING_SERVICE_URL is set, then the local ONNX
+// script under YOLO_PYTHON). Boxes are [x1, y1, x2, y2] in source-image pixels.
+// Detections are observations only: a 'person' label never identifies a person.
+server.registerTool(
+  'image.detect_objects',
+  {
+    description:
+      'Detect objects in a local image file and return class, confidence and a ' +
+      'source-pixel bounding box [x1,y1,x2,y2] for each. Read-only: writes nothing. ' +
+      'Reports which detector ran (service or local) and why any detector was ' +
+      'unavailable. Does not need the vision model on :8090. Labels are generic ' +
+      'observations, not identifications.',
+    inputSchema: z.object({
+      image_path: z
+        .string()
+        .min(1)
+        .max(1024)
+        .describe('Absolute or workspace-relative path to the image (JPEG/PNG/WebP/BMP/TIFF)'),
+      min_confidence: z
+        .number()
+        .min(0)
+        .max(1)
+        .optional()
+        .describe('Drop detections below this confidence (default 0, keep all)'),
+      max_detections: z
+        .number()
+        .int()
+        .min(1)
+        .max(200)
+        .optional()
+        .describe('Return at most this many detections, highest confidence first (default 50)'),
+    }),
+  },
+  async ({ image_path, min_confidence, max_detections }) => {
+    const { readFile, stat } = await import('node:fs/promises');
+    const { resolve, basename, extname } = await import('node:path');
+    const { createHash } = await import('node:crypto');
+    const reply = (payload: Record<string, unknown>) => ({
+      content: [{ type: 'text' as const, text: JSON.stringify(payload, null, 2) }],
+    });
+
+    const absPath = resolve(process.cwd(), image_path);
+    if (!/^\.(png|jpe?g|webp|bmp|tiff?)$/i.test(extname(absPath))) {
+      return reply({ ok: false, error: 'UNSUPPORTED_IMAGE_EXTENSION' });
+    }
+    let buffer: Buffer;
+    try {
+      const info = await stat(absPath);
+      if (!info.isFile()) return reply({ ok: false, error: 'NOT_A_FILE' });
+      if (info.size === 0 || info.size > 32 * 1024 * 1024) {
+        return reply({ ok: false, error: 'IMAGE_SIZE_OUT_OF_RANGE', bytes: info.size });
+      }
+      buffer = await readFile(absPath);
+    } catch {
+      return reply({ ok: false, error: `Cannot read: ${absPath}` });
+    }
+
+    try {
+      const { detectEvidenceObjects } = await import(
+        '../lib/server/analysis/evidence-analysis-pipeline.js'
+      );
+      const t0 = Date.now();
+      const outcome = await detectEvidenceObjects(buffer, basename(absPath));
+      const sourceSha256 = createHash('sha256').update(buffer).digest('hex');
+      if (!outcome.result) {
+        return reply({
+          ok: false,
+          error: 'DETECTOR_UNAVAILABLE',
+          detectorErrors: outcome.errors,
+          sourceSha256,
+          writesPerformed: false,
+        });
+      }
+      const floor = min_confidence ?? 0;
+      const kept = outcome.result.objects
+        .filter((o) => o.confidence >= floor)
+        .sort((a, b) => b.confidence - a.confidence);
+      const limit = max_detections ?? 50;
+      return reply({
+        ok: true,
+        authority: 'OBSERVATION_ONLY',
+        detector: outcome.source,
+        detectorErrors: outcome.errors,
+        modelType: outcome.result.modelType,
+        sourceSha256,
+        bboxFormat: 'xyxy_source_pixels',
+        totalDetections: kept.length,
+        truncated: kept.length > limit,
+        detections: kept.slice(0, limit),
+        layoutRegions: outcome.result.layout.regions.slice(0, limit),
+        durationMs: Date.now() - t0,
+        writesPerformed: false,
+      });
+    } catch (err) {
+      return reply({ ok: false, error: String(err).slice(0, 300), writesPerformed: false });
     }
   }
 );
@@ -8809,7 +8917,14 @@ server.registerTool(
 
     // ── 3. VLM caption ────────────────────────────────────────────────────────
     const fileName = resolvedPath ? basename(resolvedPath) : `point-${pid}.jpg`;
-    let vlmResult: { summary: string; suggestedTags: string[]; model: string; cached: boolean };
+    let vlmResult: {
+      summary: string;
+      suggestedTags: string[];
+      model: string;
+      cached: boolean;
+      available?: boolean;
+      unavailableReason?: string;
+    };
     try {
       vlmResult = await analyzeEvidenceImage({ buffer, fileName });
     } catch (e) {
@@ -8818,6 +8933,21 @@ server.registerTool(
           {
             type: 'text' as const,
             text: JSON.stringify({ ok: false, error: `VLM: ${String(e).slice(0, 200)}` }),
+          },
+        ],
+      };
+    }
+    // No model answered: do not PATCH an empty summary / model 'none' onto the point.
+    if (vlmResult.available === false || vlmResult.model === 'none') {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify({
+              ok: false,
+              error: `VLM: ${vlmResult.unavailableReason ?? 'VLM_UNAVAILABLE'}`,
+              writesPerformed: false,
+            }),
           },
         ],
       };
@@ -11581,6 +11711,7 @@ if (isDirectRun && MCP_TRANSPORT === 'stdio') {
     console.log('       evidence.link_image_graph (repair/backfill IMAGE_FOR Neo4j edges),');
     console.log('       image.search_by_text (text→embed→Qdrant, no file upload),');
     console.log('       image.caption (VLM describe only, no search),');
+    console.log('       image.detect_objects (object detection, source-pixel boxes, read-only),');
     console.log('       image.enrich_tags (VLM→tags→setPayload PATCH, merge dedup)');
     console.log('       ops.gpu_attention (operator-gated attention with persisted resource telemetry),');
     console.log('       ops.gpu_pagerank (operator-gated PageRank with persisted resource telemetry),');

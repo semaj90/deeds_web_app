@@ -5,6 +5,7 @@ vi.mock('$lib/server/db/client', () => ({ pool: { query: mockQuery } }));
 
 import {
 	assertLibraryIngestionLeaseV1,
+	claimLibraryIngestionJobByIdV1,
 	claimNextLibraryIngestionJobV1,
 	failLibraryIngestionAttemptV1,
 	heartbeatLibraryIngestionLeaseV1,
@@ -55,6 +56,44 @@ describe('library ingestion durable queue contract v1', () => {
 	it('returns no job when the ready queue is empty', async () => {
 		mockQuery.mockResolvedValueOnce({ rowCount: 0, rows: [] });
 		await expect(claimNextLibraryIngestionJobV1()).resolves.toBeNull();
+	});
+
+	it('claims only the job named by a document.parse dispatch', async () => {
+		const jobId = '01932000-0000-4000-8000-000000000001';
+		mockQuery.mockResolvedValueOnce({
+			rowCount: 1,
+			rows: [{ id: jobId, document_id: '01932000-0000-4000-8000-000000000002', lease_token: 'lease', fencing_token: '3', attempt_count: 2, source_hash: 'b'.repeat(64) }],
+		});
+
+		const claim = await claimLibraryIngestionJobByIdV1(jobId, 60);
+
+		expect(claim?.jobId).toBe(jobId);
+		const [sql, params] = mockQuery.mock.calls[0] as [string, unknown[]];
+		expect(sql).toContain('AND ($3::uuid IS NULL OR id = $3::uuid)');
+		expect(params[2]).toBe(jobId);
+	});
+
+	it('fences Rabbit dispatch against document, source hash, and stored revision before leasing', async () => {
+		const jobId = '01932000-0000-4000-8000-000000000001';
+		const documentId = '01932000-0000-4000-8000-000000000002';
+		const documentRevision = '01932000-0000-4000-8000-000000000003';
+		mockQuery.mockResolvedValueOnce({ rowCount: 0, rows: [] });
+
+		await expect(claimLibraryIngestionJobByIdV1(jobId, 60, {
+			documentId,
+			sourceSha256: 'c'.repeat(64),
+			documentRevision,
+		})).resolves.toBeNull();
+		const [sql, params] = mockQuery.mock.calls[0] as [string, unknown[]];
+		expect(sql).toContain('document_id = $4::uuid');
+		expect(sql).toContain('lower(source_hash) = lower($5::text)');
+		expect(sql).toContain('version.id = $6::uuid');
+		expect(params.slice(2)).toEqual([jobId, documentId, 'c'.repeat(64), documentRevision]);
+	});
+
+	it('rejects malformed specific job IDs before touching the database', async () => {
+		await expect(claimLibraryIngestionJobByIdV1('not-a-uuid')).rejects.toThrow('LIBRARY_INGESTION_JOB_ID_INVALID');
+		expect(mockQuery).not.toHaveBeenCalled();
 	});
 
 	it('rejects leases outside the bounded worker policy before querying', async () => {

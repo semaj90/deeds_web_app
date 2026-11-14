@@ -61,7 +61,15 @@ type AnalysisUploadReceiptV1 = {
 	chunkCount: number;
 	persistedCount: number;
 	sourceRevision: string;
+	canonicalReceiptVerified?: boolean;
 	synthesis?: EvidenceSynthesisResultV1;
+	representationId?: string;
+	canonicalStore?: string;
+	canonicalStores?: string[];
+	analysis?: unknown;
+	vectorId?: string;
+	qdrantPointId?: string;
+	outputSha256?: string;
 } | null;
 
 export async function executeAnalysisUploadPipelineV1(input: {
@@ -76,10 +84,12 @@ export async function executeAnalysisUploadPipelineV1(input: {
 }): Promise<Record<string, unknown>> {
 	const payload = buildAnalysisUploadEvidencePayloadV1(input);
 	const receipt = await input.processEvidence(payload, input.onProgress);
+	const verifiedNonVectorReceipt = receipt?.canonicalReceiptVerified === true &&
+		receipt.chunkCount === 0 && receipt.persistedCount === 0;
 	if (
 		!receipt ||
 		!Number.isSafeInteger(receipt.chunkCount) ||
-		receipt.chunkCount <= 0 ||
+		(!verifiedNonVectorReceipt && receipt.chunkCount <= 0) ||
 		receipt.persistedCount !== receipt.chunkCount ||
 		receipt.sourceRevision !== payload.sourceRevision
 	) {
@@ -89,10 +99,16 @@ export async function executeAnalysisUploadPipelineV1(input: {
 		status: 'processed',
 		evidenceId: payload.evidenceId,
 		sourceRevision: payload.sourceRevision,
-		representationId: 'semantic_768',
-		canonicalStore: 'postgresql.evidence_vectors',
+		representationId: receipt.representationId ?? 'semantic_768',
+		canonicalStore: receipt.canonicalStore ?? 'postgresql.evidence_vectors',
+		...(receipt.canonicalStores ? { canonicalStores: receipt.canonicalStores } : {}),
+		...(receipt.analysis ? { analysis: receipt.analysis } : {}),
+		...(receipt.vectorId ? { vectorId: receipt.vectorId } : {}),
+		...(receipt.qdrantPointId ? { qdrantPointId: receipt.qdrantPointId } : {}),
+		...(receipt.outputSha256 ? { outputSha256: receipt.outputSha256 } : {}),
 		chunkCount: receipt.chunkCount,
 		persistedCount: receipt.persistedCount,
+		...(receipt.canonicalReceiptVerified ? { canonicalReceiptVerified: true } : {}),
 		...(receipt.synthesis ? { synthesis: receipt.synthesis } : {}),
 	};
 }

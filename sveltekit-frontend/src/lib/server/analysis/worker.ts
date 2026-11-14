@@ -606,6 +606,19 @@ async function pollOnce(): Promise<void> {
 				}).catch(() => {});
 			}
 		}
+
+		try {
+			const { projectEvidenceMultimodalVectorOutboxBatchV1 } = await import(
+				'$lib/server/evidence/evidence-multimodal-vector-projection-worker-v1.js'
+			);
+			const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
+			await projectEvidenceMultimodalVectorOutboxBatchV1(db as any, qdrant as any, {
+				limit: 10,
+				resolveCollectionAlias: async () => 'evidence_multimodal_semantic_768',
+			});
+		} catch {
+			// Best-effort projection drainage on worker tick
+		}
 	} catch (err: any) {
 		consecutiveDbErrors++;
 		const readiness = classifyPostgresError(err);

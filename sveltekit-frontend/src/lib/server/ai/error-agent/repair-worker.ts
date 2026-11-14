@@ -40,12 +40,37 @@ export interface RepairWorkerStartResultV1 {
   promotionAuthorized: false;
 }
 
+export const MAX_REPAIR_WORKER_TURNS_V1 = 3;
+
+export function evaluateRepairWorkerVerifierGateV1(
+  request: ErrorAgentRepairRequestV1,
+): { allowed: boolean; reason: string } {
+  if (!request.workflowInput) {
+    return { allowed: false, reason: 'WORKFLOW_INPUT_MISSING' };
+  }
+  const { turn, verifierTier, verifierCmd } = request.workflowInput;
+  if (turn !== undefined && (!Number.isInteger(turn) || turn < 1 || turn > MAX_REPAIR_WORKER_TURNS_V1)) {
+    return { allowed: false, reason: 'AGENTIC_TURN_CAP_EXCEEDED' };
+  }
+  if (verifierTier === 'T2_DIAGNOSE_ONLY') {
+    return { allowed: false, reason: 'DIAGNOSE_ONLY_NO_PATCH' };
+  }
+  if (verifierTier === 'T1_SPEC_FILE_ON_DISK') {
+    return { allowed: false, reason: 'BLOCKED_MISSING_T0_VERIFIER' };
+  }
+  if (verifierTier === 'T0_RUNNABLE_VERIFIER' && (!verifierCmd || !verifierCmd.trim())) {
+    return { allowed: false, reason: 'BLOCKED_MISSING_T0_VERIFIER' };
+  }
+  return { allowed: true, reason: 'VERIFIER_GATE_PASSED' };
+}
+
 /** Execute one immutable request without enabling mutation or promotion. */
 export async function executeErrorAgentRepairRequestV1(
   request: ErrorAgentRepairRequestV1,
 ): Promise<RepairWorkerExecutionResultV1> {
-  if (!request.workflowInput) {
-    return { ok: false, proofRefs: [], reason: 'WORKFLOW_INPUT_MISSING' };
+  const gate = evaluateRepairWorkerVerifierGateV1(request);
+  if (!gate.allowed) {
+    return { ok: false, proofRefs: [], reason: gate.reason };
   }
 
   const selection: OpenSpecTaskSelection = {

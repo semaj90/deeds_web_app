@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { ingestVideoEvidence } from '$lib/server/features/evidence/index.js';
+import { admitVideoEvidenceV1, ingestVideoEvidence } from '$lib/server/features/evidence/index.js';
 import {
   checkVideoUploadSizeV1,
   isVideoUploadContentLengthAllowedV1,
@@ -18,6 +18,7 @@ const videoIngestSchema = z
     sourceUrl: z.string().url().optional(),
     operatorApproved: z.enum(['true', 'false']).default('false').transform((value) => value === 'true'),
     file: z.custom<File>((value) => value instanceof File, 'Must be a file').optional(),
+    mode: z.enum(['async', 'sync']).default('async'),
   })
   .refine((value) => Boolean(value.file || value.sourceUrl), {
     message: 'Provide either a video file or a source URL',
@@ -54,6 +55,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     sourceUrl: formData.get('sourceUrl') ?? undefined,
     operatorApproved: formData.get('operatorApproved') ?? undefined,
     file: formData.get('file') ?? undefined,
+    mode: formData.get('mode') ?? undefined,
   });
 
   if (!parsed.success) {
@@ -77,12 +79,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   try {
-    const result = await ingestVideoEvidence(parsed.data, String(ownerId));
+    if (parsed.data.mode === 'sync') {
+      const result = await ingestVideoEvidence(parsed.data, String(ownerId));
+      return json({
+        ok: true,
+        ...result,
+      });
+    }
 
-    return json({
-      ok: true,
-      ...result,
-    });
+    const result = await admitVideoEvidenceV1(parsed.data, ownerId);
+    return json(result, { status: 201 });
   } catch (error) {
     if (error instanceof EvidenceCaseNotFoundError) {
       return json({ ok: false, error: 'Case not found' }, { status: 404 });

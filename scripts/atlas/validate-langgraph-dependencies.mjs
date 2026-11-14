@@ -30,8 +30,14 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import semver from 'semver';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(__dirname, '..', '..');
 const FRONTEND_ROOT = path.resolve(__dirname, '..', '..', 'sveltekit-frontend');
 const frontendRequire = createRequire(path.join(FRONTEND_ROOT, 'package.json'));
+const PINNED_PACKAGES = [
+  '@langchain/core',
+  '@langchain/langgraph',
+  '@langchain/langgraph-checkpoint-postgres',
+];
 
 async function readPackageJson(pkgName) {
   const pkgPath = path.join(FRONTEND_ROOT, 'node_modules', pkgName, 'package.json');
@@ -39,18 +45,62 @@ async function readPackageJson(pkgName) {
   return JSON.parse(raw);
 }
 
+async function readDeclaredDeps(pkgJsonPath) {
+  const raw = await readFile(pkgJsonPath, 'utf8');
+  const parsed = JSON.parse(raw);
+  return { ...(parsed.dependencies ?? {}), ...(parsed.devDependencies ?? {}) };
+}
+
 async function main() {
   const langgraph = await readPackageJson('@langchain/langgraph').catch(() => null);
   const core = await readPackageJson('@langchain/core').catch(() => null);
+  const checkpoint = await readPackageJson('@langchain/langgraph-checkpoint-postgres').catch(() => null);
 
-  if (!langgraph || !core) {
+  if (!langgraph || !core || !checkpoint) {
     console.log(
       JSON.stringify({
         gate: 'LANGGRAPH_CORE_COMPATIBILITY',
         status: 'BLOCKED',
-        reason: !langgraph ? '@langchain/langgraph not installed' : '@langchain/core not installed',
+        reason: !langgraph
+          ? '@langchain/langgraph not installed'
+          : !core
+            ? '@langchain/core not installed'
+            : '@langchain/langgraph-checkpoint-postgres not installed',
       })
     );
+    process.exitCode = 1;
+    return;
+  }
+
+  const rootDeclared = await readDeclaredDeps(path.join(REPO_ROOT, 'package.json'));
+  const frontendDeclared = await readDeclaredDeps(path.join(FRONTEND_ROOT, 'package.json'));
+  const installedByPkg = {
+    '@langchain/core': core.version ?? null,
+    '@langchain/langgraph': langgraph.version ?? null,
+    '@langchain/langgraph-checkpoint-postgres': checkpoint.version ?? null,
+  };
+
+  const mismatches = [];
+  for (const pkgName of PINNED_PACKAGES) {
+    const rootSpec = rootDeclared[pkgName] ?? null;
+    const frontendSpec = frontendDeclared[pkgName] ?? null;
+    const installedVer = installedByPkg[pkgName] ?? null;
+    const exactSemver = (v) => typeof v === 'string' && /^\d+\.\d+\.\d+$/.test(v);
+    if (!exactSemver(rootSpec) || !exactSemver(frontendSpec) || rootSpec !== frontendSpec || rootSpec !== installedVer) {
+      mismatches.push({ pkgName, rootSpec, frontendSpec, installedVer });
+    }
+  }
+
+  console.log(
+    JSON.stringify({
+      gate: 'LANGGRAPH_PIN_ALIGNMENT',
+      status: mismatches.length === 0 ? 'PASS' : 'FAIL',
+      pinnedVersions: installedByPkg,
+      mismatches,
+    })
+  );
+
+  if (mismatches.length > 0) {
     process.exitCode = 1;
     return;
   }

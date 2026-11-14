@@ -1,54 +1,32 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import AddPoiModal from '$lib/components/poi/AddPoiModal.svelte';
 
 	let id = $derived(page.params.id);
 	let persons = $state<any[]>([]);
 	let loading = $state(true);
-	let showAddForm = $state(false);
+	let showAddModal = $state(false);
 	let saving = $state(false);
-	let newPerson = $state({ name: '', relationship: 'person_of_interest', description: '' });
 
 	async function loadPersons() {
 		loading = true;
 		try {
-			const res = await fetch(`/api/persons?caseId=${id}`, { signal: AbortSignal.timeout(30_000) });
+			const res = await fetch(`/api/persons-of-interest?caseId=${id}`, { signal: AbortSignal.timeout(30_000) });
 			if (res.ok) {
 				const result = await res.json();
-				persons = result.data ?? [];
+				persons = result.persons ?? result.data ?? [];
+			} else {
+				// Fallback to legacy endpoint if needed
+				const fallbackRes = await fetch(`/api/persons?caseId=${id}`, { signal: AbortSignal.timeout(30_000) });
+				if (fallbackRes.ok) {
+					const fallbackData = await fallbackRes.json();
+					persons = fallbackData.data ?? [];
+				}
 			}
 		} catch (err) {
 			console.error('Failed to load persons:', err);
 		} finally {
 			loading = false;
-		}
-	}
-
-	async function addPerson() {
-		if (!newPerson.name.trim()) return;
-		saving = true;
-		try {
-			const res = await fetch('/api/persons', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					name: newPerson.name.trim(),
-					relationship: newPerson.relationship,
-					description: newPerson.description.trim(),
-					caseIds: [id],
-					status: 'active',
-					threatLevel: 'low'
-				}),
-				signal: AbortSignal.timeout(30_000)
-			});
-			if (res.ok) {
-				newPerson = { name: '', relationship: 'person_of_interest', description: '' };
-				showAddForm = false;
-				await loadPersons();
-			}
-		} catch (err) {
-			console.error('Failed to add person:', err);
-		} finally {
-			saving = false;
 		}
 	}
 
@@ -62,38 +40,12 @@
 <div class="persons-tab">
 	<div class="persons-header">
 		<h2>Persons of Interest</h2>
-		<button class="btn-add" onclick={() => (showAddForm = !showAddForm)}>
-			{showAddForm ? 'Cancel' : '+ Add Person'}
+		<button class="btn-add" onclick={() => (showAddModal = true)}>
+			+ Add Person
 		</button>
 	</div>
 
-	{#if showAddForm}
-		<form class="add-form" onsubmit={(e) => { e.preventDefault(); addPerson(); }}>
-			<div class="form-row">
-				<label>
-					<span>Name *</span>
-					<input type="text" bind:value={newPerson.name} required placeholder="Full name" />
-				</label>
-				<label>
-					<span>Role</span>
-					<select bind:value={newPerson.relationship}>
-						<option value="person_of_interest">Person of Interest</option>
-						<option value="suspect">Suspect</option>
-						<option value="witness">Witness</option>
-						<option value="victim">Victim</option>
-						<option value="informant">Informant</option>
-					</select>
-				</label>
-			</div>
-			<label>
-				<span>Notes</span>
-				<textarea bind:value={newPerson.description} rows={2} placeholder="Optional notes..."></textarea>
-			</label>
-			<button type="submit" class="btn-primary" disabled={saving || !newPerson.name.trim()}>
-				{saving ? 'Saving...' : 'Add Person'}
-			</button>
-		</form>
-	{/if}
+	<AddPoiModal bind:open={showAddModal} caseId={id} oncreated={() => loadPersons()} />
 
 	{#if loading}
 		<div class="loading">Loading persons...</div>

@@ -67,6 +67,10 @@ const pipelineResultSchema = z.object({
 			})),
 		}),
 	}).nullable(),
+	detector: z.object({
+		source: z.string().max(20),
+		errors: z.array(z.string().max(300)).max(10),
+	}).optional(),
 }).passthrough();
 
 const vlmResultSchema = z.object({
@@ -157,8 +161,20 @@ export async function analyzeEvidenceImageV1(
 		: null;
 	if (pipelineSettled.status === 'rejected') stageErrors.push(`detection:${boundedError(pipelineSettled.reason)}`);
 	else if (!pipeline?.success) stageErrors.push('detection:RESULT_SCHEMA_INVALID');
-	const vlm = vlmSettled.status === 'fulfilled' ? vlmResultSchema.safeParse(vlmSettled.value) : null;
+	else if (pipeline.data.yolo === null) {
+		// No detector ran. Say so instead of returning an empty list silently.
+		const reasons = pipeline.data.detector?.errors.join('; ').slice(0, 300);
+		stageErrors.push(`detection:${reasons || 'DETECTOR_UNAVAILABLE'}`);
+	}
+	// A fulfilled promise is not a successful analysis: the analyzer reports
+	// "no model answered" as a value (model 'none' / available false).
+	const vlmUnavailable = vlmSettled.status === 'fulfilled'
+		&& (vlmSettled.value?.available === false || vlmSettled.value?.model === 'none');
+	const vlm = vlmSettled.status === 'fulfilled' && !vlmUnavailable
+		? vlmResultSchema.safeParse(vlmSettled.value)
+		: null;
 	if (vlmSettled.status === 'rejected') stageErrors.push(`vision:${boundedError(vlmSettled.reason)}`);
+	else if (vlmUnavailable) stageErrors.push(`vision:${vlmSettled.value?.unavailableReason ?? 'VLM_UNAVAILABLE'}`);
 	else if (!vlm?.success) stageErrors.push('vision:RESULT_SCHEMA_INVALID');
 	if (depthSettled.status === 'rejected') stageErrors.push(`depth:${boundedError(depthSettled.reason)}`);
 

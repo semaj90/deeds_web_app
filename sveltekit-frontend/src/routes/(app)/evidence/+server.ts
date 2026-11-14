@@ -7,11 +7,6 @@ const evidenceUploadFieldsSchema = z.object({
   caseId: z.string().min(1).max(200).default('unknown'),
 });
 
-// Allow GET requests to pass through to the page
-export const GET: RequestHandler = async () => {
-  return new Response(null, { status: 200 });
-};
-
 // A light wrapper that accepts multipart form uploads and stores the file in SeaweedFS under the 'evidence' bucket.
 export const POST: RequestHandler = async ({ request }) => {
   try {

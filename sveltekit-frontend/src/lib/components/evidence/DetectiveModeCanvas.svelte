@@ -16,6 +16,8 @@
 		demoMode?: boolean;
 		onOpen3DViewer?: (evidenceItem: any) => void;
 		onOpenDocEditor?: (node: any) => void;
+		onOpenVideoModal?: (evidenceId: string, timestampMs?: number) => void;
+		onOpenEvidenceModal?: (item: any) => void;
 	}
 
 	let {
@@ -24,7 +26,9 @@
 		evidenceItems = [],
 		demoMode = false,
 		onOpen3DViewer,
-		onOpenDocEditor
+		onOpenDocEditor,
+		onOpenVideoModal,
+		onOpenEvidenceModal
 	}: Props = $props();
 
 	// Theme: 'dark' (Noir Obsidian/Gold) | 'light' (Image 2 Crisp White/Slate)
@@ -105,6 +109,10 @@
 
 	function handleExpandGalleryExhibit(item: EvidenceItem) {
 		selectedGalleryExhibitId = item.id;
+		if ((item.type === 'video' || item.type === 'cctv') && onOpenVideoModal) {
+			onOpenVideoModal(item.id);
+			return;
+		}
 		isExpandedViewerOpen = true;
 	}
 
@@ -1742,6 +1750,18 @@
 							provenanceLabel="SYNTHETIC HYPOTHESIS"
 						/>
 					</div>
+
+					<!-- Detective Video Modal Trigger -->
+					<div class="nei-section" style="margin-top: 10px;">
+						<button
+							type="button"
+							class="detective-launch-video-btn w-full py-2.5 px-3 rounded bg-[#202530] hover:bg-[#2b3240] text-[#e5c158] border border-[#e5c158]/40 text-xs font-mono font-bold tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
+							onclick={() => onOpenVideoModal?.(crimeEvidenceE002.id)}
+						>
+							<Icon name="video" size={14} />
+							<span>Inspect Video Keyframes & Filmstrip</span>
+						</button>
+					</div>
 				</div>
 			{:else if inspectorMode === 'scene-primitive' && selectedScenePrimitive}
 				<div class="inspector-scroll-area" data-testid="scene-primitive-inspector">
@@ -1988,6 +2008,7 @@
 			mainView = 'dossier';
 			ornithAiPrompt = `Cross-examine witness based on Exhibit ${item.exhibitNumber} (${item.title}): ${item.summary}`;
 		}}
+		onOpenVideoModal={(id) => onOpenVideoModal?.(id)}
 	/>
 	{/if}
 </div>

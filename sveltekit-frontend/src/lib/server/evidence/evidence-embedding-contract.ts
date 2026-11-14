@@ -10,6 +10,12 @@ import { deriveUUID } from '$lib/utils/uuid.js';
  */
 export const EVIDENCE_EMBEDDING_TYPE = 'evidence_text_semantic_768' as const;
 export const EVIDENCE_SOURCE_FIELD = 'canonical_evidence_text' as const;
+export const EVIDENCE_REVISION_SOURCE_FIELD = 'evidence_markup_revision_text' as const;
+export const ALLOWED_EVIDENCE_SOURCE_FIELDS = [
+  EVIDENCE_SOURCE_FIELD,
+  EVIDENCE_REVISION_SOURCE_FIELD,
+] as const;
+export type AllowedEvidenceSourceField = (typeof ALLOWED_EVIDENCE_SOURCE_FIELDS)[number];
 export const EVIDENCE_SEMANTIC_DIMENSION = 768 as const;
 /** Input recipe: SHA-256 over the exact UTF-8 bytes of the chunk text, no task prefix, no trimming. */
 export const EVIDENCE_INPUT_RECIPE_REVISION = 'evidence-chunk-text-raw-utf8.v1' as const;
@@ -36,11 +42,12 @@ export interface EvidenceEmbeddingCandidate {
   chunkIndex: number;
   content: string;
   vector: readonly number[];
+  sourceField?: string;
   provenance: Partial<EvidenceEmbeddingProvenance> | null | undefined;
 }
 
 export type EvidenceEmbeddingDecision =
-  | { ok: true; embeddingType: typeof EVIDENCE_EMBEDDING_TYPE; sourceField: typeof EVIDENCE_SOURCE_FIELD }
+  | { ok: true; embeddingType: typeof EVIDENCE_EMBEDDING_TYPE; sourceField: AllowedEvidenceSourceField }
   | { ok: false; reasons: string[] };
 
 export function evidenceInputSha256(content: string): string {
@@ -95,8 +102,20 @@ export function decideEvidenceEmbedding(candidate: EvidenceEmbeddingCandidate): 
     }
   }
 
+  const requestedSourceField = candidate.sourceField ?? EVIDENCE_SOURCE_FIELD;
+  const validSourceField = ALLOWED_EVIDENCE_SOURCE_FIELDS.includes(
+    requestedSourceField as AllowedEvidenceSourceField,
+  );
+  if (!validSourceField) {
+    reasons.push('SOURCE_FIELD_INVALID');
+  }
+
   return reasons.length === 0
-    ? { ok: true, embeddingType: EVIDENCE_EMBEDDING_TYPE, sourceField: EVIDENCE_SOURCE_FIELD }
+    ? {
+        ok: true,
+        embeddingType: EVIDENCE_EMBEDDING_TYPE,
+        sourceField: requestedSourceField as AllowedEvidenceSourceField,
+      }
     : { ok: false, reasons };
 }
 

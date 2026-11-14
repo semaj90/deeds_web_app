@@ -55,6 +55,43 @@ export const BitsetSliceDescriptorV1Schema = z.object({
 
 export type BitsetSliceDescriptorV1 = z.infer<typeof BitsetSliceDescriptorV1Schema>;
 
+export type PackedBitOrderV1 = 'LSB0' | 'MSB0';
+
+/** Convert byte-local bit numbering while preserving logical bit indices. Returns an owned copy. */
+export function convertPackedBitOrderV1(
+  bytes: Uint8Array,
+  bitCount: number,
+  from: PackedBitOrderV1,
+  to: PackedBitOrderV1,
+): Uint8Array {
+  if (!(bytes instanceof Uint8Array) || !Number.isSafeInteger(bitCount) || bitCount < 1) {
+    throw new Error('BIT_ORDER_INPUT_INVALID');
+  }
+  if (bytes.byteLength !== Math.ceil(bitCount / 8)) throw new Error('BIT_ORDER_BYTE_LENGTH_MISMATCH');
+
+  const usedBitsInTail = bitCount & 7;
+  if (usedBitsInTail !== 0) {
+    const paddingMask = from === 'LSB0'
+      ? (0xff << usedBitsInTail) & 0xff
+      : (1 << (8 - usedBitsInTail)) - 1;
+    if ((bytes[bytes.byteLength - 1]! & paddingMask) !== 0) throw new Error('BIT_ORDER_NONZERO_PADDING');
+  }
+
+  const out = new Uint8Array(bytes.byteLength);
+  if (from === to) {
+    out.set(bytes);
+    return out;
+  }
+
+  for (let i = 0; i < bytes.byteLength; i++) {
+    let value = bytes[i]!;
+    value = ((value & 0x55) << 1) | ((value >>> 1) & 0x55);
+    value = ((value & 0x33) << 2) | ((value >>> 2) & 0x33);
+    out[i] = ((value << 4) | (value >>> 4)) & 0xff;
+  }
+  return out;
+}
+
 export interface BitsetSliceBindingV1 {
   workspaceRevision: string;
   sourceRevision: string;

@@ -91,6 +91,63 @@ describe('analyzeEvidenceImageV1', () => {
 		expect(result.stageErrors).toHaveLength(3);
 	});
 
+	it('does not count a "no model answered" VLM value as a completed vision stage', async () => {
+		const dependencies = createDependencies({
+			analyzeVlm: vi.fn(async () => ({
+				summary: '',
+				keyFindings: [],
+				suggestedTags: [],
+				model: 'none',
+				cached: false,
+				available: false,
+				unavailableReason: 'VLM_UNREACHABLE' as const,
+				resizeMeta: { resized: false, originalWidth: 10, originalHeight: 10, vlmSize: 10 },
+			})),
+		});
+		const result = await analyzeEvidenceImageV1(createInput(), dependencies);
+
+		expect(result.status).toBe('PARTIAL');
+		expect(result.visionSummary).toBeNull();
+		expect(result.visionFindings).toEqual([]);
+		expect(result.stageErrors).toContain('vision:VLM_UNREACHABLE');
+	});
+
+	it('records a stage error when no detector ran, instead of an empty detection list', async () => {
+		const dependencies = createDependencies({
+			runPipeline: vi.fn().mockResolvedValue({
+				yolo: null,
+				detector: { source: 'none', errors: ['service:DOCLING_SERVICE_URL_NOT_CONFIGURED', 'local:PYTHON_ONNXRUNTIME_OR_MODEL_UNAVAILABLE'] },
+			}),
+		});
+		const result = await analyzeEvidenceImageV1(createInput(), dependencies);
+
+		expect(result.status).toBe('PARTIAL');
+		expect(result.objectDetections).toEqual([]);
+		expect(result.stageErrors).toContain(
+			'detection:service:DOCLING_SERVICE_URL_NOT_CONFIGURED; local:PYTHON_ONNXRUNTIME_OR_MODEL_UNAVAILABLE'
+		);
+	});
+
+	it('treats the legacy placeholder shape (model none with text) as unavailable', async () => {
+		const dependencies = createDependencies({
+			runPipeline: vi.fn().mockRejectedValue(new Error('detector unavailable')),
+			fetchDepth: vi.fn().mockRejectedValue(new Error('depth unavailable')),
+			analyzeVlm: vi.fn(async () => ({
+				summary: 'Image analysis unavailable — Triton and TurboQuant were unreachable',
+				keyFindings: [],
+				suggestedTags: [],
+				model: 'none',
+				cached: false,
+				resizeMeta: { resized: false, originalWidth: 10, originalHeight: 10, vlmSize: 10 },
+			})),
+		});
+		const result = await analyzeEvidenceImageV1(createInput(), dependencies);
+
+		expect(result.status).toBe('UNAVAILABLE');
+		expect(result.visionSummary).toBeNull();
+		expect(result.stageErrors).toContain('vision:VLM_UNAVAILABLE');
+	});
+
 	it('rejects malformed detector responses and records other successful stages', async () => {
 		const dependencies = createDependencies({
 			runPipeline: vi.fn().mockResolvedValue({ yolo: { objects: [{ class: 'bad', confidence: 2, bbox: [1] }], layout: { regions: [] } } }),

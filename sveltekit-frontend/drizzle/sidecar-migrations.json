@@ -2,6 +2,34 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20261113_evidence_multimodal_vectors_v1_DRAFT.sql",
+      "status": "active_candidate",
+      "reason": "Scratch-only additive PostgreSQL 18/pgvector candidate for canonical revision-bound multimodal vectors and a separate Qdrant projection outbox. Guarded to legal_ai_live_integration_scratch; not journaled, approved, or applied to production.",
+      "appliedBy": "manual psql 2026-11-14 to legal_ai_db (operator-approved; scratch guard bypassed at apply time, file unchanged, sha256 597559597a2f88391359f0106d3c3c3236788899d37ef08babcb7f879a00fe8f; readback: 2 tables, 8 indexes, vector(768), 0 rows)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261114_evidence_multimodal_vectors_document_chunk_v1.sql",
+      "status": "applied",
+      "reason": "Widens the modality CHECK on evidence_multimodal_vectors and its projection outbox to admit 'document_chunk' (EmbeddingGemma 2 evidence text chunks). Additive; tables were empty.",
+      "appliedBy": "manual psql 2026-11-14 to legal_ai_db (rehearsed with ROLLBACK first; sha256 aad939faeec19f71d4b809450ac22f8f3c86cd3f847feabc89b0947b400e0cdd; readback: both constraints contain document_chunk, 0 rows)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261114_poi_photos_face_embedding_vector768_v1.sql",
+      "status": "applied",
+      "reason": "Converts poi_photos.face_embedding from text to vector(768) so the live column matches the Drizzle schema and vector distance queries run. Idempotent.",
+      "appliedBy": "manual psql 2026-11-14 to legal_ai_db (operator-approved; rehearsed with ROLLBACK; pre-image archived; sha256 8eaf7432897d813e03b327a5e1d916d6ff5f475a4076a2243f374f230e8c167b; readback: vector(768), 4 of 4 rows 768-d)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261113_atlas_dspy_prompt_turns_v1_DRAFT.sql",
+      "status": "active_candidate",
+      "reason": "DRAFT, NOT APPLIED. Scratch-only PostgreSQL 18 DDL for public.atlas_dspy_prompt_turns_v1 (prompt_id, signature_name, prompt_revision, model_id, adapter_rev, prefix_sha256, inputs_schema, outputs_schema, verifier_cmd, reward, task_key, turn, created_at) with current_database() = 'legal_ai_live_integration_scratch' guard, turn BETWEEN 1 AND 3 constraint, and forbidden thought/KV key checks.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
       "file": "manual/20261106_atlas_spatial_keyframes_v1.sql",
       "status": "active_candidate",
       "reason": "Proposed case-scoped PostgreSQL 18 keyframe packet table with 256-bit occupancy masks, packed 64-byte transforms and cluster metadata. Composite identity includes case, scene and revision. Candidate only; not applied to live database.",
@@ -1260,6 +1288,21 @@
       "status": "proposal_only",
       "reason": "Unapplied additive event-history proposal for resumable evidence-job SSE. Rehearse in a disposable transaction before any operator-controlled application.",
       "appliedBy": "none",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/parent_atlas_artifact_transport_v1.sql",
+      "status": "proposal_only",
+      "reason": "Existing reference-only workflow artifact storage and fenced action lease/receipt DDL required by draft artifact persistence. Not applied; rehearse on disposable PostgreSQL 18 and verify the project-scoped artifact contract before any operator-controlled application.",
+      "appliedBy": "none",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261113_evidence_vectors_widen_source_field_v1_DRAFT.sql",
+      "status": "active_candidate",
+      "reason": "Scratch-only draft widening public.evidence_vectors_source_field_ck to allow evidence_markup_revision_text alongside canonical_evidence_text for V2 markup revision indexing. Guarded by current_database() = legal_ai_live_integration_scratch; unapplied.",
+      "appliedBy": "not-applied",
+      "appliedAt": null,
       "requiresJournalEntry": false
     }
   ]

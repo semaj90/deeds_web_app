@@ -1034,3 +1034,80 @@ describe('/api/conversations/[id] (PUT/DELETE)', () => {
     });
   });
 });
+
+// ── POST: who/what/why/how intake fields and primary case link ──
+describe('/api/persons-of-interest POST intake fields', () => {
+  let POST: Function;
+
+  beforeEach(async () => {
+    const mod = await import('../src/routes/api/persons-of-interest/+server');
+    POST = mod.POST;
+    insertChain.values.mockClear();
+  });
+
+  it('stores who/what/why/how as analyst-entered text and links the owned primary case', async () => {
+    const { db } = await import('$lib/server/db/client');
+    (db.select as any).mockReturnValueOnce({
+      from: vi.fn(() => ({ where: vi.fn(async () => [{ id: VALID_UUID }]) })),
+    });
+    const res = await POST({
+      request: mkRequest({
+        name: 'Marcus Hale',
+        caseId: VALID_UUID,
+        who: '  Warehouse shift supervisor.  ',
+        what: 'Removed sealed records.',
+        why: '',
+        how: 'Borrowed access badge.',
+        intakeSource: 'txt_import',
+        intakeFileName: 'hale-intake.txt',
+        relationship: 'witness',
+        aliases: ['Mack'],
+        dateOfBirth: '1980-02-03',
+        address: '12 Dock Road',
+      }),
+      locals: authedLocals,
+    });
+    expect(res.status).toBe(201);
+    const stored = (insertChain.values.mock.calls[0] as unknown[])[0] as Record<string, any>;
+    expect(stored.caseId).toBe(VALID_UUID);
+    expect(stored.caseIds).toEqual([VALID_UUID]);
+    expect(stored.who).toEqual({ text: 'Warehouse shift supervisor.', source: 'txt_import', authority: 'ANALYST_ENTERED' });
+    expect(stored.what).toEqual({ text: 'Removed sealed records.', source: 'txt_import', authority: 'ANALYST_ENTERED' });
+    expect(stored.why).toBeNull();
+    expect(stored.how.text).toBe('Borrowed access badge.');
+    expect(stored.relationship).toBe('witness');
+    expect(stored.profileData).toEqual({ dateOfBirth: '1980-02-03', address: '12 Dock Road' });
+    expect(stored.metadata).toEqual({ intakeSource: 'txt_import', intakeFileName: 'hale-intake.txt' });
+  });
+
+  it('rejects a primary case the user does not own, without inserting', async () => {
+    const { db } = await import('$lib/server/db/client');
+    (db.select as any).mockReturnValueOnce({
+      from: vi.fn(() => ({ where: vi.fn(async () => []) })),
+    });
+    const res = await POST({
+      request: mkRequest({ name: 'Marcus Hale', caseId: VALID_UUID, who: 'x' }),
+      locals: authedLocals,
+    });
+    expect(res.status).toBe(404);
+    expect(insertChain.values).not.toHaveBeenCalled();
+  });
+
+  it('rejects a malformed case id and an oversized section', async () => {
+    const bad = await POST({ request: mkRequest({ name: 'A', caseId: 'not-a-uuid' }), locals: authedLocals });
+    expect(bad.status).toBe(400);
+    const big = await POST({ request: mkRequest({ name: 'A', who: 'x'.repeat(5001) }), locals: authedLocals });
+    expect(big.status).toBe(400);
+    expect(insertChain.values).not.toHaveBeenCalled();
+  });
+
+  it('creates a person with no case and no sections (homepage quick add)', async () => {
+    const res = await POST({ request: mkRequest({ name: 'Jane Roe' }), locals: authedLocals });
+    expect(res.status).toBe(201);
+    const stored = (insertChain.values.mock.calls[0] as unknown[])[0] as Record<string, any>;
+    expect(stored.caseId).toBeNull();
+    expect(stored.caseIds).toEqual([]);
+    expect(stored.who).toBeNull();
+    expect(stored.metadata).toEqual({ intakeSource: 'manual' });
+  });
+});

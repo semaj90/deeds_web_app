@@ -1562,6 +1562,105 @@ export const evidenceVectorProjectionOutbox = pgTable(
   ]
 );
 
+// Separate canonical lane for image/video/audio representations. The existing
+// evidence_vectors table remains restricted to canonical extracted text.
+export const evidenceMultimodalVectors = pgTable(
+  'evidence_multimodal_vectors',
+  {
+    id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    evidenceId: uuid('evidence_id').notNull().references(() => evidence.id, { onDelete: 'restrict' }),
+    sourceRevision: text('source_revision').notNull(),
+    analysisRevision: text('analysis_revision').notNull(),
+    modality: text('modality').notNull(),
+    sourceLocator: jsonb('source_locator').$type<Record<string, unknown>>().notNull(),
+    sourceLocatorSha256: text('source_locator_sha256').notNull(),
+    embedding: vector('embedding', { dimensions: 768 }).notNull(),
+    embeddingType: text('embedding_type').notNull().default('evidence_multimodal_semantic_768'),
+    model: text('model').notNull(),
+    modelArtifactSha256: text('model_artifact_sha256').notNull(),
+    preprocessingRevision: text('preprocessing_revision').notNull(),
+    inputSha256: text('input_sha256').notNull(),
+    outputSha256: text('output_sha256').notNull(),
+    metadata: jsonb('metadata').$type<Record<string, unknown>>().notNull().default({}),
+    createdAt: timestamp('created_at', { withTimezone: true }).default(sql`clock_timestamp()`).notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`clock_timestamp()`).notNull(),
+  },
+  (table) => [
+    check('evidence_multimodal_vectors_source_revision_ck', sql`${table.sourceRevision} ~ '^sha256:[0-9a-f]{64}$'`),
+    check('evidence_multimodal_vectors_analysis_revision_ck', sql`length(btrim(${table.analysisRevision})) > 0`),
+    check('evidence_multimodal_vectors_modality_ck', sql`${table.modality} IN ('image', 'video_frame', 'audio_segment', 'video_window', 'document_chunk')`),
+    check('evidence_multimodal_vectors_locator_ck', sql`jsonb_typeof(${table.sourceLocator}) = 'object'`),
+    check('evidence_multimodal_vectors_locator_sha_ck', sql`${table.sourceLocatorSha256} ~ '^[0-9a-f]{64}$'`),
+    check('evidence_multimodal_vectors_embedding_type_ck', sql`${table.embeddingType} = 'evidence_multimodal_semantic_768'`),
+    check('evidence_multimodal_vectors_model_ck', sql`length(btrim(${table.model})) > 0`),
+    check('evidence_multimodal_vectors_model_sha_ck', sql`${table.modelArtifactSha256} ~ '^sha256:[0-9a-f]{64}$'`),
+    check('evidence_multimodal_vectors_preprocessing_ck', sql`length(btrim(${table.preprocessingRevision})) > 0`),
+    check('evidence_multimodal_vectors_input_sha_ck', sql`${table.inputSha256} ~ '^sha256:[0-9a-f]{64}$'`),
+    check('evidence_multimodal_vectors_output_sha_ck', sql`${table.outputSha256} ~ '^sha256:[0-9a-f]{64}$'`),
+    unique('evidence_multimodal_vectors_identity_uq').on(
+      table.evidenceId, table.sourceRevision, table.analysisRevision, table.modality,
+      table.sourceLocatorSha256, table.modelArtifactSha256, table.preprocessingRevision,
+    ),
+    index('evidence_multimodal_vectors_evidence_revision_idx').on(
+      table.evidenceId, table.sourceRevision, table.analysisRevision, table.modality,
+    ),
+  ],
+);
+
+export const evidenceMultimodalVectorProjectionOutbox = pgTable(
+  'evidence_multimodal_vector_projection_outbox',
+  {
+    id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    evidenceMultimodalVectorId: uuid('evidence_multimodal_vector_id').notNull()
+      .references(() => evidenceMultimodalVectors.id, { onDelete: 'restrict' }),
+    qdrantPointId: uuid('qdrant_point_id').notNull(),
+    projectionLane: text('projection_lane').notNull(),
+    projectionContractRevision: text('projection_contract_revision').notNull(),
+    sourceRevision: text('source_revision').notNull(),
+    analysisRevision: text('analysis_revision').notNull(),
+    modality: text('modality').notNull(),
+    sourceLocatorSha256: text('source_locator_sha256').notNull(),
+    modelArtifactSha256: text('model_artifact_sha256').notNull(),
+    preprocessingRevision: text('preprocessing_revision').notNull(),
+    inputSha256: text('input_sha256').notNull(),
+    outputSha256: text('output_sha256').notNull(),
+    status: varchar('status', { length: 24 }).default('PENDING').notNull(),
+    attemptCount: integer('attempt_count').default(0).notNull(),
+    maxAttempts: integer('max_attempts').default(8).notNull(),
+    availableAt: timestamp('available_at', { withTimezone: true }).default(sql`clock_timestamp()`).notNull(),
+    leaseToken: uuid('lease_token'),
+    leaseExpiresAt: timestamp('lease_expires_at', { withTimezone: true }),
+    lastError: text('last_error'),
+    verificationReceipt: jsonb('verification_receipt').$type<Record<string, unknown>>(),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).default(sql`clock_timestamp()`).notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`clock_timestamp()`).notNull(),
+  },
+  (table) => [
+    check('evidence_multimodal_vector_outbox_lane_ck', sql`${table.projectionLane} = 'evidence_multimodal_semantic_768'`),
+    check('evidence_multimodal_vector_outbox_contract_ck', sql`length(btrim(${table.projectionContractRevision})) > 0`),
+    check('evidence_multimodal_vector_outbox_source_revision_ck', sql`${table.sourceRevision} ~ '^sha256:[0-9a-f]{64}$'`),
+    check('evidence_multimodal_vector_outbox_analysis_revision_ck', sql`length(btrim(${table.analysisRevision})) > 0`),
+    check('evidence_multimodal_vector_outbox_modality_ck', sql`${table.modality} IN ('image', 'video_frame', 'audio_segment', 'video_window', 'document_chunk')`),
+    check('evidence_multimodal_vector_outbox_locator_sha_ck', sql`${table.sourceLocatorSha256} ~ '^[0-9a-f]{64}$'`),
+    check('evidence_multimodal_vector_outbox_model_sha_ck', sql`${table.modelArtifactSha256} ~ '^sha256:[0-9a-f]{64}$'`),
+    check('evidence_multimodal_vector_outbox_preprocessing_ck', sql`length(btrim(${table.preprocessingRevision})) > 0`),
+    check('evidence_multimodal_vector_outbox_input_sha_ck', sql`${table.inputSha256} ~ '^sha256:[0-9a-f]{64}$'`),
+    check('evidence_multimodal_vector_outbox_output_sha_ck', sql`${table.outputSha256} ~ '^sha256:[0-9a-f]{64}$'`),
+    check('evidence_multimodal_vector_outbox_status_ck', sql`${table.status} IN ('PENDING', 'PROCESSING', 'RETRY', 'COMPLETED', 'DEAD_LETTER')`),
+    check('evidence_multimodal_vector_outbox_attempts_ck', sql`${table.attemptCount} >= 0 AND ${table.maxAttempts} > 0`),
+    check('evidence_multimodal_vector_outbox_lease_ck', sql`(${table.status} = 'PROCESSING' AND ${table.leaseToken} IS NOT NULL AND ${table.leaseExpiresAt} IS NOT NULL) OR (${table.status} <> 'PROCESSING' AND ${table.leaseToken} IS NULL AND ${table.leaseExpiresAt} IS NULL)`),
+    check('evidence_multimodal_vector_outbox_completion_ck', sql`(${table.status} = 'COMPLETED' AND ${table.completedAt} IS NOT NULL AND ${table.verificationReceipt} IS NOT NULL) OR (${table.status} <> 'COMPLETED' AND ${table.completedAt} IS NULL AND ${table.verificationReceipt} IS NULL)`),
+    unique('evidence_multimodal_vector_outbox_identity_uq').on(
+      table.evidenceMultimodalVectorId, table.projectionLane, table.projectionContractRevision,
+    ),
+    index('evidence_multimodal_vector_outbox_dispatch_idx').on(table.availableAt, table.createdAt, table.id)
+      .where(sql`${table.status} IN ('PENDING', 'RETRY')`),
+    index('evidence_multimodal_vector_outbox_lease_idx').on(table.leaseExpiresAt, table.id)
+      .where(sql`${table.status} = 'PROCESSING'`),
+  ],
+);
+
 /**
  * Evidence Analysis Cache — queryable analysis results for fast client hits.
  * Stores YOLO detections, VLM findings, LLM synthesis, and graph connections

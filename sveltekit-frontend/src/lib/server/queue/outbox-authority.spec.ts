@@ -12,7 +12,7 @@ vi.mock('$lib/server/db/client.js', () => ({
   db: { execute: mocks.execute, transaction: mocks.transaction },
 }));
 
-import { enqueueTask, publishOutboxBatch } from './outbox.js';
+import { enqueueTask, enqueueTaskInTransaction, publishOutboxBatch } from './outbox.js';
 
 function uuid(fill: string): string {
   return `${fill.repeat(8)}-${fill.repeat(4)}-4${fill.repeat(3)}-8${fill.repeat(3)}-${fill.repeat(12)}`;
@@ -39,6 +39,26 @@ describe('authoritative task outbox', () => {
 
     expect(mocks.transaction).toHaveBeenCalledTimes(1);
     expect(mocks.execute).toHaveBeenCalledTimes(2);
+  });
+
+  it('can persist a document task into a caller-owned transaction without nesting transactions', async () => {
+    const tx = { execute: vi.fn(async () => ({ rows: [] })) };
+    const taskId = uuid('5');
+    const result = await enqueueTaskInTransaction(tx, {
+      runId: uuid('6'),
+      requestId: uuid('7'),
+      commandType: 'document.parse',
+      capability: 'library.document.parse',
+      targetWorkerClass: 'library-ingestion-worker',
+      payload: { jobId: taskId, documentId: uuid('8'), sourceSha256: 'a'.repeat(64) },
+      timeoutMs: 1_800_000,
+      taskId,
+    });
+
+    expect(result.taskId).toBe(taskId);
+    expect(result.commandId).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(tx.execute).toHaveBeenCalledTimes(2);
+    expect(mocks.transaction).not.toHaveBeenCalled();
   });
 
   it('marks an outbox row delivered only after the publisher promise resolves', async () => {

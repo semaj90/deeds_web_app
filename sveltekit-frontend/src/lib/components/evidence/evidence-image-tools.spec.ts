@@ -1,41 +1,61 @@
 import { describe, expect, it, vi } from 'vitest';
-import { analyzeStoredEvidenceImage, requestEvidenceUpscale } from './evidence-image-tools';
+import { loadCanonicalStoredEvidenceImageAnalysis } from './evidence-image-tools.js';
 
-describe('evidence image tools', () => {
-	it('requests analysis for the authorized evidence record', async () => {
-		const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify({
+const evidenceId = '22222222-2222-4222-8222-222222222222';
+const sourceRevision = `sha256:${'a'.repeat(64)}`;
+
+describe('canonical saved image analysis readback', () => {
+	it('loads source-coordinate detections and provenance from the authorized readback route', async () => {
+		const fetcher = vi.fn(async () => new Response(JSON.stringify({
 			success: true,
-			analysis: { summary: 'Possible storefront', keyFindings: ['Sign visible'], suggestedTags: ['storefront'] },
+			status: 'CURRENT',
+			sourceRevision,
+			analysisRevision: 'image-analysis-r1',
+			model: 'embeddinggemma2:q8',
+			preprocessingRevision: 'sharp-vlm-2048-v1',
+			reviewState: 'UNREVIEWED_PROPOSAL',
+			analysis: {
+				schema: 'atlas.evidence-visual-analysis.v1',
+				sourceRevision,
+				status: 'PARTIAL',
+				objectDetections: [
+					{ class: 'vehicle', confidence: 0.91, bbox: [10, 20, 80, 100] },
+					{ class: 'bad-box', confidence: 0.4, bbox: [20, 20, 10, 10] },
+				],
+				visionSummary: 'A vehicle appears in the image.',
+				visionFindings: ['Vehicle visible'],
+				visionTags: ['vehicle'],
+				stageErrors: ['vision:VLM_UNREACHABLE'],
+			},
 		}), { status: 200, headers: { 'content-type': 'application/json' } }));
 
-		const result = await analyzeStoredEvidenceImage('evidence/id', fetcher);
+		const result = await loadCanonicalStoredEvidenceImageAnalysis(evidenceId, fetcher as typeof fetch);
 
-		expect(fetcher).toHaveBeenCalledWith('/api/evidence/evidence%2Fid/vlm-analyze', expect.objectContaining({ method: 'POST' }));
-		expect(fetcher.mock.calls[0]?.[1]?.body).toBe('{}');
-		expect(result.analysis.summary).toBe('Possible storefront');
+		expect(fetcher).toHaveBeenCalledWith(`/api/evidence/${evidenceId}/multimodal-analysis`, expect.objectContaining({ method: 'GET', cache: 'no-store' }));
+		expect(result).toMatchObject({ status: 'CURRENT', analysis: {
+			sourceRevision,
+			analysisRevision: 'image-analysis-r1',
+			reviewState: 'UNREVIEWED_PROPOSAL',
+			embeddingModel: 'embeddinggemma2:q8',
+			detectorStatus: 'completed',
+			vlmStatus: 'unavailable',
+			boxes: [{ x: 10, y: 20, w: 70, h: 80, label: 'vehicle', conf: 0.91 }],
+			analysis: { summary: 'A vehicle appears in the image.', keyFindings: ['Vehicle visible'], suggestedTags: ['vehicle'] },
+		} });
 	});
 
-	it('requests an authorized 2x preview and validates its image response', async () => {
-		const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(new Blob(['png'], { type: 'image/png' }), {
-			status: 200,
-			headers: { 'content-type': 'image/png', 'X-Upscale-Size': '1200x800' },
-		}));
-
-		const result = await requestEvidenceUpscale('evidence/id', 2, fetcher);
-
-		expect(fetcher).toHaveBeenCalledWith('/api/evidence/evidence%2Fid/upscale', expect.objectContaining({ method: 'POST' }));
-		expect(JSON.parse(String(fetcher.mock.calls[0]?.[1]?.body))).toEqual({ scale: 2 });
-		expect(result.dimensions).toBe('1200x800');
-		expect(result.blob.type).toBe('image/png');
+	it('does not expose stale observations as current', async () => {
+		const fetcher = vi.fn(async () => new Response(JSON.stringify({ success: true, status: 'STALE', analysis: null }), { status: 200 }));
+		expect(await loadCanonicalStoredEvidenceImageAnalysis(evidenceId, fetcher as typeof fetch)).toMatchObject({
+			status: 'STALE', analysis: null,
+		});
 	});
 
-	it('surfaces model-mode and authorization errors without masking them', async () => {
-		const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify({ error: 'VLM not in VISION mode', hint: 'Switch to VISION' }), {
-			status: 503,
-			headers: { 'content-type': 'application/json' },
-		}));
-
-		await expect(analyzeStoredEvidenceImage('evidence-1', fetcher))
-			.rejects.toThrow('VLM not in VISION mode — Switch to VISION');
+	it('surfaces a clear state while the schema candidate is not installed', async () => {
+		const fetcher = vi.fn(async () => new Response(JSON.stringify({ success: false, status: 'STORE_UNAVAILABLE', error: 'CANONICAL_IMAGE_ANALYSIS_STORE_UNAVAILABLE' }), { status: 503 }));
+		expect(await loadCanonicalStoredEvidenceImageAnalysis(evidenceId, fetcher as typeof fetch)).toMatchObject({
+			status: 'STORE_UNAVAILABLE', analysis: null,
+			message: 'Saved analysis storage is not available yet.',
+		});
 	});
 });

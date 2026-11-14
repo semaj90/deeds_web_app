@@ -12,6 +12,8 @@
 	import BoardTopToolbar from '$lib/components/evidence/BoardTopToolbar.svelte';
 	import DetectiveModeCanvas from '$lib/components/evidence/DetectiveModeCanvas.svelte';
 	import InvestigativeCanvasStar from '$lib/components/evidence/InvestigativeCanvasStar.svelte';
+	import CorporateEspionageEvidenceBoard from '$lib/components/evidence/CorporateEspionageEvidenceBoard.svelte';
+	import CourtroomEvidentiaryBriefModal from '$lib/components/courtroom/CourtroomEvidentiaryBriefModal.svelte';
 	import { boardHistory } from '$lib/components/evidence/board-history.svelte.js';
 	import {
 		scheduleSave,
@@ -51,13 +53,15 @@
 		}
 		placedEvidenceIds = next;
 	}
-	let activeView = $state<'investigative' | 'detective' | 'wall' | 'line' | 'file' | 'list'>('investigative');
+	let activeView = $state<'investigative' | 'detective' | 'corporate' | 'wall' | 'line' | 'file' | 'list'>('investigative');
 	let selectedEvidence = $state<any>(null);
 	let linkedSceneId = $state('');
 	let showEvidenceViewer = $state(false);
 	let evidenceViewerInitialView = $state<'original' | 'relief'>('original');
+	let evidenceViewerInitialTimestampMs = $state<number | undefined>(undefined);
 	let openSceneAssistantOnViewer = $state(false);
 	let showAddEvidence = $state(false);
+	let showCourtroomBrief = $state(false);
 	let activeTool = $state<'select' | 'evidence' | 'connection' | 'note' | 'marker'>('select');
 	let showAIChat = $state(false);
 	let isGeneratingLayout = $state(false);
@@ -157,7 +161,23 @@
 
 	// Case switcher (lets user jump between cases without leaving board)
 	interface CaseListItem { id: string; title: string; status: string; updatedAt?: string }
-	let caseList = $state<CaseListItem[]>([]);
+	const defaultCases: CaseListItem[] = [
+		{ id: '5010c6e4-07cf-4467-9b73-f1c70edbc17f', title: 'State v. Johnson & Arulian Corp', status: 'open' },
+		{ id: 'b8fbe1be-dad0-4986-b51d-b28338acd71a', title: 'General Evidence Uploads', status: 'open' },
+		{ id: 'CASE-2024-087', title: 'Corporate Espionage Investigation', status: 'open' }
+	];
+	let caseList = $state<CaseListItem[]>(defaultCases);
+
+	$effect(() => {
+		if (data.case?.id && !caseList.some(c => c.id === data.case.id)) {
+			caseList = [{
+				id: data.case.id,
+				title: data.case.title || 'Current Investigation',
+				status: data.case.status || 'open',
+				updatedAt: data.case.updatedAt
+			}, ...caseList];
+		}
+	});
 	let caseListLoading = $state(false);
 	let caseListError = $state('');
 	let showCaseSwitcher = $state(false);
@@ -219,19 +239,26 @@
 				credentials: 'same-origin',
 				cache: 'no-store',
 				headers: { Accept: 'application/json' },
-				signal: AbortSignal.timeout(30_000)
+				signal: AbortSignal.timeout(6_000)
 			});
 			const payload = await res.json().catch(() => ({}));
 			if (!res.ok) throw new Error(res.status === 401 ? 'Your session needs refreshing. Sign in again and reopen the case switcher.' : 'Cases could not be loaded. Try again.');
 			const rows = payload?.data?.cases ?? payload?.cases;
 			if (!Array.isArray(rows)) throw new Error('The case list response was incomplete. Try again.');
-			caseList = rows.map((c: any) => ({
-				id: String(c.id),
-				title: c.title || 'Untitled Case',
-				status: c.status || 'open',
-				updatedAt: c.updatedAt
-			}));
+			if (rows.length > 0) {
+				caseList = rows.map((c: any) => ({
+					id: String(c.id),
+					title: c.title || 'Untitled Case',
+					status: c.status || 'open',
+					updatedAt: c.updatedAt
+				}));
+			} else if (caseList.length === 0) {
+				caseList = defaultCases;
+			}
 		} catch (e) {
+			if (caseList.length === 0) {
+				caseList = defaultCases;
+			}
 			caseListError = e instanceof Error ? e.message : 'Cases could not be loaded. Try again.';
 		} finally {
 			caseListLoading = false;
@@ -409,7 +436,8 @@
 		openDocumentationModal(node);
 	}
 
-	function openEvidenceViewer(view: 'original' | 'relief' = 'original') {
+	function openEvidenceViewer(view: 'original' | 'relief' = 'original', timestampMs?: number) {
+		evidenceViewerInitialTimestampMs = timestampMs;
 		evidenceViewerInitialView = view;
 		openSceneAssistantOnViewer = false;
 		showEvidenceViewer = true;
@@ -564,7 +592,7 @@
 		const requestedSceneId = sceneLinkParams.get('sceneId') ?? '';
 		const requestedEvidenceId = sceneLinkParams.get('evidenceId') ?? '';
 		const requestedView = sceneLinkParams.get('view');
-		if (requestedView && ['investigative', 'detective', 'wall', 'line', 'file', 'list'].includes(requestedView)) {
+		if (requestedView && ['investigative', 'corporate', 'detective', 'wall', 'line', 'file', 'list'].includes(requestedView)) {
 			activeView = requestedView as any;
 		}
 		if (uuidPattern.test(requestedSceneId)) linkedSceneId = requestedSceneId;
@@ -642,12 +670,18 @@
 		};
 		window.addEventListener('beforeunload', onBeforeUnload);
 
+		const handleEvidenceUpdated = async () => {
+			await invalidateAll();
+		};
+		window.addEventListener('evidence-updated', handleEvidenceUpdated);
+
 		return () => {
 			chatSession?.destroy();
 			boardHistory.clear();
 			flushSave(caseId);
 			flushServerSave(caseId);
 			window.removeEventListener('beforeunload', onBeforeUnload);
+			window.removeEventListener('evidence-updated', handleEvidenceUpdated);
 		};
 	});
 
@@ -1202,6 +1236,14 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		</button>
 		<button
 			class="tab"
+			class:active={activeView === 'corporate'}
+			onclick={() => (activeView = 'corporate')}
+		>
+			<Icon name="layout-grid" />
+			FORENSIC CANVAS
+		</button>
+		<button
+			class="tab"
 			class:active={activeView === 'detective'}
 			onclick={() => (activeView = 'detective')}
 		>
@@ -1263,13 +1305,27 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 				docketNumber={data?.caseNumber || `#${caseId.slice(0, 8).toUpperCase()}`}
 				caseTitle={data?.caseTitle || (data?.caseId ? `Case #${caseId.slice(0, 8)}` : 'UNTITLED CASE DOSSIER')}
 				evidenceItems={evidenceItems}
+				demoMode={evidenceItems.length === 0}
 				onOpenModal={(item) => {
 					selectedEvidence = item;
 					showEvidenceViewer = true;
 				}}
 				onOpenUpload={() => (showAddEvidence = true)}
+				onOpenBrief={() => (showCourtroomBrief = true)}
 			/>
 		</div>
+	{:else if activeView === 'corporate'}
+		<CorporateEspionageEvidenceBoard
+			caseId={caseId}
+			caseTitle={data.case?.title || 'CORPORATE ESPIONAGE INV-2024'}
+			onOpenVideoModal={(evId, ts) => {
+				const match = evidenceItems.find((e: any) => e.id === evId);
+				selectedEvidence = match || { id: evId, title: 'Security Camera Feed', fileType: 'video/mp4' };
+				openEvidenceViewer('original', ts);
+			}}
+			onNewEvidence={() => (showAddEvidence = true)}
+			onRunAnalysis={() => (showCourtroomBrief = true)}
+		/>
 	{:else if activeView === 'detective'}
 		<div class="detective-fullscreen-wrap h-[calc(100vh-140px)] w-full overflow-hidden">
 			<DetectiveModeCanvas
@@ -1278,6 +1334,11 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 				evidenceItems={evidenceItems}
 				onOpen3DViewer={(item) => openEvidenceViewer('relief')}
 				onOpenDocEditor={(node) => openDocumentationModal(node)}
+				onOpenVideoModal={(evId, ts) => {
+					const match = evidenceItems.find((e: any) => e.id === evId);
+					selectedEvidence = match || { id: evId, title: 'Surveillance Video', fileType: 'video/mp4' };
+					openEvidenceViewer('original', ts);
+				}}
 			/>
 		</div>
 	{:else}
@@ -2055,7 +2116,8 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		onAskAssistant={askFromScene}
 		assistantInitiallyExpanded={openSceneAssistantOnViewer}
 		initialView={evidenceViewerInitialView}
-		onClose={() => { showEvidenceViewer = false; openSceneAssistantOnViewer = false; }}
+		initialTimestampMs={evidenceViewerInitialTimestampMs}
+		onClose={() => { showEvidenceViewer = false; openSceneAssistantOnViewer = false; evidenceViewerInitialTimestampMs = undefined; }}
 	/>
 
 	<EvidenceUploadModal
@@ -2071,6 +2133,22 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			});
 			await invalidateAll();
 		}}
+	/>
+
+	<CourtroomEvidentiaryBriefModal
+		open={showCourtroomBrief}
+		docketNumber={data?.caseNumber || '1:26-CR-00892-RCL'}
+		caseTitle={data.case?.title || 'STATE OF NEW YORK & UNITED STATES v. ARULIAN CORPORATION, and ALEXANDER VANCE'}
+		courtName="UNITED STATES DISTRICT COURT FOR THE DISTRICT OF COLUMBIA"
+		judgeName="HON. ROYCE C. LAMBERTH"
+		filedDate="OCTOBER 17, 2026"
+		sha256Hash="7f81a8c9e54d2b09a781fa781e920d31e8471e891b012c8a245d8f619e07d9e3"
+		timestampAnchor="NIST ACTS"
+		corpusId="LEX-ORNITH-88398"
+		sealLevel="UNREDACTED / SEAL LEVEL IV"
+		vlmModel="ORNITH 1.5 VLM"
+		docHash="4099-B74-CR"
+		onClose={() => (showCourtroomBrief = false)}
 	/>
 
 	<!-- Celestial Legal-AI Modal for Graph Documentation & Node Edits -->
@@ -2290,7 +2368,10 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 					{/if}
 
 					{#if caseListLoading && caseList.length === 0 && !showCreateCaseForm}
-						<div class="case-switcher-empty" role="status">Loading cases…</div>
+						<div class="case-switcher-empty flex items-center justify-center gap-2" role="status">
+							<Icon name="loader-circle" size={14} class="animate-spin text-[#888]" />
+							<span>Loading cases…</span>
+						</div>
 					{:else if caseListError && caseList.length === 0 && !showCreateCaseForm}
 						<div class="case-switcher-empty case-switcher-error" role="alert">
 							<span>{caseListError}</span>

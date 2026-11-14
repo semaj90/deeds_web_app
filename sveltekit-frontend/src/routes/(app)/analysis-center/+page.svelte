@@ -216,6 +216,32 @@
 		ingestFile = target.files?.[0] ?? null;
 	}
 
+	function analyzeExtractedPreview() {
+		const preview = String(ingestResult?.contentPreview ?? '').trim();
+		if (!preview) return;
+
+		const source = String(ingestResult?.filename ?? ingestResult?.title ?? 'uploaded file');
+		const prompt = `Review this extracted preview from "${source}". Treat it as a partial OCR/text preview, separate observed text from uncertainty, and do not assume it represents the entire source.\n\n${preview.slice(0, 760)}`;
+		analysisQuery = prompt.slice(0, 1000);
+		analysisMode = 'pattern';
+		activeTab = 'analyze';
+		activeTool = null;
+		window.setTimeout(() => {
+			document.querySelector<HTMLTextAreaElement>('.analysis-input[name="query"]')?.focus();
+		}, 0);
+	}
+
+	function toggleTool(toolId: string) {
+		activeTool = activeTool === toolId ? null : toolId;
+		if (activeTool) {
+			window.requestAnimationFrame(() => {
+				window.requestAnimationFrame(() => {
+					document.getElementById('active-tool-panel')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+				});
+			});
+		}
+	}
+
 	const analysisModes = [
 		{ id: 'pattern' as const, label: 'PATTERN ANALYSIS', icon: 'P' },
 		{ id: 'correlation' as const, label: 'CORRELATION', icon: 'C' },
@@ -600,7 +626,7 @@
 			] as tool}
 				<button
 					class="tool-card {activeTool === tool.id ? 'active' : ''}"
-					onclick={() => (activeTool = activeTool === tool.id ? null : tool.id)}
+					onclick={() => toggleTool(tool.id)}
 				>
 					<span class="tool-icon-badge">[{tool.badge}]</span>
 					<span class="tool-label">{tool.label}</span>
@@ -611,7 +637,7 @@
 	</div>
 
 	{#if activeTool}
-		<div class="tool-expanded">
+		<div id="active-tool-panel" class="tool-expanded">
 			<div class="tool-expanded-header">
 				<button class="tool-close-btn" onclick={() => (activeTool = null)}>✕ CLOSE</button>
 			</div>
@@ -658,7 +684,7 @@
 						<p style="color: #8b949e; font-size: 0.85rem; margin-bottom: 1rem;">
 							Paste a URL or upload PDF, TXT, Markdown, JSON, CSV, HTML, or image files to chunk, embed, OCR, and store in the knowledge base for chat and RAG search.
 						</p>
-						<div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+						<div class="ingest-source-row">
 							<input
 								type="url"
 								bind:value={ingestUrl}
@@ -682,7 +708,7 @@
 								{ingestLoading ? 'INGESTING...' : 'INGEST'}
 							</button>
 						</div>
-						<div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem; align-items: center; flex-wrap: wrap;">
+						<div class="ingest-file-row">
 							<input
 								type="file"
 								accept=".pdf,.txt,.md,.json,.csv,.xml,.html,.htm,.log,.yaml,.yml,.png,.jpg,.jpeg,.webp,.bmp,.tif,.tiff"
@@ -708,33 +734,45 @@
 							</div>
 						{/if}
 						{#if ingestResult}
-							<div style="color: #10b981; background: #10b98120; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem;">
-								<strong>Ingested:</strong> {ingestResult.title}<br/>
-								<strong>Source:</strong> {ingestResult.sourceType === 'file' ? ingestResult.filename : ingestResult.url}<br/>
-								<strong>Status:</strong>
-								{#if ingestResult.indexingStatus === 'queued'}
-									<span style="color: #fbbf24;">Preview ready, background indexing queued</span>
-								{:else if ingestResult.indexingStatus === 'deferred'}
-									<span style="color: #f59e0b;">Retrieval indexing deferred</span>
-								{:else}
-									<span>Indexed</span>
+							<section class="ingest-result" aria-live="polite">
+								<div class="ingest-result-heading">
+									<div>
+										<p class="ingest-eyebrow">UPLOAD SUMMARY</p>
+										<h4>{ingestResult.title ?? ingestResult.filename ?? 'Document received'}</h4>
+									</div>
+									<span class="ingest-status {ingestResult.indexingStatus ?? 'completed'}">
+										{ingestResult.indexingStatus === 'queued'
+											? 'Indexing queued'
+											: ingestResult.indexingStatus === 'deferred'
+												? 'Indexing paused'
+												: 'Ready'}
+									</span>
+								</div>
+								<p class="ingest-source">{ingestResult.sourceType === 'file' ? ingestResult.filename : ingestResult.url}</p>
+								{#if ingestJobStatus && ingestResult.indexingStatus === 'queued'}
+									<div class="ingest-progress-row">
+										<progress max="100" value={Math.min(100, Math.max(0, Number(ingestJobStatus.progress) || 0))} aria-label="Background indexing progress"></progress>
+										<span>{Math.min(100, Math.max(0, Number(ingestJobStatus.progress) || 0))}%</span>
+									</div>
+									<p class="ingest-job-message">{ingestJobStatus.message}</p>
 								{/if}
-								<br/>
-								{#if ingestJobStatus}
-									<strong>Job:</strong> {ingestJobStatus.message} ({ingestJobStatus.progress}%)<br/>
-								{/if}
-								<strong>Chunks:</strong> {ingestResult.chunksCreated} ({ingestResult.totalTokens} tokens)<br/>
-								{#if ingestResult.extractionMethod}
-									<strong>Extraction:</strong> {ingestResult.extractionMethod}<br/>
-								{/if}
-								{#if ingestResult.yoloLabels?.length}
-									<strong>YOLO:</strong> {ingestResult.yoloLabels.join(', ')}<br/>
-								{/if}
+								<div class="ingest-facts">
+									<span><strong>Chunks</strong>{ingestResult.chunksCreated ?? 0}</span>
+									<span><strong>Chunk words</strong>{ingestResult.totalTokens ?? 0}</span>
+									<span><strong>Extraction</strong>{ingestResult.extractionMethod ?? 'text preview'}</span>
+									<span><strong>Embedding</strong>{ingestResult.embeddingModel ?? 'not available yet'}</span>
+									<span><strong>Elapsed</strong>{ingestResult.totalMs ?? 0} ms</span>
+								</div>
+								<p class="ingest-count-note">Chunk words are a text count, not NES glyphs or model tokens.</p>
 								{#if ingestResult.contentPreview}
-									<strong>Preview:</strong> {ingestResult.contentPreview}<br/>
+									<details class="ingest-preview">
+										<summary>View extracted preview</summary>
+										<pre>{ingestResult.contentPreview}</pre>
+										<p class="ingest-preview-note">This is extracted text for review. It is not a custom font glyph or proof that the full document has been analyzed.</p>
+										<button type="button" class="analyze-preview-btn" onclick={analyzeExtractedPreview}>Analyze this preview</button>
+									</details>
 								{/if}
-								<strong>Model:</strong> {ingestResult.embeddingModel ?? 'pending'} | <strong>Time:</strong> {ingestResult.totalMs}ms
-							</div>
+							</section>
 						{/if}
 					</div>
 				{/if}
@@ -957,9 +995,9 @@
 		position: relative;
 		z-index: 1;
 		display: grid;
-		grid-template-columns: 1fr 1fr 280px;
+		grid-template-columns: minmax(16rem, 0.95fr) minmax(20rem, 1.25fr) minmax(15rem, 0.8fr);
 		gap: 1rem;
-		min-height: clamp(24rem, 54vh, 40rem);
+		min-height: clamp(20rem, 42vh, 34rem);
 		padding: 1rem;
 	}
 
@@ -1380,10 +1418,33 @@
 	.tool-icon-badge { font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; color: #10b981; }
 	.tool-label { font-size: 0.7rem; font-weight: 600; color: #e6edf3; }
 	.tool-desc { font-size: 0.6rem; color: #6b7280; }
-	.tool-expanded { margin: 1rem 1rem 0; border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; overflow: auto; max-height: min(72vh, 52rem); }
+	.tool-expanded { margin: 1rem 1rem 0; border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; overflow: auto; overscroll-behavior: contain; scroll-margin-top: 1rem; max-height: min(60vh, 40rem); }
 	.tool-expanded-header { display: flex; justify-content: flex-end; padding: 0.5rem 0.75rem; background: rgba(16,185,129,0.05); border-bottom: 1px solid rgba(16,185,129,0.15); }
 	.tool-close-btn { font-size: 0.7rem; color: #6b7280; cursor: pointer; background: none; border: none; padding: 0.2rem 0.5rem; border-radius: 4px; }
 	.tool-close-btn:hover { color: #10b981; background: rgba(16,185,129,0.1); }
+	.ingest-source-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(9rem, 12rem) auto; gap: 0.5rem; margin-bottom: 0.75rem; }
+	.ingest-file-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem; }
+	.ingest-result { min-width: 0; padding: 1rem; border: 1px solid rgba(16,185,129,0.25); border-radius: 8px; background: rgba(16,185,129,0.07); color: #d1fae5; }
+	.ingest-result-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+	.ingest-eyebrow { margin: 0 0 0.25rem; color: #6ee7b7; font-size: 0.65rem; letter-spacing: 0.12em; }
+	.ingest-result h4 { margin: 0; color: #f0fdf4; font-size: 0.95rem; overflow-wrap: anywhere; }
+	.ingest-status { flex: 0 0 auto; padding: 0.25rem 0.55rem; border: 1px solid rgba(52,211,153,0.35); border-radius: 999px; color: #a7f3d0; font-size: 0.7rem; }
+	.ingest-status.queued { color: #fde68a; border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.08); }
+	.ingest-status.deferred { color: #fdba74; border-color: rgba(249,115,22,0.4); background: rgba(249,115,22,0.08); }
+	.ingest-source { margin: 0.35rem 0 0.75rem; color: #9ca3af; font-size: 0.75rem; overflow-wrap: anywhere; }
+	.ingest-progress-row { display: flex; align-items: center; gap: 0.6rem; color: #fde68a; font-size: 0.72rem; }
+	.ingest-progress-row progress { flex: 1; width: 100%; height: 0.55rem; accent-color: #10b981; }
+	.ingest-job-message { margin: 0.35rem 0 0.75rem; color: #cbd5e1; font-size: 0.75rem; }
+	.ingest-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: 0.5rem; }
+	.ingest-facts span { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; color: #e5e7eb; font-size: 0.75rem; overflow-wrap: anywhere; }
+	.ingest-facts strong { color: #6ee7b7; font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+	.ingest-count-note { margin: 0.55rem 0 0; color: #8b949e; font-size: 0.66rem; }
+	.ingest-preview { margin-top: 0.8rem; padding-top: 0.75rem; border-top: 1px solid rgba(16,185,129,0.2); }
+	.ingest-preview summary { color: #a7f3d0; cursor: pointer; font-size: 0.78rem; }
+	.ingest-preview pre { max-height: 12rem; overflow: auto; margin: 0.6rem 0; padding: 0.75rem; border: 1px solid #263244; border-radius: 6px; background: #0b1118; color: #d1d5db; white-space: pre-wrap; overflow-wrap: anywhere; font: 0.78rem/1.5 'JetBrains Mono', 'Consolas', monospace; }
+	.ingest-preview-note { margin: 0 0 0.6rem; color: #9ca3af; font-size: 0.7rem; line-height: 1.45; }
+	.analyze-preview-btn { padding: 0.5rem 0.75rem; border: 1px solid rgba(52,211,153,0.45); border-radius: 5px; background: rgba(16,185,129,0.13); color: #a7f3d0; cursor: pointer; font: inherit; font-size: 0.75rem; }
+	.analyze-preview-btn:hover { background: rgba(16,185,129,0.22); }
 	@media (max-width: 1100px) {
 		.analysis-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 0; }
 		.evidence-panel { grid-column: 1 / -1; min-height: 14rem; }
@@ -1393,5 +1454,8 @@
 		.query-panel, .results-panel, .evidence-panel { min-height: 16rem; }
 		.tools-panel { margin: 1rem 0.75rem; }
 		.tool-expanded { margin: 0.75rem; max-height: 72vh; }
+		.ingest-source-row, .ingest-file-row { grid-template-columns: minmax(0, 1fr); }
+		.ingest-source-row input[type='text'] { width: 100% !important; }
+		.ingest-result-heading { flex-direction: column; gap: 0.5rem; }
 	}
 </style>

@@ -32,6 +32,7 @@ import { libraryIngestionIdentityV1 } from './library-ingestion-identity-v1.js';
 import { buildLibraryPageSpansV1, parseLibraryOcrPageSpansV1, resolveLibraryChunkPageSpanV1, verifyLibraryChunkSourceSpanV1, type LibraryPageSpanV1 } from './library-page-lineage-v1.js';
 import { SourceOffsetTableV1 } from './utf16-utf8-span-bridge-v1.js';
 import { LibraryIngestionTimingV1 } from './library-ingestion-timing-v1.js';
+import { enqueueTaskInTransaction } from '$lib/server/queue/outbox.js';
 import { pipeBoundedWebStreamV1 } from '$lib/server/library/library-bounded-stream-v1.js';
 import {
 	isSupportedLibraryUploadMimeTypeV1,
@@ -964,6 +965,37 @@ export async function uploadLibraryDocumentStreamV1(opts: {
 				id: jobId, documentId, sourceHash, stage: 'queued', status: 'queued', attemptCount: 0, maxAttempts: 3,
 			});
 			if (opts.caseId) await tx.insert(caseLibraryLinks).values({ caseId: opts.caseId, documentId });
+
+			// The durable ingestion_jobs row remains the canonical execution state.
+			// This transactional command is a wake-up/dispatch projection; the worker
+			// still claims the exact job under the existing lease and fencing rules.
+			const workflowRunId = randomUUID();
+			const requestId = randomUUID();
+			const traceId = workflowRunId;
+			await tx.execute(sql`
+				INSERT INTO workflow_runs (id, user_id, status, trace_id, query, graph_id, started_at, updated_at)
+				VALUES (
+					${workflowRunId}::uuid, ${numericActorId}, 'received', ${traceId},
+					${`Parse library upload ${documentId}`}, 'library-ingestion-v1', now(), now()
+				)
+			`);
+			await enqueueTaskInTransaction(tx, {
+				runId: workflowRunId,
+				requestId,
+				traceId,
+				commandType: 'document.parse',
+				capability: 'library.document.parse',
+				targetWorkerClass: 'library-ingestion-worker',
+				payload: {
+					jobId,
+					documentId,
+					sourceSha256: sourceHash,
+					documentRevision: versionId,
+					caseId: opts.caseId ?? null,
+				},
+				timeoutMs: 1_800_000,
+				taskId: jobId,
+			});
 			return { documentId, jobId, sourceHash, byteLength: observedBytes, alreadyExists: false, processingStatus: 'queued' };
 		});
 		if (result.alreadyExists) {

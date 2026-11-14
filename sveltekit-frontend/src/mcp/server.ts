@@ -28,6 +28,11 @@ import { PHASE18_RERANKER_TOOL_SCHEMA, handlePhase18RerankerToolCall } from './t
 import { ATLAS_IDENTITY_AUDIT_SCHEMA, ATLAS_CROSS_STORE_PROOF_SCHEMA, handleAtlasIdentityAudit, handleAtlasCrossStoreProof } from './atlas_identity_audit_tools.js';
 import { ATLAS_SEMANTIC_TOOL_DEFINITIONS, handleAtlasSemanticToolCall } from '$lib/server/atlas/atlas-semantic-tools.js';
 import { phase109aTools, getPhase109aToolDefinitions } from '$lib/server/mcp/phase109a-mcp-tools.js';
+import {
+  EVIDENCE_CANVAS_DHASH_MCP_TOOL_DEFINITIONS,
+  handleEvidenceCanvasDhashMcpToolCall,
+  isEvidenceCanvasDhashMcpToolName,
+} from '$lib/server/mcp/evidence-canvas-dhash-mcp-tools-v1.js';
 
 const SCHEMA_INDEXER_CONTRACT_CARDS_PATH = join(process.cwd(), 'memory', 'knowledge', 'schema-indexer-contract-cards.jsonl');
 
@@ -826,6 +831,7 @@ export function setupToolHandlers() {
         inputSchema: ATLAS_CROSS_STORE_PROOF_SCHEMA.strict().passthrough() as any,
       },
       ...ATLAS_SEMANTIC_TOOL_DEFINITIONS,
+      ...EVIDENCE_CANVAS_DHASH_MCP_TOOL_DEFINITIONS,
       {
         name: 'codebase:explain_cluster',
         description:
@@ -5545,6 +5551,16 @@ export function setupToolHandlers() {
         name === 'atlas.delegate'
       ) {
         const result = await handleAtlasSemanticToolCall(name, args as Record<string, unknown>);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+          isError: !result.ok,
+        };
+      }
+      if (isEvidenceCanvasDhashMcpToolName(name)) {
+        const result = await handleEvidenceCanvasDhashMcpToolCall(
+          name,
+          (args ?? {}) as Record<string, unknown>
+        );
         return {
           content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
           isError: !result.ok,
