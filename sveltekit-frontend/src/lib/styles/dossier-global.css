@@ -325,12 +325,12 @@
    One removable block. Applies ONLY when the active theme is light: no data-theme attribute,
    `parchment` or `research-light` (the theme store sets html[data-theme]; see lib/config/themes.ts and
    the per-theme palettes in app.html). Dark themes (yorha-dark, yorha-bw, investigation, nes-retro,
-   high-contrast) are untouched. Pages that render an element with class `legal-corpus-navy`
+   high-contrast) are untouched. Pages that render an element with class `legal-corpus-navy` (legal corpus) or `keep-dark-shell` (any page designed as a dark board)
    keep the original navy/white shell. It (a) defines the cream --t-* palette that the root layout's
    --shell-* variables read, and (b) overrides the root layout's hard-coded dark fallbacks (zero-
    specificity :where() rules, so any selector with specificity wins). Delete this section to revert.
    Contrast (verified): text #141312 / muted #6B6150 / accent #67140F on #ECE7DC and #FAF6F0 >= 4.5:1. */
-html:root:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) {
+html:root:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) {
 	color-scheme: light;
 	/* ResearchShell (library, citations; legal-corpus is excluded above) reads these, falling back to its dark originals */
 	--rs-bg: #ECE7DC;
@@ -394,29 +394,29 @@ html:root:where(:not([data-theme]), [data-theme="parchment"], [data-theme="resea
 	--t-shadow: rgba(54, 39, 27, 0.12);
 }
 
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) body {
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) body {
 	background: var(--t-bg);
 	color: var(--t-text);
 }
 
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) body div.app-shell.app-shell {
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) body div.app-shell.app-shell {
 	background: var(--t-bg);
 }
 
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) body div.app-shell.app-shell::before {
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) body div.app-shell.app-shell::before {
 	content: none;
 }
 
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(h1, h2, h3, h4, h5, h6) {
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) :where(h1, h2, h3, h4, h5, h6) {
 	color: var(--dossier-text-main);
 }
 
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(p) {
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) :where(p) {
 	color: var(--t-text-secondary);
 }
 
 /* Global panel/card fallback: thin-border cream card instead of dark glass */
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(.panel, .card, [class*="panel"]:not([class*="dossier-"]):not([class*="navbar-"])) {
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) :where(.panel, .card, [class*="panel"]:not([class*="dossier-"]):not([class*="navbar-"])) {
 	background: var(--dossier-bg-card);
 	border: 1px solid var(--dossier-hairline);
 	border-radius: var(--dossier-radius-card);
@@ -426,13 +426,13 @@ html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-l
 	color: var(--t-text);
 }
 
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(.panel:hover, .card:hover) {
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) :where(.panel:hover, .card:hover) {
 	background: var(--dossier-bg-card);
 	box-shadow: var(--dossier-shadow-card-hover);
 	transform: none;
 }
 
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(input:not([class*="navbar-"]):not([class*="dossier-"]):not([data-unstyled]):not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) :where(input:not([class*="navbar-"]):not([class*="dossier-"]):not([data-unstyled]):not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 	textarea:not([class*="dossier-"]):not([data-unstyled]),
 	select:not([class*="dossier-"]):not([data-unstyled])) {
 	background: #FFFFFF;
@@ -443,22 +443,22 @@ html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-l
 	box-shadow: none;
 }
 
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(input:not([class*="navbar-"])::placeholder, textarea::placeholder) {
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) :where(input:not([class*="navbar-"])::placeholder, textarea::placeholder) {
 	color: var(--t-text-muted);
 }
 
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(input[type='file']) {
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) :where(input[type='file']) {
 	background: var(--t-bg-secondary);
 }
 
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(input[type='file']::file-selector-button) {
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) :where(input[type='file']::file-selector-button) {
 	border-radius: var(--dossier-radius-control);
 	background: var(--t-accent-soft);
 	color: var(--t-accent);
 }
 
 /* Fallback buttons (same :not() chain as the root layout so tabs, Bits UI triggers, navbar, hud-*, dossier-* are untouched) */
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(button:not([role="tab"]):not([role="menuitem"]):not([role="switch"]):not([role="checkbox"]):not([role="radio"]):not([data-unstyled]):not([data-bits-tooltip-trigger]):not([data-tooltip-trigger]):not([data-dialog-close]):not([class*="dossier-"]):not([class*="navbar-"]):not([class*="hud-"]):not([class*="modal-light-"]):not([class*="legal-icon-"]),
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) :where(button:not([role="tab"]):not([role="menuitem"]):not([role="switch"]):not([role="checkbox"]):not([role="radio"]):not([data-unstyled]):not([data-bits-tooltip-trigger]):not([data-tooltip-trigger]):not([data-dialog-close]):not([class*="dossier-"]):not([class*="navbar-"]):not([class*="hud-"]):not([class*="modal-light-"]):not([class*="legal-icon-"]),
 	a[class*="btn"],
 	a.empty-action) {
 	border: 1px solid var(--dossier-hairline-strong);
@@ -469,17 +469,17 @@ html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-l
 	box-shadow: none;
 }
 
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .text-success { color: var(--t-success); }
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .text-warning { color: var(--t-warning); }
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .text-danger { color: var(--t-danger); }
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .text-info { color: var(--t-info); }
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .text-muted { color: var(--t-text-muted); }
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) .text-success { color: var(--t-success); }
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) .text-warning { color: var(--t-warning); }
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) .text-danger { color: var(--t-danger); }
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) .text-info { color: var(--t-info); }
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) .text-muted { color: var(--t-text-muted); }
 
 /* ResearchShell muted text: its alpha-tinted greys fall below AA on cream, so use the AA muted token */
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .research-shell .brand-subtitle,
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .research-shell .nav-link,
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .research-shell .mode-switch,
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .research-shell .research-subtitle {
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) .research-shell .brand-subtitle,
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) .research-shell .nav-link,
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) .research-shell .mode-switch,
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) .research-shell .research-subtitle {
 	color: var(--dossier-text-muted-aa);
 }
 
@@ -593,6 +593,6 @@ html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-l
 }
 
 /* Dark bands inside the cream theme (case-page command bar) keep light heading/body text */
-html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .hud-command-bar :where(h1, h2, h3, h4, h5, h6, p) {
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) .hud-command-bar :where(h1, h2, h3, h4, h5, h6, p) {
 	color: var(--dossier-text-light);
 }

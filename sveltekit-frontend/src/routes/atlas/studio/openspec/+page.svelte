@@ -54,7 +54,7 @@
   <meta name="description" content="SSR Parent Atlas OpenSpec execution-controller, blocker, cluster and actionable-work board." />
 </svelte:head>
 
-<div class="board-shell">
+<div class="board-shell keep-dark-shell">
   <header class="hero">
     <div>
       <p class="eyebrow">PARENT ATLAS · OPENSPEC EXECUTION CONTROL</p>

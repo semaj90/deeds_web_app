@@ -70,7 +70,7 @@
 	}
 </script>
 
-<div class="sqex-page">
+<div class="sqex-page keep-dark-shell">
 	<!-- CRT Scan Lines -->
 	<div class="scanlines"></div>
 

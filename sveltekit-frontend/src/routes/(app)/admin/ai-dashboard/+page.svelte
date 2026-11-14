@@ -172,7 +172,7 @@
 	}
 </script>
 
-<div class="ai-dashboard-hub">
+<div class="ai-dashboard-hub keep-dark-shell">
 	<header class="hub-header">
 		<div>
 			<p class="eyebrow">Admin AI Surfaces</p>
