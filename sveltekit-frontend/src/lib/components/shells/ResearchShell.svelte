@@ -96,8 +96,8 @@
 		display: grid;
 		grid-template-columns: 240px minmax(0, 1fr);
 		min-height: 100vh;
-		background: #131519;
-		color: rgba(212, 199, 163, 0.9);
+		background: var(--rs-bg, #131519);
+		color: rgb(var(--rs-fg, 212 199 163) / max(0.9, var(--rs-min-a, 0)));
 		font-family: 'Inter', system-ui, sans-serif;
 	}
 
@@ -107,8 +107,8 @@
 
 	/* ─── Sidebar ─── */
 	.research-sidebar {
-		background: rgba(0, 0, 0, 0.3);
-		border-right: 1px solid rgba(212, 199, 163, 0.08);
+		background: rgb(var(--rs-shade, 0 0 0) / 0.3);
+		border-right: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.08);
 		display: flex;
 		flex-direction: column;
 		height: 100vh;
@@ -118,7 +118,7 @@
 
 	.sidebar-brand {
 		padding: 1.25rem 1rem;
-		border-bottom: 1px solid rgba(212, 199, 163, 0.08);
+		border-bottom: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.08);
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
@@ -127,12 +127,12 @@
 	.brand-icon {
 		width: 36px;
 		height: 36px;
-		background: rgba(96, 165, 250, 0.12);
+		background: rgb(var(--rs-accent, 96 165 250) / 0.12);
 		border-radius: 8px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: rgba(96, 165, 250, 0.9);
+		color: rgb(var(--rs-accent, 96 165 250) / max(0.9, var(--rs-min-a, 0)));
 		flex-shrink: 0;
 	}
 
@@ -140,14 +140,14 @@
 		font-size: 0.875rem;
 		font-weight: 600;
 		margin: 0;
-		color: rgba(212, 199, 163, 0.9);
+		color: rgb(var(--rs-fg, 212 199 163) / max(0.9, var(--rs-min-a, 0)));
 		letter-spacing: -0.01em;
 	}
 
 	.brand-subtitle {
 		font-size: 0.6875rem;
 		margin: 0;
-		color: rgba(212, 199, 163, 0.35);
+		color: rgb(var(--rs-fg, 212 199 163) / max(0.35, var(--rs-min-a, 0)));
 	}
 
 	/* ─── Nav ─── */
@@ -164,32 +164,32 @@
 		padding: 0.5rem 0.75rem;
 		border-radius: 0.5rem;
 		font-size: 0.8125rem;
-		color: rgba(212, 199, 163, 0.45);
+		color: rgb(var(--rs-fg, 212 199 163) / max(0.45, var(--rs-min-a, 0)));
 		text-decoration: none;
 		transition: all 0.15s ease;
 		margin-bottom: 2px;
 	}
 
 	.nav-link:hover {
-		background: rgba(212, 199, 163, 0.06);
-		color: rgba(212, 199, 163, 0.8);
+		background: rgb(var(--rs-fg, 212 199 163) / 0.06);
+		color: rgb(var(--rs-fg, 212 199 163) / max(0.8, var(--rs-min-a, 0)));
 	}
 
 	.nav-link.active {
-		background: rgba(96, 165, 250, 0.12);
-		color: rgba(96, 165, 250, 0.95);
+		background: rgb(var(--rs-accent, 96 165 250) / 0.12);
+		color: rgb(var(--rs-accent, 96 165 250) / max(0.95, var(--rs-min-a, 0)));
 		font-weight: 500;
 	}
 
 	.sidebar-bridge {
 		padding: 0.5rem;
-		border-top: 1px solid rgba(212, 199, 163, 0.08);
+		border-top: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.08);
 	}
 
 	/* ─── Mode Switch ─── */
 	.sidebar-footer {
 		padding: 0.75rem;
-		border-top: 1px solid rgba(212, 199, 163, 0.08);
+		border-top: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.08);
 	}
 
 	.mode-switch {
@@ -199,15 +199,15 @@
 		padding: 0.5rem 0.75rem;
 		border-radius: 0.5rem;
 		font-size: 0.75rem;
-		color: rgba(212, 199, 163, 0.45);
+		color: rgb(var(--rs-fg, 212 199 163) / max(0.45, var(--rs-min-a, 0)));
 		text-decoration: none;
-		background: rgba(212, 199, 163, 0.04);
+		background: rgb(var(--rs-fg, 212 199 163) / 0.04);
 		transition: all 0.15s ease;
 	}
 
 	.mode-switch:hover {
-		background: rgba(96, 165, 250, 0.1);
-		color: rgba(96, 165, 250, 0.9);
+		background: rgb(var(--rs-accent, 96 165 250) / 0.1);
+		color: rgb(var(--rs-accent, 96 165 250) / max(0.9, var(--rs-min-a, 0)));
 	}
 
 	.mode-switch :global(svg:last-child) {
@@ -229,13 +229,13 @@
 		font-size: 1.375rem;
 		font-weight: 600;
 		margin: 0;
-		color: rgba(212, 199, 163, 0.95);
+		color: rgb(var(--rs-fg, 212 199 163) / max(0.95, var(--rs-min-a, 0)));
 		letter-spacing: -0.02em;
 	}
 
 	.research-subtitle {
 		font-size: 0.8125rem;
-		color: rgba(212, 199, 163, 0.4);
+		color: rgb(var(--rs-fg, 212 199 163) / max(0.4, var(--rs-min-a, 0)));
 		margin: 0.25rem 0 0;
 	}
 

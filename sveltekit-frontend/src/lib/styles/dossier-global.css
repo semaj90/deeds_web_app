@@ -17,24 +17,36 @@
 	--dossier-crimson: #67140F;
 	--dossier-mocha: #483D36;
 	--dossier-text-main: #141312;
-	--dossier-text-muted: #7F7565;
+	--dossier-text-muted: #7F7565; /* decorative only: 3.67:1 on workspace, 4.21:1 on card (fails AA for text) */
+	--dossier-text-muted-aa: #6B6150; /* text: 4.94:1 on workspace, 5.65:1 on card */
 	--dossier-text-light: #FAF4EC;
+
+	/* Refined thin-border scale: one owner for radius, hairline and shadow.
+	   Route-scoped styles must reference these instead of redefining values. */
+	--dossier-hairline: #E2D7C9;
+	--dossier-hairline-strong: #CDBFA9;
+	--dossier-hairline-gold: rgba(201, 168, 106, 0.55);
+	--dossier-radius-card: 10px;
+	--dossier-radius-inner: 6px;
+	--dossier-radius-control: 6px;
+	--dossier-shadow-card: 0 1px 2px rgba(60, 40, 20, 0.04);
+	--dossier-shadow-card-hover: 0 2px 8px rgba(60, 40, 20, 0.07);
 }
 
 /* ── 2. Card Surfaces & Arcana Filigree ──────────────────────────── */
 .dossier-card {
 	position: relative;
 	background: linear-gradient(180deg, #FFFCF9 0%, #FAF4EC 100%);
-	border: 1px solid #DFD3C3;
-	border-radius: 20px;
-	box-shadow: 0 4px 18px rgba(60, 40, 20, 0.06);
+	border: 1px solid var(--dossier-hairline);
+	border-radius: var(--dossier-radius-card);
+	box-shadow: var(--dossier-shadow-card);
 	overflow: hidden;
 	transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .dossier-card:hover {
-	box-shadow: 0 8px 24px rgba(60, 40, 20, 0.09);
-	border-color: #C8A24A;
+	box-shadow: var(--dossier-shadow-card-hover);
+	border-color: var(--dossier-hairline-gold);
 }
 
 .dossier-card-dark {
@@ -48,17 +60,17 @@
 
 .dossier-arcana-inner {
 	position: absolute;
-	inset: 5px;
-	border: 1px solid rgba(185, 127, 98, 0.18);
-	border-radius: 15px;
+	inset: 4px;
+	border: 1px solid rgba(185, 127, 98, 0.14);
+	border-radius: var(--dossier-radius-inner);
 	pointer-events: none;
 }
 
 .dossier-star {
 	position: absolute;
-	font-size: 8px;
+	font-size: 7px;
 	color: #B97F62;
-	opacity: 0.55;
+	opacity: 0.4;
 	line-height: 1;
 	pointer-events: none;
 	user-select: none;
@@ -85,10 +97,11 @@
 	align-items: center;
 	gap: 0.45rem;
 	padding: 0.25rem 0.65rem;
-	border-radius: 9999px;
+	border-radius: var(--dossier-radius-control);
 	background: linear-gradient(180deg, #5C493F 0%, #483D36 100%);
 	color: #FAF4EC;
-	box-shadow: 0 2px 6px rgba(45, 35, 30, 0.15);
+	border: 1px solid var(--dossier-hairline-strong);
+	box-shadow: none;
 }
 
 .dossier-card-title {
@@ -111,7 +124,7 @@
 	gap: 0.35rem;
 	height: 28px;
 	padding: 0 0.65rem;
-	border-radius: 9999px;
+	border-radius: var(--dossier-radius-control);
 	background: #FAF6F0;
 	border: 1px solid #D5C6AC;
 	color: #342D26;
@@ -152,7 +165,7 @@
 	font-family: 'Inter', system-ui, sans-serif;
 	font-weight: 600;
 	padding: 0.2rem 0.55rem;
-	border-radius: 9999px;
+	border-radius: var(--dossier-radius-control);
 	background: #EFEBE5;
 	border: 1px solid #D3C5B5;
 	color: #5C493F;
@@ -209,14 +222,14 @@
 .telemetry-track {
 	height: 5px;
 	width: 100%;
-	border-radius: 9999px;
+	border-radius: 2px;
 	background: #EFEBE5;
 	overflow: hidden;
 }
 
 .telemetry-fill {
 	height: 100%;
-	border-radius: 9999px;
+	border-radius: 2px;
 	transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -225,3 +238,361 @@
 .telemetry-fill-sage { background: linear-gradient(90deg, #B7E1D1 0%, #7FC2A9 100%); }
 .telemetry-fill-sky { background: linear-gradient(90deg, #A9D3FF 0%, #79B4F2 100%); }
 .telemetry-fill-mocha { background: linear-gradient(90deg, #E4B396 0%, #B97F62 100%); }
+
+/* ── 7. Page-layout primitives (thin-border, opt-in) ─────────────── */
+/* Standalone: no ancestor class required, no effect on pages that do not use them. */
+.dossier-page {
+	color: var(--dossier-text-main);
+	font-family: 'Inter', system-ui, sans-serif;
+}
+
+.dossier-page-header {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 1.25rem 0 1rem;
+	border-bottom: 1px solid var(--dossier-hairline);
+}
+
+.dossier-page-title {
+	font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+	font-size: 1.5rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	line-height: 1.15;
+	margin: 0;
+}
+
+.dossier-panel {
+	background: var(--dossier-bg-card);
+	border: 1px solid var(--dossier-hairline);
+	border-radius: var(--dossier-radius-card);
+	box-shadow: var(--dossier-shadow-card);
+}
+
+.dossier-panel-dark {
+	background: var(--dossier-bg-dark-panel);
+	border: 1px solid var(--dossier-border-dark);
+	border-radius: var(--dossier-radius-card);
+	color: var(--dossier-text-light);
+}
+
+.dossier-section-label {
+	font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+	font-size: 0.7rem;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--dossier-text-muted-aa);
+	margin: 0 0 0.5rem;
+}
+
+.dossier-hairline {
+	height: 0;
+	border: 0;
+	border-top: 1px solid var(--dossier-hairline);
+	margin: 1rem 0;
+}
+
+.dossier-input {
+	width: 100%;
+	padding: 0.4rem 0.65rem;
+	background: #FFFFFF;
+	border: 1px solid var(--dossier-hairline-strong);
+	border-radius: var(--dossier-radius-control);
+	color: var(--dossier-text-main);
+	font: inherit;
+}
+
+.dossier-input:focus-visible,
+.hud-toolbar-btn:focus-visible,
+.dossier-mini-pill:focus-visible {
+	outline: 2px solid var(--dossier-crimson);
+	outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.dossier-card,
+	.hud-toolbar-btn,
+	.dossier-mini-pill,
+	.telemetry-fill {
+		transition: none;
+	}
+}
+
+/* ═══ 8. CREAM THEME LAYER (operator decision 2026-11-13: cream by default, legal-corpus stays navy) ═══
+   One removable block. Applies ONLY when the active theme is light: no data-theme attribute,
+   `parchment` or `research-light` (the theme store sets html[data-theme]; see lib/config/themes.ts and
+   the per-theme palettes in app.html). Dark themes (yorha-dark, yorha-bw, investigation, nes-retro,
+   high-contrast) are untouched. Pages that render an element with class `legal-corpus-navy`
+   keep the original navy/white shell. It (a) defines the cream --t-* palette that the root layout's
+   --shell-* variables read, and (b) overrides the root layout's hard-coded dark fallbacks (zero-
+   specificity :where() rules, so any selector with specificity wins). Delete this section to revert.
+   Contrast (verified): text #141312 / muted #6B6150 / accent #67140F on #ECE7DC and #FAF6F0 >= 4.5:1. */
+html:root:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) {
+	color-scheme: light;
+	/* ResearchShell (library, citations; legal-corpus is excluded above) reads these, falling back to its dark originals */
+	--rs-bg: #ECE7DC;
+	--rs-fg: 20 19 18;
+	--rs-accent: 103 20 15;
+	--rs-shade: 255 255 255;
+	--rs-min-a: 0.72; /* alpha floor for TEXT colours only: low-opacity greys are unreadable on cream */
+	/* AA-safe status hues on cream (>= 4.5:1 on #ECE7DC / #FAF6F0) */
+	--rs-ok: #166534;
+	--rs-bad: #991B1B;
+	--rs-info: #245F9E;
+	--rs-warn: #8A5A00;
+	--rs-violet: #5B21B6;
+	/* Global search (routes/(app)/global-search) reads --gs-*, falling back to its original dark-brown values.
+	   Cream surfaces + crimson accent from the dossier palette; all text pairs verified >= 4.5:1 on #FAF6F0 / #ECE7DC. */
+	--gs-surface: #FAF6F0;
+	--gs-surface-2: #F3EEE4;
+	--gs-surface-3: #ECE7DC;
+	--gs-border: #D5C6AC;
+	--gs-border-strong: #CDBFA9;
+	--gs-text: #141312;
+	--gs-text-2: #483D36;
+	--gs-muted: #6B6150;
+	--gs-accent: #67140F;
+	--gs-accent-bg: #67140F;
+	--gs-accent-bg-hover: #7E1B14;
+	--gs-on-accent: #FAF4EC;
+	--gs-focus: #8A704D;
+	--gs-ok: #166534;
+	--gs-warn: #8A5A00;
+	--gs-info: #245F9E;
+	--gs-teal: #0F766E;
+	--rs-teal: #0F766E;
+	--t-bg: #ECE7DC;
+	--t-bg-elevated: #FAF6F0;
+	--t-bg-secondary: #F3EEE4;
+	--t-panel: #FAF6F0;
+	--t-panel-2: #FAF4EC;
+	--t-panel-soft: #F3EEE4;
+	--t-surface: #FAF6F0;
+	--t-surface-hover: #FFFFFF;
+	--t-text: #141312;
+	--t-text-primary: #141312;
+	--t-text-heading: #141312;
+	--t-fg: #141312;
+	--t-text-secondary: #483D36;
+	--t-text-muted: #6B6150;
+	--t-fg-muted: #6B6150;
+	--t-text-dim: #6B6150;
+	--t-border: #E2D7C9;
+	--t-accent: #67140F;
+	--t-accent-2: #8A704D;
+	--t-accent-soft: rgba(103, 20, 15, 0.08);
+	--t-accent-muted: rgba(103, 20, 15, 0.55);
+	--t-gold: #9A7837;
+	--t-danger: #A32A2A;
+	--t-success: #187344;
+	--t-warning: #8A5A00;
+	--t-info: #245F9E;
+	--t-focus-ring: #8A704D;
+	--t-shadow: rgba(54, 39, 27, 0.12);
+}
+
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) body {
+	background: var(--t-bg);
+	color: var(--t-text);
+}
+
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) body div.app-shell.app-shell {
+	background: var(--t-bg);
+}
+
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) body div.app-shell.app-shell::before {
+	content: none;
+}
+
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(h1, h2, h3, h4, h5, h6) {
+	color: var(--dossier-text-main);
+}
+
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(p) {
+	color: var(--t-text-secondary);
+}
+
+/* Global panel/card fallback: thin-border cream card instead of dark glass */
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(.panel, .card, [class*="panel"]:not([class*="dossier-"]):not([class*="navbar-"])) {
+	background: var(--dossier-bg-card);
+	border: 1px solid var(--dossier-hairline);
+	border-radius: var(--dossier-radius-card);
+	box-shadow: var(--dossier-shadow-card);
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+	color: var(--t-text);
+}
+
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(.panel:hover, .card:hover) {
+	background: var(--dossier-bg-card);
+	box-shadow: var(--dossier-shadow-card-hover);
+	transform: none;
+}
+
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(input:not([class*="navbar-"]):not([class*="dossier-"]):not([data-unstyled]):not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+	textarea:not([class*="dossier-"]):not([data-unstyled]),
+	select:not([class*="dossier-"]):not([data-unstyled])) {
+	background: #FFFFFF;
+	border: 1px solid var(--dossier-hairline-strong);
+	border-radius: var(--dossier-radius-control);
+	color: var(--t-text);
+	backdrop-filter: none;
+	box-shadow: none;
+}
+
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(input:not([class*="navbar-"])::placeholder, textarea::placeholder) {
+	color: var(--t-text-muted);
+}
+
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(input[type='file']) {
+	background: var(--t-bg-secondary);
+}
+
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(input[type='file']::file-selector-button) {
+	border-radius: var(--dossier-radius-control);
+	background: var(--t-accent-soft);
+	color: var(--t-accent);
+}
+
+/* Fallback buttons (same :not() chain as the root layout so tabs, Bits UI triggers, navbar, hud-*, dossier-* are untouched) */
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) :where(button:not([role="tab"]):not([role="menuitem"]):not([role="switch"]):not([role="checkbox"]):not([role="radio"]):not([data-unstyled]):not([data-bits-tooltip-trigger]):not([data-tooltip-trigger]):not([data-dialog-close]):not([class*="dossier-"]):not([class*="navbar-"]):not([class*="hud-"]):not([class*="modal-light-"]):not([class*="legal-icon-"]),
+	a[class*="btn"],
+	a.empty-action) {
+	border: 1px solid var(--dossier-hairline-strong);
+	border-radius: var(--dossier-radius-control);
+	background: var(--dossier-bg-card);
+	color: var(--t-text);
+	backdrop-filter: none;
+	box-shadow: none;
+}
+
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .text-success { color: var(--t-success); }
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .text-warning { color: var(--t-warning); }
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .text-danger { color: var(--t-danger); }
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .text-info { color: var(--t-info); }
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .text-muted { color: var(--t-text-muted); }
+
+/* ResearchShell muted text: its alpha-tinted greys fall below AA on cream, so use the AA muted token */
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .research-shell .brand-subtitle,
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .research-shell .nav-link,
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .research-shell .mode-switch,
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .research-shell .research-subtitle {
+	color: var(--dossier-text-muted-aa);
+}
+
+/* ── 9. Scrollable sidebar + reorderable panels (Bits UI ScrollArea, svelte-dnd-action) ─────────── */
+.dossier-scroll-root {
+	position: relative;
+	overflow: hidden;
+}
+
+.dossier-scroll-viewport {
+	max-height: var(--dossier-scroll-max, calc(100dvh - 2rem));
+	border-radius: inherit;
+}
+
+.dossier-scrollbar {
+	display: flex;
+	touch-action: none;
+	user-select: none;
+	width: 10px;
+	padding: 2px;
+	background: transparent;
+}
+
+.dossier-scroll-thumb {
+	position: relative;
+	flex: 1;
+	border-radius: 4px;
+	background: var(--dossier-hairline-strong);
+}
+
+.dossier-scroll-thumb:hover {
+	background: var(--dossier-text-muted-aa);
+}
+
+.dossier-sidebar-list {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: 1px 6px 1px 1px;
+}
+
+.dossier-sidebar-item {
+	position: relative;
+}
+
+.dossier-sidebar-tools {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	z-index: 6;
+	display: flex;
+	gap: 2px;
+	opacity: 0;
+	transition: opacity 0.15s ease;
+}
+
+.dossier-sidebar-item:hover > .dossier-sidebar-tools,
+.dossier-sidebar-item:focus-within > .dossier-sidebar-tools {
+	opacity: 1;
+}
+
+.dossier-sidebar-tool {
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 10px;
+	line-height: 1;
+	color: var(--dossier-text-muted-aa);
+	background: var(--dossier-bg-card);
+	border: 1px solid var(--dossier-hairline-strong);
+	border-radius: var(--dossier-radius-control);
+	cursor: pointer;
+}
+
+.dossier-sidebar-tool:hover:not(:disabled) {
+	color: var(--dossier-crimson);
+	border-color: var(--dossier-crimson);
+}
+
+.dossier-sidebar-tool:disabled {
+	opacity: 0.35;
+	cursor: default;
+}
+
+.dossier-sidebar-tool:focus-visible {
+	outline: 2px solid var(--dossier-crimson);
+	outline-offset: 1px;
+}
+
+.dossier-sidebar-grip {
+	cursor: grab;
+}
+
+.dossier-sidebar-grip:active {
+	cursor: grabbing;
+}
+
+@media (hover: none) {
+	.dossier-sidebar-tools {
+		opacity: 1;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.dossier-sidebar-tools {
+		transition: none;
+	}
+}
+
+/* Dark bands inside the cream theme (case-page command bar) keep light heading/body text */
+html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy))) .hud-command-bar :where(h1, h2, h3, h4, h5, h6, p) {
+	color: var(--dossier-text-light);
+}

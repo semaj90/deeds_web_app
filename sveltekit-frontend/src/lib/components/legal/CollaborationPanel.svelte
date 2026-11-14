@@ -157,14 +157,12 @@ Real-time collaboration interface for multiple investigators working on evidence
   }
 </script>
 
-<div class="collaboration-panel">
+<div class="collaboration-shell">
   {#if !session}
-    <Card class="bg-panel border-sand/20">
-      <CardContent class="p-6 text-center">
-        <p class="text-sand/60 text-2xl mb-4">👥</p>
-        <p class="text-sand/60">No active collaboration session</p>
-      </CardContent>
-    </Card>
+    <div class="dossier-panel" style="padding: 1.5rem; text-align: center; color: var(--dossier-text-muted-aa);">
+      <p class="text-2xl mb-4" aria-hidden="true">👥</p>
+      <p>No active collaboration session</p>
+    </div>
   {:else}
     <!-- Active Participants -->
     <Card class="bg-panel border-sand/20 mb-4">

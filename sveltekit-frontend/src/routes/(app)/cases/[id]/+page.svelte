@@ -7,6 +7,9 @@
 	import CitationSaveModal from '$lib/components/legal-ai/CitationSaveModal.svelte';
 	import StreamingAnalysisPanel from '$lib/components/cases/StreamingAnalysisPanel.svelte';
 	import { onMount } from "svelte";
+	import { ScrollArea } from 'bits-ui';
+	import { dndzone, type DndEvent } from 'svelte-dnd-action';
+	import { flip } from 'svelte/animate';
 import EvidenceUploadPreview from '$lib/components/evidence/EvidenceUploadPreview.svelte';
 import EvidenceViewModal from '$lib/components/evidence/EvidenceViewModal.svelte';
 import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
@@ -124,6 +127,73 @@ import type { PageData } from './$types.js';
  let isLoadingCanvas = $state(false);
  let canvasError = $state('');
  let hasLoadedCanvas = $state(false);
+
+ // Right-hand sidebar: reorderable panels (svelte-dnd-action) inside a Bits UI ScrollArea.
+ // Order is a per-browser preference only (localStorage); it is not case data and is never sent to the server.
+ type SidebarPanelId = 'synthesis' | 'inspector' | 'telemetry' | 'precedents';
+ const SIDEBAR_DEFAULT_ORDER: SidebarPanelId[] = ['synthesis', 'inspector', 'telemetry', 'precedents'];
+ const SIDEBAR_ORDER_KEY = 'case-sidebar-order-v1';
+ const SIDEBAR_LABELS: Record<SidebarPanelId, string> = {
+   synthesis: 'AI Case Synthesis',
+   inspector: 'Exhibit Inspector',
+   telemetry: 'Case Telemetry',
+   precedents: 'Similar Precedents'
+ };
+ let sidebarPanels = $state<{ id: SidebarPanelId }[]>(SIDEBAR_DEFAULT_ORDER.map((id) => ({ id })));
+ let sidebarDragDisabled = $state(true);
+ const sidebarPanelHidden = (id: SidebarPanelId) => id === 'precedents' && !isLoadingSimilar && similarCases.length === 0;
+
+ function persistSidebarOrder() {
+   try {
+     localStorage.setItem(SIDEBAR_ORDER_KEY, JSON.stringify(sidebarPanels.map((p) => p.id)));
+   } catch {
+     // private mode or quota: the order simply is not remembered
+   }
+ }
+ // svelte-dnd-action only attaches its mouse/touch listeners while the zone is enabled, and Svelte applies the
+ // updated option after the event, so the zone must already be enabled BEFORE the press. The grip therefore
+ // enables dragging on hover/focus; the zone is disabled again on leave/blur unless a drag is in flight.
+ // Touch has no hover: touch users reorder with the always-visible up/down buttons.
+ let sidebarDragging = false;
+ const armSidebarDrag = () => (sidebarDragDisabled = false);
+ const disarmSidebarDrag = () => {
+   if (!sidebarDragging) sidebarDragDisabled = true;
+ };
+ function onSidebarConsider(e: CustomEvent<DndEvent<{ id: SidebarPanelId }>>) {
+   sidebarDragging = true;
+   sidebarPanels = e.detail.items;
+ }
+ function onSidebarFinalize(e: CustomEvent<DndEvent<{ id: SidebarPanelId }>>) {
+   sidebarDragging = false;
+   sidebarPanels = e.detail.items;
+   sidebarDragDisabled = true;
+   persistSidebarOrder();
+ }
+ function moveSidebarPanel(id: SidebarPanelId, delta: -1 | 1) {
+   const from = sidebarPanels.findIndex((p) => p.id === id);
+   const to = from + delta;
+   if (from < 0 || to < 0 || to >= sidebarPanels.length) return;
+   const next = [...sidebarPanels];
+   [next[from], next[to]] = [next[to], next[from]];
+   sidebarPanels = next;
+   persistSidebarOrder();
+ }
+ onMount(() => {
+   try {
+     const raw = localStorage.getItem(SIDEBAR_ORDER_KEY);
+     const saved = raw ? (JSON.parse(raw) as unknown) : null;
+     // Accept only an exact permutation of the known ids; anything else falls back to the default order.
+     if (
+       Array.isArray(saved) &&
+       saved.length === SIDEBAR_DEFAULT_ORDER.length &&
+       SIDEBAR_DEFAULT_ORDER.every((id) => saved.includes(id))
+     ) {
+       sidebarPanels = (saved as SidebarPanelId[]).map((id) => ({ id }));
+     }
+   } catch {
+     // corrupt storage: keep the default order
+   }
+ });
 
  // Case Intelligence Hub state
  let ragResults = $state<any[]>([]);
@@ -1598,9 +1668,12 @@ function formatInferenceConfidence(value: number | null): string {
       </div>
 
       <!-- Right Column (4/12): Celestial Synthesis, Exhibit Inspector & Crystarium Telemetry -->
-      <aside class="lg:col-span-4 space-y-4">
-        <StreamingAnalysisPanel {caseId} />
+      <aside class="lg:col-span-4 lg:sticky lg:top-4 lg:self-start" aria-label="Case sidebar panels">
+        {#snippet synthesisPanel()}
+          <StreamingAnalysisPanel {caseId} />
+        {/snippet}
 
+        {#snippet inspectorPanel()}
         {#if selectedEvidence}
 			<button
 				type="button"
@@ -1653,7 +1726,9 @@ function formatInferenceConfidence(value: number | null): string {
             </div>
           </section>
         {/if}
+        {/snippet}
 
+        {#snippet telemetryPanel()}
         <!-- Light Silk-Cream Bento × RYUO Botanical Case Telemetry Card -->
         <section class="dossier-card">
           <div class="dossier-arcana-inner" aria-hidden="true"></div>
@@ -1737,7 +1812,9 @@ function formatInferenceConfidence(value: number | null): string {
             </div>
           </div>
         </section>
+        {/snippet}
 
+        {#snippet precedentsPanel()}
         <!-- Similar Cases Precedent Widget -->
         {#if isLoadingSimilar}
           <section class="dossier-card">
@@ -1760,6 +1837,72 @@ function formatInferenceConfidence(value: number | null): string {
         {:else if similarCases.length > 0}
           <SimilarCasesPanel cases={similarCases} />
         {/if}
+        {/snippet}
+
+        <ScrollArea.Root type="hover" class="dossier-scroll-root">
+          <ScrollArea.Viewport class="dossier-scroll-viewport">
+            <div
+              class="dossier-sidebar-list"
+              use:dndzone={{
+                items: sidebarPanels,
+                flipDurationMs: 150,
+                dragDisabled: sidebarDragDisabled,
+                type: 'case-sidebar-panels',
+                dropTargetStyle: { outline: '1px dashed var(--dossier-gold)', 'outline-offset': '2px' }
+              }}
+              onconsider={onSidebarConsider}
+              onfinalize={onSidebarFinalize}
+            >
+              {#each sidebarPanels as panel, index (panel.id)}
+                <div
+                  class="dossier-sidebar-item"
+                  style:display={sidebarPanelHidden(panel.id) ? 'none' : undefined}
+                  animate:flip={{ duration: 150 }}
+                  data-panel-id={panel.id}
+                >
+                  <div class="dossier-sidebar-tools" role="group" aria-label="Reorder {SIDEBAR_LABELS[panel.id]}">
+                    <button
+                      type="button"
+                      class="dossier-sidebar-tool"
+                      aria-label="Move {SIDEBAR_LABELS[panel.id]} up"
+                      disabled={index === 0}
+                      onclick={() => moveSidebarPanel(panel.id, -1)}
+                    >▲</button>
+                    <button
+                      type="button"
+                      class="dossier-sidebar-tool"
+                      aria-label="Move {SIDEBAR_LABELS[panel.id]} down"
+                      disabled={index === sidebarPanels.length - 1}
+                      onclick={() => moveSidebarPanel(panel.id, 1)}
+                    >▼</button>
+                    <!-- Not a <button>: svelte-dnd-action ignores presses whose target has a `value` property.
+                         Keyboard and touch users use the up/down buttons above, so the grip is pointer-only. -->
+                    <span
+                      class="dossier-sidebar-tool dossier-sidebar-grip"
+                      aria-hidden="true"
+                      title="Drag to reorder {SIDEBAR_LABELS[panel.id]}"
+                      onpointerenter={armSidebarDrag}
+                      onpointerleave={disarmSidebarDrag}
+                    >⠿</span>
+                  </div>
+                  {#if panel.id === 'synthesis'}
+                    {@render synthesisPanel()}
+                  {:else if panel.id === 'inspector'}
+                    {@render inspectorPanel()}
+                  {:else if panel.id === 'telemetry'}
+                    {@render telemetryPanel()}
+                  {:else}
+                    {@render precedentsPanel()}
+                  {/if}
+                </div>
+              {/each}
+            </div>
+          </ScrollArea.Viewport>
+          <ScrollArea.Scrollbar orientation="vertical" class="dossier-scrollbar">
+            <ScrollArea.Thumb class="dossier-scroll-thumb" />
+          </ScrollArea.Scrollbar>
+          <ScrollArea.Corner />
+        </ScrollArea.Root>
       </aside>
     </div>
   </main>
@@ -2249,9 +2392,9 @@ function formatInferenceConfidence(value: number | null): string {
   /* ── Double-Filigree Frame & Botanical Corner Ornaments ────────────── */
   .dossier-arcana-inner {
     position: absolute;
-    inset: 6px;
-    border: 1px solid rgba(185, 127, 98, 0.22);
-    border-radius: 16px;
+    inset: 4px;
+    border: 1px solid rgba(185, 127, 98, 0.14);
+    border-radius: var(--dossier-radius-inner);
     pointer-events: none;
     z-index: 2;
   }
@@ -2274,10 +2417,10 @@ function formatInferenceConfidence(value: number | null): string {
   .dossier-tab-shell {
     position: relative;
     background: #FAF4EB;
-    border: 1px solid #E6DBCF;
-    border-radius: 9999px;
-    padding: 5px;
-    box-shadow: 0 4px 16px -6px rgba(72, 61, 54, 0.08);
+    border: 1px solid var(--dossier-hairline);
+    border-radius: var(--dossier-radius-card);
+    padding: 4px;
+    box-shadow: var(--dossier-shadow-card);
     overflow: hidden;
   }
 
@@ -2288,7 +2431,7 @@ function formatInferenceConfidence(value: number | null): string {
     align-items: center;
     gap: 6px;
     border: none;
-    border-radius: 9999px;
+    border-radius: var(--dossier-radius-control);
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -2302,7 +2445,7 @@ function formatInferenceConfidence(value: number | null): string {
     gap: 0.42rem;
     height: 33px;
     padding: 0 0.95rem;
-    border-radius: 9999px;
+    border-radius: var(--dossier-radius-control);
     border: 1px solid transparent;
     background: transparent;
     color: #5C493F;
@@ -2341,11 +2484,9 @@ function formatInferenceConfidence(value: number | null): string {
   .dossier-card {
     position: relative;
     background: linear-gradient(180deg, #FFFCF9 0%, #FAF4EC 100%);
-    border: 1px solid #E2D7C9;
-    border-radius: 22px;
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.9) inset,
-      0 12px 32px -12px rgba(72, 61, 54, 0.09);
+    border: 1px solid var(--dossier-hairline);
+    border-radius: var(--dossier-radius-card);
+    box-shadow: var(--dossier-shadow-card);
     overflow: hidden;
   }
 
@@ -2371,10 +2512,10 @@ function formatInferenceConfidence(value: number | null): string {
     align-items: center;
     gap: 0.45rem;
     padding: 0.28rem 0.85rem;
-    border-radius: 9999px;
+    border-radius: var(--dossier-radius-control);
     background: linear-gradient(180deg, #5C493F 0%, #483D36 100%);
-    border: 1px solid #C9BCAB;
-    box-shadow: 0 3px 10px -3px rgba(72, 61, 54, 0.28);
+    border: 1px solid var(--dossier-hairline-strong);
+    box-shadow: none;
     flex-shrink: 0;
   }
 
