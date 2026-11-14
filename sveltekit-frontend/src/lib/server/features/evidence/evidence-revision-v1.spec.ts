@@ -7,6 +7,7 @@ import {
   MAX_REVISION_IMAGE_BYTES,
   normalizeSha256,
   saveEvidenceMarkupRevisionV1,
+  saveEvidenceAnnotationRevisionV1,
   sniffImage,
   type EvidenceRevisionPortsV1,
 } from './evidence-revision-v1.js';
@@ -33,6 +34,16 @@ function fakePorts(over: Partial<EvidenceRevisionPortsV1> = {}) {
       if (dup) return { ...dup, created: false };
       const row = { id: `ver-${++version}`, version };
       rows.set(a.sha256, row);
+      log.insert.push(a as unknown as Record<string, unknown>);
+      return { ...row, created: true };
+    },
+    findAnnotationRevision: async (_e, sha) => rows.get(`annotation:${sha}`) ?? null,
+    insertAnnotationRevision: async (a) => {
+      const key = `annotation:${a.annotationSha256}`;
+      const dup = rows.get(key);
+      if (dup) return { ...dup, created: false };
+      const row = { id: `ver-${++version}`, version };
+      rows.set(key, row);
       log.insert.push(a as unknown as Record<string, unknown>);
       return { ...row, created: true };
     },
@@ -115,5 +126,75 @@ describe('evidence-revision-v1', () => {
     expect(db.log.put).toHaveLength(1);
     expect(db.log.del).toHaveLength(1);
     expect((db.log.del[0] as string[])[1]).toBe((db.log.put[0] as { objectKey: string }).objectKey);
+  });
+
+  it('keeps the uploaded object when a committed revision already references it, and passes the parent into the insert lock', async () => {
+    let seen: { caseId?: string; parentSha256?: string } = {};
+    let committed = false;
+    const racing = fakePorts({
+      findRevisionBySha256: async () => (committed ? { id: 'ver-other', version: 1 } : null),
+      insertRevision: async (a) => { seen = a; committed = true; throw new Error('DB_DOWN'); },
+    });
+    expect(await code(saveEvidenceMarkupRevisionV1(base(), racing.ports))).toBe('OTHER:DB_DOWN');
+    expect(seen).toMatchObject({ caseId: CASE_ID, parentSha256: PARENT });
+    expect(racing.log.del).toHaveLength(0);
+
+    const lookupFails = fakePorts({
+      findRevisionBySha256: (() => { let n = 0; return async () => { if (++n > 1) throw new Error('LOOKUP_DOWN'); return null; }; })(),
+      insertRevision: async () => { throw new Error('DB_DOWN'); },
+    });
+    expect(await code(saveEvidenceMarkupRevisionV1(base(), lookupFails.ports))).toBe('OTHER:DB_DOWN');
+    expect(lookupFails.log.del).toHaveLength(0);
+  });
+
+  it.each([
+    ['pdf', { kind: 'pdf-page', page: 3 }],
+    ['image', { kind: 'image-point', x: 0.25, y: 0.75 }],
+    ['video', { kind: 'video-time', timeMs: 14_200 }],
+    ['audio', { kind: 'audio-range', startMs: 14_200, endMs: 16_000 }],
+    ['scene', { kind: 'scene-object', objectId: 'mesh-1', assetRevision: 'sha256:asset' }],
+    ['document', { kind: 'document' }],
+  ] as const)('stores a %s annotation revision without writing a replacement media object', async (modality, location) => {
+    const { ports, log } = fakePorts();
+    const annotation = {
+      schema: 'atlas.evidence-annotation.v1',
+      modality,
+      notes: '',
+      annotations: [{ id: 'note-1', kind: 'note', text: 'Review this observation', location }],
+    };
+    const receipt = await saveEvidenceAnnotationRevisionV1({ caseId: CASE_ID, evidenceId: EV_ID, actorUserId: 7, parentSha256: PARENT, annotation }, ports);
+    expect(receipt).toMatchObject({ committed: true, idempotent: false, parentSha256: PARENT, index: { status: 'not_requested' }, canonicalAuthority: false });
+    expect(receipt.annotationSha256).toMatch(/^sha256:[a-f0-9]{64}$/);
+    expect(log.put).toHaveLength(0);
+    expect(log.insert).toHaveLength(1);
+    expect(log.insert[0]).toMatchObject({ parentSha256: PARENT, metadata: { annotation: { modality } } });
+  });
+
+  it('is idempotent for identical annotation content bound to the same source hash', async () => {
+    const { ports } = fakePorts();
+    const input = {
+      caseId: CASE_ID,
+      evidenceId: EV_ID,
+      actorUserId: 7,
+      parentSha256: PARENT,
+      annotation: { schema: 'atlas.evidence-annotation.v1', modality: 'video', notes: '', annotations: [{ id: 'n1', kind: 'note', text: 'At the doorway', location: { kind: 'video-time', timeMs: 14_200 } }] },
+    };
+    const first = await saveEvidenceAnnotationRevisionV1(input, ports);
+    const second = await saveEvidenceAnnotationRevisionV1(input, ports);
+    expect(second).toMatchObject({ idempotent: true, versionId: first.versionId, version: first.version, annotationSha256: first.annotationSha256 });
+  });
+
+  it('fails closed on stale source, case mismatch, and invalid time ranges', async () => {
+    const input = {
+      caseId: CASE_ID,
+      evidenceId: EV_ID,
+      actorUserId: 7,
+      parentSha256: PARENT,
+      annotation: { schema: 'atlas.evidence-annotation.v1', modality: 'audio', notes: '', annotations: [{ id: 'n1', kind: 'note', text: 'Listen here', location: { kind: 'audio-range', startMs: 100, endMs: 200 } }] },
+    };
+    expect(await code(saveEvidenceAnnotationRevisionV1({ ...input, parentSha256: `sha256:${'b'.repeat(64)}` }, fakePorts().ports))).toBe('PARENT_HASH_MISMATCH');
+    expect(await code(saveEvidenceAnnotationRevisionV1({ ...input, caseId: '33333333-3333-4333-8333-333333333333' }, fakePorts().ports))).toBe('EVIDENCE_CASE_MISMATCH');
+    const invalidRange = { ...input, annotation: { ...input.annotation, annotations: [{ ...input.annotation.annotations[0], location: { kind: 'audio-range', startMs: 200, endMs: 100 } }] } };
+    expect(await code(saveEvidenceAnnotationRevisionV1(invalidRange, fakePorts().ports))).toBe('INVALID_MARKUP');
   });
 });
