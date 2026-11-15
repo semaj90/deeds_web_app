@@ -106,7 +106,7 @@ export async function extractAudioTrack(videoPath: string, workDir?: string): Pr
   const ffmpegPath = ENV.FFMPEG_PATH || 'ffmpeg';
   const outputPath = join(workDir ?? dirname(videoPath), `${randomUUID()}.wav`);
 
-  const result = await spawnPromise(ffmpegPath, ['-i', videoPath, '-vn', '-ac', '1', '-ar', '16000', outputPath], workDir, 5 * 60 * 1000);
+  const result = await spawnPromise(ffmpegPath, ['-i', videoPath, '-vn', '-ac', '1', '-ar', '16000', '-c:a', 'pcm_s16le', outputPath], workDir, 5 * 60 * 1000);
   if (result.code !== 0) {
     throw new Error(`ffmpeg audio extraction failed: ${result.stderr.slice(0, 500)}`);
   }

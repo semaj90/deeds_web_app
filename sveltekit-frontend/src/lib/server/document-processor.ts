@@ -176,7 +176,7 @@ async function extractVideo(buffer: Buffer, fileName: string): Promise<{ text: s
           '$lib/server/features/evidence/video/transcript-service.js'
         );
         const audioPath = await extractAudioTrack(tmpVideoPath);
-        const transcript = await transcribeVideoAudio(audioPath);
+        const transcript = await transcribeVideoAudio(audioPath, randomUUID());
         if (transcript.text && transcript.text.trim().length > 0) {
           return { text: transcript.text.trim(), method: 'video:whisper' };
         }

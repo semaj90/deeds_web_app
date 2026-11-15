@@ -5,6 +5,7 @@ import type { PageServerLoad } from './$types';
 import { clientKey, TTL } from '$lib/server/cache-keys.js';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
 import { getAuthorizedCase } from '$lib/server/case-access.js';
+import { loadSceneSnapshot } from '$lib/server/scene-markers/scene-snapshot-v1.js';
 
 const withTimeout = <T>(promise: Promise<T>): Promise<T> => {
 	let timer: ReturnType<typeof setTimeout>;
@@ -32,7 +33,7 @@ function boardPreviewMime(item: { mimeType?: string | null; fileType?: string | 
   return candidates.find((value) => BOARD_INLINE_IMAGE_MIMES.has(value)) ?? null;
 }
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+const loadBoardCore: PageServerLoad = async ({ params, locals }) => {
   const { id } = params;
 
   // Validate UUID format (for test resilience)
@@ -145,4 +146,16 @@ export const load: PageServerLoad = async ({ params, locals }) => {
       loadError: 'Could not load this case’s evidence board. Try again in a moment.'
     };
   }
+};
+
+/**
+ * Board load: the cached/core board data plus a fresh, authorized scene snapshot for the Noir view.
+ * The snapshot is never cached, so a saved marker move is visible on the next load.
+ */
+export const load: PageServerLoad = async (event) => {
+	const core = await loadBoardCore(event);
+	const numericUserId = Number(event.locals.user?.id);
+	const authorized = Number.isInteger(numericUserId) && (await getAuthorizedCase(event.params.id, numericUserId).catch(() => null));
+	const sceneSnapshot = authorized ? await loadSceneSnapshot(event.params.id) : null;
+	return { ...(core as object), sceneSnapshot } as any;
 };

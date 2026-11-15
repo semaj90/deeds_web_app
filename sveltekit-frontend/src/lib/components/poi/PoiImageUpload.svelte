@@ -128,10 +128,27 @@
 
 <style>
 	.upload-notice {
-		margin: 0.75rem 0 0;
+		margin: 0.75rem auto 0;
+		max-width: 90%;
+		padding: 0.375rem 0.75rem;
+		border-radius: 0.375rem;
 		font-size: 0.8125rem;
 		font-weight: 500;
-		color: #166534;
+		line-height: 1.4;
+		text-align: center;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.375rem;
+		color: #14532d;
+		background: #dcfce7;
+		border: 1px solid #86efac;
+	}
+	:global(.dark) .upload-notice,
+	:global([data-theme="dark"]) .upload-notice {
+		color: #86efac;
+		background: rgba(22, 101, 52, 0.4);
+		border-color: rgba(74, 222, 128, 0.4);
 	}
 	.poi-upload {
 		padding: 1.5rem;

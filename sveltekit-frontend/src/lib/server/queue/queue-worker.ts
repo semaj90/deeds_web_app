@@ -563,6 +563,18 @@ export class EvidenceProcessWorker extends QueueWorker<{
 					uploadedBy: Number(meta.uploadedBy),
 					sourceRevision: expectedSourceSha256,
 					fileName: typeof meta.fileName === 'string' ? meta.fileName : 'evidence-video.mp4',
+						onFrameProgress: async (frameProgress) => {
+							// Coarse job percentage only; ETA stays in the progress payload and is not persisted.
+							const jobId = String(meta.jobId ?? '');
+							if (!jobId) return;
+							const { updateAnalysisJobProgressV1 } = await import('$lib/server/analysis/analysis-jobs.js');
+							const bandStart = frameProgress.phase === 'frame_ocr' ? 0 : 50;
+							try {
+								await updateAnalysisJobProgressV1(jobId, bandStart + frameProgress.percent / 2);
+							} catch {
+								// Progress is advisory; a failed write must not fail video analysis.
+							}
+						},
 					bytes: sourceBytes,
 					onProgress,
 				});

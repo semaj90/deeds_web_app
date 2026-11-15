@@ -13,10 +13,11 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
 import { evidenceFrames } from '$lib/server/db/schema/index.js';
-import { and, asc, eq, isNotNull, or } from 'drizzle-orm';
+import { and, asc, eq, isNotNull, isNull, or } from 'drizzle-orm';
 import { isUuid } from '$lib/server/validation.js';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { formatEvidenceSourceRevisionV1 } from '$lib/server/evidence-source-revision-v1.js';
+import { videoSkimPreviewManifestV1Schema } from '$lib/server/features/evidence/video/video-skim-preview-v1.js';
 
 function parseMetadata(value: unknown): Record<string, unknown> {
 	if (typeof value === 'string') {
@@ -38,11 +39,11 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	const evidenceId = params.id;
 
 	if (!locals.user?.id) {
-		return json({ success: false, error: 'Unauthorized', evidenceId, frames: [], total: 0 }, { status: 401 });
+		return json({ success: false, error: 'Unauthorized', evidenceId, frames: [], total: 0, skimPreview: null }, { status: 401 });
 	}
 
 	if (!isUuid(evidenceId)) {
-		return json({ success: false, error: 'Invalid ID format', evidenceId, frames: [], total: 0 }, { status: 400 });
+		return json({ success: false, error: 'Invalid ID format', evidenceId, frames: [], total: 0, skimPreview: null }, { status: 400 });
 	}
 
 	try {
@@ -62,14 +63,15 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 							isNotNull(evidence.caseId),
 							or(eq(cases.userId, userId), eq(cases.assignedAttorney, userId))
 						)
-					)
+					),
+					isNull(evidence.deletedAt)
 				)
 			)
 			.limit(1);
 
 		if (!item) {
 			return json(
-				{ success: false, error: 'Evidence not found or access denied', evidenceId, frames: [], total: 0 },
+				{ success: false, error: 'Evidence not found or access denied', evidenceId, frames: [], total: 0, skimPreview: null },
 				{ status: 404 }
 			);
 		}
@@ -109,7 +111,23 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 					reviewState: frame.reviewState ?? 'UNREVIEWED_PROPOSAL',
 				};
 			});
-			return json({ success: true, evidenceId, frames, total: frames.length }, { headers: cacheControl.private });
+			const parsedSkimPreview = videoSkimPreviewManifestV1Schema.safeParse(canonicalVideoAnalysis.skimPreview);
+			const skim = parsedSkimPreview.success ? parsedSkimPreview.data : null;
+			const skimPreview = skim && skim.sourceRevision === currentSourceRevision && skim.analysisRevision === canonicalVideoAnalysis.analysisRevision
+				? {
+					schema: skim.schema,
+					sourceRevision: skim.sourceRevision,
+					analysisRevision: skim.analysisRevision,
+					processingRevision: skim.processingRevision,
+					durationMs: skim.durationMs,
+					sampleIntervalMs: skim.sampleIntervalMs,
+					coverage: skim.coverage,
+					sampleTimestampsMs: skim.sampleTimestampsMs,
+					tileLayout: skim.tileLayout,
+					tiles: skim.tiles.map(({ index, firstSampleIndex, sampleCount }) => ({ index, firstSampleIndex, sampleCount })),
+				}
+				: null;
+			return json({ success: true, evidenceId, frames, total: frames.length, skimPreview }, { headers: cacheControl.private });
 		}
 
 		// 2. Attempt query against canonical evidence_frames table (if migrated)
@@ -135,7 +153,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				}));
 
 				return json(
-					{ success: true, evidenceId, frames, total: frames.length },
+					{ success: true, evidenceId, frames, total: frames.length, skimPreview: null },
 					{ headers: cacheControl.private }
 				);
 			}
@@ -152,7 +170,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				: [];
 
 		return json(
-			{ success: true, evidenceId, frames: fallbackFrames, total: fallbackFrames.length },
+			{ success: true, evidenceId, frames: fallbackFrames, total: fallbackFrames.length, skimPreview: null },
 			{ headers: cacheControl.private }
 		);
 	} catch (error) {
@@ -164,7 +182,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				error: error instanceof Error ? error.message : 'Unknown error',
 				evidenceId,
 				frames: [],
-				total: 0
+				total: 0,
+				skimPreview: null
 			},
 			{ status: 200, headers: cacheControl.private }
 		);

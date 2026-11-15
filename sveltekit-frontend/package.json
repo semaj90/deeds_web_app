@@ -1677,7 +1677,8 @@
     "atlas:phase109:ace-promotion:verbose": "npx tsx ../scripts/atlas/phase109-ace-packet-promotion.mts --verbose",
     "atlas:phase109:qdrant-backfill:dry": "npx tsx ../scripts/atlas/phase109-qdrant-pointwise-backfill.mts --dry-run --batch=100",
     "atlas:phase109:qdrant-backfill:apply": "npx tsx ../scripts/atlas/phase109-qdrant-pointwise-backfill.mts --apply --batch=100",
-    "atlas:phase109:all": "npm run atlas:phase109:redis-warmup && npm run atlas:phase109:neo4j-auth && npm run atlas:phase109:ace-promotion && npm run atlas:phase109:qdrant-backfill:dry"
+    "atlas:phase109:all": "npm run atlas:phase109:redis-warmup && npm run atlas:phase109:neo4j-auth && npm run atlas:phase109:ace-promotion && npm run atlas:phase109:qdrant-backfill:dry",
+    "build:workers": "node scripts/build/build-eg2-onnx-worker.mjs"
   },
   "devDependencies": {
     "@adobe/css-tools": "4.5.0",
@@ -1806,6 +1807,7 @@
     "nes.css": "^2.3.0",
     "nodemailer": "10.0.10",
     "ollama": "^0.6.0",
+    "onnxruntime-common": "1.29.0",
     "onnxruntime-node": "1.29.0",
     "onnxruntime-web": "1.29.0",
     "pdf-lib": "1.17.1",

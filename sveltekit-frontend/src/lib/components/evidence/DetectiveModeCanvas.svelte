@@ -1,12 +1,20 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import CrimeSceneViewer3D from './CrimeSceneViewer3D.svelte';
+	import CaseInvestigationPanel from './CaseInvestigationPanel.svelte';
+	import { invalidateAll } from '$app/navigation';
 	import EvidenceCarouselGallery from './EvidenceCarouselGallery.svelte';
 	import ExpandedEvidenceViewer from './ExpandedEvidenceViewer.svelte';
 	import ExhibitInspectorPanel from './ExhibitInspectorPanel.svelte';
 	import type { EvidenceItem } from './evidence-types.js';
 	import { DEFAULT_EVIDENCE_ITEMS } from './evidence-types.js';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import { createActor } from 'xstate';
+	import {
+		createMarkerSaveMachine,
+		makeClientMarkerSaver,
+		type MarkerSaveCommand
+	} from '$lib/machines/marker-save-machine.js';
 	import type { ScenePrimitiveSnapshot } from '$lib/n64-fsm/scene-primitive-sync.js';
 
 	interface Props {
@@ -18,6 +26,7 @@
 		onOpenDocEditor?: (node: any) => void;
 		onOpenVideoModal?: (evidenceId: string, timestampMs?: number) => void;
 		onOpenEvidenceModal?: (item: any) => void;
+		sceneSnapshot?: SceneSnapshot | null;
 	}
 
 	let {
@@ -28,14 +37,17 @@
 		onOpen3DViewer,
 		onOpenDocEditor,
 		onOpenVideoModal,
-		onOpenEvidenceModal
+		onOpenEvidenceModal,
+		sceneSnapshot = null
 	}: Props = $props();
+
+	import type { SceneSnapshot } from '$lib/server/scene-markers/scene-snapshot-v1.js';
 
 	// Theme: 'dark' (Noir Obsidian/Gold) | 'light' (Image 2 Crisp White/Slate)
 	let theme = $state<'dark' | 'light'>('light');
 
 	// Active Main View Tab: 'canvas' | 'dossier' | 'timeline' | '3d-lidar' (Image 2)
-	let mainView = $state<'canvas' | 'dossier' | 'timeline' | '3d-lidar'>('canvas');
+	let mainView = $state<'canvas' | 'dossier' | 'timeline' | '3d-lidar' | 'investigation'>('canvas');
 
 	// Active Center View Mode: 'splat-3d' (Primary HUD) | 'crime-reconstruction' (Noir 3D Crime Scene) | 'canvas-nodes' (Tactical Mint Canvas)
 	let centerMode = $state<'splat-3d' | 'crime-reconstruction' | 'canvas-nodes'>('splat-3d');
@@ -352,22 +364,149 @@
 	let isCrimePlaying = $state(false);
 	let crimeViewerRef = $state<any>(null);
 
-	let crimeEvidenceE002 = $state({
-		id: 'E-002',
-		title: 'Bloodstain',
-		type: 'Bloodstain (Image2D)',
-		caseNumber: '#98683214',
-		hash: null as string | null,
-		added: 'Mar 2, 2024 13:56',
-		verified: false,
-		bounds: { x: 0.42, y: 0.38, z: 0.02 },
+	// Active evidence marker from PostgreSQL (sceneSnapshot). Nothing is invented: fields the
+	// database does not record (bounds, rotation, scale) are null and render as "—".
+	const sceneMarkers = $derived(sceneSnapshot?.markers ?? []);
+	const activeMarker = $derived(sceneMarkers[Math.max(0, selectedCrimeMarker - 1)] ?? sceneMarkers[0] ?? null);
+	const crimeEvidenceE002 = $derived({
+		id: activeMarker?.evidenceId ?? '',
+		title: activeMarker?.evidenceTitle ?? 'No evidence marker placed',
+		type: activeMarker ? 'Evidence marker' : '—',
+		caseNumber: sceneSnapshot?.caseNumber ?? null,
+		hash: activeMarker?.evidenceHash ?? null,
+		added: activeMarker?.evidenceAddedAt ? `${activeMarker.evidenceAddedAt.replace('T', ' ').slice(0, 16)} UTC` : null,
+		verified: activeMarker?.evidenceVerified ?? false,
+		bounds: null as { x: number; y: number; z: number } | null,
 		transform: {
-			position: { x: 4.13, y: 0.010, z: -3.187 },
-			rotation: { x: 0.0, y: 0.0, z: 0.0 },
-			scale: { x: 1.00, y: 1.00, z: 1.00 }
+			position: {
+				x: activeMarker?.posX ?? null,
+				y: activeMarker?.posY ?? null,
+				z: activeMarker?.posZ ?? null
+			},
+			rotation: null as { x: number; y: number; z: number } | null,
+			scale: null as { x: number; y: number; z: number } | null
 		},
-		tags: ['blood', 'crime-scene', 'forensic']
+		tags: [] as string[]
 	});
+
+	// Marker position save (PATCH with optimistic concurrency and a per-attempt commandId).
+	let markerDraft = $state({ x: 0, y: 0, z: 0 });
+	let markerRevision = $state<number | null>(null);
+	let markerSaving = $state(false);
+	let markerSaveMessage = $state<string | null>(null);
+	$effect(() => {
+		const marker = activeMarker;
+		if (marker) {
+			markerDraft = { x: marker.posX, y: marker.posY, z: marker.posZ };
+			markerRevision = marker.revision;
+			markerSaveMessage = null;
+		}
+	});
+
+	// Marker create/move goes through the existing XState v5 marker-save machine (not a duplicate save path).
+	// A command resolves only when the machine reaches a terminal state, i.e. when the server confirmed it.
+	const markerActor = createActor(createMarkerSaveMachine(makeClientMarkerSaver()));
+	markerActor.start();
+	onDestroy(() => markerActor.stop());
+
+	function runMarkerCommand(
+		command: MarkerSaveCommand
+	): Promise<{ ok: true; revision: number } | { ok: false; message: string }> {
+		return new Promise((resolve) => {
+			// Clear any previous outcome first: the subscription below fires immediately with the current state.
+			markerActor.send({ type: 'RESET' });
+			const subscription = markerActor.subscribe((snapshot) => {
+				if (snapshot.value === 'idle' && snapshot.context.committed) {
+					subscription.unsubscribe();
+					resolve({ ok: true, revision: snapshot.context.committed.revision });
+				} else if (snapshot.value === 'conflict') {
+					subscription.unsubscribe();
+					const current = snapshot.context.conflictRevision;
+					resolve({ ok: false, message: `Changed elsewhere${current ? ` (now revision ${current})` : ''}. Reload to continue.` });
+				} else if (snapshot.value === 'failed') {
+					subscription.unsubscribe();
+					resolve({ ok: false, message: snapshot.context.error ?? 'Marker was not saved.' });
+				}
+			});
+			markerActor.send({ type: 'DROP', command });
+		});
+	}
+
+	// Place a new marker linked to a real case exhibit. The server rejects evidence from another case.
+	let placeEvidenceId = $state('');
+	let placePosition = $state({ x: 0, y: 0, z: 0 });
+	let placing = $state(false);
+	let placeMessage = $state<string | null>(null);
+	const placeableEvidence = $derived(
+		(evidenceItems as Array<{ id?: string; title?: string; name?: string }>).filter((item) => typeof item.id === 'string' && item.id.length > 0)
+	);
+	// Scene key for new markers: the active marker's scene, else the default scene key.
+	const placementSceneKey = $derived(activeMarker?.sceneKey ?? 'main-scene');
+
+	async function placeMarker() {
+		const evidenceLink = placeableEvidence.find((item) => item.id === placeEvidenceId);
+		if (!evidenceLink || !caseId) {
+			placeMessage = 'Choose an exhibit from this case first.';
+			return;
+		}
+		placing = true;
+		placeMessage = null;
+		const outcome = await runMarkerCommand({
+			kind: 'create',
+			caseId,
+			sceneKey: placementSceneKey,
+			markerId: crypto.randomUUID(),
+			evidenceId: evidenceLink.id,
+			commandId: crypto.randomUUID(),
+			expectedRevision: 0,
+			position: { x: Number(placePosition.x), y: Number(placePosition.y), z: Number(placePosition.z) },
+			label: evidenceLink.title ?? evidenceLink.name ?? null
+		});
+		placing = false;
+		if (outcome.ok === true) {
+			placeMessage = 'Marker placed and saved.';
+			// Reload the case snapshot so the new marker is read back from PostgreSQL.
+			await invalidateAll();
+		} else {
+			placeMessage = outcome.message;
+		}
+	}
+
+	// Primitive-to-evidence binding. A selected 3D primitive is never attributed to an exhibit just
+	// because it is selected. There is no verified, case-scoped primitive registry yet, so this stays
+	// null and the inspector shows the primitive as UNLINKED. A verified binding must come from the
+	// server (with source SHA-256 and verification state) before it can be set here.
+	const selectedPrimitiveEvidence = $derived(
+		null as { exhibitNumber: string; title: string; sha256: string | null; verified: boolean } | null
+	);
+
+	function fmt(value: number | null | undefined, digits: number): string {
+		return typeof value === 'number' && Number.isFinite(value) ? value.toFixed(digits) : '—';
+	}
+
+	async function saveMarkerPosition() {
+		const marker = activeMarker;
+		if (!marker || markerRevision === null || !caseId) return;
+		markerSaving = true;
+		markerSaveMessage = null;
+		const outcome = await runMarkerCommand({
+			kind: 'move',
+			caseId,
+			sceneKey: marker.sceneKey,
+			markerId: marker.id,
+			evidenceId: marker.evidenceId,
+			commandId: crypto.randomUUID(),
+			expectedRevision: markerRevision,
+			position: { x: Number(markerDraft.x), y: Number(markerDraft.y), z: Number(markerDraft.z) }
+		});
+		markerSaving = false;
+		if (outcome.ok === true) {
+			markerRevision = outcome.revision;
+			markerSaveMessage = `Saved at revision ${outcome.revision}.`;
+		} else {
+			markerSaveMessage = outcome.message;
+		}
+	}
 
 	// Active subheader filter
 	let activeSubTab = $state<'all' | 'biometrics' | 'lidar' | 'docs'>('lidar');
@@ -666,6 +805,11 @@
 					class:active={mainView === '3d-lidar'}
 					onclick={() => { mainView = '3d-lidar'; centerMode = 'splat-3d'; }}
 				>3D LiDAR</button>
+				<button
+					class="hnt-btn"
+					class:active={mainView === 'investigation'}
+					onclick={() => mainView = 'investigation'}
+				>Investigation</button>
 			</div>
 
 			<!-- Theme Toggle Button (Light / Dark) -->
@@ -752,6 +896,11 @@
 				{/each}
 			</div>
 		</div>
+	{/if}
+
+	{#if mainView === 'investigation'}
+		<!-- WHO / WHAT / WHY / HOW facets, evidence links, and the exported AI summary -->
+		<CaseInvestigationPanel {caseId} evidenceItems={evidenceItems} />
 	{/if}
 
 	{#if mainView === 'dossier'}
@@ -1313,7 +1462,7 @@
 						<!-- Cyan Glowing Bounding Box Overlay -->
 						<div class="bounding-volume-overlay">
 							<div class="bv-frame-header">
-								<span class="bv-title"><Icon name="shield" size={12} /> EXHIBIT E-002 // BOUNDING VOLUME [LOCKED]</span>
+								<span class="bv-title"><Icon name="shield" size={12} /> EXHIBIT {activeMarker?.markerKey ?? '—'} // BOUNDING VOLUME [LOCKED]</span>
 								<span class="bv-intersect-pill"><Icon name="target" size={11} /> RAY INTERSECT: 99.4%</span>
 							</div>
 
@@ -1361,7 +1510,7 @@
 					<!-- Top Sub-Bar for Crime Scene -->
 					<div class="crime-stage-header">
 						<div class="csh-title-row">
-							<span class="csh-case-tag">CASE #98683214 &gt; Crime Scene Reconstruction</span>
+							<span class="csh-case-tag">CASE {sceneSnapshot?.caseNumber ?? caseId.slice(0, 8)} &gt; Crime Scene Reconstruction</span>
 							<div class="csh-subtabs">
 								<button class="csh-tab active"><Icon name="box" size={12} /> 3D Scene</button>
 								<button class="csh-tab"><Icon name="file-text" size={12} /> Evidence</button>
@@ -1617,14 +1766,14 @@
 			<div class="inspector-header">
 				<div class="inspector-title-row">
 					<Icon name="scan" size={14} />
-					<span class="title">{inspectorMode === 'evidence-e002' ? 'EVIDENCE = E-002' : inspectorMode === 'scene-primitive' ? `SCENE OBJECT = ${selectedScenePrimitive?.id ?? 'UNSELECTED'}` : 'SELECTED DATA'}</span>
+					<span class="title">{inspectorMode === 'evidence-e002' ? `EVIDENCE = ${activeMarker?.markerKey ?? '—'}` : inspectorMode === 'scene-primitive' ? `SCENE OBJECT = ${selectedScenePrimitive?.id ?? 'UNSELECTED'}` : 'SELECTED DATA'}</span>
 					<div class="inspector-mode-toggle">
 						<button
 							class="imt-btn"
 							class:active={inspectorMode === 'evidence-e002'}
 							onclick={() => { selectedScenePrimitive = null; inspectorMode = 'evidence-e002'; }}
-							title="Show E-002 Crime Scene Evidence"
-						>E-002</button>
+							title="Show {activeMarker?.markerKey ?? 'evidence'} crime scene evidence"
+						>{activeMarker?.markerKey ?? '—'}</button>
 						<button
 							class="imt-btn"
 							class:active={inspectorMode === 'splat'}
@@ -1636,7 +1785,7 @@
 				<div class="inspector-sub">
 					{#if inspectorMode === 'evidence-e002'}
 						<span>CASE: {crimeEvidenceE002.caseNumber}</span>
-						<span class="ex-tag gold">BLOODSTAIN (2D/3D)</span>
+						<span class="ex-tag gold">{(activeMarker?.label ?? crimeEvidenceE002.title).toUpperCase()}</span>
 					{:else if inspectorMode === 'scene-primitive' && selectedScenePrimitive}
 						<span>{selectedScenePrimitive.type}</span>
 						<span class="ex-tag gold">DEMONSTRATIVE · UNCALIBRATED</span>
@@ -1661,6 +1810,7 @@
 							</div>
 						</div>
 						<div class="nei-meta-list">
+							<div class="nml-row"><span class="k">Evidence:</span> <span class="v">{crimeEvidenceE002.title}</span></div>
 							<div class="nml-row"><span class="k">Type:</span> <span class="v">{crimeEvidenceE002.type}</span></div>
 							<div class="nml-row"><span class="k">Case:</span> <span class="v">{crimeEvidenceE002.caseNumber}</span></div>
 							<div class="nml-row"><span class="k">Source hash:</span> <code class="v mono">{crimeEvidenceE002.hash ?? 'Not linked'}</code></div>
@@ -1685,9 +1835,9 @@
 							<Icon name="lock" size={12} />
 						</div>
 						<div class="bound-dimensions-grid">
-						<div class="dim-box"><span class="axis">X</span> <span class="val">{selectedScenePrimitive?.dimensionsMeters[0] ?? crimeEvidenceE002.bounds.x} m</span></div>
-							<div class="dim-box"><span class="axis">Y</span> <span class="val">{selectedScenePrimitive?.dimensionsMeters[1] ?? crimeEvidenceE002.bounds.y} m</span></div>
-							<div class="dim-box"><span class="axis">Z</span> <span class="val">{selectedScenePrimitive?.dimensionsMeters[2] ?? crimeEvidenceE002.bounds.z} m</span></div>
+						<div class="dim-box"><span class="axis">X</span> <span class="val">{selectedScenePrimitive?.dimensionsMeters[0] ?? fmt(crimeEvidenceE002.bounds?.x, 2)} m</span></div>
+							<div class="dim-box"><span class="axis">Y</span> <span class="val">{selectedScenePrimitive?.dimensionsMeters[1] ?? fmt(crimeEvidenceE002.bounds?.y, 2)} m</span></div>
+							<div class="dim-box"><span class="axis">Z</span> <span class="val">{selectedScenePrimitive?.dimensionsMeters[2] ?? fmt(crimeEvidenceE002.bounds?.z, 2)} m</span></div>
 						</div>
 					</div>
 
@@ -1701,25 +1851,25 @@
 							<div class="tr-row">
 								<span class="tr-lbl">Position</span>
 								<div class="tr-vals">
-									<span>X <code class="tr-num">{selectedScenePrimitive?.positionMeters[0] ?? crimeEvidenceE002.transform.position.x}</code></span>
-									<span>Y <code class="tr-num">{selectedScenePrimitive?.positionMeters[1] ?? crimeEvidenceE002.transform.position.y.toFixed(3)}</code></span>
-									<span>Z <code class="tr-num">{selectedScenePrimitive?.positionMeters[2] ?? crimeEvidenceE002.transform.position.z}</code></span>
+									<span>X <code class="tr-num">{selectedScenePrimitive?.positionMeters[0] ?? fmt(crimeEvidenceE002.transform.position.x, 3)}</code></span>
+									<span>Y <code class="tr-num">{selectedScenePrimitive?.positionMeters[1] ?? fmt(crimeEvidenceE002.transform.position.y, 3)}</code></span>
+									<span>Z <code class="tr-num">{selectedScenePrimitive?.positionMeters[2] ?? fmt(crimeEvidenceE002.transform.position.z, 3)}</code></span>
 								</div>
 							</div>
 							<div class="tr-row">
 								<span class="tr-lbl">Rotation</span>
 								<div class="tr-vals">
-									<span>X <code class="tr-num">{selectedScenePrimitive?.rotationDeg[0] ?? crimeEvidenceE002.transform.rotation.x.toFixed(1)}°</code></span>
-									<span>Y <code class="tr-num">{selectedScenePrimitive?.rotationDeg[1] ?? crimeEvidenceE002.transform.rotation.y.toFixed(1)}°</code></span>
-									<span>Z <code class="tr-num">{selectedScenePrimitive?.rotationDeg[2] ?? crimeEvidenceE002.transform.rotation.z.toFixed(1)}°</code></span>
+									<span>X <code class="tr-num">{selectedScenePrimitive?.rotationDeg[0] ?? fmt(crimeEvidenceE002.transform.rotation?.x, 1)}°</code></span>
+									<span>Y <code class="tr-num">{selectedScenePrimitive?.rotationDeg[1] ?? fmt(crimeEvidenceE002.transform.rotation?.y, 1)}°</code></span>
+									<span>Z <code class="tr-num">{selectedScenePrimitive?.rotationDeg[2] ?? fmt(crimeEvidenceE002.transform.rotation?.z, 1)}°</code></span>
 								</div>
 							</div>
 							<div class="tr-row">
 								<span class="tr-lbl">Scale</span>
 								<div class="tr-vals">
-									<span>X <code class="tr-num">{crimeEvidenceE002.transform.scale.x.toFixed(2)}</code></span>
-									<span>Y <code class="tr-num">{crimeEvidenceE002.transform.scale.y.toFixed(2)}</code></span>
-									<span>Z <code class="tr-num">{crimeEvidenceE002.transform.scale.z.toFixed(2)}</code></span>
+									<span>X <code class="tr-num">{fmt(crimeEvidenceE002.transform.scale?.x, 2)}</code></span>
+									<span>Y <code class="tr-num">{fmt(crimeEvidenceE002.transform.scale?.y, 2)}</code></span>
+									<span>Z <code class="tr-num">{fmt(crimeEvidenceE002.transform.scale?.z, 2)}</code></span>
 								</div>
 							</div>
 						</div>
@@ -1739,17 +1889,81 @@
 						</div>
 					</div>
 
-					<!-- N64 16 KB Memory Arena FSM Telemetry Inspector -->
-					<div class="nei-section" style="margin-top: 8px;">
-						<ExhibitInspectorPanel
-							exhibitId={crimeEvidenceE002.id}
-							label={crimeEvidenceE002.title}
-							dimensionsMeters={selectedScenePrimitive?.dimensionsMeters ?? [crimeEvidenceE002.bounds.x, crimeEvidenceE002.bounds.y, crimeEvidenceE002.bounds.z]}
-							positionMeters={selectedScenePrimitive?.positionMeters ?? [crimeEvidenceE002.transform.position.x, crimeEvidenceE002.transform.position.y, crimeEvidenceE002.transform.position.z]}
-							rotationDeg={selectedScenePrimitive?.rotationDeg ?? [crimeEvidenceE002.transform.rotation.x, crimeEvidenceE002.transform.rotation.y, crimeEvidenceE002.transform.rotation.z]}
-							provenanceLabel="SYNTHETIC HYPOTHESIS"
-						/>
+					{#if activeMarker}
+						<div class="nei-section marker-save" style="margin-top: 8px;">
+							<div class="marker-save-title">MARKER POSITION · revision {markerRevision ?? '—'}</div>
+							<div class="marker-save-grid">
+								<label>X <input type="number" step="0.01" bind:value={markerDraft.x} /></label>
+								<label>Y <input type="number" step="0.01" bind:value={markerDraft.y} /></label>
+								<label>Z <input type="number" step="0.01" bind:value={markerDraft.z} /></label>
+							</div>
+							<button type="button" class="marker-save-btn" onclick={saveMarkerPosition} disabled={markerSaving || markerRevision === null}>
+								{markerSaving ? 'Saving…' : 'Save position'}
+							</button>
+							{#if markerSaveMessage}
+								<p class="marker-save-status" role="status">{markerSaveMessage}</p>
+							{/if}
+						</div>
+					{/if}
+
+					{#if sceneMarkers.length > 0}
+						<div class="nei-section marker-save" style="margin-top: 8px;">
+							<div class="marker-save-title">SCENE MARKERS · {sceneMarkers.length} saved</div>
+							<ul class="marker-list">
+								{#each sceneMarkers as marker, index (marker.id)}
+									<li>
+										<button
+											type="button"
+											class="marker-list-btn"
+											class:active={index === Math.max(0, selectedCrimeMarker - 1)}
+											onclick={() => (selectedCrimeMarker = index + 1)}
+										>
+											{marker.label ?? marker.evidenceTitle} · rev {marker.revision}
+										</button>
+									</li>
+								{/each}
+							</ul>
+						</div>
+					{/if}
+
+					<div class="nei-section marker-save" style="margin-top: 8px;">
+						<div class="marker-save-title">PLACE MARKER · scene {placementSceneKey}</div>
+						<label class="marker-save-field">
+							Exhibit
+							<select bind:value={placeEvidenceId} disabled={placing}>
+								<option value="">Choose exhibit…</option>
+								{#each placeableEvidence as item (item.id)}
+									<option value={item.id}>{item.title ?? item.name ?? item.id}</option>
+								{/each}
+							</select>
+						</label>
+						<div class="marker-save-grid">
+							<label>X <input type="number" step="0.01" bind:value={placePosition.x} /></label>
+							<label>Y <input type="number" step="0.01" bind:value={placePosition.y} /></label>
+							<label>Z <input type="number" step="0.01" bind:value={placePosition.z} /></label>
+						</div>
+						<button type="button" class="marker-save-btn" onclick={placeMarker} disabled={placing || !placeEvidenceId}>
+							{placing ? 'Placing…' : 'Place marker'}
+						</button>
+						{#if placeMessage}
+							<p class="marker-save-status" role="status">{placeMessage}</p>
+						{/if}
 					</div>
+
+					<!-- N64 16 KB Memory Arena FSM Telemetry Inspector -->
+					{#if selectedScenePrimitive}
+						<div class="nei-section" style="margin-top: 8px;">
+							<!-- Telemetry only for a real 3D primitive selected in the viewer; no invented values. -->
+							<ExhibitInspectorPanel
+								exhibitId={selectedPrimitiveEvidence?.exhibitNumber ?? 'UNLINKED PRIMITIVE'}
+								label={selectedPrimitiveEvidence?.title ?? selectedScenePrimitive.id}
+								dimensionsMeters={selectedScenePrimitive.dimensionsMeters}
+								positionMeters={selectedScenePrimitive.positionMeters}
+								rotationDeg={selectedScenePrimitive.rotationDeg}
+								provenanceLabel={selectedPrimitiveEvidence ? 'SCENE OBJECT · VERIFIED' : 'SCENE OBJECT · UNLINKED'}
+							/>
+						</div>
+					{/if}
 
 					<!-- Detective Video Modal Trigger -->
 					<div class="nei-section" style="margin-top: 10px;">
@@ -1898,7 +2112,7 @@
 						onclick={() => activeTimelinePhase = 'evidence'}
 					>
 						<span class="chevron-pin-marker"></span>
-						<span>Evidence E-002 (Blood)</span>
+						<span>Evidence {activeMarker?.markerKey ?? '—'}</span>
 					</button>
 					<button
 						class="chevron-step"

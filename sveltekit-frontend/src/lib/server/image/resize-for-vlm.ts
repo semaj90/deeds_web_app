@@ -16,6 +16,9 @@
  */
 import sharp from 'sharp';
 
+/** Stable preprocessing label used to distinguish this thumbnail recipe in evidence metadata. */
+export const EVIDENCE_THUMBNAIL_PREPROCESSING_REVISION_V1 = 'atlas.image-thumbnail.sharp-v1:edge256-cover-jpeg75-auto-orient';
+
 /** Gemma 4 variable-resolution max edge (fills 1120-token budget) */
 export const GEMMA4_VLM_MAX_EDGE = 2048;
 /** @deprecated Use GEMMA4_VLM_MAX_EDGE */
@@ -86,7 +89,8 @@ export async function resizeForVLM(input: Buffer): Promise<ResizeResult> {
  */
 export async function resizeForThumbnail(input: Buffer, size = 256): Promise<Buffer> {
 	return sharp(input)
+		.rotate()
 		.resize(size, size, { fit: 'cover' })
-		.jpeg({ quality: 75 })
+		.jpeg({ quality: 75, mozjpeg: false })
 		.toBuffer();
 }

@@ -94,6 +94,15 @@ export async function transcribeAudio(audioPath: string, jobId: string): Promise
     child.stdout.on('data', (data) => { stdout += data; });
     child.stderr.on('data', (data) => { stderr += data; });
 
+    child.on('data', (data) => { stdout += data; });
+    child.on('error', (err: any) => {
+      if (err.code === 'ENOENT') {
+        reject(new Error(`TRANSCRIPTION_BINARY_UNAVAILABLE: Python executable not found at ${pythonPath}`));
+      } else {
+        reject(new Error(`TRANSCRIPTION_BINARY_UNAVAILABLE: ${err.message}`));
+      }
+    });
+
     child.on('close', (code) => {
       if (code === 0) {
         try {
@@ -103,7 +112,11 @@ export async function transcribeAudio(audioPath: string, jobId: string): Promise
           reject(new Error(`Failed to parse whisper output: ${err}\nRaw: ${stdout}`));
         }
       } else {
-        reject(new Error(`Whisper shim failed with code ${code}: ${stderr}`));
+        if (stderr.includes('No module named') || stderr.includes('faster_whisper') || stderr.includes('not recognized')) {
+          reject(new Error(`TRANSCRIPTION_BINARY_UNAVAILABLE: faster-whisper not installed in environment (${stderr.trim()})`));
+        } else {
+          reject(new Error(`Whisper shim failed with code ${code}: ${stderr}`));
+        }
       }
     });
   });

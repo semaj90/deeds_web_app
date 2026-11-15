@@ -1,0 +1,146 @@
+{
+  "appliedAt": "2026-11-15T03:08:17.556Z",
+  "phase": "applied_and_independently_verified",
+  "database": {
+    "database_name": "legal_ai_db",
+    "server_version": "18.4 (Debian 18.4-1.pgdg12+1)",
+    "db_user": "legal_admin",
+    "server_address": "172.18.0.17/32",
+    "server_port": 5432
+  },
+  "tableCounts": {
+    "beforeAndAfter": {
+      "jobs": "0",
+      "versions": "9",
+      "chunks": "60432"
+    }
+  },
+  "migrations": [
+    {
+      "path": "drizzle/manual/20261112_library_ingestion_lease_v1.sql",
+      "sha256": "bfebbb5b8ebecf966b17b573b977626c710036aba076cebfe9b104412020f93b"
+    },
+    {
+      "path": "drizzle/manual/20261112_library_document_revision_binding_v1.sql",
+      "sha256": "bef963fa7c1cd921fa8df1b07372b636fd3ed47ce8f8d63ce78ca7d7dfbc1358"
+    },
+    {
+      "path": "drizzle/manual/20261112_library_chunk_parser_revision_v1.sql",
+      "sha256": "5c03f2a6a7f6c4cb9f38dabe16bc4f9187848c7d218b85a7f56ae51a614a5540"
+    }
+  ],
+  "postcheck": {
+    "columns": [
+      {
+        "table_name": "ingestion_jobs",
+        "column_name": "attempt_count",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "column_default": "0"
+      },
+      {
+        "table_name": "ingestion_jobs",
+        "column_name": "available_at",
+        "data_type": "timestamp with time zone",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "ingestion_jobs",
+        "column_name": "fencing_token",
+        "data_type": "bigint",
+        "is_nullable": "NO",
+        "column_default": "0"
+      },
+      {
+        "table_name": "ingestion_jobs",
+        "column_name": "lease_expires_at",
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "ingestion_jobs",
+        "column_name": "lease_token",
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "ingestion_jobs",
+        "column_name": "max_attempts",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "column_default": "3"
+      },
+      {
+        "table_name": "ingestion_jobs",
+        "column_name": "source_hash",
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "legal_chunks",
+        "column_name": "char_offset_unit",
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "legal_chunks",
+        "column_name": "chunk_hash",
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "legal_chunks",
+        "column_name": "parser_revision",
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "library_document_versions",
+        "column_name": "source_hash",
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      }
+    ],
+    "indexes": [
+      {
+        "index_name": "ingestion_jobs_claim_idx",
+        "valid": true,
+        "definition": "CREATE INDEX ingestion_jobs_claim_idx ON public.ingestion_jobs USING btree (available_at, created_at) WHERE (status = 'queued'::text)"
+      },
+      {
+        "index_name": "ingestion_jobs_expired_lease_idx",
+        "valid": true,
+        "definition": "CREATE INDEX ingestion_jobs_expired_lease_idx ON public.ingestion_jobs USING btree (lease_expires_at, created_at) WHERE (status = 'running'::text)"
+      },
+      {
+        "index_name": "ingestion_jobs_source_hash_status_idx",
+        "valid": true,
+        "definition": "CREATE INDEX ingestion_jobs_source_hash_status_idx ON public.ingestion_jobs USING btree (source_hash, status, available_at)"
+      },
+      {
+        "index_name": "library_document_versions_source_hash_idx",
+        "valid": true,
+        "definition": "CREATE INDEX library_document_versions_source_hash_idx ON public.library_document_versions USING btree (document_id, source_hash) WHERE (source_hash IS NOT NULL)"
+      }
+    ],
+    "statusDefault": "'queued'::text",
+    "fencingConstraint": {
+      "conname": "ingestion_jobs_fencing_token_check",
+      "definition": "CHECK ((fencing_token >= 0))"
+    },
+    "legacyProvenanceBackfill": {
+      "jobs_with_source_hash": "0",
+      "versions_with_source_hash": "0",
+      "chunks_with_provenance": "0"
+    }
+  },
+  "readback": "fresh PostgreSQL connection after commit; all checks passed"
+}

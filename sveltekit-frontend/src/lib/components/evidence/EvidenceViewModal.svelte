@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import { Dialog } from 'bits-ui';
 	import '$lib/styles/evidence-document-modal.css';
 	import Icon from '$lib/components/ui/Icon.svelte';
@@ -22,6 +23,44 @@ import {
 	requestEvidenceUpscale,
 	type StoredEvidenceImageAnalysis
 } from './evidence-image-tools';
+
+type VideoSkimPreviewClientV1 = {
+	schema: 'atlas.video-skim-preview.v1';
+	sourceRevision: string;
+	analysisRevision: string;
+	processingRevision: string;
+	durationMs: number;
+	sampleIntervalMs: number;
+	coverage: 'FULL_DURATION_SAMPLED_NOT_EVERY_SOURCE_FRAME';
+	sampleTimestampsMs: number[];
+	tileLayout: { frameWidth: number; frameHeight: number; framesPerTile: number; columns: number; rows: number; tileWidth: number; tileHeight: number };
+	tiles: Array<{ index: number; firstSampleIndex: number; sampleCount: number }>;
+};
+
+function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1 | null {
+	if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+	const candidate = value as Partial<VideoSkimPreviewClientV1>;
+	const layout = candidate.tileLayout;
+	if (candidate.schema !== 'atlas.video-skim-preview.v1'
+		|| typeof candidate.sourceRevision !== 'string' || !/^sha256:[a-f0-9]{64}$/.test(candidate.sourceRevision)
+		|| typeof candidate.analysisRevision !== 'string' || typeof candidate.processingRevision !== 'string'
+		|| !Number.isSafeInteger(candidate.durationMs) || !Number.isSafeInteger(candidate.sampleIntervalMs)
+		|| candidate.coverage !== 'FULL_DURATION_SAMPLED_NOT_EVERY_SOURCE_FRAME'
+		|| !Array.isArray(candidate.sampleTimestampsMs) || candidate.sampleTimestampsMs.length < 1 || candidate.sampleTimestampsMs.length > 14_400
+		|| !candidate.sampleTimestampsMs.every((timestamp) => Number.isSafeInteger(timestamp) && timestamp >= 0 && timestamp < (candidate.durationMs ?? 0))
+		|| !layout || !Number.isSafeInteger(layout.frameWidth) || !Number.isSafeInteger(layout.frameHeight)
+		|| !Number.isSafeInteger(layout.framesPerTile) || !Number.isSafeInteger(layout.columns) || !Number.isSafeInteger(layout.rows)
+		|| !Number.isSafeInteger(layout.tileWidth) || !Number.isSafeInteger(layout.tileHeight)
+		|| !Array.isArray(candidate.tiles) || candidate.tiles.length < 1 || candidate.tiles.length > 144
+		|| candidate.tiles.length !== Math.ceil(candidate.sampleTimestampsMs!.length / 100)
+		|| !candidate.tiles.every((tile, index) => tile && typeof tile === 'object' && tile.index === index
+			&& tile.firstSampleIndex === index * 100
+			&& tile.sampleCount === Math.min(100, candidate.sampleTimestampsMs!.length - index * 100))) return null;
+	for (let index = 1; index < candidate.sampleTimestampsMs.length; index += 1) {
+		if (candidate.sampleTimestampsMs[index] <= candidate.sampleTimestampsMs[index - 1]) return null;
+	}
+	return candidate as VideoSkimPreviewClientV1;
+}
 
 	let {
 		evidenceId,
@@ -90,7 +129,7 @@ import {
 		if (open && videoFrameAnalysis.length > 0 && typeof initialTimestampMs === 'number') {
 			const targetSec = initialTimestampMs / 1000;
 			const matchingFrame = videoFrameAnalysis.find((f) => Math.abs(f.timestamp - targetSec) < 0.6);
-			if (matchingFrame && selectedAnalysisFrame?.id !== matchingFrame.id) {
+			if (matchingFrame && selectedAnalysisFrame?.timestamp !== matchingFrame.timestamp) {
 				selectedAnalysisFrame = matchingFrame;
 			}
 		}
@@ -247,6 +286,21 @@ import {
 		capturedFrameUrl = null;
 		videoFrameTimestampMs = null;
 		reviewMediaTimestampMs = null;
+
+		if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+			// Demo / synthetic exhibit fallback
+			doc = {
+				id,
+				title: id === 'e-001' ? 'Trace Residue (Footprint)' : (id === 'e-002' ? 'Witness Statement' : 'Security Footage (Lobby)'),
+				fileType: id === 'e-001' ? 'image/png' : (id === 'e-002' ? 'application/pdf' : 'video/mp4'),
+				fileName: `${id}.dat`,
+				description: 'Synthetic Investigative Exhibit for Demo Analysis',
+				createdAt: new Date().toISOString()
+			};
+			isLoading = false;
+			return;
+		}
+
 		try {
 			const res = await fetch(`/api/evidence/${id}`);
 			if (!res.ok) throw new Error(`${res.status}`);
@@ -287,12 +341,16 @@ import {
 	}
 
 	async function loadVideoFrames(id: string) {
+		stopVideoSkimScan(false);
+		videoSkimPreview = null;
 		try {
 			const res = await fetch(`/api/evidence/${encodeURIComponent(id)}/frames`);
 			if (!res.ok) return;
 			const data = await res.json();
-			if (evidenceId !== id || !Array.isArray(data?.frames) || data.frames.length === 0) return;
-			if (!doc?.frameAnalysis || doc.frameAnalysis.length === 0) {
+			if (evidenceId !== id) return;
+			videoSkimPreview = parseVideoSkimPreviewClientV1(data?.skimPreview);
+			skimPreviewIndex = 0;
+			if (Array.isArray(data?.frames) && data.frames.length > 0 && (!doc?.frameAnalysis || doc.frameAnalysis.length === 0)) {
 				doc = { ...doc, frameAnalysis: data.frames };
 			}
 		} catch {
@@ -363,6 +421,30 @@ import {
 					? doc.frames
 					: []
 	);
+	let orderedVideoKeyframes = $derived.by(() =>
+		videoFrameAnalysis
+			.map((frame, sourceIndex) => ({ frame, sourceIndex }))
+			.filter(({ frame }) => Number.isFinite(frame.timestamp) && frame.timestamp >= 0)
+			.sort((a, b) => a.frame.timestamp - b.frame.timestamp || a.sourceIndex - b.sourceIndex)
+			.map(({ frame }) => frame)
+	);
+	let activeVideoKeyframeIndex = $derived.by(() => {
+		if (orderedVideoKeyframes.length === 0) return -1;
+		const playbackSeconds = currentPlaybackTimeMs / 1000;
+		let closestIndex = 0;
+		for (let index = 1; index < orderedVideoKeyframes.length; index += 1) {
+			if (Math.abs(orderedVideoKeyframes[index].timestamp - playbackSeconds) < Math.abs(orderedVideoKeyframes[closestIndex].timestamp - playbackSeconds)) {
+				closestIndex = index;
+			}
+		}
+		return closestIndex;
+	});
+	let canStepToPreviousKeyframe = $derived.by(() =>
+		orderedVideoKeyframes.some((frame) => frame.timestamp < currentPlaybackTimeMs / 1000 - 0.001)
+	);
+	let canStepToNextKeyframe = $derived.by(() =>
+		orderedVideoKeyframes.some((frame) => frame.timestamp > currentPlaybackTimeMs / 1000 + 0.001)
+	);
 	let selectedAnalysisFrame = $state<{
 		timestamp: number;
 		framePath?: string | null;
@@ -385,6 +467,13 @@ import {
 	});
 	let depthMapUrl = $derived.by(() => {
 		const hash = doc?.hash;
+		const storedDepth = imageAnalysis?.depthMap;
+		const selectedRevision = typeof hash === 'string'
+			? hash.startsWith('sha256:') ? hash : `sha256:${hash}`
+			: null;
+		if (evidenceId && storedDepth?.status === 'ESTIMATED' && selectedRevision === storedDepth.sourceRevision) {
+			return `/api/evidence/${encodeURIComponent(evidenceId)}/depth-map`;
+		}
 		const analysis = doc?.aiAnalysis ?? doc?.ai_analysis;
 		const depth = analysis?.depthAnalysis ?? analysis?.depth_analysis;
 		const revision = depth?.sourceRevision ?? depth?.source_revision;
@@ -445,6 +534,23 @@ import {
 	let videoFrameAnalysisLoading = $state(false);
 	let reviewMediaTimestampMs = $state<number | null>(null);
 	let currentPlaybackTimeMs = $state(0);
+	let videoSkimPreview = $state<VideoSkimPreviewClientV1 | null>(null);
+	let skimPreviewIndex = $state(0);
+	let videoSkimScanTimer = $state<ReturnType<typeof setInterval> | null>(null);
+	let isVideoSkimScanning = $derived(videoSkimScanTimer !== null);
+	let skimPreviewTileIndex = $derived(videoSkimPreview
+		? Math.floor(skimPreviewIndex / videoSkimPreview.tileLayout.framesPerTile)
+		: -1);
+	let skimPreviewTileStyle = $derived.by(() => {
+		if (!videoSkimPreview || !evidenceId || skimPreviewTileIndex < 0) return null;
+		const tile = videoSkimPreview.tiles.find((candidate) => candidate.index === skimPreviewTileIndex);
+		if (!tile) return null;
+		const localIndex = skimPreviewIndex - tile.firstSampleIndex;
+		const x = (localIndex % videoSkimPreview.tileLayout.columns) * videoSkimPreview.tileLayout.frameWidth;
+		const y = Math.floor(localIndex / videoSkimPreview.tileLayout.columns) * videoSkimPreview.tileLayout.frameHeight;
+		return `width:${videoSkimPreview.tileLayout.frameWidth}px;height:${videoSkimPreview.tileLayout.frameHeight}px;background-image:url('/api/evidence/${encodeURIComponent(evidenceId)}/skim-preview/${tile.index}');background-position:-${x}px -${y}px;background-size:${videoSkimPreview.tileLayout.tileWidth}px ${videoSkimPreview.tileLayout.tileHeight}px`;
+	});
+	let selectedSkimTimestampMs = $derived(videoSkimPreview?.sampleTimestampsMs[skimPreviewIndex] ?? 0);
 
 	// Sync tags when doc loads
 	$effect(() => {
@@ -658,13 +764,73 @@ import {
 	}
 
 	function seekToAnalysisFrame(frame: { timestamp: number; [key: string]: unknown }) {
-		if (!videoElement || typeof frame.timestamp !== 'number') return;
+		if (!videoElement || !Number.isFinite(frame.timestamp) || frame.timestamp < 0) return;
 		videoElement.currentTime = frame.timestamp;
+		currentPlaybackTimeMs = Math.round(frame.timestamp * 1000);
 		videoFrameTimestampMs = Math.round(frame.timestamp * 1000);
 		reviewMediaTimestampMs = videoFrameTimestampMs;
 		selectedAnalysisFrame = frame as typeof selectedAnalysisFrame;
 		markupMessage = `Seeked to frame at ${formatVideoTime(frame.timestamp)}.`;
 	}
+
+	function stepVideoKeyframe(direction: -1 | 1) {
+		if (!videoElement || mediaState !== 'ready') return;
+		const playbackSeconds = videoElement.currentTime;
+		const target = direction > 0
+			? orderedVideoKeyframes.find((frame) => frame.timestamp > playbackSeconds + 0.001)
+			: [...orderedVideoKeyframes].reverse().find((frame) => frame.timestamp < playbackSeconds - 0.001);
+		if (target) seekToAnalysisFrame(target);
+	}
+
+	function nearestVideoSkimIndex(timestampMs: number): number {
+		const times = videoSkimPreview?.sampleTimestampsMs;
+		if (!times?.length) return 0;
+		let nearest = 0;
+		for (let index = 1; index < times.length; index += 1) {
+			if (Math.abs(times[index] - timestampMs) < Math.abs(times[nearest] - timestampMs)) nearest = index;
+		}
+		return nearest;
+	}
+
+	function seekToVideoSkimSelection() {
+		const timestampMs = videoSkimPreview?.sampleTimestampsMs[skimPreviewIndex];
+		if (!videoElement || mediaState !== 'ready' || typeof timestampMs !== 'number' || !Number.isSafeInteger(timestampMs)) return;
+		videoElement.currentTime = timestampMs / 1000;
+		currentPlaybackTimeMs = timestampMs;
+		videoFrameTimestampMs = timestampMs;
+		reviewMediaTimestampMs = timestampMs;
+		markupMessage = `Opened skim preview at ${formatVideoTime(timestampMs / 1000)}.`;
+	}
+
+	function stopVideoSkimScan(openSelectedTime = true) {
+		if (videoSkimScanTimer !== null) clearInterval(videoSkimScanTimer);
+		videoSkimScanTimer = null;
+		if (openSelectedTime) seekToVideoSkimSelection();
+	}
+
+	function toggleVideoSkimScan() {
+		if (videoSkimScanTimer !== null) {
+			stopVideoSkimScan(true);
+			return;
+		}
+		if (!videoSkimPreview || videoSkimPreview.sampleTimestampsMs.length < 2) return;
+		skimPreviewIndex = 0;
+		// Show a bounded visual scan of even a four-hour source in about 23 seconds;
+		// the range control still exposes every stored sample for precise selection.
+		const scanStride = Math.max(1, Math.ceil(videoSkimPreview.sampleTimestampsMs.length / 150));
+		videoSkimScanTimer = setInterval(() => {
+			const lastIndex = (videoSkimPreview?.sampleTimestampsMs.length ?? 1) - 1;
+			if (skimPreviewIndex >= lastIndex) {
+				stopVideoSkimScan(true);
+				return;
+			}
+			skimPreviewIndex = Math.min(lastIndex, skimPreviewIndex + scanStride);
+		}, 150);
+	}
+
+	onDestroy(() => {
+		if (videoSkimScanTimer !== null) clearInterval(videoSkimScanTimer);
+	});
 
 	function syncMarkupPins(items: readonly EvidenceMarkupItemV1[]) {
 		markupPoints = items
@@ -1188,6 +1354,12 @@ import {
 										{#if imageAnalysis.preprocessingRevision}<p>Preprocessing: {imageAnalysis.preprocessingRevision}</p>{/if}
 										{#if imageAnalysis.analysis.summary}<p>{imageAnalysis.analysis.summary}</p>{/if}
 										{#if imageAnalysis.boxes.length > 0}<ul>{#each imageAnalysis.boxes as box, index (`${box.label}-${index}`)}<li>{box.label} · {Math.round(box.conf * 100)}% confidence</li>{/each}</ul>{/if}
+										{#if imageAnalysis.thumbnail}
+											<figure class="stored-image-thumbnail">
+												<img src={imageAnalysis.thumbnail.url} alt="Small processing preview derived from this evidence revision" loading="lazy" />
+												<figcaption>Stored preview · {imageAnalysis.thumbnail.width} × {imageAnalysis.thumbnail.height} · derived from the current source revision</figcaption>
+											</figure>
+										{/if}
 										{#each imageAnalysis.warnings as warning}<p class="media-status">{warning}</p>{/each}
 									</div>
 								{/if}
@@ -1289,6 +1461,7 @@ import {
 								ontimeupdate={() => {
 									if (videoElement) {
 										currentPlaybackTimeMs = Math.round(videoElement.currentTime * 1000);
+										if (videoSkimPreview && !isVideoSkimScanning) skimPreviewIndex = nearestVideoSkimIndex(currentPlaybackTimeMs);
 									}
 								}}
 							>
@@ -1298,6 +1471,11 @@ import {
 							{#if mediaState === 'loading'}<progress class="media-loading-bar" aria-label="Loading video metadata"></progress>{/if}
 							{#if mediaState === 'error'}<p class="media-status error" role="alert">The browser could not play this video format. Download the original file to open it with a compatible player.</p>{/if}
 							<div class="video-frame-tools" role="toolbar" aria-label="Video frame review tools">
+								{#if orderedVideoKeyframes.length > 0}
+									<button type="button" aria-label="Previous keyframe" title="Previous keyframe" onclick={() => stepVideoKeyframe(-1)} disabled={mediaState !== 'ready' || !canStepToPreviousKeyframe}>◀ Keyframe</button>
+									<span aria-live="polite">Keyframe {activeVideoKeyframeIndex + 1} / {orderedVideoKeyframes.length}</span>
+									<button type="button" aria-label="Next keyframe" title="Next keyframe" onclick={() => stepVideoKeyframe(1)} disabled={mediaState !== 'ready' || !canStepToNextKeyframe}>Keyframe ▶</button>
+								{/if}
 				{#if evidenceId}
 					<button type="button" data-testid="open-video-transcript" aria-expanded={showTranscript} onclick={() => (showTranscript = true)}>Transcript</button>
 				{/if}
@@ -1307,19 +1485,56 @@ import {
 								</button>
 								{#if videoFrameTimestampMs !== null}<span>Frame at {formatVideoTime(videoFrameTimestampMs / 1000)}</span><button type="button" onclick={downloadCapturedFrame} disabled={!capturedFrameUrl}>Export still</button>{/if}
 							</div>
-							{#if videoFrameAnalysis.length > 0}
+							{#if videoSkimPreview}
+								<div class="video-skim-controls" role="group" aria-label="Full-video skim preview">
+									<div
+										class="video-skim-preview-tile"
+										role="img"
+										aria-label={`Preview frame at ${formatVideoTime(selectedSkimTimestampMs / 1000)}`}
+										style={skimPreviewTileStyle ?? ''}
+									></div>
+									<div class="video-skim-control-stack">
+										<label class="video-skim-range-label" for="video-skim-range">
+											<span>Full-film skim · {formatVideoTime(selectedSkimTimestampMs / 1000)} · {skimPreviewIndex + 1} / {videoSkimPreview.sampleTimestampsMs.length}</span>
+											<input
+												id="video-skim-range"
+												type="range"
+												min="0"
+												max={videoSkimPreview.sampleTimestampsMs.length - 1}
+												step="1"
+												value={skimPreviewIndex}
+												aria-label="Scrub the full-video preview"
+												disabled={mediaState !== 'ready'}
+												oninput={(event) => {
+													if (videoSkimScanTimer !== null) stopVideoSkimScan(false);
+													skimPreviewIndex = Number(event.currentTarget.value);
+												}}
+												onchange={seekToVideoSkimSelection}
+											/>
+										</label>
+										<div class="video-skim-actions">
+											<button type="button" onclick={toggleVideoSkimScan} disabled={mediaState !== 'ready' || videoSkimPreview.sampleTimestampsMs.length < 2}>
+												{isVideoSkimScanning ? 'Stop scan & open time' : 'Scan full film'}
+											</button>
+											<button type="button" onclick={seekToVideoSkimSelection} disabled={mediaState !== 'ready'}>Open selected time</button>
+										</div>
+						<small>Rapid scan traverses the duration in about 23 seconds. The scrubber retains every preview sample; samples are not every decoded frame or a complete analysis.</small>
+									</div>
+								</div>
+							{/if}
+							{#if orderedVideoKeyframes.length > 0}
 								<div class="video-filmstrip-section" role="region" aria-label="Extracted Video Keyframes">
 									<div class="filmstrip-header">
-										<span class="filmstrip-title">Extracted Keyframes ({videoFrameAnalysis.length})</span>
+										<span class="filmstrip-title">Extracted Keyframes ({orderedVideoKeyframes.length})</span>
 										<span class="filmstrip-legend">Unreviewed proposal · Click frame to seek</span>
 									</div>
 									<!-- svelte-ignore a11y_no_noninteractive_tabindex: keyboard scrolling is intentional for the frame strip -->
 									<div class="video-filmstrip-scroll" tabindex="0" aria-label="Keyframe timeline strip">
-										{#each videoFrameAnalysis as frame, idx}
+										{#each orderedVideoKeyframes as frame, idx}
 											<button
 												type="button"
 												class="filmstrip-frame-card"
-												class:selected={selectedAnalysisFrame === frame || Math.abs((videoFrameTimestampMs ?? -99999) - Math.round(frame.timestamp * 1000)) < 500}
+												class:selected={activeVideoKeyframeIndex === idx}
 												onclick={() => seekToAnalysisFrame(frame)}
 												title={`Seek to ${formatVideoTime(frame.timestamp)}`}
 											>

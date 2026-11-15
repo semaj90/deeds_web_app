@@ -1,0 +1,15 @@
+{
+  "createdAt": "2026-11-15T03:21:55.990Z",
+  "database": "legal_ai_live_integration_scratch",
+  "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
+  "sourceSql": "Claim SQL extracted from library-ingestion-queue-v1.ts; executed concurrently on separate PostgreSQL connections",
+  "queuedSourceBoundJobsBefore": 4,
+  "independentBackendPids": true,
+  "claimsReturned": 2,
+  "claimedDifferentJobs": true,
+  "leaseTokensDistinct": true,
+  "fencingAndAttemptAdvancedInTransactions": true,
+  "transactionsRolledBack": true,
+  "postRollbackQueueStateMatchesPreimage": true,
+  "preimageSha256": "62613d5ae39e7a43603139c7a2c74a0c31f466e34c6ea3a7aa85791edd55676b"
+}

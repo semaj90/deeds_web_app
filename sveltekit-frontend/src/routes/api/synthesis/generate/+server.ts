@@ -478,6 +478,7 @@ async function handleStream(
   body: SynthesisRequest,
   userId: string,
   documentScope: LibraryDocumentSynthesisScopeV1 | null = null,
+  documentChunks: Awaited<ReturnType<typeof loadLibraryDocumentSynthesisChunksV1>> | null = null,
 ): Promise<Response> {
   const {
     query,
@@ -627,7 +628,7 @@ async function handleStream(
         const ctxStart = performance.now();
         const context = documentScope
           ? buildLibraryDocumentSynthesisContextV1(
-              await loadLibraryDocumentSynthesisChunksV1(documentScope, query),
+              documentChunks ?? [],
               body.persona,
             )
           : await assembleACEContext({
@@ -640,7 +641,9 @@ async function handleStream(
             });
         // DAG-order RAG chunks so cited sources appear before citing sources
         context.ragChunks = dagOrderRAGChunks(context.ragChunks);
-        const acePrompt = await buildACEPromptCached(context, query);
+        const acePrompt = documentScope
+          ? buildACEPrompt(context, query)
+          : await buildACEPromptCached(context, query);
         const promptChunks = promptCitationChunks(context, acePrompt.budgetProfile.limits);
         const citationManifest = await createLibraryCitationContextManifestV1({
           actorId: userId,
@@ -871,6 +874,7 @@ export const POST: RequestHandler = async (event) => {
   // revision before cache, retrieval, LangGraph, queue, or model access. The exact
   // document path below uses only chunks from this admitted revision.
   let documentScope: LibraryDocumentSynthesisScopeV1 | null = null;
+  let documentChunks: Awaited<ReturnType<typeof loadLibraryDocumentSynthesisChunksV1>> | null = null;
   if (body.documentId && body.sourceRevision) {
     const actorId = normalizeLibraryActorIdV1(auth.user.id);
     const access = actorId === null
@@ -887,6 +891,31 @@ export const POST: RequestHandler = async (event) => {
       sourceHash: access.sourceHash,
       caseId: body.caseId ?? null,
     };
+    try {
+      documentChunks = await loadLibraryDocumentSynthesisChunksV1(documentScope, body.query);
+    } catch {
+      return json({ error: 'Document source is temporarily unavailable' }, { status: 503 });
+    }
+
+    // A document-specific answer must have a non-empty, internally consistent
+    // source set before any cache or model can observe the request. Case-wide
+    // synthesis remains available without a selected document.
+    const parserRevisions = new Set<string>();
+    const sourceBindingValid = documentChunks.length > 0 && documentChunks.every((chunk) => {
+      const metadata = chunk.metadata as Record<string, unknown> | undefined;
+      const parserRevision = metadata?.['parser_revision'];
+      if (
+        metadata?.['document_id'] !== documentScope!.documentId ||
+        metadata?.['document_revision'] !== documentScope!.sourceRevision ||
+        String(metadata?.['source_hash'] ?? '').toLowerCase() !== documentScope!.sourceHash.toLowerCase() ||
+        typeof parserRevision !== 'string' || !parserRevision.trim()
+      ) return false;
+      parserRevisions.add(parserRevision);
+      return true;
+    });
+    if (!sourceBindingValid || parserRevisions.size !== 1) {
+      return json({ error: 'No consistent published source is available for this document revision' }, { status: 409 });
+    }
   }
 
   const {
@@ -906,7 +935,7 @@ export const POST: RequestHandler = async (event) => {
 
   // SSE stream mode
   if (body.stream) {
-    return handleStream(body, auth.user.id, documentScope);
+    return handleStream(body, auth.user.id, documentScope, documentChunks);
   }
 
   // ── JSON mode (async via RabbitMQ worker) ────────────────────────
@@ -914,8 +943,10 @@ export const POST: RequestHandler = async (event) => {
   try {
     // Stage 1: Cache check (synchronous — return immediately if cached)
     timer.mark('cache-check');
-    const cacheKey = buildCacheKey(auth.user.id, query, body.caseId, body.persona, documentScope);
-    const { entry: cached } = await getVectorCache(cacheKey, {});
+    // The cache has no canonical parser/retrieval-generation identity. Keep
+    // document-bound results uncached until that generation is owned explicitly.
+    const cacheKey = documentScope ? null : buildCacheKey(auth.user.id, query, body.caseId, body.persona);
+    const { entry: cached } = cacheKey ? await getVectorCache(cacheKey, {}) : { entry: null };
 
     // Differentiate full synthesis cache hit vs predicted-prefetch ACE context entry.
     // Prefetch entries have _prefetched:true and contain acePrompt but NOT a full answer.
@@ -1040,7 +1071,7 @@ export const POST: RequestHandler = async (event) => {
     const ctxStart = performance.now();
     const context = documentScope
       ? buildLibraryDocumentSynthesisContextV1(
-          await loadLibraryDocumentSynthesisChunksV1(documentScope, query),
+          documentChunks ?? [],
           body.persona,
         )
       : await assembleACEContext({
@@ -1079,7 +1110,9 @@ export const POST: RequestHandler = async (event) => {
         // Keep DAG order — attention re-ranking is best-effort
       }
     }
-    const acePrompt = await buildACEPromptCached(context, query);
+    const acePrompt = documentScope
+      ? buildACEPrompt(context, query)
+      : await buildACEPromptCached(context, query);
     const promptChunks = promptCitationChunks(context, acePrompt.budgetProfile.limits);
     const citationManifest = await createLibraryCitationContextManifestV1({
       actorId: auth.user.id,
@@ -1205,13 +1238,15 @@ export const POST: RequestHandler = async (event) => {
       },
     };
 
-    setVectorCache(cacheKey, [response], {
-      searchTime: timer.elapsed(),
-      totalResults: 1,
-      model: MODEL,
-      distanceMetric: 'cosine',
-      threshold: 0,
-    }).catch(() => {});
+    if (cacheKey) {
+      setVectorCache(cacheKey, [response], {
+        searchTime: timer.elapsed(),
+        totalResults: 1,
+        model: MODEL,
+        distanceMetric: 'cosine',
+        threshold: 0,
+      }).catch(() => {});
+    }
 
     trackTokenUsage({
       userId: auth.user.id,

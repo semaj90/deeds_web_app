@@ -5,6 +5,8 @@ import {
 } from './evidence-image-analysis-contract-v1.js';
 import { createHash } from 'node:crypto';
 import { db } from '$lib/server/db/client.js';
+import { eq } from 'drizzle-orm';
+import { evidence } from '$lib/server/db/schema-postgres.js';
 import { ENV } from '$lib/server/env.server.js';
 import { getSeaweedFile } from '$lib/server/seaweed-client.js';
 import { processDocument } from '$lib/server/document-processor.js';
@@ -228,6 +230,16 @@ export async function processEvidenceDocumentCanonicalV1(input: {
     },
     dependencies,
   });
+  // Chunk vectors are already committed above. Store the bounded normalized text on the
+  // evidence row too, so viewer cards and text search can read it without the chunk table.
+  await db
+    .update(evidence)
+    .set({
+      extractedText: text.slice(0, 200_000),
+      // Verbatim leading excerpt for the board card (not an LLM summary).
+      aiSummary: text.replace(/\s+/g, ' ').slice(0, 240),
+    })
+    .where(eq(evidence.id, input.evidenceId));
   return { ...indexed, sourceRevision, synthesis };
 }
 

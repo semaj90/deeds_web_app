@@ -54,7 +54,7 @@
 			<div class="empty-icon">👥</div>
 			<h3>No persons linked to this case yet</h3>
 			<p>Add suspects, victims, or witnesses to get started.</p>
-			<button class="btn-primary" onclick={() => (showAddForm = true)}>
+			<button class="btn-primary" onclick={() => (showAddModal = true)}>
 				Add First Person
 			</button>
 		</div>

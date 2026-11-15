@@ -288,6 +288,9 @@
 	.evidence-document-modal .image-analysis-result p { margin: 0.4rem 0; }
 	.evidence-document-modal .image-analysis-result ul { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0; padding: 0; list-style: none; }
 	.evidence-document-modal .image-analysis-result li { padding: 0.25rem 0.45rem; border: 1px solid rgba(212, 199, 163, 0.18); border-radius: 999px; }
+	.evidence-document-modal .stored-image-thumbnail { display: flex; align-items: center; gap: 0.65rem; margin: 0.65rem 0 0; padding-top: 0.6rem; border-top: 1px solid rgba(212, 199, 163, 0.18); }
+	.evidence-document-modal .stored-image-thumbnail img { width: 64px; height: 64px; object-fit: contain; border: 1px solid rgba(212, 199, 163, 0.25); border-radius: 6px; background: rgba(0, 0, 0, 0.2); }
+	.evidence-document-modal .stored-image-thumbnail figcaption { color: rgba(232, 240, 230, 0.68); font-size: 0.68rem; }
 	.evidence-document-modal .image-review-tools {
 		display: flex;
 		flex-wrap: wrap;
@@ -436,6 +439,45 @@
 		cursor: pointer;
 	}
 	.evidence-document-modal .video-frame-tools button:disabled { opacity: 0.45; cursor: not-allowed; }
+	.evidence-document-modal .video-skim-controls {
+		display: flex;
+		align-items: center;
+		gap: 0.8rem;
+		margin: 0 0.65rem 0.65rem;
+		padding: 0.65rem;
+		border: 1px solid rgba(212, 199, 163, 0.2);
+		border-radius: 8px;
+		background: rgba(18, 20, 24, 0.72);
+		color: #e6dfce;
+	}
+	.evidence-document-modal .video-skim-preview-tile {
+		flex: 0 0 auto;
+		border: 1px solid rgba(212, 199, 163, 0.26);
+		border-radius: 5px;
+		background-color: #101722;
+		background-repeat: no-repeat;
+	}
+	.evidence-document-modal .video-skim-control-stack { display: grid; flex: 1; gap: 0.35rem; min-width: 0; }
+	.evidence-document-modal .video-skim-range-label { display: grid; gap: 0.3rem; font-size: 0.72rem; }
+	.evidence-document-modal .video-skim-range-label input { width: 100%; accent-color: #d6b465; }
+	.evidence-document-modal .video-skim-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+	.evidence-document-modal .video-skim-actions button,
+	.evidence-document-modal .video-skim-control-stack > button {
+		min-height: 30px;
+		padding: 0.3rem 0.55rem;
+		border: 1px solid rgba(212, 199, 163, 0.25);
+		border-radius: 6px;
+		background: rgba(255, 255, 255, 0.05);
+		color: #e6dfce;
+		cursor: pointer;
+		font-size: 0.7rem;
+	}
+	.evidence-document-modal .video-skim-actions button:disabled { opacity: 0.45; cursor: not-allowed; }
+	.evidence-document-modal .video-skim-control-stack small { color: rgba(212, 199, 163, 0.66); font-size: 0.65rem; }
+	@media (max-width: 640px) {
+		.evidence-document-modal .video-skim-controls { align-items: stretch; flex-direction: column; }
+		.evidence-document-modal .video-skim-preview-tile { align-self: center; }
+	}
 	.evidence-document-modal .captured-video-frame { display: block; max-width: min(100%, 720px); max-height: 420px; margin: 0 auto 0.75rem; object-fit: contain; }
 	.evidence-document-modal .transcript-drawer-scrim {
 		position: absolute;

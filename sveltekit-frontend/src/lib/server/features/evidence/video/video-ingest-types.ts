@@ -3,6 +3,7 @@ export type EvidenceModality = 'video' | 'audio' | 'image' | 'document';
 export type IngestStatus = 'queued' | 'processing' | 'completed' | 'failed';
 
 export interface VideoIngestRequest {
+  evidenceId?: string;
   caseId: string;
   title?: string;
   description?: string;

@@ -543,7 +543,7 @@
         }
       },
       "runOptions": {
-        "runOn": "userRequest"
+        "runOn": "folderOpen"
       },
       "group": "build",
       "problemMatcher": [],

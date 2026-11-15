@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('$lib/server/db/client', () => ({
 	db: { select: (...args: unknown[]) => mocks.select(...args), execute: (...args: unknown[]) => mocks.execute(...args) },
 }));
+vi.mock('$lib/server/env.server.js', () => ({ ENV: { SEAWEED_ARTIFACTS_BUCKET: 'atlas-artifacts' } }));
 vi.mock('$lib/server/db/schema-postgres.js', () => ({
 	cases: { id: 'cases.id', userId: 'cases.userId', assignedAttorney: 'cases.assignedAttorney' },
 	evidence: {
@@ -93,7 +94,16 @@ describe('GET /api/evidence/[id]/multimodal-analysis', () => {
 			model_artifact_sha256: `sha256:${'b'.repeat(64)}`,
 			preprocessing_revision: 'image-preprocess-r1',
 			source_locator: { kind: 'whole_image', coordinateSpace: 'original_pixels', width: 100, height: 200 },
-			metadata: { visualAnalysis: currentAnalysis(), modelOutputReviewState: 'UNREVIEWED_PROPOSAL' },
+			metadata: {
+				visualAnalysis: currentAnalysis(),
+				modelOutputReviewState: 'UNREVIEWED_PROPOSAL',
+				imageDerivatives: { thumbnail: {
+					kind: 'thumbnail', sourceRevision: SOURCE_REVISION,
+					objectKey: `evidence/${CASE_ID}/${EVIDENCE_ID}/${'a'.repeat(64)}/thumbnail-${'d'.repeat(64)}.jpg`,
+					bucket: 'atlas-artifacts', mimeType: 'image/jpeg', outputSha256: 'd'.repeat(64),
+					width: 256, height: 256, preprocessingRevision: 'atlas.thumbnail.v1',
+				} },
+			},
 		}] });
 
 		const response = await GET(event());
@@ -110,8 +120,11 @@ describe('GET /api/evidence/[id]/multimodal-analysis', () => {
 			model: 'embeddinggemma2:q8',
 			reviewState: 'UNREVIEWED_PROPOSAL',
 			analysis: { objectDetections: [{ class: 'vehicle' }] },
+			derivatives: { thumbnail: { sourceRevision: SOURCE_REVISION, bucket: 'atlas-artifacts', outputSha256: 'd'.repeat(64), width: 256, height: 256 } },
 		});
 		expect(payload).not.toHaveProperty('embedding');
+		const analysisQuery = mocks.execute.mock.calls[0]?.[0] as { strings?: string[] } | undefined;
+		expect(analysisQuery?.strings?.join('')).toContain("source_locator->>'kind' = 'whole_image'");
 	});
 
 	it('marks an analysis from an older source revision stale and withholds its observations', async () => {

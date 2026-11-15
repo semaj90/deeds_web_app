@@ -32,7 +32,7 @@ export class VisionService {
     videoBuffer: Buffer,
     options?: { fps?: number; maxFrames?: number; scaleWidth?: number }
   ): Promise<{ timestampMs: number; buffer: Buffer }[]> {
-    const fps = Math.min(4, Math.max(0.01, options?.fps ?? 1));
+    const fps = Math.min(4, Math.max(1 / 3600, options?.fps ?? 1));
     const maxFrames = Math.min(120, Math.max(1, options?.maxFrames ?? 60));
     const scaleWidth = Math.min(2048, Math.max(64, options?.scaleWidth ?? 768));
 
@@ -50,6 +50,7 @@ export class VisionService {
           '-hide_banner', '-loglevel', 'info',
           '-i', inputPath,
           '-vf', `fps=${fps},scale=${scaleWidth}:-1,showinfo`,
+          '-frames:v', String(maxFrames),
           join(outputDir, 'frame-%05d.jpg')
         ], { shell: false, windowsHide: true });
 

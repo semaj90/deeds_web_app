@@ -63,6 +63,7 @@ export async function loadLibraryDocumentSynthesisChunksV1(
 		   ON ldv.id = ln.version_id AND ldv.document_id = ld.id
 		 WHERE ld.id = $1::uuid
 		   AND ldv.id = $2::uuid AND ldv.is_current IS TRUE
+		   AND ld.processing_status = 'complete'
 		   AND ld.source_hash = $3
 		   AND ldv.source_hash = $3
 		   AND (ld.uploaded_by IS NULL OR ld.uploaded_by = $5::integer)

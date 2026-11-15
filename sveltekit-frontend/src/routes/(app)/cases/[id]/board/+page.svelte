@@ -1332,6 +1332,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 				caseId={caseId}
 				caseTitle={data?.caseId ? `State v. Johnson - Case #${caseId.slice(0, 8)}` : 'State v. Johnson - Fraud Investigation'}
 				evidenceItems={evidenceItems}
+				sceneSnapshot={(data as any)?.sceneSnapshot ?? null}
 				onOpen3DViewer={(item) => openEvidenceViewer('relief')}
 				onOpenDocEditor={(node) => openDocumentationModal(node)}
 				onOpenVideoModal={(evId, ts) => {

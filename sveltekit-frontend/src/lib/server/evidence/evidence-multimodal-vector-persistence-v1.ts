@@ -5,6 +5,9 @@ import { deriveUUID } from '$lib/utils/uuid.js';
 
 export const EVIDENCE_MULTIMODAL_EMBEDDING_TYPE_V1 = 'evidence_multimodal_semantic_768' as const;
 export const EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1 = 'evidence_multimodal_semantic_768' as const;
+export const EVIDENCE_AUDIO_CONTENT_REPRESENTATION_V1 = 'embeddinggemma2_audio_content_768_v1' as const;
+export const EVIDENCE_AUDIO_CONTENT_PROJECTION_LANE_V1 = 'evidence_audio_content_768' as const;
+export type EvidenceMultimodalRepresentationV1 = typeof EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1 | typeof EVIDENCE_AUDIO_CONTENT_REPRESENTATION_V1;
 export const EVIDENCE_MULTIMODAL_PROJECTION_CONTRACT_V1 = 'evidence-multimodal-qdrant-projection-v1' as const;
 
 export type EvidenceMultimodalModalityV1 = 'image' | 'video_frame' | 'audio_segment' | 'video_window' | 'document_chunk';
@@ -15,6 +18,7 @@ export interface EvidenceMultimodalVectorInputV1 {
   sourceRevision: string;
   analysisRevision: string;
   modality: EvidenceMultimodalModalityV1;
+  representationId?: EvidenceMultimodalRepresentationV1;
   sourceLocator: Record<string, unknown>;
   embedding: number[];
   model: string;
@@ -53,6 +57,14 @@ function validateInput(input: EvidenceMultimodalVectorInputV1): Float32Array {
   if (!SHA256_REF.test(input.sourceRevision)) throw new Error('EVIDENCE_MULTIMODAL_SOURCE_REVISION_INVALID');
   if (!input.analysisRevision.trim()) throw new Error('EVIDENCE_MULTIMODAL_ANALYSIS_REVISION_REQUIRED');
   if (!MODALITIES.has(input.modality)) throw new Error('EVIDENCE_MULTIMODAL_MODALITY_INVALID');
+  const representationId = input.representationId ?? EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1;
+  if (representationId === EVIDENCE_AUDIO_CONTENT_REPRESENTATION_V1
+    && (input.modality !== 'audio_segment' || input.sourceLocator.kind !== 'sampled_audio_window')) {
+    throw new Error('EVIDENCE_MULTIMODAL_AUDIO_REPRESENTATION_MODALITY_MISMATCH');
+  }
+  if (input.sourceLocator.kind === 'sampled_audio_window' && representationId !== EVIDENCE_AUDIO_CONTENT_REPRESENTATION_V1) {
+    throw new Error('EVIDENCE_MULTIMODAL_AUDIO_REPRESENTATION_REQUIRED');
+  }
   if (!input.sourceLocator || Array.isArray(input.sourceLocator) || typeof input.sourceLocator !== 'object') {
     throw new Error('EVIDENCE_MULTIMODAL_SOURCE_LOCATOR_INVALID');
   }
@@ -76,8 +88,12 @@ function readFloat4Array(value: unknown): number[] {
 export async function persistEvidenceMultimodalVectorV1(
   database: EvidenceMultimodalDatabaseV1,
   input: EvidenceMultimodalVectorInputV1,
-): Promise<{ id: string; qdrantPointId: string; outputSha256: string; sourceLocatorSha256: string }> {
+): Promise<{ id: string; qdrantPointId: string; outputSha256: string; sourceLocatorSha256: string; representationId: EvidenceMultimodalRepresentationV1; projectionLane: string }> {
   const vector = validateInput(input);
+  const representationId = input.representationId ?? EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1;
+  const projectionLane = representationId === EVIDENCE_AUDIO_CONTENT_REPRESENTATION_V1
+    ? EVIDENCE_AUDIO_CONTENT_PROJECTION_LANE_V1
+    : EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1;
   const outputSha256 = digestSemantic768OutputV1(vector);
   if (input.outputSha256 !== outputSha256) throw new Error('EVIDENCE_MULTIMODAL_OUTPUT_CHECKSUM_MISMATCH');
   const locatorJson = stableJson(input.sourceLocator);
@@ -88,6 +104,7 @@ export async function persistEvidenceMultimodalVectorV1(
     sourceRevision: input.sourceRevision,
     analysisRevision: input.analysisRevision,
     modality: input.modality,
+    ...(representationId !== EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1 ? { representationId } : {}),
     sourceLocatorSha256,
     modelArtifactSha256: input.modelArtifactSha256,
     preprocessingRevision: input.preprocessingRevision,
@@ -112,16 +129,16 @@ export async function persistEvidenceMultimodalVectorV1(
     await transaction.execute(sql`
       INSERT INTO evidence_multimodal_vectors (
         evidence_id, source_revision, analysis_revision, modality, source_locator,
-        source_locator_sha256, embedding, embedding_type, model, model_artifact_sha256,
+        source_locator_sha256, embedding, embedding_type, representation_id, model, model_artifact_sha256,
         preprocessing_revision, input_sha256, output_sha256, metadata
       ) VALUES (
         ${input.evidenceId}::uuid, ${input.sourceRevision}, ${input.analysisRevision}, ${input.modality},
         ${locatorJson}::jsonb, ${sourceLocatorSha256}, ${`[${Array.from(vector).join(',')}]`}::vector,
-        ${EVIDENCE_MULTIMODAL_EMBEDDING_TYPE_V1}, ${input.model}, ${input.modelArtifactSha256},
+        ${EVIDENCE_MULTIMODAL_EMBEDDING_TYPE_V1}, ${representationId}, ${input.model}, ${input.modelArtifactSha256},
         ${input.preprocessingRevision}, ${input.inputSha256}, ${outputSha256}, ${JSON.stringify(input.metadata ?? {})}::jsonb
       )
       ON CONFLICT (
-        evidence_id, source_revision, analysis_revision, modality, source_locator_sha256,
+        evidence_id, source_revision, analysis_revision, modality, representation_id, source_locator_sha256,
         model_artifact_sha256, preprocessing_revision
       ) DO UPDATE SET updated_at = clock_timestamp()
       WHERE evidence_multimodal_vectors.output_sha256 = EXCLUDED.output_sha256
@@ -132,7 +149,7 @@ export async function persistEvidenceMultimodalVectorV1(
     const readback = await transaction.execute(sql`
       SELECT evidence_multimodal_vectors.id::text AS id,
         evidence_multimodal_vectors.evidence_id::text AS evidence_id, evidence.case_id::text AS case_id,
-        source_revision, analysis_revision, modality, source_locator_sha256,
+        source_revision, analysis_revision, modality, representation_id, source_locator_sha256,
         vector_dims(evidence_multimodal_vectors.embedding) AS dimension,
         vector_to_float4(evidence_multimodal_vectors.embedding, 768, false) AS embedding_float4,
         model, model_artifact_sha256, preprocessing_revision, input_sha256, output_sha256
@@ -142,6 +159,7 @@ export async function persistEvidenceMultimodalVectorV1(
         AND evidence_multimodal_vectors.source_revision = ${input.sourceRevision}
         AND evidence_multimodal_vectors.analysis_revision = ${input.analysisRevision}
         AND evidence_multimodal_vectors.modality = ${input.modality}
+        AND evidence_multimodal_vectors.representation_id = ${representationId}
         AND evidence_multimodal_vectors.source_locator_sha256 = ${sourceLocatorSha256}
         AND evidence_multimodal_vectors.model_artifact_sha256 = ${input.modelArtifactSha256}
         AND evidence_multimodal_vectors.preprocessing_revision = ${input.preprocessingRevision}
@@ -152,6 +170,7 @@ export async function persistEvidenceMultimodalVectorV1(
     if (
       row.case_id !== input.caseId || row.source_revision !== input.sourceRevision
       || row.analysis_revision !== input.analysisRevision || row.modality !== input.modality
+      || row.representation_id !== representationId
       || row.source_locator_sha256 !== sourceLocatorSha256 || Number(row.dimension) !== 768
       || row.model !== input.model || row.model_artifact_sha256 !== input.modelArtifactSha256
       || row.preprocessing_revision !== input.preprocessingRevision || row.input_sha256 !== input.inputSha256
@@ -163,35 +182,35 @@ export async function persistEvidenceMultimodalVectorV1(
 
     await transaction.execute(sql`
       INSERT INTO evidence_multimodal_vector_projection_outbox (
-        evidence_multimodal_vector_id, qdrant_point_id, projection_lane, projection_contract_revision,
+        evidence_multimodal_vector_id, qdrant_point_id, projection_lane, representation_id, projection_contract_revision,
         source_revision, analysis_revision, modality, source_locator_sha256, model_artifact_sha256,
         preprocessing_revision, input_sha256, output_sha256
       ) VALUES (
-        ${row.id}::uuid, ${qdrantPointId}::uuid, ${EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1},
+        ${row.id}::uuid, ${qdrantPointId}::uuid, ${projectionLane}, ${representationId},
         ${EVIDENCE_MULTIMODAL_PROJECTION_CONTRACT_V1}, ${input.sourceRevision}, ${input.analysisRevision},
         ${input.modality}, ${sourceLocatorSha256}, ${input.modelArtifactSha256},
         ${input.preprocessingRevision}, ${input.inputSha256}, ${outputSha256}
       ) ON CONFLICT (evidence_multimodal_vector_id, projection_lane, projection_contract_revision) DO NOTHING
     `);
     const outbox = await transaction.execute(sql`
-      SELECT qdrant_point_id::text AS qdrant_point_id, source_revision, analysis_revision, modality,
+      SELECT qdrant_point_id::text AS qdrant_point_id, representation_id, source_revision, analysis_revision, modality,
         source_locator_sha256, model_artifact_sha256, preprocessing_revision, input_sha256, output_sha256
       FROM evidence_multimodal_vector_projection_outbox
       WHERE evidence_multimodal_vector_id = ${row.id}::uuid
-        AND projection_lane = ${EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1}
+        AND projection_lane = ${projectionLane}
         AND projection_contract_revision = ${EVIDENCE_MULTIMODAL_PROJECTION_CONTRACT_V1}
       LIMIT 2
     `);
     if (outbox.rows.length !== 1) throw new Error(`EVIDENCE_MULTIMODAL_OUTBOX_READBACK_NOT_UNIQUE:${outbox.rows.length}`);
     const ticket = outbox.rows[0];
     if (
-      ticket.qdrant_point_id !== qdrantPointId || ticket.source_revision !== input.sourceRevision
+      ticket.qdrant_point_id !== qdrantPointId || ticket.representation_id !== representationId || ticket.source_revision !== input.sourceRevision
       || ticket.analysis_revision !== input.analysisRevision || ticket.modality !== input.modality
       || ticket.source_locator_sha256 !== sourceLocatorSha256 || ticket.model_artifact_sha256 !== input.modelArtifactSha256
       || ticket.preprocessing_revision !== input.preprocessingRevision || ticket.input_sha256 !== input.inputSha256
       || ticket.output_sha256 !== outputSha256
     ) throw new Error('EVIDENCE_MULTIMODAL_OUTBOX_READBACK_IDENTITY_MISMATCH');
 
-    return { id: String(row.id), qdrantPointId, outputSha256, sourceLocatorSha256 };
+    return { id: String(row.id), qdrantPointId, outputSha256, sourceLocatorSha256, representationId, projectionLane };
   });
 }

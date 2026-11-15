@@ -30,6 +30,7 @@ CREATE TABLE public.evidence_multimodal_vectors (
     source_locator_sha256 text NOT NULL,
     embedding vector(768) NOT NULL,
     embedding_type text NOT NULL DEFAULT 'evidence_multimodal_semantic_768',
+    representation_id text NOT NULL DEFAULT 'evidence_multimodal_semantic_768',
     model text NOT NULL,
     model_artifact_sha256 text NOT NULL,
     preprocessing_revision text NOT NULL,
@@ -51,6 +52,13 @@ CREATE TABLE public.evidence_multimodal_vectors (
         CHECK (source_locator_sha256 ~ '^[0-9a-f]{64}$'),
     CONSTRAINT evidence_multimodal_vectors_embedding_type_ck
         CHECK (embedding_type = 'evidence_multimodal_semantic_768'),
+    CONSTRAINT evidence_multimodal_vectors_representation_ck
+        CHECK (representation_id IN ('evidence_multimodal_semantic_768', 'embeddinggemma2_audio_content_768_v1')),
+    CONSTRAINT evidence_multimodal_vectors_audio_representation_ck
+        CHECK ((representation_id = 'embeddinggemma2_audio_content_768_v1'
+                AND modality = 'audio_segment' AND source_locator->>'kind' = 'sampled_audio_window')
+            OR (representation_id = 'evidence_multimodal_semantic_768'
+                AND source_locator->>'kind' IS DISTINCT FROM 'sampled_audio_window')),
     CONSTRAINT evidence_multimodal_vectors_model_ck
         CHECK (length(btrim(model)) > 0),
     CONSTRAINT evidence_multimodal_vectors_model_sha_ck
@@ -63,7 +71,7 @@ CREATE TABLE public.evidence_multimodal_vectors (
         CHECK (output_sha256 ~ '^sha256:[0-9a-f]{64}$'),
     CONSTRAINT evidence_multimodal_vectors_identity_uq
         UNIQUE (evidence_id, source_revision, analysis_revision, modality,
-                source_locator_sha256, model_artifact_sha256, preprocessing_revision)
+                representation_id, source_locator_sha256, model_artifact_sha256, preprocessing_revision)
 );
 
 CREATE INDEX evidence_multimodal_vectors_hnsw_idx
@@ -80,6 +88,7 @@ CREATE TABLE public.evidence_multimodal_vector_projection_outbox (
         REFERENCES public.evidence_multimodal_vectors(id) ON DELETE RESTRICT,
     qdrant_point_id uuid NOT NULL,
     projection_lane text NOT NULL,
+    representation_id text NOT NULL DEFAULT 'evidence_multimodal_semantic_768',
     projection_contract_revision text NOT NULL,
     source_revision text NOT NULL,
     analysis_revision text NOT NULL,
@@ -102,7 +111,10 @@ CREATE TABLE public.evidence_multimodal_vector_projection_outbox (
     updated_at timestamptz NOT NULL DEFAULT clock_timestamp(),
 
     CONSTRAINT evidence_multimodal_vector_outbox_lane_ck
-        CHECK (projection_lane = 'evidence_multimodal_semantic_768'),
+        CHECK (projection_lane IN ('evidence_multimodal_semantic_768', 'evidence_audio_content_768')),
+    CONSTRAINT evidence_multimodal_vector_outbox_representation_ck
+        CHECK ((projection_lane = 'evidence_multimodal_semantic_768' AND representation_id = 'evidence_multimodal_semantic_768')
+            OR (projection_lane = 'evidence_audio_content_768' AND representation_id = 'embeddinggemma2_audio_content_768_v1')),
     CONSTRAINT evidence_multimodal_vector_outbox_contract_ck
         CHECK (length(btrim(projection_contract_revision)) > 0),
     CONSTRAINT evidence_multimodal_vector_outbox_source_revision_ck

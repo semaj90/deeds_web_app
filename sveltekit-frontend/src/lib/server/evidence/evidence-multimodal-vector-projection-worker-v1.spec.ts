@@ -30,6 +30,7 @@ function setup(sourceHash = sourceRevision) {
     if (n === 1) return { rows: [{
       id: jobId, vector_id: evidenceVectorId, qdrant_point_id: qdrantPointId,
       projection_lane: EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1,
+      representation_id: EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1,
       projection_contract_revision: EVIDENCE_MULTIMODAL_PROJECTION_CONTRACT_V1,
       source_revision: sourceRevision, analysis_revision: 'analysis:v1', modality: 'video_frame',
       locator_sha256: locatorSha256, model_artifact_sha256: `sha256:${'b'.repeat(64)}`,
@@ -40,6 +41,7 @@ function setup(sourceHash = sourceRevision) {
       id: evidenceVectorId, evidence_id: '55555555-5555-4555-8555-555555555555',
       case_id: '66666666-6666-4666-8666-666666666666', evidence_hash: sourceHash, deleted_at: null,
       source_revision: sourceRevision, analysis_revision: 'analysis:v1', modality: 'video_frame',
+      representation_id: EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1,
       source_locator: locator, source_locator_sha256: locatorSha256, dimension: 768,
       embedding_float4: vector, embedding_type: 'evidence_multimodal_semantic_768',
       model: 'fixture-model', model_artifact_sha256: `sha256:${'b'.repeat(64)}`,

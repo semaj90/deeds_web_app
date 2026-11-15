@@ -3,6 +3,13 @@ import { randomUUID } from 'node:crypto';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
 
+/** Preserve the page at /evidence for browsers while directing JSON clients to its API owner. */
+export const GET: RequestHandler = ({ url }) => {
+  const apiUrl = new URL(url);
+  apiUrl.pathname = '/api/evidence';
+  return Response.redirect(apiUrl, 307);
+};
+
 const evidenceUploadFieldsSchema = z.object({
   caseId: z.string().min(1).max(200).default('unknown'),
 });

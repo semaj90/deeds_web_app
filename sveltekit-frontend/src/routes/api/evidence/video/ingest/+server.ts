@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { admitVideoEvidenceV1, ingestVideoEvidence } from '$lib/server/features/evidence/index.js';
+import { admitVideoEvidenceV1 } from '$lib/server/features/evidence/index.js';
 import {
   checkVideoUploadSizeV1,
   isVideoUploadContentLengthAllowedV1,
@@ -80,11 +80,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   try {
     if (parsed.data.mode === 'sync') {
-      const result = await ingestVideoEvidence(parsed.data, String(ownerId));
+      // Synchronous ingest wrote to retired tables (evidence_items); it is retired, not silently rerouted.
       return json({
-        ok: true,
-        ...result,
-      });
+        ok: false,
+        code: 'SYNC_VIDEO_INGEST_RETIRED',
+        error: 'Synchronous video ingest is retired. Use mode=async, which returns a queued durable job.',
+      }, { status: 501 });
     }
 
     const result = await admitVideoEvidenceV1(parsed.data, ownerId);

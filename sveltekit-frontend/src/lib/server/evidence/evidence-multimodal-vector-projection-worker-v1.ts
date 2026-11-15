@@ -4,6 +4,8 @@ import { digestSemantic768OutputV1, validateSemantic768OutputV1 } from '$lib/ser
 import {
   EVIDENCE_MULTIMODAL_PROJECTION_CONTRACT_V1,
   EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1,
+  EVIDENCE_AUDIO_CONTENT_PROJECTION_LANE_V1,
+  EVIDENCE_AUDIO_CONTENT_REPRESENTATION_V1,
   type EvidenceMultimodalExecuteV1,
 } from './evidence-multimodal-vector-persistence-v1.js';
 
@@ -25,6 +27,7 @@ interface MultimodalProjectionJob {
   vector_id: string;
   qdrant_point_id: string;
   projection_lane: string;
+  representation_id: string;
   projection_contract_revision: string;
   source_revision: string;
   analysis_revision: string;
@@ -48,6 +51,7 @@ interface CanonicalVector {
   source_revision: string;
   analysis_revision: string;
   modality: string;
+  representation_id: string;
   source_locator: Record<string, unknown>;
   source_locator_sha256: string;
   embedding_float4: unknown;
@@ -119,7 +123,7 @@ async function claimBatch(db: EvidenceMultimodalProjectionDatabaseV1, limit: num
         lease_expires_at=clock_timestamp()+(${leaseSeconds} * interval '1 second'), updated_at=clock_timestamp()
       FROM candidates WHERE job.id=candidates.id
       RETURNING job.id::text AS id, job.evidence_multimodal_vector_id::text AS vector_id,
-        job.qdrant_point_id::text AS qdrant_point_id, job.source_revision, job.analysis_revision,
+        job.qdrant_point_id::text AS qdrant_point_id, job.projection_lane, job.representation_id, job.source_revision, job.analysis_revision,
         job.modality, job.source_locator_sha256 AS locator_sha256, job.model_artifact_sha256,
         job.preprocessing_revision, job.input_sha256, job.output_sha256,
         job.attempt_count, job.max_attempts, job.lease_token::text AS lease_token
@@ -133,7 +137,7 @@ async function loadCanonical(db: EvidenceMultimodalProjectionDatabaseV1, job: Mu
     SELECT mv.id::text AS id, mv.evidence_id::text AS evidence_id, e.case_id::text AS case_id,
       e.hash AS evidence_hash, e.deleted_at, mv.source_revision, mv.analysis_revision, mv.modality,
       mv.source_locator, mv.source_locator_sha256, vector_dims(mv.embedding) AS dimension,
-      vector_to_float4(mv.embedding, 768, false) AS embedding_float4, mv.embedding_type, mv.model,
+      vector_to_float4(mv.embedding, 768, false) AS embedding_float4, mv.embedding_type, mv.representation_id, mv.model,
       mv.model_artifact_sha256, mv.preprocessing_revision, mv.input_sha256, mv.output_sha256
     FROM evidence_multimodal_vectors mv JOIN evidence e ON e.id=mv.evidence_id
     WHERE mv.id=${job.vector_id}::uuid LIMIT 2
@@ -145,7 +149,7 @@ async function loadCanonical(db: EvidenceMultimodalProjectionDatabaseV1, job: Mu
   if (
     row.id !== job.vector_id || row.deleted_at != null || hash !== job.source_revision.slice(7)
     || row.source_revision !== job.source_revision || row.analysis_revision !== job.analysis_revision
-    || row.modality !== job.modality || row.source_locator_sha256 !== job.locator_sha256
+    || row.modality !== job.modality || row.representation_id !== job.representation_id || row.source_locator_sha256 !== job.locator_sha256
     || locatorDigest !== job.locator_sha256
     || row.embedding_type !== 'evidence_multimodal_semantic_768' || Number(row.dimension) !== 768
     || row.model_artifact_sha256 !== job.model_artifact_sha256 || row.preprocessing_revision !== job.preprocessing_revision
@@ -161,6 +165,7 @@ async function loadCanonical(db: EvidenceMultimodalProjectionDatabaseV1, job: Mu
       source_revision: row.source_revision,
       analysis_revision: row.analysis_revision,
       modality: row.modality,
+      representation_id: row.representation_id,
       source_locator: row.source_locator,
       source_locator_sha256: row.source_locator_sha256,
       embedding_type: row.embedding_type,
@@ -183,7 +188,7 @@ function verifyPayload(actual: Record<string, unknown> | null | undefined, expec
 async function finish(db: EvidenceMultimodalProjectionDatabaseV1, job: MultimodalProjectionJob, collectionAlias: string, payload: Record<string, unknown>): Promise<void> {
   const receipt = {
     schema: 'evidence-multimodal-qdrant-projection-receipt-v1',
-    projectionLane: EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1,
+    projectionLane: job.projection_lane,
     projectionContractRevision: EVIDENCE_MULTIMODAL_PROJECTION_CONTRACT_V1,
     collectionAlias,
     qdrantPointId: job.qdrant_point_id,
@@ -250,7 +255,10 @@ export async function projectEvidenceMultimodalVectorOutboxBatchV1(
   const result: EvidenceMultimodalProjectionResultV1 = { claimed: jobs.length, completed: 0, retried: 0, deadLettered: 0, leaseLost: 0 };
   for (const job of jobs) {
     try {
-      if (job.projection_lane !== EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1 || job.projection_contract_revision !== EVIDENCE_MULTIMODAL_PROJECTION_CONTRACT_V1) {
+      const expectedLane = job.representation_id === EVIDENCE_AUDIO_CONTENT_REPRESENTATION_V1
+        ? EVIDENCE_AUDIO_CONTENT_PROJECTION_LANE_V1
+        : EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1;
+      if (job.projection_lane !== expectedLane || job.projection_contract_revision !== EVIDENCE_MULTIMODAL_PROJECTION_CONTRACT_V1) {
         throw new Error('EVIDENCE_MULTIMODAL_PROJECTION_CONTRACT_UNSUPPORTED');
       }
       const canonical = await loadCanonical(db, job);

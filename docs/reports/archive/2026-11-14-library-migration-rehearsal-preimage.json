@@ -1,0 +1,41 @@
+{
+  "createdAt": "2026-11-15T03:08:17.556Z",
+  "phase": "rehearsal_rolled_back_and_verified",
+  "database": {
+    "database_name": "legal_ai_db",
+    "server_version": "18.4 (Debian 18.4-1.pgdg12+1)",
+    "db_user": "legal_admin",
+    "server_address": "172.18.0.17/32",
+    "server_port": 5432
+  },
+  "tableCountsBefore": {
+    "jobs": "0",
+    "versions": "9",
+    "chunks": "60432"
+  },
+  "tableCountsAfterRollback": {
+    "jobs": "0",
+    "versions": "9",
+    "chunks": "60432"
+  },
+  "migrations": [
+    {
+      "path": "drizzle/manual/20261112_library_ingestion_lease_v1.sql",
+      "sha256": "bfebbb5b8ebecf966b17b573b977626c710036aba076cebfe9b104412020f93b"
+    },
+    {
+      "path": "drizzle/manual/20261112_library_document_revision_binding_v1.sql",
+      "sha256": "bef963fa7c1cd921fa8df1b07372b636fd3ed47ce8f8d63ce78ca7d7dfbc1358"
+    },
+    {
+      "path": "drizzle/manual/20261112_library_chunk_parser_revision_v1.sql",
+      "sha256": "5c03f2a6a7f6c4cb9f38dabe16bc4f9187848c7d218b85a7f56ae51a614a5540"
+    }
+  ],
+  "rehearsal": "all three candidate files executed with 2500ms lock_timeout and 30000ms statement_timeout; columns, indexes, and row counts verified inside transaction; transaction explicitly rolled back",
+  "postRollback": {
+    "targetColumns": 0,
+    "targetIndexes": 0,
+    "countsUnchanged": true
+  }
+}

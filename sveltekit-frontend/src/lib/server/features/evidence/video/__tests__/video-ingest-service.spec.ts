@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
 	dbInsert: vi.fn(),
 	dbUpdate: vi.fn(),
 	uploadFile: vi.fn(),
+	deleteFile: vi.fn(),
 	probe: vi.fn(),
 	extractAudioTrack: vi.fn(),
 	transcribeVideoAudio: vi.fn(),
@@ -27,12 +28,14 @@ vi.mock('$lib/server/db/schema/index.js', () => ({
 	evidenceMediaAssets: { evidenceId: 'evidence_media_assets.evidence_id' },
 	evidenceTranscriptSegments: { evidenceId: 'evidence_transcript_segments.evidence_id' },
 }));
+vi.mock('$lib/server/db/schema-postgres.js', () => ({ evidence: mocks.evidence }));
 vi.mock('drizzle-orm', () => ({
 	and: (...parts: unknown[]) => parts,
 	eq: (left: unknown, right: unknown) => ({ left, right }),
 	or: (...parts: unknown[]) => parts,
+	sql: (strings: TemplateStringsArray, ...values: unknown[]) => ({ strings, values }),
 }));
-vi.mock('$lib/server/seaweed-client.js', () => ({ uploadSeaweedFile: mocks.uploadFile }));
+vi.mock('$lib/server/seaweed-client.js', () => ({ uploadSeaweedFile: mocks.uploadFile, deleteSeaweedFile: mocks.deleteFile }));
 vi.mock('$lib/server/redis.js', () => ({ getRedis: () => null }));
 vi.mock('$lib/server/evidence/services/embedding.js', () => ({ embedText: vi.fn() }));
 vi.mock('$lib/server/env.server.js', () => ({ ENV: { SEAWEED_EVIDENCE_BUCKET: 'evidence', QDRANT_URL: 'http://qdrant.invalid' } }));
@@ -168,5 +171,59 @@ describe('video ingestion stream guard', () => {
 				}),
 			})
 		);
+	});
+
+	it('admitVideoEvidenceV1 removes the stored object and archives its row when the insert fails', async () => {
+		mocks.dbInsert.mockImplementationOnce(() => ({ values: () => Promise.reject(new Error('insert boom')) }));
+
+		await expect(admitVideoEvidenceV1({
+			caseId: CASE_ID,
+			file: makeUploadFile('orphan.mp4', 'bytes that must not be orphaned'),
+			title: 'Orphan check',
+		}, '12')).rejects.toThrow('insert boom');
+
+		expect(mocks.uploadFile).toHaveBeenCalledTimes(1);
+		expect(mocks.deleteFile).toHaveBeenCalledWith('evidence', expect.stringContaining(CASE_ID));
+		expect(mocks.dbUpdate).toHaveBeenCalledWith(mocks.evidence);
+		expect(mocks.enqueueJob).not.toHaveBeenCalled();
+	});
+
+	it('canonical worker flow with request.evidenceId updates public.evidence directly and skips duplicate parent insertion', async () => {
+		mocks.probe.mockResolvedValueOnce({ hasVideoStream: true, hasAudioStream: false });
+
+		const result = await ingestVideoEvidence({
+			evidenceId: 'canonical-evidence-uuid-1',
+			caseId: CASE_ID,
+			file: makeUploadFile('worker-video.mp4', 'canonical worker video bytes'),
+		}, '12');
+
+		expect(result.evidenceId).toBe('canonical-evidence-uuid-1');
+		expect(mocks.dbInsert).not.toHaveBeenCalledWith(mocks.evidenceItems);
+		expect(mocks.dbInsert).not.toHaveBeenCalledWith(mocks.evidenceProcessingJobs);
+		expect(mocks.dbUpdate).toHaveBeenCalledWith(mocks.evidence);
+	});
+
+	it('handles missing whisper binary with TRANSCRIPTION_BINARY_UNAVAILABLE status', async () => {
+		mocks.probe.mockResolvedValueOnce({ hasVideoStream: true, hasAudioStream: true });
+		mocks.extractAudioTrack.mockImplementation(async (sourcePath: string) => sourcePath);
+		mocks.transcribeVideoAudio.mockRejectedValueOnce(new Error('TRANSCRIPTION_BINARY_UNAVAILABLE: faster_whisper not found'));
+
+		const result = await ingestVideoEvidence({
+			caseId: CASE_ID,
+			file: makeUploadFile('whisper-missing.mp4', 'audio video bytes'),
+		}, '12');
+
+		expect(result.transcriptCount).toBe(0);
+		expect(result.summary).toContain('transcription binary/model is unavailable');
+	});
+
+	it('rethrows keyframe extraction failures without falling back to original video URL', async () => {
+		mocks.probe.mockResolvedValueOnce({ hasVideoStream: true, hasAudioStream: false });
+		mocks.extractFrames.mockRejectedValueOnce(new Error('ffmpeg frame extraction crash'));
+
+		await expect(ingestVideoEvidence({
+			caseId: CASE_ID,
+			file: makeUploadFile('corrupt-frames.mp4', 'frame bytes'),
+		}, '12')).rejects.toThrow('ffmpeg frame extraction crash');
 	});
 });

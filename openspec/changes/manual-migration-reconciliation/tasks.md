@@ -1527,3 +1527,23 @@ Nothing in this section applies DDL, changes the manifest, or marks any checkbox
 - The separate HTTP log attachment is not migration evidence. It contains session credential material; invalidate that session using the normal account/session control. No credential was copied to the report or ledger.
 - No database query, DDL, service restart, migration/manifest change, or Kanban write occurred. The `agent.runs.get` SQL projection now makes artifact unavailability explicit; no dedicated router test exists, so runtime query behavior remains unverified.
 - Remaining gates: refresh approved live catalog evidence; decide canonical live shapes for `proposed_tool_calls` and `execution_reviews`; run the prepared read-only row checks on the approved target; only then design and rehearse an additive scratch repair. Migration history remains `UNKNOWN`.
+
+## LIBRARY-INGESTION-SIDECAR-APPLY-01 (2026-11-14, operator-authorized)
+
+- Applied the registered library ingestion lease, document revision-binding, and chunk parser-revision sidecars to `legal_ai_db` on PostgreSQL 18.4. No schema or row changes were made before the authorized step.
+- Rehearsed the exact three migration files in a transaction with `lock_timeout=2500ms` and `statement_timeout=30000ms`; verified expected columns/indexes and unchanged counts inside the transaction; explicitly rolled back; then independently confirmed the target columns/indexes were absent and counts unchanged.
+- Applied the same checksummed files in one bounded transaction. A fresh connection verified 11 new column entries, four valid indexes, `ingestion_jobs.status` defaulting to `queued`, and the nonnegative fencing-token check.
+- Before/after counts: `ingestion_jobs=0`, `library_document_versions=9`, `legal_chunks=60432`. No legacy provenance was inferred: all 9 existing version hashes and all 60,432 legacy chunk provenance tuples remain NULL.
+- Receipts: `docs/reports/archive/2026-11-14-library-migration-rehearsal-preimage.json` and `docs/reports/archive/2026-11-14-library-migration-apply.json`. Checksums and applied status are recorded in `sveltekit-frontend/drizzle/sidecar-migrations.json`.
+- At the time of this migration entry, two-independent-connection worker contention and live source/chunk/citation processing were still unproven. The following scratch-only addendum records later proof; no existing checkbox in this task file was changed.
+
+### Follow-up proof (scratch only, 2026-11-14)
+
+- PostgreSQL 18.4 `legal_ai_live_integration_scratch`: two concurrent backend connections claimed different queued jobs with distinct lease tokens using the claim SQL from `library-ingestion-queue-v1.ts`; both transactions rolled back and the fresh queue state matched its preimage.
+- Expired-lease recovery incremented attempt/fencing state and rejected stale heartbeat/assertion calls; transaction rolled back and fresh state matched its preimage.
+- Read-only source/chunk/citation lookup returned one revision-qualified chunk, resolved one citation source row, and verified chunk SHA-256 and UTF-16 offsets. A fresh connection found 57 eligible source-bound chunks. No scratch rows were written.
+- Receipts: `docs/reports/archive/2026-11-14-library-queue-concurrency-scratch.json`, `docs/reports/archive/2026-11-14-library-lease-fencing-scratch.json`, and `docs/reports/archive/2026-11-14-library-source-citation-readback-scratch.json`.
+- The opt-in SeaweedFS scratch integration then passed two selected cases: PDF/image upload route handling, worker processing, SeaweedFS hash readback, PostgreSQL job/document/chunk readback, source-span/citation checks, foreign-actor denial, and a standalone worker-process PDF run. Three synthetic records/objects are intentionally retained; the test created the `legal-corpus` bucket. Embeddings used fixture vectors and Qdrant/Neo4j were mocked; this was not live HTTP-server or real-model proof.
+- A separate fresh PostgreSQL connection confirmed all three retained scratch documents/jobs are complete, match the receipt's source hashes, and have persisted nodes/chunks.
+- Remaining: model-backed embedding and projections, HTTP synthesis round trip, authorized browser readback, and streaming multipart parser proof. Existing task checkboxes remain unchanged.
+- Integration receipt: `docs/reports/archive/2026-11-14-library-seaweed-worker-readback-scratch.json`.

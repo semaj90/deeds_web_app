@@ -7,10 +7,55 @@
 	import { zod4Client as zod } from 'sveltekit-superforms/adapters';
 	import { loginSchema } from './schema.js';
 
-	const demoCredentials = {
-		email: 'demo@legal-ai.local',
-		password: 'password123'
-	} as const;
+	interface DemoAccount {
+		id: string;
+		label: string;
+		email: string;
+		password: string;
+		role: string;
+		badge: string;
+		badgeClass: string;
+	}
+
+	const demoAccounts: DemoAccount[] = [
+		{
+			id: 'admin',
+			label: 'Admin (YoRHa 2B)',
+			email: 'admin@yorha.dev',
+			password: 'password123',
+			role: 'admin',
+			badge: 'DEV BYPASS',
+			badgeClass: 'badge-gold'
+		},
+		{
+			id: 'prosecutor',
+			label: 'Prosecutor (User 1)',
+			email: 'test@deeds-legal.ai',
+			password: 'password123',
+			role: 'prosecutor',
+			badge: 'CANONICAL OWNER',
+			badgeClass: 'badge-blue'
+		},
+		{
+			id: 'demo',
+			label: 'Demo Account',
+			email: 'demo@legal-ai.local',
+			password: 'password123',
+			role: 'admin',
+			badge: 'SEEDED',
+			badgeClass: 'badge-green'
+		}
+	];
+
+	function selectDemo(acc: DemoAccount, autoSubmit: boolean = false) {
+		email = acc.email;
+		password = acc.password;
+		$superFormData.username = acc.email;
+		$superFormData.password = acc.password;
+		if (autoSubmit && !isLoading) {
+			actor.send({ type: 'START_LOGIN', data: { email: acc.email, password: acc.password } });
+		}
+	}
 
 	let { data } = $props();
 
@@ -22,7 +67,6 @@
 		validators: zod(loginSchema),
 		onUpdated({ form }) {
 			if (form.valid) {
-				// Machine will handle redirection via $effect below
 				actor.send({ type: 'AUTH_SUCCESS', user: (form as any).data.user });
 			} else {
 				actor.send({ type: 'AUTH_FAILURE', error: form.message || 'Invalid credentials' });
@@ -36,8 +80,6 @@
 	let email = $state('');
 	let password = $state('');
 
-	// Sync local state to superForm for machine compatibility if needed, 
-	// though superForm can bind directly to inputs.
 	$effect(() => {
 		$superFormData.username = email;
 		$superFormData.password = password;
@@ -74,15 +116,14 @@
 		}
 	});
 
-	// Auto-fill demo credentials from ?demo=true query param
+	// Auto-fill or autologin demo credentials from query params
 	$effect(() => {
-		const isDemo = $page.url.searchParams.get('demo') === 'true';
-		if (isDemo && !email && !isLoading && !isAuthenticated) {
-			email = demoCredentials.email;
-			password = demoCredentials.password;
-			// Small delay to let fields render before submitting
+		const param = $page.url.searchParams.get('demo') || $page.url.searchParams.get('autologin') || $page.url.searchParams.get('autofill');
+		if (param && !email && !isLoading && !isAuthenticated) {
+			const target = demoAccounts.find((a) => a.id === param || a.role === param) ?? demoAccounts[0];
+			const shouldAutoSubmit = $page.url.searchParams.get('autologin') !== null || param === 'true' || param === 'admin';
 			setTimeout(() => {
-				actor.send({ type: 'START_LOGIN', data: { email: demoCredentials.email, password: demoCredentials.password } });
+				selectDemo(target, shouldAutoSubmit);
 			}, 100);
 		}
 	});
@@ -96,68 +137,84 @@
 	function handleUnlock() {
 		actor.send({ type: 'UNLOCK_ACCOUNT' });
 	}
-
-	function handleDemoLogin() {
-		if (isLoading) return;
-		email = demoCredentials.email;
-		password = demoCredentials.password;
-		actor.send({ type: 'START_LOGIN', data: { email: demoCredentials.email, password: demoCredentials.password } });
-	}
 </script>
 
-<div class="login-container">
-	<div class="login-card">
+<div class="login-container keep-dark-shell" data-theme="dark">
+	<div class="login-card-box">
+		<!-- Decorative corner brackets -->
+		<div class="bracket bracket-tl"></div>
+		<div class="bracket bracket-tr"></div>
+		<div class="bracket bracket-bl"></div>
+		<div class="bracket bracket-br"></div>
+
 		<div class="login-header">
-			<h1>YoRHa Legal AI</h1>
-			<p>Sign in to your account</p>
+			<div class="telemetry-bar">
+				<span class="telemetry-glyph">❖</span>
+				<span class="telemetry-tag">YORHA // COMMAND TERMINAL 8/13.10</span>
+				<span class="telemetry-glyph">❖</span>
+			</div>
+			<h1 class="yorha-title">YoRHa Legal AI</h1>
+			<p class="header-sub">LEX ET IUSTITIA · SECURE JUDICIAL INTAKE</p>
+			<div class="header-divider"></div>
 		</div>
 
 		{#if errorMessage}
 			<div class="error-banner" role="alert">
-				{errorMessage}
-				{#if attemptsRemaining > 0 && attemptsRemaining < maxAttempts}
-					<span class="attempts-warning">({attemptsRemaining} attempts remaining)</span>
-				{/if}
+				<span class="error-glyph">⚠</span>
+				<div class="error-text">
+					<strong>Authentication Rejected</strong>
+					<p>{errorMessage}</p>
+					{#if attemptsRemaining > 0 && attemptsRemaining < maxAttempts}
+						<span class="attempts-warning">({attemptsRemaining} attempts remaining)</span>
+					{/if}
+				</div>
 			</div>
 		{/if}
 
 		{#if isLocked}
 			<div class="lockout-banner" role="alert">
-				<p>Account locked due to too many failed attempts.</p>
-				<p>Try again in 15 minutes or</p>
+				<p class="lockout-title">🔒 Terminal Locked (Security Protocol)</p>
+				<p>Too many failed credentials. Terminal resets in 15 minutes.</p>
 				<button type="button" class="unlock-btn" onclick={handleUnlock}>
-					Unlock Account
+					Override Security Lock
 				</button>
 			</div>
 		{:else}
-			<form method="POST" action="?/login" use:enhance>
+			<form onsubmit={handleSubmit} class="login-form">
 				<div class="form-group">
-					<label for="email">Email</label>
+					<label for="email">
+						<span class="label-dot"></span>
+						IDENTIFIER (EMAIL OR USERNAME)
+					</label>
 					<input
-						id="username"
-						name="username"
+						id="email"
 						type="text"
-						required
 						bind:value={email}
-						placeholder="Email or username"
+						placeholder="admin@yorha.dev"
+						required
 						disabled={isLoading}
 						autocomplete="username"
+						class="yorha-input"
 					/>
 					{#if $errors.username}
 						<span class="field-error">{$errors.username}</span>
 					{/if}
 				</div>
+
 				<div class="form-group">
-					<label for="password">Password</label>
+					<label for="password">
+						<span class="label-dot"></span>
+						SECURITY CIPHER (PASSWORD)
+					</label>
 					<input
 						id="password"
-						name="password"
 						type="password"
-						required
 						bind:value={password}
-						placeholder="Password"
+						placeholder="••••••••••••"
+						required
 						disabled={isLoading}
 						autocomplete="current-password"
+						class="yorha-input"
 					/>
 					{#if $errors.password}
 						<span class="field-error">{$errors.password}</span>
@@ -167,40 +224,75 @@
 				<button type="submit" class="submit-btn" disabled={isLoading || !email.trim() || !password}>
 					{#if isLoading}
 						<span class="spinner"></span>
-						Signing in...
+						AUTHENTICATING...
 					{:else}
-						Sign in
+						SIGN IN TO TERMINAL →
 					{/if}
 				</button>
 			</form>
 		{/if}
 
-		<div class="demo-panel">
-			<p class="demo-title">Demo Account</p>
-			<p class="demo-copy">
-				<code>{demoCredentials.email}</code> / <code>{demoCredentials.password}</code>
-			</p>
+		<div class="demo-identities-section">
+			<div class="demo-section-header">
+				<div class="demo-title-group">
+					<span class="demo-icon">⚙</span>
+					<span class="demo-title">Development & Demo Identities</span>
+				</div>
+				<span class="demo-subtitle">1-Click Fast Auth</span>
+			</div>
 
-			<button type="button" class="demo-btn" onclick={handleDemoLogin} disabled={isLoading}>
-				{#if isLoading}
-					<span class="spinner"></span>
-					Signing in...
-				{:else}
-					Demo Login
-				{/if}
-			</button>
+			<div class="demo-accounts-grid">
+				{#each demoAccounts as acc}
+					<div class="demo-card-item">
+						<div class="demo-card-top">
+							<span class="demo-card-label">{acc.label}</span>
+							<span class="demo-badge {acc.badgeClass}">{acc.badge}</span>
+						</div>
+						<div class="demo-card-creds">
+							<code>{acc.email}</code>
+							<span class="demo-sep">/</span>
+							<code>{acc.password}</code>
+						</div>
+						<div class="demo-actions">
+							<button
+								type="button"
+								class="demo-btn-sm demo-btn-fill"
+								onclick={() => selectDemo(acc, false)}
+								title="Fill fields without submitting"
+							>
+								Autofill
+							</button>
+							<button
+								type="button"
+								class="demo-btn-sm demo-btn-signin"
+								onclick={() => selectDemo(acc, true)}
+								disabled={isLoading}
+								title="Fill and submit login"
+							>
+								{#if isLoading && email === acc.email}
+									<span class="spinner-sm"></span> Signing In...
+								{:else}
+									⚡ Sign In
+								{/if}
+							</button>
+						</div>
+					</div>
+				{/each}
+			</div>
 		</div>
 
-		<p class="register-link">
-			Don't have an account?
-			<a href="/register">Create one</a>
-		</p>
+		<div class="login-footer">
+			<p class="register-link">
+				Unregistered entity? <a href="/register">Request Credentials</a>
+			</p>
+			<span class="footer-telemetry">POSTGRESQL 18 · LUCIA V3 · YORHA SECURE OS</span>
+		</div>
 
 		<noscript>
-			<form method="POST" action="?/login">
+			<form method="POST" action="?/login" class="noscript-form">
 				<input name="username" type="text" required placeholder="Email or username" />
 				<input name="password" type="password" required placeholder="Password" />
-				<button type="submit">Sign in (no JS)</button>
+				<button type="submit">Sign in (Standard HTML)</button>
 			</form>
 		</noscript>
 	</div>
@@ -212,153 +304,509 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
-		color: white;
+		padding: 2.5rem 1rem;
+		background:
+			radial-gradient(ellipse at 50% 12%, rgba(196, 168, 130, 0.16), transparent 50%),
+			radial-gradient(ellipse at 85% 85%, rgba(114, 184, 150, 0.08), transparent 45%),
+			radial-gradient(ellipse at 15% 80%, rgba(112, 165, 216, 0.08), transparent 45%),
+			linear-gradient(135deg, #090b10 0%, #10131b 50%, #0c0e14 100%) !important;
+		color: #e2d9cd !important;
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 	}
 
-	.login-card {
+	.login-card-box {
+		position: relative;
 		width: 100%;
-		max-width: 420px;
-		padding: 2.5rem;
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
-		backdrop-filter: blur(10px);
+		max-width: 480px;
+		padding: 2.5rem 2.25rem;
+		background: rgba(18, 21, 30, 0.95) !important;
+		border: 1px solid rgba(196, 168, 130, 0.3) !important;
+		border-radius: 8px;
+		box-shadow:
+			0 16px 48px rgba(0, 0, 0, 0.75),
+			0 0 0 1px rgba(255, 255, 255, 0.05),
+			inset 0 1px 0 rgba(196, 168, 130, 0.25);
+		backdrop-filter: blur(16px);
+		box-sizing: border-box;
+	}
+
+	/* Corner technical brackets */
+	.bracket {
+		position: absolute;
+		width: 12px;
+		height: 12px;
+		pointer-events: none;
+	}
+	.bracket-tl {
+		top: -1px;
+		left: -1px;
+		border-top: 2px solid #c4a882;
+		border-left: 2px solid #c4a882;
+	}
+	.bracket-tr {
+		top: -1px;
+		right: -1px;
+		border-top: 2px solid #c4a882;
+		border-right: 2px solid #c4a882;
+	}
+	.bracket-bl {
+		bottom: -1px;
+		left: -1px;
+		border-bottom: 2px solid #c4a882;
+		border-left: 2px solid #c4a882;
+	}
+	.bracket-br {
+		bottom: -1px;
+		right: -1px;
+		border-bottom: 2px solid #c4a882;
+		border-right: 2px solid #c4a882;
 	}
 
 	.login-header {
 		text-align: center;
-		margin-bottom: 2rem;
+		margin-bottom: 1.75rem;
 	}
 
-	.login-header h1 {
-		font-size: 1.75rem;
-		font-weight: 700;
+	.telemetry-bar {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		margin-bottom: 0.5rem;
+		font-family: 'Consolas', 'Courier New', monospace;
+		font-size: 0.6875rem;
+		letter-spacing: 0.12em;
 		color: #c4a882;
+		opacity: 0.9;
 	}
 
-	.login-header p {
-		margin-top: 0.5rem;
-		color: rgba(255, 255, 255, 0.5);
+	.telemetry-glyph {
+		font-size: 0.625rem;
+		color: #ae8745;
+	}
+
+	.yorha-title {
+		font-family: 'Cinzel', 'Playfair Display', 'Georgia', serif;
+		font-size: 2rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		color: #f3dfbf !important;
+		margin: 0;
+		text-shadow: 0 2px 12px rgba(196, 168, 130, 0.25);
+	}
+
+	.header-sub {
+		margin: 0.375rem 0 0;
+		font-size: 0.6875rem;
+		font-weight: 600;
+		letter-spacing: 0.14em;
+		color: #a39580 !important;
+		text-transform: uppercase;
+	}
+
+	.header-divider {
+		width: 56px;
+		height: 2px;
+		background: linear-gradient(90deg, transparent, #c4a882, transparent);
+		margin: 0.875rem auto 0;
+	}
+
+	.login-form {
+		display: flex;
+		flex-direction: column;
+		gap: 1.125rem;
+	}
+
+	.form-group {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.form-group label {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		margin-bottom: 0.375rem;
+		font-family: 'Consolas', 'Courier New', monospace;
+		font-size: 0.6875rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		color: #c4a882 !important;
+		text-transform: uppercase;
+	}
+
+	.label-dot {
+		width: 4px;
+		height: 4px;
+		border-radius: 50%;
+		background: #c4a882;
+	}
+
+	.yorha-input {
+		width: 100%;
+		padding: 0.75rem 0.875rem;
+		font-size: 0.875rem;
+		color: #f3dfbf !important;
+		background: #141722 !important;
+		border: 1px solid rgba(196, 168, 130, 0.35) !important;
+		border-radius: 5px;
+		outline: none;
+		transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+		box-sizing: border-box;
+	}
+
+	.yorha-input:focus {
+		border-color: #c4a882 !important;
+		background: #181c2b !important;
+		box-shadow: 0 0 0 3px rgba(196, 168, 130, 0.2);
+	}
+
+	.yorha-input:-webkit-autofill,
+	.yorha-input:-webkit-autofill:hover, 
+	.yorha-input:-webkit-autofill:focus {
+		-webkit-box-shadow: 0 0 0 30px #141722 inset !important;
+		-webkit-text-fill-color: #f3dfbf !important;
+		caret-color: #f3dfbf;
+	}
+
+	.yorha-input::placeholder {
+		color: rgba(196, 168, 130, 0.35);
 	}
 
 	.field-error {
 		display: block;
 		margin-top: 0.375rem;
 		font-size: 0.75rem;
-		color: #fca5a5;
-	}
-
-	.error-banner {
-		padding: 0.75rem 1rem;
-		font-size: 0.875rem;
-		color: #fca5a5;
-		background: rgba(239, 68, 68, 0.15);
-		border: 1px solid rgba(239, 68, 68, 0.3);
-		border-radius: 8px;
-		margin-bottom: 1.5rem;
-	}
-
-	.attempts-warning {
-		display: block;
-		margin-top: 0.25rem;
-		font-size: 0.75rem;
-		color: rgba(252, 165, 165, 0.7);
-	}
-
-	.lockout-banner {
-		padding: 1.25rem;
-		text-align: center;
-		color: #fbbf24;
-		background: rgba(245, 158, 11, 0.1);
-		border: 1px solid rgba(245, 158, 11, 0.3);
-		border-radius: 8px;
-	}
-
-	.lockout-banner p {
-		margin: 0.25rem 0;
-	}
-
-	.unlock-btn {
-		margin-top: 0.75rem;
-		padding: 0.5rem 1rem;
-		font-size: 0.875rem;
-		color: white;
-		background: rgba(245, 158, 11, 0.3);
-		border: 1px solid rgba(245, 158, 11, 0.5);
-		border-radius: 6px;
-		cursor: pointer;
-	}
-
-	.unlock-btn:hover {
-		background: rgba(245, 158, 11, 0.5);
-	}
-
-	.form-group {
-		margin-bottom: 1.25rem;
-	}
-
-	.form-group label {
-		display: block;
-		margin-bottom: 0.375rem;
-		font-size: 0.875rem;
-		color: rgba(255, 255, 255, 0.7);
-	}
-
-	.form-group input {
-		width: 100%;
-		padding: 0.625rem 0.75rem;
-		font-size: 0.9375rem;
-		color: white;
-		background: rgba(0, 0, 0, 0.3);
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 6px;
-		outline: none;
-		transition: border-color 0.2s;
-		box-sizing: border-box;
-	}
-
-	.form-group input:focus {
-		border-color: #c4a882;
-	}
-
-	.form-group input:disabled {
-		opacity: 0.5;
+		color: #e06c75;
 	}
 
 	.submit-btn {
+		margin-top: 0.375rem;
 		width: 100%;
-		padding: 0.75rem;
-		font-size: 0.9375rem;
-		font-weight: 600;
-		color: white;
-		background: #c4a882;
-		border: none;
-		border-radius: 6px;
+		padding: 0.8125rem;
+		font-family: 'Consolas', 'Courier New', monospace;
+		font-size: 0.8125rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: #12151d !important;
+		background: linear-gradient(135deg, #c4a882 0%, #b39268 100%) !important;
+		border: 1px solid #d4be9c !important;
+		border-radius: 5px;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		gap: 0.5rem;
-		transition: background 0.2s;
+		transition: all 0.2s ease;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 	}
 
 	.submit-btn:hover:not(:disabled) {
-		background: #b89a74;
+		background: linear-gradient(135deg, #d4be9c 0%, #c4a882 100%) !important;
+		box-shadow: 0 0 16px rgba(196, 168, 130, 0.45);
+		transform: translateY(-1px);
+	}
+
+	.submit-btn:active:not(:disabled) {
+		transform: translateY(0);
 	}
 
 	.submit-btn:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
+		background: #33312c !important;
+		border-color: #4a453c !important;
+		color: #7d7568 !important;
+		box-shadow: none;
+	}
+
+	.error-banner {
+		padding: 0.75rem 1rem;
+		display: flex;
+		gap: 0.625rem;
+		background: rgba(224, 108, 117, 0.12);
+		border: 1px solid rgba(224, 108, 117, 0.35);
+		border-radius: 6px;
+		margin-bottom: 1.25rem;
+	}
+
+	.error-glyph {
+		font-size: 1rem;
+		color: #e06c75;
+	}
+
+	.error-text strong {
+		display: block;
+		font-size: 0.8125rem;
+		color: #e06c75;
+		margin-bottom: 0.125rem;
+	}
+
+	.error-text p {
+		margin: 0;
+		font-size: 0.75rem;
+		color: #e2d9cd;
+	}
+
+	.attempts-warning {
+		display: block;
+		margin-top: 0.25rem;
+		font-size: 0.6875rem;
+		color: rgba(224, 108, 117, 0.8);
+	}
+
+	.lockout-banner {
+		padding: 1.25rem;
+		text-align: center;
+		background: rgba(245, 158, 11, 0.1);
+		border: 1px solid rgba(245, 158, 11, 0.3);
+		border-radius: 6px;
+	}
+
+	.lockout-title {
+		font-weight: 700;
+		color: #fbbf24;
+		margin-bottom: 0.25rem;
+	}
+
+	.unlock-btn {
+		margin-top: 0.75rem;
+		padding: 0.5rem 1rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: #12151d;
+		background: #fbbf24;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+	}
+
+	/* Demo & Development Accounts Section */
+	.demo-identities-section {
+		margin-top: 1.75rem;
+		padding-top: 1.25rem;
+		border-top: 1px solid rgba(196, 168, 130, 0.25);
+		background: transparent !important;
+	}
+
+	.demo-section-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 0.875rem;
+	}
+
+	.demo-title-group {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+	}
+
+	.demo-icon {
+		font-size: 0.75rem;
+		color: #c4a882;
+	}
+
+	.demo-title {
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: #c4a882 !important;
+		margin: 0;
+	}
+
+	.demo-subtitle {
+		font-size: 0.6875rem;
+		font-family: 'Consolas', 'Courier New', monospace;
+		color: rgba(196, 168, 130, 0.75);
+	}
+
+	.demo-accounts-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.demo-card-item {
+		padding: 0.75rem 0.875rem;
+		border-radius: 6px;
+		background: rgba(12, 14, 20, 0.85) !important;
+		border: 1px solid rgba(196, 168, 130, 0.22) !important;
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+		transition: border-color 0.15s, background-color 0.15s, transform 0.15s;
+		box-sizing: border-box;
+	}
+
+	.demo-card-item:hover {
+		border-color: rgba(196, 168, 130, 0.45) !important;
+		background: rgba(16, 19, 28, 0.95) !important;
+		transform: translateY(-1px);
+	}
+
+	.demo-card-top {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.demo-card-label {
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: #f3dfbf;
+	}
+
+	.demo-badge {
+		font-family: 'Consolas', 'Courier New', monospace;
+		font-size: 0.625rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		padding: 0.125rem 0.375rem;
+		border-radius: 3px;
+	}
+
+	.badge-gold {
+		background: rgba(196, 168, 130, 0.18);
+		color: #c4a882;
+		border: 1px solid rgba(196, 168, 130, 0.4);
+	}
+
+	.badge-blue {
+		background: rgba(112, 165, 216, 0.18);
+		color: #8bbbe8;
+		border: 1px solid rgba(112, 165, 216, 0.4);
+	}
+
+	.badge-green {
+		background: rgba(114, 184, 150, 0.18);
+		color: #8ed6af;
+		border: 1px solid rgba(114, 184, 150, 0.4);
+	}
+
+	.demo-card-creds {
+		font-size: 0.75rem;
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		color: rgba(226, 217, 205, 0.75);
+	}
+
+	.demo-card-creds code {
+		font-family: 'Consolas', 'Courier New', monospace;
+		padding: 0.0625rem 0.3125rem;
+		border-radius: 3px;
+		background: rgba(0, 0, 0, 0.6) !important;
+		color: #f3dfbf !important;
+		border: 1px solid rgba(196, 168, 130, 0.2) !important;
+	}
+
+	.demo-sep {
+		color: rgba(196, 168, 130, 0.4);
+	}
+
+	.demo-actions {
+		display: flex;
+		gap: 0.5rem;
+		margin-top: 0.375rem;
+	}
+
+	.demo-btn-sm {
+		flex: 1;
+		padding: 0.4375rem 0.625rem;
+		font-family: 'Consolas', 'Courier New', monospace;
+		font-size: 0.6875rem;
+		font-weight: 600;
+		letter-spacing: 0.05em;
+		border-radius: 4px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.25rem;
+		transition: all 0.15s ease;
+		box-sizing: border-box;
+	}
+
+	.demo-btn-fill {
+		color: #c4a882 !important;
+		background: transparent !important;
+		border: 1px solid rgba(196, 168, 130, 0.35) !important;
+	}
+
+	.demo-btn-fill:hover {
+		background: rgba(196, 168, 130, 0.16) !important;
+		border-color: #c4a882 !important;
+	}
+
+	.demo-btn-signin {
+		color: #12151d !important;
+		background: #c4a882 !important;
+		border: 1px solid #c4a882 !important;
+	}
+
+	.demo-btn-signin:hover:not(:disabled) {
+		background: #f3dfbf !important;
+		border-color: #f3dfbf !important;
+		box-shadow: 0 0 10px rgba(196, 168, 130, 0.45);
+	}
+
+	.demo-btn-signin:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.login-footer {
+		margin-top: 1.75rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		text-align: center;
+	}
+
+	.register-link {
+		margin: 0;
+		font-size: 0.75rem;
+		color: rgba(226, 217, 205, 0.6) !important;
+	}
+
+	.register-link a {
+		color: #c4a882;
+		text-decoration: none;
+		font-weight: 600;
+	}
+
+	.register-link a:hover {
+		text-decoration: underline;
+		color: #f3dfbf;
+	}
+
+	.footer-telemetry {
+		font-family: 'Consolas', 'Courier New', monospace;
+		font-size: 0.625rem;
+		letter-spacing: 0.08em;
+		color: rgba(196, 168, 130, 0.4);
 	}
 
 	.spinner {
-		width: 16px;
-		height: 16px;
-		border: 2px solid rgba(255, 255, 255, 0.3);
-		border-top-color: white;
+		width: 14px;
+		height: 14px;
+		border: 2px solid rgba(18, 21, 29, 0.3);
+		border-top-color: #12151d;
 		border-radius: 50%;
-		animation: spin 0.6s linear infinite;
+		animation: spin 0.8s linear infinite;
+	}
+
+	.spinner-sm {
+		width: 10px;
+		height: 10px;
+		border: 2px solid rgba(18, 21, 29, 0.3);
+		border-top-color: #12151d;
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
 	}
 
 	@keyframes spin {
@@ -367,73 +815,9 @@
 		}
 	}
 
-	.register-link {
-		text-align: center;
-		margin-top: 1.5rem;
-		font-size: 0.875rem;
-		color: rgba(255, 255, 255, 0.5);
-	}
-
-	.demo-panel {
-		margin-top: 1.5rem;
-		padding-top: 1.25rem;
-		border-top: 1px solid rgba(255, 255, 255, 0.12);
-	}
-
-	.demo-title {
-		margin: 0 0 0.375rem;
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: #c4a882;
-	}
-
-	.demo-copy {
-		margin: 0 0 0.875rem;
-		font-size: 0.8125rem;
-		line-height: 1.5;
-		color: rgba(255, 255, 255, 0.65);
-	}
-
-	.demo-copy code {
-		padding: 0.125rem 0.375rem;
-		border-radius: 4px;
-		background: rgba(0, 0, 0, 0.25);
-		color: #f3dfbf;
-	}
-
-	.demo-btn {
-		width: 100%;
-		padding: 0.75rem;
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: #f3dfbf;
-		background: rgba(196, 168, 130, 0.12);
-		border: 1px solid rgba(196, 168, 130, 0.35);
-		border-radius: 6px;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.5rem;
-		transition: background 0.2s, border-color 0.2s;
-	}
-
-	.demo-btn:hover:not(:disabled) {
-		background: rgba(196, 168, 130, 0.2);
-		border-color: rgba(196, 168, 130, 0.5);
-	}
-
-	.demo-btn:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.register-link a {
-		color: #c4a882;
-		text-decoration: none;
-	}
-
-	.register-link a:hover {
-		text-decoration: underline;
+	.noscript-form {
+		margin-top: 1rem;
+		padding: 1rem;
+		border: 1px dashed rgba(255, 255, 255, 0.2);
 	}
 </style>

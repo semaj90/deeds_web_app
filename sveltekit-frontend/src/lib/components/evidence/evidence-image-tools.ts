@@ -18,6 +18,23 @@ export type StoredEvidenceImageAnalysis = Pick<EvidenceImageAnalysis, 'analysis'
 	embeddingModel?: string;
 	preprocessingRevision?: string;
 	reviewState?: string;
+	depthMap?: {
+		status: 'ESTIMATED';
+		sourceRevision: string;
+		artifactSha256: string;
+		width: number;
+		height: number;
+	};
+	thumbnail?: {
+		sourceRevision: string;
+		url: string;
+		objectKey: string;
+		bucket: string;
+		outputSha256: string;
+		width: number;
+		height: number;
+		preprocessingRevision: string;
+	};
 };
 
 export type CanonicalImageAnalysisReadback = {
@@ -126,6 +143,7 @@ export async function loadCanonicalStoredEvidenceImageAnalysis(
 		preprocessingRevision?: unknown;
 		reviewState?: unknown;
 		analysis?: Record<string, unknown> | null;
+	derivatives?: { thumbnail?: Record<string, unknown> } | null;
 	} | null;
 	if (!payload || typeof payload.status !== 'string') {
 		throw new Error('Saved image analysis returned an invalid response');
@@ -159,6 +177,43 @@ export async function loadCanonicalStoredEvidenceImageAnalysis(
 	const detectorError = stageErrors.find((item) => item.startsWith('detection:'));
 	const visionError = stageErrors.find((item) => item.startsWith('vision:'));
 	const summary = typeof rawAnalysis.visionSummary === 'string' ? rawAnalysis.visionSummary : '';
+	const rawDepthMap = rawAnalysis.depthMap && typeof rawAnalysis.depthMap === 'object'
+		? rawAnalysis.depthMap as Record<string, unknown>
+		: null;
+	const depthMap = rawDepthMap?.status === 'ESTIMATED'
+		&& typeof rawDepthMap.artifactSha256 === 'string'
+		&& /^[a-f0-9]{64}$/.test(rawDepthMap.artifactSha256)
+		&& Number.isInteger(rawDepthMap.width) && Number(rawDepthMap.width) > 0
+		&& Number.isInteger(rawDepthMap.height) && Number(rawDepthMap.height) > 0
+		? {
+			status: 'ESTIMATED' as const,
+			sourceRevision: payload.sourceRevision,
+			artifactSha256: rawDepthMap.artifactSha256,
+			width: Number(rawDepthMap.width),
+			height: Number(rawDepthMap.height),
+		}
+		: undefined;
+	const rawThumbnail = payload.derivatives?.thumbnail;
+	const thumbnail = rawThumbnail
+		&& rawThumbnail.sourceRevision === payload.sourceRevision
+		&& typeof rawThumbnail.objectKey === 'string'
+		&& typeof rawThumbnail.bucket === 'string'
+		&& typeof rawThumbnail.outputSha256 === 'string'
+		&& /^[a-f0-9]{64}$/.test(rawThumbnail.outputSha256)
+		&& Number.isInteger(rawThumbnail.width) && Number(rawThumbnail.width) > 0 && Number(rawThumbnail.width) <= 256
+		&& Number.isInteger(rawThumbnail.height) && Number(rawThumbnail.height) > 0 && Number(rawThumbnail.height) <= 256
+		&& typeof rawThumbnail.preprocessingRevision === 'string'
+		? {
+			sourceRevision: payload.sourceRevision,
+			url: `/api/evidence/${encodeURIComponent(evidenceId)}/thumbnail`,
+			objectKey: rawThumbnail.objectKey,
+			bucket: rawThumbnail.bucket,
+			outputSha256: rawThumbnail.outputSha256,
+			width: Number(rawThumbnail.width),
+			height: Number(rawThumbnail.height),
+			preprocessingRevision: rawThumbnail.preprocessingRevision,
+		}
+		: undefined;
 	return {
 		status: 'CURRENT',
 		message: null,
@@ -177,6 +232,8 @@ export async function loadCanonicalStoredEvidenceImageAnalysis(
 			detectorStatus: detectorError ? 'failed' : 'completed',
 			vlmStatus: visionError ? (/UNAVAILABLE|UNREACHABLE/.test(visionError) ? 'unavailable' : 'failed') : 'completed',
 			warnings: stageErrors,
+			...(depthMap ? { depthMap } : {}),
+			...(thumbnail ? { thumbnail } : {}),
 		},
 	};
 }

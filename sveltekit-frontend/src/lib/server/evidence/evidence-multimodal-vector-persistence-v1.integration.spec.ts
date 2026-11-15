@@ -16,6 +16,7 @@ import {
 } from './evidence-multimodal-vector-persistence-v1.js';
 import { processEvidenceImageCanonicalV1 } from './process-evidence-image-canonical-v1.js';
 import { embedEvidenceImageWithEmbeddingGemma2OnnxV1 } from './embeddinggemma2-onnx-image-v1.js';
+import { resizeForThumbnail } from '$lib/server/image/resize-for-vlm.js';
 
 const enabled = process.env.ATLAS_EVIDENCE_MULTIMODAL_SCRATCH_TEST === '1';
 const SCRATCH_DATABASE = 'legal_ai_live_integration_scratch';
@@ -155,7 +156,7 @@ describe.skipIf(!enabled)('multimodal vector writer against rollback-only Postgr
 			authority: 'OBSERVATION_ONLY',
 			sourceRevision,
 			status: 'PARTIAL',
-			objectDetections: [],
+			objectDetections: [{ class: 'fixture_object', confidence: 0.91, bbox: [2, 2, 24, 22] }],
 			layoutRegions: [],
 			visionSummary: null,
 			visionFindings: [],
@@ -202,6 +203,7 @@ describe.skipIf(!enabled)('multimodal vector writer against rollback-only Postgr
 				execute: transactionAdapter.execute,
 				transaction: async <T>(operation: (tx: EvidenceMultimodalExecuteV1) => Promise<T>) => operation(transactionAdapter),
 			};
+			const derivativeObjects = new Map<string, Buffer>();
 			const result = await processEvidenceImageCanonicalV1({
 				evidenceId,
 				caseId,
@@ -211,17 +213,30 @@ describe.skipIf(!enabled)('multimodal vector writer against rollback-only Postgr
 				bytes,
 			}, {
 				modelDir,
+				thumbnailBucket: 'atlas-artifacts-fixture',
+				maxObjectCrops: 4,
+				deriveObjectCrop: async (source, crop) => sharp(source).extract(crop).jpeg({ quality: 90, mozjpeg: false }).toBuffer(),
+				deriveThumbnail: resizeForThumbnail,
+				storeThumbnail: async (bucket, key, thumbnailBytes) => {
+					const identity = `${bucket}/${key}`;
+					derivativeObjects.set(identity, Buffer.from(thumbnailBytes));
+					const readback = derivativeObjects.get(identity);
+					if (!readback || !readback.equals(thumbnailBytes)) throw new Error('FIXTURE_THUMBNAIL_READBACK_MISMATCH');
+				},
 				analyze: async () => ({ ...analysis }),
 				embed: embedEvidenceImageWithEmbeddingGemma2OnnxV1,
 				persist: async (_appDatabase, input) => persistEvidenceMultimodalVectorV1(database, input),
 			});
 			expect(result).toMatchObject({
-				chunkCount: 1,
-				persistedCount: 1,
+				chunkCount: 2,
+				persistedCount: 2,
+				objectCropCount: 1,
 				sourceRevision,
 				representationId: 'evidence_multimodal_semantic_768',
 				canonicalStore: 'postgresql.evidence_multimodal_vectors',
+				thumbnail: { bucket: 'atlas-artifacts-fixture', sourceRevision },
 			});
+			expect(derivativeObjects.has(`atlas-artifacts-fixture/${result.thumbnail.objectKey}`)).toBe(true);
 
 			const readback = await client.query<{
 				vector_count: string;
@@ -237,15 +252,47 @@ describe.skipIf(!enabled)('multimodal vector writer against rollback-only Postgr
 				  (SELECT vector_dims(embedding) FROM public.evidence_multimodal_vectors WHERE id=$2) AS dimension,
 				  (SELECT model FROM public.evidence_multimodal_vectors WHERE id=$2) AS model,
 				  (SELECT metadata->>'modelOutputReviewState' FROM public.evidence_multimodal_vectors WHERE id=$2) AS model_output_review_state,
+				  (SELECT metadata->'imageDerivatives'->'thumbnail'->>'outputSha256' FROM public.evidence_multimodal_vectors WHERE id=$2) AS thumbnail_sha256,
 				  (SELECT status FROM public.evidence_multimodal_vector_projection_outbox WHERE evidence_multimodal_vector_id=$2) AS outbox_status
 			`, [evidenceId, result.vectorId]);
 			expect(readback.rows[0]).toMatchObject({
-				vector_count: '1',
+				vector_count: '2',
 				outbox_count: '1',
 				dimension: 768,
 				model: expect.stringContaining(':q8'),
 				model_output_review_state: 'UNREVIEWED_PROPOSAL',
+				thumbnail_sha256: result.thumbnail.outputSha256,
 				outbox_status: 'PENDING',
+			});
+			const cropReadback = await client.query<{
+				vector_count: string;
+				outbox_count: string;
+				dimension: number;
+				locator_kind: string;
+				label: string;
+				bbox: number[];
+				input_sha256: string;
+				model_output_review_state: string;
+			}>(`
+				SELECT
+				  (SELECT count(*)::text FROM public.evidence_multimodal_vectors WHERE evidence_id=$1 AND source_locator->>'kind'='image_object_crop') AS vector_count,
+				  (SELECT count(*)::text FROM public.evidence_multimodal_vector_projection_outbox WHERE evidence_multimodal_vector_id=$2) AS outbox_count,
+				  (SELECT vector_dims(embedding) FROM public.evidence_multimodal_vectors WHERE id=$2) AS dimension,
+				  (SELECT source_locator->>'kind' FROM public.evidence_multimodal_vectors WHERE id=$2) AS locator_kind,
+				  (SELECT source_locator->>'label' FROM public.evidence_multimodal_vectors WHERE id=$2) AS label,
+				  (SELECT ARRAY(SELECT jsonb_array_elements_text(source_locator->'bbox')::float8) FROM public.evidence_multimodal_vectors WHERE id=$2) AS bbox,
+				  (SELECT input_sha256 FROM public.evidence_multimodal_vectors WHERE id=$2) AS input_sha256,
+				  (SELECT metadata->>'modelOutputReviewState' FROM public.evidence_multimodal_vectors WHERE id=$2) AS model_output_review_state
+			`, [evidenceId, result.objectCropVectorIds[0]]);
+			expect(cropReadback.rows[0]).toMatchObject({
+				vector_count: '1',
+				outbox_count: '1',
+				dimension: 768,
+				locator_kind: 'image_object_crop',
+				label: 'fixture_object',
+				bbox: [2, 2, 24, 22],
+				input_sha256: expect.stringMatching(/^sha256:[a-f0-9]{64}$/),
+				model_output_review_state: 'UNREVIEWED_PROPOSAL',
 			});
 
 			await client.query('ROLLBACK');

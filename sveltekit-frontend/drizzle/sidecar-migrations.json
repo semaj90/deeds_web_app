@@ -2,6 +2,20 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20261115_evidence_video_metadata_columns_v1.sql",
+      "status": "applied",
+      "reason": "Adds nullable video_codec, audio_codec, duration_seconds and frame_count to evidence. Additive; no rows rewritten or backfilled. Writer and backfill are separate steps.",
+      "appliedBy": "manual psql 2026-11-15 to legal_ai_db (operator-approved; pre-check: columns absent; post-check: 4 columns added; readback: 4 nullable columns present; evidence row count 857 after apply)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261114_evidence_audio_window_ledger_v1.sql",
+      "status": "applied",
+      "reason": "Additive durable per-window ledger for bounded audio embedding (task 5.6). Creates evidence_audio_window_ledger with revision, locator and status CHECKs and a unique window key. Worker wiring is feature-detected and not enabled by default.",
+      "appliedBy": "manual psql 2026-11-14 to legal_ai_db (operator-approved; pre-image: table absent; file sha256 25f338718e923bc3a1af2177794de78428b264c7aec7c1b37ea4c27954513367; readback: 0 rows, CHECK/unique/FK/PK constraints and 2 indexes present). Previously rehearsed in legal_ai_live_integration_scratch inside BEGIN/ROLLBACK.",
+      "requiresJournalEntry": false
+    },
+    {
       "file": "manual/20261113_evidence_multimodal_vectors_v1_DRAFT.sql",
       "status": "active_candidate",
       "reason": "Scratch-only additive PostgreSQL 18/pgvector candidate for canonical revision-bound multimodal vectors and a separate Qdrant projection outbox. Guarded to legal_ai_live_integration_scratch; not journaled, approved, or applied to production.",
@@ -809,28 +823,29 @@
     },
     {
       "file": "manual/20261112_library_ingestion_lease_v1.sql",
-      "status": "active_candidate",
-      "reason": "Adds bounded retry and lease fields to the existing library ingestion_jobs queue. Candidate only; not rehearsed or applied to any database.",
-      "appliedBy": "not-applied",
+      "status": "applied",
+      "reason": "Applied 2026-11-14 to PostgreSQL 18.4 legal_ai_db after a rollback rehearsal with bounded lock and statement timeouts. Independent readback verified the columns, default, fencing check, indexes, and unchanged row counts. SHA-256 bfebbb5b8ebecf966b17b573b977626c710036aba076cebfe9b104412020f93b.",
+      "appliedBy": "operator-approved, session 2026-11-14",
+      "appliedAt": "2026-11-14",
       "requiresJournalEntry": false
     },
     {
       "file": "manual/20261112_library_document_revision_binding_v1.sql",
-      "status": "planned_sidecar",
-      "reason": "Adds nullable SHA-256 bindings to ingestion jobs and document versions. Legacy rows are not inferred or backfilled. Candidate only; not applied to any database.",
-      "appliedBy": null,
-      "appliedAt": null,
+      "status": "applied",
+      "reason": "Applied 2026-11-14 to PostgreSQL 18.4 legal_ai_db after a rollback rehearsal with bounded lock and statement timeouts. Independent readback verified both nullable source-hash columns and index; 9 legacy versions remain unbackfilled. SHA-256 bef963fa7c1cd921fa8df1b07372b636fd3ed47ce8f8d63ce78ca7d7dfbc1358.",
+      "appliedBy": "operator-approved, session 2026-11-14",
+      "appliedAt": "2026-11-14",
       "requiresJournalEntry": false,
-      "validationCommand": "Review source-hash producer binding and rehearse only in a disposable PostgreSQL 18 database before approval."
+      "validationCommand": "Verify every new ingestion job binds to the exact admitted source hash; legacy rows remain null until independently reconciled."
     },
     {
       "file": "manual/20261112_library_chunk_parser_revision_v1.sql",
-      "status": "planned_sidecar",
-      "reason": "Adds nullable chunk_hash, parser_revision, and char_offset_unit provenance columns. Existing rows remain NULL because their exact chunk bytes, extractor/chunker recipe, and offset units are unverified. Candidate only; not applied.",
-      "appliedBy": null,
-      "appliedAt": null,
+      "status": "applied",
+      "reason": "Applied 2026-11-14 to PostgreSQL 18.4 legal_ai_db after a rollback rehearsal with bounded lock and statement timeouts. Independent readback verified all nullable provenance columns and unchanged counts; all 60,432 legacy chunks remain unbackfilled. SHA-256 5c03f2a6a7f6c4cb9f38dabe16bc4f9187848c7d218b85a7f56ae51a614a5540.",
+      "appliedBy": "operator-approved, session 2026-11-14",
+      "appliedAt": "2026-11-14",
       "requiresJournalEntry": false,
-      "validationCommand": "Review and rehearse in a disposable PostgreSQL 18 database before approval."
+      "validationCommand": "Verify newly produced chunks carry exact hash, parser revision, and offset-unit provenance; do not infer these fields for legacy chunks."
     },
     {
       "file": "manual/20261112_orf_cluster_projection_provenance_v1.sql",
@@ -1303,6 +1318,41 @@
       "reason": "Scratch-only draft widening public.evidence_vectors_source_field_ck to allow evidence_markup_revision_text alongside canonical_evidence_text for V2 markup revision indexing. Guarded by current_database() = legal_ai_live_integration_scratch; unapplied.",
       "appliedBy": "not-applied",
       "appliedAt": null,
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/scene_markers.sql",
+      "status": "applied",
+      "reason": "Creates scene_markers, scene_events and scene_event_outbox for durable evidence-board marker persistence. Reuses cases and evidence; idempotent IF NOT EXISTS.",
+      "appliedBy": "manual psql 2026-11-15 to legal_ai_db (operator-approved; pre-image: tables absent; rehearsed in BEGIN/ROLLBACK, then committed in one transaction; readback: 3 tables present, 0 rows)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/scene_markers_anchor.sql",
+      "status": "applied",
+      "reason": "Adds nullable anchor columns (IMAGE_UV / MESH_SURFACE), anchor_status and revision-qualified source fields to scene_markers, with CHECK constraints. Additive; legacy x/y/z rows keep anchor_kind NULL.",
+      "appliedBy": "manual psql 2026-11-15 to legal_ai_db (operator-approved; rehearsed in BEGIN/ROLLBACK, then committed in the same transaction as the other scene and facet files; readback: 9 anchor columns present, 0 rows)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/scene_document_revisions.sql",
+      "status": "applied",
+      "reason": "Creates append-only scene_document_revisions (immutable trigger), scene_assets (GLB/SOG, immutable trigger) and scene_asset_files (streamed SOG members, immutable trigger). Upload stays disabled behind SCENE_PERSISTENCE_ENABLED.",
+      "appliedBy": "manual psql 2026-11-15 to legal_ai_db (operator-approved; rehearsed in BEGIN/ROLLBACK, then committed; readback: 3 tables present, 3 immutable triggers present, 0 rows)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261115_case_investigation_facets_v1_DRAFT.sql",
+      "status": "applied",
+      "reason": "Creates case_investigation_facets (WHO/WHAT/WHY/HOW), investigation_facet_evidence (facet to evidence links) and case_ai_summary_exports (append-only AI summary revisions with immutable trigger). Reuses cases, evidence, evidence_analysis_cache.",
+      "appliedBy": "manual psql 2026-11-15 to legal_ai_db (operator-approved; rehearsed in BEGIN/ROLLBACK, then committed; readback: 3 tables present, 1 immutable trigger present, 0 rows)",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261116_investigation_relations_review_v2_DRAFT.sql",
+      "status": "applied",
+      "reason": "Additive v2: facet to person_of_interest FK; investigation_facet_notes junction to case_notes (case_notes stays the summary table); append-only case_ai_summary_export_sources lineage and case_ai_summary_export_reviews ledger; evidence_analysis_cache review_status/reviewed_by/reviewed_at; multi-column indexes. case_reports intentionally untouched.",
+      "appliedBy": "manual psql 2026-11-16 to legal_ai_db (operator-approved; rehearsed in BEGIN/ROLLBACK, then committed in one transaction; readback: 3 tables, 3 review columns, 3 immutable triggers present; 0 facet rows; 1 analysis row UNREVIEWED)",
       "requiresJournalEntry": false
     }
   ]

@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { and, eq, isNull, sql } from 'drizzle-orm';
 import { db } from '$lib/server/db/client.js';
+import { createAudioWindowLedgerIfAvailableV1, type AudioWindowLedgerDatabaseV1 } from './audio-window-ledger-v1.js';
 import { audioTranscripts, evidence, whisperSegments } from '$lib/server/db/schema-postgres.js';
 import { ensureCaseOwned } from './video-ingest-service.js';
 import { ENV } from '$lib/server/env.server.js';
@@ -12,11 +13,68 @@ import { statSeaweedObject, uploadSeaweedFile } from '$lib/server/seaweed-client
 import { extractAudioTrack, transcribeVideoAudio } from './transcript-service.js';
 import { detectVideoAndAudioStreamsV1 } from './storyboard-manifest-contract-v1.js';
 import type { AnalysisJobProgressStageV1 } from '$lib/server/analysis/analysis-job-progress-events-v1.js';
+import {
+	embedEvidenceAudioWithEmbeddingGemma2OnnxV1,
+	embedEvidenceImageWithEmbeddingGemma2OnnxV1,
+	embedEvidenceTextWithEmbeddingGemma2OnnxV1,
+	EMBEDDINGGEMMA2_ONNX_AUDIO_MAX_SAMPLES_V1,
+	EMBEDDINGGEMMA2_ONNX_AUDIO_PREPROCESSING_REVISION_V1,
+	EMBEDDINGGEMMA2_ONNX_AUDIO_SAMPLE_RATE_V1,
+	EMBEDDINGGEMMA2_ONNX_MODEL_ARTIFACT_SHA256_V1,
+	readPcm16MonoWavWindowV1,
+} from '$lib/server/evidence/embeddinggemma2-onnx-image-v1.js';
+import {
+	embedEvidenceAudioViaEg2WorkerV1,
+	embedEvidenceImageViaEg2WorkerV1,
+	embedEvidenceTextViaEg2WorkerV1,
+} from '$lib/server/evidence/eg2-onnx-worker-client.js';
+import { persistEvidenceMultimodalVectorV1 } from '$lib/server/evidence/evidence-multimodal-vector-persistence-v1.js';
+import { EVIDENCE_AUDIO_CONTENT_REPRESENTATION_V1 } from '$lib/server/evidence/evidence-multimodal-vector-persistence-v1.js';
+import {
+	createVideoSkimPreviewTileV1,
+	extractVideoSkimPreviewV1,
+	VIDEO_SKIM_PREVIEW_FRAME_HEIGHT_V1,
+	VIDEO_SKIM_PREVIEW_FRAME_WIDTH_V1,
+	VIDEO_SKIM_PREVIEW_PROCESSING_REVISION_V1,
+	VIDEO_SKIM_PREVIEW_SCHEMA_V1,
+	VIDEO_SKIM_PREVIEW_TILE_COLUMNS_V1,
+	VIDEO_SKIM_PREVIEW_TILE_FRAMES_V1,
+	VIDEO_SKIM_PREVIEW_TILE_HEIGHT_V1,
+	VIDEO_SKIM_PREVIEW_TILE_ROWS_V1,
+	VIDEO_SKIM_PREVIEW_TILE_WIDTH_V1,
+	videoSkimPreviewManifestV1Schema,
+	type VideoSkimPreviewManifestV1,
+	type VideoSkimPreviewTileV1,
+} from './video-skim-preview-v1.js';
 
 const MAX_VIDEO_BYTES_V1 = 2 * 1024 * 1024 * 1024;
 const MAX_FRAME_SAMPLES_V1 = 60;
 const MAX_AUDIO_ARTIFACT_BYTES_V1 = 512 * 1024 * 1024;
+const MAX_VIDEO_TRANSCRIPT_EMBEDDINGS_V1 = 32;
+const MAX_FRAME_OCR_CHARS_V1 = 4000;
+const MAX_VIDEO_AUDIO_EMBEDDINGS_V1 = 8;
 const VIDEO_ANALYSIS_REVISION_V1 = 'video-analysis-v1';
+export const VIDEO_FRAME_SAMPLING_POLICY_V1 = 'ffmpeg-evenly-spaced-max-60-pts-v1' as const;
+export const VIDEO_AUDIO_EMBEDDING_SAMPLING_POLICY_V1 = 'pcm16-16khz-nonoverlap-even-windows-max-8x30s-v1' as const;
+
+/** Explicit audio coverage of the bounded sampling policy; a sample is never reported as full-recording coverage. */
+export type VideoAudioEmbeddingCoverageV1 = {
+	policy: typeof VIDEO_AUDIO_EMBEDDING_SAMPLING_POLICY_V1;
+	sourceDurationMs: number;
+	candidateWindowCount: number;
+	selectedWindowCount: number;
+	completedWindowCount: number;
+	failedWindowCount: number;
+	resumedWindowCount: number;
+	coveredMs: number;
+};
+
+export function computeVideoFrameSampleRateV1(durationSeconds: number, maxFrames = MAX_FRAME_SAMPLES_V1): number {
+	if (!Number.isFinite(durationSeconds) || durationSeconds <= 0 || !Number.isSafeInteger(maxFrames) || maxFrames < 1) {
+		throw new Error('VIDEO_FRAME_SAMPLING_INPUT_INVALID');
+	}
+	return Math.max(1 / 3600, Math.min(1, maxFrames / durationSeconds));
+}
 
 export interface VideoDerivedArtifactV1 {
 	bucket: string;
@@ -31,6 +89,13 @@ export interface VideoDerivedArtifactV1 {
 	analysisRevision?: string;
 }
 
+export interface VideoFrameOcrV1 {
+	engine: 'tesseract';
+	status: 'COMPLETED' | 'EMPTY' | 'FAILED';
+	text: string;
+	error?: string;
+}
+
 export interface VideoFrameProposalV1 {
 	frameIndex: number;
 	timestampMs: number;
@@ -39,6 +104,7 @@ export interface VideoFrameProposalV1 {
 	objects: Array<{ label: string; confidence: number; bbox: [number, number, number, number] }>;
 	modelRevision: string | null;
 	artifact: VideoDerivedArtifactV1;
+	ocr?: VideoFrameOcrV1;
 	sourceRevision: string;
 	analysisRevision: string;
 	reviewState: 'UNREVIEWED_PROPOSAL';
@@ -53,34 +119,103 @@ export interface CanonicalVideoAnalysisV1Input {
 	fileName: string;
 	bytes: Buffer;
 	onProgress?: (stage: AnalysisJobProgressStageV1) => Promise<void> | void;
+	onFrameProgress?: (progress: VideoFrameProgressV1) => Promise<void> | void;
 }
 
 export interface CanonicalVideoAnalysisV1Receipt {
 	canonicalReceiptVerified: true;
-	chunkCount: 0;
-	persistedCount: 0;
+	chunkCount: number;
+	persistedCount: number;
 	sourceRevision: string;
 	analysisRevision: string;
-	representationId: 'video-analysis-v1';
-	canonicalStore: 'postgresql.evidence+audio_transcripts+whisper_segments';
+	representationId: string;
+	canonicalStore: string;
+	readback: {
+		evidenceRowCount: number;
+		frameFindingCount: number;
+		transcriptRowCount: number;
+		transcriptSegmentCount: number;
+		canonicalRecordCount: number;
+		vectorCount: number;
+	};
 	analysis: {
 		status: 'COMPLETE' | 'PARTIAL';
-		transcriptionStatus: 'COMPLETED' | 'SKIPPED_NO_AUDIO' | 'FAILED';
+		transcriptionStatus: 'COMPLETED' | 'SKIPPED_NO_AUDIO' | 'TRANSCRIPTION_BINARY_UNAVAILABLE' | 'FAILED';
 		transcriptSegmentCount: number;
 		detectorStatus: 'COMPLETED' | 'UNAVAILABLE' | 'FAILED';
 		frameCount: number;
 		coverage: 'BOUNDED_SAMPLE_NOT_FULL_VIDEO_COVERAGE';
+		skimPreviewStatus: 'COMPLETED' | 'FAILED' | 'UNAVAILABLE';
+		skimPreviewSampleCount: number;
+		embeddingStatus?: 'COMPLETED' | 'UNAVAILABLE' | 'SKIPPED_NO_CONTENT';
+		audioEmbeddingStatus?: 'COMPLETED' | 'UNAVAILABLE' | 'SKIPPED_NO_AUDIO' | 'SKIPPED_FEATURE_DISABLED';
+		audioEmbeddingError?: string;
+		embeddedVectorCount?: number;
+	frameSamplingPolicy: typeof VIDEO_FRAME_SAMPLING_POLICY_V1;
+	frameSampleRateFps: number;
+		substages: {
+			probe: { status: 'COMPLETED'; hasVideoStream: boolean; hasAudioStream: boolean };
+			keyframes: { status: 'COMPLETED' | 'FAILED'; count: number; bucket: string };
+			yolo: { status: 'COMPLETED' | 'UNAVAILABLE' | 'FAILED'; error?: string };
+			transcription: { status: 'COMPLETED' | 'SKIPPED_NO_AUDIO' | 'TRANSCRIPTION_BINARY_UNAVAILABLE' | 'FAILED'; error?: string };
+			audioEmbedding: { status: 'COMPLETED' | 'UNAVAILABLE' | 'SKIPPED_NO_AUDIO' | 'SKIPPED_FEATURE_DISABLED'; error?: string; coverage?: VideoAudioEmbeddingCoverageV1 };
+		};
 	};
 }
 
+/**
+ * Optional durable window ledger (task 5.6). When absent, behaviour is unchanged. When present, windows
+ * already COMPLETED for the same source and analysis revision are skipped, and every outcome is recorded.
+ */
+export interface AudioWindowLedgerV1 {
+	completedWindowIndexes(input: { evidenceId: string; sourceRevision: string; analysisRevision: string }): Promise<Set<number>>;
+	recordWindow(input: {
+		evidenceId: string;
+		sourceRevision: string;
+		analysisRevision: string;
+		analysisJobId: string;
+		windowIndex: number;
+		startSample: number;
+		sampleCount: number;
+		status: 'COMPLETED' | 'FAILED';
+		vectorLocatorSha256?: string;
+		error?: string;
+	}): Promise<void>;
+}
+
+async function loadAudioWindowLedgerOrUndefinedV1(database: typeof db): Promise<AudioWindowLedgerV1 | undefined> {
+	try {
+		return await createAudioWindowLedgerIfAvailableV1(database as unknown as AudioWindowLedgerDatabaseV1);
+	} catch (error) {
+		// Resume is an optimisation; a probe failure disables it for this job and never fails the stage.
+		console.warn('[VideoAnalysis] audio window ledger unavailable; resume disabled:', error instanceof Error ? error.message : String(error));
+		return undefined;
+	}
+}
+
 export interface VideoAnalysisDependenciesV1 {
+	database: typeof db;
+	ensureCaseOwned(caseId: string, ownerId: string): Promise<void>;
+	modelDir: string | null;
+	audioEmbeddingsEnabled: boolean;
+	audioWindowLedger?: AudioWindowLedgerV1;
 	probe(path: string): ReturnType<typeof detectVideoAndAudioStreamsV1>;
-	extractFrames(bytes: Buffer): Promise<Array<{ timestampMs: number; buffer: Buffer }>>;
+	extractFrames(bytes: Buffer, options: { fps: number; maxFrames: number }): Promise<Array<{ timestampMs: number; buffer: Buffer }>>;
+	extractSkimPreview?(input: {
+		videoPath: string;
+		durationSeconds: number;
+		onTile(tile: { index: number; bytes: Buffer; sampleTimestampsMs: number[]; firstSampleIndex: number }): Promise<void>;
+	}): Promise<{ sampleIntervalMs: number; sampleTimestampsMs: number[]; tileCount: number }>;
 	frameDimensions(buffer: Buffer): Promise<{ width: number; height: number }>;
+		ocrFrame?(buffer: Buffer): Promise<{ text: string; error?: string }>;
 	extractAudio(path: string, workDir: string): Promise<string>;
 	transcribe(path: string, jobId: string): ReturnType<typeof transcribeVideoAudio>;
 	readArtifactFile(path: string): Promise<Buffer>;
 	artifactFileSize(path: string): Promise<number>;
+	embedFrame(buffer: Buffer, modelDir: string): ReturnType<typeof embedEvidenceImageWithEmbeddingGemma2OnnxV1>;
+	embedAudio(pcm: Float32Array, sampleRate: number, modelDir: string): ReturnType<typeof embedEvidenceAudioWithEmbeddingGemma2OnnxV1>;
+	embedTranscript(text: string, modelDir: string): ReturnType<typeof embedEvidenceTextWithEmbeddingGemma2OnnxV1>;
+	persistVector: typeof persistEvidenceMultimodalVectorV1;
 	uploadArtifact(bucket: string, objectKey: string, bytes: Buffer, metadata: Record<string, string>): Promise<void>;
 	statArtifact(bucket: string, objectKey: string): Promise<{ size: number }>;
 	loadDetector(): Promise<{
@@ -95,19 +230,63 @@ export interface VideoAnalysisDependenciesV1 {
 		analysisJobId: string;
 		sourceRevision: string;
 		analysisRevision: string;
+		samplingFps: number;
 		probe: Awaited<ReturnType<typeof detectVideoAndAudioStreamsV1>>;
 		transcript: Awaited<ReturnType<typeof transcribeVideoAudio>> | null;
 		audioArtifact: VideoDerivedArtifactV1 | null;
 		frames: VideoFrameProposalV1[];
-		transcriptionStatus: 'COMPLETED' | 'SKIPPED_NO_AUDIO' | 'FAILED';
+		transcriptionStatus: 'COMPLETED' | 'SKIPPED_NO_AUDIO' | 'TRANSCRIPTION_BINARY_UNAVAILABLE' | 'FAILED';
 		transcriptionError?: string;
 		detectorStatus: 'COMPLETED' | 'UNAVAILABLE' | 'FAILED';
 		detectorError?: string;
-	}): Promise<void>;
+		embeddingStatus?: 'COMPLETED' | 'UNAVAILABLE' | 'SKIPPED_NO_CONTENT';
+		audioEmbeddingStatus?: 'COMPLETED' | 'UNAVAILABLE' | 'SKIPPED_NO_AUDIO' | 'SKIPPED_FEATURE_DISABLED';
+		audioEmbeddingError?: string;
+		embeddedVectorCount?: number;
+		skimPreview: VideoSkimPreviewManifestV1 | null;
+		skimPreviewStatus: 'COMPLETED' | 'FAILED' | 'UNAVAILABLE';
+		skimPreviewError?: string;
+	}, database: typeof db): Promise<{
+		evidenceRowCount: number;
+		frameFindingCount: number;
+		transcriptRowCount: number;
+		transcriptSegmentCount: number;
+	skimTileCount: number;
+	skimSampleCount: number;
+	}>;
 }
 
 function sha256(bytes: Uint8Array): string {
 	return createHash('sha256').update(bytes).digest('hex');
+}
+
+export interface VideoFrameProgressV1 {
+	phase: 'frame_ocr' | 'frame_embedding';
+	completed: number;
+	total: number;
+	percent: number;
+	etaMs: number | null;
+}
+
+/** Linear ETA from elapsed time per completed frame. Null until one frame has finished. */
+export function frameProgressV1(
+	phase: VideoFrameProgressV1['phase'],
+	completed: number,
+	total: number,
+	startedAtMs: number,
+	nowMs: number = Date.now(),
+): VideoFrameProgressV1 {
+	const percent = total > 0 ? Math.round((100 * completed) / total) : 100;
+	let etaMs: number | null = null;
+	if (completed >= total) etaMs = 0;
+	else if (completed > 0) etaMs = Math.round(((nowMs - startedAtMs) / completed) * (total - completed));
+	return { phase, completed, total, percent, etaMs };
+}
+
+function selectEvenly<T>(items: T[], limit: number): T[] {
+	if (items.length <= limit) return items;
+	if (limit === 1) return [items[Math.floor((items.length - 1) / 2)]];
+	return Array.from({ length: limit }, (_, index) => items[Math.round(index * (items.length - 1) / (limit - 1))]);
 }
 
 function derivedObjectKey(input: CanonicalVideoAnalysisV1Input, kind: 'audio' | 'frame', index?: number): string {
@@ -188,8 +367,18 @@ async function loadDetectorV1(): Promise<NonNullable<VideoAnalysisDependenciesV1
 	}
 }
 
-async function persistCanonicalVideoAnalysisV1(input: Parameters<VideoAnalysisDependenciesV1['persist']>[0]): Promise<void> {
-	await db.transaction(async (tx) => {
+export async function persistCanonicalVideoAnalysisV1(
+	input: Parameters<VideoAnalysisDependenciesV1['persist']>[0],
+	database: typeof db = db,
+): Promise<{
+	evidenceRowCount: number;
+	frameFindingCount: number;
+	transcriptRowCount: number;
+	transcriptSegmentCount: number;
+	skimTileCount: number;
+	skimSampleCount: number;
+}> {
+	await database.transaction(async (tx) => {
 		if (input.transcript) {
 			await tx.insert(audioTranscripts).values({
 				id: input.analysisJobId,
@@ -253,7 +442,31 @@ async function persistCanonicalVideoAnalysisV1(input: Parameters<VideoAnalysisDe
 			analysisRevision: input.analysisRevision,
 			analysisJobId: input.analysisJobId,
 			sourceRevision: input.sourceRevision,
-			status: input.transcriptionStatus === 'FAILED' || input.detectorStatus !== 'COMPLETED' ? 'PARTIAL' : 'COMPLETE',
+			status: input.transcriptionStatus === 'FAILED' || input.transcriptionStatus === 'TRANSCRIPTION_BINARY_UNAVAILABLE' || input.detectorStatus !== 'COMPLETED' || input.embeddingStatus === 'UNAVAILABLE' || input.audioEmbeddingStatus === 'UNAVAILABLE' ? 'PARTIAL' : 'COMPLETE',
+			substages: {
+				probe: {
+					status: 'COMPLETED' as const,
+					hasVideoStream: input.probe.hasVideoStream,
+					hasAudioStream: input.probe.hasAudioStream,
+				},
+				keyframes: {
+					status: input.frames.length > 0 ? ('COMPLETED' as const) : ('FAILED' as const),
+					count: input.frames.length,
+					bucket: 'atlas-artifacts',
+				},
+				yolo: {
+					status: input.detectorStatus,
+					...(input.detectorError ? { error: input.detectorError } : {}),
+				},
+				transcription: {
+					status: input.transcriptionStatus,
+					...(input.transcriptionError ? { error: input.transcriptionError } : {}),
+				},
+				audioEmbedding: {
+					status: input.audioEmbeddingStatus ?? (input.probe.hasAudioStream ? 'UNAVAILABLE' : 'SKIPPED_NO_AUDIO'),
+					...(input.audioEmbeddingError ? { error: input.audioEmbeddingError } : {}),
+				},
+			},
 			probe: {
 				hasVideoStream: input.probe.hasVideoStream,
 				hasAudioStream: input.probe.hasAudioStream,
@@ -267,37 +480,157 @@ async function persistCanonicalVideoAnalysisV1(input: Parameters<VideoAnalysisDe
 				streams: input.probe.streams,
 			},
 			sampling: {
-				policy: 'ffmpeg-fps-1-pts-v1',
+				policy: VIDEO_FRAME_SAMPLING_POLICY_V1,
 				maxFrames: MAX_FRAME_SAMPLES_V1,
 				coverage: 'BOUNDED_SAMPLE_NOT_FULL_VIDEO_COVERAGE',
+				fps: input.samplingFps,
 				sampledStartMs: input.frames[0]?.timestampMs ?? null,
 				sampledEndMs: input.frames.at(-1)?.timestampMs ?? null,
 			},
 			transcriptionStatus: input.transcriptionStatus,
+			embeddingStatus: input.embeddingStatus,
+			audioEmbeddingStatus: input.audioEmbeddingStatus ?? (input.probe.hasAudioStream ? 'UNAVAILABLE' : 'SKIPPED_NO_AUDIO'),
+			...(input.audioEmbeddingError ? { audioEmbeddingError: input.audioEmbeddingError } : {}),
+			embeddedVectorCount: input.embeddedVectorCount,
 			audioArtifact: input.audioArtifact,
 			...(input.transcriptionError ? { transcriptionError: input.transcriptionError } : {}),
 			detectorStatus: input.detectorStatus,
 			...(input.detectorError ? { detectorError: input.detectorError } : {}),
 			frames: input.frames,
+			skimPreview: input.skimPreview,
+			skimPreviewStatus: input.skimPreviewStatus,
+			...(input.skimPreviewError ? { skimPreviewError: input.skimPreviewError } : {}),
 		};
 
-		const updated = await tx.update(evidence).set({
+		// Derived frame detector labels for viewer cards (prefixed `detected:`, unreviewed).
+			const videoDetectorLabels = [...new Set(input.frames.flatMap((frame) =>
+				((frame as { objects?: Array<{ label?: string }> }).objects ?? [])
+					.map((obj) => obj.label)
+					.filter((label): label is string => typeof label === 'string' && label.length > 0)
+					.map((label) => `detected:${label}`)
+			))];
+			const updated = await tx.update(evidence).set({
+				...(videoDetectorLabels.length > 0 ? { aiTags: videoDetectorLabels } : {}),
+				videoCodec: analysis.probe?.videoCodec ?? null,
+				audioCodec: analysis.probe?.streams?.find((stream) => stream.codecType === 'audio')?.codecName ?? null,
+				durationSeconds: typeof analysis.probe?.durationSeconds === 'number' ? analysis.probe.durationSeconds.toFixed(3) : null,
+				frameCount: Array.isArray(analysis.frames) ? analysis.frames.length : null,
 			aiAnalysis: sql`COALESCE(${evidence.aiAnalysis}, '{}'::jsonb) || jsonb_build_object('videoAnalysis', ${JSON.stringify(analysis)}::jsonb)`,
 		}).where(and(
 			eq(evidence.id, input.evidenceId),
 			eq(evidence.caseId, input.caseId),
-			eq(evidence.hash, input.sourceRevision.slice('sha256:'.length)),
+			eq(evidence.hash, input.sourceRevision),
 			isNull(evidence.deletedAt),
 		)).returning({ id: evidence.id });
 		if (!updated.length) throw new Error('EVIDENCE_VIDEO_SOURCE_REVISION_STALE');
 	});
+
+	// Read after commit so a success receipt means canonical results were independently
+	// visible, not merely accepted by the transaction or written to SeaweedFS.
+	const [evidenceReadback] = await database.select({
+		hash: evidence.hash,
+		aiAnalysis: evidence.aiAnalysis,
+	}).from(evidence).where(and(
+		eq(evidence.id, input.evidenceId),
+		eq(evidence.caseId, input.caseId),
+		eq(evidence.hash, input.sourceRevision),
+		isNull(evidence.deletedAt),
+	)).limit(1);
+	const aiAnalysis = evidenceReadback?.aiAnalysis as Record<string, unknown> | null | undefined;
+	const videoAnalysis = aiAnalysis?.videoAnalysis as Record<string, unknown> | undefined;
+	const storedFrames = Array.isArray(videoAnalysis?.frames) ? videoAnalysis.frames : [];
+	const parsedStoredSkimPreview = videoSkimPreviewManifestV1Schema.safeParse(videoAnalysis?.skimPreview);
+	const storedSkimPreview = parsedStoredSkimPreview.success ? parsedStoredSkimPreview.data : null;
+	if (
+		!videoAnalysis ||
+		videoAnalysis.sourceRevision !== input.sourceRevision ||
+		videoAnalysis.analysisRevision !== input.analysisRevision ||
+		videoAnalysis.skimPreviewStatus !== input.skimPreviewStatus ||
+		storedFrames.length !== input.frames.length ||
+		storedFrames.some((value) => {
+			if (!value || typeof value !== 'object') return true;
+			const frame = value as Record<string, unknown>;
+			return frame.sourceRevision !== input.sourceRevision || frame.analysisRevision !== input.analysisRevision || frame.reviewState !== 'UNREVIEWED_PROPOSAL';
+		})
+	) {
+		throw new Error('EVIDENCE_VIDEO_CANONICAL_READBACK_MISMATCH');
+	}
+	if (input.skimPreview && (
+		!storedSkimPreview ||
+		storedSkimPreview.sourceRevision !== input.sourceRevision ||
+		storedSkimPreview.analysisRevision !== input.analysisRevision ||
+		JSON.stringify(storedSkimPreview.sampleTimestampsMs) !== JSON.stringify(input.skimPreview.sampleTimestampsMs) ||
+		storedSkimPreview.tiles.length !== input.skimPreview.tiles.length ||
+		storedSkimPreview.tiles.some((tile, index) => {
+			const expected = input.skimPreview?.tiles[index];
+			return !expected || tile.index !== expected.index || tile.objectKey !== expected.objectKey ||
+				tile.sha256 !== expected.sha256 || tile.byteLength !== expected.byteLength ||
+				tile.firstSampleIndex !== expected.firstSampleIndex || tile.sampleCount !== expected.sampleCount;
+		})
+	)) throw new Error('EVIDENCE_VIDEO_SKIM_READBACK_MISMATCH');
+
+	let transcriptRowCount = 0;
+	let transcriptSegmentCount = 0;
+	if (input.transcript) {
+		const transcriptRows = await database.select({ metadata: audioTranscripts.metadata })
+			.from(audioTranscripts)
+			.where(and(
+				eq(audioTranscripts.id, input.analysisJobId),
+				eq(audioTranscripts.evidenceId, input.evidenceId),
+				eq(audioTranscripts.caseId, input.caseId),
+			))
+			.limit(1);
+		const transcriptMetadata = transcriptRows[0]?.metadata as Record<string, unknown> | null | undefined;
+		if (
+			!transcriptMetadata ||
+			transcriptMetadata.sourceRevision !== input.sourceRevision ||
+			transcriptMetadata.analysisRevision !== input.analysisRevision
+		) {
+			throw new Error('EVIDENCE_VIDEO_TRANSCRIPT_READBACK_MISMATCH');
+		}
+		transcriptRowCount = transcriptRows.length;
+
+		const segments = await database.select({
+			segmentIndex: whisperSegments.segmentIndex,
+			startMs: whisperSegments.startMs,
+			endMs: whisperSegments.endMs,
+			text: whisperSegments.text,
+			metadata: whisperSegments.metadata,
+		}).from(whisperSegments).where(and(
+			eq(whisperSegments.transcriptId, input.analysisJobId),
+			eq(whisperSegments.evidenceId, input.evidenceId),
+		));
+		const expectedSegments = input.transcript.chunks;
+		if (segments.length !== expectedSegments.length || segments.some((segment) => {
+			const expected = expectedSegments[segment.segmentIndex];
+			const metadata = segment.metadata as Record<string, unknown> | null | undefined;
+			return !expected || segment.startMs !== expected.startMs || segment.endMs !== expected.endMs || segment.text !== expected.text ||
+				metadata?.sourceRevision !== input.sourceRevision || metadata?.analysisRevision !== input.analysisRevision;
+		})) {
+			throw new Error('EVIDENCE_VIDEO_TRANSCRIPT_SEGMENT_READBACK_MISMATCH');
+		}
+		transcriptSegmentCount = segments.length;
+	}
+
+	return {
+		evidenceRowCount: 1,
+		frameFindingCount: storedFrames.length,
+		transcriptRowCount,
+		transcriptSegmentCount,
+		skimTileCount: input.skimPreview?.tiles.length ?? 0,
+		skimSampleCount: input.skimPreview?.sampleTimestampsMs.length ?? 0,
+	};
 }
 
 const defaultDependencies: VideoAnalysisDependenciesV1 = {
+	database: db,
+	ensureCaseOwned,
+	modelDir: ENV.ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR?.trim() || null,
+	audioEmbeddingsEnabled: ENV.ATLAS_EMBEDDINGGEMMA2_AUDIO_SEGMENTS_ENABLED === true,
 	probe: detectVideoAndAudioStreamsV1,
-	extractFrames: async (bytes) => {
+		extractFrames: async (bytes, options) => {
 		const { VisionService } = await import('$lib/server/evidence/video/vision-service.js');
-		return new VisionService().extractFrames(bytes, { fps: 1, maxFrames: MAX_FRAME_SAMPLES_V1, scaleWidth: 768 });
+			return new VisionService().extractFrames(bytes, { fps: options.fps, maxFrames: options.maxFrames, scaleWidth: 768 });
 	},
 	frameDimensions: async (buffer) => {
 		const sharpModule = await import('sharp');
@@ -305,17 +638,28 @@ const defaultDependencies: VideoAnalysisDependenciesV1 = {
 		if (!metadata.width || !metadata.height) throw new Error('VIDEO_FRAME_DIMENSIONS_UNAVAILABLE');
 		return { width: metadata.width, height: metadata.height };
 	},
+	ocrFrame: async (buffer) => {
+			const { extractTextFromImage } = await import('$lib/server/ocr/tesseract.js');
+			return extractTextFromImage(buffer, 'frame.jpg');
+		},
+		embedFrame: async (buffer, modelDir) => embedEvidenceImageViaEg2WorkerV1({ buffer, modelDir }),
+	embedAudio: async (pcm, sampleRate, modelDir) => embedEvidenceAudioViaEg2WorkerV1({ pcm, sampleRate, modelDir }),
+	embedTranscript: async (text, modelDir) => embedEvidenceTextViaEg2WorkerV1({ text, kind: 'document', modelDir }),
+	persistVector: persistEvidenceMultimodalVectorV1,
 	extractAudio: extractAudioTrack,
 	transcribe: transcribeVideoAudio,
 	readArtifactFile: readFile,
 	artifactFileSize: async (path) => (await stat(path)).size,
-	uploadArtifact: async (bucket, objectKey, bytes, metadata) => uploadSeaweedFile(bucket, objectKey, bytes, metadata),
+	uploadArtifact: async (bucket, objectKey, bytes, metadata) => {
+		await uploadSeaweedFile(bucket, objectKey, bytes, metadata);
+	},
 	statArtifact: async (bucket, objectKey) => {
 		const result = await statSeaweedObject(bucket, objectKey);
 		return { size: result.size };
 	},
+	extractSkimPreview: extractVideoSkimPreviewV1,
 	loadDetector: loadDetectorV1,
-	persist: persistCanonicalVideoAnalysisV1,
+	persist: (input, database) => persistCanonicalVideoAnalysisV1(input, database),
 };
 
 export async function processCanonicalVideoAnalysisV1(
@@ -328,14 +672,15 @@ export async function processCanonicalVideoAnalysisV1(
 	if (!/^sha256:[a-f0-9]{64}$/.test(input.sourceRevision)) throw new Error('EVIDENCE_VIDEO_SOURCE_REVISION_INVALID');
 	if (input.bytes.byteLength === 0 || input.bytes.byteLength > MAX_VIDEO_BYTES_V1) throw new Error('EVIDENCE_VIDEO_SOURCE_SIZE_INVALID');
 	if (`sha256:${sha256(input.bytes)}` !== input.sourceRevision) throw new Error('EVIDENCE_VIDEO_SOURCE_SHA256_MISMATCH');
+	const sourceSha256 = input.sourceRevision.slice('sha256:'.length);
 
-	await ensureCaseOwned(input.caseId, String(input.uploadedBy));
-	const [currentSource] = await db.select({ id: evidence.id })
+	await dependencies.ensureCaseOwned(input.caseId, String(input.uploadedBy));
+	const [currentSource] = await dependencies.database.select({ id: evidence.id })
 		.from(evidence)
 		.where(and(
 			eq(evidence.id, input.evidenceId),
 			eq(evidence.caseId, input.caseId),
-			eq(evidence.hash, input.sourceRevision.slice('sha256:'.length)),
+			eq(evidence.hash, input.sourceRevision),
 			isNull(evidence.deletedAt),
 		))
 		.limit(1);
@@ -355,9 +700,10 @@ export async function processCanonicalVideoAnalysisV1(
 		if (!probe.hasVideoStream) throw new Error('VIDEO_STREAM_NOT_FOUND');
 
 		let transcription: Awaited<ReturnType<typeof transcribeVideoAudio>> | null = null;
-		let transcriptionStatus: 'COMPLETED' | 'SKIPPED_NO_AUDIO' | 'FAILED' = 'SKIPPED_NO_AUDIO';
+		let transcriptionStatus: 'COMPLETED' | 'SKIPPED_NO_AUDIO' | 'TRANSCRIPTION_BINARY_UNAVAILABLE' | 'FAILED' = 'SKIPPED_NO_AUDIO';
 		let transcriptionError: string | undefined;
 		let audioArtifact: VideoDerivedArtifactV1 | null = null;
+		let audioBytes: Buffer | null = null;
 		if (probe.hasAudioStream) {
 			let audioPath: string;
 			try {
@@ -371,7 +717,7 @@ export async function processCanonicalVideoAnalysisV1(
 				if (!Number.isSafeInteger(audioFileSize) || audioFileSize <= 0 || audioFileSize > MAX_AUDIO_ARTIFACT_BYTES_V1) {
 					throw new Error('VIDEO_AUDIO_ARTIFACT_SIZE_OUT_OF_BOUNDS');
 				}
-				const audioBytes = await dependencies.readArtifactFile(audioPath!);
+				audioBytes = Buffer.from(await dependencies.readArtifactFile(audioPath!));
 				if (audioBytes.byteLength !== audioFileSize) throw new Error('VIDEO_AUDIO_ARTIFACT_SIZE_CHANGED');
 				audioArtifact = await storeDerivedArtifactV1({
 					job: input,
@@ -395,18 +741,68 @@ export async function processCanonicalVideoAnalysisV1(
 					};
 					transcriptionStatus = 'COMPLETED';
 				} catch (error) {
-					transcriptionStatus = 'FAILED';
-					transcriptionError = (error instanceof Error ? error.message : String(error)).slice(0, 180);
+					const msg = error instanceof Error ? error.message : String(error);
+					transcriptionStatus = msg.includes('TRANSCRIPTION_BINARY_UNAVAILABLE') ? 'TRANSCRIPTION_BINARY_UNAVAILABLE' : 'FAILED';
+					transcriptionError = msg.slice(0, 180);
 				}
 			}
 		}
 
-		const extractedFrames = await dependencies.extractFrames(input.bytes);
+		const samplingFps = computeVideoFrameSampleRateV1(probe.durationSeconds, MAX_FRAME_SAMPLES_V1);
+		const extractedFrames = await dependencies.extractFrames(input.bytes, { fps: samplingFps, maxFrames: MAX_FRAME_SAMPLES_V1 });
+		const skimPreviewAssets: VideoSkimPreviewTileV1[] = [];
+		let skimPreviewTimesMs: number[] = [];
+		let skimPreviewIntervalMs = 0;
+		let skimPreviewStatus: 'COMPLETED' | 'FAILED' | 'UNAVAILABLE' = 'UNAVAILABLE';
+		let skimPreviewError: string | undefined;
+		if (dependencies.extractSkimPreview) {
+			try {
+				await input.onProgress?.('content_analysis');
+				const extractedSkim = await dependencies.extractSkimPreview({
+					videoPath: sourcePath,
+					durationSeconds: probe.durationSeconds,
+					onTile: async (tile) => {
+						const digest = sha256(tile.bytes);
+						const bucket = ENV.SEAWEED_ARTIFACTS_BUCKET || ARTIFACTS_BUCKET;
+						assertArtifactBucket(bucket);
+						const objectKey = `evidence/${input.caseId}/${input.evidenceId}/${sourceSha256}/skim-preview-v1/tile-${String(tile.index).padStart(4, '0')}-${digest}.jpg`;
+						await dependencies.uploadArtifact(bucket, objectKey, tile.bytes, {
+							'Content-Type': 'image/jpeg',
+						'x-evidence-id': input.evidenceId,
+						'x-case-id': input.caseId,
+						'x-source-revision': input.sourceRevision,
+						'x-artifact-sha256': `sha256:${digest}`,
+						'x-processing-revision': VIDEO_SKIM_PREVIEW_PROCESSING_REVISION_V1,
+					});
+						const statResult = await dependencies.statArtifact(bucket, objectKey);
+						if (statResult.size !== tile.bytes.byteLength) throw new Error('VIDEO_SKIM_TILE_READBACK_SIZE_MISMATCH');
+						skimPreviewAssets.push(createVideoSkimPreviewTileV1({
+							index: tile.index,
+							bytes: tile.bytes,
+							firstSampleIndex: tile.firstSampleIndex,
+							sampleCount: tile.sampleTimestampsMs.length,
+							objectKey,
+						}));
+					},
+				});
+				skimPreviewIntervalMs = extractedSkim.sampleIntervalMs;
+				skimPreviewTimesMs = extractedSkim.sampleTimestampsMs;
+				if (extractedSkim.tileCount !== skimPreviewAssets.length || skimPreviewAssets.length === 0) throw new Error('VIDEO_SKIM_TILE_COUNT_MISMATCH');
+				skimPreviewStatus = 'COMPLETED';
+			} catch (error) {
+				skimPreviewStatus = 'FAILED';
+				skimPreviewError = (error instanceof Error ? error.message : String(error)).slice(0, 180);
+				skimPreviewAssets.length = 0;
+				skimPreviewTimesMs = [];
+			}
+		}
 		const detector = await dependencies.loadDetector();
 		const frames: Array<Omit<VideoFrameProposalV1, 'sourceRevision' | 'analysisRevision'>> = [];
 		let detectorStatus: 'COMPLETED' | 'UNAVAILABLE' | 'FAILED' = detector ? 'COMPLETED' : 'UNAVAILABLE';
 		let detectorError: string | undefined;
-		for (let frameIndex = 0; frameIndex < extractedFrames.length && frameIndex < MAX_FRAME_SAMPLES_V1; frameIndex += 1) {
+		const ocrTotal = Math.min(extractedFrames.length, MAX_FRAME_SAMPLES_V1);
+			const ocrStartedAt = Date.now();
+			for (let frameIndex = 0; frameIndex < extractedFrames.length && frameIndex < MAX_FRAME_SAMPLES_V1; frameIndex += 1) {
 			const frame = extractedFrames[frameIndex];
 			const { width: resizedWidth, height: resizedHeight } = await dependencies.frameDimensions(frame.buffer);
 			const objects: VideoFrameProposalV1['objects'] = [];
@@ -435,7 +831,21 @@ export async function processCanonicalVideoAnalysisV1(
 				upload: dependencies.uploadArtifact,
 				stat: dependencies.statArtifact,
 			});
-			frames.push({
+			let ocr: VideoFrameOcrV1 | undefined;
+				if (dependencies.ocrFrame) {
+					try {
+						const result = await dependencies.ocrFrame(frame.buffer);
+						const text = result.text.trim().slice(0, MAX_FRAME_OCR_CHARS_V1);
+						ocr = result.error
+							? { engine: 'tesseract', status: 'FAILED', text: '', error: result.error.slice(0, 180) }
+							: { engine: 'tesseract', status: text ? 'COMPLETED' : 'EMPTY', text };
+					} catch (error) {
+						ocr = { engine: 'tesseract', status: 'FAILED', text: '', error: (error instanceof Error ? error.message : String(error)).slice(0, 180) };
+					}
+				}
+				await input.onFrameProgress?.(frameProgressV1('frame_ocr', frameIndex + 1, ocrTotal, ocrStartedAt));
+				frames.push({
+					ocr,
 				frameIndex,
 				timestampMs: frame.timestampMs,
 				width: probe.width ?? resizedWidth,
@@ -451,8 +861,20 @@ export async function processCanonicalVideoAnalysisV1(
 			sourceRevision: input.sourceRevision,
 			jobId: input.analysisJobId,
 			frameCount: frames.length,
+			skimProcessingRevision: VIDEO_SKIM_PREVIEW_PROCESSING_REVISION_V1,
+			skimSampleCount: skimPreviewTimesMs.length,
+			skimSampleIntervalMs: skimPreviewIntervalMs,
+			samplingPolicy: VIDEO_FRAME_SAMPLING_POLICY_V1,
+			samplingFps,
 			modelRevision: detector?.modelRevision ?? 'unavailable',
 			whisperModel: transcription ? ENV.WHISPER_MODEL || 'whisper' : null,
+			embeddingModelArtifactSha256: dependencies.modelDir ? EMBEDDINGGEMMA2_ONNX_MODEL_ARTIFACT_SHA256_V1 : null,
+			frameEmbeddingPolicy: 'ALL_SAMPLED_FRAMES_V1',
+			audioEmbeddingLimit: MAX_VIDEO_AUDIO_EMBEDDINGS_V1,
+			audioEmbeddingWindowSamples: EMBEDDINGGEMMA2_ONNX_AUDIO_MAX_SAMPLES_V1,
+			audioEmbeddingSamplingPolicy: VIDEO_AUDIO_EMBEDDING_SAMPLING_POLICY_V1,
+			audioEmbeddingPreprocessingRevision: EMBEDDINGGEMMA2_ONNX_AUDIO_PREPROCESSING_REVISION_V1,
+			transcriptEmbeddingLimit: MAX_VIDEO_TRANSCRIPT_EMBEDDINGS_V1,
 		})))}`;
 		const revisionBoundFrames = frames.map((frame) => ({
 			...frame,
@@ -461,37 +883,258 @@ export async function processCanonicalVideoAnalysisV1(
 			artifact: { ...frame.artifact, analysisRevision },
 		}));
 		const revisionBoundAudioArtifact = audioArtifact ? { ...audioArtifact, analysisRevision } : null;
-		await dependencies.persist({
+		const skimPreview: VideoSkimPreviewManifestV1 | null = skimPreviewStatus === 'COMPLETED' ? {
+			schema: VIDEO_SKIM_PREVIEW_SCHEMA_V1,
+			status: 'COMPLETED',
+			sourceRevision: input.sourceRevision,
+			analysisRevision,
+			processingRevision: VIDEO_SKIM_PREVIEW_PROCESSING_REVISION_V1,
+			durationMs: Math.ceil(probe.durationSeconds * 1000),
+			sampleIntervalMs: skimPreviewIntervalMs,
+			coverage: 'FULL_DURATION_SAMPLED_NOT_EVERY_SOURCE_FRAME',
+			sampleTimestampsMs: skimPreviewTimesMs,
+			tileLayout: {
+				frameWidth: VIDEO_SKIM_PREVIEW_FRAME_WIDTH_V1,
+				frameHeight: VIDEO_SKIM_PREVIEW_FRAME_HEIGHT_V1,
+				framesPerTile: VIDEO_SKIM_PREVIEW_TILE_FRAMES_V1,
+				columns: VIDEO_SKIM_PREVIEW_TILE_COLUMNS_V1,
+				rows: VIDEO_SKIM_PREVIEW_TILE_ROWS_V1,
+				tileWidth: VIDEO_SKIM_PREVIEW_TILE_WIDTH_V1,
+				tileHeight: VIDEO_SKIM_PREVIEW_TILE_HEIGHT_V1,
+			},
+			tiles: skimPreviewAssets,
+		} : null;
+		const modelDir = dependencies.modelDir?.trim();
+		const hasEmbeddingContent = revisionBoundFrames.length > 0 || (transcription?.chunks.length ?? 0) > 0 || (dependencies.audioEmbeddingsEnabled && audioBytes !== null);
+		let embeddedVectorCount = 0;
+		let embeddingStatus: 'COMPLETED' | 'UNAVAILABLE' | 'SKIPPED_NO_CONTENT' = 'SKIPPED_NO_CONTENT';
+		let audioEmbeddingStatus: 'COMPLETED' | 'UNAVAILABLE' | 'SKIPPED_NO_AUDIO' | 'SKIPPED_FEATURE_DISABLED' = !probe.hasAudioStream
+			? 'SKIPPED_NO_AUDIO'
+			: !dependencies.audioEmbeddingsEnabled ? 'SKIPPED_FEATURE_DISABLED' : 'UNAVAILABLE';
+		let audioEmbeddingError: string | undefined;
+		let audioCoverage: VideoAudioEmbeddingCoverageV1 | undefined;
+		if (modelDir && hasEmbeddingContent) {
+			embeddingStatus = 'COMPLETED';
+			await input.onProgress?.('canonical_indexing');
+			const embeddingStartedAt = Date.now();
+				for (const [embeddedIndex, frame] of revisionBoundFrames.entries()) {
+				const frameSource = extractedFrames[frame.frameIndex];
+				if (!frameSource) throw new Error('VIDEO_FRAME_EMBEDDING_SOURCE_UNAVAILABLE');
+				const embedded = await dependencies.embedFrame(frameSource.buffer, modelDir);
+				if (embedded.inputSha256 !== frame.artifact.sha256) throw new Error('VIDEO_FRAME_EMBEDDING_INPUT_REVISION_MISMATCH');
+				await dependencies.persistVector(dependencies.database, {
+					evidenceId: input.evidenceId,
+					caseId: input.caseId,
+					sourceRevision: input.sourceRevision,
+					analysisRevision,
+					modality: 'video_frame',
+					sourceLocator: {
+						kind: 'sampled_video_frame', frameIndex: frame.frameIndex, timestampMs: frame.timestampMs,
+						streamTimeBase: probe.streams.find((stream) => stream.codecType === 'video')?.timeBase ?? null,
+						sourceWidth: frame.width, sourceHeight: frame.height,
+						artifactObjectKey: frame.artifact.objectKey, artifactSha256: frame.artifact.sha256,
+					},
+					embedding: embedded.embedding, model: embedded.model,
+					modelArtifactSha256: embedded.modelArtifactSha256,
+					preprocessingRevision: embedded.preprocessingRevision,
+					inputSha256: embedded.inputSha256, outputSha256: embedded.outputSha256,
+					metadata: { modelOutputReviewState: 'UNREVIEWED_PROPOSAL', detectorModelRevision: frame.modelRevision },
+				});
+				embeddedVectorCount += 1;
+				await input.onFrameProgress?.(frameProgressV1('frame_embedding', embeddedIndex + 1, revisionBoundFrames.length, embeddingStartedAt));
+			}
+			if (dependencies.audioEmbeddingsEnabled && audioBytes && revisionBoundAudioArtifact) {
+				const audioWindowLedger = dependencies.audioWindowLedger ?? await loadAudioWindowLedgerOrUndefinedV1(dependencies.database);
+				const windowSamples = EMBEDDINGGEMMA2_ONNX_AUDIO_MAX_SAMPLES_V1;
+				const audioInfo = readPcm16MonoWavWindowV1(audioBytes, 0, EMBEDDINGGEMMA2_ONNX_AUDIO_MAX_SAMPLES_V1).info;
+				const candidateCount = Math.ceil(audioInfo.sampleCount / windowSamples);
+				const selectedWindowIndexes = selectEvenly(Array.from({ length: candidateCount }, (_, index) => index), MAX_VIDEO_AUDIO_EMBEDDINGS_V1);
+				audioCoverage = {
+					policy: VIDEO_AUDIO_EMBEDDING_SAMPLING_POLICY_V1,
+					sourceDurationMs: Math.round(audioInfo.sampleCount * 1000 / EMBEDDINGGEMMA2_ONNX_AUDIO_SAMPLE_RATE_V1),
+					candidateWindowCount: candidateCount,
+					selectedWindowCount: selectedWindowIndexes.length,
+					completedWindowCount: 0,
+						failedWindowCount: 0,
+						resumedWindowCount: 0,
+						coveredMs: 0,
+					};
+					const ledgerKey = { evidenceId: input.evidenceId, sourceRevision: input.sourceRevision, analysisRevision };
+					const alreadyCompleted = audioWindowLedger
+						? await audioWindowLedger.completedWindowIndexes(ledgerKey)
+						: new Set<number>();
+					for (const windowIndex of selectedWindowIndexes) {
+						const startSample = windowIndex * windowSamples;
+						const windowSampleCount = Math.min(windowSamples, audioInfo.sampleCount - startSample);
+						if (alreadyCompleted.has(windowIndex)) {
+							// Resume: this window's vector was already persisted for this source and analysis revision.
+							audioCoverage.completedWindowCount += 1;
+							audioCoverage.resumedWindowCount += 1;
+							audioCoverage.coveredMs += Math.round(windowSampleCount * 1000 / EMBEDDINGGEMMA2_ONNX_AUDIO_SAMPLE_RATE_V1);
+							continue;
+						}
+						const { pcm } = readPcm16MonoWavWindowV1(audioBytes, startSample, windowSamples);
+						let embedded;
+						try {
+							embedded = await dependencies.embedAudio(pcm, EMBEDDINGGEMMA2_ONNX_AUDIO_SAMPLE_RATE_V1, modelDir);
+						} catch (error) {
+							// One failed window must not discard the remaining independent windows; the
+							// stage stays UNAVAILABLE (never COMPLETED) and coverage reports the failure.
+							const message = (error instanceof Error ? error.message : String(error)).slice(0, 180);
+							audioEmbeddingStatus = 'UNAVAILABLE';
+							audioEmbeddingError ??= message;
+							if (audioCoverage) audioCoverage.failedWindowCount += 1;
+							await audioWindowLedger?.recordWindow({
+								...ledgerKey, analysisJobId: input.analysisJobId, windowIndex, startSample,
+								sampleCount: windowSampleCount, status: 'FAILED', error: message,
+							});
+							continue;
+						}
+					const startMs = Math.round((probe.audioStartTimeSeconds ?? 0) * 1000 + startSample * 1000 / EMBEDDINGGEMMA2_ONNX_AUDIO_SAMPLE_RATE_V1);
+					const endMs = startMs + embedded.durationMs;
+					const persistedWindow = await dependencies.persistVector(dependencies.database, {
+						evidenceId: input.evidenceId,
+						caseId: input.caseId,
+						sourceRevision: input.sourceRevision,
+						analysisRevision,
+						modality: 'audio_segment',
+						representationId: EVIDENCE_AUDIO_CONTENT_REPRESENTATION_V1,
+						sourceLocator: {
+							kind: 'sampled_audio_window', windowIndex, startSample, sampleCount: pcm.length,
+							startMs, endMs, sampleRate: EMBEDDINGGEMMA2_ONNX_AUDIO_SAMPLE_RATE_V1,
+							samplingPolicy: VIDEO_AUDIO_EMBEDDING_SAMPLING_POLICY_V1,
+							audioArtifactObjectKey: revisionBoundAudioArtifact.objectKey,
+							audioArtifactSha256: revisionBoundAudioArtifact.sha256,
+						},
+						embedding: embedded.embedding, model: embedded.model,
+						modelArtifactSha256: embedded.modelArtifactSha256,
+						preprocessingRevision: embedded.preprocessingRevision,
+						inputSha256: embedded.inputSha256, outputSha256: embedded.outputSha256,
+						metadata: { representationKind: 'audio_content_embedding', modelRevision: embedded.modelRevision },
+					});
+					await audioWindowLedger?.recordWindow({
+						...ledgerKey, analysisJobId: input.analysisJobId, windowIndex, startSample,
+						sampleCount: pcm.length, status: 'COMPLETED', vectorLocatorSha256: persistedWindow.sourceLocatorSha256,
+					});
+					embeddedVectorCount += 1;
+					if (audioCoverage) {
+						audioCoverage.completedWindowCount += 1;
+						audioCoverage.coveredMs += Math.round(pcm.length * 1000 / EMBEDDINGGEMMA2_ONNX_AUDIO_SAMPLE_RATE_V1);
+					}
+				}
+				if (!audioEmbeddingError) audioEmbeddingStatus = 'COMPLETED';
+			}
+			for (const chunk of selectEvenly(transcription?.chunks ?? [], MAX_VIDEO_TRANSCRIPT_EMBEDDINGS_V1)) {
+				const embedded = await dependencies.embedTranscript(chunk.text, modelDir);
+				await dependencies.persistVector(dependencies.database, {
+					evidenceId: input.evidenceId,
+					caseId: input.caseId,
+					sourceRevision: input.sourceRevision,
+					analysisRevision,
+					modality: 'audio_segment',
+					sourceLocator: {
+						kind: 'transcript_segment', startMs: chunk.startMs, endMs: chunk.endMs,
+						streamTimeBase: probe.streams.find((stream) => stream.codecType === 'audio')?.timeBase ?? null,
+					},
+					embedding: embedded.embedding, model: embedded.model,
+					modelArtifactSha256: embedded.modelArtifactSha256,
+					preprocessingRevision: embedded.preprocessingRevision,
+					inputSha256: embedded.inputSha256, outputSha256: embedded.outputSha256,
+					metadata: { modelOutputReviewState: 'UNREVIEWED_PROPOSAL', transcriptId: input.analysisJobId },
+				});
+				embeddedVectorCount += 1;
+			}
+		} else if (hasEmbeddingContent) {
+			embeddingStatus = 'UNAVAILABLE';
+		}
+		const readback = await dependencies.persist({
 			evidenceId: input.evidenceId,
 			caseId: input.caseId,
 			analysisJobId: input.analysisJobId,
 			sourceRevision: input.sourceRevision,
 			analysisRevision,
+			samplingFps,
 			probe,
 			transcript: transcription,
 			audioArtifact: revisionBoundAudioArtifact,
 			frames: revisionBoundFrames,
+			skimPreview,
+			skimPreviewStatus,
+			...(skimPreviewError ? { skimPreviewError } : {}),
 			transcriptionStatus,
 			...(transcriptionError ? { transcriptionError } : {}),
 			detectorStatus,
 			...(detectorError ? { detectorError } : {}),
-		});
+			embeddingStatus,
+			audioEmbeddingStatus,
+			...(audioEmbeddingError ? { audioEmbeddingError } : {}),
+			embeddedVectorCount,
+		}, dependencies.database);
+		const expectedTranscriptSegmentCount = transcription?.chunks.length ?? 0;
+		if (
+			readback.evidenceRowCount !== 1 ||
+			readback.frameFindingCount !== revisionBoundFrames.length ||
+			readback.transcriptRowCount !== (transcription ? 1 : 0) ||
+			readback.transcriptSegmentCount !== expectedTranscriptSegmentCount ||
+			readback.skimTileCount !== (skimPreview?.tiles.length ?? 0) ||
+			readback.skimSampleCount !== (skimPreview?.sampleTimestampsMs.length ?? 0)
+		) {
+			throw new Error('EVIDENCE_VIDEO_CANONICAL_READBACK_MISMATCH');
+		}
+		const canonicalRecordCount = readback.evidenceRowCount + readback.frameFindingCount + readback.transcriptRowCount + readback.transcriptSegmentCount + embeddedVectorCount;
+		const canonicalReadback = { ...readback, vectorCount: embeddedVectorCount, canonicalRecordCount };
 
 		return {
 			canonicalReceiptVerified: true,
-			chunkCount: 0,
-			persistedCount: 0,
+			chunkCount: embeddedVectorCount,
+			persistedCount: embeddedVectorCount,
 			sourceRevision: input.sourceRevision,
 			analysisRevision,
-			representationId: 'video-analysis-v1',
-			canonicalStore: 'postgresql.evidence+audio_transcripts+whisper_segments',
+			representationId: embeddedVectorCount > 0 ? 'video-analysis-v1+evidence_multimodal_semantic_768' : 'video-analysis-v1',
+			canonicalStore: embeddedVectorCount > 0
+				? 'postgresql.evidence+audio_transcripts+whisper_segments+evidence_multimodal_vectors+projection_outbox'
+				: 'postgresql.evidence+audio_transcripts+whisper_segments',
+			readback: canonicalReadback,
 			analysis: {
-				status: transcriptionStatus === 'FAILED' || detectorStatus !== 'COMPLETED' ? 'PARTIAL' : 'COMPLETE',
+				status: transcriptionStatus === 'FAILED' || transcriptionStatus === 'TRANSCRIPTION_BINARY_UNAVAILABLE' || detectorStatus !== 'COMPLETED' || embeddingStatus === 'UNAVAILABLE' || audioEmbeddingStatus === 'UNAVAILABLE' || skimPreviewStatus === 'FAILED' ? 'PARTIAL' : 'COMPLETE',
 				transcriptionStatus,
 				transcriptSegmentCount: transcription?.chunks.length ?? 0,
 				detectorStatus,
 				frameCount: revisionBoundFrames.length,
 				coverage: 'BOUNDED_SAMPLE_NOT_FULL_VIDEO_COVERAGE',
+				skimPreviewStatus,
+				skimPreviewSampleCount: skimPreview?.sampleTimestampsMs.length ?? 0,
+				frameSamplingPolicy: VIDEO_FRAME_SAMPLING_POLICY_V1,
+				frameSampleRateFps: samplingFps,
+				embeddingStatus,
+				audioEmbeddingStatus,
+				...(audioEmbeddingError ? { audioEmbeddingError } : {}),
+				embeddedVectorCount,
+				substages: {
+					probe: {
+						status: 'COMPLETED',
+						hasVideoStream: probe.hasVideoStream,
+						hasAudioStream: probe.hasAudioStream,
+					},
+					keyframes: {
+						status: revisionBoundFrames.length > 0 ? 'COMPLETED' : 'FAILED',
+						count: revisionBoundFrames.length,
+						bucket: 'atlas-artifacts',
+					},
+					yolo: {
+						status: detectorStatus,
+						...(detectorError ? { error: detectorError } : {}),
+					},
+					transcription: {
+						status: transcriptionStatus,
+						...(transcriptionError ? { error: transcriptionError } : {}),
+					},
+					audioEmbedding: {
+						status: audioEmbeddingStatus,
+						...(audioEmbeddingError ? { error: audioEmbeddingError } : {}),
+						...(audioCoverage ? { coverage: audioCoverage } : {}),
+					},
+				},
 			},
 		};
 	} finally {

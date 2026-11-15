@@ -27,6 +27,15 @@ describe('canonical saved image analysis readback', () => {
 				visionTags: ['vehicle'],
 				stageErrors: ['vision:VLM_UNREACHABLE'],
 			},
+			derivatives: { thumbnail: {
+				sourceRevision,
+				objectKey: `evidence/fixture/thumbnail-${'d'.repeat(64)}.jpg`,
+				bucket: 'atlas-artifacts',
+				outputSha256: 'd'.repeat(64),
+				width: 256,
+				height: 256,
+				preprocessingRevision: 'atlas.image-thumbnail.v1',
+			} },
 		}), { status: 200, headers: { 'content-type': 'application/json' } }));
 
 		const result = await loadCanonicalStoredEvidenceImageAnalysis(evidenceId, fetcher as typeof fetch);
@@ -41,6 +50,7 @@ describe('canonical saved image analysis readback', () => {
 			vlmStatus: 'unavailable',
 			boxes: [{ x: 10, y: 20, w: 70, h: 80, label: 'vehicle', conf: 0.91 }],
 			analysis: { summary: 'A vehicle appears in the image.', keyFindings: ['Vehicle visible'], suggestedTags: ['vehicle'] },
+			thumbnail: { sourceRevision, url: `/api/evidence/${evidenceId}/thumbnail`, bucket: 'atlas-artifacts', outputSha256: 'd'.repeat(64), width: 256, height: 256 },
 		} });
 	});
 

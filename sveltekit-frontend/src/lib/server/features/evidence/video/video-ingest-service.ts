@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, extname } from 'node:path';
 import { tmpdir } from 'node:os';
-import { and, eq, or } from 'drizzle-orm';
+import { and, eq, or, sql } from 'drizzle-orm';
 import { db } from '$lib/server/db/client';
 import {
   cases,
@@ -13,7 +13,8 @@ import {
   evidenceProcessingJobs,
   evidenceTranscriptSegments,
 } from '$lib/server/db/schema/index.js';
-import { uploadSeaweedFile as uploadFile } from '$lib/server/seaweed-client.js';
+import { evidence as canonicalEvidence } from '$lib/server/db/schema-postgres.js';
+import { uploadSeaweedFile as uploadFile, deleteSeaweedFile } from '$lib/server/seaweed-client.js';
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import { createJob, updateJob } from '$lib/server/evidence-progress.js';
@@ -129,39 +130,61 @@ export async function admitVideoEvidenceV1(
   const objectName = buildObjectName(request.caseId, evidenceId, jobId, originalFileName);
   const uploadedOriginalUri = storageUri(bucket, objectName);
 
-  await uploadFile(bucket, objectName, originalBuffer, uploadSource.mimeType);
+  await uploadFile(bucket, objectName, originalBuffer, { 'Content-Type': uploadSource.mimeType });
 
-  await db.insert(evidence).values({
-    id: evidenceId,
-    caseId: request.caseId,
-    kind: 'video',
-    title: request.title ?? originalFileName,
-    description: request.description ?? null,
-    fileKey: objectName,
-    mimeType: uploadSource.mimeType,
-    sizeBytes: String(originalBuffer.byteLength),
-    hash: checksum,
-    hashAlgorithm: 'sha256',
-    tags: ['video', 'unprocessed'],
-  });
+  try {
+    // Canonical evidence row (live schema): prefixed sha256 revision, integer owner, video enum value.
+    await db.insert(canonicalEvidence).values({
+      id: evidenceId,
+      caseId: request.caseId,
+      userId: numericOwnerId,
+      uploadedBy: numericOwnerId,
+      title: request.title ?? originalFileName,
+      description: request.description ?? null,
+      evidenceType: 'video',
+      fileUrl: uploadedOriginalUri,
+      fileName: originalFileName,
+      fileType: uploadSource.mimeType,
+      mimeType: uploadSource.mimeType,
+      fileSize: originalBuffer.byteLength,
+      hash: sourceRevision,
+      uploadedAt: new Date().toISOString(),
+      aiAnalysis: { uploadedVia: 'video-ingest-admission', analysisRequested: true, extractionStatus: 'pending' },
+    });
 
-  const { enqueueJob } = await import('$lib/server/analysis/analysis-jobs.js');
-  await enqueueJob({
-    id: jobId,
-    evidenceId,
-    caseId: request.caseId,
-    jobType: 'upload_pipeline',
-    result: {
+    const { enqueueJob } = await import('$lib/server/analysis/analysis-jobs.js');
+    await enqueueJob({
+      id: jobId,
       evidenceId,
       caseId: request.caseId,
-      objectKey: objectName,
-      object_bucket: bucket,
-      sourceSha256: sourceRevision,
-      fileName: originalFileName,
-      contentType: uploadSource.mimeType,
-      uploadedBy: numericOwnerId,
-    },
-  });
+      jobType: 'upload_pipeline',
+      result: {
+        evidenceId,
+        caseId: request.caseId,
+        objectKey: objectName,
+        object_bucket: bucket,
+        sourceSha256: sourceRevision,
+        fileName: originalFileName,
+        contentType: uploadSource.mimeType,
+        uploadedBy: numericOwnerId,
+      },
+    });
+  } catch (error) {
+    // Compensate: nothing depends on this row or object yet. Soft-delete the row (archive, not delete)
+    // and remove the stored object so a failed admission leaves no orphan.
+    // Best-effort: a cleanup failure must not mask the original admission error.
+    try {
+      await db.update(canonicalEvidence).set({ deletedAt: new Date().toISOString() }).where(eq(canonicalEvidence.id, evidenceId));
+    } catch (cleanupError) {
+      console.warn('[VideoAdmission] soft-delete of failed admission row failed:', cleanupError);
+    }
+    try {
+      await deleteSeaweedFile(bucket, objectName);
+    } catch (cleanupError) {
+      console.warn('[VideoAdmission] orphan object removal failed:', cleanupError);
+    }
+    throw error;
+  }
 
   createJob(jobId, String(numericOwnerId));
   updateJob(jobId, {
@@ -206,8 +229,9 @@ export async function ingestVideoEvidence(request: VideoIngestRequest, ownerId: 
     const originalBuffer = uploadSource.buffer;
     const checksum = sha256(originalBuffer);
     const sourceRevision = formatEvidenceSourceRevisionV1(checksum);
-    const evidenceId = crypto.randomUUID();
-    admittedEvidenceId = evidenceId;
+    const isCanonicalWorker = Boolean(request.evidenceId);
+    const evidenceId = request.evidenceId ?? crypto.randomUUID();
+    admittedEvidenceId = isCanonicalWorker ? undefined : evidenceId;
     const bucket = ENV.SEAWEED_EVIDENCE_BUCKET;
     const artifactsBucket = ENV.SEAWEED_ARTIFACTS_BUCKET || 'atlas-artifacts';
     const objectName = buildObjectName(request.caseId, evidenceId, jobId, originalFileName);
@@ -215,35 +239,38 @@ export async function ingestVideoEvidence(request: VideoIngestRequest, ownerId: 
 
     updateJob(jobId, { evidenceId, step: 'storing', progress: 10, message: 'Saving original video...' });
 
-    const evidenceInsert = await db
-      .insert(evidenceItems)
-      .values({
-        id: evidenceId,
-        caseId: request.caseId,
-        modality: 'video',
-        sourceUrl: request.sourceUrl ?? null,
-        storageUri: uploadedOriginalUri,
-        status: 'processing',
-        sha256: checksum,
-        metadataJson: {
-          title: request.title ?? originalFileName,
-          description: request.description ?? null,
-          originalFileName,
-          operatorApproved: Boolean(request.operatorApproved),
-          sourceMetadata,
+    let evidenceInsert: Array<{ id: string; storageUri: string }> = [];
+    if (!isCanonicalWorker) {
+      evidenceInsert = await db
+        .insert(evidenceItems)
+        .values({
+          id: evidenceId,
+          caseId: request.caseId,
           modality: 'video',
-        },
-      })
-      .returning({ id: evidenceItems.id, storageUri: evidenceItems.storageUri });
+          sourceUrl: request.sourceUrl ?? null,
+          storageUri: uploadedOriginalUri,
+          status: 'processing',
+          sha256: checksum,
+          metadataJson: {
+            title: request.title ?? originalFileName,
+            description: request.description ?? null,
+            originalFileName,
+            operatorApproved: Boolean(request.operatorApproved),
+            sourceMetadata,
+            modality: 'video',
+          },
+        })
+        .returning({ id: evidenceItems.id, storageUri: evidenceItems.storageUri });
 
-    await db.insert(evidenceProcessingJobs).values({
-      id: jobId,
-      evidenceId,
-      status: 'running',
-      progress: '0',
-      errorText: null,
-      updatedAt: new Date(),
-    });
+      await db.insert(evidenceProcessingJobs).values({
+        id: jobId,
+        evidenceId,
+        status: 'running',
+        progress: '0',
+        errorText: null,
+        updatedAt: new Date(),
+      });
+    }
 
     const originalPath = join(workDir, originalFileName.replace(/[^a-zA-Z0-9._-]/g, '_'));
     await writeFile(originalPath, originalBuffer);
@@ -279,16 +306,13 @@ export async function ingestVideoEvidence(request: VideoIngestRequest, ownerId: 
     };
     let audioObjectName: string | null = null;
     let transcriptionLanguage: string | null = null;
+    let transcriptionStatus: 'COMPLETED' | 'SKIPPED_NO_AUDIO' | 'TRANSCRIPTION_BINARY_UNAVAILABLE' | 'FAILED' = 'SKIPPED_NO_AUDIO';
+    let transcriptionError: string | undefined;
 
     if (probeResult.hasAudioStream) {
+      let audioPath: string | null = null;
       try {
-        const audioPath = await extractAudioTrack(originalPath, workDir);
-        updateJob(jobId, { step: 'hashing', progress: 30, message: 'Transcribing audio track...' });
-
-        const transcription = await transcribeVideoAudio(audioPath, jobId);
-        chunks = transcription.chunks;
-        transcriptionLanguage = transcription.language;
-        summary = await summarizeVideoTranscript(transcription.text, chunks);
+        audioPath = await extractAudioTrack(originalPath, workDir);
         audioObjectName = buildObjectName(request.caseId, evidenceId, jobId, 'audio.wav');
 
         const audioBuffer = await readFile(audioPath);
@@ -298,9 +322,34 @@ export async function ingestVideoEvidence(request: VideoIngestRequest, ownerId: 
           'x-case-id': request.caseId,
           'x-modality': 'audio',
         });
-      } catch (audioErr) {
-        console.warn('[VideoIngest] Audio extraction or transcription skipped:', audioErr);
-        summary.summary = 'Video audio track unreadable or absent; visual analysis proceeding.';
+      } catch (audioExtractErr) {
+        transcriptionStatus = 'FAILED';
+        transcriptionError = audioExtractErr instanceof Error ? audioExtractErr.message : String(audioExtractErr);
+        console.warn('[VideoIngest] Audio extraction skipped:', audioExtractErr);
+        summary.summary = 'Video audio track unreadable; visual analysis proceeding.';
+      }
+
+      if (audioPath && transcriptionStatus !== 'FAILED') {
+        updateJob(jobId, { step: 'hashing', progress: 30, message: 'Transcribing audio track...' });
+        try {
+          const transcription = await transcribeVideoAudio(audioPath, jobId);
+          chunks = transcription.chunks;
+          transcriptionLanguage = transcription.language;
+          summary = await summarizeVideoTranscript(transcription.text, transcription.chunks);
+          transcriptionStatus = 'COMPLETED';
+        } catch (audioErr) {
+          const errMsg = audioErr instanceof Error ? audioErr.message : String(audioErr);
+          if (errMsg.includes('TRANSCRIPTION_BINARY_UNAVAILABLE')) {
+            transcriptionStatus = 'TRANSCRIPTION_BINARY_UNAVAILABLE';
+            transcriptionError = errMsg;
+            summary.summary = 'Audio track extracted to artifacts, but transcription binary/model is unavailable in environment.';
+          } else {
+            transcriptionStatus = 'FAILED';
+            transcriptionError = errMsg;
+            summary.summary = 'Audio track extracted, but transcription failed; visual analysis proceeding.';
+          }
+          console.warn('[VideoIngest] Audio transcription status:', transcriptionStatus, transcriptionError);
+        }
       }
     } else {
       updateJob(jobId, { step: 'hashing', progress: 30, message: 'Skipping audio transcription (no audio stream found)...' });
@@ -309,6 +358,9 @@ export async function ingestVideoEvidence(request: VideoIngestRequest, ownerId: 
     // Extract keyframes at 1 fps (50 frames for a 50s video) up to 60 frames
     updateJob(jobId, { step: 'storing', progress: 45, message: 'Extracting video keyframes at 1 fps with image analysis...' });
     let frameList: Array<{ timestamp: number; framePath: string; description: string; objects: string[]; tags: string[]; confidence: number }> = [];
+    let yoloStatus: 'COMPLETED' | 'UNAVAILABLE' | 'FAILED' = 'UNAVAILABLE';
+    let yoloError: string | undefined;
+
     try {
       const vision = new VisionService();
       const extracted = await vision.extractFrames(originalBuffer, { fps: 1, maxFrames: 60 });
@@ -316,8 +368,11 @@ export async function ingestVideoEvidence(request: VideoIngestRequest, ownerId: 
       try {
         const { YOLOService } = await import('$lib/server/yolo.js');
         yoloService = new YOLOService({ confidence: 0.4 });
-      } catch {
+        yoloStatus = 'COMPLETED';
+      } catch (yoloInitErr) {
         yoloService = null;
+        yoloStatus = 'UNAVAILABLE';
+        yoloError = yoloInitErr instanceof Error ? yoloInitErr.message : String(yoloInitErr);
       }
 
       for (let idx = 0; idx < extracted.length; idx += 1) {
@@ -345,7 +400,9 @@ export async function ingestVideoEvidence(request: VideoIngestRequest, ownerId: 
               description = `Keyframe ${idx + 1} at ${frameSec.toFixed(1)}s: detected ${detectedObjects.join(', ')}`;
             }
           } catch (yoloErr) {
-            console.debug('[VideoIngest] YOLO frame inference skipped:', yoloErr);
+            yoloStatus = 'FAILED';
+            yoloError = yoloErr instanceof Error ? yoloErr.message : String(yoloErr);
+            console.warn(`[VideoIngest] YOLO frame inference failed on frame ${idx}:`, yoloErr);
           }
         }
 
@@ -375,6 +432,27 @@ export async function ingestVideoEvidence(request: VideoIngestRequest, ownerId: 
       console.warn('[VideoIngest] Keyframe extraction failed:', frameErr);
       throw frameErr;
     }
+
+    const substages = {
+      probe: {
+        status: 'COMPLETED' as const,
+        hasVideoStream: probeResult.hasVideoStream,
+        hasAudioStream: probeResult.hasAudioStream,
+      },
+      keyframes: {
+        status: frameList.length > 0 ? ('COMPLETED' as const) : ('FAILED' as const),
+        count: frameList.length,
+        bucket: artifactsBucket,
+      },
+      yolo: {
+        status: yoloStatus,
+        ...(yoloError ? { error: yoloError } : {}),
+      },
+      transcription: {
+        status: transcriptionStatus,
+        ...(transcriptionError ? { error: transcriptionError } : {}),
+      },
+    };
 
     updateJob(jobId, { step: 'db-insert', progress: 55, message: 'Persisting transcript segments...' });
 
@@ -465,58 +543,75 @@ export async function ingestVideoEvidence(request: VideoIngestRequest, ownerId: 
       crypto.createHash('sha256').update(summary.summary).digest('hex')
     );
 
-    await db
-      .update(evidenceItems)
-      .set({
-        status: 'completed',
-        metadataJson: {
-          title: request.title ?? originalFileName,
-          description: request.description ?? null,
-          sourceUrl: request.sourceUrl ?? null,
-          originalFileName,
-          fileSize: originalBuffer.byteLength,
-          mimeType: uploadSource.mimeType,
-          checksum,
-          sourceRevision,
-          summaryRevision,
-          transcriptCount: chunks.length,
-          summary: summary.summary,
-          keyFacts: summary.keyFacts,
-          frameAnalysis: frameList,
-          frameCount: frameList.length,
-          operatorApproved: Boolean(request.operatorApproved),
-          sourceMetadata,
-          processingStatus: searchIndexStatus === 'failed'
-            ? 'complete_with_search_index_error'
-            : searchIndexStatus === 'deferred'
+    if (isCanonicalWorker) {
+      const videoAnalysisPayload = {
+        schema: 'atlas.video-analysis.v1',
+        summary: summary.summary,
+        keyFacts: summary.keyFacts,
+        substages,
+        frameCount: frameList.length,
+        transcriptCount: chunks.length,
+        yoloStatus,
+        transcriptionStatus,
+        audioUri: audioObjectName ? storageUri(artifactsBucket, audioObjectName) : null,
+        frameAnalysis: frameList,
+      };
+      await db
+        .update(canonicalEvidence)
+        .set({
+          aiAnalysis: sql`COALESCE(${canonicalEvidence.aiAnalysis}, '{}'::jsonb) || jsonb_build_object('videoAnalysis', ${JSON.stringify(videoAnalysisPayload)}::jsonb)`,
+        })
+        .where(eq(canonicalEvidence.id, evidenceId));
+    } else {
+      await db
+        .update(evidenceItems)
+        .set({
+          status: 'completed',
+          metadataJson: {
+            title: request.title ?? originalFileName,
+            description: request.description ?? null,
+            sourceUrl: request.sourceUrl ?? null,
+            originalFileName,
+            fileSize: originalBuffer.byteLength,
+            mimeType: uploadSource.mimeType,
+            checksum,
+            sourceRevision,
+            summaryRevision,
+            transcriptCount: chunks.length,
+            summary: summary.summary,
+            keyFacts: summary.keyFacts,
+            frameAnalysis: frameList,
+            frameCount: frameList.length,
+            operatorApproved: Boolean(request.operatorApproved),
+            sourceMetadata,
+            substages,
+            processingStatus: searchIndexStatus === 'deferred'
               ? 'complete_with_search_index_deferred'
               : 'complete',
-          processingJobId: jobId,
-          searchIndexStatus,
-          searchIndexError,
-        },
-      })
-      .where(eq(evidenceItems.id, evidenceId));
+            processingJobId: jobId,
+            searchIndexStatus,
+            searchIndexError,
+          },
+        })
+        .where(eq(evidenceItems.id, evidenceId));
 
-    await db
-      .update(evidenceProcessingJobs)
-      .set({
-        status: 'completed',
-        progress: '100',
-        updatedAt: new Date(),
-        errorText: searchIndexStatus === 'failed' ? searchIndexError : null,
-      })
-      .where(eq(evidenceProcessingJobs.id, jobId));
+      await db
+        .update(evidenceProcessingJobs)
+        .set({
+          status: 'completed',
+          progress: '100',
+          updatedAt: new Date(),
+          errorText: null,
+        })
+        .where(eq(evidenceProcessingJobs.id, jobId));
+    }
 
     updateJob(jobId, {
       step: 'complete',
       progress: 100,
-      message: searchIndexStatus === 'failed'
-        ? 'Video analysis complete; transcript search indexing failed.'
-        : searchIndexStatus === 'deferred'
-          ? 'Video analysis complete; transcript indexing is pending the canonical PostgreSQL lane.'
-          : 'Video ingestion complete.',
-      ...(searchIndexStatus === 'failed' && searchIndexError ? { error: searchIndexError } : {}),
+      message: searchIndexStatus === 'deferred'
+        ? 'Video analysis complete; transcript indexing is pending the canonical PostgreSQL lane.'
+        : 'Video ingestion complete.',
     });
 
     await setRedisBestEffort(`evidence:summary:${evidenceId}`, {
@@ -545,17 +640,17 @@ export async function ingestVideoEvidence(request: VideoIngestRequest, ownerId: 
     const message = error instanceof Error ? error.message : 'Video ingestion failed';
     updateJob(jobId, { step: 'error', progress: 0, message: 'Video ingestion failed', error: message });
 
-    await db
-      .update(evidenceProcessingJobs)
-      .set({
-        status: 'failed',
-        errorText: message,
-        updatedAt: new Date(),
-      })
-      .where(eq(evidenceProcessingJobs.id, jobId))
-      .catch(() => {});
-
     if (admittedEvidenceId) {
+      await db
+        .update(evidenceProcessingJobs)
+        .set({
+          status: 'failed',
+          errorText: message,
+          updatedAt: new Date(),
+        })
+        .where(eq(evidenceProcessingJobs.id, jobId))
+        .catch(() => {});
+
       await db
         .update(evidenceItems)
         .set({ status: 'failed' })
@@ -570,4 +665,28 @@ export async function ingestVideoEvidence(request: VideoIngestRequest, ownerId: 
       await rm(sourceCleanupDir, { recursive: true, force: true }).catch(() => {});
     }
   }
+}
+
+export async function processVideoEvidenceWorkerV1(params: {
+  evidenceId: string;
+  caseId: string;
+  jobId: string;
+  bytes: Buffer;
+  fileName: string;
+  mimeType?: string;
+  uploadedBy?: number | string;
+  onProgress?: (stage: string) => Promise<void> | void;
+}): Promise<VideoIngestResult> {
+  const file = {
+    name: params.fileName,
+    type: params.mimeType || 'video/mp4',
+    size: params.bytes.byteLength,
+    arrayBuffer: async () => params.bytes.buffer.slice(params.bytes.byteOffset, params.bytes.byteOffset + params.bytes.byteLength),
+  } as unknown as File;
+
+  return ingestVideoEvidence({
+    evidenceId: params.evidenceId,
+    caseId: params.caseId,
+    file,
+  }, String(params.uploadedBy ?? '1'));
 }

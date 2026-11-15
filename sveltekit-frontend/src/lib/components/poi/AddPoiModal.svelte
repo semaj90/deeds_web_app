@@ -363,7 +363,7 @@
 										class="visually-hidden"
 										tabindex="-1"
 										aria-hidden="true"
-										onchange={(e) => { const input = e.currentTarget; void importIntakeFile(input.files?.[0]); input.value = ''; }}
+										onchange={(e) => { const input = e.currentTarget as HTMLInputElement; void importIntakeFile(input.files?.[0]); input.value = ''; }}
 									/>
 									<p id="poi-intake-help" class="help-text">
 										Lines starting with Name, Alias, Who, What, Why or How fill the matching fields. The file is read on this device and is not uploaded.

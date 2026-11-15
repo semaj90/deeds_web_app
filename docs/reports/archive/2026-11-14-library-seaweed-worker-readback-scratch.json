@@ -1,0 +1,58 @@
+{
+  "createdAt": "2026-11-15T03:33:21.000Z",
+  "database": "legal_ai_live_integration_scratch",
+  "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
+  "bucket": "legal-corpus",
+  "bucketCreatedByTest": true,
+  "test": "library-seaweed-scratch.integration.spec.ts",
+  "selectedCases": [
+    "processes a text PDF and an OCR image without invoking the configured embedding or graph services",
+    "runs one uploaded PDF through the standalone worker CLI with scratch-only provider fixtures"
+  ],
+  "result": {
+    "passed": 2,
+    "failed": 0,
+    "skipped": 3,
+    "uploadAdmission": "passed for three synthetic fixtures",
+    "sourceHashAndSeaweedReadback": "passed",
+    "postgresJobDocumentNodeChunkReadback": "passed",
+    "chunkSourceOffsetsAndCitationProvenance": "passed for PDF and image route flow",
+    "foreignActorReadbackDenied": "404 asserted for PDF/image/chunk endpoints",
+    "pdfByteRange": "206 asserted",
+    "standaloneWorkerProcess": "completed job at fencing token 1",
+    "allThreeJobs": "complete with one node and one chunk each",
+    "embeddingProvider": "mocked scratch 768-dimensional fixture vectors",
+    "qdrantProjection": "mocked",
+    "neo4jProjection": "mocked",
+    "liveBrowserOrHttpServer": false
+  },
+  "retainedScratchRowsAndObjects": [
+    {
+      "documentId": "0cb40736-7ec3-4a09-9edb-713097ae7c43",
+      "jobId": "ae8c48b2-2d94-457c-986a-92831152e27b",
+      "sourceSha256": "eefb92b7d000d015358b79b81378e35f91f973597fc70ae1c395d8c6ca5e6bb8",
+      "bytes": 1120
+    },
+    {
+      "documentId": "0ab7fbe3-acb7-453d-8d20-3d3d16879bfc",
+      "jobId": "4499cfe6-24ac-4849-90cf-f5c630ec62f2",
+      "sourceSha256": "65922eabfc691496947a2396d4a29f8fcc0bdb5503b15d6693918eb942f13900",
+      "bytes": 27624
+    },
+    {
+      "documentId": "2230dfad-ee0a-4f5c-b42c-21ab66953350",
+      "jobId": "4d289175-916b-49a4-a2aa-918ad3a00c5c",
+      "sourceSha256": "eef51f7bb50ff82211859664486b5fb6ef14dcb2761958d3e586005fa18c7c26",
+      "bytes": 1121
+    }
+  ],
+  "retention": "Synthetic scratch rows and objects are intentionally retained by the integration test; no cleanup was performed.",
+  "independentFreshConnectionReadback": {
+    "recordsFound": 3,
+    "jobsComplete": true,
+    "sourceHashesMatchReceipt": true,
+    "allRowsHaveNodesAndChunks": true,
+    "readOnly": true
+  },
+  "canonicalDatabaseTouched": false
+}

@@ -112,21 +112,33 @@
 	}
 
 	function validateFile(file: File): { valid: boolean; error?: string } {
-		const maxSize = 50 * 1024 * 1024; // 50MB
+		const maxSize = 100 * 1024 * 1024; // 100MB
 		const allowedTypes = [
 			'application/pdf',
 			'image/png',
 			'image/jpeg',
 			'image/tiff',
-			'application/x-tiff'
+			'application/x-tiff',
+			'video/mp4',
+			'video/quicktime',
+			'video/webm',
+			'video/x-msvideo',
+			'video/x-matroska',
+			'audio/wav',
+			'audio/x-wav',
+			'audio/mpeg',
+			'audio/mp3'
 		];
 
 		if (file.size > maxSize) {
-			return { valid: false, error: 'File size exceeds 50MB limit' };
+			return { valid: false, error: 'File size exceeds 100MB limit' };
 		}
 
-		if (!allowedTypes.includes(file.type)) {
-			return { valid: false, error: 'File type not supported (PDF, PNG, JPG, TIFF)' };
+		const isAllowedType = allowedTypes.includes(file.type) ||
+			/\.(pdf|png|jpe?g|tiff?|mp4|mov|webm|avi|mkv|wav|mp3)$/i.test(file.name);
+
+		if (!isAllowedType) {
+			return { valid: false, error: 'File type not supported (PDF, PNG, JPG, MP4, MOV, WEBM, WAV)' };
 		}
 
 		return { valid: true };
@@ -289,11 +301,11 @@
 				<input
 					type="file"
 					multiple
-					accept=".pdf,.png,.jpg,.jpeg,.tiff"
+					accept=".pdf,.png,.jpg,.jpeg,.tiff,.mp4,.mov,.webm,.avi,.mkv,.wav,.mp3,video/*,audio/*,image/*"
 					onchange={handleFileSelect}
 				/>
 			</label>
-			<p class="file-info">Supported: PDF, PNG, JPG, TIFF (max 50MB each)</p>
+			<p class="file-info">Supported: PDF, PNG, JPG, TIFF, MP4, MOV, WEBM, WAV (max 100MB each)</p>
 		</div>
 	</div>
 

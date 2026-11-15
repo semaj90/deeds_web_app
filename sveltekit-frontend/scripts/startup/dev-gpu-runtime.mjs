@@ -71,7 +71,20 @@ const envFromFiles = loadRepoEnv(process.env);
 // never meant ONNX Runtime; it started the GGUF embed server. Kept only for
 // backward compatibility with existing .env files.
 // ---------------------------------------------------------------------------
-const EMBEDDING_BACKENDS = ['ollama', 'llama_cpp_gguf', 'onnx_directml'];
+// 'onnx_cpu' runs the EmbeddingGemma 2 ONNX bundle (text, vision and audio encoders) on the
+// CPU provider through the evidence adapter. It starts no :8081 server, adds no DirectML
+// session, and leaves /api/embed on its Ollama provider, so the GPU budget is unchanged.
+const EMBEDDING_BACKENDS = ['ollama', 'llama_cpp_gguf', 'onnx_directml', 'onnx_cpu'];
+const EMBEDDINGGEMMA2_ONNX_DEFAULT_DIR = path.resolve(REPO_ROOT, 'models', 'embeddinggemma2', 'onnx-q8');
+
+/** Env overrides for the onnx_cpu backend (evidence lane only; /api/embed keeps its provider). */
+function onnxCpuEvidenceEnv(envSource) {
+  return {
+    EVIDENCE_TEXT_EMBEDDING_LANE: envSource.EVIDENCE_TEXT_EMBEDDING_LANE ?? 'embeddinggemma2_onnx',
+    ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR:
+      envSource.ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR ?? EMBEDDINGGEMMA2_ONNX_DEFAULT_DIR,
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Local ONNX model probe — checked once at startup, cached.
@@ -183,7 +196,8 @@ function mergedEnv(extra = {}) {
     // EMBEDDING_PROVIDER controls the /api/embed route. Keep them aligned so
     // `EMBEDDING_BACKEND=onnx_directml` actually reaches the DirectML branch
     // instead of being shadowed by a stale .env EMBEDDING_PROVIDER=ollama.
-    EMBEDDING_PROVIDER: embeddingBackend,
+    EMBEDDING_PROVIDER: embeddingBackend === 'onnx_cpu' ? 'ollama' : embeddingBackend,
+    ...(embeddingBackend === 'onnx_cpu' ? onnxCpuEvidenceEnv({ ...process.env, ...envFromFiles }) : {}),
     // Explicit undefined (not omission) so a leftover value from process.env
     // or envFromFiles is actually cleared for the child process, not inherited.
     EMBEDDING_BASE_URL: wantOnnxEmbedServer
@@ -683,6 +697,13 @@ async function main() {
     console.log(`[dev:gpu]    Model:    ${onnxPath}`);
     console.log('[dev:gpu]    EP chain: DirectML (D3D12/GPU) → CPU (ONNX intra-op workers) → Ollama :11434 (network fallback)');
     console.log(`[dev:gpu]    Threads:  intra-op=${Math.min(4, Math.max(1, (await import('node:os')).cpus().length))} (ONNX_CPU_INTRA_OP_THREADS to override)`);
+  } else if (embeddingBackend === 'onnx_cpu') {
+    // In-process evidence embeddings on CPU. No :8081 server and no GPU session. /api/embed
+    // keeps its Ollama provider; the evidence adapter uses text, vision and audio encoders.
+    const onnxDir = onnxCpuEvidenceEnv({ ...process.env, ...envFromFiles }).ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR;
+    console.log('[dev:gpu] ✅ Embedding backend: onnx_cpu — EmbeddingGemma 2 ONNX on CPU (text, vision, audio encoders)');
+    console.log(`[dev:gpu]    Model dir: ${onnxDir}`);
+    console.log('[dev:gpu]    No :8081 server and no GPU session; /api/embed keeps its Ollama provider');
   } else if (await isLlamaServerRunning(embedPort)) {
     console.log(`[dev:gpu] ✅ Embed server already running on :${embedPort} — leaving it up`);
   } else if (wantEmbedServer) {
@@ -709,7 +730,8 @@ async function main() {
 
   const runtimeEmbeddingEnv = (extra = {}) => mergedEnv({
     EMBEDDING_BACKEND: runtimeEmbeddingBackend,
-    EMBEDDING_PROVIDER: runtimeEmbeddingBackend,
+    EMBEDDING_PROVIDER: runtimeEmbeddingBackend === 'onnx_cpu' ? 'ollama' : runtimeEmbeddingBackend,
+    ...(runtimeEmbeddingBackend === 'onnx_cpu' ? onnxCpuEvidenceEnv({ ...process.env, ...envFromFiles }) : {}),
     ...extra,
   });
 
@@ -753,6 +775,12 @@ async function main() {
     console.log('[dev:gpu]   Model:              embeddinggemma (ONNX, static/embeddinggemma_300m_onnx/model.onnx)');
     console.log('[dev:gpu]   Endpoint:           in-process (no port — session lives inside the SvelteKit server)');
     console.log('[dev:gpu]   Execution provider: DirectML (D3D12) → CPU fallback');
+  } else if (embeddingBackend === 'onnx_cpu') {
+    console.log('[dev:gpu] Embedding backend: onnx_cpu');
+    console.log('[dev:gpu]   Model:              EmbeddingGemma 2 Q8 ONNX (text, vision, audio encoders)');
+    console.log(`[dev:gpu]   Model dir:          ${onnxCpuEvidenceEnv({ ...process.env, ...envFromFiles }).ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR}`);
+    console.log('[dev:gpu]   Endpoint:           in-process evidence adapter (no port)');
+    console.log('[dev:gpu]   Execution provider: ONNX Runtime CPU');
   } else if (wantEmbedServer) {
     console.log('[dev:gpu] Embedding backend: llama_cpp_gguf');
     console.log('[dev:gpu]   Model:              embeddinggemma (GGUF)');

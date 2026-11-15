@@ -287,6 +287,20 @@ export async function runEvidenceAnalysisPipeline(
 		console.warn('[AnalysisPipeline] DB cache persist failed (non-fatal):', err);
 	}
 
+	// ── Stage 4b: Surface YOLO labels on the evidence row for viewer cards ──
+	// Derived detector labels only (prefixed `detected:`); not a review or identity decision.
+	const yoloLabels = [...new Set(tags.filter((t) => t.startsWith('detected:')))];
+	if (yoloLabels.length > 0) {
+		try {
+			const { db } = await import('$lib/server/db/client');
+			await db.execute(
+				sql`UPDATE evidence SET ai_tags = ${JSON.stringify(yoloLabels)}::jsonb WHERE id = ${input.evidenceId}::uuid AND deleted_at IS NULL`
+			);
+		} catch (err) {
+			console.warn('[AnalysisPipeline] evidence ai_tags update failed (non-fatal):', err);
+		}
+	}
+
 	return {
 		detector,
 		yolo: yoloResult,

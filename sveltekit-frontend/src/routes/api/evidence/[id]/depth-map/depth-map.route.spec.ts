@@ -1,9 +1,10 @@
 import { createHash } from 'node:crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mocks = vi.hoisted(() => ({ select: vi.fn(), from: vi.fn(), leftJoin: vi.fn(), where: vi.fn(), limit: vi.fn(), getFile: vi.fn() }));
+const mocks = vi.hoisted(() => ({ select: vi.fn(), from: vi.fn(), leftJoin: vi.fn(), where: vi.fn(), limit: vi.fn(), execute: vi.fn(), getFile: vi.fn() }));
 
-vi.mock('$lib/server/db/client', () => ({ db: { select: (...args: unknown[]) => mocks.select(...args) } }));
+vi.mock('$lib/server/db/client', () => ({ db: { select: (...args: unknown[]) => mocks.select(...args), execute: (...args: unknown[]) => mocks.execute(...args) } }));
+vi.mock('$lib/server/env.server.js', () => ({ ENV: { SEAWEED_ARTIFACTS_BUCKET: 'atlas-artifacts' } }));
 vi.mock('$lib/server/db/schema-postgres.js', () => ({
 	cases: { id: 'case.id', userId: 'case.userId', assignedAttorney: 'case.assignedAttorney' },
 	evidence: {
@@ -17,6 +18,7 @@ vi.mock('drizzle-orm', () => ({
 	and: (...conditions: unknown[]) => ({ and: conditions }),
 	eq: (...fields: unknown[]) => ({ eq: fields }),
 	or: (...conditions: unknown[]) => ({ or: conditions }),
+	sql: (strings: TemplateStringsArray, ...values: unknown[]) => ({ strings, values }),
 }));
 
 import { GET } from './+server.js';
@@ -62,6 +64,7 @@ describe('evidence depth-map route', () => {
 		mocks.from.mockReturnValue({ leftJoin: mocks.leftJoin });
 		mocks.leftJoin.mockReturnValue({ where: mocks.where });
 		mocks.where.mockReturnValue({ limit: mocks.limit });
+		mocks.execute.mockRejectedValue(new Error('canonical vector table unavailable'));
 		mocks.getFile.mockResolvedValue(png);
 	});
 
@@ -102,6 +105,29 @@ describe('evidence depth-map route', () => {
 		expect(response.headers.get('cache-control')).toBe('private, no-store');
 		expect(mocks.getFile).toHaveBeenCalledWith('evidence', `evidence/4fe33e08-dc1e-47dd-9da5-37b4cc81a9fc/${evidenceId}-depth-${depthSha256}.png`);
 		expect(Buffer.from(await response.arrayBuffer())).toEqual(png);
+	});
+
+	it('reads a source- and digest-bound depth estimate from canonical image-vector metadata', async () => {
+		const caseId = '4fe33e08-dc1e-47dd-9da5-37b4cc81a9fc';
+		const sourceHash = sourceRevision.slice('sha256:'.length);
+		const objectKey = `evidence/${caseId}/${evidenceId}/${sourceHash}/depth-${depthSha256}.png`;
+		mocks.limit.mockResolvedValue([evidenceRow({ aiAnalysis: null })]);
+		mocks.execute.mockResolvedValue({ rows: [{
+			source_revision: sourceRevision,
+			metadata: { visualAnalysis: {
+				schema: 'atlas.evidence-visual-analysis.v1',
+				sourceRevision,
+				depthMap: { objectKey, bucket: 'atlas-artifacts', artifactSha256: depthSha256, status: 'ESTIMATED', width: 1, height: 1 },
+			} },
+		}] });
+
+		const response = await GET(event({ id: '42' }));
+
+		expect(response.status).toBe(200);
+		expect(mocks.getFile).toHaveBeenCalledWith('atlas-artifacts', objectKey);
+		expect(response.headers.get('x-depth-verification')).toBe('sha256-verified');
+		const depthQuery = mocks.execute.mock.calls[0]?.[0] as { strings?: string[] } | undefined;
+		expect(depthQuery?.strings?.join('')).toContain("source_locator->>'kind' = 'whole_image'");
 	});
 
 	it('continues to read legacy minio-scheme records through the SeaweedFS adapter', async () => {

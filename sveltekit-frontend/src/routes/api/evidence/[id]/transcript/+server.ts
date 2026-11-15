@@ -4,8 +4,16 @@ import { db } from '$lib/server/db/client';
 import { audioTranscripts, cases, evidence, whisperSegments } from '$lib/server/db/schema-postgres.js';
 import { evidenceTranscriptSegments } from '$lib/server/db/schema/evidence-multi-modal.js';
 import { and, eq, isNotNull, or, sql } from 'drizzle-orm';
+import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 import { formatEvidenceSourceRevisionV1 } from '$lib/server/evidence-source-revision-v1.js';
+import { ENV } from '$lib/server/env.server.js';
+
+const transcriptReviewBodySchema = z.object({
+	segmentId: z.string().uuid(),
+	reviewStatus: z.enum(['approved', 'rejected', 'unreviewed_proposal']),
+}).strict();
+const ANONYMOUS_SPEAKER_ID_RE = /^spk_[a-z0-9_]{1,48}$/;
 
 function formatTimestampVtt(ms: number): string {
 	const totalSeconds = Math.max(0, Math.floor(ms / 1000));
@@ -88,6 +96,7 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 		text: string;
 		language: string | null;
 		translatedText: string | null;
+		speaker: string | null;
 		confidence: string | number | null;
 		model: string | null;
 		metadataJson: unknown;
@@ -102,6 +111,7 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 				text: evidenceTranscriptSegments.text,
 				language: evidenceTranscriptSegments.language,
 				translatedText: evidenceTranscriptSegments.translatedText,
+				speaker: sql<string | null>`NULL`,
 				confidence: evidenceTranscriptSegments.confidence,
 				model: evidenceTranscriptSegments.model,
 				metadataJson: evidenceTranscriptSegments.metadataJson,
@@ -127,6 +137,7 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 					text: whisperSegments.text,
 					language: whisperSegments.language,
 					translatedText: sql<string | null>`NULL`,
+					speaker: whisperSegments.speaker,
 					confidence: whisperSegments.confidence,
 					model: audioTranscripts.whisperModel,
 					metadataJson: whisperSegments.metadata,
@@ -163,7 +174,10 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 				model: s.model ?? 'whisper-base',
 				sourceRevision: typeof meta.sourceRevision === 'string' ? meta.sourceRevision : sourceRevision,
 				analysisRevision: typeof meta.analysisRevision === 'string' ? meta.analysisRevision : null,
-				speakerId: (typeof meta.speakerId === 'string' ? meta.speakerId : null),
+				speakerId: (() => {
+					const speakerId = typeof meta.speakerId === 'string' ? meta.speakerId : s.speaker;
+					return typeof speakerId === 'string' && ANONYMOUS_SPEAKER_ID_RE.test(speakerId) ? speakerId : null;
+				})(),
 				reviewStatus: (meta.reviewStatus === 'approved' || meta.reviewState === 'APPROVED' ? 'approved' : 'unreviewed_proposal') as 'approved' | 'unreviewed_proposal',
 			};
 		})
@@ -269,32 +283,73 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 	if (!locals.user && !process.env.DEV_BYPASS_AUTH) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
+	// Feature gate (operator-enabled): review writes are refused while the flag is off.
+	if (!ENV.EVIDENCE_TRANSCRIPT_REVIEW_ENABLED) {
+		return json({ error: 'Transcript review is disabled', code: 'TRANSCRIPT_REVIEW_DISABLED' }, { status: 403 });
+	}
 
 	const evidenceId = params.id;
 	if (!isUuid(evidenceId)) {
 		return json({ error: 'Invalid evidence ID format' }, { status: 400 });
 	}
 
-	const body = await request.json().catch(() => null);
-	if (!body || typeof body.segmentId !== 'string' || !['approved', 'rejected', 'unreviewed_proposal'].includes(body.reviewStatus)) {
+	const bodyResult = transcriptReviewBodySchema.safeParse(await request.json().catch(() => null));
+	if (!bodyResult.success) {
 		return json({ error: 'Invalid review payload. Required: segmentId and reviewStatus.' }, { status: 400 });
 	}
+	const body = bodyResult.data;
+	const userId = Number(locals.user?.id ?? 1);
+	if (!Number.isSafeInteger(userId) || userId <= 0) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	try {
-		await db
-			.update(evidenceTranscriptSegments)
+		const [item] = await db
+			.select({ id: evidence.id, caseId: evidence.caseId, hash: evidence.hash })
+			.from(evidence)
+			.leftJoin(cases, eq(evidence.caseId, cases.id))
+			.where(and(
+				eq(evidence.id, evidenceId),
+				or(
+					eq(evidence.userId, userId),
+					eq(evidence.uploadedBy, userId),
+					and(isNotNull(evidence.caseId), or(eq(cases.userId, userId), eq(cases.assignedAttorney, userId))),
+				),
+			))
+			.limit(1);
+		if (!item) return json({ error: 'Evidence not found or unauthorized' }, { status: 404 });
+		const sourceRevision = item.hash ? formatEvidenceSourceRevisionV1(item.hash) : `urn:evidence:${item.id}`;
+
+		const canonicalUpdate = await db
+			.update(whisperSegments)
 			.set({
-				metadataJson: sql`jsonb_set(COALESCE(metadata_json, '{}'::jsonb), '{reviewStatus}', to_jsonb(${body.reviewStatus}::text))`,
+				metadata: sql`jsonb_set(jsonb_set(jsonb_set(COALESCE(metadata, '{}'::jsonb), '{reviewStatus}', to_jsonb(${body.reviewStatus}::text), true), '{reviewedBy}', to_jsonb(${String(userId)}::text), true), '{reviewedAt}', to_jsonb(now()::text), true)`,
 			})
 			.where(
 				and(
-					eq(evidenceTranscriptSegments.id, body.segmentId),
-					eq(evidenceTranscriptSegments.evidenceId, evidenceId),
+					eq(whisperSegments.id, body.segmentId),
+					eq(whisperSegments.evidenceId, evidenceId),
+					sql`${whisperSegments.metadata}->>'sourceRevision' = ${sourceRevision}`,
 				),
-			);
+			)
+			.returning({ id: whisperSegments.id });
+		if (canonicalUpdate.length > 0) {
+			return json({ ok: true, segmentId: body.segmentId, reviewStatus: body.reviewStatus });
+		}
+
+		const legacyUpdate = await db
+			.update(evidenceTranscriptSegments)
+			.set({
+				metadataJson: sql`jsonb_set(jsonb_set(jsonb_set(COALESCE(metadata_json, '{}'::jsonb), '{reviewStatus}', to_jsonb(${body.reviewStatus}::text), true), '{reviewedBy}', to_jsonb(${String(userId)}::text), true), '{reviewedAt}', to_jsonb(now()::text), true)`,
+			})
+			.where(and(
+				eq(evidenceTranscriptSegments.id, body.segmentId),
+				eq(evidenceTranscriptSegments.evidenceId, evidenceId),
+				sql`${evidenceTranscriptSegments.metadataJson}->>'source_revision' = ${sourceRevision}`,
+			))
+			.returning({ id: evidenceTranscriptSegments.id });
+		if (legacyUpdate.length === 0) return json({ error: 'Transcript segment not found for current source revision' }, { status: 404 });
 
 		return json({ ok: true, segmentId: body.segmentId, reviewStatus: body.reviewStatus });
-	} catch (error) {
+	} catch {
 		return json({ ok: false, error: 'Failed to update segment review status' }, { status: 500 });
 	}
 };

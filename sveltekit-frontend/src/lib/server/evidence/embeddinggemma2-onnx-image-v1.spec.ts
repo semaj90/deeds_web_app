@@ -6,8 +6,23 @@ import {
 	EMBEDDINGGEMMA2_ONNX_QUANTIZATION_V1,
 	EMBEDDINGGEMMA2_ONNX_REVISION_V1,
 	EMBEDDINGGEMMA2_ONNX_EXPECTED_FILES_V1,
+	EMBEDDINGGEMMA2_ONNX_AUDIO_MAX_SAMPLES_V1,
+	EMBEDDINGGEMMA2_ONNX_AUDIO_SAMPLE_RATE_V1,
+	embedEvidenceAudioWithEmbeddingGemma2OnnxV1,
 	embedEvidenceImageWithEmbeddingGemma2OnnxV1,
+	readPcm16MonoWavWindowV1,
 } from './embeddinggemma2-onnx-image-v1.js';
+
+function pcm16MonoWav(samples: number[]): Buffer {
+	const dataBytes = samples.length * 2;
+	const wav = Buffer.alloc(44 + dataBytes);
+	wav.write('RIFF', 0); wav.writeUInt32LE(36 + dataBytes, 4); wav.write('WAVE', 8);
+	wav.write('fmt ', 12); wav.writeUInt32LE(16, 16); wav.writeUInt16LE(1, 20); wav.writeUInt16LE(1, 22);
+	wav.writeUInt32LE(16_000, 24); wav.writeUInt32LE(32_000, 28); wav.writeUInt16LE(2, 32); wav.writeUInt16LE(16, 34);
+	wav.write('data', 36); wav.writeUInt32LE(dataBytes, 40);
+	samples.forEach((sample, index) => wav.writeInt16LE(sample, 44 + index * 2));
+	return wav;
+}
 
 describe('EmbeddingGemma 2 ONNX image adapter', () => {
 	it('pins the model export and all three modality graph-data pairs', () => {
@@ -21,6 +36,17 @@ describe('EmbeddingGemma 2 ONNX image adapter', () => {
 		await expect(embedEvidenceImageWithEmbeddingGemma2OnnxV1({
 			buffer: Buffer.from([1]),
 		})).rejects.toThrow('EMBEDDINGGEMMA2_ONNX_MODEL_DIR_UNCONFIGURED');
+	});
+
+	it('decodes only bounded PCM16 mono WAV windows and rejects unsupported layouts', () => {
+		const wav = pcm16MonoWav([-32768, -16384, 0, 16384, 32767]);
+		const { info, pcm } = readPcm16MonoWavWindowV1(wav, 1, 3);
+		expect(info).toMatchObject({ sampleRate: 16_000, sampleCount: 5 });
+		expect(Array.from(pcm)).toEqual([-0.5, 0, 0.5]);
+		expect(() => readPcm16MonoWavWindowV1(wav, 5, 1)).toThrow('EMBEDDINGGEMMA2_AUDIO_WINDOW_INVALID');
+		const stereo = Buffer.from(wav);
+		stereo.writeUInt16LE(2, 22);
+		expect(() => readPcm16MonoWavWindowV1(stereo, 0, 1)).toThrow('EMBEDDINGGEMMA2_AUDIO_WAV_FORMAT_UNSUPPORTED');
 	});
 
 	const modelDir = process.env.ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR;
@@ -56,6 +82,23 @@ describe('EmbeddingGemma 2 ONNX image adapter', () => {
 				+ ' cos(doc, unrelated query)=' + dot(doc.embedding, unrelated.embedding).toFixed(4));
 			expect(dot(doc.embedding, related.embedding)).toBeGreaterThan(dot(doc.embedding, unrelated.embedding));
 		}, 120_000);
+
+		it('embeds bounded PCM audio through the audio tower and shared 768-D text encoder', async () => {
+			const pcm = Float32Array.from({ length: EMBEDDINGGEMMA2_ONNX_AUDIO_SAMPLE_RATE_V1 }, (_, index) =>
+				0.15 * Math.sin((2 * Math.PI * 440 * index) / EMBEDDINGGEMMA2_ONNX_AUDIO_SAMPLE_RATE_V1));
+			const result = await embedEvidenceAudioWithEmbeddingGemma2OnnxV1({
+				pcm,
+				sampleRate: EMBEDDINGGEMMA2_ONNX_AUDIO_SAMPLE_RATE_V1,
+				modelDir,
+			});
+			const norm = Math.sqrt(result.embedding.reduce((sum, value) => sum + value * value, 0));
+			expect(result.embedding).toHaveLength(768);
+			expect(norm).toBeCloseTo(1, 5);
+			expect(result.durationMs).toBe(1000);
+			expect(result.preprocessingRevision).toContain('audio-pcm-f32le-16khz-mono');
+			expect(result.inputSha256).toMatch(/^sha256:[a-f0-9]{64}$/);
+			expect(result.outputSha256).toMatch(/^sha256:[a-f0-9]{64}$/);
+		}, 120_000);
 	});
 
 	it('rejects empty text and an unconfigured model directory for text embedding', async () => {
@@ -64,5 +107,18 @@ describe('EmbeddingGemma 2 ONNX image adapter', () => {
 			.rejects.toThrow('EMBEDDINGGEMMA2_TEXT_INPUT_INVALID');
 		await expect(embedEvidenceTextWithEmbeddingGemma2OnnxV1({ text: 'hello', kind: 'document' }))
 			.rejects.toThrow('EMBEDDINGGEMMA2_ONNX_MODEL_DIR_UNCONFIGURED');
+	});
+
+	it('rejects wrong-rate, non-finite, and over-budget PCM before model loading', async () => {
+		const pcm = new Float32Array([0, 0.1]);
+		await expect(embedEvidenceAudioWithEmbeddingGemma2OnnxV1({ pcm, sampleRate: 8_000, modelDir: 'x' }))
+			.rejects.toThrow('EMBEDDINGGEMMA2_AUDIO_INPUT_INVALID');
+		await expect(embedEvidenceAudioWithEmbeddingGemma2OnnxV1({ pcm: new Float32Array([Number.NaN]), sampleRate: 16_000, modelDir: 'x' }))
+			.rejects.toThrow('EMBEDDINGGEMMA2_AUDIO_PCM_SAMPLE_INVALID');
+		await expect(embedEvidenceAudioWithEmbeddingGemma2OnnxV1({
+			pcm: new Float32Array(EMBEDDINGGEMMA2_ONNX_AUDIO_MAX_SAMPLES_V1 + 1),
+			sampleRate: 16_000,
+			modelDir: 'x',
+		})).rejects.toThrow('EMBEDDINGGEMMA2_AUDIO_INPUT_INVALID');
 	});
 });

@@ -6,10 +6,8 @@
  * Response envelope: { success, data | null, message }.
  */
 import { json } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client.js';
-import { cases } from '$lib/server/db/schema-postgres.js';
 import {
 	CommandReuseError,
 	EvidenceMismatchError,
@@ -18,6 +16,7 @@ import {
 	deleteMarker,
 	moveMarker
 } from '$lib/server/scene-markers/move-marker.js';
+import { authorizeSceneAccess } from '$lib/server/scene-markers/scene-access-v1.js';
 import type { RequestHandler } from './$types';
 
 const uuid = z.uuid();
@@ -63,20 +62,9 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 		);
 	}
 
-	const [owner] = await db
-		.select({ userId: cases.userId, assignedAttorney: cases.assignedAttorney })
-		.from(cases)
-		.where(eq(cases.id, caseId.data))
-		.limit(1);
-	if (!owner) {
-		return json({ success: false, data: null, message: 'Case not found' }, { status: 404 });
-	}
-
-	const userId = Number(locals.user.id);
-	const isAdmin = locals.user.role === 'admin';
-	if (!isAdmin && (Number.isNaN(userId) || (owner.userId !== userId && owner.assignedAttorney !== userId))) {
-		return json({ success: false, data: null, message: 'Forbidden' }, { status: 403 });
-	}
+	const access = await authorizeSceneAccess(locals, caseId.data);
+	if (access.ok === false) return json({ success: false, data: null, message: access.message }, { status: access.status });
+	const userId = access.userId;
 
 	try {
 		const result = await moveMarker(db, {
@@ -125,12 +113,9 @@ export const DELETE: RequestHandler = async ({ locals, params, request }) => {
 	const parsed = deleteBody.safeParse(raw);
 	if (!parsed.success) return json({ success: false, data: null, message: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 
-	const [owner] = await db.select({ userId: cases.userId, assignedAttorney: cases.assignedAttorney }).from(cases).where(eq(cases.id, caseId.data)).limit(1);
-	if (!owner) return json({ success: false, data: null, message: 'Case not found' }, { status: 404 });
-	const userId = Number(locals.user.id);
-	if (locals.user.role !== 'admin' && (Number.isNaN(userId) || (owner.userId !== userId && owner.assignedAttorney !== userId))) {
-		return json({ success: false, data: null, message: 'Forbidden' }, { status: 403 });
-	}
+	const access = await authorizeSceneAccess(locals, caseId.data);
+	if (access.ok === false) return json({ success: false, data: null, message: access.message }, { status: access.status });
+	const userId = access.userId;
 	try {
 		const result = await deleteMarker(db, {
 			caseId: caseId.data,

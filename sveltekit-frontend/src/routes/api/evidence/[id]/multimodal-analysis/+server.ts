@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { and, eq, isNotNull, isNull, or, sql } from 'drizzle-orm';
 import { db } from '$lib/server/db/client';
+import { ENV } from '$lib/server/env.server.js';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
@@ -26,11 +27,26 @@ const storedVisualAnalysisSchema = z.object({
 	visionTags: z.array(z.string().max(100)).max(100),
 	depthMap: z.object({
 		objectKey: z.string().min(1).max(1024),
+		bucket: z.string().min(1).max(63).optional(),
+		artifactSha256: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+		status: z.literal('ESTIMATED').optional(),
 		width: z.number().int().min(1).max(8192),
 		height: z.number().int().min(1).max(8192),
 		processingTimeMs: z.number().finite().nonnegative().nullable(),
 	}).nullable(),
 	stageErrors: z.array(z.string().max(300)).max(30),
+}).strict();
+
+const storedImageDerivativeSchema = z.object({
+	kind: z.literal('thumbnail'),
+	sourceRevision: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+	objectKey: z.string().min(1).max(1024),
+	bucket: z.string().min(1).max(63),
+	mimeType: z.literal('image/jpeg'),
+	outputSha256: z.string().regex(/^[a-f0-9]{64}$/),
+	width: z.number().int().min(1).max(256),
+	height: z.number().int().min(1).max(256),
+	preprocessingRevision: z.string().min(1).max(200),
 }).strict();
 
 type ResponseShape = {
@@ -46,6 +62,7 @@ type ResponseShape = {
 	preprocessingRevision: string | null;
 	reviewState: string | null;
 	analysis: Record<string, unknown> | null;
+	derivatives: { thumbnail: z.infer<typeof storedImageDerivativeSchema> } | null;
 	error: string | null;
 };
 
@@ -63,6 +80,7 @@ function response(status: ResponseShape['status'], evidenceId: string, fields: P
 		preprocessingRevision: null,
 		reviewState: null,
 		analysis: null,
+		derivatives: null,
 		error: null,
 		...fields,
 	};
@@ -120,7 +138,9 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				SELECT source_revision, analysis_revision, model, model_artifact_sha256,
 			       preprocessing_revision, source_locator, metadata
 				FROM public.evidence_multimodal_vectors
-				WHERE evidence_id = ${evidenceId}::uuid AND modality = 'image'
+				WHERE evidence_id = ${evidenceId}::uuid
+				  AND modality = 'image'
+				  AND source_locator->>'kind' = 'whole_image'
 				ORDER BY created_at DESC, id DESC
 				LIMIT 1
 			`);
@@ -162,6 +182,17 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				error: 'CANONICAL_IMAGE_ANALYSIS_RECORD_INVALID',
 			}, 500);
 		}
+		const rawDerivatives = objectRecord(metadata?.imageDerivatives);
+		const rawThumbnail = storedImageDerivativeSchema.safeParse(rawDerivatives?.thumbnail);
+		let derivatives: ResponseShape['derivatives'] = null;
+		if (rawThumbnail.success) {
+			const thumbnail = rawThumbnail.data;
+			const sourceHash = sourceRevision.slice('sha256:'.length);
+			const expectedKey = `evidence/${source.caseId ?? 'default'}/${evidenceId}/${sourceHash}/thumbnail-${thumbnail.outputSha256}.jpg`;
+			if (thumbnail.sourceRevision === sourceRevision && thumbnail.bucket === ENV.SEAWEED_ARTIFACTS_BUCKET && thumbnail.objectKey === expectedKey) {
+				derivatives = { thumbnail };
+			}
+		}
 
 		return response('CURRENT', evidenceId, {
 			caseId: source.caseId ?? null,
@@ -173,6 +204,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			preprocessingRevision: String(row.preprocessing_revision ?? '') || null,
 			reviewState: String(metadata?.modelOutputReviewState ?? 'UNREVIEWED_PROPOSAL'),
 			analysis: analysis.data,
+			derivatives,
 		});
 	} catch {
 		return response('ERROR', evidenceId, { error: 'IMAGE_ANALYSIS_READ_FAILED' }, 500);

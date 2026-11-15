@@ -8,6 +8,14 @@
  */
 import { and, eq, isNull, sql } from 'drizzle-orm';
 import { sceneEventOutbox, sceneEvents, sceneMarkers } from '../db/schema/scene-markers.js';
+import { evidence } from '../db/schema-postgres.js';
+
+/** Raised when a marker would reference evidence that is not active in the same case. */
+export class EvidenceNotInCaseError extends Error {
+	constructor() {
+		super('EVIDENCE_NOT_IN_CASE');
+	}
+}
 
 export type MarkerPosition = { x: number; y: number; z: number };
 
@@ -84,16 +92,41 @@ export async function createMarker(
 				.where(eq(sceneEvents.commandId, cmd.commandId))
 				.limit(1);
 			if (prior) {
-				if (prior.markerId !== cmd.markerId || prior.caseId !== cmd.caseId || prior.sceneKey !== cmd.sceneKey) {
+				// A replay must match every field of the original create, not just the identifiers.
+				// Compared against the committed event payload, not the marker's current row (a later move is legitimate).
+				const stored = prior.payload as {
+					position?: MarkerPosition;
+					evidenceId?: string;
+					label?: string | null;
+				};
+				const sameIdentity =
+					prior.markerId === cmd.markerId && prior.caseId === cmd.caseId && prior.sceneKey === cmd.sceneKey;
+				const sameFields =
+					typeof stored.evidenceId === 'string' &&
+					stored.evidenceId === cmd.evidenceId &&
+					(stored.label ?? null) === (cmd.label ?? null) &&
+					!!stored.position &&
+					stored.position.x === cmd.position.x &&
+					stored.position.y === cmd.position.y &&
+					stored.position.z === cmd.position.z;
+				if (!sameIdentity || !sameFields) {
 					throw new CommandReuseError();
 				}
 				return {
 					markerId: cmd.markerId,
 					revision: prior.aggregateRevision,
-					position: (prior.payload as { position: MarkerPosition }).position,
+					position: stored.position as MarkerPosition,
 					replayed: true
 				};
 			}
+
+			// Same-case evidence only: a marker may not reference another case's (or a deleted) exhibit.
+			const [owned] = await tx
+				.select({ id: evidence.id })
+				.from(evidence)
+				.where(and(eq(evidence.id, cmd.evidenceId), eq(evidence.caseId, cmd.caseId), isNull(evidence.deletedAt)))
+				.limit(1);
+			if (!owned) throw new EvidenceNotInCaseError();
 
 			await tx.insert(sceneMarkers).values({
 				id: cmd.markerId,
@@ -118,7 +151,7 @@ export async function createMarker(
 					eventType: 'MARKER_CREATED',
 					markerId: cmd.markerId,
 					aggregateRevision: 1,
-					payload: { position: cmd.position, evidenceId: cmd.evidenceId },
+					payload: { position: cmd.position, evidenceId: cmd.evidenceId, label: cmd.label },
 					createdBy: cmd.userId
 				})
 				.returning({ id: sceneEvents.id });

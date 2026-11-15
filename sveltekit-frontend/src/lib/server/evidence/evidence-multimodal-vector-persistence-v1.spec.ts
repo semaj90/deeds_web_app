@@ -5,6 +5,8 @@ import { deriveUUID } from '$lib/utils/uuid.js';
 import {
   EVIDENCE_MULTIMODAL_PROJECTION_CONTRACT_V1,
   EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1,
+  EVIDENCE_AUDIO_CONTENT_PROJECTION_LANE_V1,
+  EVIDENCE_AUDIO_CONTENT_REPRESENTATION_V1,
   persistEvidenceMultimodalVectorV1,
   type EvidenceMultimodalDatabaseV1,
   type EvidenceMultimodalVectorInputV1,
@@ -47,12 +49,14 @@ function mockDatabase(input: EvidenceMultimodalVectorInputV1, sourceHash = revis
     if (index === 2) return { rows: [{
       id: '33333333-3333-4333-8333-333333333333', evidence_id: input.evidenceId, case_id: input.caseId,
       source_revision: input.sourceRevision, analysis_revision: input.analysisRevision, modality: input.modality,
+      representation_id: input.representationId ?? EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1,
       source_locator_sha256: locatorSha256, dimension: 768, embedding_float4: vector,
       model: input.model, model_artifact_sha256: input.modelArtifactSha256,
       preprocessing_revision: input.preprocessingRevision, input_sha256: input.inputSha256, output_sha256: outputSha256,
     }] };
     if (index === 4) return { rows: [{
       qdrant_point_id: qdrantPointId, source_revision: input.sourceRevision,
+      representation_id: input.representationId ?? EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1,
       analysis_revision: input.analysisRevision, modality: input.modality,
       source_locator_sha256: locatorSha256, model_artifact_sha256: input.modelArtifactSha256,
       preprocessing_revision: input.preprocessingRevision, input_sha256: input.inputSha256, output_sha256: outputSha256,
@@ -85,6 +89,13 @@ describe('canonical multimodal vector persistence', () => {
     expect(mock.execute).not.toHaveBeenCalled();
   });
 
+  it('requires sampled PCM audio windows to use a separate representation lane', async () => {
+    const input = makeInput({ modality: 'audio_segment', sourceLocator: { kind: 'sampled_audio_window', startMs: 0, endMs: 1000 } });
+    const mock = mockDatabase(input);
+    await expect(persistEvidenceMultimodalVectorV1(mock.database, input)).rejects.toThrow('EVIDENCE_MULTIMODAL_AUDIO_REPRESENTATION_REQUIRED');
+    expect(mock.execute).not.toHaveBeenCalled();
+  });
+
   it('commits PostgreSQL vector and Qdrant outbox intent only after source and vector readback', async () => {
     const input = makeInput();
     const mock = mockDatabase(input);
@@ -105,9 +116,32 @@ describe('canonical multimodal vector persistence', () => {
       qdrantPointId,
       outputSha256,
       sourceLocatorSha256: locatorSha256,
+      representationId: EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1,
+      projectionLane: EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1,
     });
     expect(mock.calls).toHaveLength(5);
     expect(EVIDENCE_MULTIMODAL_PROJECTION_LANE_V1).toBe('evidence_multimodal_semantic_768');
     expect(EVIDENCE_MULTIMODAL_PROJECTION_CONTRACT_V1).toBe('evidence-multimodal-qdrant-projection-v1');
+  });
+
+  it('persists audio content under a distinct PostgreSQL representation and projection lane', async () => {
+    const input = makeInput({
+      modality: 'audio_segment',
+      representationId: EVIDENCE_AUDIO_CONTENT_REPRESENTATION_V1,
+      sourceLocator: { kind: 'sampled_audio_window', startMs: 0, endMs: 5000, sampleRate: 16000 },
+    });
+    const mock = mockDatabase(input);
+    const qdrantPointId = await deriveUUID('atlas.evidence-multimodal-vector.qdrant-point.v1', {
+      evidenceId: input.evidenceId, sourceRevision: input.sourceRevision, analysisRevision: input.analysisRevision,
+      modality: input.modality, representationId: EVIDENCE_AUDIO_CONTENT_REPRESENTATION_V1,
+      sourceLocatorSha256: mock.locatorSha256, modelArtifactSha256: input.modelArtifactSha256,
+      preprocessingRevision: input.preprocessingRevision,
+    });
+    mock.setPointId(qdrantPointId);
+    await expect(persistEvidenceMultimodalVectorV1(mock.database, input)).resolves.toMatchObject({
+      qdrantPointId,
+      representationId: EVIDENCE_AUDIO_CONTENT_REPRESENTATION_V1,
+      projectionLane: EVIDENCE_AUDIO_CONTENT_PROJECTION_LANE_V1,
+    });
   });
 });

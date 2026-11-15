@@ -1,0 +1,16 @@
+{
+  "createdAt": "2026-11-15T03:22:53.333Z",
+  "database": "legal_ai_live_integration_scratch",
+  "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
+  "sourceSql": "claim, heartbeat, and assert query strings extracted from library-ingestion-queue-v1.ts",
+  "queuedSourceBoundJobs": 4,
+  "fixtureJobSha256": "bb00f6ada8adce7ea00911d3aa8715d5ba4a920114298a972eaa8b56d6f34f45",
+  "expiredLeaseReclaimed": true,
+  "attemptIncremented": true,
+  "fencingTokenIncremented": true,
+  "staleHeartbeatRejected": true,
+  "staleLeaseAssertionRejected": true,
+  "transactionRolledBack": true,
+  "queueStateAfterRollbackMatchesPreimage": true,
+  "preimageSha256": "6e63feb8004cac136baaf8dcadb4f9455eb37918d2ecbc247bd0d9ec03cd027d"
+}
