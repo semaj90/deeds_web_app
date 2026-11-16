@@ -18,6 +18,8 @@ import { isUuid } from '$lib/server/validation.js';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { formatEvidenceSourceRevisionV1 } from '$lib/server/evidence-source-revision-v1.js';
 import { videoSkimPreviewManifestV1Schema } from '$lib/server/features/evidence/video/video-skim-preview-v1.js';
+import { videoEventTimelineV1Schema } from '$lib/server/features/evidence/video/video-event-fusion-v1.js';
+import { videoMotionLutManifestV1Schema } from '$lib/shared/video-motion-lut-v1.js';
 
 function parseMetadata(value: unknown): Record<string, unknown> {
 	if (typeof value === 'string') {
@@ -39,11 +41,11 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	const evidenceId = params.id;
 
 	if (!locals.user?.id) {
-		return json({ success: false, error: 'Unauthorized', evidenceId, frames: [], total: 0, skimPreview: null }, { status: 401 });
+		return json({ success: false, error: 'Unauthorized', evidenceId, frames: [], total: 0, skimPreview: null, eventTimeline: null }, { status: 401 });
 	}
 
 	if (!isUuid(evidenceId)) {
-		return json({ success: false, error: 'Invalid ID format', evidenceId, frames: [], total: 0, skimPreview: null }, { status: 400 });
+		return json({ success: false, error: 'Invalid ID format', evidenceId, frames: [], total: 0, skimPreview: null, eventTimeline: null }, { status: 400 });
 	}
 
 	try {
@@ -71,7 +73,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
 		if (!item) {
 			return json(
-				{ success: false, error: 'Evidence not found or access denied', evidenceId, frames: [], total: 0, skimPreview: null },
+				{ success: false, error: 'Evidence not found or access denied', evidenceId, frames: [], total: 0, skimPreview: null, eventTimeline: null },
 				{ status: 404 }
 			);
 		}
@@ -93,6 +95,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			);
 				return {
 					id: `${String(canonicalVideoAnalysis.analysisRevision ?? 'video')}:${index}`,
+					frameIndex: index,
 					timestamp: Number(frame.timestampMs ?? 0) / 1000,
 					timestampMs: Number(frame.timestampMs ?? 0),
 					framePath: null,
@@ -108,11 +111,34 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 					modelRevision: frame.modelRevision ?? null,
 					analysisRevision: canonicalVideoAnalysis.analysisRevision,
 					sourceRevision: canonicalVideoAnalysis.sourceRevision,
+					trackScopeId: typeof frame.trackScopeId === 'string' ? frame.trackScopeId : null,
 					reviewState: frame.reviewState ?? 'UNREVIEWED_PROPOSAL',
+					motionLut: (() => {
+						const parsedMotion = videoMotionLutManifestV1Schema.safeParse(frame.motionLut);
+						const motion = parsedMotion.success ? parsedMotion.data : null;
+						return motion && motion.evidenceId === evidenceId && motion.frameIndex === index &&
+							motion.sourceRevision === currentSourceRevision && motion.analysisRevision === canonicalVideoAnalysis.analysisRevision
+							? {
+								schema: motion.schema,
+								width: motion.width,
+								height: motion.height,
+								timestampMs: motion.timestampMs,
+								motionScore: motion.motionScore,
+								url: `/api/evidence/${encodeURIComponent(evidenceId)}/motion-preview/${index}`,
+							}
+							: null;
+					})(),
 				};
 			});
 			const parsedSkimPreview = videoSkimPreviewManifestV1Schema.safeParse(canonicalVideoAnalysis.skimPreview);
 			const skim = parsedSkimPreview.success ? parsedSkimPreview.data : null;
+			const parsedEventTimeline = videoEventTimelineV1Schema.safeParse(canonicalVideoAnalysis.eventTimeline);
+			const eventCandidate = parsedEventTimeline.success ? parsedEventTimeline.data : null;
+			const eventTimeline = eventCandidate && eventCandidate.evidenceId === evidenceId &&
+				eventCandidate.sourceRevision === currentSourceRevision &&
+				eventCandidate.analysisRevision === canonicalVideoAnalysis.analysisRevision
+				? eventCandidate
+				: null;
 			const skimPreview = skim && skim.sourceRevision === currentSourceRevision && skim.analysisRevision === canonicalVideoAnalysis.analysisRevision
 				? {
 					schema: skim.schema,
@@ -127,7 +153,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 					tiles: skim.tiles.map(({ index, firstSampleIndex, sampleCount }) => ({ index, firstSampleIndex, sampleCount })),
 				}
 				: null;
-			return json({ success: true, evidenceId, frames, total: frames.length, skimPreview }, { headers: cacheControl.private });
+			return json({ success: true, evidenceId, frames, total: frames.length, skimPreview, eventTimeline }, { headers: cacheControl.private });
 		}
 
 		// 2. Attempt query against canonical evidence_frames table (if migrated)
@@ -139,8 +165,9 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				.orderBy(asc(evidenceFrames.timestampMs));
 
 			if (rows.length > 0) {
-				const frames = rows.map((r) => ({
+				const frames = rows.map((r, index) => ({
 					id: r.id,
+					frameIndex: index,
 					timestamp: r.timestampMs / 1000,
 					timestampMs: r.timestampMs,
 					framePath: r.storageUri,
@@ -153,7 +180,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				}));
 
 				return json(
-					{ success: true, evidenceId, frames, total: frames.length, skimPreview: null },
+					{ success: true, evidenceId, frames, total: frames.length, skimPreview: null, eventTimeline: null },
 					{ headers: cacheControl.private }
 				);
 			}
@@ -170,7 +197,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				: [];
 
 		return json(
-			{ success: true, evidenceId, frames: fallbackFrames, total: fallbackFrames.length, skimPreview: null },
+			{ success: true, evidenceId, frames: fallbackFrames, total: fallbackFrames.length, skimPreview: null, eventTimeline: null },
 			{ headers: cacheControl.private }
 		);
 	} catch (error) {
@@ -183,7 +210,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				evidenceId,
 				frames: [],
 				total: 0,
-				skimPreview: null
+				skimPreview: null,
+				eventTimeline: null
 			},
 			{ status: 200, headers: cacheControl.private }
 		);

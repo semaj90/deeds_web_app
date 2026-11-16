@@ -94,7 +94,8 @@
           "value": "local",
           "weight": 1,
           "models": [
-            "ornith-1.5-9b"
+            "ornith-1.5-9b",
+            "gemma4-legal-iq4xs-direct.gguf"
           ]
         }
       ],

@@ -8,7 +8,11 @@ const SEGMENT_ID = '00000000-0000-4000-8000-0000000000dd';
 
 const mocks = vi.hoisted(() => ({
 	whereConditions: [] as unknown[],
-	evidenceRow: null as null | { id: string; caseId: string; hash: string },
+	updateValues: [] as Array<Record<string, unknown>>,
+	evidenceRow: null as null | { id: string; caseId: string; hash: string; title?: string; tags?: string[]; aiSummary?: string | null; aiAnalysis?: unknown },
+	selectCalls: 0,
+	canonicalRows: [] as Array<Record<string, unknown>>,
+	legacyRows: [] as Array<Record<string, unknown>>,
 	gateEnabled: true,
 }));
 
@@ -18,30 +22,48 @@ vi.mock('$lib/server/env.server.js', () => ({
 
 vi.mock('$lib/server/db/client', () => {
 	const db = {
-		select: () => ({
-			from: () => ({
-				leftJoin: () => ({
-					where: () => ({
-						limit: async () => (mocks.evidenceRow ? [mocks.evidenceRow] : []),
+		select: () => {
+			const call = mocks.selectCalls++;
+			if (call === 0) return {
+				from: () => ({
+					leftJoin: () => ({
+						where: () => ({
+							limit: async () => (mocks.evidenceRow ? [mocks.evidenceRow] : []),
+						}),
 					}),
 				}),
-			}),
-		}),
+			};
+			if (call === 1) return {
+				from: () => ({
+					innerJoin: () => ({
+						where: () => ({ orderBy: async () => mocks.canonicalRows }),
+					}),
+				}),
+			};
+			return {
+				from: () => ({
+					where: () => ({ orderBy: async () => mocks.legacyRows }),
+				}),
+			};
+		},
 		update: () => ({
-			set: () => ({
+			set: (values: Record<string, unknown>) => {
+				mocks.updateValues.push(values);
+				return {
 				where: (condition: unknown) => ({
 					returning: async () => {
 						mocks.whereConditions.push(condition);
 						return [{ id: SEGMENT_ID }];
 					},
 				}),
-			}),
+				};
+			},
 		}),
 	};
 	return { db };
 });
 
-import { POST } from './+server';
+import { GET, POST } from './+server';
 
 const dialect = new PgDialect();
 
@@ -56,8 +78,47 @@ function reviewRequest(body: unknown): Request {
 describe('transcript review POST (canonical whisper_segments path)', () => {
 	beforeEach(() => {
 		mocks.whereConditions.length = 0;
-		mocks.evidenceRow = { id: EVIDENCE_ID, caseId: '00000000-0000-4000-8000-0000000000bb', hash: SOURCE_HASH };
+		mocks.updateValues.length = 0;
+		mocks.selectCalls = 0;
+		mocks.canonicalRows = [];
+		mocks.legacyRows = [];
+		mocks.evidenceRow = { id: EVIDENCE_ID, caseId: '00000000-0000-4000-8000-0000000000bb', hash: SOURCE_HASH, title: 'Interview' };
 		mocks.gateEnabled = true;
+	});
+
+	it('prefers canonical source-bound transcript rows over legacy rows', async () => {
+		mocks.canonicalRows = [{
+			id: SEGMENT_ID, startMs: 1000, endMs: 2100, text: 'canonical speech', language: 'en', translatedText: null,
+			speaker: 'spk_01', confidence: 0.91, model: 'faster-whisper', metadataJson: { sourceRevision: `sha256:${SOURCE_HASH}`, analysisRevision: 'analysis-v1', speakerId: 'spk_01' },
+		}];
+		mocks.legacyRows = [{
+			id: '00000000-0000-4000-8000-0000000000ee', startMs: 1000, endMs: 2100, text: 'legacy speech', language: 'en', translatedText: null,
+			speaker: null, confidence: 0.5, model: 'legacy', metadataJson: { source_revision: `sha256:${SOURCE_HASH}` },
+		}];
+		const response = await GET({
+			params: { id: EVIDENCE_ID },
+			locals: { user: { id: '7' } },
+			url: new URL(`http://localhost/api/evidence/${EVIDENCE_ID}/transcript`),
+		} as never);
+
+		expect(response.status).toBe(200);
+		expect(await response.json()).toMatchObject({
+			segments: [{ id: SEGMENT_ID, text: 'canonical speech', speakerId: 'spk_01', sourceRevision: `sha256:${SOURCE_HASH}` }],
+		});
+	});
+
+	it('does not expose human-name speaker labels as model identity', async () => {
+		mocks.canonicalRows = [{
+			id: SEGMENT_ID, startMs: 1000, endMs: 2100, text: 'speech', language: 'en', translatedText: null,
+			speaker: 'Detective Miller', confidence: 0.91, model: 'faster-whisper', metadataJson: { sourceRevision: `sha256:${SOURCE_HASH}` },
+		}];
+		const response = await GET({
+			params: { id: EVIDENCE_ID },
+			locals: { user: { id: '7' } },
+			url: new URL(`http://localhost/api/evidence/${EVIDENCE_ID}/transcript`),
+		} as never);
+
+		expect((await response.json()).segments[0].speakerId).toBeNull();
 	});
 
 	it('updates the canonical row and filters it only by whisper_segments columns', async () => {
@@ -75,6 +136,21 @@ describe('transcript review POST (canonical whisper_segments path)', () => {
 		// "missing FROM-clause entry" in PostgreSQL before the legacy path could run.
 		expect(compiled.sql).not.toContain('evidence_transcript_segments');
 		expect(compiled.sql).toContain('"whisper_segments"."id"');
+	});
+
+	it('stores a reviewer correction separately from the original model transcript', async () => {
+		const correctedText = 'The witness entered the corridor.';
+		const response = await POST({
+			params: { id: EVIDENCE_ID },
+			locals: { user: { id: '7' } },
+			request: reviewRequest({ segmentId: SEGMENT_ID, reviewStatus: 'approved', correctedText }),
+		} as never);
+
+		expect(response.status).toBe(200);
+		expect(mocks.updateValues[0].text).toBe(correctedText);
+		const metadata = dialect.sqlToQuery(mocks.updateValues[0].metadata as never);
+		expect(metadata.sql).toContain('modelText');
+		expect(metadata.sql).toContain('whisper_segments"."text');
 	});
 
 	it('refuses every review write while the operator gate is off', async () => {
@@ -97,6 +173,16 @@ describe('transcript review POST (canonical whisper_segments path)', () => {
 		} as never);
 		expect(response.status).toBe(400);
 		expect(mocks.whereConditions).toHaveLength(0);
+	});
+
+	it('rejects corrections that are not marked approved', async () => {
+		const response = await POST({
+			params: { id: EVIDENCE_ID },
+			locals: { user: { id: '7' } },
+			request: reviewRequest({ segmentId: SEGMENT_ID, reviewStatus: 'rejected', correctedText: 'Corrected words.' }),
+		} as never);
+		expect(response.status).toBe(400);
+		expect(mocks.updateValues).toHaveLength(0);
 	});
 
 	it('returns 404 when the caller cannot see the evidence', async () => {

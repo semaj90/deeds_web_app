@@ -8,7 +8,7 @@ const mockSegments = [
 		startMs: 1000,
 		endMs: 3200,
 		text: 'The suspect approached the exterior gate at approximately 14:02.',
-		speakerId: 'Detective Miller',
+		speakerId: 'spk_01',
 		confidence: 0.95,
 		reviewStatus: 'unreviewed_proposal' as const,
 	},
@@ -17,7 +17,7 @@ const mockSegments = [
 		startMs: 3500,
 		endMs: 6000,
 		text: 'A keycard was presented to the RFID reader.',
-		speakerId: 'Officer Chen',
+		speakerId: 'spk_02',
 		confidence: 0.92,
 		reviewStatus: 'approved' as const,
 	},
@@ -26,7 +26,7 @@ const mockSegments = [
 		startMs: 6500,
 		endMs: 9000,
 		text: 'Server room door opened 3 seconds later.',
-		speakerId: 'Detective Miller',
+		speakerId: 'spk_01',
 		confidence: 0.88,
 		reviewStatus: 'unreviewed_proposal' as const,
 	},
@@ -43,6 +43,7 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 				evidenceId: 'ev-video-001',
 				sourceRevision: 'sha256:fixture-source-revision',
 				analysisRevision: 'video-analysis-v1:fixture-analysis-revision',
+				reviewEnabled: true,
 				status: 'completed',
 				segments: mockSegments,
 			}),
@@ -66,7 +67,7 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 
 		await waitFor(() => {
 			expect(screen.getByText(/The suspect approached the exterior gate/i)).toBeTruthy();
-			expect(screen.getAllByText(/Detective Miller/i).length).toBeGreaterThan(0);
+			expect(screen.getAllByText(/spk_01/i).length).toBeGreaterThan(0);
 			expect(screen.getByTestId('transcript-provenance').textContent).toContain('sha256:fixture-source-revision');
 		});
 	});
@@ -118,8 +119,8 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 
 		// Filter by speaker
 		const speakerSelect = screen.getByLabelText(/Speaker:/i);
-		await fireEvent.change(speakerSelect, { target: { value: 'Officer Chen' } });
-		expect(screen.getAllByText(/Officer Chen/i).length).toBeGreaterThan(0);
+		await fireEvent.change(speakerSelect, { target: { value: 'spk_02' } });
+		expect(screen.getAllByText(/spk_02/i).length).toBeGreaterThan(0);
 	});
 
 	it('renders truthful silent video state when video has no audio', async () => {
@@ -173,6 +174,26 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 		await fireEvent.click(approveBtns[0]);
 		await waitFor(() => {
 			expect(onSegmentReviewed).toHaveBeenCalledWith('seg-1', 'approved');
+		});
+	});
+
+	it('saves a transcript correction while retaining the original model text', async () => {
+		render(EvidenceTranscriptPanel, { props: { evidenceId: 'ev-video-001', initialOpen: true } });
+		await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' }).length).toBeGreaterThan(0));
+		(globalThis.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true }) });
+
+		await fireEvent.click(screen.getAllByRole('button', { name: 'Edit' })[0]);
+		const editor = screen.getByRole('textbox', { name: /Correct transcript at 0:01/i });
+		await fireEvent.input(editor, { target: { value: 'The witness entered the corridor.' } });
+		await fireEvent.click(screen.getByRole('button', { name: 'Save correction' }));
+
+		await waitFor(() => {
+			expect(globalThis.fetch).toHaveBeenLastCalledWith('/api/evidence/ev-video-001/transcript', expect.objectContaining({
+				method: 'POST',
+				body: JSON.stringify({ segmentId: 'seg-1', reviewStatus: 'approved', correctedText: 'The witness entered the corridor.' }),
+			}));
+			expect(screen.getByText('The witness entered the corridor.')).toBeTruthy();
+			expect(screen.getByText(/Corrected from: The suspect approached/i)).toBeTruthy();
 		});
 	});
 

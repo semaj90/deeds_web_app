@@ -1094,3 +1094,58 @@ and a 40,960-byte residency budget with 32,320 bytes selected. The proof uses
 an ephemeral in-memory cache client (`writesPerformed=false`); it does not
 establish live Valkey residency, production caller wiring, or full ACE/
 ContextManifest admission. Keep the live integration gates above open.
+
+## QDRANT-1.20-TURBO-01 plan — 2026-11-15 (planning; nothing applied)
+
+Status: `CREATED` (plan only). No collection, snapshot, image pin, or Docker state was changed by this entry.
+
+| # | Task | Owner | Gate | Status |
+|---|---|---|---|---|
+| 1 | Human starts Docker Desktop (human-only; `com.docker.service` Manual, Stopped; last failure = disk full at 2026-11-15 22:32, now ~7.3 GB free) | operator | Docker engine answers `docker info` | `BLOCKED_HUMAN` |
+| 2 | Verify 1.20 image: `qdrant/qdrant:v1.20.0@sha256:9bfc89f9914fc14876a88c05270685921a55b8877b254a98bcc1cc2f0a424cd2` (Docker Hub manifest read 2026-11-15; 1.19.0 digest `057ee3a8…` re-verified against pins) | agent | digest re-fetched before pin | `DIGEST_VERIFIED` |
+| 3 | Release age: 1.20.0 published 2026-10-22 (>= 2 weeks) | agent | GitHub release API | `VERIFIED` |
+| 4 | Client parity: `@qdrant/js-client-rest@1.20.0` and `@qdrant/qdrant-js@1.20.0` exist; REST types include `TurboQuant` / turbo4/8/16 | agent | `npm pack` inspection | `VERIFIED_TYPES` (runtime call not yet exercised) |
+| 5 | Baseline on current 1.19.0: `scripts/atlas/audit-qdrant-connectivity.mjs` (REST 6333 and gRPC 6334) | agent | both transports PASS | `NOT_RUN` (needs Docker) |
+| 6 | Timing baseline: `rg` vs pgvector/Qdrant vector search, tie-aware recall@10 | agent | same query set, receipt written | `RG_PARTIAL` (4 queries, wall-clock 6–12 s over src+scripts+docs; vector side `NOT_RUN`) |
+| 7 | Snapshot all collections before any change (`POST /collections/{name}/snapshots`); pre-image archived under `docs/reports/archive/` | agent with operator OK | free space >= snapshot size (~6 GB for data; existing 4.9 GB snapshots are NOT deleted) | `BLOCKED_SPACE_AND_APPROVAL` |
+| 8 | Edit image pin + digest in `docker-compose.yml`, `docker-compose.dev.yml`, `docker-compose.production.yml`, `docker/docker-compose.gpu.yml`; pin `docker-compose.test.yml` and `docker-compose.vector.yml` (currently `:latest`) | agent | `docker compose config` clean | `NOT_STARTED` (held until 7 passes) |
+| 9 | Bump client pins in `sveltekit-frontend/package.json` (`@qdrant/js-client-rest`, `@qdrant/qdrant-js`) 1.19.0 → 1.20.0 | agent | `npm run check:fast` 0 errors | `NOT_STARTED` |
+| 10 | Upgrade server to 1.20 (restart is operator-run) | operator | `GET /` reports 1.20.0; collections green | `BLOCKED_HUMAN` |
+| 11 | Create ONE turbo collection (`turbo8` or `turbo4`) as a copy of one existing collection; recall/latency vs source | agent | tie-aware recall, p50 latency, receipt | `NOT_STARTED` |
+| 12 | Only after 11 passes: convert remaining collections; keep originals until readback passes | operator-approved | per-collection readback | `NOT_STARTED` |
+| 13 | gRPC: `QDRANT__SERVICE__GRPC_PORT=6334` already set in `docker/docker-compose.gpu.yml`; run connectivity audit on 1.20 | agent | gRPC PASS | `NOT_RUN` |
+
+**Not required:** re-embedding. Turbo quantization compresses stored vectors; they are copied, not regenerated. Re-embedding applies only to a move to EmbeddingGemma 2, which is a separate lane needing its own parity proof against canonical `semantic_768`.
+
+**Constraints:** no snapshot deletion; no in-place datatype change (1.20 turbo is set at collection creation); no restart without operator action; `codebase_chunks_768` duplicates are not part of this plan (QDRANT-DUP-CENSUS-01).
+
+### DEV-GPU-GEMMA4-IQ4XS-01 — 2026-11-15 (code edited; not run)
+
+- `scripts/launch-turboquant.ps1`: new profile `gemma4-legal-iq4xs` (`models/gemma4-legal-iq4xs-direct.gguf`, alias `gemma4-legal-iq4xs-direct.gguf`, gemma4 template, 65536 ctx). Parse check PASS.
+- `sveltekit-frontend/scripts/startup/dev-gpu-runtime.mjs`: default non-vision chat profile is now `gemma4-legal-iq4xs`; the served-model gate and the launcher profile share one map (`CHAT_PROFILE_ALIAS`), so they cannot drift. `node --check` PASS. Restore Ornith with `TURBO_STARTUP_PROFILE=ornith-1.5`.
+- **Not proven:** VRAM saving (file size difference is ~0.8 GB before KV cache); tool-call behaviour and template fit for this GGUF; app-side model-id resolution (`model-ids.ts` and the llama-server resolver still reference `ornith-1.5-9b`). Live `:8090` start is operator-run, and `dev:gpu` has not been executed.
+
+### DEV-GPU-CHAT-ALIAS-SWEEP-01 — 2026-11-15 (audit + env switch; no model started)
+
+- Env switched in gitignored `.env` and `sveltekit-frontend/.env`: `TURBO_STARTUP_PROFILE=gemma4-legal-iq4xs`, `LLAMA_SERVER_MODEL=gemma4-legal-iq4xs-direct.gguf`. Revert = restore `ornith-1.5` / `ornith-1.5-9b`.
+- `dev-gpu-runtime.mjs` now reads `TURBO_STARTUP_PROFILE` from the repo `.env` first, matching the rest of its config resolution.
+- **Blockers (not changed; need a decision):**
+  - `sveltekit-frontend/src/lib/ai/model-ids.ts:102` hardcodes `SERVER_CHAT_MODEL = 'ornith-1.5-9b'`, sent as the `model` field on direct `:8090` calls. Unverified whether llama-server ignores or rejects a mismatched `model`.
+  - Ornith-only gates hard-fail under Gemma: `python/atlas_summary_claim_judge_v1.py:124`, `python/atlas_summary_faithfulness_v1.py:187` (both raise on non-Ornith alias), `scripts/launch-ornith-vlm.ps1:39` (throws), `docker/docling-vlm/ornith_vlm_client.py:62`. These are policy gates; keep them Ornith-only and run them with Ornith, or relax by decision.
+  - Hardcoded `'ornith-1.5-9b'` fallbacks in about 40 scripts (`scripts/*.mjs`, `scripts/**/*.py`, `packages/parent-atlas/src/pipelines/summary-packets.ts:131`, `packages/atlas-core/src/langgraph/*`, `opencode.json(c)`, `scripts/audit/backend-infrastructure-audit.sh:218`). Most read `LLAMA_SERVER_MODEL` first and now get the Gemma alias via `.env`; the literal fallbacks only apply when the env var is unset.
+- Vision: the Gemma IQ4_XS file has no projector here. The vision lane (`ornith-1.5-vlm`, `:8085` VLM, docling) stays on Ornith.
+
+### VIDEO-EVIDENCE-EVENT-TIMELINE-01 — 2026-11-15 (pasted review; claims not re-verified here)
+
+Goal: join existing video outputs into reviewed, source-bound events that drive the reconstruction timeline. Not a new graphics or OpenCV runtime.
+
+| # | Task | Gate | Status |
+|---|---|---|---|
+| 1 | Verify the video transcription worker uses the intended Python (`.venv`, faster-whisper 1.2.1) and model weights are cached | worker start receipt with Python path and model id | `NOT_RUN` |
+| 2 | Prove one real transcript end-to-end on one clip (no placeholder output) | transcript segments with IDs and time ranges | `NOT_RUN` |
+| 3 | Event-synthesis stage: each proposed event holds transcript segment IDs, frame/finding IDs, source revision, time range, review status | schema + Postgres readback, no fuzzy joins | `NOT_STARTED` |
+| 4 | Review reel: FFmpeg cuts selected event ranges (after human selection only) | cut file SHA-256 and duration vs range | `NOT_STARTED` |
+| 5 | Reviewed events drive scene annotations | scene revision linkage (see scene-revision audit) | `NOT_STARTED` |
+
+Out of scope for now: Mode 7 effect (optional display only); browser OpenCV.js; OpenCV WebAssembly; WebGPU in the Rust module. Existing owners: FFmpeg/FFprobe (server), Python OpenCV (in Python 3.13 only), faster-whisper (in `.venv`), Three.js renderers.
+Caveat from the pasted review: Whisper CLI missing from the venv per an earlier observation; verify before task 2.

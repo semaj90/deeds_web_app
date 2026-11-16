@@ -123,46 +123,6 @@
 		cursor: not-allowed;
 	}
 
-	.add-form {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-		padding: 1rem;
-		margin-bottom: 1.5rem;
-		border: 1px solid var(--sand-dark, #3a3a3a);
-		border-radius: 8px;
-		background: var(--panel-soft, #1a1a1a);
-	}
-
-	.form-row {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.75rem;
-	}
-
-	.add-form label {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
-		font-size: 0.875rem;
-	}
-
-	.add-form label span {
-		font-weight: 500;
-		opacity: 0.8;
-	}
-
-	.add-form input,
-	.add-form select,
-	.add-form textarea {
-		padding: 0.5rem;
-		border: 1px solid var(--sand-dark, #3a3a3a);
-		border-radius: 4px;
-		background: var(--panel, #111);
-		color: inherit;
-		font-size: 0.875rem;
-	}
-
 	.loading,
 	.empty-state {
 		text-align: center;

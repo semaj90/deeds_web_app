@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, it, expect } from 'vitest';
 import crypto from 'node:crypto';
+import { humanCoco17PoseSchemaV1 } from '$lib/shared/pose-skeleton-schema-v1.js';
 import {
   EVIDENCE_REVISION_SCHEMA_V1,
   EvidenceRevisionErrorV1,
@@ -182,6 +183,78 @@ describe('evidence-revision-v1', () => {
     const first = await saveEvidenceAnnotationRevisionV1(input, ports);
     const second = await saveEvidenceAnnotationRevisionV1(input, ports);
     expect(second).toMatchObject({ idempotent: true, versionId: first.versionId, version: first.version, annotationSha256: first.annotationSha256 });
+  });
+
+  it('persists full-precision pose observations inside the source-bound annotation revision', async () => {
+    const { ports, log } = fakePorts();
+    const pose = {
+      schema: 'atlas.pose-observation.v1',
+      evidenceId: EV_ID,
+      sourceSha256: PARENT,
+      sourceRevision: PARENT,
+      analysisRevision: 'analysis-rev-1',
+      framePtsUs: 1_250_000,
+      frameIndex: 37,
+      frameWidth: 640,
+      frameHeight: 480,
+      skeletonSchemaId: humanCoco17PoseSchemaV1.schemaId,
+      trackId: 'track-0001',
+      trackScopeId: 'sha256:run-scoped-track',
+      origin: 'manual',
+      modelRevision: null,
+      reviewState: 'UNREVIEWED',
+      keypoints: humanCoco17PoseSchemaV1.joints.map(({ index }) => ({
+        index,
+        x: index === 0 ? 320.125 : null,
+        y: index === 0 ? 240.75 : null,
+        confidence: index === 0 ? 1 : 0,
+        visibility: index === 0 ? 'visible' : 'not_labeled',
+      })),
+    };
+    const annotation = {
+      schema: 'atlas.evidence-annotation.v1',
+      modality: 'video',
+      notes: '',
+      annotations: [],
+      poseSchemas: [humanCoco17PoseSchemaV1],
+      poseObservations: [pose],
+    };
+    const receipt = await saveEvidenceAnnotationRevisionV1({ caseId: CASE_ID, evidenceId: EV_ID, actorUserId: 7, parentSha256: PARENT, annotation }, ports);
+    expect(receipt).toMatchObject({ committed: true, parentSha256: PARENT, canonicalAuthority: false });
+    const savedAnnotation = (log.insert[0]?.metadata as { annotation?: { poseSchemas?: unknown[]; poseObservations?: Array<{ keypoints?: unknown[]; [key: string]: unknown }> } }).annotation;
+    expect(savedAnnotation?.poseSchemas?.[0]).toMatchObject({ schemaId: 'human.coco17.v1' });
+    expect((savedAnnotation?.poseSchemas?.[0] as { joints?: unknown[] })?.joints?.[0]).toMatchObject({ index: 0, name: 'nose' });
+    expect(savedAnnotation?.poseObservations?.[0]).toMatchObject({ evidenceId: EV_ID, sourceSha256: PARENT, framePtsUs: 1_250_000 });
+    expect(savedAnnotation?.poseObservations?.[0]?.keypoints?.[0]).toMatchObject({ index: 0, x: 320.125, y: 240.75 });
+    expect(log.put).toHaveLength(0);
+  });
+
+  it('rejects pose annotations with a mismatched source or client-asserted review state', async () => {
+    const basePose = {
+      schema: 'atlas.pose-observation.v1',
+      evidenceId: EV_ID,
+      sourceSha256: PARENT,
+      sourceRevision: PARENT,
+      analysisRevision: 'analysis-rev-1',
+      framePtsUs: 1_250_000,
+      frameIndex: 37,
+      frameWidth: 640,
+      frameHeight: 480,
+      skeletonSchemaId: humanCoco17PoseSchemaV1.schemaId,
+      trackId: null,
+      trackScopeId: null,
+      origin: 'manual',
+      modelRevision: null,
+      reviewState: 'UNREVIEWED',
+      keypoints: humanCoco17PoseSchemaV1.joints.map(({ index }) => ({ index, x: null, y: null, confidence: 0, visibility: 'not_labeled' })),
+    };
+    const input = (pose: unknown) => ({
+      caseId: CASE_ID, evidenceId: EV_ID, actorUserId: 7, parentSha256: PARENT,
+      annotation: { schema: 'atlas.evidence-annotation.v1', modality: 'video', notes: '', annotations: [], poseSchemas: [humanCoco17PoseSchemaV1], poseObservations: [pose] },
+    });
+    expect(await code(saveEvidenceAnnotationRevisionV1(input({ ...basePose, sourceSha256: `sha256:${'b'.repeat(64)}` }), fakePorts().ports))).toBe('INVALID_MARKUP');
+    expect(await code(saveEvidenceAnnotationRevisionV1(input({ ...basePose, sourceRevision: 'stale-source-revision' }), fakePorts().ports))).toBe('INVALID_MARKUP');
+    expect(await code(saveEvidenceAnnotationRevisionV1(input({ ...basePose, reviewState: 'REVIEWED' }), fakePorts().ports))).toBe('INVALID_MARKUP');
   });
 
   it('fails closed on stale source, case mismatch, and invalid time ranges', async () => {

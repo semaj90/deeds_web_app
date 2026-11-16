@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { createHash, randomUUID } from 'node:crypto';
-import { mkdtemp, readFile, rm, stat } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readFile, rm, stat, unlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
@@ -27,6 +27,9 @@ import {
 const enabled = process.env.ATLAS_EVIDENCE_VIDEO_MEDIA_E2E === '1';
 const SCRATCH_DATABASE = 'legal_ai_live_integration_scratch';
 const FIXTURE_IMAGE = process.env.ATLAS_VIDEO_FIXTURE_IMAGE_PATH || join(tmpdir(), 'atlas-yolo-bus-fixture.jpg');
+const FIXTURE_VIDEO = process.env.ATLAS_VIDEO_FIXTURE_VIDEO_PATH?.trim();
+const FIXTURE_ASR_URL = process.env.ATLAS_VIDEO_FIXTURE_ASR_URL?.trim();
+const MAX_FIXTURE_VIDEO_BYTES = 100 * 1024 * 1024;
 const clients: Client[] = [];
 
 function sha256(bytes: Uint8Array): string {
@@ -80,6 +83,7 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 		clients.push(client);
 		let transactionStarted = false;
 		let workDir: string | undefined;
+		let asrWorkerInputPath: string | undefined;
 		let vectorSchemaCreatedInTransaction = false;
 
 		try {
@@ -101,13 +105,22 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 			}
 
 			workDir = await mkdtemp(join(tmpdir(), 'atlas-video-media-e2e-'));
-			const videoPath = join(workDir, 'source.mp4');
-			await run(ffmpegPath, [
-				'-hide_banner', '-loglevel', 'error', '-loop', '1', '-framerate', '2', '-i', FIXTURE_IMAGE,
-				'-f', 'lavfi', '-i', 'sine=frequency=440:sample_rate=48000', '-t', '2',
-				'-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-shortest', '-y', videoPath,
-			]);
-			const videoBytes = await readFile(videoPath);
+			let videoBytes: Buffer;
+			if (FIXTURE_VIDEO) {
+				const fixtureStat = await stat(FIXTURE_VIDEO);
+				if (!fixtureStat.isFile() || fixtureStat.size <= 0 || fixtureStat.size > MAX_FIXTURE_VIDEO_BYTES) {
+					throw new Error('VIDEO_FIXTURE_PATH_MUST_BE_A_NONEMPTY_FILE_UNDER_100_MIB');
+				}
+				videoBytes = await readFile(FIXTURE_VIDEO);
+			} else {
+				const videoPath = join(workDir, 'source.mp4');
+				await run(ffmpegPath, [
+					'-hide_banner', '-loglevel', 'error', '-loop', '1', '-framerate', '2', '-i', FIXTURE_IMAGE,
+					'-f', 'lavfi', '-i', 'sine=frequency=440:sample_rate=48000', '-t', '2',
+					'-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-shortest', '-y', videoPath,
+				]);
+				videoBytes = await readFile(videoPath);
+			}
 			const sourceRevision = sha256(videoBytes);
 			const evidenceId = randomUUID();
 			const caseId = randomUUID();
@@ -129,6 +142,7 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 				value: async (operation: (transaction: typeof rollbackDatabase) => Promise<unknown>) => operation(rollbackDatabase),
 			});
 			const artifacts = new Map<string, Buffer>();
+			let transcriptChunkCount = 1;
 			const detector = createYOLOService();
 			if (!(await detector.isModelAvailable())) throw new Error('VIDEO_MEDIA_E2E_YOLO_RUNTIME_UNAVAILABLE');
 			const detectorRevision = await detector.getModelArtifactRevision();
@@ -153,10 +167,48 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 					return { width: metadata.width, height: metadata.height };
 				},
 				extractAudio: extractAudioTrack,
-				transcribe: async () => ({
-					text: 'fixture transcript segment', language: 'en',
-					chunks: [{ startMs: 250, endMs: 750, text: 'fixture transcript segment', language: 'en', confidence: 1, model: 'fixture-transcript-v1' }],
-				}),
+				transcribe: async (audioPath) => {
+					if (!FIXTURE_ASR_URL) return {
+						text: 'fixture transcript segment', language: 'en',
+						chunks: [{ startMs: 250, endMs: 750, text: 'fixture transcript segment', language: 'en', confidence: 1, model: 'fixture-transcript-v1' }],
+					};
+					const asrUrl = new URL(FIXTURE_ASR_URL);
+					if (!['127.0.0.1', 'localhost', '[::1]'].includes(asrUrl.hostname) || asrUrl.pathname !== '/transcribe') {
+						throw new Error('VIDEO_MEDIA_E2E_ASR_URL_MUST_BE_LOOPBACK_TRANSCRIBE_ENDPOINT');
+					}
+					const allowedAudioDir = resolve(process.cwd(), 'temp', 'media', 'rollback-asr-e2e');
+					await mkdir(allowedAudioDir, { recursive: true });
+					asrWorkerInputPath = join(allowedAudioDir, `${randomUUID()}.wav`);
+					await copyFile(audioPath, asrWorkerInputPath);
+					const response = await fetch(asrUrl, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ path: asrWorkerInputPath, word_timestamps: true, beam_size: 1 }),
+					});
+					if (!response.ok) throw new Error(`VIDEO_MEDIA_E2E_ASR_WORKER_FAILED:${response.status}`);
+					const payload = await response.json() as {
+						language?: unknown;
+						model_size?: unknown;
+						compute_type?: unknown;
+						segments?: Array<{ start?: unknown; end?: unknown; text?: unknown }>;
+					};
+					if (!Array.isArray(payload.segments) || payload.segments.length > 10_000) throw new Error('VIDEO_MEDIA_E2E_ASR_SEGMENTS_INVALID');
+					const chunks = payload.segments.map((segment) => {
+						if (typeof segment.start !== 'number' || !Number.isFinite(segment.start) || typeof segment.end !== 'number' || !Number.isFinite(segment.end) || segment.start < 0 || segment.end <= segment.start || typeof segment.text !== 'string' || !segment.text.trim()) {
+							throw new Error('VIDEO_MEDIA_E2E_ASR_SEGMENT_INVALID');
+						}
+						return {
+							startMs: Math.round(segment.start * 1000),
+							endMs: Math.round(segment.end * 1000),
+							text: segment.text.trim(),
+							language: typeof payload.language === 'string' ? payload.language : undefined,
+							confidence: 0.85,
+							model: `faster-whisper:${String(payload.model_size ?? 'unknown')}:${String(payload.compute_type ?? 'unknown')}`,
+						};
+					});
+					transcriptChunkCount = chunks.length;
+					return { text: chunks.map((chunk) => chunk.text).join(' '), language: typeof payload.language === 'string' ? payload.language : undefined, chunks };
+				},
 				readArtifactFile: readFile,
 				artifactFileSize: async (path) => (await stat(path)).size,
 				uploadArtifact: async (bucket, objectKey, bytes) => { artifacts.set(`${bucket}/${objectKey}`, Buffer.from(bytes)); },
@@ -179,7 +231,7 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 
 			expect(receipt.canonicalReceiptVerified).toBe(true);
 			expect(receipt.readback.frameFindingCount).toBeGreaterThan(0);
-			expect(receipt.readback.transcriptSegmentCount).toBe(1);
+			expect(receipt.readback.transcriptSegmentCount).toBe(transcriptChunkCount);
 			expect(receipt.readback.vectorCount).toBeGreaterThanOrEqual(3);
 			expect(receipt.analysis.audioEmbeddingStatus).toBe('COMPLETED');
 			expect(artifacts.size).toBeGreaterThanOrEqual(2);
@@ -194,7 +246,7 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 				audio_outbox_lane_count: string;
 				outbox_count: string;
 				vector_dims: number;
-				video_analysis: Record<string, unknown>;
+				video_analysis: Record<string, unknown> & { frames?: Array<Record<string, unknown>> };
 			}>(`
 				SELECT
 				  jsonb_array_length(e.ai_analysis->'videoAnalysis'->'frames')::text AS frame_count,
@@ -227,6 +279,24 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 				embeddingStatus: 'COMPLETED',
 				audioEmbeddingStatus: 'COMPLETED',
 			});
+			const persistedFrames = rows.rows[0].video_analysis.frames;
+			expect(persistedFrames).toHaveLength(receipt.readback.frameFindingCount);
+			expect(persistedFrames?.every((frame, index) => {
+				const motion = frame.motionLut as {
+					schema?: unknown;
+					sourceRevision?: unknown;
+					analysisRevision?: unknown;
+					frameIndex?: unknown;
+					artifact?: { byteLength?: unknown; sha256?: unknown };
+				} | undefined;
+				return motion?.schema === 'atlas.video-motion-lut.v1' &&
+					motion.sourceRevision === sourceRevision &&
+					motion.analysisRevision === receipt.analysisRevision &&
+					motion.frameIndex === index &&
+					motion.artifact?.byteLength === 4112 &&
+					typeof motion.artifact.sha256 === 'string' && /^sha256:[a-f0-9]{64}$/.test(motion.artifact.sha256);
+			})).toBe(true);
+			expect(persistedFrames?.[0]?.motionLut).toMatchObject({ previousTimestampMs: null, frameIndex: 0 });
 
 			await client.query('ROLLBACK');
 			transactionStarted = false;
@@ -244,7 +314,8 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 			}
 		} finally {
 			if (transactionStarted) await client.query('ROLLBACK').catch(() => undefined);
+			if (asrWorkerInputPath) await unlink(asrWorkerInputPath).catch(() => undefined);
 			if (workDir) await rm(workDir, { recursive: true, force: true }).catch(() => undefined);
 		}
-	}, 180_000);
+	}, 900_000);
 });

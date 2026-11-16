@@ -8,10 +8,21 @@ import { createAudioWindowLedgerIfAvailableV1, type AudioWindowLedgerDatabaseV1 
 import { audioTranscripts, evidence, whisperSegments } from '$lib/server/db/schema-postgres.js';
 import { ensureCaseOwned } from './video-ingest-service.js';
 import { ENV } from '$lib/server/env.server.js';
+import { stableStringify } from '$lib/server/analysis/stable-hash.js';
 import { ARTIFACTS_BUCKET, assertArtifactBucket } from '$lib/server/storage/storage-buckets.js';
 import { statSeaweedObject, uploadSeaweedFile } from '$lib/server/seaweed-client.js';
 import { extractAudioTrack, transcribeVideoAudio } from './transcript-service.js';
 import { detectVideoAndAudioStreamsV1 } from './storyboard-manifest-contract-v1.js';
+import { fuseVideoEventsV1, videoEventTimelineV1Schema } from './video-event-fusion-v1.js';
+import { linkVideoFrameTracksV1, VIDEO_TRACK_LINKER_REVISION_V1 } from './video-track-linker-v1.js';
+import {
+	encodeVideoMotionLutV1,
+	VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1,
+	VIDEO_MOTION_LUT_HEIGHT_V1,
+	VIDEO_MOTION_LUT_PROCESSING_REVISION_V1,
+	VIDEO_MOTION_LUT_WIDTH_V1,
+	type VideoMotionLutManifestV1,
+} from '$lib/shared/video-motion-lut-v1.js';
 import type { AnalysisJobProgressStageV1 } from '$lib/server/analysis/analysis-job-progress-events-v1.js';
 import {
 	embedEvidenceAudioWithEmbeddingGemma2OnnxV1,
@@ -101,9 +112,19 @@ export interface VideoFrameProposalV1 {
 	timestampMs: number;
 	width: number;
 	height: number;
-	objects: Array<{ label: string; confidence: number; bbox: [number, number, number, number] }>;
+	objects: Array<{
+		label: string;
+		confidence: number;
+		bbox: [number, number, number, number];
+		trackId?: string;
+		centerPx?: [number, number];
+		velocityPxPerSecond?: [number, number] | null;
+		trackState?: 'UNREVIEWED_TRACK_HYPOTHESIS';
+	}>;
+	trackScopeId?: string;
 	modelRevision: string | null;
 	artifact: VideoDerivedArtifactV1;
+	motionLut?: VideoMotionLutManifestV1;
 	ocr?: VideoFrameOcrV1;
 	sourceRevision: string;
 	analysisRevision: string;
@@ -148,6 +169,7 @@ export interface CanonicalVideoAnalysisV1Receipt {
 		skimPreviewStatus: 'COMPLETED' | 'FAILED' | 'UNAVAILABLE';
 		skimPreviewSampleCount: number;
 		embeddingStatus?: 'COMPLETED' | 'UNAVAILABLE' | 'SKIPPED_NO_CONTENT';
+		embeddingError?: string;
 		audioEmbeddingStatus?: 'COMPLETED' | 'UNAVAILABLE' | 'SKIPPED_NO_AUDIO' | 'SKIPPED_FEATURE_DISABLED';
 		audioEmbeddingError?: string;
 		embeddedVectorCount?: number;
@@ -240,6 +262,7 @@ export interface VideoAnalysisDependenciesV1 {
 		detectorStatus: 'COMPLETED' | 'UNAVAILABLE' | 'FAILED';
 		detectorError?: string;
 		embeddingStatus?: 'COMPLETED' | 'UNAVAILABLE' | 'SKIPPED_NO_CONTENT';
+		embeddingError?: string;
 		audioEmbeddingStatus?: 'COMPLETED' | 'UNAVAILABLE' | 'SKIPPED_NO_AUDIO' | 'SKIPPED_FEATURE_DISABLED';
 		audioEmbeddingError?: string;
 		embeddedVectorCount?: number;
@@ -289,15 +312,17 @@ function selectEvenly<T>(items: T[], limit: number): T[] {
 	return Array.from({ length: limit }, (_, index) => items[Math.round(index * (items.length - 1) / (limit - 1))]);
 }
 
-function derivedObjectKey(input: CanonicalVideoAnalysisV1Input, kind: 'audio' | 'frame', index?: number): string {
+function derivedObjectKey(input: CanonicalVideoAnalysisV1Input, kind: 'audio' | 'frame' | 'motion', index?: number): string {
 	const sourceHash = input.sourceRevision.slice('sha256:'.length);
-	const name = kind === 'audio' ? 'audio.wav' : `frame-${String(index ?? 0).padStart(4, '0')}.jpg`;
+	const name = kind === 'audio' ? 'audio.wav' : kind === 'motion'
+		? `motion-${String(index ?? 0).padStart(4, '0')}.atm`
+		: `frame-${String(index ?? 0).padStart(4, '0')}.jpg`;
 	return `evidence/${input.caseId}/${input.evidenceId}/${sourceHash}/${input.analysisJobId}/${name}`;
 }
 
 async function storeDerivedArtifactV1(input: {
 	job: CanonicalVideoAnalysisV1Input;
-	kind: 'audio' | 'frame';
+	kind: 'audio' | 'frame' | 'motion';
 	index?: number;
 	bytes: Buffer;
 	contentType: string;
@@ -378,6 +403,21 @@ export async function persistCanonicalVideoAnalysisV1(
 	skimTileCount: number;
 	skimSampleCount: number;
 }> {
+	const eventTimeline = fuseVideoEventsV1({
+		evidenceId: input.evidenceId,
+		caseId: input.caseId,
+		transcriptId: input.analysisJobId,
+		sourceRevision: input.sourceRevision,
+		analysisRevision: input.analysisRevision,
+		frames: input.frames,
+		transcriptSegments: input.transcript?.chunks.map((chunk, segmentIndex) => ({
+			segmentIndex,
+			startMs: chunk.startMs,
+			endMs: chunk.endMs,
+			text: chunk.text,
+			model: chunk.model ?? ENV.WHISPER_MODEL ?? null,
+		})) ?? [],
+	});
 	await database.transaction(async (tx) => {
 		if (input.transcript) {
 			await tx.insert(audioTranscripts).values({
@@ -466,6 +506,12 @@ export async function persistCanonicalVideoAnalysisV1(
 					status: input.audioEmbeddingStatus ?? (input.probe.hasAudioStream ? 'UNAVAILABLE' : 'SKIPPED_NO_AUDIO'),
 					...(input.audioEmbeddingError ? { error: input.audioEmbeddingError } : {}),
 				},
+				eventFusion: {
+					status: eventTimeline.status,
+					revision: eventTimeline.processingRevision,
+					eventCount: eventTimeline.events.length,
+					omittedObservationCount: eventTimeline.omittedObservationCount,
+				},
 			},
 			probe: {
 				hasVideoStream: input.probe.hasVideoStream,
@@ -489,6 +535,7 @@ export async function persistCanonicalVideoAnalysisV1(
 			},
 			transcriptionStatus: input.transcriptionStatus,
 			embeddingStatus: input.embeddingStatus,
+			...(input.embeddingError ? { embeddingError: input.embeddingError } : {}),
 			audioEmbeddingStatus: input.audioEmbeddingStatus ?? (input.probe.hasAudioStream ? 'UNAVAILABLE' : 'SKIPPED_NO_AUDIO'),
 			...(input.audioEmbeddingError ? { audioEmbeddingError: input.audioEmbeddingError } : {}),
 			embeddedVectorCount: input.embeddedVectorCount,
@@ -497,6 +544,8 @@ export async function persistCanonicalVideoAnalysisV1(
 			detectorStatus: input.detectorStatus,
 			...(input.detectorError ? { detectorError: input.detectorError } : {}),
 			frames: input.frames,
+			eventTimeline,
+			eventTimelineStatus: eventTimeline.status,
 			skimPreview: input.skimPreview,
 			skimPreviewStatus: input.skimPreviewStatus,
 			...(input.skimPreviewError ? { skimPreviewError: input.skimPreviewError } : {}),
@@ -541,16 +590,26 @@ export async function persistCanonicalVideoAnalysisV1(
 	const storedFrames = Array.isArray(videoAnalysis?.frames) ? videoAnalysis.frames : [];
 	const parsedStoredSkimPreview = videoSkimPreviewManifestV1Schema.safeParse(videoAnalysis?.skimPreview);
 	const storedSkimPreview = parsedStoredSkimPreview.success ? parsedStoredSkimPreview.data : null;
+	const parsedStoredEventTimeline = videoEventTimelineV1Schema.safeParse(videoAnalysis?.eventTimeline);
+	const storedEventTimeline = parsedStoredEventTimeline.success ? parsedStoredEventTimeline.data : null;
 	if (
 		!videoAnalysis ||
 		videoAnalysis.sourceRevision !== input.sourceRevision ||
 		videoAnalysis.analysisRevision !== input.analysisRevision ||
+		!storedEventTimeline ||
+		storedEventTimeline.evidenceId !== input.evidenceId ||
+		storedEventTimeline.caseId !== input.caseId ||
+		storedEventTimeline.sourceRevision !== input.sourceRevision ||
+		storedEventTimeline.analysisRevision !== input.analysisRevision ||
+		stableStringify(storedEventTimeline) !== stableStringify(eventTimeline) ||
 		videoAnalysis.skimPreviewStatus !== input.skimPreviewStatus ||
 		storedFrames.length !== input.frames.length ||
-		storedFrames.some((value) => {
+		storedFrames.some((value, index) => {
 			if (!value || typeof value !== 'object') return true;
 			const frame = value as Record<string, unknown>;
-			return frame.sourceRevision !== input.sourceRevision || frame.analysisRevision !== input.analysisRevision || frame.reviewState !== 'UNREVIEWED_PROPOSAL';
+			const expected = input.frames[index];
+			return frame.sourceRevision !== input.sourceRevision || frame.analysisRevision !== input.analysisRevision ||
+				frame.reviewState !== 'UNREVIEWED_PROPOSAL' || stableStringify(frame.motionLut ?? null) !== stableStringify(expected?.motionLut ?? null);
 		})
 	) {
 		throw new Error('EVIDENCE_VIDEO_CANONICAL_READBACK_MISMATCH');
@@ -802,6 +861,7 @@ export async function processCanonicalVideoAnalysisV1(
 		let detectorError: string | undefined;
 		const ocrTotal = Math.min(extractedFrames.length, MAX_FRAME_SAMPLES_V1);
 			const ocrStartedAt = Date.now();
+			let previousMotionLuma: { luma: Uint8Array; timestampMs: number } | null = null;
 			for (let frameIndex = 0; frameIndex < extractedFrames.length && frameIndex < MAX_FRAME_SAMPLES_V1; frameIndex += 1) {
 			const frame = extractedFrames[frameIndex];
 			const { width: resizedWidth, height: resizedHeight } = await dependencies.frameDimensions(frame.buffer);
@@ -831,6 +891,57 @@ export async function processCanonicalVideoAnalysisV1(
 				upload: dependencies.uploadArtifact,
 				stat: dependencies.statArtifact,
 			});
+			let motionLut: VideoMotionLutManifestV1 | undefined;
+			try {
+				const sharpModule = await import('sharp');
+				const luma = await sharpModule.default(frame.buffer, { failOn: 'error', limitInputPixels: 16_777_216 })
+					.resize(VIDEO_MOTION_LUT_WIDTH_V1, VIDEO_MOTION_LUT_HEIGHT_V1, { fit: 'fill', kernel: 'lanczos3' })
+					.greyscale()
+					.raw()
+					.toBuffer();
+				const currentLuma = new Uint8Array(luma.buffer, luma.byteOffset, luma.byteLength);
+				const prior = previousMotionLuma;
+				const encoded = encodeVideoMotionLutV1(prior?.luma ?? null, currentLuma);
+				const motionArtifact = await storeDerivedArtifactV1({
+					job: input,
+					kind: 'motion',
+					index: frameIndex,
+					bytes: Buffer.from(encoded.bytes),
+					contentType: 'application/vnd.atlas.video-motion-lut-v1',
+					width: VIDEO_MOTION_LUT_WIDTH_V1,
+					height: VIDEO_MOTION_LUT_HEIGHT_V1,
+					upload: dependencies.uploadArtifact,
+					stat: dependencies.statArtifact,
+				});
+				motionLut = {
+					schema: 'atlas.video-motion-lut.v1',
+					processingRevision: VIDEO_MOTION_LUT_PROCESSING_REVISION_V1,
+					evidenceId: input.evidenceId,
+					sourceRevision: input.sourceRevision,
+					analysisRevision: 'pending-analysis-revision',
+					frameIndex,
+					width: VIDEO_MOTION_LUT_WIDTH_V1,
+					height: VIDEO_MOTION_LUT_HEIGHT_V1,
+					bitDepth: 4,
+					packing: 'row-major-even-pixel-low-nibble-first',
+					previousTimestampMs: prior?.timestampMs ?? null,
+					timestampMs: frame.timestampMs,
+					motionScore: encoded.motionScore,
+					artifact: {
+						bucket: motionArtifact.bucket,
+						objectKey: motionArtifact.objectKey,
+						sha256: motionArtifact.sha256,
+						byteLength: VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1,
+						sourceRevision: input.sourceRevision,
+						analysisRevision: 'pending-analysis-revision',
+					},
+				};
+				previousMotionLuma = { luma: Uint8Array.from(currentLuma), timestampMs: frame.timestampMs };
+			} catch (error) {
+				// Motion is a review/LOD cue; it must not fail source-frame detections or transcription.
+				console.warn('[VideoAnalysis] motion LUT unavailable for sampled frame:', error instanceof Error ? error.message : String(error));
+				previousMotionLuma = null;
+			}
 			let ocr: VideoFrameOcrV1 | undefined;
 				if (dependencies.ocrFrame) {
 					try {
@@ -853,10 +964,13 @@ export async function processCanonicalVideoAnalysisV1(
 				objects,
 				modelRevision: detector?.modelRevision ?? null,
 				artifact,
+				...(motionLut ? { motionLut } : {}),
 				reviewState: 'UNREVIEWED_PROPOSAL',
 			});
 		}
 
+		const trackScopeId = `sha256:${sha256(Buffer.from(`${input.evidenceId}:${input.sourceRevision}:${input.analysisJobId}`))}`;
+		const trackedFrames = linkVideoFrameTracksV1(frames, trackScopeId);
 		const analysisRevision = `${VIDEO_ANALYSIS_REVISION_V1}:${sha256(Buffer.from(JSON.stringify({
 			sourceRevision: input.sourceRevision,
 			jobId: input.analysisJobId,
@@ -867,6 +981,8 @@ export async function processCanonicalVideoAnalysisV1(
 			samplingPolicy: VIDEO_FRAME_SAMPLING_POLICY_V1,
 			samplingFps,
 			modelRevision: detector?.modelRevision ?? 'unavailable',
+			motionLutRevision: VIDEO_MOTION_LUT_PROCESSING_REVISION_V1,
+			trackLinkerRevision: VIDEO_TRACK_LINKER_REVISION_V1,
 			whisperModel: transcription ? ENV.WHISPER_MODEL || 'whisper' : null,
 			embeddingModelArtifactSha256: dependencies.modelDir ? EMBEDDINGGEMMA2_ONNX_MODEL_ARTIFACT_SHA256_V1 : null,
 			frameEmbeddingPolicy: 'ALL_SAMPLED_FRAMES_V1',
@@ -876,12 +992,21 @@ export async function processCanonicalVideoAnalysisV1(
 			audioEmbeddingPreprocessingRevision: EMBEDDINGGEMMA2_ONNX_AUDIO_PREPROCESSING_REVISION_V1,
 			transcriptEmbeddingLimit: MAX_VIDEO_TRANSCRIPT_EMBEDDINGS_V1,
 		})))}`;
-		const revisionBoundFrames = frames.map((frame) => ({
-			...frame,
-			sourceRevision: input.sourceRevision,
-			analysisRevision,
-			artifact: { ...frame.artifact, analysisRevision },
-		}));
+		const revisionBoundFrames = trackedFrames.map((frame) => {
+			const motionLut = frame.motionLut ? {
+				...frame.motionLut,
+				analysisRevision,
+				artifact: { ...frame.motionLut.artifact, analysisRevision },
+			} : undefined;
+			return {
+				...frame,
+				trackScopeId,
+				sourceRevision: input.sourceRevision,
+				analysisRevision,
+				artifact: { ...frame.artifact, analysisRevision },
+				...(motionLut ? { motionLut } : {}),
+			};
+		});
 		const revisionBoundAudioArtifact = audioArtifact ? { ...audioArtifact, analysisRevision } : null;
 		const skimPreview: VideoSkimPreviewManifestV1 | null = skimPreviewStatus === 'COMPLETED' ? {
 			schema: VIDEO_SKIM_PREVIEW_SCHEMA_V1,
@@ -908,6 +1033,7 @@ export async function processCanonicalVideoAnalysisV1(
 		const hasEmbeddingContent = revisionBoundFrames.length > 0 || (transcription?.chunks.length ?? 0) > 0 || (dependencies.audioEmbeddingsEnabled && audioBytes !== null);
 		let embeddedVectorCount = 0;
 		let embeddingStatus: 'COMPLETED' | 'UNAVAILABLE' | 'SKIPPED_NO_CONTENT' = 'SKIPPED_NO_CONTENT';
+		let embeddingError: string | undefined;
 		let audioEmbeddingStatus: 'COMPLETED' | 'UNAVAILABLE' | 'SKIPPED_NO_AUDIO' | 'SKIPPED_FEATURE_DISABLED' = !probe.hasAudioStream
 			? 'SKIPPED_NO_AUDIO'
 			: !dependencies.audioEmbeddingsEnabled ? 'SKIPPED_FEATURE_DISABLED' : 'UNAVAILABLE';
@@ -917,32 +1043,38 @@ export async function processCanonicalVideoAnalysisV1(
 			embeddingStatus = 'COMPLETED';
 			await input.onProgress?.('canonical_indexing');
 			const embeddingStartedAt = Date.now();
-				for (const [embeddedIndex, frame] of revisionBoundFrames.entries()) {
-				const frameSource = extractedFrames[frame.frameIndex];
-				if (!frameSource) throw new Error('VIDEO_FRAME_EMBEDDING_SOURCE_UNAVAILABLE');
-				const embedded = await dependencies.embedFrame(frameSource.buffer, modelDir);
-				if (embedded.inputSha256 !== frame.artifact.sha256) throw new Error('VIDEO_FRAME_EMBEDDING_INPUT_REVISION_MISMATCH');
-				await dependencies.persistVector(dependencies.database, {
-					evidenceId: input.evidenceId,
-					caseId: input.caseId,
-					sourceRevision: input.sourceRevision,
-					analysisRevision,
-					modality: 'video_frame',
-					sourceLocator: {
-						kind: 'sampled_video_frame', frameIndex: frame.frameIndex, timestampMs: frame.timestampMs,
-						streamTimeBase: probe.streams.find((stream) => stream.codecType === 'video')?.timeBase ?? null,
-						sourceWidth: frame.width, sourceHeight: frame.height,
-						artifactObjectKey: frame.artifact.objectKey, artifactSha256: frame.artifact.sha256,
-					},
-					embedding: embedded.embedding, model: embedded.model,
-					modelArtifactSha256: embedded.modelArtifactSha256,
-					preprocessingRevision: embedded.preprocessingRevision,
-					inputSha256: embedded.inputSha256, outputSha256: embedded.outputSha256,
-					metadata: { modelOutputReviewState: 'UNREVIEWED_PROPOSAL', detectorModelRevision: frame.modelRevision },
-				});
-				embeddedVectorCount += 1;
-				await input.onFrameProgress?.(frameProgressV1('frame_embedding', embeddedIndex + 1, revisionBoundFrames.length, embeddingStartedAt));
-			}
+			for (const [embeddedIndex, frame] of revisionBoundFrames.entries()) {
+					try {
+						const frameSource = extractedFrames[frame.frameIndex];
+						if (!frameSource) throw new Error('VIDEO_FRAME_EMBEDDING_SOURCE_UNAVAILABLE');
+						const embedded = await dependencies.embedFrame(frameSource.buffer, modelDir);
+						if (embedded.inputSha256 !== frame.artifact.sha256) throw new Error('VIDEO_FRAME_EMBEDDING_INPUT_REVISION_MISMATCH');
+						await dependencies.persistVector(dependencies.database, {
+							evidenceId: input.evidenceId,
+							caseId: input.caseId,
+							sourceRevision: input.sourceRevision,
+							analysisRevision,
+							modality: 'video_frame',
+							sourceLocator: {
+								kind: 'sampled_video_frame', frameIndex: frame.frameIndex, timestampMs: frame.timestampMs,
+								streamTimeBase: probe.streams.find((stream) => stream.codecType === 'video')?.timeBase ?? null,
+								sourceWidth: frame.width, sourceHeight: frame.height,
+								artifactObjectKey: frame.artifact.objectKey, artifactSha256: frame.artifact.sha256,
+							},
+							embedding: embedded.embedding, model: embedded.model,
+							modelArtifactSha256: embedded.modelArtifactSha256,
+							preprocessingRevision: embedded.preprocessingRevision,
+							inputSha256: embedded.inputSha256, outputSha256: embedded.outputSha256,
+							metadata: { modelOutputReviewState: 'UNREVIEWED_PROPOSAL', detectorModelRevision: frame.modelRevision },
+						});
+						embeddedVectorCount += 1;
+						await input.onFrameProgress?.(frameProgressV1('frame_embedding', embeddedIndex + 1, revisionBoundFrames.length, embeddingStartedAt));
+					} catch (error) {
+						embeddingStatus = 'UNAVAILABLE';
+						embeddingError = (error instanceof Error ? error.message : String(error)).slice(0, 180);
+						break;
+					}
+				}
 			if (dependencies.audioEmbeddingsEnabled && audioBytes && revisionBoundAudioArtifact) {
 				const audioWindowLedger = dependencies.audioWindowLedger ?? await loadAudioWindowLedgerOrUndefinedV1(dependencies.database);
 				const windowSamples = EMBEDDINGGEMMA2_ONNX_AUDIO_MAX_SAMPLES_V1;
@@ -1024,25 +1156,33 @@ export async function processCanonicalVideoAnalysisV1(
 				}
 				if (!audioEmbeddingError) audioEmbeddingStatus = 'COMPLETED';
 			}
-			for (const chunk of selectEvenly(transcription?.chunks ?? [], MAX_VIDEO_TRANSCRIPT_EMBEDDINGS_V1)) {
-				const embedded = await dependencies.embedTranscript(chunk.text, modelDir);
-				await dependencies.persistVector(dependencies.database, {
-					evidenceId: input.evidenceId,
-					caseId: input.caseId,
-					sourceRevision: input.sourceRevision,
-					analysisRevision,
-					modality: 'audio_segment',
-					sourceLocator: {
-						kind: 'transcript_segment', startMs: chunk.startMs, endMs: chunk.endMs,
-						streamTimeBase: probe.streams.find((stream) => stream.codecType === 'audio')?.timeBase ?? null,
-					},
-					embedding: embedded.embedding, model: embedded.model,
-					modelArtifactSha256: embedded.modelArtifactSha256,
-					preprocessingRevision: embedded.preprocessingRevision,
-					inputSha256: embedded.inputSha256, outputSha256: embedded.outputSha256,
-					metadata: { modelOutputReviewState: 'UNREVIEWED_PROPOSAL', transcriptId: input.analysisJobId },
-				});
-				embeddedVectorCount += 1;
+			if (embeddingStatus !== 'UNAVAILABLE') {
+				for (const chunk of selectEvenly(transcription?.chunks ?? [], MAX_VIDEO_TRANSCRIPT_EMBEDDINGS_V1)) {
+					try {
+						const embedded = await dependencies.embedTranscript(chunk.text, modelDir);
+						await dependencies.persistVector(dependencies.database, {
+							evidenceId: input.evidenceId,
+							caseId: input.caseId,
+							sourceRevision: input.sourceRevision,
+							analysisRevision,
+							modality: 'audio_segment',
+							sourceLocator: {
+								kind: 'transcript_segment', startMs: chunk.startMs, endMs: chunk.endMs,
+								streamTimeBase: probe.streams.find((stream) => stream.codecType === 'audio')?.timeBase ?? null,
+							},
+							embedding: embedded.embedding, model: embedded.model,
+							modelArtifactSha256: embedded.modelArtifactSha256,
+							preprocessingRevision: embedded.preprocessingRevision,
+							inputSha256: embedded.inputSha256, outputSha256: embedded.outputSha256,
+							metadata: { modelOutputReviewState: 'UNREVIEWED_PROPOSAL', transcriptId: input.analysisJobId },
+						});
+						embeddedVectorCount += 1;
+					} catch (error) {
+						embeddingStatus = 'UNAVAILABLE';
+						embeddingError = (error instanceof Error ? error.message : String(error)).slice(0, 180);
+						break;
+					}
+				}
 			}
 		} else if (hasEmbeddingContent) {
 			embeddingStatus = 'UNAVAILABLE';
@@ -1066,6 +1206,7 @@ export async function processCanonicalVideoAnalysisV1(
 			detectorStatus,
 			...(detectorError ? { detectorError } : {}),
 			embeddingStatus,
+			...(embeddingError ? { embeddingError } : {}),
 			audioEmbeddingStatus,
 			...(audioEmbeddingError ? { audioEmbeddingError } : {}),
 			embeddedVectorCount,
@@ -1107,6 +1248,7 @@ export async function processCanonicalVideoAnalysisV1(
 				frameSamplingPolicy: VIDEO_FRAME_SAMPLING_POLICY_V1,
 				frameSampleRateFps: samplingFps,
 				embeddingStatus,
+				...(embeddingError ? { embeddingError } : {}),
 				audioEmbeddingStatus,
 				...(audioEmbeddingError ? { audioEmbeddingError } : {}),
 				embeddedVectorCount,

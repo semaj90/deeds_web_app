@@ -80,12 +80,12 @@ describe('POST /api/evidence/[id]/versions (multipart markup revision)', () => {
   it('returns private revision history to an authorized case collaborator', async () => {
     mocks.dbRows = [
       [{ id: EV_ID, caseId: CASE_ID, userId: 99 }],
-      [{ id: 'v2', version: 2, title: null, description: null, metadata: { schema: 'atlas.evidence-annotation-revision.v1' }, changedBy: 7, changeReason: 'Playback marker', createdAt: new Date('2026-11-13T12:00:00Z'), userName: 'Reviewer' }],
+      [{ id: 'v2', version: 2, title: null, description: null, metadata: { schema: 'atlas.evidence-annotation-revision.v1', annotation: { poseObservations: [{ schema: 'atlas.pose-observation.v1', evidenceId: EV_ID, sourceSha256: PARENT, framePtsUs: 1_250_000, skeletonSchemaId: 'human.coco17.v1' }] } }, changedBy: 7, changeReason: 'Pose annotation', createdAt: new Date('2026-11-13T12:00:00Z'), userName: 'Reviewer' }],
     ];
     const res = await GET(getReq());
     expect(res.status).toBe(200);
     expect(res.headers.get('Cache-Control')).toBe('private, no-store');
-    expect(await body(res)).toMatchObject({ evidenceId: EV_ID, count: 1, versions: [{ id: 'v2', version: 2 }] });
+    expect(await body(res)).toMatchObject({ evidenceId: EV_ID, count: 1, versions: [{ id: 'v2', version: 2, metadata: { annotation: { poseObservations: [{ evidenceId: EV_ID, sourceSha256: PARENT, framePtsUs: 1_250_000, skeletonSchemaId: 'human.coco17.v1' }] } } }] });
     expect(mocks.getAuthorizedCase).toHaveBeenCalledWith(CASE_ID, 7);
   });
 

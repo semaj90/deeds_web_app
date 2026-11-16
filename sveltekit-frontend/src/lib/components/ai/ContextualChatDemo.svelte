@@ -1,7 +1,7 @@
 <!--
   Contextual Chat Demo Component
   Demonstrates:
-  - Gemma3 agentic function calling
+  - The configured local llama-server chat model
   - HMM state machine visualization
   - Next-step predictions
   - Entity extraction
@@ -12,14 +12,14 @@
 
 	interface Props {
 		sessionId?: string;
-		userId?: string;
 		enableFunctions?: boolean;
+		inputId?: string;
 	}
 
 	let {
 		sessionId = `session-${Date.now()}`,
-		userId = 'demo-user',
-		enableFunctions = true
+		enableFunctions = true,
+		inputId
 	}: Props = $props();
 
 	let message = $state('');
@@ -69,7 +69,6 @@
 				body: JSON.stringify({
 					message,
 					sessionId,
-					userId,
 					enableFunctions
 				})
 			});
@@ -109,7 +108,7 @@
 	async function fetchContextualState(): Promise<void> {
 		try {
 			const response = await fetch(
-				`/api/contextual/state?sessionId=${sessionId}&userId=${userId}`
+				`/api/contextual/state?sessionId=${encodeURIComponent(sessionId)}`
 			);
 			if (!response.ok) throw new Error(`API error: ${response.statusText}`);
 			const result = await response.json();
@@ -125,7 +124,7 @@
 	async function fetchPredictions(): Promise<void> {
 		try {
 			const response = await fetch(
-				`/api/contextual/predictions?sessionId=${sessionId}&userId=${userId}`
+				`/api/contextual/predictions?sessionId=${encodeURIComponent(sessionId)}`
 			);
 			if (!response.ok) throw new Error(`API error: ${response.statusText}`);
 			const result = await response.json();
@@ -140,7 +139,7 @@
 	async function fetchStats(): Promise<void> {
 		try {
 			const response = await fetch(
-				`/api/contextual/stats?sessionId=${sessionId}&userId=${userId}`
+				`/api/contextual/stats?sessionId=${encodeURIComponent(sessionId)}`
 			);
 			if (!response.ok) throw new Error(`API error: ${response.statusText}`);
 			const result = await response.json();
@@ -155,7 +154,7 @@
 	async function clearConversation(): Promise<void> {
 		try {
 			const response = await fetch(
-				`/api/contextual/state?sessionId=${sessionId}`,
+				`/api/contextual/state?sessionId=${encodeURIComponent(sessionId)}`,
 				{ method: 'DELETE' }
 			);
 			if (!response.ok) throw new Error(`API error: ${response.statusText}`);
@@ -189,7 +188,7 @@
 		<h2>Contextual Chat with HMM State Machine</h2>
 		<div class="session-info">
 			<span>Session {sessionId.substring(0, 12)}...</span>
-			<span>User: {userId}</span>
+			<span>Authenticated session</span>
 		</div>
 	</div>
 
@@ -225,6 +224,7 @@
 					<div class="error-banner">{error}</div>
 				{/if}
 				<textarea
+					id={inputId}
 					bind:value={message}
 					onkeydown={handleKeyDown}
 					placeholder="Ask about legal cases, documents, or risk assessment..."

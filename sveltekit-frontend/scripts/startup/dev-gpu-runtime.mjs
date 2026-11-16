@@ -160,6 +160,28 @@ function resolveEmbeddingBackend(extra = {}) {
  * keeps the projector on the CPU (LLAMA_ARG_MMPROJ_OFFLOAD=0) so it adds no VRAM on an
  * 8 GiB card. Default is unchanged: text-only 'ornith-1.5'.
  */
+// Chat/synthesis profile -> served alias. Single source for the launcher profile
+// and the :8090 model verification gate, so they cannot drift apart.
+// Default is the Gemma4 legal IQ4_XS direct profile (smaller weights than Ornith
+// 1.5 Q5, ~5.1 GB vs ~5.9 GB, to free VRAM on the 8 GiB card). Restore Ornith with
+// TURBO_STARTUP_PROFILE=ornith-1.5.
+const CHAT_PROFILE_ALIAS = {
+  'gemma4-legal-iq4xs': 'gemma4-legal-iq4xs-direct.gguf',
+  'gemma4-direct': 'ornith-1.5-9b',
+  'gemma4-thinking': 'ornith-1.5-9b',
+  'ornith-1.5': 'ornith-1.5-9b',
+  'ornith-1.5-vlm': 'ornith-1.5-9b',
+  'ornith': 'ornith-9b',
+};
+
+function devGpuChatProfile() {
+  return envFromFiles.TURBO_STARTUP_PROFILE || process.env.TURBO_STARTUP_PROFILE || (isDevGpuVisionEnabled() ? 'ornith-1.5-vlm' : 'gemma4-legal-iq4xs');
+}
+
+function devGpuChatAlias() {
+  return CHAT_PROFILE_ALIAS[devGpuChatProfile()] ?? 'ornith-1.5-9b';
+}
+
 function isDevGpuVisionEnabled(extra = {}) {
   return String(
     extra.DEV_GPU_VISION ?? envFromFiles.DEV_GPU_VISION ?? process.env.DEV_GPU_VISION ?? 'false',
@@ -239,7 +261,7 @@ function mergedEnv(extra = {}) {
     // Gemma). Treat it as "the resolved expected/target model", not literally
     // "the Gemma model". Prefer EXPECTED_LLAMA_MODEL or TURBO_MODEL in new
     // config; LOCAL_GEMMA_MODEL remains the lowest-priority explicit override.
-    LOCAL_GEMMA_MODEL: envFromFiles.EXPECTED_LLAMA_MODEL ?? envFromFiles.TURBO_MODEL ?? envFromFiles.LOCAL_GEMMA_MODEL ?? (isLiteRT ? 'gemma-4-E2B-it.litertlm' : 'ornith-1.5-9b'),
+    LOCAL_GEMMA_MODEL: envFromFiles.EXPECTED_LLAMA_MODEL ?? envFromFiles.TURBO_MODEL ?? envFromFiles.LOCAL_GEMMA_MODEL ?? (isLiteRT ? 'gemma-4-E2B-it.litertlm' : devGpuChatAlias()),
     TURBO_PORT: isLiteRT ? synthPort : (envFromFiles.TURBO_PORT ?? '8090'),
     TURBO_CTX: envFromFiles.TURBO_CTX ?? envFromFiles.LLAMA_SERVER_CTX ?? '65536',
     LLM_CONTEXT_SIZE: envFromFiles.LLM_CONTEXT_SIZE ?? envFromFiles.TURBO_CTX ?? envFromFiles.LLAMA_SERVER_CTX ?? '65536',
@@ -520,16 +542,44 @@ async function isTcpPortOpen(port) {
   }
 }
 
-async function findFreePort(startPort) {
-  let port = startPort;
-  for (let i = 0; i < 20; i++, port++) {
-    const open = await isTcpPortOpen(port);
-    if (!open) return port;
+// faster-whisper ASR worker (scripts/atlas/faster-whisper-asr-worker-v1.py) on :8093.
+// Started through the PowerShell helper, which runs it hidden so it outlives this
+// process. Audio only: it does not touch the LLM, embedding or GPU lanes.
+// Opt out with ASR_WORKER_AUTOSTART=0.
+async function ensureAsrWorker() {
+  if (String(process.env.ASR_WORKER_AUTOSTART ?? '1') === '0') {
+    console.log('[dev:gpu] ASR worker autostart disabled (ASR_WORKER_AUTOSTART=0)');
+    return;
   }
-  return startPort;
+  const port = Number(process.env.ASR_PORT ?? 8093);
+  if (await isTcpPortOpen(port)) {
+    console.log(`[dev:gpu] ✅ ASR worker already listening on :${port}`);
+    return;
+  }
+  const helper = path.resolve(REPO_ROOT, 'scripts', 'atlas', 'start-faster-whisper-asr-worker.ps1');
+  try {
+    await runChecked('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', helper], {
+      env: { ...mergedEnv(), ASR_PORT: String(port) },
+    });
+    console.log(`[dev:gpu] ✅ ASR worker started on :${port}`);
+  } catch (error) {
+    // Non-fatal: the media pipeline falls back to the legacy shim when the worker is down.
+    console.warn(`[dev:gpu] ⚠️ ASR worker did not start (${error.message}); media falls back to the shim`);
+  }
 }
 
 async function main() {
+  // Fixed dev port: fail fast before any model/sidecar starts. Silent fallback to
+  // another port (previously 5174) broke bookmarks, PUBLIC_API_URL and OAuth callbacks.
+  const fixedVitePort = parseInt(process.env.VITE_PORT ?? '5173', 10);
+  if (await isTcpPortOpen(fixedVitePort)) {
+    console.error(`[dev:gpu] ❌ :${fixedVitePort} is already in use. dev:gpu keeps Vite on :${fixedVitePort} and will not fall back.`);
+    console.error(`[dev:gpu]    Find the owner: netstat -ano | findstr :${fixedVitePort}   then stop that process and rerun.`);
+    process.exit(1);
+  }
+
+  await ensureAsrWorker();
+
   // Determine LLM backend: llama-server (default) or litert
   const llmBackend = String(process.env.DEV_GPU_LLM_BACKEND ?? 'llama-server').toLowerCase();
   const isLiteRT = llmBackend === 'litert';
@@ -627,7 +677,7 @@ async function main() {
       // different profile (e.g. "ornith" for the legacy model, once restored)
       // is intentionally wanted for a dev:gpu run.
       const wantVision = isDevGpuVisionEnabled();
-      const startupProfile = process.env.TURBO_STARTUP_PROFILE || (wantVision ? 'ornith-1.5-vlm' : 'ornith-1.5');
+      const startupProfile = devGpuChatProfile();
       if (wantVision) {
         console.log('[dev:gpu] DEV_GPU_VISION=true: vision profile, projector on CPU (LLAMA_ARG_MMPROJ_OFFLOAD=' + (launcherEnv.LLAMA_ARG_MMPROJ_OFFLOAD ?? '0') + '); ~0.9 GB extra system RAM, no extra VRAM.');
       }
@@ -649,7 +699,7 @@ async function main() {
       // failure: write the report and STOP dev:gpu here — do not retry, do
       // not fall back to a different backend, do not proceed into Vite with
       // an unverified/wrong LLM backend.
-      const profileAliasMap = { 'ornith-1.5': 'ornith-1.5-9b', 'ornith-1.5-vlm': 'ornith-1.5-9b', 'ornith': 'ornith-9b', 'gemma4-direct': 'ornith-1.5-9b', 'gemma4-thinking': 'ornith-1.5-9b' };
+      const profileAliasMap = CHAT_PROFILE_ALIAS;
       const targetModel = launcherEnv.EXPECTED_LLAMA_MODEL ?? launcherEnv.TURBO_MODEL ?? launcherEnv.LOCAL_GEMMA_MODEL ?? profileAliasMap[startupProfile] ?? 'ornith-1.5-9b';
       console.log(`[dev:gpu] Verifying :8090 is serving "${targetModel}"...`);
       const verification = await verifyLlamaServerModelLoaded(targetModel, synthPort);
@@ -796,8 +846,7 @@ async function main() {
   }
   console.log(`[dev:gpu] NLP sidecar:     http://127.0.0.1:${nlpPort} (${nlpSidecarStatus}; LangExtract + treesitter-chunker + ast-grep; Docker provenance-v2 by default)`);
 
-  const desiredVitePort = parseInt(process.env.VITE_PORT ?? '5173', 10);
-  const vitePort = await findFreePort(desiredVitePort);
+  const vitePort = fixedVitePort;
 
   // Check graphify readiness (advisory only, non-blocking)
   console.log('[dev:gpu] Checking graphify readiness...');
@@ -834,11 +883,7 @@ async function main() {
     console.warn('[dev:gpu] ⚠️  TRACE MCP server error:', err.message);
   }
 
-  if (vitePort !== desiredVitePort) {
-    console.log(`[dev:gpu] :${desiredVitePort} is busy — starting Vite on :${vitePort}`);
-  } else {
-    console.log(`[dev:gpu] Starting Vite dev server (:${vitePort})...\n`);
-  }
+  console.log(`[dev:gpu] Starting Vite dev server (:${vitePort}, fixed)...\n`);
 
   if (isGraphifyStartupEnabled(envFromFiles.GRAPHIFY_STARTUP_ENABLED ?? process.env.GRAPHIFY_STARTUP_ENABLED)) {
     const orchestratorScript = path.resolve(REPO_ROOT, 'scripts/atlas/graphify-trigger-downstream-pipeline.mjs');
@@ -882,7 +927,13 @@ async function main() {
   );
   spawnForeground(npx, ['vite', 'dev', '--port', String(vitePort)], {
     cwd: FRONTEND_ROOT,
-    env: runtimeEmbeddingEnv({ VITE_PORT: String(vitePort) }),
+    // Keep server-side callbacks and telemetry aligned with the port Vite
+    // actually claimed when the default port is occupied.
+    env: runtimeEmbeddingEnv({
+      VITE_PORT: String(vitePort),
+      PORT: String(vitePort),
+      PUBLIC_API_URL: `http://127.0.0.1:${vitePort}`,
+    }),
     logPath: viteLogPath,
   });
 }

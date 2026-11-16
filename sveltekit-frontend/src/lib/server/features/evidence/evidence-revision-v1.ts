@@ -16,6 +16,12 @@
  */
 import crypto from 'node:crypto';
 import { z } from 'zod';
+import {
+	parsePoseObservationV1,
+	poseSkeletonSchemaV1Schema,
+	type PoseObservationV1,
+	type PoseSkeletonSchemaV1,
+} from '$lib/shared/pose-skeleton-schema-v1.js';
 
 export const EVIDENCE_REVISION_SCHEMA_V1 = 'atlas.evidence-revision.v1' as const;
 export const EVIDENCE_ANNOTATION_REVISION_SCHEMA_V1 = 'atlas.evidence-annotation-revision.v1' as const;
@@ -41,6 +47,8 @@ export const evidenceAnnotationDocumentV1Schema = z.object({
     text: z.string().min(1).max(2000),
     location: annotationLocationV1Schema,
   }).strict()).max(200),
+	poseSchemas: z.array(poseSkeletonSchemaV1Schema).max(32).optional(),
+	poseObservations: z.array(z.unknown()).max(200).optional(),
 }).strict();
 export type EvidenceAnnotationDocumentV1 = z.infer<typeof evidenceAnnotationDocumentV1Schema>;
 
@@ -165,6 +173,67 @@ export async function saveEvidenceAnnotationRevisionV1(input: {
   const annotation = evidenceAnnotationDocumentV1Schema.safeParse(input.annotation);
   if (!annotation.success) throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'Annotation document is invalid.');
 
+  let canonicalPoseSchemas: PoseSkeletonSchemaV1[] | undefined;
+  let canonicalPoseObservations: PoseObservationV1[] | undefined;
+  try {
+    if (annotation.data.poseSchemas || annotation.data.poseObservations) {
+      const schemaRows = annotation.data.poseSchemas ?? [];
+      const schemaById = new Map<string, PoseSkeletonSchemaV1>();
+      for (const schema of schemaRows) {
+        if (schemaById.has(schema.schemaId)) throw new RangeError('Pose schema IDs must be unique within an annotation revision.');
+        schemaById.set(schema.schemaId, schema);
+      }
+      const observations = annotation.data.poseObservations ?? [];
+      if (observations.length > 0 && schemaById.size === 0) throw new RangeError('Pose observations require their declared skeleton schemas.');
+      canonicalPoseSchemas = [...schemaById.values()].map((schema) => ({
+        schemaId: schema.schemaId,
+        subjectKind: schema.subjectKind,
+        species: schema.species,
+        coordinateSpace: schema.coordinateSpace,
+        joints: schema.joints.map((joint) => ({ index: joint.index, name: joint.name })),
+        bones: schema.bones.map(([from, to]) => [from, to] as [number, number]),
+      }));
+      canonicalPoseObservations = observations.map((rawObservation) => {
+        const skeletonSchemaId = typeof rawObservation === 'object' && rawObservation !== null && 'skeletonSchemaId' in rawObservation
+          ? String(rawObservation.skeletonSchemaId)
+          : '';
+        const skeletonSchema = schemaById.get(skeletonSchemaId);
+        if (!skeletonSchema) throw new RangeError('Pose observation references an undeclared skeleton schema.');
+        const pose = parsePoseObservationV1(rawObservation, skeletonSchema);
+        if (pose.evidenceId !== input.evidenceId || pose.sourceSha256 !== parentSha256 || pose.sourceRevision !== parentSha256) {
+          throw new RangeError('Pose observation must match the evidence and exact source hash being revised.');
+        }
+        if (pose.reviewState !== 'UNREVIEWED') throw new RangeError('Pose review status cannot be asserted by annotation submission.');
+        return {
+          schema: pose.schema,
+          evidenceId: pose.evidenceId,
+          sourceSha256: pose.sourceSha256,
+          sourceRevision: pose.sourceRevision,
+          analysisRevision: pose.analysisRevision,
+          framePtsUs: pose.framePtsUs,
+          frameIndex: pose.frameIndex,
+          frameWidth: pose.frameWidth,
+          frameHeight: pose.frameHeight,
+          skeletonSchemaId: pose.skeletonSchemaId,
+          trackId: pose.trackId,
+          trackScopeId: pose.trackScopeId,
+          origin: pose.origin,
+          modelRevision: pose.modelRevision,
+          reviewState: pose.reviewState,
+          keypoints: pose.keypoints.map((point) => ({
+            index: point.index,
+            x: point.x,
+            y: point.y,
+            confidence: point.confidence,
+            visibility: point.visibility,
+          })),
+        };
+      });
+    }
+  } catch {
+    throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'Pose annotation data is invalid or does not match its source.');
+  }
+
   const parent = await ports.loadEvidence(input.evidenceId);
   if (!parent || parent.deletedAt) throw new EvidenceRevisionErrorV1('EVIDENCE_NOT_FOUND', 'Evidence not found.');
   if (parent.caseId !== input.caseId) throw new EvidenceRevisionErrorV1('EVIDENCE_CASE_MISMATCH', 'Evidence does not belong to the stated case.');
@@ -183,6 +252,8 @@ export async function saveEvidenceAnnotationRevisionV1(input: {
       text: item.text,
       location: item.location,
     })),
+    ...(canonicalPoseSchemas ? { poseSchemas: canonicalPoseSchemas } : {}),
+    ...(canonicalPoseObservations ? { poseObservations: canonicalPoseObservations } : {}),
   };
   const annotationSha256 = `sha256:${crypto.createHash('sha256').update(JSON.stringify({
     evidenceId: input.evidenceId,

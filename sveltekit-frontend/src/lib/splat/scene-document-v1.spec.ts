@@ -71,6 +71,66 @@ describe('scene document v1', () => {
 		}
 	});
 
+	it('binds generated GLB provenance to the exact evidence revision and output digest', () => {
+		const sourceHash = 'b'.repeat(64);
+		const outputHash = 'c'.repeat(64);
+		const modelGeneration = {
+			schema: 'atlas.generated-scene-asset-provenance.v1',
+			claimKind: 'MODEL_GENERATED_HYPOTHESIS',
+			source: { evidenceId: localSourceId, sourceRevision: `sha256:${sourceHash}` },
+			generator: {
+				id: 'trellis.cpp', version: 'fixture-runtime-v1', modelId: 'trellis2-q4',
+				checkpointRevision: 'fixture-checkpoint-v1', checkpointSha256: 'd'.repeat(64),
+				quantization: 'Q4', licenseStatus: 'UNVERIFIED', licenseSpdx: null
+			},
+			seed: 42,
+			settings: { resolution: 512, faceBudget: 25_000 },
+			outputSha256: outputHash,
+			reviewStatus: 'UNREVIEWED',
+			generatedAt: '2026-11-15T22:00:00.000Z'
+		};
+		const manifest = createSceneDocumentV1(fixture({
+			status: 'HYPOTHESIS',
+			sceneClassification: 'SINGLE_IMAGE_HYPOTHESIS',
+			evidenceBindings: [{ evidenceId: localSourceId, sourceRevision: `sha256:${sourceHash}` }],
+			assets: [
+				{ assetId: localSourceId, format: 'IMAGE_PNG', sha256: sourceHash, bytes: 128, role: 'SOURCE' },
+				{ assetId: parentId, format: 'GLB', sha256: outputHash, bytes: 256, role: 'DERIVED', modelGeneration }
+			],
+			quality: createSceneQualityReceiptV1({ derivedAssetBytes: 256, triangleCount: 12, textureBytes: 0 })
+		}));
+
+		expect(manifest.assets[1]?.modelGeneration?.source.sourceRevision).toBe(`sha256:${sourceHash}`);
+		expect(manifest.assets[1]?.modelGeneration?.outputSha256).toBe(outputHash);
+		expect(manifest.assets[1]?.modelGeneration?.claimKind).toBe('MODEL_GENERATED_HYPOTHESIS');
+	});
+
+	it('rejects generated assets with a mismatched evidence revision or output digest', () => {
+		const baseGeneration = {
+			schema: 'atlas.generated-scene-asset-provenance.v1',
+			claimKind: 'MODEL_GENERATED_HYPOTHESIS',
+			source: { evidenceId: localSourceId, sourceRevision: `sha256:${'b'.repeat(64)}` },
+			generator: {
+				id: 'trellis.cpp', version: 'fixture-runtime-v1', modelId: 'trellis2-q4',
+				checkpointRevision: 'fixture-checkpoint-v1', checkpointSha256: 'd'.repeat(64),
+				quantization: 'Q4', licenseStatus: 'UNVERIFIED', licenseSpdx: null
+			},
+			seed: 42, settings: { resolution: 512 }, outputSha256: 'c'.repeat(64),
+			reviewStatus: 'UNREVIEWED', generatedAt: '2026-11-15T22:00:00.000Z'
+		};
+		const base = {
+			status: 'HYPOTHESIS', sceneClassification: 'SINGLE_IMAGE_HYPOTHESIS',
+			evidenceBindings: [{ evidenceId: localSourceId, sourceRevision: `sha256:${'a'.repeat(64)}` }],
+			assets: [
+				{ assetId: localSourceId, format: 'IMAGE_PNG', sha256: 'a'.repeat(64), bytes: 128, role: 'SOURCE' },
+				{ assetId: parentId, format: 'GLB', sha256: 'c'.repeat(64), bytes: 256, role: 'DERIVED', modelGeneration: baseGeneration }
+			],
+			quality: createSceneQualityReceiptV1({ derivedAssetBytes: 256, triangleCount: 12, textureBytes: 0 })
+		};
+		expect(() => createSceneDocumentV1(fixture({ ...base, assets: [base.assets[0], { ...base.assets[1], modelGeneration: { ...baseGeneration, outputSha256: 'e'.repeat(64) } }] }))).toThrow(/output hash must match/);
+		expect(() => createSceneDocumentV1(fixture({ ...base, assets: [base.assets[0], { ...base.assets[1], modelGeneration: { ...baseGeneration, source: { ...baseGeneration.source, sourceRevision: `sha256:${'f'.repeat(64)}` } } }] }))).toThrow(/exact evidence revision/);
+	});
+
 	it('rejects non-normalized rotations, unsafe scales and duplicate object identities', () => {
 		const badRotation = fixture({ objects: [{ ...(fixture().objects as any[])[0], transform: { translation: [0, 0, 0], rotationXyzw: [0, 0, 0, 2], scale: [1, 1, 1] } }] });
 		expect(() => createSceneDocumentV1(badRotation)).toThrow(/Quaternion must be normalized/);

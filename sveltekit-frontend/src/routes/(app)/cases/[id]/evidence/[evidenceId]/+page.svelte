@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { estimateEtaSeconds, formatEta } from '$lib/utils/progress-eta.js';
+	import { onDestroy } from 'svelte';
 	import { page } from '$app/state';
 
 	type Detail = {
@@ -18,7 +20,16 @@
 			textLength: number;
 		};
 		provenance: { sha256: string | null; sourceRevision: string | null; note: string };
-		jobs: Array<{ id: string; jobType: string; status: string; progress: string | number; createdAt: string; updatedAt: string }>;
+		jobs: Array<{
+			id: string;
+			jobType: string;
+			status: string;
+			progress: string | number;
+			createdAt: string;
+			updatedAt: string;
+			progressStep?: string;
+			progressMessage?: string;
+		}>;
 		vectors: Array<{
 			modality: string;
 			sourceRevision: string;
@@ -66,10 +77,65 @@ let mediaElement = $state<HTMLVideoElement | HTMLAudioElement | null>(null);
 let selectedTranscriptId = $state<string | null>(null);
 let selectedFrameIndex = $state<number | null>(null);
 let transcriptError = $state<string | null>(null);
+const jobProgressStreams = new Map<string, EventSource>();
+
+function closeJobProgressStreams(): void {
+	for (const source of jobProgressStreams.values()) source.close();
+	jobProgressStreams.clear();
+}
+
+function updateJobProgress(jobId: string, patch: Partial<Detail['jobs'][number]>): void {
+	if (!detail) return;
+	detail = {
+		...detail,
+		jobs: detail.jobs.map((job) => job.id === jobId ? { ...job, ...patch } : job),
+	};
+}
+
+function connectJobProgressStreams(jobs: Detail['jobs']): void {
+	closeJobProgressStreams();
+	if (typeof EventSource === 'undefined') return;
+	for (const job of jobs) {
+		if (!['queued', 'running', 'processing'].includes(job.status.toLowerCase())) continue;
+		const source = new EventSource(`/api/evidence/realtime?jobId=${encodeURIComponent(job.id)}`);
+		jobProgressStreams.set(job.id, source);
+		source.addEventListener('progress', (event) => {
+			let payload: { progress?: unknown; step?: unknown; message?: unknown };
+			try { payload = JSON.parse((event as MessageEvent<string>).data); } catch { return; }
+			const rawProgress = Number(payload.progress);
+			const step = typeof payload.step === 'string' ? payload.step : undefined;
+			const progress = Number.isFinite(rawProgress) ? Math.max(0, Math.min(step === 'complete' ? 100 : 99, rawProgress)) : 0;
+			updateJobProgress(job.id, {
+				progress,
+				status: step === 'queued' ? 'queued' : step === 'complete' ? 'completed' : step === 'error' ? 'failed' : 'running',
+				progressStep: step,
+				updatedAt: new Date().toISOString(),
+			});
+		});
+		source.addEventListener('complete', () => {
+			updateJobProgress(job.id, { progress: 100, status: 'completed', progressStep: 'complete', progressMessage: 'Processing complete.' });
+			source.close();
+			jobProgressStreams.delete(job.id);
+		});
+		source.addEventListener('error', (event) => {
+			if (!(event instanceof MessageEvent) || !event.data) return;
+			let message = 'Processing failed.';
+			try {
+				const payload = JSON.parse(event.data) as { error?: unknown; message?: unknown };
+				if (typeof payload.error === 'string') message = payload.error.slice(0, 180);
+				else if (typeof payload.message === 'string') message = payload.message.slice(0, 180);
+			} catch { /* keep stable message */ }
+			updateJobProgress(job.id, { status: 'failed', progressStep: 'error', progressMessage: message });
+			source.close();
+			jobProgressStreams.delete(job.id);
+		});
+	}
+}
 
 	$effect(() => {
 		const caseId = page.params.id;
 		const evidenceId = page.params.evidenceId;
+		closeJobProgressStreams();
 		loading = true;
 		loadError = null;
 		detail = null;
@@ -85,6 +151,7 @@ let transcriptError = $state<string | null>(null);
 					if (!response.ok) throw new Error(`Transcript request failed (${response.status})`);
 					detail = { ...data, transcript: await response.json() as NonNullable<Detail['transcript']> };
 				}
+				connectJobProgressStreams(data.jobs);
 			})
 			.catch((err: unknown) => {
 				if (detail) transcriptError = err instanceof Error ? err.message : 'Transcript could not be loaded.';
@@ -94,6 +161,8 @@ let transcriptError = $state<string | null>(null);
 				loading = false;
 			});
 	});
+
+	onDestroy(closeJobProgressStreams);
 
 	function objectLabel(o: { class?: string; label?: string }): string {
 		return o.class ?? o.label ?? 'unknown';
@@ -193,9 +262,32 @@ let transcriptError = $state<string | null>(null);
 			{:else}
 				<ul class="space-y-1 text-xs">
 					{#each detail.jobs as job (job.id)}
-						<li>
-							<span class="font-mono">{job.jobType}</span> · {job.status} · {job.progress}% · updated {job.updatedAt}
-							<progress class="ml-2 h-2 w-24 align-middle" value={Number(job.progress) || 0} max="100" aria-label={`${job.jobType} processing progress`}></progress>
+						{@const progressValue = Math.max(0, Math.min(100, Number(job.progress) || 0))}
+						<li class="analysis-job-progress">
+							<div class="analysis-job-progress-label">
+								<span><span class="font-mono">{job.jobType}</span> · {job.status}</span>
+								<span class="flex items-center gap-2">
+									{#if job.status.toLowerCase() === 'running' && estimateEtaSeconds(job.createdAt, progressValue, Date.now()) !== null}
+										<span class="analysis-job-eta font-mono" title="Linear estimate from job start; approximate">~{formatEta(estimateEtaSeconds(job.createdAt, progressValue, Date.now()) ?? 0)} left</span>
+									{/if}
+									<strong>{Math.round(progressValue)}%</strong>
+								</span>
+							</div>
+							<div
+								class="analysis-progress-track"
+								class:indeterminate={['queued', 'running', 'processing'].includes(job.status.toLowerCase()) && progressValue === 0}
+								role="progressbar"
+								aria-label={`${job.jobType} processing progress`}
+								aria-valuemin="0"
+								aria-valuemax="100"
+								aria-valuenow={Math.round(progressValue)}
+								aria-valuetext={progressValue === 0 && ['queued', 'running', 'processing'].includes(job.status.toLowerCase()) ? 'Waiting for the worker to report progress' : `${Math.round(progressValue)} percent`}
+							>
+								<span class="analysis-progress-fill" style={`--progress: ${progressValue}%`}></span>
+							</div>
+							<p class="analysis-job-progress-note" aria-live="polite">
+				{job.status === 'queued' ? 'Waiting for an available worker.' : job.status === 'completed' ? 'Processing complete.' : job.status === 'failed' ? job.progressMessage ?? 'Processing failed.' : progressValue === 0 ? 'The worker has not reported a percentage yet.' : `Durable worker reported ${Math.round(progressValue)}% completion.`}
+							</p>
 						</li>
 					{/each}
 				</ul>
@@ -312,3 +404,37 @@ let transcriptError = $state<string | null>(null);
 		{/if}
 	{/if}
 </main>
+
+<style>
+	.analysis-job-progress { display: grid; gap: 0.35rem; max-width: 28rem; padding: 0.45rem 0; }
+	.analysis-job-progress-label { display: flex; justify-content: space-between; gap: 0.75rem; align-items: baseline; }
+	.analysis-job-progress-label strong { font: 700 0.7rem ui-monospace, monospace; color: #f3d471; }
+	.analysis-progress-track {
+		position: relative;
+		height: 0.8rem;
+		overflow: hidden;
+		border: 2px solid #111;
+		border-radius: 0.2rem;
+		background: #27231d;
+		box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35) inset;
+	}
+	.analysis-progress-fill {
+		display: block;
+		width: var(--progress);
+		height: 100%;
+		background: linear-gradient(90deg, #16804f, #48ba68 55%, #f3d471);
+		background-size: 1.1rem 100%;
+		transition: width 320ms ease-out;
+	}
+	.analysis-progress-track.indeterminate .analysis-progress-fill {
+		width: 38%;
+		background-image: repeating-linear-gradient(135deg, #48ba68 0 8px, #247d4b 8px 16px);
+		animation: analysis-progress-sweep 1.2s ease-in-out infinite alternate;
+	}
+	.analysis-job-progress-note { margin: 0; color: #b9b1a1; font-size: 0.68rem; }
+	@keyframes analysis-progress-sweep { from { transform: translateX(-35%); } to { transform: translateX(165%); } }
+	@media (prefers-reduced-motion: reduce) {
+		.analysis-progress-fill { transition: none; }
+		.analysis-progress-track.indeterminate .analysis-progress-fill { animation: none; width: 25%; transform: none; }
+	}
+</style>

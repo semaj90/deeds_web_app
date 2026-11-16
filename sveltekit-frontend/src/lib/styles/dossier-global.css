@@ -596,3 +596,47 @@ html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-l
 html:where(:not([data-theme]), [data-theme="parchment"], [data-theme="research-light"]):where(:not(:has(.legal-corpus-navy, .keep-dark-shell))) .hud-command-bar :where(h1, h2, h3, h4, h5, h6, p) {
 	color: var(--dossier-text-light);
 }
+
+/* Add-form field rules, moved from cases/[id]/persons (dead there: the form lives in AddPoiModal). */
+	.dossier-add-form {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		padding: 1rem;
+		margin-bottom: 1.5rem;
+		border: 1px solid var(--sand-dark, #3a3a3a);
+		border-radius: 8px;
+		background: var(--panel-soft, #1a1a1a);
+	}
+
+	.dossier-add-form-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.75rem;
+	}
+
+	.dossier-add-form label {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		font-size: 0.875rem;
+	}
+
+	.dossier-add-form label span {
+		font-weight: 500;
+		opacity: 0.8;
+	}
+
+	.dossier-add-form input,
+	.dossier-add-form select,
+	.dossier-add-form textarea {
+		padding: 0.5rem;
+		border: 1px solid var(--sand-dark, #3a3a3a);
+		border-radius: 4px;
+		background: var(--panel, #111);
+		color: inherit;
+		font-size: 0.875rem;
+	}
+
+/* Heading meta text, moved from cases/[id]/crime-scene (h3 small was unused there). */
+.dossier-heading-meta { font-weight: 400; color: #6b7280; margin-left: 6px; }

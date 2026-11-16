@@ -1,0 +1,4 @@
+# BuildKit per-Dockerfile ignore: send only the server script (the root .dockerignore
+# excludes scripts/ and models/ by default). The model is mounted, never copied.
+*
+!scripts/atlas/gemma2-onnx-embed-server-v1.py

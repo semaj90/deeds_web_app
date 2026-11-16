@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { calibrate, type CalibrationAnchor } from './calibration.js';
+import { generatedSceneAssetProvenanceV1Schema } from './generated-scene-asset-provenance-v1.js';
 
 const finite = z.number().finite();
 const digest = z.string().regex(/^[a-f0-9]{64}$/i, 'Expected SHA-256 hex');
@@ -37,6 +38,15 @@ export const sceneDocumentObjectV1Schema = z.object({
 	name: z.string().min(1).max(200),
 	kind: z.enum(['MESH', 'SPLAT', 'MARKER', 'GROUP']),
 	assetSha256: digest.nullable(),
+	// Optional additive links keep prior v1 manifest hashes and fixtures readable.
+	sourceBindings: z.array(z.object({ evidenceId: z.string().uuid(), sourceRevision }).strict()).max(32).optional(),
+	reviewedRecommendations: z.array(z.object({
+		recommendationId: z.string().uuid(),
+		text: z.string().min(1).max(8_000),
+		sourceBindings: z.array(z.object({ evidenceId: z.string().uuid(), sourceRevision }).strict()).min(1).max(32),
+		reviewStatus: z.literal('HUMAN_ACCEPTED'),
+		acceptedAt: z.string().datetime()
+	}).strict()).max(100).optional(),
 	transform: sceneTransformV1Schema,
 	geometry: z.object({ meshCount: z.number().int().nonnegative(), vertexCount: z.number().int().nonnegative(), triangleCount: z.number().int().nonnegative(), textureCount: z.number().int().nonnegative(), boneCount: z.number().int().nonnegative() }).strict().nullable()
 }).strict();
@@ -165,6 +175,8 @@ export const sceneDocumentV1Schema = z.object({
 	assets: z.array(z.object({
 		assetId: z.string().uuid(), format: z.enum(['GLB', 'OBJ', 'FBX', 'SPZ', 'SOG', 'RAD', 'RADC', 'IMAGE_JPEG', 'IMAGE_PNG', 'IMAGE_GIF', 'IMAGE_WEBP']), sha256: digest,
 		bytes: z.number().int().positive(), role: z.enum(['SOURCE', 'DERIVED', 'PREVIEW', 'LOD']),
+		// Optional so existing v1 manifest hashes and imported assets remain unchanged.
+		modelGeneration: generatedSceneAssetProvenanceV1Schema.optional(),
 		derivation: z.object({
 			parentAssetSha256: digest,
 			producer: z.string().min(1).max(200),
@@ -228,6 +240,17 @@ export const sceneDocumentV1Schema = z.object({
 		if (!calibratedEvidenceSource) context.addIssue({ code: 'custom', message: 'Calibration source hash must match an SPZ evidence source revision', path: ['calibration', 'sourceSha256'] });
 	}
 	for (const [index, asset] of document.assets.entries()) {
+		if (asset.modelGeneration) {
+			if (asset.role !== 'DERIVED' || asset.format !== 'GLB') {
+				context.addIssue({ code: 'custom', message: 'Model-generated provenance is only valid on a derived GLB asset', path: ['assets', index, 'modelGeneration'] });
+			}
+			if (asset.modelGeneration.outputSha256 !== asset.sha256) {
+				context.addIssue({ code: 'custom', message: 'Generated GLB output hash must match the scene asset hash', path: ['assets', index, 'modelGeneration', 'outputSha256'] });
+			}
+			if (sourceRevisions.get(asset.modelGeneration.source.evidenceId) !== asset.modelGeneration.source.sourceRevision) {
+				context.addIssue({ code: 'custom', message: 'Generated scene asset must bind to the exact evidence revision in this scene manifest', path: ['assets', index, 'modelGeneration', 'source'] });
+			}
+		}
 		if (asset.role === 'LOD') {
 			if (!asset.derivation) {
 				context.addIssue({ code: 'custom', message: 'LOD asset requires source hash and producer lineage', path: ['assets', index, 'derivation'] });
@@ -262,6 +285,20 @@ export const sceneDocumentV1Schema = z.object({
 	for (const [index, object] of document.objects.entries()) {
 		if (objectIds.has(object.objectId)) context.addIssue({ code: 'custom', message: 'Duplicate objectId', path: ['objects', index, 'objectId'] });
 		objectIds.add(object.objectId);
+		const objectSources = new Map<string, string>();
+		for (const [sourceIndex, binding] of (object.sourceBindings ?? []).entries()) {
+			if (sourceRevisions.get(binding.evidenceId) !== binding.sourceRevision) {
+				context.addIssue({ code: 'custom', message: 'Object source binding must match an evidence revision in this scene', path: ['objects', index, 'sourceBindings', sourceIndex] });
+			}
+			objectSources.set(binding.evidenceId, binding.sourceRevision);
+		}
+		for (const [recommendationIndex, recommendation] of (object.reviewedRecommendations ?? []).entries()) {
+			for (const [bindingIndex, binding] of recommendation.sourceBindings.entries()) {
+				if (objectSources.get(binding.evidenceId) !== binding.sourceRevision) {
+					context.addIssue({ code: 'custom', message: 'Accepted recommendation must cite an exact source revision bound to its target object', path: ['objects', index, 'reviewedRecommendations', recommendationIndex, 'sourceBindings', bindingIndex] });
+				}
+			}
+		}
 	}
 	for (const [index, object] of document.objects.entries()) {
 		if (object.parentObjectId && !objectIds.has(object.parentObjectId)) context.addIssue({ code: 'custom', message: 'Parent object is not in this manifest', path: ['objects', index, 'parentObjectId'] });

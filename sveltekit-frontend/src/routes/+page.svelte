@@ -773,8 +773,8 @@
   filter: drop-shadow(0 0 0.35rem rgb(217 189 121 / 20%));
  }
 
- .nav-item:hover .nav-icon,
- .nav-item.active .nav-icon { color: #fdf3d4; }
+ .nav-item:hover :global(.nav-icon),
+ .nav-item.active :global(.nav-icon) { color: #fdf3d4; }
 
  .badge {
  margin-left: auto;

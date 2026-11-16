@@ -24,8 +24,12 @@ const out = openSync(resolve(logDir, `${safeName}.out.log`), 'a');
 const err = openSync(resolve(logDir, `${safeName}.err.log`), 'a');
 
 const isWindows = process.platform === 'win32';
-const npmCommand = isWindows ? 'cmd.exe' : 'npm';
-const launchArgs = isWindows ? ['/d', '/s', '/c', 'npm.cmd', 'run', script] : ['run', script];
+// Windows: run npm's CLI through node directly. A detached `cmd.exe /c npm.cmd`
+// child exits silently with no console (verified 2026-11-16: even a trivial
+// detached cmd child produced no output), so dev:gpu never started.
+const npmCli = resolve(dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js');
+const npmCommand = isWindows ? process.execPath : 'npm';
+const launchArgs = isWindows ? [npmCli, 'run', script] : ['run', script];
 const child = spawn(npmCommand, launchArgs, {
   cwd: ROOT,
   detached: true,

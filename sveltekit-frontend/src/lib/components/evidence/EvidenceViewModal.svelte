@@ -8,6 +8,9 @@
 	import Evidence3DModal from './Evidence3DModal.svelte';
 	import EvidenceSpzViewer from './EvidenceSpzViewer.svelte';
 	import EvidenceTranscriptPanel from './EvidenceTranscriptPanel.svelte';
+	import EvidenceVideoEventTimeline from './EvidenceVideoEventTimeline.svelte';
+	import EvidenceMotionLutPreview from './EvidenceMotionLutPreview.svelte';
+	import EvidencePoseAnnotationEditor from './EvidencePoseAnnotationEditor.svelte';
 	import { formatFileSize, formatDate, getIcon, getTypeLabel } from './evidence-utils.js';
 	import {
 		audioFormatTip,
@@ -350,8 +353,16 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 			if (evidenceId !== id) return;
 			videoSkimPreview = parseVideoSkimPreviewClientV1(data?.skimPreview);
 			skimPreviewIndex = 0;
-			if (Array.isArray(data?.frames) && data.frames.length > 0 && (!doc?.frameAnalysis || doc.frameAnalysis.length === 0)) {
-				doc = { ...doc, frameAnalysis: data.frames };
+			if (Array.isArray(data?.frames) && data.frames.length > 0) {
+				const existingFrames = Array.isArray(doc?.frameAnalysis) ? doc.frameAnalysis : [];
+				const frames = data.frames.map((frame: Record<string, unknown>, index: number) => ({
+					...(existingFrames[index] && typeof existingFrames[index] === 'object' ? existingFrames[index] : {}),
+					...frame,
+					frameIndex: Number.isInteger(frame.frameIndex) ? frame.frameIndex : index,
+					timestampMs: Number.isFinite(frame.timestampMs) ? frame.timestampMs : Math.round(Number(frame.timestamp ?? 0) * 1000),
+					framePath: frame.framePath ?? existingFrames[index]?.framePath ?? null,
+				}));
+				doc = { ...doc, frameAnalysis: frames };
 			}
 		} catch {
 			// Frames are progressive enhancement; keep viewer responsive
@@ -401,17 +412,21 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 	let isMarkdown = $derived(fileType === 'text/markdown' || fileName.endsWith('.md'));
 	let videoFrameAnalysis = $derived<Array<{
 		timestamp: number;
+		frameIndex?: number;
+		timestampMs?: number;
 		framePath?: string | null;
 		description?: string;
 		objects?: string[];
 		tags?: string[];
 		confidence?: number;
-		detections?: Array<{ label: string; confidence?: number; bbox: [number, number, number, number] }>;
+		detections?: Array<{ label: string; confidence?: number; bbox: [number, number, number, number]; trackId?: string; velocityPxPerSecond?: [number, number] | null; trackState?: string }>;
+		trackScopeId?: string;
 		width?: number;
 		height?: number;
 		modelRevision?: string | null;
 		analysisRevision?: string;
 		sourceRevision?: string;
+		motionLut?: { schema: string; width: number; height: number; timestampMs: number; motionScore: number; url: string } | null;
 	}>>(
 		Array.isArray(doc?.frameAnalysis)
 			? doc.frameAnalysis
@@ -447,18 +462,33 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 	);
 	let selectedAnalysisFrame = $state<{
 		timestamp: number;
+		frameIndex?: number;
+		timestampMs?: number;
 		framePath?: string | null;
 		description?: string;
 		objects?: string[];
 		tags?: string[];
 		confidence?: number;
-		detections?: Array<{ label: string; confidence?: number; bbox: [number, number, number, number] }>;
+		detections?: Array<{ label: string; confidence?: number; bbox: [number, number, number, number]; trackId?: string; velocityPxPerSecond?: [number, number] | null; trackState?: string }>;
+		trackScopeId?: string;
 		width?: number;
 		height?: number;
 		modelRevision?: string | null;
 		analysisRevision?: string;
 		sourceRevision?: string;
+		motionLut?: { schema: string; width: number; height: number; timestampMs: number; motionScore: number; url: string } | null;
 	} | null>(null);
+	let poseEditorExpanded = $state(false);
+	let selectedPoseTrackId = $state('');
+	let poseSelectionScope = '';
+	$effect(() => {
+		const nextScope = `${String(evidenceId ?? '')}:${String(doc?.hash ?? '')}:${selectedAnalysisFrame?.analysisRevision ?? ''}:${selectedAnalysisFrame?.trackScopeId ?? ''}`;
+		if (nextScope !== poseSelectionScope) {
+			poseSelectionScope = nextScope;
+			poseEditorExpanded = false;
+			selectedPoseTrackId = '';
+		}
+	});
 	let previewUrl = $derived.by(() => {
 		const previewCaseId = doc?.caseId ?? doc?.case_id ?? caseId;
 		if (!evidenceId || !previewCaseId) return null;
@@ -771,6 +801,21 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 		reviewMediaTimestampMs = videoFrameTimestampMs;
 		selectedAnalysisFrame = frame as typeof selectedAnalysisFrame;
 		markupMessage = `Seeked to frame at ${formatVideoTime(frame.timestamp)}.`;
+	}
+
+	function seekToPoseSample(timestampMs: number) {
+		const timestampSeconds = timestampMs / 1000;
+		const frame = orderedVideoKeyframes.reduce<(typeof orderedVideoKeyframes)[number] | null>((nearest, candidate) =>
+			!nearest || Math.abs(candidate.timestamp - timestampSeconds) < Math.abs(nearest.timestamp - timestampSeconds) ? candidate : nearest,
+			null
+		);
+		if (!videoElement) return;
+		videoElement.currentTime = timestampSeconds;
+		currentPlaybackTimeMs = timestampMs;
+		videoFrameTimestampMs = timestampMs;
+		reviewMediaTimestampMs = timestampMs;
+		if (frame) selectedAnalysisFrame = frame;
+		markupMessage = `Seeked to pose sample at ${formatVideoTime(timestampSeconds)}.`;
 	}
 
 	function stepVideoKeyframe(direction: -1 | 1) {
@@ -1259,9 +1304,14 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 						{/if}
 					</div>
 				</div>
-				<button type="button" class="modal-close" onclick={close} aria-label="Close">
-					<Icon name="x" class="w-4 h-4" />
-				</button>
+				<div class="modal-header-actions">
+					{#if isVideo && evidenceId}
+						<button type="button" class="modal-transcript-open" data-testid="open-video-transcript" aria-expanded={showTranscript} onclick={() => (showTranscript = true)}>Transcript</button>
+					{/if}
+					<button type="button" class="modal-close" onclick={close} aria-label="Close">
+						<Icon name="x" class="w-4 h-4" />
+					</button>
+				</div>
 			</div>
 
 			<!-- Body -->
@@ -1304,6 +1354,7 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 										title={doc.title ?? fileName ?? 'Evidence relief'}
 										{evidenceId}
 										caseId={caseId}
+										sourceRevision={typeof doc?.hash === 'string' ? `sha256:${doc.hash.replace(/^sha256:/i, '').toLowerCase()}` : null}
 										{chatMessages}
 										{chatStatus}
 										{onAskAssistant}
@@ -1448,6 +1499,8 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 								controls
 								preload="metadata"
 								class="video-player"
+								data-testid="evidence-video-player"
+								aria-label={`Evidence video: ${doc?.title ?? fileName}`}
 								src={previewUrl}
 								onloadstart={() => (mediaState = 'loading')}
 								onloadedmetadata={() => {
@@ -1476,9 +1529,6 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 									<span aria-live="polite">Keyframe {activeVideoKeyframeIndex + 1} / {orderedVideoKeyframes.length}</span>
 									<button type="button" aria-label="Next keyframe" title="Next keyframe" onclick={() => stepVideoKeyframe(1)} disabled={mediaState !== 'ready' || !canStepToNextKeyframe}>Keyframe ▶</button>
 								{/if}
-				{#if evidenceId}
-					<button type="button" data-testid="open-video-transcript" aria-expanded={showTranscript} onclick={() => (showTranscript = true)}>Transcript</button>
-				{/if}
 								<button type="button" onclick={captureVideoFrame} disabled={mediaState !== 'ready'}>Capture current frame</button>
 								<button type="button" onclick={analyzeVideoFrameInWasm} disabled={mediaState !== 'ready' || videoFrameAnalysisLoading}>
 									{videoFrameAnalysisLoading ? 'Analyzing frame…' : 'Analyze frame (WASM)'}
@@ -1565,6 +1615,15 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 													<span class="confidence-badge">{Math.round(selectedAnalysisFrame.confidence * 100)}% conf</span>
 												{/if}
 											</div>
+										{#if evidenceId && selectedAnalysisFrame.motionLut && selectedAnalysisFrame.sourceRevision && selectedAnalysisFrame.analysisRevision}
+											<EvidenceMotionLutPreview
+												url={selectedAnalysisFrame.motionLut.url}
+												sourceRevision={selectedAnalysisFrame.sourceRevision}
+												analysisRevision={selectedAnalysisFrame.analysisRevision}
+												timestampMs={selectedAnalysisFrame.motionLut.timestampMs}
+												motionScore={selectedAnalysisFrame.motionLut.motionScore}
+											/>
+										{/if}
 											{#if selectedAnalysisFrame.description}
 												<p class="frame-description">{selectedAnalysisFrame.description}</p>
 											{/if}
@@ -1577,12 +1636,37 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 								<div class="frame-objects-row">
 									<strong>Source-space boxes (px):</strong>
 									{#each selectedAnalysisFrame.detections as detection}
-										<span>{detection.label} [{detection.bbox.map((coordinate) => Math.round(coordinate)).join(', ')}]</span>
+										<span>
+										{detection.label} [{detection.bbox.map((coordinate) => Math.round(coordinate)).join(', ')}]
+										{#if detection.trackId} · {detection.trackId} (unreviewed track hypothesis){/if}
+										{#if detection.velocityPxPerSecond} · Δ {detection.velocityPxPerSecond.map((coordinate) => coordinate.toFixed(1)).join(', ')} px/s{/if}
+									</span>
 									{/each}
 								</div>
+								{#if selectedAnalysisFrame.trackScopeId}
+									<p class="frame-description">Track IDs are hypotheses scoped to this evidence revision and analysis run. They do not identify people.</p>
+								{/if}
 							{/if}
 							{#if selectedAnalysisFrame.modelRevision}
 								<p class="frame-description">Model revision {selectedAnalysisFrame.modelRevision}</p>
+							{/if}
+							{#if evidenceId && selectedAnalysisFrame.analysisRevision && selectedAnalysisFrame.frameIndex !== undefined && selectedAnalysisFrame.timestampMs !== undefined && doc?.hash && (doc?.caseId ?? doc?.case_id ?? caseId)}
+								{#key `${selectedAnalysisFrame.analysisRevision}:${selectedAnalysisFrame.frameIndex}:${selectedAnalysisFrame.timestampMs}`}
+									<EvidencePoseAnnotationEditor
+										evidenceId={String(evidenceId)}
+										caseId={String(doc?.caseId ?? doc?.case_id ?? caseId)}
+										sourceSha256={String(doc.hash)}
+										analysisRevision={selectedAnalysisFrame.analysisRevision}
+										frameIndex={selectedAnalysisFrame.frameIndex}
+										timestampMs={selectedAnalysisFrame.timestampMs}
+										trackScopeId={selectedAnalysisFrame.trackScopeId}
+										detections={selectedAnalysisFrame.detections ?? []}
+										videoElement={videoElement}
+										onSeekToFrame={seekToPoseSample}
+										bind:expanded={poseEditorExpanded}
+										bind:selectedTrackId={selectedPoseTrackId}
+									/>
+								{/key}
 							{/if}
 										</div>
 									{/if}
@@ -1599,6 +1683,16 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 						<div><strong>Transcript</strong><span>{doc?.title ?? fileName}</span></div>
 						<button type="button" aria-label="Close transcript" data-testid="close-video-transcript" onclick={() => (showTranscript = false)}>×</button>
 					</header>
+					<EvidenceVideoEventTimeline
+						evidenceId={evidenceId}
+						onSeek={(timestampMs) => {
+							if (videoElement) {
+								videoElement.currentTime = timestampMs / 1000;
+								reviewMediaTimestampMs = timestampMs;
+								currentPlaybackTimeMs = timestampMs;
+							}
+						}}
+					/>
 					<EvidenceTranscriptPanel
 						evidenceId={evidenceId}
 						caseId={caseId ?? undefined}

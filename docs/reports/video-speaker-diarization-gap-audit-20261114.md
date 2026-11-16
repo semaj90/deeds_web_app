@@ -61,3 +61,31 @@ Observed output found the transcript panel's `speakerId` rendering/filtering and
 - safe_next_command: `git diff --check -- openspec/changes/evidence-analysis-bdd-pipeline/tasks.md docs/reports/video-speaker-diarization-gap-audit-20261114.md`.
 - smoke_command: `cd sveltekit-frontend; npm exec -- vitest run src/lib/server/features/evidence/video/__tests__/durable-video-analysis-v1.spec.ts src/lib/components/evidence/EvidenceTranscriptPanel.spec.ts`.
 - report_path: `docs/reports/video-speaker-diarization-gap-audit-20261114.md`.
+
+## Reviewer correction follow-up (2026-11-15)
+
+The transcript API accepts a bounded `correctedText` only with an approved review status. It updates the current-source transcript row and preserves the first model-produced text in metadata as `modelText`. The transcript drawer now hides review/edit controls unless the API reports the review feature gate enabled, supports editing and saving a cue, and shows the original model text after correction. No schema migration was needed; correction provenance remains in the existing JSONB metadata.
+
+Validation: the transcript review route and `EvidenceTranscriptPanel` specs passed, 15 tests total. This remains mocked API/UI proof. No live PostgreSQL readback, authenticated browser flow, or concurrent reviewer behavior was verified. Audio transcription is still whole-file, and no VAD, diarization, or forced-alignment provider is connected to the durable worker. OpenSpec tasks 5.6–5.10 remain unchecked.
+
+- likely_cause: The viewer could approve transcript cues but had no controlled way to correct words while retaining the model's original output.
+- evidence: `sveltekit-frontend/src/routes/api/evidence/[id]/transcript/+server.ts`; `sveltekit-frontend/src/lib/components/evidence/EvidenceTranscriptPanel.svelte`; their route and component specs; 15 passing focused tests.
+- patch_targets: `sveltekit-frontend/src/routes/api/evidence/[id]/transcript/+server.ts`; `sveltekit-frontend/src/routes/api/evidence/[id]/transcript/transcript-review.spec.ts`; `sveltekit-frontend/src/lib/components/evidence/EvidenceTranscriptPanel.svelte`; `sveltekit-frontend/src/lib/components/evidence/EvidenceTranscriptPanel.spec.ts`.
+- safe_next_command: `git diff --check -- sveltekit-frontend/src/routes/api/evidence/[id]/transcript/+server.ts sveltekit-frontend/src/routes/api/evidence/[id]/transcript/transcript-review.spec.ts sveltekit-frontend/src/lib/components/evidence/EvidenceTranscriptPanel.svelte sveltekit-frontend/src/lib/components/evidence/EvidenceTranscriptPanel.spec.ts`.
+- smoke_command: `cd sveltekit-frontend; npm exec -- vitest run "src/routes/api/evidence/[id]/transcript/transcript-review.spec.ts" src/lib/components/evidence/EvidenceTranscriptPanel.spec.ts`.
+- report_path: `docs/reports/video-speaker-diarization-gap-audit-20261114.md`.
+
+## Follow-up (2026-11-15)
+
+The transcript GET route now prefers current-source canonical `whisper_segments` rows and falls back to the legacy transcript table only when the canonical result is empty. Focused tests cover canonical-first selection and ensure model speaker labels are exposed only when they match the anonymous `spk_*` contract. The existing review POST remains disabled by default and updates only an authorized current-source segment. Focused validation passed 28 tests across the route, durable video worker, and audio window ledger.
+
+This does not add a diarization/VAD/forced-alignment runtime. `durable-video-analysis-v1.ts` still invokes whole-file transcription through `transcript-service.ts`; VAD, overlap-aware speaker assignment, and word alignment remain unimplemented and unproven. No live PostgreSQL write/readback, real Whisper inference, or browser seek/export proof was run. OpenSpec tasks 5.6–5.10 remain unchecked.
+
+Updated structured handoff:
+
+- likely_cause: The transcript viewer previously preferred a legacy row source with no canonical speaker field, while the durable worker still has no speaker-analysis producer.
+- evidence: `sveltekit-frontend/src/routes/api/evidence/[id]/transcript/+server.ts`; `sveltekit-frontend/src/routes/api/evidence/[id]/transcript/transcript-review.spec.ts`; `sveltekit-frontend/src/lib/server/features/evidence/video/durable-video-analysis-v1.ts`; 28 focused tests passed.
+- patch_targets: `sveltekit-frontend/src/routes/api/evidence/[id]/transcript/+server.ts`; `sveltekit-frontend/src/routes/api/evidence/[id]/transcript/transcript-review.spec.ts`; `openspec/changes/evidence-analysis-bdd-pipeline/tasks.md`.
+- safe_next_command: `git diff --check -- sveltekit-frontend/src/routes/api/evidence/[id]/transcript/+server.ts sveltekit-frontend/src/routes/api/evidence/[id]/transcript/transcript-review.spec.ts openspec/changes/evidence-analysis-bdd-pipeline/tasks.md docs/reports/video-speaker-diarization-gap-audit-20261114.md`.
+- smoke_command: `cd sveltekit-frontend; npm exec -- vitest run "src/routes/api/evidence/[id]/transcript/transcript-review.spec.ts" src/lib/server/features/evidence/video/__tests__/durable-video-analysis-v1.spec.ts src/lib/server/features/evidence/video/audio-window-ledger-v1.spec.ts`.
+- report_path: `docs/reports/video-speaker-diarization-gap-audit-20261114.md`.

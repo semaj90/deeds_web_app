@@ -60,6 +60,11 @@ describe('GET /api/evidence/[id]/download', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mocks.observedMime = 'application/pdf';
+		mocks.row.fileUrl = 'minio://legal-evidence/evidence/example.pdf';
+		mocks.row.fileName = 'example.pdf';
+		mocks.row.mimeType = 'application/pdf';
+		mocks.row.fileType = 'application/pdf';
+		mocks.row.fileSize = 4;
 		mocks.row.caseId = null;
 		mocks.stream = {
 			async *[Symbol.asyncIterator]() { yield Buffer.from('%PDF-1.7'); },
@@ -101,6 +106,28 @@ describe('GET /api/evidence/[id]/download', () => {
 			],
 		});
 		expect(mocks.getStream).toHaveBeenCalledWith('legal-evidence', 'evidence/example.pdf');
+	});
+
+	it('serves signature-validated WebM video for inline browser playback', async () => {
+		const caseId = 'fc0277ba-9d09-4d52-8d74-f16db1a678ce';
+		mocks.row.caseId = caseId;
+		mocks.row.fileName = 'surveillance.webm';
+		mocks.row.fileUrl = 'minio://legal-evidence/evidence/surveillance.webm';
+		mocks.row.mimeType = 'video/webm';
+		mocks.row.fileType = 'video/webm';
+		mocks.observedMime = 'video/webm';
+		const { GET } = await import('./+server.js');
+		const response = await GET({
+			params: { id: mocks.row.id },
+			locals: { user: { id: 2 } },
+			url: new URL(`http://localhost/api/evidence/example/download?inline=1&caseId=${caseId}`),
+			request: new Request(`http://localhost/api/evidence/example/download?inline=1&caseId=${caseId}`),
+		} as any);
+
+		expect(response.status).toBe(200);
+		expect(response.headers.get('content-type')).toBe('video/webm');
+		expect(response.headers.get('content-disposition')).toContain('inline;');
+		expect(await response.text()).toBe('test');
 	});
 
 	it('keeps the default response as an attachment', async () => {

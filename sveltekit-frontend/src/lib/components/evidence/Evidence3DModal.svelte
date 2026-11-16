@@ -1,10 +1,13 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { Dialog } from 'bits-ui';
-	import DepthReliefViewer, { type DepthSourceMode, type AnnotationScreenPositions, type ReliefSamplingMode } from './DepthReliefViewer.svelte';
+	import DepthReliefViewer, { type DepthSourceMode, type AnnotationScreenPositions, type ReliefSamplingMode, type ReliefSegmentMask } from './DepthReliefViewer.svelte';
 	import EvidenceSpzViewer from './EvidenceSpzViewer.svelte';
 	import { analyzeStoredEvidenceImage, requestEvidenceUpscale } from './evidence-image-tools.js';
 	import { createActor } from 'xstate';
 	import type { ChatMessage } from '$lib/models/ChatSession.svelte.js';
+	import { createSceneQualityReceiptV1, createSceneDocumentV1 } from '$lib/splat/scene-document-v1.js';
+	import { evidenceSceneIdV1, fetchSceneAssetV1, fetchSceneRevisionV1, saveSceneManifestRevisionV1, saveSceneRevisionV1 } from '$lib/splat/scene-persistence-client-v1.js';
 	import {
 		createMarkerSaveMachine,
 		deleteSavedMarker,
@@ -17,6 +20,7 @@
 		open = $bindable(false),
 		imageUrl,
 		depthUrl = null,
+		sourceRevision = null,
 		evidenceId = null,
 		caseId = null,
 		spzSourceEligible = false,
@@ -26,7 +30,7 @@
 		chatStatus = 'idle',
 		onAskAssistant,
 		assistantInitiallyExpanded = false
-	}: { open?: boolean; imageUrl: string | null; depthUrl?: string | null; evidenceId?: string | null; caseId?: string | null; spzSourceEligible?: boolean; title?: string; embedded?: boolean; chatMessages?: ChatMessage[]; chatStatus?: string; onAskAssistant?: (prompt: string) => void | Promise<void>; assistantInitiallyExpanded?: boolean } = $props();
+	}: { open?: boolean; imageUrl: string | null; depthUrl?: string | null; sourceRevision?: string | null; evidenceId?: string | null; caseId?: string | null; spzSourceEligible?: boolean; title?: string; embedded?: boolean; chatMessages?: ChatMessage[]; chatStatus?: string; onAskAssistant?: (prompt: string) => void | Promise<void>; assistantInitiallyExpanded?: boolean } = $props();
 
 	// Upscaled result replaces the source for the relief view (blob URL, never persisted).
 	let upscaledUrl = $state<string | null>(null);
@@ -36,7 +40,7 @@
 	let actionError = $state('');
 	const effectiveUrl = $derived(upscaledUrl ?? imageUrl);
 	type EvidenceMarker = { id: string; number: number; x: number; y: number; label: string; note: string; revision: number | null };
-	let toolMode = $state<'orbit' | 'marker'>('orbit');
+	let toolMode = $state<'orbit' | 'marker' | 'segment'>('orbit');
 	let sceneView = $state<'relief' | 'spz'>('relief');
 	let samplingMode = $state<ReliefSamplingMode>('native');
 	let markerMotion = $state(true);
@@ -44,6 +48,18 @@
 	let assistantDraft = $state('');
 	let assistantSending = $state(false);
 	let markers = $state<EvidenceMarker[]>([]);
+	let segmentMasks = $state<ReliefSegmentMask[]>([]);
+	let segmentPoints = $state<Array<{ x: number; y: number }>>([]);
+	let segmentLabel = $state('Object region');
+	let savedGlb = $state<ArrayBuffer | null>(null);
+	let sceneStatus = $state('');
+	let sceneBusy = $state<'' | 'save' | 'reload'>('');
+	let sceneObjectId = $state<string | null>(null);
+	let sceneRevision = $state<number | null>(null);
+	let assistantReplyCandidate = $state<ChatMessage | null>(null);
+	let assistantReplyBaseline = 0;
+	let stageElement = $state<HTMLDivElement | null>(null);
+	let markerMiniDialog = $state<HTMLDialogElement | null>(null);
 
 	$effect(() => {
 		if (open) assistantExpanded = assistantInitiallyExpanded;
@@ -63,6 +79,161 @@
 	// Bumped on close/reset so a late analyze/upscale response cannot land in a closed or different viewer.
 	let actionToken = 0;
 	const selectedMarker = $derived(markers.find((marker) => marker.id === selectedMarkerId) ?? null);
+	const sceneSaveEligible = $derived(Boolean(caseId && evidenceId && /^sha256:[a-f0-9]{64}$/i.test(sourceRevision ?? '') && depthMode === 'STORED_MONOCULAR_DEPTH'));
+
+	$effect(() => {
+		const marker = selectedMarker;
+		const position = marker ? markerScreenPositions[marker.id] : null;
+		const dialog = markerMiniDialog;
+		if (!dialog) return;
+		if (!marker || !position || !stageElement) {
+			if (dialog.open) dialog.close();
+			return;
+		}
+		const bounds = stageElement.getBoundingClientRect();
+		const left = bounds.left + (position.left / 100) * bounds.width;
+		const top = bounds.top + (position.top / 100) * bounds.height;
+		dialog.style.left = `${Math.max(12, Math.min(window.innerWidth - 300, left + 18))}px`;
+		dialog.style.top = `${Math.max(12, Math.min(window.innerHeight - 160, top + 12))}px`;
+		if (!dialog.open) dialog.show();
+	});
+
+	async function saveReliefMesh(glb: ArrayBuffer, metrics: { vertexCount: number; triangleCount: number; segmentMasks: ReliefSegmentMask[] }) {
+		if (!sceneSaveEligible || !caseId || !evidenceId || !sourceRevision) throw new Error('A verified source revision and stored depth map are required to save this relief.');
+		sceneBusy = 'save';
+		sceneStatus = 'Saving source-bound mesh…';
+		try {
+			const sceneId = await evidenceSceneIdV1(caseId, evidenceId);
+			const prior = await fetchSceneRevisionV1({ caseId, sceneId });
+			const binding = { evidenceId, sourceRevision };
+			const priorBindings = (prior?.manifest.evidenceBindings ?? []).filter((entry) => entry.evidenceId !== evidenceId);
+			const meshObjectId = prior?.manifest.objects.find((object) => object.kind === 'MESH' && object.name === 'Single-image depth relief hypothesis')?.objectId ?? crypto.randomUUID();
+			const saved = await saveSceneRevisionV1({
+				caseId,
+				sceneId,
+				expectedRevision: prior?.revision ?? 0,
+				commandId: crypto.randomUUID(),
+				glb,
+				createManifest: (asset) => {
+					const assets = [...(prior?.manifest.assets ?? []), { assetId: asset.assetId, format: 'GLB' as const, sha256: asset.sha256, bytes: asset.bytes, role: 'DERIVED' as const }];
+					const objects = [...(prior?.manifest.objects ?? []).filter((object) => object.name !== 'Single-image depth relief hypothesis'), {
+						objectId: meshObjectId,
+						parentObjectId: null,
+						name: 'Single-image depth relief hypothesis',
+						kind: 'MESH' as const,
+						assetSha256: asset.sha256,
+						sourceBindings: [binding],
+						transform: { translation: [0, 0, 0] as [number, number, number], rotationXyzw: [0, 0, 0, 1] as [number, number, number, number], scale: [1, 1, 1] as [number, number, number] },
+						geometry: { meshCount: 1, vertexCount: metrics.vertexCount, triangleCount: metrics.triangleCount, textureCount: 1, boneCount: 0 }
+					}];
+					return createSceneDocumentV1({
+						schema: 'parent-atlas.scene-document.v1',
+						sceneId,
+						caseId,
+						status: 'HYPOTHESIS',
+						sceneClassification: 'SINGLE_IMAGE_HYPOTHESIS',
+						revision: (prior?.revision ?? 0) + 1,
+						parentManifestSha256: prior?.manifestSha256 ?? null,
+						createdAt: new Date().toISOString(),
+						coordinateFrame: 'GLTF_Y_UP_METERS',
+						objects,
+						animations: prior?.manifest.animations ?? [],
+						evidenceBindings: [...priorBindings, binding],
+						evidenceSources: (prior?.manifest.evidenceSources ?? []).filter((entry) => entry.evidenceId !== evidenceId),
+						surfaceMarkers: prior?.manifest.surfaceMarkers ?? [],
+						assets,
+						quality: createSceneQualityReceiptV1({
+							derivedAssetBytes: assets.reduce((sum, item) => sum + (item.role === 'DERIVED' || item.role === 'LOD' ? item.bytes : 0), 0),
+							triangleCount: (prior?.manifest.quality.triangleCount ?? 0) + metrics.triangleCount,
+							textureBytes: prior?.manifest.quality.textureBytes ?? null
+						})
+					});
+				}
+			});
+			sceneObjectId = meshObjectId;
+			sceneRevision = saved.revision.revision;
+			sceneStatus = `Saved hypothesis mesh at scene revision ${saved.revision.revision}.`;
+		} catch (cause) {
+			sceneStatus = `Mesh was not saved: ${cause instanceof Error ? cause.message : String(cause)}`;
+		} finally {
+			sceneBusy = '';
+		}
+	}
+
+	async function reloadReliefMesh() {
+		if (!caseId || !evidenceId || !sourceRevision) return;
+		sceneBusy = 'reload';
+		sceneStatus = 'Checking saved scene access…';
+		try {
+			const sceneId = await evidenceSceneIdV1(caseId, evidenceId);
+			const saved = await fetchSceneRevisionV1({ caseId, sceneId });
+			if (!saved) throw new Error('No saved scene is available for this exhibit.');
+			if (!(saved.manifest.evidenceBindings ?? []).some((entry) => entry.evidenceId === evidenceId && entry.sourceRevision === sourceRevision)) {
+				throw new Error('Saved scene belongs to a different source revision.');
+			}
+			const mesh = [...saved.manifest.objects].reverse().find((object) => object.kind === 'MESH' && object.assetSha256);
+			if (!mesh?.assetSha256) throw new Error('Saved scene has no registered relief mesh.');
+			const asset = saved.manifest.assets.find((entry) => entry.sha256 === mesh.assetSha256 && entry.format === 'GLB');
+			if (!asset) throw new Error('Saved relief mesh asset is missing from its manifest.');
+			savedGlb = await fetchSceneAssetV1({ caseId, sceneId, assetId: asset.assetId, expectedSha256: asset.sha256, expectedBytes: asset.bytes });
+			sceneObjectId = mesh.objectId;
+			sceneRevision = saved.revision;
+			sceneStatus = `Authorized reload complete · scene revision ${saved.revision}.`;
+		} catch (cause) {
+			savedGlb = null;
+			sceneStatus = `Saved mesh was not loaded: ${cause instanceof Error ? cause.message : String(cause)}`;
+		} finally {
+			sceneBusy = '';
+		}
+	}
+
+	async function saveAssistantReplyAsReviewedSceneNote() {
+		const answer = assistantReplyCandidate?.content.trim();
+		if (!answer || !caseId || !evidenceId || !sourceRevision || !sceneObjectId) return;
+		sceneBusy = 'save';
+		sceneStatus = 'Saving the human-accepted recommendation as a scene revision…';
+		try {
+			const sceneId = await evidenceSceneIdV1(caseId, evidenceId);
+			const current = await fetchSceneRevisionV1({ caseId, sceneId });
+			if (!current || !(current.manifest.evidenceBindings ?? []).some((binding) => binding.evidenceId === evidenceId && binding.sourceRevision === sourceRevision)) {
+				throw new Error('The saved scene no longer matches this evidence revision. Reload it before accepting a recommendation.');
+			}
+			const target = current.manifest.objects.find((object) => object.objectId === sceneObjectId);
+			if (!target || !(target.sourceBindings ?? []).some((binding) => binding.evidenceId === evidenceId && binding.sourceRevision === sourceRevision)) {
+				throw new Error('The selected scene object is not bound to this exact evidence revision.');
+			}
+			const acceptedNote = {
+				recommendationId: crypto.randomUUID(),
+				text: answer.slice(0, 8_000),
+				sourceBindings: [{ evidenceId, sourceRevision }],
+				reviewStatus: 'HUMAN_ACCEPTED' as const,
+				acceptedAt: new Date().toISOString()
+			};
+			const manifest = createSceneDocumentV1({
+				...current.manifest,
+				revision: current.revision + 1,
+				parentManifestSha256: current.manifestSha256,
+				createdAt: new Date().toISOString(),
+				objects: current.manifest.objects.map((object) => object.objectId === target.objectId
+					? { ...object, reviewedRecommendations: [...(object.reviewedRecommendations ?? []), acceptedNote] }
+					: object)
+			});
+			const saved = await saveSceneManifestRevisionV1({
+				caseId,
+				sceneId,
+				expectedRevision: current.revision,
+				commandId: crypto.randomUUID(),
+				manifest
+			});
+			sceneRevision = saved.revision;
+			assistantReplyCandidate = null;
+			sceneStatus = `Human-accepted recommendation saved on scene revision ${saved.revision}. Geometry was not changed.`;
+		} catch (cause) {
+			sceneStatus = `Recommendation was not saved: ${cause instanceof Error ? cause.message : String(cause)}`;
+		} finally {
+			sceneBusy = '';
+		}
+	}
 
 	// Durable persistence is on only when the case and exhibit are both known. Otherwise
 	// markers stay temporary, as before. One save runs at a time, in order (queue).
@@ -238,6 +409,46 @@
 		toolMode = mode;
 	}
 
+	function beginSegmentation() {
+		toolMode = 'segment';
+		selectedMarkerId = null;
+		segmentPoints = [];
+		segmentLabel = `Region ${segmentMasks.length + 1}`;
+	}
+
+	function handleReliefPlacement(x: number, y: number) {
+		if (toolMode === 'segment') {
+			if (segmentPoints.length >= 200) return;
+			segmentPoints = [...segmentPoints, { x, y }];
+			return;
+		}
+		addMarker(x, y);
+	}
+
+	function finishSegmentation() {
+		if (segmentPoints.length < 3) {
+			sceneStatus = 'A region outline needs at least three points.';
+			return;
+		}
+		if (segmentMasks.length >= 32) {
+			sceneStatus = 'This scene has reached the 32-region authoring limit.';
+			return;
+		}
+		segmentMasks = [...segmentMasks, {
+			id: crypto.randomUUID(),
+			label: segmentLabel.trim().slice(0, 80) || `Region ${segmentMasks.length + 1}`,
+			points: segmentPoints.map((point) => ({ ...point })),
+			reviewStatus: 'unreviewed'
+		}];
+		segmentPoints = [];
+		toolMode = 'orbit';
+		sceneStatus = 'Manual region mask added as an unreviewed proposal. Save the mesh to persist it.';
+	}
+
+	function toggleMaskReview(maskId: string) {
+		segmentMasks = segmentMasks.map((mask) => mask.id === maskId ? { ...mask, reviewStatus: mask.reviewStatus === 'reviewed' ? 'unreviewed' : 'reviewed' } : mask);
+	}
+
 	function startMarkerDrag(event: PointerEvent, markerId: string) {
 		event.preventDefault();
 		event.stopPropagation();
@@ -279,9 +490,18 @@
 		const question = prompt.trim();
 		if (!question || !caseId || !evidenceId || !onAskAssistant || assistantSending || chatStatus !== 'idle') return;
 		assistantSending = true;
+		assistantReplyCandidate = null;
+		assistantReplyBaseline = chatMessages.filter((message) => message.role === 'assistant').length;
 		assistantDraft = '';
 		try {
-			await onAskAssistant(question);
+			const objectContext = sceneObjectId
+				? `Selected scene object ID: ${sceneObjectId}; scene revision: ${sceneRevision ?? 'not yet saved'}; source evidence ID: ${evidenceId}; source revision: ${sourceRevision ?? 'unknown'}. Treat the object as a derived single-image relief hypothesis, not measured geometry.`
+				: `Selected source evidence ID: ${evidenceId}; source revision: ${sourceRevision ?? 'unknown'}. No persisted scene object is selected.`;
+			const boundedQuestion = `${question}\n\n${objectContext}\nReturn at most four concise recommendations. Separate source-supported observations from hypotheses, cite evidence IDs and exact source revisions (and timestamps or annotation IDs when available), state uncertainty, and never modify or save geometry.`;
+			await onAskAssistant(boundedQuestion);
+			await tick();
+			const assistantReplies = chatMessages.filter((message) => message.role === 'assistant');
+			if (assistantReplies.length > assistantReplyBaseline) assistantReplyCandidate = assistantReplies.at(-1) ?? null;
 		} finally {
 			assistantSending = false;
 		}
@@ -300,8 +520,15 @@
 		upscaleInfo = '';
 		analysisText = '';
 		actionError = '';
+		savedGlb = null;
+		sceneStatus = '';
+		sceneObjectId = null;
+		sceneRevision = null;
+		assistantReplyCandidate = null;
 		busy = '';
 		markers = [];
+		segmentMasks = [];
+		segmentPoints = [];
 		selectedMarkerId = null;
 		markerScreenPositions = {};
 		saveQueue.length = 0;
@@ -365,6 +592,12 @@
 				<div class="e3d-tool-group" aria-label="Canvas tools">
 					<button class="e3d-btn" aria-label="Orbit" class:active={toolMode === 'orbit'} aria-pressed={toolMode === 'orbit'} title="Orbit and inspect the relief (O)" onclick={() => chooseMarkerTool('orbit')}>Orbit <kbd aria-hidden="true">O</kbd></button>
 					<button class="e3d-btn" aria-label="Place marker" class:active={toolMode === 'marker'} aria-pressed={toolMode === 'marker'} title="Place a pin on the relief (M)" onclick={() => chooseMarkerTool('marker')}>＋ Place marker <kbd aria-hidden="true">M</kbd></button>
+					<button class="e3d-btn" aria-label="Draw a region mask" class:active={toolMode === 'segment'} aria-pressed={toolMode === 'segment'} title="Trace a manual region outline on the image surface" onclick={beginSegmentation}>▱ Outline region</button>
+					{#if toolMode === 'segment'}
+						<label class="e3d-mask-label">Region name <input bind:value={segmentLabel} maxlength="80" /></label>
+						<button class="e3d-btn" disabled={segmentPoints.length < 3} onclick={finishSegmentation}>Finish mask ({segmentPoints.length})</button>
+						<button class="e3d-btn" onclick={() => { segmentPoints = []; toolMode = 'orbit'; }}>Cancel outline</button>
+					{/if}
 				</div>
 				<div class="e3d-tool-group" role="group" aria-label="Display sampling">
 					<span class="e3d-sampling-label">Display</span>
@@ -383,18 +616,32 @@
 				</button>
 				{#if toolMode === 'marker'}<span class="e3d-instruction" aria-live="polite">Click surface to pin · Enter to place · drag a pin to reposition · Del removes selection</span>{/if}
 			</div>
-			<div class="e3d-stage" data-status={status}>
+			<div class="e3d-stage" bind:this={stageElement} data-status={status}>
 				{#if sceneView === 'spz' && caseId && evidenceId}
 					<EvidenceSpzViewer {caseId} {evidenceId} />
 				{:else}
 				{#if selectedMarker}
-					<div class="e3d-marker-editor" aria-label="Selected marker details">
-						<label>Marker {selectedMarker.number}<input aria-label="Marker label" value={selectedMarker.label} oninput={(event) => updateSelectedMarker('label', (event.currentTarget as HTMLInputElement).value)} /></label>
-						<label>Note<input aria-label="Marker note" value={selectedMarker.note} oninput={(event) => updateSelectedMarker('note', (event.currentTarget as HTMLInputElement).value)} /></label>
-						<button class="e3d-btn" data-testid="e3d-remove-marker" onclick={() => removeMarker(selectedMarker.id)}>Remove</button>
-					</div>
+					<dialog bind:this={markerMiniDialog} class="e3d-marker-editor" aria-label={`Marker ${selectedMarker.number} details`}>
+						<header><strong>Marker {selectedMarker.number}</strong><button type="button" aria-label="Close marker editor" onclick={() => (selectedMarkerId = null)}>×</button></header>
+						<label>Annotation label<input aria-label="Marker label" value={selectedMarker.label} oninput={(event) => updateSelectedMarker('label', (event.currentTarget as HTMLInputElement).value)} /></label>
+						<p>Label and location are saved to the authorized case scene. Scene note fields are not available in the current marker API.</p>
+						<div class="e3d-marker-actions"><button class="e3d-btn" onclick={() => selectedMarker && enqueueSave('move', selectedMarker.id)} disabled={!persistenceOn || selectedMarker.revision === null}>Save label</button><button class="e3d-btn" data-testid="e3d-remove-marker" onclick={() => selectedMarker && removeMarker(selectedMarker.id)}>Remove</button></div>
+					</dialog>
 				{/if}
 				<div class="e3d-marker-overlay" aria-label="Image source markers">
+					<svg class="e3d-segment-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-label="Manual region masks">
+						{#each segmentMasks as mask (mask.id)}
+							<polygon class:reviewed={mask.reviewStatus === 'reviewed'} points={mask.points.map((point) => `${point.x * 100},${point.y * 100}`).join(' ')}><title>{mask.label} · {mask.reviewStatus}</title></polygon>
+						{/each}
+						{#if segmentPoints.length}
+							<polyline class="e3d-segment-draft" points={segmentPoints.map((point) => `${point.x * 100},${point.y * 100}`).join(' ')} />
+						{/if}
+					</svg>
+					{#each segmentMasks as mask (mask.id)}
+						<button class="e3d-mask-review" style={`left:${Math.max(0, Math.min(85, mask.points[0].x * 100))}%;top:${Math.max(0, Math.min(90, mask.points[0].y * 100))}%;`} onclick={() => toggleMaskReview(mask.id)} aria-label={`${mask.reviewStatus === 'reviewed' ? 'Mark' : 'Review'} ${mask.label}`}>
+							{mask.label} · {mask.reviewStatus}
+						</button>
+					{/each}
 					{#each markers as marker (marker.id)}
 						{#if markerScreenPositions[marker.id]}
 							<button
@@ -432,6 +679,7 @@
 						</div>
 						{#if assistantExpanded}
 							<div class="e3d-context-suggestions" aria-label="Suggested questions">
+								<button class="e3d-context-chip" disabled={!sceneObjectId || assistantSending || chatStatus !== 'idle'} onclick={() => askAssistant('Analyze the selected 3D object using only authorized, source-linked case observations. Give 1–4 reviewable recommendations and explain what cannot be established from this relief.')}>Analyze this 3D object</button>
 								<button class="e3d-context-chip" onclick={() => askAssistant('Summarize this exhibit and identify what the source does not establish.')}>Summarize exhibit</button>
 								<button class="e3d-context-chip" onclick={() => askAssistant('What should I verify next from this exhibit? Cite the supporting case evidence.')}>What should I verify?</button>
 								<button class="e3d-context-chip" onclick={() => askAssistant('Draft a scene hypothesis from the authorized case evidence and timeline. Separate sourced facts from inferred beats, cite the source evidence, and list what remains unknown. Do not invent measurements, GPS coordinates, or unseen geometry.')}>Draft scene hypothesis</button>
@@ -445,13 +693,19 @@
 											{/if}
 										{/if}
 								{/each}
+								{#if assistantReplyCandidate && sceneObjectId && sceneSaveEligible}
+									<div class="e3d-context-review">
+										<p>Review this reply before adding it to the selected object’s scene history. Saving it will not change geometry.</p>
+										<button class="e3d-btn" disabled={sceneBusy !== ''} onclick={() => void saveAssistantReplyAsReviewedSceneNote()}>Accept reply as reviewed scene note</button>
+									</div>
+								{/if}
 								{#if chatStatus === 'thinking' || chatStatus === 'streaming' || assistantSending}<p class="e3d-context-wait" role="status">Reviewing case context…</p>{/if}
 							</div>
 							<form class="e3d-context-form" onsubmit={(event) => { event.preventDefault(); void askAssistant(); }}>
 								<textarea bind:value={assistantDraft} rows="2" placeholder="Ask about this exhibit…" aria-label="Ask the case assistant" onkeydown={(event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); void askAssistant(); } }}></textarea>
 								<button class="e3d-btn" type="submit" disabled={!assistantDraft.trim() || assistantSending || chatStatus !== 'idle'}>Send</button>
 							</form>
-							<p class="e3d-context-note">Chat proposals do not create or save scene geometry. This relief is a visual aid, not a measured reconstruction.</p>
+							<p class="e3d-context-note">Assistant replies are proposals. Accepting one records the reply, exact source revision, and review status in a new scene revision; it does not edit geometry or source evidence. This relief is not measured reconstruction.</p>
 						{/if}
 					</aside>
 				{/if}
@@ -462,15 +716,18 @@
 							{depthUrl}
 							relief={depthScale}
 							wireframe={wire}
-							showToolbar={false}
+							showToolbar={true}
+							{savedGlb}
+							onExportGlb={sceneSaveEligible ? saveReliefMesh : undefined}
 							samplingMode={samplingMode}
-							annotations={markers.map(({ id, x, y }) => ({ id, x, y }))}
-							placementEnabled={toolMode === 'marker'}
+							annotations={markers.map(({ id, x, y, label, revision }) => ({ id, x, y, label, saved: revision !== null }))}
+							placementEnabled={toolMode !== 'orbit'}
+							{segmentMasks}
 							draggingAnnotationId={draggingMarkerId}
 							onDepthSource={handleDepthSource}
 							onLoadState={handleViewerLoadState}
 							onAnnotationPositions={(positions: AnnotationScreenPositions) => (markerScreenPositions = positions)}
-							onPlaceAnnotation={(x: number, y: number) => addMarker(x, y)}
+							onPlaceAnnotation={handleReliefPlacement}
 							onMoveAnnotation={handleMarkerMove}
 							onToolShortcut={handleViewerShortcut}
 						/>
@@ -488,6 +745,11 @@
 				<label class="e3d-check">
 					<input type="checkbox" bind:checked={wire} /> Wireframe
 				</label>
+				{#if caseId && evidenceId}
+					<button class="e3d-btn" data-testid="e3d-reload-saved-mesh" disabled={sceneBusy !== '' || !sourceRevision} onclick={() => void reloadReliefMesh()}>
+						{sceneBusy === 'reload' ? 'Reloading…' : 'Reload saved mesh'}
+					</button>
+				{/if}
 				{#if evidenceId}
 					<button class="e3d-btn" data-testid="e3d-analyze" disabled={!!busy} onclick={runAnalyze}>
 						{busy === 'analyze' ? 'Analyzing…' : 'Analyze image'}
@@ -500,6 +762,7 @@
 					</button>
 				{/if}
 			</footer>
+			{#if sceneStatus}<p class="e3d-result" role="status" data-testid="e3d-scene-status">{sceneStatus}</p>{/if}
 			{#if actionError}<p class="e3d-result e3d-err" data-testid="e3d-error">{actionError}</p>{/if}
 			{#if upscaleInfo}<p class="e3d-result" data-testid="e3d-upscale-info">Upscaled to {upscaleInfo}</p>{/if}
 			{#if analysisText}<p class="e3d-result" data-testid="e3d-analysis"><strong>AI suggestion · review required · not a finding.</strong> {analysisText}</p>{/if}
@@ -680,23 +943,39 @@
 		background: rgba(197, 158, 43, 0.09);
 		line-height: 1.35;
 	}
+	.e3d-mask-label { display: inline-flex; align-items: center; gap: 6px; color: #d8cfbd; font-size: 10px; }
+	.e3d-mask-label input { width: 120px; padding: 5px 7px; border: 1px solid rgba(212,199,163,.35); color: #f2ead7; background: #111722; }
 	.e3d-marker-editor {
-		background: #171d28;
+		position: fixed;
+		z-index: 100;
+		width: min(280px, calc(100vw - 24px));
+		max-width: calc(100vw - 24px);
+		margin: 0;
+		padding: 11px;
+		border: 2px solid #221f1b;
+		border-radius: 8px;
+		color: #29241d;
+		background: #faf6f0;
+		box-shadow: 5px 5px 0 #221f1b;
 	}
+	.e3d-marker-editor::backdrop { background: transparent; }
+	.e3d-marker-editor header, .e3d-marker-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+	.e3d-marker-editor header button { border: 1px solid #221f1b; background: transparent; color: inherit; font-size: 18px; cursor: pointer; }
+	.e3d-marker-editor p { margin: 8px 0 0; font-size: 10px; line-height: 1.35; color: #625a4e; }
 	.e3d-marker-editor label {
-		display: flex;
-		align-items: center;
+		display: grid;
 		gap: 8px;
+		margin-top: 8px;
 		font-size: 11px;
-		color: #c8b991;
+		color: #29241d;
 	}
 	.e3d-marker-editor input {
-		width: min(240px, 24vw);
+		width: 100%;
 		padding: 5px 8px;
-		color: #f2ead7;
-		background: #0b1018;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 5px;
+		color: #29241d;
+		background: #fff;
+		border: 1px solid #a89e8f;
+		border-radius: 3px;
 	}
 	.e3d-marker-overlay {
 		position: absolute;
@@ -705,6 +984,11 @@
 		pointer-events: none;
 		overflow: hidden;
 	}
+	.e3d-segment-overlay { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+	.e3d-segment-overlay polygon { fill: rgba(230,172,55,.22); stroke: #e6ac37; stroke-width: .4; vector-effect: non-scaling-stroke; }
+	.e3d-segment-overlay polygon.reviewed { fill: rgba(63,190,168,.25); stroke: #3fbea8; }
+	.e3d-segment-overlay .e3d-segment-draft { fill: rgba(230,172,55,.12); stroke: #f5cb6b; stroke-width: .45; stroke-dasharray: 1.2 0.8; vector-effect: non-scaling-stroke; }
+	.e3d-mask-review { position: absolute; z-index: 3; transform: translate(6px, 6px); max-width: 150px; padding: 4px 7px; border: 1px solid #221f1b; border-radius: 3px; color: #29241d; background: #faf6f0; box-shadow: 2px 2px 0 #221f1b; font-size: 9px; cursor: pointer; pointer-events: auto; }
 	.e3d-context-assistant {
 		position: absolute;
 		right: 14px;

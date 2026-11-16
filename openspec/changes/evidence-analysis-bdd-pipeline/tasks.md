@@ -1,6 +1,6 @@
 # Tasks: Evidence Analysis BDD Pipeline & Case-to-Analysis Journey
 
-Status: COMPLETED
+Status: IN PROGRESS (BDD scenarios verified; live/runtime gates remain)
 Target: 56/56 Executable BDD Scenarios Verified across 4 Feature Suites
 
 ## 1. Durable Media Processing (`media-analysis-durable-pipeline.feature`, 18 Scenarios)
@@ -203,7 +203,7 @@ Decisions pending (2026-11-15, recorded for the next session):
 - D2 Queue owner: keep the DB-backed analysis_jobs queue with its concurrency gate (recommended), or move video jobs to RabbitMQ. RabbitMQ would be a second queue owner for the same jobs.
 - D3 Intra-op threads: 8 (physical cores) or 16 (logical); measure both before choosing.
 - D4 SeaweedFS test objects from all test uploads: archive or delete.
-- Status line: the top of this file still reads "Status: COMPLETED" and conflicts with the open items above. Change to IN PROGRESS, or confirm it is intentional.
+- Status line was corrected to distinguish verified BDD coverage from the still-open live/runtime gates.
 
 Next-session order once D1 to D3 are answered: frame embedding cap (embed all sampled frames), per-frame OCR with tesseract (C:\Program Files\Tesseract-OCR\tesseract.exe, eng), per-frame progress and ETA, then encoder isolation.
 
@@ -258,3 +258,223 @@ Still open:
 - Live upload of a WebM clip through the app to confirm OCR, progress and worker embedding end to end.
 - Ornith source-grounded answer test.
 - Graph refresh and serial deep-audit re-run (graph last written 2026-11-01).
+
+## Transcript API follow-up (2026-11-15)
+
+- The authorized transcript GET now reads the canonical `audio_transcripts` / `whisper_segments` owner first and uses the legacy transcript table only when no current-revision canonical rows are available. This prevents stale legacy rows from masking canonical speaker attribution.
+- Added focused checks for canonical-first readback, anonymous-only speaker IDs, review-write feature gating, strict payload validation, and unauthorized evidence access.
+- Verification: transcript route, durable video worker, and audio-window-ledger specs passed (28 tests). These are mocked/unit checks, not live PostgreSQL or viewer authorization proof.
+- No diarization, VAD, or forced-alignment runtime is connected to the durable worker; the worker still calls whole-file transcription. Leave the speaker-analysis work and its runtime gate open; do not mark tasks 5.6–5.10 complete.
+- The transcript drawer now exposes approve/edit actions only when the review feature gate is enabled. Corrections update the current source-bound canonical row, save the original model text in JSONB on first correction, and show both corrected and original wording after reload. Focused API/UI validation passed 15 tests; this is mocked persistence proof only.
+
+## Live video viewer update (2026-11-15)
+
+- Uploaded the user-provided WebM into the existing authorized case through the normal upload path. Job `efef9519-cf3f-4630-9e75-b130841d76fe` completed with a verified receipt; independent PostgreSQL 18.4 readback found 90 timestamped transcript segments, 60 video-frame vectors, 32 transcript/audio-segment vectors, and 768-D embeddings. The audio-content encoder feature gate remains off; no dedicated audio-content vectors were written.
+- Live Chromium Playwright passed against detail, frames, transcript, skim tile, and source download endpoints. It verified HTTP range delivery, seeking to the last skim sample, transcript cue loading/seeking, and no page errors. Screenshot: `docs/reports/screenshots/evidence-video-viewer-live-20261115.png`.
+- Fixed signature detection and inline serving for WebM after the authorized route returned 415; moved the transcript button into the modal header after the media preview intercepted pointer clicks. Focused WebM classification/download specs pass 29/29.
+- This does not complete tasks 5.1–5.5: live cross-case denial, production-auth run, dedicated audio-content embedding, diarization/alignment, and reviewed event-to-scene publication remain unproven. Do not check those tasks from this run alone.
+
+## Evidence processing progress UI (2026-11-15)
+
+- The case-scoped Evidence Detail job list now subscribes to the existing owner-authorized `api/evidence/realtime` SSE endpoint for queued/running analysis jobs and updates its accessible progress bar from durable `analysis_jobs.progress`. A queued/running job at 0% is explicitly indeterminate until the worker reports progress; no synthetic percentage is shown. CSS sweep animation follows reduced-motion settings.
+- Playwright file passed 3/3: synthetic media modal, live authorized WebM/detail progress at 100%, and an adversarial `progress: 137` SSE payload that remains capped at 99% while running. Screenshot: `docs/reports/screenshots/evidence-analysis-progress-live-20261115.png`. This does not prove a still-running Whisper progress stream.
+- The agent Pokémon EXP widget is a simulated demo (`AgentBattleExpWidget.svelte` / `agent-exp-tracker.ts`); it was not reused as an evidence progress source.
+- The actual worker Python environment is repository-root `.venv` (Python 3.11.9, faster-whisper 1.2.1, PyAV 18.1.0, CTranslate2 4.9.0). Global Python 3.13 has PyAV 19.0.2 but is not the executable used by the shim. FFmpeg and sibling FFprobe are installed on C:; see `docs/reports/evidence-analysis-progress-ui-20261115.md` for exact paths and check output.
+- `npm run check:fast` reported five diagnostics in four unrelated source files; it emitted none for the changed evidence-detail page. Do not mark video tasks 5.1–5.5 complete from this UI improvement.
+
+## Gap closure notes (2026-11-16) — no task boxes changed
+
+- **Correction to an earlier read:** frame and crop embeddings are written. The canonical worker persists frame/transcript EmbeddingGemma 2 vectors and crop vectors through the PostgreSQL multimodal writer and projection outbox (see the 2026-11-14 notes above). `durable-video-analysis-v1.ts` only inserts transcript rows directly; the vector writes go through the shared writer.
+- **Annotation storage map (current code):**
+  - `evidence_analysis_cache`: detections as JSONB `result`, `analysis_type` `yolo`, 768-d `result_embedding`, `review_status` defaults to `UNREVIEWED`. Review writer: `investigation-v1.ts`.
+  - `evidence_multimodal_vectors`: EG2 vectors with `source_revision`, `source_locator_sha256`, `model_artifact_sha256`, `input_sha256`, `representation_id`.
+  - `feature_ontology_tuples`: subject/predicate/object rows with JSONB `object_value`, `confidence`, `ontology_version`, `evidence`, `resolved_concept_id` (OAKLib-style resolution).
+  - `canvas_annotations`: UI canvas JSONB only.
+  - The `perception.v1` envelope from the planning note is NOT implemented.
+- **Model provenance (unverified where marked):**
+  - `docker/docling-vlm/models/yolox_x.pth` (793,463,373 bytes): no source URL or hash recorded in the repo. Provenance UNKNOWN.
+  - `yolox_tiny.pth` (CPU fallback named in `app.py`): absent. Not fetched, because the weight license is not cleared.
+  - `sveltekit-frontend/models/yolox_nano.onnx`: SHA-256 `c789161e…b7d`, local evaluation only per the 2026-11-14 gate.
+  - `yolov8x.pt` (AGPL-3.0): ARCHIVED 2026-11-16 to `deeds_labs/archive/2026-11-16/yolov8x.pt` (sha256 `3df4ada6…524c8`), manifest entry in `docs/archive-manifest.json`.
+- **Bifrost:** added `gemma4-legal-iq4xs-direct.gguf` alongside `ornith-1.5-9b` in the `openai` key's model list (`docker/bifrost/config.json`, JSON validated). Takes effect only after the Bifrost container restarts. Restart is not done; it needs operator approval.
+- **Still open (not closed by this note):**
+  1. Detector owner decision: `yolo.ts` (ONNX, local evaluation) and `docker/docling-vlm/app.py` (YOLOX `.pth`) are two paths. Pick one owner.
+  2. Commercially cleared, artifact-specific detector receipt, plus real fixture inference (see the 2026-11-14 detector license gate).
+  3. Bifrost restart and a live `/v1/models` check showing the Gemma 4 alias.
+  4. Tasks 5.1–5.5 remain open until the authorized upload-to-viewer run is proven live (SeaweedFS, Whisper, viewer readback).
+
+## 6. Detector lane — weight-free operation and admission (2026-11-16)
+
+Status key: `[x]` verified in this repo; `[ ]` open. Weights (`yolox_x.pth` ~793 MB, `yolox_tiny.pth` absent) are gitignored and are NOT in git. Weight-free operation is the production default until DET-05/DET-06 clear.
+
+- [x] DET-01 Archive the AGPL-3.0 `yolov8x.pt` under the archive rule. Done: `deeds_labs/archive/2026-11-16/yolov8x.pt`, SHA-256 `3df4ada6…524c8`, entry in `docs/archive-manifest.json`.
+- [x] DET-02 Weight-free video path. Verified: `durable-video-analysis-v1.spec.ts` gained `runs weight-free: no admitted detector records yolo UNAVAILABLE and keeps frame proposals`; the file's other 19 tests passed earlier this session. The worker records `detectorStatus: UNAVAILABLE` and keeps frame proposals (`UNREVIEWED_PROPOSAL`). Owner: `loadDetectorV1` in `durable-video-analysis-v1.ts`.
+- [x] BIF-01 Bifrost config carries the served alias `gemma4-legal-iq4xs-direct.gguf` beside `ornith-1.5-9b` (`docker/bifrost/config.json`, JSON valid).
+- [x] BIF-02 (done 2026-11-16, operator-approved, `docker restart legal-ai-bifrost` only; healthy; `/v1/models` lists `openai/gemma4-legal-iq4xs-direct.gguf`; routed chat completion returned from `:8090`) Restart the Bifrost container, then confirm `GET /v1/models` lists the Gemma 4 alias and a routed request reaches `:8090`. Needs operator approval (container lifecycle).
+- [x] DET-03 DECIDED 2026-11-16 (operator): ONE detector owner = `sveltekit-frontend/src/lib/server/yolo.ts` (ONNX, CPU via Python 3.13 onnxruntime). `docker/docling-vlm/app.py` YOLOX path is a dormant COMPATIBILITY path (not called by the video worker; container not running); do not add GPU detection as a second owner. If a GPU backend is needed later, add it behind yolo.ts as a backend. Candidates: `sveltekit-frontend/src/lib/server/yolo.ts` (ONNX, local evaluation; current worker path) or `docker/docling-vlm/app.py` (YOLOX `.pth`, container not running). Operator decision. The other path is removed or marked `COMPATIBILITY` after the choice.
+- [ ] DET-04 Provenance for `yolox_x.pth` and `yolox_tiny.pth`: record the upstream source URL, release tag and SHA-256, plus the upstream license evidence for the WEIGHTS (the repo LICENSE is Apache-2.0 but does not cover the pretrained grant). Clear the upstream issue or get a written grant. Operator/legal.
+- [ ] DET-05 Admission: add an admission manifest entry only for a weight that passed DET-04. Production stays UNAVAILABLE for every weight without a grant.
+- [x] DET-06 CPU fixture inference with saved receipt: `docs/reports/yolox-nano-cpu-fixture-receipt-20261116.json` (Python 3.13.5, onnxruntime 1.27.0 CPU, 4 detections). Status is NOT production admission; the sample photo is scratch-only and not committed. Committed inference test still needs a rights-cleared fixture.
+- [ ] DET-07 Docker `docling-vlm` build and `/detect` smoke. Only if DET-03 selects the container path; the container is not running today.
+- [ ] DET-08 `yolox_tiny.pth` CPU fallback: fetch only after DET-04. Until then `app.py` tier 2 stays empty and reports UNAVAILABLE.
+- [ ] VID-01 Tasks 5.1–5.5 above remain open until a live upload-to-viewer run passes (SeaweedFS, Whisper, viewer readback).
+
+Not done in this section: no weight was downloaded, no detector was admitted, and no service was restarted.
+
+### 6a. CPU detector check (2026-11-16)
+
+- CPU path = `yolox_nano.onnx` (`sveltekit-frontend/models/`) run through `yolo.ts` by Python 3.13 (`YOLO_PYTHON=C:\Python313\python.exe`, onnxruntime 1.27, `CPUExecutionProvider`). The default `python` on PATH has no onnxruntime, so an unset `YOLO_PYTHON` fails the detector.
+- Real inference, scratch-only input (public sample photo, 810×1080, not committed): 3 `person` (conf 0.87, 0.67, 0.57) + 1 `bus` (conf 0.59), 3.7 s CPU including Python startup. Repo fixture `tests/fixtures/test-poi-photo.png` is a synthetic red frame with text, so 0 detections is correct there.
+- `yolo-model-admission-v1.spec.ts`: 8/8 pass.
+- DET-06 is PARTIAL: inference verified; the saved receipt and a committed inference test are open. A committed test needs a rights-cleared photo fixture (not the downloaded sample).
+- Production admission still rejects `yolox_nano.onnx` (DET-04 license gate). CPU detection is local evaluation until DET-04 clears.
+- `yolox_tiny.pth` is needed only for the Docker `docling-vlm` tier 2. It is not required for the ONNX CPU path. Decide with DET-03.
+
+### 6b. Verified facts for the CPU / keypoint / storage questions (2026-11-16)
+
+- Sizes (bytes): `sveltekit-frontend/models/yolox_nano.onnx` 3,659,407 (CPU, local evaluation only); `docker/docling-vlm/models/yolox_x.pth` 793,463,373 (GPU tier, provenance unknown); `yolox_tiny.pth` absent.
+- Cython: no `.pyx`/`.pxd` in `python/`, `simd-bridge/`, `scripts/`, or `sveltekit-frontend/src`. `python/atlas_corpus_lib/setup.py` builds a CMake/ATen `Extension`, not Cython.
+- Radix sort: `simd-bridge/cpp/atlas_byte_synth_core.cpp` is scalar 8-bit LSD radix (4 passes). No AVX2 or AVX-512 radix sort exists. AVX2 kernels exist for NES LUT filtering (`nes_lut_filter_avx2.cpp`) and MRL prefix renormalisation (`mrl_prefix_renorm_avx2.cpp`). No AVX-512 code is ours; the only AVX-512 match is vendored simdjson.
+- EmbeddingGemma 2 (`models/embeddinggemma2/onnx-q8/config.json`): `text_config.embedding_dim` = 768. MRL 512/256/128 is a derived projection and must stay optional under the Embedding Dimensions Policy; 768 remains canonical.
+- NES palette: `NES_LUT_DOMAIN_PALETTE` / `atlas_nes_lut_v1` are DOMAIN palettes (10 entries, `lut_byte` ≠ `nes_hex`). No keypoint or pose topology exists in `sveltekit-frontend/src` (grep: no `keypoint`, `COCO_KEYPOINTS`, `pose_topology`).
+- PostgreSQL 18.4: `io_method` = `worker`. `evidence_multimodal_vectors` has 232 rows (2,320 kB) and an HNSW index. `EXPLAIN (ANALYZE, BUFFERS, SETTINGS)` on a modality filter + `<=>` ORDER BY used Seq Scan + top-N heapsort (37 ms). Bitmap scan and AIO effects are NOT exercised at this size; proving them needs a scratch table of realistic size, not this table.
+- Open: DET-06 receipt; PG18 bitmap/AIO proof (scratch, rollback); COCO-17 pose model admission (none exists); a separate versioned animal keypoint topology (none exists); palette-indexed skeleton renderer (none exists).
+
+### 6c. Continuation (2026-11-16)
+
+- DET-06 receipt written: `docs/reports/yolox-nano-cpu-fixture-receipt-20261116.json` (Python 3.13.5, onnxruntime 1.27.0 CPU, model sha256 `c789161e…b7d`, 4 detections: person 0.87/0.67/0.57, bus 0.59). Model directory stays gitignored; the receipt is not.
+- Motion tile already exists and is tested: `sveltekit-frontend/src/lib/shared/video-motion-lut-v1.ts` (64×128 gray-delta, 4 bpp, low nibble first, versioned header `ATLMOT1`); spec 3/3 pass; served by `api/evidence/[id]/motion-preview/[frameIndex]` and `frames`. It is a rebuildable visualization and does not establish movement.
+- Not verified this turn: N64 hardware claims, DLSS/raycasting, AVX-512 radix, or any SIMD helper. These are research notes, not repo facts.
+
+### 6d. What else is needed (2026-11-16)
+
+Done this round:
+- Committed opt-in inference test `sveltekit-frontend/src/lib/server/yolo-cpu-inference-v1.spec.ts`: skipped unless `YOLO_TEST_IMAGE` is set (skip verified); passes on the scratch photo with `YOLO_TEST_MIN_OBJECTS=3` in 2.7 s. No photo or model is required in git.
+- PostgreSQL 18.4 bitmap check (rollback-only, `legal_ai_live_integration_scratch`, 300k-row TEMP table): rare value → Index Scan, common value → Bitmap Heap Scan. Confirms planner selection. NOT an AIO measurement: TEMP tables use local buffers, so `io_method` effects are not exercised. An AIO proof needs shared-buffer tables at scale.
+
+Still needed, grouped by who unblocks it:
+- Operator decision: DET-03 (one detector owner: `yolo.ts` ONNX vs `docling-vlm` YOLOX container).
+- Operator approval: BIF-02 (Bifrost container restart, then `/v1/models` shows the Gemma 4 alias).
+- Legal/upstream: DET-04 (weight-level license for `yolox_nano.onnx`, `yolox_x.pth`, `yolox_tiny.pth`). Until cleared, production stays UNAVAILABLE.
+- Operator approval: DET-07 (Docker `docling-vlm` build and `/detect` smoke), only if DET-03 selects the container.
+- Engineering: AIO proof on a shared-buffer scratch table (size chosen to exceed shared_buffers); VID-01 live upload-to-viewer run (SeaweedFS, Whisper, viewer); pose model admission (COCO-17, none exists); separate animal keypoint topology (none exists); palette-indexed skeleton renderer (none exists).
+
+### 6e. DET-04 licence evidence (2026-11-16, fetched from upstream)
+
+- `Megvii-BaseDetection/YOLOX` LICENSE: Apache License 2.0; copyright holder Megvii Inc. (2021–2022). The text covers software, documentation and configuration; it does not mention model weights, checkpoints or pretrained models.
+- Repository page: the only licence reference is "Apache-2.0 license" in Resources. The Model Zoo links to the .pth files with no licence terms of their own.
+- Reading: the code licence is Apache-2.0. No separate grant for the weights was found, and none excludes them. This is an interpretation, not a legal opinion.
+- Training data: the COCO-trained weights inherit COCO's image-rights caveat (annotations CC BY 4.0; photos carry their own rights).
+- Status: DET-04 remains OPEN until the operator records a decision that accepts this basis (or obtains a written grant). Production admission for `yolox_nano.onnx` is unchanged.
+
+### 6f. DET-04 / DET-05 decision (2026-11-16, operator)
+
+- Operator decision: accept the Apache-2.0 reading for `yolox_nano.onnx` (see 6e: code LICENSE Apache-2.0, no separate weight grant found). Recorded as the basis, not a legal opinion.
+- Code: `yolo.ts` `PRODUCTION_YOLO_MODEL_BASENAMES` now admits `yolox_nano.onnx`. Production still requires `YOLO_MODEL_SHA256` = `c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d` and an exact match of the artifact. Spec: `yolo-model-admission-v1.spec.ts` 9/9 pass (admits with pin; rejects without pin).
+- Not admitted: `yolox_x.pth` and `yolox_tiny.pth` (same Apache reading would apply, but they are not in the `yo.ts` path and need their own hash pin and receipt). YOLOv8/YOLOv10 remain blocked.
+- Video use: the durable worker calls `detector.analyze` once per sampled frame (`durable-video-analysis-v1.ts`). Each call spawns a Python 3.13 subprocess. Measured per image: ~3.7 s cold (includes Python start), ~0.6 s warm. Video cost is therefore frame-count × per-call latency; NOT measured on a real video yet.
+
+### 6g. Gemma 4 E2B ONNX VLM — CPU feasibility (2026-11-16)
+
+- Licence: HF metadata and the Google Gemma 4 licence page (read through a summariser, so verify clause text before production) say Apache-2.0. Same basis as the YOLOX decision; the operator accepted the Apache reading for YOLOX.
+- Runtime: `@huggingface/transformers` 4.2.0 (exports `Gemma4ForConditionalGeneration`, `Gemma4ImageProcessor`) on `onnxruntime-node` 1.29.0, CPU. Python onnxruntime is not used for this path.
+- Files (q4f16, gitignored under `static/gemma4_e2b_onnx/onnx/`): text decoder + embed already present; ADDED vision_encoder_q4f16.onnx (189,124 B) + `_data` (99,189,440 B), audio_encoder_q4f16.onnx (260,446 B) + `_data` (171,258,112 B). The audio encoder is required by Transformers.js even for image-only input.
+- Result, scratch bus photo, prompt "List the main objects in this image in one short sentence.", max 60 new tokens, CPU: load 20.9 s, generate 29.0 s. Answer: "The image features a large electric bus and several people standing near it on a paved area."
+- Speed: ~29 s per answer on CPU is too slow for "quick answers" as-is. Not a fallback latency target until measured tuning (threads, shorter image input) is tested.
+- GPU: NOT run. nvidia-smi shows ~5.7 GB used by :8090 and ~2.3 GB free; the q4f16 VLM needs roughly 3.2 GB of weights plus activations. A GPU run requires stopping :8090 via the operator-run VS Code task (rules). Browser WebGPU is the repo's existing GPU path (`browser-model-policy.ts`); it has not been tested with the vision encoder.
+- Not done: no router change, no admission, no Node GPU provider check.
+
+### 6h. MTP drafter, GPU YOLOX and owner check (2026-11-16)
+
+- Correction: `turbovec/turbovec-cy/turbovec_cy.pyx` EXISTS in this checkout (4,517 B, with setup.py and pyproject.toml). My earlier search missed the root `turbovec/` folder. Compile-check and benchmark it before reuse (pasted P1 item is valid as a task).
+- Correction: live `evidence_analysis_cache` has `review_status`, reviewed_by and reviewed_at. Only the manual SQL file may lack them.
+- MTP drafter: `.env` sets `ENABLE_MTP_DRAFTER=true` and `MTP_DRAFT_MODEL=.tmp/atomic-mtp/gemma-4-E4B-it-assistant.Q4_K_M.gguf`, but `.tmp/atomic-mtp/` does NOT exist. The `.tmp` cache holds only svelte/atlas outputs. Local assistant artifacts: `models/atlas-gemma4-e4b-assistant/mtp-f16/atlas-gemma4-e4b-assistant-mtp-f16.gguf` (171,766,880 B); HF safetensors assistants (159,138,208 B each) under `models/gemma4-e4b-qat-assistant-2026-07-20` and `models/gemma4_assistant_huggingface_7_3_26`. None has been loaded as a llama-server draft. `dev:gpu` runs with MTP disabled. Quick-answer use requires a draft-compatible target/draft pair and a VRAM test with :8090 running.
+- YOLOX GPU review: NOT run. `yolox` Python package not installed (torch and onnxruntime are). Installing it needs the capability-guard check first. VRAM ~2.3 GB free while :8090 runs.
+- Owner rule: video frames currently call `yolo.ts` (Python ONNX, CPU). A separate GPU Python helper would be a second owner. Preferred: one Python detector helper with device backends (ONNX CPU and PyTorch GPU), selected by config, behind the one `yolo.ts` contract.
+- Pasted external P0–P2 ledger (`Visual Observation` tasks): treated as a proposal, not verified. Its GitHub-main premise did not match this local checkout (the `.pyx` and `review_status` checks above). Reconcile with the remote before adopting any task list.
+
+### 6i. Local model status — what runs, what does not (2026-11-16)
+
+| Model | Status | Evidence |
+|---|---|---|
+| YOLOX-Nano ONNX, CPU | WORKS (local, and production-admitted by the operator's Apache decision) | 6f; receipt `docs/reports/yolox-nano-cpu-fixture-receipt-20261116.json` |
+| Gemma 4 E2B ONNX VLM, CPU (q4f16 + vision + audio encoders) | WORKS, slow (~29 s per short answer) | 6g |
+| Gemma 4 E4B assistant MTP GGUF (`models/atlas-gemma4-e4b-assistant/mtp-f16/…`, 171,766,880 B) | DOES NOT LOAD | `unknown model architecture: 'gemma4-assistant'` in both local `llama-server` builds (`Desktop/llama-server-cuda`, `Downloads/llama-turboquant-triattention…`); architecture not in either binary |
+| MTP drafter via AtomicBot fork | HISTORICAL ONLY | July 2026 logs (`.tmp/atomicbot-*-mtp-*.err.log`) show a draft-mtp load and `listening` on 8092; the binary, `.tmp/google-gemma4-e4b-assistant/` and `.tmp/atomic-mtp-unsloth/` are gone from `.tmp` |
+| YOLOX-X `.pth`, GPU | NOT RUN | `yolox` package not installed; ~2.3 GB VRAM free while `:8090` runs |
+| YOLOX-Tiny `.pth` | ABSENT | — |
+| Gemma 4 E2B VLM, GPU | NOT RUN | needs ~3.2 GB VRAM; blocked by `:8090` |
+
+To make the MTP drafter work, all of these are needed: (1) an AtomicBot-fork binary (external download, operator approval; a supply-chain trust decision); (2) a target GGUF matching the drafter's E4B-it family (the July unsloth target is gone; the current `gemma4-legal-iq4xs-direct.gguf` is unverified as a match); (3) a VRAM test, which needs `:8090` stopped via the operator-run task.
+
+### 6j. Current chat model (operator-confirmed 2026-11-16)
+
+- Current chat/synthesis model on `:8090`: `gemma4-legal-iq4xs-direct.gguf` (5,091,434,336 B; `/props` alias matches). Operator confirmed Gemma 4 is in use.
+- `.opencode/opencode.jsonc` updated to this alias (six references; agent names unchanged).
+- Still stale: `CLAUDE.md` and `AGENTS.md` describe Ornith 1.5 as the active chat model. Not edited in this pass; needs an operator decision.
+- `docker/bifrost/config.json` has the Gemma alias added beside Ornith; the Bifrost container has not been restarted (BIF-02 open).
+
+### 6k. Gemma 4 legal on :8090 — text vs vision (2026-11-16)
+
+- The current `:8090` launch is TEXT/TOOL ONLY: the `gemma4-legal-iq4xs` profile (`scripts/launch-turboquant.ps1`) has no mmproj, and `dev:gpu` passes `-TextOnly`.
+- Added profile `gemma4-legal-iq4xs-vlm` (same alias and model, `WantsVision = $true`, family projector `models/mmproj-F16.gguf`, 990,372,800 B, carries vision and audio encoders). The profile is NOT yet run or tested: confirm `/props` `modalities.vision=true` and a real image answer before relying on it. Launcher parses (PowerShell parser OK). Not started; `:8090` is unchanged.
+- Starting it requires restarting `:8090`: operator-run VS Code task, or an agent restart that passes all production-hardening gates. VRAM: ~2.3 GB free while the text server runs; the 5.1 GB legal model plus projector must be placed as the Ornith vision lane did (projector on CPU via `LLAMA_ARG_MMPROJ_OFFLOAD=0`, which `dev:gpu` sets for the vision lane). Not verified for this model.
+- Quick-hit speculative answers still need the AtomicBot-fork binary (not on disk; see 6h/6i).
+
+### 6l. Gemma 4 legal vision server ON (2026-11-16, operator-approved)
+
+- Root cause of the earlier text-only launch: root `.env` `TURBO_MMPROJ_PATH` held a mangled Ornith path (`C:SERSJAMES…MMPROJ-ORNITH…`). For the gemma4 family the launcher uses that value as the projector override, so the file test failed and the launch silently fell back to text-only. Fixed to `C:/Users/james/Videos/deeds-web-app/models/mmproj-F16.gguf` (backup `.env.bak-20261116-mmproj`).
+- Restarted `:8090`: stopped the port-scoped text PID, then `launch-turboquant.ps1 -StartupProfile gemma4-legal-iq4xs-vlm -Detached` with `LLAMA_ARG_MMPROJ_OFFLOAD=0`. Log: "Multimodal projector: loading …mmproj-F16.gguf … TurboQuant ready (with VLM, kv=q8_0/q8_0)".
+- Verified: `/props` `modalities.vision=true`, alias `gemma4-legal-iq4xs-direct.gguf`. Image request with the scratch bus photo answered (truncated at 60 tokens): several people and a large electric bus.
+- Speed of the vision request and VRAM use under the projector were not measured in this pass.
+
+### 6m. Measured per-frame detector cost (2026-11-16)
+
+- Input: 10 s test clip made from the scratch bus photo with the bundled `tools/ffmpeg/ffmpeg.exe` (libx264, 640 px wide, 2 fps); 20 frames extracted. Clip is scratch-only, not committed.
+- Detector: production `yolo.ts` `analyzeDocument`, one Python 3.13 subprocess per frame, ONNX Runtime CPU, `yolox_nano.onnx`.
+- Result: 20 frames, 3–4 objects per frame. First call 5,796 ms (cold). Steady-state p50 1,087 ms. Total 26.7 s. The p95 figure (5.8 s) is the cold first call, not steady state.
+- Not included: frame decode time and the rest of the video worker stages.
+- Planning figure: roughly 1.1 s per sampled frame after warm-up. A 60-frame budget costs about 65–70 s of detection, plus the cold start.
+
+### 6n. ASR venv and transcription check (2026-11-16)
+
+- ASR interpreter: `C:\Users\james\atlas-asr-venv` (outside the repo), Python 3.13.5, faster-whisper 1.2.1, av 18.1.0, ctranslate2 4.9.0. Pinned as the worker expects. Worker on `:8093` runs `base` model, CPU, int8, 4 threads, allowed roots `Music` and `sveltekit-frontend/temp/media`.
+- Test: 5.4 s English speech made with Windows text-to-speech (`System.Speech`), copied to `sveltekit-frontend/temp/media/asr-test-speech.wav` (scratch test file).
+- Result: "The witness saw a large white bus parked outside the courthouse at 10.15 in the morning." Transcribe time 2.09 s (about 0.39 real-time factor). No ffmpeg binary used; PyAV bundles its own FFmpeg libraries.
+- Not tested: video with an audio track, word timestamps, diarisation.
+
+### 6o. ffprobe wiring and production packaging (2026-11-16)
+
+- Root `.env` `FFMPEG_PATH` changed to `C:/Users/james/.stacher/ffmpeg.exe` (backup `.env.bak-20261116-ffmpeg`). The sibling `ffprobe.exe` is found automatically; probe of the 10 s test clip returned duration 10.0 s and one video stream.
+- Licence of the stacher build: `ffmpeg -buildconf` shows `--enable-gpl --enable-version3 --enable-libx264 --enable-libx265`. This is a GPL build. Shipping it in production needs a licence review (or an LGPL build without x264/x265).
+- PyAV 18.1.0 in `C:\Users\james\atlas-asr-venv` probes the same clip without any executable (duration 10.0, streams ['video']). Its bundled FFmpeg libraries' licence was not checked.
+- Production needs, not yet done: a pinned ffprobe (binary + sha256 manifest, or a PyAV probe helper); the ASR worker as a managed service with a locked venv (`atlas-asr-venv` is outside the repo); `YOLO_MODEL_SHA256` set for production; model files (gitignored, several GB) delivered by checksummed artefacts; the DET-04 weight decision for anything beyond nano; the Gemma licence clause check.
+
+### 6p. Production hardening notes (2026-11-16)
+
+- PRODUCTION NOTE: PyAV (`av` 18.1.0, `C:\Users\james\atlas-asr-venv`) is available for ffprobe-style metadata (duration and streams) without an external ffprobe executable. Use it to remove the ffprobe packaging dependency, after its bundled FFmpeg licence is checked.
+- MCP `transcribe_audio` (`sveltekit-frontend/src/mcp/server.ts`) now transcribes through `lib/server/analysis/media-processing.ts` (faster-whisper worker `:8093`, fallback whisper CLI), not the Docling module. It writes the buffer to a unique file under `temp/media`, transcribes, and removes that temporary copy. Parses with esbuild. NOT live-tested: the MCP server must be restarted to load it.
+- Worker supervision: `scripts/atlas/faster-whisper-asr-worker-v1.py` (FastAPI/uvicorn) is started by `start-faster-whisper-asr-worker.ps1` as a hidden process with a PID file in `%TEMP%`. No restart on crash. Production needs a Windows service wrapper (decision pending).
+- `evidence:transcribe_gpu` MCP tool posts to `FASTAPI_URL` (`http://localhost:8096`), which I have not verified is running.
+
+### 6q. TRACE media.transcribe tool (2026-11-16)
+
+- Added `media.transcribe` to `sveltekit-frontend/src/mcp/trace-mcp-server.ts` (before `wiki.status`). Input: `path` (must lie under an allowed worker root). Output: language, text, timed segments, word count. Calls `lib/server/analysis/media-processing.ts` `transcribeAudio`, so it uses the `:8093` ASR worker first. Parses with esbuild.
+- NOT live: the running TRACE process (`:8788`) was not restarted. Restart is a service-lifecycle action gated by the production rules (operator token in the TRACE launch environment, fake-token refusal, receipt). Until it restarts, `media.transcribe` is not callable.
+- Underlying path verified earlier: `transcribeAudio` on a 5.4 s speech WAV returned the expected sentence (section 6n).
+- Not done: the end-to-end video run (upload → durable worker → Postgres/SeaweedFS readback → viewer), which is the open task 5.1–5.5.
+
+### 6r. TRACE restart and media.transcribe live (2026-11-16, operator-approved)
+
+- Restart: stopped the port-scoped TRACE PID 30332; started with `node scripts/ensure-mcp-server.mjs --spawn` (new PID 63172). Receipt: `sveltekit-frontend/logs/operations/trace-restart-20261116.json`. The ensure script printed a 15 s health timeout, but `/health` returned 200 about 4 s later.
+- Operator token: `TRACE_MCP_OPERATOR_TOKEN` was not in this shell's environment, so the new process has none. The operator-gated `ops.*` tools are therefore refused. Not verified against the fake-token check; not performed by me.
+- Verified: `tools/list` returns 211 tools including `media.transcribe`. `tools/call` on the 5.4 s speech WAV returned "The witness saw a large white bus parked outside the courthouse at 10.15 in the morning." (language en, 16 words, one segment). `isError: false`.
+- Still open: the video end-to-end run (task 5.1–5.5).
+
+### 6s. ETA on the evidence job progress bar (2026-11-16)
+
+- Existing before this step: the 15 Nov progress bar showed durable `analysis_jobs.progress` with no ETA. ETA existed only in the document-ingestion store (`GrpcStatusAdapter`, `DocumentProgressStore`), fed by gRPC events.
+- Added `sveltekit-frontend/src/lib/utils/progress-eta.ts` (`estimateEtaSeconds`, `formatEta`) with `progress-eta.spec.ts` (3/3 pass). Shown on `cases/[id]/evidence/[evidenceId]/+page.svelte` only for running jobs with progress between 0 and 100.
+- Limit: the estimate starts at `createdAt` (queue time included), so it is approximate. It refreshes only when the page re-renders (on progress events), not on a timer.
+- Svelte compile of the page: OK. Not browser-tested in this step.
+- Media integration spec: the test's own timeout was hard-coded to 180 s (line 320); raised to 900 s. The earlier CLI `--testTimeout` had no effect on it.

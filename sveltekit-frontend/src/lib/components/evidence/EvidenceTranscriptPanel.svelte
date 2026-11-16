@@ -8,6 +8,7 @@
 		startMs: number;
 		endMs: number;
 		text: string;
+		modelText?: string | null;
 		speakerId?: string | null;
 		confidence?: number;
 		model?: string | null;
@@ -43,6 +44,11 @@
 	let analysisRevision = $state<string | null>(null);
 	let isLoading = $state(false);
 	let status = $state<'completed' | 'no_audio' | 'processing' | 'failed' | 'empty' | 'idle'>('idle');
+	let reviewEnabled = $state(false);
+	let editingSegmentId = $state<string | null>(null);
+	let correctionDraft = $state('');
+	let isSavingCorrection = $state(false);
+	let reviewError = $state<string | null>(null);
 	let searchQuery = $state('');
 	let selectedSpeaker = $state<string>('all');
 	let autoScrollEnabled = $state(true);
@@ -67,6 +73,7 @@
 				segments = data.segments || [];
 				sourceRevision = typeof data.sourceRevision === 'string' ? data.sourceRevision : null;
 				analysisRevision = typeof data.analysisRevision === 'string' ? data.analysisRevision : null;
+				reviewEnabled = data.reviewEnabled === true;
 				status = data.status || (segments.length > 0 ? 'completed' : 'empty');
 			} else {
 				status = 'failed';
@@ -79,8 +86,10 @@
 	}
 
 	onMount(() => {
-		if (initialOpen) isOpen = true;
-		if (isOpen) {
+		if (initialOpen) {
+			isOpen = true;
+			void loadTranscript();
+		} else if (isOpen) {
 			void loadTranscript();
 		}
 	});
@@ -152,6 +161,7 @@
 	}
 
 	async function reviewSegment(segmentId: string, newStatus: 'approved' | 'rejected') {
+		reviewError = null;
 		try {
 			const res = await fetch(`/api/evidence/${evidenceId}/transcript`, {
 				method: 'POST',
@@ -161,9 +171,46 @@
 			if (res.ok) {
 				segments = segments.map((s) => (s.id === segmentId ? { ...s, reviewStatus: newStatus } : s));
 				onSegmentReviewed?.(segmentId, newStatus);
+			} else {
+				reviewError = 'Could not save this review. Reload the transcript and try again.';
 			}
 		} catch (err) {
 			console.error('Failed to review segment:', err);
+			reviewError = 'Could not save this review. Check the connection and try again.';
+		}
+	}
+
+	function beginCorrection(cue: TranscriptSegment) {
+		reviewError = null;
+		editingSegmentId = cue.id;
+		correctionDraft = cue.text;
+	}
+
+	async function saveCorrection(cue: TranscriptSegment) {
+		const correctedText = correctionDraft.trim();
+		if (!correctedText || correctedText.length > 10_000) {
+			reviewError = 'Enter a correction between 1 and 10,000 characters.';
+			return;
+		}
+		isSavingCorrection = true;
+		reviewError = null;
+		try {
+			const res = await fetch(`/api/evidence/${evidenceId}/transcript`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ segmentId: cue.id, reviewStatus: 'approved', correctedText }),
+			});
+			if (!res.ok) throw new Error('Transcript correction was rejected');
+			segments = segments.map((segment) => segment.id === cue.id
+				? { ...segment, modelText: segment.modelText ?? segment.text, text: correctedText, reviewStatus: 'approved' }
+				: segment);
+			editingSegmentId = null;
+			onSegmentReviewed?.(cue.id, 'approved');
+		} catch (err) {
+			console.error('Failed to correct transcript segment:', err);
+			reviewError = 'Could not save this correction. Check the connection and try again.';
+		} finally {
+			isSavingCorrection = false;
 		}
 	}
 
@@ -273,6 +320,9 @@
 						</div>
 					{/if}
 				</div>
+				{#if reviewError}
+					<p class="review-error" role="alert">{reviewError}</p>
+				{/if}
 
 				<!-- Scrollable Transcript Cues -->
 				<!-- svelte-ignore a11y_no_noninteractive_tabindex: keyboard scrolling is intentional for the cue list -->
@@ -328,19 +378,35 @@
 											<span class="confidence-tag">{Math.round(cue.confidence * 100)}%</span>
 										{/if}
 									</div>
-									<button
-										type="button"
-										class="cue-text-btn"
-										onclick={() => handleCueClick(cue.startMs)}
-										title={`Seek to ${formatTime(cue.startMs)}`}
-									>
-										{cue.text}
-									</button>
+									{#if editingSegmentId === cue.id}
+										<textarea aria-label={`Correct transcript at ${formatTime(cue.startMs)}`} bind:value={correctionDraft} maxlength="10000"></textarea>
+										{#if cue.modelText}
+											<small class="model-transcript-text">Original model text: {cue.modelText}</small>
+										{/if}
+										<div class="cue-actions-col">
+											<button type="button" class="btn-verify-cue" disabled={isSavingCorrection} onclick={() => saveCorrection(cue)}>{isSavingCorrection ? 'Saving…' : 'Save correction'}</button>
+											<button type="button" class="btn-cancel-correction" disabled={isSavingCorrection} onclick={() => (editingSegmentId = null)}>Cancel</button>
+										</div>
+									{:else}
+										<button
+											type="button"
+											class="cue-text-btn"
+											onclick={() => handleCueClick(cue.startMs)}
+											title={`Seek to ${formatTime(cue.startMs)}`}
+										>
+											{cue.text}
+										</button>
+										{#if cue.modelText}
+											<small class="model-transcript-text">Corrected from: {cue.modelText}</small>
+										{/if}
+									{/if}
 								</div>
 
 								<!-- Verification Action -->
-								{#if cue.reviewStatus === 'unreviewed_proposal'}
+								{#if reviewEnabled && editingSegmentId !== cue.id}
 									<div class="cue-actions-col">
+										<button type="button" class="btn-correct-cue" title="Correct transcript cue" onclick={() => beginCorrection(cue)}>Edit</button>
+										{#if cue.reviewStatus === 'unreviewed_proposal'}
 										<button
 											type="button"
 											class="btn-verify-cue"
@@ -349,6 +415,7 @@
 										>
 											Approve
 										</button>
+										{/if}
 									</div>
 								{/if}
 							</div>
@@ -647,6 +714,49 @@
 	.cue-actions-col {
 		display: flex;
 		align-items: center;
+		gap: 0.3rem;
+	}
+
+	.cue-body-col textarea {
+		width: 100%;
+		min-height: 4.5rem;
+		box-sizing: border-box;
+		padding: 0.45rem;
+		border: 1px solid #475569;
+		border-radius: 4px;
+		background: #111827;
+		color: #e2e8f0;
+		font: inherit;
+		resize: vertical;
+	}
+
+	.model-transcript-text {
+		display: block;
+		margin-top: 0.25rem;
+		color: #94a3b8;
+		font-size: 0.7rem;
+	}
+
+	.review-error {
+		margin: 0.5rem 0;
+		color: #fca5a5;
+		font-size: 0.78rem;
+	}
+
+	.btn-correct-cue,
+	.btn-cancel-correction {
+		padding: 0.15rem 0.45rem;
+		border: 1px solid #475569;
+		border-radius: 3px;
+		background: #1f2937;
+		color: #cbd5e1;
+		font-size: 0.68rem;
+		cursor: pointer;
+	}
+	.btn-correct-cue:hover,
+	.btn-cancel-correction:hover {
+		background: #334155;
+		color: white;
 	}
 
 	.btn-verify-cue {

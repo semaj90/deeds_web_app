@@ -199,6 +199,10 @@
 	<div class="intake-layout">
 		<!-- Left: Intake Form -->
 		<form method="POST" action="?/create" use:enhance class="intake-form">
+			{#if data.returnToAnalysis}
+				<input type="hidden" name="returnTo" value="analysis-center" />
+				<p class="analysis-return-note">Create a case to open it in Analysis Center. Case details stay in your authorized workspace.</p>
+			{/if}
 			{#if actionData?.error || $message}
 				<p class="field-error" role="alert">{actionData?.error ?? $message}</p>
 			{:else if Object.keys($errors).length}
@@ -466,6 +470,16 @@
 </div>
 
 <style>
+	.analysis-return-note {
+		margin: 0 0 1rem;
+		padding: 0.75rem 0.9rem;
+		border: 1px solid #d8cdbb;
+		border-radius: 6px;
+		background: #faf6f0;
+		color: #51483a;
+		font-size: 0.85rem;
+		line-height: 1.45;
+	}
 	.form-mode-toggle {
 		max-width: 1200px;
 		margin: 0 auto 1.5rem;

@@ -12,7 +12,12 @@ import { ENV } from '$lib/server/env.server.js';
 const transcriptReviewBodySchema = z.object({
 	segmentId: z.string().uuid(),
 	reviewStatus: z.enum(['approved', 'rejected', 'unreviewed_proposal']),
-}).strict();
+	correctedText: z.string().trim().min(1).max(10_000).optional(),
+}).strict().superRefine((value, context) => {
+	if (value.correctedText !== undefined && value.reviewStatus !== 'approved') {
+		context.addIssue({ code: z.ZodIssueCode.custom, path: ['reviewStatus'], message: 'A correction must be approved.' });
+	}
+});
 const ANONYMOUS_SPEAKER_ID_RE = /^spk_[a-z0-9_]{1,48}$/;
 
 function formatTimestampVtt(ms: number): string {
@@ -105,54 +110,53 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 	try {
 		segmentsRaw = await db
 			.select({
-				id: evidenceTranscriptSegments.id,
-				startMs: evidenceTranscriptSegments.startMs,
-				endMs: evidenceTranscriptSegments.endMs,
-				text: evidenceTranscriptSegments.text,
-				language: evidenceTranscriptSegments.language,
-				translatedText: evidenceTranscriptSegments.translatedText,
-				speaker: sql<string | null>`NULL`,
-				confidence: evidenceTranscriptSegments.confidence,
-				model: evidenceTranscriptSegments.model,
-				metadataJson: evidenceTranscriptSegments.metadataJson,
+				id: whisperSegments.id,
+				startMs: whisperSegments.startMs,
+				endMs: whisperSegments.endMs,
+				text: whisperSegments.text,
+				language: whisperSegments.language,
+				translatedText: sql<string | null>`NULL`,
+				speaker: whisperSegments.speaker,
+				confidence: whisperSegments.confidence,
+				model: audioTranscripts.whisperModel,
+				metadataJson: whisperSegments.metadata,
 			})
-			.from(evidenceTranscriptSegments)
+			.from(whisperSegments)
+			.innerJoin(audioTranscripts, eq(whisperSegments.transcriptId, audioTranscripts.id))
 			.where(and(
-				eq(evidenceTranscriptSegments.evidenceId, evidenceId),
-				sql`${evidenceTranscriptSegments.metadataJson}->>'source_revision' = ${sourceRevision}`,
+				eq(whisperSegments.evidenceId, evidenceId),
+				eq(audioTranscripts.evidenceId, evidenceId),
+				sql`${whisperSegments.metadata}->>'sourceRevision' = ${sourceRevision}`,
 			))
-			.orderBy(evidenceTranscriptSegments.startMs);
-	} catch (err) {
-		// Table may be empty or awaiting schema sync
+			.orderBy(whisperSegments.startMs);
+	} catch {
+		// Older deployments may not have the canonical transcript tables yet.
 		segmentsRaw = [];
 	}
 
 	if (segmentsRaw.length === 0) {
 		try {
-			const canonicalSegments = await db
+			segmentsRaw = await db
 				.select({
-					id: whisperSegments.id,
-					startMs: whisperSegments.startMs,
-					endMs: whisperSegments.endMs,
-					text: whisperSegments.text,
-					language: whisperSegments.language,
-					translatedText: sql<string | null>`NULL`,
-					speaker: whisperSegments.speaker,
-					confidence: whisperSegments.confidence,
-					model: audioTranscripts.whisperModel,
-					metadataJson: whisperSegments.metadata,
+					id: evidenceTranscriptSegments.id,
+					startMs: evidenceTranscriptSegments.startMs,
+					endMs: evidenceTranscriptSegments.endMs,
+					text: evidenceTranscriptSegments.text,
+					language: evidenceTranscriptSegments.language,
+					translatedText: evidenceTranscriptSegments.translatedText,
+					speaker: sql<string | null>`NULL`,
+					confidence: evidenceTranscriptSegments.confidence,
+					model: evidenceTranscriptSegments.model,
+					metadataJson: evidenceTranscriptSegments.metadataJson,
 				})
-				.from(whisperSegments)
-				.innerJoin(audioTranscripts, eq(whisperSegments.transcriptId, audioTranscripts.id))
+				.from(evidenceTranscriptSegments)
 				.where(and(
-					eq(whisperSegments.evidenceId, evidenceId),
-					eq(audioTranscripts.evidenceId, evidenceId),
-					sql`${whisperSegments.metadata}->>'sourceRevision' = ${sourceRevision}`,
+					eq(evidenceTranscriptSegments.evidenceId, evidenceId),
+					sql`${evidenceTranscriptSegments.metadataJson}->>'source_revision' = ${sourceRevision}`,
 				))
-				.orderBy(whisperSegments.startMs);
-			segmentsRaw = canonicalSegments;
+				.orderBy(evidenceTranscriptSegments.startMs);
 		} catch {
-			// Canonical transcript tables may not be installed in older deployments.
+			// Legacy table may be empty or awaiting schema sync.
 		}
 	}
 
@@ -174,6 +178,7 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 				model: s.model ?? 'whisper-base',
 				sourceRevision: typeof meta.sourceRevision === 'string' ? meta.sourceRevision : sourceRevision,
 				analysisRevision: typeof meta.analysisRevision === 'string' ? meta.analysisRevision : null,
+				modelText: typeof meta.modelText === 'string' ? meta.modelText : null,
 				speakerId: (() => {
 					const speakerId = typeof meta.speakerId === 'string' ? meta.speakerId : s.speaker;
 					return typeof speakerId === 'string' && ANONYMOUS_SPEAKER_ID_RE.test(speakerId) ? speakerId : null;
@@ -266,6 +271,7 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 		page,
 		limit,
 		totalPages: Math.ceil(segments.length / limit) || 1,
+		reviewEnabled: ENV.EVIDENCE_TRANSCRIPT_REVIEW_ENABLED,
 		segments: paginatedSegments,
 	};
 	if (exportFormat === 'json') {
@@ -321,7 +327,10 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 		const canonicalUpdate = await db
 			.update(whisperSegments)
 			.set({
-				metadata: sql`jsonb_set(jsonb_set(jsonb_set(COALESCE(metadata, '{}'::jsonb), '{reviewStatus}', to_jsonb(${body.reviewStatus}::text), true), '{reviewedBy}', to_jsonb(${String(userId)}::text), true), '{reviewedAt}', to_jsonb(now()::text), true)`,
+				...(body.correctedText !== undefined ? { text: body.correctedText } : {}),
+				metadata: body.correctedText !== undefined
+					? sql`jsonb_set(jsonb_set(jsonb_set(jsonb_set(COALESCE(${whisperSegments.metadata}, '{}'::jsonb), '{modelText}', COALESCE(${whisperSegments.metadata}->'modelText', to_jsonb(${whisperSegments.text}::text)), true), '{reviewStatus}', to_jsonb(${body.reviewStatus}::text), true), '{reviewedBy}', to_jsonb(${String(userId)}::text), true), '{reviewedAt}', to_jsonb(now()::text), true)`
+					: sql`jsonb_set(jsonb_set(jsonb_set(COALESCE(${whisperSegments.metadata}, '{}'::jsonb), '{reviewStatus}', to_jsonb(${body.reviewStatus}::text), true), '{reviewedBy}', to_jsonb(${String(userId)}::text), true), '{reviewedAt}', to_jsonb(now()::text), true)`,
 			})
 			.where(
 				and(
@@ -338,7 +347,10 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 		const legacyUpdate = await db
 			.update(evidenceTranscriptSegments)
 			.set({
-				metadataJson: sql`jsonb_set(jsonb_set(jsonb_set(COALESCE(metadata_json, '{}'::jsonb), '{reviewStatus}', to_jsonb(${body.reviewStatus}::text), true), '{reviewedBy}', to_jsonb(${String(userId)}::text), true), '{reviewedAt}', to_jsonb(now()::text), true)`,
+				...(body.correctedText !== undefined ? { text: body.correctedText } : {}),
+				metadataJson: body.correctedText !== undefined
+					? sql`jsonb_set(jsonb_set(jsonb_set(jsonb_set(COALESCE(${evidenceTranscriptSegments.metadataJson}, '{}'::jsonb), '{modelText}', COALESCE(${evidenceTranscriptSegments.metadataJson}->'modelText', to_jsonb(${evidenceTranscriptSegments.text}::text)), true), '{reviewStatus}', to_jsonb(${body.reviewStatus}::text), true), '{reviewedBy}', to_jsonb(${String(userId)}::text), true), '{reviewedAt}', to_jsonb(now()::text), true)`
+					: sql`jsonb_set(jsonb_set(jsonb_set(COALESCE(${evidenceTranscriptSegments.metadataJson}, '{}'::jsonb), '{reviewStatus}', to_jsonb(${body.reviewStatus}::text), true), '{reviewedBy}', to_jsonb(${String(userId)}::text), true), '{reviewedAt}', to_jsonb(now()::text), true)`,
 			})
 			.where(and(
 				eq(evidenceTranscriptSegments.id, body.segmentId),

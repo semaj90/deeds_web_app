@@ -24,6 +24,7 @@ export class SpatialBvhManagerV1 {
 	private readonly skinnedTrees = new Map<THREE.SkinnedMesh, SkinnedMeshBVH>();
 	private readonly originalRaycasts = new Map<THREE.Mesh, OriginalRaycast>();
 	private readonly ownedGeometryTrees = new Map<THREE.BufferGeometry, MeshBVH>();
+	private readonly meshTrees = new Set<MeshBVH>();
 
 	build(root: THREE.Object3D | readonly THREE.Object3D[]): SpatialBvhInventoryV1 {
 		this.dispose();
@@ -52,6 +53,8 @@ export class SpatialBvhManagerV1 {
 					mesh.geometry.boundsTree = tree;
 					this.ownedGeometryTrees.set(mesh.geometry, tree);
 				}
+				const tree = mesh.geometry.boundsTree as MeshBVH | undefined;
+				if (tree) this.meshTrees.add(tree);
 				this.originalRaycasts.set(mesh, mesh.raycast);
 				mesh.raycast = acceleratedRaycast;
 				this.staticMeshes.push(mesh);
@@ -92,6 +95,7 @@ export class SpatialBvhManagerV1 {
 	refit(): void {
 		if (!this.tlas) return;
 		for (const root of this.roots) root.updateWorldMatrix(true, true);
+		for (const tree of this.meshTrees) tree.refit();
 		for (const [mesh, tree] of this.skinnedTrees) {
 			mesh.skeleton.update();
 			// ObjectBVH uses the SkinnedMesh's cached object-level box for its
@@ -112,6 +116,7 @@ export class SpatialBvhManagerV1 {
 		this.staticMeshes.length = 0;
 		this.skinnedMeshes.length = 0;
 		this.skinnedTrees.clear();
+		this.meshTrees.clear();
 		this.originalRaycasts.clear();
 		this.ownedGeometryTrees.clear();
 	}

@@ -13,9 +13,11 @@
 
 	const scene = new CourtroomScene();
 	let canvas: HTMLCanvasElement;
-	let project = $state(createSyntheticCourtroomProjectV1());
-	let projectRevision = $state(project.projectRevision);
-	let segments = $state(project.segments.map((segment) => ({ ...segment })));
+	// Initial project is captured once on purpose; the editor owns state after mount.
+	const initialProject = createSyntheticCourtroomProjectV1();
+	let project = $state(initialProject);
+	let projectRevision = $state(initialProject.projectRevision);
+	let segments = $state(initialProject.segments.map((segment) => ({ ...segment })));
 	let currentFrame = $state(0);
 	let playing = $state(false);
 	let exporting = $state(false);

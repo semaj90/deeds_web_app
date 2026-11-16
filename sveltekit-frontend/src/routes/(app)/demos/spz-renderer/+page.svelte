@@ -11,6 +11,12 @@
 	import { SpatialBvhManagerV1 } from '$lib/splat/spatial-bvh-manager-v1.js';
 	import { createSceneAssetLifecycleActorV1, isCurrentSceneAssetLoadV1 } from '$lib/splat/scene-asset-lifecycle-v1.js';
 	import { interpolateTrianglePointV1, triangleBarycentricV1 } from '$lib/splat/surface-marker-v1.js';
+	import { PRIMITIVE_DETAIL_LEVELS_V1, SCENE_ASSEMBLY_KINDS_V1, SCENE_MATERIAL_KEYS_V1, SCENE_PRIMITIVE_KINDS_V1, resolveSceneAssemblyV1, resolveSceneMaterialV1, resolveScenePrimitiveV1, type PrimitiveDetailLevelV1, type SceneAssemblyKindV1, type SceneMaterialKeyV1, type ScenePrimitiveGeometryV1, type ScenePrimitiveKindV1 } from '$lib/splat/scene-primitive-registry-v1.js';
+	import { decodeIndexed4BppToRgbaV1, INDEXED_PALETTE16_V1, INDEXED_PALETTE_TEXTURE_REVISION_V1, quantizeRgbaToIndexed4BppV1, type IndexedTexture4BppV1 } from '$lib/splat/indexed-palette-texture-v1.js';
+	import { createIndexedPaletteShaderMaterialV1, createIndexedPaletteTslMaterialV1, type IndexedPaletteShaderTexturesV1 } from '$lib/splat/indexed-palette-shader-v1.js';
+	import { describeIndexedPaletteRendererPathV1, selectIndexedPaletteRendererPathV1 } from '$lib/splat/indexed-palette-renderer-paths-v1.js';
+	import { buildSceneTextureRecommendationsV1 } from '$lib/splat/scene-texture-recommendations-v1.js';
+	import DossierMiniModal from '$lib/components/ui/DossierMiniModal.svelte';
 	import { RetargetRuntime } from '$lib/courtroom/character-retarget-runtime-v1.js';
 	import StreamedSogPlayCanvasViewer from '$lib/components/evidence/StreamedSogPlayCanvasViewer.svelte';
 	import fixtureUrl from '$lib/splat/fixtures/niantic-official-degree0-5pt.spz?url';
@@ -19,7 +25,7 @@
 	type DecodeMode = 'worker' | 'three-loader';
 	type SamplingMode = 'native' | 'half' | 'retro';
 	type MeshPreviewMode = 'source' | 'phong';
-	type PrimitiveDetail = 'retro' | 'balanced' | 'detailed';
+	type PrimitiveDetail = PrimitiveDetailLevelV1;
 	type SurfaceMarkerDraft = Omit<SurfaceMarkerV1, 'meshAssetSha256'> & { meshAssetSha256?: string };
 	const ANIMATION_PREVIEW_FPS = 24;
 	let canvas = $state<HTMLCanvasElement>();
@@ -38,6 +44,22 @@
 	let renderDiagnostics = $state({ quality: 'HIGH', mode: 'native', cssWidth: 0, cssHeight: 0, backingWidth: 0, backingHeight: 0, rgba8EstimateBytes: 0, antialiasRequested: RENDERER_ANTIALIAS_REQUESTED });
 	let meshPreviewMode = $state<MeshPreviewMode>('source');
 	let primitiveDetail = $state<PrimitiveDetail>('balanced');
+	let primitiveMaterial = $state<SceneMaterialKeyV1>('evidence-gold');
+	let showPrimitiveGuide = $state(false);
+	let indexedPalettePreviewEnabled = $state(false);
+	let showSceneTextureOverlay = $state(true);
+	let indexedPalettePreviewStatus = $state('No indexed texture preview');
+	// $state.raw: the value holds three.js objects; it only needs reassignment to be tracked, not deep proxying.
+	let localImagePalettePreview = $state.raw<{
+		mesh: any;
+		sourceMaterial: any;
+		sourceTexture: any;
+		indexedTexture: any | null;
+		fallbackMaterial: any | null;
+		shaderMaterial: any | null;
+		shaderTextures: IndexedPaletteShaderTexturesV1 | null;
+		packedTexture: IndexedTexture4BppV1 | null;
+	} | null>(null);
 	const LOCAL_PREVIEW_TRIANGLE_LIMIT = 100_000;
 	const LOCAL_SHADER_SOURCE_LIMIT_BYTES = 64 * 1024;
 	let shaderSourceName = $state('No local shader source indexed');
@@ -56,6 +78,7 @@
 	let loadedModel = $state<any>(null);
 	let editableRoot: any = null;
 	let sceneObjects = $state<string[]>([]);
+	let sceneSelectableObjects = $state<string[]>([]);
 	let selectedObjectName = $state('');
 	let loadedModelName = $state('No local Blender GLB loaded');
 	let localAssetName = $state('No local 3D asset selected');
@@ -96,6 +119,22 @@
 	let retargetChangedBoneCount = $state(0);
 	let sceneId = $state('');
 	let caseId = $state<string | null>(null);
+	let sceneTextureRecommendations = $derived.by(() => buildSceneTextureRecommendationsV1({
+		assetName: localAssetName,
+		assetFormat: localAssetFormat,
+		assetBytes: localAssetBytes,
+		meshCount: meshDiagnostics.meshCount,
+		vertexCount: meshDiagnostics.vertexCount,
+		triangleCount: meshDiagnostics.triangleCount,
+		uvChannelCount: meshDiagnostics.uvChannelCount,
+		textureCount: meshDiagnostics.textureCount,
+		textureWidth: localImagePalettePreview?.packedTexture?.width ?? null,
+		textureHeight: localImagePalettePreview?.packedTexture?.height ?? null,
+		indexedPreviewEnabled: indexedPalettePreviewEnabled,
+		packedTextureBytes: localImagePalettePreview?.packedTexture?.packedIndices.byteLength ?? 0,
+		backend,
+		caseLinked: Boolean(caseId)
+	}));
 	let linkedEvidenceId = $state<string | null>(null);
 	let linkedEvidenceRevision = $state<string | null>(null);
 	let sceneRevision = $state(0);
@@ -289,6 +328,7 @@
 		loadedModel = null;
 		editableRoot = null;
 		sceneObjects = [];
+		sceneSelectableObjects = [];
 		selectedObjectName = '';
 		loadedModelName = 'No local 3D asset loaded';
 		localAssetName = 'No local 3D asset selected';
@@ -317,8 +357,26 @@
 		pickStatus = 'Click a splat to test picking';
 	}
 
+	function clearLocalImagePalettePreview() {
+		if (localImagePalettePreview) {
+			const preview = localImagePalettePreview;
+			if (preview.mesh?.material === preview.shaderMaterial || preview.mesh?.material === preview.fallbackMaterial) {
+				preview.mesh.material = preview.sourceMaterial;
+				preview.sourceMaterial.needsUpdate = true;
+			}
+			preview.shaderMaterial?.dispose?.();
+			preview.fallbackMaterial?.dispose?.();
+			preview.shaderTextures?.dispose();
+			if (preview.indexedTexture) preview.indexedTexture.dispose?.();
+		}
+		localImagePalettePreview = null;
+		indexedPalettePreviewEnabled = false;
+		indexedPalettePreviewStatus = 'No indexed texture preview';
+	}
+
 	function disposeObjectResources(root: any) {
 		if (!root?.traverse) return;
+		if (root === editableRoot) clearLocalImagePalettePreview();
 		const geometries = new Set<any>();
 		const materials = new Set<any>();
 		const textures = new Set<any>();
@@ -353,6 +411,92 @@
 	function setMeshEditMode(mode: 'translate' | 'rotate' | 'scale') {
 		meshEditMode = mode;
 		transformControls?.setMode(mode);
+	}
+
+	function setIndexedPalettePreview(enabled: boolean) {
+		const preview = localImagePalettePreview;
+		if (!preview || !preview.mesh || !three) return;
+		try {
+			if (enabled) {
+				if (!preview.packedTexture) {
+					const canvas = preview.sourceTexture.image as HTMLCanvasElement;
+					const context = canvas.getContext('2d', { willReadFrequently: true });
+					if (!context) throw new Error('Could not read the local image texture for palette preview.');
+					const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+					const packedTexture = quantizeRgbaToIndexed4BppV1(canvas.width, canvas.height, pixels.data, 0);
+					preview.packedTexture = packedTexture;
+				}
+				if (!preview.indexedTexture) {
+					const expanded = decodeIndexed4BppToRgbaV1(preview.packedTexture!);
+					const sourceCanvas = preview.sourceTexture.image as HTMLCanvasElement;
+					const previewCanvas = document.createElement('canvas');
+					previewCanvas.width = sourceCanvas.width;
+					previewCanvas.height = sourceCanvas.height;
+					const previewContext = previewCanvas.getContext('2d');
+					if (!previewContext) throw new Error('Could not create the expanded RGBA compatibility texture.');
+					const imageData = previewContext.createImageData(sourceCanvas.width, sourceCanvas.height);
+					imageData.data.set(expanded);
+					previewContext.putImageData(imageData, 0, 0);
+					preview.indexedTexture = new three.CanvasTexture(previewCanvas);
+					preview.indexedTexture.name = `${INDEXED_PALETTE_TEXTURE_REVISION_V1} · RGBA compatibility preview`;
+					preview.indexedTexture.colorSpace = three.SRGBColorSpace;
+					preview.indexedTexture.magFilter = three.NearestFilter;
+					preview.indexedTexture.minFilter = three.NearestFilter;
+					preview.indexedTexture.generateMipmaps = false;
+				}
+				if (!preview.fallbackMaterial) {
+					preview.fallbackMaterial = preview.sourceMaterial.clone();
+					preview.fallbackMaterial.name = `${preview.sourceMaterial.name || 'Material'} · indexed RGBA export fallback`;
+					preview.fallbackMaterial.map = preview.indexedTexture;
+					preview.fallbackMaterial.needsUpdate = true;
+				}
+				const rendererPath = selectIndexedPaletteRendererPathV1(backend, Boolean(three?.TSL && three?.MeshStandardNodeMaterial));
+				if (rendererPath === 'rgba-compat') {
+					preview.mesh.material = preview.fallbackMaterial;
+					indexedPalettePreviewStatus = `${preview.packedTexture?.width}×${preview.packedTexture?.height} · expanded RGBA fallback for ${backend ?? 'current'} backend`;
+				} else {
+					if (!preview.shaderMaterial) {
+						// Both GPU paths share the packed R8 texture and palette; only the shader language differs.
+						const shader = rendererPath === 'webgl2-glsl-packed'
+							? createIndexedPaletteShaderMaterialV1(
+								three,
+								preview.sourceMaterial,
+								preview.packedTexture!,
+								renderer?.capabilities?.maxTextureSize ?? 4096
+							)
+							: createIndexedPaletteTslMaterialV1(
+								three,
+								preview.sourceMaterial,
+								preview.packedTexture!,
+								renderer?.capabilities?.maxTextureSize ?? 4096
+							);
+						preview.shaderMaterial = shader.material;
+						preview.shaderTextures = shader.textures;
+					}
+					preview.mesh.material = preview.shaderMaterial;
+					indexedPalettePreviewStatus = describeIndexedPaletteRendererPathV1(
+						rendererPath,
+						preview.packedTexture?.width ?? 0,
+						preview.packedTexture?.height ?? 0,
+						preview.shaderTextures?.gpuTexelBytes ?? 0
+					);
+				}
+				indexedPalettePreviewEnabled = true;
+			} else {
+				preview.mesh.material = preview.sourceMaterial;
+				indexedPalettePreviewEnabled = false;
+				indexedPalettePreviewStatus = `${preview.packedTexture?.width}×${preview.packedTexture?.height} packed preview cached locally; source texture restored`;
+			}
+			preview.mesh.material.needsUpdate = true;
+			refreshSceneObjects(preview.mesh.name);
+			meshEditStatus = enabled
+				? 'Indexed 4-bit palette preview enabled · original source bytes unchanged · export captures the currently selected preview texture.'
+				: 'Original image texture restored · indexed derivative remains local preview data.';
+		} catch (cause) {
+			indexedPalettePreviewEnabled = false;
+			indexedPalettePreviewStatus = cause instanceof Error ? cause.message : 'Could not generate indexed palette preview.';
+			error = indexedPalettePreviewStatus;
+		}
 	}
 
 	function syncMeshTransformReceipt() {
@@ -415,11 +559,16 @@
 			const { GLTFExporter } = await import('three/addons/exporters/GLTFExporter.js');
 			const previewModeForExport = meshPreviewMode;
 			if (previewModeForExport !== 'source') setMeshPreviewMode('source');
+			const indexedPreviewForExport = indexedPalettePreviewEnabled;
+			if (indexedPreviewForExport && localImagePalettePreview?.fallbackMaterial) {
+				localImagePalettePreview.mesh.material = localImagePalettePreview.fallbackMaterial;
+			}
 			let buffer: ArrayBuffer | object;
 			try {
 				buffer = await new GLTFExporter().parseAsync(editableRoot, { binary: true, animations: animationClips });
 			} finally {
 				if (previewModeForExport !== 'source') setMeshPreviewMode(previewModeForExport);
+				if (indexedPreviewForExport) setIndexedPalettePreview(true);
 			}
 			if (!(buffer instanceof ArrayBuffer)) throw new Error('The GLB exporter did not return a binary asset.');
 			if (buffer.byteLength > 64 * 1024 * 1024) throw new Error('The derived GLB exceeds the 64 MiB local export limit.');
@@ -834,6 +983,7 @@
 		editableRoot = null;
 		loadedModel = null;
 		sceneObjects = [];
+		sceneSelectableObjects = [];
 		selectedObjectName = '';
 	}
 
@@ -890,6 +1040,11 @@
 			}
 		});
 		sceneObjects = objects.map((object) => object.name);
+		const selectionNames = new Set(sceneObjects);
+		editableRoot?.traverse?.((object: any) => {
+			if (object !== editableRoot && object.userData?.atlasAssemblySpec && object.name) selectionNames.add(object.name);
+		});
+		sceneSelectableObjects = [...selectionNames];
 		const textureSet = new Set<any>();
 		const materialSet = new Set<any>();
 		const uvChannels = new Set<string>();
@@ -976,28 +1131,49 @@
 		if (selected) attachTransformControls(selected);
 	}
 
-	async function addPrimitive(kind: 'box' | 'sphere' | 'cylinder' | 'cone' | 'torus') {
+	function createRecipeGeometry(recipe: ScenePrimitiveGeometryV1) {
+		switch (recipe.kind) {
+			case 'box': return new three.BoxGeometry(recipe.width, recipe.height, recipe.depth, recipe.widthSegments, recipe.heightSegments, recipe.depthSegments);
+			case 'sphere': return new three.SphereGeometry(recipe.radius, recipe.widthSegments, recipe.heightSegments);
+			case 'cylinder': return new three.CylinderGeometry(recipe.radiusTop, recipe.radiusBottom, recipe.height, recipe.radialSegments, recipe.heightSegments);
+			case 'cone': return new three.ConeGeometry(recipe.radius, recipe.height, recipe.radialSegments, recipe.heightSegments);
+			case 'torus': return new three.TorusGeometry(recipe.radius, recipe.tube, recipe.radialSegments, recipe.tubularSegments);
+			case 'circle': return new three.CircleGeometry(recipe.radius, recipe.segments);
+			case 'rectangle': return new three.PlaneGeometry(recipe.width, recipe.height);
+			case 'polygon-prism': {
+				const shape = new three.Shape();
+				const [first, ...rest] = recipe.points;
+				if (!first || rest.length < 2) throw new Error('A polygon prism needs at least three points.');
+				shape.moveTo(first[0], first[1]);
+				for (const [x, y] of rest) shape.lineTo(x, y);
+				shape.closePath();
+				return new three.ExtrudeGeometry(shape, { depth: recipe.depth, bevelEnabled: false, curveSegments: 1 });
+			}
+			default: throw new Error(`Unsupported recipe geometry: ${String((recipe as { kind: string }).kind)}`);
+		}
+	}
+
+	function createRecipeMaterial(key: SceneMaterialKeyV1, flat = false) {
+		return new three.MeshStandardMaterial({ ...resolveSceneMaterialV1(key), side: flat ? three.DoubleSide : three.FrontSide });
+	}
+
+	async function addPrimitive(kind: ScenePrimitiveKindV1) {
 		if (!scene && !busy) await loadFixture('webgpu', 'worker');
 		if (!scene || !three || busy) return;
-		const used = sceneObjects.filter((name) => name.startsWith(`Evidence ${kind}`)).length;
+		let used = 0;
+		editableRoot?.traverse?.((object: any) => { if (object.userData?.atlasPrimitiveSpec?.kind === kind) used += 1; });
 		const name = `Evidence ${kind} ${used + 1}`;
-		const detail = primitiveDetail === 'retro' ? { radial: 8, height: 6, tube: 6 } : primitiveDetail === 'detailed' ? { radial: 32, height: 20, tube: 12 } : { radial: 16, height: 10, tube: 10 };
-		const geometries: Record<string, any> = {
-			box: () => new three.BoxGeometry(0.5, 0.5, 0.5),
-			sphere: () => new three.SphereGeometry(0.3, detail.radial, detail.height),
-			cylinder: () => new three.CylinderGeometry(0.25, 0.25, 0.6, detail.radial),
-			cone: () => new three.ConeGeometry(0.3, 0.65, detail.radial),
-			torus: () => new three.TorusGeometry(0.3, 0.08, detail.tube, detail.radial * 2)
-		};
-		const primitiveGeometry = geometries[kind]();
+		const primitiveSpec = resolveScenePrimitiveV1(kind, primitiveDetail);
+		const primitiveGeometry = createRecipeGeometry(primitiveSpec.geometry);
 		const primitiveTriangles = Math.floor((primitiveGeometry.index?.count ?? primitiveGeometry.getAttribute('position')?.count ?? 0) / 3);
 		if (countTriangles() + primitiveTriangles > LOCAL_PREVIEW_TRIANGLE_LIMIT) {
 			primitiveGeometry.dispose();
 			error = `Local preview is limited to ${LOCAL_PREVIEW_TRIANGLE_LIMIT.toLocaleString()} triangles. Reduce or remove geometry before adding another primitive.`;
 			return;
 		}
-		const object = new three.Mesh(primitiveGeometry, new three.MeshStandardMaterial({ color: '#d8b14d', metalness: 0.25, roughness: 0.55 }));
+		const object = new three.Mesh(primitiveGeometry, createRecipeMaterial(primitiveMaterial, kind === 'circle' || kind === 'rectangle'));
 		object.name = name;
+		object.userData.atlasPrimitiveSpec = { ...primitiveSpec, materialKey: primitiveMaterial, estimatedTriangles: primitiveTriangles };
 		object.position.set((used % 4) * 0.8 - 1.2, Math.floor(used / 4) * 0.7, 0);
 		ensureEditableRoot('Synthetic evidence scene').add(object);
 		refreshSceneObjects(name);
@@ -1007,6 +1183,49 @@
 		sceneDirty = true;
 		scheduleSceneAutoSave();
 		status = 'Synthetic mesh playground. No case assets or records are loaded.';
+	}
+
+	async function addAssembly(kind: SceneAssemblyKindV1) {
+		if (!scene && !busy) await loadFixture('webgpu', 'worker');
+		if (!scene || !three || busy) return;
+		const recipe = resolveSceneAssemblyV1(kind, primitiveDetail);
+		let used = 0;
+		let assemblyIndex = 0;
+		editableRoot?.traverse?.((object: any) => {
+			if (object.userData?.atlasAssemblySpec) {
+				assemblyIndex += 1;
+				if (object.userData.atlasAssemblySpec.kind === kind) used += 1;
+			}
+		});
+		const group = new three.Group();
+		group.name = `Evidence ${kind} ${used + 1}`;
+		group.userData.atlasAssemblySpec = recipe;
+		group.position.set((assemblyIndex % 3) * 1.6 - 1.6, 0, 0);
+		let addedTriangles = 0;
+		for (const part of recipe.parts) {
+			const geometry = createRecipeGeometry(part.geometry);
+			const material = createRecipeMaterial(part.material, part.geometry.kind === 'circle' || part.geometry.kind === 'rectangle');
+			const mesh = new three.Mesh(geometry, material);
+			mesh.name = `${group.name} · ${part.partId}`;
+			mesh.userData.atlasAssemblyPart = { assembly: kind, registryRevision: recipe.registryRevision, partId: part.partId };
+			mesh.position.set(...part.position);
+			mesh.rotation.set(...part.rotation);
+			addedTriangles += Math.floor((geometry.index?.count ?? geometry.getAttribute('position')?.count ?? 0) / 3);
+			group.add(mesh);
+		}
+		if (countTriangles() + addedTriangles > LOCAL_PREVIEW_TRIANGLE_LIMIT) {
+			disposeObjectResources(group);
+			error = `Local preview is limited to ${LOCAL_PREVIEW_TRIANGLE_LIMIT.toLocaleString()} triangles. Reduce or remove geometry before adding another assembly.`;
+			return;
+		}
+		ensureEditableRoot('Synthetic evidence scene').add(group);
+		refreshSceneObjects(`${group.name} · ${recipe.parts[0]?.partId ?? ''}`);
+		loadedModelName = 'synthetic-playground · local only';
+		meshEditStatus = `Added ${recipe.label} · ${recipe.parts.length} parts · ${addedTriangles.toLocaleString()} triangles · local only.`;
+		sceneAssetDirty = true;
+		sceneDirty = true;
+		scheduleSceneAutoSave();
+		status = 'Demonstrative assembly added. No case assets or records are loaded.';
 	}
 
 	async function loadFixture(requestedMode: Backend, decodeMode: DecodeMode = 'worker') {
@@ -1156,9 +1375,9 @@
 			if (!isCurrent()) return;
 			let importedAnimations: any[] = [];
 			if (extension === 'glb') {
-				const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+				const { parseSceneGltfWithKtx2V1 } = await import('$lib/splat/scene-gltf-ktx2-loader-v1.js');
 				if (!isCurrent()) return;
-				const gltf = await new Promise<any>((resolve, reject) => new GLTFLoader().parse(buffer, '', resolve, reject));
+				const gltf = await parseSceneGltfWithKtx2V1(buffer, renderer);
 				importedRoot = gltf.scene;
 				importedAnimations = Array.isArray(gltf.animations) ? gltf.animations : [];
 			} else if (extension === 'obj') {
@@ -1341,6 +1560,18 @@
 			reliefMesh.name = 'Image-derived relief proxy';
 			reliefMesh.userData.atlasObjectId = crypto.randomUUID();
 			editableRoot.add(reliefMesh);
+			localImagePalettePreview = {
+				mesh: reliefMesh,
+				sourceMaterial: material,
+				sourceTexture: texture,
+				indexedTexture: null,
+				fallbackMaterial: null,
+				shaderMaterial: null,
+				shaderTextures: null,
+				packedTexture: null
+			};
+			indexedPalettePreviewEnabled = false;
+			indexedPalettePreviewStatus = 'Ready · create the local 4-bit preview on demand';
 			scene.add(editableRoot);
 			sceneId = crypto.randomUUID();
 			sceneRevision = 0;
@@ -1543,7 +1774,7 @@
 			<button onclick={() => setMeshEditMode('translate')} disabled={!loadedModel} aria-pressed={meshEditMode === 'translate'}>Move mesh</button>
 			<button onclick={() => setMeshEditMode('rotate')} disabled={!loadedModel} aria-pressed={meshEditMode === 'rotate'}>Rotate mesh</button>
 			<button onclick={() => setMeshEditMode('scale')} disabled={!loadedModel} aria-pressed={meshEditMode === 'scale'}>Scale mesh</button>
-			<label class="object-select">Select object<select aria-label="Select scene object" value={selectedObjectName} disabled={!sceneObjects.length} onchange={(event) => selectSceneObject((event.currentTarget as HTMLSelectElement).value)}>{#each sceneObjects as objectName}<option value={objectName}>{objectName}</option>{/each}</select></label>
+			<label class="object-select">Select object<select aria-label="Select scene object" value={selectedObjectName} disabled={!sceneSelectableObjects.length} onchange={(event) => selectSceneObject((event.currentTarget as HTMLSelectElement).value)}>{#each sceneSelectableObjects as objectName}<option value={objectName}>{objectName}</option>{/each}</select></label>
 			{#if loadedModel}<button data-testid="frame-editable-scene" onclick={frameEditableScene}>Frame mesh</button>{/if}
 			{#if pointCount > 0}<label class="object-select"><input data-testid="synthetic-splat-visibility" type="checkbox" checked={showSyntheticSplatFixture} onchange={(event) => setSyntheticSplatFixtureVisible((event.currentTarget as HTMLInputElement).checked)} /> Show synthetic SPZ fixture</label>{/if}
 			<label class="object-select">Animation<select aria-label="Select animation clip" value={selectedAnimation} disabled={!animationNames.length} onchange={(event) => { selectedAnimation = (event.currentTarget as HTMLSelectElement).value; animationPreviewFrame = 0; }}>{#each animationNames as animationName}<option value={animationName}>{animationName}</option>{/each}</select></label>
@@ -1555,10 +1786,15 @@
 				<button data-testid="retarget-play" onclick={playRetargetMotion} disabled={!retargetReady || animationPlaying}>Play retargeted motion</button>
 				<button data-testid="retarget-stop" onclick={stopAnimation} disabled={!animationPlaying || !retargetReady}>Stop retargeted motion</button>
 			{/if}
-			{#each ['box', 'sphere', 'cylinder', 'cone', 'torus'] as kind}
-				<button onclick={() => addPrimitive(kind as 'box' | 'sphere' | 'cylinder' | 'cone' | 'torus')} disabled={busy} aria-label={`Add ${kind}`}>+ {kind}</button>
+			{#each SCENE_PRIMITIVE_KINDS_V1 as kind (kind)}
+				<button onclick={() => addPrimitive(kind as ScenePrimitiveKindV1)} disabled={busy} aria-label={`Add ${kind}`}>+ {kind}</button>
 			{/each}
-			<label class="object-select">Primitive detail<select data-testid="primitive-detail" bind:value={primitiveDetail} disabled={busy}><option value="retro">Retro · low polygons</option><option value="balanced">Balanced</option><option value="detailed">Detailed</option></select></label>
+			{#each SCENE_ASSEMBLY_KINDS_V1 as kind (kind)}
+				<button data-testid={`add-assembly-${kind}`} onclick={() => addAssembly(kind as SceneAssemblyKindV1)} disabled={busy}>+ {kind.replaceAll('-', ' ')}</button>
+			{/each}
+			<label class="object-select">Primitive detail<select data-testid="primitive-detail" bind:value={primitiveDetail} disabled={busy}>{#each PRIMITIVE_DETAIL_LEVELS_V1 as level (level)}<option value={level}>{level === 'retro' ? 'Retro · low polygons' : level === 'balanced' ? 'Balanced' : 'Detailed'}</option>{/each}</select></label>
+			<label class="object-select">Primitive palette<select data-testid="primitive-palette" bind:value={primitiveMaterial} disabled={busy}>{#each SCENE_MATERIAL_KEYS_V1 as key (key)}<option value={key}>{key.replaceAll('-', ' ')}</option>{/each}</select></label>
+			<button type="button" data-testid="primitive-guide-open" onclick={() => (showPrimitiveGuide = true)}>Primitive guide</button>
 			{#if caseId}<button onclick={() => downloadEditedGlb()} disabled={!loadedModel || busy}>Save case scene revision</button>{#if sceneId}<button onclick={loadSavedCaseScene} disabled={busy}>Reload saved scene</button>{/if}{:else}<button onclick={() => downloadEditedGlb()} disabled={!loadedModel || busy}>Download edited GLB</button>{/if}
 			<button onclick={disposeForUser} disabled={!backend || busy}>Dispose</button>
 		</div>
@@ -1595,6 +1831,14 @@
 		<button data-testid="material-mode-phong" onclick={() => setMeshPreviewMode('phong')} aria-pressed={meshPreviewMode === 'phong'} disabled={!loadedModel || busy}>Three.js Phong</button>
 		<span class="sampling-note">Preview only · export restores source materials · no path tracing</span>
 	</nav>
+	{#if preCaseMode && localImagePalettePreview}
+		<nav class="sampling material-preview" aria-label="Indexed image palette preview" data-testid="indexed-image-preview-controls">
+			<span class="label">Indexed image palette</span>
+			<button type="button" data-testid="indexed-image-preview-toggle" onclick={() => setIndexedPalettePreview(!indexedPalettePreviewEnabled)} aria-pressed={indexedPalettePreviewEnabled} disabled={busy}>{indexedPalettePreviewEnabled ? 'Restore original texture' : 'Preview indexed palette'}</button>
+			<output data-testid="indexed-image-preview-status">{indexedPalettePreviewStatus}</output>
+			<span class="sampling-note">Local-only derivative · WebGL2 samples packed 4bpp indices; WebGPU uses the expanded RGBA fallback · no storage writes</span>
+		</nav>
+	{/if}
 	{#if preCaseMode}
 		<section class="shader-drop" aria-label="Local shader source inventory" ondragover={(event) => event.preventDefault()} ondrop={(event) => { event.preventDefault(); void indexLocalShaderSource(event.dataTransfer?.files?.[0]); }}>
 			<div><span class="label">Shader source inventory · local only</span><strong data-testid="shader-source-name">{shaderSourceName}</strong><small data-testid="shader-source-receipt">{shaderSourceReceipt}</small></div>
@@ -1607,6 +1851,25 @@
 			<StreamedSogPlayCanvasViewer />
 		{:else}
 			<canvas bind:this={canvas} onclick={pick} data-testid="spz-fixture-canvas" aria-label="Interactive synthetic SPZ scene; drag to orbit, scroll to zoom, click to test splat picking"></canvas>
+			{#if loadedModel && sceneTextureRecommendations.length}
+				<aside class="texture-recommendation-overlay" aria-label="Scene texture recommendations" data-testid="scene-texture-recommendation-overlay">
+					<header>
+						<div><strong>Scene texture guide</strong><small>Local scene checks · not AI conclusions</small></div>
+						<button type="button" aria-expanded={showSceneTextureOverlay} onclick={() => showSceneTextureOverlay = !showSceneTextureOverlay}>{showSceneTextureOverlay ? 'Hide' : `Show ${sceneTextureRecommendations.length}`}</button>
+					</header>
+					{#if showSceneTextureOverlay}
+						<ol>
+							{#each sceneTextureRecommendations as recommendation (recommendation.id)}
+								<li data-state={recommendation.state}>
+									<div><strong>{recommendation.title}</strong><span class="texture-recommendation-state">{recommendation.state}</span></div>
+									<p>{recommendation.detail}</p>
+									<small>{recommendation.evidence}</small>
+								</li>
+							{/each}
+						</ol>
+					{/if}
+				</aside>
+			{/if}
 			<div class="controls-hint" aria-hidden="true">Drag to orbit · scroll to zoom · {placingSurfaceMarker ? 'click a static mesh triangle to add a hypothesis anchor' : 'click a mesh or splat to inspect'}</div>
 			{#if !backend && !busy}<div class="empty">Load the synthetic fixture to begin the renderer check.</div>{/if}
 			{#if busy}<div class="overlay-status" role="status">{status}</div>{/if}
@@ -1653,7 +1916,88 @@
 		{#if error}<p class="error" role="alert">{error}</p>{/if}
 	</footer>
 	<aside>{preCaseMode ? 'Local preflight only: 2D images produce luminance-based 2.5D hypotheses; geometry and export details are preview-only. Nothing is added to a case and no GPU performance claim is made.' : 'Format fixture proof only: decode, actual GaussianSplat object, auto-sort path, pointer raycast, resize, and disposal can be inspected here. No GPU performance claim is made.'}</aside>
-</main>
+	<DossierMiniModal bind:open={showPrimitiveGuide} title="Primitive recipes" description={`Current profile: ${primitiveDetail}. These are editable scene helpers, not observations about the source evidence.`}>
+		<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+			{#each SCENE_PRIMITIVE_KINDS_V1 as kind (kind)}
+				{@const spec = resolveScenePrimitiveV1(kind, primitiveDetail)}
+				<article class="border-2 border-[#161412] bg-[#FAF6F0] p-3 shadow-[4px_4px_0_#161412]">
+					<h3 class="m-0 text-sm font-extrabold capitalize">{kind}</h3>
+					<p class="my-1 text-xs text-[#51483d]">{spec.dimensionsMeters.join(' × ')} m · {spec.estimatedTriangles.toLocaleString()} estimated triangles</p>
+					<p class="m-0 text-xs"><strong>Rigid collider:</strong> {spec.collider.shape} · {spec.collider.fidelity}</p>
+				</article>
+			{/each}
+		</div>
+		<section class="mt-4 border-2 border-[#161412] bg-[#FAF4EC] p-3 shadow-[4px_4px_0_#161412]">
+			<h3 class="m-0 text-sm font-extrabold">Composite prop recipes</h3>
+			<p class="mb-2 mt-1 text-xs text-[#51483d]">Assemblies are editable mesh groups built from versioned parts. They are demonstrative props, not calibrated evidence objects.</p>
+			<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+				{#each SCENE_ASSEMBLY_KINDS_V1 as kind (kind)}
+					{@const recipe = resolveSceneAssemblyV1(kind, primitiveDetail)}
+					<article class="border-2 border-[#161412] bg-[#FAF6F0] p-3 shadow-[4px_4px_0_#161412]">
+						<h4 class="m-0 text-sm font-extrabold capitalize">{recipe.label}</h4>
+						<p class="mb-0 mt-1 text-xs text-[#51483d]">{recipe.parts.length} parts · {recipe.dimensionsMeters.join(' × ')} m · {recipe.physics}</p>
+						<p class="mb-0 mt-1 text-xs text-[#51483d]">Parts: {recipe.parts.map((part) => part.partId).join(', ')}</p>
+					</article>
+				{/each}
+			</div>
+		</section>
+		<section class="mt-4 border-2 border-[#161412] bg-[#FAF4EC] p-3 shadow-[4px_4px_0_#161412]">
+			<h3 class="m-0 text-sm font-extrabold">Material palette LUT</h3>
+			<p class="mb-2 mt-1 text-xs text-[#51483d]">Palette entries set color and surface response; geometry recipes remain independent.</p>
+			<div class="flex flex-wrap gap-2">
+				{#each SCENE_MATERIAL_KEYS_V1 as key (key)}
+					{@const material = resolveSceneMaterialV1(key)}
+					<span class="inline-flex items-center gap-2 border-2 border-[#161412] bg-[#FAF6F0] px-2 py-1 text-xs capitalize shadow-[2px_2px_0_#161412]"><i aria-hidden="true" class="h-4 w-4 border border-[#161412]" style={`background-color:${material.color}`}></i>{key.replaceAll('-', ' ')}</span>
+				{/each}
+			</div>
+		</section>
+		<section class="mt-4 border-2 border-[#161412] bg-[#FAF4EC] p-3 shadow-[4px_4px_0_#161412]" data-testid="indexed-palette-guide">
+			<h3 class="m-0 text-sm font-extrabold">4-bit indexed texture palette</h3>
+			<p class="mb-2 mt-1 text-xs text-[#51483d]">{INDEXED_PALETTE_TEXTURE_REVISION_V1} · 16 entries · 2 pixel indices per byte · index 0 is transparent. This texture codec is separate from mesh materials and the evidence-routing LUT.</p>
+			<div class="grid grid-cols-4 gap-2 sm:grid-cols-8">
+				{#each INDEXED_PALETTE16_V1 as entry (entry.index)}
+					<div class="border-2 border-[#161412] bg-[#FAF6F0] p-2 text-center text-[0.65rem] shadow-[2px_2px_0_#161412]" data-testid={`indexed-palette-entry-${entry.index}`}>
+						<i aria-hidden="true" class="mx-auto block h-6 w-6 border border-[#161412]" style={`background-color:${entry.hex === '#00000000' ? 'transparent' : entry.hex};${entry.index === 0 ? 'background-image:repeating-conic-gradient(#aaa 0% 25%,transparent 0% 50%);background-size:8px 8px' : ''}`}></i>
+						<span class="mt-1 block font-bold">{entry.index.toString(16).toUpperCase()}</span>
+						<span class="block">{entry.name}</span>
+					</div>
+				{/each}
+			</div>
+			<p class="mb-0 mt-2 text-xs text-[#51483d]">The helper resizes no source data and caps input at 4,194,304 pixels; resize first, then store this as a rebuildable derivative with its palette revision.</p>
+		</section>
+		<section class="mt-4 border-2 border-[#161412] bg-[#FAF4EC] p-3 shadow-[4px_4px_0_#161412]">
+			<h3 class="m-0 text-sm font-extrabold">Generated GLB assets</h3>
+			<p class="mb-0 mt-1 text-sm leading-5 text-[#51483d]">Generated meshes are separate derived assets, linked by their GLB hash and scene revision. Model/checkpoint, quantization, seed, settings, source evidence revision, and review state belong to the asset provenance record; that record identifies a hypothesis, not an observed fact.</p>
+			{#if savedCaseManifest}
+				{@const generatedAssets = savedCaseManifest.assets.filter((asset) => asset.modelGeneration)}
+				{#if generatedAssets.length > 0}
+					<div class="mt-3 grid gap-2">
+						{#each generatedAssets as asset (asset.assetId)}
+							{@const provenance = asset.modelGeneration}
+							{#if provenance}
+							<article class="border-2 border-[#161412] bg-[#fffaf0] p-3 text-xs shadow-[3px_3px_0_#161412]">
+								<h4 class="m-0 font-extrabold">{provenance.generator.modelId} · {provenance.reviewStatus.replaceAll('_', ' ').toLowerCase()}</h4>
+								<dl class="mb-0 mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+									<dt>Checkpoint</dt><dd class="m-0 break-all">{provenance.generator.checkpointRevision} · SHA-256 {provenance.generator.checkpointSha256}</dd>
+									<dt>Quantization</dt><dd class="m-0">{provenance.generator.quantization} · {provenance.generator.licenseStatus}{provenance.generator.licenseSpdx ? ` · ${provenance.generator.licenseSpdx}` : ''}</dd>
+									<dt>Source revision</dt><dd class="m-0 break-all">{provenance.source.evidenceId} · {provenance.source.sourceRevision}</dd>
+									<dt>Seed / output</dt><dd class="m-0 break-all">{provenance.seed} · SHA-256 {asset.sha256}</dd>
+								</dl>
+								<p class="mb-0 mt-2">Model-generated geometry is a hypothesis; review status does not convert it into a source observation.</p>
+							</article>
+							{/if}
+						{/each}
+					</div>
+				{:else}
+					<p class="mb-0 mt-2 text-xs">This saved scene has no model-generated GLB provenance record.</p>
+				{/if}
+			{/if}
+		</section>
+		<p class="mt-4 border-l-4 border-[#8D251E] bg-[#F3E8D8] p-3 text-sm leading-5 text-[#30271f]">
+			Physics is not active here. Collider recipes are setup hints; soft-body behavior requires a separate deformable mesh and reviewed solver settings. Scene objects remain demonstrative until linked and reviewed through the authorized case workflow.
+		</p>
+	</DossierMiniModal>
+	</main>
 
 <style>
 	.spz-page { min-height: calc(100vh - 3.5rem); display: grid; grid-template-rows: auto auto minmax(24rem, 1fr) auto auto; gap: 1rem; padding: 1.25rem; color: #eee7d8; background: #0b101b; }
@@ -1707,6 +2051,18 @@
 	.object-select select { max-width:12rem; border:0; background:#171d29; color:#f3d27f; }
 	.file-action input { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; }
 	.viewer { position:relative; min-height:24rem; overflow:hidden; border:1px solid #37556b; border-radius:.75rem; background:#0b101b; box-shadow:0 0 24px #42d9f122; }
+	.texture-recommendation-overlay { position:absolute; z-index:3; top:.75rem; right:.75rem; width:min(25rem,calc(100% - 1.5rem)); max-height:calc(100% - 1.5rem); overflow:auto; border:2px solid #161412; border-radius:.75rem; background:#faf4ecf2; color:#211c16; box-shadow:5px 5px 0 #161412; backdrop-filter:blur(8px); }
+	.texture-recommendation-overlay > header { display:flex; align-items:center; justify-content:space-between; gap:.75rem; border-bottom:2px solid #161412; padding:.65rem .75rem; }
+	.texture-recommendation-overlay > header div { display:grid; gap:.15rem; }
+	.texture-recommendation-overlay > header strong { font-size:.82rem; }
+	.texture-recommendation-overlay small { color:#5b5145; font-size:.66rem; line-height:1.35; }
+	.texture-recommendation-overlay button { border:2px solid #161412; border-radius:.5rem; background:#211c16; color:#fff8ed; padding:.35rem .55rem; font-size:.68rem; font-weight:700; }
+	.texture-recommendation-overlay ol { display:grid; gap:.45rem; margin:0; padding:.6rem; list-style:none; }
+	.texture-recommendation-overlay li { border:1px solid #9d8e7a; border-radius:.5rem; background:#fffaf2; padding:.55rem; }
+	.texture-recommendation-overlay li > div { display:flex; align-items:center; justify-content:space-between; gap:.5rem; }
+	.texture-recommendation-overlay li strong { font-size:.72rem; }
+	.texture-recommendation-overlay li p { margin:.35rem 0; font-size:.68rem; line-height:1.4; }
+	.texture-recommendation-overlay .texture-recommendation-state { flex:none; border:1px solid #796b59; border-radius:999px; padding:.12rem .4rem; font-size:.6rem; text-transform:uppercase; }
 	canvas { display:block; width:100%; height:100%; min-height:24rem; touch-action:none; cursor:grab; }
 	canvas:active { cursor:grabbing; }
 	.empty,.overlay-status { position:absolute; inset:0; display:grid; place-items:center; color:#c8c2b5; pointer-events:none; }

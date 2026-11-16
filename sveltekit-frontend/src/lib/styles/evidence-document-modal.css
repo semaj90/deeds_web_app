@@ -59,6 +59,26 @@
 		gap: 0.875rem;
 		min-width: 0;
 	}
+	.evidence-document-modal .modal-header-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-shrink: 0;
+	}
+	.evidence-document-modal .modal-transcript-open {
+		min-height: 30px;
+		padding: 0.35rem 0.7rem;
+		border: 1px solid rgba(212, 199, 163, 0.25);
+		border-radius: 7px;
+		background: rgba(255, 255, 255, 0.04);
+		color: #e6dfce;
+		cursor: pointer;
+	}
+	.evidence-document-modal .modal-transcript-open:hover,
+	.evidence-document-modal .modal-transcript-open[aria-expanded="true"] {
+		border-color: rgba(243, 212, 113, 0.65);
+		background: rgba(243, 212, 113, 0.12);
+	}
 	.evidence-document-modal .modal-file-icon-wrap {
 		width: 42px;
 		height: 42px;

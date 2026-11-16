@@ -12,10 +12,15 @@ describe('production YOLO model admission', () => {
 			.toThrow('YOLO_MODEL_NOT_ADMITTED_FOR_PRODUCTION');
 	});
 
-	it('keeps the pinned YOLOX-Nano artifact out of production until pretrained-weight licensing is explicit', () => {
+	it('admits the hash-pinned YOLOX-Nano artifact in production (Apache-2.0 basis, DET-04)', () => {
 		const sha256 = 'c'.repeat(64);
 		expect(() => assertProductionYoloModelAdmission('C:/models/yolox_nano.onnx', 'production', sha256, sha256))
-			.toThrow('YOLO_MODEL_NOT_ADMITTED_FOR_PRODUCTION');
+			.not.toThrow();
+	});
+
+	it('still requires the exact YOLOX-Nano hash pin in production', () => {
+		expect(() => assertProductionYoloModelAdmission('C:/models/yolox_nano.onnx', 'production'))
+			.toThrow('YOLO_MODEL_CHECKSUM_NOT_ADMITTED_FOR_PRODUCTION');
 	});
 
 	it('rejects unknown models in production instead of inferring their license from their path', () => {

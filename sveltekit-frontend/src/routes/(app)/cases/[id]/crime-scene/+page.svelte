@@ -153,7 +153,7 @@
 	.crime-scene { padding: 16px; max-width: 1100px; margin: 0 auto; color: #1f2430; font: 14px/1.5 system-ui, sans-serif; }
 	h1 { font-size: 20px; margin: 0; }
 	h2 { font-size: 16px; margin: 20px 0 8px; }
-	h2 small, h3 small { font-weight: 400; color: #6b7280; margin-left: 6px; }
+	h2 small { font-weight: 400; color: #6b7280; margin-left: 6px; }
 	.case-title, .export-state { margin: 2px 0; color: #4b5563; }
 	table { width: 100%; border-collapse: collapse; font-size: 13px; }
 	th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #e5e7eb; }

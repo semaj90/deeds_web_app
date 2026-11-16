@@ -9,3 +9,12 @@ export type Eg2WorkerRequestV1 =
 export type Eg2WorkerResponseV1 =
 	| { id: number; ok: true; result: unknown }
 	| { id: number; ok: false; error: string };
+
+/** Node worker_threads structured-clones Buffer values into plain Uint8Arrays. */
+export function restoreEg2WorkerImageBufferV1(value: unknown): Buffer {
+	if (Buffer.isBuffer(value)) return value;
+	if (value instanceof Uint8Array) {
+		return Buffer.from(value.buffer, value.byteOffset, value.byteLength);
+	}
+	throw new Error('EG2_WORKER_IMAGE_BUFFER_INVALID');
+}

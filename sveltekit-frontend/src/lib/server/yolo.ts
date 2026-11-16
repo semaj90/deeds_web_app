@@ -42,7 +42,10 @@ export function resolveYoloPython(configured?: string): string {
 // infer a permissive weight license from the ONNX format or model filename.
 // These names are permitted only with an exact artifact hash pin. The model
 // artifact inventory remains the license authority; names alone are not proof.
-const PRODUCTION_YOLO_MODEL_BASENAMES = new Set(['yolo-doc.onnx']);
+// yolox_nano.onnx: Megvii YOLOX repository LICENSE is Apache-2.0 and names no separate
+// weight grant (operator accepted this basis 2026-11-16, ledger DET-04). Production also
+// requires YOLO_MODEL_SHA256 to match the artifact's exact hash.
+const PRODUCTION_YOLO_MODEL_BASENAMES = new Set(['yolo-doc.onnx', 'yolox_nano.onnx']);
 
 /** Fail closed in production on model family and exact-artifact checksum. */
 export function assertProductionYoloModelAdmission(

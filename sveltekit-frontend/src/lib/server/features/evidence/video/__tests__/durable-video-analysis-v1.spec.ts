@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createHash } from 'node:crypto';
+import sharp from 'sharp';
 
 const mocks = vi.hoisted(() => ({
 	artifactSizes: new Map<string, number>(),
@@ -202,6 +203,76 @@ describe('durable video analysis worker stage', () => {
 		});
 	});
 
+	it('stores compact revision-bound motion LUTs from adjacent sampled frames', async () => {
+		const bytes = Buffer.from('fixture-motion-video');
+		const blackFrame = await sharp({ create: { width: 64, height: 128, channels: 3, background: { r: 0, g: 0, b: 0 } } }).png().toBuffer();
+		const whiteFrame = await sharp({ create: { width: 64, height: 128, channels: 3, background: { r: 255, g: 255, b: 255 } } }).png().toBuffer();
+		mocks.extractFrames.mockResolvedValue([
+			{ timestampMs: 1000, buffer: blackFrame },
+			{ timestampMs: 2500, buffer: whiteFrame },
+		]);
+
+		const result = await processCanonicalVideoAnalysisV1({
+			evidenceId: EVIDENCE_ID,
+			caseId: CASE_ID,
+			analysisJobId: JOB_ID,
+			uploadedBy: 7,
+			sourceRevision: sourceRevision(bytes),
+			fileName: 'fixture-motion.mp4',
+			bytes,
+		}, dependencies());
+
+		const frames = mocks.persist.mock.calls.at(-1)?.[0]?.frames as Array<{
+			timestampMs: number;
+			motionLut?: { frameIndex: number; timestampMs: number; previousTimestampMs: number | null; motionScore: number; analysisRevision: string; artifact: { byteLength: number; sha256: string; analysisRevision: string } };
+		}>;
+		expect(frames).toHaveLength(2);
+		expect(frames[0]?.motionLut).toMatchObject({ frameIndex: 0, timestampMs: 1000, previousTimestampMs: null, motionScore: 0 });
+		expect(frames[1]?.motionLut).toMatchObject({ frameIndex: 1, timestampMs: 2500, previousTimestampMs: 1000, motionScore: 1 });
+		expect(frames[1]?.motionLut?.artifact).toMatchObject({
+			byteLength: 4112,
+			sha256: expect.stringMatching(/^sha256:[a-f0-9]{64}$/),
+			analysisRevision: frames[1]?.motionLut?.analysisRevision,
+		});
+		expect(mocks.uploadArtifact).toHaveBeenCalledWith(
+			'atlas-artifacts',
+			expect.stringContaining(`/motion-0001.atm`),
+			expect.any(Buffer),
+			expect.objectContaining({ 'Content-Type': 'application/vnd.atlas.video-motion-lut-v1' }),
+		);
+		expect(result?.canonicalReceiptVerified).toBe(true);
+	});
+
+	it('persists source-scoped track hypotheses and timestamp-derived box motion', async () => {
+		const bytes = Buffer.from('fixture-track-video');
+		const frame = await sharp({ create: { width: 64, height: 128, channels: 3, background: { r: 24, g: 24, b: 24 } } }).png().toBuffer();
+		mocks.extractFrames.mockResolvedValue([
+			{ timestampMs: 1000, buffer: frame },
+			{ timestampMs: 2000, buffer: frame },
+		]);
+		let detectionIndex = 0;
+		const detector = {
+			modelRevision: 'sha256:fixture-detector',
+			analyze: async () => ({ objects: [{ class: 'person', confidence: 0.9, bbox: detectionIndex++ === 0 ? [10, 10, 30, 50] : [14, 10, 34, 50] }] }),
+		};
+
+		const result = await processCanonicalVideoAnalysisV1({
+			evidenceId: EVIDENCE_ID, caseId: CASE_ID, analysisJobId: JOB_ID, uploadedBy: 7,
+			sourceRevision: sourceRevision(bytes), fileName: 'fixture-track.mp4', bytes,
+		}, dependencies({ loadDetector: async () => detector }));
+
+		const frames = mocks.persist.mock.calls.at(-1)?.[0]?.frames as Array<{
+			trackScopeId: string;
+			objects: Array<{ trackId: string; centerPx: [number, number]; velocityPxPerSecond: [number, number] | null; trackState: string }>;
+		}>;
+		expect(frames.map((entry) => entry.objects[0]?.trackId)).toEqual(['track-0001', 'track-0001']);
+		expect(frames[0]?.trackScopeId).toMatch(/^sha256:[a-f0-9]{64}$/);
+		expect(frames[0]?.trackScopeId).toBe(frames[1]?.trackScopeId);
+		expect(frames[0]?.objects[0]).toMatchObject({ velocityPxPerSecond: null, trackState: 'UNREVIEWED_TRACK_HYPOTHESIS' });
+		expect(frames[1]?.objects[0]?.velocityPxPerSecond?.[0]).toBeGreaterThan(0);
+		expect(result?.canonicalReceiptVerified).toBe(true);
+	});
+
 	it('fails closed when skim manifest readback misses tile or sample records', async () => {
 		const bytes = Buffer.from('fixture-skim-readback-mismatch');
 		const extractSkimPreview = vi.fn(async (input: { onTile(tile: { index: number; bytes: Buffer; sampleTimestampsMs: number[]; firstSampleIndex: number }): Promise<void> }) => {
@@ -248,6 +319,29 @@ describe('durable video analysis worker stage', () => {
 		expect(computeVideoFrameSampleRateV1(4 * 60 * 60)).toBeCloseTo(1 / 240, 12);
 		expect(mocks.extractFrames).toHaveBeenCalledWith(bytes, { fps: 1 / 240, maxFrames: 60 });
 		expect(mocks.persist).toHaveBeenCalledWith(expect.objectContaining({ samplingFps: 1 / 240 }), expect.anything());
+	});
+
+	it('runs weight-free: no admitted detector records yolo UNAVAILABLE and keeps frame proposals', async () => {
+		const bytes = Buffer.from('fixture-video-no-detector');
+		const result = await processCanonicalVideoAnalysisV1({
+			evidenceId: EVIDENCE_ID,
+			caseId: CASE_ID,
+			analysisJobId: JOB_ID,
+			uploadedBy: 7,
+			sourceRevision: sourceRevision(bytes),
+			fileName: 'no-detector.mp4',
+			bytes,
+		}, dependencies());
+
+		expect(mocks.loadDetector).toHaveBeenCalled();
+		expect(mocks.persist).toHaveBeenCalledWith(expect.objectContaining({
+			detectorStatus: 'UNAVAILABLE',
+			frames: [expect.objectContaining({ reviewState: 'UNREVIEWED_PROPOSAL' })],
+		}), expect.anything());
+		expect(result).toMatchObject({
+			canonicalReceiptVerified: true,
+			readback: expect.objectContaining({ frameFindingCount: 1 }),
+		});
 	});
 
 	it('skips audio work on silent video and persists only source-bound frame proposals', async () => {

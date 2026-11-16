@@ -1393,6 +1393,41 @@ server.registerTool(
 );
 
 server.registerTool(
+  'media.transcribe',
+  {
+    description:
+      'Transcribe a local audio file (WAV/MP3/M4A) through the faster-whisper ASR worker (:8093). The path must lie under an allowed worker root (Music or sveltekit-frontend/temp/media). Returns transcript text, language and timed segments. Read-only: writes no database rows.',
+    inputSchema: z.object({
+      path: z.string().min(1).max(4096).describe('Absolute or repo-relative path to an audio file under an allowed root'),
+    }),
+  },
+  async ({ path }) => {
+    const { transcribeAudio } = await import('../lib/server/analysis/media-processing.js');
+    try {
+      const result = await transcribeAudio(path, 'trace-media-transcribe');
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify({
+              language: result.language,
+              text: result.text,
+              segments: result.chunks,
+              wordCount: result.text.split(/\s+/).filter(Boolean).length,
+            }),
+          },
+        ],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: 'text' as const, text: JSON.stringify({ error: (err as Error).message }) }],
+        isError: true,
+      };
+    }
+  }
+);
+
+server.registerTool(
   'wiki.status',
   {
     description:
