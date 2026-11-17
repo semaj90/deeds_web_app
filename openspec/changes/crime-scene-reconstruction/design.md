@@ -42,3 +42,20 @@
 - Clip window: budget check against the selected model's token budget (SCENE-18).
 - Renderer and frame-hash determinism (SCENE-24).
 - Browser run of upload → set the scene → job → artifact → Detective Mode load (SCENE-08).
+
+## API contract (AUD-05, proposed, no code)
+
+Follows the existing scene routes under `src/routes/api/cases/[id]/scenes/`: the `{ success, data, message }` envelope, case access through `getAuthorizedCase` (`src/lib/server/case-access.ts`), and writes gated by `ENV.SCENE_PERSISTENCE_ENABLED`, which stays off until MAP-01 and the schema are admitted.
+
+| Method and path | Purpose | Notes |
+|---|---|---|
+| `POST /api/cases/[id]/scenes/jobs` | Create a scene job (SCENE-02) | Idempotent on `(case, evidence revisions, clipSeconds, seed)`. Body validated by Zod. Returns the existing job on replay. Writes gated. |
+| `GET /api/cases/[id]/scenes/jobs/[jobId]` | Read job status and failure reason | Read only. Status vocabulary: queued, running, completed, failed, source_missing. |
+| `GET /api/cases/[id]/scenes/[sceneKey]/proposals` | List proposals (SceneIntent plus provenance) | Read only. Returns proposals with `kind` and citations. |
+| `POST /api/cases/[id]/scenes/[sceneKey]/proposals/[proposalId]/review` | Reviewer decision (REV-06, VR-14) | Server-side only. Checks case access, reviewer authority, the source revision and the expected scene revision, then writes an audit row. The client never sends the canonical state. Gated. |
+
+Rules:
+- Upload never creates a job. Only the explicit set-the-scene action does (SCENE-01).
+- The planner runs in a worker, not in the request (SCENE-04). The request returns the job id.
+- Every write goes through the existing scene-revision owner once MAP-01 is settled; no new scene table is created here.
+- Routes are added only after the existing `[sceneKey]` and `[sceneId]` routes are checked for overlap.
