@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { sceneRevisionCommandV1Schema, validateSceneRevisionBindingV1, validateSceneEvidenceSourceBindingsV1, hashSceneDocumentV1, verifySceneDocumentRevisionReadbackV1 } from './scene-document-revisions-v1.js';
+import { sceneRevisionCommandV1Schema, validateSceneRevisionBindingV1, validateSceneEvidenceSourceBindingsV1, validateSceneVideoEventBindingsV1, hashSceneDocumentV1, verifySceneDocumentRevisionReadbackV1 } from './scene-document-revisions-v1.js';
 import { createSceneCalibrationV1, SPZ_DECODER_REVISION_V1, SPZ_GAUSSIAN_REPRESENTATION_REVISION_V1 } from '$lib/splat/scene-document-v1.js';
 import type { CalibrationAnchor } from '$lib/splat/calibration.js';
+import { fuseVideoEventsV1 } from '$lib/server/features/evidence/video/video-event-fusion-v1.js';
 
 const caseId = '11111111-1111-4111-8111-111111111111';
 const sceneId = '22222222-2222-4222-8222-222222222222';
@@ -83,6 +84,41 @@ describe('scene document revision v1 admission', () => {
 		expect(() => validateSceneEvidenceSourceBindingsV1(base as never)).not.toThrow();
 		expect(() => validateSceneEvidenceSourceBindingsV1({ ...base, evidenceRows: [{ id: evidenceId, caseId, hash: `sha256:${'b'.repeat(64)}` }] } as never)).toThrow('SCENE_REVISION_EVIDENCE_SOURCE_NOT_REGISTERED');
 		expect(() => validateSceneEvidenceSourceBindingsV1({ ...base, evidenceRows: [{ id: evidenceId, caseId: '55555555-5555-4555-8555-555555555555', hash: sourceRevision }] } as never)).toThrow('SCENE_REVISION_EVIDENCE_SOURCE_NOT_REGISTERED');
+	});
+
+	it('admits only the exact currently approved source-time event from the canonical evidence row', () => {
+		const analysisRevision = 'video-analysis-v1:scene-event-test';
+		const proposed = fuseVideoEventsV1({
+			evidenceId, caseId, transcriptId: commandId, sourceRevision, analysisRevision,
+			frames: [], transcriptSegments: [{ segmentIndex: 0, startMs: 1200, endMs: 1800, text: 'Door opens.' }]
+		});
+		const event = proposed.events[0]!;
+		const approvedTimeline = {
+			...proposed,
+			events: [{ ...event, reviewStatus: 'APPROVED' as const, sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL' as const, reviewedBy: 7, reviewedAt: '2026-11-16T20:00:00.000Z' }]
+		};
+		const videoEventBindings = [{
+			evidenceId, sourceRevision, analysisRevision, eventId: event.eventId,
+			startMs: event.startMs, endMs: event.endMs, reviewState: 'APPROVED_FOR_SCENE_PROPOSAL' as const
+		}];
+		const sceneManifest = sceneRevisionCommandV1Schema.parse({
+			commandId, expectedRevision: 0,
+			manifest: manifest({ evidenceBindings: [{ evidenceId, sourceRevision }], videoEventBindings })
+		}).manifest;
+		const evidenceRows = [{ id: evidenceId, caseId, hash: sourceRevision, aiAnalysis: { videoAnalysis: { eventTimeline: approvedTimeline } } }];
+		expect(() => validateSceneVideoEventBindingsV1({ caseId, manifest: sceneManifest, evidenceRows })).not.toThrow();
+		expect(() => validateSceneVideoEventBindingsV1({
+			caseId, manifest: sceneManifest, evidenceRows: [{ ...evidenceRows[0], aiAnalysis: { videoAnalysis: { eventTimeline: proposed } } }]
+		})).toThrow('SCENE_REVISION_VIDEO_EVENT_NOT_ADMITTED');
+		expect(() => validateSceneVideoEventBindingsV1({
+			caseId, manifest: sceneRevisionCommandV1Schema.parse({
+				commandId, expectedRevision: 0,
+				manifest: manifest({ evidenceBindings: [{ evidenceId, sourceRevision }], videoEventBindings: [{ ...videoEventBindings[0], analysisRevision: 'stale-run' }] })
+			}).manifest, evidenceRows
+		})).toThrow('SCENE_REVISION_VIDEO_EVENT_NOT_ADMITTED');
+		expect(() => validateSceneVideoEventBindingsV1({
+			caseId, manifest: sceneManifest, evidenceRows: [{ ...evidenceRows[0], caseId: '55555555-5555-4555-8555-555555555555' }]
+		})).toThrow('SCENE_REVISION_VIDEO_EVENT_SOURCE_NOT_REGISTERED');
 	});
 
 	it('admits calibration only when its source revision is registered to the same canonical case evidence row', () => {

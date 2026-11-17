@@ -98,7 +98,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 					frameIndex: index,
 					timestamp: Number(frame.timestampMs ?? 0) / 1000,
 					timestampMs: Number(frame.timestampMs ?? 0),
-					framePath: null,
+					framePath: `/api/evidence/${encodeURIComponent(evidenceId)}/video-frame/${index}`,
 					description: detections.length
 						? `Model observations: ${detections.map((detection) => String(detection.label)).join(', ')}`
 						: 'Sampled video frame; no reviewed finding is recorded.',

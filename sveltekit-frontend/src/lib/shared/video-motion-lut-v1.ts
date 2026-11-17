@@ -8,6 +8,10 @@ export const VIDEO_MOTION_LUT_BIT_DEPTH_V1 = 4;
 export const VIDEO_MOTION_LUT_HEADER_BYTES_V1 = 16;
 export const VIDEO_MOTION_LUT_PIXEL_BYTES_V1 = VIDEO_MOTION_LUT_WIDTH_V1 * VIDEO_MOTION_LUT_HEIGHT_V1 / 2;
 export const VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1 = VIDEO_MOTION_LUT_HEADER_BYTES_V1 + VIDEO_MOTION_LUT_PIXEL_BYTES_V1;
+/** Canonical display lookup: 16 evenly spaced grayscale values for the packed 4-bit motion index. */
+export const VIDEO_MOTION_GRAYSCALE_LUT_V1 = Object.freeze([
+	0, 17, 34, 51, 68, 85, 102, 119, 136, 153, 170, 187, 204, 221, 238, 255,
+] as const);
 
 const MAGIC = new Uint8Array([0x41, 0x54, 0x4c, 0x4d, 0x4f, 0x54, 0x31, 0x00]); // "ATLMOT1\0"
 

@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { createEvidenceVersion } from '$lib/server/features/evidence/index.js';
 import { isUuid } from '$lib/server/validation.js';
 import { getAuthorizedCase } from '$lib/server/case-access.js';
+import { ENV } from '$lib/server/env.server.js';
 import {
   EvidenceRevisionErrorV1,
   MAX_REVISION_IMAGE_BYTES,
@@ -153,10 +154,10 @@ async function handleMarkupRevision(evidenceId: string, userId: number, request:
  * Return version history for an evidence item.
  */
 export const GET: RequestHandler = async ({ params, locals, url }) => {
-  if (!locals.user) return json({ evidenceId: params.id, versions: [], count: 0, error: 'Unauthorized' }, { status: 401, headers: { 'Cache-Control': 'private, no-store' } });
+  if (!locals.user) return json({ evidenceId: params.id, versions: [], count: 0, reviewEnabled: false, error: 'Unauthorized' }, { status: 401, headers: { 'Cache-Control': 'private, no-store' } });
 
   const { id } = params;
-  if (!isUuid(id)) return json({ evidenceId: id, versions: [], count: 0, error: 'Invalid evidence ID format' }, { status: 400, headers: { 'Cache-Control': 'private, no-store' } });
+  if (!isUuid(id)) return json({ evidenceId: id, versions: [], count: 0, reviewEnabled: false, error: 'Invalid evidence ID format' }, { status: 400, headers: { 'Cache-Control': 'private, no-store' } });
 
   try {
     const requestedLimit = Number.parseInt(url.searchParams.get('limit') ?? '50', 10);
@@ -164,17 +165,17 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 
     // Match revision-write authorization: owner or authorized case collaborator.
     const actorId = Number(locals.user.id);
-    if (!Number.isSafeInteger(actorId) || actorId < 1) return json({ error: 'Unauthorized' }, { status: 401 });
+    if (!Number.isSafeInteger(actorId) || actorId < 1) return json({ evidenceId: id, versions: [], count: 0, reviewEnabled: false, error: 'Unauthorized' }, { status: 401 });
     const [source] = await db
       .select({ id: evidence.id, caseId: evidence.caseId, userId: evidence.userId })
       .from(evidence)
       .where(eq(evidence.id, id))
       .limit(1);
-    if (!source) return json({ evidenceId: id, versions: [], count: 0, error: 'Evidence not found' }, { status: 404, headers: { 'Cache-Control': 'private, no-store' } });
+    if (!source) return json({ evidenceId: id, versions: [], count: 0, reviewEnabled: false, error: 'Evidence not found' }, { status: 404, headers: { 'Cache-Control': 'private, no-store' } });
     const authorized = source.caseId
       ? Boolean(await getAuthorizedCase(source.caseId, actorId))
       : source.userId === actorId;
-    if (!authorized) return json({ evidenceId: id, versions: [], count: 0, error: 'Evidence not found' }, { status: 404, headers: { 'Cache-Control': 'private, no-store' } });
+    if (!authorized) return json({ evidenceId: id, versions: [], count: 0, reviewEnabled: false, error: 'Evidence not found' }, { status: 404, headers: { 'Cache-Control': 'private, no-store' } });
 
     const versions = await db
       .select({
@@ -197,12 +198,13 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
         evidenceId: id,
         versions,
         count: versions.length,
+        reviewEnabled: ENV.EVIDENCE_TRANSCRIPT_REVIEW_ENABLED,
       },
       { headers: { 'Cache-Control': 'private, no-store' } }
     );
   } catch (err) {
     console.error('[evidence/versions] GET error:', err);
-    return json({ evidenceId: id, versions: [], count: 0, error: 'Unable to load revision history' }, { headers: { 'Cache-Control': 'private, no-store' } });
+    return json({ evidenceId: id, versions: [], count: 0, reviewEnabled: false, error: 'Unable to load revision history' }, { headers: { 'Cache-Control': 'private, no-store' } });
   }
 };
 

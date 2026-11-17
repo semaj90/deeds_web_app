@@ -1557,7 +1557,7 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 												disabled={mediaState !== 'ready'}
 												oninput={(event) => {
 													if (videoSkimScanTimer !== null) stopVideoSkimScan(false);
-													skimPreviewIndex = Number(event.currentTarget.value);
+					skimPreviewIndex = Number((event.currentTarget as HTMLInputElement).value);
 												}}
 												onchange={seekToVideoSkimSelection}
 											/>

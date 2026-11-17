@@ -1,8 +1,10 @@
 import { mkdir, readFile } from 'node:fs/promises';
 import { dirname, extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 import { test, expect } from '@playwright/test';
 import { encodeVideoMotionLutV1, VIDEO_MOTION_LUT_HEIGHT_V1, VIDEO_MOTION_LUT_WIDTH_V1 } from '../../src/lib/shared/video-motion-lut-v1.js';
+import { stableStringifySceneDocumentV1 } from '../../src/lib/splat/scene-document-v1.js';
 
 const evidenceId = '4cf3e0c4-f3c7-4e0a-9a7e-1adf01dd7291';
 const caseId = 'b8fbe1be-7024-4b72-bdae-e3a1b4a83f8e';
@@ -18,6 +20,18 @@ const title = isSyntheticFixture ? 'Synthetic hallway video' : 'Local video play
 const fixtureVideo = await readFile(fixturePath);
 const sourceRevision = `sha256:${'a'.repeat(64)}`;
 const analysisRevision = 'video-analysis-motion-fixture-v1';
+const videoEventId = '55555555-5555-4555-8555-555555555555';
+const videoEventTimeline = {
+	schema: 'atlas.video-event-timeline.v1', processingRevision: 'video-event-fusion-v1', evidenceId, caseId,
+	sourceRevision, analysisRevision, status: 'PROPOSED', canonicalAuthority: false,
+	orderingSemantics: 'SOURCE_TIME_DISPLAY_ONLY_NOT_CAUSAL', bucketWidthMs: 10_000, omittedObservationCount: 0,
+	events: [{
+		eventId: videoEventId, startMs: 1000, endMs: 1800, label: 'Evidence observations 00:00:01.000–00:00:01.800',
+		summary: 'Unreviewed transcript excerpt: “Door opens.”',
+		sourceReferences: [{ kind: 'transcript_segment', referenceId: '66666666-6666-4666-8666-666666666666', transcriptId: '77777777-7777-4777-8777-777777777777', segmentIndex: 0, startMs: 1000, endMs: 1800, text: 'Door opens.', modelRevision: 'fixture-whisper' }],
+		reviewStatus: 'APPROVED', sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', reviewedBy: 7, reviewedAt: '2026-11-16T20:00:00.000Z'
+	}]
+};
 const motionTile = Buffer.from(encodeVideoMotionLutV1(
 	new Uint8Array(VIDEO_MOTION_LUT_WIDTH_V1 * VIDEO_MOTION_LUT_HEIGHT_V1),
 	new Uint8Array(VIDEO_MOTION_LUT_WIDTH_V1 * VIDEO_MOTION_LUT_HEIGHT_V1).fill(255),
@@ -29,12 +43,15 @@ const liveStorageState = process.env.PLAYWRIGHT_LIVE_VIDEO_STORAGE_STATE ?? proc
 
 test('native video modal decodes and a transcript cue seeks with byte-range loading', async ({ page }, testInfo) => {
 	const pageErrors: string[] = [];
+	const pageWarnings: string[] = [];
 	let posePostBody: Record<string, any> | null = null;
 	const evidenceApiTrace: string[] = [];
 	const evidenceApiRequests: string[] = [];
 	const rangeResponses: number[] = [];
 	const mediaRequests: string[] = [];
+	let savedSceneRevision: { revision: number; manifestSha256: string; manifest: Record<string, any> } | null = null;
 	page.on('pageerror', (error) => pageErrors.push(error.message));
+	page.on('console', (message) => { if (message.type() === 'warning') pageWarnings.push(message.text()); });
 	page.on('response', (response) => {
 		const url = new URL(response.url());
 		if (url.pathname.startsWith('/api/evidence/')) evidenceApiTrace.push(`${response.status()} ${response.request().method()} ${url.pathname}${url.search}`);
@@ -58,7 +75,7 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 			hash: `sha256:${'a'.repeat(64)}`
 		})
 	}));
-	await page.addInitScript(({ targetEvidenceId, targetCaseId, targetAnalysisRevision }) => {
+	await page.addInitScript(({ targetEvidenceId, targetCaseId, targetAnalysisRevision, targetEventTimeline, targetMotionTileBytes }) => {
 		const previousPose = {
 			schema: 'atlas.pose-observation.v1', evidenceId: targetEvidenceId,
 			sourceSha256: `sha256:${'a'.repeat(64)}`, sourceRevision: `sha256:${'a'.repeat(64)}`,
@@ -73,7 +90,7 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 			metadata: { annotation: { poseObservations: [previousPose] } },
 		}];
 		const nativeFetch = window.fetch.bind(window);
-		(window as any).__poseFixture = { postBody: null, requests: [] as string[] };
+		(window as any).__poseFixture = { postBody: null, reviewBody: null, requests: [] as string[] };
 		window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
 			const requestUrl = new URL(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url, location.href);
 			const requestMethod = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
@@ -87,8 +104,29 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 					segments: [{ id: 'cue-door', startMs: 1000, endMs: 1800, text: 'Door opens.', speakerId: 'speaker-01', reviewStatus: 'unreviewed_proposal' }],
 				}), { status: 200, headers: { 'Content-Type': 'application/json' } });
 			}
+			if (requestUrl.pathname === `/api/evidence/${targetEvidenceId}/motion-preview/0`) {
+				return new Response(Uint8Array.from(targetMotionTileBytes), { status: 200, headers: {
+					'Content-Type': 'application/vnd.atlas.video-motion-lut-v1',
+					'Cache-Control': 'private, no-store',
+					'X-Source-Revision': `sha256:${'a'.repeat(64)}`,
+					'X-Analysis-Revision': targetAnalysisRevision,
+					'X-Frame-Timestamp-Ms': '1000',
+				} });
+			}
 			if (requestUrl.pathname === `/api/evidence/${targetEvidenceId}/video-events`) {
-				return new Response(JSON.stringify({ success: true, eventTimeline: null, reviewEnabled: false }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+				return new Response(JSON.stringify({ success: true, eventTimeline: targetEventTimeline, reviewEnabled: false }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+			}
+			if (requestUrl.pathname === `/api/evidence/${targetEvidenceId}/pose-review` && requestMethod === 'POST') {
+				const body = JSON.parse(String(init?.body ?? '{}'));
+				(window as any).__poseFixture.reviewBody = body;
+				revisions.unshift({ id: 'pose-review-decision-1', version: 3, createdAt: '2026-11-16T20:01:00Z', changeReason: 'Pose review', metadata: {
+					schema: 'atlas.pose-review-decision.v1', evidenceId: targetEvidenceId, caseId: targetCaseId,
+					sourceSha256: body.parentSha256, analysisRevision: body.analysisRevision,
+					annotationRevisionId: body.annotationRevisionId, frameIndex: body.frameIndex, framePtsUs: body.framePtsUs,
+					skeletonSchemaId: body.skeletonSchemaId, trackId: body.trackId, trackScopeId: body.trackScopeId,
+					decision: body.decision, reviewerUserId: 7, sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false,
+				} });
+				return new Response(JSON.stringify({ ok: true, evidenceId: targetEvidenceId, decision: body.decision, sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false }), { status: 201, headers: { 'Content-Type': 'application/json' } });
 			}
 			if (requestUrl.pathname !== `/api/evidence/${targetEvidenceId}/versions`) return nativeFetch(input, init);
 			if (requestMethod === 'POST') {
@@ -97,9 +135,9 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 				revisions.unshift({ id: 'pose-revision-1', version: 2, createdAt: '2026-11-16T20:00:00Z', changeReason: 'Manual pose proposal', metadata: { annotation: body.annotation } });
 				return new Response(JSON.stringify({ ok: true, committed: true, version: 2 }), { status: 201, headers: { 'Content-Type': 'application/json' } });
 			}
-			return new Response(JSON.stringify({ evidenceId: targetEvidenceId, versions: revisions, count: revisions.length }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+			return new Response(JSON.stringify({ evidenceId: targetEvidenceId, versions: revisions, count: revisions.length, reviewEnabled: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 		};
-	}, { targetEvidenceId: evidenceId, targetCaseId: caseId, targetAnalysisRevision: analysisRevision });
+	}, { targetEvidenceId: evidenceId, targetCaseId: caseId, targetAnalysisRevision: analysisRevision, targetEventTimeline: videoEventTimeline, targetMotionTileBytes: Array.from(motionTile) });
 	await page.route(`**/api/evidence/${evidenceId}/frames**`, (route) => route.fulfill({
 		status: 200,
 		contentType: 'application/json',
@@ -121,7 +159,7 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 			},
 		] })
 	}));
-	await page.route(`**/api/evidence/${evidenceId}/motion-preview/0`, (route) => route.fulfill({
+	await page.route((url) => new URL(url).pathname === `/api/evidence/${evidenceId}/motion-preview/0`, (route) => route.fulfill({
 		status: 200,
 		contentType: 'application/vnd.atlas.video-motion-lut-v1',
 		headers: {
@@ -135,8 +173,18 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 	await page.route(`**/api/evidence/${evidenceId}/video-events`, (route) => route.fulfill({
 		status: 200,
 		contentType: 'application/json',
-		body: JSON.stringify({ success: true, eventTimeline: null, reviewEnabled: false })
+		body: JSON.stringify({ success: true, eventTimeline: videoEventTimeline, reviewEnabled: false })
 	}));
+	await page.route('**/api/cases/*/scenes/*/revisions', async (route) => {
+		if (route.request().method() === 'GET') {
+			return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: savedSceneRevision, message: savedSceneRevision ? 'OK' : 'No scene revision' }) });
+		}
+		const command = route.request().postDataJSON() as { manifest: Record<string, any> };
+		const manifest = command.manifest;
+		const manifestSha256 = createHash('sha256').update(stableStringifySceneDocumentV1(manifest), 'utf8').digest('hex');
+		savedSceneRevision = { revision: manifest.revision, manifestSha256, manifest };
+		return route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify({ success: true, data: { ...savedSceneRevision, replayed: false }, message: 'Saved' }) });
+	});
 	await page.route(`**/api/evidence/${evidenceId}/transcript**`, (route) => {
 		const url = new URL(route.request().url());
 		if (url.searchParams.has('export')) {
@@ -211,10 +259,15 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 	await page.locator('.filmstrip-frame-card').first().click();
 	const motionPreview = page.getByRole('figure', { name: 'Low-resolution frame-to-frame motion cue' });
 	await expect(motionPreview).toBeVisible();
-	await expect(motionPreview.getByText('100% change')).toBeVisible();
+	await expect.poll(() => motionPreview.textContent(), { timeout: 15_000 }).toContain('100% change').catch(async () => {
+		const motionStatus = await motionPreview.textContent();
+		const clientRequests = await page.evaluate(() => (window as any).__poseFixture?.requests ?? []);
+		throw new Error(`Expected the fixture motion tile to render at 100% change; preview="${motionStatus}", evidence responses=${JSON.stringify(evidenceApiTrace)}, client requests=${JSON.stringify(clientRequests)}, warnings=${JSON.stringify(pageWarnings)}`);
+	});
 	await expect(motionPreview.locator('canvas:not(.hidden)')).toBeVisible();
 	const motionRenderer = await motionPreview.getAttribute('data-renderer');
 	expect(['webgpu', 'webgl2', 'canvas2d']).toContain(motionRenderer);
+	if (testInfo.project.name === 'chromium-webgl2-motion') expect(motionRenderer).toBe('webgl2');
 	await testInfo.attach('motion-preview-renderer', { body: motionRenderer ?? 'unknown', contentType: 'text/plain' });
 	await expect(page.getByText(/track IDs are hypotheses scoped to this evidence revision and analysis run/i)).toBeVisible();
 	await page.getByRole('button', { name: 'Add manual human pose' }).click();
@@ -240,6 +293,16 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 	expect(posePostBody?.annotation.poseObservations[0].keypoints).toHaveLength(17);
 	await expect(page.getByText('1/17 placed · current: left_eye')).toBeVisible();
 	await expect(page.getByRole('region', { name: 'Saved pose samples for selected track' }).getByText('2 source-frame pose samples for track-0001')).toBeVisible();
+	const poseSamples = page.getByRole('region', { name: 'Saved pose samples for selected track' });
+	await poseSamples.getByRole('button', { name: 'Accept for scene proposal' }).first().click();
+	await expect(page.getByText('Pose accepted for scene proposal; it is still not calibrated world geometry.')).toBeVisible();
+	await expect(poseSamples.getByText('Accepted for scene proposal')).toBeVisible();
+	const poseReviewBody = await page.evaluate(() => (window as any).__poseFixture.reviewBody);
+	expect(poseReviewBody).toMatchObject({
+		schema: 'atlas.pose-review-request.v1', caseId, parentSha256: sourceRevision,
+		analysisRevision, frameIndex: 0, framePtsUs: 1_000_000,
+		annotationRevisionId: 'pose-revision-1', decision: 'ACCEPTED_FOR_SCENE_PROPOSAL',
+	});
 	await expect(page.getByRole('region', { name: 'Adjacent pose sample motion in source pixels' }).getByText('Frame 0 → 1 · 500 ms')).toBeVisible();
 	await expect(page.getByRole('region', { name: 'Adjacent pose sample motion in source pixels' }).getByText(/nose: Δx .* px, Δy .* px/)).toBeVisible();
 	await page.getByRole('button', { name: 'Seek to pose sample frame 1' }).click();
@@ -256,8 +319,14 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 	await page.getByTestId('open-video-transcript').click();
 	const drawer = page.getByTestId('video-transcript-drawer');
 	await testInfo.attach('evidence-api-trace', { body: evidenceApiTrace.join('\n'), contentType: 'text/plain' });
-	await expect(drawer.getByText('Door opens.')).toBeVisible();
-	await drawer.getByRole('button', { name: 'Seek to 0:01' }).click();
+	await expect(drawer.getByText('Door opens.', { exact: true })).toBeVisible();
+	await drawer.getByRole('button', { name: 'Add to scene timeline' }).click();
+	await expect(drawer.getByRole('status').filter({ hasText: /Saved as scene revision 1; source time 0:01–0:01/ })).toBeVisible();
+	expect(savedSceneRevision?.manifest.videoEventBindings).toEqual([{
+		evidenceId, sourceRevision, analysisRevision, eventId: videoEventId, startMs: 1000, endMs: 1800,
+		reviewState: 'APPROVED_FOR_SCENE_PROPOSAL'
+	}]);
+	await drawer.getByRole('button', { name: 'Seek to 0:01' }).last().click();
 	await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime)).toBeGreaterThanOrEqual(0.95);
 	if (isSyntheticFixture) {
 		await mkdir(dirname(proofScreenshot), { recursive: true });

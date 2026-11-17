@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import { decodeVideoMotionLutIndicesV1, buildPackedMotionLodsV1, VIDEO_MOTION_LUT_HEIGHT_V1, VIDEO_MOTION_LUT_WIDTH_V1 } from '$lib/shared/video-motion-lut-v1.js';
+	import { decodeVideoMotionLutIndicesV1, buildPackedMotionLodsV1, VIDEO_MOTION_GRAYSCALE_LUT_V1, VIDEO_MOTION_LUT_HEIGHT_V1, VIDEO_MOTION_LUT_WIDTH_V1 } from '$lib/shared/video-motion-lut-v1.js';
 	import { n64TextureLOD } from '$lib/webgpu/N64TextureLODSystem.js';
 
 	let {
@@ -33,9 +33,10 @@
 	let lastWebglIndices: Uint8Array | null = null;
 	let webglContextLost = false;
 
-	function releaseResidentTexture() {
-		if (residentTextureId) n64TextureLOD.unregisterTexture(residentTextureId);
-		residentTextureId = null;
+	function releaseResidentTexture(textureId = residentTextureId) {
+		if (!textureId) return;
+		n64TextureLOD.unregisterTexture(textureId);
+		if (residentTextureId === textureId) residentTextureId = null;
 	}
 
 	function compileWebglShader(gl: WebGL2RenderingContext, kind: number, source: string): WebGLShader {
@@ -57,17 +58,22 @@
 		const gl = webglCanvas.getContext('webgl2', { alpha: false, antialias: false, depth: false, stencil: false, preserveDrawingBuffer: false });
 		if (!gl) return false;
 		webglContext = gl;
+		let vertex: WebGLShader | null = null;
+		let fragment: WebGLShader | null = null;
+		let program: WebGLProgram | null = null;
+		let buffer: WebGLBuffer | null = null;
 		try {
-			const vertex = compileWebglShader(gl, gl.VERTEX_SHADER, `#version 300 es
+			vertex = compileWebglShader(gl, gl.VERTEX_SHADER, `#version 300 es
 				in vec2 position;
 				void main() { gl_Position = vec4(position, 0.0, 1.0); }
 			`);
-			const fragment = compileWebglShader(gl, gl.FRAGMENT_SHADER, `#version 300 es
+			fragment = compileWebglShader(gl, gl.FRAGMENT_SHADER, `#version 300 es
 				precision highp float;
 				precision highp int;
 				precision highp usampler2D;
 				uniform highp usampler2D packedMotion;
 				uniform ivec2 packedSize;
+				const int motionLut[16] = int[16](${VIDEO_MOTION_GRAYSCALE_LUT_V1.join(', ')});
 				out vec4 outColor;
 				void main() {
 					int x = clamp(int(gl_FragCoord.x), 0, 63);
@@ -76,11 +82,11 @@
 					int sourceY = min((y * packedSize.y) / 128, packedSize.y - 1);
 					uint packed = texelFetch(packedMotion, ivec2(sourceX / 2, sourceY), 0).r;
 					uint index = (sourceX & 1) == 0 ? (packed & 15u) : (packed >> 4u);
-					float value = float(index) / 15.0;
-					outColor = vec4(value, value * 0.72, value * 0.22, 1.0);
+					float value = float(motionLut[index]) / 255.0;
+					outColor = vec4(value, value, value, 1.0);
 				}
 			`);
-			const program = gl.createProgram();
+			program = gl.createProgram();
 			if (!program) throw new Error('WebGL2 program allocation failed.');
 			gl.attachShader(program, vertex);
 			gl.attachShader(program, fragment);
@@ -89,7 +95,7 @@
 			gl.deleteShader(vertex);
 			gl.deleteShader(fragment);
 			if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program) ?? 'WebGL2 program linking failed.');
-			const buffer = gl.createBuffer();
+			buffer = gl.createBuffer();
 			if (!buffer) throw new Error('WebGL2 vertex buffer allocation failed.');
 			gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
@@ -115,6 +121,10 @@
 			}
 			return true;
 		} catch {
+			if (vertex) gl.deleteShader(vertex);
+			if (fragment) gl.deleteShader(fragment);
+			if (program) gl.deleteProgram(program);
+			if (buffer) gl.deleteBuffer(buffer);
 			webglProgram = null;
 			webglVertexBuffer = null;
 			return false;
@@ -175,16 +185,18 @@
 		const selectedLod = Math.max(0, lods.length - 2);
 		const texture = await n64TextureLOD.requestTexture(cacheKey, selectedLod);
 		if (!texture || signal.aborted) {
-			releaseResidentTexture();
+			// A newer frame may now own the component's resident texture. Release only
+			// this stale request's cache entry; never evict the newer revision's tile.
+			releaseResidentTexture(cacheKey);
 			return false;
 		}
 
 		gpuContext ??= gpuCanvas.getContext('webgpu') as GPUCanvasContext | null;
 		if (!gpuContext) {
-			releaseResidentTexture();
+			releaseResidentTexture(cacheKey);
 			return false;
 		}
-		const format = navigator.gpu.getPreferredCanvasFormat();
+		const format = navigator.gpu.getPreferredCanvasFormat() as GPUTextureFormat;
 		if (!gpuConfigured) {
 			gpuContext.configure({ device, format, alphaMode: 'opaque' });
 			gpuConfigured = true;
@@ -202,6 +214,7 @@
 			},
 			fragment: {
 				module: device.createShaderModule({ code: `
+					const motionLut = array<u32, 16>(${VIDEO_MOTION_GRAYSCALE_LUT_V1.map((value) => `${value}u`).join(', ')});
 					@group(0) @binding(0) var motion: texture_2d<u32>;
 					@fragment fn fs(@builtin(position) p: vec4f) -> @location(0) vec4f {
 						let dims = textureDimensions(motion);
@@ -210,8 +223,8 @@
 						let y = min(u32(p.y * f32(dims.y) / 128.0), dims.y - 1u);
 						let packed = textureLoad(motion, vec2i(i32(x / 2u), i32(y)), 0).r;
 						let index = select(packed & 15u, packed >> 4u, (x & 1u) == 1u);
-						let value = f32(index) / 15.0;
-						return vec4f(value, value * 0.72, value * 0.22, 1.0);
+						let value = f32(motionLut[index]) / 255.0;
+						return vec4f(value, value, value, 1.0);
 					}
 				` }),
 				entryPoint: 'fs',
@@ -254,6 +267,9 @@
 		const expectedAnalysis = analysisRevision;
 		const expectedTimestamp = timestampMs;
 		const controller = new AbortController();
+		// Release the prior frame's GPU allocation as soon as evidence/analysis scope
+		// changes, rather than retaining stale pixels while the next artifact loads.
+		releaseResidentTexture();
 		status = 'loading';
 		activeRenderer = null;
 
@@ -287,11 +303,11 @@
 				if (!context) throw new Error('Canvas is unavailable.');
 				const image = context.createImageData(VIDEO_MOTION_LUT_WIDTH_V1, VIDEO_MOTION_LUT_HEIGHT_V1);
 				for (let pixel = 0; pixel < indices.length; pixel += 1) {
-					const intensity = Math.round((indices[pixel]! / 15) * 255);
+					const intensity = VIDEO_MOTION_GRAYSCALE_LUT_V1[indices[pixel]!]!;
 					const offset = pixel * 4;
 					image.data[offset] = intensity;
-					image.data[offset + 1] = Math.round(intensity * 0.72);
-					image.data[offset + 2] = Math.round(intensity * 0.22);
+					image.data[offset + 1] = intensity;
+					image.data[offset + 2] = intensity;
 					image.data[offset + 3] = 255;
 				}
 				context.putImageData(image, 0, 0);

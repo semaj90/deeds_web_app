@@ -4,6 +4,7 @@ import {
 	decodeVideoMotionLutIndicesV1,
 	encodeVideoMotionLutV1,
 	VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1,
+	VIDEO_MOTION_GRAYSCALE_LUT_V1,
 	VIDEO_MOTION_LUT_HEADER_BYTES_V1,
 	VIDEO_MOTION_LUT_HEIGHT_V1,
 	VIDEO_MOTION_LUT_PIXEL_BYTES_V1,
@@ -17,6 +18,7 @@ describe('video motion LUT v1', () => {
 		expect(VIDEO_MOTION_LUT_PIXEL_BYTES_V1).toBe(4096);
 		expect(VIDEO_MOTION_LUT_HEADER_BYTES_V1).toBe(16);
 		expect(VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1).toBe(4112);
+		expect(VIDEO_MOTION_GRAYSCALE_LUT_V1).toEqual(Array.from({ length: 16 }, (_, index) => index * 17));
 	});
 
 	it('quantizes deltas deterministically and packs even pixels low-nibble first', () => {

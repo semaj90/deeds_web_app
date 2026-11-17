@@ -5,7 +5,7 @@
  * as the dev admin user (00000000-0000-0000-0000-000000000001), which is the same identity
  * that browser tests use. This ensures seeded cases appear when navigating /cases.
  *
- * Also hard-deletes any stale [PW-TEST] cases from previous runs before seeding.
+ * Archives only stale [PW-TEST] cases from previous runs before seeding.
  */
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
@@ -59,18 +59,20 @@ export default async function globalSetup() {
 
   console.log('\n🌱  [global-setup] Cleaning up stale test cases …');
 
-  // Hard-delete any leftover [PW-TEST] cases from previous runs
+  // Archive old test fixtures only; preserve every case row for recovery/audit.
   const readiness = DB_URL ? await waitForDatabaseReady(DB_URL) : null;
   const pool = new pg.Pool({ connectionString: DB_URL || undefined });
   try {
     if (!readiness || readiness.state !== 'healthy') {
       throw new Error(`database ${readiness?.state ?? 'not configured'} (${readiness?.reason ?? 'NO_DATABASE_URL'})`);
     }
-    const result = await pool.query(`DELETE FROM cases WHERE title LIKE $1 RETURNING title`, [
+    const result = await pool.query(`UPDATE cases SET status = 'archived', updated_at = now()
+      WHERE title LIKE $1 AND created_at < now() - interval '7 days' AND status <> 'archived'
+      RETURNING title`, [
       `${TEST_CASE_PREFIX}%`,
     ]);
     if (result.rowCount && result.rowCount > 0) {
-      console.log(`   🗑️  Removed ${result.rowCount} stale test case(s) from previous runs`);
+      console.log(`   📦 Archived ${result.rowCount} stale test case(s) from previous runs`);
     } else {
       console.log('   ✓  No stale test cases to clean up');
     }

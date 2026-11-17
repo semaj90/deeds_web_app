@@ -166,6 +166,25 @@ describe('scene document v1', () => {
 		expect(() => createSceneDocumentV1(fixture({ caseId: sceneId, status: 'HYPOTHESIS', evidenceBindings: [binding, binding] }))).toThrow(/Duplicate evidence binding/);
 	});
 
+	it('records reviewed video events as source-time links, not invented 3D positions', () => {
+		const sourceBinding = { evidenceId: localSourceId, sourceRevision: `sha256:${hash}` };
+		const eventBinding = {
+			...sourceBinding, analysisRevision: 'video-analysis-v1:fixture', eventId: parentId,
+			startMs: 1200, endMs: 1800, reviewState: 'APPROVED_FOR_SCENE_PROPOSAL'
+		};
+		const document = createSceneDocumentV1(fixture({
+			caseId: sceneId, status: 'HYPOTHESIS', evidenceBindings: [sourceBinding], videoEventBindings: [eventBinding]
+		}));
+		expect(document.videoEventBindings?.[0]).toMatchObject({ eventId: parentId, startMs: 1200, endMs: 1800 });
+		expect(document).not.toHaveProperty('worldPosition');
+		expect(() => createSceneDocumentV1(fixture({
+			caseId: sceneId, status: 'HYPOTHESIS', videoEventBindings: [eventBinding]
+		}))).toThrow(/must match an evidence revision/);
+		expect(() => createSceneDocumentV1(fixture({
+			caseId: sceneId, status: 'HYPOTHESIS', evidenceBindings: [sourceBinding], videoEventBindings: [{ ...eventBinding, endMs: 1200 }]
+		}))).toThrow(/interval must be positive/);
+	});
+
 	it('stores recomputable SPZ-to-local-meter calibration bound to an admitted source hash', () => {
 		const points: Array<[number, number, number]> = [[0.1, 0, 0.2], [1.3, 0.4, -0.5], [-0.7, 0.9, 1.1]];
 		const anchors: CalibrationAnchor[] = points.map((splat, index) => {

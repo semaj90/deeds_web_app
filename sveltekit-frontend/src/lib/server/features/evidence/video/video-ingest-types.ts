@@ -20,6 +20,13 @@ export interface VideoTranscriptChunk {
   model: string;
   language?: string;
   translatedText?: string;
+  words?: VideoTranscriptWord[];
+}
+
+export interface VideoTranscriptWord {
+  startMs: number;
+  endMs: number;
+  text: string;
 }
 
 export interface VideoSummaryResult {

@@ -118,6 +118,101 @@ export interface EvidenceRevisionPortsV1 {
   findAnnotationRevision(evidenceId: string, annotationSha256: string): Promise<{ id: string; version: number } | null>;
   /** Must lock the source row, recheck its hash/case, dedupe, and append evidence_versions in one transaction. */
   insertAnnotationRevision(args: { evidenceId: string; caseId: string; parentSha256: string; annotationSha256: string; actorUserId: number; metadata: Record<string, unknown>; changeReason: string | null }): Promise<{ id: string; version: number; created: boolean }>;
+  loadAnnotationRevision(evidenceId: string, revisionId: string): Promise<{ id: string; version: number; metadata: unknown } | null>;
+  /** Lock/recheck the current evidence row and append the review decision under evidence_versions. */
+  insertPoseReviewDecision(args: { evidenceId: string; caseId: string; parentSha256: string; decisionSha256: string; metadata: Record<string, unknown>; changeReason: string | null }): Promise<{ id: string; version: number; created: boolean }>;
+}
+
+export interface SavePoseReviewDecisionInputV1 {
+  caseId: string;
+  evidenceId: string;
+  actorUserId: number;
+  parentSha256: string;
+  annotationRevisionId: string;
+  analysisRevision: string;
+  frameIndex: number;
+  framePtsUs: number;
+  skeletonSchemaId: string;
+  trackId: string | null;
+  trackScopeId: string | null;
+  decision: 'ACCEPTED_FOR_SCENE_PROPOSAL' | 'REJECTED';
+  notes?: string;
+}
+
+export async function savePoseReviewDecisionV1(input: SavePoseReviewDecisionInputV1, ports: EvidenceRevisionPortsV1) {
+  const parentSha256 = normalizeSha256(input.parentSha256);
+  if (!parentSha256) throw new EvidenceRevisionErrorV1('INVALID_PARENT_SHA256', 'parentSha256 must be sha256:<64 hex>.');
+  const parent = await ports.loadEvidence(input.evidenceId);
+  if (!parent || parent.deletedAt) throw new EvidenceRevisionErrorV1('EVIDENCE_NOT_FOUND', 'Evidence not found.');
+  if (parent.caseId !== input.caseId) throw new EvidenceRevisionErrorV1('EVIDENCE_CASE_MISMATCH', 'Evidence does not belong to the stated case.');
+  if (normalizeSha256(parent.hash) !== parentSha256) throw new EvidenceRevisionErrorV1('PARENT_HASH_MISMATCH', 'Source evidence changed before pose review.');
+
+  const sourceRevision = await ports.loadAnnotationRevision(input.evidenceId, input.annotationRevisionId);
+  const sourceMetadata = sourceRevision?.metadata;
+  if (!sourceRevision || !sourceMetadata || typeof sourceMetadata !== 'object' || Array.isArray(sourceMetadata)) {
+    throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'The referenced pose annotation revision was not found.');
+  }
+  const metadata = sourceMetadata as Record<string, unknown>;
+  const annotation = metadata.annotation;
+  if (metadata.schema !== EVIDENCE_ANNOTATION_REVISION_SCHEMA_V1 || metadata.parentSha256 !== parentSha256 || !annotation || typeof annotation !== 'object' || Array.isArray(annotation)) {
+    throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'The referenced revision is not a matching annotation revision.');
+  }
+  const annotationRecord = annotation as Record<string, unknown>;
+  if (!Array.isArray(annotationRecord.poseSchemas) || !Array.isArray(annotationRecord.poseObservations)) {
+    throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'The referenced revision has no pose observations.');
+  }
+  const skeletonRow = annotationRecord.poseSchemas.find((row) => typeof row === 'object' && row !== null && (row as Record<string, unknown>).schemaId === input.skeletonSchemaId);
+  const skeleton = poseSkeletonSchemaV1Schema.safeParse(skeletonRow);
+  if (!skeleton.success) throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'The referenced pose schema is invalid.');
+  const matchingPose = annotationRecord.poseObservations.find((raw) => {
+    try {
+      const pose = parsePoseObservationV1(raw, skeleton.data);
+      return pose.evidenceId === input.evidenceId && pose.sourceSha256 === parentSha256 && pose.sourceRevision === parentSha256 &&
+        pose.analysisRevision === input.analysisRevision && pose.frameIndex === input.frameIndex && pose.framePtsUs === input.framePtsUs &&
+        pose.skeletonSchemaId === input.skeletonSchemaId && pose.trackId === input.trackId && pose.trackScopeId === input.trackScopeId;
+    } catch { return false; }
+  });
+  if (!matchingPose) throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'The selected pose does not match the source revision and frame.');
+
+  const decisionPayload = {
+    schema: 'atlas.pose-review-decision.v1',
+    evidenceId: input.evidenceId,
+    caseId: input.caseId,
+    sourceSha256: parentSha256,
+    analysisRevision: input.analysisRevision,
+    annotationRevisionId: sourceRevision.id,
+    annotationRevision: sourceRevision.version,
+    frameIndex: input.frameIndex,
+    framePtsUs: input.framePtsUs,
+    skeletonSchemaId: input.skeletonSchemaId,
+    trackId: input.trackId,
+    trackScopeId: input.trackScopeId,
+    decision: input.decision,
+    reviewerUserId: input.actorUserId,
+    notes: input.notes?.trim().slice(0, 1000) ?? '',
+    canonicalAuthority: false,
+    sceneAdmission: input.decision === 'ACCEPTED_FOR_SCENE_PROPOSAL' ? 'APPROVED_FOR_SCENE_PROPOSAL' : 'NOT_ADMITTED',
+  };
+  const decisionSha256 = `sha256:${crypto.createHash('sha256').update(JSON.stringify(decisionPayload), 'utf8').digest('hex')}`;
+  const row = await ports.insertPoseReviewDecision({
+    evidenceId: input.evidenceId,
+    caseId: input.caseId,
+    parentSha256,
+    decisionSha256,
+    metadata: { ...decisionPayload, decisionSha256 },
+    changeReason: `Pose review: ${input.decision}`,
+  });
+  return {
+    schema: 'atlas.pose-review-decision.v1' as const,
+    committed: true as const,
+    idempotent: !row.created,
+    decisionId: row.id,
+    revision: row.version,
+    sourceSha256: parentSha256,
+    decision: input.decision,
+    sceneAdmission: decisionPayload.sceneAdmission,
+    canonicalAuthority: false as const,
+  };
 }
 
 export interface SaveEvidenceRevisionInputV1 {
@@ -438,6 +533,38 @@ export async function createDrizzleRevisionPortsV1(override?: { db: (typeof impo
     async findAnnotationRevision(evidenceId, annotationSha256) {
       const [row] = await db.select({ id: evidenceVersions.id, version: evidenceVersions.version }).from(evidenceVersions).where(byAnnotationFilter(evidenceId, annotationSha256)).limit(1);
       return row ?? null;
+    },
+    async loadAnnotationRevision(evidenceId, revisionId) {
+      const [row] = await db.select({ id: evidenceVersions.id, version: evidenceVersions.version, metadata: evidenceVersions.metadata })
+        .from(evidenceVersions)
+        .where(and(eq(evidenceVersions.id, revisionId), eq(evidenceVersions.evidenceId, evidenceId), sql`${evidenceVersions.metadata}->>'schema' = ${EVIDENCE_ANNOTATION_REVISION_SCHEMA_V1}`))
+        .limit(1);
+      return row ?? null;
+    },
+    async insertPoseReviewDecision({ evidenceId, caseId, parentSha256, decisionSha256, metadata, changeReason }) {
+      return db.transaction(async (tx) => {
+        await tx.execute(sql`SELECT 1 FROM ${evidence} WHERE ${evidence.id} = ${evidenceId} FOR UPDATE`);
+        const [parent] = await tx.select({ id: evidence.id, caseId: evidence.caseId, hash: evidence.hash, deletedAt: evidence.deletedAt })
+          .from(evidence).where(eq(evidence.id, evidenceId)).limit(1);
+        if (!parent || parent.deletedAt) throw new EvidenceRevisionErrorV1('EVIDENCE_NOT_FOUND', 'Evidence not found.');
+        if (parent.caseId !== caseId) throw new EvidenceRevisionErrorV1('EVIDENCE_CASE_MISMATCH', 'Evidence does not belong to the stated case.');
+        if (normalizeSha256(parent.hash) !== parentSha256) throw new EvidenceRevisionErrorV1('PARENT_HASH_MISMATCH', 'Source evidence changed while recording pose review.');
+        const reviewFilter = and(eq(evidenceVersions.evidenceId, evidenceId), sql`${evidenceVersions.metadata}->>'schema' = 'atlas.pose-review-decision.v1'`, sql`${evidenceVersions.metadata}->>'decisionSha256' = ${decisionSha256}`);
+        const [duplicate] = await tx.select({ id: evidenceVersions.id, version: evidenceVersions.version }).from(evidenceVersions).where(reviewFilter).limit(1);
+        if (duplicate) return { ...duplicate, created: false };
+        const [max] = await tx.select({ m: sql<number>`coalesce(max(${evidenceVersions.version}), 0)` }).from(evidenceVersions).where(eq(evidenceVersions.evidenceId, evidenceId));
+        const [row] = await tx.insert(evidenceVersions).values({
+          evidenceId,
+          version: Number(max?.m ?? 0) + 1,
+          title: null,
+          description: null,
+          metadata,
+          changedBy: null,
+          changeReason,
+        }).returning({ id: evidenceVersions.id, version: evidenceVersions.version });
+        if (!row) throw new Error('EVIDENCE_POSE_REVIEW_INSERT_NO_ROW');
+        return { ...row, created: true };
+      });
     },
     async insertAnnotationRevision({ evidenceId, caseId, parentSha256, annotationSha256, metadata, changeReason }) {
       return db.transaction(async (tx) => {

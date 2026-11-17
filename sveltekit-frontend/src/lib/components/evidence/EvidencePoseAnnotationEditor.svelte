@@ -36,7 +36,8 @@
 	let busy = $state(false);
 	let status = $state('');
 	let savedRevision: number | null = $state(null);
-	let savedTrackFrames = $state<Array<{ frameIndex: number; timestampMs: number; placedJoints: number }>>([]);
+	let poseReviewEnabled = $state(false);
+	let savedTrackFrames = $state<Array<{ frameIndex: number; framePtsUs: number; timestampMs: number; placedJoints: number; annotationRevisionId: string; reviewDecision: string | null }>>([]);
 	let savedTrackMotion = $state<PoseTrackMotionV1 | null>(null);
 	const trackOptions = $derived(detections.filter((detection) =>
 		detection.label.trim().toLowerCase() === 'person' &&
@@ -57,12 +58,21 @@
 	async function loadSavedPose(): Promise<boolean> {
 		savedTrackFrames = [];
 		savedTrackMotion = null;
+		poseReviewEnabled = false;
 		try {
 			const response = await fetch(`/api/evidence/${encodeURIComponent(evidenceId)}/versions?limit=200`, { cache: 'no-store' });
 			if (!response.ok) return false;
 			const payload = await response.json();
 			if (!Array.isArray(payload?.versions)) return false;
-			const frameSamples = new Map<number, { frameIndex: number; timestampMs: number; placedJoints: number }>();
+			poseReviewEnabled = payload.reviewEnabled === true;
+			const reviewBySample = new Map<string, string>();
+			for (const revision of payload.versions) {
+				const decision = revision?.metadata;
+				if (decision?.schema !== 'atlas.pose-review-decision.v1' || decision.evidenceId !== evidenceId || decision.caseId !== caseId || decision.sourceSha256 !== normalizedSourceSha256 || decision.analysisRevision !== analysisRevision || decision.skeletonSchemaId !== humanCoco17PoseSchemaV1.schemaId || (decision.trackId ?? '') !== selectedTrackId || (decision.trackScopeId ?? '') !== (selectedTrackId ? trackScopeId ?? '' : '') || !Number.isSafeInteger(decision.framePtsUs)) continue;
+				const key = `${decision.annotationRevisionId}:${decision.framePtsUs}:${decision.trackId ?? ''}:${decision.trackScopeId ?? ''}`;
+				if (!reviewBySample.has(key)) reviewBySample.set(key, String(decision.decision));
+			}
+			const frameSamples = new Map<number, { frameIndex: number; framePtsUs: number; timestampMs: number; placedJoints: number; annotationRevisionId: string; reviewDecision: string | null }>();
 			const trackObservations = new Map<number, PoseObservationV1>();
 			let selectedPose: PoseObservationV1 | null = null;
 			let selectedRevision: number | null = null;
@@ -78,8 +88,11 @@
 					if (!frameSamples.has(parsed.framePtsUs)) {
 						frameSamples.set(parsed.framePtsUs, {
 							frameIndex: parsed.frameIndex,
+							framePtsUs: parsed.framePtsUs,
 							timestampMs: parsed.framePtsUs / 1000,
 							placedJoints: parsed.keypoints.filter((point) => point.x !== null && point.y !== null).length,
+							annotationRevisionId: String(revision.id ?? ''),
+							reviewDecision: reviewBySample.get(`${revision.id}:${parsed.framePtsUs}:${parsed.trackId ?? ''}:${parsed.trackScopeId ?? ''}`) ?? null,
 						});
 					}
 					if (selectedTrackId && !trackObservations.has(parsed.framePtsUs)) trackObservations.set(parsed.framePtsUs, parsed);
@@ -255,6 +268,36 @@
 			busy = false;
 		}
 	}
+
+	async function reviewPose(sample: (typeof savedTrackFrames)[number], decision: 'ACCEPTED_FOR_SCENE_PROPOSAL' | 'REJECTED') {
+		if (busy || !sample.annotationRevisionId) return;
+		busy = true;
+		status = decision === 'ACCEPTED_FOR_SCENE_PROPOSAL' ? 'Recording reviewer acceptance for a scene proposal…' : 'Recording reviewer rejection…';
+		try {
+			const response = await fetch(`/api/evidence/${encodeURIComponent(evidenceId)}/pose-review`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					schema: 'atlas.pose-review-request.v1', caseId, parentSha256: normalizedSourceSha256,
+					annotationRevisionId: sample.annotationRevisionId, analysisRevision,
+					frameIndex: sample.frameIndex, framePtsUs: sample.framePtsUs,
+					skeletonSchemaId: humanCoco17PoseSchemaV1.schemaId,
+					trackId: selectedTrackId || null, trackScopeId: selectedTrackId ? trackScopeId ?? null : null,
+					decision,
+				}),
+			});
+			const payload = await response.json().catch(() => ({}));
+			if (!response.ok || payload?.ok !== true) throw new Error(payload?.error ?? `Pose review failed (${response.status}).`);
+			await loadSavedPose();
+			status = decision === 'ACCEPTED_FOR_SCENE_PROPOSAL'
+				? 'Pose accepted for scene proposal; it is still not calibrated world geometry.'
+				: 'Pose rejected; the source annotation remains preserved in history.';
+		} catch (error) {
+			status = error instanceof Error ? error.message : 'Could not record pose review.';
+		} finally {
+			busy = false;
+		}
+	}
 </script>
 
 <section class="pose-editor" aria-label="Manual human pose annotation">
@@ -317,12 +360,21 @@
 			{#if selectedTrackId && savedTrackFrames.length > 0}
 				<section class="pose-track-samples" aria-label="Saved pose samples for selected track">
 					<strong>{savedTrackFrames.length} source-frame pose sample{savedTrackFrames.length === 1 ? '' : 's'} for {selectedTrackId}</strong>
-					<p>Unreviewed source-pixel observations. Camera movement is included; these are not calibrated 3D positions.</p>
+					<p>Review decisions are appended to history. Accepted poses remain proposals; camera movement is included and coordinates are not calibrated 3D positions.</p>
 					<div>
 						{#each savedTrackFrames as sample (`${sample.frameIndex}-${sample.timestampMs}`)}
-							<button type="button" onclick={() => seekToPoseSample(sample.timestampMs)} aria-label={`Seek to pose sample frame ${sample.frameIndex}`}>
-								Frame {sample.frameIndex} · {sample.timestampMs.toFixed(0)} ms · {sample.placedJoints}/17 joints
-							</button>
+							<article class="pose-sample-row">
+								<button type="button" onclick={() => seekToPoseSample(sample.timestampMs)} aria-label={`Seek to pose sample frame ${sample.frameIndex}`}>
+									Frame {sample.frameIndex} · {sample.timestampMs.toFixed(0)} ms · {sample.placedJoints}/17 joints
+								</button>
+								<span>{sample.reviewDecision === 'ACCEPTED_FOR_SCENE_PROPOSAL' ? 'Accepted for scene proposal' : sample.reviewDecision === 'REJECTED' ? 'Rejected' : 'Unreviewed'}</span>
+								{#if poseReviewEnabled}
+									<button type="button" disabled={busy} onclick={() => reviewPose(sample, 'ACCEPTED_FOR_SCENE_PROPOSAL')}>Accept for scene proposal</button>
+									<button type="button" disabled={busy} onclick={() => reviewPose(sample, 'REJECTED')}>Reject</button>
+								{:else}
+									<span>Review actions are disabled by the operator.</span>
+								{/if}
+							</article>
 						{/each}
 					</div>
 					{#if savedTrackMotion}
@@ -354,7 +406,8 @@
 	.pose-track-field span { color: var(--text-muted, #666); font-size: 0.76rem; }
 	.pose-track-samples { display: grid; gap: 0.3rem; padding-top: 0.45rem; border-top: 1px solid var(--border, #bbb); font-size: 0.8rem; }
 	.pose-track-samples p { margin: 0; color: var(--text-muted, #666); }
-	.pose-track-samples > div { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+	.pose-track-samples > div { display: grid; gap: 0.35rem; }
+	.pose-sample-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
 	.pose-track-samples button { min-height: 2rem; padding: 0.25rem 0.5rem; border: 1px solid var(--border, #999); border-radius: 0.3rem; background: var(--surface, #fff); color: inherit; font: inherit; }
 	.pose-track-motion { display: grid; gap: 0.2rem; padding: 0.45rem; border-radius: 0.3rem; background: var(--surface, #fff); font-variant-numeric: tabular-nums; }
 	.pose-toggle, .pose-save { font-weight: 700; }

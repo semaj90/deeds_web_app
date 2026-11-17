@@ -8,6 +8,10 @@ const mockSegments = [
 		startMs: 1000,
 		endMs: 3200,
 		text: 'The suspect approached the exterior gate at approximately 14:02.',
+		words: [
+			{ startMs: 1000, endMs: 1280, text: 'The' },
+			{ startMs: 1290, endMs: 1650, text: 'suspect' },
+		],
 		speakerId: 'spk_01',
 		confidence: 0.95,
 		reviewStatus: 'unreviewed_proposal' as const,
@@ -93,8 +97,19 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 		expect(seg2Card?.classList.contains('active')).toBe(true);
 
 		// Click timestamp to seek
-		const seekBtn = screen.getByRole('button', { name: /Seek to 0:01/i });
+		const seekBtn = screen.getByRole('button', { name: 'Seek to 0:01', exact: true });
 		await fireEvent.click(seekBtn);
+		expect(onSeek).toHaveBeenCalledWith(1000);
+	});
+
+	it('seeks to a persisted word timestamp from the authorized transcript response', async () => {
+		const onSeek = vi.fn();
+		render(EvidenceTranscriptPanel, {
+			props: { evidenceId: 'ev-video-001', initialOpen: true, onSeek },
+		});
+
+		const wordButton = await screen.findByRole('button', { name: /Seek to 0:01: The/i });
+		await fireEvent.click(wordButton);
 		expect(onSeek).toHaveBeenCalledWith(1000);
 	});
 

@@ -19,6 +19,7 @@
 	import DossierMiniModal from '$lib/components/ui/DossierMiniModal.svelte';
 	import { RetargetRuntime } from '$lib/courtroom/character-retarget-runtime-v1.js';
 	import StreamedSogPlayCanvasViewer from '$lib/components/evidence/StreamedSogPlayCanvasViewer.svelte';
+	import SceneVideoEventBindings from '$lib/components/evidence/SceneVideoEventBindings.svelte';
 	import fixtureUrl from '$lib/splat/fixtures/niantic-official-degree0-5pt.spz?url';
 
 	type Backend = 'webgpu' | 'webgl2';
@@ -1815,6 +1816,9 @@
 		{/if}
 		<p>These annotations are analyst hypotheses attached by mesh object, triangle, and barycentric coordinates. They are not source observations or survey-calibrated measurements.</p>
 	</section>{/if}
+	{#if !preCaseMode && caseId && savedCaseManifest?.videoEventBindings?.length}
+		<SceneVideoEventBindings caseId={caseId} bindings={savedCaseManifest.videoEventBindings} />
+	{/if}
 	<nav class="sampling" aria-label="Render sampling preview">
 		<span class="label">Render sampling</span>
 		<button onclick={() => setSamplingMode('native')} aria-pressed={samplingMode === 'native'}>Native</button>

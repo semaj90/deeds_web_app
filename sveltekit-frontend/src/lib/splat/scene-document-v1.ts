@@ -115,6 +115,21 @@ export const sceneCalibrationV1Schema = z.object({
 	}
 });
 
+/** A reviewed source-time event attached to a scene timeline; it does not assert a 3D position. */
+export const sceneVideoEventBindingV1Schema = z.object({
+	evidenceId: z.string().uuid(),
+	sourceRevision,
+	analysisRevision: z.string().min(1).max(256),
+	eventId: z.string().uuid(),
+	startMs: z.number().int().nonnegative(),
+	endMs: z.number().int().positive(),
+	reviewState: z.literal('APPROVED_FOR_SCENE_PROPOSAL')
+}).strict().superRefine((binding, context) => {
+	if (binding.endMs <= binding.startMs) {
+		context.addIssue({ code: 'custom', message: 'Scene event interval must be positive', path: ['endMs'] });
+	}
+});
+
 export function createSceneCalibrationV1(input: {
 	sourceSha256: string;
 	anchors: readonly CalibrationAnchor[];
@@ -159,6 +174,8 @@ export const sceneDocumentV1Schema = z.object({
 	objects: z.array(sceneDocumentObjectV1Schema).max(10_000),
 	animations: z.array(z.object({ clipId: z.string().uuid(), name: z.string().min(1).max(200), durationSeconds: finite.nonnegative(), frameRate: finite.positive().nullable() }).strict()).max(1_000),
 	evidenceBindings: z.array(z.object({ evidenceId: z.string().uuid(), sourceRevision }).strict()).max(10_000).optional(),
+	// Optional additive source-time links preserve earlier v1 scene manifests.
+	videoEventBindings: z.array(sceneVideoEventBindingV1Schema).max(10_000).optional(),
 	// Optional to preserve canonical hashes for existing v1 scene manifests.
 	surfaceMarkers: z.array(surfaceMarkerV1Schema).max(10_000).optional(),
 	evidenceSources: z.array(z.object({
@@ -231,6 +248,17 @@ export const sceneDocumentV1Schema = z.object({
 	const sourceRevisions = new Map<string, string>();
 	for (const binding of (document.evidenceBindings ?? [])) sourceRevisions.set(binding.evidenceId, binding.sourceRevision);
 	for (const source of document.evidenceSources) sourceRevisions.set(source.evidenceId, source.sourceRevision);
+	const linkedVideoEvents = new Set<string>();
+	for (const [index, binding] of (document.videoEventBindings ?? []).entries()) {
+		const identity = `${binding.evidenceId}:${binding.eventId}`;
+		if (linkedVideoEvents.has(identity)) {
+			context.addIssue({ code: 'custom', message: 'Duplicate video event binding', path: ['videoEventBindings', index, 'eventId'] });
+		}
+		linkedVideoEvents.add(identity);
+		if (sourceRevisions.get(binding.evidenceId) !== binding.sourceRevision) {
+			context.addIssue({ code: 'custom', message: 'Video event binding must match an evidence revision in this scene', path: ['videoEventBindings', index, 'sourceRevision'] });
+		}
+	}
 	const admittedSourceHashes = new Set(document.assets.map((asset) => asset.sha256));
 	for (const binding of (document.evidenceBindings ?? [])) admittedSourceHashes.add(binding.sourceRevision.slice('sha256:'.length));
 	for (const source of document.evidenceSources) admittedSourceHashes.add(source.sourceRevision.slice('sha256:'.length));

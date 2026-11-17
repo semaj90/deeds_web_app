@@ -61,6 +61,25 @@ describe('N64TextureLODSystem', () => {
 		system.destroy();
 	});
 
+	it('releases every resident allocation and resets residency accounting on destroy', async () => {
+		vi.stubGlobal('GPUTextureUsage', { TEXTURE_BINDING: 4, COPY_DST: 2 });
+		const { device, created } = makeDevice();
+		const system = new N64TextureLODSystem();
+		await system.initialize(device);
+		const bytes = new Uint8Array([1, 2, 3, 4]).buffer;
+		system.registerTexture('source-a:analysis-1:frame-0', 'source-a', [{ level: 0, width: 2, height: 2, format: 'r8uint', data: bytes }]);
+		system.registerTexture('source-b:analysis-2:frame-0', 'source-b', [{ level: 0, width: 2, height: 2, format: 'r8uint', data: bytes }]);
+		await system.requestTexture('source-a:analysis-1:frame-0', 0);
+		await system.requestTexture('source-b:analysis-2:frame-0', 0);
+
+		system.destroy();
+
+		expect(created).toHaveLength(2);
+		expect(created[0]?.texture.destroy).toHaveBeenCalledOnce();
+		expect(created[1]?.texture.destroy).toHaveBeenCalledOnce();
+		expect(system.getStats()).toMatchObject({ memoryUsed: 0, activeTextures: 0, cacheSize: 0, initialized: false });
+	});
+
 	it('rejects malformed and undeclared compressed payloads', () => {
 		const system = new N64TextureLODSystem();
 		expect(() => system.registerTexture('bad', 'revision', [{ level: 0, width: 2, height: 2, data: new ArrayBuffer(3) }])).toThrow(/byte length/);

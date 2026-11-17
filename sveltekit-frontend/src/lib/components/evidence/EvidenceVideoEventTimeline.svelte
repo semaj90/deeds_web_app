@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { createSceneDocumentV1, createSceneQualityReceiptV1 } from '$lib/splat/scene-document-v1.js';
+	import { evidenceSceneIdV1, fetchSceneRevisionV1, saveSceneManifestRevisionV1 } from '$lib/splat/scene-persistence-client-v1.js';
 	type EventReference =
 		| { kind: 'transcript_segment'; referenceId: string; transcriptId: string; segmentIndex: number; startMs: number; endMs: number; text: string; modelRevision: string | null }
 		| { kind: 'frame_detection'; referenceId: string; frameIndex: number; timestampMs: number; artifactSha256: string; modelRevision: string | null; label: string; confidence: number; bbox: number[] }
@@ -13,7 +15,7 @@
 		reviewStatus: 'UNREVIEWED_PROPOSAL' | 'APPROVED' | 'REJECTED';
 		sceneAdmission: 'NOT_ADMITTED' | 'APPROVED_FOR_SCENE_PROPOSAL';
 	};
-	type Timeline = { sourceRevision: string; analysisRevision: string; status: 'PROPOSED' | 'PARTIAL' | 'EMPTY'; events: VideoEvent[] };
+	type Timeline = { caseId: string; evidenceId: string; sourceRevision: string; analysisRevision: string; status: 'PROPOSED' | 'PARTIAL' | 'EMPTY'; events: VideoEvent[] };
 
 	let { evidenceId, onSeek }: { evidenceId: string; onSeek: (timestampMs: number) => void } = $props();
 	let timeline = $state<Timeline | null>(null);
@@ -21,6 +23,8 @@
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 	let savingEventId = $state<string | null>(null);
+	let savingSceneEventId = $state<string | null>(null);
+	let sceneSaveMessage = $state<string | null>(null);
 
 	$effect(() => {
 		const id = evidenceId;
@@ -65,6 +69,63 @@
 			error = cause instanceof Error ? cause.message : 'Could not save review.';
 		} finally {
 			savingEventId = null;
+		}
+	}
+
+	async function saveApprovedEventToScene(event: VideoEvent) {
+		if (!timeline || event.reviewStatus !== 'APPROVED' || event.sceneAdmission !== 'APPROVED_FOR_SCENE_PROPOSAL') return;
+		savingSceneEventId = event.eventId;
+		sceneSaveMessage = null;
+		error = null;
+		try {
+			const sceneId = await evidenceSceneIdV1(timeline.caseId, evidenceId);
+			const current = await fetchSceneRevisionV1({ caseId: timeline.caseId, sceneId });
+			if (current?.manifest.videoEventBindings?.some((binding) => binding.evidenceId === evidenceId && binding.eventId === event.eventId)) {
+				sceneSaveMessage = 'This reviewed event is already on the scene timeline.';
+				return;
+			}
+			const evidenceBinding = { evidenceId, sourceRevision: timeline.sourceRevision };
+			const eventBinding = {
+				evidenceId,
+				sourceRevision: timeline.sourceRevision,
+				analysisRevision: timeline.analysisRevision,
+				eventId: event.eventId,
+				startMs: event.startMs,
+				endMs: event.endMs,
+				reviewState: 'APPROVED_FOR_SCENE_PROPOSAL' as const
+			};
+			const manifest = createSceneDocumentV1(current ? {
+				...current.manifest,
+				revision: current.revision + 1,
+				parentManifestSha256: current.manifestSha256,
+				createdAt: new Date().toISOString(),
+				evidenceBindings: [...(current.manifest.evidenceBindings ?? []).filter((binding) => binding.evidenceId !== evidenceId), evidenceBinding],
+				videoEventBindings: [...(current.manifest.videoEventBindings ?? []), eventBinding]
+			} : {
+				schema: 'parent-atlas.scene-document.v1', sceneId, caseId: timeline.caseId, status: 'HYPOTHESIS',
+				revision: 1, parentManifestSha256: null, createdAt: new Date().toISOString(), coordinateFrame: 'LOCAL_UNCALIBRATED',
+				objects: [], animations: [], evidenceBindings: [evidenceBinding], videoEventBindings: [eventBinding],
+				evidenceSources: [], assets: [],
+				quality: createSceneQualityReceiptV1({ derivedAssetBytes: 0, triangleCount: 0 })
+			});
+			await saveSceneManifestRevisionV1({
+				caseId: timeline.caseId,
+				sceneId,
+				expectedRevision: current?.revision ?? 0,
+				commandId: crypto.randomUUID(),
+				manifest
+			});
+			const readback = await fetchSceneRevisionV1({ caseId: timeline.caseId, sceneId });
+			const persisted = readback?.manifest.videoEventBindings?.some((binding) =>
+				binding.evidenceId === evidenceId && binding.eventId === event.eventId
+					&& binding.sourceRevision === timeline.sourceRevision && binding.analysisRevision === timeline.analysisRevision
+			);
+			if (!persisted || !readback) throw new Error('Scene timeline save did not match an independent revision readback.');
+			sceneSaveMessage = `Saved as scene revision ${readback.revision}; source time ${formatTime(event.startMs)}–${formatTime(event.endMs)}.`;
+		} catch (cause) {
+			error = cause instanceof Error ? cause.message : 'Could not add this event to the scene timeline.';
+		} finally {
+			savingSceneEventId = null;
 		}
 	}
 
@@ -122,10 +183,18 @@
 							<button type="button" disabled={savingEventId === event.eventId} onclick={() => review(event, 'REJECTED')}>Reject</button>
 						</div>
 					{/if}
+					{#if event.reviewStatus === 'APPROVED' && event.sceneAdmission === 'APPROVED_FOR_SCENE_PROPOSAL'}
+						<div class="event-review-actions">
+							<button type="button" disabled={savingSceneEventId === event.eventId} onclick={() => saveApprovedEventToScene(event)}>
+								{savingSceneEventId === event.eventId ? 'Saving…' : 'Add to scene timeline'}
+							</button>
+						</div>
+					{/if}
 				</li>
 			{/each}
 		</ol>
 	{/if}
+	{#if sceneSaveMessage}<p class="timeline-success" role="status">{sceneSaveMessage}</p>{/if}
 </section>
 
 <style>
@@ -148,4 +217,5 @@
 	.review-state.rejected { color: #9f2c2c; }
 	.timeline-empty, .timeline-warning, .timeline-error { margin: 0.8rem 0 0; font-size: 0.85rem; }
 	.timeline-warning, .timeline-error { color: #8c2a20; }
+	.timeline-success { margin: 0.8rem 0 0; color: #17603d; font-size: 0.85rem; }
 </style>

@@ -1,8 +1,9 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { and, eq, or } from 'drizzle-orm';
+import { and, eq, isNull, or } from 'drizzle-orm';
 import { db } from '$lib/server/db/client';
 import { cases, evidenceItems } from '$lib/server/db/schema/index.js';
+import { evidence as canonicalEvidence } from '$lib/server/db/schema-postgres.js';
 import { requireOwnedEvidenceCaseV1 } from '$lib/server/evidence-case-admission-v1.js';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
@@ -20,6 +21,36 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	}
 
 	try {
+		const [canonical] = await db
+			.select({
+				id: canonicalEvidence.id,
+				caseId: canonicalEvidence.caseId,
+				title: canonicalEvidence.title,
+				fileName: canonicalEvidence.fileName,
+				mimeType: canonicalEvidence.mimeType,
+				evidenceType: canonicalEvidence.evidenceType,
+				type: canonicalEvidence.type,
+			})
+			.from(canonicalEvidence)
+			.where(and(eq(canonicalEvidence.id, evidenceId), isNull(canonicalEvidence.deletedAt)))
+			.limit(1);
+
+		if (canonical) {
+			if (canonical.evidenceType !== 'video' && canonical.type !== 'video' && !canonical.mimeType?.startsWith('video/')) {
+				return { loadError: 'Video evidence not found', evidenceId: null, title: null };
+			}
+			const ownerId = Number(locals.user?.id);
+			await requireOwnedEvidenceCaseV1(canonical.caseId ?? '', ownerId, async (caseId, userId) => {
+				const [ownedCase] = await db
+					.select({ id: cases.id })
+					.from(cases)
+					.where(and(eq(cases.id, caseId), or(eq(cases.userId, userId), eq(cases.assignedAttorney, userId))))
+					.limit(1);
+				return ownedCase?.id ?? null;
+			});
+			return { evidenceId, title: canonical.title || canonical.fileName || 'Video evidence', loadError: null };
+		}
+
 		const [videoEvidence] = await db
 			.select({ id: evidenceItems.id, caseId: evidenceItems.caseId, metadataJson: evidenceItems.metadataJson })
 			.from(evidenceItems)

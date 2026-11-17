@@ -9,6 +9,7 @@ import {
   normalizeSha256,
   saveEvidenceMarkupRevisionV1,
   saveEvidenceAnnotationRevisionV1,
+  savePoseReviewDecisionV1,
   sniffImage,
   type EvidenceRevisionPortsV1,
 } from './evidence-revision-v1.js';
@@ -41,6 +42,16 @@ function fakePorts(over: Partial<EvidenceRevisionPortsV1> = {}) {
     findAnnotationRevision: async (_e, sha) => rows.get(`annotation:${sha}`) ?? null,
     insertAnnotationRevision: async (a) => {
       const key = `annotation:${a.annotationSha256}`;
+      const dup = rows.get(key);
+      if (dup) return { ...dup, created: false };
+      const row = { id: `ver-${++version}`, version };
+      rows.set(key, row);
+      log.insert.push(a as unknown as Record<string, unknown>);
+      return { ...row, created: true };
+    },
+    loadAnnotationRevision: async () => null,
+    insertPoseReviewDecision: async (a) => {
+      const key = `pose-review:${a.decisionSha256}`;
       const dup = rows.get(key);
       if (dup) return { ...dup, created: false };
       const row = { id: `ver-${++version}`, version };
@@ -255,6 +266,51 @@ describe('evidence-revision-v1', () => {
     expect(await code(saveEvidenceAnnotationRevisionV1(input({ ...basePose, sourceSha256: `sha256:${'b'.repeat(64)}` }), fakePorts().ports))).toBe('INVALID_MARKUP');
     expect(await code(saveEvidenceAnnotationRevisionV1(input({ ...basePose, sourceRevision: 'stale-source-revision' }), fakePorts().ports))).toBe('INVALID_MARKUP');
     expect(await code(saveEvidenceAnnotationRevisionV1(input({ ...basePose, reviewState: 'REVIEWED' }), fakePorts().ports))).toBe('INVALID_MARKUP');
+  });
+
+  it('records an append-only pose decision only for the exact source-bound saved sample', async () => {
+    const pose = {
+      schema: 'atlas.pose-observation.v1', evidenceId: EV_ID, sourceSha256: PARENT, sourceRevision: PARENT,
+      analysisRevision: 'analysis-rev-1', framePtsUs: 1_250_000, frameIndex: 37, frameWidth: 640, frameHeight: 480,
+      skeletonSchemaId: humanCoco17PoseSchemaV1.schemaId, trackId: 'track-0001', trackScopeId: 'sha256:run-scoped-track',
+      origin: 'manual', modelRevision: null, reviewState: 'UNREVIEWED',
+      keypoints: humanCoco17PoseSchemaV1.joints.map(({ index }) => ({ index, x: index === 0 ? 320.125 : null, y: index === 0 ? 240.75 : null, confidence: index === 0 ? 1 : 0, visibility: index === 0 ? 'visible' : 'not_labeled' })),
+    };
+    const savedAnnotation = {
+      schema: 'atlas.evidence-annotation.v1', modality: 'video', notes: '', annotations: [],
+      poseSchemas: [humanCoco17PoseSchemaV1], poseObservations: [pose],
+    };
+    const { ports, log } = fakePorts({
+      loadAnnotationRevision: async () => ({
+        id: '33333333-3333-4333-8333-333333333333', version: 2,
+        metadata: { schema: 'atlas.evidence-annotation-revision.v1', parentSha256: PARENT, annotation: savedAnnotation },
+      }),
+    });
+    const input = {
+      caseId: CASE_ID, evidenceId: EV_ID, actorUserId: 7, parentSha256: PARENT,
+      annotationRevisionId: '33333333-3333-4333-8333-333333333333', analysisRevision: 'analysis-rev-1',
+      frameIndex: 37, framePtsUs: 1_250_000, skeletonSchemaId: humanCoco17PoseSchemaV1.schemaId,
+      trackId: 'track-0001', trackScopeId: 'sha256:run-scoped-track', decision: 'ACCEPTED_FOR_SCENE_PROPOSAL' as const,
+    };
+    const first = await savePoseReviewDecisionV1(input, ports);
+    const replay = await savePoseReviewDecisionV1(input, ports);
+    expect(first).toMatchObject({ committed: true, idempotent: false, decision: 'ACCEPTED_FOR_SCENE_PROPOSAL', sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false });
+    expect(replay).toMatchObject({ idempotent: true, decisionId: first.decisionId, revision: first.revision });
+    expect(log.insert).toHaveLength(1);
+    expect(log.insert[0]).toMatchObject({
+      metadata: { schema: 'atlas.pose-review-decision.v1', annotationRevisionId: input.annotationRevisionId, sourceSha256: PARENT, framePtsUs: 1_250_000, decision: 'ACCEPTED_FOR_SCENE_PROPOSAL', reviewerUserId: 7, canonicalAuthority: false },
+    });
+  });
+
+  it('rejects pose review when its referenced sample or source revision is stale', async () => {
+    const baseInput = {
+      caseId: CASE_ID, evidenceId: EV_ID, actorUserId: 7, parentSha256: PARENT,
+      annotationRevisionId: '33333333-3333-4333-8333-333333333333', analysisRevision: 'analysis-rev-1',
+      frameIndex: 37, framePtsUs: 1_250_000, skeletonSchemaId: humanCoco17PoseSchemaV1.schemaId,
+      trackId: null, trackScopeId: null, decision: 'REJECTED' as const,
+    };
+    expect(await code(savePoseReviewDecisionV1(baseInput, fakePorts().ports))).toBe('INVALID_MARKUP');
+    expect(await code(savePoseReviewDecisionV1({ ...baseInput, parentSha256: `sha256:${'b'.repeat(64)}` }, fakePorts().ports))).toBe('PARENT_HASH_MISMATCH');
   });
 
   it('fails closed on stale source, case mismatch, and invalid time ranges', async () => {

@@ -179,6 +179,15 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 				sourceRevision: typeof meta.sourceRevision === 'string' ? meta.sourceRevision : sourceRevision,
 				analysisRevision: typeof meta.analysisRevision === 'string' ? meta.analysisRevision : null,
 				modelText: typeof meta.modelText === 'string' ? meta.modelText : null,
+				words: Array.isArray(meta.words) ? meta.words.flatMap((value) => {
+					if (!value || typeof value !== 'object' || Array.isArray(value)) return [];
+					const word = value as Record<string, unknown>;
+					if (!Number.isInteger(word.startMs) || !Number.isInteger(word.endMs) || typeof word.text !== 'string' || !word.text.trim()) return [];
+					const startMs = word.startMs as number;
+					const endMs = word.endMs as number;
+					if (startMs < s.startMs || endMs > s.endMs || endMs <= startMs) return [];
+					return [{ startMs, endMs, text: word.text.trim() }];
+				}) : [],
 				speakerId: (() => {
 					const speakerId = typeof meta.speakerId === 'string' ? meta.speakerId : s.speaker;
 					return typeof speakerId === 'string' && ANONYMOUS_SPEAKER_ID_RE.test(speakerId) ? speakerId : null;

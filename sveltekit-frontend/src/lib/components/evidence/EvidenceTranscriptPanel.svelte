@@ -8,6 +8,7 @@
 		startMs: number;
 		endMs: number;
 		text: string;
+		words?: Array<{ startMs: number; endMs: number; text: string }>;
 		modelText?: string | null;
 		speakerId?: string | null;
 		confidence?: number;
@@ -396,6 +397,15 @@
 										>
 											{cue.text}
 										</button>
+						{#if cue.words?.length}
+							<div class="word-timing-row" aria-label="Word-level transcript timings">
+								{#each cue.words as word, wordIndex (`${word.startMs}-${wordIndex}`)}
+									<button type="button" class="word-timing-btn" onclick={() => handleCueClick(word.startMs)} title={`Seek to ${formatTime(word.startMs)}–${formatTime(word.endMs)}`} aria-label={`Seek to ${formatTime(word.startMs)}: ${word.text}`}>
+										<time>{formatTime(word.startMs)}</time> {word.text}
+									</button>
+								{/each}
+							</div>
+						{/if}
 										{#if cue.modelText}
 											<small class="model-transcript-text">Corrected from: {cue.modelText}</small>
 										{/if}
@@ -430,9 +440,9 @@
 <style>
 	.evidence-transcript-wrapper {
 		width: 100%;
-		border: 1px solid #334155;
+		border: 1px solid var(--t-border);
 		border-radius: 6px;
-		background: #0f172a;
+		background: var(--t-panel);
 		overflow: hidden;
 		margin-top: 0.75rem;
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -443,8 +453,8 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 0.6rem 0.85rem;
-		background: #1e293b;
-		border-bottom: 1px solid #334155;
+		background: var(--t-panel);
+		border-bottom: 1px solid var(--t-border);
 	}
 
 	.btn-transcript-toggle {
@@ -453,14 +463,14 @@
 		gap: 0.5rem;
 		background: transparent;
 		border: none;
-		color: #f1f5f9;
+		color: var(--t-fg);
 		font-size: 0.85rem;
 		font-weight: 600;
 		cursor: pointer;
 		padding: 0;
 	}
 	.btn-transcript-toggle:hover {
-		color: #38bdf8;
+		color: var(--t-accent);
 	}
 
 	.toggle-icon {
@@ -475,7 +485,7 @@
 		border-radius: 4px;
 	}
 	.status-ready {
-		background: #14532d;
+		background: var(--t-panel);
 		color: #86efac;
 	}
 	.status-no-audio {
@@ -483,12 +493,12 @@
 		color: #cbd5e1;
 	}
 	.status-processing {
-		background: #1e3a8a;
+		background: var(--t-panel);
 		color: #93c5fd;
 	}
 	.status-failed {
 		background: #7f1d1d;
-		color: #fca5a5;
+		color: var(--t-danger);
 	}
 
 	.header-export-actions {
@@ -518,9 +528,9 @@
 	}
 
 	.btn-export-pill {
-		background: #0f172a;
+		background: var(--t-panel);
 		color: #cbd5e1;
-		border: 1px solid #334155;
+		border: 1px solid var(--t-border);
 		font-size: 0.68rem;
 		font-weight: 600;
 		padding: 0.15rem 0.4rem;
@@ -529,15 +539,15 @@
 		transition: background 0.15s ease;
 	}
 	.btn-export-pill:hover {
-		background: #334155;
-		color: #ffffff;
+		background: var(--t-panel);
+		color: var(--t-fg);
 	}
 
 	.transcript-panel-body {
 		display: flex;
 		flex-direction: column;
 		height: 320px;
-		background: #0b0f19;
+		background: var(--t-panel);
 	}
 
 	.transcript-filter-bar {
@@ -545,16 +555,16 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 0.5rem 0.85rem;
-		background: #111827;
-		border-bottom: 1px solid #1f2937;
+		background: var(--t-panel);
+		border-bottom: 1px solid var(--t-border);
 		gap: 0.75rem;
 	}
 
 	.search-box {
 		display: flex;
 		align-items: center;
-		background: #1f2937;
-		border: 1px solid #374151;
+		background: var(--t-panel);
+		border: 1px solid var(--t-border);
 		border-radius: 4px;
 		padding: 0.25rem 0.5rem;
 		flex: 1;
@@ -565,7 +575,7 @@
 	.search-box input {
 		background: transparent;
 		border: none;
-		color: #e5e7eb;
+		color: var(--t-fg);
 		font-size: 0.78rem;
 		width: 100%;
 		outline: none;
@@ -591,9 +601,9 @@
 	}
 
 	.speaker-filter-box select {
-		background: #1f2937;
-		color: #e5e7eb;
-		border: 1px solid #374151;
+		background: var(--t-panel);
+		color: var(--t-fg);
+		border: 1px solid var(--t-border);
 		border-radius: 4px;
 		font-size: 0.75rem;
 		padding: 0.2rem 0.4rem;
@@ -614,24 +624,24 @@
 		gap: 0.75rem;
 		padding: 0.45rem 0.65rem;
 		border-radius: 5px;
-		background: #111827;
+		background: var(--t-panel);
 		border: 1px solid transparent;
 		transition: all 0.15s ease;
 	}
 	.transcript-cue-card:hover {
-		background: #1e293b;
-		border-color: #334155;
+		background: var(--t-panel);
+		border-color: var(--t-border);
 	}
 	.transcript-cue-card.active {
-		background: #172554;
-		border-color: #3b82f6;
+		background: var(--t-panel);
+		border-color: var(--t-border);
 		box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
 	}
 
 	.cue-timestamp-btn {
-		background: #1f2937;
-		color: #38bdf8;
-		border: 1px solid #374151;
+		background: var(--t-panel);
+		color: var(--t-accent);
+		border: 1px solid var(--t-border);
 		font-size: 0.72rem;
 		font-family: monospace;
 		font-weight: 600;
@@ -641,12 +651,12 @@
 		white-space: nowrap;
 	}
 	.cue-timestamp-btn:hover {
-		background: #38bdf8;
-		color: #0f172a;
+		background: var(--t-panel);
+		color: var(--t-bg-elevated);
 	}
 	.cue-timestamp-btn.active {
-		background: #2563eb;
-		color: #ffffff;
+		background: var(--t-panel);
+		color: var(--t-fg);
 		border-color: #60a5fa;
 	}
 
@@ -666,7 +676,7 @@
 	.speaker-badge {
 		font-size: 0.68rem;
 		font-weight: 700;
-		background: #312e81;
+		background: var(--t-panel);
 		color: #c7d2fe;
 		padding: 0.1rem 0.35rem;
 		border-radius: 3px;
@@ -675,7 +685,7 @@
 	.unreviewed-pill {
 		font-size: 0.65rem;
 		background: #78350f;
-		color: #fde68a;
+		color: var(--t-fg);
 		padding: 0.08rem 0.3rem;
 		border-radius: 2px;
 		font-weight: 600;
@@ -683,7 +693,7 @@
 
 	.approved-pill {
 		font-size: 0.65rem;
-		background: #064e3b;
+		background: var(--t-panel);
 		color: #a7f3d0;
 		padding: 0.08rem 0.3rem;
 		border-radius: 2px;
@@ -708,7 +718,32 @@
 		font-family: inherit;
 	}
 	.cue-text-btn:hover {
-		color: #38bdf8;
+		color: var(--t-accent);
+	}
+	.word-timing-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+		margin-top: 0.2rem;
+	}
+	.word-timing-btn {
+		border: 1px solid var(--t-border);
+		border-radius: 3px;
+		background: var(--t-panel);
+		color: #cbd5e1;
+		padding: 0.12rem 0.3rem;
+		font: inherit;
+		font-size: 0.68rem;
+		cursor: pointer;
+	}
+	.word-timing-btn time {
+		color: var(--t-accent);
+		font-family: monospace;
+	}
+	.word-timing-btn:hover,
+	.word-timing-btn:focus-visible {
+		border-color: var(--t-accent);
+		color: #fff;
 	}
 
 	.cue-actions-col {
@@ -724,7 +759,7 @@
 		padding: 0.45rem;
 		border: 1px solid #475569;
 		border-radius: 4px;
-		background: #111827;
+		background: var(--t-panel);
 		color: #e2e8f0;
 		font: inherit;
 		resize: vertical;
@@ -739,7 +774,7 @@
 
 	.review-error {
 		margin: 0.5rem 0;
-		color: #fca5a5;
+		color: var(--t-danger);
 		font-size: 0.78rem;
 	}
 
@@ -748,29 +783,29 @@
 		padding: 0.15rem 0.45rem;
 		border: 1px solid #475569;
 		border-radius: 3px;
-		background: #1f2937;
+		background: var(--t-panel);
 		color: #cbd5e1;
 		font-size: 0.68rem;
 		cursor: pointer;
 	}
 	.btn-correct-cue:hover,
 	.btn-cancel-correction:hover {
-		background: #334155;
+		background: var(--t-panel);
 		color: white;
 	}
 
 	.btn-verify-cue {
-		background: #1e3a8a;
+		background: var(--t-panel);
 		color: #93c5fd;
-		border: 1px solid #2563eb;
+		border: 1px solid var(--t-border);
 		font-size: 0.68rem;
 		padding: 0.15rem 0.45rem;
 		border-radius: 3px;
 		cursor: pointer;
 	}
 	.btn-verify-cue:hover {
-		background: #2563eb;
-		color: #ffffff;
+		background: var(--t-panel);
+		color: var(--t-fg);
 	}
 
 	.empty-transcript-state {
@@ -795,7 +830,7 @@
 	}
 
 	.btn-retry {
-		background: #1e293b;
+		background: var(--t-panel);
 		color: #e2e8f0;
 		border: 1px solid #475569;
 		padding: 0.3rem 0.75rem;

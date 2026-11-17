@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { sceneDocumentV1Schema, stableStringifySceneDocumentV1, type SceneDocumentV1 } from '$lib/splat/scene-document-v1.js';
+import { videoEventTimelineV1Schema } from '$lib/server/features/evidence/video/video-event-fusion-v1.js';
 import { db } from '$lib/server/db/client.js';
 import { sceneDocumentRevisions } from '$lib/server/db/schema/scene-document-revisions.js';
 import { sceneAssets } from '$lib/server/db/schema/scene-assets.js';
@@ -98,6 +99,41 @@ export function validateSceneEvidenceSourceBindingsV1(input: {
 	}
 }
 
+/** Accept scene links only for the exact event that a reviewer admitted on the canonical evidence row. */
+export function validateSceneVideoEventBindingsV1(input: {
+	caseId: string;
+	manifest: SceneDocumentV1;
+	evidenceRows: Array<{ id: string; caseId: string | null; hash: string | null; aiAnalysis: unknown }>;
+}): void {
+	const rows = new Map(input.evidenceRows.map((row) => [row.id, row]));
+	for (const binding of input.manifest.videoEventBindings ?? []) {
+		const row = rows.get(binding.evidenceId);
+		const canonicalRevision = row?.hash
+			? (row.hash.startsWith('sha256:') ? row.hash : `sha256:${row.hash}`)
+			: null;
+		if (!row || row.caseId !== input.caseId || canonicalRevision !== binding.sourceRevision) {
+			throw new Error('SCENE_REVISION_VIDEO_EVENT_SOURCE_NOT_REGISTERED');
+		}
+		if (!row.aiAnalysis || typeof row.aiAnalysis !== 'object' || Array.isArray(row.aiAnalysis)) {
+			throw new Error('SCENE_REVISION_VIDEO_EVENT_NOT_ADMITTED');
+		}
+		const videoAnalysis = (row.aiAnalysis as Record<string, unknown>).videoAnalysis;
+		const rawTimeline = videoAnalysis && typeof videoAnalysis === 'object' && !Array.isArray(videoAnalysis)
+			? (videoAnalysis as Record<string, unknown>).eventTimeline
+			: null;
+		const timeline = videoEventTimelineV1Schema.safeParse(rawTimeline);
+		if (!timeline.success || timeline.data.evidenceId !== binding.evidenceId || timeline.data.caseId !== input.caseId
+			|| timeline.data.sourceRevision !== binding.sourceRevision || timeline.data.analysisRevision !== binding.analysisRevision) {
+			throw new Error('SCENE_REVISION_VIDEO_EVENT_NOT_ADMITTED');
+		}
+		const event = timeline.data.events.find((candidate) => candidate.eventId === binding.eventId);
+		if (!event || event.reviewStatus !== 'APPROVED' || event.sceneAdmission !== 'APPROVED_FOR_SCENE_PROPOSAL'
+			|| event.startMs !== binding.startMs || event.endMs !== binding.endMs) {
+			throw new Error('SCENE_REVISION_VIDEO_EVENT_NOT_ADMITTED');
+		}
+	}
+}
+
 /** Append-only revision save with command idempotency and optimistic head comparison. */
 export async function appendSceneDocumentRevisionV1(input: {
 	caseId: string;
@@ -136,14 +172,16 @@ export async function appendSceneDocumentRevisionV1(input: {
 				throw new Error('SCENE_REVISION_ASSET_NOT_REGISTERED');
 			}
 		}
-		if (binding.manifest.evidenceSources.length || (binding.manifest.evidenceBindings?.length ?? 0) > 0) {
+		if (binding.manifest.evidenceSources.length || (binding.manifest.evidenceBindings?.length ?? 0) > 0 || (binding.manifest.videoEventBindings?.length ?? 0) > 0) {
 			const evidenceIds = [...new Set([
 				...binding.manifest.evidenceSources.map((source) => source.evidenceId),
-				...(binding.manifest.evidenceBindings ?? []).map((source) => source.evidenceId)
+				...(binding.manifest.evidenceBindings ?? []).map((source) => source.evidenceId),
+				...(binding.manifest.videoEventBindings ?? []).map((source) => source.evidenceId)
 			])];
-			const evidenceRows = await tx.select({ id: evidence.id, caseId: evidence.caseId, hash: evidence.hash })
+			const evidenceRows = await tx.select({ id: evidence.id, caseId: evidence.caseId, hash: evidence.hash, aiAnalysis: evidence.aiAnalysis })
 				.from(evidence).where(inArray(evidence.id, evidenceIds));
 			validateSceneEvidenceSourceBindingsV1({ caseId: input.caseId, manifest: binding.manifest, evidenceRows });
+			validateSceneVideoEventBindingsV1({ caseId: input.caseId, manifest: binding.manifest, evidenceRows });
 		}
 		const [saved] = await tx.insert(sceneDocumentRevisions).values({
 			caseId: input.caseId,

@@ -89,7 +89,7 @@ describe('transcript review POST (canonical whisper_segments path)', () => {
 	it('prefers canonical source-bound transcript rows over legacy rows', async () => {
 		mocks.canonicalRows = [{
 			id: SEGMENT_ID, startMs: 1000, endMs: 2100, text: 'canonical speech', language: 'en', translatedText: null,
-			speaker: 'spk_01', confidence: 0.91, model: 'faster-whisper', metadataJson: { sourceRevision: `sha256:${SOURCE_HASH}`, analysisRevision: 'analysis-v1', speakerId: 'spk_01' },
+			speaker: 'spk_01', confidence: 0.91, model: 'faster-whisper', metadataJson: { sourceRevision: `sha256:${SOURCE_HASH}`, analysisRevision: 'analysis-v1', speakerId: 'spk_01', words: [{ startMs: 1020, endMs: 1330, text: 'canonical' }, { startMs: 1340, endMs: 1800, text: 'speech' }, { startMs: 900, endMs: 1100, text: 'out-of-range' }] },
 		}];
 		mocks.legacyRows = [{
 			id: '00000000-0000-4000-8000-0000000000ee', startMs: 1000, endMs: 2100, text: 'legacy speech', language: 'en', translatedText: null,
@@ -103,7 +103,7 @@ describe('transcript review POST (canonical whisper_segments path)', () => {
 
 		expect(response.status).toBe(200);
 		expect(await response.json()).toMatchObject({
-			segments: [{ id: SEGMENT_ID, text: 'canonical speech', speakerId: 'spk_01', sourceRevision: `sha256:${SOURCE_HASH}` }],
+			segments: [{ id: SEGMENT_ID, text: 'canonical speech', speakerId: 'spk_01', sourceRevision: `sha256:${SOURCE_HASH}`, words: [{ startMs: 1020, endMs: 1330, text: 'canonical' }, { startMs: 1340, endMs: 1800, text: 'speech' }] }],
 		});
 	});
 

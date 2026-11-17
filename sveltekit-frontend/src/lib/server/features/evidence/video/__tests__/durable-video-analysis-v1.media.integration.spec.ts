@@ -143,6 +143,13 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 			});
 			const artifacts = new Map<string, Buffer>();
 			let transcriptChunkCount = 1;
+			let transcriptExpectedText = 'fixture transcript segment';
+			let transcriptExpectedLanguage = 'en';
+			let transcriptExpectedWordCount = 0;
+			let transcriptExpectedSegments: Array<{ startMs: number; endMs: number; text: string; words?: Array<{ startMs: number; endMs: number; text: string }> }> = [
+				{ startMs: 250, endMs: 750, text: 'fixture transcript segment' },
+			];
+			let transcriptExpectedAsrModel = 'fixture-transcript-v1';
 			const detector = createYOLOService();
 			if (!(await detector.isModelAvailable())) throw new Error('VIDEO_MEDIA_E2E_YOLO_RUNTIME_UNAVAILABLE');
 			const detectorRevision = await detector.getModelArtifactRevision();
@@ -160,7 +167,8 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 				// Explicitly enabled only inside this rollback-only scratch-database fixture.
 				audioEmbeddingsEnabled: true,
 				probe: (path) => detectVideoAndAudioStreamsV1(path),
-				extractFrames: async (bytes, options) => new VisionService().extractFrames(bytes, { ...options, scaleWidth: 768 }),
+				// Keep this live-model integration bounded while still sampling adjacent source frames.
+				extractFrames: async (bytes, options) => new VisionService().extractFrames(bytes, { ...options, maxFrames: Math.min(options.maxFrames, 2), scaleWidth: 768 }),
 				frameDimensions: async (buffer) => {
 					const metadata = await sharp(buffer).metadata();
 					if (!metadata.width || !metadata.height) throw new Error('VIDEO_FRAME_DIMENSIONS_UNAVAILABLE');
@@ -190,23 +198,38 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 						language?: unknown;
 						model_size?: unknown;
 						compute_type?: unknown;
-						segments?: Array<{ start?: unknown; end?: unknown; text?: unknown }>;
+						segments?: Array<{ start?: unknown; end?: unknown; text?: unknown; words?: Array<{ start?: unknown; end?: unknown; word?: unknown }> }>;
 					};
 					if (!Array.isArray(payload.segments) || payload.segments.length > 10_000) throw new Error('VIDEO_MEDIA_E2E_ASR_SEGMENTS_INVALID');
 					const chunks = payload.segments.map((segment) => {
 						if (typeof segment.start !== 'number' || !Number.isFinite(segment.start) || typeof segment.end !== 'number' || !Number.isFinite(segment.end) || segment.start < 0 || segment.end <= segment.start || typeof segment.text !== 'string' || !segment.text.trim()) {
 							throw new Error('VIDEO_MEDIA_E2E_ASR_SEGMENT_INVALID');
 						}
+						const startMs = Math.round(segment.start * 1000);
+						const endMs = Math.round(segment.end * 1000);
+						const words = (segment.words ?? []).map((word) => {
+							if (typeof word.start !== 'number' || !Number.isFinite(word.start) || typeof word.end !== 'number' || !Number.isFinite(word.end) || word.start < segment.start || word.end > segment.end || word.end <= word.start || typeof word.word !== 'string' || !word.word.trim()) {
+								throw new Error('VIDEO_MEDIA_E2E_ASR_WORD_INVALID');
+							}
+							return { startMs: Math.round(word.start * 1000), endMs: Math.round(word.end * 1000), text: word.word.trim() };
+						});
 						return {
-							startMs: Math.round(segment.start * 1000),
-							endMs: Math.round(segment.end * 1000),
+							startMs,
+							endMs,
 							text: segment.text.trim(),
 							language: typeof payload.language === 'string' ? payload.language : undefined,
 							confidence: 0.85,
 							model: `faster-whisper:${String(payload.model_size ?? 'unknown')}:${String(payload.compute_type ?? 'unknown')}`,
+							...(words.length ? { words } : {}),
 						};
 					});
+					transcriptExpectedWordCount = chunks.reduce((count, chunk) => count + (chunk.words?.length ?? 0), 0);
+					if (transcriptExpectedWordCount === 0) throw new Error('VIDEO_MEDIA_E2E_ASR_WORD_TIMESTAMPS_MISSING');
 					transcriptChunkCount = chunks.length;
+					transcriptExpectedSegments = chunks.map(({ startMs, endMs, text, words }) => ({ startMs, endMs, text, ...(words ? { words } : {}) }));
+					transcriptExpectedText = chunks.map((chunk) => chunk.text).join(' ');
+					transcriptExpectedLanguage = typeof payload.language === 'string' ? payload.language : 'und';
+					transcriptExpectedAsrModel = `faster-whisper:${String(payload.model_size ?? 'unknown')}:${String(payload.compute_type ?? 'unknown')}`;
 					return { text: chunks.map((chunk) => chunk.text).join(' '), language: typeof payload.language === 'string' ? payload.language : undefined, chunks };
 				},
 				readArtifactFile: readFile,
@@ -240,6 +263,8 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 				frame_count: string;
 				transcript_count: string;
 				segment_count: string;
+				transcript: { id: string; evidence_id: string; case_id: string; language: string; full_text: string; segment_count: number; whisper_model: string | null; metadata: Record<string, unknown> } | null;
+				transcript_segments: Array<{ segment_index: number; start_ms: number; end_ms: number; text: string; language: string | null; confidence: number | null; metadata: Record<string, unknown> }>;
 				vector_count: string;
 				audio_window_vector_count: string;
 				audio_representation_count: string;
@@ -252,6 +277,8 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 				  jsonb_array_length(e.ai_analysis->'videoAnalysis'->'frames')::text AS frame_count,
 				  (SELECT count(*)::text FROM public.audio_transcripts WHERE id=$3) AS transcript_count,
 				  (SELECT count(*)::text FROM public.whisper_segments WHERE transcript_id=$3) AS segment_count,
+				  (SELECT jsonb_build_object('id', t.id::text, 'evidence_id', t.evidence_id::text, 'case_id', t.case_id::text, 'language', t.language, 'full_text', t.full_text, 'segment_count', t.segment_count, 'whisper_model', t.whisper_model, 'metadata', t.metadata) FROM public.audio_transcripts t WHERE t.id=$3) AS transcript,
+				  (SELECT coalesce(jsonb_agg(jsonb_build_object('segment_index', s.segment_index, 'start_ms', s.start_ms, 'end_ms', s.end_ms, 'text', s.text, 'language', s.language, 'confidence', s.confidence, 'metadata', s.metadata) ORDER BY s.segment_index), '[]'::jsonb) FROM public.whisper_segments s WHERE s.transcript_id=$3) AS transcript_segments,
 				  (SELECT count(*)::text FROM public.evidence_multimodal_vectors WHERE evidence_id=$1 AND source_revision=$4) AS vector_count,
 				  (SELECT count(*)::text FROM public.evidence_multimodal_vectors WHERE evidence_id=$1 AND source_revision=$4 AND modality='audio_segment' AND source_locator->>'kind'='sampled_audio_window') AS audio_window_vector_count,
 				  (SELECT count(*)::text FROM public.evidence_multimodal_vectors WHERE evidence_id=$1 AND source_revision=$4 AND representation_id='embeddinggemma2_audio_content_768_v1') AS audio_representation_count,
@@ -265,7 +292,7 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 			expect(rows.rows[0]).toMatchObject({
 				frame_count: String(receipt.readback.frameFindingCount),
 				transcript_count: '1',
-				segment_count: '1',
+				segment_count: String(transcriptChunkCount),
 				vector_count: String(receipt.readback.vectorCount),
 				audio_window_vector_count: '1',
 				audio_representation_count: '1',
@@ -273,6 +300,43 @@ describe.skipIf(!enabled)('real media and EmbeddingGemma video stage on rollback
 				outbox_count: String(receipt.readback.vectorCount),
 				vector_dims: 768,
 			});
+			expect(rows.rows[0].transcript).toMatchObject({
+				id: analysisJobId,
+				evidence_id: evidenceId,
+				case_id: caseId,
+				language: transcriptExpectedLanguage,
+				full_text: transcriptExpectedText,
+				segment_count: transcriptChunkCount,
+				whisper_model: ENV.WHISPER_MODEL || 'whisper',
+				metadata: expect.objectContaining({ sourceRevision, analysisRevision: receipt.analysisRevision, modality: 'video_audio' }),
+			});
+			expect(rows.rows[0].transcript_segments).toHaveLength(transcriptChunkCount);
+			expect(rows.rows[0].transcript_segments.reduce((count, segment) => count + (Array.isArray(segment.metadata.words) ? segment.metadata.words.length : 0), 0)).toBe(FIXTURE_ASR_URL ? transcriptExpectedWordCount : 0);
+			expect(rows.rows[0].transcript_segments.map((segment) => ({
+				segment_index: segment.segment_index,
+				start_ms: segment.start_ms,
+				end_ms: segment.end_ms,
+				text: segment.text,
+				metadata: {
+					sourceRevision: segment.metadata.sourceRevision,
+					analysisRevision: segment.metadata.analysisRevision,
+					model: segment.metadata.model,
+					reviewState: segment.metadata.reviewState,
+					words: segment.metadata.words,
+				},
+			}))).toEqual(transcriptExpectedSegments.map((segment, segment_index) => ({
+				segment_index,
+				start_ms: segment.startMs,
+				end_ms: segment.endMs,
+				text: segment.text,
+				metadata: {
+					sourceRevision,
+					analysisRevision: receipt.analysisRevision,
+					model: FIXTURE_ASR_URL ? transcriptExpectedAsrModel : 'fixture-transcript-v1',
+					reviewState: 'UNREVIEWED_PROPOSAL',
+					words: segment.words,
+				},
+			})));
 			expect(rows.rows[0].video_analysis).toMatchObject({
 				sourceRevision,
 				analysisRevision: receipt.analysisRevision,

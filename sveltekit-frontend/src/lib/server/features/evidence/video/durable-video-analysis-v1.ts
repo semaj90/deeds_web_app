@@ -472,6 +472,7 @@ export async function persistCanonicalVideoAnalysisV1(
 						model: chunk.model ?? ENV.WHISPER_MODEL ?? 'whisper',
 						locator: { kind: 'video_presentation_time_ms', startMs: chunk.startMs, endMs: chunk.endMs },
 						reviewState: 'UNREVIEWED_PROPOSAL',
+						...(chunk.words ? { words: chunk.words } : {}),
 					},
 				})));
 			}
@@ -664,7 +665,8 @@ export async function persistCanonicalVideoAnalysisV1(
 			const expected = expectedSegments[segment.segmentIndex];
 			const metadata = segment.metadata as Record<string, unknown> | null | undefined;
 			return !expected || segment.startMs !== expected.startMs || segment.endMs !== expected.endMs || segment.text !== expected.text ||
-				metadata?.sourceRevision !== input.sourceRevision || metadata?.analysisRevision !== input.analysisRevision;
+				metadata?.sourceRevision !== input.sourceRevision || metadata?.analysisRevision !== input.analysisRevision ||
+				stableStringify(metadata?.words ?? null) !== stableStringify(expected.words ?? null);
 		})) {
 			throw new Error('EVIDENCE_VIDEO_TRANSCRIPT_SEGMENT_READBACK_MISMATCH');
 		}

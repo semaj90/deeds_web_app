@@ -148,6 +148,16 @@ export default defineConfig({
         },
       },
     },
+    {
+      name: 'chromium-webgl2-motion',
+      testMatch: ['**/evidence-video-viewer.spec.ts'],
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          args: ['--enable-features=WebAssemblySimd', '--disable-webgpu', '--use-gl=angle', '--use-angle=swiftshader', '--no-sandbox'],
+        },
+      },
+    },
   ],
 
   // Web server: auto-start in CI, reuse existing locally

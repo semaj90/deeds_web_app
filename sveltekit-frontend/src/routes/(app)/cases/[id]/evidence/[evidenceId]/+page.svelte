@@ -181,6 +181,26 @@ function connectJobProgressStreams(jobs: Detail['jobs']): void {
 		if (selectedId) selectedTranscriptId = selectedId;
 	}
 
+function seekFromSourceLink(): void {
+	const raw = page.url.searchParams.get('timeMs');
+	if (raw === null || !mediaElement || mediaElement.readyState < 1) return;
+	const requested = Number(raw);
+	if (!Number.isSafeInteger(requested) || requested < 0) return;
+	const durationMs = Number.isFinite(mediaElement.duration) ? mediaElement.duration * 1000 : requested;
+	seekTo(Math.min(requested, durationMs));
+}
+
+$effect(() => {
+	const query = page.url.searchParams.get('timeMs');
+	const ready = mediaElement?.readyState;
+	if (query !== null && ready !== undefined) seekFromSourceLink();
+});
+
+	function selectFrame(frameIndex: number, timestampMs: number | null): void {
+		selectedFrameIndex = frameIndex;
+		if (timestampMs !== null) seekTo(timestampMs);
+	}
+
 	function transcriptUrl(format: string): string {
 		return `/api/evidence/${encodeURIComponent(page.params.evidenceId)}/transcript?export=${encodeURIComponent(format)}`;
 	}
@@ -221,7 +241,7 @@ function connectJobProgressStreams(jobs: Detail['jobs']): void {
 				<a class="text-xs underline" href={originalEvidenceUrl(false)}>Download original</a>
 			</div>
 			{#if detail.evidence.fileType?.startsWith('video/')}
-				<video bind:this={mediaElement} controls preload="metadata" class="max-h-[60vh] w-full bg-black" aria-label="Original evidence video">
+				<video bind:this={mediaElement} onloadedmetadata={seekFromSourceLink} controls preload="metadata" class="max-h-[60vh] w-full bg-black" aria-label="Original evidence video">
 					<source src={originalEvidenceUrl(true)} type={detail.evidence.fileType} />
 					Your browser does not support video playback.
 				</video>
