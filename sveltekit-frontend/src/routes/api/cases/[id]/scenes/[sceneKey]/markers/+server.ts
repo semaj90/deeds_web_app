@@ -14,6 +14,7 @@ import {
 	listSceneMarkers
 } from '$lib/server/scene-markers/move-marker.js';
 import { authorizeSceneAccess } from '$lib/server/scene-markers/scene-access-v1.js';
+import { anchorProvenanceSchema, markerAnchorSchema } from '$lib/server/scene-markers/marker-anchor-v1.js';
 import type { RequestHandler } from './$types';
 
 const uuid = z.uuid();
@@ -24,7 +25,10 @@ const createBody = z
 		commandId: uuid,
 		evidenceId: uuid,
 		label: z.string().max(500).nullable().default(null),
-		position: z.object({ x: z.number(), y: z.number(), z: z.number() })
+		position: z.object({ x: z.number(), y: z.number(), z: z.number() }),
+		// Optional anchor (MARK-01). Omitted = positional marker, exactly as before.
+		anchor: markerAnchorSchema.nullable().default(null),
+		provenance: anchorProvenanceSchema.default({ sourceRevision: null, sourceSha256: null })
 	})
 	.strict();
 
@@ -87,7 +91,10 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 			commandId: parsed.data.commandId,
 			position: parsed.data.position,
 			label: parsed.data.label,
-			userId: Number.isNaN(userId) ? 0 : userId
+			userId: Number.isNaN(userId) ? 0 : userId,
+			anchor: parsed.data.anchor,
+			sourceRevision: parsed.data.provenance.sourceRevision,
+			sourceSha256: parsed.data.provenance.sourceSha256
 		});
 		return json({ success: true, data: result, message: result.replayed ? 'Replayed' : 'Created' }, {
 			status: result.replayed ? 200 : 201

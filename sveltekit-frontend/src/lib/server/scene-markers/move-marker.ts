@@ -9,6 +9,7 @@
 import { and, eq, isNull, sql } from 'drizzle-orm';
 import { sceneEventOutbox, sceneEvents, sceneMarkers } from '../db/schema/scene-markers.js';
 import { evidence } from '../db/schema-postgres.js';
+import { anchorRowValues, type MarkerAnchor } from './marker-anchor-v1.js';
 
 /** Raised when a marker would reference evidence that is not active in the same case. */
 export class EvidenceNotInCaseError extends Error {
@@ -74,6 +75,10 @@ export type CreateMarkerCommand = {
 	position: MarkerPosition;
 	label: string | null;
 	userId: number;
+	/** Optional anchor (MARK-01). Stored as DRAFT; review status is never set here. */
+	anchor?: MarkerAnchor | null;
+	sourceRevision?: string | null;
+	sourceSha256?: string | null;
 };
 
 /**
@@ -98,6 +103,9 @@ export async function createMarker(
 					position?: MarkerPosition;
 					evidenceId?: string;
 					label?: string | null;
+					anchor?: MarkerAnchor | null;
+					sourceRevision?: string | null;
+					sourceSha256?: string | null;
 				};
 				const sameIdentity =
 					prior.markerId === cmd.markerId && prior.caseId === cmd.caseId && prior.sceneKey === cmd.sceneKey;
@@ -108,7 +116,11 @@ export async function createMarker(
 					!!stored.position &&
 					stored.position.x === cmd.position.x &&
 					stored.position.y === cmd.position.y &&
-					stored.position.z === cmd.position.z;
+					stored.position.z === cmd.position.z &&
+					// Events written before MARK-01 carry no anchor fields; treat them as null.
+					JSON.stringify(stored.anchor ?? null) === JSON.stringify(cmd.anchor ?? null) &&
+					(stored.sourceRevision ?? null) === (cmd.sourceRevision ?? null) &&
+					(stored.sourceSha256 ?? null) === (cmd.sourceSha256 ?? null);
 				if (!sameIdentity || !sameFields) {
 					throw new CommandReuseError();
 				}
@@ -138,6 +150,9 @@ export async function createMarker(
 				posY: cmd.position.y,
 				posZ: cmd.position.z,
 				label: cmd.label,
+				sourceRevision: cmd.sourceRevision ?? null,
+				sourceSha256: cmd.sourceSha256 ?? null,
+				...anchorRowValues(cmd.anchor),
 				revision: 1,
 				createdBy: cmd.userId
 			});
@@ -151,7 +166,14 @@ export async function createMarker(
 					eventType: 'MARKER_CREATED',
 					markerId: cmd.markerId,
 					aggregateRevision: 1,
-					payload: { position: cmd.position, evidenceId: cmd.evidenceId, label: cmd.label },
+					payload: {
+						position: cmd.position,
+						evidenceId: cmd.evidenceId,
+						label: cmd.label,
+						anchor: cmd.anchor ?? null,
+						sourceRevision: cmd.sourceRevision ?? null,
+						sourceSha256: cmd.sourceSha256 ?? null,
+					},
 					createdBy: cmd.userId
 				})
 				.returning({ id: sceneEvents.id });
