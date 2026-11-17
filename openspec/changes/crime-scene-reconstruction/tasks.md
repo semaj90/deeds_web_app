@@ -90,3 +90,13 @@ Live `scene_markers` (legal_ai_db) has the anchor columns: `anchor_kind` (IMAGE_
 - [ ] MARK-03 Image anchors (`IMAGE_UV`) hold `anchor_u/v` in [0,1] and an `evidence_id`, but for a video evidence item there is no frame reference (frame index or timestamp). A UV on a video is ambiguous until a frame reference exists. Add it, bound to the frame's source revision.
 - [ ] MARK-04 Sidecar duplicates: `drizzle/sidecar-migrations.json` lists `scene_markers.sql` and `scene_markers_anchor.sql` twice, once `active_candidate` (not-applied) and once `applied`. The applied entries match the live database. Remove the stale candidate entries.
 - [ ] MARK-05 Verification: a real marker placed on a real image and on a real mesh must read back with its anchor fields, its source revision, and an anchor status (DRAFT, PROPOSED, REVIEWED) from PostgreSQL. Not yet run.
+
+### 13h. Live upload end to end (2026-11-16, real file, real services)
+
+- [x] E2E-01 Upload accepted: `POST /api/evidence/upload` with `gemini_generated_video_58d7bdc2.mp4` (1,237,047 bytes, H.264 + AAC, 10.000 s) returned HTTP 201. Evidence `4fb1e374-ab27-489c-857b-6dd3618d1acb`, job `ee38e5b9-ca6e-40de-af55-ba1fa6dbe50e`. A 400 "No file provided" test confirmed the route was reachable first.
+- [x] E2E-02 Storage readback: `seaweed://legal-evidence/evidence/b8fbe1be-…/2026-11-17T03-01-54-027Z-3fcc3629.mp4` read back from the filer (HTTP 200, 1,237,047 bytes). SHA-256 `02c24d3b…64742` matches the source and the stored `evidence.hash`.
+- [x] E2E-03 Job reached `completed` (progress 100); evidence status `complete`.
+- [ ] E2E-04 FAILED: transcription. `ai_analysis.videoAnalysis.transcriptionStatus` = `FAILED` with no error text recorded, and the analysis status is `PARTIAL`. The file has an AAC audio stream, so this is not a silent video. Zero `audio_transcripts` and zero `whisper_segments` rows for this evidence.
+- [ ] E2E-05 FAILED: frames. Zero `evidence_frames` rows for this evidence. The job still reports completed.
+- [ ] E2E-06 Gap in the job status: a job can be `completed` while transcription and frame extraction have failed. Make the job record the stage failures, and add the failure reason that is currently missing.
+- [ ] E2E-07 Not checked: the worker's own log for the transcription error. The failure reason needs the worker log before a fix is attempted.
