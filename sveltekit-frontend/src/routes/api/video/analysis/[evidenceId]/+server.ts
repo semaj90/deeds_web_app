@@ -77,6 +77,18 @@ async function loadLatestUploadJob(evidenceId: string) {
 	}
 }
 
+/**
+ * The legacy evidence_items table is declared in Drizzle but absent from legal_ai_db.
+ * A query against it means the evidence is not in the canonical table: a not-found answer,
+ * not a server failure. Any other error keeps the 500 path.
+ */
+function isLegacyEvidenceTableMissing(error: unknown): boolean {
+	const candidate = error as { code?: string; message?: string; cause?: { code?: string; message?: string } };
+	const code = candidate.code ?? candidate.cause?.code;
+	const message = `${candidate.message ?? ''} ${candidate.cause?.message ?? ''}`;
+	return code === '42P01' && message.includes('evidence_items');
+}
+
 export const GET: RequestHandler = async ({ params, locals }) => {
 	const { evidenceId } = params;
 	if (!locals.user && process.env.DEV_BYPASS_AUTH !== 'true') {
@@ -242,6 +254,9 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		});
 	} catch (error) {
 		if (error instanceof EvidenceCaseNotFoundError) {
+			return json(emptyAnalysis(evidenceId, 'Video evidence not found'), { status: 404 });
+		}
+		if (isLegacyEvidenceTableMissing(error)) {
 			return json(emptyAnalysis(evidenceId, 'Video evidence not found'), { status: 404 });
 		}
 		console.error('[VideoAnalysisAPI] Read failed:', error);
