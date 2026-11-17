@@ -31,7 +31,7 @@
 
 ## Constraints
 
-- The LLM never renders. It emits SceneIntent JSON only; a deterministic compiler renders. Same input and seed give the same bytes.
+- The LLM never renders. It emits SceneIntent JSON only; the existing deterministic compiler (src/lib/server/reconstruction/scene-compiler.ts) renders. Same input and seed give the same bytes.
 - No GPU or 3D work runs in the upload request or on the Node main thread.
 - GPU use stays under the VRAM rule (`:8090` holds about 6.2–6.7 GiB of the 8 GiB card).
 - Renderer frame hashes are tested under SwiftShader in CI; hardware GPU is checked separately.
