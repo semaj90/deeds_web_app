@@ -288,11 +288,16 @@ export interface NesFsmNativeRuntimeReportV1 {
 	readonly blockedProductionGates: readonly string[];
 }
 
+/** Freezes candidate rows while checking each literal against FrozenCandidateInputRecordV1. */
+function frozenCandidateRecordsV1(rows: readonly FrozenCandidateInputRecordV1[]): readonly FrozenCandidateInputRecordV1[] {
+	return Object.freeze([...rows]);
+}
+
 export const FROZEN_NES_FSM_BATCH_V1: FrozenCandidateBatchV1 = Object.freeze({
 	schema: 'atlas.frozen-candidate-batch.v1',
 	sourceRevision: FROZEN_SOURCE_REVISION_V1,
 	workspaceRevision: FROZEN_WORKSPACE_REVISION_V1,
-	records: Object.freeze([
+	records: frozenCandidateRecordsV1([
 		{ candidateOrdinal: 142, kmeansClusterId: 2, somBmuId: 17,  primaryLutByte: 10, domainBitmask: 0x0202, featureLabel: 'canvas',          sourceRef: 'src/lib/server/atlas/fsm/nes-feature-fsm.ts',               tokenCount: 128 },
 		{ candidateOrdinal: 108, kmeansClusterId: 1, somBmuId: 6,   primaryLutByte: 2,  domainBitmask: 0x0002, featureLabel: 'search_rag',      sourceRef: 'src/lib/server/search/qdrant-search.ts',                  tokenCount: 128 },
 		{ candidateOrdinal: 115, kmeansClusterId: 2, somBmuId: 7,   primaryLutByte: 1,  domainBitmask: 0x0001, featureLabel: 'auth',            sourceRef: 'src/lib/server/lucia.ts',                                 tokenCount: 128 },

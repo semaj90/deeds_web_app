@@ -1354,6 +1354,13 @@
       "reason": "Additive v2: facet to person_of_interest FK; investigation_facet_notes junction to case_notes (case_notes stays the summary table); append-only case_ai_summary_export_sources lineage and case_ai_summary_export_reviews ledger; evidence_analysis_cache review_status/reviewed_by/reviewed_at; multi-column indexes. case_reports intentionally untouched.",
       "appliedBy": "manual psql 2026-11-16 to legal_ai_db (operator-approved; rehearsed in BEGIN/ROLLBACK, then committed in one transaction; readback: 3 tables, 3 review columns, 3 immutable triggers present; 0 facet rows; 1 analysis row UNREVIEWED)",
       "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261116_evidence_pose_observations_v1.sql",
+      "status": "proposal_only",
+      "reason": "New normalized tables evidence_pose_tracks and evidence_pose_observations for pose proposals (one row per person per frame, keypoints JSONB with a joint-count CHECK, revision-qualified, status PROPOSED/REVIEWED/REJECTED). Chosen over ALTER TABLE on evidence_frames (write amplification) and over a new schema (second namespace). Time fields are source_frame_index, source_pts_us (original timeline) and clip_time_us (clip-relative), replacing the earlier millisecond pts_ms. Not applied to any live database. Pose-analysis ownership: evidence_pose_* own pose analysis; video_reconstruction_runs (if drafted) owns processing runs; reviewed authority stays with the evidence revision JSONB until a migration is designed.",
+      "appliedBy": "not applied. Rehearsed 2026-11-16 in legal_ai_live_integration_scratch inside BEGIN/ROLLBACK, twice: v1 (six invalid rows rejected) and v2 with the time-field change (valid row accepted; clip_time_us > source_pts_us, negative source_pts_us, duplicate track+frame, keypoint count mismatch and REVIEWED-without-reviewer rejected; tables absent after rollback).",
+      "requiresJournalEntry": false
     }
   ]
 }

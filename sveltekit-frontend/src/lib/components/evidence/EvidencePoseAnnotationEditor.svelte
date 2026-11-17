@@ -24,7 +24,7 @@
 	type Point = { x: number; y: number } | null;
 
 	let { evidenceId, caseId, sourceSha256, analysisRevision, frameIndex, timestampMs, trackScopeId, detections = [], videoElement, onSeekToFrame, expanded = $bindable(false), selectedTrackId = $bindable('') }: Props = $props();
-	let snapshotCanvas: HTMLCanvasElement;
+	let snapshotCanvas: HTMLCanvasElement | undefined = $state();
 	let stageWidth = $state(0);
 	let stageHeight = $state(0);
 	let snapshotUrl = $state<string | null>(null);
@@ -133,6 +133,7 @@
 			const width = videoElement.videoWidth;
 			const height = videoElement.videoHeight;
 			if (!width || !height) throw new Error('The selected video frame has no decoded dimensions yet.');
+			if (!snapshotCanvas) throw new Error('The frame preview canvas is not mounted.');
 			snapshotCanvas.width = width;
 			snapshotCanvas.height = height;
 			const context = snapshotCanvas.getContext('2d', { alpha: false });
@@ -265,7 +266,7 @@
 		<label class="pose-track-field">
 			Link to detector track hypothesis (optional)
 			<select aria-label="Link pose to detector track hypothesis" bind:value={selectedTrackId} disabled={busy} onchange={async (event) => {
-				selectedTrackId = event.currentTarget.value;
+			selectedTrackId = (event.currentTarget as HTMLSelectElement).value;
 				await loadSavedPose();
 			}}>
 				<option value="">No track link</option>

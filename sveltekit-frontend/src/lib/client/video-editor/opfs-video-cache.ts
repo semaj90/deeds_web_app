@@ -58,12 +58,12 @@ export class OPFSVideoCache {
         if ('createSyncAccessHandle' in fileHandle && typeof (fileHandle as any).createSyncAccessHandle === 'function') {
           const syncHandle = await (fileHandle as any).createSyncAccessHandle();
           syncHandle.truncate(0);
-          syncHandle.write(bytes.buffer, { at: 0 });
+          syncHandle.write(bytes, { at: 0 });
           syncHandle.flush();
           syncHandle.close();
         } else {
           const writable = await fileHandle.createWritable();
-          await writable.write(bytes);
+          await writable.write(bytes as Uint8Array<ArrayBuffer>);
           await writable.close();
         }
 

@@ -26,7 +26,7 @@ export const generatedSceneAssetProvenanceV1Schema = z.object({
 		licenseSpdx: z.string().min(1).max(100).nullable()
 	}).strict(),
 	seed: z.number().int().nonnegative().safe(),
-	settings: z.record(settingValue).superRefine((settings, context) => {
+	settings: z.record(z.string(), settingValue).superRefine((settings, context) => {
 		if (Object.keys(settings).length > 64) {
 			context.addIssue({ code: 'custom', message: 'Generation settings must contain at most 64 entries' });
 		}

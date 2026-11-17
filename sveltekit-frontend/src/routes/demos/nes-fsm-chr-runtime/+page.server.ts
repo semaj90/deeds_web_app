@@ -42,7 +42,7 @@ export const load: PageServerLoad = () => {
 			workspaceRevision: report.workspaceRevision,
 			binarySchemaRevision: report.binarySchemaRevision,
 			endianness: report.endianness,
-			alignmentBytes: report.alignmentBytes,
+			alignmentBytes: report.serializedLayoutAlignmentBytes,
 			descriptorByteLength: report.descriptorByteLength,
 			candidateCount: report.candidateCount,
 			batchPrimaryLutByte: report.batchPrimaryLutByte,

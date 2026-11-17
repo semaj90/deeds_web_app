@@ -65,14 +65,19 @@ export interface SceneAssemblySpecV1 {
 	readonly softBody: 'not-applicable';
 }
 
+/** Freezes one definition while keeping its literal kinds checked against the contract. */
+function def<T extends ScenePrimitiveDefinitionV1>(definition: T): Readonly<T> {
+	return Object.freeze(definition);
+}
+
 export const SCENE_PRIMITIVE_REGISTRY_V1: Readonly<Record<ScenePrimitiveKindV1, ScenePrimitiveDefinitionV1>> = Object.freeze({
-	box: Object.freeze({ kind: 'box', dimensionsMeters: [0.5, 0.5, 0.5] as const, collider: { shape: 'box', fidelity: 'exact' } }),
-	sphere: Object.freeze({ kind: 'sphere', dimensionsMeters: [0.6, 0.6, 0.6] as const, collider: { shape: 'sphere', fidelity: 'exact' } }),
-	cylinder: Object.freeze({ kind: 'cylinder', dimensionsMeters: [0.5, 0.6, 0.5] as const, collider: { shape: 'cylinder', fidelity: 'approximate' } }),
-	cone: Object.freeze({ kind: 'cone', dimensionsMeters: [0.6, 0.65, 0.6] as const, collider: { shape: 'convex-hull', fidelity: 'approximate' } }),
-	torus: Object.freeze({ kind: 'torus', dimensionsMeters: [0.76, 0.16, 0.76] as const, collider: { shape: 'convex-hull', fidelity: 'approximate' } }),
-	circle: Object.freeze({ kind: 'circle', dimensionsMeters: [0.5, 0, 0.5] as const, collider: { shape: 'none', fidelity: 'exact' } }),
-	rectangle: Object.freeze({ kind: 'rectangle', dimensionsMeters: [0.6, 0.4, 0] as const, collider: { shape: 'none', fidelity: 'exact' } })
+	box: def({ kind: 'box', dimensionsMeters: [0.5, 0.5, 0.5] as const, collider: { shape: 'box', fidelity: 'exact' } as const }),
+	sphere: def({ kind: 'sphere', dimensionsMeters: [0.6, 0.6, 0.6] as const, collider: { shape: 'sphere', fidelity: 'exact' } as const }),
+	cylinder: def({ kind: 'cylinder', dimensionsMeters: [0.5, 0.6, 0.5] as const, collider: { shape: 'cylinder', fidelity: 'approximate' } as const }),
+	cone: def({ kind: 'cone', dimensionsMeters: [0.6, 0.65, 0.6] as const, collider: { shape: 'convex-hull', fidelity: 'approximate' } as const }),
+	torus: def({ kind: 'torus', dimensionsMeters: [0.76, 0.16, 0.76] as const, collider: { shape: 'convex-hull', fidelity: 'approximate' } as const }),
+	circle: def({ kind: 'circle', dimensionsMeters: [0.5, 0, 0.5] as const, collider: { shape: 'none', fidelity: 'exact' } as const }),
+	rectangle: def({ kind: 'rectangle', dimensionsMeters: [0.6, 0.4, 0] as const, collider: { shape: 'none', fidelity: 'exact' } as const })
 });
 
 /** Palette lookup table for mesh appearance; it does not encode geometry. */
@@ -161,7 +166,7 @@ export function resolveSceneAssemblyV1(kind: SceneAssemblyKindV1, detail: Primit
 		return Object.freeze({
 			...common, kind, label: 'Demonstrative sword', dimensionsMeters: [0.3, 1.05, 0.08] as const,
 			parts: Object.freeze([
-				{ partId: 'blade', geometry: { kind: 'polygon-prism', points: [[0, 0.62], [0.065, 0.42], [0.055, -0.27], [0, -0.38], [-0.055, -0.27], [-0.065, 0.42]] as const, depth: 0.025 }, position: [0, 0.48, 0] as const, rotation: [0, 0, 0] as const, material: 'steel' as const },
+				{ partId: 'blade', geometry: { kind: 'polygon-prism' as const, points: [[0, 0.62], [0.065, 0.42], [0.055, -0.27], [0, -0.38], [-0.055, -0.27], [-0.065, 0.42]] as const, depth: 0.025 }, position: [0, 0.48, 0] as const, rotation: [0, 0, 0] as const, material: 'steel' as const },
 				{ partId: 'guard', geometry: box(0.34, 0.055, 0.075), position: [0, 0.06, 0] as const, rotation: [0, 0, 0] as const, material: 'brass' as const },
 				{ partId: 'grip', geometry: cylinder(0.035, 0.035, 0.22, segments.radial), position: [0, -0.11, 0] as const, rotation: [0, 0, 0] as const, material: 'dark-leather' as const },
 				{ partId: 'pommel', geometry: sphere(0.055, segments.radial, Math.max(4, segments.height - 2)), position: [0, -0.27, 0] as const, rotation: [0, 0, 0] as const, material: 'brass' as const }
