@@ -822,5 +822,19 @@
     "sha256": "3df4ada6b4dad6d657868f2fdf7faecfb34dcfccf3a25c4b82079064718524c8",
     "archived": "2026-11-16T18:00:00Z",
     "reason": "AGPL-3.0 Ultralytics YOLOv8 weight in the YOLOX detector folder. Production admission excludes YOLOv8; the active detector code (docker/docling-vlm/app.py) loads only yolox_x.pth. Archived, not deleted; restore by copying back to docker/docling-vlm/models/."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/scene/scene-intent-v1.ts",
+    "archive_path": "git tag archive/2026-11-16/scene-intent-v1 : sveltekit-frontend/src/lib/server/scene/scene-intent-v1.ts",
+    "sha256": "a5d2ef06cccb46dac5b158f03774d53d23303060d6fd986a0e1efa57fe32ff93",
+    "archived": "2026-11-17T02:29:43.832Z",
+    "reason": "Duplicate SceneIntent schema. The existing owner is src/lib/server/reconstruction/crime-scene-schema.ts, which now carries the evidence citations. Archived by git tag; restore with git show archive/2026-11-16/scene-intent-v1:<path>."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/scene/scene-intent-v1.spec.ts",
+    "archive_path": "git tag archive/2026-11-16/scene-intent-v1 : sveltekit-frontend/src/lib/server/scene/scene-intent-v1.spec.ts",
+    "sha256": "f1ef693b131133dbd093c826e74182bd51069297d7afab5e6c046e1779c03214",
+    "archived": "2026-11-17T02:29:43.832Z",
+    "reason": "Duplicate SceneIntent schema. The existing owner is src/lib/server/reconstruction/crime-scene-schema.ts, which now carries the evidence citations. Archived by git tag; restore with git show archive/2026-11-16/scene-intent-v1:<path>."
   }
 ]

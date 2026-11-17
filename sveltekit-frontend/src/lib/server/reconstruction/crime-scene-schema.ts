@@ -174,7 +174,33 @@ export const EvidenceLinkSchema = z.object({
 });
 export type EvidenceLink = z.infer<typeof EvidenceLinkSchema>;
 
-export const SceneIntentEventSchema = z.object({
+/** Evidence provenance for an event (SCENE-17 extension). Additive: legacy payloads may omit it. */
+const SHA256_REVISION = /^sha256:[0-9a-f]{64}$/;
+export const SceneIntentKindV1 = z.enum(['measured', 'hypothesis', 'fixture']);
+export const SceneIntentCitationV1 = z.discriminatedUnion('source', [
+  z.object({
+    source: z.literal('transcript_segment'),
+    evidence_id: z.string().min(1),
+    source_revision: z.string().regex(SHA256_REVISION),
+    start_ms: z.number().int().nonnegative(),
+    end_ms: z.number().int().nonnegative(),
+  }).refine((c) => c.end_ms >= c.start_ms, 'end_ms must not precede start_ms'),
+  z.object({
+    source: z.literal('scene_cut'),
+    evidence_id: z.string().min(1),
+    source_revision: z.string().regex(SHA256_REVISION),
+    cut_s: z.number().nonnegative(),
+  }),
+  z.object({
+    source: z.literal('timeline_event'),
+    evidence_id: z.string().min(1),
+    source_revision: z.string().regex(SHA256_REVISION),
+    event_ref: z.string().min(1).max(200),
+  }),
+]);
+export type SceneIntentCitationV1 = z.infer<typeof SceneIntentCitationV1>;
+
+const SceneIntentEventBaseSchema = z.object({
   id:               z.string().min(1),
   time_s:           z.number().min(0),
   duration_s:       z.number().min(0.1).max(30),
@@ -189,6 +215,19 @@ export const SceneIntentEventSchema = z.object({
   confidence:       z.enum(CONFIDENCE_LEVELS),
   disputed:         z.boolean().default(false),
   annotations:      z.array(AnnotationSchema).default([]),
+});
+/** Legacy fields are unchanged. `kind` and `citations` are optional, so existing payloads still parse. */
+export const SceneIntentEventSchema = SceneIntentEventBaseSchema.extend({
+  kind: SceneIntentKindV1.optional(),
+  citations: z.array(SceneIntentCitationV1).default([]),
+}).superRefine((event, ctx) => {
+  if (event.kind === 'measured' && event.citations.some((c) => c.source === 'timeline_event')) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'a measured event may not cite a timeline_event; use kind hypothesis',
+      path: ['kind'],
+    });
+  }
 });
 export type SceneIntentEvent = z.infer<typeof SceneIntentEventSchema>;
 
@@ -206,6 +245,27 @@ export const SceneIntentSchema = z.object({
   disclaimer:  z.string().default('Demonstrative reconstruction — not original footage'),
 });
 export type SceneIntent = z.infer<typeof SceneIntentSchema>;
+
+/** Storyboard clip length decided 2026-11-16 (SCENE-DEC-A). */
+export const STORYBOARD_CLIP_SECONDS = 20;
+
+/**
+ * Storyboard rule (SCENE-17 extension): exactly a 20 s clip, every event cites evidence with a
+ * source revision, and no event runs past the clip. `SceneIntentSchema` alone stays lenient so
+ * existing payloads keep working; only the storyboard path calls this.
+ */
+export function assertEvidenceBoundSceneIntent(intent: SceneIntent): SceneIntent {
+  if (intent.duration_s !== STORYBOARD_CLIP_SECONDS) {
+    throw new Error(`storyboard duration must be ${STORYBOARD_CLIP_SECONDS} s, got ${intent.duration_s}`);
+  }
+  intent.events.forEach((event) => {
+    if (event.citations.length === 0) throw new Error(`event ${event.id} has no citation`);
+    if (event.time_s + event.duration_s > STORYBOARD_CLIP_SECONDS) {
+      throw new Error(`event ${event.id} ends after the ${STORYBOARD_CLIP_SECONDS} s clip`);
+    }
+  });
+  return intent;
+}
 
 /** Project a SceneIntent to a CrimeScenePlan the existing compiler accepts. */
 export function sceneIntentToPlan(intent: SceneIntent): {
