@@ -24,7 +24,7 @@
 ## Tables and ownership
 
 - Scene assets: `scene_assets`, `scene_asset_files` (declared in Drizzle; empty).
-- Scene revisions and markers: `scene_markers`, `scene_document_revisions`, `scene_events`, `scene_event_outbox` (live; empty; not declared in Drizzle). Ownership is MAP-01, which must be settled before scene proposals are written.
+- Scene revisions and markers: `scene_markers`, `scene_document_revisions`, `scene_events`, `scene_event_outbox` (live; empty; declared in Drizzle). Owners: `scene-document-revisions-v1.ts` and `scene-markers/` (MAP-01 corrected).
 - Timeline input: `timeline_events` (read only).
 - Pose: `evidence_pose_tracks`, `evidence_pose_observations` (draft, not applied).
 - Reconstruction runs: `video_reconstruction_runs` (draft, not created). Live catalog recheck (VR-10) is required first.

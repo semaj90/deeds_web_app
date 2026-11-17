@@ -23,5 +23,5 @@ A user uploads evidence (documents, photos, video, transcripts) and wants a scen
 ## Impact
 
 - Routes: shared evidence routes keep their owners and are reached through `src/lib/courtroom/courtroom-api-allowlist-v1.ts`. No new general-purpose API.
-- Database: scene-revision ownership is unresolved (MAP-01 in `courtroom-upload-story-pipeline` section 13e). Pose and reconstruction tables are drafts only and are not applied.
+- Database: scene-revision owners exist (`scene-document-revisions-v1.ts`, `scene-markers/`); MAP-01 in `courtroom-upload-story-pipeline` section 13e is corrected. Pose and reconstruction tables are drafts only and are not applied.
 - Evidence bytes and rows are never modified. Derived outputs go to derived storage only.

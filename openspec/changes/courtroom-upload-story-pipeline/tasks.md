@@ -154,18 +154,18 @@ No single OpenSpec change owns the crime-scene upload flow. Owners found by `rg`
 
 | Flow | OpenSpec owner | Tables (live state 2026-11-16) |
 |---|---|---|
-| Upload to storage and evidence row | `courtroom-upload-story-pipeline` (CSP-97, verified), `evidence-analysis-bdd-pipeline` | `evidence` (canonical, live), `evidence_media_assets`, `evidence_multimodal_vectors` (232 rows, no Drizzle declaration) |
+| Upload to storage and evidence row | `courtroom-upload-story-pipeline` (CSP-97, verified), `evidence-analysis-bdd-pipeline` | `evidence` (canonical, live), `evidence_media_assets`, `evidence_multimodal_vectors` (232 rows, declared) |
 | Durable video/audio analysis | `evidence-analysis-bdd-pipeline`, `courtroom-upload-story-pipeline` section 12 | `analysis_jobs`, `analysis_job_events` (610 rows), `evidence_frames`, `evidence_transcript_segments`, `whisper_segments`, `audio_transcripts` |
-| Evidence artifacts registry | Named by the video-to-3D draft and specs as "existing canonical artifact registry" | `atlas_artifacts` (58,312 rows) has **no Drizzle declaration**. Owner not yet confirmed. |
-| Set the scene / scene revisions | `crime-scene-reconstruction` (moved from section 13; SCENE-01 to 26), `parent-atlas-spz-detective-renderer` | `scene_assets` and `scene_asset_files` (0 rows, Drizzle-declared); `scene_markers`, `scene_document_revisions`, `scene_events`, `scene_event_outbox` (all 0 rows, **no Drizzle declaration**); `timeline_events` (5 rows); `courtroom_models` (11 rows, declared) |
+| Evidence artifacts registry | Named by the video-to-3D draft and specs as "existing canonical artifact registry" | `atlas_artifacts` (58,312 rows) is declared in Drizzle. Owner not yet confirmed. |
+| Set the scene / scene revisions | `crime-scene-reconstruction` (moved from section 13; SCENE-01 to 26), `parent-atlas-spz-detective-renderer` | `scene_assets` and `scene_asset_files` (0 rows, Drizzle-declared); `scene_markers`, `scene_document_revisions`, `scene_events`, `scene_event_outbox` (all 0 rows, declared in Drizzle); `timeline_events` (5 rows); `courtroom_models` (11 rows, declared) |
 | Source-bound annotations and relief viewer | `evidence-relief-source-bound-annotations` | `evidence_versions`, `evidence_audit_log`, `evidence_board_connections` (live); annotation JSONB in revision metadata |
 | Pose and reconstruction (proposals) | `crime-scene-reconstruction` (moved from 13b), VR-09 and the pose draft | `evidence_pose_tracks`, `evidence_pose_observations` (drafts, not applied); `video_reconstruction_*` (drafts, absent) |
 | Legacy evidence path | Referenced by 16 spec mentions | `evidence_items`: Drizzle-declared, **absent live** (causes the legacy branch behavior fixed in the 404 commit) |
 
 Gaps found by this map:
-- [ ] MAP-01 Scene-revision tables exist live with 0 rows but have no Drizzle declaration. Decide whether Drizzle declares them, or they are retired, before scene proposals are written. The reconstruction draft must not create a second scene-revision owner.
-- [ ] MAP-02 `atlas_artifacts` (58,312 rows) has no Drizzle declaration, and the video-to-3D draft links to it. Confirm its owner and schema before VR-09 links anything to it.
-- [ ] MAP-03 `evidence_multimodal_vectors` (232 rows) and `evidence_analysis_cache` (1 row) have no Drizzle declarations. Confirm their owners.
+- [x] MAP-01 CORRECTED 2026-11-16: the scene tables are declared in Drizzle (`src/lib/server/db/schema/scene-markers.ts`, `scene-document-revisions.ts`, `scene-assets.ts`) and their sidecar migrations are applied. Owners: `src/lib/server/scene-document-revisions-v1.ts` (revisions) and `src/lib/server/scene-markers/` (markers, events, outbox). Reconstruction writes go through these owners. Open housekeeping: `drizzle/sidecar-migrations.json` lists `scene_markers.sql`, `scene_markers_anchor.sql` and `scene_document_revisions.sql` twice (applied and active_candidate). Reconcile the duplicates.
+- [x] MAP-02 CORRECTED 2026-11-16: `atlas_artifacts` is declared in Drizzle (the earlier "no declaration" finding came from a single-line search that missed multi-line declarations). Still open: confirm its owner module before VR-09 links to it.
+- [x] MAP-03 CORRECTED 2026-11-16: `evidence_multimodal_vectors` and `evidence_analysis_cache` are declared in Drizzle. Still open: confirm their owner modules.
 - [ ] MAP-04 The pose and reconstruction drafts must reference `evidence`, `analysis_jobs` and the scene-revision owner from MAP-01, not copy them.
 - [ ] MAP-05 Keep the two flows separate in code: upload-to-analysis (`analysis_*`, `evidence_*`) and set-the-scene (`scene_*`, `courtroom_*`, `video_reconstruction_*`). A shared table is allowed only through a named owner from this table.
 
