@@ -101,3 +101,34 @@ Live `scene_markers` (legal_ai_db) has the anchor columns: `anchor_kind` (IMAGE_
 - [ ] E2E-06 Gap in the job status: a job can be `completed` while transcription and frame extraction have failed. Make the job record the stage failures, and add the failure reason that is currently missing.
 - [ ] E2E-07 Not checked: the worker's own log for the transcription error. The failure reason needs the worker log before a fix is attempted.
 - Correction to E2E-07 (2026-11-16): FFmpeg is in the repo (`tools/ffmpeg/ffmpeg.exe`), and the app's `FFMPEG_PATH` points to `~/.stacher/ffmpeg.exe`, which exists. FFprobe is `~/.stacher/ffprobe.exe`, found as the sibling of `FFMPEG_PATH` (`storyboard-manifest-contract-v1.ts`). My earlier "ffprobe not found" came from this shell's PATH, not the app. The binaries are therefore not the cause of the transcription failure. The cause is still unknown and needs the worker log.
+
+## Handoff (2026-11-16, end of session)
+
+State: committed and pushed. Last commit on `session/2026-11-08-verified-context-live-shadow` before this note: `425162a1e08`.
+
+| Item | State | Evidence |
+|---|---|---|
+| Real upload through live app (201) | PROVEN | 13h E2E-01; evidence `4fb1e374-ab27-489c-857b-6dd3618d1acb`, job `ee38e5b9-ca6e-40de-af55-ba1fa6dbe50e` |
+| SeaweedFS storage readback | PROVEN | 13h E2E-02; 1,237,047 bytes, SHA-256 `02c24d3b…64742` matches source and `evidence.hash` |
+| Job completed, evidence complete | PROVEN (but masks stage failures) | 13h E2E-03 |
+| Transcription | FAILED, cause unknown | 13h E2E-04; `ai_analysis.videoAnalysis.transcriptionStatus = FAILED`, no error text; file has AAC audio |
+| Frame extraction | NO ROWS, cause unknown | 13h E2E-05; zero `evidence_frames` for this evidence |
+| Marker anchor writer (MARK-01) | WRITTEN, 9 unit tests pass | commit `caceb22c6f5`; live read-back not run (MARK-05) |
+| FFmpeg / FFprobe | NOT the cause | FFmpeg: `tools/ffmpeg/ffmpeg.exe` and `FFMPEG_PATH` → `~/.stacher/ffmpeg.exe` (exists). FFprobe: `~/.stacher/ffprobe.exe` (sibling of `FFMPEG_PATH`) |
+
+Next steps, in order:
+
+1. **Find the transcription error.** Trace where `transcriptionStatus` is set to `FAILED` in the video worker (`src/lib/server/features/evidence/video/durable-video-analysis-v1.ts` and `video-ingest-service.ts`), and read the dev server output or log for job `ee38e5b9`. Fix the cause before changing anything else. Check whether frame extraction (zero `evidence_frames` rows) fails for the same reason.
+2. **Make stage failures visible.** A job must not report `completed` when a stage failed. Record each stage's status and reason on the job.
+3. **Read back an anchored marker (MARK-05).** Create a marker with an image anchor through `POST /api/cases/[id]/scenes/[sceneKey]/markers` on a real case and evidence, then read the row from PostgreSQL and check `anchor_kind`, `anchor_u`, `anchor_v`, `source_revision` and `anchor_status = DRAFT`.
+4. **Reconcile sidecar duplicates.** `drizzle/sidecar-migrations.json` lists `scene_markers.sql`, `scene_markers_anchor.sql` and `scene_document_revisions.sql` twice (`active_candidate` and `applied`). Keep the applied entries.
+5. **Decide the legacy evidence branch (`evidence_items`).** Remove it or keep the 404 mapping. This is a decision for the operator.
+6. **Mesh links (MARK-02) and video frame references (MARK-03).** Open modelling work.
+
+Known open items outside this change:
+
+- `src/routes/api/evidence/[id]/pose-review/+server.ts` (untracked, another session) has three TypeScript errors. The project check reports them.
+- Two DELETE tests in `src/routes/api/cases/[id]/scenes/[sceneKey]/markers/[markerId]/markers.route.spec.ts` fail on the committed code. They predate the anchor work.
+- The real-audio media integration test timed out at 180 s; its rerun result is not confirmed.
+
+Verification rules for this handoff: do not mark any item PROVEN without a live readback. Unit tests and mocked browser fixtures do not count as end-to-end proof.
