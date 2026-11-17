@@ -779,6 +779,24 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   // === SESSION AUTH / DEV BYPASS AUTH ===
   const sessionId = event.cookies.get('auth_session');
+  const applyDevBypassIdentity = () => {
+    // Lucia user.id is always a string. '1' is the seeded development user and
+    // maps to the integer evidence/case owner columns used by local fixtures.
+    event.locals.user = {
+      id: '1',
+      email: 'admin@yorha.dev',
+      username: '2B',
+      role: 'admin',
+      hasCompletedOnboarding: true,
+      onboardingStep: 10,
+    };
+    event.locals.session = {
+      id: 'dev-bypass-session',
+      userId: '1',
+      expiresAt: new Date(Date.now() + 86400000),
+      fresh: true,
+    } as any;
+  };
 
   if (sessionId) {
     const { session, user } = await validateSession(sessionId);
@@ -791,29 +809,19 @@ export const handle: Handle = async ({ event, resolve }) => {
       deleteSessionCookie(event.cookies);
     }
 
-    event.locals.user = user;
-    event.locals.session = session;
+    if (session && user) {
+      event.locals.user = user;
+      event.locals.session = session;
+    } else if (dev && ENV.DEV_BYPASS_AUTH) {
+      // A stale cookie should not make local dev-bypass fail for this request.
+      // Production remains fail-closed and never falls back to this identity.
+      applyDevBypassIdentity();
+    } else {
+      event.locals.user = null;
+      event.locals.session = null;
+    }
   } else if (dev && ENV.DEV_BYPASS_AUTH) {
-    // Lucia user.id is always a string. We use '1' (string repr of users.id integer 1)
-    // so Number(locals.user.id) returns 1 for integer-FK columns (cases.user_id,
-    // evidence.uploaded_by, sessions.user_id, etc.) AND queries against orphan uuid
-    // columns silently return 0 rows (graceful, documented in CLAUDE.md).
-    // ID 1 is the seeded test@deeds-legal.ai user (always present after db:seed).
-    const devUserId = '1';
-    event.locals.user = {
-      id: devUserId,
-      email: 'admin@yorha.dev',
-      username: '2B',
-      role: 'admin',
-      hasCompletedOnboarding: true,
-      onboardingStep: 10,
-    };
-    event.locals.session = {
-      id: 'dev-bypass-session',
-      userId: devUserId,
-      expiresAt: new Date(Date.now() + 86400000),
-      fresh: true,
-    } as any;
+    applyDevBypassIdentity();
   } else {
     event.locals.user = null;
     event.locals.session = null;

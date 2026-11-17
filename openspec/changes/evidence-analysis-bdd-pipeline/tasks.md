@@ -475,6 +475,15 @@ To make the MTP drafter work, all of these are needed: (1) an AtomicBot-fork bin
 - Verified: `tools/list` returns 211 tools including `media.transcribe`. `tools/call` on the 5.4 s speech WAV returned "The witness saw a large white bus parked outside the courthouse at 10.15 in the morning." (language en, 16 words, one segment). `isError: false`.
 - Still open: the video end-to-end run (task 5.1–5.5).
 
+### 6t. Read-only transcript schema and index check (2026-11-16)
+
+- Queried only `legal_ai_live_integration_scratch` on local PostgreSQL 18.4. The connection was derived from the configured local URL, forced to the scratch database, set `default_transaction_read_only=on`, and gated on the returned database name/version before schema inspection. No writes or migrations were performed; `legal_ai_db` was not queried.
+- Live tables present: `audio_transcripts`, `whisper_segments`, and `analysis_jobs`. `evidence_transcript_segments` and `evidence_frames` were absent from this scratch database. `audio_transcripts` stores evidence/case IDs, language, duration, full text, count, model, JSONB metadata; `whisper_segments` stores transcript/evidence IDs, ordinal, millisecond start/end, text/language, optional 768-D vector/model, speaker, confidence, and JSONB metadata. Run/source revisions and word intervals currently live in metadata, not dedicated columns.
+- Live indexes: `audio_transcripts` and `whisper_segments` had only primary-key indexes; `analysis_jobs` had primary key plus evidence/status/job-type indexes. This differs from Drizzle declarations and from the candidate read-index SQL. Do not infer live parity from schema declarations or apply the candidate index migration to a canonical database from this observation.
+- The video-analysis GET already scopes transcript readback by authorized evidence/case, current source revision, analysis revision, and transcript/job ID, then orders by `start_ms, segment_index`. This is the existing UI/API owner to reuse for the case evidence detail and scene workspace.
+- Next: reconcile the scratch DB’s migration history/schema against the checked-in Drizzle journal and sidecar registry; run `EXPLAIN (ANALYZE, BUFFERS, SETTINGS)` on representative scratch queries before selecting index changes. A fresh-connection authorized viewer readback remains a separate gate. This schema check does not prove current `legal_ai_db` contents.
+- Detail and reproduction: `docs/reports/video-transcript-schema-readonly-20261116.md`.
+
 ### 6s. ETA on the evidence job progress bar (2026-11-16)
 
 - Existing before this step: the 15 Nov progress bar showed durable `analysis_jobs.progress` with no ETA. ETA existed only in the document-ingestion store (`GrpcStatusAdapter`, `DocumentProgressStore`), fed by gRPC events.

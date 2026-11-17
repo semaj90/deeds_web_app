@@ -32,13 +32,17 @@
 	const ALLOWED_TYPES = [
 		'application/pdf', 'image/png', 'image/jpeg', 'image/tiff',
 		'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-		'text/plain', 'text/markdown', 'text/csv', 'application/json'
+		'text/plain', 'text/markdown', 'text/csv', 'application/json',
+		'video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo',
+		'audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/mp4', 'audio/flac', 'audio/ogg'
 	];
 	const MAX_SIZE = 100 * 1024 * 1024; // 100MB
+	const VIDEO_EXTENSIONS = /\.(mp4|mov|webm|avi|wmv|mkv|flv)$/i;
+	const AUDIO_EXTENSIONS = /\.(mp3|wav|m4a|ogg|flac|aac|wma)$/i;
 
 	function validateFile(file: File): { valid: boolean; error?: string } {
 		if (file.size > MAX_SIZE) return { valid: false, error: `File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Max 100MB.` };
-		if (!ALLOWED_TYPES.includes(file.type) && !file.name.match(/\.(pdf|png|jpe?g|tiff?|docx|txt|md|csv|json|xml|log|bmp|webp)$/i)) {
+		if (!ALLOWED_TYPES.includes(file.type) && !file.name.match(/\.(pdf|png|jpe?g|tiff?|docx|txt|md|csv|json|xml|log|bmp|webp|mp4|mov|avi|wmv|mkv|webm|flv|mp3|wav|m4a|ogg|flac|aac|wma)$/i)) {
 			return { valid: false, error: `Unsupported file type: ${file.type || file.name.split('.').pop()}` };
 		}
 		return { valid: true };
@@ -48,9 +52,13 @@
 		return file.type.startsWith('image/') || /\.(png|jpe?g|tiff?|bmp|webp)$/i.test(file.name);
 	}
 
+	function isVideoFile(file: File): boolean {
+		return file.type.startsWith('video/') || VIDEO_EXTENSIONS.test(file.name);
+	}
+
 	let fileTypeIconName = $derived(
 		selectedFile && isImageFile(selectedFile) ? 'image' :
-		selectedFile?.type.startsWith('video/') ? 'video' : 'file-text'
+		selectedFile && isVideoFile(selectedFile) ? 'video' : 'file-text'
 	);
 
 	const handleDragOver = (e: DragEvent) => { e.preventDefault(); isDragging = true; };
@@ -154,7 +162,7 @@
 			formData.append('enableEmbeddings', 'true');
 			formData.append('enableSummarization', 'true');
 			formData.append('title', selectedFile.name);
-			formData.append('evidenceType', isImageFile(selectedFile) ? 'photo' : 'document');
+			formData.append('evidenceType', isImageFile(selectedFile) ? 'photo' : isVideoFile(selectedFile) ? 'video' : AUDIO_EXTENSIONS.test(selectedFile.name) || selectedFile.type.startsWith('audio/') ? 'audio' : 'document');
 
 			const res = await fetch('/api/evidence/upload', {
 				method: 'POST',
@@ -262,7 +270,7 @@
 						<button type="button" class="upload-modal-select" onclick={(event) => { event.stopPropagation(); openFilePicker(); }}>
 							Select File
 						</button>
-						<input bind:this={fileInputEl} type="file" class="upload-modal-input" accept=".pdf,.png,.jpg,.jpeg,.tiff,.docx,.txt,.md,.csv,.json,.mp4,.mov,.webm,.avi,.glb,.spz,video/*,image/*" onchange={handleFileInput} disabled={isUploading} />
+						<input bind:this={fileInputEl} type="file" class="upload-modal-input" accept=".pdf,.png,.jpg,.jpeg,.tiff,.docx,.txt,.md,.csv,.json,.mp4,.mov,.webm,.avi,.mkv,.mp3,.wav,.m4a,.ogg,.flac,.aac,.wma,.glb,.spz,video/*,audio/*,image/*" onchange={handleFileInput} disabled={isUploading} />
 						<p class="upload-modal-hint">PDF, PNG, JPG, MP4, MOV, GLB, DOCX, TXT up to 100MB</p>
 					</div>
 				{:else}

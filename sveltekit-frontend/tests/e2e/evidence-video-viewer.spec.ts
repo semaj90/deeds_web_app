@@ -84,13 +84,22 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 			trackId: 'track-0001', trackScopeId: 'sha256:fixture-track-scope',
 			origin: 'manual', modelRevision: null, reviewState: 'UNREVIEWED',
 			keypoints: Array.from({ length: 17 }, (_, index) => ({ index, x: 20 + index, y: 30 + index, confidence: 1, visibility: 'visible' })),
+			groundContact: { imagePx: [40, 150], footSide: 'left', label: 'operator-marked-ground-contact-candidate' },
 		};
-		const revisions: Array<Record<string, unknown>> = [{
-			id: 'pose-revision-previous', version: 1, createdAt: '2026-11-16T19:00:00Z', changeReason: 'Fixture prior frame pose',
-			metadata: { annotation: { poseObservations: [previousPose] } },
-		}];
+		const revisions: Array<Record<string, unknown>> = [
+			{ id: '10000000-0000-4000-8000-000000000001', version: 1, createdAt: '2026-11-16T19:00:00Z', changeReason: 'Fixture prior frame pose',
+				metadata: { schema: 'atlas.evidence-annotation-revision.v1', parentSha256: `sha256:${'a'.repeat(64)}`, annotation: { poseObservations: [previousPose] } } },
+			{ id: 'pose-review-previous', version: 2, createdAt: '2026-11-16T19:01:00Z', changeReason: 'Fixture pose review', metadata: {
+				schema: 'atlas.pose-review-decision.v1', evidenceId: targetEvidenceId, caseId: targetCaseId,
+				sourceSha256: `sha256:${'a'.repeat(64)}`, analysisRevision: targetAnalysisRevision,
+				annotationRevisionId: '10000000-0000-4000-8000-000000000001', framePtsUs: 1_500_000, skeletonSchemaId: 'human.coco17.v1',
+				trackId: 'track-0001', trackScopeId: 'sha256:fixture-track-scope', decision: 'ACCEPTED_FOR_SCENE_PROPOSAL',
+				sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', groundContactReviewed: true,
+				groundContactDecision: 'ACCEPTED_FOR_SCENE_PROPOSAL', canonicalAuthority: false,
+			} },
+		];
 		const nativeFetch = window.fetch.bind(window);
-		(window as any).__poseFixture = { postBody: null, reviewBody: null, requests: [] as string[] };
+		(window as any).__poseFixture = { postBody: null, calibrationPostBody: null, calibrationReviewBody: null, reviewBody: null, requests: [] as string[] };
 		window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
 			const requestUrl = new URL(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url, location.href);
 			const requestMethod = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
@@ -119,20 +128,40 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 			if (requestUrl.pathname === `/api/evidence/${targetEvidenceId}/pose-review` && requestMethod === 'POST') {
 				const body = JSON.parse(String(init?.body ?? '{}'));
 				(window as any).__poseFixture.reviewBody = body;
+				const poseRevision = revisions.find((revision) => revision.id === body.annotationRevisionId);
+				const reviewedContact = Boolean((poseRevision?.metadata as any)?.annotation?.poseObservations?.some((pose: any) => pose.framePtsUs === body.framePtsUs && pose.groundContact));
 				revisions.unshift({ id: 'pose-review-decision-1', version: 3, createdAt: '2026-11-16T20:01:00Z', changeReason: 'Pose review', metadata: {
 					schema: 'atlas.pose-review-decision.v1', evidenceId: targetEvidenceId, caseId: targetCaseId,
 					sourceSha256: body.parentSha256, analysisRevision: body.analysisRevision,
 					annotationRevisionId: body.annotationRevisionId, frameIndex: body.frameIndex, framePtsUs: body.framePtsUs,
 					skeletonSchemaId: body.skeletonSchemaId, trackId: body.trackId, trackScopeId: body.trackScopeId,
-					decision: body.decision, reviewerUserId: 7, sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false,
+					decision: body.decision, reviewerUserId: 7, sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL',
+					groundContactReviewed: reviewedContact, groundContactDecision: reviewedContact ? body.decision : 'NOT_PRESENT', canonicalAuthority: false,
+				} });
+				return new Response(JSON.stringify({ ok: true, evidenceId: targetEvidenceId, decision: body.decision, sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false }), { status: 201, headers: { 'Content-Type': 'application/json' } });
+			}
+			if (requestUrl.pathname === `/api/evidence/${targetEvidenceId}/calibration-review` && requestMethod === 'POST') {
+				const body = JSON.parse(String(init?.body ?? '{}'));
+				(window as any).__poseFixture.calibrationReviewBody = body;
+				revisions.unshift({ id: 'calibration-review-1', version: 5, createdAt: '2026-11-16T20:03:00Z', changeReason: 'Planar calibration review', metadata: {
+					schema: 'atlas.planar-camera-calibration-review.v1', evidenceId: targetEvidenceId, caseId: targetCaseId,
+					sourceSha256: body.parentSha256, analysisRevision: body.analysisRevision, annotationRevisionId: body.annotationRevisionId,
+					calibrationSha256: body.calibrationSha256, calibrationFrameIndex: body.calibrationFrameIndex,
+					calibrationFramePtsUs: body.calibrationFramePtsUs, decision: body.decision,
+					sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false,
 				} });
 				return new Response(JSON.stringify({ ok: true, evidenceId: targetEvidenceId, decision: body.decision, sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false }), { status: 201, headers: { 'Content-Type': 'application/json' } });
 			}
 			if (requestUrl.pathname !== `/api/evidence/${targetEvidenceId}/versions`) return nativeFetch(input, init);
 			if (requestMethod === 'POST') {
 				const body = JSON.parse(String(init?.body ?? '{}'));
+				if (Array.isArray(body.annotation?.planarCameraCalibrations)) {
+					(window as any).__poseFixture.calibrationPostBody = body;
+				revisions.unshift({ id: '10000000-0000-4000-8000-000000000003', version: 4, createdAt: '2026-11-16T20:02:00Z', changeReason: 'Fixed-camera planar calibration', metadata: { schema: 'atlas.evidence-annotation-revision.v1', parentSha256: body.parentSha256, annotation: body.annotation } });
+					return new Response(JSON.stringify({ ok: true, committed: true, version: 4 }), { status: 201, headers: { 'Content-Type': 'application/json' } });
+				}
 				(window as any).__poseFixture.postBody = body;
-				revisions.unshift({ id: 'pose-revision-1', version: 2, createdAt: '2026-11-16T20:00:00Z', changeReason: 'Manual pose proposal', metadata: { annotation: body.annotation } });
+				revisions.unshift({ id: '10000000-0000-4000-8000-000000000002', version: 2, createdAt: '2026-11-16T20:00:00Z', changeReason: 'Manual pose proposal', metadata: { schema: 'atlas.evidence-annotation-revision.v1', parentSha256: body.parentSha256, annotation: body.annotation } });
 				return new Response(JSON.stringify({ ok: true, committed: true, version: 2 }), { status: 201, headers: { 'Content-Type': 'application/json' } });
 			}
 			return new Response(JSON.stringify({ evidenceId: targetEvidenceId, versions: revisions, count: revisions.length, reviewEnabled: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
@@ -277,8 +306,13 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 	await expect(poseStage).toBeVisible();
 	await page.getByRole('button', { name: 'Place nose on the captured frame' }).click();
 	await expect(page.getByText('1/17 placed · current: left_eye')).toBeVisible();
-	await page.getByRole('button', { name: 'Save unreviewed pose' }).click();
-	await expect(page.getByText(/Unreviewed pose proposal saved as evidence revision 2 and verified from revision history/i)).toBeVisible();
+	await page.getByRole('button', { name: 'Mark ground contact' }).click();
+	await page.getByLabel('Contact side').selectOption('left');
+	const poseStageBox = await poseStage.boundingBox();
+	expect(poseStageBox).not.toBeNull();
+	await poseStage.locator('.pose-stage-target').click({ position: { x: poseStageBox!.width * 0.5, y: poseStageBox!.height * 0.8 } });
+	await page.getByRole('button', { name: 'Save unreviewed pose and contact' }).click();
+	await expect(page.getByText(/Unreviewed pose and ground-contact candidate saved as evidence revision 2 and verified from revision history/i)).toBeVisible();
 	posePostBody = await page.evaluate(() => (window as any).__poseFixture.postBody);
 	expect(posePostBody?.annotation.poseObservations[0]).toMatchObject({
 		evidenceId,
@@ -289,19 +323,22 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 		trackId: 'track-0001',
 		trackScopeId: 'sha256:fixture-track-scope',
 		reviewState: 'UNREVIEWED',
+		groundContact: { footSide: 'left', label: 'operator-marked-ground-contact-candidate' },
 	});
+	expect(posePostBody?.annotation.poseObservations[0].groundContact.imagePx[0]).toBeCloseTo(160, 0);
+	expect(posePostBody?.annotation.poseObservations[0].groundContact.imagePx[1]).toBeCloseTo(144, 0);
 	expect(posePostBody?.annotation.poseObservations[0].keypoints).toHaveLength(17);
 	await expect(page.getByText('1/17 placed · current: left_eye')).toBeVisible();
 	await expect(page.getByRole('region', { name: 'Saved pose samples for selected track' }).getByText('2 source-frame pose samples for track-0001')).toBeVisible();
 	const poseSamples = page.getByRole('region', { name: 'Saved pose samples for selected track' });
-	await poseSamples.getByRole('button', { name: 'Accept for scene proposal' }).first().click();
+	await poseSamples.getByRole('button', { name: 'Accept pose and contact candidate' }).first().click();
 	await expect(page.getByText('Pose accepted for scene proposal; it is still not calibrated world geometry.')).toBeVisible();
-	await expect(poseSamples.getByText('Accepted for scene proposal')).toBeVisible();
+	await expect(poseSamples.getByText(/Accepted pose and contact candidate for scene proposal/).first()).toBeVisible();
 	const poseReviewBody = await page.evaluate(() => (window as any).__poseFixture.reviewBody);
 	expect(poseReviewBody).toMatchObject({
 		schema: 'atlas.pose-review-request.v1', caseId, parentSha256: sourceRevision,
 		analysisRevision, frameIndex: 0, framePtsUs: 1_000_000,
-		annotationRevisionId: 'pose-revision-1', decision: 'ACCEPTED_FOR_SCENE_PROPOSAL',
+		annotationRevisionId: '10000000-0000-4000-8000-000000000002', decision: 'ACCEPTED_FOR_SCENE_PROPOSAL',
 	});
 	await expect(page.getByRole('region', { name: 'Adjacent pose sample motion in source pixels' }).getByText('Frame 0 → 1 · 500 ms')).toBeVisible();
 	await expect(page.getByRole('region', { name: 'Adjacent pose sample motion in source pixels' }).getByText(/nose: Δx .* px, Δy .* px/)).toBeVisible();
@@ -310,6 +347,52 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 	await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime)).toBeGreaterThanOrEqual(1.45);
 	await expect(page.getByLabel('Link pose to detector track hypothesis')).toHaveValue('track-0001');
 	await expect(page.getByText('Loaded this frame’s saved, unreviewed pose proposal.')).toBeVisible();
+	await page.getByRole('button', { name: 'Ground-plane calibration' }).click();
+	await page.getByRole('button', { name: 'Capture selected video frame' }).click();
+	await expect(page.getByRole('region', { name: 'Ground-plane calibration proposal' })).toBeVisible();
+	await page.getByLabel('I confirm the camera was fixed during this recording.').check();
+	const planeStage = page.locator('.pose-stage');
+	const stageBox = await planeStage.boundingBox();
+	expect(stageBox).not.toBeNull();
+	const anchorFractions = [0.1, 0.9, 0.9, 0.1, 0.25, 0.75, 0.75, 0.25].map((x, index) => [x, index % 4 < 2 ? 0.1 : 0.9] as const);
+	for (let index = 0; index < 8; index += 1) {
+		const row = page.locator('.plane-anchor-row').nth(index);
+		await row.locator('button').click();
+		const [fx, fy] = anchorFractions[index]!;
+		await planeStage.locator('.pose-stage-target').click({ position: { x: stageBox!.width * fx, y: stageBox!.height * fy } });
+		const pixelX = fx * 320;
+		const pixelY = fy * 180;
+		await row.getByLabel('Ground X (m)').fill((pixelX / 100).toFixed(3));
+		await row.getByLabel('Ground Y (m)').fill((pixelY / 100).toFixed(3));
+	}
+	await page.getByRole('button', { name: 'Check calibration' }).click();
+	await expect(page.getByText(/Four validation anchors passed/)).toBeVisible();
+	await page.getByRole('button', { name: 'Save unreviewed calibration' }).click();
+	await expect(page.getByText(/Unreviewed calibration proposal saved and matched from authorized evidence revision history/)).toBeVisible();
+	const calibrationPostBody = await page.evaluate(() => (window as any).__poseFixture.calibrationPostBody);
+	expect(calibrationPostBody?.annotation.planarCameraCalibrations[0]).toMatchObject({
+		evidenceId, sourceRevision, analysisRevision, validationStatus: 'CHECKS_PASSED', status: 'UNREVIEWED_CALIBRATION_PROPOSAL',
+	});
+	expect(calibrationPostBody?.annotation.planarCameraCalibrations[0].validationResidualsMeters).toHaveLength(4);
+	await page.getByLabel('Review note (optional)').fill('Independent fixture review of the measured plane anchors.');
+	await page.getByRole('region', { name: 'Ground-plane calibration proposal' }).getByRole('button', { name: 'Accept for scene proposal' }).click();
+	await expect(page.getByText(/Calibration accepted for a scene proposal/)).toBeVisible();
+	const calibrationReviewBody = await page.evaluate(() => (window as any).__poseFixture.calibrationReviewBody);
+	expect(calibrationReviewBody).toMatchObject({
+		schema: 'atlas.planar-camera-calibration-review-request.v1', caseId, parentSha256: sourceRevision,
+		annotationRevisionId: '10000000-0000-4000-8000-000000000003', analysisRevision, calibrationFrameIndex: 1,
+		calibrationFramePtsUs: 1_500_000, decision: 'ACCEPTED_FOR_SCENE_PROPOSAL',
+		notes: 'Independent fixture review of the measured plane anchors.',
+	});
+	const frameCards = page.locator('.filmstrip-frame-card');
+	if (await frameCards.count() > 1) {
+		await frameCards.first().click();
+		// The keyed editor resets its captured pixels when the selected analyzed frame changes.
+		await expect(page.locator('.pose-stage')).toHaveCount(0);
+		await expect(page.getByRole('button', { name: 'Capture selected video frame' })).toBeVisible();
+		await page.getByRole('button', { name: 'Capture selected video frame' }).click();
+		await expect(page.locator('.pose-stage')).toBeVisible();
+	}
 	await testInfo.attach('network-api-trace', { body: evidenceApiTrace.join('\n'), contentType: 'text/plain' });
 	await testInfo.attach('fixture-api-trace', {
 		body: JSON.stringify(await page.evaluate(() => (window as any).__poseFixture.requests), null, 2),
@@ -326,6 +409,14 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 		evidenceId, sourceRevision, analysisRevision, eventId: videoEventId, startMs: 1000, endMs: 1800,
 		reviewState: 'APPROVED_FOR_SCENE_PROPOSAL'
 	}]);
+	await drawer.getByRole('button', { name: 'Add reviewed track to scene' }).click();
+	await expect(drawer.getByRole('status').filter({ hasText: /Saved reviewed 2D ground-plane track as scene revision 2/ })).toBeVisible();
+	expect(savedSceneRevision?.manifest.groundPlaneTrackProposals).toHaveLength(1);
+	expect(savedSceneRevision?.manifest.groundPlaneTrackProposals[0]).toMatchObject({
+		evidenceId, sourceRevision, analysisRevision, trackId: 'track-0001', trackScopeId: 'sha256:fixture-track-scope',
+		status: 'REVIEWED_GROUND_PLANE_PROPOSAL', semantics: 'image_to_measured_plane_only_no_height_or_camera_motion_compensation',
+	});
+	expect(savedSceneRevision?.manifest.groundPlaneTrackProposals[0].points).toHaveLength(2);
 	await drawer.getByRole('button', { name: 'Seek to 0:01' }).last().click();
 	await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime)).toBeGreaterThanOrEqual(0.95);
 	if (isSyntheticFixture) {

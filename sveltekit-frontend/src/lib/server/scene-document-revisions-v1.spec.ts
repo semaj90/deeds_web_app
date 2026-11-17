@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { sceneRevisionCommandV1Schema, validateSceneRevisionBindingV1, validateSceneEvidenceSourceBindingsV1, validateSceneVideoEventBindingsV1, hashSceneDocumentV1, verifySceneDocumentRevisionReadbackV1 } from './scene-document-revisions-v1.js';
+import { createHash } from 'node:crypto';
+import { sceneRevisionCommandV1Schema, validateSceneRevisionBindingV1, validateSceneEvidenceSourceBindingsV1, validateSceneVideoEventBindingsV1, validateSceneGroundPlaneTrackProposalsV1, hashSceneDocumentV1, verifySceneDocumentRevisionReadbackV1 } from './scene-document-revisions-v1.js';
 import { createSceneCalibrationV1, SPZ_DECODER_REVISION_V1, SPZ_GAUSSIAN_REPRESENTATION_REVISION_V1 } from '$lib/splat/scene-document-v1.js';
 import type { CalibrationAnchor } from '$lib/splat/calibration.js';
 import { fuseVideoEventsV1 } from '$lib/server/features/evidence/video/video-event-fusion-v1.js';
+import { createPlanarCameraCalibrationV1 } from '$lib/splat/planar-camera-calibration-v1.js';
+import { deriveReviewedGroundPlaneTrackFromHistoryV1 } from '$lib/splat/reviewed-ground-plane-track-v1.js';
+import { humanCoco17PoseSchemaV1 } from '$lib/shared/pose-skeleton-schema-v1.js';
 
 const caseId = '11111111-1111-4111-8111-111111111111';
 const sceneId = '22222222-2222-4222-8222-222222222222';
@@ -135,5 +139,71 @@ describe('scene document revision v1 admission', () => {
 		expect(binding.manifest.calibration?.sourceSha256).toBe('a'.repeat(64));
 		expect(() => validateSceneEvidenceSourceBindingsV1({ caseId, manifest: binding.manifest, evidenceRows: [{ id: evidenceId, caseId, hash: `sha256:${'b'.repeat(64)}` }] })).toThrow('SCENE_REVISION_EVIDENCE_SOURCE_NOT_REGISTERED');
 		expect(() => validateSceneEvidenceSourceBindingsV1({ caseId, manifest: binding.manifest, evidenceRows: [{ id: evidenceId, caseId, hash: sourceRevision }] })).not.toThrow();
+	});
+
+	it('admits only an exact reviewer-approved ground-plane track from canonical evidence revision history', async () => {
+		const calibration = createPlanarCameraCalibrationV1({
+			evidenceId, sourceRevision, analysisRevision: 'run-ground-track', calibrationFrameIndex: 0,
+			calibrationFramePtsUs: 0, frameWidth: 640, frameHeight: 480, operatorConfirmedFixedCamera: true,
+			fitAnchors: [
+				{ id: 'a', imagePx: [0, 0], planeM: [0, 0] }, { id: 'b', imagePx: [640, 0], planeM: [6.4, 0] },
+				{ id: 'c', imagePx: [640, 480], planeM: [6.4, 4.8] }, { id: 'd', imagePx: [0, 480], planeM: [0, 4.8] }
+			],
+			validationAnchors: [
+				{ id: 'v1', imagePx: [160, 120], planeM: [1.6, 1.2] }, { id: 'v2', imagePx: [480, 120], planeM: [4.8, 1.2] },
+				{ id: 'v3', imagePx: [480, 360], planeM: [4.8, 3.6] }, { id: 'v4', imagePx: [160, 360], planeM: [1.6, 3.6] }
+			], toleranceMeters: 0.001
+		});
+		const annotationRevisionId = '66666666-6666-4666-8666-666666666666';
+		const calibrationSha256 = `sha256:${createHash('sha256').update(JSON.stringify(calibration), 'utf8').digest('hex')}`;
+		const poses = [0, 1].map((index) => ({
+			schema: 'atlas.pose-observation.v1', evidenceId, sourceSha256: sourceRevision, sourceRevision,
+			analysisRevision: 'run-ground-track', framePtsUs: (index + 1) * 1_000_000, frameIndex: (index + 1) * 30,
+			frameWidth: 640, frameHeight: 480, skeletonSchemaId: humanCoco17PoseSchemaV1.schemaId,
+			trackId: 'track-ground-1', trackScopeId: 'scope-run-ground-track', origin: 'manual', modelRevision: null,
+			reviewState: 'UNREVIEWED', keypoints: humanCoco17PoseSchemaV1.joints.map(({ index: jointIndex }) => ({
+				index: jointIndex, x: null, y: null, confidence: 0, visibility: 'not_labeled'
+			})),
+			groundContact: { imagePx: [100 + index * 100, 400], footSide: 'left', label: 'operator-marked-ground-contact-candidate' }
+		}));
+		const versionRows = [
+			{ id: '77777777-7777-4777-8777-777777777777', evidenceId, version: 4, metadata: {
+				schema: 'atlas.planar-camera-calibration-review.v1', evidenceId, caseId, sourceSha256: sourceRevision,
+				analysisRevision: 'run-ground-track', annotationRevisionId, calibrationSha256, calibrationFrameIndex: 0,
+				calibrationFramePtsUs: 0, decision: 'ACCEPTED_FOR_SCENE_PROPOSAL',
+				sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false
+			} },
+			...poses.map((pose, index) => ({ id: `pose-review-${index}`, evidenceId, version: 3 - index, metadata: {
+				schema: 'atlas.pose-review-decision.v1', evidenceId, caseId, sourceSha256: sourceRevision,
+				analysisRevision: 'run-ground-track', annotationRevisionId, framePtsUs: pose.framePtsUs,
+				skeletonSchemaId: humanCoco17PoseSchemaV1.schemaId, trackId: pose.trackId, trackScopeId: pose.trackScopeId,
+				decision: 'ACCEPTED_FOR_SCENE_PROPOSAL', sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false,
+				groundContactReviewed: true, groundContactDecision: 'ACCEPTED_FOR_SCENE_PROPOSAL'
+			} })),
+			{ id: annotationRevisionId, evidenceId, version: 2, metadata: {
+				schema: 'atlas.evidence-annotation-revision.v1', parentSha256: sourceRevision,
+				annotation: { poseObservations: poses, planarCameraCalibrations: [calibration] }
+			} }
+		];
+		const derived = await deriveReviewedGroundPlaneTrackFromHistoryV1({
+			history: { versions: versionRows }, evidenceId, caseId, sourceRevision, analysisRevision: 'run-ground-track'
+		});
+		const proposal = {
+			proposalId: '88888888-8888-4888-8888-888888888888', evidenceId, sourceRevision,
+			analysisRevision: 'run-ground-track', calibrationRevisionId: annotationRevisionId,
+			trackId: 'track-ground-1', trackScopeId: 'scope-run-ground-track',
+			status: 'REVIEWED_GROUND_PLANE_PROPOSAL' as const,
+			semantics: 'image_to_measured_plane_only_no_height_or_camera_motion_compensation' as const,
+			points: derived.map((point) => ({ frameIndex: point.frameIndex, framePtsUs: point.framePtsUs,
+				imagePx: point.imagePx, planeM: point.planeM, poseAnnotationRevisionId: point.poseAnnotationRevisionId, status: point.status }))
+		};
+		const sceneManifest = sceneRevisionCommandV1Schema.parse({ commandId, expectedRevision: 0,
+			manifest: manifest({ evidenceBindings: [{ evidenceId, sourceRevision }], groundPlaneTrackProposals: [proposal] }) }).manifest;
+		const evidenceRows = [{ id: evidenceId, caseId, hash: sourceRevision }];
+		await expect(validateSceneGroundPlaneTrackProposalsV1({ caseId, manifest: sceneManifest, evidenceRows, versionRows })).resolves.toBeUndefined();
+		await expect(validateSceneGroundPlaneTrackProposalsV1({ caseId, manifest: sceneManifest, evidenceRows: [{ ...evidenceRows[0], caseId: sceneId }], versionRows })).rejects.toThrow('SCENE_REVISION_GROUND_TRACK_SOURCE_NOT_REGISTERED');
+		const tamperedManifest = sceneRevisionCommandV1Schema.parse({ commandId, expectedRevision: 0,
+			manifest: manifest({ evidenceBindings: [{ evidenceId, sourceRevision }], groundPlaneTrackProposals: [{ ...proposal, points: proposal.points.map((point, index) => index ? point : { ...point, planeM: [99, 99] }) }] }) }).manifest;
+		await expect(validateSceneGroundPlaneTrackProposalsV1({ caseId, manifest: tamperedManifest, evidenceRows, versionRows })).rejects.toThrow('SCENE_REVISION_GROUND_TRACK_NOT_ADMITTED');
 	});
 });

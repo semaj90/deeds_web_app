@@ -1816,8 +1816,8 @@
 		{/if}
 		<p>These annotations are analyst hypotheses attached by mesh object, triangle, and barycentric coordinates. They are not source observations or survey-calibrated measurements.</p>
 	</section>{/if}
-	{#if !preCaseMode && caseId && savedCaseManifest?.videoEventBindings?.length}
-		<SceneVideoEventBindings caseId={caseId} bindings={savedCaseManifest.videoEventBindings} />
+	{#if !preCaseMode && caseId && (savedCaseManifest?.videoEventBindings?.length || savedCaseManifest?.groundPlaneTrackProposals?.length)}
+		<SceneVideoEventBindings caseId={caseId} bindings={savedCaseManifest.videoEventBindings ?? []} groundPlaneTrackProposals={savedCaseManifest.groundPlaneTrackProposals ?? []} />
 	{/if}
 	<nav class="sampling" aria-label="Render sampling preview">
 		<span class="label">Render sampling</span>

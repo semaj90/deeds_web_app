@@ -130,6 +130,34 @@ export const sceneVideoEventBindingV1Schema = z.object({
 	}
 });
 
+/** A reviewed fixed-camera ground-plane trajectory. It is still a proposal, not a 3D body track. */
+export const sceneGroundPlaneTrackProposalV1Schema = z.object({
+	proposalId: z.string().uuid(),
+	evidenceId: z.string().uuid(),
+	sourceRevision,
+	analysisRevision: z.string().min(1).max(256),
+	calibrationRevisionId: z.string().uuid(),
+	trackId: z.string().min(1).max(256),
+	trackScopeId: z.string().min(1).max(256),
+	status: z.literal('REVIEWED_GROUND_PLANE_PROPOSAL'),
+	semantics: z.literal('image_to_measured_plane_only_no_height_or_camera_motion_compensation'),
+	points: z.array(z.object({
+		frameIndex: z.number().int().nonnegative().max(0xffffffff),
+		framePtsUs: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+		imagePx: z.tuple([finite, finite]),
+		planeM: z.tuple([finite, finite]),
+		poseAnnotationRevisionId: z.string().uuid(),
+		status: z.literal('REVIEWED_GROUND_PLANE_PROPOSAL')
+	}).strict()).min(2).max(4096)
+}).strict().superRefine((track, context) => {
+	const frames = new Set<string>();
+	for (const [index, point] of track.points.entries()) {
+		const key = `${point.frameIndex}:${point.framePtsUs}`;
+		if (frames.has(key)) context.addIssue({ code: 'custom', message: 'Ground-plane track frame identities must be unique', path: ['points', index] });
+		frames.add(key);
+	}
+});
+
 export function createSceneCalibrationV1(input: {
 	sourceSha256: string;
 	anchors: readonly CalibrationAnchor[];
@@ -176,6 +204,8 @@ export const sceneDocumentV1Schema = z.object({
 	evidenceBindings: z.array(z.object({ evidenceId: z.string().uuid(), sourceRevision }).strict()).max(10_000).optional(),
 	// Optional additive source-time links preserve earlier v1 scene manifests.
 	videoEventBindings: z.array(sceneVideoEventBindingV1Schema).max(10_000).optional(),
+	// Optional reviewed 2D ground-plane proposals; they do not assert height or a 3D pose.
+	groundPlaneTrackProposals: z.array(sceneGroundPlaneTrackProposalV1Schema).max(1_000).optional(),
 	// Optional to preserve canonical hashes for existing v1 scene manifests.
 	surfaceMarkers: z.array(surfaceMarkerV1Schema).max(10_000).optional(),
 	evidenceSources: z.array(z.object({
@@ -257,6 +287,14 @@ export const sceneDocumentV1Schema = z.object({
 		linkedVideoEvents.add(identity);
 		if (sourceRevisions.get(binding.evidenceId) !== binding.sourceRevision) {
 			context.addIssue({ code: 'custom', message: 'Video event binding must match an evidence revision in this scene', path: ['videoEventBindings', index, 'sourceRevision'] });
+		}
+	}
+	const groundTrackIds = new Set<string>();
+	for (const [index, track] of (document.groundPlaneTrackProposals ?? []).entries()) {
+		if (groundTrackIds.has(track.proposalId)) context.addIssue({ code: 'custom', message: 'Duplicate ground-plane track proposal ID', path: ['groundPlaneTrackProposals', index, 'proposalId'] });
+		groundTrackIds.add(track.proposalId);
+		if (sourceRevisions.get(track.evidenceId) !== track.sourceRevision) {
+			context.addIssue({ code: 'custom', message: 'Ground-plane track must match an evidence revision in this scene', path: ['groundPlaneTrackProposals', index, 'sourceRevision'] });
 		}
 	}
 	const admittedSourceHashes = new Set(document.assets.map((asset) => asset.sha256));

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { createHash } from 'node:crypto';
 import sharp from 'sharp';
 
 const caseId = '11111111-1111-4111-8111-111111111111';
@@ -21,7 +22,8 @@ const poseObservation = (frameIndex: number, framePtsUs: number, hipX: number) =
 		y: index === 0 ? 30 : index === 11 || index === 12 ? 90 : null,
 		confidence: index === 0 || index === 11 || index === 12 ? 1 : 0,
 		visibility: index === 0 || index === 11 || index === 12 ? 'visible' : 'not_labeled'
-	}))
+	})),
+	groundContact: { imagePx: [hipX, 150], footSide: 'left', label: 'operator-marked-ground-contact-candidate' }
 });
 
 test('scene event panel verifies the current source and links to its source timestamp', async ({ page }) => {
@@ -59,10 +61,46 @@ test('scene event panel verifies the current source and links to its source time
 			}
 		})
 	}));
+	const annotationRevisionId = '44444444-4444-4444-8444-444444444444';
+	const calibration = {
+		schema: 'atlas.planar-camera-calibration.v1', evidenceId, sourceRevision, analysisRevision,
+		calibrationFrameIndex: 0, calibrationFramePtsUs: 0, frameWidth: 320, frameHeight: 180,
+		plane: 'operator-defined-ground-plane', operatorConfirmedFixedCamera: true,
+		imageToPlaneHomography: [0.01, 0, 0, 0, 0.01, 0, 0, 0, 1],
+		fitResidualsMeters: ['a', 'b', 'c', 'd'].map((anchorId) => ({ anchorId, residualMeters: 0 })),
+		validationResidualsMeters: ['v1', 'v2', 'v3', 'v4'].map((anchorId) => ({ anchorId, residualMeters: 0 })),
+		toleranceMeters: 0.05, validationStatus: 'CHECKS_PASSED', status: 'UNREVIEWED_CALIBRATION_PROPOSAL',
+		semantics: 'image_to_measured_plane_only_no_height_or_camera_motion_compensation'
+	};
+	const calibrationSha256 = `sha256:${createHash('sha256').update(JSON.stringify(calibration), 'utf8').digest('hex')}`;
+	const poseRows = [poseObservation(1, 1_250_000, 40), poseObservation(2, 1_500_000, 70)];
+	const reviewRows = poseRows.map((pose) => ({
+		version: 4, metadata: {
+			schema: 'atlas.pose-review-decision.v1', evidenceId, caseId, sourceSha256: sourceRevision, analysisRevision,
+			annotationRevisionId, framePtsUs: pose.framePtsUs, skeletonSchemaId: 'human.coco17.v1', trackId: pose.trackId, trackScopeId: pose.trackScopeId,
+			decision: 'ACCEPTED_FOR_SCENE_PROPOSAL', sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false,
+			groundContactReviewed: true, groundContactDecision: 'ACCEPTED_FOR_SCENE_PROPOSAL'
+		}
+	}));
+	const versionsPayload = {
+		evidenceId,
+		versions: [
+			...reviewRows,
+			{ version: 3, metadata: {
+				schema: 'atlas.planar-camera-calibration-review.v1', evidenceId, caseId, sourceSha256: sourceRevision, analysisRevision,
+				annotationRevisionId, calibrationSha256, calibrationFrameIndex: 0, calibrationFramePtsUs: 0,
+				decision: 'ACCEPTED_FOR_SCENE_PROPOSAL', sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false
+			} },
+			{ id: annotationRevisionId, version: 2, metadata: {
+				schema: 'atlas.evidence-annotation-revision.v1', parentSha256: sourceRevision,
+				annotation: { poseObservations: poseRows, planarCameraCalibrations: [calibration] }
+			} }
+		]
+	};
 	await page.route(`**/api/evidence/${evidenceId}/versions**`, (route) => route.fulfill({
 		status: 200,
 		contentType: 'application/json',
-		body: JSON.stringify({ evidenceId, versions: [{ version: 2, metadata: { annotation: { poseObservations: [poseObservation(1, 1_250_000, 40), poseObservation(2, 1_500_000, 70)] } } }] })
+		body: JSON.stringify(versionsPayload)
 	}));
 	let frameReadbackMatches = true;
 	await page.route(`**/api/evidence/${evidenceId}/video-frame/*`, (route) => {
@@ -98,16 +136,33 @@ test('scene event panel verifies the current source and links to its source time
 	const panel = page.getByTestId('scene-video-event-bindings');
 	await expect(panel.getByText('Subject crosses doorway')).toBeVisible();
 	const posePanel = page.getByTestId('scene-pose-observations');
-	const frame2Row = posePanel.getByRole('listitem').filter({ hasText: 'Frame 2 ·' });
-	await expect(frame2Row.getByText(/Frame 2 · 3\/17 landmarks · unreviewed · revision 2 · track hypothesis track-fixture/)).toBeVisible();
-	await expect(frame2Row.getByText('Hip-center image trail · camera motion not corrected · no world scale')).toBeVisible();
-	await expect(frame2Row.locator('.hip-trail')).toHaveAttribute('points', '45,90 75,90');
-	await expect(frame2Row.getByRole('img', { name: 'Source-frame skeleton preview, frame 2' })).toBeVisible();
-	const sourceFramePreview = frame2Row.locator('.pose-source-preview img');
+	const frame3Row = posePanel.getByRole('listitem').filter({ hasText: 'Frame 3 ·' });
+	await expect(frame3Row.getByText(/Frame 3 · 3\/17 landmarks · accepted proposal · revision 2 · track hypothesis track-fixture/)).toBeVisible();
+	await expect(frame3Row.getByText('Hip-center image trail · camera motion not corrected · no world scale')).toBeVisible();
+	await expect(frame3Row.getByText(/Reviewed ground-plane proposal: X 0\.700 m, Y 1\.500 m/)).toBeVisible();
+	await expect(frame3Row.locator('.ground-contact-marker')).toHaveClass(/ground-contact-reviewed/);
+	await expect(frame3Row.locator('.hip-trail')).toHaveAttribute('points', '45,90 75,90');
+	await expect(frame3Row.getByRole('img', { name: 'Source-frame skeleton preview, frame 3' })).toBeVisible();
+	const sourceFramePreview = frame3Row.locator('.pose-source-preview img');
 	await expect(sourceFramePreview).toBeVisible();
 	await expect.poll(() => sourceFramePreview.evaluate((element) => (element as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
 	await expect(sourceFramePreview).toHaveAttribute('src', /^blob:/);
-	await expect(frame2Row.getByRole('link', { name: 'Open source at 0:01' })).toHaveAttribute('href', `/cases/${caseId}/evidence/${evidenceId}?timeMs=1500`);
+	await expect(frame3Row.getByRole('link', { name: 'Open source at 0:01' })).toHaveAttribute('href', `/cases/${caseId}/evidence/${evidenceId}?timeMs=1500`);
+	const groundPlot = page.getByTestId('scene-ground-plane-tracks').getByRole('img', { name: 'Top-down measured ground-plane path for track-fixture' });
+	await expect(groundPlot).toBeVisible();
+	await expect(groundPlot.locator('polyline')).toHaveAttribute('points', /,/);
+	const plotPoints = groundPlot.locator('a');
+	await expect(plotPoints).toHaveCount(2);
+	await expect(plotPoints.nth(0)).toHaveAttribute('href', `/cases/${caseId}/evidence/${evidenceId}?timeMs=1250`);
+	await expect(plotPoints.nth(1).locator('circle')).toHaveAttribute('fill', '#c9593e');
+	const scrubber = page.getByRole('slider', { name: 'Scrub reviewed samples for track-fixture' });
+	await expect(scrubber).toHaveValue('0');
+	await scrubber.focus();
+	await scrubber.press('ArrowRight');
+	await expect(scrubber).toHaveValue('1');
+	await expect(panel.getByText(/Frame 3 · 0:01 · X 0\.700 m, Y 1\.500 m · discrete reviewed sample/)).toBeVisible();
+	await expect(plotPoints.nth(1)).toHaveClass(/active/);
+	await expect(page.getByRole('link', { name: 'Open selected source frame at 0:01' })).toHaveAttribute('href', `/cases/${caseId}/evidence/${evidenceId}?timeMs=1500`);
 	frameReadbackMatches = false;
 	await page.reload();
 	await expect(page.getByTestId('scene-pose-observations').getByText('Frame preview does not match this pose revision and timestamp.').first()).toBeVisible();

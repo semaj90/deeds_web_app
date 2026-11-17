@@ -41,6 +41,12 @@
 		</p>
 	</header>
 
+	<nav class="case-actions" aria-label="Case scene actions">
+		<a class="case-action primary" href={`/cases/${encodeURIComponent(data.caseId)}/evidence/upload`}>Upload evidence</a>
+		<a class="case-action" href={`/cases/${encodeURIComponent(data.caseId)}/board`}>Open evidence board</a>
+		<a class="case-action" href={`/cases/${encodeURIComponent(data.caseId)}/board?view=detective`}>Add evidence to scene</a>
+	</nav>
+
 	{#if data.loadError}
 		<p class="load-error" role="status">{data.loadError}</p>
 	{/if}
@@ -48,7 +54,10 @@
 	<section aria-labelledby="markers-heading">
 		<h2 id="markers-heading">Evidence markers <small>{data.markers.length} placed</small></h2>
 		{#if data.markers.length === 0}
-			<p class="empty">No markers placed in this case yet.</p>
+			<div class="empty-state">
+				<p class="empty">No saved case markers yet. Local preflight placements are not saved; choose a saved case exhibit and place its marker in Detective Mode.</p>
+				<a class="case-action primary" href={`/cases/${encodeURIComponent(data.caseId)}/board?view=detective`}>Choose exhibit and place marker</a>
+			</div>
 		{:else}
 			<table>
 				<thead>
@@ -150,21 +159,26 @@
 </main>
 
 <style>
-	.crime-scene { padding: 16px; max-width: 1100px; margin: 0 auto; color: #1f2430; font: 14px/1.5 system-ui, sans-serif; }
+	.crime-scene { padding: 20px; width: min(100% - 32px, 1320px); margin: 20px auto; color: var(--dossier-text-main, #141312); background: var(--dossier-bg-card, #faf6f0); border: 1px solid var(--dossier-hairline, #e2d7c9); border-radius: var(--dossier-radius-card, 10px); box-shadow: var(--dossier-shadow-card, 0 1px 2px rgba(60, 40, 20, .04)); font: 14px/1.5 system-ui, sans-serif; }
+	.case-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 20px; }
+	.case-action { display: inline-flex; align-items: center; min-height: 38px; padding: 8px 13px; border: 1px solid var(--dossier-hairline-strong, #cdbfa9); border-radius: 6px; background: #fffdf9; color: #30261b; font-weight: 600; text-decoration: none; }
+	.case-action:hover, .case-action:focus-visible { border-color: var(--dossier-gold, #c9a86a); outline: 2px solid var(--dossier-gold, #c9a86a); outline-offset: 2px; }
+	.case-action.primary { background: #483d36; color: #faf4ec; border-color: #483d36; }
+	.crime-scene section { margin-top: 14px; padding: 14px 16px; background: linear-gradient(180deg, #fffcf9 0%, #faf4ec 100%); border: 1px solid var(--dossier-hairline, #e2d7c9); border-radius: var(--dossier-radius-card, 10px); }
 	h1 { font-size: 20px; margin: 0; }
 	h2 { font-size: 16px; margin: 20px 0 8px; }
 	h2 small { font-weight: 400; color: #6b7280; margin-left: 6px; }
-	.case-title, .export-state { margin: 2px 0; color: #4b5563; }
+	.case-title, .export-state { margin: 2px 0; color: var(--dossier-text-muted-aa, #6b6150); }
 	table { width: 100%; border-collapse: collapse; font-size: 13px; }
-	th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #e5e7eb; }
-	button { padding: 4px 10px; border: 1px solid #9ca3af; border-radius: 4px; background: #f9fafb; cursor: pointer; }
+	th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--dossier-hairline, #e2d7c9); }
+	button { padding: 6px 10px; border: 1px solid var(--dossier-hairline-strong, #cdbfa9); border-radius: 6px; background: #fffdf9; color: #30261b; cursor: pointer; }
 	.facet-list { list-style: none; padding: 0; margin: 0 0 8px; }
 	.facet-list li { display: flex; gap: 8px; align-items: center; padding: 4px 0; }
 	.claim { flex: 1; }
 	.status { font-size: 12px; font-weight: 600; color: #374151; }
-	.empty, .note, .evidence-count { color: #6b7280; font-size: 13px; }
+	.empty, .note, .evidence-count { color: var(--dossier-text-muted-aa, #6b6150); font-size: 13px; }
 	.load-error { color: #b91c1c; }
-	dialog.mini-modal { border: 1px solid #d1d5db; border-radius: 8px; padding: 16px; max-width: 480px; width: calc(100% - 32px); }
+	dialog.mini-modal { border: 1px solid var(--dossier-hairline-strong, #cdbfa9); border-radius: 10px; padding: 16px; max-width: 480px; width: calc(100% - 32px); background: var(--dossier-bg-card, #faf6f0); color: var(--dossier-text-main, #141312); }
 	dialog.mini-modal::backdrop { background: rgb(15 23 42 / 0.45); }
 	dialog.mini-modal dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0 0 12px; }
 	dialog.mini-modal dt { color: #6b7280; }

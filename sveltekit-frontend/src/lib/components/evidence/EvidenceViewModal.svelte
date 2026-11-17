@@ -92,6 +92,8 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 		onEdit?: (id: string) => void;
 		onAnalyze?: (doc: any) => void;
 	} = $props();
+	const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+	let hasPersistedEvidenceId = $derived(typeof evidenceId === 'string' && UUID_PATTERN.test(evidenceId));
 
 	let doc = $state<any>(null);
 	let showRelief = $state(false);
@@ -1305,8 +1307,10 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 					</div>
 				</div>
 				<div class="modal-header-actions">
-					{#if isVideo && evidenceId}
+					{#if isVideo && hasPersistedEvidenceId}
 						<button type="button" class="modal-transcript-open" data-testid="open-video-transcript" aria-expanded={showTranscript} onclick={() => (showTranscript = true)}>Transcript</button>
+					{:else if isVideo}
+						<span class="modal-transcript-unavailable" role="status" title="Save this exhibit to the case before loading its transcript">Transcript available for saved exhibits</span>
 					{/if}
 					<button type="button" class="modal-close" onclick={close} aria-label="Close">
 						<Icon name="x" class="w-4 h-4" />
@@ -1676,7 +1680,7 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 								<p class="media-status" aria-live="polite">Local dHash <code>{videoFrameDhash}</code> · FilmCraft ticks {videoFrameTicks} · preview only, not persisted</p>
 							{/if}
 							{#if capturedFrameUrl}<img class="captured-video-frame" src={capturedFrameUrl} alt={`Captured video frame at ${formatVideoTime((videoFrameTimestampMs ?? 0) / 1000)}`} />{/if}
-			{#if evidenceId && showTranscript}
+			{#if hasPersistedEvidenceId && showTranscript}
 				<div class="transcript-drawer-scrim" aria-hidden="true"></div>
 				<div class="transcript-drawer" role="dialog" aria-modal="false" tabindex="-1" aria-label={`Transcript for ${doc?.title ?? fileName}`} data-testid="video-transcript-drawer">
 					<header class="transcript-drawer-header">

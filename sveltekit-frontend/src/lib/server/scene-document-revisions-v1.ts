@@ -3,10 +3,11 @@ import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { sceneDocumentV1Schema, stableStringifySceneDocumentV1, type SceneDocumentV1 } from '$lib/splat/scene-document-v1.js';
 import { videoEventTimelineV1Schema } from '$lib/server/features/evidence/video/video-event-fusion-v1.js';
+import { deriveReviewedGroundPlaneTrackFromHistoryV1 } from '$lib/splat/reviewed-ground-plane-track-v1.js';
 import { db } from '$lib/server/db/client.js';
 import { sceneDocumentRevisions } from '$lib/server/db/schema/scene-document-revisions.js';
 import { sceneAssets } from '$lib/server/db/schema/scene-assets.js';
-import { evidence } from '$lib/server/db/schema-postgres.js';
+import { evidence, evidenceVersions } from '$lib/server/db/schema-postgres.js';
 import { SPZ_DECODER_REVISION_V1, SPZ_GAUSSIAN_REPRESENTATION_REVISION_V1 } from '$lib/splat/scene-document-v1.js';
 
 export const sceneRevisionCommandV1Schema = z.object({
@@ -134,6 +135,52 @@ export function validateSceneVideoEventBindingsV1(input: {
 	}
 }
 
+/** Recompute every saved ground-plane proposal from canonical append-only reviews. */
+export async function validateSceneGroundPlaneTrackProposalsV1(input: {
+	caseId: string;
+	manifest: SceneDocumentV1;
+	evidenceRows: Array<{ id: string; caseId: string | null; hash: string | null }>;
+	versionRows: Array<{ id: string; evidenceId: string; version: number; metadata: unknown }>;
+}): Promise<void> {
+	const evidenceById = new Map(input.evidenceRows.map((row) => [row.id, row]));
+	const versionsByEvidence = new Map<string, Array<{ id: string; version: number; metadata: unknown }>>();
+	for (const row of input.versionRows) {
+		const group = versionsByEvidence.get(row.evidenceId) ?? [];
+		group.push({ id: row.id, version: row.version, metadata: row.metadata });
+		versionsByEvidence.set(row.evidenceId, group);
+	}
+	for (const proposal of input.manifest.groundPlaneTrackProposals ?? []) {
+		const evidenceRow = evidenceById.get(proposal.evidenceId);
+		const currentSource = evidenceRow?.hash
+			? (evidenceRow.hash.startsWith('sha256:') ? evidenceRow.hash : `sha256:${evidenceRow.hash}`)
+			: null;
+		if (!evidenceRow || evidenceRow.caseId !== input.caseId || currentSource !== proposal.sourceRevision) {
+			throw new Error('SCENE_REVISION_GROUND_TRACK_SOURCE_NOT_REGISTERED');
+		}
+		const derived = await deriveReviewedGroundPlaneTrackFromHistoryV1({
+			history: { versions: versionsByEvidence.get(proposal.evidenceId) ?? [] },
+			evidenceId: proposal.evidenceId,
+			caseId: input.caseId,
+			sourceRevision: proposal.sourceRevision,
+			analysisRevision: proposal.analysisRevision
+		});
+		const matching = derived.filter((point) => point.trackId === proposal.trackId
+			&& point.trackScopeId === proposal.trackScopeId
+			&& point.calibrationRevisionId === proposal.calibrationRevisionId);
+		const expected = matching.map((point) => ({
+			frameIndex: point.frameIndex,
+			framePtsUs: point.framePtsUs,
+			imagePx: point.imagePx,
+			planeM: point.planeM,
+			poseAnnotationRevisionId: point.poseAnnotationRevisionId,
+			status: point.status
+		}));
+		if (expected.length < 2 || stableStringifySceneDocumentV1(expected) !== stableStringifySceneDocumentV1(proposal.points)) {
+			throw new Error('SCENE_REVISION_GROUND_TRACK_NOT_ADMITTED');
+		}
+	}
+}
+
 /** Append-only revision save with command idempotency and optimistic head comparison. */
 export async function appendSceneDocumentRevisionV1(input: {
 	caseId: string;
@@ -172,16 +219,22 @@ export async function appendSceneDocumentRevisionV1(input: {
 				throw new Error('SCENE_REVISION_ASSET_NOT_REGISTERED');
 			}
 		}
-		if (binding.manifest.evidenceSources.length || (binding.manifest.evidenceBindings?.length ?? 0) > 0 || (binding.manifest.videoEventBindings?.length ?? 0) > 0) {
+		if (binding.manifest.evidenceSources.length || (binding.manifest.evidenceBindings?.length ?? 0) > 0 || (binding.manifest.videoEventBindings?.length ?? 0) > 0 || (binding.manifest.groundPlaneTrackProposals?.length ?? 0) > 0) {
 			const evidenceIds = [...new Set([
 				...binding.manifest.evidenceSources.map((source) => source.evidenceId),
 				...(binding.manifest.evidenceBindings ?? []).map((source) => source.evidenceId),
-				...(binding.manifest.videoEventBindings ?? []).map((source) => source.evidenceId)
+				...(binding.manifest.videoEventBindings ?? []).map((source) => source.evidenceId),
+				...(binding.manifest.groundPlaneTrackProposals ?? []).map((source) => source.evidenceId)
 			])];
 			const evidenceRows = await tx.select({ id: evidence.id, caseId: evidence.caseId, hash: evidence.hash, aiAnalysis: evidence.aiAnalysis })
 				.from(evidence).where(inArray(evidence.id, evidenceIds));
 			validateSceneEvidenceSourceBindingsV1({ caseId: input.caseId, manifest: binding.manifest, evidenceRows });
 			validateSceneVideoEventBindingsV1({ caseId: input.caseId, manifest: binding.manifest, evidenceRows });
+			if (binding.manifest.groundPlaneTrackProposals?.length) {
+				const versionRows = await tx.select({ id: evidenceVersions.id, evidenceId: evidenceVersions.evidenceId, version: evidenceVersions.version, metadata: evidenceVersions.metadata })
+					.from(evidenceVersions).where(inArray(evidenceVersions.evidenceId, evidenceIds)).orderBy(desc(evidenceVersions.version));
+				await validateSceneGroundPlaneTrackProposalsV1({ caseId: input.caseId, manifest: binding.manifest, evidenceRows, versionRows });
+			}
 		}
 		const [saved] = await tx.insert(sceneDocumentRevisions).values({
 			caseId: input.caseId,
