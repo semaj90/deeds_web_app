@@ -153,6 +153,7 @@ export class CourtroomScene {
   private retargetAssetCache = createRetargetAssetFetchCacheV1();
   private crtPostProcess: any = null;
   private animatingCamera = false;
+  private deterministicCapture = false;
   private renderLoop: (() => void) | null = null;
   private fpsInterval: ReturnType<typeof setInterval> | null = null;
   private evidencePlane: any = null;
@@ -257,6 +258,7 @@ export class CourtroomScene {
       this.scene.render();
     };
     this.scene.onBeforeRenderObservable.add(() => {
+      if (this.deterministicCapture) return;
       this.applyRetargets();
       this.advanceAccessoryRigs();
     });
@@ -850,6 +852,126 @@ export class CourtroomScene {
   /** Move the camera to one of the fixed presets (used by the Level 1 demo controls). */
   setCameraView(view: CourtroomView): void {
     this.transitionToView(view);
+  }
+
+  /**
+   * Render a stable PNG for a synthetic timeline frame. The frame index drives a small, repeatable
+   * procedural speaker pose and the camera preset is applied synchronously; no playback timer,
+   * requestAnimationFrame time, imported actor animation, or source evidence is used.
+   */
+  private async withDeterministicFrame<T>(
+    frameNumber: number,
+    view: CourtroomView,
+    speakerRole: string,
+    draw: (canvas: HTMLCanvasElement) => Promise<T> | T
+  ): Promise<T> {
+    if (!Number.isSafeInteger(frameNumber) || frameNumber < 0 || frameNumber >= 240) {
+      throw new RangeError(`FRAME_OUT_OF_RANGE:${frameNumber}`);
+    }
+    if (!this.scene || !this.camera || !this.engine || !this.isReady) {
+      throw new Error('COURTROOM_SCENE_NOT_READY');
+    }
+    if (!CAMERA_PRESETS[view]) throw new Error(`CAMERA_PRESET_UNAVAILABLE:${view}`);
+    if ([...this.characters.values()].some((character) => character.isModel)) {
+      throw new Error('DETERMINISTIC_CAPTURE_REQUIRES_SYNTHETIC_PROCEDURAL_ACTORS');
+    }
+    const speaker = this.characters.get(speakerRole);
+    if (!speaker || speaker.isModel || !speaker.head || !STATIONS[speakerRole]) {
+      throw new Error(`DETERMINISTIC_CAPTURE_SPEAKER_UNAVAILABLE:${speakerRole}`);
+    }
+
+    const B = BABYLON;
+    const preset = CAMERA_PRESETS[view];
+    this.deterministicCapture = true;
+    try {
+      this.scene.stopAllAnimations();
+      this.animatingCamera = false;
+      this.resetProceduralCharactersForCapture();
+      const segmentFrame = frameNumber % 60;
+      const phase = (segmentFrame / 60) * Math.PI * 2;
+      const speakerStation = STATIONS[speakerRole];
+      speaker.head.position.y = speakerStation.y + 1.9 + Math.sin(phase) * 0.055;
+      speaker.head.rotation.x = Math.cos(phase) * 0.035;
+      this.camera.alpha = preset.alpha;
+      this.camera.beta = preset.beta;
+      this.camera.radius = preset.radius;
+      this.camera.target = new B.Vector3(preset.target.x, preset.target.y, preset.target.z);
+      this.camera.animations = [];
+      this.currentView = view;
+      this.activeCharacter = null;
+      this.evidenceVisible = false;
+      if (this.evidencePlane) this.evidencePlane.setEnabled(false);
+      if (!this.scene.isReady()) throw new Error('COURTROOM_SCENE_PIPELINE_NOT_READY');
+      this.scene.render();
+
+      const canvas = this.engine.getRenderingCanvas() as HTMLCanvasElement | null;
+      if (!canvas) throw new Error('COURTROOM_RENDER_CANVAS_UNAVAILABLE');
+      return await draw(canvas);
+    } finally {
+      this.deterministicCapture = false;
+      this.resetProceduralCharactersForCapture();
+      this.resumeProceduralIdleAnimations();
+    }
+  }
+
+  async renderAtFrame(frameNumber: number, view: CourtroomView, speakerRole: string): Promise<Blob> {
+    return this.withDeterministicFrame(frameNumber, view, speakerRole, (canvas) => new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error('COURTROOM_PNG_ENCODING_FAILED')), 'image/png');
+      }));
+  }
+
+  async renderAtFrameInto(
+    frameNumber: number,
+    view: CourtroomView,
+    speakerRole: string,
+    target: HTMLCanvasElement
+  ): Promise<void> {
+    await this.withDeterministicFrame(frameNumber, view, speakerRole, (source) => {
+      const context = target.getContext('2d');
+      if (!context) throw new Error('COURTROOM_TARGET_CANVAS_UNAVAILABLE');
+      context.drawImage(source, 0, 0, target.width, target.height);
+    });
+  }
+
+  private resumeProceduralIdleAnimations(): void {
+    if (!this.scene || !BABYLON) return;
+    for (const character of this.characters.values()) {
+      const torso = character.torso;
+      if (!torso || character.isModel) continue;
+      const B = BABYLON;
+      const baseY = torso.position.y;
+      const idle = new B.Animation(
+        'courtroomCaptureIdle',
+        'position.y',
+        30,
+        B.Animation.ANIMATIONTYPE_FLOAT,
+        B.Animation.ANIMATIONLOOPMODE_CYCLE
+      );
+      idle.setKeys([
+        { frame: 0, value: baseY },
+        { frame: 30, value: baseY + 0.05 },
+        { frame: 60, value: baseY },
+      ]);
+      torso.animations = [idle];
+      this.scene.beginAnimation(torso, 0, 60, true);
+    }
+  }
+
+  private resetProceduralCharactersForCapture(): void {
+    for (const [role, character] of this.characters) {
+      const station = STATIONS[role];
+      if (!station || !character.torso) continue;
+      character.torso.position.set(station.x, station.y + 1.2, station.z);
+      character.torso.rotation.set(0, 0, 0);
+      if (character.head) {
+        character.head.position.set(station.x, station.y + 1.9, station.z);
+        character.head.rotation.set(0, 0, 0);
+      }
+      // Keep imported media out of this capture path; only the procedural fixture is admitted.
+      for (const mesh of character.meshes) {
+        if (mesh.material) mesh.material.alpha = 1;
+      }
+    }
   }
 
   /** Smooth camera transition to a preset */

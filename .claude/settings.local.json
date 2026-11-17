@@ -657,7 +657,14 @@
       "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:5173/api/health\" -UseBasicParsing -TimeoutSec 20; \"5173 -> $\\($r.StatusCode\\)\" } catch { \"5173 -> \" + $_.Exception.Message }; Select-String -Path \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\.tmp-pw-3d-rerun.txt\" -Pattern \"ECONN|Error|error\" | Select-Object -First 5 | ForEach-Object { $_.Line }; Get-Content \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\sveltekit-frontend\\\\logs\\\\task-output\\\\dev-gpu-restart.log\" -Tail 6)",
       "Bash(ls playwright.config.*)",
       "Bash(grep -n \"baseURL\\\\|webServer\\\\|port\" playwright.config.*)",
-      "Bash(cd *)"
+      "Bash(cd *)",
+      "mcp__trace__db_schema_overview",
+      "Bash(ls v1/chat/messages \"documents/upload\" \"evidence/[id]/analyze/stream\")",
+      "Bash(sed -n 1,80p v1/chat/messages/*.spec.ts)",
+      "mcp__trace__trace_kag_search",
+      "Bash(grep -n '\"pdfjs-dist\"' node_modules/pdf-parse/package.json)",
+      "Bash(cmp node_modules/pdfjs-dist/build/pdf.worker.min.mjs static/pdf.worker.min.mjs)",
+      "mcp__plugin_claude-mem_mcp-search__work_state_read"
     ],
     "deny": [],
     "ask": []

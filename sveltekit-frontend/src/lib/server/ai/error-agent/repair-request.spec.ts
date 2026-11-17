@@ -52,5 +52,28 @@ describe('ErrorAgentRepairRequestV1', () => {
       ...request,
       workflowInput: { ...request.workflowInput!, hmmErrorClass: 'not-a-class' as never },
     })).toBe(false);
+
+    const validVerifierReq = buildErrorAgentRepairRequestV1(selection, {
+      requestId: 'repair:test-4',
+      workflowInput: {
+        query: 'run bounded verifier',
+        hmmErrorClass: 'route_contract_mismatch',
+        verifierTier: 'T0_RUNNABLE_VERIFIER',
+        verifierCmd: 'node scripts/atlas/verify-nes-fsm-native-runtime-v1.mjs',
+        turn: 2,
+        promptRevision: 'v1',
+      },
+    });
+    expect(verifyErrorAgentRepairRequestV1(validVerifierReq)).toBe(true);
+
+    const turnTooHigh = buildErrorAgentRepairRequestV1(selection, {
+      requestId: 'repair:test-5',
+      workflowInput: {
+        query: 'exceed turn cap',
+        hmmErrorClass: 'route_contract_mismatch',
+        turn: 4,
+      },
+    });
+    expect(verifyErrorAgentRepairRequestV1(turnTooHigh)).toBe(false);
   });
 });

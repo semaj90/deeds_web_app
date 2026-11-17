@@ -16,6 +16,7 @@
 		onClose?: () => void;
 		onPinToCanvas?: (item: EvidenceItem) => void;
 		onImpeach?: (item: EvidenceItem) => void;
+		onOpenVideoModal?: (evidenceId: string) => void;
 	}
 
 	let {
@@ -24,7 +25,8 @@
 		theme = 'light',
 		onClose,
 		onPinToCanvas,
-		onImpeach
+		onImpeach,
+		onOpenVideoModal
 	}: Props = $props();
 
 	let activeTab = $state<'preview' | 'ocr' | 'chain' | 'statutes'>('preview');
@@ -240,6 +242,10 @@
 												<button class="cctv-btn" onclick={() => { showBiometricBox = !showBiometricBox; }}>
 													<Icon name="user-check" size={13} />
 													<span>{showBiometricBox ? 'HIDE BIOMETRIC' : 'SHOW BIOMETRIC'}</span>
+												</button>
+												<button class="cctv-btn video-modal-launch-btn" onclick={() => { open = false; onOpenVideoModal?.(exhibit.id); }}>
+													<Icon name="film" size={13} />
+													<span>KEYFRAME MODAL</span>
 												</button>
 												<span class="cctv-timecode">TIMECODE: 02:14:09 / 04:12</span>
 												<span class="cctv-format">HARDWARE SIG: ARULIAN-HIK-SEC-9</span>

@@ -710,7 +710,9 @@
       "byte_length_mismatch": 0,
       "sha256_mismatch": 0,
       "read_errors": 0,
-      "unmanifested_extra_files": ["sveltekit-frontend/.svelte-kit/env.d.ts"],
+      "unmanifested_extra_files": [
+        "sveltekit-frontend/.svelte-kit/env.d.ts"
+      ],
       "materialization_marker_sha256": "sha256:4f2a3294a2e1a9e128cb3b48738437e97201c71670a41a65aa2ec00805793656",
       "exact_path_set_parity": false,
       "canonical_authority": false,
@@ -813,5 +815,26 @@
     "sha256": "66ab1aefddb703edd7ef6a14b9f2d64c929726e4dd19bcf5e7f1aab61d6d7e4d",
     "archived": "2026-11-11T21:00:00Z",
     "reason": "Stale hand-placed SvelteKit route types (route id /(authenticated)/all-routes, May 2026; fields availableRoutes/routeInventory/serviceHealth no longer returned). SvelteKit never writes $types.d.ts into src; it shadowed the generated .svelte-kit/types file for TypeScript literal-path resolution, so `import type { PageLoad } from \"./$types\"` failed (TS2305). Last tracked in git at 6f212a1ded6. Restore by moving the file back to its path."
+  },
+  {
+    "path": "docker/docling-vlm/models/yolov8x.pt",
+    "archive_path": "deeds_labs/archive/2026-11-16/yolov8x.pt",
+    "sha256": "3df4ada6b4dad6d657868f2fdf7faecfb34dcfccf3a25c4b82079064718524c8",
+    "archived": "2026-11-16T18:00:00Z",
+    "reason": "AGPL-3.0 Ultralytics YOLOv8 weight in the YOLOX detector folder. Production admission excludes YOLOv8; the active detector code (docker/docling-vlm/app.py) loads only yolox_x.pth. Archived, not deleted; restore by copying back to docker/docling-vlm/models/."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/scene/scene-intent-v1.ts",
+    "archive_path": "git tag archive/2026-11-16/scene-intent-v1 : sveltekit-frontend/src/lib/server/scene/scene-intent-v1.ts",
+    "sha256": "a5d2ef06cccb46dac5b158f03774d53d23303060d6fd986a0e1efa57fe32ff93",
+    "archived": "2026-11-17T02:29:43.832Z",
+    "reason": "Duplicate SceneIntent schema. The existing owner is src/lib/server/reconstruction/crime-scene-schema.ts, which now carries the evidence citations. Archived by git tag; restore with git show archive/2026-11-16/scene-intent-v1:<path>."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/scene/scene-intent-v1.spec.ts",
+    "archive_path": "git tag archive/2026-11-16/scene-intent-v1 : sveltekit-frontend/src/lib/server/scene/scene-intent-v1.spec.ts",
+    "sha256": "f1ef693b131133dbd093c826e74182bd51069297d7afab5e6c046e1779c03214",
+    "archived": "2026-11-17T02:29:43.832Z",
+    "reason": "Duplicate SceneIntent schema. The existing owner is src/lib/server/reconstruction/crime-scene-schema.ts, which now carries the evidence citations. Archived by git tag; restore with git show archive/2026-11-16/scene-intent-v1:<path>."
   }
 ]

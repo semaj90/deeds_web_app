@@ -3,14 +3,16 @@ import { randomUUID } from 'node:crypto';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
 
+/** Preserve the page at /evidence for browsers while directing JSON clients to its API owner. */
+export const GET: RequestHandler = ({ url }) => {
+  const apiUrl = new URL(url);
+  apiUrl.pathname = '/api/evidence';
+  return Response.redirect(apiUrl, 307);
+};
+
 const evidenceUploadFieldsSchema = z.object({
   caseId: z.string().min(1).max(200).default('unknown'),
 });
-
-// Allow GET requests to pass through to the page
-export const GET: RequestHandler = async () => {
-  return new Response(null, { status: 200 });
-};
 
 // A light wrapper that accepts multipart form uploads and stores the file in SeaweedFS under the 'evidence' bucket.
 export const POST: RequestHandler = async ({ request }) => {

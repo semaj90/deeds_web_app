@@ -1,9 +1,10 @@
 import { json } from '@sveltejs/kit';
 import { createHash } from 'node:crypto';
 import type { RequestHandler } from './$types';
-import { and, eq, or } from 'drizzle-orm';
+import { and, eq, or, sql } from 'drizzle-orm';
 import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
+import { ENV } from '$lib/server/env.server.js';
 import { getSeaweedFile } from '$lib/server/seaweed-client.js';
 import { isUuid } from '$lib/server/validation.js';
 
@@ -19,6 +20,13 @@ function parseDepthArtifactLocation(value: unknown): { bucket: string; key: stri
 	const [bucket, ...keyParts] = value.slice(separator + 3).split('/');
 	const key = keyParts.join('/');
 	return bucket && key ? { bucket, key } : null;
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+	if (typeof value === 'string') {
+		try { value = JSON.parse(value); } catch { return null; }
+	}
+	return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
 }
 
 export const GET: RequestHandler = async ({ params, locals }) => {
@@ -54,27 +62,70 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			return json({ error: 'Evidence is not an image' }, { status: 415 });
 		}
 
-		const aiAnalysis = item.aiAnalysis && typeof item.aiAnalysis === 'object'
-			? item.aiAnalysis as Record<string, unknown>
-			: {};
-		const depthAnalysis = aiAnalysis.depthAnalysis && typeof aiAnalysis.depthAnalysis === 'object'
-			? aiAnalysis.depthAnalysis as Record<string, unknown>
-			: null;
 		const sourceRevision = typeof item.hash === 'string'
 			? item.hash.startsWith('sha256:') ? item.hash : `sha256:${item.hash}`
 			: null;
-		if (!depthAnalysis || !sourceRevision || depthAnalysis.sourceRevision !== sourceRevision) {
-			return json({ error: 'No source-revision-bound depth map is available' }, { status: 404 });
+		if (!sourceRevision || !/^sha256:[a-f0-9]{64}$/.test(sourceRevision)) {
+			return json({ error: 'Evidence source revision is invalid' }, { status: 409 });
 		}
 
-		const storedUrl = depthAnalysis.depthMapUrl;
-		const artifactLocation = parseDepthArtifactLocation(storedUrl);
-		if (!artifactLocation) {
-			return json({ error: 'Depth map location is invalid' }, { status: 404 });
+		let bucket: string | null = null;
+		let key: string | null = null;
+		let recordedSha: unknown = null;
+		let expectedWidth: unknown = null;
+		let expectedHeight: unknown = null;
+		let canonicalDepthManifestPresent = false;
+		try {
+			const result = await db.execute(sql`
+				SELECT source_revision, metadata
+				FROM public.evidence_multimodal_vectors
+				WHERE evidence_id = ${item.id}::uuid
+				  AND modality = 'image'
+				  AND source_locator->>'kind' = 'whole_image'
+				ORDER BY created_at DESC, id DESC
+				LIMIT 1
+			`);
+			const row = (result.rows as Array<Record<string, unknown>>)[0];
+			if (row && row.source_revision === sourceRevision) {
+				const metadata = asRecord(row.metadata);
+				const visual = asRecord(metadata?.visualAnalysis);
+				const depth = asRecord(visual?.depthMap);
+				if (depth) {
+					canonicalDepthManifestPresent = true;
+					recordedSha = depth.artifactSha256;
+					expectedWidth = depth.width;
+					expectedHeight = depth.height;
+					bucket = typeof depth.bucket === 'string' ? depth.bucket : null;
+					key = typeof depth.objectKey === 'string' ? depth.objectKey : null;
+					if (visual?.sourceRevision !== sourceRevision || depth.status !== 'ESTIMATED' || bucket !== ENV.SEAWEED_ARTIFACTS_BUCKET) {
+						return json({ error: 'Canonical depth map binding is invalid' }, { status: 404 });
+					}
+			}
+			}
+		} catch {
+			// An absent canonical table is possible before its additive migration is applied;
+			// keep legacy readback available while the canonical owner is unavailable.
 		}
-		const { bucket, key } = artifactLocation;
 
-		const recordedSha = depthAnalysis.depthSha256;
+		if (!canonicalDepthManifestPresent) {
+			const aiAnalysis = item.aiAnalysis && typeof item.aiAnalysis === 'object'
+				? item.aiAnalysis as Record<string, unknown>
+				: {};
+			const legacyDepth = aiAnalysis.depthAnalysis && typeof aiAnalysis.depthAnalysis === 'object'
+				? aiAnalysis.depthAnalysis as Record<string, unknown>
+				: null;
+			if (!legacyDepth || legacyDepth.sourceRevision !== sourceRevision) {
+				return json({ error: 'No source-revision-bound depth map is available' }, { status: 404 });
+			}
+			const location = parseDepthArtifactLocation(legacyDepth.depthMapUrl);
+			if (!location) return json({ error: 'Depth map location is invalid' }, { status: 404 });
+			bucket = location.bucket;
+			key = location.key;
+			recordedSha = legacyDepth.depthSha256;
+			expectedWidth = legacyDepth.width;
+			expectedHeight = legacyDepth.height;
+		}
+		if (!bucket || !key) return json({ error: 'Depth map location is invalid' }, { status: 404 });
 		if (recordedSha === undefined || recordedSha === null) {
 			return json({ error: 'A verified depth map is unavailable' }, { status: 404 });
 		}
@@ -82,10 +133,14 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			return json({ error: 'Depth map digest record is invalid' }, { status: 422 });
 		}
 		// Digest-keyed objects are immutable: a regenerated depth map gets a new key.
-		const expectedKey = `evidence/${item.caseId ?? 'default'}/${item.id}-depth-${recordedSha}.png`;
-		if (!bucket || key !== expectedKey) return json({ error: 'Depth map binding is invalid' }, { status: 404 });
-		const expectedWidth = depthAnalysis.width;
-		const expectedHeight = depthAnalysis.height;
+		if (canonicalDepthManifestPresent) {
+			const sourceHash = sourceRevision.slice('sha256:'.length);
+			const expectedKey = `evidence/${item.caseId ?? 'default'}/${item.id}/${sourceHash}/depth-${recordedSha}.png`;
+			if (key !== expectedKey) return json({ error: 'Canonical depth map binding is invalid' }, { status: 404 });
+		} else {
+			const expectedKey = `evidence/${item.caseId ?? 'default'}/${item.id}-depth-${recordedSha}.png`;
+			if (key !== expectedKey) return json({ error: 'Depth map binding is invalid' }, { status: 404 });
+		}
 		if (typeof expectedWidth !== 'number' || !Number.isInteger(expectedWidth) || expectedWidth <= 0 ||
 			typeof expectedHeight !== 'number' || !Number.isInteger(expectedHeight) || expectedHeight <= 0) {
 			return json({ error: 'Depth map dimensions are invalid' }, { status: 422 });

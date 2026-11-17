@@ -19,6 +19,7 @@ describe('upload-classification-v1 Contract & Proof Gates', () => {
     0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45, 0x66, 0x6d, 0x74
   ]); // RIFF...WAVE
   const MP3_BYTES = new Uint8Array([0x49, 0x44, 0x33, 0x03, 0x00, 0x00, 0x00, 0x00]); // ID3
+  const WEBM_BYTES = new Uint8Array([0x1a, 0x45, 0xdf, 0xa3, 0x9f, 0x42, 0x86, 0x81, 0x01]); // EBML header
   const TEXT_BYTES = new TextEncoder().encode('TITLE,AMOUNT,DATE\nDeed of Trust,$500000,2026-10-31\n');
   const TS_CODE_BYTES = new TextEncoder().encode('export function verifyContract(): boolean { return true; }\n');
 
@@ -169,6 +170,16 @@ describe('upload-classification-v1 Contract & Proof Gates', () => {
       expect(res.mimeStatus).toBe('CONFIRMED');
       expect(res.effectiveMime).toBe('audio/mpeg');
       expect(res.legalEvidenceTypeProposal).toBe('audio');
+    });
+
+    it('classifies WebM video from its EBML signature', () => {
+      const res = classifyUploadedBytes({
+        filename: 'surveillance.webm',
+        declaredMime: 'video/webm',
+        bytes: WEBM_BYTES,
+      });
+      expect(res.mimeStatus).toBe('CONFIRMED');
+      expect(res.effectiveMime).toBe('video/webm');
     });
 
     it('classifies Source Code without throwing', () => {

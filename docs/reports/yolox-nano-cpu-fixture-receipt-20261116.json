@@ -1,0 +1,73 @@
+{
+  "schema": "yolox-nano-cpu-fixture-receipt.v1",
+  "status": "CPU_FIXTURE_INFERENCE_PASSED__NOT_PRODUCTION_ADMITTED",
+  "generatedAt": "2026-11-16T19:26:10.411Z",
+  "model": {
+    "file": "sveltekit-frontend/models/yolox_nano.onnx",
+    "bytes": 3659407,
+    "sha256": "sha256:c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+    "license": "code Apache-2.0; weight grant not separately documented (DET-04)"
+  },
+  "runtime": {
+    "python": "C:/Python313/python.exe",
+    "pythonVersion": "3.13.5",
+    "onnxruntime": "1.27.0",
+    "executionProviders": [
+      "CPUExecutionProvider"
+    ]
+  },
+  "input": {
+    "description": "public sample photo, scratch-only, NOT committed; rights not cleared",
+    "bytes": 137419,
+    "sha256": "sha256:c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63",
+    "width": 810,
+    "height": 1080
+  },
+  "result": {
+    "method": "yolo",
+    "modelType": "coco",
+    "latencyMs": 613,
+    "objects": [
+      {
+        "label": "person",
+        "confidence": 0.874,
+        "bboxXyxy": [
+          50.2,
+          394.3,
+          213.6,
+          902
+        ]
+      },
+      {
+        "label": "person",
+        "confidence": 0.6704,
+        "bboxXyxy": [
+          210.9,
+          405.2,
+          364.2,
+          864.5
+        ]
+      },
+      {
+        "label": "bus",
+        "confidence": 0.5907,
+        "bboxXyxy": [
+          32,
+          230.7,
+          806.8,
+          754.4
+        ]
+      },
+      {
+        "label": "person",
+        "confidence": 0.5686,
+        "bboxXyxy": [
+          683.1,
+          437.5,
+          810,
+          874.7
+        ]
+      }
+    ]
+  }
+}

@@ -10,6 +10,19 @@ Canonical lanes:
 - ACE / NES: context cards and prompt injection
 - TurboVec / Karpathy / SOM: quantization, clustering, and routing hints
 
+## Svelte 5 and Bits UI compatibility
+
+- Keep application components on Svelte 5 runes. Do not enable global `compilerOptions.compatibility.componentApi: 4` in `sveltekit-frontend/svelte.config.js`: it applies the Svelte 4 component-instance API to every component and has been reported to break Bits UI transition completion callbacks (`onOpenChangeComplete.current is not a function`; see [Bits UI discussion #1302](https://github.com/huntabyte/bits-ui/discussions/1302)).
+- The app's `dynamicCompileOptions` exception is scoped to `lucide-svelte`, the only dependency currently identified as needing Svelte 4 `$$props` behavior. Do not use a broad `node_modules` condition; keep Bits UI, `svelte-sonner`, SvelteKit internals, and other Svelte 5 dependencies on runes.
+- Use Bits UI v2's documented `bind:open` / `onOpenChange` API. Do not forward an arbitrary `onOpenChangeComplete` prop through a wrapper; if a caller supplies it, validate that it is a function. No application source call site should need a no-op callback to mask a compiler-compatibility problem.
+- Keep `src/lib/config/svelte-compile-options.spec.ts` covering both the absence of global `componentApi: 4` and the runes-mode exceptions. Run it after compiler-config changes.
+- After changing Svelte compiler configuration, restart SvelteKit/Vite before judging the result: an already-running server or optimized `bits-ui` dependency can retain the old compiled callback shape. If the error remains after restart, inspect the effective config and optimized dependency bundle before changing dialog call sites.
+
+## Legal AI visual assets
+
+- The dossier theme stylesheet is `sveltekit-frontend/src/lib/styles/dossier-global.css`; the evidence document modal has its own imported stylesheet, `sveltekit-frontend/src/lib/styles/evidence-document-modal.css`.
+- Prefer the existing legal/Celestial icon pack in `sveltekit-frontend/src/lib/icons/yorha/` through `sveltekit-frontend/src/lib/components/ui/Icon.svelte` names such as `yorha-ai-assistant`, `yorha-law-book`, `yorha-citation`, and `yorha-evidence`. Other names use UnoCSS `i-lucide-*` icons. Keep icon rendering on this Svelte 5 component path rather than adding a global compiler compatibility exception.
+
 OpenCode / Claude-Mem:
 - treat as an observation source only
 - do not make SQLite canonical

@@ -109,6 +109,13 @@
 								</div>
 							{/if}
 
+							<a
+								href={`/cases/${encodeURIComponent(caseId)}/evidence/${encodeURIComponent(ev.id)}`}
+								class="mt-1 mr-2 text-[9px] text-[#6bffdf] underline underline-offset-2"
+							>
+								Details
+							</a>
+
 							{#if ev.hasFile}
 								<a
 									href={`/api/evidence/${encodeURIComponent(ev.id)}/download?inline=1&caseId=${encodeURIComponent(caseId)}`}

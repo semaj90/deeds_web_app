@@ -354,3 +354,184 @@ pub fn hint_turbovec_topk(vectors: Float32Array, queries: Float32Array, dim: u32
     }
     Ok(TopKResult { indices, scores })
 }
+
+// ── 8. dHash-64 + SIMD Bitset Hamming Top-K (ArtCraft / Video Keyframing) ─────
+
+/// Pure 64-bit horizontal gradient dHash over a 9x8 (72-byte) grayscale frame in LSB-first order.
+pub fn compute_dhash_64_raw(gray_9x8: &[u8]) -> std::result::Result<u64, &'static str> {
+    if gray_9x8.len() != 72 {
+        return Err("DHASH_INPUT_MUST_BE_72_BYTES");
+    }
+    let mut bits: u64 = 0;
+    let mut bit_idx = 0u32;
+    for row in 0..8usize {
+        let row_offset = row * 9;
+        for col in 0..8usize {
+            if gray_9x8[row_offset + col] < gray_9x8[row_offset + col + 1] {
+                bits |= 1u64 << bit_idx;
+            }
+            bit_idx += 1;
+        }
+    }
+    Ok(bits)
+}
+
+/// Computes a 64-bit horizontal gradient dHash (9x8 grayscale) and returns a 16-char lowercase hex string.
+#[napi]
+pub fn compute_dhash_64(gray_9x8: Uint8Array) -> Result<String> {
+    let bits = compute_dhash_64_raw(&gray_9x8).map_err(Error::from_reason)?;
+    Ok(format!("{bits:016x}"))
+}
+
+#[napi(object)]
+pub struct HammingMatch {
+    pub index: u32,
+    pub distance: u32,
+}
+
+/// Pure Rayon XOR + hardware POPCNT search with stable 2-pass 8-bit LSD radix sort over 16-bit Hamming distance.
+/// Returns `(index, distance)` pairs ordered by ascending distance, preserving ascending index order on ties.
+pub fn batch_hamming_search_top_k_raw(
+    query_words: &[u64],
+    corpus_flat_words: &[u64],
+    words_per_vec: usize,
+    top_k: usize,
+) -> std::result::Result<Vec<(u32, u32)>, &'static str> {
+    if words_per_vec == 0 {
+        return Err("WORDS_PER_VEC_MUST_BE_POSITIVE");
+    }
+    if words_per_vec > 1023 {
+        return Err("WORDS_PER_VEC_EXCEEDS_U16_DISTANCE_BOUND");
+    }
+    if query_words.len() != words_per_vec {
+        return Err("QUERY_WORDS_LENGTH_MISMATCH");
+    }
+    if corpus_flat_words.len() % words_per_vec != 0 {
+        return Err("CORPUS_WORDS_LENGTH_MISMATCH");
+    }
+    let num_vecs = corpus_flat_words.len() / words_per_vec;
+    if num_vecs == 0 || top_k == 0 {
+        return Ok(Vec::new());
+    }
+
+    let mut scores: Vec<(u32, u32)> = (0..num_vecs)
+        .into_par_iter()
+        .map(|idx| {
+            let base = idx * words_per_vec;
+            let mut dist = 0u32;
+            for i in 0..words_per_vec {
+                dist += (query_words[i] ^ corpus_flat_words[base + i]).count_ones();
+            }
+            (dist, idx as u32)
+        })
+        .collect();
+
+    let mut temp = vec![(0u32, 0u32); scores.len()];
+    for shift in [0u32, 8u32] {
+        let mut count = [0usize; 256];
+        for &(dist, _) in &scores {
+            count[((dist >> shift) & 0xFF) as usize] += 1;
+        }
+        let mut prefix = [0usize; 256];
+        for i in 1..256 {
+            prefix[i] = prefix[i - 1] + count[i - 1];
+        }
+        for &item in &scores {
+            let bucket = ((item.0 >> shift) & 0xFF) as usize;
+            temp[prefix[bucket]] = item;
+            prefix[bucket] += 1;
+        }
+        std::mem::swap(&mut scores, &mut temp);
+    }
+
+    Ok(scores
+        .into_iter()
+        .take(top_k.min(num_vecs))
+        .map(|(dist, idx)| (idx, dist))
+        .collect())
+}
+
+/// Converts a packed little-endian byte buffer into `u64` words (8 bytes per word).
+pub fn bytes_le_to_u64_words(
+    bytes: &[u8],
+    err_code: &'static str,
+) -> std::result::Result<Vec<u64>, &'static str> {
+    if bytes.len() % 8 != 0 {
+        return Err(err_code);
+    }
+    Ok(bytes
+        .chunks_exact(8)
+        .map(|chunk| u64::from_le_bytes(chunk.try_into().unwrap()))
+        .collect())
+}
+
+/// Hardware POPCNT(A ^ B) + 2-pass LSD radix sort over packed little-endian u64 bitsets (e.g. twelve u64 words = 96 bytes for 768-bit vectors).
+#[napi]
+pub fn batch_hamming_search_top_k(
+    query_words_le: Uint8Array,
+    corpus_flat_words_le: Uint8Array,
+    words_per_vec: u32,
+    top_k: u32,
+) -> Result<Vec<HammingMatch>> {
+    let query_words = bytes_le_to_u64_words(&query_words_le, "QUERY_BYTES_NOT_U64_ALIGNED")
+        .map_err(Error::from_reason)?;
+    let corpus_words = bytes_le_to_u64_words(&corpus_flat_words_le, "CORPUS_BYTES_NOT_U64_ALIGNED")
+        .map_err(Error::from_reason)?;
+    let pairs = batch_hamming_search_top_k_raw(
+        &query_words,
+        &corpus_words,
+        words_per_vec as usize,
+        top_k as usize,
+    )
+    .map_err(Error::from_reason)?;
+    Ok(pairs
+        .into_iter()
+        .map(|(index, distance)| HammingMatch { index, distance })
+        .collect())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn compute_dhash_64_raw_validates_len_and_packs_lsb_gradient() {
+        assert_eq!(compute_dhash_64_raw(&[0u8; 71]), Err("DHASH_INPUT_MUST_BE_72_BYTES"));
+
+        let flat = [42u8; 72];
+        assert_eq!(compute_dhash_64_raw(&flat), Ok(0));
+
+        let mut ramp = vec![0u8; 72];
+        for row in 0..8usize {
+            for col in 0..9usize {
+                ramp[row * 9 + col] = col as u8;
+            }
+        }
+        assert_eq!(compute_dhash_64_raw(&ramp), Ok(u64::MAX));
+    }
+
+    #[test]
+    fn batch_hamming_search_top_k_raw_ranks_768bit_vectors_and_preserves_tie_order() {
+        let w = 12usize; // 12 * 64 = 768 bits
+        let query = vec![0u64; w];
+        let mut corpus = vec![0u64; 5 * w];
+        corpus[0] = 0b1111;         // idx 0: dist 4
+        corpus[w] = 0b11;           // idx 1: dist 2
+        corpus[2 * w] = 0xFF;       // idx 2: dist 8
+        corpus[3 * w] = 0b101;      // idx 3: dist 2 (tie with idx 1; idx 1 must precede idx 3)
+        corpus[4 * w] = u64::MAX;   // idx 4: dist 64
+
+        let hits = batch_hamming_search_top_k_raw(&query, &corpus, w, 3).unwrap();
+        assert_eq!(hits, vec![(1, 2), (3, 2), (0, 4)]);
+    }
+
+    #[test]
+    fn batch_hamming_search_top_k_raw_handles_empty_and_validation() {
+        assert_eq!(batch_hamming_search_top_k_raw(&[0], &[], 1, 5), Ok(Vec::new()));
+        assert_eq!(batch_hamming_search_top_k_raw(&[0], &[0], 0, 1), Err("WORDS_PER_VEC_MUST_BE_POSITIVE"));
+        assert_eq!(batch_hamming_search_top_k_raw(&[0], &[0, 0], 2, 1), Err("QUERY_WORDS_LENGTH_MISMATCH"));
+        assert_eq!(batch_hamming_search_top_k_raw(&[0, 0], &[0, 0, 0], 2, 1), Err("CORPUS_WORDS_LENGTH_MISMATCH"));
+        assert_eq!(bytes_le_to_u64_words(&[1, 2, 3], "QUERY_BYTES_NOT_U64_ALIGNED"), Err("QUERY_BYTES_NOT_U64_ALIGNED"));
+        assert_eq!(bytes_le_to_u64_words(&42u64.to_le_bytes(), "QUERY_BYTES_NOT_U64_ALIGNED"), Ok(vec![42u64]));
+    }
+}

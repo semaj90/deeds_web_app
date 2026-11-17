@@ -1,9 +1,10 @@
 <#
 .SYNOPSIS
-  Launch a dedicated llama-server.exe embedding server for the embeddinggemma model.
+  Launch an isolated llama-server.exe embedding server for the EmbeddingGemma 2 Q8 GGUF model.
 
 .DESCRIPTION
-  Runs a second llama-server instance on port 8081 (separate from the chat server on
+  Runs the EmbeddingGemma 2 challenger on port 8082 (separate from the existing
+  semantic_768 endpoint on 8081 and chat server on
   8090) with --embedding + --pooling mean + --embd-normalize 2. This exposes:
     POST /v1/embeddings   — OpenAI-compatible embedding endpoint
     POST /embeddings      — llama.cpp native endpoint
@@ -26,12 +27,12 @@
 
 .ENV
   LLAMA_SERVER_PATH      default: resolves same as launch-turboquant.ps1
-  EMBED_MODEL_PATH       default: auto-discovers embeddinggemma blob from Ollama store
-  EMBED_PORT             default: 8081
+  EMBED_MODEL_PATH       default: repo-local EmbeddingGemma 2 Q8 GGUF
+  EMBED_PORT             default: 8082 (isolated challenger endpoint)
   EMBED_NGL              default: 0   (CPU-only; set explicitly for GPU use)
   EMBED_BATCH_SIZE       default: 2048 (must equal EMBED_UBATCH_SIZE and be >= EMBED_CTX — see invariant below)
   EMBED_UBATCH_SIZE      default: 2048
-  EMBED_CTX              default: 2048 (embeddinggemma-300m model-card max input tokens)
+  EMBED_CTX              default: 2048 (bounded executor profile; evaluate before raising)
 
 .NOTES
   EMBED-SERVER-PHYSICAL-BATCH-01 (2026-09-02): for llama.cpp's non-causal/pooled
@@ -48,7 +49,7 @@
   This script now derives batch/ubatch from ctx by default (both = EMBED_CTX) and
   fails closed — refuses to launch — if an operator explicitly sets
   EMBED_BATCH_SIZE != EMBED_UBATCH_SIZE, or sets a batch/ubatch below EMBED_CTX,
-  for this canonical EmbeddingGemma profile. This does not forbid a deliberately
+  for this isolated EmbeddingGemma 2 evaluation profile. This does not forbid a deliberately
   smaller admitted-context profile for some future non-canonical embedding model —
   it forbids exactly the silent ctx/batch mismatch that caused the incident.
 #>
@@ -113,64 +114,34 @@ $llama = if ($env:LLAMA_SERVER_PATH) {
 
 if (-not (Test-Path $llama)) { throw "llama-server.exe not found at: $llama" }
 
-# -- Resolve embedding model GGUF --------------------------------------------
-# Priority: EMBED_MODEL_PATH > repo-local GGUF > embeddinggemma Ollama blob > nomic-embed-text blob
+# -- Resolve EmbeddingGemma 2 GGUF -------------------------------------------
+# ONNX graphs are used by the in-process ONNX adapter; llama-server requires GGUF.
+# Keep this model isolated from the existing semantic_768/EmbeddingGemma v1 lane.
 $model = if ($env:EMBED_MODEL_PATH) {
   $env:EMBED_MODEL_PATH
 } else {
-  $vendorEmbed = Join-Path $PSScriptRoot "..\vendor\models\embeddinggemma.gguf"
-  $localEmbed  = Join-Path $PSScriptRoot "..\models\embeddinggemma-300m-f16.gguf"
-  $localQ8     = Join-Path $PSScriptRoot "..\models\embeddinggemma-300m-q8_0.gguf"
-
-  $ollamaBlob  = $null
-  $manifestRoot = Join-Path $env:USERPROFILE '.ollama\models\manifests\registry.ollama.ai\library'
-  $blobRoot     = Join-Path $env:USERPROFILE '.ollama\models\blobs'
-  # embeddinggemma is the sole canonical dense encoder (semantic_768) — no active dense
-  # fallback. nomic-embed-text/all-minilm are legacy/experiment only, not auto-discovered.
-  foreach ($tag in @('embeddinggemma')) {
-    $mf = Join-Path $manifestRoot "$tag\latest"
-    if (-not (Test-Path $mf)) { continue }
-    try {
-      $mfData     = Get-Content $mf -Raw | ConvertFrom-Json
-      $modelLayer = $mfData.layers | Where-Object { $_.mediaType -eq 'application/vnd.ollama.image.model' } | Select-Object -First 1
-      if ($modelLayer -and $modelLayer.digest) {
-        $blobName = $modelLayer.digest -replace ':', '-'
-        $blobPath = Join-Path $blobRoot $blobName
-        if (Test-Path $blobPath) {
-          Write-Host ("Embed model: $tag → $blobPath") -ForegroundColor DarkCyan
-          $ollamaBlob = $blobPath
-          break
-        }
-      }
-    } catch { }
-  }
-
-  if     (Test-Path $localEmbed)  { $localEmbed }
-  elseif (Test-Path $localQ8)     { $localQ8 }
-  elseif (Test-Path $vendorEmbed) { $vendorEmbed }
-  elseif ($ollamaBlob)            { $ollamaBlob }
-  else                            { $null }
+  Join-Path $PSScriptRoot "..\models\embeddinggemma2\unsloth-q8\embeddinggemma-2-Q8_0.gguf"
 }
 
 if (-not $model) {
-  throw "No embedding model GGUF found. Set EMBED_MODEL_PATH=<path>, or ensure embeddinggemma is pulled in Ollama (~/.ollama/models/)."
+  throw "EmbeddingGemma 2 GGUF not found. Set EMBED_MODEL_PATH to a valid GGUF path."
 }
-if (-not (Test-Path $model)) { throw "Embed model GGUF not found at: $model" }
+if (-not (Test-Path -LiteralPath $model -PathType Leaf)) { throw "EmbeddingGemma 2 GGUF not found at: $model`nExpected repo-local path: $((Join-Path $PSScriptRoot '..\models\embeddinggemma2\unsloth-q8\embeddinggemma-2-Q8_0.gguf'))" }
 
 # -- Config -------------------------------------------------------------------
-$port       = if ($env:EMBED_PORT)       { $env:EMBED_PORT }       else { '8081' }
+$port       = if ($env:EMBED_PORT)       { $env:EMBED_PORT }       else { '8082' }
 $ngl        = if ($env:EMBED_NGL)        { $env:EMBED_NGL }        else { '0'    }
 $ctxLen     = if ($env:EMBED_CTX)        { $env:EMBED_CTX }        else { '2048' }
-# batch/ubatch default to ctx (canonical EmbeddingGemma profile — see
+# batch/ubatch default to ctx (isolated EmbeddingGemma 2 profile — see
 # EMBED-SERVER-PHYSICAL-BATCH-01 note above). Only override via env if you
 # know what you're doing; a mismatch is refused below, not silently accepted.
 $batchSize  = if ($env:EMBED_BATCH_SIZE) { $env:EMBED_BATCH_SIZE } else { $ctxLen }
 $ubatchSize = if ($env:EMBED_UBATCH_SIZE){ $env:EMBED_UBATCH_SIZE} else { $ctxLen }
 $threads    = [System.Environment]::ProcessorCount.ToString()
-# The model receipt (EMB-PROV-01) records serverModelAlias=embeddinggemma. Without --alias llama-server reports the GGUF
+# The model receipt (EMB-PROV-01) records serverModelAlias. Without --alias llama-server reports the GGUF
 # file name, so the runtime readback cannot match the requested model id. Identity is still decided by the loaded
 # path + sha256, never by this alias.
-$alias      = if ($env:EMBED_ALIAS) { $env:EMBED_ALIAS } else { 'embeddinggemma' }
+$alias      = if ($env:EMBED_ALIAS) { $env:EMBED_ALIAS } else { 'embeddinggemma2' }
 
 # -- Fail-closed invariant (EMBED-SERVER-PHYSICAL-BATCH-01) -------------------
 # Refuses to launch with a config that would silently cap admitted input length
@@ -178,10 +149,10 @@ $alias      = if ($env:EMBED_ALIAS) { $env:EMBED_ALIAS } else { 'embeddinggemma'
 # embedding requests to fail with "input too large to process" while the model
 # happily advertised a 2048-token EMBED_CTX.
 if ([int]$batchSize -ne [int]$ubatchSize) {
-  throw "EMBED_BATCH_SIZE ($batchSize) must equal EMBED_UBATCH_SIZE ($ubatchSize) for the canonical EmbeddingGemma embedding profile — llama.cpp's non-causal/pooled path is capped by the smaller of the two, so a mismatch silently truncates the admitted context. See EMBED-SERVER-PHYSICAL-BATCH-01 in this file's header."
+  throw "EMBED_BATCH_SIZE ($batchSize) must equal EMBED_UBATCH_SIZE ($ubatchSize) for the EmbeddingGemma 2 embedding profile — llama.cpp's non-causal/pooled path is capped by the smaller of the two, so a mismatch silently truncates the admitted context. See EMBED-SERVER-PHYSICAL-BATCH-01 in this file's header."
 }
 if ([int]$batchSize -lt [int]$ctxLen) {
-  throw "Canonical EmbeddingGemma executor cannot advertise EMBED_CTX=$ctxLen with physical batch EMBED_BATCH_SIZE/EMBED_UBATCH_SIZE=$batchSize — requests near the advertised context would fail with 'input too large to process'. Raise EMBED_BATCH_SIZE/EMBED_UBATCH_SIZE to at least $ctxLen, or lower EMBED_CTX to match. See EMBED-SERVER-PHYSICAL-BATCH-01 in this file's header."
+  throw "EmbeddingGemma 2 executor cannot advertise EMBED_CTX=$ctxLen with physical batch EMBED_BATCH_SIZE/EMBED_UBATCH_SIZE=$batchSize — requests near the advertised context would fail with 'input too large to process'. Raise EMBED_BATCH_SIZE/EMBED_UBATCH_SIZE to at least $ctxLen, or lower EMBED_CTX to match. See EMBED-SERVER-PHYSICAL-BATCH-01 in this file's header."
 }
 
 Write-Host "`nEmbed server config:" -ForegroundColor Gray

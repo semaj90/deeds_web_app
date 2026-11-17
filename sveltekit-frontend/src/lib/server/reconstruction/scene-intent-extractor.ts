@@ -107,6 +107,7 @@ export function buildDegradedFixture(input: {
         action:       'idle',
         path:         [],
         evidence_ids: [],
+        citations:    [],
         confidence:   'low',
         disputed:     false,
         annotations:  [

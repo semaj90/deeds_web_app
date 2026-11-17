@@ -6,10 +6,12 @@
 		tier: Tier;
 		lod: number;
 		vertices: number;
+		pickAcceleration?: 'multi-bvh' | 'three-raycast';
 	}
 	export type DepthSourceMode = 'STORED_MONOCULAR_DEPTH' | 'BRIGHTNESS_PREVIEW' | 'DEPTH_UNAVAILABLE';
 	export type ReliefSamplingMode = 'native' | 'half' | 'retro';
-	export interface ReliefAnnotationPoint { id: string; x: number; y: number; }
+	export interface ReliefAnnotationPoint { id: string; x: number; y: number; label?: string; saved?: boolean; }
+	export type ReliefSegmentMask = { id: string; label: string; points: Array<{ x: number; y: number }>; reviewStatus: 'unreviewed' | 'reviewed' };
 	export type AnnotationScreenPositions = Record<string, { left: number; top: number }>;
 </script>
 
@@ -20,6 +22,7 @@
 	import { create2DDepthReliefGaussianCloud, serializeSpz } from '$lib/splat/spz-serializer.js';
 	import { parseSpz } from '$lib/splat/spz-loader.js';
 	import { createLocalSpzSession } from '$lib/splat/local-spz-session.js';
+	import { SpatialBvhManagerV1 } from '$lib/splat/spatial-bvh-manager-v1.js';
 
 	/**
 	 * Estimated 2.5D relief from ONE image + its depth map (both MUST describe the same frame).
@@ -39,6 +42,9 @@
 		showToolbar?: boolean;
 		samplingMode?: ReliefSamplingMode;
 		annotations?: ReliefAnnotationPoint[];
+		savedGlb?: ArrayBuffer | null;
+		segmentMasks?: ReliefSegmentMask[];
+		onExportGlb?: (glb: ArrayBuffer, metrics: { vertexCount: number; triangleCount: number; segmentMasks: ReliefSegmentMask[] }) => void | Promise<void>;
 		placementEnabled?: boolean;
 		draggingAnnotationId?: string | null;
 		onStatus?: (s: ViewerStatus) => void;
@@ -62,6 +68,9 @@
 		showToolbar = true,
 		samplingMode,
 		annotations = [],
+		savedGlb = null,
+		segmentMasks = [],
+		onExportGlb,
 		placementEnabled = false,
 		draggingAnnotationId = null,
 		onStatus,
@@ -93,12 +102,15 @@
 	function changeCameraZoom(value: number) { setCameraZoom?.(value); }
 	const debugWireframe = $derived(wireframe ?? localWireframe);
 	let updateRelief: ((value: number) => void) | null = null;
-	let status = $state<ViewerStatus>({ backend: 'none', vendor: 'unknown', tier: 'medium', lod: 0, vertices: 0 });
+	let status = $state<ViewerStatus>({ backend: 'none', vendor: 'unknown', tier: 'medium', lod: 0, vertices: 0, pickAcceleration: 'three-raycast' });
 	let sourceMode = $state<DepthSourceMode>('DEPTH_UNAVAILABLE');
 	let exportSpz = $state<(() => void) | null>(null);
+	let exportGlb = $state<(() => Promise<void>) | null>(null);
+	let applySavedGlb: ((bytes: ArrayBuffer | null) => Promise<void>) | null = null;
 
 	$effect(() => updateRelief?.(relief));
 	$effect(() => applySampling?.(activeSamplingMode));
+	$effect(() => { void applySavedGlb?.(savedGlb); });
 
 	async function detectGpu(): Promise<{ vendor: string; tier: Tier; hasWebGPU: boolean }> {
 		const gpu = (navigator as any).gpu;
@@ -127,10 +139,14 @@
 			let colorBitmap: ImageBitmap | null = null;
 			let depthBitmap: ImageBitmap | null = null;
 			let renderer: any = null;
+			let scene: any = null;
 			let controls: any = null;
+			let reliefBvh: SpatialBvhManagerV1 | null = null;
+			let pickAcceleration: 'multi-bvh' | 'three-raycast' = 'three-raycast';
 			let observer: ResizeObserver | null = null;
 			let interactionCleanup: (() => void) | null = null;
 			let spzSession: any = null;
+			let savedScene: any = null;
 			const geometries: Array<{ dispose(): void }> = [];
 			const materials: Array<{ dispose(): void }> = [];
 			const textures: Array<{ dispose(): void }> = [];
@@ -139,12 +155,27 @@
 				if (resourcesReleased) return;
 				resourcesReleased = true;
 				renderer?.setAnimationLoop(null);
+				reliefBvh?.dispose();
+				reliefBvh = null;
 				setCameraZoom = null;
 				applySampling = null;
 				updateRelief = null;
 				spzSession?.cancel();
 				spzSession = null;
 				exportSpz = null;
+				exportGlb = null;
+				applySavedGlb = null;
+				if (savedScene) {
+					scene.remove(savedScene);
+					savedScene.traverse?.((node: any) => {
+						node.geometry?.dispose?.();
+						for (const material of Array.isArray(node.material) ? node.material : node.material ? [node.material] : []) {
+							for (const value of Object.values(material)) if ((value as any)?.isTexture) (value as any).dispose?.();
+							material.dispose?.();
+						}
+					});
+					savedScene = null;
+				}
 				observer?.disconnect();
 				interactionCleanup?.();
 				interactionCleanup = null;
@@ -331,7 +362,7 @@
 					map: texture, color: '#ffffff', metalness: 0, roughness: 0.88, side: THREE.DoubleSide
 				});
 				materials.push(material);
-				const scene = new THREE.Scene();
+				scene = new THREE.Scene();
 				scene.background = new THREE.Color('#0c1220');
 				const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 50);
 				camera.position.set(0, 0, 3.4);
@@ -346,6 +377,20 @@
 					scene.add(mesh);
 					return { ...grid, mesh, vertices: geometry.getAttribute('position').count };
 				});
+				let currentLod = -1;
+				try {
+					reliefBvh = new SpatialBvhManagerV1();
+					const inventory = reliefBvh.build(lods.map((lod) => lod.mesh));
+					if (inventory.tlasBuilt && inventory.staticMeshCount === lods.length) pickAcceleration = 'multi-bvh';
+					else {
+						reliefBvh.dispose();
+						reliefBvh = null;
+					}
+				} catch {
+					// Keep annotation placement available through Three.js's standard raycaster.
+					reliefBvh?.dispose();
+					reliefBvh = null;
+				}
 
 				// Backplate hides gaps at culled discontinuities.
 				const backMaterial = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
@@ -354,6 +399,36 @@
 				geometries.push(backPlane.geometry);
 				backPlane.position.z = -Math.abs(relief) * 0.5 - 0.045;
 				scene.add(backPlane);
+				applySavedGlb = async (bytes) => {
+					if (savedScene) {
+						scene.remove(savedScene);
+						savedScene.traverse?.((node: any) => {
+							node.geometry?.dispose?.();
+							for (const material of Array.isArray(node.material) ? node.material : node.material ? [node.material] : []) {
+								for (const value of Object.values(material)) if ((value as any)?.isTexture) (value as any).dispose?.();
+								material.dispose?.();
+							}
+						});
+						savedScene = null;
+					}
+					lods.forEach((lod) => (lod.mesh.visible = !bytes && lod === lods[currentLod]));
+					backPlane.visible = !bytes;
+					if (!bytes) return;
+					try {
+						const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+						const parsed = await new GLTFLoader().parseAsync(bytes, '');
+						if (disposed) return;
+						savedScene = parsed.scene;
+						savedScene.name = 'Saved source-bound 2.5D hypothesis';
+						scene.add(savedScene);
+					} catch (cause) {
+						lods.forEach((lod) => (lod.mesh.visible = lod === lods[currentLod]));
+						backPlane.visible = true;
+						error = `Saved mesh could not be decoded: ${cause instanceof Error ? cause.message : String(cause)}`;
+						onLoadState?.('error');
+					}
+				};
+				void applySavedGlb(savedGlb);
 				scene.add(new THREE.HemisphereLight(0xf4f7ff, 0x525d77, 2.1));
 				const key = new THREE.DirectionalLight(0xfff5e9, 1.6);
 				key.position.set(-2, 3, 5);
@@ -392,6 +467,7 @@
 						lod.geometry.computeVertexNormals();
 						lod.geometry.computeBoundingBox();
 					}
+					reliefBvh?.refit();
 					backPlane.position.z = -Math.abs(value) * 0.5 - 0.045;
 				};
 
@@ -442,9 +518,72 @@
 				observer.observe(host);
 				resize();
 
-				let currentLod = -1;
 				let projectionTick = 0;
 				let boundsTick = 0;
+				exportGlb = async () => {
+					if (currentLod < 0 || !onExportGlb || !colorBitmap) throw new Error('Relief mesh is not ready to export.');
+					const active = lods[currentLod].mesh;
+					const canvas = document.createElement('canvas');
+					canvas.width = Math.min(768, colorBitmap.width);
+					canvas.height = Math.max(1, Math.round(canvas.width / imageAspect));
+					const context = canvas.getContext('2d');
+					if (!context) throw new Error('Could not prepare the mesh texture for export.');
+					context.drawImage(colorBitmap, 0, 0, canvas.width, canvas.height);
+					for (const annotation of annotations) {
+						const x = annotation.x * canvas.width;
+						const y = annotation.y * canvas.height;
+						context.beginPath();
+						context.arc(x, y, Math.max(4, canvas.width / 90), 0, Math.PI * 2);
+						context.fillStyle = 'rgba(15, 24, 34, 0.9)';
+						context.fill();
+						context.strokeStyle = annotation.saved ? '#7ee7ff' : '#f0c85a';
+						context.lineWidth = Math.max(2, canvas.width / 360);
+						context.stroke();
+					}
+					for (const mask of segmentMasks) {
+						if (mask.points.length < 3) continue;
+						context.beginPath();
+						mask.points.forEach((point, index) => {
+							const x = point.x * canvas.width;
+							const y = point.y * canvas.height;
+							if (index === 0) context.moveTo(x, y); else context.lineTo(x, y);
+						});
+						context.closePath();
+						context.fillStyle = mask.reviewStatus === 'reviewed' ? 'rgba(63, 190, 168, 0.28)' : 'rgba(230, 172, 55, 0.24)';
+						context.fill();
+						context.strokeStyle = mask.reviewStatus === 'reviewed' ? '#3fbea8' : '#e6ac37';
+						context.lineWidth = 2;
+						context.stroke();
+					}
+					const map = new THREE.CanvasTexture(canvas);
+					map.colorSpace = THREE.SRGBColorSpace;
+					const materialCopy = active.material.clone();
+					materialCopy.map = map;
+					materialCopy.needsUpdate = true;
+					const meshCopy = new THREE.Mesh(active.geometry.clone(), materialCopy);
+					meshCopy.name = 'Source-bound 2.5D relief hypothesis';
+					const root = new THREE.Group();
+					root.name = 'Parent Atlas derived relief';
+					root.userData.parentAtlasSegmentMasks = segmentMasks.filter((mask) => mask.points.length >= 3).map((mask) => ({ ...mask, points: mask.points.map((point) => [point.x, point.y]) }));
+					root.userData.parentAtlasAnnotations = annotations.map((annotation) => ({ id: annotation.id, label: annotation.label ?? 'Evidence marker', x: annotation.x, y: annotation.y, saved: annotation.saved === true }));
+					root.add(meshCopy);
+					root.updateMatrixWorld(true);
+					try {
+						const { GLTFExporter } = await import('three/addons/exporters/GLTFExporter.js');
+						const result = await new GLTFExporter().parseAsync(root, { binary: true });
+						if (!(result instanceof ArrayBuffer)) throw new Error('GLB exporter did not return binary data.');
+						const index = active.geometry.getIndex();
+						await onExportGlb(result, {
+							vertexCount: active.geometry.getAttribute('position').count,
+							triangleCount: Math.floor((index?.count ?? active.geometry.getAttribute('position').count) / 3),
+							segmentMasks: segmentMasks.map((mask) => ({ ...mask, points: mask.points.map((point) => ({ ...point })) }))
+						});
+					} finally {
+						meshCopy.geometry.dispose();
+						materialCopy.dispose();
+						map.dispose();
+					}
+				};
 				const raycaster = new THREE.Raycaster();
 				const pointer = new THREE.Vector2();
 				function pickImagePoint(clientX: number, clientY: number) {
@@ -452,7 +591,9 @@
 					if (!bounds.width || !bounds.height || currentLod < 0) return null;
 					pointer.set(((clientX - bounds.left) / bounds.width) * 2 - 1, -((clientY - bounds.top) / bounds.height) * 2 + 1);
 					raycaster.setFromCamera(pointer, camera);
-					const hit = raycaster.intersectObject(lods[currentLod].mesh, false)[0];
+					const activeMesh = lods[currentLod].mesh;
+					const intersections = reliefBvh?.raycast(raycaster) ?? raycaster.intersectObject(activeMesh, false);
+					const hit = intersections.find((intersection: any) => intersection.object === activeMesh);
 					if (!hit) return null;
 					const local = lods[currentLod].mesh.worldToLocal(hit.point.clone());
 					return { x: THREE.MathUtils.clamp(local.x / width + 0.5, 0, 1), y: THREE.MathUtils.clamp(0.5 - local.y / height, 0, 1) };
@@ -500,7 +641,7 @@
 						material.map = textureLevels[lod] ?? textureLevels[2];
 						material.needsUpdate = true;
 						currentLod = lod;
-						status = { backend: activeBackend, vendor: gpuInfo.vendor, tier, lod, vertices: lods[lod].vertices };
+						status = { backend: activeBackend, vendor: gpuInfo.vendor, tier, lod, vertices: lods[lod].vertices, pickAcceleration };
 						onStatus?.(status);
 					}
 					if (showEvidenceBounds && host && ++boundsTick % 2 === 0) {
@@ -585,6 +726,7 @@
 	data-backend={status.backend}
 	data-tier={status.tier}
 	data-lod={status.lod}
+	data-pick-acceleration={status.pickAcceleration}
 	data-depth-source={sourceMode}
 >
 	<div bind:this={host} class="scene"></div>
@@ -623,6 +765,7 @@
 			<Icon name="yorha-evidence" size={16} />
 			{sourceMode === 'STORED_MONOCULAR_DEPTH' ? 'Stored image-bound depth' : sourceMode === 'BRIGHTNESS_PREVIEW' ? 'Brightness preview only' : 'Flat image fallback'} · derived 2.5D, not measured 3D
 			{#if status.backend !== 'none'}· {status.backend} · {status.tier} · LOD{status.lod}{/if}
+			{#if status.backend !== 'none'}· {status.pickAcceleration === 'multi-bvh' ? 'accelerated annotation picking' : 'standard annotation picking'}{/if}
 		</span>
 		<button type="button" aria-pressed={debugWireframe} onclick={() => (localWireframe = !localWireframe)}>
 			<Icon name="yorha-network" size={16} />
@@ -641,6 +784,12 @@
 		<button type="button" onclick={exportSpz} title="Export 2.5D depth relief as standard Niantic SPZ v4 Gaussian splat file">
 			<Icon name="yorha-evidence" size={16} />
 			Export .SPZ
+		</button>
+		{/if}
+		{#if exportGlb && onExportGlb}
+		<button type="button" onclick={() => void exportGlb?.()} title="Export the current relief surface and source texture as a GLB hypothesis mesh">
+			<Icon name="yorha-evidence" size={16} />
+			Save 2.5D mesh
 		</button>
 		{/if}
 	</div>

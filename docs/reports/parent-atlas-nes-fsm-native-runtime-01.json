@@ -1,0 +1,106 @@
+{
+  "schema": "atlas.parent-atlas-nes-fsm-native-runtime-receipt.v1",
+  "taskId": "PARENT-ATLAS-NES-FSM-NATIVE-RUNTIME-01",
+  "status": "PASS_PARITY_VERIFIED",
+  "revisionScope": "fixture-only; source/workspace revisions are stable fixture identities, not live repository revisions",
+  "canonicalAuthority": false,
+  "promotionEligible": false,
+  "writesPerformed": false,
+  "valkeyWritesPerformed": false,
+  "sourceRevision": "fixture:parent-atlas-nes-fsm-native-runtime-v1:source",
+  "workspaceRevision": "fixture:parent-atlas-nes-fsm-native-runtime-v1:workspace",
+  "binarySchemaRevision": "atlas.nes-fsm-binary-descriptor.v1",
+  "endianness": "LE",
+  "serializedLayoutAlignmentBytes": 64,
+  "descriptorByteLength": 320,
+  "candidateOrdinalMapChecksum": "01cafa7557290165a3ccd9be1dc71aa3310899f181735f01828d7e9585e78bf1",
+  "inputBufferChecksum": "ec97a9cb1831c388b3b0ada81f865339405b2c125ccb5a72624f9f06c07b59b7",
+  "outputBufferChecksum": "b00d6db4467a57ad5c048da11345d89c1d817ce8f0dc241cf2f3a221df7de209",
+  "binaryPacket": {
+    "schema": "atlas.nes-fsm-binary-packet.v1",
+    "scope": "FIXTURE_ONLY",
+    "payloadByteLength": 320,
+    "payloadSha256": "b00d6db4467a57ad5c048da11345d89c1d817ce8f0dc241cf2f3a221df7de209",
+    "candidateMapEntries": 16,
+    "sortedOrdinalCount": 16,
+    "endianness": "LE",
+    "serializedLayoutAlignmentBytes": 64,
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "readbackValidated": true
+  },
+  "transitionAndAuthorization": {
+    "taskTransition": {
+      "schema": "atlas.task-execution-lifecycle-fsm.v1",
+      "taskId": "PARENT-ATLAS-NES-FSM-NATIVE-RUNTIME-01",
+      "runId": "nes-fsm-native-v1-frozen-run",
+      "actor": "system:cpu-vertical-slice-verifier",
+      "sourceRevision": "fixture:parent-atlas-nes-fsm-native-runtime-v1:source",
+      "fromState": "DEPENDENCY_CHECKED",
+      "toState": "READY",
+      "primaryLutByte": 1,
+      "domainBitmask": 3,
+      "unresolvedDependencies": [],
+      "authorizationGranted": true,
+      "inputsPresent": true,
+      "blockReason": null,
+      "receiptSha256": "405ae44642410f327bd4e85823ca3392d730c82cf4a88eaa6fb118205ec3ba69",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "nesFeatureFsmState": "DESCRIPTOR_READY",
+    "policyAuthorizationMaskHex": "0xf",
+    "authorityFlagsByteHex": "0x00",
+    "bitfrostResidentCount": 12,
+    "bitfrostAdmittedCount": 4,
+    "bufferSwap": {
+      "bufferSwapped": true,
+      "swapCount": 1,
+      "previousActiveChecksum": null,
+      "activeChecksum": "b00d6db4467a57ad5c048da11345d89c1d817ce8f0dc241cf2f3a221df7de209",
+      "readbackVerified": true
+    },
+    "csrTotalVisited": 5,
+    "csrDiscoveryPrefixChecksum": "68cbe86a086dd23a89413ffc4c5c723137fb03bc9cd370642c45aa60b85e3eaa"
+  },
+  "nativeGuards": {
+    "addonLoaded": true,
+    "addonPath": "C:\\Users\\james\\Videos\\deeds-web-app\\packages\\atlas-native-core\\build\\Release\\atlas_native_core.node",
+    "max65536RowsEnforced": true,
+    "duplicateOrdinalsEnforced": true,
+    "somBmuRange400Enforced": true
+  },
+  "crossLanguageParity": {
+    "matchedFields": [
+      "sourceRevision",
+      "binarySchemaRevision",
+      "endianness",
+      "serializedLayoutAlignmentBytes",
+      "descriptorByteLength",
+      "candidateOrdinalMapChecksum",
+      "inputBufferChecksum",
+      "outputBufferChecksum",
+      "csrTotalVisited",
+      "csrDiscoveryPrefixChecksum",
+      "sortedOrdinals",
+      "residentCount",
+      "admittedCount",
+      "descriptorHex",
+      "canonicalAuthority",
+      "promotionEligible"
+    ],
+    "cppNegativeGatesPassed": true,
+    "descriptorHexLength": 640,
+    "commands": {
+      "cpp": "wsl -e bash -lc 'cd \"/mnt/c/Users/james/Videos/deeds-web-app\" && ./packages/atlas-native-core/build/nes_fsm_runtime_parity_smoke --emit-json'",
+      "python": "wsl -e bash -lc 'cd \"/mnt/c/Users/james/Videos/deeds-web-app\" && /home/james/miniforge3/envs/atlas-rapids-cu13/bin/python python/tests/test_nes_fsm_native_runtime_parity_v1.py --emit-json'",
+      "typescript": "node node_modules/tsx/dist/cli.mjs --eval runNesFsmNativeRuntimeV1()"
+    }
+  },
+  "blockedProductionGates": [
+    "CANONICAL_CANDIDATE_IDENTITY: Requires PG18 codebase_chunk_index live ordinal binding (proposal-only fixture used here)",
+    "VALKEY_PUBLICATION: Shared Valkey keys disabled (valkeyWritesPerformed=false)",
+    "ACP_MCP_TOOL_DISPATCH: No registered mutation action admitted without human/policy promotion receipt",
+    "LIVE_8098_CUVS_GPU_PARITY: CPU-only slice; WSL2 RAPIDS cuVS/CAGRA admission remains separate gate"
+  ]
+}

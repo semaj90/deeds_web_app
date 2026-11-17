@@ -1,9 +1,9 @@
 import { summarizeDocument } from '$lib/server/analysis/summarizer.js';
-import type { VideoSummaryResult, VideoTranscriptChunk } from './video-ingest-types.js';
+import type { VideoSummaryResult } from './video-ingest-types.js';
 
 export async function summarizeVideoTranscript(
   transcriptText: string,
-  chunks: VideoTranscriptChunk[]
+  chunks: Array<{ text: string }>
 ): Promise<VideoSummaryResult> {
   const summary = (await summarizeDocument(transcriptText, 120)).trim();
   const keyFacts = chunks

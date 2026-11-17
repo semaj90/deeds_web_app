@@ -1,5 +1,8 @@
 # AGENTS.md — Deeds Web App
 
+> **Active chat/synthesis model (operator-confirmed 2026-11-16):** llama-server `:8090` serves `gemma4-legal-iq4xs-direct.gguf` (Gemma 4 legal merge). Ornith 1.5 9B was the prior model; references to Ornith below are historical unless stated. Verify live via `GET :8090/props`.
+
+
 > Legal-AI platform: SvelteKit 2 + Svelte 5 (runes) + Bits UI v2 + Drizzle + pgvector + Qdrant + Redis + Ollama + LibTorch GPU.
 
 ## Response rules
@@ -144,7 +147,7 @@ ACE cards → ContextManifest → bounded agent/DAG execution
 
 ### Ornith, adapters, and agentic memory boundary
 
-- **Ornith** is the active synthesis and tool-use model served by the live llama-server endpoint. Resolve its model ID from `/v1/models` or the environment-backed model resolver; do not treat a hard-coded Gemma4 name as the active model authority. The current workstation runtime reports `ornith-1.5-9b`.
+- **Gemma 4 legal (`gemma4-legal-iq4xs-direct.gguf`)** is the active synthesis and tool-use model served by the live llama-server endpoint (operator-confirmed 2026-11-16). Ornith 1.5 was the prior model. Resolve its model ID from `/v1/models` or the environment-backed model resolver; do not hard-code it. The current workstation runtime reports `gemma4-legal-iq4xs-direct.gguf`.
 - **Gemma4 lineage** describes the base/model family relationship, not a second active embedding or synthesis owner. The canonical dense embedding contract remains `EmbeddingGemma` → `semantic_768`; Ornith is not the embedding writer.
 - **Legal adapters and QLoRA merges** are future, revisioned artifacts. A legal/domain adapter may be proposed, evaluated, and merged only under a new model/adapter/parameter revision with immutable checksums, held-out evaluation, replay evidence, rollback metadata, and an explicit promotion receipt. Do not imply that an adapter is merged merely because it is available on disk.
 - **BitFrost/Valkey** caches revision- and checksum-addressed manifests, candidate lists, ACE cards, residency descriptors, and context plans. It must not become canonical storage for source truth, hidden thoughts, KV cache, tensors, or unvalidated adapter state.
@@ -234,7 +237,7 @@ LangGraph is **optional orchestration and testing only**.
 
 **Allowed:**
 - Validation workflows, planning graphs, subagent sequencing
-- Ornith via llama-server / function-tool calling, dry-run reasoning
+- Gemma 4 legal via llama-server / function-tool calling, dry-run reasoning
 
 **Not allowed — hard block:**
 - Direct writes to Postgres, Qdrant, Redis, Neo4j, DuckDB, or SeaweedFS from any graph node

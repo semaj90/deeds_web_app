@@ -337,6 +337,8 @@
 		const selection = window.getSelection();
 		const selectedText = selection?.toString().trim();
 		if (!selectedText || selectedText.length < 3) return;
+		const sid = sessionId;
+		if (!sid) return;
 
 		// Position popup near click
 		const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -349,7 +351,7 @@
 		};
 
 		try {
-			const res = await fetch(`/api/simulation/${sessionId}`, {
+			const res = await fetch(`/api/simulation/${sid}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -359,7 +361,7 @@
 			});
 			if (res.ok) {
 				const data = await res.json();
-				await loadSessionState(sessionId!);
+				await loadSessionState(sid);
 				const latest = data.newDialogue?.[0];
 				insight = { ...insight!, analysis: latest?.content ?? 'Analysis generated — see dialogue.', loading: false };
 			} else {
@@ -433,6 +435,7 @@
 	}
 
 	async function loadSessionState(sid: string) {
+		if (!sid) throw new Error('Missing simulation session ID');
 		const res = await fetch(`/api/simulation/${sid}`);
 		if (!res.ok) throw new Error('Failed to load session');
 		const result = await res.json();

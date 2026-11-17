@@ -262,8 +262,8 @@
 						<button type="button" class="upload-modal-select" onclick={(event) => { event.stopPropagation(); openFilePicker(); }}>
 							Select File
 						</button>
-						<input bind:this={fileInputEl} type="file" class="upload-modal-input" accept=".pdf,.png,.jpg,.jpeg,.tiff,.docx,.txt,.md,.csv,.json" onchange={handleFileInput} disabled={isUploading} />
-						<p class="upload-modal-hint">PDF, PNG, JPG, TIFF, DOCX, TXT, MD, CSV, JSON up to 100MB</p>
+						<input bind:this={fileInputEl} type="file" class="upload-modal-input" accept=".pdf,.png,.jpg,.jpeg,.tiff,.docx,.txt,.md,.csv,.json,.mp4,.mov,.webm,.avi,.glb,.spz,video/*,image/*" onchange={handleFileInput} disabled={isUploading} />
+						<p class="upload-modal-hint">PDF, PNG, JPG, MP4, MOV, GLB, DOCX, TXT up to 100MB</p>
 					</div>
 				{:else}
 					<!-- Selected File Info -->

@@ -86,10 +86,33 @@ export async function enqueueTask(opts: {
   payload: unknown;
   timeoutMs: number;
 }): Promise<{ taskId: string; commandId: string; idempotencyKey: string }> {
+  return db.transaction((tx: SqlExecutor) => enqueueTaskInTransaction(tx, opts));
+}
+
+/**
+ * Persist a workflow task and its RabbitMQ outbox row in a caller-owned
+ * transaction. Use this when the task must commit atomically with another
+ * canonical write, such as a library document and its ingestion job.
+ */
+export async function enqueueTaskInTransaction(
+  tx: SqlExecutor,
+  opts: {
+    runId: string;
+    requestId: string;
+    traceId?: string;
+    commandType: TaskType;
+    capability: string;
+    targetWorkerClass: string;
+    payload: unknown;
+    timeoutMs: number;
+    taskId?: string;
+    commandId?: string;
+  },
+): Promise<{ taskId: string; commandId: string; idempotencyKey: string }> {
   taskTypeSchema.parse(opts.commandType);
 
-  const taskId = crypto.randomUUID();
-  const commandId = crypto.randomUUID();
+  const taskId = opts.taskId ?? crypto.randomUUID();
+  const commandId = opts.commandId ?? crypto.randomUUID();
   const idempotencyKey = await computeIdempotencyKey(taskId, 0, opts.commandType);
 
   const command: WorkCommandBase = {
@@ -109,8 +132,7 @@ export async function enqueueTask(opts: {
 
   const routingKey = TASK_TYPE_TO_ROUTING_KEY[opts.commandType];
 
-  await db.transaction(async (tx: SqlExecutor) => {
-    await tx.execute(sql`
+  await tx.execute(sql`
       INSERT INTO workflow_tasks (
         id, run_id, request_id, trace_id, command_type, capability,
         target_worker_class, status, attempt, idempotency_key,
@@ -131,9 +153,9 @@ export async function enqueueTask(opts: {
         NOW(),
         NOW()
       )
-    `);
+  `);
 
-    await tx.execute(sql`
+  await tx.execute(sql`
       INSERT INTO workflow_outbox (
         id, run_id, task_id, event_type, payload, routing_key, exchange,
         attempt, created_at
@@ -148,8 +170,7 @@ export async function enqueueTask(opts: {
         0,
         NOW()
       )
-    `);
-  });
+  `);
 
   return { taskId, commandId, idempotencyKey };
 }

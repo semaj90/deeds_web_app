@@ -30,6 +30,16 @@
  <!-- UnoCSS Core Styles -->
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@unocss/reset/tailwind.min.css" />
 
+ <!-- Apply the saved theme before first paint (the theme store only loads on some pages) -->
+ <script>
+ try {
+ var __tc = JSON.parse(localStorage.getItem('theme-config') || 'null');
+ if (__tc && typeof __tc.id === 'string' && /^[a-z0-9-]{1,32}$/.test(__tc.id)) {
+ document.documentElement.setAttribute('data-theme', __tc.id);
+ }
+ } catch (e) {}
+ </script>
+
  <!-- Browser Polyfills for better compatibility -->
  <script>
  // Essential polyfills for Bits UI and modern dependencies

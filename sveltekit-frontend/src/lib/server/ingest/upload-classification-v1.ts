@@ -137,6 +137,15 @@ const SIGNATURES: Array<{
       b[6] === 0x79 &&
       b[7] === 0x70, // ....ftyp
   },
+  {
+    mime: 'video/webm',
+    check: (b) =>
+      b.length >= 4 &&
+      b[0] === 0x1a &&
+      b[1] === 0x45 &&
+      b[2] === 0xdf &&
+      b[3] === 0xa3, // EBML header used by WebM/Matroska containers
+  },
 ];
 
 // OpenXML MIME types that are fundamentally ZIP packages

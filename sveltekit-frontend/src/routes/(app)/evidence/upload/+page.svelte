@@ -209,13 +209,13 @@
 		<p class="upload-kicker">Secure evidence intake</p>
 		<h2>Drop a document to begin</h2>
 		<p>or <span class="browse-hint">choose a file</span> from your device</p>
-		<div class="file-type-list"><span>PDF</span><span>DOCX</span><span>PNG</span><span>JPG</span><span>Up to 100 MB</span></div>
+		<div class="file-type-list"><span>PDF</span><span>DOCX</span><span>PNG</span><span>JPG</span><span>MP4</span><span>WAV</span><span>Up to 100 MB</span></div>
 	</div>
 
 	<input
 		bind:this={fileInput}
 		type="file"
-		accept=".pdf,.docx,.png,.jpg,.jpeg"
+		accept=".pdf,.docx,.png,.jpg,.jpeg,.mp4,.mov,.webm,.avi,.mkv,.wav,.mp3,video/*,audio/*,image/*"
 		onchange={handleFileSelect}
 		style="display: none"
 	/>

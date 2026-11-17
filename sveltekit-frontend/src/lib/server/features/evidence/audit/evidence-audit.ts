@@ -8,6 +8,8 @@ import { db } from '$lib/server/db/client';
 import { evidenceAuditLog, evidenceVersions, evidence } from '$lib/server/db/schema-postgres.js';
 import { eq, desc, sql } from 'drizzle-orm';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export type EvidenceAction = 'uploaded' | 'viewed' | 'updated' | 'deleted' | 'exported' | 'tagged' | 'analyzed' | 'gpu_analyzed';
 
 export async function logEvidenceAction(
@@ -74,7 +76,9 @@ export async function createEvidenceVersion(
 			title: current.title ?? null,
 			description: current.description ?? null,
 			metadata: current.metadata ?? null,
-			changedBy: options?.changedBy ?? null,
+			// evidence_versions.changed_by is a uuid but users.id is an integer. Writing the string id ('1') made every insert
+			// fail with an invalid-uuid error that this function swallowed, so no version was ever recorded. Only a real uuid is stored.
+			changedBy: options?.changedBy && UUID_RE.test(options.changedBy) ? options.changedBy : null,
 			changeReason: options?.changeReason ?? null,
 		});
 	} catch (err) {

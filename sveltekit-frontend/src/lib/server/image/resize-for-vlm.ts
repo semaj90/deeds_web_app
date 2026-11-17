@@ -16,6 +16,9 @@
  */
 import sharp from 'sharp';
 
+/** Stable preprocessing label used to distinguish this thumbnail recipe in evidence metadata. */
+export const EVIDENCE_THUMBNAIL_PREPROCESSING_REVISION_V1 = 'atlas.image-thumbnail.sharp-v1:edge256-cover-jpeg75-auto-orient';
+
 /** Gemma 4 variable-resolution max edge (fills 1120-token budget) */
 export const GEMMA4_VLM_MAX_EDGE = 2048;
 /** @deprecated Use GEMMA4_VLM_MAX_EDGE */
@@ -42,10 +45,14 @@ export interface ResizeResult {
  */
 export async function resizeForVLM(input: Buffer): Promise<ResizeResult> {
 	const meta = await sharp(input).metadata();
-	const w = meta.width ?? 0;
-	const h = meta.height ?? 0;
+	const rawWidth = meta.width ?? 0;
+	const rawHeight = meta.height ?? 0;
+	const exifRotatesAxes = meta.orientation !== undefined && meta.orientation >= 5 && meta.orientation <= 8;
+	const w = exifRotatesAxes ? rawHeight : rawWidth;
+	const h = exifRotatesAxes ? rawWidth : rawHeight;
 
-	const alreadyFits = w <= GEMMA4_VLM_MAX_EDGE && h <= GEMMA4_VLM_MAX_EDGE;
+	const orientationIsCanonical = meta.orientation === undefined || meta.orientation === 1;
+	const alreadyFits = w <= GEMMA4_VLM_MAX_EDGE && h <= GEMMA4_VLM_MAX_EDGE && orientationIsCanonical;
 	const isJpeg = meta.format === 'jpeg';
 
 	if (alreadyFits && isJpeg) {
@@ -59,6 +66,7 @@ export async function resizeForVLM(input: Buffer): Promise<ResizeResult> {
 	}
 
 	const buffer = await sharp(input)
+		.rotate()
 		.resize(GEMMA4_VLM_MAX_EDGE, GEMMA4_VLM_MAX_EDGE, {
 			fit: 'contain',
 			background: { r: 127, g: 127, b: 127, alpha: 1 },
@@ -81,7 +89,8 @@ export async function resizeForVLM(input: Buffer): Promise<ResizeResult> {
  */
 export async function resizeForThumbnail(input: Buffer, size = 256): Promise<Buffer> {
 	return sharp(input)
+		.rotate()
 		.resize(size, size, { fit: 'cover' })
-		.jpeg({ quality: 75 })
+		.jpeg({ quality: 75, mozjpeg: false })
 		.toBuffer();
 }

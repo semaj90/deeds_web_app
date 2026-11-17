@@ -48,7 +48,15 @@ export interface EvidenceVisualAnalysisV1 {
 	visionSummary: string | null;
 	visionFindings: string[];
 	visionTags: string[];
-	depthMap: { objectKey: string; width: number; height: number; processingTimeMs: number | null } | null;
+	depthMap: {
+		objectKey: string;
+		bucket: string;
+		artifactSha256: string;
+		status: 'ESTIMATED';
+		width: number;
+		height: number;
+		processingTimeMs: number | null;
+	} | null;
 	stageErrors: string[];
 }
 
@@ -67,6 +75,10 @@ const pipelineResultSchema = z.object({
 			})),
 		}),
 	}).nullable(),
+	detector: z.object({
+		source: z.string().max(20),
+		errors: z.array(z.string().max(300)).max(10),
+	}).optional(),
 }).passthrough();
 
 const vlmResultSchema = z.object({
@@ -76,10 +88,7 @@ const vlmResultSchema = z.object({
 }).passthrough();
 
 const defaultDependencies: EvidenceVisualAnalysisDependenciesV1 = {
-	runPipeline: async (input) => {
-		const { runEvidenceAnalysisPipeline } = await import('$lib/server/analysis/evidence-analysis-pipeline.js');
-		return runEvidenceAnalysisPipeline(input);
-	},
+	runPipeline: runCanonicalImageDetectorV1,
 	analyzeVlm: async (input) => {
 		const { analyzeEvidenceImage } = await import('$lib/server/analysis/vlm-evidence-analyzer.js');
 		return analyzeEvidenceImage(input);
@@ -98,13 +107,39 @@ const defaultDependencies: EvidenceVisualAnalysisDependenciesV1 = {
 		return response.json();
 	},
 	uploadDepth: async (bucket, key, bytes) => {
-		const { uploadSeaweedFile } = await import('$lib/server/seaweed-client.js');
+		const { uploadSeaweedFile, getSeaweedFile } = await import('$lib/server/seaweed-client.js');
 		await uploadSeaweedFile(bucket, key, bytes, {
 			'Content-Type': 'image/png',
 			'X-Analysis-Type': 'depth_map',
 		});
+		const readback = await getSeaweedFile(bucket, key);
+		if (createHash('sha256').update(readback).digest('hex') !== createHash('sha256').update(bytes).digest('hex')) {
+			throw new Error('DEPTH_ARTIFACT_READBACK_MISMATCH');
+		}
 	},
 };
+
+/** Calls the detector-only owner. The legacy full pipeline also writes graph/cache state and is not the canonical upload worker. */
+export async function runCanonicalImageDetectorV1(
+	input: { evidenceId: string; caseId?: string; fileName: string; buffer: Buffer },
+	detect: typeof import('$lib/server/analysis/evidence-analysis-pipeline.js').detectEvidenceObjects = async (buffer, fileName) => {
+		const pipeline = await import('$lib/server/analysis/evidence-analysis-pipeline.js');
+		return pipeline.detectEvidenceObjects(buffer, fileName);
+	},
+): Promise<AnalysisPipelineResult> {
+	const outcome = await detect(input.buffer, input.fileName);
+	return {
+		detector: { source: outcome.source, errors: outcome.errors },
+		yolo: outcome.result,
+		yoloCacheHit: false,
+		llmSynthesis: null,
+		llmEscalated: false,
+		graphConnectionsCreated: 0,
+		cachedToDb: false,
+		tags: [],
+		processingTimeMs: outcome.result?.processingTime ?? 0,
+	};
+}
 
 function boundedError(error: unknown): string {
 	const message = error instanceof Error ? error.message : String(error);
@@ -141,9 +176,19 @@ export async function analyzeEvidenceImageV1(
 		if (!bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) {
 			throw new Error('DEPTH_MAP_PNG_SIGNATURE_INVALID');
 		}
-		const key = `evidence/${image.caseId ?? 'default'}/${image.evidenceId}-depth.png`;
+		const artifactSha256 = createHash('sha256').update(bytes).digest('hex');
+		const sourceHash = image.sourceRevision.slice('sha256:'.length);
+		const key = `evidence/${image.caseId ?? 'default'}/${image.evidenceId}/${sourceHash}/depth-${artifactSha256}.png`;
 		await dependencies.uploadDepth(config.bucket, key, bytes);
-		return { objectKey: key, width: response.width, height: response.height, processingTimeMs: response.processing_time_ms ?? null };
+		return {
+			objectKey: key,
+			bucket: config.bucket,
+			artifactSha256,
+			status: 'ESTIMATED' as const,
+			width: response.width,
+			height: response.height,
+			processingTimeMs: response.processing_time_ms ?? null,
+		};
 	};
 
 	const [pipelineSettled, vlmSettled, depthSettled] = await Promise.allSettled([
@@ -157,8 +202,20 @@ export async function analyzeEvidenceImageV1(
 		: null;
 	if (pipelineSettled.status === 'rejected') stageErrors.push(`detection:${boundedError(pipelineSettled.reason)}`);
 	else if (!pipeline?.success) stageErrors.push('detection:RESULT_SCHEMA_INVALID');
-	const vlm = vlmSettled.status === 'fulfilled' ? vlmResultSchema.safeParse(vlmSettled.value) : null;
+	else if (pipeline.data.yolo === null) {
+		// No detector ran. Say so instead of returning an empty list silently.
+		const reasons = pipeline.data.detector?.errors.join('; ').slice(0, 300);
+		stageErrors.push(`detection:${reasons || 'DETECTOR_UNAVAILABLE'}`);
+	}
+	// A fulfilled promise is not a successful analysis: the analyzer reports
+	// "no model answered" as a value (model 'none' / available false).
+	const vlmUnavailable = vlmSettled.status === 'fulfilled'
+		&& (vlmSettled.value?.available === false || vlmSettled.value?.model === 'none');
+	const vlm = vlmSettled.status === 'fulfilled' && !vlmUnavailable
+		? vlmResultSchema.safeParse(vlmSettled.value)
+		: null;
 	if (vlmSettled.status === 'rejected') stageErrors.push(`vision:${boundedError(vlmSettled.reason)}`);
+	else if (vlmUnavailable) stageErrors.push(`vision:${vlmSettled.value?.unavailableReason ?? 'VLM_UNAVAILABLE'}`);
 	else if (!vlm?.success) stageErrors.push('vision:RESULT_SCHEMA_INVALID');
 	if (depthSettled.status === 'rejected') stageErrors.push(`depth:${boundedError(depthSettled.reason)}`);
 

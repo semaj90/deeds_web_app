@@ -3,6 +3,19 @@
 	import { invalidateAll } from '$app/navigation';
 	import type { PageData } from './$types';
 	import { buttonVariants } from '$lib/components/ui/button-variants';
+	import {
+		IconAiAssistant,
+		IconCitation,
+		IconEvidenceFile,
+		IconIntegrityShield,
+		IconLawBook,
+		IconNetworkGraph,
+		IconPrecedentCase,
+		IconRegulation,
+		IconSubjectProfile,
+		IconTimeline,
+		IconWarningFlag
+	} from '$lib/icons/yorha';
 
 	let { data }: { data: PageData } = $props();
 
@@ -135,14 +148,14 @@
 		}
 	}
 
-	async function handleDemoLogin() {
+	async function handleDemoLogin(email = 'demo@legal-ai.local', role = 'admin') {
 		authError = '';
 		authLoading = true;
 		try {
 			const res = await fetch('/api/auth/demo-login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email: 'demo@legal-ai.local', role: 'admin' }),
+				body: JSON.stringify({ email, role }),
 				signal: AbortSignal.timeout(30_000)
 			});
 			if (!res.ok) {
@@ -158,9 +171,14 @@
 		}
 	}
 
+	function fillDemo(email: string, password = 'password123') {
+		loginEmail = email;
+		loginPassword = password;
+		authError = '';
+	}
+
 	function fillDemoCredentials() {
-		loginEmail = 'demo@legal-ai.local';
-		loginPassword = 'password123';
+		fillDemo('demo@legal-ai.local', 'password123');
 	}
 
 	function cycleAIMode() {
@@ -237,46 +255,46 @@
 
  <nav class="sidebar-nav">
  <a href="/command-center" class="nav-item active">
- <span class="nav-icon">📋</span> COMMAND CENTER
+ <IconNetworkGraph size={19} class="nav-icon" /> COMMAND CENTER
  </a>
  <a href="/" class="nav-item">
- <span class="nav-icon">📁</span> ACTIVE CASES <span class="badge">{recentCases.length}</span>
+ <IconPrecedentCase size={19} class="nav-icon" /> ACTIVE CASES <span class="badge">{recentCases.length}</span>
  </a>
  <a href="/evidence" class="nav-item">
- <span class="nav-icon">📊</span> EVIDENCE LIBRARY
+ <IconEvidenceFile size={19} class="nav-icon" /> EVIDENCE LIBRARY
  </a>
  <a href="/persons-of-interest" class="nav-item">
- <span class="nav-icon">👤</span> PERSONS OF INTEREST
+ <IconSubjectProfile size={19} class="nav-icon" /> PERSONS OF INTEREST
  </a>
  <a href="/analysis-center" class="nav-item">
- <span class="nav-icon">🔍</span> ANALYSIS CENTER
+ <IconTimeline size={19} class="nav-icon" /> ANALYSIS CENTER
  </a>
  <a href="/global-search" class="nav-item">
- <span class="nav-icon">🔍</span> GLOBAL SEARCH
+ <IconLawBook size={19} class="nav-icon" /> GLOBAL SEARCH
  </a>
  <a href="/citations" class="nav-item">
- <span class="nav-icon">📜</span> CITATIONS
+ <IconCitation size={19} class="nav-icon" /> CITATIONS
  </a>
  <a href="/dashboard" class="nav-item">
- <span class="nav-icon">📈</span> DASHBOARD
+ <IconRegulation size={19} class="nav-icon" /> DASHBOARD
  </a>
  <a href="/admin/ai-dashboard" class="nav-item">
- <span class="nav-icon">🧠</span> AI DASHBOARD
+ <IconIntegrityShield size={19} class="nav-icon" /> AI DASHBOARD
  </a>
  <a href="/chat" class="nav-item">
- <span class="nav-icon">🤖</span> AI ASSISTANT
+ <IconAiAssistant size={19} class="nav-icon" /> AI ASSISTANT
  </a>
  <a href="/demos" class="nav-item">
- <span class="nav-icon">🎮</span> DEMOS
+ <IconWarningFlag size={19} class="nav-icon" /> DEMOS
  </a>
  <a href="/terminal" class="nav-item">
- <span class="nav-icon">🔧</span> TERMINAL
+ <IconNetworkGraph size={19} class="nav-icon" /> TERMINAL
  </a>
  </nav>
 
  <div class="sidebar-footer">
  <a href="/system-configuration" class="nav-item">
- <span class="nav-icon">⚙️</span> SYSTEM CONFIGURATION
+ <IconIntegrityShield size={19} class="nav-icon" /> SYSTEM CONFIGURATION
  </a>
  </div>
 
@@ -546,11 +564,27 @@
 </main>
 
 <!-- Auth Dialog -->
-<dialog bind:this={authDialogRef} class="auth-dialog" onclick={(e) => { if (e.target === authDialogRef) closeAuthDialog(); }}>
+<dialog bind:this={authDialogRef} class="auth-dialog dossier-modal-light" onclick={(e) => { if (e.target === authDialogRef) closeAuthDialog(); }}>
 	<div class="dialog-inner">
+		<!-- Tactical celestial crosshair notches -->
+		<div class="hud-notch-tl"></div>
+		<div class="hud-notch-tr"></div>
+		<div class="hud-notch-bl"></div>
+		<div class="hud-notch-br"></div>
+		<div class="dossier-star dossier-star-tl">✦</div>
+		<div class="dossier-star dossier-star-tr">✦</div>
+		<div class="dossier-star dossier-star-bl">✦</div>
+		<div class="dossier-star dossier-star-br">✦</div>
+
 		<div class="dialog-header">
-			<h2>YORHA // {authTab === 'login' ? 'SIGN IN' : 'REGISTER'}</h2>
-			<button class="dialog-close" onclick={closeAuthDialog}>X</button>
+			<div class="header-branding">
+				<div class="header-icon">⚖</div>
+				<div>
+					<h2 class="dialog-title">DOSSIER LEX AI // {authTab === 'login' ? 'SIGN IN' : 'REGISTER'}</h2>
+					<div class="dialog-subtitle">TACTICAL LEGAL INTELLIGENCE // OPERATOR ACCESS</div>
+				</div>
+			</div>
+			<button class="dialog-close" onclick={closeAuthDialog} aria-label="Close dialog">✕</button>
 		</div>
 
 		<div class="dialog-tabs">
@@ -563,50 +597,69 @@
 		</div>
 
 		{#if authError}
-			<div class="dialog-error">{authError}</div>
+			<div class="dialog-error">
+				<span class="error-badge">ERROR</span>
+				<span>{authError}</span>
+			</div>
 		{/if}
 
 		{#if authTab === 'login'}
 			<form class="dialog-form" onsubmit={(e) => { e.preventDefault(); handleLogin(); }}>
 				<label class="dialog-label">
-					EMAIL
-					<input type="email" bind:value={loginEmail} required class="dialog-input" placeholder="demo@legal-ai.local" />
+					OPERATOR EMAIL
+					<input type="email" bind:value={loginEmail} required class="dialog-input" placeholder="admin@yorha.dev" />
 				</label>
 				<label class="dialog-label">
 					PASSWORD
-					<input type="password" bind:value={loginPassword} required class="dialog-input" placeholder="password123" />
+					<input type="password" bind:value={loginPassword} required class="dialog-input" placeholder="••••••••••••" />
 				</label>
-				<button type="submit" class="dialog-btn-primary" disabled={authLoading}>
-					{authLoading ? 'AUTHENTICATING...' : 'SIGN IN'}
+				<button type="submit" class="dialog-btn-primary dossier-btn-primary" disabled={authLoading}>
+					{authLoading ? 'AUTHENTICATING...' : 'ACCESS DOSSIER →'}
 				</button>
 			</form>
 
 			<div class="dialog-divider">
-				<span>DEMO ACCOUNTS</span>
+				<span>PRE-AUTHORIZED IDENTITIES</span>
 			</div>
 
 			<div class="demo-credentials">
 				<div class="demo-row">
-					<span class="demo-label">Admin:</span>
-					<code>demo@legal-ai.local</code> / <code>password123</code>
-					<button class="demo-fill-btn" onclick={fillDemoCredentials}>FILL</button>
+					<div class="demo-id-info">
+						<span class="demo-badge badge-gold">ADMIN</span>
+						<span class="demo-name">YoRHa 2B</span>
+						<code>admin@yorha.dev</code>
+					</div>
+					<div class="demo-actions">
+						<button type="button" class="demo-action-btn fill-btn" onclick={() => fillDemo('admin@yorha.dev')}>FILL</button>
+						<button type="button" class="demo-action-btn enter-btn" onclick={() => handleDemoLogin('admin@yorha.dev', 'admin')} disabled={authLoading}>LOGIN</button>
+					</div>
 				</div>
 				<div class="demo-row">
-					<span class="demo-label">Prosecutor:</span>
-					<code>prosecutor@legal.ai</code> / <code>password123</code>
+					<div class="demo-id-info">
+						<span class="demo-badge badge-blue">PROSECUTOR</span>
+						<span class="demo-name">User 1</span>
+						<code>test@deeds-legal.ai</code>
+					</div>
+					<div class="demo-actions">
+						<button type="button" class="demo-action-btn fill-btn" onclick={() => fillDemo('test@deeds-legal.ai')}>FILL</button>
+						<button type="button" class="demo-action-btn enter-btn" onclick={() => handleDemoLogin('test@deeds-legal.ai', 'prosecutor')} disabled={authLoading}>LOGIN</button>
+					</div>
 				</div>
 				<div class="demo-row">
-					<span class="demo-label">Detective:</span>
-					<code>detective@legal.ai</code> / <code>password123</code>
+					<div class="demo-id-info">
+						<span class="demo-badge badge-green">DEMO</span>
+						<span class="demo-name">Seeded User</span>
+						<code>demo@legal-ai.local</code>
+					</div>
+					<div class="demo-actions">
+						<button type="button" class="demo-action-btn fill-btn" onclick={() => fillDemo('demo@legal-ai.local')}>FILL</button>
+						<button type="button" class="demo-action-btn enter-btn" onclick={() => handleDemoLogin('demo@legal-ai.local', 'admin')} disabled={authLoading}>LOGIN</button>
+					</div>
 				</div>
 			</div>
 
-			<button class="dialog-btn-demo" onclick={handleDemoLogin} disabled={authLoading}>
-				SEED + SIGN IN DEMO (admin)
-			</button>
-
 			<div class="dialog-hint">
-				The demo button creates or refreshes the admin demo account in the database.
+				Pre-authorized development keys authenticate against local session tokens and PostgreSQL 18.
 			</div>
 		{:else}
 			<form class="dialog-form" onsubmit={(e) => { e.preventDefault(); handleRegister(); }}>
@@ -622,14 +675,14 @@
 				</div>
 				<label class="dialog-label">
 					EMAIL
-					<input type="email" bind:value={regEmail} required class="dialog-input" placeholder="you@legal.ai" />
+					<input type="email" bind:value={regEmail} required class="dialog-input" placeholder="you@deeds-legal.ai" />
 				</label>
 				<label class="dialog-label">
 					PASSWORD
 					<input type="password" bind:value={regPassword} required minlength="8" class="dialog-input" placeholder="Min 8 characters" />
 				</label>
-				<button type="submit" class="dialog-btn-primary" disabled={authLoading}>
-					{authLoading ? 'CREATING ACCOUNT...' : 'REGISTER'}
+				<button type="submit" class="dialog-btn-primary dossier-btn-primary" disabled={authLoading}>
+					{authLoading ? 'CREATING ACCOUNT...' : 'REGISTER DOSSIER OPERATOR'}
 				</button>
 			</form>
 		{/if}
@@ -712,8 +765,16 @@
  }
 
  .nav-icon {
- margin-right: 0.75rem;
+  flex: 0 0 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.75rem;
+  color: #d9bd79;
+  filter: drop-shadow(0 0 0.35rem rgb(217 189 121 / 20%));
  }
+
+ .nav-item:hover :global(.nav-icon),
+ .nav-item.active :global(.nav-icon) { color: #fdf3d4; }
 
  .badge {
  margin-left: auto;
@@ -1361,249 +1422,451 @@
 		opacity: 0.6;
  }
 
- /* Auth Dialog */
- .auth-dialog {
-	border: none;
-	padding: 0;
-	background: transparent;
-	max-width: 480px;
-	width: 90vw;
- }
+ /* ═══════════════════════════════════════════════════════════════════
+	   DOSSIER LEX AI // LIGHT AUTH DIALOG
+	   Royal Parchment, Arcana Filigree & Celestial HUD Accents
+	   ═══════════════════════════════════════════════════════════════════ */
+	.auth-dialog {
+		border: none;
+		padding: 0;
+		background: transparent;
+		max-width: 520px;
+		width: 92vw;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		margin: 0;
+		outline: none;
+	}
 
- .auth-dialog::backdrop {
-	background: rgba(15, 15, 15, 0.7);
-	backdrop-filter: blur(4px);
- }
+	.auth-dialog::backdrop {
+		background: rgba(18, 16, 14, 0.65);
+		backdrop-filter: blur(8px) saturate(1.1);
+		animation: dossierFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	}
 
- .dialog-inner {
-	background: #2a2016;
-	color: #f8f0d9;
-	border: 4px solid #0f0f0f;
-	padding: 2rem;
- }
+	.dialog-inner {
+		position: relative;
+		background: linear-gradient(180deg, #FFFCF9 0%, #FAF6F0 50%, #FAF4EC 100%);
+		color: #141312;
+		border: 1px solid #D5C6AC;
+		border-radius: 14px;
+		box-shadow:
+			0 0 0 1px rgba(201, 168, 106, 0.25),
+			0 24px 60px -12px rgba(45, 35, 25, 0.35),
+			0 0 35px rgba(201, 168, 106, 0.12);
+		padding: 1.75rem 2rem;
+		overflow: hidden;
+		animation: dossierScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+	}
 
- .dialog-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 1.5rem;
-	padding-bottom: 1rem;
-	border-bottom: 2px solid #0f0f0f;
- }
+	/* Tactical corner notches in burnished attorney gold */
+	.hud-notch-tl, .hud-notch-tr, .hud-notch-bl, .hud-notch-br {
+		position: absolute;
+		width: 12px;
+		height: 12px;
+		pointer-events: none;
+		z-index: 10;
+	}
+	.hud-notch-tl { top: -1px; left: -1px; border-top: 2.5px solid #C59E2B; border-left: 2.5px solid #C59E2B; }
+	.hud-notch-tr { top: -1px; right: -1px; border-top: 2.5px solid #C59E2B; border-right: 2.5px solid #C59E2B; }
+	.hud-notch-bl { bottom: -1px; left: -1px; border-bottom: 2.5px solid #C59E2B; border-left: 2.5px solid #C59E2B; }
+	.hud-notch-br { bottom: -1px; right: -1px; border-bottom: 2.5px solid #C59E2B; border-right: 2.5px solid #C59E2B; }
 
- .dialog-header h2 {
-	margin: 0;
-	font-size: 1.25rem;
-	font-weight: 900;
-	letter-spacing: 2px;
- }
+	.dossier-star {
+		position: absolute;
+		font-size: 8px;
+		color: #B97F62;
+		opacity: 0.45;
+		line-height: 1;
+		pointer-events: none;
+		user-select: none;
+		z-index: 2;
+	}
+	.dossier-star-tl { top: 8px; left: 8px; }
+	.dossier-star-tr { top: 8px; right: 8px; }
+	.dossier-star-bl { bottom: 8px; left: 8px; }
+	.dossier-star-br { bottom: 8px; right: 8px; }
 
- .dialog-close {
-	background: transparent;
-	border: 2px solid #f8f0d9;
-	color: #f8f0d9;
-	width: 32px;
-	height: 32px;
-	font-weight: 900;
-	cursor: pointer;
-	font-size: 0.85rem;
- }
+	/* Header */
+	.dialog-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1.25rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid #E2D7C9;
+	}
 
- .dialog-close:hover {
-	background: #f8f0d9;
-	color: #2a2016;
- }
+	.header-branding {
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+	}
 
- .dialog-tabs {
-	display: flex;
-	gap: 0;
-	margin-bottom: 1.5rem;
- }
+	.header-icon {
+		width: 38px;
+		height: 38px;
+		border-radius: 10px;
+		background: radial-gradient(circle at 35% 35%, #FFFDF8 0%, #ECDDBA 100%);
+		border: 1px solid #CBB68D;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.15rem;
+		color: #67140F;
+		box-shadow: 0 1px 4px rgba(197, 158, 43, 0.2), inset 0 0 6px rgba(255, 255, 255, 0.7);
+		flex-shrink: 0;
+	}
 
- .dialog-tab {
-	flex: 1;
-	padding: 0.75rem;
-	background: #1a160f;
-	color: #8a7a5a;
-	border: 2px solid #0f0f0f;
-	font-weight: 700;
-	font-size: 0.8rem;
-	letter-spacing: 1px;
-	cursor: pointer;
- }
+	.dialog-title {
+		margin: 0;
+		font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+		font-size: 1.05rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		color: #141312;
+		line-height: 1.2;
+	}
 
- .dialog-tab.active {
-	background: #0f0f0f;
-	color: #fdf3d4;
-	border-bottom-color: #fdf3d4;
- }
+	.dialog-subtitle {
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: 0.62rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		color: #8C6A23;
+		margin-top: 0.2rem;
+		text-transform: uppercase;
+	}
 
- .dialog-error {
-	background: #4a1010;
-	border: 2px solid #d32f2f;
-	padding: 0.75rem 1rem;
-	margin-bottom: 1rem;
-	font-size: 0.8rem;
-	color: #ff8a80;
- }
+	.dialog-close {
+		width: 32px;
+		height: 32px;
+		border-radius: 8px;
+		background: #EDE4D6;
+		border: 1px solid #DBCCB8;
+		color: #6B6150;
+		font-size: 0.85rem;
+		font-weight: 700;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.15s ease;
+		outline: none;
+	}
 
- .dialog-form {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
- }
+	.dialog-close:hover {
+		background: #E2D4C0;
+		color: #67140F;
+		border-color: #67140F;
+		box-shadow: 0 1px 4px rgba(103, 20, 15, 0.15);
+	}
 
- .dialog-row {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 1rem;
- }
+	/* Tabs */
+	.dialog-tabs {
+		display: flex;
+		gap: 4px;
+		padding: 4px;
+		background: #EFEBE5;
+		border: 1px solid #D5C6AC;
+		border-radius: 8px;
+		margin-bottom: 1.25rem;
+	}
 
- .dialog-label {
-	display: flex;
-	flex-direction: column;
-	gap: 0.375rem;
-	font-size: 0.7rem;
-	font-weight: 700;
-	letter-spacing: 1px;
-	color: #b4a080;
- }
+	.dialog-tab {
+		flex: 1;
+		padding: 0.55rem 0.75rem;
+		border-radius: 6px;
+		border: 1px solid transparent;
+		background: transparent;
+		color: #6B6150;
+		font-family: 'Inter', system-ui, sans-serif;
+		font-weight: 600;
+		font-size: 0.78rem;
+		letter-spacing: 0.05em;
+		cursor: pointer;
+		transition: all 0.15s ease;
+	}
 
- .dialog-input {
-	padding: 0.625rem 0.75rem;
-	background: #12100c;
-	border: 2px solid #0f0f0f;
-	color: #f8f0d9;
-	font-family: inherit;
-	font-size: 0.85rem;
- }
+	.dialog-tab:hover:not(.active) {
+		color: #141312;
+		background: rgba(255, 255, 255, 0.5);
+	}
 
- .dialog-input:focus {
-	outline: none;
-	border-color: #fdf3d4;
- }
+	.dialog-inner .dialog-tab.active {
+		background: #FAF6F0 !important;
+		color: #67140F !important;
+		font-weight: 700;
+		border-color: #D5C6AC;
+		box-shadow: 0 1px 4px rgba(60, 40, 20, 0.08);
+	}
 
- .dialog-input::placeholder {
-	color: #5a4a3a;
- }
+	/* Error */
+	.dialog-error {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.65rem 0.85rem;
+		border-radius: 6px;
+		background: #FDF2F2;
+		border: 1px solid #F87171;
+		color: #991B1B;
+		font-size: 0.8rem;
+		margin-bottom: 1rem;
+	}
 
- .dialog-btn-primary {
-	padding: 0.875rem;
-	background: #f8f0d9;
-	color: #0f0f0f;
-	border: 3px solid #0f0f0f;
-	font-weight: 900;
-	font-size: 0.85rem;
-	letter-spacing: 1px;
-	cursor: pointer;
-	margin-top: 0.5rem;
- }
+	.error-badge {
+		background: #DC2626;
+		color: #FFFFFF !important;
+		font-size: 0.62rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		padding: 1px 5px;
+		border-radius: 3px;
+	}
 
- .dialog-btn-primary:hover:not(:disabled) {
-	background: #fdf3d4;
- }
+	/* Form */
+	.dialog-form {
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+	}
 
- .dialog-btn-primary:disabled {
-	opacity: 0.5;
-	cursor: not-allowed;
- }
+	.dialog-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.75rem;
+	}
 
- .dialog-divider {
-	display: flex;
-	align-items: center;
-	margin: 1.5rem 0 1rem;
-	gap: 1rem;
- }
+	.dialog-label {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		font-family: 'Inter', system-ui, sans-serif;
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		color: #483D36;
+	}
 
- .dialog-divider::before,
- .dialog-divider::after {
-	content: '';
-	flex: 1;
-	height: 1px;
-	background: #0f0f0f;
- }
+	.dialog-input {
+		width: 100%;
+		box-sizing: border-box;
+		padding: 0.6rem 0.8rem;
+		background: #FFFFFF;
+		border: 1px solid #CDBFA9;
+		border-radius: 6px;
+		color: #141312;
+		font-family: inherit;
+		font-size: 0.85rem;
+		transition: border-color 0.15s, box-shadow 0.15s;
+	}
 
- .dialog-divider span {
-	font-size: 0.7rem;
-	font-weight: 700;
-	letter-spacing: 1px;
-	color: #8a7a5a;
- }
+	.dialog-input:focus {
+		outline: none;
+		border-color: #67140F;
+		box-shadow: 0 0 0 2px rgba(103, 20, 15, 0.18);
+	}
 
- .demo-credentials {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-	margin-bottom: 1rem;
- }
+	.dialog-input::placeholder {
+		color: #A39683;
+	}
 
- .demo-row {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	font-size: 0.75rem;
-	padding: 0.375rem 0.625rem;
-	background: #12100c;
-	border: 1px solid #1a160f;
- }
+	.dialog-inner .dialog-btn-primary, .dialog-inner .dossier-btn-primary {
+		padding: 0.75rem 1.25rem;
+		background: linear-gradient(180deg, #67140F 0%, #52100C 100%) !important;
+		color: #FFE59A !important;
+		border: 1px solid #67140F !important;
+		border-radius: 6px;
+		font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+		font-weight: 700;
+		font-size: 0.85rem;
+		letter-spacing: 0.08em;
+		cursor: pointer;
+		box-shadow: 0 2px 6px rgba(103, 20, 15, 0.25);
+		transition: all 0.15s ease;
+		margin-top: 0.35rem;
+	}
 
- .demo-label {
-	font-weight: 700;
-	color: #b4a080;
-	min-width: 80px;
- }
+	.dialog-inner .dialog-btn-primary:hover:not(:disabled), .dialog-inner .dossier-btn-primary:hover:not(:disabled) {
+		background: linear-gradient(180deg, #7E1B14 0%, #67140F 100%) !important;
+		color: #FFFFFF;
+		box-shadow: 0 3px 10px rgba(103, 20, 15, 0.35);
+		transform: translateY(-1px);
+	}
 
- .demo-row code {
-	color: #fdf3d4;
-	font-size: 0.7rem;
- }
+	.dialog-btn-primary:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
 
- .demo-fill-btn {
-	margin-left: auto;
-	padding: 0.25rem 0.5rem;
-	background: #0f0f0f;
-	color: #fdf3d4;
-	border: 1px solid #fdf3d4;
-	font-size: 0.65rem;
-	font-weight: 700;
-	letter-spacing: 0.5px;
-	cursor: pointer;
- }
+	/* Divider */
+	.dialog-divider {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin: 1.25rem 0 0.85rem;
+	}
 
- .demo-fill-btn:hover {
-	background: #fdf3d4;
-	color: #0f0f0f;
- }
+	.dialog-divider::before,
+	.dialog-divider::after {
+		content: '';
+		flex: 1;
+		height: 1px;
+		background: #D5C6AC;
+	}
 
- .dialog-btn-demo {
-	width: 100%;
-	padding: 0.75rem;
-	background: #1a3a1a;
-	color: #4ade80;
-	border: 2px solid #4ade80;
-	font-weight: 700;
-	font-size: 0.8rem;
-	letter-spacing: 1px;
-	cursor: pointer;
-	margin-bottom: 1rem;
- }
+	.dialog-divider span {
+		font-family: 'Inter', system-ui, sans-serif;
+		font-size: 0.65rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		color: #6B6150;
+		text-transform: uppercase;
+	}
 
- .dialog-btn-demo:hover:not(:disabled) {
-	background: #2a4a2a;
- }
+	/* Demo Credentials */
+	.demo-credentials {
+		display: flex;
+		flex-direction: column;
+		gap: 0.45rem;
+		margin-bottom: 0.85rem;
+	}
 
- .dialog-btn-demo:disabled {
-	opacity: 0.5;
-	cursor: not-allowed;
- }
+	.demo-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+		padding: 0.45rem 0.65rem;
+		background: #FAF4EC;
+		border: 1px solid #E2D7C9;
+		border-radius: 8px;
+		transition: border-color 0.15s ease, background 0.15s ease;
+	}
 
- .dialog-hint {
-	text-align: center;
-	font-size: 0.7rem;
-	color: #8a7a5a;
- }
+	.demo-row:hover {
+		border-color: #C9A86A;
+		background: #FFFDF8;
+	}
 
- /* Responsive */
+	.demo-id-info {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		flex-wrap: wrap;
+		font-size: 0.72rem;
+	}
+
+	.demo-badge {
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: 0.6rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		padding: 1px 5px;
+		border-radius: 4px;
+	}
+
+	.badge-gold {
+		background: rgba(201, 168, 106, 0.2);
+		color: #8C6A23;
+		border: 1px solid rgba(201, 168, 106, 0.45);
+	}
+
+	.badge-blue {
+		background: rgba(37, 99, 235, 0.1);
+		color: #1E40AF;
+		border: 1px solid rgba(37, 99, 235, 0.3);
+	}
+
+	.badge-green {
+		background: rgba(22, 101, 52, 0.1);
+		color: #166534;
+		border: 1px solid rgba(22, 101, 52, 0.3);
+	}
+
+	.demo-name {
+		font-weight: 600;
+		color: #141312;
+	}
+
+	.demo-row code {
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: 0.68rem;
+		color: #6B6150;
+		background: rgba(0, 0, 0, 0.03);
+		padding: 1px 4px;
+		border-radius: 3px;
+	}
+
+	.demo-actions {
+		display: flex;
+		gap: 0.3rem;
+		flex-shrink: 0;
+	}
+
+	.demo-action-btn {
+		padding: 0.22rem 0.5rem;
+		border-radius: 5px;
+		font-family: 'Inter', system-ui, sans-serif;
+		font-size: 0.65rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		cursor: pointer;
+		transition: all 0.15s ease;
+	}
+
+	.dialog-inner .fill-btn {
+		background: #FAF6F0 !important;
+		border: 1px solid #D5C6AC !important;
+		color: #483D36 !important;
+	}
+
+	.fill-btn:hover {
+		background: #FFFFFF;
+		border-color: #67140F;
+		color: #67140F;
+		box-shadow: 0 1px 4px rgba(103, 20, 15, 0.12);
+	}
+
+	.dialog-inner .enter-btn {
+		background: #5C493F !important;
+		border: 1px solid #483D36 !important;
+		color: #FAF4EC !important;
+	}
+
+	.dialog-inner .enter-btn:hover:not(:disabled) {
+		background: #67140F !important;
+		border-color: #67140F !important;
+		color: #FFE59A !important;
+		box-shadow: 0 1px 4px rgba(103, 20, 15, 0.2);
+	}
+
+	.enter-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.dialog-hint {
+		text-align: center;
+		font-size: 0.68rem;
+		color: #6B6150;
+		line-height: 1.4;
+	}
+
+	@keyframes dossierFadeIn {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
+
+	@keyframes dossierScaleIn {
+		from { opacity: 0; transform: scale(0.96); }
+		to { opacity: 1; transform: scale(1); }
+	}
+	
+	/* Responsive */
  @media (max-width: 1200px) {
  .content-grid {
  grid-template-columns: 1fr;
@@ -1639,6 +1902,74 @@
  .quick-stats {
  grid-template-columns: repeat(2, 1fr);
  }
+ }
+
+ /* Shared rounded, high-contrast surfaces used by the legal search controls. */
+ .stat-card {
+  background: #17130e;
+  color: #fdf3d4;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgb(15 15 15 / 14%);
+ }
+
+ .stat-label { color: #fdf3d4; }
+
+ .legal-search-section,
+ .cases-section,
+ .activity-section {
+  border-radius: 18px;
+ }
+
+ .search-tabs {
+  gap: 0.5rem;
+  flex-wrap: wrap;
+ }
+
+ .search-tab {
+  border: 1px solid #0f0f0f;
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  color: #fdf3d4;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+ }
+
+ .search-tab:hover { transform: translateY(-1px); }
+
+ .search-tab.active {
+  background: #0f0f0f;
+  color: #fdf3d4;
+  box-shadow: inset 0 -2px #e7bd61;
+ }
+
+ .search-input,
+ .jurisdiction-select {
+  border-radius: 12px;
+ }
+
+ .search-btn,
+ .view-all-btn,
+ .header-btn,
+ .case-action-btn {
+  border-radius: 12px;
+ }
+
+ .result-card,
+ .search-empty,
+ .case-card,
+ .activity-item {
+  border-radius: 14px;
+  box-shadow: 0 3px 10px rgb(15 15 15 / 8%);
+ }
+
+ .featured-demo-banner { border-radius: 18px; }
+
+ .search-tab:focus-visible,
+ .search-input:focus-visible,
+ .jurisdiction-select:focus-visible,
+ .search-btn:focus-visible,
+ .view-all-btn:focus-visible {
+  outline: 3px solid #d8a83e;
+  outline-offset: 3px;
  }
 </style>
 

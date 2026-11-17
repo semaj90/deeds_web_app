@@ -8,7 +8,7 @@ import { extractCaseStructureWithGemma } from '$lib/server/llm/gemmaIntake.js';
 import type { Actions, PageServerLoad } from './$types';
 import { intakeAnalysisSchema, intakeCaseSchema } from './schema.js';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user) throw redirect(302, '/login');
 
 	const safe = <T>(p: Promise<T>, fallback: T, timeoutMs = 5000): Promise<T> =>
@@ -29,7 +29,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     []
   );
 
-	return { form, user: locals.user, recentCases };
+	return { form, user: locals.user, recentCases, returnToAnalysis: url.searchParams.get('returnTo') === 'analysis-center' };
 };
 
 export const actions = {
@@ -37,6 +37,8 @@ export const actions = {
   create: async ({ request, locals }) => {
     if (!locals.user) return fail(401, { error: 'Unauthorized' });
 
+    const formData = await request.clone().formData().catch(() => null);
+    const returnToAnalysis = formData?.get('returnTo') === 'analysis-center';
     const form = await superValidate(request, zod(intakeCaseSchema));
     if (!form.valid) return fail(400, { form });
 
@@ -74,7 +76,9 @@ export const actions = {
       return message(form, 'Failed to create case. Please try again.', { status: 500 });
     }
 
-    redirect(303, `/cases/${newCase.id}/overview`);
+    redirect(303, returnToAnalysis
+      ? `/analysis-center?caseId=${encodeURIComponent(String(newCase.id))}&caseCreated=1`
+      : `/cases/${newCase.id}/overview`);
   },
 
   // AI analysis — calls Gemma4-Legal to extract persons, title, statute from narrative

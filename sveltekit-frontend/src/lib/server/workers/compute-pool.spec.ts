@@ -11,7 +11,9 @@ import {
 	MAX_GPU_SIMILARITY_VALUES_PER_BATCH,
 	MAX_SOM_RADIX_CANDIDATES,
 	ComputePool,
+	classifyVerifierTierCpu,
 	validateSomRadixOrderInput,
+	validateVerifierCommandCpu,
 } from './compute-pool.js';
 
 /**
@@ -174,4 +176,91 @@ describe('SOM radix ordering proposal admission', () => {
 			}
 		}
 	);
+});
+
+describe('CPU worker verifier validation and tier classification', () => {
+	it('validates allowlisted verifier commands and blocks unsafe flags or shell chaining', () => {
+		expect(
+			validateVerifierCommandCpu({
+				command: 'npm exec -- vitest run src/lib/server/workers/compute-pool.spec.ts',
+			})
+		).toMatchObject({
+			valid: true,
+			prefix: 'npm exec -- vitest run',
+			canonicalWritesAllowed: false,
+		});
+
+		expect(
+			validateVerifierCommandCpu({
+				command: 'node scripts/atlas/verify-nes-fsm-native-runtime-v1.mjs; rm -rf /tmp/x',
+			}).reason
+		).toBe('SHELL_METACHARACTERS_FORBIDDEN');
+
+		expect(
+			validateVerifierCommandCpu({
+				command: 'node scripts/atlas/verify-nes-fsm-native-runtime-v1.mjs --apply',
+			}).reason
+		).toBe('MUTATION_FLAG_FORBIDDEN');
+
+		expect(
+			validateVerifierCommandCpu({
+				command: 'pytest -c malicious.py',
+			}).reason
+		).toBe('INLINE_EXEC_FLAG_FORBIDDEN');
+	});
+
+	it('classifies T0, T1, T2, and stale non-checkbox tasks deterministically', () => {
+		expect(
+			classifyVerifierTierCpu({
+				taskKey: 't0',
+				text: 'run verifier',
+				runnableCommand: 'node scripts/atlas/verify-nes-fsm-native-runtime-v1.mjs',
+			}).tier
+		).toBe('T0_RUNNABLE_VERIFIER');
+
+		expect(
+			classifyVerifierTierCpu({
+				taskKey: 't1',
+				text: 'spec present',
+				specFilesOnDisk: ['src/lib/server/workers/compute-pool.spec.ts'],
+			}).tier
+		).toBe('T1_SPEC_FILE_ON_DISK');
+
+		expect(
+			classifyVerifierTierCpu({
+				taskKey: 't2',
+				text: 'prose bullet',
+			}).tier
+		).toBe('T2_DIAGNOSE_ONLY');
+
+		expect(
+			classifyVerifierTierCpu({
+				taskKey: 'stale',
+				text: 'blank line',
+				isCheckbox: false,
+			}).tier
+		).toBe('STALE_NON_CHECKBOX_LOCATOR');
+	});
+
+	it('executes verifier.command.validate and verifier.tier.classify inside ComputePool worker_threads', async () => {
+		const pool = new ComputePool(1);
+		try {
+			const cmdRes = await pool.runVerifierCommandValidate({
+				command: 'node scripts/atlas/audit-cohort-verifier-tiers-v1.mjs',
+			});
+			expect(cmdRes.valid).toBe(true);
+			expect(cmdRes.prefix).toBe('node scripts/atlas/audit-');
+			expect(cmdRes.canonicalWritesAllowed).toBe(false);
+
+			const tierRes = await pool.runVerifierTierClassify({
+				taskKey: 'worker-t0',
+				text: 'run audit',
+				runnableCommand: 'node scripts/atlas/audit-cohort-verifier-tiers-v1.mjs',
+			});
+			expect(tierRes.tier).toBe('T0_RUNNABLE_VERIFIER');
+			expect(tierRes.verifierValid).toBe(true);
+		} finally {
+			await pool.dispose();
+		}
+	});
 });

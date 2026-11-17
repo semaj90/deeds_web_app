@@ -18,8 +18,39 @@ interface ClientError {
 
 const ERROR_BUFFER_MAX = 20;
 const FLUSH_INTERVAL_MS = 10_000;
+const STALE_CLIENT_RELOAD_KEY = 'atlas:stale-client-chunk-reloaded-at';
+const STALE_CLIENT_RELOAD_WINDOW_MS = 60_000;
 let errorBuffer: ClientError[] = [];
 let flushTimer: ReturnType<typeof setInterval> | null = null;
+
+/**
+ * A Vite/SvelteKit client can keep a route chunk from before a dev-server
+ * rebuild. Reload once so it requests the current generated module graph;
+ * leave repeated failures visible instead of creating a reload loop.
+ */
+function reloadOnceForStaleClientChunk(): boolean {
+  try {
+    const now = Date.now();
+    const previous = Number(window.sessionStorage.getItem(STALE_CLIENT_RELOAD_KEY));
+    if (Number.isFinite(previous) && previous > 0 && now - previous < STALE_CLIENT_RELOAD_WINDOW_MS) {
+      return false;
+    }
+    window.sessionStorage.setItem(STALE_CLIENT_RELOAD_KEY, String(now));
+    window.location.reload();
+    return true;
+  } catch {
+    // If session storage is unavailable, don't risk an unbounded reload loop.
+    return false;
+  }
+}
+
+function isStaleClientChunkError(message: string, stack: string): boolean {
+  return (
+    /Failed to fetch dynamically imported module/i.test(message) ||
+    (/Cannot read properties of undefined \(reading 'call'\)/i.test(message) &&
+      (/node_modules\\?\.vite\\?deps|node_modules\/.vite\/deps|\.svelte-kit\/generated/i.test(stack)))
+  );
+}
 
 // Dev-server-only failures (stale HMR chunks after an edit, Vite transport timeouts, SvelteKit
 // build-time globals missing from a pre-bundled dep). They are not application faults and
@@ -88,13 +119,22 @@ if (dev) {
 
 window.addEventListener('error', (event) => {
   console.error('Uncaught error:', event.error);
+  const errorMessage = event.error?.message ?? event.message ?? 'Unknown error';
+  const errorStack = event.error?.stack ?? '';
+  if (isStaleClientChunkError(errorMessage, errorStack) && reloadOnceForStaleClientChunk()) return;
   pushError({
-    message: event.error?.message ?? event.message ?? 'Unknown error',
-    stack: event.error?.stack ?? '',
+    message: errorMessage,
+    stack: errorStack,
     url: window.location.pathname,
     timestamp: new Date().toISOString(),
     type: 'uncaught',
   });
+});
+
+// Vite emits this when a dynamic route/component chunk cannot be loaded, such
+// as when a tab still references a module invalidated by a dev-server rebuild.
+window.addEventListener('vite:preloadError', (event) => {
+  if (reloadOnceForStaleClientChunk()) event.preventDefault();
 });
 
 window.addEventListener('unhandledrejection', (event) => {

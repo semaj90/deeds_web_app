@@ -1,0 +1,22 @@
+{
+  "createdAt": "2026-11-15T03:28:06.000Z",
+  "database": "legal_ai_live_integration_scratch",
+  "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
+  "mode": "read-only; no writes",
+  "readback": {
+    "sourceBoundEligibleChunksInFreshConnection": 57,
+    "revisionQualifiedChunksReturned": 1,
+    "citationRowsResolved": 1,
+    "chunkContentSha256Verified": 1,
+    "documentRevisionMatched": true,
+    "sourceSha256Matched": true,
+    "utf16OffsetsValid": true,
+    "selectedDocumentId": "047f7b7f-a3f9-4b6f-9759-6248f641a627",
+    "selectedRevisionId": "4089317b-a913-819b-8391-5ee1bfbcf86d",
+    "selectedChunkId": "488f3fa7-56fd-804e-be63-cbde5f41da5b",
+    "sourceSha256": "56dc8488cf1f96166e43954dab1cda7fc28ee68b408d32da444b8ab0513fc510",
+    "chunkSha256": "23e4d8d06fa393420924002f09f69b4cce4c353e74d554df74828f8e2256c128"
+  },
+  "transactionRolledBack": true,
+  "independentFreshConnectionReadback": true
+}

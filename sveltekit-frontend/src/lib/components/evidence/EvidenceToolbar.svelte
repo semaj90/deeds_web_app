@@ -245,20 +245,29 @@
 	.toolbar {
 		margin: 0.25rem 1.5rem;
 		padding: 0.85rem;
-		border: 1px solid rgba(196, 169, 117, 0.45);
-		border-radius: 16px;
-		background: rgba(255, 252, 245, 0.66);
+		border: 3px solid #17130e;
+		border-radius: 14px;
+		background: #fff8e8;
 		backdrop-filter: blur(16px) saturate(1.1);
-		box-shadow: 0 8px 24px rgba(77, 49, 32, 0.055), inset 0 1px rgba(255,255,255,0.85);
+		box-shadow: 6px 6px 0 #17130e;
 	}
 	.toolbar-search :global(.search-icon) { color: #8a6b42; }
 	.toolbar-input {
-		border-color: #ddcdb3;
-		background: rgba(255, 253, 248, 0.9);
+		min-height: 48px;
+		padding: 0.65rem 1rem 0.65rem 2.75rem;
+		border: 3px solid #17130e;
+		border-radius: 12px;
+		background: #fffdf8;
 		color: #342621;
+		box-shadow: 4px 4px 0 #17130e;
+		font-size: 0.9rem;
 	}
-	.toolbar-input::placeholder { color: #8b7c6e; }
-	.toolbar-input:focus { border-color: #9d793a; background: #fffdf8; }
+	.toolbar-input::placeholder { color: #6e5d4d; opacity: 1; }
+	.toolbar-input:focus {
+		border-color: #7b252b;
+		background: #fffdf8;
+		box-shadow: 5px 5px 0 #17130e;
+	}
 	.search-status.searching { color: #7b3034; }
 	.search-status.searching .search-dot { background-color: #7b3034; }
 	.search-status.semantic { color: #765328; }

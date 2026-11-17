@@ -426,11 +426,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       'real',
     ] as const;
     type EvidenceTypeVal = (typeof VALID_EVIDENCE_TYPES)[number];
-    const safeEvidenceType: EvidenceTypeVal | null = VALID_EVIDENCE_TYPES.includes(
+    // evidence_type is NOT NULL in PostgreSQL. A missing or unknown submitted type
+    // falls back to a MIME-derived default instead of inserting null.
+    const mimeDefaultEvidenceType: EvidenceTypeVal = file.type.startsWith('image/')
+      ? 'photo'
+      : file.type.startsWith('video/')
+        ? 'video'
+        : file.type.startsWith('audio/')
+          ? 'audio'
+          : 'document';
+    const safeEvidenceType: EvidenceTypeVal = VALID_EVIDENCE_TYPES.includes(
       evidenceType as EvidenceTypeVal
     )
       ? (evidenceType as EvidenceTypeVal)
-      : null;
+      : mimeDefaultEvidenceType;
 
     const [inserted] = await db
       .insert(evidence)

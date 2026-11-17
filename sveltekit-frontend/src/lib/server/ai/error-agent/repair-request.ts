@@ -32,6 +32,17 @@ export interface ErrorAgentRepairRequestV1 {
   checksum: string;
 }
 
+export type ErrorAgentVerifierTierV1 =
+  | 'T0_RUNNABLE_VERIFIER'
+  | 'T1_SPEC_FILE_ON_DISK'
+  | 'T2_DIAGNOSE_ONLY';
+
+const VALID_VERIFIER_TIERS = new Set<ErrorAgentVerifierTierV1>([
+  'T0_RUNNABLE_VERIFIER',
+  'T1_SPEC_FILE_ON_DISK',
+  'T2_DIAGNOSE_ONLY',
+]);
+
 export interface RepairWorkflowInputV1 {
   query: string;
   hmmErrorClass: HmmErrorClass;
@@ -41,6 +52,10 @@ export interface RepairWorkflowInputV1 {
   modelRevision?: string;
   sourceRefs?: string[];
   threadId?: string;
+  verifierTier?: ErrorAgentVerifierTierV1;
+  verifierCmd?: string | null;
+  turn?: number;
+  promptRevision?: string;
 }
 
 export interface RepairRequestSelectionV1 {
@@ -105,6 +120,19 @@ export function verifyErrorAgentRepairRequestV1(request: ErrorAgentRepairRequest
   if (request.workflowInput) {
     if (!request.workflowInput.query || !VALID_HMM_ERROR_CLASSES.has(request.workflowInput.hmmErrorClass)) return false;
     if (request.workflowInput.sourceRefs?.some((value) => typeof value !== 'string')) return false;
+    if (
+      request.workflowInput.verifierTier !== undefined &&
+      !VALID_VERIFIER_TIERS.has(request.workflowInput.verifierTier)
+    ) return false;
+    if (
+      request.workflowInput.turn !== undefined &&
+      (!Number.isInteger(request.workflowInput.turn) || request.workflowInput.turn < 1 || request.workflowInput.turn > 3)
+    ) return false;
+    if (
+      request.workflowInput.verifierCmd !== undefined &&
+      request.workflowInput.verifierCmd !== null &&
+      typeof request.workflowInput.verifierCmd !== 'string'
+    ) return false;
   }
   const { checksum: provided, ...unsigned } = request;
   return Boolean(provided) && provided === checksum(unsigned);

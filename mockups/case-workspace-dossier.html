@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YorHA Legal AI — Case Workspace (Dossier Mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../sveltekit-frontend/src/lib/styles/dossier-global.css">
+<style>
+  body { margin: 0; background: var(--dossier-bg-workspace); color: var(--dossier-text-main); font-family: 'Inter', system-ui, sans-serif; font-size: 14px; line-height: 1.45; }
+  .serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+  .display { font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif; letter-spacing: 0.04em; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  .muted { color: var(--dossier-text-muted); }
+  .topbar { background: var(--dossier-bg-dark); color: var(--dossier-text-light); display: flex; align-items: center; gap: 24px; padding: 0 28px; height: 60px; border-bottom: 1px solid var(--dossier-border-dark); }
+  .topbar nav { display: flex; gap: 20px; font-family: 'Cinzel', Georgia, serif; font-size: 12px; letter-spacing: 0.08em; }
+  .topbar nav a { color: var(--dossier-text-light); text-decoration: none; opacity: 0.75; }
+  .topbar nav a.active { color: var(--dossier-gold-light); opacity: 1; border-bottom: 2px solid var(--dossier-gold); padding-bottom: 4px; }
+  .case-hero { background: var(--dossier-bg-card); border-bottom: 1px solid var(--dossier-border-sand); padding: 22px 28px; display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+  .case-hero h1 { font-family: 'Cinzel', Georgia, serif; font-size: 30px; font-weight: 600; margin: 6px 0 10px 0; }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; margin-left: auto; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 28px 0 28px; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 22px; padding: 22px 28px; }
+  .stack { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+  .exhibit { background: var(--dossier-bg-card); border: 1px solid #DFD3C3; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .exhibit-selected { outline: 2px solid var(--dossier-gold); outline-offset: -1px; }
+  .ledger { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+  .search { border: 1px solid var(--dossier-border-sand); background: #fff; border-radius: 999px; padding: 8px 14px; font: inherit; width: 100%; box-sizing: border-box; }
+  .callout-risk { border-left: 3px solid var(--dossier-crimson); background: #F6E9E6; padding: 10px 12px; border-radius: 8px; font-size: 13px; }
+  .callout-auth { border-left: 3px solid var(--dossier-gold); background: #F6EFDC; padding: 10px 12px; border-radius: 8px; font-size: 13px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; margin-top: 6px; }
+  .footer { border-top: 1px solid var(--dossier-border-sand); background: var(--dossier-bg-card); padding: 10px 28px; display: flex; gap: 16px; font-size: 12px; }
+  @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div style="display:flex; flex-direction:column; line-height:1.1">
+    <span class="display" style="font-size:15px; color: var(--dossier-gold-light)">YorHA Legal AI</span>
+    <span class="display" style="font-size:9px; color: var(--dossier-gold); letter-spacing: 0.22em">Lex et Iustitia</span>
+  </div>
+  <nav aria-label="Primary">
+    <a href="#">Cases</a>
+    <a href="#" class="active">Evidence</a>
+    <a href="#">Authorities</a>
+    <a href="#">Library</a>
+  </nav>
+  <input class="search" aria-label="Search cases, exhibits and authorities" placeholder="Search cases, exhibits, authorities" style="max-width:380px; margin-left:auto; background: var(--dossier-bg-dark-panel); border-color: var(--dossier-border-dark); color: var(--dossier-text-light)">
+  <span style="color:#CFC6B3; font-size:12px">Demo User · Admin</span>
+</header>
+
+<section class="case-hero" aria-label="Case summary">
+  <div style="flex:1; min-width:320px">
+    <div class="muted mono">Cases / Docket 89317A13</div>
+    <h1>State v. Chen</h1>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+      <span class="dossier-mini-pill dossier-mini-pill-active">Open</span>
+      <span class="dossier-mini-pill">Brief in draft</span>
+      <span class="muted" style="font-size:13px">12 exhibits · 4 authorities linked · Updated Nov 12, 2026</span>
+    </div>
+  </div>
+  <div class="toolbar">
+    <button class="hud-toolbar-btn">Edit brief</button>
+    <button class="hud-toolbar-btn">Case notes</button>
+    <button class="hud-toolbar-btn">AI counsel</button>
+    <button class="hud-toolbar-btn" aria-haspopup="menu">More</button>
+    <button class="hud-toolbar-btn hud-toolbar-btn-gold">Export packet</button>
+  </div>
+</section>
+
+<div class="tabs" role="tablist" aria-label="Case sections">
+  <button role="tab" aria-selected="true" class="dossier-mini-pill dossier-mini-pill-active">Evidence (12)</button>
+  <button role="tab" aria-selected="false" class="dossier-mini-pill">Organize</button>
+  <button role="tab" aria-selected="false" class="dossier-mini-pill">Authorities (4)</button>
+  <button role="tab" aria-selected="false" class="dossier-mini-pill">Case theory</button>
+  <button role="tab" aria-selected="false" class="dossier-mini-pill">Cross-exam</button>
+  <button role="tab" aria-selected="false" class="dossier-mini-pill">Timeline</button>
+  <button role="tab" aria-selected="false" class="dossier-mini-pill">Prediction</button>
+  <button role="tab" aria-selected="false" class="dossier-mini-pill">Contract</button>
+</div>
+
+<main class="layout">
+
+  <div class="stack">
+
+    <section class="dossier-card" aria-label="Add exhibit" style="padding:18px; display:flex; align-items:center; gap:16px; border-style:dashed; border-color:#8F8775; box-shadow:none">
+      <div style="flex:1">
+        <div class="dossier-card-title" style="color: var(--dossier-text-main); margin-bottom:2px">Add an exhibit</div>
+        <div class="muted" style="font-size:13px">PDF, DOCX, JPG, PNG, audio or video. File type is checked against its contents before upload. Each file gets a SHA-256 hash on ingest.</div>
+      </div>
+      <button class="hud-toolbar-btn hud-toolbar-btn-gold">Choose files</button>
+    </section>
+
+    <section class="dossier-card" aria-labelledby="ledger-h">
+      <div class="dossier-card-header">
+        <h2 id="ledger-h" class="dossier-plaque dossier-card-title" style="margin:0">Evidence ledger</h2>
+        <span class="chat-mime-badge chat-mime-document">12 exhibits</span>
+        <div style="margin-left:auto; display:flex; gap:8px; min-width:280px; flex:0 1 360px">
+          <input class="search" aria-label="Search exhibits" placeholder="Search exhibits (3+ characters)">
+          <button class="hud-toolbar-btn">Filter</button>
+        </div>
+      </div>
+      <div class="dossier-card-body">
+        <div class="ledger">
+
+          <button class="exhibit exhibit-selected" aria-pressed="true" aria-label="E-004 Security CCTV, lobby, 22:45">
+            <div style="display:flex; justify-content:space-between"><span class="mono">E-004</span><span class="chat-mime-badge chat-mime-video">VIDEO</span></div>
+            <div class="serif" style="font-size:17px; font-weight:600; line-height:1.2">Security CCTV, lobby, 22:45</div>
+            <div class="muted" style="font-size:12px">Added May 18, 2026</div>
+            <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center"><span class="dossier-mini-pill" style="color:#67140F; border-color:#B48A7E; background:#F4E4E0">Needs review</span><span class="muted" style="font-size:11px">Hash verified</span></div>
+          </button>
+
+          <button class="exhibit" aria-label="E-005 Wiretap call, tape 11-A">
+            <div style="display:flex; justify-content:space-between"><span class="mono">E-005</span><span class="chat-mime-badge chat-mime-audio">AUDIO</span></div>
+            <div class="serif" style="font-size:17px; font-weight:600; line-height:1.2">Wiretap call, tape 11-A</div>
+            <div class="muted" style="font-size:12px">Added May 18, 2026</div>
+            <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center"><span class="dossier-mini-pill">Transcribed</span><span class="muted" style="font-size:11px">Hash verified</span></div>
+          </button>
+
+          <button class="exhibit" aria-label="E-001 Surveillance still, L3 corridor">
+            <div style="display:flex; justify-content:space-between"><span class="mono">E-001</span><span class="chat-mime-badge chat-mime-image">IMAGE</span></div>
+            <div class="serif" style="font-size:17px; font-weight:600; line-height:1.2">Surveillance still, L3 corridor</div>
+            <div class="muted" style="font-size:12px">Added Nov 1, 2026</div>
+            <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center"><span class="dossier-mini-pill">Parsed</span><span class="muted" style="font-size:11px">Hash verified</span></div>
+          </button>
+
+          <button class="exhibit" aria-label="E-002 Bill text, SB-830">
+            <div style="display:flex; justify-content:space-between"><span class="mono">E-002</span><span class="chat-mime-badge chat-mime-pdf">PDF</span></div>
+            <div class="serif" style="font-size:17px; font-weight:600; line-height:1.2">Bill text, SB-830</div>
+            <div class="muted" style="font-size:12px">Added Oct 31, 2026</div>
+            <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center"><span class="dossier-mini-pill">Statute</span><span class="muted" style="font-size:11px">Hash verified</span></div>
+          </button>
+
+          <button class="exhibit" aria-label="E-003 Bill text, SB-225">
+            <div style="display:flex; justify-content:space-between"><span class="mono">E-003</span><span class="chat-mime-badge chat-mime-pdf">PDF</span></div>
+            <div class="serif" style="font-size:17px; font-weight:600; line-height:1.2">Bill text, SB-225</div>
+            <div class="muted" style="font-size:12px">Added Oct 31, 2026</div>
+            <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center"><span class="dossier-mini-pill">Statute</span><span class="muted" style="font-size:11px">Hash verified</span></div>
+          </button>
+
+          <button class="exhibit" aria-label="E-006 Witness statement, identity theft deposition">
+            <div style="display:flex; justify-content:space-between"><span class="mono">E-006</span><span class="chat-mime-badge chat-mime-document">DOC</span></div>
+            <div class="serif" style="font-size:17px; font-weight:600; line-height:1.2">Witness statement, identity theft deposition</div>
+            <div class="muted" style="font-size:12px">Added May 18, 2026</div>
+            <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center"><span class="dossier-mini-pill">Sworn affidavit</span><span class="muted" style="font-size:11px">Hash verified</span></div>
+          </button>
+
+          <button class="exhibit" aria-label="E-007 Offshore account ledgers">
+            <div style="display:flex; justify-content:space-between"><span class="mono">E-007</span><span class="chat-mime-badge chat-mime-other">FILE</span></div>
+            <div class="serif" style="font-size:17px; font-weight:600; line-height:1.2">Offshore account ledgers</div>
+            <div class="muted" style="font-size:12px">Added May 18, 2026</div>
+            <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center"><span class="dossier-mini-pill" style="color:#7A4300; border-color:#C9A86A; background:#F6EBD0">Flagged</span><span class="muted" style="font-size:11px">Hash verified</span></div>
+          </button>
+
+          <button class="exhibit" aria-label="E-008 Estate executory clause agreement">
+            <div style="display:flex; justify-content:space-between"><span class="mono">E-008</span><span class="chat-mime-badge chat-mime-document">CONTRACT</span></div>
+            <div class="serif" style="font-size:17px; font-weight:600; line-height:1.2">Estate executory clause agreement</div>
+            <div class="muted" style="font-size:12px">Added May 18, 2026</div>
+            <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center"><span class="dossier-mini-pill" style="color:#2F4A2A; border-color:#8FA88A; background:#E9EFE4">Executed</span><span class="muted" style="font-size:11px">Hash verified</span></div>
+          </button>
+
+        </div>
+        <div class="muted" style="font-size:13px; margin-top:12px">Showing 8 of 12 exhibits · <a href="#">Show all 12</a></div>
+      </div>
+    </section>
+  </div>
+
+  <aside class="stack">
+
+    <section class="dossier-card">
+      <span class="dossier-arcana-inner"></span>
+      <span class="dossier-star dossier-star-tl">✦</span><span class="dossier-star dossier-star-tr">✦</span>
+      <div class="dossier-card-header">
+        <h2 class="dossier-plaque dossier-card-title" style="margin:0">Case synthesis</h2>
+        <span class="dossier-mini-pill" style="margin-left:auto; color:#6B4E14; border-color:#C9A86A; background:#F6EBD0">Draft for attorney review</span>
+      </div>
+      <div class="dossier-card-body" style="display:flex; flex-direction:column; gap:14px">
+        <div role="group" aria-label="Synthesis view" style="display:flex; gap:6px; flex-wrap:wrap">
+          <button class="dossier-mini-pill dossier-mini-pill-active" aria-pressed="true">Summary</button>
+          <button class="dossier-mini-pill" aria-pressed="false">Legal issues</button>
+          <button class="dossier-mini-pill" aria-pressed="false">Risk flags</button>
+          <button class="dossier-mini-pill" aria-pressed="false">Exhibit audit</button>
+        </div>
+        <div>
+          <div class="muted" style="font-size:12px; margin-bottom:4px">Working theory, v3.1</div>
+          <p class="serif" style="margin:0; font-size:17px; line-height:1.4">E-004 (lobby CCTV, 22:45) and E-005 (wiretap, tape 11-A) conflict with the defendant’s account of where he was that evening. <a href="#" class="mono">E-004</a> <a href="#" class="mono">E-005</a></p>
+        </div>
+        <div class="callout-risk"><strong>Risk:</strong> The timestamp on tape 11-A does not match its chain-of-custody log. This affects the foundation under FRE 901. Review before relying on E-005.</div>
+        <div class="callout-auth"><strong>Supporting authority:</strong> <a href="#">People v. Villegas</a>, on probation eligibility under Cal. Penal Code § 1203. Verify the current text before citing.</div>
+        <button class="hud-toolbar-btn hud-toolbar-btn-gold" style="justify-content:center; height:36px">Run analysis on all exhibits</button>
+        <div class="muted" style="font-size:12px">Uses AI. Output is a draft and cites exhibits by ID. Nothing is filed or sent automatically.</div>
+      </div>
+    </section>
+
+    <section class="dossier-card" aria-labelledby="inspector-h">
+      <div class="dossier-card-header">
+        <h2 id="inspector-h" class="dossier-plaque dossier-card-title" style="margin:0">Exhibit E-004</h2>
+        <span class="dossier-mini-pill" style="margin-left:auto; color:#67140F; border-color:#B48A7E; background:#F4E4E0">Needs review</span>
+      </div>
+      <div class="dossier-card-body" style="display:flex; flex-direction:column; gap:12px">
+        <div class="muted" style="font-size:13px">Security CCTV, lobby, 22:45</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:13px">
+          <div><div class="muted" style="font-size:12px">Hash</div>SHA-256 verified on ingest</div>
+          <div><div class="muted" style="font-size:12px">Chain of custody</div>6 of 6 transfers recorded</div>
+        </div>
+        <div>
+          <div class="dossier-card-title" style="color:var(--dossier-text-main); margin-bottom:8px">Foundation checklist</div>
+          <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; font-size:13px">
+            <li style="display:flex; gap:8px"><span aria-hidden="true" class="dot" style="background:#2F4A2A"></span><span><strong>Chain of custody.</strong> Complete.</span></li>
+            <li style="display:flex; gap:8px"><span aria-hidden="true" class="dot" style="background:#C9A86A"></span><span><strong>Authentication.</strong> Pending. No witness or system attestation on file.</span></li>
+            <li style="display:flex; gap:8px"><span aria-hidden="true" class="dot" style="background:#67140F"></span><span><strong>Timestamp consistency.</strong> Conflicts with E-005.</span></li>
+            <li style="display:flex; gap:8px"><span aria-hidden="true" class="dot" style="background:#7F7565"></span><span><strong>Hearsay exception.</strong> Not assessed.</span></li>
+          </ul>
+        </div>
+        <div class="muted" style="font-size:12px">Checklist items are for attorney review. The tool does not score admissibility.</div>
+      </div>
+    </section>
+
+  </aside>
+</main>
+
+<footer class="footer muted">
+  <span>All 12 exhibits hashed and verified on ingest.</span>
+  <span style="margin-left:auto">Mockup · styles: sveltekit-frontend/src/lib/styles/dossier-global.css</span>
+</footer>
+
+</body>
+</html>

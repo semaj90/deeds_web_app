@@ -1,0 +1,563 @@
+{
+  "schema": "atlas.cohort-verifier-tier-audit.v1",
+  "generatedAt": "2026-11-14T00:32:16.928Z",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "promotionEligible": false,
+  "sources": {
+    "openspecCohortJsonl": ".tmp/atlas/openspec-cohort-6527-current-source-bindings-v1.jsonl",
+    "openspecCohortSha256": "sha256:de32847bda8bee924335d1354da03e2361267abc0cdef31fefc115dcd1265f84",
+    "openspecPerRowJsonl": ".tmp/atlas/cohort-6527-verifier-tiers-v1.jsonl",
+    "nextstepsCohortJsonl": ".tmp/atlas/next-steps-task-extract-v1/20261108T181650Z/tasks.jsonl",
+    "nextstepsCohortSha256": "sha256:83d6d4770e5f3181b4b2e85d437655d6ab985a0dc5647a5afb21be9bdd576ca3",
+    "nextstepsPerRowJsonl": ".tmp/atlas/nextsteps-3105-verifier-tiers-v1.jsonl",
+    "bridgeReportJson": ".tmp/atlas/kanban-task-bridge-20261109T002152Z.json",
+    "bridgeReportSha256": "sha256:e8f88f8003e33460642c124ac3a8f7613b1da360e5fe566ebb2906af13b91ac6"
+  },
+  "openspecCohortSummary": {
+    "totalRows": 6527,
+    "tierCounts": {
+      "T0_RUNNABLE_VERIFIER": 15,
+      "T1_SPEC_FILE_ON_DISK": 49,
+      "T2_DIAGNOSE_ONLY": 6395,
+      "STALE_NON_CHECKBOX_LOCATOR": 68
+    },
+    "tierSharePct": {
+      "T0_RUNNABLE_VERIFIER": 0.23,
+      "T1_SPEC_FILE_ON_DISK": 0.751,
+      "T2_DIAGNOSE_ONLY": 97.978,
+      "STALE_NON_CHECKBOX_LOCATOR": 1.042
+    },
+    "sourceMatchCounts": {
+      "EXACT": 6524,
+      "CHECKBOX_STATE_UPDATED": 2,
+      "LOCATOR_RECOVERED": 1
+    },
+    "checkboxStateCounts": {
+      " ": 6450,
+      "x": 8,
+      "NONE": 68,
+      "~": 1
+    },
+    "t2WithDiskSourceTarget": 195,
+    "rawCommandMentionRows": 81,
+    "brokenCommandRows": 7,
+    "missingPathRefRows": 18,
+    "sourceDriftRows": 0
+  },
+  "openspecSamples": {
+    "T0_RUNNABLE_VERIFIER": [
+      {
+        "canonicalTaskKey": "atlas-feature-intelligence#a113baba0659243f",
+        "sourceRef": "openspec/changes/atlas-feature-intelligence/tasks.md#L259",
+        "runnableCommands": [
+          "node --test packages/parent-atlas/test/hypergraph-ppr.test.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "atlas-directory-first-analysis-v1#ead75c49e0ba2cdf",
+        "sourceRef": "openspec/changes/atlas-directory-first-analysis-v1/tasks.md#L42",
+        "runnableCommands": [
+          "npm run check"
+        ]
+      },
+      {
+        "canonicalTaskKey": "legal-corpus-california-codes#fb3c6f371acb73ef",
+        "sourceRef": "openspec/changes/legal-corpus-california-codes/tasks.md#L258",
+        "runnableCommands": [
+          "node --test scripts/atlas/qdrant-grpc-upsert-request.test.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-ace-rlm-bitfrost-integration#238e6359ab960438",
+        "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16360",
+        "runnableCommands": [
+          "node --test scripts/atlas/graphify-daily-lifecycle-open-v1.test.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-evidence-agent-proposals#2cc5fbb2d14c0211",
+        "sourceRef": "openspec/changes/parent-atlas-evidence-agent-proposals/tasks.md#L3",
+        "runnableCommands": [
+          "node scripts/atlas/audit-atlas-migration-owners.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-document-governance-master-index#c38667069bf79d65",
+        "sourceRef": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md#L108",
+        "runnableCommands": [
+          "npm run check"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-agent-framework-integration-hardening#03c23ab46bab82bd",
+        "sourceRef": "openspec/changes/parent-atlas-agent-framework-integration-hardening/tasks.md#L179",
+        "runnableCommands": [
+          "npm run check"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-graph-retrieval-proof#d79a905582095163~6",
+        "sourceRef": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L204",
+        "runnableCommands": [
+          "node scripts/atlas/audit-env-contract.mjs --dry-run",
+          "node scripts/validate-parent-atlas-integration-proof.mjs gate env",
+          "node scripts/validate-parent-atlas-integration-proof.mjs gate identity",
+          "node scripts/validate-parent-atlas-integration-proof.mjs gate mcp"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-retrieval-lod-algorithm-taxonomy#238b603de3fb3b20",
+        "sourceRef": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L988",
+        "runnableCommands": [
+          "node scripts/atlas/audit-callable-search-lineage-v1.mjs --workspace-revision=sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9 --limit=500",
+          "node --test scripts/atlas/lib/function-native-source-alignment-v1.test.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "phase1-rrf-semantic-fusion#5554222d22b811de",
+        "sourceRef": "sveltekit-frontend/openspec/changes/phase1-rrf-semantic-fusion/tasks.md#L86",
+        "runnableCommands": [
+          "npm run check"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-ml-graph-retrieval-convergence#2e2a038c271107e4",
+        "sourceRef": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L259",
+        "runnableCommands": [
+          "node scripts/atlas/audit-durable-journal-receipt-v1.test.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "svelte-a11y-warning-remediation#c9242c9a34e022b7",
+        "sourceRef": "openspec/changes/svelte-a11y-warning-remediation/tasks.md#L37",
+        "runnableCommands": [
+          "npx vitest run"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-workstation-domain-classifier#5e482346cca67eac",
+        "sourceRef": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L1439",
+        "runnableCommands": [
+          "npm run check"
+        ]
+      },
+      {
+        "canonicalTaskKey": "wire-agentic-workflows-e2e-test#ab0d7754cb82f4b6",
+        "sourceRef": "sveltekit-frontend/openspec/changes/wire-agentic-workflows-e2e-test/tasks.md#L106",
+        "runnableCommands": [
+          "npm run test"
+        ]
+      },
+      {
+        "canonicalTaskKey": "svelte-a11y-warning-remediation#9cef83650665a126",
+        "sourceRef": "openspec/changes/svelte-a11y-warning-remediation/tasks.md#L36",
+        "runnableCommands": [
+          "npm run check"
+        ]
+      }
+    ],
+    "T1_SPEC_FILE_ON_DISK": [
+      {
+        "canonicalTaskKey": "parent-atlas-retrieval-logic-convergence#75fdab688d2cac4c",
+        "sourceRef": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md#L618",
+        "diskTestTargets": [
+          "scripts/atlas/prove-postgres-pgvector-exact-hnsw-replay-v1.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-candidate-feature-execution-fabric#11fc258618c75f1e",
+        "sourceRef": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md#L1818",
+        "diskTestTargets": [
+          "scripts/atlas/audit-hgrag-oak-owner-map-v1.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-gpu-sidecar-patch-tournament#82dfd8d2383671e3",
+        "sourceRef": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L426",
+        "diskTestTargets": [
+          "scripts/atlas/audit-runtime-ownership.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-candidate-feature-execution-fabric#cd68c3eb5f765d20",
+        "sourceRef": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md#L713",
+        "diskTestTargets": [
+          "packages/parent-atlas-retrieval/src/gpu/simdjson-bridge.spec.ts"
+        ]
+      },
+      {
+        "canonicalTaskKey": "atlas-directory-first-analysis-v1#4f51404305d5bc82",
+        "sourceRef": "openspec/changes/atlas-directory-first-analysis-v1/tasks.md#L31",
+        "diskTestTargets": [
+          "scripts/atlas/lib/derive-feature-identityv2.test.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "legal-corpus-california-codes#d261684b8887e216",
+        "sourceRef": "openspec/changes/legal-corpus-california-codes/tasks.md#L252",
+        "diskTestTargets": [
+          "scripts/atlas/validate-okf-dict-linked-list-v1.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-nlp-sidecar-feature-compiler#8ef1d7f91976ce6b",
+        "sourceRef": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md#L998",
+        "diskTestTargets": [
+          "packages/parent-atlas/test/langextract-utf8-grounding.test.mjs",
+          "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-intelligence-adapter.spec.ts"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-ontology-kernel#409563a85f1f5e00",
+        "sourceRef": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L5372",
+        "diskTestTargets": [
+          "scripts/atlas/verify-okf-doc-fetch-readback-v1.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-tensor-residency-integration#1f101d8b4cd40cd7",
+        "sourceRef": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md#L1107",
+        "diskTestTargets": [
+          "python/tests/test_atlas_rapids_graph_runtime.py",
+          "python/tests/test_graph_projection_manifest.py"
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-versioned-doc-intelligence#a0c30948d024fe3b",
+        "sourceRef": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L1001",
+        "diskTestTargets": [
+          "scripts/atlas/prove-doc-26-incremental-recrawl-fixture-v1.mjs"
+        ]
+      }
+    ],
+    "STALE_NON_CHECKBOX_LOCATOR": [
+      {
+        "canonicalTaskKey": "parent-atlas-gpu-compute-lanes-consolidation#ba8da0312e31b266",
+        "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L66",
+        "sourceMatch": "EXACT",
+        "linePreview": "  - **Handoff (2026-11-09), MCP tool-calling status:**"
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-workboard-feature-utility-fabric#9c72c61995aca1cd",
+        "sourceRef": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md#L436",
+        "sourceMatch": "EXACT",
+        "linePreview": ""
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-gpu-compute-lanes-consolidation#44f3f55b22fd3374",
+        "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1871",
+        "sourceMatch": "EXACT",
+        "linePreview": "  7. Prove the five flags (`querySpecific`, `identityBound`, `revisionQualified`, `evidenceLinked`, `proofUsable`): NOT MET; `revisionQualif"
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-gpu-compute-lanes-consolidation#8170504967ee521f",
+        "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L938",
+        "sourceMatch": "EXACT",
+        "linePreview": "- **Classes** (`audit-embedding-direct-endpoints-v1.mjs`, 8 tests): `LIVE_DIRECT_CALLER`, `LIVE_WRAPPER` (an exported embed/vector/encode fu"
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-gpu-compute-lanes-consolidation#11735d25b1e1e0d5",
+        "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L935",
+        "sourceMatch": "EXACT",
+        "linePreview": "- **Commit hazard:** the new executor imports `embedding-execution-adapter-v1.ts` and `embedding-provider-v1.ts` contract types; the adapter"
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-gpu-compute-lanes-consolidation#b32e54656e618b8b",
+        "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L1872",
+        "sourceMatch": "EXACT",
+        "linePreview": "  8. Then CONTEXT-DEPTH-ALIGNMENT-01, ContextBudgetV1, continuations and the token benchmark (the measured result duplication, `promptPacket"
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-gpu-compute-lanes-consolidation#e532bbd2e8f9f09c",
+        "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L934",
+        "sourceMatch": "EXACT",
+        "linePreview": "- **Deliberately NOT migrated yet:** `lib/server/retrieval/auto-backfill.ts`, `embedding-models.ts`, `lib/server/ace/*` and the other live f"
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-gpu-compute-lanes-consolidation#a4f7ecfd64362dbf",
+        "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md#L936",
+        "sourceMatch": "EXACT",
+        "linePreview": ""
+      },
+      {
+        "canonicalTaskKey": "courtroom-upload-story-pipeline#5ea5fc0b970c50fc",
+        "sourceRef": "openspec/changes/courtroom-upload-story-pipeline/tasks.md#L139",
+        "sourceMatch": "EXACT",
+        "linePreview": ""
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-graphify-recovery-proof-ladder#6c51f54d5d355b5e",
+        "sourceRef": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md#L713",
+        "sourceMatch": "EXACT",
+        "linePreview": ""
+      }
+    ],
+    "brokenCommands": [
+      {
+        "canonicalTaskKey": "wire-agentic-workflows-e2e-test#71aa9d290c1cff7e",
+        "sourceRef": "sveltekit-frontend/openspec/changes/wire-agentic-workflows-e2e-test/tasks.md#L59",
+        "brokenCommands": [
+          {
+            "command": "npm run test:opencode-mcp-integration",
+            "missingTargets": [
+              "npm-script:test:opencode-mcp-integration"
+            ]
+          }
+        ]
+      },
+      {
+        "canonicalTaskKey": "wire-agentic-workflows-e2e-test#289b1e8267fc8016",
+        "sourceRef": "sveltekit-frontend/openspec/changes/wire-agentic-workflows-e2e-test/tasks.md#L46",
+        "brokenCommands": [
+          {
+            "command": "npm run test:a2a-discovery",
+            "missingTargets": [
+              "npm-script:test:a2a-discovery"
+            ]
+          }
+        ]
+      },
+      {
+        "canonicalTaskKey": "wire-agentic-workflows-e2e-test#dc195483ef596b18",
+        "sourceRef": "sveltekit-frontend/openspec/changes/wire-agentic-workflows-e2e-test/tasks.md#L72",
+        "brokenCommands": [
+          {
+            "command": "npm run test:agentic-e2e:reference-queries",
+            "missingTargets": [
+              "npm-script:test:agentic-e2e:reference-queries"
+            ]
+          }
+        ]
+      },
+      {
+        "canonicalTaskKey": "wire-agentic-workflows-e2e-test#83cca9c4c61e11a1",
+        "sourceRef": "sveltekit-frontend/openspec/changes/wire-agentic-workflows-e2e-test/tasks.md#L86",
+        "brokenCommands": [
+          {
+            "command": "npm run test:agentic-e2e:perf-baseline",
+            "missingTargets": [
+              "npm-script:test:agentic-e2e:perf-baseline"
+            ]
+          }
+        ]
+      },
+      {
+        "canonicalTaskKey": "wire-agentic-workflows-e2e-test#8764f4035f6c21b2",
+        "sourceRef": "sveltekit-frontend/openspec/changes/wire-agentic-workflows-e2e-test/tasks.md#L105",
+        "brokenCommands": [
+          {
+            "command": "npm run test:a2a-discovery && npm run test:opencode-mcp-integration && npm run test:agentic-e2e:reference-queries && npm run test:agentic-e2e:perf-baseline",
+            "missingTargets": [
+              "npm-script:test:a2a-discovery",
+              "npm-script:test:opencode-mcp-integration",
+              "npm-script:test:agentic-e2e:reference-queries",
+              "npm-script:test:agentic-e2e:perf-baseline"
+            ]
+          }
+        ]
+      },
+      {
+        "canonicalTaskKey": "parent-atlas-ast-summary-lineage-pipeline#2173e387a706a3cd",
+        "sourceRef": "openspec/changes/parent-atlas-ast-summary-lineage-pipeline/tasks.md#L152",
+        "brokenCommands": [
+          {
+            "command": "npm run test:run",
+            "missingTargets": [
+              "npm-script:test:run"
+            ]
+          }
+        ]
+      },
+      {
+        "canonicalTaskKey": "svelte-a11y-warning-remediation#c9242c9a34e022b7",
+        "sourceRef": "openspec/changes/svelte-a11y-warning-remediation/tasks.md#L37",
+        "brokenCommands": [
+          {
+            "command": "npm run test:run",
+            "missingTargets": [
+              "npm-script:test:run"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "nextstepsCohortSummary": {
+    "totalRows": 3105,
+    "tierCounts": {
+      "T0_RUNNABLE_VERIFIER": 5,
+      "T1_SPEC_FILE_ON_DISK": 3,
+      "T2_DIAGNOSE_ONLY": 3097,
+      "STALE_NON_CHECKBOX_LOCATOR": 0
+    },
+    "tierSharePct": {
+      "T0_RUNNABLE_VERIFIER": 0.161,
+      "T1_SPEC_FILE_ON_DISK": 0.097,
+      "T2_DIAGNOSE_ONLY": 99.742,
+      "STALE_NON_CHECKBOX_LOCATOR": 0
+    },
+    "sourceMatchCounts": {
+      "open": 2479,
+      "done": 626
+    },
+    "checkboxStateCounts": {
+      " ": 2479,
+      "x": 626
+    },
+    "t2WithDiskSourceTarget": 83,
+    "rawCommandMentionRows": 80,
+    "brokenCommandRows": 1,
+    "missingPathRefRows": 31,
+    "sourceDriftRows": 0
+  },
+  "nextstepsSamples": {
+    "T0_RUNNABLE_VERIFIER": [
+      {
+        "canonicalTaskKey": "next-steps-archive-comprehensive-consolidation-roadmap#06bb7f8ba924e327",
+        "sourceRef": "next_steps/archive/COMPREHENSIVE_CONSOLIDATION_ROADMAP.md#L60",
+        "runnableCommands": [
+          "npm run test"
+        ]
+      },
+      {
+        "canonicalTaskKey": "next-steps-production-ready-audit#c848313a4e934b99",
+        "sourceRef": "next_steps/production-ready-audit.md#L15",
+        "runnableCommands": [
+          "node scripts/atlas/audit-rg-search-integrity.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "sveltekit-frontend-next-steps-active-2026-05-03-production-blockers#3b02d7d8b5528b91",
+        "sourceRef": "sveltekit-frontend/next_steps/active/2026-05-03-production-blockers.md#L35",
+        "runnableCommands": [
+          "npm run check"
+        ]
+      },
+      {
+        "canonicalTaskKey": "sveltekit-frontend-next-steps-active-2026-06-16-production-blockers#8b2932425e3849d1",
+        "sourceRef": "sveltekit-frontend/next_steps/active/2026-06-16-production-blockers.md#L73",
+        "runnableCommands": [
+          "npm run check"
+        ]
+      },
+      {
+        "canonicalTaskKey": "sveltekit-frontend-next-steps-plans-bitfrost-turboquant-turbovec-production-todo#a7290921bc8d8fca",
+        "sourceRef": "sveltekit-frontend/next_steps/plans/bitfrost_turboquant_turbovec_production_todo.md#L64",
+        "runnableCommands": [
+          "npm run check"
+        ]
+      }
+    ],
+    "T1_SPEC_FILE_ON_DISK": [
+      {
+        "canonicalTaskKey": "next-steps-active-todo-2026-05-18#6f933fd31b99b430",
+        "sourceRef": "next_steps/active/todo-2026-05-18.md#L1077",
+        "diskTestTargets": [
+          "sveltekit-frontend/scripts/validate-nes-glyph-architecture.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "next-steps-production-ready-audit#235adf9f9c3376c1",
+        "sourceRef": "next_steps/production-ready-audit.md#L10",
+        "diskTestTargets": [
+          "scripts/atlas/audit-rg-search-integrity.mjs"
+        ]
+      },
+      {
+        "canonicalTaskKey": "next-steps-production-ready-gitignore-drizzle-audit#3de8fe42adc11077",
+        "sourceRef": "next_steps/production-ready-gitignore-drizzle-audit.md#L67",
+        "diskTestTargets": [
+          "scripts/atlas/audit-rg-search-integrity.mjs"
+        ]
+      }
+    ],
+    "STALE_NON_CHECKBOX_LOCATOR": [],
+    "brokenCommands": [
+      {
+        "canonicalTaskKey": "next-steps-production-ready-gitignore-drizzle-audit#4e949be78342924f",
+        "sourceRef": "next_steps/production-ready-gitignore-drizzle-audit.md#L426",
+        "brokenCommands": [
+          {
+            "command": "npm run test:network-contracts",
+            "missingTargets": [
+              "npm-script:test:network-contracts"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "nextstepsBlockedCandidates": [
+    {
+      "taskId": "sveltekit-frontend-next-steps-plans-bitfrost-turboquant-turbovec-production-todo#0670a95a5ede358a",
+      "sourceRef": "sveltekit-frontend/next_steps/plans/bitfrost_turboquant_turbovec_production_todo.md#L1035",
+      "bridgeAction": "BLOCKED_BY_STATE_OR_PROVENANCE",
+      "hasRevisionBoundPrefill": false,
+      "hasRunnableValidation": false,
+      "sectionHeading": "### Phase 12 — Agent orchestration decision",
+      "parentLabel": "Defer:",
+      "lineText": "- [ ] OpenAI hosted agents",
+      "verifierTier": "T2_DIAGNOSE_ONLY",
+      "verifierCmd": null,
+      "disposition": "NON_ACTIONABLE_DECISION_OR_DEFERRAL_BULLET"
+    },
+    {
+      "taskId": "sveltekit-frontend-next-steps-plans-bitfrost-turboquant-turbovec-production-todo#0819febed9ee2b31",
+      "sourceRef": "sveltekit-frontend/next_steps/plans/bitfrost_turboquant_turbovec_production_todo.md#L1012",
+      "bridgeAction": "BLOCKED_BY_STATE_OR_PROVENANCE",
+      "hasRevisionBoundPrefill": false,
+      "hasRunnableValidation": false,
+      "sectionHeading": "### Phase 11 — Triton / TensorRT / vLLM / SGLang decision gate",
+      "parentLabel": "Consider later only if:",
+      "lineText": "- [ ] need continuous batching",
+      "verifierTier": "T2_DIAGNOSE_ONLY",
+      "verifierCmd": null,
+      "disposition": "NON_ACTIONABLE_DECISION_OR_DEFERRAL_BULLET"
+    },
+    {
+      "taskId": "sveltekit-frontend-next-steps-plans-bitfrost-turboquant-turbovec-production-todo#1716f3eb48b1c38a",
+      "sourceRef": "sveltekit-frontend/next_steps/plans/bitfrost_turboquant_turbovec_production_todo.md#L777",
+      "bridgeAction": "BLOCKED_BY_STATE_OR_PROVENANCE",
+      "hasRevisionBoundPrefill": false,
+      "hasRunnableValidation": false,
+      "sectionHeading": "### Phase 0 — Lock runtime contract",
+      "parentLabel": null,
+      "lineText": "- [ ] Record current KV mode: `q8_0/q8_0`",
+      "verifierTier": "T2_DIAGNOSE_ONLY",
+      "verifierCmd": null,
+      "disposition": "OPERATOR_CONFIG_RECORD_ONLY"
+    },
+    {
+      "taskId": "sveltekit-frontend-next-steps-plans-bitfrost-turboquant-turbovec-production-todo#179983bf6179d287",
+      "sourceRef": "sveltekit-frontend/next_steps/plans/bitfrost_turboquant_turbovec_production_todo.md#L993",
+      "bridgeAction": "BLOCKED_BY_STATE_OR_PROVENANCE",
+      "hasRevisionBoundPrefill": false,
+      "hasRunnableValidation": false,
+      "sectionHeading": "### Phase 10 — FlashAttention decision gate",
+      "parentLabel": null,
+      "lineText": "- [ ] do not compile separate FlashAttention",
+      "verifierTier": "T2_DIAGNOSE_ONLY",
+      "verifierCmd": null,
+      "disposition": "NON_ACTIONABLE_DECISION_OR_DEFERRAL_BULLET"
+    },
+    {
+      "taskId": "sveltekit-frontend-next-steps-plans-bitfrost-turboquant-turbovec-production-todo#1961a3bf3a1cd303",
+      "sourceRef": "sveltekit-frontend/next_steps/plans/bitfrost_turboquant_turbovec_production_todo.md#L1014",
+      "bridgeAction": "BLOCKED_BY_STATE_OR_PROVENANCE",
+      "hasRevisionBoundPrefill": false,
+      "hasRunnableValidation": false,
+      "sectionHeading": "### Phase 11 — Triton / TensorRT / vLLM / SGLang decision gate",
+      "parentLabel": "Consider later only if:",
+      "lineText": "- [ ] need multi-GPU scheduling",
+      "verifierTier": "T2_DIAGNOSE_ONLY",
+      "verifierCmd": null,
+      "disposition": "NON_ACTIONABLE_DECISION_OR_DEFERRAL_BULLET"
+    }
+  ],
+  "verifierGapsIdentified": [
+    "OpenSpec 6,527: 6395 of 6527 rows are T2_DIAGNOSE_ONLY (15 T0 runnable, 49 T1 spec-on-disk, 68 STALE_NON_CHECKBOX_LOCATOR, 81 loose command mentions vs 7 broken command row(s)).",
+    "NextSteps 3,105: 3097 of 3105 rows are T2_DIAGNOSE_ONLY (5 T0 runnable, 3 T1 spec-on-disk, 0 STALE_NON_CHECKBOX_LOCATOR, 0 file-sha drift rows, 80 loose command mentions, 1 broken command row(s)).",
+    "All 5 blocked nextsteps DAG candidates are non-runnable operational config notes, architectural decisions, negative constraints, or Defer bullets without a T0 verifier."
+  ]
+}

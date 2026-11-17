@@ -144,7 +144,7 @@ export const GET: RequestHandler = async ({ params, locals, url, request }) => {
         if (sampleChunks.reduce((total, part) => total + part.length, 0) >= 512) break;
       }
       const observedType = probeObservedMime(Buffer.concat(sampleChunks).subarray(0, 512));
-      const safeInlineTypes = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'audio/wav', 'audio/mpeg', 'video/mp4']);
+      const safeInlineTypes = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'audio/wav', 'audio/mpeg', 'video/mp4', 'video/webm']);
       if (!observedType || observedType !== storedContentType.toLowerCase() || !safeInlineTypes.has(observedType)) {
         return json({ error: 'Inline preview requires a matching supported file signature' }, { status: 415 });
       }

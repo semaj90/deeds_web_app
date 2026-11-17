@@ -4,6 +4,8 @@
 	import KeyboardShortcutsHelp from '$lib/components/analysis/KeyboardShortcutsHelp.svelte';
 	import AnalysisToast from '$lib/components/analysis/AnalysisToast.svelte';
 	import { goto } from '$app/navigation';
+	import { tick } from 'svelte';
+	import { estimateEtaSeconds, formatEta } from '$lib/utils/progress-eta.js';
 
 	let { data }: { data: PageData } = $props();
 
@@ -21,11 +23,17 @@
 			objects: string[];
 			tags: string[];
 			confidence: number;
+			frameIndex?: number;
 		}>;
 		sceneDetection: Array<{
 			startTime: number;
 			endTime: number;
 			description: string;
+			reviewState?: string;
+			sourceReferences?: Array<
+				| { kind: 'transcript_segment'; referenceId: string; startMs: number; endMs: number; text: string; segmentIndex: number }
+				| { kind: 'frame_detection' | 'frame_ocr'; referenceId: string; frameIndex: number; timestampMs: number; label?: string; text?: string; confidence?: number }
+			>;
 		}>;
 		videoMetadata: {
 			duration: number;
@@ -37,6 +45,7 @@
 		transcription: { text: string } | null;
 		transcriptSegments: Array<{ startMs: number; endMs: number; text: string; language: string | null; confidence: string | number | null; model: string | null }>;
 		transcriptSummary: string | null;
+			analysisJob?: { status: string; progressPct: number; startedAt: string | null; createdAt: string } | null;
 		summaryRevision: string | null;
 		keyFacts: string[];
 		aceAnalysis: {
@@ -49,6 +58,21 @@
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let analysis = $state<VideoAnalysisData | null>(null);
+		let nowMs = $state(Date.now());
+
+		// Approximate remaining time for a running upload job. Hidden when no honest estimate exists.
+		const etaLabel = $derived.by(() => {
+			const job = analysis?.analysisJob;
+			if (!job || job.status !== 'running') return null;
+			const seconds = estimateEtaSeconds(job.startedAt ?? job.createdAt, job.progressPct, nowMs);
+			return seconds === null ? null : `About ${formatEta(seconds)} left`;
+		});
+
+		$effect(() => {
+			if (analysis?.analysisJob?.status !== 'running') return;
+			const timer = setInterval(() => { nowMs = Date.now(); }, 15_000);
+			return () => clearInterval(timer);
+		});
 	let activeTab = $state<'overview' | 'frames' | 'scenes' | 'transcription' | 'analysis'>('overview');
 	let currentFrame = $state(0);
 	let showHelp = $state(false);
@@ -124,6 +148,18 @@
 
 	function selectFrame(idx: number) {
 		currentFrame = idx;
+	}
+
+	async function openSourceReference(reference: NonNullable<VideoAnalysisData['sceneDetection'][number]['sourceReferences']>[number]) {
+		if (reference.kind === 'transcript_segment') {
+			activeTab = 'transcription';
+			await tick();
+			document.getElementById(`transcript-${reference.startMs}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			return;
+		}
+		const frameIndex = analysis?.frameAnalysis.findIndex((frame) => frame.frameIndex === reference.frameIndex) ?? -1;
+		if (frameIndex >= 0) currentFrame = frameIndex;
+		activeTab = 'frames';
 	}
 
 	function copyToClipboard(text: string) {
@@ -205,6 +241,12 @@
 		</div>
 
 		<div class="toolbar-center">
+			{#if etaLabel}
+				<span class="meta-chip" role="status">
+					<Icon name="clock" />
+					{etaLabel}
+				</span>
+			{/if}
 			{#if analysis?.videoMetadata}
 				<div class="video-metadata">
 					<span class="meta-chip">
@@ -441,6 +483,22 @@
 											</span>
 										</div>
 										<p class="scene-description">{scene.description}</p>
+									<div class="scene-review-state">{scene.reviewState ?? 'UNREVIEWED_PROPOSAL'} · machine-generated proposal</div>
+									{#if scene.sourceReferences?.length}
+										<div class="scene-sources" aria-label="Event source references">
+											{#each scene.sourceReferences as source (source.referenceId)}
+												<button type="button" class="scene-source-link" onclick={() => openSourceReference(source)}>
+													{#if source.kind === 'transcript_segment'}
+														Transcript {formatTimestamp(source.startMs / 1000)}–{formatTimestamp(source.endMs / 1000)}: {source.text}
+													{:else}
+														Frame {source.frameIndex + 1} · {formatTimestamp(source.timestampMs / 1000)}{source.label ? ` · ${source.label}` : ''}{source.text ? ` · ${source.text}` : ''}
+													{/if}
+												</button>
+											{/each}
+										</div>
+									{:else}
+										<p class="analysis-caveat">No source references are available for this proposal.</p>
+									{/if}
 									</div>
 								{/each}
 							</div>
@@ -460,7 +518,7 @@
 								{#if analysis.transcriptSegments.length}
 									<ol class="transcript-segments">
 										{#each analysis.transcriptSegments as segment (segment.startMs)}
-											<li>
+											<li id="transcript-{segment.startMs}">
 												<time>{formatTimestamp(segment.startMs / 1000)}</time>
 												<span>{segment.text}</span>
 											</li>
@@ -956,6 +1014,39 @@
 	.scene-description {
 		line-height: 1.6;
 		color: var(--t-text-secondary);
+	}
+
+	.scene-review-state {
+		margin-top: 0.75rem;
+		color: var(--t-text-secondary);
+		font: 0.7rem/1.4 ui-monospace, monospace;
+		text-transform: uppercase;
+	}
+
+	.scene-sources {
+		display: grid;
+		gap: 0.4rem;
+		margin-top: 0.85rem;
+	}
+
+	.scene-source-link {
+		width: fit-content;
+		max-width: 100%;
+		padding: 0.45rem 0.65rem;
+		border: 1px solid var(--t-border);
+		border-radius: 0.35rem;
+		background: transparent;
+		color: var(--t-accent);
+		text-align: left;
+		line-height: 1.45;
+		cursor: pointer;
+	}
+
+	.scene-source-link:hover,
+	.scene-source-link:focus-visible {
+		background: var(--t-accent-soft);
+		outline: 2px solid var(--t-accent);
+		outline-offset: 1px;
 	}
 
 	/* ═══ Transcription/Analysis Views ═══ */

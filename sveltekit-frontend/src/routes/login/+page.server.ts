@@ -8,8 +8,9 @@ import { eq, or } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 import { loginSchema } from './schema.js';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	if (locals.user) {
+export const load: PageServerLoad = async ({ locals, url }) => {
+	const allowView = url.searchParams.has('demo') || url.searchParams.has('force') || url.searchParams.has('autofill');
+	if (locals.user && !allowView) {
 		throw redirect(302, '/');
 	}
 	return {

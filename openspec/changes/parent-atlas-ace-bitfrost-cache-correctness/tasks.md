@@ -512,6 +512,20 @@ applied by the coordinating session afterward, not by the fork itself).
 - **Open operator decisions (none executed):** (1) `git worktree remove` for clean-ci; (2) other three copies: move to another drive with manifest (archive-not-delete; frees nothing on C:) vs delete; (3) unlocked 7.75 GB swap after owner check; (4) `docker builder prune -f` (~13.5 GB) then `docker image prune -a` (~21.7 GB), then elevated diskpart compact with Docker stopped; never prune volumes; (5) `package.json` `atlas:centroids:cache:dry` hardcodes `DB_PASSWORD`/`REDIS_PASSWORD` inline — move to `.env.local`.
 - Still blocked per the 2026-09-15 entry below: no indexing, embedding, cache warming or fanout until headroom is healthy.
 
+## DOCKER-DISK-PRESSURE-01 measurement — 2026-11-13 (read-only; nothing deleted, pruned, moved or restarted)
+
+- **State:** C: 3.2 GB free (931 GB volume, 100% used); `docker_data.vhdx` 165.3 GB; ~2.6 GB RAM free. The Docker CLI/engine hung (`docker version`, `system df`, `ps -s`, `exec` all timed out); `svelte-check-native` died with a Go `out of memory` in the same window. Both are consistent with disk plus memory pressure; cause not proven.
+- **Method that works with the engine down:** `wsl -d docker-desktop -e sh -c "du -sm /mnt/docker-desktop-disk/data/docker/volumes/*/_data"` (read-only; needs `MSYS_NO_PATHCONV=1` from Git Bash). Qdrant (:6333) and Postgres (:5434) kept answering over TCP.
+- **Volume sizes (MB, du):** postgres_data 14,911; seaweed_volume_data 6,891; qdrant_production_data 5,904; qdrant_snapshots 4,932; langfuse_clickhouse_data 1,272; neo4j_data 1,229; next largest anonymous volume 546.
+- **Postgres (14 GB database, measured via SQL):** heap 5.5 GB + indexes 6.5 GB + TOAST 2.6 GB across 606 tables / 2,933 indexes; WAL 80 MB. Largest: `codebase_chunk_index` 3.78 GB (48 indexes 1.69 GB, TOAST 1.52 GB, HNSW 974 MB), `atlas_packets` 1.84 GB, `atlas_graph_nodes_v2` 0.87 GB, `atlas_ast_nodes` 0.79 GB. Indexes exceed table data; nothing looks corrupt.
+- **Qdrant is 10.8 GB, not 20 GB:** collections 5.9 GB (`codebase_chunks_768` 4,627 MB; `_768_v2` 652; `_512` 186; `topology_64` 172; `latent256` 138) plus a separate snapshots volume 4.9 GB (`codebase_chunks_768` 3,026 MB, `_v2` 1,142, `_512` 370, `topology_64` 342). The snapshot files are dated 2026-08-26 (one set); the global `/snapshots` API lists none because they are per-collection. Sampled payloads are small (~0.6 GB total). `codebase_chunks_768` has 328,468 points vs 274,465 canonical Postgres chunks and 3 named 768-d vectors; int8 quantization config, HNSW m=16 ef_construct=200. 31 of 49 collections are empty.
+- **Not measured / caveats:** per-container writable layers and image/build-cache totals (engine down); whether the earlier "20 GB" figure counted both Qdrant volumes plus something else; whether the August snapshots are the only restore point for any collection.
+- **Open operator decisions (none executed):** (1) the 4.9 GB snapshot set is a backup of a rebuildable mirror (Postgres is truth) but may be the only point-in-time copy: archive with manifest/SHA-256 before any removal; (2) a clean rebuild of `codebase_chunks_768` from Postgres to drop duplicate points needs explicit approval and the projection gates; (3) prune steps and the elevated diskpart compact stay as listed in the 2026-11-02 entry above; never prune volumes; (4) restarting Docker Desktop is human-only.
+- **QDRANT-QUANTIZE-01 (2026-11-13, applied on explicit operator request):** added scalar int8 quantization (`quantile 0.99`, `always_ram:false`, same shape as `codebase_chunks_768`) to the three derived collections that had none, one at a time via `PATCH /collections/{name}`: `codebase_chunks_latent256` (55,169 pts), `codebase_chunks_512` (53,380), `codebase_chunks_768_v2` (52,816). Pre-image (config before, `quantization_config` absent) archived at `docs/reports/archive/2026-11-13-qdrant-quantize-preimage/`. Readback: status green/ok, point counts unchanged, top-10 overlap vs the pre-change search on 25 stored vectors = 0.972 / 0.968 / 0.980 (a small probe, not a recall evaluation). **Disk went UP, as predicted** (scalar int8 keeps the float32 originals): 138->149 MB, 186->210 MB, 652->695 MB (+~80 MB). It buys RAM/search speed, not space. Skipped: `codebase_chunks_768` and `codebase_topology_64` (already quantized), the 31 empty and tiny collections. Revert is a config PATCH; the exact disable syntax for 1.19.0 was not exercised. Real space savings still need a new turbo-datatype collection (1.20) or dropping duplicate points.
+- **QDRANT-QUANTIZE-01 live recheck (2026-11-13, read-only):** `GET /` reports Qdrant `1.19.0`; each target collection is green and its point count still matches the receipt. `GET /collections/{name}` confirms `config.quantization_config.scalar={type:int8, quantile:0.99, always_ram:false}` for all three. (The config is at `result.config.quantization_config`, not `result.config.params.quantization_config`.) C: had 3,207,630,848 bytes free at the check. No collection was patched again; the current state already matches the requested quantization.
+- **QDRANT-DUP-CENSUS-01 (2026-11-13, read-only payload scroll of `codebase_chunks_768`, 328,468 points):** 278,975 points carry `chunk_id` (277,921 distinct; 1,040 ids repeated, 1,054 extra points, max 3 copies); 52,380 carry `postgres_id`; **49,493 points carry neither** (all but ~120 still have `source_ref`; 325,557 have `content_hash`). So true duplicates are only ~0.3% (~1.1k points, well under 20 MB) and a rebuild to drop them would save almost no disk. The open question is the 49,493 keyless points (15%): their join to `codebase_chunk_index` is unproven, and 277,921 distinct chunk_ids exceeds the 274,465 canonical rows (~3.5k ids may be stale). No point was changed or deleted. Next read-only step: resolve a sample of keyless points to Postgres by `source_ref` + `content_hash` before any rebuild decision.
+- Mutation block unchanged: no indexing, embedding, cache warming or fanout until headroom and the Docker engine are healthy.
+
 ## Storage and packet-artifact reconciliation — 2026-09-15
 
 - **DOCKER-DISK-PRESSURE-01 remains open and mutation-blocking:** read-only host census found
@@ -1080,3 +1094,58 @@ and a 40,960-byte residency budget with 32,320 bytes selected. The proof uses
 an ephemeral in-memory cache client (`writesPerformed=false`); it does not
 establish live Valkey residency, production caller wiring, or full ACE/
 ContextManifest admission. Keep the live integration gates above open.
+
+## QDRANT-1.20-TURBO-01 plan — 2026-11-15 (planning; nothing applied)
+
+Status: `CREATED` (plan only). No collection, snapshot, image pin, or Docker state was changed by this entry.
+
+| # | Task | Owner | Gate | Status |
+|---|---|---|---|---|
+| 1 | Human starts Docker Desktop (human-only; `com.docker.service` Manual, Stopped; last failure = disk full at 2026-11-15 22:32, now ~7.3 GB free) | operator | Docker engine answers `docker info` | `BLOCKED_HUMAN` |
+| 2 | Verify 1.20 image: `qdrant/qdrant:v1.20.0@sha256:9bfc89f9914fc14876a88c05270685921a55b8877b254a98bcc1cc2f0a424cd2` (Docker Hub manifest read 2026-11-15; 1.19.0 digest `057ee3a8…` re-verified against pins) | agent | digest re-fetched before pin | `DIGEST_VERIFIED` |
+| 3 | Release age: 1.20.0 published 2026-10-22 (>= 2 weeks) | agent | GitHub release API | `VERIFIED` |
+| 4 | Client parity: `@qdrant/js-client-rest@1.20.0` and `@qdrant/qdrant-js@1.20.0` exist; REST types include `TurboQuant` / turbo4/8/16 | agent | `npm pack` inspection | `VERIFIED_TYPES` (runtime call not yet exercised) |
+| 5 | Baseline on current 1.19.0: `scripts/atlas/audit-qdrant-connectivity.mjs` (REST 6333 and gRPC 6334) | agent | both transports PASS | `NOT_RUN` (needs Docker) |
+| 6 | Timing baseline: `rg` vs pgvector/Qdrant vector search, tie-aware recall@10 | agent | same query set, receipt written | `RG_PARTIAL` (4 queries, wall-clock 6–12 s over src+scripts+docs; vector side `NOT_RUN`) |
+| 7 | Snapshot all collections before any change (`POST /collections/{name}/snapshots`); pre-image archived under `docs/reports/archive/` | agent with operator OK | free space >= snapshot size (~6 GB for data; existing 4.9 GB snapshots are NOT deleted) | `BLOCKED_SPACE_AND_APPROVAL` |
+| 8 | Edit image pin + digest in `docker-compose.yml`, `docker-compose.dev.yml`, `docker-compose.production.yml`, `docker/docker-compose.gpu.yml`; pin `docker-compose.test.yml` and `docker-compose.vector.yml` (currently `:latest`) | agent | `docker compose config` clean | `NOT_STARTED` (held until 7 passes) |
+| 9 | Bump client pins in `sveltekit-frontend/package.json` (`@qdrant/js-client-rest`, `@qdrant/qdrant-js`) 1.19.0 → 1.20.0 | agent | `npm run check:fast` 0 errors | `NOT_STARTED` |
+| 10 | Upgrade server to 1.20 (restart is operator-run) | operator | `GET /` reports 1.20.0; collections green | `BLOCKED_HUMAN` |
+| 11 | Create ONE turbo collection (`turbo8` or `turbo4`) as a copy of one existing collection; recall/latency vs source | agent | tie-aware recall, p50 latency, receipt | `NOT_STARTED` |
+| 12 | Only after 11 passes: convert remaining collections; keep originals until readback passes | operator-approved | per-collection readback | `NOT_STARTED` |
+| 13 | gRPC: `QDRANT__SERVICE__GRPC_PORT=6334` already set in `docker/docker-compose.gpu.yml`; run connectivity audit on 1.20 | agent | gRPC PASS | `NOT_RUN` |
+
+**Not required:** re-embedding. Turbo quantization compresses stored vectors; they are copied, not regenerated. Re-embedding applies only to a move to EmbeddingGemma 2, which is a separate lane needing its own parity proof against canonical `semantic_768`.
+
+**Constraints:** no snapshot deletion; no in-place datatype change (1.20 turbo is set at collection creation); no restart without operator action; `codebase_chunks_768` duplicates are not part of this plan (QDRANT-DUP-CENSUS-01).
+
+### DEV-GPU-GEMMA4-IQ4XS-01 — 2026-11-15 (code edited; not run)
+
+- `scripts/launch-turboquant.ps1`: new profile `gemma4-legal-iq4xs` (`models/gemma4-legal-iq4xs-direct.gguf`, alias `gemma4-legal-iq4xs-direct.gguf`, gemma4 template, 65536 ctx). Parse check PASS.
+- `sveltekit-frontend/scripts/startup/dev-gpu-runtime.mjs`: default non-vision chat profile is now `gemma4-legal-iq4xs`; the served-model gate and the launcher profile share one map (`CHAT_PROFILE_ALIAS`), so they cannot drift. `node --check` PASS. Restore Ornith with `TURBO_STARTUP_PROFILE=ornith-1.5`.
+- **Not proven:** VRAM saving (file size difference is ~0.8 GB before KV cache); tool-call behaviour and template fit for this GGUF; app-side model-id resolution (`model-ids.ts` and the llama-server resolver still reference `ornith-1.5-9b`). Live `:8090` start is operator-run, and `dev:gpu` has not been executed.
+
+### DEV-GPU-CHAT-ALIAS-SWEEP-01 — 2026-11-15 (audit + env switch; no model started)
+
+- Env switched in gitignored `.env` and `sveltekit-frontend/.env`: `TURBO_STARTUP_PROFILE=gemma4-legal-iq4xs`, `LLAMA_SERVER_MODEL=gemma4-legal-iq4xs-direct.gguf`. Revert = restore `ornith-1.5` / `ornith-1.5-9b`.
+- `dev-gpu-runtime.mjs` now reads `TURBO_STARTUP_PROFILE` from the repo `.env` first, matching the rest of its config resolution.
+- **Blockers (not changed; need a decision):**
+  - `sveltekit-frontend/src/lib/ai/model-ids.ts:102` hardcodes `SERVER_CHAT_MODEL = 'ornith-1.5-9b'`, sent as the `model` field on direct `:8090` calls. Unverified whether llama-server ignores or rejects a mismatched `model`.
+  - Ornith-only gates hard-fail under Gemma: `python/atlas_summary_claim_judge_v1.py:124`, `python/atlas_summary_faithfulness_v1.py:187` (both raise on non-Ornith alias), `scripts/launch-ornith-vlm.ps1:39` (throws), `docker/docling-vlm/ornith_vlm_client.py:62`. These are policy gates; keep them Ornith-only and run them with Ornith, or relax by decision.
+  - Hardcoded `'ornith-1.5-9b'` fallbacks in about 40 scripts (`scripts/*.mjs`, `scripts/**/*.py`, `packages/parent-atlas/src/pipelines/summary-packets.ts:131`, `packages/atlas-core/src/langgraph/*`, `opencode.json(c)`, `scripts/audit/backend-infrastructure-audit.sh:218`). Most read `LLAMA_SERVER_MODEL` first and now get the Gemma alias via `.env`; the literal fallbacks only apply when the env var is unset.
+- Vision: the Gemma IQ4_XS file has no projector here. The vision lane (`ornith-1.5-vlm`, `:8085` VLM, docling) stays on Ornith.
+
+### VIDEO-EVIDENCE-EVENT-TIMELINE-01 — 2026-11-15 (pasted review; claims not re-verified here)
+
+Goal: join existing video outputs into reviewed, source-bound events that drive the reconstruction timeline. Not a new graphics or OpenCV runtime.
+
+| # | Task | Gate | Status |
+|---|---|---|---|
+| 1 | Verify the video transcription worker uses the intended Python (`.venv`, faster-whisper 1.2.1) and model weights are cached | worker start receipt with Python path and model id | `NOT_RUN` |
+| 2 | Prove one real transcript end-to-end on one clip (no placeholder output) | transcript segments with IDs and time ranges | `NOT_RUN` |
+| 3 | Event-synthesis stage: each proposed event holds transcript segment IDs, frame/finding IDs, source revision, time range, review status | schema + Postgres readback, no fuzzy joins | `NOT_STARTED` |
+| 4 | Review reel: FFmpeg cuts selected event ranges (after human selection only) | cut file SHA-256 and duration vs range | `NOT_STARTED` |
+| 5 | Reviewed events drive scene annotations | scene revision linkage (see scene-revision audit) | `NOT_STARTED` |
+
+Out of scope for now: Mode 7 effect (optional display only); browser OpenCV.js; OpenCV WebAssembly; WebGPU in the Rust module. Existing owners: FFmpeg/FFprobe (server), Python OpenCV (in Python 3.13 only), faster-whisper (in `.venv`), Three.js renderers.
+Caveat from the pasted review: Whisper CLI missing from the venv per an earlier observation; verify before task 2.

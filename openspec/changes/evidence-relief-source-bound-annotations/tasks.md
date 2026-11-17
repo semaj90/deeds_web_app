@@ -29,3 +29,51 @@
 - [ ] 5.2 Verify unauthorized access, wrong-source/depth rejection, duplicate retries, concurrent edits, resize/close disposal, and zero page/console errors.
 - [ ] 5.3 Record separate results for live read-path proof, disposable write/readback proof, browser proof, and hardware WebGPU; mark any unavailable service or hardware gate BLOCKED.
 - [ ] 5.4 Obtain separate operator approval before any production migration, source/depth artifact write, evidence URI rewrite, or production annotation write.
+
+## 6. Handoff: scene markers, Noir view and investigation layer (2026-11-15)
+
+Status key: DONE = verified by a test named below. PARTIAL = implemented, not covered by the gate it belongs to. OPEN = not started.
+
+### What is verified
+
+| Area | Status | Evidence |
+|---|---|---|
+| Marker create, move, delete through shared authorization (owner or assigned attorney only; admin gets no case access; non-members get 404) | DONE (scratch) | `src/lib/server/scene-markers/scene-authz.scratch.spec.ts`, 6 tests |
+| Same-case evidence check inside the create transaction, for admins too | DONE (scratch) | `create-marker.scratch.spec.ts`, 4 tests; browser: cross-case returns 422 |
+| Idempotent create replay compares evidence ID, label and position against the original `MARKER_CREATED` payload; legacy events without those fields are rejected | DONE (scratch) | `create-marker.scratch.spec.ts` (mismatch refused, replay after a later move still matches) |
+| Optimistic concurrency on move (stale revision returns 409 with current revision) | DONE (scratch) | `scene-authz.scratch.spec.ts`, browser Noir test |
+| Marker save and create run through `src/lib/machines/marker-save-machine.ts` | DONE (browser) | Noir browser test: saved at revision 3 after the change |
+| Server-side scene snapshot loaded on every board request, never cached | DONE (browser) | Noir browser test reads the header and inspector from PostgreSQL |
+| Investigation facets, evidence links, notes, AI summary export, four-eyes review | DONE (scratch + browser) | `investigation-e2e.scratch.spec.ts` (12), `investigation-relations.scratch.spec.ts` (8), `investigation-flow` browser run |
+| Schema for `scene_markers` anchors (IMAGE_UV columns, source revision columns) | DONE (live, applied 2026-11-15 after rehearsal) | `drizzle/manual/scene_markers_anchor.sql`, sidecar registry |
+
+### What is not done
+
+- **Marker create and move do not accept UV anchors.** The `scene_markers` table has `anchor_kind`, `anchor_u`, `anchor_v` and the source-revision columns, but the marker routes accept only x, y, z. This is task 3.1 and 3.3 in part: UV validation and revision binding are missing from the writer.
+- **Task 3.2 is not met.** The anchor migration was applied to the live database after a rollback rehearsal on live. The task asks for a disposable PostgreSQL 18 rehearsal, not live.
+- **Task 3.4 and the SeaweedFS side are not started.** No object storage is involved in the marker work so far.
+- **Section 4 (viewer connection) is not started.** The relief viewer is not connected to the scene marker routes. The Noir view uses CrimeSceneViewer3D, not the relief viewer.
+- **Whole-scene revision save is not built.** The revision API (`scene-document-revisions-v1.ts`) validates manifests (HYPOTHESIS status only, unverified SOURCE assets rejected), but nothing in the UI builds a manifest or calls it.
+- **2D icon markers on the detective board are not built.** No board-space or image-space placement is stored for them.
+- **Primitive identity in the inspector is unlinked.** There is no primitive-to-evidence registry, so `ExhibitInspectorPanel` shows every 3D primitive as unlinked.
+- **Second-user approval and report export are not browser-tested.** Dev sign-in only provides one user.
+
+### Open decisions
+
+1. Admin access to case scenes: the shared helper gives admins no case access. This matches the board, investigation API and revision routes. It should be documented in the product permissions, not only in code.
+2. Which evidence gets 2D UV markers: photo exhibits only is the suggested default, because video and audio have no fixed image plane.
+3. Whether board icons are stored by image position (existing IMAGE_UV columns) or by board-canvas position (needs a new column, so a reviewed migration).
+
+### Commands used for verification (run from `sveltekit-frontend`, scratch database only)
+
+```
+INVESTIGATION_SCRATCH_E2E=1 DATABASE_URL=<...legal_ai_live_integration_scratch> npx vitest run src/lib/server/scene-markers/
+INVESTIGATION_SCRATCH_E2E=1 DATABASE_URL=<...legal_ai_live_integration_scratch> npx vitest run src/lib/server/investigation/
+npx svelte-check-native --workspace . --output machine
+```
+
+Browser scripts used during this work live in the session scratchpad, not in the repository. Live PostgreSQL was not written to by any test.
+
+### Next safe milestone
+
+Add UV anchor support to the marker create path, with same-case checks, replay comparison and a rejection test for anchors outside 0..1, then rehearse on a disposable PostgreSQL 18 database before touching the live database.

@@ -17,6 +17,8 @@ import { z } from 'zod';
 const synthesisRequestSchema = z.object({
   query: z.string().min(3, 'Query must be at least 3 characters').max(5000),
   caseId: z.string().uuid().optional(),
+  documentId: z.string().uuid().optional(),
+  sourceRevision: z.string().uuid().optional(),
   conversationId: z.string().max(200).optional(),
   persona: z.enum(['neutral', 'prosecutor', 'defense', 'plain-language', 'academic']).optional(),
   maxTokens: z.number().int().min(64).max(8192).optional(),
@@ -46,9 +48,13 @@ const synthesisRequestSchema = z.object({
     )
     .max(11)
     .optional(),
+}).superRefine((value, ctx) => {
+  if (Boolean(value.documentId) !== Boolean(value.sourceRevision)) {
+    ctx.addIssue({ code: 'custom', path: ['sourceRevision'], message: 'documentId and sourceRevision must be provided together' });
+  }
 });
 import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
-import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
+import { assembleACEContext, buildACEPrompt, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed.js';
 import { dispatchOrExecuteInline } from '$lib/server/queue/dispatch-inline.js';
@@ -69,7 +75,12 @@ import {
   type LangGraphSynthesizeResponse,
 } from '$lib/server/ai/langgraph-client.js';
 import { getAuthorizedCase } from '$lib/server/case-access.js';
-import { normalizeLibraryActorIdV1 } from '$lib/server/library/library-document-access-v1.js';
+import { authorizeLibraryDocumentV1, normalizeLibraryActorIdV1 } from '$lib/server/library/library-document-access-v1.js';
+import {
+  buildLibraryDocumentSynthesisContextV1,
+  loadLibraryDocumentSynthesisChunksV1,
+  type LibraryDocumentSynthesisScopeV1,
+} from '$lib/server/library/library-document-synthesis-context-v1.js';
 import {
   createLibraryCitationContextManifestV1,
   verifyLibraryCitationReferencesV1,
@@ -259,8 +270,14 @@ function dagOrderRAGChunks(
     .filter((c): c is (typeof chunks)[number] => c !== undefined);
 }
 
-function buildCacheKey(userId: string, query: string, caseId?: string, persona?: string): string {
-  const payload = `${userId}|${query}|${caseId ?? ''}|${persona ?? 'neutral'}`;
+function buildCacheKey(
+  userId: string,
+  query: string,
+  caseId?: string,
+  persona?: string,
+  documentScope?: LibraryDocumentSynthesisScopeV1 | null,
+): string {
+  const payload = `${userId}|${query}|${caseId ?? ''}|${persona ?? 'neutral'}|${documentScope?.documentId ?? ''}|${documentScope?.sourceRevision ?? ''}|${documentScope?.sourceHash ?? ''}`;
   return `synthesis:${createHash('sha256').update(payload).digest('hex').slice(0, 16)}`;
 }
 
@@ -457,7 +474,12 @@ async function callOllama(
 
 // ── SSE Stream Handler ────────────────────────────────────────────────
 
-async function handleStream(body: SynthesisRequest, userId: string): Promise<Response> {
+async function handleStream(
+  body: SynthesisRequest,
+  userId: string,
+  documentScope: LibraryDocumentSynthesisScopeV1 | null = null,
+  documentChunks: Awaited<ReturnType<typeof loadLibraryDocumentSynthesisChunksV1>> | null = null,
+): Promise<Response> {
   const {
     query,
     maxTokens = 2048,
@@ -468,7 +490,7 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
 
   // ── LangGraph streaming fast-path ────────────────────────────────────
   // Translates LangGraph SSE events → SvelteKit synthesis event format.
-  const lgStream = await langGraphSynthesizeStream({
+  const lgStream = documentScope ? null : await langGraphSynthesizeStream({
     query,
     case_id: body.caseId ?? null,
     temperature,
@@ -604,17 +626,24 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
 
         // Stage 1: Context assembly
         const ctxStart = performance.now();
-        const context = await assembleACEContext({
-          query,
-          userId,
-          caseId: body.caseId,
-          conversationId: body.conversationId,
-          persona: body.persona,
-          sectionTypes: body.sectionTypes,
-        });
+        const context = documentScope
+          ? buildLibraryDocumentSynthesisContextV1(
+              documentChunks ?? [],
+              body.persona,
+            )
+          : await assembleACEContext({
+              query,
+              userId,
+              caseId: body.caseId,
+              conversationId: body.conversationId,
+              persona: body.persona,
+              sectionTypes: body.sectionTypes,
+            });
         // DAG-order RAG chunks so cited sources appear before citing sources
         context.ragChunks = dagOrderRAGChunks(context.ragChunks);
-        const acePrompt = await buildACEPromptCached(context, query);
+        const acePrompt = documentScope
+          ? buildACEPrompt(context, query)
+          : await buildACEPromptCached(context, query);
         const promptChunks = promptCitationChunks(context, acePrompt.budgetProfile.limits);
         const citationManifest = await createLibraryCitationContextManifestV1({
           actorId: userId,
@@ -841,6 +870,54 @@ export const POST: RequestHandler = async (event) => {
     if (!authorizedCase) return json({ error: 'Case not found' }, { status: 404 });
   }
 
+  // A document-scoped request is admitted against the actor-visible current source
+  // revision before cache, retrieval, LangGraph, queue, or model access. The exact
+  // document path below uses only chunks from this admitted revision.
+  let documentScope: LibraryDocumentSynthesisScopeV1 | null = null;
+  let documentChunks: Awaited<ReturnType<typeof loadLibraryDocumentSynthesisChunksV1>> | null = null;
+  if (body.documentId && body.sourceRevision) {
+    const actorId = normalizeLibraryActorIdV1(auth.user.id);
+    const access = actorId === null
+      ? { allowed: false as const, reason: 'INVALID_ACTOR' as const }
+      : await authorizeLibraryDocumentV1({ documentId: body.documentId, actorId, caseId: body.caseId ?? null });
+    if (
+      !access.allowed || access.revisionId !== body.sourceRevision ||
+      !access.sourceHash || !/^[0-9a-f]{64}$/i.test(access.sourceHash)
+    ) return json({ error: 'Document revision not found' }, { status: 404 });
+    documentScope = {
+      actorId: access.actorId,
+      documentId: access.documentId,
+      sourceRevision: body.sourceRevision,
+      sourceHash: access.sourceHash,
+      caseId: body.caseId ?? null,
+    };
+    try {
+      documentChunks = await loadLibraryDocumentSynthesisChunksV1(documentScope, body.query);
+    } catch {
+      return json({ error: 'Document source is temporarily unavailable' }, { status: 503 });
+    }
+
+    // A document-specific answer must have a non-empty, internally consistent
+    // source set before any cache or model can observe the request. Case-wide
+    // synthesis remains available without a selected document.
+    const parserRevisions = new Set<string>();
+    const sourceBindingValid = documentChunks.length > 0 && documentChunks.every((chunk) => {
+      const metadata = chunk.metadata as Record<string, unknown> | undefined;
+      const parserRevision = metadata?.['parser_revision'];
+      if (
+        metadata?.['document_id'] !== documentScope!.documentId ||
+        metadata?.['document_revision'] !== documentScope!.sourceRevision ||
+        String(metadata?.['source_hash'] ?? '').toLowerCase() !== documentScope!.sourceHash.toLowerCase() ||
+        typeof parserRevision !== 'string' || !parserRevision.trim()
+      ) return false;
+      parserRevisions.add(parserRevision);
+      return true;
+    });
+    if (!sourceBindingValid || parserRevisions.size !== 1) {
+      return json({ error: 'No consistent published source is available for this document revision' }, { status: 409 });
+    }
+  }
+
   const {
     query,
     maxTokens = 2048,
@@ -858,7 +935,7 @@ export const POST: RequestHandler = async (event) => {
 
   // SSE stream mode
   if (body.stream) {
-    return handleStream(body, auth.user.id);
+    return handleStream(body, auth.user.id, documentScope, documentChunks);
   }
 
   // ── JSON mode (async via RabbitMQ worker) ────────────────────────
@@ -866,8 +943,10 @@ export const POST: RequestHandler = async (event) => {
   try {
     // Stage 1: Cache check (synchronous — return immediately if cached)
     timer.mark('cache-check');
-    const cacheKey = buildCacheKey(auth.user.id, query, body.caseId, body.persona);
-    const { entry: cached } = await getVectorCache(cacheKey, {});
+    // The cache has no canonical parser/retrieval-generation identity. Keep
+    // document-bound results uncached until that generation is owned explicitly.
+    const cacheKey = documentScope ? null : buildCacheKey(auth.user.id, query, body.caseId, body.persona);
+    const { entry: cached } = cacheKey ? await getVectorCache(cacheKey, {}) : { entry: null };
 
     // Differentiate full synthesis cache hit vs predicted-prefetch ACE context entry.
     // Prefetch entries have _prefetched:true and contain acePrompt but NOT a full answer.
@@ -903,7 +982,7 @@ export const POST: RequestHandler = async (event) => {
     const synthesisId = crypto.randomUUID();
     timer.mark('langgraph-check');
 
-    const lgResult = await langGraphSynthesize({
+    const lgResult = documentScope ? null : await langGraphSynthesize({
       query,
       case_id: body.caseId ?? null,
       temperature,
@@ -959,7 +1038,7 @@ export const POST: RequestHandler = async (event) => {
 
     timer.mark('queue-publish');
 
-    const published = await rabbitmq.publishSynthesisGenerate({
+    const published = documentScope ? false : await rabbitmq.publishSynthesisGenerate({
       synthesisId,
       query,
       userId: auth.user.id,
@@ -990,16 +1069,21 @@ export const POST: RequestHandler = async (event) => {
 
     timer.mark('ace-context-start');
     const ctxStart = performance.now();
-    const context = await assembleACEContext({
-      query,
-      userId: auth.user.id,
-      caseId: body.caseId,
-      conversationId: body.conversationId,
-      persona: body.persona,
-      sectionTypes: body.sectionTypes,
-      enableCodebaseContext,
-      enableWebSearch: true,
-    });
+    const context = documentScope
+      ? buildLibraryDocumentSynthesisContextV1(
+          documentChunks ?? [],
+          body.persona,
+        )
+      : await assembleACEContext({
+          query,
+          userId: auth.user.id,
+          caseId: body.caseId,
+          conversationId: body.conversationId,
+          persona: body.persona,
+          sectionTypes: body.sectionTypes,
+          enableCodebaseContext,
+          enableWebSearch: true,
+        });
     context.ragChunks = dagOrderRAGChunks(context.ragChunks);
     // GPU attention re-ranking: re-score DAG-ordered chunks against the query embedding.
     // Preserves citation chain ordering from DAG while surfacing the most query-relevant
@@ -1026,7 +1110,9 @@ export const POST: RequestHandler = async (event) => {
         // Keep DAG order — attention re-ranking is best-effort
       }
     }
-    const acePrompt = await buildACEPromptCached(context, query);
+    const acePrompt = documentScope
+      ? buildACEPrompt(context, query)
+      : await buildACEPromptCached(context, query);
     const promptChunks = promptCitationChunks(context, acePrompt.budgetProfile.limits);
     const citationManifest = await createLibraryCitationContextManifestV1({
       actorId: auth.user.id,
@@ -1152,13 +1238,15 @@ export const POST: RequestHandler = async (event) => {
       },
     };
 
-    setVectorCache(cacheKey, [response], {
-      searchTime: timer.elapsed(),
-      totalResults: 1,
-      model: MODEL,
-      distanceMetric: 'cosine',
-      threshold: 0,
-    }).catch(() => {});
+    if (cacheKey) {
+      setVectorCache(cacheKey, [response], {
+        searchTime: timer.elapsed(),
+        totalResults: 1,
+        model: MODEL,
+        distanceMetric: 'cosine',
+        threshold: 0,
+      }).catch(() => {});
+    }
 
     trackTokenUsage({
       userId: auth.user.id,
@@ -1199,8 +1287,10 @@ export const POST: RequestHandler = async (event) => {
     });
 
     // ── Pre-fetch ACE context for top predicted follow-ups (fire-and-forget) ─
-    prefetchContextForPredictions(auth.user.id, predictedFollowUps, body.caseId, body.persona)
-      .catch(() => {});
+    if (!documentScope) {
+      prefetchContextForPredictions(auth.user.id, predictedFollowUps, body.caseId, body.persona)
+        .catch(() => {});
+    }
 
     // Non-blocking save to synthesis_runs — provides QLoRA training pairs
     db.insert(synthesisRuns).values({

@@ -182,12 +182,13 @@
 	}
 	.lanes {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: 16px;
 		align-items: start;
 	}
 	.lane {
 		display: grid;
+		min-width: 0;
 		gap: 8px;
 	}
 	.badge {
@@ -197,6 +198,7 @@
 		background: rgba(127, 127, 127, 0.2);
 	}
 	.card {
+		min-width: 0;
 		padding: 10px;
 		border: 1px solid rgba(127, 127, 127, 0.35);
 		border-radius: 6px;
@@ -209,7 +211,11 @@
 	.card h3 {
 		font-size: 0.95rem;
 		margin: 0;
+		overflow-wrap: anywhere;
 	}
+	.card p,
+	.card li,
+	.card a { overflow-wrap: anywhere; }
 	.meta {
 		display: flex;
 		flex-wrap: wrap;
@@ -230,5 +236,11 @@
 	.invalid ul {
 		padding-left: 16px;
 		font-size: 0.85rem;
+	}
+	@media (max-width: 1100px) {
+		.lanes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	}
+	@media (max-width: 680px) {
+		.lanes { grid-template-columns: minmax(0, 1fr); }
 	}
 </style>

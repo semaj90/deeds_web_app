@@ -50,7 +50,8 @@ export interface ThemeSettings {
 }
 
 export const DEFAULT_THEME_SETTINGS: ThemeSettings = {
-  id: 'yorha-dark',
+  // Light cream default (operator decision 2026-11-13). Dark themes remain selectable.
+  id: 'parchment',
   density: 'normal',
   fontScale: 1,
   borderStyle: 'rounded',

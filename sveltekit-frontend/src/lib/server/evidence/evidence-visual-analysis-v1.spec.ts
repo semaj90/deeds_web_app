@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { describe, expect, it, vi } from 'vitest';
-import { analyzeEvidenceImageV1, type EvidenceVisualAnalysisDependenciesV1 } from './evidence-visual-analysis-v1.js';
+import { analyzeEvidenceImageV1, runCanonicalImageDetectorV1, type EvidenceVisualAnalysisDependenciesV1 } from './evidence-visual-analysis-v1.js';
 
 const evidenceId = '11111111-1111-4111-8111-111111111111';
 const caseId = '22222222-2222-4222-8222-222222222222';
@@ -39,7 +39,7 @@ function createDependencies(overrides: Partial<EvidenceVisualAnalysisDependencie
 			cached: false,
 			resizeMeta: { resized: false, originalWidth: 10, originalHeight: 10, vlmSize: 10 },
 		})),
-		getDepthConfig: vi.fn(() => ({ endpoint: 'https://depth.invalid', bucket: 'legal-evidence' })),
+		getDepthConfig: vi.fn(() => ({ endpoint: 'https://depth.invalid', bucket: 'atlas-artifacts' })),
 		fetchDepth: vi.fn(async () => ({ depth_base64: Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 1]).toString('base64'), width: 10, height: 10, processing_time_ms: 5 })),
 		uploadDepth: vi.fn(async () => {}),
 		...overrides,
@@ -47,6 +47,28 @@ function createDependencies(overrides: Partial<EvidenceVisualAnalysisDependencie
 }
 
 describe('analyzeEvidenceImageV1', () => {
+	it('uses the detector-only result shape and does not request legacy cache, graph, or database writes', async () => {
+		const result = {
+			text: '',
+			layout: { regions: [] },
+			objects: [{ class: 'person', confidence: 0.8, bbox: [1, 2, 8, 9] as [number, number, number, number] }],
+			processingTime: 12,
+			method: 'yolo' as const,
+			modelType: 'coco' as const,
+		};
+		const detect = vi.fn(async () => ({ result, source: 'local' as const, errors: [] }));
+		const output = await runCanonicalImageDetectorV1({ ...createInput(), caseId, buffer: Buffer.from('fixture') }, detect);
+
+		expect(detect).toHaveBeenCalledWith(Buffer.from('fixture'), 'fixture.png');
+		expect(output).toMatchObject({
+			yolo: result,
+			detector: { source: 'local', errors: [] },
+			graphConnectionsCreated: 0,
+			cachedToDb: false,
+			llmSynthesis: null,
+		});
+	});
+
 	it('validates and returns source-bound detection, VLM, and depth metadata', async () => {
 		const dependencies = createDependencies();
 		const result = await analyzeEvidenceImageV1(createInput(), dependencies);
@@ -55,7 +77,12 @@ describe('analyzeEvidenceImageV1', () => {
 		expect(result.sourceRevision).toBe(createInput().sourceRevision);
 		expect(result.objectDetections[0]?.class).toBe('document');
 		expect(result.visionFindings).toEqual(['Signature present']);
-		expect(result.depthMap?.objectKey).toBe(`evidence/${caseId}/${evidenceId}-depth.png`);
+		expect(result.depthMap).toMatchObject({
+			objectKey: `evidence/${caseId}/${evidenceId}/${createInput().sourceRevision.slice('sha256:'.length)}/depth-${createHash('sha256').update(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 1])).digest('hex')}.png`,
+			bucket: 'atlas-artifacts',
+			artifactSha256: createHash('sha256').update(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 1])).digest('hex'),
+			status: 'ESTIMATED',
+		});
 		expect(dependencies.runPipeline).toHaveBeenCalledTimes(1);
 		expect(dependencies.uploadDepth).toHaveBeenCalledTimes(1);
 	});
@@ -89,6 +116,63 @@ describe('analyzeEvidenceImageV1', () => {
 		expect(result.objectDetections).toEqual([]);
 		expect(result.visionSummary).toBeNull();
 		expect(result.stageErrors).toHaveLength(3);
+	});
+
+	it('does not count a "no model answered" VLM value as a completed vision stage', async () => {
+		const dependencies = createDependencies({
+			analyzeVlm: vi.fn(async () => ({
+				summary: '',
+				keyFindings: [],
+				suggestedTags: [],
+				model: 'none',
+				cached: false,
+				available: false,
+				unavailableReason: 'VLM_UNREACHABLE' as const,
+				resizeMeta: { resized: false, originalWidth: 10, originalHeight: 10, vlmSize: 10 },
+			})),
+		});
+		const result = await analyzeEvidenceImageV1(createInput(), dependencies);
+
+		expect(result.status).toBe('PARTIAL');
+		expect(result.visionSummary).toBeNull();
+		expect(result.visionFindings).toEqual([]);
+		expect(result.stageErrors).toContain('vision:VLM_UNREACHABLE');
+	});
+
+	it('records a stage error when no detector ran, instead of an empty detection list', async () => {
+		const dependencies = createDependencies({
+			runPipeline: vi.fn().mockResolvedValue({
+				yolo: null,
+				detector: { source: 'none', errors: ['service:DOCLING_SERVICE_URL_NOT_CONFIGURED', 'local:PYTHON_ONNXRUNTIME_OR_MODEL_UNAVAILABLE'] },
+			}),
+		});
+		const result = await analyzeEvidenceImageV1(createInput(), dependencies);
+
+		expect(result.status).toBe('PARTIAL');
+		expect(result.objectDetections).toEqual([]);
+		expect(result.stageErrors).toContain(
+			'detection:service:DOCLING_SERVICE_URL_NOT_CONFIGURED; local:PYTHON_ONNXRUNTIME_OR_MODEL_UNAVAILABLE'
+		);
+	});
+
+	it('treats the legacy placeholder shape (model none with text) as unavailable', async () => {
+		const dependencies = createDependencies({
+			runPipeline: vi.fn().mockRejectedValue(new Error('detector unavailable')),
+			fetchDepth: vi.fn().mockRejectedValue(new Error('depth unavailable')),
+			analyzeVlm: vi.fn(async () => ({
+				summary: 'Image analysis unavailable — Triton and TurboQuant were unreachable',
+				keyFindings: [],
+				suggestedTags: [],
+				model: 'none',
+				cached: false,
+				resizeMeta: { resized: false, originalWidth: 10, originalHeight: 10, vlmSize: 10 },
+			})),
+		});
+		const result = await analyzeEvidenceImageV1(createInput(), dependencies);
+
+		expect(result.status).toBe('UNAVAILABLE');
+		expect(result.visionSummary).toBeNull();
+		expect(result.stageErrors).toContain('vision:VLM_UNAVAILABLE');
 	});
 
 	it('rejects malformed detector responses and records other successful stages', async () => {

@@ -10,6 +10,7 @@ export * from './schema/scene-document-revisions.js';
 export * from './schema/scene-assets.js';
 export * from './schema/scene-asset-files.js';
 export * from './schema/atlas-render-material-presets.js';
+export * from './schema/investigation.js';
 
 // Evidence CRUD + RAG Integration tables
 export {

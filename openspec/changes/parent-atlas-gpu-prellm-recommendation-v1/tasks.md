@@ -322,3 +322,66 @@
       tests were attempted but blocked locally: Python 3.14 lacks NumPy for importing the DAG worker,
       and the targeted Vitest process did not finish within the bounded observation window. This is
       design completion, not runtime proof.
+
+## 10. Analysis Center Gemma 4 Legal workflow and cache admission — implementation started
+
+Status receipt: `docs/reports/analysis-center-production-hardening-20261116.md`. Scope is the Analysis
+Center page and directly called search/model paths, not an application-wide route audit. The page now
+requires an authorized case, filters evidence by case, calls the actually loaded Gemma 4 Legal model
+on `:8090`, constrains analysis to retrieved source references, abstains below an interim `0.5`
+retrieval score, and renders Dossier styling. The `dev:gpu` launcher now passes its allocated Vite
+port through `PUBLIC_API_URL`, `PORT`, and `VITE_PORT`; the running process was not restarted.
+
+Read-only gateway status: Bifrost `:3040` is healthy but advertises only Ornith and EmbeddingGemma,
+not Gemma 4 Legal. Its current semantic cache configuration uses a global default key. No Docker
+configuration or Valkey/BitFrost data was changed. Do not warm case-specific analysis responses until
+model routing and case/source-revision cache identity are admitted. The current page uses the local
+Gemma 4 Legal llama-server directly after model identity verification.
+
+- [ ] 10.1 Freeze a case-scoped retrieval evaluation set and calibrate the interim relevance floor
+      using judged relevant and irrelevant source passages; record Recall@K/NDCG and abstention.
+- [ ] 10.2 Validate every model citation against the persisted evidence revision, source SHA-256,
+      chunk ID, and exact source span; reject stale or cross-case references.
+- [ ] 10.3 Decide whether to register Gemma 4 Legal in Bifrost. If selected, prove its configured
+      alias routes to the expected loaded model. Keep semantic-cache reuse disabled until the key
+      includes actor/tenant, case, exact source and retrieval revisions, model ID, and prompt recipe.
+- [ ] 10.4 Connect the existing recommendation/context owners to a durable, human-reviewable
+      proposal lifecycle; prove authorized save, independent readback, accept/reject, and revision
+      conflict behavior without creating a parallel scene or evidence owner.
+- [ ] 10.5 Add focused action tests for empty retrieval, weak-score abstention, malformed structured
+      output, unknown citations, server/model mismatch, timeout, and cross-case denial.
+- [ ] 10.6 Add visible progress/error states and explicit proposal review controls; distinguish
+      transient model output from saved findings and accepted recommendations.
+- [ ] 10.7 Audit the Analysis Center's ten analytical modules and their directly reachable routes;
+      this receipt does not claim full page/route/layout coverage.
+- [ ] 10.8 On the next normal VS Code `dev:gpu` start, verify Vite and `PUBLIC_API_URL` agree on the
+      selected port; do not restart GPU/Docker services as part of this task.
+- [ ] 10.9 Browser-verify the Dossier cream "did you mean another case?" dialog, authorized case
+      switching, empty-case creation handoff, and the case-created return without submitting a
+      real case during fixture checks. The suggestion is deterministic UI routing from authorized
+      cases and retrieval state; do not describe it as AI-ranked until a qualified case ranker exists.
+- [ ] 10.10 Add route/action coverage for the allowlisted `returnTo=analysis-center` handoff,
+      authenticated case creation, selected-case authorization on return, and ordinary case-create
+      redirect preservation; do not accept arbitrary return URLs.
+- [ ] 10.11 Implement the separate `authorized-case-routing` capability in
+      `specs/authorized-case-routing/spec.md`: extract a pure typed suggestion policy from the
+      Analysis Center page, accept only server-authorized case candidates and explicit empty-result /
+      abstention triggers, and return bounded reason-coded navigation options without ranking
+      evidence or changing SearchRuntime order.
+- [ ] 10.12 Extract the Dossier cream Bits UI dialog into a reusable `DidYouMeanCaseDialog` component
+      with typed `suggestions`, `onSelectCase`, `onCreateCase`, and `onKeepCurrent` callbacks. Keep
+      selection explicit, recheck authorization server-side, and reuse `/cases/new` for creation.
+- [ ] 10.13 Define the replaceable suggestion-provider interface. Keep the deterministic authorized
+      case-list provider as default; an assistant-backed provider may only reorder IDs from its
+      authorized input set, must have unknown IDs discarded, and requires separate quality and
+      privacy review. Do not call `recommendContextualCandidatesV1` as a case ranker.
+- [ ] 10.14 Add pure policy tests, component tests, and authorized browser/action coverage for empty
+      results, abstention, provider failure, unknown IDs, case switching, case creation handoff, and
+      ordinary case-create redirect. Do not submit case-creation fixtures to the shared legal DB.
+- [x] 10.15 Add a 3D / orthographic 2D presentation switch and a Dossier-style dialogue overlay to
+      the existing courtroom palette demo. Keep the same scene geometry, mark the view illustrative,
+      route the overlay action to the existing chat input, and use the configured local chat model
+      without enabling demo tool calls by default.
+- [ ] 10.16 Browser-verify the 3D/2D switch, responsive dialogue overlay, local video texture, and
+      chat submission against the configured :8090 model. This demo does not prove case-grounded
+      recommendations or authorized scene/evidence retrieval.

@@ -91,7 +91,7 @@ param(
   [switch] $TextOnly,
   [switch] $NoEvict,
   [switch] $StatusOnly,
-  [ValidateSet('gemma4-direct', 'ornith', 'ornith-1.5', 'ornith-1.5-vlm', 'gemma4-thinking')]
+  [ValidateSet('gemma4-direct', 'gemma4-legal-iq4xs', 'gemma4-legal-iq4xs-vlm', 'ornith', 'ornith-1.5', 'ornith-1.5-vlm', 'gemma4-thinking')]
   [string] $StartupProfile,
   [switch] $SelectProfile
 )
@@ -183,6 +183,35 @@ function Get-TurboStartupProfiles {
       SpecType = 'none'
       ModelFamily = 'gemma4'
       WantsVision = $false
+    },
+    [pscustomobject]@{
+      Id = 'gemma4-legal-iq4xs'
+      DisplayName = 'Gemma 4 Legal IQ4_XS - Direct Tools (smaller VRAM footprint)'
+      Model = Join-Path $modelRoot 'gemma4-legal-iq4xs-direct.gguf'
+      Alias = 'gemma4-legal-iq4xs-direct.gguf'
+      TemplateFile = Join-Path $templateRoot 'custom_pub_chat_template_gemma4.jinja'
+      Reasoning = 'off'
+      ReasoningBudget = 0
+      ContextLength = 65536
+      SpecType = 'none'
+      ModelFamily = 'gemma4'
+      WantsVision = $false
+    },
+    [pscustomobject]@{
+      # Same served alias and model as gemma4-legal-iq4xs; adds the Gemma-family
+      # projector (mmproj-F16.gguf, vision + audio encoders). Untested with this
+      # legal merge: confirm /props modalities.vision=true before relying on it.
+      Id = 'gemma4-legal-iq4xs-vlm'
+      DisplayName = 'Gemma 4 Legal IQ4_XS - Vision (mmproj-F16)'
+      Model = Join-Path $modelRoot 'gemma4-legal-iq4xs-direct.gguf'
+      Alias = 'gemma4-legal-iq4xs-direct.gguf'
+      TemplateFile = Join-Path $templateRoot 'custom_pub_chat_template_gemma4.jinja'
+      Reasoning = 'off'
+      ReasoningBudget = 0
+      ContextLength = 65536
+      SpecType = 'none'
+      ModelFamily = 'gemma4'
+      WantsVision = $true
     },
     [pscustomobject]@{
       Id = 'ornith'

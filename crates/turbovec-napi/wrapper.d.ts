@@ -82,3 +82,49 @@ export declare function packQdrantPayloads(nodesPath: string, edgesPath: string)
  * Verify the turbovec TurboQuantIndex is linked and functional.
  */
 export declare function turbovecSmoke(dim: number, bits: number): string
+
+export interface TopKResult {
+  indices: number[]
+  scores: number[]
+}
+
+export interface HammingMatch {
+  index: number
+  distance: number
+}
+
+/**
+ * Exact cosine top-k oracle over row-major vectors (`n*dim`) and queries (`nq*dim`).
+ */
+export declare function hintExactCosineTopk(
+  vectors: Float32Array,
+  queries: Float32Array,
+  dim: number,
+  k: number
+): TopKResult
+
+/**
+ * Quantized TurboVec top-k challenger over row-major vectors (`n*dim`) and queries (`nq*dim`).
+ */
+export declare function hintTurbovecTopk(
+  vectors: Float32Array,
+  queries: Float32Array,
+  dim: number,
+  bits: number,
+  k: number
+): TopKResult
+
+/**
+ * Compute 64-bit horizontal gradient dHash over a 72-byte (9x8) grayscale frame.
+ */
+export declare function computeDhash64(gray9X8: Uint8Array): string
+
+/**
+ * Hardware POPCNT(A ^ B) + 2-pass LSD radix sort over packed u64 bitsets.
+ */
+export declare function batchHammingSearchTopK(
+  queryWords: BigUint64Array | Uint8Array,
+  corpusFlatWords: BigUint64Array | Uint8Array,
+  wordsPerVec: number,
+  topK: number
+): HammingMatch[]

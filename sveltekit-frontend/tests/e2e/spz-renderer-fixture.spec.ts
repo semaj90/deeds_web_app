@@ -206,6 +206,42 @@ test('synthetic playground creates, selects and exports multiple editable meshes
 	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
 });
 
+test('primitive guide opens a dossier-styled native mini-modal and dismisses safely', async ({ page }, testInfo) => {
+	const pageErrors: string[] = [];
+	const nonReadRequests: string[] = [];
+	page.on('pageerror', (error) => pageErrors.push(error.message));
+	page.on('request', (request) => {
+		if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method())) nonReadRequests.push(`${request.method()} ${request.url()}`);
+	});
+	await page.route('**/api/analytics/events', (route) => route.fulfill({ status: 204, body: '' }));
+	await page.route('**/api/errors/client-report', (route) => route.fulfill({ status: 204, body: '' }));
+	await page.goto('/demos/spz-renderer?mode=preflight');
+
+	const openButton = page.getByTestId('primitive-guide-open');
+	await expect(openButton).toBeVisible();
+	await openButton.click();
+	const dialog = page.getByRole('dialog', { name: 'Primitive recipes' });
+	await expect(dialog).toBeVisible();
+	await expect(dialog).toContainText('Current profile: balanced');
+	await expect(dialog).toContainText('estimated triangles');
+	await expect(dialog).toContainText('convex-hull · approximate');
+	await expect(dialog).toContainText('Physics is not active here');
+	await expect(dialog.getByRole('button', { name: 'Close dialog' })).toBeFocused();
+	await dialog.screenshot({ path: testInfo.outputPath('primitive-guide-dossier-mini-modal.png') });
+
+	await page.keyboard.press('Escape');
+	await expect(dialog).not.toBeVisible();
+	await openButton.click();
+	await dialog.getByRole('button', { name: 'Close dialog' }).click();
+	await expect(dialog).not.toBeVisible();
+	await openButton.click();
+	await page.mouse.click(8, 8);
+	await expect(dialog).not.toBeVisible();
+
+	expect(pageErrors, pageErrors.join('\n')).toEqual([]);
+	expect(nonReadRequests.filter((request) => !request.includes('/api/analytics/events') && !request.includes('/api/errors/client-report'))).toEqual([]);
+});
+
 test('case scene navigation preserves the scene and exhibit IDs across the editor return link', async ({ page }) => {
 	const caseId = '11111111-1111-4111-8111-111111111111';
 	const sceneId = '22222222-2222-4222-8222-222222222222';

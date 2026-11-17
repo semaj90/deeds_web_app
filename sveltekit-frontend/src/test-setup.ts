@@ -11,4 +11,13 @@ import { loadRuntimeEnv } from './lib/server/config/load-runtime-env.js';
 // imports it regardless of whether the test itself exercises LLM behavior.
 loadRuntimeEnv();
 
+// The opt-in library SeaweedFS integration may write durable fixture rows and
+// objects. Force its process onto the named scratch database before any test
+// imports can initialize env.server.ts or the shared PostgreSQL pool.
+if (process.env.ATLAS_LIBRARY_SEAWEED_SCRATCH_TEST === '1') {
+	const scratchDatabaseUrl = new URL(process.env.DATABASE_URL ?? '');
+	scratchDatabaseUrl.pathname = '/legal_ai_live_integration_scratch';
+	process.env.DATABASE_URL = scratchDatabaseUrl.toString();
+}
+
 import '@testing-library/jest-dom/vitest';

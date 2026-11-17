@@ -432,7 +432,7 @@
   }
 </script>
 
-<div class="dashboard-dark">
+<div class="dashboard-dark keep-dark-shell">
 <LegalDisclaimer />
 
 <div class="dashboard-page">

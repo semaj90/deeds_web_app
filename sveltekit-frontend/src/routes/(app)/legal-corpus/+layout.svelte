@@ -5,5 +5,7 @@
 </script>
 
 <ResearchShell title="" showSidebar={true}>
-	{@render children()}
+	<div class="legal-corpus-navy" style="display: contents">
+		{@render children()}
+	</div>
 </ResearchShell>

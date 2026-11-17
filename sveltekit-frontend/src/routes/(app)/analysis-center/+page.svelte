@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
+	import { Dialog } from 'bits-ui';
 	import { analytics } from '$lib/stores/analytics.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import type { PageData } from './$types';
@@ -26,6 +28,10 @@
 	let analysisMode: 'pattern' | 'correlation' | 'prediction' = $state('pattern');
 	let activeTab: 'search' | 'analyze' = $state('search');
 	let selectedCaseId = $state('');
+	let showCaseGuidance = $state(false);
+	let suggestedCaseId = $state('');
+	let hasSearched = $state(false);
+	let caseCreatedNotice = $state(false);
 	let showSummaryReader = $state(false);
 	let showJudicialAgent = $state(false);
 	let showGraphGallery = $state(false);
@@ -216,6 +222,32 @@
 		ingestFile = target.files?.[0] ?? null;
 	}
 
+	function analyzeExtractedPreview() {
+		const preview = String(ingestResult?.contentPreview ?? '').trim();
+		if (!preview) return;
+
+		const source = String(ingestResult?.filename ?? ingestResult?.title ?? 'uploaded file');
+		const prompt = `Review this extracted preview from "${source}". Treat it as a partial OCR/text preview, separate observed text from uncertainty, and do not assume it represents the entire source.\n\n${preview.slice(0, 760)}`;
+		analysisQuery = prompt.slice(0, 1000);
+		analysisMode = 'pattern';
+		activeTab = 'analyze';
+		activeTool = null;
+		window.setTimeout(() => {
+			document.querySelector<HTMLTextAreaElement>('.analysis-input[name="query"]')?.focus();
+		}, 0);
+	}
+
+	function toggleTool(toolId: string) {
+		activeTool = activeTool === toolId ? null : toolId;
+		if (activeTool) {
+			window.requestAnimationFrame(() => {
+				window.requestAnimationFrame(() => {
+					document.getElementById('active-tool-panel')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+				});
+			});
+		}
+	}
+
 	const analysisModes = [
 		{ id: 'pattern' as const, label: 'PATTERN ANALYSIS', icon: 'P' },
 		{ id: 'correlation' as const, label: 'CORRELATION', icon: 'C' },
@@ -224,12 +256,47 @@
 
 	let webgpuCapable = $derived(typeof navigator !== 'undefined' && !!navigator.gpu);
 
-	let evidencePool = $derived(data.recentEvidence ?? []);
+	const EVIDENCE_PAGE_SIZE = 12;
+	let evidencePool = $derived(
+		(data.recentEvidence ?? []).filter((item) => !selectedCaseId || String(item.caseId ?? '') === selectedCaseId)
+	);
+	let evidencePage = $state(1);
+	let evidencePageCount = $derived(Math.max(1, Math.ceil(evidencePool.length / EVIDENCE_PAGE_SIZE)));
+	let currentEvidencePage = $derived(Math.min(evidencePage, evidencePageCount));
+	let evidencePageStart = $derived((currentEvidencePage - 1) * EVIDENCE_PAGE_SIZE);
+	let visibleEvidence = $derived(evidencePool.slice(evidencePageStart, evidencePageStart + EVIDENCE_PAGE_SIZE));
 	let caseStats = $derived(data.caseStats ?? { total: 0, open: 0, closed: 0 });
 	let evidenceCount = $derived(data.evidenceCount ?? 0);
+
+	$effect(() => {
+		selectedCaseId = String(data.selectedCaseId ?? '');
+		suggestedCaseId = selectedCaseId;
+		caseCreatedNotice = Boolean(data.caseCreated);
+	});
+
+	function openCaseGuidance() {
+		suggestedCaseId = selectedCaseId;
+		showCaseGuidance = true;
+	}
+
+	function useSuggestedCase() {
+		if (!suggestedCaseId) return;
+		selectedCaseId = suggestedCaseId;
+		searchResults = [];
+		searchBundles = [];
+		analysisResults = [];
+		selectedEvidence = null;
+		errorMessage = '';
+		evidencePage = 1;
+		showCaseGuidance = false;
+	}
+
+	function createCaseFromAnalysis() {
+		void goto('/cases/new?returnTo=analysis-center');
+	}
 </script>
 
-<main class="analysis-center">
+	<main class="analysis-center dossier-page">
 	<!-- Header -->
 	<header class="analysis-header">
 		<div class="header-title">
@@ -282,6 +349,12 @@
 			</div>
 		</div>
 	</header>
+	{#if caseCreatedNotice}
+		<div class="case-created-notice" role="status">
+			<strong>Case created.</strong> It is now selected as your Analysis Center scope.
+			<button type="button" onclick={() => (caseCreatedNotice = false)} aria-label="Dismiss case created message">Dismiss</button>
+		</div>
+	{/if}
 
 	{#if errorMessage}
 		<div class="error-banner">
@@ -298,6 +371,43 @@
 				<h2>{activeTab === 'search' ? 'EVIDENCE SEARCH' : 'AI ANALYSIS'}</h2>
 				<span class="query-mode">{analysisMode.toUpperCase()}</span>
 			</div>
+			<label class="case-scope-label" for="analysis-case-scope">CASE SCOPE</label>
+			<select
+				id="analysis-case-scope"
+				class="case-scope-select"
+				bind:value={selectedCaseId}
+				disabled={data.authorizedCases.length === 0}
+				onchange={() => {
+					searchResults = [];
+					searchBundles = [];
+					analysisResults = [];
+					selectedEvidence = null;
+					errorMessage = '';
+					hasSearched = false;
+					evidencePage = 1;
+				}}
+			>
+				<option value="">Choose an authorized case</option>
+				{#each data.authorizedCases as caseItem (caseItem.id)}
+					<option value={String(caseItem.id)}>{caseItem.title || `Case ${caseItem.id}`}</option>
+				{/each}
+			</select>
+			{#if !selectedCaseId || evidencePool.length === 0}
+				<div class="case-start-card">
+					<p class="case-start-eyebrow">CASE ROUTING</p>
+					<p>{data.authorizedCases.length === 0 ? 'Start by creating a case for this investigation.' : data.caseCreated ? 'Your case is ready. Add or upload evidence to begin a source-grounded analysis.' : 'No recent evidence is shown for this case. Choose another case or start a new one.'}</p>
+					<div class="case-start-actions">
+						{#if data.authorizedCases.length > 1}
+							<button type="button" class="case-secondary-btn" onclick={openCaseGuidance}>Did you mean another case?</button>
+						{/if}
+						{#if data.caseCreated && selectedCaseId}
+							<button type="button" class="case-primary-btn" onclick={() => void goto(`/cases/${encodeURIComponent(selectedCaseId)}/overview`)}>Open this case</button>
+						{:else}
+							<button type="button" class="case-primary-btn" onclick={createCaseFromAnalysis}>Create a new case</button>
+						{/if}
+					</div>
+				</div>
+			{/if}
 
 			{#if activeTab === 'search'}
 				<!-- Semantic Evidence Search Form -->
@@ -314,8 +424,11 @@
 								searchResults = Array.isArray(d.searchResults) ? d.searchResults : [];
 								searchBundles = Array.isArray(d.bundles) ? d.bundles : [];
 								searchTiming = d.timing ?? null;
+								hasSearched = true;
+								if (searchResults.length === 0) openCaseGuidance();
 							} else if (result.type === 'failure') {
 								errorMessage = (result.data as any)?.searchError ?? 'Search failed';
+								hasSearched = true;
 							}
 						};
 					}}
@@ -333,7 +446,7 @@
 						<button
 							type="submit"
 							class="analyze-btn {isSearching ? 'loading' : ''}"
-							disabled={isSearching || !analysisQuery.trim()}
+							disabled={isSearching || !analysisQuery.trim() || !selectedCaseId}
 						>
 							{#if isSearching}
 								<span class="loading-spinner"></span>
@@ -359,6 +472,7 @@
 								analysisQuery = '';
 							} else if (result.type === 'failure') {
 								errorMessage = (result.data as any)?.analysisError ?? 'Analysis failed';
+								if (String((result.data as any)?.analysisError ?? '').includes('No authorized source passages')) openCaseGuidance();
 							}
 						};
 					}}
@@ -371,10 +485,11 @@
 						rows="3"
 					></textarea>
 					<input type="hidden" name="mode" value={analysisMode} />
+					<input type="hidden" name="caseId" value={selectedCaseId} />
 					<button
 						type="submit"
 						class="analyze-btn {isAnalyzing ? 'loading' : ''}"
-						disabled={isAnalyzing || !analysisQuery.trim()}
+						disabled={isAnalyzing || !analysisQuery.trim() || !selectedCaseId}
 					>
 						{#if isAnalyzing}
 							<span class="loading-spinner"></span>
@@ -401,8 +516,8 @@
 				<div class="results-list">
 					{#if searchResults.length === 0}
 						<div class="empty-results">
-							<p>No results yet. Enter a query to search evidence semantically.</p>
-							<p class="hint">Uses RAG + KAG + DAG pipeline with legal-aware reranking.</p>
+							<p>{hasSearched ? 'No matching passages were found in this case.' : 'Enter a query to search evidence in the selected case.'}</p>
+							<p class="hint">Suggestions use your authorized case list; they do not change case access or create an AI finding.</p>
 						</div>
 					{/if}
 
@@ -491,7 +606,7 @@
 					{#if analysisResults.length === 0}
 						<div class="empty-results">
 							<p>No analyses yet. Enter a query and run AI analysis.</p>
-							<p class="hint">Uses Gemma4-Legal for pattern detection, correlation mapping, and threat prediction.</p>
+							<p class="hint">Uses the loaded Gemma 4 Legal model. Findings are source-linked proposals for reviewer verification.</p>
 						</div>
 					{/if}
 
@@ -500,7 +615,7 @@
 							<div class="result-header">
 								<span class="result-mode">{result.mode.toUpperCase()}</span>
 								<span class="result-confidence">
-									{(result.confidence * 100).toFixed(1)}%
+									{typeof result.confidence === 'number' ? `${(result.confidence * 100).toFixed(1)}%` : 'UNVERIFIED'}
 								</span>
 								<span class="result-time">
 									{new Date(result.timestamp).toLocaleTimeString()}
@@ -510,6 +625,16 @@
 								<strong>Query:</strong> {result.query}
 							</div>
 							<div class="result-content analysis-text">{result.result}</div>
+							{#if result.model}
+								<p class="analysis-model">Model: {result.model}</p>
+							{/if}
+							{#if result.sources?.length}
+								<div class="analysis-sources" aria-label="Analysis sources">
+									{#each result.sources as source (source.ref)}
+										<span>{source.ref} · {source.evidenceId}{source.chunkIndex !== null ? ` · chunk ${source.chunkIndex}` : ''}</span>
+									{/each}
+								</div>
+							{/if}
 						</div>
 					{/each}
 				</div>
@@ -522,8 +647,18 @@
 				<h2>EVIDENCE POOL</h2>
 				<span class="evidence-count">{evidencePool.length} RECENT</span>
 			</div>
+			{#if evidencePool.length > EVIDENCE_PAGE_SIZE}
+				<nav class="evidence-pagination" aria-label="Evidence pool pages" aria-controls="evidence-page-items">
+					<span aria-live="polite">{evidencePageStart + 1}–{Math.min(evidencePageStart + EVIDENCE_PAGE_SIZE, evidencePool.length)} of {evidencePool.length}</span>
+					<div class="evidence-pagination-actions">
+						<button type="button" aria-label="Previous evidence page" disabled={currentEvidencePage <= 1} onclick={() => (evidencePage = Math.max(1, currentEvidencePage - 1))}>Previous</button>
+						<span aria-label={`Page ${currentEvidencePage} of ${evidencePageCount}`}>Page {currentEvidencePage} / {evidencePageCount}</span>
+						<button type="button" aria-label="Next evidence page" disabled={currentEvidencePage >= evidencePageCount} onclick={() => (evidencePage = Math.min(evidencePageCount, currentEvidencePage + 1))}>Next</button>
+					</div>
+				</nav>
+			{/if}
 
-			<div class="evidence-list">
+			<div class="evidence-list" id="evidence-page-items">
 				{#if evidencePool.length === 0}
 					<div class="empty-results">
 						<p>No evidence in database yet.</p>
@@ -531,7 +666,7 @@
 					</div>
 				{/if}
 
-				{#each evidencePool as ev}
+				{#each visibleEvidence as ev (ev.id)}
 					<button
 						class="evidence-item {selectedEvidence?.id === ev.id ? 'selected' : ''}"
 						onclick={() => {
@@ -600,7 +735,7 @@
 			] as tool}
 				<button
 					class="tool-card {activeTool === tool.id ? 'active' : ''}"
-					onclick={() => (activeTool = activeTool === tool.id ? null : tool.id)}
+					onclick={() => toggleTool(tool.id)}
 				>
 					<span class="tool-icon-badge">[{tool.badge}]</span>
 					<span class="tool-label">{tool.label}</span>
@@ -611,7 +746,7 @@
 	</div>
 
 	{#if activeTool}
-		<div class="tool-expanded">
+		<div id="active-tool-panel" class="tool-expanded">
 			<div class="tool-expanded-header">
 				<button class="tool-close-btn" onclick={() => (activeTool = null)}>✕ CLOSE</button>
 			</div>
@@ -658,7 +793,7 @@
 						<p style="color: #8b949e; font-size: 0.85rem; margin-bottom: 1rem;">
 							Paste a URL or upload PDF, TXT, Markdown, JSON, CSV, HTML, or image files to chunk, embed, OCR, and store in the knowledge base for chat and RAG search.
 						</p>
-						<div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+						<div class="ingest-source-row">
 							<input
 								type="url"
 								bind:value={ingestUrl}
@@ -682,7 +817,7 @@
 								{ingestLoading ? 'INGESTING...' : 'INGEST'}
 							</button>
 						</div>
-						<div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem; align-items: center; flex-wrap: wrap;">
+						<div class="ingest-file-row">
 							<input
 								type="file"
 								accept=".pdf,.txt,.md,.json,.csv,.xml,.html,.htm,.log,.yaml,.yml,.png,.jpg,.jpeg,.webp,.bmp,.tif,.tiff"
@@ -708,45 +843,86 @@
 							</div>
 						{/if}
 						{#if ingestResult}
-							<div style="color: #10b981; background: #10b98120; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem;">
-								<strong>Ingested:</strong> {ingestResult.title}<br/>
-								<strong>Source:</strong> {ingestResult.sourceType === 'file' ? ingestResult.filename : ingestResult.url}<br/>
-								<strong>Status:</strong>
-								{#if ingestResult.indexingStatus === 'queued'}
-									<span style="color: #fbbf24;">Preview ready, background indexing queued</span>
-								{:else if ingestResult.indexingStatus === 'deferred'}
-									<span style="color: #f59e0b;">Retrieval indexing deferred</span>
-								{:else}
-									<span>Indexed</span>
+							<section class="ingest-result" aria-live="polite">
+								<div class="ingest-result-heading">
+									<div>
+										<p class="ingest-eyebrow">UPLOAD SUMMARY</p>
+										<h4>{ingestResult.title ?? ingestResult.filename ?? 'Document received'}</h4>
+									</div>
+									<span class="ingest-status {ingestResult.indexingStatus ?? 'completed'}">
+										{ingestResult.indexingStatus === 'queued'
+											? 'Indexing queued'
+											: ingestResult.indexingStatus === 'deferred'
+												? 'Indexing paused'
+												: 'Ready'}
+									</span>
+								</div>
+								<p class="ingest-source">{ingestResult.sourceType === 'file' ? ingestResult.filename : ingestResult.url}</p>
+								{#if ingestJobStatus && ingestResult.indexingStatus === 'queued'}
+									<div class="ingest-progress-row">
+										<progress max="100" value={Math.min(100, Math.max(0, Number(ingestJobStatus.progress) || 0))} aria-label="Background indexing progress"></progress>
+										<span>{Math.min(100, Math.max(0, Number(ingestJobStatus.progress) || 0))}%</span>
+									</div>
+									<p class="ingest-job-message">{ingestJobStatus.message}</p>
 								{/if}
-								<br/>
-								{#if ingestJobStatus}
-									<strong>Job:</strong> {ingestJobStatus.message} ({ingestJobStatus.progress}%)<br/>
-								{/if}
-								<strong>Chunks:</strong> {ingestResult.chunksCreated} ({ingestResult.totalTokens} tokens)<br/>
-								{#if ingestResult.extractionMethod}
-									<strong>Extraction:</strong> {ingestResult.extractionMethod}<br/>
-								{/if}
-								{#if ingestResult.yoloLabels?.length}
-									<strong>YOLO:</strong> {ingestResult.yoloLabels.join(', ')}<br/>
-								{/if}
+								<div class="ingest-facts">
+									<span><strong>Chunks</strong>{ingestResult.chunksCreated ?? 0}</span>
+									<span><strong>Chunk words</strong>{ingestResult.totalTokens ?? 0}</span>
+									<span><strong>Extraction</strong>{ingestResult.extractionMethod ?? 'text preview'}</span>
+									<span><strong>Embedding</strong>{ingestResult.embeddingModel ?? 'not available yet'}</span>
+									<span><strong>Elapsed</strong>{ingestResult.totalMs ?? 0} ms</span>
+								</div>
+								<p class="ingest-count-note">Chunk words are a text count, not NES glyphs or model tokens.</p>
 								{#if ingestResult.contentPreview}
-									<strong>Preview:</strong> {ingestResult.contentPreview}<br/>
+									<details class="ingest-preview">
+										<summary>View extracted preview</summary>
+										<pre>{ingestResult.contentPreview}</pre>
+										<p class="ingest-preview-note">This is extracted text for review. It is not a custom font glyph or proof that the full document has been analyzed.</p>
+										<button type="button" class="analyze-preview-btn" onclick={analyzeExtractedPreview}>Analyze this preview</button>
+									</details>
 								{/if}
-								<strong>Model:</strong> {ingestResult.embeddingModel ?? 'pending'} | <strong>Time:</strong> {ingestResult.totalMs}ms
-							</div>
+							</section>
 						{/if}
 					</div>
 				{/if}
 			</div>
 		</div>
-	{/if}
+		{/if}
+	<Dialog.Root bind:open={showCaseGuidance}>
+		<Dialog.Portal>
+			<Dialog.Overlay class="case-guidance-overlay" />
+			<Dialog.Content class="case-guidance-modal">
+				<p class="case-start-eyebrow">DOSSIER · CASE SCOPE</p>
+				<Dialog.Title class="case-guidance-title">Did you mean another case?</Dialog.Title>
+				<Dialog.Description class="case-guidance-description">
+					No matching source was found in the current case. Choose another case you can access, or create a case and return here.
+				</Dialog.Description>
+				{#if data.authorizedCases.length > 0}
+					<label class="case-scope-label" for="suggested-case-scope">AUTHORIZED CASES</label>
+					<select id="suggested-case-scope" class="case-scope-select" bind:value={suggestedCaseId}>
+						{#each data.authorizedCases as caseItem (caseItem.id)}
+							<option value={String(caseItem.id)}>{caseItem.title || `Case ${caseItem.id}`}</option>
+						{/each}
+					</select>
+				{/if}
+				<div class="case-start-actions">
+					{#if data.authorizedCases.length > 0}
+						<button type="button" class="case-primary-btn" onclick={useSuggestedCase}>Use this case</button>
+					{/if}
+					<button type="button" class="case-secondary-btn" onclick={createCaseFromAnalysis}>Create a new case</button>
+					<Dialog.Close class="case-text-btn">Keep current case</Dialog.Close>
+				</div>
+			</Dialog.Content>
+		</Dialog.Portal>
+	</Dialog.Root>
 </main>
 
 <style>
 	.analysis-center {
 		background: linear-gradient(135deg, #0d1117, #161b22);
-		min-height: 100vh;
+		min-height: calc(100dvh - 5.5rem);
+		box-sizing: border-box;
+		padding: 0 5.25rem 0.75rem 0;
 		color: #f0f6fc;
 		font-family: 'JetBrains Mono', 'Consolas', monospace;
 		position: relative;
@@ -897,6 +1073,7 @@
 
 	.mode-selector {
 		display: flex;
+		flex-wrap: wrap;
 		gap: 0.4rem;
 	}
 
@@ -957,9 +1134,10 @@
 		position: relative;
 		z-index: 1;
 		display: grid;
-		grid-template-columns: 1fr 1fr 280px;
+		grid-template-columns: minmax(16rem, 0.95fr) minmax(20rem, 1.25fr) minmax(15rem, 0.8fr);
 		gap: 1rem;
-		min-height: clamp(24rem, 54vh, 40rem);
+		height: clamp(24rem, calc(100dvh - 30rem), 36rem);
+		min-height: 24rem;
 		padding: 1rem;
 	}
 
@@ -1004,6 +1182,49 @@
 	.evidence-count {
 		color: #6b7280;
 		font-size: 0.7rem;
+	}
+
+	.evidence-pagination {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: center;
+		gap: 0.5rem;
+		margin: 0 0 0.65rem;
+		color: #9ca3af;
+		font-size: 0.68rem;
+	}
+
+	.evidence-pagination-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+
+	.evidence-pagination-actions button {
+		min-height: 2rem;
+		padding: 0.35rem 0.55rem;
+		border: 1px solid #374151;
+		border-radius: 4px;
+		background: #111827;
+		color: #e5e7eb;
+		font: inherit;
+		cursor: pointer;
+	}
+
+	.evidence-pagination-actions button:hover:not(:disabled) {
+		border-color: #10b981;
+		background: rgba(16, 185, 129, 0.12);
+	}
+
+	.evidence-pagination-actions button:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
+	}
+
+	.evidence-pagination-actions button:focus-visible {
+		outline: 2px solid #34d399;
+		outline-offset: 2px;
 	}
 
 	.timing-badge {
@@ -1380,18 +1601,187 @@
 	.tool-icon-badge { font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; color: #10b981; }
 	.tool-label { font-size: 0.7rem; font-weight: 600; color: #e6edf3; }
 	.tool-desc { font-size: 0.6rem; color: #6b7280; }
-	.tool-expanded { margin: 1rem 1rem 0; border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; overflow: auto; max-height: min(72vh, 52rem); }
+	.tool-expanded { margin: 1rem 1rem 0; border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; overflow: auto; overscroll-behavior: contain; scroll-margin-top: 1rem; max-height: min(60vh, 40rem); }
 	.tool-expanded-header { display: flex; justify-content: flex-end; padding: 0.5rem 0.75rem; background: rgba(16,185,129,0.05); border-bottom: 1px solid rgba(16,185,129,0.15); }
 	.tool-close-btn { font-size: 0.7rem; color: #6b7280; cursor: pointer; background: none; border: none; padding: 0.2rem 0.5rem; border-radius: 4px; }
 	.tool-close-btn:hover { color: #10b981; background: rgba(16,185,129,0.1); }
+	.ingest-source-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(9rem, 12rem) auto; gap: 0.5rem; margin-bottom: 0.75rem; }
+	.ingest-file-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem; }
+	.ingest-result { min-width: 0; padding: 1rem; border: 1px solid rgba(16,185,129,0.25); border-radius: 8px; background: rgba(16,185,129,0.07); color: #d1fae5; }
+	.ingest-result-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+	.ingest-eyebrow { margin: 0 0 0.25rem; color: #6ee7b7; font-size: 0.65rem; letter-spacing: 0.12em; }
+	.ingest-result h4 { margin: 0; color: #f0fdf4; font-size: 0.95rem; overflow-wrap: anywhere; }
+	.ingest-status { flex: 0 0 auto; padding: 0.25rem 0.55rem; border: 1px solid rgba(52,211,153,0.35); border-radius: 999px; color: #a7f3d0; font-size: 0.7rem; }
+	.ingest-status.queued { color: #fde68a; border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.08); }
+	.ingest-status.deferred { color: #fdba74; border-color: rgba(249,115,22,0.4); background: rgba(249,115,22,0.08); }
+	.ingest-source { margin: 0.35rem 0 0.75rem; color: #9ca3af; font-size: 0.75rem; overflow-wrap: anywhere; }
+	.ingest-progress-row { display: flex; align-items: center; gap: 0.6rem; color: #fde68a; font-size: 0.72rem; }
+	.ingest-progress-row progress { flex: 1; width: 100%; height: 0.55rem; accent-color: #10b981; }
+	.ingest-job-message { margin: 0.35rem 0 0.75rem; color: #cbd5e1; font-size: 0.75rem; }
+	.ingest-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: 0.5rem; }
+	.ingest-facts span { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; color: #e5e7eb; font-size: 0.75rem; overflow-wrap: anywhere; }
+	.ingest-facts strong { color: #6ee7b7; font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+	.ingest-count-note { margin: 0.55rem 0 0; color: #8b949e; font-size: 0.66rem; }
+	.ingest-preview { margin-top: 0.8rem; padding-top: 0.75rem; border-top: 1px solid rgba(16,185,129,0.2); }
+	.ingest-preview summary { color: #a7f3d0; cursor: pointer; font-size: 0.78rem; }
+	.ingest-preview pre { max-height: 12rem; overflow: auto; margin: 0.6rem 0; padding: 0.75rem; border: 1px solid #263244; border-radius: 6px; background: #0b1118; color: #d1d5db; white-space: pre-wrap; overflow-wrap: anywhere; font: 0.78rem/1.5 'JetBrains Mono', 'Consolas', monospace; }
+	.ingest-preview-note { margin: 0 0 0.6rem; color: #9ca3af; font-size: 0.7rem; line-height: 1.45; }
+	.analyze-preview-btn { padding: 0.5rem 0.75rem; border: 1px solid rgba(52,211,153,0.45); border-radius: 5px; background: rgba(16,185,129,0.13); color: #a7f3d0; cursor: pointer; font: inherit; font-size: 0.75rem; }
+	.analyze-preview-btn:hover { background: rgba(16,185,129,0.22); }
+	.case-scope-label {
+		display: block;
+		margin: 0.25rem 0 0.4rem;
+		color: var(--dossier-gold-light);
+		font-size: 0.68rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+	}
+	.case-scope-select {
+		width: 100%;
+		min-height: 2.6rem;
+		margin-bottom: 0.85rem;
+		padding: 0.55rem 0.7rem;
+		border: 1px solid var(--dossier-border-dark);
+		border-radius: 5px;
+		background: var(--dossier-bg-dark);
+		color: var(--dossier-text-light);
+		font: inherit;
+	}
+	.analysis-model { margin: 0.6rem 0 0; color: #d7c7a4; font-size: 0.68rem; }
+	.analysis-sources { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.55rem; }
+	.analysis-sources span {
+		padding: 0.25rem 0.4rem;
+		border: 1px solid var(--dossier-border-dark);
+		border-radius: 4px;
+		color: var(--dossier-gold-light);
+		font-size: 0.65rem;
+	}
+	.analysis-center {
+		background: linear-gradient(135deg, var(--dossier-bg-dark), #211c16);
+		font-family: Inter, system-ui, sans-serif;
+	}
+	.analysis-center .analysis-header { border-bottom-color: var(--dossier-gold); }
+	.analysis-center .header-title h1,
+	.analysis-center .query-header h2,
+	.analysis-center .results-header h2,
+	.analysis-center .evidence-header h2 {
+		font-family: Cinzel, 'Cormorant Garamond', Georgia, serif;
+		color: var(--dossier-gold-light);
+	}
+	.analysis-center .query-panel,
+	.analysis-center .results-panel,
+	.analysis-center .evidence-panel {
+		background: var(--dossier-bg-dark-panel);
+		border-color: var(--dossier-border-dark);
+		border-radius: 6px;
+	}
+	.analysis-center .analysis-input { border-color: var(--dossier-border-dark); }
+	.analysis-center .analyze-btn,
+	.analysis-center .mode-btn.active { border-color: var(--dossier-gold); }
+	/* Dossier cream surface: analysis controls remain readable without the legacy HUD shell. */
+	.analysis-center {
+		background: var(--dossier-bg, #f4efe6);
+		color: var(--dossier-text-main, #24211c);
+		font-family: Inter, system-ui, sans-serif;
+	}
+	.analysis-center::before { display: none; }
+	.analysis-center .analysis-header { border-bottom-color: var(--dossier-hairline, #d8cdbb); }
+	.analysis-center .header-title h1,
+	.analysis-center .query-header h2,
+	.analysis-center .results-header h2,
+	.analysis-center .evidence-header h2 { color: #24382f; }
+	.analysis-center .header-stats,
+	.analysis-center .hint,
+	.analysis-center .query-mode,
+	.analysis-center .results-count,
+	.analysis-center .evidence-count { color: var(--dossier-text-muted-aa, #6b6150); }
+	.analysis-center .query-panel,
+	.analysis-center .results-panel,
+	.analysis-center .evidence-panel {
+		background: var(--dossier-bg-card, #faf6f0);
+		border-color: var(--dossier-hairline, #d8cdbb);
+		color: var(--dossier-text-main, #24211c);
+		box-shadow: 0 8px 24px rgba(54, 42, 24, 0.06);
+	}
+	.analysis-center .analysis-input,
+	.analysis-center .case-scope-select {
+		background: #fffdf9;
+		border: 1px solid var(--dossier-hairline, #d8cdbb);
+		color: var(--dossier-text-main, #24211c);
+	}
+	.analysis-center .case-scope-label { color: #6b5632; }
+	.analysis-center .result-card,
+	.analysis-center .evidence-card,
+	.analysis-center .tool-card {
+		background: var(--dossier-bg-card-alt, #faf4ec);
+		border-color: var(--dossier-hairline, #d8cdbb);
+		color: var(--dossier-text-main, #24211c);
+	}
+	.analysis-center .result-content,
+	.analysis-center .evidence-title,
+	.analysis-center .tool-label,
+	.analysis-center .empty-results,
+	.analysis-center .analysis-result { color: var(--dossier-text-main, #24211c); }
+	.analysis-center .case-start-card,
+	.analysis-center .case-created-notice {
+		margin: 0.55rem 0 0.8rem;
+		padding: 0.8rem;
+		border: 1px solid var(--dossier-hairline, #d8cdbb);
+		border-radius: var(--dossier-radius-card, 8px);
+		background: #fffdf9;
+		color: var(--dossier-text-main, #24211c);
+	}
+	.analysis-center .case-start-eyebrow { margin: 0 0 0.3rem; color: #81683b; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; }
+	.analysis-center .case-start-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.65rem; }
+	.analysis-center .case-primary-btn,
+	.analysis-center .case-secondary-btn,
+	.analysis-center .case-created-notice button {
+		min-height: 2.35rem;
+		padding: 0.55rem 0.8rem;
+		border: 1px solid #a98a52;
+		border-radius: 5px;
+		background: #345647;
+		color: #fffdf8;
+		font: inherit;
+		font-size: 0.78rem;
+		font-weight: 650;
+		cursor: pointer;
+	}
+	.analysis-center .case-secondary-btn { background: #fffdf9; color: #34483d; }
+	.analysis-center .case-text-btn { border: 0; background: transparent; color: #625a4d; cursor: pointer; font: inherit; font-size: 0.78rem; }
+	.analysis-center .case-created-notice { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+	.case-guidance-overlay { position: fixed; inset: 0; z-index: 9990; background: rgba(29, 25, 19, 0.48); backdrop-filter: blur(3px); }
+	.case-guidance-modal { position: fixed; inset: 50% auto auto 50%; z-index: 9991; transform: translate(-50%, -50%); width: min(30rem, calc(100vw - 2rem)); padding: 1.35rem; border: 1px solid #d8cdbb; border-radius: 10px; background: #faf6f0; color: #24211c; box-shadow: 0 24px 70px rgba(35, 28, 19, 0.25); }
+	.case-guidance-title { margin: 0.15rem 0 0.6rem; color: #24382f; font: 600 1.35rem/1.25 Georgia, serif; }
+	.case-guidance-description { display: block; margin-bottom: 1rem; color: #5d554a; font-size: 0.88rem; line-height: 1.55; }
+	.case-guidance-modal .case-scope-select { width: 100%; margin: 0.35rem 0 0.25rem; padding: 0.65rem; border-radius: 5px; }
+	.case-guidance-modal .case-start-actions { align-items: center; }
+	.case-guidance-modal .case-start-eyebrow { margin: 0 0 0.3rem; color: #81683b; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; }
+	.case-guidance-modal .case-primary-btn,
+	.case-guidance-modal .case-secondary-btn { min-height: 2.5rem; padding: 0.65rem 0.85rem; border: 1px solid #a98a52; border-radius: 5px; background: #345647; color: #fffdf8; cursor: pointer; font: inherit; font-size: 0.78rem; font-weight: 650; }
+	.case-guidance-modal .case-secondary-btn { background: #fffdf9; color: #34483d; }
+	.case-guidance-modal .case-text-btn { border: 0; background: transparent; color: #625a4d; cursor: pointer; font: inherit; font-size: 0.78rem; }
+	.analysis-center .case-created-notice button { min-height: auto; padding: 0.4rem 0.6rem; background: transparent; color: #34483d; }
 	@media (max-width: 1100px) {
-		.analysis-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 0; }
+		.analysis-center { height: auto; padding-right: 0; }
+		.analysis-layout { height: auto; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 0; }
 		.evidence-panel { grid-column: 1 / -1; min-height: 14rem; }
 	}
 	@media (max-width: 680px) {
+		.analysis-header { padding: 0.75rem; }
+		.header-title h1 { font-size: 1.15rem; letter-spacing: 0.1em; }
+		.mode-selector { width: 100%; }
+		.mode-btn { flex: 1 1 8rem; justify-content: center; }
 		.analysis-layout { grid-template-columns: minmax(0, 1fr); padding: 0.75rem; }
 		.query-panel, .results-panel, .evidence-panel { min-height: 16rem; }
+		.evidence-panel { max-height: 28rem; }
+		.evidence-list { min-height: 0; }
+		.evidence-pagination { align-items: flex-start; }
+		.evidence-pagination-actions { flex-wrap: wrap; }
 		.tools-panel { margin: 1rem 0.75rem; }
 		.tool-expanded { margin: 0.75rem; max-height: 72vh; }
+		.ingest-source-row, .ingest-file-row { grid-template-columns: minmax(0, 1fr); }
+		.ingest-source-row input[type='text'] { width: 100% !important; }
+		.ingest-result-heading { flex-direction: column; gap: 0.5rem; }
 	}
 </style>

@@ -70,7 +70,61 @@ export async function downloadMedia(url: string, jobId: string): Promise<MediaDo
 /**
  * Transcribes audio file using faster-whisper.
  */
+/**
+ * Persistent faster-whisper worker (scripts/atlas/faster-whisper-asr-worker-v1.py).
+ * Set ASR_WORKER_URL=off to force the legacy per-file shim.
+ */
+const ASR_WORKER_URL = (process.env.ASR_WORKER_URL?.trim() || 'http://127.0.0.1:8093');
+const ASR_WORKER_TIMEOUT_MS = Number(process.env.ASR_WORKER_TIMEOUT_MS) || 900_000;
+
+class AsrWorkerError extends Error {
+  constructor(message: string, readonly retryable: boolean) {
+    super(message);
+    this.name = 'AsrWorkerError';
+  }
+}
+
+async function transcribeViaWorker(absoluteAudioPath: string): Promise<TranscriptionResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${ASR_WORKER_URL}/transcribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: absoluteAudioPath, word_timestamps: false, beam_size: 1 }),
+      signal: AbortSignal.timeout(ASR_WORKER_TIMEOUT_MS)
+    });
+  } catch (err) {
+    // Network failure or timeout: worker not reachable, so the shim may run.
+    throw new AsrWorkerError(`ASR worker unreachable: ${(err as Error).message}`, true);
+  }
+  if (!res.ok) {
+    // 5xx and 503 (model not loaded) can fall back; 403/413/422 are real rejections.
+    throw new AsrWorkerError(
+      `ASR worker HTTP ${res.status}: ${await res.text()}`,
+      res.status >= 500
+    );
+  }
+  const body = (await res.json()) as {
+    language: string;
+    segments: Array<{ start: number; end: number; text: string }>;
+  };
+  const chunks = body.segments.map((s) => ({ start: s.start, end: s.end, text: s.text }));
+  return { text: chunks.map((c) => c.text).join(' '), chunks, language: body.language };
+}
+
 export async function transcribeAudio(audioPath: string, jobId: string): Promise<TranscriptionResult> {
+  if (ASR_WORKER_URL.toLowerCase() !== 'off') {
+    try {
+      console.log(`[MediaProcessing] Transcribing via ASR worker: ${audioPath}`);
+      return await transcribeViaWorker(path.resolve(audioPath));
+    } catch (err) {
+      if (err instanceof AsrWorkerError && !err.retryable) {
+        throw new Error(`TRANSCRIPTION_REJECTED: ${err.message}`);
+      }
+      console.warn(`[MediaProcessing] ${(err as Error).message}; falling back to shim`);
+    }
+  }
+
   const whisperPath = ENV.WHISPER_PATH || 'whisper';
   const model = ENV.WHISPER_MODEL || 'base';
   const device = ENV.WHISPER_DEVICE || 'cpu';
@@ -94,6 +148,15 @@ export async function transcribeAudio(audioPath: string, jobId: string): Promise
     child.stdout.on('data', (data) => { stdout += data; });
     child.stderr.on('data', (data) => { stderr += data; });
 
+    child.on('data', (data) => { stdout += data; });
+    child.on('error', (err: any) => {
+      if (err.code === 'ENOENT') {
+        reject(new Error(`TRANSCRIPTION_BINARY_UNAVAILABLE: Python executable not found at ${pythonPath}`));
+      } else {
+        reject(new Error(`TRANSCRIPTION_BINARY_UNAVAILABLE: ${err.message}`));
+      }
+    });
+
     child.on('close', (code) => {
       if (code === 0) {
         try {
@@ -103,7 +166,11 @@ export async function transcribeAudio(audioPath: string, jobId: string): Promise
           reject(new Error(`Failed to parse whisper output: ${err}\nRaw: ${stdout}`));
         }
       } else {
-        reject(new Error(`Whisper shim failed with code ${code}: ${stderr}`));
+        if (stderr.includes('No module named') || stderr.includes('faster_whisper') || stderr.includes('not recognized')) {
+          reject(new Error(`TRANSCRIPTION_BINARY_UNAVAILABLE: faster-whisper not installed in environment (${stderr.trim()})`));
+        } else {
+          reject(new Error(`Whisper shim failed with code ${code}: ${stderr}`));
+        }
       }
     });
   });

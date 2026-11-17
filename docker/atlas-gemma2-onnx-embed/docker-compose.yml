@@ -1,0 +1,16 @@
+# Standalone compose for the EmbeddingGemma2 ONNX CPU challenger (:8094).
+# Not merged into docker-compose.gpu.yml. Start: docker compose -f docker/atlas-gemma2-onnx-embed/docker-compose.yml up -d --build
+services:
+  atlas-gemma2-onnx-embed:
+    build:
+      context: ../..
+      dockerfile: docker/atlas-gemma2-onnx-embed/Dockerfile
+    image: atlas-gemma2-onnx-embed:v1
+    container_name: atlas-gemma2-onnx-embed
+    ports:
+      - "127.0.0.1:8094:8094"
+    volumes:
+      - ../../models/embeddinggemma2/onnx-q8:/models/embeddinggemma2/onnx-q8:ro
+    environment:
+      ORT_INTRA_THREADS: "8"
+    restart: unless-stopped

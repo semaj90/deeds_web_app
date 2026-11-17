@@ -28,6 +28,11 @@ import { PHASE18_RERANKER_TOOL_SCHEMA, handlePhase18RerankerToolCall } from './t
 import { ATLAS_IDENTITY_AUDIT_SCHEMA, ATLAS_CROSS_STORE_PROOF_SCHEMA, handleAtlasIdentityAudit, handleAtlasCrossStoreProof } from './atlas_identity_audit_tools.js';
 import { ATLAS_SEMANTIC_TOOL_DEFINITIONS, handleAtlasSemanticToolCall } from '$lib/server/atlas/atlas-semantic-tools.js';
 import { phase109aTools, getPhase109aToolDefinitions } from '$lib/server/mcp/phase109a-mcp-tools.js';
+import {
+  EVIDENCE_CANVAS_DHASH_MCP_TOOL_DEFINITIONS,
+  handleEvidenceCanvasDhashMcpToolCall,
+  isEvidenceCanvasDhashMcpToolName,
+} from '$lib/server/mcp/evidence-canvas-dhash-mcp-tools-v1.js';
 
 const SCHEMA_INDEXER_CONTRACT_CARDS_PATH = join(process.cwd(), 'memory', 'knowledge', 'schema-indexer-contract-cards.jsonl');
 
@@ -826,6 +831,7 @@ export function setupToolHandlers() {
         inputSchema: ATLAS_CROSS_STORE_PROOF_SCHEMA.strict().passthrough() as any,
       },
       ...ATLAS_SEMANTIC_TOOL_DEFINITIONS,
+      ...EVIDENCE_CANVAS_DHASH_MCP_TOOL_DEFINITIONS,
       {
         name: 'codebase:explain_cluster',
         description:
@@ -2875,55 +2881,44 @@ export function setupToolHandlers() {
       }
 
       case 'transcribe_audio': {
+        // Routed through the faster-whisper ASR worker (:8093) via media-processing,
+        // not the Docling module (its container is not running). Writes the buffer to
+        // a unique file under an allowed worker root, transcribes, then removes it.
         const { evidenceId, audioUrl } = args as { evidenceId: string; audioUrl: string };
-        const { transcribeAudio, isDoclingAvailable } = await import('../lib/server/docling.js');
-
-        if (!(await isDoclingAvailable())) {
+        const { transcribeAudio } = await import('../lib/server/analysis/media-processing.js');
+        const { writeFile, rm, mkdir } = await import('node:fs/promises');
+        const nodePath = await import('node:path');
+        const audioBuffer = await mcpGetFile(audioUrl);
+        const ext = (audioUrl.split('.').pop()?.toLowerCase() || 'wav').replace(/[^a-z0-9]/g, '') || 'wav';
+        const mediaDir = nodePath.resolve(process.cwd(), 'temp', 'media');
+        await mkdir(mediaDir, { recursive: true });
+        const tmpPath = nodePath.join(mediaDir, `mcp-asr-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`);
+        try {
+          await writeFile(tmpPath, audioBuffer);
+          const result = await transcribeAudio(tmpPath, String(evidenceId));
+          const wordCount = result.text.split(/\s+/).filter(Boolean).length;
           return {
             content: [
               {
                 type: 'text',
                 text: JSON.stringify({
-                  error: 'Docling ASR unavailable — python/docling_analyze.py not found',
                   evidenceId,
+                  transcript: result.text,
+                  language: result.language,
+                  wordCount,
+                  segments: result.chunks,
                 }),
               },
             ],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ error: `ASR transcription failed: ${(err as Error).message}`, evidenceId }) }],
             isError: true,
           };
+        } finally {
+          await rm(tmpPath, { force: true });
         }
-
-        // Fetch audio from SeaweedFS
-        const audioBuffer = await mcpGetFile(audioUrl);
-
-        // Detect MIME from extension
-        const ext = audioUrl.split('.').pop()?.toLowerCase() || '';
-        const mimeMap: Record<string, string> = {
-          mp3: 'audio/mpeg',
-          wav: 'audio/wav',
-          m4a: 'audio/mp4',
-          ogg: 'audio/ogg',
-          flac: 'audio/flac',
-        };
-        const mimeType = mimeMap[ext] || 'audio/wav';
-
-        const result = await transcribeAudio(audioBuffer, mimeType);
-        const wordCount = result.fullText.split(/\s+/).filter(Boolean).length;
-
-        return {
-          content: [
-            {
-              type: 'text',
-              text: JSON.stringify({
-                evidenceId,
-                transcript: result.fullText,
-                wordCount,
-                blocks: result.blocks,
-                processingTimeMs: result.processingTimeMs,
-              }),
-            },
-          ],
-        };
       }
 
       case 'evidence:analyze': {
@@ -5545,6 +5540,16 @@ export function setupToolHandlers() {
         name === 'atlas.delegate'
       ) {
         const result = await handleAtlasSemanticToolCall(name, args as Record<string, unknown>);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+          isError: !result.ok,
+        };
+      }
+      if (isEvidenceCanvasDhashMcpToolName(name)) {
+        const result = await handleEvidenceCanvasDhashMcpToolCall(
+          name,
+          (args ?? {}) as Record<string, unknown>
+        );
         return {
           content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
           isError: !result.ok,

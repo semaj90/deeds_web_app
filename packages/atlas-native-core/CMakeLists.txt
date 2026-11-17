@@ -20,6 +20,10 @@ if(ATLAS_NATIVE_BUILD_TESTS)
   add_executable(atlas_memory_registry_smoke tests/memory_registry_smoke.cc)
   target_link_libraries(atlas_memory_registry_smoke PRIVATE atlas_native_core)
   add_test(NAME atlas_memory_registry_smoke COMMAND atlas_memory_registry_smoke)
+
+  add_executable(nes_fsm_runtime_parity_smoke tests/nes_fsm_runtime_parity_smoke.cc)
+  target_link_libraries(nes_fsm_runtime_parity_smoke PRIVATE atlas_native_core)
+  add_test(NAME nes_fsm_runtime_parity_smoke COMMAND nes_fsm_runtime_parity_smoke)
   find_program(ATLAS_NODE_EXECUTABLE node)
   if(ATLAS_NODE_EXECUTABLE)
     add_test(NAME atlas_tensor_tile_protobuf_runtime_parity

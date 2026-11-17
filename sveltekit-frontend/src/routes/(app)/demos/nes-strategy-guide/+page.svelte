@@ -61,7 +61,7 @@
 	<title>NES CHROM 97 Strategy Guide & Cartridge Registry</title>
 </svelte:head>
 
-<div class="strategy-guide-page p-6 max-w-7xl mx-auto">
+<div class="strategy-guide-page keep-dark-shell p-6 max-w-7xl mx-auto">
 	<header class="mb-6 border-b border-sand/20 pb-4">
 		<div class="flex items-center gap-3 mb-2">
 			<span class="text-3xl">🎮</span>

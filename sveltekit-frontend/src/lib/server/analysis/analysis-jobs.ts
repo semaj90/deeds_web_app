@@ -681,3 +681,17 @@ export async function getJobCounts(): Promise<Record<string, number>> {
 
   return result;
 }
+
+/**
+ * Persists a bounded 0-100 percentage for a running job. Only `running` rows are updated,
+ * so a late progress callback cannot overwrite a terminal status.
+ */
+export async function updateAnalysisJobProgressV1(jobId: string, percent: number): Promise<boolean> {
+  const bounded = Math.max(0, Math.min(100, Math.round(percent)));
+  const result = await db.execute(sql`
+    UPDATE public.analysis_jobs SET progress = ${String(bounded)}, updated_at = now()
+    WHERE id = ${jobId}::uuid AND status = 'running'
+    RETURNING id::text
+  `);
+  return pgRows(result).length > 0;
+}

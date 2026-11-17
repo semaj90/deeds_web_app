@@ -3,6 +3,7 @@ export type EvidenceModality = 'video' | 'audio' | 'image' | 'document';
 export type IngestStatus = 'queued' | 'processing' | 'completed' | 'failed';
 
 export interface VideoIngestRequest {
+  evidenceId?: string;
   caseId: string;
   title?: string;
   description?: string;
@@ -19,6 +20,13 @@ export interface VideoTranscriptChunk {
   model: string;
   language?: string;
   translatedText?: string;
+  words?: VideoTranscriptWord[];
+}
+
+export interface VideoTranscriptWord {
+  startMs: number;
+  endMs: number;
+  text: string;
 }
 
 export interface VideoSummaryResult {
@@ -54,7 +62,17 @@ export interface VideoIngestResult {
   storageUri: string;
   transcriptCount: number;
   summary: string;
-  searchIndexStatus: 'indexed' | 'failed' | 'not_applicable';
+  searchIndexStatus: 'indexed' | 'failed' | 'deferred' | 'not_applicable';
+}
+
+export interface VideoAdmissionResultV1 {
+  ok: true;
+  evidenceId: string;
+  jobId: string;
+  status: 'queued';
+  sourceRevision: string;
+  fileName: string;
+  storageUri: string;
 }
 
 export interface QdrantEvidencePayload {

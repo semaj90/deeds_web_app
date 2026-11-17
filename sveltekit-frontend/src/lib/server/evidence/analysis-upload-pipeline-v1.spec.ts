@@ -99,6 +99,26 @@ describe('DB-backed evidence upload pipeline contract', () => {
 		})).rejects.toThrow('ANALYSIS_UPLOAD_CANONICAL_RECEIPT_INVALID');
 	});
 
+	it('accepts a zero-vector video receipt only when canonical persistence was verified', async () => {
+		const processEvidence = vi.fn().mockResolvedValue({
+			chunkCount: 0,
+			persistedCount: 0,
+			sourceRevision: sourceSha256,
+			canonicalReceiptVerified: true,
+			canonicalStore: 'postgresql.evidence+audio_transcripts+whisper_segments',
+		});
+		const result = await executeAnalysisUploadPipelineV1({
+			evidenceId, analysisJobId, metadata, processEvidence,
+		});
+		expect(result).toMatchObject({
+			status: 'processed',
+			canonicalReceiptVerified: true,
+			canonicalStore: 'postgresql.evidence+audio_transcripts+whisper_segments',
+			chunkCount: 0,
+			persistedCount: 0,
+		});
+	});
+
 	it('forwards source-processing stage updates without changing the canonical receipt', async () => {
 		const stages = ['source_fetch', 'text_extraction', 'content_analysis', 'canonical_indexing'] as const;
 		const onProgress = vi.fn();

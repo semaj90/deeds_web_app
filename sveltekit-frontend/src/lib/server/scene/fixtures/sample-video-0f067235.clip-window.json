@@ -1,0 +1,527 @@
+{
+ "schema": "atlas.scene-clip-window-fixture.v1",
+ "provenance": {
+  "evidenceId": "0f067235-4957-4783-82a5-ad93bd71daab",
+  "endpoint": "GET /api/video/analysis/{evidenceId}",
+  "sourceRevision": "sha256:f2c64f35ea2b85f8af703988ba16291c38075995c8cbf6150502cd838a04bf03",
+  "analysisRevision": "video-analysis-v1:a017f002bc5eab3e7d6d62ab01080432dfd8393b3482115e87735e8775442262",
+  "analysisJobId": "efef9519-cf3d-4630-9e75-b130841d76fe",
+  "capturedFrom": "live app read on 2026-11-16, not a mock"
+ },
+ "durationSec": 614.781,
+ "transcriptSegments": [
+  {
+   "startMs": 0,
+   "endMs": 4400,
+   "text": "Both of these are font size 16 pixels, same browser. Why don't they match?"
+  },
+  {
+   "startMs": 5760,
+   "endMs": 13680,
+   "text": "Or this, write the word office on a web page, six characters typed, four shapes drawn. Why not six?"
+  },
+  {
+   "startMs": 15360,
+   "endMs": 23120,
+   "text": "Or this, the same font scaled from 12 pixels to 2,000, sharp at every size every time."
+  },
+  {
+   "startMs": 23120,
+   "endMs": 31120,
+   "text": "All of this comes from a file with a .ttf or .waf2 extension, but you probably have never looked"
+  },
+  {
+   "startMs": 31120,
+   "endMs": 39120,
+   "text": "inside one. So let's look. A font file is basically a database of shapes, plus a bunch of metadata"
+  },
+  {
+   "startMs": 39120,
+   "endMs": 46720,
+   "text": "explaining how to use them. There are five main parts. First, the letter forms themselves. They aren't"
+  },
+  {
+   "startMs": 46720,
+   "endMs": 53600,
+   "text": "stored as pixel images. They're vector outlines, mathematical descriptions of curves. Bezier curves"
+  },
+  {
+   "startMs": 53600,
+   "endMs": 60160,
+   "text": "mostly, defined by points and handles. True type fonts use quadratic bezier's, open type can also"
+  },
+  {
+   "startMs": 60160,
+   "endMs": 68000,
+   "text": "use cubic, which answers the third puzzle from the intro. Scale a font to any size and it stays sharp"
+  },
+  {
+   "startMs": 68000,
+   "endMs": 74720,
+   "text": "because the file doesn't store the letter A. It stores the recipe for the letter A. The browser"
+  },
+  {
+   "startMs": 74720,
+   "endMs": 82320,
+   "text": "cooks it fresh every time, at whatever size you need. Okay, so the file has all these shapes."
+  },
+  {
+   "startMs": 82320,
+   "endMs": 87680,
+   "text": "How does it know which one to draw for which letter you typed? That's what the character map"
+  },
+  {
+   "startMs": 87680,
+   "endMs": 95120,
+   "text": "does, the CMAP table. It's the lookup that says Code.72 is the letter H, draw this glyph."
+  },
+  {
+   "startMs": 96880,
+   "endMs": 101680,
+   "text": "You've probably noticed that sometimes one character in a sentence looks slightly off,"
+  },
+  {
+   "startMs": 101680,
+   "endMs": 106880,
+   "text": "different style, different weight than the letters around it. What's happening is the CMAP"
+  },
+  {
+   "startMs": 106880,
+   "endMs": 113280,
+   "text": "doesn't have an entry for that character, usually a less common currency symbol or emoji."
+  },
+  {
+   "startMs": 113280,
+   "endMs": 120080,
+   "text": "So the browser grabs it from a different font, just for that one glyph. Same paragraph, different font"
+  },
+  {
+   "startMs": 120080,
+   "endMs": 128880,
+   "text": "for one character. Back to those two hellos from the intro. Same font size, different visual size."
+  },
+  {
+   "startMs": 128880,
+   "endMs": 135840,
+   "text": "Why? When you write font size 16 pixels, you're not setting the height of the letters."
+  },
+  {
+   "startMs": 135840,
+   "endMs": 142640,
+   "text": "You're setting the height of the inbox. An invisible design grid, the typeface lives inside,"
+  },
+  {
+   "startMs": 142640,
+   "endMs": 149600,
+   "text": "and different fonts fill that grid in different ways. Where the baseline sits, how tall the"
+  },
+  {
+   "startMs": 149600,
+   "endMs": 156960,
+   "text": "lowercase letters are, how far descenders dip below all of its decided inside the font, not by your"
+  },
+  {
+   "startMs": 156960,
+   "endMs": 164720,
+   "text": "CSS, which is why two fonts at the exact same font size can look like completely different sizes."
+  },
+  {
+   "startMs": 164720,
+   "endMs": 170720,
+   "text": "CSS doesn't care. The metrics inside the font do. One more thing,"
+  },
+  {
+   "startMs": 171280,
+   "endMs": 177120,
+   "text": "kerning. Some letter pairs leave awkward gaps when you put them next to each other. So the font"
+  },
+  {
+   "startMs": 177120,
+   "endMs": 183520,
+   "text": "ships rules to nudge them closer. Modern text fonts have thousands of these. They run on every line"
+  },
+  {
+   "startMs": 183600,
+   "endMs": 190480,
+   "text": "of text you read. Next one is hinting. We'll save for later. It's the weirdest one."
+  },
+  {
+   "startMs": 191280,
+   "endMs": 197440,
+   "text": "Okay, we know what's in the file. CSS says font family enter. Pixels show up on screen."
+  },
+  {
+   "startMs": 198080,
+   "endMs": 204240,
+   "text": "What happens between those two points? The browser picks the first font it can find from your stack."
+  },
+  {
+   "startMs": 204240,
+   "endMs": 211040,
+   "text": "That's just a quick look up. Then it goes through three stages. Shaping turns the characters you"
+  },
+  {
+   "startMs": 211040,
+   "endMs": 219200,
+   "text": "typed into a sequence of shapes to draw. Those aren't the same thing. Take office from the intro,"
+  },
+  {
+   "startMs": 219200,
+   "endMs": 226960,
+   "text": "six characters, but FFI gets drawn as one glyph in some fonts, a single design shape called a"
+  },
+  {
+   "startMs": 226960,
+   "endMs": 233760,
+   "text": "ligature. Six characters in, four glyphs out. What you typed and what gets drawn aren't the same"
+  },
+  {
+   "startMs": 233760,
+   "endMs": 240400,
+   "text": "list. And ligatures are the easy case. In Arabic, letter shapes change depending on their position"
+  },
+  {
+   "startMs": 240400,
+   "endMs": 247920,
+   "text": "in a word. Same character up to four different glyphs. Shaping is complicated enough that Chrome,"
+  },
+  {
+   "startMs": 247920,
+   "endMs": 254000,
+   "text": "Firefox and Edge all handed off to a library called Harfbuzz. Safari uses Apple's core text."
+  },
+  {
+   "startMs": 255600,
+   "endMs": 261920,
+   "text": "Now we have a list of glyph shapes, vector outlines. That's math. But your screen isn't math."
+  },
+  {
+   "startMs": 261920,
+   "endMs": 268640,
+   "text": "It's pixels. Rasterization bridges the two. It picks which pixels to turn on and how strongly."
+  },
+  {
+   "startMs": 269600,
+   "endMs": 276160,
+   "text": "At large sizes, this is easy. Plenty of room. Every stroke gets enough pixels. But it's small sizes."
+  },
+  {
+   "startMs": 276160,
+   "endMs": 283520,
+   "text": "Body text on an older monitor. Things get ugly fast. A vertical stem can land halfway between two"
+  },
+  {
+   "startMs": 283520,
+   "endMs": 289360,
+   "text": "pixel columns. Snap it to one and the letter shifts off center. Split it across both and the letter"
+  },
+  {
+   "startMs": 289360,
+   "endMs": 298320,
+   "text": "blurs. Neither looks right. This is where hinting comes in. Hinting isn't a config file. It isn't a list"
+  },
+  {
+   "startMs": 298480,
+   "endMs": 307040,
+   "text": "of values. It's bytecode. Inside, well-hunted fonts is a small program that runs on your CPU every time"
+  },
+  {
+   "startMs": 307040,
+   "endMs": 314720,
+   "text": "the font gets rasterized at a new size. TrueType has its own virtual machine built into the font"
+  },
+  {
+   "startMs": 314720,
+   "endMs": 320000,
+   "text": "rendering library of every major operating system. FreeType on Linux and Android, direct write on"
+  },
+  {
+   "startMs": 320000,
+   "endMs": 326640,
+   "text": "Windows, core text on Apple. Running tiny font programs every time something gets drawn at a new size."
+  },
+  {
+   "startMs": 328320,
+   "endMs": 334160,
+   "text": "What those programs do is tell the rasterizer at this size, snap this stem to a whole pixel,"
+  },
+  {
+   "startMs": 334160,
+   "endMs": 340960,
+   "text": "or at this size, thicken this curve so it doesn't disappear. Sometimes the type designer hand codes them,"
+  },
+  {
+   "startMs": 340960,
+   "endMs": 346880,
+   "text": "mostly an auto-hinter generates them. This is less important on retina and high DPI displays."
+  },
+  {
+   "startMs": 346880,
+   "endMs": 352800,
+   "text": "The pixel grade is fine enough that nudging things around barely shows up. But on a standard monitor,"
+  },
+  {
+   "startMs": 352800,
+   "endMs": 356880,
+   "text": "you've been reading the output of these tiny font programs your entire career."
+  },
+  {
+   "startMs": 358640,
+   "endMs": 364640,
+   "text": "A font file isn't just a database of shapes. It's a small program, with shapes attached."
+  },
+  {
+   "startMs": 366800,
+   "endMs": 373760,
+   "text": "Next stage. Vector curves don't fit cleanly onto a pixel grid. You get this jagged staircase along"
+  },
+  {
+   "startMs": 373760,
+   "endMs": 381200,
+   "text": "every diagonal and every arc. Anti-aliasing fixes it. Paint the edge pixels in shades of gray instead"
+  },
+  {
+   "startMs": 381200,
+   "endMs": 386480,
+   "text": "of pure black. Your eye reads the gradient as a smooth curve even though they're still staircase"
+  },
+  {
+   "startMs": 386480,
+   "endMs": 393920,
+   "text": "under it. Same idea in game graphics, image scaling anywhere a curved shape has to fit on a square"
+  },
+  {
+   "startMs": 393920,
+   "endMs": 400080,
+   "text": "grid. And it's the reason why text on your screen looks like text instead of jagged dots."
+  },
+  {
+   "startMs": 401680,
+   "endMs": 408640,
+   "text": "That's the theory. In practice, for most of font history, every weight of a font was its own"
+  },
+  {
+   "startMs": 408640,
+   "endMs": 416080,
+   "text": "file. Want regular, medium and bold? Three files, three downloads. Variable fonts below that"
+  },
+  {
+   "startMs": 416080,
+   "endMs": 424320,
+   "text": "up. One file, every weight, often width and slant too. The font defines an axis, usually weight,"
+  },
+  {
+   "startMs": 424320,
+   "endMs": 430960,
+   "text": "and a continuous range along it. You don't pick one of nine weights anymore, you pick any value on"
+  },
+  {
+   "startMs": 430960,
+   "endMs": 438960,
+   "text": "a slider. And in CSS, font weight accepts any number from one to one thousand, not just hundreds."
+  },
+  {
+   "startMs": 438960,
+   "endMs": 445440,
+   "text": "So when a variable font is loaded, font weight 437 is a real meaningful value. The browser"
+  },
+  {
+   "startMs": 445440,
+   "endMs": 452320,
+   "text": "interpolates that exact weight off the font's continuous axis. This works because of those vector"
+  },
+  {
+   "startMs": 452320,
+   "endMs": 457600,
+   "text": "outlines we discussed earlier. A variable font ships multiple sets of control point positions,"
+  },
+  {
+   "startMs": 457600,
+   "endMs": 462320,
+   "text": "one for each end of the axis. And the browser interpolates between them on the fly."
+  },
+  {
+   "startMs": 464240,
+   "endMs": 469760,
+   "text": "And the same approach gets you width, slant, optical size, and any custom axis the designer"
+  },
+  {
+   "startMs": 469760,
+   "endMs": 476320,
+   "text": "exposes through font variation settings. And if you're shipping three or more weights of a font,"
+  },
+  {
+   "startMs": 476320,
+   "endMs": 481760,
+   "text": "the variable file is usually smaller than the static ones combined. More flexibility, less to"
+  },
+  {
+   "startMs": 481760,
+   "endMs": 487280,
+   "text": "download. Many websites have this problem and don't know it. Page loads, text appears in a fallback"
+  },
+  {
+   "startMs": 487280,
+   "endMs": 494080,
+   "text": "font, then half a second later swaps to the brand font and the layout reflows. Google calls this"
+  },
+  {
+   "startMs": 494080,
+   "endMs": 499600,
+   "text": "cumulative layout shift. It hits your core web vital score, which factors into search ranking."
+  },
+  {
+   "startMs": 499600,
+   "endMs": 506640,
+   "text": "So this isn't just a visual annoyance. It costs traffic. And the reason is metrics. The fallback"
+  },
+  {
+   "startMs": 506640,
+   "endMs": 512080,
+   "text": "font and the custom font have different internal proportions. So when the swap happens, every line"
+  },
+  {
+   "startMs": 512080,
+   "endMs": 520320,
+   "text": "subtly resizes and the page reflows. The fix is in CSS, but barely anybody uses it. Three"
+  },
+  {
+   "startMs": 520320,
+   "endMs": 526480,
+   "text": "at font face descriptors, size adjust, a cent override, decent override. Let you override a fallback"
+  },
+  {
+   "startMs": 526480,
+   "endMs": 532800,
+   "text": "font's metrics to match your custom font. Most modern browsers support these. Match the metrics"
+  },
+  {
+   "startMs": 532800,
+   "endMs": 540640,
+   "text": "and the swap becomes invisible. Layout doesn't shift, CWV stays green. Last one. Some fonts are huge,"
+  },
+  {
+   "startMs": 540640,
+   "endMs": 546800,
+   "text": "a Noto CJK font with full Chinese, Japanese, and Korean coverage runs into the tens of megabytes."
+  },
+  {
+   "startMs": 547920,
+   "endMs": 552640,
+   "text": "And if your site is in English, you're shipping all those bytes for nothing. Every visitor"
+  },
+  {
+   "startMs": 552640,
+   "endMs": 559760,
+   "text": "downloads thousands of glyphs they will never see. Subsetting fixes this. Strip the font down to"
+  },
+  {
+   "startMs": 559760,
+   "endMs": 566000,
+   "text": "only the glyphs your page uses. Google fonts does this for you automatically. Their CSS chips fonts"
+  },
+  {
+   "startMs": 566000,
+   "endMs": 572480,
+   "text": "pre-split by unicode range. Latin, Latin extended, Cyrillic, Vietnamese, and so on. And the"
+  },
+  {
+   "startMs": 572480,
+   "endMs": 578720,
+   "text": "browser only downloads the subsets it needs. For self-hosted fonts, tools like Pi FT subset let you"
+  },
+  {
+   "startMs": 578720,
+   "endMs": 584960,
+   "text": "do the same thing offline. A typical English subset is one to two orders of magnitude smaller than"
+  },
+  {
+   "startMs": 584960,
+   "endMs": 590720,
+   "text": "the full font. This is one of the easiest performance wins on the web. Still most sites don't bother."
+  },
+  {
+   "startMs": 591200,
+   "endMs": 596480,
+   "text": "So that's what happens every time between you typing a string and seeing it on screen."
+  },
+  {
+   "startMs": 597200,
+   "endMs": 603040,
+   "text": "A type designer's curves encoded into a small program executed by your browser against a pixel"
+  },
+  {
+   "startMs": 603040,
+   "endMs": 609040,
+   "text": "grid, so a few thousand pixels could light up in roughly the right places. And it happens fast enough"
+  },
+  {
+   "startMs": 609040,
+   "endMs": 619760,
+   "text": "that we don't notice any of it. Thanks for watching and see you in the next one."
+  }
+ ],
+ "sceneCutsSec": [
+  0,
+  15.36,
+  20.493,
+  30.739,
+  40.985,
+  51.232,
+  60.16,
+  71.724,
+  81.971,
+  92.217,
+  101.68,
+  112.71,
+  120.08,
+  133.203,
+  142.64,
+  153.695,
+  163.942,
+  171.28,
+  183.6,
+  191.28,
+  204.24,
+  211.04,
+  225.42,
+  233.76,
+  240.4,
+  255.6,
+  261.92,
+  276.16,
+  283.52,
+  297.144,
+  307.04,
+  314.72,
+  320,
+  334.16,
+  340.96,
+  352.8,
+  366.8,
+  373.76,
+  381.2,
+  393.92,
+  401.68,
+  416.08,
+  420.1,
+  430.347,
+  440.593,
+  450.839,
+  461.086,
+  471.332,
+  481.578,
+  491.825,
+  502.071,
+  512.08,
+  520.32,
+  532.8,
+  540.64,
+  552.64,
+  563.549,
+  572.48,
+  584.042,
+  591.2,
+  603.04
+ ]
+}

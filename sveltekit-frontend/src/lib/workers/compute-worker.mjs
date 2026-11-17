@@ -948,6 +948,67 @@ function runSchemaEncode({ sharedFeatures, sharedScores, features, docs, n }) {
 	return sharedScores ? { n: count, shared: true } : { scores: Array.from(scores), n: count };
 }
 
+const ALLOWED_VERIFIER_COMMAND_PREFIXES = [
+	'npm exec -- vitest run',
+	'npx vitest run',
+	'node --test',
+	'node scripts/atlas/verify-',
+	'node scripts/atlas/audit-',
+	'npm run check',
+	'npm run test',
+	'pytest',
+	'ctest',
+];
+
+function runVerifierCommandValidate(payload) {
+	const command = typeof payload?.command === 'string' ? payload.command.trim() : '';
+	const makeRes = (valid, prefix, reason) => ({
+		schema: 'atlas.verifier-command-validate.v1',
+		valid,
+		command,
+		prefix,
+		reason,
+		canonicalWritesAllowed: false,
+	});
+	if (!command) return makeRes(false, null, 'EMPTY_VERIFIER_CMD');
+	if (/[;&|`$><\r\n]/.test(command)) return makeRes(false, null, 'SHELL_METACHARACTERS_FORBIDDEN');
+	if (/(?:^|\s)--(?:apply|write|execute|force|live)(?:\s|$)/i.test(command)) {
+		return makeRes(false, null, 'MUTATION_FLAG_FORBIDDEN');
+	}
+	if (/(?:^|\s)(?:-e|-c|--eval)(?:\s|$)/i.test(command)) {
+		return makeRes(false, null, 'INLINE_EXEC_FLAG_FORBIDDEN');
+	}
+	const prefix = ALLOWED_VERIFIER_COMMAND_PREFIXES.find((p) => command.startsWith(p)) ?? null;
+	if (!prefix) return makeRes(false, null, 'VERIFIER_RUNNER_NOT_ALLOWLISTED');
+	return makeRes(true, prefix, 'VALID_ALLOWLISTED_VERIFIER');
+}
+
+function runVerifierTierClassify(payload) {
+	const taskKey = typeof payload?.taskKey === 'string' ? payload.taskKey : '';
+	const isCheckbox = payload?.isCheckbox !== false;
+	const makeRes = (tier, verifierValid, reason) => ({
+		schema: 'atlas.verifier-tier-classify.v1',
+		taskKey,
+		tier,
+		verifierValid,
+		reason,
+		canonicalWritesAllowed: false,
+	});
+	if (!isCheckbox) {
+		return makeRes('STALE_NON_CHECKBOX_LOCATOR', false, 'TARGET_LINE_NOT_A_MARKDOWN_CHECKBOX');
+	}
+	if (payload?.runnableCommand) {
+		const cmdCheck = runVerifierCommandValidate({ command: payload.runnableCommand });
+		if (cmdCheck.valid) {
+			return makeRes('T0_RUNNABLE_VERIFIER', true, cmdCheck.reason);
+		}
+	}
+	if (Array.isArray(payload?.specFilesOnDisk) && payload.specFilesOnDisk.length > 0) {
+		return makeRes('T1_SPEC_FILE_ON_DISK', false, 'SPEC_FILE_EXISTS_WITHOUT_RUNNABLE_T0_COMMAND');
+	}
+	return makeRes('T2_DIAGNOSE_ONLY', false, 'NO_RUNNABLE_VERIFIER_OR_SPEC_TARGET');
+}
+
 const HANDLERS = {
 	kmeans:                   runKMeans,
 	som:                      runSOM,
@@ -971,6 +1032,8 @@ const HANDLERS = {
 	'schema.encode':          runSchemaEncode,
 	'hamming128.proposal':    runHamming128Proposal,
 	'som.radix-order.proposal': runSomRadixOrderProposal,
+	'verifier.command.validate': runVerifierCommandValidate,
+	'verifier.tier.classify': runVerifierTierClassify,
 };
 
 parentPort?.on('message', (msg) => {

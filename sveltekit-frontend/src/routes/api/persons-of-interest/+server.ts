@@ -16,7 +16,25 @@ const createPOISchema = z.object({
   relationship: z.string().max(500).optional(),
   crimes: z.array(z.string()).optional(),
   caseIds: z.array(z.string()).optional(),
+  /** Primary case this person is being added to. Must be a case the user owns. */
+  caseId: z.string().uuid().optional(),
+  // Who / what / why / how: analyst-entered text (typed or imported from a .txt intake note).
+  who: z.string().max(5000).optional(),
+  what: z.string().max(5000).optional(),
+  why: z.string().max(5000).optional(),
+  how: z.string().max(5000).optional(),
+  intakeSource: z.enum(['manual', 'txt_import']).default('manual'),
+  intakeFileName: z.string().max(255).optional(),
+  notes: z.string().max(5000).optional(),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(z.literal('')),
+  address: z.string().max(500).optional(),
 });
+
+/** Stored shape of the who/what/why/how jsonb columns when a person enters them. */
+function intakeSection(text: string | undefined, source: 'manual' | 'txt_import') {
+  const trimmed = text?.trim();
+  return trimmed ? { text: trimmed, source, authority: 'ANALYST_ENTERED' as const } : null;
+}
 
 const poiListSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -24,6 +42,7 @@ const poiListSchema = z.object({
   search: z.string().max(500).optional().default(''),
   status: z.enum(['surveillance', 'wanted', 'active', 'cleared']).or(z.literal('')).default(''),
   threatLevel: z.enum(['low', 'medium', 'high', 'critical']).or(z.literal('')).default(''),
+  caseId: z.string().uuid().optional(),
 });
 
 /**
@@ -38,14 +57,23 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
     search: url.searchParams.get('search')?.trim(),
     status: url.searchParams.get('status') ?? undefined,
     threatLevel: url.searchParams.get('threatLevel') ?? undefined,
+    caseId: url.searchParams.get('caseId') ?? undefined,
   });
   if (!parsed.success)
     return json({ error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
-  const { page, limit, search, status, threatLevel } = parsed.data;
+  const { page, limit, search, status, threatLevel, caseId } = parsed.data;
   const offset = (page - 1) * limit;
 
   try {
     const conditions = [or(eq(personsOfInterest.createdBy, Number(locals.user.id)), isNull(personsOfInterest.createdBy))];
+    if (caseId) {
+      conditions.push(
+        or(
+          eq(personsOfInterest.caseId, caseId),
+          sql`${personsOfInterest.caseIds} @> ARRAY[${caseId}]::text[]`
+        )!
+      );
+    }
     if (status)
       conditions.push(
         eq(personsOfInterest.status, status as (typeof personsOfInterest.status.enumValues)[number])
@@ -135,9 +163,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
     }
 
-    if (parsed.data.caseIds?.length) {
-      const validCaseIds = parsed.data.caseIds.filter((caseId) => isUuid(caseId));
-      if (validCaseIds.length !== parsed.data.caseIds.length) {
+    // The primary case is always part of the linked-case list, and is ownership-checked with it.
+    const requestedCaseIds = [...new Set([
+      ...(parsed.data.caseId ? [parsed.data.caseId] : []),
+      ...(parsed.data.caseIds ?? []),
+    ])];
+
+    if (requestedCaseIds.length) {
+      const validCaseIds = requestedCaseIds.filter((caseId) => isUuid(caseId));
+      if (validCaseIds.length !== requestedCaseIds.length) {
         return json({ error: 'Invalid case ID format' }, { status: 400 });
       }
 
@@ -161,7 +195,21 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         aliases: parsed.data.aliases ?? [],
         relationship: parsed.data.relationship ?? null,
         crimes: parsed.data.crimes ?? [],
-        caseIds: parsed.data.caseIds ?? [],
+        caseIds: requestedCaseIds,
+        caseId: parsed.data.caseId ?? null,
+        who: intakeSection(parsed.data.who, parsed.data.intakeSource),
+        what: intakeSection(parsed.data.what, parsed.data.intakeSource),
+        why: intakeSection(parsed.data.why, parsed.data.intakeSource),
+        how: intakeSection(parsed.data.how, parsed.data.intakeSource),
+        notes: parsed.data.notes?.trim() || null,
+        profileData: {
+          ...(parsed.data.dateOfBirth ? { dateOfBirth: parsed.data.dateOfBirth } : {}),
+          ...(parsed.data.address?.trim() ? { address: parsed.data.address.trim() } : {}),
+        },
+        metadata: {
+          intakeSource: parsed.data.intakeSource,
+          ...(parsed.data.intakeFileName ? { intakeFileName: parsed.data.intakeFileName } : {}),
+        },
         createdBy: Number(locals.user.id),
       })
       .returning();

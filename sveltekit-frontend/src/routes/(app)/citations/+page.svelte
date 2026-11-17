@@ -944,7 +944,7 @@
   /* ── Citations page layout ── */
   .citations-page {
     min-height: 100vh;
-    background: #0e0d0b;
+    background: var(--rs-bg, #0e0d0b);
     margin: -2.5rem;
     padding: 2rem max(1.5rem, calc(50% - 36rem));
   }
@@ -975,23 +975,23 @@
     width: 2.75rem;
     height: 2.75rem;
     border-radius: 0.625rem;
-    background: linear-gradient(135deg, rgba(96, 165, 250, 0.15), rgba(167, 139, 250, 0.15));
-    border: 1px solid rgba(96, 165, 250, 0.25);
-    color: rgba(96, 165, 250, 0.9);
+    background: linear-gradient(135deg, rgb(var(--rs-accent, 96 165 250) / 0.15), rgba(167, 139, 250, 0.15));
+    border: 1px solid rgb(var(--rs-accent, 96 165 250) / 0.25);
+    color: rgb(var(--rs-accent, 96 165 250) / max(0.9, var(--rs-min-a, 0)));
     flex-shrink: 0;
     margin-top: 0.125rem;
   }
   .cit-title {
     font-size: 1.375rem;
     font-weight: 700;
-    color: rgba(212, 199, 163, 0.95);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.95, var(--rs-min-a, 0)));
     letter-spacing: -0.01em;
     margin: 0;
     line-height: 1.3;
   }
   .cit-subtitle {
     font-size: 0.75rem;
-    color: rgba(212, 199, 163, 0.4);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.4, var(--rs-min-a, 0)));
     margin-top: 0.125rem;
     letter-spacing: 0.04em;
   }
@@ -1004,7 +1004,7 @@
   }
   .cit-meta-line {
     font-size: 0.625rem;
-    color: rgba(212, 199, 163, 0.22);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.22, var(--rs-min-a, 0)));
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     letter-spacing: 0.02em;
   }
@@ -1015,8 +1015,8 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.625rem 0.875rem;
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(212, 199, 163, 0.08);
+    background: rgb(var(--rs-shade, 0 0 0) / 0.25);
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.08);
     border-radius: 0.5rem;
     margin-bottom: 1rem;
   }
@@ -1025,10 +1025,10 @@
     align-items: center;
     gap: 0.375rem;
     font-size: 0.6875rem;
-    color: rgba(212, 199, 163, 0.5);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.5, var(--rs-min-a, 0)));
   }
   .cit-stat strong {
-    color: rgba(212, 199, 163, 0.85);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.85, var(--rs-min-a, 0)));
     font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
@@ -1038,7 +1038,7 @@
   .cit-stat-divider {
     width: 1px;
     height: 1rem;
-    background: rgba(212, 199, 163, 0.12);
+    background: rgb(var(--rs-fg, 212 199 163) / 0.12);
   }
 
   /* ── Action bar ── */
@@ -1064,32 +1064,32 @@
     padding: 0.4375rem 0.75rem;
     font-size: 0.75rem;
     font-weight: 500;
-    color: rgba(212, 199, 163, 0.6);
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(212, 199, 163, 0.12);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.6, var(--rs-min-a, 0)));
+    background: rgb(var(--rs-shade, 0 0 0) / 0.2);
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.12);
     border-radius: 0.375rem;
     cursor: pointer;
     transition: all 0.15s ease;
     text-decoration: none;
   }
   .cit-btn:hover {
-    color: rgba(212, 199, 163, 0.85);
-    border-color: rgba(96, 165, 250, 0.35);
-    background: rgba(96, 165, 250, 0.08);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.85, var(--rs-min-a, 0)));
+    border-color: rgb(var(--rs-accent, 96 165 250) / 0.35);
+    background: rgb(var(--rs-accent, 96 165 250) / 0.08);
   }
   .cit-btn.active {
-    color: rgba(96, 165, 250, 0.95);
-    border-color: rgba(96, 165, 250, 0.4);
-    background: rgba(96, 165, 250, 0.12);
+    color: rgb(var(--rs-accent, 96 165 250) / max(0.95, var(--rs-min-a, 0)));
+    border-color: rgb(var(--rs-accent, 96 165 250) / 0.4);
+    background: rgb(var(--rs-accent, 96 165 250) / 0.12);
   }
   .cit-btn.primary {
-    color: rgba(96, 165, 250, 0.9);
-    border-color: rgba(96, 165, 250, 0.3);
-    background: rgba(96, 165, 250, 0.1);
+    color: rgb(var(--rs-accent, 96 165 250) / max(0.9, var(--rs-min-a, 0)));
+    border-color: rgb(var(--rs-accent, 96 165 250) / 0.3);
+    background: rgb(var(--rs-accent, 96 165 250) / 0.1);
   }
   .cit-btn.primary:hover {
-    background: rgba(96, 165, 250, 0.18);
-    border-color: rgba(96, 165, 250, 0.45);
+    background: rgb(var(--rs-accent, 96 165 250) / 0.18);
+    border-color: rgb(var(--rs-accent, 96 165 250) / 0.45);
   }
 
   /* ── Corpus tab strip ── */
@@ -1107,28 +1107,28 @@
     padding: 0.375rem 0.75rem;
     font-size: 0.6875rem;
     font-weight: 500;
-    color: rgba(212, 199, 163, 0.5);
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(212, 199, 163, 0.1);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.5, var(--rs-min-a, 0)));
+    background: rgb(var(--rs-shade, 0 0 0) / 0.25);
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.1);
     border-radius: 9999px;
     cursor: pointer;
     transition: all 0.15s ease;
   }
   .cit-corpus-tab:hover {
-    color: rgba(96, 165, 250, 0.85);
-    border-color: rgba(96, 165, 250, 0.3);
-    background: rgba(96, 165, 250, 0.06);
+    color: rgb(var(--rs-accent, 96 165 250) / max(0.85, var(--rs-min-a, 0)));
+    border-color: rgb(var(--rs-accent, 96 165 250) / 0.3);
+    background: rgb(var(--rs-accent, 96 165 250) / 0.06);
   }
   .cit-corpus-tab.active {
     color: #000;
-    background: rgba(96, 165, 250, 0.9);
-    border-color: rgba(96, 165, 250, 0.9);
+    background: rgb(var(--rs-accent, 96 165 250) / 0.9);
+    border-color: rgb(var(--rs-accent, 96 165 250) / 0.9);
     font-weight: 600;
   }
   .cit-corpus-count {
     margin-left: auto;
     font-size: 0.625rem;
-    color: rgba(212, 199, 163, 0.25);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.25, var(--rs-min-a, 0)));
     padding-right: 0.25rem;
     font-variant-numeric: tabular-nums;
   }
@@ -1139,8 +1139,8 @@
   /* ── Search / Filter Panel ── */
   .cit-search-panel {
     border-radius: 0.5rem;
-    border: 1px solid rgba(212, 199, 163, 0.08);
-    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.08);
+    background: rgb(var(--rs-shade, 0 0 0) / 0.25);
     padding: 1rem;
     margin-bottom: 1.5rem;
   }
@@ -1155,21 +1155,21 @@
     min-width: 12rem;
     padding: 0.5rem 0.75rem;
     border-radius: 0.375rem;
-    border: 1px solid rgba(212, 199, 163, 0.12);
-    background: rgba(0, 0, 0, 0.3);
-    color: rgba(212, 199, 163, 0.9);
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.12);
+    background: rgb(var(--rs-shade, 0 0 0) / 0.3);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.9, var(--rs-min-a, 0)));
     font-size: 0.875rem;
     outline: none;
     transition: border-color 0.15s;
   }
-  .cit-search-input::placeholder { color: rgba(212, 199, 163, 0.3); }
-  .cit-search-input:focus { border-color: rgba(96, 165, 250, 0.5); }
+  .cit-search-input::placeholder { color: rgb(var(--rs-fg, 212 199 163) / 0.3); }
+  .cit-search-input:focus { border-color: rgb(var(--rs-accent, 96 165 250) / 0.5); }
   .cit-search-select {
     padding: 0.5rem 0.75rem;
     border-radius: 0.375rem;
-    border: 1px solid rgba(212, 199, 163, 0.12);
-    background: rgba(0, 0, 0, 0.3);
-    color: rgba(212, 199, 163, 0.9);
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.12);
+    background: rgb(var(--rs-shade, 0 0 0) / 0.3);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.9, var(--rs-min-a, 0)));
     font-size: 0.875rem;
   }
 
@@ -1181,8 +1181,8 @@
   }
   .cit-skel-card {
     border-radius: 0.5rem;
-    border: 1px solid rgba(212, 199, 163, 0.06);
-    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.06);
+    background: rgb(var(--rs-shade, 0 0 0) / 0.2);
     padding: 1rem 1.25rem;
   }
   .cit-skel-top {
@@ -1213,7 +1213,7 @@
   .cit-error-panel {
     border-radius: 0.5rem;
     border: 1px solid rgba(248, 113, 113, 0.2);
-    background: rgba(0, 0, 0, 0.25);
+    background: rgb(var(--rs-shade, 0 0 0) / 0.25);
     padding: 1.5rem;
     text-align: center;
   }
@@ -1223,32 +1223,32 @@
   }
   .cit-empty-panel {
     border-radius: 0.5rem;
-    border: 1px solid rgba(212, 199, 163, 0.1);
-    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.1);
+    background: rgb(var(--rs-shade, 0 0 0) / 0.2);
     padding: 3rem 1.5rem;
     text-align: center;
   }
   .cit-empty-title {
     font-size: 1.125rem;
-    color: rgba(212, 199, 163, 0.5);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.5, var(--rs-min-a, 0)));
     margin-bottom: 0.5rem;
   }
   .cit-empty-desc {
     font-size: 0.875rem;
-    color: rgba(212, 199, 163, 0.3);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.3, var(--rs-min-a, 0)));
   }
 
   /* ── Citation Card ── */
   .cit-card {
     border-radius: 0.5rem;
-    border: 1px solid rgba(212, 199, 163, 0.08);
-    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.08);
+    background: rgb(var(--rs-shade, 0 0 0) / 0.2);
     padding: 1rem 1.25rem;
     cursor: pointer;
     transition: border-color 0.2s;
   }
   .cit-card:hover {
-    border-color: rgba(96, 165, 250, 0.3);
+    border-color: rgb(var(--rs-accent, 96 165 250) / 0.3);
   }
   .cit-card-top {
     display: flex;
@@ -1261,7 +1261,7 @@
     font-size: 0.875rem;
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-weight: 500;
-    color: rgba(96, 165, 250, 0.9);
+    color: rgb(var(--rs-accent, 96 165 250) / max(0.9, var(--rs-min-a, 0)));
   }
   .cit-card-actions {
     display: flex;
@@ -1274,15 +1274,15 @@
     padding: 0.125rem 0.375rem;
     border-radius: 0.25rem;
     font-size: 0.625rem;
-    color: rgba(212, 199, 163, 0.45);
-    border: 1px solid rgba(212, 199, 163, 0.1);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.45, var(--rs-min-a, 0)));
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.1);
     background: transparent;
     cursor: pointer;
     transition: all 0.15s;
   }
   .cit-mini-btn:hover {
-    border-color: rgba(96, 165, 250, 0.4);
-    color: rgba(96, 165, 250, 0.9);
+    border-color: rgb(var(--rs-accent, 96 165 250) / 0.4);
+    color: rgb(var(--rs-accent, 96 165 250) / max(0.9, var(--rs-min-a, 0)));
   }
   .cit-type-badge {
     padding: 0.125rem 0.5rem;
@@ -1291,8 +1291,8 @@
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-family: 'JetBrains Mono', ui-monospace, monospace;
-    background: rgba(212, 199, 163, 0.06);
-    color: rgba(212, 199, 163, 0.6);
+    background: rgb(var(--rs-fg, 212 199 163) / 0.06);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.6, var(--rs-min-a, 0)));
   }
   .cit-key-badge {
     padding: 0.125rem 0.5rem;
@@ -1301,20 +1301,20 @@
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-family: 'JetBrains Mono', ui-monospace, monospace;
-    background: rgba(96, 165, 250, 0.12);
-    color: rgba(96, 165, 250, 0.9);
+    background: rgb(var(--rs-accent, 96 165 250) / 0.12);
+    color: rgb(var(--rs-accent, 96 165 250) / max(0.9, var(--rs-min-a, 0)));
   }
 
   /* ── Card Body ── */
   .cit-card-principle {
     font-size: 0.875rem;
-    color: rgba(212, 199, 163, 0.75);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.75, var(--rs-min-a, 0)));
     margin-bottom: 0.5rem;
   }
   .cit-card-quote {
-    border-left: 2px solid rgba(96, 165, 250, 0.25);
+    border-left: 2px solid rgb(var(--rs-accent, 96 165 250) / 0.25);
     padding-left: 0.75rem;
-    color: rgba(212, 199, 163, 0.5);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.5, var(--rs-min-a, 0)));
     font-size: 0.75rem;
     font-style: italic;
     margin: 0 0 0.75rem;
@@ -1336,19 +1336,19 @@
     border-radius: 0.25rem;
     font-size: 0.625rem;
     font-family: 'JetBrains Mono', ui-monospace, monospace;
-    background: rgba(96, 165, 250, 0.08);
-    color: rgba(96, 165, 250, 0.7);
-    border: 1px solid rgba(96, 165, 250, 0.15);
+    background: rgb(var(--rs-accent, 96 165 250) / 0.08);
+    color: rgb(var(--rs-accent, 96 165 250) / max(0.7, var(--rs-min-a, 0)));
+    border: 1px solid rgb(var(--rs-accent, 96 165 250) / 0.15);
   }
   .cit-date-text {
     font-size: 0.625rem;
-    color: rgba(212, 199, 163, 0.3);
-    border-left: 1px solid rgba(212, 199, 163, 0.1);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.3, var(--rs-min-a, 0)));
+    border-left: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.1);
     padding-left: 0.5rem;
   }
   .cit-meta-text {
     font-size: 0.625rem;
-    color: rgba(212, 199, 163, 0.35);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.35, var(--rs-min-a, 0)));
   }
   .cit-meta-right {
     margin-left: auto;
@@ -1374,13 +1374,13 @@
     padding: 0.125rem 0.375rem;
     border-radius: 0.25rem;
     font-size: 0.625rem;
-    background: rgba(212, 199, 163, 0.04);
-    color: rgba(212, 199, 163, 0.25);
-    border: 1px solid rgba(212, 199, 163, 0.08);
+    background: rgb(var(--rs-fg, 212 199 163) / 0.04);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.25, var(--rs-min-a, 0)));
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.08);
   }
   .cit-relevance {
     font-size: 0.625rem;
-    color: rgba(212, 199, 163, 0.25);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.25, var(--rs-min-a, 0)));
   }
 
   /* ── Workflow Buttons ── */
@@ -1395,16 +1395,16 @@
     padding: 0.25rem 0.5rem;
     border-radius: 0.25rem;
     font-size: 0.625rem;
-    color: rgba(212, 199, 163, 0.5);
-    border: 1px solid rgba(212, 199, 163, 0.1);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.5, var(--rs-min-a, 0)));
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.1);
     background: transparent;
     cursor: pointer;
     transition: all 0.15s;
     text-decoration: none;
   }
   .cit-workflow-btn:hover {
-    border-color: rgba(96, 165, 250, 0.4);
-    color: rgba(96, 165, 250, 0.9);
+    border-color: rgb(var(--rs-accent, 96 165 250) / 0.4);
+    color: rgb(var(--rs-accent, 96 165 250) / max(0.9, var(--rs-min-a, 0)));
   }
 
   /* ── Tags ── */
@@ -1446,9 +1446,9 @@
     padding: 0.125rem 0.25rem;
     font-size: 0.625rem;
     border-radius: 0.25rem;
-    border: 1px solid rgba(212, 199, 163, 0.12);
-    background: rgba(0, 0, 0, 0.3);
-    color: rgba(212, 199, 163, 0.9);
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.12);
+    background: rgb(var(--rs-shade, 0 0 0) / 0.3);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.9, var(--rs-min-a, 0)));
   }
 
   /* ── Collection Dropdown ── */
@@ -1462,7 +1462,7 @@
     margin-top: 0.25rem;
     z-index: 20;
     background: rgba(19, 21, 25, 0.98);
-    border: 1px solid rgba(212, 199, 163, 0.12);
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.12);
     border-radius: 0.375rem;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     min-width: 10rem;
@@ -1473,7 +1473,7 @@
     text-align: left;
     padding: 0.375rem 0.75rem;
     font-size: 0.75rem;
-    color: rgba(212, 199, 163, 0.8);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.8, var(--rs-min-a, 0)));
     background: transparent;
     border: none;
     cursor: pointer;
@@ -1482,7 +1482,7 @@
     gap: 0.5rem;
     transition: background 0.15s;
   }
-  .cit-collection-item:hover { background: rgba(96, 165, 250, 0.08); }
+  .cit-collection-item:hover { background: rgb(var(--rs-accent, 96 165 250) / 0.08); }
   .cit-collection-dot {
     width: 0.5rem;
     height: 0.5rem;
@@ -1492,7 +1492,7 @@
   .cit-collection-empty {
     padding: 0.75rem;
     font-size: 0.75rem;
-    color: rgba(212, 199, 163, 0.4);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.4, var(--rs-min-a, 0)));
   }
 
   /* ── Selected Citation Section ── */
@@ -1508,7 +1508,7 @@
   .cit-selected-title {
     font-size: 0.875rem;
     font-weight: 600;
-    color: rgba(212, 199, 163, 0.85);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.85, var(--rs-min-a, 0)));
     margin: 0;
   }
   .cit-link-toggle {
@@ -1516,14 +1516,14 @@
   }
   .cit-link-btn {
     font-size: 0.875rem;
-    color: rgba(96, 165, 250, 0.8);
+    color: rgb(var(--rs-accent, 96 165 250) / max(0.8, var(--rs-min-a, 0)));
     background: none;
     border: none;
     cursor: pointer;
     text-decoration: none;
     transition: color 0.15s;
   }
-  .cit-link-btn:hover { color: rgba(96, 165, 250, 1); text-decoration: underline; }
+  .cit-link-btn:hover { color: rgb(var(--rs-accent, 96 165 250) / 1); text-decoration: underline; }
   .cit-link-editor {
     margin-top: 0.5rem;
   }
@@ -1531,18 +1531,18 @@
   /* ── Knowledge Base Panel ── */
   .kb-panel {
     border-radius: 0.5rem;
-    border: 1px solid rgba(96, 165, 250, 0.2);
-    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgb(var(--rs-accent, 96 165 250) / 0.2);
+    background: rgb(var(--rs-shade, 0 0 0) / 0.25);
     overflow: hidden;
   }
   .kb-header {
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid rgba(212, 199, 163, 0.08);
+    border-bottom: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.08);
   }
   .kb-title {
     font-size: 0.875rem;
     font-weight: 600;
-    color: rgba(96, 165, 250, 0.9);
+    color: rgb(var(--rs-accent, 96 165 250) / max(0.9, var(--rs-min-a, 0)));
     margin: 0;
   }
   .kb-content {
@@ -1560,29 +1560,29 @@
     flex: 1;
     padding: 0.5rem 0.75rem;
     border-radius: 0.375rem;
-    border: 1px solid rgba(212, 199, 163, 0.12);
-    background: rgba(0, 0, 0, 0.3);
-    color: rgba(212, 199, 163, 0.9);
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.12);
+    background: rgb(var(--rs-shade, 0 0 0) / 0.3);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.9, var(--rs-min-a, 0)));
     font-size: 0.875rem;
     outline: none;
     transition: border-color 0.15s;
   }
-  .kb-input::placeholder { color: rgba(212, 199, 163, 0.3); }
-  .kb-input:focus { border-color: rgba(96, 165, 250, 0.5); }
+  .kb-input::placeholder { color: rgb(var(--rs-fg, 212 199 163) / 0.3); }
+  .kb-input:focus { border-color: rgb(var(--rs-accent, 96 165 250) / 0.5); }
   .kb-status {
     font-size: 0.75rem;
-    color: rgba(212, 199, 163, 0.3);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.3, var(--rs-min-a, 0)));
     white-space: nowrap;
   }
   .kb-status.searching {
-    color: rgba(96, 165, 250, 0.8);
+    color: rgb(var(--rs-accent, 96 165 250) / max(0.8, var(--rs-min-a, 0)));
   }
   .kb-section-label {
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: rgba(212, 199, 163, 0.45);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.45, var(--rs-min-a, 0)));
     margin: 0 0 0.5rem;
   }
   .kb-results-list {
@@ -1596,14 +1596,14 @@
   .kb-result-card {
     padding: 0.75rem;
     border-radius: 0.375rem;
-    border: 1px solid rgba(212, 199, 163, 0.06);
-    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid rgb(var(--rs-fg, 212 199 163) / 0.06);
+    background: rgb(var(--rs-shade, 0 0 0) / 0.15);
   }
   .kb-hoverable {
     transition: border-color 0.15s;
   }
   .kb-hoverable:hover {
-    border-color: rgba(96, 165, 250, 0.25);
+    border-color: rgb(var(--rs-accent, 96 165 250) / 0.25);
   }
   .kb-result-head {
     display: flex;
@@ -1613,37 +1613,37 @@
   .kb-term-name {
     font-weight: 500;
     font-size: 0.875rem;
-    color: rgba(96, 165, 250, 0.9);
+    color: rgb(var(--rs-accent, 96 165 250) / max(0.9, var(--rs-min-a, 0)));
   }
   .kb-statute-name {
     font-weight: 500;
     font-size: 0.875rem;
-    color: rgba(212, 199, 163, 0.85);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.85, var(--rs-min-a, 0)));
   }
   .kb-tag {
     font-size: 0.625rem;
     padding: 0.125rem 0.375rem;
     border-radius: 0.25rem;
-    background: rgba(212, 199, 163, 0.06);
-    color: rgba(212, 199, 163, 0.45);
+    background: rgb(var(--rs-fg, 212 199 163) / 0.06);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.45, var(--rs-min-a, 0)));
   }
   .kb-mono-tag {
     font-size: 0.625rem;
     font-family: 'JetBrains Mono', ui-monospace, monospace;
-    color: rgba(96, 165, 250, 0.6);
+    color: rgb(var(--rs-accent, 96 165 250) / max(0.6, var(--rs-min-a, 0)));
   }
   .kb-score {
     font-size: 0.625rem;
-    color: rgba(212, 199, 163, 0.25);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.25, var(--rs-min-a, 0)));
     margin-left: auto;
   }
   .kb-jurisdiction {
     font-size: 0.625rem;
-    color: rgba(212, 199, 163, 0.3);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.3, var(--rs-min-a, 0)));
   }
   .kb-result-text {
     font-size: 0.75rem;
-    color: rgba(212, 199, 163, 0.55);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.55, var(--rs-min-a, 0)));
     margin-top: 0.25rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -1657,7 +1657,7 @@
     justify-content: flex-end;
   }
   .kb-empty {
-    color: rgba(212, 199, 163, 0.35);
+    color: rgb(var(--rs-fg, 212 199 163) / max(0.35, var(--rs-min-a, 0)));
     font-size: 0.875rem;
     text-align: center;
     padding: 1rem 0;

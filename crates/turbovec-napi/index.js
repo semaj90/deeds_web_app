@@ -310,7 +310,7 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { hashSourceRefs, dedupeEdgesJson, scoreSom20X20, loadJsonlPackets, packQdrantPayloads, turbovecSmoke, hintExactCosineTopk, hintTurbovecTopk } = nativeBinding
+const { hashSourceRefs, dedupeEdgesJson, scoreSom20X20, loadJsonlPackets, packQdrantPayloads, turbovecSmoke, hintExactCosineTopk, hintTurbovecTopk, computeDhash64, batchHammingSearchTopK } = nativeBinding
 
 module.exports.hashSourceRefs = hashSourceRefs
 module.exports.dedupeEdgesJson = dedupeEdgesJson
@@ -320,3 +320,5 @@ module.exports.packQdrantPayloads = packQdrantPayloads
 module.exports.turbovecSmoke = turbovecSmoke
 module.exports.hintExactCosineTopk = hintExactCosineTopk
 module.exports.hintTurbovecTopk = hintTurbovecTopk
+module.exports.computeDhash64 = computeDhash64
+module.exports.batchHammingSearchTopK = batchHammingSearchTopK

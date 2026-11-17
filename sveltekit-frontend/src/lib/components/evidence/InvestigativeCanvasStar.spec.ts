@@ -115,4 +115,43 @@ describe('InvestigativeCanvasStar (Screenshot 1 Dossier Alignment)', () => {
 		expect(screen.queryByText(/Linked to H-01/i)).not.toBeInTheDocument();
 		expect(screen.queryByText(/Spatial alignment to E-005/i)).not.toBeInTheDocument();
 	});
+
+	it('renders uploaded images, documents, and videos with real thumbnails and dynamic relationship pills', () => {
+		render(InvestigativeCanvasStar, {
+			props: {
+				docketNumber: '#FAFA-01',
+				caseTitle: 'FAFA Evidentiary Corpus',
+				evidenceItems: [
+					{
+						id: 'ev-img-1',
+						title: 'Lobby Footprint',
+						fileType: 'image/png',
+						thumbnail: '/api/evidence/ev-img-1/download?inline=1',
+						relation: 'PLACES SUBJECT'
+					},
+					{
+						id: 'ev-vid-1',
+						title: 'Security Feed',
+						fileType: 'video/mp4',
+						relation: 'CORROBORATES'
+					},
+					{
+						id: 'ev-doc-1',
+						title: 'Witness Statement',
+						fileType: 'application/pdf',
+						relation: 'REPORTS PRESENCE'
+					}
+				]
+			}
+		});
+
+		expect(screen.getAllByText('FAFA Evidentiary Corpus').length).toBeGreaterThanOrEqual(2);
+		expect(screen.getByText('CASE THEORY')).toBeInTheDocument();
+		expect(screen.getAllByText('PLACES SUBJECT').length).toBeGreaterThanOrEqual(1);
+		expect(screen.getAllByText('CORROBORATES').length).toBeGreaterThanOrEqual(1);
+		expect(screen.getAllByText('REPORTS PRESENCE').length).toBeGreaterThanOrEqual(1);
+		const thumbs = screen.getAllByAltText('Lobby Footprint');
+		expect(thumbs.length).toBeGreaterThanOrEqual(2);
+		expect(thumbs[0].getAttribute('src')).toBe('/api/evidence/ev-img-1/download?inline=1');
+	});
 });

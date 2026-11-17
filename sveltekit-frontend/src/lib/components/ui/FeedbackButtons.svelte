@@ -33,12 +33,12 @@
 	$effect(() => {
 		void queryHash; // track
 		if (!queryHash) return;
-		fetch(`/api/analytics/feedback?hash=${encodeURIComponent(queryHash)}`)
-			.then((r) => r.json())
-			.then((d: { up: number; down: number; userRating: 'up' | 'down' | null }) => {
-				up     = d.up   ?? 0;
-				down   = d.down ?? 0;
-				rating = d.userRating ?? null;
+		fetch(`/api/analytics/response-feedback?hash=${encodeURIComponent(queryHash)}`)
+			.then((r) => (r.ok ? r.json() : null))
+			.then((d: { counts: { up: number; down: number }; rating: 'up' | 'down' | null } | null) => {
+				up     = d?.counts?.up ?? 0;
+				down   = d?.counts?.down ?? 0;
+				rating = d?.rating ?? null;
 				loaded = true;
 			})
 			.catch(() => { loaded = true; });
@@ -63,10 +63,10 @@
 
 		pending = true;
 		try {
-			const res = await fetch('/api/analytics/feedback', {
+			const res = await fetch('/api/analytics/response-feedback', {
 				method:  'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body:    JSON.stringify({ queryHash, rating: newRating, pipeline, chunkIds, hyperedgeHash }),
+				body:    JSON.stringify({ queryHash, rating: newRating, pipeline, chunkIds }),
 			});
 			if (!res.ok) throw new Error('Failed');
 			const d = await res.json() as { counts: { up: number; down: number }; rating: 'up' | 'down' | null };

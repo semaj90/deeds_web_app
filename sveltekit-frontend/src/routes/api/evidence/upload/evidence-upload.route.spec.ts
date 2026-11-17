@@ -186,6 +186,9 @@ describe('POST /api/evidence/upload durable job boundary', () => {
 		}));
 		expect(mocks.createUploadedFile).toHaveBeenCalledTimes(1);
 		expect(mocks.putFileToSeaweed).toHaveBeenCalledTimes(1);
+		expect(mocks.putFileToSeaweed.mock.invocationCallOrder[0]).toBeLessThan(
+			mocks.enqueueJob.mock.invocationCallOrder[0],
+		);
 	});
 
 	it('compensates the stored object and evidence row when durable job enqueue fails', async () => {
