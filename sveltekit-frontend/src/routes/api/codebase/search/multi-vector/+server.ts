@@ -131,7 +131,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     } else if (type === 'signature') {
       results = await searchNamedVector(query, 'signature', limit);
     } else if (type === 'latent_64') {
-      results = await searchNamedVector(query, 'latent_64', limit);
+      // Gated: codebase_topology_64 payloads carry no checkpoint revision or validity field,
+      // so unvalidated latent rows cannot be excluded. Returns no results unless the
+      // operator sets ENABLE_LATENT64_LANE=1 after the collection is rebuilt with provenance.
+      if (process.env.ENABLE_LATENT64_LANE === '1') {
+        results = await searchNamedVector(query, 'latent_64', limit);
+      }
     } else if (type === 'fusion') {
       // Dual-lane fusion: content + signature, RRF blend
       const [contentResults, signatureResults] = await Promise.all([

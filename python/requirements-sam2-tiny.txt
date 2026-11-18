@@ -1,0 +1,17 @@
+# SAM 2.1 Tiny runtime for python/atlas_sam2_silhouette_runner_v1.py
+# Recorded 2026-11-17 from the working venv C:\Users\james\.venvs\sam2-tiny (--system-site-packages).
+# The torch wheels come from the cu128 index (PyTorch CUDA 12.8 builds). Confirm the index before a rebuild.
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.8.0+cu128
+torchvision==0.23.0+cu128
+numpy==2.2.6
+pillow==11.0.0
+hydra-core==1.3.8
+omegaconf==2.3.0
+antlr4-python3-runtime==4.9.3
+iopath==0.1.10
+tqdm==4.67.1
+packaging==24.2
+# Python 3.13.5 in the working venv. The SAM 2 package itself declares no Python or torch bounds.
+# Official SAM 2 source at the commit used in the smoke tests (Apache-2.0). Install with --no-deps.
+sam2 @ git+https://github.com/facebookresearch/sam2.git@2b90b9f5ceec907a1c18123530e92e794ad901a4

@@ -18281,3 +18281,31 @@ Cross-owner references: hot/warm/cold leases, prefill/KV lifetime, and GPU resid
 - Replayed the legacy v3 checkpoint on CPU over 500 seeded queries from the frozen 55,169×768 matrix. Checkpoint SHA-256 `ac5c069d714bd1b07efdbe5abb1aea993c11b3851d427c508ce76e4eebb616c5` and matrix SHA-256 `bd36c163938a661f9c0b3f68dd1a0eb7e576405268ebe9c2221df689697441b0` matched. Tie-aware recall@10 was AE 256/128/64 = 0.8880/0.8278/0.7358; same-width MRL prefix = 0.8410/0.7538/0.6208.
 - Results are optimistic diagnostic agreement with exact neighbors: query rows overlap the checkpoint's possible training data, held-out split is unavailable, and source/workspace/representation revisions are absent. `promotionEligible=false`; no training, checkpoint writes, database reads/writes, or GPU execution occurred.
 - `py -3.13 -m unittest python.test_export_frozen_semantic768_snapshot_contract -v` passed 4/4. No AE training or production promotion task is marked complete by this replay.
+
+## Latent autoencoder lineage and validity audit (2026-11-17, read-only)
+
+Scope: `latent_256`, `latent_128`, `latent_64` on `codebase_chunk_index`. Read-only SQL and file hashing; nothing written to Postgres or the checkpoint.
+
+- [x] Checkpoint file `models/nested-semantic-autoencoder/nested_semantic_autoencoder_v3_full01.pt` (5,825,981 bytes): file SHA-256 `ac5c069d…16c5`.
+- [x] Revision `d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259` recomputed from the checkpoint tensors (18 tensors; SHA-256 over sorted names and raw bytes, same method as `python/backfill_latent_256.py`). Matches the training receipt `modelChecksum`, the architecture receipt, and the revision stored on the rows.
+- [x] Architecture receipt `docs/reports/latent-checkpoint-architecture-receipt.json` identifies `legacy_v3_768_384_256`, verified 2026-11-07.
+- [x] Row census, `codebase_chunk_index` (274,465 chunks): 55,169 have `latent_256` and `latent_128`; 1,703 have `latent_64`.
+  - Validated: 1,703 rows. `latent_embedding_valid` true, timestamp set, `latent64_model` = the checkpoint revision.
+  - Unvalidated: 53,466 rows. Flag null, no timestamp, no `latent_64`, `latent64_model` = label `packet-autoencoder-768-64`. Nothing in the database links them to a checkpoint.
+  - Untouched: 219,296 rows with no latent columns populated.
+- [x] `atlas_packets.latent_64` (bytea): 7,522 of 61,718 rows. `atlas_topology_index.latent_64`: 0 of 67,189 rows.
+- [ ] Retrieval, ranking, and projection must exclude the 53,466 unvalidated latent rows until each is re-validated against a named checkpoint or regenerated under a revision-qualified recipe.
+- [ ] Replace the `packet-autoencoder-768-64` label with a checkpoint revision, or document it as a legacy label. Requires operator approval for any write.
+- [ ] Correct the checkpoint path in `docs/reports/latent-checkpoint-architecture-receipt.json`: the receipt says `python\checkpoints\…`, but the file is in `models\nested-semantic-autoencoder\`. Do not edit the receipt; record the correction here and in a new receipt.
+- [ ] Rerun `python/backfill_latent_256.py` in dry-run mode to confirm the production checksum path against the file, not just the recomputation in this audit.
+- [ ] Lineage is established at the model level only. Per-row provenance (which checkpoint and which source revision produced each row) is not recorded. Needs a revision-qualified recipe before any promotion.
+- [ ] Canonical AE: `CLAUDE.md` says the current code (768→512→256→128) has no checkpoint yet. The rows above are legacy 768→384→256 outputs, not canonical AE output.
+
+- [x] Dry-run `python/backfill_latent_256.py` (default mode; `--apply` is blocked in code with exit 78): loader revision and checksum match `d6e9395e…`; architecture `legacy_v3_768_384_256`; 55,540 eligible rows (content_embedding present and not validated against the checkpoint); first 2,000 processed, 0 written. The eligibility predicate is broader than the 53,466 unvalidated rows in the census, which is consistent.
+- [x] Live readers of latent columns: `api/codebase/search/multi-vector` (type `latent_64`, Qdrant collection `codebase_topology_64`), `api/search/fabric` (in-memory Ewin Tang scorer, experimental), `mcp/atlas_embedding_tools.ts`.
+- [x] `codebase_topology_64` (Qdrant, 105,761 points, green): named vector `latent_64`, size 64, Cosine. Payloads are 768-dimensional chunk metadata (`qdrant_vector_dim: 768`, `embedding_ref: codebase_chunks_768`, `packet_version: qdrant-backfill-v1`). No checkpoint revision or validity field, and no payload indexes. The unvalidated-row exclusion cannot be applied as a Qdrant query filter.
+- [ ] HIGH: treat the `latent_64` lane as unvalidated until `codebase_topology_64` is rebuilt with a checkpoint revision and validity field in each payload, and payload indexes on them. Either disable `type=latent_64` in the route or gate it behind an explicit flag. Rebuild needs operator approval.
+
+- [x] Backfill apply path (scratch-DB rehearsal only, schema `rehearsal_latent` in `legal_ai_live_integration_scratch`, dropped afterward; live tables untouched). Apply now needs `--apply` plus `LATENT256_APPLY_AUTHORIZED=1`. Pre-image compare-and-swap and in-transaction readback added. Results: happy path 5/5 validated and on the checkpoint revision; forced CAS conflict (one row skipped, 4 of 5 updated) raised `LATENT256_CAS_CONFLICT` with 0 rows written; forced readback mismatch (4 of 5 verified) raised `LATENT256_READBACK_MISMATCH` with 0 rows written. Dry-run and blocked-apply checks unchanged.
+- [ ] Live apply is not authorized. Needs operator approval for the 53,466 unvalidated rows, plus a backup or snapshot of the affected columns before the run.
+

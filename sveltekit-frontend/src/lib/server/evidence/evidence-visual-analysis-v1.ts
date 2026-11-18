@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import type { AnalysisPipelineResult } from '$lib/server/analysis/evidence-analysis-pipeline.js';
 import type { VLMAnalysisResult } from '$lib/server/analysis/vlm-evidence-analyzer.js';
+import sharp from 'sharp';
+import type { Sam2SilhouetteResultV1, YoloBoxV1 } from './sam2-silhouette-adapter-v1.js';
 
 const imageMimeSchema = z.enum([
 	'image/png',
@@ -36,6 +38,8 @@ export interface EvidenceVisualAnalysisDependenciesV1 {
 	getDepthConfig(): { endpoint: string; bucket: string } | null;
 	fetchDepth(url: string, imageBase64: string): Promise<unknown>;
 	uploadDepth(bucket: string, key: string, bytes: Buffer): Promise<void>;
+	/** Optional SAM 2 silhouette stage. Absent unless enabled; see sam2-production-deps-v1.ts. */
+	runSam2Silhouettes?(input: { buffer: Buffer; mimeType: string; boxes: YoloBoxV1[] }): Promise<Sam2SilhouetteResultV1>;
 }
 
 export interface EvidenceVisualAnalysisV1 {
@@ -57,6 +61,8 @@ export interface EvidenceVisualAnalysisV1 {
 		height: number;
 		processingTimeMs: number | null;
 	} | null;
+	/** Derivative 2D silhouette masks (SAM 2). Present only when the stage ran. Never canonical evidence. */
+	silhouettes?: Sam2SilhouetteResultV1['masks'];
 	stageErrors: string[];
 }
 
@@ -92,6 +98,13 @@ const defaultDependencies: EvidenceVisualAnalysisDependenciesV1 = {
 	analyzeVlm: async (input) => {
 		const { analyzeEvidenceImage } = await import('$lib/server/analysis/vlm-evidence-analyzer.js');
 		return analyzeEvidenceImage(input);
+	},
+	// Off unless SAM2_ENABLED=1. The disabled path never loads the storage module.
+	runSam2Silhouettes: async (input) => {
+		if (process.env.SAM2_ENABLED !== '1') return { status: 'MODEL_UNAVAILABLE_SKIPPED' as const, masks: [] };
+		const { createSam2SilhouetteStageFromEnvV1 } = await import('./sam2-production-deps-v1.js');
+		const stage = createSam2SilhouetteStageFromEnvV1();
+		return stage ? stage(input) : { status: 'MODEL_UNAVAILABLE_SKIPPED' as const, masks: [] };
 	},
 	getDepthConfig: () => ENV.IMAGE_SYNTHESIS_URL && ENV.SEAWEED_ARTIFACTS_BUCKET
 		? { endpoint: ENV.IMAGE_SYNTHESIS_URL, bucket: ENV.SEAWEED_ARTIFACTS_BUCKET }
@@ -223,6 +236,31 @@ export async function analyzeEvidenceImageV1(
 	const layoutRegions = pipeline?.success ? pipeline.data.yolo?.layout.regions ?? [] : [];
 	const vision = vlm?.success ? vlm.data : null;
 	const depthMap = depthSettled.status === 'fulfilled' ? depthSettled.value : null;
+	// Optional SAM 2 silhouette stage: runs only when a dependency is supplied and YOLO found objects.
+	// Boxes are normalized from source pixels (xyxy) using the source dimensions.
+	let silhouettes: Sam2SilhouetteResultV1['masks'] | undefined;
+	if (dependencies.runSam2Silhouettes && objectDetections.length > 0) {
+		try {
+			const meta = await sharp(image.buffer).metadata();
+			if (!meta.width || !meta.height || !meta.format) throw new Error('SAM2_SOURCE_DIMENSIONS_UNKNOWN');
+			const boxes: YoloBoxV1[] = objectDetections.map((detection) => ({
+				label: detection.class,
+				confidence: detection.confidence,
+				bboxNormalized: [
+					detection.bbox[0]! / meta.width!,
+					detection.bbox[1]! / meta.height!,
+					detection.bbox[2]! / meta.width!,
+					detection.bbox[3]! / meta.height!,
+				] as [number, number, number, number],
+			}));
+			const result = await dependencies.runSam2Silhouettes({ buffer: image.buffer, mimeType: `image/${meta.format}`, boxes });
+			if (result.status === 'EXECUTED') silhouettes = result.masks;
+			else if (result.status === 'FAILED') stageErrors.push('silhouette:SAM2_FAILED');
+		} catch (error) {
+			stageErrors.push(`silhouette:${boundedError(error)}`);
+		}
+	}
+
 	const completedStages = Number(pipeline?.success && pipeline.data.yolo !== null) + Number(vision !== null) + Number(depthMap !== null);
 	return {
 		schema: 'atlas.evidence-visual-analysis.v1',
@@ -235,6 +273,7 @@ export async function analyzeEvidenceImageV1(
 		visionFindings: vision?.keyFindings ?? [],
 		visionTags: vision?.suggestedTags ?? [],
 		depthMap,
+			...(silhouettes ? { silhouettes } : {}),
 		stageErrors,
 	};
 }

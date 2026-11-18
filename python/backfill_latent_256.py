@@ -124,7 +124,10 @@ def fetch_batch(conn, batch_size: int, offset: int, frozen_ids: list[str] | None
                   (CHECKPOINT_REVISION, CHECKPOINT_REVISION, batch_size, offset))
         cur.execute(
             f"""
-            SELECT id::text AS id, content_embedding
+            SELECT id::text AS id, content_embedding,
+                   latent_256_checkpoint_revision AS pre_latent256_revision,
+                   latent64_model AS pre_latent64_model,
+                   md5(content_embedding::text) AS pre_embedding_md5
             FROM codebase_chunk_index
             WHERE {id_clause} content_embedding IS NOT NULL
               AND (
@@ -174,10 +177,11 @@ def main() -> None:
     parser.add_argument("--apply", action="store_true", help="write to Postgres; default is dry-run")
     args = parser.parse_args()
 
-    if args.apply:
+    if args.apply and os.getenv("LATENT256_APPLY_AUTHORIZED") != "1":
+        # Writes need both --apply and an explicit operator authorization variable.
         print(
-            "LATENT256_APPLY_BLOCKED: per-row source/workspace revision compare-and-swap "
-            "and independent vector readback are not implemented.",
+            "LATENT256_APPLY_BLOCKED: set LATENT256_APPLY_AUTHORIZED=1 with --apply after operator approval. "
+            "Apply uses per-row pre-image compare-and-swap and in-transaction readback.",
             file=sys.stderr,
         )
         raise SystemExit(78)
@@ -280,23 +284,57 @@ def main() -> None:
             ]
 
             if args.apply:
-                with conn.cursor() as cur:
-                    psycopg2.extras.execute_batch(
-                        cur,
-                        """
-                        UPDATE codebase_chunk_index
-                        SET latent_256 = %s,
-                            latent_256_checkpoint_revision = %s,
-                            latent_64 = %s,
-                            latent64_model = %s,
-                            latent_embedding_valid = true,
-                            latent_embedding_validated_at = now()
-                        WHERE id = %s::uuid
-                        """,
-                        payload,
-                        page_size=500,
+                # Compare-and-swap: each row must still hold the pre-image we read. Any drift
+                # (another writer, changed embedding) rolls back the whole batch and fails closed.
+                cas_payload = [
+                    payload[i] + (
+                        rows[i]["pre_latent256_revision"],
+                        rows[i]["pre_latent64_model"],
+                        rows[i]["pre_embedding_md5"],
                     )
-                conn.commit()
+                    for i in range(len(rows))
+                ]
+                try:
+                    with conn.cursor() as cur:
+                        updated = 0
+                        for params in cas_payload:
+                            cur.execute(
+                                """
+                                UPDATE codebase_chunk_index
+                                SET latent_256 = %s,
+                                    latent_256_checkpoint_revision = %s,
+                                    latent_64 = %s,
+                                    latent64_model = %s,
+                                    latent_embedding_valid = true,
+                                    latent_embedding_validated_at = now()
+                                WHERE id = %s::uuid
+                                  AND latent_256_checkpoint_revision IS NOT DISTINCT FROM %s
+                                  AND latent64_model IS NOT DISTINCT FROM %s
+                                  AND md5(content_embedding::text) = %s
+                                """,
+                                params,
+                            )
+                            updated += cur.rowcount
+                        if updated != len(rows):
+                            raise RuntimeError(f"LATENT256_CAS_CONFLICT: updated {updated} of {len(rows)} rows")
+                        # Readback inside the same transaction: every row must now carry the checkpoint revision.
+                        cur.execute(
+                            """
+                            SELECT count(*) FROM codebase_chunk_index
+                            WHERE id = ANY(%s::uuid[])
+                              AND latent_256_checkpoint_revision = %s
+                              AND latent64_model = %s
+                              AND latent_embedding_valid = true
+                            """,
+                            ([r["id"] for r in rows], CHECKPOINT_REVISION, CHECKPOINT_REVISION),
+                        )
+                        verified = cur.fetchone()[0]
+                        if verified != len(rows):
+                            raise RuntimeError(f"LATENT256_READBACK_MISMATCH: verified {verified} of {len(rows)} rows")
+                    conn.commit()
+                except Exception:
+                    conn.rollback()
+                    raise
                 total_written += len(rows)
 
             total_processed += len(rows)

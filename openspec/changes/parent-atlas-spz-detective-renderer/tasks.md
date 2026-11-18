@@ -620,3 +620,70 @@ Next media-derivation UX gate (open): ask the investigator to confirm they selec
 - [ ] Live PostgreSQL/SeaweedFS readback remains open. Do not use hip centers or arbitrary body joints as ground-contact points; a reviewer must identify a valid plane contact and separately review the calibration before any scene use.
 - [x] Added `groundPlaneTrackProposals` to the existing scene-document contract and revision writer. The writer verifies the source evidence belongs to the case, checks the current source hash, and recomputes each submitted track from accepted calibration/contact history before saving. The timeline offers “Add reviewed track to scene,” appends through the existing scene revision API, and verifies a fresh GET readback. The scene panel renders only a recomputed, history-matched proposal as an equal-scale top-down plot; its 16-step color LUT denotes time order, and each point links to its source timestamp. A keyboard-accessible discrete scrubber selects only saved reviewed samples, highlights the selected marker, and updates the source-frame link without interpolating unobserved motion. Focused scene/track suites passed 45/45; the Chromium video-modal save/reload fixture passed 1/1 and the scene-panel suite passed 2/2 before scrubber addition; the focused scrubber browser test passed 1/1 afterward. Latest `npm run check:fast` reported 0 errors and 8 warnings in 2 files.
 - [ ] Live PostgreSQL/SeaweedFS authorized persistence/readback, camera-motion compensation, height recovery, metric 3D body pose, and scene-geometry alignment remain open. Browser and route storage in the fixture is mocked; this is not live-storage proof.
+
+## SAM 2 silhouette pipeline and llama-server launcher: status and next steps (2026-11-17)
+
+Scope: SAM 2.1 Tiny silhouette stage for evidence images, and the `:8090` launcher. Nothing here is live-stored or promoted. Canonical evidence is unchanged.
+
+### SAM 2 silhouette pipeline
+- [x] SAM 2.1 Hiera Tiny checkpoint at `models/sam2/sam2.1_hiera_tiny.pt`: 156,008,466 bytes (matches Meta Content-Length), SHA-256 `7402e0d8…be69` recorded. Meta publishes no hash, so this is a receipt, not a verification. License Apache-2.0.
+- [x] Isolated venv `C:/Users/james/.venvs/sam2-tiny` (`--system-site-packages`, inherits torch 2.8.0+cu128). Synthetic image and 20-frame video smoke passed on RTX 3060 Ti. Peak 597 MiB allocated for one image; CPU RAM not measured.
+- [x] `python/atlas_sam2_silhouette_runner_v1.py`: one normalized box per call, PNG mask out, no evidence, DB or storage access. CPU and CUDA masks matched on the test image.
+- [x] `sam2-subprocess-runner-v1.ts` (private temp dir, timeout, output cap, output validation), `sam2-silhouette-adapter-v1.ts` (injected ports, fail-closed), `sam2-mask-writer-v1.ts` (content-addressed `derived/sam2/<sha256>.png`, idempotent, readback), `sam2-production-deps-v1.ts` (env-gated factory). 26/26 focused specs pass.
+- [x] `evidence-visual-analysis-v1.ts` takes an optional `runSam2Silhouettes` dependency. It is off unless `SAM2_ENABLED=1`. Wired into the canonical image and document processors.
+- [ ] HIGH: `silhouettes` is returned but no caller reads it. Mask keys are not recorded against evidence, source revision, or packet, so enabling the stage would leave orphan artifacts. Needs a registry table (object key, mask SHA-256, source revision, box index, label, IoU, runner version, checkpoint SHA-256). Schema change: needs operator approval.
+- [ ] HIGH: `sam2-subprocess-runner-v1.ts` writes stdin without an `error` listener. If Python exits early, EPIPE becomes an unhandled error event. Add the listener and a spec case.
+- [ ] MEDIUM: runner imports (`torch`, `sam2`) sit outside the guarded section, so a missing module returns a generic code. Add an image size cap. The mask writer collision check compares lengths only; document it or strengthen it.
+- [ ] MEDIUM: pin the SAM 2 runtime to an exact upstream commit, and add a requirements file with exact numpy, Pillow and torch versions for the venv (currently inherited from `C:\Python313`).
+- [ ] MEDIUM: run `npm run check:fast` on the SAM 2 and evidence files; full `npm run check` before any enablement. Only the specs have run so far.
+- [ ] MEDIUM: measure runner process RAM, latency and clean shutdown; add a Node-to-Python spawn test with the real runner (current spawn tests use a fake child).
+- [ ] Visual check of the YOLOX box to SAM 2 mask overlay on the source screenshot.
+- [ ] Live artifact writes to `SAM2_ARTIFACT_BUCKET`: operator approval required. No backfill of existing evidence images.
+- [ ] Commit the SAM 2 files (currently untracked or modified on `session/2026-11-08-verified-context-live-shadow`).
+
+### llama-server launcher and `:8090` lifecycle
+- [x] Duplicate-process root cause: `dev:gpu` passes a startup profile, which bypasses the launcher early-exit. Two launchers started llama-server in the same second (PIDs 9164 and 45884, 3:52:55 PM). Stopped by PID after an idle check.
+- [x] Named single-instance mutex in `scripts/launch-turboquant.ps1`, commit `0a0e23da448`. Verified with two PowerShell processes only.
+- [x] `TURBO_EXTRA_ARGS` pass-through and speculative status flag, same commit. Regex verified on five cases; not exercised in a live launch.
+- [ ] HIGH: the profile-mismatch path stops whatever holds the port, regardless of owner. Add an owner or lock check before killing, and make `dev:gpu` respect it.
+- [ ] Live double-launch test through the real launcher (mutex end to end).
+- [ ] Live check of the status artifact with a speculative flag in `TURBO_EXTRA_ARGS`.
+- [ ] Decide whether the vision projector (`mmproj-F16.gguf`, about 1 GB VRAM) stays on by default for the `gemma4-legal-iq4xs-vlm` profile, or becomes opt-in.
+- [ ] Operator decision: the Vite dev server (PID 29720, started 3:54 PM) holds `:5173`. Stop it or keep it, then run `npm run dev:gpu` once and confirm it reuses the healthy `:8090` server.
+- [ ] Ops receipts (owed under the production-hardening restart gates). Restarts of `:8090` run this session, each by stop-by-PID after an idle `/slots` check: 9164 and 45884 stopped, PID 1188 started; 1188 stopped, PID 67612 started (vision profile); 67612 stopped, PID 48696 started (batch control); 48696 stopped, PID 8276 started (n-gram speculation); 8276 stopped, PID 45744 started (baseline, current). Each needs a receipt with `writesPerformed`.
+
+### Speculative decoding and throughput (greedy, 3 prompts, one run per config)
+- [x] Baseline 81.1 and 88.2 tok/s (two runs, about 8% spread). Batch flags `-b 512 -ub 128`: 86.0. N-gram `--spec-type ngram-simple --draft-max 8`: 85.5. Outputs identical to baseline at temperature 0. No measurable gain.
+- [ ] Draft acceptance is not observable: `/completion` returns no draft counters, and `/metrics` exposes none. Expose or derive acceptance before judging the n-gram lane.
+- [ ] Repeat the n-gram test on repetitive or code-heavy prompts, several runs each, before ruling it in or out.
+- [ ] MTP lane: no MTP-capable binary on this machine. Stock build supports only `ngram-*` types; the repo fork source has no `gemma4-assistant` support. Building a fork is an external clone and roughly 40 to 60 minutes of compile: operator approval required.
+- [ ] Drafter candidate `models/atlas-gemma4-e4b-assistant/mtp-f16/atlas-gemma4-e4b-assistant-mtp-f16.gguf` (172 MB, architecture `gemma4-assistant`, backbone 2560 matching target 2560). Same family as `models/gemma4_assistant_huggingface_7_3_26` by metadata only; checksums not compared.
+- [ ] Browser boundary: the MTP GGUF and assistant are server-side only. Browser policy tests forbid them (`browser-model-policy.spec.ts`, `gemma4-browser-mtp-readiness-v1.test.ts`).
+- [ ] Llama-server enhancement candidates not yet tested: none that need a new build. Any further change needs a stop-by-PID restart under the lifecycle gates above.
+
+- [x] SAM 2 code follow-ups (2026-11-17): subprocess runner now attaches an stdin `error` listener, with a regression spec that simulates EPIPE; the Python runner wraps torch and sam2 imports (missing module returns `SAM2_RUNNER_IMPORT_FAILED`, exit 1, verified) and caps decoded images at 40 megapixels (`SAM2_RUNNER_IMAGE_TOO_LARGE`, exit 2, verified). 27/27 SAM 2 specs pass. Uncommitted.
+- [ ] Still open for SAM 2: mask-writer collision check (length only), runtime and requirements pin, `npm run check:fast` on the SAM 2 files, Node-to-Python spawn test against the real runner, and the mask lineage registry (needs schema approval).
+
+- [x] Real Node-to-Python spawn probe (2026-11-17, base interpreter, no sam2, no GPU): valid box returned `SAM2_RUNNER_FAILED` after about 4.8 s (runner exit 1, import failed as designed); invalid box returned `SAM2_RUNNER_INVALID_REQUEST` after about 0.3 s (exit 2). Transport and error mapping confirmed end to end.
+- [x] `dev:gpu` startup banner now describes the EmbeddingGemma 2 graphs accurately. Correction to an earlier report: the adapter does use the audio graph. It exports image, audio and text embedding functions, used by the evidence image, document and durable video analysis paths. The adapter was not trimmed, because that would break those paths.
+
+
+## llama-server MTP fork build (PLANNED, NOT STARTED, needs operator approval; recorded 2026-11-17)
+
+Status: not started. The decision to build is pending. Stock `:8090` (the running baseline) is unchanged, and `LLAMA_SERVER_PATH` stays on the stock binary until the gates below pass.
+
+- [x] Gap confirmed: stock `llama-server.exe` supports only `--spec-type` ngram types (`ngram-cache`, `ngram-simple`, `ngram-map-k`, `ngram-map-k4v`, `ngram-mod`); no MTP flag.
+- [x] Gap confirmed: the repo copy `llama-cpp-turboquant-gemma4` (gitignored by `llama*/`, commit `e93b7c56f`, no built `llama-server.exe`) and the desktop copy `C:\Users\james\Desktop\llama-turboquant-gemma4` (same commit, no build output) have no `gemma4-assistant` architecture and no MTP flag.
+- [x] Drafter candidate present: `models/atlas-gemma4-e4b-assistant/mtp-f16/atlas-gemma4-e4b-assistant-mtp-f16.gguf` (172 MB, architecture `gemma4-assistant`, 4 blocks, embedding 256, backbone 2560 matching the target gemma4 2560). Same model family as `models/gemma4_assistant_huggingface_7_3_26` by metadata only; checksums not compared.
+- [ ] Verify a source candidate before cloning: the test1111 fork named in `SESSION-103-MTP-ATOMICBOT-BUILD.md` (`test1111111111111112/llama-cpp-turboquant-gemma4`), or the AtomicBot binaries. Confirm it lists `gemma4-assistant` support and an MTP flag (`--spec-type mtp` or `--mtp-head`) in `--help`. Record the commit or release hash.
+- [ ] Operator approval for the external clone or download and the compile (roughly 40 to 60 minutes on this machine).
+- [ ] Build outside the repo, in a directory such as `C:\Users\james\Desktop\llama-mtp-fork`: `cmake -B build -S . -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=86 -DCMAKE_BUILD_TYPE=Release`, then `cmake --build build --config Release -j4`. Output: `build\bin\llama-server.exe`.
+- [ ] Gate 1, capability: `--help` lists the MTP or draft flags, and the binary loads the drafter GGUF without the architecture error.
+- [ ] Gate 2, correctness: greedy (temperature 0) output matches the stock baseline token for token on the 3-prompt set, and on at least 3 repetitive or code-heavy prompts.
+- [ ] Gate 3, performance: at least 3 runs per configuration, with the spread reported (the baseline spread is about 8%). A gain must exceed that spread to count.
+- [ ] Gate 4, memory: VRAM measured with the drafter loaded alongside the vision projector (baseline 6.3 GB of 8 GB). If it does not fit, run text-only or drop the projector, and record the decision.
+- [ ] Gate 5, observability: speculation acceptance counters exposed (the stock `/completion` and `/metrics` expose none today).
+- [ ] Gate 6, operations: restart of `:8090` through `scripts/launch-turboquant.ps1` only, with an idle `/slots` check and stop by PID. The stock binary stays in place as rollback. A receipt is written with `writesPerformed` before the switch.
+- [ ] Gate 7, scope: the drafter and the fork stay server-only. The browser model policy forbids the MTP GGUF in the browser (`browser-model-policy.spec.ts`).
+- [ ] Not in scope: EmbeddingGemma 2, the Qdrant rebuild, and any change to the canonical embedding path.
+
