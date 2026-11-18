@@ -149,6 +149,33 @@ function Test-HeadroomProxyHealth {
   }
 }
 
+# -- Single-instance guard: serialize launches on :8090 ---------------------
+# Two launchers (e.g. dev:gpu and a VS Code backend task) can pass the health
+# check at the same moment and both start llama-server. A named mutex makes
+# the second launcher wait for the first, then reuse its healthy server.
+# The lock is released when this process exits.
+if (-not $StatusOnly) {
+  $script:TurboLaunchMutex = New-Object System.Threading.Mutex($false, 'Local\deeds-llama-server-8090-launch')
+  $lockHeld = $false
+  try { $lockHeld = $script:TurboLaunchMutex.WaitOne(0) }
+  catch [System.Threading.AbandonedMutexException] { $lockHeld = $true }
+  if (-not $lockHeld) {
+    Write-Host "⏳ Another launcher holds the :8090 launch lock; waiting up to 180s..." -ForegroundColor Yellow
+    try { $lockHeld = $script:TurboLaunchMutex.WaitOne(180000) }
+    catch [System.Threading.AbandonedMutexException] { $lockHeld = $true }
+    if (-not $lockHeld) {
+      Write-Host "❌ Timed out waiting for the other launcher. Not starting a second llama-server." -ForegroundColor Red
+      exit 1
+    }
+    if (Test-LlamaServerHealth) {
+      Write-Host "✅ llama-server is already running on :8090 (started by another launcher)" -ForegroundColor Green
+      Write-Host "   URL: http://127.0.0.1:8090"
+      Write-Host "   Skipping launch. A requested -StartupProfile was NOT applied; restart the server to change profile." -ForegroundColor Yellow
+      exit 0
+    }
+  }
+}
+
 if ((Test-LlamaServerHealth) -and -not $StatusOnly -and -not $PSBoundParameters.ContainsKey('StartupProfile') -and -not $env:TURBO_STARTUP_PROFILE) {
   Write-Host "✅ llama-server is already running on :8090" -ForegroundColor Green
   Write-Host "   URL: http://127.0.0.1:8090"
@@ -1539,6 +1566,19 @@ $launchAttempt = 0
 $retryReason = ''
 $ready = $false
 $proc = $null
+# Optional pass-through for experiments, e.g. TURBO_EXTRA_ARGS="--spec-type ngram-simple --draft-max 8".
+# Split on whitespace only (no shell evaluation). Unset or blank = no change.
+if ($env:TURBO_EXTRA_ARGS -and $env:TURBO_EXTRA_ARGS.Trim()) {
+    $extraArgs = $env:TURBO_EXTRA_ARGS.Trim() -split '\s+'
+    $baseArgs = $baseArgs + $extraArgs
+    Write-Host "Extra llama-server args (TURBO_EXTRA_ARGS): $($extraArgs -join ' ')" -ForegroundColor Cyan
+    # Keep the status artifact honest: a speculative flag passed here is speculative decoding.
+    $extraText = $extraArgs -join ' '
+    if ($extraText -match '--spec-type\s+(?!none\b)\S+' -or $extraText -match '--(model-)?draft') {
+        $TurboSpeculative = $true
+        $TurboDraftMode = 'extra-args'
+    }
+}
 $finalArgs = $baseArgs
 
 while ($launchAttempt -lt 2) {
