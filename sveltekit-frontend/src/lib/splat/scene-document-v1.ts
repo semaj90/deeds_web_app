@@ -194,7 +194,7 @@ export const sceneDocumentV1Schema = z.object({
 	status: z.enum(['FIXTURE', 'HYPOTHESIS', 'MEASURED']),
 	// Additive classification keeps old v1 manifest hashes readable while new
 	// revisions label the evidentiary meaning of their geometry explicitly.
-	sceneClassification: z.enum(['MEASURED_MULTI_IMAGE', 'SINGLE_IMAGE_HYPOTHESIS', 'SYNTHETIC_FIXTURE']).optional(),
+	sceneClassification: z.enum(['MEASURED_MULTI_IMAGE', 'SINGLE_IMAGE_HYPOTHESIS', 'UNLINKED_SCENE_HYPOTHESIS', 'SYNTHETIC_FIXTURE']).optional(),
 	revision: z.number().int().positive(),
 	parentManifestSha256: digest.nullable(),
 	createdAt: z.string().datetime(),
@@ -247,6 +247,14 @@ export const sceneDocumentV1Schema = z.object({
 	}
 	if (document.sceneClassification === 'SINGLE_IMAGE_HYPOTHESIS' && document.status !== 'HYPOTHESIS') {
 		context.addIssue({ code: 'custom', message: 'Single-image hypothesis classification requires HYPOTHESIS lifecycle status', path: ['sceneClassification'] });
+	}
+	if (document.sceneClassification === 'UNLINKED_SCENE_HYPOTHESIS') {
+		if (document.status !== 'HYPOTHESIS') {
+			context.addIssue({ code: 'custom', message: 'Unlinked scene hypothesis classification requires HYPOTHESIS lifecycle status', path: ['sceneClassification'] });
+		}
+		if ((document.evidenceBindings?.length ?? 0) > 0) {
+			context.addIssue({ code: 'custom', message: 'Unlinked scene hypotheses cannot claim evidence bindings', path: ['evidenceBindings'] });
+		}
 	}
 	if (document.sceneClassification === 'MEASURED_MULTI_IMAGE') {
 		const distinctSources = new Set([

@@ -1,5 +1,6 @@
 import { planarCameraCalibrationV1Schema, projectImagePointToPlaneV1, type PlanarCameraCalibrationV1 } from './planar-camera-calibration-v1.js';
 import { humanCoco17PoseSchemaV1, parsePoseObservationV1, type PoseObservationV1 } from '$lib/shared/pose-skeleton-schema-v1.js';
+import type { SceneDocumentV1 } from './scene-document-v1.js';
 
 export type ReviewedCalibrationDecisionV1 = {
 	schema: 'atlas.planar-camera-calibration-review.v1';
@@ -14,6 +15,10 @@ export type ReviewedCalibrationDecisionV1 = {
 	decision: 'ACCEPTED_FOR_SCENE_PROPOSAL' | 'REJECTED';
 	sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL' | 'NOT_ADMITTED';
 	canonicalAuthority: false;
+	/** Reviewer-confirmed fixed-camera window (null for rejected or legacy decisions). */
+	cameraFixedWindow?: { startPtsUs: number; endPtsUs: number } | null;
+	/** Stored calibration region copied at review time (audit only; derivation uses the hash-verified calibration). */
+	calibratedRegionPx?: { minX: number; minY: number; maxX: number; maxY: number } | null;
 };
 
 export type ReviewedPoseSampleV1 = {
@@ -65,6 +70,11 @@ export async function deriveReviewedGroundPlaneTrackV1(input: {
 	if (decision.calibrationSha256 !== calibrationSha256) throw new RangeError('GROUND_PLANE_CALIBRATION_HASH_MISMATCH');
 	if (parsed.validationStatus !== 'CHECKS_PASSED') throw new RangeError('GROUND_PLANE_CALIBRATION_CHECKS_REQUIRED');
 	if (input.samples.length > 4096) throw new RangeError('GROUND_PLANE_TRACK_SAMPLE_LIMIT');
+	// Scene use requires a stored calibrated region and a reviewer-confirmed fixed-camera window.
+	const region = parsed.calibratedRegionPx;
+	const window = decision.cameraFixedWindow;
+	if (!region) throw new RangeError('GROUND_PLANE_CALIBRATION_REGION_REQUIRED');
+	if (!window || window.startPtsUs > window.endPtsUs) throw new RangeError('GROUND_PLANE_CAMERA_WINDOW_REQUIRED');
 
 	const points: ReviewedGroundPlanePointV1[] = [];
 	const identities = new Set<string>();
@@ -79,7 +89,14 @@ export async function deriveReviewedGroundPlaneTrackV1(input: {
 			|| sample.canonicalAuthority !== false || !sample.groundContactReviewed
 			|| sample.groundContactDecision !== 'ACCEPTED_FOR_SCENE_PROPOSAL' || !sample.annotationRevisionId) continue;
 		if (!pose.groundContact) continue;
-		const identity = `${pose.framePtsUs}:${pose.trackId ?? ''}:${pose.trackScopeId ?? ''}`;
+		if (pose.framePtsUs < window.startPtsUs || pose.framePtsUs > window.endPtsUs) {
+			throw new RangeError('GROUND_PLANE_SAMPLE_OUTSIDE_CAMERA_WINDOW');
+		}
+		const [contactX, contactY] = pose.groundContact.imagePx;
+		if (contactX < region.minX || contactX > region.maxX || contactY < region.minY || contactY > region.maxY) {
+			throw new RangeError('GROUND_PLANE_CONTACT_OUTSIDE_CALIBRATED_REGION');
+		}
+		const identity =`${pose.framePtsUs}:${pose.trackId ?? ''}:${pose.trackScopeId ?? ''}`;
 		if (identities.has(identity)) throw new RangeError('GROUND_PLANE_TRACK_DUPLICATE_SAMPLE');
 		identities.add(identity);
 		const projection = projectImagePointToPlaneV1(parsed, {
@@ -103,7 +120,44 @@ export async function deriveReviewedGroundPlaneTrackV1(input: {
 			semantics: projection.semantics,
 		});
 	}
+	// Within one track, source time and frame index must advance together. A reordered or
+	// repeated source frame would make the track's timeline ambiguous.
+	const byTrack = new Map<string, ReviewedGroundPlanePointV1[]>();
+	for (const point of points) {
+		const key = `${point.trackScopeId ?? ''}:${point.trackId ?? ''}`;
+		byTrack.set(key, [...(byTrack.get(key) ?? []), point]);
+	}
+	for (const track of byTrack.values()) {
+		track.sort((a, b) => a.framePtsUs - b.framePtsUs);
+		for (let i = 1; i < track.length; i++) {
+			if (track[i]!.framePtsUs <= track[i - 1]!.framePtsUs || track[i]!.frameIndex <= track[i - 1]!.frameIndex) {
+				throw new RangeError('GROUND_PLANE_TRACK_NON_MONOTONIC_SOURCE_FRAMES');
+			}
+		}
+	}
 	return points.sort((a, b) => a.framePtsUs - b.framePtsUs || (a.trackId ?? '').localeCompare(b.trackId ?? ''));
+}
+
+type GroundTrackSnapshotV1 = NonNullable<SceneDocumentV1['groundPlaneTrackProposals']>[number];
+
+export function groundTrackSnapshotPointsV1(points: readonly ReviewedGroundPlanePointV1[]): GroundTrackSnapshotV1['points'] {
+	return points.map(({ frameIndex, framePtsUs, imagePx, planeM, poseAnnotationRevisionId, status }) => ({
+		frameIndex, framePtsUs, imagePx, planeM, poseAnnotationRevisionId, status,
+	}));
+}
+
+function groundContactIdentity(point: Pick<GroundTrackSnapshotV1['points'][number], 'poseAnnotationRevisionId' | 'frameIndex' | 'framePtsUs'>): string {
+	return `${point.poseAnnotationRevisionId}:${point.frameIndex}:${point.framePtsUs}`;
+}
+
+/** Compare the ordered points independently of JSONB property order. */
+export function sameGroundTrackSnapshotPointsV1(a: GroundTrackSnapshotV1['points'], b: GroundTrackSnapshotV1['points']): boolean {
+	return a.length === b.length && a.every((point, index) => {
+		const other = b[index]!;
+		return groundContactIdentity(point) === groundContactIdentity(other) && point.status === other.status &&
+			point.imagePx[0] === other.imagePx[0] && point.imagePx[1] === other.imagePx[1] &&
+			point.planeM[0] === other.planeM[0] && point.planeM[1] === other.planeM[1];
+	});
 }
 
 /** Readback adapter: derives display proposals from an authorized versions response. */
@@ -113,6 +167,7 @@ export async function deriveReviewedGroundPlaneTrackFromHistoryV1(input: {
 	caseId: string;
 	sourceRevision: string;
 	analysisRevision: string;
+	snapshot?: Pick<GroundTrackSnapshotV1, 'calibrationRevisionId' | 'trackId' | 'trackScopeId' | 'points'>;
 }): Promise<ReviewedGroundPlanePointV1[]> {
 	if (!input.history || typeof input.history !== 'object' || !Array.isArray((input.history as { versions?: unknown }).versions)) return [];
 	const versions = (input.history as { versions: unknown[] }).versions;
@@ -161,6 +216,7 @@ export async function deriveReviewedGroundPlaneTrackFromHistoryV1(input: {
 
 	let chosenCalibration: { calibration: PlanarCameraCalibrationV1; revisionId: string; decision: ReviewedCalibrationDecisionV1 } | null = null;
 	for (const [revisionId, row] of annotationById) {
+		if (input.snapshot && revisionId !== input.snapshot.calibrationRevisionId) continue;
 		const candidates = row.annotation.planarCameraCalibrations;
 		if (!Array.isArray(candidates)) continue;
 		for (const candidate of candidates) {
@@ -172,6 +228,8 @@ export async function deriveReviewedGroundPlaneTrackFromHistoryV1(input: {
 			const digest = `sha256:${Array.from(digestBytes, (byte) => byte.toString(16).padStart(2, '0')).join('')}`;
 			const decision = calibrationReviews.get(`${revisionId}:${digest}`);
 			if (decision?.decision !== 'ACCEPTED_FOR_SCENE_PROPOSAL' || decision.sceneAdmission !== 'APPROVED_FOR_SCENE_PROPOSAL') continue;
+			// Legacy accepted reviews without a window or stored region fail closed: no scene track.
+			if (!decision.cameraFixedWindow || !calibration.calibratedRegionPx) continue;
 			chosenCalibration = { calibration, revisionId, decision };
 			break;
 		}
@@ -179,6 +237,7 @@ export async function deriveReviewedGroundPlaneTrackFromHistoryV1(input: {
 	}
 	if (!chosenCalibration) return [];
 
+	const selectedContacts = input.snapshot && new Set(input.snapshot.points.map(groundContactIdentity));
 	const samples: ReviewedPoseSampleV1[] = [];
 	for (const [revisionId, row] of annotationById) {
 		const observations = row.annotation.poseObservations;
@@ -187,6 +246,8 @@ export async function deriveReviewedGroundPlaneTrackFromHistoryV1(input: {
 			try {
 				const pose = parsePoseObservationV1(raw, humanCoco17PoseSchemaV1);
 				if (pose.evidenceId !== input.evidenceId || pose.sourceRevision !== input.sourceRevision || pose.analysisRevision !== input.analysisRevision) continue;
+				if (input.snapshot && (pose.trackId !== input.snapshot.trackId || pose.trackScopeId !== input.snapshot.trackScopeId ||
+					!selectedContacts?.has(groundContactIdentity({ poseAnnotationRevisionId: revisionId, frameIndex: pose.frameIndex, framePtsUs: pose.framePtsUs })))) continue;
 				const key = `${revisionId}:${pose.framePtsUs}:${pose.trackId ?? ''}:${pose.trackScopeId ?? ''}`;
 				const review = poseReviews.get(key);
 				if (!review) continue;
@@ -200,4 +261,23 @@ export async function deriveReviewedGroundPlaneTrackFromHistoryV1(input: {
 		calibrationDecision: chosenCalibration.decision,
 		samples,
 	});
+}
+
+/** Recheck only the saved contacts, using their current review decisions. */
+export async function verifyReviewedGroundTrackSnapshotV1(input: {
+	history: unknown;
+	caseId: string;
+	proposal: GroundTrackSnapshotV1;
+}): Promise<boolean> {
+	const { history, caseId, proposal } = input;
+	try {
+		const reviewed = await deriveReviewedGroundPlaneTrackFromHistoryV1({
+			history, caseId, evidenceId: proposal.evidenceId, sourceRevision: proposal.sourceRevision,
+			analysisRevision: proposal.analysisRevision, snapshot: proposal,
+		});
+		return reviewed.length >= 2 && sameGroundTrackSnapshotPointsV1(groundTrackSnapshotPointsV1(reviewed), proposal.points);
+	} catch (cause) {
+		if (cause instanceof RangeError) return false;
+		throw cause;
+	}
 }

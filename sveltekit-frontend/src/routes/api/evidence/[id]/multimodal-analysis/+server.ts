@@ -6,6 +6,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
+import { Sam2SegmentationMaskSchemaV1 } from '$lib/server/evidence/evidence-image-analysis-contract-v1.js';
 
 const storedVisualAnalysisSchema = z.object({
 	schema: z.literal('atlas.evidence-visual-analysis.v1'),
@@ -35,6 +36,7 @@ const storedVisualAnalysisSchema = z.object({
 		processingTimeMs: z.number().finite().nonnegative().nullable(),
 	}).nullable(),
 	stageErrors: z.array(z.string().max(300)).max(30),
+	silhouettes: z.array(Sam2SegmentationMaskSchemaV1).max(8).optional(),
 }).strict();
 
 const storedImageDerivativeSchema = z.object({

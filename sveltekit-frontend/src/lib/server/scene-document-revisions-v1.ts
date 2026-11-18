@@ -1,9 +1,9 @@
 import { createHash } from 'node:crypto';
-import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull, max, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { sceneDocumentV1Schema, stableStringifySceneDocumentV1, type SceneDocumentV1 } from '$lib/splat/scene-document-v1.js';
 import { videoEventTimelineV1Schema } from '$lib/server/features/evidence/video/video-event-fusion-v1.js';
-import { deriveReviewedGroundPlaneTrackFromHistoryV1 } from '$lib/splat/reviewed-ground-plane-track-v1.js';
+import { verifyReviewedGroundTrackSnapshotV1 } from '$lib/splat/reviewed-ground-plane-track-v1.js';
 import { db } from '$lib/server/db/client.js';
 import { sceneDocumentRevisions } from '$lib/server/db/schema/scene-document-revisions.js';
 import { sceneAssets } from '$lib/server/db/schema/scene-assets.js';
@@ -139,7 +139,7 @@ export function validateSceneVideoEventBindingsV1(input: {
 export async function validateSceneGroundPlaneTrackProposalsV1(input: {
 	caseId: string;
 	manifest: SceneDocumentV1;
-	evidenceRows: Array<{ id: string; caseId: string | null; hash: string | null }>;
+	evidenceRows: Array<{ id: string; caseId: string | null; hash: string | null; aiAnalysis: unknown }>;
 	versionRows: Array<{ id: string; evidenceId: string; version: number; metadata: unknown }>;
 }): Promise<void> {
 	const evidenceById = new Map(input.evidenceRows.map((row) => [row.id, row]));
@@ -157,27 +157,17 @@ export async function validateSceneGroundPlaneTrackProposalsV1(input: {
 		if (!evidenceRow || evidenceRow.caseId !== input.caseId || currentSource !== proposal.sourceRevision) {
 			throw new Error('SCENE_REVISION_GROUND_TRACK_SOURCE_NOT_REGISTERED');
 		}
-		const derived = await deriveReviewedGroundPlaneTrackFromHistoryV1({
-			history: { versions: versionsByEvidence.get(proposal.evidenceId) ?? [] },
-			evidenceId: proposal.evidenceId,
-			caseId: input.caseId,
-			sourceRevision: proposal.sourceRevision,
-			analysisRevision: proposal.analysisRevision
-		});
-		const matching = derived.filter((point) => point.trackId === proposal.trackId
-			&& point.trackScopeId === proposal.trackScopeId
-			&& point.calibrationRevisionId === proposal.calibrationRevisionId);
-		const expected = matching.map((point) => ({
-			frameIndex: point.frameIndex,
-			framePtsUs: point.framePtsUs,
-			imagePx: point.imagePx,
-			planeM: point.planeM,
-			poseAnnotationRevisionId: point.poseAnnotationRevisionId,
-			status: point.status
-		}));
-		if (expected.length < 2 || stableStringifySceneDocumentV1(expected) !== stableStringifySceneDocumentV1(proposal.points)) {
-			throw new Error('SCENE_REVISION_GROUND_TRACK_NOT_ADMITTED');
+		const analysis = evidenceRow.aiAnalysis as { videoAnalysis?: { sourceRevision?: unknown; analysisRevision?: unknown } } | null;
+		if (analysis?.videoAnalysis?.sourceRevision !== proposal.sourceRevision ||
+			analysis.videoAnalysis.analysisRevision !== proposal.analysisRevision) {
+			throw new Error('SCENE_REVISION_GROUND_TRACK_ANALYSIS_CHANGED');
 		}
+		const verified = await verifyReviewedGroundTrackSnapshotV1({
+			history: { versions: versionsByEvidence.get(proposal.evidenceId) ?? [] },
+			caseId: input.caseId,
+			proposal,
+		});
+		if (!verified) throw new Error('SCENE_REVISION_GROUND_TRACK_NOT_ADMITTED');
 	}
 }
 
@@ -187,9 +177,9 @@ export async function appendSceneDocumentRevisionV1(input: {
 	sceneId: string;
 	actorId: number;
 	command: SceneRevisionCommandV1;
-}) {
+}, database: Pick<typeof db, 'transaction'> = db) {
 	const binding = validateSceneRevisionBindingV1(input);
-	return db.transaction(async (tx) => {
+	return database.transaction(async (tx) => {
 		// Serialize head comparison for this case/scene pair. The unique index is
 		// still the final guard if a caller bypasses this transaction owner.
 		await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${input.caseId}), hashtext(${input.sceneId}))`);
@@ -227,7 +217,7 @@ export async function appendSceneDocumentRevisionV1(input: {
 				...(binding.manifest.groundPlaneTrackProposals ?? []).map((source) => source.evidenceId)
 			])];
 			const evidenceRows = await tx.select({ id: evidence.id, caseId: evidence.caseId, hash: evidence.hash, aiAnalysis: evidence.aiAnalysis })
-				.from(evidence).where(inArray(evidence.id, evidenceIds));
+				.from(evidence).where(and(inArray(evidence.id, evidenceIds), isNull(evidence.deletedAt)));
 			validateSceneEvidenceSourceBindingsV1({ caseId: input.caseId, manifest: binding.manifest, evidenceRows });
 			validateSceneVideoEventBindingsV1({ caseId: input.caseId, manifest: binding.manifest, evidenceRows });
 			if (binding.manifest.groundPlaneTrackProposals?.length) {
@@ -252,10 +242,77 @@ export async function appendSceneDocumentRevisionV1(input: {
 	});
 }
 
-export async function readSceneDocumentRevisionV1(input: { caseId: string; sceneId: string; revision?: number }) {
+export async function readSceneDocumentRevisionV1(
+	input: { caseId: string; sceneId: string; revision?: number },
+	database: Pick<typeof db, 'select'> = db
+) {
 	const conditions = [eq(sceneDocumentRevisions.caseId, input.caseId), eq(sceneDocumentRevisions.sceneId, input.sceneId)];
 	const [row] = input.revision === undefined
-		? await db.select().from(sceneDocumentRevisions).where(and(...conditions)).orderBy(desc(sceneDocumentRevisions.revision)).limit(1)
-		: await db.select().from(sceneDocumentRevisions).where(and(...conditions, eq(sceneDocumentRevisions.revision, input.revision))).limit(1);
+		? await database.select().from(sceneDocumentRevisions).where(and(...conditions)).orderBy(desc(sceneDocumentRevisions.revision)).limit(1)
+		: await database.select().from(sceneDocumentRevisions).where(and(...conditions, eq(sceneDocumentRevisions.revision, input.revision))).limit(1);
 	return row ? verifySceneDocumentRevisionReadbackV1({ caseId: input.caseId, sceneId: input.sceneId, row }) : null;
+}
+
+/**
+ * Bounded, hash-verified scene source projection for the case review page.
+ * Large geometry/manifests stay server-side; only source-linked event/motion bindings
+ * needed by the review UI are returned. Invalid latest revisions are counted and omitted.
+ */
+export async function listLatestSceneDocumentSourceProjectionsV1(input: {
+	caseId: string;
+	maxScenes?: number;
+}): Promise<{
+	scenes: Array<{
+		sceneId: string;
+		revision: number;
+		manifestSha256: string;
+		videoEventBindings: NonNullable<SceneDocumentV1['videoEventBindings']>;
+		groundPlaneTrackProposals: NonNullable<SceneDocumentV1['groundPlaneTrackProposals']>;
+	}>;
+	unavailableRevisionCount: number;
+}> {
+	const requestedLimit = input.maxScenes ?? 50;
+	const limit = Number.isFinite(requestedLimit) ? Math.max(1, Math.min(100, Math.trunc(requestedLimit))) : 50;
+	const latestRevision = max(sceneDocumentRevisions.revision);
+	const heads = await db
+		.select({ sceneId: sceneDocumentRevisions.sceneId, revision: latestRevision })
+		.from(sceneDocumentRevisions)
+		.where(eq(sceneDocumentRevisions.caseId, input.caseId))
+		.groupBy(sceneDocumentRevisions.sceneId)
+		.orderBy(desc(latestRevision))
+		.limit(limit);
+
+	let unavailableRevisionCount = 0;
+	const scenes = (await Promise.all(heads.map(async (head) => {
+		if (head.revision === null) return null;
+		try {
+			const verified = await readSceneDocumentRevisionV1({
+				caseId: input.caseId,
+				sceneId: head.sceneId,
+				revision: head.revision
+			});
+			if (!verified) {
+				unavailableRevisionCount += 1;
+				return null;
+			}
+			return {
+				sceneId: verified.sceneId,
+				revision: verified.revision,
+				manifestSha256: verified.manifestSha256,
+				videoEventBindings: verified.manifest.videoEventBindings ?? [],
+				groundPlaneTrackProposals: verified.manifest.groundPlaneTrackProposals ?? []
+			};
+		} catch (cause) {
+			unavailableRevisionCount += 1;
+			console.error('[scene-revisions] source projection omitted after readback validation', {
+				caseId: input.caseId,
+				sceneId: head.sceneId,
+				revision: head.revision,
+				error: cause instanceof Error ? cause.name : 'unknown'
+			});
+			return null;
+		}
+	}))).filter((scene): scene is NonNullable<typeof scene> => scene !== null);
+
+	return { scenes, unavailableRevisionCount };
 }

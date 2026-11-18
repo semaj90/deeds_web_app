@@ -15,6 +15,7 @@
 		{ slug: 'notes', label: 'Notes' },
 		{ slug: 'canvas', label: 'Evidence Canvas' },
 		{ slug: 'board', label: 'Evidence Board' },
+		{ slug: 'crime-scene', label: 'Crime Scene' },
 		{ slug: 'reports', label: 'Reports' }
 	];
 </script>

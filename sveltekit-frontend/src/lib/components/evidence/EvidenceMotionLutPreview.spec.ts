@@ -101,4 +101,75 @@ describe('EvidenceMotionLutPreview residency lifecycle', () => {
 		view.unmount();
 		expect(lodMocks.unregisterTexture).toHaveBeenCalledWith(newTextureId);
 	});
+
+	it('does not describe a first sample as measured zero movement', async () => {
+		const view = render(EvidenceMotionLutPreview, {
+			props: { url: '/frame-old', sourceRevision: 'sha256:old', analysisRevision: 'analysis-old', timestampMs: 1000, previousTimestampMs: null, motionScore: 0 },
+		});
+		oldRequest.resolve(gpuTexture as unknown as GPUTexture);
+		await waitFor(() => expect(view.getByText('First sample: no comparison frame')).toBeTruthy());
+		expect(view.queryByText(/0% change/)).toBeNull();
+	});
+
+	it('requests the display-sized packed LOD from the residency manager', async () => {
+		vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect').mockReturnValue({
+			x: 0, y: 0, width: 48, height: 80, top: 0, right: 48, bottom: 80, left: 0, toJSON: () => ({}),
+		} as DOMRect);
+		const view = render(EvidenceMotionLutPreview, {
+			props: { url: '/frame-old', sourceRevision: 'sha256:old', analysisRevision: 'analysis-old', timestampMs: 1000, motionScore: 0.1 },
+		});
+		await waitFor(() => expect(lodMocks.requestTexture).toHaveBeenCalledTimes(1));
+		const [textureId, lodLevel] = lodMocks.requestTexture.mock.calls[0] as [string, number];
+		expect(lodLevel).toBe(3);
+		const registered = lodMocks.registerTexture.mock.calls[0]?.[2] as Array<{ level: number; width: number; height: number; data: ArrayBuffer }>;
+		expect(registered.map(({ level, width, height, data }) => [level, width, height, data.byteLength])).toEqual([
+			[0, 2, 8, 16], [1, 4, 16, 64], [2, 8, 32, 256], [3, 16, 64, 1024], [4, 32, 128, 4096],
+		]);
+		oldRequest.resolve(gpuTexture as unknown as GPUTexture);
+		await waitFor(() => expect(view.container.querySelector('[data-renderer="webgpu"]')).toBeTruthy());
+		view.unmount();
+		expect(lodMocks.unregisterTexture).toHaveBeenCalledWith(textureId);
+	});
+
+	it('does not release another viewer’s texture when both show the same frame', async () => {
+		const props = { url: '/frame-old', sourceRevision: 'sha256:old', analysisRevision: 'analysis-old', timestampMs: 1000, motionScore: 0.1 };
+		const first = render(EvidenceMotionLutPreview, { props });
+		const second = render(EvidenceMotionLutPreview, { props });
+		await waitFor(() => expect(lodMocks.requestTexture).toHaveBeenCalledTimes(2));
+		const firstId = lodMocks.requestTexture.mock.calls[0]?.[0] as string;
+		const secondId = lodMocks.requestTexture.mock.calls[1]?.[0] as string;
+		expect(firstId).not.toBe(secondId);
+		oldRequest.resolve(gpuTexture as unknown as GPUTexture);
+		newRequest.resolve(gpuTexture as unknown as GPUTexture);
+		await waitFor(() => expect(second.container.querySelector('[data-renderer="webgpu"]')).toBeTruthy());
+		first.unmount();
+		expect(lodMocks.unregisterTexture).toHaveBeenCalledWith(firstId);
+		expect(lodMocks.unregisterTexture).not.toHaveBeenCalledWith(secondId);
+		second.unmount();
+		expect(lodMocks.unregisterTexture).toHaveBeenCalledWith(secondId);
+	});
+
+	it('keeps the latest texture when an earlier request for the same frame finishes late', async () => {
+		const lastRequest = deferred<GPUTexture | null>();
+		lodMocks.requestTexture.mockReturnValueOnce(lastRequest.promise);
+		const firstProps = { url: '/frame-old', sourceRevision: 'sha256:old', analysisRevision: 'analysis-old', timestampMs: 1000, motionScore: 0.1 };
+		const secondProps = { url: '/frame-new', sourceRevision: 'sha256:new', analysisRevision: 'analysis-new', timestampMs: 2000, motionScore: 0.2 };
+		const view = render(EvidenceMotionLutPreview, { props: firstProps });
+		await waitFor(() => expect(lodMocks.requestTexture).toHaveBeenCalledTimes(1));
+		await view.rerender(secondProps);
+		await waitFor(() => expect(lodMocks.requestTexture).toHaveBeenCalledTimes(2));
+		await view.rerender(firstProps);
+		await waitFor(() => expect(lodMocks.requestTexture).toHaveBeenCalledTimes(3));
+		const firstId = lodMocks.requestTexture.mock.calls[0]?.[0] as string;
+		const lastId = lodMocks.requestTexture.mock.calls[2]?.[0] as string;
+		expect(firstId).not.toBe(lastId);
+		oldRequest.resolve(gpuTexture as unknown as GPUTexture);
+		newRequest.resolve(gpuTexture as unknown as GPUTexture);
+		await waitFor(() => expect(lodMocks.unregisterTexture).toHaveBeenCalledWith(firstId));
+		expect(lodMocks.unregisterTexture).not.toHaveBeenCalledWith(lastId);
+		lastRequest.resolve(gpuTexture as unknown as GPUTexture);
+		await waitFor(() => expect(view.container.querySelector('[data-renderer="webgpu"]')).toBeTruthy());
+		view.unmount();
+		expect(lodMocks.unregisterTexture).toHaveBeenCalledWith(lastId);
+	});
 });

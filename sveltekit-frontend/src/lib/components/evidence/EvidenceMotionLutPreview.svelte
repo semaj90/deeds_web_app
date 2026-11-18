@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import { decodeVideoMotionLutIndicesV1, buildPackedMotionLodsV1, VIDEO_MOTION_GRAYSCALE_LUT_V1, VIDEO_MOTION_LUT_HEIGHT_V1, VIDEO_MOTION_LUT_WIDTH_V1 } from '$lib/shared/video-motion-lut-v1.js';
+	import { decodeVideoMotionLutIndicesV1, buildPackedMotionLodsV1, selectPackedMotionLodV1, VIDEO_MOTION_GRAYSCALE_LUT_V1, VIDEO_MOTION_LUT_HEIGHT_V1, VIDEO_MOTION_LUT_WIDTH_V1 } from '$lib/shared/video-motion-lut-v1.js';
 	import { n64TextureLOD } from '$lib/webgpu/N64TextureLODSystem.js';
 
 	let {
@@ -8,12 +8,14 @@
 		sourceRevision,
 		analysisRevision,
 		timestampMs,
+		previousTimestampMs = undefined,
 		motionScore
 	}: {
 		url: string;
 		sourceRevision: string;
 		analysisRevision: string;
 		timestampMs: number;
+		previousTimestampMs?: number | null;
 		motionScore: number;
 	} = $props();
 
@@ -32,6 +34,18 @@
 	let webglHandlersInstalled = false;
 	let lastWebglIndices: Uint8Array | null = null;
 	let webglContextLost = false;
+
+	function pickDisplayLod(lods: ReturnType<typeof buildPackedMotionLodsV1>, target: HTMLCanvasElement) {
+		const computed = getComputedStyle(target);
+		const cssWidth = target.getBoundingClientRect().width || Number.parseFloat(computed.width) || VIDEO_MOTION_LUT_WIDTH_V1;
+		const cssHeight = target.getBoundingClientRect().height || Number.parseFloat(computed.height) || VIDEO_MOTION_LUT_HEIGHT_V1;
+		const deviceScale = Math.max(1, window.devicePixelRatio || 1);
+		return selectPackedMotionLodV1(
+			lods,
+			Math.min(VIDEO_MOTION_LUT_WIDTH_V1, cssWidth * deviceScale),
+			Math.min(VIDEO_MOTION_LUT_HEIGHT_V1, cssHeight * deviceScale),
+		);
+	}
 
 	function releaseResidentTexture(textureId = residentTextureId) {
 		if (!textureId) return;
@@ -136,8 +150,7 @@
 		if (!initializeWebgl2() || !webglContext || !webglProgram || !webglVertexBuffer || !webglCanvas) return false;
 		const gl = webglContext;
 		const lods = buildPackedMotionLodsV1(indices);
-		const level = lods[Math.max(0, lods.length - 2)];
-		if (!level) return false;
+		const level = pickDisplayLod(lods, webglCanvas);
 		const texture = gl.createTexture();
 		if (!texture) return false;
 		try {
@@ -182,7 +195,7 @@
 			})));
 		}
 		residentTextureId = cacheKey;
-		const selectedLod = Math.max(0, lods.length - 2);
+		const selectedLod = pickDisplayLod(lods, gpuCanvas).level;
 		const texture = await n64TextureLOD.requestTexture(cacheKey, selectedLod);
 		if (!texture || signal.aborted) {
 			// A newer frame may now own the component's resident texture. Release only
@@ -285,7 +298,9 @@
 				const bytes = new Uint8Array(await response.arrayBuffer());
 				const indices = decodeVideoMotionLutIndicesV1(bytes);
 				if (controller.signal.aborted || !canvas) return;
-				const cacheKey = `${requestUrl}|${expectedSource}|${expectedAnalysis}`;
+				// Each load owns its registration: two viewers (or an A→B→A reload)
+				// must not release a newer viewer's texture when an older request ends.
+				const cacheKey = `${requestUrl}|${expectedSource}|${expectedAnalysis}|${crypto.randomUUID()}`;
 				const renderedOnGpu = await drawWebGpuMotionTile(cacheKey, indices, controller.signal).catch(() => false);
 				if (controller.signal.aborted) return;
 				if (renderedOnGpu) {
@@ -331,7 +346,8 @@
 	<canvas class:hidden={activeRenderer !== 'webgl2'} bind:this={webglCanvas} width={VIDEO_MOTION_LUT_WIDTH_V1} height={VIDEO_MOTION_LUT_HEIGHT_V1} aria-label="WebGL2 packed motion tile; not a pose or event finding"></canvas>
 	<figcaption>
 		<strong>Motion cue</strong>
-		<span>{status === 'ready' ? `${Math.round(motionScore * 100)}% change` : status === 'loading' ? 'Loading revision-bound tile…' : 'Preview unavailable'}</span>
+		<span>{status === 'ready' ? previousTimestampMs === null ? 'First sample: no comparison frame' : `Difference intensity: ${Math.round(motionScore * 100)}%${typeof previousTimestampMs === 'number' ? ` · compared with ${(previousTimestampMs / 1000).toFixed(2)}s` : ' · comparison time unavailable'}` : status === 'loading' ? 'Loading revision-bound tile…' : 'Preview unavailable'}</span>
+		<span>Visual cue for review; camera movement and lighting can affect it.</span>
 	</figcaption>
 </figure>
 

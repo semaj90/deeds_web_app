@@ -9,6 +9,7 @@
 import { and, eq, isNull, sql } from 'drizzle-orm';
 import { sceneEventOutbox, sceneEvents, sceneMarkers } from '../db/schema/scene-markers.js';
 import { evidence } from '../db/schema-postgres.js';
+import { normalizeSha256 } from '../features/evidence/evidence-revision-v1.js';
 import { anchorRowValues, type MarkerAnchor } from './marker-anchor-v1.js';
 
 /** Raised when a marker would reference evidence that is not active in the same case. */
@@ -16,6 +17,35 @@ export class EvidenceNotInCaseError extends Error {
 	constructor() {
 		super('EVIDENCE_NOT_IN_CASE');
 	}
+}
+
+export class MarkerSourceMismatchError extends Error {
+	constructor() {
+		super('This image marker needs the current source image revision. Reopen the exhibit and place the marker again.');
+	}
+}
+
+function assertImageAnchorSource(
+	source: { hash: string | null; mimeType: string | null; fileType: string | null },
+	cmd: Pick<CreateMarkerCommand, 'sourceRevision' | 'sourceSha256' | 'position'>,
+	anchor: Extract<MarkerAnchor, { kind: 'IMAGE_UV' }>
+) {
+	const hash = normalizeSha256(source.hash);
+	const mimeType = (source.mimeType || source.fileType || '').toLowerCase();
+	if (!hash || !mimeType.startsWith('image/') || cmd.sourceRevision !== hash || cmd.sourceSha256 !== hash ||
+		cmd.position.x !== anchor.u || cmd.position.y !== anchor.v || cmd.position.z !== 0) {
+		throw new MarkerSourceMismatchError();
+	}
+}
+
+function sameAnchor(a: MarkerAnchor | null, b: MarkerAnchor | null): boolean {
+	if (a === null || b === null) return a === b;
+	if (a.kind === 'IMAGE_UV' && b.kind === 'IMAGE_UV') return a.u === b.u && a.v === b.v;
+	if (a.kind === 'MESH_SURFACE' && b.kind === 'MESH_SURFACE') {
+		return a.meshId === b.meshId && a.triangleIndex === b.triangleIndex &&
+			a.barycentric.every((weight, index) => weight === b.barycentric[index]);
+	}
+	return false;
 }
 
 export type MarkerPosition = { x: number; y: number; z: number };
@@ -28,6 +58,10 @@ export type MoveMarkerCommand = {
 	commandId: string;
 	expectedRevision: number;
 	position: MarkerPosition;
+	/** If provided, update the source anchor atomically with the displayed position. */
+	anchor?: MarkerAnchor | null;
+	sourceRevision?: string | null;
+	sourceSha256?: string | null;
 	userId: number;
 };
 
@@ -107,7 +141,7 @@ export async function createMarker(
 					sourceRevision?: string | null;
 					sourceSha256?: string | null;
 				};
-				const sameIdentity =
+				const sameIdentity = prior.eventType === 'MARKER_CREATED' &&
 					prior.markerId === cmd.markerId && prior.caseId === cmd.caseId && prior.sceneKey === cmd.sceneKey;
 				const sameFields =
 					typeof stored.evidenceId === 'string' &&
@@ -118,7 +152,7 @@ export async function createMarker(
 					stored.position.y === cmd.position.y &&
 					stored.position.z === cmd.position.z &&
 					// Events written before MARK-01 carry no anchor fields; treat them as null.
-					JSON.stringify(stored.anchor ?? null) === JSON.stringify(cmd.anchor ?? null) &&
+					sameAnchor(stored.anchor ?? null, cmd.anchor ?? null) &&
 					(stored.sourceRevision ?? null) === (cmd.sourceRevision ?? null) &&
 					(stored.sourceSha256 ?? null) === (cmd.sourceSha256 ?? null);
 				if (!sameIdentity || !sameFields) {
@@ -134,11 +168,13 @@ export async function createMarker(
 
 			// Same-case evidence only: a marker may not reference another case's (or a deleted) exhibit.
 			const [owned] = await tx
-				.select({ id: evidence.id })
+				.select({ hash: evidence.hash, mimeType: evidence.mimeType, fileType: evidence.fileType })
 				.from(evidence)
 				.where(and(eq(evidence.id, cmd.evidenceId), eq(evidence.caseId, cmd.caseId), isNull(evidence.deletedAt)))
-				.limit(1);
+				.limit(1)
+				.for('share');
 			if (!owned) throw new EvidenceNotInCaseError();
+			if (cmd.anchor?.kind === 'IMAGE_UV') assertImageAnchorSource(owned, cmd, cmd.anchor);
 
 			await tx.insert(sceneMarkers).values({
 				id: cmd.markerId,
@@ -212,11 +248,28 @@ async function attempt(db: TransactionalDb, cmd: MoveMarkerCommand): Promise<Mov
 			if (
 				prior.markerId !== cmd.markerId ||
 				prior.caseId !== cmd.caseId ||
-				prior.sceneKey !== cmd.sceneKey
+				prior.sceneKey !== cmd.sceneKey ||
+				prior.eventType !== 'MARKER_MOVED'
 			) {
 				throw new CommandReuseError();
 			}
-			const payload = prior.payload as { position: MarkerPosition };
+			const payload = prior.payload as {
+				position: MarkerPosition;
+				evidenceId?: string;
+				anchor?: MarkerAnchor | null;
+				sourceRevision?: string | null;
+				sourceSha256?: string | null;
+			};
+			if (
+				!payload.position ||
+				payload.position.x !== cmd.position.x ||
+				payload.position.y !== cmd.position.y ||
+				payload.position.z !== cmd.position.z ||
+				(payload.evidenceId !== undefined && payload.evidenceId !== cmd.evidenceId) ||
+				!sameAnchor(payload.anchor ?? null, cmd.anchor ?? null) ||
+				(cmd.sourceRevision !== undefined && (payload.sourceRevision ?? null) !== cmd.sourceRevision) ||
+				(cmd.sourceSha256 !== undefined && (payload.sourceSha256 ?? null) !== cmd.sourceSha256)
+			) throw new CommandReuseError();
 			return {
 				markerId: cmd.markerId,
 				revision: prior.aggregateRevision,
@@ -244,12 +297,31 @@ async function attempt(db: TransactionalDb, cmd: MoveMarkerCommand): Promise<Mov
 			throw new MarkerConflictError(marker.revision);
 		}
 
+		if (marker.anchorKind === 'IMAGE_UV' || cmd.anchor?.kind === 'IMAGE_UV') {
+			if (cmd.anchor?.kind !== 'IMAGE_UV' ||
+				(marker.sourceRevision !== null && marker.sourceRevision !== cmd.sourceRevision) ||
+				(marker.anchorKind !== null && marker.anchorKind !== 'IMAGE_UV')) {
+				throw new MarkerSourceMismatchError();
+			}
+			const [source] = await tx
+				.select({ hash: evidence.hash, mimeType: evidence.mimeType, fileType: evidence.fileType })
+				.from(evidence)
+				.where(and(eq(evidence.id, cmd.evidenceId), eq(evidence.caseId, cmd.caseId), isNull(evidence.deletedAt)))
+				.limit(1)
+				.for('share');
+			if (!source) throw new EvidenceNotInCaseError();
+			assertImageAnchorSource(source, cmd, cmd.anchor);
+		}
+
 		const [updated] = await tx
 			.update(sceneMarkers)
 			.set({
 				posX: cmd.position.x,
 				posY: cmd.position.y,
 				posZ: cmd.position.z,
+				...(cmd.anchor !== undefined ? anchorRowValues(cmd.anchor) : {}),
+				...(cmd.sourceRevision !== undefined ? { sourceRevision: cmd.sourceRevision } : {}),
+				...(cmd.sourceSha256 !== undefined ? { sourceSha256: cmd.sourceSha256 } : {}),
 				revision: sql`${sceneMarkers.revision} + 1`,
 				updatedAt: sql`now()`
 			})
@@ -269,7 +341,13 @@ async function attempt(db: TransactionalDb, cmd: MoveMarkerCommand): Promise<Mov
 				eventType: 'MARKER_MOVED',
 				markerId: cmd.markerId,
 				aggregateRevision: updated.revision,
-				payload: { position: cmd.position },
+				payload: {
+					position: cmd.position,
+					evidenceId: cmd.evidenceId,
+					...(cmd.anchor !== undefined ? { anchor: cmd.anchor } : {}),
+					...(cmd.sourceRevision !== undefined ? { sourceRevision: cmd.sourceRevision } : {}),
+					...(cmd.sourceSha256 !== undefined ? { sourceSha256: cmd.sourceSha256 } : {})
+				},
 				createdBy: cmd.userId
 			})
 			.returning({ id: sceneEvents.id });
@@ -366,6 +444,9 @@ export type SavedMarker = {
 	label: string | null;
 	revision: number;
 	position: MarkerPosition;
+	anchor: MarkerAnchor | null;
+	anchorStatus: string;
+	provenance: { sourceRevision: string | null; sourceSha256: string | null };
 };
 
 /** Live (not soft-deleted) markers for one scene, oldest first. Read-only. */
@@ -391,6 +472,13 @@ export async function listSceneMarkers(
 		evidenceId: row.evidenceId,
 		label: row.label,
 		revision: row.revision,
-		position: { x: row.posX, y: row.posY, z: row.posZ }
+		position: { x: row.posX, y: row.posY, z: row.posZ },
+		anchor: row.anchorKind === 'IMAGE_UV' && row.anchorU !== null && row.anchorV !== null
+			? { kind: 'IMAGE_UV', u: row.anchorU, v: row.anchorV }
+			: row.anchorKind === 'MESH_SURFACE' && row.meshId !== null && row.triangleIndex !== null && row.barycentric !== null
+				? { kind: 'MESH_SURFACE', meshId: row.meshId, triangleIndex: row.triangleIndex, barycentric: row.barycentric }
+				: null,
+		anchorStatus: row.anchorStatus,
+		provenance: { sourceRevision: row.sourceRevision, sourceSha256: row.sourceSha256 }
 	}));
 }

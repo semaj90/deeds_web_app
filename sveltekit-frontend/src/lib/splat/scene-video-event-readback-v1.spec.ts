@@ -128,18 +128,23 @@ describe('scene video event readback v1', () => {
 		}));
 		const first = poseObservation({ trackId: 'person-1', trackScopeId: 'scope-a', framePtsUs: 1_000_000, frameIndex: 1, keypoints: hips(0) });
 		const currentPose = poseObservation({ trackId: 'person-1', trackScopeId: 'scope-a', framePtsUs: 2_000_000, frameIndex: 2, keypoints: hips(10) });
+		const futurePose = poseObservation({ trackId: 'person-1', trackScopeId: 'scope-a', framePtsUs: 2_500_000, frameIndex: 3, keypoints: hips(20) });
 		const otherScope = poseObservation({ trackId: 'person-1', trackScopeId: 'scope-b', framePtsUs: 3_000_000, frameIndex: 3, keypoints: hips(20) });
-		const versions = { versions: [first, currentPose, otherScope].map((pose, index) => ({ id: `pose-${index}`, version: index + 1, metadata: { annotation: { poseObservations: [pose] } } })) };
+		const versions = { versions: [first, currentPose, futurePose, otherScope].map((pose, index) => ({ id: `pose-${index}`, version: index + 1, metadata: { annotation: { poseObservations: [pose] } } })) };
 		const poses = parseScenePoseReadbackV1(versions, [binding]);
 		const current = poses.find((pose) => pose.trackScopeId === 'scope-a' && pose.frameIndex === 2)!;
-		expect(poseHipImageTrajectoryV1(poses, current)).toEqual([
+		const window = { startUs: 1_000_000, endUs: 2_000_000 };
+		expect(poseHipImageTrajectoryV1(poses, current, 24, window)).toEqual([
 			{ frameIndex: 1, framePtsUs: 1_000_000, x: 10.5, y: 20, current: false },
 			{ frameIndex: 2, framePtsUs: 2_000_000, x: 20.5, y: 20, current: true },
 		]);
-		expect(poseHipImageTrajectoryV1(poses, { ...current, trackScopeId: null })).toEqual([]);
+		expect(poseHipImageTrajectoryV1(poses, current, 24, { startUs: 1_000_000, endUs: 3_000_000 }).map((point) => point.frameIndex)).toEqual([1, 2]);
+		expect(poseHipImageTrajectoryV1(poses, current)).toEqual([]);
+		expect(poseHipImageTrajectoryV1(poses, current, 24, { startUs: 1_500_000, endUs: 2_000_000 })).toHaveLength(1);
+		expect(poseHipImageTrajectoryV1(poses, { ...current, trackScopeId: null }, 24, window)).toEqual([]);
 		const longTrail = Array.from({ length: 40 }, (_, index) => ({ ...current, framePtsUs: index * 1000, frameIndex: index,
 			keypoints: current.keypoints.map((point) => ({ ...point, x: point.x === null ? null : point.x + index })) }));
-		expect(poseHipImageTrajectoryV1(longTrail, current, 8)).toHaveLength(8);
+		expect(poseHipImageTrajectoryV1(longTrail, current, 8, { startUs: 0, endUs: 2_000_000 })).toHaveLength(8);
 	});
 
 	it('lays out measured-plane tracks at equal scale and assigns stable 16-step time colors', () => {

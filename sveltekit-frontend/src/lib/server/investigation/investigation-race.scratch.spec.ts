@@ -79,6 +79,15 @@ describe.skipIf(!ENABLED)('investigation duplicate command IDs (scratch database
 		expect(injected).not.toBeNull();
 		expect(result.replayed).toBe(true);
 		expect(result.exportRow.id).toBe(injected);
+			// The replay returns the committed winner unchanged: same revision, hashes and summary.
+			const [stored] = await db.select().from(caseAiSummaryExports).where(eq(caseAiSummaryExports.id, injected!));
+			expect(result.exportRow.revision).toBe(stored!.revision);
+			expect(stored!.inputManifestSha256).toBe(hashes.inputManifestSha256);
+			expect(result.exportRow.summaryMarkdown).toBe(stored!.summaryMarkdown);
+			// Replay adds no lineage: the injected winner has none, and the replay must not create any.
+			const { caseAiSummaryExportSources } = await import('$lib/server/db/schema/investigation.js');
+			const lineage = await db.select().from(caseAiSummaryExportSources).where(eq(caseAiSummaryExportSources.exportId, injected!));
+			expect(lineage).toHaveLength(0);
 		const rows = await db.select().from(caseAiSummaryExports).where(eq(caseAiSummaryExports.commandId, commandId));
 		expect(rows).toHaveLength(1);
 	}, 120_000);
@@ -100,6 +109,36 @@ describe.skipIf(!ENABLED)('investigation duplicate command IDs (scratch database
 		).rejects.toMatchObject({ code: 'COMMAND_REUSED', status: 409 });
 		const rows = await db.select().from(caseAiSummaryExports).where(eq(caseAiSummaryExports.commandId, commandId));
 		expect(rows).toHaveLength(1);
+	}, 120_000);
+
+	it('does not disclose another case\'s export when its commandId is replayed under a different case', async () => {
+		const svc = await import('./investigation-v1.js');
+		const { db } = await import('$lib/server/db/client.js');
+		const schema = await import('$lib/server/db/schema-postgres.js');
+		const { caseAiSummaryExports } = await import('$lib/server/db/schema/investigation.js');
+		const [other] = (await db
+			.insert(schema.cases)
+			.values({ title: `Other ${randomUUID().slice(0, 8)}`, status: 'open', priority: 'medium', userId })
+			.returning({ id: schema.cases.id })) as Array<{ id: string }>;
+		const commandId = randomUUID();
+		const [owned] = (await db.insert(caseAiSummaryExports).values({
+			caseId, revision: nextRevision(), commandId,
+			inputManifestSha256: 'd'.repeat(64), facetSnapshotSha256: 'd'.repeat(64), summarySha256: 'd'.repeat(64),
+			modelId: 'owner', summaryMarkdown: 'owner-only text', citations: [], createdBy: userId,
+		}).returning({ id: caseAiSummaryExports.id })) as Array<{ id: string }>;
+		let modelCalls = 0;
+		const attempt = svc.generateSummaryExport({
+			caseId: other.id, actorId: userId, commandId, resolveModel: async () => 'stub',
+			requestModel: async () => { modelCalls++; return 'x'; },
+		});
+		// Refused as a conflict; the message must not reveal the owning case's export.
+		const error = await attempt.then(() => null, (e: unknown) => e as { code?: string; message?: string });
+		expect(error?.code).toBe('COMMAND_CONFLICT');
+		expect(error?.message ?? '').not.toContain(owned.id);
+		expect(error?.message ?? '').not.toContain('owner-only text');
+		expect(modelCalls).toBe(0);
+		const foreign = await db.select().from(caseAiSummaryExports).where(eq(caseAiSummaryExports.caseId, other.id));
+		expect(foreign.some((row) => row.id === owned.id)).toBe(false);
 	}, 120_000);
 
 	it('rejects a pre-check replay whose investigation state differs, without calling the model', async () => {

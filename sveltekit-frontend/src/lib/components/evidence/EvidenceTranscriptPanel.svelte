@@ -44,7 +44,7 @@
 	let sourceRevision = $state<string | null>(null);
 	let analysisRevision = $state<string | null>(null);
 	let isLoading = $state(false);
-	let status = $state<'completed' | 'no_audio' | 'processing' | 'failed' | 'empty' | 'idle'>('idle');
+	let status = $state<'completed' | 'no_audio' | 'processing' | 'failed' | 'empty' | 'unavailable' | 'idle'>('idle');
 	let reviewEnabled = $state(false);
 	let editingSegmentId = $state<string | null>(null);
 	let correctionDraft = $state('');
@@ -60,10 +60,14 @@
 
 	// Fetch transcript segments from API
 	async function loadTranscript() {
-		if (!evidenceId) return;
+		if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(evidenceId)) {
+			status = 'unavailable';
+			segments = [];
+			return;
+		}
 		isLoading = true;
 		try {
-			const res = await fetch(`/api/evidence/${evidenceId}/transcript`);
+			const res = await fetch(`/api/evidence/${encodeURIComponent(evidenceId)}/transcript`);
 			if (!res.ok) {
 				if (res.status === 404) status = 'empty';
 				else status = 'failed';
@@ -216,7 +220,8 @@
 	}
 
 	function handleExport(format: 'vtt' | 'srt' | 'txt' | 'json') {
-		window.open(`/api/evidence/${evidenceId}/transcript?export=${format}`, '_blank');
+		if (status === 'unavailable') return;
+		window.open(`/api/evidence/${encodeURIComponent(evidenceId)}/transcript?export=${format}`, '_blank');
 	}
 </script>
 
@@ -234,6 +239,8 @@
 			<span class="toggle-title">Transcript ({segments.length})</span>
 			{#if status === 'no_audio'}
 				<span class="badge-status status-no-audio">Silent Video · No Audio</span>
+			{:else if status === 'unavailable'}
+				<span class="badge-status">Preview only</span>
 			{:else if status === 'processing'}
 				<span class="badge-status status-processing">Transcribing…</span>
 			{:else if status === 'failed'}
@@ -254,6 +261,7 @@
 					<input type="checkbox" bind:checked={autoScrollEnabled} />
 					<span>Auto-scroll</span>
 				</label>
+				{#if status !== 'unavailable'}
 				<div class="export-dropdown-group">
 					<span class="export-label">Export:</span>
 					<button type="button" class="btn-export-pill" onclick={() => handleExport('vtt')}>VTT</button>
@@ -261,6 +269,7 @@
 					<button type="button" class="btn-export-pill" onclick={() => handleExport('txt')}>TXT</button>
 					<button type="button" class="btn-export-pill" onclick={() => handleExport('json')}>JSON</button>
 				</div>
+				{/if}
 			</div>
 		{/if}
 	</div>
@@ -268,7 +277,12 @@
 	<!-- Expandable Transcript Content Body -->
 	{#if isOpen}
 		<div id="transcript-panel-body" class="transcript-panel-body">
-			{#if status === 'no_audio'}
+			{#if status === 'unavailable'}
+				<div class="empty-transcript-state">
+					<span class="state-icon">ℹ️</span>
+					<p class="state-msg">Transcript is available after this exhibit is saved to the case. This local preview has no persisted evidence ID.</p>
+				</div>
+			{:else if status === 'no_audio'}
 				<div class="empty-transcript-state">
 					<span class="state-icon">🔇</span>
 					<p class="state-msg">No audio stream detected. This file is a silent video recording.</p>

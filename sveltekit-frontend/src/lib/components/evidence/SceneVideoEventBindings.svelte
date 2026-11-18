@@ -4,7 +4,7 @@
 	import type { SceneEvidenceAnalysisScopeV1, SceneVideoEventBindingV1, ReadbackVideoTimelineV1, ScenePoseObservationReadbackV1 } from '$lib/splat/scene-video-event-readback-v1.js';
 	import { GROUND_PLANE_TRACK_TIME_PALETTE_V1, joinSceneVideoEventReadbackV1, layoutGroundPlaneTrackPlotV1, parseReadbackVideoTimelineV1, parseScenePoseReadbackV1, poseHipImageTrajectoryV1 } from '$lib/splat/scene-video-event-readback-v1.js';
 	import { humanCoco17PoseSchemaV1 } from '$lib/shared/pose-skeleton-schema-v1.js';
-	import { deriveReviewedGroundPlaneTrackFromHistoryV1 } from '$lib/splat/reviewed-ground-plane-track-v1.js';
+	import { deriveReviewedGroundPlaneTrackFromHistoryV1, verifyReviewedGroundTrackSnapshotV1 } from '$lib/splat/reviewed-ground-plane-track-v1.js';
 
 	let { caseId, bindings, groundPlaneTrackProposals = [] }: { caseId: string; bindings: SceneVideoEventBindingV1[]; groundPlaneTrackProposals?: NonNullable<SceneDocumentV1['groundPlaneTrackProposals']> } = $props();
 	let rows = $state<ReturnType<typeof joinSceneVideoEventReadbackV1>>([]);
@@ -80,7 +80,7 @@
 				const timelines = new Map<string, ReadbackVideoTimelineV1>(responses.flatMap(([evidenceId, timeline]) => timeline ? [[evidenceId, timeline] as const] : []));
 				rows = joinSceneVideoEventReadbackV1(currentBindings, timelines);
 				const poseRows: ScenePoseObservationReadbackV1[] = [];
-				const projectionsByEvidenceRun = new Map<string, Awaited<ReturnType<typeof deriveReviewedGroundPlaneTrackFromHistoryV1>>>();
+				const histories = new Map(responses.map(([evidenceId, , versions]) => [evidenceId, versions]));
 				for (const [evidenceId, , versions] of responses) {
 					const scopedBindings = uniqueScopes.filter((binding) => binding.evidenceId === evidenceId);
 					if (!versions) { poseReadbackUnavailable = true; continue; }
@@ -91,12 +91,14 @@
 						const runKey = `${binding.evidenceId}:${binding.sourceRevision}:${binding.analysisRevision}`;
 						if (seenRuns.has(runKey)) continue;
 						seenRuns.add(runKey);
-						const runPoints = await deriveReviewedGroundPlaneTrackFromHistoryV1({
-							history: versions, evidenceId, caseId,
-							sourceRevision: binding.sourceRevision, analysisRevision: binding.analysisRevision,
-						});
-						projected.push(...runPoints);
-						projectionsByEvidenceRun.set(runKey, runPoints);
+						try {
+							projected.push(...await deriveReviewedGroundPlaneTrackFromHistoryV1({
+								history: versions, evidenceId, caseId: currentCaseId,
+								sourceRevision: binding.sourceRevision, analysisRevision: binding.analysisRevision,
+							}));
+						} catch (cause) {
+							if (!(cause instanceof RangeError)) throw cause;
+						}
 					}
 					poseRows.push(...readback.map((pose) => {
 						const projection = projected.find((point) => point.frameIndex === pose.frameIndex && point.framePtsUs === pose.framePtsUs
@@ -104,19 +106,19 @@
 						return projection ? { ...pose, groundPlanePoint: projection.planeM, groundPlaneCalibrationRevisionId: projection.calibrationRevisionId } : pose;
 					}));
 				}
+				const verifiedIds = [];
+				for (const proposal of currentGroundTracks) {
+					if (request.signal.aborted) return;
+					const timeline = timelines.get(proposal.evidenceId);
+					if (timeline?.caseId !== currentCaseId || timeline.sourceRevision !== proposal.sourceRevision ||
+						timeline.analysisRevision !== proposal.analysisRevision) continue;
+					if (await verifyReviewedGroundTrackSnapshotV1({ history: histories.get(proposal.evidenceId), caseId: currentCaseId, proposal })) {
+						verifiedIds.push(proposal.proposalId);
+					}
+				}
+				if (request.signal.aborted) return;
 				poseObservations = poseRows;
-				verifiedGroundTrackIds = currentGroundTracks.filter((proposal) => {
-					const derived = projectionsByEvidenceRun.get(`${proposal.evidenceId}:${proposal.sourceRevision}:${proposal.analysisRevision}`) ?? [];
-					const points = derived.filter((point) => point.trackId === proposal.trackId && point.trackScopeId === proposal.trackScopeId
-						&& point.calibrationRevisionId === proposal.calibrationRevisionId);
-					return points.length === proposal.points.length && points.length >= 2 && proposal.points.every((saved, index) => {
-						const actual = points[index];
-						return actual?.frameIndex === saved.frameIndex && actual.framePtsUs === saved.framePtsUs
-							&& actual.poseAnnotationRevisionId === saved.poseAnnotationRevisionId
-							&& actual.imagePx[0] === saved.imagePx[0] && actual.imagePx[1] === saved.imagePx[1]
-							&& actual.planeM[0] === saved.planeM[0] && actual.planeM[1] === saved.planeM[1];
-					}) && points.every((point) => point.calibrationRevisionId === proposal.calibrationRevisionId);
-				}).map((proposal) => proposal.proposalId);
+				verifiedGroundTrackIds = verifiedIds;
 				// Event and pose metadata stay visible while bounded frame bytes load separately.
 				loading = false;
 				// Full source-frame previews are bounded separately from the small SVG skeleton list.
@@ -173,6 +175,21 @@
 		return Math.round(pose.framePtsUs / 1000);
 	}
 
+	function poseTrail(pose: ScenePoseObservationReadbackV1) {
+		const windows = [
+			...rows.filter(({ binding, event }) => event && binding.evidenceId === pose.evidenceId
+				&& binding.sourceRevision === pose.sourceRevision && binding.analysisRevision === pose.analysisRevision)
+				.map(({ binding }) => ({ startUs: binding.startMs * 1000, endUs: binding.endMs * 1000 })),
+			...groundPlaneTrackProposals.filter((proposal) => verifiedGroundTrackIds.includes(proposal.proposalId)
+				&& proposal.evidenceId === pose.evidenceId && proposal.sourceRevision === pose.sourceRevision
+				&& proposal.analysisRevision === pose.analysisRevision && proposal.trackId === pose.trackId
+				&& proposal.trackScopeId === pose.trackScopeId && proposal.points.length >= 2)
+				.map((proposal) => ({ startUs: Math.min(...proposal.points.map((point) => point.framePtsUs)), endUs: Math.max(...proposal.points.map((point) => point.framePtsUs)) }))
+		].filter((window) => pose.framePtsUs >= window.startUs && pose.framePtsUs <= window.endUs)
+			.sort((a, b) => (a.endUs - a.startUs) - (b.endUs - b.startUs));
+		return poseHipImageTrajectoryV1(poseObservations, pose, 24, windows[0]);
+	}
+
 	function selectGroundTrackSample(proposalId: string, value: string) {
 		const index = Number(value);
 		if (!Number.isInteger(index) || index < 0) return;
@@ -216,7 +233,11 @@
 							{#if verifiedGroundTrackIds.includes(proposal.proposalId)}
 								<strong>Verified proposal readback · {proposal.trackId}</strong>
 								<span>{proposal.points.length} points · calibration revision {proposal.calibrationRevisionId}</span>
-								{@const plotPoints = layoutGroundPlaneTrackPlotV1(proposal.points)}
+										{@const plotPoints = layoutGroundPlaneTrackPlotV1(proposal.points.map((point) => ({
+											frameIndex: point.frameIndex,
+											framePtsUs: point.framePtsUs,
+											planeM: [point.planeM[0], point.planeM[1]] as readonly [number, number],
+										})))}
 								{#if plotPoints.length}
 									{@const activeIndex = Math.min(plotPoints.length - 1, selectedGroundTrackIndexById[proposal.proposalId] ?? 0)}
 									{@const activePoint = plotPoints[activeIndex]!}
@@ -233,12 +254,12 @@
 												</a>
 											{/each}
 										</svg>
-										<figcaption><span>Earlier</span><span class="ground-track-time-ramp" aria-hidden="true"></span><span>Later</span> · points link to source time</figcaption>
 										<label class="ground-track-scrubber">Reviewed sample {activeIndex + 1} of {plotPoints.length}
-											<input type="range" min="0" max={plotPoints.length - 1} step="1" value={activeIndex} aria-label={`Scrub reviewed samples for ${proposal.trackId}`} oninput={(event) => selectGroundTrackSample(proposal.proposalId, event.currentTarget.value)} />
+											<input type="range" min="0" max={plotPoints.length - 1} step="1" value={activeIndex} aria-label={`Scrub reviewed samples for ${proposal.trackId}`} oninput={(event) => selectGroundTrackSample(proposal.proposalId, (event.currentTarget as HTMLInputElement).value)} />
 										</label>
 										<p class="ground-track-selected">Frame {activePoint.frameIndex + 1} · {formatTime(Math.round(activePoint.framePtsUs / 1000))} · X {activePoint.planeM[0].toFixed(3)} m, Y {activePoint.planeM[1].toFixed(3)} m · discrete reviewed sample; no interpolated positions</p>
 										<a class="ground-track-open" href={`/cases/${encodeURIComponent(caseId)}/evidence/${encodeURIComponent(proposal.evidenceId)}?timeMs=${Math.round(activePoint.framePtsUs / 1000)}`}>Open selected source frame at {formatTime(Math.round(activePoint.framePtsUs / 1000))}</a>
+										<figcaption><span>Earlier</span><span class="ground-track-time-ramp" aria-hidden="true"></span><span>Later</span> · points link to source time</figcaption>
 									</figure>
 								{/if}
 								<ol class="ground-track-points">
@@ -264,7 +285,7 @@
 				<p>These are image-space landmark annotations, not calibrated 3D joints or actor identity.</p>
 				<ul>
 					{#each poseObservations as pose (`${pose.evidenceId}:${pose.analysisRevision}:${pose.framePtsUs}:${pose.trackId ?? 'manual'}:${pose.trackScopeId ?? ''}`)}
-						{@const hipTrail = poseHipImageTrajectoryV1(poseObservations, pose)}
+						{@const hipTrail = poseTrail(pose)}
 						<li>
 							<div class="pose-preview-row">
 								<div class="pose-source-preview" style={`aspect-ratio:${pose.frameWidth}/${pose.frameHeight}`}>

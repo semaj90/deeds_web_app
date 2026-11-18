@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
-	import CrimeSceneViewer3D from './CrimeSceneViewer3D.svelte';
+	import CrimeSceneViewer3D, { CASE_EXHIBIT_DRAG_TYPE } from './CrimeSceneViewer3D.svelte';
 	import CaseInvestigationPanel from './CaseInvestigationPanel.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import EvidenceCarouselGallery from './EvidenceCarouselGallery.svelte';
@@ -8,7 +8,7 @@
 	import ExhibitInspectorPanel from './ExhibitInspectorPanel.svelte';
 	import type { EvidenceItem } from './evidence-types.js';
 	import { DEFAULT_EVIDENCE_ITEMS } from './evidence-types.js';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, untrack } from 'svelte';
 	import { createActor } from 'xstate';
 	import {
 		createMarkerSaveMachine,
@@ -21,11 +21,13 @@
 		caseId?: string;
 		caseTitle?: string;
 		evidenceItems?: any[];
+		initialPlaceEvidenceId?: string | null;
 		demoMode?: boolean;
 		onOpen3DViewer?: (evidenceItem: any) => void;
 		onOpenDocEditor?: (node: any) => void;
 		onOpenVideoModal?: (evidenceId: string, timestampMs?: number) => void;
 		onOpenEvidenceModal?: (item: any) => void;
+		onOpenExhibitAssistant?: (evidenceId: string) => void;
 		sceneSnapshot?: SceneSnapshot | null;
 	}
 
@@ -33,15 +35,18 @@
 		caseId = '2007b040-8b33-4613-8fb8-72f90c8c5317',
 		caseTitle = 'State v. Johnson - Fraud Investigation',
 		evidenceItems = [],
+		initialPlaceEvidenceId = null,
 		demoMode = false,
 		onOpen3DViewer,
 		onOpenDocEditor,
 		onOpenVideoModal,
 		onOpenEvidenceModal,
+		onOpenExhibitAssistant,
 		sceneSnapshot = null
 	}: Props = $props();
 
 	import type { SceneSnapshot } from '$lib/server/scene-markers/scene-snapshot-v1.js';
+	import SceneToolbar from '$lib/components/scene/SceneToolbar.svelte';
 
 	// Theme: 'dark' (Noir Obsidian/Gold) | 'light' (Image 2 Crisp White/Slate)
 	let theme = $state<'dark' | 'light'>('light');
@@ -50,7 +55,11 @@
 	let mainView = $state<'canvas' | 'dossier' | 'timeline' | '3d-lidar' | 'investigation'>('canvas');
 
 	// Active Center View Mode: 'splat-3d' (Primary HUD) | 'crime-reconstruction' (Noir 3D Crime Scene) | 'canvas-nodes' (Tactical Mint Canvas)
-	let centerMode = $state<'splat-3d' | 'crime-reconstruction' | 'canvas-nodes'>('splat-3d');
+	let centerMode = $state<'splat-3d' | 'crime-reconstruction' | 'canvas-nodes'>(untrack(() => demoMode ? 'splat-3d' : 'crime-reconstruction'));
+	let showCaseInspector = $state(true);
+	let showCaseExhibits = $state(false);
+	let showIndexedFloor = $state(false);
+	let exhibitSearch = $state('');
 
 	// Active Inspector Mode: 'splat' (3D Splat Node Telemetry) | 'evidence-e002' (Bloodstain E-002 from Crime Scene)
 	let inspectorMode = $state<'splat' | 'evidence-e002' | 'scene-primitive'>('evidence-e002');
@@ -351,9 +360,9 @@
 
 	// Crime Scene Reconstruction (Noir 3D) State (Image 2)
 	let sceneLayers = $state({
-		evidence: true,
+		evidence: untrack(() => demoMode),
 		markers: true,
-		measurements: true,
+		measurements: untrack(() => demoMode),
 		reconstruction: false,
 		environment: true
 	});
@@ -366,8 +375,10 @@
 
 	// Active evidence marker from PostgreSQL (sceneSnapshot). Nothing is invented: fields the
 	// database does not record (bounds, rotation, scale) are null and render as "—".
-	const sceneMarkers = $derived(sceneSnapshot?.markers ?? []);
-	const activeMarker = $derived(sceneMarkers[Math.max(0, selectedCrimeMarker - 1)] ?? sceneMarkers[0] ?? null);
+	const CASE_MARKER_SCENE_KEY = 'main-scene';
+	const sceneMarkers = $derived(sceneSnapshot?.markers.filter((marker) => marker.sceneKey === CASE_MARKER_SCENE_KEY) ?? []);
+	let activeCaseMarkerId = $state<string | null>(null);
+	const activeMarker = $derived(sceneMarkers.find((marker) => marker.id === activeCaseMarkerId) ?? sceneMarkers[0] ?? null);
 	const crimeEvidenceE002 = $derived({
 		id: activeMarker?.evidenceId ?? '',
 		title: activeMarker?.evidenceTitle ?? 'No evidence marker placed',
@@ -434,42 +445,83 @@
 
 	// Place a new marker linked to a real case exhibit. The server rejects evidence from another case.
 	let placeEvidenceId = $state('');
-	let placePosition = $state({ x: 0, y: 0, z: 0 });
+	type PlacementPoint = { x: number; y: number; z: number };
+	let placePosition = $state<{ x?: number; y?: number; z?: number }>({ y: 0 });
 	let placing = $state(false);
 	let placeMessage = $state<string | null>(null);
 	const placeableEvidence = $derived(
 		(evidenceItems as Array<{ id?: string; title?: string; name?: string }>).filter((item) => typeof item.id === 'string' && item.id.length > 0)
 	);
-	// Scene key for new markers: the active marker's scene, else the default scene key.
-	const placementSceneKey = $derived(activeMarker?.sceneKey ?? 'main-scene');
+	const selectedExhibit = $derived(placeableEvidence.find((item) => item.id === placeEvidenceId));
+	const caseVault = $derived(caseExhibits.filter((item) =>
+		`${item.title} ${item.exhibitNumber}`.toLowerCase().includes(exhibitSearch.trim().toLowerCase())
+	));
+	const placementPreview = $derived.by((): PlacementPoint | null => {
+		const { x, y, z } = placePosition;
+		if (x === undefined || y === undefined || z === undefined || ![x, y, z].every(Number.isFinite)) return null;
+		return { x, y, z };
+	});
+	$effect(() => {
+		if (initialPlaceEvidenceId && placeableEvidence.some((item) => item.id === initialPlaceEvidenceId)) {
+			placeEvidenceId = initialPlaceEvidenceId;
+			centerMode = 'crime-reconstruction';
+			inspectorMode = 'evidence-e002';
+		}
+	});
 
-	async function placeMarker() {
-		const evidenceLink = placeableEvidence.find((item) => item.id === placeEvidenceId);
-		if (!evidenceLink || !caseId) {
+	function chooseGroundPoint(point: PlacementPoint, evidenceId = placeEvidenceId) {
+		if (placing || markerSaving) return;
+		if (!placeableEvidence.some((item) => item.id === evidenceId)) {
+			inspectorMode = 'evidence-e002';
 			placeMessage = 'Choose an exhibit from this case first.';
 			return;
 		}
+		placeEvidenceId = evidenceId;
+		placePosition = { x: Number(point.x.toFixed(3)), y: Number(point.y.toFixed(3)), z: Number(point.z.toFixed(3)) };
+		inspectorMode = 'evidence-e002';
+		transformMode = 'select';
+		placeMessage = 'Position selected. Save the marker to keep this placement.';
+	}
+
+	function openPlacementTool() {
+		centerMode = 'crime-reconstruction';
+		showCaseInspector = true;
+		inspectorMode = 'evidence-e002';
+		transformMode = 'marker';
+		placeMessage = 'Click the scene floor to choose a position.';
+	}
+
+	async function placeMarker() {
+		if (!selectedExhibit?.id || !placementPreview || !caseId || placing || markerSaving) return;
 		placing = true;
 		placeMessage = null;
+		const markerId = crypto.randomUUID();
 		const outcome = await runMarkerCommand({
 			kind: 'create',
 			caseId,
-			sceneKey: placementSceneKey,
-			markerId: crypto.randomUUID(),
-			evidenceId: evidenceLink.id,
+			sceneKey: CASE_MARKER_SCENE_KEY,
+			markerId,
+			evidenceId: selectedExhibit.id,
 			commandId: crypto.randomUUID(),
 			expectedRevision: 0,
-			position: { x: Number(placePosition.x), y: Number(placePosition.y), z: Number(placePosition.z) },
-			label: evidenceLink.title ?? evidenceLink.name ?? null
+			position: placementPreview,
+			label: selectedExhibit.title ?? selectedExhibit.name ?? null
 		});
-		placing = false;
 		if (outcome.ok === true) {
-			placeMessage = 'Marker placed and saved.';
-			// Reload the case snapshot so the new marker is read back from PostgreSQL.
-			await invalidateAll();
+			activeCaseMarkerId = markerId;
+			placePosition = { y: 0 };
+			try {
+				await invalidateAll();
+				placeMessage = sceneMarkers.some((marker) => marker.id === markerId)
+					? `Marker saved at revision ${outcome.revision}.`
+					: 'Marker saved. Reload to view the saved placement.';
+			} catch {
+				placeMessage = 'Marker saved. Reload to view the saved placement.';
+			}
 		} else {
 			placeMessage = outcome.message;
 		}
+		placing = false;
 	}
 
 	// Primitive-to-evidence binding. A selected 3D primitive is never attributed to an exhibit just
@@ -486,7 +538,7 @@
 
 	async function saveMarkerPosition() {
 		const marker = activeMarker;
-		if (!marker || markerRevision === null || !caseId) return;
+		if (!marker || markerRevision === null || !caseId || placing || markerSaving) return;
 		markerSaving = true;
 		markerSaveMessage = null;
 		const outcome = await runMarkerCommand({
@@ -499,13 +551,18 @@
 			expectedRevision: markerRevision,
 			position: { x: Number(markerDraft.x), y: Number(markerDraft.y), z: Number(markerDraft.z) }
 		});
-		markerSaving = false;
 		if (outcome.ok === true) {
 			markerRevision = outcome.revision;
+			try {
+				await invalidateAll();
+			} catch {
+				// The save was acknowledged. The list will refresh on the next visit.
+			}
 			markerSaveMessage = `Saved at revision ${outcome.revision}.`;
 		} else {
 			markerSaveMessage = outcome.message;
 		}
+		markerSaving = false;
 	}
 
 	// Active subheader filter
@@ -756,11 +813,25 @@
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
 	class="detective-hud-container {theme}-theme"
+	class:case-dossier={!demoMode}
 	onmousemove={handleCanvasMouseMove}
 	onmouseup={handleCanvasMouseUp}
 	role="region"
 	aria-label="Detective Mode Spatial Legal Intelligence HUD"
 >
+	{#if !demoMode}
+		<header class="case-scene-heading">
+			<div>
+				<h2>Detective Mode</h2>
+				<p>{caseTitle}</p>
+			</div>
+			<div class="case-scene-actions">
+				<button type="button" aria-pressed={showCaseExhibits} onclick={() => showCaseExhibits = !showCaseExhibits}>Exhibits</button>
+				<button type="button" aria-pressed={showCaseInspector} onclick={() => showCaseInspector = !showCaseInspector}>Inspector</button>
+				<a href={`/cases/${encodeURIComponent(caseId)}/crime-scene`}>Case events</a>
+			</div>
+		</header>
+	{:else}
 	<!-- LAYER 1: Global YoRHa Law Navigation Header (Image 2) -->
 	<header class="yorha-global-nav">
 		<div class="nav-left">
@@ -829,12 +900,19 @@
 			</div>
 		</div>
 	</header>
+	{/if}
 
 	<div class="scene-provenance-notice" role="note" data-testid="scene-provenance-notice">
-		<strong>DEMO SCENE</strong>
-		<span>3D placement, calibration, and scan metrics are illustrative; they are not source-verified or saved as case-scene revisions.</span>
+		{#if demoMode}
+			<strong>DEMO SCENE</strong>
+			<span>Illustrative 3D placement, calibration, and scan metrics.</span>
+		{:else}
+			<strong>ILLUSTRATIVE 3D SCENE</strong>
+			<span>Saved exhibit locations use this scene’s illustrative coordinate system.</span>
+		{/if}
 	</div>
 
+	{#if demoMode}
 	<!-- LAYER 2: KAG Vector Distance & Completion Rate Sub-Bar (Image 2) -->
 	<div class="kag-vector-subbar">
 		<div class="kvs-left">
@@ -898,6 +976,7 @@
 		</div>
 	{/if}
 
+	{/if}
 	{#if mainView === 'investigation'}
 		<!-- WHO / WHAT / WHY / HOW facets, evidence links, and the exported AI summary -->
 		<CaseInvestigationPanel {caseId} evidenceItems={evidenceItems} />
@@ -1234,6 +1313,7 @@
 			</div>
 		</div>
 	{:else}
+		{#if demoMode}
 		<!-- LAYER 2: Subheader & Mode Controls -->
 		<div class="unit-data-subheader">
 		<div class="subheader-left">
@@ -1318,8 +1398,30 @@
 		</div>
 	</div>
 
+	{/if}
 	<!-- LAYER 4: 3-Column Forensic Layout (Vault | Viewport/Canvas | Inspector) -->
-	<div class="forensic-body-workspace">
+	<div class="forensic-body-workspace" class:with-exhibits={showCaseExhibits} class:with-inspector={showCaseInspector}>
+		{#if !demoMode && showCaseExhibits}
+			<aside class="case-exhibit-panel" aria-label="Case exhibits">
+				<h3>Case exhibits</h3>
+				<label>Find an exhibit <input type="search" bind:value={exhibitSearch} /></label>
+				<div class="case-exhibit-list">
+					{#each caseVault as item (item.id)}
+						<button type="button" aria-pressed={placeEvidenceId === item.id} onclick={() => {
+							placeEvidenceId = item.id;
+							placePosition = { y: 0 };
+							showCaseInspector = true;
+							inspectorMode = 'evidence-e002';
+						}}>
+							<small>{item.exhibitNumber}</small>
+							<span>{item.title}</span>
+						</button>
+					{:else}
+						<p>{exhibitSearch ? 'No matching exhibits.' : 'This case has no exhibits yet.'}</p>
+					{/each}
+				</div>
+			</aside>
+		{:else if demoMode}
 		<!-- LEFT: EXHIBIT VAULT -->
 		<aside class="exhibit-vault-pane">
 			<div class="vault-top">
@@ -1408,6 +1510,7 @@
 				</div>
 			</div>
 		</aside>
+		{/if}
 
 		<!-- CENTER: FORENSIC 3D VIEWPORT OR TACTICAL MINT CANVAS -->
 		<main
@@ -1507,6 +1610,21 @@
 			{:else if centerMode === 'crime-reconstruction'}
 				<!-- Noir Crime Scene Reconstruction 3D Stage (Image 2) -->
 				<div class="crime-reconstruction-stage">
+					{#if !demoMode}
+						<SceneToolbar
+							title="3D scene"
+							markerActive={transformMode === 'marker'}
+							onResetView={() => crimeViewerRef?.resetCameraOrbit()}
+							onTogglePlaceMarker={() => {
+								if (transformMode === 'marker') {
+									transformMode = 'select';
+									placeMessage = '';
+								} else {
+									openPlacementTool();
+								}
+							}}
+						/>
+					{:else}
 					<!-- Top Sub-Bar for Crime Scene -->
 					<div class="crime-stage-header">
 						<div class="csh-title-row">
@@ -1554,13 +1672,14 @@
 							<button
 								class="csh-tool-btn"
 								class:active={transformMode === 'marker'}
-								onclick={() => transformMode = 'marker'}
-								title="Place Evidence Marker Tent (Click Ground)"
+								onclick={() => demoMode ? (transformMode = 'marker') : openPlacementTool()}
+								title={demoMode ? 'Place Evidence Marker Tent (Click Ground)' : 'Choose marker position on floor'}
 							><Icon name="map-pin" size={13} /></button>
 							<button class="csh-tool-btn" title="Annotate"><Icon name="pen-tool" size={13} /></button>
 							<button class="csh-tool-btn" title="More Options"><Icon name="more-horizontal" size={13} /></button>
 						</div>
 					</div>
+					{/if}
 
 					<!-- 3D Scene Container -->
 					<div class="crime-viewport-container">
@@ -1571,6 +1690,17 @@
 							selectedMarker={selectedCrimeMarker}
 							{sceneLayers}
 							{transformMode}
+							caseMarkers={demoMode ? undefined : sceneMarkers}
+							indexedFloor={showIndexedFloor}
+							placementPreview={placementPreview && selectedExhibit ? placementPreview : null}
+							onCaseGroundPoint={demoMode ? undefined : chooseGroundPoint}
+							onCaseMarkerSelect={(id) => {
+								activeCaseMarkerId = id;
+								placeEvidenceId = sceneMarkers.find((marker) => marker.id === id)?.evidenceId ?? '';
+								placePosition = { y: 0 };
+								showCaseInspector = true;
+								inspectorMode = 'evidence-e002';
+							}}
 							onSelectEvidence={() => {
 								inspectorMode = 'evidence-e002';
 								selectedCrimeMarker = 1;
@@ -1585,6 +1715,14 @@
 							}}
 						/>
 
+						{#if !demoMode}
+							<details class="case-scene-layers">
+								<summary>Layers</summary>
+								<label><input type="checkbox" bind:checked={sceneLayers.markers} /> Saved markers</label>
+								<label><input type="checkbox" bind:checked={sceneLayers.environment} /> Scene environment</label>
+								<label><input type="checkbox" bind:checked={showIndexedFloor} /> Indexed floor texture</label>
+							</details>
+						{:else}
 						<!-- Top-Left Floating SCENE LAYERS Card (Image 2) -->
 						<div class="floating-scene-layers-card">
 							<div class="fsl-head">
@@ -1644,6 +1782,7 @@
 							<span class="cnd-meta">Grid 0.25 m</span>
 							<span class="cnd-meta">Units: m</span>
 						</div>
+					{/if}
 					</div>
 				</div>
 			{:else}
@@ -1762,7 +1901,11 @@
 		</main>
 
 		<!-- RIGHT: SELECTED DATA & FORENSIC SPLAT TELEMETRY INSPECTOR -->
-		<aside class="selected-data-inspector">
+		{#if demoMode || showCaseInspector}
+		<aside class="selected-data-inspector" aria-label="Scene inspector">
+			{#if !demoMode}
+				<h3 class="case-inspector-heading">Scene inspector</h3>
+			{:else}
 			<div class="inspector-header">
 				<div class="inspector-title-row">
 					<Icon name="scan" size={14} />
@@ -1772,7 +1915,7 @@
 							class="imt-btn"
 							class:active={inspectorMode === 'evidence-e002'}
 							onclick={() => { selectedScenePrimitive = null; inspectorMode = 'evidence-e002'; }}
-							title="Show {activeMarker?.markerKey ?? 'evidence'} crime scene evidence"
+							title={demoMode ? 'Show E-002 Crime Scene Evidence' : 'Show saved exhibit markers'}
 						>{activeMarker?.markerKey ?? '—'}</button>
 						<button
 							class="imt-btn"
@@ -1795,10 +1938,58 @@
 					{/if}
 				</div>
 			</div>
+			{/if}
 
 			{#if inspectorMode === 'evidence-e002'}
-				<!-- Image 2: EVIDENCE = E-002 Crime Scene Inspector -->
-				<div class="inspector-scroll-area noir-evidence-inspector">
+			<div class="inspector-scroll-area noir-evidence-inspector">
+				{#if !demoMode}
+					<section class="nei-section marker-save case-placement" aria-label="Place evidence marker">
+					<div class="marker-save-title">Place evidence marker</div>
+					<label class="marker-save-field">
+						Exhibit
+						<select bind:value={placeEvidenceId} disabled={placing || markerSaving}>
+							<option value="">Choose exhibit…</option>
+							{#each placeableEvidence as item (item.id)}
+								<option value={item.id}>{item.title ?? item.name ?? item.id}</option>
+							{/each}
+						</select>
+					</label>
+					{#if selectedExhibit?.id}
+						<div class="case-exhibit-actions">
+							<button type="button" onclick={() => onOpenEvidenceModal?.(selectedExhibit)}>Open exhibit</button>
+							<button type="button" onclick={() => selectedExhibit?.id && onOpenExhibitAssistant?.(selectedExhibit.id)}>Ask assistant</button>
+						</div>
+					{/if}
+					<button
+						type="button"
+						class="marker-save-btn placement-pick"
+						draggable={!!selectedExhibit && !placing && !markerSaving}
+						disabled={!selectedExhibit || placing || markerSaving}
+						ondragstart={(event) => {
+							if (!selectedExhibit?.id || !event.dataTransfer) return;
+							event.dataTransfer.effectAllowed = 'copy';
+							event.dataTransfer.setData(CASE_EXHIBIT_DRAG_TYPE, selectedExhibit.id);
+						}}
+						onclick={openPlacementTool}
+					>
+						<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 14 5v6l-6 3.5L2 11V5Z" fill="none" stroke="currentColor" /></svg>
+						Choose position on floor
+					</button>
+					<p class="placement-help">Click the button, or drag it onto the scene floor. You can also enter coordinates.</p>
+					<div class="marker-save-grid">
+						<label>X <input type="number" step="0.01" bind:value={placePosition.x} /></label>
+						<label>Y <input type="number" step="0.01" bind:value={placePosition.y} /></label>
+						<label>Z <input type="number" step="0.01" bind:value={placePosition.z} /></label>
+					</div>
+					<button type="button" class="marker-save-btn" onclick={placeMarker} disabled={placing || markerSaving || !selectedExhibit || !placementPreview}>
+						{placing ? 'Saving…' : 'Save marker'}
+					</button>
+					{#if placeMessage}
+						<p class="marker-save-status" role="status">{placeMessage}</p>
+					{/if}
+				</section>
+				{/if}
+					{#if demoMode}
 					<!-- Hero Bloodstain Thumbnail & Meta -->
 					<div class="nei-hero-box">
 						<div class="nei-thumb-wrap">
@@ -1889,6 +2080,7 @@
 						</div>
 					</div>
 
+					{/if}
 					{#if activeMarker}
 						<div class="nei-section marker-save" style="margin-top: 8px;">
 							<div class="marker-save-title">MARKER POSITION · revision {markerRevision ?? '—'}</div>
@@ -1897,7 +2089,7 @@
 								<label>Y <input type="number" step="0.01" bind:value={markerDraft.y} /></label>
 								<label>Z <input type="number" step="0.01" bind:value={markerDraft.z} /></label>
 							</div>
-							<button type="button" class="marker-save-btn" onclick={saveMarkerPosition} disabled={markerSaving || markerRevision === null}>
+							<button type="button" class="marker-save-btn" onclick={saveMarkerPosition} disabled={placing || markerSaving || markerRevision === null}>
 								{markerSaving ? 'Saving…' : 'Save position'}
 							</button>
 							{#if markerSaveMessage}
@@ -1910,13 +2102,13 @@
 						<div class="nei-section marker-save" style="margin-top: 8px;">
 							<div class="marker-save-title">SCENE MARKERS · {sceneMarkers.length} saved</div>
 							<ul class="marker-list">
-								{#each sceneMarkers as marker, index (marker.id)}
+								{#each sceneMarkers as marker (marker.id)}
 									<li>
 										<button
 											type="button"
 											class="marker-list-btn"
-											class:active={index === Math.max(0, selectedCrimeMarker - 1)}
-											onclick={() => (selectedCrimeMarker = index + 1)}
+											class:active={marker.id === activeMarker?.id}
+											onclick={() => (activeCaseMarkerId = marker.id)}
 										>
 											{marker.label ?? marker.evidenceTitle} · rev {marker.revision}
 										</button>
@@ -1926,29 +2118,7 @@
 						</div>
 					{/if}
 
-					<div class="nei-section marker-save" style="margin-top: 8px;">
-						<div class="marker-save-title">PLACE MARKER · scene {placementSceneKey}</div>
-						<label class="marker-save-field">
-							Exhibit
-							<select bind:value={placeEvidenceId} disabled={placing}>
-								<option value="">Choose exhibit…</option>
-								{#each placeableEvidence as item (item.id)}
-									<option value={item.id}>{item.title ?? item.name ?? item.id}</option>
-								{/each}
-							</select>
-						</label>
-						<div class="marker-save-grid">
-							<label>X <input type="number" step="0.01" bind:value={placePosition.x} /></label>
-							<label>Y <input type="number" step="0.01" bind:value={placePosition.y} /></label>
-							<label>Z <input type="number" step="0.01" bind:value={placePosition.z} /></label>
-						</div>
-						<button type="button" class="marker-save-btn" onclick={placeMarker} disabled={placing || !placeEvidenceId}>
-							{placing ? 'Placing…' : 'Place marker'}
-						</button>
-						{#if placeMessage}
-							<p class="marker-save-status" role="status">{placeMessage}</p>
-						{/if}
-					</div>
+
 
 					<!-- N64 16 KB Memory Arena FSM Telemetry Inspector -->
 					{#if selectedScenePrimitive}
@@ -2075,11 +2245,12 @@
 			</div>
 			{/if}
 		</aside>
+		{/if}
 	</div>
 	{/if}
 
 	<!-- LAYER 5: Bottom Temporal Sequence or Noir Chevron Pipeline (Canvas / 3D modes only) -->
-	{#if mainView !== 'dossier'}
+	{#if demoMode && mainView !== 'dossier'}
 	{#if centerMode === 'crime-reconstruction'}
 		<!-- Image 2: Noir Chevron Phase Timeline Footer -->
 		<footer class="crime-timeline-footer">
@@ -2228,6 +2399,143 @@
 </div>
 
 <style>
+	.case-dossier {
+		background: var(--dossier-bg-workspace, #ece7dc);
+		color: var(--dossier-text-main, #141312);
+		font-family: system-ui, sans-serif;
+		user-select: text;
+	}
+
+	.case-scene-heading,
+	.case-viewport-toolbar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.6rem 1rem;
+		flex-wrap: wrap;
+		padding: 0.8rem 1rem;
+		background: var(--dossier-bg-card, #faf6f0);
+		color: var(--dossier-text-main, #141312);
+	}
+
+	.case-scene-heading h2 {
+		margin: 0;
+		font: 600 1.55rem/1.15 Georgia, serif;
+	}
+
+	.case-scene-heading p {
+		margin: 0.2rem 0 0;
+		color: var(--dossier-text-muted-aa, #6b6150);
+		font-size: 0.85rem;
+	}
+
+	.case-scene-actions,
+	.case-viewport-toolbar div,
+	.case-exhibit-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+	}
+
+	.case-scene-actions :is(button, a),
+	.case-viewport-toolbar button,
+	.case-exhibit-actions button {
+		padding: 0.38rem 0.65rem;
+		border: 1px solid var(--dossier-border-sand, #d5c6ac);
+		border-radius: 6px;
+		background: var(--dossier-bg-card, #faf6f0);
+		color: var(--dossier-text-main, #141312);
+		font: inherit;
+		font-size: 0.8rem;
+		text-decoration: none;
+	}
+
+	.case-dossier button[aria-pressed="true"] {
+		background: var(--dossier-bg-workspace, #ece7dc);
+		border-color: var(--dossier-mocha, #483d36);
+	}
+
+	.case-dossier .forensic-body-workspace {
+		grid-template-columns: minmax(0, 1fr);
+		min-height: 0;
+		gap: 0.65rem;
+		padding: 0.65rem;
+	}
+
+	.case-dossier .with-exhibits { grid-template-columns: minmax(10rem, 15rem) minmax(0, 1fr); }
+	.case-dossier .with-inspector { grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem); }
+	.case-dossier .with-exhibits.with-inspector { grid-template-columns: minmax(10rem, 15rem) minmax(0, 1fr) minmax(16rem, 20rem); }
+
+	.case-dossier :is(.case-exhibit-panel, .selected-data-inspector, .forensic-center-stage) {
+		min-width: 0;
+		min-height: 0;
+		background: var(--dossier-bg-card, #faf6f0);
+		color: var(--dossier-text-main, #141312);
+		border: 1px solid var(--dossier-border-sand, #d5c6ac);
+		border-radius: var(--dossier-radius-card, 10px);
+	}
+
+	.case-exhibit-panel {
+		padding: 0.8rem;
+		overflow: auto;
+	}
+
+	.case-exhibit-panel h3,
+	.case-inspector-heading {
+		font: 600 1.15rem/1.3 Georgia, serif;
+		margin: 0 0 0.65rem;
+	}
+
+	.case-inspector-heading { margin: 0; padding: 0.85rem 0.85rem 0; }
+	.case-exhibit-panel label { display: grid; gap: 0.25rem; font-size: 0.82rem; }
+	.case-exhibit-panel input { width: 100%; min-width: 0; }
+	.case-exhibit-list { display: grid; gap: 0.4rem; margin-top: 0.65rem; }
+	.case-exhibit-list button {
+		display: grid;
+		gap: 0.15rem;
+		width: 100%;
+		padding: 0.55rem;
+		text-align: left;
+		overflow-wrap: anywhere;
+		border: 1px solid var(--dossier-border-sand, #d5c6ac);
+		border-radius: 6px;
+		background: var(--dossier-bg-card, #faf6f0);
+		color: inherit;
+	}
+
+	.case-exhibit-list small { color: var(--dossier-text-muted-aa, #6b6150); }
+	.case-viewport-toolbar { padding-block: 0.55rem; }
+	.case-dossier :is(.forensic-center-stage, .crime-reconstruction-stage) {
+		align-items: stretch;
+		padding: 0;
+	}
+	.case-dossier .crime-reconstruction-stage { width: 100%; }
+	.case-dossier .crime-viewport-container { width: 100%; min-height: 0; }
+	.case-scene-layers {
+		position: absolute;
+		left: 0.75rem;
+		top: 0.75rem;
+		display: grid;
+		padding: 0.5rem 0.75rem;
+		background: var(--dossier-bg-card, #faf6f0);
+		color: var(--dossier-text-main, #141312);
+		border-radius: 6px;
+		font-size: 0.8rem;
+	}
+	.case-scene-layers summary { cursor: pointer; }
+	.case-scene-layers label { display: block; margin-top: 0.35rem; }
+
+	@media (max-width: 960px) {
+		.case-dossier .forensic-body-workspace {
+			display: flex;
+			flex-direction: column;
+			overflow-y: auto;
+		}
+		.case-dossier .forensic-center-stage { order: -1; flex: 0 0 clamp(320px, 50dvh, 460px); }
+		.case-dossier :is(.case-exhibit-panel, .selected-data-inspector) { flex: 0 0 auto; }
+		.case-exhibit-list { max-height: 14rem; overflow-y: auto; }
+	}
+
 	/* ROOT CONTAINER: High-Tech Cyber-Forensic Layout */
 	.detective-hud-container {
 		display: flex;
@@ -3917,6 +4225,60 @@
 	.chain-custody-link:hover {
 		color: #f3d471;
 		text-decoration: underline;
+	}
+
+	.nei-section.case-placement {
+		display: grid;
+		gap: 0.55rem;
+		padding: 0.85rem;
+		background: #fbf7ef;
+		color: #352a20;
+		border: 1px solid #d6c5aa;
+		border-radius: 8px;
+	}
+
+	.case-placement .marker-save-title {
+		font-weight: 700;
+	}
+
+	.marker-save-field,
+	.marker-save-grid label {
+		display: grid;
+		gap: 0.2rem;
+		min-width: 0;
+	}
+
+	.marker-save-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0.4rem;
+	}
+
+	.marker-save-grid input,
+	.marker-save-field select {
+		width: 100%;
+		min-width: 0;
+	}
+
+	.placement-pick {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+
+	.placement-pick[draggable="true"] {
+		cursor: grab;
+	}
+
+	.placement-help {
+		margin: 0;
+		font-size: 0.76rem;
+		line-height: 1.4;
+	}
+
+	.case-placement .marker-save-status {
+		margin: 0;
+		font-size: 0.8rem;
 	}
 
 	.nei-section {

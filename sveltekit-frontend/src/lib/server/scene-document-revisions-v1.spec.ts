@@ -170,7 +170,7 @@ describe('scene document revision v1 admission', () => {
 			{ id: '77777777-7777-4777-8777-777777777777', evidenceId, version: 4, metadata: {
 				schema: 'atlas.planar-camera-calibration-review.v1', evidenceId, caseId, sourceSha256: sourceRevision,
 				analysisRevision: 'run-ground-track', annotationRevisionId, calibrationSha256, calibrationFrameIndex: 0,
-				calibrationFramePtsUs: 0, decision: 'ACCEPTED_FOR_SCENE_PROPOSAL',
+				calibrationFramePtsUs: 0, decision: 'ACCEPTED_FOR_SCENE_PROPOSAL', cameraFixedWindow: { startPtsUs: 0, endPtsUs: 10_000_000 },
 				sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false
 			} },
 			...poses.map((pose, index) => ({ id: `pose-review-${index}`, evidenceId, version: 3 - index, metadata: {
@@ -199,8 +199,27 @@ describe('scene document revision v1 admission', () => {
 		};
 		const sceneManifest = sceneRevisionCommandV1Schema.parse({ commandId, expectedRevision: 0,
 			manifest: manifest({ evidenceBindings: [{ evidenceId, sourceRevision }], groundPlaneTrackProposals: [proposal] }) }).manifest;
-		const evidenceRows = [{ id: evidenceId, caseId, hash: sourceRevision }];
+		const evidenceRows = [{ id: evidenceId, caseId, hash: sourceRevision,
+			aiAnalysis: { videoAnalysis: { sourceRevision, analysisRevision: 'run-ground-track' } } }];
 		await expect(validateSceneGroundPlaneTrackProposalsV1({ caseId, manifest: sceneManifest, evidenceRows, versionRows })).resolves.toBeUndefined();
+		const newerPose = { ...poses[1]!, frameIndex: 90, framePtsUs: 3_000_000 };
+		const newerPoseRevisionId = '99999999-9999-4999-8999-999999999999';
+		const priorReview = versionRows[1]!;
+		const extendedHistory = [
+			{ ...priorReview, id: 'new-review', version: 6, metadata: { ...priorReview.metadata, annotationRevisionId: newerPoseRevisionId, framePtsUs: newerPose.framePtsUs } },
+			{ id: newerPoseRevisionId, evidenceId, version: 5, metadata: {
+				schema: 'atlas.evidence-annotation-revision.v1', parentSha256: sourceRevision, annotation: { poseObservations: [newerPose] },
+			} },
+			...versionRows,
+		];
+		await expect(validateSceneGroundPlaneTrackProposalsV1({ caseId, manifest: sceneManifest, evidenceRows, versionRows: extendedHistory })).resolves.toBeUndefined();
+		await expect(validateSceneGroundPlaneTrackProposalsV1({ caseId, manifest: sceneManifest, versionRows: extendedHistory,
+			evidenceRows: [{ ...evidenceRows[0]!, aiAnalysis: { videoAnalysis: { sourceRevision, analysisRevision: 'another-run' } } }],
+		})).rejects.toThrow('SCENE_REVISION_GROUND_TRACK_ANALYSIS_CHANGED');
+		const rejectedHistory = [{ ...priorReview, id: 'revoked-review', version: 7,
+			metadata: { ...priorReview.metadata, decision: 'REJECTED', sceneAdmission: 'NOT_ADMITTED', groundContactDecision: 'REJECTED' } }, ...extendedHistory];
+		await expect(validateSceneGroundPlaneTrackProposalsV1({ caseId, manifest: sceneManifest, evidenceRows, versionRows: rejectedHistory }))
+			.rejects.toThrow('SCENE_REVISION_GROUND_TRACK_NOT_ADMITTED');
 		await expect(validateSceneGroundPlaneTrackProposalsV1({ caseId, manifest: sceneManifest, evidenceRows: [{ ...evidenceRows[0], caseId: sceneId }], versionRows })).rejects.toThrow('SCENE_REVISION_GROUND_TRACK_SOURCE_NOT_REGISTERED');
 		const tamperedManifest = sceneRevisionCommandV1Schema.parse({ commandId, expectedRevision: 0,
 			manifest: manifest({ evidenceBindings: [{ evidenceId, sourceRevision }], groundPlaneTrackProposals: [{ ...proposal, points: proposal.points.map((point, index) => index ? point : { ...point, planeM: [99, 99] }) }] }) }).manifest;

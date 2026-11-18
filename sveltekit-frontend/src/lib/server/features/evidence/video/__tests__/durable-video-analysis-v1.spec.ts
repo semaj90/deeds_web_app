@@ -34,7 +34,7 @@ vi.mock('$lib/server/env.server.js', () => ({ ENV: { WHISPER_MODEL: 'fixture-whi
 vi.mock('../transcript-service.js', () => ({ extractAudioTrack: mocks.extractAudio, transcribeVideoAudio: mocks.transcribe }));
 vi.mock('../storyboard-manifest-contract-v1.js', () => ({ detectVideoAndAudioStreamsV1: mocks.probe }));
 
-import { computeVideoFrameSampleRateV1, processCanonicalVideoAnalysisV1 } from '../durable-video-analysis-v1.js';
+import { computeVideoFrameSampleRateV1, computeVideoMotionSampleRateV1, processCanonicalVideoAnalysisV1 } from '../durable-video-analysis-v1.js';
 
 const EVIDENCE_ID = 'b6cdd941-8d37-4b2f-97dc-80bd37d5b183';
 const CASE_ID = '0b52c31f-ff93-4c6e-823a-b4e95fb5a050';
@@ -203,7 +203,7 @@ describe('durable video analysis worker stage', () => {
 		});
 	});
 
-	it('stores compact revision-bound motion LUTs from adjacent sampled frames', async () => {
+	it('stores compact revision-bound motion samples on their independent low-resolution lane', async () => {
 		const bytes = Buffer.from('fixture-motion-video');
 		const blackFrame = await sharp({ create: { width: 64, height: 128, channels: 3, background: { r: 0, g: 0, b: 0 } } }).png().toBuffer();
 		const whiteFrame = await sharp({ create: { width: 64, height: 128, channels: 3, background: { r: 255, g: 255, b: 255 } } }).png().toBuffer();
@@ -222,25 +222,40 @@ describe('durable video analysis worker stage', () => {
 			bytes,
 		}, dependencies());
 
-		const frames = mocks.persist.mock.calls.at(-1)?.[0]?.frames as Array<{
-			timestampMs: number;
-			motionLut?: { frameIndex: number; timestampMs: number; previousTimestampMs: number | null; motionScore: number; analysisRevision: string; artifact: { byteLength: number; sha256: string; analysisRevision: string } };
-		}>;
-		expect(frames).toHaveLength(2);
-		expect(frames[0]?.motionLut).toMatchObject({ frameIndex: 0, timestampMs: 1000, previousTimestampMs: null, motionScore: 0 });
-		expect(frames[1]?.motionLut).toMatchObject({ frameIndex: 1, timestampMs: 2500, previousTimestampMs: 1000, motionScore: 1 });
-		expect(frames[1]?.motionLut?.artifact).toMatchObject({
+		const persistInput = mocks.persist.mock.calls.at(-1)?.[0] as {
+			frames: Array<{ motionLut?: unknown }>;
+			motionSamples: Array<{ sampleIndex: number; timestampMs: number; previousTimestampMs: number | null; motionScore: number; analysisRevision: string; artifact: { byteLength: number; sha256: string; analysisRevision: string } }>;
+			motionSampleFps: number;
+			motionSampleStatus: string;
+		};
+		expect(persistInput.frames).toHaveLength(2);
+		expect(persistInput.frames.every((frame) => frame.motionLut === undefined)).toBe(true);
+		expect(persistInput.motionSamples).toHaveLength(2);
+		expect(persistInput.motionSamples[0]).toMatchObject({ sampleIndex: 0, timestampMs: 1000, previousTimestampMs: null, motionScore: 0 });
+		expect(persistInput.motionSamples[1]).toMatchObject({ sampleIndex: 1, timestampMs: 2500, previousTimestampMs: 1000, motionScore: 1 });
+		expect(persistInput.motionSamples[1]?.artifact).toMatchObject({
 			byteLength: 4112,
 			sha256: expect.stringMatching(/^sha256:[a-f0-9]{64}$/),
-			analysisRevision: frames[1]?.motionLut?.analysisRevision,
+			analysisRevision: persistInput.motionSamples[1]?.analysisRevision,
 		});
+		expect(mocks.extractFrames).toHaveBeenCalledTimes(2);
+		expect(mocks.extractFrames.mock.calls[0]?.[1]).toMatchObject({ fps: 2, maxFrames: 60 });
+		expect(mocks.extractFrames.mock.calls[1]?.[1]).toMatchObject({ fps: 2, maxFrames: 300, scaleWidth: 64 });
+		expect(persistInput.motionSampleFps).toBe(2);
+		expect(persistInput.motionSampleStatus).toBe('COMPLETED');
 		expect(mocks.uploadArtifact).toHaveBeenCalledWith(
 			'atlas-artifacts',
-			expect.stringContaining(`/motion-0001.atm`),
+			expect.stringContaining(`/motion-sample-0001.atm`),
 			expect.any(Buffer),
 			expect.objectContaining({ 'Content-Type': 'application/vnd.atlas.video-motion-lut-v1' }),
 		);
 		expect(result?.canonicalReceiptVerified).toBe(true);
+	});
+
+	it('caps independent motion sampling at 2 FPS and 300 low-resolution samples', () => {
+		expect(computeVideoMotionSampleRateV1(10)).toBe(2);
+		expect(computeVideoMotionSampleRateV1(600)).toBe(0.5);
+		expect(computeVideoMotionSampleRateV1(4 * 60 * 60)).toBeCloseTo(300 / 14_400, 12);
 	});
 
 	it('persists source-scoped track hypotheses and timestamp-derived box motion', async () => {
@@ -317,6 +332,7 @@ describe('durable video analysis worker stage', () => {
 		}, dependencies());
 
 		expect(computeVideoFrameSampleRateV1(4 * 60 * 60)).toBeCloseTo(1 / 240, 12);
+		expect(computeVideoFrameSampleRateV1(10)).toBe(2);
 		expect(mocks.extractFrames).toHaveBeenCalledWith(bytes, { fps: 1 / 240, maxFrames: 60 });
 		expect(mocks.persist).toHaveBeenCalledWith(expect.objectContaining({ samplingFps: 1 / 240 }), expect.anything());
 	});

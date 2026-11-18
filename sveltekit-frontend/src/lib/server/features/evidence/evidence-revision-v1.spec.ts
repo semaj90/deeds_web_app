@@ -361,6 +361,7 @@ describe('evidence-revision-v1', () => {
       caseId: CASE_ID, evidenceId: EV_ID, actorUserId: 7, parentSha256: PARENT, annotationRevisionId,
       calibrationSha256, analysisRevision: 'analysis-rev-1', calibrationFrameIndex: 37, calibrationFramePtsUs: 1_250_000,
       decision: 'ACCEPTED_FOR_SCENE_PROPOSAL' as const,
+      cameraFixedWindow: { startPtsUs: 0, endPtsUs: 2_000_000 },
     };
     const first = await savePlanarCalibrationReviewDecisionV1(input, ports);
     const replay = await savePlanarCalibrationReviewDecisionV1(input, ports);

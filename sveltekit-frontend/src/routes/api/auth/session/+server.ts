@@ -3,7 +3,6 @@
  * Get current session or refresh/validate existing session
  */
 
-import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/server/lucia';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
@@ -12,31 +11,19 @@ import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cac
  * GET /api/auth/session
  * Check if user has a valid session
  */
-export const GET: RequestHandler = async ({ cookies, request }) => {
+export const GET: RequestHandler = async ({ locals, request }) => {
 	try {
-		const sessionId = cookies.get('auth_session');
-
-		if (!sessionId) {
+		// The server hook is the single session authority. It validates Lucia cookies
+		// and also supplies the explicitly configured development identity; checking
+		// cookies again here made the UI report signed-out while protected routes
+		// correctly accepted the same request.
+		const { user, session } = locals;
+		if (!user || !session) {
 			return json({ authenticated: false, session: null, user: null }, {
 				status: 401,
 				headers: cacheControl.private
 			});
 		}
-
-		// Validate session with Lucia v3
-		const { session, user } = await validateSession(sessionId);
-
-		if (!session || !user) {
-			// Session invalid, clear cookie
-			deleteSessionCookie(cookies);
-			return json({ authenticated: false, session: null, user: null }, {
-				status: 401,
-				headers: cacheControl.private
-			});
-		}
-
-		// Refresh session cookie if needed (Lucia automatically handles session refresh)
-		setSessionCookie(cookies, session.id);
 
 		const responseData = {
 			authenticated: true,
@@ -46,12 +33,12 @@ export const GET: RequestHandler = async ({ cookies, request }) => {
 				fresh: session.fresh
 			},
 			user: { id: user.id,
-				email: user.email,
-				firstName: user.firstName,
-				lastName: user.lastName,
-				role: user.role,
-				isActive: user.isActive,
-				avatarUrl: user.avatarUrl
+				email: user.email ?? null,
+				firstName: user.firstName ?? null,
+				lastName: user.lastName ?? null,
+				role: user.role ?? null,
+				isActive: user.isActive ?? null,
+				avatarUrl: user.avatarUrl ?? null
 			}
 		};
 

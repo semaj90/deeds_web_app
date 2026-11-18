@@ -34,7 +34,7 @@ function fixture() {
 	const calibrationDecision = {
 		schema: 'atlas.planar-camera-calibration-review.v1' as const, evidenceId, caseId, sourceSha256,
 		analysisRevision: 'run-1', annotationRevisionId: calibrationRevisionId, calibrationSha256,
-		calibrationFrameIndex: 0, calibrationFramePtsUs: 0, decision: 'ACCEPTED_FOR_SCENE_PROPOSAL' as const,
+		calibrationFrameIndex: 0, calibrationFramePtsUs: 0, decision: 'ACCEPTED_FOR_SCENE_PROPOSAL' as const, cameraFixedWindow: { startPtsUs: 0, endPtsUs: 10_000_000 },
 		sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL' as const, canonicalAuthority: false as const,
 	};
 	const sample = {
@@ -47,6 +47,41 @@ function fixture() {
 }
 
 describe('reviewed ground-plane track v1', () => {
+	it('refuses an accepted calibration without a reviewer-confirmed camera window', async () => {
+		const input = fixture();
+		const { cameraFixedWindow: _omitted, ...noWindow } = input.calibrationDecision;
+		await expect(deriveReviewedGroundPlaneTrackV1({
+			calibration: input.calibration, calibrationRevisionId, calibrationDecision: noWindow, samples: [input.sample],
+		})).rejects.toThrow('GROUND_PLANE_CAMERA_WINDOW_REQUIRED');
+	});
+
+	it('rejects a reviewed contact whose source time falls outside the fixed-camera window', async () => {
+		const input = fixture();
+		const narrow = { ...input.calibrationDecision, cameraFixedWindow: { startPtsUs: 0, endPtsUs: 500_000 } };
+		await expect(deriveReviewedGroundPlaneTrackV1({
+			calibration: input.calibration, calibrationRevisionId, calibrationDecision: narrow, samples: [input.sample],
+		})).rejects.toThrow('GROUND_PLANE_SAMPLE_OUTSIDE_CAMERA_WINDOW');
+	});
+
+	it('rejects a track whose source time advances while its frame index does not', async () => {
+		const input = fixture();
+		const later = { ...input.sample, pose: { ...input.sample.pose, framePtsUs: 2_000_000, frameIndex: 10, trackId: 'track-1' } };
+		await expect(deriveReviewedGroundPlaneTrackV1({
+			calibration: input.calibration, calibrationRevisionId, calibrationDecision: input.calibrationDecision,
+			samples: [input.sample, later],
+		})).rejects.toThrow('GROUND_PLANE_TRACK_NON_MONOTONIC_SOURCE_FRAMES');
+	});
+
+	it('accepts a monotonic two-sample track', async () => {
+		const input = fixture();
+		const later = { ...input.sample, pose: { ...input.sample.pose, framePtsUs: 2_000_000, frameIndex: 60, trackId: 'track-1' } };
+		const result = await deriveReviewedGroundPlaneTrackV1({
+			calibration: input.calibration, calibrationRevisionId, calibrationDecision: input.calibrationDecision,
+			samples: [input.sample, later],
+		});
+		expect(result.map((p) => p.framePtsUs)).toEqual([1_000_000, 2_000_000]);
+	});
+
 	it('projects only explicitly marked contact points after exact calibration and pose review', async () => {
 		const input = fixture();
 		const result = await deriveReviewedGroundPlaneTrackV1({

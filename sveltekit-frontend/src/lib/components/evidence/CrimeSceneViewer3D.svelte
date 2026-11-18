@@ -1,11 +1,16 @@
+<script module lang="ts">
+	export const CASE_EXHIBIT_DRAG_TYPE = 'application/x-atlas-case-exhibit';
+</script>
+
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import * as THREE from 'three';
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-	import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 	import { ScenePrimitiveManager, type ScenePrimitiveSnapshot } from '$lib/n64-fsm/scene-primitive-sync.js';
 	import { ARENA_BYTE_LENGTH } from '$lib/n64-fsm/scene-fsm-cache.js';
 	import { SpatialBvhManagerV1 } from '$lib/splat/spatial-bvh-manager-v1.js';
+	import { createIndexedPaletteShaderMaterialV1 } from '$lib/splat/indexed-palette-shader-v1.js';
+	import { INDEXED_PALETTE16_V1, quantizeRgbaToIndexed4BppV1 } from '$lib/splat/indexed-palette-texture-v1.js';
 	import { buildWalkPath, type Vec3 } from '$lib/courtroom/walk-path-v1.js';
 	import {
 		legalMotionEnvelope,
@@ -16,6 +21,7 @@
 		new Float32Array(ARENA_BYTE_LENGTH / Float32Array.BYTES_PER_ELEMENT)
 	);
 	const pickBvhManager = new SpatialBvhManagerV1();
+	type CaseMarker = { id: string; posX: number; posY: number; posZ: number };
 
 	interface Props {
 		activeEvidenceId?: string;
@@ -34,6 +40,11 @@
 		onSelectEvidence?: (evidence: any) => void;
 		onSelectMarker?: (markerId: number) => void;
 		onSelectScenePrimitive?: (selection: ScenePrimitiveSnapshot) => void;
+		caseMarkers?: readonly CaseMarker[];
+		indexedFloor?: boolean;
+		placementPreview?: Vec3 | null;
+		onCaseMarkerSelect?: (id: string) => void;
+		onCaseGroundPoint?: (point: Vec3, evidenceId?: string) => void;
 	}
 
 	let {
@@ -52,7 +63,12 @@
 		trajectoryProgress = 0,
 		onSelectEvidence,
 		onSelectMarker,
-		onSelectScenePrimitive
+		onSelectScenePrimitive,
+		caseMarkers,
+		indexedFloor = false,
+		placementPreview = null,
+		onCaseMarkerSelect,
+		onCaseGroundPoint
 	}: Props = $props();
 
 	let containerEl = $state<HTMLDivElement>();
@@ -83,7 +99,16 @@
 	let measurementsGroup: THREE.Group;
 	let reconstructionGroup: THREE.Group;
 	let environmentGroup: THREE.Group;
-	let groundMesh: THREE.Mesh | null = null;
+	let groundMesh: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardMaterial> | null = null;
+	let solidFloorMaterial: THREE.MeshStandardMaterial | null = null;
+	let blockout: THREE.InstancedMesh<THREE.BoxGeometry, THREE.MeshStandardMaterial> | null = null;
+	let caseMarkerReady = $state(false);
+	let sceneReady = $state(false);
+	let caseMarkerGeometry: THREE.CylinderGeometry | null = null;
+	let caseMarkerMaterial: THREE.MeshBasicMaterial | null = null;
+	let previewMaterial: THREE.MeshBasicMaterial | null = null;
+	let caseMarkerPreview: THREE.Mesh | null = null;
+	const caseMarkerMeshes = new Map<string, THREE.Mesh>();
 
 	// Pickable objects map
 	let pickables: { object: THREE.Object3D; type: string; id: any }[] = [];
@@ -98,6 +123,76 @@
 	function rebuildPickBvh(): void {
 		pickBvhManager.build(pickables.map((pickable) => pickable.object));
 	}
+
+	$effect(() => {
+		if (!caseMarkerReady || !caseMarkers || !caseMarkerGeometry || !caseMarkerMaterial) return;
+		const ids = new Set(caseMarkers.map((marker) => marker.id));
+		let topologyChanged = false;
+		for (const [id, mesh] of caseMarkerMeshes) {
+			if (ids.has(id)) continue;
+			mesh.removeFromParent();
+			caseMarkerMeshes.delete(id);
+			topologyChanged = true;
+		}
+		for (const marker of caseMarkers) {
+			let mesh = caseMarkerMeshes.get(marker.id);
+			if (!mesh) {
+				mesh = new THREE.Mesh(caseMarkerGeometry, caseMarkerMaterial);
+				caseMarkerMeshes.set(marker.id, mesh);
+				markersGroup.add(mesh);
+				topologyChanged = true;
+			}
+			mesh.position.set(marker.posX, marker.posY, marker.posZ);
+			mesh.updateWorldMatrix(true, false);
+		}
+		if (topologyChanged) {
+			pickables = pickables.filter((item) => item.type !== 'case-marker');
+			for (const [id, object] of caseMarkerMeshes) pickables.push({ object, id, type: 'case-marker' });
+			rebuildPickBvh();
+		} else {
+			pickBvhManager.refit();
+		}
+	});
+
+	$effect(() => {
+		if (!caseMarkerReady || !caseMarkerPreview) return;
+		caseMarkerPreview.visible = placementPreview !== null;
+		if (placementPreview) {
+			caseMarkerPreview.position.set(placementPreview.x, placementPreview.y, placementPreview.z);
+		}
+	});
+
+	$effect(() => {
+		if (!sceneReady || !indexedFloor || !groundMesh || !solidFloorMaterial || !renderer) return;
+		const floor = groundMesh;
+		const solid = solidFloorMaterial;
+		const size = 64;
+		const rgba = new Uint8Array(size * size * 4);
+		for (let y = 0; y < size; y++) {
+			for (let x = 0; x < size; x++) {
+				const grout = x % 8 === 0 || y % 8 === 0;
+				const alternate = ((x >>> 3) + (y >>> 3)) % 2 === 0;
+				const paletteIndex = grout ? 4 : alternate ? 6 : 13;
+				rgba.set(INDEXED_PALETTE16_V1[paletteIndex].rgba, (y * size + x) * 4);
+			}
+		}
+		const indexed = quantizeRgbaToIndexed4BppV1(size, size, rgba);
+		// A one-pixel map enables the standard material's UV map shader chunk.
+		const uvMap = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1);
+		uvMap.needsUpdate = true;
+		const source = solid.clone();
+		source.color.set(0xffffff);
+		source.map = uvMap;
+		const packed = createIndexedPaletteShaderMaterialV1(THREE, source, indexed, renderer.capabilities.maxTextureSize);
+		source.dispose();
+		floor.material = packed.material;
+		return () => {
+			floor.material = solid;
+			packed.material.dispose();
+			packed.textures.dispose();
+			uvMap.dispose();
+		};
+	});
 
 	let isWebGLAvailable = $state(true);
 	let isHoveringObject = $state(false);
@@ -521,8 +616,9 @@
 		try {
 			// 1. Scene
 			scene = new THREE.Scene();
-			scene.background = new THREE.Color(0x0a0e17);
-			scene.fog = new THREE.FogExp2(0x0a0e17, 0.08);
+			const background = caseMarkers ? 0x4c5257 : 0x0a0e17;
+			scene.background = new THREE.Color(background);
+			scene.fog = new THREE.FogExp2(background, caseMarkers ? 0.045 : 0.08);
 
 			// 2. Camera
 			const w = containerEl.clientWidth || 800;
@@ -539,7 +635,7 @@
 				powerPreference: 'high-performance'
 			});
 			renderer.setSize(w, h);
-			renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+			renderer.setPixelRatio(Math.min(window.devicePixelRatio, caseMarkers ? 1.5 : 2));
 			renderer.toneMapping = THREE.ACESFilmicToneMapping;
 			renderer.toneMappingExposure = 1.1;
 
@@ -553,7 +649,7 @@
 			controls.maxDistance = 18.0;
 
 			// 5. Lighting
-			const ambientLight = new THREE.AmbientLight(0x1e293b, 1.2);
+			const ambientLight = new THREE.AmbientLight(caseMarkers ? 0xe0dad1 : 0x1e293b, 1.2);
 			scene.add(ambientLight);
 
 			// Warm streetlight from high overhead
@@ -582,28 +678,38 @@
 			// 7. Asphalt Ground Floor
 			const groundGeo = new THREE.PlaneGeometry(32, 32);
 			const groundMat = new THREE.MeshStandardMaterial({
-				color: 0x0f172a,
+				color: caseMarkers ? 0x52504c : 0x0f172a,
 				roughness: 0.75,
 				metalness: 0.15
 			});
 			const ground = new THREE.Mesh(groundGeo, groundMat);
+			solidFloorMaterial = groundMat;
 			ground.rotation.x = -Math.PI / 2;
 			ground.position.y = 0;
 			environmentGroup.add(ground);
 			groundMesh = ground;
 
-			// Optional preflight check for Blender procedural GLB
-			const gltfLoader = new GLTFLoader();
-			gltfLoader.load(
-				'/models/crime-scene-primitives-v1.glb',
-				(gltf) => {
-					console.debug('[CrimeScene3D] Verified crime-scene-primitives-v1.glb ready:', gltf.scene.children.length, 'nodes');
-				},
-				undefined,
-				(err) => {
-					console.debug('[CrimeScene3D] Using procedural primitives pipeline (GLB optional):', err);
-				}
-			);
+			if (caseMarkers) {
+				const blocks = [
+					{ position: [-2.15, 0.13, -3.5], size: [6, 0.26, 1.8], color: 0x756d63 },
+					{ position: [-3.8, 0.95, -4.16], size: [2.6, 1.9, 0.28], color: 0xc5b49d },
+					{ position: [-0.2, 0.95, -4.16], size: [2.7, 1.9, 0.28], color: 0xc5b49d },
+					{ position: [-1.95, 1.82, -4.16], size: [1.1, 0.2, 0.4], color: 0x9c8c7a },
+					{ position: [-4.87, 0.65, -2.9], size: [0.25, 1.3, 0.25], color: 0x777e7f },
+					{ position: [0.52, 0.65, -2.9], size: [0.25, 1.3, 0.25], color: 0x777e7f }
+				] as const;
+				const material = new THREE.MeshStandardMaterial({ roughness: 0.9, flatShading: true });
+				const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(), material, blocks.length);
+				const transform = new THREE.Matrix4();
+				blocks.forEach(({ position, size, color }, index) => {
+					transform.makeScale(size[0], size[1], size[2]).setPosition(position[0], position[1], position[2]);
+					mesh.setMatrixAt(index, transform);
+					mesh.setColorAt(index, new THREE.Color(color));
+				});
+				mesh.name = 'Illustrative platform blockout';
+				environmentGroup.add(mesh);
+				blockout = mesh;
+			}
 
 			// Ground Grid
 			const grid = new THREE.GridHelper(30, 60, 0xc59e2b, 0x1e293b);
@@ -633,47 +739,36 @@
 			boundingBox.position.set(2.4, 0, -1.2);
 			measurementsGroup.add(boundingBox);
 
-			// 12. Yellow Evidence Marker Tents: 1, 2, 3
-			// Marker 1: right next to Bloodstain E-002
-			const marker1 = createEvidenceMarkerTent(1, [1.8, 0, -1.4]);
-			markersGroup.add(marker1);
-
-			// Marker 2: mid-trail near footstep turn
-			const marker2 = createEvidenceMarkerTent(2, [3.2, 0, -0.4]);
-			markersGroup.add(marker2);
-
-			// Marker 3: in background near outer corridor
-			const marker3 = createEvidenceMarkerTent(3, [3.8, 0, -2.4]);
-			markersGroup.add(marker3);
-
-			// Register primitives into N64 16 KB Float32Array Memory Arena (Zero-GC Strides)
+			if (caseMarkers) {
+				caseMarkerGeometry = new THREE.CylinderGeometry(0.18, 0.18, 0.08, 6);
+				caseMarkerGeometry.translate(0, 0.04, 0);
+				caseMarkerMaterial = new THREE.MeshBasicMaterial({ color: 0xf6c65f });
+				previewMaterial = new THREE.MeshBasicMaterial({ color: 0x72e0bf, wireframe: true });
+				caseMarkerPreview = new THREE.Mesh(caseMarkerGeometry, previewMaterial);
+				caseMarkerPreview.visible = false;
+				markersGroup.add(caseMarkerPreview);
+				caseMarkerReady = true;
+			} else {
+				const tentPositions: [number, number, number][] = [[1.8, 0, -1.4], [3.2, 0, -0.4], [3.8, 0, -2.4]];
+				for (const [index, position] of tentPositions.entries()) {
+					const number = index + 1;
+					const tent = createEvidenceMarkerTent(number, position);
+					markersGroup.add(tent);
+					scenePrimitiveManager.register({
+						id: `MARKER_0${number}`,
+						slotIndex: number,
+						type: 'MARKER_TENT',
+						mesh: tent,
+						metadata: { label: `Evidence Tent #${number}` }
+					});
+				}
+			}
 			scenePrimitiveManager.register({
 				id: 'EXHIBIT_E002',
 				slotIndex: 0,
 				type: 'EXHIBIT_OBB',
 				mesh: bloodstain,
 				metadata: { label: 'Bloodstain Decal (E-002)', dimensions: [0.42, 0.28, 0.02] }
-			});
-			scenePrimitiveManager.register({
-				id: 'MARKER_01',
-				slotIndex: 1,
-				type: 'MARKER_TENT',
-				mesh: marker1,
-				metadata: { label: 'Evidence Tent #1' }
-			});
-			scenePrimitiveManager.register({
-				id: 'MARKER_02',
-				slotIndex: 2,
-				type: 'MARKER_TENT',
-				mesh: marker2,
-				metadata: { label: 'Evidence Tent #2' }
-			});
-			scenePrimitiveManager.register({
-				id: 'MARKER_03',
-				slotIndex: 3,
-				type: 'MARKER_TENT',
-				mesh: marker3,
-				metadata: { label: 'Evidence Tent #3' }
 			});
 			scenePrimitiveManager.register({
 				id: 'INVESTIGATOR_PAWN',
@@ -763,6 +858,7 @@
 				renderer?.render(scene!, camera!);
 			};
 			animate();
+			sceneReady = true;
 
 		} catch (err) {
 			console.error('Failed to initialize Three.js WebGL scene:', err);
@@ -802,12 +898,19 @@
 		}
 	});
 
-	function setPointerRay(e: PointerEvent): void {
+	function setPointerRay(e: MouseEvent): void {
 		if (!canvasEl || !camera) return;
 		const rect = canvasEl.getBoundingClientRect();
 		mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
 		mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 		raycaster.setFromCamera(mouse, camera);
+	}
+
+	function selectCaseGroundPoint(event: MouseEvent, evidenceId?: string): void {
+		if (!groundMesh || !camera || !onCaseGroundPoint) return;
+		setPointerRay(event);
+		const point = raycaster.intersectObject(groundMesh, false)[0]?.point;
+		if (point) onCaseGroundPoint({ x: point.x, y: point.y, z: point.z }, evidenceId);
 	}
 
 	function primitiveIdForPick(pick: { type: string; id: any }): string | null {
@@ -828,6 +931,10 @@
 
 	function handlePointerDown(e: PointerEvent) {
 		if (!canvasEl || !camera || !scene) return;
+		if (transformMode === 'marker' && caseMarkers) {
+			if (e.button === 0) selectCaseGroundPoint(e);
+			return;
+		}
 		setPointerRay(e);
 
 		// Interactive Marker Placement: Click-to-place on ground floor in 'marker' mode
@@ -874,6 +981,10 @@
 			const hit = intersects[0].object;
 			const pick = pickables.find((p) => p.object === hit);
 			if (pick) {
+				if (pick.type === 'case-marker') {
+					if (sceneLayers.markers) onCaseMarkerSelect?.(pick.id);
+					return;
+				}
 				const primitiveId = primitiveIdForPick(pick);
 				if (primitiveId) {
 					selectedPrimitiveId = primitiveId;
@@ -998,6 +1109,16 @@
 		scenePrimitiveManager.clear(false);
 		pickBvhManager.dispose();
 		if (animId) cancelAnimationFrame(animId);
+		controls?.dispose();
+		caseMarkerGeometry?.dispose();
+		caseMarkerMaterial?.dispose();
+		previewMaterial?.dispose();
+		solidFloorMaterial?.dispose();
+		groundMesh?.geometry.dispose();
+		blockout?.geometry.dispose();
+		blockout?.material.dispose();
+		blockout?.dispose();
+		caseMarkerMeshes.clear();
 		renderer?.dispose();
 		renderer = null;
 		scene = null;
@@ -1006,6 +1127,9 @@
 </script>
 
 <div class="crime-scene-3d-wrapper" bind:this={containerEl}>
+	{#if caseMarkers && !sceneReady && isWebGLAvailable}
+		<div class="case-scene-loading" role="status">Preparing the 3D scene…</div>
+	{/if}
 	{#if isWebGLAvailable}
 		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 		<canvas
@@ -1014,10 +1138,21 @@
 			onpointermove={handlePointerMove}
 			onpointerup={finishPrimitiveDrag}
 			onpointercancel={finishPrimitiveDrag}
+			ondragover={(event) => {
+				if (onCaseGroundPoint && event.dataTransfer?.types.includes(CASE_EXHIBIT_DRAG_TYPE)) event.preventDefault();
+			}}
+			ondrop={(event) => {
+				const id = event.dataTransfer?.getData(CASE_EXHIBIT_DRAG_TYPE);
+				if (!id || !onCaseGroundPoint) return;
+				event.preventDefault();
+				selectCaseGroundPoint(event, id);
+			}}
 			class="three-crime-canvas"
 			class:hovering={isHoveringObject}
 			class:mode-marker={transformMode === 'marker'}
 		></canvas>
+	{:else if caseMarkers}
+		<div class="case-scene-loading" role="status">3D view unavailable. Enter a marker position in the inspector.</div>
 	{:else}
 		<!-- High-fidelity CSS 3D Isometric Fallback -->
 		<div class="isometric-crime-fallback">
@@ -1034,6 +1169,17 @@
 </div>
 
 <style>
+	.case-scene-loading {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		display: grid;
+		place-items: center;
+		padding: 1rem;
+		background: var(--dossier-bg-card, #faf6f0);
+		color: var(--dossier-text-main, #141312);
+		text-align: center;
+	}
 	.crime-scene-3d-wrapper {
 		position: relative;
 		width: 100%;

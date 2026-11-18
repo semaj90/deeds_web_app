@@ -32,6 +32,22 @@ describe('video track linker v1', () => {
 		]);
 	});
 
+	it('assigns ambiguous same-class detections by strongest frame-wide IoU pairs', () => {
+		const frames = linkVideoFrameTracksV1([
+			{ frameIndex: 0, timestampMs: 0, objects: [
+				{ label: 'person', confidence: 0.9, bbox: [50, 50, 150, 150] },
+				{ label: 'person', confidence: 0.9, bbox: [120, 50, 220, 150] },
+			] },
+			{ frameIndex: 1, timestampMs: 1000, objects: [
+				// Sorted first by x, but it has a weaker overlap with track 1.
+				{ label: 'person', confidence: 0.9, bbox: [40, 50, 140, 150] },
+				{ label: 'person', confidence: 0.9, bbox: [50, 50, 150, 150] },
+			] },
+		], 'scope');
+
+		expect(frames[1]?.objects.map(({ trackId }) => trackId)).toEqual(['track-0002', 'track-0001']);
+	});
+
 	it('rejects malformed time order, boxes and scope', () => {
 		expect(() => linkVideoFrameTracksV1([], '', {})).toThrow(/configuration/);
 		expect(() => linkVideoFrameTracksV1([

@@ -23,6 +23,7 @@ import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { extractTextHybrid } from '$lib/server/ocr/hybrid.js';
 import { chunkLegalDocument, type LegalChunk } from '$lib/server/indexer/legal-chunker.js';
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
+import { extractAudioTrackToWav } from '$lib/server/analysis/media-processing.js';
 import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { summarizeDocument } from '$lib/server/analysis/summarizer.js';
 import { createAnalysisJob, enqueueJob, getAnalysisJob, updateAnalysisJob, completeAnalysisJob, failAnalysisJob } from '$lib/server/analysis/analysis-jobs.js';
@@ -690,6 +691,23 @@ async function extractText(
   buffer: Buffer,
   mimeType?: string
 ): Promise<{ text: string; method: string; doclingBlocks?: Record<string, unknown>[] }> {
+  // Video uploads: extract the audio track (ffmpeg → WAV) and reuse the audio ASR tiers below.
+  // A failed or track-less extraction keeps the original file, so behaviour is unchanged there.
+  const isVideoUpload =
+    /\.(mp4|webm|mov|mkv|m4v|avi)$/i.test(fileName) || (mimeType?.startsWith('video/') ?? false);
+  if (isVideoUpload) {
+    try {
+      buffer = await extractAudioTrackToWav(buffer, fileName);
+      fileName = 'audio-track.wav';
+      mimeType = 'audio/wav';
+    } catch (err) {
+      console.warn(
+        '[Upload] Video audio extraction skipped:',
+        err instanceof Error ? err.message : err
+      );
+    }
+  }
+
   const isPDF = /\.pdf$/i.test(fileName);
   const isImage = /\.(png|jpg|jpeg|tiff|tif|bmp|webp)$/i.test(fileName);
   const isAudio =

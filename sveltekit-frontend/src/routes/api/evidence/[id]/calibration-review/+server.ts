@@ -20,6 +20,11 @@ const requestSchema = z.object({
 	calibrationFrameIndex: z.number().int().min(0).max(0xffffffff),
 	calibrationFramePtsUs: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
 	decision: z.enum(['ACCEPTED_FOR_SCENE_PROPOSAL', 'REJECTED']),
+	// Required by the writer for ACCEPTED decisions; the UI defaults it to the whole clip.
+	cameraFixedWindow: z.object({
+		startPtsUs: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+		endPtsUs: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+	}).strict().optional(),
 	notes: z.string().max(1000).optional(),
 }).strict();
 const MAX_REVIEW_REQUEST_BYTES = 16 * 1024;

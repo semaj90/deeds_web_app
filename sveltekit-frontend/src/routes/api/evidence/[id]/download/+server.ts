@@ -5,13 +5,14 @@
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { db } from '$lib/server/db/client';
+import { db } from '$lib/server/db/client.js';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
 import { and, eq, or } from 'drizzle-orm';
 import { getSeaweedStream as getStream, getSeaweedPartialStream as getPartialStream, statSeaweedObject as statObject } from '$lib/server/seaweed-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { isUuid } from '$lib/server/validation.js';
 import { probeObservedMime } from '$lib/server/ingest/upload-classification-v1.js';
+import { normalizeSha256 } from '$lib/server/features/evidence/evidence-revision-v1.js';
 
 const EVIDENCE_BUCKET = ENV.SEAWEED_EVIDENCE_BUCKET;
 
@@ -62,6 +63,10 @@ export const GET: RequestHandler = async ({ params, locals, url, request }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
   const caseId = url.searchParams.get('caseId');
+  const sourceRevision = url.searchParams.get('sourceRevision');
+  if (sourceRevision !== null && !/^sha256:[a-f0-9]{64}$/.test(sourceRevision)) {
+    return json({ error: 'Invalid source revision' }, { status: 400 });
+  }
   if (url.searchParams.get('inline') === '1' && !caseId) {
     return json({ error: 'Case ID is required for inline preview' }, { status: 400 });
   }
@@ -88,6 +93,7 @@ export const GET: RequestHandler = async ({ params, locals, url, request }) => {
         mimeType: evidence.mimeType,
         fileType: evidence.fileType,
         fileSize: evidence.fileSize,
+        hash: evidence.hash,
       })
       .from(evidence)
       .where(
@@ -104,6 +110,9 @@ export const GET: RequestHandler = async ({ params, locals, url, request }) => {
 
     if (!item) {
       return json({ error: 'Evidence not found' }, { status: 404 });
+    }
+    if (sourceRevision !== null && normalizeSha256(item.hash) !== sourceRevision) {
+      return json({ error: 'Source revision changed. Reopen the exhibit.' }, { status: 409 });
     }
 
     const fileUrl = item.fileUrl;

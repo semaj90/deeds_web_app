@@ -33,6 +33,22 @@ function pose(frameIndex: number, framePtsUs: number, x: number, y: number, over
 	};
 }
 
+function withPoints(base: ReturnType<typeof pose>, points: Record<number, [number, number]>) {
+	return {
+		...base,
+		keypoints: humanCoco17PoseSchemaV1.joints.map((joint) => {
+			const coordinate = points[joint.index];
+			return {
+				index: joint.index,
+				x: coordinate?.[0] ?? null,
+				y: coordinate?.[1] ?? null,
+				confidence: coordinate ? 0.8 : 0,
+				visibility: coordinate ? 'visible' : 'not_labeled',
+			};
+		}),
+	};
+}
+
 describe('derivePoseTrackMotionV1', () => {
 	it('sorts source samples and derives per-joint pixel velocity in source time', () => {
 		const result = derivePoseTrackMotionV1([
@@ -59,14 +75,42 @@ describe('derivePoseTrackMotionV1', () => {
 	it('keeps the full source/run/track identity in the result', () => {
 		const result = derivePoseTrackMotionV1([pose(0, 1_000_000, 1, 1), pose(1, 2_000_000, 2, 3)]);
 		expect(result).toMatchObject({
-		evidenceId,
-		sourceSha256,
-		sourceRevision: sourceSha256,
-		analysisRevision: 'analysis-run-1',
-		trackScopeId: 'scope-1',
-		trackId: 'track-0001',
-		skeletonSchemaId: 'human.coco17.v1',
+			evidenceId,
+			sourceSha256,
+			sourceRevision: sourceSha256,
+			analysisRevision: 'analysis-run-1',
+			trackScopeId: 'scope-1',
+			trackId: 'track-0001',
+			skeletonSchemaId: 'human.coco17.v1',
+		});
 	});
+
+	it('reports per-sample visibility, confidence and visible 2D elbow angles without inventing pixel uncertainty', () => {
+		const first = withPoints(pose(0, 1_000_000, 1, 1), {
+			5: [10, 10], 7: [10, 20], 9: [20, 20],
+		});
+		const second = withPoints(pose(1, 2_000_000, 2, 3), {
+			5: [11, 10], 7: [11, 20], 9: [21, 20],
+		});
+		const result = derivePoseTrackMotionV1([first, second]);
+		expect(result.samples[0]).toMatchObject({
+			labeledJointCount: 3,
+			visibility: { visible: 3, occluded: 0, notLabeled: 14 },
+			confidence: { min: 0.8, max: 0.8 },
+			confidenceSemantics: 'keypoint_score_not_calibrated_measurement_error',
+			measurementUncertaintyPx: null,
+			jointAnglesDeg: [{ name: 'left_elbow', degrees: 90, minKeypointConfidence: 0.8 }],
+		});
+		expect(result.samples[0]?.confidence.mean).toBeCloseTo(0.8, 12);
+	});
+
+	it('counts occluded joints but excludes them from visible-joint angle measurements', () => {
+		const sample = withPoints(pose(0, 1_000_000, 1, 1), { 5: [10, 10], 7: [10, 20], 9: [20, 20] });
+		(sample.keypoints[7] as { visibility: string }).visibility = 'occluded';
+		const next = withPoints(pose(1, 2_000_000, 1, 1), { 5: [10, 10], 7: [10, 20], 9: [20, 20] });
+		const result = derivePoseTrackMotionV1([sample, next]);
+		expect(result.samples[0]?.visibility).toEqual({ visible: 2, occluded: 1, notLabeled: 14 });
+		expect(result.samples[0]?.jointAnglesDeg).toEqual([]);
 	});
 
 	it('rejects samples from different source revisions or track scopes', () => {

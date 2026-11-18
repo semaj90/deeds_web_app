@@ -5,6 +5,7 @@ import { evidence } from '$lib/server/db/schema-postgres.js';
 import { sceneMarkers } from '$lib/server/db/schema/scene-markers.js';
 import { sceneAssets } from '$lib/server/db/schema/scene-assets.js';
 import { listInvestigation, listSummaryExports } from '$lib/server/investigation/investigation-v1.js';
+import { listLatestSceneDocumentSourceProjectionsV1 } from '$lib/server/scene-document-revisions-v1.js';
 
 /**
  * Crime-scene page data, read from PostgreSQL 18 on the server. The case layout has already
@@ -16,7 +17,13 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 	const caseId = params.id;
 
 	try {
-		const [markers, assets, facets, exportsList] = await Promise.all([
+		let sceneSourcesUnavailable = false;
+		const sceneSourcesPromise = listLatestSceneDocumentSourceProjectionsV1({ caseId, maxScenes: 50 }).catch((cause) => {
+			sceneSourcesUnavailable = true;
+			console.error('[crime-scene] scene source projection unavailable', cause instanceof Error ? cause.name : 'unknown');
+			return { scenes: [], unavailableRevisionCount: 0 };
+		});
+		const [markers, assets, facets, exportsList, availableEvidence, sceneSourceProjection] = await Promise.all([
 			db
 				.select({
 					id: sceneMarkers.id,
@@ -27,7 +34,11 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 					posY: sceneMarkers.posY,
 					posZ: sceneMarkers.posZ,
 					anchorKind: sceneMarkers.anchorKind,
+					anchorU: sceneMarkers.anchorU,
+					anchorV: sceneMarkers.anchorV,
 					anchorStatus: sceneMarkers.anchorStatus,
+					sourceRevision: sceneMarkers.sourceRevision,
+					sourceSha256: sceneMarkers.sourceSha256,
 					revision: sceneMarkers.revision,
 					evidenceId: evidence.id,
 					evidenceTitle: evidence.title,
@@ -53,7 +64,14 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 				.orderBy(desc(sceneAssets.createdAt))
 				.limit(50),
 			listInvestigation(caseId),
-			listSummaryExports(caseId)
+			listSummaryExports(caseId),
+			db
+				.select({ id: evidence.id, title: evidence.title, uploadedAt: evidence.uploadedAt })
+				.from(evidence)
+				.where(eq(evidence.caseId, caseId))
+				.orderBy(desc(evidence.uploadedAt))
+				.limit(100),
+			sceneSourcesPromise
 		]);
 
 		return {
@@ -63,6 +81,10 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 			markers,
 			assets,
 			facets,
+			availableEvidence,
+			sceneSources: sceneSourceProjection.scenes,
+			sceneSourcesUnavailable,
+			unavailableSceneRevisionCount: sceneSourceProjection.unavailableRevisionCount,
 			latestExport: exportsList[0] ?? null,
 			loadError: null as string | null
 		};
@@ -75,6 +97,10 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 			markers: [],
 			assets: [],
 			facets: [],
+			availableEvidence: [],
+			sceneSources: [],
+			sceneSourcesUnavailable: true,
+			unavailableSceneRevisionCount: 0,
 			latestExport: null,
 			loadError: 'Crime-scene data is temporarily unavailable.'
 		};

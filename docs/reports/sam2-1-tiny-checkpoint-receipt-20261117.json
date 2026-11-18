@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.model-checkpoint-receipt.v1",
+  "model": "SAM 2.1 Hiera Tiny",
+  "file": "models/sam2/sam2.1_hiera_tiny.pt",
+  "sourceUrl": "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_tiny.pt",
+  "bytes": 156008466,
+  "bytesMatchOfficialContentLength": true,
+  "sha256": "7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69",
+  "publishedSha256Compared": false,
+  "license": "Apache-2.0 (per official repo, facebookresearch/segment-anything-2)",
+  "downloadedOn": "2026-11-17",
+  "canonicalAuthority": false
+}

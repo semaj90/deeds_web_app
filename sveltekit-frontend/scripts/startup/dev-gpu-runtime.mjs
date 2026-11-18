@@ -171,11 +171,12 @@ const CHAT_PROFILE_ALIAS = {
   'gemma4-thinking': 'ornith-1.5-9b',
   'ornith-1.5': 'ornith-1.5-9b',
   'ornith-1.5-vlm': 'ornith-1.5-9b',
+  'gemma4-legal-iq4xs-vlm': 'gemma4-legal-iq4xs-direct.gguf',
   'ornith': 'ornith-9b',
 };
 
 function devGpuChatProfile() {
-  return envFromFiles.TURBO_STARTUP_PROFILE || process.env.TURBO_STARTUP_PROFILE || (isDevGpuVisionEnabled() ? 'ornith-1.5-vlm' : 'gemma4-legal-iq4xs');
+  return envFromFiles.TURBO_STARTUP_PROFILE || process.env.TURBO_STARTUP_PROFILE || (isDevGpuVisionEnabled() ? 'gemma4-legal-iq4xs-vlm' : 'gemma4-legal-iq4xs');
 }
 
 function devGpuChatAlias() {
@@ -751,7 +752,7 @@ async function main() {
     // In-process evidence embeddings on CPU. No :8081 server and no GPU session. /api/embed
     // keeps its Ollama provider; the evidence adapter uses text, vision and audio encoders.
     const onnxDir = onnxCpuEvidenceEnv({ ...process.env, ...envFromFiles }).ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR;
-    console.log('[dev:gpu] ✅ Embedding backend: onnx_cpu — EmbeddingGemma 2 ONNX on CPU (text, vision, audio encoders)');
+    console.log('[dev:gpu] ✅ Embedding backend: onnx_cpu — EmbeddingGemma 2 ONNX on CPU (text, vision, audio graphs; used by evidence image, document and video analysis paths)');
     console.log(`[dev:gpu]    Model dir: ${onnxDir}`);
     console.log('[dev:gpu]    No :8081 server and no GPU session; /api/embed keeps its Ollama provider');
   } else if (await isLlamaServerRunning(embedPort)) {
@@ -827,7 +828,7 @@ async function main() {
     console.log('[dev:gpu]   Execution provider: DirectML (D3D12) → CPU fallback');
   } else if (embeddingBackend === 'onnx_cpu') {
     console.log('[dev:gpu] Embedding backend: onnx_cpu');
-    console.log('[dev:gpu]   Model:              EmbeddingGemma 2 Q8 ONNX (text, vision, audio encoders)');
+    console.log('[dev:gpu]   Model:              EmbeddingGemma 2 Q8 ONNX (text, vision, audio graphs; loaded together by the adapter)');
     console.log(`[dev:gpu]   Model dir:          ${onnxCpuEvidenceEnv({ ...process.env, ...envFromFiles }).ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR}`);
     console.log('[dev:gpu]   Endpoint:           in-process evidence adapter (no port)');
     console.log('[dev:gpu]   Execution provider: ONNX Runtime CPU');

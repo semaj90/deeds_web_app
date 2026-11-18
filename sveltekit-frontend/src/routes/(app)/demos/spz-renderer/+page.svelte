@@ -516,6 +516,20 @@
 		sceneAutoSave.schedule();
 	}
 
+	function savePreflightHypothesisToCase() {
+		if (!returnCaseId || !loadedModel || busy) return;
+		caseId = returnCaseId;
+		sceneId = crypto.randomUUID();
+		sceneRevision = 0;
+		parentManifestSha256 = null;
+		savedCaseManifest = null;
+		preCaseMode = false;
+		sceneDirty = true;
+		sceneAssetDirty = true;
+		manifestStatus = 'Unlinked case hypothesis · no source evidence is attached';
+		void downloadEditedGlb();
+	}
+
 	async function downloadEditedGlb(automatic = false) {
 		if (!editableRoot || !loadedModel || busy) return;
 		sceneAutoSave.cancel();
@@ -536,7 +550,7 @@
 				const qualityReceipt = createSceneQualityReceiptV1({ derivedAssetBytes, triangleCount: countTriangles() });
 				const manifest = createSceneDocumentV1({
 					...savedCaseManifest,
-					sceneClassification: 'SINGLE_IMAGE_HYPOTHESIS',
+					sceneClassification: savedCaseManifest.sceneClassification ?? (localAssetFormat?.startsWith('IMAGE_') ? 'SINGLE_IMAGE_HYPOTHESIS' : 'UNLINKED_SCENE_HYPOTHESIS'),
 					revision: sceneRevision + 1,
 					parentManifestSha256,
 					createdAt: new Date().toISOString(),
@@ -589,7 +603,7 @@
 						sceneId,
 						caseId,
 						status: 'HYPOTHESIS',
-						sceneClassification: 'SINGLE_IMAGE_HYPOTHESIS',
+						sceneClassification: localAssetFormat?.startsWith('IMAGE_') ? 'SINGLE_IMAGE_HYPOTHESIS' : 'UNLINKED_SCENE_HYPOTHESIS',
 						revision: sceneRevision + 1,
 						parentManifestSha256,
 						createdAt: new Date().toISOString(),
@@ -1757,6 +1771,12 @@
 			{#if preCaseMode && returnCaseId}<a class="return-link" href={`/cases/${encodeURIComponent(returnCaseId)}/board`}>Return to Evidence Board</a>{/if}
 			{#if caseId && linkedEvidenceId}<a class="return-link" data-testid="return-to-evidence-board" href={`/cases/${encodeURIComponent(caseId)}/board?sceneId=${encodeURIComponent(sceneId)}&evidenceId=${encodeURIComponent(linkedEvidenceId)}`}>Return to Evidence Board</a>{/if}
 			{#if linkedEvidenceId}<p class="intro" data-testid="scene-evidence-binding">Linked exhibit {linkedEvidenceId}{linkedEvidenceRevision ? ` · source revision ${linkedEvidenceRevision.slice(0, 23)}…` : ' · canonical source hash unavailable; linked save disabled'}</p>{/if}
+			{#if preCaseMode && returnCaseId && loadedModel}
+				<div class="case-scene-handoff" data-testid="case-scene-handoff">
+					<p>This local model can be saved as an <strong>unlinked scene hypothesis</strong>. To make it evidence-linked, upload the source first and open Scene Studio from that exhibit.</p>
+					<button type="button" data-testid="save-preflight-to-case" onclick={savePreflightHypothesisToCase} disabled={busy}>Save hypothesis to case scene</button>
+				</div>
+			{/if}
 		</div>
 		<div class="actions">
 			<button onclick={toggleStreamedSog} aria-pressed={showStreamedSog} data-testid="streamed-sog-toggle">{showStreamedSog ? 'Return to Three.js editor' : 'Compare Streamed SOG (PlayCanvas)'}</button>
@@ -1807,6 +1827,10 @@
 			{placingSurfaceMarker ? 'Cancel placement' : 'Place hypothesis anchor'}
 		</button>
 		<span role="status" data-testid="surface-marker-status">{surfaceMarkerStatus}</span>
+		{#if surfaceMarkers.length && caseId && linkedEvidenceId && linkedEvidenceRevision}
+			<button type="button" data-testid="save-surface-markers" onclick={() => void downloadEditedGlb()} disabled={busy || animationPlaying}>Save marker and scene revision</button>
+			<p class="marker-save-hint">Placement is a draft until the scene revision is saved and acknowledged.</p>
+		{/if}
 		{#if surfaceMarkers.length}
 			<ul aria-label="Scene hypothesis markers">
 				{#each surfaceMarkers as marker (marker.markerId)}
@@ -2042,6 +2066,10 @@
 	.marker-tools li { display:flex; align-items:center; gap:.45rem; border:1px solid #403724; border-radius:.45rem; padding:.3rem .45rem; }
 	.marker-tools small { color:#aaa49a; }
 	.marker-tools li button { padding:.3rem .45rem; }
+	.case-scene-handoff { display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-top:.6rem; padding:.65rem .8rem; border:1px solid #b99a62; border-radius:.6rem; background:#fbf6eb; color:#463c2c; }
+	.case-scene-handoff p { margin:0; max-width:60rem; font-size:.78rem; }
+	.case-scene-handoff button { border:1px solid #80633b; border-radius:.45rem; padding:.5rem .75rem; background:#c6a36a; color:#211b14; font-weight:700; }
+	.marker-save-hint { margin:.25rem 0; font-size:.75rem; color:#9c7a43; }
 	.sampling-note { color:#aaa49a; font-size:.72rem; margin-left:auto; }
 	.sampling-diagnostics { flex-basis:100%; color:#9ca8b9; font-size:.7rem; line-height:1.4; }
 	button { border:1px solid #9b7535; border-radius:.45rem; padding:.55rem .8rem; background:#171d29; color:#f3d27f; cursor:pointer; }

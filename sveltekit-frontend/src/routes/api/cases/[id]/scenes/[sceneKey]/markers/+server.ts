@@ -10,6 +10,7 @@ import { db } from '$lib/server/db/client.js';
 import {
 	CommandReuseError,
 	EvidenceNotInCaseError,
+	MarkerSourceMismatchError,
 	createMarker,
 	listSceneMarkers
 } from '$lib/server/scene-markers/move-marker.js';
@@ -105,6 +106,9 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		}
 		if (err instanceof EvidenceNotInCaseError) {
 			return json({ success: false, data: null, message: 'Evidence is not an active exhibit of this case' }, { status: 422 });
+		}
+		if (err instanceof MarkerSourceMismatchError) {
+			return json({ success: false, data: null, message: err.message }, { status: 422 });
 		}
 		console.error('[scene-markers] create failed', { caseId: caseId.data });
 		return json({ success: false, data: null, message: 'Save failed' }, { status: 500 });

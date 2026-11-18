@@ -112,6 +112,18 @@
 	// Redirect on successful auth
 	$effect(() => {
 		if (isAuthenticated) {
+			const requested = $page.url.searchParams.get('returnTo');
+			if (requested && requested.startsWith('/') && !requested.startsWith('//') && !requested.includes('\\')) {
+				try {
+					const target = new URL(requested, window.location.origin);
+					if (target.origin === window.location.origin) {
+						goto(`${target.pathname}${target.search}${target.hash}`);
+						return;
+					}
+				} catch {
+					// Fall through to the default landing page for malformed return paths.
+				}
+			}
 			goto('/');
 		}
 	});

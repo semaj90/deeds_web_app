@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import SceneVideoEventBindings from '$lib/components/evidence/SceneVideoEventBindings.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -44,7 +45,7 @@
 	<nav class="case-actions" aria-label="Case scene actions">
 		<a class="case-action primary" href={`/cases/${encodeURIComponent(data.caseId)}/evidence/upload`}>Upload evidence</a>
 		<a class="case-action" href={`/cases/${encodeURIComponent(data.caseId)}/board`}>Open evidence board</a>
-		<a class="case-action" href={`/cases/${encodeURIComponent(data.caseId)}/board?view=detective`}>Add evidence to scene</a>
+		<a class="case-action" href={`/cases/${encodeURIComponent(data.caseId)}/board?view=detective`}>Place and save evidence marker</a>
 	</nav>
 
 	{#if data.loadError}
@@ -55,13 +56,13 @@
 		<h2 id="markers-heading">Evidence markers <small>{data.markers.length} placed</small></h2>
 		{#if data.markers.length === 0}
 			<div class="empty-state">
-				<p class="empty">No saved case markers yet. Local preflight placements are not saved; choose a saved case exhibit and place its marker in Detective Mode.</p>
-				<a class="case-action primary" href={`/cases/${encodeURIComponent(data.caseId)}/board?view=detective`}>Choose exhibit and place marker</a>
+				<p class="empty">No saved case-scene markers yet. Evidence Board pins and local 3D preflight placements are separate and do not appear here. Choose an uploaded exhibit, then use Detective Mode’s “Place marker” action to save an evidence-linked position.</p>
+				<a class="case-action primary" href={`/cases/${encodeURIComponent(data.caseId)}/board?view=detective`}>Choose exhibit · place marker</a>
 			</div>
 		{:else}
 			<table>
 				<thead>
-					<tr><th>Scene</th><th>Marker</th><th>Evidence</th><th>Position (x, y, z)</th><th>Anchor</th><th></th></tr>
+					<tr><th>Scene</th><th>Marker</th><th>Evidence</th><th>Saved location</th><th>Source binding</th><th></th></tr>
 				</thead>
 				<tbody>
 					{#each data.markers as marker (marker.id)}
@@ -69,8 +70,21 @@
 							<td>{marker.sceneKey}</td>
 							<td>{marker.label ?? marker.markerKey}</td>
 							<td>{marker.evidenceTitle}</td>
-							<td>{marker.posX.toFixed(2)}, {marker.posY.toFixed(2)}, {marker.posZ.toFixed(2)}</td>
-							<td>{marker.anchorKind ?? 'legacy'} · {marker.anchorStatus}</td>
+							<td>
+								{#if marker.anchorKind === 'IMAGE_UV' && marker.anchorU !== null && marker.anchorV !== null}
+									Image point (u, v): {marker.anchorU.toFixed(3)}, {marker.anchorV.toFixed(3)}
+								{:else}
+									Legacy scene position: {marker.posX.toFixed(2)}, {marker.posY.toFixed(2)}, {marker.posZ.toFixed(2)}
+								{/if}
+							</td>
+							<td>
+								{marker.anchorKind ?? 'Unanchored'} · {marker.anchorStatus}
+								{#if marker.sourceRevision}
+									<br /><small>Source {marker.sourceRevision.slice(0, 19)}…</small>
+								{:else}
+									<br /><small>Source revision not recorded</small>
+								{/if}
+							</td>
 							<td><button type="button" onclick={() => openDialog(`marker-${marker.id}`)}>Inspect</button></td>
 						</tr>
 					{/each}
@@ -86,11 +100,31 @@
 							<dt>Evidence</dt><dd>{marker.evidenceTitle}</dd>
 							<dt>Summary</dt><dd>{marker.evidenceAiSummary ?? marker.evidenceSummary ?? 'No summary recorded'}</dd>
 							<dt>Revision</dt><dd>{marker.revision}</dd>
+							<dt>Anchor</dt><dd>{marker.anchorKind === 'IMAGE_UV' && marker.anchorU !== null && marker.anchorV !== null ? `Image UV ${marker.anchorU.toFixed(4)}, ${marker.anchorV.toFixed(4)}` : marker.anchorKind ?? 'No source anchor'}</dd>
+							<dt>Source revision</dt><dd>{marker.sourceRevision ?? 'Not recorded'}</dd>
 						</dl>
 						<button type="submit">Close</button>
 					</form>
 				</dialog>
 			{/each}
+		{/if}
+	</section>
+
+	<section aria-labelledby="add-evidence-heading">
+		<h2 id="add-evidence-heading">Add evidence to the scene</h2>
+		<p class="note">Choose an uploaded exhibit to open Detective Mode with it selected. The marker is saved only after you place it and receive a save confirmation.</p>
+		{#if data.availableEvidence.length === 0}
+			<p class="empty">No uploaded evidence is available in this case yet.</p>
+			<a class="case-action primary" href={`/cases/${encodeURIComponent(data.caseId)}/evidence/upload`}>Upload evidence</a>
+		{:else}
+			<ul class="available-evidence">
+				{#each data.availableEvidence as item (item.id)}
+					<li>
+						<span>{item.title ?? 'Untitled evidence'}</span>
+						<a class="case-action" href={`/cases/${encodeURIComponent(data.caseId)}/board?view=detective&evidenceId=${encodeURIComponent(item.id)}`}>Place in scene</a>
+					</li>
+				{/each}
+			</ul>
 		{/if}
 	</section>
 
@@ -155,12 +189,47 @@
 		<p class="note">Markers are keyed by scene key and assets by scene identifier; the two are not yet joined in the schema.</p>
 	</section>
 
+	<section aria-labelledby="motion-review-heading" data-testid="case-scene-motion-review">
+		<h2 id="motion-review-heading">Video motion and event review</h2>
+		<p class="note">Only source-linked items saved in a verified scene revision appear here. Pixel-change cues and image-space poses remain review aids; this panel does not turn them into 3D body motion.</p>
+		{#if data.sceneSourcesUnavailable}
+			<p class="load-error" role="status">Saved scene source bindings could not be verified. Other case scene data remains available.</p>
+		{:else}
+			{@const boundScenes = data.sceneSources.filter((scene) => scene.videoEventBindings.length > 0 || scene.groundPlaneTrackProposals.length > 0)}
+			{#if boundScenes.length > 0}
+				{#each boundScenes as scene (scene.sceneId)}
+					<details class="scene-source-revision">
+						<summary>
+							Scene revision {scene.revision} · {scene.videoEventBindings.length} event link(s) · {scene.groundPlaneTrackProposals.length} motion proposal(s)
+						</summary>
+						<p class="note"><code>{scene.manifestSha256.slice(0, 16)}…</code> · bindings were loaded from the hash-verified saved manifest.</p>
+						<SceneVideoEventBindings
+							caseId={data.caseId}
+							bindings={scene.videoEventBindings}
+							groundPlaneTrackProposals={scene.groundPlaneTrackProposals}
+						/>
+					</details>
+				{/each}
+			{:else if data.unavailableSceneRevisionCount > 0}
+				<p class="load-error" role="status">{data.unavailableSceneRevisionCount} saved scene revision(s) did not pass readback validation and were omitted.</p>
+			{:else}
+				<p class="empty">No source-linked video events or reviewed motion proposals are saved to a scene revision yet.</p>
+			{/if}
+		{/if}
+	</section>
+
 	<p class="evidence-count">{linkedEvidenceIds.size} evidence item(s) linked to facets.</p>
 </main>
 
 <style>
 	.crime-scene { padding: 20px; width: min(100% - 32px, 1320px); margin: 20px auto; color: var(--dossier-text-main, #141312); background: var(--dossier-bg-card, #faf6f0); border: 1px solid var(--dossier-hairline, #e2d7c9); border-radius: var(--dossier-radius-card, 10px); box-shadow: var(--dossier-shadow-card, 0 1px 2px rgba(60, 40, 20, .04)); font: 14px/1.5 system-ui, sans-serif; }
 	.case-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 20px; }
+	.available-evidence { display: grid; gap: 8px; padding: 0; list-style: none; }
+	.available-evidence li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--dossier-hairline, #e2d7c9); }
+	.scene-source-revision { margin-top: 10px; padding: 10px 12px; background: #fffdf9; border: 1px solid var(--dossier-hairline, #e2d7c9); border-radius: 8px; }
+	.scene-source-revision summary { cursor: pointer; color: var(--dossier-text-main, #30261b); font-weight: 650; }
+	.scene-source-revision summary:focus-visible { outline: 2px solid var(--dossier-gold, #c9a86a); outline-offset: 3px; }
+	.scene-source-revision code { overflow-wrap: anywhere; }
 	.case-action { display: inline-flex; align-items: center; min-height: 38px; padding: 8px 13px; border: 1px solid var(--dossier-hairline-strong, #cdbfa9); border-radius: 6px; background: #fffdf9; color: #30261b; font-weight: 600; text-decoration: none; }
 	.case-action:hover, .case-action:focus-visible { border-color: var(--dossier-gold, #c9a86a); outline: 2px solid var(--dossier-gold, #c9a86a); outline-offset: 2px; }
 	.case-action.primary { background: #483d36; color: #faf4ec; border-color: #483d36; }

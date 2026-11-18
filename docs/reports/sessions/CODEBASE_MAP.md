@@ -105,6 +105,9 @@ For deeper SvelteKit application structure, see [sveltekit-frontend/CODEBASE_MAP
 - `scratch/`
   Temporary experiments and ad hoc work land here. Expect low-stability or throwaway material rather than canonical implementations.
 
+- `music/`
+  Local audio drop folder for transcription tests. It is gitignored (`/music/` in `.gitignore`) and not tracked, so files here are not part of the repository.
+
 ## Generated, Dependency, and Test Output Directories
 
 - `node_modules/`

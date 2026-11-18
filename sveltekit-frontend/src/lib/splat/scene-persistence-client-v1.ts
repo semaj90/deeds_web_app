@@ -134,16 +134,20 @@ export async function saveSceneManifestRevisionV1(input: {
 export async function fetchSceneRevisionV1(input: {
 	caseId: string;
 	sceneId: string;
+	revision?: number;
 	fetcher?: typeof fetch;
 }): Promise<SceneRevisionReceiptV1 | null> {
 	const fetcher = input.fetcher ?? fetch;
-	const response = await fetcher(`/api/cases/${encodeURIComponent(input.caseId)}/scenes/${encodeURIComponent(input.sceneId)}/revisions`, { cache: 'no-store' });
+	const query = input.revision === undefined ? '' : `?revision=${encodeURIComponent(input.revision)}`;
+	const response = await fetcher(`/api/cases/${encodeURIComponent(input.caseId)}/scenes/${encodeURIComponent(input.sceneId)}/revisions${query}`, { cache: 'no-store' });
 	const envelope = await readJson(response);
 	if (!response.ok || envelope.success !== true) {
 		throw new Error(typeof envelope.message === 'string' ? envelope.message : `Scene revision read failed (${response.status})`);
 	}
 	if (envelope.data === null) return null;
-	return verifyRevisionReceiptV1(envelope.data, { caseId: input.caseId, sceneId: input.sceneId, replayed: false });
+	const receipt = await verifyRevisionReceiptV1(envelope.data, { caseId: input.caseId, sceneId: input.sceneId, replayed: false });
+	if (input.revision !== undefined && receipt.revision !== input.revision) throw new Error('Scene revision readback did not match the requested revision.');
+	return receipt;
 }
 
 export async function fetchSceneAssetV1(input: {

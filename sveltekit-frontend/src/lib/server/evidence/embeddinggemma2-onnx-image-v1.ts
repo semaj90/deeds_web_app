@@ -47,7 +47,18 @@ export const EMBEDDINGGEMMA2_ONNX_TEXT_RECIPES_V1 = {
 	query: { prefix: 'task: search result | query: ', revision: 'atlas.embeddinggemma2.text-search-query-q8.v1' },
 } as const;
 export type EmbeddingGemma2TextKindV1 = keyof typeof EMBEDDINGGEMMA2_ONNX_TEXT_RECIPES_V1;
+/** Default text token cap. Override with EMBEDDINGGEMMA2_TEXT_MAX_TOKENS (64 to 8192); see embeddingGemma2TextMaxTokensV1. */
 export const EMBEDDINGGEMMA2_ONNX_TEXT_MAX_TOKENS_V1 = 2048 as const;
+const TEXT_MAX_TOKENS_LIMIT_V1 = 8192;
+/** Read at call time. Invalid values fail closed when text is embedded, not when the module loads. */
+export function embeddingGemma2TextMaxTokensV1(): number {
+	const raw = process.env.EMBEDDINGGEMMA2_TEXT_MAX_TOKENS?.trim();
+	if (!raw) return EMBEDDINGGEMMA2_ONNX_TEXT_MAX_TOKENS_V1;
+	if (!/^\d+$/.test(raw)) throw new Error('EMBEDDINGGEMMA2_TEXT_MAX_TOKENS_INVALID');
+	const n = Number(raw);
+	if (n < 64 || n > TEXT_MAX_TOKENS_LIMIT_V1) throw new Error('EMBEDDINGGEMMA2_TEXT_MAX_TOKENS_OUT_OF_RANGE');
+	return n;
+}
 const TEXT_MAX_CHARS = 32_000;
 
 type OrtTensor = { data: Float32Array | BigInt64Array | Uint8Array; dims: number[] };
@@ -197,7 +208,7 @@ async function loadRuntime(modelDir: string): Promise<Runtime> {
 	if (typeof tokenizer !== 'function') throw new Error('EMBEDDINGGEMMA2_TOKENIZER_UNAVAILABLE');
 	return {
 		processor: (text, image, audio) => processor(text, image, audio) as Promise<Record<string, OrtTensor>>,
-		tokenize: async (text) => tokenizer(text, { truncation: true, max_length: EMBEDDINGGEMMA2_ONNX_TEXT_MAX_TOKENS_V1 }),
+		tokenize: async (text) => tokenizer(text, { truncation: true, max_length: embeddingGemma2TextMaxTokensV1() }),
 		imageFactory: (pixels, width, height, channels) => new RawImage(pixels, width, height, channels),
 		ort,
 		textSession,
@@ -389,6 +400,9 @@ export async function embedEvidenceTextWithEmbeddingGemma2OnnxV1(input: {
 	const modelDir = input.modelDir?.trim();
 	if (!modelDir) throw new Error('EMBEDDINGGEMMA2_ONNX_MODEL_DIR_UNCONFIGURED');
 	const runtime = await getRuntime(modelDir);
+	const maxTokens = embeddingGemma2TextMaxTokensV1();
+	// A non-default cap changes the vectors, so the revision records it.
+	const textRevision = maxTokens === EMBEDDINGGEMMA2_ONNX_TEXT_MAX_TOKENS_V1 ? recipe.revision : `${recipe.revision}.t${maxTokens}`;
 	const tokens = await runtime.tokenize(`${recipe.prefix}${input.text}`);
 	if (!(tokens.input_ids?.data instanceof BigInt64Array) || !(tokens.attention_mask?.data instanceof BigInt64Array)) {
 		throw new Error('EMBEDDINGGEMMA2_TOKENIZER_OUTPUT_INVALID');
@@ -411,7 +425,7 @@ export async function embedEvidenceTextWithEmbeddingGemma2OnnxV1(input: {
 		model: `${EMBEDDINGGEMMA2_ONNX_MODEL_ID_V1}@${EMBEDDINGGEMMA2_ONNX_REVISION_V1}:${EMBEDDINGGEMMA2_ONNX_QUANTIZATION_V1}`,
 		modelArtifactSha256: EMBEDDINGGEMMA2_ONNX_MODEL_ARTIFACT_SHA256_V1,
 		modelRevision: EMBEDDINGGEMMA2_ONNX_REVISION_V1,
-		preprocessingRevision: recipe.revision,
+		preprocessingRevision: textRevision,
 		inputSha256: `sha256:${createHash('sha256').update(input.text, 'utf8').digest('hex')}`,
 		outputSha256: digestSemantic768OutputV1(vector),
 		tokenCount: tokens.input_ids.data.length,

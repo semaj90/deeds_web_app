@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import {
 		humanCoco17PoseSchemaV1,
 		type PoseObservationV1,
 		parsePoseObservationV1,
 	} from '$lib/shared/pose-skeleton-schema-v1.js';
+	import { poseKeypointDisplayColorV1 } from '$lib/shared/pose-keypoint-render-lut-v1.js';
 	import { derivePoseTrackMotionV1, type PoseTrackMotionV1 } from '$lib/shared/pose-track-motion-v1.js';
 	import {
 		createPlanarCameraCalibrationV1,
@@ -25,17 +26,19 @@
 		onSeekToFrame?: (timestampMs: number) => void;
 		expanded?: boolean;
 		selectedTrackId?: string;
+		poseDraftDirty?: boolean;
+		calibrationDraftDirty?: boolean;
 	};
 	type Point = { x: number; y: number } | null;
 	type PlaneAnchorDraft = { id: string; imagePx: { x: number; y: number } | null; planeX: string; planeY: string };
-	type CapturedFrameBinding = { evidenceId: string; sourceRevision: string; analysisRevision: string; frameIndex: number; timestampMs: number; frameWidth: number; frameHeight: number };
+	type CapturedFrameBinding = { evidenceId: string; sourceRevision: string; analysisRevision: string; frameIndex: number; timestampMs: number; frameWidth: number; frameHeight: number; artifactWidth: number; artifactHeight: number };
 	const createAnchorDrafts = (prefix: string): PlaneAnchorDraft[] => Array.from({ length: 4 }, (_, index) => ({ id: `${prefix}-${index + 1}`, imagePx: null, planeX: '', planeY: '' }));
 
-	let { evidenceId, caseId, sourceSha256, analysisRevision, frameIndex, timestampMs, trackScopeId, detections = [], videoElement, onSeekToFrame, expanded = $bindable(false), selectedTrackId = $bindable('') }: Props = $props();
-	let snapshotCanvas: HTMLCanvasElement | undefined = $state();
+	let { evidenceId, caseId, sourceSha256, analysisRevision, frameIndex, timestampMs, trackScopeId, detections = [], videoElement, onSeekToFrame, expanded = $bindable(false), selectedTrackId = $bindable(''), poseDraftDirty = $bindable(false), calibrationDraftDirty = $bindable(false) }: Props = $props();
 	let stageWidth = $state(0);
 	let stageHeight = $state(0);
 	let snapshotUrl = $state<string | null>(null);
+	let captureController: AbortController | null = null;
 	let captured = $state(false);
 	let capturedFrameBinding = $state<CapturedFrameBinding | null>(null);
 	let groundPlaneMode = $state(false);
@@ -81,6 +84,11 @@
 		&& capturedFrameBinding.frameIndex === frameIndex
 		&& capturedFrameBinding.timestampMs === timestampMs);
 
+	onDestroy(() => {
+		captureController?.abort();
+		if (snapshotUrl?.startsWith('blob:')) URL.revokeObjectURL(snapshotUrl);
+	});
+
 	onMount(() => {
 		void loadSavedPose();
 		void loadSavedCalibration();
@@ -115,7 +123,7 @@
 				for (const candidate of candidates) {
 					const parsed = planarCameraCalibrationV1Schema.safeParse(candidate);
 					if (!parsed.success) continue;
-					const calibration = parsed.data;
+					const calibration = parsed.data as unknown as PlanarCameraCalibrationV1;
 					if (calibration.evidenceId !== evidenceId || calibration.sourceRevision !== normalizedSourceSha256
 						|| calibration.analysisRevision !== analysisRevision) continue;
 					savedCalibration = calibration;
@@ -142,6 +150,16 @@
 
 	async function reviewCalibration(decision: 'ACCEPTED_FOR_SCENE_PROPOSAL' | 'REJECTED') {
 		if (!savedCalibration || !savedCalibrationRevisionId || !calibrationReviewEnabled || !calibrationReadbackVerified || busy) return;
+		// Accepting needs a fixed-camera window. Default: the whole clip, read from the loaded video.
+		let cameraFixedWindow: { startPtsUs: number; endPtsUs: number } | undefined;
+		if (decision === 'ACCEPTED_FOR_SCENE_PROPOSAL') {
+			const duration = videoElement?.duration ?? NaN;
+			if (!Number.isFinite(duration) || duration <= 0) {
+				status = 'Load the video before accepting: the fixed-camera window defaults to the whole clip.';
+				return;
+			}
+			cameraFixedWindow = { startPtsUs: 0, endPtsUs: Math.ceil(duration * 1_000_000) };
+		}
 		busy = true;
 		status = 'Recording calibration review…';
 		try {
@@ -153,6 +171,7 @@
 					annotationRevisionId: savedCalibrationRevisionId, calibrationSha256: await calibrationDigest(savedCalibration),
 					analysisRevision: savedCalibration.analysisRevision, calibrationFrameIndex: savedCalibration.calibrationFrameIndex,
 					calibrationFramePtsUs: savedCalibration.calibrationFramePtsUs, decision, notes: calibrationReviewNotes,
+					...(cameraFixedWindow ? { cameraFixedWindow } : {}),
 				}),
 			});
 			const payload = await response.json().catch(() => ({}));
@@ -169,7 +188,8 @@
 		}
 	}
 
-	async function loadSavedPose(): Promise<boolean> {
+	async function loadSavedPose(overwriteDraft = false): Promise<boolean> {
+		const requestedTrackId = selectedTrackId;
 		savedTrackFrames = [];
 		savedTrackMotion = null;
 		poseReviewEnabled = false;
@@ -186,7 +206,7 @@
 				const key = `${decision.annotationRevisionId}:${decision.framePtsUs}:${decision.trackId ?? ''}:${decision.trackScopeId ?? ''}`;
 				if (!reviewBySample.has(key)) reviewBySample.set(key, String(decision.decision));
 			}
-			const frameSamples = new Map<number, { frameIndex: number; framePtsUs: number; timestampMs: number; placedJoints: number; annotationRevisionId: string; reviewDecision: string | null }>();
+			const frameSamples = new Map<number, { frameIndex: number; framePtsUs: number; timestampMs: number; placedJoints: number; hasGroundContact: boolean; annotationRevisionId: string; reviewDecision: string | null }>();
 			const trackObservations = new Map<number, PoseObservationV1>();
 			let selectedPose: PoseObservationV1 | null = null;
 			let selectedRevision: number | null = null;
@@ -221,9 +241,14 @@
 			if (trackObservations.size >= 2) {
 				try { savedTrackMotion = derivePoseTrackMotionV1([...trackObservations.values()], humanCoco17PoseSchemaV1); } catch { savedTrackMotion = null; }
 			}
-			if (!selectedPose) return false;
+			if (!selectedPose || requestedTrackId !== selectedTrackId || (poseDraftDirty && !overwriteDraft)) return false;
 			points = selectedPose.keypoints.map((point) => point.x === null || point.y === null ? null : { x: point.x, y: point.y });
-			groundContactDraft = selectedPose.groundContact ?? null;
+			const savedContact = selectedPose.groundContact;
+			groundContactDraft = savedContact ? {
+				imagePx: [savedContact.imagePx[0]!, savedContact.imagePx[1]!],
+				footSide: savedContact.footSide,
+				label: savedContact.label,
+			} : null;
 			savedRevision = selectedRevision;
 			status = 'Loaded this frame’s saved, unreviewed pose proposal.';
 			return true;
@@ -240,68 +265,105 @@
 	}
 
 	async function captureSelectedFrame() {
-		if (!videoElement) {
-			status = 'The evidence video player is not ready.';
-			return;
-		}
+		if (captured && (poseDraftDirty || calibrationDraftDirty) && !window.confirm('Recapturing clears unsaved contact and calibration changes. Continue?')) return;
+		captureController?.abort();
+		const controller = new AbortController();
+		captureController = controller;
+		const expectedEvidenceId = evidenceId;
+		const expectedSourceRevision = normalizedSourceSha256;
+		const expectedAnalysisRevision = analysisRevision;
+		const expectedFrameIndex = frameIndex;
+		const expectedTimestampMs = timestampMs;
 		busy = true;
-		status = 'Seeking to the selected evidence timestamp…';
+		status = 'Loading the authorized analyzed frame…';
 		try {
-			videoElement.pause();
-			const targetSeconds = timestampMs / 1000;
-			if (Math.abs(videoElement.currentTime - targetSeconds) > 0.01) {
-				await new Promise<void>((resolve, reject) => {
-					const timeout = window.setTimeout(() => reject(new Error('Frame seek timed out.')), 8000);
-					const onSeeked = () => { window.clearTimeout(timeout); resolve(); };
-					const onError = () => { window.clearTimeout(timeout); reject(new Error('Could not seek to the selected frame.')); };
-					videoElement.addEventListener('seeked', onSeeked, { once: true });
-					videoElement.addEventListener('error', onError, { once: true });
-					videoElement.currentTime = targetSeconds;
-				});
+			videoElement?.pause();
+			onSeekToFrame?.(expectedTimestampMs);
+			const response = await fetch(`/api/evidence/${encodeURIComponent(expectedEvidenceId)}/video-frame/${expectedFrameIndex}`, {
+				credentials: 'same-origin',
+				cache: 'no-store',
+				headers: { Accept: 'image/jpeg' },
+				signal: controller.signal,
+			});
+			if (!response.ok) throw new Error(`The authorized analyzed frame is unavailable (HTTP ${response.status}). Select an extracted frame and retry.`);
+			const responseType = response.headers.get('content-type')?.split(';', 1)[0]?.trim().toLowerCase();
+			const responseMatchesSelection = responseType === 'image/jpeg'
+				&& response.headers.get('X-Source-Revision') === expectedSourceRevision
+				&& response.headers.get('X-Analysis-Revision') === expectedAnalysisRevision
+				&& response.headers.get('X-Frame-Index') === String(expectedFrameIndex)
+				&& response.headers.get('X-Frame-Timestamp-Ms') === String(expectedTimestampMs);
+			if (!responseMatchesSelection) throw new Error('The authorized frame does not match this evidence, analysis run, frame index, and timestamp.');
+			const readOptionalDimension = (headerName: string): number | null => {
+				const value = response.headers.get(headerName);
+				return value === null ? null : Number(value);
+			};
+			const declaredSourceWidth = readOptionalDimension('X-Source-Frame-Width');
+			const declaredSourceHeight = readOptionalDimension('X-Source-Frame-Height');
+			const declaredArtifactWidth = readOptionalDimension('X-Artifact-Frame-Width');
+			const declaredArtifactHeight = readOptionalDimension('X-Artifact-Frame-Height');
+			if ((declaredSourceWidth === null) !== (declaredSourceHeight === null)
+				|| (declaredArtifactWidth === null) !== (declaredArtifactHeight === null)) {
+				throw new Error('The analyzed frame has incomplete dimension metadata.');
 			}
-			const width = videoElement.videoWidth;
-			const height = videoElement.videoHeight;
-			if (!width || !height) throw new Error('The selected video frame has no decoded dimensions yet.');
-			if (!snapshotCanvas) throw new Error('The frame preview canvas is not mounted.');
-			snapshotCanvas.width = width;
-			snapshotCanvas.height = height;
-			const context = snapshotCanvas.getContext('2d', { alpha: false });
-			if (!context) throw new Error('The browser could not create a frame preview.');
-			context.drawImage(videoElement, 0, 0, width, height);
-			stageWidth = width;
-			stageHeight = height;
-			snapshotUrl = snapshotCanvas.toDataURL('image/png');
+			const blob = await response.blob();
+			if (blob.size <= 0 || blob.size > 16 * 1024 * 1024) throw new Error('The analyzed frame preview exceeds its size limit.');
+			const bitmap = await createImageBitmap(blob);
+			let sourceWidth = 0;
+			let sourceHeight = 0;
+			let artifactWidth = 0;
+			let artifactHeight = 0;
+			try {
+				artifactWidth = declaredArtifactWidth ?? bitmap.width;
+				artifactHeight = declaredArtifactHeight ?? bitmap.height;
+				if (bitmap.width !== artifactWidth || bitmap.height !== artifactHeight) throw new Error('The analyzed frame dimensions do not match its saved artifact metadata.');
+				sourceWidth = declaredSourceWidth ?? videoElement?.videoWidth ?? 0;
+				sourceHeight = declaredSourceHeight ?? videoElement?.videoHeight ?? 0;
+				const dimensionsAreValid = [sourceWidth, sourceHeight, artifactWidth, artifactHeight].every((value) => Number.isSafeInteger(value) && value > 0 && value <= 32768)
+					&& sourceWidth * sourceHeight <= 100_000_000
+					&& artifactWidth * artifactHeight <= 100_000_000
+					&& Math.abs(sourceWidth / sourceHeight - artifactWidth / artifactHeight) <= 0.02;
+				if (!dimensionsAreValid) throw new Error('The analyzed frame has invalid or mismatched source dimensions.');
+				if (controller.signal.aborted) return;
+				if (evidenceId !== expectedEvidenceId || normalizedSourceSha256 !== expectedSourceRevision
+					|| analysisRevision !== expectedAnalysisRevision || frameIndex !== expectedFrameIndex || timestampMs !== expectedTimestampMs) {
+					throw new Error('The selected source or frame changed while loading. Select it again before placing landmarks.');
+				}
+				const nextSnapshotUrl = URL.createObjectURL(blob);
+				if (snapshotUrl?.startsWith('blob:')) URL.revokeObjectURL(snapshotUrl);
+				snapshotUrl = nextSnapshotUrl;
+				stageWidth = sourceWidth;
+				stageHeight = sourceHeight;
+			} finally {
+				bitmap.close();
+			}
 			fitAnchorDrafts = createAnchorDrafts('fit');
 			validationAnchorDrafts = createAnchorDrafts('check');
 			groundContactDraft = null;
 			groundContactMode = false;
 			calibrationProposal = null;
+			calibrationDraftDirty = false;
 			calibrationReadbackVerified = false;
-			capturedFrameBinding = {
-				evidenceId,
-				sourceRevision: normalizedSourceSha256,
-				analysisRevision,
-				frameIndex,
-				timestampMs,
-				frameWidth: width,
-				frameHeight: height,
-			};
+			capturedFrameBinding = { evidenceId: expectedEvidenceId, sourceRevision: expectedSourceRevision, analysisRevision: expectedAnalysisRevision, frameIndex: expectedFrameIndex, timestampMs: expectedTimestampMs, frameWidth: sourceWidth, frameHeight: sourceHeight, artifactWidth, artifactHeight };
 			captured = true;
-			status = `Frame captured at ${width} × ${height}; points remain an unreviewed manual proposal.`;
+			status = `Authorized analyzed frame loaded (${artifactWidth} × ${artifactHeight} preview; ${sourceWidth} × ${sourceHeight} source coordinates). Points remain an unreviewed manual proposal.`;
 		} catch (error) {
-			status = error instanceof Error ? error.message : 'Could not capture the selected video frame.';
+			if (!controller.signal.aborted) status = error instanceof Error ? error.message : 'Could not load the selected analyzed frame.';
 		} finally {
-			busy = false;
+			if (captureController === controller) {
+				captureController = null;
+				busy = false;
+			}
 		}
 	}
 
 	function placeActiveJoint(event: MouseEvent) {
-		if (!capturedFrameMatchesSelection || !stageWidth || !stageHeight) return;
+		if (busy || !capturedFrameMatchesSelection || !stageWidth || !stageHeight) return;
 		const rect = event.currentTarget instanceof HTMLElement ? event.currentTarget.getBoundingClientRect() : null;
 		if (!rect || rect.width <= 0 || rect.height <= 0) return;
 		const x = Math.max(0, Math.min(stageWidth, ((event.clientX - rect.left) / rect.width) * stageWidth));
 		const y = Math.max(0, Math.min(stageHeight, ((event.clientY - rect.top) / rect.height) * stageHeight));
 		if (groundPlaneMode) {
+			calibrationDraftDirty = true;
 			const anchors = activePlaneAnchor.group === 'fit' ? fitAnchorDrafts : validationAnchorDrafts;
 			anchors[activePlaneAnchor.index] = { ...anchors[activePlaneAnchor.index]!, imagePx: { x, y } };
 			if (activePlaneAnchor.group === 'fit') fitAnchorDrafts = [...anchors];
@@ -312,11 +374,13 @@
 			return;
 		}
 		if (groundContactMode) {
+			poseDraftDirty = true;
 			groundContactDraft = { imagePx: [x, y], footSide: groundContactFootSide, label: 'operator-marked-ground-contact-candidate' };
 			status = 'Marked a source-pixel ground-contact candidate. It remains unreviewed; only an accepted pose review can make it eligible for a calibrated plane proposal.';
 			return;
 		}
 		const placedJointName = activeJointName;
+		poseDraftDirty = true;
 		points[activeJointIndex] = { x, y };
 		points = [...points];
 		xInput = x.toFixed(1);
@@ -411,6 +475,7 @@
 				throw new Error('The calibration proposal saved, but independent revision-history readback did not match it.');
 			}
 			status = 'Unreviewed calibration proposal saved and matched from authorized evidence revision history.';
+			calibrationDraftDirty = false;
 		} catch (error) {
 			status = error instanceof Error ? error.message : 'Could not save the calibration proposal.';
 		} finally {
@@ -426,18 +491,24 @@
 	}
 
 	function applyTypedCoordinates() {
+		if (xInput == null || yInput == null || String(xInput).trim() === '' || String(yInput).trim() === '') {
+			status = 'Enter both X and Y coordinates.';
+			return;
+		}
 		const x = Number(xInput);
 		const y = Number(yInput);
-		if (!captured || !Number.isFinite(x) || !Number.isFinite(y) || x < 0 || x > stageWidth || y < 0 || y > stageHeight) {
+		if (!capturedFrameMatchesSelection || !Number.isFinite(x) || !Number.isFinite(y) || x < 0 || x > stageWidth || y < 0 || y > stageHeight) {
 			status = `Enter X and Y within 0–${stageWidth} × 0–${stageHeight}.`;
 			return;
 		}
 		points[activeJointIndex] = { x, y };
+		poseDraftDirty = true;
 		points = [...points];
 		status = `Set ${activeJointName} by source-frame coordinates.`;
 	}
 
 	function clearPoints() {
+		poseDraftDirty = false;
 		points = Array.from({ length: 17 }, () => null);
 		groundContactDraft = null;
 		activeJointIndex = 0;
@@ -499,8 +570,9 @@
 			const payload = await response.json().catch(() => ({}));
 			if (!response.ok || !payload?.ok) throw new Error(payload?.error ?? `Pose proposal save failed (${response.status}).`);
 			savedRevision = Number.isInteger(payload.version) ? payload.version : null;
-			const reloaded = await loadSavedPose();
+			const reloaded = await loadSavedPose(true);
 			if (!reloaded) throw new Error('The pose proposal was saved, but its revision could not be verified by readback.');
+			poseDraftDirty = false;
 			status = `Unreviewed ${groundContactDraft ? 'pose and ground-contact candidate' : 'pose'} saved as evidence revision ${savedRevision ?? 'available'} and verified from revision history.`;
 		} catch (error) {
 			status = error instanceof Error ? error.message : 'Could not save the pose proposal.';
@@ -511,6 +583,7 @@
 
 	async function reviewPose(sample: (typeof savedTrackFrames)[number], decision: 'ACCEPTED_FOR_SCENE_PROPOSAL' | 'REJECTED') {
 		if (busy || !sample.annotationRevisionId) return;
+		if (poseDraftDirty && !window.confirm('Reviewing reloads the saved pose and discards unsaved pose changes. Continue?')) return;
 		busy = true;
 		status = decision === 'ACCEPTED_FOR_SCENE_PROPOSAL' ? 'Recording reviewer acceptance for a scene proposal…' : 'Recording reviewer rejection…';
 		try {
@@ -528,6 +601,7 @@
 			});
 			const payload = await response.json().catch(() => ({}));
 			if (!response.ok || payload?.ok !== true) throw new Error(payload?.error ?? `Pose review failed (${response.status}).`);
+			poseDraftDirty = false;
 			await loadSavedPose();
 			status = decision === 'ACCEPTED_FOR_SCENE_PROPOSAL'
 				? 'Pose accepted for scene proposal; it is still not calibrated world geometry.'
@@ -553,8 +627,14 @@
 		</div>
 		<label class="pose-track-field">
 			Link to detector track hypothesis (optional)
-			<select aria-label="Link pose to detector track hypothesis" bind:value={selectedTrackId} disabled={busy} onchange={async (event) => {
-			selectedTrackId = (event.currentTarget as HTMLSelectElement).value;
+			<select aria-label="Link pose to detector track hypothesis" value={selectedTrackId} disabled={busy} onchange={async (event) => {
+				const select = event.currentTarget as HTMLSelectElement;
+				if (poseDraftDirty && !window.confirm('Changing tracks discards unsaved pose changes. Continue?')) { select.value = selectedTrackId; return; }
+				selectedTrackId = select.value;
+				poseDraftDirty = false;
+				points = Array.from({ length: 17 }, () => null);
+				groundContactDraft = null;
+				savedRevision = null;
 				await loadSavedPose();
 			}}>
 				<option value="">No track link</option>
@@ -564,14 +644,13 @@
 			</select>
 			<span>Track IDs are analysis-run hypotheses. They do not identify a person.</span>
 		</label>
-		<button type="button" class="pose-capture" onclick={captureSelectedFrame} disabled={busy || !videoElement}>
-			{busy ? 'Working…' : captured ? 'Recapture selected frame' : 'Capture selected video frame'}
+		<button type="button" class="pose-capture" onclick={captureSelectedFrame} disabled={busy}>
+			{busy ? 'Loading frame…' : captured ? 'Reload authorized frame' : 'Load authorized analyzed frame'}
 		</button>
-		<canvas bind:this={snapshotCanvas} class="pose-snapshot-buffer" aria-hidden="true"></canvas>
 		{#if captured}
 			{#if !capturedFrameMatchesSelection}<p class="pose-stale-frame" role="alert">The selected frame or source changed after capture. Recapture before placing or saving landmarks.</p>{/if}
 			<div class="pose-stage" style={`aspect-ratio:${stageWidth}/${stageHeight}`}>
-				{#if snapshotUrl}<img class="pose-stage-image" src={snapshotUrl} alt="Captured source video frame for manual pose annotation" />{/if}
+				{#if snapshotUrl}<img class="pose-stage-image" src={snapshotUrl} alt={`Authorized analyzed video frame ${frameIndex} at ${timestampMs} milliseconds for manual pose annotation`} />{/if}
 				<svg class="pose-lines" viewBox={`0 0 ${stageWidth} ${stageHeight}`} preserveAspectRatio="none" aria-hidden="true">
 					{#if groundPlaneMode}
 						{#each fitAnchorDrafts as anchor, index (`fit-${anchor.id}`)}
@@ -588,7 +667,7 @@
 							{/if}
 						{/each}
 						{#each points as point, index (index)}
-							{#if point}<circle cx={point.x} cy={point.y} r={Math.max(3, stageWidth / 120)} /><text x={point.x + 5} y={point.y - 5}>{index}</text>{/if}
+							{#if point}<circle class="pose-keypoint" style={`--pose-keypoint-color:${poseKeypointDisplayColorV1(index)}`} cx={point.x} cy={point.y} r={Math.max(3, stageWidth / 120)} /><text class="pose-keypoint-label" style={`--pose-keypoint-color:${poseKeypointDisplayColorV1(index)}`} x={point.x + 5} y={point.y - 5}>{index}</text>{/if}
 		{/each}
 	{/if}
 				</svg>
@@ -602,16 +681,16 @@
 					{#each fitAnchorDrafts as anchor, index (anchor.id)}
 						<div class="plane-anchor-row">
 							<button type="button" class:active={activePlaneAnchor.group === 'fit' && activePlaneAnchor.index === index} onclick={() => selectPlaneAnchor('fit', index)}>F{index + 1} · {anchor.imagePx ? `${anchor.imagePx.x.toFixed(1)}, ${anchor.imagePx.y.toFixed(1)} px` : 'select image point'}</button>
-							<label>Ground X (m)<input type="number" step="0.001" bind:value={anchor.planeX} oninput={() => { calibrationProposal = null; }} /></label>
-							<label>Ground Y (m)<input type="number" step="0.001" bind:value={anchor.planeY} oninput={() => { calibrationProposal = null; }} /></label>
+							<label>Ground X (m)<input type="number" step="0.001" bind:value={anchor.planeX} oninput={() => { calibrationProposal = null; calibrationDraftDirty = true; }} /></label>
+							<label>Ground Y (m)<input type="number" step="0.001" bind:value={anchor.planeY} oninput={() => { calibrationProposal = null; calibrationDraftDirty = true; }} /></label>
 						</div>
 					{/each}
 					<strong>Independent validation anchors</strong>
 					{#each validationAnchorDrafts as anchor, index (anchor.id)}
 						<div class="plane-anchor-row">
 							<button type="button" class:active={activePlaneAnchor.group === 'check' && activePlaneAnchor.index === index} onclick={() => selectPlaneAnchor('check', index)}>V{index + 1} · {anchor.imagePx ? `${anchor.imagePx.x.toFixed(1)}, ${anchor.imagePx.y.toFixed(1)} px` : 'select image point'}</button>
-							<label>Ground X (m)<input type="number" step="0.001" bind:value={anchor.planeX} oninput={() => { calibrationProposal = null; }} /></label>
-							<label>Ground Y (m)<input type="number" step="0.001" bind:value={anchor.planeY} oninput={() => { calibrationProposal = null; }} /></label>
+							<label>Ground X (m)<input type="number" step="0.001" bind:value={anchor.planeX} oninput={() => { calibrationProposal = null; calibrationDraftDirty = true; }} /></label>
+							<label>Ground Y (m)<input type="number" step="0.001" bind:value={anchor.planeY} oninput={() => { calibrationProposal = null; calibrationDraftDirty = true; }} /></label>
 						</div>
 					{/each}
 					<div class="pose-actions">
@@ -653,7 +732,7 @@
 				</div>
 				<div class="pose-joint-grid" aria-label="COCO-17 joint selector">
 					{#each humanCoco17PoseSchemaV1.joints as joint, index (joint.name)}
-						<button type="button" class:active={activeJointIndex === index} class:placed={points[index] !== null} aria-pressed={activeJointIndex === index} onclick={() => selectJoint(index)}>
+						<button type="button" style={`--pose-keypoint-color:${poseKeypointDisplayColorV1(index)}`} class:active={activeJointIndex === index} class:placed={points[index] !== null} aria-pressed={activeJointIndex === index} onclick={() => selectJoint(index)}>
 							{index}. {joint.name}{points[index] ? ' ✓' : ''}
 						</button>
 					{/each}
@@ -669,14 +748,21 @@
 			{#if selectedTrackId && savedTrackFrames.length > 0}
 				<section class="pose-track-samples" aria-label="Saved pose samples for selected track">
 					<strong>{savedTrackFrames.length} source-frame pose sample{savedTrackFrames.length === 1 ? '' : 's'} for {selectedTrackId}</strong>
-					<p>Review decisions are appended to history. Accepting a sample with CONTACT? also reviews that manually marked contact candidate. It remains a ground-plane proposal only after matching calibration review; no height or camera-motion compensation is provided.</p>
+					<p>Review decisions are appended to history. Accepting a sample with CONTACT? also reviews that manually marked contact candidate. It remains a ground-plane proposal only after matching calibration review; no height or camera-motion compensation is provided. Keypoint scores are not calibrated pixel-error bounds; displayed angles are 2D image-plane measurements, not anatomical or world-space angles.</p>
 					<div>
 						{#each savedTrackFrames as sample (`${sample.frameIndex}-${sample.timestampMs}`)}
+							{@const motionSample = savedTrackMotion?.samples.find((item) => item.frameIndex === sample.frameIndex)}
 							<article class="pose-sample-row">
 								<button type="button" onclick={() => seekToPoseSample(sample.timestampMs)} aria-label={`Seek to pose sample frame ${sample.frameIndex}`}>
 									Frame {sample.frameIndex} · {sample.timestampMs.toFixed(0)} ms · {sample.placedJoints}/17 joints
 								</button>
 								<span>{sample.reviewDecision === 'ACCEPTED_FOR_SCENE_PROPOSAL' ? `Accepted ${sample.hasGroundContact ? 'pose and contact candidate' : 'pose'} for scene proposal` : sample.reviewDecision === 'REJECTED' ? 'Rejected' : `${sample.hasGroundContact ? 'Pose and contact candidate' : 'Pose'} unreviewed`}</span>
+								{#if motionSample}
+									<span class="pose-sample-metrics">Visible {motionSample.visibility.visible} · occluded {motionSample.visibility.occluded} · unlabeled {motionSample.visibility.notLabeled} · mean keypoint score {motionSample.confidence.mean === null ? 'n/a' : motionSample.confidence.mean.toFixed(2)}</span>
+									{#if motionSample.jointAnglesDeg.length > 0}
+										<span class="pose-sample-metrics">2D image-plane angles: {motionSample.jointAnglesDeg.map((angle) => `${angle.name} ${angle.degrees.toFixed(0)}°`).join(' · ')}</span>
+									{/if}
+								{/if}
 								{#if poseReviewEnabled}
 									<button type="button" disabled={busy} onclick={() => reviewPose(sample, 'ACCEPTED_FOR_SCENE_PROPOSAL')}>{sample.hasGroundContact ? 'Accept pose and contact candidate' : 'Accept for scene proposal'}</button>
 									<button type="button" disabled={busy} onclick={() => reviewPose(sample, 'REJECTED')}>Reject</button>
@@ -722,16 +808,19 @@
 	.pose-sample-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
 	.pose-track-samples button { min-height: 2rem; padding: 0.25rem 0.5rem; border: 1px solid var(--border, #999); border-radius: 0.3rem; background: var(--surface, #fff); color: inherit; font: inherit; }
 	.pose-track-motion { display: grid; gap: 0.2rem; padding: 0.45rem; border-radius: 0.3rem; background: var(--surface, #fff); font-variant-numeric: tabular-nums; }
+	.pose-sample-metrics { display: block; color: var(--muted-foreground, #666); font-size: 0.85em; }
 	.pose-toggle, .pose-save { font-weight: 700; }
 	.pose-disclaimer, .pose-status { margin: 0; font-size: 0.82rem; line-height: 1.35; }
 	.pose-stale-frame { margin: 0; padding: .45rem; border: 1px solid #a65b34; background: #fff1e8; color: #702a12; font-size: .82rem; }
 	.pose-stage { position: relative; width: min(100%, 42rem); overflow: hidden; background: #111; }
 	.pose-stage-image, .pose-lines, .pose-stage-target { position: absolute; inset: 0; width: 100%; height: 100%; }
-	.pose-stage-image { display: block; object-fit: contain; }
+	.pose-stage-image { display: block; object-fit: fill; }
 	.pose-lines { pointer-events: none; }
 	.pose-lines line { stroke: #17e0c1; stroke-width: 3; vector-effect: non-scaling-stroke; }
 	.pose-lines circle { fill: #ffc857; stroke: #111; stroke-width: 2; vector-effect: non-scaling-stroke; }
+	.pose-lines .pose-keypoint { fill: var(--pose-keypoint-color); stroke: #fff; stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
 	.pose-lines text { fill: white; font: 12px sans-serif; paint-order: stroke; stroke: #111; stroke-width: 3px; }
+	.pose-lines .pose-keypoint-label { fill: var(--pose-keypoint-color); }
 	.pose-lines .calibration-fit-point { fill: #ffd36d; stroke: #171d29; stroke-width: 2; vector-effect: non-scaling-stroke; }
 	.pose-lines .calibration-check-point { fill: #f28f62; stroke: #171d29; stroke-width: 2; vector-effect: non-scaling-stroke; }
 	.pose-lines .ground-contact-point { fill: #ff6b5e; stroke: #fff; stroke-width: 2; vector-effect: non-scaling-stroke; }
@@ -740,7 +829,7 @@
 	.pose-point-entry label { display: grid; gap: 0.2rem; font-size: 0.78rem; }
 	.pose-point-entry input { width: 6.5rem; min-height: 2rem; padding: 0.25rem; }
 	.pose-joint-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr)); gap: 0.3rem; max-height: 10rem; overflow: auto; }
-	.pose-joint-grid button { text-align: left; font-size: 0.72rem; }
+	.pose-joint-grid button { text-align: left; font-size: 0.72rem; border-left: 4px solid var(--pose-keypoint-color, #a89b82); }
 	.pose-joint-grid button.active { outline: 2px solid #087f72; }
 	.pose-joint-grid button.placed { border-color: #087f72; }
 	.pose-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; }
@@ -753,6 +842,5 @@
 	.plane-anchor-row button, .plane-anchor-row input { min-height: 2rem; padding: .25rem .4rem; border: 1px solid var(--border, #999); border-radius: .25rem; background: var(--surface, #fff); color: inherit; font: inherit; }
 	.plane-anchor-row button.active { outline: 2px solid #087f72; }
 	.plane-anchor-row label { display: grid; gap: .15rem; font-size: .7rem; }
-	.pose-snapshot-buffer { display: none; }
 	@media (max-width: 600px) { .pose-point-entry { align-items: stretch; } .pose-actions span { width: 100%; } .plane-anchor-row { grid-template-columns: 1fr 1fr; } .plane-anchor-row > button { grid-column: 1 / -1; } }
 </style>

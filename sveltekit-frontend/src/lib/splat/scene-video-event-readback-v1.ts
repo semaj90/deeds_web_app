@@ -16,6 +16,7 @@ export type ReadbackVideoEventV1 = {
 
 export type ReadbackVideoTimelineV1 = {
 	evidenceId: string;
+	caseId?: string;
 	sourceRevision: string;
 	analysisRevision: string;
 	events: ReadbackVideoEventV1[];
@@ -88,7 +89,8 @@ export function parseReadbackVideoTimelineV1(value: unknown, expectedEvidenceId:
 		&& typeof event.summary === 'string'
 		&& typeof event.reviewStatus === 'string'
 		&& typeof event.sceneAdmission === 'string'));
-	return { evidenceId: timeline.evidenceId, sourceRevision: timeline.sourceRevision, analysisRevision: timeline.analysisRevision, events };
+	return { evidenceId: timeline.evidenceId, caseId: typeof timeline.caseId === 'string' ? timeline.caseId : undefined,
+		sourceRevision: timeline.sourceRevision, analysisRevision: timeline.analysisRevision, events };
 }
 
 /** Reads revision history into source-frame pose summaries, scoped to scene-bound runs. */
@@ -212,9 +214,12 @@ export const GROUND_PLANE_TRACK_TIME_PALETTE_V1 = Object.freeze([
 export function poseHipImageTrajectoryV1(
 	observations: readonly ScenePoseObservationReadbackV1[],
 	current: ScenePoseObservationReadbackV1,
-	maxSamples = 24
+	maxSamples = 24,
+	window?: { startUs: number; endUs: number }
 ): PoseImageTrajectoryPointV1[] {
-	if (!current.trackId || !current.trackScopeId || !Number.isInteger(maxSamples) || maxSamples < 2) return [];
+	if (!current.trackId || !current.trackScopeId || !Number.isInteger(maxSamples) || maxSamples < 2 || !window
+		|| !Number.isSafeInteger(window.startUs) || !Number.isSafeInteger(window.endUs) || window.startUs < 0
+		|| window.endUs < window.startUs || current.framePtsUs < window.startUs || current.framePtsUs > window.endUs) return [];
 	const matching = observations.filter((pose) => pose.evidenceId === current.evidenceId
 		&& pose.sourceRevision === current.sourceRevision
 		&& pose.analysisRevision === current.analysisRevision
@@ -222,6 +227,8 @@ export function poseHipImageTrajectoryV1(
 		&& pose.trackScopeId === current.trackScopeId
 		&& pose.frameWidth === current.frameWidth
 		&& pose.frameHeight === current.frameHeight
+		&& pose.framePtsUs >= window.startUs && pose.framePtsUs <= window.endUs
+		&& (pose.framePtsUs < current.framePtsUs || (pose.framePtsUs === current.framePtsUs && pose.frameIndex <= current.frameIndex))
 		&& Number.isSafeInteger(pose.framePtsUs))
 		.sort((a, b) => a.framePtsUs - b.framePtsUs || a.frameIndex - b.frameIndex);
 	const points = matching.flatMap((pose): PoseImageTrajectoryPointV1[] => {

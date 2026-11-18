@@ -3,7 +3,11 @@ import { dirname, extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { test, expect } from '@playwright/test';
-import { encodeVideoMotionLutV1, VIDEO_MOTION_LUT_HEIGHT_V1, VIDEO_MOTION_LUT_WIDTH_V1 } from '../../src/lib/shared/video-motion-lut-v1.js';
+import sharp from 'sharp';
+import {
+	buildPackedMotionLodsV1, decodeVideoMotionLutIndicesV1, encodeVideoMotionLutV1,
+	VIDEO_MOTION_GRAYSCALE_LUT_V1, VIDEO_MOTION_LUT_HEIGHT_V1, VIDEO_MOTION_LUT_WIDTH_V1,
+} from '../../src/lib/shared/video-motion-lut-v1.js';
 import { stableStringifySceneDocumentV1 } from '../../src/lib/splat/scene-document-v1.js';
 
 const evidenceId = '4cf3e0c4-f3c7-4e0a-9a7e-1adf01dd7291';
@@ -33,7 +37,7 @@ const videoEventTimeline = {
 	}]
 };
 const motionTile = Buffer.from(encodeVideoMotionLutV1(
-	new Uint8Array(VIDEO_MOTION_LUT_WIDTH_V1 * VIDEO_MOTION_LUT_HEIGHT_V1),
+	null,
 	new Uint8Array(VIDEO_MOTION_LUT_WIDTH_V1 * VIDEO_MOTION_LUT_HEIGHT_V1).fill(255),
 ).bytes);
 const proofScreenshot = resolve(process.cwd(), '../docs/reports/screenshots/evidence-video-viewer-transcript-20261115.png');
@@ -75,7 +79,10 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 			hash: `sha256:${'a'.repeat(64)}`
 		})
 	}));
-	await page.addInitScript(({ targetEvidenceId, targetCaseId, targetAnalysisRevision, targetEventTimeline, targetMotionTileBytes }) => {
+	const sourceFrames = await Promise.all(['#393f4c', '#4c4339'].map((background) => sharp({
+		create: { width: 320, height: 180, channels: 3, background },
+	}).jpeg().toBuffer()));
+	await page.addInitScript(({ targetEvidenceId, targetCaseId, targetAnalysisRevision, targetEventTimeline, targetMotionTileBytes, targetFrames }) => {
 		const previousPose = {
 			schema: 'atlas.pose-observation.v1', evidenceId: targetEvidenceId,
 			sourceSha256: `sha256:${'a'.repeat(64)}`, sourceRevision: `sha256:${'a'.repeat(64)}`,
@@ -105,6 +112,18 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 			const requestMethod = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
 			if (requestUrl.pathname.startsWith(`/api/evidence/${targetEvidenceId}/`)) {
 				(window as any).__poseFixture.requests.push(`${requestMethod} ${requestUrl.pathname}${requestUrl.search}`);
+			}
+			if (requestUrl.pathname.startsWith(`/api/evidence/${targetEvidenceId}/video-frame/`)) {
+				const index = Number(requestUrl.pathname.split('/').at(-1));
+				const frame = targetFrames[index];
+				if (!frame) return new Response(null, { status: 404 });
+				return new Response(Uint8Array.from(frame), { headers: {
+					'Content-Type': 'image/jpeg',
+					'X-Source-Revision': `sha256:${'a'.repeat(64)}`, 'X-Analysis-Revision': targetAnalysisRevision,
+					'X-Frame-Index': String(index), 'X-Frame-Timestamp-Ms': index === 0 ? '1000' : '1500',
+					'X-Source-Frame-Width': '320', 'X-Source-Frame-Height': '180',
+					'X-Artifact-Frame-Width': '320', 'X-Artifact-Frame-Height': '180',
+				} });
 			}
 			if (requestUrl.pathname === `/api/evidence/${targetEvidenceId}/transcript`) {
 				return new Response(JSON.stringify({
@@ -143,11 +162,14 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 			if (requestUrl.pathname === `/api/evidence/${targetEvidenceId}/calibration-review` && requestMethod === 'POST') {
 				const body = JSON.parse(String(init?.body ?? '{}'));
 				(window as any).__poseFixture.calibrationReviewBody = body;
+				const calibrationRevision = revisions.find((revision) => revision.id === body.annotationRevisionId);
+				const calibration = (calibrationRevision?.metadata as any)?.annotation?.planarCameraCalibrations?.find((item: any) => item.analysisRevision === body.analysisRevision);
 				revisions.unshift({ id: 'calibration-review-1', version: 5, createdAt: '2026-11-16T20:03:00Z', changeReason: 'Planar calibration review', metadata: {
 					schema: 'atlas.planar-camera-calibration-review.v1', evidenceId: targetEvidenceId, caseId: targetCaseId,
 					sourceSha256: body.parentSha256, analysisRevision: body.analysisRevision, annotationRevisionId: body.annotationRevisionId,
 					calibrationSha256: body.calibrationSha256, calibrationFrameIndex: body.calibrationFrameIndex,
 					calibrationFramePtsUs: body.calibrationFramePtsUs, decision: body.decision,
+					cameraFixedWindow: body.cameraFixedWindow ?? null, calibratedRegionPx: calibration?.calibratedRegionPx ?? null,
 					sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false,
 				} });
 				return new Response(JSON.stringify({ ok: true, evidenceId: targetEvidenceId, decision: body.decision, sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false }), { status: 201, headers: { 'Content-Type': 'application/json' } });
@@ -166,7 +188,8 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 			}
 			return new Response(JSON.stringify({ evidenceId: targetEvidenceId, versions: revisions, count: revisions.length, reviewEnabled: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 		};
-	}, { targetEvidenceId: evidenceId, targetCaseId: caseId, targetAnalysisRevision: analysisRevision, targetEventTimeline: videoEventTimeline, targetMotionTileBytes: Array.from(motionTile) });
+	}, { targetEvidenceId: evidenceId, targetCaseId: caseId, targetAnalysisRevision: analysisRevision, targetEventTimeline: videoEventTimeline,
+		targetMotionTileBytes: Array.from(motionTile), targetFrames: sourceFrames.map((frame) => Array.from(frame)) });
 	await page.route(`**/api/evidence/${evidenceId}/frames**`, (route) => route.fulfill({
 		status: 200,
 		contentType: 'application/json',
@@ -177,7 +200,7 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 				detections: [{ label: 'person', confidence: 0.9, bbox: [10, 10, 40, 80], trackId: 'track-0001', velocityPxPerSecond: null, trackState: 'UNREVIEWED_TRACK_HYPOTHESIS' }],
 				tags: ['UNREVIEWED_PROPOSAL'], confidence: 0.9, width: 320, height: 180,
 				analysisRevision, sourceRevision, trackScopeId: 'sha256:fixture-track-scope',
-				motionLut: { schema: 'atlas.video-motion-lut.v1', width: 64, height: 128, timestampMs: 1000, motionScore: 1, url: `/api/evidence/${evidenceId}/motion-preview/0` },
+				motionLut: { schema: 'atlas.video-motion-lut.v1', width: 64, height: 128, timestampMs: 1000, previousTimestampMs: null, motionScore: 0, url: `/api/evidence/${evidenceId}/motion-preview/0` },
 			},
 			{
 				id: `${analysisRevision}:1`, timestamp: 1.5, timestampMs: 1500, frameIndex: 1, framePath: null,
@@ -186,25 +209,33 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 				tags: ['UNREVIEWED_PROPOSAL'], confidence: 0.88, width: 320, height: 180,
 				analysisRevision, sourceRevision, trackScopeId: 'sha256:fixture-track-scope',
 			},
-		] })
+		], motionSamples: [{
+			schema: 'atlas.video-motion-sample.v1', sampleIndex: 0, timestampMs: 1000,
+			previousTimestampMs: null, motionScore: 0.125, width: 64, height: 128,
+			analysisRevision, sourceRevision,
+			url: `/api/evidence/${evidenceId}/motion-preview/0?lane=motion-sample`,
+		}] })
 	}));
-	await page.route((url) => new URL(url).pathname === `/api/evidence/${evidenceId}/motion-preview/0`, (route) => route.fulfill({
+	await page.route((url) => new URL(url).pathname === `/api/evidence/${evidenceId}/motion-preview/0`, (route) => {
+		const sampleTimeMs = 1000;
+		return route.fulfill({
 		status: 200,
 		contentType: 'application/vnd.atlas.video-motion-lut-v1',
 		headers: {
 			'Cache-Control': 'private, no-store',
 			'X-Source-Revision': sourceRevision,
 			'X-Analysis-Revision': analysisRevision,
-			'X-Frame-Timestamp-Ms': '1000',
+			'X-Frame-Timestamp-Ms': String(sampleTimeMs),
 		},
 		body: motionTile,
-	}));
+		});
+	});
 	await page.route(`**/api/evidence/${evidenceId}/video-events`, (route) => route.fulfill({
 		status: 200,
 		contentType: 'application/json',
 		body: JSON.stringify({ success: true, eventTimeline: videoEventTimeline, reviewEnabled: false })
 	}));
-	await page.route('**/api/cases/*/scenes/*/revisions', async (route) => {
+	await page.route(/\/api\/cases\/[^/]+\/scenes\/[^/]+\/revisions(?:\?.*)?$/, async (route) => {
 		if (route.request().method() === 'GET') {
 			return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: savedSceneRevision, message: savedSceneRevision ? 'OK' : 'No scene revision' }) });
 		}
@@ -285,24 +316,57 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 	expect(media.controls).toBe(true);
 	expect(media.error).toBeNull();
 
-	await page.locator('.filmstrip-frame-card').first().click();
-	const motionPreview = page.getByRole('figure', { name: 'Low-resolution frame-to-frame motion cue' });
+	const keyframeStrip = page.getByRole('region', { name: 'Extracted Video Keyframes' });
+	await keyframeStrip.locator('.filmstrip-frame-card').first().click();
+	const motionPreview = keyframeStrip.getByRole('figure', { name: 'Low-resolution frame-to-frame motion cue' });
 	await expect(motionPreview).toBeVisible();
-	await expect.poll(() => motionPreview.textContent(), { timeout: 15_000 }).toContain('100% change').catch(async () => {
+	await expect.poll(() => motionPreview.textContent(), { timeout: 15_000 }).toContain('First sample: no comparison frame').catch(async () => {
 		const motionStatus = await motionPreview.textContent();
 		const clientRequests = await page.evaluate(() => (window as any).__poseFixture?.requests ?? []);
-		throw new Error(`Expected the fixture motion tile to render at 100% change; preview="${motionStatus}", evidence responses=${JSON.stringify(evidenceApiTrace)}, client requests=${JSON.stringify(clientRequests)}, warnings=${JSON.stringify(pageWarnings)}`);
+		throw new Error(`Expected the first sample to report no comparison frame; preview="${motionStatus}", evidence responses=${JSON.stringify(evidenceApiTrace)}, client requests=${JSON.stringify(clientRequests)}, warnings=${JSON.stringify(pageWarnings)}`);
 	});
 	await expect(motionPreview.locator('canvas:not(.hidden)')).toBeVisible();
 	const motionRenderer = await motionPreview.getAttribute('data-renderer');
 	expect(['webgpu', 'webgl2', 'canvas2d']).toContain(motionRenderer);
 	if (testInfo.project.name === 'chromium-webgl2-motion') expect(motionRenderer).toBe('webgl2');
 	await testInfo.attach('motion-preview-renderer', { body: motionRenderer ?? 'unknown', contentType: 'text/plain' });
+	const motionCueRegion = page.getByRole('region', { name: 'Video pixel-change review cues' });
+	await motionCueRegion.getByRole('button', { name: 'Review pixel-change cue at 00:01.000' }).click();
+	await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime)).toBeCloseTo(1, 1);
+	await expect(motionCueRegion.getByRole('figure', { name: 'Low-resolution frame-to-frame motion cue' })).toBeVisible();
+	await expect(motionCueRegion).toContainText('not object motion or a finding');
+	await expect(page.getByRole('button', { name: 'Add manual human pose' })).toBeVisible();
+	await keyframeStrip.locator('.filmstrip-frame-card').first().click();
 	await expect(page.getByText(/track IDs are hypotheses scoped to this evidence revision and analysis run/i)).toBeVisible();
 	await page.getByRole('button', { name: 'Add manual human pose' }).click();
 	await page.getByLabel('Link pose to detector track hypothesis').selectOption('track-0001');
-	await page.getByRole('button', { name: 'Capture selected video frame' }).click();
+	await page.getByRole('button', { name: 'Load authorized analyzed frame' }).click();
 	const poseStage = page.locator('.pose-stage');
+	await expect(poseStage).toBeVisible();
+	await page.getByRole('button', { name: 'Set coordinates' }).click();
+	await expect(page.getByText('Enter both X and Y coordinates.')).toBeVisible();
+	await expect(page.getByText('0/17 placed · current: nose')).toBeVisible();
+	await page.getByLabel('X px').fill('0');
+	await page.getByRole('button', { name: 'Set coordinates' }).click();
+	await expect(page.getByText('Enter both X and Y coordinates.')).toBeVisible();
+	await expect(page.getByText('0/17 placed · current: nose')).toBeVisible();
+	await page.getByLabel('Y px').fill('0');
+	await page.getByRole('button', { name: 'Set coordinates' }).click();
+	await expect(page.getByText('1/17 placed · current: nose')).toBeVisible();
+	await page.getByRole('button', { name: 'Clear', exact: true }).click();
+	await page.getByRole('button', { name: 'Place nose on the captured frame' }).click();
+	await expect(page.getByText('1/17 placed · current: left_eye')).toBeVisible();
+	page.once('dialog', async (dialog) => {
+		expect(dialog.message()).toContain('unsaved pose or calibration');
+		await dialog.dismiss();
+	});
+	await keyframeStrip.locator('.filmstrip-frame-card').nth(1).click();
+	await expect(page.getByText('1/17 placed · current: left_eye')).toBeVisible();
+	page.once('dialog', async (dialog) => { await dialog.accept(); });
+	await keyframeStrip.locator('.filmstrip-frame-card').nth(1).click();
+	await expect(poseStage).toHaveCount(0);
+	await keyframeStrip.locator('.filmstrip-frame-card').first().click();
+	await page.getByRole('button', { name: 'Load authorized analyzed frame' }).click();
 	await expect(poseStage).toBeVisible();
 	await page.getByRole('button', { name: 'Place nose on the captured frame' }).click();
 	await expect(page.getByText('1/17 placed · current: left_eye')).toBeVisible();
@@ -348,7 +412,7 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 	await expect(page.getByLabel('Link pose to detector track hypothesis')).toHaveValue('track-0001');
 	await expect(page.getByText('Loaded this frame’s saved, unreviewed pose proposal.')).toBeVisible();
 	await page.getByRole('button', { name: 'Ground-plane calibration' }).click();
-	await page.getByRole('button', { name: 'Capture selected video frame' }).click();
+	await page.getByRole('button', { name: 'Load authorized analyzed frame' }).click();
 	await expect(page.getByRole('region', { name: 'Ground-plane calibration proposal' })).toBeVisible();
 	await page.getByLabel('I confirm the camera was fixed during this recording.').check();
 	const planeStage = page.locator('.pose-stage');
@@ -384,13 +448,13 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 		calibrationFramePtsUs: 1_500_000, decision: 'ACCEPTED_FOR_SCENE_PROPOSAL',
 		notes: 'Independent fixture review of the measured plane anchors.',
 	});
-	const frameCards = page.locator('.filmstrip-frame-card');
+	expect(calibrationReviewBody.cameraFixedWindow).toMatchObject({ startPtsUs: 0 });
+	expect(calibrationReviewBody.cameraFixedWindow.endPtsUs).toBeGreaterThan(0);
+	const frameCards = keyframeStrip.locator('.filmstrip-frame-card');
 	if (await frameCards.count() > 1) {
 		await frameCards.first().click();
-		// The keyed editor resets its captured pixels when the selected analyzed frame changes.
-		await expect(page.locator('.pose-stage')).toHaveCount(0);
-		await expect(page.getByRole('button', { name: 'Capture selected video frame' })).toBeVisible();
-		await page.getByRole('button', { name: 'Capture selected video frame' }).click();
+		await expect(poseStage).toHaveCount(0);
+		await page.getByRole('button', { name: 'Load authorized analyzed frame' }).click();
 		await expect(page.locator('.pose-stage')).toBeVisible();
 	}
 	await testInfo.attach('network-api-trace', { body: evidenceApiTrace.join('\n'), contentType: 'text/plain' });
@@ -432,6 +496,78 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 
 test.describe('authorized persisted video viewer', () => {
 	if (liveStorageState) test.use({ storageState: liveStorageState });
+
+	test('reads and displays a stored motion cue for a later frame', async ({ page }, testInfo) => {
+		test.skip(!liveCaseId || !liveEvidenceId, 'Set the live case and evidence IDs to an authorized analyzed video.');
+		if (!liveCaseId || !liveEvidenceId) return;
+		const errors: string[] = [];
+		page.on('pageerror', (error) => errors.push(error.message));
+		const checkShader = testInfo.project.name === 'chromium-webgl2-motion';
+		if (checkShader) await page.addInitScript(() => {
+			const prototype = WebGL2RenderingContext.prototype;
+			const upload = prototype.texImage2D;
+			const draw = prototype.drawArrays;
+			const receipts = new WeakMap<HTMLCanvasElement, { width: number; height: number; bytes: number }>();
+			const isMotionCanvas = (canvas: HTMLCanvasElement | OffscreenCanvas): canvas is HTMLCanvasElement =>
+				canvas instanceof HTMLCanvasElement && canvas.getAttribute('aria-label')?.startsWith('WebGL2 packed motion tile') === true;
+			prototype.texImage2D = function (this: WebGL2RenderingContext, ...args: unknown[]) {
+				if (isMotionCanvas(this.canvas) && args[2] === this.R8UI && args[8] instanceof Uint8Array) {
+					receipts.set(this.canvas, { width: Number(args[3]), height: Number(args[4]), bytes: args[8].byteLength });
+				}
+				Reflect.apply(upload, this, args);
+			};
+			prototype.drawArrays = function (this: WebGL2RenderingContext, ...args: Parameters<WebGL2RenderingContext['drawArrays']>) {
+				Reflect.apply(draw, this, args);
+				if (!isMotionCanvas(this.canvas)) return;
+				const receipt = receipts.get(this.canvas);
+				if (!receipt) return;
+				const rgba = new Uint8Array(this.drawingBufferWidth * this.drawingBufferHeight * 4);
+				this.readPixels(0, 0, this.drawingBufferWidth, this.drawingBufferHeight, this.RGBA, this.UNSIGNED_BYTE, rgba);
+				Object.assign(this.canvas, { motionLodFixture: { ...receipt, rgba: Array.from(rgba) } });
+			};
+		});
+		const framesResponse = page.waitForResponse((response) =>
+			new URL(response.url()).pathname === `/api/evidence/${liveEvidenceId}/frames` && response.request().method() === 'GET');
+		await page.goto(`/e2e/video-viewer?caseId=${encodeURIComponent(liveCaseId)}&evidenceId=${encodeURIComponent(liveEvidenceId)}`);
+		const framesReply = await framesResponse;
+		expect(framesReply.status()).toBe(200);
+		const payload = await framesReply.json();
+		const frame = payload.frames?.[1];
+		expect(frame?.motionLut, 'The selected video must have a stored cue for its second frame').toBeTruthy();
+		const tileResponse = page.waitForResponse((response) =>
+			new URL(response.url()).pathname === `/api/evidence/${liveEvidenceId}/motion-preview/${frame.frameIndex}`);
+		await page.locator('.filmstrip-frame-card').nth(1).click();
+		const tile = await tileResponse;
+		expect(tile.status()).toBe(200);
+		expect(tile.headers()['x-frame-timestamp-ms']).toBe(String(frame.timestampMs));
+		const storedBytes = await tile.body();
+		expect(storedBytes.byteLength).toBe(4112);
+		const cue = page.getByRole('figure', { name: 'Low-resolution frame-to-frame motion cue' });
+		await expect(cue).toBeVisible();
+		await expect.poll(() => cue.getAttribute('data-renderer')).toMatch(/^(webgl2|webgpu|canvas2d)$/);
+		if (checkShader) {
+			await expect(cue).toHaveAttribute('data-renderer', 'webgl2');
+			const capture = await cue.locator('canvas:not(.hidden)').evaluate((element) => (element as HTMLCanvasElement & {
+				motionLodFixture?: { width: number; height: number; bytes: number; rgba: number[] };
+			}).motionLodFixture);
+			expect(capture).toMatchObject({ width: 16, height: 64, bytes: 1024 });
+			const level = buildPackedMotionLodsV1(decodeVideoMotionLutIndicesV1(storedBytes)).find(({ width }) => width === 32)!;
+			const expected = Buffer.alloc(VIDEO_MOTION_LUT_WIDTH_V1 * VIDEO_MOTION_LUT_HEIGHT_V1 * 4);
+			for (let y = 0; y < VIDEO_MOTION_LUT_HEIGHT_V1; y++) {
+				for (let x = 0; x < VIDEO_MOTION_LUT_WIDTH_V1; x++) {
+					const texel = ((127 - y) >>> 1) * level.width + (x >>> 1);
+					const packed = level.data[texel >>> 1]!;
+					const shade = VIDEO_MOTION_GRAYSCALE_LUT_V1[(texel & 1) ? packed >>> 4 : packed & 15]!;
+					const offset = (y * VIDEO_MOTION_LUT_WIDTH_V1 + x) * 4;
+					expected.set([shade, shade, shade, 255], offset);
+				}
+			}
+			expect(Buffer.from(capture!.rgba).equals(expected)).toBe(true);
+		}
+		await expect(cue).toContainText(frame.motionLut.previousTimestampMs === null ? 'no comparison frame' : 'Difference intensity:');
+		await expect.poll(() => page.getByTestId('evidence-video-player').evaluate((video: HTMLVideoElement) => video.currentTime)).toBeCloseTo(frame.timestampMs / 1000, 1);
+		expect(errors).toEqual([]);
+	});
 
 	test('keeps a running progress bar below complete when an event over-reports', async ({ page }) => {
 		test.skip(!liveCaseId || !liveEvidenceId, 'Set PLAYWRIGHT_LIVE_VIDEO_CASE_ID and PLAYWRIGHT_LIVE_VIDEO_EVIDENCE_ID to an authorized video.');

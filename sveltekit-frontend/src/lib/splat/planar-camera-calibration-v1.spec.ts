@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	createPlanarCameraCalibrationV1,
+	planarCameraCalibrationV1Schema,
 	projectImagePointToPlaneV1,
 	type PlanarCameraCalibrationInputV1,
 } from './planar-camera-calibration-v1';
@@ -30,6 +31,13 @@ const base = {
 } satisfies PlanarCameraCalibrationInputV1;
 
 describe('planar-camera-calibration-v1', () => {
+	it('records the image-pixel extent of all anchors and still parses records stored without it', () => {
+		const calibration = createPlanarCameraCalibrationV1(base);
+		expect(calibration.calibratedRegionPx).toEqual({ minX: 0, minY: 0, maxX: 640, maxY: 480 });
+		const { calibratedRegionPx: _omitted, ...legacy } = calibration;
+		expect(planarCameraCalibrationV1Schema.safeParse(legacy).success).toBe(true);
+	});
+
 	it('fits a perspective transform and projects a held-out point', () => {
 		const mapKnown = (x: number, y: number): [number, number] => {
 			const denominator = 1 + 0.0003 * x + 0.0002 * y;

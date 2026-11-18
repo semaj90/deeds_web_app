@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
+	import { beforeNavigate } from '$app/navigation';
 	import { Dialog } from 'bits-ui';
 	import '$lib/styles/evidence-document-modal.css';
 	import Icon from '$lib/components/ui/Icon.svelte';
@@ -26,6 +27,7 @@ import {
 	requestEvidenceUpscale,
 	type StoredEvidenceImageAnalysis
 } from './evidence-image-tools';
+import { findExactVideoMotionSampleFrameV1, selectStrongestVideoMotionCueV1 } from '$lib/shared/video-motion-cue-v1.js';
 
 type VideoSkimPreviewClientV1 = {
 	schema: 'atlas.video-skim-preview.v1';
@@ -348,11 +350,23 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 	async function loadVideoFrames(id: string) {
 		stopVideoSkimScan(false);
 		videoSkimPreview = null;
+		videoMotionSamples = [];
+		selectedMotionSample = null;
 		try {
 			const res = await fetch(`/api/evidence/${encodeURIComponent(id)}/frames`);
 			if (!res.ok) return;
 			const data = await res.json();
 			if (evidenceId !== id) return;
+			const rawHash = String(doc?.hash ?? '').replace(/^sha256:/i, '').toLowerCase();
+			const expectedSourceRevision = /^[a-f0-9]{64}$/.test(rawHash) ? `sha256:${rawHash}` : '';
+			videoMotionSamples = Array.isArray(data?.motionSamples)
+				? data.motionSamples.filter((sample: Record<string, unknown>) =>
+					sample?.schema === 'atlas.video-motion-sample.v1' && sample.sourceRevision === expectedSourceRevision &&
+					typeof sample.analysisRevision === 'string' && Number.isSafeInteger(sample.sampleIndex) &&
+					Number.isSafeInteger(sample.timestampMs) && typeof sample.motionScore === 'number' &&
+					typeof sample.url === 'string' && sample.url.startsWith(`/api/evidence/${encodeURIComponent(id)}/motion-preview/`))
+					.map((sample: Record<string, unknown>) => sample as MotionSampleCue)
+				: [];
 			videoSkimPreview = parseVideoSkimPreviewClientV1(data?.skimPreview);
 			skimPreviewIndex = 0;
 			if (Array.isArray(data?.frames) && data.frames.length > 0) {
@@ -385,6 +399,7 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 	}
 
 	function close() {
+		if (!confirmDiscardPoseDraft('close the viewer')) return;
 		showTranscript = false;
 		open = false;
 		onClose();
@@ -392,16 +407,20 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'Escape' && showTranscript) {
+			e.preventDefault();
+			e.stopImmediatePropagation();
 			showTranscript = false;
 			return;
 		}
-		if (e.key === 'Escape') close();
 	}
 
 	// Derived helpers
 	let fileType = $derived(doc?.fileType ?? doc?.file_type ?? doc?.mimeType ?? doc?.mime_type ?? '');
 	let fileName = $derived(doc?.fileName ?? doc?.file_name ?? '');
 	let isImage = $derived(fileType.startsWith('image/'));
+	let reliefSourceRevision = $derived(typeof doc?.hash === 'string'
+		? `sha256:${doc.hash.trim().replace(/^sha256:/i, '').toLowerCase()}`
+		: null);
 	let isSpzEvidence = $derived.by(() => {
 		const mime = fileType.split(';', 1)[0].trim().toLowerCase();
 		return fileName.toLowerCase().endsWith('.spz') && (!mime || ['model/x-spz', 'application/vnd.spz', 'application/octet-stream'].includes(mime));
@@ -428,7 +447,7 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 		modelRevision?: string | null;
 		analysisRevision?: string;
 		sourceRevision?: string;
-		motionLut?: { schema: string; width: number; height: number; timestampMs: number; motionScore: number; url: string } | null;
+		motionLut?: { schema: string; width: number; height: number; timestampMs: number; previousTimestampMs?: number | null; motionScore: number; url: string } | null;
 	}>>(
 		Array.isArray(doc?.frameAnalysis)
 			? doc.frameAnalysis
@@ -438,6 +457,20 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 					? doc.frames
 					: []
 	);
+	type MotionSampleCue = {
+		schema: 'atlas.video-motion-sample.v1';
+		sampleIndex: number;
+		timestampMs: number;
+		previousTimestampMs: number | null;
+		motionScore: number;
+		width: number;
+		height: number;
+		analysisRevision: string;
+		sourceRevision: string;
+		url: string;
+	};
+	let videoMotionSamples = $state<MotionSampleCue[]>([]);
+	let selectedMotionSample = $state<MotionSampleCue | null>(null);
 	let orderedVideoKeyframes = $derived.by(() =>
 		videoFrameAnalysis
 			.map((frame, sourceIndex) => ({ frame, sourceIndex }))
@@ -445,6 +478,7 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 			.sort((a, b) => a.frame.timestamp - b.frame.timestamp || a.sourceIndex - b.sourceIndex)
 			.map(({ frame }) => frame)
 	);
+	let strongestMotionCue = $derived(selectStrongestVideoMotionCueV1(orderedVideoKeyframes, doc?.hash));
 	let activeVideoKeyframeIndex = $derived.by(() => {
 		if (orderedVideoKeyframes.length === 0) return -1;
 		const playbackSeconds = currentPlaybackTimeMs / 1000;
@@ -478,9 +512,11 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 		modelRevision?: string | null;
 		analysisRevision?: string;
 		sourceRevision?: string;
-		motionLut?: { schema: string; width: number; height: number; timestampMs: number; motionScore: number; url: string } | null;
+		motionLut?: { schema: string; width: number; height: number; timestampMs: number; previousTimestampMs?: number | null; motionScore: number; url: string } | null;
 	} | null>(null);
 	let poseEditorExpanded = $state(false);
+	let poseDraftDirty = $state(false);
+	let calibrationDraftDirty = $state(false);
 	let selectedPoseTrackId = $state('');
 	let poseSelectionScope = '';
 	$effect(() => {
@@ -497,6 +533,9 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 		const query = new URLSearchParams({ inline: '1', caseId: previewCaseId });
 		return `/api/evidence/${encodeURIComponent(evidenceId)}/download?${query}`;
 	});
+	let reliefImageUrl = $derived(previewUrl && reliefSourceRevision && /^sha256:[a-f0-9]{64}$/.test(reliefSourceRevision)
+		? `${previewUrl}&sourceRevision=${encodeURIComponent(reliefSourceRevision)}`
+		: previewUrl);
 	let depthMapUrl = $derived.by(() => {
 		const hash = doc?.hash;
 		const storedDepth = imageAnalysis?.depthMap;
@@ -787,6 +826,14 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 		return `${String(Math.floor(safe / 60)).padStart(2, '0')}:${String(safe % 60).padStart(2, '0')}`;
 	}
 
+	function formatVideoTimestampMs(timestampMs: number): string {
+		const safe = Math.max(0, Math.floor(timestampMs));
+		const minutes = Math.floor(safe / 60_000);
+		const seconds = Math.floor((safe % 60_000) / 1000);
+		const milliseconds = safe % 1000;
+		return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+	}
+
 	function downloadCapturedFrame() {
 		if (!capturedFrameUrl) return;
 		const link = document.createElement('a');
@@ -797,12 +844,34 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 
 	function seekToAnalysisFrame(frame: { timestamp: number; [key: string]: unknown }) {
 		if (!videoElement || !Number.isFinite(frame.timestamp) || frame.timestamp < 0) return;
+		if (selectedAnalysisFrame?.timestamp !== frame.timestamp && !confirmDiscardPoseDraft()) return;
 		videoElement.currentTime = frame.timestamp;
 		currentPlaybackTimeMs = Math.round(frame.timestamp * 1000);
 		videoFrameTimestampMs = Math.round(frame.timestamp * 1000);
 		reviewMediaTimestampMs = videoFrameTimestampMs;
 		selectedAnalysisFrame = frame as typeof selectedAnalysisFrame;
 		markupMessage = `Seeked to frame at ${formatVideoTime(frame.timestamp)}.`;
+	}
+
+	function seekToMotionSample(sample: MotionSampleCue) {
+		if (
+			!videoElement || sample.schema !== 'atlas.video-motion-sample.v1' ||
+			!Number.isSafeInteger(sample.timestampMs) || !sample.sourceRevision || !sample.analysisRevision
+		) return;
+		if (!confirmDiscardPoseDraft('seek to a motion review cue')) return;
+		const timestamp = sample.timestampMs / 1000;
+		const matchingFrame = findExactVideoMotionSampleFrameV1(sample, orderedVideoKeyframes);
+		videoElement.currentTime = timestamp;
+		currentPlaybackTimeMs = sample.timestampMs;
+		videoFrameTimestampMs = sample.timestampMs;
+		reviewMediaTimestampMs = sample.timestampMs;
+		selectedMotionSample = sample;
+		// A motion-only sample may not have a detector/keyframe record. Clear any
+		// old frame selection in that case so pose tools cannot annotate a stale frame.
+		selectedAnalysisFrame = matchingFrame;
+		markupMessage = matchingFrame
+			? `Pixel-change cue at ${formatVideoTime(timestamp)}; exact analyzed frame selected for pose review. This is not an object-motion finding.`
+			: `Pixel-change cue at ${formatVideoTime(timestamp)}. No analyzed frame exists at this exact timestamp and revision; choose an extracted keyframe to annotate. This is not an object-motion finding.`;
 	}
 
 	function seekToPoseSample(timestampMs: number) {
@@ -812,6 +881,7 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 			null
 		);
 		if (!videoElement) return;
+		if (frame && selectedAnalysisFrame?.timestamp !== frame.timestamp && !confirmDiscardPoseDraft()) return;
 		videoElement.currentTime = timestampSeconds;
 		currentPlaybackTimeMs = timestampMs;
 		videoFrameTimestampMs = timestampMs;
@@ -820,6 +890,25 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 		markupMessage = `Seeked to pose sample at ${formatVideoTime(timestampSeconds)}.`;
 	}
 
+	function confirmDiscardPoseDraft(action = 'select another frame'): boolean {
+		if (!poseDraftDirty && !calibrationDraftDirty) return true;
+		if (!window.confirm(`You have unsaved pose or calibration changes. Discard them and ${action}?`)) return false;
+		poseDraftDirty = false;
+		calibrationDraftDirty = false;
+		return true;
+	}
+
+	beforeNavigate((navigation) => {
+		if (!open || (!poseDraftDirty && !calibrationDraftDirty)) return;
+		// SvelteKit delegates document unload confirmation to the browser, which
+		// preserves the current draft if the user cancels the native prompt.
+		if (navigation.willUnload) {
+			navigation.cancel();
+			return;
+		}
+		if (!confirmDiscardPoseDraft('leave this page')) navigation.cancel();
+	});
+
 	function stepVideoKeyframe(direction: -1 | 1) {
 		if (!videoElement || mediaState !== 'ready') return;
 		const playbackSeconds = videoElement.currentTime;
@@ -827,6 +916,10 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 			? orderedVideoKeyframes.find((frame) => frame.timestamp > playbackSeconds + 0.001)
 			: [...orderedVideoKeyframes].reverse().find((frame) => frame.timestamp < playbackSeconds - 0.001);
 		if (target) seekToAnalysisFrame(target);
+	}
+
+	function seekToStrongestMotionCue() {
+		if (strongestMotionCue) seekToAnalysisFrame(strongestMotionCue);
 	}
 
 	function nearestVideoSkimIndex(timestampMs: number): number {
@@ -1262,7 +1355,7 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 
 <svelte:window onkeydown={handleKeydown} />
 
-<Dialog.Root bind:open onOpenChange={(next) => { if (!next) close(); }} onOpenChangeComplete={() => {}}>
+<Dialog.Root {open} onOpenChange={(next) => { if (next) open = true; else close(); }} onOpenChangeComplete={() => {}}>
 	<Dialog.Portal>
 		<Dialog.Overlay class="evidence-document-modal-backdrop" />
 		<Dialog.Content class="evidence-document-modal">
@@ -1352,20 +1445,22 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 							</div>
 							{#if showRelief}
 								<div class="evidence-relief-embed">
-									<Evidence3DModal
-										open={true}
-										embedded
-										title={doc.title ?? fileName ?? 'Evidence relief'}
-										{evidenceId}
-										caseId={caseId}
-										sourceRevision={typeof doc?.hash === 'string' ? `sha256:${doc.hash.replace(/^sha256:/i, '').toLowerCase()}` : null}
-										{chatMessages}
-										{chatStatus}
-										{onAskAssistant}
-									{assistantInitiallyExpanded}
-										imageUrl={previewUrl}
-										depthUrl={depthMapUrl}
-									/>
+									{#key `${caseId}:${evidenceId}:${reliefSourceRevision}`}
+										<Evidence3DModal
+											open={true}
+											embedded
+											title={doc.title ?? fileName ?? 'Evidence relief'}
+											{evidenceId}
+											caseId={caseId}
+											sourceRevision={reliefSourceRevision}
+											{chatMessages}
+											{chatStatus}
+											{onAskAssistant}
+											{assistantInitiallyExpanded}
+											imageUrl={reliefImageUrl}
+											depthUrl={depthMapUrl}
+										/>
+									{/key}
 								</div>
 							{:else}
 								<div class="image-review-tools" role="toolbar" aria-label="Image review tools">
@@ -1576,11 +1671,47 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 									</div>
 								</div>
 							{/if}
+							{#if videoMotionSamples.length > 0}
+								<section class="video-filmstrip-section" aria-label="Video pixel-change review cues">
+									<div class="filmstrip-header">
+										<span class="filmstrip-title">Pixel-change cues ({videoMotionSamples.length})</span>
+										<span class="filmstrip-legend">Low-resolution grayscale comparison · not object motion or a finding</span>
+									</div>
+									<div class="video-filmstrip-scroll" aria-label="Motion cue timeline">
+										{#each videoMotionSamples as sample (sample.sampleIndex)}
+											<button type="button" class="filmstrip-frame-card" class:selected={selectedMotionSample?.sampleIndex === sample.sampleIndex}
+												onclick={() => seekToMotionSample(sample)}
+												aria-label={`Review pixel-change cue at ${formatVideoTimestampMs(sample.timestampMs)}`}
+												title={`Review pixel-change cue at ${formatVideoTimestampMs(sample.timestampMs)}`}>
+												<div class="frame-info">
+													<span class="frame-time-badge">{formatVideoTimestampMs(sample.timestampMs)}</span>
+													<span class="motion-score-badge">Change {sample.motionScore.toFixed(2)}</span>
+												</div>
+											</button>
+										{/each}
+									</div>
+									{#if evidenceId && selectedMotionSample}
+										<EvidenceMotionLutPreview
+											url={selectedMotionSample.url}
+											sourceRevision={selectedMotionSample.sourceRevision}
+											analysisRevision={selectedMotionSample.analysisRevision}
+											timestampMs={selectedMotionSample.timestampMs}
+											previousTimestampMs={selectedMotionSample.previousTimestampMs}
+											motionScore={selectedMotionSample.motionScore}
+										/>
+									{/if}
+								</section>
+							{/if}
 							{#if orderedVideoKeyframes.length > 0}
 								<div class="video-filmstrip-section" role="region" aria-label="Extracted Video Keyframes">
 									<div class="filmstrip-header">
 										<span class="filmstrip-title">Extracted Keyframes ({orderedVideoKeyframes.length})</span>
 										<span class="filmstrip-legend">Unreviewed proposal · Click frame to seek</span>
+										{#if strongestMotionCue}
+											<button type="button" class="motion-cue-action" onclick={seekToStrongestMotionCue} disabled={mediaState !== 'ready'}>
+												Review strongest pixel-change cue · {strongestMotionCue.motionLut!.motionScore.toFixed(2)}
+											</button>
+										{/if}
 									</div>
 									<!-- svelte-ignore a11y_no_noninteractive_tabindex: keyboard scrolling is intentional for the frame strip -->
 									<div class="video-filmstrip-scroll" tabindex="0" aria-label="Keyframe timeline strip">
@@ -1603,6 +1734,9 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 												</div>
 												<div class="frame-info">
 													<span class="frame-time-badge">{formatVideoTime(frame.timestamp)}</span>
+													{#if frame.motionLut && frame.sourceRevision === doc?.hash}
+														<span class="motion-score-badge" title="Grayscale pixel-change score; not an object-motion finding">Change {frame.motionLut.motionScore.toFixed(2)}</span>
+													{/if}
 													{#if frame.tags && frame.tags.length > 0}
 														<span class="frame-tag-badge">{frame.tags[0]}</span>
 													{/if}
@@ -1625,6 +1759,7 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 												sourceRevision={selectedAnalysisFrame.sourceRevision}
 												analysisRevision={selectedAnalysisFrame.analysisRevision}
 												timestampMs={selectedAnalysisFrame.motionLut.timestampMs}
+												previousTimestampMs={selectedAnalysisFrame.motionLut.previousTimestampMs}
 												motionScore={selectedAnalysisFrame.motionLut.motionScore}
 											/>
 										{/if}
@@ -1669,6 +1804,8 @@ function parseVideoSkimPreviewClientV1(value: unknown): VideoSkimPreviewClientV1
 										onSeekToFrame={seekToPoseSample}
 										bind:expanded={poseEditorExpanded}
 										bind:selectedTrackId={selectedPoseTrackId}
+											bind:poseDraftDirty
+											bind:calibrationDraftDirty
 									/>
 								{/key}
 							{/if}

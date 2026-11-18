@@ -71,6 +71,21 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			return failure('VIDEO_FRAME_NOT_FOUND', 404);
 		}
 		const artifact = objectRecord(frame.artifact);
+		const sourceWidth = frame.width;
+		const sourceHeight = frame.height;
+		const artifactWidth = artifact?.width;
+		const artifactHeight = artifact?.height;
+		const validDimensions = (width: unknown, height: unknown): boolean =>
+			Number.isSafeInteger(width) && Number(width) > 0 && Number(width) <= 32768 &&
+			Number.isSafeInteger(height) && Number(height) > 0 && Number(height) <= 32768 &&
+			Number(width) * Number(height) <= 100_000_000;
+		const sourceDimensionsPresent = sourceWidth !== undefined || sourceHeight !== undefined;
+		const artifactDimensionsPresent = artifactWidth !== undefined || artifactHeight !== undefined;
+		if (!Number.isSafeInteger(frame.timestampMs) || Number(frame.timestampMs) < 0 ||
+			(sourceDimensionsPresent && !validDimensions(sourceWidth, sourceHeight)) ||
+			(artifactDimensionsPresent && !validDimensions(artifactWidth, artifactHeight))) {
+			return failure('VIDEO_FRAME_DIMENSIONS_INVALID', 409);
+		}
 		const bucket = ENV.SEAWEED_ARTIFACTS_BUCKET || ARTIFACTS_BUCKET;
 		const sourceHash = sourceRevision.slice('sha256:'.length);
 		const prefix = `evidence/${source.caseId ?? 'default'}/${evidenceId}/${sourceHash}/${video.analysisJobId}/`;
@@ -96,6 +111,14 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				'X-Analysis-Revision': video.analysisRevision,
 				'X-Frame-Index': String(frameIndex),
 				'X-Frame-Timestamp-Ms': String(frame.timestampMs),
+				...(validDimensions(sourceWidth, sourceHeight) ? {
+					'X-Source-Frame-Width': String(sourceWidth),
+					'X-Source-Frame-Height': String(sourceHeight),
+				} : {}),
+				...(validDimensions(artifactWidth, artifactHeight) ? {
+					'X-Artifact-Frame-Width': String(artifactWidth),
+					'X-Artifact-Frame-Height': String(artifactHeight),
+				} : {}),
 			},
 		});
 	} catch (error) {

@@ -29,6 +29,7 @@
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
 	import { notificationStore } from '$lib/stores/notifications.svelte';
+	import { findCaseEvidenceTargetV1 } from '$lib/components/evidence/evidence-modal-target-v1.js';
 
 	// Props
 	let { data }: { data: PageData } = $props();
@@ -55,6 +56,7 @@
 	}
 	let activeView = $state<'investigative' | 'detective' | 'corporate' | 'wall' | 'line' | 'file' | 'list'>('investigative');
 	let selectedEvidence = $state<any>(null);
+	let requestedPlacementEvidenceId = $state<string | null>(null);
 	let linkedSceneId = $state('');
 	let showEvidenceViewer = $state(false);
 	let evidenceViewerInitialView = $state<'original' | 'relief'>('original');
@@ -64,7 +66,22 @@
 	let showCourtroomBrief = $state(false);
 	let activeTool = $state<'select' | 'evidence' | 'connection' | 'note' | 'marker'>('select');
 	let showAIChat = $state(false);
+	let sceneChatEvidenceId = $state<string | null>(null);
+	const sceneChatExhibit = $derived(findCaseEvidenceTargetV1(evidenceItems, sceneChatEvidenceId));
 	let isGeneratingLayout = $state(false);
+	function openPersistedEvidence(item: any, timestampMs?: number) {
+		const persisted = findCaseEvidenceTargetV1(evidenceItems, item?.id);
+		if (!persisted) {
+			notificationStore.add({
+				type: 'error',
+				title: 'Demo exhibit only',
+				message: 'This sample is not uploaded case evidence, so its transcript and annotations cannot be loaded. Upload or select a case exhibit first.'
+			});
+			return;
+		}
+		selectedEvidence = persisted;
+		openEvidenceViewer('original', timestampMs);
+	}
 
 	// Celestial ModalLight Graph Documentation State
 	let showModalLight = $state(false);
@@ -436,17 +453,26 @@
 		openDocumentationModal(node);
 	}
 
-	function openEvidenceViewer(view: 'original' | 'relief' = 'original', timestampMs?: number) {
+	function openEvidenceViewer(view: 'original' | 'relief' = 'original', timestampMs?: number): boolean {
+		const persisted = findCaseEvidenceTargetV1(evidenceItems, selectedEvidence?.id);
+		if (!persisted) {
+			notificationStore.add({
+				type: 'error',
+				title: 'Choose uploaded case evidence',
+				message: 'This sample is not a saved case exhibit. Select an uploaded exhibit before opening its transcript or scene tools.'
+			});
+			return false;
+		}
+		selectedEvidence = persisted;
 		evidenceViewerInitialTimestampMs = timestampMs;
 		evidenceViewerInitialView = view;
 		openSceneAssistantOnViewer = false;
 		showEvidenceViewer = true;
+		return true;
 	}
 
 	function openDetectiveMode() {
-		evidenceViewerInitialView = 'relief';
-		openSceneAssistantOnViewer = true;
-		showEvidenceViewer = true;
+		if (openEvidenceViewer('relief')) openSceneAssistantOnViewer = true;
 	}
 
 	// Save note edits back to the board
@@ -597,7 +623,16 @@
 		}
 		if (uuidPattern.test(requestedSceneId)) linkedSceneId = requestedSceneId;
 		if (uuidPattern.test(requestedEvidenceId)) {
-			selectedEvidence = evidenceItems.find((item: any) => item.id === requestedEvidenceId) ?? null;
+			const requestedExhibit = findCaseEvidenceTargetV1(evidenceItems, requestedEvidenceId);
+			if (requestedExhibit) {
+				selectedEvidence = requestedExhibit;
+				if (requestedView === 'detective') {
+					requestedPlacementEvidenceId = requestedExhibit.id;
+					evidenceViewerInitialView = 'relief';
+					openSceneAssistantOnViewer = true;
+				}
+				showEvidenceViewer = true;
+			}
 		}
 
 		// Initialize chat session with case context
@@ -998,14 +1033,17 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 	// Send chat message
 	async function sendChatMessage() {
-		if (!chatSession || !currentMessage.trim()) return;
+		if (!chatSession || chatSession.status !== 'idle' || !currentMessage.trim()) return;
 
 		const msg = currentMessage.trim();
+		if (sceneChatEvidenceId && !sceneChatExhibit) return;
 		currentMessage = '';
-		await chatSession.sendMessage(msg);
-
-		// Save to database
-		await saveChatToDatabase();
+		if (sceneChatExhibit) {
+			await askFromScene(msg, sceneChatExhibit.id);
+		} else {
+			await chatSession.sendMessage(msg);
+			await saveChatToDatabase();
+		}
 
 		// Auto-scroll chat
 		setTimeout(() => {
@@ -1015,9 +1053,10 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		}, 100);
 	}
 
-	async function askFromScene(question: string) {
+	async function askFromScene(question: string, exhibitId = selectedEvidence?.id) {
 		if (!chatSession || chatSession.status !== 'idle') return;
-		const exhibit = selectedEvidence;
+		const exhibit = findCaseEvidenceTargetV1(evidenceItems, exhibitId);
+		if (!exhibit) return;
 		const groundedPrompt = [
 			`The user is inspecting case ${caseId} in Detective Mode.`,
 			exhibit ? `Selected exhibit: ${exhibit.title} (evidence ID ${exhibit.id}).` : '',
@@ -1306,10 +1345,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 				caseTitle={data?.caseTitle || (data?.caseId ? `Case #${caseId.slice(0, 8)}` : 'UNTITLED CASE DOSSIER')}
 				evidenceItems={evidenceItems}
 				demoMode={evidenceItems.length === 0}
-				onOpenModal={(item) => {
-					selectedEvidence = item;
-					showEvidenceViewer = true;
-				}}
+				onOpenModal={(item) => openPersistedEvidence(item)}
 				onOpenUpload={() => (showAddEvidence = true)}
 				onOpenBrief={() => (showCourtroomBrief = true)}
 			/>
@@ -1320,25 +1356,31 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			caseTitle={data.case?.title || 'CORPORATE ESPIONAGE INV-2024'}
 			onOpenVideoModal={(evId, ts) => {
 				const match = evidenceItems.find((e: any) => e.id === evId);
-				selectedEvidence = match || { id: evId, title: 'Security Camera Feed', fileType: 'video/mp4' };
-				openEvidenceViewer('original', ts);
+				openPersistedEvidence(match, ts);
 			}}
 			onNewEvidence={() => (showAddEvidence = true)}
 			onRunAnalysis={() => (showCourtroomBrief = true)}
 		/>
 	{:else if activeView === 'detective'}
-		<div class="detective-fullscreen-wrap h-[calc(100vh-140px)] w-full overflow-hidden">
+		<div class="detective-fullscreen-wrap">
 			<DetectiveModeCanvas
 				caseId={caseId}
-				caseTitle={data?.caseId ? `State v. Johnson - Case #${caseId.slice(0, 8)}` : 'State v. Johnson - Fraud Investigation'}
+				caseTitle={data.case?.title || data.caseTitle || `Case #${caseId.slice(0, 8)}`}
 				evidenceItems={evidenceItems}
+				initialPlaceEvidenceId={requestedPlacementEvidenceId}
 				sceneSnapshot={(data as any)?.sceneSnapshot ?? null}
 				onOpen3DViewer={(item) => openEvidenceViewer('relief')}
 				onOpenDocEditor={(node) => openDocumentationModal(node)}
+				onOpenEvidenceModal={(item) => openPersistedEvidence(item)}
+				onOpenExhibitAssistant={(evidenceId) => {
+					const exhibit = findCaseEvidenceTargetV1(evidenceItems, evidenceId);
+					if (!exhibit) return;
+					sceneChatEvidenceId = exhibit.id;
+					showAIChat = true;
+				}}
 				onOpenVideoModal={(evId, ts) => {
 					const match = evidenceItems.find((e: any) => e.id === evId);
-					selectedEvidence = match || { id: evId, title: 'Surveillance Video', fileType: 'video/mp4' };
-					openEvidenceViewer('original', ts);
+					openPersistedEvidence(match, ts);
 				}}
 			/>
 		</div>
@@ -1880,8 +1922,8 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 							AI Summary
 						</button>
 						{#if isEvidenceImage(selectedEvidence.fileType)}
-			<button class="action-btn" onclick={openDetectiveMode}>
-								Set the scene
+			<button class="action-btn" title="Open this case exhibit in the image scene view and place a saved evidence marker" onclick={openDetectiveMode}>
+								Place evidence marker
 							</button>
 			<a class="action-btn" href={`/demos/spz-renderer?caseId=${encodeURIComponent(caseId)}${linkedSceneId ? `&sceneId=${encodeURIComponent(linkedSceneId)}` : ''}&evidenceId=${encodeURIComponent(selectedEvidence.id)}${selectedEvidence.sourceRevision ? `&sourceRevision=${encodeURIComponent(selectedEvidence.sourceRevision)}` : ''}`} data-testid="exhibit-scene-studio-link">Open scene studio for this exhibit</a>
 			<p class="related-info">The scene manifest records this exhibit and its source revision when available. Generated geometry remains a reconstruction hypothesis.</p>
@@ -1970,7 +2012,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 	<!-- AI Chat Panel (SSE Streaming) -->
 	{#if showAIChat && chatSession}
-		<aside class="ai-chat-panel">
+		<aside class="ai-chat-panel" aria-label="AI assistant" class:scene-exhibit-chat={Boolean(sceneChatExhibit)}>
 			<div class="chat-header">
 				<div class="chat-title">
 					<Icon name="bot" />
@@ -1988,11 +2030,17 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 					>
 						<Icon name="download" />
 					</button>
-					<button class="close-btn" onclick={() => (showAIChat = false)}>
+					<button class="close-btn" type="button" aria-label="Close assistant" onclick={() => {
+						showAIChat = false;
+						sceneChatEvidenceId = null;
+					}}>
 						<Icon name="x" />
 					</button>
 				</div>
 			</div>
+			{#if sceneChatExhibit}
+				<p class="scene-chat-context">Exhibit context <strong>{sceneChatExhibit.title}</strong></p>
+			{/if}
 
 			<div class="chat-messages" bind:this={chatContainer}>
 				{#if chatSession.messages.length === 0}
@@ -2125,14 +2173,31 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		{caseId}
 		isOpen={showAddEvidence}
 		onClose={() => (showAddEvidence = false)}
-		onSuccess={async () => {
+		onSuccess={async (uploadedEvidenceId) => {
 			showAddEvidence = false;
-			notificationStore.add({
-				type: 'success',
-				title: 'Evidence Uploaded',
-				message: 'Evidence successfully ingested into SeaweedFS and registered to case.'
-			});
 			await invalidateAll();
+			// Open the refreshed exhibit in Detective Mode without creating a marker
+			// automatically. The investigator still chooses and saves the position.
+			const uploaded = findCaseEvidenceTargetV1(evidenceItems, uploadedEvidenceId);
+			if (uploaded) {
+				selectedEvidence = uploaded;
+				requestedPlacementEvidenceId = uploaded.id;
+				activeView = 'detective';
+				evidenceViewerInitialView = 'relief';
+				openSceneAssistantOnViewer = true;
+				showEvidenceViewer = true;
+				notificationStore.add({
+					type: 'success',
+					title: 'Evidence uploaded to this case',
+					message: 'Review the exhibit, then choose a scene position and save the marker.'
+				});
+			} else {
+				notificationStore.add({
+					type: 'error',
+					title: 'Upload accepted; refresh needed',
+					message: 'The upload returned an evidence ID, but the case list did not include it after refresh. Reopen the Evidence Board to retry the read.'
+				});
+			}
 		}}
 	/>
 
@@ -2416,6 +2481,13 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		height: 100vh;
 		background: #fafafa;
 		font-family: 'JetBrains Mono', monospace;
+	}
+
+	.detective-fullscreen-wrap {
+		width: 100%;
+		height: max(570px, calc(100dvh - 288px));
+		display: flex;
+		flex-shrink: 0;
 	}
 
 	/* Header */
@@ -3615,6 +3687,14 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 	}
 
 	/* AI Chat Panel */
+	.scene-chat-context {
+		margin: 0;
+		padding: 0.65rem 0.9rem;
+		background: var(--dossier-bg-card, #faf6f0);
+		color: var(--dossier-text-main, #141312);
+		border-bottom: 1px solid var(--dossier-border-sand, #d5c6ac);
+	}
+
 	.ai-chat-panel {
 		position: fixed;
 		right: 0;

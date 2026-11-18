@@ -621,6 +621,12 @@ Next media-derivation UX gate (open): ask the investigator to confirm they selec
 - [x] Added `groundPlaneTrackProposals` to the existing scene-document contract and revision writer. The writer verifies the source evidence belongs to the case, checks the current source hash, and recomputes each submitted track from accepted calibration/contact history before saving. The timeline offers “Add reviewed track to scene,” appends through the existing scene revision API, and verifies a fresh GET readback. The scene panel renders only a recomputed, history-matched proposal as an equal-scale top-down plot; its 16-step color LUT denotes time order, and each point links to its source timestamp. A keyboard-accessible discrete scrubber selects only saved reviewed samples, highlights the selected marker, and updates the source-frame link without interpolating unobserved motion. Focused scene/track suites passed 45/45; the Chromium video-modal save/reload fixture passed 1/1 and the scene-panel suite passed 2/2 before scrubber addition; the focused scrubber browser test passed 1/1 afterward. Latest `npm run check:fast` reported 0 errors and 8 warnings in 2 files.
 - [ ] Live PostgreSQL/SeaweedFS authorized persistence/readback, camera-motion compensation, height recovery, metric 3D body pose, and scene-geometry alignment remain open. Browser and route storage in the fixture is mocked; this is not live-storage proof.
 
+### 11.63 Accepted upload placement link and low-poly hexagon proxy (2026-11-17)
+
+- [~] The case evidence upload progress row now validates the accepted response's evidence ID as a UUID and exposes **Place in scene · open in Detective Mode**. The case board opens that authorized exhibit from the URL; placement and marker save still require a separate investigator action.
+- [~] Added a regular six-sided extruded hexagon to the existing bounded primitive registry. It is an illustrative placeholder with a 20-triangle estimate and approximate convex-hull collider recipe; the demo's existing total-triangle cap remains the guard. It is not YOLO geometry, calibrated evidence, or a splat reconstruction.
+- [ ] Browser render/picking/drag proof and authorized scene save/reload remain open; no tests were run for this addition.
+
 ## SAM 2 silhouette pipeline and llama-server launcher: status and next steps (2026-11-17)
 
 Scope: SAM 2.1 Tiny silhouette stage for evidence images, and the `:8090` launcher. Nothing here is live-stored or promoted. Canonical evidence is unchanged.
@@ -687,3 +693,13 @@ Status: not started. The decision to build is pending. Stock `:8090` (the runnin
 - [ ] Gate 7, scope: the drafter and the fork stay server-only. The browser model policy forbids the MTP GGUF in the browser (`browser-model-policy.spec.ts`).
 - [ ] Not in scope: EmbeddingGemma 2, the Qdrant rebuild, and any change to the canonical embedding path.
 
+
+## Handoff 2026-11-17: 2.5D relief, placeholder geometry, mesh storage (planning only, nothing built)
+
+- [ ] SCENE-2D5-LABEL-01 Single-image input supports depth-based 2.5D relief only. Multi-view splat or true 3D reconstruction needs camera poses. Gate: UI copy and receipts say "relief" for one image, never "reconstruction".
+- [ ] SCENE-PLACEHOLDER-LABEL-01 The hexagon primitive (`sveltekit-frontend/src/lib/splat/scene-primitive-registry-v1.ts`, `hexagon`, 20-triangle estimate) and the `polygon-prism` kind are illustrative geometry. Gate: label them as placeholder in the UI and exclude them from evidence receipts. A YOLOX box alone gives 2D class and position only, not shape, depth or skeleton.
+- [ ] SCENE-MESH-STORAGE-01 Store mesh binaries in SeaweedFS with SHA-256 and chain of custody (`evidence_3d_assets`); keep metadata in Postgres. Do not use DiskANN, Vamana or any vector index for meshes. DiskANN is not installed (no `pgvectorscale`); canonical ANN is pgvector HNSW.
+- [ ] SCENE-DEPTH-01 Monocular depth needs a depth model. None is recorded in the repo; OpenCV alone does not provide it. Gate: choose a model, prove it on a fixed fixture, and record its revision.
+- [ ] SCENE-YOLOX-01 YOLOX is not confirmed in this repo. Gate: locate the owner before using it in the pipeline.
+- [ ] SCENE-WORKER-01 Run image analysis in a Web Worker or a `worker_threads` pool so the UI stays responsive. GPU is for tensor work only.
+- [ ] SCENE-SPZ-01 The 32-byte record in the screenshot is an example, not the SPZ spec. Gate: real-file conformance against a Niantic-produced v4 file (already open in this change) before any layout is trusted.

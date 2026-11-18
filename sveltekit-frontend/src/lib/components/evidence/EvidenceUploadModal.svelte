@@ -18,6 +18,7 @@
 	let selectedFile: File | null = $state(null);
 	let isUploading = $state(false);
 	let uploadError: string | null = $state(null);
+	let needsSignIn = $state(false);
 	let uploadResult: { evidenceId: string; jobId: string; hash: string } | null = $state(null);
 	let imageToolError: string | null = $state(null);
 	let imageAnalysis: EvidenceImageAnalysis | null = $state(null);
@@ -147,6 +148,7 @@
 		if (!selectedFile) return;
 		isUploading = true;
 		uploadError = null;
+		needsSignIn = false;
 		uploadResult = null;
 		const startedAt = Date.now();
 
@@ -173,7 +175,8 @@
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
 				if (res.status === 401) {
-					throw new Error('Your sign-in session is unavailable for this upload. Refresh the page, sign in again, and retry; your selected file is still here.');
+					needsSignIn = true;
+					throw new Error('The upload request reached the server without a valid sign-in session. Sign in again in another tab, then retry here; this selected file will stay in place.');
 				}
 				if (res.status === 403 && /evidence-owner identity/i.test(err.error || '')) {
 					throw new Error('This account is missing a valid evidence-owner ID. No file was accepted; contact an administrator to repair the account mapping.');
@@ -183,7 +186,10 @@
 			const data = await res.json();
 			const evidenceId = data.id || data.evidenceId;
 			const jobId = data.jobId;
-			if (!evidenceId || !jobId) throw new Error('Upload response did not include a trackable processing job');
+			if (typeof evidenceId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(evidenceId)) {
+				throw new Error('Upload response did not include a valid saved evidence ID.');
+			}
+			if (typeof jobId !== 'string' || !jobId) throw new Error('Upload response did not include a trackable processing job');
 			uploadResult = { evidenceId, jobId, hash: data.hash || '' };
 			onSuccess?.(evidenceId, jobId, selectedFile.name, selectedFile.size, startedAt);
 		} catch (error) {
@@ -340,6 +346,16 @@
 							<span class="font-medium">Upload issue:</span>
 							<span>{uploadError}</span>
 						</div>
+						{#if needsSignIn}
+							<a
+								class="upload-session-recovery"
+								href={`/login?force=1&returnTo=${encodeURIComponent(`/cases/${caseId}/board`)}`}
+								target="_blank"
+								rel="noreferrer"
+							>
+								Sign in again in a new tab, then return here to retry
+							</a>
+						{/if}
 					{/if}
 				{/if}
 			</div>
@@ -704,6 +720,15 @@
 		border: 1px solid #d8b7a7;
 		background: #fff1e9;
 		color: #813b32;
+	}
+	.upload-session-recovery {
+		display: inline-flex;
+		margin-top: .65rem;
+		color: #315f4b;
+		font-size: .8rem;
+		font-weight: 650;
+		text-decoration: underline;
+		text-underline-offset: 3px;
 	}
 	.upload-modal-card :global(.bg-green-900\/10) {
 		border-color: #b9d5c4;

@@ -233,6 +233,8 @@ export interface SavePlanarCalibrationReviewInputV1 {
   calibrationFrameIndex: number;
   calibrationFramePtsUs: number;
   decision: 'ACCEPTED_FOR_SCENE_PROPOSAL' | 'REJECTED';
+  /** Required for ACCEPTED decisions: the reviewer-confirmed fixed-camera window. */
+  cameraFixedWindow?: { startPtsUs: number; endPtsUs: number };
   notes?: string;
 }
 
@@ -265,6 +267,17 @@ export async function savePlanarCalibrationReviewDecisionV1(input: SavePlanarCal
       value.calibrationFrameIndex === input.calibrationFrameIndex && value.calibrationFramePtsUs === input.calibrationFramePtsUs && digest === input.calibrationSha256;
   });
   if (!calibration) throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'The selected calibration does not match this source, run, frame and revision.');
+  const storedCalibration = planarCameraCalibrationV1Schema.parse(calibration);
+  if (input.decision === 'ACCEPTED_FOR_SCENE_PROPOSAL') {
+    if (!storedCalibration.calibratedRegionPx) {
+      throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'This calibration has no stored calibrated region. Re-create it before accepting it for scene use.');
+    }
+    const window = input.cameraFixedWindow;
+    if (!window || !Number.isSafeInteger(window.startPtsUs) || !Number.isSafeInteger(window.endPtsUs)
+      || window.startPtsUs < 0 || window.startPtsUs > window.endPtsUs) {
+      throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'Accepting a calibration requires a valid fixed-camera window (startPtsUs <= endPtsUs).');
+    }
+  }
 
   const decisionPayload = {
     schema: 'atlas.planar-camera-calibration-review.v1',
@@ -281,6 +294,8 @@ export async function savePlanarCalibrationReviewDecisionV1(input: SavePlanarCal
     reviewerUserId: input.actorUserId,
     notes: input.notes?.trim().slice(0, 1000) ?? '',
     canonicalAuthority: false,
+    cameraFixedWindow: input.decision === 'ACCEPTED_FOR_SCENE_PROPOSAL' ? input.cameraFixedWindow ?? null : null,
+    calibratedRegionPx: storedCalibration.calibratedRegionPx ?? null,
     sceneAdmission: input.decision === 'ACCEPTED_FOR_SCENE_PROPOSAL' ? 'APPROVED_FOR_SCENE_PROPOSAL' : 'NOT_ADMITTED',
   };
   const decisionSha256 = `sha256:${crypto.createHash('sha256').update(JSON.stringify(decisionPayload), 'utf8').digest('hex')}`;
@@ -442,6 +457,7 @@ export async function saveEvidenceAnnotationRevisionV1(input: {
 					imageToPlaneHomography: [...calibration.imageToPlaneHomography] as typeof calibration.imageToPlaneHomography,
 					fitResidualsMeters: calibration.fitResidualsMeters.map((item) => ({ anchorId: item.anchorId, residualMeters: item.residualMeters })),
 					validationResidualsMeters: calibration.validationResidualsMeters.map((item) => ({ anchorId: item.anchorId, residualMeters: item.residualMeters })),
+					...(calibration.calibratedRegionPx ? { calibratedRegionPx: calibration.calibratedRegionPx } : {}),
 					toleranceMeters: calibration.toleranceMeters,
 					validationStatus: calibration.validationStatus,
 					status: calibration.status,

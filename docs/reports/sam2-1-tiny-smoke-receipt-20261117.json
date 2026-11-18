@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.sam2-smoke-receipt.v1",
+  "model": "SAM 2.1 Hiera Tiny",
+  "config": "configs/sam2.1/sam2.1_hiera_t.yaml (from sam2 package)",
+  "checkpoint": { "file": "models/sam2/sam2.1_hiera_tiny.pt", "bytes": 156008466, "sha256": "7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69" },
+  "license": "Apache-2.0 (official repo)",
+  "environment": { "venv": "C:/Users/james/.venvs/sam2-tiny (system-site-packages, base torch reused)", "torch": "2.8.0+cu128", "torchvision": "0.23.0+cu128", "cuda": true, "sharedVenvModified": false },
+  "installs": ["sam2 1.0 (official git, --no-deps)", "hydra-core", "iopath", "pillow (if missing)"],
+  "tests": {
+    "imageMaskSynthetic": { "result": "PASS", "maskBBox": [200,100,399,379], "expected": [200,100,399,379], "score": 0.993, "peakGpuAllocatedMiB": 596.8, "peakGpuReservedMiB": 836.0 },
+    "videoPropagationSynthetic": { "result": "PASS", "framesRequested": 20, "framesPropagated": 20, "maxEdgeErrorPx": 1, "offloadVideoToCpu": true, "offloadStateToCpu": true, "peakGpuAllocatedMiB": 711.6, "peakGpuReservedMiB": 992.0 },
+    "yoloxBoxToSam2RealScreenshot": { "result": "PASS_WITH_LIMITS", "source": "Screenshot (16283).png (third-party, scratch only)", "yoloxPersonDetections": 1, "promptBox": [310.2, 369.4, 400.4, 644.0], "maskBBox": [309,368,388,660], "maskPixels": 12670, "score": 0.862, "visuallyVerifiedAgainstImage": false }
+  },
+  "limits": [
+    "SAM 2 _C CUDA extension not built: fill-holes post-processing skipped (warning on load).",
+    "YOLOX raw head outputs must be decoded (grid offset + stride; exp for w/h). A naive decode produced 4-pixel boxes; fixed in the scratch script.",
+    "Video timestamps are frame indices; mapping to source PTS not implemented.",
+    "RAM not measured (system RAM was 2.86 GB free before the run).",
+    "Synthetic video only; no real evidence frames used."
+  ],
+  "proposalNotImplemented": "Wire runSam2Segmentation to the sam2_alpha_silhouette contract, behind an injected adapter, after reviewer-approved gates. Generated masks are not canonical evidence.",
+  "canonicalAuthority": false,
+  "evidenceModified": false
+}

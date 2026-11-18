@@ -19,7 +19,7 @@ import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { formatEvidenceSourceRevisionV1 } from '$lib/server/evidence-source-revision-v1.js';
 import { videoSkimPreviewManifestV1Schema } from '$lib/server/features/evidence/video/video-skim-preview-v1.js';
 import { videoEventTimelineV1Schema } from '$lib/server/features/evidence/video/video-event-fusion-v1.js';
-import { videoMotionLutManifestV1Schema } from '$lib/shared/video-motion-lut-v1.js';
+import { hasValidMotionComparisonV1, hasValidMotionSampleComparisonV1, videoMotionLutManifestV1Schema, videoMotionSampleManifestV1Schema } from '$lib/shared/video-motion-lut-v1.js';
 
 function parseMetadata(value: unknown): Record<string, unknown> {
 	if (typeof value === 'string') {
@@ -41,11 +41,11 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	const evidenceId = params.id;
 
 	if (!locals.user?.id) {
-		return json({ success: false, error: 'Unauthorized', evidenceId, frames: [], total: 0, skimPreview: null, eventTimeline: null }, { status: 401 });
+		return json({ success: false, error: 'Unauthorized', evidenceId, frames: [], total: 0, motionSamples: [], skimPreview: null, eventTimeline: null }, { status: 401 });
 	}
 
 	if (!isUuid(evidenceId)) {
-		return json({ success: false, error: 'Invalid ID format', evidenceId, frames: [], total: 0, skimPreview: null, eventTimeline: null }, { status: 400 });
+		return json({ success: false, error: 'Invalid ID format', evidenceId, frames: [], total: 0, motionSamples: [], skimPreview: null, eventTimeline: null }, { status: 400 });
 	}
 
 	try {
@@ -73,7 +73,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
 		if (!item) {
 			return json(
-				{ success: false, error: 'Evidence not found or access denied', evidenceId, frames: [], total: 0, skimPreview: null, eventTimeline: null },
+				{ success: false, error: 'Evidence not found or access denied', evidenceId, frames: [], total: 0, motionSamples: [], skimPreview: null, eventTimeline: null },
 				{ status: 404 }
 			);
 		}
@@ -116,13 +116,19 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 					motionLut: (() => {
 						const parsedMotion = videoMotionLutManifestV1Schema.safeParse(frame.motionLut);
 						const motion = parsedMotion.success ? parsedMotion.data : null;
-						return motion && motion.evidenceId === evidenceId && motion.frameIndex === index &&
-							motion.sourceRevision === currentSourceRevision && motion.analysisRevision === canonicalVideoAnalysis.analysisRevision
+						return motion && frame.frameIndex === index && frame.sourceRevision === currentSourceRevision &&
+							frame.analysisRevision === canonicalVideoAnalysis.analysisRevision &&
+							motion.evidenceId === evidenceId && motion.frameIndex === index &&
+							motion.sourceRevision === currentSourceRevision && motion.analysisRevision === canonicalVideoAnalysis.analysisRevision &&
+							motion.timestampMs === frame.timestampMs && motion.artifact.sourceRevision === currentSourceRevision &&
+							motion.artifact.analysisRevision === canonicalVideoAnalysis.analysisRevision &&
+							hasValidMotionComparisonV1(motion, canonicalVideoAnalysis.frames as unknown[])
 							? {
 								schema: motion.schema,
 								width: motion.width,
 								height: motion.height,
 								timestampMs: motion.timestampMs,
+								previousTimestampMs: motion.previousTimestampMs,
 								motionScore: motion.motionScore,
 								url: `/api/evidence/${encodeURIComponent(evidenceId)}/motion-preview/${index}`,
 							}
@@ -153,7 +159,30 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 					tiles: skim.tiles.map(({ index, firstSampleIndex, sampleCount }) => ({ index, firstSampleIndex, sampleCount })),
 				}
 				: null;
-			return json({ success: true, evidenceId, frames, total: frames.length, skimPreview, eventTimeline }, { headers: cacheControl.private });
+			const rawMotionSamples = Array.isArray(canonicalVideoAnalysis.motionSamples) ? canonicalVideoAnalysis.motionSamples : [];
+			const motionSamples = rawMotionSamples.flatMap((candidate, sampleIndex) => {
+				const parsed = videoMotionSampleManifestV1Schema.safeParse(candidate);
+				if (!parsed.success) return [];
+				const sample = parsed.data;
+				if (sample.sampleIndex !== sampleIndex || sample.evidenceId !== evidenceId ||
+					sample.sourceRevision !== currentSourceRevision || sample.analysisRevision !== canonicalVideoAnalysis.analysisRevision ||
+					sample.artifact.sourceRevision !== currentSourceRevision || sample.artifact.analysisRevision !== canonicalVideoAnalysis.analysisRevision ||
+					!hasValidMotionSampleComparisonV1(sample, rawMotionSamples)) return [];
+				return [{
+					schema: sample.schema,
+					sampleIndex,
+					timestampMs: sample.timestampMs,
+					previousTimestampMs: sample.previousTimestampMs,
+					motionScore: sample.motionScore,
+					reviewState: sample.reviewState,
+					width: sample.width,
+					height: sample.height,
+					analysisRevision: sample.analysisRevision,
+					sourceRevision: sample.sourceRevision,
+					url: `/api/evidence/${encodeURIComponent(evidenceId)}/motion-preview/${sampleIndex}?lane=motion-sample`,
+				}];
+			});
+			return json({ success: true, evidenceId, frames, total: frames.length, motionSamples, skimPreview, eventTimeline }, { headers: cacheControl.private });
 		}
 
 		// 2. Attempt query against canonical evidence_frames table (if migrated)
@@ -180,7 +209,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				}));
 
 				return json(
-					{ success: true, evidenceId, frames, total: frames.length, skimPreview: null, eventTimeline: null },
+					{ success: true, evidenceId, frames, total: frames.length, motionSamples: [], skimPreview: null, eventTimeline: null },
 					{ headers: cacheControl.private }
 				);
 			}
@@ -197,7 +226,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				: [];
 
 		return json(
-			{ success: true, evidenceId, frames: fallbackFrames, total: fallbackFrames.length, skimPreview: null, eventTimeline: null },
+			{ success: true, evidenceId, frames: fallbackFrames, total: fallbackFrames.length, motionSamples: [], skimPreview: null, eventTimeline: null },
 			{ headers: cacheControl.private }
 		);
 	} catch (error) {
@@ -210,6 +239,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				evidenceId,
 				frames: [],
 				total: 0,
+				motionSamples: [],
 				skimPreview: null,
 				eventTimeline: null
 			},

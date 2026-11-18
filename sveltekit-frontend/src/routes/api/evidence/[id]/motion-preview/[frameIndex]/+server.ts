@@ -10,8 +10,11 @@ import { formatEvidenceSourceRevisionV1 } from '$lib/server/evidence-source-revi
 import { ARTIFACTS_BUCKET } from '$lib/server/storage/storage-buckets.js';
 import {
 	decodeVideoMotionLutIndicesV1,
+	hasValidMotionComparisonV1,
 	VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1,
 	videoMotionLutManifestV1Schema,
+	hasValidMotionSampleComparisonV1,
+	videoMotionSampleManifestV1Schema,
 } from '$lib/shared/video-motion-lut-v1.js';
 
 const failure = (error: string, status: number) => Response.json(
@@ -27,12 +30,12 @@ function objectRecord(value: unknown): Record<string, unknown> | null {
 }
 
 /** Hash-check and return one compact motion tile only for an authorized, current source revision. */
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, url }) => {
 	const evidenceId = params.id;
 	const frameIndex = Number(params.frameIndex);
 	if (!locals.user?.id) return failure('UNAUTHORIZED', 401);
 	if (!isUuid(evidenceId)) return failure('INVALID_EVIDENCE_ID', 400);
-	if (!Number.isSafeInteger(frameIndex) || frameIndex < 0 || frameIndex >= 60) return failure('INVALID_FRAME_INDEX', 400);
+	if (!Number.isSafeInteger(frameIndex) || frameIndex < 0 || frameIndex >= 300) return failure('INVALID_FRAME_INDEX', 400);
 	const userId = Number(locals.user.id);
 	if (!Number.isSafeInteger(userId) || userId <= 0) return failure('UNAUTHORIZED', 401);
 
@@ -57,14 +60,58 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		if (videoAnalysis?.sourceRevision !== currentRevision || typeof videoAnalysis.analysisRevision !== 'string' || !Array.isArray(videoAnalysis.frames)) {
 			return failure('MOTION_TILE_NOT_FOUND', 404);
 		}
+		const requestedLane = url.searchParams.get('lane');
+		if (requestedLane === 'motion-sample') {
+			const rawMotionSamples = Array.isArray(videoAnalysis.motionSamples) ? videoAnalysis.motionSamples : [];
+			const parsedSample = videoMotionSampleManifestV1Schema.safeParse(rawMotionSamples[frameIndex]);
+			if (!parsedSample.success) return failure('MOTION_TILE_NOT_FOUND', 404);
+			const sample = parsedSample.data;
+			if (sample.sampleIndex !== frameIndex || sample.evidenceId !== evidenceId || sample.sourceRevision !== currentRevision ||
+				sample.analysisRevision !== videoAnalysis.analysisRevision || sample.artifact.sourceRevision !== currentRevision ||
+				sample.artifact.analysisRevision !== videoAnalysis.analysisRevision || !hasValidMotionSampleComparisonV1(sample, rawMotionSamples)) {
+				return failure('MOTION_TILE_NOT_FOUND', 404);
+			}
+			const bucket = ENV.SEAWEED_ARTIFACTS_BUCKET || ARTIFACTS_BUCKET;
+			const prefix = `evidence/${source.caseId ?? 'default'}/${evidenceId}/${sourceHash}/`;
+			const fileName = `motion-sample-${String(frameIndex).padStart(4, '0')}.atm`;
+			const remainder = sample.artifact.objectKey.startsWith(prefix) ? sample.artifact.objectKey.slice(prefix.length) : '';
+			const separator = remainder.indexOf('/');
+			const jobId = separator > 0 ? remainder.slice(0, separator) : '';
+			const keyFile = separator > 0 ? remainder.slice(separator + 1) : '';
+			if (sample.artifact.bucket !== bucket || !isUuid(jobId) || keyFile !== fileName) return failure('MOTION_TILE_NOT_FOUND', 404);
+			const bytes = await getFileFromSeaweed({ bucket, objectKey: sample.artifact.objectKey, maximumBytes: VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1 });
+			const digest = createHash('sha256').update(bytes).digest('hex');
+			if (bytes.byteLength !== VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1 || `sha256:${digest}` !== sample.artifact.sha256) return failure('MOTION_TILE_INTEGRITY_FAILED', 502);
+			try { decodeVideoMotionLutIndicesV1(new Uint8Array(bytes)); }
+			catch { return failure('MOTION_TILE_FORMAT_INVALID', 502); }
+			return new Response(new Uint8Array(bytes), {
+				headers: {
+					'Content-Type': 'application/vnd.atlas.video-motion-lut-v1',
+					'Content-Length': String(bytes.byteLength),
+					'Cache-Control': 'private, no-store',
+					'X-Content-Type-Options': 'nosniff',
+					'Cross-Origin-Resource-Policy': 'same-origin',
+					'X-Source-Revision': currentRevision,
+					'X-Analysis-Revision': sample.analysisRevision,
+					'X-Frame-Timestamp-Ms': String(sample.timestampMs),
+					ETag: `"sha256-${digest}"`,
+				},
+			});
+		}
+		if (requestedLane !== null) return failure('INVALID_MOTION_LANE', 400);
+	if (frameIndex >= 60) return failure('MOTION_TILE_NOT_FOUND', 404);
 		const frame = objectRecord(videoAnalysis.frames[frameIndex]);
 		const parsed = videoMotionLutManifestV1Schema.safeParse(frame?.motionLut);
 		if (!parsed.success) return failure('MOTION_TILE_NOT_FOUND', 404);
 		const tile = parsed.data;
 		if (
+			frame?.frameIndex !== frameIndex || frame.sourceRevision !== currentRevision ||
+			frame.analysisRevision !== videoAnalysis.analysisRevision ||
 			tile.evidenceId !== evidenceId || tile.sourceRevision !== currentRevision ||
 			tile.analysisRevision !== videoAnalysis.analysisRevision || tile.frameIndex !== frameIndex ||
-			tile.timestampMs !== frame?.timestampMs || tile.artifact.analysisRevision !== videoAnalysis.analysisRevision
+			tile.timestampMs !== frame?.timestampMs || tile.artifact.sourceRevision !== currentRevision ||
+			tile.artifact.analysisRevision !== videoAnalysis.analysisRevision ||
+			!hasValidMotionComparisonV1(tile, videoAnalysis.frames)
 		) return failure('MOTION_TILE_NOT_FOUND', 404);
 
 		const bucket = ENV.SEAWEED_ARTIFACTS_BUCKET || ARTIFACTS_BUCKET;

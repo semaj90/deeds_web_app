@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import path from 'path';
+import os from 'os';
 import fs from 'fs/promises';
 import { ENV } from '$lib/server/env.server.js';
 
@@ -174,6 +175,39 @@ export async function transcribeAudio(audioPath: string, jobId: string): Promise
       }
     });
   });
+}
+
+/**
+ * Extracts the audio track of a video buffer to a 16 kHz mono WAV buffer using
+ * ffmpeg (FFMPEG_PATH). Rejects when ffmpeg is unavailable, the input has no
+ * audio stream, or decoding fails. Uses a private temp directory that is always
+ * removed; never touches repository files.
+ */
+export async function extractAudioTrackToWav(input: Buffer, sourceName: string): Promise<Buffer> {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'av-extract-'));
+  const ext = path.extname(sourceName).toLowerCase() || '.mp4';
+  const inPath = path.join(dir, `source${ext}`);
+  const outPath = path.join(dir, 'audio.wav');
+  try {
+    await fs.writeFile(inPath, input);
+    const ffmpegBin = ENV.FFMPEG_PATH || 'ffmpeg';
+    await new Promise<void>((resolve, reject) => {
+      const child = spawn(ffmpegBin, [
+        '-nostdin', '-hide_banner', '-loglevel', 'error', '-y',
+        '-i', inPath, '-vn', '-ac', '1', '-ar', '16000', '-f', 'wav', outPath
+      ]);
+      let stderr = '';
+      child.stderr.on('data', (d) => { stderr += d; });
+      child.on('error', (err) => reject(new Error(`FFMPEG_UNAVAILABLE: ${err.message}`)));
+      child.on('close', (code) => {
+        if (code === 0) resolve();
+        else reject(new Error(`ffmpeg exited ${code}: ${stderr.trim().slice(0, 400)}`));
+      });
+    });
+    return await fs.readFile(outPath);
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
 }
 
 async function ensureTranscriptionShim(shimPath: string) {

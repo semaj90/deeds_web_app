@@ -48,11 +48,17 @@ export const planarCameraCalibrationV1Schema = z.object({
 	imageToPlaneHomography: matrixSchema,
 	fitResidualsMeters: z.array(residualSchema).length(4),
 	validationResidualsMeters: z.array(residualSchema).min(4).max(32),
+	/** Image-pixel extent of all calibration anchors. Optional so records stored before this field still parse. */
+	calibratedRegionPx: z.object({ minX: z.number().finite(), minY: z.number().finite(), maxX: z.number().finite(), maxY: z.number().finite() }).strict().optional(),
 	toleranceMeters: z.number().finite().positive().max(1),
 	validationStatus: z.literal('CHECKS_PASSED'),
 	status: z.literal('UNREVIEWED_CALIBRATION_PROPOSAL'),
 	semantics: z.literal('image_to_measured_plane_only_no_height_or_camera_motion_compensation'),
-}).strict();
+}).strict().refine(({ calibratedRegionPx: region, frameWidth, frameHeight }) => !region || (
+	region.minX >= 0 && region.minY >= 0 &&
+	region.maxX > region.minX && region.maxY > region.minY &&
+	region.maxX <= frameWidth && region.maxY <= frameHeight
+), { path: ['calibratedRegionPx'], message: 'The calibrated region must be within the source image.' });
 
 export type PlanarCalibrationAnchorV1 = z.infer<typeof anchorSchema>;
 export type PlanarCameraCalibrationInputV1 = z.input<typeof planarCameraCalibrationInputV1Schema>;
@@ -154,6 +160,12 @@ function solveImageToPlane(fitAnchors: readonly PlanarCalibrationAnchorV1[]): Ma
 	return denormalized.map((value) => value / maxAbs) as unknown as Matrix3;
 }
 
+function anchorPixelExtent(anchors: readonly { imagePx: readonly unknown[] }[]) {
+	const xs = anchors.map((a) => Number(a.imagePx[0]));
+	const ys = anchors.map((a) => Number(a.imagePx[1]));
+	return { minX: Math.min(...xs), minY: Math.min(...ys), maxX: Math.max(...xs), maxY: Math.max(...ys) };
+}
+
 export function createPlanarCameraCalibrationV1(input: unknown): PlanarCameraCalibrationV1 {
 	const parsed = planarCameraCalibrationInputV1Schema.parse(input);
 	const anchors = [...parsed.fitAnchors, ...parsed.validationAnchors];
@@ -192,6 +204,7 @@ export function createPlanarCameraCalibrationV1(input: unknown): PlanarCameraCal
 		imageToPlaneHomography: matrix,
 		fitResidualsMeters,
 		validationResidualsMeters,
+		calibratedRegionPx: anchorPixelExtent(anchors),
 		toleranceMeters: parsed.toleranceMeters,
 		validationStatus,
 		status: 'UNREVIEWED_CALIBRATION_PROPOSAL',

@@ -1,27 +1,29 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { CacheInvalidation } from '$lib/cache/cache-invalidation';
 	import { detectSensitiveInfo, type SensitiveInfoHit } from '$lib/utils/sensitive-info-detector.js';
 	import { admitEvidenceProgressEventV1, caseEvidenceProgressEventUrlV1 } from '$lib/components/evidence/evidence-progress-event-client-v1.js';
 
 	interface UploadProgress {
+		key: number;
 		fileName: string;
+		evidenceId?: string;
 		progress: number;
 		status: 'pending' | 'uploading' | 'processing' | 'completed' | 'error';
 		error?: string;
+		requiresSignIn?: boolean;
 		piiWarnings?: SensitiveInfoHit[];
 	}
 
-	let caseId: string;
+	const caseId = $derived(page.params.id);
 	let uploads: UploadProgress[] = $state([]);
 	let isDragging = $state(false);
-	let isUploading = false;
+	let ready = $state(false);
+	let nextUploadKey = 0;
 	let activeSources: EventSource[] = [];
 
-	$effect(() => {
-		caseId = page.params.id;
-	});
+	onMount(() => { ready = true; });
 
 	onDestroy(() => {
 		activeSources.forEach((es) => es.close());
@@ -67,21 +69,21 @@
 		}
 	}
 
-	let piiDismissed = $state<Set<string>>(new Set());
+	let piiDismissed = $state<Set<number>>(new Set());
 
-	function dismissPII(fileName: string) {
-		piiDismissed = new Set([...piiDismissed, fileName]);
+	function dismissPII(key: number) {
+		piiDismissed = new Set([...piiDismissed, key]);
 	}
 
 	async function uploadFiles(files: File[]) {
-		isUploading = true;
-
 		for (const file of files) {
+			const key = nextUploadKey++;
 			const validation = validateFile(file);
 			if (!validation.valid) {
 				uploads = [
 					...uploads,
 					{
+						key,
 						fileName: file.name,
 						progress: 0,
 						status: 'error',
@@ -94,10 +96,10 @@
 			// Pre-upload PII scan
 			const piiHits = await scanForPII(file);
 
-			const uploadIndex = uploads.length;
 			uploads = [
 				...uploads,
 				{
+					key,
 					fileName: file.name,
 					progress: 0,
 					status: 'pending',
@@ -105,10 +107,8 @@
 				}
 			];
 
-			await uploadFile(file, uploadIndex);
+			uploadFile(file, uploads[uploads.length - 1]);
 		}
-
-		isUploading = false;
 	}
 
 	function validateFile(file: File): { valid: boolean; error?: string } {
@@ -144,14 +144,15 @@
 		return { valid: true };
 	}
 
-	async function uploadFile(file: File, index: number): Promise<void> {
+	function uploadFile(file: File, row: UploadProgress): void {
+		const uploadCaseId = caseId;
 		try {
-			uploads[index].status = 'uploading';
-			uploads[index].progress = 0;
+			row.status = 'uploading';
+			row.progress = 0;
 
 			const formData = new FormData();
 			formData.append('file', file);
-			formData.append('case_id', caseId);
+			formData.append('case_id', uploadCaseId);
 			formData.append('enableAiAnalysis', 'true');
 			formData.append('enableOcr', 'true');
 			formData.append('enableEmbeddings', 'true');
@@ -162,58 +163,65 @@
 			xhr.upload.addEventListener('progress', (e) => {
 				if (e.lengthComputable) {
 					const progress = Math.round((e.loaded / e.total) * 100);
-					uploads[index].progress = progress;
-					uploads = [...uploads];
+					row.progress = progress;
 				}
 			});
 
 			xhr.addEventListener('load', async () => {
-				if (xhr.status === 200 || xhr.status === 201) {
+				if (xhr.status >= 200 && xhr.status < 300) {
 					try {
 						const result = JSON.parse(xhr.responseText);
+						const evidenceId = typeof result.id === 'string' ? result.id : result.evidenceId;
+						if (typeof evidenceId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(evidenceId)) {
+							throw new Error('Upload response did not include a valid saved evidence ID.');
+						}
+						row.evidenceId = evidenceId;
 						if (typeof result.jobId !== 'string') throw new Error('Upload accepted without a processing job ID.');
-						uploads[index].status = 'processing';
-						uploads[index].progress = 60;
-						uploads = [...uploads];
-						connectSSE(result.jobId, index);
+						row.status = 'processing';
+						row.progress = 60;
+						connectSSE(uploadCaseId, result.jobId, row);
 					} catch (error) {
-						uploads[index].status = 'error';
-						uploads[index].error = error instanceof Error ? error.message : 'Upload response was invalid.';
-						uploads = [...uploads];
+						row.status = 'error';
+						row.error = error instanceof Error ? error.message : 'Upload response was invalid.';
 					}
 
-					await CacheInvalidation.invalidateEvidence(caseId);
+					await CacheInvalidation.invalidateEvidence(uploadCaseId);
 				} else {
-					uploads[index].status = 'error';
-					uploads[index].error = `Upload failed: ${xhr.statusText}`;
-					uploads = [...uploads];
+					row.status = 'error';
+					let serverMessage = '';
+					try {
+						const response = JSON.parse(xhr.responseText);
+						serverMessage = typeof response.error === 'string' ? response.error : '';
+					} catch { /* use status fallback */ }
+					row.error = xhr.status === 401
+						? 'This tab did not send a valid sign-in session to the upload service. Confirm you are on the same app address and sign in again; then choose the file again to retry.'
+						: serverMessage || `Upload failed (${xhr.status}${xhr.statusText ? `: ${xhr.statusText}` : ''}).`;
+					row.requiresSignIn = xhr.status === 401;
 				}
 			});
 
 			xhr.addEventListener('error', () => {
-				uploads[index].status = 'error';
-				uploads[index].error = 'Network error during upload';
-				uploads = [...uploads];
+				row.status = 'error';
+				row.error = 'Network error during upload';
 			});
 
 			xhr.open('POST', '/api/evidence/upload');
+			xhr.withCredentials = true;
 			xhr.send(formData);
 		} catch (error) {
-			uploads[index].status = 'error';
-			uploads[index].error = error instanceof Error ? error.message : 'Unknown error';
-			uploads = [...uploads];
+			row.status = 'error';
+			row.error = error instanceof Error ? error.message : 'Unknown error';
 		}
 	}
 
-	function connectSSE(jobId: string, index: number) {
+	function connectSSE(caseId: string, jobId: string, row: UploadProgress) {
 		let lastSequence = 0n;
 		let streamUrl: string;
 		try {
 			streamUrl = caseEvidenceProgressEventUrlV1(caseId, jobId);
 		} catch {
-			uploads[index].status = 'error';
-			uploads[index].error = 'The case or processing job identity is invalid.';
-			uploads = [...uploads];
+			row.status = 'error';
+			row.error = 'The case or processing job identity is invalid.';
 			return;
 		}
 		const es = new EventSource(streamUrl);
@@ -227,46 +235,40 @@
 				caseId,
 				lastSequence,
 			});
-			if (!admitted.accepted) return;
+			if (!admitted.accepted || admitted.envelope.evidenceId !== row.evidenceId) return;
 
 			lastSequence = admitted.sequence;
 			const { status, progress } = admitted.envelope;
-			uploads[index].progress = status === 'completed' ? 100 : progress;
+			row.progress = status === 'completed' ? 100 : progress;
 			if (status === 'completed') {
-				uploads[index].status = 'completed';
-				uploads = [...uploads];
+				row.status = 'completed';
 				es.close();
 			} else if (status === 'failed') {
-				uploads[index].status = 'error';
-				uploads[index].error = 'Evidence processing failed.';
-				uploads = [...uploads];
+				row.status = 'error';
+				row.error = 'Evidence processing failed.';
 				es.close();
 			} else {
-				uploads[index].status = 'processing';
-				uploads = [...uploads];
+				row.status = 'processing';
 			}
 		});
 
 		es.addEventListener('stream-ended', () => {
-			uploads[index].status = 'error';
-			uploads[index].error = 'Case access changed or progress history is unavailable.';
-			uploads = [...uploads];
+			row.status = 'error';
+			row.error = 'Case access changed or progress history is unavailable.';
 			es.close();
 		});
 
 		es.addEventListener('stream-error', () => {
-			uploads[index].status = 'error';
-			uploads[index].error = 'Evidence progress could not be verified.';
-			uploads = [...uploads];
+			row.status = 'error';
+			row.error = 'Evidence progress could not be verified.';
 			es.close();
 		});
 
 		es.onerror = () => {
 			// Preserve native EventSource reconnect and Last-Event-ID while connecting.
-			if (es.readyState === EventSource.CLOSED && uploads[index].status === 'processing') {
-				uploads[index].status = 'error';
-				uploads[index].error = 'Progress connection closed before completion was verified.';
-				uploads = [...uploads];
+			if (es.readyState === EventSource.CLOSED && row.status === 'processing') {
+				row.status = 'error';
+				row.error = 'Progress connection closed before completion was verified.';
 			}
 		};
 	}
@@ -303,6 +305,7 @@
 					multiple
 					accept=".pdf,.png,.jpg,.jpeg,.tiff,.mp4,.mov,.webm,.avi,.mkv,.wav,.mp3,video/*,audio/*,image/*"
 					onchange={handleFileSelect}
+					disabled={!ready}
 				/>
 			</label>
 			<p class="file-info">Supported: PDF, PNG, JPG, TIFF, MP4, MOV, WEBM, WAV (max 100MB each)</p>
@@ -320,35 +323,46 @@
 			</div>
 
 			<div class="uploads-list">
-				{#each uploads as upload (upload.fileName)}
+				{#each uploads as upload (upload.key)}
 					<div
 						class="upload-item"
+						class:processing={upload.status === 'processing'}
 						class:completed={upload.status === 'completed'}
 						class:error={upload.status === 'error'}
 					>
 						<div class="upload-info">
 							<div class="file-name">{upload.fileName}</div>
-							{#if upload.piiWarnings && upload.piiWarnings.length > 0 && !piiDismissed.has(upload.fileName)}
+							{#if upload.piiWarnings && upload.piiWarnings.length > 0 && !piiDismissed.has(upload.key)}
 								<div class="pii-warning">
 									<strong>Sensitive info detected:</strong>
 									{upload.piiWarnings.length} item{upload.piiWarnings.length > 1 ? 's' : ''} found
 									({upload.piiWarnings.map(h => h.type).filter((v, i, a) => a.indexOf(v) === i).join(', ')})
-									<button class="pii-dismiss" onclick={() => dismissPII(upload.fileName)}>Dismiss</button>
+									<button class="pii-dismiss" onclick={() => dismissPII(upload.key)}>Dismiss</button>
 								</div>
 							{/if}
 							{#if upload.status === 'error'}
 								<div class="error-message">{upload.error}</div>
+								{#if upload.requiresSignIn}
+									<a class="place-in-scene-link" href={`/login?force=1&redirect=${encodeURIComponent(`/cases/${caseId}/evidence/upload`)}`} target="_blank" rel="noreferrer">
+										Sign in in a new tab, then return here to retry
+									</a>
+								{/if}
 							{:else}
-								<div class="progress-bar">
+								<div class="progress-bar" role="progressbar" aria-label={`Progress for ${upload.fileName}`} aria-valuenow={upload.progress}>
 									<div class="progress-fill" style="width: {upload.progress}%"></div>
 								</div>
-								<div class="progress-text">
+								<div class="progress-text" role="status">
 									{#if upload.status === 'processing'}
-										Embedding... {upload.progress}%
+										Analyzing evidence… {upload.progress}%
 									{:else}
 										{upload.progress}%
 									{/if}
 								</div>
+							{/if}
+							{#if upload.evidenceId}
+								<a class="place-in-scene-link" aria-label={`Place in scene: ${upload.fileName}`} href={`/cases/${encodeURIComponent(caseId)}/board?view=detective&evidenceId=${encodeURIComponent(upload.evidenceId)}`}>
+									Place in scene · open in Detective Mode
+								</a>
 							{/if}
 						</div>
 						<div class="status-icon">
@@ -526,6 +540,16 @@
 		opacity: 0.7;
 	}
 
+	.place-in-scene-link {
+		display: inline-flex;
+		margin-top: 0.55rem;
+		color: #d4b66f;
+		font-size: 0.82rem;
+		font-weight: 650;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+
 	.upload-item.error {
 		border-left-color: #ff6b6b;
 	}
@@ -552,8 +576,23 @@
 
 	.progress-fill {
 		height: 100%;
-		background: linear-gradient(90deg, #00d4ff, #00ff00);
+		background: linear-gradient(90deg, #47846e, #94d5b8);
 		transition: width 0.3s;
+	}
+
+	.upload-item.processing .progress-fill {
+		animation: progress-glow 2s ease-in-out infinite alternate;
+	}
+
+	@keyframes progress-glow {
+		to { filter: brightness(1.22); }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.progress-fill, .upload-item.processing .progress-fill, .spinner {
+			animation: none;
+			transition: none;
+		}
 	}
 
 	.progress-text {
