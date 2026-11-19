@@ -26,6 +26,7 @@
 - [ ] 4.2 Verify candidate identity, logical lane, source/workspace revision, evidence references, and degraded status survive each adapter boundary.
 - [ ] 4.3 Require the existing ACE/ContextManifest admission before framework context injection; reject raw retrieval hits, stale framework memory, and LUT-only references as admitted evidence.
 - [ ] 4.4 Replay one read-only request through at least two adapter paths and compare canonical IDs, revisions, evidence checksums, authorization outcomes, and logical retrieval votes.
+- [ ] 4.5 Add the noncanonical GAN MCP observation hook for KAG/RAG/DAG/ACE calls; keep caller revisions unverified and require adversarial, replay, cache-identity, provenance, and reviewer gates before `PROVEN`/`DONE`.
 
 ## 5. Build the Studio Readiness Projection
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
-	import CrimeSceneViewer3D, { CASE_EXHIBIT_DRAG_TYPE } from './CrimeSceneViewer3D.svelte';
+	import CrimeSceneViewer3D, { CASE_EXHIBIT_DRAG_TYPE, type DetectiveGuideAction } from './CrimeSceneViewer3D.svelte';
 	import CaseInvestigationPanel from './CaseInvestigationPanel.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import EvidenceCarouselGallery from './EvidenceCarouselGallery.svelte';
@@ -59,6 +59,11 @@
 	let showCaseInspector = $state(true);
 	let showCaseExhibits = $state(false);
 	let showIndexedFloor = $state(false);
+	let showGuide = $state(true);
+	let guideAction = $state<DetectiveGuideAction>('Idle');
+	let scrubGuideClip = $state(false);
+	let guideScrubTime = $state<number | null>(null);
+	let guideClipDurations = $state<Partial<Record<DetectiveGuideAction, number>>>({});
 	let exhibitSearch = $state('');
 
 	// Active Inspector Mode: 'splat' (3D Splat Node Telemetry) | 'evidence-e002' (Bloodstain E-002 from Crime Scene)
@@ -1692,6 +1697,10 @@
 							{transformMode}
 							caseMarkers={demoMode ? undefined : sceneMarkers}
 							indexedFloor={showIndexedFloor}
+							guideVisible={showGuide}
+							{guideAction}
+							{guideScrubTime}
+							onGuideClipsReady={(durations) => guideClipDurations = durations}
 							placementPreview={placementPreview && selectedExhibit ? placementPreview : null}
 							onCaseGroundPoint={demoMode ? undefined : chooseGroundPoint}
 							onCaseMarkerSelect={(id) => {
@@ -1721,6 +1730,33 @@
 								<label><input type="checkbox" bind:checked={sceneLayers.markers} /> Saved markers</label>
 								<label><input type="checkbox" bind:checked={sceneLayers.environment} /> Scene environment</label>
 								<label><input type="checkbox" bind:checked={showIndexedFloor} /> Indexed floor texture</label>
+								<label><input type="checkbox" bind:checked={showGuide} /> Illustrative detective guide</label>
+								{#if showGuide}
+									<label class="guide-action">Guide action
+										<select value={guideAction} onchange={(event) => {
+											guideAction = (event.currentTarget as HTMLSelectElement).value as DetectiveGuideAction;
+											if (scrubGuideClip) guideScrubTime = 0;
+										}}>
+											<option value="Idle">Stand by</option>
+											<option value="Walk">Walk the scene</option>
+											<option value="Inspect">Inspect</option>
+											<option value="Interact">Reach</option>
+										</select>
+									</label>
+									<label class="guide-scrub-toggle">
+										<input type="checkbox" checked={scrubGuideClip} onchange={(event) => {
+											scrubGuideClip = (event.currentTarget as HTMLInputElement).checked;
+											guideScrubTime = scrubGuideClip ? 0 : null;
+										}} />
+										Scrub guide clip
+									</label>
+									{#if scrubGuideClip}
+										<label class="guide-scrub-control">Clip time
+											<input aria-label="Guide clip time" type="range" min="0" max={Math.max(0.01, guideClipDurations[guideAction] ?? 0.01)} step="0.01" value={guideScrubTime ?? 0} oninput={(event) => guideScrubTime = Number((event.currentTarget as HTMLInputElement).value)} />
+											<output>{(guideScrubTime ?? 0).toFixed(2)} s / {(guideClipDurations[guideAction] ?? 0).toFixed(2)} s</output>
+										</label>
+									{/if}
+								{/if}
 							</details>
 						{:else}
 						<!-- Top-Left Floating SCENE LAYERS Card (Image 2) -->
@@ -2406,8 +2442,7 @@
 		user-select: text;
 	}
 
-	.case-scene-heading,
-	.case-viewport-toolbar {
+	.case-scene-heading {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -2430,7 +2465,6 @@
 	}
 
 	.case-scene-actions,
-	.case-viewport-toolbar div,
 	.case-exhibit-actions {
 		display: flex;
 		flex-wrap: wrap;
@@ -2438,7 +2472,6 @@
 	}
 
 	.case-scene-actions :is(button, a),
-	.case-viewport-toolbar button,
 	.case-exhibit-actions button {
 		padding: 0.38rem 0.65rem;
 		border: 1px solid var(--dossier-border-sand, #d5c6ac);
@@ -2504,7 +2537,6 @@
 	}
 
 	.case-exhibit-list small { color: var(--dossier-text-muted-aa, #6b6150); }
-	.case-viewport-toolbar { padding-block: 0.55rem; }
 	.case-dossier :is(.forensic-center-stage, .crime-reconstruction-stage) {
 		align-items: stretch;
 		padding: 0;
@@ -2524,6 +2556,11 @@
 	}
 	.case-scene-layers summary { cursor: pointer; }
 	.case-scene-layers label { display: block; margin-top: 0.35rem; }
+	.case-scene-layers .guide-action { display: grid; gap: 0.2rem; }
+	.case-scene-layers .guide-scrub-toggle { display: flex; align-items: center; gap: 0.35rem; }
+	.case-scene-layers .guide-scrub-control { display: grid; gap: 0.2rem; }
+	.case-scene-layers .guide-scrub-control input { width: 100%; accent-color: var(--color-accent, #c99b4a); }
+	.case-scene-layers .guide-scrub-control output { font-variant-numeric: tabular-nums; color: var(--text-muted, #756c60); }
 
 	@media (max-width: 960px) {
 		.case-dossier .forensic-body-workspace {

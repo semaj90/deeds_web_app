@@ -1,6 +1,6 @@
 <!-- EvidenceTranscriptPanel.svelte — YouTube-Style Interactive Video Transcript Panel -->
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 
 	interface TranscriptSegment {
@@ -16,6 +16,14 @@
 		sourceRevision?: string;
 		analysisRevision?: string | null;
 		reviewStatus?: 'approved' | 'unreviewed_proposal' | 'rejected';
+	}
+
+	interface TranscriptJobProgress {
+		step: string;
+		progress: number;
+		message: string;
+		createdAt: string;
+		updatedAt: string;
 	}
 
 	interface Props {
@@ -43,6 +51,8 @@
 	let segments = $state<TranscriptSegment[]>([]);
 	let sourceRevision = $state<string | null>(null);
 	let analysisRevision = $state<string | null>(null);
+	let jobProgress = $state<TranscriptJobProgress | null>(null);
+	let elapsedNow = $state(Date.now());
 	let isLoading = $state(false);
 	let status = $state<'completed' | 'no_audio' | 'processing' | 'failed' | 'empty' | 'unavailable' | 'idle'>('idle');
 	let reviewEnabled = $state(false);
@@ -57,10 +67,51 @@
 	let userScrollTimer: ReturnType<typeof setTimeout> | null = null;
 	let scrollContainer = $state<HTMLDivElement | null>(null);
 	let activeCueElement = $state<HTMLDivElement | null>(null);
+	let transcriptPollTimer: ReturnType<typeof setTimeout> | null = null;
+	let transcriptPollCount = 0;
+	let elapsedTimer: ReturnType<typeof setInterval> | null = null;
+	const transcriptPollLimit = 50;
+
+	function stopTranscriptPolling() {
+		if (transcriptPollTimer) clearTimeout(transcriptPollTimer);
+		transcriptPollTimer = null;
+		transcriptPollCount = 0;
+	}
+
+	function syncElapsedTimer() {
+		if (status === 'processing' && !elapsedTimer) {
+			elapsedTimer = setInterval(() => (elapsedNow = Date.now()), 1000);
+		} else if (status !== 'processing' && elapsedTimer) {
+			clearInterval(elapsedTimer);
+			elapsedTimer = null;
+		}
+	}
+
+	const elapsedSeconds = $derived.by(() => {
+		const started = jobProgress?.createdAt ? Date.parse(jobProgress.createdAt) : Number.NaN;
+		return Number.isFinite(started) ? Math.max(0, Math.floor((elapsedNow - started) / 1000)) : null;
+	});
+
+	function formatElapsed(seconds: number): string {
+		const minutes = Math.floor(seconds / 60);
+		const remainder = seconds % 60;
+		return minutes > 0 ? `${minutes}m ${String(remainder).padStart(2, '0')}s` : `${remainder}s`;
+	}
+
+	function scheduleTranscriptPoll() {
+		if (!isOpen || status !== 'processing' || transcriptPollTimer || transcriptPollCount >= transcriptPollLimit) return;
+		const delayMs = transcriptPollCount < 3 ? 2000 : transcriptPollCount < 8 ? 5000 : 15000;
+		transcriptPollTimer = setTimeout(() => {
+			transcriptPollTimer = null;
+			transcriptPollCount += 1;
+			void loadTranscript();
+		}, delayMs);
+	}
 
 	// Fetch transcript segments from API
 	async function loadTranscript() {
 		if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(evidenceId)) {
+			stopTranscriptPolling();
 			status = 'unavailable';
 			segments = [];
 			return;
@@ -76,6 +127,7 @@
 			const data = await res.json();
 			if (data.ok) {
 				segments = data.segments || [];
+				jobProgress = data.jobProgress && typeof data.jobProgress === 'object' ? data.jobProgress : null;
 				sourceRevision = typeof data.sourceRevision === 'string' ? data.sourceRevision : null;
 				analysisRevision = typeof data.analysisRevision === 'string' ? data.analysisRevision : null;
 				reviewEnabled = data.reviewEnabled === true;
@@ -87,6 +139,9 @@
 			status = 'failed';
 		} finally {
 			isLoading = false;
+			if (status === 'processing') scheduleTranscriptPoll();
+			else stopTranscriptPolling();
+			syncElapsedTimer();
 		}
 	}
 
@@ -101,10 +156,17 @@
 
 	function toggleOpen() {
 		isOpen = !isOpen;
-		if (isOpen && segments.length === 0 && status === 'idle') {
+		if (!isOpen) stopTranscriptPolling();
+		if (isOpen && segments.length === 0 && (status === 'idle' || status === 'processing')) {
+			transcriptPollCount = 0;
 			void loadTranscript();
 		}
 	}
+
+	onDestroy(() => {
+		stopTranscriptPolling();
+		if (elapsedTimer) clearInterval(elapsedTimer);
+	});
 
 	// Distinct speakers for filtering
 	const availableSpeakers = $derived(
@@ -290,7 +352,16 @@
 			{:else if status === 'processing'}
 				<div class="empty-transcript-state">
 					<span class="state-icon spin">⏳</span>
-					<p class="state-msg">Whisper transcription in progress. Cues will appear once durable analysis completes.</p>
+					<p class="state-msg">{jobProgress?.message || 'Video analysis is in progress.'}</p>
+					{#if jobProgress}
+						<div class="transcript-progress" role="group" aria-label="Video analysis progress">
+							<div class="transcript-progress-label"><span>{jobProgress.step.replaceAll('-', ' ')}</span><span>{Math.max(0, Math.min(100, Math.round(jobProgress.progress)))}%</span></div>
+							<progress max="100" value={Math.max(0, Math.min(100, jobProgress.progress))} aria-label="Video analysis progress"></progress>
+							<p>{#if elapsedSeconds !== null}Elapsed {formatElapsed(elapsedSeconds)} · ETA unavailable during this stage{:else}Elapsed time unavailable · ETA unavailable{/if}</p>
+						</div>
+					{:else}
+						<p class="state-msg">Refreshing analysis status automatically.</p>
+					{/if}
 				</div>
 			{:else if status === 'failed'}
 				<div class="empty-transcript-state error">
@@ -841,6 +912,31 @@
 	.state-msg {
 		font-size: 0.85rem;
 		margin: 0;
+	}
+
+	.transcript-progress {
+		width: min(100%, 25rem);
+		margin-top: 0.5rem;
+		text-align: left;
+		color: var(--dossier-text-main, #24201c);
+	}
+	.transcript-progress-label {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 0.35rem;
+		font-size: 0.75rem;
+		text-transform: capitalize;
+	}
+	.transcript-progress progress {
+		width: 100%;
+		height: 0.65rem;
+		accent-color: var(--dossier-accent, #9a6b28);
+	}
+	.transcript-progress p {
+		margin: 0.35rem 0 0;
+		font-size: 0.72rem;
+		color: var(--dossier-text-muted, #6e6257);
 	}
 
 	.btn-retry {

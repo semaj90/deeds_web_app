@@ -8,6 +8,10 @@ export const VIDEO_MOTION_LUT_BIT_DEPTH_V1 = 4;
 export const VIDEO_MOTION_LUT_HEADER_BYTES_V1 = 16;
 export const VIDEO_MOTION_LUT_PIXEL_BYTES_V1 = VIDEO_MOTION_LUT_WIDTH_V1 * VIDEO_MOTION_LUT_HEIGHT_V1 / 2;
 export const VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1 = VIDEO_MOTION_LUT_HEADER_BYTES_V1 + VIDEO_MOTION_LUT_PIXEL_BYTES_V1;
+export const VIDEO_MOTION_COMPACT_LOD_V1 = Object.freeze({
+	level: 3, width: 32, height: 64, byteLength: 1024,
+	token: '32x64', contentType: 'application/vnd.atlas.video-motion-lod-4bpp-v1',
+});
 /** Canonical display lookup: 16 evenly spaced grayscale values for the packed 4-bit motion index. */
 export const VIDEO_MOTION_GRAYSCALE_LUT_V1 = Object.freeze([
 	0, 17, 34, 51, 68, 85, 102, 119, 136, 153, 170, 187, 204, 221, 238, 255,
@@ -145,8 +149,8 @@ export function encodeVideoMotionLutV1(previousLuma: Uint8Array | null, currentL
 	});
 }
 
-/** Decode a checked tile to one 0..15 index per pixel for preview rendering. */
-export function decodeVideoMotionLutIndicesV1(bytes: Uint8Array): Uint8Array {
+/** Read the packed payload from a validated canonical motion artifact. */
+export function readPackedVideoMotionLutV1(bytes: Uint8Array): PackedMotionLodV1 {
 	if (bytes.byteLength !== VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1) throw new RangeError('Invalid motion LUT artifact length.');
 	for (let i = 0; i < MAGIC.length; i += 1) {
 		if (bytes[i] !== MAGIC[i]) throw new RangeError('Invalid motion LUT magic.');
@@ -159,14 +163,46 @@ export function decodeVideoMotionLutIndicesV1(bytes: Uint8Array): Uint8Array {
 		header.getUint8(13) !== 0 ||
 		header.getUint16(14, true) !== 0
 	) throw new RangeError('Unsupported motion LUT header.');
+	return {
+		level: 4,
+		width: VIDEO_MOTION_LUT_WIDTH_V1,
+		height: VIDEO_MOTION_LUT_HEIGHT_V1,
+		data: bytes.subarray(VIDEO_MOTION_LUT_HEADER_BYTES_V1),
+	};
+}
 
+/** Decode a checked tile to one 0..15 index per pixel for preview rendering. */
+export function decodeVideoMotionLutIndicesV1(bytes: Uint8Array): Uint8Array {
+	const { data } = readPackedVideoMotionLutV1(bytes);
 	const pixelCount = VIDEO_MOTION_LUT_WIDTH_V1 * VIDEO_MOTION_LUT_HEIGHT_V1;
 	const indices = new Uint8Array(pixelCount);
 	for (let pixel = 0; pixel < pixelCount; pixel += 1) {
-		const packed = bytes[VIDEO_MOTION_LUT_HEADER_BYTES_V1 + (pixel >>> 1)]!;
+		const packed = data[pixel >>> 1]!;
 		indices[pixel] = pixel & 1 ? packed >>> 4 : packed & 0x0f;
 	}
 	return indices;
+}
+
+/** Max-pool 2×2 cells directly from the packed canonical payload. */
+export function compactPackedMotionLodV1(source: PackedMotionLodV1): PackedMotionLodV1 {
+	if (source.width !== VIDEO_MOTION_LUT_WIDTH_V1 || source.height !== VIDEO_MOTION_LUT_HEIGHT_V1
+		|| source.data.byteLength !== VIDEO_MOTION_LUT_PIXEL_BYTES_V1) {
+		throw new RangeError('Compact motion preview requires a canonical 64×128 packed tile.');
+	}
+	const { level, width, height, byteLength } = VIDEO_MOTION_COMPACT_LOD_V1;
+	const data = new Uint8Array(byteLength);
+	const rowBytes = VIDEO_MOTION_LUT_WIDTH_V1 / 2;
+	for (let y = 0; y < height; y++) {
+		const topOffset = y * 2 * rowBytes;
+		for (let x = 0; x < width; x++) {
+			const top = source.data[topOffset + x]!;
+			const bottom = source.data[topOffset + rowBytes + x]!;
+			const index = Math.max(top & 15, top >>> 4, bottom & 15, bottom >>> 4);
+			const output = (y * width + x) >>> 1;
+			data[output] = data[output]! | (index << ((x & 1) * 4));
+		}
+	}
+	return { level, width, height, data };
 }
 
 /** Build stable max-pooled 4-bit display levels, ordered smallest to largest. */

@@ -214,6 +214,7 @@
 			{#each reports as report (report.id)}
 				<button
 					type="button"
+					id={`report-${report.id}`}
 					class="cr-report-row"
 					onclick={() => openResume(report)}
 				>
@@ -448,6 +449,7 @@
 		gap: 0.5rem;
 	}
 	.cr-report-row {
+		scroll-margin-block: 5rem;
 		width: 100%;
 		text-align: left;
 		padding: 0.5rem 0.75rem;
@@ -466,6 +468,11 @@
 	.cr-report-row:hover {
 		border-color: rgba(196, 117, 43, 0.5);
 		background: rgba(212, 199, 163, 0.03);
+	}
+
+	.cr-report-row:target {
+		outline: 2px solid var(--dossier-gold, #c9a86a);
+		outline-offset: 2px;
 	}
 	.cr-report-info {
 		display: flex;

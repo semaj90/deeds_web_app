@@ -1,0 +1,42 @@
+{
+  "schema": "yolox-sam2-combined-smoke-receipt.v1",
+  "status": "CPU_YOLOX_GPU_SAM2_SMOKE_PASSED__NOT_PRODUCTION_ADMITTED",
+  "generatedAt": "2026-11-18",
+  "script": "scratch/sam2-smoke/yolox_to_sam2.py",
+  "interpreter": "C:/Users/james/.venvs/sam2-tiny/Scripts/python.exe",
+  "interpreterNotes": "onnxruntime 1.27.0 resolves from the user site-packages through the --system-site-packages venv; sam2 resolves from the venv. No package was installed for this run.",
+  "models": {
+    "yolo": {
+      "file": "sveltekit-frontend/models/yolox_nano.onnx",
+      "sha256": "sha256:c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+      "executionProvider": "CPUExecutionProvider",
+      "weightLicense": "not separately documented (DET-04); evaluation-only"
+    },
+    "sam2": {
+      "file": "models/sam2/sam2.1_hiera_tiny.pt",
+      "bytes": 156008466,
+      "config": "configs/sam2.1/sam2.1_hiera_t.yaml",
+      "device": "cuda"
+    }
+  },
+  "input": {
+    "description": "single screenshot from the operator; scratch-only, not committed",
+    "width": 1920,
+    "height": 1080
+  },
+  "result": {
+    "personDetections": 1,
+    "topDetectionXyxyConf": [310.2, 369.4, 400.4, 644.0, 0.535],
+    "sam2MaskPixels": 12670,
+    "sam2Score": 0.862,
+    "maskBbox": [309, 368, 388, 660],
+    "promptBox": [310.2, 369.4, 400.4, 644.0],
+    "peakGpuAllocatedMib": 596.8
+  },
+  "limits": [
+    "one image, one run; no repeatability or parity evidence",
+    "YOLOX-Nano weights are evaluation-only until the weight grant is explicit",
+    "mask is a derivative 2D artifact, not evidence",
+    "no artifact stored in SeaweedFS or PostgreSQL; no authorized live upload path exercised"
+  ]
+}

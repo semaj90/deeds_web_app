@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { onDestroy, onMount } from 'svelte';
 	import { CacheInvalidation } from '$lib/cache/cache-invalidation';
@@ -17,6 +18,11 @@
 	}
 
 	const caseId = $derived(page.params.id);
+
+	function openExhibitInDetectiveMode(event: MouseEvent, href: string) {
+		event.preventDefault();
+		void goto(href);
+	}
 	let uploads: UploadProgress[] = $state([]);
 	let isDragging = $state(false);
 	let ready = $state(false);
@@ -360,7 +366,7 @@
 								</div>
 							{/if}
 							{#if upload.evidenceId}
-								<a class="place-in-scene-link" aria-label={`Place in scene: ${upload.fileName}`} href={`/cases/${encodeURIComponent(caseId)}/board?view=detective&evidenceId=${encodeURIComponent(upload.evidenceId)}`}>
+								<a class="place-in-scene-link" aria-label={`Place in scene: ${upload.fileName}`} href={`/cases/${encodeURIComponent(caseId)}/board?view=detective&evidenceId=${encodeURIComponent(upload.evidenceId)}`} onclick={(event) => openExhibitInDetectiveMode(event, `/cases/${encodeURIComponent(caseId)}/board?view=detective&evidenceId=${encodeURIComponent(upload.evidenceId)}`)}>
 									Place in scene · open in Detective Mode
 								</a>
 							{/if}

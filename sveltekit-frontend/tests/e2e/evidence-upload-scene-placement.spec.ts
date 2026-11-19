@@ -12,7 +12,14 @@ test('an accepted upload keeps its exhibit link and reaches explicit scene place
 	const markerPath = `/api/cases/${caseId}/scenes/main-scene/markers`;
 	const pageErrors: string[] = [];
 	const shaderErrors: string[] = [];
+	const boardNavigationTrace: string[] = [];
 	page.on('pageerror', (error) => pageErrors.push(error.message));
+	page.on('request', (request) => {
+		if (request.url().includes(`/cases/${caseId}/board`)) boardNavigationTrace.push(`request:${request.method()} ${request.url()}`);
+	});
+	page.on('framenavigated', (frame) => {
+		if (frame === page.mainFrame()) boardNavigationTrace.push(`frame:${frame.url()}`);
+	});
 	page.on('console', (message) => {
 		if (message.type() === 'error' && /THREE\.WebGLProgram|shader error/i.test(message.text())) {
 			shaderErrors.push(message.text());
@@ -68,7 +75,12 @@ test('an accepted upload keeps its exhibit link and reaches explicit scene place
 	await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '72');
 	await expect(links).toHaveAttribute('href', `${boardPath}?view=detective&evidenceId=${evidenceId}`);
 	await links.click();
-	await expect(page).toHaveURL(new RegExp(`view=detective&evidenceId=${evidenceId}`));
+	try {
+		await expect(page).toHaveURL(new RegExp(`view=detective&evidenceId=${evidenceId}`));
+	} catch (error) {
+		console.error('Detective Mode link navigation trace:', boardNavigationTrace, 'page errors:', pageErrors);
+		throw error;
+	}
 	await page.locator('.modal-close[aria-label="Close"]').click();
 
 	const placement = page.getByRole('region', { name: 'Place evidence marker' });
@@ -77,6 +89,51 @@ test('an accepted upload keeps its exhibit link and reaches explicit scene place
 	await expect(save).toBeDisabled();
 	const canvas = page.locator('canvas.three-crime-canvas');
 	await expect(canvas).toBeVisible();
+	await expect.poll(async () => ({
+		state: await canvas.getAttribute('data-guide'),
+		issue: await canvas.getAttribute('data-guide-issue'),
+		rig: await canvas.getAttribute('data-guide-rig-diagnostic')
+	})).toEqual({ state: 'rigged', issue: null, rig: null });
+	await expect(canvas).toHaveAttribute('data-guide-action', 'Idle');
+	const layers = page.getByText('Layers', { exact: true });
+	await layers.click();
+	for (const action of ['Walk', 'Inspect', 'Interact', 'Idle']) {
+		await page.getByLabel('Guide action').selectOption(action);
+		await expect(canvas).toHaveAttribute('data-guide-action', action);
+	}
+	await page.getByRole('checkbox', { name: 'Scrub guide clip' }).check();
+	const clipTime = page.getByLabel('Guide clip time');
+	const midpoint = await clipTime.evaluate((element) => {
+		const range = element as HTMLInputElement;
+		const value = (Number(range.max) / 2).toFixed(2);
+		range.value = value;
+		range.dispatchEvent(new Event('input', { bubbles: true }));
+		return value;
+	});
+	const midpointValue = String(Number(midpoint));
+	await expect(canvas).toHaveAttribute('data-guide-scrub-time', midpointValue);
+	const midpointFrame = await canvas.screenshot();
+	await clipTime.evaluate((element) => {
+		const range = element as HTMLInputElement;
+		range.value = range.max;
+		range.dispatchEvent(new Event('input', { bubbles: true }));
+	});
+	await expect(canvas).toHaveAttribute('data-guide-scrub-time', String(Number(await clipTime.getAttribute('max'))));
+	await clipTime.evaluate((element, value) => {
+		const range = element as HTMLInputElement;
+		range.value = String(value);
+		range.dispatchEvent(new Event('input', { bubbles: true }));
+	}, midpointValue);
+	await expect(canvas).toHaveAttribute('data-guide-scrub-time', midpointValue);
+	expect(await canvas.screenshot()).toEqual(midpointFrame);
+	await page.getByRole('checkbox', { name: 'Scrub guide clip' }).uncheck();
+	await expect(canvas).not.toHaveAttribute('data-guide-scrub-time');
+	const guideToggle = page.getByRole('checkbox', { name: 'Illustrative detective guide' });
+	await guideToggle.press('Space');
+	await expect(canvas).toHaveAttribute('data-guide-visible', 'false');
+	await guideToggle.press('Space');
+	await expect(canvas).toHaveAttribute('data-guide-visible', 'true');
+	await layers.click();
 	const handle = placement.getByRole('button', { name: 'Choose position on floor' });
 	const bounds = await canvas.boundingBox();
 	if (!bounds) throw new Error('Scene canvas has no layout bounds');
@@ -116,10 +173,13 @@ test('an accepted upload keeps its exhibit link and reaches explicit scene place
 
 	// A forged exhibit URL cannot select an exhibit or enable the case assistant.
 	await page.setViewportSize({ width: 820, height: 980 });
+	await page.route('**/models/detective-actor-v1.glb', (route) => route.fulfill({ status: 404 }));
 	await page.goto(`${boardPath}?view=detective&evidenceId=${firstExhibit}`);
 	await expect(placement.getByLabel('Exhibit')).toHaveValue('');
 	await expect(placement.getByRole('button', { name: 'Ask assistant' })).toHaveCount(0);
 	await expect(canvas).toBeVisible();
+	await expect(canvas).toHaveAttribute('data-guide', 'fallback');
+	await expect(page.getByText('Using the static guide. Its animations are unavailable.')).toBeVisible();
 	expect((await canvas.boundingBox())!.width).toBeGreaterThan(600);
 	expect(pageErrors).toEqual([]);
 });

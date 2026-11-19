@@ -15,6 +15,7 @@ import { getFileFromSeaweed } from '$lib/server/storage/seaweed.js';
 import { ARTIFACTS_BUCKET, storageBuckets } from '$lib/server/storage/storage-buckets.js';
 import {
 	buildPackedMotionLodsV1, decodeVideoMotionLutIndicesV1, VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1,
+	VIDEO_MOTION_COMPACT_LOD_V1,
 } from '$lib/shared/video-motion-lut-v1.js';
 import { humanCoco17PoseSchemaV1 } from '$lib/shared/pose-skeleton-schema-v1.js';
 import { createPlanarCameraCalibrationV1, type PlanarCalibrationAnchorV1 } from '$lib/splat/planar-camera-calibration-v1.js';
@@ -124,6 +125,7 @@ async function saveFixtureSceneFromBrowser(input: {
 		channel: 'chrome', headless: true, args: ['--disable-webgpu', '--use-gl=angle', '--use-angle=swiftshader'],
 	});
 	const handled = new Map<string, number[]>();
+	const motionTransfers: Array<{ path: string; lod: string | null; bytes: number }> = [];
 	const errors: string[] = [];
 	try {
 		const context = await browser.newContext({ serviceWorkers: 'block' });
@@ -180,9 +182,13 @@ async function saveFixtureSceneFromBrowser(input: {
 					return route.fulfill({ status: 404 });
 				}
 				handled.set(label, [...(handled.get(label) ?? []), response.status]);
+				const body = Buffer.from(await response.arrayBuffer());
+				if (label === 'motion-preview' && response.ok) {
+					motionTransfers.push({ path: url.pathname, lod: response.headers.get('X-Motion-LOD'), bytes: body.byteLength });
+				}
 				await route.fulfill({
 					status: response.status, headers: Object.fromEntries(response.headers.entries()),
-					body: Buffer.from(await response.arrayBuffer()),
+					body,
 				});
 			}
 		);
@@ -192,7 +198,15 @@ async function saveFixtureSceneFromBrowser(input: {
 			.toBeGreaterThanOrEqual(2);
 		const motionCue = page.getByRole('button', { name: /Review pixel-change cue at/ }).nth(1);
 		await motionCue.click();
-		await page.getByRole('figure', { name: 'Low-resolution frame-to-frame motion cue' }).locator('canvas:not(.hidden)').waitFor();
+		const preview = page.getByRole('region', { name: 'Video pixel-change review cues' })
+			.getByRole('figure', { name: 'Low-resolution frame-to-frame motion cue' });
+		await preview.locator('canvas:not(.hidden)').waitFor();
+		const samplePath = `${evidencePath}/motion-preview/1`;
+		expect(motionTransfers).toContainEqual({ path: samplePath, lod: '32x64', bytes: 1024 });
+		expect(motionTransfers.every(({ bytes }) => bytes === 1024)).toBe(true);
+		await preview.getByRole('button', { name: 'Full motion detail' }).click();
+		await expect.poll(() => motionTransfers).toContainEqual({ path: samplePath, lod: null, bytes: 4112 });
+		await preview.locator('canvas:not(.hidden)').waitFor();
 		await page.getByRole('button', { name: 'Add manual human pose' }).click();
 		await page.getByRole('button', { name: 'Load authorized analyzed frame' }).click();
 		await page.locator('.pose-stage-image').waitFor();
@@ -258,7 +272,20 @@ async function proveStoredMotionScene(input: {
 		expect(tile.headers.get('X-Frame-Timestamp-Ms')).toBe(String(entry.timestampMs));
 		expect(tile.headers.get('X-Analysis-Revision')).toBe(analysisRevision);
 		expect(tile.headers.get('X-Source-Revision')).toBe(sourceRevision);
-		expect(sha256(new Uint8Array(await tile.arrayBuffer()))).toBe(sample.artifact.sha256);
+		const canonical = new Uint8Array(await tile.arrayBuffer());
+		expect(sha256(canonical)).toBe(sample.artifact.sha256);
+		const compact = await checked(await motion.GET({
+			locals, params: { id: evidenceId, frameIndex: String(sample.sampleIndex) },
+			url: new URL(`http://127.0.0.1/scratch?lane=motion-sample&lod=${VIDEO_MOTION_COMPACT_LOD_V1.token}`),
+		} as Parameters<typeof motion.GET>[0]), 200);
+		for (const header of ['X-Frame-Timestamp-Ms', 'X-Analysis-Revision', 'X-Source-Revision']) {
+			expect(compact.headers.get(header)).toBe(tile.headers.get(header));
+		}
+		expect(compact.headers.get('X-Motion-LOD')).toBe(VIDEO_MOTION_COMPACT_LOD_V1.token);
+		const compactBytes = new Uint8Array(await compact.arrayBuffer());
+		expect(compactBytes).toEqual(buildPackedMotionLodsV1(decodeVideoMotionLutIndicesV1(canonical))[3]?.data);
+		expect(compactBytes).toHaveLength(VIDEO_MOTION_COMPACT_LOD_V1.byteLength);
+		expect(compact.headers.get('ETag')).toBe(`"sha256-${sha256(compactBytes).slice(7)}"`);
 		const jpeg = await checked(await frame.GET({
 			locals, params: { id: evidenceId, frameIndex: String(entry.frameIndex) },
 		} as Parameters<typeof frame.GET>[0]), 200);

@@ -1,0 +1,41 @@
+{
+  "schema": "depth-evidence-rehearsal-receipt.v1",
+  "status": "ROLLBACK_REHEARSAL_PASSED__NOT_APPLIED__NOT_STORED",
+  "generatedAt": "2026-11-18",
+  "evidence": {
+    "id": "c577cb33-9e20-4819-9dbe-e264a71be77e",
+    "caseId": "b0161460-9c0f-4b65-bd60-afaca6aad722",
+    "mimeType": "image/png",
+    "sourceRevision": "sha256:c7ace23cd15cfbef57927fb56bfe274638258a45b018e63bf08fc1aa97f2a23f",
+    "bytesReadFrom": "SeaweedFS filer 127.0.0.1:8888 (read-only GET); SHA-256 matched the DB hash"
+  },
+  "producer": {
+    "wrapper": "sveltekit-frontend/src/lib/server/evidence/depth-producer-v1.ts",
+    "worker": "python/atlas_depth_anything_v1.py",
+    "model": "depth-anything/Depth-Anything-V2-Small-hf @ 5426e4f0f36572d16453bbda7a8389317b1bef99",
+    "depthType": "relative_monocular",
+    "depthSha256": "sha256:dee3f24b88504a359bceb293f1966b002e6ea8e6712dd2ad322c35372916134b",
+    "dimensions": { "width": 1024, "height": 1024 },
+    "modelLicense": "UNVERIFIED"
+  },
+  "storageKey": "seaweed://legal-evidence/evidence/b0161460-9c0f-4b65-bd60-afaca6aad722/c577cb33-9e20-4819-9dbe-e264a71be77e-depth-dee3f24b88504a359bceb293f1966b002e6ea8e6712dd2ad322c35372916134b.png",
+  "databaseRehearsal": {
+    "sql": "scratch/depth-evidence-rehearsal/rehearsal.sql",
+    "method": "compare-and-set on the exact pre-image; refuses if depthAnalysis exists or the pre-image changed",
+    "transaction": "BEGIN ... ROLLBACK",
+    "updatedRowsInRehearsal": 1,
+    "postRollbackCheck": { "hasDepthAnalysis": false, "topLevelKeys": 11 },
+    "preImageKeysPreserved": true
+  },
+  "storage": {
+    "depthObjectUploaded": false,
+    "filerProbe": "404 for the planned depth key (not stored)"
+  },
+  "notDone": [
+    "SeaweedFS upload of the depth PNG",
+    "applying the SQL (needs explicit write approval)",
+    "GET /api/evidence/[id]/depth-map readback of the stored artifact",
+    "DepthReliefViewer display of a stored attachment",
+    "model license verification"
+  ]
+}

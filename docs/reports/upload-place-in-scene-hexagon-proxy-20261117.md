@@ -31,6 +31,46 @@ The case marker shares one six-segment Three.js cylinder geometry and one materi
 - Vitest passed 17/17. The PostgreSQL 18 rollback check created an image-anchored marker and a scene-local marker, read each back under its own scene key, and verified absence after rollback. The other tests cover the progress envelope, board authorization, and BVH.
 - The fast Svelte check reported 0 errors and 7 warnings. The live signed-in upload, placement save, and fresh browser reopen still need one continuous run.
 
+## Detective Mode dossier follow-up
+
+The station image informed the expanded canvas, compact layer control, and view tools. The multiplane illustration informed the proposed source/depth/review layer separation. The PS1 ordering diagram was used to identify transparency and retro effects as profiling candidates. The matrix and Blender references informed shared transforms and UV presentation. Copies of all five input images are under `.tmp/atlas/detective-dossier-references-20261117/` for local review. No reference art is loaded by the application.
+
+The case workspace uses the existing cream dossier tokens. The real case exhibit list and inspector can collapse, expanding the 3D view. Narrower widths stack the inspector below the canvas. **Ask assistant** opens the existing board chat with the authorized exhibit selected and visible in the panel. A real model response was outside this browser fixture.
+
+The illustrative blockout uses six instances on one box geometry and material. Saved marker moves refit the existing picking BVH. The case renderer caps device pixel ratio at 1.5. The optional procedurally colored floor uses the existing WebGL2 indexed texture path. Its 64×64 source contains 2,048 index bytes and a shared 16×RGBA8 palette of 64 bytes before texture padding. The portable motion format is still 64×128 with 4,096 packed pixel bytes plus its 16-byte header. The default 32×64 motion preview has 1,024 packed index bytes. These are payload sizes.
+
+### Verification (2026-11-17)
+
+- Browser command from `sveltekit-frontend`: `npx playwright test tests/e2e/evidence-upload-scene-placement.spec.ts tests/e2e/scene-primitive-inspector.spec.ts --project=chromium --workers=1 --retries=0`. Used `PLAYWRIGHT_SKIP_GLOBAL_SETUP=true`, `SCENE_PLACEMENT_TEST_CASE_ID=b8fbe1be-dad0-4986-b51d-b28338acd71a`, and `SCENE_PLACEMENT_TEST_EVIDENCE_ID=4fb1e374-ab27-489c-857b-6dd3618d1acb`. Reported `2 passed (29.3s)`. The desktop canvas expanded, color shader rendered, a forged exhibit ID could not populate the assistant, and the 820-pixel layout kept the canvas usable. The test intercepted upload and marker writes. Browser base revision was `dcb643ccfeb4230bce5565b82f7cd5102f296571` with worktree changes. Screenshots were saved in `.tmp/atlas/detective-dossier-qa-20261118/`.
+- Focused command from `sveltekit-frontend`: `npx vitest run src/lib/shared/video-motion-cue-v1.spec.ts src/lib/splat/indexed-palette-shader-v1.spec.ts src/lib/splat/reviewed-ground-plane-track-v1.spec.ts src/lib/splat/spatial-bvh-manager-v1.spec.ts 'src/routes/(app)/cases/[id]/board/board-page-server-auth.spec.ts' --reporter=dot`. Output `Test Files 5 passed (5)` and `Tests 28 passed (28)`.
+- Signed-in upload, investigator review, and fresh scene reopen through the running app remain open. The separate PostgreSQL and SeaweedFS scratch browser proof is recorded in `video-motion-lut-v1-20261116.md`.
+
+## Original detective guide (2026-11-18)
+
+**CREATED.** The original guide uses a petrol coat, cream cuffs, oxblood tie, brass badge, glasses, pocket lens, and notebook. The procedural Blender source uses one joint influence per authoring vertex. The GLB contains one primitive, 969 triangles, 15 joints, a nearest-filtered 64×64 PNG atlas, and Idle, Walk, Inspect, and Interact clips. Runtime GLB is `sveltekit-frontend/static/models/detective-actor-v1.glb` (167,084 bytes, SHA-256 `2a23e0c7912592a2560e53a19864df8edb728d24e5bd2e7dc4f529011c288318`). Editable Blender and rigged FBX exports, atlas, and previews are in `.tmp/atlas/detective-actor-v1/`. The pasted segmented geometry informed the joint organization. Character meshes, textures, and movements were authored for this workspace.
+
+**WIRED.** In Detective Mode, open **Layers → Illustrative detective guide** and choose a guide action. Three.js loads the GLB and plays its embedded clips. Walk moves the guide along the existing illustrative path. Inspect and Reach play authored gestures. Exhibit selection and marker placement stay in the case editor. If the GLB is unavailable, the viewer displays its procedural guide and reports animation unavailable.
+
+**PROVEN for the asset and controls.** Worktree base `4f3091bbb4832bf728fe062cdd34fe9c9b5a6ddc` with local edits. Generation command from repository root:
+
+```powershell
+& 'C:/Program Files/Blender Foundation/Blender 4.3/blender.exe' -b --factory-startup --python-exit-code 3 --python 'scripts/atlas/generate-detective-actor.py' -- '.tmp/atlas/detective-actor-v1'
+```
+
+Output `DETECTIVE_ACTOR vertices=577 triangles=969 joints=15`. FBX import returned an armature with 15 bones, a mesh with 15 vertex groups, and all four actions. Generated art preview and browser placement capture are `.tmp/atlas/detective-actor-v1/detective-actor-preview.png` and `.tmp/atlas/detective-actor-v1/detective-in-case.png`.
+
+From `sveltekit-frontend`, with `PLAYWRIGHT_SKIP_GLOBAL_SETUP=true`, `SCENE_PLACEMENT_TEST_CASE_ID=b8fbe1be-dad0-4986-b51d-b28338acd71a`, and `SCENE_PLACEMENT_TEST_EVIDENCE_ID=4fb1e374-ab27-489c-857b-6dd3618d1acb`, `npx playwright test tests/e2e/evidence-upload-scene-placement.spec.ts tests/e2e/scene-primitive-inspector.spec.ts --project=chromium --workers=1 --retries=0` reported `2 passed (56.8s)`. The browser loaded the real GLB, selected the four actions, toggled guide visibility, and exercised the marker workflow with intercepted upload and marker writes. An adversarial 404 for the GLB preserved the canvas and displayed the fallback status. The existing demo marker interaction test also passed.
+
+### Deterministic guide clip scrubbing (2026-11-18)
+
+**CREATED, WIRED, and PROVEN in the case browser fixture.** The case Layers panel now has an opt-in clip-time slider. It samples the selected GLB animation at an absolute, clamped time with the Three.js mixer held at zero delta; Walk also derives the guide's illustrative path position from that clip time. Turning scrubbing off returns to the existing free-running action behavior. Loading rejects an unexpected rig hierarchy or missing/empty/non-finite required clips and retains the existing procedural fallback. The rig check normalizes names using Three.js `PropertyBinding.sanitizeNodeName`, because GLTFLoader converts the source rig's spaces and punctuation. This is animation of the original illustrative guide, not retargeted evidence motion.
+
+An independent GLB read measured 167,084 transfer bytes, 98,842 mesh-accessor bytes, 21,836 unique animation accessor bytes, 960 inverse-bind bytes, and an 886-byte embedded PNG atlas. Expanding that 64×64 atlas to RGBA8 is 16,384 texel bytes; the listed model arrays plus expanded texels total 138,022 bytes before Three.js objects, skin pose matrices, GPU alignment, render targets, and driver overhead. This is one asset's estimate, not a measured whole-scene or GPU residency result. In `scene-document-v1.ts`, the existing 8 MiB limit applies to encoded derived/LOD scene-asset payloads; it does not enforce an 8 MiB live CPU/GPU working set. The full scene residency budget and LRU behavior remain open.
+
+The updated `tests/e2e/evidence-upload-scene-placement.spec.ts` checks the accepted-upload link into Detective Mode, loads the real GLB, samples the selected clip, clamps at the end, returns to a prior time and compares the rendered canvas bytes at the same clip time, resumes normal playback, and completes the intercepted marker and assistant flow. From `sveltekit-frontend`, with `PLAYWRIGHT_SKIP_GLOBAL_SETUP=true`, `SCENE_PLACEMENT_TEST_CASE_ID=b8fbe1be-dad0-4986-b51d-b28338acd71a`, and `SCENE_PLACEMENT_TEST_EVIDENCE_ID=4fb1e374-ab27-489c-857b-6dd3618d1acb`, `npm exec -- playwright test tests/e2e/evidence-upload-scene-placement.spec.ts --project=chromium --workers=1 --retries=0` reported `1 passed (39.7s)`. Upload and marker writes were intercepted; this did not write case data.
+
+The final `npm run check:fast` reported `0 errors and 7 warnings in 1 file`; the warnings are unused CSS selectors in `src/routes/(app)/analysis-center/+page.svelte`. An earlier full check found and prompted correction of three new `currentTarget` typing errors and four evidence-context typing errors; the scoped check then passed without errors. Scoped `git diff --check` passed for all seven changed implementation, test, ledger, and report files; Git emitted only existing LF-to-CRLF conversion notices.
+
 ## Initial validation
 
 No test, typecheck, browser, database, worker, or object-store run was performed.

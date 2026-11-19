@@ -1,0 +1,50 @@
+{
+  "schema": "keyframe-select-smoke-receipt.v1",
+  "status": "LOCAL_SELECTOR_PASSED__NOT_PERSISTED__NOT_EVIDENCE",
+  "generatedAt": "2026-11-18",
+  "selector": "python/atlas_keyframe_select_v1.py",
+  "interpreter": "C:/Users/james/atlas-asr-venv/Scripts/python.exe (PyAV 18.1.0)",
+  "unitTests": {
+    "file": "python/test_atlas_keyframe_select_v1.py",
+    "result": "7 passed",
+    "covers": ["scene changes selected with PTS", "static video gets only periodic fallback", "receipt hashes source", "near-duplicates dropped", "deterministic cap", "bad inputs rejected", "dhash and hamming"]
+  },
+  "source": {
+    "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+    "caseId": "b0161460-9c0f-4b65-bd60-afaca6aad722",
+    "sha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+    "bytesReadFrom": "SeaweedFS filer 127.0.0.1:8888 (read-only GET); SHA-256 matched the DB hash",
+    "codec": "h264",
+    "resolution": "1280x720",
+    "durationS": 10.0
+  },
+  "runs": [
+    {
+      "params": { "sampleFps": 1.0, "changeThreshold": 0.08 },
+      "sampledFrames": 10,
+      "keyframesPtsMs": [0],
+      "note": "single first-frame keyframe; no change reached threshold at 1 fps"
+    },
+    {
+      "params": { "sampleFps": 4.0, "changeThreshold": 0.03 },
+      "sampledFrames": 40,
+      "keyframes": [
+        { "ptsMs": 0, "reason": "first_frame" },
+        { "ptsMs": 2750, "reason": "visual_change", "change": 0.031637 },
+        { "ptsMs": 7500, "reason": "visual_change", "change": 0.03529 }
+      ]
+    }
+  ],
+  "limits": [
+    "pixel-level change score: cannot tell a moving object from a lighting change",
+    "one 10-second clip; threshold chosen by inspection, not validated on labelled footage",
+    "derivative index only; no media written, nothing uploaded, nothing persisted",
+    "keyframe selection is not semantic event detection"
+  ],
+  "notDone": [
+    "persisting keyframe rows with the source UUID and PTS",
+    "running YOLOX/SAM 2/depth on selected frames",
+    "validating thresholds on labelled footage",
+    "tracking objects across keyframes"
+  ]
+}

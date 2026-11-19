@@ -1,7 +1,6 @@
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { tmpdir } from 'node:os';
 import { and, eq, isNull, sql } from 'drizzle-orm';
 import { db } from '$lib/server/db/client.js';
 import { createAudioWindowLedgerIfAvailableV1, type AudioWindowLedgerDatabaseV1 } from './audio-window-ledger-v1.js';
@@ -777,15 +776,13 @@ export async function processCanonicalVideoAnalysisV1(
 		.limit(1);
 	if (!currentSource) throw new Error('EVIDENCE_VIDEO_SOURCE_REVISION_STALE');
 
-	const workDir = join(tmpdir(), `atlas-video-${input.analysisJobId}`);
-	await mkdir(workDir, { recursive: true });
-	const sourcePath = join(workDir, input.fileName.replace(/[^a-zA-Z0-9._-]/g, '_'));
+	// The faster-whisper worker only reads files staged under its allowed media root.
+	const mediaDir = join(process.cwd(), 'temp', 'media');
+	await mkdir(mediaDir, { recursive: true });
+	const workDir = await mkdtemp(join(mediaDir, 'atlas-video-'));
+	const sourcePath = join(workDir, `source-${input.fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`);
 	try {
-		await writeFile(sourcePath, input.bytes, { flag: 'wx' }).catch(async (error: NodeJS.ErrnoException) => {
-			if (error.code !== 'EEXIST') throw error;
-			await rm(sourcePath, { force: true });
-			await writeFile(sourcePath, input.bytes, { flag: 'wx' });
-		});
+		await writeFile(sourcePath, input.bytes, { flag: 'wx' });
 		await input.onProgress?.('content_analysis');
 		const probe = await dependencies.probe(sourcePath);
 		if (!probe.hasVideoStream) throw new Error('VIDEO_STREAM_NOT_FOUND');

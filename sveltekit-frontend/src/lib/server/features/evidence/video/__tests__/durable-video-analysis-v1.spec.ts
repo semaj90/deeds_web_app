@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createHash } from 'node:crypto';
+import { dirname, join } from 'node:path';
 import sharp from 'sharp';
 
 const mocks = vi.hoisted(() => ({
@@ -650,6 +651,9 @@ describe('durable video analysis worker stage', () => {
 		}, dependencies());
 
 		expect(mocks.extractAudio).toHaveBeenCalledTimes(1);
+		const [sourcePath, workDir] = mocks.extractAudio.mock.calls[0]!;
+		expect(dirname(sourcePath)).toBe(workDir);
+		expect(dirname(workDir)).toBe(join(process.cwd(), 'temp', 'media'));
 		expect(mocks.persist).toHaveBeenCalledWith(expect.objectContaining({
 			transcriptionStatus: 'COMPLETED',
 			frames: [expect.objectContaining({ objects: [expect.objectContaining({ label: 'person', bbox: [250, 125, 500, 375] })] })],

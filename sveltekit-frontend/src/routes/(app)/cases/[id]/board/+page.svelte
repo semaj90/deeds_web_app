@@ -31,6 +31,8 @@
 	import { notificationStore } from '$lib/stores/notifications.svelte';
 	import { findCaseEvidenceTargetV1 } from '$lib/components/evidence/evidence-modal-target-v1.js';
 
+	type EvidenceBoardContextRow = { id?: string; title?: string; keyPoints?: string[] };
+
 	// Props
 	let { data }: { data: PageData } = $props();
 	let caseId = $derived(data.caseId);
@@ -67,7 +69,7 @@
 	let activeTool = $state<'select' | 'evidence' | 'connection' | 'note' | 'marker'>('select');
 	let showAIChat = $state(false);
 	let sceneChatEvidenceId = $state<string | null>(null);
-	const sceneChatExhibit = $derived(findCaseEvidenceTargetV1(evidenceItems, sceneChatEvidenceId));
+	const sceneChatExhibit = $derived(findCaseEvidenceTargetV1<EvidenceBoardContextRow>(evidenceItems, sceneChatEvidenceId));
 	let isGeneratingLayout = $state(false);
 	function openPersistedEvidence(item: any, timestampMs?: number) {
 		const persisted = findCaseEvidenceTargetV1(evidenceItems, item?.id);
@@ -1055,7 +1057,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 	async function askFromScene(question: string, exhibitId = selectedEvidence?.id) {
 		if (!chatSession || chatSession.status !== 'idle') return;
-		const exhibit = findCaseEvidenceTargetV1(evidenceItems, exhibitId);
+		const exhibit = findCaseEvidenceTargetV1<EvidenceBoardContextRow>(evidenceItems, exhibitId);
 		if (!exhibit) return;
 		const groundedPrompt = [
 			`The user is inspecting case ${caseId} in Detective Mode.`,
@@ -1202,7 +1204,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 <svelte:window onkeydown={handleKeyboard} />
 
-<div class="evidence-board-container">
+<div class="evidence-board-container" class:investigative-layout={activeView === 'investigative'}>
 	<!-- Header -->
 	<header class="board-header">
 		<div class="header-left">
@@ -1338,13 +1340,15 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 	<!-- Top Tools Toolbar relocated to bottom floating dock -->
 
 	{#if activeView === 'investigative'}
+		{#if data.loadError}<p class="board-read-error" role="alert">{data.loadError}</p>{/if}
 		<div class="investigative-fullscreen-wrap h-[calc(100vh-140px)] w-full overflow-hidden">
 			<InvestigativeCanvasStar
 				caseId={caseId}
 				docketNumber={data?.caseNumber || `#${caseId.slice(0, 8).toUpperCase()}`}
 				caseTitle={data?.caseTitle || (data?.caseId ? `Case #${caseId.slice(0, 8)}` : 'UNTITLED CASE DOSSIER')}
 				evidenceItems={evidenceItems}
-				demoMode={evidenceItems.length === 0}
+				dossierContext={data.dossierContext}
+				connections={dbConnections}
 				onOpenModal={(item) => openPersistedEvidence(item)}
 				onOpenUpload={() => (showAddEvidence = true)}
 				onOpenBrief={() => (showCourtroomBrief = true)}
@@ -2475,6 +2479,14 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 </div>
 
 <style>
+	.board-read-error { margin: 0; padding: .55rem 1rem; color: var(--dossier-crimson, #67140f); background: var(--dossier-bg-card, #faf6f0); }
+	@media (max-width: 820px) {
+		.investigative-fullscreen-wrap { height: auto; overflow: visible; }
+		.evidence-board-container.investigative-layout { height: auto; min-height: 100dvh; }
+		.investigative-layout .board-header { align-items: flex-start; flex-direction: column; gap: .65rem; }
+		.investigative-layout .header-actions, .investigative-layout .view-tabs { flex-wrap: wrap; }
+		.investigative-layout .header-actions { gap: .4rem; }
+	}
 	.evidence-board-container {
 		display: flex;
 		flex-direction: column;
@@ -3707,6 +3719,15 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		flex-direction: column;
 		z-index: 100;
 		box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+	}
+
+	.scene-exhibit-chat {
+		width: min(400px, 100vw);
+		background: var(--dossier-bg-card, #faf6f0);
+	}
+
+	.scene-exhibit-chat .chat-header {
+		background: var(--dossier-bg-workspace, #ece7dc);
 	}
 
 	.chat-header {

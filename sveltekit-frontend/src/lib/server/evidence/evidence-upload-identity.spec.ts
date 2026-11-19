@@ -10,5 +10,10 @@ describe('resolveEvidenceUploaderId', () => {
 
 	it('preserves the authenticated user id for ownership attribution', () => {
 		expect(resolveEvidenceUploaderId('42')).toBe('42');
+		expect(resolveEvidenceUploaderId(42)).toBe('42');
+	});
+
+	it.each([0, -1, 1.5, NaN, Infinity])('rejects an invalid numeric owner (%s)', (userId) => {
+		expect(resolveEvidenceUploaderId(userId)).toBeNull();
 	});
 });

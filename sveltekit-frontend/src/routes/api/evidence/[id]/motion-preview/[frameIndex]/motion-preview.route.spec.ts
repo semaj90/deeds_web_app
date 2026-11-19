@@ -87,10 +87,13 @@ function makeMotionSample() {
 	};
 }
 
-function event(options: { user?: { id: string } | null; frameIndex?: string; motionSample?: boolean } = {}) {
+function event(options: { user?: { id: string } | null; frameIndex?: string; motionSample?: boolean; lod?: string } = {}) {
+	const url = new URL('http://localhost/api/evidence/test/motion-preview/0');
+	if (options.motionSample) url.searchParams.set('lane', 'motion-sample');
+	if (options.lod !== undefined) url.searchParams.set('lod', options.lod);
 	return {
 		params: { id: EVIDENCE_ID, frameIndex: options.frameIndex ?? '0' },
-		url: new URL(options.motionSample ? 'http://localhost/api/evidence/test/motion-preview/0?lane=motion-sample' : 'http://localhost/api/evidence/test/motion-preview/0'),
+		url,
 		locals: { user: options.user === undefined ? { id: '7' } : options.user },
 	} as never;
 }
@@ -120,9 +123,18 @@ describe('GET /api/evidence/[id]/motion-preview/[frameIndex]', () => {
 			id: EVIDENCE_ID, caseId: CASE_ID, hash: SOURCE_HASH,
 			aiAnalysis: { videoAnalysis: { sourceRevision: SOURCE_REVISION, analysisRevision: ANALYSIS_REVISION, frames: [makeFrame()], motionSamples: [makeMotionSample()] } },
 		}];
-		const response = await GET(event({ motionSample: true }));
+		const response = await GET(event({ motionSample: true, lod: '32x64' }));
 		expect(response.status).toBe(200);
 		expect(response.headers.get('X-Frame-Timestamp-Ms')).toBe('1000');
+		expect(response.headers.get('X-Source-Revision')).toBe(SOURCE_REVISION);
+		expect(response.headers.get('X-Analysis-Revision')).toBe(ANALYSIS_REVISION);
+		expect(response.headers.get('X-Motion-LOD')).toBe('32x64');
+		expect(response.headers.get('Content-Type')).toBe('application/vnd.atlas.video-motion-lod-4bpp-v1');
+		expect(response.headers.get('Content-Length')).toBe('1024');
+		expect(response.headers.get('Cache-Control')).toBe('private, no-store');
+		const compact = Buffer.from(await response.arrayBuffer());
+		expect(compact).toEqual(Buffer.alloc(1024));
+		expect(response.headers.get('ETag')).toBe(`"sha256-${createHash('sha256').update(compact).digest('hex')}"`);
 		expect(mocks.getFile).toHaveBeenCalledWith({ bucket: 'atlas-artifacts', objectKey: SAMPLE_OBJECT_KEY, maximumBytes: 4112 });
 		const legacyResponse = await GET(event());
 		expect(legacyResponse.status).toBe(200);
@@ -130,10 +142,21 @@ describe('GET /api/evidence/[id]/motion-preview/[frameIndex]', () => {
 	});
 
 	it('denies unauthenticated and inaccessible callers without reading storage', async () => {
-		expect((await GET(event({ user: null }))).status).toBe(401);
+		expect((await GET(event({ user: null, lod: '32x64' }))).status).toBe(401);
 		mocks.rows = [];
-		expect((await GET(event())).status).toBe(404);
+		expect((await GET(event({ lod: '32x64' }))).status).toBe(404);
 		expect(mocks.getFile).not.toHaveBeenCalled();
+	});
+
+	it('rejects an unknown LOD and a same-length corrupted compact source', async () => {
+		expect((await GET(event({ lod: '256x512' }))).status).toBe(400);
+		expect(mocks.getFile).not.toHaveBeenCalled();
+		const corrupted = Buffer.from(TILE_BYTES);
+		corrupted[16] = 0xf0;
+		mocks.getFile.mockResolvedValueOnce(corrupted);
+		const response = await GET(event({ lod: '32x64' }));
+		expect(response.status).toBe(502);
+		expect(await response.json()).toEqual({ success: false, error: 'MOTION_TILE_INTEGRITY_FAILED' });
 	});
 
 	it('rejects stale source revisions and corrupted tile bytes', async () => {

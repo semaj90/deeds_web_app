@@ -9,7 +9,9 @@ import { isUuid } from '$lib/server/validation.js';
 import { formatEvidenceSourceRevisionV1 } from '$lib/server/evidence-source-revision-v1.js';
 import { ARTIFACTS_BUCKET } from '$lib/server/storage/storage-buckets.js';
 import {
-	decodeVideoMotionLutIndicesV1,
+	compactPackedMotionLodV1,
+	readPackedVideoMotionLutV1,
+	VIDEO_MOTION_COMPACT_LOD_V1,
 	hasValidMotionComparisonV1,
 	VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1,
 	videoMotionLutManifestV1Schema,
@@ -29,6 +31,46 @@ function objectRecord(value: unknown): Record<string, unknown> | null {
 	return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
 }
 
+async function serveMotionTile(input: {
+	bucket: string;
+	artifact: { objectKey: string; sha256: string };
+	compact: boolean;
+	sourceRevision: string;
+	analysisRevision: string;
+	timestampMs: number;
+}) {
+	const bytes = await getFileFromSeaweed({
+		bucket: input.bucket,
+		objectKey: input.artifact.objectKey,
+		maximumBytes: VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1,
+	});
+	const digest = createHash('sha256').update(bytes).digest('hex');
+	if (bytes.byteLength !== VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1 || `sha256:${digest}` !== input.artifact.sha256) {
+		return failure('MOTION_TILE_INTEGRITY_FAILED', 502);
+	}
+	let tile;
+	try { tile = readPackedVideoMotionLutV1(bytes); }
+	catch { return failure('MOTION_TILE_FORMAT_INVALID', 502); }
+
+	const compact = VIDEO_MOTION_COMPACT_LOD_V1;
+	const body = input.compact ? compactPackedMotionLodV1(tile).data : bytes;
+	const bodyDigest = input.compact ? createHash('sha256').update(body).digest('hex') : digest;
+	return new Response(new Uint8Array(body).buffer, {
+		headers: {
+			'Content-Type': input.compact ? compact.contentType : 'application/vnd.atlas.video-motion-lut-v1',
+			'Content-Length': String(body.byteLength),
+			'Cache-Control': 'private, no-store',
+			'X-Content-Type-Options': 'nosniff',
+			'Cross-Origin-Resource-Policy': 'same-origin',
+			'X-Source-Revision': input.sourceRevision,
+			'X-Analysis-Revision': input.analysisRevision,
+			'X-Frame-Timestamp-Ms': String(input.timestampMs),
+			...(input.compact ? { 'X-Motion-LOD': compact.token } : {}),
+			ETag: `"sha256-${bodyDigest}"`,
+		},
+	});
+}
+
 /** Hash-check and return one compact motion tile only for an authorized, current source revision. */
 export const GET: RequestHandler = async ({ params, locals, url }) => {
 	const evidenceId = params.id;
@@ -38,6 +80,9 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 	if (!Number.isSafeInteger(frameIndex) || frameIndex < 0 || frameIndex >= 300) return failure('INVALID_FRAME_INDEX', 400);
 	const userId = Number(locals.user.id);
 	if (!Number.isSafeInteger(userId) || userId <= 0) return failure('UNAUTHORIZED', 401);
+	const lod = url.searchParams.get('lod');
+	const compact = lod === VIDEO_MOTION_COMPACT_LOD_V1.token;
+	if (lod !== null && !compact) return failure('INVALID_MOTION_LOD', 400);
 
 	try {
 		const [source] = await db.select({ id: evidence.id, caseId: evidence.caseId, hash: evidence.hash, aiAnalysis: evidence.aiAnalysis })
@@ -79,27 +124,13 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 			const jobId = separator > 0 ? remainder.slice(0, separator) : '';
 			const keyFile = separator > 0 ? remainder.slice(separator + 1) : '';
 			if (sample.artifact.bucket !== bucket || !isUuid(jobId) || keyFile !== fileName) return failure('MOTION_TILE_NOT_FOUND', 404);
-			const bytes = await getFileFromSeaweed({ bucket, objectKey: sample.artifact.objectKey, maximumBytes: VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1 });
-			const digest = createHash('sha256').update(bytes).digest('hex');
-			if (bytes.byteLength !== VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1 || `sha256:${digest}` !== sample.artifact.sha256) return failure('MOTION_TILE_INTEGRITY_FAILED', 502);
-			try { decodeVideoMotionLutIndicesV1(new Uint8Array(bytes)); }
-			catch { return failure('MOTION_TILE_FORMAT_INVALID', 502); }
-			return new Response(new Uint8Array(bytes), {
-				headers: {
-					'Content-Type': 'application/vnd.atlas.video-motion-lut-v1',
-					'Content-Length': String(bytes.byteLength),
-					'Cache-Control': 'private, no-store',
-					'X-Content-Type-Options': 'nosniff',
-					'Cross-Origin-Resource-Policy': 'same-origin',
-					'X-Source-Revision': currentRevision,
-					'X-Analysis-Revision': sample.analysisRevision,
-					'X-Frame-Timestamp-Ms': String(sample.timestampMs),
-					ETag: `"sha256-${digest}"`,
-				},
+			return await serveMotionTile({
+				bucket, artifact: sample.artifact, compact, sourceRevision: currentRevision,
+				analysisRevision: sample.analysisRevision, timestampMs: sample.timestampMs,
 			});
 		}
 		if (requestedLane !== null) return failure('INVALID_MOTION_LANE', 400);
-	if (frameIndex >= 60) return failure('MOTION_TILE_NOT_FOUND', 404);
+		if (frameIndex >= 60) return failure('MOTION_TILE_NOT_FOUND', 404);
 		const frame = objectRecord(videoAnalysis.frames[frameIndex]);
 		const parsed = videoMotionLutManifestV1Schema.safeParse(frame?.motionLut);
 		if (!parsed.success) return failure('MOTION_TILE_NOT_FOUND', 404);
@@ -123,25 +154,9 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 		const keyFile = separator > 0 ? remainder.slice(separator + 1) : '';
 		if (tile.artifact.bucket !== bucket || !isUuid(jobId) || keyFile !== fileName) return failure('MOTION_TILE_NOT_FOUND', 404);
 
-		const bytes = await getFileFromSeaweed({ bucket, objectKey: tile.artifact.objectKey, maximumBytes: VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1 });
-		const digest = createHash('sha256').update(bytes).digest('hex');
-		if (bytes.byteLength !== VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1 || `sha256:${digest}` !== tile.artifact.sha256) {
-			return failure('MOTION_TILE_INTEGRITY_FAILED', 502);
-		}
-		try { decodeVideoMotionLutIndicesV1(new Uint8Array(bytes)); }
-		catch { return failure('MOTION_TILE_FORMAT_INVALID', 502); }
-		return new Response(new Uint8Array(bytes), {
-			headers: {
-				'Content-Type': 'application/vnd.atlas.video-motion-lut-v1',
-				'Content-Length': String(bytes.byteLength),
-				'Cache-Control': 'private, no-store',
-				'X-Content-Type-Options': 'nosniff',
-				'Cross-Origin-Resource-Policy': 'same-origin',
-				'X-Source-Revision': currentRevision,
-				'X-Analysis-Revision': tile.analysisRevision,
-				'X-Frame-Timestamp-Ms': String(tile.timestampMs),
-				ETag: `"sha256-${digest}"`,
-			},
+		return await serveMotionTile({
+			bucket, artifact: tile.artifact, compact, sourceRevision: currentRevision,
+			analysisRevision: tile.analysisRevision, timestampMs: tile.timestampMs,
 		});
 	} catch {
 		return failure('MOTION_TILE_READ_FAILED', 502);

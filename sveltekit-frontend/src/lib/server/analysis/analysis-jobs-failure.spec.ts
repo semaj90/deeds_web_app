@@ -69,6 +69,13 @@ describe('durable upload pipeline status', () => {
 		chunkCount: 2,
 		persistedCount: 2,
 	};
+	const videoResult = {
+		...uploadResult,
+		evidenceId,
+		canonicalReceiptVerified: true,
+		chunkCount: 0,
+		persistedCount: 0,
+	};
 
 	it('moves evidence to processing using the job being executed', async () => {
 		const executor = { execute: vi.fn().mockResolvedValue({ rows: [{ attempt_count: 1, already_complete: false }] }) };
@@ -93,6 +100,27 @@ describe('durable upload pipeline status', () => {
 		await expect(failEvidenceUploadJobV1(jobId, evidenceId, 'source extraction failed', executor as never)).resolves.toBeUndefined();
 		expect(executor.transaction).toHaveBeenCalledOnce();
 		expect(tx.execute).toHaveBeenCalledTimes(3);
+	});
+
+	it('completes a verified video upload with frames and transcripts and zero vectors', async () => {
+		const tx = { execute: vi.fn().mockResolvedValue({ rows: [{ id: jobId }] }) };
+		const executor = { transaction: vi.fn((run) => run(tx)) };
+
+		await expect(completeEvidenceUploadJobV1(jobId, evidenceId, videoResult, executor as never)).resolves.toBeUndefined();
+		expect(tx.execute).toHaveBeenCalledTimes(3);
+	});
+
+	it('rejects zero-vector receipts without matching evidence or verified readback', async () => {
+		const executor = { transaction: vi.fn() };
+		const invalidReceipts = [
+			{ ...videoResult, evidenceId: jobId },
+			{ ...videoResult, canonicalReceiptVerified: false },
+		];
+		for (const receipt of invalidReceipts) {
+			await expect(completeEvidenceUploadJobV1(jobId, evidenceId, receipt, executor as never))
+				.rejects.toThrow('ANALYSIS_UPLOAD_CANONICAL_RECEIPT_INVALID');
+		}
+		expect(executor.transaction).not.toHaveBeenCalled();
 	});
 
 	it('rejects incomplete success receipts before changing either row', async () => {

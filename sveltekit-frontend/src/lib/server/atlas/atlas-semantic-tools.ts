@@ -14,6 +14,7 @@ import {
   type HeadroomCcrRetrieveReceiptV1,
   type HeadroomMessageV1,
 } from './context/headroom-ccr-client-v1.js';
+import { buildGanMcpHookObservationV1 } from '../../../../../packages/atlas-core/src/validation/gan-validation-hook-v1.js';
 
 export type AtlasSemanticToolName =
   | 'atlas.discover'
@@ -89,6 +90,7 @@ export interface AtlasSemanticToolResult {
   mock: boolean;
   backend: 'grpc' | 'search-runtime' | 'mock' | 'fsm';
   data: Record<string, unknown>;
+  ganValidation: ReturnType<typeof buildGanMcpHookObservationV1>;
 }
 
 const runtimeSchema = z
@@ -306,6 +308,13 @@ function makeResult(
   data: Record<string, unknown>,
   mock = false,
 ): AtlasSemanticToolResult {
+  const resultData = {
+    ...data,
+    workspaceAuthorityStatus: 'UNVERIFIED_CALLER_INPUT',
+    canonicalEvidenceValidity: 'NOT_ADMITTED',
+    canonicalAuthority: false,
+    writesPerformed: false,
+  };
   return {
     ok: true,
     tool,
@@ -314,13 +323,17 @@ function makeResult(
     confidence,
     mock,
     backend,
-    data: {
-      ...data,
-      workspaceAuthorityStatus: 'UNVERIFIED_CALLER_INPUT',
-      canonicalEvidenceValidity: 'NOT_ADMITTED',
+    data: resultData,
+    ganValidation: buildGanMcpHookObservationV1({
+      toolName: tool,
+      resultOk: true,
+      workspaceRevision: runtime.workspaceRevision,
+      packetKey: runtime.packetKey,
+      packetRevision: runtime.packetRevision,
+      canonicalEvidenceValidity: String(resultData.canonicalEvidenceValidity),
       canonicalAuthority: false,
       writesPerformed: false,
-    },
+    }),
   };
 }
 
@@ -329,6 +342,14 @@ function makeBlockedResult(
   runtime: AtlasRuntimeContext,
   reason: string,
 ): AtlasSemanticToolResult {
+  const data = {
+    error: reason,
+    evidence: [],
+    workspaceAuthorityStatus: 'UNVERIFIED_CALLER_INPUT',
+    canonicalEvidenceValidity: 'NOT_ADMITTED',
+    canonicalAuthority: false,
+    writesPerformed: false,
+  };
   return {
     ok: false,
     tool,
@@ -337,14 +358,17 @@ function makeBlockedResult(
     confidence: 0,
     mock: false,
     backend: 'fsm',
-    data: {
-      error: reason,
-      evidence: [],
-      workspaceAuthorityStatus: 'UNVERIFIED_CALLER_INPUT',
-      canonicalEvidenceValidity: 'NOT_ADMITTED',
+    data,
+    ganValidation: buildGanMcpHookObservationV1({
+      toolName: tool,
+      resultOk: false,
+      workspaceRevision: runtime.workspaceRevision,
+      packetKey: runtime.packetKey,
+      packetRevision: runtime.packetRevision,
+      canonicalEvidenceValidity: String(data.canonicalEvidenceValidity),
       canonicalAuthority: false,
       writesPerformed: false,
-    },
+    }),
   };
 }
 

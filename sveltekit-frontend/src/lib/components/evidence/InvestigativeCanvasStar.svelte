@@ -1,13 +1,28 @@
 <!-- Canonical Warm Ivory Investigative Dossier Canvas (Screenshot 1 Alignment) -->
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import Box from 'lucide-svelte/icons/box';
+	import Grid from 'lucide-svelte/icons/grid-3x3';
+	import Hand from 'lucide-svelte/icons/hand';
+	import ImageIcon from 'lucide-svelte/icons/image';
+	import Link from 'lucide-svelte/icons/link';
+	import Maximize from 'lucide-svelte/icons/maximize';
+	import MousePointer from 'lucide-svelte/icons/mouse-pointer';
+	import Pencil from 'lucide-svelte/icons/pencil';
+	import Square from 'lucide-svelte/icons/square';
+	import ZoomIn from 'lucide-svelte/icons/zoom-in';
+	import ZoomOut from 'lucide-svelte/icons/zoom-out';
 	import { onMount } from 'svelte';
+	import BoardDossierDetails from './BoardDossierDetails.svelte';
+	import type { BoardDossierConnection, BoardDossierContext } from './board-dossier-context.js';
 
 	interface Props {
 		caseId?: string;
 		docketNumber?: string;
 		caseTitle?: string;
 		evidenceItems?: any[];
+		dossierContext?: BoardDossierContext | null;
+		connections?: BoardDossierConnection[];
 		demoMode?: boolean;
 		onOpenModal?: (item: any) => void;
 		onOpenUpload?: () => void;
@@ -19,6 +34,8 @@
 		docketNumber = '#986B5214',
 		caseTitle = 'UNTITLED CASE DOSSIER',
 		evidenceItems = [],
+		dossierContext = null,
+		connections = [],
 		demoMode = false,
 		onOpenModal,
 		onOpenUpload,
@@ -34,6 +51,9 @@
 
 	// Canvas zoom and pan
 	let zoom = $state<number>(1.0);
+	let canvasWidth = $state(0);
+	let canvasHeight = $state(0);
+	const fitScale = $derived(canvasWidth && canvasHeight ? Math.min(1, (canvasWidth - 16) / 900, (canvasHeight - 84) / 560) : 1);
 	let pan = $state<{ x: number; y: number }>({ x: 0, y: 0 });
 	let isPanning = $state(false);
 	let panStart = { x: 0, y: 0 };
@@ -55,10 +75,10 @@
 		if (demoMode) return defaultHypothesis;
 		if (evidenceItems && evidenceItems.length > 0 && caseTitle && caseTitle !== 'UNTITLED CASE DOSSIER') {
 			return {
-				code: 'H-01',
-				label: 'CASE THEORY',
+				code: '',
+				label: 'CASE EVIDENCE',
 				title: caseTitle,
-				description: 'Evidentiary correlation graph anchoring admitted case exhibits to primary claim.'
+				description: 'Exhibits filed in this case.'
 			};
 		}
 		return null;
@@ -250,7 +270,6 @@
 				const is3d = (item.fileType || item.mimeType || '').includes('3d') || (item.fileType || '').includes('glb') || (item.title || '').endsWith('.glb') || (item.title || '').endsWith('.spz');
 				const isAnalysis = (item.category || '').toLowerCase().includes('analysis') || (item.title || '').toLowerCase().includes('map');
 				const catPill = isDoc ? 'DOCUMENT' : isVid ? 'VIDEO' : is3d ? 'RECONSTRUCTION' : isAnalysis ? 'ANALYSIS' : 'PHYSICAL';
-				const defaultRelation = isVid ? 'CORROBORATES' : isDoc ? 'REPORTS PRESENCE' : is3d ? 'SPATIAL MATCH' : isAnalysis ? 'ESTABLISHES MOTIVE' : 'PLACES SUBJECT';
 				const pillColor = isVid || is3d ? 'blue' : isDoc ? 'amber' : 'mint';
 				return {
 					id: item.id || `ev-${idx}`,
@@ -262,7 +281,7 @@
 					type: item.type || item.fileType || item.mimeType || (isDoc ? 'Document (PDF)' : isVid ? 'Video (MP4)' : is3d ? '3D (GLB)' : 'Image (Scene)'),
 					subtitle: `${catPill} · ${item.fileSize ? `${Math.round(item.fileSize / 1024)} KB` : 'EXHIBIT'}`,
 					thumbnail: item.thumbnail || (item.url && item.url.startsWith('blob:') ? item.url : undefined),
-					relation: typeof item.relation === 'string' && item.relation !== 'UNLINKED' ? item.relation : defaultRelation,
+					relation: typeof item.relation === 'string' ? item.relation : '',
 					collected: item.uploadedAt || item.date || 'Not recorded',
 					location: item.location || 'Not provided',
 					chainOfCustody: item.chainOfCustodyLabel || 'Not loaded',
@@ -287,6 +306,19 @@
 	let selectedExhibit = $derived(
 		exhibits.find((e) => e.id === selectedId) || exhibits[0]
 	);
+	const selectedPoiId = $derived(evidenceItems.find((item) => item.id === selectedExhibit?.id)?.poiId ?? null);
+	const visibleConnections = $derived.by(() => {
+		const byId = new Map(exhibits.map((item) => [item.id, item]));
+		return connections.flatMap((connection) => {
+			const from = byId.get(connection.fromEvidenceId);
+			const to = byId.get(connection.toEvidenceId);
+			return connection.isVisible !== false && from && to && from !== to ? [{ connection, from, to }] : [];
+		});
+	});
+	const relatedExhibits = $derived(visibleConnections.flatMap(({ connection, from, to }) => {
+		const other = from.id === selectedExhibit?.id ? to : to.id === selectedExhibit?.id ? from : null;
+		return other ? [{ id: connection.id, evidenceId: other.id, title: other.title, code: other.code, type: connection.connectionType, label: connection.label }] : [];
+	}));
 
 	// Filtered exhibits for sidebar
 	let filteredSidebarExhibits = $derived.by(() => {
@@ -381,7 +413,6 @@
 			const isAnalysis = file.name.toLowerCase().includes('analysis') || file.name.toLowerCase().includes('map');
 
 			const catPill = isDoc ? 'DOCUMENT' : isVid ? 'VIDEO' : is3d ? 'RECONSTRUCTION' : isAnalysis ? 'ANALYSIS' : 'PHYSICAL';
-			const relation = isVid ? 'CORROBORATES' : isDoc ? 'REPORTS PRESENCE' : is3d ? 'SPATIAL MATCH' : isAnalysis ? 'ESTABLISHES MOTIVE' : 'PLACES SUBJECT';
 			const pillColor = isVid || is3d ? 'blue' : isDoc ? 'amber' : 'mint';
 
 			const num = `E-${String(exhibits.length + 1).padStart(3, '0')}`;
@@ -403,19 +434,15 @@
 				type: isDoc ? 'Document (PDF)' : isVid ? 'Video (MP4)' : is3d ? '3D (GLB)' : 'Image (Scene)',
 				subtitle: `${catPill} · ${(file.size / 1024 / 1024).toFixed(1)} MB`,
 				thumbnail: previewUrl,
-				relation,
+				relation: '',
 				collected: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-				location: 'Case Evidence Ingestion',
-				chainOfCustody: 'Registered to Case Dossier',
-				verified: true,
+				location: 'Not provided',
+				chainOfCustody: 'Not loaded',
+				verified: false,
 				sha256: sha256 || 'SHA-256 Pending',
-				checklist: [
-					{ text: 'SHA-256 lineage verified in PostgreSQL 18', checked: true },
-					{ text: '768-D semantic vector indexed', checked: true },
-					{ text: 'Corroborates security timeline', checked: isVid || isDoc }
-				],
-				verdict: `Corroborates hypothesis based on ${catPill.toLowerCase()} evidence.`,
-				supports: activeHypothesis?.code || 'H-01',
+				checklist: [],
+				verdict: 'No reviewed conclusion recorded.',
+				supports: '',
 				position: { x: posX, y: posY }
 			};
 
@@ -661,6 +688,8 @@
 		<!-- CENTER: INVESTIGATIVE CANVAS (RADIAL HYPOTHESIS GRAPH) -->
 		<main
 			class="center-investigative-canvas flex-1 relative bg-[#fcfaf6] overflow-hidden"
+			bind:clientWidth={canvasWidth}
+			bind:clientHeight={canvasHeight}
 			ondrop={handleCanvasDrop}
 			ondragover={handleCanvasDragOver}
 		>
@@ -677,45 +706,45 @@
 			<!-- Floating Top Toolbar (Screenshot 1 Pill Dock) -->
 			<div class="floating-top-dock absolute top-4 left-1/2 -translate-x-1/2 bg-[#202228] text-white px-3 py-1.5 rounded-xl shadow-xl flex items-center gap-2 border border-[#3b3f4d] z-30">
 				<button class="dock-tool-btn" class:active={activeTool === 'select'} onclick={() => (activeTool = 'select')} title="Select / Move">
-					<Icon name="mouse-pointer" size={14} />
+					<MousePointer size={14} aria-hidden="true" />
 				</button>
 				<button class="dock-tool-btn" class:active={activeTool === 'pan'} onclick={() => (activeTool = 'pan')} title="Pan Canvas">
-					<Icon name="hand" size={14} />
+					<Hand size={14} aria-hidden="true" />
 				</button>
 				<button class="dock-tool-btn" class:active={activeTool === 'link'} onclick={() => (activeTool = 'link')} title="Connect Nodes">
-					<Icon name="git-branch" size={14} />
+					<Link size={14} aria-hidden="true" />
 				</button>
 				<button class="dock-tool-btn" class:active={activeTool === 'rect'} onclick={() => (activeTool = 'rect')} title="Bounding Box">
-					<Icon name="square" size={14} />
+					<Square size={14} aria-hidden="true" />
 				</button>
 				<button class="dock-tool-btn" class:active={activeTool === 'image'} onclick={triggerUpload} title="Add Image">
-					<Icon name="image" size={14} />
+					<ImageIcon size={14} aria-hidden="true" />
 				</button>
 				<button class="dock-tool-btn" class:active={activeTool === 'cube'} onclick={() => (activeTool = 'cube')} title="3D Scene">
-					<Icon name="box" size={14} />
+					<Box size={14} aria-hidden="true" />
 				</button>
 				<button class="dock-tool-btn" class:active={activeTool === 'pen'} onclick={() => (activeTool = 'pen')} title="Annotation Pen">
-					<Icon name="edit-3" size={14} />
+					<Pencil size={14} aria-hidden="true" />
 				</button>
 				<div class="h-4 w-[1px] bg-[#3e4352] mx-1"></div>
 				<button class="dock-tool-btn" onclick={zoomOut} title="Zoom Out">
-					<Icon name="zoom-out" size={14} />
+					<ZoomOut size={14} aria-hidden="true" />
 				</button>
 				<button class="dock-tool-btn" onclick={zoomIn} title="Zoom In">
-					<Icon name="zoom-in" size={14} />
+					<ZoomIn size={14} aria-hidden="true" />
 				</button>
 				<button class="dock-tool-btn" onclick={resetZoom} title="Reset View">
-					<Icon name="maximize" size={14} />
+					<Maximize size={14} aria-hidden="true" />
 				</button>
 				<button class="dock-tool-btn" title="Toggle Grid">
-					<Icon name="grid" size={14} />
+					<Grid size={14} aria-hidden="true" />
 				</button>
 			</div>
 
 			<!-- Canvas Substrate with Transform Matrix -->
 			<div
 				class="canvas-transform-layer absolute inset-0 flex items-center justify-center transition-transform duration-75"
-				style="transform: translate({pan.x}px, {pan.y}px) scale({zoom}); transform-origin: center center;"
+				style="transform: translate({pan.x}px, {pan.y}px) scale({zoom * Math.max(0.1, fitScale)}); transform-origin: center center;"
 			>
 				<!-- SVG Connection Cables Layer -->
 				<svg class="absolute inset-0 w-full h-full pointer-events-none" style="overflow: visible;">
@@ -727,12 +756,13 @@
 						</linearGradient>
 					</defs>
 
+					<g class="canvas-connections">
 					<!-- Render Radial Links from Center (0,0) to Exhibits -->
 					{#each exhibits as item}
 						{@const isSelected = selectedId === item.id}
 						{@const midX = item.position.x * 0.48}
 						{@const midY = item.position.y * 0.48}
-						{#if demoMode || activeHypothesis}<g>
+						{#if demoMode}<g>
 							<!-- Curved Bezier or Straight Line to Exhibit -->
 							<line
 								x1="0"
@@ -752,16 +782,21 @@
 							</foreignObject>
 						</g>{/if}
 					{/each}
+					{#each visibleConnections as { connection, from, to } (connection.id)}
+						<line x1={from.position.x} y1={from.position.y} x2={to.position.x} y2={to.position.y}
+							stroke={from.id === selectedId || to.id === selectedId ? '#a67826' : '#c9b89c'} stroke-width="1.5" />
+					{/each}
+					</g>
 				</svg>
 
 				<!-- CENTER NODE: H-01 PRIMARY HYPOTHESIS -->
 				{#if activeHypothesis}
 					<div
 						class="center-hypothesis-card absolute z-20 w-[240px] p-4 rounded-xl bg-[#20232a] text-white border-2 border-[#d4af37] shadow-2xl text-center transform -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-105"
+						class:live-case-center={!demoMode}
 					>
 						<div class="h-badge inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#30343f] border border-[#e5c158]/40 text-[#e5c158] text-[9px] font-mono font-bold uppercase mb-2">
-							<span>{activeHypothesis.code}</span>
-							<span>·</span>
+							{#if activeHypothesis.code}<span>{activeHypothesis.code}</span><span>·</span>{/if}
 							<span>{activeHypothesis.label}</span>
 						</div>
 						<div class="flex items-center justify-center gap-2 mb-1.5">
@@ -961,6 +996,10 @@
 					</div>
 				</div>
 
+				{#if !demoMode}
+					<BoardDossierDetails {caseId} context={dossierContext} selected={true} linkedPoiId={selectedPoiId} related={relatedExhibits} onSelect={(id) => (selectedId = id)} />
+				{/if}
+
 				<!-- Section: ANALYSIS & SYNTHESIS -->
 				<div class="analysis-synthesis-box pt-2 border-t border-[#ece5d8]">
 					<h4 class="text-[11px] font-mono font-bold tracking-wider text-[#1e2025] uppercase mb-2">ANALYSIS & SYNTHESIS</h4>
@@ -982,16 +1021,19 @@
 					</div>
 				</div>
 
-				<!-- Verdict Callout Card: SUPPORTS H-01 (Screenshot 1) -->
+				{#if demoMode || selectedExhibit.verdict !== 'No reviewed conclusion recorded.'}
 				<div class="verdict-callout p-3 rounded-xl bg-[#fdfaf3] border border-[#d9a74a]/60 shadow-sm">
 					<div class="flex items-center gap-2 mb-1">
 						<Icon name="scale" size={15} class="text-[#c59e2b]" />
-						<span class="text-xs font-bold tracking-wider text-[#8c733e] uppercase">SUPPORTS {selectedExhibit.supports}</span>
+						<span class="text-xs font-bold tracking-wider text-[#8c733e] uppercase">{demoMode ? `Supports ${selectedExhibit.supports}` : 'Reviewed conclusion'}</span>
 					</div>
 					<p class="text-xs text-[#444] leading-relaxed">
 						{selectedExhibit.verdict}
 					</p>
 				</div>
+				{:else}
+					<p class="text-xs text-[#605648]">No reviewed conclusion recorded.</p>
+				{/if}
 
 				<!-- Accordion: RELATIONSHIPS -->
 				{#if demoMode}
@@ -1020,28 +1062,6 @@
 							</div>
 						{/if}
 					</div>
-				{:else if exhibits.length > 1}
-					<div class="border-t border-[#ece5d8] pt-2">
-						<button
-							class="w-full flex items-center justify-between py-1.5 text-xs font-mono font-bold text-[#1e2025] uppercase"
-							onclick={() => (isRelationshipsOpen = !isRelationshipsOpen)}
-						>
-							<span>RELATIONSHIPS ({exhibits.length - 1})</span>
-							<Icon name={isRelationshipsOpen ? 'chevron-up' : 'chevron-down'} size={14} class="text-[#777]" />
-						</button>
-						{#if isRelationshipsOpen}
-							<div class="py-2 text-[11px] text-[#555] space-y-1.5 font-mono">
-								{#each exhibits.filter((e) => e.id !== selectedExhibit.id) as rel}
-									<div class="flex items-center justify-between p-1.5 rounded bg-white border border-[#dfd7c7]">
-										<span class="truncate font-semibold">{rel.code} {rel.title}</span>
-										<span class="text-[9px] font-bold text-[#8c733e] uppercase">{rel.relation}</span>
-									</div>
-								{/each}
-							</div>
-						{/if}
-					</div>
-				{:else}
-					<div class="border-t border-[#ece5d8] pt-3 text-xs text-[#737985]">No case-linked relationships are recorded for this exhibit.</div>
 				{/if}
 
 				<!-- Accordion: NOTES -->
@@ -1067,12 +1087,41 @@
 				<div class="insp-empty-state m-4 rounded-lg border border-[#e8e2d4] bg-white p-4 text-xs text-[#737985]" role="status">
 					Select or add a case exhibit to inspect its recorded metadata.
 				</div>
+				{#if !demoMode}
+					<div class="px-4 pb-4">
+						<BoardDossierDetails {caseId} context={dossierContext} selected={false} related={[]} onSelect={(id) => (selectedId = id)} />
+					</div>
+				{/if}
 			{/if}
 		</aside>
 	</div>
 </div>
 
 <style>
+	.sidebar-evidence-board, .sidebar-evidence-inspector { background: var(--dossier-bg-card, #faf6f0); }
+	.center-investigative-canvas { min-width: 0; }
+	.canvas-connections { transform-box: view-box; transform: translate(50%, 50%); }
+	.center-hypothesis-card { inset: 50% auto auto 50%; }
+	.center-hypothesis-card h3 { color: var(--dossier-text-light, #faf4ec); }
+	.center-hypothesis-card p { color: #e0d6c7; }
+	.live-case-center { background: var(--dossier-bg-card, #faf6f0); }
+	.live-case-center h3 { color: var(--dossier-text-main, #141312); }
+	.live-case-center p { color: var(--dossier-text-muted-aa, #6b6150); }
+	.floating-top-dock { background: var(--dossier-bg-card, #faf6f0); border-color: var(--dossier-hairline-strong, #cdbfa9); width: max-content; max-width: calc(100% - 16px); flex-wrap: wrap; justify-content: center; }
+	@media (max-width: 1150px) {
+		.sidebar-evidence-board { width: 225px; }
+		.sidebar-evidence-inspector { width: 285px; }
+		.docket-jurisdiction { display: none; }
+	}
+	@media (max-width: 820px) {
+		.star-canvas-container { height: auto; }
+		.docket-subheader-banner { flex-wrap: wrap; gap: .55rem; }
+		.banner-left, .banner-right { flex-wrap: wrap; }
+		.star-workspace-body { flex-direction: column; overflow: visible; }
+		.sidebar-evidence-board, .sidebar-evidence-inspector { width: 100%; border-inline: 0; }
+		.sidebar-evidence-board { max-height: 18rem; }
+		.center-investigative-canvas { flex: none; min-height: 26rem; }
+	}
 	.canvas-input-surface {
 		z-index: 0;
 		padding: 0;
@@ -1118,15 +1167,15 @@
 	.dock-tool-btn {
 		padding: 6px;
 		border-radius: 6px;
-		color: #a0a6b5;
+		color: var(--dossier-mocha, #483d36);
 		transition: all 0.15s ease;
 	}
 	.dock-tool-btn:hover {
-		color: #ffffff;
-		background-color: #2d3039;
+		color: var(--dossier-text-main, #141312);
+		background-color: var(--dossier-bg-workspace, #ece7dc);
 	}
 	.dock-tool-btn.active {
-		color: #e5c158;
-		background-color: #353944;
+		color: var(--dossier-text-main, #141312);
+		background-color: var(--dossier-gold-light, #ffe59a);
 	}
 </style>

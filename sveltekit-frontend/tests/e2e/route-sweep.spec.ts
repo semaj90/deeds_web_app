@@ -13,7 +13,7 @@
  * Parameterised routes ([id], [...slug]) are listed as SKIPPED_PARAMETERIZED, not guessed.
  */
 import { test, expect } from '@playwright/test';
-import { readdirSync, statSync, mkdirSync, writeFileSync } from 'node:fs';
+import { readdirSync, statSync, mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 
 const ROUTES_DIR = join(process.cwd(), 'src', 'routes');
@@ -21,6 +21,8 @@ const OUT_DIR = join(process.cwd(), '..', '.tmp', 'route-sweep');
 const SWEEP = process.env.ROUTE_SWEEP === '1';
 const MOBILE = process.env.ROUTE_SWEEP_MOBILE === '1';
 const LIMIT = Number(process.env.ROUTE_SWEEP_LIMIT ?? '0');
+const RESUME = process.env.ROUTE_SWEEP_RESUME === '1';
+const MANIFEST_PATH = join(OUT_DIR, 'manifest.json');
 
 type Entry = {
 	url: string;
@@ -73,7 +75,11 @@ test.describe.configure({ mode: 'serial', timeout: 90_000 });
 test.describe('route sweep (screenshots + browser signals)', () => {
 	test.skip(!SWEEP, 'Set ROUTE_SWEEP=1 to run the route sweep');
 
-	const manifest: Entry[] = [];
+	const priorEntries: Entry[] = RESUME && existsSync(MANIFEST_PATH)
+		? (JSON.parse(readFileSync(MANIFEST_PATH, 'utf8')).entries as Entry[])
+		: [];
+	const doneKeys = new Set(priorEntries.filter((e) => e.status !== 'NAVIGATION_FAILED').map((e) => `${e.url}|${e.pageFile}`));
+	const manifest: Entry[] = [...priorEntries];
 	const routes = discoverRoutes();
 	const selected = LIMIT > 0 ? routes.slice(0, LIMIT) : routes;
 
@@ -81,9 +87,9 @@ test.describe('route sweep (screenshots + browser signals)', () => {
 		mkdirSync(OUT_DIR, { recursive: true });
 	});
 
-	test.afterAll(() => {
+	const writeManifest = () => {
 		writeFileSync(
-			join(OUT_DIR, 'manifest.json'),
+			MANIFEST_PATH,
 			JSON.stringify(
 				{
 					generatedAt: new Date().toISOString(),
@@ -97,12 +103,22 @@ test.describe('route sweep (screenshots + browser signals)', () => {
 				2
 			)
 		);
+	};
+
+	test.afterAll(writeManifest);
+
+	test.afterEach(() => {
+		writeManifest();
 	});
 
 	for (const route of selected) {
 		const slug = slugFor(route.url);
 
 		test(`route ${route.url} [${route.pageFile}]`, async ({ page }) => {
+			if (doneKeys.has(`${route.url}|${route.pageFile}`)) {
+				test.skip(true, 'already captured in a previous run (ROUTE_SWEEP_RESUME=1)');
+				return;
+			}
 			const entry: Entry = {
 				url: route.url,
 				slug,

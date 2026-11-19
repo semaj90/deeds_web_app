@@ -1,8 +1,17 @@
-import { describe, it, expect, vi } from 'vitest';
+import { afterAll, beforeAll, describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import InvestigativeCanvasStar from './InvestigativeCanvasStar.svelte';
 
 describe('InvestigativeCanvasStar (Screenshot 1 Dossier Alignment)', () => {
+	beforeAll(() => {
+		vi.stubGlobal('ResizeObserver', class {
+			observe() {}
+			unobserve() {}
+			disconnect() {}
+		});
+	});
+	afterAll(() => vi.unstubAllGlobals());
+
 	it('renders Docket banner and center hypothesis H-01', () => {
 		render(InvestigativeCanvasStar, {
 			props: {
@@ -95,7 +104,7 @@ describe('InvestigativeCanvasStar (Screenshot 1 Dossier Alignment)', () => {
 		expect(screen.getByText('NO CASE EVIDENCE LOADED')).toBeInTheDocument();
 		expect(screen.getByText(/Select or add a case exhibit/i)).toBeInTheDocument();
 		expect(screen.queryByText(/PRIMARY HYPOTHESIS/i)).not.toBeInTheDocument();
-		expect(screen.queryByText(/Witness Statement/i)).not.toBeInTheDocument();
+		expect(screen.queryByText('Witness Statement')).not.toBeInTheDocument();
 		expect(screen.queryByText(/Strongly corroborates subject presence/i)).not.toBeInTheDocument();
 	});
 
@@ -116,17 +125,29 @@ describe('InvestigativeCanvasStar (Screenshot 1 Dossier Alignment)', () => {
 		expect(screen.queryByText(/Spatial alignment to E-005/i)).not.toBeInTheDocument();
 	});
 
-	it('renders uploaded images, documents, and videos with real thumbnails and dynamic relationship pills', () => {
+	it('uses a case evidence center and shows only saved, visible links for the selected exhibit', async () => {
 		render(InvestigativeCanvasStar, {
 			props: {
 				docketNumber: '#FAFA-01',
 				caseTitle: 'FAFA Evidentiary Corpus',
+				caseId: 'test-case',
+				dossierContext: {
+					reports: [{ id: 'report-1', title: 'Field report', status: 'draft', type: null }],
+					people: [{ id: 'person-1', name: 'Test Witness', role: 'witness', status: 'active' }],
+					unavailable: [],
+				},
+				connections: [
+					{ id: 'visible', fromEvidenceId: 'ev-img-1', toEvidenceId: 'ev-vid-1', connectionType: 'supports', label: 'Same time window', isVisible: true },
+					{ id: 'hidden', fromEvidenceId: 'ev-img-1', toEvidenceId: 'ev-doc-1', connectionType: 'contradicts', label: 'Hidden link', isVisible: false },
+					{ id: 'outside', fromEvidenceId: 'ev-img-1', toEvidenceId: 'outside-case', connectionType: 'related', label: 'Outside case', isVisible: true },
+				],
 				evidenceItems: [
 					{
 						id: 'ev-img-1',
 						title: 'Lobby Footprint',
 						fileType: 'image/png',
 						thumbnail: '/api/evidence/ev-img-1/download?inline=1',
+						poiId: 'person-1',
 						relation: 'PLACES SUBJECT'
 					},
 					{
@@ -146,12 +167,17 @@ describe('InvestigativeCanvasStar (Screenshot 1 Dossier Alignment)', () => {
 		});
 
 		expect(screen.getAllByText('FAFA Evidentiary Corpus').length).toBeGreaterThanOrEqual(2);
-		expect(screen.getByText('CASE THEORY')).toBeInTheDocument();
-		expect(screen.getAllByText('PLACES SUBJECT').length).toBeGreaterThanOrEqual(1);
-		expect(screen.getAllByText('CORROBORATES').length).toBeGreaterThanOrEqual(1);
-		expect(screen.getAllByText('REPORTS PRESENCE').length).toBeGreaterThanOrEqual(1);
+		expect(screen.getByText('CASE EVIDENCE', { exact: true })).toBeInTheDocument();
+		expect(screen.queryByText('PLACES SUBJECT')).not.toBeInTheDocument();
+		expect(screen.queryByText('Hidden link')).not.toBeInTheDocument();
+		expect(screen.queryByText('Outside case')).not.toBeInTheDocument();
+		expect(screen.getByText('Same time window')).toBeInTheDocument();
+		expect(screen.getByText('Field report').closest('a')).toHaveAttribute('href', '/cases/test-case/reports#report-report-1');
+		expect(screen.getByText('Photo filed as this exhibit')).toBeInTheDocument();
 		const thumbs = screen.getAllByAltText('Lobby Footprint');
 		expect(thumbs.length).toBeGreaterThanOrEqual(2);
 		expect(thumbs[0].getAttribute('src')).toBe('/api/evidence/ev-img-1/download?inline=1');
+		await fireEvent.click(screen.getByRole('button', { name: /Supports Security Feed Same time window/i }));
+		expect(screen.queryByText('Photo filed as this exhibit')).not.toBeInTheDocument();
 	});
 });

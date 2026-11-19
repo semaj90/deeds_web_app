@@ -29,7 +29,9 @@ export async function GET({ locals }) {
   ]);
 
   if (!centroidsRaw) {
-    return json({ error: 'Centroids not found' }, { status: 404 });
+    // Absent data is a valid empty state, not a 404 (degraded-response contract). Callers read
+    // `clusters` and fall back to [] when it is missing.
+    return json({ centroids: [], clusters: [], available: false });
   }
 
   // Centroids are stored as base64-encoded Float32Array

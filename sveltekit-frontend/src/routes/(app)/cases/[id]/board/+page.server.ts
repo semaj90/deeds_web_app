@@ -1,11 +1,13 @@
 import { db } from '$lib/server/db/client';
 import { canvasStates, evidence, evidenceBoardConnections } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { clientKey, TTL } from '$lib/server/cache-keys.js';
 import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
 import { getAuthorizedCase } from '$lib/server/case-access.js';
 import { loadSceneSnapshot } from '$lib/server/scene-markers/scene-snapshot-v1.js';
+import { loadBoardDossierContext } from '$lib/server/evidence/board-dossier-context.js';
+import type { BoardDossierContext } from '$lib/components/evidence/board-dossier-context.js';
 
 const withTimeout = <T>(promise: Promise<T>): Promise<T> => {
 	let timer: ReturnType<typeof setTimeout>;
@@ -19,6 +21,8 @@ const withTimeout = <T>(promise: Promise<T>): Promise<T> => {
 
 const EMPTY_BOARD = (id: string) => ({
   caseId: id,
+  caseNumber: null,
+  caseTitle: null,
   initialState: null,
   evidence: [],
   connections: [],
@@ -33,26 +37,9 @@ function boardPreviewMime(item: { mimeType?: string | null; fileType?: string | 
   return candidates.find((value) => BOARD_INLINE_IMAGE_MIMES.has(value)) ?? null;
 }
 
-const loadBoardCore: PageServerLoad = async ({ params, locals }) => {
-  const { id } = params;
-
-  // Validate UUID format (for test resilience)
-  const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
-  // Return empty data for invalid UUIDs (e.g., test-id) instead of DB error
-  if (!isValidUuid) return EMPTY_BOARD(id);
-
-  // Authorize before any cache read or evidence query. Unauthenticated and
-  // non-member requests get the same empty shape, so existence is not leaked.
-  const rawUserId = locals.user?.id;
-  const numericUserId = rawUserId === undefined ? NaN : Number(rawUserId);
-  if (!Number.isInteger(numericUserId) || !(await getAuthorizedCase(id, numericUserId).catch(() => null))) {
-    return EMPTY_BOARD(id);
-  }
-  const userId = numericUserId;
-
+async function loadBoardCore(id: string, userId: number) {
   // Client view cache check
-  const vKey = clientKey.view(String(userId), id, 'board-v3');
+  const vKey = clientKey.view(String(userId), id, 'board-v4');
   const memHit = getFromMemoryCache(vKey);
   if (memHit.found && memHit.value) return { ...(memHit.value as object), loadError: null } as any;
   try {
@@ -76,7 +63,7 @@ const loadBoardCore: PageServerLoad = async ({ params, locals }) => {
       ),
       withTimeout<(typeof evidence.$inferSelect)[]>(
         db.query.evidence.findMany({
-          where: eq(evidence.caseId, id),
+          where: and(eq(evidence.caseId, id), isNull(evidence.deletedAt)),
           orderBy: (evidence, { desc }) => [desc(evidence.uploadedAt)],
           limit: 100,
         })
@@ -101,6 +88,7 @@ const loadBoardCore: PageServerLoad = async ({ params, locals }) => {
         );
         return {
           id: item.id,
+          poiId: meta.admitted_via === 'poi-photo' && typeof meta.poi_id === 'string' ? meta.poi_id : null,
           sourceRevision,
           title: item.title || 'Untitled Evidence',
           type: item.evidenceType || 'document',
@@ -146,16 +134,25 @@ const loadBoardCore: PageServerLoad = async ({ params, locals }) => {
       loadError: 'Could not load this case’s evidence board. Try again in a moment.'
     };
   }
-};
+}
 
 /**
  * Board load: the cached/core board data plus a fresh, authorized scene snapshot for the Noir view.
  * The snapshot is never cached, so a saved marker move is visible on the next load.
  */
 export const load: PageServerLoad = async (event) => {
-	const core = await loadBoardCore(event);
+	const caseId = event.params.id;
 	const numericUserId = Number(event.locals.user?.id);
-	const authorized = Number.isInteger(numericUserId) && (await getAuthorizedCase(event.params.id, numericUserId).catch(() => null));
-	const sceneSnapshot = authorized ? await loadSceneSnapshot(event.params.id) : null;
-	return { ...(core as object), sceneSnapshot } as any;
+	const authorized = Number.isSafeInteger(numericUserId) && numericUserId > 0 &&
+		(await getAuthorizedCase(caseId, numericUserId).catch(() => null));
+	if (!authorized) return { ...EMPTY_BOARD(caseId), sceneSnapshot: null, dossierContext: null };
+
+	const [core, sceneSnapshot, dossierContext] = await Promise.all([
+		loadBoardCore(caseId, numericUserId),
+		loadSceneSnapshot(caseId),
+		withTimeout(loadBoardDossierContext(caseId, numericUserId)).catch((): BoardDossierContext => ({
+			reports: [], people: [], unavailable: ['reports', 'people'],
+		})),
+	]);
+	return { ...core, caseNumber: authorized.caseNumber ?? null, caseTitle: authorized.title ?? null, sceneSnapshot, dossierContext };
 };

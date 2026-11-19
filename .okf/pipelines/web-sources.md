@@ -31,6 +31,11 @@ This pipeline describes how external web sources are discovered, normalized, ran
 
 It is export-only. Canonical truth stays in PostgreSQL and the operational mirrors stay in Qdrant, Neo4j, and Redis.
 
+The official developer-documentation capture and ACE handoff contract is
+`.okf/pipelines/agentic-documentation-context-v1.yaml`. Its initial Google AI
+sources and existing DSPy snapshot are reference inputs only; admission and
+production indexing remain separate gated steps.
+
 ## Scope
 
 Web sources in this lane include:

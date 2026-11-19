@@ -1,11 +1,13 @@
 <script module lang="ts">
 	export const CASE_EXHIBIT_DRAG_TYPE = 'application/x-atlas-case-exhibit';
+	export type DetectiveGuideAction = 'Idle' | 'Walk' | 'Inspect' | 'Interact';
 </script>
 
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import * as THREE from 'three';
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+	import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 	import { ScenePrimitiveManager, type ScenePrimitiveSnapshot } from '$lib/n64-fsm/scene-primitive-sync.js';
 	import { ARENA_BYTE_LENGTH } from '$lib/n64-fsm/scene-fsm-cache.js';
 	import { SpatialBvhManagerV1 } from '$lib/splat/spatial-bvh-manager-v1.js';
@@ -42,6 +44,10 @@
 		onSelectScenePrimitive?: (selection: ScenePrimitiveSnapshot) => void;
 		caseMarkers?: readonly CaseMarker[];
 		indexedFloor?: boolean;
+		guideVisible?: boolean;
+		guideAction?: DetectiveGuideAction;
+		guideScrubTime?: number | null;
+		onGuideClipsReady?: (durations: Record<DetectiveGuideAction, number>) => void;
 		placementPreview?: Vec3 | null;
 		onCaseMarkerSelect?: (id: string) => void;
 		onCaseGroundPoint?: (point: Vec3, evidenceId?: string) => void;
@@ -66,6 +72,10 @@
 		onSelectScenePrimitive,
 		caseMarkers,
 		indexedFloor = false,
+		guideVisible = true,
+		guideAction = 'Idle',
+		guideScrubTime = null,
+		onGuideClipsReady,
 		placementPreview = null,
 		onCaseMarkerSelect,
 		onCaseGroundPoint
@@ -113,12 +123,165 @@
 	// Pickable objects map
 	let pickables: { object: THREE.Object3D; type: string; id: any }[] = [];
 	let detectiveActor: THREE.Group | null = null;
+	let guideLoadState = $state<'procedural' | 'rigged' | 'fallback'>('procedural');
+	let guideLoadIssue = $state<string | null>(null);
+	let guideRigDiagnostic = $state<string | null>(null);
+	let activeGuideClip = $state<DetectiveGuideAction | null>(null);
+	let riggedGuide: {
+		model: THREE.Group;
+		mixer: THREE.AnimationMixer;
+		actions: Map<string, THREE.AnimationAction>;
+		current: THREE.AnimationAction | null;
+		scrubAction: DetectiveGuideAction | null;
+		walkSeconds: number;
+	} | null = null;
 	const trajectoryWaypoints: readonly Vec3[] = [
 		{ x: -1.8, y: 0.05, z: 1.6 },
 		{ x: 0.5, y: 0.45, z: 0.0 },
 		{ x: 2.4, y: 0.05, z: -1.2 }
 	];
 	const walkPath = buildWalkPath(trajectoryWaypoints);
+	const guideBoneParents: Readonly<Record<string, string | null>> = {
+		hips: 'Detective Guide Rig', chest: 'hips', head: 'chest',
+		'upper_arm.L': 'chest', 'forearm.L': 'upper_arm.L', 'hand.L': 'forearm.L',
+		'thigh.L': 'hips', 'shin.L': 'thigh.L', 'foot.L': 'shin.L',
+		'upper_arm.R': 'chest', 'forearm.R': 'upper_arm.R', 'hand.R': 'forearm.R',
+		'thigh.R': 'hips', 'shin.R': 'thigh.R', 'foot.R': 'shin.R'
+	};
+	const guideActions: readonly DetectiveGuideAction[] = ['Idle', 'Walk', 'Inspect', 'Interact'];
+	const guideRestPosition = new THREE.Vector3(0.2, 0, -0.5);
+
+	function guideRigMismatch(model: THREE.Object3D): string | null {
+		const bones = new Map<string, THREE.Bone>();
+		model.traverse((object) => {
+			if ((object as THREE.Bone).isBone) bones.set(THREE.PropertyBinding.sanitizeNodeName(object.name), object as THREE.Bone);
+		});
+		if (bones.size !== Object.keys(guideBoneParents).length) return `bone-count:${bones.size}`;
+		for (const [name, parent] of Object.entries(guideBoneParents)) {
+			const bone = bones.get(THREE.PropertyBinding.sanitizeNodeName(name));
+			if (!bone) return `missing:${name}`;
+			const expectedParent = parent === null ? null : THREE.PropertyBinding.sanitizeNodeName(parent);
+			if ((bone.parent?.name ?? null) !== expectedParent) return `parent:${name}:${bone.parent?.name ?? 'none'}!=${expectedParent ?? 'none'}`;
+		}
+		return null;
+	}
+
+	function disposeGuideModel(model: THREE.Object3D) {
+		const materials = new Set<THREE.Material>();
+		const textures = new Set<THREE.Texture>();
+		model.traverse((object) => {
+			if (!(object instanceof THREE.Mesh)) return;
+			object.geometry.dispose();
+			if (object instanceof THREE.SkinnedMesh) object.skeleton.dispose();
+			for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
+				materials.add(material);
+				for (const value of Object.values(material)) {
+					if (value instanceof THREE.Texture) textures.add(value);
+				}
+			}
+		});
+		for (const material of materials) material.dispose();
+		for (const texture of textures) {
+			texture.dispose();
+			if (typeof ImageBitmap !== 'undefined' && texture.image instanceof ImageBitmap) texture.image.close();
+		}
+	}
+
+	async function loadCaseGuide(root: THREE.Group) {
+		try {
+			const gltf = await new GLTFLoader().loadAsync('/models/detective-actor-v1.glb');
+			const clips = new Map(gltf.animations.map((clip) => [clip.name, clip]));
+			const validClips = guideActions.every((name) => {
+				const clip = clips.get(name);
+				return !!clip && Number.isFinite(clip.duration) && clip.duration > 0 && clip.tracks.length > 0;
+			});
+			const rigMismatch = guideRigMismatch(gltf.scene);
+			if (detectiveActor !== root || rigMismatch || !validClips) {
+				disposeGuideModel(gltf.scene);
+				if (detectiveActor === root) {
+					guideLoadIssue = rigMismatch ? 'RIG_HIERARCHY_MISMATCH' : !validClips ? 'REQUIRED_CLIP_MISSING_OR_INVALID' : null;
+					guideRigDiagnostic = rigMismatch;
+					guideLoadState = 'fallback';
+				}
+				return;
+			}
+			const mixer = new THREE.AnimationMixer(gltf.scene);
+			riggedGuide = {
+				model: gltf.scene,
+				mixer,
+				actions: new Map(guideActions.map((name) => [name, mixer.clipAction(clips.get(name)!)])),
+				current: null,
+				scrubAction: null,
+				walkSeconds: 0,
+			};
+			onGuideClipsReady?.(Object.fromEntries(guideActions.map((name) => [name, clips.get(name)!.duration])) as Record<DetectiveGuideAction, number>);
+			for (const child of root.children) child.visible = false;
+			root.add(gltf.scene);
+			root.rotation.y = 0.6;
+			guideLoadState = 'rigged';
+		} catch {
+			if (detectiveActor === root) {
+				guideLoadIssue = 'MODEL_LOAD_FAILED';
+				guideLoadState = 'fallback';
+			}
+		}
+	}
+
+	function stepCaseGuide(root: THREE.Group, dt: number) {
+		const guide = riggedGuide;
+		if (!guide) return;
+		if (guideScrubTime !== null) {
+			const clip = guide.actions.get(guideAction);
+			if (!clip) return;
+			if (guide.scrubAction !== guideAction) {
+				guide.mixer.stopAllAction();
+				clip.reset().setLoop(THREE.LoopOnce, 1).setEffectiveWeight(1).play();
+				clip.clampWhenFinished = true;
+				clip.paused = true;
+				guide.scrubAction = guideAction;
+				activeGuideClip = guideAction;
+			}
+			const duration = clip.getClip().duration;
+			clip.time = THREE.MathUtils.clamp(Number.isFinite(guideScrubTime) ? guideScrubTime : 0, 0, duration);
+			guide.mixer.update(0);
+			if (guideAction === 'Walk') {
+				const phase = clip.time * 0.85 % (2 * walkPath.length);
+				const reverse = phase > walkPath.length;
+				const point = walkPath.at(reverse ? 2 * walkPath.length - phase : phase);
+				root.position.set(point.x, 0, point.z);
+				root.rotation.y = point.heading + (reverse ? Math.PI : 0);
+			} else {
+				root.position.copy(guideRestPosition);
+				root.rotation.y = 0.6;
+			}
+			return;
+		}
+		if (guide.scrubAction !== null) {
+			guide.mixer.stopAllAction();
+			guide.scrubAction = null;
+			guide.current = null;
+			guide.walkSeconds = 0;
+			root.position.copy(guideRestPosition);
+			root.rotation.y = 0.6;
+		}
+		const action = guide.actions.get(guideAction);
+		if (action && action !== guide.current) {
+			const previous = guide.current;
+			guide.current = action;
+			action.reset().setLoop(THREE.LoopRepeat, Infinity).setEffectiveWeight(1).play();
+			previous?.crossFadeTo(action, 0.16, false);
+			activeGuideClip = guideAction;
+		}
+		if (guideAction === 'Walk') {
+			guide.walkSeconds += dt;
+			const phase = guide.walkSeconds * 0.85 % (2 * walkPath.length);
+			const reverse = phase > walkPath.length;
+			const point = walkPath.at(reverse ? 2 * walkPath.length - phase : phase);
+			root.position.set(point.x, 0, point.z);
+			root.rotation.y = point.heading + (reverse ? Math.PI : 0);
+		}
+		guide.mixer.update(dt);
+	}
 
 	function rebuildPickBvh(): void {
 		pickBvhManager.build(pickables.map((pickable) => pickable.object));
@@ -373,7 +536,7 @@
 		);
 		actorHitBox.position.set(0.12, 0.7, 0);
 		actor.add(actorHitBox);
-		pickables.push({ object: actorHitBox, type: 'actor', id: 'INVESTIGATOR_PAWN' });
+		if (!caseMarkers) pickables.push({ object: actorHitBox, type: 'actor', id: 'INVESTIGATOR_PAWN' });
 
 		actor.userData = {
 			torso,
@@ -643,6 +806,7 @@
 			controls = new OrbitControls(camera, canvasEl);
 			controls.enableDamping = true;
 			controls.dampingFactor = 0.05;
+			controls.zoomToCursor = true;
 			controls.target.set(1.6, 0.4, -0.5);
 			controls.maxPolarAngle = Math.PI / 2 - 0.02; // don't go below asphalt floor
 			controls.minDistance = 1.0;
@@ -724,6 +888,7 @@
 			detective.rotation.y = 0.25;
 			environmentGroup.add(detective);
 			detectiveActor = detective;
+			if (caseMarkers) void loadCaseGuide(detective);
 
 			// 9. Cyan Footprints Trail
 			const footprints = createCyanFootsteps();
@@ -808,7 +973,11 @@
 				lastTime = now;
 				elapsed += dt;
 
-				if (detectiveActor) {
+				if (detectiveActor && riggedGuide && detectiveActor.visible) {
+					stepCaseGuide(detectiveActor, dt);
+					detectiveActor.updateWorldMatrix(true, false);
+					scenePrimitiveManager.writeMatrixToArena(4, detectiveActor.matrixWorld);
+				} else if (detectiveActor && !riggedGuide) {
 					const u = detectiveActor.userData;
 					// 1. Catmull-Rom Trajectory sampling along walk path when reconstruction is enabled
 					if (sceneLayers.reconstruction && trajectoryProgress > 0) {
@@ -872,6 +1041,7 @@
 		if (measurementsGroup) measurementsGroup.visible = sceneLayers.measurements;
 		if (reconstructionGroup) reconstructionGroup.visible = sceneLayers.reconstruction;
 		if (environmentGroup) environmentGroup.visible = sceneLayers.environment;
+		if (detectiveActor) detectiveActor.visible = guideVisible;
 	}
 
 	$effect(() => {
@@ -1118,6 +1288,13 @@
 		blockout?.geometry.dispose();
 		blockout?.material.dispose();
 		blockout?.dispose();
+		if (riggedGuide) {
+			riggedGuide.mixer.stopAllAction();
+			riggedGuide.mixer.uncacheRoot(riggedGuide.model);
+			disposeGuideModel(riggedGuide.model);
+			riggedGuide = null;
+		}
+		detectiveActor = null;
 		caseMarkerMeshes.clear();
 		renderer?.dispose();
 		renderer = null;
@@ -1129,6 +1306,9 @@
 <div class="crime-scene-3d-wrapper" bind:this={containerEl}>
 	{#if caseMarkers && !sceneReady && isWebGLAvailable}
 		<div class="case-scene-loading" role="status">Preparing the 3D scene…</div>
+	{/if}
+	{#if guideVisible && guideLoadState === 'fallback'}
+		<p class="case-guide-fallback" role="status">Using the static guide. Its animations are unavailable.</p>
 	{/if}
 	{#if isWebGLAvailable}
 		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -1148,6 +1328,12 @@
 				selectCaseGroundPoint(event, id);
 			}}
 			class="three-crime-canvas"
+			data-guide={guideLoadState}
+			data-guide-issue={guideLoadIssue ?? undefined}
+			data-guide-rig-diagnostic={guideRigDiagnostic ?? undefined}
+			data-guide-action={activeGuideClip}
+			data-guide-visible={guideVisible}
+			data-guide-scrub-time={guideScrubTime ?? undefined}
 			class:hovering={isHoveringObject}
 			class:mode-marker={transformMode === 'marker'}
 		></canvas>
@@ -1169,6 +1355,20 @@
 </div>
 
 <style>
+	.case-guide-fallback {
+		position: absolute;
+		z-index: 1;
+		inset: auto 0.75rem 0.75rem;
+		width: max-content;
+		max-width: calc(100% - 1.5rem);
+		margin: 0;
+		padding: 0.4rem 0.65rem;
+		border-radius: 6px;
+		background: var(--dossier-bg-card, #faf6f0);
+		color: var(--dossier-text-main, #141312);
+		font-size: 0.8rem;
+		pointer-events: none;
+	}
 	.case-scene-loading {
 		position: absolute;
 		inset: 0;

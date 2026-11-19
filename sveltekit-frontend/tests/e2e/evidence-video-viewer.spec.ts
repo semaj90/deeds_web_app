@@ -5,7 +5,8 @@ import { createHash } from 'node:crypto';
 import { test, expect } from '@playwright/test';
 import sharp from 'sharp';
 import {
-	buildPackedMotionLodsV1, decodeVideoMotionLutIndicesV1, encodeVideoMotionLutV1,
+	buildPackedMotionLodsV1, compactPackedMotionLodV1, decodeVideoMotionLutIndicesV1,
+	encodeVideoMotionLutV1, readPackedVideoMotionLutV1, VIDEO_MOTION_COMPACT_LOD_V1,
 	VIDEO_MOTION_GRAYSCALE_LUT_V1, VIDEO_MOTION_LUT_HEIGHT_V1, VIDEO_MOTION_LUT_WIDTH_V1,
 } from '../../src/lib/shared/video-motion-lut-v1.js';
 import { stableStringifySceneDocumentV1 } from '../../src/lib/splat/scene-document-v1.js';
@@ -82,7 +83,7 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 	const sourceFrames = await Promise.all(['#393f4c', '#4c4339'].map((background) => sharp({
 		create: { width: 320, height: 180, channels: 3, background },
 	}).jpeg().toBuffer()));
-	await page.addInitScript(({ targetEvidenceId, targetCaseId, targetAnalysisRevision, targetEventTimeline, targetMotionTileBytes, targetFrames }) => {
+	await page.addInitScript(({ targetEvidenceId, targetCaseId, targetAnalysisRevision, targetEventTimeline, targetMotionTileBytes, compactMotion, targetFrames }) => {
 		const previousPose = {
 			schema: 'atlas.pose-observation.v1', evidenceId: targetEvidenceId,
 			sourceSha256: `sha256:${'a'.repeat(64)}`, sourceRevision: `sha256:${'a'.repeat(64)}`,
@@ -133,8 +134,12 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 				}), { status: 200, headers: { 'Content-Type': 'application/json' } });
 			}
 			if (requestUrl.pathname === `/api/evidence/${targetEvidenceId}/motion-preview/0`) {
-				return new Response(Uint8Array.from(targetMotionTileBytes), { status: 200, headers: {
-					'Content-Type': 'application/vnd.atlas.video-motion-lut-v1',
+				const compact = requestUrl.searchParams.get('lod') === compactMotion.token;
+				const bytes = Uint8Array.from(compact ? compactMotion.bytes : targetMotionTileBytes);
+				return new Response(bytes, { status: 200, headers: {
+					'Content-Type': compact ? compactMotion.contentType : 'application/vnd.atlas.video-motion-lut-v1',
+					'Content-Length': String(bytes.length),
+					...(compact ? { 'X-Motion-LOD': compactMotion.token } : {}),
 					'Cache-Control': 'private, no-store',
 					'X-Source-Revision': `sha256:${'a'.repeat(64)}`,
 					'X-Analysis-Revision': targetAnalysisRevision,
@@ -189,7 +194,11 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 			return new Response(JSON.stringify({ evidenceId: targetEvidenceId, versions: revisions, count: revisions.length, reviewEnabled: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 		};
 	}, { targetEvidenceId: evidenceId, targetCaseId: caseId, targetAnalysisRevision: analysisRevision, targetEventTimeline: videoEventTimeline,
-		targetMotionTileBytes: Array.from(motionTile), targetFrames: sourceFrames.map((frame) => Array.from(frame)) });
+		targetMotionTileBytes: Array.from(motionTile),
+		compactMotion: {
+			...VIDEO_MOTION_COMPACT_LOD_V1, bytes: Array.from(compactPackedMotionLodV1(readPackedVideoMotionLutV1(motionTile)).data)
+		},
+		targetFrames: sourceFrames.map((frame) => Array.from(frame)) });
 	await page.route(`**/api/evidence/${evidenceId}/frames**`, (route) => route.fulfill({
 		status: 200,
 		contentType: 'application/json',
@@ -329,6 +338,14 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 	const motionRenderer = await motionPreview.getAttribute('data-renderer');
 	expect(['webgpu', 'webgl2', 'canvas2d']).toContain(motionRenderer);
 	if (testInfo.project.name === 'chromium-webgl2-motion') expect(motionRenderer).toBe('webgl2');
+	const frameMotionRequests = () => page.evaluate(() =>
+		((window as any).__poseFixture.requests as string[]).filter((request) => request.includes('/motion-preview/0') && !request.includes('lane=motion-sample'))
+	);
+	const motionPath = `GET /api/evidence/${evidenceId}/motion-preview/0`;
+	expect(await frameMotionRequests()).toEqual([`${motionPath}?lod=32x64`]);
+	await motionPreview.getByRole('button', { name: 'Full motion detail' }).click();
+	await expect.poll(frameMotionRequests).toEqual([`${motionPath}?lod=32x64`, motionPath]);
+	await expect(motionPreview.locator('canvas:not(.hidden)')).toBeVisible();
 	await testInfo.attach('motion-preview-renderer', { body: motionRenderer ?? 'unknown', contentType: 'text/plain' });
 	const motionCueRegion = page.getByRole('region', { name: 'Video pixel-change review cues' });
 	await motionCueRegion.getByRole('button', { name: 'Review pixel-change cue at 00:01.000' }).click();

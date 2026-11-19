@@ -100,6 +100,12 @@ export function getJob(jobId: string): JobProgress | undefined {
 	return jobs.get(jobId);
 }
 
+export function getActiveJobForEvidence(evidenceId: string, ownerId: string): JobProgress | undefined {
+	return [...jobs.values()]
+		.filter((job) => job.evidenceId === evidenceId && job.step !== 'complete' && job.step !== 'error' && isJobOwnedBy(job.jobId, ownerId))
+		.sort((a, b) => b.createdAt - a.createdAt)[0];
+}
+
 export function listJobs(): JobProgress[] {
 	return [...jobs.values()].sort((a, b) => b.updatedAt - a.updatedAt);
 }

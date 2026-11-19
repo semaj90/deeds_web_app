@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
 	buildPackedMotionLodsV1,
+	compactPackedMotionLodV1,
 	decodeVideoMotionLutIndicesV1,
 	encodeVideoMotionLutV1,
 	hasValidMotionComparisonV1,
+	readPackedVideoMotionLutV1,
 	selectPackedMotionLodV1,
 	type VideoMotionLutManifestV1,
 	VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1,
@@ -70,6 +72,16 @@ describe('video motion LUT v1', () => {
 		expect((displayed.data[pooledIndex >>> 1]! >>> ((pooledIndex & 1) * 4)) & 0x0f).toBe(15);
 		expect(lods[4]?.data[0]).toBe(0);
 		expect(() => buildPackedMotionLodsV1(new Uint8Array(3))).toThrow(/64x128/);
+	});
+
+	it('matches the existing unpacked max-pool at every compact pixel', () => {
+		const indices = Uint8Array.from({ length: PIXELS }, (_, pixel) =>
+			(pixel * 5 + Math.floor(pixel / 64) * 7 + Math.floor(pixel / 9)) % 16);
+		const luma = Uint8Array.from(indices, (index) => index * 16);
+		const { bytes } = encodeVideoMotionLutV1(new Uint8Array(PIXELS), luma);
+		const source = readPackedVideoMotionLutV1(bytes);
+		expect(source.data.buffer).toBe(bytes.buffer);
+		expect(compactPackedMotionLodV1(source)).toEqual(buildPackedMotionLodsV1(indices)[3]);
 	});
 
 	it('selects the largest packed LOD that fits the physical preview and caps at the 4 KiB source', () => {

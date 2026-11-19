@@ -28,6 +28,15 @@ const depthResponseSchema = z.object({
 	width: z.number().int().min(1).max(8192),
 	height: z.number().int().min(1).max(8192),
 	processing_time_ms: z.number().finite().nonnegative().optional(),
+	source_sha256: z.string().regex(/^sha256:[a-f0-9]{64}$/i).optional(),
+	depth_sha256: z.string().regex(/^sha256:[a-f0-9]{64}$/i).optional(),
+	model_id: z.string().min(1).max(256).optional(),
+	model_revision: z.string().min(1).max(128).optional(),
+	model_revision_status: z.enum(['VERIFIED', 'UNVERIFIED']).optional(),
+	model_license: z.string().min(1).max(64).optional(),
+	weights_sha256: z.string().regex(/^sha256:[a-f0-9]{64}$/i).optional(),
+	depth_type: z.literal('relative_monocular').optional(),
+	device: z.enum(['cpu', 'cuda']).optional(),
 }).passthrough();
 
 const depthConfigSchema = z.object({ endpoint: z.string().url(), bucket: z.string().trim().min(1).max(63) });
@@ -60,6 +69,13 @@ export interface EvidenceVisualAnalysisV1 {
 		width: number;
 		height: number;
 		processingTimeMs: number | null;
+		depthType: 'relative_monocular';
+		modelId: string | null;
+		modelRevision: string | null;
+		modelRevisionStatus: 'VERIFIED' | 'UNVERIFIED';
+		modelLicense: string;
+		weightsSha256: string | null;
+		device: 'cpu' | 'cuda' | null;
 	} | null;
 	/** Derivative 2D silhouette masks (SAM 2). Present only when the stage ran. Never canonical evidence. */
 	silhouettes?: Sam2SilhouetteResultV1['masks'];
@@ -190,6 +206,32 @@ export async function analyzeEvidenceImageV1(
 			throw new Error('DEPTH_MAP_PNG_SIGNATURE_INVALID');
 		}
 		const artifactSha256 = createHash('sha256').update(bytes).digest('hex');
+		if (response.depth_sha256 && response.depth_sha256.replace(/^sha256:/i, '').toLowerCase() !== artifactSha256) {
+			throw new Error('DEPTH_SERVICE_ARTIFACT_HASH_MISMATCH');
+		}
+		if (response.source_sha256 && response.source_sha256.toLowerCase() !== image.sourceRevision.toLowerCase()) {
+			throw new Error('DEPTH_SERVICE_SOURCE_REVISION_MISMATCH');
+		}
+		// The versioned local worker returns both hashes. For that receipt-bearing contract,
+		// verify the decoded PNG and source dimensions before writing the derived artifact.
+		if (response.depth_sha256 || response.source_sha256) {
+			if (!response.depth_sha256 || !response.source_sha256) throw new Error('DEPTH_WORKER_RECEIPT_INCOMPLETE');
+			if (!response.weights_sha256 || !response.model_id || !response.model_revision) throw new Error('DEPTH_WORKER_MODEL_RECEIPT_INCOMPLETE');
+			if (response.model_revision_status !== 'VERIFIED' || response.depth_type !== 'relative_monocular') {
+				throw new Error('DEPTH_WORKER_MODEL_RECEIPT_UNVERIFIED');
+			}
+			const sourceMetadata = await sharp(image.buffer, { limitInputPixels: 40_000_000, failOn: 'error' }).metadata();
+			const swapsExifAxes = sourceMetadata.orientation !== undefined && sourceMetadata.orientation >= 5 && sourceMetadata.orientation <= 8;
+			const orientedWidth = swapsExifAxes ? sourceMetadata.height : sourceMetadata.width;
+			const orientedHeight = swapsExifAxes ? sourceMetadata.width : sourceMetadata.height;
+			if (!orientedWidth || !orientedHeight || response.width !== orientedWidth || response.height !== orientedHeight) {
+				throw new Error('DEPTH_SOURCE_DIMENSIONS_MISMATCH');
+			}
+			const depthPng = await sharp(bytes, { limitInputPixels: 40_000_000, failOn: 'error' }).metadata();
+			if (depthPng.format !== 'png' || depthPng.width !== response.width || depthPng.height !== response.height) {
+				throw new Error('DEPTH_OUTPUT_DIMENSIONS_MISMATCH');
+			}
+		}
 		const sourceHash = image.sourceRevision.slice('sha256:'.length);
 		const key = `evidence/${image.caseId ?? 'default'}/${image.evidenceId}/${sourceHash}/depth-${artifactSha256}.png`;
 		await dependencies.uploadDepth(config.bucket, key, bytes);
@@ -201,6 +243,13 @@ export async function analyzeEvidenceImageV1(
 			width: response.width,
 			height: response.height,
 			processingTimeMs: response.processing_time_ms ?? null,
+			depthType: 'relative_monocular' as const,
+			modelId: response.model_id ?? null,
+			modelRevision: response.model_revision ?? null,
+			modelRevisionStatus: response.model_revision_status ?? 'UNVERIFIED',
+			modelLicense: response.model_license ?? 'UNVERIFIED',
+			weightsSha256: response.weights_sha256 ?? null,
+			device: response.device ?? null,
 		};
 	};
 

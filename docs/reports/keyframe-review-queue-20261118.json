@@ -1,0 +1,288 @@
+{
+  "schema": "keyframe-review-queue.v1",
+  "status": "AWAITING_HUMAN_REVIEW",
+  "sourceSummary": "docs/reports/keyframe-analysis-run-receipt-20261118.json",
+  "items": [
+    {
+      "itemId": "f0-q0",
+      "kind": "open_question",
+      "framePtsMs": 0,
+      "question": "No textual role evidence in this frame; roles remain unknown.",
+      "suggestedLabels": [
+        "main_character",
+        "poi",
+        "victim",
+        "suspect",
+        "witness",
+        "officer",
+        "judge",
+        "paramedic",
+        "doctor",
+        "employee",
+        "bystander",
+        "npc",
+        "unknown_person",
+        "furniture",
+        "object",
+        "not_applicable",
+        "cannot_determine"
+      ],
+      "review": {
+        "status": "PENDING",
+        "reviewer": null,
+        "label": null,
+        "note": null
+      }
+    },
+    {
+      "itemId": "f0-q1",
+      "kind": "open_question",
+      "framePtsMs": 0,
+      "question": "No readable on-screen text; speaker and setting are not determined from text.",
+      "suggestedLabels": [
+        "main_character",
+        "poi",
+        "victim",
+        "suspect",
+        "witness",
+        "officer",
+        "judge",
+        "paramedic",
+        "doctor",
+        "employee",
+        "bystander",
+        "npc",
+        "unknown_person",
+        "furniture",
+        "object",
+        "not_applicable",
+        "cannot_determine"
+      ],
+      "review": {
+        "status": "PENDING",
+        "reviewer": null,
+        "label": null,
+        "note": null
+      }
+    },
+    {
+      "itemId": "f0-q2",
+      "kind": "open_question",
+      "framePtsMs": 0,
+      "question": "Identity of every person is not determined by the frame itself.",
+      "suggestedLabels": [
+        "main_character",
+        "poi",
+        "victim",
+        "suspect",
+        "witness",
+        "officer",
+        "judge",
+        "paramedic",
+        "doctor",
+        "employee",
+        "bystander",
+        "npc",
+        "unknown_person",
+        "furniture",
+        "object",
+        "not_applicable",
+        "cannot_determine"
+      ],
+      "review": {
+        "status": "PENDING",
+        "reviewer": null,
+        "label": null,
+        "note": null
+      }
+    },
+    {
+      "itemId": "f2750-q3",
+      "kind": "open_question",
+      "framePtsMs": 2750,
+      "question": "No textual role evidence in this frame; roles remain unknown.",
+      "suggestedLabels": [
+        "main_character",
+        "poi",
+        "victim",
+        "suspect",
+        "witness",
+        "officer",
+        "judge",
+        "paramedic",
+        "doctor",
+        "employee",
+        "bystander",
+        "npc",
+        "unknown_person",
+        "furniture",
+        "object",
+        "not_applicable",
+        "cannot_determine"
+      ],
+      "review": {
+        "status": "PENDING",
+        "reviewer": null,
+        "label": null,
+        "note": null
+      }
+    },
+    {
+      "itemId": "f2750-q4",
+      "kind": "open_question",
+      "framePtsMs": 2750,
+      "question": "Identity of every person is not determined by the frame itself.",
+      "suggestedLabels": [
+        "main_character",
+        "poi",
+        "victim",
+        "suspect",
+        "witness",
+        "officer",
+        "judge",
+        "paramedic",
+        "doctor",
+        "employee",
+        "bystander",
+        "npc",
+        "unknown_person",
+        "furniture",
+        "object",
+        "not_applicable",
+        "cannot_determine"
+      ],
+      "review": {
+        "status": "PENDING",
+        "reviewer": null,
+        "label": null,
+        "note": null
+      }
+    },
+    {
+      "itemId": "f7500-q5",
+      "kind": "open_question",
+      "framePtsMs": 7500,
+      "question": "No textual role evidence in this frame; roles remain unknown.",
+      "suggestedLabels": [
+        "main_character",
+        "poi",
+        "victim",
+        "suspect",
+        "witness",
+        "officer",
+        "judge",
+        "paramedic",
+        "doctor",
+        "employee",
+        "bystander",
+        "npc",
+        "unknown_person",
+        "furniture",
+        "object",
+        "not_applicable",
+        "cannot_determine"
+      ],
+      "review": {
+        "status": "PENDING",
+        "reviewer": null,
+        "label": null,
+        "note": null
+      }
+    },
+    {
+      "itemId": "f7500-q6",
+      "kind": "open_question",
+      "framePtsMs": 7500,
+      "question": "Identity of every person is not determined by the frame itself.",
+      "suggestedLabels": [
+        "main_character",
+        "poi",
+        "victim",
+        "suspect",
+        "witness",
+        "officer",
+        "judge",
+        "paramedic",
+        "doctor",
+        "employee",
+        "bystander",
+        "npc",
+        "unknown_person",
+        "furniture",
+        "object",
+        "not_applicable",
+        "cannot_determine"
+      ],
+      "review": {
+        "status": "PENDING",
+        "reviewer": null,
+        "label": null,
+        "note": null
+      }
+    },
+    {
+      "itemId": "t0",
+      "kind": "transition",
+      "evidence": {
+        "fromPtsMs": 0,
+        "toPtsMs": 2750,
+        "source": "yolox_box_centre"
+      },
+      "statement": "Largest person's box centre moves 74 px (5.8% of frame width)",
+      "review": {
+        "status": "PENDING",
+        "reviewer": null,
+        "verdict": null,
+        "note": null
+      }
+    },
+    {
+      "itemId": "t1",
+      "kind": "transition",
+      "evidence": {
+        "fromPtsMs": 0,
+        "toPtsMs": 2750,
+        "source": "ocr"
+      },
+      "statement": "On-screen text changes between keyframes",
+      "review": {
+        "status": "PENDING",
+        "reviewer": null,
+        "verdict": null,
+        "note": null
+      }
+    },
+    {
+      "itemId": "t2",
+      "kind": "transition",
+      "evidence": {
+        "fromPtsMs": 2750,
+        "toPtsMs": 7500,
+        "source": "yolox_box_centre"
+      },
+      "statement": "Largest person's box centre stays within 1.5% of frame width",
+      "review": {
+        "status": "PENDING",
+        "reviewer": null,
+        "verdict": null,
+        "note": null
+      }
+    },
+    {
+      "itemId": "t3",
+      "kind": "transition",
+      "evidence": {
+        "fromPtsMs": 2750,
+        "toPtsMs": 7500,
+        "source": "ocr"
+      },
+      "statement": "On-screen text changes between keyframes",
+      "review": {
+        "status": "PENDING",
+        "reviewer": null,
+        "verdict": null,
+        "note": null
+      }
+    }
+  ]
+}

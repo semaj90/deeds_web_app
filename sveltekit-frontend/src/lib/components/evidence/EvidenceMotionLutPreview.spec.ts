@@ -1,6 +1,6 @@
-import { cleanup, render, waitFor } from '@testing-library/svelte';
+import { cleanup, fireEvent, render, waitFor } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { encodeVideoMotionLutV1 } from '$lib/shared/video-motion-lut-v1.js';
+import { encodeVideoMotionLutV1, VIDEO_MOTION_COMPACT_LOD_V1 } from '$lib/shared/video-motion-lut-v1.js';
 
 const lodMocks = vi.hoisted(() => ({
 	initialize: vi.fn(),
@@ -60,14 +60,17 @@ describe('EvidenceMotionLutPreview residency lifecycle', () => {
 		vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
 			const url = String(input);
 			const isNew = url.includes('frame-new');
+			const lod = VIDEO_MOTION_COMPACT_LOD_V1;
+			const compact = new URL(url).searchParams.get('lod') === lod.token;
 			return {
 				ok: true,
 				headers: new Headers({
 					'X-Source-Revision': isNew ? 'sha256:new' : 'sha256:old',
 					'X-Analysis-Revision': isNew ? 'analysis-new' : 'analysis-old',
 					'X-Frame-Timestamp-Ms': isNew ? '2000' : '1000',
+					...(compact ? { 'X-Motion-LOD': lod.token, 'Content-Type': lod.contentType } : {}),
 				}),
-				arrayBuffer: async () => fixtureTile(),
+				arrayBuffer: async () => compact ? new ArrayBuffer(lod.byteLength) : fixtureTile(),
 			} as Response;
 		}));
 	});
@@ -111,24 +114,33 @@ describe('EvidenceMotionLutPreview residency lifecycle', () => {
 		expect(view.queryByText(/0% change/)).toBeNull();
 	});
 
-	it('requests the display-sized packed LOD from the residency manager', async () => {
-		vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect').mockReturnValue({
-			x: 0, y: 0, width: 48, height: 80, top: 0, right: 48, bottom: 80, left: 0, toJSON: () => ({}),
-		} as DOMRect);
+	it('downloads only the compact tile until full detail is requested', async () => {
 		const view = render(EvidenceMotionLutPreview, {
 			props: { url: '/frame-old', sourceRevision: 'sha256:old', analysisRevision: 'analysis-old', timestampMs: 1000, motionScore: 0.1 },
 		});
 		await waitFor(() => expect(lodMocks.requestTexture).toHaveBeenCalledTimes(1));
 		const [textureId, lodLevel] = lodMocks.requestTexture.mock.calls[0] as [string, number];
 		expect(lodLevel).toBe(3);
+		expect(String(vi.mocked(fetch).mock.calls[0]?.[0])).toContain('lod=32x64');
 		const registered = lodMocks.registerTexture.mock.calls[0]?.[2] as Array<{ level: number; width: number; height: number; data: ArrayBuffer }>;
 		expect(registered.map(({ level, width, height, data }) => [level, width, height, data.byteLength])).toEqual([
-			[0, 2, 8, 16], [1, 4, 16, 64], [2, 8, 32, 256], [3, 16, 64, 1024], [4, 32, 128, 4096],
+			[3, 16, 64, 1024],
 		]);
 		oldRequest.resolve(gpuTexture as unknown as GPUTexture);
 		await waitFor(() => expect(view.container.querySelector('[data-renderer="webgpu"]')).toBeTruthy());
+		await fireEvent.click(view.getByRole('button', { name: 'Full motion detail' }));
+		await waitFor(() => expect(lodMocks.requestTexture).toHaveBeenCalledTimes(2));
+		expect(new URL(String(vi.mocked(fetch).mock.calls[1]?.[0])).searchParams.has('lod')).toBe(false);
+		const [fullTextureId, fullLod] = lodMocks.requestTexture.mock.calls[1] as [string, number];
+		expect(fullLod).toBe(4);
+		expect(lodMocks.registerTexture.mock.calls[1]?.[2]).toEqual([
+			expect.objectContaining({ level: 4, width: 32, height: 128, data: new ArrayBuffer(4096) }),
+		]);
+		newRequest.resolve(gpuTexture as unknown as GPUTexture);
+		await waitFor(() => expect(view.container.querySelector('[data-renderer="webgpu"]')).toBeTruthy());
 		view.unmount();
 		expect(lodMocks.unregisterTexture).toHaveBeenCalledWith(textureId);
+		expect(lodMocks.unregisterTexture).toHaveBeenCalledWith(fullTextureId);
 	});
 
 	it('does not release another viewer’s texture when both show the same frame', async () => {

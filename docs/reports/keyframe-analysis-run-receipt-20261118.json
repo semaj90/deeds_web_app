@@ -1,0 +1,1077 @@
+{
+  "schema": "atlas-keyframe-analysis-run.v1",
+  "status": "LOCAL_RUN_PASSED__NOT_EVIDENCE__OCR_AND_MASKS_ARE_PROPOSALS",
+  "source": {
+    "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+    "sha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587"
+  },
+  "stack": {
+    "detector": "YOLOX-Nano ONNX (CPU)",
+    "segmenter": "SAM 2.1 tiny (CUDA, one-box runner)",
+    "depth": "Depth-Anything-V2-Small (relative, CUDA)",
+    "enhancement": "OpenCV CLAHE + adaptive threshold",
+    "ocr": "Tesseract via pytesseract, psm 11"
+  },
+  "elapsedS": 120.5,
+  "frames": [
+    {
+      "framePtsMs": 0,
+      "imageSize": [
+        1280,
+        720
+      ],
+      "fullFrameOcr": {
+        "raw": [],
+        "enhanced": []
+      },
+      "boxes": [
+        {
+          "classLabel": "person",
+          "detectionConfidence": 0.8246,
+          "bboxXYXY": [
+            361.29,
+            42.73,
+            813.62,
+            560.73
+          ],
+          "sam2": {
+            "iouScore": 0.9938,
+            "device": "cuda",
+            "maskPixels": 137832,
+            "maskBboxXYXY": [
+              363,
+              43,
+              814,
+              544
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_0_0.png"
+          },
+          "relativeDepthMedian": 3.0339,
+          "ocr": {
+            "raw": [
+              {
+                "text": "j",
+                "conf": 60.0,
+                "bboxXYWH": [
+                  131,
+                  811,
+                  41,
+                  146
+                ]
+              }
+            ],
+            "enhanced": [
+              {
+                "text": "f",
+                "conf": 90.0,
+                "bboxXYWH": [
+                  131,
+                  811,
+                  41,
+                  146
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "classLabel": "person",
+          "detectionConfidence": 0.6942,
+          "bboxXYXY": [
+            1065.16,
+            265.17,
+            1173.09,
+            459.7
+          ],
+          "sam2": {
+            "iouScore": 0.9106,
+            "device": "cuda",
+            "maskPixels": 7271,
+            "maskBboxXYXY": [
+              1077,
+              277,
+              1167,
+              454
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_0_1.png"
+          },
+          "relativeDepthMedian": 0.7983,
+          "ocr": {
+            "raw": [],
+            "enhanced": []
+          }
+        },
+        {
+          "classLabel": "tie",
+          "detectionConfidence": 0.6294,
+          "bboxXYXY": [
+            632.02,
+            251.74,
+            691.62,
+            433.98
+          ],
+          "sam2": {
+            "iouScore": 0.9618,
+            "device": "cuda",
+            "maskPixels": 4751,
+            "maskBboxXYXY": [
+              636,
+              255,
+              690,
+              439
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_0_2.png"
+          },
+          "relativeDepthMedian": 3.1246,
+          "ocr": {
+            "raw": [],
+            "enhanced": []
+          }
+        },
+        {
+          "classLabel": "person",
+          "detectionConfidence": 0.6263,
+          "bboxXYXY": [
+            1119.5,
+            451.33,
+            1257.16,
+            638.06
+          ],
+          "sam2": {
+            "iouScore": 0.9522,
+            "device": "cuda",
+            "maskPixels": 16708,
+            "maskBboxXYXY": [
+              1109,
+              456,
+              1249,
+              633
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_0_3.png"
+          },
+          "relativeDepthMedian": 1.1406,
+          "ocr": {
+            "raw": [],
+            "enhanced": []
+          }
+        },
+        {
+          "classLabel": "person",
+          "detectionConfidence": 0.5521,
+          "bboxXYXY": [
+            966.4,
+            294.16,
+            1063.79,
+            461.25
+          ],
+          "sam2": {
+            "iouScore": 0.9122,
+            "device": "cuda",
+            "maskPixels": 6853,
+            "maskBboxXYXY": [
+              976,
+              294,
+              1059,
+              460
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_0_4.png"
+          },
+          "relativeDepthMedian": 0.6724,
+          "ocr": {
+            "raw": [
+              {
+                "text": "=",
+                "conf": 54.0,
+                "bboxXYWH": [
+                  0,
+                  0,
+                  291,
+                  381
+                ]
+              }
+            ],
+            "enhanced": []
+          }
+        }
+      ],
+      "roleEvidence": {
+        "status": "NO_TEXT",
+        "proposals": []
+      }
+    },
+    {
+      "framePtsMs": 2750,
+      "imageSize": [
+        1280,
+        720
+      ],
+      "fullFrameOcr": {
+        "raw": [
+          {
+            "text": ",",
+            "conf": 51.0,
+            "bboxXYWH": [
+              3507,
+              0,
+              73,
+              78
+            ]
+          },
+          {
+            "text": "Ja",
+            "conf": 60.0,
+            "bboxXYWH": [
+              3774,
+              30,
+              66,
+              65
+            ]
+          },
+          {
+            "text": "=",
+            "conf": 83.0,
+            "bboxXYWH": [
+              1368,
+              210,
+              47,
+              16
+            ]
+          },
+          {
+            "text": "|",
+            "conf": 52.0,
+            "bboxXYWH": [
+              1721,
+              243,
+              5,
+              5
+            ]
+          },
+          {
+            "text": "_",
+            "conf": 66.0,
+            "bboxXYWH": [
+              2318,
+              138,
+              51,
+              87
+            ]
+          },
+          {
+            "text": "0",
+            "conf": 56.0,
+            "bboxXYWH": [
+              2018,
+              873,
+              37,
+              37
+            ]
+          },
+          {
+            "text": "NS",
+            "conf": 50.0,
+            "bboxXYWH": [
+              2398,
+              832,
+              192,
+              91
+            ]
+          },
+          {
+            "text": "Zz",
+            "conf": 59.0,
+            "bboxXYWH": [
+              0,
+              1660,
+              409,
+              215
+            ]
+          },
+          {
+            "text": "Sorry",
+            "conf": 95.0,
+            "bboxXYWH": [
+              764,
+              1696,
+              303,
+              100
+            ]
+          },
+          {
+            "text": "toa",
+            "conf": 64.0,
+            "bboxXYWH": [
+              1139,
+              1701,
+              110,
+              75
+            ]
+          },
+          {
+            "text": "hear",
+            "conf": 96.0,
+            "bboxXYWH": [
+              1305,
+              1648,
+              254,
+              128
+            ]
+          },
+          {
+            "text": "this",
+            "conf": 94.0,
+            "bboxXYWH": [
+              1634,
+              1695,
+              229,
+              81
+            ]
+          },
+          {
+            "text": "happened",
+            "conf": 95.0,
+            "bboxXYWH": [
+              1938,
+              1694,
+              486,
+              104
+            ]
+          },
+          {
+            "text": "to",
+            "conf": 96.0,
+            "bboxXYWH": [
+              2496,
+              1702,
+              108,
+              74
+            ]
+          },
+          {
+            "text": "you,",
+            "conf": 96.0,
+            "bboxXYWH": [
+              2677,
+              1719,
+              216,
+              77
+            ]
+          },
+          {
+            "text": "we\u2019ll",
+            "conf": 80.0,
+            "bboxXYWH": [
+              765,
+              1829,
+              291,
+              82
+            ]
+          },
+          {
+            "text": "get",
+            "conf": 92.0,
+            "bboxXYWH": [
+              1134,
+              1836,
+              171,
+              92
+            ]
+          },
+          {
+            "text": "worki",
+            "conf": 91.0,
+            "bboxXYWH": [
+              1381,
+              1829,
+              288,
+              83
+            ]
+          },
+          {
+            "text": "=",
+            "conf": 93.0,
+            "bboxXYWH": [
+              3390,
+              1838,
+              101,
+              109
+            ]
+          },
+          {
+            "text": "hn",
+            "conf": 53.0,
+            "bboxXYWH": [
+              666,
+              2054,
+              40,
+              35
+            ]
+          }
+        ],
+        "enhanced": [
+          {
+            "text": "e",
+            "conf": 51.0,
+            "bboxXYWH": [
+              2018,
+              873,
+              37,
+              37
+            ]
+          },
+          {
+            "text": "NS",
+            "conf": 66.0,
+            "bboxXYWH": [
+              2398,
+              832,
+              192,
+              91
+            ]
+          },
+          {
+            "text": "Sorry",
+            "conf": 95.0,
+            "bboxXYWH": [
+              764,
+              1696,
+              303,
+              100
+            ]
+          },
+          {
+            "text": "to",
+            "conf": 96.0,
+            "bboxXYWH": [
+              1139,
+              1701,
+              110,
+              75
+            ]
+          },
+          {
+            "text": "hear",
+            "conf": 96.0,
+            "bboxXYWH": [
+              1305,
+              1648,
+              254,
+              128
+            ]
+          },
+          {
+            "text": "this",
+            "conf": 96.0,
+            "bboxXYWH": [
+              1634,
+              1695,
+              229,
+              81
+            ]
+          },
+          {
+            "text": "happened",
+            "conf": 95.0,
+            "bboxXYWH": [
+              1938,
+              1694,
+              486,
+              104
+            ]
+          },
+          {
+            "text": "to",
+            "conf": 96.0,
+            "bboxXYWH": [
+              2496,
+              1702,
+              108,
+              74
+            ]
+          },
+          {
+            "text": "you,",
+            "conf": 96.0,
+            "bboxXYWH": [
+              2677,
+              1719,
+              216,
+              77
+            ]
+          },
+          {
+            "text": "we'll",
+            "conf": 54.0,
+            "bboxXYWH": [
+              765,
+              1829,
+              291,
+              82
+            ]
+          },
+          {
+            "text": "get",
+            "conf": 93.0,
+            "bboxXYWH": [
+              1134,
+              1836,
+              171,
+              92
+            ]
+          },
+          {
+            "text": "worki",
+            "conf": 91.0,
+            "bboxXYWH": [
+              1381,
+              1829,
+              288,
+              83
+            ]
+          },
+          {
+            "text": "}",
+            "conf": 60.0,
+            "bboxXYWH": [
+              3390,
+              1862,
+              14,
+              85
+            ]
+          },
+          {
+            "text": "ri",
+            "conf": 59.0,
+            "bboxXYWH": [
+              666,
+              2054,
+              40,
+              35
+            ]
+          }
+        ]
+      },
+      "boxes": [
+        {
+          "classLabel": "person",
+          "detectionConfidence": 0.8371,
+          "bboxXYXY": [
+            409.42,
+            46.94,
+            913.74,
+            559.09
+          ],
+          "sam2": {
+            "iouScore": 0.9906,
+            "device": "cuda",
+            "maskPixels": 133514,
+            "maskBboxXYXY": [
+              362,
+              43,
+              904,
+              542
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_2750_0.png"
+          },
+          "relativeDepthMedian": 2.5803,
+          "ocr": {
+            "raw": [],
+            "enhanced": []
+          }
+        },
+        {
+          "classLabel": "person",
+          "detectionConfidence": 0.6855,
+          "bboxXYXY": [
+            1118.43,
+            453.17,
+            1255.2,
+            639.74
+          ],
+          "sam2": {
+            "iouScore": 0.9526,
+            "device": "cuda",
+            "maskPixels": 16806,
+            "maskBboxXYXY": [
+              1109,
+              456,
+              1249,
+              634
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_2750_1.png"
+          },
+          "relativeDepthMedian": 1.0236,
+          "ocr": {
+            "raw": [],
+            "enhanced": []
+          }
+        },
+        {
+          "classLabel": "person",
+          "detectionConfidence": 0.6566,
+          "bboxXYXY": [
+            1063.67,
+            264.35,
+            1172.62,
+            458.19
+          ],
+          "sam2": {
+            "iouScore": 0.9053,
+            "device": "cuda",
+            "maskPixels": 7106,
+            "maskBboxXYXY": [
+              1077,
+              277,
+              1167,
+              454
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_2750_2.png"
+          },
+          "relativeDepthMedian": 0.7119,
+          "ocr": {
+            "raw": [],
+            "enhanced": []
+          }
+        },
+        {
+          "classLabel": "person",
+          "detectionConfidence": 0.6389,
+          "bboxXYXY": [
+            965.62,
+            292.55,
+            1064.91,
+            461.87
+          ],
+          "sam2": {
+            "iouScore": 0.9183,
+            "device": "cuda",
+            "maskPixels": 6730,
+            "maskBboxXYXY": [
+              972,
+              295,
+              1058,
+              460
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_2750_3.png"
+          },
+          "relativeDepthMedian": 0.6036,
+          "ocr": {
+            "raw": [
+              {
+                "text": "=",
+                "conf": 55.0,
+                "bboxXYWH": [
+                  0,
+                  0,
+                  297,
+                  396
+                ]
+              }
+            ],
+            "enhanced": []
+          }
+        },
+        {
+          "classLabel": "tie",
+          "detectionConfidence": 0.6359,
+          "bboxXYXY": [
+            579.71,
+            251.12,
+            638.11,
+            422.93
+          ],
+          "sam2": {
+            "iouScore": 0.9602,
+            "device": "cuda",
+            "maskPixels": 3990,
+            "maskBboxXYXY": [
+              578,
+              252,
+              636,
+              418
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_2750_4.png"
+          },
+          "relativeDepthMedian": 2.8048,
+          "ocr": {
+            "raw": [
+              {
+                "text": "if",
+                "conf": 79.0,
+                "bboxXYWH": [
+                  0,
+                  0,
+                  177,
+                  315
+                ]
+              }
+            ],
+            "enhanced": [
+              {
+                "text": "if",
+                "conf": 71.0,
+                "bboxXYWH": [
+                  0,
+                  0,
+                  177,
+                  315
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "classLabel": "chair",
+          "detectionConfidence": 0.3219,
+          "bboxXYXY": [
+            1075.93,
+            647.69,
+            1193.89,
+            717.16
+          ],
+          "sam2": {
+            "iouScore": 0.941,
+            "device": "cuda",
+            "maskPixels": 6706,
+            "maskBboxXYXY": [
+              1078,
+              652,
+              1194,
+              720
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_2750_5.png"
+          },
+          "relativeDepthMedian": 1.6144,
+          "ocr": {
+            "raw": [
+              {
+                "text": "ome",
+                "conf": 52.0,
+                "bboxXYWH": [
+                  0,
+                  0,
+                  354,
+                  210
+                ]
+              }
+            ],
+            "enhanced": []
+          }
+        }
+      ],
+      "roleEvidence": {
+        "status": "PROPOSALS_ONLY__NOT_IDENTITY",
+        "sidecarRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.9.0|chunker=4.0.0",
+        "textSha256": "798d72447f19b6db0fb97e43c36e78faf84afb96ba483e3ce805ed2dcdb85727",
+        "text": "e NS Sorry to hear this happened to you, we'll get worki } ri",
+        "proposals": []
+      }
+    },
+    {
+      "framePtsMs": 7500,
+      "imageSize": [
+        1280,
+        720
+      ],
+      "fullFrameOcr": {
+        "raw": [
+          {
+            "text": "Ty",
+            "conf": 68.0,
+            "bboxXYWH": [
+              482,
+              1530,
+              11,
+              14
+            ]
+          },
+          {
+            "text": "at",
+            "conf": 68.0,
+            "bboxXYWH": [
+              903,
+              1582,
+              150,
+              125
+            ]
+          },
+          {
+            "text": "Provide",
+            "conf": 67.0,
+            "bboxXYWH": [
+              765,
+              1896,
+              462,
+              264
+            ]
+          },
+          {
+            "text": "more",
+            "conf": 93.0,
+            "bboxXYWH": [
+              1293,
+              1896,
+              220,
+              264
+            ]
+          },
+          {
+            "text": "details",
+            "conf": 93.0,
+            "bboxXYWH": [
+              1579,
+              1896,
+              418,
+              264
+            ]
+          },
+          {
+            "text": "here...",
+            "conf": 82.0,
+            "bboxXYWH": [
+              2041,
+              1896,
+              462,
+              264
+            ]
+          },
+          {
+            "text": ">",
+            "conf": 62.0,
+            "bboxXYWH": [
+              2987,
+              1896,
+              66,
+              264
+            ]
+          }
+        ],
+        "enhanced": [
+          {
+            "text": "more",
+            "conf": 96.0,
+            "bboxXYWH": [
+              1293,
+              1896,
+              220,
+              264
+            ]
+          },
+          {
+            "text": "details",
+            "conf": 92.0,
+            "bboxXYWH": [
+              1579,
+              1896,
+              418,
+              264
+            ]
+          },
+          {
+            "text": "here...",
+            "conf": 83.0,
+            "bboxXYWH": [
+              2041,
+              1896,
+              462,
+              264
+            ]
+          },
+          {
+            "text": ">",
+            "conf": 53.0,
+            "bboxXYWH": [
+              2811,
+              1896,
+              242,
+              264
+            ]
+          }
+        ]
+      },
+      "boxes": [
+        {
+          "classLabel": "person",
+          "detectionConfidence": 0.8796,
+          "bboxXYXY": [
+            436.22,
+            37.84,
+            858.54,
+            595.41
+          ],
+          "sam2": {
+            "iouScore": 0.9922,
+            "device": "cuda",
+            "maskPixels": 143361,
+            "maskBboxXYXY": [
+              435,
+              47,
+              848,
+              597
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_7500_0.png"
+          },
+          "relativeDepthMedian": 2.5275,
+          "ocr": {
+            "raw": [],
+            "enhanced": []
+          }
+        },
+        {
+          "classLabel": "person",
+          "detectionConfidence": 0.6938,
+          "bboxXYXY": [
+            1115.85,
+            449.01,
+            1254.77,
+            640.78
+          ],
+          "sam2": {
+            "iouScore": 0.9389,
+            "device": "cuda",
+            "maskPixels": 16762,
+            "maskBboxXYXY": [
+              1109,
+              456,
+              1249,
+              636
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_7500_1.png"
+          },
+          "relativeDepthMedian": 1.0687,
+          "ocr": {
+            "raw": [],
+            "enhanced": []
+          }
+        },
+        {
+          "classLabel": "person",
+          "detectionConfidence": 0.6889,
+          "bboxXYXY": [
+            1062.36,
+            266.04,
+            1175.0,
+            458.25
+          ],
+          "sam2": {
+            "iouScore": 0.9036,
+            "device": "cuda",
+            "maskPixels": 7081,
+            "maskBboxXYXY": [
+              1077,
+              278,
+              1166,
+              454
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_7500_2.png"
+          },
+          "relativeDepthMedian": 0.7344,
+          "ocr": {
+            "raw": [],
+            "enhanced": []
+          }
+        },
+        {
+          "classLabel": "person",
+          "detectionConfidence": 0.6411,
+          "bboxXYXY": [
+            964.63,
+            292.52,
+            1064.96,
+            455.06
+          ],
+          "sam2": {
+            "iouScore": 0.9172,
+            "device": "cuda",
+            "maskPixels": 6557,
+            "maskBboxXYXY": [
+              977,
+              294,
+              1059,
+              460
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_7500_3.png"
+          },
+          "relativeDepthMedian": 0.5876,
+          "ocr": {
+            "raw": [],
+            "enhanced": []
+          }
+        },
+        {
+          "classLabel": "chair",
+          "detectionConfidence": 0.4313,
+          "bboxXYXY": [
+            1074.39,
+            649.21,
+            1194.21,
+            717.15
+          ],
+          "sam2": {
+            "iouScore": 0.9257,
+            "device": "cuda",
+            "maskPixels": 7023,
+            "maskBboxXYXY": [
+              1069,
+              652,
+              1194,
+              720
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_7500_4.png"
+          },
+          "relativeDepthMedian": 1.5376,
+          "ocr": {
+            "raw": [
+              {
+                "text": "|",
+                "conf": 81.0,
+                "bboxXYWH": [
+                  306,
+                  0,
+                  51,
+                  204
+                ]
+              }
+            ],
+            "enhanced": []
+          }
+        },
+        {
+          "classLabel": "chair",
+          "detectionConfidence": 0.2583,
+          "bboxXYXY": [
+            1011.11,
+            503.48,
+            1121.11,
+            619.73
+          ],
+          "sam2": {
+            "iouScore": 0.957,
+            "device": "cuda",
+            "maskPixels": 10768,
+            "maskBboxXYXY": [
+              1010,
+              502,
+              1118,
+              617
+            ],
+            "maskPath": "scratch\\yolox-keyframes\\masks\\mask_7500_5.png"
+          },
+          "relativeDepthMedian": 0.9251,
+          "ocr": {
+            "raw": [],
+            "enhanced": []
+          }
+        }
+      ],
+      "roleEvidence": {
+        "status": "PROPOSALS_ONLY__NOT_IDENTITY",
+        "sidecarRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.9.0|chunker=4.0.0",
+        "textSha256": "de04120c86ea60477cfd155f420674e6ab80765ae006d39bd06e82a78ed6d76f",
+        "text": "more details here... >",
+        "proposals": []
+      }
+    }
+  ],
+  "roleEvidenceStatus": "ATTACHED_BY_POST_PASS__PROPOSALS_ONLY"
+}

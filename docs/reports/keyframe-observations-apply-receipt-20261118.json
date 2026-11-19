@@ -1,0 +1,25 @@
+{
+  "schema": "keyframe-observations-apply-receipt.v1",
+  "status": "APPLIED_AND_POSTCHECKED",
+  "appliedAt": "2026-11-18",
+  "approval": "operator instruction: 'apply the keyframe observations draft' (explicit, named)",
+  "database": "legal_ai_db on legal-ai-postgres (PostgreSQL 18.4)",
+  "sql": "sveltekit-frontend/drizzle/manual/20261118_keyframe_observations_DRAFT.sql plus scratch/yolox-keyframes/keyframe_obs_insert.sql",
+  "transaction": "single BEGIN ... COMMIT with DO-block post-checks (row count 17, both indexes present)",
+  "preImage": { "tableExisted": false },
+  "postImage": {
+    "rows": 17,
+    "distinctFrames": 3,
+    "indexes": ["keyframe_observations_pkey", "keyframe_obs_evidence_time_idx", "keyframe_obs_payload_gin_idx"]
+  },
+  "sourceRecords": "docs/reports/keyframe-observations-linked-20261118.json",
+  "notApplied": [
+    "depth attachment record and its SeaweedFS upload (separate approval required)",
+    "review verdicts and enrichment writes (no approval given)"
+  ],
+  "limits": [
+    "records are derivative analysis, not evidence",
+    "asset IDs in payload are scratch-local paths, not stored SeaweedFS objects",
+    "evidence_id references the evidence row a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778"
+  ]
+}

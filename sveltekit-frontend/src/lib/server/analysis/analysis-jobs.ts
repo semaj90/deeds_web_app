@@ -594,10 +594,13 @@ export async function completeEvidenceUploadJobV1(
   executor: typeof db = db
 ): Promise<void> {
   const receipt = result as Record<string, unknown>;
+  // The upload pipeline already checks the source hash and verifies the video readback.
+  const verifiedNonVectorReceipt = receipt.canonicalReceiptVerified === true &&
+    receipt.evidenceId === evidenceId && receipt.chunkCount === 0;
   if (
     receipt.status !== 'processed' ||
     !Number.isSafeInteger(receipt.chunkCount) ||
-    (receipt.chunkCount as number) <= 0 ||
+    (!verifiedNonVectorReceipt && (receipt.chunkCount as number) <= 0) ||
     receipt.persistedCount !== receipt.chunkCount ||
     typeof receipt.sourceRevision !== 'string'
   ) {

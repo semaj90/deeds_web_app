@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 import { formatEvidenceSourceRevisionV1 } from '$lib/server/evidence-source-revision-v1.js';
 import { ENV } from '$lib/server/env.server.js';
+import { getActiveJobForEvidence } from '$lib/server/evidence-progress.js';
 
 const transcriptReviewBodySchema = z.object({
 	segmentId: z.string().uuid(),
@@ -87,6 +88,7 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 	}
 
 	const sourceRevision = item.hash ? formatEvidenceSourceRevisionV1(item.hash) : `urn:evidence:${item.id}`;
+	const activeProgress = getActiveJobForEvidence(evidenceId, String(userId));
 	const videoAnalysis = typeof item.aiAnalysis === 'object' && item.aiAnalysis !== null
 		? (item.aiAnalysis as Record<string, unknown>).videoAnalysis as Record<string, unknown> | undefined
 		: undefined;
@@ -205,6 +207,8 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 	let status: 'completed' | 'no_audio' | 'processing' | 'failed' | 'empty' = 'completed';
 	if (isSilentVideo) {
 		status = 'no_audio';
+	} else if (activeProgress) {
+		status = 'processing';
 	} else if (videoAnalysis?.transcriptionStatus === 'FAILED') {
 		status = 'failed';
 	} else if (segmentsRaw.length === 0) {
@@ -281,6 +285,13 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 		limit,
 		totalPages: Math.ceil(segments.length / limit) || 1,
 		reviewEnabled: ENV.EVIDENCE_TRANSCRIPT_REVIEW_ENABLED,
+		jobProgress: activeProgress ? {
+			step: activeProgress.step,
+			progress: activeProgress.progress,
+			message: activeProgress.message,
+			createdAt: new Date(activeProgress.createdAt).toISOString(),
+			updatedAt: new Date(activeProgress.updatedAt).toISOString(),
+		} : null,
 		segments: paginatedSegments,
 	};
 	if (exportFormat === 'json') {
