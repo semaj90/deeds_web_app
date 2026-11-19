@@ -1,11 +1,12 @@
 // @vitest-environment node
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import crypto from 'node:crypto';
 import { humanCoco17PoseSchemaV1 } from '$lib/shared/pose-skeleton-schema-v1.js';
 import { createPlanarCameraCalibrationV1 } from '$lib/splat/planar-camera-calibration-v1.js';
 import {
   EVIDENCE_REVISION_SCHEMA_V1,
   EvidenceRevisionErrorV1,
+  createDrizzleRevisionPortsV1,
   MAX_REVISION_IMAGE_BYTES,
   normalizeSha256,
   saveEvidenceMarkupRevisionV1,
@@ -15,6 +16,8 @@ import {
   sniffImage,
   type EvidenceRevisionPortsV1,
 } from './evidence-revision-v1.js';
+import type { StorybookRegionReviewV1 } from '$lib/shared/storybook-region-review-v1.js';
+import { parseWholeImageAnalysisRowV1 } from '$lib/server/evidence/whole-image-analysis-readback-v1.js';
 
 const CASE_ID = '11111111-1111-4111-8111-111111111111';
 const EV_ID = '22222222-2222-4222-8222-222222222222';
@@ -78,6 +81,80 @@ const base = () => ({ caseId: CASE_ID, evidenceId: EV_ID, actorUserId: 7, parent
 const code = async (p: Promise<unknown>) => { try { await p; return 'NO_ERROR'; } catch (e) { return e instanceof EvidenceRevisionErrorV1 ? e.code : `OTHER:${(e as Error).message}`; } };
 
 describe('evidence-revision-v1', () => {
+  const regionReview: StorybookRegionReviewV1 = {
+    schema: 'atlas.storybook-region-review.v1', reviewId: CASE_ID, analysisRevision: 'analysis-1',
+    artifactSha256: `sha256:${'b'.repeat(64)}`, frameIndex: 0, timestampMs: 250, width: 100, height: 80,
+    column: 7, row: 4, decision: 'NOT_REVIEWED', notes: '',
+  };
+
+  it('records each region decision on its own and sends retries through locked validation', async () => {
+    const { ports, log } = fakePorts({ findAnnotationRevision: vi.fn(async () => { throw new Error('must check current frame before dedupe'); }) });
+    const input = { ...base(), annotation: { schema: 'atlas.evidence-annotation.v1', modality: 'video', annotations: [], storybookRegionReview: regionReview } };
+    const saved = await saveEvidenceAnnotationRevisionV1(input, ports);
+    const retry = await saveEvidenceAnnotationRevisionV1(input, ports);
+    expect(retry).toMatchObject({ versionId: saved.versionId, idempotent: true });
+    expect(log.put).toHaveLength(0);
+    expect(log.insert).toHaveLength(1);
+    expect(log.insert[0]).toMatchObject({ storybookRegionReview: regionReview, metadata: {
+      actorUserId: 7, parentSha256: PARENT, annotation: { storybookRegionReview: regionReview }, canonicalAuthority: false,
+    } });
+    await expect(saveEvidenceAnnotationRevisionV1({ ...input, annotation: { ...input.annotation, modality: 'image' } }, ports))
+      .rejects.toMatchObject({ code: 'INVALID_MARKUP' });
+  });
+
+  it('checks the current frame while holding the evidence lock, before dedupe or insert', async () => {
+    const parent = { id: EV_ID, caseId: CASE_ID, hash: PARENT, deletedAt: null };
+    const selects = [[parent], [{ videoAnalysis: null }]];
+    const execute = vi.fn();
+    const insert = vi.fn();
+    const select = vi.fn(() => ({ from: () => ({ where: () => ({ limit: async () => selects.shift() }) }) }));
+    const transactionalDb = { transaction: (body: (tx: unknown) => unknown) => body({ execute, insert, select }) };
+    const ports = await createDrizzleRevisionPortsV1({ db: transactionalDb as never });
+    await expect(ports.insertAnnotationRevision({ evidenceId: EV_ID, caseId: CASE_ID, parentSha256: PARENT,
+      annotationSha256: PARENT, actorUserId: 7, metadata: {}, changeReason: null, storybookRegionReview: regionReview,
+    })).rejects.toMatchObject({ code: 'STORYBOOK_REVIEW_FRAME_CHANGED' });
+    expect(execute.mock.invocationCallOrder[0]).toBeLessThan(select.mock.invocationCallOrder[0]!);
+    expect(select).toHaveBeenCalledTimes(2);
+    expect(insert).not.toHaveBeenCalled();
+  });
+
+  it('saves an image cell and rejects its replay after the canonical analysis changes', async () => {
+    const row = {
+      source_revision: PARENT, analysis_revision: 'image-analysis-1',
+      source_locator: { kind: 'whole_image', coordinateSpace: 'original_pixels', width: 100, height: 80 },
+      metadata: { visualAnalysis: {
+        schema: 'atlas.evidence-visual-analysis.v1', authority: 'OBSERVATION_ONLY', status: 'PARTIAL',
+        sourceRevision: PARENT, detectionExecuted: true, objectDetections: [], layoutRegions: [],
+        visionSummary: null, visionFindings: [], visionTags: [], depthMap: null, stageErrors: [],
+      } },
+    };
+    const manifest = parseWholeImageAnalysisRowV1(row, EV_ID, PARENT)?.storybook?.manifest;
+    expect(manifest).toBeDefined();
+    const review: StorybookRegionReviewV1 = {
+      schema: 'atlas.storybook-region-review.v1', reviewId: CASE_ID, analysisRevision: row.analysis_revision,
+      observationRevision: manifest!.observationRevision, width: 100, height: 80,
+      column: 2, row: 4, decision: 'UNCLASSIFIED', notes: 'Detail is obscured.',
+    };
+    const parent = { id: EV_ID, caseId: CASE_ID, hash: PARENT, deletedAt: null };
+    let latestRow = row;
+    const execute = vi.fn().mockResolvedValueOnce({ rows: [] }).mockImplementationOnce(async () => ({ rows: [latestRow] }))
+      .mockResolvedValueOnce({ rows: [] }).mockImplementationOnce(async () => ({ rows: [latestRow] }));
+    const selects = [[parent], [], [], [{ m: 0 }], [parent]];
+    const select = vi.fn(() => ({ from: () => ({ where: () => {
+      const pending = Promise.resolve(selects.shift());
+      return Object.assign(pending, { limit: () => pending });
+    } }) }));
+    const insert = vi.fn(() => ({ values: () => ({ returning: async () => [{ id: CASE_ID, version: 1 }] }) }));
+    const transactionalDb = { transaction: (body: (tx: unknown) => unknown) => body({ execute, insert, select }) };
+    const ports = await createDrizzleRevisionPortsV1({ db: transactionalDb as never });
+    const command = { evidenceId: EV_ID, caseId: CASE_ID, parentSha256: PARENT,
+      annotationSha256: PARENT, actorUserId: 7, metadata: {}, changeReason: null, storybookRegionReview: review };
+    await expect(ports.insertAnnotationRevision(command)).resolves.toMatchObject({ version: 1, created: true });
+    latestRow = { ...row, metadata: { visualAnalysis: { ...row.metadata.visualAnalysis, detectionExecuted: false } } };
+    await expect(ports.insertAnnotationRevision(command)).rejects.toMatchObject({ code: 'STORYBOOK_REVIEW_FRAME_CHANGED' });
+    expect(insert).toHaveBeenCalledTimes(1);
+  });
+
   it('normalizes sha256 and sniffs image bytes', () => {
     expect(normalizeSha256(PARENT_HEX.toUpperCase())).toBe(PARENT);
     expect(normalizeSha256('sha256:xyz')).toBeNull();

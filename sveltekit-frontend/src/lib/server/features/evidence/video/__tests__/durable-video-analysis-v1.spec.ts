@@ -353,7 +353,7 @@ describe('durable video analysis worker stage', () => {
 		expect(mocks.loadDetector).toHaveBeenCalled();
 		expect(mocks.persist).toHaveBeenCalledWith(expect.objectContaining({
 			detectorStatus: 'UNAVAILABLE',
-			frames: [expect.objectContaining({ reviewState: 'UNREVIEWED_PROPOSAL' })],
+			frames: [expect.objectContaining({ reviewState: 'UNREVIEWED_PROPOSAL', detectionStatus: 'UNAVAILABLE' })],
 		}), expect.anything());
 		expect(result).toMatchObject({
 			canonicalReceiptVerified: true,

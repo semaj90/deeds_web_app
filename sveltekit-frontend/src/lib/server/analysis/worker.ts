@@ -309,6 +309,15 @@ type AnalysisStageConfig = {
 };
 
 const stageConfig: Record<string, AnalysisStageConfig> = {
+	scene_palette: {
+		gate: entityGate, concurrency: 1, family: 'structural',
+		passName: 'scene_palette', passRevision: 'scene-palette-pack-v1',
+		backend: 'native-ts', backendVersion: ANALYSIS_WORKER_REVISION, device: 'cpu',
+		run: async (evidenceId, metadata, jobId) => {
+			const { executeScenePaletteJobV1 } = await import('./scene-palette-job-v1.js');
+			return executeScenePaletteJobV1(evidenceId, metadata, jobId);
+		},
+	},
 	upload_pipeline: {
 		gate: entityGate,
 		concurrency: 1,
@@ -474,7 +483,7 @@ async function pollOnce(): Promise<void> {
 							});
 							return;
 						}
-						if (jobType === 'lexical_feature_registry') {
+						if (jobType === 'lexical_feature_registry' || jobType === 'scene_palette') {
 							await completeAnalysisJob(job.id, { ...result, durationMs: Date.now() - t0 });
 							return;
 						}

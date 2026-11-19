@@ -33,6 +33,7 @@
 	interface Props {
 		imageUrl: string;
 		depthUrl: string | null;
+		artifactDigests?: { image: string; depth: string };
 		relief?: number;
 		discontinuity?: number;
 		invertDepth?: boolean;
@@ -59,6 +60,7 @@
 	let {
 		imageUrl,
 		depthUrl,
+		artifactDigests,
 		relief = 0.85,
 		discontinuity = 0.17,
 		invertDepth = false,
@@ -191,19 +193,27 @@
 				const THREE: any = await import('three/webgpu');
 				const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
 				if (disposed) return;
-				const fetchBitmap = async (url: string) => {
-					const response = await fetch(url, { credentials: 'same-origin' });
+				const fetchBitmap = async (url: string, expectedDigest?: string) => {
+					const response = await fetch(url, { credentials: 'same-origin', ...(expectedDigest ? { cache: 'no-store' as const } : {}) });
 					if (!response.ok) throw new Error(`Image HTTP ${response.status}`);
-					return createImageBitmap(await response.blob());
+					if (expectedDigest && Number(response.headers.get('content-length')) > 32 * 1024 * 1024) throw new Error('Preview artifact exceeds the size limit.');
+					const blob = await response.blob();
+					if (expectedDigest) {
+						if (blob.size > 32 * 1024 * 1024) throw new Error('Preview artifact exceeds the size limit.');
+						const { sha256Hex } = await import('$lib/splat/spz-loader.js');
+						const hash = await sha256Hex(new Uint8Array(await blob.arrayBuffer()));
+						if (`sha256:${hash}` !== expectedDigest) throw new Error('Preview artifact failed digest verification.');
+					}
+					return createImageBitmap(blob);
 				};
-				colorBitmap = await fetchBitmap(imageUrl);
+				colorBitmap = await fetchBitmap(imageUrl, artifactDigests?.image);
 				if (disposed) return;
 
 				const imageAspect = colorBitmap.width / colorBitmap.height;
 				let depthSourceMode: DepthSourceMode = 'DEPTH_UNAVAILABLE';
 				if (depthUrl) {
 					try {
-						const candidateDepth = await fetchBitmap(depthUrl);
+						const candidateDepth = await fetchBitmap(depthUrl, artifactDigests?.depth);
 						const depthAspect = candidateDepth.width / candidateDepth.height;
 						if (candidateDepth.width !== colorBitmap.width || candidateDepth.height !== colorBitmap.height || Math.abs(imageAspect - depthAspect) > 0.001) {
 							candidateDepth.close();
@@ -211,11 +221,13 @@
 						}
 						depthBitmap = candidateDepth;
 						depthSourceMode = 'STORED_MONOCULAR_DEPTH';
-					} catch {
+					} catch (cause) {
+						if (artifactDigests) throw cause;
 						depthBitmap = null;
 					}
 				}
 				if (!depthBitmap) {
+					if (artifactDigests) throw new Error('Verified relative depth is unavailable.');
 					try {
 						const previewCanvas = document.createElement('canvas');
 						previewCanvas.width = 256;
@@ -754,7 +766,7 @@
 	{#if loading}<div class="message">Building textured depth surface…</div>{/if}
 	{#if error}
 		<!-- Final fallback: flat evidence image so the panel is never blank. -->
-		<img class="flat" src={imageUrl} alt="Evidence (flat view; relief unavailable)" />
+		{#if !artifactDigests}<img class="flat" src={imageUrl} alt="Evidence (flat view; relief unavailable)" />{/if}
 		<div class="message error" role="alert" data-testid="depth-relief-error">
 			<Icon name="yorha-warning" size={16} /> {error}
 		</div>

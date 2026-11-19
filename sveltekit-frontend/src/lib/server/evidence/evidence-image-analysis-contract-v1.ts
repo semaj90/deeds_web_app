@@ -23,6 +23,8 @@ export const Sam2SegmentationMaskSchemaV1 = z.object({
   maskObjectKey: z.string().min(1),
   maskSha256: z.string().regex(/^[a-f0-9]{64}$/i),
   targetBoxIndex: z.number().int().min(0),
+  sourceDetectionIndex: z.number().int().min(0).optional(),
+  modelRevision: z.string().min(1).max(256).optional(),
   label: z.string().min(1),
   iouScore: z.number().min(0).max(1),
   is3DReconstruction: z.literal(false),

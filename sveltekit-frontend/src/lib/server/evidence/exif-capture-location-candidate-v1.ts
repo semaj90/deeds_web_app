@@ -7,10 +7,27 @@ const SUPPORTED_IMAGE_TYPES = new Set([
 	'image/jpeg',
 	'image/png',
 	'image/tiff',
-	'image/webp',
 	'image/heic',
 	'image/avif',
 ]);
+
+function hasSupportedImageSignature(bytes: Buffer, mimeType: string): boolean {
+	const mime = mimeType.toLowerCase().split(';', 1)[0]?.trim();
+	if (mime === 'image/jpeg') return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+	if (mime === 'image/png') return bytes.length >= 8 && bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+	if (mime === 'image/tiff') {
+		return bytes.length >= 4 && (
+			(bytes[0] === 0x49 && bytes[1] === 0x49 && bytes[2] === 0x2a && bytes[3] === 0x00) ||
+			(bytes[0] === 0x4d && bytes[1] === 0x4d && bytes[2] === 0x00 && bytes[3] === 0x2a)
+		);
+	}
+	if (mime === 'image/heic' || mime === 'image/avif') {
+		if (bytes.length < 12 || bytes.toString('ascii', 4, 8) !== 'ftyp') return false;
+		const brands = bytes.toString('ascii', 8, Math.min(bytes.length, 64));
+		return mime === 'image/avif' ? /avif|avis/.test(brands) : /heic|heix|hevc|hevx|mif1|msf1/.test(brands);
+	}
+	return false;
+}
 
 const inputSchema = z.object({
 	caseId: z.string().uuid(),
@@ -53,7 +70,7 @@ export async function extractExifCaptureLocationCandidateV1(
 	if (bytes.byteLength === 0 || bytes.byteLength > MAX_IMAGE_BYTES) {
 		return { status: 'INVALID_INPUT', candidate: null };
 	}
-	if (!SUPPORTED_IMAGE_TYPES.has(mimeType.toLowerCase())) {
+	if (!SUPPORTED_IMAGE_TYPES.has(mimeType.toLowerCase().split(';', 1)[0]?.trim() ?? '') || !hasSupportedImageSignature(bytes, mimeType)) {
 		return { status: 'UNSUPPORTED_FORMAT', candidate: null };
 	}
 

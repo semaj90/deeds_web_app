@@ -82,6 +82,7 @@ export async function runSam2SilhouetteAdapterV1(
 				maskObjectKey,
 				maskSha256,
 				targetBoxIndex: index,
+				sourceDetectionIndex: input.boxes.indexOf(prompt),
 				label: prompt.label,
 				iouScore,
 				is3DReconstruction: false,

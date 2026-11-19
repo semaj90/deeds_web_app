@@ -23,6 +23,9 @@ import {
 	type PoseSkeletonSchemaV1,
 } from '$lib/shared/pose-skeleton-schema-v1.js';
 import { planarCameraCalibrationV1Schema } from '$lib/splat/planar-camera-calibration-v1.js';
+import { reviewableImageObservationsV1, storybookRegionReviewV1Schema, type StorybookRegionReviewV1 } from '$lib/shared/storybook-region-review-v1.js';
+import { matchesCurrentStorybookReviewFrameV1 } from './video/video-storybook-coverage-v1.js';
+import { parseWholeImageAnalysisRowV1, readLatestWholeImageAnalysisRowV1 } from '$lib/server/evidence/whole-image-analysis-readback-v1.js';
 
 export const EVIDENCE_REVISION_SCHEMA_V1 = 'atlas.evidence-revision.v1' as const;
 export const EVIDENCE_ANNOTATION_REVISION_SCHEMA_V1 = 'atlas.evidence-annotation-revision.v1' as const;
@@ -51,6 +54,7 @@ export const evidenceAnnotationDocumentV1Schema = z.object({
 	poseSchemas: z.array(poseSkeletonSchemaV1Schema).max(32).optional(),
 	poseObservations: z.array(z.unknown()).max(200).optional(),
 	planarCameraCalibrations: z.array(z.unknown()).max(8).optional(),
+	storybookRegionReview: storybookRegionReviewV1Schema.optional(),
 }).strict();
 export type EvidenceAnnotationDocumentV1 = z.infer<typeof evidenceAnnotationDocumentV1Schema>;
 
@@ -101,7 +105,9 @@ export class EvidenceRevisionErrorV1 extends Error {
       | 'EVIDENCE_NOT_FOUND'
       | 'EVIDENCE_CASE_MISMATCH'
       | 'PARENT_HASH_UNAVAILABLE'
-      | 'PARENT_HASH_MISMATCH',
+      | 'PARENT_HASH_MISMATCH'
+      | 'STORYBOOK_REVIEW_FRAME_CHANGED'
+      | 'STORYBOOK_REVIEW_ID_CONFLICT',
     message: string,
   ) {
     super(message);
@@ -119,7 +125,7 @@ export interface EvidenceRevisionPortsV1 {
   insertRevision(args: { evidenceId: string; caseId: string; parentSha256: string; sha256: string; metadata: Record<string, unknown>; changeReason: string | null }): Promise<{ id: string; version: number; created: boolean }>;
   findAnnotationRevision(evidenceId: string, annotationSha256: string): Promise<{ id: string; version: number } | null>;
   /** Must lock the source row, recheck its hash/case, dedupe, and append evidence_versions in one transaction. */
-  insertAnnotationRevision(args: { evidenceId: string; caseId: string; parentSha256: string; annotationSha256: string; actorUserId: number; metadata: Record<string, unknown>; changeReason: string | null }): Promise<{ id: string; version: number; created: boolean }>;
+  insertAnnotationRevision(args: { evidenceId: string; caseId: string; parentSha256: string; annotationSha256: string; actorUserId: number; metadata: Record<string, unknown>; changeReason: string | null; storybookRegionReview?: StorybookRegionReviewV1 }): Promise<{ id: string; version: number; created: boolean }>;
   loadAnnotationRevision(evidenceId: string, revisionId: string): Promise<{ id: string; version: number; metadata: unknown } | null>;
   /** Lock/recheck the current evidence row and append the review decision under evidence_versions. */
   insertPoseReviewDecision(args: { evidenceId: string; caseId: string; parentSha256: string; decisionSha256: string; metadata: Record<string, unknown>; changeReason: string | null }): Promise<{ id: string; version: number; created: boolean }>;
@@ -372,6 +378,11 @@ export async function saveEvidenceAnnotationRevisionV1(input: {
   if (!parentSha256) throw new EvidenceRevisionErrorV1('INVALID_PARENT_SHA256', 'parentSha256 must be sha256:<64 hex>.');
   const annotation = evidenceAnnotationDocumentV1Schema.safeParse(input.annotation);
   if (!annotation.success) throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'Annotation document is invalid.');
+	const regionReview = annotation.data.storybookRegionReview;
+	if (regionReview && (annotation.data.modality !== ('observationRevision' in regionReview ? 'image' : 'video') || annotation.data.annotations.length || annotation.data.notes ||
+		annotation.data.poseSchemas || annotation.data.poseObservations || annotation.data.planarCameraCalibrations)) {
+		throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'Record each region review on its own using the matching evidence modality.');
+	}
 
   let canonicalPoseSchemas: PoseSkeletonSchemaV1[] | undefined;
   let canonicalPoseObservations: PoseObservationV1[] | undefined;
@@ -490,14 +501,16 @@ export async function saveEvidenceAnnotationRevisionV1(input: {
     ...(canonicalPoseSchemas ? { poseSchemas: canonicalPoseSchemas } : {}),
     ...(canonicalPoseObservations ? { poseObservations: canonicalPoseObservations } : {}),
 	...(canonicalPlanarCameraCalibrations ? { planarCameraCalibrations: canonicalPlanarCameraCalibrations } : {}),
+	...(regionReview ? { storybookRegionReview: regionReview } : {}),
   };
   const annotationSha256 = `sha256:${crypto.createHash('sha256').update(JSON.stringify({
     evidenceId: input.evidenceId,
     caseId: input.caseId,
     parentSha256,
     annotation: canonicalAnnotation,
+	...(regionReview ? { reviewerUserId: input.actorUserId } : {}),
   }), 'utf8').digest('hex')}`;
-  const existing = await ports.findAnnotationRevision(input.evidenceId, annotationSha256);
+  const existing = regionReview ? null : await ports.findAnnotationRevision(input.evidenceId, annotationSha256);
   if (existing) return {
     schema: EVIDENCE_ANNOTATION_REVISION_SCHEMA_V1,
     committed: true,
@@ -516,6 +529,7 @@ export async function saveEvidenceAnnotationRevisionV1(input: {
     parentSha256,
     annotationSha256,
     actorUserId: input.actorUserId,
+	...(regionReview ? { storybookRegionReview: regionReview } : {}),
     changeReason: input.revisionNotes?.trim() ? input.revisionNotes.trim().slice(0, 1000) : null,
     metadata: {
       schema: EVIDENCE_ANNOTATION_REVISION_SCHEMA_V1,
@@ -725,13 +739,38 @@ export async function createDrizzleRevisionPortsV1(override?: { db: (typeof impo
         return { ...row, created: true };
       });
     },
-    async insertAnnotationRevision({ evidenceId, caseId, parentSha256, annotationSha256, metadata, changeReason }) {
+    async insertAnnotationRevision({ evidenceId, caseId, parentSha256, annotationSha256, metadata, changeReason, storybookRegionReview }) {
       return db.transaction(async (tx) => {
         await tx.execute(sql`SELECT 1 FROM ${evidence} WHERE ${evidence.id} = ${evidenceId} FOR UPDATE`);
         const [parent] = await tx.select({ id: evidence.id, caseId: evidence.caseId, hash: evidence.hash, deletedAt: evidence.deletedAt }).from(evidence).where(eq(evidence.id, evidenceId)).limit(1);
         if (!parent || parent.deletedAt) throw new EvidenceRevisionErrorV1('EVIDENCE_NOT_FOUND', 'Evidence not found.');
         if (parent.caseId !== caseId) throw new EvidenceRevisionErrorV1('EVIDENCE_CASE_MISMATCH', 'Evidence does not belong to the stated case.');
         if (normalizeSha256(parent.hash) !== parentSha256) throw new EvidenceRevisionErrorV1('PARENT_HASH_MISMATCH', 'Source evidence changed while saving annotations.');
+		if (storybookRegionReview) {
+		  if ('observationRevision' in storybookRegionReview) {
+			const row = await readLatestWholeImageAnalysisRowV1(evidenceId, tx);
+			const manifest = row && parseWholeImageAnalysisRowV1(row, evidenceId, parentSha256)?.storybook?.manifest;
+			if (!manifest || manifest.analysisRevision !== storybookRegionReview.analysisRevision ||
+				manifest.observationRevision !== storybookRegionReview.observationRevision ||
+				manifest.width !== storybookRegionReview.width || manifest.height !== storybookRegionReview.height ||
+				('observationId' in storybookRegionReview && !reviewableImageObservationsV1(manifest)
+					.some((observation) => observation.observationId === storybookRegionReview.observationId))) {
+			  throw new EvidenceRevisionErrorV1('STORYBOOK_REVIEW_FRAME_CHANGED', 'The image analysis changed. Reload the chapter before reviewing.');
+			}
+		  } else {
+			const [current] = await tx.select({ videoAnalysis: sql<unknown>`${evidence.aiAnalysis}->'videoAnalysis'` })
+			  .from(evidence).where(eq(evidence.id, evidenceId)).limit(1);
+			if (!matchesCurrentStorybookReviewFrameV1({ sourceRevision: parentSha256, videoAnalysis: current?.videoAnalysis, review: storybookRegionReview })) {
+			  throw new EvidenceRevisionErrorV1('STORYBOOK_REVIEW_FRAME_CHANGED', 'The sampled frame changed. Reload the chapter before reviewing.');
+			}
+		  }
+		  const [previous] = await tx.select({ sha256: sql<string>`${evidenceVersions.metadata}->>'annotationSha256'` })
+			.from(evidenceVersions).where(and(eq(evidenceVersions.evidenceId, evidenceId),
+			  sql`${evidenceVersions.metadata}#>>'{annotation,storybookRegionReview,reviewId}' = ${storybookRegionReview.reviewId}`)).limit(1);
+		  if (previous && previous.sha256 !== annotationSha256) {
+			throw new EvidenceRevisionErrorV1('STORYBOOK_REVIEW_ID_CONFLICT', 'This review ID already belongs to another saved decision.');
+		  }
+		}
         const [dup] = await tx.select({ id: evidenceVersions.id, version: evidenceVersions.version }).from(evidenceVersions).where(byAnnotationFilter(evidenceId, annotationSha256)).limit(1);
         if (dup) return { ...dup, created: false };
         const [max] = await tx.select({ m: sql<number>`coalesce(max(${evidenceVersions.version}), 0)` }).from(evidenceVersions).where(eq(evidenceVersions.evidenceId, evidenceId));

@@ -26,6 +26,7 @@ import { appendFileSync, createWriteStream, existsSync, mkdirSync } from 'node:f
 import { loadRepoEnv } from '../../../scripts/atlas/connection-config.mjs';
 import { isMiniforgeNlpRunning } from './miniforge-nlp-health.mjs';
 import { isGraphifyStartupEnabled } from './graphify-startup-gate.mjs';
+import { publishActiveServerWhenReady } from '../qa/active-server-manifest.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND_ROOT = path.resolve(__dirname, '../..');
@@ -574,7 +575,22 @@ async function main() {
   // another port (previously 5174) broke bookmarks, PUBLIC_API_URL and OAuth callbacks.
   const fixedVitePort = parseInt(process.env.VITE_PORT ?? '5173', 10);
   if (await isTcpPortOpen(fixedVitePort)) {
-    console.error(`[dev:gpu] ❌ :${fixedVitePort} is already in use. dev:gpu keeps Vite on :${fixedVitePort} and will not fall back.`);
+    // A second launch (VS Code folder-open plus a manual run) finds a live dev server.
+    // That is success, not an error: nothing new is needed, so exit 0 without starting
+    // a second set of launchers. Any HTTP response counts as the server being up.
+    let answering = false;
+    try {
+      await fetch(`http://127.0.0.1:${fixedVitePort}/`, { signal: AbortSignal.timeout(3000) });
+      answering = true;
+    } catch {
+      answering = false;
+    }
+    if (answering) {
+      console.log(`[dev:gpu] ✅ Dev server already running on :${fixedVitePort}; not starting a second instance.`);
+      console.log(`[dev:gpu]    Open http://localhost:${fixedVitePort}. To restart, stop the owning node process and rerun.`);
+      process.exit(0);
+    }
+    console.error(`[dev:gpu] ❌ :${fixedVitePort} is open but not answering HTTP. dev:gpu keeps Vite on :${fixedVitePort} and will not fall back.`);
     console.error(`[dev:gpu]    Find the owner: netstat -ano | findstr :${fixedVitePort}   then stop that process and rerun.`);
     process.exit(1);
   }
@@ -926,7 +942,17 @@ async function main() {
     FRONTEND_ROOT, 'logs', 'startup',
     `vite-${new Date().toISOString().replace(/[:.]/g, '-')}.log`,
   );
-  spawnForeground(npx, ['vite', 'dev', '--port', String(vitePort)], {
+  // This launch starts Vite, so it owns the active-server manifest. The already-running
+  // branch above exits before this point and never rewrites it.
+  publishActiveServerWhenReady({
+    port: vitePort,
+    logPath: viteLogPath,
+    repoRoot: REPO_ROOT,
+    manifestPath: path.join(FRONTEND_ROOT, 'logs', 'qa', 'active-server.json'),
+    service: 'dev-gpu',
+  });
+  // --strictPort: fail instead of silently moving to 5174 if the port is taken in the race window.
+  spawnForeground(npx, ['vite', 'dev', '--port', String(vitePort), '--strictPort'], {
     cwd: FRONTEND_ROOT,
     // Keep server-side callbacks and telemetry aligned with the port Vite
     // actually claimed when the default port is occupied.

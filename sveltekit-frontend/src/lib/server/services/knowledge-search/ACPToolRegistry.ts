@@ -2109,7 +2109,9 @@ export async function executeACPTool(
   args: any,
   options?: ACPToolOptions
 ): Promise<ToolResult> {
-  const tool = TOOLS[name];
+  // Own-property lookup only: TOOLS[name] would resolve inherited keys such as
+  // "constructor" or "__proto__" and hand a non-tool to the handler path.
+  const tool = getACPToolSchema(name);
   if (!tool) {
     return { success: false, kind: 'result', error: `Tool ${name} not found`, duration: 0 };
   }
@@ -2117,7 +2119,7 @@ export async function executeACPTool(
 }
 
 export function getACPToolSchema(name: string): ACPTool | undefined {
-  return TOOLS[name];
+  return Object.hasOwn(TOOLS, name) ? TOOLS[name] : undefined;
 }
 
 export function getAllTools(): ACPTool[] {

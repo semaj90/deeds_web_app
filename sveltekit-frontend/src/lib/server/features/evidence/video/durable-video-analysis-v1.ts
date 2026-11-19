@@ -131,6 +131,7 @@ export interface VideoFrameProposalV1 {
 	}>;
 	trackScopeId?: string;
 	modelRevision: string | null;
+	detectionStatus?: 'COMPLETED' | 'FAILED' | 'UNAVAILABLE';
 	artifact: VideoDerivedArtifactV1;
 	motionLut?: VideoMotionLutManifestV1;
 	ocr?: VideoFrameOcrV1;
@@ -639,6 +640,7 @@ export async function persistCanonicalVideoAnalysisV1(
 			const frame = value as Record<string, unknown>;
 			const expected = input.frames[index];
 			return frame.sourceRevision !== input.sourceRevision || frame.analysisRevision !== input.analysisRevision ||
+				frame.detectionStatus !== expected?.detectionStatus ||
 				frame.reviewState !== 'UNREVIEWED_PROPOSAL' || stableStringify(frame.motionLut ?? null) !== stableStringify(expected?.motionLut ?? null);
 		})
 	) {
@@ -950,6 +952,7 @@ export async function processCanonicalVideoAnalysisV1(
 			const frame = extractedFrames[frameIndex];
 			const { width: resizedWidth, height: resizedHeight } = await dependencies.frameDimensions(frame.buffer);
 			const objects: VideoFrameProposalV1['objects'] = [];
+			let detectionStatus: VideoFrameProposalV1['detectionStatus'] = 'UNAVAILABLE';
 			if (detector) {
 				try {
 					const detection = await detector.analyze(frame.buffer, `${frameIndex}.jpg`);
@@ -959,7 +962,9 @@ export async function processCanonicalVideoAnalysisV1(
 							objects.push({ label: object.class, confidence: object.confidence, bbox });
 						}
 					}
+					detectionStatus = 'COMPLETED';
 				} catch (error) {
+					detectionStatus = 'FAILED';
 					detectorStatus = 'FAILED';
 					detectorError = (error instanceof Error ? error.message : String(error)).slice(0, 180);
 				}
@@ -996,6 +1001,7 @@ export async function processCanonicalVideoAnalysisV1(
 				height: probe.height ?? resizedHeight,
 				objects,
 				modelRevision: detector?.modelRevision ?? null,
+				detectionStatus,
 				artifact,
 				reviewState: 'UNREVIEWED_PROPOSAL',
 			});

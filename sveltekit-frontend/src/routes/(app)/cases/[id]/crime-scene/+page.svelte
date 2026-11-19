@@ -1,6 +1,13 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import SceneVideoEventBindings from '$lib/components/evidence/SceneVideoEventBindings.svelte';
+	import CaseStorybook from '$lib/components/evidence/CaseStorybook.svelte';
+	import { storybookSavedChapterHrefV1 } from '$lib/shared/storybook-video-chapter-v1.js';
+	import { savedImageChapterHrefV1, storybookRelativeDepthHrefV1, type StorybookImageChapterV1 } from '$lib/shared/storybook-image-chapter-v1.js';
+	import { STORYBOOK_REGION_GRID_SIZE } from '$lib/shared/storybook-region-review-v1.js';
+	import StorybookAuthorities from '$lib/components/evidence/StorybookAuthorities.svelte';
+	import StorybookScenePalette from '$lib/components/evidence/StorybookScenePalette.svelte';
+	import type { StorybookVideoCitationV1 } from '$lib/shared/storybook-video-chapter-v1.js';
 
 	let { data }: { data: PageData } = $props();
 
@@ -16,6 +23,21 @@
 		if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
 		return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 	}
+
+	function seconds(ms: number) { return `${(ms / 1000).toFixed(3)} s`; }
+
+	function savedFrameHref(binding: { evidenceId: string; sourceRevision: string; analysisRevision: string }, citation: Exclude<StorybookVideoCitationV1, { kind: 'transcript_segment' }>) {
+		const query = new URLSearchParams({ sourceRevision: binding.sourceRevision, analysisRevision: binding.analysisRevision, artifactSha256: citation.artifactSha256 });
+		return `/api/evidence/${encodeURIComponent(binding.evidenceId)}/video-frame/${citation.frameIndex}?${query}`;
+	}
+
+	function savedMaskHref(chapter: StorybookImageChapterV1, observationId: string) {
+		const query = new URLSearchParams({ maskObservation: observationId, sourceRevision: chapter.sourceRevision,
+			analysisRevision: chapter.analysisRevision, observationRevision: chapter.observationRevision });
+		return `/api/evidence/${encodeURIComponent(chapter.evidenceId)}/multimodal-analysis?${query}`;
+	}
+	let openDepthRevision = $state<string | null>(null);
+	const coverageLabels = { RECORDED: 'Recorded', NOT_RUN: 'Did not run', NOT_RECORDED: 'Not recorded', FAILED_OR_UNAVAILABLE: 'Failed or unavailable' };
 
 	const KINDS = ['WHO', 'WHAT', 'WHY', 'HOW'] as const;
 	const linkedEvidenceIds = $derived(
@@ -51,6 +73,155 @@
 	{#if data.loadError}
 		<p class="load-error" role="status">{data.loadError}</p>
 	{/if}
+	{#key data.storybookChapter?.id}
+		<CaseStorybook caseId={data.caseId} chapters={data.storybookChapters} chapter={data.storybookChapter}
+			video={data.videoStorybook} unavailable={data.storybookUnavailable} />
+	{/key}
+
+	{#if data.savedChapterRequested || data.sceneSources.some((scene) => scene.storybookChapters.length || scene.imageStorybookChapter)}
+		<section id="saved-storybook-chapter" aria-labelledby="saved-storybook-heading">
+			<h2 id="saved-storybook-heading">Saved storybook chapters</h2>
+			<ul>
+				{#each data.sceneSources as scene (scene.sceneId)}
+					{#each scene.storybookChapters as chapter (chapter.eventId)}
+						<li><a href={storybookSavedChapterHrefV1({ caseId: data.caseId, sceneId: scene.sceneId, revision: scene.revision, eventId: chapter.eventId })}>
+							{chapter.title} · Revision {scene.revision}
+						</a> · <a href={`/cases/${data.caseId}/evidence/${chapter.evidenceId}`}>Exhibit</a></li>
+					{/each}
+					{#if scene.imageStorybookChapter}
+						{@const chapter = scene.imageStorybookChapter}
+						<li><a href={savedImageChapterHrefV1({ caseId: data.caseId, sceneId: scene.sceneId, revision: scene.revision, chapterId: chapter.chapterId })}>
+							{chapter.title} · Revision {scene.revision} · Still image
+						</a></li>
+					{/if}
+				{/each}
+			</ul>
+			{#if data.savedChapter}
+				{@const saved = data.savedChapter}
+				<h3>{saved.chapter.title}</h3>
+				<p>Scene revision {saved.revision} · {seconds(saved.binding.startMs)}–{seconds(saved.binding.endMs)} · Sampled frames and excerpts</p>
+				<p class="note">Cells use this exhibit’s image coordinates. Review links observations for inspection.</p>
+				{#if saved.sourceState === 'CHANGED'}
+					<p role="status">The source analysis or review changed after this chapter was saved. These references describe the saved revision.</p>
+				{:else if saved.sourceState === 'UNAVAILABLE'}
+					<p role="status">The source exhibit is unavailable. These references describe the saved revision.</p>
+				{/if}
+				<ul>
+					{#each saved.chapter.citations as citation (citation.referenceId)}
+						<li>
+							{#if citation.kind === 'transcript_segment'}
+								Transcript · {seconds(citation.startMs)}–{seconds(citation.endMs)}
+							{:else}
+								{#if citation.kind === 'frame_detection'}
+									Detector: {citation.label} · Cell {String.fromCharCode(65 + citation.imageCell.column)}{citation.imageCell.row + 1}
+								{:else}Frame OCR{/if}
+								· {seconds(citation.timestampMs)}
+								{#if saved.sourceState === 'CURRENT'}<a href={savedFrameHref(saved.binding, citation)}>Open cited frame</a>{/if}
+							{/if}
+						</li>
+					{/each}
+				</ul>
+				{#if saved.chapter.unresolvedReferenceIds.length}<p>{saved.chapter.unresolvedReferenceIds.length} observation references were unresolved at save time.</p>{/if}
+			{:else if data.savedImageChapter}
+				{@const saved = data.savedImageChapter}
+				{@const depthUrl = storybookRelativeDepthHrefV1(saved.chapter)}
+				<h3>{saved.chapter.title}</h3>
+				<p>Scene revision {saved.revision} · Reviewed hypothesis · Image coordinates</p>
+				<details>
+					<summary>Analysis coverage at save time</summary>
+					<ul>
+						<li>Detection · {coverageLabels[saved.chapter.coverage.detection]}</li>
+						<li>Segmentation · {coverageLabels[saved.chapter.coverage.mask]}</li>
+						<li>Scene description · {coverageLabels[saved.chapter.coverage.sceneContext]}</li>
+						{#if saved.chapter.coverage.ocr}
+							<li>OCR · {saved.chapter.coverage.ocr === 'COMPLETED' ? 'Text recorded' : saved.chapter.coverage.ocr === 'EMPTY' ? 'No text returned' : 'Failed'}</li>
+						{/if}
+						{#if saved.chapter.coverage.unresolvedMaskCount}<li>Unlinked masks · {saved.chapter.coverage.unresolvedMaskCount}</li>{/if}
+					</ul>
+				</details>
+				{#if saved.sourceState === 'CURRENT'}
+					<a href={`?${new URLSearchParams({ chapter: saved.chapter.evidenceId })}#case-storybook`}>Inspect source exhibit</a>
+					{#key `${data.caseId}:${saved.sceneId}:${saved.revision}:${saved.chapter.sourceRevision}`}
+						<StorybookScenePalette caseId={data.caseId} evidenceId={saved.chapter.evidenceId}
+							sourceRevision={saved.chapter.sourceRevision} runId={saved.sceneId} sequenceId={saved.revision} />
+					{/key}
+				{:else if saved.sourceState === 'CHANGED'}
+					<p role="status">The source, analysis, or review decisions changed. These observations belong to the saved revision.</p>
+				{:else}
+					<p role="status">The source is unavailable. These observations belong to the saved revision.</p>
+				{/if}
+				{#if saved.chapter.relativeDepth && depthUrl}
+					{@const depth = saved.chapter.relativeDepth}
+					{@const depthKey = `${saved.sceneId}:${saved.revision}:${depth.artifactSha256}`}
+					<h4>Relative 2.5D preview</h4>
+					<p>Single-image depth estimate · {depth.modelId} · No measured scale</p>
+					{#if saved.sourceState === 'CURRENT'}
+						<button type="button" aria-expanded={openDepthRevision === depthKey}
+							onclick={() => { openDepthRevision = openDepthRevision === depthKey ? null : depthKey; }}>
+							{openDepthRevision === depthKey ? 'Close relative preview' : 'Open relative preview'}
+						</button>
+						{#if openDepthRevision === depthKey}
+							{#await import('$lib/components/evidence/DepthReliefViewer.svelte')}
+								<p role="status">Loading preview…</p>
+							{:then { default: DepthReliefViewer }}
+								<DepthReliefViewer imageUrl={`/api/evidence/${encodeURIComponent(saved.chapter.evidenceId)}/download?${new URLSearchParams({
+									caseId: data.caseId, sourceRevision: saved.chapter.sourceRevision, inline: '1',
+								})}`} {depthUrl} artifactDigests={{ image: saved.chapter.sourceRevision, depth: depth.artifactSha256 }} />
+							{:catch}
+								<p role="status">The preview could not be opened.</p>
+							{/await}
+						{/if}
+					{:else}
+						<p>The pinned depth preview is unavailable for this source state.</p>
+					{/if}
+				{/if}
+				{#if saved.chapter.sceneCells}
+					<h4>Saved image-space scene cells</h4>
+					<div class="chapter-grid" aria-hidden="true" style:grid-template-columns={`repeat(${STORYBOOK_REGION_GRID_SIZE}, minmax(0, 1fr))`}>
+						{#each Array.from({ length: STORYBOOK_REGION_GRID_SIZE ** 2 }, (_, index) => index) as index (index)}
+							{@const markers = saved.chapter.sceneCells.flatMap(({ placedCell }, marker) =>
+								placedCell.row * STORYBOOK_REGION_GRID_SIZE + placedCell.column === index ? [marker + 1] : [])}
+							<span class:occupied={markers.length > 0}>{markers.join(', ')}</span>
+						{/each}
+					</div>
+					<ol>
+						{#each saved.chapter.sceneCells as cell (cell.observationId)}
+							{@const citation = saved.chapter.citations.find((item) => item.observationId === cell.observationId)}
+							<li>{citation && 'label' in citation ? citation.label : 'Observation'} ·
+								Placed at {String.fromCharCode(65 + cell.placedCell.column)}{cell.placedCell.row + 1} ·
+								Source cell {String.fromCharCode(65 + cell.sourceCell.column)}{cell.sourceCell.row + 1}</li>
+						{/each}
+					</ol>
+				{/if}
+				<ol>
+					{#each saved.chapter.beats as beat}
+						<li><p>{beat.what}</p><p>{beat.how}</p>
+							<ul>
+								{#each beat.observationIds as id (id)}
+									{@const citation = saved.chapter.citations.find((item) => item.observationId === id)}
+									{#if citation?.kind === 'scene_context'}
+										<li>Unreviewed scene description · {citation.description}</li>
+									{:else if citation?.kind === 'image_ocr_span'}
+										<li>Unreviewed OCR · {citation.text}{citation.truncated ? ' (excerpt)' : ''}</li>
+									{:else if citation}
+										<li>{citation.kind === 'detection' ? 'Detection' : 'Mask'} · {citation.label} · Cell {String.fromCharCode(65 + citation.imageCell.column)}{citation.imageCell.row + 1}
+											{#if citation.kind === 'segmentation_mask' && saved.sourceState === 'CURRENT'}
+												<a href={savedMaskHref(saved.chapter, id)} target="_blank" rel="noreferrer">Open cited mask</a>
+											{/if}
+										</li>
+									{/if}
+								{/each}
+							</ul>
+						</li>
+					{/each}
+				</ol>
+			{:else if data.savedChapterRequested}
+				<p role="status">This saved chapter could not be opened.</p>
+			{/if}
+		</section>
+	{/if}
+
+	{#key data.caseId}<StorybookAuthorities caseId={data.caseId} />{/key}
 
 	<section aria-labelledby="markers-heading">
 		<h2 id="markers-heading">Evidence markers <small>{data.markers.length} placed</small></h2>
@@ -222,6 +393,9 @@
 </main>
 
 <style>
+	.chapter-grid { display: grid; width: min(100%, 22rem); border: 1px solid var(--dossier-hairline, #dacdb9); margin-block: .75rem; }
+	.chapter-grid span { display: grid; place-items: center; min-height: 2rem; border: 1px solid var(--dossier-hairline, #dacdb9); font-size: .75rem; }
+	.chapter-grid .occupied { background: #f6e3a7; color: #3d3019; font-weight: 700; }
 	.crime-scene { padding: 20px; width: min(100% - 32px, 1320px); margin: 20px auto; color: var(--dossier-text-main, #141312); background: var(--dossier-bg-card, #faf6f0); border: 1px solid var(--dossier-hairline, #e2d7c9); border-radius: var(--dossier-radius-card, 10px); box-shadow: var(--dossier-shadow-card, 0 1px 2px rgba(60, 40, 20, .04)); font: 14px/1.5 system-ui, sans-serif; }
 	.case-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 20px; }
 	.available-evidence { display: grid; gap: 8px; padding: 0; list-style: none; }

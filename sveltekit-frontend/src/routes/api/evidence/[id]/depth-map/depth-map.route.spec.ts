@@ -17,6 +17,7 @@ vi.mock('$lib/server/validation.js', () => ({ isUuid: (value: string) => /^[0-9a
 vi.mock('drizzle-orm', () => ({
 	and: (...conditions: unknown[]) => ({ and: conditions }),
 	eq: (...fields: unknown[]) => ({ eq: fields }),
+	isNull: (...fields: unknown[]) => ({ isNull: fields }),
 	or: (...conditions: unknown[]) => ({ or: conditions }),
 	sql: (strings: TemplateStringsArray, ...values: unknown[]) => ({ strings, values }),
 }));
@@ -33,8 +34,10 @@ png.writeUInt32BE(1, 16);
 png.writeUInt32BE(1, 20);
 const depthSha256 = createHash('sha256').update(png).digest('hex');
 
-function event(user?: { id: string }) {
-	return { params: { id: evidenceId }, locals: user ? { user } : {} } as never;
+function event(user?: { id: string }, query?: Record<string, string>) {
+	const url = new URL(`https://example.test/api/evidence/${evidenceId}/depth-map`);
+	if (query) url.search = new URLSearchParams(query).toString();
+	return { params: { id: evidenceId }, locals: user ? { user } : {}, url } as never;
 }
 
 function evidenceRow(overrides: Record<string, unknown> = {}) {
@@ -128,6 +131,33 @@ describe('evidence depth-map route', () => {
 		expect(response.headers.get('x-depth-verification')).toBe('sha256-verified');
 		const depthQuery = mocks.execute.mock.calls[0]?.[0] as { strings?: string[] } | undefined;
 		expect(depthQuery?.strings?.join('')).toContain("source_locator->>'kind' = 'whole_image'");
+	});
+
+	it('serves a pinned verified relative estimate and refuses stale, rotated, and fallback sources', async () => {
+		const source = evidenceRow();
+		const query = { sourceRevision, artifactSha256: `sha256:${depthSha256}`, analysisRevision: 'verified-run' };
+		const row = {
+			source_revision: sourceRevision, analysis_revision: query.analysisRevision,
+			source_locator: { kind: 'whole_image', coordinateSpace: 'original_pixels', width: 1, height: 1, orientation: null },
+			metadata: { visualAnalysis: {
+				schema: 'atlas.evidence-visual-analysis.v1', authority: 'OBSERVATION_ONLY', sourceRevision, status: 'PARTIAL',
+				objectDetections: [], layoutRegions: [], visionSummary: null, visionFindings: [], visionTags: [], stageErrors: [],
+				depthMap: { objectKey: `evidence/${source.caseId}/${evidenceId}/${sourceRevision.slice(7)}/depth-${depthSha256}.png`,
+					bucket: 'atlas-artifacts', artifactSha256: depthSha256, status: 'ESTIMATED', width: 1, height: 1, processingTimeMs: null,
+					depthType: 'relative_monocular', modelRevisionStatus: 'VERIFIED', modelId: 'fixture-depth',
+					modelRevision: 'fixture-revision', weightsSha256: `sha256:${'b'.repeat(64)}` },
+			} },
+		};
+		mocks.limit.mockResolvedValue([source]);
+		mocks.execute.mockResolvedValue({ rows: [row] });
+		expect((await GET(event({ id: '42' }, query))).status).toBe(200);
+		mocks.getFile.mockClear();
+		expect((await GET(event({ id: '42' }, { ...query, analysisRevision: 'stale' }))).status).toBe(409);
+		mocks.execute.mockResolvedValueOnce({ rows: [{ ...row, source_locator: { ...row.source_locator, orientation: 3 } }] });
+		expect((await GET(event({ id: '42' }, query))).status).toBe(409);
+		mocks.execute.mockRejectedValueOnce(new Error('unavailable'));
+		expect((await GET(event({ id: '42' }, query))).status).toBe(503);
+		expect(mocks.getFile).not.toHaveBeenCalled();
 	});
 
 	it('continues to read legacy minio-scheme records through the SeaweedFS adapter', async () => {

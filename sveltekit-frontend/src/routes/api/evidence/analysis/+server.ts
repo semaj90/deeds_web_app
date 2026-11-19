@@ -29,7 +29,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	try {
 		if (evidenceId) {
 			const jobs = await getJobsForEvidence(evidenceId);
-			return json({ available: true, evidenceId, jobs, error: null });
+			return json({ available: true, evidenceId, jobs: jobs.filter((job) => job.jobType !== 'scene_palette'), error: null });
 		}
 
 		const [worker, counts] = await Promise.all([

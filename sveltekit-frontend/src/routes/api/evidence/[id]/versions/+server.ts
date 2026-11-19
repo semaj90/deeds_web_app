@@ -8,8 +8,10 @@ import { createEvidenceVersion } from '$lib/server/features/evidence/index.js';
 import { isUuid } from '$lib/server/validation.js';
 import { getAuthorizedCase } from '$lib/server/case-access.js';
 import { ENV } from '$lib/server/env.server.js';
+import { storybookRegionCellV1Schema, storybookRegionFrameV1Schema, storybookRegionImageV1Schema } from '$lib/shared/storybook-region-review-v1.js';
 import {
   EvidenceRevisionErrorV1,
+  EVIDENCE_ANNOTATION_REVISION_SCHEMA_V1,
   MAX_REVISION_IMAGE_BYTES,
   createDrizzleRevisionPortsV1,
   saveEvidenceAnnotationRevisionV1,
@@ -84,6 +86,8 @@ const REVISION_ERROR_STATUS: Record<EvidenceRevisionErrorV1['code'], number> = {
   EVIDENCE_CASE_MISMATCH: 404,
   PARENT_HASH_UNAVAILABLE: 422,
   PARENT_HASH_MISMATCH: 409,
+  STORYBOOK_REVIEW_FRAME_CHANGED: 409,
+  STORYBOOK_REVIEW_ID_CONFLICT: 409,
 };
 
 /**
@@ -162,6 +166,33 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
   try {
     const requestedLimit = Number.parseInt(url.searchParams.get('limit') ?? '50', 10);
     const limit = Number.isInteger(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 200) : 50;
+	const frameParam = url.searchParams.get('regionFrame');
+	const imageParam = url.searchParams.get('regionImage');
+	const imageFilter = imageParam === null ? null : storybookRegionImageV1Schema.safeParse({
+	  analysisRevision: url.searchParams.get('analysisRevision'),
+	  observationRevision: imageParam,
+	});
+	const frameFilter = frameParam === null ? null : storybookRegionFrameV1Schema.safeParse({
+	  frameIndex: /^\d{1,2}$/.test(frameParam) ? Number(frameParam) : -1,
+	  analysisRevision: url.searchParams.get('analysisRevision'),
+	  artifactSha256: url.searchParams.get('artifactSha256'),
+	});
+	const columnParam = url.searchParams.get('regionColumn');
+	const rowParam = url.searchParams.get('regionRow');
+	const regionFilter = frameFilter ?? imageFilter;
+	const observationId = url.searchParams.get('observationId');
+	const cellFilter = regionFilter && observationId === null ? storybookRegionCellV1Schema.safeParse({
+	  column: columnParam && /^\d$/.test(columnParam) ? Number(columnParam) : -1,
+	  row: rowParam && /^\d$/.test(rowParam) ? Number(rowParam) : -1,
+	}) : null;
+	const sourceRevision = url.searchParams.get('sourceRevision');
+	const validObservation = imageFilter?.success && !frameFilter && columnParam === null && rowParam === null &&
+		observationId !== null && /^sha256:[a-f0-9]{64}$/.test(observationId);
+	if ((frameFilter && imageFilter) || (observationId !== null && !validObservation) ||
+		(regionFilter && (!regionFilter.success || (!cellFilter?.success && !validObservation) ||
+			!sourceRevision || !/^sha256:[a-f0-9]{64}$/.test(sourceRevision)))) {
+	  return json({ evidenceId: id, versions: [], count: 0, reviewEnabled: false, error: 'Invalid region review filter' }, { status: 400, headers: { 'Cache-Control': 'private, no-store' } });
+	}
 
     // Match revision-write authorization: owner or authorized case collaborator.
     const actorId = Number(locals.user.id);
@@ -189,7 +220,20 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
         createdAt: evidenceVersions.createdAt,
       })
       .from(evidenceVersions)
-      .where(eq(evidenceVersions.evidenceId, id))
+      .where(and(eq(evidenceVersions.evidenceId, id), regionFilter?.success ? and(
+        sql`${evidenceVersions.metadata}->>'schema' = ${EVIDENCE_ANNOTATION_REVISION_SCHEMA_V1}`,
+        sql`${evidenceVersions.metadata}->>'parentSha256' = ${sourceRevision}`,
+        sql`${evidenceVersions.metadata}#>>'{annotation,storybookRegionReview,analysisRevision}' = ${regionFilter.data.analysisRevision}`,
+        frameFilter?.success ? and(
+          sql`${evidenceVersions.metadata}#>>'{annotation,storybookRegionReview,frameIndex}' = ${String(frameFilter.data.frameIndex)}`,
+          sql`${evidenceVersions.metadata}#>>'{annotation,storybookRegionReview,artifactSha256}' = ${frameFilter.data.artifactSha256}`,
+        ) : undefined,
+        imageFilter?.success ? sql`${evidenceVersions.metadata}#>>'{annotation,storybookRegionReview,observationRevision}' = ${imageFilter.data.observationRevision}` : undefined,
+        cellFilter?.success ? and(
+          sql`${evidenceVersions.metadata}#>>'{annotation,storybookRegionReview,column}' = ${String(cellFilter.data.column)}`,
+          sql`${evidenceVersions.metadata}#>>'{annotation,storybookRegionReview,row}' = ${String(cellFilter.data.row)}`,
+        ) : sql`${evidenceVersions.metadata}#>>'{annotation,storybookRegionReview,observationId}' = ${observationId}`,
+      ) : undefined))
       .orderBy(desc(evidenceVersions.version))
       .limit(limit);
 
@@ -233,6 +277,10 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
     if (typeof raw === 'object' && raw !== null && 'schema' in raw && raw.schema === 'atlas.evidence-annotation-revision-request.v1') {
       const parsed = annotationRevisionRequestSchema.safeParse(raw);
       if (!parsed.success) return json({ ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	  if (typeof parsed.data.annotation === 'object' && parsed.data.annotation !== null &&
+		  'storybookRegionReview' in parsed.data.annotation && !ENV.EVIDENCE_TRANSCRIPT_REVIEW_ENABLED) {
+		return json({ ok: false, error: 'Region review is disabled' }, { status: 403, headers: { 'Cache-Control': 'private, no-store' } });
+	  }
       const actorId = Number(locals.user.id);
       if (!Number.isInteger(actorId) || actorId < 1) return json({ ok: false, error: 'Unauthorized' }, { status: 401 });
       if (!(await getAuthorizedCase(parsed.data.caseId, actorId))) return json({ ok: false, error: 'Evidence not found' }, { status: 404 });

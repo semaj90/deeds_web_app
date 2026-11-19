@@ -1,0 +1,28 @@
+{
+  "baseRevision": "1544c87b895",
+  "scope": "Local worktree, JavaScript transport and mocked browser UI",
+  "likely_cause": "The fallback packet key did not match the envelope schema, and the packed fanout batch omitted compacted record boundaries.",
+  "evidence": [
+    "The assembler preserves zero-valued topology fields and requires either an explicit digest key or a source revision for the fallback.",
+    "The V2 consumer reconstructed both original records byte for byte. Source offsets were [0,217] and packed offsets were [0,215,429]. A changed offset table raised PACKED_BATCH_CHECKSUM_MISMATCH.",
+    "Six focused Vitest suites passed (45 tests). npm run check:fast exited zero with 0 errors and 7 warnings. Chromium rendered the authority search, citations, revision provenance, and coverage with fixture HTTP responses.",
+    "The gitignored scratch detective export contains both FBX and GLB. Its GLB JSON lists 27 meshes, one skin, three clips and zero images. The app detective GLB lists one mesh, one skin, four clips and one image. These are metadata checks, with projection and storage readback pending.",
+    "Storybook authority route handlers and the real case-access query ran against scratch PostgreSQL 18.4 within a rollback transaction. The route rejected unauthorized, cross-case, wrong-jurisdiction, out-of-scope, stale and hash-mismatched passages. It excluded 28 stale candidates before the search limit and returned one verified excerpt out of two eligible matches. The test verified UTF-16 boundaries and absence of the fixture case after rollback."
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/acp/packet-assembler.ts",
+    "sveltekit-frontend/src/lib/server/atlas/ingest/simd-fanout-contract-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/ingest/simd-fanout-engine-v1.ts",
+    "openspec/changes/crime-scene-reconstruction/tasks.md"
+  ],
+  "safe_next_command": "rg -n 'claimBatch|executeAnalysisJobStageV1' sveltekit-frontend/src/lib/server/analysis",
+  "smoke_command": "npm exec -- vitest run src/lib/server/acp/packet-assembler.spec.ts src/lib/server/atlas/ingest/simd-fanout-contract-v1.spec.ts src/lib/server/atlas/ingest/simd-fanout-engine-v1.spec.ts src/lib/server/legal/statute-search-v1.spec.ts src/lib/server/library/library-citation-provenance-v1.spec.ts src/lib/server/ace/context-compiler.parent-atlas.test.ts",
+  "report_path": "docs/reports/ace-native-execution-bridge-20261119.json",
+  "pending": [
+    "Production gRPC caller and canonical packet lookup",
+    "Procedure admission through analysis_jobs and independent artifact readback",
+    "Native and Python worker parity",
+    "Signed-in evidence-to-scene reopen with the stored baked model",
+    "Signed-in browser authority search against a deployed route, contrary-authority checks, and reviewer-confirmed legal synthesis"
+  ]
+}

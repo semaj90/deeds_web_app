@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { createSceneDocumentV1, createSceneQualityReceiptV1 } from '$lib/splat/scene-document-v1.js';
+	import { createSceneDocumentV1, createSceneQualityReceiptV1, stableStringifySceneDocumentV1 } from '$lib/splat/scene-document-v1.js';
+	import { storybookSavedChapterHrefV1, storybookVideoChapterV1Schema, type StorybookVideoChapterV1 } from '$lib/shared/storybook-video-chapter-v1.js';
 	import { evidenceSceneIdV1, fetchSceneRevisionV1, saveSceneManifestRevisionV1 } from '$lib/splat/scene-persistence-client-v1.js';
 	import { deriveReviewedGroundPlaneTrackFromHistoryV1, groundTrackSnapshotPointsV1, sameGroundTrackSnapshotPointsV1, type ReviewedGroundPlanePointV1 } from '$lib/splat/reviewed-ground-plane-track-v1.js';
 	type EventReference =
@@ -26,6 +27,7 @@
 	let savingEventId = $state<string | null>(null);
 	let savingSceneEventId = $state<string | null>(null);
 	let sceneSaveMessage = $state<string | null>(null);
+	let savedChapterHref = $state<string | null>(null);
 	let reviewedGroundTracks = $state<Array<{ key: string; trackId: string; trackScopeId: string; calibrationRevisionId: string; points: ReviewedGroundPlanePointV1[] }>>([]);
 	let savingGroundTrackKey = $state<string | null>(null);
 	let localPreview = $state(false);
@@ -162,56 +164,78 @@
 		}
 	}
 
-	async function saveApprovedEventToScene(event: VideoEvent) {
-		if (!timeline || event.reviewStatus !== 'APPROVED' || event.sceneAdmission !== 'APPROVED_FOR_SCENE_PROPOSAL') return;
+	async function saveApprovedEventToScene(event: VideoEvent, asChapter = false) {
+		const active = timeline;
+		const sourceId = evidenceId;
+		if (!active || active.evidenceId !== sourceId || savingSceneEventId || event.reviewStatus !== 'APPROVED' || event.sceneAdmission !== 'APPROVED_FOR_SCENE_PROPOSAL') return;
 		savingSceneEventId = event.eventId;
 		sceneSaveMessage = null;
+		savedChapterHref = null;
 		error = null;
 		try {
-			const sceneId = await evidenceSceneIdV1(timeline.caseId, evidenceId);
-			const current = await fetchSceneRevisionV1({ caseId: timeline.caseId, sceneId });
-			if (current?.manifest.videoEventBindings?.some((binding) => binding.evidenceId === evidenceId && binding.eventId === event.eventId)) {
+			const sceneId = await evidenceSceneIdV1(active.caseId, sourceId);
+			const current = await fetchSceneRevisionV1({ caseId: active.caseId, sceneId });
+			const existing = current?.manifest.videoEventBindings?.find((binding) => binding.evidenceId === sourceId && binding.eventId === event.eventId);
+			if (existing && !asChapter) {
 				sceneSaveMessage = 'This reviewed event is already on the scene timeline.';
 				return;
 			}
-			const evidenceBinding = { evidenceId, sourceRevision: timeline.sourceRevision };
+			let chapter: StorybookVideoChapterV1 | undefined;
+			if (asChapter) {
+				const response = await fetch(`/api/evidence/${encodeURIComponent(sourceId)}/video-events?${new URLSearchParams({ chapterEvent: event.eventId })}`, { cache: 'no-store' });
+				const payload = await response.json();
+				const parsed = storybookVideoChapterV1Schema.safeParse(payload?.chapter);
+				if (!response.ok || !parsed.success || payload.evidenceId !== sourceId || payload.caseId !== active.caseId ||
+					payload.sourceRevision !== active.sourceRevision || payload.analysisRevision !== active.analysisRevision ||
+					payload.eventId !== event.eventId || payload.startMs !== event.startMs || payload.endMs !== event.endMs) {
+					throw new Error('The reviewed chapter changed or could not be verified. Reload the event timeline.');
+				}
+				chapter = parsed.data;
+				if (current && existing?.chapter && stableStringifySceneDocumentV1(existing.chapter) === stableStringifySceneDocumentV1(chapter)) {
+					sceneSaveMessage = 'This reviewed chapter is already saved.';
+					savedChapterHref = storybookSavedChapterHrefV1({ caseId: active.caseId, sceneId, revision: current.revision, eventId: event.eventId });
+					return;
+				}
+			}
+			const evidenceBinding = { evidenceId: sourceId, sourceRevision: active.sourceRevision };
 			const eventBinding = {
-				evidenceId,
-				sourceRevision: timeline.sourceRevision,
-				analysisRevision: timeline.analysisRevision,
+				evidenceId: sourceId,
+				sourceRevision: active.sourceRevision,
+				analysisRevision: active.analysisRevision,
 				eventId: event.eventId,
 				startMs: event.startMs,
 				endMs: event.endMs,
-				reviewState: 'APPROVED_FOR_SCENE_PROPOSAL' as const
+				reviewState: 'APPROVED_FOR_SCENE_PROPOSAL' as const,
+				...(chapter ? { chapter } : {})
 			};
 			const manifest = createSceneDocumentV1(current ? {
 				...current.manifest,
 				revision: current.revision + 1,
 				parentManifestSha256: current.manifestSha256,
 				createdAt: new Date().toISOString(),
-				evidenceBindings: [...(current.manifest.evidenceBindings ?? []).filter((binding) => binding.evidenceId !== evidenceId), evidenceBinding],
-				videoEventBindings: [...(current.manifest.videoEventBindings ?? []), eventBinding]
+				evidenceBindings: [...(current.manifest.evidenceBindings ?? []).filter((binding) => binding.evidenceId !== sourceId), evidenceBinding],
+				videoEventBindings: [...(current.manifest.videoEventBindings ?? []).filter((binding) => binding !== existing), eventBinding]
 			} : {
-				schema: 'parent-atlas.scene-document.v1', sceneId, caseId: timeline.caseId, status: 'HYPOTHESIS',
+				schema: 'parent-atlas.scene-document.v1', sceneId, caseId: active.caseId, status: 'HYPOTHESIS',
 				revision: 1, parentManifestSha256: null, createdAt: new Date().toISOString(), coordinateFrame: 'LOCAL_UNCALIBRATED',
 				objects: [], animations: [], evidenceBindings: [evidenceBinding], videoEventBindings: [eventBinding],
 				evidenceSources: [], assets: [],
 				quality: createSceneQualityReceiptV1({ derivedAssetBytes: 0, triangleCount: 0 })
 			});
-			await saveSceneManifestRevisionV1({
-				caseId: timeline.caseId,
+			const receipt = await saveSceneManifestRevisionV1({
+				caseId: active.caseId,
 				sceneId,
 				expectedRevision: current?.revision ?? 0,
 				commandId: crypto.randomUUID(),
 				manifest
 			});
-			const readback = await fetchSceneRevisionV1({ caseId: timeline.caseId, sceneId });
+			const readback = await fetchSceneRevisionV1({ caseId: active.caseId, sceneId, revision: receipt.revision });
 			const persisted = readback?.manifest.videoEventBindings?.some((binding) =>
-				binding.evidenceId === evidenceId && binding.eventId === event.eventId
-					&& binding.sourceRevision === timeline.sourceRevision && binding.analysisRevision === timeline.analysisRevision
+				stableStringifySceneDocumentV1(binding) === stableStringifySceneDocumentV1(eventBinding)
 			);
-			if (!persisted || !readback) throw new Error('Scene timeline save did not match an independent revision readback.');
+			if (!persisted || !readback || readback.manifestSha256 !== receipt.manifestSha256) throw new Error('Scene timeline save did not match an independent revision readback.');
 			sceneSaveMessage = `Saved as scene revision ${readback.revision}; source time ${formatTime(event.startMs)}–${formatTime(event.endMs)}.`;
+			if (chapter) savedChapterHref = storybookSavedChapterHrefV1({ caseId: active.caseId, sceneId, revision: readback.revision, eventId: event.eventId });
 		} catch (cause) {
 			error = cause instanceof Error ? cause.message : 'Could not add this event to the scene timeline.';
 		} finally {
@@ -280,6 +304,7 @@
 							<button type="button" disabled={savingSceneEventId === event.eventId} onclick={() => saveApprovedEventToScene(event)}>
 								{savingSceneEventId === event.eventId ? 'Saving…' : 'Add to scene timeline'}
 							</button>
+							<button type="button" disabled={savingSceneEventId !== null} onclick={() => saveApprovedEventToScene(event, true)}>Save as chapter</button>
 						</div>
 					{/if}
 				</li>
@@ -287,6 +312,7 @@
 		</ol>
 	{/if}
 	{#if sceneSaveMessage}<p class="timeline-success" role="status">{sceneSaveMessage}</p>{/if}
+	{#if savedChapterHref}<a href={savedChapterHref}>Open saved chapter</a>{/if}
 	{#if reviewedGroundTracks.length}
 		<section class="ground-tracks" aria-label="Reviewed ground-plane motion tracks">
 			<h4>Reviewed motion tracks</h4>

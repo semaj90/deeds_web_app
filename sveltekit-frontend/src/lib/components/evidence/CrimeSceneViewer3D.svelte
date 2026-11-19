@@ -7,7 +7,9 @@
 	import { onMount, onDestroy } from 'svelte';
 	import * as THREE from 'three';
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+	import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 	import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+	import { SceneControllerV1 } from '$lib/scene/scene-controller-v1.js';
 	import { ScenePrimitiveManager, type ScenePrimitiveSnapshot } from '$lib/n64-fsm/scene-primitive-sync.js';
 	import { ARENA_BYTE_LENGTH } from '$lib/n64-fsm/scene-fsm-cache.js';
 	import { SpatialBvhManagerV1 } from '$lib/splat/spatial-bvh-manager-v1.js';
@@ -87,6 +89,10 @@
 	let scene: THREE.Scene | null = null;
 	let camera: THREE.PerspectiveCamera | null = null;
 	let controls: OrbitControls | null = null;
+	// ENG-01: TransformControls gizmo for translate/rotate/scale (suspends OrbitControls during drag)
+	let transformControls: TransformControls | null = null;
+	// ENG-01: Centralized SceneController for CommandHistory (undo/redo) across all object mutations
+	const sceneController = new SceneControllerV1();
 	let animId: number = 0;
 	let raycaster = new THREE.Raycaster();
 	let mouse = new THREE.Vector2();
@@ -812,6 +818,36 @@
 			controls.minDistance = 1.0;
 			controls.maxDistance = 18.0;
 
+			// ENG-01: TransformControls gizmo (translate/rotate/scale). Suspends OrbitControls
+			// while the user is dragging the gizmo so camera orbit does not interfere.
+			transformControls = new TransformControls(camera, canvasEl);
+			transformControls.setSize(0.85);
+			transformControls.addEventListener('dragging-changed', (event) => {
+				if (controls) controls.enabled = !event.value;
+			});
+			// On drag end: snapshot old + new matrix into a TransformObjectCommand for undo/redo
+			transformControls.addEventListener('mouseUp', () => {
+				const target = transformControls?.object;
+				if (!target || !selectedPrimitiveId) return;
+				target.updateWorldMatrix(true, false);
+				const p = target.position;
+				const q = target.quaternion;
+				const s = target.scale;
+				sceneController.transformObject(selectedPrimitiveId, {
+					position: [p.x, p.y, p.z],
+					rotation: [q.x, q.y, q.z, q.w],
+					scale: [s.x, s.y, s.z]
+				});
+				// Keep BVH and primitive registry in sync
+				const config = scenePrimitiveManager.get(selectedPrimitiveId);
+				if (config) {
+					scenePrimitiveManager.writeMatrixToArena(config.slotIndex, config.mesh.matrixWorld);
+					pickBvhManager.refit();
+					publishPrimitiveSnapshot(selectedPrimitiveId);
+				}
+			});
+			scene.add(transformControls.getHelper());
+
 			// 5. Lighting
 			const ambientLight = new THREE.AmbientLight(caseMarkers ? 0xe0dad1 : 0x1e293b, 1.2);
 			scene.add(ambientLight);
@@ -1160,6 +1196,17 @@
 					selectedPrimitiveId = primitiveId;
 					scenePrimitiveManager.focusExhibit(primitiveId);
 					publishPrimitiveSnapshot(primitiveId);
+					// ENG-01: Attach TransformControls gizmo to picked mesh when in a transform mode.
+					// The gizmo handles its own pointer capture; suspend OrbitControls via 'dragging-changed'.
+					const primConfig = scenePrimitiveManager.get(primitiveId);
+					if (primConfig && transformControls) {
+						if (transformMode === 'translate' || transformMode === 'rotate' || transformMode === 'scale') {
+							transformControls.attach(primConfig.mesh);
+							transformControls.setMode(transformMode as 'translate' | 'rotate' | 'scale');
+						} else {
+							transformControls.detach();
+						}
+					}
 				}
 				if (pick.type === 'evidence') {
 					onSelectEvidence?.({ id: pick.id, title: 'Bloodstain', type: 'Bloodstain (Image2D)' });
@@ -1261,6 +1308,21 @@
 		}
 	}
 
+	// ENG-01: Expose SceneController for undo/redo wiring in DetectiveModeCanvas.
+	export function getSceneController(): SceneControllerV1 {
+		return sceneController;
+	}
+
+	/** Undo the last scene command (TransformObjectCommand, AddObjectCommand, etc.) */
+	export function undoSceneCommand(): boolean {
+		return sceneController.undo();
+	}
+
+	/** Redo the last undone scene command */
+	export function redoSceneCommand(): boolean {
+		return sceneController.redo();
+	}
+
 	onMount(() => {
 		initScene();
 		window.addEventListener('resize', handleResize);
@@ -1273,12 +1335,34 @@
 		};
 	});
 
+	// ENG-01: Sync TransformControls gizmo mode whenever the parent changes transformMode prop.
+	// When the tool is not a transform mode, detach the gizmo so OrbitControls takes over.
+	$effect(() => {
+		if (!transformControls) return;
+		if (transformMode === 'translate' || transformMode === 'rotate' || transformMode === 'scale') {
+			transformControls.setMode(transformMode as 'translate' | 'rotate' | 'scale');
+			// Re-attach to current selection if one exists
+			if (selectedPrimitiveId) {
+				const cfg = scenePrimitiveManager.get(selectedPrimitiveId);
+				if (cfg) transformControls.attach(cfg.mesh);
+			}
+		} else {
+			transformControls.detach();
+		}
+	});
+
 	onDestroy(() => {
 		// This viewer owns its registry and transform arena; tearing it down must not
 		// reset the shared inspector FSM used by another active view.
 		scenePrimitiveManager.clear(false);
 		pickBvhManager.dispose();
 		if (animId) cancelAnimationFrame(animId);
+		// ENG-01: Dispose TransformControls gizmo and its helper before OrbitControls
+		if (transformControls) {
+			transformControls.detach();
+			transformControls.dispose();
+			transformControls = null;
+		}
 		controls?.dispose();
 		caseMarkerGeometry?.dispose();
 		caseMarkerMaterial?.dispose();

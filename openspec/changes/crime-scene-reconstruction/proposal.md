@@ -11,12 +11,19 @@ A user uploads evidence (documents, photos, video, transcripts) and wants a scen
 - A deterministic clip window (20 s, decided) and a camera track stored as data. The renderer only interpolates stored keyframes.
 - A 2D storyboard output, each panel labeled as a demonstrative reconstruction with its source revisions and measured or hypothesis status.
 - A later 3D review path: a pilot that tracks a person in a 10 s clip and produces an unreviewed low-poly proposal.
+- A source-bound image/video storybook handoff: report analysis coverage and unknowns, review visual/text observations, draft a cited hypothesis, then save image-space scene cells before any calibrated 2.5D/3D promotion.
+- A separate legal-research panel may attach jurisdiction-qualified authorities retrieved through existing case-law search and admitted through ACE ContextManifest. It does not turn visual observations into a legal finding or replace attorney review.
+
+## Capabilities
+
+- `evidence-storybook-scene-handoff`: revision-bound observation coverage, review, cited storybook, and coordinate-safe scene handoff for uploaded evidence.
 
 ## Out of scope
 
 - Upload, storage, worker and failure handling. These stay in `courtroom-upload-story-pipeline`.
 - Playback of the courtroom simulation. That is `courtroom-simulation-runtime`.
-- Text analysis and any machine-learning passes. That is `courtroom-text-analysis-ml`.
+- New text-analysis/vision model training or a replacement legal-search/indexing stack. Existing OCR, perception, case-law retrieval, and ACE owners are reused and must retain their current boundaries.
+- Legal conclusions, identity attribution, guilt/innocence decisions, or automatic confirmation that an incident occurred or a location is correct.
 - The jester demo. That is `jester-accessory-demo`.
 - Generative video. Evidence is never replaced by generated footage.
 

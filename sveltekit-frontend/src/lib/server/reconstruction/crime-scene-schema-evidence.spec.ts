@@ -67,6 +67,27 @@ describe('SceneIntentSchema: additive evidence provenance', () => {
 		]))).not.toThrow();
 	});
 
+	it('accepts an image observation citation with frame timestamp and artifact URI', () => {
+		const parsed = SceneIntentSchema.parse(intent([
+			event({
+				kind: 'hypothesis',
+				citations: [{
+					source: 'image_observation',
+					evidence_id: EVIDENCE_ID,
+					source_revision: REVISION,
+					frame_timestamp_s: 14.5,
+					frame_index: 14,
+					observation_kind: 'detection',
+					artifact_uri: 'atlas-artifacts/keyframes/e1/f14_bbox.json',
+					confidence: 0.84,
+					model_version: 'yolov10n-coco-v1',
+				}],
+			}),
+		]));
+		expect(parsed.events[0].citations).toHaveLength(1);
+		expect(parsed.events[0].citations[0].source).toBe('image_observation');
+	});
+
 	it('rejects a malformed source revision', () => {
 		expect(() => SceneIntentSchema.parse(intent([
 			event({ citations: [{ source: 'scene_cut', evidence_id: EVIDENCE_ID, source_revision: 'sha256:ABC', cut_s: 3 }] }),

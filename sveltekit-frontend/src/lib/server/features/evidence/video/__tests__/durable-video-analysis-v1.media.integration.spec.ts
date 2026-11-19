@@ -242,13 +242,15 @@ async function proveStoredMotionScene(input: {
 	samples: { sampleIndex: number; timestampMs: number; artifact: { sha256: string } }[];
 }) {
 	const { caseId, evidenceId, actorId, sourceRevision, analysisRevision } = input;
-	const [versions, pose, calibrationReview, scene, frame, motion] = await Promise.all([
+	const [versions, pose, calibrationReview, scene, frame, motion, events, sceneStore] = await Promise.all([
 		import('../../../../../../routes/api/evidence/[id]/versions/+server.js'),
 		import('../../../../../../routes/api/evidence/[id]/pose-review/+server.js'),
 		import('../../../../../../routes/api/evidence/[id]/calibration-review/+server.js'),
 		import('../../../../../../routes/api/cases/[id]/scenes/[sceneId]/revisions/+server.js'),
 		import('../../../../../../routes/api/evidence/[id]/video-frame/[frameIndex]/+server.js'),
 		import('../../../../../../routes/api/evidence/[id]/motion-preview/[frameIndex]/+server.js'),
+		import('../../../../../../routes/api/evidence/[id]/video-events/+server.js'),
+		import('$lib/server/scene-document-revisions-v1.js'),
 	]);
 	const locals = { user: { id: String(actorId) } };
 	const request = (body: unknown) => new Request('http://127.0.0.1/scratch', {
@@ -288,6 +290,7 @@ async function proveStoredMotionScene(input: {
 		expect(compact.headers.get('ETag')).toBe(`"sha256-${sha256(compactBytes).slice(7)}"`);
 		const jpeg = await checked(await frame.GET({
 			locals, params: { id: evidenceId, frameIndex: String(entry.frameIndex) },
+			url: new URL(`http://127.0.0.1/scratch?${new URLSearchParams({ sourceRevision, analysisRevision, artifactSha256: entry.artifact.sha256 })}`),
 		} as Parameters<typeof frame.GET>[0]), 200);
 		expect(jpeg.headers.get('X-Frame-Timestamp-Ms')).toBe(String(entry.timestampMs));
 		expect(sha256(new Uint8Array(await jpeg.arrayBuffer()))).toBe(entry.artifact.sha256);
@@ -390,6 +393,29 @@ async function proveStoredMotionScene(input: {
 		browserSessionId ? { ...proposal, proposalId: storedTrack?.proposalId } : proposal,
 	]);
 	if (saved) expect(readback!.manifestSha256).toBe(saved.manifestSha256);
+	const eventScope = { locals, params: { id: evidenceId } };
+	const timelineReply = await checked(await events.GET({ ...eventScope, url: new URL('http://127.0.0.1/scratch') } as Parameters<typeof events.GET>[0]), 200);
+	const timeline = (await timelineReply.json()).eventTimeline;
+	const eventId = timeline.events[0]?.eventId;
+	expect(eventId).toBeTruthy();
+	const reviewEvent = async (reviewStatus: 'APPROVED' | 'REJECTED') => checked(await events.POST({ ...eventScope,
+		request: request({ eventId, sourceRevision, analysisRevision, reviewStatus }),
+	} as Parameters<typeof events.POST>[0]), 200);
+	await reviewEvent('APPROVED');
+	const chapterReply = await checked(await events.GET({ ...eventScope,
+		url: new URL(`http://127.0.0.1/scratch?${new URLSearchParams({ chapterEvent: eventId })}`),
+	} as Parameters<typeof events.GET>[0]), 200);
+	const { chapter, startMs, endMs } = await chapterReply.json();
+	expect(chapter).toMatchObject({ coordinateSpace: 'IMAGE_ONLY', citations: expect.any(Array) });
+	expect(chapter.citations.length).toBeGreaterThan(0);
+	const chapterManifest = createSceneDocumentV1({ ...readback!.manifest, revision: 2, parentManifestSha256: readback!.manifestSha256,
+		videoEventBindings: [{ evidenceId, sourceRevision, analysisRevision, eventId, startMs, endMs, reviewState: 'APPROVED_FOR_SCENE_PROPOSAL', chapter }],
+	});
+	const chapterSave = await saveSceneManifestRevisionV1({ caseId, sceneId, expectedRevision: 1, commandId: randomUUID(), manifest: chapterManifest, fetcher });
+	const pinned = { caseId, sceneId, revision: chapterSave.revision, eventId };
+	expect(await sceneStore.readSavedStorybookChapterV1(pinned)).toMatchObject({ sourceState: 'CURRENT', revision: 2, chapter });
+	await reviewEvent('REJECTED');
+	expect(await sceneStore.readSavedStorybookChapterV1(pinned)).toMatchObject({ sourceState: 'CHANGED', revision: 2, chapter });
 	const denied = await scene.GET({
 		...sceneScope, locals: { user: { id: String(actorId + 1) } }, url: new URL('http://127.0.0.1/scratch?revision=1'),
 	} as Parameters<typeof scene.GET>[0]);

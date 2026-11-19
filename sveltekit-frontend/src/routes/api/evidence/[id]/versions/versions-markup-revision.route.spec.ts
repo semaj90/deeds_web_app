@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   saveAnnotationRevision: vi.fn(),
   createPorts: vi.fn(async () => ({ ports: true })),
   dbRows: [] as unknown[][],
+  reviewEnabled: false,
 }));
 
 vi.mock('$lib/server/db/client', () => ({
@@ -32,6 +33,7 @@ vi.mock('$lib/server/features/evidence/index.js', () => ({ createEvidenceVersion
 vi.mock('$lib/server/validation.js', () => ({ isUuid: (v: string) => /^[0-9a-f-]{36}$/i.test(v) }));
 vi.mock('$lib/server/middleware/cache-headers.js', () => ({ cacheControl: vi.fn() }));
 vi.mock('$lib/server/case-access.js', () => ({ getAuthorizedCase: mocks.getAuthorizedCase }));
+vi.mock('$lib/server/env.server.js', () => ({ ENV: { get EVIDENCE_TRANSCRIPT_REVIEW_ENABLED() { return mocks.reviewEnabled; } } }));
 vi.mock('$lib/server/features/evidence/evidence-revision-v1.js', async (orig) => {
   const real = await orig<typeof import('$lib/server/features/evidence/evidence-revision-v1.js')>();
   return { ...real, saveEvidenceMarkupRevisionV1: mocks.saveRevision, saveEvidenceAnnotationRevisionV1: mocks.saveAnnotationRevision, createDrizzleRevisionPortsV1: mocks.createPorts };
@@ -72,6 +74,7 @@ const body = async (r: Response) => (await r.json()) as Record<string, unknown>;
 describe('POST /api/evidence/[id]/versions (multipart markup revision)', () => {
   beforeEach(() => {
     mocks.dbRows = [];
+    mocks.reviewEnabled = false;
     mocks.getAuthorizedCase.mockReset().mockResolvedValue({ id: CASE_ID });
     mocks.saveRevision.mockReset().mockResolvedValue({ committed: true, idempotent: false, versionId: 'v1', version: 2, index: { status: 'not_requested' } });
     mocks.saveAnnotationRevision.mockReset().mockResolvedValue({ committed: true, idempotent: false, versionId: 'v2', version: 3, index: { status: 'not_requested' }, canonicalAuthority: false });
@@ -171,6 +174,19 @@ describe('POST /api/evidence/[id]/versions (multipart markup revision)', () => {
     mocks.getAuthorizedCase.mockResolvedValue(null);
     expect((await POST(jsonReq({ schema: 'atlas.evidence-annotation-revision-request.v1', caseId: CASE_ID, parentSha256: PARENT, annotation: { schema: 'atlas.evidence-annotation.v1' } }))).status).toBe(404);
     expect(mocks.saveAnnotationRevision).not.toHaveBeenCalled();
+  });
+
+  it('gates region decisions and maps stale frame conflicts to 409', async () => {
+    const payload = { schema: 'atlas.evidence-annotation-revision-request.v1', caseId: CASE_ID, parentSha256: PARENT,
+      annotation: { schema: 'atlas.evidence-annotation.v1', modality: 'video', annotations: [], storybookRegionReview: {} } };
+    expect((await POST(jsonReq(payload))).status).toBe(403);
+    expect(mocks.saveAnnotationRevision).not.toHaveBeenCalled();
+    mocks.reviewEnabled = true;
+    mocks.saveAnnotationRevision.mockRejectedValueOnce(new EvidenceRevisionErrorV1('STORYBOOK_REVIEW_FRAME_CHANGED', 'Reload the chapter.'));
+    const result = await POST(jsonReq(payload));
+    expect(result.status).toBe(409);
+    expect(await body(result)).toMatchObject({ code: 'STORYBOOK_REVIEW_FRAME_CHANGED' });
+    expect(mocks.getAuthorizedCase).toHaveBeenCalledWith(CASE_ID, 7);
   });
 
   it('rejects oversized chunked JSON before parsing or calling persistence', async () => {

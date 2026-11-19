@@ -166,3 +166,32 @@ describe('A2A-04 POST-FIX: /api/acp/execute authorization boundary', () => {
 		expect(missing).toEqual([]);
 	});
 });
+
+describe('ERROR CODES: /api/acp/execute', () => {
+	it('unauthenticated -> 401 with code ACP_UNAUTHORIZED', async () => {
+		const res = await POST(makeEvent({ tool: 'atlas.kanban.claim', args: {}, dryRun: true }, null));
+		expect(res.status).toBe(401);
+		expect((await res.json()).code).toBe('ACP_UNAUTHORIZED');
+	});
+
+	it('malformed JSON body -> 400 with code ACP_INVALID_JSON (not a 500 execution failure)', async () => {
+		const res = await POST({
+			request: new Request('http://localhost/api/acp/execute', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: '{not json',
+			}),
+			locals: { user: { id: 'viewer-1', role: 'viewer' } },
+		} as any);
+		expect(res.status).toBe(400);
+		expect((await res.json()).code).toBe('ACP_INVALID_JSON');
+	});
+
+	it('inherited Object.prototype key is not a tool -> 404 with code ACP_TOOL_NOT_FOUND (no handler path)', async () => {
+		const res = await POST(
+			makeEvent({ tool: 'constructor', args: {}, dryRun: true }, { id: 'viewer-1', role: 'viewer' })
+		);
+		expect(res.status).toBe(404);
+		expect((await res.json()).code).toBe('ACP_TOOL_NOT_FOUND');
+	});
+});

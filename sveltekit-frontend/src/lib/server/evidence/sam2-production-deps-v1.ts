@@ -14,6 +14,7 @@
  */
 import { resolve } from 'node:path';
 import { headFileInSeaweed, putFileToSeaweed } from '$lib/server/storage/seaweed.js';
+import { assertArtifactBucket } from '$lib/server/storage/storage-buckets.js';
 import { createSam2SubprocessRunnerV1 } from './sam2-subprocess-runner-v1.js';
 import { createSam2MaskWriterV1, type Sam2MaskStoragePortV1 } from './sam2-mask-writer-v1.js';
 import { runSam2SilhouetteAdapterV1, type Sam2SilhouetteResultV1, type YoloBoxV1 } from './sam2-silhouette-adapter-v1.js';
@@ -58,6 +59,7 @@ export function createSam2SilhouetteStageFromEnvV1(env: NodeJS.ProcessEnv = proc
 	const config = requireEnv(env, 'SAM2_CONFIG');
 	const checkpoint = requireEnv(env, 'SAM2_CHECKPOINT');
 	const bucket = requireEnv(env, 'SAM2_ARTIFACT_BUCKET');
+	assertArtifactBucket(bucket);
 	const script = env.SAM2_RUNNER?.trim() || resolve(process.cwd(), '..', 'python', 'atlas_sam2_silhouette_runner_v1.py');
 	const runMask = createSam2SubprocessRunnerV1({ python, script, config, checkpoint });
 	const writeMask = createSam2MaskWriterV1({ bucket, storage: sam2SeaweedMaskStorageV1 });

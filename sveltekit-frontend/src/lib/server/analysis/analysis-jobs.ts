@@ -15,7 +15,7 @@ import { and, eq, or, sql, type SQL } from 'drizzle-orm';
 import { postgresErrorDetails } from '$lib/server/db/postgres-error-details.js';
 import { classifyPostgresError } from '$lib/server/db/readiness.js';
 
-export type JobType = 'upload_pipeline' | 'entity_extraction' | 'forensics' | 'summarization' | 'code_feature_registry' | 'lexical_feature_registry';
+export type JobType = 'upload_pipeline' | 'entity_extraction' | 'forensics' | 'summarization' | 'code_feature_registry' | 'lexical_feature_registry' | 'scene_palette';
 export type JobStatus = 'queued' | 'running' | 'completed' | 'failed';
 
 export const ANALYSIS_JOBS_NOTIFY_CHANNEL = 'atlas_analysis_jobs';
@@ -103,19 +103,24 @@ export async function enqueueJob(params: {
   caseId?: string | null;
   jobType: JobType;
   result?: AnalysisJobPayload;
+  /** Caller must read back and validate the existing job's identity before reuse. */
+  reuseId?: string;
 }): Promise<string> {
-  const [row] = await db
+  const insert = db
     .insert(analysisJobs)
     .values({
-      ...(params.id ? { id: params.id } : {}),
+      ...(params.reuseId || params.id ? { id: params.reuseId ?? params.id } : {}),
       evidenceId: params.evidenceId,
       caseId: params.caseId ?? null,
       jobType: params.jobType,
       status: 'queued',
       progress: '0',
       result: normalizeAnalysisJobPayload(params.result, params.jobType),
-    })
-    .returning({ id: analysisJobs.id });
+    });
+  const [row] = await (params.reuseId
+    ? insert.onConflictDoNothing({ target: analysisJobs.id }).returning({ id: analysisJobs.id })
+    : insert.returning({ id: analysisJobs.id }));
+  if (!row && params.reuseId) return params.reuseId;
 
   void notifyAnalysisJobs({
     event: 'enqueued',

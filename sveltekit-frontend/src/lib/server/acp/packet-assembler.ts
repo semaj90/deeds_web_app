@@ -13,6 +13,7 @@
  */
 
 import { createHash, randomUUID } from 'node:crypto';
+import { PacketTopologyEnvelopeSchema } from '../db/packet-topology-envelope.js';
 import type {
   PacketTopologyEnvelope,
   CanonicalPacketIdentity,
@@ -124,9 +125,7 @@ export function assemblePacketFromGrpcResponse(
   };
 
   // Validate before return
-  validatePacketEnvelope(envelope);
-
-  return envelope;
+  return PacketTopologyEnvelopeSchema.parse(envelope);
 }
 
 /**
@@ -138,7 +137,10 @@ function extractIdentity(
   metadata: AssemblyMetadata
 ): CanonicalPacketIdentity {
   // Try to extract from response first
-  const extractedPacketKey = response.packet_key ?? response.id ?? response.key;
+  const keySchema = PacketTopologyEnvelopeSchema.shape.packet_key;
+  const alias = keySchema.safeParse(response.id ?? response.key);
+  const extractedPacketKey = response.packet_key == null ? (alias.success ? alias.data : undefined)
+    : keySchema.parse(response.packet_key);
   const extractedSourceRef = response.source_ref ?? response.sourceRef ?? response.file_path;
   const extractedFilePath = response.file_path ?? response.filePath ?? extractedSourceRef;
   const extractedFunctionSymbol = response.function_symbol ?? response.functionSymbol ?? null;
@@ -152,13 +154,15 @@ function extractIdentity(
   let feature_id = extractedFeatureId;
   let feature_label = extractedFeatureLabel;
 
-  // Generate packet_key if missing (deterministic from source_ref + symbol)
-  if (!packet_key && source_ref) {
+  // A derived transport key binds the declared source revision. Admission still checks canonical ownership.
+  if (!packet_key && typeof source_ref === 'string' && source_ref.trim()) {
+    const revision = keySchema.safeParse(response.source_revision ?? response.sourceRevision);
+    if (!revision.success) throw new Error('PACKET_KEY_FALLBACK_REQUIRES_SOURCE_REVISION');
     const hash = createHash('sha256')
-      .update(`${source_ref}:${function_symbol || 'default'}`)
-      .digest('hex')
-      .slice(0, 8);
-    packet_key = `ace:packet:${metadata.serviceId}:${hash}`;
+      .update(JSON.stringify(['atlas.acp-transport-packet-key.v1', source_ref,
+        revision.data.replace(/^sha256:/, ''), function_symbol ?? null, feature_id ?? null]))
+      .digest('hex');
+    packet_key = `sha256:${hash}`;
   }
 
   // Validate minimums
@@ -230,12 +234,12 @@ function extractTopology(
   const topological_neighbors = response.topological_neighbors ?? response.topologicalNeighbors ?? [];
 
   if (
-    !som_cluster &&
-    !som_row &&
-    !som_col &&
-    !manifold_t &&
-    !manifold_4d &&
-    !community_id &&
+    som_cluster === null &&
+    som_row === null &&
+    som_col === null &&
+    manifold_t === null &&
+    manifold_4d === null &&
+    community_id === null &&
     topological_neighbors.length === 0
   ) {
     return null; // No topology extracted
@@ -286,42 +290,6 @@ function extractMirrors(
     neo4j_edges,
     cold_storage_uri,
   };
-}
-
-/**
- * Validate a packet envelope against the canonical schema.
- * Hard fails if validation fails (prevents shape divergence).
- */
-function validatePacketEnvelope(envelope: PacketTopologyEnvelope): void {
-  // Validate required fields
-  if (!envelope.packet_key || typeof envelope.packet_key !== 'string') {
-    throw new Error('Invalid packet_key: must be non-empty string');
-  }
-  if (!envelope.source_ref || typeof envelope.source_ref !== 'string') {
-    throw new Error('Invalid source_ref: must be non-empty string');
-  }
-  if (!envelope.feature_id || typeof envelope.feature_id !== 'string') {
-    throw new Error('Invalid feature_id: must be non-empty string');
-  }
-
-  // Validate optional numeric fields
-  if (envelope.som_row !== null && typeof envelope.som_row !== 'number') {
-    throw new Error('Invalid som_row: must be number or null');
-  }
-  if (envelope.som_col !== null && typeof envelope.som_col !== 'number') {
-    throw new Error('Invalid som_col: must be number or null');
-  }
-
-  // Validate arrays
-  if (!Array.isArray(envelope.semantic_tags)) {
-    throw new Error('Invalid semantic_tags: must be array');
-  }
-  if (!Array.isArray(envelope.topological_neighbors)) {
-    throw new Error('Invalid topological_neighbors: must be array');
-  }
-  if (!Array.isArray(envelope.neo4j_edges)) {
-    throw new Error('Invalid neo4j_edges: must be array');
-  }
 }
 
 /**

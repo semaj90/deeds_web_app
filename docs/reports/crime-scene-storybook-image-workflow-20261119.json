@@ -1,0 +1,222 @@
+{
+  "schema": "atlas.crime-scene-storybook-workflow-review.v1",
+  "date": "2026-11-19",
+  "likely_cause": "The image-analysis pieces were presented as a single scene-generation flow even though observation coverage, reviewer decisions, legal retrieval, and 3D coordinate admission have separate owners and proof gates.",
+  "evidence": [
+    "The screenshots show a dense detector/segmentation overlay with overlapping labels, a retro palette lookup, a character UV/rigging workflow, an exhibit/storyboard review panel, and a multi-view image-to-splat workflow; they are visual references, not evidence of local implementation.",
+    "sveltekit-frontend/src/lib/server/evidence/storybook-image-observation-read-model-v1.ts exposes source-bound detections, linked masks, separate scene context, and detection/mask/context coverage.",
+    "sveltekit-frontend/src/lib/server/reconstruction/storybook-image-prefill-v1.ts drafts from the bounded image packet; its current packet does not include OCR or legal research citations.",
+    "sveltekit-frontend/src/lib/server/evidence/whole-image-analysis-readback-v1.ts reads the current whole-image analysis from evidence_multimodal_vectors and verifies the exact source revision and original-pixel dimensions.",
+    "Existing upload code performs image OCR, but the current image storybook packet does not bind those OCR results as reviewable observations.",
+    "A read-only Atlas MCP context query returned four live cards with proofUsable=false and rejection reason NON_CANONICAL; no raw MCP hits were admitted to synthesis.",
+    "A rollback-only PostgreSQL 18.4 scratch harness saved and reopened still-image scene revision 1 with detection, segmentation-mask, and scene-context citations; after reanalysis it reported CHANGED, stale save returned HTTP 409, and an independent connection verified rollback. manifestSha256=30f522d8e85575856d7ba737e424f0c1c1f938a2330c1692d7d61cabb775d33e.",
+    "Six focused Vitest suites passed 74/74; npm run check:fast reported 0 errors and 7 warnings.",
+    "openspec validate crime-scene-reconstruction reported: Change 'crime-scene-reconstruction' is valid."
+  ],
+  "implementation_status": {
+    "CREATED": [
+      "Workflow design, delta spec, and concrete follow-up tasks for image review, legal context admission, and scene compilation."
+    ],
+    "WIRED": [
+      "Still-image storybook save and historical reopen use the existing scene revision owner."
+    ],
+    "PROVEN": [
+      "Scratch PostgreSQL stale-source rejection and rollback; focused mocked route/client tests; static Svelte check; OpenSpec validation."
+    ],
+    "DONE": []
+  },
+  "patch_targets": [
+    "openspec/changes/crime-scene-reconstruction/proposal.md",
+    "openspec/changes/crime-scene-reconstruction/design.md",
+    "openspec/changes/crime-scene-reconstruction/tasks.md",
+    "openspec/changes/crime-scene-reconstruction/specs/evidence-storybook-scene-handoff/spec.md",
+    "docs/reports/crime-scene-storybook-image-workflow-20261119.json"
+  ],
+  "safe_next_command": "openspec status --change \"crime-scene-reconstruction\" --json",
+  "smoke_command": "npm exec -- vitest run src/lib/server/scene-document-revisions-v1.spec.ts src/lib/splat/scene-document-v1.spec.ts src/lib/splat/scene-persistence-client-v1.spec.ts 'src/routes/api/cases/[id]/scenes/[sceneId]/revisions/revisions.route.spec.ts' 'src/routes/api/evidence/[id]/multimodal-analysis/multimodal-analysis.route.spec.ts' 'src/routes/api/reconstruction/scene-intent/storybook.route.spec.ts'",
+  "report_path": "docs/reports/crime-scene-storybook-image-workflow-20261119.json",
+  "open_gates": [
+    "Authenticated browser save/reopen on an authorized case and live artifact readback.",
+    "Extend the review-gated scene workflow to measured calibration and qualified multi-view alignment.",
+    "Accepted ACE ContextManifest/DAG legal-research integration with jurisdiction-qualified citations.",
+    "Qualified multi-view alignment and 2.5D/3D asset compilation with reviewed coordinate transforms.",
+    "Representative performance and memory measurements before N-API, WASM, SIMD, or a new codec is selected."
+  ],
+  "still_image_relative_depth": {
+    "base_revision": "1544c87b8958",
+    "revision_scope": "Local working tree",
+    "CREATED": "Optional saved relative-monocular depth binding and strict artifact locator.",
+    "WIRED": "Canonical image readback, Case Storybook save, saved chapter preview, and existing Three.js relief viewer.",
+    "PROVEN": [
+      {
+        "command": "npm exec -- vitest run src/lib/server/scene-document-revisions-v1.spec.ts src/lib/splat/scene-document-v1.spec.ts 'src/routes/api/evidence/[id]/depth-map/depth-map.route.spec.ts' 'src/routes/api/evidence/[id]/multimodal-analysis/multimodal-analysis.route.spec.ts'",
+        "observed": "Test Files  4 passed (4); Tests  56 passed (56)",
+        "scope": "Depth route checks include a stale locator, rotated source, and canonical store failure with a legacy record available"
+      },
+      {
+        "command": "npm run check:fast",
+        "observed": "svelte-check found 0 errors and 7 warnings in 1 file",
+        "scope": "Incremental frontend diagnostics"
+      },
+      {
+        "command": "node --input-type=module (inline stillSceneDepthPg18Fixture)",
+        "observed": "{\"depthHash\":\"sha256:b3de77c20c5fa035db21c648f4186e6a49b05dcbd925e6a52152ab12c4f37706\",\"pinnedDepthHttp\":200,\"forgedDepthWeightsHttp\":409,\"staleDepthHttp\":409}",
+        "manifestSha256": "7759a951219b05c595fa04aeb6444af7cc8fc49f2bf2f009f71ffb74aaff8a3a",
+        "scope": "Real route and scene revision handlers against PostgreSQL 18.4 scratch and synthetic PNG bytes served via a fixture storage adapter; rolled back"
+      },
+      {
+        "command": "node --input-type=module (inline stillSceneDepthBrowserFixture)",
+        "observed": "Chromium WebGL2 rendered verified stored depth and rejected changed bytes without rendering a fallback.",
+        "scope": "Actual Three.js relief component with SwiftShader and fixture HTTP responses"
+      }
+    ],
+    "DONE": []
+  },
+  "still_image_scene_cells": {
+    "base_revision": "1544c87b8958",
+    "revision_scope": "Local working tree",
+    "CREATED": "Image-space scene placement contract with immutable cited source cell and review reference.",
+    "WIRED": "Draft response, placement controls, canonical scene revision writer, and saved chapter grid.",
+    "PROVEN": [
+      {
+        "command": "npm exec -- vitest run src/lib/server/scene-document-revisions-v1.spec.ts src/lib/splat/scene-document-v1.spec.ts 'src/routes/api/reconstruction/scene-intent/storybook.route.spec.ts'",
+        "observed": "Test Files  3 passed (3); Tests  55 passed (55)",
+        "scope": "Scene revision, document compatibility and storyboard route; the route suite was rerun after adding the accepted-spatial-only assertion and passed 18 of 18"
+      },
+      {
+        "command": "npm run check:fast",
+        "observed": "svelte-check found 0 errors and 7 warnings in 1 file",
+        "scope": "Incremental frontend diagnostics"
+      },
+      {
+        "command": "node --input-type=module (inline stillSceneCellsPg18Fixture)",
+        "observed": "{\"sourceCell\":\"E3\",\"placedCell\":\"G8\",\"decisionVersionPreserved\":true,\"forgedDecisionHttp\":409,\"worldObjects\":0}",
+        "manifestSha256": "d4bdfe13c511b9e25e41f4a2c2c1c910b00a9968111b44bbde3c9d0eb6071d3a",
+        "scope": "Canonical scene write and readback with a rollback-only PostgreSQL 18.4 synthetic exhibit"
+      },
+      {
+        "command": "node --input-type=module (inline stillSceneCellsBrowserFixture)",
+        "observed": "Chromium fixture passed: image draft locator, source description, OCR citation, and lazy mask links, stale-draft rejection, region selection, save receipt, and observation review history after reload, blocked acceptance of an unavailable mask, draft invalidation, and edited 2D placement save with pinned readback.",
+        "scope": "Actual Svelte component with mocked HTTP"
+      }
+    ],
+    "DONE": []
+  },
+  "still_image_reviewed_drafts": {
+    "base_revision": "1544c87b8958",
+    "revision_scope": "Local working tree",
+    "CREATED": "Latest image observation decision read model and review digest for storyboard packets.",
+    "WIRED": "Authorized image readback, draft synthesis and recheck, scene save guard, historical reopen, and draft invalidation in Case Storybook.",
+    "PROVEN": [
+      {
+        "command": "npm exec -- vitest run src/lib/server/scene-document-revisions-v1.spec.ts 'src/routes/api/evidence/[id]/multimodal-analysis/multimodal-analysis.route.spec.ts' 'src/routes/api/reconstruction/scene-intent/storybook.route.spec.ts'",
+        "observed": "Test Files  3 passed (3); Tests  39 passed (39)",
+        "scope": "Review changes during synthesis and compatibility of image readback and scene save"
+      },
+      {
+        "command": "npm run check:fast",
+        "observed": "svelte-check found 0 errors and 7 warnings in 1 file",
+        "scope": "Incremental frontend diagnostics"
+      },
+      {
+        "command": "node --input-type=module (inline stillReviewedDraftPg18Fixture)",
+        "observed": "{\"rejectedOcrExcluded\":true,\"reviewChangedDraftSaveHttp\":409,\"reviewChangedHistoricalState\":\"CHANGED\"}",
+        "scope": "Actual image and scene revision handlers in a rollback-only PostgreSQL 18.4 fixture"
+      },
+      {
+        "command": "node --input-type=module (inline stillReviewedDraftBrowserFixture)",
+        "observed": "Chromium fixture passed: image draft locator, source description, OCR citation, and lazy mask links, stale-draft rejection, region selection, save receipt, and observation review history after reload, blocked acceptance of an unavailable mask, and draft invalidation after recording a decision.",
+        "scope": "Actual Svelte component with mocked HTTP"
+      }
+    ],
+    "DONE": []
+  },
+  "still_image_observation_review": {
+    "base_revision": "1544c87b8958",
+    "revision_scope": "Local working tree",
+    "CREATED": "Observation review contract with accepted, rejected and uncertain decisions.",
+    "WIRED": "Case Storybook and existing evidence versions route, with locked canonical observation validation.",
+    "PROVEN": [
+      {
+        "command": "node --input-type=module (inline stillObservationPg18Fixture)",
+        "observed": "{\"observationKind\":\"image_ocr_span\",\"decision\":\"REJECTED\",\"reopen\":\"IDENTICAL\",\"unknownObservationHttp\":409,\"staleReviewHttp\":409}",
+        "scope": "Actual GET/POST route handlers, rolled-back PostgreSQL 18.4 synthetic fixture"
+      },
+      {
+        "command": "node --input-type=module (inline stillObservationBrowserFixtureFinal)",
+        "observed": "Chromium fixture passed: image draft locator, source description, OCR citation, and lazy mask links, stale-draft rejection, region selection, save receipt, and observation review history after reload, and blocked acceptance of an unavailable mask.",
+        "scope": "Actual Svelte component with mocked HTTP"
+      },
+      {
+        "command": "npm exec -- vitest run src/lib/server/features/evidence/evidence-revision-v1.spec.ts src/lib/server/features/evidence/video/video-storybook-coverage-v1.spec.ts 'src/routes/api/evidence/[id]/versions/versions-markup-revision.route.spec.ts'",
+        "observed": "Test Files  3 passed (3); Tests  47 passed (47)",
+        "scope": "Focused compatibility and boundary checks"
+      },
+      {
+        "command": "npm run check:fast",
+        "observed": "svelte-check found 0 errors and 7 warnings in 1 file",
+        "scope": "Incremental frontend diagnostics"
+      }
+    ],
+    "DONE": []
+  },
+  "still_image_ocr": {
+    "base_revision": "1544c87b8958",
+    "revision_scope": "Local working tree",
+    "CREATED": "Source-bound OCR receipt and bounded span contract with prepared input hash and text offsets.",
+    "WIRED": "Canonical image worker, multimodal readback, SceneIntent prefill and validation, reviewed image chapter and case storybook.",
+    "PROVEN": [
+      {
+        "command": "npm exec -- vitest run src/lib/server/evidence/process-evidence-image-canonical-v1.spec.ts src/lib/server/features/evidence/evidence-revision-v1.spec.ts src/lib/server/scene-document-revisions-v1.spec.ts 'src/routes/api/reconstruction/scene-intent/storybook.route.spec.ts' 'src/routes/api/evidence/[id]/multimodal-analysis/multimodal-analysis.route.spec.ts'",
+        "observed": "Test Files  5 passed (5); Tests  68 passed (68)",
+        "scope": "Focused suites, including obsolete OCR locator rejected before synthesis"
+      },
+      {
+        "command": "npm run check:fast",
+        "observed": "svelte-check found 0 errors and 7 warnings in 1 file",
+        "scope": "Incremental frontend diagnostics"
+      },
+      {
+        "command": "node --input-type=module (inline stillOcrPg18Fixture)",
+        "observed": "Tesseract assertion EXIT ONLY passed. citationKinds=[detection,segmentation_mask,scene_context,image_ocr_span]; reopenAfterReanalysis=CHANGED; staleSaveHttp=409; rollbackVerified=true",
+        "manifestSha256": "f49a7673781bc665b5dd4844a465d321b4563c3caa4b61b9ebfa437566d418bb",
+        "scope": "Tesseract v5.5.0.20241111 on synthetic pixels, PostgreSQL 18.4 scratch transaction, canonical writer/readback, synthetic adapter vector and mask reference"
+      },
+      {
+        "command": "node --input-type=module (inline stillOcrBrowserFixture)",
+        "observed": "Chromium fixture passed: image draft locator, source description, OCR citation, and lazy mask links, stale-draft rejection, region selection, save receipt, and history after reload.",
+        "scope": "Actual Svelte component with mocked HTTP"
+      }
+    ],
+    "DONE": []
+  },
+  "still_image_region_review": {
+    "base_revision": "1544c87b8958",
+    "revision_scope": "Local working tree",
+    "CREATED": "Image region review locator bound to the image analysis and observation digest.",
+    "WIRED": "Case Storybook, evidence versions route, and existing PostgreSQL evidence revision owner.",
+    "PROVEN": [
+      {
+        "command": "npm exec -- vitest run src/lib/server/features/evidence/evidence-revision-v1.spec.ts src/lib/server/features/evidence/video/video-storybook-coverage-v1.spec.ts 'src/routes/api/evidence/[id]/versions/versions-markup-revision.route.spec.ts'",
+        "observed": "Test Files  3 passed (3); Tests  47 passed (47)",
+        "scope": "Focused unit and route fixture suites"
+      },
+      {
+        "command": "npm run check:fast",
+        "observed": "svelte-check found 0 errors and 7 warnings in 1 file",
+        "scope": "Incremental frontend type and Svelte diagnostics"
+      },
+      {
+        "command": "node --input-type=module (inline stillRegionPg18Fixture)",
+        "observed": "{\"regionVersion\":1,\"decision\":\"UNCLASSIFIED\",\"currentReplay\":\"IDEMPOTENT\",\"staleReplay\":\"STORYBOOK_REVIEW_FRAME_CHANGED\"}",
+        "scope": "PG18.4 scratch database, existing writer, direct row readback, fixture transaction rolled back"
+      },
+      {
+        "command": "node --input-type=module (inline stillRegionBrowserFixture)",
+        "observed": "Chromium fixture passed: image draft locator, source description and lazy mask links, stale-draft rejection, region selection, save receipt, and history after reload.",
+        "scope": "Actual Svelte component in Chromium with mocked HTTP responses"
+      }
+    ],
+    "DONE": []
+  }
+}

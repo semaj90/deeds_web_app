@@ -115,11 +115,13 @@ describe('Multicore SIMD Fanout Engine (FANOUT-01, SORT-01, PARSE-02, BATCH-01)'
 
     for (const domain of ['ast', 'graph', 'retrieval'] as const) {
       const batch = res.batches[domain];
-      expect(batch.schema).toBe('atlas.simd-fanout-batch.v1');
+      expect(batch.schema).toBe('atlas.simd-fanout-batch.v2');
       expect(batch.batchChecksum).toMatch(/^[a-f0-9]{64}$/);
       expect(batch.payloadDigest).toMatch(/^[a-f0-9]{64}$/);
       expect(batch.sourceOffsets).toBeInstanceOf(BigUint64Array);
       expect(batch.payload).toBeInstanceOf(Uint8Array);
+      expect(batch.payloadOffsets).toBeInstanceOf(Uint32Array);
+      expect(batch.payloadOffsets[batch.recordCount]).toBe(batch.payload.byteLength);
       expect(batch.canonicalAuthority).toBe(false);
       expect(batch.writesPerformed).toBe(false);
     }

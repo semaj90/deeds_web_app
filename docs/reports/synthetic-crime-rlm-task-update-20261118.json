@@ -1,0 +1,23 @@
+{
+  "likely_cause": "The reconstruction backlog mentioned synthetic clips, scene cells, and legal recommendations but did not define clip-duration tiers, concrete RLM prompt gates, multi-location timeline semantics, or jurisdiction-aware source requirements.",
+  "evidence": [
+    "openspec/changes/crime-scene-reconstruction/tasks.md already fixes storyboard output at 20 seconds and distinguishes synthetic fixtures from source evidence.",
+    "The synthetic clip tasks now recommend 8-12 seconds for one event and 12-15 seconds for a short sequence, while preserving the 20-second storyboard decision.",
+    "Existing local schema declarations include legal_documents, statutes, canonical_docs, jurisdictions, and legal case records; any future implementation must verify current canonical ownership and live schema before adding storage/indexes.",
+    "atlas-tools build_agentic_rag_context returned 4 live ranked cards but marked them UNADMITTED_RETRIEVAL_CANDIDATES, MISSING_SOURCE_REVISION, NON_CANONICAL, and proofUsable=false; no database or legal-PDF source claims were accepted from those cards."
+  ],
+  "patch_targets": [
+    "openspec/changes/crime-scene-reconstruction/tasks.md",
+    "docs/reports/synthetic-crime-rlm-task-update-20261118.json"
+  ],
+  "safe_next_command": "git diff --check",
+  "smoke_command": "rg -n \"SYN-0[1-8]|RLM-0[1-6]|CASE-0[1-7]|LOC-MULTI-01\" openspec/changes/crime-scene-reconstruction/tasks.md",
+  "report_path": "docs/reports/synthetic-crime-rlm-task-update-20261118.json",
+  "implementation_status": {
+    "task_ledger_updated": true,
+    "runtime_prompts_implemented": false,
+    "synthetic_clips_created": false,
+    "live_case_or_law_retrieval_verified": false,
+    "database_or_index_changed": false
+  }
+}

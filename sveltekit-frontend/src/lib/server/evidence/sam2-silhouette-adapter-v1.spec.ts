@@ -30,11 +30,11 @@ function fakePorts(overrides: { runMask?: unknown; writeMask?: unknown } = {}) {
 describe('sam2 silhouette adapter v1', () => {
 	it('returns one contract-valid silhouette per admitted person box, with the mask hash the writer received', async () => {
 		const { ports, writes } = fakePorts();
-		const result = await runSam2SilhouetteAdapterV1({ bytes, mimeType: 'image/png', boxes: [person(0.8)] }, ports);
+		const result = await runSam2SilhouetteAdapterV1({ bytes, mimeType: 'image/png', boxes: [person(0.1), person(0.8)] }, ports);
 		expect(result.status).toBe('EXECUTED');
 		expect(result.masks).toHaveLength(1);
 		const mask = result.masks[0]!;
-		expect(mask).toMatchObject({ artifactKind: 'sam2_alpha_silhouette', is3DReconstruction: false, targetBoxIndex: 0, label: 'person', iouScore: 0.9 });
+		expect(mask).toMatchObject({ artifactKind: 'sam2_alpha_silhouette', is3DReconstruction: false, targetBoxIndex: 0, sourceDetectionIndex: 1, label: 'person', iouScore: 0.9 });
 		expect(mask.maskSha256).toBe(createHash('sha256').update(png).digest('hex'));
 		expect(writes[0]).toEqual({ maskSha256: mask.maskSha256, targetBoxIndex: 0 });
 	});

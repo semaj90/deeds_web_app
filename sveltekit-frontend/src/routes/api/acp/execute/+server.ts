@@ -32,22 +32,58 @@ const acpExecuteSchema = z.object({
 	dryRun: z.boolean().optional().default(false)
 });
 
+/**
+ * Error codes (additive `code` field on every error body; `error` text kept for existing clients).
+ * Filter server logs with: rg "ACP_" (each log line is JSON with the same `code`).
+ */
+const ACP_ERROR_CODES = {
+	UNAUTHORIZED: 'ACP_UNAUTHORIZED',
+	INVALID_JSON: 'ACP_INVALID_JSON',
+	INVALID_INPUT: 'ACP_INVALID_INPUT',
+	TOOL_NOT_FOUND: 'ACP_TOOL_NOT_FOUND',
+	PERMISSION_DENIED: 'ACP_PERMISSION_DENIED',
+	EXECUTION_FAILED: 'ACP_EXECUTION_FAILED'
+} as const;
+
 export const POST: RequestHandler = async (event) => {
 	const { request, locals } = event;
-	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!locals.user) {
+		return json({ error: 'Unauthorized', code: ACP_ERROR_CODES.UNAUTHORIZED }, { status: 401 });
+	}
 	const startTime = Date.now();
+	let toolName: string | undefined;
+
+	let raw: unknown;
+	try {
+		raw = await request.json();
+	} catch {
+		// Malformed body is a client error, not an execution failure.
+		return json(
+			{ error: 'Request body must be valid JSON', code: ACP_ERROR_CODES.INVALID_JSON },
+			{ status: 400 }
+		);
+	}
 
 	try {
-		const raw = await request.json();
 		const parsed = acpExecuteSchema.safeParse(raw);
 		if (!parsed.success) {
-			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+			return json(
+				{
+					error: parsed.error.issues[0]?.message ?? 'Invalid input',
+					code: ACP_ERROR_CODES.INVALID_INPUT
+				},
+				{ status: 400 }
+			);
 		}
 		const { tool, args, dryRun } = parsed.data;
+		toolName = tool;
 
 		const schema = getACPToolSchema(tool);
 		if (!schema) {
-			return json({ error: `Unknown tool: ${tool}` }, { status: 404 });
+			return json(
+				{ error: `Unknown tool: ${tool}`, code: ACP_ERROR_CODES.TOOL_NOT_FOUND },
+				{ status: 404 }
+			);
 		}
 
 		// AUTHORIZATION -- must happen before dispatch/handler invocation.
@@ -57,7 +93,10 @@ export const POST: RequestHandler = async (event) => {
 		const required = requiredAcpToolPermission(tool);
 		if (!hasPermission(grant, required)) {
 			return json(
-				{ error: `Permission denied: requires '${required}' for tool '${tool}'` },
+				{
+						error: `Permission denied: requires '${required}' for tool '${tool}'`,
+						code: ACP_ERROR_CODES.PERMISSION_DENIED
+					},
 				{ status: 403 }
 			);
 		}
@@ -80,10 +119,24 @@ export const POST: RequestHandler = async (event) => {
 		});
 
 	} catch (error) {
-		console.error('ACP Execute error:', error);
+		// Structured, code-tagged log line. Tool arguments are never logged; the
+			// error message is truncated to limit any user-data leakage.
+			const message = error instanceof Error ? error.message : String(error);
+			console.error(
+				JSON.stringify({
+					level: 'error',
+					code: ACP_ERROR_CODES.EXECUTION_FAILED,
+					route: '/api/acp/execute',
+					tool: toolName ?? null,
+					errorName: error instanceof Error ? error.name : 'UnknownError',
+					message: message.slice(0, 200),
+					durationMs: Date.now() - startTime
+				})
+			);
 		return json(
 			{
-				error: 'Execution failed'
+				error: 'Execution failed',
+					code: ACP_ERROR_CODES.EXECUTION_FAILED
 			},
 			{ status: 500 }
 		);

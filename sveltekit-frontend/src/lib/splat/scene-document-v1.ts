@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { calibrate, type CalibrationAnchor } from './calibration.js';
 import { generatedSceneAssetProvenanceV1Schema } from './generated-scene-asset-provenance-v1.js';
+import { storybookVideoChapterV1Schema } from '$lib/shared/storybook-video-chapter-v1.js';
+import { storybookImageChapterV1Schema } from '$lib/shared/storybook-image-chapter-v1.js';
 
 const finite = z.number().finite();
 const digest = z.string().regex(/^[a-f0-9]{64}$/i, 'Expected SHA-256 hex');
@@ -123,7 +125,8 @@ export const sceneVideoEventBindingV1Schema = z.object({
 	eventId: z.string().uuid(),
 	startMs: z.number().int().nonnegative(),
 	endMs: z.number().int().positive(),
-	reviewState: z.literal('APPROVED_FOR_SCENE_PROPOSAL')
+	reviewState: z.literal('APPROVED_FOR_SCENE_PROPOSAL'),
+	chapter: storybookVideoChapterV1Schema.optional(),
 }).strict().superRefine((binding, context) => {
 	if (binding.endMs <= binding.startMs) {
 		context.addIssue({ code: 'custom', message: 'Scene event interval must be positive', path: ['endMs'] });
@@ -204,6 +207,7 @@ export const sceneDocumentV1Schema = z.object({
 	evidenceBindings: z.array(z.object({ evidenceId: z.string().uuid(), sourceRevision }).strict()).max(10_000).optional(),
 	// Optional additive source-time links preserve earlier v1 scene manifests.
 	videoEventBindings: z.array(sceneVideoEventBindingV1Schema).max(10_000).optional(),
+	imageStorybookChapter: storybookImageChapterV1Schema.optional(),
 	// Optional reviewed 2D ground-plane proposals; they do not assert height or a 3D pose.
 	groundPlaneTrackProposals: z.array(sceneGroundPlaneTrackProposalV1Schema).max(1_000).optional(),
 	// Optional to preserve canonical hashes for existing v1 scene manifests.
@@ -286,6 +290,9 @@ export const sceneDocumentV1Schema = z.object({
 	const sourceRevisions = new Map<string, string>();
 	for (const binding of (document.evidenceBindings ?? [])) sourceRevisions.set(binding.evidenceId, binding.sourceRevision);
 	for (const source of document.evidenceSources) sourceRevisions.set(source.evidenceId, source.sourceRevision);
+	if (document.imageStorybookChapter && sourceRevisions.get(document.imageStorybookChapter.evidenceId) !== document.imageStorybookChapter.sourceRevision) {
+		context.addIssue({ code: 'custom', message: 'Image chapter must match an evidence revision in this scene', path: ['imageStorybookChapter', 'sourceRevision'] });
+	}
 	const linkedVideoEvents = new Set<string>();
 	for (const [index, binding] of (document.videoEventBindings ?? []).entries()) {
 		const identity = `${binding.evidenceId}:${binding.eventId}`;

@@ -24,7 +24,7 @@ function objectRecord(value: unknown): Record<string, unknown> | null {
 }
 
 /** Serves one current, case-authorized JPEG derived from the canonical video-analysis run. */
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, url }) => {
 	const evidenceId = params.id;
 	const frameIndex = Number(params.frameIndex);
 	if (!locals.user?.id) return failure('UNAUTHORIZED', 401);
@@ -94,6 +94,14 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			artifact.sourceRevision !== sourceRevision || typeof artifact.sha256 !== 'string' || !/^sha256:[a-f0-9]{64}$/.test(artifact.sha256) ||
 			typeof artifact.byteLength !== 'number' || !Number.isSafeInteger(artifact.byteLength) || artifact.byteLength <= 0 || artifact.byteLength > MAX_FRAME_BYTES) {
 			return failure('VIDEO_FRAME_NOT_FOUND', 404);
+		}
+		const expectedSourceRevision = url.searchParams.get('sourceRevision');
+		const expectedAnalysisRevision = url.searchParams.get('analysisRevision');
+		const expectedArtifactSha256 = url.searchParams.get('artifactSha256');
+		if ((expectedSourceRevision !== null && expectedSourceRevision !== sourceRevision) ||
+			(expectedAnalysisRevision !== null && expectedAnalysisRevision !== video.analysisRevision) ||
+			(expectedArtifactSha256 !== null && expectedArtifactSha256 !== artifact.sha256)) {
+			return failure('VIDEO_FRAME_REVISION_CHANGED', 409);
 		}
 
 		const bytes = await getFileFromSeaweed({ bucket, objectKey: expectedKey, maximumBytes: MAX_FRAME_BYTES });

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   createParsedBatchV1,
+  createParsedBatchV2,
+  openParsedBatchV2,
   sortParsedRecordsDeterministicV1,
   type ParsedRecordEntryV1,
   PARENT_ATLAS_SIMD_PROOF_SEQUENCE,
@@ -91,5 +93,24 @@ describe('SIMD Fanout & Ingestion Contract (PARSE-01..02, FANOUT-01, SORT-01, BA
       'BATCH-01',
       'PERF-01',
     ]);
+  });
+});
+describe('packed V2 batch', () => {
+  it('reconstructs multibyte, CRLF and empty records and authenticates the boundaries', () => {
+    const records = ['{"name":"雪"}\r\n', '', '{"value":"é"}'].map((text, index) => ({
+      domain: 'ast' as const, packetKey: 'fixture', sourceRevision: 'run', sourceOffset: 100n + BigInt(index * 50),
+      rawBytes: Buffer.from(text),
+    }));
+    const batch = createParsedBatchV2({ domain: 'ast', records: [...records].reverse() });
+    const read = openParsedBatchV2(batch);
+    expect(Array.from(batch.sourceOffsets)).toEqual([100n, 150n, 200n]);
+    expect(Array.from(batch.payloadOffsets)).toEqual([0, records[0].rawBytes.length, records[0].rawBytes.length, batch.payload.length]);
+    expect(records.map((_, index) => Buffer.from(read(index)))).toEqual(records.map((record) => record.rawBytes));
+    expect(() => read(1.5)).toThrow('PACKET_OFFSET_INVALID');
+    const tampered = batch.payloadOffsets.slice();
+    tampered[1] -= 1;
+    expect(() => openParsedBatchV2({ ...batch, payloadOffsets: tampered })).toThrow('PACKED_BATCH_CHECKSUM_MISMATCH');
+    tampered[1] = batch.payload.length + 1;
+    expect(() => openParsedBatchV2({ ...batch, payloadOffsets: tampered })).toThrow('PACKET_OFFSET_INVALID');
   });
 });

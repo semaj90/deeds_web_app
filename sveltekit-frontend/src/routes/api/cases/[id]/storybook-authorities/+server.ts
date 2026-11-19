@@ -1,0 +1,74 @@
+import { randomUUID } from 'node:crypto';
+import { json } from '@sveltejs/kit';
+import { z } from 'zod';
+import type { RequestHandler } from './$types';
+import { pool } from '$lib/server/db/client.js';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
+import { compileContext } from '$lib/server/ace/context-compiler.parent-atlas.js';
+import { listCaseAuthorityJurisdictionsV1, searchCaseLinkedAuthorityChunksV1 } from '$lib/server/legal/statute-search-v1.js';
+import { createLibraryCitationContextManifestV1 } from '$lib/server/library/library-citation-provenance-v1.js';
+
+const questionSchema = z.object({
+	question: z.string().trim().min(1).max(500),
+	jurisdiction: z.string().trim().regex(/^[A-Za-z0-9_-]{1,64}$/),
+}).strict();
+const headers = { 'Cache-Control': 'private, no-store' };
+
+export const GET: RequestHandler = async ({ params, locals }) => {
+	const actorId = Number(locals.user?.id);
+	const empty = { jurisdictions: [] };
+	if (!Number.isSafeInteger(actorId) || actorId < 1) return json(empty, { status: 401, headers });
+	const caseId = z.uuid().safeParse(params.id);
+	if (!caseId.success) return json(empty, { status: 404, headers });
+	try {
+		if (!await getAuthorizedCase(caseId.data, actorId)) return json(empty, { status: 404, headers });
+		const jurisdictions = await listCaseAuthorityJurisdictionsV1(pool, caseId.data, actorId);
+		return json({ jurisdictions }, { headers });
+	} catch {
+		return json(empty, { status: 503, headers });
+	}
+};
+
+export const POST: RequestHandler = async ({ params, locals, request }) => {
+	const actorId = Number(locals.user?.id);
+	if (!Number.isSafeInteger(actorId) || actorId < 1) return json({ error: 'Sign in to search case authorities.' }, { status: 401, headers });
+	const caseId = z.uuid().safeParse(params.id);
+	if (!caseId.success) return json({ error: 'Case not found.' }, { status: 404, headers });
+	const parsed = questionSchema.safeParse(await request.json().catch(() => null));
+	if (!parsed.success) return json({ error: 'Enter a question and a library jurisdiction code.' }, { status: 400, headers });
+	const { question, jurisdiction } = parsed.data;
+	try {
+		if (!await getAuthorizedCase(caseId.data, actorId)) return json({ error: 'Case not found.' }, { status: 404, headers });
+		const hits = await searchCaseLinkedAuthorityChunksV1(pool, { caseId: caseId.data, actorId, jurisdiction, question });
+		const libraryManifest = await createLibraryCitationContextManifestV1({
+			caseId: caseId.data, actorId, authorityJurisdiction: jurisdiction,
+			candidates: hits.map(({ chunkId }, index) => ({ chunkId, ordinal: index + 1 })),
+		});
+		if (!await getAuthorizedCase(caseId.data, actorId)) return json({ error: 'Case not found.' }, { status: 404, headers });
+		const verified = [...(libraryManifest?.entries.values() ?? [])];
+		const entries = new Map(verified.map((entry) => [entry.chunkId, entry]));
+		const compiled = compileContext({
+			request_id: randomUUID(),
+			candidates: hits.flatMap(({ chunkId, score }) => {
+				const entry = entries.get(chunkId);
+				if (!entry?.authority || !Number.isFinite(score)) return [];
+				return [{ packet_key: chunkId, source_ref: `library:${entry.documentId}:${entry.documentRevision}:${chunkId}`,
+					source_revision: `sha256:${entry.sourceHash.toLowerCase()}`, content: entry.quote,
+					lanes: ['lexical' as const], relevance: score, authority: 1 }];
+			}),
+			policy: { version: 'storybook-linked-authorities.v1', token_budget: 1500, max_packet_tokens: 450, max_packets: 6 },
+		});
+		const authorities = compiled.manifest.selected_packet_keys.flatMap((chunkId) => {
+			const entry = entries.get(chunkId);
+			return entry ? [{ ...entry, excerptCharEnd: entry.charStart + entry.quote.length }] : [];
+		});
+		return json({
+			status: authorities.length ? 'READY_FOR_REVIEW' : 'NO_VERIFIED_PASSAGES', jurisdiction, authorities,
+			coverage: { matched: hits.length, verified: verified.length, shown: authorities.length,
+				matchLimit: 24, contraryAuthorityChecked: false },
+			citationManifestSha256: authorities.length ? libraryManifest?.manifestSha256 ?? null : null,
+		}, { headers });
+	} catch {
+		return json({ error: 'Case authority search is unavailable.' }, { status: 503, headers });
+	}
+};

@@ -18,6 +18,16 @@
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
+import { and, eq, isNull } from 'drizzle-orm';
+import { db } from '$lib/server/db/client.js';
+import { evidence } from '$lib/server/db/schema-postgres.js';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
+import { formatEvidenceSourceRevisionV1 } from '$lib/server/evidence-source-revision-v1.js';
+import { buildVideoStorybookCoverageV1 } from '$lib/server/features/evidence/video/video-storybook-coverage-v1.js';
+import { storybookImageObservationScopeV1Schema } from '$lib/shared/storybook-image-observations-v1.js';
+import type { SceneIntent } from '$lib/server/reconstruction/crime-scene-schema.js';
+import { acceptsStorybookFrameIntentV1, buildStorybookFramePrefillV1, storybookFrameLocatorV1Schema } from '$lib/server/reconstruction/storybook-frame-prefill-v1.js';
+import { acceptsStorybookImageIntentV1, buildStorybookImagePrefillV1 } from '$lib/server/reconstruction/storybook-image-prefill-v1.js';
 import {
   extractSceneIntent,
   buildDegradedFixture,
@@ -34,9 +44,26 @@ const RequestSchema = z.object({
   /** Optional override; defaults to ornith-1.5-9b in the extractor. */
   model:         z.string().min(1).max(100).optional(),
   temperature:   z.number().min(0).max(1.5).optional(),
-});
+  storybookFrame: storybookFrameLocatorV1Schema.optional(),
+  storybookImage: storybookImageObservationScopeV1Schema.optional(),
+}).refine((input) => !input.storybookFrame || !input.storybookImage, 'Select one source for a storybook draft.');
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+function storybookError(code: string, status: number) {
+  return json({ ok: false, sceneIntent: null, source: 'storybook', diagnostics: { parseError: code }, prefillSha256: null },
+    { status, headers: { 'Cache-Control': 'private, no-store' } });
+}
+
+async function resolveStorybookPrefill(caseId: string, frame: z.infer<typeof storybookFrameLocatorV1Schema>) {
+  const [item] = await db.select({ hash: evidence.hash, aiAnalysis: evidence.aiAnalysis })
+    .from(evidence).where(and(eq(evidence.caseId, caseId), eq(evidence.id, frame.evidenceId), isNull(evidence.deletedAt))).limit(1);
+  if (!item?.hash) return null;
+  const sourceRevision = formatEvidenceSourceRevisionV1(item.hash);
+  const root = item.aiAnalysis as { videoAnalysis?: unknown } | null;
+  const coverage = buildVideoStorybookCoverageV1({ evidenceId: frame.evidenceId, caseId, sourceRevision, videoAnalysis: root?.videoAnalysis });
+  return coverage ? buildStorybookFramePrefillV1(coverage, frame) : null;
+}
+
+export const POST: RequestHandler = async ({ request, locals, fetch }) => {
   if (!locals.user?.id) {
     // Auth-required, but degraded shape on auth fail too — keeps client
     // destructuring stable. Status 401 still signals the actual problem.
@@ -91,6 +118,54 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   const input = parsed.data;
+
+  if (input.storybookFrame || input.storybookImage) {
+    const { caseId, storybookFrame, storybookImage } = input;
+    if (!caseId) return storybookError('Case is required for a storybook proposal.', 400);
+    const actorId = Number(locals.user.id);
+    if (!Number.isSafeInteger(actorId) || actorId <= 0) return storybookError('Unauthorized', 401);
+    const resolveDraft = async () => {
+      if (storybookImage) {
+        const response = await fetch(`/api/evidence/${encodeURIComponent(storybookImage.evidenceId)}/multimodal-analysis`, {
+          cache: 'no-store', redirect: 'error',
+        });
+        if (!response.ok) return null;
+        const packet = buildStorybookImagePrefillV1(await response.json(), caseId, storybookImage);
+        return packet && { packet, accepts: (intent: SceneIntent) => acceptsStorybookImageIntentV1(intent, packet) };
+      }
+      const packet = storybookFrame && await resolveStorybookPrefill(caseId, storybookFrame);
+      return packet ? { packet, accepts: (intent: SceneIntent) => acceptsStorybookFrameIntentV1(intent, caseId, packet) } : null;
+    };
+    try {
+      if (!await getAuthorizedCase(caseId, actorId)) return storybookError('Case not found.', 404);
+      const resolved = await resolveDraft();
+      if (!resolved) return storybookError('The selected source is stale or unavailable. Reload the chapter.', 409);
+      const { packet, accepts } = resolved;
+      if (!packet.observations.length) return storybookError('The selected source has no current observations to cite.', 422);
+      const result = await extractSceneIntent({
+        narrative: 'Draft a visual review storyboard. Describe the observations and questions the source leaves open.',
+        caseId, evidenceIds: [packet.source.evidenceId],
+        aestheticHint: input.aestheticHint, temperature: 0,
+        ...(packet.schema === 'atlas.storybook-image-prefill.v1'
+          ? { storybookImagePrefill: packet } : { storybookPrefill: JSON.stringify(packet) }) });
+      if (!result.ok || !accepts(result.sceneIntent)) {
+        return storybookError('The storyboard model did not return a proposal with valid observation citations.', 422);
+      }
+      if (!await getAuthorizedCase(caseId, actorId)) return storybookError('Case not found.', 404);
+      const current = await resolveDraft();
+      if (current?.packet.prefillSha256 !== packet.prefillSha256) return storybookError('The analysis changed while drafting. Reload the chapter.', 409);
+      const cited = new Set(result.sceneIntent.events.flatMap((event) => event.citations.map((citation) =>
+        citation.source === 'image_observation' ? citation.observation_id : undefined)));
+      const spatialReviews = packet.schema === 'atlas.storybook-image-prefill.v1' ? packet.observations.flatMap((observation) =>
+        (observation.kind === 'detection' || observation.kind === 'segmentation_mask') &&
+        observation.reviewerDecision === 'ACCEPTED' && observation.reviewVersionId && cited.has(observation.observationId)
+          ? [{ observationId: observation.observationId, versionId: observation.reviewVersionId, decision: 'ACCEPTED' as const }] : []) : [];
+      return json({ ...result, prefillSha256: packet.prefillSha256, ...(spatialReviews.length ? { spatialReviews } : {}) },
+        { headers: { 'Cache-Control': 'private, no-store' } });
+    } catch {
+      return storybookError('The storyboard proposal could not be prepared.', 503);
+    }
+  }
 
   // Optional ACE retrieval. Lazy import so a failing ACE module never
   // blocks the route from booting (per current import-resilience pattern).

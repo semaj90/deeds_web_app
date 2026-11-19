@@ -28,6 +28,49 @@ export const STATUTE_EMBEDDING_RECIPE_V1 = Object.freeze({
 /** pgvector HNSW returns at most hnsw.ef_search (default 40) candidates unless iterative scan is enabled. */
 export const MAX_VECTOR_RESULTS = 40;
 
+/** Case-scoped lexical discovery. Passage text is resolved by the library citation verifier. */
+export async function searchCaseLinkedAuthorityChunksV1(
+	db: StatuteQueryable, input: { caseId: string; actorId: number; jurisdiction: string; question: string },
+): Promise<Array<{ chunkId: string; score: number }>> {
+	const { rows } = await db.query(
+		`WITH q AS (SELECT websearch_to_tsquery('english', $1) AS tsq)
+		SELECT lc.id::text AS chunk_id, ts_rank_cd(lc.tsv, q.tsq, 32) AS score
+		FROM legal_chunks lc
+		JOIN legal_nodes ln ON ln.id = lc.legal_node_id
+		JOIN library_documents ld ON ld.id = ln.document_id
+		JOIN library_document_versions ldv
+		  ON ldv.id = ln.version_id AND ldv.document_id = ld.id
+		 AND ldv.source_hash = ld.source_hash AND ldv.is_current IS TRUE
+		JOIN jurisdictions j ON j.id = ld.jurisdiction_id
+		CROSS JOIN q
+		WHERE lc.tsv @@ q.tsq AND j.code = $2 AND ld.is_official IS TRUE
+		  AND ld.corpus_type IN ('statute', 'case', 'constitution', 'regulation')
+		  AND lc.parser_revision IS NOT NULL AND lc.char_offset_unit = 'utf16_code_units'
+		  AND ld.source_hash ~ '^[a-fA-F0-9]{64}$'
+		  AND (ld.uploaded_by IS NULL OR ld.uploaded_by = $3::integer)
+		  AND EXISTS (SELECT 1 FROM case_library_links cl WHERE cl.document_id = ld.id AND cl.case_id = $4::uuid
+			AND (cl.node_id IS NULL OR cl.node_id = ln.id))
+		ORDER BY score DESC, lc.id
+		LIMIT 24`,
+		[toOrWebSearchQuery(input.question), input.jurisdiction, input.actorId, input.caseId],
+	);
+	return rows.map((row) => ({ chunkId: String(row.chunk_id), score: Number(row.score) }));
+}
+
+export async function listCaseAuthorityJurisdictionsV1(db: StatuteQueryable, caseId: string, actorId: number) {
+	const { rows } = await db.query(
+		`SELECT DISTINCT j.code, j.name
+		FROM case_library_links cl
+		JOIN library_documents ld ON ld.id = cl.document_id
+		JOIN jurisdictions j ON j.id = ld.jurisdiction_id
+		WHERE cl.case_id = $1::uuid AND ld.is_official IS TRUE
+		  AND ld.corpus_type IN ('statute', 'case', 'constitution', 'regulation')
+		  AND (ld.uploaded_by IS NULL OR ld.uploaded_by = $2::integer)
+		ORDER BY j.code LIMIT 100`, [caseId, actorId],
+	);
+	return rows.map((row) => ({ code: String(row.code), name: String(row.name) }));
+}
+
 export type CorpusSourceType = 'statute' | 'treatise' | 'unregistered' | 'unknown';
 export type LegalSourceType = CorpusSourceType | 'case' | 'judicial_opinion';
 

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import {
 	requestLangExtractAnalyze,
@@ -8,6 +9,7 @@ const inputSchema = z.object({
 	caseId: z.string().uuid(),
 	evidenceId: z.string().uuid(),
 	sourceSha256: z.string().regex(/^[a-f0-9]{64}$/i),
+	analysisRevision: z.string().min(1).max(256),
 	text: z.string().min(1).max(10_000).refine((value) => value.trim().length > 0),
 	enabled: z.boolean(),
 }).strict();
@@ -19,6 +21,8 @@ export type CaseLocationTextCandidateV1 = {
 	caseId: string;
 	evidenceId: string;
 	sourceSha256: string;
+	analysisRevision: string;
+	extractedTextSha256: string;
 	mention: string;
 	startChar: number;
 	endChar: number;
@@ -33,7 +37,7 @@ export type CaseLocationTextCandidateResultV1 = {
 	errorCode?: 'LANGEXTRACT_REQUEST_FAILED';
 };
 
-const LOCATION_LABEL = /^(?:location|place|address|gpe|facility|landmark)$/i;
+const LOCATION_LABEL = /^(?:location|loc|place|address|gpe|facility|fac|landmark)$/i;
 const MAX_CANDIDATES = 10;
 
 function findVerifiedSpan(
@@ -72,10 +76,10 @@ export async function extractCaseLocationTextCandidatesV1(
 	try {
 		const response = await request({
 			text: parsed.data.text,
-			source_type: 'general',
+		source_type: 'ocr_text',
 			extraction_mode: 'full',
 			max_chars: 10_000,
-		}, { timeoutMs: 30_000 });
+		}, { timeoutMs: 30_000, path: '/extract' });
 
 		const candidates: CaseLocationTextCandidateV1[] = [];
 		for (const entity of response.entities) {
@@ -89,6 +93,8 @@ export async function extractCaseLocationTextCandidatesV1(
 				caseId: parsed.data.caseId,
 				evidenceId: parsed.data.evidenceId,
 				sourceSha256: parsed.data.sourceSha256.toLowerCase(),
+				analysisRevision: parsed.data.analysisRevision,
+				extractedTextSha256: createHash('sha256').update(parsed.data.text, 'utf8').digest('hex'),
 				mention: parsed.data.text.slice(span.startChar, span.endChar),
 				startChar: span.startChar,
 				endChar: span.endChar,

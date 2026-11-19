@@ -1,0 +1,15 @@
+{
+  "service": "dev-gpu",
+  "port": 5173,
+  "pid": 36612,
+  "status": "running",
+  "verified": {
+    "endpoint": "/api/health",
+    "serverStatus": "healthy"
+  },
+  "started_at": "2026-11-19T17:44:46.2319516Z",
+  "revision": "1544c87b8958a2d17cdcf7a0ddb16a5771491887",
+  "stdout_log": "logs/startup/test.log",
+  "stderr_log": "logs/startup/test.log",
+  "published_at": "2026-11-19T18:47:58.893Z"
+}

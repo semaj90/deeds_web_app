@@ -9,6 +9,7 @@ import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { formatEvidenceSourceRevisionV1 } from '$lib/server/evidence-source-revision-v1.js';
 import { isUuid } from '$lib/server/validation.js';
 import { videoEventTimelineV1Schema } from '$lib/server/features/evidence/video/video-event-fusion-v1.js';
+import { buildReviewedVideoStorybookChapterV1 } from '$lib/server/reconstruction/reviewed-video-storybook-chapter-v1.js';
 
 const reviewBodySchema = z.object({
 	eventId: z.string().uuid(),
@@ -21,15 +22,17 @@ function response(evidenceId: string, eventTimeline: unknown, reviewEnabled: boo
 	return { success: error === null, evidenceId, eventTimeline, reviewEnabled, error };
 }
 
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, url }) => {
 	const evidenceId = params.id;
 	if (!locals.user?.id) return json(response(evidenceId, null, false, 'Unauthorized'), { status: 401 });
 	if (!isUuid(evidenceId)) return json(response(evidenceId, null, false, 'Invalid evidence ID'), { status: 400 });
 	const userId = Number(locals.user.id);
 	if (!Number.isSafeInteger(userId) || userId <= 0) return json(response(evidenceId, null, false, 'Unauthorized'), { status: 401 });
+	const chapterEvent = url?.searchParams.get('chapterEvent') ?? null;
+	if (chapterEvent !== null && !isUuid(chapterEvent)) return json(response(evidenceId, null, false, 'Invalid event ID'), { status: 400 });
 
 	try {
-		const [item] = await db.select({ hash: evidence.hash, aiAnalysis: evidence.aiAnalysis })
+		const [item] = await db.select({ hash: evidence.hash, caseId: evidence.caseId, aiAnalysis: evidence.aiAnalysis })
 			.from(evidence)
 			.leftJoin(cases, eq(evidence.caseId, cases.id))
 			.where(and(
@@ -53,6 +56,15 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		const sourceRevision = item.hash ? formatEvidenceSourceRevisionV1(item.hash) : null;
 		const timeline = parsed.success && parsed.data.evidenceId === evidenceId && parsed.data.sourceRevision === sourceRevision &&
 			parsed.data.analysisRevision === video.analysisRevision ? parsed.data : null;
+		if (chapterEvent !== null) {
+			const chapter = item.caseId && sourceRevision ? buildReviewedVideoStorybookChapterV1({ caseId: item.caseId,
+				evidenceId, sourceRevision, videoAnalysis: video, eventId: chapterEvent }) : null;
+			if (!chapter) return json(response(evidenceId, null, false, 'The reviewed chapter is unavailable. Reload the event timeline.'),
+				{ status: 409, headers: { 'Cache-Control': 'private, no-store' } });
+			return json({ success: true, evidenceId, caseId: item.caseId, sourceRevision, analysisRevision: chapter.analysisRevision,
+				eventId: chapter.event.eventId, startMs: chapter.event.startMs, endMs: chapter.event.endMs, chapter: chapter.chapter },
+				{ headers: { 'Cache-Control': 'private, no-store' } });
+		}
 		return json(response(evidenceId, timeline, ENV.EVIDENCE_TRANSCRIPT_REVIEW_ENABLED), { headers: cacheControl.private });
 	} catch (error) {
 		console.error('[video-events] GET failed:', error);
@@ -99,9 +111,9 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 					SELECT jsonb_agg(
 						CASE WHEN event_row.value->>'eventId' = ${body.data.eventId}
 							THEN event_row.value || jsonb_build_object(
-								'reviewStatus', ${body.data.reviewStatus},
-								'sceneAdmission', ${sceneAdmission},
-								'reviewedBy', ${userId},
+								'reviewStatus', ${body.data.reviewStatus}::text,
+								'sceneAdmission', ${sceneAdmission}::text,
+								'reviewedBy', ${userId}::integer,
 							'reviewedAt', to_char(now() at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')
 							)
 							ELSE event_row.value

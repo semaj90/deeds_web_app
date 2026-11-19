@@ -1,12 +1,16 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createHash } from 'node:crypto';
-import { sceneRevisionCommandV1Schema, validateSceneRevisionBindingV1, validateSceneEvidenceSourceBindingsV1, validateSceneVideoEventBindingsV1, validateSceneGroundPlaneTrackProposalsV1, hashSceneDocumentV1, verifySceneDocumentRevisionReadbackV1 } from './scene-document-revisions-v1.js';
+import { appendSceneDocumentRevisionV1, readSavedStorybookChapterV1, readSavedImageStorybookChapterV1, matchesReviewedImageChapterV1, sceneRevisionCommandV1Schema, validateSceneRevisionBindingV1, validateSceneEvidenceSourceBindingsV1, validateSceneVideoEventBindingsV1, validateSceneGroundPlaneTrackProposalsV1, hashSceneDocumentV1, verifySceneDocumentRevisionReadbackV1 } from './scene-document-revisions-v1.js';
 import { createSceneCalibrationV1, SPZ_DECODER_REVISION_V1, SPZ_GAUSSIAN_REPRESENTATION_REVISION_V1 } from '$lib/splat/scene-document-v1.js';
 import type { CalibrationAnchor } from '$lib/splat/calibration.js';
 import { fuseVideoEventsV1 } from '$lib/server/features/evidence/video/video-event-fusion-v1.js';
 import { createPlanarCameraCalibrationV1 } from '$lib/splat/planar-camera-calibration-v1.js';
 import { deriveReviewedGroundPlaneTrackFromHistoryV1 } from '$lib/splat/reviewed-ground-plane-track-v1.js';
 import { humanCoco17PoseSchemaV1 } from '$lib/shared/pose-skeleton-schema-v1.js';
+import { buildReviewedVideoStorybookChapterV1 } from '$lib/server/reconstruction/reviewed-video-storybook-chapter-v1.js';
+import { parseWholeImageAnalysisRowV1 } from '$lib/server/evidence/whole-image-analysis-readback-v1.js';
+import { buildStorybookImagePrefillV1 } from '$lib/server/reconstruction/storybook-image-prefill-v1.js';
+import { buildReviewedImageStorybookChapterV1 } from '$lib/shared/storybook-image-chapter-v1.js';
 
 const caseId = '11111111-1111-4111-8111-111111111111';
 const sceneId = '22222222-2222-4222-8222-222222222222';
@@ -21,7 +25,167 @@ const manifest = (overrides: Record<string, unknown> = {}) => ({
 	...overrides
 });
 
+function chapterFixture(sourceEvidenceId = evidenceId) {
+	const evidenceId = sourceEvidenceId;
+	const analysisRevision = 'video-analysis-v1:chapter-fixture';
+	const artifactSha256 = `sha256:${'b'.repeat(64)}`;
+	const frame = { frameIndex: 0, timestampMs: 1270, sourceRevision, analysisRevision, width: 100, height: 80,
+		modelRevision: 'detector-v1', artifact: { sha256: artifactSha256, sourceRevision, analysisRevision, contentType: 'image/jpeg' },
+		objects: [{ label: 'backpack', confidence: 0.7, bbox: [50, 10, 70, 30] }],
+		ocr: { engine: 'tesseract', status: 'COMPLETED', text: 'Platform 4' } };
+	const timeline = fuseVideoEventsV1({ caseId, evidenceId, transcriptId: commandId, sourceRevision, analysisRevision, frames: [frame],
+		transcriptSegments: [{ segmentIndex: 0, startMs: 1000, endMs: 1800, text: 'Fixture transcript excerpt' }] });
+	const event = { ...timeline.events[0]!, reviewStatus: 'APPROVED', sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', reviewedBy: 7, reviewedAt: '2026-11-16T20:00:00.000Z' };
+	const videoAnalysis = { schema: 'atlas.video-analysis.v1', sourceRevision, analysisRevision, analysisJobId: commandId,
+		frames: [frame], eventTimeline: { ...timeline, events: [event] } };
+	const chapter = buildReviewedVideoStorybookChapterV1({ caseId, evidenceId, sourceRevision, videoAnalysis, eventId: event.eventId })!.chapter;
+	const binding = { evidenceId, sourceRevision, analysisRevision, eventId: event.eventId, startMs: event.startMs, endMs: event.endMs,
+		reviewState: 'APPROVED_FOR_SCENE_PROPOSAL', chapter };
+	return { videoAnalysis, binding, chapter, evidenceRow: { id: evidenceId, caseId, hash: sourceRevision, aiAnalysis: { videoAnalysis } } };
+}
+
+function imageChapterFixture() {
+	const analysisRevision = 'fixture-image-1';
+	const maskSha256 = 'b'.repeat(64);
+	const row = { source_revision: sourceRevision, analysis_revision: analysisRevision,
+		source_locator: { kind: 'whole_image', coordinateSpace: 'original_pixels', width: 100, height: 80 },
+		metadata: { visualAnalysis: {
+			schema: 'atlas.evidence-visual-analysis.v1', authority: 'OBSERVATION_ONLY', sourceRevision, status: 'COMPLETE',
+			detectionExecuted: true, silhouetteStageStatus: 'EXECUTED',
+			objectDetections: [{ class: 'chair', confidence: .85, bbox: [50, 10, 70, 30] }],
+			layoutRegions: [], visionSummary: 'An indoor room of uncertain purpose.', visionModelId: 'fixture-vision',
+			visionFindings: [], visionTags: [], depthMap: null, stageErrors: [],
+			silhouettes: [{ artifactKind: 'sam2_alpha_silhouette', is3DReconstruction: false, targetBoxIndex: 0, sourceDetectionIndex: 0,
+				label: 'chair', iouScore: .87, maskSha256, maskObjectKey: `derived/sam2/${maskSha256}.png` }],
+		} },
+	};
+	const observations = parseWholeImageAnalysisRowV1(row, evidenceId, sourceRevision)!.storybook!.manifest;
+	const scope = { evidenceId, sourceRevision, analysisRevision, observationRevision: observations.observationRevision };
+	const packet = buildStorybookImagePrefillV1({ status: 'CURRENT', caseId, ...scope, storybook: observations }, caseId, scope)!;
+	const chapter = buildReviewedImageStorybookChapterV1(observations, { chapterId: commandId, prefillSha256: packet.prefillSha256,
+		title: 'Inspect the image', beats: [{ what: 'A detector proposed a chair.', how: 'Check the mask and the room description.',
+			observationIds: packet.observations.map((item) => item.observationId) }] })!;
+	return { row, chapter, evidenceRow: { id: evidenceId, caseId, hash: sourceRevision, aiAnalysis: null } };
+}
+
 describe('scene document revision v1 admission', () => {
+	it('re-derives still-image cells and mask digests against the exact case packet', () => {
+		const { row, chapter } = imageChapterFixture();
+		expect(chapter.citations).toEqual([
+			expect.objectContaining({ kind: 'detection', imageCell: { column: 4, row: 2 } }),
+			expect.objectContaining({ kind: 'segmentation_mask', imageCell: { column: 4, row: 2 }, artifactSha256: `sha256:${'b'.repeat(64)}` }),
+			expect.objectContaining({ kind: 'scene_context', reviewState: 'UNREVIEWED_PROPOSAL' }),
+		]);
+		expect(matchesReviewedImageChapterV1(caseId, chapter, row)).toBe(true);
+		expect(matchesReviewedImageChapterV1(sceneId, chapter, row)).toBe(false);
+		expect(matchesReviewedImageChapterV1(caseId, chapter, { ...row, analysis_revision: 'new-run' })).toBe(false);
+		const citations = chapter.citations.map((item) => item.kind === 'segmentation_mask' ? { ...item, imageCell: { column: 1, row: 1 } } : item);
+		expect(matchesReviewedImageChapterV1(caseId, { ...chapter, citations }, row)).toBe(false);
+	});
+
+	it('saves a still-image chapter under the source lock and preserves its pinned revision through analysis replacement', async () => {
+		const { chapter, evidenceRow, row } = imageChapterFixture();
+		const command = sceneRevisionCommandV1Schema.parse({ commandId, expectedRevision: 0,
+			manifest: manifest({ evidenceBindings: [{ evidenceId, sourceRevision }], imageStorybookChapter: chapter }) });
+		const save = async (imageRow: unknown) => {
+			const trace: string[] = [];
+			const select = vi.fn().mockReturnValueOnce({ from: () => ({ where: () => ({ limit: async () => [] }) }) })
+				.mockReturnValueOnce({ from: () => ({ where: () => ({ orderBy: () => ({ limit: async () => [] }) }) }) })
+				.mockReturnValueOnce({ from: () => ({ where: () => ({ orderBy: () => ({ for: async (mode: string) => {
+					trace.push(`locked:${mode}`);
+					return [evidenceRow];
+				} }) }) }) });
+			let stored: unknown;
+			const execute = vi.fn().mockResolvedValueOnce({ rows: [] }).mockImplementationOnce(async () => {
+				trace.push('current image');
+				return { rows: [imageRow] };
+			}).mockImplementationOnce(async () => {
+				trace.push('current image reviews');
+				return { rows: [] };
+			});
+			const transaction = async (fn: (tx: unknown) => unknown) => fn({ execute, select,
+				insert: () => ({ values: (value: unknown) => ({ returning: async () => { trace.push('append'); stored = value; return [value]; } }) }) });
+			const receipt = await appendSceneDocumentRevisionV1({ caseId, sceneId, command, actorId: 7 }, { transaction } as never);
+			return { trace, stored, receipt };
+		};
+		const changedRow = { ...row, analysis_revision: 'new-run' };
+		await expect(save(changedRow)).rejects.toThrow('SCENE_REVISION_IMAGE_CHAPTER_CHANGED');
+		const { stored, receipt, trace } = await save(row);
+		expect(trace).toEqual(['locked:share', 'current image', 'current image reviews', 'append']);
+		expect(receipt.manifest.objects).toEqual([]);
+		const reopen = (source: unknown, analysisRow: unknown, chapterId = chapter.chapterId) => {
+			const rows = [[stored], [source]];
+			return readSavedImageStorybookChapterV1({ caseId, sceneId, revision: receipt.revision, chapterId }, {
+				select: () => ({ from: () => ({ where: () => ({ limit: async () => rows.shift() }) }) }),
+				execute: vi.fn().mockResolvedValueOnce({ rows: [analysisRow] }).mockResolvedValueOnce({ rows: [] }),
+			} as never);
+		};
+		expect(await reopen(evidenceRow, row)).toMatchObject({ chapter, revision: 1, sourceState: 'CURRENT' });
+		expect(await reopen(evidenceRow, changedRow)).toMatchObject({ chapter, revision: 1, sourceState: 'CHANGED' });
+		expect(await reopen({ ...evidenceRow, hash: `sha256:${'c'.repeat(64)}` }, row)).toMatchObject({ chapter, sourceState: 'CHANGED' });
+		expect(await reopen(evidenceRow, row, evidenceId)).toBeNull();
+	});
+
+	it('re-derives a reviewed chapter from its cited observations and rejects forged cells', () => {
+		const { chapter, binding, videoAnalysis, evidenceRow } = chapterFixture();
+		expect(chapter.citations).toEqual(expect.arrayContaining([
+			expect.objectContaining({ kind: 'transcript_segment', segmentIndex: 0 }),
+			expect.objectContaining({ kind: 'frame_ocr', frameIndex: 0, timestampMs: 1270 }),
+			expect.objectContaining({ kind: 'frame_detection', label: 'backpack', imageCell: { column: 4, row: 2 } }),
+		]));
+		expect(JSON.stringify(chapter)).not.toContain('Fixture transcript excerpt');
+		const command = (candidate: unknown) => sceneRevisionCommandV1Schema.parse({ commandId, expectedRevision: 0,
+			manifest: manifest({ evidenceBindings: [{ evidenceId, sourceRevision }], videoEventBindings: [candidate] }) });
+		const validate = (candidate: unknown) => validateSceneVideoEventBindingsV1({ caseId, manifest: command(candidate).manifest, evidenceRows: [evidenceRow] });
+		expect(() => validate(binding)).not.toThrow();
+		const altered = chapter.citations.map((citation) => citation.kind === 'frame_detection' ? { ...citation, imageCell: { column: 0, row: 0 } } : citation);
+		expect(() => validate({ ...binding, chapter: { ...chapter, citations: altered } })).toThrow('SCENE_REVISION_STORYBOOK_CHAPTER_CHANGED');
+		const changedVideo = { ...videoAnalysis, frames: [] };
+		const partial = buildReviewedVideoStorybookChapterV1({ caseId, evidenceId, sourceRevision, videoAnalysis: changedVideo, eventId: binding.eventId });
+		expect(partial?.chapter.unresolvedReferenceIds).toHaveLength(2);
+		expect(partial?.chapter.citations.map((citation) => citation.kind)).toEqual(['transcript_segment']);
+	});
+
+	it('appends the chapter under the source lock and reopens its pinned revision after source replacement', async () => {
+		const { chapter, binding, evidenceRow, videoAnalysis } = chapterFixture();
+		const command = sceneRevisionCommandV1Schema.parse({ commandId, expectedRevision: 0,
+			manifest: manifest({ evidenceBindings: [{ evidenceId, sourceRevision }], videoEventBindings: [binding] }) });
+		let stored: unknown;
+		const lockedRead = vi.fn(async () => [evidenceRow]);
+		const select = vi.fn().mockReturnValueOnce({ from: () => ({ where: () => ({ limit: async () => [] }) }) })
+			.mockReturnValueOnce({ from: () => ({ where: () => ({ orderBy: () => ({ limit: async () => [] }) }) }) })
+			.mockReturnValueOnce({ from: () => ({ where: () => ({ orderBy: () => ({ for: lockedRead }) }) }) });
+		const transaction = async (fn: (tx: unknown) => unknown) => fn({ execute: async () => {}, select,
+			insert: () => ({ values: (row: unknown) => ({ returning: async () => { stored = row; return [row]; } }) }) });
+		const receipt = await appendSceneDocumentRevisionV1({ caseId, sceneId, command, actorId: 7 }, { transaction } as never);
+		expect(lockedRead).toHaveBeenCalledWith('share');
+		expect(receipt.revision).toBe(1);
+		const reopen = (source: unknown) => {
+			const rows = [[stored], [source]];
+			return readSavedStorybookChapterV1({ caseId, sceneId, revision: receipt.revision, eventId: binding.eventId },
+				{ select: () => ({ from: () => ({ where: () => ({ limit: async () => rows.shift() }) }) }) } as never);
+		};
+		expect(await reopen(evidenceRow)).toMatchObject({ sourceState: 'CURRENT', revision: 1, chapter });
+		expect(await reopen({ ...evidenceRow, hash: `sha256:${'d'.repeat(64)}` })).toMatchObject({ sourceState: 'CHANGED', revision: 1, chapter });
+		expect(await reopen({ ...evidenceRow, aiAnalysis: { videoAnalysis: { ...videoAnalysis, analysisRevision: 'next-run' } } }))
+			.toMatchObject({ sourceState: 'CHANGED', revision: 1, chapter });
+	});
+
+	it('preserves separate frame references when two exhibits have matching image cells', () => {
+		const otherId = '55555555-5555-4555-8555-555555555555';
+		const sources = [chapterFixture(), chapterFixture(otherId)];
+		const command = sceneRevisionCommandV1Schema.parse({ commandId, expectedRevision: 0, manifest: manifest({
+			evidenceBindings: [evidenceId, otherId].map((id) => ({ evidenceId: id, sourceRevision })),
+			videoEventBindings: sources.map(({ binding }) => binding),
+		}) });
+		validateSceneVideoEventBindingsV1({ caseId, manifest: command.manifest, evidenceRows: sources.map(({ evidenceRow }) => evidenceRow) });
+		const observations = sources.map(({ chapter }) => chapter.citations.find(({ kind }) => kind === 'frame_detection'));
+		expect(observations[0]).toMatchObject({ imageCell: { column: 4, row: 2 } });
+		expect(observations[1]).toMatchObject({ imageCell: { column: 4, row: 2 } });
+		expect(observations[0]?.referenceId).not.toBe(observations[1]?.referenceId);
+		expect(command.manifest.objects).toEqual([]);
+	});
+
 	it('accepts a case-scoped hypothesis at expectedRevision + 1', () => {
 		const command = sceneRevisionCommandV1Schema.parse({ commandId, expectedRevision: 0, manifest: manifest() });
 		const result = validateSceneRevisionBindingV1({ caseId, sceneId, command });

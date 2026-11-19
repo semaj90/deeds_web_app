@@ -56,9 +56,12 @@ export interface EvidenceVisualAnalysisV1 {
 	authority: 'OBSERVATION_ONLY';
 	sourceRevision: string;
 	status: 'COMPLETE' | 'PARTIAL' | 'UNAVAILABLE';
+	detectionExecuted?: boolean;
+	silhouetteStageStatus?: Sam2SilhouetteResultV1['status'] | 'NOT_RUN';
 	objectDetections: Array<{ class: string; confidence: number; bbox: number[] }>;
 	layoutRegions: Array<{ type: string; confidence: number; bbox: number[] }>;
 	visionSummary: string | null;
+	visionModelId?: string;
 	visionFindings: string[];
 	visionTags: string[];
 	depthMap: {
@@ -288,6 +291,7 @@ export async function analyzeEvidenceImageV1(
 	// Optional SAM 2 silhouette stage: runs only when a dependency is supplied and YOLO found objects.
 	// Boxes are normalized from source pixels (xyxy) using the source dimensions.
 	let silhouettes: Sam2SilhouetteResultV1['masks'] | undefined;
+	let silhouetteStageStatus: NonNullable<EvidenceVisualAnalysisV1['silhouetteStageStatus']> = 'NOT_RUN';
 	if (dependencies.runSam2Silhouettes && objectDetections.length > 0) {
 		try {
 			const meta = await sharp(image.buffer).metadata();
@@ -303,9 +307,11 @@ export async function analyzeEvidenceImageV1(
 				] as [number, number, number, number],
 			}));
 			const result = await dependencies.runSam2Silhouettes({ buffer: image.buffer, mimeType: `image/${meta.format}`, boxes });
+			silhouetteStageStatus = result.status;
 			if (result.status === 'EXECUTED') silhouettes = result.masks;
 			else if (result.status === 'FAILED') stageErrors.push('silhouette:SAM2_FAILED');
 		} catch (error) {
+			silhouetteStageStatus = 'FAILED';
 			stageErrors.push(`silhouette:${boundedError(error)}`);
 		}
 	}
@@ -316,9 +322,12 @@ export async function analyzeEvidenceImageV1(
 		authority: 'OBSERVATION_ONLY',
 		sourceRevision: image.sourceRevision,
 		status: completedStages === 3 ? 'COMPLETE' : completedStages > 0 ? 'PARTIAL' : 'UNAVAILABLE',
+		detectionExecuted: Boolean(pipeline?.success && pipeline.data.yolo !== null),
+		silhouetteStageStatus,
 		objectDetections,
 		layoutRegions,
 		visionSummary: vision?.summary ?? null,
+		...(typeof vision?.model === 'string' && vision.model.length > 0 && vision.model.length <= 256 ? { visionModelId: vision.model } : {}),
 		visionFindings: vision?.keyFindings ?? [],
 		visionTags: vision?.suggestedTags ?? [],
 		depthMap,
