@@ -6,12 +6,19 @@
 	import { humanCoco17PoseSchemaV1 } from '$lib/shared/pose-skeleton-schema-v1.js';
 	import { deriveReviewedGroundPlaneTrackFromHistoryV1, verifyReviewedGroundTrackSnapshotV1 } from '$lib/splat/reviewed-ground-plane-track-v1.js';
 
-	let { caseId, bindings, groundPlaneTrackProposals = [] }: { caseId: string; bindings: SceneVideoEventBindingV1[]; groundPlaneTrackProposals?: NonNullable<SceneDocumentV1['groundPlaneTrackProposals']> } = $props();
+	let { caseId, bindings, groundPlaneTrackProposals = [], sceneAnimationBindings = [], sceneRevision }: {
+		caseId: string;
+		bindings: SceneVideoEventBindingV1[];
+		groundPlaneTrackProposals?: NonNullable<SceneDocumentV1['groundPlaneTrackProposals']>;
+		sceneAnimationBindings?: NonNullable<SceneDocumentV1['sceneAnimationBindings']>;
+		sceneRevision?: { caseId: string; sceneId: string; revision: number };
+	} = $props();
 	let rows = $state<ReturnType<typeof joinSceneVideoEventReadbackV1>>([]);
 	let loading = $state(false);
 	let error = $state('');
 	let poseObservations = $state<ScenePoseObservationReadbackV1[]>([]);
 	let verifiedGroundTrackIds = $state<string[]>([]);
+	let openWalkId = $state<string | null>(null);
 	let selectedGroundTrackIndexById = $state<Record<string, number>>({});
 	let poseReadbackUnavailable = $state(false);
 	let poseFramePreviews = $state<Record<string, { url?: string; error?: string }>>({});
@@ -232,6 +239,24 @@
 						<li>
 							{#if verifiedGroundTrackIds.includes(proposal.proposalId)}
 								<strong>Verified proposal readback · {proposal.trackId}</strong>
+								<button type="button" aria-expanded={openWalkId === proposal.proposalId}
+									onclick={() => { openWalkId = openWalkId === proposal.proposalId ? null : proposal.proposalId; }}>
+									{openWalkId === proposal.proposalId ? 'Close detective walk' : 'Preview detective walk'}
+								</button>
+								{#if openWalkId === proposal.proposalId}
+									{#key proposal}
+										{#await import('./ReviewedWalkPreview.svelte')}
+											<p role="status">Loading walk preview…</p>
+										{:then { default: ReviewedWalkPreview }}
+							<ReviewedWalkPreview {proposal} {sceneRevision} savedAnimations={sceneAnimationBindings}
+								eventBindings={rows.filter((row) => row.event && row.binding.evidenceId === proposal.evidenceId
+									&& row.binding.sourceRevision === proposal.sourceRevision && row.binding.analysisRevision === proposal.analysisRevision)
+								.map((row) => row.binding)} />
+										{:catch}
+											<p role="status">Walk preview is unavailable.</p>
+										{/await}
+									{/key}
+								{/if}
 								<span>{proposal.points.length} points · calibration revision {proposal.calibrationRevisionId}</span>
 										{@const plotPoints = layoutGroundPlaneTrackPlotV1(proposal.points.map((point) => ({
 											frameIndex: point.frameIndex,

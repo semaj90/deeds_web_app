@@ -2180,26 +2180,21 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		onSuccess={async (uploadedEvidenceId) => {
 			showAddEvidence = false;
 			await invalidateAll();
-			// Open the refreshed exhibit in Detective Mode without creating a marker
-			// automatically. The investigator still chooses and saves the position.
+			// Keep the current board/view in place. The uploaded case exhibit remains
+			// available in Detective Mode's placement selector; placement stays explicit.
 			const uploaded = findCaseEvidenceTargetV1(evidenceItems, uploadedEvidenceId);
 			if (uploaded) {
-				selectedEvidence = uploaded;
 				requestedPlacementEvidenceId = uploaded.id;
-				activeView = 'detective';
-				evidenceViewerInitialView = 'relief';
-				openSceneAssistantOnViewer = true;
-				showEvidenceViewer = true;
 				notificationStore.add({
 					type: 'success',
 					title: 'Evidence uploaded to this case',
-					message: 'Review the exhibit, then choose a scene position and save the marker.'
+					message: 'The exhibit is available in Detective Mode. Open it when you are ready to choose a scene position.'
 				});
 			} else {
 				notificationStore.add({
 					type: 'error',
 					title: 'Upload accepted; refresh needed',
-					message: 'The upload returned an evidence ID, but the case list did not include it after refresh. Reopen the Evidence Board to retry the read.'
+					message: 'The upload returned an evidence ID, but the refreshed case list does not include it yet. Refresh the board before placing it in the scene.'
 				});
 			}
 		}}

@@ -1,0 +1,10 @@
+{
+  "caseId": "PA-DEMO-ROBBERY-001",
+  "expectedScenes": 8,
+  "expectedEvents": 11,
+  "expectedPeople": 8,
+  "expectedEvidence": 9,
+  "transcriptFiles": 5,
+  "syntheticPortraits": 8,
+  "generatedAt": "deterministic_fixture_no_runtime_timestamp"
+}

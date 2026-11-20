@@ -1,0 +1,58 @@
+{
+  "schema": "parent-atlas.asset-compiler-v2.progress.v1",
+  "date": "2026-11-19",
+  "status": "PARTIAL",
+  "goal": "Wire a first mask-to-editable-image-space-polygon slice into the existing Case Storybook and scene revision owners.",
+  "likely_cause": "The scene authoring flow had reviewed masks and durable image chapters but no source-bound path to compile a mask into editable polygon data.",
+  "evidence": [
+    "The authorized multimodal-analysis mask route verifies case access, current source/analysis/observation revisions, the SeaweedFS artifact SHA-256, PNG format, and exact source image dimensions.",
+    "CaseStorybook.svelte already owns mask selection, observation review, storyboard drafting, and scene revision save/readback.",
+    "scene-document-revisions-v1.ts re-derives still-image chapters under the existing evidence lock."
+  ],
+  "created": [
+    "sveltekit-frontend/src/lib/splat/mask-contour-compiler-v1.ts",
+    "sveltekit-frontend/src/lib/splat/mask-contour-compiler-v1.spec.ts"
+  ],
+  "wired": [
+    "Case Storybook compiles the authorized PNG pixel plane after verifying its SHA-256 and the latest accepted review for the exact mask/source revisions.",
+    "Compiled contours preview in original image pixels and can be included as separately cited HUMAN_ACCEPTED_2D geometry in the saved image chapter.",
+    "Scene revision reopen re-derives the mask citation, artifact digest, and accepted review binding."
+  ],
+  "proven": {
+    "focused_tests": {
+      "command": "npm exec vitest run src/lib/splat/mask-contour-compiler-v1.spec.ts src/lib/server/scene-document-revisions-v1.spec.ts",
+      "result": "PASS",
+      "test_files": 2,
+      "tests": 22
+    },
+    "native_svelte_check": {
+      "command": "npm run check:native",
+      "result": "EXIT 1: 11 diagnostics remain outside changed files",
+      "diagnostics": [
+        "9 in src/lib/components/evidence/StorybookAuthorities.svelte (existing rune declaration/type errors)",
+        "2 in src/routes/api/cases/[id]/storybook-authorities/+server.ts (unknown value typing)"
+      ],
+      "changed_files_diagnostic_count": 0
+    },
+    "diff_check": "git diff --check passed; Git printed existing LF-to-CRLF working-copy warnings."
+  },
+  "not_proven": [
+    "Authenticated browser workflow with real upload, SeaweedFS, and database save/reopen",
+    "Interactive polygon editing, UV atlas authoring, rig composition, animation retargeting, and hair motion",
+    "Depth/camera calibration or metric 3D reconstruction",
+    "GLB/SPZ export, streaming, and renderer parity",
+    "C++/N-API, WASM, SIMD, or performance gains"
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/splat/mask-contour-compiler-v1.ts",
+    "sveltekit-frontend/src/lib/splat/mask-contour-compiler-v1.spec.ts",
+    "sveltekit-frontend/src/lib/shared/storybook-image-chapter-v1.ts",
+    "sveltekit-frontend/src/lib/components/evidence/CaseStorybook.svelte",
+    "sveltekit-frontend/src/lib/server/scene-document-revisions-v1.ts",
+    "sveltekit-frontend/src/lib/server/scene-document-revisions-v1.spec.ts",
+    "openspec/changes/crime-scene-reconstruction/tasks.md"
+  ],
+  "safe_next_command": "cd sveltekit-frontend; npm run check:native",
+  "smoke_command": "cd sveltekit-frontend; npm exec vitest run src/lib/splat/mask-contour-compiler-v1.spec.ts src/lib/server/scene-document-revisions-v1.spec.ts",
+  "report_path": "docs/reports/parent-atlas-asset-compiler-v2-progress-20261119.json"
+}

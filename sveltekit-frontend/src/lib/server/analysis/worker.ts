@@ -665,18 +665,20 @@ async function startNotificationListener(): Promise<void> {
 			application_name: 'parent-atlas-analysis-worker-listener',
 			connectionTimeoutMillis: 3000,
 		});
+		// A dedicated pg.Client emits `error` when PostgreSQL drops its socket.
+		// Register handlers before connect/LISTEN: either awaited operation can
+		// be interrupted, and an unhandled EventEmitter `error` terminates Node.
+		client.on('error', (err) => {
+			console.warn('[Worker] analysis notify listener error:', err);
+			if (notificationClient === client) notificationClient = null;
+		});
+		client.on('end', () => {
+			if (notificationClient === client) notificationClient = null;
+		});
 		await client.connect();
 		await client.query(`LISTEN ${ANALYSIS_JOBS_NOTIFY_CHANNEL}`);
 		client.on('notification', () => {
 			void pollOnce();
-		});
-		client.on('error', (err) => {
-			console.warn('[Worker] analysis notify listener error:', err);
-		});
-		client.on('end', () => {
-			if (notificationClient === client) {
-				notificationClient = null;
-			}
 		});
 		notificationClient = client;
 		console.log(`[Worker] Listening on ${ANALYSIS_JOBS_NOTIFY_CHANNEL}`);

@@ -13,6 +13,19 @@ export async function evidenceSceneIdV1(caseId: string, evidenceId: string): Pro
 	return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
+/** Stable case-wide scene identity for still-image storyboard chapters; sources stay separately bound. */
+export async function caseStorybookSceneIdV1(caseId: string): Promise<string> {
+	if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId)) {
+		throw new Error('CASE_ID_MUST_BE_UUID');
+	}
+	const digest = await sha256Hex(new TextEncoder().encode(`parent-atlas:case-storybook-scene:v1:${caseId.toLowerCase()}`));
+	const bytes = new Uint8Array(digest.match(/.{2}/g)!.slice(0, 16).map((byte) => Number.parseInt(byte, 16)));
+	bytes[6] = (bytes[6] & 0x0f) | 0x80;
+	bytes[8] = (bytes[8] & 0x3f) | 0x80;
+	const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+	return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
 export interface SceneAssetReceiptV1 {
 	assetId: string;
 	format: 'GLB';

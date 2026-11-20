@@ -1,0 +1,19 @@
+{
+  "exhibitId": "E-03",
+  "caseId": "PA-DEMO-ROBBERY-001",
+  "synthetic": true,
+  "sourceMediaPresent": false,
+  "description": "Rear corridor camera and occupancy synopsis",
+  "kind": "camera_log",
+  "observationEntries": [
+    {
+      "time": "2026-10-14T15:04:57-07:00",
+      "text": "Several silhouettes move toward corridor; assignments among actors unresolved."
+    },
+    {
+      "time": "2026-10-14T15:05:20-07:00",
+      "text": "Door opened; no identity confidently visible."
+    }
+  ],
+  "warning": "Written synthetic exercise only. No real footage or official alarm source exists."
+}

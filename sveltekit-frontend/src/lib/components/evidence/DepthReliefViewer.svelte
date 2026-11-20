@@ -23,6 +23,8 @@
 	import { parseSpz } from '$lib/splat/spz-loader.js';
 	import { createLocalSpzSession } from '$lib/splat/local-spz-session.js';
 	import { SpatialBvhManagerV1 } from '$lib/splat/spatial-bvh-manager-v1.js';
+	import { fetchScenePalettePreviewV1, type ScenePalettePreviewV1 } from '$lib/splat/indexed-palette-artifact-v1.js';
+	import { decodeIndexed4BppToRgbaV1 } from '$lib/splat/indexed-palette-texture-v1.js';
 
 	/**
 	 * Estimated 2.5D relief from ONE image + its depth map (both MUST describe the same frame).
@@ -34,6 +36,7 @@
 		imageUrl: string;
 		depthUrl: string | null;
 		artifactDigests?: { image: string; depth: string };
+		palettePreview?: ScenePalettePreviewV1 | null;
 		relief?: number;
 		discontinuity?: number;
 		invertDepth?: boolean;
@@ -61,6 +64,7 @@
 		imageUrl,
 		depthUrl,
 		artifactDigests,
+		palettePreview = null,
 		relief = 0.85,
 		discontinuity = 0.17,
 		invertDepth = false,
@@ -109,10 +113,18 @@
 	let exportSpz = $state<(() => void) | null>(null);
 	let exportGlb = $state<(() => Promise<void>) | null>(null);
 	let applySavedGlb: ((bytes: ArrayBuffer | null) => Promise<void>) | null = null;
+	let showPalette = $state(false);
+	let paletteState = $state<'off' | 'loading' | 'ready' | 'unavailable'>('off');
+	let applyPalette = $state<((preview: ScenePalettePreviewV1 | null) => void) | null>(null);
 
 	$effect(() => updateRelief?.(relief));
 	$effect(() => applySampling?.(activeSamplingMode));
 	$effect(() => { void applySavedGlb?.(savedGlb); });
+	$effect(() => {
+		const preview = showPalette && !savedGlb && palettePreview?.sourceRevision === artifactDigests?.image
+			? palettePreview : null;
+		applyPalette?.(preview);
+	});
 
 	async function detectGpu(): Promise<{ vendor: string; tier: Tier; hasWebGPU: boolean }> {
 		const gpu = (navigator as any).gpu;
@@ -153,9 +165,14 @@
 			const materials: Array<{ dispose(): void }> = [];
 			const textures: Array<{ dispose(): void }> = [];
 			let resourcesReleased = false;
+			let paletteRequest: AbortController | null = null;
+			let paletteTexture: import('three').CanvasTexture | null = null;
 			const releaseResources = () => {
 				if (resourcesReleased) return;
 				resourcesReleased = true;
+				paletteRequest?.abort();
+				paletteTexture?.dispose();
+				applyPalette = null;
 				renderer?.setAnimationLoop(null);
 				reliefBvh?.dispose();
 				reliefBvh = null;
@@ -411,6 +428,58 @@
 				geometries.push(backPlane.geometry);
 				backPlane.position.z = -Math.abs(relief) * 0.5 - 0.045;
 				scene.add(backPlane);
+				const sourceWidth = colorBitmap.width;
+				const sourceHeight = colorBitmap.height;
+				const applyColorMaps = () => {
+					material.map = paletteTexture ?? textureLevels[currentLod] ?? texture;
+					backMaterial.map = paletteTexture ?? texture;
+				};
+				applyPalette = (preview) => {
+					paletteRequest?.abort();
+					paletteRequest = null;
+					paletteTexture?.dispose();
+					paletteTexture = null;
+					applyColorMaps();
+					material.alphaTest = backMaterial.alphaTest = 0;
+					material.needsUpdate = true;
+					backMaterial.needsUpdate = true;
+					paletteState = preview ? 'loading' : 'off';
+					if (!preview) return;
+					const request = new AbortController();
+					paletteRequest = request;
+					void (async () => {
+						try {
+							const indexed = await fetchScenePalettePreviewV1(preview, request.signal);
+							if (disposed || request.signal.aborted) return;
+							const scale = Math.min(1, 256 / Math.max(sourceWidth, sourceHeight));
+							if (indexed.width !== Math.max(1, Math.round(sourceWidth * scale)) ||
+								indexed.height !== Math.max(1, Math.round(sourceHeight * scale))) {
+								throw new Error('Palette texture dimensions do not match the source image.');
+							}
+							const canvas = document.createElement('canvas');
+							canvas.width = indexed.width;
+							canvas.height = indexed.height;
+							const context = canvas.getContext('2d');
+							if (!context) throw new Error('Palette canvas unavailable.');
+							const pixels = context.createImageData(indexed.width, indexed.height);
+							pixels.data.set(decodeIndexed4BppToRgbaV1(indexed));
+							context.putImageData(pixels, 0, 0);
+							const next = new THREE.CanvasTexture(canvas);
+							next.colorSpace = THREE.SRGBColorSpace;
+							next.generateMipmaps = false;
+							next.minFilter = THREE.NearestFilter;
+							next.magFilter = THREE.NearestFilter;
+							paletteTexture = next;
+							applyColorMaps();
+							material.alphaTest = backMaterial.alphaTest = 0.5;
+							material.needsUpdate = true;
+							backMaterial.needsUpdate = true;
+							paletteState = 'ready';
+						} catch {
+							if (!disposed && !request.signal.aborted) paletteState = 'unavailable';
+						}
+					})();
+				};
 				applySavedGlb = async (bytes) => {
 					if (savedScene) {
 						scene.remove(savedScene);
@@ -569,7 +638,8 @@
 					}
 					const map = new THREE.CanvasTexture(canvas);
 					map.colorSpace = THREE.SRGBColorSpace;
-					const materialCopy = active.material.clone();
+					const materialCopy = material.clone();
+					materialCopy.alphaTest = 0;
 					materialCopy.map = map;
 					materialCopy.needsUpdate = true;
 					const meshCopy = new THREE.Mesh(active.geometry.clone(), materialCopy);
@@ -650,7 +720,7 @@
 					const lod = pickLod(camera.position.distanceTo(controls.target));
 					if (lod !== currentLod) {
 						lods.forEach((l, i) => (l.mesh.visible = i === lod));
-						material.map = textureLevels[lod] ?? textureLevels[2];
+						applyColorMaps();
 						material.needsUpdate = true;
 						currentLod = lod;
 						status = { backend: activeBackend, vendor: gpuInfo.vendor, tier, lod, vertices: lods[lod].vertices, pickAcceleration };
@@ -773,6 +843,14 @@
 	{/if}
 	{#if showToolbar}
 	<div class="toolbar">
+		{#if palettePreview && palettePreview.sourceRevision === artifactDigests?.image && !savedGlb}
+			<button type="button" aria-pressed={showPalette} onclick={() => { showPalette = !showPalette; }}>
+				4-bit texture
+			</button>
+			{#if paletteState === 'loading'}<span class="note" role="status">Loading 4-bit texture…</span>{/if}
+			{#if paletteState === 'ready'}<span class="note" role="status">4-bit texture applied</span>{/if}
+			{#if paletteState === 'unavailable'}<span class="note" role="status">4-bit texture unavailable. Showing source image.</span>{/if}
+		{/if}
 		<span class="note">
 			<Icon name="yorha-evidence" size={16} />
 			{sourceMode === 'STORED_MONOCULAR_DEPTH' ? 'Stored image-bound depth' : sourceMode === 'BRIGHTNESS_PREVIEW' ? 'Brightness preview only' : 'Flat image fallback'} · derived 2.5D, not measured 3D

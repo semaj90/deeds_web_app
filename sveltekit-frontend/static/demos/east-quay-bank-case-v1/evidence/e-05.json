@@ -1,0 +1,19 @@
+{
+  "exhibitId": "E-05",
+  "caseId": "PA-DEMO-ROBBERY-001",
+  "synthetic": true,
+  "sourceMediaPresent": false,
+  "description": "Cash audit worksheet",
+  "kind": "financial_record",
+  "observationEntries": [
+    {
+      "time": "2026-10-14T15:06:34-07:00",
+      "text": "Preliminary shortage estimate $86,240 USD; reconciliation pending."
+    },
+    {
+      "time": "2026-10-14T19:05:00-07:00",
+      "text": "End-of-day verification not provided in fixture; do not call figure recovered or conclusively stolen."
+    }
+  ],
+  "warning": "Written synthetic exercise only. No real footage or official alarm source exists."
+}

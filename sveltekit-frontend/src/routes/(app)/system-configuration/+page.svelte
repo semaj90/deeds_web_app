@@ -29,14 +29,7 @@
         autoSave: true,
         notifications: true
       },
-      ai: {
-        model: 'ornith-1.5-9b',
-        temperature: 0.7,
-        maxTokens: 2048,
-        ollamaEndpoint: '/api/embed',
-        embeddingModel: 'embeddinggemma',
-        enableFallback: true
-      },
+      ai: {},
       database: {
         type: 'postgresql',
         host: 'localhost',
@@ -71,7 +64,9 @@
     const stored = value as Partial<ConfigState>;
     return {
       general: { ...defaults.general, ...(stored.general ?? {}) },
-      ai: { ...defaults.ai, ...(stored.ai ?? {}) },
+      // AI runtime selection is server-managed. Drop stale browser-local
+      // model/endpoint preferences from older settings versions.
+      ai: defaults.ai,
       database: { ...defaults.database, ...(stored.database ?? {}) },
       gpu: { ...defaults.gpu, ...(stored.gpu ?? {}) },
       security: { ...defaults.security, ...(stored.security ?? {}) }
@@ -97,6 +92,36 @@
   let vlmHealthy = $state(false);
   let vlmSwitching = $state(false);
   let vlmError = $state('');
+
+  type LlmRuntimeStatus = {
+    ok: boolean;
+    provider: 'llama-server';
+    model: string | null;
+    configuredModel: string | null;
+    modelSource: 'configured-match' | 'llama-server-loaded' | null;
+    error: string | null;
+  };
+  let llmRuntimeStatus = $state<LlmRuntimeStatus | null>(null);
+  let llmRuntimeLoading = $state(false);
+
+  async function fetchLlmRuntimeStatus() {
+    llmRuntimeLoading = true;
+    try {
+      const response = await fetch('/api/llm/runtime-status', { cache: 'no-store' });
+      llmRuntimeStatus = await response.json() as LlmRuntimeStatus;
+    } catch {
+      llmRuntimeStatus = {
+        ok: false,
+        provider: 'llama-server',
+        model: null,
+        configuredModel: null,
+        modelSource: null,
+        error: 'Runtime status could not be loaded.'
+      };
+    } finally {
+      llmRuntimeLoading = false;
+    }
+  }
 
   async function fetchVlmStatus() {
     try {
@@ -168,6 +193,12 @@
   $effect(() => {
     if (activeTab === 'gpu') {
       fetchVlmStatus();
+    }
+  });
+
+  $effect(() => {
+    if (activeTab === 'ai' || activeTab === 'status') {
+      fetchLlmRuntimeStatus();
     }
   });
 
@@ -360,32 +391,21 @@
 
    {#if activeTab === 'ai'}
     <section class="config-section">
-     <h2>AI_MODEL_CONFIGURATION</h2>
+     <h2>LOCAL_AI_RUNTIME</h2>
      <div class="form-grid">
-      <div class="form-group">
-       <label for="model">Primary Model</label>
-       <select id="model" bind:value={config.ai.model}>
-        <option value="ornith-1.5-9b">Gemma 3 Legal (Fine-tuned)</option>
-        <option value="gpt-4o">GPT-4o (OpenAI)</option>
-        <option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
-       </select>
-      </div>
-
-      <div class="form-group">
-       <label for="temp">Temperature ({config.ai.temperature})</label>
-       <input
-        type="range"
-        id="temp"
-        min="0"
-        max="1"
-        step="0.1"
-        bind:value={config.ai.temperature}
-       >
-      </div>
-
-      <div class="form-group">
-       <label for="endpoint">Ollama Endpoint</label>
-       <input type="text" id="endpoint" bind:value={config.ai.ollamaEndpoint}>
+      <div class="form-group runtime-status-card" aria-live="polite">
+       <span class="runtime-label">Chat inference provider</span>
+       <strong>{llmRuntimeLoading ? 'Checking local runtime…' : llmRuntimeStatus?.ok ? 'llama-server ready' : 'llama-server unavailable'}</strong>
+       {#if llmRuntimeStatus?.ok}
+        <span>Loaded model: <code>{llmRuntimeStatus.model}</code></span>
+        <span>Model selection source: {llmRuntimeStatus.modelSource}</span>
+       {:else if llmRuntimeStatus?.error}
+        <span class="form-hint">{llmRuntimeStatus.error}</span>
+       {/if}
+       <p class="form-hint">The running model is resolved from the server. Model switching is managed by the local launch profile. Embedding-provider migration is separate from chat inference.</p>
+       <button class="btn-secondary runtime-refresh" type="button" onclick={fetchLlmRuntimeStatus} disabled={llmRuntimeLoading}>
+        {llmRuntimeLoading ? 'Checking…' : 'Refresh status'}
+       </button>
       </div>
      </div>
 
@@ -476,8 +496,9 @@
       <SystemStatusCard title="Qdrant Vector DB" status="OK" updatedAt={new Date()}>
        <p class="text-xs text-gray-400 mt-1">768-dim, 6 collections, GPU-accelerated</p>
       </SystemStatusCard>
-      <SystemStatusCard title="Ollama LLM" status="OK" updatedAt={new Date()}>
-       <p class="text-xs text-gray-400 mt-1">ornith-1.5-9b + embeddinggemma</p>
+      <SystemStatusCard title="Local Chat Inference" status={llmRuntimeStatus?.ok ? 'OK' : llmRuntimeStatus ? 'WARN' : 'UNKNOWN'}>
+       <p class="text-xs text-gray-400 mt-1">llama-server · {llmRuntimeStatus?.model ?? (llmRuntimeStatus ? 'model unavailable' : 'status not checked')}</p>
+       <p class="text-xs text-gray-400 mt-1">Embedding runtime is separate and not verified by this status.</p>
       </SystemStatusCard>
       <SystemStatusCard title="RabbitMQ" status="WARN" updatedAt={new Date()}>
        <p class="text-xs text-gray-400 mt-1">7 queues, 5 exchanges</p>
@@ -787,6 +808,28 @@
   font-size: 0.875rem;
   color: #cbd5e1;
  }
+
+ .form-hint {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  line-height: 1.4;
+ }
+
+ .runtime-status-card {
+  grid-column: 1 / -1;
+  padding: 1rem;
+  border: 1px solid var(--t-border, #334155);
+  border-radius: 0.5rem;
+  background: rgba(15, 23, 42, 0.72);
+ }
+
+ .runtime-label {
+  font-size: 0.875rem;
+  color: #cbd5e1;
+ }
+
+ .runtime-refresh { align-self: flex-start; }
 
  select, input[type="text"] { background: #0f172a;
 		border: 1px solid #475569;

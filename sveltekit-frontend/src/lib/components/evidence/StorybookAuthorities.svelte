@@ -24,6 +24,10 @@
 	let searching = $state(false);
 	let error = $state('');
 	let result = $state<z.infer<typeof resultSchema> | null>(null);
+	let citing = $state<z.infer<typeof resultSchema> | null>(null);
+	let citingTarget = $state('');
+	let checkingCites = $state(false);
+	let citingError = $state('');
 
 	async function open() {
 		visible = !visible;
@@ -41,9 +45,12 @@
 	}
 
 	async function search() {
-		if (!question.trim() || !jurisdiction || searching) return;
+		if (!question.trim() || !jurisdiction || searching || checkingCites) return;
 		searching = true;
 		result = null;
+		citing = null;
+		citingTarget = '';
+		citingError = '';
 		error = '';
 		try {
 			const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -56,7 +63,48 @@
 			searching = false;
 		}
 	}
+
+	async function findCiting(entry: z.infer<typeof resultSchema>['authorities'][number]) {
+		if (!result || searching || checkingCites) return;
+		checkingCites = true;
+		citing = null;
+		citingError = '';
+		citingTarget = entry.authority.citation;
+		try {
+			const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					jurisdiction: result.jurisdiction, targetChunkId: entry.chunkId,
+					targetRevision: entry.documentRevision, targetChunkHash: entry.chunkHash,
+				}) });
+			if (response.status === 409) {
+				citingError = 'That citation changed or is unavailable. Search again to check the current revision.';
+			} else if (response.ok) {
+				citing = resultSchema.parse(await response.json());
+			} else {
+				throw new Error();
+			}
+		} catch {
+			citingError = 'Citing passages are unavailable.';
+		} finally {
+			checkingCites = false;
+		}
+	}
 </script>
+
+{#snippet sourcePassage(entry: z.infer<typeof resultSchema>['authorities'][number])}
+	<h3>{entry.authority.citation}</h3>
+	<p>{entry.documentTitle} · {entry.authority.kind}{entry.pageStart ? ` · Page ${entry.pageStart}` : ''}</p>
+	<blockquote>{entry.quote}</blockquote>
+	<a href={`/library/${encodeURIComponent(entry.documentId)}`}>Open library source</a>
+	<details><summary>Citation provenance</summary>
+		<dl>
+			<dt>Document revision</dt><dd>{entry.documentRevision}</dd>
+			<dt>Source SHA-256</dt><dd>{entry.sourceHash}</dd>
+			<dt>Chunk SHA-256</dt><dd>{entry.chunkHash}</dd>
+			<dt>Excerpt offsets (UTF-16)</dt><dd>{entry.charStart}–{entry.excerptCharEnd}</dd>
+		</dl>
+	</details>
+{/snippet}
 
 <section aria-labelledby="storybook-authorities">
 	<h2 id="storybook-authorities">Legal research</h2>
@@ -79,7 +127,7 @@
 				<label>Research question
 					<input bind:value={question} maxlength="500" required disabled={searching} />
 				</label>
-				<button type="submit" disabled={searching || !jurisdiction || !question.trim()}>{searching ? 'Searching…' : 'Find passages'}</button>
+				<button type="submit" disabled={searching || checkingCites || !jurisdiction || !question.trim()}>{searching ? 'Searching…' : 'Find passages'}</button>
 			</form>
 		{/if}
 		{#if error}<p role="status">{error}</p>{/if}
@@ -89,20 +137,23 @@
 				Search covers up to {result.coverage.matchLimit} passages linked to this case. Contrary authority and later history require review.</p>
 			{#each result.authorities as entry (entry.chunkId)}
 				<article>
-					<h3>{entry.authority.citation}</h3>
-					<p>{entry.documentTitle} · {entry.authority.kind}{entry.pageStart ? ` · Page ${entry.pageStart}` : ''}</p>
-					<blockquote>{entry.quote}</blockquote>
-					<a href={`/library/${encodeURIComponent(entry.documentId)}`}>Open library source</a>
-					<details><summary>Citation provenance</summary>
-						<dl>
-							<dt>Document revision</dt><dd>{entry.documentRevision}</dd>
-							<dt>Source SHA-256</dt><dd>{entry.sourceHash}</dd>
-							<dt>Chunk SHA-256</dt><dd>{entry.chunkHash}</dd>
-							<dt>Excerpt offsets (UTF-16)</dt><dd>{entry.charStart}–{entry.excerptCharEnd}</dd>
-						</dl>
-					</details>
+					{@render sourcePassage(entry)}
+					<button type="button" aria-label={`Find passages citing ${entry.authority.citation}`}
+						disabled={checkingCites} onclick={() => void findCiting(entry)}>Find citing passages</button>
 				</article>
 			{/each}
+		{/if}
+		{#if citingTarget}
+			<h3>Citing passages for {citingTarget}</h3>
+			<p>Scope covers indexed citations in this case and jurisdiction. Review each passage for how it treats the authority.</p>
+			{#if checkingCites}<p role="status">Checking citation links…</p>{/if}
+			{#if citingError}<p role="status">{citingError}</p>{/if}
+			{#if citing}
+				<p role="status">{citing.coverage.shown} shown from {citing.coverage.verified} verified citing passages and {citing.coverage.matched} matches.</p>
+				{#each citing.authorities as entry (entry.chunkId)}
+					<article>{@render sourcePassage(entry)}</article>
+				{/each}
+			{/if}
 		{/if}
 	{/if}
 </section>

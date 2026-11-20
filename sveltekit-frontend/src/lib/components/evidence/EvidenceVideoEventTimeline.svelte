@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createSceneDocumentV1, createSceneQualityReceiptV1, stableStringifySceneDocumentV1 } from '$lib/splat/scene-document-v1.js';
 	import { storybookSavedChapterHrefV1, storybookVideoChapterV1Schema, type StorybookVideoChapterV1 } from '$lib/shared/storybook-video-chapter-v1.js';
-	import { evidenceSceneIdV1, fetchSceneRevisionV1, saveSceneManifestRevisionV1 } from '$lib/splat/scene-persistence-client-v1.js';
+	import { caseStorybookSceneIdV1, fetchSceneRevisionV1, saveSceneManifestRevisionV1 } from '$lib/splat/scene-persistence-client-v1.js';
 	import { deriveReviewedGroundPlaneTrackFromHistoryV1, groundTrackSnapshotPointsV1, sameGroundTrackSnapshotPointsV1, type ReviewedGroundPlanePointV1 } from '$lib/splat/reviewed-ground-plane-track-v1.js';
 	type EventReference =
 		| { kind: 'transcript_segment'; referenceId: string; transcriptId: string; segmentIndex: number; startMs: number; endMs: number; text: string; modelRevision: string | null }
@@ -91,7 +91,7 @@
 		sceneSaveMessage = null;
 		error = null;
 		try {
-			const sceneId = await evidenceSceneIdV1(caseId, sourceEvidenceId);
+			const sceneId = await caseStorybookSceneIdV1(caseId);
 			const current = await fetchSceneRevisionV1({ caseId, sceneId });
 			const prior = current?.manifest.groundPlaneTrackProposals ?? [];
 			const sameTrack = (proposal: (typeof prior)[number]) => proposal.evidenceId === sourceEvidenceId
@@ -173,7 +173,7 @@
 		savedChapterHref = null;
 		error = null;
 		try {
-			const sceneId = await evidenceSceneIdV1(active.caseId, sourceId);
+			const sceneId = await caseStorybookSceneIdV1(active.caseId);
 			const current = await fetchSceneRevisionV1({ caseId: active.caseId, sceneId });
 			const existing = current?.manifest.videoEventBindings?.find((binding) => binding.evidenceId === sourceId && binding.eventId === event.eventId);
 			if (existing && !asChapter) {

@@ -1,32 +1,40 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { z } from 'zod';
+	import { scenePaletteArtifactSchemaV1, type ScenePalettePreviewV1 } from '$lib/splat/indexed-palette-artifact-v1.js';
 
-	let { caseId, evidenceId, sourceRevision, runId, sequenceId }: {
+	let { caseId, evidenceId, sourceRevision, runId, sequenceId, onPreview }: {
 		caseId: string; evidenceId: string; sourceRevision: string; runId: string; sequenceId: number;
+		onPreview?: (preview: ScenePalettePreviewV1 | null) => void;
 	} = $props();
 	const resultSchema = z.object({
 		status: z.enum(['READY', 'PENDING', 'NOT_FOUND', 'FAILED', 'STALE_SOURCE', 'UNAVAILABLE']),
 		sourceRevision: z.string().nullable(),
-		artifact: z.object({ width: z.number(), height: z.number(), byteLength: z.number() }).nullable(),
+		artifact: scenePaletteArtifactSchemaV1.nullable(),
 	});
 	type Result = z.infer<typeof resultSchema>;
 	let status = $state<Result['status'] | 'CHECKING'>('CHECKING');
 	let busy = $state(false);
 	let artifact = $state<Result['artifact']>(null);
+	const lifetime = new AbortController();
 	let endpoint = $derived(`/api/cases/${encodeURIComponent(caseId)}/evidence/${encodeURIComponent(evidenceId)}/scene-palette`);
 	let locator = $derived(new URLSearchParams({ runId, sequenceId: String(sequenceId) }).toString());
+	let downloadUrl = $derived(`${endpoint}?${locator}&download=1`);
 
 	async function refresh() {
 		busy = true;
 		try {
-			const response = await fetch(`${endpoint}?${locator}`);
+			const response = await fetch(`${endpoint}?${locator}`, { signal: lifetime.signal });
 			const result = resultSchema.parse(await response.json());
+			if (lifetime.signal.aborted) return;
 			const stale = result.status === 'READY' && result.sourceRevision !== sourceRevision;
 			status = stale ? 'STALE_SOURCE' : result.status;
 			artifact = status === 'READY' ? result.artifact : null;
+			onPreview?.(artifact ? { url: downloadUrl, sourceRevision, artifact } : null);
 		} catch {
+			if (lifetime.signal.aborted) return;
 			status = 'UNAVAILABLE';
+			onPreview?.(null);
 		} finally {
 			busy = false;
 		}
@@ -38,6 +46,7 @@
 			const response = await fetch(endpoint, {
 				method: 'POST', headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ runId, sequenceId, sourceRevision }),
+				signal: lifetime.signal,
 			});
 			if (!response.ok) {
 				const failure = z.object({ status: z.string() }).parse(await response.json());
@@ -52,14 +61,17 @@
 		}
 	}
 
-	onMount(() => { void refresh(); });
+	onMount(() => {
+		void refresh();
+		return () => lifetime.abort();
+	});
 </script>
 
 <section aria-label="Scene texture">
 	<h4>4-bit scene texture</h4>
 	{#if status === 'READY' && artifact}
 		<p>{artifact.width} × {artifact.height} · {artifact.byteLength} bytes</p>
-		<a href={`${endpoint}?${locator}&download=1`}>Download palette indices</a>
+		<a href={downloadUrl}>Download palette indices</a>
 	{:else if status === 'CHECKING'}
 		<p role="status">Checking texture status…</p>
 	{:else if status === 'NOT_FOUND'}

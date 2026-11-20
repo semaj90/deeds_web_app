@@ -1,0 +1,19 @@
+{
+  "exhibitId": "E-01",
+  "caseId": "PA-DEMO-ROBBERY-001",
+  "synthetic": true,
+  "sourceMediaPresent": false,
+  "description": "Exterior/entry camera synopsis",
+  "kind": "camera_log",
+  "observationEntries": [
+    {
+      "time": "2026-10-14T15:04:12-07:00",
+      "text": "Four figures cross the entry threshold; facial identity cannot be independently verified from the synthetic description."
+    },
+    {
+      "time": "2026-10-14T15:07:08-07:00",
+      "text": "Figure in dark jacket exits, followed by others within about 30 seconds."
+    }
+  ],
+  "warning": "Written synthetic exercise only. No real footage or official alarm source exists."
+}

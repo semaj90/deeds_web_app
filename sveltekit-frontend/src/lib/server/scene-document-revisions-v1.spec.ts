@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createHash } from 'node:crypto';
-import { appendSceneDocumentRevisionV1, readSavedStorybookChapterV1, readSavedImageStorybookChapterV1, matchesReviewedImageChapterV1, sceneRevisionCommandV1Schema, validateSceneRevisionBindingV1, validateSceneEvidenceSourceBindingsV1, validateSceneVideoEventBindingsV1, validateSceneGroundPlaneTrackProposalsV1, hashSceneDocumentV1, verifySceneDocumentRevisionReadbackV1 } from './scene-document-revisions-v1.js';
+import { appendSceneDocumentRevisionV1, readSavedStorybookChapterV1, readSavedImageStorybookChapterV1, matchesReviewedImageChapterV1, sceneRevisionCommandV1Schema, validateSceneRevisionBindingV1, validateNewSceneAnimationEventBindingsV1, validateSceneEvidenceSourceBindingsV1, validateSceneVideoEventBindingsV1, validateSceneGroundPlaneTrackProposalsV1, hashSceneDocumentV1, verifySceneDocumentRevisionReadbackV1 } from './scene-document-revisions-v1.js';
 import { createSceneCalibrationV1, SPZ_DECODER_REVISION_V1, SPZ_GAUSSIAN_REPRESENTATION_REVISION_V1 } from '$lib/splat/scene-document-v1.js';
 import type { CalibrationAnchor } from '$lib/splat/calibration.js';
 import { fuseVideoEventsV1 } from '$lib/server/features/evidence/video/video-event-fusion-v1.js';
@@ -83,10 +83,31 @@ describe('scene document revision v1 admission', () => {
 		expect(matchesReviewedImageChapterV1(caseId, { ...chapter, citations }, row)).toBe(false);
 	});
 
+	it('saves reviewed mask contours as source-pixel polygons and re-derives them on reopen', () => {
+		const { row } = imageChapterFixture();
+		const observations = parseWholeImageAnalysisRowV1(row, evidenceId, sourceRevision)!.storybook!.manifest;
+		const scope = { evidenceId, sourceRevision, analysisRevision: observations.analysisRevision, observationRevision: observations.observationRevision };
+		const mask = observations.masks[0]!;
+		const reviews = [{ observationId: mask.observationId, versionId: commandId, decision: 'ACCEPTED' as const }];
+		const prefill = buildStorybookImagePrefillV1({ status: 'CURRENT', caseId, ...scope, storybook: { ...observations, reviews } }, caseId, scope)!;
+		const contours = [{ maskObservationId: mask.observationId, artifactSha256: mask.artifactSha256,
+			coordinateSpace: 'ORIGINAL_IMAGE_PIXELS' as const, reviewState: 'HUMAN_ACCEPTED_2D' as const,
+			polygons: [{ outer: [[10, 10], [30, 10], [30, 30], [10, 30]] as [number, number][], holes: [[[15, 15], [15, 20], [20, 20], [20, 15]]] as [number, number][][] }] }];
+		const reviewed = buildReviewedImageStorybookChapterV1({ ...observations, reviews }, { chapterId: commandId,
+			prefillSha256: prefill.prefillSha256, title: 'Reviewed contour', beats: [{ what: 'Review the chair mask.', how: 'Keep its image-space outline.', observationIds: [observations.detections[0]!.observationId] }] }, [], undefined, contours);
+		expect(reviewed?.citations.at(-1)).toMatchObject({ kind: 'segmentation_mask', observationId: mask.observationId,
+			artifactSha256: mask.artifactSha256 });
+		expect(reviewed?.maskPolygons).toEqual(contours);
+		expect(matchesReviewedImageChapterV1(caseId, reviewed!, row, reviews)).toBe(true);
+		expect(matchesReviewedImageChapterV1(caseId, reviewed!, row, [])).toBe(false);
+		expect(matchesReviewedImageChapterV1(caseId, { ...reviewed!, maskPolygons: contours.map((item) => ({ ...item,
+			artifactSha256: `sha256:${'c'.repeat(64)}` })) }, row, reviews)).toBe(false);
+	});
+
 	it('saves a still-image chapter under the source lock and preserves its pinned revision through analysis replacement', async () => {
 		const { chapter, evidenceRow, row } = imageChapterFixture();
 		const command = sceneRevisionCommandV1Schema.parse({ commandId, expectedRevision: 0,
-			manifest: manifest({ evidenceBindings: [{ evidenceId, sourceRevision }], imageStorybookChapter: chapter }) });
+			manifest: manifest({ evidenceBindings: [{ evidenceId, sourceRevision }], imageStorybookChapters: [chapter] }) });
 		const save = async (imageRow: unknown) => {
 			const trace: string[] = [];
 			const select = vi.fn().mockReturnValueOnce({ from: () => ({ where: () => ({ limit: async () => [] }) }) })
@@ -191,6 +212,18 @@ describe('scene document revision v1 admission', () => {
 		const result = validateSceneRevisionBindingV1({ caseId, sceneId, command });
 		expect(result.manifestSha256).toMatch(/^[a-f0-9]{64}$/);
 		expect(result.manifest.revision).toBe(1);
+	});
+
+	it('requires an event link for newly appended animation clips but preserves legacy clips', () => {
+		const legacyClip = '55555555-5555-4555-8555-555555555555';
+		const addedClip = '66666666-6666-4666-8666-666666666666';
+		const previousManifest = manifest({ sceneAnimationBindings: [{ clipId: legacyClip }] }) as never;
+		const nextWithoutEvent = manifest({ sceneAnimationBindings: [{ clipId: legacyClip }, { clipId: addedClip }] }) as never;
+		expect(() => validateNewSceneAnimationEventBindingsV1({ previousManifest, manifest: nextWithoutEvent })).toThrow('SCENE_REVISION_NEW_ANIMATION_EVENT_REQUIRED');
+		const nextWithEvent = manifest({ sceneAnimationBindings: [{ clipId: legacyClip }, { clipId: addedClip, eventId: commandId }] }) as never;
+		expect(() => validateNewSceneAnimationEventBindingsV1({ previousManifest, manifest: nextWithEvent })).not.toThrow();
+		const firstRevision = manifest({ sceneAnimationBindings: [{ clipId: addedClip, eventId: commandId }] }) as never;
+		expect(() => validateNewSceneAnimationEventBindingsV1({ previousManifest: null, manifest: firstRevision })).not.toThrow();
 	});
 
 	it('rejects fixture, client-asserted measured state, and unverified source assets', () => {

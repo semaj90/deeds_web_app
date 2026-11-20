@@ -1,0 +1,27 @@
+{
+  "exhibitId": "E-02",
+  "caseId": "PA-DEMO-ROBBERY-001",
+  "synthetic": true,
+  "sourceMediaPresent": false,
+  "description": "Lobby camera synopsis",
+  "kind": "camera_log",
+  "observationEntries": [
+    {
+      "time": "2026-10-14T15:04:23-07:00",
+      "text": "Four figures pass a cluster of bank visitors; at least ten visible, counts vary by occlusion."
+    },
+    {
+      "time": "2026-10-14T15:05:06-07:00",
+      "text": "Multiple standing figures raise or move arms; object classification unavailable."
+    },
+    {
+      "time": "2026-10-14T15:05:37-07:00",
+      "text": "A figure at teller counter gestures. Footage alone cannot establish exact speech."
+    },
+    {
+      "time": "2026-10-14T15:06:16-07:00",
+      "text": "Object resembling a bag on counter; contents unknown."
+    }
+  ],
+  "warning": "Written synthetic exercise only. No real footage or official alarm source exists."
+}

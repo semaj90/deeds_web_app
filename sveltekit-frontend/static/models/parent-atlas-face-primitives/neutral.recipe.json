@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "face-preset-neutral-v1",
+  "type": "humanoid_face",
+  "coordinateSystem": "Y_UP_Z_FORWARD_METERS",
+  "params": {
+    "preset": "neutral",
+    "headWidthM": 0.168,
+    "headHeightM": 0.236,
+    "headDepthM": 0.186,
+    "jawWidthRatio": 0.82,
+    "cheekWidthRatio": 1.04,
+    "chinProjectionM": 0.005,
+    "browProjectionM": 0.004,
+    "noseProjectionM": 0.017,
+    "lipProjectionM": 0.003,
+    "eyeSeparationRatio": 0.44
+  },
+  "parts": [
+    "face.head",
+    "face.ear.left",
+    "face.ear.right",
+    "face.eye.left",
+    "face.eye.right",
+    "face.nose",
+    "face.mouth",
+    "face.hair",
+    "face.neck"
+  ],
+  "provenance": {
+    "kind": "procedural_generated",
+    "sourceSha256": null,
+    "reviewStatus": "unreviewed"
+  },
+  "geometry": {
+    "format": "glb",
+    "uri": "./neutral.glb",
+    "sha256": "cb12a34f9ad3ae64aa2f232dc01dace85753c99eadb93d63f375d234a221109b"
+  },
+  "generator": "parent-atlas-face-math/v1"
+}

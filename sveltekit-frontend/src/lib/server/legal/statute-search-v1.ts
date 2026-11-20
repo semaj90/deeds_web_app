@@ -71,6 +71,35 @@ export async function listCaseAuthorityJurisdictionsV1(db: StatuteQueryable, cas
 	return rows.map((row) => ({ code: String(row.code), name: String(row.name) }));
 }
 
+/** Return case-linked excerpts that contain the citation text of an indexed inbound edge. */
+export async function searchCaseLinkedCitingChunksV1(
+	db: StatuteQueryable, input: { caseId: string; actorId: number; jurisdiction: string; targetChunkId: string; targetRevision: string },
+): Promise<Array<{ chunkId: string; score: number; citationText: string }>> {
+	const { rows } = await db.query(
+		`SELECT citing.id::text AS chunk_id, max(coalesce(edge.confidence, 0)) AS score,
+		   min(trim(edge.citation_text)) AS citation_text
+		 FROM legal_chunks target
+		 JOIN legal_nodes target_node ON target_node.id = target.legal_node_id AND target_node.version_id = $2::uuid
+		 JOIN legal_citations edge ON edge.to_node_id = target_node.id
+		 JOIN legal_nodes ln ON ln.id = edge.from_node_id AND ln.id <> target_node.id
+		 JOIN legal_chunks citing ON citing.legal_node_id = ln.id
+		 JOIN library_documents ld ON ld.id = ln.document_id
+		 JOIN library_document_versions ldv ON ldv.id = ln.version_id AND ldv.document_id = ld.id
+		  AND ldv.source_hash = ld.source_hash AND ldv.is_current IS TRUE
+		 JOIN jurisdictions j ON j.id = ld.jurisdiction_id
+		 WHERE target.id = $1::uuid AND j.code = $3 AND ld.is_official IS TRUE
+		  AND ld.corpus_type IN ('statute', 'case', 'constitution', 'regulation')
+		  AND citing.parser_revision IS NOT NULL AND citing.char_offset_unit = 'utf16_code_units'
+		  AND (ld.uploaded_by IS NULL OR ld.uploaded_by = $4::integer)
+		  AND EXISTS (SELECT 1 FROM case_library_links cl WHERE cl.document_id = ld.id AND cl.case_id = $5::uuid
+		   AND (cl.node_id IS NULL OR cl.node_id = ln.id))
+		  AND position(lower(nullif(trim(edge.citation_text), '')) in lower(citing.chunk_text)) > 0
+		 GROUP BY citing.id ORDER BY score DESC, citing.id LIMIT 24`,
+		[input.targetChunkId, input.targetRevision, input.jurisdiction, input.actorId, input.caseId],
+	);
+	return rows.map((row) => ({ chunkId: String(row.chunk_id), score: Number(row.score), citationText: String(row.citation_text) }));
+}
+
 export type CorpusSourceType = 'statute' | 'treatise' | 'unregistered' | 'unknown';
 export type LegalSourceType = CorpusSourceType | 'case' | 'judicial_opinion';
 

@@ -10,6 +10,7 @@ const sourceSchema = z.object({
 	caseId: z.uuid().transform((value) => value.toLowerCase()),
 	evidenceId: z.uuid().transform((value) => value.toLowerCase()),
 });
+type PaletteSource = { actorId: number; caseId: string; evidenceId: string };
 const headers = { 'Cache-Control': 'private, no-store' };
 const locatorSchema = z.union([
 	z.object({ jobId: z.uuid().transform((value) => value.toLowerCase()), download: z.literal('1').optional() }).strict(),
@@ -25,10 +26,11 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 	const source = sourceSchema.safeParse({ actorId: Number(locals.user.id), caseId: params.id, evidenceId: params.evidenceId });
 	const payload = scenePaletteRequestSchemaV1.safeParse(await request.json().catch(() => null));
 	if (!source.success || !payload.success) return json({ status: 'INVALID_REQUEST' }, { status: 400, headers });
+	const sourceData = source.data as PaletteSource;
 	try {
-		const result = await enqueueScenePaletteJobV1(source.data, payload.data);
+		const result = await enqueueScenePaletteJobV1(sourceData, payload.data);
 		const status = result.status === 'ACCEPTED' ? 202 : result.status === 'NOT_FOUND' ? 404
-			: result.status === 'UNSUPPORTED_MEDIA' ? 415 : 409;
+			: result.status === 'UNSUPPORTED_MEDIA' ? 415 : result.status === 'UNAVAILABLE' ? 503 : 409;
 		return json(result, { status, headers });
 	} catch {
 		return json({ status: 'UNAVAILABLE' }, { status: 503, headers });
@@ -41,11 +43,21 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 	const source = sourceSchema.safeParse({ actorId: Number(locals.user.id), caseId: params.id, evidenceId: params.evidenceId });
 	const locator = locatorSchema.safeParse(Object.fromEntries(url.searchParams));
 	if (!source.success || !locator.success) return respond('INVALID_REQUEST', 400);
+	const sourceData = source.data as PaletteSource;
+	const locatorData = locator.data as { jobId?: string; runId?: string; sequenceId?: number; download?: '1' };
 	try {
-		const id = 'jobId' in locator.data ? locator.data.jobId : scenePaletteJobIdV1({ ...source.data, ...locator.data });
-		const result = await reopenScenePaletteJobV1(source.data, id, locator.data.download === '1');
+		let id: string;
+		if (typeof locatorData.jobId === 'string') {
+			id = locatorData.jobId;
+		} else if (typeof locatorData.runId === 'string' && typeof locatorData.sequenceId === 'number') {
+			id = scenePaletteJobIdV1({ caseId: sourceData.caseId, runId: locatorData.runId, sequenceId: locatorData.sequenceId });
+		} else {
+			return respond('INVALID_REQUEST', 400);
+		}
+		const result = await reopenScenePaletteJobV1(sourceData, id, locatorData.download === '1');
 		if (result.status === 'NOT_FOUND') return respond(result.status, 404);
 		if (result.status === 'STALE_SOURCE') return respond(result.status, 409);
+		if (result.status === 'UNAVAILABLE') return respond(result.status, 503);
 		if (!('artifact' in result)) {
 			return json({ status: result.status, jobStatus: result.jobStatus, sourceRevision: null, artifact: null }, { headers });
 		}

@@ -1,0 +1,27 @@
+{
+  "schema": "parent_atlas_face_primitives_import_report.v1",
+  "date": "2026-11-19",
+  "status": "IMPORTED_NOT_RUNTIME_WIRED",
+  "likely_cause": "The downloaded starter was a standalone package and had no existing call site in the Detective Mode scene or scene revision flow.",
+  "evidence": [
+    "Copied face-math.ts, face-three.ts, mesh-culling.ts, mesh-packer.ts, mesh-three.ts, and mesh-wasm.ts into sveltekit-frontend/src/lib/scene/procedural/parent-atlas-face-primitives-v1/.",
+    "Copied 10 sample assets into sveltekit-frontend/static/models/parent-atlas-face-primitives/; catalog.json records byte lengths, SHA-256 values, source archive paths, and unreviewed_procedural_fixture provenance.",
+    "Source and destination asset bytes were verified SHA-256 identical.",
+    "Focused smoke probe produced 377 face vertices, 720 triangles, cull mask [1,0], round-tripped a 90-byte ATMP packet, and rejected a corrupted packet header.",
+    "git diff --check passed."
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/scene/procedural/parent-atlas-face-primitives-v1/",
+    "sveltekit-frontend/static/models/parent-atlas-face-primitives/",
+    "openspec/changes/crime-scene-reconstruction/tasks.md"
+  ],
+  "not_done": [
+    "No Detective Mode, character inspector, scene revision, or culling/streaming runtime call site was added.",
+    "Native Node-API addon and WASM binary were not built or activated.",
+    "No browser render, picking, GPU memory, or production evidence alignment was verified.",
+    "The in-progress npm run check:native session disappeared before a final result could be recovered; no pass is claimed."
+  ],
+  "safe_next_command": "cd sveltekit-frontend; npm run check:native",
+  "smoke_command": "node --import tsx --input-type=module <focused-probe-for-face-mesh-cull-and-atmp-roundtrip>",
+  "report_path": "docs/reports/parent-atlas-face-primitives-integration-20261119.json"
+}

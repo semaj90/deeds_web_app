@@ -73,6 +73,19 @@ export function validateSceneRevisionBindingV1(input: {
 	return { manifest, manifestSha256: hashSceneDocumentV1(manifest) };
 }
 
+/** Newly appended animation clips must explicitly reference a reviewed timeline event. */
+export function validateNewSceneAnimationEventBindingsV1(input: {
+	previousManifest: SceneDocumentV1 | null;
+	manifest: SceneDocumentV1;
+}): void {
+	const existingClipIds = new Set((input.previousManifest?.sceneAnimationBindings ?? []).map((binding) => binding.clipId));
+	for (const binding of input.manifest.sceneAnimationBindings ?? []) {
+		if (!existingClipIds.has(binding.clipId) && !binding.eventId) {
+			throw new Error('SCENE_REVISION_NEW_ANIMATION_EVENT_REQUIRED');
+		}
+	}
+}
+
 export function validateSceneEvidenceSourceBindingsV1(input: {
 	caseId: string;
 	manifest: SceneDocumentV1;
@@ -161,7 +174,7 @@ export function matchesReviewedImageChapterV1(caseId: string, chapter: Storybook
 	if (!chapter.beats.every((beat) => beat.observationIds.every((id) => allowed.has(id)))) return false;
 	if (chapter.relativeDepth && !parsed.relativeDepth) return false;
 	const derived = buildReviewedImageStorybookChapterV1(storybook, chapter, chapter.sceneCells,
-		chapter.relativeDepth ? parsed.relativeDepth : undefined);
+		chapter.relativeDepth ? parsed.relativeDepth : undefined, chapter.maskPolygons);
 	return derived !== null && stableStringifySceneDocumentV1(derived) === stableStringifySceneDocumentV1(chapter);
 }
 
@@ -237,6 +250,10 @@ export async function appendSceneDocumentRevisionV1(input: {
 			.orderBy(desc(sceneDocumentRevisions.revision)).limit(1);
 		const currentRevision = head?.revision ?? 0;
 		if (currentRevision !== input.command.expectedRevision) throw new Error('SCENE_REVISION_CONFLICT');
+		const previousManifest = head
+			? verifySceneDocumentRevisionReadbackV1({ caseId: input.caseId, sceneId: input.sceneId, row: head }).manifest
+			: null;
+		validateNewSceneAnimationEventBindingsV1({ previousManifest, manifest: binding.manifest });
 		const expectedParentHash = head?.manifestSha256 ?? null;
 		if (binding.manifest.parentManifestSha256 !== expectedParentHash) throw new Error('SCENE_REVISION_PARENT_HASH_MISMATCH');
 		for (const asset of binding.manifest.assets) {
@@ -248,24 +265,27 @@ export async function appendSceneDocumentRevisionV1(input: {
 				throw new Error('SCENE_REVISION_ASSET_NOT_REGISTERED');
 			}
 		}
-		const imageChapter = binding.manifest.imageStorybookChapter;
-		if (imageChapter || binding.manifest.evidenceSources.length || (binding.manifest.evidenceBindings?.length ?? 0) > 0 || (binding.manifest.videoEventBindings?.length ?? 0) > 0 || (binding.manifest.groundPlaneTrackProposals?.length ?? 0) > 0) {
+		const imageChapters = [
+			...(binding.manifest.imageStorybookChapter ? [binding.manifest.imageStorybookChapter] : []),
+			...(binding.manifest.imageStorybookChapters ?? [])
+		];
+		const imageChapter = imageChapters[0];
+		if (imageChapters.length || binding.manifest.evidenceSources.length || (binding.manifest.evidenceBindings?.length ?? 0) > 0 || (binding.manifest.videoEventBindings?.length ?? 0) > 0 || (binding.manifest.groundPlaneTrackProposals?.length ?? 0) > 0) {
 			const evidenceIds = [...new Set([
 				...binding.manifest.evidenceSources.map((source) => source.evidenceId),
 				...(binding.manifest.evidenceBindings ?? []).map((source) => source.evidenceId),
 				...(binding.manifest.videoEventBindings ?? []).map((source) => source.evidenceId),
-				...(binding.manifest.groundPlaneTrackProposals ?? []).map((source) => source.evidenceId)
+				...(binding.manifest.groundPlaneTrackProposals ?? []).map((source) => source.evidenceId),
+				...imageChapters.map((source) => source.evidenceId)
 			])];
 			const evidenceQuery = tx.select({ id: evidence.id, caseId: evidence.caseId, hash: evidence.hash, aiAnalysis: evidence.aiAnalysis })
 				.from(evidence).where(and(inArray(evidence.id, evidenceIds), isNull(evidence.deletedAt)));
-			const hasChapters = imageChapter || binding.manifest.videoEventBindings?.some((event) => event.chapter !== undefined);
+			const hasChapters = imageChapters.length > 0 || binding.manifest.videoEventBindings?.some((event) => event.chapter !== undefined);
 			const evidenceRows = await (hasChapters ? evidenceQuery.orderBy(asc(evidence.id)).for('share') : evidenceQuery);
 			validateSceneEvidenceSourceBindingsV1({ caseId: input.caseId, manifest: binding.manifest, evidenceRows });
 			validateSceneVideoEventBindingsV1({ caseId: input.caseId, manifest: binding.manifest, evidenceRows });
-			if (imageChapter) {
-				if (!await matchesCurrentImageChapter(input.caseId, imageChapter, tx)) {
-					throw new Error('SCENE_REVISION_IMAGE_CHAPTER_CHANGED');
-				}
+			for (const chapter of imageChapters) {
+				if (!await matchesCurrentImageChapter(input.caseId, chapter, tx)) throw new Error('SCENE_REVISION_IMAGE_CHAPTER_CHANGED');
 			}
 			if (binding.manifest.groundPlaneTrackProposals?.length) {
 				const versionRows = await tx.select({ id: evidenceVersions.id, evidenceId: evidenceVersions.evidenceId, version: evidenceVersions.version, metadata: evidenceVersions.metadata })
@@ -319,11 +339,13 @@ export async function readSavedStorybookChapterV1(input: { caseId: string; scene
 }
 
 export async function readSavedImageStorybookChapterV1(
-	input: { caseId: string; sceneId: string; revision: number; chapterId: string }, database: Pick<typeof db, 'select' | 'execute'> = db,
+	input: { caseId: string; sceneId: string; revision: number; chapterId?: string }, database: Pick<typeof db, 'select' | 'execute'> = db,
 ) {
 	const saved = await readSceneDocumentRevisionV1(input, database);
-	const chapter = saved?.manifest.imageStorybookChapter;
-	if (!saved || !chapter || chapter.chapterId !== input.chapterId) return null;
+	const chapter = saved?.manifest.imageStorybookChapters?.find((candidate) => input.chapterId === undefined || candidate.chapterId === input.chapterId)
+		?? (input.chapterId === undefined || saved?.manifest.imageStorybookChapter?.chapterId === input.chapterId
+			? saved?.manifest.imageStorybookChapter : undefined);
+	if (!saved || !chapter || (input.chapterId !== undefined && chapter.chapterId !== input.chapterId)) return null;
 	const [source] = await database.select({ hash: evidence.hash }).from(evidence)
 		.where(and(eq(evidence.caseId, input.caseId), eq(evidence.id, chapter.evidenceId), isNull(evidence.deletedAt))).limit(1);
 	let sourceState: 'CURRENT' | 'CHANGED' | 'UNAVAILABLE' = 'UNAVAILABLE';
@@ -335,7 +357,7 @@ export async function readSavedImageStorybookChapterV1(
 			if (matches !== undefined) sourceState = matches ? 'CURRENT' : 'CHANGED';
 		}
 	}
-	return { sceneId: saved.sceneId, revision: saved.revision, chapter, sourceState };
+	return { sceneId: saved.sceneId, revision: saved.revision, manifestSha256: saved.manifestSha256, chapter, sourceState };
 }
 
 /**
@@ -354,7 +376,9 @@ export async function listLatestSceneDocumentSourceProjectionsV1(input: {
 		videoEventBindings: Omit<NonNullable<SceneDocumentV1['videoEventBindings']>[number], 'chapter'>[];
 		storybookChapters: Array<{ eventId: string; evidenceId: string; title: string; startMs: number; endMs: number }>;
 		imageStorybookChapter?: Pick<StorybookImageChapterV1, 'chapterId' | 'evidenceId' | 'title'>;
+		imageStorybookChapters: Array<Pick<StorybookImageChapterV1, 'chapterId' | 'evidenceId' | 'title'>>;
 		groundPlaneTrackProposals: NonNullable<SceneDocumentV1['groundPlaneTrackProposals']>;
+		sceneAnimationBindings: NonNullable<SceneDocumentV1['sceneAnimationBindings']>;
 	}>;
 	unavailableRevisionCount: number;
 }> {
@@ -383,7 +407,10 @@ export async function listLatestSceneDocumentSourceProjectionsV1(input: {
 				return null;
 			}
 			const videoEvents = verified.manifest.videoEventBindings ?? [];
-			const imageChapter = verified.manifest.imageStorybookChapter;
+			const imageChapters = [
+				...(verified.manifest.imageStorybookChapter ? [verified.manifest.imageStorybookChapter] : []),
+				...(verified.manifest.imageStorybookChapters ?? [])
+			];
 			return {
 				sceneId: verified.sceneId,
 				revision: verified.revision,
@@ -392,8 +419,10 @@ export async function listLatestSceneDocumentSourceProjectionsV1(input: {
 				storybookChapters: videoEvents.flatMap(({ chapter, eventId, evidenceId, startMs, endMs }) =>
 					chapter ? [{ eventId, evidenceId, title: chapter.title, startMs, endMs }] : [])
 					.sort((a, b) => a.evidenceId.localeCompare(b.evidenceId) || a.startMs - b.startMs || a.endMs - b.endMs).slice(0, 100),
-				...(imageChapter ? { imageStorybookChapter: { chapterId: imageChapter.chapterId, evidenceId: imageChapter.evidenceId, title: imageChapter.title } } : {}),
-				groundPlaneTrackProposals: verified.manifest.groundPlaneTrackProposals ?? []
+				...(imageChapters[0] ? { imageStorybookChapter: { chapterId: imageChapters[0].chapterId, evidenceId: imageChapters[0].evidenceId, title: imageChapters[0].title } } : {}),
+				imageStorybookChapters: imageChapters.map(({ chapterId, evidenceId, title }) => ({ chapterId, evidenceId, title })),
+				groundPlaneTrackProposals: verified.manifest.groundPlaneTrackProposals ?? [],
+				sceneAnimationBindings: verified.manifest.sceneAnimationBindings ?? []
 			};
 		} catch (cause) {
 			unavailableRevisionCount += 1;

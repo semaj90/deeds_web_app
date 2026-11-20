@@ -1,0 +1,23 @@
+{
+  "report": "dev-gpu-postgres-listener-triage",
+  "date": "2026-11-19",
+  "likely_cause": "A PostgreSQL connection drop reached the analysis worker's dedicated pg.Client during connection setup before its error handler was attached, allowing Node to terminate the Vite process with an unhandled error event.",
+  "evidence": [
+    "sveltekit-frontend/logs/startup/vite-2026-11-19T17-44-38-776Z.log: repeated analysis notify listener and pool connection termination errors followed by node:events:497 unhandled error and Node.js v22.23.3 exit.",
+    "logs/turboquant/launch-2026-11-19T16-35-56.err: Gemma 4 model loaded and llama-server listening on 127.0.0.1:8090.",
+    "Read-only port probe: PostgreSQL :5432 reachable, llama-server :8090 reachable, Vite :5173 unavailable; RabbitMQ :5672 and embedding sidecar :8081 unavailable.",
+    "RabbitMQ and embedding sidecar failures are separate from the captured fatal Node PostgreSQL client event."
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/analysis/worker.ts"
+  ],
+  "change": "Attach pg.Client error and end handlers before connect() and LISTEN so a connection failure cannot become an unhandled EventEmitter error; preserve existing polling fallback.",
+  "verification": {
+    "git_diff_check": "passed",
+    "dev_gpu_rerun": "not run; :8090 is already active and guarded lifecycle rules prohibit restarting or replacing it without the documented operator gates",
+    "tests": "not run"
+  },
+  "safe_next_command": "cd sveltekit-frontend; npm run check:fast",
+  "smoke_command": "After the guarded :8090 reuse/profile checks are satisfied, run npm run dev:gpu from the operator terminal and confirm Vite reaches :5173 without an unhandled PostgreSQL client error.",
+  "report_path": "docs/reports/dev-gpu-postgres-listener-triage-20261119.json"
+}

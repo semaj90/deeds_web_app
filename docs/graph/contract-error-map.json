@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-09T23:17:35.128Z",
-  "totalFindings": 40,
+  "generatedAt": "2026-11-19T21:51:35.075Z",
+  "totalFindings": 41,
   "nodes": [
     {
       "id": "contract:schema_mismatch",
@@ -16,7 +16,7 @@
       "label": "Route Contract Mismatch",
       "state": "route_contract_mismatch",
       "severity": "low",
-      "findingCount": 2,
+      "findingCount": 3,
       "rootCauseScore": 0.2,
       "fixOrder": 7
     }

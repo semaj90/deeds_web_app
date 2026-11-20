@@ -1,0 +1,61 @@
+{
+  "schema": "parent-atlas.case-scene-chapter-aggregation-report.v1",
+  "status": {
+    "created": [
+      "Deterministic case-scoped scene identity for storybook writes",
+      "Additive imageStorybookChapters array with per-chapter evidence and source revision binding",
+      "Image and video event save paths targeting the same case scene revision",
+      "Saved chapter projection supporting multiple still-image links"
+    ],
+    "wired": [
+      "Scene revision admission validates each still-image chapter against its current source and review state under the evidence lock",
+      "Still-image save appends or replaces one chapter while retaining other image chapters in the case scene revision",
+      "Legacy imageStorybookChapter remains readable"
+    ],
+    "proven": [
+      {
+        "command": "npm exec -- vitest run src/lib/splat/scene-document-v1.spec.ts src/lib/splat/scene-persistence-client-v1.spec.ts src/lib/server/scene-document-revisions-v1.spec.ts",
+        "result": "PASS: 3 files, 50 tests",
+        "scope": "Scene schema, stable case-scene identity, and mocked revision writer/readback"
+      },
+      {
+        "command": "npm run check:fast",
+        "result": "PASS: 0 errors, 8 warnings in 2 files",
+        "scope": "Svelte and TypeScript diagnostics"
+      },
+      {
+        "command": "git diff --check -- <changed paths>",
+        "result": "PASS",
+        "scope": "Whitespace and patch integrity"
+      }
+    ],
+    "not_proven": [
+      "Authenticated browser flow for saving two independent uploaded image chapters into one case scene",
+      "Live PostgreSQL and SeaweedFS save/reopen",
+      "Shared-plane or multi-view camera alignment",
+      "A unified measured 3D scene"
+    ]
+  },
+  "likely_cause": "Per-exhibit scene IDs and a singular image chapter field prevented separate evidence chapters from accumulating in one case scene revision.",
+  "evidence": [
+    "sveltekit-frontend/src/lib/components/evidence/CaseStorybook.svelte",
+    "sveltekit-frontend/src/lib/components/evidence/EvidenceVideoEventTimeline.svelte",
+    "sveltekit-frontend/src/lib/server/scene-document-revisions-v1.ts",
+    "sveltekit-frontend/src/lib/splat/scene-document-v1.ts"
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/components/evidence/CaseStorybook.svelte",
+    "sveltekit-frontend/src/lib/components/evidence/EvidenceVideoEventTimeline.svelte",
+    "sveltekit-frontend/src/lib/server/scene-document-revisions-v1.ts",
+    "sveltekit-frontend/src/lib/server/scene-document-revisions-v1.spec.ts",
+    "sveltekit-frontend/src/lib/splat/scene-document-v1.ts",
+    "sveltekit-frontend/src/lib/splat/scene-document-v1.spec.ts",
+    "sveltekit-frontend/src/lib/splat/scene-persistence-client-v1.ts",
+    "sveltekit-frontend/src/lib/splat/scene-persistence-client-v1.spec.ts",
+    "sveltekit-frontend/src/routes/(app)/cases/[id]/crime-scene/+page.svelte",
+    "openspec/changes/crime-scene-reconstruction/tasks.md"
+  ],
+  "safe_next_command": "npm exec -- vitest run src/lib/splat/scene-document-v1.spec.ts src/lib/splat/scene-persistence-client-v1.spec.ts src/lib/server/scene-document-revisions-v1.spec.ts",
+  "smoke_command": "Use an authenticated Chromium session to save two different evidence image chapters and one reviewed video event, reopen the case scene revision, and verify the sources remain separately pixel/time bound.",
+  "report_path": "docs/reports/case-scene-chapter-aggregation-20261119.json"
+}

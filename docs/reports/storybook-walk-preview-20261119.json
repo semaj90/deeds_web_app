@@ -1,0 +1,37 @@
+{
+  "baseRevision": "b283b7436c1",
+  "scope": "Synthetic reviewed-track input, actual Three.js viewer and detective GLB in Chromium WebGL2",
+  "likely_cause": "The inspected guide used elapsed frame time and the previous path progress did not preserve individual source timestamps.",
+  "created": ["Timed arc-length spline sampler with deterministic heading"],
+  "wired": ["Verified saved ground-plane proposals can open an illustrative rigged walk preview and download an animated GLB and synthesized keypoint JSON"],
+  "proven": [
+    {
+      "status": "PASS",
+      "command": "Get-Content -Raw -LiteralPath ../scratch/storybook-walk-preview/verify.mjs | node --input-type=module",
+      "cwd": "sveltekit-frontend",
+      "output": "{\"renderer\":\"Chromium WebGL2\",\"actor\":\"rigged Walk\",\"sourceStartUs\":2000009,\"sourceEndUs\":13101111,\"visualChange\":true,\"rewindPixelIdentical\":true,\"keypointFrames\":269,\"joints\":15,\"jsonBytes\":310708,\"glbBytes\":350220,\"glbChannels\":47,\"maxReimportError\":1.249880619558219e-7,\"registeredAssetReloaded\":true,\"registeredAnimationScrubbed\":true,\"repeatExportIdentical\":true,\"missingRigRejected\":true,\"pageErrors\":0}",
+      "artifact": "scratch/storybook-walk-preview/detective-walk.glb",
+      "keypointsArtifact": "scratch/storybook-walk-preview/detective-walk-keypoints.json",
+      "adversarialProbe": "The registered GLB was fetched through the case asset route, checksum-validated, reopened in a second viewer and scrubbed to a different source time. The missing-rig fallback refused export. Repeated JSON export was byte-identical. HTTP storage was fixture-backed; live authorization and durable storage remain unproven."
+    },
+    {
+      "status": "PASS",
+      "command": "npm exec -- vitest run src/lib/courtroom/walk-path-v1.spec.ts src/lib/courtroom/runtime/walk-heading.spec.ts",
+      "cwd": "sveltekit-frontend",
+      "output": "Test Files  2 passed (2)\nTests  7 passed (7)",
+      "adversarialProbe": "Two distinct points with duplicate source timestamps are rejected. Seeking backward through a held position reproduces the same pose sample."
+    }
+  ],
+  "done": [],
+  "evidence": ["Interpolation preserved every anchor timestamp in the unevenly spaced fixture."],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/courtroom/walk-path-v1.ts",
+    "sveltekit-frontend/src/lib/components/evidence/SceneVideoEventBindings.svelte",
+    "sveltekit-frontend/src/lib/components/evidence/ReviewedWalkPreview.svelte",
+    "sveltekit-frontend/src/lib/components/evidence/CrimeSceneViewer3D.svelte"
+  ],
+  "safe_next_command": "npm run check:fast",
+  "smoke_command": "Get-Content -Raw -LiteralPath ../scratch/storybook-walk-preview/verify.mjs | node --input-type=module",
+  "report_path": "docs/reports/storybook-walk-preview-20261119.json",
+  "pending": ["Live analysis_jobs admission and durable PostgreSQL/SeaweedFS binding readback", "Editable reviewed path", "Signed-in save and reopen against live services"]
+}

@@ -73,6 +73,13 @@
 			tip: 'Drag & drop files anywhere in the evidence library to upload',
 		},
 		{
+			id: 'case-scene',
+			title: 'Optional Case Scene Workspace',
+			description: 'After choosing a case and linking evidence, open its Crime Scene workspace from that case. Start with an illustrative blockout or add evidence first; scene tools never open automatically.',
+			icon: 'briefcase',
+			tip: 'Choose a case below to continue in its workspace',
+		},
+		{
 			id: 'ai-assistant',
 			title: 'AI Research Assistant',
 			description: 'Ask legal questions, search case law, and get AI-powered analysis. The assistant understands legal context and citations.',
@@ -90,8 +97,8 @@
 		},
 		{
 			id: 'models',
-			title: 'AI Models Setup',
-			description: 'The platform uses local AI models for privacy. Install Ollama and download the required models to enable full AI features.',
+			title: 'Local AI Runtime',
+			description: 'This workspace uses its configured local AI services, including Gemma 4 Legal through llama-server. Check Settings for service status; this tutorial does not install or switch models.',
 			icon: 'cpu',
 			route: '/system-configuration',
 			action: 'showModelSetup',
@@ -134,6 +141,26 @@
 	let onboardingReady = $state(false);
 	let initializedUserId = $state<string | null>(null);
 	let hasCompletedOnce = $state(false);
+	type RuntimeModelStatus = {
+		ok: boolean;
+		model: string | null;
+		modelSource: 'configured-match' | 'llama-server-loaded' | null;
+		error: string | null;
+	};
+	let runtimeModelStatus = $state<RuntimeModelStatus | null>(null);
+	let runtimeModelStatusLoading = $state(false);
+
+	async function refreshRuntimeModelStatus() {
+		runtimeModelStatusLoading = true;
+		try {
+			const response = await fetch('/api/llm/runtime-status', { cache: 'no-store' });
+			runtimeModelStatus = await response.json() as RuntimeModelStatus;
+		} catch {
+			runtimeModelStatus = { ok: false, model: null, modelSource: null, error: 'Runtime status unavailable.' };
+		} finally {
+			runtimeModelStatusLoading = false;
+		}
+	}
 	let replayMode = $state(false);
 
 	type OnboardingState = {
@@ -319,6 +346,14 @@
 		if (activeStep.action === 'openChat' && browser) {
 			window.dispatchEvent(new CustomEvent('yorha:open-chat'));
 		}
+		if (activeStep.id === 'models' && browser) {
+			void refreshRuntimeModelStatus();
+		}
+	}
+
+	function openCasesFromSceneStep() {
+		completeWizard();
+		void goto('/cases');
 	}
 
 	function goToStep(stepIndex: number) {
@@ -549,21 +584,22 @@
 					{#if step.id === 'models'}
 						<div class="model-info">
 							<div class="model-row">
-								<span class="model-name">ornith-1.5-9b</span>
-								<span class="model-detail">11.8B params — Legal reasoning</span>
-							</div>
-							<div class="model-row">
-								<span class="model-name">embeddinggemma</span>
-								<span class="model-detail">307M params — Document search</span>
-							</div>
-							<div class="model-cmds">
-								<code class="model-cmd">ollama pull ornith-1.5-9b</code>
-								<code class="model-cmd">ollama pull embeddinggemma:latest</code>
+								<span class="model-name">{runtimeModelStatusLoading ? 'Checking llama-server…' : runtimeModelStatus?.model ?? 'llama-server unavailable'}</span>
+								<span class="model-detail">{runtimeModelStatus?.ok ? `Loaded chat model (${runtimeModelStatus.modelSource})` : 'Chat model status is not available'}</span>
 							</div>
 							<p class="model-note">
 								<Icon name="shield" size={12} />
-								All models run locally — your data stays on your machine
+								Chat inference follows the model loaded by the local profile. This tour does not install or switch models; embedding services are configured separately.
 							</p>
+						</div>
+					{/if}
+
+					{#if step.id === 'case-scene'}
+						<div class="completion-actions">
+							<button class="btn-action" onclick={openCasesFromSceneStep}>
+								<Icon name="briefcase" size={16} />
+								Choose a case
+							</button>
 						</div>
 					{/if}
 
@@ -916,24 +952,6 @@
 	.model-detail {
 		font-size: 0.75rem;
 		color: #718096;
-	}
-
-	.model-cmds {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-		margin-top: 8px;
-	}
-
-	.model-cmd {
-		display: block;
-		padding: 6px 10px;
-		background: rgba(0, 0, 0, 0.4);
-		border-radius: 4px;
-		font-size: 0.75rem;
-		color: #48bb78;
-		font-family: 'JetBrains Mono', monospace;
-		user-select: all;
 	}
 
 	.model-note {

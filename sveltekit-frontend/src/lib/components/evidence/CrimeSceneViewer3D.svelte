@@ -1,6 +1,12 @@
 <script module lang="ts">
 	export const CASE_EXHIBIT_DRAG_TYPE = 'application/x-atlas-case-exhibit';
 	export type DetectiveGuideAction = 'Idle' | 'Walk' | 'Inspect' | 'Interact';
+	export type ReviewedWalkJointSample = {
+		framePtsUs: number;
+		root: [number, number, number];
+		headingRadians: number;
+		joints: Record<string, [number, number, number] | null>;
+	};
 </script>
 
 <script lang="ts">
@@ -13,9 +19,10 @@
 	import { ScenePrimitiveManager, type ScenePrimitiveSnapshot } from '$lib/n64-fsm/scene-primitive-sync.js';
 	import { ARENA_BYTE_LENGTH } from '$lib/n64-fsm/scene-fsm-cache.js';
 	import { SpatialBvhManagerV1 } from '$lib/splat/spatial-bvh-manager-v1.js';
+	import { createAnimationClipRegistryV1, type AnimationClipActionV1 } from '$lib/courtroom/animation-clip-registry-v1.js';
 	import { createIndexedPaletteShaderMaterialV1 } from '$lib/splat/indexed-palette-shader-v1.js';
 	import { INDEXED_PALETTE16_V1, quantizeRgbaToIndexed4BppV1 } from '$lib/splat/indexed-palette-texture-v1.js';
-	import { buildWalkPath, type Vec3 } from '$lib/courtroom/walk-path-v1.js';
+	import { buildWalkPath, type buildTimedWalkPath, type Vec3 } from '$lib/courtroom/walk-path-v1.js';
 	import {
 		legalMotionEnvelope,
 		ATLAS_MOTION_DURATIONS,
@@ -49,6 +56,8 @@
 		guideVisible?: boolean;
 		guideAction?: DetectiveGuideAction;
 		guideScrubTime?: number | null;
+		reviewedWalkPath?: ReturnType<typeof buildTimedWalkPath>;
+		reviewedWalkPtsUs?: number;
 		onGuideClipsReady?: (durations: Record<DetectiveGuideAction, number>) => void;
 		placementPreview?: Vec3 | null;
 		onCaseMarkerSelect?: (id: string) => void;
@@ -77,6 +86,8 @@
 		guideVisible = true,
 		guideAction = 'Idle',
 		guideScrubTime = null,
+		reviewedWalkPath,
+		reviewedWalkPtsUs,
 		onGuideClipsReady,
 		placementPreview = null,
 		onCaseMarkerSelect,
@@ -133,14 +144,18 @@
 	let guideLoadIssue = $state<string | null>(null);
 	let guideRigDiagnostic = $state<string | null>(null);
 	let activeGuideClip = $state<DetectiveGuideAction | null>(null);
-	let riggedGuide: {
+	let riggedGuide = $state<{
 		model: THREE.Group;
 		mixer: THREE.AnimationMixer;
 		actions: Map<string, THREE.AnimationAction>;
 		current: THREE.AnimationAction | null;
 		scrubAction: DetectiveGuideAction | null;
 		walkSeconds: number;
-	} | null = null;
+		assetSha256: string | null;
+		animationRegistry: ReturnType<typeof createAnimationClipRegistryV1>;
+		registeredWalkStartUs: number | null;
+	} | null>(null);
+	let guideLoadGeneration = 0;
 	const trajectoryWaypoints: readonly Vec3[] = [
 		{ x: -1.8, y: 0.05, z: 1.6 },
 		{ x: 0.5, y: 0.45, z: 0.0 },
@@ -193,16 +208,44 @@
 		}
 	}
 
-	async function loadCaseGuide(root: THREE.Group) {
+	async function loadCaseGuide(root: THREE.Group, registeredWalk?: { bytes: ArrayBuffer; startUs: number }) {
+		const generation = ++guideLoadGeneration;
 		try {
-			const gltf = await new GLTFLoader().loadAsync('/models/detective-actor-v1.glb');
-			const clips = new Map(gltf.animations.map((clip) => [clip.name, clip]));
-			const validClips = guideActions.every((name) => {
-				const clip = clips.get(name);
+			const modelUrl = '/models/detective-actor-v1.glb';
+			const loader = new GLTFLoader();
+			let assetSha256: string | null = null;
+			const gltf = await (async () => {
+				let bytes: ArrayBuffer;
+				let resourcePath = '/models/';
+				if (registeredWalk) {
+					bytes = registeredWalk.bytes;
+					resourcePath = '/';
+				} else {
+					const response = await fetch(modelUrl, { credentials: 'same-origin' });
+					if (!response.ok) throw new Error('GUIDE_ASSET_UNAVAILABLE');
+					bytes = await response.arrayBuffer();
+				}
+				if (bytes.byteLength === 0 || bytes.byteLength > 64 * 1024 * 1024 || !globalThis.crypto?.subtle) {
+					throw new Error('GUIDE_ASSET_HASH_UNAVAILABLE');
+				}
+				const checksum = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
+				assetSha256 = `sha256:${Array.from(checksum, (byte) => byte.toString(16).padStart(2, '0')).join('')}`;
+				return loader.parseAsync(bytes, resourcePath);
+			})();
+			if (!assetSha256) throw new Error('GUIDE_ASSET_HASH_UNAVAILABLE');
+			const animationRegistry = createAnimationClipRegistryV1(assetSha256, gltf.animations);
+			const clipsByAction = new Map<AnimationClipActionV1, THREE.AnimationClip>(
+				animationRegistry.actions.map(({ action, clipIndex }) => [action, gltf.animations[clipIndex]]),
+			);
+			const validClips = registeredWalk ? (() => {
+				const clip = clipsByAction.get('walk');
+				return !!clip && Number.isFinite(clip.duration) && clip.duration > 0 && clip.tracks.length > 0;
+			})() : guideActions.every((name) => {
+				const clip = clipsByAction.get(name.toLowerCase() as AnimationClipActionV1);
 				return !!clip && Number.isFinite(clip.duration) && clip.duration > 0 && clip.tracks.length > 0;
 			});
 			const rigMismatch = guideRigMismatch(gltf.scene);
-			if (detectiveActor !== root || rigMismatch || !validClips) {
+			if (detectiveActor !== root || generation !== guideLoadGeneration || rigMismatch || !validClips) {
 				disposeGuideModel(gltf.scene);
 				if (detectiveActor === root) {
 					guideLoadIssue = rigMismatch ? 'RIG_HIERARCHY_MISMATCH' : !validClips ? 'REQUIRED_CLIP_MISSING_OR_INVALID' : null;
@@ -215,27 +258,169 @@
 			riggedGuide = {
 				model: gltf.scene,
 				mixer,
-				actions: new Map(guideActions.map((name) => [name, mixer.clipAction(clips.get(name)!)])),
+				actions: registeredWalk
+					? new Map([['Walk', mixer.clipAction(clipsByAction.get('walk')!)]])
+					: new Map(guideActions.map((name) => [name, mixer.clipAction(clipsByAction.get(name.toLowerCase() as AnimationClipActionV1)!)])),
 				current: null,
 				scrubAction: null,
 				walkSeconds: 0,
+				assetSha256,
+				animationRegistry,
+				registeredWalkStartUs: registeredWalk?.startUs ?? null,
 			};
-			onGuideClipsReady?.(Object.fromEntries(guideActions.map((name) => [name, clips.get(name)!.duration])) as Record<DetectiveGuideAction, number>);
+			const guideDurations = registeredWalk
+				? { Idle: 0, Walk: clipsByAction.get('walk')!.duration, Inspect: 0, Interact: 0 }
+				: Object.fromEntries(guideActions.map((name) => [name, clipsByAction.get(name.toLowerCase() as AnimationClipActionV1)!.duration]));
+			onGuideClipsReady?.(guideDurations as Record<DetectiveGuideAction, number>);
 			for (const child of root.children) child.visible = false;
 			root.add(gltf.scene);
-			root.rotation.y = 0.6;
+			root.rotation.y = registeredWalk ? 0 : 0.6;
 			guideLoadState = 'rigged';
 		} catch {
-			if (detectiveActor === root) {
+			if (detectiveActor === root && generation === guideLoadGeneration) {
 				guideLoadIssue = 'MODEL_LOAD_FAILED';
 				guideLoadState = 'fallback';
 			}
 		}
 	}
 
+	export async function loadRegisteredReviewedWalkGlb(bytes: ArrayBuffer, startUs: number) {
+		const root = detectiveActor;
+		if (!root || !Number.isSafeInteger(startUs) || startUs < 0 || bytes.byteLength === 0 || bytes.byteLength > 64 * 1024 * 1024) return false;
+		if (riggedGuide) {
+			riggedGuide.mixer.stopAllAction();
+			riggedGuide.mixer.uncacheRoot(riggedGuide.model);
+			root.remove(riggedGuide.model);
+			disposeGuideModel(riggedGuide.model);
+			riggedGuide = null;
+		}
+		for (const child of [...root.children]) {
+			if (child.userData.isGuideFallback) child.visible = false;
+		}
+		await loadCaseGuide(root, { bytes, startUs });
+		return riggedGuide?.registeredWalkStartUs === startUs;
+	}
+
+	function seekReviewedWalk(root: THREE.Group, path: ReturnType<typeof buildTimedWalkPath>, framePtsUs: number) {
+		const guide = riggedGuide;
+		const walk = guide?.actions.get('Walk');
+		if (!guide || !walk) return null;
+		const sample = path.atSourceTime(framePtsUs);
+		if (guide.scrubAction !== 'Walk') {
+			guide.mixer.stopAllAction();
+			walk.reset().setLoop(THREE.LoopOnce, 1).setEffectiveWeight(1).play();
+			walk.paused = true;
+			guide.scrubAction = 'Walk';
+			activeGuideClip = 'Walk';
+		}
+		walk.time = guide.registeredWalkStartUs === null
+			? sample.localSeconds % walk.getClip().duration
+			: THREE.MathUtils.clamp((framePtsUs - guide.registeredWalkStartUs) / 1_000_000, 0, walk.getClip().duration);
+		guide.mixer.update(0);
+		if (guide.registeredWalkStartUs === null) {
+			root.position.set(sample.x, sample.y, sample.z);
+			root.rotation.y = sample.heading;
+		} else {
+			root.position.set(0, 0, 0);
+			root.rotation.set(0, 0, 0);
+		}
+		return sample;
+	}
+
+	function sampleWalk(times: readonly number[], visit?: (root: THREE.Group, bones: Array<THREE.Object3D | undefined>) => void) {
+		const root = detectiveActor;
+		const guide = riggedGuide;
+		const path = reviewedWalkPath;
+		if (!root || !guide?.assetSha256 || !path || reviewedWalkPtsUs === undefined ||
+			!times.length || times.length > 1_000 ||
+			times.some((time, index) => !Number.isSafeInteger(time) || time < path.startUs || time > path.endUs ||
+				(index > 0 && time <= times[index - 1]))) return null;
+		const jointNames = Object.keys(guideBoneParents);
+		const bones = jointNames.map((name) => guide.model.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(name)));
+		const position = new THREE.Vector3();
+		try {
+			const frames: ReviewedWalkJointSample[] = [];
+			for (const time of times) {
+				const sample = seekReviewedWalk(root, path, time);
+				if (!sample) return null;
+				root.updateWorldMatrix(true, true);
+				frames.push({
+					framePtsUs: sample.framePtsUs, root: [sample.x, sample.y, sample.z], headingRadians: sample.heading,
+					joints: Object.fromEntries(jointNames.map((name, index) => {
+						const bone = bones[index];
+						return [name, bone ? bone.getWorldPosition(position).toArray() : null];
+					})),
+				});
+				visit?.(root, bones);
+			}
+			return { assetSha256: guide.assetSha256, clipName: 'Walk' as const, frames };
+		} finally {
+			seekReviewedWalk(root, path, reviewedWalkPtsUs);
+			root.updateWorldMatrix(true, true);
+		}
+	}
+
+	/** Sample the same loaded rig and evaluator used by the timeline, then restore the visible pose. */
+	export function sampleReviewedWalkJoints(times: readonly number[]) {
+		return sampleWalk(times);
+	}
+
+	export async function exportReviewedWalkGlb(times: readonly number[], provenance: Record<string, unknown>) {
+		const [{ GLTFExporter }, { clone }] = await Promise.all([
+			import('three/addons/exporters/GLTFExporter.js'),
+			import('three/addons/utils/SkeletonUtils.js'),
+		]);
+		const model = riggedGuide?.model;
+		if (!model || times.length < 2) return null;
+		const rootName = 'atlas_reviewed_walk_root';
+		const channels = new Map<string, number[]>();
+		function append(name: string, values: number[]) {
+			const existing = channels.get(name);
+			if (existing) existing.push(...values);
+			else channels.set(name, values);
+		}
+		const sampled = sampleWalk(times, (root, bones) => {
+			append(`${rootName}.position`, root.position.toArray());
+			append(`${rootName}.quaternion`, root.quaternion.toArray());
+			for (const bone of bones) {
+				if (!bone) continue;
+				append(`${bone.name}.position`, bone.position.toArray());
+				append(`${bone.name}.quaternion`, bone.quaternion.toArray());
+				append(`${bone.name}.scale`, bone.scale.toArray());
+			}
+		});
+		if (!sampled) return null;
+		const seconds = times.map((time) => (time - times[0]) / 1_000_000);
+		const tracks = [...channels].map(([name, values]) => name.endsWith('.quaternion')
+			? new THREE.QuaternionKeyframeTrack(name, seconds, values)
+			: new THREE.VectorKeyframeTrack(name, seconds, values));
+		const clip = new THREE.AnimationClip('Reviewed Detective Walk', seconds[seconds.length - 1], tracks);
+		const exportedRoot = new THREE.Group();
+		exportedRoot.name = rootName;
+		exportedRoot.userData = {
+			...provenance, assetSha256: sampled.assetSha256, clipName: sampled.clipName,
+		};
+		exportedRoot.add(clone(model));
+		try {
+			const binary = await new GLTFExporter().parseAsync(exportedRoot, { binary: true, animations: [clip] });
+			return binary instanceof ArrayBuffer ? binary : null;
+		} finally {
+			// Clone owns its skeletons. Geometries, images and materials are shared with the viewer.
+			const skeletons = new Set<THREE.Skeleton>();
+			exportedRoot.traverse((node) => {
+				if (node instanceof THREE.SkinnedMesh) skeletons.add(node.skeleton);
+			});
+			for (const skeleton of skeletons) skeleton.dispose();
+		}
+	}
+
 	function stepCaseGuide(root: THREE.Group, dt: number) {
 		const guide = riggedGuide;
 		if (!guide) return;
+		if (reviewedWalkPath && reviewedWalkPtsUs !== undefined) {
+			seekReviewedWalk(root, reviewedWalkPath, reviewedWalkPtsUs);
+			return;
+		}
 		if (guideScrubTime !== null) {
 			const clip = guide.actions.get(guideAction);
 			if (!clip) return;
@@ -1013,6 +1198,12 @@
 					stepCaseGuide(detectiveActor, dt);
 					detectiveActor.updateWorldMatrix(true, false);
 					scenePrimitiveManager.writeMatrixToArena(4, detectiveActor.matrixWorld);
+				} else if (detectiveActor && !riggedGuide && reviewedWalkPath && reviewedWalkPtsUs !== undefined) {
+					const sample = reviewedWalkPath.atSourceTime(reviewedWalkPtsUs);
+					detectiveActor.position.set(sample.x, sample.y, sample.z);
+					detectiveActor.rotation.y = sample.heading;
+					detectiveActor.updateWorldMatrix(true, false);
+					scenePrimitiveManager.writeMatrixToArena(4, detectiveActor.matrixWorld);
 				} else if (detectiveActor && !riggedGuide) {
 					const u = detectiveActor.userData;
 					// 1. Catmull-Rom Trajectory sampling along walk path when reconstruction is enabled
@@ -1416,6 +1607,7 @@
 			data-guide-issue={guideLoadIssue ?? undefined}
 			data-guide-rig-diagnostic={guideRigDiagnostic ?? undefined}
 			data-guide-action={activeGuideClip}
+			data-guide-registered-walk={riggedGuide?.registeredWalkStartUs !== null && riggedGuide?.registeredWalkStartUs !== undefined}
 			data-guide-visible={guideVisible}
 			data-guide-scrub-time={guideScrubTime ?? undefined}
 			class:hovering={isHoveringObject}

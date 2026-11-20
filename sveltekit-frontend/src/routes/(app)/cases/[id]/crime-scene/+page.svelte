@@ -7,6 +7,7 @@
 	import { STORYBOOK_REGION_GRID_SIZE } from '$lib/shared/storybook-region-review-v1.js';
 	import StorybookAuthorities from '$lib/components/evidence/StorybookAuthorities.svelte';
 	import StorybookScenePalette from '$lib/components/evidence/StorybookScenePalette.svelte';
+	import type { ScenePalettePreviewV1 } from '$lib/splat/indexed-palette-artifact-v1.js';
 	import type { StorybookVideoCitationV1 } from '$lib/shared/storybook-video-chapter-v1.js';
 
 	let { data }: { data: PageData } = $props();
@@ -37,6 +38,7 @@
 		return `/api/evidence/${encodeURIComponent(chapter.evidenceId)}/multimodal-analysis?${query}`;
 	}
 	let openDepthRevision = $state<string | null>(null);
+	let scenePalette = $state<{ chapterKey: string; preview: ScenePalettePreviewV1 } | null>(null);
 	const coverageLabels = { RECORDED: 'Recorded', NOT_RUN: 'Did not run', NOT_RECORDED: 'Not recorded', FAILED_OR_UNAVAILABLE: 'Failed or unavailable' };
 
 	const KINDS = ['WHO', 'WHAT', 'WHY', 'HOW'] as const;
@@ -78,7 +80,7 @@
 			video={data.videoStorybook} unavailable={data.storybookUnavailable} />
 	{/key}
 
-	{#if data.savedChapterRequested || data.sceneSources.some((scene) => scene.storybookChapters.length || scene.imageStorybookChapter)}
+	{#if data.savedChapterRequested || data.sceneSources.some((scene) => scene.storybookChapters.length || scene.imageStorybookChapters.length)}
 		<section id="saved-storybook-chapter" aria-labelledby="saved-storybook-heading">
 			<h2 id="saved-storybook-heading">Saved storybook chapters</h2>
 			<ul>
@@ -88,12 +90,11 @@
 							{chapter.title} · Revision {scene.revision}
 						</a> · <a href={`/cases/${data.caseId}/evidence/${chapter.evidenceId}`}>Exhibit</a></li>
 					{/each}
-					{#if scene.imageStorybookChapter}
-						{@const chapter = scene.imageStorybookChapter}
+					{#each scene.imageStorybookChapters as chapter (chapter.chapterId)}
 						<li><a href={savedImageChapterHrefV1({ caseId: data.caseId, sceneId: scene.sceneId, revision: scene.revision, chapterId: chapter.chapterId })}>
 							{chapter.title} · Revision {scene.revision} · Still image
 						</a></li>
-					{/if}
+					{/each}
 				{/each}
 			</ul>
 			{#if data.savedChapter}
@@ -124,6 +125,7 @@
 				{#if saved.chapter.unresolvedReferenceIds.length}<p>{saved.chapter.unresolvedReferenceIds.length} observation references were unresolved at save time.</p>{/if}
 			{:else if data.savedImageChapter}
 				{@const saved = data.savedImageChapter}
+				{@const paletteKey = `${data.caseId}:${saved.sceneId}:${saved.revision}:${saved.chapter.sourceRevision}`}
 				{@const depthUrl = storybookRelativeDepthHrefV1(saved.chapter)}
 				<h3>{saved.chapter.title}</h3>
 				<p>Scene revision {saved.revision} · Reviewed hypothesis · Image coordinates</p>
@@ -141,9 +143,13 @@
 				</details>
 				{#if saved.sourceState === 'CURRENT'}
 					<a href={`?${new URLSearchParams({ chapter: saved.chapter.evidenceId })}#case-storybook`}>Inspect source exhibit</a>
-					{#key `${data.caseId}:${saved.sceneId}:${saved.revision}:${saved.chapter.sourceRevision}`}
+					{#key paletteKey}
 						<StorybookScenePalette caseId={data.caseId} evidenceId={saved.chapter.evidenceId}
-							sourceRevision={saved.chapter.sourceRevision} runId={saved.sceneId} sequenceId={saved.revision} />
+							sourceRevision={saved.chapter.sourceRevision} runId={saved.sceneId} sequenceId={saved.revision}
+							onPreview={(preview) => {
+								if (preview) scenePalette = { chapterKey: paletteKey, preview };
+								else if (scenePalette?.chapterKey === paletteKey) scenePalette = null;
+							}} />
 					{/key}
 				{:else if saved.sourceState === 'CHANGED'}
 					<p role="status">The source, analysis, or review decisions changed. These observations belong to the saved revision.</p>
@@ -166,7 +172,8 @@
 							{:then { default: DepthReliefViewer }}
 								<DepthReliefViewer imageUrl={`/api/evidence/${encodeURIComponent(saved.chapter.evidenceId)}/download?${new URLSearchParams({
 									caseId: data.caseId, sourceRevision: saved.chapter.sourceRevision, inline: '1',
-								})}`} {depthUrl} artifactDigests={{ image: saved.chapter.sourceRevision, depth: depth.artifactSha256 }} />
+								})}`} {depthUrl} artifactDigests={{ image: saved.chapter.sourceRevision, depth: depth.artifactSha256 }}
+								palettePreview={scenePalette?.chapterKey === paletteKey ? scenePalette.preview : null} />
 							{:catch}
 								<p role="status">The preview could not be opened.</p>
 							{/await}
@@ -375,9 +382,11 @@
 						</summary>
 						<p class="note"><code>{scene.manifestSha256.slice(0, 16)}…</code> · bindings were loaded from the hash-verified saved manifest.</p>
 						<SceneVideoEventBindings
+							sceneRevision={{ caseId: data.caseId, sceneId: scene.sceneId, revision: scene.revision }}
 							caseId={data.caseId}
 							bindings={scene.videoEventBindings}
 							groundPlaneTrackProposals={scene.groundPlaneTrackProposals}
+							sceneAnimationBindings={scene.sceneAnimationBindings}
 						/>
 					</details>
 				{/each}

@@ -1,0 +1,108 @@
+{
+  "transcriptId": "INT-MARA",
+  "evidenceId": "E-09",
+  "caseId": "PA-DEMO-ROBBERY-001",
+  "synthetic": true,
+  "recordingActuallyPresent": false,
+  "sceneId": "SC-07",
+  "personIds": [
+    "POI-004",
+    "SEC-001"
+  ],
+  "start": "2026-10-14T18:07:05-07:00",
+  "end": "2026-10-14T18:15:32-07:00",
+  "admissibilityReviewed": false,
+  "rightsAndConsentVerified": false,
+  "statements": [
+    {
+      "lineId": "INT-MARA-L001",
+      "time": "2026-10-14T18:07:05-07:00",
+      "speaker": "OFFICER",
+      "text": "Did you know what the men intended when you entered?"
+    },
+    {
+      "lineId": "INT-MARA-L002",
+      "time": "2026-10-14T18:07:21-07:00",
+      "speaker": "MARA",
+      "text": "No. I was told we were getting something signed at the bank."
+    },
+    {
+      "lineId": "INT-MARA-L003",
+      "time": "2026-10-14T18:08:14-07:00",
+      "speaker": "OFFICER",
+      "text": "Did anyone ask you to watch the doors or warn the others?"
+    },
+    {
+      "lineId": "INT-MARA-L004",
+      "time": "2026-10-14T18:08:27-07:00",
+      "speaker": "MARA",
+      "text": "No. I was standing by the brochure stand. I did not know what was happening."
+    },
+    {
+      "lineId": "INT-MARA-L005",
+      "time": "2026-10-14T18:09:09-07:00",
+      "speaker": "OFFICER",
+      "text": "Why did you remain in the lobby during the alarm?"
+    },
+    {
+      "lineId": "INT-MARA-L006",
+      "time": "2026-10-14T18:09:25-07:00",
+      "speaker": "MARA",
+      "text": "I froze. People were moving fast and I did not want to get hurt."
+    },
+    {
+      "lineId": "INT-MARA-L007",
+      "time": "2026-10-14T18:10:13-07:00",
+      "speaker": "OFFICER",
+      "text": "Did you see any weapons?"
+    },
+    {
+      "lineId": "INT-MARA-L008",
+      "time": "2026-10-14T18:10:28-07:00",
+      "speaker": "MARA",
+      "text": "I saw one object raised but could not tell if it was real or what it was."
+    },
+    {
+      "lineId": "INT-MARA-L009",
+      "time": "2026-10-14T18:11:16-07:00",
+      "speaker": "OFFICER",
+      "text": "Was cash placed in a bag?"
+    },
+    {
+      "lineId": "INT-MARA-L010",
+      "time": "2026-10-14T18:11:30-07:00",
+      "speaker": "MARA",
+      "text": "I did not see cash. I saw a bag but did not touch it."
+    },
+    {
+      "lineId": "INT-MARA-L011",
+      "time": "2026-10-14T18:12:45-07:00",
+      "speaker": "OFFICER",
+      "text": "Did you leave with the men?"
+    },
+    {
+      "lineId": "INT-MARA-L012",
+      "time": "2026-10-14T18:13:03-07:00",
+      "speaker": "MARA",
+      "text": "I left when people ran toward the door. I was terrified."
+    },
+    {
+      "lineId": "INT-MARA-L013",
+      "time": "2026-10-14T18:14:07-07:00",
+      "speaker": "OFFICER",
+      "text": "Are you claiming you were not involved in any plan to rob the bank?"
+    },
+    {
+      "lineId": "INT-MARA-L014",
+      "time": "2026-10-14T18:14:24-07:00",
+      "speaker": "MARA",
+      "text": "Yes. I did not agree to help anyone rob anyone."
+    },
+    {
+      "lineId": "INT-MARA-L015",
+      "time": "2026-10-14T18:15:32-07:00",
+      "speaker": "OFFICER",
+      "text": "Interview ended."
+    }
+  ]
+}

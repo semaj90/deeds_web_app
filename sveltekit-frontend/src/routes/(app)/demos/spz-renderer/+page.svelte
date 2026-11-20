@@ -12,6 +12,7 @@
 	import { createSceneAssetLifecycleActorV1, isCurrentSceneAssetLoadV1 } from '$lib/splat/scene-asset-lifecycle-v1.js';
 	import { interpolateTrianglePointV1, triangleBarycentricV1 } from '$lib/splat/surface-marker-v1.js';
 	import { PRIMITIVE_DETAIL_LEVELS_V1, SCENE_ASSEMBLY_KINDS_V1, SCENE_MATERIAL_KEYS_V1, SCENE_PRIMITIVE_KINDS_V1, resolveSceneAssemblyV1, resolveSceneMaterialV1, resolveScenePrimitiveV1, type PrimitiveDetailLevelV1, type SceneAssemblyKindV1, type SceneMaterialKeyV1, type ScenePrimitiveGeometryV1, type ScenePrimitiveKindV1 } from '$lib/splat/scene-primitive-registry-v1.js';
+	import { triangulateSimplePolygonV1 } from '$lib/splat/polygon-prism-validation-v1.js';
 	import { decodeIndexed4BppToRgbaV1, INDEXED_PALETTE16_V1, INDEXED_PALETTE_TEXTURE_REVISION_V1, quantizeRgbaToIndexed4BppV1, type IndexedTexture4BppV1 } from '$lib/splat/indexed-palette-texture-v1.js';
 	import { createIndexedPaletteShaderMaterialV1, createIndexedPaletteTslMaterialV1, type IndexedPaletteShaderTexturesV1 } from '$lib/splat/indexed-palette-shader-v1.js';
 	import { describeIndexedPaletteRendererPathV1, selectIndexedPaletteRendererPathV1 } from '$lib/splat/indexed-palette-renderer-paths-v1.js';
@@ -1156,6 +1157,7 @@
 			case 'circle': return new three.CircleGeometry(recipe.radius, recipe.segments);
 			case 'rectangle': return new three.PlaneGeometry(recipe.width, recipe.height);
 			case 'polygon-prism': {
+				triangulateSimplePolygonV1(recipe.points);
 				const shape = new three.Shape();
 				const [first, ...rest] = recipe.points;
 				if (!first || rest.length < 2) throw new Error('A polygon prism needs at least three points.');

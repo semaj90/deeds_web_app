@@ -9,12 +9,13 @@ import { ENV } from '$lib/server/env.server.js';
 import { buildEvidenceReprocessJobV1 } from '$lib/server/evidence/evidence-reprocess-job-v1.js';
 import { normalizeSha256 } from '$lib/server/features/evidence/evidence-revision-v1.js';
 import { getFileFromSeaweed, putFileToSeaweed } from '$lib/server/storage/seaweed.js';
+import { readSavedImageStorybookChapterV1 } from '$lib/server/scene-document-revisions-v1.js';
 import { INDEXED_PALETTE_TEXTURE_REVISION_V1, quantizeRgbaToIndexed4BppV1 } from '$lib/splat/indexed-palette-texture-v1.js';
+import { scenePaletteArtifactSchemaV1 as artifactSchema } from '$lib/splat/indexed-palette-artifact-v1.js';
 import { enqueueJob } from './analysis-jobs.js';
 
 const TYPE = 'scene_palette' as const;
 const PROCEDURE = 'scene.palette.pack.v1' as const;
-const MAX_OUTPUT_BYTES = 256 * 256 / 2;
 const SUPPORTED_MEDIA = /^image\/(png|jpeg|webp|tiff)$/i;
 const digest = z.string().regex(/^sha256:[0-9a-f]{64}$/);
 export const scenePaletteRequestSchemaV1 = z.object({
@@ -25,12 +26,8 @@ export const scenePaletteRequestSchemaV1 = z.object({
 const jobSchema = scenePaletteRequestSchemaV1.extend({
 	actorId: z.number().int().positive(), caseId: z.uuid(), evidenceId: z.uuid(),
 	procedureId: z.literal(PROCEDURE),
+	sceneManifestSha256: z.string().regex(/^[0-9a-f]{64}$/).optional(),
 }).strip();
-const artifactSchema = z.object({
-	schema: z.literal(INDEXED_PALETTE_TEXTURE_REVISION_V1),
-	width: z.number().int().min(1).max(256), height: z.number().int().min(1).max(256),
-	byteLength: z.number().int().min(1).max(MAX_OUTPUT_BYTES), sha256: digest,
-}).strict().refine((entry) => entry.byteLength === Math.ceil(entry.width * entry.height / 2));
 
 type Job = z.infer<typeof jobSchema>;
 type Artifact = z.infer<typeof artifactSchema>;
@@ -70,19 +67,38 @@ async function readJob(source: Source, id: string) {
 	return row;
 }
 
+async function resolveScene(input: Pick<Job, 'caseId' | 'evidenceId' | 'runId' | 'sequenceId' | 'sourceRevision' | 'sceneManifestSha256'>) {
+	const saved = await readSavedImageStorybookChapterV1({
+		caseId: input.caseId, sceneId: input.runId, revision: input.sequenceId,
+	});
+	if (!saved || saved.chapter.evidenceId !== input.evidenceId) return { status: 'NOT_FOUND' } as const;
+	if (saved.chapter.sourceRevision !== input.sourceRevision ||
+		(input.sceneManifestSha256 !== undefined && input.sceneManifestSha256 !== saved.manifestSha256)) {
+		return { status: 'STALE_SOURCE' } as const;
+	}
+	if (saved.sourceState === 'UNAVAILABLE') return { status: 'UNAVAILABLE' } as const;
+	if (saved.sourceState === 'CHANGED') return { status: 'STALE_SOURCE' } as const;
+	return { status: 'CURRENT', manifestSha256: saved.manifestSha256 } as const;
+}
+
 export async function enqueueScenePaletteJobV1(source: Source, request: Request) {
 	const row = await loadSource(source);
 	if (!row) return { status: 'NOT_FOUND' } as const;
 	if (normalizeSha256(row.hash) !== request.sourceRevision) return { status: 'STALE_SOURCE' } as const;
 	if (!SUPPORTED_MEDIA.test(row.mime ?? row.fileType ?? '')) return { status: 'UNSUPPORTED_MEDIA' } as const;
-	const input = jobSchema.parse({ ...source, ...request, procedureId: PROCEDURE });
+	const scene = await resolveScene({ ...source, ...request });
+	if (scene.status !== 'CURRENT') return scene;
+	const input = jobSchema.parse({ ...source, ...request, procedureId: PROCEDURE, sceneManifestSha256: scene.manifestSha256 });
 	const jobId = scenePaletteJobIdV1(input);
 	await enqueueJob({ evidenceId: source.evidenceId, caseId: source.caseId, jobType: TYPE, reuseId: jobId, result: input });
 	const existing = await readJob(source, jobId);
 	const stored = jobSchema.safeParse(existing?.result);
 	if (!stored.success || stored.data.actorId !== input.actorId || stored.data.sourceRevision !== input.sourceRevision ||
 		stored.data.evidenceId !== input.evidenceId || stored.data.caseId !== input.caseId ||
-		stored.data.runId !== input.runId || stored.data.sequenceId !== input.sequenceId) return { status: 'SEQUENCE_CONFLICT' } as const;
+		stored.data.runId !== input.runId || stored.data.sequenceId !== input.sequenceId ||
+		(stored.data.sceneManifestSha256 !== undefined && stored.data.sceneManifestSha256 !== input.sceneManifestSha256)) {
+		return { status: 'SEQUENCE_CONFLICT' } as const;
+	}
 	return { status: 'ACCEPTED', jobId, jobStatus: existing?.status } as const;
 }
 
@@ -108,6 +124,9 @@ export async function executeScenePaletteJobV1(evidenceId: string, metadata: Rec
 	}
 	const source = await loadSource(input);
 	if (!source || normalizeSha256(source.hash) !== input.sourceRevision) throw new Error('SCENE_PALETTE_STALE_SOURCE');
+	const scene = await resolveScene(input);
+	if (scene.status !== 'CURRENT') throw new Error('SCENE_PALETTE_SCENE_REVISION_UNAVAILABLE');
+	const binding = { ...input, sceneManifestSha256: scene.manifestSha256 };
 	if (!SUPPORTED_MEDIA.test(source.mime ?? source.fileType ?? '')) throw new Error('SCENE_PALETTE_UNSUPPORTED_MEDIA');
 	const locator = buildEvidenceReprocessJobV1({
 		evidenceId, caseId: input.caseId, fileUrl: source.fileUrl, fileName: source.fileName,
@@ -128,7 +147,8 @@ export async function executeScenePaletteJobV1(evidenceId: string, metadata: Rec
 	await readPaletteBytes(input, input.sourceRevision, artifact);
 	const current = await loadSource(input);
 	if (!current || normalizeSha256(current.hash) !== input.sourceRevision) throw new Error('SCENE_PALETTE_STALE_SOURCE');
-	return { ...input, artifact };
+	if ((await resolveScene(binding)).status !== 'CURRENT') throw new Error('SCENE_PALETTE_SCENE_REVISION_UNAVAILABLE');
+	return { ...binding, artifact };
 }
 
 export async function reopenScenePaletteJobV1(source: Source, jobId: string, download: boolean) {
@@ -139,6 +159,8 @@ export async function reopenScenePaletteJobV1(source: Source, jobId: string, dow
 	if (!pin.success || pin.data.caseId !== source.caseId || pin.data.evidenceId !== source.evidenceId ||
 		scenePaletteJobIdV1(pin.data) !== jobId) return { status: 'NOT_FOUND' } as const;
 	if (normalizeSha256(current.hash) !== pin.data.sourceRevision) return { status: 'STALE_SOURCE' } as const;
+	const scene = await resolveScene(pin.data);
+	if (scene.status !== 'CURRENT') return scene;
 	if (job?.status !== 'completed') return { status: job?.status === 'failed' ? 'FAILED' : 'PENDING', jobStatus: job?.status } as const;
 	const artifact = artifactSchema.parse(z.object({ artifact: z.unknown() }).parse(job.result).artifact);
 	const bytes = download ? await readPaletteBytes(source, pin.data.sourceRevision, artifact) : null;
@@ -146,6 +168,8 @@ export async function reopenScenePaletteJobV1(source: Source, jobId: string, dow
 		const latest = await loadSource(source);
 		if (!latest) return { status: 'NOT_FOUND' } as const;
 		if (normalizeSha256(latest.hash) !== pin.data.sourceRevision) return { status: 'STALE_SOURCE' } as const;
+		const latestScene = await resolveScene({ ...pin.data, sceneManifestSha256: scene.manifestSha256 });
+		if (latestScene.status !== 'CURRENT') return latestScene;
 	}
 	return { status: 'READY', sourceRevision: pin.data.sourceRevision, artifact, bytes } as const;
 }

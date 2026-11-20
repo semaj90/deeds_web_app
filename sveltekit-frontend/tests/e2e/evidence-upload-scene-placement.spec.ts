@@ -7,6 +7,29 @@ const evidenceId = process.env.SCENE_PLACEMENT_TEST_EVIDENCE_ID;
 test.use({ serviceWorkers: 'block', viewport: { width: 1680, height: 1050 } });
 test.skip(!caseId || !evidenceId, 'Set the case and exhibit IDs for an authorized test fixture');
 
+test('case board upload stays on the board and makes the exhibit available for deliberate scene placement', async ({ page }) => {
+	const boardPath = `/cases/${caseId}/board`;
+	await page.route('**/api/evidence/upload', (route) => route.fulfill({
+		status: 201,
+		json: { id: evidenceId, jobId: randomUUID() },
+	}));
+
+	await page.goto(boardPath);
+	await page.locator('.header-actions button.btn-primary').filter({ hasText: 'Add Evidence' }).click();
+	const dialog = page.getByRole('dialog', { name: 'Evidence Upload Pipeline' });
+	await dialog.locator('input[type="file"]').setInputFiles({ name: 'board-upload.png', mimeType: 'image/png', buffer: Buffer.from('fixture') });
+	await dialog.getByRole('button', { name: 'Upload evidence' }).click();
+	await expect(dialog).toHaveCount(0);
+	await expect(page).toHaveURL(boardPath);
+	await expect(page.locator('canvas.three-crime-canvas')).toHaveCount(0);
+
+	await page.getByRole('button', { name: 'DETECTIVE', exact: true }).click();
+	const placement = page.getByRole('region', { name: 'Place evidence marker' });
+	await expect(page.locator('canvas.three-crime-canvas')).toBeVisible();
+	await expect(placement.getByLabel('Exhibit')).toHaveValue(evidenceId!);
+	await expect(placement.getByRole('button', { name: 'Save marker' })).toBeDisabled();
+});
+
 test('an accepted upload keeps its exhibit link and reaches explicit scene placement', async ({ page }, testInfo) => {
 	const boardPath = `/cases/${caseId}/board`;
 	const markerPath = `/api/cases/${caseId}/scenes/main-scene/markers`;

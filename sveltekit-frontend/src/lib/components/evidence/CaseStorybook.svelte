@@ -6,9 +6,10 @@
 	import { reviewableImageObservationsV1 } from '$lib/shared/storybook-region-review-v1.js';
 	import { STORYBOOK_REGION_GRID_SIZE } from '$lib/shared/storybook-region-review-v1.js';
 	import { storybookImageDecisionV1Schema, storybookImageObservationsV1Schema } from '$lib/shared/storybook-image-observations-v1.js';
-	import { buildReviewedImageStorybookChapterV1, savedImageChapterHrefV1, storybookRelativeDepthV1Schema, type StorybookImageSceneCellV1 } from '$lib/shared/storybook-image-chapter-v1.js';
+	import { buildReviewedImageStorybookChapterV1, savedImageChapterHrefV1, storybookRelativeDepthV1Schema, type ReviewedMaskPolygonsV1, type StorybookImageSceneCellV1 } from '$lib/shared/storybook-image-chapter-v1.js';
+	import { compileMaskContoursV1 } from '$lib/splat/mask-contour-compiler-v1.js';
 	import { createSceneDocumentV1, createSceneQualityReceiptV1, stableStringifySceneDocumentV1 } from '$lib/splat/scene-document-v1.js';
-	import { evidenceSceneIdV1, fetchSceneRevisionV1, saveSceneManifestRevisionV1 } from '$lib/splat/scene-persistence-client-v1.js';
+	import { caseStorybookSceneIdV1, fetchSceneRevisionV1, saveSceneManifestRevisionV1 } from '$lib/splat/scene-persistence-client-v1.js';
 	import type { VideoStorybookCoverageV1 } from '$lib/server/features/evidence/video/video-storybook-coverage-v1.js';
 
 	type Chapter = { id: string; title: string };
@@ -50,6 +51,10 @@
 	let selection = $state<{ key: string | null; index: number } | null>(null);
 	let maskSelection = $state<{ revision: string; id: string } | null>(null);
 	let failedMask = $state<string | null>(null);
+	let compiledMask = $state<{ observationId: string; artifactSha256: string; reviewVersionId: string; polygons: ReviewedMaskPolygonsV1['polygons']; width: number; height: number } | null>(null);
+	let compilingMask = $state(false);
+	let maskCompileError = $state<string | null>(null);
+	let acceptMaskPolygons = $state(false);
 	let region = $state<{ key: string | null; column: number; row: number } | null>(null);
 	let loadedPreview = $state<string | null>(null);
 	let failedPreview = $state<string | null>(null);
@@ -59,6 +64,13 @@
 			how: z.string().optional(),
 			citations: z.array(z.object({ observation_id: digest })).min(1),
 		})) }) });
+	const maskReviewHistory = z.object({ evidenceId: z.uuid(), versions: z.array(z.object({
+		id: z.uuid(),
+		metadata: z.object({ caseId: z.uuid(), evidenceId: z.uuid(), parentSha256: digest,
+			annotation: z.object({ storybookRegionReview: z.object({ observationId: digest, analysisRevision: z.string(),
+				observationRevision: digest, decision: z.enum(['ACCEPTED', 'REJECTED', 'UNCERTAIN']) }).passthrough() }).passthrough(),
+		}).passthrough(),
+	})).max(200) });
 	type Draft = z.infer<typeof draftResponse>['sceneIntent'] & {
 		sourceKey: string; prefillSha256: string; chapterId: string; spatialReviews: z.infer<typeof draftResponse>['spatialReviews'];
 		includeRelativeDepth: boolean;
@@ -158,7 +170,76 @@
 		const wasSelected = toggle && selectedMask?.observationId === id;
 		showDetection(detection.ordinal, wasSelected);
 		failedMask = null;
+		compiledMask = null;
+		acceptMaskPolygons = false;
+		maskCompileError = null;
 		if (!wasSelected) maskSelection = { revision: imageObservations.observationRevision, id };
+	}
+
+	async function compileSelectedMask() {
+		if (!maskUrl || !selectedMask || !imageObservations) return;
+		const selected = selectedMask;
+		const source = imageObservations;
+		compilingMask = true;
+		maskCompileError = null;
+		compiledMask = null;
+		acceptMaskPolygons = false;
+		try {
+			const reviewQuery = new URLSearchParams({ regionImage: source.observationRevision,
+				analysisRevision: source.analysisRevision, sourceRevision: source.sourceRevision,
+				observationId: selected.observationId, limit: '25' });
+			const reviewResponse = await fetch(`/api/evidence/${encodeURIComponent(source.evidenceId)}/versions?${reviewQuery}`, { cache: 'no-store' });
+			const reviewBody = maskReviewHistory.safeParse(await reviewResponse.json());
+			const latestReview = reviewResponse.ok && reviewBody.success && reviewBody.data.evidenceId === source.evidenceId
+				? reviewBody.data.versions.find(({ metadata }) => metadata.caseId === caseId && metadata.evidenceId === source.evidenceId &&
+					metadata.parentSha256 === source.sourceRevision && metadata.annotation.storybookRegionReview.observationId === selected.observationId &&
+					metadata.annotation.storybookRegionReview.analysisRevision === source.analysisRevision &&
+					metadata.annotation.storybookRegionReview.observationRevision === source.observationRevision) : undefined;
+			if (!latestReview || latestReview.metadata.annotation.storybookRegionReview.decision !== 'ACCEPTED') {
+				throw new Error('Record an accepted review for this exact mask revision before polygonizing it.');
+			}
+			const response = await fetch(maskUrl, { cache: 'no-store', credentials: 'same-origin' });
+			if (!response.ok) throw new Error('The authorized mask artifact could not be read.');
+			const declaredLength = Number(response.headers.get('content-length') ?? 0);
+			if (declaredLength > 32 * 1024 * 1024) throw new Error('Mask artifact exceeds the decode limit.');
+			if (!response.headers.get('content-type')?.toLowerCase().startsWith('image/')) throw new Error('Mask response is not an image artifact.');
+			const bytes = await response.arrayBuffer();
+			if (bytes.byteLength > 32 * 1024 * 1024) throw new Error('Mask artifact exceeds the decode limit.');
+			const digestBytes = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
+			const actualDigest = [...digestBytes].map((value) => value.toString(16).padStart(2, '0')).join('');
+			if (actualDigest !== selected.artifactSha256.replace(/^sha256:/, '')) throw new Error('Mask checksum does not match the reviewed observation.');
+			const bitmap = await createImageBitmap(new Blob([bytes], { type: response.headers.get('content-type') ?? 'image/png' }));
+			try {
+				if (bitmap.width < 1 || bitmap.height < 1 || bitmap.width * bitmap.height > 4_000_000) throw new Error('Mask dimensions exceed the compiler limit.');
+				const canvas = document.createElement('canvas');
+				canvas.width = bitmap.width;
+				canvas.height = bitmap.height;
+				const context = canvas.getContext('2d', { willReadFrequently: true });
+				if (!context) throw new Error('Mask pixels could not be decoded.');
+				context.drawImage(bitmap, 0, 0);
+				const rgba = context.getImageData(0, 0, bitmap.width, bitmap.height).data;
+				const plane = new Uint8Array(bitmap.width * bitmap.height);
+				let hasTransparency = false;
+				for (let pixel = 0; pixel < plane.length; pixel++) if (rgba[pixel * 4 + 3] !== 255) { hasTransparency = true; break; }
+				for (let pixel = 0; pixel < plane.length; pixel++) {
+					const offset = pixel * 4;
+					plane[pixel] = hasTransparency ? rgba[offset + 3]! : Math.round((rgba[offset]! * 0.2126 + rgba[offset + 1]! * 0.7152 + rgba[offset + 2]! * 0.0722));
+				}
+				const result = compileMaskContoursV1({ values: plane, width: bitmap.width, height: bitmap.height });
+				const sx = source.width / bitmap.width;
+				const sy = source.height / bitmap.height;
+				const polygons = result.polygons.map((polygon) => ({
+					outer: polygon.outer.map(([x, y]) => [x * sx, y * sy] as [number, number]),
+					holes: polygon.holes.map((ring) => ring.map(([x, y]) => [x * sx, y * sy] as [number, number])),
+				}));
+				if (!polygons.length) throw new Error('The mask contains no foreground region to polygonize.');
+				if (selectedMask?.observationId !== selected.observationId || imageObservations?.observationRevision !== source.observationRevision) return;
+				compiledMask = { observationId: selected.observationId, artifactSha256: `sha256:${actualDigest}`, reviewVersionId: latestReview.id,
+					polygons, width: bitmap.width, height: bitmap.height };
+			} finally { bitmap.close(); }
+		} catch (cause) {
+			maskCompileError = cause instanceof Error ? cause.message : 'Mask polygon compilation failed.';
+		} finally { compilingMask = false; }
 	}
 
 	function selectReviewObservation(id: string) {
@@ -238,9 +319,17 @@
 		const { chapterId, prefillSha256, title, events, cells, spatialReviews, includeRelativeDepth } = draft;
 		const placements = cells.filter((cell) => cell.included);
 		const scopedCase = caseId;
-		const reviewed = buildReviewedImageStorybookChapterV1({ ...imageObservations, reviews: spatialReviews }, { chapterId, prefillSha256, title,
+		const acceptedMask = acceptMaskPolygons && compiledMask
+			? [{ maskObservationId: compiledMask.observationId, artifactSha256: compiledMask.artifactSha256,
+				coordinateSpace: 'ORIGINAL_IMAGE_PIXELS' as const, reviewState: 'HUMAN_ACCEPTED_2D' as const, polygons: compiledMask.polygons }]
+			: [];
+		const effectiveReviews = compiledMask && acceptMaskPolygons
+			? [...(spatialReviews ?? []).filter((review) => review.observationId !== compiledMask.observationId),
+				{ observationId: compiledMask.observationId, versionId: compiledMask.reviewVersionId, decision: 'ACCEPTED' as const }]
+			: spatialReviews;
+		const reviewed = buildReviewedImageStorybookChapterV1({ ...imageObservations, reviews: effectiveReviews }, { chapterId, prefillSha256, title,
 			beats: events.map((beat) => ({ what: beat.what, how: beat.how ?? '', observationIds: beat.citations.map((citation) => citation.observation_id) })) },
-			placements, includeRelativeDepth && placements.length ? image?.relativeDepth : undefined);
+			placements, includeRelativeDepth && placements.length ? image?.relativeDepth : undefined, acceptedMask);
 		chapterSave = null;
 		if (!reviewed) {
 			chapterSave = { chapterId, error: 'The draft citations could not be resolved. Reload the chapter and draft again.' };
@@ -248,26 +337,37 @@
 		}
 		savingChapter = true;
 		try {
-			const { evidenceId, sourceRevision } = reviewed;
-			const sceneId = await evidenceSceneIdV1(scopedCase, evidenceId);
+			const sceneId = await caseStorybookSceneIdV1(scopedCase);
 			const current = await fetchSceneRevisionV1({ caseId: scopedCase, sceneId });
 			const sameChapter = (value: unknown) => value != null && stableStringifySceneDocumentV1(value) === stableStringifySceneDocumentV1(reviewed);
-			if (current && sameChapter(current.manifest.imageStorybookChapter)) {
+			const existingChapters = [
+				...(current?.manifest.imageStorybookChapter ? [current.manifest.imageStorybookChapter] : []),
+				...(current?.manifest.imageStorybookChapters ?? [])
+			];
+			if (current && existingChapters.some((candidate) => sameChapter(candidate))) {
 				chapterSave = { chapterId, href: savedImageChapterHrefV1({ caseId: scopedCase, sceneId, revision: current.revision, chapterId }) };
 				return;
 			}
 			const expectedRevision = current?.revision ?? 0;
+			const { imageStorybookChapter: _legacyChapter, ...baseManifest } = current?.manifest ?? {
+				schema: 'parent-atlas.scene-document.v1' as const, caseId: scopedCase, sceneId, status: 'HYPOTHESIS' as const,
+				coordinateFrame: 'LOCAL_UNCALIBRATED' as const, objects: [], animations: [], evidenceSources: [], assets: [],
+				quality: createSceneQualityReceiptV1({ derivedAssetBytes: 0, triangleCount: 0 })
+			};
+		const imageStorybookChapters = [...new Map(existingChapters.filter((candidate) => candidate.chapterId !== reviewed.chapterId)
+			.map((candidate) => [candidate.chapterId, candidate] as const)).values(), reviewed];
+		const evidenceBindings = new Map((current?.manifest.evidenceBindings ?? []).map((binding) => [binding.evidenceId, binding] as const));
+		for (const imageChapter of imageStorybookChapters) evidenceBindings.set(imageChapter.evidenceId, { evidenceId: imageChapter.evidenceId, sourceRevision: imageChapter.sourceRevision });
 			const manifest = createSceneDocumentV1({
-				...(current?.manifest ?? { schema: 'parent-atlas.scene-document.v1', caseId: scopedCase, sceneId, status: 'HYPOTHESIS',
-					coordinateFrame: 'LOCAL_UNCALIBRATED', objects: [], animations: [], evidenceSources: [], assets: [],
-					quality: createSceneQualityReceiptV1({ derivedAssetBytes: 0, triangleCount: 0 }) }),
+				...baseManifest,
 				revision: expectedRevision + 1, parentManifestSha256: current?.manifestSha256 ?? null, createdAt: new Date().toISOString(),
-				evidenceBindings: [...(current?.manifest.evidenceBindings ?? []).filter((item) => item.evidenceId !== evidenceId), { evidenceId, sourceRevision }],
-				imageStorybookChapter: reviewed,
+				evidenceBindings: [...evidenceBindings.values()],
+				imageStorybookChapters,
 			});
 			const receipt = await saveSceneManifestRevisionV1({ caseId: scopedCase, sceneId, manifest, expectedRevision, commandId: chapterId });
 			const readback = await fetchSceneRevisionV1({ caseId: scopedCase, sceneId, revision: receipt.revision });
-			if (!readback || readback.manifestSha256 !== receipt.manifestSha256 || !sameChapter(readback.manifest.imageStorybookChapter)) {
+			if (!readback || readback.manifestSha256 !== receipt.manifestSha256 ||
+				!readback.manifest.imageStorybookChapters?.some((candidate) => sameChapter(candidate))) {
 				throw new Error('The saved scene revision could not be verified. Check the chapter history before retrying.');
 			}
 			chapterSave = { chapterId, href: savedImageChapterHrefV1({ caseId: scopedCase, sceneId, revision: readback.revision, chapterId }) };
@@ -369,7 +469,15 @@
 									{@const url = maskUrl}
 									{#key url}<img class="mask-preview" src={url} alt={`Segmentation mask for ${selectedMask.label}`}
 										onload={() => { loadedMask = url; }} onerror={() => { failedMask = url; }} />{/key}
+					{#if loadedMask === url && failedMask !== url}
+						<button type="button" onclick={compileSelectedMask} disabled={compilingMask}>{compilingMask ? 'Compiling contours…' : 'Compile editable 2D polygons'}</button>
+					{/if}
 								{/if}
+				{#if maskCompileError}<p role="status">{maskCompileError}</p>{/if}
+				{#if compiledMask && compiledMask.observationId === selectedMask?.observationId}
+					<p>Polygon preview · {compiledMask.polygons.length} component(s), {compiledMask.polygons.reduce((sum, polygon) => sum + polygon.holes.length, 0)} hole(s) · source-image pixels · 2D only.</p>
+					<label><input type="checkbox" bind:checked={acceptMaskPolygons} /> I reviewed these contours as an editable 2D hypothesis.</label>
+				{/if}
 							{/if}
 						</details>
 					{:else}
@@ -386,7 +494,7 @@
 							{#if previewUrl}
 								{#key previewUrl}<img src={previewUrl} alt={frame ? `Evidence frame at ${labelTime(frame.timestampMs)}` : 'Original evidence image'}
 									onload={(event) => {
-										const preview = event.currentTarget;
+									const preview = event.currentTarget as HTMLImageElement;
 										const url = preview.getAttribute('src');
 										if (preview.naturalWidth === dimensions.width && preview.naturalHeight === dimensions.height) loadedPreview = url;
 										else failedPreview = url;
@@ -400,6 +508,13 @@
 							{:else if activeBox && previewReady}
 									<div class="selected-box" aria-hidden="true" style:left={`${activeBox.bbox[0] * 100 / dimensions.width}%`} style:top={`${activeBox.bbox[1] * 100 / dimensions.height}%`}
 										style:width={`${(activeBox.bbox[2] - activeBox.bbox[0]) * 100 / dimensions.width}%`} style:height={`${(activeBox.bbox[3] - activeBox.bbox[1]) * 100 / dimensions.height}%`}></div>
+								{/if}
+								{#if compiledMask && compiledMask.observationId === selectedMask?.observationId && imageObservations}
+									<svg class="polygon-overlay" viewBox={`0 0 ${imageObservations.width} ${imageObservations.height}`} preserveAspectRatio="none" aria-label="Compiled mask polygon preview">
+										{#each compiledMask.polygons as polygon, index (index)}
+											<path d={`${polygon.outer.map(([x, y], point) => `${point ? 'L' : 'M'}${x} ${y}`).join(' ')} Z ${polygon.holes.map((ring) => `${ring.map(([x, y], point) => `${point ? 'L' : 'M'}${x} ${y}`).join(' ')} Z`).join(' ')}`} fill="#ffd34e66" fill-rule="evenodd" stroke="#ffc928" stroke-width="2" vector-effect="non-scaling-stroke" />
+										{/each}
+									</svg>
 								{/if}
 							</div>
 						<p>{previewUrl && failedPreview === previewUrl ? 'This source preview is unavailable. Reload the chapter to check for a newer run.' : 'Source image coordinates · unsampled or unclassified areas are unknown.'}</p>
@@ -433,7 +548,7 @@
 					{@const { evidenceId, sourceRevision, analysisRevision, observationRevision, width, height } = imageObservations}
 					{#if reviewable.length}
 						<label>Observation to review
-							<select value={reviewObservation?.observationId ?? ''} onchange={(event) => selectReviewObservation(event.currentTarget.value)}>
+						<select value={reviewObservation?.observationId ?? ''} onchange={(event) => selectReviewObservation((event.currentTarget as HTMLSelectElement).value)}>
 								<option value="">Choose an observation</option>
 								{#each reviewable as item (item.observationId)}
 									<option value={item.observationId}>{item.kind === 'detection' ? `Detection ${item.ordinal + 1} · ${item.label}`
@@ -540,6 +655,7 @@
 	.chapter-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem; }
 	.chapter-heading a { color: inherit; }
 	.image-plane { position: relative; max-width: 100%; overflow: hidden; border-radius: .3rem; background-color: #ede4d1; background-image: linear-gradient(to right, #baa98b 1px, transparent 1px), linear-gradient(to bottom, #baa98b 1px, transparent 1px); background-size: 12.5% 12.5%; }
+	.polygon-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 	.image-plane img { display: block; width: 100%; height: 100%; object-fit: fill; }
 	.mask-preview { display: block; max-width: 100%; max-height: 18rem; object-fit: contain; margin: .5rem 0; }
 	.ocr-text { white-space: pre-wrap; overflow-wrap: anywhere; }

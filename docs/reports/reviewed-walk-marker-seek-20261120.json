@@ -1,0 +1,30 @@
+{
+  "report": "crime-scene-reviewed-walk-marker-seek-v1",
+  "date": "2026-11-20",
+  "status": "PARTIAL",
+  "likely_cause": "Reviewed ground-plane points were shown as a plot and source links, but the 3D walk preview supplied no case markers and had no marker-to-source-time seek callback.",
+  "scope": "Marker and accessible anchor-button seeking inside the reviewed walk preview; no claim of a full live reconstruction workflow.",
+  "change": "Render one scene marker for each reviewed ground-plane point. Clicking it resolves the point's source PTS and updates the shared scrub state, which drives the spline and AnimationMixer. Add keyboard-accessible timestamp buttons using the same seek action.",
+  "verification": [
+    {
+      "command": "npm run check:fast",
+      "observed": "svelte-check found 0 errors and 8 warnings in 2 files."
+    },
+    {
+      "command": "git diff --check",
+      "observed": "Exit code 0; only line-ending normalization warnings from the existing dirty worktree."
+    }
+  ],
+  "not_proven": [
+    "Real browser/WebGL marker pointer interaction and screenshot/readback.",
+    "Authenticated PostgreSQL and SeaweedFS persistence of saved animation assets.",
+    "Marker-triggered replay from an admitted scene event or cross-source coordinate alignment."
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/components/evidence/ReviewedWalkPreview.svelte",
+    "openspec/changes/crime-scene-reconstruction/tasks.md"
+  ],
+  "safe_next_command": "cd sveltekit-frontend; npm exec vitest run src/lib/courtroom/walk-path-v1.spec.ts src/lib/courtroom/animation-clip-registry-v1.spec.ts",
+  "smoke_command": "Open a reviewed ground-plane track in a signed-in case; click each in-scene marker and keyboard anchor button, confirm the source-time label and actor pose change together, then save/reopen and replay the scene revision.",
+  "report_path": "docs/reports/reviewed-walk-marker-seek-20261120.json"
+}
