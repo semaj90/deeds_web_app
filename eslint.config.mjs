@@ -34,6 +34,7 @@ export default ts.config(
     languageOptions: {
       parserOptions: {
         projectService: true,
+        tsconfigRootDir: import.meta.dirname,
         extraFileExtensions: ['.svelte'],
         parser: ts.parser,
         svelteConfig,
@@ -42,12 +43,27 @@ export default ts.config(
     rules: sharedRules,
   },
 
-  // Typed frontend TypeScript.
+  // Typed frontend TypeScript and Svelte components.
   {
-    files: ['sveltekit-frontend/**/*.{ts,mts,cts}', 'sveltekit-frontend/src/**/*.js'],
+    files: ['sveltekit-frontend/**/*.{ts,mts,cts}'],
     languageOptions: {
       parserOptions: {
         projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    rules: sharedRules,
+  },
+
+  // Frontend JavaScript is linted without project-service type information.
+  // Many app helpers are intentionally outside the TypeScript project; letting
+  // projectService discover a tsconfig for them causes multi-root ambiguity.
+  {
+    files: ['sveltekit-frontend/src/**/*.js'],
+    languageOptions: {
+      parserOptions: {
+        project: null,
+        projectService: false,
         tsconfigRootDir: import.meta.dirname,
       },
     },

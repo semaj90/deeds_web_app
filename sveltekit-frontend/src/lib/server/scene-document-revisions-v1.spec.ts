@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createHash } from 'node:crypto';
-import { appendSceneDocumentRevisionV1, readSavedStorybookChapterV1, readSavedImageStorybookChapterV1, matchesReviewedImageChapterV1, sceneRevisionCommandV1Schema, validateSceneRevisionBindingV1, validateNewSceneAnimationEventBindingsV1, validateSceneEvidenceSourceBindingsV1, validateSceneVideoEventBindingsV1, validateSceneGroundPlaneTrackProposalsV1, hashSceneDocumentV1, verifySceneDocumentRevisionReadbackV1 } from './scene-document-revisions-v1.js';
+import { appendSceneDocumentRevisionV1, readSceneDocumentRevisionV1, readSavedStorybookChapterV1, readSavedImageStorybookChapterV1, matchesReviewedImageChapterV1, sceneRevisionCommandV1Schema, validateSceneRevisionBindingV1, validateNewSceneAnimationEventBindingsV1, validateSceneEvidenceSourceBindingsV1, validateSceneVideoEventBindingsV1, validateSceneGroundPlaneTrackProposalsV1, hashSceneDocumentV1, verifySceneDocumentRevisionReadbackV1 } from './scene-document-revisions-v1.js';
 import { createSceneCalibrationV1, SPZ_DECODER_REVISION_V1, SPZ_GAUSSIAN_REPRESENTATION_REVISION_V1 } from '$lib/splat/scene-document-v1.js';
 import type { CalibrationAnchor } from '$lib/splat/calibration.js';
 import { fuseVideoEventsV1 } from '$lib/server/features/evidence/video/video-event-fusion-v1.js';
@@ -11,6 +11,7 @@ import { buildReviewedVideoStorybookChapterV1 } from '$lib/server/reconstruction
 import { parseWholeImageAnalysisRowV1 } from '$lib/server/evidence/whole-image-analysis-readback-v1.js';
 import { buildStorybookImagePrefillV1 } from '$lib/server/reconstruction/storybook-image-prefill-v1.js';
 import { buildReviewedImageStorybookChapterV1 } from '$lib/shared/storybook-image-chapter-v1.js';
+import { buildSceneGenerationPlanV1 } from '$lib/server/reconstruction/scene-generation-plan-v1.js';
 
 const caseId = '11111111-1111-4111-8111-111111111111';
 const sceneId = '22222222-2222-4222-8222-222222222222';
@@ -69,6 +70,100 @@ function imageChapterFixture() {
 }
 
 describe('scene document revision v1 admission', () => {
+	it('pins a house note to its event, evidence and original plan through revision readback', async () => {
+		const { binding, evidenceRow, videoAnalysis } = chapterFixture();
+		const plan = buildSceneGenerationPlanV1({
+			schema: 'parent-atlas.scene-generation-plan/v1', caseId, sceneId, expectedSceneRevision: 0,
+			generator: 'procedural-three-scene-v1', caseIntake: null,
+			narrative: { why: { status: 'unknown' }, how: { status: 'unknown' } },
+			sources: [{ evidenceId, sourceRevision, sha256: sourceRevision.slice(7) }],
+			actors: [], primitives: [], placements: [],
+			events: [{ eventId: 'EVENT-01', cueType: 'custom', label: 'Reported activity near desk',
+				status: 'hypothesis', reviewStatus: 'accepted', evidenceIds: [evidenceId],
+				clock: { evidenceId, clockId: `evidence:${evidenceId}`, startMs: binding.startMs, endMs: binding.endMs, uncertaintyMs: 200 },
+				sourceEvent: { sourceEvidenceId: evidenceId, sourceEventId: binding.eventId,
+					analysisRevision: binding.analysisRevision, startMs: binding.startMs, endMs: binding.endMs } }],
+			environment: { kind: 'four-bedroom-house', seed: 1, cellSizeMeters: 32,
+				extentMeters: { x: 32, z: 32 }, coordinateStatus: 'illustrative_uncalibrated' },
+			quality: { profile: 'retro', maxTextureDimension: 128, maxTriangles: 100_000, maxInstances: 20_000, activeSceneMemoryMiB: 8 },
+			provenance: { intakeStatus: 'USER_INTAKE_UNVERIFIED', clockPolicy: 'source_local_unaligned',
+				identityPolicy: 'pseudonymous_visual_handles', motivePolicy: 'unknown_or_cited_hypothesis' }
+		});
+		const note = { id: commandId, eventId: 'EVENT-01', sourceTimeMs: binding.startMs, text: 'Compare this placement with the source', objectId: 'bedroom-1-desk' };
+		const draft = { schema: 'parent-atlas.scene-preview-draft/v1', plan, annotations: [note] };
+		const evidenceBindings = [{ evidenceId, sourceRevision }];
+		const command = sceneRevisionCommandV1Schema.parse({ commandId, expectedRevision: 0,
+			manifest: manifest({ evidenceBindings, proceduralPreviewDraft: draft }) });
+		for (const altered of [{ ...note, sourceTimeMs: binding.endMs }, { ...note, objectId: 'invented-desk' }]) {
+			expect(sceneRevisionCommandV1Schema.safeParse({ ...command, manifest: manifest({
+				evidenceBindings, proceduralPreviewDraft: { ...draft, annotations: [altered] }
+			}) }).success).toBe(false);
+		}
+		expect(() => validateSceneRevisionBindingV1({ caseId, sceneId, command: { ...command, manifest: {
+			...command.manifest, proceduralPreviewDraft: { ...command.manifest.proceduralPreviewDraft!, plan: { ...plan, planHash: '0'.repeat(64) } }
+		} } })).toThrow('SCENE_REVISION_PLAN_HASH_MISMATCH');
+		for (const altered of [
+			{ ...videoAnalysis, analysisRevision: 'replacement' },
+			{ ...videoAnalysis, eventTimeline: { ...videoAnalysis.eventTimeline, events: videoAnalysis.eventTimeline.events.map((event) =>
+				({ ...event, reviewStatus: 'REJECTED', sceneAdmission: 'NOT_ADMITTED' })) } }
+		]) {
+			expect(() => validateSceneVideoEventBindingsV1({ caseId, manifest: command.manifest,
+				evidenceRows: [{ ...evidenceRow, aiAnalysis: { videoAnalysis: altered } }]
+			})).toThrow('SCENE_REVISION_VIDEO_EVENT_NOT_ADMITTED');
+		}
+		const lockEvidence = vi.fn().mockResolvedValue([evidenceRow]);
+		const select = vi.fn()
+			.mockReturnValueOnce({ from: () => ({ where: () => ({ limit: async () => [] }) }) })
+			.mockReturnValueOnce({ from: () => ({ where: () => ({ orderBy: () => ({ limit: async () => [] }) }) }) })
+			.mockReturnValueOnce({ from: () => ({ where: () => ({ orderBy: () => ({ for: lockEvidence }) }) }) });
+		let stored: Record<string, unknown> | undefined;
+		const transaction = (run: (transaction: unknown) => unknown) => run({
+			execute: vi.fn(), select,
+			insert: () => ({ values: (row: Record<string, unknown>) => ({ returning: async () => {
+				stored = JSON.parse(JSON.stringify(row));
+				return [row];
+			} }) })
+		});
+		const receipt = await appendSceneDocumentRevisionV1({ caseId, sceneId, command, actorId: 7 }, { transaction } as never);
+		expect(lockEvidence).toHaveBeenCalledWith('share');
+		const reopened = await readSceneDocumentRevisionV1({ caseId, sceneId, revision: 1 }, {
+			select: () => ({ from: () => ({ where: () => ({ limit: async () => [stored] }) }) })
+		} as never);
+		expect(reopened?.manifestSha256).toBe(receipt.manifestSha256);
+		expect(reopened?.manifest.proceduralPreviewDraft).toEqual(draft);
+	});
+	it('saves and reopens an evidence-free authored event cue through the scene revision owner', async () => {
+		const objectId = '55555555-5555-4555-8555-555555555555';
+		const cue = {
+			cueId: '66666666-6666-4666-8666-666666666666', eventId: '77777777-7777-4777-8777-777777777777',
+			clockId: 'SCENE-RELATIVE-01', timeBasis: 'SCENE_RELATIVE' as const, startMs: 1_000, endMs: 5_000,
+			uncertaintyMs: 0, visualizationStatus: 'UNREVIEWED_ILLUSTRATION' as const, source: { kind: 'AUTHORING' as const },
+			targets: [{ objectId, role: 'PROP' as const }], action: { type: 'visible_during_interval' as const, visible: true }
+		};
+		const object = { objectId, parentObjectId: null, name: 'Bonfire visual', kind: 'MESH' as const, assetSha256: null,
+			transform: { translation: [0, 0, 0] as [number, number, number], rotationXyzw: [0, 0, 0, 1] as [number, number, number, number], scale: [1, 1, 1] as [number, number, number] }, geometry: null };
+		const command = sceneRevisionCommandV1Schema.parse({ commandId, expectedRevision: 0,
+			manifest: manifest({ objects: [object], sceneTimelineCues: [cue] }) });
+		let stored: Record<string, unknown> | undefined;
+		const select = vi.fn()
+			.mockReturnValueOnce({ from: () => ({ where: () => ({ limit: async () => [] }) }) })
+			.mockReturnValueOnce({ from: () => ({ where: () => ({ orderBy: () => ({ limit: async () => [] }) }) }) });
+		const tx = {
+			execute: vi.fn().mockResolvedValue({ rows: [] }), select,
+			insert: () => ({ values: (row: Record<string, unknown>) => ({ returning: async () => { stored = row; return [row]; } }) })
+		};
+		const transaction = async (run: (transaction: unknown) => unknown) => run(tx);
+		const receipt = await appendSceneDocumentRevisionV1({ caseId, sceneId, command, actorId: 7 }, { transaction } as never);
+		expect(select).toHaveBeenCalledTimes(2); // replay and revision head only; no evidence lookup
+		expect(receipt.manifest.sceneTimelineCues).toEqual([cue]);
+		expect(receipt.manifest.evidenceBindings).toEqual([]);
+		const reopened = await readSceneDocumentRevisionV1({ caseId, sceneId }, {
+			select: () => ({ from: () => ({ where: () => ({ orderBy: () => ({ limit: async () => stored ? [stored] : [] }) }) }) })
+		} as never);
+		expect(reopened?.manifestSha256).toBe(receipt.manifestSha256);
+		expect(reopened?.manifest.sceneTimelineCues).toEqual([cue]);
+	});
+
 	it('re-derives still-image cells and mask digests against the exact case packet', () => {
 		const { row, chapter } = imageChapterFixture();
 		expect(chapter.citations).toEqual([

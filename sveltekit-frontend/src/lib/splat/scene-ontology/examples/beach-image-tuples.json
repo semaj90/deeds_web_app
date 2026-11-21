@@ -1,0 +1,148 @@
+{
+  "schema": "parent-atlas.scene-ontology.v1",
+  "nodes": [
+    {
+      "id": "source:image1",
+      "kind": "source",
+      "conceptId": "pa:observation.source.photo",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:beach-image",
+      "source": {
+        "sourceKind": "EVIDENCE",
+        "sourceId": "evidence:photo-1",
+        "evidenceId": "11111111-2222-4333-8444-555555555555",
+        "contentSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "modelId": "licensed-detector-candidate",
+        "runId": "demo-run-001",
+        "modelArtifactSha256": "3333333333333333333333333333333333333333333333333333333333333333",
+        "sourceRevision": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+      }
+    },
+    {
+      "id": "region:person1",
+      "kind": "region",
+      "conceptId": "pa:observation.image-region.bounding-box",
+      "origin": "MODEL_PROPOSAL",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:beach-image",
+      "region": {
+        "width": 1920,
+        "height": 1080,
+        "box": [
+          345,
+          220,
+          520,
+          890
+        ]
+      }
+    },
+    {
+      "id": "obs:person1",
+      "kind": "observation",
+      "conceptId": "pa:observation.model-output.person-proposal",
+      "origin": "MODEL_PROPOSAL",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:beach-image"
+    },
+    {
+      "id": "entity:person-proxy1",
+      "kind": "entity",
+      "conceptId": "pa:actor.representation.neutral-humanoid",
+      "origin": "MODEL_PROPOSAL",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:beach-image"
+    },
+    {
+      "id": "entity:image-plane",
+      "kind": "entity",
+      "conceptId": "pa:geometry.representation.source-image-plane",
+      "origin": "SOURCE_OBSERVATION",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:beach-image"
+    },
+    {
+      "id": "recipe:person-proxy",
+      "kind": "recipe",
+      "conceptId": "pa:actor.representation.neutral-humanoid",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:beach-image",
+      "recipeKey": "neutral-avatar-v1"
+    }
+  ],
+  "tuples": [
+    {
+      "subject": "obs:person1",
+      "predicate": "DETECTED_IN",
+      "object": "source:image1",
+      "origin": "MODEL_PROPOSAL",
+      "source": {
+        "sourceKind": "EVIDENCE",
+        "sourceId": "evidence:photo-1",
+        "evidenceId": "11111111-2222-4333-8444-555555555555",
+        "contentSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "modelId": "licensed-detector-candidate",
+        "runId": "demo-run-001",
+        "modelArtifactSha256": "3333333333333333333333333333333333333333333333333333333333333333",
+        "sourceRevision": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+      }
+    },
+    {
+      "subject": "obs:person1",
+      "predicate": "HAS_PIXEL_REGION",
+      "object": "region:person1",
+      "origin": "MODEL_PROPOSAL",
+      "source": {
+        "sourceKind": "EVIDENCE",
+        "sourceId": "evidence:photo-1",
+        "evidenceId": "11111111-2222-4333-8444-555555555555",
+        "contentSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "modelId": "licensed-detector-candidate",
+        "runId": "demo-run-001",
+        "modelArtifactSha256": "3333333333333333333333333333333333333333333333333333333333333333",
+        "sourceRevision": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+      }
+    },
+    {
+      "subject": "obs:person1",
+      "predicate": "PROPOSES_PROXY",
+      "object": "entity:person-proxy1",
+      "origin": "MODEL_PROPOSAL",
+      "source": {
+        "sourceKind": "EVIDENCE",
+        "sourceId": "evidence:photo-1",
+        "evidenceId": "11111111-2222-4333-8444-555555555555",
+        "contentSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "modelId": "licensed-detector-candidate",
+        "runId": "demo-run-001",
+        "modelArtifactSha256": "3333333333333333333333333333333333333333333333333333333333333333",
+        "sourceRevision": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+      },
+      "confidence": 0.84
+    },
+    {
+      "subject": "entity:person-proxy1",
+      "predicate": "INSTANCE_OF",
+      "object": "recipe:person-proxy",
+      "origin": "MODEL_PROPOSAL"
+    },
+    {
+      "subject": "entity:image-plane",
+      "predicate": "DERIVED_FROM",
+      "object": "source:image1",
+      "origin": "SOURCE_OBSERVATION",
+      "source": {
+        "sourceKind": "EVIDENCE",
+        "sourceId": "evidence:photo-1",
+        "evidenceId": "11111111-2222-4333-8444-555555555555",
+        "contentSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "modelId": "licensed-detector-candidate",
+        "runId": "demo-run-001",
+        "modelArtifactSha256": "3333333333333333333333333333333333333333333333333333333333333333",
+        "sourceRevision": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+      }
+    }
+  ],
+  "sceneNote": "The pixel box is a synthetic fixture example. No depth, real-world position, actor identity or observed activity is established."
+}

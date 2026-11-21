@@ -69,7 +69,10 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 		const admitted = hits.filter((hit) => {
 			const entry = entries.get(hit.chunkId);
 			if (!entry?.authority || !Number.isFinite(hit.score)) return false;
-			return !('citationText' in hit) || (hit.citationText.length > 0 && entry.quote.toLowerCase().includes(hit.citationText.toLowerCase()));
+			if ('citationText' in hit && typeof hit.citationText === 'string') {
+				return hit.citationText.length > 0 && entry.quote.toLowerCase().includes(hit.citationText.toLowerCase());
+			}
+			return !('citationText' in hit);
 		});
 		const compiled = compileContext({
 			request_id: randomUUID(),

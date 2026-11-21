@@ -17,7 +17,7 @@
 - [ ] 3.2 Audit and test A2A agent discovery/dispatch only for independently deployable owners; keep local calls local absent an isolation requirement.
 - [ ] 3.3 Verify MCP `tools/list` and authorized `tools/call` for selected read-only Atlas tools, including stable schemas, bounded inputs, structured outputs, and rejection before handler execution when unauthorized.
 - [ ] 3.4 Add adapter contract tests for existing LangChain/LangGraph and Mastra owners; preserve framework-neutral workflow and evidence contracts.
-- [ ] 3.5 Determine whether Deep Agents and Hermes have actual installed/runtime owners; leave them `NOT_PRESENT` or `UNVERIFIED` when absent and add no dependency solely for visibility.
+- [ ] 3.5 Determine whether Deep Agents and we were copying hermes, paperclip logic from their official github for deep agents langchain, mastra durable agents, have actual installed/runtime owners; leave them `NOT_PRESENT` or `UNVERIFIED` when absent and add no dependency solely for visibility.
 - [ ] 3.6 Verify OpenWiki/TOC discovery links cannot register, authorize, invoke, or promote a tool.
 
 ## 4. Preserve Retrieval and Context Authority

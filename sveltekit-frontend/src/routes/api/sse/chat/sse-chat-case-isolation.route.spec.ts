@@ -319,4 +319,16 @@ describe('POST /api/sse/chat: 2 users x 3 cases, denied requests stop at the gat
 		});
 		await response.body?.cancel().catch(() => {});
 	});
+
+	it('admits a dedicated scene-planner conversation under the explicit authorized case owner', async () => {
+		const conversationId = `scene-planner-${CASE_A1}`;
+		const response = await call({ conversationId, caseId: CASE_A1 });
+		expect(response.status).toBe(200);
+		expect(h.state.inserts.find((entry) => entry.table === 'chatMetadata')?.values).toMatchObject({
+			chatId: conversationId,
+			userId: USER_A,
+			caseId: CASE_A1,
+		});
+		await response.body?.cancel().catch(() => {});
+	});
 });

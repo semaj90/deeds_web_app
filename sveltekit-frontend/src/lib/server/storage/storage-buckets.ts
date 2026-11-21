@@ -19,6 +19,7 @@ export const LEGAL_CORPUS_BUCKET = 'legal-corpus' as const;
 export const FEDERAL_LAW_BUCKET = 'federal-law' as const;
 export const STATE_LAW_BUCKET = 'state-law' as const;
 export const LOCAL_LAW_BUCKET = 'local-law' as const;
+export const CHARACTER_ASSETS_BUCKET = 'character-assets' as const;
 
 const bucketName = z
 	.string()
@@ -101,5 +102,26 @@ export function assertStateLawBucket(bucket: string): void {
 export function assertLocalLawBucket(bucket: string): void {
 	if (bucket !== storageBuckets.localLaw) {
 		throw new Error(`LOCAL_LAW_BUCKET_MISMATCH: expected ${storageBuckets.localLaw}, got ${bucket}`);
+	}
+}
+
+/** Resolve the dedicated character-assets bucket while guaranteeing isolation from legal-evidence. */
+export function resolveCharacterAssetsBucket(env: Record<string, string | undefined> = process.env): string {
+	const raw = env.SEAWEED_CHARACTER_ASSETS_BUCKET;
+	const resolved = raw && raw.trim() !== '' ? bucketName.parse(raw.trim()) : CHARACTER_ASSETS_BUCKET;
+	if (resolved === EVIDENCE_BUCKET || resolved === storageBuckets.evidence) {
+		throw new Error('CHARACTER_ASSETS_BUCKET_COLLISION: character assets must never share legal-evidence bucket');
+	}
+	return resolved;
+}
+
+/** Guard for character-assets: ensures synthetic/illustrative character meshes never pollute legal-evidence. */
+export function assertCharacterAssetsBucket(bucket: string, env: Record<string, string | undefined> = process.env): void {
+	const expected = resolveCharacterAssetsBucket(env);
+	if (bucket === EVIDENCE_BUCKET || bucket === storageBuckets.evidence) {
+		throw new Error('CHARACTER_ASSETS_BUCKET_MISMATCH: character assets cannot use legal-evidence bucket');
+	}
+	if (bucket !== expected) {
+		throw new Error(`CHARACTER_ASSETS_BUCKET_MISMATCH: expected ${expected}, got ${bucket}`);
 	}
 }

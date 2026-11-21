@@ -1,0 +1,59 @@
+{
+  "tasks": [
+    {
+      "id": "source",
+      "stage": "SOURCE",
+      "after": []
+    },
+    {
+      "id": "detect",
+      "stage": "DETECT",
+      "after": [
+        "source"
+      ]
+    },
+    {
+      "id": "concept",
+      "stage": "CONCEPT",
+      "after": [
+        "detect"
+      ]
+    },
+    {
+      "id": "layout",
+      "stage": "LAYOUT",
+      "after": [
+        "concept"
+      ]
+    },
+    {
+      "id": "recipe",
+      "stage": "RECIPE",
+      "after": [
+        "layout"
+      ]
+    },
+    {
+      "id": "render",
+      "stage": "RENDER",
+      "after": [
+        "recipe"
+      ]
+    },
+    {
+      "id": "review",
+      "stage": "REVIEW",
+      "after": [
+        "render"
+      ]
+    },
+    {
+      "id": "save",
+      "stage": "SAVE",
+      "after": [
+        "review"
+      ]
+    }
+  ],
+  "policy": "Review and save have their own authorization gates; topological order is scheduling metadata only."
+}

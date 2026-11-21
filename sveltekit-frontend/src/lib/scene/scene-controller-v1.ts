@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { SceneScriptEngineV1, type SceneScriptRuntimeAdapterV1 } from './scene-script-engine-v1.js';
 
 export type SceneToolMode =
 	| 'select'
@@ -429,6 +430,36 @@ export class SceneControllerV1 {
 		this.history.execute(cmd, this.context);
 		this.dirty = true;
 		this.notify('object_removed', { id });
+	}
+
+	executeCommand(cmd: SceneCommand): void {
+		this.history.execute(cmd, this.context);
+		this.dirty = true;
+		this.notify('command_executed', { command: cmd });
+	}
+
+	executeScript(rawProgram: unknown, customAdapter?: SceneScriptRuntimeAdapterV1): { stepsExecuted: number; programId: string } {
+		const engine = new SceneScriptEngineV1();
+		const adapter: SceneScriptRuntimeAdapterV1 = customAdapter ?? {
+			cueCamera: (position, lookAt, durationMs) => {
+				this.notify('script_cue_camera', { position, lookAt, durationMs });
+			},
+			playAnimation: (targetId, clipName, timeSeconds) => {
+				this.notify('script_play_animation', { targetId, clipName, timeSeconds });
+			},
+			setVisibility: (targetId, visible) => {
+				this.notify('script_set_visibility', { targetId, visible });
+			},
+			highlightObservation: (observationId, observationSha256, targetId, colorHex) => {
+				this.notify('script_highlight_observation', { observationId, observationSha256, targetId, colorHex });
+			},
+			placeProxy: (proxyId, recipeId, position, snapToGround) => {
+				this.notify('script_place_proxy', { proxyId, recipeId, position, snapToGround });
+			}
+		};
+		const result = engine.execute(rawProgram, adapter);
+		this.notify('script_executed', result);
+		return result;
 	}
 
 	undo(): boolean {

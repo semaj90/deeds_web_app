@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { calibrationForEvidenceV1, createSceneCalibrationV1, createSceneDocumentV1, createSceneQualityReceiptV1, DERIVED_SCENE_ASSET_BYTE_BUDGET } from './scene-document-v1.js';
+import { evaluateSceneTimelineV1, sceneTimelineCueToRuntimeV1 } from './scene-event-visibility-v1.js';
 import type { CalibrationAnchor } from './calibration.js';
 
 const sceneId = 'f3c63bb4-50c9-4b13-8d52-5b144de1ae15';
@@ -254,6 +255,48 @@ describe('scene document v1', () => {
 		expect(() => createSceneDocumentV1(fixture({
 			caseId: sceneId, status: 'HYPOTHESIS', evidenceBindings: [sourceBinding], videoEventBindings: [{ ...eventBinding, endMs: 1200 }]
 		}))).toThrow(/interval must be positive/);
+	});
+
+	it('persists generic actor/prop cues while keeping authored blockouts evidence-free and evidence cues event-qualified', () => {
+		const authoredCue = {
+			cueId: localSourceId, eventId: parentId, clockId: 'SCENE-RELATIVE-01', timeBasis: 'SCENE_RELATIVE' as const,
+			startMs: 10_000, endMs: 20_000, uncertaintyMs: 0, visualizationStatus: 'UNREVIEWED_ILLUSTRATION' as const,
+			source: { kind: 'AUTHORING' as const }, targets: [{ objectId, role: 'PROP' as const }],
+			action: { type: 'visible_during_interval' as const, visible: true }
+		};
+		const authored = createSceneDocumentV1(fixture({ sceneTimelineCues: [authoredCue] }));
+		expect(authored.sceneTimelineCues?.[0]).toEqual(authoredCue);
+		expect(authored.evidenceBindings).toEqual([]);
+		const runtimeCue = sceneTimelineCueToRuntimeV1(authoredCue);
+		const target = { kind: 'primitive' as const, targetId: objectId, visible: false, positionMeters: [0, 0, 0] as [number, number, number] };
+		expect(evaluateSceneTimelineV1([target], [runtimeCue], 'SCENE-RELATIVE-01', 15_000)[0]?.visible).toBe(true);
+		expect(evaluateSceneTimelineV1([target], [runtimeCue], 'OTHER-LANE', 15_000)[0]?.visible).toBe(false);
+		expect(() => createSceneDocumentV1(fixture({ sceneTimelineCues: [{ ...authoredCue, timeBasis: 'SOURCE_WALL_CLOCK' }] }))).toThrow(/Evidence-free authoring cues must use the scene-relative clock/);
+		expect(() => createSceneDocumentV1(fixture({ sceneTimelineCues: [{ ...authoredCue, targets: [{ objectId: parentId, role: 'PROP' }] }] }))).toThrow(/target must exist in this manifest/);
+
+		const sourceRevision = `sha256:${hash}`;
+		const eventCue = {
+			...authoredCue, clockId: 'BANK-CAMERA-01', timeBasis: 'MEDIA_ELAPSED' as const,
+			source: { kind: 'EVIDENCE' as const, evidenceId: localSourceId, sourceRevision, analysisRevision: 'video-analysis-v1' }
+		};
+		const eventBinding = {
+			evidenceId: localSourceId, sourceRevision, analysisRevision: 'video-analysis-v1', eventId: parentId,
+			startMs: 5_000, endMs: 25_000, reviewState: 'APPROVED_FOR_SCENE_PROPOSAL' as const,
+			sourceClock: { clockId: 'BANK-CAMERA-01', timeBasis: 'MEDIA_ELAPSED' as const, uncertaintyMs: 0 }
+		};
+		const evidenceBacked = createSceneDocumentV1(fixture({
+			caseId: sceneId, status: 'HYPOTHESIS', evidenceBindings: [{ evidenceId: localSourceId, sourceRevision }],
+			videoEventBindings: [eventBinding], sceneTimelineCues: [eventCue]
+		}));
+		expect(evidenceBacked.sceneTimelineCues?.[0]?.source.kind).toBe('EVIDENCE');
+		expect(() => createSceneDocumentV1(fixture({
+			caseId: sceneId, status: 'HYPOTHESIS', evidenceBindings: [{ evidenceId: localSourceId, sourceRevision }],
+			sceneTimelineCues: [eventCue]
+		}))).toThrow(/must fit an approved event interval/);
+		expect(() => createSceneDocumentV1(fixture({
+			caseId: sceneId, status: 'HYPOTHESIS', evidenceBindings: [{ evidenceId: localSourceId, sourceRevision }],
+			videoEventBindings: [{ ...eventBinding, sourceClock: { ...eventBinding.sourceClock, clockId: 'OTHER-CAMERA' } }], sceneTimelineCues: [eventCue]
+		}))).toThrow(/must fit an approved event interval/);
 	});
 
 	it('stores recomputable SPZ-to-local-meter calibration bound to an admitted source hash', () => {

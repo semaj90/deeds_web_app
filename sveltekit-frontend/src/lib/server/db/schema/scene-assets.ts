@@ -19,8 +19,8 @@ export const sceneAssets = pgTable('scene_assets', {
 	uniqueIndex('scene_assets_case_scene_sha_uq').on(table.caseId, table.sceneId, table.sha256),
 	uniqueIndex('scene_assets_bucket_object_key_uq').on(table.bucket, table.objectKey),
 	index('scene_assets_case_scene_idx').on(table.caseId, table.sceneId),
-	check('scene_assets_format_ck', sql`${table.format} in ('GLB', 'SOG')`),
+	check('scene_assets_format_ck', sql`${table.format} in ('GLB', 'SOG', 'PNG', 'WEBP', 'MOTION_GLB')`),
 	check('scene_assets_sha256_ck', sql`${table.sha256} ~ '^[0-9a-f]{64}$'`),
 	check('scene_assets_byte_length_ck', sql`${table.byteLength} > 0 and ${table.byteLength} <= 67108864`),
-	check('scene_assets_content_type_ck', sql`(${table.format} = 'GLB' and ${table.contentType} = 'model/gltf-binary') or (${table.format} = 'SOG' and ${table.contentType} = 'application/vnd.parent-atlas.streamed-sog+json')`)
+	check('scene_assets_content_type_ck', sql`(${table.format} = 'GLB' and ${table.contentType} = 'model/gltf-binary') or (${table.format} = 'SOG' and ${table.contentType} = 'application/vnd.parent-atlas.streamed-sog+json') or (${table.format} = 'PNG' and ${table.contentType} = 'image/png') or (${table.format} = 'WEBP' and ${table.contentType} = 'image/webp') or (${table.format} = 'MOTION_GLB' and ${table.contentType} = 'model/gltf-binary')`)
 ]);

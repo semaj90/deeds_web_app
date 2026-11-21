@@ -65,6 +65,18 @@ export const actions = {
         .values({
           title: title.trim(),
           description,
+          metadata: {
+            caseSceneIntakeV1: {
+              schema: 'parent-atlas.case-scene-intake/v1',
+              status: 'USER_INTAKE_UNVERIFIED',
+              who: who.trim() || null,
+              what: what.trim() || null,
+              when: when.trim() || null,
+              where: where.trim() || null,
+              why: why.trim() || null,
+              how: how.trim() || null,
+            },
+          },
           priority: priority,
           userId: Number(locals.user.id),
           status: 'open' as const,

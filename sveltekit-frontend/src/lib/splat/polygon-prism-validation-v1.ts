@@ -98,6 +98,45 @@ export function triangulateSimplePolygonV1(points: readonly PolygonPointV1[]): U
 	return Uint16Array.from(triangles);
 }
 
+function pointInsidePolygonV1(point: PolygonPointV1, ring: readonly PolygonPointV1[]): boolean {
+	let inside = false;
+	for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+		const a = ring[i]!;
+	const b = ring[j]!;
+		const crosses = (a[1] > point[1]) !== (b[1] > point[1]) &&
+			point[0] < ((b[0] - a[0]) * (point[1] - a[1])) / (b[1] - a[1]) + a[0];
+		if (crosses) inside = !inside;
+	}
+	return inside;
+}
+
+/** Validate an outer ring plus non-overlapping interior rings for editable scene contours. */
+export function validatePolygonWithHolesV1(outer: readonly PolygonPointV1[], holes: readonly (readonly PolygonPointV1[])[]): void {
+	triangulateSimplePolygonV1(outer);
+	const rings = [outer, ...holes];
+	for (let holeIndex = 0; holeIndex < holes.length; holeIndex++) {
+		const hole = holes[holeIndex]!;
+		triangulateSimplePolygonV1(hole);
+		if (!pointInsidePolygonV1(hole[0]!, outer)) throw new RangeError('polygon hole lies outside the outer contour');
+		for (let i = 0; i < rings.length; i++) {
+			if (i === holeIndex + 1) continue;
+			const other = rings[i]!;
+			for (let a = 0; a < hole.length; a++) {
+				const aNext = (a + 1) % hole.length;
+				for (let b = 0; b < other.length; b++) {
+					const bNext = (b + 1) % other.length;
+					if (segmentsIntersect(hole[a]!, hole[aNext]!, other[b]!, other[bNext]!)) {
+						throw new RangeError('polygon rings intersect or touch');
+					}
+				}
+			}
+			if (i > 0 && (pointInsidePolygonV1(hole[0]!, other) || pointInsidePolygonV1(other[0]!, hole))) {
+				throw new RangeError('polygon holes overlap or nest');
+			}
+		}
+	}
+}
+
 export function estimatePolygonPrismTrianglesV1(vertexCount: number): number {
 	if (!Number.isInteger(vertexCount) || vertexCount < 3 || vertexCount > MAX_VERTICES) {
 		throw new RangeError(`polygon vertex count must be 3..${MAX_VERTICES}`);

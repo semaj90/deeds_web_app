@@ -16,31 +16,35 @@
 			authority: z.object({ kind: z.string(), citation: z.string(), jurisdiction: z.string() }),
 		})).max(6),
 	});
+	type JurisdictionItem = z.infer<typeof jurisdictionSchema>;
+	type AuthorityResult = z.infer<typeof resultSchema>;
+	type AuthorityItem = AuthorityResult['authorities'][number];
+
 	let visible = $state(false);
-	let jurisdictions = $state<z.infer<typeof jurisdictionSchema>[]>([]);
+	let jurisdictions: JurisdictionItem[] = $state([]);
 	let jurisdiction = $state('');
 	let question = $state('');
-	let state = $state<'idle' | 'loading' | 'ready' | 'error'>('idle');
+	let loadState: 'idle' | 'loading' | 'ready' | 'error' = $state('idle');
 	let searching = $state(false);
 	let error = $state('');
-	let result = $state<z.infer<typeof resultSchema> | null>(null);
-	let citing = $state<z.infer<typeof resultSchema> | null>(null);
+	let result: AuthorityResult | null = $state(null);
+	let citing: AuthorityResult | null = $state(null);
 	let citingTarget = $state('');
 	let checkingCites = $state(false);
 	let citingError = $state('');
 
 	async function open() {
 		visible = !visible;
-		if (!visible || state === 'ready' || state === 'loading') return;
-		state = 'loading';
+		if (!visible || loadState === 'ready' || loadState === 'loading') return;
+		loadState = 'loading';
 		try {
 			const response = await fetch(endpoint, { cache: 'no-store' });
 			if (!response.ok) throw new Error();
 			jurisdictions = z.object({ jurisdictions: z.array(jurisdictionSchema).max(100) }).parse(await response.json()).jurisdictions;
 			jurisdiction = jurisdictions.length === 1 ? jurisdictions[0].code : '';
-			state = 'ready';
+			loadState = 'ready';
 		} catch {
-			state = 'error';
+			loadState = 'error';
 		}
 	}
 
@@ -64,7 +68,7 @@
 		}
 	}
 
-	async function findCiting(entry: z.infer<typeof resultSchema>['authorities'][number]) {
+	async function findCiting(entry: AuthorityItem) {
 		if (!result || searching || checkingCites) return;
 		checkingCites = true;
 		citing = null;
@@ -91,7 +95,7 @@
 	}
 </script>
 
-{#snippet sourcePassage(entry: z.infer<typeof resultSchema>['authorities'][number])}
+{#snippet sourcePassage(entry: AuthorityItem)}
 	<h3>{entry.authority.citation}</h3>
 	<p>{entry.documentTitle} · {entry.authority.kind}{entry.pageStart ? ` · Page ${entry.pageStart}` : ''}</p>
 	<blockquote>{entry.quote}</blockquote>
@@ -110,9 +114,9 @@
 	<h2 id="storybook-authorities">Legal research</h2>
 	<button type="button" aria-expanded={visible} onclick={open}>{visible ? 'Close authority search' : 'Search linked authorities'}</button>
 	{#if visible}
-		{#if state === 'loading'}
+		{#if loadState === 'loading'}
 			<p role="status">Checking linked jurisdictions…</p>
-		{:else if state === 'error'}
+		{:else if loadState === 'error'}
 			<p role="status">Linked jurisdictions are unavailable.</p>
 		{:else if !jurisdictions.length}
 			<p>No official authorities with a registered jurisdiction are linked to this case.</p>

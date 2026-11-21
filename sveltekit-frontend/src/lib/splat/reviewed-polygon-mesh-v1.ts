@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { triangulateSimplePolygonV1, type PolygonPointV1 } from './polygon-prism-validation-v1.js';
+import { validatePolygonWithHolesV1, type PolygonPointV1 } from './polygon-prism-validation-v1.js';
 import type { MaskPolygonV1 } from './mask-contour-compiler-v1.js';
 
 export const REVIEWED_POLYGON_MESH_SCHEMA_V1 = 'atlas.reviewed-polygon-mesh.v1' as const;
@@ -29,38 +29,6 @@ function assertText(value: string, name: string): void {
 	if (typeof value !== 'string' || value.trim().length === 0 || value.length > 256) throw new TypeError(`${name} is invalid`);
 }
 
-function pointInside(point: PolygonPointV1, ring: readonly PolygonPointV1[]): boolean {
-	let inside = false;
-	for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-		const a = ring[i]!;
-		const b = ring[j]!;
-		const crosses = (a[1] > point[1]) !== (b[1] > point[1]) &&
-			point[0] < ((b[0] - a[0]) * (point[1] - a[1])) / (b[1] - a[1]) + a[0];
-		if (crosses) inside = !inside;
-	}
-	return inside;
-}
-
-function ringsIntersect(a: readonly PolygonPointV1[], b: readonly PolygonPointV1[]): boolean {
-	const orient = (p: PolygonPointV1, q: PolygonPointV1, r: PolygonPointV1) =>
-		(q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]);
-	for (let i = 0; i < a.length; i++) {
-		const p = a[i]!;
-		const q = a[(i + 1) % a.length]!;
-		for (let j = 0; j < b.length; j++) {
-			const r = b[j]!;
-			const s = b[(j + 1) % b.length]!;
-			const o1 = orient(p, q, r), o2 = orient(p, q, s), o3 = orient(r, s, p), o4 = orient(r, s, q);
-			if (((o1 > 0 && o2 < 0) || (o1 < 0 && o2 > 0)) && ((o3 > 0 && o4 < 0) || (o3 < 0 && o4 > 0))) return true;
-			if (o1 === 0 && r[0] >= Math.min(p[0], q[0]) && r[0] <= Math.max(p[0], q[0]) && r[1] >= Math.min(p[1], q[1]) && r[1] <= Math.max(p[1], q[1])) return true;
-			if (o2 === 0 && s[0] >= Math.min(p[0], q[0]) && s[0] <= Math.max(p[0], q[0]) && s[1] >= Math.min(p[1], q[1]) && s[1] <= Math.max(p[1], q[1])) return true;
-			if (o3 === 0 && p[0] >= Math.min(r[0], s[0]) && p[0] <= Math.max(r[0], s[0]) && p[1] >= Math.min(r[1], s[1]) && p[1] <= Math.max(r[1], s[1])) return true;
-			if (o4 === 0 && q[0] >= Math.min(r[0], s[0]) && q[0] <= Math.max(r[0], s[0]) && q[1] >= Math.min(r[1], s[1]) && q[1] <= Math.max(r[1], s[1])) return true;
-		}
-	}
-	return false;
-}
-
 function validateRecipe(recipe: ReviewedPolygonMeshRecipeV1): void {
 	if (!recipe || recipe.schema !== REVIEWED_POLYGON_MESH_SCHEMA_V1) throw new TypeError('POLYGON_MESH_SCHEMA_INVALID');
 	assertText(recipe.geometryRevision, 'geometryRevision');
@@ -72,16 +40,24 @@ function validateRecipe(recipe: ReviewedPolygonMeshRecipeV1): void {
 		throw new RangeError('POLYGON_MESH_SOURCE_DIMENSIONS_INVALID');
 	}
 	const { outer, holes } = recipe.polygon;
-	triangulateSimplePolygonV1(outer);
+	try {
+		validatePolygonWithHolesV1(outer, holes);
+	} catch (error) {
+		const message = error instanceof Error ? error.message : '';
+		if (message.includes('lies outside the outer')) throw new RangeError('POLYGON_MESH_HOLE_OUTSIDE_OUTER');
+		if (message.includes('rings intersect') || message.includes('holes overlap or nest')) throw new RangeError('POLYGON_MESH_HOLES_OVERLAP');
+		throw error;
+	}
 	for (const point of outer) if (point[0] < 0 || point[1] < 0 || point[0] > recipe.width || point[1] > recipe.height) throw new RangeError('POLYGON_MESH_VERTEX_OUTSIDE_SOURCE');
 	for (let i = 0; i < holes.length; i++) {
 		const hole = holes[i]!;
-		triangulateSimplePolygonV1(hole);
-		if (hole.some((point) => point[0] < 0 || point[1] < 0 || point[0] > recipe.width || point[1] > recipe.height || !pointInside(point, outer))) throw new RangeError('POLYGON_MESH_HOLE_OUTSIDE_OUTER');
-		if (ringsIntersect(outer, hole) || holes.slice(0, i).some((previous) => ringsIntersect(previous, hole) || pointInside(hole[0]!, previous) || pointInside(previous[0]!, hole))) {
-			throw new RangeError('POLYGON_MESH_HOLES_OVERLAP');
-		}
+		if (hole.some((point) => point[0] < 0 || point[1] < 0 || point[0] > recipe.width || point[1] > recipe.height)) throw new RangeError('POLYGON_MESH_HOLE_OUTSIDE_OUTER');
 	}
+}
+
+/** Validate a stored or edited image-space mesh recipe without allocating Three.js geometry. */
+export function validateReviewedPolygonMeshRecipeV1(recipe: ReviewedPolygonMeshRecipeV1): void {
+	validateRecipe(recipe);
 }
 
 /** Build a Three.js planar mesh from a reviewed contour without altering source pixels. */

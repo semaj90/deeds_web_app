@@ -7,6 +7,7 @@
 	import { STORYBOOK_REGION_GRID_SIZE } from '$lib/shared/storybook-region-review-v1.js';
 	import StorybookAuthorities from '$lib/components/evidence/StorybookAuthorities.svelte';
 	import StorybookScenePalette from '$lib/components/evidence/StorybookScenePalette.svelte';
+	import CaseScenePlanBuilder from '$lib/components/reconstruction/CaseScenePlanBuilder.svelte';
 	import type { ScenePalettePreviewV1 } from '$lib/splat/indexed-palette-artifact-v1.js';
 	import type { StorybookVideoCitationV1 } from '$lib/shared/storybook-video-chapter-v1.js';
 
@@ -71,6 +72,25 @@
 		<a class="case-action" href={`/cases/${encodeURIComponent(data.caseId)}/board`}>Open evidence board</a>
 		<a class="case-action" href={`/cases/${encodeURIComponent(data.caseId)}/board?view=detective`}>Place and save evidence marker</a>
 	</nav>
+
+	{#key data.caseId}
+		<CaseScenePlanBuilder caseId={data.caseId} caseSceneIntake={data.caseSceneIntake} evidenceItems={data.availableEvidence}
+			setSceneRequest={data.setSceneRequest} setSceneRequestError={data.setSceneRequestError}
+			scenePersistenceEnabled={data.scenePersistenceEnabled} />
+	{/key}
+	{#if data.sceneSources.some((scene) => scene.proceduralPreview)}
+		<section aria-label="Saved procedural drafts">
+			<h2>Saved scene drafts</h2>
+			<ul>
+				{#each data.sceneSources.filter((scene) => scene.proceduralPreview) as scene (scene.sceneId)}
+					<li><a data-sveltekit-reload href={`?previewScene=${scene.sceneId}&previewRevision=${scene.revision}#scene-builder-title`}>
+						{scene.proceduralPreview === 'four-bedroom-house' ? 'Four-bedroom house' : scene.proceduralPreview}
+						· Revision {scene.revision} · {scene.sceneId.slice(0, 8)}
+					</a></li>
+				{/each}
+			</ul>
+		</section>
+	{/if}
 
 	{#if data.loadError}
 		<p class="load-error" role="status">{data.loadError}</p>

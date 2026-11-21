@@ -38,6 +38,7 @@ export async function putFileToSeaweed(args: {
   contentType?: string;
   bucket?: string;
   metadata?: Record<string, string>;
+  ifAbsent?: boolean;
 }): Promise<{ etag: string | null }> {
   const result = await seaweed.send(
     new PutObjectCommand({
@@ -46,6 +47,7 @@ export async function putFileToSeaweed(args: {
       Body: args.bytes,
       ContentType: args.contentType,
       Metadata: args.metadata,
+      ...(args.ifAbsent ? { IfNoneMatch: '*' } : {}),
     })
   );
   return { etag: result.ETag ?? null };

@@ -97,7 +97,13 @@ export async function readCaseSceneE2E01BFixtureV1() {
 
 	const asset = fixture.assets[0];
 	if (!asset) throw new Error('CASE_SCENE_E2E_01B_ASSET_MISSING');
-	const bytes = await readFile(assetPath);
+	let bytes: Buffer;
+	try {
+		bytes = await readFile(assetPath);
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+		return { fixture, asset: null } as const;
+	}
 	const actualHash = createHash('sha256').update(bytes).digest('hex');
 	if (bytes.byteLength !== asset.byte_length || actualHash !== asset.sha256 || bytes.toString('ascii', 0, 4) !== 'glTF' || bytes.readUInt32LE(8) !== bytes.byteLength) {
 		throw new Error('CASE_SCENE_E2E_01B_ASSET_READBACK_MISMATCH');

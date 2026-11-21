@@ -65,6 +65,20 @@
       "requiresJournalEntry": false
     },
     {
+      "file": "manual/scene_generation_jobs_v1.sql",
+      "status": "active_candidate",
+      "reason": "Candidate-only case/scene-scoped generation orchestration with BLOCKOUT versus EVIDENCE_BACKED source snapshots, idempotency, bounded lease/retry metadata, and append-only transition events. Not rehearsed or applied; no route or worker writes these rows. scene_document_revisions remains the canonical saved scene owner.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/character_assets_v1.sql",
+      "status": "active_candidate",
+      "reason": "Candidate-only character assets and modular socket registry (MEM-05) foreign-keyed to cases.id and scene_assets.asset_id. Character asset versions cover retro/balanced/detailed LODs with byte bounds. Not applied to live database.",
+      "appliedBy": "not-applied",
+      "requiresJournalEntry": false
+    },
+    {
       "file": "manual/scene_markers.sql",
       "status": "active_candidate",
       "reason": "Evidence-board marker persistence: scene_markers, scene_events (command_id idempotency), scene_event_outbox. Rehearsed on a disposable PostgreSQL 18 database only; NOT applied to the live database.",

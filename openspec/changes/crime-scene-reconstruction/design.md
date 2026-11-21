@@ -5,8 +5,8 @@
 | ID | Decision | Status |
 |---|---|---|
 | DEC-A | Storyboard clip length is 20 s. The schema hard-codes it; a different length needs a new schema version. | Decided 2026-11-16 (operator) |
-| DEC-B | First output is a 2D storyboard. Rendered frames and interactive 3D follow later. | Decided 2026-11-16 (operator) |
-| DEC-C | Renderer for the 3D review editor: Three.js (plan) or Babylon (proposed split). | Open |
+| DEC-B | The primary delivered scene is a browser-based, interactive HTML5 reconstruction experience in the existing SvelteKit app. A 2D storyboard remains an optional review/export view, not a prerequisite before interactive 3D. | Updated 2026-11-20 (operator direction) |
+| DEC-C | Three.js is the primary browser renderer, using the existing scene and streaming owners. Unreal/Blender are optional authoring or native-export lanes; they are not required to build or run the web scene. | Decided 2026-11-20 (operator direction) |
 | DEC-D | Pose format: COCO-17 (already in the repo) or MediaPipe / RTMPose. | Open |
 | DEC-E | The 10 s pilot is a separate perception test, not a storyboard default. | Open (recommended) |
 | DEC-F | Pose ownership: `evidence_pose_*` own pose analysis; reviewed authority stays in the evidence revision until a migration is designed. | Recorded (operator reply, read as acceptance) |
@@ -19,7 +19,15 @@
 4. **Camera track:** keyframes `{t, position, lookAt, fov}` stored in the manifest. The renderer interpolates them; no runtime code chooses camera moves.
 5. **Primitives:** `src/lib/splat/scene-primitive-registry-v1.ts` (box, sphere, cylinder, cone, torus, rectangle, circle, and the sword's polygon-prism parts). A courtroom kit is a parent/child tree with positions in meters. Each kit entry needs a measured or documented size before it is used as evidence.
 6. **Anchors:** markers and evidence cards create anchors. An anchor is `measured` only when its source is a calibrated measurement; otherwise it is `hypothesis`. Placement never comes from FFT, cosine similarity, Hilbert transforms, PageRank or top-k ranking.
-7. **Output:** each storyboard panel records source revisions, the SceneIntent SHA-256, render settings, and the label "Demonstrative reconstruction — not original footage".
+7. **Output:** the primary output is a revision-pinned browser scene and event timeline; optional storyboard panels record source revisions, the SceneIntent SHA-256, render settings, and the label "Demonstrative reconstruction — not original footage".
+
+## Browser scene experience and event model
+
+The user-facing reconstruction target is a complete, interactive HTML5 scene experience hosted by the existing SvelteKit application. It may feel game-like through navigation, selection, scene controls, timeline playback, and event-triggered presentation; it is still an evidence-review visualization, not a game that turns allegations into established facts. The deliverable includes a populated environment, reusable actors/props, navigation and inspection controls, an event/timeline interface, and deterministic replay from a saved scene revision. It must work through the procedural Three.js path without Blender, Unreal, Ollama, or an AI call.
+
+Scene generation is driven by a versioned, reviewable plan built from the case intake, explicitly selected evidence, reviewed observations, and source-clock intervals. The plan distinguishes authored blockout parameters, source-backed observations, hypotheses, and unknowns. Every visual event carries its source ID, clock domain, source interval, uncertainty, evidence references, review status, and scene revision. Events only appear or animate on their own source-time lane until a reviewer accepts an explicit clock mapping; a cross-clock comparison must fail closed when no reviewed mapping exists. `why` remains unknown unless a reviewer accepts a cited hypothesis; no model or procedural rule may infer motive.
+
+The browser renderer streams a populated city, beach, or other user-selected environment through bounded spatial cells. Repeated buildings, vegetation, and props use shared geometry and per-cell instancing; the existing 256-slot primitive manager remains for actively edited objects. Timed effects (for example, a bonfire) are visible only for the matching event/source interval. The active authored-scene budget is reported separately from GPU textures, render targets, original evidence, decoded media, and inference memory. Unreal executable packaging and Blender optimization are optional derived outputs, never dependencies of the HTML5 experience.
 
 ## Tables and ownership
 
@@ -49,15 +57,18 @@ Follows the existing scene routes under `src/routes/api/cases/[id]/scenes/`: the
 
 | Method and path | Purpose | Notes |
 |---|---|---|
-| `POST /api/cases/[id]/scenes/jobs` | Create a scene job (SCENE-02) | Idempotent on `(case, evidence revisions, clipSeconds, seed)`. Body validated by Zod. Returns the existing job on replay. Writes gated. |
-| `GET /api/cases/[id]/scenes/jobs/[jobId]` | Read job status and failure reason | Read only. Status vocabulary: queued, running, completed, failed, source_missing. |
+| `POST /api/cases/[id]/scenes/jobs` | Create work that must outlive the HTTP request (SCENE-02) | Idempotent on `(case, scene, expected revision, input kind, canonical input hash)`. `BLOCKOUT` has an empty source snapshot; `EVIDENCE_BACKED` requires exact source IDs/revisions/hashes. Never create an `analysis_jobs` row for an evidence-free blockout. Writes gated. |
+| `GET /api/cases/[id]/scenes/jobs/[jobId]` | Read job status and failure reason | Case-authorized read only. Candidate status vocabulary: queued, running, completed, failed, canceled, source_missing, source_stale. |
 | `GET /api/cases/[id]/scenes/[sceneKey]/proposals` | List proposals (SceneIntent plus provenance) | Read only. Returns proposals with `kind` and citations. |
 | `POST /api/cases/[id]/scenes/[sceneKey]/proposals/[proposalId]/review` | Reviewer decision (REV-06, VR-14) | Server-side only. Checks case access, reviewer authority, the source revision and the expected scene revision, then writes an audit row. The client never sends the canonical state. Gated. |
 
 Rules:
-- Upload never creates a job. Only the explicit set-the-scene action does (SCENE-01).
-- The planner runs in a worker, not in the request (SCENE-04). The request returns the job id.
-- Every write goes through the existing scene-revision owner once MAP-01 is settled; no new scene table is created here.
+- Upload never creates a scene-generation job. Only an explicit user action can queue long-running work (SCENE-01).
+- Bounded parameter preparation, deterministic plan validation, and interactive procedural preview may remain request/response; they must not claim durable job state. The current `/scene-reconstruction/parameters` and `/scene-reconstruction/plans` routes are read-only and do not create jobs.
+- When work must continue after the request, persist orchestration in a case-and-scene-scoped `scene_generation_jobs` owner. Its input snapshot is explicitly `BLOCKOUT` with no evidence refs or `EVIDENCE_BACKED` with exact authorized source revisions/hashes. Do not use `analysis_jobs` as the scene aggregate; its `evidence_id` is required and it remains owned by source analysis.
+- A scene job stores status, retries, idempotency, and references only. Final scene content continues through the existing `scene_document_revisions` writer; derived bytes continue through the existing scene asset registry. A job completion must not itself mean reviewed or saved.
+- The planner/reconstruction worker runs outside the request for queued jobs (SCENE-04); the create response returns the durable job ID. RabbitMQ is only a wake-up transport, not job state.
+- Candidate-only `scene_generation_jobs_v1.sql` and matching Drizzle declarations now define the job/state-event contract. They have not been rehearsed or applied; no route, writer, or worker exists. Admit through the existing database migration and feature-gate process before enabling writes.
 - Routes are added only after the existing `[sceneKey]` and `[sceneId]` routes are checked for overlap.
 
 ## Uploaded-image storybook to scene workflow

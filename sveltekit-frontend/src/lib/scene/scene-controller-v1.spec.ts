@@ -206,5 +206,45 @@ describe('scene-controller-v1', () => {
 			expect(typeof log[0].id).toBe('string');
 			expect(typeof log[1].timestampMs).toBe('number');
 		});
+
+		it('executes validated scene script programs and notifies listeners', () => {
+			const controller = new SceneControllerV1();
+			const events: Array<{ type: string; payload?: unknown }> = [];
+			controller.subscribe((event) => events.push(event));
+
+			const script = {
+				schema: 'atlas.scene-script.v1',
+				programId: 'prog-demo-01',
+				steps: [
+					{
+						action: 'cue_camera',
+						position: [0, 5, 10],
+						lookAt: [0, 1, 0],
+						durationMs: 1200
+					},
+					{
+						action: 'play_animation',
+						targetId: 'actor-01',
+						clipName: 'Inspect',
+						timeSeconds: 2.5
+					},
+					{
+						action: 'set_visibility',
+						targetId: 'prop-desk-01',
+						visible: false
+					}
+				]
+			};
+
+			const result = controller.executeScript(script);
+			expect(result.stepsExecuted).toBe(3);
+			expect(result.programId).toBe('prog-demo-01');
+
+			const eventTypes = events.map((e) => e.type);
+			expect(eventTypes).toContain('script_cue_camera');
+			expect(eventTypes).toContain('script_play_animation');
+			expect(eventTypes).toContain('script_set_visibility');
+			expect(eventTypes).toContain('script_executed');
+		});
 	});
 });

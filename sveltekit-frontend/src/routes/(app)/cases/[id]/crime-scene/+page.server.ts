@@ -8,7 +8,10 @@ import { listInvestigation, listSummaryExports } from '$lib/server/investigation
 import { listLatestSceneDocumentSourceProjectionsV1, readSavedImageStorybookChapterV1, readSavedStorybookChapterV1 } from '$lib/server/scene-document-revisions-v1.js';
 import { formatEvidenceSourceRevisionV1 } from '$lib/server/evidence-source-revision-v1.js';
 import { buildVideoStorybookCoverageV1 } from '$lib/server/features/evidence/video/video-storybook-coverage-v1.js';
+import { CaseSceneIntakeContextV1Schema } from '$lib/reconstruction/case-scene-fetch-contract-v1.js';
 import { isUuid } from '$lib/server/validation.js';
+import { SetTheSceneRequestV1Schema, validateSetTheSceneHandoffV1 } from '$lib/reconstruction/set-the-scene-workflow-v1.js';
+import { ENV } from '$lib/server/env.server.js';
 
 function currentSourceRevision(hash: string | null) {
 	if (!hash) return null;
@@ -23,6 +26,9 @@ function currentSourceRevision(hash: string | null) {
 export const load: PageServerLoad = async ({ params, parent, url }) => {
 	const { caseData } = await parent();
 	const caseId = params.id;
+	const caseMetadata = caseData?.metadata && typeof caseData.metadata === 'object' && !Array.isArray(caseData.metadata) ? caseData.metadata as Record<string, unknown> : {};
+	const intake = CaseSceneIntakeContextV1Schema.safeParse(caseMetadata.caseSceneIntakeV1);
+	const caseSceneIntake = intake.success ? intake.data : null;
 	const chapterId = url.searchParams.get('chapter');
 	const requestedFrame = url.searchParams.get('frame');
 	const storyScene = url.searchParams.get('storyScene');
@@ -98,6 +104,18 @@ export const load: PageServerLoad = async ({ params, parent, url }) => {
 			savedImagePromise
 		]);
 		const media = availableEvidence.filter((item) => item.mimeType?.startsWith('video/') || item.mimeType?.startsWith('image/'));
+		const setSceneRequested = url.searchParams.get('setScene') === '1';
+		const setSceneParsed = setSceneRequested ? SetTheSceneRequestV1Schema.safeParse({
+			schema: 'parent-atlas.set-the-scene-request/v1', caseId,
+			mode: url.searchParams.get('mode') ?? 'evidence', prompt: url.searchParams.get('prompt') ?? '',
+			sourceEvidenceIds: url.searchParams.getAll('sourceEvidenceId')
+		}) : null;
+		const setSceneRequest = setSceneParsed?.success
+			? validateSetTheSceneHandoffV1(setSceneParsed.data, caseId, availableEvidence.map((source) => source.id))
+			: null;
+		const setSceneRequestError = setSceneRequested && !setSceneRequest
+			? 'The scene handoff was incomplete or its evidence is no longer available in this case. Review the sources and try again.'
+			: null;
 		const chapter = media.find((item) => item.id === chapterId) ?? media[0] ?? null;
 		let videoStorybook = null;
 		let storybookUnavailable = false;
@@ -125,6 +143,10 @@ export const load: PageServerLoad = async ({ params, parent, url }) => {
 		return {
 			caseId,
 			caseTitle: caseData?.title ?? '',
+			caseSceneIntake,
+			scenePersistenceEnabled: ENV.SCENE_PERSISTENCE_ENABLED,
+			setSceneRequest,
+			setSceneRequestError,
 			caseNumber: caseData?.caseNumber ?? null,
 			markers,
 			assets,
@@ -148,6 +170,10 @@ export const load: PageServerLoad = async ({ params, parent, url }) => {
 		return {
 			caseId,
 			caseTitle: caseData?.title ?? '',
+			caseSceneIntake,
+			scenePersistenceEnabled: ENV.SCENE_PERSISTENCE_ENABLED,
+			setSceneRequest: null,
+			setSceneRequestError: null,
 			caseNumber: caseData?.caseNumber ?? null,
 			markers: [],
 			assets: [],

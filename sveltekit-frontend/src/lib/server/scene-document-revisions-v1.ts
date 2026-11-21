@@ -14,6 +14,7 @@ import { buildStorybookImagePrefillV1 } from '$lib/server/reconstruction/storybo
 import { parseWholeImageAnalysisRowV1, readLatestWholeImageAnalysisRowV1, readStorybookImageReviewsV1 } from '$lib/server/evidence/whole-image-analysis-readback-v1.js';
 import type { StorybookImageObservationsV1 } from '$lib/shared/storybook-image-observations-v1.js';
 import { buildReviewedImageStorybookChapterV1, type StorybookImageChapterV1 } from '$lib/shared/storybook-image-chapter-v1.js';
+import { buildSceneGenerationPlanV1 } from '$lib/server/reconstruction/scene-generation-plan-v1.js';
 
 export const sceneRevisionCommandV1Schema = z.object({
 	commandId: z.uuid(),
@@ -70,6 +71,10 @@ export function validateSceneRevisionBindingV1(input: {
 	if (manifest.assets.some((asset) => asset.role === 'SOURCE')) throw new Error('SCENE_REVISION_SOURCE_ASSET_NOT_VERIFIED');
 	if (manifest.caseId !== caseId || manifest.sceneId !== sceneId) throw new Error('SCENE_REVISION_SCOPE_MISMATCH');
 	if (manifest.revision !== command.expectedRevision + 1) throw new Error('SCENE_REVISION_NUMBER_MISMATCH');
+	if (manifest.proceduralPreviewDraft) {
+		const { planHash, ...body } = manifest.proceduralPreviewDraft.plan;
+		if (buildSceneGenerationPlanV1(body).planHash !== planHash) throw new Error('SCENE_REVISION_PLAN_HASH_MISMATCH');
+	}
 	return { manifest, manifestSha256: hashSceneDocumentV1(manifest) };
 }
 
@@ -125,7 +130,14 @@ export function validateSceneVideoEventBindingsV1(input: {
 	evidenceRows: Array<{ id: string; caseId: string | null; hash: string | null; aiAnalysis: unknown }>;
 }): void {
 	const rows = new Map(input.evidenceRows.map((row) => [row.id, row]));
-	for (const binding of input.manifest.videoEventBindings ?? []) {
+	const plan = input.manifest.proceduralPreviewDraft?.plan;
+	const sourceRevisions = new Map(plan?.sources.map((source) => [source.evidenceId, source.sourceRevision]));
+	const draftBindings = (plan?.events ?? []).flatMap(({ sourceEvent }) => sourceEvent ? [{
+		evidenceId: sourceEvent.sourceEvidenceId, sourceRevision: sourceRevisions.get(sourceEvent.sourceEvidenceId),
+		analysisRevision: sourceEvent.analysisRevision, eventId: sourceEvent.sourceEventId,
+		startMs: sourceEvent.startMs, endMs: sourceEvent.endMs, chapter: undefined, requiresCurrentAnalysis: true
+	}] : []);
+	for (const binding of [...(input.manifest.videoEventBindings ?? []), ...draftBindings]) {
 		const row = rows.get(binding.evidenceId);
 		const canonicalRevision = row?.hash
 			? (row.hash.startsWith('sha256:') ? row.hash : `sha256:${row.hash}`)
@@ -140,6 +152,10 @@ export function validateSceneVideoEventBindingsV1(input: {
 		const rawTimeline = videoAnalysis && typeof videoAnalysis === 'object' && !Array.isArray(videoAnalysis)
 			? (videoAnalysis as Record<string, unknown>).eventTimeline
 			: null;
+		if ('requiresCurrentAnalysis' in binding &&
+			(videoAnalysis as { analysisRevision?: unknown } | null)?.analysisRevision !== binding.analysisRevision) {
+			throw new Error('SCENE_REVISION_VIDEO_EVENT_NOT_ADMITTED');
+		}
 		const timeline = videoEventTimelineV1Schema.safeParse(rawTimeline);
 		if (!timeline.success || timeline.data.evidenceId !== binding.evidenceId || timeline.data.caseId !== input.caseId
 			|| timeline.data.sourceRevision !== binding.sourceRevision || timeline.data.analysisRevision !== binding.analysisRevision) {
@@ -253,6 +269,11 @@ export async function appendSceneDocumentRevisionV1(input: {
 		const previousManifest = head
 			? verifySceneDocumentRevisionReadbackV1({ caseId: input.caseId, sceneId: input.sceneId, row: head }).manifest
 			: null;
+		const draftPlan = binding.manifest.proceduralPreviewDraft?.plan;
+		if (draftPlan && draftPlan.expectedSceneRevision !== currentRevision &&
+			draftPlan.planHash !== previousManifest?.proceduralPreviewDraft?.plan.planHash) {
+			throw new Error('SCENE_REVISION_CONFLICT');
+		}
 		validateNewSceneAnimationEventBindingsV1({ previousManifest, manifest: binding.manifest });
 		const expectedParentHash = head?.manifestSha256 ?? null;
 		if (binding.manifest.parentManifestSha256 !== expectedParentHash) throw new Error('SCENE_REVISION_PARENT_HASH_MISMATCH');
@@ -281,7 +302,7 @@ export async function appendSceneDocumentRevisionV1(input: {
 			const evidenceQuery = tx.select({ id: evidence.id, caseId: evidence.caseId, hash: evidence.hash, aiAnalysis: evidence.aiAnalysis })
 				.from(evidence).where(and(inArray(evidence.id, evidenceIds), isNull(evidence.deletedAt)));
 			const hasChapters = imageChapters.length > 0 || binding.manifest.videoEventBindings?.some((event) => event.chapter !== undefined);
-			const evidenceRows = await (hasChapters ? evidenceQuery.orderBy(asc(evidence.id)).for('share') : evidenceQuery);
+			const evidenceRows = await (hasChapters || draftPlan ? evidenceQuery.orderBy(asc(evidence.id)).for('share') : evidenceQuery);
 			validateSceneEvidenceSourceBindingsV1({ caseId: input.caseId, manifest: binding.manifest, evidenceRows });
 			validateSceneVideoEventBindingsV1({ caseId: input.caseId, manifest: binding.manifest, evidenceRows });
 			for (const chapter of imageChapters) {
@@ -373,6 +394,7 @@ export async function listLatestSceneDocumentSourceProjectionsV1(input: {
 		sceneId: string;
 		revision: number;
 		manifestSha256: string;
+		proceduralPreview?: NonNullable<SceneDocumentV1['proceduralPreviewDraft']>['plan']['environment']['kind'];
 		videoEventBindings: Omit<NonNullable<SceneDocumentV1['videoEventBindings']>[number], 'chapter'>[];
 		storybookChapters: Array<{ eventId: string; evidenceId: string; title: string; startMs: number; endMs: number }>;
 		imageStorybookChapter?: Pick<StorybookImageChapterV1, 'chapterId' | 'evidenceId' | 'title'>;
@@ -415,6 +437,7 @@ export async function listLatestSceneDocumentSourceProjectionsV1(input: {
 				sceneId: verified.sceneId,
 				revision: verified.revision,
 				manifestSha256: verified.manifestSha256,
+				proceduralPreview: verified.manifest.proceduralPreviewDraft?.plan.environment.kind,
 				videoEventBindings: videoEvents.map(({ chapter: _chapter, ...binding }) => binding),
 				storybookChapters: videoEvents.flatMap(({ chapter, eventId, evidenceId, startMs, endMs }) =>
 					chapter ? [{ eventId, evidenceId, title: chapter.title, startMs, endMs }] : [])

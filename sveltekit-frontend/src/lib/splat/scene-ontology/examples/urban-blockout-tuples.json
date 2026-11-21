@@ -1,0 +1,58 @@
+{
+  "schema": "parent-atlas.scene-ontology.v1",
+  "nodes": [
+    {
+      "id": "entity:road",
+      "kind": "entity",
+      "conceptId": "pa:space.outdoor-zone.road",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:urban-blockout"
+    },
+    {
+      "id": "entity:sidewalk",
+      "kind": "entity",
+      "conceptId": "pa:space.outdoor-zone.sidewalk",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:urban-blockout"
+    },
+    {
+      "id": "entity:lamppost",
+      "kind": "entity",
+      "conceptId": "pa:object.landscape.lamp-post",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:urban-blockout"
+    },
+    {
+      "id": "recipe:cylinder",
+      "kind": "recipe",
+      "conceptId": "pa:geometry.primitive.cylinder",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:urban-blockout",
+      "recipeKey": "cylinder:thin"
+    }
+  ],
+  "tuples": [
+    {
+      "subject": "entity:sidewalk",
+      "predicate": "CONNECTS_TO",
+      "object": "entity:road",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "entity:lamppost",
+      "predicate": "LOCATED_IN",
+      "object": "entity:sidewalk",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "entity:lamppost",
+      "predicate": "HAS_GEOMETRY",
+      "object": "recipe:cylinder",
+      "origin": "SYNTHETIC"
+    }
+  ]
+}
