@@ -908,3 +908,26 @@ This section records blockers only. It does not change any checkbox above. Evide
 | Wiring (corrected) | MOUNTED, covered by E2E | ENG-03 timeline, ENG-04 deformation brush and GOAP what-if panel are all in `SceneRuntimeRecipeCanvas.svelte` (uncommitted working copy). Earlier "not wired" note was stale. Crime-scene E2E asserts `SIMULATION_HYPOTHESIS · PLANNED`, brush PADF preview/undo, and `IMMUTABLE_EVIDENCE` lock. Unit: 4 specs, 18 tests pass (brush, GOAP, geometry kernel x2) | Full check still NOT_PROVEN; CASE-SCENE-E2E-13 stays `[~]` (cancel-in-UI, replay and conflict acceptance not shown) |
 | GeometryKernelV1 name collision | NOT A DUPLICATE; open naming decision | Two different lanes share a file name and an exported interface name. `src/lib/reconstruction/geometry-kernel-v1.ts` serves the prompt-driven scene flow (who/what/why/how from user uploads, polygon masks, 4bpp palettes, bounded queue). `src/lib/splat/geometry-kernel-v1.ts` serves SPZ splat reconstruction from uploaded images (backend capability probe). Both are unfinished and both target memory-saving flow. Neither is imported outside its own spec | Decide rename or namespace (for example `SceneKernelV1` and `SplatKernelV1`) so the names stop colliding; keep both lanes |
 | CASE-SCENE-E2E-12 scope | NOT_PROVEN, not started | Task text is profiling the completed vertical slice (geometry compile, artifact transfer, scene load, frame time, CPU/GPU memory, worker throughput) before any native path. The NES LUT AVX2 parity named in the pilot plan is a different capability | Operator decision on measurement harness and whether a browser run is in scope |
+
+## Status and next steps (2026-11-21, estimates from artifacts, not measured)
+
+Percentages are judgement from the files and tests named below, not measured completion.
+
+| Lane | Est. | Evidence | Not done |
+|---|---|---|---|
+| Scene ontology vocabulary (`src/lib/splat/scene-ontology/scene-ontology-catalog-v1.json`) | 40% | 506 concepts, 28 relations, no duplicate IDs, no dangling parents, all labelled; status `PROPOSED_SCENE_VOCABULARY_NOT_CANONICAL`; ontology specs 21/21 pass | No shape-primitive registry (geometry branch has 5 children); no operator-approved primitive list |
+| Prompt to plan (who/what/why/how) | 35% | `case-scene-fetch-contract`, `scene-assistant-patch`, `scene-generation-plan` modules and specs | Generation step not integrated; TRELLIS appears only as optional generator enum `trellis_optional`; `scene-compiler.ts` does not call it |
+| Upload to scene placement | 60% | `tests/e2e/evidence-upload-scene-placement.spec.ts` (2 tests) | Image-to-3D output not covered |
+| SPZ splat rendering (`src/lib/splat/`) | 50% | `tests/e2e/spz-renderer-fixture.spec.ts` (synthetic SPZ and SOG fixtures) | Real Niantic v4 file conformance still open |
+| Registry index with bitset, nibble, AVX2-512, hashmap-256, EmbeddingGemma2 768, MRL 512/256/128, latent awareness | 15% | Pieces exist in other lanes: 4bpp palette and bitset reference in `reconstruction/geometry-kernel-v1.ts`; latent and MRL in other owners | No single registry index; no AVX2-512 or hashmap-256 path in this lane |
+
+Kernel naming: `reconstruction/geometry-kernel-v1.ts` keeps `GeometryKernelV1`; `splat/geometry-kernel-v1.ts` renamed to `SplatGeometryKernelV1` (3 specs pass).
+
+Next steps, in order:
+1. Operator: approve a primitive list and its tier placement, then add it to the catalog as a new branch under `pa:geometry`. Until then the catalog stays `PROPOSED`.
+2. Decide whether TRELLIS is a required generation step or stays optional. Record the decision before wiring anything.
+3. Build the registry index as a derived projection of the catalog, with stable primitive IDs and tuple relations, after step 1. Use existing owners (`scene-ontology-linked-tuples-v1.ts`, `geometry-kernel-v1.ts`); do not add a second owner.
+4. Add an E2E for image-to-scene generation once step 2 is decided.
+5. Measure before any AVX2-512 or hashmap-256 work; keep the TypeScript path as the reference.
+6. Keep EmbeddingGemma2 and MRL work in their existing owners. Do not add a scene-local embedding lane.
+
