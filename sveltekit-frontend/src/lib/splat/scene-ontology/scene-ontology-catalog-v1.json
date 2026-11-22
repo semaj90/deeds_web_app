@@ -599,6 +599,18 @@
       "tier": 2
     },
     {
+      "id": "pa:geometry.primitive.triangle",
+      "parent": "pa:geometry.primitive",
+      "label": "Triangle",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.primitive.polygon",
+      "parent": "pa:geometry.primitive",
+      "label": "Convex Polygon (fan-triangulated)",
+      "tier": 2
+    },
+    {
       "id": "pa:geometry.composite",
       "parent": "pa:geometry",
       "label": "Composite",
@@ -3183,5 +3195,89 @@
       "objectKind": "cue"
     }
   ],
-  "note": "Labels are scene authoring concepts, not asserted facts about evidence or alleged conduct."
+  "note": "Labels are scene authoring concepts, not asserted facts about evidence or alleged conduct.",
+  "n64PrimitiveBudgets": {
+    "status": "PROPOSED_DESIGN_BUDGET_NOT_MEASURED",
+    "basis": {
+      "rdramBaseBytes": 4194304,
+      "rdramWithExpansionPakBytes": 8388608,
+      "tmemBytes": 4096,
+      "rspVertexCacheEntries": 32,
+      "vertexRecordBytes": 16,
+      "note": "Hardware figures from N64 documentation as commonly cited; confirm against the target toolchain before use. All per-primitive limits below are design proposals."
+    },
+    "perPrimitive": {
+      "pa:geometry.primitive.triangle": {
+        "maxVerts": 3,
+        "maxTris": 1
+      },
+      "pa:geometry.primitive.polygon": {
+        "maxVerts": 8,
+        "maxTris": 6,
+        "maxSides": 8,
+        "convexOnly": true
+      },
+      "pa:geometry.primitive.rectangle": {
+        "maxVerts": 4,
+        "maxTris": 2
+      },
+      "pa:geometry.primitive.plane": {
+        "maxVerts": 4,
+        "maxTris": 2
+      },
+      "pa:geometry.primitive.circle": {
+        "maxVerts": 9,
+        "maxTris": 8,
+        "maxSegments": 8
+      },
+      "pa:geometry.primitive.line": {
+        "maxVerts": 4,
+        "maxTris": 2
+      },
+      "pa:geometry.primitive.box": {
+        "maxVerts": 8,
+        "maxTris": 12
+      },
+      "pa:geometry.primitive.sphere": {
+        "maxVerts": 64,
+        "maxTris": 96,
+        "maxSegments": 8,
+        "maxRings": 6
+      },
+      "pa:geometry.primitive.capsule": {
+        "maxVerts": 64,
+        "maxTris": 96,
+        "maxSegments": 8,
+        "maxRings": 6
+      },
+      "pa:geometry.primitive.cylinder": {
+        "maxVerts": 32,
+        "maxTris": 32,
+        "maxSegments": 8
+      },
+      "pa:geometry.primitive.cone": {
+        "maxVerts": 16,
+        "maxTris": 16,
+        "maxSegments": 8
+      },
+      "pa:geometry.primitive.torus": {
+        "maxVerts": 64,
+        "maxTris": 96,
+        "maxSegments": 8,
+        "maxRings": 6
+      },
+      "pa:geometry.primitive.polygon-prism": {
+        "maxVerts": 16,
+        "maxTris": 24,
+        "maxSides": 8,
+        "convexOnly": true
+      }
+    },
+    "sceneLimits": {
+      "vertsPerDrawBatch": 32,
+      "textureBytesPerTile": 2048,
+      "textureNote": "32x32 16-bit fits TMEM; larger textures must be tiled or 4bpp",
+      "primitivesPerScene": 512
+    }
+  }
 }
