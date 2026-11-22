@@ -1,0 +1,108 @@
+{
+  "schema": "atlas.openspec-conflict-free-batch.v1",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "maxConcurrentWorkers": 2,
+  "workerA": {
+    "role": "a2a-worker-a",
+    "ownedFiles": [
+      "grounded_nlp_fact_v1.py",
+      "python/tests/test_atlas_summary_claim_judge_v1.py",
+      "server.ts",
+      "server/atlas/residency/residency-controller-v1.ts"
+    ],
+    "tasks": [
+      {
+        "durableKey": "parent-atlas-compute-rank-cache-eval-dspy-gepa:HGR-FACT-01:1",
+        "locator": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L564",
+        "score": 85.0,
+        "ownedFiles": [
+          "grounded_nlp_fact_v1.py"
+        ],
+        "summary": "HGR-FACT-01 \u2014 reuse `grounded_nlp_fact_v1.py` strict dataclass and TypeScript canonical checksum roundtrip for extracted n-ary role-beari..."
+      },
+      {
+        "durableKey": "parent-atlas-ontology-kernel:NEXT-06:1",
+        "locator": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L5517",
+        "score": 85.0,
+        "ownedFiles": [
+          "server.ts"
+        ],
+        "summary": "NEXT-06 READY - Full-corpus extractor DRY RUN over all 238 indexed `+server.ts` routes (the 20-route sample was clean): measure extractio..."
+      },
+      {
+        "durableKey": "parent-atlas-tensor-residency-integration:MIG-17:1",
+        "locator": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md#L3012",
+        "score": 85.0,
+        "ownedFiles": [
+          "python/tests/test_atlas_summary_claim_judge_v1.py"
+        ],
+        "summary": "MIG-17 Python judge gate `python/tests/test_atlas_summary_claim_judge_v1.py` (negative case with bare alias `hforf`) is NOT_PROVEN in thi..."
+      },
+      {
+        "durableKey": "crime-scene-reconstruction:REG-DEQ-01:1",
+        "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L397",
+        "score": 80.0,
+        "ownedFiles": [
+          "server/atlas/residency/residency-controller-v1.ts"
+        ],
+        "summary": "REG-DEQ-01 Dequeue exists only in residency (`server/atlas/residency/residency-controller-v1.ts`) and packet binary registry. Not connect..."
+      }
+    ]
+  },
+  "workerB": {
+    "role": "a2a-worker-b",
+    "ownedFiles": [
+      "ace-wiki.ts",
+      "helper-registry-v1.ts",
+      "ranking-features.ts"
+    ],
+    "tasks": [
+      {
+        "durableKey": "parent-atlas-ml-graph-retrieval-convergence:ML-DATA-01:1",
+        "locator": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L16",
+        "score": 85.0,
+        "ownedFiles": [
+          "ranking-features.ts"
+        ],
+        "summary": "ML-DATA-01 Trace the actual feature/label producer from `ranking-features.ts`, existing policy reranker and XGBoost grouped ranking input..."
+      },
+      {
+        "durableKey": "parent-atlas-ml-graph-retrieval-convergence:SCAF-06:1",
+        "locator": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L89",
+        "score": 85.0,
+        "ownedFiles": [
+          "ranking-features.ts"
+        ],
+        "summary": "SCAF-06 Tie the new 8-feature adapter to the actual existing `ranking-features.ts` / XGBoost/ListMLE feature shape and model inputs via e..."
+      },
+      {
+        "durableKey": "atlas-directory-first-analysis-v1:TASK-L127:1",
+        "locator": "openspec/changes/atlas-directory-first-analysis-v1/tasks.md#L127",
+        "score": 80.0,
+        "ownedFiles": [
+          "helper-registry-v1.ts"
+        ],
+        "summary": "6.7 Reconcile the extension routing table in the coverage core with `helper-registry-v1.ts`; add an owner validator for `projection-admis..."
+      },
+      {
+        "durableKey": "parent-atlas-ace-rlm-bitfrost-integration:TASK-L7217:1",
+        "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L7217",
+        "score": 80.0,
+        "ownedFiles": [
+          "ace-wiki.ts"
+        ],
+        "summary": "Reconcile `ace-wiki.ts` with the HEVAL raw-trace/wiki/skill separation"
+      }
+    ]
+  },
+  "disjointVerified": true,
+  "skippedConflicts": [
+    {
+      "durableKey": "local-llm-offload-ownership:TASK-L284:1",
+      "conflictFiles": [
+        "server.ts"
+      ]
+    }
+  ]
+}

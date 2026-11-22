@@ -3,6 +3,7 @@
 	import type { PageData } from './$types';
 	import type { SceneTimedEventV1 } from '$lib/splat/scene-event-visibility-v1.js';
 	import SceneRuntimeRecipeCanvas from '$lib/components/reconstruction/SceneRuntimeRecipeCanvas.svelte';
+	import CaseScenePlanBuilder from '$lib/components/reconstruction/CaseScenePlanBuilder.svelte';
 	let { data }: { data: PageData } = $props();
 	let showV2Canvas = $state(untrack(() => Boolean(data.showV2CanvasInitial)));
 	let canvas = $state<HTMLCanvasElement>();
@@ -101,7 +102,14 @@
 	<p class="notice">All records and meshes here are synthetic. Curfew at 22:00 is unverified scenario context, not proof of a violation. The possible-drinking reports do not establish drinking, anyone’s age, or which person was involved. Coordinates are illustrative and uncalibrated.</p>
 	{#if data.conflictFixture}<p role="note">Synthetic test variation: Actor A has two overlapping illustrative movement proposals on one camera clock. Neither proposal is accepted as an observed action.</p>{/if}
 	{#if data.maskFixture}<p role="note">Synthetic contour editor fixture: the mask and review status are invented test data, not case evidence or a real reviewer decision. Its source-pixel edit is local and cannot be saved.</p>{/if}
-	{#if showV2Canvas}
+	{#if data.planBuilderFixture}
+		<CaseScenePlanBuilder
+			caseId={data.demoPlan.caseId}
+			caseSceneIntake={null}
+			evidenceItems={data.demoEvidenceItems}
+			scenePersistenceEnabled={false}
+		/>
+	{:else if showV2Canvas}
 		<SceneRuntimeRecipeCanvas
 			plan={data.demoPlan}
 			recipe={data.demoRecipe}

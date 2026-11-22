@@ -8,6 +8,7 @@ import {
   decodeTaskRecordsAndLatents,
   upsertKanbanDagPrefill,
   buildPrefillRows,
+  partitionConflictFreePrefillBatchV1,
   type DecodedTaskRecordV2
 } from './kanban-dag-prefill-v1.js';
 
@@ -287,6 +288,23 @@ describe('kanban-dag-prefill-v1', () => {
       const written = ['task_id', 'canonical_task_key', 'cohort_ordinal', 'change_id', 'status', 'routing_status', 'community_id', 'domain_id', 'morton_code', 'priority_score', 'final_score', 'routing_active_bit', 'umap_xyz', 'rot_6d', 'latent_64d', 'cohort_revision', 'source_revision', 'source_sha256', 'canonical_authority'];
       for (const c of written) expect(ddlColumns.has(c), `column ${c} missing from the candidate DDL`).toBe(true);
       expect(ddl).toMatch(/canonical_authority\s+BOOLEAN\s+NOT NULL DEFAULT FALSE CHECK \(canonical_authority = FALSE\)/);
+    });
+
+    it('partitions prefill rows into disjoint A2A/MCP worker queues and skips overlapping file owners', () => {
+      const r0 = rowOf(0);
+      const r1 = rowOf(1);
+      const r2 = rowOf(2);
+      const part = partitionConflictFreePrefillBatchV1([r0, r1, r2], {
+        [r0.canonicalTaskKey]: ['src/a.ts'],
+        [r1.canonicalTaskKey]: ['src/b.ts'],
+        [r2.canonicalTaskKey]: ['src/a.ts', 'src/b.ts'],
+      });
+      expect(part.canonicalAuthority).toBe(false);
+      expect(part.writesPerformed).toBe(false);
+      expect(part.disjointVerified).toBe(true);
+      expect(part.workerA.map((r) => r.canonicalTaskKey)).toEqual([r0.canonicalTaskKey]);
+      expect(part.workerB.map((r) => r.canonicalTaskKey)).toEqual([r1.canonicalTaskKey]);
+      expect(part.skippedConflicts).toEqual([r2.canonicalTaskKey]);
     });
   });
 });

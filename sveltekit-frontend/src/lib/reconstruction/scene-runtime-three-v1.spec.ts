@@ -157,6 +157,41 @@ describe('SceneRuntimeThreeV1', () => {
 		}
 	});
 
+	it('counts builds, evictions and cache releases for the performance dialog (LIVE-05)', () => {
+		const runtime = makeRuntime();
+		try {
+			const start = runtime.getResidencyMetrics();
+			expect(start).toMatchObject({ cellBuilds: 0, cellHits: 0, cellEvictions: 0, cacheReleases: 0 });
+			runtime.updateEnvironmentFocus([320, 0, 0], 'video-scrub', 2000);
+			runtime.drainEnvironmentCellQueue(1);
+			const built = runtime.getResidencyMetrics();
+			expect(built.cellBuilds).toBe(1);
+			// A release is counted.
+			const released = runtime.releasePreviewCache();
+			expect(released.releasedCells).toBeGreaterThanOrEqual(0);
+			expect(runtime.getResidencyMetrics().cacheReleases).toBe(1);
+		} finally {
+			runtime.dispose();
+		}
+	});
+
+	it('evicts cells when focus sweeps past the resident limit (LIVE-05 eviction counter)', () => {
+		const runtime = makeRuntime();
+		try {
+			// Walk focus across distant tiles, spaced beyond the unload grace period, and build cells as we go.
+			for (let step = 1; step <= 16; step++) {
+				runtime.updateEnvironmentFocus([step * 400, 0, 0], 'video-scrub', 10_000 * step);
+				runtime.drainEnvironmentCellQueue(4);
+			}
+			const counters = runtime.getResidencyMetrics();
+			expect(counters.cellBuilds).toBeGreaterThan(9);
+			expect(counters.cellEvictions).toBeGreaterThanOrEqual(1);
+			expect(counters.loadedCells).toBeLessThanOrEqual(counters.residentLimit);
+		} finally {
+			runtime.dispose();
+		}
+	});
+
 	it('scrubs one absolute source clock at a time and applies visibility and movement actions', () => {
 		const runtime = makeRuntime();
 		const actor = runtime.targetNodes.get('actor:ACTOR-01')!;

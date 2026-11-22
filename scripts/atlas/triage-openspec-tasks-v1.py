@@ -81,6 +81,8 @@ def classify_bucket(status: str, text: str) -> tuple[str, str]:
             "migration",
             "drizzle-kit",
             "postgres",
+            "live db schema",
+            "drizzle schema",
             "5434",
             "seaweedfs",
             "8333",
@@ -98,6 +100,8 @@ def classify_bucket(status: str, text: str) -> tuple[str, str]:
     if status == "~" or any(
         k in low
         for k in (
+            "blocked on",
+            "only after",
             "playwright",
             "e2e",
             "proof",

@@ -3,7 +3,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { appendTaskAttemptReceipt, readLastTaskAttemptReceipts, TASK_ATTEMPT_RECEIPTS_FILE } from './receipt-store';
+import { appendTaskAttemptReceipt, readLastTaskAttemptReceipts, readTaskAttemptReceiptForRevision, TASK_ATTEMPT_RECEIPTS_FILE } from './receipt-store';
 
 let dir: string;
 beforeEach(async () => {
@@ -41,6 +41,15 @@ describe('receipt-store', () => {
   it('rejects an invalid receipt without writing anything', async () => {
     await expect(appendTaskAttemptReceipt({ ...blocked, blockerClass: 'NONE' }, dir)).rejects.toThrow();
     expect((await readLastTaskAttemptReceipts(dir)).size).toBe(0);
+  });
+
+  it('ignores a later attempt for an older revision and an attempt for another task', async () => {
+    await appendTaskAttemptReceipt(blocked, dir);
+    await appendTaskAttemptReceipt({ ...blocked, taskRevision: 'sha256:older' }, dir);
+    await appendTaskAttemptReceipt({ ...blocked, logicalTaskKey: 'other:task' }, dir);
+    const result = await readTaskAttemptReceiptForRevision(['change:task', 'change#abc'], blocked.taskRevision, dir);
+    expect(result.current?.taskRevision).toBe(blocked.taskRevision);
+    expect(result.staleCount).toBe(1);
   });
 
   it('ignores malformed lines', async () => {

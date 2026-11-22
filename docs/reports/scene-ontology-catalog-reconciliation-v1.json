@@ -1,0 +1,3741 @@
+{
+  "schema": "atlas.scene-ontology-reconciliation.v1",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "catalogPath": "sveltekit-frontend/src/lib/splat/scene-ontology/scene-ontology-catalog-v1.json",
+  "conceptCount": 508,
+  "relationCount": 28,
+  "categoryCounts": {
+    "renderable": 258,
+    "not_applicable": 152,
+    "evidence_provenance": 66,
+    "event_action": 32,
+    "relationship": 28
+  },
+  "concepts": [
+    {
+      "id": "pa:space",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.site",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.site.urban",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "city.block.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.site.beach",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "beach.night.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.site.rural",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.site.suburban",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "city.block.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.site.industrial",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.site.park",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.site.highway",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.site.forest",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.site.waterfront",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.site.underground",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.building",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "city.block.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.building.house",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "house.four_bedroom.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.building.apartment",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "house.studio.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.building.studio",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "house.studio.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.building.condominium",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "city.block.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.building.townhouse",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "house.four_bedroom.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.building.hotel",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "city.block.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.building.motel",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "city.block.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.building.warehouse",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "house.four_bedroom.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.building.office",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "office.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.building.courthouse",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "house.four_bedroom.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.building.shop",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "city.block.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.building.restaurant",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "city.block.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.building.garage",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "city.block.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.floor",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.floor.ground",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.floor.upper",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.floor.basement",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.floor.attic",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.floor.mezzanine",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.floor.roof",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.bedroom",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "house.four_bedroom.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.bathroom",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "house.four_bedroom.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.kitchen",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "house.four_bedroom.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.living-room",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "house.four_bedroom.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.dining-room",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "house.four_bedroom.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.hallway",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "house.four_bedroom.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.foyer",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "house.four_bedroom.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.stairwell",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.study",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.nursery",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.laundry",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.utility",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.balcony",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.terrace",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.room.closet",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "house.four_bedroom.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone.sidewalk",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "road.parking_lot.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone.intersection",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone.crosswalk",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "road.parking_lot.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone.parking-lot",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "road.parking_lot.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone.alley",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "city.block.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone.road",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "road.parking_lot.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone.plaza",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone.patio",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone.yard",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone.sand-dune",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "beach.night.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone.shore",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "beach.night.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone.pier",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "beach.night.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone.pool",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.outdoor-zone.garden",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.structure",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.structure.wall",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.structure.floor-slab",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.structure.ceiling",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.structure.roof",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.structure.door",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.structure.window",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.structure.doorway",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.structure.stair",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.structure.railing",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.structure.pillar",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.structure.fence",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.structure.gate",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.structure.canopy",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.navigation",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.navigation.exit",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.navigation.entry",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.navigation.corridor",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.navigation.obstacle",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.navigation.accessible-path",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.navigation.portal",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:space.navigation.threshold",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.primitive",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.primitive.box",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.primitive.sphere",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:cylinder",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.primitive.cylinder",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:cylinder",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.primitive.cone",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:cylinder",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.primitive.torus",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.primitive.plane",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.primitive.circle",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.primitive.rectangle",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.primitive.line",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.primitive.capsule",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.primitive.polygon-prism",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.primitive.triangle",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.primitive.polygon",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.composite",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.composite.table",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.composite.sofa",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.composite.chair",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.composite.bed",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.composite.cabinet",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.composite.shelf",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.composite.lamp",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:cylinder",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.composite.door-frame",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.composite.staircase",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.composite.person-proxy",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.composite.vehicle-proxy",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.composite.beach-umbrella",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "beach.night.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.representation",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.representation.mesh",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.representation.glb",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.representation.skinned-mesh",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.representation.instanced-mesh",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.representation.billboard",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.representation.sprite",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.representation.gaussian-splat",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.representation.spz",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.representation.point-cloud",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.representation.depth-relief",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.representation.source-image-plane",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.shape-operation",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.shape-operation.translate",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.shape-operation.rotate",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.shape-operation.scale",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.shape-operation.group",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.shape-operation.parent-child",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.shape-operation.union",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.shape-operation.subtract",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.shape-operation.intersect",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.shape-operation.extrude",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.shape-operation.mirror",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.shape-operation.array",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.shape-operation.loft",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.precision",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.precision.schematic",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.precision.inferred",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.precision.relative-depth",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.precision.calibrated",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:geometry.precision.metric",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.furniture",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.furniture.chair",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.furniture.table",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.furniture.desk",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "office.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.furniture.sofa",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.furniture.bed",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.furniture.dresser",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.furniture.stool",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.furniture.shelf",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.furniture.bookcase",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.furniture.bench",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "courtroom.generic.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.furniture.nightstand",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.furniture.counter",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.fixture",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.fixture.sink",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:cylinder",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.fixture.toilet",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.fixture.bathtub",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.fixture.shower",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.fixture.faucet",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.fixture.switch",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.fixture.outlet",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.fixture.light-fixture",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.fixture.radiator",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.fixture.heater",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.appliance",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.appliance.oven",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.appliance.stove",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.appliance.refrigerator",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.appliance.microwave",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.appliance.kettle",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.appliance.dishwasher",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.appliance.washer",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.appliance.dryer",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.appliance.television",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.appliance.computer",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.personal-item",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.personal-item.plate",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.personal-item.cup",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.personal-item.glass",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.personal-item.knife",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.personal-item.fork",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.personal-item.spoon",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.personal-item.bottle",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.personal-item.bag",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.personal-item.phone",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.personal-item.wallet",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.personal-item.key",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.personal-item.shoes",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.personal-item.hat",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.transport",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.transport.car",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.transport.bicycle",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.transport.motorcycle",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.transport.bus",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.transport.truck",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.transport.boat",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.transport.scooter",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.landscape",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.landscape.tree",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:cylinder",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.landscape.shrub",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:cylinder",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.landscape.grass",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.landscape.rock",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.landscape.sand",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "prefab",
+        "recipeKey": "beach.night.v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.landscape.water",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.landscape.lamp-post",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:cylinder",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.landscape.trash-bin",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.landscape.fire-pit",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.evidence-proxy",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.evidence-proxy.marker",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.evidence-proxy.footprint-card",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.evidence-proxy.measurement-line",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.evidence-proxy.bounding-box",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.evidence-proxy.annotation-pin",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:object.evidence-proxy.trajectory-line",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "primitive",
+        "recipeKey": "registry-v1:box",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.representation",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.representation.neutral-humanoid",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.representation.generated-head",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.representation.portrait-card",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.representation.sprite",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.representation.low-poly-body",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.representation.rigged-body",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.representation.glb-actor",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.head",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.torso",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.left-arm",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.right-arm",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.left-hand",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.right-hand",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.left-leg",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.right-leg",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.left-foot",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.right-foot",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.eye",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.ear",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.mouth",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.nose",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.hair-card",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.component.clothing",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.role",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.role.anonymous-person",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.role.illustrative-participant",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.role.nonhuman-animal",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.role.environmental-agent",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.pose",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.pose.standing",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.pose.sitting",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.pose.kneeling",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.pose.lying",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.pose.crouching",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:actor.pose.idle",
+      "category": "renderable",
+      "recipe": {
+        "targetKind": "actor_template",
+        "recipeKey": "neutral-avatar-v1",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "id": "pa:material",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.wood",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.concrete",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.brick",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.plaster",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.tile",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.glass",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.stone",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.carpet",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.fabric",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.leather",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.metal",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.plastic",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.skin",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.hair",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.water",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.surface.sand",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.render",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.render.pbr",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.render.unlit",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.render.flat",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.render.toon",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.render.cel-outline",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.render.wireframe",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.render.vertex-color",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.render.texture-atlas",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.light-color",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.light-color.red",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.light-color.green",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.light-color.blue",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.light-color.yellow",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.light-color.cyan",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.light-color.magenta",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.light-color.white",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.light-color.black",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.color-model",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.color-model.rgb-additive",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.color-model.cmy-subtractive",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.color-model.pigment-mix",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.color-model.alpha-compositing",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:material.color-model.additive-blending",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:material",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.image-region",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.image-region.bounding-box",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.image-region.segmentation-mask",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.image-region.keypoint",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.image-region.pixel-point",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.image-region.polygon-region",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.model-output",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.model-output.object-detection",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.model-output.caption",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.model-output.optical-flow",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.model-output.depth-estimate",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.model-output.person-proposal",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.model-output.text-extraction",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.model-output.audio-transcript",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.source",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.source.photo",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.source.video",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.source.frame",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.source.audio",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.source.pdf",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.source.prompt",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.source.witness-account",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.status",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.status.raw",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.status.candidate",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.status.extracted",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.status.reviewed",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.status.rejected",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.status.unresolved",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.coordinate",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.coordinate.image-pixel",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.coordinate.normalized-uv",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.coordinate.image-depth",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.coordinate.camera-ray",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.coordinate.world-uncalibrated",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:observation.coordinate.world-calibrated",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:event",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.cue",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.cue.presence",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.cue.dialogue",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.cue.gesture",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.cue.interact",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.cue.move",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.cue.impact",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.cue.inspect",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.cue.approach",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.cue.exit",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.cue.enter",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.cue.dispute",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.cue.conflict",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.cue.uncertainty",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.temporal",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.temporal.start-time",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.temporal.end-time",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.temporal.duration",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.temporal.source-interval",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.temporal.replay-clock",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.review",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.review.unreviewed",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.review.proposed",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.review.accepted",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.review.rejected",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.review.disputed",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.motion",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.motion.static-preview",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.motion.proposed-trajectory",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.motion.reviewed-animation",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:event.motion.path-spline",
+      "category": "event_action",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.origin",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.origin.source-evidence",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.origin.derived-model-output",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.origin.hand-authored",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.origin.generated-fixture",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.origin.reviewed-reconstruction",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.trace",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.trace.case-id",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.trace.scene-id",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.trace.scene-revision",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.trace.evidence-id",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.trace.evidence-revision",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.trace.source-sha256",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.trace.artifact-sha256",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.trace.model-name",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.trace.model-version",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.trace.model-sha256",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.trace.run-id",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.review",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.review.unreviewed",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.review.human-reviewed",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.review.rejected",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.review.unknown",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.authority",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.authority.illustrative-hypothesis",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.authority.measured-source",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.authority.verified-artifact",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:provenance.authority.unauthorized",
+      "category": "evidence_provenance",
+      "recipe": null
+    },
+    {
+      "id": "pa:render",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.camera",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.camera.orthographic-topdown",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.camera.orthographic-isometric",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.camera.perspective",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.camera.orbit",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.camera.follow-actor",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.camera.photo-frustum",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.lod",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.lod.retro",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.lod.balanced",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.lod.detailed",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.lod.impostor",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.visibility",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.visibility.visible",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.visibility.hidden",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.visibility.selected",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.visibility.ghosted",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.visibility.faded",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.streaming",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.streaming.cell",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.streaming.morton-key",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.streaming.resident",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.streaming.evicted",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.streaming.pending-loading",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.streaming.scene-root",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.streaming.transform-arena",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.interaction",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.interaction.select",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.interaction.move",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.interaction.rotate",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.interaction.scale",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.interaction.drag",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.interaction.orbit",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.interaction.scrub",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:render.interaction.timeline",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:render",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.stage",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.stage.draft",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.stage.classify",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.stage.propose",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.stage.preview",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.stage.review",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.stage.authorize",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.stage.save",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.stage.readback",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.stage.reopen",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.stage.archive",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.job",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.job.queued",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.job.processing",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.job.completed",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.job.failed",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.job.source-missing",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.job.cancelled",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.compute",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.compute.node-typescript",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.compute.browser-worker",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.compute.n-api-cpp",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.compute.python-worker",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.compute.onnx-inference",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.compute.gpu-render",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.storage",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.storage.postgres",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.storage.scene-asset-revision",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.storage.seaweedfs",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.storage.valkey",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.storage.transient-hashmap",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.storage.qdrant-projection",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:workflow.storage.neo4j-projection",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:workflow",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.setting",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.setting.indoor",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.setting.urban",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.setting.beach",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.setting.coastal",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.setting.rural",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.setting.transit",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.setting.commercial",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.setting.residential",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.setting.public-space",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.case-category",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.case-category.unclassified",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.case-category.allegation",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.case-category.incident",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.case-category.disputed-event",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.case-category.recorded-event",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.case-category.reconstructed-hypothesis",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.purpose",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.purpose.illustration",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.purpose.investigation",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.purpose.training",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.purpose.review",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.purpose.comparison",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:scene-context.purpose.storyboard",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:scene-context",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety.claim",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety.claim.not-an-identity",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety.claim.not-a-measurement",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety.claim.not-an-observed-action",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety.claim.requires-review",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety.claim.uncertain-source",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety.claim.synthetic-only",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety.gate",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety.gate.case-membership",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety.gate.hash-match",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety.gate.source-revision-match",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety.gate.rights-qualified",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety.gate.human-approval",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    },
+    {
+      "id": "pa:safety.gate.cross-case-deny",
+      "category": "not_applicable",
+      "reason": "semantic_or_style_layer:pa:safety",
+      "recipe": null
+    }
+  ]
+}

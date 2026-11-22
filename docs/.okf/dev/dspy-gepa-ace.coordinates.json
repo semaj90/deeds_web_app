@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.external-doc-coordinates.v1",
+  "sources": {
+    "dspy-api": {
+      "provider": "stanfordnlp",
+      "product": "dspy",
+      "productVersion": "3.1.0",
+      "versionQualification": "EXACT_VERSION",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    "gepa-api": {
+      "provider": "gepa-ai",
+      "product": "gepa",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    "ace-upstream": {
+      "provider": "ace-agent",
+      "product": "agentic-context-engineering",
+      "productVersion": "git:82709de050e1db6e6ef2f07bcb0393560b94992a",
+      "versionQualification": "EXACT_VERSION",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    }
+  }
+}

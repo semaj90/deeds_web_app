@@ -1,0 +1,102 @@
+{
+  "schema": "atlas.openspec-conflict-free-batch.v1",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "maxConcurrentWorkers": 2,
+  "workerA": {
+    "role": "a2a-worker-a",
+    "ownedFiles": [
+      "ace-materializer.ts",
+      "hmm-section-classifier.ts",
+      "rrf-oracle.ts",
+      "sveltekit-frontend/src/lib/server/router/authority-ranking-bridge.ts"
+    ],
+    "tasks": [
+      {
+        "durableKey": "parent-atlas-agentic-repair-bundle-integration:TASK-L138:1",
+        "locator": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md#L138",
+        "score": 80.0,
+        "ownedFiles": [
+          "rrf-oracle.ts"
+        ],
+        "summary": "Use `rrf-oracle.ts` against frozen lane rankings and confirm mathematical agreement with"
+      },
+      {
+        "durableKey": "parent-atlas-agentic-repair-bundle-integration:TASK-L321:1",
+        "locator": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md#L321",
+        "score": 80.0,
+        "ownedFiles": [
+          "hmm-section-classifier.ts"
+        ],
+        "summary": "Do not touch `hmm-section-classifier.ts` or the `hmm-repair` Rust crate as part of this task"
+      },
+      {
+        "durableKey": "parent-atlas-agentic-repair-bundle-integration:TASK-L343:1",
+        "locator": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md#L343",
+        "score": 80.0,
+        "ownedFiles": [
+          "sveltekit-frontend/src/lib/server/router/authority-ranking-bridge.ts"
+        ],
+        "summary": "Wire `sveltekit-frontend/src/lib/server/router/authority-ranking-bridge.ts::"
+      },
+      {
+        "durableKey": "parent-atlas-branch-merge-consolidation-aug20:TASK-L120:1",
+        "locator": "openspec/changes/parent-atlas-branch-merge-consolidation-aug20/tasks.md#L120",
+        "score": 80.0,
+        "ownedFiles": [
+          "ace-materializer.ts"
+        ],
+        "summary": "`ace-materializer.ts`"
+      }
+    ]
+  },
+  "workerB": {
+    "role": "a2a-worker-b",
+    "ownedFiles": [
+      "centroid-compression.ts",
+      "deterministic-tool-ranker.ts",
+      "hmm/tool-router-hmm.ts",
+      "phase18-reranker.ts"
+    ],
+    "tasks": [
+      {
+        "durableKey": "parent-atlas-agentic-repair-bundle-integration:TASK-L318:1",
+        "locator": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md#L318",
+        "score": 80.0,
+        "ownedFiles": [
+          "deterministic-tool-ranker.ts"
+        ],
+        "summary": "Evaluate the Viterbi-decoded state path against `deterministic-tool-ranker.ts`'s current"
+      },
+      {
+        "durableKey": "parent-atlas-agentic-repair-bundle-integration:TASK-L324:1",
+        "locator": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md#L324",
+        "score": 80.0,
+        "ownedFiles": [
+          "hmm/tool-router-hmm.ts"
+        ],
+        "summary": "Do not resurrect or wire the orphaned `hmm/tool-router-hmm.ts` (T0a) \u2014 it has no"
+      },
+      {
+        "durableKey": "parent-atlas-best-fit-score-fabric:TASK-L2554:1",
+        "locator": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L2554",
+        "score": 80.0,
+        "ownedFiles": [
+          "phase18-reranker.ts"
+        ],
+        "summary": "the unrelated Phase 18 `phase18-reranker.ts` path remains a duplicate/unbuilt"
+      },
+      {
+        "durableKey": "parent-atlas-branch-merge-consolidation-aug20:TASK-L121:1",
+        "locator": "openspec/changes/parent-atlas-branch-merge-consolidation-aug20/tasks.md#L121",
+        "score": 80.0,
+        "ownedFiles": [
+          "centroid-compression.ts"
+        ],
+        "summary": "`centroid-compression.ts`"
+      }
+    ]
+  },
+  "disjointVerified": true,
+  "skippedConflicts": []
+}

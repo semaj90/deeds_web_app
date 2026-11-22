@@ -2,7 +2,10 @@ import type { PageServerLoad } from './$types';
 import { createHash } from 'node:crypto';
 import { CURFEW_BEACH_CASE_FIXTURE_V1 } from '$lib/server/reconstruction/fixtures/curfew-beach-case-v1.js';
 import { buildSceneGenerationPlanV1 } from '$lib/server/reconstruction/scene-generation-plan-v1.js';
-import { compileSceneRuntimeRecipeV1 } from '$lib/reconstruction/scene-runtime-recipe-v1.js';
+import {
+	attachModularPrefabAssemblyToRecipeV1,
+	compileSceneRuntimeRecipeV1
+} from '$lib/reconstruction/scene-runtime-recipe-v1.js';
 import { createSceneDocumentV1, createSceneQualityReceiptV1, stableStringifySceneDocumentV1 } from '$lib/splat/scene-document-v1.js';
 
 const DEMO_CASE_ID = '11111111-1111-4111-8111-111111111111';
@@ -134,6 +137,7 @@ const demoPlan = buildSceneGenerationPlanV1({
 });
 
 const demoRecipe = compileSceneRuntimeRecipeV1(demoPlan);
+const prefabDemoRecipe = attachModularPrefabAssemblyToRecipeV1(demoRecipe, 'courtroom.generic.v1');
 const { planHash: _demoPlanHash, ...demoPlanBody } = demoPlan;
 const conflictDemoPlan = buildSceneGenerationPlanV1({
 	...demoPlanBody,
@@ -183,14 +187,18 @@ const maskDemoRevision = {
 export const load: PageServerLoad = async ({ url }) => {
 	const conflictFixture = url.searchParams.get('conflict-fixture') === '1';
 	const maskFixture = url.searchParams.get('mask-fixture') === '1';
+	const prefabFixture = url.searchParams.get('prefab-fixture') === '1';
+	const planBuilderFixture = url.searchParams.get('plan-builder') === '1';
 	return ({
 	fixture: CURFEW_BEACH_CASE_FIXTURE_V1,
 	demoPlan: conflictFixture ? conflictDemoPlan : demoPlan,
-	demoRecipe: conflictFixture ? conflictDemoRecipe : demoRecipe,
+	demoRecipe: conflictFixture ? conflictDemoRecipe : prefabFixture ? prefabDemoRecipe : demoRecipe,
 	...(maskFixture ? { demoRevision: maskDemoRevision } : {}),
 	demoEvidenceItems: [{ id: DEMO_EVIDENCE_ID, title: 'Synthetic Beach Camera A (Read-Only Demo)', mimeType: 'text/plain' }],
-	showV2CanvasInitial: url.searchParams.get('v2') === '1' || conflictFixture || maskFixture,
+	showV2CanvasInitial: url.searchParams.get('v2') === '1' || conflictFixture || maskFixture || prefabFixture,
 	conflictFixture,
-	maskFixture
+	maskFixture,
+	prefabFixture,
+	planBuilderFixture
 	});
 };

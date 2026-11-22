@@ -15,6 +15,7 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL, SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import { VLM_MODELS } from '$lib/server/ollama.js';
 
 // ─── Response type ────────────────────────────────────────────────────────────
@@ -164,6 +165,15 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	let embedModelReady = false;
 
 	try {
+		const llamaTarget = await resolveLlamaInferenceTarget(3000);
+		if (llamaTarget?.model) {
+			chatModelReady = true;
+		}
+	} catch {
+		// Fall back to Ollama /api/tags check below if llama-server is offline
+	}
+
+	try {
 		const ctrl = new AbortController();
 		const tid = setTimeout(() => ctrl.abort(), 4000);
 		const r = await fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, {
@@ -176,7 +186,9 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 			const names = (body.models ?? []).map((m) => m.name.toLowerCase());
 			const chatModel = (VLM_MODELS.legal ?? SERVER_CHAT_MODEL).toLowerCase();
 			const embedModel = SERVER_EMBEDDING_MODEL.toLowerCase();
-			chatModelReady = names.some((n) => n.startsWith(chatModel.split(':')[0]));
+			if (!chatModelReady) {
+				chatModelReady = names.some((n) => n.startsWith(chatModel.split(':')[0]));
+			}
 			embedModelReady = names.some((n) => n.startsWith(embedModel.split(':')[0]));
 		}
 	} catch {

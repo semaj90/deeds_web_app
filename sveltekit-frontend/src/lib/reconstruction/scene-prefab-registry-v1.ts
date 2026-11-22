@@ -12,7 +12,7 @@
  */
 
 import { z } from 'zod';
-import { createHash } from 'node:crypto';
+import { sha256HexSync } from './sha256-sync-v1.js';
 import type { SceneGeometryRecipeV1, SceneObjectInstanceV1 } from './scene-object-registry-v1.js';
 import { createGeometryRecipeV1 } from './scene-object-registry-v1.js';
 import type { SceneConceptV1 } from './scene-ontology-bridge-v1.js';
@@ -71,7 +71,7 @@ export function hashScenePrefabV1(prefab: Omit<ScenePrefabV1, 'prefabHash'>): st
 			behaviorPolicy: c.behaviorPolicy
 		}))
 	};
-	return createHash('sha256').update(JSON.stringify(canonical), 'utf8').digest('hex');
+	return sha256HexSync(JSON.stringify(canonical));
 }
 
 export function createScenePrefabV1(input: Omit<ScenePrefabV1, 'prefabHash'>): ScenePrefabV1 {

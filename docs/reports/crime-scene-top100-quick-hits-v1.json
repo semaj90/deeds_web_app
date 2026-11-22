@@ -11,7 +11,7 @@
     "effectiveBackend": "networkx",
     "graphRevision": "openspec:crime-scene-reconstruction:tasks-v1",
     "nodeCount": 279,
-    "edgeCount": 286,
+    "edgeCount": 285,
     "status": "PROVEN",
     "canonicalAuthority": false,
     "error": null
@@ -50,8 +50,31 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-LIVE-04 \u00b7 Activity-aware memory and LOD \u00b7 CREATED and WIRED (partial). The case Three.js runtime now consumes the existing Mor...",
-      "pagerankScore": 0.004782,
+      "pagerankScore": 0.004777,
       "pagerankBoost": 3.61
+    },
+    {
+      "candidateOrdinal": 20,
+      "canonicalId": "openspec:crime-scene-reconstruction:SCENE-20#L40",
+      "line": 40,
+      "taskId": "SCENE-20",
+      "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L40",
+      "scopedTaskId": "openspec:crime-scene-reconstruction:SCENE-20#L40",
+      "status": "PARTIAL",
+      "rubricScore": 91,
+      "ontologyBoost": 2.0,
+      "score": 95.16,
+      "breakdown": {
+        "total": 91,
+        "readiness": 30,
+        "leverage": 25,
+        "friction": 20,
+        "scope": 6,
+        "clarity": 10
+      },
+      "summary": "SCENE-20 Primitive vocabulary and composition: reuse `scene-primitive-registry-v1.ts`, `scene-prefab-registry-v1.ts`, and the proposed 50...",
+      "pagerankScore": 0.002856,
+      "pagerankBoost": 2.16
     },
     {
       "candidateOrdinal": 263,
@@ -73,7 +96,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-LIVE-03-video-clock \u00b7 CREATED and WIRED, worktree base `4ae8253ab6e`. The scene preview can follow the selected lane's revisio...",
-      "pagerankScore": 0.004851,
+      "pagerankScore": 0.004846,
       "pagerankBoost": 3.66
     },
     {
@@ -96,7 +119,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-LIVE-05 \u00b7 Memory and performance modal \u00b7 CREATED and WIRED (partial). The scene preview dialog samples at 750 ms while open. I...",
-      "pagerankScore": 0.004702,
+      "pagerankScore": 0.004696,
       "pagerankBoost": 3.55
     },
     {
@@ -119,7 +142,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-LIVE-01 \u00b7 Assistant chat and editable proposals \u00b7 CREATED and WIRED (partial). The case scene builder now sends an explicit us...",
-      "pagerankScore": 0.005115,
+      "pagerankScore": 0.00511,
       "pagerankBoost": 3.86
     },
     {
@@ -142,7 +165,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-11-character-v2-alignment \u00b7 CREATED and WIRED (partial, 2026-11-20). Reconciled the Parent Atlas Character Creator v2 refe...",
-      "pagerankScore": 0.002022,
+      "pagerankScore": 0.00202,
       "pagerankBoost": 1.52
     },
     {
@@ -165,7 +188,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02c-5-edit-reopened CREATED and WIRED at worktree base `4ae8253ab6e`: reopening an editor-compatible draft restores its en...",
-      "pagerankScore": 0.005232,
+      "pagerankScore": 0.005227,
       "pagerankBoost": 3.95
     },
     {
@@ -188,7 +211,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-LIVE-01-selection-inspector \u00b7 CREATED, WIRED, and synthetic-browser-proven (partial, 2026-11-20). Selecting a scene object now...",
-      "pagerankScore": 0.005067,
+      "pagerankScore": 0.005062,
       "pagerankBoost": 3.82
     },
     {
@@ -211,7 +234,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-LIVE-01-overlapping-cue-conflicts \u00b7 CREATED, WIRED, and synthetic-browser-proven (partial, 2026-11-20). Runtime evaluation det...",
-      "pagerankScore": 0.005037,
+      "pagerankScore": 0.005031,
       "pagerankBoost": 3.8
     },
     {
@@ -234,7 +257,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02c-5-reviewed-video CREATED and WIRED at worktree base `4ae8253ab6e`: the case builder imports approved events from selec...",
-      "pagerankScore": 0.005231,
+      "pagerankScore": 0.005225,
       "pagerankBoost": 3.94
     },
     {
@@ -257,31 +280,8 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02c-5-procedural-draft CREATED and WIRED at worktree base `4ae8253ab6e`: save and reopen the illustrative plan and event/t...",
-      "pagerankScore": 0.005229,
+      "pagerankScore": 0.005223,
       "pagerankBoost": 3.94
-    },
-    {
-      "candidateOrdinal": 20,
-      "canonicalId": "openspec:crime-scene-reconstruction:SCENE-20#L40",
-      "line": 40,
-      "taskId": "SCENE-20",
-      "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L40",
-      "scopedTaskId": "openspec:crime-scene-reconstruction:SCENE-20#L40",
-      "status": "PARTIAL",
-      "rubricScore": 83,
-      "ontologyBoost": 2.0,
-      "score": 87.16,
-      "breakdown": {
-        "total": 83,
-        "readiness": 30,
-        "leverage": 25,
-        "friction": 16,
-        "scope": 6,
-        "clarity": 6
-      },
-      "summary": "SCENE-20 Primitive vocabulary and composition: reuse `scene-primitive-registry-v1.ts`, `scene-prefab-registry-v1.ts`, and the canonical 5...",
-      "pagerankScore": 0.002859,
-      "pagerankBoost": 2.16
     },
     {
       "candidateOrdinal": 261,
@@ -303,7 +303,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-LIVE-02-preview \u00b7 CREATED and WIRED (partial). The case builder shows evidence and plan preparation stages, aborts both fetch ...",
-      "pagerankScore": 0.004959,
+      "pagerankScore": 0.004953,
       "pagerankBoost": 3.74
     },
     {
@@ -326,7 +326,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-LIVE-08 \u00b7 Searchable scene recipe catalog \u00b7 CREATED and WIRED (partial). Added a deterministic local search index over the exi...",
-      "pagerankScore": 0.004363,
+      "pagerankScore": 0.004358,
       "pagerankBoost": 3.29
     },
     {
@@ -349,7 +349,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-09-report \u00b7 CREATED and WIRED (partial, 2026-11-20). Added `scene-revision-report-v1.ts` and an authorized `GET /api/cases...",
-      "pagerankScore": 0.00356,
+      "pagerankScore": 0.003556,
       "pagerankBoost": 2.68
     },
     {
@@ -372,7 +372,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-10-blockout-staging Playwright scenario authored for an evidence-free cue and object annotation. It compares the save rece...",
-      "pagerankScore": 0.002915,
+      "pagerankScore": 0.002912,
       "pagerankBoost": 2.2
     },
     {
@@ -395,7 +395,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-LIVE-01-event-targets \u00b7 CREATED and WIRED (partial). Editable event cues now accept one primary and up to 63 additional actor/...",
-      "pagerankScore": 0.005093,
+      "pagerankScore": 0.005088,
       "pagerankBoost": 3.84
     },
     {
@@ -418,7 +418,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02b-5-staging-evidence-proof The companion Playwright scenario imports a preapproved event from an authorized staging vide...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -441,7 +441,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-06c-chapter-entry The case page can open a saved illustrative scene with reviewed contours even if it has no procedural dr...",
-      "pagerankScore": 0.005185,
+      "pagerankScore": 0.005179,
       "pagerankBoost": 3.91
     },
     {
@@ -464,7 +464,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02b-job-lifecycle Added PostgreSQL transaction functions for scoped job claim, completion and recovery. Completion checks ...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -487,7 +487,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02b-job-enqueue The internal enqueue service shares the case and evidence resolver with the read-only preview route. It re...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -510,7 +510,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02b-5-worker-entry The existing analysis worker tick can recover up to eight expired scene leases and dispatch one eligibl...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -533,7 +533,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02b-5-builder The case builder exposes an explicit queue action for the resolved proposal when generation jobs are enabled...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -556,7 +556,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02b-5-recipe-read The case jobs route can return the completed recipe after current case/source/review and scene-revision ...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -579,7 +579,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02c-3-plan-actions Preserve optional visibility, movement, and timed-light presentation actions from the typed generation ...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -602,7 +602,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02c-3-camera Add an optional preset camera cue on the same source-clock interval as the existing object action. The scene ...",
-      "pagerankScore": 0.005239,
+      "pagerankScore": 0.005233,
       "pagerankBoost": 3.95
     },
     {
@@ -625,7 +625,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02c-3-lane-playback The case preview can play the entire selected clock lane through gaps and overlapping cues, stop at th...",
-      "pagerankScore": 0.005239,
+      "pagerankScore": 0.005233,
       "pagerankBoost": 3.95
     },
     {
@@ -648,7 +648,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-06c-contour-notes Reviewers can add notes directly to a selected source-pixel contour without authoring a timed event. The...",
-      "pagerankScore": 0.005175,
+      "pagerankScore": 0.005169,
       "pagerankBoost": 3.9
     },
     {
@@ -671,7 +671,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-E2E-02c-2-runtime-recipe-consumer Add a browser-side Three.js consumer for the validated runtime recipe. `createSceneRuntimeTh...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -694,7 +694,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02c-3-curfew-fixture Add a separate fictional curfew/beach event fixture: the stated 22:00 curfew is unverified jurisdicti...",
-      "pagerankScore": 0.005238,
+      "pagerankScore": 0.005232,
       "pagerankBoost": 3.95
     },
     {
@@ -717,7 +717,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02c-3-curfew-fixture Add a separate fictional curfew/beach event fixture: the stated 22:00 curfew is unverified jurisdicti...",
-      "pagerankScore": 0.005237,
+      "pagerankScore": 0.005231,
       "pagerankBoost": 3.95
     },
     {
@@ -740,7 +740,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-E2E-01C Typed East Quay Scene Bridge + Case Workspace Readback: port fixture helpers to TypeScript; render a synthetic actor a...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -763,7 +763,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02b-5-staging-proof Playwright defines an opt-in staging round trip for an evidence-free job. It queues through the case b...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -785,8 +785,8 @@
         "scope": 6,
         "clarity": 6
       },
-      "summary": "CASE-SCENE-E2E-02b-4 Durable job contract \u00b7 schema candidate created, not operational. Added the candidate-only Drizzle/SQL owner `scene_...",
-      "pagerankScore": 0.00524,
+      "summary": "CASE-SCENE-E2E-02b-4 Durable job contract \u00b7 schema candidate created, runtime path gated, live operation unproven. The Drizzle/SQL owner ...",
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -809,7 +809,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02b-5 Implement the worker/compiler adapter for admitted plans and immutable scene outputs. The worker now uses the existi...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -832,7 +832,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02b-5-dispatch The server runner connects one explicitly dispatched job to the lease owner and verified artifact compiler....",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -855,7 +855,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-E2E-02b-5-completion The job owner now locks the claimed row and rechecks canonical inputs inside the serializable completion ...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -878,7 +878,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02b-5-cancel The case job panel can request cancellation for queued or running jobs. The API validates session identity an...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -901,7 +901,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-E2E-02b-5-recover The case job panel reloads the session user's recent job from the case-scoped database owner and resumes sta...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -924,7 +924,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02c-3-captions The scene preview can display currently cited transcript excerpts at the playhead of a selected, approved v...",
-      "pagerankScore": 0.005239,
+      "pagerankScore": 0.005233,
       "pagerankBoost": 3.95
     },
     {
@@ -947,7 +947,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-E2E-02c-4-house-preview Wire the four-bedroom house into the existing case plan, runtime recipe and browser preview. The roofl...",
-      "pagerankScore": 0.005234,
+      "pagerankScore": 0.005229,
       "pagerankBoost": 3.95
     },
     {
@@ -970,7 +970,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-E2E-06c-reviewed-mask-preview Project accepted image-storyboard mask polygons into selectable Three.js image-plane meshes only...",
-      "pagerankScore": 0.005211,
+      "pagerankScore": 0.005205,
       "pagerankBoost": 3.93
     },
     {
@@ -993,7 +993,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-06c-scene-edit Save source-pixel contour edits as optional unreviewed derivatives in the existing procedural scene revisio...",
-      "pagerankScore": 0.005193,
+      "pagerankScore": 0.005187,
       "pagerankBoost": 3.92
     },
     {
@@ -1016,7 +1016,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02c-3-case-preview-lanes Add source-lane selection, event selection, play/pause, and absolute-time scrubbing to the author...",
-      "pagerankScore": 0.005238,
+      "pagerankScore": 0.005232,
       "pagerankBoost": 3.95
     },
     {
@@ -1039,7 +1039,7 @@
         "clarity": 10
       },
       "summary": "SCENE-13 Metric marker sizing: after calibration, size markers in meters of the real object, not screen pixels. Screen-constant size appl...",
-      "pagerankScore": 0.002515,
+      "pagerankScore": 0.002512,
       "pagerankBoost": 1.9
     },
     {
@@ -1062,7 +1062,7 @@
         "clarity": 2
       },
       "summary": "CASE-SCENE-LIVE-02 \u00b7 Cancelable parameter and plan requests. Use the builder's async parameter \u2192 authorized plan path. Only start it on a...",
-      "pagerankScore": 0.005001,
+      "pagerankScore": 0.004996,
       "pagerankBoost": 3.77
     },
     {
@@ -1085,7 +1085,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-E2E-02a Preserve case-intake WHO/WHAT/WHEN/WHERE/WHY/HOW as versioned, explicitly unverified JSONB and prepare case-authorized...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -1108,7 +1108,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-E2E-02c-1-case-builder-preview Add an explicit builder to the authorized crime-scene case page with blockout-first/evidence-fi...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -1131,7 +1131,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-E2E-02c-3-cue-manifest Add backward-compatible event cues to saved scene revisions so actor/prop targets, source-clock lanes, ...",
-      "pagerankScore": 0.005237,
+      "pagerankScore": 0.005231,
       "pagerankBoost": 3.95
     },
     {
@@ -1154,7 +1154,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-E2E-02c-3-dev Add a development-only cue panel to the synthetic scene manager preview. It edits a registered scene target, sou...",
-      "pagerankScore": 0.005236,
+      "pagerankScore": 0.00523,
       "pagerankBoost": 3.95
     },
     {
@@ -1177,7 +1177,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-E2E-01B Verified mesh seed + five-scene fixture: separate fictional Morrow Bay `State v. Unidentified Participants` from East ...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -1200,7 +1200,7 @@
         "clarity": 6
       },
       "summary": "14.6 COCO-17 index visualization and source frame: the supplied pose reference uses the same 0\u201316 joint order as `humanCoco17PoseSchemaV1...",
-      "pagerankScore": 0.004959,
+      "pagerankScore": 0.004953,
       "pagerankBoost": 3.74
     },
     {
@@ -1223,7 +1223,7 @@
         "clarity": 2
       },
       "summary": "CASE-SCENE-E2E-02b-2 Resolve plan refs through case access, current scene revision, current evidence-row SHA-256, latest accepted Storybo...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -1246,7 +1246,7 @@
         "clarity": 2
       },
       "summary": "CASE-SCENE-E2E-02b-5-seaweed The worker has a SeaweedFS entry point using the configured derived-artifact bucket, a conditional object wr...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -1269,7 +1269,7 @@
         "clarity": 2
       },
       "summary": "CASE-SCENE-E2E-02c-3-prop-rotation Add illustrative rotation around a registered prop's local vertical pivot with an angle bounded to \u00b118...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -1292,7 +1292,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-E2E-06c-local-vertex-editor The existing scene preview loads the original image through the case-authorized download route pin...",
-      "pagerankScore": 0.005206,
+      "pagerankScore": 0.0052,
       "pagerankBoost": 3.93
     },
     {
@@ -1315,7 +1315,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-E2E-06c-recipe-contract Extend the existing browser-safe scene-object recipe with optional source-pixel coordinate space, imag...",
-      "pagerankScore": 0.0052,
+      "pagerankScore": 0.005194,
       "pagerankBoost": 3.92
     },
     {
@@ -1338,7 +1338,7 @@
         "clarity": 2
       },
       "summary": "CASE-SCENE-E2E-06e-instanced-preview Wire camera-driven 32 m residency into the browser demo; render deterministic urban building/vehicle...",
-      "pagerankScore": 0.005163,
+      "pagerankScore": 0.005158,
       "pagerankBoost": 3.89
     },
     {
@@ -1361,7 +1361,7 @@
         "clarity": 2
       },
       "summary": "CASE-SCENE-E2E-13 Optional GOAP what-if simulation: keep source-backed/reviewed case events separate from simulated actions. Define a ren...",
-      "pagerankScore": 0.000786,
+      "pagerankScore": 0.000785,
       "pagerankBoost": 0.59
     },
     {
@@ -1384,7 +1384,7 @@
         "clarity": 2
       },
       "summary": "CASE-SCENE-E2E-01 Admit the synthetic seed through an explicit fixture/demo path. Map case, scene, participant, evidence, interview, even...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -1397,7 +1397,7 @@
       "status": "OPEN",
       "rubricScore": 61,
       "ontologyBoost": 0.0,
-      "score": 68.16,
+      "score": 68.52,
       "breakdown": {
         "total": 61,
         "readiness": 0,
@@ -1407,8 +1407,8 @@
         "clarity": 10
       },
       "summary": "SCENE-06 Artifact and activation gate: register immutable derived assets, case association, source revisions, scene revision, rights/mode...",
-      "pagerankScore": 0.0095,
-      "pagerankBoost": 7.16
+      "pagerankScore": 0.009965,
+      "pagerankBoost": 7.52
     },
     {
       "candidateOrdinal": 61,
@@ -1430,7 +1430,7 @@
         "clarity": 2
       },
       "summary": "15.D1 PARTIAL: `src/lib/splat/one-bone-rigid-skin-validator-v1.ts` (per-vertex rigid influence: one bone, weight 1, no blending; bone ind...",
-      "pagerankScore": 0.004026,
+      "pagerankScore": 0.004022,
       "pagerankBoost": 3.04
     },
     {
@@ -1453,7 +1453,7 @@
         "clarity": 2
       },
       "summary": "CASE-SCENE-E2E-02c-3-pulse-readback The case builder restores a procedural draft's pulse color, intensity range, and period when editing ...",
-      "pagerankScore": 0.005238,
+      "pagerankScore": 0.005233,
       "pagerankBoost": 3.95
     },
     {
@@ -1476,7 +1476,7 @@
         "clarity": 10
       },
       "summary": "SWEEP-RESUME-03 Restart: `cd sveltekit-frontend && ROUTE_SWEEP=1 npx playwright test tests/e2e/route-sweep.spec.ts`. Needs the dev server...",
-      "pagerankScore": 0.006048,
+      "pagerankScore": 0.006041,
       "pagerankBoost": 4.56
     },
     {
@@ -1499,7 +1499,7 @@
         "clarity": 6
       },
       "summary": "SCENE-08 Verification: an isolated worker/browser run proves authorized upload \u2192 explicit Set the scene \u2192 durable job/progress/failure \u2192 ...",
-      "pagerankScore": 0.009974,
+      "pagerankScore": 0.009964,
       "pagerankBoost": 7.52
     },
     {
@@ -1522,7 +1522,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-LIVE-03 \u00b7 Video-first editing. Use the selected video's source-local presentation time as the lane playhead. Keep evidence, re...",
-      "pagerankScore": 0.004909,
+      "pagerankScore": 0.004904,
       "pagerankBoost": 3.7
     },
     {
@@ -1535,7 +1535,7 @@
       "status": "OPEN",
       "rubricScore": 57,
       "ontologyBoost": 0.0,
-      "score": 63.49,
+      "score": 63.34,
       "breakdown": {
         "total": 57,
         "readiness": 0,
@@ -1545,8 +1545,8 @@
         "clarity": 6
       },
       "summary": "SCENE-01 Explicit case action: add Set the scene to the authorized evidence board. The user selects evidence for the scene; the action is...",
-      "pagerankScore": 0.008602,
-      "pagerankBoost": 6.49
+      "pagerankScore": 0.0084,
+      "pagerankBoost": 6.34
     },
     {
       "candidateOrdinal": 273,
@@ -1568,7 +1568,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-10 Prove the authorized browser round trip on the fictional fixture: choose case and path, add/select evidence, review one...",
-      "pagerankScore": 0.003264,
+      "pagerankScore": 0.00326,
       "pagerankBoost": 2.46
     },
     {
@@ -1591,7 +1591,7 @@
         "clarity": 6
       },
       "summary": "SCENE-12 Splat calibration receipt (Lane E): an SPZ has no real-world units. Solve a similarity transform (uniform scale, yaw about Y, tr...",
-      "pagerankScore": 0.002784,
+      "pagerankScore": 0.002781,
       "pagerankBoost": 2.1
     },
     {
@@ -1614,7 +1614,7 @@
         "clarity": 10
       },
       "summary": "SCENE-18 PARTIAL (2026-11-16): deterministic selector implemented in `sveltekit-frontend/src/lib/server/scene/clip-window-v1.ts` (policy ...",
-      "pagerankScore": 0.003965,
+      "pagerankScore": 0.003961,
       "pagerankBoost": 2.99
     },
     {
@@ -1637,7 +1637,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02c-5 Complete revisioned save/reopen through existing authorized scene/asset owners and prove in Playwright from a fresh ...",
-      "pagerankScore": 0.005233,
+      "pagerankScore": 0.005228,
       "pagerankBoost": 3.95
     },
     {
@@ -1660,7 +1660,7 @@
         "clarity": 2
       },
       "summary": "SCENE-01 follow-up (2026-11-19): uploads initiated from the case board now refresh the exhibit list but preserve the current board view. ...",
-      "pagerankScore": 0.009804,
+      "pagerankScore": 0.009793,
       "pagerankBoost": 7.39
     },
     {
@@ -1683,7 +1683,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-LIVE-07 \u00b7 Browser and persistence proof. In a signed-in staging case, stream a proposal while scrubbing, apply only selected f...",
-      "pagerankScore": 0.004495,
+      "pagerankScore": 0.00449,
       "pagerankBoost": 3.39
     },
     {
@@ -1706,7 +1706,7 @@
         "clarity": 2
       },
       "summary": "SCENE-07 Evidence interaction and failure behavior: support dragging/placing case evidence cards on scene markers with evidence ID and im...",
-      "pagerankScore": 0.009691,
+      "pagerankScore": 0.009681,
       "pagerankBoost": 7.31
     },
     {
@@ -1729,7 +1729,7 @@
         "clarity": 2
       },
       "summary": "AUD-07 CORRECTED 2026-11-16: a production crime-scene page exists at `src/routes/(app)/cases/[id]/crime-scene/`. Its server load reads `s...",
-      "pagerankScore": 0.000786,
+      "pagerankScore": 0.000785,
       "pagerankBoost": 0.59
     },
     {
@@ -1752,7 +1752,7 @@
         "clarity": 2
       },
       "summary": "SCENE-17 PARTIAL (2026-11-16): schema, validator and canonical SHA-256 implemented in `sveltekit-frontend/src/lib/server/scene/scene-inte...",
-      "pagerankScore": 0.004156,
+      "pagerankScore": 0.004152,
       "pagerankBoost": 3.13
     },
     {
@@ -1775,7 +1775,7 @@
         "clarity": 10
       },
       "summary": "CASE-01 Inventory the existing case, statute, canonical-document, and legal-PDF owners before adding indexes or tables. Verify current Po...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -1798,7 +1798,7 @@
         "clarity": 6
       },
       "summary": "SCENE-14 Lane C mesh master and FBX checklist: keep a Blender master file as the source of truth. Before any FBX export, record unit scal...",
-      "pagerankScore": 0.006103,
+      "pagerankScore": 0.006096,
       "pagerankBoost": 4.6
     },
     {
@@ -1821,7 +1821,7 @@
         "clarity": 6
       },
       "summary": "14.11 Text-grounded person-role proposals use the existing `python/atlas_role_evidence_v1.py` and `python/atlas_keyframe_analysis_v1.py` ...",
-      "pagerankScore": 0.004363,
+      "pagerankScore": 0.004358,
       "pagerankBoost": 3.29
     },
     {
@@ -1844,7 +1844,7 @@
         "clarity": 10
       },
       "summary": "SCENE-09 Typed 3D asset loading: qualify the viewer's GLB/glTF mesh path, FBX/OBJ import or normalization path, and SPZ Gaussian-splat pa...",
-      "pagerankScore": 0.010609,
+      "pagerankScore": 0.010598,
       "pagerankBoost": 8.0
     },
     {
@@ -1862,12 +1862,12 @@
         "total": 57,
         "readiness": 0,
         "leverage": 25,
-        "friction": 16,
-        "scope": 10,
+        "friction": 20,
+        "scope": 6,
         "clarity": 6
       },
-      "summary": "AUD-05 API gaps for the set-the-scene flow: no route creates or reads a scene job (SCENE-02), reads or reviews proposals (VR-14, REV-06),...",
-      "pagerankScore": 0.00112,
+      "summary": "AUD-05 API gaps for the set-the-scene flow: a case-scoped `/api/cases/[id]/scene-reconstruction/jobs` route now provides POST admission, ...",
+      "pagerankScore": 0.001119,
       "pagerankBoost": 0.84
     },
     {
@@ -1890,7 +1890,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-07 Persist a derived mesh/GLB through the existing case-scoped asset registry and scene-revision writer. PostgreSQL assign...",
-      "pagerankScore": 0.004208,
+      "pagerankScore": 0.004204,
       "pagerankBoost": 3.17
     },
     {
@@ -1913,7 +1913,7 @@
         "clarity": 2
       },
       "summary": "CASE-SCENE-LIVE-06 \u00b7 SvelteKit boundaries and acceleration. SSR loads authorized case and revision metadata and the shell. Mount Three.js...",
-      "pagerankScore": 0.004606,
+      "pagerankScore": 0.004601,
       "pagerankBoost": 3.47
     },
     {
@@ -1936,7 +1936,7 @@
         "clarity": 10
       },
       "summary": "VR-08 Investigator review gate: nothing moves into the scene-revision authority without an explicit reviewer action. Reuse the source-bou...",
-      "pagerankScore": 0.002641,
+      "pagerankScore": 0.002639,
       "pagerankBoost": 1.99
     },
     {
@@ -1959,7 +1959,7 @@
         "clarity": 10
       },
       "summary": "CASE-SCENE-E2E-02c-3-multitrack Add a declarative, deterministic multi-track event presentation model for actor motion, props/environment...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -1972,7 +1972,7 @@
       "status": "OPEN",
       "rubricScore": 49,
       "ontologyBoost": 0.0,
-      "score": 55.93,
+      "score": 55.76,
       "breakdown": {
         "total": 49,
         "readiness": 0,
@@ -1981,9 +1981,9 @@
         "scope": 6,
         "clarity": 2
       },
-      "summary": "SCENE-02 Durable job lifecycle: distinguish bounded read-only plan/preview requests from work that is actually queued. The current parame...",
-      "pagerankScore": 0.009196,
-      "pagerankBoost": 6.93
+      "summary": "SCENE-02 Durable job lifecycle: distinguish bounded read-only plan/preview requests from work that is actually queued. The parameter and ...",
+      "pagerankScore": 0.008959,
+      "pagerankBoost": 6.76
     },
     {
       "candidateOrdinal": 175,
@@ -2005,7 +2005,7 @@
         "clarity": 10
       },
       "summary": "PRX-05 Test: an OBJ and an FBX each convert to GLB with the hash recorded and the budget checked. The original file is never modified.",
-      "pagerankScore": 0.000786,
+      "pagerankScore": 0.000785,
       "pagerankBoost": 0.59
     },
     {
@@ -2028,7 +2028,7 @@
         "clarity": 10
       },
       "summary": "MEM-07 Acceptance Test: Multi-Scene Shared Texture & Persistence Gate:",
-      "pagerankScore": 0.000786,
+      "pagerankScore": 0.000785,
       "pagerankBoost": 0.59
     },
     {
@@ -2051,7 +2051,7 @@
         "clarity": 6
       },
       "summary": "14.10 Persistent local depth worker added at `python/atlas_depth_anything_worker_v1.py`: loads only the pinned snapshot once per process,...",
-      "pagerankScore": 0.004495,
+      "pagerankScore": 0.00449,
       "pagerankBoost": 3.39
     },
     {
@@ -2074,7 +2074,7 @@
         "clarity": 2
       },
       "summary": "SCENE-21 Evidence placement: markers and drag-and-drop evidence cards (SCENE-07, SCENE-11) create `evidenceAnchors`. An anchor is `measur...",
-      "pagerankScore": 0.001758,
+      "pagerankScore": 0.001756,
       "pagerankBoost": 1.33
     },
     {
@@ -2097,7 +2097,7 @@
         "clarity": 10
       },
       "summary": "SYN-07 Adversarial cases: off-screen event, occluded actor, similar-looking background motion, conflicting scripted labels, timestamp dri...",
-      "pagerankScore": 0.001454,
+      "pagerankScore": 0.001453,
       "pagerankBoost": 1.1
     },
     {
@@ -2120,7 +2120,7 @@
         "clarity": 2
       },
       "summary": "CASE-SCENE-E2E-02c-1 Build the case-bound HTML5 workspace shell with explicit blockout-first/evidence-first entry, authorized SSR metadat...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -2143,7 +2143,7 @@
         "clarity": 6
       },
       "summary": "CASE-SCENE-E2E-06d Choose and implement canonical persistence for editable recipes using existing scene revision ownership, including sta...",
-      "pagerankScore": 0.00515,
+      "pagerankScore": 0.005144,
       "pagerankBoost": 3.88
     },
     {
@@ -2166,7 +2166,7 @@
         "clarity": 10
       },
       "summary": "Add a reviewed motion/event path and note editor in the workspace backed by the existing case revision owner. Keep source-pixel paths and...",
-      "pagerankScore": 0.00356,
+      "pagerankScore": 0.003556,
       "pagerankBoost": 2.68
     },
     {
@@ -2189,8 +2189,31 @@
         "clarity": 2
       },
       "summary": "SCENE-16 Beat extraction (who/what/why/how): derive beats from the authorized timeline (`timeline-reconstruction-bridge.ts`, which alread...",
-      "pagerankScore": 0.004319,
+      "pagerankScore": 0.004314,
       "pagerankBoost": 3.26
+    },
+    {
+      "candidateOrdinal": 4,
+      "canonicalId": "openspec:crime-scene-reconstruction:SCENE-05#L14",
+      "line": 14,
+      "taskId": "SCENE-05",
+      "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L14",
+      "scopedTaskId": "openspec:crime-scene-reconstruction:SCENE-05#L14",
+      "status": "OPEN",
+      "rubricScore": 46,
+      "ontologyBoost": 0.0,
+      "score": 52.99,
+      "breakdown": {
+        "total": 46,
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 6,
+        "clarity": 6
+      },
+      "summary": "SCENE-05 Streamed asset derivation: for a rights-qualified splat admitted to streaming, run pinned SplatTransform steps separately to pro...",
+      "pagerankScore": 0.009255,
+      "pagerankBoost": 6.99
     },
     {
       "candidateOrdinal": 203,
@@ -2212,7 +2235,7 @@
         "clarity": 2
       },
       "summary": "CASE-SCENE-E2E-02c Deliver the complete browser-based HTML5 reconstruction experience in the existing SvelteKit + Three.js scene: populat...",
-      "pagerankScore": 0.00524,
+      "pagerankScore": 0.005234,
       "pagerankBoost": 3.95
     },
     {
@@ -2235,7 +2258,7 @@
         "clarity": 2
       },
       "summary": "CASE-SCENE-E2E-06c Wire polygon mesh selection and vertex editing into the existing Detective Mode scene, with explicit image-plane/uncal...",
-      "pagerankScore": 0.005216,
+      "pagerankScore": 0.00521,
       "pagerankBoost": 3.93
     },
     {
@@ -2258,7 +2281,7 @@
         "clarity": 10
       },
       "summary": "STORYBOOK-04 Build a chapter from a reviewed interval or storyboard revision and persist the exact observation citations through the scen...",
-      "pagerankScore": 0.002505,
+      "pagerankScore": 0.002502,
       "pagerankBoost": 1.89
     },
     {
@@ -2281,31 +2304,8 @@
         "clarity": 2
       },
       "summary": "CASE-SCENE-E2E-06e Connect tile/Morton/LOD helpers to the existing scene residency/render path with bounded load, grace-period unload, an...",
-      "pagerankScore": 0.005134,
+      "pagerankScore": 0.005128,
       "pagerankBoost": 3.87
-    },
-    {
-      "candidateOrdinal": 4,
-      "canonicalId": "openspec:crime-scene-reconstruction:SCENE-05#L14",
-      "line": 14,
-      "taskId": "SCENE-05",
-      "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L14",
-      "scopedTaskId": "openspec:crime-scene-reconstruction:SCENE-05#L14",
-      "status": "OPEN",
-      "rubricScore": 46,
-      "ontologyBoost": 0.0,
-      "score": 52.68,
-      "breakdown": {
-        "total": 46,
-        "readiness": 0,
-        "leverage": 18,
-        "friction": 16,
-        "scope": 6,
-        "clarity": 6
-      },
-      "summary": "SCENE-05 Streamed asset derivation: for a rights-qualified splat admitted to streaming, run pinned SplatTransform steps separately to pro...",
-      "pagerankScore": 0.008861,
-      "pagerankBoost": 6.68
     },
     {
       "candidateOrdinal": 36,
@@ -2327,7 +2327,7 @@
         "clarity": 2
       },
       "summary": "VR-09 Database: the draft adds five new tables (`video_reconstruction_runs`, `_tracks`, `_samples`, `_artifact_links`, `_scene_proposals`...",
-      "pagerankScore": 0.002183,
+      "pagerankScore": 0.002181,
       "pagerankBoost": 1.65
     }
   ]

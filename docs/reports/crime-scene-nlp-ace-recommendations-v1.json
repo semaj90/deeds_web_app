@@ -1,0 +1,158 @@
+{
+  "schema": "atlas.nlp-ace-recommendations.v1",
+  "authorityLabel": "CONTEXTUAL_AGENTIC_REPAIR_PROPOSAL",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "nlpSidecar8095": {
+    "reachable": true,
+    "status": "ok",
+    "contract": "provenance-v2",
+    "capabilities": {
+      "spacy": true,
+      "spacy_pos": true,
+      "langextract": true,
+      "tree_sitter": true,
+      "treesitter_chunker": true,
+      "ast_grep": true,
+      "torch": false,
+      "networkx": true,
+      "nx_cugraph": false,
+      "cugraph": false,
+      "cuvs": false,
+      "cupy": false,
+      "classification_helper": true
+    }
+  },
+  "sourcePacketSha256": "24bc9f5af2be377a4cad87f18b623c760d5cc90587b3b70711ea1dedc87ad9bf",
+  "topkSchema": "atlas.topk.v1",
+  "topkOrder": "SCORE_DESC_ORDINAL_ASC_ID_ASC",
+  "proposalWindow": "1-4 proposals",
+  "totalEvaluated": 16,
+  "live8095AnalyzedCount": 16,
+  "top4Proposals": [
+    {
+      "candidateOrdinal": 0,
+      "canonicalId": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-04#L859",
+      "taskId": "CASE-SCENE-LIVE-04",
+      "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L859",
+      "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-04#L859",
+      "domain": "memory_lod_residency",
+      "keywords": [
+        "memory",
+        "lod",
+        "case-scene-live-04",
+        "activity-aware",
+        "created",
+        "wired",
+        "partial",
+        "three"
+      ],
+      "nlp8095Attached": true,
+      "nlp8095Contract": null,
+      "ganLane": "WIRED_NEEDS_PROOF",
+      "score": 96.61,
+      "sourceRevision": "24bc9f5af2be377a4cad87f18b623c760d5cc90587b3b70711ea1dedc87ad9bf",
+      "evidenceRefs": [
+        "openspec/changes/crime-scene-reconstruction/tasks.md#L859"
+      ],
+      "kernelDagCandidate": {
+        "requiresSchemaGate": true,
+        "requiresIndependentReadback": true,
+        "autoPromoteAllowed": false
+      }
+    },
+    {
+      "candidateOrdinal": 1,
+      "canonicalId": "openspec:crime-scene-reconstruction:SCENE-20#L40",
+      "taskId": "SCENE-20",
+      "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L40",
+      "ConceptID": "openspec:crime-scene-reconstruction:SCENE-20#L40",
+      "domain": "character_v2",
+      "keywords": [
+        "pose",
+        "scene-20",
+        "primitive",
+        "vocabulary",
+        "composition",
+        "reuse",
+        "scene-primitive-registry-v1",
+        "scene-prefab-registry-v1"
+      ],
+      "nlp8095Attached": true,
+      "nlp8095Contract": null,
+      "ganLane": "WIRED_NEEDS_PROOF",
+      "score": 95.66,
+      "sourceRevision": "24bc9f5af2be377a4cad87f18b623c760d5cc90587b3b70711ea1dedc87ad9bf",
+      "evidenceRefs": [
+        "openspec/changes/crime-scene-reconstruction/tasks.md#L40"
+      ],
+      "kernelDagCandidate": {
+        "requiresSchemaGate": true,
+        "requiresIndependentReadback": true,
+        "autoPromoteAllowed": false
+      }
+    },
+    {
+      "candidateOrdinal": 3,
+      "canonicalId": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-05#L860",
+      "taskId": "CASE-SCENE-LIVE-05",
+      "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L860",
+      "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-05#L860",
+      "domain": "memory_lod_residency",
+      "keywords": [
+        "memory",
+        "modal",
+        "case-scene-live-05",
+        "performance",
+        "created",
+        "wired",
+        "partial",
+        "scene"
+      ],
+      "nlp8095Attached": true,
+      "nlp8095Contract": null,
+      "ganLane": "WIRED_NEEDS_PROOF",
+      "score": 95.55,
+      "sourceRevision": "24bc9f5af2be377a4cad87f18b623c760d5cc90587b3b70711ea1dedc87ad9bf",
+      "evidenceRefs": [
+        "openspec/changes/crime-scene-reconstruction/tasks.md#L860"
+      ],
+      "kernelDagCandidate": {
+        "requiresSchemaGate": true,
+        "requiresIndependentReadback": true,
+        "autoPromoteAllowed": false
+      }
+    },
+    {
+      "candidateOrdinal": 2,
+      "canonicalId": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-03-#L857",
+      "taskId": "CASE-SCENE-LIVE-03-",
+      "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L857",
+      "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-03-#L857",
+      "domain": "scene_ui_webgl",
+      "keywords": [
+        "clock",
+        "case-scene-live-03-video-clock",
+        "created",
+        "wired",
+        "worktree",
+        "4ae8253ab6e",
+        "scene",
+        "preview"
+      ],
+      "nlp8095Attached": true,
+      "nlp8095Contract": null,
+      "ganLane": "WIRED_NEEDS_PROOF",
+      "score": 95.16,
+      "sourceRevision": "24bc9f5af2be377a4cad87f18b623c760d5cc90587b3b70711ea1dedc87ad9bf",
+      "evidenceRefs": [
+        "openspec/changes/crime-scene-reconstruction/tasks.md#L857"
+      ],
+      "kernelDagCandidate": {
+        "requiresSchemaGate": true,
+        "requiresIndependentReadback": true,
+        "autoPromoteAllowed": false
+      }
+    }
+  ]
+}

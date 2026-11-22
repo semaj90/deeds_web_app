@@ -30,6 +30,16 @@ import {
 	type FrozenEvalSplitV1,
 	type GepaPromotionReceiptV1
 } from './oak-gepa-heldout-gate-v1.js';
+import {
+	partitionConflictFreePrefillBatchV1,
+	type ConflictFreePrefillPartitionV1,
+	type PrefillRowV1
+} from '../kanban/kanban-dag-prefill-v1.js';
+import {
+	verifyAndParseVitestExecution,
+	type ReceiptVerificationOutcome,
+	type VitestExecutionEvent
+} from '../execution/test-receipt-ingest-v1.js';
 
 export interface KanbanAcePacketInputV1 {
 	readonly schema: 'atlas.kanban-ace-packet.v1';
@@ -178,4 +188,107 @@ export function runWorkboardAndPromotionLoopV1(input: {
 		humanReview: input.humanReview
 	});
 	return { workboard, promotion };
+}
+
+export interface ConflictFreeWorkboardDispatchResultV1 {
+	readonly schema: 'atlas.conflict-free-workboard-dispatch.v1';
+	readonly canonicalAuthority: false;
+	readonly writesPerformed: false;
+	readonly partition: ConflictFreePrefillPartitionV1;
+	readonly a2aPayload: {
+		readonly jsonrpc: '2.0';
+		readonly id: string;
+		readonly method: 'tasks/send';
+		readonly params: {
+			readonly id: string;
+			readonly message: {
+				readonly role: 'user';
+				readonly parts: readonly [{ readonly type: 'text'; readonly text: string }];
+			};
+			readonly metadata: {
+				readonly skill: 'agentic-conflict-free-batch-proposal';
+				readonly rows: readonly PrefillRowV1[];
+				readonly ownedFilesByKey: Readonly<Record<string, readonly string[]>>;
+				readonly maxPerWorker: number;
+			};
+		};
+	};
+	readonly workerGates: readonly WorkboardGateResultV1[];
+	readonly receiptOutcome: ReceiptVerificationOutcome | null;
+}
+
+/**
+ * Connects Kanban prefill partitioning -> A2A `agentic-conflict-free-batch-proposal`
+ * -> per-worker ACE/FSM workboard admission -> post-patch Vitest receipt ingestion.
+ */
+export function dispatchConflictFreeWorkboardBatchV1(input: {
+	requestId: string;
+	executionId: string;
+	acePacket: KanbanAcePacketInputV1;
+	rows: readonly PrefillRowV1[];
+	ownedFilesByKey: Readonly<Record<string, readonly string[]>>;
+	maxPerWorker?: number;
+	workspaceRevision?: string;
+	postPatchExecutionEvent?: VitestExecutionEvent;
+}): ConflictFreeWorkboardDispatchResultV1 {
+	const maxPerWorker = input.maxPerWorker ?? 4;
+	const partition = partitionConflictFreePrefillBatchV1(input.rows, input.ownedFilesByKey, maxPerWorker);
+
+	const a2aPayload = {
+		jsonrpc: '2.0' as const,
+		id: input.requestId,
+		method: 'tasks/send' as const,
+		params: {
+			id: `batch:${input.executionId}`,
+			message: {
+				role: 'user' as const,
+				parts: [{ type: 'text' as const, text: `Dispatch conflict-free batch (${partition.workerA.length + partition.workerB.length} tasks)` }] as const
+			},
+			metadata: {
+				skill: 'agentic-conflict-free-batch-proposal' as const,
+				rows: input.rows,
+				ownedFilesByKey: input.ownedFilesByKey,
+				maxPerWorker
+			}
+		}
+	};
+
+	const workerQueues = [
+		{ workerId: 'worker-a', tasks: partition.workerA },
+		{ workerId: 'worker-b', tasks: partition.workerB }
+	].filter((q) => q.tasks.length > 0);
+
+	const allowedRefs = new Set(input.acePacket.ContextBlob.prefillTasks.map((t) => t.taskId));
+	const fallbackRefs = allowedRefs.size > 0 ? [Array.from(allowedRefs)[0]!] : [];
+	const workerGates = workerQueues.map((queue, idx) => {
+		const cited = queue.tasks.map((t) => t.taskId).filter((id) => allowedRefs.has(id));
+		return runAgenticWorkboardGateV1({
+			requestId: `${input.requestId}:${queue.workerId}`,
+			executionId: `${input.executionId}:${idx + 1}`,
+			acePacket: input.acePacket,
+			subpromptResponse: {
+				requestId: `${input.requestId}:${queue.workerId}`,
+				contextManifestChecksum: `sha256:${input.acePacket.packetSha256}`,
+				citedEvidenceIds: cited.length > 0 ? cited : fallbackRefs,
+				proposalPayload: { workerId: queue.workerId, taskCount: queue.tasks.length }
+			},
+			proposedNextActionId: `dispatch_${queue.workerId}`
+		});
+	});
+
+	const receiptOutcome = input.postPatchExecutionEvent
+		? verifyAndParseVitestExecution(input.postPatchExecutionEvent, {
+				expectedWorkspaceRevision: input.workspaceRevision
+			})
+		: null;
+
+	return {
+		schema: 'atlas.conflict-free-workboard-dispatch.v1',
+		canonicalAuthority: false,
+		writesPerformed: false,
+		partition,
+		a2aPayload,
+		workerGates,
+		receiptOutcome
+	};
 }

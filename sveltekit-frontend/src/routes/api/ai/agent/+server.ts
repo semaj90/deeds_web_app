@@ -22,14 +22,27 @@
 
 import { json }           from '@sveltejs/kit';
 import { z }              from 'zod';
+import { pool }           from '$lib/server/db/client.js';
+import { searchDocCorpus } from '$lib/server/atlas/docs/doc-intelligence-read-model.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
+
+const a2aAdmittedDocContextRequestSchema = z.object({
+  query: z.string().min(2).max(300),
+  product: z.string().min(1).max(100).optional(),
+  productVersion: z.string().min(1).max(100).optional(),
+  limit: z.number().int().min(1).max(10).default(5),
+  canonicalOfficialOnly: z.boolean().default(true)
+}).strict();
 import { getRedis }       from '$lib/server/redis.js';
 import { recordSearchQuery, type HitPipeline } from '$lib/server/features/observability/index.js';
 import { ENV } from '$lib/server/env.server.js';
 import {
+  a2aConflictFreeBatchProposalRequestV1Schema,
   a2aErrorFixProposalRequestV1Schema,
+  buildA2AConflictFreeBatchProposalResultV1,
   buildA2AErrorFixProposalResultV1,
 } from '$lib/server/atlas/kanban-acp-dag-contracts.js';
+import { readErrorFixTaskReceiptV1 } from '$lib/server/atlas/openspec-board/error-fix-task-receipt-v1.js';
 import type { RequestHandler } from './$types';
 
 const RATE_LIMIT    = 20;
@@ -195,7 +208,88 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
         { status: 400 },
       );
     }
-    return json(buildA2AErrorFixProposalResultV1({ requestId: task.id, errorFix: errorFix.data }));
+    const result = buildA2AErrorFixProposalResultV1({ requestId: task.id, errorFix: errorFix.data });
+    const ref = errorFix.data.workboardTaskRef;
+    if (!ref) return json(result);
+
+    return json({
+      ...result,
+      metadata: {
+        ...result.metadata,
+        workboardReceipt: await readErrorFixTaskReceiptV1(ref)
+      }
+    });
+  }
+
+  if (task.metadata?.skill === 'agentic-conflict-free-batch-proposal') {
+    const batch = a2aConflictFreeBatchProposalRequestV1Schema.safeParse(task.metadata.batch);
+    if (!batch.success) {
+      return json(
+        { error: { code: -32602, message: 'Invalid agentic-conflict-free-batch-proposal input' } },
+        { status: 400 },
+      );
+    }
+    return json(buildA2AConflictFreeBatchProposalResultV1({ requestId: task.id, batch: batch.data }));
+  }
+
+  if (task.metadata?.skill === 'external-doc-admitted-context') {
+    const parsed = a2aAdmittedDocContextRequestSchema.safeParse(task.metadata.docQuery);
+    if (!parsed.success) {
+      return json(
+        { error: { code: -32602, message: 'Invalid external-doc-admitted-context input' } },
+        { status: 400 },
+      );
+    }
+    const docResult = await searchDocCorpus({
+      pool,
+      root: process.cwd(),
+      q: parsed.data.query,
+      limit: parsed.data.limit,
+      product: parsed.data.product ?? null,
+      productVersion: parsed.data.productVersion ?? null,
+      canonicalOfficialOnly: parsed.data.canonicalOfficialOnly
+    });
+    const citations = docResult.hits
+      .filter((h) => Boolean(h.chunkId && h.url && h.chunkEvidenceRevision))
+      .map((h) => ({
+        schema: 'atlas.acp-admitted-doc-context.v1' as const,
+        canonicalAuthority: false as const,
+        chunkId: h.chunkId,
+        url: h.url,
+        provider: h.provider,
+        product: h.product,
+        productVersion: h.productVersion,
+        sourceRevision: h.revision,
+        chunkEvidenceRevision: h.chunkEvidenceRevision,
+        excerpt: h.excerpt
+      }));
+    return json({
+      jsonrpc: '2.0',
+      id: task.id,
+      result: {
+        id: task.id,
+        status: { state: 'completed' },
+        artifacts: [
+          {
+            artifactId: `admitted-doc-context:${task.id}`,
+            name: 'atlas.a2a-doc-artifact.v1',
+            parts: [
+              {
+                type: 'data',
+                data: {
+                  schema: 'atlas.a2a-doc-artifact.v1',
+                  canonicalAuthority: false,
+                  writesPerformed: false,
+                  mode: docResult.mode,
+                  query: docResult.query,
+                  citations
+                }
+              }
+            ]
+          }
+        ]
+      }
+    });
   }
 
   // Extract text query from first text part

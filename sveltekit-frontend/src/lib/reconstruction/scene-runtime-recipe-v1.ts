@@ -1,6 +1,15 @@
 import { z } from 'zod';
 import { SceneGenerationPlanV1Schema, scenePropRotationActionV1Schema } from './scene-generation-plan-v1.js';
 import { sceneCameraPresetV1Schema } from './scene-camera-cue-v1.js';
+import {
+	buildBeachNightPrefabV1,
+	buildCityBlockPrefabV1,
+	buildCourtroomGenericPrefabV1,
+	buildFourBedroomHousePrefabV1,
+	buildOfficePrefabV1,
+	buildParkingLotPrefabV1,
+	compilePrefabToPlanComponentsV1,
+} from './scene-modular-p0-recipes-v1.js';
 
 export const SceneRuntimeRecipeV1Schema = z.object({
 	schema: z.literal('parent-atlas.scene-runtime-recipe/v1'),
@@ -25,6 +34,21 @@ export const SceneRuntimeRecipeV1Schema = z.object({
 	}).strict(),
 	actors: z.array(z.object({ actorId: z.string(), label: z.string(), appearance: z.string(), evidenceIds: z.array(z.string().uuid()) }).strict()),
 	primitiveRegistry: z.array(z.object({ objectId: z.string(), registryId: z.string() }).strict()),
+	prefabAssemblies: z.array(z.object({
+		prefabId: z.string(),
+		version: z.string(),
+		components: z.array(z.object({
+			objectId: z.string(),
+			label: z.string(),
+			recipeId: z.string(),
+			ontologyConceptId: z.string(),
+			primitiveKind: z.string(),
+			position: z.tuple([z.number(), z.number(), z.number()]),
+			rotationXyzw: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+			scale: z.tuple([z.number(), z.number(), z.number()]),
+			capability: z.enum(['door', 'light', 'prop', 'static'])
+		}).strict())
+	}).strict()).optional(),
 	assets: z.array(z.object({ assetId: z.string().uuid(), assetRevision: z.number().int(), sha256: z.string() }).strict()),
 	placements: z.array(z.object({
 		placementId: z.string(), targetKind: z.enum(['actor', 'primitive', 'asset']), targetId: z.string(),
@@ -120,4 +144,39 @@ export function compileSceneRuntimeRecipeV1(input: unknown): SceneRuntimeRecipeV
 		provenance: { generator: plan.generator, clockPolicy: plan.provenance.clockPolicy, identityPolicy: plan.provenance.identityPolicy, motivePolicy: plan.provenance.motivePolicy }
 	};
 	return SceneRuntimeRecipeV1Schema.parse(recipe);
+}
+
+export type CanonicalModularPrefabIdV1 =
+	| 'house.four_bedroom.v1'
+	| 'city.block.v1'
+	| 'beach.night.v1'
+	| 'office.v1'
+	| 'road.parking_lot.v1'
+	| 'courtroom.generic.v1';
+
+const PREFAB_BUILDERS_V1: Record<CanonicalModularPrefabIdV1, () => ReturnType<typeof buildOfficePrefabV1>> = {
+	'house.four_bedroom.v1': buildFourBedroomHousePrefabV1,
+	'city.block.v1': buildCityBlockPrefabV1,
+	'beach.night.v1': buildBeachNightPrefabV1,
+	'office.v1': buildOfficePrefabV1,
+	'road.parking_lot.v1': buildParkingLotPrefabV1,
+	'courtroom.generic.v1': buildCourtroomGenericPrefabV1,
+};
+
+/**
+ * Compile a canonical P0 modular prefab into selectable runtime assembly components
+ * and attach it to a SceneRuntimeRecipeV1 while preserving all existing primitive/event invariants.
+ */
+export function attachModularPrefabAssemblyToRecipeV1(
+	recipe: SceneRuntimeRecipeV1,
+	prefabId: CanonicalModularPrefabIdV1,
+	version = '1.0.0'
+): SceneRuntimeRecipeV1 {
+	const built = PREFAB_BUILDERS_V1[prefabId]();
+	const components = compilePrefabToPlanComponentsV1(built.prefab, built.recipes);
+	const existing = recipe.prefabAssemblies ?? [];
+	return SceneRuntimeRecipeV1Schema.parse({
+		...recipe,
+		prefabAssemblies: [...existing.filter((a) => a.prefabId !== prefabId), { prefabId, version, components }],
+	});
 }

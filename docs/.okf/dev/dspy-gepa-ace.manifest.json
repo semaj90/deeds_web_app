@@ -1,0 +1,69 @@
+{
+  "manifest_revision": "okf-dspy-gepa-ace-v1",
+  "workspace_revision": "workspace-current",
+  "source_snapshot_revision": "dspy-gepa-ace-2026-11-21",
+  "producer_revision": "parent-atlas-okf-pipeline-r1",
+  "output_root": ".tmp/atlas/okf-dspy-gepa-ace-v1",
+  "embedding": { "url": "http://127.0.0.1:8081", "model": "embeddinggemma-300m-f16.gguf" },
+  "qdrant": { "url": "http://127.0.0.1:6333", "collection": "external_programming_docs_768" },
+  "sources": [
+    {
+      "source_id": "dspy-api",
+      "source_revision": "dspy-api-3.1.0-2026-11-21",
+      "title": "DSPy 3.1.0 API",
+      "base_urls": ["https://dspy.ai/3.1.0/"],
+      "allowed_domains": ["dspy.ai"],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "FIRECRAWL_V2",
+      "maximum_pages": 2,
+      "maximum_depth": 0,
+      "pages": [
+        "https://dspy.ai/3.1.0/api/adapters/JSONAdapter/",
+        "https://dspy.ai/3.1.0/api/optimizers/GEPA/overview/"
+      ],
+      "provider": "stanfordnlp",
+      "product": "dspy",
+      "product_version": "3.1.0",
+      "version_qualification": "EXACT_VERSION",
+      "chunk_identity_version": "V2",
+      "language": "python",
+      "publisher": "DSPy"
+    },
+    {
+      "source_id": "gepa-api",
+      "source_revision": "gepa-api-2026-11-21",
+      "title": "GEPA Optimizer API",
+      "base_urls": ["https://gepa.dev/api/core/optimize/"],
+      "allowed_domains": ["gepa.dev"],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "FIRECRAWL_V2",
+      "maximum_pages": 1,
+      "maximum_depth": 0,
+      "pages": ["https://gepa.dev/api/core/optimize/"],
+      "provider": "gepa-ai",
+      "product": "gepa",
+      "version_qualification": "CURRENT_UPSTREAM",
+      "language": "python",
+      "publisher": "GEPA"
+    },
+    {
+      "source_id": "ace-upstream",
+      "source_revision": "git:82709de050e1db6e6ef2f07bcb0393560b94992a",
+      "title": "Agentic Context Engineering Upstream",
+      "base_urls": ["https://raw.githubusercontent.com/ace-agent/ace/82709de050e1db6e6ef2f07bcb0393560b94992a/README.md"],
+      "allowed_domains": ["raw.githubusercontent.com"],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "FIRECRAWL_V2",
+      "maximum_pages": 1,
+      "maximum_depth": 0,
+      "pages": ["https://raw.githubusercontent.com/ace-agent/ace/82709de050e1db6e6ef2f07bcb0393560b94992a/README.md"],
+      "provider": "ace-agent",
+      "product": "agentic-context-engineering",
+      "product_version": "git:82709de050e1db6e6ef2f07bcb0393560b94992a",
+      "version_qualification": "EXACT_VERSION",
+      "chunk_identity_version": "V2",
+      "language": "python",
+      "publisher": "ACE authors"
+    }
+  ]
+}

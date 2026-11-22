@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { onMount, untrack } from 'svelte';
+	import { onDestroy, onMount, untrack } from 'svelte';
+	import { createSeekCoalescerV1 } from '$lib/reconstruction/seek-coalescer-v1.js';
 	import { resolveSceneCameraCueV1, sceneCameraPresetLabelsV1, type SceneCameraPresetV1 } from '$lib/reconstruction/scene-camera-cue-v1.js';
 	import { activeSceneLaneCaptionsV1, sceneCaptionRequestWindowV1, sceneCaptionResponseV1Schema, sceneCaptionScopeKeyV1,
 		SCENE_CAPTION_EVENT_LIMIT_V1, type SceneCaptionResponseV1, type SceneCaptionScopeV1 } from '$lib/reconstruction/scene-captions-v1.js';
@@ -10,6 +11,7 @@
 	import type { ScenePreviewAnnotationV1 } from '$lib/reconstruction/scene-preview-draft-v1.js';
 	import SceneSourceVideo from './SceneSourceVideo.svelte';
 	import TimelineEngine from './TimelineEngine.svelte';
+	import DossierBrutalModal from '$lib/components/ui/DossierBrutalModal.svelte';
 	import type { TimelineTrackItemV1 } from '$lib/reconstruction/dual-clock-timeline-v1.js';
 	import { countSceneGeometryBufferBytesV1, createScenePreviewSamplesV1 } from '$lib/reconstruction/scene-preview-metrics-v1.js';
 	import { SceneControllerV1 } from '$lib/scene/scene-controller-v1.js';
@@ -17,7 +19,7 @@
 	import { compileReviewedPolygonMeshV1 } from '$lib/splat/reviewed-polygon-mesh-v1.js';
 	import { buildSceneObjectInspectorV1 } from '$lib/reconstruction/scene-object-inspector-v1.js';
 	import { SceneDeformationBrushV1, type DeformationRevisionReceiptV1 } from '$lib/scene/scene-deformation-brush-v1.js';
-	import { planGoapWhatIfV1, type GoapSimulationPlanV1 } from '$lib/splat/scene-goap-planner-v1.js';
+	import { planGoapWhatIfV1, type GoapOperatorV1, type GoapSimulationPlanV1 } from '$lib/splat/scene-goap-planner-v1.js';
 	import {
 		CREATOR_SWATCHES,
 		DEFAULT_MATERIAL_EDITOR,
@@ -78,6 +80,9 @@
 	let reportStatus = $state('');
 	let deformationReceipt = $state.raw<DeformationRevisionReceiptV1 | null>(null);
 	let deformationError = $state('');
+	let deformationUndoStack = $state.raw<{ binary: Uint8Array }[]>([]);
+	let authoredGoapOperators = $state.raw<GoapOperatorV1[]>([]);
+	let goapEmptyError = $state('');
 	let goapSimulationPlan = $state.raw<GoapSimulationPlanV1 | null>(null);
 
 	async function runSoftDeformationPreview() {
@@ -85,18 +90,71 @@
 		try {
 			const THREE = await import('three');
 			const brush = new SceneDeformationBrushV1();
-			const targetMesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial());
+			const baseGeo = new THREE.BoxGeometry(1, 1, 1);
+			const targetMesh = new THREE.Mesh(baseGeo.clone(), new THREE.MeshStandardMaterial());
 			targetMesh.userData.mutable = true;
 			targetMesh.userData.evidenceImmutable = false;
 			brush.applyStrokeStep(targetMesh, { center: [0, 0, 0], radius: 1.5, delta: [0, 0.12, 0] });
 			const committed = brush.commitStroke();
+			deformationUndoStack = [...deformationUndoStack, { binary: committed.binary }];
 			deformationReceipt = committed.receipt;
 		} catch (err) {
 			deformationError = err instanceof Error ? err.message : String(err);
 		}
 	}
 
+	function undoSoftDeformationPreview() {
+		if (deformationUndoStack.length === 0) return;
+		deformationUndoStack = deformationUndoStack.slice(0, -1);
+		deformationReceipt = null;
+		deformationError = '';
+	}
+
+	async function verifyEvidenceLockRejection() {
+		deformationError = '';
+		try {
+			const THREE = await import('three');
+			const brush = new SceneDeformationBrushV1();
+			const evidenceMesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial());
+			evidenceMesh.userData.readOnlyEvidence = true;
+			evidenceMesh.userData.immutableSource = true;
+			brush.applyStrokeStep(evidenceMesh, { center: [0, 0, 0], radius: 1.0, delta: [0, 0.1, 0] });
+		} catch (err) {
+			deformationError = err instanceof Error ? err.message : String(err);
+		}
+	}
+
+	function loadSyntheticGoapOperators() {
+		goapEmptyError = '';
+		authoredGoapOperators = [
+			{
+				id: 'open_door',
+				label: 'Open entry door',
+				cost: 1,
+				durationMs: 400,
+				preconditions: { doorOpen: false },
+				effects: { doorOpen: true },
+				sceneEffects: [],
+			},
+			{
+				id: 'verify_sightline',
+				label: 'Verify sightline',
+				cost: 1,
+				durationMs: 300,
+				preconditions: { doorOpen: true },
+				effects: { lineOfSightClear: true },
+				sceneEffects: [],
+			},
+		];
+	}
+
 	function runGoapWhatIfPreview() {
+		if (authoredGoapOperators.length === 0) {
+			goapEmptyError = 'No what-if actions configured';
+			goapSimulationPlan = null;
+			return;
+		}
+		goapEmptyError = '';
 		goapSimulationPlan = planGoapWhatIfV1({
 			schema: 'atlas.goap-simulation-input.v1',
 			sceneRevisionId: revision?.manifestSha256 ?? `preview:${plan.sceneId}`,
@@ -106,26 +164,7 @@
 			baseline: [],
 			initialFacts: { doorOpen: false, lineOfSightClear: false },
 			goalFacts: { doorOpen: true, lineOfSightClear: true },
-			operators: [
-				{
-					id: 'open_door',
-					label: 'Open entry door',
-					cost: 1,
-					durationMs: 400,
-					preconditions: { doorOpen: false },
-					effects: { doorOpen: true },
-					sceneEffects: [],
-				},
-				{
-					id: 'verify_sightline',
-					label: 'Verify sightline',
-					cost: 1,
-					durationMs: 300,
-					preconditions: { doorOpen: true },
-					effects: { lineOfSightClear: true },
-					sceneEffects: [],
-				},
-			],
+			operators: authoredGoapOperators,
 			budget: { maxExpansions: 32, maxDepth: 4 },
 		});
 	}
@@ -167,7 +206,7 @@
 	let presentedTime = $state(false);
 	let videoSeek = $state.raw({ timeMs: 0 });
 	let seekStartedAt: number | null = null;
-	let memoryDialog: HTMLDialogElement;
+	let memoryOpen = $state(false);
 	let applyCameraPreset = $state<(preset: SceneCameraPresetV1) => void>(() => {});
 	let followsCameraCues = $state(false);
 	const hasCameraCues = $derived(recipe.eventLanes.some((lane) => lane.events.some((event) => event.cameraPreset)));
@@ -183,13 +222,18 @@
 		applyCameraPreset(preset);
 	}
 	let inspecting = $state(false);
+	let samplingPaused = $state(false);
+	let confirmReleaseCache = $state(false);
+	$effect(() => { if (!memoryOpen) { inspecting = false; confirmReleaseCache = false; } });
+	let lastCacheRelease = $state<{ releasedCells: number; releasedInstances: number; remainingLoadedCells: number } | null>(null);
 	const frameSamples = createScenePreviewSamplesV1();
 	const seekSamples = createScenePreviewSamplesV1(32);
 	type RenderMetrics = {
 		calls: number; triangles: number; geometries: number; textures: number; geometryBytes: number;
-		residency: { loadedCells: number; queuedCells: number; residentLimit: number; mode: string };
+		residency: { loadedCells: number; queuedCells: number; residentLimit: number; mode: string; cellBuilds: number; cellHits: number; cellEvictions: number; cacheReleases: number };
 	};
 	let readRenderMetrics: (() => RenderMetrics | null) | undefined;
+	let releasePreviewCacheHandler: (() => { releasedCells: number; releasedInstances: number; remainingLoadedCells: number } | null) | undefined;
 	let metrics = $state.raw<{ render: RenderMetrics | null; frameP95: number | null; seekP95: number | null } | null>(null);
 	let planBytes = $state<number | null>(null);
 	let previewFocus = $derived(followingVideo ? (videoPending ? 'Video seek' : 'Video review') :
@@ -204,7 +248,7 @@
 	}
 
 	$effect(() => {
-		if (!inspecting) return;
+		if (!inspecting || samplingPaused) return;
 		sampleMetrics();
 		const interval = window.setInterval(sampleMetrics, 750);
 		return () => window.clearInterval(interval);
@@ -283,12 +327,39 @@
 		return { min: Math.min(0, ...events.map((event) => event.startMs)), max: Math.max(1, ...events.map((event) => event.endMs)) };
 	});
 
+	const seekCoalescer = createSeekCoalescerV1();
+	let seekStall: ReturnType<typeof setTimeout> | null = null;
+	const SEEK_STALL_MS = 1500;
+
+	function clearSeekStall() {
+		if (seekStall !== null) clearTimeout(seekStall);
+		seekStall = null;
+	}
+	onDestroy(() => {
+		seekCoalescer.cancel();
+		clearSeekStall();
+	});
+
+	function dispatchCoalescedSeek(timeMs: number) {
+		videoSeek = { timeMs };
+		clearSeekStall();
+		seekStall = setTimeout(releaseStalledSeek, SEEK_STALL_MS);
+	}
+
+	// A seek that never reports presentation must not block later seeks forever.
+	function releaseStalledSeek() {
+		seekStall = null;
+		const next = seekCoalescer.acknowledge();
+		if (next !== null) dispatchCoalescedSeek(next);
+	}
+
 	function seekTo(timeMs: number) {
 		playing = false;
 		if (followingVideo) {
 			videoPending = true;
 			seekStartedAt = performance.now();
-			videoSeek = { timeMs };
+			const dispatch = seekCoalescer.request(timeMs);
+			if (dispatch !== null) dispatchCoalescedSeek(dispatch);
 		} else sourceTimeMs = timeMs;
 	}
 
@@ -298,6 +369,8 @@
 		videoPending = !followingVideo;
 		presentedTime = false;
 		seekStartedAt = null;
+		seekCoalescer.cancel();
+		clearSeekStall();
 		videoSeek = { timeMs: sourceTimeMs };
 		followingVideo = !followingVideo;
 	}
@@ -306,6 +379,11 @@
 		if (!followingVideo) return;
 		sourceTimeMs = time;
 		presentedTime = presented;
+		if (presented && seekCoalescer.inFlight) {
+			const next = seekCoalescer.acknowledge();
+			if (next !== null) dispatchCoalescedSeek(next);
+			else clearSeekStall();
+		}
 		if (seekStartedAt !== null) {
 			if (presented) seekSamples.add(performance.now() - seekStartedAt);
 			seekStartedAt = null;
@@ -757,6 +835,7 @@
 					geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures,
 					geometryBytes: countSceneGeometryBufferBytesV1(runtime!.root), residency: runtime!.getResidencyMetrics()
 				} : null;
+				releasePreviewCacheHandler = () => runtime?.releasePreviewCache() ?? null;
 				renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5)); renderer.setSize(width, height, false);
 				controls = new orbit.OrbitControls(camera, renderer.domElement); controls.target.set(0, 0, 0); controls.update();
 				function setCameraPreset(preset: SceneCameraPresetV1) {
@@ -843,7 +922,10 @@
 				const observer = new ResizeObserver(resize); observer.observe(canvas);
 				if (activeClock) runtime.setSourceTime(activeClock, sourceTimeMs);
 				if (selectedEventId) runtime.selectEvent(selectedEventId);
-				status = `Illustrative preview · ${runtime.environmentInstanceCount} repeated environment instances · 8 MiB authored-data target`;
+				const prefabSuffix = runtime.prefabAssemblySummary.spawnedCount > 0
+					? ` · ${runtime.prefabAssemblySummary.spawnedCount} prefab components`
+					: '';
+				status = `Illustrative preview · ${runtime.environmentInstanceCount} repeated environment instances · 8 MiB authored-data target${prefabSuffix}`;
 				onPreviewReady?.();
 				const draw = (now: number) => {
 					if (disposed || !renderer) return;
@@ -896,6 +978,7 @@
 			activeRuntime = null;
 			document.removeEventListener('visibilitychange', resetFrameWindow);
 			readRenderMetrics = undefined;
+			releasePreviewCacheHandler = undefined;
 			cancelAnimationFrame(frame);
 			stopObserver?.(); clearPicking?.(); controls?.dispose(); runtime?.dispose(); renderer?.dispose(); polygonMeshes.clear();
 		};
@@ -914,11 +997,11 @@
 	</div>
 	{#if error}<p class="error" role="alert">{error}</p>{/if}
 	<div class="timeline">
-		<button type="button" onclick={() => { memoryDialog.showModal(); inspecting = true; }}>Performance and memory</button>
+		<button type="button" onclick={() => { memoryOpen = true; inspecting = true; }}>Performance and memory</button>
 		<TimelineEngine durationSeconds={timelineDurationSeconds} currentTimeSeconds={sourceTimeMs / 1000} items={timelineItems}
 			onSeek={(seconds) => { sourceTimeMs = Math.round(seconds * 1000); }} />
-		<dialog bind:this={memoryDialog} aria-label="Scene performance and memory" onclose={() => { inspecting = false; }}>
-			<h3>Scene performance and memory</h3>
+		<DossierBrutalModal bind:open={memoryOpen} title="Scene performance and memory">
+			<p role="status" data-testid="live05-sampling-status">Sampler: {samplingPaused ? 'Paused' : 'Active (750 ms)'}</p>
 			<dl>
 				<dt>Focus</dt><dd>{previewFocus}</dd>
 				<dt>Frame interval p95</dt><dd>{formatMetric(metrics?.frameP95, 'ms')}</dd>
@@ -929,13 +1012,38 @@
 				<dt>CPU geometry backing buffers</dt><dd>{formatMetric(metrics?.render?.geometryBytes, 'bytes')}</dd>
 				<dt>Procedural cells loaded / queued</dt><dd>{formatMetric(metrics?.render?.residency.loadedCells, '')} / {formatMetric(metrics?.render?.residency.queuedCells, '')} · cap {formatMetric(metrics?.render?.residency.residentLimit, '')}</dd>
 				<dt>Cell priority</dt><dd>{metrics?.render?.residency.mode ?? 'Unavailable'}</dd>
+				<dt>Cell builds / hits / evictions / cache releases</dt><dd data-testid="live05-cache-counters">{formatMetric(metrics?.render?.residency.cellBuilds, '')} / {formatMetric(metrics?.render?.residency.cellHits, '')} / {formatMetric(metrics?.render?.residency.cellEvictions, '')} / {formatMetric(metrics?.render?.residency.cacheReleases, '')}</dd>
 				<dt>Serialized plan</dt><dd>{formatMetric(planBytes, 'bytes')}</dd>
 				<dt>Authored scene target</dt><dd>8 MiB</dd>
 				<dt>GPU bytes, media bytes, tile cache</dt><dd>Unavailable</dd>
 			</dl>
-			<p>Frame intervals include display scheduling. Geometry bytes exclude textures, video, engine overhead, and GPU allocations.</p>
-			<form method="dialog"><button type="submit">Close</button></form>
-		</dialog>
+			{#if lastCacheRelease}
+				<p role="status" data-testid="live05-cache-release-status">
+					Released {lastCacheRelease.releasedCells} unpinned cells ({lastCacheRelease.releasedInstances} instances); {lastCacheRelease.remainingLoadedCells} primary cell(s) kept.
+				</p>
+			{/if}
+			<div class="live05-actions">
+				<button type="button" onclick={() => { samplingPaused = !samplingPaused; if (!samplingPaused) sampleMetrics(); }}>
+					{samplingPaused ? 'Resume sampling' : 'Pause sampling'}
+				</button>
+				{#if !confirmReleaseCache}
+					<button type="button" onclick={() => { confirmReleaseCache = true; }}>Release preview cache…</button>
+				{:else}
+					<span role="group" aria-label="Confirm preview cache release">
+						<button type="button" onclick={() => {
+							const released = releasePreviewCacheHandler?.() ?? null;
+							if (released) {
+								lastCacheRelease = released;
+								sampleMetrics();
+							}
+							confirmReleaseCache = false;
+						}}>Confirm release</button>
+						<button type="button" onclick={() => { confirmReleaseCache = false; }}>Cancel release</button>
+					</span>
+				{/if}
+			</div>
+			<p>Frame intervals include display scheduling. Geometry bytes exclude textures, video, engine overhead, and GPU allocations. Releasing preview cache unloads only regenerable, unpinned cells and unused caches.</p>
+		</DossierBrutalModal>
 		{#if houseObjects.length}
 			<label>Scene object
 				<select value={houseObject?.id ?? ''} onchange={(event) => {
@@ -1085,13 +1193,19 @@
 			<div class="controls" data-testid="scene-deformation-goap-panel" style="margin-top:.65rem;padding-top:.5rem;border-top:1px solid #cfc9bb">
 				<div style="display:flex;gap:.4rem;flex-wrap:wrap">
 					<button type="button" data-testid="eng04-brush-preview-btn" onclick={() => void runSoftDeformationPreview()}>Soft Brush Preview (PADF)</button>
+					<button type="button" data-testid="eng04-brush-undo-btn" disabled={deformationUndoStack.length === 0} onclick={undoSoftDeformationPreview}>Undo Brush</button>
+					<button type="button" data-testid="eng04-evidence-lock-btn" onclick={() => void verifyEvidenceLockRejection()}>Test Evidence Lock</button>
+					<button type="button" data-testid="goap-load-fixture-btn" onclick={loadSyntheticGoapOperators}>Load Synthetic What-If</button>
 					<button type="button" data-testid="goap-whatif-preview-btn" onclick={runGoapWhatIfPreview}>GOAP What-If (Hypothesis)</button>
 				</div>
 				{#if deformationReceipt}
 					<small role="status" data-testid="eng04-brush-receipt">PADF {deformationReceipt.affectedVertexCount} verts · {deformationReceipt.byteLength} B · {deformationReceipt.storageKey}</small>
 				{/if}
 				{#if deformationError}
-					<small class="error" role="alert">{deformationError}</small>
+					<small class="error" role="alert" data-testid="eng04-brush-error">{deformationError}</small>
+				{/if}
+				{#if authoredGoapOperators.length === 0}
+					<small data-testid="goap-whatif-empty">{goapEmptyError || 'No what-if actions configured'}</small>
 				{/if}
 				{#if goapSimulationPlan}
 					<small role="status" data-testid="goap-whatif-receipt">{goapSimulationPlan.authorityLabel} · {goapSimulationPlan.status} · cost {goapSimulationPlan.totalCost} · [{goapSimulationPlan.operatorIds.join(' -> ')}]</small>
@@ -1198,10 +1312,11 @@
 	.object-inspector{margin:.65rem 0;padding:.75rem;background:#f4f7fa;border:1px solid #c5d1dc;border-left:4px solid #547da0;border-radius:.3rem}.object-inspector p{margin:.3rem 0;font-size:.78rem}.object-inspector h4{margin:.55rem 0 .2rem;font-size:.82rem}.object-inspector ul{margin:.25rem 0;padding-left:1.2rem;font-size:.76rem}.object-inspector li{margin:.25rem 0;overflow-wrap:anywhere}.object-inspector a{color:#245884;text-decoration:underline}
 	.cue-conflicts{padding:.55rem;background:#fff2e4;border:1px solid #d78b4b;border-left:3px solid #ba522c;font-size:.76rem}.cue-conflicts ul{margin:.25rem 0;padding-left:1.2rem}.cue-conflicts span{display:block;margin-top:.35rem}
 	.polygon-editor{margin:.7rem 0;padding:.7rem;background:#fff9e9;border:1px solid #d8bd7e;border-radius:.35rem}.polygon-editor>p{font-size:.78rem;color:#536068}.polygon-editor h4{margin:.55rem 0 .25rem}.polygon-source-preview{position:relative;width:min(100%,34rem);max-height:28rem;margin:.65rem auto;overflow:hidden;background:#202a31;border:1px solid #78848a;border-radius:.25rem;touch-action:none}.polygon-source-preview img,.polygon-source-preview svg{position:absolute;inset:0;width:100%;height:100%}.polygon-source-preview img{object-fit:fill}.polygon-source-preview svg{touch-action:none}.polygon-source-preview circle{cursor:grab}.polygon-source-preview circle:active{cursor:grabbing}.polygon-source-preview circle:focus{outline:none;filter:drop-shadow(0 0 3px #ffe27a)}.vertex-row{display:grid;grid-template-columns:5rem 1fr 1fr;gap:.4rem;align-items:center;padding:.25rem 0;border-bottom:1px solid #eee6d4}.vertex-row label{display:grid;gap:.15rem;font-size:.72rem}.vertex-row input{min-width:0;width:100%;box-sizing:border-box}.polygon-editor .actions{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}.polygon-editor .actions span{font-size:.7rem;overflow-wrap:anywhere}
-	dialog { width: min(36rem, 90vw); max-height: 85vh; overflow: auto; padding: 1rem 1.25rem; border: 1px solid #cfc9bb; border-radius: .5rem; color: #1d2830; background: #f7f5ef; }
-	dialog::backdrop { background: #17263099; }
-	dialog dl { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: .4rem .85rem; }
-	dialog dd { margin: 0; font-variant-numeric: tabular-nums; }
+	:global(.dossier-brutal-body) dl { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: .4rem .85rem; margin: 0; }
+	:global(.dossier-brutal-body) dd { margin: 0; font-variant-numeric: tabular-nums; text-align: right; }
+	:global(.dossier-brutal-body) dt { color: #6B6150; }
+	:global(.dossier-brutal-body) .live05-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+	:global(.dossier-brutal-body) p { margin: .5rem 0; color: #141312; }
 	.camera-presets{position:absolute;top:.6rem;left:.6rem;display:flex;gap:.3rem}.camera-presets button{padding:.35rem .5rem;background:#0b131bcc;color:#eef4f4;border:1px solid #809196;border-radius:.25rem}
 	.runtime{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(18rem,1fr);gap:1rem}.viewport{position:relative;min-height:34rem;background:#172630;border:1px solid #43545b;border-radius:.45rem;overflow:hidden}.viewport canvas{display:block;width:100%;height:34rem}.status{position:absolute;left:.6rem;bottom:.6rem;padding:.35rem .55rem;color:#eef4f4;background:#0b131bcc;border-radius:.25rem;font-size:.76rem}.timeline{padding:1rem;background:#f7f5ef;color:#1d2830;border:1px solid #cfc9bb;border-radius:.45rem}.controls{display:grid;gap:.6rem}.controls label{display:grid;gap:.25rem;font-size:.8rem}.controls select,.controls button{min-height:2.4rem;padding:.45rem}.scrub input{width:100%}.event-list{display:grid;gap:.4rem;margin-top:.8rem}.event-list button{display:grid;gap:.25rem;text-align:left;padding:.6rem;background:#fff;border:1px solid #c9c6bd;border-radius:.35rem}.event-list button.active{border-color:#a26a16;box-shadow:0 0 0 1px #a26a16}.event-list span,.event-list small{font-size:.74rem;color:#49565d}.synopsis{margin-top:.8rem;padding:.7rem;background:#fff;border-left:3px solid #c88e2e}.synopsis p{font-size:.82rem;margin:.4rem 0}.error{color:#8d1723}@media(max-width:850px){.runtime{grid-template-columns:1fr}.viewport,.viewport canvas{min-height:23rem;height:23rem}}
 </style>

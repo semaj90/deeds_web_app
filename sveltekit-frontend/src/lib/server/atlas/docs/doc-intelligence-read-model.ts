@@ -650,7 +650,7 @@ export async function searchDocCorpusDense(opts: { pool: Pool | null; queryVecto
 	}
 }
 
-export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q: string; limit?: number; runtime?: RuntimeVersions; product?: string | null; productVersion?: string | null }): Promise<DocSearchResult> {
+export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q: string; limit?: number; runtime?: RuntimeVersions; product?: string | null; productVersion?: string | null; canonicalOfficialOnly?: boolean }): Promise<DocSearchResult> {
 	const limit = Math.min(Math.max(opts.limit ?? 10, 1), 25);
 	const q = opts.q.trim().slice(0, 300);
 	let postgresNote: string | null = null;
@@ -670,6 +670,7 @@ export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q
 					  WHERE c.search_vector @@ query
 					    AND ($3::text IS NULL OR p.product = $3)
 					    AND ($4::text IS NULL OR p.product_version = $4)
+					    ${opts.canonicalOfficialOnly ? "AND p.source_authority = 'OFFICIAL'" : ''}
 					  ORDER BY ts_rank(c.search_vector, query) DESC, c.chunk_id
 					  LIMIT $2`,
 					[q, limit, product, productVersion]
@@ -683,6 +684,9 @@ export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q
 		} catch (error) {
 			postgresNote = `POSTGRES_UNAVAILABLE:${error instanceof Error ? error.message : String(error)}`;
 		}
+	}
+	if (opts.canonicalOfficialOnly) {
+		return { query: q, mode: 'POSTGRES_FTS', postgresNote: postgresNote ?? 'POSTGRES_FTS_UNAVAILABLE', filters: { product, productVersion }, hits: [] };
 	}
 	const runtime = opts.runtime ?? { postgres: null, pgvector: null, drizzleOrm: null, drizzleKit: null, pg: null, svelte: null, svelteKit: null, bitsUi: null };
 	const { sources } = collectLocalCaptures(opts.root, runtime);

@@ -57,6 +57,21 @@ class WinLoopbackLM(dspy.BaseLM):
                 ],
                 "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
             }
+        if self.simulate_mode == "unauthorized_ref":
+            forged = json.dumps({
+                "task_kind": "SUMMARIZE",
+                "instruction": "Summarize using an unauthorized forged reference.",
+                "evidence_refs": ["unauthorized://forged-ref#L999"],
+            })
+            return {
+                "choices": [
+                    {
+                        "message": {"role": "assistant", "content": forged},
+                        "finish_reason": "stop",
+                    }
+                ],
+                "usage": {"prompt_tokens": 10, "completion_tokens": 24, "total_tokens": 34},
+            }
 
         msgs = messages or [{"role": "user", "content": prompt or ""}]
         body = {
@@ -198,7 +213,7 @@ def main():
 
     adversarial_results = []
     if args.run_adversarial:
-        for mode in ("transport_error", "parse_error"):
+        for mode in ("transport_error", "parse_error", "unauthorized_ref"):
             adv_lm = WinLoopbackLM(
                 model="gemma4-legal-iq4xs-direct.gguf",
                 max_tokens=args.max_tokens,

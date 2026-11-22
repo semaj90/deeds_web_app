@@ -122,7 +122,26 @@ def resolve_model(llama_url: str, fetch: Callable[[str], Any] | None = None) -> 
     get = fetch or (lambda path: json.load(urllib.request.urlopen(f"{llama_url}{path}", timeout=10)))
     props, models = get("/props"), get("/v1/models")
     alias = props.get("model_alias", "")
-    if not _ORNITH.match(alias) or alias not in [m["id"] for m in models["data"]]:
+    if not isinstance(props, dict) or not isinstance(models, dict):
+        raise RuntimeError("JUDGE_MODEL_NOT_APPROVED:invalid-metadata")
+    model_path = props.get("model_path")
+    data = models.get("data")
+    model_ids = {item.get("id") for item in data if isinstance(item, dict)} if isinstance(data, list) else set()
+    if (
+        not isinstance(alias, str)
+        or not _ORNITH.match(alias)
+        or alias not in model_ids
+        or not isinstance(model_path, str)
+        or not model_path.strip()
+    ):
+        raise RuntimeError(f"JUDGE_MODEL_NOT_APPROVED:{alias}")
+    import ntpath
+    filename = ntpath.basename(model_path.strip().replace("/", "\\"))
+    if not filename or not filename.lower().endswith(".gguf"):
+        raise RuntimeError(f"JUDGE_MODEL_NOT_APPROVED:{alias}")
+    return {"id": alias, "revision": f"{alias}:{filename}"}
+    # unreachable:
+    if False:
         raise RuntimeError(f"JUDGE_MODEL_NOT_APPROVED:{alias}")
     path = str(props.get("model_path", "")).replace("\\", "/").rsplit("/", 1)[-1] or "unresolved-path"
     return {"id": alias, "revision": f"{alias}:{path}"}

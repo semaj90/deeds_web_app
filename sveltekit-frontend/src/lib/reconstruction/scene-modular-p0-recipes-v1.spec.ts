@@ -2,6 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
+	attachModularPrefabAssemblyToRecipeV1,
+	SceneRuntimeRecipeV1Schema,
+} from './scene-runtime-recipe-v1.js';
+import { createSceneRuntimeThreeV1 } from './scene-runtime-three-v1.js';
+import {
 	P0_MODULAR_RECIPES_V1,
 	buildBeachNightPrefabV1,
 	buildCityBlockPrefabV1,
@@ -132,5 +137,73 @@ describe('Parent Atlas P0 Modular Recipes & Four-Bedroom House Milestone', () =>
 		const light = selectable.find((c) => c.capability === 'light');
 		expect(door?.objectId).toBe('house.four_bedroom.v1:door_front_leaf');
 		expect(light?.ontologyConceptId).toBe('pa:object.fixture.light-fixture');
+	});
+
+	it('attaches canonical modular prefab assemblies directly into SceneRuntimeRecipeV1', () => {
+		const baseRecipe = SceneRuntimeRecipeV1Schema.parse({
+			schema: 'parent-atlas.scene-runtime-recipe/v1',
+			planHash: 'a'.repeat(64),
+			caseId: '11111111-2222-4333-8444-555555555555',
+			sceneId: '22222222-3333-4444-8555-666666666666',
+			sceneRevision: 1,
+			environment: {
+				kind: 'four-bedroom-house',
+				seed: 7,
+				profile: 'four-bedroom-house-v1',
+				customRecipeId: null,
+				cellSizeMeters: 16,
+				extentMeters: { x: 16, z: 16 },
+				coordinateStatus: 'illustrative_uncalibrated',
+			},
+			streaming: {
+				algorithm: 'parent-atlas.scene-cell-residency/v1',
+				maxResidentCells: 64,
+				unloadGraceMs: 1500,
+				activeSceneMemoryMiB: 8,
+			},
+			actors: [],
+			primitiveRegistry: [],
+			assets: [],
+			placements: [],
+			eventLanes: [],
+			quality: { profile: 'retro', maxTextureDimension: 128, maxTriangles: 50000, maxInstances: 256 },
+			narrative: {
+				why: { status: 'unknown', text: null, evidenceIds: [], reviewStatus: 'unreviewed', reviewDecisionId: null },
+				how: { status: 'unknown', text: null, evidenceIds: [], reviewStatus: 'unreviewed', reviewDecisionId: null },
+			},
+			provenance: {
+				generator: 'procedural-three-scene-v1',
+				clockPolicy: 'source_local_unaligned',
+				identityPolicy: 'pseudonymous_visual_handles',
+				motivePolicy: 'unknown_or_cited_hypothesis',
+			},
+		});
+
+		const withCourt = attachModularPrefabAssemblyToRecipeV1(baseRecipe, 'courtroom.generic.v1');
+		const withOffice = attachModularPrefabAssemblyToRecipeV1(withCourt, 'office.v1');
+		expect(withOffice.prefabAssemblies?.length).toBe(2);
+		expect(withOffice.prefabAssemblies?.[0]?.prefabId).toBe('courtroom.generic.v1');
+		expect(withOffice.prefabAssemblies?.[0]?.components.length).toBeGreaterThan(0);
+		expect(withOffice.prefabAssemblies?.[1]?.prefabId).toBe('office.v1');
+
+		const runtime = createSceneRuntimeThreeV1(withOffice);
+		try {
+			const prefabRoot = runtime.root.getObjectByName('prefab-assemblies');
+			expect(prefabRoot).toBeDefined();
+			expect(runtime.prefabAssemblySummary.assemblyCount).toBe(2);
+			expect(runtime.prefabAssemblySummary.spawnedCount).toBeGreaterThan(0);
+			expect(runtime.prefabAssemblySummary.spawnedCount).toBeLessThanOrEqual(256);
+			expect(runtime.prefabAssemblySummary.memoryBudgetMiB).toBeLessThanOrEqual(8);
+			expect(runtime.prefabAssemblySummary.tupleCount).toBeGreaterThan(0);
+
+			const firstComp = withOffice.prefabAssemblies![0]!.components[0]!;
+			const targetNode = runtime.targetNodes.get(`primitive:${firstComp.objectId}`);
+			expect(targetNode).toBeDefined();
+			expect(targetNode?.userData.objectId).toBe(firstComp.objectId);
+			expect(targetNode?.userData.prefabId).toBe('courtroom.generic.v1');
+			expect(runtime.findObjectMesh(firstComp.objectId)).not.toBeNull();
+		} finally {
+			runtime.dispose();
+		}
 	});
 });

@@ -7,7 +7,7 @@
  * individual transforms, object IDs, room membership, and ontology tuples.
  */
 
-import { createHash } from 'node:crypto';
+import { sha256HexSync } from './sha256-sync-v1.js';
 import type { SceneConceptV1 } from './scene-ontology-bridge-v1.js';
 import type { ScenePrimitiveKindV1, SceneMaterialKeyV1, PrimitiveDetailLevelV1 } from '$lib/splat/scene-primitive-registry-v1.js';
 import { type PolygonPointV1, triangulateSimplePolygonV1 } from '$lib/splat/polygon-prism-validation-v1.js';
@@ -40,7 +40,7 @@ export function hashGeometryRecipeV1(recipe: Omit<SceneGeometryRecipeV1, 'recipe
 		canonical.polygonCoordinateSpace = recipe.polygonCoordinateSpace ?? null;
 		canonical.polygonImageDimensions = recipe.polygonImageDimensions ?? null;
 	}
-	return createHash('sha256').update(JSON.stringify(canonical), 'utf8').digest('hex');
+	return sha256HexSync(JSON.stringify(canonical));
 }
 
 export function createGeometryRecipeV1(input: Omit<SceneGeometryRecipeV1, 'recipeHash'>): SceneGeometryRecipeV1 {

@@ -36,20 +36,37 @@ export async function readLastTaskAttemptReceipts(
   dir?: string,
 ): Promise<Map<string, TaskAttemptReceiptV1>> {
   const last = new Map<string, TaskAttemptReceiptV1>();
+  for await (const receipt of readAttemptReceipts(dir)) last.set(receipt.logicalTaskKey, receipt);
+  return last;
+}
+
+async function* readAttemptReceipts(dir?: string) {
   let raw: string;
   try {
     raw = await fs.readFile(await receiptsPath(dir), 'utf8');
   } catch {
-    return last;
+    return;
   }
   for (const line of raw.split('\n')) {
     if (!line.trim()) continue;
     try {
       const parsed = TaskAttemptReceiptV1Schema.safeParse(JSON.parse(line));
-      if (parsed.success) last.set(parsed.data.logicalTaskKey, parsed.data);
+      if (parsed.success) yield parsed.data;
     } catch {
       /* skip malformed line */
     }
   }
-  return last;
+}
+
+/** Preserve an older matching attempt when a later append belongs to a different revision. */
+export async function readTaskAttemptReceiptForRevision(keys: readonly string[], revision: string, dir?: string) {
+  const aliases = new Set(keys);
+  let current: TaskAttemptReceiptV1 | null = null;
+  let staleCount = 0;
+  for await (const receipt of readAttemptReceipts(dir)) {
+    if (!aliases.has(receipt.logicalTaskKey)) continue;
+    if (receipt.taskRevision === revision) current = receipt;
+    else staleCount++;
+  }
+  return { current, staleCount };
 }

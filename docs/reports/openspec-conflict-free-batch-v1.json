@@ -1,0 +1,102 @@
+{
+  "schema": "atlas.openspec-conflict-free-batch.v1",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "maxConcurrentWorkers": 2,
+  "workerA": {
+    "role": "a2a-worker-a",
+    "ownedFiles": [
+      "pose-skeleton-schema-v1.ts",
+      "scope:parent-atlas-ml-graph-retrieval-convergence:SCAF-04",
+      "test-receipt-ingest-v1.ts",
+      "test_async_dag_worker_v1.py"
+    ],
+    "tasks": [
+      {
+        "durableKey": "parent-atlas-ml-graph-retrieval-convergence:SCAF-04:1",
+        "locator": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L87",
+        "score": 95.0,
+        "ownedFiles": [
+          "scope:parent-atlas-ml-graph-retrieval-convergence:SCAF-04"
+        ],
+        "summary": "SCAF-04 Run tests in existing Python environment: `PYTHONPATH=python python -m unittest discover -s python/tests -p test_ranking_alignmen..."
+      },
+      {
+        "durableKey": "parent-atlas-ml-graph-retrieval-convergence:ASYNC-04:1",
+        "locator": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L194",
+        "score": 95.0,
+        "ownedFiles": [
+          "test_async_dag_worker_v1.py"
+        ],
+        "summary": "ASYNC-04 Execute tests via `PYTHONPATH=python python -m unittest discover -s python/tests -p test_async_dag_worker_v1.py -v`."
+      },
+      {
+        "durableKey": "crime-scene-reconstruction:DEC-D:1",
+        "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L83",
+        "score": 85.0,
+        "ownedFiles": [
+          "pose-skeleton-schema-v1.ts"
+        ],
+        "summary": "DEC-D Pose model and keypoint format: COCO-17 is already defined in the repo (`pose-skeleton-schema-v1.ts`). The plan proposes MediaPipe ..."
+      },
+      {
+        "durableKey": "parent-atlas-ace-rlm-bitfrost-integration:RECEIPT-WRITER-01:4",
+        "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16639",
+        "score": 85.0,
+        "ownedFiles": [
+          "test-receipt-ingest-v1.ts"
+        ],
+        "summary": "RECEIPT-WRITER-01 (candidate, not verified end to end) `test-receipt-ingest-v1.ts` parses a vitest JSON report into `AtlasTestExecutionRe..."
+      }
+    ]
+  },
+  "workerB": {
+    "role": "a2a-worker-b",
+    "ownedFiles": [
+      "features/canonical-candidate-v1.ts",
+      "optional-search-tool-contract.spec.ts",
+      "semantic-packet-writer.ts",
+      "test_candidate_concept_tile_v1.py"
+    ],
+    "tasks": [
+      {
+        "durableKey": "parent-atlas-ml-graph-retrieval-convergence:TILE-03:1",
+        "locator": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L120",
+        "score": 95.0,
+        "ownedFiles": [
+          "test_candidate_concept_tile_v1.py"
+        ],
+        "summary": "TILE-03 Execute `PYTHONPATH=python python -m unittest discover -s python/tests -p test_candidate_concept_tile_v1.py -v`; record runtime r..."
+      },
+      {
+        "durableKey": "parent-atlas-semantic-768-canonical-contract:TASK-L1453:1",
+        "locator": "openspec/changes/parent-atlas-semantic-768-canonical-contract/tasks.md#L1453",
+        "score": 95.0,
+        "ownedFiles": [
+          "semantic-packet-writer.ts"
+        ],
+        "summary": "Keep `semantic-packet-writer.ts` a provisional candidate only. Schema"
+      },
+      {
+        "durableKey": "parent-atlas-ace-rlm-bitfrost-integration:TASK-L16047:1",
+        "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16047",
+        "score": 85.0,
+        "ownedFiles": [
+          "optional-search-tool-contract.spec.ts"
+        ],
+        "summary": "Run `optional-search-tool-contract.spec.ts` successfully. The focused Vitest process stalled before reporting this spec; it was interrupt..."
+      },
+      {
+        "durableKey": "parent-atlas-ace-rlm-bitfrost-integration:ALIGN-GEMM-GAP-10:1",
+        "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16687",
+        "score": 85.0,
+        "ownedFiles": [
+          "features/canonical-candidate-v1.ts"
+        ],
+        "summary": "ALIGN-GEMM-GAP-10 `features/canonical-candidate-v1.ts::resolveCanonicalCandidateByOrdinal` re-parses the entire map with zod on EVERY cal..."
+      }
+    ]
+  },
+  "disjointVerified": true,
+  "skippedConflicts": []
+}

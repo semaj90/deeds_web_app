@@ -26,6 +26,10 @@ import {
 } from '$lib/splat/scene-action-evaluator-v1.js';
 import { SceneRuntimeRecipeV1Schema, type SceneRuntimeRecipeV1 } from './scene-runtime-recipe-v1.js';
 import { createFourBedroomHouseThreeV1 } from './four-bedroom-house-three-v1.js';
+import {
+	compilePrefabAssemblyPlacementsAndTuplesV1,
+	type CompiledAssemblyPlacementsAndTuplesV1
+} from '$lib/splat/scene-ontology/scene-plan-ontology-bridge-v1.js';
 
 export interface SceneRuntimeThreeOptionsV1 {
 	resolveAsset?: (asset: SceneRuntimeRecipeV1['assets'][number]) => THREE.Object3D;
@@ -117,6 +121,8 @@ export function createSceneRuntimeThreeV1(input: unknown, options: SceneRuntimeT
 	const environmentResourceNodes = new Set<THREE.Object3D>();
 	let environmentLoadQueue: SceneCellV1[] = [];
 	let residencyMode: SceneResidencyModeV1 = 'navigation';
+	// LIVE-05: bounded counters for the performance dialog. Reset only when the runtime is created.
+	const residencyCounters = { cellBuilds: 0, cellHits: 0, cellEvictions: 0, cacheReleases: 0 };
 	let activeResidentLimit = maxResidentCells;
 	let lastFocusTile = '';
 	let lastResidencyUpdateMs = -Infinity;
@@ -160,6 +166,64 @@ export function createSceneRuntimeThreeV1(input: unknown, options: SceneRuntimeT
 		root.add(mesh);
 		targetNodes.set(`primitive:${primitive.objectId}`, mesh);
 		baseTargets.push({ kind: 'primitive', targetId: primitive.objectId, visible: true, positionMeters: [0, 0, 0] });
+	}
+
+	const compiledPrefabs: CompiledAssemblyPlacementsAndTuplesV1 | null =
+		recipe.prefabAssemblies && recipe.prefabAssemblies.length > 0
+			? compilePrefabAssemblyPlacementsAndTuplesV1(recipe)
+			: null;
+	let spawnedPrefabCount = 0;
+	if (recipe.prefabAssemblies && recipe.prefabAssemblies.length > 0) {
+		const maxPrefabInstances = Math.min(256, recipe.quality.maxInstances);
+		const detail = recipe.quality.profile === 'high' ? 'detailed' : recipe.quality.profile === 'balanced' ? 'balanced' : 'retro';
+		const prefabRoot = new THREE.Group();
+		prefabRoot.name = 'prefab-assemblies';
+		prefabRoot.userData = {
+			planHash: recipe.planHash,
+			memoryBudgetMiB: Math.min(8, recipe.streaming.activeSceneMemoryMiB),
+			maxInstances: maxPrefabInstances,
+			illustrative: true
+		};
+		for (const assembly of recipe.prefabAssemblies) {
+			const assemblyGroup = new THREE.Group();
+			assemblyGroup.name = `assembly:${assembly.prefabId}`;
+			assemblyGroup.userData = {
+				prefabId: assembly.prefabId,
+				version: assembly.version,
+				generated: true,
+				illustrative: true
+			};
+			for (const comp of assembly.components) {
+				if (spawnedPrefabCount >= maxPrefabInstances) break;
+				const targetKey = `primitive:${comp.objectId}`;
+				if (targetNodes.has(targetKey)) continue;
+				const kind = (SCENE_PRIMITIVE_KINDS_V1.find((candidate) => candidate === comp.primitiveKind) ?? 'box') as ScenePrimitiveKindV1;
+				const mesh = createScenePrimitiveMeshV1(kind, { detail, name: comp.objectId });
+				mesh.position.set(comp.position[0], comp.position[1], comp.position[2]);
+				mesh.quaternion.set(comp.rotationXyzw[0], comp.rotationXyzw[1], comp.rotationXyzw[2], comp.rotationXyzw[3]);
+				mesh.scale.set(comp.scale[0], comp.scale[1], comp.scale[2]);
+				mesh.updateMatrix();
+				mesh.userData = {
+					...mesh.userData,
+					objectId: comp.objectId,
+					prefabId: assembly.prefabId,
+					prefabVersion: assembly.version,
+					recipeId: comp.recipeId,
+					ontologyConceptId: comp.ontologyConceptId,
+					capability: comp.capability,
+					label: comp.label,
+					planHash: recipe.planHash,
+					generated: true,
+					illustrative: true
+				};
+				assemblyGroup.add(mesh);
+				targetNodes.set(targetKey, mesh);
+				baseTargets.push({ kind: 'primitive', targetId: comp.objectId, visible: true, positionMeters: [comp.position[0], comp.position[1], comp.position[2]] });
+				spawnedPrefabCount += 1;
+			}
+			prefabRoot.add(assemblyGroup);
+		}
+		root.add(prefabRoot);
 	}
 
 	for (const asset of recipe.assets) {
@@ -362,12 +426,14 @@ export function createSceneRuntimeThreeV1(input: unknown, options: SceneRuntimeT
 		for (const cell of plan.unload) {
 			const loaded = environmentCells.get(cell.key);
 			if (!loaded) continue;
+			residencyCounters.cellEvictions += 1;
 			loaded.group.removeFromParent();
 			disposeSceneEnvironmentCellThreeV1(loaded.group);
 			loaded.group.traverse((node) => environmentResourceNodes.delete(node));
 			environmentCells.delete(cell.key);
 			environmentInstanceCount -= loaded.instanceCount;
 		}
+		residencyCounters.cellHits += plan.resident.filter((cell) => environmentCells.has(cell.key)).length;
 		const desired = new Set(plan.resident.map((cell) => cell.key));
 		environmentLoadQueue = environmentLoadQueue.filter((cell) => desired.has(cell.key) && !environmentCells.has(cell.key));
 		const queued = new Set(environmentLoadQueue.map((cell) => cell.key));
@@ -388,6 +454,7 @@ export function createSceneRuntimeThreeV1(input: unknown, options: SceneRuntimeT
 			built.group.traverse((node) => environmentResourceNodes.add(node));
 			environmentCells.set(cell.key, { cell, group: built.group, instanceCount: built.instanceCount });
 			environmentInstanceCount += built.instanceCount;
+			residencyCounters.cellBuilds += 1;
 		}
 	}
 
@@ -396,7 +463,40 @@ export function createSceneRuntimeThreeV1(input: unknown, options: SceneRuntimeT
 			loadedCells: environmentCells.size,
 			queuedCells: environmentLoadQueue.length,
 			residentLimit: cellResidency ? activeResidentLimit : 0,
-			mode: residencyMode
+			mode: residencyMode,
+			...residencyCounters
+		};
+	}
+
+	/**
+	 * Release regenerable, unpinned preview cache (non-primary environment cells,
+	 * queued cell loads, unused motion clips, and unreferenced character templates)
+	 * without touching original evidence, active objects, reviewed edits, or shared resources.
+	 * Allows lazy reloading on subsequent focus updates.
+	 */
+	function releasePreviewCache() {
+		let releasedCells = 0;
+		let releasedInstances = 0;
+		for (const [key, loaded] of Array.from(environmentCells.entries())) {
+			if (key === '0:0') continue;
+			loaded.group.removeFromParent();
+			disposeSceneEnvironmentCellThreeV1(loaded.group);
+			loaded.group.traverse((node) => environmentResourceNodes.delete(node));
+			environmentCells.delete(key);
+			environmentInstanceCount -= loaded.instanceCount;
+			releasedCells += 1;
+			releasedInstances += loaded.instanceCount;
+		}
+		environmentLoadQueue = [];
+		residencyCounters.cacheReleases += 1;
+		lastFocusTile = '';
+		lastResidencyUpdateMs = -Infinity;
+		defaultMotionCache.trim();
+		characterTemplates.evictUnreferenced();
+		return {
+			releasedCells,
+			releasedInstances,
+			remainingLoadedCells: environmentCells.size
 		};
 	}
 
@@ -547,6 +647,14 @@ export function createSceneRuntimeThreeV1(input: unknown, options: SceneRuntimeT
 		characterRuntimes,
 		materialPreview,
 		motionCache: defaultMotionCache,
+		compiledPrefabs,
+		prefabAssemblySummary: {
+			assemblyCount: recipe.prefabAssemblies?.length ?? 0,
+			spawnedCount: spawnedPrefabCount,
+			tupleCount: compiledPrefabs?.tupleGraph.tuples.length ?? 0,
+			animationCueBindings: compiledPrefabs?.animationCueBindings ?? [],
+			memoryBudgetMiB: Math.min(8, recipe.streaming.activeSceneMemoryMiB)
+		},
 		get environmentInstanceCount() {
 			return environmentInstanceCount;
 		},
@@ -557,6 +665,7 @@ export function createSceneRuntimeThreeV1(input: unknown, options: SceneRuntimeT
 		updateEnvironmentFocus,
 		drainEnvironmentCellQueue,
 		getResidencyMetrics,
+		releasePreviewCache,
 		loadCharacterActor,
 		findObjectMesh,
 		applyObjectMaterialPreview,

@@ -19,16 +19,16 @@
 | Rank | Score | Status | Line | Task ID | Summary |
 | :---: | :---: | :---: | :---: | :--- | :--- |
 | 1 | **95.61** | PARTIAL | L859 | `CASE-SCENE-LIVE-04` | CASE-SCENE-LIVE-04 · Activity-aware memory and LOD · CREATED and WIRED (partial). The case Three.js runtime now consumes the existing Mor... |
-| 2 | **94.66** | PARTIAL | L857 | `CASE-SCENE-LIVE-03-` | CASE-SCENE-LIVE-03-video-clock · CREATED and WIRED, worktree base `4ae8253ab6e`. The scene preview can follow the selected lane's revisio... |
-| 3 | **94.55** | PARTIAL | L860 | `CASE-SCENE-LIVE-05` | CASE-SCENE-LIVE-05 · Memory and performance modal · CREATED and WIRED (partial). The scene preview dialog samples at 750 ms while open. I... |
-| 4 | **93.86** | PARTIAL | L846 | `CASE-SCENE-LIVE-01` | CASE-SCENE-LIVE-01 · Assistant chat and editable proposals · CREATED and WIRED (partial). The case scene builder now sends an explicit us... |
-| 5 | **91.52** | PARTIAL | L874 | `CASE-SCENE-E2E-11-` | CASE-SCENE-E2E-11-character-v2-alignment · CREATED and WIRED (partial, 2026-11-20). Reconciled the Parent Atlas Character Creator v2 refe... |
-| 6 | **89.95** | PARTIAL | L816 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02c-5-edit-reopened CREATED and WIRED at worktree base `4ae8253ab6e`: reopening an editor-compatible draft restores its en... |
-| 7 | **88.82** | PARTIAL | L852 | `CASE-SCENE-LIVE-01-` | CASE-SCENE-LIVE-01-selection-inspector · CREATED, WIRED, and synthetic-browser-proven (partial, 2026-11-20). Selecting a scene object now... |
-| 8 | **88.8** | PARTIAL | L853 | `CASE-SCENE-LIVE-01-` | CASE-SCENE-LIVE-01-overlapping-cue-conflicts · CREATED, WIRED, and synthetic-browser-proven (partial, 2026-11-20). Runtime evaluation det... |
-| 9 | **87.94** | PARTIAL | L817 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02c-5-reviewed-video CREATED and WIRED at worktree base `4ae8253ab6e`: the case builder imports approved events from selec... |
-| 10 | **87.94** | PARTIAL | L818 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02c-5-procedural-draft CREATED and WIRED at worktree base `4ae8253ab6e`: save and reopen the illustrative plan and event/t... |
-| 11 | **87.16** | PARTIAL | L40 | `SCENE-20` | SCENE-20 Primitive vocabulary and composition: reuse `scene-primitive-registry-v1.ts`, `scene-prefab-registry-v1.ts`, and the canonical 5... |
+| 2 | **95.16** | PARTIAL | L40 | `SCENE-20` | SCENE-20 Primitive vocabulary and composition: reuse `scene-primitive-registry-v1.ts`, `scene-prefab-registry-v1.ts`, and the proposed 50... |
+| 3 | **94.66** | PARTIAL | L857 | `CASE-SCENE-LIVE-03-` | CASE-SCENE-LIVE-03-video-clock · CREATED and WIRED, worktree base `4ae8253ab6e`. The scene preview can follow the selected lane's revisio... |
+| 4 | **94.55** | PARTIAL | L860 | `CASE-SCENE-LIVE-05` | CASE-SCENE-LIVE-05 · Memory and performance modal · CREATED and WIRED (partial). The scene preview dialog samples at 750 ms while open. I... |
+| 5 | **93.86** | PARTIAL | L846 | `CASE-SCENE-LIVE-01` | CASE-SCENE-LIVE-01 · Assistant chat and editable proposals · CREATED and WIRED (partial). The case scene builder now sends an explicit us... |
+| 6 | **91.52** | PARTIAL | L874 | `CASE-SCENE-E2E-11-` | CASE-SCENE-E2E-11-character-v2-alignment · CREATED and WIRED (partial, 2026-11-20). Reconciled the Parent Atlas Character Creator v2 refe... |
+| 7 | **89.95** | PARTIAL | L816 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02c-5-edit-reopened CREATED and WIRED at worktree base `4ae8253ab6e`: reopening an editor-compatible draft restores its en... |
+| 8 | **88.82** | PARTIAL | L852 | `CASE-SCENE-LIVE-01-` | CASE-SCENE-LIVE-01-selection-inspector · CREATED, WIRED, and synthetic-browser-proven (partial, 2026-11-20). Selecting a scene object now... |
+| 9 | **88.8** | PARTIAL | L853 | `CASE-SCENE-LIVE-01-` | CASE-SCENE-LIVE-01-overlapping-cue-conflicts · CREATED, WIRED, and synthetic-browser-proven (partial, 2026-11-20). Runtime evaluation det... |
+| 10 | **87.94** | PARTIAL | L817 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02c-5-reviewed-video CREATED and WIRED at worktree base `4ae8253ab6e`: the case builder imports approved events from selec... |
+| 11 | **87.94** | PARTIAL | L818 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02c-5-procedural-draft CREATED and WIRED at worktree base `4ae8253ab6e`: save and reopen the illustrative plan and event/t... |
 | 12 | **86.74** | PARTIAL | L855 | `CASE-SCENE-LIVE-02-` | CASE-SCENE-LIVE-02-preview · CREATED and WIRED (partial). The case builder shows evidence and plan preparation stages, aborts both fetch ... |
 | 13 | **86.29** | PARTIAL | L865 | `CASE-SCENE-LIVE-08` | CASE-SCENE-LIVE-08 · Searchable scene recipe catalog · CREATED and WIRED (partial). Added a deterministic local search index over the exi... |
 | 14 | **85.68** | PARTIAL | L870 | `CASE-SCENE-E2E-09-` | CASE-SCENE-E2E-09-report · CREATED and WIRED (partial, 2026-11-20). Added `scene-revision-report-v1.ts` and an authorized `GET /api/cases... |
@@ -50,7 +50,7 @@
 | 30 | **78.95** | PARTIAL | L810 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02c-3-curfew-fixture Add a separate fictional curfew/beach event fixture: the stated 22:00 curfew is unverified jurisdicti... |
 | 31 | **77.95** | PARTIAL | L770 | `CASE-SCENE-E2E-01C` | CASE-SCENE-E2E-01C Typed East Quay Scene Bridge + Case Workspace Readback: port fixture helpers to TypeScript; render a synthetic actor a... |
 | 32 | **76.95** | PARTIAL | L793 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02b-5-staging-proof Playwright defines an opt-in staging round trip for an evidence-free job. It queues through the case b... |
-| 33 | **75.95** | PARTIAL | L779 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02b-4 Durable job contract · schema candidate created, not operational. Added the candidate-only Drizzle/SQL owner `scene_... |
+| 33 | **75.95** | PARTIAL | L779 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02b-4 Durable job contract · schema candidate created, runtime path gated, live operation unproven. The Drizzle/SQL owner ... |
 | 34 | **75.95** | PARTIAL | L782 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02b-5 Implement the worker/compiler adapter for admitted plans and immutable scene outputs. The worker now uses the existi... |
 | 35 | **75.95** | PARTIAL | L786 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02b-5-dispatch The server runner connects one explicitly dispatched job to the lease owner and verified artifact compiler.... |
 | 36 | **75.95** | PARTIAL | L787 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02b-5-completion The job owner now locks the claimed row and rechecks canonical inputs inside the serializable completion ... |
@@ -77,13 +77,13 @@
 | 57 | **71.89** | PARTIAL | L838 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-06e-instanced-preview Wire camera-driven 32 m residency into the browser demo; render deterministic urban building/vehicle... |
 | 58 | **70.59** | PARTIAL | L877 | `CASE-SCENE-E2E-13` | CASE-SCENE-E2E-13 Optional GOAP what-if simulation: keep source-backed/reviewed case events separate from simulated actions. Define a ren... |
 | 59 | **68.95** | PARTIAL | L765 | `CASE-SCENE-E2E-01` | CASE-SCENE-E2E-01 Admit the synthetic seed through an explicit fixture/demo path. Map case, scene, participant, evidence, interview, even... |
-| 60 | **68.16** | OPEN | L15 | `SCENE-06` | SCENE-06 Artifact and activation gate: register immutable derived assets, case association, source revisions, scene revision, rights/mode... |
+| 60 | **68.52** | OPEN | L15 | `SCENE-06` | SCENE-06 Artifact and activation gate: register immutable derived assets, case association, source revisions, scene revision, rights/mode... |
 | 61 | **68.04** | PARTIAL | L224 | `TASK-L224` | 15.D1 PARTIAL: `src/lib/splat/one-bone-rigid-skin-validator-v1.ts` (per-vertex rigid influence: one bone, weight 1, no blending; bone ind... |
 | 62 | **67.95** | PARTIAL | L807 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02c-3-pulse-readback The case builder restores a procedural draft's pulse color, intensity range, and period when editing ... |
 | 63 | **67.56** | OPEN | L411 | `SWEEP-RESUME-03` | SWEEP-RESUME-03 Restart: `cd sveltekit-frontend && ROUTE_SWEEP=1 npx playwright test tests/e2e/route-sweep.spec.ts`. Needs the dev server... |
 | 64 | **65.52** | OPEN | L17 | `SCENE-08` | SCENE-08 Verification: an isolated worker/browser run proves authorized upload → explicit Set the scene → durable job/progress/failure → ... |
 | 65 | **64.7** | OPEN | L856 | `CASE-SCENE-LIVE-03` | CASE-SCENE-LIVE-03 · Video-first editing. Use the selected video's source-local presentation time as the lane playhead. Keep evidence, re... |
-| 66 | **63.49** | OPEN | L10 | `SCENE-01` | SCENE-01 Explicit case action: add Set the scene to the authorized evidence board. The user selects evidence for the scene; the action is... |
+| 66 | **63.34** | OPEN | L10 | `SCENE-01` | SCENE-01 Explicit case action: add Set the scene to the authorized evidence board. The user selects evidence for the scene; the action is... |
 | 67 | **61.46** | OPEN | L871 | `CASE-SCENE-E2E-10` | CASE-SCENE-E2E-10 Prove the authorized browser round trip on the fictional fixture: choose case and path, add/select evidence, review one... |
 | 68 | **61.1** | OPEN | L24 | `SCENE-12` | SCENE-12 Splat calibration receipt (Lane E): an SPZ has no real-world units. Solve a similarity transform (uniform scale, yaw about Y, tr... |
 | 69 | **60.99** | OPEN | L38 | `SCENE-18` | SCENE-18 PARTIAL (2026-11-16): deterministic selector implemented in `sveltekit-frontend/src/lib/server/scene/clip-window-v1.ts` (policy ... |
@@ -97,12 +97,12 @@
 | 77 | **58.6** | OPEN | L26 | `SCENE-14` | SCENE-14 Lane C mesh master and FBX checklist: keep a Blender master file as the source of truth. Before any FBX export, record unit scal... |
 | 78 | **58.29** | OPEN | L192 | `TASK-L192` | 14.11 Text-grounded person-role proposals use the existing `python/atlas_role_evidence_v1.py` and `python/atlas_keyframe_analysis_v1.py` ... |
 | 79 | **58.0** | OPEN | L21 | `SCENE-09` | SCENE-09 Typed 3D asset loading: qualify the viewer's GLB/glTF mesh path, FBX/OBJ import or normalization path, and SPZ Gaussian-splat pa... |
-| 80 | **57.84** | OPEN | L95 | `AUD-05` | AUD-05 API gaps for the set-the-scene flow: no route creates or reads a scene job (SCENE-02), reads or reviews proposals (VR-14, REV-06),... |
+| 80 | **57.84** | OPEN | L95 | `AUD-05` | AUD-05 API gaps for the set-the-scene flow: a case-scoped `/api/cases/[id]/scene-reconstruction/jobs` route now provides POST admission, ... |
 | 81 | **57.17** | OPEN | L866 | `CASE-SCENE-E2E-07` | CASE-SCENE-E2E-07 Persist a derived mesh/GLB through the existing case-scoped asset registry and scene-revision writer. PostgreSQL assign... |
 | 82 | **56.47** | OPEN | L861 | `CASE-SCENE-LIVE-06` | CASE-SCENE-LIVE-06 · SvelteKit boundaries and acceleration. SSR loads authorized case and revision metadata and the shell. Mount Three.js... |
 | 83 | **55.99** | OPEN | L72 | `VR-08` | VR-08 Investigator review gate: nothing moves into the scene-revision authority without an explicit reviewer action. Reuse the source-bou... |
 | 84 | **55.95** | OPEN | L802 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02c-3-multitrack Add a declarative, deterministic multi-track event presentation model for actor motion, props/environment... |
-| 85 | **55.93** | OPEN | L11 | `SCENE-02` | SCENE-02 Durable job lifecycle: distinguish bounded read-only plan/preview requests from work that is actually queued. The current parame... |
+| 85 | **55.76** | OPEN | L11 | `SCENE-02` | SCENE-02 Durable job lifecycle: distinguish bounded read-only plan/preview requests from work that is actually queued. The parameter and ... |
 | 86 | **54.59** | OPEN | L566 | `PRX-05` | PRX-05 Test: an OBJ and an FBX each convert to GLB with the hash recorded and the budget checked. The original file is never modified. |
 | 87 | **54.59** | OPEN | L716 | `MEM-07` | MEM-07 Acceptance Test: Multi-Scene Shared Texture & Persistence Gate: |
 | 88 | **54.39** | OPEN | L191 | `TASK-L191` | 14.10 Persistent local depth worker added at `python/atlas_depth_anything_worker_v1.py`: loads only the pinned snapshot once per process,... |
@@ -112,9 +112,9 @@
 | 92 | **53.88** | OPEN | L839 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-06d Choose and implement canonical persistence for editable recipes using existing scene revision ownership, including sta... |
 | 93 | **53.68** | OPEN | L365 | `TASK-L365` | Add a reviewed motion/event path and note editor in the workspace backed by the existing case revision owner. Keep source-pixel paths and... |
 | 94 | **53.26** | OPEN | L36 | `SCENE-16` | SCENE-16 Beat extraction (who/what/why/how): derive beats from the authorized timeline (`timeline-reconstruction-bridge.ts`, which alread... |
-| 95 | **52.95** | OPEN | L775 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02c Deliver the complete browser-based HTML5 reconstruction experience in the existing SvelteKit + Three.js scene: populat... |
-| 96 | **52.93** | OPEN | L829 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-06c Wire polygon mesh selection and vertex editing into the existing Detective Mode scene, with explicit image-plane/uncal... |
-| 97 | **52.89** | OPEN | L590 | `STORYBOOK-04` | STORYBOOK-04 Build a chapter from a reviewed interval or storyboard revision and persist the exact observation citations through the scen... |
-| 98 | **52.87** | OPEN | L840 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-06e Connect tile/Morton/LOD helpers to the existing scene residency/render path with bounded load, grace-period unload, an... |
-| 99 | **52.68** | OPEN | L14 | `SCENE-05` | SCENE-05 Streamed asset derivation: for a rights-qualified splat admitted to streaming, run pinned SplatTransform steps separately to pro... |
+| 95 | **52.99** | OPEN | L14 | `SCENE-05` | SCENE-05 Streamed asset derivation: for a rights-qualified splat admitted to streaming, run pinned SplatTransform steps separately to pro... |
+| 96 | **52.95** | OPEN | L775 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-02c Deliver the complete browser-based HTML5 reconstruction experience in the existing SvelteKit + Three.js scene: populat... |
+| 97 | **52.93** | OPEN | L829 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-06c Wire polygon mesh selection and vertex editing into the existing Detective Mode scene, with explicit image-plane/uncal... |
+| 98 | **52.89** | OPEN | L590 | `STORYBOOK-04` | STORYBOOK-04 Build a chapter from a reviewed interval or storyboard revision and persist the exact observation citations through the scen... |
+| 99 | **52.87** | OPEN | L840 | `CASE-SCENE-E2E-` | CASE-SCENE-E2E-06e Connect tile/Morton/LOD helpers to the existing scene residency/render path with bounded load, grace-period unload, an... |
 | 100 | **52.65** | OPEN | L73 | `VR-09` | VR-09 Database: the draft adds five new tables (`video_reconstruction_runs`, `_tracks`, `_samples`, `_artifact_links`, `_scene_proposals`... |

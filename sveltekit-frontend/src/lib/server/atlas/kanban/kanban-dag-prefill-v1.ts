@@ -377,3 +377,63 @@ export async function upsertKanbanDagPrefill(
     durationMs: Number((performance.now() - t0).toFixed(2)), sha256Digest: hasher.digest('hex'), canonicalAuthority: false,
   };
 }
+
+export interface ConflictFreePrefillPartitionV1 {
+  schema: 'atlas.kanban-conflict-free-batch.v1';
+  canonicalAuthority: false;
+  writesPerformed: false;
+  workerA: PrefillRowV1[];
+  workerB: PrefillRowV1[];
+  disjointVerified: boolean;
+  skippedConflicts: string[];
+}
+
+/**
+ * Partition prefill rows into two disjoint A2A/MCP worker queues using each task's
+ * declared `ownedFilesByKey` map (never allowing two concurrent workers on the same file).
+ */
+export function partitionConflictFreePrefillBatchV1(
+  rows: readonly PrefillRowV1[],
+  ownedFilesByKey: Readonly<Record<string, readonly string[]>>,
+  maxPerWorker = 4,
+): ConflictFreePrefillPartitionV1 {
+  const workerA: PrefillRowV1[] = [];
+  const workerB: PrefillRowV1[] = [];
+  const filesA = new Set<string>();
+  const filesB = new Set<string>();
+  const skippedConflicts: string[] = [];
+
+  for (const row of rows) {
+    const owned = ownedFilesByKey[row.canonicalTaskKey] ?? [`scope:${row.changeId}:${row.taskId}`];
+    const hasOverlapA = owned.some((f) => filesA.has(f));
+    const hasOverlapB = owned.some((f) => filesB.has(f));
+
+    if (workerA.length <= workerB.length && workerA.length < maxPerWorker && !hasOverlapB) {
+      workerA.push(row);
+      for (const f of owned) filesA.add(f);
+    } else if (workerB.length < maxPerWorker && !hasOverlapA) {
+      workerB.push(row);
+      for (const f of owned) filesB.add(f);
+    } else {
+      skippedConflicts.push(row.canonicalTaskKey);
+    }
+  }
+
+  let disjointVerified = true;
+  for (const f of filesA) {
+    if (filesB.has(f)) {
+      disjointVerified = false;
+      break;
+    }
+  }
+
+  return {
+    schema: 'atlas.kanban-conflict-free-batch.v1',
+    canonicalAuthority: false,
+    writesPerformed: false,
+    workerA,
+    workerB,
+    disjointVerified,
+    skippedConflicts,
+  };
+}

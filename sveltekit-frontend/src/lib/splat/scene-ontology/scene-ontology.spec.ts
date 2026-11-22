@@ -13,7 +13,12 @@ import {
 	type SceneCatalog,
 	type TupleGraph
 } from './scene-ontology-linked-tuples-v1.js';
-import { createLinkedTuplesFromPromptScene } from './scene-plan-ontology-bridge-v1.js';
+import {
+	compilePrefabAssemblyPlacementsAndTuplesV1,
+	createLinkedTuplesFromPromptScene,
+	resolveRenderableOntologyRecipeV1,
+} from './scene-plan-ontology-bridge-v1.js';
+import { attachModularPrefabAssemblyToRecipeV1, SceneRuntimeRecipeV1Schema } from '../../reconstruction/scene-runtime-recipe-v1.js';
 import { createImageDetectionProposalsV1 } from './image-detection-tuple-bridge-v1.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -240,5 +245,84 @@ describe('Parent Atlas Scene Ontology (v1)', () => {
 
 		if (link) link.sourceIntervalMs = [9000, 2000];
 		expect(validateTupleGraph(g, catalog).errors.some((e) => e.includes('SOURCE_INTERVAL_INVALID'))).toBe(true);
+	});
+
+	it('maps only renderable ontology concepts to recipes and keeps events/provenance/time semantic-only', () => {
+		expect(resolveRenderableOntologyRecipeV1('pa:space.building.studio')).toEqual({
+			conceptId: 'space.building.studio',
+			renderable: true,
+			targetKind: 'prefab',
+			recipeKey: 'house.studio.v1',
+		});
+		expect(resolveRenderableOntologyRecipeV1('object.fixture.sink')).toEqual({
+			conceptId: 'object.fixture.sink',
+			renderable: true,
+			targetKind: 'primitive',
+			recipeKey: 'registry-v1:cylinder',
+		});
+		expect(resolveRenderableOntologyRecipeV1('pa:event.cue.uncertainty')).toEqual({
+			conceptId: 'event.cue.uncertainty',
+			renderable: false,
+			semanticOnlyReason: 'NON_RENDERABLE_SEMANTIC_CONCEPT',
+		});
+		expect(resolveRenderableOntologyRecipeV1('observation.source.prompt')).toEqual({
+			conceptId: 'observation.source.prompt',
+			renderable: false,
+			semanticOnlyReason: 'NON_RENDERABLE_SEMANTIC_CONCEPT',
+		});
+	});
+
+	it('compiles prefabAssemblies into bounded 3D placements, ontology tuples, and door/light animation cue bindings', () => {
+		const baseRecipe = SceneRuntimeRecipeV1Schema.parse({
+			schema: 'parent-atlas.scene-runtime-recipe/v1',
+			planHash: 'b'.repeat(64),
+			caseId: '11111111-2222-4333-8444-555555555555',
+			sceneId: '22222222-3333-4444-8555-666666666666',
+			sceneRevision: 1,
+			environment: {
+				kind: 'four-bedroom-house',
+				seed: 1,
+				profile: 'four-bedroom-house-v1',
+				customRecipeId: null,
+				cellSizeMeters: 16,
+				extentMeters: { x: 16, z: 16 },
+				coordinateStatus: 'illustrative_uncalibrated',
+			},
+			streaming: {
+				algorithm: 'parent-atlas.scene-cell-residency/v1',
+				maxResidentCells: 64,
+				unloadGraceMs: 1500,
+				activeSceneMemoryMiB: 8,
+			},
+			actors: [],
+			primitiveRegistry: [],
+			assets: [],
+			placements: [],
+			eventLanes: [],
+			quality: { profile: 'retro', maxTextureDimension: 128, maxTriangles: 50000, maxInstances: 256 },
+			narrative: {
+				why: { status: 'unknown', text: null, evidenceIds: [], reviewStatus: 'unreviewed', reviewDecisionId: null },
+				how: { status: 'unknown', text: null, evidenceIds: [], reviewStatus: 'unreviewed', reviewDecisionId: null },
+			},
+			provenance: {
+				generator: 'procedural-three-scene-v1',
+				clockPolicy: 'source_local_unaligned',
+				identityPolicy: 'pseudonymous_visual_handles',
+				motivePolicy: 'unknown_or_cited_hypothesis',
+			},
+		});
+
+		const withHouse = attachModularPrefabAssemblyToRecipeV1(baseRecipe, 'house.four_bedroom.v1');
+		const compiled = compilePrefabAssemblyPlacementsAndTuplesV1(withHouse);
+		expect(compiled.canonicalAuthority).toBe(false);
+		expect(compiled.writesPerformed).toBe(false);
+		expect(compiled.memoryBudgetMiB).toBeLessThanOrEqual(8);
+		expect(compiled.placements.length).toBeGreaterThan(0);
+		expect(compiled.placements.length).toBeLessThanOrEqual(256);
+		expect(compiled.tupleGraph.tuples.some((t) => t.predicate === 'PART_OF')).toBe(true);
+		expect(compiled.tupleGraph.tuples.some((t) => t.predicate === 'HAS_GEOMETRY')).toBe(true);
+		expect(compiled.tupleGraph.tuples.some((t) => t.predicate === 'CUE_TARGETS')).toBe(true);
+		expect(compiled.animationCueBindings.some((b) => b.capability === 'door')).toBe(true);
+		expect(compiled.animationCueBindings.some((b) => b.capability === 'light')).toBe(true);
 	});
 });
