@@ -35,6 +35,7 @@ export function sceneTimelineCueToRuntimeV1(cue: SceneTimelineCueV1): SceneTimed
 export type SceneEventActionV1 =
 	| { type: 'visible_during_interval'; visible: boolean }
 	| { type: 'move_during_interval'; fromMeters: [number, number, number]; toMeters: [number, number, number] }
+	| { type: 'rotate_prop_during_interval'; degrees: number }
 	| { type: 'pulse_light_during_interval'; colorHex: string; minIntensity: number; maxIntensity: number; periodMs: number };
 
 export interface SceneTimelineTargetV1 {
@@ -51,6 +52,7 @@ export interface SceneTimelineTargetStateV1 {
 	positionMeters: [number, number, number];
 	activeEventIds: string[];
 	conflictEventIds: string[];
+	yawDegrees?: number;
 }
 
 export interface SceneEventConflictV1 {
@@ -58,7 +60,7 @@ export interface SceneEventConflictV1 {
 	targetId: string;
 	clockId: string;
 	eventIds: [string, string];
-	reason: 'contradictory_visibility' | 'overlapping_movement';
+	reason: 'contradictory_visibility' | 'overlapping_movement' | 'overlapping_rotation';
 }
 
 /** Find overlapping same-clock cues that ask one target to take incompatible actions. */
@@ -74,7 +76,10 @@ export function findSceneEventConflictsV1(events: readonly SceneTimedEventV1[]):
 				? left.action.visible !== right.action.visible ? 'contradictory_visibility' as const : null
 				: left.action.type === 'move_during_interval' && right.action.type === 'move_during_interval'
 					? JSON.stringify([left.action.fromMeters, left.action.toMeters]) !== JSON.stringify([right.action.fromMeters, right.action.toMeters]) ? 'overlapping_movement' as const : null
-					: null;
+					: left.action.type === 'rotate_prop_during_interval' && right.action.type === 'rotate_prop_during_interval'
+						? left.action.degrees !== right.action.degrees || left.startMs !== right.startMs || left.endMs !== right.endMs
+							? 'overlapping_rotation' as const : null
+						: null;
 			if (!reason) continue;
 			for (const leftTarget of left.targetRefs ?? []) {
 				if (!(right.targetRefs ?? []).some((target) => target.kind === leftTarget.kind && target.targetId === leftTarget.targetId)) continue;
@@ -126,7 +131,7 @@ export function evaluateSceneTimelineV1(
 	}
 	const states = new Map(targets.map((target) => [
 		`${target.kind}:${target.targetId}`,
-		{ ...target, positionMeters: [...target.positionMeters] as [number, number, number], activeEventIds: [] as string[], conflictEventIds: [] as string[], activeEvents: [] as SceneTimedEventV1[] }
+		{ ...target, positionMeters: [...target.positionMeters] as [number, number, number], activeEventIds: [] as string[], conflictEventIds: [] as string[], activeEvents: [] as SceneTimedEventV1[], yawDegrees: undefined as number | undefined }
 	]));
 	for (const event of events) {
 		if (!isSceneEventActiveV1(event, clockId, sourceTimeMs)) continue;
@@ -155,7 +160,19 @@ export function evaluateSceneTimelineV1(
 		const movementPositions = new Set(movementResults.map(({ position }) => position.join(',')));
 		if (movementPositions.size > 1) state.conflictEventIds.push(...movementResults.map((result) => result.eventId));
 		else if (movementResults.length) state.positionMeters = movementResults[0]!.position;
+		const rotations = state.activeEvents.flatMap((event) => event.action?.type === 'rotate_prop_during_interval'
+			? [{ eventId: event.eventId, degrees: event.action.degrees, startMs: event.startMs, endMs: event.endMs }] : []);
+		if (rotations.length) {
+			const first = rotations[0]!;
+			if (rotations.some((item) => item.degrees !== first.degrees || item.startMs !== first.startMs || item.endMs !== first.endMs)) {
+				state.conflictEventIds.push(...rotations.map((item) => item.eventId));
+			} else {
+				state.yawDegrees = first.degrees * (sourceTimeMs - first.startMs) / (first.endMs - first.startMs);
+			}
+		}
 		state.conflictEventIds = [...new Set(state.conflictEventIds)].sort();
 	}
-	return [...states.values()].map(({ kind, targetId, visible, positionMeters, activeEventIds, conflictEventIds }) => ({ kind, targetId, visible, positionMeters, activeEventIds, conflictEventIds }));
+	return [...states.values()].map(({ kind, targetId, visible, positionMeters, activeEventIds, conflictEventIds, yawDegrees }) => ({
+		kind, targetId, visible, positionMeters, activeEventIds, conflictEventIds, ...(yawDegrees === undefined ? {} : { yawDegrees })
+	}));
 }

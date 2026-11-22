@@ -27,6 +27,7 @@ type SceneWorkflowEvent =
 	| { type: 'START'; caseId: string } | { type: 'ACCESS_GRANTED' } | { type: 'ACCESS_REJECTED'; message?: string }
 	| { type: 'INPUTS_READY' } | { type: 'NEEDS_INPUT'; message?: string } | { type: 'BUILD_PROPOSAL' }
 	| { type: 'PROPOSAL_VALID' } | { type: 'PROPOSAL_INVALID'; message?: string } | { type: 'LOAD_SCENE' }
+	| { type: 'OPEN_GENERATED_SCENE'; caseId: string }
 	| { type: 'SCENE_READY' } | { type: 'SCENE_FAILED'; message?: string } | { type: 'SELECT_OBJECT'; objectId: string }
 	| { type: 'REVIEW' } | { type: 'SOURCE_STALE' } | { type: 'CANCEL' } | { type: 'RETRY' }
 	| { type: 'SAVE_REQUESTED' } | { type: 'SAVE_DISABLED' } | { type: 'SAVE_SUCCEEDED' } | { type: 'SAVE_FAILED'; message?: string };
@@ -39,6 +40,11 @@ export const setTheSceneWorkflowMachineV1 = setup({
 	// A case switch is a new workflow even when the current state is preview/review/save.
 	// Keep this at the machine root so START cannot be ignored by an in-flight state.
 	on: {
+		OPEN_GENERATED_SCENE: {
+			guard: ({ context, event }) => context.caseId === event.caseId,
+			target: '#setTheSceneWorkflowV1.loading_scene',
+			actions: assign({ selectedObjectId: null, error: null })
+		},
 		START: {
 			target: '#setTheSceneWorkflowV1.checking_access',
 			actions: assign(({ event }) => ({ caseId: event.caseId, requestId: 0, selectedObjectId: null, error: null }))

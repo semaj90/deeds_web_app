@@ -465,6 +465,60 @@ export const P0_MODULAR_RECIPES_V1: readonly P0ModularRecipeEntryV1[] = Object.f
 			materialKey: 'evidence-gold',
 			detailLevel: 'retro'
 		})
+	},
+
+	// P1 / P2 Prefab Completion Recipes (office.v1, road.parking_lot.v1, courtroom.generic.v1)
+	{
+		draftMeshKey: 'atlas.mesh.indoor_furniture.bookcase.v1',
+		canonicalOntologyConceptId: 'pa:object.furniture.bookcase',
+		recommendedBuilder: 'cpp',
+		recipe: createGeometryRecipeV1({
+			recipeId: 'p1_bookcase_v1',
+			name: 'Office Bookcase (1.2m x 2.0m x 0.4m)',
+			primitiveKind: 'box',
+			dimensions: { width: 1.2, height: 2.0, depth: 0.4 },
+			materialKey: 'dark-leather',
+			detailLevel: 'balanced'
+		})
+	},
+	{
+		draftMeshKey: 'atlas.mesh.indoor_furniture.office_chair.v1',
+		canonicalOntologyConceptId: 'pa:object.furniture.chair',
+		recommendedBuilder: 'blender',
+		recipe: createGeometryRecipeV1({
+			recipeId: 'p1_office_chair_v1',
+			name: 'Swivel Office Chair (0.6m x 0.95m x 0.6m)',
+			primitiveKind: 'box',
+			dimensions: { width: 0.6, height: 0.95, depth: 0.6 },
+			materialKey: 'steel',
+			detailLevel: 'balanced'
+		})
+	},
+	{
+		draftMeshKey: 'atlas.mesh.urban_outdoor.parking_marking.v1',
+		canonicalOntologyConceptId: 'pa:space.outdoor-zone.parking-lot',
+		recommendedBuilder: 'threejs',
+		recipe: createGeometryRecipeV1({
+			recipeId: 'p1_parking_marking_v1',
+			name: 'Parking Stall Line (5.0m x 0.02m x 0.15m)',
+			primitiveKind: 'box',
+			dimensions: { width: 5.0, height: 0.02, depth: 0.15 },
+			materialKey: 'ivory',
+			detailLevel: 'retro'
+		})
+	},
+	{
+		draftMeshKey: 'atlas.mesh.urban_outdoor.bench_public.v1',
+		canonicalOntologyConceptId: 'pa:object.furniture.bench',
+		recommendedBuilder: 'cpp',
+		recipe: createGeometryRecipeV1({
+			recipeId: 'p1_bench_public_v1',
+			name: 'Gallery / Public Bench (2.2m x 0.85m x 0.55m)',
+			primitiveKind: 'box',
+			dimensions: { width: 2.2, height: 0.85, depth: 0.55 },
+			materialKey: 'dark-leather',
+			detailLevel: 'balanced'
+		})
 	}
 ]);
 
@@ -777,3 +831,161 @@ export const catalogAssetRegistrationV1Schema = z
 	.strict();
 
 export type CatalogAssetRegistrationV1 = z.infer<typeof catalogAssetRegistrationV1Schema>;
+
+/**
+ * Builds `office.v1` (atlas.prefab.office.v1):
+ * Workplace / office suite assembled from interior walls, door frame, desks,
+ * office chairs, bookcases, and ceiling lights.
+ */
+export function buildOfficePrefabV1(): {
+	prefab: ScenePrefabV1;
+	recipes: SceneGeometryRecipeV1[];
+} {
+	const recipes = P0_MODULAR_RECIPES_V1.map((entry) => entry.recipe);
+	const components: PrefabComponentV1[] = [
+		comp('office_floor', 'Office Floor', 'pa:space.structure.floor-slab', 'p0_floor_slab_4x4_v1', [0, -0.06, 0], { scale: [2.0, 1, 2.0], isInstanced: false }),
+		comp('office_wall_n', 'North Office Wall', 'pa:space.structure.wall', 'p0_wall_interior_4m_v1', [0, 1.4, -4.0], { scale: [2.0, 1, 1] }),
+		comp('office_door_frame', 'Office Entry Door Frame', 'pa:geometry.composite.door-frame', 'p0_door_frame_v1', [0, 1.05, 4.0]),
+		comp('office_desk_1', 'Executive Desk', 'pa:object.furniture.desk', 'p0_desk_v1', [0, 0.375, -1.5], { behaviorPolicy: 'INTERACTIVE_GIZMO' }),
+		comp('office_chair_1', 'Office Chair', 'pa:object.furniture.chair', 'p1_office_chair_v1', [0, 0.475, -2.3], { behaviorPolicy: 'INTERACTIVE_GIZMO' }),
+		comp('office_bookcase_w', 'Bookcase West', 'pa:object.furniture.bookcase', 'p1_bookcase_v1', [-3.2, 1.0, -3.5]),
+		comp('office_light_main', 'Office Ceiling Light', 'pa:object.fixture.light-fixture', 'p0_ceiling_light_v1', [0, 2.74, 0], { behaviorPolicy: 'PASSIVE_DECORATION' })
+	];
+
+	const prefab = createScenePrefabV1({
+		prefabId: 'office.v1',
+		name: 'Office / Workplace Suite (8m x 8m)',
+		category: 'room',
+		visualStyle: 'balanced',
+		authority: 'GENERATED_ILLUSTRATIVE_BLOCKOUT',
+		dimensions: { width: 8.0, height: 2.8, depth: 8.0 },
+		components
+	});
+
+	return { prefab, recipes };
+}
+
+/**
+ * Builds `road.parking_lot.v1` (atlas.prefab.road.parking_lot.v1):
+ * Parking lot module assembled from asphalt road slabs, stall markings,
+ * vehicle proxies, and streetlamps.
+ */
+export function buildParkingLotPrefabV1(): {
+	prefab: ScenePrefabV1;
+	recipes: SceneGeometryRecipeV1[];
+} {
+	const recipes = P0_MODULAR_RECIPES_V1.map((entry) => entry.recipe);
+	const components: PrefabComponentV1[] = [
+		comp('lot_asphalt_0', 'Asphalt Bay West', 'pa:space.outdoor-zone.road', 'p0_road_segment_8m_v1', [-4.0, -0.04, 0], { scale: [1, 1, 2.0], isInstanced: false }),
+		comp('lot_asphalt_1', 'Asphalt Bay East', 'pa:space.outdoor-zone.road', 'p0_road_segment_8m_v1', [4.0, -0.04, 0], { scale: [1, 1, 2.0], isInstanced: false }),
+		comp('stall_line_1', 'Parking Line 1', 'pa:space.outdoor-zone.parking-lot', 'p1_parking_marking_v1', [-5.5, 0.01, -3.0]),
+		comp('stall_line_2', 'Parking Line 2', 'pa:space.outdoor-zone.parking-lot', 'p1_parking_marking_v1', [-5.5, 0.01, 0.0]),
+		comp('stall_line_3', 'Parking Line 3', 'pa:space.outdoor-zone.parking-lot', 'p1_parking_marking_v1', [-5.5, 0.01, 3.0]),
+		comp('lot_car_1', 'Parked Car 1', 'pa:geometry.composite.vehicle-proxy', 'p0_vehicle_car_proxy_v1', [-5.5, 0.725, -1.5], { behaviorPolicy: 'INTERACTIVE_GIZMO' }),
+		comp('lot_lamp_1', 'Parking Lot Lamp', 'pa:object.landscape.lamp-post', 'p0_streetlamp_v1', [0, 2.1, -5.5])
+	];
+
+	const prefab = createScenePrefabV1({
+		prefabId: 'road.parking_lot.v1',
+		name: 'Parking Lot Assembly (16m x 12m)',
+		category: 'street_prop',
+		visualStyle: 'retro',
+		authority: 'GENERATED_ILLUSTRATIVE_BLOCKOUT',
+		dimensions: { width: 16.0, height: 4.2, depth: 12.0 },
+		components
+	});
+
+	return { prefab, recipes };
+}
+
+/**
+ * Builds `courtroom.generic.v1` (atlas.prefab.courtroom.generic.v1):
+ * Generic illustrative courtroom assembled from floor slabs, partition walls,
+ * judge/counsel tables, chairs, and gallery benches.
+ */
+export function buildCourtroomGenericPrefabV1(): {
+	prefab: ScenePrefabV1;
+	recipes: SceneGeometryRecipeV1[];
+} {
+	const recipes = P0_MODULAR_RECIPES_V1.map((entry) => entry.recipe);
+	const components: PrefabComponentV1[] = [
+		comp('court_floor', 'Courtroom Floor', 'pa:space.structure.floor-slab', 'p0_floor_slab_4x4_v1', [0, -0.06, 0], { scale: [3.0, 1, 3.5], isInstanced: false }),
+		comp('court_wall_n', 'Courtroom Rear Wall', 'pa:space.structure.wall', 'p0_wall_interior_4m_v1', [0, 1.4, -7.0], { scale: [3.0, 1, 1] }),
+		comp('judge_bench_table', 'Judge Bench', 'pa:geometry.composite.table', 'p0_table_simple_v1', [0, 0.375, -5.2], { scale: [1.8, 1.3, 1.0] }),
+		comp('judge_chair', 'Judge Chair', 'pa:geometry.composite.chair', 'p0_chair_simple_v1', [0, 0.425, -6.1], { behaviorPolicy: 'INTERACTIVE_GIZMO' }),
+		comp('counsel_table_w', 'Plaintiff / Prosecution Table', 'pa:geometry.composite.table', 'p0_table_simple_v1', [-2.4, 0.375, -1.5], { behaviorPolicy: 'INTERACTIVE_GIZMO' }),
+		comp('counsel_table_e', 'Defense Table', 'pa:geometry.composite.table', 'p0_table_simple_v1', [2.4, 0.375, -1.5], { behaviorPolicy: 'INTERACTIVE_GIZMO' }),
+		comp('gallery_bench_w', 'Gallery Bench West', 'pa:object.furniture.bench', 'p1_bench_public_v1', [-2.6, 0.425, 2.5]),
+		comp('gallery_bench_e', 'Gallery Bench East', 'pa:object.furniture.bench', 'p1_bench_public_v1', [2.6, 0.425, 2.5])
+	];
+
+	const prefab = createScenePrefabV1({
+		prefabId: 'courtroom.generic.v1',
+		name: 'Generic Illustrative Courtroom (12m x 14m)',
+		category: 'courtroom',
+		visualStyle: 'balanced',
+		authority: 'GENERATED_ILLUSTRATIVE_BLOCKOUT',
+		dimensions: { width: 12.0, height: 2.8, depth: 14.0 },
+		components
+	});
+
+	return { prefab, recipes };
+}
+
+export interface SelectablePlanComponentV1 {
+	readonly objectId: string;
+	readonly label: string;
+	readonly recipeId: string;
+	readonly ontologyConceptId: string;
+	readonly primitiveKind: SceneGeometryRecipeV1['primitiveKind'];
+	readonly position: [number, number, number];
+	readonly rotationXyzw: [number, number, number, number];
+	readonly scale: [number, number, number];
+	readonly capability: 'door' | 'light' | 'prop' | 'static';
+}
+
+/**
+ * Compiles any ScenePrefabV1 into selectable plan components so case scene plans
+ * and event evaluators can target individual modular doors, lights, and furniture.
+ */
+export function compilePrefabToPlanComponentsV1(
+	prefab: ScenePrefabV1,
+	recipes: readonly SceneGeometryRecipeV1[]
+): SelectablePlanComponentV1[] {
+	const recipeById = new Map(recipes.map((r) => [r.recipeId, r]));
+	return prefab.components.map((c) => {
+		const recipe = recipeById.get(c.recipeId);
+		const capability: SelectablePlanComponentV1['capability'] =
+			c.conceptId === 'pa:space.structure.door'
+				? 'door'
+				: c.conceptId === 'pa:object.fixture.light-fixture'
+					? 'light'
+					: c.behaviorPolicy === 'INTERACTIVE_GIZMO'
+						? 'prop'
+						: 'static';
+		return {
+			objectId: `${prefab.prefabId}:${c.componentId}`,
+			label: c.name,
+			recipeId: c.recipeId,
+			ontologyConceptId: c.conceptId,
+			primitiveKind: recipe?.primitiveKind ?? 'box',
+			position: [
+				c.relativeTransform.position[0] ?? 0,
+				c.relativeTransform.position[1] ?? 0,
+				c.relativeTransform.position[2] ?? 0
+			] as [number, number, number],
+			rotationXyzw: [
+				c.relativeTransform.rotationXyzw[0] ?? 0,
+				c.relativeTransform.rotationXyzw[1] ?? 0,
+				c.relativeTransform.rotationXyzw[2] ?? 0,
+				c.relativeTransform.rotationXyzw[3] ?? 1
+			] as [number, number, number, number],
+			scale: [
+				c.relativeTransform.scale[0] ?? 1,
+				c.relativeTransform.scale[1] ?? 1,
+				c.relativeTransform.scale[2] ?? 1
+			] as [number, number, number],
+			capability
+		};
+	});
+}

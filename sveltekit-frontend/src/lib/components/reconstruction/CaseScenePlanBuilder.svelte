@@ -7,8 +7,11 @@ import { requestScenePreviewV1, ScenePreviewRequestErrorV1 } from '$lib/reconstr
 	import { buildCaseScenePlanDraftV1, restoreCaseSceneDraftV1, type SceneDraftActorV1, type SceneDraftEventV1, type SceneDraftObjectV1 } from '$lib/reconstruction/case-scene-plan-draft-v1.js';
 	import { scenePreviewDraftV1Schema, type ScenePreviewAnnotationV1 } from '$lib/reconstruction/scene-preview-draft-v1.js';
 	import { SceneGenerationPlanV1Schema, type SceneGenerationPlanV1 } from '$lib/reconstruction/scene-generation-plan-v1.js';
-	import { compileSceneRuntimeRecipeV1 } from '$lib/reconstruction/scene-runtime-recipe-v1.js';
+	import { compileSceneRuntimeRecipeV1, type SceneRuntimeRecipeV1 } from '$lib/reconstruction/scene-runtime-recipe-v1.js';
 	import SceneRuntimeRecipeCanvas from './SceneRuntimeRecipeCanvas.svelte';
+	import SceneGenerationJobPanel from './SceneGenerationJobPanel.svelte';
+	import { sceneCameraPresetLabelsV1, sceneCameraPresetV1Schema } from '$lib/reconstruction/scene-camera-cue-v1.js';
+	import { reviewedContourSceneSourcesV1 } from '$lib/reconstruction/scene-reviewed-polygons-v1.js';
 	import type { CaseSceneIntakeContextV1 } from '$lib/reconstruction/case-scene-fetch-contract-v1.js';
 	import { SCENE_PRIMITIVE_KINDS_V1 } from '$lib/splat/scene-primitive-registry-v1.js';
 	import { searchSceneAuthoringCatalogV1, type SceneAuthoringCatalogEntryV1 } from '$lib/reconstruction/scene-authoring-catalog-v1.js';
@@ -21,9 +24,10 @@ import { requestScenePreviewV1, ScenePreviewRequestErrorV1 } from '$lib/reconstr
 	import { setTheSceneWorkflowMachineV1, type SetTheSceneRequestV1, type SceneWorkflowStateV1 } from '$lib/reconstruction/set-the-scene-workflow-v1.js';
 
 	type EvidenceOption = { id: string; title: string; mimeType: string | null };
-	let { caseId, caseSceneIntake, evidenceItems, setSceneRequest = null, setSceneRequestError = null, scenePersistenceEnabled = false }: {
+	let { caseId, caseSceneIntake, evidenceItems, setSceneRequest = null, setSceneRequestError = null, scenePersistenceEnabled = false, sceneGenerationJobsEnabled = false }: {
 		caseId: string; caseSceneIntake: CaseSceneIntakeContextV1 | null; evidenceItems: EvidenceOption[];
 		setSceneRequest?: SetTheSceneRequestV1 | null; setSceneRequestError?: string | null; scenePersistenceEnabled?: boolean;
+		sceneGenerationJobsEnabled?: boolean;
 	} = $props();
 	let startMode = $state<'blockout' | 'evidence'>('blockout');
 	let environmentKind = $state<'urban' | 'beach' | 'indoor' | 'four-bedroom-house'>('urban');
@@ -51,9 +55,12 @@ import { requestScenePreviewV1, ScenePreviewRequestErrorV1 } from '$lib/reconstr
 	let preview = $state.raw<{
 		plan: SceneGenerationPlanV1;
 		recipe: ReturnType<typeof compileSceneRuntimeRecipeV1>;
+		generatedJobId?: string;
 		revision?: { manifest: SceneDocumentV1; manifestSha256: string };
 	} | null>(null);
 	let proposal = $state.raw<typeof preview>(null);
+	let contourBase = $state.raw<NonNullable<NonNullable<typeof preview>['revision']> | null>(null);
+	let polygonEditsDirty = $state(false);
 	let busy = $state(false);
 	let previewStage = $state<'parameters' | 'plan' | null>(null);
 	let activeRequest: AbortController | null = null;
@@ -95,7 +102,7 @@ import { requestScenePreviewV1, ScenePreviewRequestErrorV1 } from '$lib/reconstr
 		reviewedEventsRequest?.abort(); reviewedEventsRequest = null;
 		assistantRequestToken++; assistantSession?.destroy(); assistantSession = null;
 		busy = false; saving = false; previewStage = null;
-		preview = null; proposal = null; sceneId = null; annotations = [];
+		preview = null; proposal = null; contourBase = null; sceneId = null; annotations = []; polygonEditsDirty = false;
 		selectedEvidenceIds = []; objects = []; events = [];
 		startMode = 'blockout'; environmentKind = 'urban'; assistantQuestion = ''; nextEventNumber = 1;
 		error = null; notice = null; canEdit = true;
@@ -192,23 +199,31 @@ import { requestScenePreviewV1, ScenePreviewRequestErrorV1 } from '$lib/reconstr
 				if (!response.ok) throw new Error(result.message ?? 'Could not reopen scene');
 				const document = sceneDocumentV1Schema.parse(result.data?.manifest);
 				const draft = document.proceduralPreviewDraft;
-				if (!draft || document.caseId !== caseId || document.sceneId !== id || String(document.revision) !== number ||
+				if (document.caseId !== caseId || document.sceneId !== id || String(document.revision) !== number ||
 					!/^[0-9a-f]{64}$/.test(result.data?.manifestSha256 ?? '')) throw new Error('This revision does not match the requested scene draft');
 				if (controller.signal.aborted) return;
-				preview = { plan: draft.plan, recipe: compileSceneRuntimeRecipeV1(draft.plan),
-					revision: { manifest: document, manifestSha256: result.data.manifestSha256 } };
+				const revision = { manifest: document, manifestSha256: result.data.manifestSha256 as string };
+				if (!draft) {
+					const sources = reviewedContourSceneSourcesV1(document);
+					if (!sources.length) throw new Error('This scene revision has no reviewed contours available to open.');
+					if (sources.some(({ evidenceId }) => !evidenceItems.some((item) => item.id === evidenceId))) {
+						throw new Error('A reviewed contour source is no longer available in this case.');
+					}
+					contourBase = revision;
+					sceneId = document.sceneId;
+					startMode = 'evidence';
+					environmentKind = 'indoor';
+					selectedEvidenceIds = sources.map(({ evidenceId }) => evidenceId);
+					actors = [];
+					notice = `Reviewed contours from revision ${document.revision} are ready for a scene proposal.`;
+					return;
+				}
+				preview = { plan: draft.plan, recipe: compileSceneRuntimeRecipeV1(draft.plan), revision };
 				annotations = draft.annotations;
 				sceneId = document.sceneId;
 				notice = `Opened saved draft revision ${document.revision} with its original evidence references.`;
 				try {
-					const restored = restoreCaseSceneDraftV1(draft.plan);
-					environmentKind = restored.kind;
-					selectedEvidenceIds = restored.evidenceIds;
-					actors = restored.actors;
-					objects = restored.objects;
-					events = restored.events;
-					whyBrief = restored.why;
-					howBrief = restored.how;
+					restoreEditor(draft.plan);
 				} catch (cause) {
 					canEdit = false;
 					notice = cause instanceof Error ? cause.message : 'The saved plan is available for viewing.';
@@ -424,6 +439,10 @@ import { requestScenePreviewV1, ScenePreviewRequestErrorV1 } from '$lib/reconstr
 
 	async function generatePreview() {
 		if (busy || saving || !canEdit) return;
+		if (polygonEditsDirty) {
+			error = 'Save or undo the contour changes before replacing this preview.';
+			return;
+		}
 		const controller = new AbortController();
 		activeRequest = controller;
 		workflowActor.send({ type: 'BUILD_PROPOSAL' });
@@ -437,7 +456,8 @@ import { requestScenePreviewV1, ScenePreviewRequestErrorV1 } from '$lib/reconstr
 				throw new Error('Each event needs a description and a valid interval on its selected clock.');
 			}
 			const nextSceneId = sceneId ?? crypto.randomUUID(); sceneId = nextSceneId;
-			const expectedRevision = preview?.revision?.manifest.revision ?? 0;
+			const revision = preview?.revision ?? contourBase ?? undefined;
+			const expectedRevision = revision?.manifest.revision ?? preview?.plan.expectedSceneRevision ?? 0;
 			const edits = $state.snapshot({ actors, objects, events, environmentKind });
 			const fetchInput = CaseSceneFetchParametersInputV1Schema.parse({
 				sceneId: nextSceneId, expectedRevision, sourceEvidenceIds: selectedEvidenceIds,
@@ -459,20 +479,17 @@ import { requestScenePreviewV1, ScenePreviewRequestErrorV1 } from '$lib/reconstr
 			const plan = SceneGenerationPlanV1Schema.parse(result);
 			if (plan.caseId !== caseId || plan.caseId !== scope.caseId || plan.sceneId !== nextSceneId ||
 				plan.expectedSceneRevision !== expectedRevision) throw new Error('The returned plan did not match this scene revision.');
-			if (preview?.plan.planHash !== plan.planHash) {
-				const previous = preview?.plan;
-				const retained = scenePreviewDraftV1Schema.safeParse({ schema: 'parent-atlas.scene-preview-draft/v1', plan, annotations });
-				const changedSource = annotations.some((note) => {
-					const before = previous?.events.find((event) => event.eventId === note.eventId);
-					const after = plan.events.find((event) => event.eventId === note.eventId);
-					return before?.clock.evidenceId !== after?.clock.evidenceId ||
-						JSON.stringify(before?.sourceEvent) !== JSON.stringify(after?.sourceEvent) ||
-						previous?.sources.find((source) => source.evidenceId === before?.clock.evidenceId)?.sourceRevision !==
-							plan.sources.find((source) => source.evidenceId === after?.clock.evidenceId)?.sourceRevision;
-				});
-				if (!retained.success || changedSource) throw new Error('An existing note no longer matches the proposed event, source, or object. Export or remove that note before changing its binding.');
+			if (contourBase && reviewedContourSceneSourcesV1(contourBase.manifest).some((pin) =>
+				!plan.sources.some((source) => source.evidenceId === pin.evidenceId && source.sourceRevision === pin.sourceRevision))) {
+				throw new Error('A reviewed contour source was removed or changed. Restore the selected source or review the current image again.');
 			}
-			proposal = { plan, recipe: compileSceneRuntimeRecipeV1(plan), revision: preview?.revision };
+			if (preview?.plan.planHash !== plan.planHash) assertCompatibleNotes(preview?.plan, plan, annotations);
+			const savedDraft = preview?.revision?.manifest.proceduralPreviewDraft;
+			if ([...(savedDraft?.polygonEdits ?? []), ...(savedDraft?.contourNotes ?? [])].some((binding) =>
+				!plan.sources.some((source) => source.evidenceId === binding.evidenceId && source.sourceRevision === binding.sourceRevision))) {
+				throw new Error('The proposal would remove the source revision of an existing contour edit or note.');
+			}
+			proposal = { plan, recipe: compileSceneRuntimeRecipeV1(plan), revision };
 			workflowActor.send({ type: 'PROPOSAL_VALID' });
 			notice = 'Proposal validated. Review its sources, event clocks, objects, and assumptions before generating the preview.';
 		} catch (cause) {
@@ -492,11 +509,71 @@ import { requestScenePreviewV1, ScenePreviewRequestErrorV1 } from '$lib/reconstr
 
 	function loadScenePreview() {
 		if (!proposal || busy || saving) return;
-		const unchangedPreview = preview?.plan.planHash === proposal.plan.planHash;
+		if (polygonEditsDirty) {
+			error = 'Save or undo the contour changes before replacing this preview.';
+			return;
+		}
+		const unchangedPreview = preview?.plan.planHash === proposal.plan.planHash && preview?.generatedJobId === proposal.generatedJobId;
 		workflowActor.send({ type: 'LOAD_SCENE' });
 		preview = proposal;
 		proposal = null;
 		if (unchangedPreview) queueMicrotask(handlePreviewReady);
+	}
+
+	function restoreEditor(plan: SceneGenerationPlanV1) {
+		const restored = restoreCaseSceneDraftV1(plan);
+		environmentKind = restored.kind;
+		selectedEvidenceIds = restored.evidenceIds;
+		startMode = restored.evidenceIds.length ? 'evidence' : 'blockout';
+		actors = restored.actors;
+		objects = restored.objects;
+		events = restored.events;
+		whyBrief = restored.why;
+		howBrief = restored.how;
+	}
+
+	function assertCompatibleNotes(previous: SceneGenerationPlanV1 | undefined, plan: SceneGenerationPlanV1, notes: ScenePreviewAnnotationV1[]) {
+		const retained = scenePreviewDraftV1Schema.safeParse({ schema: 'parent-atlas.scene-preview-draft/v1', plan, annotations: notes });
+		const changedSource = notes.some((note) => {
+			const before = previous?.events.find((event) => event.eventId === note.eventId);
+			const after = plan.events.find((event) => event.eventId === note.eventId);
+			return before?.clock.evidenceId !== after?.clock.evidenceId ||
+				JSON.stringify(before?.sourceEvent) !== JSON.stringify(after?.sourceEvent) ||
+				previous?.sources.find((source) => source.evidenceId === before?.clock.evidenceId)?.sourceRevision !==
+					plan.sources.find((source) => source.evidenceId === after?.clock.evidenceId)?.sourceRevision;
+		});
+		if (!retained.success || changedSource) throw new Error('An existing note no longer matches the proposed event, source, or object. Export or remove that note before changing its binding.');
+	}
+
+	function openWorkerRecipe(jobId: string, recipe: SceneRuntimeRecipeV1, plan: SceneGenerationPlanV1,
+		revision: NonNullable<typeof preview>['revision']) {
+		if (polygonEditsDirty) throw new Error('Save or undo the contour changes before replacing this preview.');
+		if (contourBase && plan.sceneId !== contourBase.manifest.sceneId) throw new Error('The generated recipe belongs to a different scene.');
+		const current = proposal ?? preview;
+		if (busy || saving || recipe.caseId !== caseId || recipe.sceneId !== plan.sceneId ||
+			recipe.planHash !== plan.planHash || recipe.sceneRevision !== plan.expectedSceneRevision ||
+			(current && current.plan.planHash !== plan.planHash)) {
+			throw new Error('The current preview no longer matches the generated recipe.');
+		}
+		if (!current) {
+			const baseDraft = revision?.manifest.proceduralPreviewDraft;
+			const notes = baseDraft?.annotations ?? [];
+			assertCompatibleNotes(baseDraft?.plan, plan, notes);
+			canEdit = true;
+			try { restoreEditor(plan); }
+			catch { canEdit = false; }
+			sceneId = plan.sceneId;
+			annotations = notes;
+			workflowActor.send({ type: 'OPEN_GENERATED_SCENE', caseId });
+			preview = { plan, recipe, revision, generatedJobId: jobId };
+			return;
+		}
+		if (proposal) {
+			proposal = { ...proposal, recipe, generatedJobId: jobId };
+			loadScenePreview();
+		} else {
+			preview = { ...current, recipe, generatedJobId: jobId };
+		}
 	}
 
 	function handlePreviewReady() {
@@ -548,7 +625,7 @@ import { requestScenePreviewV1, ScenePreviewRequestErrorV1 } from '$lib/reconstr
 				{#each objects as object, index (object.objectId)}<div class="entity"><strong>{object.objectId}</strong><label>Object label<input value={object.label} oninput={(event) => updateObject(index, { label: (event.currentTarget as HTMLInputElement).value })} /></label><label>Primitive<select value={object.registryId} onchange={(event) => updateObject(index, { registryId: (event.currentTarget as HTMLInputElement).value })}>{#each SCENE_PRIMITIVE_KINDS_V1 as kind}<option value={kind}>{kind}</option>{/each}</select></label><label>Position · x,y,z meters<input value={object.positionMeters.join(', ')} oninput={(event) => { const position = parseCoordinateTriplet((event.currentTarget as HTMLInputElement).value); if (position) updateObject(index, { positionMeters: position }); }} /></label></div>{/each}
 			</section>
 			<section class="events-step"><h3>Events and source times</h3><p class="hint">Enter elapsed milliseconds within one source clock. For wall-clock reports, preserve the quoted time wording in the description; do not convert it to media time until a reviewed alignment exists. Overnight source-local intervals must pass midnight monotonically (the end value is later than the start).</p>
-				{#each events as event, index (event.eventId)}<div class="entity event-form"><strong>{event.eventId} · {event.sourceEvent ? "reviewed source, illustrative cue" : "hypothesis / review pending"}</strong><label>Description<input value={event.label} placeholder="Reported activity; cite and review before treating as a finding" oninput={(input) => updateEvent(index, { label: (input.currentTarget as HTMLInputElement).value })} /></label><label>Timeline clock<select disabled={!!event.sourceEvent} value={event.sourceEvidenceId} onchange={(input) => updateEvent(index, { sourceEvidenceId: (input.currentTarget as HTMLInputElement).value })}><option value="">Scene time (illustrative)</option>{#each selectedEvidence as item (item.id)}<option value={item.id}>{item.title || item.id}</option>{/each}</select></label><div class="time-row"><label>Start ms<input type="number" min="0" readonly={!!event.sourceEvent} value={event.startMs} oninput={(input) => updateEvent(index, { startMs: Number((input.currentTarget as HTMLInputElement).value) })} /></label><label>End ms<input type="number" min="1" readonly={!!event.sourceEvent} value={event.endMs} oninput={(input) => updateEvent(index, { endMs: Number((input.currentTarget as HTMLInputElement).value) })} /></label><label>Uncertainty ms<input type="number" min="0" value={event.uncertaintyMs} oninput={(input) => updateEvent(index, { uncertaintyMs: Number((input.currentTarget as HTMLInputElement).value) })} /></label></div><label>Event type<select value={event.cueType} onchange={(input) => updateEvent(index, { cueType: (input.currentTarget as HTMLInputElement).value as SceneDraftEventV1['cueType'] })}><option value="custom">Reported event</option><option value="timed_prop">Timed prop</option><option value="enter">Entry proposal</option><option value="exit">Exit proposal</option><option value="move">Movement proposal</option><option value="alarm">Alarm proposal</option><option value="evacuate">Evacuation proposal</option><option value="interview">Interview statement</option><option value="interact">Interaction proposal</option></select></label><label>Target<select value={`${event.targetKind}:${event.targetId}`} onchange={(input) => { const [kind, id] = (input.currentTarget as HTMLInputElement).value.split(':'); if (kind === 'actor' && id) updateEvent(index, { targetKind: 'actor', targetId: id }); else if (kind === 'primitive' && id) updateEvent(index, { targetKind: 'primitive', targetId: id }); }}><optgroup label="People">{#each actors as person (person.actorId)}<option value={`actor:${person.actorId}`}>{person.label}</option>{/each}</optgroup><optgroup label="Props">{#each objects as prop (prop.objectId)}<option value={`primitive:${prop.objectId}`}>{prop.label}</option>{/each}</optgroup></select></label><label>Presentation behavior<select value={event.action} onchange={(input) => updateEvent(index, { action: (input.currentTarget as HTMLInputElement).value as SceneDraftEventV1['action'] })}><option value="none">Timeline marker only</option><option value="visible">Show target only during interval</option><option value="move">Move target along illustrative path</option><option value="pulse">Pulse a light at the target</option></select></label>{#if event.action === 'move'}<div class="time-row"><label>From x,y,z<input value={event.fromMeters.join(', ')} oninput={(input) => { const value = parseCoordinateTriplet((input.currentTarget as HTMLInputElement).value); if (value) updateEvent(index, { fromMeters: value }); }} /></label><label>To x,y,z<input value={event.toMeters.join(', ')} oninput={(input) => { const value = parseCoordinateTriplet((input.currentTarget as HTMLInputElement).value); if (value) updateEvent(index, { toMeters: value }); }} /></label></div>{/if}{#if event.action === 'pulse'}<p class="hint">Illustrative point light pulses only within this selected source-clock interval; it does not establish that a light was observed.</p>{/if}<button type="button" onclick={() => { events = events.filter((item) => item.eventId !== event.eventId); }}>Remove event</button></div>{/each}
+				{#each events as event, index (event.eventId)}<div class="entity event-form"><strong>{event.eventId} · {event.sourceEvent ? "reviewed source, illustrative cue" : "hypothesis / review pending"}</strong><label>Description<input value={event.label} placeholder="Reported activity; cite and review before treating as a finding" oninput={(input) => updateEvent(index, { label: (input.currentTarget as HTMLInputElement).value })} /></label><label>Timeline clock<select disabled={!!event.sourceEvent} value={event.sourceEvidenceId} onchange={(input) => updateEvent(index, { sourceEvidenceId: (input.currentTarget as HTMLInputElement).value })}><option value="">Scene time (illustrative)</option>{#each selectedEvidence as item (item.id)}<option value={item.id}>{item.title || item.id}</option>{/each}</select></label><div class="time-row"><label>Start ms<input type="number" min="0" readonly={!!event.sourceEvent} value={event.startMs} oninput={(input) => updateEvent(index, { startMs: Number((input.currentTarget as HTMLInputElement).value) })} /></label><label>End ms<input type="number" min="1" readonly={!!event.sourceEvent} value={event.endMs} oninput={(input) => updateEvent(index, { endMs: Number((input.currentTarget as HTMLInputElement).value) })} /></label><label>Uncertainty ms<input type="number" min="0" value={event.uncertaintyMs} oninput={(input) => updateEvent(index, { uncertaintyMs: Number((input.currentTarget as HTMLInputElement).value) })} /></label></div><label>Event type<select value={event.cueType} onchange={(input) => updateEvent(index, { cueType: (input.currentTarget as HTMLInputElement).value as SceneDraftEventV1['cueType'] })}><option value="custom">Reported event</option><option value="timed_prop">Timed prop</option><option value="enter">Entry proposal</option><option value="exit">Exit proposal</option><option value="move">Movement proposal</option><option value="alarm">Alarm proposal</option><option value="evacuate">Evacuation proposal</option><option value="interview">Interview statement</option><option value="interact">Interaction proposal</option></select></label><label>Target<select value={`${event.targetKind}:${event.targetId}`} onchange={(input) => { const [kind, id] = (input.currentTarget as HTMLInputElement).value.split(':'); if (kind === 'actor' && id) updateEvent(index, { targetKind: 'actor', targetId: id }); else if (kind === 'primitive' && id) updateEvent(index, { targetKind: 'primitive', targetId: id }); }}><optgroup label="People">{#each actors as person (person.actorId)}<option value={`actor:${person.actorId}`}>{person.label}</option>{/each}</optgroup><optgroup label="Props">{#each objects as prop (prop.objectId)}<option value={`primitive:${prop.objectId}`}>{prop.label}</option>{/each}</optgroup></select></label><label>Presentation behavior<select value={event.action} onchange={(input) => updateEvent(index, { action: (input.currentTarget as HTMLInputElement).value as SceneDraftEventV1['action'] })}><option value="none">Timeline marker only</option><option value="visible">Show target only during interval</option><option value="move">Move target along illustrative path</option><option value="pulse">Pulse a light at the target</option><option value="rotate">Rotate a prop</option></select></label>{#if event.action === 'move'}<div class="time-row"><label>From x,y,z<input value={event.fromMeters.join(', ')} oninput={(input) => { const value = parseCoordinateTriplet((input.currentTarget as HTMLInputElement).value); if (value) updateEvent(index, { fromMeters: value }); }} /></label><label>To x,y,z<input value={event.toMeters.join(', ')} oninput={(input) => { const value = parseCoordinateTriplet((input.currentTarget as HTMLInputElement).value); if (value) updateEvent(index, { toMeters: value }); }} /></label></div>{/if}{#if event.action === 'rotate'}<label>Rotation in degrees<input type="number" min="-180" max="180" step="any" value={event.rotationDegrees ?? 90} onchange={(input) => { const degrees = (input.currentTarget as HTMLInputElement).valueAsNumber; if (Number.isFinite(degrees)) updateEvent(index, { rotationDegrees: degrees }); }} /></label><p class="hint">Rotate a prop around its local vertical pivot during the cue. Choose props for every target.</p>{/if}{#if event.action === 'pulse'}<p class="hint">Illustrative point light pulses only within this selected source-clock interval; it does not establish that a light was observed.</p>{/if}<label>Camera cue<select value={event.cameraPreset ?? ''} onchange={(input) => { const preset = sceneCameraPresetV1Schema.safeParse((input.currentTarget as HTMLSelectElement).value); updateEvent(index, { cameraPreset: preset.success ? preset.data : undefined }); }}><option value="">Keep manual view</option>{#each sceneCameraPresetV1Schema.options as preset (preset)}<option value={preset}>{sceneCameraPresetLabelsV1[preset]}</option>{/each}</select></label><button type="button" onclick={() => { events = events.filter((item) => item.eventId !== event.eventId); }}>Remove event</button></div>{/each}
 				<button type="button" onclick={addEvent} disabled={events.length >= 128}>Add timed event</button>
 				{#if selectedEvidence.some((item) => item.mimeType?.startsWith('video/'))}
 					<label>Video with reviewed events
@@ -631,11 +708,18 @@ import { requestScenePreviewV1, ScenePreviewRequestErrorV1 } from '$lib/reconstr
 				<button class="generate" type="button" onclick={loadScenePreview} disabled={busy || saving}>Generate Preview</button>
 			</section>
 		{/if}
+		{#if sceneGenerationJobsEnabled}
+			{#key caseId}
+				<SceneGenerationJobPanel {caseId} plan={proposal?.plan ?? null} disabled={busy || saving}
+					openPlanHash={(proposal ?? preview)?.plan.planHash ?? null} onOpenRecipe={openWorkerRecipe} />
+			{/key}
+		{/if}
 		{#if preview}
 			<div class="preview" aria-label="Generated scene preview">
-				{#key preview.plan.planHash}
+				{#key `${preview.plan.planHash}:${preview.generatedJobId ?? 'local'}`}
 					<SceneRuntimeRecipeCanvas plan={preview.plan} recipe={preview.recipe} revision={preview.revision} {evidenceItems}
 						bind:annotations bind:saving preparing={busy} persistenceEnabled={scenePersistenceEnabled}
+						onPolygonEditsChanged={(dirty) => { polygonEditsDirty = dirty; }}
 						onObjectSelected={(objectId) => workflowActor.send({ type: 'SELECT_OBJECT', objectId })}
 						onSaveRequested={() => workflowActor.send({ type: 'SAVE_REQUESTED' })}
 						onSaveFailed={(message) => workflowActor.send({ type: 'SAVE_FAILED', message })}

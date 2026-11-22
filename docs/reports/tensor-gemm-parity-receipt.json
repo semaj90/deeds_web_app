@@ -1,10 +1,10 @@
 {
   "schema": "atlas.tensor-gemm-parity.v1",
-  "generated_at": "2026-10-15T23:39:03Z",
+  "generated_at": "2026-11-22T00:33:14Z",
   "mode": "READ_ONLY_BENCHMARK",
   "writes_performed": false,
   "environment": {
-    "pytorch_version": "2.13.0+cu130",
+    "pytorch_version": "2.8.0+cu128",
     "cuda_available": true,
     "cuda_device": "NVIDIA GeForce RTX 3060 Ti"
   },
@@ -16,13 +16,13 @@
     "theoretical_flop_count": 245760000
   },
   "metrics": {
-    "cpu_latency_ms": 202.938,
-    "cpu_gflops": 1.21,
-    "cuda_latency_ms": 0.748,
-    "cuda_gflops": 328.37,
-    "speedup_cuda_vs_cpu": 271.15,
+    "cpu_latency_ms": 12.85,
+    "cpu_gflops": 19.12,
+    "cuda_latency_ms": 0.12,
+    "cuda_gflops": 2049.45,
+    "speedup_cuda_vs_cpu": 107.16,
     "max_abs_difference": 1.4156103134155273e-07,
-    "mean_abs_difference": 1.0470531996986665e-08,
+    "mean_abs_difference": 1.047140418819481e-08,
     "parity_threshold": 0.0001,
     "peak_vram_bytes": 41306112,
     "peak_vram_mib": 39.39

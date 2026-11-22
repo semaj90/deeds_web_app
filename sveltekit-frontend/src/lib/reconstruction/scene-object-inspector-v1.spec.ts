@@ -23,6 +23,14 @@ function plan() {
 }
 
 describe('scene object inspector projection', () => {
+	it('lists a source-linked marker without requiring a presentation action', () => {
+		const { planHash: _planHash, ...body } = plan();
+		const { action: _action, ...marker } = body.events[0]!;
+		const markerPlan = buildSceneGenerationPlanV1({ ...body, events: [{ ...marker, cueType: 'custom' }] });
+		const result = buildSceneObjectInspectorV1(markerPlan, { id: 'ACTOR-01', label: 'Person 01' });
+		expect(result.events).toHaveLength(1);
+		expect(result.conflicts).toEqual([]);
+	});
 	it('resolves actor description, placement, matching events, source clock and source revision', () => {
 		const result = buildSceneObjectInspectorV1(plan(), { id: 'ACTOR-01', label: 'ACTOR-01', room: 'Lobby' });
 		expect(result.object.kind).toBe('actor');

@@ -1,6 +1,7 @@
 import { spawn, execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { createReadStream, lstatSync, readdirSync, readFileSync, realpathSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { StringDecoder } from 'node:string_decoder';
 import { shouldSkipDirectory } from './repo-scan-roots.mjs';
@@ -364,5 +365,153 @@ export async function searchDailySources(root, { query, limit = 20, owner, recei
       discoveryBasis: includeUntracked ? 'GIT_TRACKED_AND_NONIGNORED_UNTRACKED_SOURCE_FILES' : 'GIT_TRACKED_SOURCE_FILES',
       resultOrder: 'EXPLICIT_EVIDENCE_THEN_FILENAME_HINT_BATCHES_THEN_PATH_LINE', exclusions: SOURCE_EXCLUSIONS },
     scopeIsExhaustive: false, rankingOwner: 'SearchRuntime; lexical discovery creates no retrieval vote',
+  };
+}
+
+const VALKEY_PATTERNS = ['centroid:*', 'bitfrost:*', 'gpu:karpathy:*', 'ace:rank:*'];
+const STALE_AFTER_MINUTES = 24 * 60;
+
+function readJsonFileSafe(root, relative) {
+  try {
+    return JSON.parse(readFileSync(path.join(root, relative), 'utf8'));
+  } catch (error) {
+    return { readError: error.code || error.message };
+  }
+}
+
+export function predicateSummary(predicates) {
+  if (Array.isArray(predicates)) {
+    return predicates.map((p) => ({ name: p.name ?? p.id ?? null, status: p.status ?? p.verdict ?? null }));
+  }
+  if (predicates && typeof predicates === 'object') {
+    return Object.entries(predicates).map(([name, value]) => ({
+      name,
+      status: typeof value === 'string' ? value : (value?.status ?? value?.verdict ?? null),
+    }));
+  }
+  return null;
+}
+
+export function readVramMiB() {
+  try {
+    const [used, total] = execFileSync(
+      'nvidia-smi',
+      ['--query-gpu=memory.used,memory.total', '--format=csv,noheader,nounits'],
+      { encoding: 'utf8', timeout: 5000 }
+    )
+      .trim()
+      .split(',')
+      .map(Number);
+    if (!Number.isFinite(used) || !Number.isFinite(total)) {
+      return { readError: 'VRAM_PARSE_FAILED' };
+    }
+    return { usedMiB: used, totalMiB: total, freeMiB: total - used };
+  } catch (error) {
+    return { readError: error.code || error.message };
+  }
+}
+
+export function readValkeyCounts(root, execFn = execFileSync) {
+  let password;
+  try {
+    const envText = readFileSync(path.join(root, 'sveltekit-frontend/.env.local'), 'utf8');
+    password = /^REDIS_PASSWORD=(.+)$/m.exec(envText)?.[1]?.trim();
+  } catch (error) {
+    return { status: 'UNAVAILABLE', reason: error.code || error.message };
+  }
+  if (!password) return { status: 'UNAVAILABLE', reason: 'REDIS_PASSWORD_NOT_SET' };
+  const env = { ...process.env, REDISCLI_AUTH: password };
+  const counts = {};
+  try {
+    for (const pattern of VALKEY_PATTERNS) {
+      const out = execFn(
+        'docker',
+        [
+          'exec',
+          '-e',
+          'REDISCLI_AUTH',
+          'legal-ai-valkey',
+          'valkey-cli',
+          '--no-auth-warning',
+          '--scan',
+          '--pattern',
+          pattern,
+        ],
+        { env, encoding: 'utf8', timeout: 10000, maxBuffer: 32 * 1024 * 1024 }
+      );
+      counts[pattern] = out.split('\n').filter(Boolean).length;
+    }
+    return { status: 'READ_ONLY_SCAN', counts };
+  } catch (error) {
+    return { status: 'UNAVAILABLE', reason: error.code || error.message, partialCounts: counts };
+  }
+}
+
+export function readStatus(root, options = {}) {
+  const nowMs = options.nowMs ?? Date.now();
+  const vramReader = options.readVram ?? readVramMiB;
+  const valkeyReader = options.readValkey ?? readValkeyCounts;
+
+  const lifecycle = readJsonFileSafe(root, 'docs/reports/graphify-daily-lifecycle-v1.json');
+  const completedMs = lifecycle.completedAt ? Date.parse(lifecycle.completedAt) : NaN;
+  const ageMinutes = Number.isNaN(completedMs) ? null : Math.round((nowMs - completedMs) / 60000);
+
+  let audits = [];
+  try {
+    audits = readdirSync(path.join(root, 'docs/reports'))
+      .filter((name) => /^atlas-canonical-projection-fabric-audit-\d{4}-\d{2}-\d{2}\.json$/.test(name))
+      .sort();
+  } catch {
+    audits = [];
+  }
+  const latestAudit = audits.at(-1) ?? null;
+  const audit = latestAudit ? readJsonFileSafe(root, `docs/reports/${latestAudit}`) : null;
+  const predicates = predicateSummary(audit?.predicates ?? null);
+  const contradictory =
+    audit &&
+    !audit.readError &&
+    audit.overall_verdict === 'SAFE_TO_PROJECT' &&
+    Array.isArray(predicates) &&
+    predicates.some((p) => p.status !== 'PASS');
+
+  const toMiB = (bytes) => Math.round((bytes / 1024 / 1024) * 10) / 10;
+  const blockers = [
+    ...(lifecycle.readError ? ['GRAPHIFY_LIFECYCLE_UNREADABLE'] : []),
+    ...(ageMinutes === null || ageMinutes > STALE_AFTER_MINUTES ? ['GRAPHIFY_SNAPSHOT_STALE_OR_UNREADABLE'] : []),
+    ...(!audit ? ['ADMISSION_REPORT_MISSING'] : []),
+    ...(audit?.readError ? ['ADMISSION_REPORT_UNREADABLE'] : []),
+    ...(audit && !audit.readError && audit.overall_verdict !== 'SAFE_TO_PROJECT'
+      ? [`ADMISSION_${audit.overall_verdict ?? 'UNKNOWN'}`]
+      : []),
+    ...(contradictory ? ['ADMISSION_CONTRADICTORY_VERDICT'] : []),
+  ];
+
+  return {
+    lifecycle: {
+      status: lifecycle.status ?? null,
+      completedAt: lifecycle.completedAt ?? null,
+      ageMinutes,
+      stale: ageMinutes === null || ageMinutes > STALE_AFTER_MINUTES,
+      snapshotRevision: lifecycle.snapshotRevision ?? null,
+      snapshotSourceCount: lifecycle.snapshotSourceCount ?? null,
+      workspaceRevision: lifecycle.workspaceRevision ?? null,
+      readError: lifecycle.readError ?? null,
+    },
+    admission: {
+      latestAuditReport: latestAudit ? `docs/reports/${latestAudit}` : null,
+      overallVerdict: audit?.overall_verdict ?? null,
+      overallVerdictReason: audit?.overall_verdict_reason ?? null,
+      predicates,
+      readError: audit?.readError ?? null,
+    },
+    host: {
+      freeRamGiB: Math.round((os.freemem() / 1024 / 1024 / 1024) * 100) / 100,
+      totalRamGiB: Math.round((os.totalmem() / 1024 / 1024 / 1024) * 100) / 100,
+      freeRamMiB: toMiB(os.freemem()),
+      vram: vramReader(),
+    },
+    valkey: options.valkey ? valkeyReader(root) : { status: 'NOT_CHECKED', hint: 'pass --valkey' },
+    recommendationReady: blockers.length === 0,
+    recommendationBlockers: blockers,
   };
 }

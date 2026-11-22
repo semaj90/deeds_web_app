@@ -8,11 +8,29 @@ import { readLatestWholeImageAnalysisRowV1, parseWholeImageAnalysisRowV1, readSt
 import { reviewableImageObservationsV1 } from '$lib/shared/storybook-region-review-v1.js';
 import { videoEventTimelineV1Schema } from '$lib/server/features/evidence/video/video-event-fusion-v1.js';
 import { CaseSceneIntakeContextV1Schema } from '$lib/reconstruction/case-scene-fetch-contract-v1.js';
-import { resolveSceneGenerationPlanReferencesV1, type CanonicalSceneObservationReviewV1, type CanonicalSceneVideoEventV1 } from '$lib/server/reconstruction/resolve-scene-generation-plan-v1.js';
-import type { SceneGenerationPlanV1Body } from '$lib/reconstruction/scene-generation-plan-v1.js';
+import { resolveSceneGenerationPlanReferencesV1, SceneGenerationPlanResolutionErrorV1, type CanonicalSceneObservationReviewV1, type CanonicalSceneVideoEventV1 } from '$lib/server/reconstruction/resolve-scene-generation-plan-v1.js';
+import { SceneGenerationPlanV1Schema, type SceneGenerationPlanV1Body } from '$lib/reconstruction/scene-generation-plan-v1.js';
 
 export class SceneGenerationPlanLoadErrorV1 extends Error {
 	constructor(message: string, readonly status: number) { super(message); }
+}
+
+export async function readSceneGenerationInputStatusV1(
+	input: { caseId: string; sceneId: string; expectedSceneRevision: number; createdBy: number; requestSnapshot: unknown },
+	database: Pick<typeof db, 'select' | 'execute'> = db
+) {
+	const { planHash, ...candidate } = SceneGenerationPlanV1Schema.parse(input.requestSnapshot);
+	if (candidate.caseId !== input.caseId || candidate.sceneId !== input.sceneId ||
+		candidate.expectedSceneRevision !== input.expectedSceneRevision) return 'source_stale';
+	try {
+		const current = await loadSceneGenerationPlanV1({ caseId: input.caseId, actorId: input.createdBy, candidate }, database);
+		return current.planHash === planHash ? 'current' : 'source_stale';
+	} catch (error) {
+		if (error instanceof SceneGenerationPlanLoadErrorV1 && error.status === 404) return 'source_missing';
+		if ((error instanceof SceneGenerationPlanLoadErrorV1 && error.status === 409) ||
+			error instanceof SceneGenerationPlanResolutionErrorV1) return 'source_stale';
+		throw error;
+	}
 }
 
 /** Resolve canonical inputs through the caller's database snapshot. */

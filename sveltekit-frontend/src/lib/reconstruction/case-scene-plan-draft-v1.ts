@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { SceneGenerationPlanV1BodySchema, type SceneGenerationPlanV1Body } from './scene-generation-plan-v1.js';
 import { CaseSceneFetchParametersInputV1Schema } from './case-scene-fetch-contract-v1.js';
+import type { SceneCameraPresetV1 } from './scene-camera-cue-v1.js';
 
 const evidenceIdSchema = z.string().uuid();
 const parameterResponseSchema = z.object({
@@ -18,11 +19,15 @@ const parameterResponseSchema = z.object({
 export type SceneDraftActorV1 = { actorId: string; label: string; appearance: string; evidenceIds: string[] };
 export type SceneDraftObjectV1 = { objectId: string; registryId: string; label: string; positionMeters: [number, number, number] };
 export type SceneDraftTargetRefV1 = { kind: 'actor' | 'primitive'; targetId: string };
+type PulseLightAction = Extract<NonNullable<SceneGenerationPlanV1Body['events'][number]['action']>, { type: 'pulse_light_during_interval' }>;
 export type SceneDraftEventV1 = {
 	eventId: string; label: string; cueType: 'enter' | 'exit' | 'move' | 'interact' | 'alarm' | 'evacuate' | 'timed_prop' | 'interview' | 'custom';
 	sourceEvidenceId: string; startMs: number; endMs: number; uncertaintyMs: number;
-	targetKind: 'actor' | 'primitive'; targetId: string; action: 'none' | 'visible' | 'move' | 'pulse';
+	targetKind: 'actor' | 'primitive'; targetId: string; action: 'none' | 'visible' | 'move' | 'pulse' | 'rotate';
+	rotationDegrees?: number;
+	cameraPreset?: SceneCameraPresetV1;
 	additionalTargets?: SceneDraftTargetRefV1[];
+	pulseLight?: PulseLightAction;
 	fromMeters: [number, number, number]; toMeters: [number, number, number];
 	sourceEvent?: NonNullable<SceneGenerationPlanV1Body['events'][number]['sourceEvent']>;
 };
@@ -57,12 +62,17 @@ export function restoreCaseSceneDraftV1(plan: SceneGenerationPlanV1Body) {
 			throw new Error('This revision contains an event outside the editor.');
 		}
 		const move = event.action?.type === 'move_during_interval' ? event.action : undefined;
+		const pulseLight = event.action?.type === 'pulse_light_during_interval' ? event.action : undefined;
+		const rotation = event.action?.type === 'rotate_prop_during_interval' ? event.action : undefined;
 		return {
 			eventId: event.eventId, label: event.label, cueType: event.cueType, sourceEvidenceId: event.clock.evidenceId ?? '',
 			startMs: event.clock.startMs, endMs: event.clock.endMs, uncertaintyMs: event.clock.uncertaintyMs,
 			targetKind: target.kind, targetId: target.targetId,
 			additionalTargets: additionalTargets.map((item) => ({ kind: item.kind as 'actor' | 'primitive', targetId: item.targetId })),
-			action: move ? 'move' : event.action?.type === 'pulse_light_during_interval' ? 'pulse' : event.action ? 'visible' : 'none',
+			action: move ? 'move' : pulseLight ? 'pulse' : rotation ? 'rotate' : event.action ? 'visible' : 'none',
+			...(pulseLight ? { pulseLight } : {}),
+			...(rotation ? { rotationDegrees: rotation.degrees } : {}),
+			...(event.cameraPreset ? { cameraPreset: event.cameraPreset } : {}),
 			fromMeters: move ? coordinates(move.fromMeters) : [0, 0, 0],
 			toMeters: move ? coordinates(move.toMeters) : [2, 0, 0],
 			sourceEvent: event.sourceEvent ?? undefined
@@ -133,13 +143,15 @@ export function buildCaseScenePlanDraftV1(input: {
 			const actorIds = [...new Set(targetRefs.filter((target) => target.kind === 'actor').map((target) => target.targetId))];
 			return {
 			eventId: event.eventId, cueType: event.cueType, label: event.label, status: 'hypothesis' as const,
+			...(event.cameraPreset ? { cameraPreset: event.cameraPreset } : {}),
 			reviewStatus: event.sourceEvent ? 'accepted' as const : 'unreviewed' as const,
 			evidenceIds: event.sourceEvidenceId ? [event.sourceEvidenceId] : [], actorIds, targetRefs,
 			...(event.action === 'none' ? {} : { action: event.action === 'move'
 				? { type: 'move_during_interval' as const, fromMeters: event.fromMeters, toMeters: event.toMeters }
 				: event.action === 'pulse'
-					? { type: 'pulse_light_during_interval' as const, colorHex: '#ffb347', minIntensity: 0.15, maxIntensity: 2.5, periodMs: 900 }
-					: { type: 'visible_during_interval' as const, visible: true } }),
+					? event.pulseLight ?? { type: 'pulse_light_during_interval' as const, colorHex: '#ffb347', minIntensity: 0.15, maxIntensity: 2.5, periodMs: 900 }
+					: event.action === 'rotate' ? { type: 'rotate_prop_during_interval' as const, degrees: event.rotationDegrees ?? 90 }
+						: { type: 'visible_during_interval' as const, visible: true } }),
 			clock: { evidenceId: event.sourceEvidenceId || null, clockId: event.sourceEvidenceId ? `evidence:${event.sourceEvidenceId}` : `scene:${input.sceneId}`, startMs: event.startMs, endMs: event.endMs, uncertaintyMs: event.uncertaintyMs },
 			sourceEvent: event.sourceEvent ?? null
 			};

@@ -1,11 +1,16 @@
 import { z } from 'zod';
 import { CaseSceneIntakeContextV1Schema } from './case-scene-fetch-contract-v1.js';
+import { sceneCameraPresetV1Schema } from './scene-camera-cue-v1.js';
 
 const sha256 = z.string().regex(/^[a-f0-9]{64}$/i).transform((value) => value.toLowerCase());
 const evidenceId = z.string().uuid();
 const stableId = (prefix: 'ACTOR' | 'EVENT' | 'OBJECT' | 'PLACEMENT') =>
 	z.string().regex(new RegExp(`^${prefix}-[A-Z0-9-]{1,48}$`));
 const boundedMeter = (limit: number) => z.number().finite().min(-limit).max(limit);
+export const scenePropRotationActionV1Schema = z.object({
+	type: z.literal('rotate_prop_during_interval'),
+	degrees: z.number().finite().min(-180).max(180)
+}).strict();
 
 const SourceRefV1Schema = z.object({
 	evidenceId,
@@ -64,11 +69,13 @@ const EventCueV1Schema = z.object({
 	evidenceIds: z.array(evidenceId).max(100),
 	actorIds: z.array(stableId('ACTOR')).max(64).default([]),
 	targetRefs: z.array(z.object({ kind: z.enum(['actor', 'primitive', 'asset']), targetId: z.string().min(1).max(128) }).strict()).max(256).default([]),
+	cameraPreset: sceneCameraPresetV1Schema.optional(),
 	// Deterministic presentation behavior, separate from the source event's truth/review state.
 	// Movement is an authored path proposal in scene-local coordinates, not measured motion.
 	action: z.discriminatedUnion('type', [
 		z.object({ type: z.literal('visible_during_interval'), visible: z.boolean() }).strict(),
 		z.object({ type: z.literal('move_during_interval'), fromMeters: z.tuple([boundedMeter(100_000), boundedMeter(1_000), boundedMeter(100_000)] as const), toMeters: z.tuple([boundedMeter(100_000), boundedMeter(1_000), boundedMeter(100_000)] as const) }).strict(),
+		scenePropRotationActionV1Schema,
 		z.object({ type: z.literal('pulse_light_during_interval'), colorHex: z.string().regex(/^#[0-9a-f]{6}$/i), minIntensity: z.number().finite().min(0).max(5), maxIntensity: z.number().finite().min(0).max(10), periodMs: z.number().int().min(100).max(10_000) }).strict().refine((action) => action.maxIntensity > action.minIntensity, 'Pulse max intensity must exceed min intensity')
 	]).optional(),
 	clock: z.object({
@@ -215,6 +222,10 @@ export const SceneGenerationPlanV1BodySchema = z.object({
 		}
 		if (event.action?.type === 'pulse_light_during_interval' && event.targetRefs.length === 0) {
 			ctx.addIssue({ code: 'custom', path: ['events', index, 'targetRefs'], message: 'Pulse-light cues must target a registered scene object' });
+		}
+		if (event.action?.type === 'rotate_prop_during_interval' &&
+			(!event.targetRefs.length || event.targetRefs.some((target) => target.kind !== 'primitive'))) {
+			ctx.addIssue({ code: 'custom', path: ['events', index, 'targetRefs'], message: 'Prop rotation requires primitive targets only' });
 		}
 		if (event.action?.type === 'pulse_light_during_interval') pulseLightBindings += event.targetRefs.length;
 		if (event.status === 'measured' && event.reviewStatus !== 'accepted') {

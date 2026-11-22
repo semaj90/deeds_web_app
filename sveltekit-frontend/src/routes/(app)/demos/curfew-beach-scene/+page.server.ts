@@ -65,6 +65,7 @@ const demoPlan = buildSceneGenerationPlanV1({
 	events: [
 		{
 			eventId: 'EVENT-WALK-01',
+			cameraPreset: 'top-down',
 			cueType: 'move',
 			label: 'Synthetic Actor A walk interval',
 			status: 'hypothesis',
@@ -87,6 +88,7 @@ const demoPlan = buildSceneGenerationPlanV1({
 		},
 		{
 			eventId: 'EVENT-WALK-02',
+			cameraPreset: 'isometric',
 			cueType: 'move',
 			label: 'Synthetic Actor B walk interval',
 			status: 'hypothesis',

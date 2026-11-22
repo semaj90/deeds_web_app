@@ -4,6 +4,7 @@ import { generatedSceneAssetProvenanceV1Schema } from './generated-scene-asset-p
 import { storybookVideoChapterV1Schema } from '$lib/shared/storybook-video-chapter-v1.js';
 import { storybookImageChapterV1Schema } from '$lib/shared/storybook-image-chapter-v1.js';
 import { scenePreviewDraftV1Schema } from '$lib/reconstruction/scene-preview-draft-v1.js';
+import { applyScenePolygonEditV1, collectSceneReviewedPolygonsV1, matchesSceneContourBindingV1 } from '$lib/reconstruction/scene-reviewed-polygons-v1.js';
 import { sceneLinkedTupleV1Schema, validateSceneOntologyGraphV1 } from '$lib/reconstruction/scene-ontology-bridge-v1.js';
 import { sceneGeometryRecipeV1Schema, sceneObjectInstanceV1Schema } from '$lib/reconstruction/scene-object-contract-v1.js';
 
@@ -347,6 +348,37 @@ export const sceneDocumentV1Schema = z.object({
 			plan.caseId !== document.caseId || plan.sceneId !== document.sceneId || plan.expectedSceneRevision >= document.revision ||
 			plan.sources.some((source) => evidence.get(source.evidenceId) !== source.sourceRevision)) {
 			context.addIssue({ code: 'custom', path: ['proceduralPreviewDraft'], message: 'Draft scope, revision and evidence must match its scene document' });
+		}
+		const edits = document.proceduralPreviewDraft?.polygonEdits ?? [];
+		const notes = document.proceduralPreviewDraft?.contourNotes ?? [];
+		if (edits.length || notes.length) {
+			const bases = collectSceneReviewedPolygonsV1([
+				...(document.imageStorybookChapter ? [document.imageStorybookChapter] : []), ...(document.imageStorybookChapters ?? [])
+			], plan.sources);
+			const noteIds = new Set<string>();
+			for (const [index, note] of notes.entries()) {
+				const matches = bases.filter((base) => base.objectId === note.objectId);
+				if (noteIds.has(note.id) || matches.length !== 1 || !matchesSceneContourBindingV1(matches[0]!, note)) {
+					context.addIssue({ code: 'custom', path: ['proceduralPreviewDraft', 'contourNotes', index], message: 'Contour notes require a unique ID and the exact reviewed contour binding' });
+				}
+				noteIds.add(note.id);
+			}
+			const vertices = edits.reduce((count, { polygon }) =>
+				count + polygon.outer.length + polygon.holes.reduce((sum, ring) => sum + ring.length, 0), 0);
+			const path = ['proceduralPreviewDraft', 'polygonEdits'];
+			if (vertices > 4096 || new Set(edits.map((edit) => edit.objectId)).size !== edits.length) {
+				context.addIssue({ code: 'custom', path, message: 'Polygon edits exceed the vertex budget or contain duplicate objects' });
+			} else {
+				for (const [index, edit] of edits.entries()) {
+					const base = bases.filter((item) => item.objectId === edit.objectId);
+					try {
+						if (base.length !== 1) throw new Error('Unknown or ambiguous reviewed contour');
+						applyScenePolygonEditV1(base[0]!, edit);
+					} catch {
+						context.addIssue({ code: 'custom', path: [...path, index], message: 'Polygon edit must preserve its exact reviewed base and valid source-pixel topology' });
+					}
+				}
+			}
 		}
 	}
 	if (document.sceneClassification === 'SYNTHETIC_FIXTURE' && document.status !== 'FIXTURE') {

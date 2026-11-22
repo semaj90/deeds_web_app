@@ -1,0 +1,17 @@
+{
+  "gan-validation-gate": {
+    "enabled": true,
+    "PostToolUse": [
+      {
+        "matcher": "edit_file|write_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node scripts/atlas/gan-validation-hook.mjs",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

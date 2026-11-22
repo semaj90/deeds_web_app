@@ -76,15 +76,15 @@
 	{#key data.caseId}
 		<CaseScenePlanBuilder caseId={data.caseId} caseSceneIntake={data.caseSceneIntake} evidenceItems={data.availableEvidence}
 			setSceneRequest={data.setSceneRequest} setSceneRequestError={data.setSceneRequestError}
-			scenePersistenceEnabled={data.scenePersistenceEnabled} />
+			scenePersistenceEnabled={data.scenePersistenceEnabled} sceneGenerationJobsEnabled={data.sceneGenerationJobsEnabled} />
 	{/key}
-	{#if data.sceneSources.some((scene) => scene.proceduralPreview)}
+	{#if data.scenePersistenceEnabled && data.sceneSources.some((scene) => scene.proceduralPreview || scene.hasReviewedContours)}
 		<section aria-label="Saved procedural drafts">
 			<h2>Saved scene drafts</h2>
 			<ul>
-				{#each data.sceneSources.filter((scene) => scene.proceduralPreview) as scene (scene.sceneId)}
+				{#each data.sceneSources.filter((scene) => scene.proceduralPreview || scene.hasReviewedContours) as scene (scene.sceneId)}
 					<li><a data-sveltekit-reload href={`?previewScene=${scene.sceneId}&previewRevision=${scene.revision}#scene-builder-title`}>
-						{scene.proceduralPreview === 'four-bedroom-house' ? 'Four-bedroom house' : scene.proceduralPreview}
+						{scene.proceduralPreview === 'four-bedroom-house' ? 'Four-bedroom house' : scene.proceduralPreview ?? 'Open reviewed contours'}
 						· Revision {scene.revision} · {scene.sceneId.slice(0, 8)}
 					</a></li>
 				{/each}

@@ -10,7 +10,7 @@ const evidenceB = '22222222-2222-4222-8222-222222222222';
 const hashA = 'a'.repeat(64);
 const hashB = 'b'.repeat(64);
 
-function makeRuntime(kind: 'beach' | 'four-bedroom-house' = 'beach', calibrated = false, withMovementConflict = false) {
+function makeRuntime(kind: 'beach' | 'four-bedroom-house' = 'beach', calibrated = false, withMovementConflict = false, withRotationConflict = false) {
 	const plan = buildSceneGenerationPlanV1({
 		schema: 'parent-atlas.scene-generation-plan/v1', caseId, sceneId, expectedSceneRevision: 2, generator: 'procedural-three-scene-v1',
 		caseIntake: null, narrative: { why: { status: 'unknown' }, how: { status: 'unknown' } },
@@ -33,7 +33,14 @@ function makeRuntime(kind: 'beach' | 'four-bedroom-house' = 'beach', calibrated 
 				clock: { evidenceId: evidenceB, clockId: `camera:${evidenceB}`, startMs: 5_000, endMs: 7_000, uncertaintyMs: 500 } },
 			{ eventId: 'EVENT-ALARM-01', cueType: 'alarm', label: 'Illustrative alarm light', status: 'hypothesis', reviewStatus: 'unreviewed', evidenceIds: [evidenceB], actorIds: [], targetRefs: [{ kind: 'primitive', targetId: 'OBJECT-01' }],
 				action: { type: 'pulse_light_during_interval', colorHex: '#ffb347', minIntensity: 0.15, maxIntensity: 2.5, periodMs: 1_000 },
-				clock: { evidenceId: evidenceB, clockId: `camera:${evidenceB}`, startMs: 7_000, endMs: 9_000, uncertaintyMs: 500 } },
+				clock: { evidenceId: evidenceB, clockId: `camera:${evidenceB}`, startMs: 6_000, endMs: 9_000, uncertaintyMs: 500 } },
+			...[90, ...(withRotationConflict ? [-90] : [])].map((degrees, index) => ({
+				eventId: `EVENT-ROTATE-0${index + 1}`, cueType: 'interact' as const, label: 'Illustrative prop rotation',
+				status: 'hypothesis' as const, reviewStatus: 'unreviewed' as const, evidenceIds: [evidenceB], actorIds: [],
+				targetRefs: [{ kind: 'primitive' as const, targetId: 'OBJECT-01' }],
+				action: { type: 'rotate_prop_during_interval' as const, degrees },
+				clock: { evidenceId: evidenceB, clockId: `camera:${evidenceB}`, startMs: 5_000, endMs: 7_000, uncertaintyMs: 500 }
+			})),
 			...(withMovementConflict ? [{
 				eventId: 'EVENT-MOVE-02', cueType: 'move' as const, label: 'Conflicting alternate movement', status: 'hypothesis' as const, reviewStatus: 'unreviewed' as const,
 				evidenceIds: [evidenceA], actorIds: ['ACTOR-01'], targetRefs: [{ kind: 'actor' as const, targetId: 'ACTOR-01' }],
@@ -51,21 +58,54 @@ function makeRuntime(kind: 'beach' | 'four-bedroom-house' = 'beach', calibrated 
 }
 
 describe('SceneRuntimeThreeV1', () => {
+	it('seeks local prop rotation alongside visibility and restores placement outside its clock and interval', () => {
+		const runtime = makeRuntime();
+		try {
+			const prop = runtime.targetNodes.get('primitive:OBJECT-01')!;
+			const base = prop.quaternion.clone();
+			runtime.setSourceTime(`camera:${evidenceB}`, 6_000);
+			expect(prop.visible).toBe(true);
+			expect(prop.quaternion.angleTo(base)).toBeCloseTo(Math.PI / 4);
+			runtime.setSourceTime(`camera:${evidenceB}`, 7_000);
+			expect(prop.quaternion.equals(base)).toBe(true);
+			runtime.setSourceTime(`camera:${evidenceB}`, 6_000);
+			expect(prop.quaternion.angleTo(base)).toBeCloseTo(Math.PI / 4);
+			runtime.setSourceTime(`camera:${evidenceA}`, 6_000);
+			expect(prop.quaternion.equals(base)).toBe(true);
+		} finally { runtime.dispose(); }
+	});
+
+	it('keeps base rotation when incompatible proposals overlap', () => {
+		const runtime = makeRuntime('beach', false, false, true);
+		try {
+			const prop = runtime.targetNodes.get('primitive:OBJECT-01')!;
+			const base = prop.quaternion.clone();
+			runtime.setSourceTime(`camera:${evidenceB}`, 6_000);
+			expect(prop.quaternion.equals(base)).toBe(true);
+			expect(prop.userData.conflictEventIds).toEqual(['EVENT-ROTATE-01', 'EVENT-ROTATE-02']);
+		} finally { runtime.dispose(); }
+	});
 	it('pulses an illustrative alarm light deterministically only on its bound source clock and interval', () => {
 		const runtime = makeRuntime();
 		try {
 			const target = runtime.targetNodes.get('primitive:OBJECT-01')!;
 			const light = target.getObjectByName('event-pulse:EVENT-ALARM-01') as import('three').PointLight;
 			expect(light).toBeDefined();
-			runtime.setSourceTime(`camera:${evidenceA}`, 8_000);
+			runtime.setSourceTime(`camera:${evidenceA}`, 6_250);
 			expect(light.visible).toBe(false);
-			runtime.setSourceTime(`camera:${evidenceB}`, 7_000);
+			runtime.setSourceTime(`camera:${evidenceB}`, 6_000);
 			const midpointIntensity = light.intensity;
 			expect(light.visible).toBe(true);
-			runtime.setSourceTime(`camera:${evidenceB}`, 7_250);
-			expect(light.intensity).toBeGreaterThan(midpointIntensity);
+			runtime.setSourceTime(`camera:${evidenceB}`, 6_250);
+			const peakIntensity = light.intensity;
+			expect(peakIntensity).toBeGreaterThan(midpointIntensity);
+			expect(target.visible).toBe(true);
 			runtime.setSourceTime(`camera:${evidenceB}`, 9_000);
 			expect(light.visible).toBe(false);
+			runtime.setSourceTime(`camera:${evidenceB}`, 6_250);
+			expect(target.visible).toBe(true);
+			expect(light.visible).toBe(true);
+			expect(light.intensity).toBe(peakIntensity);
 		} finally {
 			runtime.dispose();
 		}

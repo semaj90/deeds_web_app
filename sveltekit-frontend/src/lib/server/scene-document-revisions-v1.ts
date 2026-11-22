@@ -14,6 +14,7 @@ import { buildStorybookImagePrefillV1 } from '$lib/server/reconstruction/storybo
 import { parseWholeImageAnalysisRowV1, readLatestWholeImageAnalysisRowV1, readStorybookImageReviewsV1 } from '$lib/server/evidence/whole-image-analysis-readback-v1.js';
 import type { StorybookImageObservationsV1 } from '$lib/shared/storybook-image-observations-v1.js';
 import { buildReviewedImageStorybookChapterV1, type StorybookImageChapterV1 } from '$lib/shared/storybook-image-chapter-v1.js';
+import { collectSceneReviewedPolygonsV1, reviewedContourSceneSourcesV1 } from '$lib/reconstruction/scene-reviewed-polygons-v1.js';
 import { buildSceneGenerationPlanV1 } from '$lib/server/reconstruction/scene-generation-plan-v1.js';
 
 export const sceneRevisionCommandV1Schema = z.object({
@@ -290,6 +291,25 @@ export async function appendSceneDocumentRevisionV1(input: {
 			...(binding.manifest.imageStorybookChapter ? [binding.manifest.imageStorybookChapter] : []),
 			...(binding.manifest.imageStorybookChapters ?? [])
 		];
+		const touchedContours = new Set([
+			...(binding.manifest.proceduralPreviewDraft?.polygonEdits ?? []).map(({ objectId }) => objectId),
+			...(binding.manifest.proceduralPreviewDraft?.contourNotes ?? []).map(({ objectId }) => objectId)
+		]);
+		if (touchedContours.size && draftPlan) {
+			const before = collectSceneReviewedPolygonsV1([
+				...(previousManifest?.imageStorybookChapter ? [previousManifest.imageStorybookChapter] : []),
+				...(previousManifest?.imageStorybookChapters ?? [])
+			], draftPlan.sources);
+			const after = collectSceneReviewedPolygonsV1(imageChapters, draftPlan.sources);
+			for (const objectId of touchedContours) {
+				const previous = before.filter((item) => item.objectId === objectId);
+				const current = after.find((item) => item.objectId === objectId);
+				if (previous.length !== 1 || !current ||
+					stableStringifySceneDocumentV1(previous[0]!.recipe) !== stableStringifySceneDocumentV1(current.recipe)) {
+					throw new Error('SCENE_REVISION_IMAGE_CHAPTER_CHANGED');
+				}
+			}
+		}
 		const imageChapter = imageChapters[0];
 		if (imageChapters.length || binding.manifest.evidenceSources.length || (binding.manifest.evidenceBindings?.length ?? 0) > 0 || (binding.manifest.videoEventBindings?.length ?? 0) > 0 || (binding.manifest.groundPlaneTrackProposals?.length ?? 0) > 0) {
 			const evidenceIds = [...new Set([
@@ -395,6 +415,7 @@ export async function listLatestSceneDocumentSourceProjectionsV1(input: {
 		revision: number;
 		manifestSha256: string;
 		proceduralPreview?: NonNullable<SceneDocumentV1['proceduralPreviewDraft']>['plan']['environment']['kind'];
+		hasReviewedContours: boolean;
 		videoEventBindings: Omit<NonNullable<SceneDocumentV1['videoEventBindings']>[number], 'chapter'>[];
 		storybookChapters: Array<{ eventId: string; evidenceId: string; title: string; startMs: number; endMs: number }>;
 		imageStorybookChapter?: Pick<StorybookImageChapterV1, 'chapterId' | 'evidenceId' | 'title'>;
@@ -438,6 +459,7 @@ export async function listLatestSceneDocumentSourceProjectionsV1(input: {
 				revision: verified.revision,
 				manifestSha256: verified.manifestSha256,
 				proceduralPreview: verified.manifest.proceduralPreviewDraft?.plan.environment.kind,
+				hasReviewedContours: reviewedContourSceneSourcesV1(verified.manifest).length > 0,
 				videoEventBindings: videoEvents.map(({ chapter: _chapter, ...binding }) => binding),
 				storybookChapters: videoEvents.flatMap(({ chapter, eventId, evidenceId, startMs, endMs }) =>
 					chapter ? [{ eventId, evidenceId, title: chapter.title, startMs, endMs }] : [])

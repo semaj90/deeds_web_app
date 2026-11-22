@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, realpathSync, rmSync, utimesSync, writeFileSync
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import {
-  inspectGraphArtifacts, readOwnershipIndex, readTrackedInventory, resolveDiscoveryPath, searchDailySources,
+  inspectGraphArtifacts, readOwnershipIndex, readStatus, readTrackedInventory, readValkeyCounts, resolveDiscoveryPath, searchDailySources,
 } from './graphify-daily-discovery-v1.mjs';
 
 function fixture(context) {
@@ -173,4 +173,98 @@ test('an unavailable rg executable returns failure rather than successful empty 
     if (previous === undefined) delete process.env.PATH;
     else process.env.PATH = previous;
   }
+});
+
+test('status mode flags missing audit report as ADMISSION_REPORT_MISSING', (context) => {
+  const { root, write } = fixture(context);
+  const nowMs = Date.parse('2026-11-22T00:00:00.000Z');
+  write('docs/reports/graphify-daily-lifecycle-v1.json', JSON.stringify({
+    status: 'COMPLETED',
+    completedAt: '2026-11-21T23:30:00.000Z',
+  }));
+  const status = readStatus(root, { nowMs, readVram: () => ({ usedMiB: 100, totalMiB: 8192, freeMiB: 8092 }) });
+  assert.equal(status.recommendationReady, false);
+  assert.ok(status.recommendationBlockers.includes('ADMISSION_REPORT_MISSING'));
+  assert.equal(status.lifecycle.stale, false);
+});
+
+test('status mode flags stale lifecycle snapshot (>24h)', (context) => {
+  const { root, write } = fixture(context);
+  const nowMs = Date.parse('2026-11-22T00:00:00.000Z');
+  write('docs/reports/graphify-daily-lifecycle-v1.json', JSON.stringify({
+    status: 'COMPLETED',
+    completedAt: '2026-11-19T00:00:00.000Z',
+  }));
+  write('docs/reports/atlas-canonical-projection-fabric-audit-2026-11-21.json', JSON.stringify({
+    overall_verdict: 'SAFE_TO_PROJECT',
+    predicates: [{ name: 'IDENTITY_ALIGNED', status: 'PASS' }],
+  }));
+  const status = readStatus(root, { nowMs, readVram: () => ({ usedMiB: 100, totalMiB: 8192, freeMiB: 8092 }) });
+  assert.equal(status.lifecycle.stale, true);
+  assert.equal(status.recommendationReady, false);
+  assert.ok(status.recommendationBlockers.includes('GRAPHIFY_SNAPSHOT_STALE_OR_UNREADABLE'));
+});
+
+test('status mode handles invalid JSON in lifecycle and audit reports without crashing', (context) => {
+  const { root, write } = fixture(context);
+  write('docs/reports/graphify-daily-lifecycle-v1.json', '{not-json');
+  write('docs/reports/atlas-canonical-projection-fabric-audit-2026-11-21.json', '{bad-json');
+  const status = readStatus(root, { readVram: () => ({ usedMiB: 100, totalMiB: 8192, freeMiB: 8092 }) });
+  assert.equal(status.recommendationReady, false);
+  assert.ok(status.lifecycle.readError);
+  assert.ok(status.admission.readError);
+  assert.ok(status.recommendationBlockers.includes('GRAPHIFY_LIFECYCLE_UNREADABLE'));
+  assert.ok(status.recommendationBlockers.includes('ADMISSION_REPORT_UNREADABLE'));
+});
+
+test('status mode flags contradictory admission (SAFE_TO_PROJECT with non-PASS predicate)', (context) => {
+  const { root, write } = fixture(context);
+  const nowMs = Date.parse('2026-11-22T00:00:00.000Z');
+  write('docs/reports/graphify-daily-lifecycle-v1.json', JSON.stringify({
+    status: 'COMPLETED',
+    completedAt: '2026-11-21T23:50:00.000Z',
+  }));
+  write('docs/reports/atlas-canonical-projection-fabric-audit-2026-11-21.json', JSON.stringify({
+    overall_verdict: 'SAFE_TO_PROJECT',
+    predicates: [
+      { name: 'IDENTITY_ALIGNED', status: 'PASS' },
+      { name: 'REVISION_QUALIFIED', status: 'NOT_PROVEN' },
+    ],
+  }));
+  const status = readStatus(root, { nowMs, readVram: () => ({ usedMiB: 100, totalMiB: 8192, freeMiB: 8092 }) });
+  assert.equal(status.recommendationReady, false);
+  assert.ok(status.recommendationBlockers.includes('ADMISSION_CONTRADICTORY_VERDICT'));
+});
+
+test('status mode reports UNAVAILABLE when Valkey env or docker is absent', (context) => {
+  const { root, write } = fixture(context);
+  const missingEnv = readValkeyCounts(root);
+  assert.equal(missingEnv.status, 'UNAVAILABLE');
+  write('sveltekit-frontend/.env.local', 'REDIS_PASSWORD=secret\n');
+  const dockerFail = readValkeyCounts(root, () => {
+    const err = new Error('docker unavailable');
+    err.code = 'ENOENT';
+    throw err;
+  });
+  assert.equal(dockerFail.status, 'UNAVAILABLE');
+  assert.equal(dockerFail.reason, 'ENOENT');
+});
+
+test('status mode degrades cleanly on host resource-query (VRAM) failure', (context) => {
+  const { root, write } = fixture(context);
+  const nowMs = Date.parse('2026-11-22T00:00:00.000Z');
+  write('docs/reports/graphify-daily-lifecycle-v1.json', JSON.stringify({
+    status: 'COMPLETED',
+    completedAt: '2026-11-21T23:50:00.000Z',
+  }));
+  write('docs/reports/atlas-canonical-projection-fabric-audit-2026-11-21.json', JSON.stringify({
+    overall_verdict: 'SAFE_TO_PROJECT',
+    predicates: [{ name: 'IDENTITY_ALIGNED', status: 'PASS' }],
+  }));
+  const status = readStatus(root, {
+    nowMs,
+    readVram: () => ({ readError: 'ENOENT' }),
+  });
+  assert.equal(status.host.vram.readError, 'ENOENT');
+  assert.equal(status.recommendationReady, true);
 });

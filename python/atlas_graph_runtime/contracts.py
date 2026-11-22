@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-GraphBackend = Literal["networkx", "cugraph"]
+GraphBackend = Literal["networkx", "cugraph", "torch_cuda", "torch_cpu"]
 
 
 @dataclass(frozen=True)

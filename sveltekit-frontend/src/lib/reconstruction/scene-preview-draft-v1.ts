@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { SceneGenerationPlanV1Schema } from './scene-generation-plan-v1.js';
+import { sceneContourNoteV1Schema, scenePolygonEditV1Schema } from './scene-reviewed-polygons-v1.js';
 
 export const HOUSE_ROOMS_V1 = [
 	['bedroom-1', 'Bedroom 1', -1, -6, 'bed'],
@@ -30,7 +31,9 @@ export type ScenePreviewAnnotationV1 = z.infer<typeof annotation>;
 export const scenePreviewDraftV1Schema = z.object({
 	schema: z.literal('parent-atlas.scene-preview-draft/v1'),
 	plan: SceneGenerationPlanV1Schema,
-	annotations: z.array(annotation).max(500)
+	annotations: z.array(annotation).max(500),
+	polygonEdits: z.array(scenePolygonEditV1Schema).max(32).optional(),
+	contourNotes: z.array(sceneContourNoteV1Schema).max(100).optional()
 }).strict().superRefine(({ plan, annotations }, ctx) => {
 	const issue = (path: (string | number)[], message: string) => ctx.addIssue({ code: 'custom', path, message });
 	// Reviewed inputs and asset-backed scenes use their existing admission owners.

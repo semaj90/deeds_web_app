@@ -4,7 +4,11 @@ export default defineConfig({
 	// This focused staging lane never seeds or cleans application data.
 	globalSetup: './tests/e2e/set-the-scene-noop-global-setup.ts',
 	testDir: './tests/e2e',
-	testMatch: ['set-the-scene-workflow.spec.ts', 'parent-atlas-v2-character-runtime.spec.ts'],
+	testMatch: [
+		'set-the-scene-workflow.spec.ts',
+		'parent-atlas-v2-character-runtime.spec.ts',
+		'crime-scene-comprehensive-v1.spec.ts'
+	],
 	fullyParallel: false,
 	workers: 1,
 	retries: 0,

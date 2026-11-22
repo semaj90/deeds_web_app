@@ -1,0 +1,1011 @@
+{
+  "schema": "atlas.pg18-native-capability-audit.v1",
+  "generatedAt": "2026-11-21T22:52:04.350Z",
+  "postgres": {
+    "connected": true,
+    "serverVersion": "PostgreSQL 18.4 (Debian 18.4-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit",
+    "extensions": [
+      {
+        "extname": "pg_trgm",
+        "extversion": "1.6"
+      },
+      {
+        "extname": "vector",
+        "extversion": "0.8.3"
+      },
+      {
+        "extname": "uuid-ossp",
+        "extversion": "1.1"
+      }
+    ],
+    "vectorAndSceneIndexes": [
+      {
+        "schemaname": "public",
+        "tablename": "agent_observations",
+        "indexname": "idx_agent_observations_hnsw",
+        "indexdef": "CREATE INDEX idx_agent_observations_hnsw ON public.agent_observations USING hnsw (hnsw_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "agent_observations",
+        "indexname": "idx_agent_observations_hnsw_768",
+        "indexdef": "CREATE INDEX idx_agent_observations_hnsw_768 ON public.agent_observations USING hnsw (hnsw_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_callable_search",
+        "indexname": "atlas_callable_search_search_vector_gin",
+        "indexdef": "CREATE INDEX atlas_callable_search_search_vector_gin ON public.atlas_callable_search USING gin (search_vector)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_class_search_index_v1",
+        "indexname": "atlas_class_search_index_v1_embedding_hnsw",
+        "indexdef": "CREATE INDEX atlas_class_search_index_v1_embedding_hnsw ON public.atlas_class_search_index_v1 USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64') WHERE (embedding IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_class_search_index_v1",
+        "indexname": "atlas_class_search_index_v1_search_gin",
+        "indexdef": "CREATE INDEX atlas_class_search_index_v1_search_gin ON public.atlas_class_search_index_v1 USING gin (search_vector)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_embeddings_384",
+        "indexname": "atlas_embeddings_384_subject_type_subject_id_vector_role_ve_key",
+        "indexdef": "CREATE UNIQUE INDEX atlas_embeddings_384_subject_type_subject_id_vector_role_ve_key ON public.atlas_embeddings_384 USING btree (subject_type, subject_id, vector_role, vector_contract, input_hash)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_embeddings_384",
+        "indexname": "idx_ae384_content_hnsw",
+        "indexdef": "CREATE INDEX idx_ae384_content_hnsw ON public.atlas_embeddings_384 USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='128') WHERE ((vector_role = 'content'::text) AND (normalized = true))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_embeddings_64_latent",
+        "indexname": "atlas_embeddings_64_latent_subject_type_subject_id_vector_r_key",
+        "indexdef": "CREATE UNIQUE INDEX atlas_embeddings_64_latent_subject_type_subject_id_vector_r_key ON public.atlas_embeddings_64_latent USING btree (subject_type, subject_id, vector_role, vector_contract, input_hash)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_embeddings_768",
+        "indexname": "atlas_embeddings_768_subject_type_subject_id_vector_role_ve_key",
+        "indexdef": "CREATE UNIQUE INDEX atlas_embeddings_768_subject_type_subject_id_vector_role_ve_key ON public.atlas_embeddings_768 USING btree (subject_type, subject_id, vector_role, vector_contract, input_hash)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_evidence",
+        "indexname": "atlas_evidence_search_gin_idx",
+        "indexdef": "CREATE INDEX atlas_evidence_search_gin_idx ON public.atlas_evidence USING gin (search_vector)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_external_doc_analyses",
+        "indexname": "aeda_summary_fts_gin",
+        "indexdef": "CREATE INDEX aeda_summary_fts_gin ON public.atlas_external_doc_analyses USING gin (to_tsvector('english'::regconfig, COALESCE(summary_text, ''::text)))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_external_doc_chunks",
+        "indexname": "aedc_embedding_hnsw",
+        "indexdef": "CREATE INDEX aedc_embedding_hnsw ON public.atlas_external_doc_chunks USING hnsw (content_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_external_doc_chunks",
+        "indexname": "aedc_fts_gin",
+        "indexdef": "CREATE INDEX aedc_fts_gin ON public.atlas_external_doc_chunks USING gin (search_vector)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_embeddings",
+        "indexname": "atlas_feature_embeddings_hnsw_cosine_idx",
+        "indexdef": "CREATE INDEX atlas_feature_embeddings_hnsw_cosine_idx ON public.atlas_feature_embeddings USING hnsw (embedding vector_cosine_ops)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_packets",
+        "indexname": "idx_atlas_feature_eigenvector",
+        "indexdef": "CREATE INDEX idx_atlas_feature_eigenvector ON public.atlas_feature_packets USING btree (eigenvector)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_packets",
+        "indexname": "idx_atlas_feature_vectors",
+        "indexdef": "CREATE INDEX idx_atlas_feature_vectors ON public.atlas_feature_packets USING gin (vectors)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_vectors",
+        "indexname": "atlas_feature_vectors_pkey",
+        "indexdef": "CREATE UNIQUE INDEX atlas_feature_vectors_pkey ON public.atlas_feature_vectors USING btree (packet_key)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_vectors",
+        "indexname": "idx_atlas_feature_vectors_community_id",
+        "indexdef": "CREATE INDEX idx_atlas_feature_vectors_community_id ON public.atlas_feature_vectors USING btree (community_id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_vectors",
+        "indexname": "idx_atlas_feature_vectors_domain_class",
+        "indexdef": "CREATE INDEX idx_atlas_feature_vectors_domain_class ON public.atlas_feature_vectors USING btree (domain_class)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_vectors",
+        "indexname": "idx_atlas_feature_vectors_feature_id",
+        "indexdef": "CREATE INDEX idx_atlas_feature_vectors_feature_id ON public.atlas_feature_vectors USING btree (feature_id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_vectors",
+        "indexname": "idx_atlas_feature_vectors_identity",
+        "indexdef": "CREATE INDEX idx_atlas_feature_vectors_identity ON public.atlas_feature_vectors USING btree (packet_key, source_ref, feature_id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_vectors",
+        "indexname": "idx_atlas_feature_vectors_keywords",
+        "indexdef": "CREATE INDEX idx_atlas_feature_vectors_keywords ON public.atlas_feature_vectors USING gin (keywords)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_vectors",
+        "indexname": "idx_atlas_feature_vectors_ontology",
+        "indexdef": "CREATE INDEX idx_atlas_feature_vectors_ontology ON public.atlas_feature_vectors USING gin (ontology_classes)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_vectors",
+        "indexname": "idx_atlas_feature_vectors_pagerank",
+        "indexdef": "CREATE INDEX idx_atlas_feature_vectors_pagerank ON public.atlas_feature_vectors USING btree (pagerank DESC)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_vectors",
+        "indexname": "idx_atlas_feature_vectors_semantic_tags",
+        "indexdef": "CREATE INDEX idx_atlas_feature_vectors_semantic_tags ON public.atlas_feature_vectors USING gin (semantic_tags)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_vectors",
+        "indexname": "idx_atlas_feature_vectors_som_cluster",
+        "indexdef": "CREATE INDEX idx_atlas_feature_vectors_som_cluster ON public.atlas_feature_vectors USING btree (som_cluster)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_vectors",
+        "indexname": "idx_atlas_feature_vectors_som_coords",
+        "indexdef": "CREATE INDEX idx_atlas_feature_vectors_som_coords ON public.atlas_feature_vectors USING btree (som_x, som_y) WHERE ((som_x IS NOT NULL) AND (som_y IS NOT NULL))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_vectors",
+        "indexname": "idx_atlas_feature_vectors_source_ref",
+        "indexdef": "CREATE INDEX idx_atlas_feature_vectors_source_ref ON public.atlas_feature_vectors USING btree (source_ref)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_feature_vectors",
+        "indexname": "idx_atlas_feature_vectors_tree_node_id",
+        "indexdef": "CREATE INDEX idx_atlas_feature_vectors_tree_node_id ON public.atlas_feature_vectors USING btree (tree_node_id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_packet_registry",
+        "indexname": "idx_packet_embedding_cosine",
+        "indexdef": "CREATE INDEX idx_packet_embedding_cosine ON public.atlas_packet_registry USING hnsw (embedding_768d vector_cosine_ops)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_packets",
+        "indexname": "idx_atlas_packets_envelope_fts",
+        "indexdef": "CREATE INDEX idx_atlas_packets_envelope_fts ON public.atlas_packets USING gin (to_tsvector('english'::regconfig, ((((((COALESCE((payload ->> 'title'::text), ''::text) || ' '::text) || COALESCE(summary, ''::text)) || ' '::text) || COALESCE(feature_label, ''::text)) || ' '::text) || COALESCE(feature_id, ''::text))))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_packets",
+        "indexname": "idx_atlas_packets_summary_fts",
+        "indexdef": "CREATE INDEX idx_atlas_packets_summary_fts ON public.atlas_packets USING gin (to_tsvector('english'::regconfig, COALESCE(summary, ''::text)))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_packets",
+        "indexname": "idx_atlas_packets_vectors_gin_pathops",
+        "indexdef": "CREATE INDEX idx_atlas_packets_vectors_gin_pathops ON public.atlas_packets USING gin (vectors jsonb_path_ops)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_qdrant_collection_mappings",
+        "indexname": "atlas_qdrant_collection_mappings_pkey",
+        "indexdef": "CREATE UNIQUE INDEX atlas_qdrant_collection_mappings_pkey ON public.atlas_qdrant_collection_mappings USING btree (collection_name, vector_name)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_relationship_embeddings",
+        "indexname": "atlas_relationship_embeddings_hnsw_cosine_idx",
+        "indexdef": "CREATE INDEX atlas_relationship_embeddings_hnsw_cosine_idx ON public.atlas_relationship_embeddings USING hnsw (embedding vector_cosine_ops)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_summary_layers",
+        "indexname": "idx_summary_layers_summary_fts",
+        "indexdef": "CREATE INDEX idx_summary_layers_summary_fts ON public.atlas_summary_layers USING gin (to_tsvector('english'::regconfig, COALESCE(summary, summary_text, ''::text)))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_tool_manifest_vectors_v1",
+        "indexname": "atlas_tool_manifest_vectors_v1_pkey",
+        "indexdef": "CREATE UNIQUE INDEX atlas_tool_manifest_vectors_v1_pkey ON public.atlas_tool_manifest_vectors_v1 USING btree (tool_name)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_tool_manifest_vectors_v1",
+        "indexname": "idx_atlas_tool_manifest_vectors_v1_embedding_hnsw",
+        "indexdef": "CREATE INDEX idx_atlas_tool_manifest_vectors_v1_embedding_hnsw ON public.atlas_tool_manifest_vectors_v1 USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_tool_manifest_vectors_v1",
+        "indexname": "idx_atlas_tool_manifest_vectors_v1_namespace",
+        "indexdef": "CREATE INDEX idx_atlas_tool_manifest_vectors_v1_namespace ON public.atlas_tool_manifest_vectors_v1 USING btree (namespace)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_vector_registry",
+        "indexname": "atlas_vector_registry_pkey",
+        "indexdef": "CREATE UNIQUE INDEX atlas_vector_registry_pkey ON public.atlas_vector_registry USING btree (id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_vector_registry",
+        "indexname": "atlas_vector_registry_source_ref_vector_version_key",
+        "indexdef": "CREATE UNIQUE INDEX atlas_vector_registry_source_ref_vector_version_key ON public.atlas_vector_registry USING btree (source_ref, vector_version)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_vector_registry",
+        "indexname": "avr_exported_idx",
+        "indexdef": "CREATE INDEX avr_exported_idx ON public.atlas_vector_registry USING btree (exported_arrow) WHERE (NOT exported_arrow)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_vector_registry",
+        "indexname": "avr_packet_key_idx",
+        "indexdef": "CREATE INDEX avr_packet_key_idx ON public.atlas_vector_registry USING btree (packet_key) WHERE (packet_key IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "atlas_vector_registry",
+        "indexname": "avr_qdrant_idx",
+        "indexdef": "CREATE INDEX avr_qdrant_idx ON public.atlas_vector_registry USING btree (qdrant_point_id) WHERE (qdrant_point_id IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "chat_embeddings",
+        "indexname": "idx_chat_embeddings_embedding",
+        "indexdef": "CREATE INDEX idx_chat_embeddings_embedding ON public.chat_embeddings USING ivfflat (embedding vector_cosine_ops) WITH (lists='50')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "cluster_summaries",
+        "indexname": "cluster_summaries_embedding_hnsw",
+        "indexdef": "CREATE INDEX cluster_summaries_embedding_hnsw ON public.cluster_summaries USING hnsw (summary_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "cluster_summaries",
+        "indexname": "idx_cluster_summaries_embedding_ivfflat",
+        "indexdef": "CREATE INDEX idx_cluster_summaries_embedding_ivfflat ON public.cluster_summaries USING ivfflat (summary_embedding vector_cosine_ops) WITH (lists='5')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "code_retrieval_chunks",
+        "indexname": "crc_embedding_hnsw",
+        "indexdef": "CREATE INDEX crc_embedding_hnsw ON public.code_retrieval_chunks USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "code_retrieval_chunks",
+        "indexname": "crc_fts_gin",
+        "indexdef": "CREATE INDEX crc_fts_gin ON public.code_retrieval_chunks USING gin (search_vector)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_eg2_embeddings",
+        "indexname": "codebase_chunk_eg2_embeddings_hnsw",
+        "indexdef": "CREATE INDEX codebase_chunk_eg2_embeddings_hnsw ON public.codebase_chunk_eg2_embeddings USING hnsw (embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_centroid_idx",
+        "indexdef": "CREATE INDEX codebase_chunk_index_centroid_idx ON public.codebase_chunk_index USING btree (centroid_id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_chunk_id_idx",
+        "indexdef": "CREATE INDEX codebase_chunk_index_chunk_id_idx ON public.codebase_chunk_index USING btree (chunk_id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_cluster_summary_gin",
+        "indexdef": "CREATE INDEX codebase_chunk_index_cluster_summary_gin ON public.codebase_chunk_index USING gin (cluster_summary jsonb_path_ops)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_content_hnsw",
+        "indexdef": "CREATE INDEX codebase_chunk_index_content_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_domain_idx",
+        "indexdef": "CREATE INDEX codebase_chunk_index_domain_idx ON public.codebase_chunk_index USING btree (domain)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_extension_idx",
+        "indexdef": "CREATE INDEX codebase_chunk_index_extension_idx ON public.codebase_chunk_index USING btree (extension)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_gpu_cluster_idx",
+        "indexdef": "CREATE INDEX codebase_chunk_index_gpu_cluster_idx ON public.codebase_chunk_index USING btree (gpu_cluster)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_language_idx",
+        "indexdef": "CREATE INDEX codebase_chunk_index_language_idx ON public.codebase_chunk_index USING btree (language)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_metadata_gin",
+        "indexdef": "CREATE INDEX codebase_chunk_index_metadata_gin ON public.codebase_chunk_index USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_path_idx",
+        "indexdef": "CREATE INDEX codebase_chunk_index_path_idx ON public.codebase_chunk_index USING btree (relative_path)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_pkey",
+        "indexdef": "CREATE UNIQUE INDEX codebase_chunk_index_pkey ON public.codebase_chunk_index USING btree (id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_qdrant_id_unique",
+        "indexdef": "CREATE UNIQUE INDEX codebase_chunk_index_qdrant_id_unique ON public.codebase_chunk_index USING btree (qdrant_id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_routing_tier_idx",
+        "indexdef": "CREATE INDEX codebase_chunk_index_routing_tier_idx ON public.codebase_chunk_index USING btree (routing_tier)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_semantic_tags_gin",
+        "indexdef": "CREATE INDEX codebase_chunk_index_semantic_tags_gin ON public.codebase_chunk_index USING gin (semantic_tags)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_som_bmu_idx",
+        "indexdef": "CREATE INDEX codebase_chunk_index_som_bmu_idx ON public.codebase_chunk_index USING btree (som_bmu_row, som_bmu_col)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_som_cluster_idx",
+        "indexdef": "CREATE INDEX codebase_chunk_index_som_cluster_idx ON public.codebase_chunk_index USING btree (som_cluster)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "codebase_chunk_index_tags_idx",
+        "indexdef": "CREATE INDEX codebase_chunk_index_tags_idx ON public.codebase_chunk_index USING gin (tags)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_cci_kmeans_cluster",
+        "indexdef": "CREATE INDEX idx_cci_kmeans_cluster ON public.codebase_chunk_index USING btree (kmeans_cluster) WHERE (kmeans_cluster IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_bm25_search",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_bm25_search ON public.codebase_chunk_index USING gin (search_vector)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_content_embedding_768_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_content_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_768 vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_embedding_model_normalized",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_embedding_model_normalized ON public.codebase_chunk_index USING btree (embedding_model, embedding_normalized) WHERE ((embedding_model IS NOT NULL) AND (embedding_normalized = true))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_encoder_id",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_encoder_id ON public.codebase_chunk_index USING btree (encoder_id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_error_embedding_768_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='64') WHERE (error_embedding IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_error_embedding_latent64_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent64_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_64 vector_cosine_ops) WHERE (error_embedding_latent_64 IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_error_embedding_latent_128_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_128_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_128 halfvec_cosine_ops) WHERE (error_embedding_latent_128 IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_error_embedding_latent_256_checkpoint_revisi",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_256_checkpoint_revisi ON public.codebase_chunk_index USING btree (error_embedding_latent_256_checkpoint_revision) WHERE (error_embedding_latent_256_checkpoint_revision IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_error_embedding_latent_256_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_256_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_256 halfvec_cosine_ops) WHERE (error_embedding_latent_256 IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_error_embedding_latent_valid",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_valid ON public.codebase_chunk_index USING btree (error_embedding_latent_valid)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_index_file_content_hash",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_file_content_hash ON public.codebase_chunk_index USING btree (source_ref, file_content_hash) WHERE (file_content_hash IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_index_lineage_checksum",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_lineage_checksum ON public.codebase_chunk_index USING btree (lineage_binding_checksum) WHERE (lineage_binding_checksum IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_index_metadata_packet_key",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_metadata_packet_key ON public.codebase_chunk_index USING btree (((metadata ->> 'packet_key'::text)))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_index_metadata_tree_node_id",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_metadata_tree_node_id ON public.codebase_chunk_index USING btree (((metadata ->> 'tree_node_id'::text)))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_index_output_meta_tree_node_id",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_output_meta_tree_node_id ON public.codebase_chunk_index USING btree (((output_meta ->> 'tree_node_id'::text)))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_index_representation_revision",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_representation_revision ON public.codebase_chunk_index USING btree (representation_revision) WHERE (representation_revision IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_index_source_revision",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_source_revision ON public.codebase_chunk_index USING btree (source_revision) WHERE (source_revision IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_index_workspace_source_lineage",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_workspace_source_lineage ON public.codebase_chunk_index USING btree (workspace_revision, source_ref) WHERE ((workspace_revision IS NOT NULL) AND (source_ref IS NOT NULL))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_latent64_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_latent64_hnsw ON public.codebase_chunk_index USING hnsw (latent_64 vector_cosine_ops) WHERE (latent_64 IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_latent_128_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_latent_128_hnsw ON public.codebase_chunk_index USING hnsw (latent_128 halfvec_cosine_ops) WHERE (latent_128 IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_latent_256_checkpoint_revision",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_latent_256_checkpoint_revision ON public.codebase_chunk_index USING btree (latent_256_checkpoint_revision) WHERE (latent_256_checkpoint_revision IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_latent_256_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_latent_256_hnsw ON public.codebase_chunk_index USING hnsw (latent_256 halfvec_cosine_ops) WHERE (latent_256 IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_latent_valid",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_latent_valid ON public.codebase_chunk_index USING btree (latent_embedding_valid)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_metadata_gin",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_metadata_gin ON public.codebase_chunk_index USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_pgsearch_bm25",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_pgsearch_bm25 ON public.codebase_chunk_index USING bm25 (id, content, relative_path) WITH (key_field=id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_semantic_tags_gin",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_semantic_tags_gin ON public.codebase_chunk_index USING gin (semantic_tags)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_source_ref",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_source_ref ON public.codebase_chunk_index USING btree (source_ref)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_summary_embedding_768_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_summary_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (summary_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200') WHERE (summary_embedding IS NOT NULL)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_summary_null",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_summary_null ON public.codebase_chunk_index USING btree (summary) WHERE ((summary IS NOT NULL) AND (btrim(summary) <> ''::text))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_tags_gin",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_tags_gin ON public.codebase_chunk_index USING gin (tags jsonb_path_ops)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "document_embeddings",
+        "indexname": "document_embeddings_hnsw_idx",
+        "indexdef": "CREATE INDEX document_embeddings_hnsw_idx ON public.document_embeddings USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "embedded_summaries",
+        "indexname": "idx_embedded_summaries_vector_hnsw",
+        "indexdef": "CREATE INDEX idx_embedded_summaries_vector_hnsw ON public.embedded_summaries USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "embedding_cache",
+        "indexname": "embedding_cache_hnsw_idx",
+        "indexdef": "CREATE INDEX embedding_cache_hnsw_idx ON public.embedding_cache USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "error_fingerprints",
+        "indexname": "error_fingerprints_fts_idx",
+        "indexdef": "CREATE INDEX error_fingerprints_fts_idx ON public.error_fingerprints USING gin (to_tsvector('english'::regconfig, normalized_text))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "error_logs",
+        "indexname": "idx_error_logs_message_embedding_hnsw",
+        "indexdef": "CREATE INDEX idx_error_logs_message_embedding_hnsw ON public.error_logs USING hnsw (message_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence",
+        "indexname": "evidence_search_vector_idx",
+        "indexdef": "CREATE INDEX evidence_search_vector_idx ON public.evidence USING gin (search_vector)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_multimodal_vector_projection_outbox",
+        "indexname": "evidence_multimodal_vector_outbox_dispatch_idx",
+        "indexdef": "CREATE INDEX evidence_multimodal_vector_outbox_dispatch_idx ON public.evidence_multimodal_vector_projection_outbox USING btree (available_at, created_at, id) WHERE ((status)::text = ANY ((ARRAY['PENDING'::character varying, 'RETRY'::character varying])::text[]))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_multimodal_vector_projection_outbox",
+        "indexname": "evidence_multimodal_vector_outbox_identity_uq",
+        "indexdef": "CREATE UNIQUE INDEX evidence_multimodal_vector_outbox_identity_uq ON public.evidence_multimodal_vector_projection_outbox USING btree (evidence_multimodal_vector_id, projection_lane, projection_contract_revision)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_multimodal_vector_projection_outbox",
+        "indexname": "evidence_multimodal_vector_outbox_lease_idx",
+        "indexdef": "CREATE INDEX evidence_multimodal_vector_outbox_lease_idx ON public.evidence_multimodal_vector_projection_outbox USING btree (lease_expires_at, id) WHERE ((status)::text = 'PROCESSING'::text)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_multimodal_vector_projection_outbox",
+        "indexname": "evidence_multimodal_vector_projection_outbox_pkey",
+        "indexdef": "CREATE UNIQUE INDEX evidence_multimodal_vector_projection_outbox_pkey ON public.evidence_multimodal_vector_projection_outbox USING btree (id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_multimodal_vectors",
+        "indexname": "evidence_multimodal_vectors_evidence_revision_idx",
+        "indexdef": "CREATE INDEX evidence_multimodal_vectors_evidence_revision_idx ON public.evidence_multimodal_vectors USING btree (evidence_id, source_revision, analysis_revision, modality)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_multimodal_vectors",
+        "indexname": "evidence_multimodal_vectors_hnsw_idx",
+        "indexdef": "CREATE INDEX evidence_multimodal_vectors_hnsw_idx ON public.evidence_multimodal_vectors USING hnsw (embedding vector_cosine_ops)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_multimodal_vectors",
+        "indexname": "evidence_multimodal_vectors_identity_uq",
+        "indexdef": "CREATE UNIQUE INDEX evidence_multimodal_vectors_identity_uq ON public.evidence_multimodal_vectors USING btree (evidence_id, source_revision, analysis_revision, modality, representation_id, source_locator_sha256, model_artifact_sha256, preprocessing_revision)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_multimodal_vectors",
+        "indexname": "evidence_multimodal_vectors_pkey",
+        "indexdef": "CREATE UNIQUE INDEX evidence_multimodal_vectors_pkey ON public.evidence_multimodal_vectors USING btree (id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_vector_projection_outbox",
+        "indexname": "evidence_vector_projection_outbox_dispatch_idx",
+        "indexdef": "CREATE INDEX evidence_vector_projection_outbox_dispatch_idx ON public.evidence_vector_projection_outbox USING btree (available_at, created_at, id) WHERE ((status)::text = ANY ((ARRAY['PENDING'::character varying, 'RETRY'::character varying])::text[]))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_vector_projection_outbox",
+        "indexname": "evidence_vector_projection_outbox_identity_uq",
+        "indexdef": "CREATE UNIQUE INDEX evidence_vector_projection_outbox_identity_uq ON public.evidence_vector_projection_outbox USING btree (evidence_vector_id, projection_lane, projection_contract_revision)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_vector_projection_outbox",
+        "indexname": "evidence_vector_projection_outbox_lease_idx",
+        "indexdef": "CREATE INDEX evidence_vector_projection_outbox_lease_idx ON public.evidence_vector_projection_outbox USING btree (lease_expires_at, id) WHERE ((status)::text = 'PROCESSING'::text)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_vector_projection_outbox",
+        "indexname": "evidence_vector_projection_outbox_pkey",
+        "indexdef": "CREATE UNIQUE INDEX evidence_vector_projection_outbox_pkey ON public.evidence_vector_projection_outbox USING btree (id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_vectors",
+        "indexname": "evidence_vectors_hnsw_idx",
+        "indexdef": "CREATE INDEX evidence_vectors_hnsw_idx ON public.evidence_vectors USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_vectors",
+        "indexname": "evidence_vectors_pkey",
+        "indexdef": "CREATE UNIQUE INDEX evidence_vectors_pkey ON public.evidence_vectors USING btree (id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "evidence_vectors",
+        "indexname": "evidence_vectors_source_chunk_uq",
+        "indexdef": "CREATE UNIQUE INDEX evidence_vectors_source_chunk_uq ON public.evidence_vectors USING btree (evidence_id, source_revision, chunk_index) WHERE ((source_revision IS NOT NULL) AND (chunk_index IS NOT NULL))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "feature_implementations",
+        "indexname": "fi_fts_idx",
+        "indexdef": "CREATE INDEX fi_fts_idx ON public.feature_implementations USING gin (to_tsvector('english'::regconfig, ((feature_name || ' '::text) || COALESCE(description, ''::text))))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "fixer_patterns",
+        "indexname": "fp_embedding_hnsw_idx",
+        "indexdef": "CREATE INDEX fp_embedding_hnsw_idx ON public.fixer_patterns USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "legal_chunks",
+        "indexname": "legal_chunks_embedding_hnsw",
+        "indexdef": "CREATE INDEX legal_chunks_embedding_hnsw ON public.legal_chunks USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='200')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "legal_documents",
+        "indexname": "legal_documents_hnsw_idx",
+        "indexdef": "CREATE INDEX legal_documents_hnsw_idx ON public.legal_documents USING hnsw (content_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "nes_chrom_packets",
+        "indexname": "idx_nes_chrom_packets_eigenvector",
+        "indexdef": "CREATE INDEX idx_nes_chrom_packets_eigenvector ON public.nes_chrom_packets USING btree (eigenvector)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "nes_chrom_packets",
+        "indexname": "idx_nes_chrom_packets_vectors_gin",
+        "indexdef": "CREATE INDEX idx_nes_chrom_packets_vectors_gin ON public.nes_chrom_packets USING gin (vectors)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "nes_chrom_packets",
+        "indexname": "nes_chrom_packets_embedding_hnsw",
+        "indexdef": "CREATE INDEX nes_chrom_packets_embedding_hnsw ON public.nes_chrom_packets USING hnsw (embedding vector_cosine_ops)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "packet_vector_bundles",
+        "indexname": "idx_packet_vector_bundles_enriched",
+        "indexdef": "CREATE INDEX idx_packet_vector_bundles_enriched ON public.packet_vector_bundles USING btree (enriched_at)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "packet_vector_bundles",
+        "indexname": "packet_vector_bundles_pkey",
+        "indexdef": "CREATE UNIQUE INDEX packet_vector_bundles_pkey ON public.packet_vector_bundles USING btree (packet_key)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "parent_atlas_vectors",
+        "indexname": "parent_atlas_vectors_pkey",
+        "indexdef": "CREATE UNIQUE INDEX parent_atlas_vectors_pkey ON public.parent_atlas_vectors USING btree (id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "phase89_vector_events",
+        "indexname": "phase89_vector_events_pkey",
+        "indexdef": "CREATE UNIQUE INDEX phase89_vector_events_pkey ON public.phase89_vector_events USING btree (id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "phase89_vector_events_vlm",
+        "indexname": "phase89_vector_events_vlm_pkey",
+        "indexdef": "CREATE UNIQUE INDEX phase89_vector_events_vlm_pkey ON public.phase89_vector_events_vlm USING btree (id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "rag_query_log",
+        "indexname": "rag_query_log_embedding_hnsw",
+        "indexdef": "CREATE INDEX rag_query_log_embedding_hnsw ON public.rag_query_log USING hnsw (query_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "research_summaries",
+        "indexname": "rs_embedding_hnsw",
+        "indexdef": "CREATE INDEX rs_embedding_hnsw ON public.research_summaries USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "research_summaries",
+        "indexname": "rs_fts",
+        "indexdef": "CREATE INDEX rs_fts ON public.research_summaries USING gin (to_tsvector('english'::regconfig, ((COALESCE(query, ''::text) || ' '::text) || COALESCE(summary, ''::text))))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "scene_assets",
+        "indexname": "scene_assets_bucket_object_key_uq",
+        "indexdef": "CREATE UNIQUE INDEX scene_assets_bucket_object_key_uq ON public.scene_assets USING btree (bucket, object_key)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "scene_assets",
+        "indexname": "scene_assets_case_scene_format_idx",
+        "indexdef": "CREATE INDEX scene_assets_case_scene_format_idx ON public.scene_assets USING btree (case_id, scene_id, format)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "scene_assets",
+        "indexname": "scene_assets_case_scene_idx",
+        "indexdef": "CREATE INDEX scene_assets_case_scene_idx ON public.scene_assets USING btree (case_id, scene_id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "scene_assets",
+        "indexname": "scene_assets_case_scene_sha_uq",
+        "indexdef": "CREATE UNIQUE INDEX scene_assets_case_scene_sha_uq ON public.scene_assets USING btree (case_id, scene_id, sha256)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "scene_assets",
+        "indexname": "scene_assets_pkey",
+        "indexdef": "CREATE UNIQUE INDEX scene_assets_pkey ON public.scene_assets USING btree (asset_id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "scene_document_revisions",
+        "indexname": "scene_document_revisions_case_scene_revision_uq",
+        "indexdef": "CREATE UNIQUE INDEX scene_document_revisions_case_scene_revision_uq ON public.scene_document_revisions USING btree (case_id, scene_id, revision)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "scene_document_revisions",
+        "indexname": "scene_document_revisions_command_uq",
+        "indexdef": "CREATE UNIQUE INDEX scene_document_revisions_command_uq ON public.scene_document_revisions USING btree (command_id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "scene_document_revisions",
+        "indexname": "scene_document_revisions_head_idx",
+        "indexdef": "CREATE INDEX scene_document_revisions_head_idx ON public.scene_document_revisions USING btree (case_id, scene_id, revision DESC)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "scene_document_revisions",
+        "indexname": "scene_document_revisions_pkey",
+        "indexdef": "CREATE UNIQUE INDEX scene_document_revisions_pkey ON public.scene_document_revisions USING btree (id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "screenshot_artifacts",
+        "indexname": "screenshot_artifacts_caption_embedding_hnsw_idx",
+        "indexdef": "CREATE INDEX screenshot_artifacts_caption_embedding_hnsw_idx ON public.screenshot_artifacts USING hnsw (caption_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "tool_execution_audit",
+        "indexname": "idx_tool_execution_keywords",
+        "indexdef": "CREATE INDEX idx_tool_execution_keywords ON public.tool_execution_audit USING gin (to_tsvector('english'::regconfig, keywords))"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "tool_registry",
+        "indexname": "tool_registry_embedding_hnsw",
+        "indexdef": "CREATE INDEX tool_registry_embedding_hnsw ON public.tool_registry USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "vector_index_registry",
+        "indexname": "vector_index_registry_index_name_key",
+        "indexdef": "CREATE UNIQUE INDEX vector_index_registry_index_name_key ON public.vector_index_registry USING btree (index_name)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "vector_index_registry",
+        "indexname": "vector_index_registry_pkey",
+        "indexdef": "CREATE UNIQUE INDEX vector_index_registry_pkey ON public.vector_index_registry USING btree (id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "vector_jobs",
+        "indexname": "vector_jobs_pkey",
+        "indexdef": "CREATE UNIQUE INDEX vector_jobs_pkey ON public.vector_jobs USING btree (id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "vector_metadata",
+        "indexname": "vector_metadata_document_id_unique",
+        "indexdef": "CREATE UNIQUE INDEX vector_metadata_document_id_unique ON public.vector_metadata USING btree (document_id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "vector_metadata",
+        "indexname": "vector_metadata_pkey",
+        "indexdef": "CREATE UNIQUE INDEX vector_metadata_pkey ON public.vector_metadata USING btree (id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "vector_outbox",
+        "indexname": "vector_outbox_pkey",
+        "indexdef": "CREATE UNIQUE INDEX vector_outbox_pkey ON public.vector_outbox USING btree (id)"
+      },
+      {
+        "schemaname": "public",
+        "tablename": "warden_chunks",
+        "indexname": "warden_chunks_hnsw_idx",
+        "indexdef": "CREATE INDEX warden_chunks_hnsw_idx ON public.warden_chunks USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      }
+    ],
+    "tableCounts": {
+      "codebase_chunk_index": 274465,
+      "scene_assets": 0,
+      "scene_document_revisions": 0,
+      "sessions": 155,
+      "users": 11
+    },
+    "chunkEmbeddingStats": {
+      "total_rows": 274465,
+      "embedded_768_rows": 274428
+    }
+  },
+  "nativeArtifacts": [
+    {
+      "id": "nes_lut_avx2_src",
+      "path": "simd-bridge/cpp/nes_lut_filter_avx2.cpp",
+      "kind": "cpp_source",
+      "exists": true,
+      "bytes": 8976
+    },
+    {
+      "id": "nes_lut_avx2_exe",
+      "path": "simd-bridge/cpp/test_nes_lut_filter_avx2.exe",
+      "kind": "native_binary",
+      "exists": true,
+      "bytes": 289280
+    },
+    {
+      "id": "simdjson_bridge",
+      "path": "simd-bridge/cpp/simdjson_bridge.cc",
+      "kind": "cpp_source",
+      "exists": true,
+      "bytes": 22340
+    },
+    {
+      "id": "libtorch_graph",
+      "path": "simd-bridge/cpp/libtorch_graph_impl.cpp",
+      "kind": "cpp_source",
+      "exists": true,
+      "bytes": 18455
+    },
+    {
+      "id": "mrl_renorm_avx2",
+      "path": "simd-bridge/cpp/mrl_prefix_renorm_avx2.cpp",
+      "kind": "cpp_source",
+      "exists": true,
+      "bytes": 3472
+    },
+    {
+      "id": "indexed_palette_4bpp",
+      "path": "simd-bridge/cpp/indexed_palette_4bpp.h",
+      "kind": "cpp_header",
+      "exists": true,
+      "bytes": 2964
+    },
+    {
+      "id": "atlas_byte_synth_dll",
+      "path": "simd-bridge/cpp/atlas_byte_synth.dll",
+      "kind": "native_dll",
+      "exists": true,
+      "bytes": 17408
+    },
+    {
+      "id": "atlas_native_core_pkg",
+      "path": "packages/atlas-native-core/package.json",
+      "kind": "napi_package",
+      "exists": false,
+      "bytes": 0
+    }
+  ]
+}

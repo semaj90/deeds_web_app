@@ -40,6 +40,7 @@ import type { AnalysisPassLedgerInput } from '$lib/server/db/schema/analysis-pas
 import type { ExtractedFeature } from './ast-langextract-bridge.js';
 import { classifyPostgresError } from '$lib/server/db/readiness.js';
 import { getDatabaseUrl as getConfiguredDatabaseUrl } from '$lib/config/env.server.js';
+import { ENV } from '$lib/server/env.server.js';
 import {
 	recordAnalysisJobProgressStageV1,
 	type AnalysisJobProgressStageV1,
@@ -424,6 +425,7 @@ if (process.env.ATLAS_LEXICAL_PASS_ENABLED === 'true') {
 let workerInterval: ReturnType<typeof setInterval> | null = null;
 let notificationClient: Client | null = null;
 let polling = false;
+let sceneDispatchInFlight = false;
 const POLL_MS = 30_000;
 
 // Error tracking for exponential backoff
@@ -434,6 +436,14 @@ const DB_ERROR_LOG_INTERVAL = 60_000; // Log once per minute max
 async function pollOnce(): Promise<void> {
 	if (polling) return;
 	polling = true;
+
+	if (ENV.SCENE_GENERATION_JOBS_ENABLED && !sceneDispatchInFlight) {
+		sceneDispatchInFlight = true;
+		void import('$lib/server/reconstruction/dispatch-scene-generation-jobs-v1.js')
+			.then(({ dispatchSceneGenerationJobsV1 }) => dispatchSceneGenerationJobsV1())
+			.catch((error) => console.error('[Worker] Scene generation dispatch failed:', error instanceof Error ? error.name : 'UnknownError'))
+			.finally(() => { sceneDispatchInFlight = false; });
+	}
 
 	try {
 		for (const jobType of Object.keys(stageConfig) as JobType[]) {

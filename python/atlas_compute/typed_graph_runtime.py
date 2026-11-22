@@ -7,7 +7,8 @@ receipt suitable for parity and promotion gates.
 
 from __future__ import annotations
 
-from typing import Any, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 from atlas_graph_runtime.contracts import GraphBackend, GraphExecutionReceipt, TypedGraphEdge
 
@@ -27,6 +28,96 @@ def build_networkx_graph(node_ordinals: Sequence[int], edges: Sequence[TypedGrap
             raise ValueError("ATLAS_GRAPH_EDGE_ENDPOINT_MISSING")
         graph.add_edge(edge.src_ordinal, edge.dst_ordinal, kind=edge.kind, weight=float(edge.weight))
     return graph
+
+
+def parse_graphrag_alignment_simdjson(raw_json: bytes | str) -> tuple[list[int], list[TypedGraphEdge]]:
+    """Parse a GraphRAG alignment JSON payload via simdjson into ordinal nodes and typed edges."""
+    import simdjson
+
+    payload = raw_json.encode("utf-8") if isinstance(raw_json, str) else raw_json
+    parsed = simdjson.Parser().parse(payload)
+    if not isinstance(parsed, (dict, simdjson.Object, Mapping)):
+        raise ValueError("GRAPHRAG_ALIGNMENT_MUST_BE_OBJECT")
+
+    raw_nodes = parsed.get("nodeOrdinals")
+    raw_edges = parsed.get("edges")
+    if (
+        not isinstance(raw_nodes, (list, simdjson.Array, Sequence))
+        or isinstance(raw_nodes, (str, bytes))
+        or not isinstance(raw_edges, (list, simdjson.Array, Sequence))
+        or isinstance(raw_edges, (str, bytes))
+    ):
+        raise ValueError("GRAPHRAG_ALIGNMENT_MISSING_NODES_OR_EDGES")
+
+    node_ordinals: list[int] = []
+    for node in raw_nodes:
+        if isinstance(node, bool) or not isinstance(node, int):
+            raise ValueError("ATLAS_GRAPH_ORDINALS_MUST_BE_INTS")
+        node_ordinals.append(int(node))
+
+    edges: list[TypedGraphEdge] = []
+    for edge in raw_edges:
+        if not isinstance(edge, (dict, simdjson.Object, Mapping)):
+            raise ValueError("GRAPHRAG_EDGE_MUST_BE_OBJECT")
+        src = edge.get("srcOrdinal")
+        dst = edge.get("dstOrdinal")
+        kind = edge.get("kind", "RELATED_TO")
+        weight = edge.get("weight", 1.0)
+        if isinstance(src, bool) or isinstance(dst, bool) or not isinstance(src, int) or not isinstance(dst, int):
+            raise ValueError("ATLAS_GRAPH_ORDINALS_MUST_BE_INTS")
+        edges.append(TypedGraphEdge(src_ordinal=int(src), dst_ordinal=int(dst), kind=str(kind), weight=float(weight)))
+
+    return node_ordinals, edges
+
+
+def _run_torch_pagerank(
+    node_ordinals: Sequence[int],
+    edges: Sequence[TypedGraphEdge],
+    *,
+    device: str,
+    alpha: float,
+    tol: float,
+    max_iter: int,
+) -> dict[int, float]:
+    import torch
+
+    if device == "cuda" and not torch.cuda.is_available():
+        raise RuntimeError("TORCH_CUDA_UNAVAILABLE")
+
+    ordered_nodes = list(dict.fromkeys(int(o) for o in node_ordinals))
+    n = len(ordered_nodes)
+    if n == 0:
+        return {}
+
+    idx_by_ord = {ord_id: idx for idx, ord_id in enumerate(ordered_nodes)}
+    # Match NetworkX DiGraph weight semantics (last edge weight wins on parallel edges, row-normalized out-weights)
+    adj = torch.zeros((n, n), dtype=torch.float64, device=device)
+    for edge in edges:
+        if edge.src_ordinal not in idx_by_ord or edge.dst_ordinal not in idx_by_ord:
+            raise ValueError("ATLAS_GRAPH_EDGE_ENDPOINT_MISSING")
+        w = float(edge.weight)
+        if w < 0:
+            raise ValueError("ATLAS_GRAPH_NEGATIVE_WEIGHT")
+        adj[idx_by_ord[edge.dst_ordinal], idx_by_ord[edge.src_ordinal]] = w
+
+    out_sum = adj.sum(dim=0)
+    dangling_mask = out_sum == 0
+    inv_out = torch.where(dangling_mask, torch.zeros_like(out_sum), 1.0 / out_sum)
+    trans = adj * inv_out.unsqueeze(0)
+
+    x = torch.full((n,), 1.0 / n, dtype=torch.float64, device=device)
+    teleport = (1.0 - alpha) / n
+
+    for _ in range(max_iter):
+        dangling_mass = alpha * x[dangling_mask].sum() / n
+        x_next = alpha * torch.mv(trans, x) + dangling_mass + teleport
+        if float(torch.abs(x_next - x).sum().item()) < n * tol:
+            x = x_next
+            break
+        x = x_next
+
+    values = x.detach().cpu().tolist()
+    return {ord_id: float(val) for ord_id, val in zip(ordered_nodes, values)}
 
 
 def run_pagerank(
@@ -57,6 +148,17 @@ def run_pagerank(
             frame = cugraph.pagerank(gpu_graph, alpha=alpha, tol=tol, max_iter=max_iter, weight="weight")
             values = dict(zip(frame["vertex"].to_pandas(), frame["pagerank"].to_pandas()))
             effective_backend = "cugraph"
+        elif backend in ("torch_cuda", "torch_cpu"):
+            target_device = "cuda" if backend == "torch_cuda" else "cpu"
+            values = _run_torch_pagerank(
+                node_ordinals,
+                edges,
+                device=target_device,
+                alpha=alpha,
+                tol=tol,
+                max_iter=max_iter,
+            )
+            effective_backend = backend
         else:
             import networkx as nx
             values = nx.pagerank(graph, **kwargs)

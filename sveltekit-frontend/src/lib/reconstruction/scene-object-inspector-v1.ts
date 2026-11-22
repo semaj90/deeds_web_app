@@ -24,21 +24,11 @@ export function buildSceneObjectInspectorV1(plan: SceneGenerationPlanV1, selecte
 		endMs: event.clock.endMs,
 		status: event.reviewStatus === 'accepted' ? 'accepted' as const : event.reviewStatus === 'disputed' ? 'disputed' as const : event.reviewStatus === 'unresolved' ? 'unresolved' as const : 'provisional' as const,
 		targetRefs: event.targetRefs,
-		action: event.action.type === 'visible_during_interval'
-			? { type: 'visible_during_interval' as const, visible: event.action.visible }
-			: event.action.type === 'pulse_light_during_interval'
-				? {
-					type: 'pulse_light_during_interval' as const,
-					colorHex: event.action.colorHex,
-					minIntensity: event.action.minIntensity,
-					maxIntensity: event.action.maxIntensity,
-					periodMs: event.action.periodMs
-				}
-				: {
+		action: event.action?.type === 'move_during_interval' ? {
 				type: 'move_during_interval' as const,
 				fromMeters: [event.action.fromMeters[0] ?? 0, event.action.fromMeters[1] ?? 0, event.action.fromMeters[2] ?? 0] as [number, number, number],
 				toMeters: [event.action.toMeters[0] ?? 0, event.action.toMeters[1] ?? 0, event.action.toMeters[2] ?? 0] as [number, number, number]
-			}
+			} : event.action
 	}))).filter((conflict) => conflict.targetId === selected.id);
 	const evidenceIds = new Set<string>([
 		...(actor?.evidenceIds ?? []),

@@ -79,6 +79,7 @@ describe('scene revision report v1', () => {
 			events: [{
 				eventId: 'EVENT-01', cueType: 'custom', label: 'Reported activity near a prop',
 				status: 'hypothesis', reviewStatus: 'accepted', evidenceIds: [evidenceId],
+				cameraPreset: 'top-down',
 				targetRefs: [{ kind: 'primitive', targetId: primitive.objectId }],
 				clock: { evidenceId, clockId: `evidence:${evidenceId}`, startMs: 1000, endMs: 2000, uncertaintyMs: 40 },
 				sourceEvent
@@ -94,7 +95,7 @@ describe('scene revision report v1', () => {
 			evidenceBindings, proceduralPreviewDraft: { schema: 'parent-atlas.scene-preview-draft/v1', plan, annotations: [note] }
 		}));
 		expect(report.proceduralGeometry).toMatchObject({ environment: plan.environment, primitives: [primitive], placements: [placement] });
-		expect(report.plannedEvents[0]).toMatchObject({ eventId: note.eventId, sourceEvent, targetRefs: plan.events[0].targetRefs });
+		expect(report.plannedEvents[0]).toMatchObject({ eventId: note.eventId, sourceEvent, targetRefs: plan.events[0].targetRefs, cameraPreset: 'top-down' });
 		expect(report.annotations).toEqual([note]);
 	});
 });

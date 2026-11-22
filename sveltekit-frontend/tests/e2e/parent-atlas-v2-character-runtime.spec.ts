@@ -1,5 +1,33 @@
 import { expect, test } from '@playwright/test';
 
+test('synthetic camera cues switch views while scrubbing and yield to the manual camera on overlap', async ({ page }) => {
+	const response = await page.goto('/demos/curfew-beach-scene?v2=1', { waitUntil: 'domcontentloaded' });
+	expect(response?.status()).toBe(200);
+	const canvas = page.getByLabel('Illustrative 3D scene preview');
+	await expect(canvas).toBeVisible();
+	await expect(page.getByText(/Illustrative preview ·/)).toBeVisible();
+	const follow = page.getByLabel('Follow camera cues');
+	await expect(follow).not.toBeChecked();
+	const seek = (timeMs: number) => page.getByLabel('Source time in milliseconds').evaluate((input: HTMLInputElement, value) => {
+		input.value = String(value);
+		input.dispatchEvent(new Event('input', { bubbles: true }));
+	}, timeMs);
+	await seek(1500);
+	const manualFrame = await canvas.screenshot();
+	await follow.check();
+	await expect(page.getByText('Camera cue: Top down', { exact: true })).toBeVisible();
+	await expect.poll(async () => (await canvas.screenshot()).equals(manualFrame)).toBe(false);
+	await seek(2500);
+	await expect(page.getByText('Conflicting camera cues. Using your manual view.')).toBeVisible();
+	await seek(3500);
+	await expect(page.getByText('Camera cue: Isometric', { exact: true })).toBeVisible();
+	await seek(1500);
+	await expect(page.getByText('Camera cue: Top down', { exact: true })).toBeVisible();
+	await page.getByRole('button', { name: 'Perspective', exact: true }).click();
+	await expect(follow).not.toBeChecked();
+	await expect(page.getByText('Camera cue: Top down', { exact: true })).toHaveCount(0);
+});
+
 const SCREENSHOT_PATH =
 	'C:/Users/james/.gemini/antigravity/brain/ba824cbc-894a-4499-859f-d05973d1056c/pa_v2_recipe_canvas_proof.png';
 
@@ -141,12 +169,16 @@ test('synthetic reviewed-mask fixture renders and edits source-pixel geometry wi
 	await objectSelect.selectOption(maskObjectId!);
 	await expect(page.getByText('Edit reviewed contour · source pixels')).toBeVisible();
 	await expect(page.getByRole('img', { name: 'Original evidence with selected mask contour overlay' })).toBeVisible();
+	await page.getByLabel('Note on this contour', { exact: true }).fill('Compare the outline to the source image.');
+	await page.getByRole('button', { name: 'Add contour note' }).click();
+	await expect(page.getByLabel('Notes on this contour')).toContainText('Compare the outline to the source image.');
+	await expect(page.getByText('Contour notes are unsaved.')).toBeVisible();
 	const thirdVertexX = page.getByLabel('X px').nth(2);
 	await thirdVertexX.fill('400');
 	await thirdVertexX.press('Tab');
 	await expect(thirdVertexX).toHaveValue('400');
 	await expect(page.getByText(/draft-1/)).toBeVisible();
-	await expect(page.getByText(/Scene save is blocked while this edit is pending/i)).toBeVisible();
+	await expect(page.getByText(/Contour edits are unsaved/i)).toBeVisible();
 	await page.getByRole('button', { name: 'Undo vertex edit' }).click();
 	await expect(thirdVertexX).toHaveValue('420');
 	await expect(page.getByText(/draft-2/)).toBeVisible();

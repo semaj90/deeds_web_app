@@ -5,9 +5,13 @@ import {
 	P0_MODULAR_RECIPES_V1,
 	buildBeachNightPrefabV1,
 	buildCityBlockPrefabV1,
+	buildCourtroomGenericPrefabV1,
 	buildFourBedroomHouseMilestoneSceneV1,
 	buildFourBedroomHousePrefabV1,
-	catalogAssetRegistrationV1Schema
+	buildOfficePrefabV1,
+	buildParkingLotPrefabV1,
+	catalogAssetRegistrationV1Schema,
+	compilePrefabToPlanComponentsV1
 } from './scene-modular-p0-recipes-v1.js';
 import { SceneObjectRegistryV1 } from './scene-object-registry-v1.js';
 import { scenePrefabV1Schema } from './scene-prefab-registry-v1.js';
@@ -111,5 +115,22 @@ describe('Parent Atlas P0 Modular Recipes & Four-Bedroom House Milestone', () =>
 			reviewStatus: 'CANDIDATE'
 		});
 		expect(reg.success).toBe(true);
+	});
+
+	it('builds office.v1, road.parking_lot.v1, and courtroom.generic.v1 and compiles selectable plan targets', () => {
+		const office = buildOfficePrefabV1();
+		const lot = buildParkingLotPrefabV1();
+		const court = buildCourtroomGenericPrefabV1();
+
+		expect(scenePrefabV1Schema.safeParse(office.prefab).success).toBe(true);
+		expect(scenePrefabV1Schema.safeParse(lot.prefab).success).toBe(true);
+		expect(scenePrefabV1Schema.safeParse(court.prefab).success).toBe(true);
+
+		const house = buildFourBedroomHousePrefabV1();
+		const selectable = compilePrefabToPlanComponentsV1(house.prefab, house.recipes);
+		const door = selectable.find((c) => c.capability === 'door');
+		const light = selectable.find((c) => c.capability === 'light');
+		expect(door?.objectId).toBe('house.four_bedroom.v1:door_front_leaf');
+		expect(light?.ontologyConceptId).toBe('pa:object.fixture.light-fixture');
 	});
 });

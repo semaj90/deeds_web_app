@@ -15,6 +15,41 @@ const params = { schema: 'parent-atlas.case-scene-fetch-parameters/v1', caseId, 
 	interpretation: { who: 'pseudonymous_visual_handles', why: 'hypothesis_or_unknown', clocks: 'source_local_unaligned', geometry: 'illustrative_uncalibrated' } };
 
 describe('case scene plan draft v1', () => {
+	it('round-trips signed prop rotation and rejects actor targets or out-of-range angles', () => {
+		const input = { caseId, sceneId, expectedSceneRevision: 0, parameters: params, environmentKind: 'beach' as const, seed: 1,
+			actors: [{ actorId: 'ACTOR-01', label: 'Neutral placeholder', appearance: 'Illustrative', evidenceIds: [] }],
+			objects: [{ objectId: 'OBJECT-01', registryId: 'box', label: 'Prop', positionMeters: [0, 0, 0] as [number, number, number] }] };
+		const event = { eventId: 'EVENT-ROTATE', label: 'Rotate the prop', cueType: 'interact' as const, sourceEvidenceId: evidenceId,
+			startMs: 1000, endMs: 3000, uncertaintyMs: 50, targetKind: 'primitive' as const, targetId: 'OBJECT-01',
+			action: 'rotate' as const, rotationDegrees: -75, cameraPreset: 'isometric' as const,
+			fromMeters: [0, 0, 0] as [number, number, number], toMeters: [0, 0, 0] as [number, number, number] };
+		const candidate = buildCaseScenePlanDraftV1({ ...input, events: [event] });
+		const restored = restoreCaseSceneDraftV1(candidate).events;
+		expect(buildCaseScenePlanDraftV1({ ...input, events: restored }).events).toEqual(candidate.events);
+		expect(compileSceneRuntimeRecipeV1({ ...candidate, planHash: sha256 }).eventLanes[0]?.events[0]?.cameraPreset).toBe('isometric');
+		expect(() => buildCaseScenePlanDraftV1({ ...input, events: [{ ...event, targetKind: 'actor', targetId: 'ACTOR-01' }] })).toThrow(/primitive targets/i);
+		expect(() => buildCaseScenePlanDraftV1({ ...input, events: [{ ...event, rotationDegrees: 360 }] })).toThrow();
+	});
+	it('preserves a reopened alarm’s authored light settings when editing its label', () => {
+		const input = { caseId, sceneId, expectedSceneRevision: 0, parameters: params,
+			environmentKind: 'beach' as const, seed: 1, actors: [],
+			objects: [{ objectId: 'OBJECT-01', registryId: 'cone', label: 'Alarm proxy', positionMeters: [2, 0, 3] as [number, number, number] }] };
+		const pulseLight = { type: 'pulse_light_during_interval' as const, colorHex: '#bb4422',
+			minIntensity: 0.2, maxIntensity: 3, periodMs: 640 };
+		const plan = buildCaseScenePlanDraftV1({ ...input, events: [{
+			eventId: 'EVENT-ALARM-01', label: 'Alarm proposal', cueType: 'alarm', sourceEvidenceId: evidenceId,
+			startMs: 1000, endMs: 3000, uncertaintyMs: 50, targetKind: 'primitive', targetId: 'OBJECT-01',
+			action: 'pulse', pulseLight, fromMeters: [0, 0, 0], toMeters: [0, 0, 0]
+		}] });
+		const [restored] = restoreCaseSceneDraftV1(plan).events;
+		const edited = { ...restored!, label: 'Compare alarm timing' };
+		const rebuilt = buildCaseScenePlanDraftV1({ ...input, expectedSceneRevision: 1, basePlan: plan, events: [edited] });
+		expect(rebuilt.events[0]).toEqual({ ...plan.events[0], label: edited.label });
+		expect(() => buildCaseScenePlanDraftV1({ ...input, events: [{
+			...edited, pulseLight: { ...pulseLight, periodMs: 0 }
+		}] })).toThrow();
+	});
+
 	it('carries an evidence-free timed prop through the scene clock, save contract and editor reopen', () => {
 		const candidate = buildCaseScenePlanDraftV1({
 			caseId, sceneId, expectedSceneRevision: 0, parameters: { ...params, sourceEvidence: [] },

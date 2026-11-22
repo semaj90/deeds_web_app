@@ -18,6 +18,12 @@ import { createSceneCellResidencyV1, type SceneCellV1 } from '$lib/splat/scene-c
 import { createIllustrativeRoomBlockoutV1, createScenePrimitiveMeshV1 } from '$lib/splat/scene-primitive-three-v1.js';
 import { SCENE_PRIMITIVE_KINDS_V1, type ScenePrimitiveKindV1 } from '$lib/splat/scene-primitive-registry-v1.js';
 import { evaluateSceneTimelineV1, type SceneEventActionV1, type SceneTimedEventV1, type SceneTimelineTargetV1 } from '$lib/splat/scene-event-visibility-v1.js';
+import {
+	evaluateDeterministicSceneStateV1,
+	type EvaluatedTargetState,
+	type SceneBaselineTargetState,
+	type TimedSceneAction
+} from '$lib/splat/scene-action-evaluator-v1.js';
 import { SceneRuntimeRecipeV1Schema, type SceneRuntimeRecipeV1 } from './scene-runtime-recipe-v1.js';
 import { createFourBedroomHouseThreeV1 } from './four-bedroom-house-three-v1.js';
 
@@ -57,6 +63,7 @@ export function createSceneRuntimeThreeV1(input: unknown, options: SceneRuntimeT
 
 	const targetNodes = new Map<string, THREE.Object3D>();
 	const pulseLights = new Map<string, THREE.PointLight>();
+	const baseRotations = new Map<string, THREE.Quaternion>();
 	const actors = new Map<string, PrimitiveAvatar>();
 	const characterRuntimes = new Map<string, ThreeCharacterRuntime>();
 	const materialPreview = new MaterialPreviewThree();
@@ -196,6 +203,13 @@ export function createSceneRuntimeThreeV1(input: unknown, options: SceneRuntimeT
 		eventsByClock.set(lane.clockId, laneEvents);
 	}
 	for (const lane of recipe.eventLanes) for (const event of lane.events) {
+		if (event.action?.type === 'rotate_prop_during_interval') {
+			for (const target of event.targetRefs) {
+				const key = `${target.kind}:${target.targetId}`;
+				const node = targetNodes.get(key);
+				if (node && !baseRotations.has(key)) baseRotations.set(key, node.quaternion.clone());
+			}
+		}
 		if (event.action?.type !== 'pulse_light_during_interval') continue;
 		for (const target of event.targetRefs) {
 			const key = `${event.eventId}:${target.kind}:${target.targetId}`;
@@ -225,6 +239,8 @@ export function createSceneRuntimeThreeV1(input: unknown, options: SceneRuntimeT
 
 	let activeClockId: string | null = null;
 	let activeTimeMs: number | null = null;
+	const yawAxis = new THREE.Vector3(0, 1, 0);
+	const yaw = new THREE.Quaternion();
 	function setSourceTime(clockId: string, sourceTimeMs: number): void {
 		const events = eventsByClock.get(clockId);
 		if (!events) throw new Error('SCENE_CLOCK_LANE_NOT_FOUND');
@@ -243,10 +259,15 @@ export function createSceneRuntimeThreeV1(input: unknown, options: SceneRuntimeT
 			}
 		}
 		for (const state of states) {
-			const node = targetNodes.get(`${state.kind}:${state.targetId}`);
+			const key = `${state.kind}:${state.targetId}`;
+			const node = targetNodes.get(key);
 			if (!node) continue;
 			node.visible = state.visible;
 			node.position.fromArray(state.positionMeters);
+			const baseRotation = baseRotations.get(key);
+			if (baseRotation) {
+				node.quaternion.copy(baseRotation).multiply(yaw.setFromAxisAngle(yawAxis, THREE.MathUtils.degToRad(state.yawDegrees ?? 0)));
+			}
 			node.updateMatrix();
 			node.userData = { ...node.userData, activeEventIds: state.activeEventIds, conflictEventIds: state.conflictEventIds, activeClockId: clockId, sourceTimeMs };
 			const avatar = state.kind === 'actor' ? actors.get(state.targetId) : undefined;
@@ -540,6 +561,54 @@ export function createSceneRuntimeThreeV1(input: unknown, options: SceneRuntimeT
 		findObjectMesh,
 		applyObjectMaterialPreview,
 		resetObjectMaterialPreview,
+		applyTimedSceneActionsAtSourceTime(
+			baseline: readonly SceneBaselineTargetState[],
+			actions: readonly TimedSceneAction[],
+			sourceId: string,
+			sourceTimeMs: number,
+			evalOptions: { includeSimulation?: boolean } = {}
+		): EvaluatedTargetState[] {
+			const evaluated = evaluateDeterministicSceneStateV1(
+				baseline,
+				actions,
+				sourceId,
+				sourceTimeMs,
+				evalOptions
+			);
+			for (const state of evaluated) {
+				const node =
+					targetNodes.get(`actor:${state.targetId}`) ??
+					targetNodes.get(`primitive:${state.targetId}`) ??
+					targetNodes.get(`asset:${state.targetId}`) ??
+					root.getObjectByName(state.targetId);
+				if (!node) continue;
+				node.visible = state.visible;
+				node.position.fromArray(state.position);
+				if (state.capability === 'door') {
+					node.rotation.y = state.hingeRad;
+				}
+				if (state.capability === 'light' && (node as THREE.Light).isLight) {
+					(node as THREE.Light).intensity = state.lightIntensity;
+				}
+				if (state.activeClip) {
+					const charRuntime = characterRuntimes.get(state.targetId);
+					if (charRuntime?.root && charRuntime.clips().includes(state.activeClip.clipId)) {
+						charRuntime.seekClip(state.activeClip.clipId, state.activeClip.localTimeSeconds);
+					}
+				}
+				node.userData = {
+					...node.userData,
+					materialStateId: state.materialStateId,
+					appliedActionIds: state.appliedActionIds,
+					conflictActionIds: state.conflictActionIds,
+					originsPresent: state.originsPresent
+				};
+				node.updateMatrix();
+			}
+			activeClockId = sourceId;
+			activeTimeMs = sourceTimeMs;
+			return evaluated;
+		},
 		get activeSourceTime() {
 			return activeClockId && activeTimeMs !== null
 				? { clockId: activeClockId, sourceTimeMs: activeTimeMs }

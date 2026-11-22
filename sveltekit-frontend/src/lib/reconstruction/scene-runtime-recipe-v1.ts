@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { SceneGenerationPlanV1Schema } from './scene-generation-plan-v1.js';
+import { SceneGenerationPlanV1Schema, scenePropRotationActionV1Schema } from './scene-generation-plan-v1.js';
+import { sceneCameraPresetV1Schema } from './scene-camera-cue-v1.js';
 
 export const SceneRuntimeRecipeV1Schema = z.object({
 	schema: z.literal('parent-atlas.scene-runtime-recipe/v1'),
@@ -36,10 +37,12 @@ export const SceneRuntimeRecipeV1Schema = z.object({
 		evidenceId: z.string().uuid().nullable(),
 		events: z.array(z.object({
 			eventId: z.string(), cueType: z.string(), label: z.string(), status: z.string(), reviewStatus: z.string(),
+			cameraPreset: sceneCameraPresetV1Schema.optional(),
 			evidenceIds: z.array(z.string().uuid()), actorIds: z.array(z.string()), targetRefs: z.array(z.object({ kind: z.enum(['actor', 'primitive', 'asset']), targetId: z.string() }).strict()),
 			action: z.discriminatedUnion('type', [
 				z.object({ type: z.literal('visible_during_interval'), visible: z.boolean() }).strict(),
 				z.object({ type: z.literal('move_during_interval'), fromMeters: z.tuple([z.number().finite(), z.number().finite(), z.number().finite()] as const), toMeters: z.tuple([z.number().finite(), z.number().finite(), z.number().finite()] as const) }).strict(),
+				scenePropRotationActionV1Schema,
 				z.object({ type: z.literal('pulse_light_during_interval'), colorHex: z.string().regex(/^#[0-9a-f]{6}$/i), minIntensity: z.number().finite().min(0).max(5), maxIntensity: z.number().finite().min(0).max(10), periodMs: z.number().int().min(100).max(10_000) }).strict().refine((action) => action.maxIntensity > action.minIntensity)
 			]).optional(),
 			startMs: z.number().int(), endMs: z.number().int(), uncertaintyMs: z.number().int()
@@ -61,6 +64,13 @@ export const SceneRuntimeRecipeV1Schema = z.object({
 		.filter((event) => event.action?.type === 'pulse_light_during_interval')
 		.reduce((total, event) => total + event.targetRefs.length, 0);
 	if (pulseLightBindings > 64) ctx.addIssue({ code: 'custom', path: ['eventLanes'], message: 'Pulse-light presentation is limited to 64 event-target bindings' });
+	const primitiveIds = new Set(recipe.primitiveRegistry.map((primitive) => primitive.objectId));
+	for (const lane of recipe.eventLanes) for (const event of lane.events) {
+		if (event.action?.type === 'rotate_prop_during_interval' && (!event.targetRefs.length ||
+			event.targetRefs.some((target) => target.kind !== 'primitive' || !primitiveIds.has(target.targetId)))) {
+			ctx.addIssue({ code: 'custom', path: ['eventLanes'], message: 'Prop rotation requires registered primitive targets' });
+		}
+	}
 });
 
 export type SceneRuntimeRecipeV1 = z.infer<typeof SceneRuntimeRecipeV1Schema>;
@@ -85,6 +95,7 @@ export function compileSceneRuntimeRecipeV1(input: unknown): SceneRuntimeRecipeV
 			throw new Error('SCENE_CLOCK_LANE_MERGES_EVIDENCE_SOURCES');
 		}
 		lane.events.push({ eventId: event.eventId, cueType: event.cueType, label: event.label, status: event.status, reviewStatus: event.reviewStatus,
+			...(event.cameraPreset ? { cameraPreset: event.cameraPreset } : {}),
 			evidenceIds: event.evidenceIds, actorIds: event.actorIds, targetRefs: event.targetRefs, action: event.action,
 			startMs: event.clock.startMs, endMs: event.clock.endMs, uncertaintyMs: event.clock.uncertaintyMs });
 	}

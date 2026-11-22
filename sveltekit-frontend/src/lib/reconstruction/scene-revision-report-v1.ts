@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { sceneContourNoteV1Schema, scenePolygonEditV1Schema } from './scene-reviewed-polygons-v1.js';
+import { sceneCameraPresetV1Schema } from './scene-camera-cue-v1.js';
 import { sha256Hex } from '$lib/splat/spz-loader.js';
 import { sceneDocumentV1Schema, stableStringifySceneDocumentV1 } from '$lib/splat/scene-document-v1.js';
 import { SceneGenerationPlanV1BodySchema } from './scene-generation-plan-v1.js';
@@ -30,6 +32,7 @@ export const SceneRevisionReportV1Schema = z.object({
 	sourceEvidence: z.array(z.object({ evidenceId: z.uuid(), sourceRevision: z.string() }).strict()),
 	reviewedObservations: z.array(z.object({ observationId: z.string(), evidenceId: z.uuid(), sourceRevision: z.string(), sourceSha256: digest, analysisRevision: z.string(), observationRevision: z.string(), reviewDecisionId: z.uuid() }).strict()),
 	plannedEvents: z.array(z.object({
+		cameraPreset: sceneCameraPresetV1Schema.optional(),
 		eventId: z.string(), label: z.string(), cueType: z.string(), status: z.enum(['measured', 'hypothesis', 'disputed', 'unknown']),
 		reviewStatus: z.enum(['unreviewed', 'accepted', 'disputed', 'unresolved']), evidenceIds: z.array(z.uuid()), actorIds: z.array(z.string()),
 		targetRefs: z.array(z.object({ kind: z.enum(['actor', 'primitive', 'asset']), targetId: z.string() }).strict()),
@@ -56,6 +59,8 @@ export const SceneRevisionReportV1Schema = z.object({
 		action: z.unknown(), reviewState: z.literal('UNREVIEWED_ILLUSTRATION')
 	}).strict()),
 	annotations: z.array(z.object({ id: z.uuid(), eventId: z.string(), sourceTimeMs: z.number().int().nonnegative(), text: z.string(), objectId: z.string().nullable() }).strict()),
+	polygonEdits: z.array(scenePolygonEditV1Schema).optional(),
+	contourNotes: z.array(sceneContourNoteV1Schema).optional(),
 	unresolvedQuestions: z.array(z.string()),
 	narrative: z.object({
 		why: z.object({ status: z.enum(['unknown', 'hypothesis', 'disputed']), text: z.string().nullable(), evidenceIds: z.array(z.uuid()), reviewStatus: z.enum(['unreviewed', 'accepted', 'disputed']) }).strict(),
@@ -132,8 +137,9 @@ export async function buildSceneRevisionReportV1(input: { manifest: unknown; man
 		} : null,
 		sourceEvidence: [...sourceBindings.values()].sort((a, b) => a.evidenceId.localeCompare(b.evidenceId) || a.sourceRevision.localeCompare(b.sourceRevision)),
 		reviewedObservations: (preview?.plan.reviewedObservations ?? []).map(({ observationId, evidenceId, sourceRevision, sourceSha256, analysisRevision, observationRevision, reviewDecisionId }) => ({ observationId, evidenceId, sourceRevision, sourceSha256, analysisRevision, observationRevision, reviewDecisionId })),
-		plannedEvents: (preview?.plan.events ?? []).map(({ eventId, label, cueType, status, reviewStatus, evidenceIds, actorIds, targetRefs, clock, action, sourceEvent }) => ({
-			eventId, label, cueType, status, reviewStatus, evidenceIds, actorIds, targetRefs, clock, action: action ?? null, sourceEvent
+		plannedEvents: (preview?.plan.events ?? []).map(({ eventId, label, cueType, status, reviewStatus, evidenceIds, actorIds, targetRefs, clock, action, sourceEvent, cameraPreset }) => ({
+			eventId, label, cueType, status, reviewStatus, evidenceIds, actorIds, targetRefs, clock, action: action ?? null, sourceEvent,
+			...(cameraPreset ? { cameraPreset } : {})
 		})),
 		approvedSourceEvents: (manifest.videoEventBindings ?? []).map((binding) => ({
 			evidenceId: binding.evidenceId, sourceRevision: binding.sourceRevision, analysisRevision: binding.analysisRevision,
@@ -144,6 +150,8 @@ export async function buildSceneRevisionReportV1(input: { manifest: unknown; man
 		sceneChapters,
 		visualCues,
 		annotations: (preview?.annotations ?? []).map((note) => ({ ...note, objectId: note.objectId ?? null })),
+		...(preview?.polygonEdits?.length ? { polygonEdits: preview.polygonEdits } : {}),
+		...(preview?.contourNotes?.length ? { contourNotes: preview.contourNotes } : {}),
 		unresolvedQuestions,
 		narrative: preview ? {
 			why: { status: preview.plan.narrative.why.status, text: preview.plan.narrative.why.text ?? null, evidenceIds: preview.plan.narrative.why.evidenceIds, reviewStatus: preview.plan.narrative.why.reviewStatus },

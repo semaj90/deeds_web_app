@@ -1,0 +1,321 @@
+{
+  "schema": "atlas.kanban-ace-packet.v1",
+  "authorityLabel": "KANBAN_ACE_PROPOSAL",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "redisKeyHint": "ace:packet:openspec-crime-scene-reconstruction-v1",
+  "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md",
+  "ConceptID": "openspec:crime-scene-reconstruction",
+  "ConfidenceScore": 0.88,
+  "ContextBlob": {
+    "featureId": "openspec:crime-scene-reconstruction",
+    "pg18": {
+      "connected": true,
+      "embedded768Rows": 274428,
+      "totalChunkRows": 274465,
+      "indexCount": 153
+    },
+    "ontologyGraph": {
+      "conceptCount": 506,
+      "clusterCount": 12,
+      "topConceptIds": [
+        "pa:actor",
+        "pa:space.room.bedroom",
+        "pa:space.room",
+        "pa:actor.representation.glb-actor",
+        "pa:render.camera.follow-actor"
+      ]
+    },
+    "prefillTasks": [
+      {
+        "rank": 1,
+        "taskId": "CASE-SCENE-LIVE-04",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L859",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-04#L859",
+        "line": 859,
+        "quickHitScore": 95.61,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L859",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-04#L859",
+        "ConfidenceScore": 0.96,
+        "summary": "CASE-SCENE-LIVE-04 · Activity-aware memory and LOD · CREATED and WIRED (partial). The case Three.js runtime now consumes the existing Mor...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 2,
+        "taskId": "CASE-SCENE-LIVE-03-",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L857",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-03-#L857",
+        "line": 857,
+        "quickHitScore": 94.66,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L857",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-03-#L857",
+        "ConfidenceScore": 0.95,
+        "summary": "CASE-SCENE-LIVE-03-video-clock · CREATED and WIRED, worktree base `4ae8253ab6e`. The scene preview can follow the selected lane's revisio...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 3,
+        "taskId": "CASE-SCENE-LIVE-05",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L860",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-05#L860",
+        "line": 860,
+        "quickHitScore": 94.55,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L860",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-05#L860",
+        "ConfidenceScore": 0.95,
+        "summary": "CASE-SCENE-LIVE-05 · Memory and performance modal · CREATED and WIRED (partial). The scene preview dialog samples at 750 ms while open. I...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 4,
+        "taskId": "CASE-SCENE-LIVE-01",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L846",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-01#L846",
+        "line": 846,
+        "quickHitScore": 93.86,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L846",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-01#L846",
+        "ConfidenceScore": 0.94,
+        "summary": "CASE-SCENE-LIVE-01 · Assistant chat and editable proposals · CREATED and WIRED (partial). The case scene builder now sends an explicit us...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 5,
+        "taskId": "CASE-SCENE-E2E-11-",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L874",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-11-#L874",
+        "line": 874,
+        "quickHitScore": 91.52,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L874",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-11-#L874",
+        "ConfidenceScore": 0.92,
+        "summary": "CASE-SCENE-E2E-11-character-v2-alignment · CREATED and WIRED (partial, 2026-11-20). Reconciled the Parent Atlas Character Creator v2 refe...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 6,
+        "taskId": "CASE-SCENE-E2E-",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L816",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-#L816",
+        "line": 816,
+        "quickHitScore": 89.95,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L816",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-#L816",
+        "ConfidenceScore": 0.9,
+        "summary": "CASE-SCENE-E2E-02c-5-edit-reopened CREATED and WIRED at worktree base `4ae8253ab6e`: reopening an editor-compatible draft restores its en...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 7,
+        "taskId": "CASE-SCENE-LIVE-01-",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L852",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-01-#L852",
+        "line": 852,
+        "quickHitScore": 88.82,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L852",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-01-#L852",
+        "ConfidenceScore": 0.89,
+        "summary": "CASE-SCENE-LIVE-01-selection-inspector · CREATED, WIRED, and synthetic-browser-proven (partial, 2026-11-20). Selecting a scene object now...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 8,
+        "taskId": "CASE-SCENE-LIVE-01-",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L853",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-01-#L853",
+        "line": 853,
+        "quickHitScore": 88.8,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L853",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-01-#L853",
+        "ConfidenceScore": 0.89,
+        "summary": "CASE-SCENE-LIVE-01-overlapping-cue-conflicts · CREATED, WIRED, and synthetic-browser-proven (partial, 2026-11-20). Runtime evaluation det...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 9,
+        "taskId": "CASE-SCENE-E2E-",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L817",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-#L817",
+        "line": 817,
+        "quickHitScore": 87.94,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L817",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-#L817",
+        "ConfidenceScore": 0.88,
+        "summary": "CASE-SCENE-E2E-02c-5-reviewed-video CREATED and WIRED at worktree base `4ae8253ab6e`: the case builder imports approved events from selec...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 10,
+        "taskId": "CASE-SCENE-E2E-",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L818",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-#L818",
+        "line": 818,
+        "quickHitScore": 87.94,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L818",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-#L818",
+        "ConfidenceScore": 0.88,
+        "summary": "CASE-SCENE-E2E-02c-5-procedural-draft CREATED and WIRED at worktree base `4ae8253ab6e`: save and reopen the illustrative plan and event/t...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 11,
+        "taskId": "SCENE-20",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L40",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:SCENE-20#L40",
+        "line": 40,
+        "quickHitScore": 87.16,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L40",
+        "ConceptID": "openspec:crime-scene-reconstruction:SCENE-20#L40",
+        "ConfidenceScore": 0.87,
+        "summary": "SCENE-20 Primitive vocabulary and composition: reuse `scene-primitive-registry-v1.ts`, `scene-prefab-registry-v1.ts`, and the canonical 5...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 12,
+        "taskId": "CASE-SCENE-LIVE-02-",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L855",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-02-#L855",
+        "line": 855,
+        "quickHitScore": 86.74,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L855",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-02-#L855",
+        "ConfidenceScore": 0.87,
+        "summary": "CASE-SCENE-LIVE-02-preview · CREATED and WIRED (partial). The case builder shows evidence and plan preparation stages, aborts both fetch ...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 13,
+        "taskId": "CASE-SCENE-LIVE-08",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L865",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-08#L865",
+        "line": 865,
+        "quickHitScore": 86.29,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L865",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-08#L865",
+        "ConfidenceScore": 0.86,
+        "summary": "CASE-SCENE-LIVE-08 · Searchable scene recipe catalog · CREATED and WIRED (partial). Added a deterministic local search index over the exi...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 14,
+        "taskId": "CASE-SCENE-E2E-09-",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L870",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-09-#L870",
+        "line": 870,
+        "quickHitScore": 85.68,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L870",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-09-#L870",
+        "ConfidenceScore": 0.86,
+        "summary": "CASE-SCENE-E2E-09-report · CREATED and WIRED (partial, 2026-11-20). Added `scene-revision-report-v1.ts` and an authorized `GET /api/cases...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 15,
+        "taskId": "CASE-SCENE-E2E-10-",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L872",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-10-#L872",
+        "line": 872,
+        "quickHitScore": 85.2,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L872",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-10-#L872",
+        "ConfidenceScore": 0.85,
+        "summary": "CASE-SCENE-E2E-10-blockout-staging Playwright scenario authored for an evidence-free cue and object annotation. It compares the save rece...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      },
+      {
+        "rank": 16,
+        "taskId": "CASE-SCENE-LIVE-01-",
+        "changeQualifiedKey": "crime-scene-reconstruction/tasks.md#L851",
+        "scopedTaskId": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-01-#L851",
+        "line": 851,
+        "quickHitScore": 82.84,
+        "ganLane": "WIRED_NEEDS_PROOF",
+        "sourceRef": "openspec/changes/crime-scene-reconstruction/tasks.md#L851",
+        "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-01-#L851",
+        "ConfidenceScore": 0.83,
+        "summary": "CASE-SCENE-LIVE-01-event-targets · CREATED and WIRED (partial). Editable event cues now accept one primary and up to 63 additional actor/...",
+        "kernelDagCandidate": {
+          "requiresSchemaGate": true,
+          "requiresIndependentReadback": true,
+          "autoPromoteAllowed": false
+        }
+      }
+    ]
+  },
+  "packetSha256": "8b6ab1feb35f02f5702d7a927bcb97d2cccfceebf2dc3b37164bbbf0bfd28699"
+}

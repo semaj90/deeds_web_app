@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.nes_lut_4bpp_binary_abi.v1",
+  "owners": {
+    "nesLutCppHeader": "simd-bridge/cpp/nes_lut_filter.h",
+    "nesLutAvx2Cpp": "simd-bridge/cpp/nes_lut_filter_avx2.cpp",
+    "nesLutPythonOracle": "python/atlas_compute/nes_lut_filter_v1.py",
+    "palette4bppCppHeader": "simd-bridge/cpp/indexed_palette_4bpp.h",
+    "palette4bppTsOwner": "sveltekit-frontend/src/lib/splat/indexed-palette-texture-v1.ts",
+    "geometryKernelTs": "sveltekit-frontend/src/lib/splat/geometry-kernel-v1.ts"
+  },
+  "nesLutFilter": {
+    "maxAllowed": 16,
+    "wordBits": 32,
+    "bitOrder": "LSB_FIRST",
+    "endianness": "little",
+    "rule": "bit i of out[i >> 5] is 1 iff lut[i] in allowed[0..k)",
+    "failClosedOnDuplicateOrEmptyAllowed": true
+  },
+  "palette4Bpp": {
+    "pixelLimit": 4194304,
+    "nibbleOrder": "LOW_NIBBLE_FIRST",
+    "evenPixelShift": 0,
+    "oddPixelShift": 4,
+    "transparentIndex": 0
+  },
+  "smoke_gates": {
+    "cpp_scalar_avx2_parity": true,
+    "ts_cpp_nibble_parity": true,
+    "fail_closed_invalid_allowed": true
+  }
+}

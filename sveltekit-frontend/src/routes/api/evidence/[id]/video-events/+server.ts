@@ -10,6 +10,9 @@ import { formatEvidenceSourceRevisionV1 } from '$lib/server/evidence-source-revi
 import { isUuid } from '$lib/server/validation.js';
 import { videoEventTimelineV1Schema } from '$lib/server/features/evidence/video/video-event-fusion-v1.js';
 import { buildReviewedVideoStorybookChapterV1 } from '$lib/server/reconstruction/reviewed-video-storybook-chapter-v1.js';
+import { getAuthorizedCase } from '$lib/server/case-access.js';
+import { sceneCaptionScopeV1Schema } from '$lib/reconstruction/scene-captions-v1.js';
+import { loadSceneCaptionsV1 } from '$lib/server/reconstruction/load-scene-captions-v1.js';
 
 const reviewBodySchema = z.object({
 	eventId: z.string().uuid(),
@@ -24,12 +27,17 @@ function response(evidenceId: string, eventTimeline: unknown, reviewEnabled: boo
 
 export const GET: RequestHandler = async ({ params, locals, url }) => {
 	const evidenceId = params.id;
-	if (!locals.user?.id) return json(response(evidenceId, null, false, 'Unauthorized'), { status: 401 });
-	if (!isUuid(evidenceId)) return json(response(evidenceId, null, false, 'Invalid evidence ID'), { status: 400 });
+	const captionEvent = url?.searchParams.get('captionEvent') ?? null;
+	const headers = { 'Cache-Control': 'private, no-store' };
+	const fail = (error: string, status: number) => captionEvent === null
+		? json(response(evidenceId, null, false, error), { status })
+		: json({ scope: null, captions: [], unavailableCount: 0, error }, { status, headers });
+	if (!locals.user?.id) return fail('Unauthorized', 401);
+	if (!isUuid(evidenceId)) return fail('Invalid evidence ID', 400);
 	const userId = Number(locals.user.id);
-	if (!Number.isSafeInteger(userId) || userId <= 0) return json(response(evidenceId, null, false, 'Unauthorized'), { status: 401 });
+	if (!Number.isSafeInteger(userId) || userId <= 0) return fail('Unauthorized', 401);
 	const chapterEvent = url?.searchParams.get('chapterEvent') ?? null;
-	if (chapterEvent !== null && !isUuid(chapterEvent)) return json(response(evidenceId, null, false, 'Invalid event ID'), { status: 400 });
+	if (chapterEvent !== null && !isUuid(chapterEvent)) return fail('Invalid event ID', 400);
 
 	try {
 		const [item] = await db.select({ hash: evidence.hash, caseId: evidence.caseId, aiAnalysis: evidence.aiAnalysis })
@@ -44,7 +52,7 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 				),
 				isNull(evidence.deletedAt),
 			)).limit(1);
-		if (!item) return json(response(evidenceId, null, false, 'Evidence not found or access denied'), { status: 404 });
+		if (!item) return fail('Evidence not found or access denied', 404);
 
 		const root = item.aiAnalysis && typeof item.aiAnalysis === 'object' && !Array.isArray(item.aiAnalysis)
 			? item.aiAnalysis as Record<string, unknown>
@@ -52,8 +60,22 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 		const video = root.videoAnalysis && typeof root.videoAnalysis === 'object' && !Array.isArray(root.videoAnalysis)
 			? root.videoAnalysis as Record<string, unknown>
 			: {};
-		const parsed = videoEventTimelineV1Schema.safeParse(video.eventTimeline);
 		const sourceRevision = item.hash ? formatEvidenceSourceRevisionV1(item.hash) : null;
+		if (captionEvent !== null) {
+			const scope = sceneCaptionScopeV1Schema.safeParse({
+				caseId: url.searchParams.get('caseId'), evidenceId, eventId: captionEvent,
+				sourceRevision: url.searchParams.get('sourceRevision'), analysisRevision: url.searchParams.get('analysisRevision'),
+				startMs: Number(url.searchParams.get('startMs') ?? NaN), endMs: Number(url.searchParams.get('endMs') ?? NaN)
+			});
+			if (!scope.success) return fail('Invalid caption scope', 400);
+			if (item.caseId !== scope.data.caseId || !await getAuthorizedCase(scope.data.caseId, userId)) {
+				return fail('Evidence not found or access denied', 404);
+			}
+			const result = sourceRevision === scope.data.sourceRevision && video.analysisRevision === scope.data.analysisRevision
+				? await loadSceneCaptionsV1(scope.data, video.eventTimeline) : null;
+			return result ? json({ ...result, error: null }, { headers }) : fail('The reviewed caption source changed or is unavailable', 409);
+		}
+		const parsed = videoEventTimelineV1Schema.safeParse(video.eventTimeline);
 		const timeline = parsed.success && parsed.data.evidenceId === evidenceId && parsed.data.sourceRevision === sourceRevision &&
 			parsed.data.analysisRevision === video.analysisRevision ? parsed.data : null;
 		if (chapterEvent !== null) {
@@ -68,6 +90,7 @@ export const GET: RequestHandler = async ({ params, locals, url }) => {
 		return json(response(evidenceId, timeline, ENV.EVIDENCE_TRANSCRIPT_REVIEW_ENABLED), { headers: cacheControl.private });
 	} catch (error) {
 		console.error('[video-events] GET failed:', error);
+		if (captionEvent !== null) return fail('Could not load scene captions', 500);
 		return json(response(evidenceId, null, false, 'Could not load video events'), { status: 500, headers: cacheControl.private });
 	}
 };

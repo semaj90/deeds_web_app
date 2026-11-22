@@ -13,6 +13,16 @@ function authorized(a: ReturnType<typeof actor>) {
 }
 
 describe('Set the Scene workflow v1', () => {
+	it('opens recovered output only for the active case and accepts renderer readiness', () => {
+		const a = actor(); authorized(a);
+		a.send({ type: 'OPEN_GENERATED_SCENE', caseId: '33333333-3333-4333-8333-333333333333' });
+		expect(a.getSnapshot().matches('needs_input')).toBe(true);
+		a.send({ type: 'OPEN_GENERATED_SCENE', caseId });
+		expect(a.getSnapshot().matches('loading_scene')).toBe(true);
+		a.send({ type: 'SCENE_READY' });
+		expect(a.getSnapshot().matches('preview_ready')).toBe(true);
+		a.stop();
+	});
 	it('validates the assistant handoff against the authorized case evidence snapshot', () => {
 		const request = { schema: 'parent-atlas.set-the-scene-request/v1', caseId, mode: 'evidence', prompt: 'Map the reported entrance.', sourceEvidenceIds: [evidenceId] };
 		expect(validateSetTheSceneHandoffV1(request, caseId, [evidenceId])).toEqual(request);

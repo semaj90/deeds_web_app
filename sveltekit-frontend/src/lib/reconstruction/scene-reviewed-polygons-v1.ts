@@ -1,12 +1,29 @@
+import { z } from 'zod';
 import { storybookImageChapterV1Schema, type StorybookImageChapterV1 } from '$lib/shared/storybook-image-chapter-v1.js';
 import type { ReviewedPolygonMeshRecipeV1 } from '$lib/splat/reviewed-polygon-mesh-v1.js';
 import type { PolygonPointV1 } from '$lib/splat/polygon-prism-validation-v1.js';
 import type { MaskPolygonV1 } from '$lib/splat/mask-contour-compiler-v1.js';
 import { moveReviewedPolygonVertexV1, validateReviewedPolygonMeshRecipeV1 } from '$lib/splat/reviewed-polygon-mesh-v1.js';
+import type { SceneDocumentV1 } from '$lib/splat/scene-document-v1.js';
 
 export interface ScenePolygonSourceBindingV1 {
 	evidenceId: string;
 	sourceRevision: string;
+}
+
+/** Seed the case builder from prior reviewed image contours without adding geometry or identities. */
+export function reviewedContourSceneSourcesV1(document: SceneDocumentV1): ScenePolygonSourceBindingV1[] {
+	if (document.status !== 'HYPOTHESIS' || document.coordinateFrame !== 'LOCAL_UNCALIBRATED' || !document.caseId) return [];
+	const sources = new Map<string, ScenePolygonSourceBindingV1>();
+	const chapters = [...(document.imageStorybookChapter ? [document.imageStorybookChapter] : []), ...(document.imageStorybookChapters ?? [])];
+	for (const chapter of chapters) {
+		if (!chapter.maskPolygons?.length) continue;
+		const { evidenceId, sourceRevision } = chapter;
+		const previous = sources.get(evidenceId);
+		if (previous && previous.sourceRevision !== sourceRevision) return [];
+		sources.set(evidenceId, { evidenceId, sourceRevision });
+	}
+	return [...sources.values()];
 }
 
 export interface SceneReviewedPolygonV1 {
@@ -20,6 +37,54 @@ export interface SceneReviewedPolygonEditDraftV1 extends SceneReviewedPolygonV1 
 	history: readonly MaskPolygonV1[];
 	historyIndex: number;
 	revisionCounter: number;
+}
+
+const pixelPoint = z.tuple([z.number().finite(), z.number().finite()] as const)
+	.transform(([x, y]): PolygonPointV1 => [x!, y!]);
+const pixelRing = z.array(pixelPoint).min(3).max(256);
+const contourBinding = z.object({
+	objectId: z.string().min(1).max(128),
+	baseGeometryRevision: z.string().min(1).max(256),
+	evidenceId: z.uuid(),
+	sourceRevision: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+	reviewRevision: z.string().regex(/^sha256:[a-f0-9]{64}$/)
+}).strict();
+export const sceneContourNoteV1Schema = contourBinding.extend({
+	id: z.uuid(),
+	text: z.string().trim().min(1).max(1000)
+});
+export type SceneContourNoteV1 = z.infer<typeof sceneContourNoteV1Schema>;
+export const scenePolygonEditV1Schema = contourBinding.extend({
+	polygon: z.object({ outer: pixelRing, holes: z.array(pixelRing).max(32) }).strict(),
+	reviewState: z.literal('UNREVIEWED_SCENE_EDIT')
+}).strict();
+export type ScenePolygonEditV1 = z.infer<typeof scenePolygonEditV1Schema>;
+
+export function matchesSceneContourBindingV1(base: SceneReviewedPolygonV1, binding: z.infer<typeof contourBinding>): boolean {
+	const recipe = base.recipe;
+	return binding.objectId === base.objectId && binding.baseGeometryRevision === recipe.geometryRevision &&
+		binding.evidenceId === recipe.evidenceId && binding.sourceRevision === recipe.sourceRevision && binding.reviewRevision === recipe.reviewRevision;
+}
+
+export function applyScenePolygonEditV1(base: SceneReviewedPolygonV1, edit: ScenePolygonEditV1): ReviewedPolygonMeshRecipeV1 {
+	const recipe = base.recipe;
+	if (!matchesSceneContourBindingV1(base, edit) ||
+		edit.polygon.outer.length !== recipe.polygon.outer.length || edit.polygon.holes.length !== recipe.polygon.holes.length ||
+		edit.polygon.holes.some((ring, index) => ring.length !== recipe.polygon.holes[index]?.length)) {
+		throw new Error('SCENE_POLYGON_EDIT_BASE_MISMATCH');
+	}
+	const result = { ...recipe, geometryRevision: `${base.recipe.geometryRevision}:scene-edit`, polygon: edit.polygon };
+	validateReviewedPolygonMeshRecipeV1(result);
+	return result;
+}
+
+export function serializeScenePolygonEditsV1(drafts: readonly SceneReviewedPolygonEditDraftV1[]): ScenePolygonEditV1[] {
+	return drafts.flatMap(({ objectId, recipe, originalRecipe }) =>
+		JSON.stringify(recipe.polygon) === JSON.stringify(originalRecipe.polygon) ? [] : [{
+			objectId, baseGeometryRevision: originalRecipe.geometryRevision, evidenceId: recipe.evidenceId,
+			sourceRevision: recipe.sourceRevision, reviewRevision: recipe.reviewRevision, polygon: recipe.polygon,
+			reviewState: 'UNREVIEWED_SCENE_EDIT'
+		}]);
 }
 
 /** Project only chapter contours whose exact evidence revision is in this scene plan. */
@@ -65,8 +130,16 @@ export function collectSceneReviewedPolygonsV1(
 	return result;
 }
 
-export function createSceneReviewedPolygonEditDraftsV1(polygons: readonly SceneReviewedPolygonV1[]): SceneReviewedPolygonEditDraftV1[] {
-	return polygons.map((item) => ({ ...item, originalRecipe: item.recipe, history: [item.recipe.polygon], historyIndex: 0, revisionCounter: 0 }));
+export function createSceneReviewedPolygonEditDraftsV1(
+	polygons: readonly SceneReviewedPolygonV1[], edits: readonly ScenePolygonEditV1[] = []
+): SceneReviewedPolygonEditDraftV1[] {
+	const editById = new Map(edits.map((edit) => [edit.objectId, edit]));
+	return polygons.map((item) => {
+		const edit = editById.get(item.objectId);
+		const recipe = edit ? applyScenePolygonEditV1(item, edit) : item.recipe;
+		const history = edit ? [item.recipe.polygon, recipe.polygon] : [item.recipe.polygon];
+		return { ...item, recipe, originalRecipe: item.recipe, history, historyIndex: history.length - 1, revisionCounter: 0 };
+	});
 }
 
 export function editSceneReviewedPolygonVertexV1(input: {

@@ -1,16 +1,23 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
+	import { resolveSceneCameraCueV1, sceneCameraPresetLabelsV1, type SceneCameraPresetV1 } from '$lib/reconstruction/scene-camera-cue-v1.js';
+	import { activeSceneLaneCaptionsV1, sceneCaptionRequestWindowV1, sceneCaptionResponseV1Schema, sceneCaptionScopeKeyV1,
+		SCENE_CAPTION_EVENT_LIMIT_V1, type SceneCaptionResponseV1, type SceneCaptionScopeV1 } from '$lib/reconstruction/scene-captions-v1.js';
 	import type { SceneGenerationPlanV1 } from '$lib/reconstruction/scene-generation-plan-v1.js';
 	import type { SceneRuntimeRecipeV1 } from '$lib/reconstruction/scene-runtime-recipe-v1.js';
 	import { RETRO_DEMONSTRATIVE_LABEL_V1 } from '$lib/splat/retro-framebuffer-config-v1.js';
 	import { sceneDocumentV1Schema, createSceneQualityReceiptV1, type SceneDocumentV1 } from '$lib/splat/scene-document-v1.js';
 	import type { ScenePreviewAnnotationV1 } from '$lib/reconstruction/scene-preview-draft-v1.js';
 	import SceneSourceVideo from './SceneSourceVideo.svelte';
+	import TimelineEngine from './TimelineEngine.svelte';
+	import type { TimelineTrackItemV1 } from '$lib/reconstruction/dual-clock-timeline-v1.js';
 	import { countSceneGeometryBufferBytesV1, createScenePreviewSamplesV1 } from '$lib/reconstruction/scene-preview-metrics-v1.js';
 	import { SceneControllerV1 } from '$lib/scene/scene-controller-v1.js';
-	import { collectSceneReviewedPolygonsV1, createSceneReviewedPolygonEditDraftsV1, editSceneReviewedPolygonVertexV1, stepSceneReviewedPolygonEditHistoryV1, type SceneReviewedPolygonEditDraftV1 } from '$lib/reconstruction/scene-reviewed-polygons-v1.js';
+	import { collectSceneReviewedPolygonsV1, createSceneReviewedPolygonEditDraftsV1, editSceneReviewedPolygonVertexV1, serializeScenePolygonEditsV1, stepSceneReviewedPolygonEditHistoryV1, type SceneContourNoteV1, type SceneReviewedPolygonEditDraftV1 } from '$lib/reconstruction/scene-reviewed-polygons-v1.js';
 	import { compileReviewedPolygonMeshV1 } from '$lib/splat/reviewed-polygon-mesh-v1.js';
 	import { buildSceneObjectInspectorV1 } from '$lib/reconstruction/scene-object-inspector-v1.js';
+	import { SceneDeformationBrushV1, type DeformationRevisionReceiptV1 } from '$lib/scene/scene-deformation-brush-v1.js';
+	import { planGoapWhatIfV1, type GoapSimulationPlanV1 } from '$lib/splat/scene-goap-planner-v1.js';
 	import {
 		CREATOR_SWATCHES,
 		DEFAULT_MATERIAL_EDITOR,
@@ -27,7 +34,7 @@
 	} from '$lib/characters/character-runtime-v2.js';
 
 	let { plan, recipe, evidenceItems, revision = null, annotations = $bindable([]), saving = $bindable(false), preparing = false, sourceNavigationEnabled = true,
-		persistenceEnabled = false, onSaved, onObjectSelected, onSaveRequested, onSaveFailed, onPreviewReady, onPreviewFailed }: {
+		persistenceEnabled = false, onSaved, onObjectSelected, onSaveRequested, onSaveFailed, onPreviewReady, onPreviewFailed, onPolygonEditsChanged }: {
 		plan: SceneGenerationPlanV1;
 		recipe: SceneRuntimeRecipeV1;
 		evidenceItems: readonly { id: string; title: string; mimeType?: string | null }[];
@@ -43,24 +50,85 @@
 		onSaveFailed?: (message: string) => void;
 		onPreviewReady?: () => void;
 		onPreviewFailed?: (message: string) => void;
+		onPolygonEditsChanged?: (dirty: boolean) => void;
 	} = $props();
 	type HouseObject = { id: string; label: string; room: string; sourceEvidenceId?: string; sourceRevision?: string; reviewRevision?: string };
 	let houseObject = $state<HouseObject | null>(null);
 	let houseObjects = $state.raw<HouseObject[]>([]);
 	let polygonEditDrafts = $state.raw<SceneReviewedPolygonEditDraftV1[]>([]);
+	let polygonDraftsReady = $state(false);
+	let saved = $state.raw(untrack(() => revision));
+	let contourNotes = $state.raw<SceneContourNoteV1[]>(untrack(() => revision?.manifest.proceduralPreviewDraft?.contourNotes ?? []));
+	let contourNoteText = $state('');
 	let polygonEditError = $state('');
 	let polygonMeshes = new Map<string, import('three').Mesh<import('three').ShapeGeometry, import('three').Material>>();
 	const selectedPolygonDraft = $derived(polygonEditDrafts.find((draft) => draft.objectId === houseObject?.id) ?? null);
+	const selectedContourNotes = $derived(contourNotes.filter((note) => note.objectId === selectedPolygonDraft?.objectId));
 	const selectedObjectInspector = $derived(houseObject ? buildSceneObjectInspectorV1(plan, houseObject) : null);
 	const selectedPolygonImageUrl = $derived(selectedPolygonDraft ? `/api/evidence/${encodeURIComponent(selectedPolygonDraft.recipe.evidenceId)}/download?${new URLSearchParams({
 		caseId: plan.caseId, inline: '1', sourceRevision: selectedPolygonDraft.recipe.sourceRevision
 	})}` : null);
-	const hasUnsavedPolygonEdits = $derived(polygonEditDrafts.some((draft) => JSON.stringify(draft.recipe.polygon) !== JSON.stringify(draft.originalRecipe.polygon)));
+	const polygonEdits = $derived(serializeScenePolygonEditsV1(polygonEditDrafts));
+	const hasUnsavedPolygonEdits = $derived(polygonDraftsReady && JSON.stringify(polygonEdits) !== JSON.stringify(saved?.manifest.proceduralPreviewDraft?.polygonEdits ?? []));
+	const hasUnsavedContourNotes = $derived(JSON.stringify(contourNotes) !== JSON.stringify(saved?.manifest.proceduralPreviewDraft?.contourNotes ?? []));
 	let polygonSourceImageError = $state(false);
 	let activePolygonDrag: { ring: 'outer' | 'hole'; vertexIndex: number; holeIndex?: number } | null = null;
-	let saved = $state.raw(untrack(() => revision));
+	$effect(() => { onPolygonEditsChanged?.(hasUnsavedPolygonEdits || hasUnsavedContourNotes); });
 	let saveError = $state('');
 	let reportStatus = $state('');
+	let deformationReceipt = $state.raw<DeformationRevisionReceiptV1 | null>(null);
+	let deformationError = $state('');
+	let goapSimulationPlan = $state.raw<GoapSimulationPlanV1 | null>(null);
+
+	async function runSoftDeformationPreview() {
+		deformationError = '';
+		try {
+			const THREE = await import('three');
+			const brush = new SceneDeformationBrushV1();
+			const targetMesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial());
+			targetMesh.userData.mutable = true;
+			targetMesh.userData.evidenceImmutable = false;
+			brush.applyStrokeStep(targetMesh, { center: [0, 0, 0], radius: 1.5, delta: [0, 0.12, 0] });
+			const committed = brush.commitStroke();
+			deformationReceipt = committed.receipt;
+		} catch (err) {
+			deformationError = err instanceof Error ? err.message : String(err);
+		}
+	}
+
+	function runGoapWhatIfPreview() {
+		goapSimulationPlan = planGoapWhatIfV1({
+			schema: 'atlas.goap-simulation-input.v1',
+			sceneRevisionId: revision?.manifestSha256 ?? `preview:${plan.sceneId}`,
+			stateHash: '0000000000000000000000000000000000000000000000000000000000000000',
+			sourceId: activeClock || 'scene-time',
+			startMs: Math.max(0, Math.round(sourceTimeMs)),
+			baseline: [],
+			initialFacts: { doorOpen: false, lineOfSightClear: false },
+			goalFacts: { doorOpen: true, lineOfSightClear: true },
+			operators: [
+				{
+					id: 'open_door',
+					label: 'Open entry door',
+					cost: 1,
+					durationMs: 400,
+					preconditions: { doorOpen: false },
+					effects: { doorOpen: true },
+					sceneEffects: [],
+				},
+				{
+					id: 'verify_sightline',
+					label: 'Verify sightline',
+					cost: 1,
+					durationMs: 300,
+					preconditions: { doorOpen: true },
+					effects: { lineOfSightClear: true },
+					sceneEffects: [],
+				},
+			],
+			budget: { maxExpansions: 32, maxDepth: 4 },
+		});
+	}
 	let reportController: AbortController | null = null;
 	$effect(() => {
 		const scope = `${plan.caseId}:${plan.sceneId}`;
@@ -82,6 +150,7 @@
 	let selectedEventId = $state('');
 	let sourceTimeMs = $state(0);
 	let playing = $state(false);
+	let playbackMode = $state<'event' | 'lane'>('event');
 	let error = $state<string | null>(null);
 	let playbackStartedAt = 0;
 	const lane = $derived(recipe.eventLanes.find((item) => item.clockId === activeClock) ?? null);
@@ -99,7 +168,20 @@
 	let videoSeek = $state.raw({ timeMs: 0 });
 	let seekStartedAt: number | null = null;
 	let memoryDialog: HTMLDialogElement;
-	let applyCameraPreset: (preset: 'top-down' | 'isometric' | 'perspective') => void = () => {};
+	let applyCameraPreset = $state<(preset: SceneCameraPresetV1) => void>(() => {});
+	let followsCameraCues = $state(false);
+	const hasCameraCues = $derived(recipe.eventLanes.some((lane) => lane.events.some((event) => event.cameraPreset)));
+	// Timeline items come from the same active event lane the canvas already plays; no second event source.
+	const timelineItems = $derived<TimelineTrackItemV1[]>((lane?.events ?? []).map((event) => ({
+		id: event.eventId, track: 'EventTrack' as const, label: event.label,
+		startSeconds: event.startMs / 1000, endSeconds: event.endMs / 1000
+	})));
+	const timelineDurationSeconds = $derived(Math.max(1, ...recipe.eventLanes.flatMap((item) => item.events.map((event) => event.endMs / 1000))));
+	const cameraCue = $derived(followsCameraCues ? resolveSceneCameraCueV1(lane?.events ?? [], Math.floor(sourceTimeMs)) : null);
+	function chooseManualCamera(preset: SceneCameraPresetV1) {
+		followsCameraCues = false;
+		applyCameraPreset(preset);
+	}
 	let inspecting = $state(false);
 	const frameSamples = createScenePreviewSamplesV1();
 	const seekSamples = createScenePreviewSamplesV1(32);
@@ -128,6 +210,74 @@
 		return () => window.clearInterval(interval);
 	});
 	const selectedEvent = $derived(lane?.events.find((item) => item.eventId === selectedEventId) ?? null);
+	let showCaptions = $state(false);
+	let captionResults = $state.raw<SceneCaptionResponseV1[]>([]);
+	let captionStatus = $state('');
+	const laneCaptionScopes = $derived.by((): SceneCaptionScopeV1[] => {
+		if (!sourceNavigationEnabled || !lane?.evidenceId) return [];
+		const source = plan.sources.find(({ evidenceId }) => evidenceId === lane?.evidenceId);
+		if (!source || lane.clockId !== `evidence:${source.evidenceId}`) return [];
+		const scopes = plan.events.flatMap((event) => {
+			const binding = event.sourceEvent;
+			if (event.reviewStatus !== 'accepted' || !binding || binding.sourceEvidenceId !== source.evidenceId ||
+				event.clock.clockId !== lane?.clockId) return [];
+			return [{ caseId: plan.caseId, evidenceId: source.evidenceId, eventId: binding.sourceEventId, sourceRevision: source.sourceRevision,
+				analysisRevision: binding.analysisRevision, startMs: binding.startMs, endMs: binding.endMs }];
+		});
+		return [...new Map(scopes.map((scope) => [sceneCaptionScopeKeyV1(scope), scope])).values()];
+	});
+	const captionRequestWindow = $derived(showCaptions ? sceneCaptionRequestWindowV1(laneCaptionScopes, Math.floor(sourceTimeMs)) : []);
+	const captionRequestKey = $derived(JSON.stringify(captionRequestWindow));
+	const activeCaptions = $derived.by(() => {
+		const keys = new Set(captionRequestWindow.map(sceneCaptionScopeKeyV1));
+		return activeSceneLaneCaptionsV1(captionResults.filter(({ scope }) => keys.has(sceneCaptionScopeKeyV1(scope))), Math.floor(sourceTimeMs));
+	});
+	const activeCaptionEventCount = $derived(laneCaptionScopes.filter(({ startMs, endMs }) => sourceTimeMs >= startMs && sourceTimeMs < endMs).length);
+
+	$effect(() => {
+		// Observe the stable window key instead of reissuing requests on every playhead update.
+		const key = captionRequestKey;
+		const scopes = untrack(() => captionRequestWindow);
+		const scopeKeys = new Set(scopes.map(sceneCaptionScopeKeyV1));
+		const retained = untrack(() => captionResults.filter(({ scope }) => scopeKeys.has(sceneCaptionScopeKeyV1(scope))));
+		captionResults = retained;
+		captionStatus = '';
+		if (!scopes.length) return;
+		const controller = new AbortController();
+		const loaded = new Set(retained.map(({ scope }) => sceneCaptionScopeKeyV1(scope)));
+		const pending = scopes.filter((scope) => !loaded.has(sceneCaptionScopeKeyV1(scope)));
+		if (pending.length) captionStatus = 'Loading source transcript excerpts…';
+		const timer = setTimeout(() => {
+			void Promise.allSettled(pending.map(async (scope) => {
+				const query = new URLSearchParams({ caseId: scope.caseId, captionEvent: scope.eventId, sourceRevision: scope.sourceRevision,
+					analysisRevision: scope.analysisRevision, startMs: String(scope.startMs), endMs: String(scope.endMs) });
+				const response = await fetch(`/api/evidence/${encodeURIComponent(scope.evidenceId)}/video-events?${query}`, {
+					signal: controller.signal, cache: 'no-store'
+				});
+				if (!response.ok) throw new Error('Caption source unavailable or changed.');
+				const result = sceneCaptionResponseV1Schema.parse(await response.json());
+				if (sceneCaptionScopeKeyV1(scope) !== sceneCaptionScopeKeyV1(result.scope)) throw new Error('Caption scope changed.');
+				return result;
+			})).then((outcomes) => {
+				if (controller.signal.aborted || captionRequestKey !== key) return;
+				captionResults = [...retained, ...outcomes.flatMap((result) => result.status === 'fulfilled' ? [result.value] : [])];
+				const unavailable = captionResults.reduce((count, result) => count + result.unavailableCount, 0);
+				captionStatus = outcomes.some((outcome) => outcome.status === 'rejected') ? 'Some caption sources are unavailable or changed.'
+					: unavailable ? `${unavailable} referenced transcript excerpt(s) unavailable.`
+						: captionResults.every((result) => result.captions.length === 0) ? 'No transcript excerpts were cited in this window.' : '';
+			});
+		}, pending.length ? 120 : 0);
+		return () => { clearTimeout(timer); controller.abort(); };
+	});
+	const lanePlaybackRange = $derived.by(() => {
+		const events = lane?.events;
+		if (!events?.length) return null;
+		return { startMs: Math.min(...events.map((event) => event.startMs)), endMs: Math.max(...events.map((event) => event.endMs)) };
+	});
+	const activeEventIds = $derived.by(() => {
+		const time = Math.floor(sourceTimeMs);
+		return new Set((lane?.events ?? []).filter((event) => time >= event.startMs && time < event.endMs).map((event) => event.eventId));
+	});
 	let seekRange = $derived.by(() => {
 		const events = lane?.events ?? [];
 		return { min: Math.min(0, ...events.map((event) => event.startMs)), max: Math.max(1, ...events.map((event) => event.endMs)) };
@@ -171,6 +321,7 @@
 	}
 
 	function selectHouseObject(object: HouseObject | null) {
+		if (object?.id !== houseObject?.id) contourNoteText = '';
 		houseObject = object;
 		if (object && activeRuntime) {
 			const mesh = activeRuntime.findObjectMesh(object.id);
@@ -333,15 +484,19 @@
 		if (next) selectEvent(next.eventId);
 	}
 
-	function togglePlayback() {
-		if (!selectedEvent) return;
-		if (!playing) {
-			if (sourceTimeMs < selectedEvent.startMs || sourceTimeMs >= selectedEvent.endMs) {
-				sourceTimeMs = selectedEvent.startMs;
-			}
-			playbackStartedAt = performance.now();
+	function togglePlayback(mode: 'event' | 'lane' = 'event') {
+		const interval = mode === 'lane' ? lanePlaybackRange : selectedEvent;
+		if (!interval) return;
+		if (playing && playbackMode === mode) {
+			playing = false;
+			return;
 		}
-		playing = !playing;
+		if (sourceTimeMs < interval.startMs || sourceTimeMs >= interval.endMs) {
+			sourceTimeMs = interval.startMs;
+		}
+		playbackMode = mode;
+		playbackStartedAt = performance.now();
+		playing = true;
 	}
 
 	function addAnnotation() {
@@ -441,6 +596,16 @@
 		}
 	}
 
+	function addContourNote() {
+		const contour = selectedPolygonDraft;
+		const text = contourNoteText.trim();
+		if (!contour || !text || text.length > 1000 || contourNotes.length >= 100 || saving || preparing) return;
+		const { evidenceId, sourceRevision, reviewRevision, geometryRevision } = contour.originalRecipe;
+		contourNotes = [...contourNotes, { id: crypto.randomUUID(), text, objectId: contour.objectId,
+			evidenceId, sourceRevision, reviewRevision, baseGeometryRevision: geometryRevision }];
+		contourNoteText = '';
+	}
+
 	function exportPreview() {
 		const report = {
 			schema: 'parent-atlas.scene-preview-report/v1',
@@ -448,12 +613,8 @@
 			status: 'UNSAVED_PREVIEW',
 			plan,
 			annotations: $state.snapshot(annotations),
-			imagePolygonDrafts: polygonEditDrafts.filter((draft) => JSON.stringify(draft.recipe.polygon) !== JSON.stringify(draft.originalRecipe.polygon)).map((draft) => ({
-				objectId: draft.objectId, evidenceId: draft.recipe.evidenceId, sourceSha256: draft.recipe.sourceSha256,
-				sourceRevision: draft.recipe.sourceRevision, reviewRevision: draft.recipe.reviewRevision,
-				baseGeometryRevision: draft.originalRecipe.geometryRevision, geometryRevision: draft.recipe.geometryRevision,
-				coordinateSpace: 'SOURCE_IMAGE_PIXELS', polygon: draft.recipe.polygon, reviewState: 'UNREVIEWED_LOCAL_EDIT'
-			}))
+			...(contourNotes.length ? { contourNotes } : {}),
+			imagePolygonDrafts: polygonEdits.map((edit) => ({ ...edit, coordinateSpace: 'SOURCE_IMAGE_PIXELS' }))
 		};
 		const url = URL.createObjectURL(new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' }));
 		const link = document.createElement('a');
@@ -494,18 +655,18 @@
 	}
 
 	async function savePreview() {
-		if (saving || preparing || !persistenceEnabled || hasUnsavedPolygonEdits) {
-			if (hasUnsavedPolygonEdits) saveError = 'Save is blocked: contour edits are local drafts and are not yet part of the authorized scene revision contract. Export the preview report to retain them.';
-			return;
-		}
+		if (saving || preparing || !persistenceEnabled || !polygonDraftsReady) return;
 		onSaveRequested?.();
 		saving = true;
 		saveError = '';
 		try {
 			const expectedRevision = saved?.manifest.revision ?? 0;
-			const draft = { schema: 'parent-atlas.scene-preview-draft/v1' as const, plan, annotations: $state.snapshot(annotations) };
+			const draft = { schema: 'parent-atlas.scene-preview-draft/v1' as const, plan, annotations: $state.snapshot(annotations),
+				...(polygonEdits.length ? { polygonEdits } : {}), ...(contourNotes.length ? { contourNotes } : {}) };
 			const key = JSON.stringify({ expectedRevision, draft });
 			if (pendingSave?.key !== key) {
+				const evidenceBindings = new Map((saved?.manifest.evidenceBindings ?? []).map((binding) => [binding.evidenceId, binding]));
+				for (const { evidenceId, sourceRevision } of plan.sources) evidenceBindings.set(evidenceId, { evidenceId, sourceRevision });
 				const manifest = sceneDocumentV1Schema.parse({
 					...(saved?.manifest ?? {
 						schema: 'parent-atlas.scene-document.v1', sceneId: plan.sceneId, caseId: plan.caseId,
@@ -514,7 +675,7 @@
 					}),
 					revision: expectedRevision + 1, createdAt: new Date().toISOString(),
 					parentManifestSha256: saved?.manifestSha256 ?? null,
-					evidenceBindings: plan.sources.map(({ evidenceId, sourceRevision }) => ({ evidenceId, sourceRevision })),
+					evidenceBindings: [...evidenceBindings.values()],
 					proceduralPreviewDraft: draft
 				});
 				pendingSave = { key, payload: JSON.stringify({ commandId: crypto.randomUUID(), expectedRevision, manifest }) };
@@ -566,11 +727,11 @@
 				const scene = new THREE.Scene(); scene.background = new THREE.Color('#172630'); scene.add(runtime.root);
 				const imageChapters = [...(saved?.manifest.imageStorybookChapter ? [saved.manifest.imageStorybookChapter] : []), ...(saved?.manifest.imageStorybookChapters ?? [])];
 				const reviewedPolygons = collectSceneReviewedPolygonsV1(imageChapters, plan.sources);
-				polygonEditDrafts = createSceneReviewedPolygonEditDraftsV1(reviewedPolygons);
+				polygonEditDrafts = createSceneReviewedPolygonEditDraftsV1(reviewedPolygons, saved?.manifest.proceduralPreviewDraft?.polygonEdits);
 				polygonMeshes.clear();
 				const chapterIndex = new Map<string, number>();
 				const chapterMaskCounts = new Map<string, number>();
-				for (const item of reviewedPolygons) {
+				for (const item of polygonEditDrafts) {
 					const groupKey = item.objectId.split('-').slice(1, 6).join('-');
 					const index = chapterIndex.get(groupKey) ?? chapterIndex.size;
 					chapterIndex.set(groupKey, index);
@@ -586,6 +747,7 @@
 					runtime.root.add(mesh);
 					polygonMeshes.set(item.objectId, mesh);
 				}
+				polygonDraftsReady = true;
 				const camera = new THREE.PerspectiveCamera(48, width / height, 0.1, 2000);
 				if (recipe.environment.kind === 'four-bedroom-house') camera.position.set(14, 21, 17);
 				else camera.position.set(34, 25, 38);
@@ -597,13 +759,44 @@
 				} : null;
 				renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5)); renderer.setSize(width, height, false);
 				controls = new orbit.OrbitControls(camera, renderer.domElement); controls.target.set(0, 0, 0); controls.update();
-				applyCameraPreset = (preset) => {
+				function setCameraPreset(preset: SceneCameraPresetV1) {
 					const distance = recipe.environment.kind === 'four-bedroom-house' ? 28 : 70;
 					camera.up.set(0, preset === 'top-down' ? 0 : 1, preset === 'top-down' ? -1 : 0);
 					if (preset === 'top-down') camera.position.set(0, distance, 0.01);
 					else if (preset === 'isometric') camera.position.set(distance * 0.68, distance * 0.68, distance * 0.68);
 					else camera.position.set(distance * 0.25, distance * 0.38, distance);
 					controls!.target.set(0, 0, 0); controls!.update();
+				};
+				const orbitControls = controls;
+				let restoreManualView: (() => void) | null = null;
+				let appliedCuePreset: SceneCameraPresetV1 | null = null;
+				function updateCameraCue(preset: SceneCameraPresetV1 | null) {
+					if (preset === appliedCuePreset) return;
+					appliedCuePreset = preset;
+					if (!preset) {
+						restoreManualView?.();
+						restoreManualView = null;
+						return;
+					}
+					if (!restoreManualView) {
+						const position = camera.position.clone();
+						const up = camera.up.clone();
+						const target = orbitControls.target.clone();
+						const enabled = orbitControls.enabled;
+						restoreManualView = () => {
+							camera.position.copy(position);
+							camera.up.copy(up);
+							orbitControls.target.copy(target);
+							orbitControls.enabled = enabled;
+							orbitControls.update();
+						};
+					}
+					setCameraPreset(preset);
+					orbitControls.enabled = false;
+				}
+				applyCameraPreset = (preset) => {
+					updateCameraCue(null);
+					setCameraPreset(preset);
 				};
 				{
 					const objects: HouseObject[] = [];
@@ -659,15 +852,22 @@
 						lastVisibleFrame = now;
 					}
 					const dt = Math.min(0.05, (now - previous) / 1000); previous = now;
-					if (playing && selectedEvent) {
+					const playbackInterval = playbackMode === 'lane' ? lanePlaybackRange : selectedEvent;
+					if (playing && playbackInterval) {
 						const elapsed = now - playbackStartedAt; playbackStartedAt = now;
-						const duration = selectedEvent.endMs - selectedEvent.startMs;
-						sourceTimeMs = selectedEvent.startMs + ((sourceTimeMs - selectedEvent.startMs + elapsed) % duration);
+						const { startMs, endMs } = playbackInterval;
+						if (playbackMode === 'lane') {
+							sourceTimeMs = Math.min(endMs, sourceTimeMs + elapsed);
+							if (sourceTimeMs === endMs) playing = false;
+						} else {
+							sourceTimeMs = startMs + ((sourceTimeMs - startMs + elapsed) % (endMs - startMs));
+						}
 					}
 					const time = Math.floor(sourceTimeMs);
 					const last = runtime?.activeSourceTime;
 					if (runtime && activeClock && (last?.clockId !== activeClock || last.sourceTimeMs !== time)) runtime.setSourceTime(activeClock, time);
-					controls?.update(dt);
+					updateCameraCue(cameraCue?.preset ?? null);
+					if (!cameraCue?.preset) controls?.update(dt);
 					if (runtime) {
 						const mode = followingVideo ? 'video-scrub' : houseObject ? 'editing' : 'navigation';
 						const eventFocus = followingVideo && selectedEventId ? runtime.getEventFocusPosition(selectedEventId) : null;
@@ -705,11 +905,18 @@
 
 <section class="runtime" aria-label="Scene preview and event timeline">
 	<div class="viewport"><canvas bind:this={canvas} aria-label="Illustrative 3D scene preview"></canvas><span class="status">{status}</span>
-		<div class="camera-presets" aria-label="Scene camera"><button type="button" onclick={() => applyCameraPreset('top-down')}>Top down</button><button type="button" onclick={() => applyCameraPreset('isometric')}>Isometric</button><button type="button" onclick={() => applyCameraPreset('perspective')}>Perspective</button></div>
+		<div class="camera-presets" aria-label="Scene camera"><button type="button" onclick={() => chooseManualCamera('top-down')}>Top down</button><button type="button" onclick={() => chooseManualCamera('isometric')}>Isometric</button><button type="button" onclick={() => chooseManualCamera('perspective')}>Perspective</button></div>
+		{#if hasCameraCues}
+			<label><input type="checkbox" bind:checked={followsCameraCues} /> Follow camera cues</label>
+			{#if cameraCue?.conflict}<p role="status">Conflicting camera cues. Using your manual view.</p>
+			{:else if cameraCue?.preset}<p role="status">Camera cue: {sceneCameraPresetLabelsV1[cameraCue.preset]}</p>{/if}
+		{/if}
 	</div>
 	{#if error}<p class="error" role="alert">{error}</p>{/if}
 	<div class="timeline">
 		<button type="button" onclick={() => { memoryDialog.showModal(); inspecting = true; }}>Performance and memory</button>
+		<TimelineEngine durationSeconds={timelineDurationSeconds} currentTimeSeconds={sourceTimeMs / 1000} items={timelineItems}
+			onSeek={(seconds) => { sourceTimeMs = Math.round(seconds * 1000); }} />
 		<dialog bind:this={memoryDialog} aria-label="Scene performance and memory" onclose={() => { inspecting = false; }}>
 			<h3>Scene performance and memory</h3>
 			<dl>
@@ -764,7 +971,17 @@
 		{#if selectedPolygonDraft}
 			<section class="polygon-editor" aria-label="Image-space polygon editor">
 				<strong>Edit reviewed contour · source pixels</strong>
-				<p>This creates a local, unreviewed geometry revision. It does not change the source image or mask. Scene save is blocked while this edit is pending; export the preview report to retain the draft.</p>
+				<p>Contour edits are illustrative and stay in source pixels. Saving records them as unreviewed geometry alongside the reviewed source mask.</p>
+				<label>Note on this contour<textarea bind:value={contourNoteText} rows={2} maxlength={1000}></textarea></label>
+				<button type="button" onclick={addContourNote} disabled={saving || preparing || !contourNoteText.trim() || contourNotes.length >= 100}>Add contour note</button>
+				{#if selectedContourNotes.length}
+					<ul aria-label="Notes on this contour">
+						{#each selectedContourNotes as note (note.id)}
+							<li>{note.text} <button type="button" aria-label={`Remove contour note: ${note.text}`} disabled={saving || preparing}
+								onclick={() => { contourNotes = contourNotes.filter((item) => item.id !== note.id); }}>Remove</button></li>
+						{/each}
+					</ul>
+				{/if}
 				{#if selectedPolygonImageUrl}
 					<div class="polygon-source-preview" style={`aspect-ratio: ${selectedPolygonDraft.recipe.width} / ${selectedPolygonDraft.recipe.height}`}>
 						<img src={selectedPolygonImageUrl} alt="Original evidence with selected mask contour overlay" loading="lazy" onerror={() => (polygonSourceImageError = true)} onload={() => (polygonSourceImageError = false)} />
@@ -865,6 +1082,21 @@
 			{:else}
 				<small>Select a scene object to enable focus-scoped material/UV hotkeys (1–5, M, [, ], U) and K / J / L / Shift+K motion cues.</small>
 			{/if}
+			<div class="controls" data-testid="scene-deformation-goap-panel" style="margin-top:.65rem;padding-top:.5rem;border-top:1px solid #cfc9bb">
+				<div style="display:flex;gap:.4rem;flex-wrap:wrap">
+					<button type="button" data-testid="eng04-brush-preview-btn" onclick={() => void runSoftDeformationPreview()}>Soft Brush Preview (PADF)</button>
+					<button type="button" data-testid="goap-whatif-preview-btn" onclick={runGoapWhatIfPreview}>GOAP What-If (Hypothesis)</button>
+				</div>
+				{#if deformationReceipt}
+					<small role="status" data-testid="eng04-brush-receipt">PADF {deformationReceipt.affectedVertexCount} verts · {deformationReceipt.byteLength} B · {deformationReceipt.storageKey}</small>
+				{/if}
+				{#if deformationError}
+					<small class="error" role="alert">{deformationError}</small>
+				{/if}
+				{#if goapSimulationPlan}
+					<small role="status" data-testid="goap-whatif-receipt">{goapSimulationPlan.authorityLabel} · {goapSimulationPlan.status} · cost {goapSimulationPlan.totalCost} · [{goapSimulationPlan.operatorIds.join(' -> ')}]</small>
+				{/if}
+			</div>
 		</aside>
 		<div class="controls">
 			<label>Source clock lane
@@ -885,7 +1117,8 @@
 						onPlaying={(active) => { videoPlaying = active; }} />
 				{/key}
 			{:else}
-				<button type="button" onclick={togglePlayback} disabled={!selectedEvent}>{playing ? 'Pause' : 'Play selected event'}</button>
+				<button type="button" onclick={() => togglePlayback()} disabled={!selectedEvent}>{playing && playbackMode === 'event' ? 'Pause selected event' : 'Play selected event'}</button>
+				<button type="button" onclick={() => togglePlayback('lane')} disabled={!lanePlaybackRange}>{playing && playbackMode === 'lane' ? 'Pause source lane' : 'Play source lane'}</button>
 			{/if}
 			<label class="scrub">
 				{followingVideo ? (videoPending ? 'Seeking source video' : presentedTime ? 'Presented frame' : 'Media time estimate') : 'Source time'}
@@ -899,7 +1132,7 @@
 				{#each lane.events as event (event.eventId)}
 					<button class:active={event.eventId === selectedEventId} type="button" onclick={() => selectEvent(event.eventId)}>
 						<strong>{event.label}</strong><span>{event.startMs}–{event.endMs} ms · ±{event.uncertaintyMs} ms</span>
-						<small>{event.reviewStatus === 'accepted' ? 'Reviewed source · illustrative cue' : `${event.status} · ${event.reviewStatus}`} · {event.cueType}</small>
+						<small>{event.reviewStatus === 'accepted' ? 'Reviewed source · illustrative cue' : `${event.status} · ${event.reviewStatus}`} · {event.cueType}{activeEventIds.has(event.eventId) ? ' · At playhead' : ''}</small>
 					</button>
 				{/each}
 			</div>
@@ -907,6 +1140,17 @@
 				<aside class="synopsis">
 					<strong>Event synopsis</strong>
 					<p>{selectedEvent.label}</p>
+					{#if laneCaptionScopes.length > 0}
+						<label><input type="checkbox" bind:checked={showCaptions} /> Show cited transcript captions</label>
+						{#if showCaptions && captionStatus}<p role="status">{captionStatus}</p>{/if}
+						{#if activeCaptions.length}
+							<ul aria-label="Transcript captions at playhead">
+								{#each activeCaptions as caption (caption.referenceId)}
+									<li><p>{caption.text}</p><small>{caption.startMs}–{caption.endMs} ms · {caption.reviewed ? 'Reviewed transcript' : 'Unreviewed transcript excerpt'}</small></li>
+								{/each}
+							</ul>
+						{/if}
+					{/if}
 					<ul>
 						{#each selectedEvent.evidenceIds as evidenceId (evidenceId)}
 							<li><a href={`/cases/${encodeURIComponent(plan.caseId)}/evidence/${encodeURIComponent(evidenceId)}`}>
@@ -935,9 +1179,10 @@
 			{/if}
 		{:else}<p>No timed events in this preview.</p>{/if}
 		<p>Save or export draft notes before leaving the preview.</p>
-		<button type="button" onclick={savePreview} disabled={!persistenceEnabled || saving || preparing || hasUnsavedPolygonEdits}>{saving ? 'Saving…' : 'Save scene draft'}</button>
+		<button type="button" onclick={savePreview} disabled={!persistenceEnabled || saving || preparing || !polygonDraftsReady}>{saving ? 'Saving…' : 'Save scene draft'}</button>
 		{#if !persistenceEnabled}<p role="status">Saving is disabled because the scene persistence feature gate is off. Export the preview report to keep a local review copy.</p>{/if}
-		{#if hasUnsavedPolygonEdits}<p role="status">Polygon edits remain unreviewed local drafts and cannot enter this scene revision. Export the preview report to retain them.</p>{/if}
+		{#if hasUnsavedPolygonEdits}<p role="status">Contour edits are unsaved. Save the scene draft or export the preview report to keep a copy.</p>{/if}
+		{#if hasUnsavedContourNotes}<p role="status">Contour notes are unsaved.</p>{/if}
 		{#if saved}<a href={reopenHref} data-sveltekit-reload>Reopen saved revision {saved.manifest.revision}</a>{/if}
 		{#if saveError}<p role="alert">{saveError}</p>{/if}
 		<button type="button" onclick={exportPreview}>Export preview report (JSON)</button>

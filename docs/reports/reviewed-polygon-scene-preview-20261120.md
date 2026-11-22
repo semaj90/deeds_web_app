@@ -37,3 +37,27 @@ This advances `CASE-SCENE-E2E-06c` only partially. Synthetic browser interaction
 - `safe_next_command`: `npm exec vitest run src/lib/reconstruction/scene-reviewed-polygons-v1.spec.ts src/lib/splat/reviewed-polygon-mesh-v1.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1 --no-file-parallelism`
 - `smoke_command`: `npm run check:native`
 - `report_path`: `docs/reports/reviewed-polygon-scene-preview-20261120.md`
+## Scene revision follow-up
+
+Worktree base `2ac62dafe35`. The optional procedural draft contour section records edited source-pixel vertices as `UNREVIEWED_SCENE_EDIT`. It pins the evidence revision, chapter review token and original geometry revision. The scene document requires a unique matching reviewed base, preserves ring sizes, validates topology and image bounds, and admits at most 4,096 edit vertices in aggregate. The scene writer compares the base with the preceding persisted scene and checks the current evidence and image chapter before appending. The canvas restores the edited mesh without modifying the reviewed chapter. The saved JSON report includes the separate derivative, and unsaved edits prevent replacing the preview.
+
+`npm exec vitest run scene-reviewed-polygons-v1.spec.ts reviewed-polygon-mesh-v1.spec.ts scene-document-v1.spec.ts scene-document-revisions-v1.spec.ts scene-revision-report-v1.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1 --no-file-parallelism` returned `Test Files 5 passed (5)`, `Tests 55 passed (55)`. Adversarial checks reject missing bases, mismatched review tokens, out-of-bounds vertices, and attempted review promotion. Live case save/reopen and independent PostgreSQL/SeaweedFS readback remain open.
+
+`npm exec playwright test -- --config=playwright.set-the-scene.config.ts parent-atlas-v2-character-runtime.spec.ts --grep 'synthetic reviewed-mask fixture' --workers=1 --reporter=list` returned `1 passed (14.8s)`. Chromium exercised vertex editing and undo/redo on the synthetic route using a mocked image response. Final `npm run check:native` returned `COMPLETED 2185 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS`. Strict OpenSpec validation returned `Change 'crime-scene-reconstruction' is valid`.
+
+## Opening a chapter-only scene from the case
+
+Worktree base `2ac62dafe35`. Saved illustrative scenes with reviewed mask contours are now listed in the case page's Scene Builder entry. The authorized revision route returns the exact base revision, then the builder preselects its contour evidence and prepares an indoor scene on that same scene ID. It rejects incompatible coordinate frames, conflicting source revisions, removed sources, and stale source hashes. The revision save builds on the prior manifest and preserves existing evidence bindings.
+
+`npm exec vitest run scene-reviewed-polygons-v1.spec.ts scene-document-revisions-v1.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1 --no-file-parallelism` returned `Test Files 2 passed (2)`, `Tests 23 passed (23)`. The source seed checks cover a chapter-only revision, a metric-frame rejection, and conflicting revisions of the same image.
+
+`npm exec playwright test -- --config=playwright.set-the-scene.config.ts set-the-scene-workflow.spec.ts --grep 'opens a reviewed contour' --workers=1 --reporter=list` returned `1 skipped`. The authorized staging case/session and write opt-in are required along with `PW_SCENE_CONTOUR_SCENE_ID` for a chapter-only scene and `PW_SCENE_CONTOUR_EDIT_X` for a valid first vertex edit. Live browser persistence and direct service readback remain open.
+
+`npm run check:native` returned `COMPLETED 2185 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS`. Strict OpenSpec validation returned `Change 'crime-scene-reconstruction' is valid`.
+## Contour annotations
+
+The scene preview can add or remove a note on the selected image contour. These object notes have no time coordinate. They carry the saved base geometry, evidence revision and image review token separately from timed event notes. Save uses the existing scene revision contract, checks the prior reviewed base and current case evidence, and restores the same note with the contour. The saved report exports the note and its binding. A local note prevents preview replacement until saved or removed.
+
+`npm exec vitest run scene-reviewed-polygons-v1.spec.ts scene-document-revisions-v1.spec.ts scene-revision-report-v1.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1 --no-file-parallelism` returned `Test Files 3 passed (3)`, `Tests 27 passed (27)`. Adversarial checks reject a duplicate note ID and a forged review token even with no vertex edits. The staging test now checks the note in the committed revision, reopened editor and exported report.
+
+Worktree base `2ac62dafe35`. `npm run check:native` returned `COMPLETED 2185 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS`. Strict OpenSpec validation passed. `npm exec playwright test -- --config=playwright.set-the-scene.config.ts --grep 'synthetic reviewed-mask fixture|opens a reviewed contour' --workers=1 --reporter=list` returned `1 skipped` and `1 passed (8.4s)`. Chromium added a note on the synthetic contour and retained the existing vertex edit and undo/redo coverage. The signed-in staging test remains skipped.
