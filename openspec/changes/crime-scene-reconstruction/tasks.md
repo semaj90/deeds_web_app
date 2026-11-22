@@ -897,3 +897,14 @@ This section records blockers only. It does not change any checkbox above. Evide
 | Staging E2E (CASE-SCENE-E2E-10) | BLOCKED (approval) | Needs `PW_SCENE_*` variables, live Postgres on `:5434`, SeaweedFS on `:8333`; not run | Explicit approval and environment scope |
 | Authorized SSE through Caddy | NOT_PROVEN | `analysis_job_events` absent from the live database; mock and scratch-database tests only | Admit the event-history migration deliberately, then authorized browser reconnect test |
 | GAN validation gate | NOT_PROVEN (advisory) | `.claude/hooks/gan-validation-gate.mjs` tested by script only; no enforceable CI check | Live session test; add CI check for unauthorized checkbox edits |
+
+## Verification record (2026-11-21, no checkbox changed)
+
+| Check | Result | Evidence |
+|---|---|---|
+| Playwright `tests/e2e/crime-scene-comprehensive-v1.spec.ts` | PASS 3/3 (21.9 s) | Includes `timeline seek drives the canvas source time without page errors` |
+| `npm run check:native` | 1 error, 2,185 files | `src/routes/api/codeintel/semantic-health/+server.ts:169` (`modelId` missing on resolver result). File has uncommitted edits from another session; not a reconstruction file |
+| `npm run check` (full authoritative gate) | NOT_PROVEN | Run killed to free CPU before completion; no result recorded |
+| Wiring (corrected) | MOUNTED, covered by E2E | ENG-03 timeline, ENG-04 deformation brush and GOAP what-if panel are all in `SceneRuntimeRecipeCanvas.svelte` (uncommitted working copy). Earlier "not wired" note was stale. Crime-scene E2E asserts `SIMULATION_HYPOTHESIS · PLANNED`, brush PADF preview/undo, and `IMMUTABLE_EVIDENCE` lock. Unit: 4 specs, 18 tests pass (brush, GOAP, geometry kernel x2) | Full check still NOT_PROVEN; CASE-SCENE-E2E-13 stays `[~]` (cancel-in-UI, replay and conflict acceptance not shown) |
+| GeometryKernelV1 owner | DIVERGENT, unresolved | Two files export an interface named `GeometryKernelV1`. Candidate canonical: `src/lib/reconstruction/geometry-kernel-v1.ts` (rasterize, palette pack, bitset, bounded queue). Divergent: `src/lib/splat/geometry-kernel-v1.ts` (backend probe, `createTypeScriptGeometryKernelV1`). Neither is imported outside its own spec | Operator decision: confirm owner, then rename or archive the other (archive, do not delete) |
+| CASE-SCENE-E2E-12 scope | NOT_PROVEN, not started | Task text is profiling the completed vertical slice (geometry compile, artifact transfer, scene load, frame time, CPU/GPU memory, worker throughput) before any native path. The NES LUT AVX2 parity named in the pilot plan is a different capability | Operator decision on measurement harness and whether a browser run is in scope |
