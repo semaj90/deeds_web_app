@@ -64,7 +64,7 @@ export function probeBackendCapabilitiesV1(options: { napiAvailable?: boolean } 
 	};
 }
 
-export interface GeometryKernelV1 {
+export interface SplatGeometryKernelV1 {
 	readonly backend: GeometryBackendKindV1;
 	rasterizePolygonMask(polygon: Float32Array, width: number, height: number): Promise<Uint8Array>;
 	packPalette4Bpp(pixels: Uint8Array): Promise<Uint8Array>;
@@ -94,10 +94,10 @@ function popcount32(x: number): number {
 }
 
 /**
- * Canonical scalar TypeScript reference implementation of GeometryKernelV1.
+ * Canonical scalar TypeScript reference implementation of SplatGeometryKernelV1.
  * All accelerated WASM SIMD / N-API backends must match this exact byte output.
  */
-export function createTypeScriptGeometryKernelV1(): GeometryKernelV1 {
+export function createTypeScriptGeometryKernelV1(): SplatGeometryKernelV1 {
 	return {
 		backend: 'typescript',
 
