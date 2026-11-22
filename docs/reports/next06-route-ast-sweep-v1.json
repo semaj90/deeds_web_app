@@ -3,11 +3,11 @@
   "canonicalAuthority": false,
   "writesPerformed": false,
   "totalApiRoutesIndexed": 900,
-  "sweptCount": 725,
-  "matchedCount": 719,
-  "totalNodes": 3533,
-  "routesWithSchema": 473,
-  "routesWithAuth": 683,
+  "sweptCount": 800,
+  "matchedCount": 794,
+  "totalNodes": 3931,
+  "routesWithSchema": 532,
+  "routesWithAuth": 752,
   "results": [
     {
       "route": "src/routes/api/ace/agent/+server.ts",
@@ -9849,6 +9849,20 @@
       "receiptReadback": "MATCH"
     },
     {
+      "route": "src/routes/api/rag/search-fused/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "3cf3e17a6f43da61ccd57d55eb9689f1bf0728f437b2557b253c6df5e3f31ba8",
+      "receiptReadback": "MATCH"
+    },
+    {
       "route": "src/routes/api/rag/search/+server.ts",
       "ok": true,
       "nodeCount": 6,
@@ -9860,6 +9874,1020 @@
       },
       "validationProblems": [],
       "receiptChecksum": "ec8393dd237894324ad511b511eaf2cda4f71e4af34abc704aa97950018b8e0b",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/rag/suggestions/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "897d3d0ce7054235d8ef2f1a357959a3ab8ff724484796285029973037bd148a",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/rag/todo-suggestions/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "63875571a4e354c2c136e326f3e75c27f54d2930d8bae124a26b45faecae862b",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/rag/unified/+server.ts",
+      "ok": true,
+      "nodeCount": 3,
+      "byKind": {
+        "file": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "ff373426f11eefba2a574d3bf445cc929ef3c85e03d5de2d378bdc3d9aa44d30",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/rag/validate/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "88805ec4c0dcfb77676b09563869ca579dc5955e07ff45f3f3458c2068186ee8",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/recommendations/+server.ts",
+      "ok": true,
+      "nodeCount": 6,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "22fc4c54aaddc56ffba0e84dbb7df87f60f27f1edb26cec18cac51c9474384fb",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/recommendations/[userId]/+server.ts",
+      "ok": true,
+      "nodeCount": 9,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 5
+      },
+      "validationProblems": [],
+      "receiptChecksum": "4f872c767786f5dc5f53bb365976fdbf2e2775060408a585dd16852b7f5d3d41",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/recommendations/jobs/[jobId]/+server.ts",
+      "ok": true,
+      "nodeCount": 3,
+      "byKind": {
+        "file": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "f8037f2d80fb480141a905b993b6ae707e0a22014ae2569b5b867bd7fab9f087",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/recommendations/metrics/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "258d0512a683d882b94750299e65698b930753bdb8b808ac12a801bcb153be89",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/recommendations/track/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "36eb71dc02f05aa4c5cd04935cde8e9c4b9fbfb0576d09e33902eb46ef6fe1e3",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/reconstruction/compile/+server.ts",
+      "ok": true,
+      "nodeCount": 3,
+      "byKind": {
+        "file": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "718844e582ca5238a01c9782f2c79a0673e0ec6dbd4c262b8a4594c61c0ce6d8",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/reconstruction/scene-intent/+server.ts",
+      "ok": true,
+      "nodeCount": 7,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 3
+      },
+      "validationProblems": [],
+      "receiptChecksum": "14a5eaf74ae8474c31f094a69866fe075ff9236d0fb0217ab2d522e463cf928d",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/reports/+server.ts",
+      "ok": true,
+      "nodeCount": 28,
+      "byKind": {
+        "file": 1,
+        "schema": 4,
+        "route": 4,
+        "auth_guard": 19
+      },
+      "validationProblems": [],
+      "receiptChecksum": "76b83788d90d9348276406cc57cd2cb2c7c064d11d8a5ff57632db5fcf75a44c",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/reports/[id]/export/+server.ts",
+      "ok": true,
+      "nodeCount": 8,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "auth_guard": 4,
+        "route": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "afded719c26f5169987fa8b17c93fe39a7f260fe869bc2786d5a627369efd3ee",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/reports/[id]/publish/+server.ts",
+      "ok": true,
+      "nodeCount": 7,
+      "byKind": {
+        "file": 1,
+        "route": 2,
+        "auth_guard": 4
+      },
+      "validationProblems": [],
+      "receiptChecksum": "a6a9f79ea733552ac0210ef1e043edd0399f4bcd88b2b3b062544e9ebd6c8e7b",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/reports/batch-export/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "2cb8f2233752b32de0d782d2b56d9644985e8f3d129c4441dc7b680906c3b2b3",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/reports/generate-from-template/+server.ts",
+      "ok": true,
+      "nodeCount": 6,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 3
+      },
+      "validationProblems": [],
+      "receiptChecksum": "28c939a6347af377af181426f760168177d08525ec138acb4f0cc3f71a16f35b",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/reports/generate/+server.ts",
+      "ok": true,
+      "nodeCount": 9,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 6
+      },
+      "validationProblems": [],
+      "receiptChecksum": "12bc1a8de0c131f200e60cf074d7e67ddd5396f0b28b7d4d87d6881ca91a5b38",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/reports/police/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "9183ae9aa71b647179532168148d84c82368c9ccf8306d038f2e2e303b284c65",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/reports/preview/[id]/+server.ts",
+      "ok": true,
+      "nodeCount": 8,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "auth_guard": 4,
+        "route": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "735e6687fd3b73856264bd9af63f9465c871f43766540711cdaf5dbcdf14d43e",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/reports/save/+server.ts",
+      "ok": true,
+      "nodeCount": 7,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 4
+      },
+      "validationProblems": [],
+      "receiptChecksum": "4bd1e8b833d9be940738f4a288f14eaccc3cc3c46075aa73093b71f75024b476",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/research/concurrent-deep/+server.ts",
+      "ok": true,
+      "nodeCount": 9,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 5
+      },
+      "validationProblems": [],
+      "receiptChecksum": "4a3cf6b7ea687f6274fdcb00908fb62eacfd45b0ddf12f365b9468c4c6251936",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/research/concurrent-deep/stream/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "6fefdb0052fd7eb9468f06013b65832387c6582c807bc1b10a98763f89e8ae7d",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/research/deep/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "a542863f399347495a25378a1a620b9587fd31c272fbc6c628c75139f81ec935",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/research/encode/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "e9a532b974f3c529cd77ceae77d12b55221884cefd3162fd03056f4d30b60303",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/research/external-deep/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "db5da9ddec5c218b6596712268292c57f85ff457bcaae91972051069d09fcc5f",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/research/ingest/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "5f340c6b9d814c09357fe14adbea32430411523c5d06a0076d12e3d9d1146397",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/research/ldr-status/+server.ts",
+      "ok": true,
+      "nodeCount": 7,
+      "byKind": {
+        "file": 1,
+        "schema": 2,
+        "route": 2,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "9b8ef6218ef62a107a28fe29a67da0fd1ae7da1b6f393deb06a654fc0250fb51",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/research/search/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "83ad371620360a20a2a0223bd743f33e32c1e85c1f77720a85424c5e4ba72067",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/research/topological-encyclopedia/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "7b9b0a9ef7d24c4377765d4b86f8ab78f99d16acc5ff82c8a8bf5d6062c08927",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/retrieval/cache-layers/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "c93dc91c298d21ad5f7c15d939b593c07a58fa7fcf8c78ba2a1e954d52987502",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/retrieval/cache-layers/health/+server.ts",
+      "ok": true,
+      "nodeCount": 2,
+      "byKind": {
+        "file": 1,
+        "route": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "1cb5fad615133a634b2f5f66e1b6bba316ab8bff16512b88290678d722534e0e",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/retrieval/cache-layers/metrics/+server.ts",
+      "ok": true,
+      "nodeCount": 2,
+      "byKind": {
+        "file": 1,
+        "route": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "8adc350f355e42ce5d512bd53d2e056514d0cd8c771cc2e967a5ee6ef80670a7",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/retrieval/canonical-rerank/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "7867249d6a490a712397bcd5b63ee5c97057beaf0aebc7384de588ccc416bf53",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/retrieval/dual-lane/+server.ts",
+      "ok": true,
+      "nodeCount": 2,
+      "byKind": {
+        "file": 1,
+        "route": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "2f97b8c097a935109fc5d51684b144137ddbaf7fb3388118557bb7b25e28b091",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/retrieval/executor-tree-test/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "ce2544c248e39a6346cc48e389a4d6df53c40470a5260ba33b53e9161eb7a4ea",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/retrieval/go/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "65fcf1fb85d56dc6c2a6b4b42a7267489e273eb33c998901ea727463daa77932",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/retrieval/multi-vector/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "8763e443a3c5262110871c1aed3a2f443ca209bc81b5f6c57c0f02d4c9db349e",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/retrieval/reranked-search/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "dfb5bc3b1b815ec52d2fc935f86b9699168c3e562fa1515dac3ca1866d66206c",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/retrieval/reranked-search/weights-tuning/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "c3835c50a070a4b62f0ecee6cde1d70dc285a45a58e379b9146e94f29a8d704c",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/retrieval/rrf/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "a9b92356205b5d842546cc975cbeba14982b2b97f5fda9e85be556f5471f661f",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/retrieval/search-unified/+server.ts",
+      "ok": true,
+      "nodeCount": 11,
+      "byKind": {
+        "file": 1,
+        "route": 2,
+        "auth_guard": 8
+      },
+      "validationProblems": [],
+      "receiptChecksum": "40a66a01be13df67cccff6a3989f33a1411f6abc5b2a427ba19ac82a494150a6",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/retrieval/semantic-rerank/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "176f92f509d9e4a7f4438e80d290a8257a156ebfd6853625a0a14c449dde29ea",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/retrieval/unified/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "60ea8b0fb296fae346045174abb4658faac11276d5c2600a362a5473cfd0a188",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/rg-atlas/search/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "ffab923fccc28924c9f688a0cba388355f3c2cf38505d4a1c049d5cffb5734fb",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/route-operations/log/+server.ts",
+      "ok": true,
+      "nodeCount": 3,
+      "byKind": {
+        "file": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "5f5452dbaec8fe14cc0e53e17f81aa40b1481244c253f2031e2d7bab7dccfbb5",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/routes/[routeId]/error-brain-analyses/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "f10421a756945b223f6d5496636fa8c694901b4baa74e763c49cf634a20b910b",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/routes/[routeId]/error-brain-analysis/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "a0e41a39cd07efff0b8ef9c6806f0b806058f2d8ee4953f9d83445995b53fffe",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/routes/[routeId]/error-brain-patch/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "ba0ab833bb6c96aa2c77157b8995d081daaf552ca60881b6f980d928285dd985",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/routes/[routeId]/error-brain-patch/[patchId]/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "bd15709716553626731725f50194b4d2e52b7515aa79878e8e7c3f4912fc21ae",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/routes/[routeId]/errors/+server.ts",
+      "ok": true,
+      "nodeCount": 6,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "df0415a1428ebbe31f797c456c5383556e28ed86536d575ad66bd2658ee9c9db",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/routes/[routeId]/health-event/+server.ts",
+      "ok": true,
+      "nodeCount": 6,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "7442e3adb2b8fa0eb0d3a08a8e26babec816b4f13d83302c6dce079c29257f92",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/routes/[routeId]/interactions/+server.ts",
+      "ok": true,
+      "nodeCount": 6,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "a20935e05741c807b5747a007583d2847571f6d8e7ceec775ce180c045857f94",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/routes/events/+server.ts",
+      "ok": true,
+      "nodeCount": 3,
+      "byKind": {
+        "file": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "1ffb123370b321e32e3adc2912eab8083c684ef8a117269287242e2ea6244903",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/routes/metadata/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "ba6212fa30c29d50c3c3006d1bddb1956dd135862e1f84f71a15bdcfc8b60baf",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/search/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "d3eb12dc7f2cdbdc777a697539ff606523756d19847eda1f7dfa362c34284376",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/search/ace/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "f6f83467226861e163e3914664b340d802b3b7e2da3113a0f0f71adbdb352e0c",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/search/cases/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "a8779798b46026f3a9b15e12845df84b7acf8b8f7eb12ea6ea98e2be9681efcb",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/search/citations/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "6dbcbb0f0ef7397974c4276d2111ae69c2e0dbaebd777d69bd3357d4252d933f",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/search/fabric/+server.ts",
+      "ok": true,
+      "nodeCount": 6,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "81b6664600f1436af021e5a4566370a83bc03d788fd72aac320f8dc70fa25715",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/search/filters/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "3233866787513579110ec39ca1c1081039205afa4a553ae0577a8c22db03a4fa",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/search/hyperrag/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "828919d75aeba9b58b06e6dd2db369990bd4eb386e4aa4cace1f5179027bdf38",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/search/laws/+server.ts",
+      "ok": true,
+      "nodeCount": 5,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "a8aaadab516e8bbe925a0f0fed213671e1d92689d8988638e01543f53aa9b679",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/search/rg/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "route": 2,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "1ac4c4f721ffc9c6115392c53420948a20037339c8a659081a22397413a374d0",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/search/rrf/+server.ts",
+      "ok": true,
+      "nodeCount": 3,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "215567371186ff1f0fbd4bd01e3779ea1071f3d116f2fa59cecd82ac27295925",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/search/suggestions/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "ebe5abfc7c2fb65922218d09b0cf56e4d944fa2638b96c3dc5199bc3e04e671b",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/security/validate/progress/+server.ts",
+      "ok": true,
+      "nodeCount": 3,
+      "byKind": {
+        "file": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "0d749a92a580be4ff03446228dddec88af49c8ad750612ddfb23b19989c04b7e",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/semantic-contracts/predictions/promote/+server.ts",
+      "ok": true,
+      "nodeCount": 3,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "ba2387dccb7d114aba8c26b5350974d252a20f1dcb93cb67c3b36df2934559bd",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/semantic-contracts/proposals/approve/+server.ts",
+      "ok": true,
+      "nodeCount": 3,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "152683d4933d749363bffc367828c6fc9351bd77255212d45cfc8bf20b2296af",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/simulation/+server.ts",
+      "ok": true,
+      "nodeCount": 10,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 6
+      },
+      "validationProblems": [],
+      "receiptChecksum": "49129a134fef11f6e1818de6ee83997684894afae568dd2e9cacdce78f52c761",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/simulation/[sessionId]/+server.ts",
+      "ok": true,
+      "nodeCount": 13,
+      "byKind": {
+        "file": 1,
+        "route": 3,
+        "auth_guard": 8,
+        "schema": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "f5368470ddced0517cc81c9f07670cd3151f1308bedd8c03aa3df57efc71a215",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/simulation/[sessionId]/keyframes/+server.ts",
+      "ok": true,
+      "nodeCount": 6,
+      "byKind": {
+        "file": 1,
+        "route": 2,
+        "auth_guard": 2,
+        "schema": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "66e0f0e941ef3ef99d0dff4e81e9c32b0d9a702518157b81d3df0762ecdb685f",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/simulation/[sessionId]/strategy/+server.ts",
+      "ok": true,
+      "nodeCount": 4,
+      "byKind": {
+        "file": 1,
+        "route": 1,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "ec161d06677802f70aafb2201f7a3bac4ed7bb52b39419db221c80cd8ff75a49",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/splat/calibrate/+server.ts",
+      "ok": true,
+      "nodeCount": 3,
+      "byKind": {
+        "file": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "d76055dbaa254e0436035381d952e53ef5482ea47a2ae39b2ddee5462a24fcec",
+      "receiptReadback": "MATCH"
+    },
+    {
+      "route": "src/routes/api/sse/[id]/+server.ts",
+      "ok": true,
+      "nodeCount": 3,
+      "byKind": {
+        "file": 1,
+        "route": 1,
+        "auth_guard": 1
+      },
+      "validationProblems": [],
+      "receiptChecksum": "7abe994a6f2131e9a8e8c6655c3a08a2e60f6d1e9fe348c5689963dd188f81fb",
       "receiptReadback": "MATCH"
     }
   ]
