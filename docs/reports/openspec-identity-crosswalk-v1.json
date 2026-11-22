@@ -1,0 +1,3947 @@
+{
+  "schema": "atlas.openspec-identity-crosswalk.v1",
+  "generatedBy": "read-only scan (scratchpad script); not a canonical authority",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "keyForm": "change:BARE_ID:ordinalWithinChange",
+  "locatorNote": "line numbers are locators only and move when Markdown changes",
+  "scope": {
+    "changesScanned": 132,
+    "taskRows": 4867,
+    "uniqueBareIds": 4500,
+    "crimeSceneRows": 322
+  },
+  "crimeSceneCollisions": 29,
+  "crimeSceneWithinChangeDuplicates": 12,
+  "inputsDigest": "sha256:4e42d1c3dd2a848e31fac3d3ea3a581384b100790f15192c5e4f4616b5264da7",
+  "entries": [
+    {
+      "key": "crime-scene-reconstruction:SCENE-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 10
+      },
+      "bareId": "SCENE-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": true
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 11
+      },
+      "bareId": "SCENE-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 12
+      },
+      "bareId": "SCENE-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 13
+      },
+      "bareId": "SCENE-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 14
+      },
+      "bareId": "SCENE-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 15
+      },
+      "bareId": "SCENE-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 16
+      },
+      "bareId": "SCENE-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-08:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 17
+      },
+      "bareId": "SCENE-08",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-01:2",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 20
+      },
+      "bareId": "SCENE-01",
+      "ordinalWithinChange": 2,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": true
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-09:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 21
+      },
+      "bareId": "SCENE-09",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-10:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 22
+      },
+      "bareId": "SCENE-10",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-11:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 23
+      },
+      "bareId": "SCENE-11",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-12:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 24
+      },
+      "bareId": "SCENE-12",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-13:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 25
+      },
+      "bareId": "SCENE-13",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-14:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 26
+      },
+      "bareId": "SCENE-14",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-15:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 27
+      },
+      "bareId": "SCENE-15",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-DEC-A:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 34
+      },
+      "bareId": "SCENE-DEC-A",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-DEC-B:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 35
+      },
+      "bareId": "SCENE-DEC-B",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-16:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 36
+      },
+      "bareId": "SCENE-16",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-17:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 37
+      },
+      "bareId": "SCENE-17",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-18:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 38
+      },
+      "bareId": "SCENE-18",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-19:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 39
+      },
+      "bareId": "SCENE-19",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-20:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 40
+      },
+      "bareId": "SCENE-20",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-21:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 45
+      },
+      "bareId": "SCENE-21",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-22:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 46
+      },
+      "bareId": "SCENE-22",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-23:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 47
+      },
+      "bareId": "SCENE-23",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-24:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 48
+      },
+      "bareId": "SCENE-24",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-25:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 49
+      },
+      "bareId": "SCENE-25",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-26:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 50
+      },
+      "bareId": "SCENE-26",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:VR-00:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 59
+      },
+      "bareId": "VR-00",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:VR-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 60
+      },
+      "bareId": "VR-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:VR-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 65
+      },
+      "bareId": "VR-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:VR-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 66
+      },
+      "bareId": "VR-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:VR-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 67
+      },
+      "bareId": "VR-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:VR-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 68
+      },
+      "bareId": "VR-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:VR-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 70
+      },
+      "bareId": "VR-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:VR-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 71
+      },
+      "bareId": "VR-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:VR-08:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 72
+      },
+      "bareId": "VR-08",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:VR-09:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 73
+      },
+      "bareId": "VR-09",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:VR-10:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 74
+      },
+      "bareId": "VR-10",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:VR-11:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 75
+      },
+      "bareId": "VR-11",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:VR-12:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 79
+      },
+      "bareId": "VR-12",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:DEC-C:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 82
+      },
+      "bareId": "DEC-C",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:DEC-D:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 83
+      },
+      "bareId": "DEC-D",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:DEC-E:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 84
+      },
+      "bareId": "DEC-E",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:AUD-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 91
+      },
+      "bareId": "AUD-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [
+        "parent-atlas-tensor-residency-integration"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:AUD-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 92
+      },
+      "bareId": "AUD-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [
+        "parent-atlas-tensor-residency-integration"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:AUD-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 93
+      },
+      "bareId": "AUD-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [
+        "parent-atlas-tensor-residency-integration"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:AUD-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 94
+      },
+      "bareId": "AUD-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [
+        "parent-atlas-tensor-residency-integration"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:AUD-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 95
+      },
+      "bareId": "AUD-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "parent-atlas-tensor-residency-integration"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:AUD-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 96
+      },
+      "bareId": "AUD-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [
+        "parent-atlas-tensor-residency-integration"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:AUD-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 97
+      },
+      "bareId": "AUD-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MARK-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 112
+      },
+      "bareId": "MARK-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MARK-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 115
+      },
+      "bareId": "MARK-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MARK-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 116
+      },
+      "bareId": "MARK-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MARK-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 117
+      },
+      "bareId": "MARK-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MARK-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 118
+      },
+      "bareId": "MARK-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:E2E-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 122
+      },
+      "bareId": "E2E-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:E2E-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 123
+      },
+      "bareId": "E2E-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:E2E-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 124
+      },
+      "bareId": "E2E-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:E2E-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 125
+      },
+      "bareId": "E2E-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:TRANSCRIPT-UI-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 126
+      },
+      "bareId": "TRANSCRIPT-UI-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:E2E-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 127
+      },
+      "bareId": "E2E-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:E2E-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 128
+      },
+      "bareId": "E2E-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:E2E-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 129
+      },
+      "bareId": "E2E-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 341
+      },
+      "bareId": "REG-OPT-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 342
+      },
+      "bareId": "REG-OPT-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 343
+      },
+      "bareId": "REG-OPT-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": true
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 344
+      },
+      "bareId": "REG-OPT-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 345
+      },
+      "bareId": "REG-OPT-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 346
+      },
+      "bareId": "REG-OPT-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 347
+      },
+      "bareId": "REG-OPT-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-08:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 348
+      },
+      "bareId": "REG-OPT-08",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-09:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 349
+      },
+      "bareId": "REG-OPT-09",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-10:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 350
+      },
+      "bareId": "REG-OPT-10",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": true
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-10:2",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 351
+      },
+      "bareId": "REG-OPT-10",
+      "ordinalWithinChange": 2,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": true
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-11:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 352
+      },
+      "bareId": "REG-OPT-11",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-03:2",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 353
+      },
+      "bareId": "REG-OPT-03",
+      "ordinalWithinChange": 2,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": true
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-12:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 354
+      },
+      "bareId": "REG-OPT-12",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-13:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 355
+      },
+      "bareId": "REG-OPT-13",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-OPT-14:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 356
+      },
+      "bareId": "REG-OPT-14",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:DET-GUIDE-SCRUB-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 363
+      },
+      "bareId": "DET-GUIDE-SCRUB-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAP-UX-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 372
+      },
+      "bareId": "MAP-UX-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:LOC-HELPER-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 373
+      },
+      "bareId": "LOC-HELPER-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:LOC-HELPER-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 374
+      },
+      "bareId": "LOC-HELPER-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:LOC-HELPER-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 375
+      },
+      "bareId": "LOC-HELPER-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:LOC-PERSIST-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 376
+      },
+      "bareId": "LOC-PERSIST-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:LOC-UI-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 377
+      },
+      "bareId": "LOC-UI-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:LOC-INGEST-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 378
+      },
+      "bareId": "LOC-INGEST-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:LOC-MULTI-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 379
+      },
+      "bareId": "LOC-MULTI-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAP-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 380
+      },
+      "bareId": "MAP-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "courtroom-upload-story-pipeline"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAP-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 381
+      },
+      "bareId": "MAP-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "courtroom-upload-story-pipeline"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAP-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 382
+      },
+      "bareId": "MAP-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "courtroom-upload-story-pipeline"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAP-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 383
+      },
+      "bareId": "MAP-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "courtroom-upload-story-pipeline"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAP-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 384
+      },
+      "bareId": "MAP-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "courtroom-upload-story-pipeline"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-OBS-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 385
+      },
+      "bareId": "SCENE-OBS-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-OBS-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 386
+      },
+      "bareId": "SCENE-OBS-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SCENE-OBS-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 387
+      },
+      "bareId": "SCENE-OBS-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAP-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 388
+      },
+      "bareId": "MAP-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAP-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 389
+      },
+      "bareId": "MAP-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAP-08:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 390
+      },
+      "bareId": "MAP-08",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAP-09:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 391
+      },
+      "bareId": "MAP-09",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAP-10:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 392
+      },
+      "bareId": "MAP-10",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-KEY-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 394
+      },
+      "bareId": "REG-KEY-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-IDX-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 395
+      },
+      "bareId": "REG-IDX-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-LS4Z-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 396
+      },
+      "bareId": "REG-LS4Z-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-DEQ-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 397
+      },
+      "bareId": "REG-DEQ-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-PROXY-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 398
+      },
+      "bareId": "REG-PROXY-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-INST-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 399
+      },
+      "bareId": "REG-INST-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-INST-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 400
+      },
+      "bareId": "REG-INST-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:REG-INST-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 401
+      },
+      "bareId": "REG-INST-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:UX-TOOLBAR-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 402
+      },
+      "bareId": "UX-TOOLBAR-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:UX-TOOLBAR-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 403
+      },
+      "bareId": "UX-TOOLBAR-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:UX-TOOLBAR-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 404
+      },
+      "bareId": "UX-TOOLBAR-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 405
+      },
+      "bareId": "SWEEP-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 406
+      },
+      "bareId": "SWEEP-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-RESUME-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 410
+      },
+      "bareId": "SWEEP-RESUME-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-RESUME-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 411
+      },
+      "bareId": "SWEEP-RESUME-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-RESUME-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 412
+      },
+      "bareId": "SWEEP-RESUME-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-RESUME-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 413
+      },
+      "bareId": "SWEEP-RESUME-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-NEXT-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 417
+      },
+      "bareId": "SWEEP-NEXT-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": true
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-NEXT-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 418
+      },
+      "bareId": "SWEEP-NEXT-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": true
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-NEXT-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 419
+      },
+      "bareId": "SWEEP-NEXT-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-NEXT-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 420
+      },
+      "bareId": "SWEEP-NEXT-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-NEXT-01:2",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 430
+      },
+      "bareId": "SWEEP-NEXT-01",
+      "ordinalWithinChange": 2,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": true
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-NEXT-02:2",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 431
+      },
+      "bareId": "SWEEP-NEXT-02",
+      "ordinalWithinChange": 2,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": true
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-TRIAGE-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 432
+      },
+      "bareId": "SWEEP-TRIAGE-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-TRIAGE-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 437
+      },
+      "bareId": "SWEEP-TRIAGE-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-TRIAGE-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 441
+      },
+      "bareId": "SWEEP-TRIAGE-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-TRIAGE-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 445
+      },
+      "bareId": "SWEEP-TRIAGE-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-TRIAGE-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 448
+      },
+      "bareId": "SWEEP-TRIAGE-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SWEEP-TRIAGE-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 449
+      },
+      "bareId": "SWEEP-TRIAGE-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PARK-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 459
+      },
+      "bareId": "PARK-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PARK-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 460
+      },
+      "bareId": "PARK-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PARK-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 461
+      },
+      "bareId": "PARK-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PARK-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 462
+      },
+      "bareId": "PARK-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PARK-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 463
+      },
+      "bareId": "PARK-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SYN-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 471
+      },
+      "bareId": "SYN-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "parent-atlas-ml-graph-retrieval-convergence"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SYN-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 472
+      },
+      "bareId": "SYN-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "parent-atlas-ml-graph-retrieval-convergence"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SYN-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 473
+      },
+      "bareId": "SYN-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "parent-atlas-ml-graph-retrieval-convergence"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SYN-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 479
+      },
+      "bareId": "SYN-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "parent-atlas-ml-graph-retrieval-convergence"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SYN-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 480
+      },
+      "bareId": "SYN-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SYN-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 481
+      },
+      "bareId": "SYN-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SYN-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 482
+      },
+      "bareId": "SYN-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SYN-08:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 483
+      },
+      "bareId": "SYN-08",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:RLM-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 487
+      },
+      "bareId": "RLM-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "parent-atlas-transport-memory-boundaries"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:RLM-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 488
+      },
+      "bareId": "RLM-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:RLM-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 489
+      },
+      "bareId": "RLM-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:RLM-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 490
+      },
+      "bareId": "RLM-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:RLM-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 491
+      },
+      "bareId": "RLM-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:RLM-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 492
+      },
+      "bareId": "RLM-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 500
+      },
+      "bareId": "CASE-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 501
+      },
+      "bareId": "CASE-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 502
+      },
+      "bareId": "CASE-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 503
+      },
+      "bareId": "CASE-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 504
+      },
+      "bareId": "CASE-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 505
+      },
+      "bareId": "CASE-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 506
+      },
+      "bareId": "CASE-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:RND-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 516
+      },
+      "bareId": "RND-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:RND-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 517
+      },
+      "bareId": "RND-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:RND-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 518
+      },
+      "bareId": "RND-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:RND-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 519
+      },
+      "bareId": "RND-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:RND-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 520
+      },
+      "bareId": "RND-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:RND-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 521
+      },
+      "bareId": "RND-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:RND-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 522
+      },
+      "bareId": "RND-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:RND-08:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 523
+      },
+      "bareId": "RND-08",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SHOT-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 527
+      },
+      "bareId": "SHOT-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SHOT-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 528
+      },
+      "bareId": "SHOT-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SHOT-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 529
+      },
+      "bareId": "SHOT-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SHOT-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 530
+      },
+      "bareId": "SHOT-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:SHOT-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 531
+      },
+      "bareId": "SHOT-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PUP-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 535
+      },
+      "bareId": "PUP-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PUP-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 536
+      },
+      "bareId": "PUP-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PUP-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 537
+      },
+      "bareId": "PUP-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PUP-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 538
+      },
+      "bareId": "PUP-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PUP-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 539
+      },
+      "bareId": "PUP-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PUP-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 540
+      },
+      "bareId": "PUP-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:DET-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 544
+      },
+      "bareId": "DET-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "evidence-analysis-bdd-pipeline"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:DET-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 545
+      },
+      "bareId": "DET-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "evidence-analysis-bdd-pipeline"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:DET-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 546
+      },
+      "bareId": "DET-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "evidence-analysis-bdd-pipeline"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:DET-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 547
+      },
+      "bareId": "DET-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "evidence-analysis-bdd-pipeline"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:DET-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 548
+      },
+      "bareId": "DET-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "evidence-analysis-bdd-pipeline"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:POP-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 552
+      },
+      "bareId": "POP-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:POP-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 553
+      },
+      "bareId": "POP-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:POP-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 554
+      },
+      "bareId": "POP-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:POP-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 555
+      },
+      "bareId": "POP-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:POP-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 556
+      },
+      "bareId": "POP-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:POP-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 557
+      },
+      "bareId": "POP-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:POP-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 558
+      },
+      "bareId": "POP-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PRX-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 562
+      },
+      "bareId": "PRX-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PRX-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 563
+      },
+      "bareId": "PRX-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PRX-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 564
+      },
+      "bareId": "PRX-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PRX-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 565
+      },
+      "bareId": "PRX-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PRX-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 566
+      },
+      "bareId": "PRX-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAT-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 570
+      },
+      "bareId": "MAT-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAT-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 571
+      },
+      "bareId": "MAT-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAT-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 572
+      },
+      "bareId": "MAT-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAT-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 576
+      },
+      "bareId": "MAT-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MAT-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 578
+      },
+      "bareId": "MAT-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:STORYBOOK-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 582
+      },
+      "bareId": "STORYBOOK-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:STORYBOOK-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 584
+      },
+      "bareId": "STORYBOOK-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:STORYBOOK-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 588
+      },
+      "bareId": "STORYBOOK-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:STORYBOOK-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 590
+      },
+      "bareId": "STORYBOOK-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:STORYBOOK-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 595
+      },
+      "bareId": "STORYBOOK-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:STORYBOOK-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 600
+      },
+      "bareId": "STORYBOOK-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:STORYBOOK-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 602
+      },
+      "bareId": "STORYBOOK-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ACE-EXEC-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 615
+      },
+      "bareId": "ACE-EXEC-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ACE-EXEC-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 616
+      },
+      "bareId": "ACE-EXEC-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ACE-EXEC-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 617
+      },
+      "bareId": "ACE-EXEC-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ACE-EXEC-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 618
+      },
+      "bareId": "ACE-EXEC-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ACE-EXEC-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 620
+      },
+      "bareId": "ACE-EXEC-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ACE-EXEC-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 622
+      },
+      "bareId": "ACE-EXEC-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ENG-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 645
+      },
+      "bareId": "ENG-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ENG-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 657
+      },
+      "bareId": "ENG-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ENG-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 661
+      },
+      "bareId": "ENG-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ENG-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 668
+      },
+      "bareId": "ENG-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ENG-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 674
+      },
+      "bareId": "ENG-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MEM-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 688
+      },
+      "bareId": "MEM-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [
+        "parent-atlas-prefill-routing-residency-convergence",
+        "parent-atlas-transport-memory-boundaries"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MEM-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 695
+      },
+      "bareId": "MEM-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [
+        "parent-atlas-prefill-routing-residency-convergence",
+        "parent-atlas-transport-memory-boundaries"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MEM-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 701
+      },
+      "bareId": "MEM-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "parent-atlas-prefill-routing-residency-convergence",
+        "parent-atlas-transport-memory-boundaries"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MEM-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 704
+      },
+      "bareId": "MEM-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [
+        "parent-atlas-prefill-routing-residency-convergence",
+        "parent-atlas-transport-memory-boundaries"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MEM-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 708
+      },
+      "bareId": "MEM-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [
+        "parent-atlas-prefill-routing-residency-convergence",
+        "parent-atlas-transport-memory-boundaries"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MEM-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 712
+      },
+      "bareId": "MEM-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [
+        "parent-atlas-prefill-routing-residency-convergence",
+        "parent-atlas-transport-memory-boundaries"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MEM-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 716
+      },
+      "bareId": "MEM-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [
+        "parent-atlas-prefill-routing-residency-convergence"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:PREFAB-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 720
+      },
+      "bareId": "PREFAB-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:MODEL-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 725
+      },
+      "bareId": "MODEL-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [
+        "parent-atlas-prefill-routing-residency-convergence"
+      ],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:KERNEL-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 729
+      },
+      "bareId": "KERNEL-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ENG-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 733
+      },
+      "bareId": "ENG-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ENG-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 739
+      },
+      "bareId": "ENG-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ENG-08:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 743
+      },
+      "bareId": "ENG-08",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ENG-09:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 747
+      },
+      "bareId": "ENG-09",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:ENG-10:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 750
+      },
+      "bareId": "ENG-10",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 765
+      },
+      "bareId": "CASE-SCENE-E2E-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-01B:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 769
+      },
+      "bareId": "CASE-SCENE-E2E-01B",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-01C:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 770
+      },
+      "bareId": "CASE-SCENE-E2E-01C",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 772
+      },
+      "bareId": "CASE-SCENE-E2E-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02a:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 773
+      },
+      "bareId": "CASE-SCENE-E2E-02a",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 774
+      },
+      "bareId": "CASE-SCENE-E2E-02b",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 775
+      },
+      "bareId": "CASE-SCENE-E2E-02c",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-1:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 776
+      },
+      "bareId": "CASE-SCENE-E2E-02b-1",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-2:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 777
+      },
+      "bareId": "CASE-SCENE-E2E-02b-2",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-3:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 778
+      },
+      "bareId": "CASE-SCENE-E2E-02b-3",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-4:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 779
+      },
+      "bareId": "CASE-SCENE-E2E-02b-4",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-5:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 782
+      },
+      "bareId": "CASE-SCENE-E2E-02b-5",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-job-lifecycle:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 783
+      },
+      "bareId": "CASE-SCENE-E2E-02b-job-lifecycle",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-job-enqueue:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 784
+      },
+      "bareId": "CASE-SCENE-E2E-02b-job-enqueue",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-5-seaweed:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 785
+      },
+      "bareId": "CASE-SCENE-E2E-02b-5-seaweed",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-5-dispatch:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 786
+      },
+      "bareId": "CASE-SCENE-E2E-02b-5-dispatch",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-5-completion:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 787
+      },
+      "bareId": "CASE-SCENE-E2E-02b-5-completion",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-5-worker-entry:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 788
+      },
+      "bareId": "CASE-SCENE-E2E-02b-5-worker-entry",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-5-builder:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 789
+      },
+      "bareId": "CASE-SCENE-E2E-02b-5-builder",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-5-recipe-read:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 790
+      },
+      "bareId": "CASE-SCENE-E2E-02b-5-recipe-read",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-5-cancel:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 791
+      },
+      "bareId": "CASE-SCENE-E2E-02b-5-cancel",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-5-recover:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 792
+      },
+      "bareId": "CASE-SCENE-E2E-02b-5-recover",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-5-staging-proof:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 793
+      },
+      "bareId": "CASE-SCENE-E2E-02b-5-staging-proof",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-5-staging-evidence-proof:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 794
+      },
+      "bareId": "CASE-SCENE-E2E-02b-5-staging-evidence-proof",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02b-scene-time:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 795
+      },
+      "bareId": "CASE-SCENE-E2E-02b-scene-time",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-1:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 796
+      },
+      "bareId": "CASE-SCENE-E2E-02c-1",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-1-case-builder-preview:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 797
+      },
+      "bareId": "CASE-SCENE-E2E-02c-1-case-builder-preview",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-2:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 798
+      },
+      "bareId": "CASE-SCENE-E2E-02c-2",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-2-runtime-recipe-consumer:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 799
+      },
+      "bareId": "CASE-SCENE-E2E-02c-2-runtime-recipe-consumer",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-3:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 800
+      },
+      "bareId": "CASE-SCENE-E2E-02c-3",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-3-plan-actions:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 801
+      },
+      "bareId": "CASE-SCENE-E2E-02c-3-plan-actions",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-3-multitrack:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 802
+      },
+      "bareId": "CASE-SCENE-E2E-02c-3-multitrack",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-3-prop-rotation:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 803
+      },
+      "bareId": "CASE-SCENE-E2E-02c-3-prop-rotation",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-3-camera:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 804
+      },
+      "bareId": "CASE-SCENE-E2E-02c-3-camera",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-3-captions:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 805
+      },
+      "bareId": "CASE-SCENE-E2E-02c-3-captions",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-3-lane-playback:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 806
+      },
+      "bareId": "CASE-SCENE-E2E-02c-3-lane-playback",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-3-pulse-readback:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 807
+      },
+      "bareId": "CASE-SCENE-E2E-02c-3-pulse-readback",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-3-case-preview-lanes:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 808
+      },
+      "bareId": "CASE-SCENE-E2E-02c-3-case-preview-lanes",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-3-curfew-fixture:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 809
+      },
+      "bareId": "CASE-SCENE-E2E-02c-3-curfew-fixture",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": true
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-3-curfew-fixture:2",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 810
+      },
+      "bareId": "CASE-SCENE-E2E-02c-3-curfew-fixture",
+      "ordinalWithinChange": 2,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": true
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-3-cue-manifest:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 811
+      },
+      "bareId": "CASE-SCENE-E2E-02c-3-cue-manifest",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-3-dev:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 812
+      },
+      "bareId": "CASE-SCENE-E2E-02c-3-dev",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-4:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 813
+      },
+      "bareId": "CASE-SCENE-E2E-02c-4",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-4-house-preview:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 814
+      },
+      "bareId": "CASE-SCENE-E2E-02c-4-house-preview",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-5:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 815
+      },
+      "bareId": "CASE-SCENE-E2E-02c-5",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-5-edit-reopened:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 816
+      },
+      "bareId": "CASE-SCENE-E2E-02c-5-edit-reopened",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-5-reviewed-video:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 817
+      },
+      "bareId": "CASE-SCENE-E2E-02c-5-reviewed-video",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-02c-5-procedural-draft:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 818
+      },
+      "bareId": "CASE-SCENE-E2E-02c-5-procedural-draft",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 823
+      },
+      "bareId": "CASE-SCENE-E2E-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 824
+      },
+      "bareId": "CASE-SCENE-E2E-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 825
+      },
+      "bareId": "CASE-SCENE-E2E-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 826
+      },
+      "bareId": "CASE-SCENE-E2E-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06a:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 827
+      },
+      "bareId": "CASE-SCENE-E2E-06a",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06b:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 828
+      },
+      "bareId": "CASE-SCENE-E2E-06b",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06c:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 829
+      },
+      "bareId": "CASE-SCENE-E2E-06c",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06c-reviewed-mask-preview:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 830
+      },
+      "bareId": "CASE-SCENE-E2E-06c-reviewed-mask-preview",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06c-local-vertex-editor:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 831
+      },
+      "bareId": "CASE-SCENE-E2E-06c-local-vertex-editor",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06c-recipe-contract:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 832
+      },
+      "bareId": "CASE-SCENE-E2E-06c-recipe-contract",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06c-scene-edit:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 833
+      },
+      "bareId": "CASE-SCENE-E2E-06c-scene-edit",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06c-chapter-entry:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 834
+      },
+      "bareId": "CASE-SCENE-E2E-06c-chapter-entry",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06c-contour-notes:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 835
+      },
+      "bareId": "CASE-SCENE-E2E-06c-contour-notes",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06c-primitive-preview:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 836
+      },
+      "bareId": "CASE-SCENE-E2E-06c-primitive-preview",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06e-planning-contract:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 837
+      },
+      "bareId": "CASE-SCENE-E2E-06e-planning-contract",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06e-instanced-preview:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 838
+      },
+      "bareId": "CASE-SCENE-E2E-06e-instanced-preview",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06d:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 839
+      },
+      "bareId": "CASE-SCENE-E2E-06d",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-06e:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 840
+      },
+      "bareId": "CASE-SCENE-E2E-06e",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-LIVE-01:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 846
+      },
+      "bareId": "CASE-SCENE-LIVE-01",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-LIVE-01-event-targets:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 851
+      },
+      "bareId": "CASE-SCENE-LIVE-01-event-targets",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-LIVE-01-selection-inspector:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 852
+      },
+      "bareId": "CASE-SCENE-LIVE-01-selection-inspector",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-LIVE-01-overlapping-cue-conflicts:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 853
+      },
+      "bareId": "CASE-SCENE-LIVE-01-overlapping-cue-conflicts",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-LIVE-02:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 854
+      },
+      "bareId": "CASE-SCENE-LIVE-02",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-LIVE-02-preview:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 855
+      },
+      "bareId": "CASE-SCENE-LIVE-02-preview",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-LIVE-03:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 856
+      },
+      "bareId": "CASE-SCENE-LIVE-03",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-LIVE-03-video-clock:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 857
+      },
+      "bareId": "CASE-SCENE-LIVE-03-video-clock",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-LIVE-04:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 859
+      },
+      "bareId": "CASE-SCENE-LIVE-04",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-LIVE-05:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 860
+      },
+      "bareId": "CASE-SCENE-LIVE-05",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-LIVE-06:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 861
+      },
+      "bareId": "CASE-SCENE-LIVE-06",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-LIVE-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 863
+      },
+      "bareId": "CASE-SCENE-LIVE-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-LIVE-08:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 865
+      },
+      "bareId": "CASE-SCENE-LIVE-08",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-07:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 866
+      },
+      "bareId": "CASE-SCENE-E2E-07",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-08:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 867
+      },
+      "bareId": "CASE-SCENE-E2E-08",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-09:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 868
+      },
+      "bareId": "CASE-SCENE-E2E-09",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-09-report-lineage:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 869
+      },
+      "bareId": "CASE-SCENE-E2E-09-report-lineage",
+      "ordinalWithinChange": 1,
+      "checkbox": "CHECKED",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-09-report:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 870
+      },
+      "bareId": "CASE-SCENE-E2E-09-report",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-10:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 871
+      },
+      "bareId": "CASE-SCENE-E2E-10",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-10-blockout-staging:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 872
+      },
+      "bareId": "CASE-SCENE-E2E-10-blockout-staging",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-11:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 873
+      },
+      "bareId": "CASE-SCENE-E2E-11",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-11-character-v2-alignment:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 874
+      },
+      "bareId": "CASE-SCENE-E2E-11-character-v2-alignment",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-12:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 876
+      },
+      "bareId": "CASE-SCENE-E2E-12",
+      "ordinalWithinChange": 1,
+      "checkbox": "OPEN",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    },
+    {
+      "key": "crime-scene-reconstruction:CASE-SCENE-E2E-13:1",
+      "locator": {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "line": 877
+      },
+      "bareId": "CASE-SCENE-E2E-13",
+      "ordinalWithinChange": 1,
+      "checkbox": "PARTIAL",
+      "collidesWithChanges": [],
+      "withinChangeDuplicate": false
+    }
+  ]
+}

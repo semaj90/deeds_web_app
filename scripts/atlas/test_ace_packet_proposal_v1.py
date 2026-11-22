@@ -206,5 +206,157 @@ class Outcome(unittest.TestCase):
                                          status="PROMOTED", validator_verdict="ok", previous_receipt_checksum=None)
 
 
+class Refine(unittest.TestCase):
+    def setUp(self):
+        self.align = payload()["output_checksum"]
+        self.kw = dict(context_manifest_checksum=MANIFEST, allowed_evidence_refs=["E1", "E2", "E3"],
+                       allowed_packet_keys=["P1"], alignment_output_checksum=self.align)
+
+    def test_valid_first_pass(self):
+        calls = []
+        def propose(prior):
+            calls.append(prior)
+            return good_proposal(self.align)
+        out = ace.refine_proposal_v1(propose, validate_kwargs=self.kw)
+        self.assertEqual(out["status"], "VALIDATED")
+        self.assertEqual(out["attempts"], 1)
+        self.assertEqual(calls, [None])
+        self.assertEqual([r["status"] for r in out["receipts"]], ["SUCCEEDED"])
+        self.assertTrue(out["chainOk"])
+
+    def test_second_pass_receives_only_validator_error(self):
+        bad = good_proposal(self.align)
+        bad["evidenceRefs"] = ["E1", "E999"]
+        seq = [bad, good_proposal(self.align)]
+        seen = []
+        def propose(prior):
+            seen.append(prior)
+            return seq.pop(0)
+        out = ace.refine_proposal_v1(propose, validate_kwargs=self.kw)
+        self.assertEqual(out["status"], "VALIDATED")
+        self.assertEqual(out["attempts"], 2)
+        self.assertIsNone(seen[0])
+        self.assertIn("UNAUTHORIZED_EVIDENCE_REF", seen[1])
+        self.assertEqual([r["status"] for r in out["receipts"]], ["REJECTED", "SUCCEEDED"])
+        self.assertTrue(out["chainOk"])
+        self.assertEqual(out["receipts"][1]["previousReceiptChecksum"], out["receipts"][0]["receiptChecksum"])
+
+    def test_exhausts_after_max_passes(self):
+        n = []
+        def propose(prior):
+            n.append(prior)
+            p = good_proposal(self.align)
+            p["packetKey"] = "P9"
+            return p
+        out = ace.refine_proposal_v1(propose, validate_kwargs=self.kw, max_passes=2)
+        self.assertEqual(out["status"], "EXHAUSTED")
+        self.assertEqual(len(n), 2)  # hard stop, no third call
+        self.assertIsNone(out["validated"])
+        self.assertTrue(all(r["status"] == "REJECTED" for r in out["receipts"]))
+        self.assertTrue(out["chainOk"])
+
+    def test_pass_ceiling_enforced(self):
+        with self.assertRaises(ValueError):
+            ace.refine_proposal_v1(lambda p: good_proposal(self.align), validate_kwargs=self.kw, max_passes=3)
+        with self.assertRaises(ValueError):
+            ace.refine_proposal_v1(lambda p: good_proposal(self.align), validate_kwargs=self.kw, max_passes=0)
+
+    def test_receipts_never_write_or_claim_authority(self):
+        out = ace.refine_proposal_v1(lambda p: good_proposal(self.align), validate_kwargs=self.kw)
+        for r in out["receipts"]:
+            self.assertIs(r["writesPerformed"], False)
+            self.assertIs(r["canonicalAuthority"], False)
+            self.assertIsNone(r["promptPlanChecksum"])
+
+    def test_deterministic_replay(self):
+        def run():
+            seq = [dict(good_proposal(self.align), evidenceRefs=["E9"]), good_proposal(self.align)]
+            return ace.refine_proposal_v1(lambda p: seq.pop(0), validate_kwargs=self.kw)
+        a, b = run(), run()
+        self.assertEqual([r["receiptChecksum"] for r in a["receipts"]], [r["receiptChecksum"] for r in b["receipts"]])
+
+    def test_dspy_predictor_adapter_feeds_back_only_error(self):
+        from types import SimpleNamespace
+        header = dict(workspace_revision="ws:r1", source_revision="src:r1", context_manifest_checksum=MANIFEST,
+                      alignment_output_checksum=self.align, model_revision="ornith-1.5-9b", policy_revision="policy:r1")
+        calls = []
+        def predict(**kw):
+            calls.append(kw)
+            refs = ["E9"] if len(calls) == 1 else ["E1"]  # first draft cites an unlisted id
+            return SimpleNamespace(task_kind="diagnose", instruction="Diagnose the supplied failure.", evidence_refs=refs)
+        propose = ace.make_proposer_v1(predict, packet_key="P1", evidence_summary="summary",
+                                       allowed_evidence_refs=["E1", "E2", "E3"], header=header)
+        out = ace.refine_proposal_v1(propose, validate_kwargs=self.kw)
+        self.assertEqual(out["status"], "VALIDATED")
+        self.assertEqual(out["attempts"], 2)
+        self.assertNotIn("VALIDATOR_FEEDBACK", calls[0]["evidence_summary"])
+        self.assertIn("VALIDATOR_FEEDBACK: ", calls[1]["evidence_summary"])
+        self.assertIn("UNAUTHORIZED_EVIDENCE_REF", calls[1]["evidence_summary"])
+        self.assertEqual(calls[1]["allowed_evidence_refs"], ["E1", "E2", "E3"])
+
+    def _topk(self, rows):
+        return {"schema": "atlas.topk.v1", "order": "SCORE_DESC_ORDINAL_ASC_ID_ASC", "candidates": rows}
+
+    def _row(self, cid, ordinal, score, refs):
+        return {"canonicalId": cid, "candidateOrdinal": ordinal, "score": score, "sourceRevision": "src:r1",
+                "evidenceRefs": refs}
+
+    def _header(self):
+        return dict(workspace_revision="ws:r1", source_revision="src:r1", context_manifest_checksum=MANIFEST,
+                    alignment_output_checksum=self.align, model_revision="ornith-1.5-9b", policy_revision="policy:r1")
+
+    def test_recommend_refine_end_to_end_cpu(self):
+        from types import SimpleNamespace
+        ranked = self._topk([self._row("c1", 0, 0.9, ["E1"]), self._row("c2", 1, 0.5, ["E2"]),
+                             self._row("c3", 2, 0.1, ["E3"])])
+        calls = []
+        def predict(**kw):
+            calls.append(kw)
+            refs = ["E9"] if len(calls) == 1 else ["E1", "E2"]
+            return SimpleNamespace(task_kind="repair_plan", instruction="Plan the repair for the top candidates.",
+                                   evidence_refs=refs)
+        out = ace.recommend_refine_v1(ranked, k=2, packet_key="P1", predict=predict, header=self._header())
+        self.assertEqual(out["status"], "VALIDATED")
+        self.assertEqual(out["topKCanonicalIds"], ["c1", "c2"])        # c3 excluded by k
+        self.assertEqual(out["allowedEvidenceRefs"], ["E1", "E2"])     # allowlist = top-k refs only
+        self.assertNotIn("c3", calls[0]["evidence_summary"])
+        self.assertIn("UNAUTHORIZED_EVIDENCE_REF", calls[1]["evidence_summary"])
+        self.assertTrue(out["chainOk"])
+
+    def test_top_k_refs_only_bound_allowlist(self):
+        from types import SimpleNamespace
+        ranked = self._topk([self._row("c1", 0, 0.9, ["E1"]), self._row("c2", 1, 0.5, ["E3"])])
+        out = ace.recommend_refine_v1(ranked, k=1, packet_key="P1",
+                                      predict=lambda **kw: SimpleNamespace(task_kind="diagnose", instruction="x",
+                                                                            evidence_refs=["E3"]),
+                                      header=self._header(), max_passes=1)
+        self.assertEqual(out["status"], "EXHAUSTED")  # E3 belongs to c2, outside top-1
+
+    def test_rejects_non_canonical_order_and_bad_input(self):
+        bad_order = self._topk([self._row("c1", 0, 0.1, ["E1"]), self._row("c2", 1, 0.9, ["E2"])])
+        with self.assertRaises(ValueError):
+            ace.recommendation_context_v1(bad_order, k=2)
+        with self.assertRaises(ValueError):
+            ace.recommendation_context_v1({"schema": "other"}, k=1)
+        with self.assertRaises(ValueError):
+            ace.recommendation_context_v1(self._topk([self._row("c1", 0, float("nan"), ["E1"])]), k=1)
+        with self.assertRaises(ValueError):
+            ace.recommendation_context_v1(self._topk([self._row("c1", 0, 0.5, [])]), k=1)
+        with self.assertRaises(ValueError):
+            ace.recommendation_context_v1(self._topk([self._row("c1", 0, 0.5, ["E1"])]), k=0)
+
+    def test_proposer_rejects_incomplete_header(self):
+        with self.assertRaises(ValueError):
+            ace.make_proposer_v1(lambda **kw: None, packet_key="P1", evidence_summary="s",
+                                 allowed_evidence_refs=["E1"], header={"workspace_revision": "ws:r1"})
+
+    def test_missing_model_revision_is_marked_not_defaulted(self):
+        bad = good_proposal(self.align)
+        del bad["modelRevision"]
+        seq = [bad, good_proposal(self.align)]
+        out = ace.refine_proposal_v1(lambda p: seq.pop(0), validate_kwargs=self.kw)
+        self.assertEqual(out["receipts"][0]["modelRevision"], "unrecorded:proposal-missing-modelRevision")
+
+
 if __name__ == "__main__":
     unittest.main()
