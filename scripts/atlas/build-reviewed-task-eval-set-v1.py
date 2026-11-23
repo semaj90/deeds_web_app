@@ -4,13 +4,14 @@ Read-only / non-canonical (`canonicalAuthority=False`, `writesPerformed=False`):
   - Selects >= 30 distinct task groups (24 train + 12 held-out, disjoint by `change`
     and `sourceRef` so there is zero task/source leakage).
   - Pairs each task with top-3 candidate chunks from `doc14-admitted-chunks.jsonl`.
-  - Marks all rows `reviewStatus="PENDING_HUMAN_REVIEW"` (`reviewedLabel=None`).
+  - Marks all rows `reviewStatus="PENDING_HUMAN_REVIEW"` with unfilled candidate labels.
   - `evaluate_reviewed_holdout_v1` fails closed (`UNREVIEWED_EVAL_SET`) until rows
-    are human-reviewed, computing Recall@K, MRR, NDCG@5, and Citation Pass Rate.
+    are human-reviewed, computing pooled Recall@K, MRR@K, NDCG@K, and Citation Pass Rate.
 """
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import math
@@ -113,6 +114,8 @@ def build_leakage_free_eval_template_v1(
 
 
 def evaluate_reviewed_holdout_v1(records: Sequence[Mapping[str, Any]], *, k: int = 3) -> dict[str, Any]:
+    if type(k) is not int or k < 1:
+        raise ValueError("INVALID_EVALUATION_CUTOFF")
     held_out = [r for r in records if r.get("split") == "held_out"]
     if not held_out:
         return {"status": "EMPTY_HELD_OUT", "passed": False, "canonicalAuthority": False}
@@ -126,6 +129,11 @@ def evaluate_reviewed_holdout_v1(records: Sequence[Mapping[str, Any]], *, k: int
             "canonicalAuthority": False,
         }
 
+    train = [r for r in records if r.get("split") == "train"]
+    for key in ("taskGroupId", "sourceRef"):
+        if {r.get(key) for r in train} & {r.get(key) for r in held_out}:
+            return {"status": "HOLDOUT_GROUP_OR_TASK_SOURCE_LEAKAGE", "passed": False, "canonicalAuthority": False}
+
     recalls: list[float] = []
     mrrs: list[float] = []
     ndcgs: list[float] = []
@@ -133,44 +141,68 @@ def evaluate_reviewed_holdout_v1(records: Sequence[Mapping[str, Any]], *, k: int
     citation_total = 0
 
     for row in held_out:
-        cands = list(row.get("candidates") or [])[:k]
-        rels = [float(c.get("relevanceLabel") or 0.0) for c in cands]
-        has_rel = any(r > 0 for r in rels)
-        recalls.append(1.0 if has_rel else 0.0)
+        candidates = list(row.get("candidates") or [])
+        grades = [c.get("relevanceLabel") for c in candidates]
+        ids = [c.get("chunkId") for c in candidates]
+        if (
+            not grades or any(type(g) not in (int, float) or g not in (0, 1, 2, 3) for g in grades)
+            or any(not isinstance(cid, str) or not cid for cid in ids) or len(set(ids)) != len(ids)
+            or any(type(c.get("citationVerified")) is not bool for c in candidates)
+        ):
+            return {"status": "INVALID_OR_INCOMPLETE_GOLD_LABELS", "passed": False, "canonicalAuthority": False}
+        cands = candidates[:k]
+        rels = grades[:k]
+        relevant_total = sum(g > 0 for g in grades)
+        if relevant_total:
+            recalls.append(sum(g > 0 for g in rels) / relevant_total)
 
         rr = 0.0
         for idx, r in enumerate(rels, start=1):
             if r > 0:
                 rr = 1.0 / idx
                 break
-        mrrs.append(rr)
+        if relevant_total:
+            mrrs.append(rr)
 
-        dcg = sum(r / math.log2(idx + 1) for idx, r in enumerate(rels, start=1))
-        ideal_rels = sorted(rels, reverse=True)
-        idcg = sum(r / math.log2(idx + 1) for idx, r in enumerate(ideal_rels, start=1))
-        ndcgs.append(dcg / idcg if idcg > 0 else 0.0)
+        dcg = sum((2**r - 1) / math.log2(idx + 1) for idx, r in enumerate(rels, start=1))
+        ideal_rels = sorted(grades, reverse=True)[:k]
+        idcg = sum((2**r - 1) / math.log2(idx + 1) for idx, r in enumerate(ideal_rels, start=1))
+        if relevant_total:
+            ndcgs.append(dcg / idcg)
 
         for c in cands:
-            if c.get("citationVerified") is not None:
-                citation_total += 1
-                if c.get("citationVerified") is True:
-                    citations_ok += 1
+            citation_total += 1
+            citations_ok += int(c["citationVerified"])
 
     return {
         "schema": "atlas.reviewed-holdout-eval.v1",
         "status": "EVALUATED",
         "heldOutCount": len(held_out),
-        "recallAtK": round(sum(recalls) / len(recalls), 6),
-        "mrr": round(sum(mrrs) / len(mrrs), 6),
-        "ndcgAtK": round(sum(ndcgs) / len(ndcgs), 6),
+        "heldOutWithRelevantCandidates": len(recalls),
+        "k": k,
+        "datasetChecksum": "sha256:" + hashlib.sha256(
+            "\n".join(json.dumps(r, sort_keys=True) for r in records).encode("utf-8")
+        ).hexdigest(),
+        "recallAtK": round(sum(recalls) / len(recalls), 6) if recalls else None,
+        "mrr": round(sum(mrrs) / len(mrrs), 6) if mrrs else None,
+        "ndcgAtK": round(sum(ndcgs) / len(ndcgs), 6) if ndcgs else None,
         "citationPassRate": round(citations_ok / citation_total, 6) if citation_total else None,
-        "passed": len(held_out) >= 10,
+        "passed": len(recalls) >= 10,
         "canonicalAuthority": False,
         "writesPerformed": False,
     }
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--evaluate", type=Path, help="Score existing reviewed JSONL without writing files")
+    parser.add_argument("--k", type=int, default=3)
+    args = parser.parse_args()
+    if args.evaluate:
+        records = [json.loads(line) for line in args.evaluate.read_text(encoding="utf-8").splitlines() if line.strip()]
+        result = evaluate_reviewed_holdout_v1(records, k=args.k)
+        print(json.dumps(result, indent=2))
+        return 0 if result["passed"] else 2
     tasks = [json.loads(l) for l in TASKS_NDJSON.read_text(encoding="utf-8").splitlines() if l.strip()]
     chunks = [json.loads(l) for l in CHUNKS_JSONL.read_text(encoding="utf-8").splitlines() if l.strip()]
     records, receipt = build_leakage_free_eval_template_v1(tasks, chunks, target_groups=36)

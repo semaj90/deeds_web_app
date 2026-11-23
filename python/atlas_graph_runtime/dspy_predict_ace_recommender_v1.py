@@ -83,6 +83,7 @@ def build_native_dspy_lm_v1(
         api_base=f"{configured_base}/v1",
         api_key=os.environ.get("DSPY_LM_API_KEY") or "local-llama",
         engine="lm15",
+        cache=False,
         max_tokens=1024,
         temperature=0.0,
     )

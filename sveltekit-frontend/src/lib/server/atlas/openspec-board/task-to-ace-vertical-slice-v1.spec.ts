@@ -3,7 +3,8 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import pg from 'pg';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import * as taskReceiptView from './task-receipt-view-v1.js';
 import {
   matchesCurrentTaskSourceIndexRowV1,
   resolveCurrentGraphRevisionForWorkspaceV1,
@@ -12,7 +13,7 @@ import {
 
 describe('matchesCurrentTaskSourceIndexRowV1', () => {
   const expected = {
-    sourceRef: 'openspec/changes/sample/tasks.md',
+    sourceRef: 'openspec/changes/sample/tasks.md#L12',
     changeId: 'sample',
     sourceLine: 12,
     taskRevision: `sha256:${'f'.repeat(64)}`,
@@ -30,6 +31,58 @@ describe('matchesCurrentTaskSourceIndexRowV1', () => {
     expect(matchesCurrentTaskSourceIndexRowV1(null, expected)).toBe(false);
     expect(matchesCurrentTaskSourceIndexRowV1({ ...row, task_hash: `sha256:${'0'.repeat(64)}` }, expected)).toBe(false);
     expect(matchesCurrentTaskSourceIndexRowV1({ ...row, identity_status: 'AMBIGUOUS' }, expected)).toBe(false);
+  });
+
+  it('carries the anchored task reference from the workboard through index readback', async () => {
+    const view = vi.spyOn(taskReceiptView, 'readOpenSpecTaskReceiptView');
+    const taskKey = 'sample:DOC-14';
+    view.mockResolvedValue({
+      status: 'FOUND',
+      task: { key: taskKey, text: 'Review documentation', sourceRef: expected.sourceRef, revision: expected.taskRevision, checkboxState: 'Open' },
+      identity: {
+        workboardTaskId: taskKey,
+        logicalTaskKey: taskKey,
+        stableKey: taskKey,
+        sourceRef: 'openspec/changes/sample/tasks.md',
+        sourceFileSha256: expected.taskRevision,
+        workboardSnapshotSha256: expected.taskRevision,
+      },
+      current: null,
+      staleCount: 0,
+    });
+
+    const query = vi.fn()
+      .mockResolvedValueOnce({ rows: [row] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [{ ...row, source_ref: 'openspec/changes/sample/tasks.md#L13' }] });
+    const pool = { query };
+    try {
+      const result = await runTaskToAceVerticalSliceV1({ taskKey, pool });
+      expect(query).toHaveBeenNthCalledWith(1, expect.any(String), [expected.sourceRef]);
+      expect(result.status).toBe('BLOCKED_NO_ADMITTED_SOURCE_CHUNKS');
+
+      const substituted = await runTaskToAceVerticalSliceV1({ taskKey, pool });
+      expect(substituted.status).toBe('BLOCKED_TASK_SOURCE_INDEX_MISMATCH');
+      expect(substituted.contextManifest).toBeNull();
+      expect(query).toHaveBeenCalledTimes(3);
+
+      const targetSourceRef = 'src/lib/server/atlas/openspec-board/task-to-ace-vertical-slice-v1.ts';
+      const sourceBytes = await fs.readFile(path.resolve(targetSourceRef));
+      query.mockResolvedValueOnce({ rows: [row] })
+        .mockResolvedValueOnce({ rows: [{
+          source_ref: targetSourceRef,
+          source_revision: `sha256:${createHash('sha256').update(sourceBytes).digest('hex')}`,
+          workspace_revision: expected.taskRevision,
+        }] })
+        .mockRejectedValueOnce(new Error('simulated graph query failure'));
+      const unavailable = await runTaskToAceVerticalSliceV1({ taskKey, pool, targetSourceRef, repoRoot: process.cwd() });
+      expect(unavailable.status).toBe('BLOCKED_GRAPH_SNAPSHOT_READBACK_FAILED');
+      expect(unavailable.blocker).toBe('GRAPH_SNAPSHOT_QUERY_FAILED');
+      expect(unavailable.contextManifest).toBeNull();
+      expect(query).toHaveBeenCalledTimes(6);
+    } finally {
+      view.mockRestore();
+    }
   });
 });
 
@@ -80,8 +133,8 @@ describe('Task-to-ACE Vertical Slice (P0 Canonical Readback + P1 Error-Agent Rec
     await pool.end().catch(() => {});
   });
 
-  it('fails closed without fabricating rows when a task ledger has zero PROVEN chunks in codebase_chunk_index', async () => {
-    if (!dbReachable) return;
+  it('fails closed without fabricating rows when a task ledger has zero PROVEN chunks in codebase_chunk_index', async (ctx) => {
+    if (!dbReachable) return ctx.skip();
     const res = await runTaskToAceVerticalSliceV1({
       taskKey: 'parent-atlas-candidate-feature-execution-fabric:QUEUE-01A',
       targetSourceRef: 'nonexistent/unindexed-ledger-file.md',
@@ -89,6 +142,7 @@ describe('Task-to-ACE Vertical Slice (P0 Canonical Readback + P1 Error-Agent Rec
       repoRoot,
       pool,
     });
+    console.info('Live missing-source probe:', res.status);
     if (res.status === 'BLOCKED_TASK_SOURCE_INDEX_MISMATCH') {
       expect(res.contextManifest).toBeNull();
       expect(res.canonicalAuthority).toBe(false);
@@ -102,8 +156,8 @@ describe('Task-to-ACE Vertical Slice (P0 Canonical Readback + P1 Error-Agent Rec
     expect(res.writesPerformed).toBe(false);
   });
 
-  it('uses a real graph snapshot and otherwise blocks the live task-to-ACE slice', async () => {
-    if (!dbReachable) return;
+  it('uses a real graph snapshot and otherwise blocks the live task-to-ACE slice', async (ctx) => {
+    if (!dbReachable) return ctx.skip();
     const result = await runTaskToAceVerticalSliceV1({
       taskKey: 'parent-atlas-ml-graph-retrieval-convergence:ML-CPU-01',
       targetSourceRef: 'scripts/atlas/train-policy-reranker.py',
@@ -112,6 +166,18 @@ describe('Task-to-ACE Vertical Slice (P0 Canonical Readback + P1 Error-Agent Rec
       repoRoot,
       pool,
     });
+    console.info('Live graph-dependent probe:', result.status);
+
+    if (result.status === 'BLOCKED_NO_CURRENT_GRAPH_SNAPSHOT') {
+      const workspaceRevision = result.provenChunks[0]!.workspaceRevision;
+      const { rows } = await pool.query(
+        `SELECT status, count(*)::int AS total,
+                (count(*) FILTER (WHERE workspace_revision = $1))::int AS workspace_matches
+           FROM public.atlas_graph_snapshots_v2 GROUP BY status ORDER BY status`,
+        [workspaceRevision],
+      );
+      console.info('Live graph snapshot inventory:', JSON.stringify({ workspaceRevision, statuses: rows }));
+    }
 
     if (result.status === 'BLOCKED_TASK_SOURCE_INDEX_MISMATCH'
       || result.status === 'BLOCKED_NO_CURRENT_GRAPH_SNAPSHOT'

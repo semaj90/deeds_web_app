@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.doc14-pgvector-relation-ace-proof.v1",
+  "status": "PROPOSAL_SPAN_NOT_CITED",
+  "draft": {
+    "sourceRef": "docs/reports/doc14-pgvector-relation-review-v1.json",
+    "sha256": "sha256:79417c8b9c559b6ab381bd5c8ab0ce4cff54df51d6f5844508d356a6d4df08e7"
+  },
+  "sourceRevision": "sha256:f9a6c0eb36814b0887965c042918c85bcc433ce4fbc1cc15182ab7e6b1ee38b6",
+  "chunkId": "doc:pgvector:fe883c75f323441d:24",
+  "chunkEvidenceRevision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+  "verifiedSpan": {
+    "startByte": 13122,
+    "endByte": 13173,
+    "sha256": "f274eba5716af270d78563675f31ed3959876c0cdb0bd20973e1380102914640"
+  },
+  "staleRevisionProbe": "CANONICAL_PAGE_OR_CHUNK_REVISION_CHANGED",
+  "recommendation": {
+    "status": "BLOCKED",
+    "reason": "DOC14_DSPY_RUNTIME_AdapterParseError",
+    "recommendation": null
+  },
+  "admittedGraphEdgeUsed": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

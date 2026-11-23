@@ -14,10 +14,17 @@ import path from 'node:path';
 import { REPO_ROOT } from './connection-config.mjs';
 import { deriveGraphNodeKeyV1 } from '../../packages/parent-atlas/dist/index.js';
 import { astScanCompleteness } from './lib/source-observation-http-v1.mjs';
+import { compareCurrentSourceBytesV1 } from './lib/graphify-source-binding-comparison-v1.mjs';
 
 const root = REPO_ROOT;
 const sourcePlanPath = path.resolve(process.env.ATLAS_SOURCE_GRAPHIFY_PLAN ?? path.join(root, 'docs/reports/current-source-graphify-batch-plan-v1.json'));
-const reportPath = path.join(root, 'docs/reports/current-structural-edge-artifact-plan-v2.json');
+const customReportPath = process.env.ATLAS_STRUCTURAL_EDGE_REPORT;
+const reportPath = path.resolve(root, customReportPath ?? 'docs/reports/current-structural-edge-artifact-plan-v2.json');
+const scratchRelativePath = path.relative(path.join(root, '.tmp', 'atlas'), reportPath);
+if (customReportPath && (!scratchRelativePath || path.isAbsolute(scratchRelativePath)
+    || scratchRelativePath.split(path.sep)[0] === '..')) {
+  throw new Error('CUSTOM_REPORT_MUST_BE_UNDER_REPO_TMP_ATLAS');
+}
 const sidecarUrl = process.env.ATLAS_NLP_SIDECAR_URL ?? 'http://127.0.0.1:8095';
 const sha256 = (value) => crypto.createHash('sha256').update(value, 'utf8').digest('hex');
 const PRODUCER_REVISION = 'atlas.structural-edge-planner.v2';
@@ -31,6 +38,7 @@ function deriveEdgeIdentity({ sourceNodeKey, targetNodeKey, edgeType, sourceRef,
 function languageFor(sourceRef) {
   if (/\.(tsx?|mts|cts)$/.test(sourceRef)) return 'typescript';
   if (/\.(jsx?|mjs|cjs)$/.test(sourceRef)) return 'javascript';
+  if (/\.py$/.test(sourceRef)) return 'python';
   if (/\.rs$/.test(sourceRef)) return 'rust';
   return null;
 }
@@ -67,13 +75,23 @@ async function main() {
       unsupportedSourceRefs.push({ sourceRef: source.sourceRef, reason: 'STRUCTURAL_LANGUAGE_ADAPTER_NOT_CONFIGURED' });
       continue;
     }
-    const sourcePath = path.join(root, source.sourceRef.replaceAll('/', path.sep));
-    if (!fs.existsSync(sourcePath)) {
-      errors.push({ sourceRef: source.sourceRef, error: 'SOURCE_FILE_NOT_FOUND' });
+    let sourceText;
+    try {
+      const sourcePath = fs.realpathSync(path.resolve(root, source.sourceRef));
+      if (path.relative(root, sourcePath).split(path.sep).join('/') !== source.sourceRef) {
+        throw new Error('SOURCE_PATH_MISMATCH');
+      }
+      const bytes = fs.readFileSync(sourcePath);
+      if (source.workspaceRevision !== sourcePlan.workspaceRevision
+          || !compareCurrentSourceBytesV1(source, bytes).exact) {
+        throw new Error('SOURCE_REVISION_MISMATCH');
+      }
+      sourceText = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes);
+    } catch (error) {
+      errors.push({ sourceRef: source.sourceRef, error: error.message });
       continue;
     }
     sourceCount += 1;
-    const sourceText = fs.readFileSync(sourcePath, 'utf8');
     let response;
     try {
       response = await fetch(`${sidecarUrl}/ast/chunk`, {

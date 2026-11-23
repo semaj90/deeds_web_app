@@ -1,0 +1,102 @@
+{
+  "schema": "atlas.doc14-golden-label-review-draft.v1",
+  "reviewStatus": "PENDING_HUMAN_REVIEW",
+  "inputChecksums": {
+    "reviewed-task-eval-set-v1.jsonl": "sha256:2a2073232d95f283a9024b94b7db6cdbe387c233e21b88572cd6cb31c482c849",
+    "doc14-admitted-chunks.jsonl": "sha256:362445a16ecf441d48a63b275219332a10349af8ff22ffb01b919ff90deac346"
+  },
+  "existingCohort": {
+    "taskGroups": 36,
+    "reviewedGroups": 0,
+    "candidateOccurrences": {
+      "SOURCE_REVISION_STALE": 51,
+      "CHUNK_SPAN_NOT_UNIQUE_OR_MISSING": 14,
+      "VERIFIED_LOCAL_BYTES": 43
+    }
+  },
+  "gradeRubric": {
+    "0": "No support for this question",
+    "1": "Related background only",
+    "2": "Partial answer",
+    "3": "Direct answer with exact source evidence"
+  },
+  "queries": [
+    {
+      "queryId": "doc14-draft-001",
+      "query": "Which PostgreSQL table does the concept evidence spine audit inspect?",
+      "labels": [
+        {
+          "chunkId": "fullrepo:scripts/atlas/audit-concept-evidence-spine.mjs:0",
+          "sourceRef": "scripts/atlas/audit-concept-evidence-spine.mjs",
+          "sourceRevision": "sha256:a631f8165459dd3b0f5f1d05f2652a6873689fc26b92d234b4f9fca33db017c1",
+          "chunkSha256": "166edef4d845e86872f64fe178f5e315efb377ac5a2e0819d151e9dff0d4bad7",
+          "sourceSpan": {
+            "startByte": 143,
+            "endByte": 184,
+            "quote": "Read-only audit of concept_records table.",
+            "sha256": "sha256:8b27170d5dbd4ce07784088b4f6508d6e7a8177fedf0e6deab6dc9a38ec0d1c4"
+          },
+          "proposedGrade": 3,
+          "reason": "Names the table explicitly.",
+          "reviewedGrade": null,
+          "reviewerRef": null
+        },
+        {
+          "chunkId": "fullrepo:scripts/atlas/audit-concept-evidence-spine.mjs:1",
+          "sourceRef": "scripts/atlas/audit-concept-evidence-spine.mjs",
+          "sourceRevision": "sha256:a631f8165459dd3b0f5f1d05f2652a6873689fc26b92d234b4f9fca33db017c1",
+          "chunkSha256": "fe24ae2bce8fb127e1c688351aac6c67b13e6055eb70cbbbd1d25de6826a8597",
+          "sourceSpan": {
+            "startByte": 903,
+            "endByte": 925,
+            "quote": "async function getDb()",
+            "sha256": "sha256:11d9675880d5ec40b329b62c919ed87995df05631c8eee77b93b6e45de239d8d"
+          },
+          "proposedGrade": 0,
+          "reason": "Same script but this excerpt only describes connection setup.",
+          "reviewedGrade": null,
+          "reviewerRef": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-draft-002",
+      "query": "Should an existing BitFrost cache hit boost semantic admission in the registry context adapter?",
+      "labels": [
+        {
+          "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:34",
+          "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+          "sourceRevision": "sha256:bc71868584a6f32c43f331ac11179670bde75ccd76025809dd99fd59f61d5eb7",
+          "chunkSha256": "4a55f12e81d154528ba5ecb088e80142c97ed66f4d801ff48feb0f215bea7367",
+          "sourceSpan": {
+            "startByte": 24262,
+            "endByte": 24341,
+            "quote": "must not boost semantic admission simply because Bitfrost already had the item.",
+            "sha256": "sha256:6fd76926d8af48cc0b5267da030ddcac4bf77031fe9582515bf6aff3a176b5ee"
+          },
+          "proposedGrade": 3,
+          "reason": "Directly states the cache admission rule.",
+          "reviewedGrade": null,
+          "reviewerRef": null
+        },
+        {
+          "chunkId": "fullrepo:scripts/atlas/audit-concept-evidence-spine.mjs:0",
+          "sourceRef": "scripts/atlas/audit-concept-evidence-spine.mjs",
+          "sourceRevision": "sha256:a631f8165459dd3b0f5f1d05f2652a6873689fc26b92d234b4f9fca33db017c1",
+          "chunkSha256": "166edef4d845e86872f64fe178f5e315efb377ac5a2e0819d151e9dff0d4bad7",
+          "sourceSpan": {
+            "startByte": 143,
+            "endByte": 184,
+            "quote": "Read-only audit of concept_records table.",
+            "sha256": "sha256:8b27170d5dbd4ce07784088b4f6508d6e7a8177fedf0e6deab6dc9a38ec0d1c4"
+          },
+          "proposedGrade": 0,
+          "reason": "Discusses a different audit and does not address cache admission.",
+          "reviewedGrade": null,
+          "reviewerRef": null
+        }
+      ]
+    }
+  ],
+  "canonicalAuthority": false
+}

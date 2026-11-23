@@ -1,0 +1,18 @@
+format-version: 1.2
+ontology: atlas-doc14-software-fixture
+remark: Synthetic test vocabulary for DOC-14. Keep these identifiers out of production admission.
+
+[Typedef]
+id: requires_version
+name: requires version
+
+[Term]
+id: ATLASFIX:0001
+name: Foo
+def: "A fictional API used to test the DOC-14 review path." []
+relationship: requires_version ATLASFIX:0002
+
+[Term]
+id: ATLASFIX:0002
+name: CUDA 13.2
+def: "A version label used by the synthetic API example." []

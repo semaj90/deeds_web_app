@@ -1,0 +1,529 @@
+format-version: 1.2
+ontology: atlas-domain-and-language-terms-v1
+remark: Self-contained OBO vocabulary combining 17 domain_taxonomy_v1 terms, .okf/languages/*.yaml profiles, and CUDA/PTX/RTX concepts.
+
+[Typedef]
+id: associated_language
+name: associated language
+
+[Typedef]
+id: targets_platform
+name: targets platform
+
+[Typedef]
+id: compiles_to
+name: compiles to
+
+[Term]
+id: ATLASHW:rtx_gpu
+name: NVIDIA RTX GPU
+
+[Term]
+id: ATLASPLAT:cuda
+name: NVIDIA CUDA Platform
+
+[Term]
+id: ATLASISA:ptx
+name: PTX Virtual ISA
+relationship: targets_platform ATLASPLAT:cuda
+
+[Term]
+id: ATLASLANG:cuda_cpp
+name: CUDA C++
+is_a: ATLASLANG:cpp
+relationship: targets_platform ATLASPLAT:cuda
+relationship: compiles_to ATLASISA:ptx
+
+[Term]
+id: ATLASDOM:api
+name: api
+
+[Term]
+id: ATLASDOM:auth
+name: auth
+
+[Term]
+id: ATLASDOM:cache
+name: cache
+
+[Term]
+id: ATLASDOM:compiler
+name: compiler
+
+[Term]
+id: ATLASDOM:database
+name: database
+
+[Term]
+id: ATLASDOM:database.postgresql
+name: database.postgresql
+is_a: ATLASDOM:database
+
+[Term]
+id: ATLASDOM:devops
+name: devops
+
+[Term]
+id: ATLASDOM:devops.env-config
+name: devops.env-config
+is_a: ATLASDOM:devops
+
+[Term]
+id: ATLASDOM:devops.process-mgmt
+name: devops.process-mgmt
+is_a: ATLASDOM:devops
+
+[Term]
+id: ATLASDOM:error-handling
+name: error-handling
+
+[Term]
+id: ATLASDOM:frontend
+name: frontend
+
+[Term]
+id: ATLASDOM:frontend.sveltekit
+name: frontend.sveltekit
+is_a: ATLASDOM:frontend
+
+[Term]
+id: ATLASDOM:gpu
+name: gpu
+
+[Term]
+id: ATLASDOM:graph
+name: graph
+
+[Term]
+id: ATLASDOM:machine-learning
+name: machine-learning
+
+[Term]
+id: ATLASDOM:retrieval
+name: retrieval
+
+[Term]
+id: ATLASDOM:test
+name: test
+
+[Term]
+id: ATLASLANG:bash
+name: Bash / POSIX shell
+
+[Term]
+id: ATLASEXT:sh
+name: .sh
+relationship: associated_language ATLASLANG:bash
+
+[Term]
+id: ATLASEXT:bash
+name: .bash
+relationship: associated_language ATLASLANG:bash
+
+[Term]
+id: ATLASLANG:binary
+name: Binary / compiled artifacts
+
+[Term]
+id: ATLASEXT:exe
+name: .exe
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:dll
+name: .dll
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:node
+name: .node
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:so
+name: .so
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:dylib
+name: .dylib
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:o
+name: .o
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:obj
+name: .obj
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:lib
+name: .lib
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:a
+name: .a
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:pdb
+name: .pdb
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:wasm
+name: .wasm
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:pyc
+name: .pyc
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:pyd
+name: .pyd
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:gguf
+name: .gguf
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:onnx
+name: .onnx
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:pt
+name: .pt
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:pth
+name: .pth
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASEXT:bin
+name: .bin
+relationship: associated_language ATLASLANG:binary
+
+[Term]
+id: ATLASLANG:c
+name: C
+
+[Term]
+id: ATLASEXT:c
+name: .c
+relationship: associated_language ATLASLANG:c
+
+[Term]
+id: ATLASLANG:cmake
+name: CMake
+
+[Term]
+id: ATLASEXT:cmake
+name: .cmake
+relationship: associated_language ATLASLANG:cmake
+
+[Term]
+id: ATLASLANG:cpp
+name: C++
+
+[Term]
+id: ATLASEXT:cc
+name: .cc
+relationship: associated_language ATLASLANG:cpp
+
+[Term]
+id: ATLASEXT:cpp
+name: .cpp
+relationship: associated_language ATLASLANG:cpp
+
+[Term]
+id: ATLASEXT:cxx
+name: .cxx
+relationship: associated_language ATLASLANG:cpp
+
+[Term]
+id: ATLASEXT:hh
+name: .hh
+relationship: associated_language ATLASLANG:cpp
+
+[Term]
+id: ATLASEXT:hpp
+name: .hpp
+relationship: associated_language ATLASLANG:cpp
+
+[Term]
+id: ATLASEXT:cu
+name: .cu
+relationship: associated_language ATLASLANG:cuda_cpp
+
+[Term]
+id: ATLASLANG:css
+name: CSS
+
+[Term]
+id: ATLASEXT:css
+name: .css
+relationship: associated_language ATLASLANG:css
+
+[Term]
+id: ATLASLANG:glsl
+name: GLSL
+
+[Term]
+id: ATLASEXT:comp
+name: .comp
+relationship: associated_language ATLASLANG:glsl
+
+[Term]
+id: ATLASEXT:glsl
+name: .glsl
+relationship: associated_language ATLASLANG:glsl
+
+[Term]
+id: ATLASLANG:go
+name: Go
+
+[Term]
+id: ATLASEXT:go
+name: .go
+relationship: associated_language ATLASLANG:go
+
+[Term]
+id: ATLASLANG:html
+name: HTML
+
+[Term]
+id: ATLASEXT:html
+name: .html
+relationship: associated_language ATLASLANG:html
+
+[Term]
+id: ATLASEXT:htm
+name: .htm
+relationship: associated_language ATLASLANG:html
+
+[Term]
+id: ATLASLANG:java
+name: Java
+
+[Term]
+id: ATLASEXT:java
+name: .java
+relationship: associated_language ATLASLANG:java
+
+[Term]
+id: ATLASLANG:json
+name: JSON / JSONC
+
+[Term]
+id: ATLASEXT:json
+name: .json
+relationship: associated_language ATLASLANG:json
+
+[Term]
+id: ATLASEXT:jsonc
+name: .jsonc
+relationship: associated_language ATLASLANG:json
+
+[Term]
+id: ATLASLANG:lua
+name: Lua
+
+[Term]
+id: ATLASEXT:lua
+name: .lua
+relationship: associated_language ATLASLANG:lua
+
+[Term]
+id: ATLASLANG:markdown
+name: Markdown
+
+[Term]
+id: ATLASEXT:md
+name: .md
+relationship: associated_language ATLASLANG:markdown
+
+[Term]
+id: ATLASEXT:markdown
+name: .markdown
+relationship: associated_language ATLASLANG:markdown
+
+[Term]
+id: ATLASLANG:ndjson
+name: NDJSON / JSON Lines
+
+[Term]
+id: ATLASEXT:ndjson
+name: .ndjson
+relationship: associated_language ATLASLANG:ndjson
+
+[Term]
+id: ATLASEXT:jsonl
+name: .jsonl
+relationship: associated_language ATLASLANG:ndjson
+
+[Term]
+id: ATLASLANG:powershell
+name: PowerShell
+
+[Term]
+id: ATLASEXT:ps1
+name: .ps1
+relationship: associated_language ATLASLANG:powershell
+
+[Term]
+id: ATLASEXT:psm1
+name: .psm1
+relationship: associated_language ATLASLANG:powershell
+
+[Term]
+id: ATLASEXT:psd1
+name: .psd1
+relationship: associated_language ATLASLANG:powershell
+
+[Term]
+id: ATLASLANG:proto
+name: Protocol Buffers
+
+[Term]
+id: ATLASEXT:proto
+name: .proto
+relationship: associated_language ATLASLANG:proto
+
+[Term]
+id: ATLASLANG:python
+name: Python
+
+[Term]
+id: ATLASEXT:py
+name: .py
+relationship: associated_language ATLASLANG:python
+
+[Term]
+id: ATLASEXT:pyi
+name: .pyi
+relationship: associated_language ATLASLANG:python
+
+[Term]
+id: ATLASLANG:rust
+name: Rust
+
+[Term]
+id: ATLASEXT:rs
+name: .rs
+relationship: associated_language ATLASLANG:rust
+
+[Term]
+id: ATLASLANG:sql
+name: SQL
+
+[Term]
+id: ATLASEXT:sql
+name: .sql
+relationship: associated_language ATLASLANG:sql
+
+[Term]
+id: ATLASLANG:text
+name: Plain text
+
+[Term]
+id: ATLASEXT:txt
+name: .txt
+relationship: associated_language ATLASLANG:text
+
+[Term]
+id: ATLASLANG:toml
+name: TOML
+
+[Term]
+id: ATLASEXT:toml
+name: .toml
+relationship: associated_language ATLASLANG:toml
+
+[Term]
+id: ATLASLANG:typescript
+name: TypeScript / JavaScript / Svelte
+
+[Term]
+id: ATLASEXT:ts
+name: .ts
+relationship: associated_language ATLASLANG:typescript
+
+[Term]
+id: ATLASEXT:tsx
+name: .tsx
+relationship: associated_language ATLASLANG:typescript
+
+[Term]
+id: ATLASEXT:mts
+name: .mts
+relationship: associated_language ATLASLANG:typescript
+
+[Term]
+id: ATLASEXT:cts
+name: .cts
+relationship: associated_language ATLASLANG:typescript
+
+[Term]
+id: ATLASEXT:svelte.ts
+name: .svelte.ts
+relationship: associated_language ATLASLANG:typescript
+
+[Term]
+id: ATLASEXT:js
+name: .js
+relationship: associated_language ATLASLANG:typescript
+
+[Term]
+id: ATLASEXT:jsx
+name: .jsx
+relationship: associated_language ATLASLANG:typescript
+
+[Term]
+id: ATLASEXT:mjs
+name: .mjs
+relationship: associated_language ATLASLANG:typescript
+
+[Term]
+id: ATLASEXT:cjs
+name: .cjs
+relationship: associated_language ATLASLANG:typescript
+
+[Term]
+id: ATLASEXT:svelte
+name: .svelte
+relationship: associated_language ATLASLANG:typescript
+
+[Term]
+id: ATLASLANG:yaml
+name: YAML
+
+[Term]
+id: ATLASEXT:yaml
+name: .yaml
+relationship: associated_language ATLASLANG:yaml
+
+[Term]
+id: ATLASEXT:yml
+name: .yml
+relationship: associated_language ATLASLANG:yaml
+
+[Term]
+id: ATLASEXT:cuh
+name: .cuh
+relationship: associated_language ATLASLANG:cuda_cpp
+
+[Term]
+id: ATLASEXT:ptx
+name: .ptx
+relationship: associated_language ATLASISA:ptx

@@ -427,16 +427,16 @@ def make_dspy_predict_synthesizer_v1(
 
         Do not include private reasoning or analysis. supporting_claims must
         contain objects with exactly claim, chunkId, and quote fields.
-        Each quote must be copied exactly from that chunk's verifiedText. The
-        answer must equal the claim strings joined by one space. Select only
-        chunk IDs present in the supplied evidence. If evidence is insufficient,
+        Copy one short contiguous quote from that chunk's verifiedText. Keep
+        spelling, punctuation, and whitespace exactly as supplied. Do not
+        insert ellipses or change Markdown formatting. The
+        reader sees only the claims. Select only chunk IDs present in the
+        supplied evidence. If evidence is insufficient,
         do not invent a quote or claim.
         """
 
         question: str = dspy_module.InputField()
         verified_evidence_json: str = dspy_module.InputField()
-        answer: str = dspy_module.OutputField()
-
         supporting_claims: list[Doc14SupportingClaimV1] = dspy_module.OutputField()
 
     predictor = dspy_module.Predict(Doc14RecommendationSignature)
@@ -484,10 +484,7 @@ def make_dspy_predict_synthesizer_v1(
         context = dspy_module.context(**context_options) if context_options else nullcontext()
         with context:
             prediction = predictor(question=question, verified_evidence_json=evidence_json)
-        answer = str(getattr(prediction, "answer", "")).strip()
         claims_value = getattr(prediction, "supporting_claims", None)
-        if not answer or len(answer) > max_output_chars:
-            raise ValueError("DSPY_ANSWER_INVALID_OR_OVER_BUDGET")
         if not isinstance(claims_value, list) or len(claims_value) > 12:
             raise ValueError("DSPY_SUPPORTING_CLAIMS_REQUIRED")
         claims = [dict(item) if isinstance(item, Mapping) else item for item in claims_value]
@@ -527,8 +524,8 @@ def make_dspy_predict_synthesizer_v1(
                 "endByte": quote_end_byte,
             })
         claim_answer = " ".join(item["claim"] for item in normalized_claims)
-        if answer != claim_answer or len(claim_answer) > max_output_chars:
-            raise ValueError("DSPY_ANSWER_CLAIMS_MISMATCH")
+        if len(claim_answer) > max_output_chars:
+            raise ValueError("DSPY_ANSWER_INVALID_OR_OVER_BUDGET")
         normalized_ids = list(dict.fromkeys(item["chunkId"] for item in normalized_claims))
         return {
             "answer": claim_answer,

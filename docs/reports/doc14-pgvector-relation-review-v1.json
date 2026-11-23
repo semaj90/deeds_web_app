@@ -1,0 +1,124 @@
+{
+  "schema": "atlas.doc14-pgvector-relation-review.v1",
+  "status": "PENDING_HUMAN_AND_ONTOLOGY_REVIEW",
+  "capture": {
+    "sourceRef": "docs/.okf/pinned/pgvector/raw/github.com-pgvector-pgvector.md",
+    "rawSha256": "c5b748e49aa60eb97384fcf108c6bfefac0f51c7a612ffdc5ea43ea29dc369c1",
+    "normalizedSha256": "fe883c75f323441db37223c998515a8173e2c51a69536b1e8d4196b032c5b931"
+  },
+  "snapshot": {
+    "kind": "PINNED_DOC_ADMISSION_ENVELOPES",
+    "sha256": "sha256:7392d9187cc5edaeee1af7211c8b99a986a849f5180aedb2b0d8261e46e61be4",
+    "postgresReviewPoolSha256": "sha256:aa483e0c123dab724b5e821aece7570b7b599215cfeb704dee650d8a7ff8b986"
+  },
+  "sourceCandidate": {
+    "schema": "atlas.external-doc-relation-candidate.v1",
+    "span_validation": "SPAN_READBACK_VERIFIED",
+    "admission_state": "PROPOSAL_ONLY",
+    "canonical_authority": false,
+    "candidate": {
+      "tuple_id": "doc:pgvector:fe883c75f323441d:24:manual-use-v1",
+      "predicate": "use",
+      "predicate_span_chars": [
+        351,
+        354
+      ],
+      "evidence_span_chars": [
+        331,
+        382
+      ],
+      "participants": [
+        {
+          "role": "subject",
+          "text": "Iterative scans",
+          "start_char": 331,
+          "end_char": 346
+        },
+        {
+          "role": "object",
+          "text": "strict or relaxed ordering",
+          "start_char": 355,
+          "end_char": 381
+        }
+      ],
+      "subject_candidates": [
+        {
+          "role": "subject",
+          "text": "Iterative scans",
+          "start_char": 331,
+          "end_char": 346
+        }
+      ],
+      "object_candidates": [
+        {
+          "role": "object",
+          "text": "strict or relaxed ordering",
+          "start_char": 355,
+          "end_char": 381
+        }
+      ],
+      "extractor_version": "manual-doc14-review-draft.v1",
+      "producer_revision": "atlas.doc14-pgvector-relation-proposal.v1",
+      "status": "PROPOSED",
+      "canonical_authority": false,
+      "evidence_binding": {
+        "source_ref": "pgvector",
+        "source_url": "https://github.com/pgvector/pgvector",
+        "source_revision": "sha256:f9a6c0eb36814b0887965c042918c85bcc433ce4fbc1cc15182ab7e6b1ee38b6",
+        "document_checksum": "fe883c75f323441db37223c998515a8173e2c51a69536b1e8d4196b032c5b931",
+        "chunk_id": "doc:pgvector:fe883c75f323441d:24",
+        "chunk_evidence_revision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+        "coordinate_space": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "start_byte": 13122,
+        "end_byte": 13173,
+        "evidence_text": "Iterative scans can use strict or relaxed ordering.",
+        "evidence_checksum": "f274eba5716af270d78563675f31ed3959876c0cdb0bd20973e1380102914640"
+      }
+    },
+    "source_id": "pgvector",
+    "source_revision": "sha256:f9a6c0eb36814b0887965c042918c85bcc433ce4fbc1cc15182ab7e6b1ee38b6",
+    "chunk_id": "doc:pgvector:fe883c75f323441d:24",
+    "chunk_evidence_revision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+    "chunk_checksum": "e5279ed0d214a142498d5125c018d6a3caa3683f17e97fd9a7d6b3cfc39e0622"
+  },
+  "proposal": {
+    "schema": "atlas.hypergraph-fact-proposal.v1",
+    "proposal_id": "9019b18606be33fa167cd29c18e615e30d422c3ab0b2fbe19bcea15bd2ac28ac",
+    "fact_id": "doc:pgvector:fe883c75f323441d:24:manual-use-v1",
+    "predicate": "UNMAPPED_VERB:use",
+    "source_ref": "https://github.com/pgvector/pgvector",
+    "source_revision": "sha256:f9a6c0eb36814b0887965c042918c85bcc433ce4fbc1cc15182ab7e6b1ee38b6",
+    "workspace_revision": "sha256:7392d9187cc5edaeee1af7211c8b99a986a849f5180aedb2b0d8261e46e61be4",
+    "producer_revision": "atlas.doc14-pgvector-relation-proposal.v1|model:unknown",
+    "evidence_start_byte": 13122,
+    "evidence_end_byte": 13173,
+    "evidence_text": "Iterative scans can use strict or relaxed ordering.",
+    "evidence_checksum": "f274eba5716af270d78563675f31ed3959876c0cdb0bd20973e1380102914640",
+    "participants": [
+      {
+        "entity_id": "mention:843896203a22abcebfdbcb7d",
+        "entity_kind": "external_doc_mention",
+        "role": "object",
+        "label": "strict or relaxed ordering"
+      },
+      {
+        "entity_id": "mention:75b4a76e5576bba0ce7e4300",
+        "entity_kind": "external_doc_mention",
+        "role": "subject",
+        "label": "Iterative scans"
+      }
+    ],
+    "ontology_ids": [],
+    "concept_ids": [],
+    "confidence": 0.0,
+    "proposal_checksum": "96fcbf174057c2d2e4f7c95f3b522df7c227157e3439d72e35369ea739175dce",
+    "graph_revision": null,
+    "admission_state": "PROPOSAL_ONLY",
+    "canonical_authority": false,
+    "writes_performed": false
+  },
+  "adversarialReadback": "NORMALIZED_CAPTURE_READBACK_CHECKSUM_MISMATCH",
+  "reviewDecision": null,
+  "graphRevision": null,
+  "writesPerformed": false
+}

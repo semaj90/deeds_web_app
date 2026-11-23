@@ -88,6 +88,15 @@ export async function readVerifiedCanonicalDocChunksV1(input: {
   }
 
   const hitByChunkId = new Map(eligible.map((hit) => [hit.chunkId!, hit]));
+  if (hitByChunkId.size !== eligible.length || blockers.length > 0) {
+    if (hitByChunkId.size !== eligible.length) {
+      blockers.push({ chunkId: '', reason: 'DUPLICATE_CANONICAL_CHUNK_SELECTION' });
+    }
+    return {
+      schema: 'atlas.external-doc-citation-readback.v1',
+      status: 'BLOCKED', citations: [], blockers, readOnly: true, writesPerformed: false,
+    };
+  }
   const result = await input.pool.query<CanonicalDocChunkRow>(
     `SELECT c.chunk_id, c.page_id, c.ordinal, c.start_byte, c.end_byte, c.text,
             c.chunk_checksum, c.evidence_revision AS chunk_evidence_revision,
@@ -101,6 +110,14 @@ export async function readVerifiedCanonicalDocChunksV1(input: {
   );
 
   const rows = new Map(result.rows.map((row) => [row.chunk_id, row]));
+  if (rows.size !== result.rows.length || result.rows.some((row) => !hitByChunkId.has(row.chunk_id))) {
+    return {
+      schema: 'atlas.external-doc-citation-readback.v1',
+      status: 'BLOCKED', citations: [],
+      blockers: [{ chunkId: '', reason: 'CANONICAL_CHUNK_READBACK_SELECTION_MISMATCH' }],
+      readOnly: true, writesPerformed: false,
+    };
+  }
   const citations: VerifiedExternalDocCitationV1[] = [];
   for (const [chunkId, hit] of hitByChunkId) {
     const row = rows.get(chunkId);
@@ -113,7 +130,8 @@ export async function readVerifiedCanonicalDocChunksV1(input: {
       continue;
     }
     if (row.page_id !== hit.pageId || row.url !== hit.url || row.page_evidence_revision !== hit.revision
-      || row.chunk_evidence_revision !== hit.chunkEvidenceRevision) {
+      || row.chunk_evidence_revision !== hit.chunkEvidenceRevision || row.provider !== hit.provider
+      || row.product !== hit.product || row.product_version !== hit.productVersion) {
       blockers.push({ chunkId, reason: 'CANONICAL_PAGE_OR_CHUNK_REVISION_CHANGED' });
       continue;
     }
@@ -154,6 +172,6 @@ export async function readVerifiedCanonicalDocChunksV1(input: {
   return {
     schema: 'atlas.external-doc-citation-readback.v1',
     status: citations.length > 0 && blockers.length === 0 ? 'VERIFIED' : 'BLOCKED',
-    citations, blockers, readOnly: true, writesPerformed: false,
+    citations: blockers.length === 0 ? citations : [], blockers, readOnly: true, writesPerformed: false,
   };
 }

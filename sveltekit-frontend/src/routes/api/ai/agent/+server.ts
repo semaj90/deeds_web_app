@@ -23,8 +23,10 @@
 import { json }           from '@sveltejs/kit';
 import { z }              from 'zod';
 import { pool }           from '$lib/server/db/client.js';
-import { searchDocCorpus } from '$lib/server/atlas/docs/doc-intelligence-read-model.js';
+import { findRepoRoot, searchDocCorpus } from '$lib/server/atlas/docs/doc-intelligence-read-model.js';
 import { readVerifiedCanonicalDocChunksV1 } from '$lib/server/atlas/docs/external-doc-citation-readback-v1.js';
+import { buildExternalDocContextManifestV1 } from '$lib/server/atlas/docs/external-doc-context-manifest-v1.js';
+import { recommendFromOfficialDocReadbackV1 } from '$lib/server/atlas/docs/external-doc-dspy-v1.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
 
 const a2aAdmittedDocContextRequestSchema = z.object({
@@ -32,6 +34,7 @@ const a2aAdmittedDocContextRequestSchema = z.object({
   product: z.string().min(1).max(100).optional(),
   productVersion: z.string().min(1).max(100).optional(),
   limit: z.number().int().min(1).max(10).default(5),
+  recommend: z.boolean().default(false),
   canonicalOfficialOnly: z.boolean().default(true)
 }).strict();
 import { getRedis }       from '$lib/server/redis.js';
@@ -245,16 +248,30 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
       pool,
       root: process.cwd(),
       q: parsed.data.query,
-      limit: parsed.data.limit,
+      limit: parsed.data.recommend ? Math.min(parsed.data.limit, 4) : parsed.data.limit,
       product: parsed.data.product ?? null,
       productVersion: parsed.data.productVersion ?? null,
       canonicalOfficialOnly: parsed.data.canonicalOfficialOnly
     });
     const citationReadback = await readVerifiedCanonicalDocChunksV1({ pool, hits: docResult.hits });
-    const citations = citationReadback.citations.map((citation) => ({
-      schema: 'atlas.acp-admitted-doc-context.v1' as const,
-      ...citation,
-    }));
+    const contextManifest = buildExternalDocContextManifestV1({
+      requestId: task.id,
+      query: parsed.data.query,
+      tokenBudget: 2048,
+      readback: citationReadback,
+    });
+    const citations = contextManifest ? citationReadback.citations : [];
+    const recommendation = parsed.data.recommend
+      ? await recommendFromOfficialDocReadbackV1({
+          requestId: task.id,
+          query: parsed.data.query,
+          readback: citationReadback,
+          python: ENV.PYTHON_PATH,
+          llamaUrl: ENV.LLAMA_SERVER_URL,
+          repoRoot: findRepoRoot(),
+          signal: request.signal,
+        })
+      : null;
     return json({
       jsonrpc: '2.0',
       id: task.id,
@@ -276,6 +293,8 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
                   query: docResult.query,
                   citationReadbackStatus: citationReadback.status,
                   citationBlockers: citationReadback.blockers,
+                  contextManifest,
+                  recommendation,
                   citations
                 }
               }

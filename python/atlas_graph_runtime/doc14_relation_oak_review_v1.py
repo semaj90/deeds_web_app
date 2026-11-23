@@ -76,7 +76,8 @@ def build_doc14_relation_oak_review_v1(
     relation_rows = bundle.get("relations", [])
     if not isinstance(concepts, list) or not isinstance(relation_rows, list):
         raise ValueError("DOC14_OAK_CANDIDATE_LISTS_INVALID")
-    if len(matches) > 16 or len(concepts) > 256 or len(relation_rows) > 4_096:
+    # The pipeline merges up to four bounded 16-term sidecar responses per chunk.
+    if len(matches) > 64 or len(concepts) > 256 or len(relation_rows) > 4_096:
         raise ValueError("DOC14_OAK_RESPONSE_LIMIT_EXCEEDED")
     concepts_by_id: dict[str, Mapping[str, Any]] = {}
     for candidate in concepts:
@@ -89,6 +90,8 @@ def build_doc14_relation_oak_review_v1(
                 or candidate.get("ontologyRevision") != ontology_revision
                 or candidate.get("producerRevision") != producer_revision):
             raise ValueError("DOC14_OAK_CONCEPT_CANDIDATE_INVALID")
+        if external_id in concepts_by_id:
+            raise ValueError("DOC14_OAK_CONCEPT_ID_DUPLICATE")
         concepts_by_id[external_id] = candidate
 
     normalized_matches: dict[str, set[str]] = {}
@@ -106,6 +109,15 @@ def build_doc14_relation_oak_review_v1(
         normalized_matches.setdefault(key, set()).update(selected)
 
     source_selector_checksum = _sha256(source_selector.encode("utf-8"))
+    chunk_text = chunk["text"]
+    chunk_start = chunk["start_byte"]
+
+    def document_byte_span(start: int, end: int) -> dict[str, int]:
+        return {
+            "startByte": chunk_start + len(chunk_text[:start].encode("utf-8")),
+            "endByte": chunk_start + len(chunk_text[:end].encode("utf-8")),
+        }
+
     mapping_rows: list[dict[str, Any]] = []
     for field, role in (("subject_candidates", "subject"), ("object_candidates", "object")):
         mentions = relation.get(field, [])
@@ -134,6 +146,7 @@ def build_doc14_relation_oak_review_v1(
             mapping_rows.append({
                 "role": role,
                 "sourceText": label,
+                "evidenceSpan": document_byte_span(mention["start_char"], mention["end_char"]),
                 "candidates": suggested,
                 "status": _review_status(suggested),
             })
@@ -178,6 +191,8 @@ def build_doc14_relation_oak_review_v1(
         },
         "relationProposal": {
             "predicateText": relation["predicate"],
+            "predicateSpan": document_byte_span(*relation["predicate_span_chars"]),
+            "extractorVersion": relation["extractor_version"],
             "status": "PROPOSED",
             "ontologyIds": [],
         },

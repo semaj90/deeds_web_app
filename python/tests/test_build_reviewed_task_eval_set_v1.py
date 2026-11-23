@@ -56,10 +56,18 @@ def test_builds_36_disjoint_task_groups_and_fails_closed_when_unreviewed():
             r["reviewStatus"] = "REVIEWED"
             r["candidates"][0]["relevanceLabel"] = 1.0
             r["candidates"][0]["citationVerified"] = True
+    assert mod.evaluate_reviewed_holdout_v1(records)["status"] == "INVALID_OR_INCOMPLETE_GOLD_LABELS"
+    for r in records:
+        if r["split"] == "held_out":
+            r["candidates"][1].update(relevanceLabel=0, citationVerified=False)
+            r["candidates"][2].update(relevanceLabel=3, citationVerified=True)
 
-    ok = mod.evaluate_reviewed_holdout_v1(records)
+    ok = mod.evaluate_reviewed_holdout_v1(records, k=1)
     assert ok["status"] == "EVALUATED"
-    assert ok["recallAtK"] == 1.0
+    assert ok["recallAtK"] == 0.5
+    assert ok["ndcgAtK"] == 0.142857
     assert ok["mrr"] == 1.0
     assert ok["citationPassRate"] == 1.0
     assert ok["passed"] is True
+    records[0]["sourceRef"] = records[-1]["sourceRef"]
+    assert mod.evaluate_reviewed_holdout_v1(records)["status"] == "HOLDOUT_GROUP_OR_TASK_SOURCE_LEAKAGE"

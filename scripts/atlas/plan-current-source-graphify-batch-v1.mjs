@@ -91,7 +91,14 @@ const sourceRows = (useAdmittedSnapshot
   .filter(Boolean)
   .sort();
 const uniqueSourceRefs = [...new Set(sourceRows)];
-const selectedCandidates = uniqueSourceRefs.slice(0, limit).map((sourceRef) => {
+const requestedSourceRefs = [...new Set(process.argv.filter((arg) => arg.startsWith('--source-ref='))
+  .map((arg) => clean(arg.slice('--source-ref='.length))))];
+if (requestedSourceRefs.length > limit
+    || requestedSourceRefs.some((ref) => !ref || !uniqueSourceRefs.includes(ref))) {
+  throw new Error('REQUESTED_SOURCE_REFS_MUST_BE_IN_COHORT_AND_WITHIN_LIMIT');
+}
+const boundedSourceRefs = requestedSourceRefs.length ? requestedSourceRefs.sort() : uniqueSourceRefs.slice(0, limit);
+const selectedCandidates = boundedSourceRefs.map((sourceRef) => {
   const binding = bindingByRef.get(sourceRef) ?? bindingByRef.get(sourceRef.replace(/^sveltekit-frontend\//, ''));
   const candidate = {
     sourceRef,
@@ -129,16 +136,30 @@ if (selected.some((row) => row.workspaceRevision !== workspaceRevision || !row.s
   throw new Error('CURRENT_SOURCE_GRAPHIFY_PLAN_BINDING_NOT_CURRENT_OR_COMPLETE');
 }
 
-const pool = new Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, statement_timeout: 120000 });
+const pool = new Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, statement_timeout: 120000, options: '-c default_transaction_read_only=on' });
 let graphifyRows = [];
 let databaseError = null;
 try {
   graphifyRows = (await pool.query(
-    `select source_ref, workspace_revision, content_hash, code_source_revision, byte_length
+    useAdmittedSnapshot
+      ? `with latest_completed as (
+           select execution_id, workspace_revision from public.graphify_executions
+            where workspace_id = $3 and status = 'COMPLETED'
+            order by completed_at desc nulls last, execution_id limit 1
+         )
+         select m.source_ref, m.workspace_revision, m.content_hash, m.code_source_revision,
+                m.byte_length, m.repository_id, m.repository_relative_path, m.execution_id
+           from latest_completed execution
+           join public.graphify_execution_file_membership_v2 m on m.execution_id = execution.execution_id
+          where execution.workspace_revision = $2
+            and m.workspace_revision = $2
+            and m.source_ref = any($1::text[])
+          order by m.source_ref, m.repository_id, m.repository_relative_path`
+      : `select source_ref, workspace_revision, content_hash, code_source_revision, byte_length
        from public.graphify_files
       where source_ref = any($1::text[])
       order by source_ref`,
-    [selected.map((row) => row.sourceRef)],
+    useAdmittedSnapshot ? [selected.map((row) => row.sourceRef), workspaceRevision, admission.workspaceId] : [selected.map((row) => row.sourceRef)],
   )).rows;
 } catch (error) {
   databaseError = error instanceof Error ? error.message : String(error);
@@ -197,6 +218,7 @@ const report = {
   scope: 'BOUNDED_RECORDED_BINDING_COMPARISON',
   writes: { postgres: false, graphify: false, qdrant: false, neo4j: false, valkey: false },
   workspaceRevision,
+  membershipReadback: useAdmittedSnapshot ? 'CURRENT_COMPLETED_EXECUTION_MEMBERSHIP' : 'LEGACY_FILE_INVENTORY',
   snapshotRevision: useAdmittedSnapshot ? clean(admission.snapshotRevision) : null,
   sourceSelectionChecksum: useAdmittedSnapshot ? clean(admission.sourceSelectionChecksum) : null,
   inputSource: useAdmittedSnapshot

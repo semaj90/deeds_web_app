@@ -16,6 +16,8 @@ from hashlib import sha256
 import json
 from typing import Any, Iterable, Mapping, Sequence
 
+from python.atlas_doc14_span_integrity_v1 import validate_stanza_relation_candidate_v1
+
 
 def _sha256_hex(data: str | bytes) -> str:
     payload = data if isinstance(data, bytes) else data.encode("utf-8")
@@ -303,7 +305,7 @@ def build_external_doc_relation_proposal_v1(
     *,
     candidate_row: Mapping[str, Any],
     chunk: Mapping[str, Any],
-    normalized_page_bytes: bytes,
+    source_readback: Mapping[str, Any],
     workspace_revision: str,
 ) -> HypergraphFactProposalV1:
     """Adapt one readback-verified lexical candidate to the existing proposal owner.
@@ -325,46 +327,20 @@ def build_external_doc_relation_proposal_v1(
     candidate = candidate_row.get("candidate")
     if not isinstance(candidate, Mapping):
         raise ValueError("EXTERNAL_DOC_RELATION_CANDIDATE_MISSING")
-    binding = candidate.get("evidence_binding")
-    if not isinstance(binding, Mapping):
-        raise ValueError("EXTERNAL_DOC_RELATION_EVIDENCE_BINDING_MISSING")
+    span = validate_stanza_relation_candidate_v1(
+        relation=candidate, source_readback=source_readback, chunk=chunk,
+    )
     if (
         candidate_row.get("source_id") != chunk.get("source_id")
         or candidate_row.get("source_revision") != chunk.get("source_revision")
         or candidate_row.get("chunk_id") != chunk.get("chunk_id")
-        or candidate_row.get("chunk_checksum") != _sha256_hex(str(chunk.get("text") or ""))
-        or binding.get("chunk_id") != chunk.get("chunk_id")
-        or binding.get("source_ref") != chunk.get("source_id")
-        or binding.get("source_url") != chunk.get("source_url")
-        or binding.get("source_revision") != chunk.get("source_revision")
-        or binding.get("document_checksum") != chunk.get("document_checksum")
-        or binding.get("coordinate_space") != "NORMALIZED_DOCUMENT_UTF8_BYTES"
+        or candidate_row.get("chunk_checksum") != span["chunkSha256"]
+        or candidate_row.get("chunk_evidence_revision") != chunk.get("chunk_evidence_revision")
     ):
         raise ValueError("EXTERNAL_DOC_RELATION_CHUNK_IDENTITY_MISMATCH")
 
-    absolute_start = binding.get("start_byte")
-    absolute_end = binding.get("end_byte")
-    evidence_text = binding.get("evidence_text")
-    if (
-        not isinstance(absolute_start, int) or isinstance(absolute_start, bool)
-        or not isinstance(absolute_end, int) or isinstance(absolute_end, bool)
-        or not isinstance(evidence_text, str)
-        or absolute_start < int(chunk.get("start_byte", -1))
-        or absolute_end > int(chunk.get("end_byte", -1))
-        or absolute_end <= absolute_start
-        or absolute_end > len(normalized_page_bytes)
-    ):
-        raise ValueError("EXTERNAL_DOC_RELATION_SPAN_INVALID")
-    try:
-        source_surface = normalized_page_bytes[absolute_start:absolute_end].decode("utf-8", errors="strict")
-    except UnicodeDecodeError as error:
-        raise ValueError("EXTERNAL_DOC_RELATION_SPAN_NOT_UTF8_BOUNDARY") from error
-    if (
-        source_surface != evidence_text
-        or _sha256_hex(source_surface) != binding.get("evidence_checksum")
-        or _sha256_hex(normalized_page_bytes) != chunk.get("document_checksum")
-    ):
-        raise ValueError("EXTERNAL_DOC_RELATION_SOURCE_READBACK_MISMATCH")
+    absolute_start, absolute_end = span["startByte"], span["endByte"]
+    evidence_text = source_readback["content_bytes"][absolute_start:absolute_end].decode("utf-8")
 
     raw_participants = candidate.get("participants")
     if not isinstance(raw_participants, (list, tuple)) or len(raw_participants) < 2:
@@ -376,9 +352,9 @@ def build_external_doc_relation_proposal_v1(
     for ordinal, raw in enumerate(raw_participants):
         if not isinstance(raw, Mapping):
             raise ValueError("EXTERNAL_DOC_RELATION_PARTICIPANT_INVALID")
-        normalized = str(raw.get("normalized_text") or "").strip().lower()
         role = str(raw.get("role") or "").strip()
         label = str(raw.get("text") or "").strip()
+        normalized = label.casefold()
         if not normalized or not role or not label:
             raise ValueError("EXTERNAL_DOC_RELATION_PARTICIPANT_UNGROUNDED")
         mention_digest = _sha256_hex(f"{tuple_id}|{ordinal}|{normalized}")[:24]
@@ -392,8 +368,6 @@ def build_external_doc_relation_proposal_v1(
     predicate_lemma = str(candidate.get("predicate_lemma") or candidate.get("predicate") or "").strip().lower()
     if not predicate_lemma:
         raise ValueError("EXTERNAL_DOC_RELATION_PREDICATE_MISSING")
-    chunk_text = str(chunk.get("text") or "")
-    chunk_bytes = chunk_text.encode("utf-8")
     relative_start = absolute_start - int(chunk["start_byte"])
     relative_end = absolute_end - int(chunk["start_byte"])
     fact = build_grounded_fact_bridge_from_external_doc_chunk_v1(
@@ -413,8 +387,4 @@ def build_external_doc_relation_proposal_v1(
         concept_ids=(),
         confidence=0.0,
     )
-    # Keep the local variable use explicit: the bridge has independently sliced
-    # the chunk, while the check above independently sliced the source artifact.
-    if chunk_bytes[relative_start:relative_end].decode("utf-8", errors="strict") != source_surface:
-        raise ValueError("EXTERNAL_DOC_RELATION_CHUNK_SOURCE_PARITY_MISMATCH")
     return build_hypergraph_fact_proposal_v1(fact)

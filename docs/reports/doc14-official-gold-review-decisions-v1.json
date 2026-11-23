@@ -1,0 +1,854 @@
+{
+  "schema": "atlas.doc14-official-doc-review-decisions.v1",
+  "poolChecksum": "sha256:0698d3196775abc0ea9a616ea792a973bbffdf6e420946e2f370148cb774bd52",
+  "decisions": [
+    {
+      "queryId": "doc14-pgvector-1",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:24",
+          "chunkEvidenceRevision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:22",
+          "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-pgvector-2",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:26",
+          "chunkEvidenceRevision": "sha256:d6c81cea58985f63bae5d39098303933c5f839eac8c023341d79d304da65dfac",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-pgvector-3",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:26",
+          "chunkEvidenceRevision": "sha256:d6c81cea58985f63bae5d39098303933c5f839eac8c023341d79d304da65dfac",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:24",
+          "chunkEvidenceRevision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-pgvector-4",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:15",
+          "chunkEvidenceRevision": "sha256:c3ce7d77f4eec6af9ae35943a3e9681c36b1bd0dbf760e2c493bf7798f12cf4c",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:22",
+          "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:54",
+          "chunkEvidenceRevision": "sha256:aef0472f44693d94e3c3c88c90c57b060cdf0a4e9e8c19c7fd50ec2d792e13e7",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-pgvector-5",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:63",
+          "chunkEvidenceRevision": "sha256:e97977e3e4ac19ac7b229f39230369d7052249609e514b6754b760afb3b7ab1a",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:64",
+          "chunkEvidenceRevision": "sha256:27fe0e969e2023cd29b323d399fd739e5f56bb51d6f3dba9f8c2e633f520eaaf",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:13",
+          "chunkEvidenceRevision": "sha256:4b0a04c62526c74836a840b984fff6ab8269488dd66501c6f326e0c632b1508f",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:18",
+          "chunkEvidenceRevision": "sha256:ce8d8f8111e0a3555dfdeff42b778e571e72e7876bd0d698acda3cd8fbf85c76",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:29",
+          "chunkEvidenceRevision": "sha256:83c15f3b20e6cc401640d9ad3958df0ca3bef139455dd1ca040ff57fd1aef5df",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-pgvector-6",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:7",
+          "chunkEvidenceRevision": "sha256:aba9dfb205303ea7979b9e8b98019c2ffb1c92f94ac440bafdbd2a4047588b18",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:9",
+          "chunkEvidenceRevision": "sha256:0c5db6d066aa404d0298f2a498bb60459debe6a33741380e083c0c1967e01656",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:4",
+          "chunkEvidenceRevision": "sha256:c43738179e4f0a3a5a088f886911ac4235384fddaa89cf5fcdd8babfcbb3af7a",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:59",
+          "chunkEvidenceRevision": "sha256:d0ee8da84bd0db7dac928cb6407c14f338b4131cec73711c6513a56572fbfdf5",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:63",
+          "chunkEvidenceRevision": "sha256:e97977e3e4ac19ac7b229f39230369d7052249609e514b6754b760afb3b7ab1a",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:70",
+          "chunkEvidenceRevision": "sha256:72346d3b6b887876e21d3e28f150a04c3228d11e2549ce6104ac0e9748abac48",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-pgvector-7",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:18",
+          "chunkEvidenceRevision": "sha256:ce8d8f8111e0a3555dfdeff42b778e571e72e7876bd0d698acda3cd8fbf85c76",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:13",
+          "chunkEvidenceRevision": "sha256:4b0a04c62526c74836a840b984fff6ab8269488dd66501c6f326e0c632b1508f",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:ca39935f7857789b:25",
+          "chunkEvidenceRevision": "sha256:117ef1a6edbb3dcc31b465366189821ff32783492f65e5e64761f17ec677ec7f",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-pgvector-8",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:19",
+          "chunkEvidenceRevision": "sha256:614a91eae0a3e6987ab5681d3f730ab38eac698402b4b5730b2ab89073a180ec",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:27",
+          "chunkEvidenceRevision": "sha256:aeba8a2c456b1238d9cdf65dbd1c47e61f973593e3987b3f6ac85614ea4c02fd",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:55",
+          "chunkEvidenceRevision": "sha256:96e80e051e6f8f29ab57c34970cea9e8042650b832b4267cc1573698475022f2",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-postgresql-1",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:postgresql-18:38d5e74bafb89df8:12",
+          "chunkEvidenceRevision": "sha256:7a538a4bd94b8f1cfa46a4747d0047ba603e78bbc59a0d9cf2f56fe1375dc461",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-postgresql-2",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:15",
+          "chunkEvidenceRevision": "sha256:8c66ad7b3cc845da27bc0c895d6b6fe361834daf605740b8c83b0ae5f7810632",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:16",
+          "chunkEvidenceRevision": "sha256:6d60ce0663246fe64504c98292bf3bc6c94e447250dc9aacbf7fb7028d6ad1ac",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:9",
+          "chunkEvidenceRevision": "sha256:420a1eab2f7c47f4c4a8735e5f42a6bd2d78e90ab72dca69bf54671c2851df8f",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:11",
+          "chunkEvidenceRevision": "sha256:8089a1fdb9598bf1d52815f6c2db225277217c66d4878fc6abc026f631ac7dc7",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:21",
+          "chunkEvidenceRevision": "sha256:26186a7b6f77fac2ee8104e91edc726891978c48e14db4d7636b86c882a52250",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:25",
+          "chunkEvidenceRevision": "sha256:2c2fd744af4bc94dc6945ee3d607d696c942b1ee4b54c34d748eace349644535",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:24",
+          "chunkEvidenceRevision": "sha256:5668304d46d342a13ac2c7675c4f7574d54149caf3cb040ec443782459174626",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:30",
+          "chunkEvidenceRevision": "sha256:d8fc7910891aa604eb2e98b4b4f840012d8966fdcb881685738f5357579c940d",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-postgresql-3",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:postgresql-18:a92f2cf09489fb29:1",
+          "chunkEvidenceRevision": "sha256:310a88163ea716a17249804ef78aaccbcd1663fd0853223ad32728ebb584c471",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2",
+          "chunkEvidenceRevision": "sha256:1a53b6f8ec67e33ba9ba93cf1af87d3ec525a4cd43aee5b1dbd6f619c0b57716",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+          "chunkEvidenceRevision": "sha256:07f62f723503cc1dbf010318be5747aa11a6c81b12de4a1c97a8587e3d8c9ed2",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-postgresql-4",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:29",
+          "chunkEvidenceRevision": "sha256:9487d17e01f0c62078ead82febd12e5aca65b8e69f6eb37c81e5427387e39ff4",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:38d5e74bafb89df8:24",
+          "chunkEvidenceRevision": "sha256:47cd2c1e335a1ddbc17c7c01c6b0346d0cb216a7b51470ba4326fc3d145ca5bb",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:38d5e74bafb89df8:36",
+          "chunkEvidenceRevision": "sha256:9ccd369c14a41d34d4bb65515c73a4527a92c3189369b290eda3018f1de2abfa",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:35",
+          "chunkEvidenceRevision": "sha256:5f17313841dce2fc42cdd81479f9703cb771dedfca475ca990de9c14e18f7238",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:21",
+          "chunkEvidenceRevision": "sha256:26186a7b6f77fac2ee8104e91edc726891978c48e14db4d7636b86c882a52250",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-postgresql-5",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": []
+    },
+    {
+      "queryId": "doc14-postgresql-6",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": []
+    },
+    {
+      "queryId": "doc14-postgresql-7",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": []
+    },
+    {
+      "queryId": "doc14-postgresql-8",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:24",
+          "chunkEvidenceRevision": "sha256:5668304d46d342a13ac2c7675c4f7574d54149caf3cb040ec443782459174626",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:26",
+          "chunkEvidenceRevision": "sha256:45229f8ccb138fd1d7e51479f50e101ea51ae64494684f24a5e416d0819ee56d",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:24d9f452d20b88e0:1",
+          "chunkEvidenceRevision": "sha256:609a3c555e7e81031291d33c776e0b7eaac4e6d6fb6b4403d4214beccdc7b449",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:25",
+          "chunkEvidenceRevision": "sha256:2c2fd744af4bc94dc6945ee3d607d696c942b1ee4b54c34d748eace349644535",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:2",
+          "chunkEvidenceRevision": "sha256:b41231c387620ccb09245869ba1e0eac51ecbfaafa78c36b74f1e22e0f85948d",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-drizzle-kit-1",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:1",
+          "chunkEvidenceRevision": "sha256:faf44f96c5d143e2ac0a439b3f7787704c518c88d12f3949624d2f31fff947cc",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:0",
+          "chunkEvidenceRevision": "sha256:fd72378b2259e6c8bbf845e0f141aa39bd943267a949de846f94f27838710ad6",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:8",
+          "chunkEvidenceRevision": "sha256:73184e2c6c80758df0f4002a1f3f969720d37e16c06c690f57eb6024d2929b1a",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:0",
+          "chunkEvidenceRevision": "sha256:5f7e0bda2f87878f5bb7f9113d5bf10ad3809759396af9bd3a7dd82a4b322fe2",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:5",
+          "chunkEvidenceRevision": "sha256:9fab06593b4bb51fa021693d81b858ef2959f508ff7438dc050189109d69cdc5",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:2",
+          "chunkEvidenceRevision": "sha256:9ba69dea027c721894b06c59090f9a068a3423abac2609749f2c367fb3addc25",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-drizzle-kit-2",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:0",
+          "chunkEvidenceRevision": "sha256:5f7e0bda2f87878f5bb7f9113d5bf10ad3809759396af9bd3a7dd82a4b322fe2",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:1",
+          "chunkEvidenceRevision": "sha256:faf44f96c5d143e2ac0a439b3f7787704c518c88d12f3949624d2f31fff947cc",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:drizzle-kit:0608a335e55cd6ac:3",
+          "chunkEvidenceRevision": "sha256:08d125d4a5523a2c7879eb3617701a409116b7d155ac6c092592a84af0107479",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:8",
+          "chunkEvidenceRevision": "sha256:73184e2c6c80758df0f4002a1f3f969720d37e16c06c690f57eb6024d2929b1a",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:drizzle-kit:0608a335e55cd6ac:0",
+          "chunkEvidenceRevision": "sha256:fd87694e2e8aeda0463ff46f80d5e48b00194b0982caa4609ad12f8fc17520c4",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-drizzle-kit-3",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:0",
+          "chunkEvidenceRevision": "sha256:5f7e0bda2f87878f5bb7f9113d5bf10ad3809759396af9bd3a7dd82a4b322fe2",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:1",
+          "chunkEvidenceRevision": "sha256:faf44f96c5d143e2ac0a439b3f7787704c518c88d12f3949624d2f31fff947cc",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:2",
+          "chunkEvidenceRevision": "sha256:9ba69dea027c721894b06c59090f9a068a3423abac2609749f2c367fb3addc25",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:3",
+          "chunkEvidenceRevision": "sha256:388a7cb829541f1af198f9b7cb9abe25b8db3b2e78b462d297b7eab3baf56bc3",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-drizzle-kit-4",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:0",
+          "chunkEvidenceRevision": "sha256:5f7e0bda2f87878f5bb7f9113d5bf10ad3809759396af9bd3a7dd82a4b322fe2",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:1",
+          "chunkEvidenceRevision": "sha256:faf44f96c5d143e2ac0a439b3f7787704c518c88d12f3949624d2f31fff947cc",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-drizzle-kit-5",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": []
+    },
+    {
+      "queryId": "doc14-drizzle-kit-6",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:0",
+          "chunkEvidenceRevision": "sha256:5f7e0bda2f87878f5bb7f9113d5bf10ad3809759396af9bd3a7dd82a4b322fe2",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:1",
+          "chunkEvidenceRevision": "sha256:faf44f96c5d143e2ac0a439b3f7787704c518c88d12f3949624d2f31fff947cc",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-svelte-1",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:10",
+          "chunkEvidenceRevision": "sha256:76591a0398570a37fc6abd34d561bbe12f1d97165e70bcdc2cf19a71d1b7901c",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:16",
+          "chunkEvidenceRevision": "sha256:7176f545c5847e23ae960cdcc7c2292e3e393114aa3bf5ad0fe4d08e09ac41ac",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:15",
+          "chunkEvidenceRevision": "sha256:7dd28ba50a0fa404415742506a56891d7c32d765c6f8fb6f89aa5dc99228a9a1",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:12",
+          "chunkEvidenceRevision": "sha256:9960184370471abd348a21c69e551396afa10dc89d9caee0760292df9437750a",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:14",
+          "chunkEvidenceRevision": "sha256:78aab3e9c4ef03dd7bf2334f6b1b9bccb76a733b983ad25ca321a36f7320a0f0",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-svelte-2",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:10",
+          "chunkEvidenceRevision": "sha256:b9b99a4e2aa2bcd59717a73b3fd1fc4739343ba502758c7aa19529d563ad74fd",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:11",
+          "chunkEvidenceRevision": "sha256:6995ad7fad1ea0440be5696a03bf723bdff837cbc928b276dd2f3adbce9d84d7",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:14",
+          "chunkEvidenceRevision": "sha256:6c0a19493b7d642a23f835fc54261891be42a13f1594ba1fb78dd85f062d49d0",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:12",
+          "chunkEvidenceRevision": "sha256:e84b44c2fd08d8eb0b444c9a126b240b53266859e02db886c690811b531b020e",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:13",
+          "chunkEvidenceRevision": "sha256:0e4ca7c807e3efacc16703c54800941ec7fe840994cd012b24190a0f71d66547",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-svelte-3",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:svelte5-runes:9d3a717d27cb2c0d:36",
+          "chunkEvidenceRevision": "sha256:65724ac451309526f53a0352ceb8eaf8c01c072153fec3f17963f42b8c6c3d3b",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:14",
+          "chunkEvidenceRevision": "sha256:78aab3e9c4ef03dd7bf2334f6b1b9bccb76a733b983ad25ca321a36f7320a0f0",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:9d3a717d27cb2c0d:13",
+          "chunkEvidenceRevision": "sha256:889d19658f747bd73adec4236dec467b48f7e4dec13fb00a204c27f50377f00d",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:16",
+          "chunkEvidenceRevision": "sha256:7176f545c5847e23ae960cdcc7c2292e3e393114aa3bf5ad0fe4d08e09ac41ac",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:9d3a717d27cb2c0d:50",
+          "chunkEvidenceRevision": "sha256:e753a22a038c9751bbd0fd974d17e621637d5052b8232639cc0854be62494c56",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-svelte-4",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:2",
+          "chunkEvidenceRevision": "sha256:801ae369c996331939a57dcc85c9ab6a1084e1c1c4fed7b2defa174f78d4c4f8",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:4606958abe2e620d:2",
+          "chunkEvidenceRevision": "sha256:fc00f7cd1c33d06e0b59c29de7b9bd330c11a721e41b4b4f8a7950eef545e905",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:9d3a717d27cb2c0d:2",
+          "chunkEvidenceRevision": "sha256:f7c091b8fc90b72138ffb8441e434bd5fecb839d394995a6c2ecf68aadd1144b",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:2",
+          "chunkEvidenceRevision": "sha256:6963819f1abed17550498806a40eac5f19e5d98dca085b564c3cd9d1bd9ef7ae",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:18",
+          "chunkEvidenceRevision": "sha256:b1004b199d2630410ad8b99b047923db569a9ec16c297dc7068eaac21eee2a6f",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:4606958abe2e620d:10",
+          "chunkEvidenceRevision": "sha256:5bb861d4732014aefffa6e6926f40e534d2daa7bffd5ad004088e999d7da58aa",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:4606958abe2e620d:13",
+          "chunkEvidenceRevision": "sha256:73c10463c028ab80e2616fe5c662410e0d7ff66aa26d9160fd6b78fa2e9a2e5f",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:4606958abe2e620d:17",
+          "chunkEvidenceRevision": "sha256:7ef8e9698584d5e96922b53ea242908c87fd1392232f5eeabe1efa52d183e9b0",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-svelte-5",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:svelte5-runes:4606958abe2e620d:10",
+          "chunkEvidenceRevision": "sha256:5bb861d4732014aefffa6e6926f40e534d2daa7bffd5ad004088e999d7da58aa",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:4606958abe2e620d:21",
+          "chunkEvidenceRevision": "sha256:ce03f9197eb1611f4293031a1d51f499223ed27faec303749f0e12360e430e25",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:4606958abe2e620d:13",
+          "chunkEvidenceRevision": "sha256:73c10463c028ab80e2616fe5c662410e0d7ff66aa26d9160fd6b78fa2e9a2e5f",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:4606958abe2e620d:16",
+          "chunkEvidenceRevision": "sha256:6da738e346ff5e615a82af54252e38e27e825596888c89bcbfc8f8677f79316a",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:4606958abe2e620d:22",
+          "chunkEvidenceRevision": "sha256:7fd0594e5d6199f37f95c071c62a7815473e0623b68719167c04b4d1d09be7be",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-svelte-6",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:1",
+          "chunkEvidenceRevision": "sha256:d364bfe52f2e13e0e6b565ed83b03a326ac51bfc0dd79060c07bdb52696f874e",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:11",
+          "chunkEvidenceRevision": "sha256:6995ad7fad1ea0440be5696a03bf723bdff837cbc928b276dd2f3adbce9d84d7",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:12",
+          "chunkEvidenceRevision": "sha256:e84b44c2fd08d8eb0b444c9a126b240b53266859e02db886c690811b531b020e",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:13",
+          "chunkEvidenceRevision": "sha256:0e4ca7c807e3efacc16703c54800941ec7fe840994cd012b24190a0f71d66547",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:14",
+          "chunkEvidenceRevision": "sha256:6c0a19493b7d642a23f835fc54261891be42a13f1594ba1fb78dd85f062d49d0",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-svelte-7",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:svelte5-runes:9d3a717d27cb2c0d:10",
+          "chunkEvidenceRevision": "sha256:79541c9bcb39c754665c5eda44952059650f5c835363ba06228a8ecda89d946b",
+          "grade": null,
+          "citationSupported": null
+        },
+        {
+          "chunkId": "doc:svelte5-runes:9d3a717d27cb2c0d:18",
+          "chunkEvidenceRevision": "sha256:8ed384c050aa27675e7eaa20558ab299ca913f179cd0a1926ab72e4fab1522b7",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    },
+    {
+      "queryId": "doc14-svelte-8",
+      "reviewerRef": null,
+      "answerability": null,
+      "note": null,
+      "candidates": [
+        {
+          "chunkId": "doc:svelte5-runes:9d3a717d27cb2c0d:19",
+          "chunkEvidenceRevision": "sha256:d4a8243ef0d84139a185ae464961f8cc2602f2cb9907ac0864b1651d867d065e",
+          "grade": null,
+          "citationSupported": null
+        }
+      ]
+    }
+  ]
+}

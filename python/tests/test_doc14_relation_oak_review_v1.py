@@ -119,6 +119,13 @@ def test_verified_mentions_join_to_oak_suggestions_without_promotion_or_path_lea
         "objectExternalId": "cuda:13.2",
     }]
     assert result["relationProposal"]["ontologyIds"] == []
+    raw = source["content_bytes"]
+    for mapping in result["participantMappings"]:
+        span = mapping["evidenceSpan"]
+        assert raw[span["startByte"]:span["endByte"]].decode("utf-8") == mapping["sourceText"]
+    predicate_span = result["relationProposal"]["predicateSpan"]
+    assert raw[predicate_span["startByte"]:predicate_span["endByte"]].decode("utf-8") == "requires"
+    assert result["relationProposal"]["extractorVersion"] == relation["extractor_version"]
     assert result["reviewRequired"] is True
     assert result["canonicalAuthority"] is False
     assert result["writesPerformed"] is False
@@ -142,7 +149,54 @@ def test_ambiguous_and_missing_oak_matches_remain_reviewable():
     assert result["participantMappings"][1]["status"] == "SINGLE_CANDIDATE_REVIEW_REQUIRED"
 
 
-@pytest.mark.parametrize("mutation", ["stale-source", "authority", "unbound-id", "revision"])
+def test_review_accepts_the_bounded_multi_batch_label_response():
+    relation, source, chunk, oak = _inputs()
+    oak["matches"].extend(
+        {"searchText": f"Other mention {index}", "externalIds": []} for index in range(62)
+    )
+    result = build_doc14_relation_oak_review_v1(
+        relation=relation, source_readback=source, chunk=chunk, oak_response=oak,
+    )
+    assert len(result["participantMappings"]) == 2
+    oak["matches"].append({"searchText": "One term too many", "externalIds": []})
+    with pytest.raises(ValueError, match="DOC14_OAK_RESPONSE_LIMIT_EXCEEDED"):
+        build_doc14_relation_oak_review_v1(
+            relation=relation, source_readback=source, chunk=chunk, oak_response=oak,
+        )
+
+
+def test_real_oak_fixture_binds_subject_object_and_relationship(monkeypatch):
+    pytest.importorskip("oaklib")
+    import miniforge_nlp_sidecar_v2 as sidecar
+
+    fixture = Path(__file__).parent / "fixtures" / "doc14-software-review-fixture.obo"
+    monkeypatch.setenv("ATLAS_OAKLIB_ONTOLOGY_ROOT", str(fixture.parent))
+    monkeypatch.setenv("ATLAS_OAKLIB_ONTOLOGY_FILE", fixture.name)
+    relation, source, chunk, _ = _inputs()
+    labels = sidecar.oaklib_label_search(sidecar.OaklibLabelSearchRequestV1(
+        terms=["Foo", "CUDA 13.2"],
+    )).model_dump(mode="json", by_alias=True)
+    edges = sidecar.oaklib_candidates(sidecar.OaklibCandidateRequestV1(
+        external_ids=["ATLASFIX:0001", "ATLASFIX:0002"],
+    )).model_dump(mode="json", by_alias=True)
+    labels["candidateBundle"]["relations"] = edges["candidates"]["relations"]
+    review = build_doc14_relation_oak_review_v1(
+        relation=relation, source_readback=source, chunk=chunk, oak_response=labels,
+    )
+    assert review["oak"]["ontologyRevision"] == "sha256:" + hashlib.sha256(fixture.read_bytes()).hexdigest()
+    assert [row["candidates"][0]["externalId"] for row in review["participantMappings"]] == [
+        "ATLASFIX:0001", "ATLASFIX:0002",
+    ]
+    assert review["existingOntologyRelations"] == [{
+        "subjectExternalId": "ATLASFIX:0001",
+        "predicateExternalId": "requires_version",
+        "objectExternalId": "ATLASFIX:0002",
+    }]
+    assert review["relationProposal"]["ontologyIds"] == []
+    assert review["canonicalAuthority"] is False
+
+
+@pytest.mark.parametrize("mutation", ["stale-source", "authority", "unbound-id", "revision", "duplicate-id"])
 def test_invalid_source_or_oak_candidate_is_rejected(mutation):
     relation, source, chunk, oak = _inputs()
     if mutation == "stale-source":
@@ -151,6 +205,8 @@ def test_invalid_source_or_oak_candidate_is_rejected(mutation):
         oak["canonicalAuthority"] = True
     elif mutation == "unbound-id":
         oak["matches"][0]["externalIds"] = ["missing:concept"]
+    elif mutation == "duplicate-id":
+        oak["candidateBundle"]["concepts"].append(dict(oak["candidateBundle"]["concepts"][0]))
     else:
         oak["candidateBundle"]["ontologyRevision"] = "sha256:" + "c" * 64
     with pytest.raises(ValueError):
@@ -166,6 +222,30 @@ def test_oak_relation_cannot_self_admit_or_cross_revisions():
         build_doc14_relation_oak_review_v1(
             relation=relation, source_readback=source, chunk=chunk, oak_response=oak,
         )
+
+
+def test_hypergraph_bridge_revalidates_participants_even_with_verified_status():
+    from python.atlas_external_doc_hypergraph import build_external_doc_relation_proposal_v1
+
+    relation, source, chunk, _ = _inputs()
+    relation["tuple_id"] = "fixture-tuple"
+    row = {
+        "schema": "atlas.external-doc-relation-candidate.v1",
+        "span_validation": "SPAN_READBACK_VERIFIED",
+        "admission_state": "PROPOSAL_ONLY",
+        "canonical_authority": False,
+        "source_id": chunk["source_id"],
+        "source_revision": chunk["source_revision"],
+        "chunk_id": chunk["chunk_id"],
+        "chunk_evidence_revision": chunk["chunk_evidence_revision"],
+        "chunk_checksum": hashlib.sha256(chunk["text"].encode("utf-8")).hexdigest(),
+        "candidate": relation,
+    }
+    kwargs = {"candidate_row": row, "chunk": chunk, "source_readback": source, "workspace_revision": "fixture"}
+    assert build_external_doc_relation_proposal_v1(**kwargs).admission_state == "PROPOSAL_ONLY"
+    relation["participants"][0]["text"] = "Bar"
+    with pytest.raises(ValueError, match="PARTICIPANT_TEXT_SPAN_MISMATCH"):
+        build_external_doc_relation_proposal_v1(**kwargs)
 
 
 def test_pipeline_queries_both_read_only_oak_label_and_relation_endpoints():

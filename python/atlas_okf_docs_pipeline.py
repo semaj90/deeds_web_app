@@ -1227,7 +1227,7 @@ def write_source_artifacts(
                     proposal = build_external_doc_relation_proposal_v1(
                         candidate_row=row,
                         chunk=chunk.to_dict(),
-                        normalized_page_bytes=page_bytes or b"",
+                        source_readback=page_readback or {},
                         workspace_revision=workspace_revision,
                     )
                     row["hypergraph_proposal"] = proposal.to_dict()

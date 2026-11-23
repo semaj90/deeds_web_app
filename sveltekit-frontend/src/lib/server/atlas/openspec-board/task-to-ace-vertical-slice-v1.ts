@@ -28,7 +28,7 @@ export interface TaskToAceVerticalSliceInputV1 {
   errorSignature?: string;
   reportDirectory?: string;
   repoRoot?: string;
-  pool: pg.Pool;
+  pool: Pick<pg.Pool, 'query'>;
 }
 
 export interface ProvenChunkReadbackV1 {
@@ -139,7 +139,7 @@ export async function runTaskToAceVerticalSliceV1(input: TaskToAceVerticalSliceI
   const taskLineMatch = /#L(\d+)$/.exec(taskView.task.sourceRef);
   const expectedChangeId = taskView.identity.logicalTaskKey.split(':', 1)[0];
   if (!matchesCurrentTaskSourceIndexRowV1(taskSourceIndexRow, {
-    sourceRef: taskView.identity.sourceRef,
+    sourceRef: taskView.task.sourceRef,
     changeId: expectedChangeId,
     sourceLine: Number(taskLineMatch?.[1] ?? 0),
     taskRevision: taskView.task.revision,
@@ -282,6 +282,7 @@ export async function runTaskToAceVerticalSliceV1(input: TaskToAceVerticalSliceI
   }
 
   let graphRevision: string | null = null;
+  let graphReadbackFailed = false;
   try {
     const graphSnapshotRes = await input.pool.query<CurrentGraphSnapshotReadbackV1>(
       `SELECT status, workspace_revision, source_inventory_revision, graph_revision,
@@ -300,13 +301,17 @@ export async function runTaskToAceVerticalSliceV1(input: TaskToAceVerticalSliceI
     );
     graphRevision = resolveCurrentGraphRevisionForWorkspaceV1(graphSnapshotRes.rows, workspaceRevision);
   } catch {
-    graphRevision = null;
+    graphReadbackFailed = true;
   }
   if (!graphRevision) {
     return {
       schema: 'atlas.task-to-ace-vertical-slice.v1' as const,
-      status: 'BLOCKED_NO_CURRENT_GRAPH_SNAPSHOT' as const,
-      blocker: 'NO_VALIDATED_GRAPH_SNAPSHOT_MATCHES_THE_PROVEN_CHUNK_WORKSPACE_REVISION',
+      status: graphReadbackFailed
+        ? 'BLOCKED_GRAPH_SNAPSHOT_READBACK_FAILED' as const
+        : 'BLOCKED_NO_CURRENT_GRAPH_SNAPSHOT' as const,
+      blocker: graphReadbackFailed
+        ? 'GRAPH_SNAPSHOT_QUERY_FAILED'
+        : 'NO_VALIDATED_GRAPH_SNAPSHOT_MATCHES_THE_PROVEN_CHUNK_WORKSPACE_REVISION',
       checkedRefs: [...candidateRefs],
       task: taskView.task,
       taskIdentity: taskView.identity,

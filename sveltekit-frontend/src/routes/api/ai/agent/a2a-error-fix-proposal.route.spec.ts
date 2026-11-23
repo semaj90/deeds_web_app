@@ -260,6 +260,16 @@ describe('A2A agentic error-fix proposal skill', () => {
       writesPerformed: false,
       mode: 'POSTGRES_FTS',
       citationReadbackStatus: 'VERIFIED',
+      contextManifest: {
+        schema: 'atlas.context-manifest.v2',
+        v1: {
+          requestId: 'a2a-doc-1',
+          query: '$state runes',
+          selectedNodeKeys: ['chunk-svelte-state-0'],
+          evidenceRefs: [`sha256:${'b'.repeat(64)}`],
+        },
+        identityChecksum: expect.stringMatching(/^[a-f0-9]{64}$/),
+      },
     });
     expect(result.result.artifacts[0].parts[0].data.citations[0]).toMatchObject({
       chunkId: 'chunk-svelte-state-0',
@@ -269,6 +279,26 @@ describe('A2A agentic error-fix proposal skill', () => {
     expect(readVerifiedCanonicalDocChunks).toHaveBeenCalledWith(expect.objectContaining({
       hits: expect.arrayContaining([expect.objectContaining({ chunkId: 'chunk-svelte-state-0' })]),
     }));
+    expect(runGemma4Agent).not.toHaveBeenCalled();
+  });
+
+  it('never exposes a manifest or partial citation bodies when official readback is blocked', async () => {
+    searchDocCorpus.mockResolvedValueOnce({ query: 'test', mode: 'POSTGRES_FTS', hits: [] });
+    readVerifiedCanonicalDocChunks.mockResolvedValueOnce({
+      status: 'BLOCKED',
+      blockers: [{ chunkId: 'stale', reason: 'CANONICAL_CHUNK_READBACK_MISSING' }],
+      citations: [{ chunkId: 'other', verifiedText: 'partial body' }],
+    });
+    const response = await POST(event({
+      id: 'a2a-blocked-doc',
+      message: { role: 'user', parts: [{ text: 'test' }] },
+      metadata: { skill: 'external-doc-admitted-context', docQuery: { query: 'test' } },
+    }));
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.result.artifacts[0].parts[0].data).toMatchObject({
+      citationReadbackStatus: 'BLOCKED', contextManifest: null, citations: [],
+    });
     expect(runGemma4Agent).not.toHaveBeenCalled();
   });
 });

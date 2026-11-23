@@ -1,7 +1,7 @@
 {
   "schema": "atlas.current-structural-edge-resolution.v1",
   "mode": "READ_ONLY_PLAN",
-  "generatedAt": "2026-09-14T16:33:08.015Z",
+  "generatedAt": "2026-11-23T07:57:29.529Z",
   "writes": {
     "postgres": false,
     "qdrant": false,

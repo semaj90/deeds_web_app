@@ -1,12 +1,14 @@
 {
   "schema": "atlas.wsl2-rapids-gpu-challenger-receipt.v1",
-  "arrowPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\feature_matrix_5.arrow",
+  "arrowPath": "/mnt/c/Users/james/Videos/deeds-web-app/docs/reports/feature_matrix_5.arrow",
   "preflight": {
-    "preflightPassed": true,
-    "freeVramMiB": 1792,
+    "preflightPassed": false,
+    "freeVramMiB": 2811,
     "minFreeVramMiB": 1536,
-    "slotsIdle": true,
-    "reasons": []
+    "slotsIdle": false,
+    "reasons": [
+      "LLAMA_8090_SLOTS_BUSY_OR_UNREACHABLE"
+    ]
   },
   "cpuOracle": {
     "rowCount": 200,
@@ -14,7 +16,7 @@
     "inputChecksum": "sha256:75a37e7c1f3ab1d7a8051d3067eb6b3b47a009c9dacd96e2abe759aa40190628",
     "cpuProj2Checksum": "sha256:1787d513bdf81deee65641eae5722163a60f7dafb68266d2752156ef30ab03cd"
   },
-  "gpuRequested": false,
+  "gpuRequested": true,
   "gpuExecuted": false,
   "gpuBackend": null,
   "gpuMetrics": null,

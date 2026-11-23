@@ -655,7 +655,7 @@ export async function searchDocCorpusDense(opts: { pool: Pool | null; queryVecto
 	}
 }
 
-export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q: string; limit?: number; runtime?: RuntimeVersions; product?: string | null; productVersion?: string | null; canonicalOfficialOnly?: boolean }): Promise<DocSearchResult> {
+export async function searchDocCorpus(opts: { pool: Pick<Pool, 'query'> | null; root: string; q: string; limit?: number; runtime?: RuntimeVersions; product?: string | null; productVersion?: string | null; canonicalOfficialOnly?: boolean }): Promise<DocSearchResult> {
 	const limit = Math.min(Math.max(opts.limit ?? 10, 1), 25);
 	const q = opts.q.trim().slice(0, 300);
 	let postgresNote: string | null = null;

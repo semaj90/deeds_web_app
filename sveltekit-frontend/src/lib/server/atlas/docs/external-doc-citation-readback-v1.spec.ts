@@ -68,6 +68,25 @@ describe('canonical official documentation citation readback', () => {
 		expect(result.blockers).toContainEqual({ chunkId: 'chunk-1', reason: 'CANONICAL_CHUNK_CHECKSUM_MISMATCH' });
 	});
 
+	it('withholds every citation when a selected row has a changed product version', async () => {
+		const result = await readVerifiedCanonicalDocChunksV1({
+			pool: poolWith([row(), row({ chunk_id: 'chunk-2', product_version: 'v1' })]),
+			hits: [hit(), hit({ chunkId: 'chunk-2' })],
+		});
+		expect(result.status).toBe('BLOCKED');
+		expect(result.citations).toEqual([]);
+		expect(result.blockers).toContainEqual({ chunkId: 'chunk-2', reason: 'CANONICAL_PAGE_OR_CHUNK_REVISION_CHANGED' });
+	});
+
+	it('blocks duplicate or unselected database rows', async () => {
+		for (const rows of [[row(), row()], [row(), row({ chunk_id: 'chunk-unselected' })]]) {
+			const result = await readVerifiedCanonicalDocChunksV1({ pool: poolWith(rows), hits: [hit()] });
+			expect(result.status).toBe('BLOCKED');
+			expect(result.citations).toEqual([]);
+			expect(result.blockers[0].reason).toBe('CANONICAL_CHUNK_READBACK_SELECTION_MISMATCH');
+		}
+	});
+
 	it('rejects noncanonical and nonofficial retrieval hits before SQL', async () => {
 		const query = vi.fn();
 		const result = await readVerifiedCanonicalDocChunksV1({

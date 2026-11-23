@@ -1,0 +1,75 @@
+format-version: 1.2
+ontology: atlas-domain-taxonomy-v1
+remark: Local self-contained OBO vocabulary derived from PostgreSQL 18 public.domain_taxonomy_v1 (17 frozen entries). Non-canonical proposal/lookup source only.
+
+[Term]
+id: ATLASDOM:api
+name: API Design & Integration
+
+[Term]
+id: ATLASDOM:auth
+name: Authentication & Authorization
+
+[Term]
+id: ATLASDOM:cache
+name: Caching
+
+[Term]
+id: ATLASDOM:compiler
+name: Compiler & Language Tooling
+
+[Term]
+id: ATLASDOM:database
+name: Database & Persistence
+
+[Term]
+id: ATLASDOM:database.postgresql
+name: PostgreSQL
+is_a: ATLASDOM:database ! Database & Persistence
+
+[Term]
+id: ATLASDOM:devops
+name: DevOps & Infrastructure
+
+[Term]
+id: ATLASDOM:devops.env-config
+name: Environment Configuration
+is_a: ATLASDOM:devops ! DevOps & Infrastructure
+
+[Term]
+id: ATLASDOM:devops.process-mgmt
+name: Process Management
+is_a: ATLASDOM:devops ! DevOps & Infrastructure
+
+[Term]
+id: ATLASDOM:error-handling
+name: Error Handling & Recovery
+
+[Term]
+id: ATLASDOM:frontend
+name: Frontend & UI
+
+[Term]
+id: ATLASDOM:frontend.sveltekit
+name: SvelteKit / Svelte
+is_a: ATLASDOM:frontend ! Frontend & UI
+
+[Term]
+id: ATLASDOM:gpu
+name: GPU & CUDA Acceleration
+
+[Term]
+id: ATLASDOM:graph
+name: Graph & Topology
+
+[Term]
+id: ATLASDOM:machine-learning
+name: Machine Learning
+
+[Term]
+id: ATLASDOM:retrieval
+name: Information Retrieval
+
+[Term]
+id: ATLASDOM:test
+name: Testing
