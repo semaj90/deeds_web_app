@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.doc14-embedding-dryrun.v1",
+  "runtime": "ollama",
+  "embedUrl": "http://127.0.0.1:11434",
+  "qdrantPreflight": {
+    "collection": "codebase_chunks_eg2_768_q8",
+    "pointsCount": 0,
+    "vectorSize": 768,
+    "distance": "Cosine"
+  },
+  "manifestRecordsValidated": 200,
+  "embeddedSampleCount": 10,
+  "matrixReceipt": {
+    "schema": "atlas.doc14-feature-matrix-receipt.v1",
+    "shape": [
+      10,
+      768
+    ],
+    "dtype": "float32",
+    "model": "embeddinggemma2:q8_0",
+    "modelSha256": "6f1bd4ac6c5df7444f9cca7ca36cafe6cfa34cd6f49fefb1e0b4be8143aed8bc",
+    "prefixPolicy": "embeddinggemma2-document-v1",
+    "candidateOrdinalMapChecksum": "sha256:cd2089ea6002926be0e4f6e516f2d590ab6955f0473828db04951705d706dfb9",
+    "matrixChecksum": "sha256:6edb45a347078e461fe27336a1b1e9c3cb9faaee0c4b18066c1eefb0c2f738ef",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "samplePointIds": [
+    {
+      "pointId": "b84e9ef5-76f7-5b78-a12c-ca9c9f45eaaa",
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:0046a5745d5d9e09",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts"
+    },
+    {
+      "pointId": "39230ca3-bcec-5aba-9973-c06e48dbe347",
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:0050320904c52c61",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts"
+    },
+    {
+      "pointId": "6557b9c3-9180-5829-a2e4-234ba7c21c47",
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:01dd89db9af965b1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts"
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

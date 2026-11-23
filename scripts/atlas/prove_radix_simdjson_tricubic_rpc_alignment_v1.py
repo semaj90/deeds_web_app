@@ -35,6 +35,10 @@ if str(WORKSPACE_ROOT / "python") not in sys.path:
     sys.path.insert(0, str(WORKSPACE_ROOT / "python"))
 
 from atlas_compute.interpolation import interpolate_topology_field
+from atlas_compute.radix_sort_cpp_helper_v1 import (
+    benchmark_radix_sort_backends_v1,
+    radix_sort_u64_cpp_or_fallback,
+)
 from python.atlas_domain_challenger_v1 import load_okf_groups
 from scripts.atlas.audit_unpacketized_bound_candidates_v2 import compute_packet_key_v2
 
@@ -388,13 +392,17 @@ def run_radix_simdjson_tricubic_rpc_alignment(
         )
         rpc_packets.append(rpc_pkt)
 
-    # Verify 8-pass LSB Radix Sort matches numpy std::sort / argsort exactly
+    # Verify 8-pass LSB Radix Sort matches numpy std::sort / argsort and C++20 _atlas_native_core / CUDA
     radix_sorted_keys, radix_perm = lsb_radix_sort_u64(packed_keys)
+    cpp_sorted_keys, cpp_perm, cpp_backend = radix_sort_u64_cpp_or_fallback(packed_keys.tolist())
+    radix_bench_receipt = benchmark_radix_sort_backends_v1(packed_keys.tolist())
     ref_perm = np.argsort(packed_keys, kind="stable")
     ref_sorted_keys = packed_keys[ref_perm]
     radix_parity = bool(
         np.array_equal(radix_sorted_keys, ref_sorted_keys)
         and np.array_equal(radix_perm, ref_perm)
+        and [int(k) for k in radix_sorted_keys.tolist()] == cpp_sorted_keys
+        and [int(i) for i in radix_perm.tolist()] == cpp_perm
     )
 
     # 2. PyTorch 3D Tricubic (4^3=64 Catmull-Rom) vs Trilinear (2^3=8) Alignment
@@ -445,6 +453,14 @@ def run_radix_simdjson_tricubic_rpc_alignment(
             "passes": 8,
             "bitsPerPass": 8,
             "matchesReferenceSortExact": radix_parity,
+            "cppNativeBackendUsed": cpp_backend,
+            "cppNativeAvailable": radix_bench_receipt.cpp_native_available,
+            "cppNativeElapsedMs": radix_bench_receipt.cpp_native_elapsed_ms,
+            "numpyLsdElapsedMs": radix_bench_receipt.numpy_lsd_elapsed_ms,
+            "torchCudaElapsedMs": radix_bench_receipt.torch_cuda_elapsed_ms,
+            "cppVsNumpyExactMatch": radix_bench_receipt.cpp_vs_numpy_exact_match,
+            "cudaVsCppExactMatch": radix_bench_receipt.cuda_vs_cpp_exact_match,
+            "speedupCppOverNumpy": radix_bench_receipt.speedup_cpp_over_numpy,
             "top3AscendingRadixKeysHex": [f"0x{int(k):016x}" for k in radix_sorted_keys[:3]],
             "top3ProjectionOrdinals": [int(idx) for idx in radix_perm[:3]],
         },

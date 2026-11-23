@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-structural-edge-contract.v1",
-  "generatedAt": "2026-09-15T23:53:54.120Z",
+  "generatedAt": "2026-11-23T00:11:11.184Z",
   "mode": "READ_ONLY_CONTRACT_AUDIT",
   "canonicalAuthority": false,
   "writes": {

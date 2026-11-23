@@ -1,0 +1,15 @@
+{
+  "schema": "atlas.doc14-valkey-ace-readback.v1",
+  "generatedAt": "2026-11-22T21:48:47.197Z",
+  "chunkId": "card:src/lib/server/ace/context-assembler.ts:0046a5745d5d9e09",
+  "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+  "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+  "cacheKey": "atlas:bitfrost:v1:ace_packet:ace_packet_v3:semantic_768:embeddinggemma2%3Aq8_0:doc14-admitted-chunks-v1:model%3Aunspecified:adapter%3Aunspecified:workspace-doc14-proof-v1:sha256%3A9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe:doc14-valkey-proof-v1:sha256%3A694470867e87ffa6c0fbae390df2a2b296a1605a6ae1df343b0ad3eef47c4c73",
+  "writeStatus": "WRITTEN",
+  "ttlSecondsObserved": 60,
+  "readbackStatus": "HIT",
+  "checksumMatched": true,
+  "staleRevisionRejected": true,
+  "cleanedUpTestKey": true,
+  "canonicalAuthority": false
+}

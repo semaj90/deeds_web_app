@@ -313,13 +313,18 @@
 					class="term-pill"
 					class:term-pill-live={handsFreeEnabled}
 					title={handsFreeEnabled ? 'Disable hands-free mode' : 'Enable hands-free mode'}
+					aria-label={handsFreeEnabled ? 'Disable hands-free voice mode' : 'Enable hands-free voice mode'}
 				>
 					<Icon name={handsFreeEnabled ? 'radio' : 'headphones'} size={14} />
-					{handsFreeEnabled ? 'LIVE' : 'VOICE'}
+					{handsFreeEnabled ? 'HANDS-FREE LIVE' : 'VOICE READY'}
 					{#if handsFreeEnabled}
 						<span class="term-state-tag">({stateLabels[conversationState]})</span>
 					{/if}
 				</button>
+				<details class="term-pill" aria-label="Voice commands reference">
+					<summary>VOICE CMDS</summary>
+					<small>Say: "send message" · "clear chat" · "stop speaking"</small>
+				</details>
 			{/if}
 			<button class="term-pill">TERMINAL</button>
 			<button class="term-pill term-pill-active">AI CHAT</button>

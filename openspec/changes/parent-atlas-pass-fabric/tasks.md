@@ -1361,6 +1361,140 @@ type PassExecution = {
       a Go Retrieval fusion owner. No KAG write was run.
       Focused MCP/kernel tests pass 41/41 on the current worktree; this is
       hermetic contract evidence, not live identity or model-injection proof.
+- [ ] KERNEL-GRAPH-DEPENDENCY-MIGRATION-01 — replace the `atlas_expand` /
+      `find_dependencies` Neo4j lookup only after a source-qualified structural
+      graph containing `IMPORTS`/`CALLS` edges is admitted. 2026-11-22 boundary
+      trace: the current derived graph manifest is revisioned but explicitly
+      `NON_PRODUCTION_DERIVED_ARTIFACT` (`graphRevision=sha256:5fdebed5…`;
+      `workspaceRevision=sha256:55edaaad…`; 2,545 nodes / 1,334 edges), and a
+      Parquet read found all 1,334 edges are `DEFINES`. Its referenced producer
+      plan selected zero sources and is `CURRENT_STRUCTURAL_EDGE_PLAN_INCOMPLETE`.
+      The referenced `current-source-graphify-batch-plan-v1.json` is dated
+      2026-09-17, `CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW`, has
+      `sourceBytesRevalidated=false` and `promotionAllowed=false`; its five
+      selected rows contain zero `CURRENT_GRAPHIFY_EXACT` classifications.
+      The edge plan's workspace revision also differs from the graph manifest.
+      Reconcile and revalidate the source cohort before rerunning the producer;
+      do not point it at an arbitrary current workspace snapshot. It therefore
+      cannot answer direct dependencies. Keep exact dependency
+      traversal on bounded NetworkX BFS over admitted typed dependency edges;
+      PageRank may only rank already-resolved candidates and must not create
+      dependency edges, identity, or evidence. cuGraph/CUDA is an optional,
+      receipt-backed ranking executor after CPU parity and resource admission;
+      it is not the graph source or a substitute for BFS. Require exact source
+      and workspace revisions, ordinal-map checksum, graph revision, bounded
+      result count, evidence refs, stale-input rejection, and no-write proof.
+      Trace of the six task-kernel facade mappings is complete at source level:
+      `atlas_context` → live TRACE search/packet binding (unadmitted candidates);
+      `atlas_inspect` → packet identity lookup, with Neo4j still used for name
+      search; `atlas_expand` → revision-bound Atlas graph resolver through
+      `find_dependencies` (no Neo4j fallback); `atlas_verify` → local
+      `classify_intent`; `atlas_validate_plan` → retrieval-backed
+      `build_recommendation` (not authorization); `atlas_research` → one context
+      round (`maxRounds` is echoed, not applied). This source trace does not
+      prove all six live transports. 2026-11-22 implementation update: the MCP
+      `find_dependencies` path now resolves an exact local byte hash against
+      `atlas_workspace_source_bindings` and `codebase_chunk_index`, then invokes
+      a read-only graph-artifact adapter. The adapter validates graph manifest,
+      ordinal-map checksum, source-plan checksum, graph/source/workspace
+      revisions, typed edge evidence, and uses NetworkX depth-1 BFS; NetworkX
+      PageRank only orders returned neighbors. It does not fall back to Neo4j,
+      write stores, or run CUDA. Focused MCP contract and graph-kernel tests
+      pass. The checked-in structural edge plan remains incomplete (0 selected
+      sources; its workspace revision differs from the graph artifact), so a
+      real lookup is still expected to return `SOURCE_GRAPH_PLAN_INCOMPLETE_OR_MISMATCHED`.
+      The database resolver, complete source-plan producer, current admitted
+      IMPORTS/CALLS edges, live MCP invocation, and CUDA parity/resource receipt
+      remain unproven. Follow-up 2026-11-22: the existing read-only source batch
+      planner now compares bounded selected local bytes against sourceRevision,
+      contentDigest, and byteLength; mismatch or unreadable files keep its plan
+      blocked with `SOURCE_BYTES_REVALIDATION_REQUIRED`. This helper has focused
+      unit coverage, but the DB comparison was not rerun because the available
+      admission/preflight is historical and requires exact operator approval to
+      refresh. Keep this task and KERNEL-RETRIEVAL-REAL-01 open; do not mark the
+      migration complete from fixture tests alone.
+      Live MCP read-only probe 2026-11-22 adds a separate runtime blocker:
+      `mcp__atlas_tools__find_dependencies({target:"src/lib/server/atlas/tensors/tensor-handle-4x4x6-v1.ts"})`
+      still returned `authority=neo4j_projection`, `failure=PROJECTION_MISSING_FILE`,
+      `graphRevision=null`, and no matched nodes. The connected `trace_database`
+      lookup for `feature_file_edges`, `atlas_graph_edges_v2`, and
+      `graphify_current_source_membership_v1` returned zero traces; that tool is
+      code mapping discovery, not a PostgreSQL schema/row audit. Therefore the
+      new workspace implementation is not yet proven loaded by the active MCP
+      runtime, and the user-provided PostgreSQL counts remain unverified in this
+      run. Before claiming migration, refresh/rebind the active MCP server under
+      its approved lifecycle, then run a read-only PostgreSQL schema/sample audit
+      for `feature_file_edges`, CPG, and source-membership tables. Do not select
+      all `atlas_graph_edges_v2` rows: the reported snapshots are superseded and
+      their edge classes are not imports/calls.
+      Follow-up 2026-11-22: added the MCP `inspect_postgres_backend` read-only
+      tool. Its Zod 4 request schema is published as JSON Schema Draft 7 for
+      the existing Ajv validator; the result is also Zod-validated. A local
+      stdio invocation reached `legal_ai_db` on PostgreSQL 18 in a confirmed
+      read-only transaction and found `atlas_workspace_source_bindings`,
+      `codebase_chunk_index`, and the three graph-v2 tables. It reports the
+      actual dependency path precisely: PostgreSQL source identity, local
+      revision-qualified graph artifact, NetworkX CPU traversal/ranking;
+      Neo4j and Valkey are explicitly not queried. Zero writes were performed.
+      This proves the local MCP process can reach PostgreSQL, not that the
+      connected desktop MCP server has been reloaded or that the graph artifact
+      is currently admitted. `trace_database` still uses Neo4j for its
+      `USES_DB` code-mapping query; no equivalent admitted PostgreSQL relation
+      was established here. Keep KERNEL-GRAPH-DEPENDENCY-MIGRATION-01 open.
+      Follow-up live PostgreSQL 18.4 read-only probe: `feature_file_edges`
+      has 95,995 rows but no predicate column and no candidate row for the
+      TensorHandle target; `cpg_edges` and `phase89_import_edges` each have 0
+      rows; `graphify_current_source_membership_v1` has 30,318 rows. Both
+      `atlas_graph_snapshots_v2` rows are `SUPERSEDED`; graph-v2 edges remain
+      `CONTAINS`, `MATERIALIZES`, and `DERIVED_FROM`. Thus PostgreSQL is live,
+      but its inspected relations do not yet provide current IMPORTS/CALLS
+      edges for this lookup. The connected MCP still returned the Neo4j result
+      after the local code update. Do not switch dependency traversal to these
+      tables or claim the connected MCP has adopted the local tool until a
+      current source-qualified edge snapshot and approved server reload exist.
+      Follow-up: added `scripts/atlas/audit-graph-sources-readonly-v1.mjs` as a
+      bounded operator-run discovery tool. It confirms PostgreSQL read-only
+      transaction mode before introspection, uses statement/lock timeouts,
+      queries only allowlisted public tables and safe identity/provenance sample
+      columns, and emits basename matches explicitly as candidates rather than
+      exact identity. Mocked safety/argument tests pass 4/4. Live read-only
+      audit (2026-11-22) confirmed PostgreSQL 18.4 and found no target basename
+      candidates in `code_features`, graph-v2 nodes, Graphify membership/files,
+      or `codebase_chunk_index`; both graph-v2 snapshots remain superseded with
+      null graph/source/workspace revisions. The 6,558 `code_feature_edges`
+      rows include 110 `DEPENDS_ON`; aggregate readback shows exactly 11
+      distinct source/target IDs, uniform confidence 0.10000000149011612, and
+      zero non-null `evidence_ref` values. This matches the `--complete-graph`
+      branch of `sveltekit-frontend/scripts/atlas/populate-code-feature-edges.mjs`,
+      which emits bidirectional all-pairs edges at `1/(n-1)` and stores no
+      source or workspace revision. These are synthetic topology, not admitted
+      dependency edges.
+      `phase89_import_edges`, `cpg_edges`, and `atlas_typed_edges` are empty.
+      The audit now includes `code_feature_edges.relation` and endpoint IDs;
+      focused tests pass 4/4. No graph was promoted and no database writes
+      occurred. Keep the migration task open.
+      Follow-up read-only `trace_database` latency check (2026-11-22): the
+      existing FTS GIN index is used, but PostgreSQL planned a sequential scan
+      of about 93,500 `atlas_workspace_source_bindings` rows because the
+      source-binding join used three `OR` predicates. A candidate `JOIN
+      LATERAL` with three indexed equality branches reduced estimated total
+      cost from 11,641.88 to 1,408.35. On PostgreSQL 18.4 read-only, the old
+      and candidate queries returned identical 107-row results (same SHA-256);
+      the paired read-only comparison completed in about 17 seconds overall,
+      while a separately timed candidate returned 107 rows in 34.39 ms under
+      a 5-second timeout. The local MCP SQL now uses
+      the indexed branch form and its focused contract test passes. This does
+      not reload the connected desktop MCP facade, fix missing source index
+      identity, or supply a current dependency graph; those remain open.
+      Follow-up on the four `localSourceBytesMismatch` records: their current
+      on-disk files still match the planner report's recorded local byte length
+      and SHA-256 exactly. The differing fields are the existing workspace
+      source binding's `sourceRevision`, `contentDigest`, and `byteLength`, not
+      a change since the report was generated. All four are under `.claude/`;
+      one is `settings.local.json`. No file contents were read into output or
+      changed. This is stale/conflicting binding metadata, not a safe local
+      repair. Do not rebind these files or refresh Graphify from them without
+      an approved current workspace snapshot and source-inclusion policy.
 - [ ] KERNEL-CONTEXT-ADMISSION-01 — held until real query-specific,
       canonical, revision-qualified evidence is returned and independently
       read back. Also withhold unadmitted candidate summaries from any

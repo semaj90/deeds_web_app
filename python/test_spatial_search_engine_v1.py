@@ -36,7 +36,7 @@ def test_okf_ast_node_schema():
 
 def test_spatial_codebase_index_cpu():
     dim = 64
-    index = SpatialCodebaseIndex(dim=dim, j_bits=32, num_voronoi_cells=4, device="cpu")
+    index = SpatialCodebaseIndex(dim=dim, j_bits=32, num_voronoi_cells=4, device="cpu", allow_ephemeral_projection=True)
     embeddings = torch.randn(10, dim)
 
     x_l2, hamming_bits, hilbert_keys = index.normalize_and_hash(embeddings)

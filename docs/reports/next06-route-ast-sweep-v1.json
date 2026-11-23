@@ -4,10 +4,10 @@
   "writesPerformed": false,
   "totalApiRoutesIndexed": 900,
   "sweptCount": 900,
-  "matchedCount": 893,
-  "totalNodes": 4350,
-  "routesWithSchema": 604,
-  "routesWithAuth": 847,
+  "matchedCount": 900,
+  "totalNodes": 4363,
+  "routesWithSchema": 605,
+  "routesWithAuth": 849,
   "results": [
     {
       "route": "src/routes/api/ace/agent/+server.ts",
@@ -4946,14 +4946,17 @@
     },
     {
       "route": "src/routes/api/codebase-index/centroids/+server.ts",
-      "ok": false,
-      "nodeCount": 0,
-      "byKind": {},
-      "validationProblems": [
-        "EXTRACTION_FAILED"
-      ],
-      "receiptChecksum": null,
-      "receiptReadback": null
+      "ok": true,
+      "nodeCount": 6,
+      "byKind": {
+        "file": 1,
+        "schema": 1,
+        "route": 2,
+        "auth_guard": 2
+      },
+      "validationProblems": [],
+      "receiptChecksum": "bec1f4dfd8275c45514d060b25d05cf914b1fdeb15fe943f0e38af0de70d687f",
+      "receiptReadback": "MATCH"
     },
     {
       "route": "src/routes/api/codebase-index/claude-assist/+server.ts",
@@ -5914,7 +5917,7 @@
     },
     {
       "route": "src/routes/api/contextual/stats/+server.ts",
-      "ok": false,
+      "ok": true,
       "nodeCount": 4,
       "byKind": {
         "file": 1,
@@ -5928,7 +5931,7 @@
     },
     {
       "route": "src/routes/api/conversations/[id]/+server.ts",
-      "ok": false,
+      "ok": true,
       "nodeCount": 12,
       "byKind": {
         "file": 1,
@@ -5942,7 +5945,7 @@
     },
     {
       "route": "src/routes/api/couchdb/view/+server.ts",
-      "ok": false,
+      "ok": true,
       "nodeCount": 3,
       "byKind": {
         "file": 1,
@@ -5955,7 +5958,7 @@
     },
     {
       "route": "src/routes/api/courtroom/dialogue/+server.ts",
-      "ok": false,
+      "ok": true,
       "nodeCount": 4,
       "byKind": {
         "file": 1,
@@ -5982,7 +5985,7 @@
     },
     {
       "route": "src/routes/api/courtroom/studio/draft/+server.ts",
-      "ok": false,
+      "ok": true,
       "nodeCount": 8,
       "byKind": {
         "file": 1,
@@ -12151,14 +12154,16 @@
     },
     {
       "route": "src/routes/api/wiki/watch/+server.ts",
-      "ok": false,
-      "nodeCount": 0,
-      "byKind": {},
-      "validationProblems": [
-        "EXTRACTION_FAILED"
-      ],
-      "receiptChecksum": null,
-      "receiptReadback": null
+      "ok": true,
+      "nodeCount": 7,
+      "byKind": {
+        "file": 1,
+        "route": 3,
+        "auth_guard": 3
+      },
+      "validationProblems": [],
+      "receiptChecksum": "375fb258b7da926c9c83eae9abe3670190fc714870cebcb0a90f3fd2596cd6b0",
+      "receiptReadback": "MATCH"
     },
     {
       "route": "src/routes/api/worker/autotag/trigger/+server.ts",

@@ -5,11 +5,11 @@
  * caches them in Redis (6h TTL), and persists to Postgres gpu_cluster_centroids.
  *
  * Typically called after graphify:semantic / GPU k-means completes.
- * Safe to re-run — upserts are idempotent.
+ * Safe to re-run â€” upserts are idempotent.
  *
  * Body (optional):
  *   { clusterIds?: number[], clusterType?: 'gpu' | 'som' }
- *   — defaults to all clusters 0-49 if clusterIds omitted
+ *   â€” defaults to all clusters 0-49 if clusterIds omitted
  *
  * Returns: { built, persisted, durationMs }
  */

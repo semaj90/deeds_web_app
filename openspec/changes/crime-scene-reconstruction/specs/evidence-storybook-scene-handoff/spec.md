@@ -55,3 +55,14 @@ The system MUST keep original-image pixels, relative monocular depth, calibrated
 #### Scenario: Pick a compiled scene object
 - **WHEN** an investigator selects a rendered object using the scene BVH
 - **THEN** the inspector resolves it to the saved scene revision and its source observation/artifact references; BVH picking does not perform semantic or legal search
+
+### Requirement: Indexed palette visuals use revision-bound sidecar bindings
+The renderer MAY consume a read-only visual binding that joins a stable scene object and scene revision to an authorized indexed-palette artifact, source revision, content hash, and normalized-UV affine transform. The client MUST recheck the expected case/scene/object/source scope and verify the fetched artifact hash before rendering. Palette indices, candidate-ordinal bitsets, and retrieval-feature INT4 values MUST remain separate representations; a candidate-selection bitset MUST NOT be interpreted as a per-pixel mask. The affine transform MUST be labeled `NORMALIZED_UV` and MUST NOT change source-image or world-coordinate evidence claims.
+
+#### Scenario: Visual asset or scene binding is stale
+- **WHEN** a palette artifact's revision/hash or the expected scene/object/source scope does not match the binding
+- **THEN** the client rejects the visual upgrade and retains the existing placeholder or material
+
+#### Scenario: A valid affine palette visual is loaded
+- **WHEN** an authorized binding and exact artifact bytes are current
+- **THEN** the existing WebGL2/WebGPU palette shader applies the binding's normalized-UV affine transform while stable scene-object identity and scene revision remain unchanged

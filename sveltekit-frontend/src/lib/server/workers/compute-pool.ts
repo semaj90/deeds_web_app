@@ -40,7 +40,9 @@ export interface RunOptions {
 export const DEFAULT_MAX_QUEUED_COMPUTE_TASKS = 64;
 export const DEFAULT_MAX_QUEUED_COMPUTE_BYTES = 64 * 1024 * 1024;
 export const MAX_SIMILARITY_CANDIDATES_PER_BATCH = 500;
-export const MAX_SIMILARITY_BATCH_BYTES = 64 * 1024 * 1024;
+// Keep this as decimal MB: the fixed 500-row cap must not hide large-dimension
+// batches that exceed the intended transfer/allocation budget.
+export const MAX_SIMILARITY_BATCH_BYTES = 64_000_000;
 export const MAX_GPU_SIMILARITY_VALUES_PER_BATCH = 250_000;
 export const MAX_SOM_RADIX_CANDIDATES = 65_536;
 

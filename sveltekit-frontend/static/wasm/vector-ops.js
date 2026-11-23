@@ -96,6 +96,8 @@ export const {
   dotProduct,
   manhattanDistance,
   normalize,
+  normalizeWithEpsilon,
+  l2NormalizeBackwardWithEpsilon,
   zScoreNormalize,
   computeBatchSimilarity,
   batchNormalizeVectors,

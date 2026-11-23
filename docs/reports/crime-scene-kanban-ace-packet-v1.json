@@ -26,6 +26,13 @@
         "pa:render.camera.follow-actor"
       ]
     },
+    "keywordDomainAlignment": {
+      "status": null,
+      "shadowCorpusEntries": 0,
+      "topKCount": 0,
+      "domainBitmapParity": "PROVEN",
+      "hybridTopKBaseline": "PROVEN"
+    },
     "prefillTasks": [
       {
         "rank": 1,
@@ -39,6 +46,17 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-04#L859",
         "ConfidenceScore": 0.96,
         "summary": "CASE-SCENE-LIVE-04 · Activity-aware memory and LOD · CREATED and WIRED (partial). The case Three.js runtime now consumes the existing Mor...",
+        "nlp8095": {
+          "concepts": [],
+          "domain": "memory_lod_residency",
+          "rankScore": null
+        },
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-LIVE-04_859",
+          "promptSha256": "b1411d58fe3e239753a78b321ad5855fc19a24a921545f33836f96f9b29ce515",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -57,6 +75,17 @@
         "ConceptID": "openspec:crime-scene-reconstruction:SCENE-20#L40",
         "ConfidenceScore": 0.95,
         "summary": "SCENE-20 Primitive vocabulary and composition: reuse `scene-primitive-registry-v1.ts`, `scene-prefab-registry-v1.ts`, and the proposed 50...",
+        "nlp8095": {
+          "concepts": [],
+          "domain": "character_v2",
+          "rankScore": null
+        },
+        "dspyRlmPrompt": {
+          "chainId": "task_SCENE-20_40",
+          "promptSha256": "a7dcd70e68a2cebb6987b39ffcf8455c1733eba879556170e41d66acdb35a4ed",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -75,6 +104,17 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-03-#L857",
         "ConfidenceScore": 0.95,
         "summary": "CASE-SCENE-LIVE-03-video-clock · CREATED and WIRED, worktree base `4ae8253ab6e`. The scene preview can follow the selected lane's revisio...",
+        "nlp8095": {
+          "concepts": [],
+          "domain": "scene_ui_webgl",
+          "rankScore": null
+        },
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-LIVE-03-_857",
+          "promptSha256": "a4a31fe3a840bea03575511a1d6069f7771bfd435bf391fd898fcaf838c8af0b",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -93,6 +133,17 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-05#L860",
         "ConfidenceScore": 0.95,
         "summary": "CASE-SCENE-LIVE-05 · Memory and performance modal · CREATED and WIRED (partial). The scene preview dialog samples at 750 ms while open. I...",
+        "nlp8095": {
+          "concepts": [],
+          "domain": "memory_lod_residency",
+          "rankScore": null
+        },
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-LIVE-05_860",
+          "promptSha256": "9964ae28bd3db31005cabc66d08533457b3f67f7f31b52915a63d6c9b330eb76",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -111,6 +162,12 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-01#L846",
         "ConfidenceScore": 0.94,
         "summary": "CASE-SCENE-LIVE-01 · Assistant chat and editable proposals · CREATED and WIRED (partial). The case scene builder now sends an explicit us...",
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-LIVE-01_846",
+          "promptSha256": "02dd31243d0828c6457bb62521dcdf0f989f570f3f8b9abd8161a31ff2d5b8e1",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -129,6 +186,12 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-11-#L874",
         "ConfidenceScore": 0.92,
         "summary": "CASE-SCENE-E2E-11-character-v2-alignment · CREATED and WIRED (partial, 2026-11-20). Reconciled the Parent Atlas Character Creator v2 refe...",
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-E2E-11-_874",
+          "promptSha256": "7f05ad94e6c000d5e38d563cba71a2594ff2fb7e6295731d50aa01686c6531d9",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -147,6 +210,12 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-#L816",
         "ConfidenceScore": 0.9,
         "summary": "CASE-SCENE-E2E-02c-5-edit-reopened CREATED and WIRED at worktree base `4ae8253ab6e`: reopening an editor-compatible draft restores its en...",
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-E2E-_816",
+          "promptSha256": "165e8576d70d9a3e05bd6080f94f792e40fb688a40379832c931e7a9149d08c8",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -165,6 +234,12 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-01-#L852",
         "ConfidenceScore": 0.89,
         "summary": "CASE-SCENE-LIVE-01-selection-inspector · CREATED, WIRED, and synthetic-browser-proven (partial, 2026-11-20). Selecting a scene object now...",
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-LIVE-01-_852",
+          "promptSha256": "4b61bddbc148000c7a6f1911ee7b5ce1f84cf5f83e010f8a550a78a8b6ae3339",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -183,6 +258,12 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-01-#L853",
         "ConfidenceScore": 0.89,
         "summary": "CASE-SCENE-LIVE-01-overlapping-cue-conflicts · CREATED, WIRED, and synthetic-browser-proven (partial, 2026-11-20). Runtime evaluation det...",
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-LIVE-01-_853",
+          "promptSha256": "5324b60a67065629df9ffd2071d36a45c09899082fb5c4d9ab3f5ecd9596e210",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -201,6 +282,12 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-#L817",
         "ConfidenceScore": 0.88,
         "summary": "CASE-SCENE-E2E-02c-5-reviewed-video CREATED and WIRED at worktree base `4ae8253ab6e`: the case builder imports approved events from selec...",
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-E2E-_817",
+          "promptSha256": "c11dbe24788adf364633ae8bcc116c337d99f3108f247e9b0e7cf853cba49a68",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -219,6 +306,12 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-#L818",
         "ConfidenceScore": 0.88,
         "summary": "CASE-SCENE-E2E-02c-5-procedural-draft CREATED and WIRED at worktree base `4ae8253ab6e`: save and reopen the illustrative plan and event/t...",
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-E2E-_818",
+          "promptSha256": "6a72eb08598ce8ec300f68a87639ae7d007395ec538096f6552c7e136b8bfb72",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -237,6 +330,12 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-02-#L855",
         "ConfidenceScore": 0.87,
         "summary": "CASE-SCENE-LIVE-02-preview · CREATED and WIRED (partial). The case builder shows evidence and plan preparation stages, aborts both fetch ...",
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-LIVE-02-_855",
+          "promptSha256": "2ceb6c5a16d62448e7fa5baee1e9d868d82e6d554775e6da7e6cd2d32762d73f",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -255,6 +354,12 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-08#L865",
         "ConfidenceScore": 0.86,
         "summary": "CASE-SCENE-LIVE-08 · Searchable scene recipe catalog · CREATED and WIRED (partial). Added a deterministic local search index over the exi...",
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-LIVE-08_865",
+          "promptSha256": "8d41378d6db86607d4a409746e7eeacfe741e26f29049d1647624124a98f7ba0",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -273,6 +378,12 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-09-#L870",
         "ConfidenceScore": 0.86,
         "summary": "CASE-SCENE-E2E-09-report · CREATED and WIRED (partial, 2026-11-20). Added `scene-revision-report-v1.ts` and an authorized `GET /api/cases...",
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-E2E-09-_870",
+          "promptSha256": "b24457d6ddd98129166c154dcfbecf1efd6cae3d5b8e5e7afde382e16999073a",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -291,6 +402,12 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-E2E-10-#L872",
         "ConfidenceScore": 0.85,
         "summary": "CASE-SCENE-E2E-10-blockout-staging Playwright scenario authored for an evidence-free cue and object annotation. It compares the save rece...",
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-E2E-10-_872",
+          "promptSha256": "693344d9bb91ca1f6f20ca26eeb83089c7f70ae41ddba74b253ad51faf4fe1f8",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -309,6 +426,12 @@
         "ConceptID": "openspec:crime-scene-reconstruction:CASE-SCENE-LIVE-01-#L851",
         "ConfidenceScore": 0.83,
         "summary": "CASE-SCENE-LIVE-01-event-targets · CREATED and WIRED (partial). Editable event cues now accept one primary and up to 63 additional actor/...",
+        "dspyRlmPrompt": {
+          "chainId": "task_CASE-SCENE-LIVE-01-_851",
+          "promptSha256": "40bae3e9c00915fbd606aa1a992ce1d934e1c17464683e0263dd08d172d46da3",
+          "rtxTotalBufferBytes": 704,
+          "alignmentBytes": 64
+        },
         "kernelDagCandidate": {
           "requiresSchemaGate": true,
           "requiresIndependentReadback": true,
@@ -317,5 +440,5 @@
       }
     ]
   },
-  "packetSha256": "24bc9f5af2be377a4cad87f18b623c760d5cc90587b3b70711ea1dedc87ad9bf"
+  "packetSha256": "9a234a77cb22f5f9f6b637646452aa0982c138d7b6bebafd16b1a4330ba8f191"
 }

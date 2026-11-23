@@ -358,6 +358,165 @@ Napi::Value AssembleLodTextureBlockNapi(const Napi::CallbackInfo& info) {
     return buffer;
 }
 
+Napi::Value EncodeTensorHandle4x4x6V1Napi(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 7 || !info[0].IsTypedArray() ||
+        info[0].As<Napi::TypedArray>().TypedArrayType() != napi_float32_array ||
+        !info[1].IsNumber() || !info[2].IsNumber() || !info[3].IsNumber() ||
+        !info[4].IsBigInt() || !info[5].IsBigInt() ||
+        !info[6].IsTypedArray() || info[6].As<Napi::TypedArray>().TypedArrayType() != napi_float32_array) {
+        Napi::TypeError::New(
+            env,
+            "Expected (Float32Array values96, candidateOrdinal, kmeansClusterId, somBmuId, BigInt wsRev64, BigInt srcRev64, Float32Array affine2x3, [residencyState, activeConsumers])"
+        ).ThrowAsJavaScriptException();
+        return env.Null();
+    }
+    const auto values = info[0].As<Napi::Float32Array>();
+    const auto affine = info[6].As<Napi::Float32Array>();
+    if (values.ElementLength() != TENSOR_HANDLE_V1_ELEMENT_COUNT) {
+        Napi::RangeError::New(env, "TENSOR_HANDLE_V1_REQUIRES_96_VALUES").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+    if (affine.ElementLength() != 6) {
+        Napi::RangeError::New(env, "TENSOR_HANDLE_V1_REQUIRES_6_AFFINE_COEFFS").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+    const std::uint32_t candidate_ordinal = info[1].As<Napi::Number>().Uint32Value();
+    const std::uint16_t kmeans_cluster_id = static_cast<std::uint16_t>(info[2].As<Napi::Number>().Uint32Value() & 0xFFFFu);
+    const std::uint32_t som_raw = info[3].As<Napi::Number>().Uint32Value();
+    if (som_raw >= 400) {
+        Napi::RangeError::New(env, "TENSOR_HANDLE_V1_SOM_BMU_OUT_OF_RANGE").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+    bool lossless_ws = false;
+    bool lossless_src = false;
+    const std::uint64_t ws_rev = info[4].As<Napi::BigInt>().Uint64Value(&lossless_ws);
+    const std::uint64_t src_rev = info[5].As<Napi::BigInt>().Uint64Value(&lossless_src);
+    std::uint8_t residency_state = static_cast<std::uint8_t>(SafeTileResidencyStateV1::HOST_STAGED);
+    if (info.Length() >= 8 && info[7].IsNumber()) {
+        const std::uint32_t st = info[7].As<Napi::Number>().Uint32Value();
+        if (st > 6) {
+            Napi::RangeError::New(env, "SAFE_RESIDENCY_STATE_OUT_OF_RANGE").ThrowAsJavaScriptException();
+            return env.Null();
+        }
+        residency_state = static_cast<std::uint8_t>(st);
+    }
+    std::uint16_t active_consumers = 0;
+    if (info.Length() >= 9 && info[8].IsNumber()) {
+        active_consumers = static_cast<std::uint16_t>(info[8].As<Napi::Number>().Uint32Value() & 0xFFFFu);
+    }
+
+    std::array<float, 6> aff{};
+    for (std::size_t i = 0; i < 6; ++i) aff[i] = affine[i];
+
+    try {
+        const auto encoded = encode_tensor_handle_4x4x6_v1(
+            values.Data(),
+            candidate_ordinal,
+            kmeans_cluster_id,
+            static_cast<std::uint16_t>(som_raw),
+            ws_rev,
+            src_rev,
+            aff,
+            static_cast<SafeTileResidencyStateV1>(residency_state),
+            active_consumers
+        );
+        AlignedExternalBufferOwner* owner = nullptr;
+        auto buffer = NewAlignedExternalBuffer(env, TENSOR_HANDLE_V1_TOTAL_BYTES, owner);
+        if (env.IsExceptionPending() || owner == nullptr) return env.Null();
+        std::memcpy(owner->data, encoded.data(), TENSOR_HANDLE_V1_TOTAL_BYTES);
+        return buffer;
+    } catch (const std::exception& ex) {
+        Napi::RangeError::New(env, ex.what()).ThrowAsJavaScriptException();
+        return env.Null();
+    }
+}
+
+Napi::Value DecodeTensorHandle4x4x6V1Napi(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 2 || !info[0].IsTypedArray() || !info[1].IsBigInt()) {
+        Napi::TypeError::New(env, "Expected (Buffer|Uint8Array bytes160, BigInt expectedWorkspaceRevisionPrefix64)").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+    const auto arr = info[0].As<Napi::TypedArray>();
+    const auto* raw_ptr = static_cast<const std::uint8_t*>(arr.ArrayBuffer().Data()) + arr.ByteOffset();
+    const std::size_t byte_len = arr.ByteLength();
+    bool lossless = false;
+    const std::uint64_t expected_ws = info[1].As<Napi::BigInt>().Uint64Value(&lossless);
+    try {
+        const auto decoded = decode_tensor_handle_4x4x6_v1(raw_ptr, byte_len, expected_ws);
+        auto out = Napi::Float32Array::New(env, TENSOR_HANDLE_V1_ELEMENT_COUNT);
+        std::copy(decoded.begin(), decoded.end(), out.Data());
+        return out;
+    } catch (const std::exception& ex) {
+        Napi::RangeError::New(env, ex.what()).ThrowAsJavaScriptException();
+        return env.Null();
+    }
+}
+
+Napi::Value TransitionSafeTileResidencyV1Napi(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 4 || !info[0].IsNumber() || !info[1].IsNumber() ||
+        !info[2].IsBoolean() || !info[3].IsNumber()) {
+        Napi::TypeError::New(env, "Expected (currentState, targetState, transferCompleted, activeConsumers, [revisionMatched])").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+    const std::uint32_t curr = info[0].As<Napi::Number>().Uint32Value();
+    const std::uint32_t targ = info[1].As<Napi::Number>().Uint32Value();
+    if (curr > 6 || targ > 6) {
+        Napi::RangeError::New(env, "SAFE_RESIDENCY_STATE_OUT_OF_RANGE").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+    const bool transfer_completed = info[2].As<Napi::Boolean>().Value();
+    const std::uint32_t active_consumers = info[3].As<Napi::Number>().Uint32Value();
+    bool revision_matched = true;
+    if (info.Length() >= 5 && info[4].IsBoolean()) {
+        revision_matched = info[4].As<Napi::Boolean>().Value();
+    }
+    try {
+        const auto next = transition_safe_tile_residency_v1(
+            static_cast<SafeTileResidencyStateV1>(curr),
+            static_cast<SafeTileResidencyStateV1>(targ),
+            transfer_completed,
+            active_consumers,
+            revision_matched
+        );
+        return Napi::Number::New(env, static_cast<std::uint32_t>(next));
+    } catch (const std::exception& ex) {
+        Napi::RangeError::New(env, ex.what()).ThrowAsJavaScriptException();
+        return env.Null();
+    }
+}
+
+Napi::Value ProjectMode7Affine2x3V1Napi(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 3 || !info[0].IsTypedArray() ||
+        info[0].As<Napi::TypedArray>().TypedArrayType() != napi_float32_array ||
+        !info[1].IsNumber() || !info[2].IsNumber()) {
+        Napi::TypeError::New(env, "Expected (Float32Array affine2x3, number u, number v)").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+    const auto affine = info[0].As<Napi::Float32Array>();
+    if (affine.ElementLength() != 6) {
+        Napi::RangeError::New(env, "TENSOR_HANDLE_V1_REQUIRES_6_AFFINE_COEFFS").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+    std::array<float, 6> aff{};
+    for (std::size_t i = 0; i < 6; ++i) aff[i] = affine[i];
+    const float u = info[1].As<Napi::Number>().FloatValue();
+    const float v = info[2].As<Napi::Number>().FloatValue();
+    try {
+        const auto pt = project_mode7_affine_2x3_v1(aff, u, v);
+        auto out = Napi::Float32Array::New(env, 2);
+        out[0] = pt[0];
+        out[1] = pt[1];
+        return out;
+    } catch (const std::exception& ex) {
+        Napi::RangeError::New(env, ex.what()).ThrowAsJavaScriptException();
+        return env.Null();
+    }
+}
+
 Napi::Object InitAtlasNativeCore(Napi::Env env, Napi::Object exports) {
     exports.Set("detectRfcOrLanguage", Napi::Function::New(env, DetectRfcOrLanguageNapi));
     exports.Set("packTurboVecMrl128", Napi::Function::New(env, PackTurboVecMrl128Napi));
@@ -368,6 +527,10 @@ Napi::Object InitAtlasNativeCore(Napi::Env env, Napi::Object exports) {
     exports.Set("unpackPgvectorBinary768", Napi::Function::New(env, UnpackPgvectorBinary768Napi));
     exports.Set("radixSortSomCandidateIndicesV1", Napi::Function::New(env, RadixSortSomCandidateIndicesNapi));
     exports.Set("assembleLodTextureBlockV1", Napi::Function::New(env, AssembleLodTextureBlockNapi));
+    exports.Set("encodeTensorHandle4x4x6V1", Napi::Function::New(env, EncodeTensorHandle4x4x6V1Napi));
+    exports.Set("decodeTensorHandle4x4x6V1", Napi::Function::New(env, DecodeTensorHandle4x4x6V1Napi));
+    exports.Set("transitionSafeTileResidencyV1", Napi::Function::New(env, TransitionSafeTileResidencyV1Napi));
+    exports.Set("projectMode7Affine2x3V1", Napi::Function::New(env, ProjectMode7Affine2x3V1Napi));
     return exports;
 }
 

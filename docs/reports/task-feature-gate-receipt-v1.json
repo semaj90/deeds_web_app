@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.task-feature-gate-receipt.v1",
+  "taskCount": 40,
+  "keywordCsr": {
+    "shape": [
+      40,
+      331
+    ],
+    "nnz": 570,
+    "csrChecksum": "sha256:b04221a38caef40ebaa9e12240a5ea4f98ca2013096becf02f80a8856e7bb2be"
+  },
+  "domainCsr": {
+    "shape": [
+      40,
+      17
+    ],
+    "nnz": 6,
+    "csrChecksum": "sha256:56fa8cf1c23ea909bd3dc1d4dc5529a702abd0ef117b3b9e7d2687f1c16b9ec2",
+    "proposalOnly": true
+  },
+  "queueProposalCount": 40,
+  "sampleQueueProposal": {
+    "idempotencyKey": "sha256:3b0a5920ad5a69ffd0f580343c447a9ed6f414a3ded27732c61fe799ca6ae2f3",
+    "taskId": "parent-atlas-prefill-routing-residency-convergence:L59",
+    "taskRevision": "line:59:sha256:e55597b28bba",
+    "scope": "repo:deeds",
+    "sourceRef": "openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md",
+    "sourceSha256": "sha256:e55597b28bba1fbd47ac8ee905c57b1fa9b1aa7ce83939b6ee3c52a41c15247b",
+    "status": "PROPOSED",
+    "canonicalAuthority": false
+  },
+  "tournamentPromotionGate": {
+    "schema": "atlas.tournament-promotion-gate.v1",
+    "winner": "xgboost_ranker",
+    "evalRows": 6,
+    "minEvalRows": 30,
+    "executionUtilityMaskedCount": 200,
+    "promotionAllowed": false,
+    "reasons": [
+      "INSUFFICIENT_EVAL_GROUPS:6<30",
+      "EXECUTION_UTILITY_MASKED:200"
+    ],
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

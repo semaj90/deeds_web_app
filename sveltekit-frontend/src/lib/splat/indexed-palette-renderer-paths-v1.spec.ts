@@ -60,16 +60,18 @@ describe('CPU oracle for the shared index formula', () => {
 });
 
 describe('TSL material construction (no GPU required)', () => {
-	it('builds a node material with a colour node and the packed texture uniforms', () => {
+	it('builds a node material with packed textures and applies the validated UV affine', () => {
 		const width = 4;
 		const height = 4;
 		const rgba = new Uint8Array(width * height * 4).fill(128);
 		const indexed = quantizeRgbaToIndexed4BppV1(width, height, rgba);
 		const source = new THREE.MeshStandardMaterial({ map: new THREE.DataTexture(new Uint8Array(4), 1, 1) });
-		const { material, textures } = createIndexedPaletteTslMaterialV1(THREE, source, indexed);
+		const affine = [1, 0, 0.25, 0, 1, 0] as const;
+		const { material, textures } = createIndexedPaletteTslMaterialV1(THREE, source, indexed, 4096, undefined, affine);
 		expect(material.isMeshStandardNodeMaterial).toBe(true);
 		expect(material.colorNode).toBeTruthy();
 		expect(material.userData.atlasIndexedPaletteRendererPath).toBe('webgpu-tsl-packed');
+		expect(material.userData.atlasIndexedPaletteUvAffine).toEqual(affine);
 		expect(textures.packedIndexTexture.format).toBe(THREE.RedFormat);
 		expect(textures.gpuTexelBytes).toBeGreaterThan(0);
 		textures.dispose();

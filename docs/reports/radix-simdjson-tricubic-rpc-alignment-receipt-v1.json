@@ -1,6 +1,6 @@
 {
   "schema": "atlas.radix-simdjson-tricubic-rpc-alignment-receipt.v1",
-  "generatedAt": "2026-10-25T23:33:57.609868+00:00",
+  "generatedAt": "2026-11-22T17:14:36.537298+00:00",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "radixSort64BitProof": {
@@ -9,6 +9,14 @@
     "passes": 8,
     "bitsPerPass": 8,
     "matchesReferenceSortExact": true,
+    "cppNativeBackendUsed": "cpp_pybind11_native",
+    "cppNativeAvailable": true,
+    "cppNativeElapsedMs": 0.0235,
+    "numpyLsdElapsedMs": 0.8955,
+    "torchCudaElapsedMs": 33.9535,
+    "cppVsNumpyExactMatch": true,
+    "cudaVsCppExactMatch": true,
+    "speedupCppOverNumpy": 38.11,
     "top3AscendingRadixKeysHex": [
       "0x0100037200000023",
       "0x010005090000008c",
@@ -112,5 +120,5 @@
     },
     "v2ReceiptChecksum": "sha256:6bc87dbbd900297d5d66f1fe592df70a1e36f8e618ddf5c443ae4128811550da"
   },
-  "receiptChecksum": "sha256:583951c251ffa54091195da9e40de42b3d7a2a86ed9c60cab9cce6069f580a28"
+  "receiptChecksum": "sha256:b60950eb8c2f479ca2685914d0779ce80dbd35007627c3708ae69ba39fa5aade"
 }

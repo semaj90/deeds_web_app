@@ -42,6 +42,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Optional
 
+from atlas_domain_classifier_runtime import NumpyCentroidKMeans, cluster_distance_features
+
 try:
     import numpy as np
     import sklearn
@@ -192,6 +194,15 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=200, help="Max files to sample (bounded, not the whole repo)")
     parser.add_argument("--extensions", nargs="+", default=[".ts"])
     parser.add_argument("--n-clusters", type=int, default=16)
+    parser.add_argument(
+        "--compute-backend",
+        choices=("cpu", "cuda", "auto"),
+        default="cpu",
+        help=(
+            "KMeans fit backend. 'cuda' requires a working RAPIDS/cuML CUDA runtime and fails closed; "
+            "'auto' may fall back to scikit-learn. NB/LR heads remain scikit-learn CPU models."
+        ),
+    )
     parser.add_argument("--api-url", default=DEFAULT_CLASSIFY_API_URL)
     parser.add_argument("--ollama-url", default=DEFAULT_OLLAMA_URL)
     parser.add_argument("--embed-model", default=DEFAULT_EMBED_MODEL)
@@ -311,9 +322,51 @@ def main() -> int:
         )
         return 1
 
-    print(f"Fitting KMeans(n_clusters={args.n_clusters}) over {len(all_chunk_embeddings)} chunk embeddings...")
-    kmeans = KMeans(n_clusters=args.n_clusters, n_init="auto", random_state=42)
-    kmeans.fit(np.array(all_chunk_embeddings))
+    print(
+        f"Fitting KMeans(n_clusters={args.n_clusters}) over {len(all_chunk_embeddings)} "
+        f"chunk embeddings (requested_backend={args.compute_backend})..."
+    )
+    embedding_matrix = np.asarray(all_chunk_embeddings, dtype=np.float32)
+    kmeans_backend = "sklearn.cluster.KMeans"
+    cuda_runtime: Optional[dict[str, Any]] = None
+    if args.compute_backend in ("cuda", "auto"):
+        try:
+            import cupy as cp
+            import cuml
+            from cuml.cluster import KMeans as CuKMeans
+
+            device_count = int(cp.cuda.runtime.getDeviceCount())
+            if device_count < 1:
+                raise RuntimeError("CUDA runtime reports no visible devices")
+            gpu_matrix = cp.asarray(embedding_matrix, dtype=cp.float32)
+            gpu_model = CuKMeans(n_clusters=args.n_clusters, n_init=10, random_state=42)
+            gpu_model.fit(gpu_matrix)
+            centers = cp.asnumpy(gpu_model.cluster_centers_).astype(np.float32, copy=False)
+            kmeans = NumpyCentroidKMeans(centers)
+            device_id = int(cp.cuda.Device().id)
+            properties = cp.cuda.runtime.getDeviceProperties(device_id)
+            device_name = properties.get("name", "unknown")
+            if isinstance(device_name, bytes):
+                device_name = device_name.decode("utf-8", errors="replace")
+            cuda_runtime = {
+                "deviceId": device_id,
+                "deviceName": str(device_name),
+                "deviceCount": device_count,
+                "runtimeVersion": int(cp.cuda.runtime.runtimeGetVersion()),
+                "cumlVersion": str(getattr(cuml, "__version__", "unknown")),
+            }
+            kmeans_backend = f"cuml.cluster.KMeans-{cuda_runtime['cumlVersion']}"
+            print(f"KMeans fitted on CUDA device {device_id}: {device_name}")
+        except Exception as exc:
+            if args.compute_backend == "cuda":
+                print(f"ERROR: requested CUDA KMeans backend unavailable: {type(exc).__name__}: {exc}", file=sys.stderr)
+                return 2
+            print(f"CUDA KMeans unavailable; falling back to CPU: {type(exc).__name__}: {exc}", file=sys.stderr)
+            kmeans = KMeans(n_clusters=args.n_clusters, n_init="auto", random_state=42)
+            kmeans.fit(embedding_matrix)
+    else:
+        kmeans = KMeans(n_clusters=args.n_clusters, n_init="auto", random_state=42)
+        kmeans.fit(embedding_matrix)
 
     feature_rows: list[list[float]] = []
     fit_labels: list[str] = []
@@ -321,15 +374,13 @@ def main() -> int:
         if not label or not chunk_vecs:
             continue
         matrix = np.array(chunk_vecs)
-        distances = kmeans.transform(matrix)
-        assignments = kmeans.predict(matrix)
-        nearest = distances[np.arange(len(assignments)), assignments]
+        cluster_features = cluster_distance_features(kmeans, matrix)
         feature_rows.append(
             [
-                float(np.mean(nearest)),
-                float(np.std(nearest)) if len(nearest) > 1 else 0.0,
-                float(len(set(assignments.tolist()))) / float(args.n_clusters),
-                float(len(chunk_vecs)),
+                cluster_features["cluster_mean_distance"],
+                cluster_features["cluster_distance_std"],
+                cluster_features["cluster_diversity"],
+                cluster_features["chunk_count"],
             ]
         )
         fit_labels.append(label)
@@ -382,6 +433,10 @@ def main() -> int:
         "embeddingModel": args.embed_model,
         "embeddingModelRevision": None,
         "nClusters": args.n_clusters,
+        "requestedComputeBackend": args.compute_backend,
+        "kmeansBackend": kmeans_backend,
+        "estimatorBackend": "scikit-learn-cpu",
+        "cudaRuntime": cuda_runtime,
         "randomState": 42,
         "pythonVersion": platform.python_version(),
         "sklearnVersion": sklearn.__version__,
@@ -401,6 +456,7 @@ def main() -> int:
         "model_revision": model_revision,
         "trained_on_files": len(feature_rows),
         "n_clusters": args.n_clusters,
+        "kmeans_backend": kmeans_backend,
         "embed_model": args.embed_model,
         "training_receipt": receipt,
     }

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.single-candidate-owner-attribution-chain-receipt.v1",
-  "generatedAt": "2026-10-25T00:06:54.457653+00:00",
+  "generatedAt": "2026-11-22T16:45:08.881118+00:00",
   "forgedCallerCurrentBooleanRejected": true,
   "stage1_workspaceAuthorization": {
     "admitted": true,
@@ -170,5 +170,5 @@
     ]
   },
   "writesPerformed": false,
-  "receiptChecksum": "sha256:6754dac6bb9069c6aeb3136a96aad3f1b308bd21a7bba90e4c6698862ff6df4b"
+  "receiptChecksum": "sha256:1240c99adb91d6857eabe7f10adb6a99496df96feaafb6579fcf43778cb97766"
 }

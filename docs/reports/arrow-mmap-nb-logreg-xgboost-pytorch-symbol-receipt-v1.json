@@ -1,6 +1,6 @@
 {
   "schema": "atlas.arrow-mmap-nb-logreg-xgboost-pytorch-symbol-receipt.v1",
-  "generatedAt": "2026-10-25T00:04:10.917468+00:00",
+  "generatedAt": "2026-11-22T17:04:42.203149+00:00",
   "authority": "SHADOW_DIAGNOSTIC_ONLY",
   "canonicalAuthority": false,
   "writesPerformed": false,
@@ -175,5 +175,5 @@
       "xgbProb": 0.03612
     }
   ],
-  "receiptChecksum": "sha256:58db698e08f4eceae7bbd26e25959d7ee05c0f0dac29a6f1d240a455cfe48a30"
+  "receiptChecksum": "sha256:5daac3632b05e2bbd974d51bb29a484d7dcb15b876fabcf38b66b32b55d25cf9"
 }

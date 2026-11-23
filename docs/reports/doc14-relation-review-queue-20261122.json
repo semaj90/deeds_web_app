@@ -1,0 +1,683 @@
+{
+  "aceOrValkeyWritePerformed": false,
+  "candidates": [
+    {
+      "candidateOrdinal": 0,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 480,
+        "sha256": "e58ea6c89aaed2d66730f7b995a9d92dfd460f68fabc722b0c7ad04cc6f8af8d",
+        "startByte": 455,
+        "text": "deploy them to the public"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 57,
+          "role": "object",
+          "startChar": 53,
+          "surfaceText": "them"
+        },
+        {
+          "endChar": 71,
+          "role": "obl",
+          "startChar": 65,
+          "surfaceText": "public"
+        }
+      ],
+      "predicateText": "deploy",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:1",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:1:tuple:0:10"
+    },
+    {
+      "candidateOrdinal": 1,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 718,
+        "sha256": "2c1a6e1e7b2b43c64d026bea221313416d80f0c6de4d76465b410277b6b9eff8",
+        "startByte": 648,
+        "text": "process, we created a repository on your Github with\nyour docs content"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 54,
+          "role": "obl",
+          "startChar": 47,
+          "surfaceText": "process"
+        },
+        {
+          "endChar": 58,
+          "role": "subject",
+          "startChar": 56,
+          "surfaceText": "we"
+        },
+        {
+          "endChar": 79,
+          "role": "object",
+          "startChar": 69,
+          "surfaceText": "repository"
+        },
+        {
+          "endChar": 117,
+          "role": "obl",
+          "startChar": 110,
+          "surfaceText": "content"
+        }
+      ],
+      "predicateText": "created",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:2",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:2:tuple:1:7"
+    },
+    {
+      "candidateOrdinal": 2,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 766,
+        "sha256": "7badca040e403b10aeaf7dfc6dda33b0b2f977957f1573947725e15ac944f81e",
+        "startByte": 720,
+        "text": "You can find this repository on our\n[dashboard"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 122,
+          "role": "subject",
+          "startChar": 119,
+          "surfaceText": "You"
+        },
+        {
+          "endChar": 147,
+          "role": "object",
+          "startChar": 137,
+          "surfaceText": "repository"
+        },
+        {
+          "endChar": 165,
+          "role": "obl",
+          "startChar": 156,
+          "surfaceText": "dashboard"
+        }
+      ],
+      "predicateText": "find",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:2",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:2:tuple:2:3"
+    },
+    {
+      "candidateOrdinal": 3,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 861,
+        "sha256": "7e4c54e44a7d99b492b3a95b1752c5710dd84f10e73d85070aca51f7b309884c",
+        "startByte": 835,
+        "text": "follow these\n[instructions"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 246,
+          "role": "object",
+          "startChar": 241,
+          "surfaceText": "these"
+        },
+        {
+          "endChar": 260,
+          "role": "object",
+          "startChar": 248,
+          "surfaceText": "instructions"
+        }
+      ],
+      "predicateText": "follow",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:2",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:2:tuple:3:7"
+    },
+    {
+      "candidateOrdinal": 4,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 1091,
+        "sha256": "8be3e43970555f0ff3cd8366d50cee1b03130d2db3976e745552840bbdfd9406",
+        "startByte": 1058,
+        "text": "We built a\ncommand line interface"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 459,
+          "role": "subject",
+          "startChar": 457,
+          "surfaceText": "We"
+        },
+        {
+          "endChar": 490,
+          "role": "object",
+          "startChar": 481,
+          "surfaceText": "interface"
+        }
+      ],
+      "predicateText": "built",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:2",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:2:tuple:6:2"
+    },
+    {
+      "candidateOrdinal": 5,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 1257,
+        "sha256": "13168819fee908cf7ab6a1bc40b9348ae1ee13d81206c1cdbdb73f6b5555946e",
+        "startByte": 1198,
+        "text": "preview the\ndocumentation changes locally with this command"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 630,
+          "role": "object",
+          "startChar": 623,
+          "surfaceText": "changes"
+        },
+        {
+          "endChar": 656,
+          "role": "obl",
+          "startChar": 649,
+          "surfaceText": "command"
+        }
+      ],
+      "predicateText": "preview",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:2",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:2:tuple:7:12"
+    },
+    {
+      "candidateOrdinal": 6,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 1320,
+        "sha256": "a281b8e7310dc5ee48e0057d04b305e6284fa341a876a32a97980a8bab234a6e",
+        "startByte": 1283,
+        "text": "Run the following command at the root"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 707,
+          "role": "object",
+          "startChar": 700,
+          "surfaceText": "command"
+        },
+        {
+          "endChar": 719,
+          "role": "obl",
+          "startChar": 715,
+          "surfaceText": "root"
+        }
+      ],
+      "predicateText": "Run",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:2",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:2:tuple:8:1"
+    },
+    {
+      "candidateOrdinal": 7,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 1601,
+        "sha256": "ce07130572e48e859e1a255a772d1a1e3e59faef255ad6ccd536a9420cfb582a",
+        "startByte": 1545,
+        "text": "app automatically deploys your changes to your docs site"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 38,
+          "role": "subject",
+          "startChar": 35,
+          "surfaceText": "app"
+        },
+        {
+          "endChar": 73,
+          "role": "object",
+          "startChar": 66,
+          "surfaceText": "changes"
+        },
+        {
+          "endChar": 91,
+          "role": "obl",
+          "startChar": 87,
+          "surfaceText": "site"
+        }
+      ],
+      "predicateText": "deploys",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:3",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:3:tuple:1:5"
+    },
+    {
+      "candidateOrdinal": 8,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 1653,
+        "sha256": "cb976f5ca132cda116564e54eded9f3f2802431311c938659e44cf4aa24ecb58",
+        "startByte": 1626,
+        "text": "manage deployments yourself"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 132,
+          "role": "object",
+          "startChar": 121,
+          "surfaceText": "deployments"
+        },
+        {
+          "endChar": 141,
+          "role": "obl:unmarked",
+          "startChar": 133,
+          "surfaceText": "yourself"
+        }
+      ],
+      "predicateText": "manage",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:3",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:3:tuple:1:19"
+    },
+    {
+      "candidateOrdinal": 9,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 1676,
+        "sha256": "4035763882f8b42f87ac049ffaf13a910fc9449397f33a71af56389b2bde5538",
+        "startByte": 1655,
+        "text": "You can find the link"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 146,
+          "role": "subject",
+          "startChar": 143,
+          "surfaceText": "You"
+        },
+        {
+          "endChar": 164,
+          "role": "object",
+          "startChar": 160,
+          "surfaceText": "link"
+        }
+      ],
+      "predicateText": "find",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:3",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:3:tuple:2:3"
+    },
+    {
+      "candidateOrdinal": 10,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 2034,
+        "sha256": "d27826d4671087cd7ee2bd109ce6af1932bc3e2330bc5d83f770a8c3f83d80f2",
+        "startByte": 1875,
+        "text": "Commit and push your changes to\\\\\nGit](https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository#about-git-push)\nfor your changes"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 400,
+          "role": "obl",
+          "startChar": 397,
+          "surfaceText": "Git"
+        },
+        {
+          "endChar": 522,
+          "role": "obl",
+          "startChar": 515,
+          "surfaceText": "changes"
+        }
+      ],
+      "predicateText": "Commit",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:3",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:3:tuple:5:2"
+    },
+    {
+      "candidateOrdinal": 11,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 2146,
+        "sha256": "89c530f4542f3f3b390c440d85903edb74f43dd9179d1077c04c4922e68cb50a",
+        "startByte": 2108,
+        "text": "app successfully deployed your changes"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 597,
+          "role": "subject",
+          "startChar": 594,
+          "surfaceText": "app"
+        },
+        {
+          "endChar": 632,
+          "role": "object",
+          "startChar": 625,
+          "surfaceText": "changes"
+        }
+      ],
+      "predicateText": "deployed",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:3",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:3:tuple:6:13"
+    },
+    {
+      "candidateOrdinal": 12,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 2209,
+        "sha256": "67423380e3a35b4527f9b7cfc63315eb02d5f48293d4ad96261dcbcd18cc931b",
+        "startByte": 2148,
+        "text": "you can also manually\nupdate your docs through our [dashboard"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 637,
+          "role": "subject",
+          "startChar": 634,
+          "surfaceText": "you"
+        },
+        {
+          "endChar": 672,
+          "role": "object",
+          "startChar": 668,
+          "surfaceText": "docs"
+        },
+        {
+          "endChar": 695,
+          "role": "obl",
+          "startChar": 686,
+          "surfaceText": "dashboard"
+        }
+      ],
+      "predicateText": "update",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:3",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:3:tuple:6:21"
+    },
+    {
+      "candidateOrdinal": 13,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 2397,
+        "sha256": "4e39e2f05b87aad5e37246ce4371083b3e8cbfecfac52360ce8ef036b38ff675",
+        "startByte": 2363,
+        "text": "Add content directly in your files"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 11,
+          "role": "object",
+          "startChar": 4,
+          "surfaceText": "content"
+        },
+        {
+          "endChar": 34,
+          "role": "obl",
+          "startChar": 29,
+          "surfaceText": "files"
+        }
+      ],
+      "predicateText": "Add",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:4",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:4:tuple:0:1"
+    },
+    {
+      "candidateOrdinal": 14,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 2451,
+        "sha256": "7db277dfe47fdb916c8151ffda5619a020df20ec7aaeb95e06262f475210ed76",
+        "startByte": 2436,
+        "text": "You can use any"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 76,
+          "role": "subject",
+          "startChar": 73,
+          "surfaceText": "You"
+        },
+        {
+          "endChar": 88,
+          "role": "object",
+          "startChar": 85,
+          "surfaceText": "any"
+        }
+      ],
+      "predicateText": "use",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:4",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:4:tuple:1:3"
+    },
+    {
+      "candidateOrdinal": 15,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 2572,
+        "sha256": "64fe33ec5d67206152eae386cc437f0354a8d1338589f80cbc469896936cc196",
+        "startByte": 2523,
+        "text": "Add flair to your docs with personalized branding"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 169,
+          "role": "object",
+          "startChar": 164,
+          "surfaceText": "flair"
+        },
+        {
+          "endChar": 182,
+          "role": "obl",
+          "startChar": 178,
+          "surfaceText": "docs"
+        },
+        {
+          "endChar": 209,
+          "role": "obl",
+          "startChar": 201,
+          "surfaceText": "branding"
+        }
+      ],
+      "predicateText": "Add",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:4",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:4:tuple:2:9"
+    },
+    {
+      "candidateOrdinal": 16,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 2860,
+        "sha256": "0e0bf9f4f205400b8fac1bf8c984990bfa3c4a566cb435ee1ced98f3abffa0cf",
+        "startByte": 2800,
+        "text": "Draw insights from user interactions with your documentation"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 450,
+          "role": "object",
+          "startChar": 442,
+          "surfaceText": "insights"
+        },
+        {
+          "endChar": 473,
+          "role": "obl",
+          "startChar": 461,
+          "surfaceText": "interactions"
+        },
+        {
+          "endChar": 497,
+          "role": "obl",
+          "startChar": 484,
+          "surfaceText": "documentation"
+        }
+      ],
+      "predicateText": "Draw",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:4",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:4:tuple:4:8"
+    },
+    {
+      "candidateOrdinal": 17,
+      "conceptIds": [],
+      "evidence": {
+        "coordinateSpace": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+        "endByte": 3008,
+        "sha256": "fdb6703864efae025a46ce634d10560cac723805307692f811c6a80280958044",
+        "startByte": 2960,
+        "text": "Keep your docs on your own website’s subdomain"
+      },
+      "ontologyIds": [],
+      "ontologyMappingStatus": "UNMAPPED_REVIEW_REQUIRED",
+      "participants": [
+        {
+          "endChar": 611,
+          "role": "object",
+          "startChar": 607,
+          "surfaceText": "docs"
+        },
+        {
+          "endChar": 643,
+          "role": "obl",
+          "startChar": 634,
+          "surfaceText": "subdomain"
+        }
+      ],
+      "predicateText": "Keep",
+      "reviewDecision": null,
+      "reviewStatus": "PENDING_HUMAN_SEMANTIC_AND_ONTOLOGY_REVIEW",
+      "reviewerAnnotations": [],
+      "sourceChunkId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:4",
+      "spanValidation": "SPAN_READBACK_VERIFIED",
+      "tupleId": "doc:131b9f41b5b130ae4a65c6f561452d61:21b4f9b4eddf12f9:4:tuple:5:12"
+    }
+  ],
+  "canonicalAuthority": false,
+  "counts": {
+    "candidateCount": 18,
+    "noSubjectCount": 10,
+    "sourceSpanRecheckedCount": 18,
+    "subjectBearingCount": 8
+  },
+  "databaseWritePerformed": false,
+  "graphifyAdmissionPerformed": false,
+  "reviewInstructions": [
+    "Confirm the relation predicate is supported by the cited text.",
+    "Map only to reviewed canonical ontology IDs; leave unresolved when no mapping is justified.",
+    "Do not identify documentation mentions as case evidence or factual claims.",
+    "Do not promote or persist this packet; it is a review queue only."
+  ],
+  "schema": "parent-atlas.doc14-relation-review-queue.v1",
+  "source": {
+    "contentSha256": "sha256:21b4f9b4eddf12f9e697204c60078054c255f0489b11f781898da5e019a818c9",
+    "provider": "Firecrawl MCP",
+    "revisionKind": "CAPTURE_CONTENT_HASH_NOT_CANONICAL_SOURCE_INDEX_REVISION",
+    "scrapeId": "01a20557-513c-7154-944d-3b4a14646c6f",
+    "url": "https://docs.firecrawl.dev/quickstart"
+  },
+  "status": "HUMAN_REVIEW_REQUIRED"
+}

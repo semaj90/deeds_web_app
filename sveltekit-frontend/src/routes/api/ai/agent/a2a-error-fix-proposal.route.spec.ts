@@ -7,12 +7,14 @@ const incr = vi.hoisted(() => vi.fn());
 const expire = vi.hoisted(() => vi.fn());
 const readTaskReceipt = vi.hoisted(() => vi.fn());
 const searchDocCorpus = vi.hoisted(() => vi.fn());
+const readVerifiedCanonicalDocChunks = vi.hoisted(() => vi.fn());
 
 vi.mock('$lib/server/ai/gemma4-agent.js', () => ({ runGemma4Agent }));
 vi.mock('$lib/server/redis.js', () => ({ getRedis: () => ({ incr, expire }) }));
 vi.mock('$lib/server/features/observability/index.js', () => ({ recordSearchQuery }));
 vi.mock('$lib/server/db/client.js', () => ({ pool: {} }));
 vi.mock('$lib/server/atlas/docs/doc-intelligence-read-model.js', () => ({ searchDocCorpus }));
+vi.mock('$lib/server/atlas/docs/external-doc-citation-readback-v1.js', () => ({ readVerifiedCanonicalDocChunksV1: readVerifiedCanonicalDocChunks }));
 vi.mock('$lib/server/atlas/openspec-board/task-receipt-view-v1.js', () => ({
   readOpenSpecTaskReceiptView: readTaskReceipt
 }));
@@ -54,6 +56,18 @@ describe('A2A agentic error-fix proposal skill', () => {
     incr.mockResolvedValue(1);
     expire.mockResolvedValue(1);
     readTaskReceipt.mockResolvedValue({ status: 'NOT_FOUND' });
+    readVerifiedCanonicalDocChunks.mockResolvedValue({
+      schema: 'atlas.external-doc-citation-readback.v1', status: 'VERIFIED', blockers: [],
+      readOnly: true, writesPerformed: false,
+      citations: [{
+        schema: 'atlas.external-doc-verified-citation.v1', chunkId: 'chunk-svelte-state-0',
+        pageId: 'page-1', url: 'https://svelte.dev/docs/svelte/$state', provider: 'svelte',
+        product: 'svelte', productVersion: '5.0', sourceRevision: `sha256:${'a'.repeat(64)}`,
+        chunkEvidenceRevision: `sha256:${'b'.repeat(64)}`, startByte: 0, endByte: 44,
+        chunkChecksum: 'c'.repeat(64), verifiedText: 'Use $state runes in Svelte 5 components.',
+        sourceAuthority: 'OFFICIAL', canonicalAuthority: false,
+      }],
+    });
   });
 
   it.each([
@@ -245,12 +259,16 @@ describe('A2A agentic error-fix proposal skill', () => {
       canonicalAuthority: false,
       writesPerformed: false,
       mode: 'POSTGRES_FTS',
+      citationReadbackStatus: 'VERIFIED',
     });
     expect(result.result.artifacts[0].parts[0].data.citations[0]).toMatchObject({
       chunkId: 'chunk-svelte-state-0',
       url: 'https://svelte.dev/docs/svelte/$state',
       canonicalAuthority: false,
     });
+    expect(readVerifiedCanonicalDocChunks).toHaveBeenCalledWith(expect.objectContaining({
+      hits: expect.arrayContaining([expect.objectContaining({ chunkId: 'chunk-svelte-state-0' })]),
+    }));
     expect(runGemma4Agent).not.toHaveBeenCalled();
   });
 });

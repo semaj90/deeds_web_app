@@ -1,6 +1,6 @@
 {
   "schema": "atlas.okf-domain-keyword-bitmap-alignment.v1",
-  "generatedAt": "2026-10-24T00:22:21.365Z",
+  "generatedAt": "2026-11-22T07:34:10.408Z",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "verdicts": {
@@ -19,7 +19,7 @@
   },
   "postgres18Inventory": {
     "keywordCorpusExists": false,
-    "ginIndexCount": 213,
+    "ginIndexCount": 219,
     "activeTaxonomyDomains": 17
   },
   "okfAcquisition": {

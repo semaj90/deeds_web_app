@@ -1,13 +1,13 @@
 {
   "schema": "atlas.retrieval-grpc-envelope-parity.v1",
-  "generatedAt": "2026-09-08T18:12:26.811Z",
+  "generatedAt": "2026-11-22T16:51:05.828Z",
   "mode": "READ_ONLY",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "proto": {
     "path": "proto/active/retrieval.proto",
     "message": "CodebaseSearchRequest",
-    "checksum": "sha256:d7789a698e4b81691f72dbb37c9ee5a3b35eb45a39a357e9b8eeebcb96f2cc59",
+    "checksum": "sha256:af2c526642d0c4160205809b5f301d91f8b7f315d2229214ad1ca6efb5320710",
     "fields": [
       {
         "type": "string",
@@ -68,6 +68,12 @@
         "name": "representation_id",
         "number": 10,
         "camelName": "representationId"
+      },
+      {
+        "type": "yorha.shared.AtlasRequestContextV2",
+        "name": "atlas_context",
+        "number": 11,
+        "camelName": "atlasContext"
       }
     ]
   },
@@ -83,7 +89,8 @@
       "path_prefixes",
       "include_debug",
       "packet_keys",
-      "representation_id"
+      "representation_id",
+      "atlas_context"
     ],
     "missingForwarders": []
   },

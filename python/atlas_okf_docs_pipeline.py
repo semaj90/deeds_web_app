@@ -30,9 +30,15 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 
 import numpy as np
 
+from atlas_doc14_span_integrity_v1 import (
+    publish_validated_relation_candidates_jsonl_v1,
+    validate_stanza_relation_candidate_v1,
+)
+from atlas_graph_runtime.doc14_relation_oak_review_v1 import build_doc14_relation_oak_review_v1
 from atlas_doc_manifest import parse_manifest_json_v1
 from atlas_external_docs import (
     ChunkRecord,
+    _normalize_ws,
     classify_domain,
     chunk_document,
     deterministic_pagerank,
@@ -45,6 +51,8 @@ from atlas_external_docs import (
     stanza_observations,
     validate_okf_output_namespace,
 )
+from atlas_external_doc_hypergraph import build_external_doc_relation_proposal_v1
+from atlas_graph_runtime.api_document_fact_v1 import extract_api_document_facts_v1
 from parent_atlas_ontology.domain_mapping import admit_domain_classification
 from parent_atlas_ontology.domain_tuple_bridge import build_domain_classification_signal_from_chunk
 
@@ -88,6 +96,136 @@ def _http_json(
     if not isinstance(parsed, dict):
         raise RuntimeError(f"JSON_OBJECT_REQUIRED:{url}")
     return parsed
+
+
+def query_oak_review_for_chunks_v1(
+    chunks: Sequence[ChunkRecord],
+    *,
+    sidecar_url: str,
+    request_json: Callable[..., Json] = _http_json,
+) -> tuple[dict[str, Json], dict[str, str]]:
+    """Read bounded OAK label and relationship candidates for relation review.
+
+    Calls only the sidecar's read-only proposal endpoints. Failures are returned
+    per chunk so relation candidates remain published as unresolved proposals.
+    """
+    if not sidecar_url.startswith(("http://", "https://")):
+        raise ValueError("OAK_SIDECAR_URL_INVALID")
+    responses: dict[str, Json] = {}
+    failures: dict[str, str] = {}
+    for chunk in chunks:
+        chunk_id = str(chunk.chunk_id)
+        terms: list[str] = []
+        seen: set[str] = set()
+        for relation in chunk.ontology_tuples:
+            if not isinstance(relation, Mapping):
+                continue
+            for key in ("subject_candidates", "object_candidates"):
+                mentions = relation.get(key, [])
+                if not isinstance(mentions, (list, tuple)):
+                    continue
+                for mention in mentions:
+                    label = mention.get("text") if isinstance(mention, Mapping) else None
+                    if isinstance(label, str) and label.strip():
+                        normalized = label.strip()
+                        folded = normalized.casefold()
+                        if folded not in seen:
+                            seen.add(folded)
+                            terms.append(normalized)
+        if not terms:
+            continue
+        if len(terms) > 64:
+            failures[chunk_id] = "OAK_TERM_BUDGET_EXCEEDED"
+            continue
+        try:
+            label_matches: list[Json] = []
+            concepts_by_id: dict[str, Json] = {}
+            first_bundle: Json | None = None
+            for offset in range(0, len(terms), 16):
+                response = request_json(
+                    f"{sidecar_url.rstrip('/')}/ontology/oaklib/search",
+                    method="POST",
+                    body={"terms": terms[offset:offset + 16], "maxCandidatesPerTerm": 8},
+                    timeout_seconds=15,
+                )
+                bundle = response.get("candidateBundle")
+                if (response.get("schema") != "atlas.oaklib-label-search-response.v1"
+                        or response.get("status") != "PROPOSAL_ONLY"
+                        or response.get("canonicalAuthority") is not False
+                        or response.get("writesPerformed") is not False
+                        or not isinstance(bundle, Mapping)
+                        or bundle.get("schema") != "atlas.oaklib-candidate-bundle.v1"
+                        or bundle.get("canonicalAuthority") is not False):
+                    raise ValueError("OAK_LABEL_RESPONSE_INVALID")
+                if first_bundle is None:
+                    first_bundle = dict(bundle)
+                elif any(bundle.get(key) != first_bundle.get(key) for key in ("sourceSelector", "ontologyRevision", "producerRevision")):
+                    raise ValueError("OAK_LABEL_REVISION_MISMATCH")
+                matches = response.get("matches")
+                candidate_concepts = bundle.get("concepts")
+                if not isinstance(matches, list) or not isinstance(candidate_concepts, list):
+                    raise ValueError("OAK_LABEL_RESPONSE_SHAPE_INVALID")
+                label_matches.extend(matches)
+                for concept in candidate_concepts:
+                    if not isinstance(concept, Mapping) or not isinstance(concept.get("externalId"), str):
+                        raise ValueError("OAK_CONCEPT_ROW_INVALID")
+                    concept_id = concept["externalId"]
+                    if concept_id in concepts_by_id and concepts_by_id[concept_id] != concept:
+                        raise ValueError("OAK_CONCEPT_CANDIDATE_CONFLICT")
+                    concepts_by_id[concept_id] = dict(concept)
+            if first_bundle is None:
+                continue
+            if len(concepts_by_id) > 256:
+                failures[chunk_id] = "OAK_CONCEPT_BUDGET_EXCEEDED"
+                continue
+
+            relation_rows: list[Json] = []
+            concept_ids = sorted(concepts_by_id)
+            if len(concept_ids) > 128:
+                failures[chunk_id] = "OAK_RELATION_LOOKUP_BUDGET_EXCEEDED"
+                continue
+            for offset in range(0, len(concept_ids), 32):
+                response = request_json(
+                    f"{sidecar_url.rstrip('/')}/ontology/oaklib/candidates",
+                    method="POST",
+                    body={"external_ids": concept_ids[offset:offset + 32]},
+                    timeout_seconds=15,
+                )
+                bundle = response.get("candidates")
+                if (response.get("schema") != "atlas.oaklib-candidate-response.v1"
+                        or response.get("status") != "PROPOSAL_ONLY"
+                        or response.get("canonicalAuthority") is not False
+                        or response.get("writesPerformed") is not False
+                        or not isinstance(bundle, Mapping)
+                        or bundle.get("schema") != "atlas.oaklib-candidate-bundle.v1"
+                        or bundle.get("canonicalAuthority") is not False):
+                    raise ValueError("OAK_RELATION_RESPONSE_INVALID")
+                if any(bundle.get(key) != first_bundle.get(key) for key in ("sourceSelector", "ontologyRevision", "producerRevision")):
+                    raise ValueError("OAK_RELATION_REVISION_MISMATCH")
+                rows = bundle.get("relations")
+                if not isinstance(rows, list):
+                    raise ValueError("OAK_RELATION_ROWS_INVALID")
+                relation_rows.extend(rows)
+            merged_bundle = {
+                **first_bundle,
+                "concepts": [concepts_by_id[key] for key in sorted(concepts_by_id)],
+                "relations": relation_rows,
+                "canonicalAuthority": False,
+            }
+            responses[chunk_id] = {
+                "schema": "atlas.oaklib-label-search-response.v1",
+                "status": "PROPOSAL_ONLY",
+                "ontologyRevision": first_bundle.get("ontologyRevision"),
+                "producerRevision": first_bundle.get("producerRevision"),
+                "matches": label_matches,
+                "candidateBundle": merged_bundle,
+                "canonicalAuthority": False,
+                "writesPerformed": False,
+            }
+        except Exception as error:
+            code = getattr(error, "code", None)
+            failures[chunk_id] = f"OAK_HTTP_{code}" if isinstance(code, int) else (str(error) if isinstance(error, ValueError) else "OAK_REQUEST_FAILED")
+    return responses, failures
 
 
 @dataclass(frozen=True)
@@ -930,20 +1068,53 @@ def _safe_filename(url: str) -> str:
     return slug or _sha(url)[:16]
 
 
-def write_source_artifacts(root: Path, source: SourceConfig, pages: Sequence[PageArtifact], chunks: Sequence[ChunkRecord]) -> Json:
+def write_source_artifacts(
+    root: Path,
+    source: SourceConfig,
+    pages: Sequence[PageArtifact],
+    chunks: Sequence[ChunkRecord],
+    *,
+    workspace_revision: str | None = None,
+    oak_responses_by_chunk: Mapping[str, Mapping[str, Any]] | None = None,
+    oak_review_failures_by_chunk: Mapping[str, str] | None = None,
+) -> Json:
     source_root = root / source.output_namespace
     raw_root = source_root / "raw"
     raw_root.mkdir(parents=True, exist_ok=True)
     page_receipts = []
+    normalized_page_readbacks: dict[tuple[str, str, str], Json] = {}
     for page in pages:
         name = _safe_filename(page.resolved_url)
         markdown_path = raw_root / f"{name}.md"
+        normalized_path = raw_root / f"{name}.{_sha(page.resolved_url)[:12]}.normalized.md"
+        normalized_text = _normalize_ws(page.text)
         receipt_path = raw_root / f"{name}.json"
         _write_utf8(markdown_path, page.text)
+        _write_utf8(normalized_path, normalized_text)
+        normalized_bytes = normalized_path.read_bytes()
+        normalized_checksum = _sha(normalized_bytes)
+        if not re.fullmatch(r"[0-9a-f]{64}", page.normalized_checksum or ""):
+            raise ValueError("CAPTURE_READBACK_SHA256_REQUIRED")
+        if normalized_checksum != page.normalized_checksum:
+            raise ValueError("NORMALIZED_CAPTURE_READBACK_CHECKSUM_MISMATCH")
+        page_identity = (page.source_id, page.source_revision, page.resolved_url)
+        prior_readback = normalized_page_readbacks.get(page_identity)
+        if prior_readback is not None and prior_readback["content_sha256"] != normalized_checksum:
+            raise ValueError("NORMALIZED_CAPTURE_IDENTITY_COLLISION")
+        normalized_page_readbacks[page_identity] = {
+            "source_id": page.source_id,
+            "source_revision": page.source_revision,
+            "source_url": page.resolved_url,
+            "content_sha256": normalized_checksum,
+            "content_bytes": normalized_bytes,
+            "normalized_path": str(normalized_path),
+        }
         receipt = {
             **asdict(page),
             "text": None,
             "markdown_path": str(markdown_path),
+            "normalized_markdown_path": str(normalized_path),
+            "normalized_artifact_checksum": normalized_checksum,
             "fetched_at": page.retrieved_at or _now(),
             "canonical_authority": False,
         }
@@ -955,12 +1126,196 @@ def write_source_artifacts(root: Path, source: SourceConfig, pages: Sequence[Pag
         for chunk in chunks
     )
     _write_utf8(chunks_path, chunks_bytes)
+    # Re-read each proposed evidence span from the exact normalized page bytes
+    # before writing a batch artifact.  This is a local integrity check only:
+    # it does not admit ontology IDs or authorize a Graphify/cache write.
+    pages_by_identity = normalized_page_readbacks
+    relation_candidate_rows: list[Json] = []
+    api_document_fact_rows: list[Json] = []
+    for chunk in chunks:
+        page_readback = pages_by_identity.get((chunk.source_id, chunk.source_revision, chunk.source_url))
+        page_bytes = page_readback.get("content_bytes") if page_readback is not None else None
+        chunk_readback_valid = False
+        if (
+            isinstance(page_bytes, bytes)
+            and page_readback is not None
+            and chunk.document_checksum == page_readback.get("content_sha256")
+            and 0 <= chunk.start_byte < chunk.end_byte <= len(page_bytes)
+        ):
+            try:
+                chunk_readback_valid = (
+                    page_bytes[chunk.start_byte:chunk.end_byte].decode("utf-8", errors="strict") == chunk.text
+                    and _sha(page_bytes) == chunk.document_checksum
+                )
+            except UnicodeDecodeError:
+                chunk_readback_valid = False
+        if chunk.api_signatures:
+            if not chunk_readback_valid:
+                api_document_fact_rows.append({
+                    "schema": "atlas.external-doc-api-fact-record.v1",
+                    "source_id": chunk.source_id,
+                    "source_revision": chunk.source_revision,
+                    "chunk_id": chunk.chunk_id,
+                    "chunk_checksum": _sha(chunk.text),
+                    "status": "BLOCKED_CHUNK_SOURCE_READBACK_MISMATCH",
+                    "facts": [],
+                    "canonical_authority": False,
+                })
+            else:
+                try:
+                    facts = extract_api_document_facts_v1(
+                        document_id=chunk.source_id,
+                        chunk_id=chunk.chunk_id,
+                        source_url=chunk.source_url,
+                        source_revision=chunk.source_revision,
+                        markdown_text=chunk.text,
+                        heading=" / ".join(chunk.heading_path),
+                        expected_content_sha256=f"sha256:{_sha(chunk.text)}",
+                        extractor_revision="api-document-fact-v1|external-doc-chunk-v1",
+                    )
+                except ValueError as error:
+                    api_document_fact_rows.append({
+                        "schema": "atlas.external-doc-api-fact-record.v1",
+                        "source_id": chunk.source_id,
+                        "source_revision": chunk.source_revision,
+                        "chunk_id": chunk.chunk_id,
+                        "chunk_checksum": _sha(chunk.text),
+                        "status": str(error),
+                        "facts": [],
+                        "canonical_authority": False,
+                    })
+                else:
+                    api_document_fact_rows.append({
+                        "schema": "atlas.external-doc-api-fact-record.v1",
+                        "source_id": chunk.source_id,
+                        "source_revision": chunk.source_revision,
+                        "chunk_id": chunk.chunk_id,
+                        "chunk_checksum": _sha(chunk.text),
+                        "status": "PENDING_ONTOLOGY_REVIEW",
+                        "facts": facts,
+                        "canonical_authority": False,
+                    })
+        for relation in chunk.ontology_tuples:
+            try:
+                evidence_validation = validate_stanza_relation_candidate_v1(
+                    relation=relation,
+                    source_readback=page_readback or {},
+                    chunk=chunk.to_dict(),
+                )
+                validation, reason = evidence_validation["status"], ""
+            except ValueError as error:
+                validation, reason = "REJECTED", str(error)
+            row = {
+                "schema": "atlas.external-doc-relation-candidate.v1",
+                "source_namespace": source.source_namespace,
+                "source_id": chunk.source_id,
+                "source_revision": chunk.source_revision,
+                "chunk_id": chunk.chunk_id,
+                "chunk_checksum": _sha(chunk.text),
+                "chunk_evidence_revision": chunk.chunk_evidence_revision,
+                "candidate": relation,
+                "span_validation": validation,
+                "validation_reason": reason,
+                "canonical_authority": False,
+                "admission_state": "PROPOSAL_ONLY" if validation == "SPAN_READBACK_VERIFIED" else validation,
+                "hypergraph_proposal": None,
+                "ontology_mapping_status": "UNMAPPED_REVIEW_REQUIRED",
+                "proposal_bridge_status": "EVIDENCE_NOT_VERIFIED",
+            }
+            if validation == "SPAN_READBACK_VERIFIED" and workspace_revision:
+                try:
+                    proposal = build_external_doc_relation_proposal_v1(
+                        candidate_row=row,
+                        chunk=chunk.to_dict(),
+                        normalized_page_bytes=page_bytes or b"",
+                        workspace_revision=workspace_revision,
+                    )
+                    row["hypergraph_proposal"] = proposal.to_dict()
+                    row["proposal_bridge_status"] = "PROPOSAL_BUILT_UNMAPPED"
+                except (TypeError, ValueError) as error:
+                    row["proposal_bridge_status"] = str(error) or "PROPOSAL_BRIDGE_REJECTED"
+            elif validation == "SPAN_READBACK_VERIFIED":
+                row["proposal_bridge_status"] = "WORKSPACE_REVISION_UNPROVEN"
+            relation_candidate_rows.append(row)
+    relation_candidates_path = source_root / "relation-candidates.jsonl"
+    chunks_by_id: dict[str, Json] = {}
+    for chunk in chunks:
+        if chunk.chunk_id in chunks_by_id:
+            raise ValueError("RELATION_CANDIDATE_CHUNK_ID_DUPLICATE")
+        chunks_by_id[chunk.chunk_id] = chunk.to_dict()
+    relation_candidate_publication = publish_validated_relation_candidates_jsonl_v1(
+        path=relation_candidates_path,
+        rows=relation_candidate_rows,
+        sources_by_identity=pages_by_identity,
+        chunks_by_id=chunks_by_id,
+    )
+    relation_candidates_readback = relation_candidates_path.read_bytes()
+    oak_review_path: Path | None = None
+    oak_review_rows: list[Json] = []
+    if oak_responses_by_chunk is not None:
+        for row in relation_candidate_rows:
+            if row.get("span_validation") != "SPAN_READBACK_VERIFIED":
+                continue
+            chunk_id = str(row.get("chunk_id") or "")
+            chunk = chunks_by_id.get(chunk_id)
+            relation = row.get("candidate")
+            source_key = (str(row.get("source_id") or ""), str(row.get("source_revision") or ""), str(chunk.get("source_url") or "") if chunk else "")
+            source_readback = pages_by_identity.get(source_key)
+            response = oak_responses_by_chunk.get(chunk_id)
+            if not isinstance(relation, Mapping) or not isinstance(chunk, Mapping) or not isinstance(source_readback, Mapping):
+                oak_review_rows.append({"schema": "atlas.doc14-relation-oak-review-record.v1", "chunkId": chunk_id, "status": "SOURCE_BINDING_MISSING", "canonicalAuthority": False, "writesPerformed": False})
+                continue
+            if not isinstance(response, Mapping):
+                failure = (oak_review_failures_by_chunk or {}).get(chunk_id)
+                oak_review_rows.append({"schema": "atlas.doc14-relation-oak-review-record.v1", "chunkId": chunk_id, "status": "OAK_QUERY_FAILED" if failure else "OAK_RESPONSE_NOT_SUPPLIED", "failure": failure, "canonicalAuthority": False, "writesPerformed": False})
+                continue
+            try:
+                oak_review_rows.append(build_doc14_relation_oak_review_v1(
+                    relation=relation,
+                    source_readback=source_readback,
+                    chunk=chunk,
+                    oak_response=response,
+                ))
+            except ValueError as error:
+                oak_review_rows.append({"schema": "atlas.doc14-relation-oak-review-record.v1", "chunkId": chunk_id, "status": "REJECTED_OAK_RESPONSE", "failure": str(error), "canonicalAuthority": False, "writesPerformed": False})
+        oak_review_path = source_root / "relation-oak-review.jsonl"
+        oak_review_bytes = "".join(json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n" for row in oak_review_rows).encode("utf-8")
+        _write_utf8(oak_review_path, oak_review_bytes.decode("utf-8"))
+        if oak_review_path.read_bytes() != oak_review_bytes:
+            raise RuntimeError("DOC14_OAK_REVIEW_ARTIFACT_READBACK_MISMATCH")
+    api_document_facts_path = source_root / "api-document-facts.jsonl"
+    api_document_facts_bytes = "".join(
+        json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n"
+        for row in api_document_fact_rows
+    )
+    _write_utf8(api_document_facts_path, api_document_facts_bytes)
+    api_document_facts_readback = api_document_facts_path.read_bytes()
+    if api_document_facts_readback != api_document_facts_bytes.encode("utf-8"):
+        raise RuntimeError("API_DOCUMENT_FACT_ARTIFACT_READBACK_MISMATCH")
     return {
         "source_id": source.source_id,
         "source_namespace": source.source_namespace,
         "pages": len(pages),
         "chunks": len(chunks),
         "chunks_path": str(chunks_path),
+        "relation_candidates_path": str(relation_candidates_path),
+        "relation_candidate_count": len(relation_candidate_rows),
+        "relation_candidate_bound_count": sum(row["span_validation"] == "SPAN_READBACK_VERIFIED" for row in relation_candidate_rows),
+        "relation_candidate_unbound_count": sum(row["span_validation"] == "UNBOUND_EVIDENCE" for row in relation_candidate_rows),
+        "relation_candidate_rejected_count": sum(row["span_validation"] == "REJECTED" for row in relation_candidate_rows),
+        "relation_proposal_bridged_count": sum(row["proposal_bridge_status"] == "PROPOSAL_BUILT_UNMAPPED" for row in relation_candidate_rows),
+        "relation_proposal_bridge_blocked_count": sum(row["span_validation"] == "SPAN_READBACK_VERIFIED" and row["proposal_bridge_status"] != "PROPOSAL_BUILT_UNMAPPED" for row in relation_candidate_rows),
+        "relation_candidates_checksum": _sha(relation_candidates_readback),
+        "relation_candidate_publication": relation_candidate_publication,
+        "relation_oak_review_path": str(oak_review_path) if oak_review_path else None,
+        "relation_oak_review_count": len(oak_review_rows),
+        "relation_oak_review_checksum": _sha(oak_review_path.read_bytes()) if oak_review_path else None,
+        "relation_oak_review_admission_count": 0,
+        "api_document_facts_path": str(api_document_facts_path),
+        "api_document_fact_record_count": len(api_document_fact_rows),
+        "api_document_fact_pending_count": sum(row["status"] == "PENDING_ONTOLOGY_REVIEW" for row in api_document_fact_rows),
+        "api_document_fact_blocked_count": sum(row["status"] != "PENDING_ONTOLOGY_REVIEW" for row in api_document_fact_rows),
+        "api_document_facts_checksum": _sha(api_document_facts_readback),
         "page_receipt_checksum": _sha(_stable(page_receipts)),
     }
 
@@ -976,7 +1331,11 @@ def run_pipeline(
     acquire_only: bool = False,
     maximum_chars: int = 1600,
     overlap_chars: int = 200,
+    oak_review: bool = False,
+    oak_sidecar_url: str | None = None,
 ) -> Json:
+    if oak_review and not oak_sidecar_url:
+        raise ValueError("OAK_REVIEW_REQUIRES_EXPLICIT_SIDECAR_URL")
     selected_sources, recrawl_plan = _sources_selected_by_recrawl_plan(manifest, prior_manifest)
     if not selected_sources:
         return {
@@ -1008,7 +1367,21 @@ def run_pipeline(
         )
         all_pages.extend(pages)
         all_chunks.extend(chunks)
-        source_receipts.append(write_source_artifacts(root, source, pages, chunks))
+        oak_responses: dict[str, Json] | None = None
+        oak_failures: dict[str, str] | None = None
+        if oak_review:
+            oak_responses, oak_failures = query_oak_review_for_chunks_v1(
+                chunks, sidecar_url=str(oak_sidecar_url),
+            )
+        source_receipts.append(write_source_artifacts(
+            root,
+            source,
+            pages,
+            chunks,
+            workspace_revision=manifest.workspace_revision,
+            oak_responses_by_chunk=oak_responses,
+            oak_review_failures_by_chunk=oak_failures,
+        ))
 
     if not all_chunks:
         raise RuntimeError("NO_EXTERNAL_DOC_CHUNKS")
@@ -1126,6 +1499,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--plan-only", action="store_true", help="Print a read-only manifest delta plan; do not fetch or write artifacts")
     parser.add_argument("--acquire-only", action="store_true", help="Fetch, normalize, cite, and chunk locally; do not embed, rank, or project")
     parser.add_argument("--stanza", action="store_true", help="Run Stanza POS/lemma/dependency extraction")
+    parser.add_argument("--oak-review", action="store_true", help="Query the explicitly supplied read-only OAK sidecar for review suggestions and existing ontology relations")
+    parser.add_argument("--oak-sidecar-url", help="Explicit base URL for the read-only OAK sidecar; required with --oak-review")
     parser.add_argument("--clusters", action="store_true", help="Run existing cuVS KMeans + deterministic SOM stages")
     parser.add_argument("--write-qdrant", action="store_true", help="Create payload indexes and upsert external_programming_docs_768")
     parser.add_argument("--smoke-query")
@@ -1143,8 +1518,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         plan = plan_manifest_recrawl_delta_v1(prior_manifest, manifest)
         print(json.dumps(plan, indent=2, sort_keys=True))
         return 0 if plan["canAcquire"] else 2
-    if args.acquire_only and (args.stanza or args.clusters or args.write_qdrant or args.smoke_query):
-        parser.error("--acquire-only cannot be combined with --stanza, --clusters, --write-qdrant, or --smoke-query")
+    if args.acquire_only and (args.stanza or args.clusters or args.write_qdrant or args.smoke_query or args.oak_review or args.oak_sidecar_url):
+        parser.error("--acquire-only cannot be combined with extraction, OAK review, clustering, projection, or smoke-query flags")
+    if args.oak_review and not args.oak_sidecar_url:
+        parser.error("--oak-review requires --oak-sidecar-url")
+    if not args.oak_review and args.oak_sidecar_url:
+        parser.error("--oak-sidecar-url requires --oak-review")
     receipt = run_pipeline(
         manifest,
         prior_manifest=prior_manifest,
@@ -1155,6 +1534,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         acquire_only=args.acquire_only,
         maximum_chars=args.maximum_chars,
         overlap_chars=args.overlap_chars,
+        oak_review=args.oak_review,
+        oak_sidecar_url=args.oak_sidecar_url,
     )
     print(json.dumps(receipt, indent=2, sort_keys=True))
     return 0

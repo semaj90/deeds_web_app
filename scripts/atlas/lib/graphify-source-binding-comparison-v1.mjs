@@ -1,4 +1,6 @@
 // Pure diagnostics for the existing batch planner; no source or mutation authority.
+import { createHash } from 'node:crypto';
+
 const text = (value) => String(value ?? '').trim();
 const hash = (value) => text(value).replace(/^sha256:/i, '').toLowerCase();
 const byteLength = (value) => value !== null && value !== undefined && text(value) !== ''
@@ -25,6 +27,27 @@ export function compareGraphifySourceBindingV1(expected, row) {
   };
   const mismatchedFields = Object.keys(matches).filter((field) => !matches[field]);
   return { observed, matches, mismatchedFields, exact: mismatchedFields.length === 0 };
+}
+
+export function compareCurrentSourceBytesV1(expected, bytes) {
+  const validBytes = bytes instanceof Uint8Array;
+  const digest = validBytes ? createHash('sha256').update(bytes).digest('hex') : null;
+  const expectedSourceRevision = hash(expected?.sourceRevision);
+  const expectedContentDigest = hash(expected?.contentDigest);
+  const expectedByteLength = byteLength(expected?.byteLength);
+  const matches = {
+    sourceRevision: digest !== null && /^[0-9a-f]{64}$/.test(expectedSourceRevision) && digest === expectedSourceRevision,
+    contentDigest: digest !== null && /^[0-9a-f]{64}$/.test(expectedContentDigest) && digest === expectedContentDigest,
+    byteLength: validBytes && expectedByteLength !== null && bytes.byteLength === expectedByteLength,
+  };
+  return {
+    available: validBytes,
+    byteLength: validBytes ? bytes.byteLength : null,
+    contentDigest: digest,
+    matches,
+    mismatchedFields: Object.keys(matches).filter((field) => !matches[field]),
+    exact: validBytes && Object.values(matches).every(Boolean),
+  };
 }
 
 export function parseGraphifyBatchLimitV1(raw = '128') {

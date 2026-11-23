@@ -479,6 +479,7 @@ def stanza_observations(text: str, *, pipeline: Any, model_revision: str) -> tup
     for sentence_index, sentence in enumerate(doc.sentences):
         words = list(sentence.words)
         by_id = {int(word.id): word for word in words if isinstance(word.id, int)}
+        spans_by_id: dict[int, tuple[int, int]] = {}
         child_by_head: dict[int, list[Any]] = {}
         for word in words:
             if isinstance(word.head, int):
@@ -494,6 +495,9 @@ def stanza_observations(text: str, *, pipeline: Any, model_revision: str) -> tup
                     start = search_from
                 end = start + len(token_text)
                 search_from = end
+            start = int(start)
+            end = int(end)
+            spans_by_id[int(word.id)] = (start, end)
             tokens.append({
                 "token_id": f"tok:{sentence_index}:{word.id}",
                 "text": token_text,
@@ -503,8 +507,8 @@ def stanza_observations(text: str, *, pipeline: Any, model_revision: str) -> tup
                 "morphology": getattr(word, "feats", None),
                 "dependency_relation": getattr(word, "deprel", None),
                 "head_token_index": int(word.head) if isinstance(word.head, int) and word.head > 0 else None,
-                "start_char": int(start),
-                "end_char": int(end),
+                "start_char": start,
+                "end_char": end,
                 "producer": "STANZA",
                 "producer_revision": "stanza-pos-depparse-v1",
                 "model_revision": model_revision,
@@ -520,25 +524,56 @@ def stanza_observations(text: str, *, pipeline: Any, model_revision: str) -> tup
                 if not (dep.startswith("nsubj") or dep in {"obj", "iobj"} or dep.startswith("obl")):
                     continue
                 role = "subject" if dep.startswith("nsubj") else ("object" if dep in {"obj", "iobj"} else dep)
+                participant_span = spans_by_id.get(int(child.id))
                 participants.append({
                     "role": role,
                     "text": str(child.text),
                     "normalized_text": str(getattr(child, "lemma", None) or child.text).lower(),
                     "ontology_class": "CONCEPT",
-                    "start_char": getattr(child, "start_char", None),
-                    "end_char": getattr(child, "end_char", None),
+                    "start_char": participant_span[0] if participant_span is not None else None,
+                    "end_char": participant_span[1] if participant_span is not None else None,
                 })
             if len(participants) >= 2:
+                predicate_span = spans_by_id.get(int(predicate.id))
+                participant_spans = [
+                    spans_by_id[int(child.id)]
+                    for child in child_by_head.get(int(predicate.id), [])
+                    if int(child.id) in spans_by_id
+                    and (str(getattr(child, "deprel", "")).startswith("nsubj")
+                         or str(getattr(child, "deprel", "")) in {"obj", "iobj"}
+                         or str(getattr(child, "deprel", "")).startswith("obl"))
+                ]
+                evidence_spans = [*participant_spans]
+                if predicate_span is not None:
+                    evidence_spans.append(predicate_span)
+                evidence_start = min((span[0] for span in evidence_spans), default=None)
+                evidence_end = max((span[1] for span in evidence_spans), default=None)
                 tuples.append({
                     "schema": "atlas.external-doc-ontology-tuple.v1",
                     "tuple_id": f"tuple:{sentence_index}:{predicate.id}",
                     "predicate": str(predicate.text),
                     "predicate_lemma": getattr(predicate, "lemma", None),
+                    "subject_candidates": [
+                        dict(participant) for participant in participants
+                        if participant.get("role") == "subject"
+                    ],
+                    "object_candidates": [
+                        dict(participant) for participant in participants
+                        if participant.get("role") == "object"
+                    ],
+                    "predicate_span_chars": list(predicate_span) if predicate_span is not None else None,
+                    "evidence_span_chars": [evidence_start, evidence_end]
+                    if evidence_start is not None and evidence_end is not None and evidence_end > evidence_start
+                    else None,
                     "participants": participants,
                     "degree": len(participants),
                     "extraction_method": "STANZA_DEPENDENCY",
+                    "producer_revision": "stanza-pos-depparse-v1",
+                    "extractor_version": "stanza-pos-depparse-v1",
+                    "model_revision": model_revision,
                     "evidence_span_refs": [f"sentence:{sentence_index}"],
                     "confidence": 1.0,
+                    "status": "PROPOSED",
                     "canonical_authority": False,
                 })
     return tuple(tokens), tuple(tuples)
@@ -679,6 +714,46 @@ def chunk_document(
                     )
                 else:
                     chunk_id = f"doc:{source_id}:{document_checksum[:16]}:{ordinal}"
+                # Bind extractor-local character offsets to this exact chunk and
+                # its page byte coordinates. These remain proposals: lexical NLP
+                # cannot supply canonical ontology IDs or graph admission.
+                evidence_tuples: list[Json] = []
+                for tuple_value in tuples:
+                    relation = dict(tuple_value)
+                    relation["tuple_id"] = f"{chunk_id}:{relation.get('tuple_id', 'tuple:unknown')}"
+                    char_span = relation.get("evidence_span_chars")
+                    if (
+                        isinstance(char_span, list) and len(char_span) == 2
+                        and isinstance(char_span[0], int) and isinstance(char_span[1], int)
+                        and 0 <= char_span[0] < char_span[1] <= len(chunk_text)
+                    ):
+                        local_start, local_end = char_span
+                        evidence_text = chunk_text[local_start:local_end]
+                        evidence_start_byte = start_byte + len(chunk_text[:local_start].encode("utf-8"))
+                        evidence_end_byte = evidence_start_byte + len(evidence_text.encode("utf-8"))
+                        relation["evidence_binding"] = {
+                            "source_ref": source_id,
+                            "source_url": source_url,
+                            "source_revision": source_revision,
+                            "document_checksum": document_checksum,
+                            "chunk_id": chunk_id,
+                            "chunk_evidence_revision": chunk_evidence,
+                            "coordinate_space": "NORMALIZED_DOCUMENT_UTF8_BYTES",
+                            "start_byte": evidence_start_byte,
+                            "end_byte": evidence_end_byte,
+                            "evidence_text": evidence_text,
+                            "evidence_checksum": _sha(evidence_text),
+                            "producer_revision": relation.get("producer_revision"),
+                            "model_revision": relation.get("model_revision"),
+                            "ontology_ids": [],
+                            "admission_state": "PROPOSAL_ONLY",
+                            "canonical_authority": False,
+                        }
+                    else:
+                        relation["evidence_binding"] = None
+                        relation["admission_state"] = "UNBOUND_EVIDENCE"
+                        relation["canonical_authority"] = False
+                    evidence_tuples.append(relation)
                 code_blocks, api_signatures = extract_code_blocks_and_signatures(chunk_text)
                 chunks.append(ChunkRecord(
                     chunk_id=chunk_id,
@@ -694,7 +769,7 @@ def chunk_document(
                     domain_class=domain,
                     ontology_classes=classify_ontology(chunk_text),
                     lexical_tokens=lexical,
-                    ontology_tuples=tuples,
+                    ontology_tuples=tuple(evidence_tuples),
                     doc_coordinate=doc_coordinate,
                     code_blocks=code_blocks,
                     api_signatures=api_signatures,

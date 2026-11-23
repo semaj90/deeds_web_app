@@ -1,0 +1,1249 @@
+{
+  "schema": "atlas.doc14-relation-source-readback.v1",
+  "observedAt": "2026-11-23T06:29:38.053999+00:00",
+  "input": {
+    "path": "docs/reports/doc14-admitted-chunks.jsonl",
+    "chunkRows": 200,
+    "sha256": "362445a16ecf441d48a63b275219332a10349af8ff22ffb01b919ff90deac346"
+  },
+  "verifier": {
+    "path": "python/atlas_graph_runtime/relation_proposal_verifier_v1.py",
+    "sha256": "92a26a0bbf9006427feaa7ea8fafea63383adac6f496bbcf303d23807c9e807f"
+  },
+  "producer": {
+    "path": "scripts/atlas/run-bow-relation-clustering-v1.py",
+    "sha256": "6c333dc1ae0270ecc33df44f124fe94de020d7a1a72d9538852de46ac9598fef"
+  },
+  "readbackPolicy": "Current repository files only; reject absolute paths, repository escapes, missing files, files over 16 MiB, stale full-file content hashes, and non-unique chunk matches.",
+  "result": {
+    "inputChunkRows": 200,
+    "verifiedProposedCount": 15,
+    "rejectedCount": 157,
+    "rowsWithoutImportCandidates": 28,
+    "rejectionClasses": {
+      "SOURCE_CONTENT_SHA256_MISMATCH": 125,
+      "CHUNK_NOT_FOUND_IN_SOURCE": 32
+    },
+    "sourceContentHashVerifiedCount": 15,
+    "sourceReadbackRequired": true,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "verifiedProposalsForReview": [
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-concept-evidence-spine.mjs:0",
+      "sourceRef": "scripts/atlas/audit-concept-evidence-spine.mjs",
+      "sourceRevision": "sha256:a631f8165459dd3b0f5f1d05f2652a6873689fc26b92d234b4f9fca33db017c1",
+      "contentSha256": "a631f8165459dd3b0f5f1d05f2652a6873689fc26b92d234b4f9fca33db017c1",
+      "chunkSha256": "166edef4d845e86872f64fe178f5e315efb377ac5a2e0819d151e9dff0d4bad7",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-concept-evidence-spine.mjs",
+      "object": "node:fs/promises",
+      "startByte": 445,
+      "endByte": 478,
+      "exactText": "import fs from 'node:fs/promises'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-concept-evidence-spine.mjs:0",
+      "sourceRef": "scripts/atlas/audit-concept-evidence-spine.mjs",
+      "sourceRevision": "sha256:a631f8165459dd3b0f5f1d05f2652a6873689fc26b92d234b4f9fca33db017c1",
+      "contentSha256": "a631f8165459dd3b0f5f1d05f2652a6873689fc26b92d234b4f9fca33db017c1",
+      "chunkSha256": "166edef4d845e86872f64fe178f5e315efb377ac5a2e0819d151e9dff0d4bad7",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-concept-evidence-spine.mjs",
+      "object": "node:path",
+      "startByte": 480,
+      "endByte": 508,
+      "exactText": "import path from 'node:path'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-concept-evidence-spine.mjs:0",
+      "sourceRef": "scripts/atlas/audit-concept-evidence-spine.mjs",
+      "sourceRevision": "sha256:a631f8165459dd3b0f5f1d05f2652a6873689fc26b92d234b4f9fca33db017c1",
+      "contentSha256": "a631f8165459dd3b0f5f1d05f2652a6873689fc26b92d234b4f9fca33db017c1",
+      "chunkSha256": "166edef4d845e86872f64fe178f5e315efb377ac5a2e0819d151e9dff0d4bad7",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-concept-evidence-spine.mjs",
+      "object": "node:url",
+      "startByte": 510,
+      "endByte": 565,
+      "exactText": "import { fileURLToPath, pathToFileURL } from 'node:url'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-concept-evidence-spine.mjs:0",
+      "sourceRef": "scripts/atlas/audit-concept-evidence-spine.mjs",
+      "sourceRevision": "sha256:a631f8165459dd3b0f5f1d05f2652a6873689fc26b92d234b4f9fca33db017c1",
+      "contentSha256": "a631f8165459dd3b0f5f1d05f2652a6873689fc26b92d234b4f9fca33db017c1",
+      "chunkSha256": "166edef4d845e86872f64fe178f5e315efb377ac5a2e0819d151e9dff0d4bad7",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-concept-evidence-spine.mjs",
+      "object": "./load-atlas-env.mjs",
+      "startByte": 567,
+      "endByte": 618,
+      "exactText": "import { loadAtlasEnv } from './load-atlas-env.mjs'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-error-fixes.mjs:0",
+      "sourceRef": "scripts/atlas/audit-error-fixes.mjs",
+      "sourceRevision": "sha256:cf628d33055a9b5cb8c0cda2a4ef78503a9e1a2e440f58ad68cf98e5029bf017",
+      "contentSha256": "cf628d33055a9b5cb8c0cda2a4ef78503a9e1a2e440f58ad68cf98e5029bf017",
+      "chunkSha256": "8245274de31a93a8897dad9773b59077cc00afb242c58a0bfd35dfdd50366fb1",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-error-fixes.mjs",
+      "object": "node:fs",
+      "startByte": 21,
+      "endByte": 45,
+      "exactText": "import fs from 'node:fs'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-error-fixes.mjs:0",
+      "sourceRef": "scripts/atlas/audit-error-fixes.mjs",
+      "sourceRevision": "sha256:cf628d33055a9b5cb8c0cda2a4ef78503a9e1a2e440f58ad68cf98e5029bf017",
+      "contentSha256": "cf628d33055a9b5cb8c0cda2a4ef78503a9e1a2e440f58ad68cf98e5029bf017",
+      "chunkSha256": "8245274de31a93a8897dad9773b59077cc00afb242c58a0bfd35dfdd50366fb1",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-error-fixes.mjs",
+      "object": "node:path",
+      "startByte": 47,
+      "endByte": 75,
+      "exactText": "import path from 'node:path'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-error-fixes.mjs:0",
+      "sourceRef": "scripts/atlas/audit-error-fixes.mjs",
+      "sourceRevision": "sha256:cf628d33055a9b5cb8c0cda2a4ef78503a9e1a2e440f58ad68cf98e5029bf017",
+      "contentSha256": "cf628d33055a9b5cb8c0cda2a4ef78503a9e1a2e440f58ad68cf98e5029bf017",
+      "chunkSha256": "8245274de31a93a8897dad9773b59077cc00afb242c58a0bfd35dfdd50366fb1",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-error-fixes.mjs",
+      "object": "node:url",
+      "startByte": 77,
+      "endByte": 117,
+      "exactText": "import { fileURLToPath } from 'node:url'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-error-fixes.mjs:0",
+      "sourceRef": "scripts/atlas/audit-error-fixes.mjs",
+      "sourceRevision": "sha256:cf628d33055a9b5cb8c0cda2a4ef78503a9e1a2e440f58ad68cf98e5029bf017",
+      "contentSha256": "cf628d33055a9b5cb8c0cda2a4ef78503a9e1a2e440f58ad68cf98e5029bf017",
+      "chunkSha256": "8245274de31a93a8897dad9773b59077cc00afb242c58a0bfd35dfdd50366fb1",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-error-fixes.mjs",
+      "object": "pg",
+      "startByte": 119,
+      "endByte": 138,
+      "exactText": "import pg from 'pg'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-higher-hop-enrichment.mjs:0",
+      "sourceRef": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "sourceRevision": "sha256:4df90528b734c572412c6d36fa8394a4cc37e0c2041efac2405013a3a6c1481b",
+      "contentSha256": "4df90528b734c572412c6d36fa8394a4cc37e0c2041efac2405013a3a6c1481b",
+      "chunkSha256": "c7b40134897b8c7361af267e6825548d942d6975b443f46a96401ed648595961",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "object": "neo4j-driver",
+      "startByte": 734,
+      "endByte": 766,
+      "exactText": "import neo4j from 'neo4j-driver'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-higher-hop-enrichment.mjs:0",
+      "sourceRef": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "sourceRevision": "sha256:4df90528b734c572412c6d36fa8394a4cc37e0c2041efac2405013a3a6c1481b",
+      "contentSha256": "4df90528b734c572412c6d36fa8394a4cc37e0c2041efac2405013a3a6c1481b",
+      "chunkSha256": "c7b40134897b8c7361af267e6825548d942d6975b443f46a96401ed648595961",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "object": "pg",
+      "startByte": 768,
+      "endByte": 787,
+      "exactText": "import pg from 'pg'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-higher-hop-enrichment.mjs:1",
+      "sourceRef": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "sourceRevision": "sha256:4df90528b734c572412c6d36fa8394a4cc37e0c2041efac2405013a3a6c1481b",
+      "contentSha256": "4df90528b734c572412c6d36fa8394a4cc37e0c2041efac2405013a3a6c1481b",
+      "chunkSha256": "f5f9beca983c43a093bc8c7d85d86d6f7520c81b2ccc1787df878c561ea7ab41",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "object": "neo4j-driver",
+      "startByte": 734,
+      "endByte": 766,
+      "exactText": "import neo4j from 'neo4j-driver'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-higher-hop-enrichment.mjs:1",
+      "sourceRef": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "sourceRevision": "sha256:4df90528b734c572412c6d36fa8394a4cc37e0c2041efac2405013a3a6c1481b",
+      "contentSha256": "4df90528b734c572412c6d36fa8394a4cc37e0c2041efac2405013a3a6c1481b",
+      "chunkSha256": "f5f9beca983c43a093bc8c7d85d86d6f7520c81b2ccc1787df878c561ea7ab41",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "object": "pg",
+      "startByte": 768,
+      "endByte": 787,
+      "exactText": "import pg from 'pg'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-higher-hop-enrichment.mjs:1",
+      "sourceRef": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "sourceRevision": "sha256:4df90528b734c572412c6d36fa8394a4cc37e0c2041efac2405013a3a6c1481b",
+      "contentSha256": "4df90528b734c572412c6d36fa8394a4cc37e0c2041efac2405013a3a6c1481b",
+      "chunkSha256": "f5f9beca983c43a093bc8c7d85d86d6f7520c81b2ccc1787df878c561ea7ab41",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "object": "node:fs",
+      "startByte": 789,
+      "endByte": 839,
+      "exactText": "import { writeFileSync, mkdirSync } from 'node:fs'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-higher-hop-enrichment.mjs:1",
+      "sourceRef": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "sourceRevision": "sha256:4df90528b734c572412c6d36fa8394a4cc37e0c2041efac2405013a3a6c1481b",
+      "contentSha256": "4df90528b734c572412c6d36fa8394a4cc37e0c2041efac2405013a3a6c1481b",
+      "chunkSha256": "f5f9beca983c43a093bc8c7d85d86d6f7520c81b2ccc1787df878c561ea7ab41",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "object": "node:path",
+      "startByte": 841,
+      "endByte": 882,
+      "exactText": "import { join, dirname } from 'node:path'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "chunkId": "fullrepo:scripts/atlas/audit-higher-hop-enrichment.mjs:1",
+      "sourceRef": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "sourceRevision": "sha256:4df90528b734c572412c6d36fa8394a4cc37e0c2041efac2405013a3a6c1481b",
+      "contentSha256": "4df90528b734c572412c6d36fa8394a4cc37e0c2041efac2405013a3a6c1481b",
+      "chunkSha256": "f5f9beca983c43a093bc8c7d85d86d6f7520c81b2ccc1787df878c561ea7ab41",
+      "predicate": "IMPORTS",
+      "subject": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "object": "node:url",
+      "startByte": 884,
+      "endByte": 924,
+      "exactText": "import { fileURLToPath } from 'node:url'",
+      "extractorVersion": "import-regex-v1",
+      "status": "PROPOSED",
+      "mappingStatus": "UNRESOLVED",
+      "oakSuggestions": [],
+      "spanVerified": true,
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    }
+  ],
+  "reviewCandidates": [
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:0046a5745d5d9e09",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:0050320904c52c61",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:01dd89db9af965b1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:0225c68b377e87ce",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:0763a425e136439e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:079da512f1aeb97c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:09494005c852513e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:0c4f553ca529631c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:1152ade674cc08fb",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:16bd5192541e4e41",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:1883549d6c1f2de6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:19bffe571d9a6095",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:1ad4aa65f242412b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:1c0d4d275274f858",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:1f1acf01a7a5f34d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:2461a46280311431",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:247bce3ea7db5097",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:2cbe62868df9742f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:2eb65fb4fdcdaa14",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:303c4f6866fa479e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:3124150a6711ef96",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:31689648bcb74565",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:31867bc320e14068",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:31cde9add208c51e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:3306c80628ab711f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:36f44cebb84d35ca",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:3a90dfa257f19f05",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:3b30083ac051c5ce",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:3d7a9414e3615f2f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:40a6b980c2ec4b25",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:412c6eb3badc7806",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:41f1a9b40be76337",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:42a2e9e1061848c3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:43497d105fd5bcd1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:436598cbbebdcd9c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:4789acc082182b84",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:48fc0d7c98e8ec14",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:4aef6e71241ccf81",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:4d728cd6a086236f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:4e2fd48219d383a9",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:5223a6f9bad4e90c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:52aa7bc32700f415",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:54ad69b76b4b067f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:5587c775634b82a5",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:57c4b78556ef92bf",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:593e703cf97643bf",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:5e7ea5c07f91532d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:634658b6ae12ddfe",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:63f4ab21670c567c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:66043f99833a6eb9",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:687ea57931c3f01f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:7086868a124e1c67",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:74544cc0c3820bc7",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:76a1a41832cd74e3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:7805a850228fc7eb",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:7912af81f0821ebf",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:7e0c27379b958b8b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:7ee62fe5a04a5b77",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:86d7b86a7c889479",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:879cfb49cf1c1574",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:8a0aa7fda8f0a489",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:8b31f24f2161b046",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:8bd1f534e41958e7",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:90a36211af282bb3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:91d6888f19d7653f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:94581f151ab37022",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:99d999047185e451",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:9caea0e9eb229812",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:a07004bf241dfb37",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:a20674981909cbc9",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:a250dddbbcd34cd7",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:a40341ae0458c46d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:a538be7ba10cd2c8",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:a63a61e07cd09f7f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:a6e7912e4cc4ffe7",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:ae2eab88b6afb841",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:afcfc725af94adf8",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:b0f9cce207f471b5",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:b23f67a6be9f479e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:b2b779cc42ae87d2",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:b3b25d6b3e8b4b0c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:b4f9a74da5d39a76",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:b7d9452631ce5f8b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:b83e96a95a6d91b2",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:b9ff8f360ca81024",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:ba274f55676b0c61",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:bb55c4a7a736ee69",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:bb903d63ae85f5c1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:c04f373ac99f7c7d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:c1f57e348b1ea263",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:c2de86487875dab3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:c375a13e8a338bf6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:c479a382e5ffddfb",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:c65959ac98dc658d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:c721a1c394fb4058",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:cae3a365c8bfe163",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:cb2b6a4e5e6cf666",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:cbd6bb64d0526585",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:cd31194f77430922",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:ceff11d9d0fb32a3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:d03ec330a090aea1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:d3d163e047195dcc",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:d4f8bcc5961de71a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:db59baba792ca53f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:ddb03026bab79dbb",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:ddd00bc2b614e544",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:dfce9fe167e62f09",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:e0531e6c4dc95087",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:e1f1e9f046594a82",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:e526bad035beda87",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:e5741e30a6f9c215",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:e6750a1817609ee0",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:e7409c589fec1ed1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:e9dc15dfa0b6f00a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:ebfbe3053b4c6422",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:ee71a697afee8e50",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:eeec0d0479c7c9c7",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:ef06cdf2e239866c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:f0527b02ad5f200c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:f1edcd20b474564e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:f2f6235802540acf",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:f4a0f8c87cf6f803",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:f794a96911c1e9ab",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:fe0f4a17cce662a4",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:ff114fc3732e4f22",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "failure": "SOURCE_CONTENT_SHA256_MISMATCH"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:0",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:1",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:10",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:11",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:12",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:13",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:14",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:15",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:16",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:17",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:18",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:19",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:2",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:20",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:21",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:22",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:23",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:24",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:25",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:26",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:27",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:28",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:29",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:3",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:30",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:31",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:4",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:5",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:6",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:7",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:8",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    },
+    {
+      "chunkId": "fullrepo:packages/atlas-core/src/retrieval/feature-registry-search.ts:9",
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "failure": "CHUNK_NOT_FOUND_IN_SOURCE"
+    }
+  ],
+  "limitations": [
+    "Only IMPORTS proposals are emitted by this bounded regex extractor.",
+    "Accepted offsets are verified against current full-file UTF-8 bytes.",
+    "OAK mappings remain unresolved until live OAK is configured and reviewed.",
+    "Rejected source records are review/reindex candidates only; no automatic backfill occurs.",
+    "No Graphify admission, ACE readback, or database/cache writes were performed."
+  ],
+  "sourceReconciliation": {
+    "generatedAt": "2026-11-23T06:31:17.528347+00:00",
+    "sourceFileCount": 2,
+    "statusCounts": {
+      "RECHUNK_CURRENT_SOURCE": 1,
+      "REVIEW_SOURCE_REVISION_REBIND": 1
+    },
+    "items": [
+      {
+        "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+        "rejectedChunkCount": 32,
+        "rejectionCounts": {
+          "CHUNK_NOT_FOUND_IN_SOURCE": 32
+        },
+        "storedContentSha256": [
+          "bc71868584a6f32c43f331ac11179670bde75ccd76025809dd99fd59f61d5eb7"
+        ],
+        "currentContentSha256": "bc71868584a6f32c43f331ac11179670bde75ccd76025809dd99fd59f61d5eb7",
+        "reconciliationStatus": "RECHUNK_CURRENT_SOURCE",
+        "canonicalAuthority": false,
+        "writesPerformed": false,
+        "canonicalChunkerDiagnostic": {
+          "rowCount": 43,
+          "sourceRevisionMatches": 43,
+          "exactSourceOccurrences": 11,
+          "storedSourceSpansPresent": 0,
+          "chunkerAlgorithm": "INDEX_FULL_REPO_SLIDING_WINDOW_V1",
+          "reproducedTextMatches": 11,
+          "chunkerMismatchCount": 32,
+          "chunkerStatus": "CURRENT_CHUNKER_REPRODUCTION_MISMATCH",
+          "producerAttribution": "NOT_ESTABLISHED_BY_REPRODUCTION",
+          "canonicalAuthority": false,
+          "evidenceAdmitted": false
+        },
+        "canonicalIndexerDryRun": {
+          "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+          "command": "node --import dotenv/config scripts/atlas/index-full-repo-for-search.mjs --dry-run --file=packages/atlas-core/src/retrieval/feature-registry-search.ts --verbose --no-redis",
+          "plannedChunks": 43,
+          "reuseDisposition": {
+            "CHUNK_CONTENT_HASH_MISMATCH": 32,
+            "SOURCE_REVISION_MISMATCH": 11
+          },
+          "mode": "DRY_RUN",
+          "postgresReadOnlyPath": "SELECT existing indexed rows for exact qdrant IDs",
+          "qdrantWritesPerformed": false,
+          "postgresWritesPerformed": false,
+          "redisDisabled": true,
+          "canonicalAuthority": false
+        }
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+        "rejectedChunkCount": 125,
+        "rejectionCounts": {
+          "SOURCE_CONTENT_SHA256_MISMATCH": 125
+        },
+        "storedContentSha256": [
+          "f5588bfed4400814c707f71b908b569be4a6de063bd6ff16ea995e92d1c4a8cf"
+        ],
+        "currentContentSha256": "695d205ad2685f907e4cab2aa844cc084a48ca8046108ba3b53985badde2115e",
+        "reconciliationStatus": "REVIEW_SOURCE_REVISION_REBIND",
+        "canonicalAuthority": false,
+        "writesPerformed": false,
+        "revisionComparison": {
+          "storedSourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+          "currentSourceRevision": "sha256:695d205ad2685f907e4cab2aa844cc084a48ca8046108ba3b53985badde2115e",
+          "allStoredRowsShareRevision": true,
+          "matchesCurrent": false,
+          "canonicalAuthority": false,
+          "evidenceAdmitted": false
+        },
+        "canonicalIndexerDryRun": {
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+          "command": "node --import dotenv/config scripts/atlas/index-full-repo-for-search.mjs --dry-run --file=sveltekit-frontend/src/lib/server/ace/context-assembler.ts --verbose --no-redis",
+          "plannedChunks": 23,
+          "reuseDisposition": {
+            "CHUNK_CONTENT_HASH_MISMATCH": 21,
+            "STORED_ROW_MISSING": 2
+          },
+          "mode": "DRY_RUN",
+          "postgresReadOnlyPath": "SELECT existing indexed rows for exact qdrant IDs",
+          "qdrantWritesPerformed": false,
+          "postgresWritesPerformed": false,
+          "redisDisabled": true,
+          "canonicalAuthority": false
+        }
+      }
+    ],
+    "policy": "Dry-run only. Review source ownership and index admission before re-chunking or rebinding revisions; no Graphify, PostgreSQL, Qdrant, or Valkey writes. Existing index-full-repo chunker reproduction was used as diagnostic evidence only; no provenance or admission is inferred.",
+    "indexerNote": "Dry-runs used the existing index-full-repo-for-search.mjs owner and its current Postgres reuse classifier. They are source/index reconciliation evidence only; no --apply, embedding, Qdrant, Postgres, or Redis/Valkey write occurred."
+  }
+}

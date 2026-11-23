@@ -1,0 +1,10 @@
+^C:\USERS\JAMES\VIDEOS\DEEDS-WEB-APP\PACKAGES\ATLAS-NATIVE-CORE\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/james/Videos/deeds-web-app/packages/atlas-native-core -BC:/Users/james/Videos/deeds-web-app/packages/atlas-native-core/build-win --check-stamp-file C:/Users/james/Videos/deeds-web-app/packages/atlas-native-core/build-win/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

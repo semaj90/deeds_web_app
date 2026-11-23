@@ -155,6 +155,25 @@ class AtlasComputeReferenceTests(unittest.TestCase):
         self.assertEqual(sorted(item["id"] for item in first["tasks"]), sorted(task["id"] for task in tasks))
         self.assertEqual([item["rank"] for item in first["tasks"]], list(range(1, 41)))
         self.assertEqual(first["featuresUsedByDeterministicRank"], ["goalRank"])
+        self.assertEqual(first["compute"]["requestedDevice"], "cpu")
+        self.assertEqual(first["compute"]["usedDevice"], "cpu")
+
+    def test_task_recommendation_accepts_explicit_cpu_backend(self) -> None:
+        tasks = [
+            self._feature_task(
+                i,
+                goalRank=((i % 5) * 10, "DERIVED"),
+                selectionEligible=(i % 2, "DERIVED"),
+                estimatedMinutes=(10 + (i * 7) % 40, "OBSERVED"),
+            )
+            for i in range(20)
+        ]
+        report = self._run_task_recommendation(tasks, "--device", "cpu")
+        self.assertEqual(report["status"], "OK")
+        self.assertEqual(report["compute"]["requestedDevice"], "cpu")
+        self.assertEqual(report["compute"]["usedDevice"], "cpu")
+        self.assertEqual(report["receipt"]["device"], "cpu")
+        self.assertFalse(report["compute"]["canonicalAuthority"])
 
     def test_task_recommendation_refuses_single_varying_feature(self) -> None:
         tasks = [

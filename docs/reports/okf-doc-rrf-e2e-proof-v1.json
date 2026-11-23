@@ -1,0 +1,183 @@
+{
+  "schema": "atlas.okf-doc-rrf-e2e-proof.v1",
+  "status": "PROVEN",
+  "externalDocChunkCount": 852,
+  "conceptVocabSize": 0,
+  "graphRevision": "sha256:00b8cbeeee3c06b67c07bc6528185c469c4cc85cd7522a59ee65c447de341ee7",
+  "lexicalHitCount": 1,
+  "fusedTop5": [
+    {
+      "chunkId": "doc:drizzle-orm:e4532e671c881d5f:0",
+      "fusionScore": 0.03278688524590164,
+      "contributingLanes": [
+        "lexical",
+        "dense"
+      ],
+      "laneRanks": {
+        "lexical": 1,
+        "dense": 1
+      }
+    },
+    {
+      "chunkId": "doc:drizzle-orm:d1b6909995c31bb5:4",
+      "fusionScore": 0.032266458495966696,
+      "contributingLanes": [
+        "dense",
+        "lowrank"
+      ],
+      "laneRanks": {
+        "dense": 3,
+        "lowrank": 1
+      }
+    },
+    {
+      "chunkId": "doc:pgvector:ca39935f7857789b:23",
+      "fusionScore": 0.03125763125763126,
+      "contributingLanes": [
+        "dense",
+        "lowrank"
+      ],
+      "laneRanks": {
+        "dense": 5,
+        "lowrank": 3
+      }
+    },
+    {
+      "chunkId": "doc:pgvector:ca39935f7857789b:11",
+      "fusionScore": 0.030017921146953404,
+      "contributingLanes": [
+        "graph",
+        "lowrank"
+      ],
+      "laneRanks": {
+        "graph": 12,
+        "lowrank": 2
+      }
+    },
+    {
+      "chunkId": "doc:pgvector:ca39935f7857789b:0",
+      "fusionScore": 0.01639344262295082,
+      "contributingLanes": [
+        "graph"
+      ],
+      "laneRanks": {
+        "graph": 1
+      }
+    }
+  ],
+  "admittedCount": 10,
+  "admittedTop3": [
+    {
+      "chunkId": "doc:drizzle-orm:e4532e671c881d5f:0",
+      "taskKey": null,
+      "fusionScore": 0.03278688524590164,
+      "scoreBreakdown": {
+        "fusion": 0.03278688524590164,
+        "laneRanks": {
+          "lexical": 1,
+          "dense": 1
+        }
+      },
+      "relationPaths": [
+        {
+          "predicate": "DOCUMENT_HAS_CHUNK",
+          "pageUrl": "https://orm.drizzle.team/docs/guides/vector-similarity-search"
+        }
+      ],
+      "sourceRevision": "sha256:e4532e671c881d5fa1aea65da9139b025e69b39ae65ef8eeda201486d5688895",
+      "graphRevision": "sha256:00b8cbeeee3c06b67c07bc6528185c469c4cc85cd7522a59ee65c447de341ee7",
+      "admissionStatus": "ADMITTED",
+      "rejectionReason": null,
+      "supportingSpans": [
+        [
+          51,
+          1649
+        ]
+      ]
+    },
+    {
+      "chunkId": "doc:drizzle-orm:d1b6909995c31bb5:4",
+      "taskKey": null,
+      "fusionScore": 0.032266458495966696,
+      "scoreBreakdown": {
+        "fusion": 0.032266458495966696,
+        "laneRanks": {
+          "dense": 3,
+          "lowrank": 1
+        }
+      },
+      "relationPaths": [
+        {
+          "predicate": "DOCUMENT_HAS_CHUNK",
+          "pageUrl": "https://github.com/drizzle-team/drizzle-orm/issues/5792"
+        }
+      ],
+      "sourceRevision": "sha256:d1b6909995c31bb53ea82c58796b0055b054ebf1a1db7aa7aa224ca931b1175f",
+      "graphRevision": "sha256:00b8cbeeee3c06b67c07bc6528185c469c4cc85cd7522a59ee65c447de341ee7",
+      "admissionStatus": "ADMITTED",
+      "rejectionReason": null,
+      "supportingSpans": [
+        [
+          887,
+          1276
+        ]
+      ]
+    },
+    {
+      "chunkId": "doc:pgvector:ca39935f7857789b:23",
+      "taskKey": null,
+      "fusionScore": 0.03125763125763126,
+      "scoreBreakdown": {
+        "fusion": 0.03125763125763126,
+        "laneRanks": {
+          "dense": 5,
+          "lowrank": 3
+        }
+      },
+      "relationPaths": [
+        {
+          "predicate": "DOCUMENT_HAS_CHUNK",
+          "pageUrl": "https://github.com/pgvector/pgvector/blob/master/CHANGELOG.md"
+        }
+      ],
+      "sourceRevision": "sha256:ca39935f7857789b3e3e12371cdb5767a38b657a0e5f695cdc592968c78b119b",
+      "graphRevision": "sha256:00b8cbeeee3c06b67c07bc6528185c469c4cc85cd7522a59ee65c447de341ee7",
+      "admissionStatus": "ADMITTED",
+      "rejectionReason": null,
+      "supportingSpans": [
+        [
+          3424,
+          3975
+        ]
+      ]
+    }
+  ],
+  "sampleRelationProposal": {
+    "schema": "atlas.relation-proposal.v1",
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "subject": {
+      "kind": "task",
+      "id": "cuda_tile_query",
+      "sourceRevision": "sha256:00b8cbeeee3c06b67c07bc6528185c469c4cc85cd7522a59ee65c447de341ee7"
+    },
+    "object": {
+      "kind": "document_chunk",
+      "id": "doc:drizzle-orm:e4532e671c881d5f:0",
+      "sourceRevision": "sha256:e4532e671c881d5fa1aea65da9139b025e69b39ae65ef8eeda201486d5688895"
+    },
+    "relation": {
+      "predicate": "TASK_RELEVANT_TO_DOCUMENT",
+      "assertion": "PREDICTED",
+      "method": "rrf_svd_4lane_v1"
+    },
+    "evidence": {
+      "sourceRef": "https://orm.drizzle.team/docs/guides/vector-similarity-search",
+      "contentSha256": "sha256:e4532e671c881d5fa1aea65da9139b025e69b39ae65ef8eeda201486d5688895"
+    },
+    "graphRevision": "sha256:00b8cbeeee3c06b67c07bc6528185c469c4cc85cd7522a59ee65c447de341ee7",
+    "admission": "PENDING"
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

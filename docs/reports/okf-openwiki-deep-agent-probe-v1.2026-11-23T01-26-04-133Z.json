@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.okf-openwiki-deep-agent-probe.v1",
+  "generatedAt": "2026-11-23T01:26:59.124Z",
+  "status": "COMPLETED",
+  "failure": null,
+  "question": "Which OKF registries does the manifest declare, and which OpenWiki sections exist? Cite paths.",
+  "model": {
+    "id": "gemma4-legal-iq4xs-direct.gguf",
+    "endpoint": "http://127.0.0.1:8090"
+  },
+  "durationMs": 22082,
+  "toolCallsObserved": [
+    "okf_list_files",
+    "okf_read_file",
+    "openwiki_list_pages"
+  ],
+  "answer": "The manifest declares several registries under `languages`, `domains`, `corpora`, `concepts`, `tools`, `predicates`, `schemas`, `pipelines`, and `indexes` (as seen in the file structure and content of `.okf/manifest.yaml`).\n\nThe OpenWiki sections available are:\n*   `openwiki/.claims/architecture/boundaries-and-authority.json`\n*   `openwiki/.claims/architecture/overview.json`\n*   `openwiki/.claims/architecture/system-map.json`\n*   `openwiki/.claims/concepts/glossary.json`\n*   `openwiki/.claims/concepts/packet-identity-and-provenance.json`\n*   `openwiki/.claims/concepts/packet-registry.json`\n*   `openwiki/.claims/evidence/status-and-gaps.json`\n*   `openwiki/.claims/integrations/protocol-and-service-adapters.json`\n*   `openwiki/.claims/operations/monitoring.json`\n*   `openwiki/.claims/quickstart.json`\n*   `openwiki/.claims/testing/validation.json`\n*   `openwiki/.last-update.json`\n*   `openwiki/.page-manifest.json`\n*   `openwiki/.run.json`\n*   `openwiki/architecture/boundaries-and-authority.md`\n*   `openwiki/architecture/overview.md`\n*   `openwiki/architecture/system-map.md`\n*   `openwiki/concepts/glossary.md`\n*   `openwiki/concepts/packet-identity-and-provenance.md`\n*   `openwiki/concepts/packet-registry.md`\n*   `openwiki/evidence/status-and-gaps.md`\n*   `openwiki/INSTRUCTIONS.md`\n*   `openwiki/integrations/protocol-and-service-adapters.md`\n*   `openwiki/operations/monitoring.md`\n*   `openwiki/quickstart.md`\n*   `openwiki/testing/validation.md`\n\nThe OKF registries declared in the manifest are:\n*   **`languages`**: Declares language-specific AST rules, extensions, exclusions (e.g., `bash.yaml`, `python.yaml`, etc.) [`.okf/manifest.yaml`].\n*   **`domains`**: Declares domain classifications with feature evidence paths (e.g., `atlas-domain-taxonomy.yaml`) [`.okf/manifest.yaml`].\n*   **`corpora`**: Declares keyword corpus, semantic ontology, and NLP-derived feature snapshots (e.g., `keyword-corpus.yaml`) [`.okf/manifest.yaml`].\n*   **`concepts`**: Declares evidence-linked gap records (e.g., `domain-lineage-gap.yaml`) [`.okf/manifest.yaml`].\n*   **`tools`**: For external tool integrations (no specific schemas listed in the manifest) [`.okf/manifest.yaml`].\n*   **`predicates`**: Declares ontology and relationship classification rules (e.g., `feature-relationships.yaml`) [`.okf/manifest.yaml`].\n*   **`schemas`**: Contains structural contracts (e.g., `domain-taxonomy-v1.schema.json`) [`.okf/manifest.yaml`].\n*   **`pipelines`**: Contains bounded, evidence-qualified data and execution pipelines (e.g., `ast-entity-prefill.yaml`) [`.okf/manifest.yaml`].\n*   **`indexes`**: Contains canonical store and rebuildable index/executor ownership policies (e.g., `feature-intelligence.yaml`) [`.okf/manifest.yaml`].",
+  "recursionLimit": 12,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "readScopes": [
+    ".okf/",
+    "openwiki/"
+  ]
+}

@@ -22,6 +22,7 @@ import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { resolveOpenSpecDiagnosticTaskBindingsV1 } from './lib/openspec-workboard-task-ref-v1.mjs';
+import { classifyLanePhaseForCandidate } from './lib/acp-a2a-lane-classifier-v1.mjs';
 import { parseMachineDiagnostic } from '../../sveltekit-frontend/scripts/svelte-check-capture.mjs';
 
 const ROOT = process.cwd();
@@ -405,7 +406,7 @@ const modelResolution = offline
 const deterministicBody = {
   schema: 'atlas.agentic-error-fixing.v1',
   inputChecksum: sha256(diagnostics),
-  candidates: candidates.map(({ findingId, fingerprint, diagnosticFingerprint, errorCode, gateId, kind, file, sourceRevision, workspaceRevision, evidenceDigest, sourceSpan, evidenceRefs, verificationMethod, verificationRef, owner, diagnostic, proposedAction, recommendedMcpTools, status, mutationAllowed }) => ({ findingId, fingerprint, ...(diagnosticFingerprint ? { diagnosticFingerprint } : {}), errorCode, gateId, kind, file, sourceRevision, workspaceRevision, evidenceDigest, sourceSpan, evidenceRefs, verificationMethod, verificationRef, owner, diagnostic, proposedAction, recommendedMcpTools, status, mutationAllowed, ...(workboardTaskRefs.has(fingerprint) ? { workboardTaskRef: workboardTaskRefs.get(fingerprint) } : {}) })),
+  candidates: candidates.map(({ findingId, fingerprint, diagnosticFingerprint, errorCode, gateId, kind, file, sourceRevision, workspaceRevision, evidenceDigest, sourceSpan, evidenceRefs, verificationMethod, verificationRef, owner, diagnostic, proposedAction, recommendedMcpTools, status, mutationAllowed }) => ({ findingId, fingerprint, ...(diagnosticFingerprint ? { diagnosticFingerprint } : {}), errorCode, gateId, kind, file, sourceRevision, workspaceRevision, evidenceDigest, sourceSpan, evidenceRefs, verificationMethod, verificationRef, owner, diagnostic, proposedAction, recommendedMcpTools, ...classifyLanePhaseForCandidate(kind, diagnostic), status, mutationAllowed, ...(workboardTaskRefs.has(fingerprint) ? { workboardTaskRef: workboardTaskRefs.get(fingerprint) } : {}) })),
   validation: validation ? { command: validation.command, exitCode: validation.exitCode, timedOut: validation.timedOut, outputChecksum: validation.outputChecksum } : null,
   modelResolution: {
     status: modelResolution.status,

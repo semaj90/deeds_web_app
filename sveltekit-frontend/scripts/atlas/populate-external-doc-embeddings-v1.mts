@@ -17,6 +17,7 @@ import { Pool } from 'pg';
 
 const ROOT = resolve(import.meta.dirname, '..', '..', '..');
 const PARITY = resolve(ROOT, 'docs/reports/semantic-doc-01-embedding-parity-v1.json');
+const OLLAMA_PARITY = resolve(ROOT, 'docs/reports/semantic-doc-01-ollama-embedding-parity-v1.json');
 const RECEIPT = resolve(ROOT, 'docs/reports/semantic-doc-01-embedding-population-v1.json');
 const OLLAMA_BASE = process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434';
 const OLLAMA_MODEL = 'embeddinggemma:latest';
@@ -79,7 +80,8 @@ async function main(): Promise<void> {
 	EXEC = selected;
 	if (apply) {
 		if (process.env.ATLAS_DOC_EMBED_AUTHORIZED !== AUTH) throw new Error(`EMBED_NOT_AUTHORIZED: set ATLAS_DOC_EMBED_AUTHORIZED=${AUTH}`);
-		const parity = existsSync(PARITY) ? JSON.parse(readFileSync(PARITY, 'utf8')) as { result?: string; executor?: { url?: string; kind?: string } } : null;
+		const parityPath = EXEC.kind === 'ollama' && existsSync(OLLAMA_PARITY) ? OLLAMA_PARITY : PARITY;
+		const parity = existsSync(parityPath) ? JSON.parse(readFileSync(parityPath, 'utf8')) as { result?: string; executor?: { url?: string; kind?: string } } : null;
 		if (parity?.result !== 'EMBEDDING_PARITY_PROVEN') throw new Error('EMBED_PARITY_NOT_PROVEN: run the parity proof first');
 		const parityExecutor = parity.executor?.kind ?? '';
 		const parityCoversSelected = EXEC.kind === 'ollama' ? /ollama/i.test(parityExecutor) && !/NOT Ollama/i.test(parityExecutor) : normalizeUrl(parity.executor?.url ?? '') === EXEC.url;

@@ -1,0 +1,1125 @@
+{
+  "schema": "atlas.openspec-task-extract.v1",
+  "generatedAt": "2026-11-22T17:42:33.045894+00:00",
+  "canonicalAuthority": false,
+  "producer": {
+    "path": "scripts/atlas/openspec-task-extract-v1.py",
+    "sha256": "c4594ab276eefdea004da5bd0f59924ba4e588a339913beaf1660ef72b61ada2"
+  },
+  "invocation": [
+    "scripts/atlas/openspec-task-extract-v1.py",
+    "--out-dir",
+    "docs/reports/openspec-local-inventory-20261122",
+    "--stamp",
+    "local-review-04",
+    "--top",
+    "100",
+    "--page-size",
+    "100"
+  ],
+  "workspaceHead": "4fe5ebf63e07d57bcfc3f002c3537215d5011f79",
+  "workspaceBranch": "session/2026-11-08-verified-context-live-shadow",
+  "inputMode": "working-tree tracked plus untracked non-ignored task files",
+  "sourceManifestChecksum": "sha256:328db8321ffb970ce1da819db3daa52f67694d7d64c6ab434b0fa7e1f70200d6",
+  "params": {
+    "root": ".",
+    "top": 100,
+    "pageSize": 100,
+    "pagerankDamping": 0.85,
+    "pagerankMaxIter": 200,
+    "pagerankTol": 1e-10,
+    "excludePattern": "(archive|phase-110|phase_|/v2/|^v2/|parent_atlas_tensor_residency_integration_v2)",
+    "rankBy": "pagerank desc, in_degree desc, id asc"
+  },
+  "inputs": {
+    "tasksMdFiles": 152,
+    "files": [
+      {
+        "file": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md",
+        "sha256": "b3390276fac67bded2908fbf0f37e72eb9513022d3a43c92c0a9d6a869b71300",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 7
+      },
+      {
+        "file": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md",
+        "sha256": "4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 20
+      },
+      {
+        "file": "openspec/changes/atlas-directory-first-analysis-v1/tasks.md",
+        "sha256": "7e0f1f2d5567307da12ab01d5129cd3c1ac363ffa5ae69a56343a8056ff3f747",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 53
+      },
+      {
+        "file": "openspec/changes/atlas-feature-intelligence/tasks.md",
+        "sha256": "eefbaa001dfbf2e095b3b3bb251a195c367be83b357765e244aadd008bea14de",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 82
+      },
+      {
+        "file": "openspec/changes/case-detail-hud-dossier-polish/tasks.md",
+        "sha256": "a50cd9535e52d9aa0dddaae70e68ac154da5695f3b35b8b80f2ac91d5bbbf9f6",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 34
+      },
+      {
+        "file": "openspec/changes/case-investigation-layer/tasks.md",
+        "sha256": "86a002c8455db836a3d3109d8980959602f7dcef4ac5df5ba5becd562195e55a",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 19
+      },
+      {
+        "file": "openspec/changes/codereview-inference-wiring-followup-aug22/tasks.md",
+        "sha256": "358fffb1d592a936100e87d1876d64d1ec5c83b982c6c8f97a970cb49bdffdcc",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 10
+      },
+      {
+        "file": "openspec/changes/codereview-semantic-dimension-regression-aug22/tasks.md",
+        "sha256": "a9ee6886782c154ff5adaaa65130eda6487a8126146e3dda3a8b292c11bf7afb",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 12
+      },
+      {
+        "file": "openspec/changes/courtroom-simulation-runtime/tasks.md",
+        "sha256": "66594c4c6eae5a6b0f740886e0cd065e8e65efc92c3d61bd552edb31eb968531",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 10
+      },
+      {
+        "file": "openspec/changes/courtroom-text-analysis-ml/tasks.md",
+        "sha256": "7768c388b4b9f3b2919d240ef04d887c440ad8a157d3e95deb2abf9dd74ebb6d",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 6
+      },
+      {
+        "file": "openspec/changes/courtroom-upload-story-pipeline/tasks.md",
+        "sha256": "c65632f4d324b078fa3826170608f235078baee541299b6968d21335518b520c",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 149
+      },
+      {
+        "file": "openspec/changes/crime-scene-reconstruction/tasks.md",
+        "sha256": "b73882bcf3d4140682d64a2b1698c93dcf7c15bb33dc0757606e7f98dfda85db",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 348
+      },
+      {
+        "file": "openspec/changes/deep-audit-code-gates-aug22/tasks.md",
+        "sha256": "a9a3dde81d8fc0b6171b77c0c34a5eff8f7fbeb9a42690c6189ee63f7206bd9c",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 28
+      },
+      {
+        "file": "openspec/changes/docker-compose-duplication-remediation/tasks.md",
+        "sha256": "e996502be3936b179247221b7eb0e054e7e2df4255934853c0d3918e69258d0b",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 9
+      },
+      {
+        "file": "openspec/changes/e2e-error-intelligence-kanban/tasks.md",
+        "sha256": "f262029a5be6bf7da49dc9d43b19be8680f757aed3d07881e90c20bc6372bb75",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 60
+      },
+      {
+        "file": "openspec/changes/evidence-analysis-bdd-pipeline/tasks.md",
+        "sha256": "ed971d9a0d3b0fa7059c04a7418cc483721ebacce15f861db9a5df872be0b2ff",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 77
+      },
+      {
+        "file": "openspec/changes/evidence-board-dossier-routing/tasks.md",
+        "sha256": "a6955f0499124462f4ff56dbe71ae29e3c642dd0b909ad6fa913811405f5425f",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 12
+      },
+      {
+        "file": "openspec/changes/evidence-relief-source-bound-annotations/tasks.md",
+        "sha256": "be4830a9575905207a89214b3ed91949f6ffc9ff9400b242316d762483b82903",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 17
+      },
+      {
+        "file": "openspec/changes/feature-label-semantic-derivation/tasks.md",
+        "sha256": "3122849c96a9a356f59a697715f5be3b360e86bdbade9a2f6c23838d4bf509d9",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 9
+      },
+      {
+        "file": "openspec/changes/frontend-component-palette-analyzer/tasks.md",
+        "sha256": "1357f9b40225c189d2460598f3ae8faccbde643a887f19a415c05efb0c327e8e",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 23
+      },
+      {
+        "file": "openspec/changes/inference-wiring-deep-audit-aug22/tasks.md",
+        "sha256": "feee1c3fac8c589e172427a36bc4ef89399d1e3821f230679a16db9be50eb54a",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 56
+      },
+      {
+        "file": "openspec/changes/jester-accessory-demo/tasks.md",
+        "sha256": "f971887f346e1ca8eca3567dee33f25b66b9de44823825db415a7b8041fdaee4",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 0
+      },
+      {
+        "file": "openspec/changes/legal-corpus-california-codes/tasks.md",
+        "sha256": "d94d5ab6733a648ba30d4934c231958153be8fb6b1aa6b25bb5af3f82be93d0e",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 106
+      },
+      {
+        "file": "openspec/changes/local-llm-offload-ownership/tasks.md",
+        "sha256": "8c098822d850de1d6dd3575f3c19dbfd9d5821bb4394b93f64c35bad195d6a5d",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 86
+      },
+      {
+        "file": "openspec/changes/manual-migration-reconciliation/tasks.md",
+        "sha256": "8440e22a01b8e7c405adf20a22226e48e9d7751538436df9e6424f8249e160db",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 132
+      },
+      {
+        "file": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
+        "sha256": "7e2b593db03b95d47b4f424e9f451f472c544ef5b68de337b572dc17e69060eb",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 110
+      },
+      {
+        "file": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+        "sha256": "5aad37703e62b37f4f300795920da6a83adcfa15a245940f1c9c1b1f8d00d650",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 1694
+      },
+      {
+        "file": "openspec/changes/parent-atlas-adaptive-backprop-hll-monitoring/tasks.md",
+        "sha256": "51102d43cc4e5852292bfdede4eb4fbbfd8b1b152a99a2193f215101b751cfa8",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 64
+      },
+      {
+        "file": "openspec/changes/parent-atlas-adaptive-dag-fabric/tasks.md",
+        "sha256": "1dcb6438d23c2215a341df7e8d8938916a9ceb8d1473d93b15b79c0dbbce6d9a",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 13
+      },
+      {
+        "file": "openspec/changes/parent-atlas-agent-framework-integration-hardening/tasks.md",
+        "sha256": "b0a9c34b7eb243864d3eadff242c7bc126d7b0ba394319ff9b1290e3074a1bf8",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 106
+      },
+      {
+        "file": "openspec/changes/parent-atlas-agentic-completion/tasks.md",
+        "sha256": "1570297564025faad995fa1f0ff526ea62af547d864a7b7a4babb0c420280a99",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 11
+      },
+      {
+        "file": "openspec/changes/parent-atlas-agentic-file-compiler/tasks.md",
+        "sha256": "00f96e69ef66b8a5e499bfc9441c66c732a6ae5568ce013c6b93e41b7b51238d",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 124
+      },
+      {
+        "file": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md",
+        "sha256": "ab6fb1e871a5fabe132390df5405b10810afe563bb912487a864c8984a0e90a5",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 96
+      },
+      {
+        "file": "openspec/changes/parent-atlas-agentic-repair-fabric/tasks.md",
+        "sha256": "794e76df0b1d94e35134ebf819f86a6bb00107a6151c11d564b895d4b10e07ec",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 62
+      },
+      {
+        "file": "openspec/changes/parent-atlas-agentic-run-receipt-binding/tasks.md",
+        "sha256": "50d5bdfc8864e8c2e0e3493665ceae12ce2ab854507879162dbe95e2ce4705b9",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 16
+      },
+      {
+        "file": "openspec/changes/parent-atlas-analysis-pass-ornith-adapter/tasks.md",
+        "sha256": "5aaddf572d4987cf002389b4c35ba9f9616e9dcabfb0677ab40a95c2e90cbbd6",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 25
+      },
+      {
+        "file": "openspec/changes/parent-atlas-ast-summary-lineage-pipeline/tasks.md",
+        "sha256": "e7fbb45807956c5ae7801de7df912f3dcad2ad4998ba25fa9e493686ccb9a9c1",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 43
+      },
+      {
+        "file": "openspec/changes/parent-atlas-autoresearch-fabric/tasks.md",
+        "sha256": "c1dcff6d8638f219ed1819dc3cf052a42b104555befeb9d510815db73ecde404",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 8
+      },
+      {
+        "file": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+        "sha256": "044d6669abe12d9fdf642e039abd8cc996be340efc9760bd133e1a3106ed68cd",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 714
+      },
+      {
+        "file": "openspec/changes/parent-atlas-branch-merge-consolidation-aug20/tasks.md",
+        "sha256": "640c21b7fa15ced56456c7278a0932c69c1c9400aad6d78d0293dcf8247d92d4",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 35
+      },
+      {
+        "file": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+        "sha256": "e0cc2e3eebeba0c56e898aad2e61abcca25c407ac148a725726cfef15cf8c936",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 471
+      },
+      {
+        "file": "openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/tasks.md",
+        "sha256": "bd00d790b237bd9cf3436c9bcbc74bccf8681286295bde1a88fea773744ac07c",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 87
+      },
+      {
+        "file": "openspec/changes/parent-atlas-chunk-index-whole-file-hash/tasks.md",
+        "sha256": "91ae2f8b10d95aa734bc6b48b0158972da4969fff9af6c29d3106b3e204ea049",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 29
+      },
+      {
+        "file": "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md",
+        "sha256": "855f9b15f3e357f6c54c9386cdb20b0995a1ad270660bafeb756884cd515cf2a",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 35
+      },
+      {
+        "file": "openspec/changes/parent-atlas-code-intel-e2e/tasks.md",
+        "sha256": "93a637c111f9974b04c81b680fb68be751a4b4b109070014d60328c42fdc6ad7",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 28
+      },
+      {
+        "file": "openspec/changes/parent-atlas-compiler-semantic-graph-resolution/tasks.md",
+        "sha256": "eb6d8c12c1b12d177788e8e3bfc287f720f335bd662370bcc6e6ea0789341aac",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 89
+      },
+      {
+        "file": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md",
+        "sha256": "9ce319d9100f487a52542a26d637b5ebf05d0535d984542731a475fe50e1920b",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 165
+      },
+      {
+        "file": "openspec/changes/parent-atlas-deep-research-ingestion/tasks.md",
+        "sha256": "0c36287fe21b67498396356527551ced7b0f4128a1259d92403a05a8646c0c42",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 7
+      },
+      {
+        "file": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+        "sha256": "428f99cf36381f1013ef5e0975e8b89c9e0cd40fadd435220ecf98087c79e6c0",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 80
+      },
+      {
+        "file": "openspec/changes/parent-atlas-error-embedding-768-migration/tasks.md",
+        "sha256": "1ebf7a97d4602c302299597f23850fac0c6c4b35308c0804ac263c279ad3a8fc",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 26
+      },
+      {
+        "file": "openspec/changes/parent-atlas-error-research-lane/tasks.md",
+        "sha256": "c2d84cdc79d0717abf13eebee87edfd1a7531a84343c2942b73e2c2a4600e7b6",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 0
+      },
+      {
+        "file": "openspec/changes/parent-atlas-evidence-agent-proposals/tasks.md",
+        "sha256": "5f234cad16caf5f523e1493ef9358aa31edafb9726ffcc82c854d93b9db2d250",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 63
+      },
+      {
+        "file": "openspec/changes/parent-atlas-gate2-chunk-lineage-convergence/tasks.md",
+        "sha256": "99c372d6b266be0138a5784afa6e0042a311e4155ed83c2634abcf28ca4991c6",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 20
+      },
+      {
+        "file": "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md",
+        "sha256": "47c134b34e5be604222b09747b9451130bc289ac364f888662722865d6129af3",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 180
+      },
+      {
+        "file": "openspec/changes/parent-atlas-gpu-graph-vector-substrate/tasks.md",
+        "sha256": "129bef56051880619355093e85cbdbb9fe84ae4000c8a5ce6334458dd1ac87d7",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 57
+      },
+      {
+        "file": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/tasks.md",
+        "sha256": "8178b415a6c5788b8dca698fcf853021f4b75a7ffade485846fb787affcd92fc",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 62
+      },
+      {
+        "file": "openspec/changes/parent-atlas-gpu-runtime-abi-alignment/tasks.md",
+        "sha256": "1024f41845af32c37590d45707dbe1d6099046e35ca2a1ed96a1aa94d3fbf05f",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 22
+      },
+      {
+        "file": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+        "sha256": "60b26f52f0a51e7575f7ddadb07fce370907586a14cf7bd29e76a14375206f3e",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 130
+      },
+      {
+        "file": "openspec/changes/parent-atlas-graph-analysis-contract/tasks.md",
+        "sha256": "1dbe78ddca2eae863c742ad13b4684b6aaacaa759114f4ca3036e4bc28f7248b",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 128
+      },
+      {
+        "file": "openspec/changes/parent-atlas-graph-pagerank-okf-fanout-hardening/tasks.md",
+        "sha256": "91830fe5624260349d02d2fe3be40b023c3d736a4de43df6212f2aa796b1e3fe",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 10
+      },
+      {
+        "file": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+        "sha256": "9732820923a09c2c9bc33e4f28b2b350e6636adfa5b36e1aae2aff65e6c6b1f4",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 293
+      },
+      {
+        "file": "openspec/changes/parent-atlas-graph-runtime-enhancement/tasks.md",
+        "sha256": "615a64aa4610e2bef6adc86a497af8dcf5e5bb22f1a5b79234d7d7593e9e1074",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 8
+      },
+      {
+        "file": "openspec/changes/parent-atlas-graph-runtime-python-consolidation/tasks.md",
+        "sha256": "30a4425de09a57769dfb363a33c701f1497d0b4ca5fad01b4cbfeb4cab06e505",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 30
+      },
+      {
+        "file": "openspec/changes/parent-atlas-graph-validation-fabric/tasks.md",
+        "sha256": "e05ee9fbb155423d2e163959a2a64fe41dc33b4a905ce1666f283d93cefc9705",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 94
+      },
+      {
+        "file": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md",
+        "sha256": "6fa998f6ce268b4cd30713d94e1d071cd174c5ffcffb851f85fc9801bd6aeadb",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 42
+      },
+      {
+        "file": "openspec/changes/parent-atlas-grounded-knowledge-fabric/tasks.md",
+        "sha256": "951f80cd4d503954cef294e31bed9c37170bee49a32f85c240dd8fe2c6c4d5a7",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 25
+      },
+      {
+        "file": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md",
+        "sha256": "1f23c4749561d107199a3497fae439504f929affcff8cc481573066c48e8b44c",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 71
+      },
+      {
+        "file": "openspec/changes/parent-atlas-kv-cache-adaptation-research/tasks.md",
+        "sha256": "9fe5de3a909dd57f4b631ae90cfd73eb3f3dcaa6cf3f75ad9055870892ef1760",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 118
+      },
+      {
+        "file": "openspec/changes/parent-atlas-live-graph-proof/tasks.md",
+        "sha256": "e2184322549451d10a16eaeeb642b35b8e9c37cf2c75d2725a1777c4923b245a",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 0
+      },
+      {
+        "file": "openspec/changes/parent-atlas-memory-architecture-freeze/tasks.md",
+        "sha256": "88de3d2aa7056d4d2240ab87da96099b63b6517f98a3476815d72f52f83e43ab",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 57
+      },
+      {
+        "file": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md",
+        "sha256": "fe38e61971151a278b7d86f94768361e489c22550306f57e557f8d5d6ced4c33",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 254
+      },
+      {
+        "file": "openspec/changes/parent-atlas-multi-agent-wave-plan/tasks.md",
+        "sha256": "0e620919d4ad10d82ac359e5ddd7b763bd6ed268abdf707c5b84359e0d745384",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 36
+      },
+      {
+        "file": "openspec/changes/parent-atlas-native-acceleration-cabi/tasks.md",
+        "sha256": "5d1ac8ff95622f096f542dd9765e31ca0c87ebb2c343110f7812b4a2f933bf51",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 63
+      },
+      {
+        "file": "openspec/changes/parent-atlas-nes-lut-single-owner/tasks.md",
+        "sha256": "e99f7fc0e61137bdfa5c0b899fb1225f72dd425bd645a41c2c5853632719661c",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 23
+      },
+      {
+        "file": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "sha256": "ae9f44d6b14d285b24bb5f9d5507acb46ca71882b141bc2c2a261df2dc996d8b",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 2255
+      },
+      {
+        "file": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+        "sha256": "9ce76b8843dda7a466cce59672b31e1665995cff8752cb7bd88d3dc5b62695f2",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 194
+      },
+      {
+        "file": "openspec/changes/parent-atlas-nlp-sidecar-okf-alignment/tasks.md",
+        "sha256": "6a9651cad4d9512a6d7806665959cf3511fcfe223bad6338a02e8cde6a546603",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 16
+      },
+      {
+        "file": "openspec/changes/parent-atlas-observation-routing-fabric/tasks.md",
+        "sha256": "6a917eef8a9c02247981adc0f89d19ec4e0ce53191a1650bf050fbafd9667572",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 26
+      },
+      {
+        "file": "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md",
+        "sha256": "6006d32b9c45ccae46cb445887dcd0d37c22b3f9b86d9aefa5af12345a2ee6c8",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 63
+      },
+      {
+        "file": "openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/tasks.md",
+        "sha256": "49406bbe0fba6f4ac869cc666edc6925199badc68335f0959eefacd1cd14e188",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 82
+      },
+      {
+        "file": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+        "sha256": "a26ebac0c07de905b99ee2db26dc4484a1b4fb4548a02e2a8ade1d5d38009bcf",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 412
+      },
+      {
+        "file": "openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap/tasks.md",
+        "sha256": "0ec7de021955201422248e71c777471b567c6eb6814549f74e2c97fb90985c72",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 36
+      },
+      {
+        "file": "openspec/changes/parent-atlas-opencode-replay-proof/tasks.md",
+        "sha256": "5bba751260923c9e6c013131787d718f2885ea1bef1e82128b1cf20094bb13ef",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 19
+      },
+      {
+        "file": "openspec/changes/parent-atlas-openspec-ledger-reconciliation/tasks.md",
+        "sha256": "51e050c873a14e54f845d389307dbaa27def33a58096d12b6efdec557de34690",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 13
+      },
+      {
+        "file": "openspec/changes/parent-atlas-openspec-task-triage-pipeline/tasks.md",
+        "sha256": "917de6ce805e6625ab29683894661e770defbb2cdefbfd5be15eb7f9b508014d",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 54
+      },
+      {
+        "file": "openspec/changes/parent-atlas-openspec-tasks-audit-fabric/tasks.md",
+        "sha256": "ff98466aad311c0e236e910ded841af6553f55bbee6d8d2518bb935c12785f75",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 17
+      },
+      {
+        "file": "openspec/changes/parent-atlas-openspec-workstation-synthesis/tasks.md",
+        "sha256": "fb5368137a73a873fd67e018c8da6cb5adca9e544ae753a993a921f6f309dbbf",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 31
+      },
+      {
+        "file": "openspec/changes/parent-atlas-pass-fabric/tasks.md",
+        "sha256": "64a11aa7b4110b6ddc523ced8d4cfe25962a319227d3b61470c34d622a7a8ad4",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 184
+      },
+      {
+        "file": "openspec/changes/parent-atlas-pca-svd-representation-baseline/tasks.md",
+        "sha256": "0d56a602a24887f0fcce02c97027b57182e3666c73137a67f94315f3f1f3aefa",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 20
+      },
+      {
+        "file": "openspec/changes/parent-atlas-policy-routing-integration/tasks.md",
+        "sha256": "947c4bac20cf4a412d8c1fea9a6fa06bd17cb731a75ef1b725b64b3a8730c6e9",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 40
+      },
+      {
+        "file": "openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md",
+        "sha256": "e55597b28bba1fbd47ac8ee905c57b1fa9b1aa7ce83939b6ee3c52a41c15247b",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 171
+      },
+      {
+        "file": "openspec/changes/parent-atlas-qdrant-structural-payload-enrichment/tasks.md",
+        "sha256": "f393eb64fee7cf2c60f0fec55a86e463666aa4cd5797e972d06534eec886f8af",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 23
+      },
+      {
+        "file": "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+        "sha256": "82307fcdd2759ad21ad35a8a010a8c4e5e61131fab290848d1983e6a6cba230c",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 114
+      },
+      {
+        "file": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md",
+        "sha256": "42a0840135c3c4f271d1813972e22fd174c003f21b5eb6d286f019d2aee1c9d9",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 199
+      },
+      {
+        "file": "openspec/changes/parent-atlas-resource-ledger-procedure-registry/tasks.md",
+        "sha256": "71ac5a06c8c26da718b17596c20e7ef008f711f858d20fffe4b84ba43ef78317",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 28
+      },
+      {
+        "file": "openspec/changes/parent-atlas-retire-384-lane/tasks.md",
+        "sha256": "079caba1bdfbe178b3830bee6cabf5cb4005201b1351efb0e98b5cfa6a064c57",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 31
+      },
+      {
+        "file": "openspec/changes/parent-atlas-retrieval-demand-token-budgeting/tasks.md",
+        "sha256": "c35a65c9beeee0c6862b362bf2fa036c854c59bdc8869a1519679d4a6dbc0422",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 14
+      },
+      {
+        "file": "openspec/changes/parent-atlas-retrieval-executor-compatibility-convergence/tasks.md",
+        "sha256": "dfb8941a63a6096471c367f81ef47e3f47f3242309d30cd59bf480e7f776a466",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 48
+      },
+      {
+        "file": "openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md",
+        "sha256": "b335e3e0ccf9d89c41efb24f3db042e2f7ceedbb036468b33aba87f7e67c5e1a",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 148
+      },
+      {
+        "file": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+        "sha256": "425503ca92f6a3b1bc0e7c3c7c035094c7bf779d31c678f7b15b0add9cf8e601",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 1188
+      },
+      {
+        "file": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+        "sha256": "8578ea22db325e373257124b607cd15d60a6419a08cb96561e117018ed2f6d22",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 157
+      },
+      {
+        "file": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
+        "sha256": "ded1189c7c8bf91a615884276088d4edbfcebdd1641a2990b08b7c97cb47a840",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 74
+      },
+      {
+        "file": "openspec/changes/parent-atlas-rpc-packet-registry-fabric/tasks.md",
+        "sha256": "07bc84ef922505449dad3b7fe31876c33f1c798610b5687efc31848b034ac13a",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 41
+      },
+      {
+        "file": "openspec/changes/parent-atlas-rrf-fusion-consolidation/tasks.md",
+        "sha256": "11c034908a26fb61997fbff82dd337f8465524b0dbb301688d591a54db146d4e",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 7
+      },
+      {
+        "file": "openspec/changes/parent-atlas-runtime-log-remediation/tasks.md",
+        "sha256": "c371de0fcce15f7990e4ebc5eea0ed1df735ee7bf5834e05003123e5356c34da",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 18
+      },
+      {
+        "file": "openspec/changes/parent-atlas-search-classifier-sidecar/tasks.md",
+        "sha256": "ec47e1a18d6f44688380e9d95f5e6ad1e02e9a4a76fcecc5d0904a1af6aa9180",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 106
+      },
+      {
+        "file": "openspec/changes/parent-atlas-semantic-512-canonicalization/tasks.md",
+        "sha256": "5532b2a6944b6e467ef2ad57efa2bef379c274401c274d14742d863aa33452b4",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 31
+      },
+      {
+        "file": "openspec/changes/parent-atlas-semantic-768-canonical-contract/tasks.md",
+        "sha256": "29b10b8644157b67269d18420f6d06341b46480f617b945c73bccc0b3094a962",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 116
+      },
+      {
+        "file": "openspec/changes/parent-atlas-source-qualified-corpus-admission/tasks.md",
+        "sha256": "79e74092e9b22c24c1438f1e930ca93d63731f86ad86f80d06c20a3b8876f507",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 95
+      },
+      {
+        "file": "openspec/changes/parent-atlas-spz-detective-renderer/tasks.md",
+        "sha256": "c2f5238d7ed91e672e4c93e2a8fa0ad264261ff17da51e516fa63a1a95a42a85",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 317
+      },
+      {
+        "file": "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md",
+        "sha256": "bcca65396c0b1d3b0c9d43d420a01248b5e5022f706b68630bd406d3ad92be8f",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 55
+      },
+      {
+        "file": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
+        "sha256": "6ec18be7f93947a33fba650107b23d90dce818eb31bf235a566fe9480d1dfdfb",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 343
+      },
+      {
+        "file": "openspec/changes/parent-atlas-topology-representation-admission/tasks.md",
+        "sha256": "4b791b21d90ccc06535409528dd3c8d4f912979b35565acb1b7e7cf076b114e8",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 58
+      },
+      {
+        "file": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+        "sha256": "34ff37fa4e9beea950c6d3e1059d0ab06c63bb3ab1a7a64c22491e1c5ff00082",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 106
+      },
+      {
+        "file": "openspec/changes/parent-atlas-unified-symbol-ranking/tasks.md",
+        "sha256": "b46d5c8e2a11700ee28fbbce71e3dc67d36e8deb6b44a4f5d114f27f374c3d4d",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 17
+      },
+      {
+        "file": "openspec/changes/parent-atlas-unordered-execution-contract/tasks.md",
+        "sha256": "2e9663c3e0ec491ed7ba3a50505eba824157ee73a81ac83ad759afe20ad927f6",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 26
+      },
+      {
+        "file": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md",
+        "sha256": "08ecc750f5870d8cde56174323f1d2e6ada93176bdd788d91c6a26e117d60ee7",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 98
+      },
+      {
+        "file": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md",
+        "sha256": "91e5f83f1ce66b7614e0ab407956e8edf88c8e3403da8596e74f08351b98b9e6",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 77
+      },
+      {
+        "file": "openspec/changes/parent-atlas-workspace-snapshot-runtime/tasks.md",
+        "sha256": "d9db8123aea0e691dc2a77484467ab725b82fa31d54de82d6def6b8f8b9e0468",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 51
+      },
+      {
+        "file": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
+        "sha256": "5a7c231083f4e5393fc07a03d4f3ab940f9d8fc01898fa44d7adba5075a52e8a",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 234
+      },
+      {
+        "file": "openspec/changes/parent-atlas-xgboost-cuda-runtime-proof/tasks.md",
+        "sha256": "69d15d8e978951577223cfdac7f142a27030869ad456fef89b21cc00efb73f4e",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 30
+      },
+      {
+        "file": "openspec/changes/phase79-canonical-workflow-action-wiring/tasks.md",
+        "sha256": "bdcf4a27d8da98685204e98f50288ac7daf0a15ad2bc7352ce72862f9bc87c10",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 16
+      },
+      {
+        "file": "openspec/changes/route-import-infra-isolation/tasks.md",
+        "sha256": "9011261528cd496e3c964cfd07c1b43bfe6914fb84ae88e7cf445f83a92382cd",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 17
+      },
+      {
+        "file": "openspec/changes/svelte-a11y-warning-remediation/tasks.md",
+        "sha256": "5159f4c9f9ac995ad85be11978e705e003529e73d4d10266f5bffe880c915969",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 20
+      },
+      {
+        "file": "openspec/changes/sveltekit2-docs-corpus-analysis/tasks.md",
+        "sha256": "09bfdfeea7eb7244b4d3ec20d7fd54bbfbf95ac7220c95f16b9d143844b6391b",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 19
+      },
+      {
+        "file": "openspec/changes/visual-element-rendering/tasks.md",
+        "sha256": "b4be2897309ac88d83911770057ab8ab6bcac82bfad0689b8d113c0bad027375",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 16
+      },
+      {
+        "file": "openspec/specs/openspec/changes/parent-atlas-agentic-completion/tasks.md",
+        "sha256": "430bd7706e3a6a1a310a83e355e9703dd4e1476f2fd4af782e9e0037f5a3c1b9",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 145
+      },
+      {
+        "file": "parent-atlas-graph-runtime-enhancement/openspec/tasks.md",
+        "sha256": "ca936718bace5608d7a4f838c56ddbf23db233031c53b06bf27622875e8a3d83",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 36
+      },
+      {
+        "file": "parent-atlas-qas-bundle/openspec/changes/parent-atlas-query-adaptive-synthesis/tasks.md",
+        "sha256": "af64d21a2a2c70161d87bbc182099cf041d19445f613cdabde32bc01bd7f06b0",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 47
+      },
+      {
+        "file": "parent-atlas-rtx-gpu-lab/openspec/tasks.md",
+        "sha256": "7a0d722b34a373911f449c1863861bc77ce0c3ee085d6d2c3a4671a3c562e979",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 40
+      },
+      {
+        "file": "parent-atlas-tensor-residency-integration/openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
+        "sha256": "6f61f79b6a4472bb5eeb01182fe28b0eb7ceb1549922bfb8b1d16becbbac9d1c",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 15
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/add-gemma4-retrieval-loop-hook-harness/tasks.md",
+        "sha256": "bebb40c68518590968bdfcbb4af44e9946ac5aaf23fd038331d5fe642a81fd4f",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 10
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/add-packet-ontology-registry/tasks.md",
+        "sha256": "56a6f3913bc82282b1eac297f15b1cb76f9c388a5934af796e6c97ee9920a287",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 46
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-384-representation-retirement/tasks.md",
+        "sha256": "c4ced3d75a3e8409fd6c36c9a31b50eaf37cd14d7f9b5168a6d20d5b62b4c555",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 12
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-ace-json-dag-prefill-pipeline/tasks.md",
+        "sha256": "ecb6e3d9ba4119a53c36070142a1e45a9770c832d239f5c05a902e802ec4b060",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 84
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-ace-radix-residency/tasks.md",
+        "sha256": "ea04a37fe8fa801fa34b5bd6fa939071175339c52ae36ee206cc64fc8fdc4057",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 26
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-agentic-diagnostic-repair-v1/tasks.md",
+        "sha256": "4ed8363d475ea78d45996912a2987a410a4f93d3e6ceeea68966b4d17f391f2b",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 49
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-capability-owner-matrix-v1/tasks.md",
+        "sha256": "9cde3b3e5999dd9dd2a94b32e947ecc715fdce683b3306bc36f1ef8a855df3b6",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 22
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-code-langextract-evidence-lane/tasks.md",
+        "sha256": "675afe05ef5d1fab806b7ab1748e09725e6f336f24766e324888bf8ff44bee0f",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 10
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-cuda134-tensorrt-rtx-lane/tasks.md",
+        "sha256": "db6915cb90ea249b7d38a30957a5381ed1b948ba29e455855140ddb6dc3c3845",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 19
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-directory-intelligence-route-gate/tasks.md",
+        "sha256": "b0129b192c266b422369dc0dec58ffcc46af12789863e91bd92bc78b147498f6",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 205
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md",
+        "sha256": "eb055fe9317cbb22364a9a55d90bf1140096cf21b6a71a6521d5ea591174c042",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 64
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-mini-fabric-01/tasks.md",
+        "sha256": "cfaeeff186a16d18af7f878a5e81a8783430f7dcc6f2c48e736eebc390c09541",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 41
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-packet-control-word-record/tasks.md",
+        "sha256": "82e68cbbcf93ed1067964fd56be4c6d1002f8c0bb5ef5db402a2877abb81ba9f",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 21
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-packet-dense-bitmap-search/tasks.md",
+        "sha256": "a597aa00cf0856d0e80778674070b1da3eae96c382ca7cf3fa2cf43817d502cb",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 35
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md",
+        "sha256": "9dec1c3e5054b628d2a139f10cf5b93ef9b2a40b2c84287ec0815a53ad8547ee",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 119
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-temporal-retrieval-context-fabric/tasks.md",
+        "sha256": "6462638a4781462c8471b4c5e9407e66ce63e3885a6ab86625eb20bf324add0e",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 30
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/parent-atlas-trace-search-joinback-proof/tasks.md",
+        "sha256": "3cb8b880c548c600f75fd1d82b929e9eedf25b3e149b20b8258c3ac1490ea470",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 59
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/phase-109b-repository-provenance-workflow/tasks.md",
+        "sha256": "0a58c69d940d15e104b7f920b3bc3ee763a0c24b21527ea44904c6c623540117",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 11
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/phase-2f1-real-evaluation-corpus/tasks.md",
+        "sha256": "a2075ef1f143cffceeafb23a6fc423018491c71604ba8303d164f7f9e10aca16",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 56
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/phase1-rrf-semantic-fusion/tasks.md",
+        "sha256": "a319461a2c73b662fbdf9f453927b05a944bcf26ded10e815e3d95acf166fa9b",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 49
+      },
+      {
+        "file": "sveltekit-frontend/openspec/changes/wire-agentic-workflows-e2e-test/tasks.md",
+        "sha256": "eea99caa11d0f8ed490d3fd41b2a5816bfdba28e4b9f7144d4ff4ba270fba9b9",
+        "encoding": "utf-8",
+        "decodeStatus": "OK",
+        "taskRows": 90
+      }
+    ],
+    "sourceManifestChecksum": "sha256:328db8321ffb970ce1da819db3daa52f67694d7d64c6ab434b0fa7e1f70200d6",
+    "encodingIssueFiles": 0,
+    "declaredTaskCodeRows": 7481,
+    "rowsWithoutDeclaredTaskCode": 8720,
+    "openRowsWithoutDeclaredTaskCode": 2922,
+    "duplicateDeclaredTaskCodeGroupsWithinChange": 170,
+    "rowsWithDuplicateDeclaredTaskCodeWithinChange": 630
+  },
+  "counts": {
+    "rows": 16201,
+    "open": 7126,
+    "partial": 258,
+    "done": 8817,
+    "graphNodes": 16201,
+    "graphEdges": 1042,
+    "withTaskCode": 7481,
+    "topWritten": 100,
+    "pages": 1
+  },
+  "outputs": {
+    "openspec-task-extract-v1.local-review-04.all.jsonl": "0e802b5e2150df40dd57e699277871a95303dfb5433aba909a8400d579116af2",
+    "openspec-task-extract-v1.local-review-04.top100.jsonl": "faa50c21f5e8557317e86b70ba063f01c666b4b177d0c2d437e4878c748dd20b"
+  }
+}

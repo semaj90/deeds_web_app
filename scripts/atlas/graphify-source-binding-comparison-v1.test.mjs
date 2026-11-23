@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { compareGraphifySourceBindingV1, parseGraphifyBatchLimitV1, graphifyBatchReviewStatusV1 } from './lib/graphify-source-binding-comparison-v1.mjs';
+import { createHash } from 'node:crypto';
+import { compareCurrentSourceBytesV1, compareGraphifySourceBindingV1, parseGraphifyBatchLimitV1, graphifyBatchReviewStatusV1 } from './lib/graphify-source-binding-comparison-v1.mjs';
 
 const digest = 'a'.repeat(64);
 const expected = { sourceRef: 'src/a.ts', workspaceRevision: `sha256:${'b'.repeat(64)}`, sourceRevision: `sha256:${digest}`, contentDigest: digest, byteLength: 0 };
@@ -25,6 +26,20 @@ test('case and namespace aliases cannot establish exact source identity', () => 
   for (const source_ref of ['SRC/a.ts', 'sveltekit-frontend/src/a.ts']) {
     assert.deepEqual(compareGraphifySourceBindingV1(expected, { ...row, source_ref }).mismatchedFields, ['sourceRef']);
   }
+});
+test('current bytes must match source revision, content digest, and byte length', () => {
+  const bytes = Buffer.from('current source');
+  const digest = createHash('sha256').update(bytes).digest('hex');
+  const current = { sourceRevision: `sha256:${digest}`, contentDigest: digest, byteLength: bytes.byteLength };
+  assert.equal(compareCurrentSourceBytesV1(current, bytes).exact, true);
+  const stale = compareCurrentSourceBytesV1({ ...current, sourceRevision: `sha256:${'f'.repeat(64)}` }, bytes);
+  assert.deepEqual(stale.mismatchedFields, ['sourceRevision']);
+});
+test('unreadable or missing local bytes cannot be treated as revalidated', () => {
+  const result = compareCurrentSourceBytesV1(expected, null);
+  assert.equal(result.available, false);
+  assert.equal(result.exact, false);
+  assert.deepEqual(result.mismatchedFields, ['sourceRevision', 'contentDigest', 'byteLength']);
 });
 test('invalid limits reject before any database query', () => {
   for (const value of ['', 'NaN', 'Infinity', '0', '-1', '1.5', '129', 'abc']) assert.throws(() => parseGraphifyBatchLimitV1(value));

@@ -87,4 +87,69 @@ inline void radix_sort_som_tiles(std::vector<SomTileSortEntry>& entries) {
     // 8 passes (even) means final sorted order is already back in `entries`.
 }
 
+struct ResidencyRadixKeyEntry {
+    std::uint64_t composite_key{0};
+    std::uint32_t source_index{0};
+};
+
+constexpr std::uint64_t pack_residency_glyph_key_v1(
+    std::uint8_t residency_tier,
+    std::uint8_t lod,
+    std::uint16_t pagerank_quantized,
+    std::uint16_t recency,
+    std::uint32_t projection_ordinal
+) noexcept {
+    const std::uint64_t tier = static_cast<std::uint64_t>(residency_tier) & 0xFFULL;
+    const std::uint64_t lod_field = static_cast<std::uint64_t>(lod) & 0xFFULL;
+    const std::uint64_t utility_bucket = static_cast<std::uint64_t>(pagerank_quantized / 257u) & 0xFFULL;
+    const std::uint64_t recency_bucket = static_cast<std::uint64_t>(recency / 257u) & 0xFFULL;
+    const std::uint64_t ordinal = static_cast<std::uint64_t>(projection_ordinal) & 0xFFFFFFFFULL;
+    return (tier << 56ULL) |
+           (lod_field << 48ULL) |
+           (utility_bucket << 40ULL) |
+           (recency_bucket << 32ULL) |
+           ordinal;
+}
+
+/**
+ * Generic 8-pass (8-bit LSD) stable radix sort over uint64 keys.
+ * Releases GIL in pybind11/Cython bindings for zero-allocation ping-pong execution.
+ */
+inline void radix_sort_u64_entries(std::vector<ResidencyRadixKeyEntry>& entries) {
+    if (entries.size() > MAX_SOM_RADIX_CANDIDATES_V1) {
+        throw std::invalid_argument("RADIX_U64_CANDIDATE_LIMIT_EXCEEDED");
+    }
+    const std::size_t n = entries.size();
+    if (n <= 1) return;
+
+    std::vector<ResidencyRadixKeyEntry> scratch(n);
+    ResidencyRadixKeyEntry* src = entries.data();
+    ResidencyRadixKeyEntry* dst = scratch.data();
+
+    for (unsigned pass = 0; pass < 8; ++pass) {
+        const unsigned shift = pass * 8;
+        std::array<std::size_t, 256> count{};
+        for (std::size_t i = 0; i < n; ++i) {
+            const std::uint8_t bucket = static_cast<std::uint8_t>((src[i].composite_key >> shift) & 0xFFULL);
+            ++count[bucket];
+        }
+
+        std::array<std::size_t, 256> offset{};
+        std::size_t running = 0;
+        for (std::size_t b = 0; b < 256; ++b) {
+            offset[b] = running;
+            running += count[b];
+        }
+
+        for (std::size_t i = 0; i < n; ++i) {
+            const std::uint8_t bucket = static_cast<std::uint8_t>((src[i].composite_key >> shift) & 0xFFULL);
+            dst[offset[bucket]++] = src[i];
+        }
+
+        ResidencyRadixKeyEntry* tmp = src;
+        src = dst;
+        dst = tmp;
+    }
+}
+
 } // namespace atlas::native

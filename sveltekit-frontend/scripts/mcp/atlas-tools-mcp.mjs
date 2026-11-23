@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * atlas-tools-mcp.mjs — Stdio MCP server exposing three Atlas agentic tools:
+ * atlas-tools-mcp.mjs — Stdio MCP server exposing Atlas analysis, retrieval, and source-index tools:
  *   classify_intent         — classify prompt → intent/domain/safeNextCommand
  *   build_agentic_rag_context — score ACE packet cards against query
  *   build_recommendation    — produce structured repair/research recommendation
@@ -21,11 +21,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import Ajv from 'ajv';
+import { z } from 'zod';
 import neo4j from 'neo4j-driver';
 import pg from 'pg';
 import { normalizeSourceRef } from '../../../scripts/atlas/lib/normalize-source-ref.mjs';
+import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
 import { buildGroundedRecommendationV1 } from '../../../scripts/atlas/lib/grounded-recommendation-v1.mjs';
 import { selectKanbanDagPrefillAlgorithm } from './kanban-dag-algorithm-selector-v1.mjs';
 
@@ -49,7 +51,10 @@ process.on('exit', () => {
 });
 
 const PROTOCOL_VERSION = '2024-11-05';
-const SERVER_INFO = { name: 'atlas-tools', version: '0.2.0' };
+const SERVER_INFO = { name: 'atlas-tools', version: '0.4.0' };
+const SERVER_BUILD_REVISION = crypto.createHash('sha256')
+  .update(fs.readFileSync(fileURLToPath(import.meta.url)))
+  .digest('hex');
 const MOCK_MODE = /^(1|true|yes)$/i.test(process.env.ATLAS_TOOLS_MOCK ?? '');
 
 function mockGraphResult(tool, args) {
@@ -108,6 +113,11 @@ function mockGraphResult(tool, args) {
 // ── Tool definitions ───────────────────────────────────────────────────────────
 
 const TOOLS = [
+  {
+    name: 'inspect_postgres_backend',
+    description: 'Read-only check of PostgreSQL 18 reachability, Parent Atlas source/graph tables, and graph snapshot revision readiness. Does not query Neo4j or write to PostgreSQL, Valkey, or centroid caches.',
+    inputSchema: z.toJSONSchema(z.object({}).strict(), { target: 'draft-07' }),
+  },
   {
     name: 'classify_intent',
     description:
@@ -250,13 +260,18 @@ const TOOLS = [
   },
   {
     name: 'find_dependencies',
-    description: 'Find dependencies (IMPORTS, CALLS) of a target codebase file in the graph.',
+    description: 'Find source-backed dependencies (outgoing) or dependents (incoming) of a codebase file through the revision-qualified Parent Atlas graph. NetworkX traverses typed edges; PageRank only orders results.',
     inputSchema: {
       type: 'object',
       properties: {
         target: {
           type: 'string',
           description: 'Target file path (relative to sveltekit-frontend/src or absolute).',
+        },
+        direction: {
+          type: 'string',
+          enum: ['outgoing', 'incoming'],
+          description: 'Traversal direction: outgoing dependencies (default) or incoming dependents.',
         },
       },
       required: ['target'],
@@ -266,11 +281,11 @@ const TOOLS = [
   {
     name: 'trace_database',
     description:
-      'Find files in the codebase mapping database usage (USES_DB) for a table name or query.',
+      'Search revision-bound PostgreSQL code-index chunks for database/table mentions. Returns lexical candidates only; it does not assert a USES_DB graph relation.',
     inputSchema: {
       type: 'object',
       properties: {
-        query: { type: 'string', description: 'Table name or search term.' },
+        query: { type: 'string', minLength: 1, maxLength: 256, description: 'Table name or bounded search phrase.' },
       },
       required: ['query'],
       additionalProperties: false,
@@ -373,6 +388,165 @@ const TOOLS = [
     },
   },
 ];
+
+const postgresBackendInspectionInputV1 = z.object({}).strict();
+const postgresBackendInspectionResultV1 = z.object({
+  schema: z.literal('atlas.postgres-backend-inspection.v1'),
+  serverBuildRevision: z.string().regex(/^[a-f0-9]{64}$/),
+  status: z.enum(['READY', 'SCHEMA_INCOMPLETE', 'VERSION_MISMATCH', 'UNAVAILABLE']),
+  postgres: z.object({
+    reachable: z.boolean(),
+    database: z.string().nullable(),
+    majorVersion: z.number().int().nullable(),
+    transactionReadOnly: z.boolean(),
+  }).strict(),
+  tables: z.object({
+    workspaceSourceBindings: z.boolean(),
+    codebaseChunkIndex: z.boolean(),
+    graphSnapshots: z.boolean(),
+    graphNodes: z.boolean(),
+    graphEdges: z.boolean(),
+  }).strict(),
+  graphSnapshotSummary: z.object({
+    status: z.enum(['NO_SNAPSHOTS', 'SUPERSEDED_OR_REJECTED_ONLY', 'NON_SUPERSEDED_PRESENT']),
+    snapshotCount: z.number().int().nonnegative(),
+    nonSupersededSnapshotCount: z.number().int().nonnegative(),
+    revisionQualifiedSnapshotCount: z.number().int().nonnegative(),
+    statuses: z.array(z.object({ status: z.string(), count: z.number().int().nonnegative(), revisionQualifiedCount: z.number().int().nonnegative() }).strict()),
+    edgeTypeCountsByStatus: z.array(z.object({ status: z.string(), edgeType: z.string(), count: z.number().int().nonnegative() }).strict()),
+  }).strict(),
+  dependencyLookup: z.object({
+    sourceIdentityBackend: z.literal('POSTGRESQL'),
+    graphTraversalBackend: z.literal('LOCAL_REVISION_QUALIFIED_ARTIFACT'),
+    rankingBackend: z.literal('NETWORKX_CPU'),
+  }).strict(),
+  otherBackends: z.object({ neo4j: z.literal('NOT_QUERIED'), valkey: z.literal('NOT_QUERIED') }).strict(),
+  failure: z.string().nullable(),
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+}).strict();
+
+export async function inspectPostgresBackend({ poolFactory } = {}) {
+  let pool;
+  let connected = false;
+  let result = {
+    schema: 'atlas.postgres-backend-inspection.v1',
+    serverBuildRevision: SERVER_BUILD_REVISION,
+    status: 'UNAVAILABLE',
+    postgres: { reachable: false, database: null, majorVersion: null, transactionReadOnly: true },
+    tables: { workspaceSourceBindings: false, codebaseChunkIndex: false, graphSnapshots: false, graphNodes: false, graphEdges: false },
+    graphSnapshotSummary: {
+      status: 'NO_SNAPSHOTS', snapshotCount: 0, nonSupersededSnapshotCount: 0, revisionQualifiedSnapshotCount: 0,
+      statuses: [], edgeTypeCountsByStatus: [],
+    },
+    dependencyLookup: {
+      sourceIdentityBackend: 'POSTGRESQL',
+      graphTraversalBackend: 'LOCAL_REVISION_QUALIFIED_ARTIFACT',
+      rankingBackend: 'NETWORKX_CPU',
+    },
+    otherBackends: { neo4j: 'NOT_QUERIED', valkey: 'NOT_QUERIED' },
+    failure: null,
+    canonicalAuthority: false,
+    writesPerformed: false,
+  };
+
+  try {
+    const connectionString = resolveDatabaseUrl(loadRepoEnv());
+    const Pool = poolFactory ?? pg.Pool;
+    pool = new Pool({ connectionString, max: 1, connectionTimeoutMillis: 3000, statement_timeout: 5000 });
+    await pool.query('BEGIN READ ONLY');
+    connected = true;
+    const identity = (await pool.query(`
+      SELECT current_database() AS database,
+             current_setting('server_version_num')::int AS version_num,
+             current_setting('transaction_read_only')::boolean AS transaction_read_only
+    `)).rows?.[0];
+    const tableRow = (await pool.query(`
+      SELECT
+        to_regclass('public.atlas_workspace_source_bindings') IS NOT NULL AS workspace_source_bindings,
+        to_regclass('public.codebase_chunk_index') IS NOT NULL AS codebase_chunk_index,
+        to_regclass('public.atlas_graph_snapshots_v2') IS NOT NULL AS graph_snapshots,
+        to_regclass('public.atlas_graph_nodes_v2') IS NOT NULL AS graph_nodes,
+        to_regclass('public.atlas_graph_edges_v2') IS NOT NULL AS graph_edges
+    `)).rows?.[0] ?? {};
+    const versionNum = Number(identity?.version_num);
+    const majorVersion = Number.isFinite(versionNum) ? Math.floor(versionNum / 10000) : null;
+    const tables = {
+      workspaceSourceBindings: Boolean(tableRow.workspace_source_bindings),
+      codebaseChunkIndex: Boolean(tableRow.codebase_chunk_index),
+      graphSnapshots: Boolean(tableRow.graph_snapshots),
+      graphNodes: Boolean(tableRow.graph_nodes),
+      graphEdges: Boolean(tableRow.graph_edges),
+    };
+    const allTablesPresent = Object.values(tables).every(Boolean);
+    let graphSnapshotSummary = result.graphSnapshotSummary;
+    if (tables.graphSnapshots) {
+      const snapshots = await pool.query(`
+        SELECT status,
+               count(*)::int AS count,
+               count(*) FILTER (
+                 WHERE graph_revision IS NOT NULL
+                   AND workspace_revision IS NOT NULL
+                   AND source_inventory_revision IS NOT NULL
+               )::int AS revision_qualified_count
+        FROM public.atlas_graph_snapshots_v2
+        GROUP BY status
+        ORDER BY status
+      `);
+      const edgeTypes = tables.graphEdges ? await pool.query(`
+        SELECT s.status, e.edge_type, count(*)::int AS count
+        FROM public.atlas_graph_edges_v2 e
+        JOIN public.atlas_graph_snapshots_v2 s USING (snapshot_id)
+        GROUP BY s.status, e.edge_type
+        ORDER BY s.status, count(*) DESC, e.edge_type
+        LIMIT 100
+      `) : { rows: [] };
+      const statuses = (snapshots.rows ?? []).map((row) => ({
+        status: String(row.status ?? 'UNKNOWN'),
+        count: Math.max(0, Number(row.count) || 0),
+        revisionQualifiedCount: Math.max(0, Number(row.revision_qualified_count) || 0),
+      }));
+      const snapshotCount = statuses.reduce((sum, row) => sum + row.count, 0);
+      const nonSupersededSnapshotCount = statuses
+        .filter((row) => !['SUPERSEDED', 'REJECTED'].includes(row.status.toUpperCase()))
+        .reduce((sum, row) => sum + row.count, 0);
+      graphSnapshotSummary = {
+        status: snapshotCount === 0 ? 'NO_SNAPSHOTS' : nonSupersededSnapshotCount === 0 ? 'SUPERSEDED_OR_REJECTED_ONLY' : 'NON_SUPERSEDED_PRESENT',
+        snapshotCount,
+        nonSupersededSnapshotCount,
+        revisionQualifiedSnapshotCount: statuses.reduce((sum, row) => sum + row.revisionQualifiedCount, 0),
+        statuses,
+        edgeTypeCountsByStatus: (edgeTypes.rows ?? []).map((row) => ({
+          status: String(row.status ?? 'UNKNOWN'),
+          edgeType: String(row.edge_type ?? 'UNKNOWN'),
+          count: Math.max(0, Number(row.count) || 0),
+        })),
+      };
+    }
+    result = {
+      ...result,
+      graphSnapshotSummary,
+      status: majorVersion !== 18 ? 'VERSION_MISMATCH' : allTablesPresent ? 'READY' : 'SCHEMA_INCOMPLETE',
+      postgres: {
+        reachable: true,
+        database: typeof identity?.database === 'string' ? identity.database : null,
+        majorVersion: Number.isFinite(majorVersion) ? majorVersion : null,
+        transactionReadOnly: identity?.transaction_read_only === true,
+      },
+      tables,
+      failure: null,
+    };
+    if (result.postgres.transactionReadOnly !== true) result.failure = 'READ_ONLY_TRANSACTION_NOT_CONFIRMED';
+    if (result.status === 'READY' && result.failure) result.status = 'SCHEMA_INCOMPLETE';
+  } catch (error) {
+    result.failure = typeof error?.code === 'string' ? `POSTGRES_QUERY_FAILED:${error.code}` : 'POSTGRES_UNAVAILABLE';
+  } finally {
+    if (connected) await pool?.query('ROLLBACK').catch(() => {});
+    await pool?.end().catch(() => {});
+  }
+
+  return postgresBackendInspectionResultV1.parse(result);
+}
 
 // ── GPU status / release REQUEST (read-only + request record; never stops a process) ──
 // Rule: CLAUDE.md § "Production hardening: ops.* and service-lifecycle gates".
@@ -1650,103 +1824,393 @@ export function collapseDependencyRows(rows) {
   return [...seen.values()];
 }
 
-const DEPENDENCY_RETURN = `OPTIONAL MATCH (f)-[r:IMPORTS|CALLS]->(dep)
-       RETURN f.path AS nodePath, f.filePath AS nodeFilePath, f.dataQualityFlag AS flagged,
-              type(r) AS type, dep.path AS depPath, dep.filePath AS depFilePath,
-              dep.sourceRef AS depSourceRef, labels(dep)[0] AS depKind, dep.name AS depName
-       LIMIT ${DEPENDENCY_ROW_CAP + 1}`;
+const DEPENDENCY_GRAPH_DEFAULT = path.join(WORKSPACE_ABS_ROOT, 'docs/reports/current-structural-graph-artifact-v2');
+const DEPENDENCY_RESOLVER_SCRIPT = path.join(WORKSPACE_ABS_ROOT, 'python/atlas_graph_runtime/dependency_lookup_cli_v1.py');
+const DEPENDENCY_SOURCE_INDEX_SQL = `
+  SELECT DISTINCT b.canonical_source_ref AS source_ref,
+         c.relative_path,
+         c.file_content_hash,
+         b.content_digest,
+         b.source_revision,
+         b.workspace_revision
+  FROM atlas_workspace_source_bindings b
+  JOIN codebase_chunk_index c
+    ON c.source_ref = b.canonical_source_ref
+    OR c.relative_path = b.canonical_source_ref
+    OR c.relative_path = 'sveltekit-frontend/' || b.canonical_source_ref
+  WHERE b.repo_id = 'deeds-web-app'
+    AND lower(b.canonical_source_ref) = lower($1)
+  LIMIT 501
+`;
 
-export async function findDependencies({ target }, { driver } = {}) {
-  if (MOCK_MODE) return mockGraphResult('find_dependencies', { target });
-  const keys = buildCodebaseFileLookupKeys(target);
-  if (!keys) {
-    return {
-      target: String(target ?? ''),
-      dependencies: [],
-      lookup: { failure: 'EMPTY_TARGET' },
-      ...diagnosticProvenance('find_dependencies', String(target ?? '')),
-    };
-  }
-  const session = (driver ?? getNeo4jDriver()).session();
+function normalizeSha256(value) {
+  const text = String(value ?? '').trim().toLowerCase().replace(/^sha256:/, '');
+  return /^[0-9a-f]{64}$/.test(text) ? `sha256:${text}` : null;
+}
+
+async function readCanonicalSourceIdentity(target, keys, { poolFactory } = {}) {
+  const display = workspaceRelativeDisplay(target);
+  const candidates = [
+    path.resolve(WORKSPACE_ABS_ROOT, display),
+    path.resolve(WORKSPACE_ABS_ROOT, 'sveltekit-frontend', display),
+  ];
+  const absolutePath = candidates.find((candidate) => {
+    const rel = path.relative(WORKSPACE_ABS_ROOT, candidate);
+    return rel && !rel.startsWith('..') && !path.isAbsolute(rel) && fs.existsSync(candidate) && fs.statSync(candidate).isFile();
+  });
+  if (!absolutePath) return { ok: false, failure: 'SOURCE_FILE_NOT_FOUND' };
+  const currentHash = `sha256:${crypto.createHash('sha256').update(fs.readFileSync(absolutePath)).digest('hex')}`;
+
+  let connectionString;
   try {
-    // Phase A: exact keys (the `path` property is indexed). Phase B: case-insensitive scan, run when phase A
-    // found nothing OR reached only one of the two node families (a case difference would otherwise hide the
-    // other family's edges). Phase B's rows are a superset of phase A's, so they replace them.
-    let phase = 'A';
-    let res = await session.run(
-      `MATCH (f:CodebaseFile)
-       WHERE f.path IN $pathKeys OR f.filePath IN $filePathKeys
-       ${DEPENDENCY_RETURN}`,
-      { pathKeys: keys.pathKeys, filePathKeys: keys.filePathKeys }
+    connectionString = resolveDatabaseUrl(loadRepoEnv());
+  } catch {
+    return { ok: false, failure: 'CANONICAL_SOURCE_INDEX_UNAVAILABLE' };
+  }
+  const Pool = poolFactory ?? pg.Pool;
+  const pool = new Pool({ connectionString, max: 1, connectionTimeoutMillis: 4000, statement_timeout: 5000 });
+  try {
+    const result = await pool.query(DEPENDENCY_SOURCE_INDEX_SQL, [keys.canonical]);
+    const matching = (result.rows ?? []).filter((row) =>
+      canonicalWorkspaceRef(row.source_ref) === keys.canonical
+      && normalizeSha256(row.file_content_hash) === currentHash
+      && normalizeSha256(row.content_digest) === currentHash
+      && normalizeSha256(row.source_revision) === currentHash
     );
-    let rows = res.records.map((r) => r.toObject());
-    const familiesSeen = new Set(rows.map((row) => (row.nodePath != null ? 'path' : 'filePath')));
-    if (familiesSeen.size < 2) {
-      phase = 'B';
-      res = await session.run(
-        `MATCH (f:CodebaseFile)
-         WHERE toLower(f.path) = $canonical OR toLower(f.filePath) IN $lowerFilePathKeys
-         ${DEPENDENCY_RETURN}`,
-        { canonical: keys.canonical, lowerFilePathKeys: keys.lowerFilePathKeys }
-      );
-      const phaseBRows = res.records.map((r) => r.toObject());
-      if (phaseBRows.length >= rows.length) rows = phaseBRows;
+    if (matching.length === 0) return { ok: false, failure: 'SOURCE_NOT_INDEXED' };
+    const identities = new Map();
+    for (const row of matching) {
+      const sourceRevision = normalizeSha256(row.source_revision);
+      const workspaceRevision = normalizeSha256(row.workspace_revision);
+      if (!sourceRevision || !workspaceRevision) continue;
+      identities.set(`${sourceRevision}|${workspaceRevision}`, {
+        sourceRef: keys.canonical,
+        sourceRevision,
+        workspaceRevision,
+        fileContentHash: currentHash,
+      });
     }
-    const truncated = rows.length > DEPENDENCY_ROW_CAP;
-    if (truncated) rows = rows.slice(0, DEPENDENCY_ROW_CAP);
-    const nodes = new Map();
-    for (const row of rows) {
-      const family = row.nodePath != null ? 'path' : 'filePath';
-      nodes.set(`${family}|${row.nodePath ?? row.nodeFilePath}`, { family, key: row.nodePath ?? row.nodeFilePath, flagged: Boolean(row.flagged) });
-    }
-    const dependencies = collapseDependencyRows(rows);
-    return {
-      target: keys.canonical,
-      dependencies,
-      lookup: {
-        canonical: keys.canonical,
-        phase,
-        nodesMatched: [...nodes.values()],
-        // TARGET_NOT_A_PATH: no node and the input has neither a slash nor an extension (for example a symbol name;
-        // this tool is file-keyed). PROJECTION_MISSING_FILE: no node under any known key form.
-        // NO_OUTGOING_EDGES: node(s) found, none outgoing.
-        failure:
-          nodes.size === 0
-            ? /[/.]/.test(keys.canonical)
-              ? 'PROJECTION_MISSING_FILE'
-              : 'TARGET_NOT_A_PATH'
-            : dependencies.length === 0
-              ? 'NO_OUTGOING_EDGES'
-              : null,
-        truncated,
-        rowCap: DEPENDENCY_ROW_CAP,
-      },
-      ...diagnosticProvenance('find_dependencies', keys.canonical),
-    };
+    if (identities.size === 0) return { ok: false, failure: 'SOURCE_REVISION_UNAVAILABLE' };
+    if (identities.size > 1) return { ok: false, failure: 'SOURCE_INDEX_REVISION_CONFLICT' };
+    const identity = [...identities.values()][0];
+    if (identity.sourceRevision !== currentHash) return { ok: false, failure: 'SOURCE_REVISION_MISMATCH' };
+    return { ok: true, identity };
+  } catch {
+    return { ok: false, failure: 'CANONICAL_SOURCE_INDEX_READ_FAILED' };
   } finally {
-    await session.close();
+    await pool.end().catch(() => {});
   }
 }
 
-async function traceDatabase({ query }) {
-  if (MOCK_MODE) return mockGraphResult('trace_database', { query });
-  const driver = getNeo4jDriver();
-  const session = driver.session();
+function runDependencyGraphResolver(request, { pythonExecutable = process.env.ATLAS_GRAPH_PYTHON || process.env.PYTHON || 'python' } = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(pythonExecutable, [DEPENDENCY_RESOLVER_SCRIPT], { cwd: WORKSPACE_ABS_ROOT, stdio: ['pipe', 'pipe', 'pipe'] });
+    let stdout = '';
+    let stderr = '';
+    const timer = setTimeout(() => child.kill(), 15000);
+    child.stdout.setEncoding('utf8').on('data', (chunk) => { stdout += chunk; if (stdout.length > 1_000_000) child.kill(); });
+    child.stderr.setEncoding('utf8').on('data', (chunk) => { stderr += chunk; if (stderr.length > 32_000) stderr = stderr.slice(-32_000); });
+    child.on('error', () => { clearTimeout(timer); reject(Object.assign(new Error('ATLAS_GRAPH_PYTHON_UNAVAILABLE'), { code: 'ATLAS_GRAPH_PYTHON_UNAVAILABLE' })); });
+    child.on('close', (code) => {
+      clearTimeout(timer);
+      if (code !== 0) return reject(Object.assign(new Error(stderr.slice(0, 500) || 'ATLAS_GRAPH_RESOLVER_FAILED'), { code: 'ATLAS_GRAPH_RESOLVER_FAILED' }));
+      try { resolve(JSON.parse(stdout)); }
+      catch { reject(Object.assign(new Error('ATLAS_GRAPH_RESOLVER_INVALID_RESPONSE'), { code: 'ATLAS_GRAPH_RESOLVER_INVALID_RESPONSE' })); }
+    });
+    child.stdin.end(JSON.stringify({ ...request, artifactDir: process.env.ATLAS_DEPENDENCY_GRAPH_ARTIFACT_DIR || DEPENDENCY_GRAPH_DEFAULT, maxResults: DEPENDENCY_ROW_CAP }));
+  });
+}
+
+function dependencyLookupEnvelope(target, keys, failure, graph = {}) {
+  return {
+    target: keys?.canonical ?? String(target ?? ''),
+    dependencies: [],
+    lookup: { canonical: keys?.canonical ?? null, phase: 'atlas-graph', nodesMatched: [], failure, truncated: false, rowCap: DEPENDENCY_ROW_CAP },
+    provenance: {
+      tool: 'find_dependencies',
+      authority: 'atlas_typed_graph_projection',
+      graphRevision: graph.graphRevision ?? null,
+      evidenceRefs: [],
+      status: 'UNRESOLVED',
+      subject: keys?.canonical ?? String(target ?? ''),
+    },
+    canonicalAuthority: false,
+    writesPerformed: false,
+  };
+}
+
+export async function findDependencies(
+  { target, direction },
+  { sourceIndexResolver = readCanonicalSourceIdentity, graphResolver = runDependencyGraphResolver } = {},
+) {
+  if (MOCK_MODE) return mockGraphResult('find_dependencies', { target });
+  const keys = buildCodebaseFileLookupKeys(target);
+  if (!keys) return dependencyLookupEnvelope(target, null, 'EMPTY_TARGET');
+  let indexed;
   try {
-    const res = await session.run(
-      `MATCH (f:CodebaseFile)-[r:USES_DB]->(t:Table)
-       WHERE t.name CONTAINS $query OR f.filePath CONTAINS $query
-       RETURN f.filePath as file, t.name as table, r.operation as operation`,
-      { query }
-    );
-    const traces = res.records.map((r) => ({
-      file: r.get('file'),
-      table: r.get('table'),
-      operation: r.get('operation'),
+    indexed = await sourceIndexResolver(target, keys);
+  } catch {
+    return dependencyLookupEnvelope(target, keys, 'CANONICAL_SOURCE_INDEX_READ_FAILED');
+  }
+  if (!indexed?.ok || !indexed.identity) return dependencyLookupEnvelope(target, keys, indexed?.failure || 'SOURCE_INDEX_LOOKUP_FAILED');
+  let graph;
+  try {
+    graph = await graphResolver({
+      target: keys.canonical,
+      sourceIdentity: indexed.identity,
+      ...(direction ? { direction } : {}),
+    });
+  } catch (error) {
+    return dependencyLookupEnvelope(target, keys, error?.code || 'ATLAS_GRAPH_RESOLVER_FAILED');
+  }
+  if (!graph || typeof graph !== 'object') return dependencyLookupEnvelope(target, keys, 'ATLAS_GRAPH_RESOLVER_INVALID_RESPONSE');
+  const graphFailure = typeof graph.failure === 'string' ? graph.failure : graph.failure == null ? null : 'ATLAS_GRAPH_RESOLVER_INVALID_RESPONSE';
+  if (!graphFailure && (
+    normalizeSha256(graph.graphRevision) == null
+    || normalizeSha256(graph.sourceRevision) !== indexed.identity.sourceRevision
+    || normalizeSha256(graph.workspaceRevision) !== indexed.identity.workspaceRevision
+    || graph.canonicalAuthority !== false
+    || graph.writesPerformed !== false
+    || !Array.isArray(graph.dependencies)
+    || graph.dependencies.some((row) => !row || !['IMPORTS', 'CALLS', 'REFERENCES', 'EXTENDS', 'DEPENDS_ON'].includes(row.type)
+      || !Array.isArray(row.evidenceRefs) || row.evidenceRefs.length === 0)
+  )) return dependencyLookupEnvelope(target, keys, 'ATLAS_GRAPH_RESOLVER_RESPONSE_UNQUALIFIED', graph);
+  const dependencies = Array.isArray(graph.dependencies) ? graph.dependencies.slice(0, DEPENDENCY_ROW_CAP) : [];
+  const failure = graphFailure;
+  return {
+    ...dependencyLookupEnvelope(target, keys, failure, graph),
+    dependencies,
+    lookup: {
+      canonical: keys.canonical,
+      phase: 'atlas-graph',
+      nodesMatched: Array.isArray(graph.nodesMatched) ? graph.nodesMatched : [],
+      failure,
+      truncated: Boolean(graph.truncated) || (graph.dependencies?.length ?? 0) > DEPENDENCY_ROW_CAP,
+      rowCap: DEPENDENCY_ROW_CAP,
+    },
+    provenance: {
+      tool: 'find_dependencies',
+      authority: 'atlas_typed_graph_projection',
+      graphRevision: graph.graphRevision ?? null,
+      evidenceRefs: Array.isArray(graph.evidenceRefs) ? graph.evidenceRefs : [],
+      status: failure ? 'UNRESOLVED' : 'REVISION_QUALIFIED_DERIVED',
+      subject: keys.canonical,
+      sourceRevision: graph.sourceRevision ?? indexed.identity.sourceRevision,
+      workspaceRevision: graph.workspaceRevision ?? indexed.identity.workspaceRevision,
+      pageRankBackend: graph.pageRank?.backend ?? null,
+    },
+    canonicalAuthority: false,
+    writesPerformed: false,
+  };
+}
+
+const DATABASE_TRACE_ROW_CAP = 50;
+const DATABASE_TRACE_FILE_BYTE_CAP = 2 * 1024 * 1024;
+const DATABASE_TRACE_TOTAL_FILE_BYTE_CAP = 16 * 1024 * 1024;
+const DATABASE_TRACE_SQL = `
+  WITH q AS (SELECT plainto_tsquery('simple', $1) AS tsq),
+  candidate_chunks AS MATERIALIZED (
+    SELECT c.source_ref, c.chunk_id, c.relative_path, c.symbol, c.kind,
+           c.line_start, c.line_end, c.file_content_hash,
+           ts_rank_cd(c.search_vector, q.tsq, 32)::float8 AS score
+    FROM public.codebase_chunk_index c
+    CROSS JOIN q
+    WHERE numnode(q.tsq) > 0 AND c.search_vector @@ q.tsq
+    ORDER BY score DESC, c.source_ref, c.chunk_id
+    LIMIT 1001
+  ),
+  candidate_binding_rows AS MATERIALIZED (
+    SELECT b.*, c.chunk_id, c.relative_path, c.symbol, c.kind,
+           c.line_start, c.line_end, c.file_content_hash, c.score
+    FROM candidate_chunks c
+    JOIN LATERAL (
+      SELECT b.*
+      FROM public.atlas_workspace_source_bindings b
+      WHERE b.repo_id = 'deeds-web-app'
+        AND b.canonical_source_ref = c.source_ref
+      UNION
+      SELECT b.*
+      FROM public.atlas_workspace_source_bindings b
+      WHERE b.repo_id = 'deeds-web-app'
+        AND b.canonical_source_ref = c.relative_path
+      UNION
+      SELECT b.*
+      FROM public.atlas_workspace_source_bindings b
+      WHERE b.repo_id = 'deeds-web-app'
+        AND c.relative_path LIKE 'sveltekit-frontend/%'
+        AND b.canonical_source_ref = substring(c.relative_path FROM char_length('sveltekit-frontend/') + 1)
+    ) b ON true
+  ),
+  latest_observation AS (
+    SELECT lower(canonical_source_ref) AS ref_key, max(observed_at) AS observed_at
+    FROM candidate_binding_rows
+    GROUP BY lower(canonical_source_ref)
+  ),
+  latest_binding_rows AS (
+    SELECT b.*
+    FROM candidate_binding_rows b
+    JOIN latest_observation l
+      ON lower(b.canonical_source_ref) = l.ref_key
+     AND b.observed_at = l.observed_at
+  ),
+  binding_revision_counts AS (
+    SELECT lower(canonical_source_ref) AS ref_key,
+           count(DISTINCT source_revision) AS source_revision_count,
+           count(DISTINCT workspace_revision) AS workspace_revision_count
+    FROM latest_binding_rows
+    GROUP BY lower(canonical_source_ref)
+  ),
+  current_binding_ids AS (
+    SELECT DISTINCT ON (lower(b.canonical_source_ref))
+           b.canonical_source_ref, b.source_revision, b.workspace_revision,
+           b.content_digest, b.observed_at
+    FROM latest_binding_rows b
+    JOIN binding_revision_counts r ON lower(b.canonical_source_ref) = r.ref_key
+    WHERE r.source_revision_count = 1 AND r.workspace_revision_count = 1
+    ORDER BY lower(b.canonical_source_ref), b.source_manifest_ordinal
+  ),
+  current_candidates AS (
+    SELECT c.*
+    FROM candidate_binding_rows c
+    JOIN current_binding_ids b
+      ON lower(c.canonical_source_ref) = lower(b.canonical_source_ref)
+     AND c.source_revision = b.source_revision
+     AND c.workspace_revision = b.workspace_revision
+     AND c.content_digest = b.content_digest
+     AND c.observed_at = b.observed_at
+  )
+  SELECT b.canonical_source_ref AS source_ref,
+         b.chunk_id,
+         b.relative_path,
+         b.symbol,
+         b.kind,
+         b.line_start,
+         b.line_end,
+         b.file_content_hash,
+         b.content_digest,
+         b.source_revision,
+         b.workspace_revision,
+         b.observed_at AS binding_observed_at,
+         b.score
+  FROM current_candidates b
+  ORDER BY b.score DESC, b.canonical_source_ref, b.chunk_id
+  LIMIT 201
+`;
+
+function currentWorkspaceFileSha256(sourceRef, relativePath, { maxFileBytes = DATABASE_TRACE_FILE_BYTE_CAP } = {}) {
+  const root = fs.realpathSync(WORKSPACE_ABS_ROOT);
+  const refs = [workspaceRelativeDisplay(sourceRef), workspaceRelativeDisplay(relativePath)].filter(Boolean);
+  const candidates = refs.flatMap((ref) => [path.resolve(root, ref), path.resolve(root, 'sveltekit-frontend', ref)]);
+  for (const candidate of [...new Set(candidates)]) {
+    const relative = path.relative(root, candidate);
+    if (!relative || relative.startsWith('..') || path.isAbsolute(relative) || !fs.existsSync(candidate)) continue;
+    try {
+      const real = fs.realpathSync(candidate);
+      const realRelative = path.relative(root, real);
+      if (!realRelative || realRelative.startsWith('..') || path.isAbsolute(realRelative)) continue;
+      const stat = fs.statSync(real);
+      if (!stat.isFile() || stat.size > maxFileBytes) continue;
+      return {
+        sha256: `sha256:${crypto.createHash('sha256').update(fs.readFileSync(real)).digest('hex')}`,
+        byteLength: stat.size,
+      };
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+
+export async function traceDatabase({ query }, { poolFactory, sourceFileHashResolver = currentWorkspaceFileSha256 } = {}) {
+  const normalizedQuery = String(query ?? '').trim().slice(0, 256);
+  const base = {
+    schema: 'atlas.database-trace-candidates.v1',
+    query: normalizedQuery,
+    traces: [],
+    lookup: { backend: 'POSTGRESQL_CODE_INDEX_FTS', status: 'UNRESOLVED', rowCap: DATABASE_TRACE_ROW_CAP, truncated: false, failure: null },
+    provenance: { tool: 'trace_database', authority: 'postgresql_source_index', graphRevision: null, evidenceRefs: [], status: 'UNRESOLVED', subject: normalizedQuery },
+    canonicalAuthority: false,
+    writesPerformed: false,
+  };
+  if (!normalizedQuery) return { ...base, lookup: { ...base.lookup, failure: 'EMPTY_QUERY' } };
+  if (MOCK_MODE) return { ...base, lookup: { ...base.lookup, status: 'MOCK_DISABLED' }, provenance: { ...base.provenance, authority: 'none' } };
+
+  let pool;
+  let transactionStarted = false;
+  try {
+    const connectionString = resolveDatabaseUrl(loadRepoEnv());
+    const Pool = poolFactory ?? pg.Pool;
+    pool = new Pool({ connectionString, max: 1, connectionTimeoutMillis: 4000, statement_timeout: 5000 });
+    await pool.query('BEGIN READ ONLY');
+    transactionStarted = true;
+    const result = await pool.query(DATABASE_TRACE_SQL, [normalizedQuery]);
+    const hashBySource = new Map();
+    let hashedBytes = 0;
+    const qualifiedRows = [];
+    for (const row of result.rows ?? []) {
+      const fileHash = normalizeSha256(row.file_content_hash);
+      const digest = normalizeSha256(row.content_digest);
+      const sourceRevision = normalizeSha256(row.source_revision);
+      const workspaceRevision = normalizeSha256(row.workspace_revision);
+      if (!(fileHash && digest && sourceRevision && fileHash === digest && digest === sourceRevision && workspaceRevision)) continue;
+      const sourceKey = canonicalWorkspaceRef(row.source_ref);
+      if (!hashBySource.has(sourceKey)) {
+        const remainingBudget = DATABASE_TRACE_TOTAL_FILE_BYTE_CAP - hashedBytes;
+        if (remainingBudget <= 0) hashBySource.set(sourceKey, null);
+        else {
+          let currentFile = null;
+          try {
+            currentFile = sourceFileHashResolver(row.source_ref, row.relative_path, {
+              maxFileBytes: Math.min(DATABASE_TRACE_FILE_BYTE_CAP, remainingBudget),
+            });
+          } catch { currentFile = null; }
+          const actualHash = currentFile && typeof currentFile === 'object' ? currentFile.sha256 : currentFile;
+          const byteLength = currentFile && typeof currentFile === 'object' ? Number(currentFile.byteLength) : 0;
+          if (Number.isSafeInteger(byteLength) && byteLength > remainingBudget) hashBySource.set(sourceKey, null);
+          else {
+            if (Number.isSafeInteger(byteLength) && byteLength > 0) hashedBytes += byteLength;
+            hashBySource.set(sourceKey, normalizeSha256(actualHash));
+          }
+        }
+      }
+      if (hashBySource.get(sourceKey) !== sourceRevision) continue;
+      qualifiedRows.push(row);
+    }
+    const traces = qualifiedRows.slice(0, DATABASE_TRACE_ROW_CAP).map((row) => ({
+      sourceRef: canonicalWorkspaceRef(row.source_ref),
+      chunkId: row.chunk_id ?? null,
+      relativePath: row.relative_path ?? null,
+      symbol: row.symbol ?? null,
+      kind: row.kind ?? null,
+      lineStart: Number.isInteger(row.line_start) ? row.line_start : null,
+      lineEnd: Number.isInteger(row.line_end) ? row.line_end : null,
+      sourceRevision: normalizeSha256(row.source_revision),
+      workspaceRevision: normalizeSha256(row.workspace_revision),
+      bindingObservedAt: row.binding_observed_at instanceof Date ? row.binding_observed_at.toISOString() : row.binding_observed_at ?? null,
+      score: Number.isFinite(Number(row.score)) ? Number(row.score) : 0,
+      relationStatus: 'LEXICAL_MENTION_CANDIDATE',
     }));
-    return { query, traces, ...diagnosticProvenance('trace_database', query) };
+    return {
+      ...base,
+      traces,
+      lookup: {
+        ...base.lookup,
+        status: traces.length > 0 ? 'CANDIDATES_FOUND' : 'NO_MATCH',
+        truncated: qualifiedRows.length > DATABASE_TRACE_ROW_CAP,
+        unqualifiedRows: (result.rows?.length ?? 0) - qualifiedRows.length,
+        currentWorkspaceBytesHashed: hashedBytes,
+      },
+      provenance: {
+        ...base.provenance,
+        status: traces.length > 0 ? 'REVISION_BOUND_CANDIDATES' : 'NO_MATCH',
+        evidenceRefs: traces.flatMap((row) => row.chunkId ? [`${row.sourceRef}#${row.chunkId}`] : []),
+      },
+    };
+  } catch (error) {
+    return { ...base, lookup: { ...base.lookup, failure: typeof error?.code === 'string' ? `POSTGRES_QUERY_FAILED:${error.code}` : 'POSTGRES_LOOKUP_FAILED' } };
   } finally {
-    await session.close();
+    if (transactionStarted) await pool?.query('ROLLBACK').catch(() => {});
+    await pool?.end().catch(() => {});
   }
 }
 
@@ -1940,7 +2404,11 @@ export async function dispatch(method, params, id) {
         throw new Error(`Invalid arguments for ${name}: ${JSON.stringify(validation.errors)}`);
       }
       let result;
-      if (name === 'classify_intent') result = classifyIntent(args);
+      if (name === 'inspect_postgres_backend') {
+        postgresBackendInspectionInputV1.parse(args);
+        result = await inspectPostgresBackend();
+      }
+      else if (name === 'classify_intent') result = classifyIntent(args);
       else if (name === 'build_agentic_rag_context') result = await buildAgenticRagContextLive(args);
       else if (name === 'build_recommendation') result = await buildRecommendation(args);
       else if (name === 'record_outcome') result = await recordOutcome(args);
@@ -2031,6 +2499,6 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   });
 
   log(
-    'atlas-tools MCP ready (intent, RAG context, recommendations, Kanban DAG prefill, outcomes, and path trace tools)'
+    'atlas-tools MCP ready (intent, RAG context, recommendations, Kanban DAG prefill, outcomes, PostgreSQL source search, and graph diagnostics)'
   );
 }

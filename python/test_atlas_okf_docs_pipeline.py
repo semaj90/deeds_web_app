@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from hashlib import sha256
 from contextlib import redirect_stdout
 from io import StringIO
@@ -11,7 +12,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from atlas_external_docs import ChunkRecord, chunk_document
+from atlas_external_docs import ChunkRecord, _normalize_ws, chunk_document
 from atlas_okf_docs_pipeline import (
     PipelineManifest,
     PageArtifact,
@@ -26,6 +27,7 @@ from atlas_okf_docs_pipeline import (
     qdrant_query_body,
     read_ldr_export_urls,
     run_pipeline,
+    write_source_artifacts,
     preview_domain_ontology_admission,
     plan_manifest_recrawl_delta_v1,
     _sources_selected_by_recrawl_plan,
@@ -181,15 +183,211 @@ class OkfDocsPipelineTests(unittest.TestCase):
             self.assertEqual(receipt["page_count"], 1)
             self.assertGreater(receipt["chunk_count"], 0)
             raw_root = Path(tmp) / source.output_namespace / "raw"
-            markdown_path = next(raw_root.glob("*.md"))
+            markdown_path = next(path for path in raw_root.glob("*.md") if not path.name.endswith(".normalized.md"))
             page_receipt = json.loads(next(raw_root.glob("*.json")).read_text(encoding="utf-8"))
             markdown_bytes = markdown_path.read_bytes()
             self.assertEqual(markdown_bytes, page.text.encode("utf-8"))
             self.assertEqual(sha256(markdown_bytes).hexdigest(), page.normalized_checksum)
+            normalized_path = Path(page_receipt["normalized_markdown_path"])
+            normalized_bytes = normalized_path.read_bytes()
+            self.assertEqual(sha256(normalized_bytes).hexdigest(), page_receipt["normalized_artifact_checksum"])
             self.assertFalse(page_receipt["canonical_authority"])
             chunks_bytes = (Path(tmp) / source.output_namespace / "chunks.jsonl").read_bytes()
             self.assertNotIn(b"\r\n", chunks_bytes)
             self.assertTrue(chunks_bytes.endswith(b"\n"))
+
+    def test_relation_candidate_artifact_reads_back_utf8_spans_and_rejects_corruption(self) -> None:
+        source = self._recrawl_source(source_id="shared-doc", source_revision="manifest-r1")
+        pages = tuple(
+            PageArtifact(
+                source_id=source.source_id,
+                source_revision=source.source_revision,
+                requested_url=f"https://docs.example.test/{slug}",
+                resolved_url=f"https://docs.example.test/{slug}",
+                title=slug,
+                text=f"# Guide\n\nCaf\u00e9 {slug} documents API.",
+                fetcher="FIXTURE",
+                raw_checksum="raw",
+                normalized_checksum=sha256(_normalize_ws(f"# Guide\n\nCafé {slug} documents API.").encode("utf-8")).hexdigest(),
+                outgoing_urls=(),
+                metadata={},
+            )
+            for slug in ("alpha", "beta")
+        )
+
+        def relation_extractor(chunk_text: str):
+            subject_start = chunk_text.index("Café")
+            subject_end = subject_start + len("Café")
+            predicate_start = chunk_text.index("documents", subject_end)
+            predicate_end = predicate_start + len("documents")
+            object_start = chunk_text.index("API", predicate_end)
+            object_end = object_start + len("API")
+            return tuple(), ({
+                "schema": "atlas.external-doc-ontology-tuple.v1",
+                "tuple_id": "tuple:cafe",
+                "predicate": "documents",
+                "subject_candidates": [
+                    {"role": "subject", "text": "Café", "normalized_text": "café", "start_char": subject_start, "end_char": subject_end},
+                ],
+                "object_candidates": [
+                    {"role": "object", "text": "API", "normalized_text": "api", "start_char": object_start, "end_char": object_end},
+                ],
+                "predicate_span_chars": [predicate_start, predicate_end],
+                "evidence_span_chars": [subject_start, object_end],
+                "participants": [
+                    {"role": "subject", "text": "Café", "normalized_text": "café", "start_char": subject_start, "end_char": subject_end},
+                    {"role": "object", "text": "API", "normalized_text": "api", "start_char": object_start, "end_char": object_end},
+                ],
+                "producer_revision": "fixture-v1",
+                "extractor_version": "fixture-v1",
+                "model_revision": "fixture-model-v1",
+                "status": "PROPOSED",
+                "canonical_authority": False,
+            },)
+
+        chunks = tuple(
+            chunk
+            for page in pages
+            for chunk in chunk_document(
+                source_id=page.source_id,
+                source_revision=page.source_revision,
+                source_url=page.resolved_url,
+                title=page.title,
+                text=page.text,
+                maximum_chars=100,
+                overlap_chars=0,
+                nlp=relation_extractor,
+            )
+        )
+        self.assertEqual(len(chunks), 2)
+
+        oak_revision = "sha256:" + "b" * 64
+        oak_producer = "oak-sidecar-fixture-v1"
+        oak_responses = {
+            chunk.chunk_id: {
+                "schema": "atlas.oaklib-label-search-response.v1",
+                "status": "PROPOSAL_ONLY",
+                "ontologyRevision": oak_revision,
+                "producerRevision": oak_producer,
+                "canonicalAuthority": False,
+                "writesPerformed": False,
+                "matches": [
+                    {"searchText": "Café", "externalIds": ["fixture:Cafe"]},
+                    {"searchText": "API", "externalIds": ["fixture:API"]},
+                ],
+                "candidateBundle": {
+                    "schema": "atlas.oaklib-candidate-bundle.v1",
+                    "sourceSelector": "sqlite:/private/fixture.obo",
+                    "ontologyRevision": oak_revision,
+                    "producerRevision": oak_producer,
+                    "canonicalAuthority": False,
+                    "concepts": [
+                        {"externalId": "fixture:Cafe", "label": "Café", "evidenceRefs": ["sqlite:/private/fixture.obo:entity:fixture:Cafe"], "status": "PROPOSED", "canonicalAuthority": False, "ontologyRevision": oak_revision, "producerRevision": oak_producer},
+                        {"externalId": "fixture:API", "label": "API", "evidenceRefs": ["sqlite:/private/fixture.obo:entity:fixture:API"], "status": "PROPOSED", "canonicalAuthority": False, "ontologyRevision": oak_revision, "producerRevision": oak_producer},
+                    ],
+                    "relations": [{"subjectExternalId": "fixture:Cafe", "predicateExternalId": "fixture:documents", "objectExternalId": "fixture:API", "status": "PROPOSED", "canonicalAuthority": False, "ontologyRevision": oak_revision, "producerRevision": oak_producer}],
+                },
+            }
+            for chunk in chunks
+        }
+
+        with TemporaryDirectory() as tmp:
+            receipt = write_source_artifacts(
+                Path(tmp), source, pages, chunks, workspace_revision="workspace-fixture-r1",
+                oak_responses_by_chunk=oak_responses,
+            )
+            artifact_path = Path(receipt["relation_candidates_path"])
+            rows = [json.loads(line) for line in artifact_path.read_text(encoding="utf-8").splitlines()]
+            self.assertEqual([row["span_validation"] for row in rows], ["SPAN_READBACK_VERIFIED"] * 2)
+            self.assertTrue(all(row["candidate"]["status"] == "PROPOSED" for row in rows))
+            self.assertEqual(rows[0]["candidate"]["subject_candidates"][0]["text"], "Café")
+            self.assertEqual(rows[0]["candidate"]["object_candidates"][0]["text"], "API")
+            self.assertEqual(rows[0]["candidate"]["extractor_version"], "fixture-v1")
+            self.assertEqual(receipt["relation_candidate_bound_count"], 2)
+            self.assertEqual(receipt["relation_candidate_rejected_count"], 0)
+            self.assertEqual(receipt["relation_proposal_bridged_count"], 2)
+            self.assertTrue(all(row["ontology_mapping_status"] == "UNMAPPED_REVIEW_REQUIRED" for row in rows))
+            proposal = rows[0]["hypergraph_proposal"]
+            self.assertEqual(proposal["admission_state"], "PROPOSAL_ONLY")
+            self.assertEqual(proposal["predicate"], "UNMAPPED_VERB:documents")
+            self.assertEqual(proposal["ontology_ids"], [])
+            self.assertEqual(proposal["concept_ids"], [])
+            self.assertFalse(proposal["canonical_authority"])
+            self.assertFalse(proposal["writes_performed"])
+            oak_path = Path(receipt["relation_oak_review_path"])
+            oak_rows = [json.loads(line) for line in oak_path.read_text(encoding="utf-8").splitlines()]
+            self.assertEqual(receipt["relation_oak_review_count"], 2)
+            self.assertEqual(len(oak_rows), 2)
+            self.assertEqual(oak_rows[0]["participantMappings"][0]["status"], "SINGLE_CANDIDATE_REVIEW_REQUIRED")
+            self.assertEqual(oak_rows[0]["participantMappings"][1]["status"], "SINGLE_CANDIDATE_REVIEW_REQUIRED")
+            self.assertEqual(oak_rows[0]["relationProposal"]["ontologyIds"], [])
+            self.assertEqual(len(oak_rows[0]["existingOntologyRelations"]), 1)
+            self.assertFalse(oak_rows[0]["canonicalAuthority"])
+            self.assertFalse(oak_rows[0]["writesPerformed"])
+            self.assertNotIn("/private/", oak_path.read_text(encoding="utf-8"))
+
+            prior_artifact = artifact_path.read_bytes()
+            corrupt_relation = dict(chunks[0].ontology_tuples[0])
+            corrupt_binding = dict(corrupt_relation["evidence_binding"])
+            corrupt_binding["start_byte"] += 4  # starts inside the UTF-8 encoding of é
+            corrupt_relation["evidence_binding"] = corrupt_binding
+            corrupt_chunk = replace(chunks[0], ontology_tuples=(corrupt_relation,))
+            with self.assertRaisesRegex(ValueError, "DOC14_RELATION_CANDIDATE_BATCH_REJECTED"):
+                write_source_artifacts(
+                    Path(tmp), source, pages, (corrupt_chunk, chunks[1]), workspace_revision="workspace-fixture-r1"
+                )
+            self.assertEqual(artifact_path.read_bytes(), prior_artifact)
+
+            changed_page = replace(pages[0], text=pages[0].text.replace("documents", "mentions"))
+            with self.assertRaisesRegex(ValueError, "NORMALIZED_CAPTURE_READBACK_CHECKSUM_MISMATCH"):
+                write_source_artifacts(
+                    Path(tmp), source, (changed_page, pages[1]), chunks,
+                    workspace_revision="workspace-fixture-r1",
+                )
+            self.assertEqual(artifact_path.read_bytes(), prior_artifact)
+
+    def test_api_document_facts_are_source_spanned_and_remain_pending(self) -> None:
+        source_revision = "sha256:" + ("a" * 64)
+        source = self._recrawl_source(source_id="dspy-docs", source_revision=source_revision)
+        page = PageArtifact(
+            source_id=source.source_id,
+            source_revision=source_revision,
+            requested_url="https://dspy.ai/current/api/modules/RLM/",
+            resolved_url="https://dspy.ai/current/api/modules/RLM/",
+            title="DSPy RLM API",
+            text="# DSPy RLM\nUse `dspy.Predict(Signature)` with CUDA >= 12.1.\n",
+            fetcher="FIXTURE",
+            raw_checksum="raw",
+            normalized_checksum=sha256(_normalize_ws("# DSPy RLM\nUse `dspy.Predict(Signature)` with CUDA >= 12.1.\n").encode("utf-8")).hexdigest(),
+            outgoing_urls=(),
+            metadata={},
+        )
+        chunks = chunk_document(
+            source_id=page.source_id,
+            source_revision=page.source_revision,
+            source_url=page.resolved_url,
+            title=page.title,
+            text=page.text,
+            maximum_chars=200,
+            overlap_chars=0,
+        )
+        with TemporaryDirectory() as tmp:
+            receipt = write_source_artifacts(Path(tmp), source, (page,), chunks, workspace_revision="workspace-r1")
+            records = [
+                json.loads(line)
+                for line in Path(receipt["api_document_facts_path"]).read_text(encoding="utf-8").splitlines()
+            ]
+        self.assertEqual(receipt["api_document_fact_pending_count"], 1)
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0]["status"], "PENDING_ONTOLOGY_REVIEW")
+        fact = records[0]["facts"][0]
+        self.assertEqual(fact["relationProposal"]["predicate"], "DOCUMENTED_BY")
+        self.assertEqual(fact["relationProposal"]["status"], "PENDING")
+        self.assertIsNone(fact["relationProposal"]["ontologyRevision"])
+        self.assertIsNone(fact["relationProposal"]["objectRef"])
+        chunk_bytes = chunks[0].text.encode("utf-8")
+        mention = fact["mention"]
+        self.assertEqual(chunk_bytes[mention["startByte"]:mention["endByte"]].decode("utf-8"), mention["text"])
 
     def test_firecrawl_request_uses_manifest_bounds_and_disables_domain_expansion(self) -> None:
         source = SourceConfig(

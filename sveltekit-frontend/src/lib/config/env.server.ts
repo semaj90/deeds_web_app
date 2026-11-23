@@ -71,7 +71,7 @@ function normalizeObjectStorageUrl(rawValue?: string): string {
 function normalizeRedisUrl(rawValue?: string): string {
   const fallbackHost = isDocker ? 'redis' : LOOPBACK_IP;
   const fallbackPort = '6379';
-  const redisPassword = env?.REDIS_PASSWORD ?? env?.REDIS_PASS ?? env?.VALKEY_PASSWORD ?? env?.VALKEY_PASS ?? 'redis';
+  const redisPassword = env?.REDIS_PASSWORD ?? env?.REDIS_PASS ?? env?.VALKEY_PASSWORD ?? env?.VALKEY_PASS;
   const raw = rawValue?.trim();
 
   if (!raw) {
@@ -118,7 +118,7 @@ export function getRedisPort(): number {
 }
 
 export function getRedisPassword(): string {
- return env?.REDIS_PASSWORD ?? env?.REDIS_PASS ?? env?.VALKEY_PASSWORD ?? env?.VALKEY_PASS ?? 'redis';
+ return env?.REDIS_PASSWORD ?? env?.REDIS_PASS ?? env?.VALKEY_PASSWORD ?? env?.VALKEY_PASS;
 }
 
 export function getRabbitMQUrl(): string {
@@ -238,7 +238,7 @@ const ConfigSchema = z.object({
   POSTGRES_HOST: z.string().optional(),
   POSTGRES_PORT: z.coerce.number().optional(),
   REDIS_URL: z.string().url().default(getRedisUrl()),
-  REDIS_PASSWORD: z.string().default('redis'),
+  REDIS_PASSWORD: z.string().optional(),
   OLLAMA_URL: z.string().url().default(getOllamaUrl()),
   TRITON_URL: z
     .string()

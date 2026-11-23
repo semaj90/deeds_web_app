@@ -1,0 +1,386 @@
+{
+  "schema": "atlas.graphrag-oak-matrix.v1",
+  "featureColumns": [
+    "cosine_similarity",
+    "pagerank_prior",
+    "concept_overlap_jaccard",
+    "relation_degree_norm",
+    "chunk_char_len_norm"
+  ],
+  "matrixShape": [
+    20,
+    5
+  ],
+  "dtype": "float32",
+  "modelRevision": "embeddinggemma2:q8_0",
+  "graphRevision": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "candidateOrdinalMapChecksum": "sha256:2cc950d9c15ee6f255684597b48a52031859e6d968f9638ffb5d413bc97f9250",
+  "matrixChecksum": "sha256:d0c6d56047b6f019260276f71c8632066f9dd96c6770e117b5fcb2721e9b5590",
+  "pageRankReceipt": {
+    "schema": "atlas.graph-execution-receipt.v2",
+    "operation": "GRAPH_PAGERANK",
+    "requested_backend": "networkx",
+    "effective_backend": "networkx",
+    "graph_revision": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "node_count": 1,
+    "edge_count": 0,
+    "status": "PROVEN",
+    "executor_revision": "networkx:3.7:graph_pagerank-v1",
+    "input_checksum": "sha256:80e29b1fb26865e608ff2a8ef6bdda2df290ba28e002c479d0804f143d3d47c3",
+    "output_checksum": "sha256:446a3134d66ad693d1888ec77cda3aa1f87f705c6ac9786a659352fe5f9a3f4d",
+    "canonical_authority": false,
+    "writes_performed": false,
+    "error": null
+  },
+  "xgbAndRlRows": [
+    {
+      "ordinal": 0,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:0046a5745d5d9e09",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.656441,
+        1.0,
+        1.0,
+        0.0,
+        0.095825
+      ],
+      "observableReward": 0.811042,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 1,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:0050320904c52c61",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.633612,
+        1.0,
+        1.0,
+        0.0,
+        0.096436
+      ],
+      "observableReward": 0.798487,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 2,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:01dd89db9af965b1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.666653,
+        1.0,
+        1.0,
+        0.0,
+        0.090698
+      ],
+      "observableReward": 0.816659,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 3,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:0225c68b377e87ce",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.647514,
+        1.0,
+        1.0,
+        0.0,
+        0.092407
+      ],
+      "observableReward": 0.806133,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 4,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:0763a425e136439e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.67193,
+        1.0,
+        1.0,
+        0.0,
+        0.093628
+      ],
+      "observableReward": 0.819562,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 5,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:079da512f1aeb97c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.719429,
+        1.0,
+        1.0,
+        0.0,
+        0.09082
+      ],
+      "observableReward": 0.845686,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 6,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:09494005c852513e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.723746,
+        1.0,
+        1.0,
+        0.0,
+        0.090942
+      ],
+      "observableReward": 0.84806,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 7,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:0c4f553ca529631c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.712167,
+        1.0,
+        1.0,
+        0.0,
+        0.096558
+      ],
+      "observableReward": 0.841692,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 8,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:1152ade674cc08fb",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.698457,
+        1.0,
+        1.0,
+        0.0,
+        0.488281
+      ],
+      "observableReward": 0.834151,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 9,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:16bd5192541e4e41",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.637888,
+        1.0,
+        1.0,
+        0.0,
+        0.095459
+      ],
+      "observableReward": 0.800839,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 10,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:1883549d6c1f2de6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.59626,
+        1.0,
+        1.0,
+        0.0,
+        0.097046
+      ],
+      "observableReward": 0.777943,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 11,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:19bffe571d9a6095",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.667759,
+        1.0,
+        1.0,
+        0.0,
+        0.088257
+      ],
+      "observableReward": 0.817267,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 12,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:1ad4aa65f242412b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.654262,
+        1.0,
+        1.0,
+        0.0,
+        0.088745
+      ],
+      "observableReward": 0.809844,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 13,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:1c0d4d275274f858",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.685306,
+        1.0,
+        1.0,
+        0.0,
+        0.09668
+      ],
+      "observableReward": 0.826918,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 14,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:1f1acf01a7a5f34d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.711547,
+        1.0,
+        1.0,
+        0.0,
+        0.097656
+      ],
+      "observableReward": 0.841351,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 15,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:2461a46280311431",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.669058,
+        1.0,
+        1.0,
+        0.0,
+        0.097046
+      ],
+      "observableReward": 0.817982,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 16,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:247bce3ea7db5097",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.703951,
+        1.0,
+        1.0,
+        0.0,
+        0.097168
+      ],
+      "observableReward": 0.837173,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 17,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:2cbe62868df9742f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.706287,
+        1.0,
+        1.0,
+        0.0,
+        0.09375
+      ],
+      "observableReward": 0.838458,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 18,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:2eb65fb4fdcdaa14",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.648009,
+        1.0,
+        1.0,
+        0.0,
+        0.097046
+      ],
+      "observableReward": 0.806405,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    },
+    {
+      "ordinal": 19,
+      "chunkId": "card:src/lib/server/ace/context-assembler.ts:303c4f6866fa479e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "features": [
+        0.735978,
+        1.0,
+        1.0,
+        0.0,
+        0.092285
+      ],
+      "observableReward": 0.854788,
+      "oakConcepts": [
+        "ace_context",
+        "retrieval_runtime"
+      ]
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "embeddingSource": "live:ollama:embeddinggemma2:q8_0",
+  "datasetExport": {
+    "xgbCsvPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\doc14-xgboost-features-v1.csv",
+    "xgbRowCount": 20,
+    "grpoJsonlPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\doc14-grpo-pairs-v1.jsonl",
+    "grpoPairCount": 3
+  }
+}

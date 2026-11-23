@@ -85,13 +85,62 @@ export function normalize(vectorPtr: usize, length: i32): void {
  }
  norm = Mathf.sqrt(norm);
 
- if (norm < 1e-12) return; // Avoid division by zero
+ if (norm <= 0.0) return; // Preserve zero vectors; normalize every nonzero vector.
 
  // Normalize in place
  for (let i = 0; i < length; i++) {
  const addr = vectorPtr + (i << 2);
  const val = load<f32>(addr);
  store<f32>(addr, val / norm);
+ }
+}
+
+/**
+ * Stabilized L2 normalization for training/reference parity. This uses
+ * sqrt(sum(x*x) + epsilon), which is intentionally distinct from z-score
+ * normalization and from normalize()'s exact unit-length behavior.
+ * Returns r so callers can reproduce the matching backward derivative.
+ */
+export function normalizeWithEpsilon(vectorPtr: usize, length: i32, epsilon: f32): f32 {
+ if (length <= 0 || epsilon <= 0.0) return 0.0;
+ let squaredNorm: f32 = 0.0;
+ for (let i = 0; i < length; i++) {
+  const value = load<f32>(vectorPtr + (i << 2));
+  squaredNorm += value * value;
+ }
+ const r = Mathf.sqrt(squaredNorm + epsilon);
+ for (let i = 0; i < length; i++) {
+  const address = vectorPtr + (i << 2);
+  store<f32>(address, load<f32>(address) / r);
+ }
+ return r;
+}
+
+/** Exact VJP for y=x/sqrt(sum(x*x)+epsilon), using saved original x. */
+export function l2NormalizeBackwardWithEpsilon(
+ inputPtr: usize,
+ gradOutputPtr: usize,
+ gradInputPtr: usize,
+ length: i32,
+ epsilon: f32
+): void {
+ if (length <= 0 || epsilon <= 0.0) return;
+ let squaredNorm: f32 = 0.0;
+ let inputGradDot: f32 = 0.0;
+ for (let i = 0; i < length; i++) {
+  const x = load<f32>(inputPtr + (i << 2));
+  const g = load<f32>(gradOutputPtr + (i << 2));
+  squaredNorm += x * x;
+  inputGradDot += x * g;
+ }
+ const r = Mathf.sqrt(squaredNorm + epsilon);
+ const invR: f32 = <f32>1.0 / r;
+ const invR3: f32 = invR * invR * invR;
+ for (let i = 0; i < length; i++) {
+  const x = load<f32>(inputPtr + (i << 2));
+  const g = load<f32>(gradOutputPtr + (i << 2));
+  const grad: f32 = g * invR - x * inputGradDot * invR3;
+  store<f32>(gradInputPtr + (i << 2), grad);
  }
 }
 
@@ -167,7 +216,7 @@ export function batchNormalizeVectors(vectorsPtr: usize, numVectors: i32, vector
  for (let v = 0; v < numVectors; v++) {
  const vectorOffset = v * vectorLength * 4;
  const currentVectorPtr = vectorsPtr + vectorOffset;
- zScoreNormalize(currentVectorPtr, vectorLength);
+  normalize(currentVectorPtr, vectorLength);
  }
 }
 

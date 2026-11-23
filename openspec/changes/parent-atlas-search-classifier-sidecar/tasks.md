@@ -776,3 +776,93 @@ Status: `BOUNDARY_REACHABLE_LINEAGE_BLOCKED`; authority=false;
 writesPerformed=false.
 First blocker: `SOURCE_REVISION_UNKNOWN`.
 Next gate: source-qualified grounded fixture bound to the admitted snapshot.
+
+## CUDA KMeans training lane (2026-11-22)
+
+- [x] Added an explicit `--compute-backend cpu|cuda|auto` selector to
+      `python/train_domain_classifier.py`. `cuda` requires RAPIDS/cuML and a
+      visible CUDA device and fails closed; `auto` may fall back to CPU.
+- [x] CUDA-fitted centroids are converted to a portable inference adapter, so
+      the existing CPU serving sidecar does not need RAPIDS to load them.
+- [x] Python 3.13 focused unit tests passed 3/3 for centroid distance/prediction,
+      invalid-input rejection, and joblib round-trip; CLI `--help` exposes the
+      backend selector. This is adapter/CLI proof, not GPU execution proof.
+- [ ] Verify KMeans feature parity and checkpoint loading in the exact serving
+      Python environment before considering this lane proven. **Partial 2026-11-22:**
+      training and sidecar now share `cluster_distance_features()`; Python 3.13
+      fixture tests compare scikit-learn and portable-centroid outputs and exercise
+      the sidecar joblib loader. Seven focused tests passed. The deployed `:8095`
+      process and its production checkpoint were not read back in this pass.
+- [ ] Run an actual CUDA fit on the RTX only after the documented GPU/VRAM
+      admission gate is satisfied; no GPU job or checkpoint replacement was
+      performed in this pass.
+- [ ] Keep classifier promotion blocked pending reviewed labels, full taxonomy
+      coverage, held-out evaluation, and revision-qualified source lineage.
+
+Status: `CREATED_AND_WIRED`; shared training/serving feature math is fixture-proven;
+the deployed serving process and CUDA hardware execution remain unproven. Production
+promotion is blocked. Naive Bayes and logistic-regression heads remain scikit-learn
+CPU models in this version.
+
+## v2 classification handoff (2026-11-22)
+
+- [x] Expose the existing legacy classification proposal at the actual v2
+      FastAPI facade used by the sidecar container; keep its canonical-authority
+      and write flags hard-coded false.
+- [x] Add ASGI route coverage for proposal shape/source echo, reject a missing
+      source revision, and prove caller-supplied authority/write flags cannot
+      elevate the response. Combined focused Python 3.13 checks: 9 passed.
+- [ ] Finish task/source authorization for classification. The new authenticated
+      SvelteKit endpoint resolves text, exact task block revision, source file
+      hash, and workboard snapshot through `readOpenSpecTaskReceiptView`, then
+      rechecks the task after the sidecar call and rejects stale results. Four
+      mocked route tests pass. Workspace-level authorization beyond the signed-in
+      app session and live sidecar wiring still need proof.
+- [ ] Join the proposal to the exact task revision and admitted ontology tuple,
+      then convert only qualified evidence into ACE packets and read back the
+      resulting ContextManifest. **Partial:** the authenticated Svelte route now
+      uses the canonical deterministic domain taxonomy and emits a revision-bound
+      OKF task-domain tuple proposal with the exact task source span; it is not an
+      admitted ontology tuple and does not produce a ContextManifest. Read-only
+      PostgreSQL check found zero `codebase_chunk_index` rows for this task
+      ledger, so there is no canonical task packet to pass through the current
+      candidate-snapshot/ACE bridge. Do not synthesize one.
+- [ ] Deploy and prove the changed v2 classification route on :8095. Read-only
+      probe 2026-11-22 found :8095 healthy, but its `/openapi.json` does not list
+      `/classify`; loaded module SHA-256 values also differ from the local files.
+      Do not restart the operator-managed service from this task.
+- [ ] Prove one end-to-end repair proposal through reviewer approval, bounded
+      targeted validation, and independently read-back task receipt. No patch
+      execution or receipt write was performed in this pass.
+
+Status: `PROPOSAL_ROUTE_WIRED_AND_FIXTURE_PROVEN`; source authorization, ACE
+admission, live sidecar execution, reviewed repair, and receipt readback remain
+open. Do not treat the route response as an admitted task classification.
+
+Task classification ingress now exists at
+`POST /api/atlas/openspec/classify-task`. It accepts a task key only, derives
+classification input from the verified workboard row, checks the sidecar output
+against the source file hash, and repeats the task lookup before returning. It
+does not call ACE, promote ontology tuples, mutate tasks, or write receipts.
+Focused route proof: 4/4 Vitest tests. The full `npm run check` produced no
+diagnostics and did not finish after more than two minutes; it was interrupted.
+
+## WSL2 runtime admission readback (2026-11-22)
+
+- [x] Read-only import probe of `/home/james/miniforge3/envs/atlas-rapids-cu13`
+      reported Python 3.14.6, torch 2.13.0+cu130 with CUDA available, cuDF
+      26.06.01, cuML/cuVS/cuGraph 26.06.00.
+- [x] Read-only import probe of `/home/james/.venvs/atlas-cutile-cu132`
+      reported Python 3.14.6, torch 2.14.0+cu132 with CUDA available, and
+      `cuda.tile` importable.
+- [x] Ran the existing trainer's `--help` from the WSL2 RAPIDS Python against
+      the mounted Windows checkout; its CLI and RAPIDS imports initialize.
+      This proves command compatibility only, not a training run.
+- [x] WSL GPU telemetry reported RTX 3060 Ti, 8,192 MiB total, 7,174 MiB used,
+      851 MiB free, 12% utilization.
+- [ ] Actual CUDA KMeans fit remains blocked: free VRAM is below the documented
+      1,536 MiB threshold. No model was trained and no checkpoint was written.
+- [ ] cuTile was import-probed only; no kernel or workload was run.
+
+Status: `WSL2_ENVIRONMENTS_IMPORTABLE_GPU_ADMISSION_BLOCKED`; environment imports
+do not prove the CUDA classifier fit or production readiness.

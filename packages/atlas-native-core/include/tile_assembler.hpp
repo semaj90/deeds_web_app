@@ -297,4 +297,279 @@ inline KernelSwapDescriptor assemble_som_aligned_tiles(
     };
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// TensorHandleV1: 4x4x6 Spatial Tile Feature Buffer Codec (64B Header + 96B Body = 160B)
+// ═══════════════════════════════════════════════════════════════════════════
+
+constexpr std::uint32_t TENSOR_HANDLE_V1_MAGIC_LE = 0x54485631u; // "THV1"
+constexpr std::uint32_t TENSOR_HANDLE_V1_ENDIAN_LE = 0x01020304u;
+constexpr std::size_t TENSOR_HANDLE_V1_HEADER_BYTES = 64;
+constexpr std::size_t TENSOR_HANDLE_V1_DIM_X = 4;
+constexpr std::size_t TENSOR_HANDLE_V1_DIM_Y = 4;
+constexpr std::size_t TENSOR_HANDLE_V1_CHANNELS = 6;
+constexpr std::size_t TENSOR_HANDLE_V1_ELEMENT_COUNT =
+    TENSOR_HANDLE_V1_DIM_X * TENSOR_HANDLE_V1_DIM_Y * TENSOR_HANDLE_V1_CHANNELS; // 96
+constexpr std::size_t TENSOR_HANDLE_V1_INT4_PAYLOAD_BYTES = TENSOR_HANDLE_V1_ELEMENT_COUNT / 2; // 48B
+constexpr std::size_t TENSOR_HANDLE_V1_AFFINE_PARAM_BYTES = TENSOR_HANDLE_V1_CHANNELS * 2 * sizeof(float); // 48B
+constexpr std::size_t TENSOR_HANDLE_V1_TOTAL_BYTES =
+    TENSOR_HANDLE_V1_HEADER_BYTES + TENSOR_HANDLE_V1_INT4_PAYLOAD_BYTES + TENSOR_HANDLE_V1_AFFINE_PARAM_BYTES; // 160B
+
+/**
+ * Safer 7-State Residency FSM for TensorHandleV1:
+ *   ABSENT -> HOST_STAGED -> GPU_PENDING -> GPU_READY -> IN_USE -> EVICTABLE -> EVICTED
+ */
+enum class SafeTileResidencyStateV1 : std::uint8_t {
+    ABSENT = 0,
+    HOST_STAGED = 1,
+    GPU_PENDING = 2,
+    GPU_READY = 3,
+    IN_USE = 4,
+    EVICTABLE = 5,
+    EVICTED = 6
+};
+
+inline SafeTileResidencyStateV1 transition_safe_tile_residency_v1(
+    SafeTileResidencyStateV1 current,
+    SafeTileResidencyStateV1 target,
+    bool transfer_completed,
+    std::uint32_t active_consumers,
+    bool revision_matched
+) {
+    if (!revision_matched) {
+        return SafeTileResidencyStateV1::ABSENT;
+    }
+    switch (current) {
+        case SafeTileResidencyStateV1::ABSENT:
+            if (target == SafeTileResidencyStateV1::HOST_STAGED) return target;
+            break;
+        case SafeTileResidencyStateV1::HOST_STAGED:
+            if (target == SafeTileResidencyStateV1::GPU_PENDING || target == SafeTileResidencyStateV1::EVICTED) return target;
+            break;
+        case SafeTileResidencyStateV1::GPU_PENDING:
+            if (target == SafeTileResidencyStateV1::GPU_READY) {
+                if (!transfer_completed) throw std::invalid_argument("SAFE_RESIDENCY_GPU_READY_REQUIRES_TRANSFER_COMPLETE");
+                return target;
+            }
+            break;
+        case SafeTileResidencyStateV1::GPU_READY:
+            if (target == SafeTileResidencyStateV1::IN_USE || target == SafeTileResidencyStateV1::EVICTABLE) return target;
+            break;
+        case SafeTileResidencyStateV1::IN_USE:
+            if (target == SafeTileResidencyStateV1::GPU_READY) return target;
+            if (target == SafeTileResidencyStateV1::EVICTABLE) {
+                if (active_consumers > 0) throw std::invalid_argument("SAFE_RESIDENCY_EVICTABLE_REQUIRES_ZERO_CONSUMERS");
+                return target;
+            }
+            break;
+        case SafeTileResidencyStateV1::EVICTABLE:
+            if (target == SafeTileResidencyStateV1::IN_USE) return target;
+            if (target == SafeTileResidencyStateV1::EVICTED) {
+                if (active_consumers > 0) throw std::invalid_argument("SAFE_RESIDENCY_EVICT_REQUIRES_ZERO_CONSUMERS");
+                return target;
+            }
+            break;
+        case SafeTileResidencyStateV1::EVICTED:
+            if (target == SafeTileResidencyStateV1::HOST_STAGED || target == SafeTileResidencyStateV1::ABSENT) return target;
+            break;
+    }
+    throw std::invalid_argument("SAFE_RESIDENCY_TRANSITION_FORBIDDEN");
+}
+
+/**
+ * Encodes a 96-float (4x4x6) spatial feature tile into a 160-byte aligned binary TensorHandleV1 blob:
+ *   - Bytes   0..3   (4B): Magic 0x54485631 ("THV1" LE)
+ *   - Bytes   4..7   (4B): Endian Tag 0x01020304 (LE)
+ *   - Bytes   8..11  (4B): candidate_ordinal (uint32 LE)
+ *   - Bytes  12..13  (2B): kmeans_cluster_id (uint16 LE)
+ *   - Bytes  14..15  (2B): som_bmu_id (uint16 LE, 0..399)
+ *   - Bytes  16..23  (8B): workspace_revision_prefix64 (uint64 LE)
+ *   - Bytes  24..31  (8B): source_revision_prefix64 (uint64 LE)
+ *   - Bytes  32..55 (24B): Mode-7 / 2D Affine Transform (a, b, tx, c, d, ty as 6 x float32 LE)
+ *   - Byte   56      (1B): SafeTileResidencyStateV1 (uint8)
+ *   - Byte   57      (1B): shape_code (0x46 = 4x4x6)
+ *   - Bytes  58..59  (2B): active_consumers (uint16 LE)
+ *   - Bytes  60..63  (4B): payload_crc_prefix32 (first 4 bytes of SHA-256 over bytes 64..159)
+ *   - Bytes  64..111 (48B): 6 channels x (min_c: float32 LE, scale_c: float32 LE)
+ *   - Bytes 112..159 (48B): 96 x 4-bit quantized nibbles (2 nibbles per byte: low=even idx, high=odd idx)
+ */
+inline std::array<std::uint8_t, TENSOR_HANDLE_V1_TOTAL_BYTES> encode_tensor_handle_4x4x6_v1(
+    const float* values_96,
+    std::uint32_t candidate_ordinal,
+    std::uint16_t kmeans_cluster_id,
+    std::uint16_t som_bmu_id,
+    std::uint64_t workspace_revision_prefix64,
+    std::uint64_t source_revision_prefix64,
+    const std::array<float, 6>& affine_2x3,
+    SafeTileResidencyStateV1 residency_state = SafeTileResidencyStateV1::HOST_STAGED,
+    std::uint16_t active_consumers = 0
+) {
+    if (values_96 == nullptr) throw std::invalid_argument("TENSOR_HANDLE_V1_NULL_VALUES");
+    if (som_bmu_id >= 400) throw std::invalid_argument("TENSOR_HANDLE_V1_SOM_BMU_OUT_OF_RANGE");
+    for (std::size_t i = 0; i < TENSOR_HANDLE_V1_ELEMENT_COUNT; ++i) {
+        if (!std::isfinite(values_96[i])) throw std::invalid_argument("TENSOR_HANDLE_V1_NONFINITE_VALUE");
+    }
+    for (float a : affine_2x3) {
+        if (!std::isfinite(a)) throw std::invalid_argument("TENSOR_HANDLE_V1_NONFINITE_AFFINE");
+    }
+
+    std::array<std::uint8_t, TENSOR_HANDLE_V1_TOTAL_BYTES> buf{};
+    const auto put_u16 = [&buf](std::size_t off, std::uint16_t v) {
+        buf[off] = static_cast<std::uint8_t>(v & 0xFFu);
+        buf[off + 1] = static_cast<std::uint8_t>((v >> 8u) & 0xFFu);
+    };
+    const auto put_u32 = [&buf](std::size_t off, std::uint32_t v) {
+        for (unsigned s = 0; s < 32; s += 8) buf[off + s / 8] = static_cast<std::uint8_t>((v >> s) & 0xFFu);
+    };
+    const auto put_u64 = [&buf](std::size_t off, std::uint64_t v) {
+        for (unsigned s = 0; s < 64; s += 8) buf[off + s / 8] = static_cast<std::uint8_t>((v >> s) & 0xFFULL);
+    };
+    const auto put_f32 = [&put_u32](std::size_t off, float v) {
+        put_u32(off, std::bit_cast<std::uint32_t>(v));
+    };
+
+    // Per-channel affine quantization (6 channels, 16 spatial cells per channel)
+    std::array<float, TENSOR_HANDLE_V1_CHANNELS> ch_min{};
+    std::array<float, TENSOR_HANDLE_V1_CHANNELS> ch_scale{};
+    ch_min.fill(1e9f);
+    std::array<float, TENSOR_HANDLE_V1_CHANNELS> ch_max{};
+    ch_max.fill(-1e9f);
+
+    for (std::size_t cell = 0; cell < 16; ++cell) {
+        for (std::size_t ch = 0; ch < TENSOR_HANDLE_V1_CHANNELS; ++ch) {
+            const float v = values_96[cell * TENSOR_HANDLE_V1_CHANNELS + ch];
+            if (v < ch_min[ch]) ch_min[ch] = v;
+            if (v > ch_max[ch]) ch_max[ch] = v;
+        }
+    }
+    for (std::size_t ch = 0; ch < TENSOR_HANDLE_V1_CHANNELS; ++ch) {
+        const float range = std::max(ch_max[ch] - ch_min[ch], 1e-8f);
+        ch_scale[ch] = range / 15.0f;
+        put_f32(64 + ch * 8, ch_min[ch]);
+        put_f32(64 + ch * 8 + 4, ch_scale[ch]);
+    }
+
+    // Pack 96 nibbles into bytes 112..159 (low nibble = even index, high nibble = odd index)
+    for (std::size_t idx = 0; idx < TENSOR_HANDLE_V1_ELEMENT_COUNT; idx += 2) {
+        const std::size_t ch0 = idx % TENSOR_HANDLE_V1_CHANNELS;
+        const std::size_t ch1 = (idx + 1) % TENSOR_HANDLE_V1_CHANNELS;
+        const float n0 = std::clamp((values_96[idx] - ch_min[ch0]) / (ch_scale[ch0] * 15.0f), 0.0f, 1.0f);
+        const float n1 = std::clamp((values_96[idx + 1] - ch_min[ch1]) / (ch_scale[ch1] * 15.0f), 0.0f, 1.0f);
+        const auto q0 = static_cast<std::uint8_t>(std::lround(n0 * 15.0f)) & 0x0Fu;
+        const auto q1 = static_cast<std::uint8_t>(std::lround(n1 * 15.0f)) & 0x0Fu;
+        buf[112 + idx / 2] = static_cast<std::uint8_t>(q0 | (q1 << 4u));
+    }
+
+    const std::string body_sha = sha256_hex(buf.data() + 64, 96);
+    std::uint32_t crc_prefix = 0;
+    for (unsigned i = 0; i < 4; ++i) {
+        const auto hi = body_sha[i * 2];
+        const auto lo = body_sha[i * 2 + 1];
+        const auto nib = [](char c) -> std::uint8_t {
+            return (c >= '0' && c <= '9') ? static_cast<std::uint8_t>(c - '0') : static_cast<std::uint8_t>(10 + (c - 'a'));
+        };
+        crc_prefix |= (static_cast<std::uint32_t>((nib(hi) << 4u) | nib(lo)) << (i * 8));
+    }
+
+    put_u32(0, TENSOR_HANDLE_V1_MAGIC_LE);
+    put_u32(4, TENSOR_HANDLE_V1_ENDIAN_LE);
+    put_u32(8, candidate_ordinal);
+    put_u16(12, kmeans_cluster_id);
+    put_u16(14, som_bmu_id);
+    put_u64(16, workspace_revision_prefix64);
+    put_u64(24, source_revision_prefix64);
+    for (std::size_t a_idx = 0; a_idx < 6; ++a_idx) {
+        put_f32(32 + a_idx * 4, affine_2x3[a_idx]);
+    }
+    buf[56] = static_cast<std::uint8_t>(residency_state);
+    buf[57] = 0x46u; // 4x4x6 shape code
+    put_u16(58, active_consumers);
+    put_u32(60, crc_prefix);
+    return buf;
+}
+
+inline std::array<float, TENSOR_HANDLE_V1_ELEMENT_COUNT> decode_tensor_handle_4x4x6_v1(
+    const std::uint8_t* bytes,
+    std::size_t byte_length,
+    std::uint64_t expected_workspace_revision_prefix64
+) {
+    if (bytes == nullptr || byte_length != TENSOR_HANDLE_V1_TOTAL_BYTES) {
+        throw std::invalid_argument("TENSOR_HANDLE_V1_BYTE_LENGTH_INVALID");
+    }
+    const auto get_u32 = [bytes](std::size_t off) -> std::uint32_t {
+        return static_cast<std::uint32_t>(bytes[off]) |
+               (static_cast<std::uint32_t>(bytes[off + 1]) << 8u) |
+               (static_cast<std::uint32_t>(bytes[off + 2]) << 16u) |
+               (static_cast<std::uint32_t>(bytes[off + 3]) << 24u);
+    };
+    const auto get_u64 = [bytes](std::size_t off) -> std::uint64_t {
+        std::uint64_t v = 0;
+        for (unsigned s = 0; s < 64; s += 8) {
+            v |= (static_cast<std::uint64_t>(bytes[off + s / 8]) << s);
+        }
+        return v;
+    };
+    const auto get_f32 = [&get_u32](std::size_t off) -> float {
+        return std::bit_cast<float>(get_u32(off));
+    };
+
+    if (get_u32(0) != TENSOR_HANDLE_V1_MAGIC_LE) throw std::invalid_argument("TENSOR_HANDLE_V1_MAGIC_MISMATCH");
+    if (get_u32(4) != TENSOR_HANDLE_V1_ENDIAN_LE) throw std::invalid_argument("TENSOR_HANDLE_V1_ENDIAN_MISMATCH");
+    if (bytes[57] != 0x46u) throw std::invalid_argument("TENSOR_HANDLE_V1_SHAPE_CODE_MISMATCH");
+    if (get_u64(16) != expected_workspace_revision_prefix64) {
+        throw std::invalid_argument("TENSOR_HANDLE_V1_STALE_WORKSPACE_REVISION");
+    }
+
+    const std::string body_sha = sha256_hex(bytes + 64, 96);
+    std::uint32_t crc_prefix = 0;
+    for (unsigned i = 0; i < 4; ++i) {
+        const auto hi = body_sha[i * 2];
+        const auto lo = body_sha[i * 2 + 1];
+        const auto nib = [](char c) -> std::uint8_t {
+            return (c >= '0' && c <= '9') ? static_cast<std::uint8_t>(c - '0') : static_cast<std::uint8_t>(10 + (c - 'a'));
+        };
+        crc_prefix |= (static_cast<std::uint32_t>((nib(hi) << 4u) | nib(lo)) << (i * 8));
+    }
+    if (get_u32(60) != crc_prefix) throw std::invalid_argument("TENSOR_HANDLE_V1_BODY_CHECKSUM_MISMATCH");
+
+    std::array<float, TENSOR_HANDLE_V1_CHANNELS> ch_min{};
+    std::array<float, TENSOR_HANDLE_V1_CHANNELS> ch_scale{};
+    for (std::size_t ch = 0; ch < TENSOR_HANDLE_V1_CHANNELS; ++ch) {
+        ch_min[ch] = get_f32(64 + ch * 8);
+        ch_scale[ch] = get_f32(64 + ch * 8 + 4);
+    }
+
+    std::array<float, TENSOR_HANDLE_V1_ELEMENT_COUNT> out{};
+    for (std::size_t idx = 0; idx < TENSOR_HANDLE_V1_ELEMENT_COUNT; idx += 2) {
+        const std::uint8_t packed = bytes[112 + idx / 2];
+        const std::uint8_t q0 = packed & 0x0Fu;
+        const std::uint8_t q1 = (packed >> 4u) & 0x0Fu;
+        const std::size_t ch0 = idx % TENSOR_HANDLE_V1_CHANNELS;
+        const std::size_t ch1 = (idx + 1) % TENSOR_HANDLE_V1_CHANNELS;
+        out[idx] = ch_min[ch0] + static_cast<float>(q0) * ch_scale[ch0];
+        out[idx + 1] = ch_min[ch1] + static_cast<float>(q1) * ch_scale[ch1];
+    }
+    return out;
+}
+
+/**
+ * Applies the Mode-7 / 2D affine transform [a, b, tx, c, d, ty] to a 2D tile coordinate (u, v):
+ *   x_world = a * u + b * v + tx
+ *   y_world = c * u + d * v + ty
+ */
+inline std::array<float, 2> project_mode7_affine_2x3_v1(
+    const std::array<float, 6>& affine_2x3,
+    float u,
+    float v
+) {
+    if (!std::isfinite(u) || !std::isfinite(v)) {
+        throw std::invalid_argument("TENSOR_HANDLE_V1_NONFINITE_COORDINATE");
+    }
+    for (float coeff : affine_2x3) {
+        if (!std::isfinite(coeff)) throw std::invalid_argument("TENSOR_HANDLE_V1_NONFINITE_AFFINE");
+    }
+    const float x = affine_2x3[0] * u + affine_2x3[1] * v + affine_2x3[2];
+    const float y = affine_2x3[3] * u + affine_2x3[4] * v + affine_2x3[5];
+    return {x, y};
+}
+
 } // namespace atlas::native

@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.doc14-llama-lm15-capability-receipt.v1",
+  "dspyVersion": "3.5.0",
+  "engine": "lm15",
+  "litellmUsed": false,
+  "modelId": "gemma4-legal-iq4xs-direct.gguf",
+  "serverBuildInfo": "b8757-a29e4c0b7",
+  "serverBaseUrl": "http://127.0.0.1:8090/v1",
+  "transportCapabilities": {
+    "healthStatus": "ok",
+    "jsonObjectSupported": true,
+    "jsonSchemaSupported": true
+  },
+  "manifestVerification": {
+    "chunkId": "card:src/lib/server/ace/context-assembler.ts:0046a5745d5d9e09",
+    "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+    "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+    "chunkHashVerified": true,
+    "manifestChecksum": "sha256:8c20def5c442beb65e07ca90019a030a0d3a41864eab20819aa1a5cca3406df2"
+  },
+  "liveInference": {
+    "status": "VERIFIED_CITATIONS_READY",
+    "citationVerified": true,
+    "strictSchemaValidated": true,
+    "supportingChunkIds": [
+      "card:src/lib/server/ace/context-assembler.ts:0046a5745d5d9e09"
+    ],
+    "responseSha256": "sha256:8fbaa61b2e80f22764a7b80d141ce1b25b550a28d27db27693a64c22f2fffbcf",
+    "elapsedMs": 280.48
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

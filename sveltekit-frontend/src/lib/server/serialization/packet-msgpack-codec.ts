@@ -92,10 +92,15 @@ export function encodeFP32(values: number[]): Uint8Array {
   return new Uint8Array(buf.buffer);
 }
 
-/** Decode FP32 raw bytes back to float array. */
+/** Decode FP32 raw bytes back to float array (alignment-safe for unaligned MsgPack byte offsets). */
 export function decodeFP32(bytes: Uint8Array): number[] {
-  const view = new Float32Array(bytes.buffer, bytes.byteOffset, bytes.byteLength / 4);
-  return Array.from(view);
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const count = Math.floor(bytes.byteLength / 4);
+  const out: number[] = new Array(count);
+  for (let i = 0; i < count; i++) {
+    out[i] = view.getFloat32(i * 4, true);
+  }
+  return out;
 }
 
 // IEEE 754 FP16 ↔ float32 conversion (no external dependency)

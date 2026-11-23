@@ -1,0 +1,273 @@
+{
+  "schema": "atlas.okf-docs-openspec-relations.v1",
+  "status": "PROVEN",
+  "okfFileCount": 752,
+  "docsFileCount": 1349,
+  "totalIndexedFiles": 2101,
+  "yamlParsedCount": 48,
+  "yamlParseErrorCount": 0,
+  "conceptVocabSize": 142,
+  "totalExplicitCrossRefs": 4512,
+  "graphRevision": "sha256:1cc2fdfb2118bfe22eb6afb20ac07d72c210e64861c28e5236f843ba81ca74f3",
+  "sampleTaskKey": "agent-branch-review-fanout-ace-centroid-aug22#16f4feb094087a07",
+  "admittedTopKCount": 10,
+  "admittedTop5": [
+    {
+      "chunkId": ".okf/corpora/keyword-corpus.yaml",
+      "taskKey": null,
+      "fusionScore": 0.045855808214348676,
+      "scoreBreakdown": {
+        "fusion": 0.045855808214348676,
+        "laneRanks": {
+          "dense": 1,
+          "graph": 2,
+          "lowrank": 15
+        }
+      },
+      "relationPaths": [
+        {
+          "predicate": "DOCUMENT_LINKS_TO",
+          "target": "docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langchain-overview-overview.md"
+        },
+        {
+          "predicate": "DOCUMENT_LINKS_TO",
+          "target": "docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langgraph-overview-overview.md"
+        },
+        {
+          "predicate": "DOCUMENT_LINKS_TO",
+          "target": "docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langchain-overview-overview.md"
+        },
+        {
+          "predicate": "DOCUMENT_LINKS_TO",
+          "target": "docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langgraph-overview-overview.md"
+        },
+        {
+          "predicate": "DOCUMENT_LINKS_TO",
+          "target": "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-code-mode-md-code-mode-md.md"
+        }
+      ],
+      "sourceRevision": "sha256:b3f9ddb1a47552b1dbdbf94aad8966e50593879dafc597f7db931fc2b5d52ab8",
+      "graphRevision": "sha256:1cc2fdfb2118bfe22eb6afb20ac07d72c210e64861c28e5236f843ba81ca74f3",
+      "admissionStatus": "ADMITTED",
+      "rejectionReason": null,
+      "supportingSpans": [
+        [
+          0,
+          29064
+        ]
+      ]
+    },
+    {
+      "chunkId": "docs/.okf/registry.yaml",
+      "taskKey": null,
+      "fusionScore": 0.03252247488101534,
+      "scoreBreakdown": {
+        "fusion": 0.03252247488101534,
+        "laneRanks": {
+          "dense": 2,
+          "lowrank": 1
+        }
+      },
+      "relationPaths": [
+        {
+          "predicate": "DOCUMENT_LINKS_TO",
+          "target": "docs/.okf/architecture/domain-classification-and-agentic-retrieval-v1.md"
+        },
+        {
+          "predicate": "DOCUMENT_LINKS_TO",
+          "target": "docs/.okf/dev/context-engineering-docs-v1.json"
+        },
+        {
+          "predicate": "DOCUMENT_LINKS_TO",
+          "target": "docs/.okf/dev/library-api-doc-catalog-v1.json"
+        },
+        {
+          "predicate": "DOCUMENT_LINKS_TO",
+          "target": "docs/.okf/dev/library-docs-manifest-v1.json"
+        },
+        {
+          "predicate": "DOCUMENT_LINKS_TO",
+          "target": "docs/.okf/dev/library-docs-prioritization-v1.md"
+        }
+      ],
+      "sourceRevision": "sha256:703300c25e641c5143810265f70a4b828b39e903a269b6665618d985d1b4aa17",
+      "graphRevision": "sha256:1cc2fdfb2118bfe22eb6afb20ac07d72c210e64861c28e5236f843ba81ca74f3",
+      "admissionStatus": "ADMITTED",
+      "rejectionReason": null,
+      "supportingSpans": [
+        [
+          0,
+          14554
+        ]
+      ]
+    },
+    {
+      "chunkId": "docs/architecture/agentic-error-proposal-flow.md",
+      "taskKey": null,
+      "fusionScore": 0.03252247488101534,
+      "scoreBreakdown": {
+        "fusion": 0.03252247488101534,
+        "laneRanks": {
+          "lexical": 1,
+          "lowrank": 2
+        }
+      },
+      "relationPaths": [],
+      "sourceRevision": "sha256:525ea82cdec0fc1ef160d9ca71c72973ea51732b211183a274c89bc394668b73",
+      "graphRevision": "sha256:1cc2fdfb2118bfe22eb6afb20ac07d72c210e64861c28e5236f843ba81ca74f3",
+      "admissionStatus": "ADMITTED",
+      "rejectionReason": null,
+      "supportingSpans": [
+        [
+          0,
+          3227
+        ]
+      ]
+    },
+    {
+      "chunkId": ".okf/architecture/parent-atlas-ingestion-agent-integrations-glossary-v1.md",
+      "taskKey": null,
+      "fusionScore": 0.03177805800756621,
+      "scoreBreakdown": {
+        "fusion": 0.03177805800756621,
+        "laneRanks": {
+          "dense": 5,
+          "graph": 1
+        }
+      },
+      "relationPaths": [
+        {
+          "predicate": "DOCUMENT_LINKS_TO",
+          "target": "docs/.okf/research/deltanet-swiglu/manifest.json"
+        },
+        {
+          "predicate": "DOCUMENT_LINKS_TO",
+          "target": "docs/.okf/research/deltanet-swiglu/published-current.json"
+        },
+        {
+          "predicate": "DOCUMENT_LINKS_TO",
+          "target": "docs/MASTER-TOC-v2.md"
+        },
+        {
+          "predicate": "DOCUMENT_LINKS_TO",
+          "target": "sveltekit-frontend/src/lib/server/retrieval/retrieve-candidates.ts"
+        }
+      ],
+      "sourceRevision": "sha256:5a0de7a621a6c25ebd938ad49ae2a65cc61ddeea011e240f6b34893e1fb1cc96",
+      "graphRevision": "sha256:1cc2fdfb2118bfe22eb6afb20ac07d72c210e64861c28e5236f843ba81ca74f3",
+      "admissionStatus": "ADMITTED",
+      "rejectionReason": null,
+      "supportingSpans": [
+        [
+          0,
+          9858
+        ]
+      ]
+    },
+    {
+      "chunkId": "docs/architecture/rabbitmq-workflow-fabric.md",
+      "taskKey": null,
+      "fusionScore": 0.031054405392392875,
+      "scoreBreakdown": {
+        "fusion": 0.031054405392392875,
+        "laneRanks": {
+          "lexical": 2,
+          "lowrank": 7
+        }
+      },
+      "relationPaths": [],
+      "sourceRevision": "sha256:4b477713f36541742e7d233c6f03f85a5d098a2026333c6c8512e7c5a304b4e0",
+      "graphRevision": "sha256:1cc2fdfb2118bfe22eb6afb20ac07d72c210e64861c28e5236f843ba81ca74f3",
+      "admissionStatus": "ADMITTED",
+      "rejectionReason": null,
+      "supportingSpans": [
+        [
+          0,
+          1431
+        ]
+      ]
+    }
+  ],
+  "sampleRelationProposals": [
+    {
+      "schema": "atlas.relation-proposal.v1",
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "subject": {
+        "kind": "task",
+        "id": "agent-branch-review-fanout-ace-centroid-aug22#16f4feb094087a07",
+        "sourceRevision": "sha256:3eaefc9a0c8a860f9db37ff24232c2e5d6d48c8e711cf0a29ec86ca1fac8f801"
+      },
+      "object": {
+        "kind": "document_chunk",
+        "id": ".okf/corpora/keyword-corpus.yaml",
+        "sourceRevision": "sha256:b3f9ddb1a47552b1dbdbf94aad8966e50593879dafc597f7db931fc2b5d52ab8"
+      },
+      "relation": {
+        "predicate": "TASK_RELEVANT_TO_DOCUMENT",
+        "assertion": "PREDICTED",
+        "method": "okf_docs_svd_rrf_4lane_v1"
+      },
+      "evidence": {
+        "sourceRef": ".okf/corpora/keyword-corpus.yaml",
+        "contentSha256": "sha256:b3f9ddb1a47552b1dbdbf94aad8966e50593879dafc597f7db931fc2b5d52ab8"
+      },
+      "graphRevision": "sha256:1cc2fdfb2118bfe22eb6afb20ac07d72c210e64861c28e5236f843ba81ca74f3",
+      "admission": "PENDING"
+    },
+    {
+      "schema": "atlas.relation-proposal.v1",
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "subject": {
+        "kind": "task",
+        "id": "agent-branch-review-fanout-ace-centroid-aug22#16f4feb094087a07",
+        "sourceRevision": "sha256:3eaefc9a0c8a860f9db37ff24232c2e5d6d48c8e711cf0a29ec86ca1fac8f801"
+      },
+      "object": {
+        "kind": "document_chunk",
+        "id": "docs/.okf/registry.yaml",
+        "sourceRevision": "sha256:703300c25e641c5143810265f70a4b828b39e903a269b6665618d985d1b4aa17"
+      },
+      "relation": {
+        "predicate": "TASK_RELEVANT_TO_DOCUMENT",
+        "assertion": "PREDICTED",
+        "method": "okf_docs_svd_rrf_4lane_v1"
+      },
+      "evidence": {
+        "sourceRef": "docs/.okf/registry.yaml",
+        "contentSha256": "sha256:703300c25e641c5143810265f70a4b828b39e903a269b6665618d985d1b4aa17"
+      },
+      "graphRevision": "sha256:1cc2fdfb2118bfe22eb6afb20ac07d72c210e64861c28e5236f843ba81ca74f3",
+      "admission": "PENDING"
+    },
+    {
+      "schema": "atlas.relation-proposal.v1",
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "subject": {
+        "kind": "task",
+        "id": "agent-branch-review-fanout-ace-centroid-aug22#16f4feb094087a07",
+        "sourceRevision": "sha256:3eaefc9a0c8a860f9db37ff24232c2e5d6d48c8e711cf0a29ec86ca1fac8f801"
+      },
+      "object": {
+        "kind": "document_chunk",
+        "id": "docs/architecture/agentic-error-proposal-flow.md",
+        "sourceRevision": "sha256:525ea82cdec0fc1ef160d9ca71c72973ea51732b211183a274c89bc394668b73"
+      },
+      "relation": {
+        "predicate": "TASK_RELEVANT_TO_DOCUMENT",
+        "assertion": "PREDICTED",
+        "method": "okf_docs_svd_rrf_4lane_v1"
+      },
+      "evidence": {
+        "sourceRef": "docs/architecture/agentic-error-proposal-flow.md",
+        "contentSha256": "sha256:525ea82cdec0fc1ef160d9ca71c72973ea51732b211183a274c89bc394668b73"
+      },
+      "graphRevision": "sha256:1cc2fdfb2118bfe22eb6afb20ac07d72c210e64861c28e5236f843ba81ca74f3",
+      "admission": "PENDING"
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

@@ -20,6 +20,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
 import sys
 import concurrent.futures
+import urllib.error
+import urllib.request
 
 try:
     import dspy  # type: ignore
@@ -677,9 +679,52 @@ def require_dspy() -> Any:
     return dspy
 
 
-def build_repair_program_v1() -> Any:
+def resolve_native_dspy_lm_v1(
+    *,
+    api_base: str | None = None,
+    requested_model_id: str | None = None,
+    api_key: str | None = None,
+    timeout_s: float = 5.0,
+) -> Any:
+    """Resolve the active OpenAI-compatible model and require DSPy's native engine."""
+    dp = require_dspy()
+    endpoint = (api_base or os.environ.get("DSPY_LM_API_BASE") or "http://127.0.0.1:8090/v1").rstrip("/")
+    models_url = f"{endpoint}/models" if endpoint.endswith("/v1") else f"{endpoint}/v1/models"
+    request = urllib.request.Request(models_url, headers={"Accept": "application/json"})
+    try:
+        with urllib.request.urlopen(request, timeout=timeout_s) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except (OSError, urllib.error.URLError, json.JSONDecodeError) as exc:
+        raise RuntimeError("DSPY_MODEL_DISCOVERY_FAILED") from exc
+
+    model_rows = payload.get("data") if isinstance(payload, Mapping) else None
+    available_ids = [
+        str(row.get("id")) for row in model_rows or []
+        if isinstance(row, Mapping) and isinstance(row.get("id"), str) and row["id"].strip()
+    ]
+    if not available_ids:
+        raise RuntimeError("DSPY_NO_ACTIVE_MODEL_AT_ENDPOINT")
+
+    configured_id = (requested_model_id or os.environ.get("DSPY_LM_MODEL") or "").strip()
+    if configured_id.startswith("openai/"):
+        configured_id = configured_id.removeprefix("openai/")
+    if configured_id and configured_id not in available_ids:
+        raise RuntimeError("DSPY_CONFIGURED_MODEL_NOT_AVAILABLE")
+    selected_id = configured_id or available_ids[0]
+    return dp.LM(
+        model=f"openai/{selected_id}",
+        api_base=endpoint,
+        api_key=api_key or os.environ.get("DSPY_LM_API_KEY") or "local-llama",
+        engine="lm15",
+        temperature=0.0,
+        max_tokens=1024,
+    )
+
+
+def build_repair_program_v1(*, lm_resolver: Callable[[], Any] | None = None) -> Any:
     """Construct the DSPy program lazily using the installed DSPy API."""
     dp = require_dspy()
+    resolve_lm = lm_resolver or resolve_native_dspy_lm_v1
 
     class DiagnoseRepair(dp.Signature):
         """Diagnose a code failure using only the supplied exact evidence."""
@@ -713,18 +758,24 @@ def build_repair_program_v1() -> Any:
             self.propose = dp.Predict(ProposeRepair)
 
         def forward(self, failure: str, context_manifest: str, constraints: str) -> Any:
-            diag = self.diagnose(
-                failure=failure,
-                context_manifest=context_manifest,
-                constraints=constraints,
-            )
-            prop = self.propose(
-                failure=failure,
-                diagnosis=diag.diagnosis,
-                target_candidates=diag.target_candidates,
-                context_manifest=context_manifest,
-                constraints=constraints,
-            )
+            # Resolve on the first actual repair request, not process startup or /health.
+            # This keeps liveness model-free and ensures no implicit LiteLLM fallback.
+            with dp.context(
+                lm=resolve_lm(),
+                adapter=dp.JSONAdapter(use_native_function_calling=False),
+            ):
+                diag = self.diagnose(
+                    failure=failure,
+                    context_manifest=context_manifest,
+                    constraints=constraints,
+                )
+                prop = self.propose(
+                    failure=failure,
+                    diagnosis=diag.diagnosis,
+                    target_candidates=diag.target_candidates,
+                    context_manifest=context_manifest,
+                    constraints=constraints,
+                )
             return dp.Prediction(
                 diagnosis=diag.diagnosis,
                 target_candidates=diag.target_candidates,

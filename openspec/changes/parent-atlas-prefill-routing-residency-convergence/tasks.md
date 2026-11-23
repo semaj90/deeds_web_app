@@ -59,6 +59,8 @@ upgrade the TensorRT-RTX or Atlas ranker parity gates.
 - [ ] ROUTE-04 Train/evaluate PyTorch MLP only on revision-qualified non-toy data.
 - [ ] ROUTE-05 Compare PyTorch MLP and XGBoost on the identical frozen split/tensor.
 
+Normalization helper status (2026-11-22): `python/atlas_compute/l2_normalization_v1.py` implements the differentiable stabilized contract `y = x / sqrt(sum(x*x) + epsilon)` with the exact VJP `g/r - x*(x·g)/r^3`; `sveltekit-frontend/src/wasm/vector-operations.ts` exposes matching forward/backward WASM exports. Python gradcheck and zero/small-vector cases pass, and the WASM smoke checks forward, backward, and ordinary batch unit normalization. These are reusable primitives only: no facial-geometry/22-feature model or ROUTE-04 training consumer was found, so they do not satisfy ROUTE-04/05 or change canonical `semantic_768` normalization. Keep physically meaningful geometry ratios unnormalized unless a named model contract requires otherwise; use ordinary unit normalization for cosine embeddings under their existing owner.
+
 Router evidence (read-only, 2026-09-17): `sveltekit-frontend/scripts/atlas/prove-query-router-154-fixture.mts` and `docs/reports/query-router-154-fixture-v1.json` prove fixture plumbing only: 128-value classification-MRL-shaped input plus the existing 26-value deterministic projection yields width 154, finite values, and L2-normalized fixture input. A real EmbeddingGemma execution/checksum is not proven by that older fixture. The repository also contains `retrieval-router-tensor-manifest-v2.ts` at width 234; ROUTE-01 is now resolved by the explicit projection receipt below, with no second live tensor owner introduced.
 
 Router projection evidence (read-only, 2026-09-18):

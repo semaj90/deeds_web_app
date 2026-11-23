@@ -24,6 +24,7 @@ import { json }           from '@sveltejs/kit';
 import { z }              from 'zod';
 import { pool }           from '$lib/server/db/client.js';
 import { searchDocCorpus } from '$lib/server/atlas/docs/doc-intelligence-read-model.js';
+import { readVerifiedCanonicalDocChunksV1 } from '$lib/server/atlas/docs/external-doc-citation-readback-v1.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
 
 const a2aAdmittedDocContextRequestSchema = z.object({
@@ -249,20 +250,11 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
       productVersion: parsed.data.productVersion ?? null,
       canonicalOfficialOnly: parsed.data.canonicalOfficialOnly
     });
-    const citations = docResult.hits
-      .filter((h) => Boolean(h.chunkId && h.url && h.chunkEvidenceRevision))
-      .map((h) => ({
-        schema: 'atlas.acp-admitted-doc-context.v1' as const,
-        canonicalAuthority: false as const,
-        chunkId: h.chunkId,
-        url: h.url,
-        provider: h.provider,
-        product: h.product,
-        productVersion: h.productVersion,
-        sourceRevision: h.revision,
-        chunkEvidenceRevision: h.chunkEvidenceRevision,
-        excerpt: h.excerpt
-      }));
+    const citationReadback = await readVerifiedCanonicalDocChunksV1({ pool, hits: docResult.hits });
+    const citations = citationReadback.citations.map((citation) => ({
+      schema: 'atlas.acp-admitted-doc-context.v1' as const,
+      ...citation,
+    }));
     return json({
       jsonrpc: '2.0',
       id: task.id,
@@ -282,6 +274,8 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
                   writesPerformed: false,
                   mode: docResult.mode,
                   query: docResult.query,
+                  citationReadbackStatus: citationReadback.status,
+                  citationBlockers: citationReadback.blockers,
                   citations
                 }
               }

@@ -18,7 +18,7 @@ interface RetrievalServiceClient {
     metadata: Metadata,
     options: { deadline: Date },
     callback: (error: Error | null, response?: Record<string, any>) => void
-  ): void;
+  ): { cancel?: () => void };
   close(): void;
 }
 
@@ -114,16 +114,31 @@ export async function retrieveFromGo(
   options?: {
     topK?: number;
     lanes?: RetrievalLane[];
+    deadlineMs?: number;
+    signal?: AbortSignal;
+    authToken?: string;
+    disableHttpFallback?: boolean;
   }
 ): Promise<RetrieveResponse> {
   assertAtlasRuntimeRevisionQualified(runtime);
+  if (options?.signal?.aborted) {
+    throw new Error('ATLAS_GRPC_CALL_ABORTED');
+  }
   try {
     const client = await getRetrievalGrpcClient();
     const metadata = new Metadata();
     metadata.add('workspace-revision', runtime.workspaceRevision);
     metadata.add('run-id', runtime.runId);
+    metadata.add('packet-key', runtime.packetKey);
+    metadata.add('packet-revision', runtime.packetRevision);
+    const bearer = options?.authToken ?? process.env.TRACE_MCP_OPERATOR_TOKEN;
+    if (bearer && bearer.trim().length > 0) {
+      metadata.add('authorization', `Bearer ${bearer.trim()}`);
+    }
+    const deadlineMs = options?.deadlineMs ?? 10_000;
     const response = await new Promise<Record<string, any>>((resolve, reject) => {
-      client.searchCodebase(
+      let settled = false;
+      const call = client.searchCodebase(
         {
           query,
           limit: options?.topK ?? 12,
@@ -138,9 +153,26 @@ export async function retrieveFromGo(
           },
         },
         metadata,
-        { deadline: new Date(Date.now() + 10_000) },
-        (error, result) => error ? reject(error) : resolve(result ?? {}),
+        { deadline: new Date(Date.now() + deadlineMs) },
+        (error, result) => {
+          if (settled) return;
+          settled = true;
+          error ? reject(error) : resolve(result ?? {});
+        },
       );
+      if (options?.signal) {
+        const onAbort = () => {
+          if (settled) return;
+          settled = true;
+          call?.cancel?.();
+          reject(new Error('ATLAS_GRPC_CALL_ABORTED'));
+        };
+        if (options.signal.aborted) {
+          onAbort();
+        } else {
+          options.signal.addEventListener('abort', onAbort, { once: true });
+        }
+      }
     });
     const receipt = response.receipt;
     const mappedReceipt = mapGoReceiptV2(receipt ? {
@@ -200,6 +232,13 @@ export async function retrieveFromGo(
       receipt: mappedReceipt,
     };
   } catch (err) {
+    if (
+      options?.disableHttpFallback ||
+      options?.signal?.aborted ||
+      (err instanceof Error && err.message === 'ATLAS_GRPC_CALL_ABORTED')
+    ) {
+      throw err;
+    }
     console.error('gRPC retrieval failed, falling back to HTTP:', err);
     return retrieveFromGoHttp(runtime, query, options);
   }
@@ -274,6 +313,13 @@ interface GoToolReceiptV2Http {
 
 function mapGoReceiptV2(receipt: GoToolReceiptV2Http | undefined): RuntimeToolReceiptV1 | undefined {
   if (!receipt) return undefined;
+  const rawStatus = receipt.validation_status;
+  const normalizedStatus =
+    rawStatus === 'REVIEW_REQUIRED'
+      ? 'WARN'
+      : rawStatus === 'UNAVAILABLE'
+        ? 'FAIL'
+        : rawStatus;
   const parsed = RuntimeToolReceiptV1Schema.safeParse({
     schema: 'atlas.runtime-tool-receipt.v1',
     receiptId: receipt.receipt_id,
@@ -290,7 +336,7 @@ function mapGoReceiptV2(receipt: GoToolReceiptV2Http | undefined): RuntimeToolRe
     errorCode: receipt.error_code ?? null,
     retrievalConfidence: receipt.retrieval_confidence ?? null,
     evidenceCount: receipt.evidence_count,
-    validationStatus: receipt.validation_status,
+    validationStatus: normalizedStatus,
     outputChecksum: receipt.output_checksum ?? null,
     writesPerformed: receipt.writes_performed,
     canonicalAuthority: receipt.canonical_authority,

@@ -14,6 +14,8 @@ import {
   buildCodebaseFileLookupKeys,
   collapseDependencyRows,
   findDependencies,
+  inspectPostgresBackend,
+  traceDatabase,
   assertOutcomeReceiptScratchUrl,
   recommendKanbanDagPrefillAlgorithm,
   validateToolCallArguments,
@@ -23,6 +25,10 @@ import {
 const ROOT = 'C:/Users/james/Videos/deeds-web-app';
 
 test('MCP call arguments are validated against the exact schema advertised by tools/list', async () => {
+  const initialized = await dispatch('initialize', {}, 0);
+  const listed = await dispatch('tools/list', {}, 0);
+  assert.equal(initialized.serverInfo.version, '0.4.0');
+  assert.ok(listed.tools.some((tool) => tool.name === 'inspect_postgres_backend'));
   assert.equal(validateToolCallArguments('classify_intent', { prompt: 'repair this error' }).valid, true);
   assert.equal(validateToolCallArguments('classify_intent', {}).valid, false);
   assert.equal(validateToolCallArguments('classify_intent', { prompt: 'repair', unexpected: true }).valid, false);
@@ -41,6 +47,151 @@ test('MCP call arguments are validated against the exact schema advertised by to
   }, 2);
   assert.equal(validCall.isError, undefined);
   assert.equal(JSON.parse(validCall.content[0].text).intent, 'repair');
+});
+
+test('inspect_postgres_backend checks PostgreSQL 18 tables inside a read-only transaction without touching Neo4j or Valkey', async () => {
+  const sql = [];
+  class FakePool {
+    constructor(options) { this.options = options; }
+    async query(statement) {
+      sql.push(statement.trim());
+      if (statement.includes('current_database()')) {
+        return { rows: [{ database: 'atlas_test', version_num: 180004, transaction_read_only: true }] };
+      }
+      if (statement.includes('to_regclass')) {
+        return { rows: [{
+          workspace_source_bindings: true,
+          codebase_chunk_index: true,
+          graph_snapshots: true,
+          graph_nodes: true,
+          graph_edges: true,
+        }] };
+      }
+      if (statement.includes('GROUP BY status')) {
+        return { rows: [{ status: 'SUPERSEDED', count: 2, revision_qualified_count: 0 }] };
+      }
+      if (statement.includes('GROUP BY s.status')) {
+        return { rows: [{ status: 'SUPERSEDED', edge_type: 'CONTAINS', count: 5 }] };
+      }
+      return { rows: [] };
+    }
+    async end() {}
+  }
+  const result = await inspectPostgresBackend({ poolFactory: FakePool });
+  assert.equal(result.status, 'READY');
+  assert.match(result.serverBuildRevision, /^[a-f0-9]{64}$/);
+  assert.equal(result.postgres.database, 'atlas_test');
+  assert.equal(result.postgres.majorVersion, 18);
+  assert.equal(result.postgres.transactionReadOnly, true);
+  assert.equal(result.graphSnapshotSummary.status, 'SUPERSEDED_OR_REJECTED_ONLY');
+  assert.equal(result.graphSnapshotSummary.snapshotCount, 2);
+  assert.equal(result.graphSnapshotSummary.revisionQualifiedSnapshotCount, 0);
+  assert.deepEqual(result.graphSnapshotSummary.edgeTypeCountsByStatus, [{ status: 'SUPERSEDED', edgeType: 'CONTAINS', count: 5 }]);
+  assert.equal(result.otherBackends.neo4j, 'NOT_QUERIED');
+  assert.equal(result.otherBackends.valkey, 'NOT_QUERIED');
+  assert.equal(result.canonicalAuthority, false);
+  assert.equal(result.writesPerformed, false);
+  assert.match(sql[0], /^BEGIN READ ONLY$/);
+  assert.equal(sql.at(-1), 'ROLLBACK');
+  assert.equal(validateToolCallArguments('inspect_postgres_backend', {}).valid, true);
+  assert.equal(validateToolCallArguments('inspect_postgres_backend', { query: 'unexpected' }).valid, false);
+});
+
+test('inspect_postgres_backend reports unavailable or incomplete databases without fallback', async () => {
+  class UnavailablePool {
+    constructor() {}
+    async query() { throw Object.assign(new Error('connection refused'), { code: 'ECONNREFUSED' }); }
+    async end() {}
+  }
+  const unavailable = await inspectPostgresBackend({ poolFactory: UnavailablePool });
+  assert.equal(unavailable.status, 'UNAVAILABLE');
+  assert.equal(unavailable.failure, 'POSTGRES_QUERY_FAILED:ECONNREFUSED');
+  assert.equal(unavailable.otherBackends.neo4j, 'NOT_QUERIED');
+
+  class IncompletePool {
+    constructor() {}
+    async query(statement) {
+      if (statement.includes('current_database()')) {
+        return { rows: [{ database: 'atlas_test', version_num: 180004, transaction_read_only: true }] };
+      }
+      return { rows: [{ workspace_source_bindings: true, codebase_chunk_index: true, graph_snapshots: false, graph_nodes: false, graph_edges: false }] };
+    }
+    async end() {}
+  }
+  const incomplete = await inspectPostgresBackend({ poolFactory: IncompletePool });
+  assert.equal(incomplete.status, 'SCHEMA_INCOMPLETE');
+  assert.equal(incomplete.tables.graphEdges, false);
+  assert.equal(incomplete.graphSnapshotSummary.status, 'NO_SNAPSHOTS');
+});
+
+test('trace_database searches PostgreSQL read-only and returns only revision-bound lexical candidates', async () => {
+  const statements = [];
+  const digest = 'a'.repeat(64);
+  class FakePool {
+    constructor(options) { this.options = options; }
+    async query(statement, values) {
+      statements.push({ sql: statement.trim(), values });
+      if (statement.includes('WITH q AS')) return { rows: [
+        {
+          source_ref: 'src/lib/server/db/example.ts', chunk_id: 'chunk-1', relative_path: 'src/lib/server/db/example.ts',
+          symbol: 'loadRows', kind: 'function', line_start: 8, line_end: 14, content: 'FROM atlas_external_doc_chunks',
+          file_content_hash: digest, content_digest: digest, source_revision: digest,
+          workspace_revision: 'b'.repeat(64), binding_observed_at: new Date('2026-11-20T00:00:00Z'), score: 0.75,
+        },
+        {
+          source_ref: 'src/lib/server/db/stale.ts', chunk_id: 'chunk-2', relative_path: 'src/lib/server/db/stale.ts',
+          symbol: null, kind: null, line_start: 1, line_end: 2, content: 'stale mention',
+          file_content_hash: digest, content_digest: digest, source_revision: 'c'.repeat(64),
+          workspace_revision: 'b'.repeat(64), score: 0.5,
+        },
+        {
+          source_ref: 'src/lib/server/db/changed-after-index.ts', chunk_id: 'chunk-3', relative_path: 'src/lib/server/db/changed-after-index.ts',
+          symbol: null, kind: null, line_start: 2, line_end: 3, content: 'indexed text no longer matches disk',
+          file_content_hash: digest, content_digest: digest, source_revision: digest,
+          workspace_revision: 'b'.repeat(64), score: 0.4,
+        },
+      ] };
+      return { rows: [] };
+    }
+    async end() {}
+  }
+  const result = await traceDatabase({ query: ' atlas_external_doc_chunks ' }, {
+    poolFactory: FakePool,
+    sourceFileHashResolver: (sourceRef) => ({
+      sha256: sourceRef.includes('changed-after-index') ? `sha256:${'d'.repeat(64)}` : `sha256:${digest}`,
+      byteLength: 128,
+    }),
+  });
+  assert.equal(result.lookup.backend, 'POSTGRESQL_CODE_INDEX_FTS');
+  assert.equal(result.lookup.status, 'CANDIDATES_FOUND');
+  assert.equal(result.traces.length, 1);
+  assert.equal(result.traces[0].sourceRef, 'src/lib/server/db/example.ts');
+  assert.equal(result.traces[0].relationStatus, 'LEXICAL_MENTION_CANDIDATE');
+  assert.equal(result.lookup.currentWorkspaceBytesHashed, 256);
+  assert.equal(result.provenance.status, 'REVISION_BOUND_CANDIDATES');
+  assert.equal(result.canonicalAuthority, false);
+  assert.equal(result.writesPerformed, false);
+  assert.equal(statements[0].sql, 'BEGIN READ ONLY');
+  assert.equal(statements[1].values[0], 'atlas_external_doc_chunks');
+  assert.match(statements[1].sql, /latest_observation/);
+  assert.match(statements[1].sql, /JOIN LATERAL/);
+  assert.doesNotMatch(statements[1].sql, /OR\s+c\.(?:source_ref|relative_path)\s*=\s*b\.canonical_source_ref/i);
+  assert.equal(result.traces[0].bindingObservedAt, '2026-11-20T00:00:00.000Z');
+  assert.equal(statements.at(-1).sql, 'ROLLBACK');
+});
+
+test('trace_database rejects empty input and reports PostgreSQL failure without Neo4j fallback', async () => {
+  const empty = await traceDatabase({ query: '  ' });
+  assert.equal(empty.lookup.failure, 'EMPTY_QUERY');
+  class UnavailablePool {
+    constructor() {}
+    async query() { throw Object.assign(new Error('unavailable'), { code: 'ECONNREFUSED' }); }
+    async end() {}
+  }
+  const unavailable = await traceDatabase({ query: 'accounts' }, { poolFactory: UnavailablePool });
+  assert.equal(unavailable.lookup.failure, 'POSTGRES_QUERY_FAILED:ECONNREFUSED');
+  assert.equal(unavailable.traces.length, 0);
+  assert.equal(unavailable.provenance.authority, 'postgresql_source_index');
 });
 
 test('outcome receipt persistence accepts only an explicit loopback scratch database', () => {
@@ -193,105 +344,87 @@ test('rows from both node families collapse to one deduplicated edge list and ke
   assert.equal(calls.viaFlaggedDuplicate, true); // only ever reached through a duplicate-tagged node
 });
 
-function fakeDriver(scripted) {
-  const queries = [];
-  return {
-    queries,
-    session() {
-      return {
-        async run(cypher, params) {
-          queries.push({ cypher, params });
-          const rows = scripted.shift() ?? [];
-          return { records: rows.map((row) => ({ toObject: () => row })) };
-        },
-        async close() {},
-      };
-    },
+test('findDependencies uses the canonical source revision and Atlas graph resolver, without a Neo4j fallback', async () => {
+  const sourceIdentity = {
+    sourceRef: 'src/a.ts',
+    sourceRevision: `sha256:${'a'.repeat(64)}`,
+    workspaceRevision: `sha256:${'b'.repeat(64)}`,
   };
-}
-
-test('findDependencies reaches both families in one query and never claims canonical authority', async () => {
-  const driver = fakeDriver([[
-    { nodePath: 'src/a.ts', flagged: null, type: 'IMPORTS', depPath: 'src/b.ts', depKind: 'CodebaseFile' },
-    { nodeFilePath: `${ROOT}/sveltekit-frontend/src/a.ts`, flagged: 'ABSOLUTE_DUPLICATE', type: 'CALLS', depKind: 'Function', depName: 'helper' },
-  ]]);
-  const result = await findDependencies({ target: 'sveltekit-frontend/src/a.ts' }, { driver });
-  assert.equal(driver.queries.length, 1, 'phase A hit, so no fallback scan');
-  assert.deepEqual(driver.queries[0].params.pathKeys, ['src/a.ts']);
-  assert.equal(result.lookup.phase, 'A');
+  let graphInput;
+  const result = await findDependencies(
+    { target: 'sveltekit-frontend/src/a.ts' },
+    {
+      sourceIndexResolver: async (_target, keys) => ({ ok: true, identity: { ...sourceIdentity, sourceRef: keys.canonical } }),
+      graphResolver: async (input) => {
+        graphInput = input;
+        return {
+          target: 'src/a.ts',
+          dependencies: [{ dep: 'src/b.ts', type: 'IMPORTS', evidenceRefs: ['ast:src/a.ts:0-10'], pageRankPrior: 0.5 }],
+          failure: null,
+          graphRevision: `sha256:${'c'.repeat(64)}`,
+          sourceRevision: sourceIdentity.sourceRevision,
+          workspaceRevision: sourceIdentity.workspaceRevision,
+          evidenceRefs: ['ast:src/a.ts:0-10'],
+          pageRank: { backend: 'networkx' },
+          canonicalAuthority: false,
+          writesPerformed: false,
+        };
+      },
+    },
+  );
+  assert.equal(graphInput.target, 'src/a.ts');
+  assert.equal(graphInput.sourceIdentity.sourceRevision, sourceIdentity.sourceRevision);
+  assert.equal(result.lookup.phase, 'atlas-graph');
   assert.equal(result.lookup.failure, null);
-  assert.deepEqual(result.lookup.nodesMatched.map((n) => n.family).sort(), ['filePath', 'path']);
-  assert.equal(result.dependencies.length, 2);
+  assert.deepEqual(result.dependencies.map((row) => row.dep), ['src/b.ts']);
+  assert.equal(result.provenance.graphRevision, `sha256:${'c'.repeat(64)}`);
+  assert.equal(result.provenance.pageRankBackend, 'networkx');
   assert.equal(result.canonicalAuthority, false);
   assert.equal(result.writesPerformed, false);
+});
+
+test('an unindexed or stale source fails closed before graph traversal', async () => {
+  let graphCalls = 0;
+  const missing = await findDependencies(
+    { target: 'src/missing.ts' },
+    { sourceIndexResolver: async () => ({ ok: false, failure: 'SOURCE_NOT_INDEXED' }), graphResolver: async () => { graphCalls += 1; return {}; } },
+  );
+  assert.equal(missing.lookup.failure, 'SOURCE_NOT_INDEXED');
+  assert.equal(missing.provenance.authority, 'atlas_typed_graph_projection');
+  assert.equal(graphCalls, 0);
+
+  const empty = await findDependencies({ target: '  ' }, {
+    sourceIndexResolver: async () => { throw new Error('must not run'); },
+    graphResolver: async () => { throw new Error('must not run'); },
+  });
+  assert.equal(empty.lookup.failure, 'EMPTY_TARGET');
+});
+
+test('graph artifact errors remain typed unresolved results and never fall back to Neo4j', async () => {
+  const result = await findDependencies(
+    { target: 'src/a.ts' },
+    {
+      sourceIndexResolver: async (_target, keys) => ({ ok: true, identity: { sourceRef: keys.canonical, sourceRevision: `sha256:${'a'.repeat(64)}`, workspaceRevision: `sha256:${'b'.repeat(64)}` } }),
+      graphResolver: async () => ({ failure: 'SOURCE_GRAPH_PLAN_INCOMPLETE', dependencies: [], graphRevision: null }),
+    },
+  );
+  assert.equal(result.lookup.failure, 'SOURCE_GRAPH_PLAN_INCOMPLETE');
   assert.equal(result.provenance.graphRevision, null);
-  assert.equal(result.provenance.status, 'UNRESOLVED'); // a projection hit is not admitted evidence
-});
-
-test('a miss falls back to the case-insensitive scan, and a second miss is reported as PROJECTION_MISSING_FILE', async () => {
-  const driver = fakeDriver([[], []]);
-  const result = await findDependencies({ target: 'src/brand-new-file.ts' }, { driver });
-  assert.equal(driver.queries.length, 2);
-  assert.match(driver.queries[1].cypher, /toLower/);
-  assert.equal(result.lookup.phase, 'B');
-  assert.equal(result.lookup.failure, 'PROJECTION_MISSING_FILE');
   assert.deepEqual(result.dependencies, []);
+  assert.equal(result.canonicalAuthority, false);
 });
 
-test('a node with no outgoing edge is distinguished from a missing node', async () => {
-  const driver = fakeDriver([[{ nodePath: 'src/leaf.ts', flagged: null, type: null }]]);
-  const result = await findDependencies({ target: 'src/leaf.ts' }, { driver });
-  assert.equal(result.lookup.failure, 'NO_OUTGOING_EDGES');
-  assert.equal(result.lookup.nodesMatched.length, 1);
-});
-
-test('the row cap truncates and says so', async () => {
-  const many = Array.from({ length: 600 }, (_, i) => ({ nodePath: 'src/hub.ts', flagged: null, type: 'IMPORTS', depPath: `src/dep-${i}.ts`, depKind: 'CodebaseFile' }));
-  const driver = fakeDriver([many]);
-  const result = await findDependencies({ target: 'src/hub.ts' }, { driver });
-  assert.equal(result.lookup.truncated, true);
-  assert.equal(result.dependencies.length, 500);
-  assert.equal(result.lookup.rowCap, 500);
-});
-
-test('an empty target is rejected before any query is sent', async () => {
-  const driver = fakeDriver([]);
-  const result = await findDependencies({ target: '  ' }, { driver });
-  assert.equal(driver.queries.length, 0);
-  assert.equal(result.lookup.failure, 'EMPTY_TARGET');
-});
-
-test('an exact-key hit in only one family triggers the case-insensitive scan, whose superset replaces the partial result', async () => {
-  const partial = [{ nodePath: 'src/lib/Example.ts', flagged: null, type: 'IMPORTS', depPath: 'src/b.ts', depKind: 'CodebaseFile' }];
-  const superset = [
-    ...partial,
-    { nodeFilePath: `${ROOT}/sveltekit-frontend/src/lib/Example.ts`, flagged: 'ABSOLUTE_DUPLICATE', type: 'CALLS', depKind: 'Function', depName: 'helper' },
-  ];
-  const driver = fakeDriver([partial, superset]);
-  const result = await findDependencies({ target: 'SRC/LIB/EXAMPLE.TS' }, { driver });
-  assert.equal(driver.queries.length, 2);
-  assert.equal(result.lookup.phase, 'B');
-  assert.deepEqual(result.lookup.nodesMatched.map((n) => n.family).sort(), ['filePath', 'path']);
-  assert.deepEqual(result.dependencies.map((d) => d.type).sort(), ['CALLS', 'IMPORTS']);
-});
-
-test('a file found in both families on the first query does not pay for the second scan', async () => {
-  const both = [
-    { nodePath: 'src/a.ts', flagged: null, type: 'IMPORTS', depPath: 'src/b.ts', depKind: 'CodebaseFile' },
-    { nodeFilePath: 'sveltekit-frontend/src/a.ts', flagged: null, type: 'CALLS', depKind: 'Function', depName: 'f' },
-  ];
-  const driver = fakeDriver([both]);
-  const result = await findDependencies({ target: 'src/a.ts' }, { driver });
-  assert.equal(driver.queries.length, 1);
-  assert.equal(result.lookup.phase, 'A');
-});
-
-test('a symbol name is reported as TARGET_NOT_A_PATH, not as a missing file', async () => {
-  const driver = fakeDriver([[], []]);
-  const result = await findDependencies({ target: 'planGraphifyEdgeReplayV1' }, { driver });
-  assert.equal(result.lookup.failure, 'TARGET_NOT_A_PATH');
-  const missing = await findDependencies({ target: 'src/not-there.ts' }, { driver: fakeDriver([[], []]) });
-  assert.equal(missing.lookup.failure, 'PROJECTION_MISSING_FILE');
+test('unqualified graph resolver output cannot be presented as dependencies', async () => {
+  const result = await findDependencies(
+    { target: 'src/a.ts' },
+    {
+      sourceIndexResolver: async (_target, keys) => ({ ok: true, identity: { sourceRef: keys.canonical, sourceRevision: `sha256:${'a'.repeat(64)}`, workspaceRevision: `sha256:${'b'.repeat(64)}` } }),
+      graphResolver: async () => ({ dependencies: [{ type: 'IMPORTS', dep: 'src/b.ts', evidenceRefs: [] }] }),
+    },
+  );
+  assert.equal(result.lookup.failure, 'ATLAS_GRAPH_RESOLVER_RESPONSE_UNQUALIFIED');
+  assert.deepEqual(result.dependencies, []);
+  assert.equal(result.provenance.status, 'UNRESOLVED');
 });
 
 const REAL_PACKET = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '../../../reports/semantic-contracts/reconciliation-ace-packet.json');
@@ -695,4 +828,48 @@ test('a packet key is reported as unsupported instead of guessed, and empty inpu
   assert.equal(trace.calls.length, 0);
   const empty = await findSourceRefs({}, { trace });
   assert.equal(empty.lookup.failure, 'EMPTY_INSPECT_INPUT');
+});
+
+test('findDependencies forwards direction=incoming to the Atlas graph resolver', async () => {
+  const seenRequests = [];
+  const sourceRev = `sha256:${'a'.repeat(64)}`;
+  const workspaceRev = `sha256:${'b'.repeat(64)}`;
+  const graphRev = `sha256:${'c'.repeat(64)}`;
+  const result = await findDependencies(
+    { target: 'src/lib/leaf.ts', direction: 'incoming' },
+    {
+      sourceIndexResolver: async (_target, keys) => ({
+        ok: true,
+        identity: { sourceRef: keys.canonical, sourceRevision: sourceRev, workspaceRevision: workspaceRev },
+      }),
+      graphResolver: async (req) => {
+        seenRequests.push(req);
+        return {
+          target: req.target,
+          direction: req.direction,
+          graphRevision: graphRev,
+          sourceRevision: sourceRev,
+          workspaceRevision: workspaceRev,
+          canonicalAuthority: false,
+          writesPerformed: false,
+          dependencies: [
+            {
+              dep: 'src/lib/caller.ts',
+              depCanonical: 'src/lib/caller.ts',
+              type: 'IMPORTS',
+              evidenceRefs: ['ast:src/lib/caller.ts:bytes:0-24'],
+              pageRankPrior: 0.42,
+            },
+          ],
+          evidenceRefs: ['ast:src/lib/caller.ts:bytes:0-24'],
+        };
+      },
+    },
+  );
+  assert.equal(seenRequests.length, 1);
+  assert.equal(seenRequests[0].direction, 'incoming');
+  assert.equal(result.lookup.failure, null);
+  assert.equal(result.dependencies.length, 1);
+  assert.equal(result.dependencies[0].dep, 'src/lib/caller.ts');
+  assert.equal(result.provenance.authority, 'atlas_typed_graph_projection');
 });

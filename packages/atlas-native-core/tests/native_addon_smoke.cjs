@@ -150,4 +150,25 @@ assert.throws(() => addon.assembleLodTextureBlockV1(lodValues, -1, 13, 5), /cand
 assert.throws(() => addon.assembleLodTextureBlockV1(lodValues, 91, 65536, 5), /somBmuId must be uint16/);
 assert.throws(() => addon.assembleLodTextureBlockV1(Float32Array.from({ length: 128 }, () => Number.NaN), 91, 13, 5), /non-finite/);
 
+// TensorHandleV1 4x4x6 (160B) N-API encode/decode, Mode-7 affine transform, and 7-state SafeTileResidencyStateV1 FSM
+const thValues96 = Float32Array.from({ length: 96 }, (_, i) => Math.sin(i * 0.37) * 1.25 + (i % 6) * 0.4);
+const thAffine = Float32Array.from([1.5, -0.25, 10.0, 0.25, 1.5, -4.0]);
+const thWsRev = 0x1122334455667788n;
+const thSrcRev = 0x99aabbccddeeff00n;
+const thBuf = addon.encodeTensorHandle4x4x6V1(thValues96, 42, 3, 127, thWsRev, thSrcRev, thAffine, 3, 2);
+assert.equal(thBuf.length, 160);
+assert.equal(thBuf.readUInt32LE(0), 0x54485631);
+const thDecoded = addon.decodeTensorHandle4x4x6V1(thBuf, thWsRev);
+assert.equal(thDecoded.length, 96);
+for (let i = 0; i < 96; i++) {
+  assert.ok(Math.abs(thDecoded[i] - thValues96[i]) <= 0.15, `INT4 quantization error out of bound at ${i}`);
+}
+assert.throws(() => addon.decodeTensorHandle4x4x6V1(thBuf, 0xdeadbeefn), /TENSOR_HANDLE_V1_STALE_WORKSPACE_REVISION/);
+assert.equal(addon.transitionSafeTileResidencyV1(0, 1, false, 0, true), 1);
+assert.throws(() => addon.transitionSafeTileResidencyV1(2, 3, false, 0, true), /SAFE_RESIDENCY_GPU_READY_REQUIRES_TRANSFER_COMPLETE/);
+assert.equal(addon.transitionSafeTileResidencyV1(3, 4, true, 0, false), 0);
+const mode7Pt = addon.projectMode7Affine2x3V1(thAffine, 2.0, 4.0);
+assert.ok(Math.abs(mode7Pt[0] - 12.0) < 1e-5);
+assert.ok(Math.abs(mode7Pt[1] - 2.5) < 1e-5);
+
 process.stdout.write('node_api_smoke=PASS\n');

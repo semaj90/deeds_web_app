@@ -1,5 +1,9 @@
 import type { IndexedTexture4BppV1 } from './indexed-palette-texture-v1.js';
 import {
+	IDENTITY_MODE7_UV_AFFINE_V1,
+	type Mode7UvAffineV1,
+} from './mode7-uv-affine-v1.js';
+import {
 	createIndexedPaletteShaderMaterialV1,
 	createIndexedPaletteShaderTexturesV1,
 	createIndexedPaletteTslMaterialV1,
@@ -37,7 +41,8 @@ export function applyIndexedPaletteToObjectV1(
 	indexed: IndexedTexture4BppV1,
 	rgbaTexture: any,
 	backend: IndexedPaletteBackendV1,
-	maxTextureSize = 4096
+	maxTextureSize = 4096,
+	uvAffine: Mode7UvAffineV1 = IDENTITY_MODE7_UV_AFFINE_V1,
 ): IndexedPaletteObjectApplicationV1 {
 	if (!root || typeof root.traverse !== 'function') throw new TypeError('INDEXED_PALETTE_OBJECT_ROOT_INVALID');
 	if (!rgbaTexture) throw new TypeError('INDEXED_PALETTE_OBJECT_RGBA_TEXTURE_REQUIRED');
@@ -70,9 +75,9 @@ export function applyIndexedPaletteToObjectV1(
 
 		let next: any;
 		if (path === 'webgl2-glsl-packed') {
-			next = createIndexedPaletteShaderMaterialV1(three, source, indexed, maxTextureSize, textures!).material;
+			next = createIndexedPaletteShaderMaterialV1(three, source, indexed, maxTextureSize, textures!, uvAffine).material;
 		} else if (path === 'webgpu-tsl-packed') {
-			next = createIndexedPaletteTslMaterialV1(three, source, indexed, maxTextureSize, textures!).material;
+			next = createIndexedPaletteTslMaterialV1(three, source, indexed, maxTextureSize, textures!, uvAffine).material;
 		} else {
 			next = source;
 		}

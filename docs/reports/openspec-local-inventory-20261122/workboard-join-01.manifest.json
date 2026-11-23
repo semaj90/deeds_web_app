@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.openspec.task-inventory-workboard-join-manifest.v1",
+  "readOnlyProjection": true,
+  "writesPerformed": false,
+  "joinPolicy": "EXACT_SOURCE_PATH_LINE_AND_SOURCE_FILE_SHA256; NO_TITLE_OR_CODE_FALLBACK",
+  "inputs": {
+    "inventory": "docs\\reports\\openspec-local-inventory-20261122\\openspec-task-extract-v1.local-review-03.all.jsonl",
+    "inventorySha256": "sha256:85d5025c6a0534e58ba23c59782838c2939d30c4cc95af71044a3ae0b3faa79b",
+    "snapshot": ".tmp\\atlas\\openspec-workboard-task-snapshot-local.json",
+    "snapshotSha256": "sha256:977fcbc364055d3f7d272ba724a7b51497fc14633f055e43db84bfbfecf4f82c",
+    "snapshotSchema": "atlas.openspec.workboard-task-snapshot.v1",
+    "snapshotGeneratedAt": "2026-11-22T16:31:55.567Z",
+    "snapshotTaskCount": 14848
+  },
+  "output": {
+    "path": "docs\\reports\\openspec-local-inventory-20261122\\workboard-join-01.jsonl",
+    "sha256": "sha256:081deca5b803bb3df7ac2a589f4f20cd4b6886c40513e0c80b19dadc6a1356c8"
+  },
+  "rowCount": 16189,
+  "joinStatusCounts": {
+    "MATCHED_EXACT_SOURCE_REVISION": 14848,
+    "OUTSIDE_WORKBOARD_SNAPSHOT_SCOPE": 1341
+  },
+  "programClassificationCountsOnExactMatches": {
+    "CHANGE_FALLBACK_REVIEW": 2482,
+    "TASK_TEXT_RULE": 9658,
+    "UNCLASSIFIED_REVIEW_REQUIRED": 2708
+  },
+  "programLabelDispositionCounts": {
+    "CHANGE_FALLBACK_REVIEW_ONLY": 2482,
+    "HEURISTIC_CANDIDATE_ONLY": 9658,
+    "NO_CANDIDATE_REVIEW_REQUIRED": 2708,
+    "NO_EXACT_TASK_JOIN": 1341
+  },
+  "reviewedTaskDomainLabelCount": 0,
+  "exactMatchesWithLogicalTaskKey": 6263,
+  "exactMatchesWithoutLogicalTaskKey": 8585,
+  "declaredTaskCodeRows": 4551,
+  "declaredTaskCodeExactMatches": 4063
+}
