@@ -2,11 +2,14 @@ import { writeFileSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  inspectGraphArtifacts, readOwnershipIndex, readTrackedInventory, searchDailySources,
+  inspectGraphArtifacts, readOwnershipIndex, readStatus, readTrackedInventory, searchDailySources,
 } from './lib/graphify-daily-discovery-v1.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const help = `Daily Graphify discovery (local, read-only; JSON to stdout)
+  node scripts/atlas/graphify-daily-discovery-v1.mjs status [--valkey]
+    status reads the last lifecycle receipt, the newest admission audit, host RAM/VRAM and (with --valkey) read-only
+    SCAN counts of centroid/bitfrost/gpu/ace keys. It starts nothing and writes nothing.
   node scripts/atlas/graphify-daily-discovery-v1.mjs [inspect] [--sizes] [--hash-graphs]
   node scripts/atlas/graphify-daily-discovery-v1.mjs search --query ContextManifest [--limit 20] [--include-untracked]
     [--owner parent-atlas-retrieval-lineage-dag-convergence]
@@ -20,11 +23,14 @@ async function main() {
   const args = process.argv.slice(2);
   if (args.includes('--help')) { console.log(help); return; }
   const mode = args[0] && !args[0].startsWith('--') ? args.shift() : 'inspect';
-  if (!['inspect', 'search'].includes(mode)) throw new Error('MODE_MUST_BE_INSPECT_OR_SEARCH');
+  if (!['inspect', 'search', 'status'].includes(mode)) throw new Error('MODE_MUST_BE_INSPECT_SEARCH_OR_STATUS');
   const options = {};
   for (let index = 0; index < args.length; index++) {
     const flag = args[index];
-    if (flag === '--include-untracked') {
+    if (flag === '--valkey') {
+      if (mode !== 'status' || options.valkey) throw new Error('INVALID_STATUS_OPTION');
+      options.valkey = true;
+    } else if (flag === '--include-untracked') {
       if (mode !== 'search' || options.includeUntracked) throw new Error('INVALID_SEARCH_OPTION');
       options.includeUntracked = true;
     } else if (flag === '--hash-graphs' || flag === '--sizes') {
@@ -41,6 +47,17 @@ async function main() {
     throw new Error('SEARCH_OPTIONS_REQUIRE_SEARCH_MODE');
   }
   let body;
+  if (mode === 'status') {
+    const status = readStatus(root, options);
+    const report = {
+      schema: 'atlas.graphify-daily-status.v1', observedAt: new Date().toISOString(), mode: 'status',
+      status: status.recommendationReady ? 'READY' : 'BLOCKED', canonicalAuthority: false,
+      sourceWritesPerformed: false, datastoreWritesPerformed: false, localArtifactWritesPerformed: false,
+      promotionAuthorized: false, ...status,
+    };
+    process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+    return;
+  }
   if (mode === 'inspect') {
     const { trackedPaths, summary } = readTrackedInventory(root, options);
     body = { inventory: summary, ownership: readOwnershipIndex(root),

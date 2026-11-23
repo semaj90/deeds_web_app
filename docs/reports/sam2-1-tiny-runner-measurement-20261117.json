@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.sam2-runner-measurement.v1",
+  "runtime": {
+    "package": "SAM-2 1.0",
+    "gitRepo": "https://github.com/facebookresearch/sam2.git",
+    "gitCommit": "2b90b9f5ceec907a1c18123530e92e794ad901a4",
+    "venv": "C:/Users/james/.venvs/sam2-tiny",
+    "torch": "2.8.0+cu128",
+    "torchvision": "0.23.0+cu128",
+    "psutil": "7.0.0",
+    "sharedVenvModified": false,
+    "cudaExtensionBuilt": false
+  },
+  "checkpoint": {
+    "file": "models/sam2/sam2.1_hiera_tiny.pt",
+    "bytes": 156008466,
+    "sha256": "7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69",
+    "officialContentLengthMatch": true,
+    "license": "Apache-2.0"
+  },
+  "runnerProcessMeasurement": {
+    "exitCode": 0,
+    "latencySeconds": 6.56,
+    "peakProcessTreeRssMiB": 1431.3,
+    "gpuUsedBeforeMiB": 5104,
+    "gpuUsedPeakMiB": 6104,
+    "gpuUsedAfterExitMiB": 5103,
+    "runnerReportedPeakAllocMiB": 596.8,
+    "cleanShutdown": true,
+    "note": "RSS summed over the process tree; single run; GPU figures are nvidia-smi, includes other processes"
+  },
+  "adapterEndToEnd": {
+    "path": "runSam2SilhouetteAdapterV1 + createSam2SubprocessRunnerV1 + python/atlas_sam2_silhouette_runner_v1.py",
+    "input": "YOLOX-nano person box on Screenshot (16283).png (third-party, scratch)",
+    "status": "EXECUTED",
+    "masks": 1,
+    "iouScore": 0.862,
+    "storageWrites": 0,
+    "inMemoryWrites": 1
+  },
+  "statusLabels": {
+    "checkpointDownloadAndHash": "PROVEN (exact size vs official Content-Length; no published hash to compare)",
+    "environment": "CREATED and PROVEN (imports; base torch unchanged)",
+    "imageMaskSynthetic": "PROVEN",
+    "videoPropagationSynthetic": "PROVEN (20 frames, offload on, max edge error 1 px)",
+    "yoloxBoxToSam2Scratch": "PROVEN (not visually verified)",
+    "runnerAndSubprocessPort": "WIRED to the adapter, PROVEN end to end with in-memory writes",
+    "productionWiringToProcessor": "NOT WIRED",
+    "durableMaskWriter": "NOT STARTED (needs approval)",
+    "visualVerificationOfBoxes": "PROVEN (human-readable overlay on scratch crop: mask follows the person, box encloses it; scratch/sam2-smoke/yolox_sam2_overlay.png)",
+    "cudaExtension": "NOT BUILT"
+  }
+}

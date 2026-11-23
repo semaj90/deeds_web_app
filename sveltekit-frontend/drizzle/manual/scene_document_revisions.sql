@@ -34,12 +34,15 @@ CREATE TABLE IF NOT EXISTS scene_assets (
   asset_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   case_id uuid NOT NULL REFERENCES cases(id) ON DELETE RESTRICT,
   scene_id uuid NOT NULL,
-  format text NOT NULL CONSTRAINT scene_assets_format_ck CHECK (format IN ('GLB', 'SOG')),
+  format text NOT NULL CONSTRAINT scene_assets_format_ck CHECK (format IN ('GLB', 'SOG', 'PNG', 'WEBP', 'MOTION_GLB')),
   sha256 text NOT NULL CONSTRAINT scene_assets_sha256_ck CHECK (sha256 ~ '^[0-9a-f]{64}$'),
   byte_length integer NOT NULL CONSTRAINT scene_assets_byte_length_ck CHECK (byte_length > 0 AND byte_length <= 67108864),
   content_type text NOT NULL CONSTRAINT scene_assets_content_type_ck CHECK (
     (format = 'GLB' AND content_type = 'model/gltf-binary') OR
-    (format = 'SOG' AND content_type = 'application/vnd.parent-atlas.streamed-sog+json')
+    (format = 'SOG' AND content_type = 'application/vnd.parent-atlas.streamed-sog+json') OR
+    (format = 'PNG' AND content_type = 'image/png') OR
+    (format = 'WEBP' AND content_type = 'image/webp') OR
+    (format = 'MOTION_GLB' AND content_type = 'model/gltf-binary')
   ),
   bucket text NOT NULL,
   object_key text NOT NULL,

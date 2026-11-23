@@ -1,0 +1,37 @@
+{
+  "report": "crime-scene-animation-clip-registry-v1",
+  "date": "2026-11-20",
+  "status": "PARTIAL",
+  "likely_cause": "The scene viewer selected GLTF animations by exact hard-coded display names, so imported clips had no explicit semantic index and duplicate matches could not be rejected deterministically.",
+  "scope": "Loaded GLB animation clip indexing and guide-action resolution only; this is not proof of the complete evidence-to-reconstruction workflow.",
+  "created": [
+    "Versioned Zod animation clip registry schema with exact GLB SHA-256, clip index/name, duration, track count, action mapping, and admission status.",
+    "Explicit idle, walk, inspect, and interact aliases; ambiguous duplicate matches produce no selected action.",
+    "GLTFLoader integration that hashes the loaded asset bytes before parsing and resolves guide actions through the registry."
+  ],
+  "proven": [
+    {
+      "command": "npm exec vitest run src/lib/courtroom/animation-clip-registry-v1.spec.ts src/lib/courtroom/walk-path-v1.spec.ts",
+      "observed": "2 test files passed; 6 tests passed."
+    },
+    {
+      "command": "npm run check:fast",
+      "observed": "svelte-check found 0 errors and 8 warnings in 2 files."
+    }
+  ],
+  "not_proven": [
+    "Browser load and playback of the real detective GLB after registry integration.",
+    "Authenticated scene save/reopen against live PostgreSQL and SeaweedFS.",
+    "Marker-triggered playback, uploaded custom actor/clip registration, and animation-registry persistence.",
+    "The broader scene compilation requirements, including measured courtroom kit dimensions/colliders and multi-image shared-coordinate alignment."
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/courtroom/animation-clip-registry-v1.ts",
+    "sveltekit-frontend/src/lib/courtroom/animation-clip-registry-v1.spec.ts",
+    "sveltekit-frontend/src/lib/components/evidence/CrimeSceneViewer3D.svelte",
+    "openspec/changes/crime-scene-reconstruction/tasks.md"
+  ],
+  "safe_next_command": "cd sveltekit-frontend; npm exec vitest run src/lib/courtroom/animation-clip-registry-v1.spec.ts src/lib/courtroom/walk-path-v1.spec.ts",
+  "smoke_command": "Open a signed-in case with an admitted reviewed 8–20 second ground-plane track; confirm GLTFLoader hashes the actual model, the registry resolves one Walk clip, playback scrubs at reviewed source timestamps, then save and reopen the scene asset with independent PostgreSQL readback.",
+  "report_path": "docs/reports/animation-clip-registry-v1-20261120.json"
+}

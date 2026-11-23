@@ -18,6 +18,21 @@ export const load: PageServerLoad = ({ url }) => {
 			startMs: 1_250,
 			endMs: 1_400,
 			reviewState: 'APPROVED_FOR_SCENE_PROPOSAL' as const
-		}
+		},
+		groundPlaneTrackProposals: [{
+			proposalId: '66666666-6666-4666-8666-666666666666',
+			evidenceId: '33333333-3333-4333-8333-333333333333',
+			sourceRevision: `sha256:${'a'.repeat(64)}`,
+			analysisRevision: 'scene-event-browser-fixture-v1',
+			calibrationRevisionId: '44444444-4444-4444-8444-444444444444',
+			trackId: 'track-fixture',
+			trackScopeId: 'sha256:fixture-track-scope',
+			status: 'REVIEWED_GROUND_PLANE_PROPOSAL' as const,
+			semantics: 'image_to_measured_plane_only_no_height_or_camera_motion_compensation' as const,
+			points: [
+				{ frameIndex: 1, framePtsUs: 1_250_000, imagePx: [40, 150] as [number, number], planeM: [0.01 * 40, 0.01 * 150] as [number, number], poseAnnotationRevisionId: '44444444-4444-4444-8444-444444444444', status: 'REVIEWED_GROUND_PLANE_PROPOSAL' as const },
+				{ frameIndex: 2, framePtsUs: 1_500_000, imagePx: [70, 150] as [number, number], planeM: [0.01 * 70, 0.01 * 150] as [number, number], poseAnnotationRevisionId: '44444444-4444-4444-8444-444444444444', status: 'REVIEWED_GROUND_PLANE_PROPOSAL' as const }
+			]
+		}]
 	};
 };

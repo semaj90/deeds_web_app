@@ -23,6 +23,35 @@ messages: string[] }>;
  errorVelocity: Array<{ date: string, count: number }>;
  }
 
+	// /api/phase78/monitor returns route-health fields ({ totalRoutes, healthyRoutes, routes: [] }),
+	// not the MonitoringStats shape below. Fill the missing sections with zeros and empty lists so
+	// the dashboard renders instead of throwing. The contract mismatch is still open.
+	function normalizeStats(raw: unknown): MonitoringStats {
+		const r = (raw ?? {}) as Record<string, any>;
+		return {
+			timestamp: r.timestamp ?? '',
+			summary: {
+				totalErrors: Number(r.summary?.totalErrors ?? 0),
+				totalRoutes: Number(r.summary?.totalRoutes ?? r.totalRoutes ?? 0),
+				totalClusters: Number(r.summary?.totalClusters ?? 0),
+				totalSuggestions: Number(r.summary?.totalSuggestions ?? 0),
+				appliedSuggestions: Number(r.summary?.appliedSuggestions ?? 0)
+			},
+			errors: { bySeverity: Array.isArray(r.errors?.bySeverity) ? r.errors.bySeverity : [] },
+			routes: {
+				byHealth: Array.isArray(r.routes?.byHealth) ? r.routes.byHealth : [],
+				top: Array.isArray(r.routes?.top) ? r.routes.top : []
+			},
+			suggestions: {
+				byRisk: Array.isArray(r.suggestions?.byRisk) ? r.suggestions.byRisk : [],
+				applied: Number(r.suggestions?.applied ?? 0),
+				effectiveness: Number(r.suggestions?.effectiveness ?? 0)
+			},
+			topErrors: Array.isArray(r.topErrors) ? r.topErrors : [],
+			errorVelocity: Array.isArray(r.errorVelocity) ? r.errorVelocity : []
+		};
+	}
+
 	let stats = $state<MonitoringStats | null>(null);
 	let isLoading = $state(true);
 	let error = $state<string | null>(null);
@@ -36,7 +65,7 @@ messages: string[] }>;
 			if (!response.ok) {
 				throw new Error(`HTTP ${response.status}`);
 			}
-			stats = await response.json();
+			stats = normalizeStats(await response.json());
 			lastUpdated = new Date();
 		} catch (err) {
 			console.error('Failed to load monitoring stats:', err);

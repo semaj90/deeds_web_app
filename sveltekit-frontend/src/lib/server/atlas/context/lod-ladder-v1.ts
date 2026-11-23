@@ -47,13 +47,75 @@ export interface LodLadderCandidate {
 export type LodExpansionLoader = (
   candidateId: string,
   targetTier: LodTier,
+  signal?: AbortSignal,
 ) => Promise<Record<string, unknown>>;
+
+export interface ExpandLodOptions {
+  signal?: AbortSignal;
+  maxBytes?: number;
+  expectedRevision?: string;
+  requireRevision?: boolean;
+  expectedChecksum?: string;
+  allowModelState?: boolean;
+}
+
+export const DEFAULT_LOD_MAX_BYTES = 512 * 1024;
+const FORBIDDEN_RUNTIME_KEYS = new Set([
+  'hiddenThoughts',
+  'chainOfThought',
+  'kv_cache',
+  'kvCache',
+  'hiddenState',
+]);
+
+export function isServiceWorkerCacheableTier(tier: LodTier): boolean {
+  return tier !== 'L7_MODEL_STATE';
+}
+
+export function createLodConsumerLease(onReleaseLast: () => void): {
+  acquire: () => () => void;
+  activeConsumers: () => number;
+} {
+  let count = 0;
+  let releasedAll = false;
+  return {
+    acquire() {
+      count += 1;
+      let released = false;
+      return () => {
+        if (released) return;
+        released = true;
+        count = Math.max(0, count - 1);
+        if (count === 0 && !releasedAll) {
+          releasedAll = true;
+          onReleaseLast();
+        }
+      };
+    },
+    activeConsumers() {
+      return count;
+    },
+  };
+}
 
 export async function expandLOD(
   candidate: LodLadderCandidate,
   targetTier: LodTier,
   loader: LodExpansionLoader,
+  options: ExpandLodOptions = {},
 ): Promise<LodLadderCandidate> {
+  if (options.signal?.aborted) {
+    throw new Error('LOD_EXPANSION_ABORTED');
+  }
+  if (targetTier === 'L7_MODEL_STATE' && !options.allowModelState) {
+    throw new Error('LOD_L7_MODEL_STATE_FORBIDDEN');
+  }
+
+  const maxBytes = options.maxBytes ?? DEFAULT_LOD_MAX_BYTES;
+  if (!Number.isFinite(maxBytes) || maxBytes <= 0) {
+    throw new Error('LOD_BYTE_BUDGET_INVALID');
+  }
+
   const currentRank = LOD_TIER_ORDER[candidate.currentTier];
   const targetRank = LOD_TIER_ORDER[targetTier];
 
@@ -62,7 +124,44 @@ export async function expandLOD(
     return candidate;
   }
 
-  const enrichedData = await loader(candidate.candidateId, targetTier);
+  const enrichedData = await loader(candidate.candidateId, targetTier, options.signal);
+  if (options.signal?.aborted) {
+    throw new Error('LOD_EXPANSION_ABORTED');
+  }
+
+  if (!options.allowModelState) {
+    for (const key of Object.keys(enrichedData)) {
+      if (FORBIDDEN_RUNTIME_KEYS.has(key)) {
+        throw new Error(`LOD_FORBIDDEN_RUNTIME_STATE:${key}`);
+      }
+    }
+  }
+
+  const payloadBytes = new TextEncoder().encode(JSON.stringify(enrichedData)).byteLength;
+  if (payloadBytes > maxBytes) {
+    throw new Error(`LOD_BYTE_BUDGET_EXCEEDED:${payloadBytes}>${maxBytes}`);
+  }
+
+  const actualRevision = enrichedData.sourceRevision ?? enrichedData.revision;
+  if (options.requireRevision && typeof actualRevision !== 'string') {
+    throw new Error('LOD_STALE_REVISION:MISSING');
+  }
+  if (
+    options.expectedRevision !== undefined
+    && actualRevision !== undefined
+    && actualRevision !== options.expectedRevision
+  ) {
+    throw new Error('LOD_STALE_REVISION');
+  }
+
+  if (
+    options.expectedChecksum !== undefined
+    && enrichedData.checksum !== undefined
+    && enrichedData.checksum !== options.expectedChecksum
+  ) {
+    throw new Error('LOD_CHECKSUM_MISMATCH');
+  }
+
   return {
     candidateId: candidate.candidateId,
     currentTier: targetTier,

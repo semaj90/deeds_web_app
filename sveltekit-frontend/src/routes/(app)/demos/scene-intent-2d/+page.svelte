@@ -1,11 +1,15 @@
 <script lang="ts">
   import type { PageData } from './$types';
   import type { SceneIntent } from '$lib/server/reconstruction/crime-scene-schema.js';
+  import EastQuayFixturePanel from './EastQuayFixturePanel.svelte';
 
   let { data }: { data: PageData } = $props();
 
   // Derive view state from the loaded SceneIntent.
-  const sceneIntent = $derived<SceneIntent>(data.sceneIntent);
+  let activeMode = $state<'fictional-case' | 'single-scene-demo'>('fictional-case');
+  let selectedCaseSceneId = $state<string | null>(null);
+  const selectedCaseScene = $derived(data.fictionalCase.scenes.find((scene) => scene.sceneId === selectedCaseSceneId) ?? data.fictionalCase.scenes[0] ?? null);
+  const sceneIntent = $derived<SceneIntent>(activeMode === 'fictional-case' ? selectedCaseScene?.intent ?? data.sceneIntent : data.sceneIntent);
   const events     = $derived(sceneIntent.events);
   const totalSecs  = $derived(sceneIntent.duration_s);
 
@@ -93,6 +97,73 @@
     </div>
     <div class="disclaimer" role="note">{sceneIntent.disclaimer}</div>
   </header>
+
+  <section class="fictional-case" aria-label="Fictional multi-scene case fixture">
+    <header class="fictional-case-heading">
+      <div>
+        <h2>{data.fictionalCase.title}</h2>
+        <p class="fixture-status">{data.fictionalCase.provenanceClass} · {data.fictionalCase.admissionMode}</p>
+        <p>{data.fictionalCase.disclaimer} Coordinates are fictional local-grid labels. Source clocks remain separate.</p>
+        <a class="case-kit-link" href="/demos/east-quay-bank-case-v1/examples/case-explorer.html">Open the full East Quay case explorer · synthetic demo</a>
+      </div>
+      <label>Open view
+        <select value={activeMode} onchange={(event) => {
+          activeMode = (event.currentTarget as HTMLSelectElement).value as typeof activeMode;
+          selectedEventId = null;
+        }}>
+          <option value="fictional-case">Fictional case scene</option>
+          <option value="single-scene-demo">Original single-scene demo</option>
+        </select>
+      </label>
+    </header>
+    {#if activeMode === 'fictional-case' && selectedCaseScene}
+      <div class="case-fixture-grid">
+        <label>Scene timeline
+          <select value={selectedCaseScene.sceneId} onchange={(event) => {
+            selectedCaseSceneId = (event.currentTarget as HTMLSelectElement).value;
+            selectedEventId = null;
+          }}>
+            {#each data.fictionalCase.scenes as caseScene (caseScene.sceneId)}
+              <option value={caseScene.sceneId}>{caseScene.title}</option>
+            {/each}
+          </select>
+        </label>
+        <p><strong>Scene frame:</strong> <code>{selectedCaseScene.coordinateFrame.frameId}</code> · local, uncalibrated · not GPS</p>
+        <p><strong>Unknowns:</strong> {data.fictionalCase.unknowns.join(' ')}</p>
+      </div>
+      <details>
+        <summary>Person registry ({data.fictionalCase.participants.length})</summary>
+        <ul class="case-person-list">
+          {#each data.fictionalCase.participants as participant (participant.participantId)}
+            <li>
+              <span class="synthetic-head" aria-hidden="true">{participant.participantId.slice(-2)}</span>
+              <span><code>{participant.participantId}</code> · {participant.displayLabel}<br />
+                <small>{participant.registryKind} · {participant.identityStatus} · no cross-scene identity link</small><br />
+                <small>Mesh key: {participant.presentation.meshRegistryKey} · head card: {participant.presentation.portrait.assetKey} · synthetic, not evidence</small>
+              </span>
+            </li>
+          {/each}
+        </ul>
+      </details>
+      <details>
+        <summary>Evidence and source clocks ({data.fictionalCase.evidence.length})</summary>
+        <ul class="case-evidence-list">
+          {#each data.fictionalCase.evidence as item (item.evidenceId)}
+            <li><strong>{item.label}</strong> · <code>{item.clockDomain}</code> · {item.timeBasis} · ±{item.clockUncertaintyMs} ms
+              {#if item.transcriptSegments.length}
+                <ul>{#each item.transcriptSegments as segment (segment.segmentId)}
+                  <li>{(segment.startMs / 1000).toFixed(1)}–{(segment.endMs / 1000).toFixed(1)}s · {segment.speakerId}: “{segment.text}” · UNVERIFIED STATEMENT</li>
+                {/each}</ul>
+              {/if}
+            </li>
+          {/each}
+        </ul>
+      </details>
+      <p class="fixture-boundary">Selected scene below uses fixture-only SceneIntent and can be compiled for preview. It is not written to a case record, evidence store, or GLB registry.</p>
+    {/if}
+  </section>
+
+  <EastQuayFixturePanel fixture={data.eastQuayFixture} />
 
   {#if data.loadError}
     <div class="warn">
@@ -316,6 +387,21 @@
 </main>
 
 <style>
+  .fictional-case { margin: 1rem 0; padding: 1rem; border: 1px solid #a58c62; border-radius: .5rem; background: #f8f1e3; color: #282019; }
+  .fictional-case-heading { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+  .fictional-case-heading h2 { margin: 0; }
+  .fictional-case-heading p, .case-fixture-grid p { margin: .35rem 0; }
+  .case-kit-link { display: inline-block; margin-top: .35rem; color: #1556a8; font-weight: 700; text-underline-offset: .15em; }
+  .fictional-case label { display: grid; gap: .3rem; }
+  .fictional-case select { min-width: 14rem; padding: .4rem; }
+  .case-fixture-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .75rem; align-items: end; margin: .75rem 0; }
+  .fictional-case details { margin-top: .6rem; }
+  .case-person-list, .case-evidence-list { display: grid; gap: .5rem; padding-left: 1.2rem; }
+  .case-person-list li { display: flex; align-items: center; gap: .6rem; }
+  .case-person-list small { color: #645744; }
+  .synthetic-head { display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 50%; border: 1px solid #9b815a; background: #ead9b8; font-weight: 700; }
+  .fixture-boundary { font-size: .9rem; font-weight: 600; }
+  @media (max-width: 42rem) { .fictional-case-heading { display: grid; } }
   .page {
     max-width: 1200px;
     margin: 0 auto;

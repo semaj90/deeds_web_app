@@ -1,0 +1,211 @@
+{
+  "schema": "atlas.doc14-topk-lane-eval.v1",
+  "evaluationKind": "DIAGNOSTIC_SELF_MATCH_SMOKE",
+  "queryConstruction": "sampled from the same exported corpus being scored",
+  "reviewedRelevanceLabels": false,
+  "graphLaneAvailable": false,
+  "qualityBenchmarkEligible": false,
+  "reviewedCohortShapeValid": false,
+  "cohortRevision": null,
+  "k": 5,
+  "queryCount": 30,
+  "recordCount": 200,
+  "metrics": {
+    "exact_id": {
+      "recallAt5": 0.7,
+      "mrr": 0.6467,
+      "verifiedRate": 0.7,
+      "recallAtK": 0.0972,
+      "precisionAtK": 0.63,
+      "ndcgAtK": 0.52
+    },
+    "lexical": {
+      "recallAt5": 1.0,
+      "mrr": 1.0,
+      "verifiedRate": 1.0,
+      "recallAtK": 0.2524,
+      "precisionAtK": 0.8667,
+      "ndcgAtK": 0.8994
+    },
+    "corpus_order_prior": {
+      "recallAt5": 0.2,
+      "mrr": 0.2,
+      "verifiedRate": 0.2,
+      "recallAtK": 0.008,
+      "precisionAtK": 0.2,
+      "ndcgAtK": 0.2
+    },
+    "hybrid_rrf": {
+      "recallAt5": 0.8667,
+      "mrr": 0.7667,
+      "verifiedRate": 0.8667,
+      "recallAtK": 0.1427,
+      "precisionAtK": 0.58,
+      "ndcgAtK": 0.6126
+    }
+  },
+  "perQuerySample": [
+    {
+      "query": "feature-registry-search Feature Registry Search Agentic",
+      "expectedSourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "exact_id": {
+        "rank": 1,
+        "verified": true,
+        "recallAtK": 0.1163,
+        "precisionAtK": 1.0,
+        "ndcgAtK": 1.0
+      },
+      "lexical": {
+        "rank": 1,
+        "verified": true,
+        "recallAtK": 0.1163,
+        "precisionAtK": 1.0,
+        "ndcgAtK": 1.0
+      },
+      "corpus_order_prior": {
+        "rank": null,
+        "verified": false,
+        "recallAtK": 0.0,
+        "precisionAtK": 0.0,
+        "ndcgAtK": 0.0
+      },
+      "hybrid_rrf": {
+        "rank": 1,
+        "verified": true,
+        "recallAtK": 0.1163,
+        "precisionAtK": 1.0,
+        "ndcgAtK": 1.0
+      }
+    },
+    {
+      "query": "audit-concept-evidence-spine scripts audit-concept-evidence-spine description Audits",
+      "expectedSourceRef": "scripts/atlas/audit-concept-evidence-spine.mjs",
+      "exact_id": {
+        "rank": 1,
+        "verified": true,
+        "recallAtK": 0.1,
+        "precisionAtK": 0.5,
+        "ndcgAtK": 0.3392
+      },
+      "lexical": {
+        "rank": 1,
+        "verified": true,
+        "recallAtK": 0.5,
+        "precisionAtK": 1.0,
+        "ndcgAtK": 1.0
+      },
+      "corpus_order_prior": {
+        "rank": null,
+        "verified": false,
+        "recallAtK": 0.0,
+        "precisionAtK": 0.0,
+        "ndcgAtK": 0.0
+      },
+      "hybrid_rrf": {
+        "rank": 1,
+        "verified": true,
+        "recallAtK": 0.2,
+        "precisionAtK": 0.4,
+        "ndcgAtK": 0.4704
+      }
+    },
+    {
+      "query": "audit-error-fixes import import import fileURLToPath",
+      "expectedSourceRef": "scripts/atlas/audit-error-fixes.mjs",
+      "exact_id": {
+        "rank": null,
+        "verified": false,
+        "recallAtK": 0.0,
+        "precisionAtK": 0.0,
+        "ndcgAtK": 0.0
+      },
+      "lexical": {
+        "rank": 1,
+        "verified": true,
+        "recallAtK": 0.0833,
+        "precisionAtK": 0.2,
+        "ndcgAtK": 0.3392
+      },
+      "corpus_order_prior": {
+        "rank": null,
+        "verified": false,
+        "recallAtK": 0.0,
+        "precisionAtK": 0.0,
+        "ndcgAtK": 0.0
+      },
+      "hybrid_rrf": {
+        "rank": null,
+        "verified": false,
+        "recallAtK": 0.0,
+        "precisionAtK": 0.0,
+        "ndcgAtK": 0.0
+      }
+    },
+    {
+      "query": "audit-higher-hop-enrichment audit-higher-hop-enrichment Producer script Higher-Hop",
+      "expectedSourceRef": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "exact_id": {
+        "rank": 1,
+        "verified": true,
+        "recallAtK": 0.1,
+        "precisionAtK": 1.0,
+        "ndcgAtK": 0.3392
+      },
+      "lexical": {
+        "rank": 1,
+        "verified": true,
+        "recallAtK": 0.5,
+        "precisionAtK": 1.0,
+        "ndcgAtK": 1.0
+      },
+      "corpus_order_prior": {
+        "rank": null,
+        "verified": false,
+        "recallAtK": 0.0,
+        "precisionAtK": 0.0,
+        "ndcgAtK": 0.0
+      },
+      "hybrid_rrf": {
+        "rank": 1,
+        "verified": true,
+        "recallAtK": 0.2,
+        "precisionAtK": 0.4,
+        "ndcgAtK": 0.4852
+      }
+    },
+    {
+      "query": "context-assembler Codebase Context clusterPrefix codeLines",
+      "expectedSourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "exact_id": {
+        "rank": 1,
+        "verified": true,
+        "recallAtK": 0.04,
+        "precisionAtK": 1.0,
+        "ndcgAtK": 1.0
+      },
+      "lexical": {
+        "rank": 1,
+        "verified": true,
+        "recallAtK": 0.04,
+        "precisionAtK": 1.0,
+        "ndcgAtK": 1.0
+      },
+      "corpus_order_prior": {
+        "rank": 1,
+        "verified": true,
+        "recallAtK": 0.04,
+        "precisionAtK": 1.0,
+        "ndcgAtK": 1.0
+      },
+      "hybrid_rrf": {
+        "rank": 1,
+        "verified": true,
+        "recallAtK": 0.04,
+        "precisionAtK": 1.0,
+        "ndcgAtK": 1.0
+      }
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

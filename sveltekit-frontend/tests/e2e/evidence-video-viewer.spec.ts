@@ -3,7 +3,12 @@ import { dirname, extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { test, expect } from '@playwright/test';
-import { encodeVideoMotionLutV1, VIDEO_MOTION_LUT_HEIGHT_V1, VIDEO_MOTION_LUT_WIDTH_V1 } from '../../src/lib/shared/video-motion-lut-v1.js';
+import sharp from 'sharp';
+import {
+	buildPackedMotionLodsV1, compactPackedMotionLodV1, decodeVideoMotionLutIndicesV1,
+	encodeVideoMotionLutV1, readPackedVideoMotionLutV1, VIDEO_MOTION_COMPACT_LOD_V1,
+	VIDEO_MOTION_GRAYSCALE_LUT_V1, VIDEO_MOTION_LUT_HEIGHT_V1, VIDEO_MOTION_LUT_WIDTH_V1,
+} from '../../src/lib/shared/video-motion-lut-v1.js';
 import { stableStringifySceneDocumentV1 } from '../../src/lib/splat/scene-document-v1.js';
 
 const evidenceId = '4cf3e0c4-f3c7-4e0a-9a7e-1adf01dd7291';
@@ -33,7 +38,7 @@ const videoEventTimeline = {
 	}]
 };
 const motionTile = Buffer.from(encodeVideoMotionLutV1(
-	new Uint8Array(VIDEO_MOTION_LUT_WIDTH_V1 * VIDEO_MOTION_LUT_HEIGHT_V1),
+	null,
 	new Uint8Array(VIDEO_MOTION_LUT_WIDTH_V1 * VIDEO_MOTION_LUT_HEIGHT_V1).fill(255),
 ).bytes);
 const proofScreenshot = resolve(process.cwd(), '../docs/reports/screenshots/evidence-video-viewer-transcript-20261115.png');
@@ -75,7 +80,10 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 			hash: `sha256:${'a'.repeat(64)}`
 		})
 	}));
-	await page.addInitScript(({ targetEvidenceId, targetCaseId, targetAnalysisRevision, targetEventTimeline, targetMotionTileBytes }) => {
+	const sourceFrames = await Promise.all(['#393f4c', '#4c4339'].map((background) => sharp({
+		create: { width: 320, height: 180, channels: 3, background },
+	}).jpeg().toBuffer()));
+	await page.addInitScript(({ targetEvidenceId, targetCaseId, targetAnalysisRevision, targetEventTimeline, targetMotionTileBytes, compactMotion, targetFrames }) => {
 		const previousPose = {
 			schema: 'atlas.pose-observation.v1', evidenceId: targetEvidenceId,
 			sourceSha256: `sha256:${'a'.repeat(64)}`, sourceRevision: `sha256:${'a'.repeat(64)}`,
@@ -84,18 +92,39 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 			trackId: 'track-0001', trackScopeId: 'sha256:fixture-track-scope',
 			origin: 'manual', modelRevision: null, reviewState: 'UNREVIEWED',
 			keypoints: Array.from({ length: 17 }, (_, index) => ({ index, x: 20 + index, y: 30 + index, confidence: 1, visibility: 'visible' })),
+			groundContact: { imagePx: [40, 150], footSide: 'left', label: 'operator-marked-ground-contact-candidate' },
 		};
-		const revisions: Array<Record<string, unknown>> = [{
-			id: 'pose-revision-previous', version: 1, createdAt: '2026-11-16T19:00:00Z', changeReason: 'Fixture prior frame pose',
-			metadata: { annotation: { poseObservations: [previousPose] } },
-		}];
+		const revisions: Array<Record<string, unknown>> = [
+			{ id: '10000000-0000-4000-8000-000000000001', version: 1, createdAt: '2026-11-16T19:00:00Z', changeReason: 'Fixture prior frame pose',
+				metadata: { schema: 'atlas.evidence-annotation-revision.v1', parentSha256: `sha256:${'a'.repeat(64)}`, annotation: { poseObservations: [previousPose] } } },
+			{ id: 'pose-review-previous', version: 2, createdAt: '2026-11-16T19:01:00Z', changeReason: 'Fixture pose review', metadata: {
+				schema: 'atlas.pose-review-decision.v1', evidenceId: targetEvidenceId, caseId: targetCaseId,
+				sourceSha256: `sha256:${'a'.repeat(64)}`, analysisRevision: targetAnalysisRevision,
+				annotationRevisionId: '10000000-0000-4000-8000-000000000001', framePtsUs: 1_500_000, skeletonSchemaId: 'human.coco17.v1',
+				trackId: 'track-0001', trackScopeId: 'sha256:fixture-track-scope', decision: 'ACCEPTED_FOR_SCENE_PROPOSAL',
+				sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', groundContactReviewed: true,
+				groundContactDecision: 'ACCEPTED_FOR_SCENE_PROPOSAL', canonicalAuthority: false,
+			} },
+		];
 		const nativeFetch = window.fetch.bind(window);
-		(window as any).__poseFixture = { postBody: null, reviewBody: null, requests: [] as string[] };
+		(window as any).__poseFixture = { postBody: null, calibrationPostBody: null, calibrationReviewBody: null, reviewBody: null, requests: [] as string[] };
 		window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
 			const requestUrl = new URL(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url, location.href);
 			const requestMethod = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
 			if (requestUrl.pathname.startsWith(`/api/evidence/${targetEvidenceId}/`)) {
 				(window as any).__poseFixture.requests.push(`${requestMethod} ${requestUrl.pathname}${requestUrl.search}`);
+			}
+			if (requestUrl.pathname.startsWith(`/api/evidence/${targetEvidenceId}/video-frame/`)) {
+				const index = Number(requestUrl.pathname.split('/').at(-1));
+				const frame = targetFrames[index];
+				if (!frame) return new Response(null, { status: 404 });
+				return new Response(Uint8Array.from(frame), { headers: {
+					'Content-Type': 'image/jpeg',
+					'X-Source-Revision': `sha256:${'a'.repeat(64)}`, 'X-Analysis-Revision': targetAnalysisRevision,
+					'X-Frame-Index': String(index), 'X-Frame-Timestamp-Ms': index === 0 ? '1000' : '1500',
+					'X-Source-Frame-Width': '320', 'X-Source-Frame-Height': '180',
+					'X-Artifact-Frame-Width': '320', 'X-Artifact-Frame-Height': '180',
+				} });
 			}
 			if (requestUrl.pathname === `/api/evidence/${targetEvidenceId}/transcript`) {
 				return new Response(JSON.stringify({
@@ -105,8 +134,12 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 				}), { status: 200, headers: { 'Content-Type': 'application/json' } });
 			}
 			if (requestUrl.pathname === `/api/evidence/${targetEvidenceId}/motion-preview/0`) {
-				return new Response(Uint8Array.from(targetMotionTileBytes), { status: 200, headers: {
-					'Content-Type': 'application/vnd.atlas.video-motion-lut-v1',
+				const compact = requestUrl.searchParams.get('lod') === compactMotion.token;
+				const bytes = Uint8Array.from(compact ? compactMotion.bytes : targetMotionTileBytes);
+				return new Response(bytes, { status: 200, headers: {
+					'Content-Type': compact ? compactMotion.contentType : 'application/vnd.atlas.video-motion-lut-v1',
+					'Content-Length': String(bytes.length),
+					...(compact ? { 'X-Motion-LOD': compactMotion.token } : {}),
 					'Cache-Control': 'private, no-store',
 					'X-Source-Revision': `sha256:${'a'.repeat(64)}`,
 					'X-Analysis-Revision': targetAnalysisRevision,
@@ -119,25 +152,53 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 			if (requestUrl.pathname === `/api/evidence/${targetEvidenceId}/pose-review` && requestMethod === 'POST') {
 				const body = JSON.parse(String(init?.body ?? '{}'));
 				(window as any).__poseFixture.reviewBody = body;
+				const poseRevision = revisions.find((revision) => revision.id === body.annotationRevisionId);
+				const reviewedContact = Boolean((poseRevision?.metadata as any)?.annotation?.poseObservations?.some((pose: any) => pose.framePtsUs === body.framePtsUs && pose.groundContact));
 				revisions.unshift({ id: 'pose-review-decision-1', version: 3, createdAt: '2026-11-16T20:01:00Z', changeReason: 'Pose review', metadata: {
 					schema: 'atlas.pose-review-decision.v1', evidenceId: targetEvidenceId, caseId: targetCaseId,
 					sourceSha256: body.parentSha256, analysisRevision: body.analysisRevision,
 					annotationRevisionId: body.annotationRevisionId, frameIndex: body.frameIndex, framePtsUs: body.framePtsUs,
 					skeletonSchemaId: body.skeletonSchemaId, trackId: body.trackId, trackScopeId: body.trackScopeId,
-					decision: body.decision, reviewerUserId: 7, sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false,
+					decision: body.decision, reviewerUserId: 7, sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL',
+					groundContactReviewed: reviewedContact, groundContactDecision: reviewedContact ? body.decision : 'NOT_PRESENT', canonicalAuthority: false,
+				} });
+				return new Response(JSON.stringify({ ok: true, evidenceId: targetEvidenceId, decision: body.decision, sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false }), { status: 201, headers: { 'Content-Type': 'application/json' } });
+			}
+			if (requestUrl.pathname === `/api/evidence/${targetEvidenceId}/calibration-review` && requestMethod === 'POST') {
+				const body = JSON.parse(String(init?.body ?? '{}'));
+				(window as any).__poseFixture.calibrationReviewBody = body;
+				const calibrationRevision = revisions.find((revision) => revision.id === body.annotationRevisionId);
+				const calibration = (calibrationRevision?.metadata as any)?.annotation?.planarCameraCalibrations?.find((item: any) => item.analysisRevision === body.analysisRevision);
+				revisions.unshift({ id: 'calibration-review-1', version: 5, createdAt: '2026-11-16T20:03:00Z', changeReason: 'Planar calibration review', metadata: {
+					schema: 'atlas.planar-camera-calibration-review.v1', evidenceId: targetEvidenceId, caseId: targetCaseId,
+					sourceSha256: body.parentSha256, analysisRevision: body.analysisRevision, annotationRevisionId: body.annotationRevisionId,
+					calibrationSha256: body.calibrationSha256, calibrationFrameIndex: body.calibrationFrameIndex,
+					calibrationFramePtsUs: body.calibrationFramePtsUs, decision: body.decision,
+					cameraFixedWindow: body.cameraFixedWindow ?? null, calibratedRegionPx: calibration?.calibratedRegionPx ?? null,
+					sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false,
 				} });
 				return new Response(JSON.stringify({ ok: true, evidenceId: targetEvidenceId, decision: body.decision, sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false }), { status: 201, headers: { 'Content-Type': 'application/json' } });
 			}
 			if (requestUrl.pathname !== `/api/evidence/${targetEvidenceId}/versions`) return nativeFetch(input, init);
 			if (requestMethod === 'POST') {
 				const body = JSON.parse(String(init?.body ?? '{}'));
+				if (Array.isArray(body.annotation?.planarCameraCalibrations)) {
+					(window as any).__poseFixture.calibrationPostBody = body;
+				revisions.unshift({ id: '10000000-0000-4000-8000-000000000003', version: 4, createdAt: '2026-11-16T20:02:00Z', changeReason: 'Fixed-camera planar calibration', metadata: { schema: 'atlas.evidence-annotation-revision.v1', parentSha256: body.parentSha256, annotation: body.annotation } });
+					return new Response(JSON.stringify({ ok: true, committed: true, version: 4 }), { status: 201, headers: { 'Content-Type': 'application/json' } });
+				}
 				(window as any).__poseFixture.postBody = body;
-				revisions.unshift({ id: 'pose-revision-1', version: 2, createdAt: '2026-11-16T20:00:00Z', changeReason: 'Manual pose proposal', metadata: { annotation: body.annotation } });
+				revisions.unshift({ id: '10000000-0000-4000-8000-000000000002', version: 2, createdAt: '2026-11-16T20:00:00Z', changeReason: 'Manual pose proposal', metadata: { schema: 'atlas.evidence-annotation-revision.v1', parentSha256: body.parentSha256, annotation: body.annotation } });
 				return new Response(JSON.stringify({ ok: true, committed: true, version: 2 }), { status: 201, headers: { 'Content-Type': 'application/json' } });
 			}
 			return new Response(JSON.stringify({ evidenceId: targetEvidenceId, versions: revisions, count: revisions.length, reviewEnabled: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 		};
-	}, { targetEvidenceId: evidenceId, targetCaseId: caseId, targetAnalysisRevision: analysisRevision, targetEventTimeline: videoEventTimeline, targetMotionTileBytes: Array.from(motionTile) });
+	}, { targetEvidenceId: evidenceId, targetCaseId: caseId, targetAnalysisRevision: analysisRevision, targetEventTimeline: videoEventTimeline,
+		targetMotionTileBytes: Array.from(motionTile),
+		compactMotion: {
+			...VIDEO_MOTION_COMPACT_LOD_V1, bytes: Array.from(compactPackedMotionLodV1(readPackedVideoMotionLutV1(motionTile)).data)
+		},
+		targetFrames: sourceFrames.map((frame) => Array.from(frame)) });
 	await page.route(`**/api/evidence/${evidenceId}/frames**`, (route) => route.fulfill({
 		status: 200,
 		contentType: 'application/json',
@@ -148,7 +209,7 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 				detections: [{ label: 'person', confidence: 0.9, bbox: [10, 10, 40, 80], trackId: 'track-0001', velocityPxPerSecond: null, trackState: 'UNREVIEWED_TRACK_HYPOTHESIS' }],
 				tags: ['UNREVIEWED_PROPOSAL'], confidence: 0.9, width: 320, height: 180,
 				analysisRevision, sourceRevision, trackScopeId: 'sha256:fixture-track-scope',
-				motionLut: { schema: 'atlas.video-motion-lut.v1', width: 64, height: 128, timestampMs: 1000, motionScore: 1, url: `/api/evidence/${evidenceId}/motion-preview/0` },
+				motionLut: { schema: 'atlas.video-motion-lut.v1', width: 64, height: 128, timestampMs: 1000, previousTimestampMs: null, motionScore: 0, url: `/api/evidence/${evidenceId}/motion-preview/0` },
 			},
 			{
 				id: `${analysisRevision}:1`, timestamp: 1.5, timestampMs: 1500, frameIndex: 1, framePath: null,
@@ -157,25 +218,33 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 				tags: ['UNREVIEWED_PROPOSAL'], confidence: 0.88, width: 320, height: 180,
 				analysisRevision, sourceRevision, trackScopeId: 'sha256:fixture-track-scope',
 			},
-		] })
+		], motionSamples: [{
+			schema: 'atlas.video-motion-sample.v1', sampleIndex: 0, timestampMs: 1000,
+			previousTimestampMs: null, motionScore: 0.125, width: 64, height: 128,
+			analysisRevision, sourceRevision,
+			url: `/api/evidence/${evidenceId}/motion-preview/0?lane=motion-sample`,
+		}] })
 	}));
-	await page.route((url) => new URL(url).pathname === `/api/evidence/${evidenceId}/motion-preview/0`, (route) => route.fulfill({
+	await page.route((url) => new URL(url).pathname === `/api/evidence/${evidenceId}/motion-preview/0`, (route) => {
+		const sampleTimeMs = 1000;
+		return route.fulfill({
 		status: 200,
 		contentType: 'application/vnd.atlas.video-motion-lut-v1',
 		headers: {
 			'Cache-Control': 'private, no-store',
 			'X-Source-Revision': sourceRevision,
 			'X-Analysis-Revision': analysisRevision,
-			'X-Frame-Timestamp-Ms': '1000',
+			'X-Frame-Timestamp-Ms': String(sampleTimeMs),
 		},
 		body: motionTile,
-	}));
+		});
+	});
 	await page.route(`**/api/evidence/${evidenceId}/video-events`, (route) => route.fulfill({
 		status: 200,
 		contentType: 'application/json',
 		body: JSON.stringify({ success: true, eventTimeline: videoEventTimeline, reviewEnabled: false })
 	}));
-	await page.route('**/api/cases/*/scenes/*/revisions', async (route) => {
+	await page.route(/\/api\/cases\/[^/]+\/scenes\/[^/]+\/revisions(?:\?.*)?$/, async (route) => {
 		if (route.request().method() === 'GET') {
 			return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: savedSceneRevision, message: savedSceneRevision ? 'OK' : 'No scene revision' }) });
 		}
@@ -256,29 +325,75 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 	expect(media.controls).toBe(true);
 	expect(media.error).toBeNull();
 
-	await page.locator('.filmstrip-frame-card').first().click();
-	const motionPreview = page.getByRole('figure', { name: 'Low-resolution frame-to-frame motion cue' });
+	const keyframeStrip = page.getByRole('region', { name: 'Extracted Video Keyframes' });
+	await keyframeStrip.locator('.filmstrip-frame-card').first().click();
+	const motionPreview = keyframeStrip.getByRole('figure', { name: 'Low-resolution frame-to-frame motion cue' });
 	await expect(motionPreview).toBeVisible();
-	await expect.poll(() => motionPreview.textContent(), { timeout: 15_000 }).toContain('100% change').catch(async () => {
+	await expect.poll(() => motionPreview.textContent(), { timeout: 15_000 }).toContain('First sample: no comparison frame').catch(async () => {
 		const motionStatus = await motionPreview.textContent();
 		const clientRequests = await page.evaluate(() => (window as any).__poseFixture?.requests ?? []);
-		throw new Error(`Expected the fixture motion tile to render at 100% change; preview="${motionStatus}", evidence responses=${JSON.stringify(evidenceApiTrace)}, client requests=${JSON.stringify(clientRequests)}, warnings=${JSON.stringify(pageWarnings)}`);
+		throw new Error(`Expected the first sample to report no comparison frame; preview="${motionStatus}", evidence responses=${JSON.stringify(evidenceApiTrace)}, client requests=${JSON.stringify(clientRequests)}, warnings=${JSON.stringify(pageWarnings)}`);
 	});
 	await expect(motionPreview.locator('canvas:not(.hidden)')).toBeVisible();
 	const motionRenderer = await motionPreview.getAttribute('data-renderer');
 	expect(['webgpu', 'webgl2', 'canvas2d']).toContain(motionRenderer);
 	if (testInfo.project.name === 'chromium-webgl2-motion') expect(motionRenderer).toBe('webgl2');
+	const frameMotionRequests = () => page.evaluate(() =>
+		((window as any).__poseFixture.requests as string[]).filter((request) => request.includes('/motion-preview/0') && !request.includes('lane=motion-sample'))
+	);
+	const motionPath = `GET /api/evidence/${evidenceId}/motion-preview/0`;
+	expect(await frameMotionRequests()).toEqual([`${motionPath}?lod=32x64`]);
+	await motionPreview.getByRole('button', { name: 'Full motion detail' }).click();
+	await expect.poll(frameMotionRequests).toEqual([`${motionPath}?lod=32x64`, motionPath]);
+	await expect(motionPreview.locator('canvas:not(.hidden)')).toBeVisible();
 	await testInfo.attach('motion-preview-renderer', { body: motionRenderer ?? 'unknown', contentType: 'text/plain' });
+	const motionCueRegion = page.getByRole('region', { name: 'Video pixel-change review cues' });
+	await motionCueRegion.getByRole('button', { name: 'Review pixel-change cue at 00:01.000' }).click();
+	await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime)).toBeCloseTo(1, 1);
+	await expect(motionCueRegion.getByRole('figure', { name: 'Low-resolution frame-to-frame motion cue' })).toBeVisible();
+	await expect(motionCueRegion).toContainText('not object motion or a finding');
+	await expect(page.getByRole('button', { name: 'Add manual human pose' })).toBeVisible();
+	await keyframeStrip.locator('.filmstrip-frame-card').first().click();
 	await expect(page.getByText(/track IDs are hypotheses scoped to this evidence revision and analysis run/i)).toBeVisible();
 	await page.getByRole('button', { name: 'Add manual human pose' }).click();
 	await page.getByLabel('Link pose to detector track hypothesis').selectOption('track-0001');
-	await page.getByRole('button', { name: 'Capture selected video frame' }).click();
+	await page.getByRole('button', { name: 'Load authorized analyzed frame' }).click();
 	const poseStage = page.locator('.pose-stage');
+	await expect(poseStage).toBeVisible();
+	await page.getByRole('button', { name: 'Set coordinates' }).click();
+	await expect(page.getByText('Enter both X and Y coordinates.')).toBeVisible();
+	await expect(page.getByText('0/17 placed · current: nose')).toBeVisible();
+	await page.getByLabel('X px').fill('0');
+	await page.getByRole('button', { name: 'Set coordinates' }).click();
+	await expect(page.getByText('Enter both X and Y coordinates.')).toBeVisible();
+	await expect(page.getByText('0/17 placed · current: nose')).toBeVisible();
+	await page.getByLabel('Y px').fill('0');
+	await page.getByRole('button', { name: 'Set coordinates' }).click();
+	await expect(page.getByText('1/17 placed · current: nose')).toBeVisible();
+	await page.getByRole('button', { name: 'Clear', exact: true }).click();
+	await page.getByRole('button', { name: 'Place nose on the captured frame' }).click();
+	await expect(page.getByText('1/17 placed · current: left_eye')).toBeVisible();
+	page.once('dialog', async (dialog) => {
+		expect(dialog.message()).toContain('unsaved pose or calibration');
+		await dialog.dismiss();
+	});
+	await keyframeStrip.locator('.filmstrip-frame-card').nth(1).click();
+	await expect(page.getByText('1/17 placed · current: left_eye')).toBeVisible();
+	page.once('dialog', async (dialog) => { await dialog.accept(); });
+	await keyframeStrip.locator('.filmstrip-frame-card').nth(1).click();
+	await expect(poseStage).toHaveCount(0);
+	await keyframeStrip.locator('.filmstrip-frame-card').first().click();
+	await page.getByRole('button', { name: 'Load authorized analyzed frame' }).click();
 	await expect(poseStage).toBeVisible();
 	await page.getByRole('button', { name: 'Place nose on the captured frame' }).click();
 	await expect(page.getByText('1/17 placed · current: left_eye')).toBeVisible();
-	await page.getByRole('button', { name: 'Save unreviewed pose' }).click();
-	await expect(page.getByText(/Unreviewed pose proposal saved as evidence revision 2 and verified from revision history/i)).toBeVisible();
+	await page.getByRole('button', { name: 'Mark ground contact' }).click();
+	await page.getByLabel('Contact side').selectOption('left');
+	const poseStageBox = await poseStage.boundingBox();
+	expect(poseStageBox).not.toBeNull();
+	await poseStage.locator('.pose-stage-target').click({ position: { x: poseStageBox!.width * 0.5, y: poseStageBox!.height * 0.8 } });
+	await page.getByRole('button', { name: 'Save unreviewed pose and contact' }).click();
+	await expect(page.getByText(/Unreviewed pose and ground-contact candidate saved as evidence revision 2 and verified from revision history/i)).toBeVisible();
 	posePostBody = await page.evaluate(() => (window as any).__poseFixture.postBody);
 	expect(posePostBody?.annotation.poseObservations[0]).toMatchObject({
 		evidenceId,
@@ -289,19 +404,22 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 		trackId: 'track-0001',
 		trackScopeId: 'sha256:fixture-track-scope',
 		reviewState: 'UNREVIEWED',
+		groundContact: { footSide: 'left', label: 'operator-marked-ground-contact-candidate' },
 	});
+	expect(posePostBody?.annotation.poseObservations[0].groundContact.imagePx[0]).toBeCloseTo(160, 0);
+	expect(posePostBody?.annotation.poseObservations[0].groundContact.imagePx[1]).toBeCloseTo(144, 0);
 	expect(posePostBody?.annotation.poseObservations[0].keypoints).toHaveLength(17);
 	await expect(page.getByText('1/17 placed · current: left_eye')).toBeVisible();
 	await expect(page.getByRole('region', { name: 'Saved pose samples for selected track' }).getByText('2 source-frame pose samples for track-0001')).toBeVisible();
 	const poseSamples = page.getByRole('region', { name: 'Saved pose samples for selected track' });
-	await poseSamples.getByRole('button', { name: 'Accept for scene proposal' }).first().click();
+	await poseSamples.getByRole('button', { name: 'Accept pose and contact candidate' }).first().click();
 	await expect(page.getByText('Pose accepted for scene proposal; it is still not calibrated world geometry.')).toBeVisible();
-	await expect(poseSamples.getByText('Accepted for scene proposal')).toBeVisible();
+	await expect(poseSamples.getByText(/Accepted pose and contact candidate for scene proposal/).first()).toBeVisible();
 	const poseReviewBody = await page.evaluate(() => (window as any).__poseFixture.reviewBody);
 	expect(poseReviewBody).toMatchObject({
 		schema: 'atlas.pose-review-request.v1', caseId, parentSha256: sourceRevision,
 		analysisRevision, frameIndex: 0, framePtsUs: 1_000_000,
-		annotationRevisionId: 'pose-revision-1', decision: 'ACCEPTED_FOR_SCENE_PROPOSAL',
+		annotationRevisionId: '10000000-0000-4000-8000-000000000002', decision: 'ACCEPTED_FOR_SCENE_PROPOSAL',
 	});
 	await expect(page.getByRole('region', { name: 'Adjacent pose sample motion in source pixels' }).getByText('Frame 0 → 1 · 500 ms')).toBeVisible();
 	await expect(page.getByRole('region', { name: 'Adjacent pose sample motion in source pixels' }).getByText(/nose: Δx .* px, Δy .* px/)).toBeVisible();
@@ -310,6 +428,52 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 	await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime)).toBeGreaterThanOrEqual(1.45);
 	await expect(page.getByLabel('Link pose to detector track hypothesis')).toHaveValue('track-0001');
 	await expect(page.getByText('Loaded this frame’s saved, unreviewed pose proposal.')).toBeVisible();
+	await page.getByRole('button', { name: 'Ground-plane calibration' }).click();
+	await page.getByRole('button', { name: 'Load authorized analyzed frame' }).click();
+	await expect(page.getByRole('region', { name: 'Ground-plane calibration proposal' })).toBeVisible();
+	await page.getByLabel('I confirm the camera was fixed during this recording.').check();
+	const planeStage = page.locator('.pose-stage');
+	const stageBox = await planeStage.boundingBox();
+	expect(stageBox).not.toBeNull();
+	const anchorFractions = [0.1, 0.9, 0.9, 0.1, 0.25, 0.75, 0.75, 0.25].map((x, index) => [x, index % 4 < 2 ? 0.1 : 0.9] as const);
+	for (let index = 0; index < 8; index += 1) {
+		const row = page.locator('.plane-anchor-row').nth(index);
+		await row.locator('button').click();
+		const [fx, fy] = anchorFractions[index]!;
+		await planeStage.locator('.pose-stage-target').click({ position: { x: stageBox!.width * fx, y: stageBox!.height * fy } });
+		const pixelX = fx * 320;
+		const pixelY = fy * 180;
+		await row.getByLabel('Ground X (m)').fill((pixelX / 100).toFixed(3));
+		await row.getByLabel('Ground Y (m)').fill((pixelY / 100).toFixed(3));
+	}
+	await page.getByRole('button', { name: 'Check calibration' }).click();
+	await expect(page.getByText(/Four validation anchors passed/)).toBeVisible();
+	await page.getByRole('button', { name: 'Save unreviewed calibration' }).click();
+	await expect(page.getByText(/Unreviewed calibration proposal saved and matched from authorized evidence revision history/)).toBeVisible();
+	const calibrationPostBody = await page.evaluate(() => (window as any).__poseFixture.calibrationPostBody);
+	expect(calibrationPostBody?.annotation.planarCameraCalibrations[0]).toMatchObject({
+		evidenceId, sourceRevision, analysisRevision, validationStatus: 'CHECKS_PASSED', status: 'UNREVIEWED_CALIBRATION_PROPOSAL',
+	});
+	expect(calibrationPostBody?.annotation.planarCameraCalibrations[0].validationResidualsMeters).toHaveLength(4);
+	await page.getByLabel('Review note (optional)').fill('Independent fixture review of the measured plane anchors.');
+	await page.getByRole('region', { name: 'Ground-plane calibration proposal' }).getByRole('button', { name: 'Accept for scene proposal' }).click();
+	await expect(page.getByText(/Calibration accepted for a scene proposal/)).toBeVisible();
+	const calibrationReviewBody = await page.evaluate(() => (window as any).__poseFixture.calibrationReviewBody);
+	expect(calibrationReviewBody).toMatchObject({
+		schema: 'atlas.planar-camera-calibration-review-request.v1', caseId, parentSha256: sourceRevision,
+		annotationRevisionId: '10000000-0000-4000-8000-000000000003', analysisRevision, calibrationFrameIndex: 1,
+		calibrationFramePtsUs: 1_500_000, decision: 'ACCEPTED_FOR_SCENE_PROPOSAL',
+		notes: 'Independent fixture review of the measured plane anchors.',
+	});
+	expect(calibrationReviewBody.cameraFixedWindow).toMatchObject({ startPtsUs: 0 });
+	expect(calibrationReviewBody.cameraFixedWindow.endPtsUs).toBeGreaterThan(0);
+	const frameCards = keyframeStrip.locator('.filmstrip-frame-card');
+	if (await frameCards.count() > 1) {
+		await frameCards.first().click();
+		await expect(poseStage).toHaveCount(0);
+		await page.getByRole('button', { name: 'Load authorized analyzed frame' }).click();
+		await expect(page.locator('.pose-stage')).toBeVisible();
+	}
 	await testInfo.attach('network-api-trace', { body: evidenceApiTrace.join('\n'), contentType: 'text/plain' });
 	await testInfo.attach('fixture-api-trace', {
 		body: JSON.stringify(await page.evaluate(() => (window as any).__poseFixture.requests), null, 2),
@@ -326,6 +490,14 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 		evidenceId, sourceRevision, analysisRevision, eventId: videoEventId, startMs: 1000, endMs: 1800,
 		reviewState: 'APPROVED_FOR_SCENE_PROPOSAL'
 	}]);
+	await drawer.getByRole('button', { name: 'Add reviewed track to scene' }).click();
+	await expect(drawer.getByRole('status').filter({ hasText: /Saved reviewed 2D ground-plane track as scene revision 2/ })).toBeVisible();
+	expect(savedSceneRevision?.manifest.groundPlaneTrackProposals).toHaveLength(1);
+	expect(savedSceneRevision?.manifest.groundPlaneTrackProposals[0]).toMatchObject({
+		evidenceId, sourceRevision, analysisRevision, trackId: 'track-0001', trackScopeId: 'sha256:fixture-track-scope',
+		status: 'REVIEWED_GROUND_PLANE_PROPOSAL', semantics: 'image_to_measured_plane_only_no_height_or_camera_motion_compensation',
+	});
+	expect(savedSceneRevision?.manifest.groundPlaneTrackProposals[0].points).toHaveLength(2);
 	await drawer.getByRole('button', { name: 'Seek to 0:01' }).last().click();
 	await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime)).toBeGreaterThanOrEqual(0.95);
 	if (isSyntheticFixture) {
@@ -341,6 +513,78 @@ test('native video modal decodes and a transcript cue seeks with byte-range load
 
 test.describe('authorized persisted video viewer', () => {
 	if (liveStorageState) test.use({ storageState: liveStorageState });
+
+	test('reads and displays a stored motion cue for a later frame', async ({ page }, testInfo) => {
+		test.skip(!liveCaseId || !liveEvidenceId, 'Set the live case and evidence IDs to an authorized analyzed video.');
+		if (!liveCaseId || !liveEvidenceId) return;
+		const errors: string[] = [];
+		page.on('pageerror', (error) => errors.push(error.message));
+		const checkShader = testInfo.project.name === 'chromium-webgl2-motion';
+		if (checkShader) await page.addInitScript(() => {
+			const prototype = WebGL2RenderingContext.prototype;
+			const upload = prototype.texImage2D;
+			const draw = prototype.drawArrays;
+			const receipts = new WeakMap<HTMLCanvasElement, { width: number; height: number; bytes: number }>();
+			const isMotionCanvas = (canvas: HTMLCanvasElement | OffscreenCanvas): canvas is HTMLCanvasElement =>
+				canvas instanceof HTMLCanvasElement && canvas.getAttribute('aria-label')?.startsWith('WebGL2 packed motion tile') === true;
+			prototype.texImage2D = function (this: WebGL2RenderingContext, ...args: unknown[]) {
+				if (isMotionCanvas(this.canvas) && args[2] === this.R8UI && args[8] instanceof Uint8Array) {
+					receipts.set(this.canvas, { width: Number(args[3]), height: Number(args[4]), bytes: args[8].byteLength });
+				}
+				Reflect.apply(upload, this, args);
+			};
+			prototype.drawArrays = function (this: WebGL2RenderingContext, ...args: Parameters<WebGL2RenderingContext['drawArrays']>) {
+				Reflect.apply(draw, this, args);
+				if (!isMotionCanvas(this.canvas)) return;
+				const receipt = receipts.get(this.canvas);
+				if (!receipt) return;
+				const rgba = new Uint8Array(this.drawingBufferWidth * this.drawingBufferHeight * 4);
+				this.readPixels(0, 0, this.drawingBufferWidth, this.drawingBufferHeight, this.RGBA, this.UNSIGNED_BYTE, rgba);
+				Object.assign(this.canvas, { motionLodFixture: { ...receipt, rgba: Array.from(rgba) } });
+			};
+		});
+		const framesResponse = page.waitForResponse((response) =>
+			new URL(response.url()).pathname === `/api/evidence/${liveEvidenceId}/frames` && response.request().method() === 'GET');
+		await page.goto(`/e2e/video-viewer?caseId=${encodeURIComponent(liveCaseId)}&evidenceId=${encodeURIComponent(liveEvidenceId)}`);
+		const framesReply = await framesResponse;
+		expect(framesReply.status()).toBe(200);
+		const payload = await framesReply.json();
+		const frame = payload.frames?.[1];
+		expect(frame?.motionLut, 'The selected video must have a stored cue for its second frame').toBeTruthy();
+		const tileResponse = page.waitForResponse((response) =>
+			new URL(response.url()).pathname === `/api/evidence/${liveEvidenceId}/motion-preview/${frame.frameIndex}`);
+		await page.locator('.filmstrip-frame-card').nth(1).click();
+		const tile = await tileResponse;
+		expect(tile.status()).toBe(200);
+		expect(tile.headers()['x-frame-timestamp-ms']).toBe(String(frame.timestampMs));
+		const storedBytes = await tile.body();
+		expect(storedBytes.byteLength).toBe(4112);
+		const cue = page.getByRole('figure', { name: 'Low-resolution frame-to-frame motion cue' });
+		await expect(cue).toBeVisible();
+		await expect.poll(() => cue.getAttribute('data-renderer')).toMatch(/^(webgl2|webgpu|canvas2d)$/);
+		if (checkShader) {
+			await expect(cue).toHaveAttribute('data-renderer', 'webgl2');
+			const capture = await cue.locator('canvas:not(.hidden)').evaluate((element) => (element as HTMLCanvasElement & {
+				motionLodFixture?: { width: number; height: number; bytes: number; rgba: number[] };
+			}).motionLodFixture);
+			expect(capture).toMatchObject({ width: 16, height: 64, bytes: 1024 });
+			const level = buildPackedMotionLodsV1(decodeVideoMotionLutIndicesV1(storedBytes)).find(({ width }) => width === 32)!;
+			const expected = Buffer.alloc(VIDEO_MOTION_LUT_WIDTH_V1 * VIDEO_MOTION_LUT_HEIGHT_V1 * 4);
+			for (let y = 0; y < VIDEO_MOTION_LUT_HEIGHT_V1; y++) {
+				for (let x = 0; x < VIDEO_MOTION_LUT_WIDTH_V1; x++) {
+					const texel = ((127 - y) >>> 1) * level.width + (x >>> 1);
+					const packed = level.data[texel >>> 1]!;
+					const shade = VIDEO_MOTION_GRAYSCALE_LUT_V1[(texel & 1) ? packed >>> 4 : packed & 15]!;
+					const offset = (y * VIDEO_MOTION_LUT_WIDTH_V1 + x) * 4;
+					expected.set([shade, shade, shade, 255], offset);
+				}
+			}
+			expect(Buffer.from(capture!.rgba).equals(expected)).toBe(true);
+		}
+		await expect(cue).toContainText(frame.motionLut.previousTimestampMs === null ? 'no comparison frame' : 'Difference intensity:');
+		await expect.poll(() => page.getByTestId('evidence-video-player').evaluate((video: HTMLVideoElement) => video.currentTime)).toBeCloseTo(frame.timestampMs / 1000, 1);
+		expect(errors).toEqual([]);
+	});
 
 	test('keeps a running progress bar below complete when an event over-reports', async ({ page }) => {
 		test.skip(!liveCaseId || !liveEvidenceId, 'Set PLAYWRIGHT_LIVE_VIDEO_CASE_ID and PLAYWRIGHT_LIVE_VIDEO_EVIDENCE_ID to an authorized video.');

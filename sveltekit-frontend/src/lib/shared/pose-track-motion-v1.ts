@@ -21,7 +21,16 @@ export type PoseTrackMotionV1 = {
 	measurementSemantics: 'source_frame_pixel_delta_includes_camera_motion';
 	cameraMotionCompensated: false;
 	worldCalibrated: false;
-	samples: Array<{ frameIndex: number; framePtsUs: number; labeledJointCount: number }>;
+	samples: Array<{
+		frameIndex: number;
+		framePtsUs: number;
+		labeledJointCount: number;
+		visibility: { visible: number; occluded: number; notLabeled: number };
+		confidence: { mean: number | null; min: number | null; max: number | null };
+		confidenceSemantics: 'keypoint_score_not_calibrated_measurement_error';
+		measurementUncertaintyPx: null;
+		jointAnglesDeg: Array<{ name: string; degrees: number; minKeypointConfidence: number }>;
+	}>;
 	intervals: Array<{
 		startFrameIndex: number;
 		endFrameIndex: number;
@@ -104,6 +113,53 @@ export function derivePoseTrackMotionV1(
 		};
 	});
 
+	const jointIndexes = new Map(schema.joints.map((joint) => [joint.name, joint.index]));
+	const angleTriplets = [
+		['left_elbow', 'left_shoulder', 'left_elbow', 'left_wrist'],
+		['right_elbow', 'right_shoulder', 'right_elbow', 'right_wrist'],
+		['left_knee', 'left_hip', 'left_knee', 'left_ankle'],
+		['right_knee', 'right_hip', 'right_knee', 'right_ankle'],
+	] as const;
+	const samples = observations.map((observation) => {
+		const visible = observation.keypoints.filter((point) => point.visibility === 'visible').length;
+		const occluded = observation.keypoints.filter((point) => point.visibility === 'occluded').length;
+		const labeled = observation.keypoints.filter((point) => point.visibility !== 'not_labeled');
+		const scores = labeled.map((point) => point.confidence);
+		const jointAnglesDeg = angleTriplets.flatMap(([name, firstName, vertexName, lastName]) => {
+			const firstPoint = observation.keypoints[jointIndexes.get(firstName) ?? -1];
+			const vertexPoint = observation.keypoints[jointIndexes.get(vertexName) ?? -1];
+			const lastPoint = observation.keypoints[jointIndexes.get(lastName) ?? -1];
+			if (
+				!firstPoint || !vertexPoint || !lastPoint ||
+				firstPoint.visibility !== 'visible' || vertexPoint.visibility !== 'visible' || lastPoint.visibility !== 'visible' ||
+				firstPoint.x === null || firstPoint.y === null || vertexPoint.x === null || vertexPoint.y === null ||
+				lastPoint.x === null || lastPoint.y === null
+			) return [];
+			const ax = firstPoint.x - vertexPoint.x;
+			const ay = firstPoint.y - vertexPoint.y;
+			const bx = lastPoint.x - vertexPoint.x;
+			const by = lastPoint.y - vertexPoint.y;
+			const magnitude = Math.hypot(ax, ay) * Math.hypot(bx, by);
+			if (magnitude === 0) return [];
+			const degrees = Math.acos(Math.max(-1, Math.min(1, (ax * bx + ay * by) / magnitude))) * (180 / Math.PI);
+			return [{ name, degrees, minKeypointConfidence: Math.min(firstPoint.confidence, vertexPoint.confidence, lastPoint.confidence) }];
+		});
+		return {
+			frameIndex: observation.frameIndex,
+			framePtsUs: observation.framePtsUs,
+			labeledJointCount: labeled.length,
+			visibility: { visible, occluded, notLabeled: observation.keypoints.length - labeled.length },
+			confidence: {
+				mean: scores.length ? scores.reduce((sum, score) => sum + score, 0) / scores.length : null,
+				min: scores.length ? Math.min(...scores) : null,
+				max: scores.length ? Math.max(...scores) : null,
+			},
+			confidenceSemantics: 'keypoint_score_not_calibrated_measurement_error' as const,
+			measurementUncertaintyPx: null,
+			jointAnglesDeg,
+		};
+	});
+
 	return {
 		schema: POSE_TRACK_MOTION_SCHEMA_V1,
 		evidenceId: first.evidenceId,
@@ -118,11 +174,7 @@ export function derivePoseTrackMotionV1(
 		measurementSemantics: 'source_frame_pixel_delta_includes_camera_motion',
 		cameraMotionCompensated: false,
 		worldCalibrated: false,
-		samples: observations.map((observation) => ({
-			frameIndex: observation.frameIndex,
-			framePtsUs: observation.framePtsUs,
-			labeledJointCount: observation.keypoints.filter((point) => point.x !== null && point.y !== null).length,
-		})),
+		samples,
 		intervals,
 	};
 }

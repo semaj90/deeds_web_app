@@ -28,6 +28,78 @@ export const STATUTE_EMBEDDING_RECIPE_V1 = Object.freeze({
 /** pgvector HNSW returns at most hnsw.ef_search (default 40) candidates unless iterative scan is enabled. */
 export const MAX_VECTOR_RESULTS = 40;
 
+/** Case-scoped lexical discovery. Passage text is resolved by the library citation verifier. */
+export async function searchCaseLinkedAuthorityChunksV1(
+	db: StatuteQueryable, input: { caseId: string; actorId: number; jurisdiction: string; question: string },
+): Promise<Array<{ chunkId: string; score: number }>> {
+	const { rows } = await db.query(
+		`WITH q AS (SELECT websearch_to_tsquery('english', $1) AS tsq)
+		SELECT lc.id::text AS chunk_id, ts_rank_cd(lc.tsv, q.tsq, 32) AS score
+		FROM legal_chunks lc
+		JOIN legal_nodes ln ON ln.id = lc.legal_node_id
+		JOIN library_documents ld ON ld.id = ln.document_id
+		JOIN library_document_versions ldv
+		  ON ldv.id = ln.version_id AND ldv.document_id = ld.id
+		 AND ldv.source_hash = ld.source_hash AND ldv.is_current IS TRUE
+		JOIN jurisdictions j ON j.id = ld.jurisdiction_id
+		CROSS JOIN q
+		WHERE lc.tsv @@ q.tsq AND j.code = $2 AND ld.is_official IS TRUE
+		  AND ld.corpus_type IN ('statute', 'case', 'constitution', 'regulation')
+		  AND lc.parser_revision IS NOT NULL AND lc.char_offset_unit = 'utf16_code_units'
+		  AND ld.source_hash ~ '^[a-fA-F0-9]{64}$'
+		  AND (ld.uploaded_by IS NULL OR ld.uploaded_by = $3::integer)
+		  AND EXISTS (SELECT 1 FROM case_library_links cl WHERE cl.document_id = ld.id AND cl.case_id = $4::uuid
+			AND (cl.node_id IS NULL OR cl.node_id = ln.id))
+		ORDER BY score DESC, lc.id
+		LIMIT 24`,
+		[toOrWebSearchQuery(input.question), input.jurisdiction, input.actorId, input.caseId],
+	);
+	return rows.map((row) => ({ chunkId: String(row.chunk_id), score: Number(row.score) }));
+}
+
+export async function listCaseAuthorityJurisdictionsV1(db: StatuteQueryable, caseId: string, actorId: number) {
+	const { rows } = await db.query(
+		`SELECT DISTINCT j.code, j.name
+		FROM case_library_links cl
+		JOIN library_documents ld ON ld.id = cl.document_id
+		JOIN jurisdictions j ON j.id = ld.jurisdiction_id
+		WHERE cl.case_id = $1::uuid AND ld.is_official IS TRUE
+		  AND ld.corpus_type IN ('statute', 'case', 'constitution', 'regulation')
+		  AND (ld.uploaded_by IS NULL OR ld.uploaded_by = $2::integer)
+		ORDER BY j.code LIMIT 100`, [caseId, actorId],
+	);
+	return rows.map((row) => ({ code: String(row.code), name: String(row.name) }));
+}
+
+/** Return case-linked excerpts that contain the citation text of an indexed inbound edge. */
+export async function searchCaseLinkedCitingChunksV1(
+	db: StatuteQueryable, input: { caseId: string; actorId: number; jurisdiction: string; targetChunkId: string; targetRevision: string },
+): Promise<Array<{ chunkId: string; score: number; citationText: string }>> {
+	const { rows } = await db.query(
+		`SELECT citing.id::text AS chunk_id, max(coalesce(edge.confidence, 0)) AS score,
+		   min(trim(edge.citation_text)) AS citation_text
+		 FROM legal_chunks target
+		 JOIN legal_nodes target_node ON target_node.id = target.legal_node_id AND target_node.version_id = $2::uuid
+		 JOIN legal_citations edge ON edge.to_node_id = target_node.id
+		 JOIN legal_nodes ln ON ln.id = edge.from_node_id AND ln.id <> target_node.id
+		 JOIN legal_chunks citing ON citing.legal_node_id = ln.id
+		 JOIN library_documents ld ON ld.id = ln.document_id
+		 JOIN library_document_versions ldv ON ldv.id = ln.version_id AND ldv.document_id = ld.id
+		  AND ldv.source_hash = ld.source_hash AND ldv.is_current IS TRUE
+		 JOIN jurisdictions j ON j.id = ld.jurisdiction_id
+		 WHERE target.id = $1::uuid AND j.code = $3 AND ld.is_official IS TRUE
+		  AND ld.corpus_type IN ('statute', 'case', 'constitution', 'regulation')
+		  AND citing.parser_revision IS NOT NULL AND citing.char_offset_unit = 'utf16_code_units'
+		  AND (ld.uploaded_by IS NULL OR ld.uploaded_by = $4::integer)
+		  AND EXISTS (SELECT 1 FROM case_library_links cl WHERE cl.document_id = ld.id AND cl.case_id = $5::uuid
+		   AND (cl.node_id IS NULL OR cl.node_id = ln.id))
+		  AND position(lower(nullif(trim(edge.citation_text), '')) in lower(citing.chunk_text)) > 0
+		 GROUP BY citing.id ORDER BY score DESC, citing.id LIMIT 24`,
+		[input.targetChunkId, input.targetRevision, input.jurisdiction, input.actorId, input.caseId],
+	);
+	return rows.map((row) => ({ chunkId: String(row.chunk_id), score: Number(row.score), citationText: String(row.citation_text) }));
+}
+
 export type CorpusSourceType = 'statute' | 'treatise' | 'unregistered' | 'unknown';
 export type LegalSourceType = CorpusSourceType | 'case' | 'judicial_opinion';
 

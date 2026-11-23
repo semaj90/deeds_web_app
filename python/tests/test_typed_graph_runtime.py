@@ -2,6 +2,7 @@ import pytest
 
 from atlas_compute.typed_graph_runtime import (
     TypedGraphEdge,
+    parse_graphrag_alignment_simdjson,
     run_pagerank,
     run_sssp,
     som_neighborhood,
@@ -285,3 +286,71 @@ def test_pagerank_metric_receipt_includes_correlations_topk_error_and_dangling_m
     assert metrics["scoreL1"] == pytest.approx(2e-7)
     assert metrics["scoreLInf"] == pytest.approx(1e-7)
     assert metrics["danglingScoreMassAbsoluteDelta"] == 0.0
+
+
+def test_simdjson_graphrag_alignment_feeds_torch_pagerank_with_networkx_parity():
+    import torch
+
+    payload = (
+        '{"nodeOrdinals":[10,11,12,13],"edges":['
+        '{"srcOrdinal":10,"dstOrdinal":11,"kind":"CALLS","weight":2.0},'
+        '{"srcOrdinal":11,"dstOrdinal":12,"kind":"REFERENCES","weight":1.0},'
+        '{"srcOrdinal":12,"dstOrdinal":10,"kind":"EVIDENCE_LINK","weight":0.5}'
+        ']}'
+    )
+    nodes, edges = parse_graphrag_alignment_simdjson(payload)
+    assert nodes == [10, 11, 12, 13]
+    assert len(edges) == 3
+
+    nx_scores, nx_receipt = run_pagerank(
+        graph_revision="sha256:" + "a" * 64,
+        node_ordinals=nodes,
+        edges=edges,
+        backend="networkx",
+    )
+    cpu_scores, cpu_receipt = run_pagerank(
+        graph_revision="sha256:" + "a" * 64,
+        node_ordinals=nodes,
+        edges=edges,
+        backend="torch_cpu",
+    )
+    assert cpu_receipt.status == "PROVEN"
+    assert cpu_receipt.effective_backend == "torch_cpu"
+    assert cpu_receipt.canonical_authority is False
+    for node in nodes:
+        assert cpu_scores[node] == pytest.approx(nx_scores[node], abs=1e-6)
+
+    if torch.cuda.is_available():
+        gpu_scores, gpu_receipt = run_pagerank(
+            graph_revision="sha256:" + "a" * 64,
+            node_ordinals=nodes,
+            edges=edges,
+            backend="torch_cuda",
+        )
+        assert gpu_receipt.status == "PROVEN"
+        assert gpu_receipt.effective_backend == "torch_cuda"
+        assert gpu_receipt.canonical_authority is False
+        for node in nodes:
+            assert gpu_scores[node] == pytest.approx(nx_scores[node], abs=1e-6)
+
+
+def test_simdjson_graphrag_alignment_rejects_non_int_ordinals():
+    with pytest.raises(ValueError, match="ATLAS_GRAPH_ORDINALS_MUST_BE_INTS"):
+        parse_graphrag_alignment_simdjson('{"nodeOrdinals":["10"],"edges":[]}')
+
+
+def test_torch_cuda_fails_closed_when_cuda_unavailable(monkeypatch):
+    import torch
+
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
+    scores, receipt = run_pagerank(
+        graph_revision="graph-test-v1",
+        node_ordinals=[1, 2],
+        edges=[TypedGraphEdge(1, 2, "CALLS")],
+        backend="torch_cuda",
+    )
+    assert scores == {}
+    assert receipt.status == "DEGRADED"
+    assert receipt.effective_backend == "none"
+    assert receipt.canonical_authority is False
+    assert "TORCH_CUDA_UNAVAILABLE" in (receipt.error or "")

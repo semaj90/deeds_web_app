@@ -2,6 +2,7 @@ import type { SceneDocumentV1 } from './scene-document-v1.js';
 import { humanCoco17PoseSchemaV1, parsePoseObservationV1 } from '$lib/shared/pose-skeleton-schema-v1.js';
 
 export type SceneVideoEventBindingV1 = NonNullable<SceneDocumentV1['videoEventBindings']>[number];
+export type SceneEvidenceAnalysisScopeV1 = Pick<SceneVideoEventBindingV1, 'evidenceId' | 'sourceRevision' | 'analysisRevision'>;
 
 export type ReadbackVideoEventV1 = {
 	eventId: string;
@@ -15,6 +16,7 @@ export type ReadbackVideoEventV1 = {
 
 export type ReadbackVideoTimelineV1 = {
 	evidenceId: string;
+	caseId?: string;
 	sourceRevision: string;
 	analysisRevision: string;
 	events: ReadbackVideoEventV1[];
@@ -34,6 +36,11 @@ export type ScenePoseObservationReadbackV1 = {
 	frameWidth: number;
 	frameHeight: number;
 	keypoints: Array<{ index: number; x: number | null; y: number | null; visibility: 'visible' | 'occluded' | 'not_labeled' }>;
+	groundContact: { imagePx: [number, number]; footSide: 'left' | 'right' | 'unknown' } | null;
+	groundContactReviewed: boolean;
+	groundContactDecision: string;
+	groundPlanePoint: [number, number] | null;
+	groundPlaneCalibrationRevisionId: string | null;
 	trackId: string | null;
 	trackScopeId: string | null;
 	placedKeypoints: number;
@@ -82,18 +89,19 @@ export function parseReadbackVideoTimelineV1(value: unknown, expectedEvidenceId:
 		&& typeof event.summary === 'string'
 		&& typeof event.reviewStatus === 'string'
 		&& typeof event.sceneAdmission === 'string'));
-	return { evidenceId: timeline.evidenceId, sourceRevision: timeline.sourceRevision, analysisRevision: timeline.analysisRevision, events };
+	return { evidenceId: timeline.evidenceId, caseId: typeof timeline.caseId === 'string' ? timeline.caseId : undefined,
+		sourceRevision: timeline.sourceRevision, analysisRevision: timeline.analysisRevision, events };
 }
 
 /** Reads revision history into source-frame pose summaries, scoped to scene-bound runs. */
 export function parseScenePoseReadbackV1(
 	value: unknown,
-	bindings: readonly SceneVideoEventBindingV1[]
+	bindings: readonly SceneEvidenceAnalysisScopeV1[]
 ): ScenePoseObservationReadbackV1[] {
 	if (!value || typeof value !== 'object' || !Array.isArray((value as { versions?: unknown }).versions)) return [];
 	const revisions = (value as { versions: unknown[] }).versions;
 	const latestBySample = new Map<string, ScenePoseObservationReadbackV1>();
-	const reviewByPoseRevision = new Map<string, { decision: string; sceneAdmission: string }>();
+	const reviewByPoseRevision = new Map<string, { decision: string; sceneAdmission: string; groundContactReviewed: boolean; groundContactDecision: string }>();
 	for (const revision of revisions) {
 		if (!revision || typeof revision !== 'object') continue;
 		const row = revision as { metadata?: Record<string, unknown> };
@@ -102,13 +110,18 @@ export function parseScenePoseReadbackV1(
 			|| typeof decision.evidenceId !== 'string' || typeof decision.sourceSha256 !== 'string'
 			|| typeof decision.analysisRevision !== 'string' || typeof decision.annotationRevisionId !== 'string'
 			|| !Number.isSafeInteger(decision.framePtsUs) || typeof decision.skeletonSchemaId !== 'string'
+			|| decision.canonicalAuthority !== false
 			|| (decision.decision !== 'ACCEPTED_FOR_SCENE_PROPOSAL' && decision.decision !== 'REJECTED')) continue;
 		const matchingBinding = bindings.some((binding) => binding.evidenceId === decision.evidenceId
 			&& binding.sourceRevision === decision.sourceSha256
 			&& binding.analysisRevision === decision.analysisRevision);
 		if (!matchingBinding || decision.skeletonSchemaId !== humanCoco17PoseSchemaV1.schemaId) continue;
 		const key = `${decision.annotationRevisionId}:${decision.framePtsUs}:${decision.trackId ?? ''}:${decision.trackScopeId ?? ''}`;
-		if (!reviewByPoseRevision.has(key)) reviewByPoseRevision.set(key, { decision: String(decision.decision), sceneAdmission: String(decision.sceneAdmission ?? 'NOT_ADMITTED') });
+		if (!reviewByPoseRevision.has(key)) reviewByPoseRevision.set(key, {
+			decision: String(decision.decision), sceneAdmission: String(decision.sceneAdmission ?? 'NOT_ADMITTED'),
+			groundContactReviewed: decision.groundContactReviewed === true,
+			groundContactDecision: typeof decision.groundContactDecision === 'string' ? decision.groundContactDecision : 'NOT_PRESENT',
+		});
 	}
 	for (const revision of revisions) {
 		if (!revision || typeof revision !== 'object') continue;
@@ -136,6 +149,10 @@ export function parseScenePoseReadbackV1(
 				frameWidth: pose.frameWidth,
 				frameHeight: pose.frameHeight,
 				keypoints: pose.keypoints.map(({ index, x, y, visibility }) => ({ index, x, y, visibility })),
+				groundContact: pose.groundContact ? {
+					imagePx: [pose.groundContact.imagePx[0], pose.groundContact.imagePx[1]],
+					footSide: pose.groundContact.footSide,
+				} : null,
 				trackId: pose.trackId,
 				trackScopeId: pose.trackScopeId,
 				placedKeypoints: pose.keypoints.filter((point) => point.x !== null && point.y !== null && point.visibility !== 'not_labeled').length,
@@ -143,6 +160,10 @@ export function parseScenePoseReadbackV1(
 				reviewState: pose.reviewState,
 				reviewDecision: reviewByPoseRevision.get(`${String(version.id ?? '')}:${pose.framePtsUs}:${pose.trackId ?? ''}:${pose.trackScopeId ?? ''}`)?.decision ?? null,
 				sceneAdmission: reviewByPoseRevision.get(`${String(version.id ?? '')}:${pose.framePtsUs}:${pose.trackId ?? ''}:${pose.trackScopeId ?? ''}`)?.sceneAdmission ?? 'NOT_ADMITTED',
+				groundContactReviewed: reviewByPoseRevision.get(`${String(version.id ?? '')}:${pose.framePtsUs}:${pose.trackId ?? ''}:${pose.trackScopeId ?? ''}`)?.groundContactReviewed ?? false,
+				groundContactDecision: reviewByPoseRevision.get(`${String(version.id ?? '')}:${pose.framePtsUs}:${pose.trackId ?? ''}:${pose.trackScopeId ?? ''}`)?.groundContactDecision ?? 'NOT_PRESENT',
+				groundPlanePoint: null,
+				groundPlaneCalibrationRevisionId: null,
 				annotationRevision: Number(version.version)
 			});
 		}
@@ -152,13 +173,53 @@ export function parseScenePoseReadbackV1(
 
 export type PoseImageTrajectoryPointV1 = { frameIndex: number; framePtsUs: number; x: number; y: number; current: boolean };
 
+export type GroundPlanePlotInputPointV1 = { frameIndex: number; framePtsUs: number; planeM: readonly [number, number] };
+export type GroundPlanePlotPointV1 = GroundPlanePlotInputPointV1 & { x: number; y: number; index: number; paletteSlot: number };
+
+/** Compact, equal-scale top-down plot coordinates for a reviewed measured-plane track. */
+export function layoutGroundPlaneTrackPlotV1(
+	points: readonly GroundPlanePlotInputPointV1[],
+	width = 240,
+	height = 150,
+	padding = 18
+): GroundPlanePlotPointV1[] {
+	if (points.length < 2 || points.length > 4096 || !Number.isFinite(width) || !Number.isFinite(height)
+		|| !Number.isFinite(padding) || width <= padding * 2 || height <= padding * 2) return [];
+	if (points.some((point) => !Number.isSafeInteger(point.frameIndex) || point.frameIndex < 0
+		|| !Number.isSafeInteger(point.framePtsUs) || point.framePtsUs < 0
+		|| point.planeM.length !== 2 || point.planeM.some((value) => !Number.isFinite(value)))) return [];
+	const xs = points.map((point) => point.planeM[0]);
+	const ys = points.map((point) => point.planeM[1]);
+	const minX = Math.min(...xs); const maxX = Math.max(...xs);
+	const minY = Math.min(...ys); const maxY = Math.max(...ys);
+	const spanX = maxX - minX; const spanY = maxY - minY;
+	const usableWidth = width - padding * 2; const usableHeight = height - padding * 2;
+	const scale = Math.min(usableWidth / (spanX || 1), usableHeight / (spanY || 1));
+	const centerX = (minX + maxX) / 2; const centerY = (minY + maxY) / 2;
+	return points.map((point, index) => ({
+		...point, index,
+		x: width / 2 + (point.planeM[0] - centerX) * scale,
+		y: height / 2 - (point.planeM[1] - centerY) * scale,
+		paletteSlot: Math.round(index * 15 / (points.length - 1))
+	}));
+}
+
+/** Time-order display LUT only; this is not a class vocabulary or evidence classification. */
+export const GROUND_PLANE_TRACK_TIME_PALETTE_V1 = Object.freeze([
+	'#183b56', '#1d5268', '#216a77', '#27827f', '#369985', '#50ad85', '#72bd7f', '#98c875',
+	'#b9cf6b', '#d3d061', '#e5c557', '#efb74c', '#f2a444', '#eb8d3e', '#dc733c', '#c9593e'
+] as const);
+
 /** Builds a display-only COCO hip-center path for one exact clip-scoped track. */
 export function poseHipImageTrajectoryV1(
 	observations: readonly ScenePoseObservationReadbackV1[],
 	current: ScenePoseObservationReadbackV1,
-	maxSamples = 24
+	maxSamples = 24,
+	window?: { startUs: number; endUs: number }
 ): PoseImageTrajectoryPointV1[] {
-	if (!current.trackId || !current.trackScopeId || !Number.isInteger(maxSamples) || maxSamples < 2) return [];
+	if (!current.trackId || !current.trackScopeId || !Number.isInteger(maxSamples) || maxSamples < 2 || !window
+		|| !Number.isSafeInteger(window.startUs) || !Number.isSafeInteger(window.endUs) || window.startUs < 0
+		|| window.endUs < window.startUs || current.framePtsUs < window.startUs || current.framePtsUs > window.endUs) return [];
 	const matching = observations.filter((pose) => pose.evidenceId === current.evidenceId
 		&& pose.sourceRevision === current.sourceRevision
 		&& pose.analysisRevision === current.analysisRevision
@@ -166,6 +227,8 @@ export function poseHipImageTrajectoryV1(
 		&& pose.trackScopeId === current.trackScopeId
 		&& pose.frameWidth === current.frameWidth
 		&& pose.frameHeight === current.frameHeight
+		&& pose.framePtsUs >= window.startUs && pose.framePtsUs <= window.endUs
+		&& (pose.framePtsUs < current.framePtsUs || (pose.framePtsUs === current.framePtsUs && pose.frameIndex <= current.frameIndex))
 		&& Number.isSafeInteger(pose.framePtsUs))
 		.sort((a, b) => a.framePtsUs - b.framePtsUs || a.frameIndex - b.frameIndex);
 	const points = matching.flatMap((pose): PoseImageTrajectoryPointV1[] => {

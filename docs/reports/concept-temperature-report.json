@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-11T21:31:53.689Z",
+  "timestamp": "2026-11-22T17:09:55.406Z",
   "summary": {
     "totalConcepts": 10,
     "averageTemperature": "0.410",
@@ -34,7 +34,29 @@
   },
   "topConcepts": [
     {
-      "concept_id": "native_accelerators",
+      "concept_id": "general_abstractions",
+      "temperature": "0.414",
+      "retrievals": 15,
+      "strategy_distribution": {
+        "fusion": 10,
+        "vector_only": 2,
+        "lexical_only": 2,
+        "cold_neschrom": 1
+      }
+    },
+    {
+      "concept_id": "observability_telemetry",
+      "temperature": "0.414",
+      "retrievals": 15,
+      "strategy_distribution": {
+        "fusion": 10,
+        "vector_only": 2,
+        "lexical_only": 2,
+        "cold_neschrom": 1
+      }
+    },
+    {
+      "concept_id": "agent_intelligence",
       "temperature": "0.414",
       "retrievals": 15,
       "strategy_distribution": {
@@ -78,18 +100,7 @@
       }
     },
     {
-      "concept_id": "agent_intelligence",
-      "temperature": "0.414",
-      "retrievals": 15,
-      "strategy_distribution": {
-        "fusion": 10,
-        "vector_only": 2,
-        "lexical_only": 2,
-        "cold_neschrom": 1
-      }
-    },
-    {
-      "concept_id": "general_abstractions",
+      "concept_id": "native_accelerators",
       "temperature": "0.414",
       "retrievals": 15,
       "strategy_distribution": {
@@ -101,17 +112,6 @@
     },
     {
       "concept_id": "emergent_topology",
-      "temperature": "0.414",
-      "retrievals": 15,
-      "strategy_distribution": {
-        "fusion": 10,
-        "vector_only": 2,
-        "lexical_only": 2,
-        "cold_neschrom": 1
-      }
-    },
-    {
-      "concept_id": "observability_telemetry",
       "temperature": "0.414",
       "retrievals": 15,
       "strategy_distribution": {

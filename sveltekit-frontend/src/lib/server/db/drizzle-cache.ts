@@ -14,6 +14,7 @@ import { Cache, type MutationOption } from 'drizzle-orm/cache/core';
 import type { CacheConfig } from 'drizzle-orm/cache/core/types';
 import { type Table, getTableName } from 'drizzle-orm';
 import { getRedis } from '../redis.js';
+import { isValkeyAvailable, recordValkeyFailure, recordValkeySuccess } from '../cache/valkey-client.js';
 
 const PREFIX = 'drizzle';
 const DEFAULT_TTL = 300; // 5 minutes
@@ -40,6 +41,7 @@ export class IoRedisDrizzleCache extends Cache {
 	}
 
 	async get(key: string, tables: string[], isTag = false, isAutoInvalidate?: boolean): Promise<any[] | undefined> {
+		if (!isValkeyAvailable()) return undefined;
 		try {
 			const redis = getRedis();
 			let cacheKey: string;
@@ -53,15 +55,17 @@ export class IoRedisDrizzleCache extends Cache {
 			}
 
 			const raw = await redis.get(cacheKey);
+			recordValkeySuccess();
 			if (raw === null) return undefined;
 			return JSON.parse(raw);
 		} catch (e) {
-			console.warn('[DrizzleCache] get error (non-fatal):', (e as Error).message);
+			recordValkeyFailure(e);
 			return undefined;
 		}
 	}
 
 	async put(hashedQuery: string, response: any, tables: string[], isTag = false, config?: CacheConfig): Promise<void> {
+		if (!isValkeyAvailable()) return;
 		try {
 			const redis = getRedis();
 			const ttl = config?.ex ?? this.defaultTtl;
@@ -96,7 +100,7 @@ export class IoRedisDrizzleCache extends Cache {
 
 			await pipeline.exec();
 		} catch (e) {
-			console.warn('[DrizzleCache] put error (non-fatal):', (e as Error).message);
+			recordValkeyFailure(e);
 		}
 	}
 
@@ -143,7 +147,7 @@ export class IoRedisDrizzleCache extends Cache {
 
 			await pipeline.exec();
 		} catch (e) {
-			console.warn('[DrizzleCache] onMutate error (non-fatal):', (e as Error).message);
+			recordValkeyFailure(e);
 		}
 	}
 

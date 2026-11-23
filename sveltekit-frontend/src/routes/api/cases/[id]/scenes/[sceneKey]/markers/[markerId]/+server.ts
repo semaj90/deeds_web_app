@@ -11,12 +11,15 @@ import { db } from '$lib/server/db/client.js';
 import {
 	CommandReuseError,
 	EvidenceMismatchError,
+	EvidenceNotInCaseError,
 	MarkerConflictError,
 	MarkerNotFoundError,
+	MarkerSourceMismatchError,
 	deleteMarker,
 	moveMarker
 } from '$lib/server/scene-markers/move-marker.js';
 import { authorizeSceneAccess } from '$lib/server/scene-markers/scene-access-v1.js';
+import { anchorProvenanceSchema, markerAnchorSchema } from '$lib/server/scene-markers/marker-anchor-v1.js';
 import type { RequestHandler } from './$types';
 
 const uuid = z.uuid();
@@ -26,7 +29,9 @@ const moveBody = z
 		commandId: uuid,
 		evidenceId: uuid,
 		expectedRevision: z.number().int().min(1),
-		position: z.object({ x: z.number(), y: z.number(), z: z.number() })
+		position: z.object({ x: z.number(), y: z.number(), z: z.number() }),
+		anchor: markerAnchorSchema.nullable().optional(),
+		provenance: anchorProvenanceSchema.optional()
 	})
 	.strict();
 
@@ -75,6 +80,11 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 			commandId: parsed.data.commandId,
 			expectedRevision: parsed.data.expectedRevision,
 			position: parsed.data.position,
+			...(parsed.data.anchor !== undefined ? { anchor: parsed.data.anchor } : {}),
+			...(parsed.data.provenance ? {
+				sourceRevision: parsed.data.provenance.sourceRevision,
+				sourceSha256: parsed.data.provenance.sourceSha256
+			} : {}),
 			userId: Number.isNaN(userId) ? 0 : userId
 		});
 		return json({ success: true, data: result, message: 'Committed' });
@@ -88,8 +98,11 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 		if (err instanceof MarkerNotFoundError) {
 			return json({ success: false, data: null, message: 'Marker not found' }, { status: 404 });
 		}
-		if (err instanceof EvidenceMismatchError) {
+		if (err instanceof EvidenceMismatchError || err instanceof EvidenceNotInCaseError) {
 			return json({ success: false, data: null, message: 'Evidence does not match marker' }, { status: 422 });
+		}
+		if (err instanceof MarkerSourceMismatchError) {
+			return json({ success: false, data: null, message: err.message }, { status: 422 });
 		}
 		if (err instanceof CommandReuseError) {
 			return json({ success: false, data: null, message: 'commandId already used' }, { status: 409 });

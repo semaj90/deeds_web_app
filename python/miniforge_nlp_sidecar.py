@@ -2637,6 +2637,10 @@ def _build_event_hypergraph(
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434").rstrip("/")
 DOMAIN_CLASSIFIER_EMBED_MODEL = os.getenv("DOMAIN_CLASSIFIER_EMBED_MODEL", "embeddinggemma:latest")
+try:
+    from atlas_domain_classifier_runtime import cluster_distance_features
+except Exception:  # pragma: no cover - mirrors the optional classifier import policy
+    cluster_distance_features = None  # type: ignore[assignment]
 DOMAIN_CLASSIFIER_CHECKPOINT_PATH = Path(
     os.getenv("DOMAIN_CLASSIFIER_CHECKPOINT_PATH", "/models/domain-classifier/checkpoint.joblib")
 )
@@ -2712,7 +2716,7 @@ def _extract_cluster_features(text: str, checkpoint: dict[str, Any]) -> Optional
     """KMeans distance-to-centroid features over embedded text chunks. The KMeans
     model itself is fit offline (train_domain_classifier.py) and only predicts here."""
     kmeans = checkpoint.get("kmeans")
-    if kmeans is None or np is None:
+    if kmeans is None or np is None or cluster_distance_features is None:
         return None
     chunks = _chunk_text_for_clustering(text)
     if not chunks:
@@ -2724,20 +2728,12 @@ def _extract_cluster_features(text: str, checkpoint: dict[str, Any]) -> Optional
             embeddings.append(vector)
     if not embeddings:
         return None
-    matrix = np.array(embeddings)
     try:
-        distances = kmeans.transform(matrix)
-        assignments = kmeans.predict(matrix)
+        # Preserve the checkpoint's training feature recipe; the count is the
+        # successfully embedded rows, not requested chunks that failed embedding.
+        return cluster_distance_features(kmeans, np.asarray(embeddings, dtype=np.float32))
     except Exception:
         return None
-    nearest_distances = distances[np.arange(len(assignments)), assignments]
-    n_clusters = getattr(kmeans, "n_clusters", None) or 1
-    return {
-        "cluster_mean_distance": float(np.mean(nearest_distances)),
-        "cluster_distance_std": float(np.std(nearest_distances)) if len(nearest_distances) > 1 else 0.0,
-        "cluster_diversity": float(len(set(assignments.tolist()))) / float(n_clusters),
-        "chunk_count": float(len(chunks)),
-    }
 
 
 def _classify_domain_pass(text: str) -> tuple[str, dict[str, Any], dict[str, Any], list[str]]:

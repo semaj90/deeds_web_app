@@ -99,6 +99,11 @@ export const poseObservationV1Schema = z.object({
 	modelRevision: z.string().min(1).max(256).nullable(),
 	reviewState: z.enum(['UNREVIEWED', 'REVIEWED', 'REJECTED']),
 	keypoints: z.array(poseKeypointV1Schema).min(1).max(256),
+	groundContact: z.object({
+		imagePx: z.tuple([z.number().finite(), z.number().finite()]),
+		footSide: z.enum(['left', 'right', 'unknown']),
+		label: z.literal('operator-marked-ground-contact-candidate'),
+	}).strict().optional(),
 }).strict();
 
 export type PoseSkeletonSchemaV1 = z.infer<typeof poseSkeletonSchemaV1Schema>;
@@ -111,6 +116,11 @@ export function parsePoseObservationV1(input: unknown, schemaInput: unknown): Po
 	if (observation.keypoints.length !== parsedSchema.joints.length) throw new RangeError('Pose keypoint count does not match the declared skeleton schema.');
 	if (observation.origin === 'manual' && observation.modelRevision !== null) throw new RangeError('Manual pose observations cannot claim a model revision.');
 	if (observation.origin === 'model' && !observation.modelRevision) throw new RangeError('Model pose observations require an exact model revision.');
+	if (observation.groundContact) {
+		const [x, y] = observation.groundContact.imagePx;
+		if (observation.origin !== 'manual') throw new RangeError('Ground-contact candidates must be manually marked.');
+		if (x < 0 || x > observation.frameWidth || y < 0 || y > observation.frameHeight) throw new RangeError('Ground-contact candidate must be inside the source frame.');
+	}
 	if (observation.trackId !== null && observation.trackScopeId === null) throw new RangeError('Track-linked pose observations require a track scope.');
 	for (let index = 0; index < observation.keypoints.length; index += 1) {
 		const point = observation.keypoints[index]!;

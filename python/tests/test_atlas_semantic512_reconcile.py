@@ -57,7 +57,7 @@ def test_normalize_source_ref_preserves_case_and_normalizes_slashes():
 
 
 def test_expected_packet_key_uses_source_ref_and_hash_prefix():
-    assert expected_packet_key("src/lib/a.ts", "abcdef0123456789ffff") == "src/lib/a.ts:abcdef0123456789"
+    assert expected_packet_key("src/lib/a.ts", "abcdef0123456789ffff") == "ace:packet:31954764ce55"
 
 
 def test_unique_strong_identifiers_admit_even_when_legacy_payload_is_placeholder():

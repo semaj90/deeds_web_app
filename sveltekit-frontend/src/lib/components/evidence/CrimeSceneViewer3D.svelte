@@ -1,12 +1,28 @@
+<script module lang="ts">
+	export const CASE_EXHIBIT_DRAG_TYPE = 'application/x-atlas-case-exhibit';
+	export type DetectiveGuideAction = 'Idle' | 'Walk' | 'Inspect' | 'Interact';
+	export type ReviewedWalkJointSample = {
+		framePtsUs: number;
+		root: [number, number, number];
+		headingRadians: number;
+		joints: Record<string, [number, number, number] | null>;
+	};
+</script>
+
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import * as THREE from 'three';
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+	import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 	import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+	import { SceneControllerV1 } from '$lib/scene/scene-controller-v1.js';
 	import { ScenePrimitiveManager, type ScenePrimitiveSnapshot } from '$lib/n64-fsm/scene-primitive-sync.js';
 	import { ARENA_BYTE_LENGTH } from '$lib/n64-fsm/scene-fsm-cache.js';
 	import { SpatialBvhManagerV1 } from '$lib/splat/spatial-bvh-manager-v1.js';
-	import { buildWalkPath, type Vec3 } from '$lib/courtroom/walk-path-v1.js';
+	import { createAnimationClipRegistryV1, type AnimationClipActionV1 } from '$lib/courtroom/animation-clip-registry-v1.js';
+	import { createIndexedPaletteShaderMaterialV1 } from '$lib/splat/indexed-palette-shader-v1.js';
+	import { INDEXED_PALETTE16_V1, quantizeRgbaToIndexed4BppV1 } from '$lib/splat/indexed-palette-texture-v1.js';
+	import { buildWalkPath, type buildTimedWalkPath, type Vec3 } from '$lib/courtroom/walk-path-v1.js';
 	import {
 		legalMotionEnvelope,
 		ATLAS_MOTION_DURATIONS,
@@ -16,6 +32,7 @@
 		new Float32Array(ARENA_BYTE_LENGTH / Float32Array.BYTES_PER_ELEMENT)
 	);
 	const pickBvhManager = new SpatialBvhManagerV1();
+	type CaseMarker = { id: string; posX: number; posY: number; posZ: number };
 
 	interface Props {
 		activeEvidenceId?: string;
@@ -34,6 +51,17 @@
 		onSelectEvidence?: (evidence: any) => void;
 		onSelectMarker?: (markerId: number) => void;
 		onSelectScenePrimitive?: (selection: ScenePrimitiveSnapshot) => void;
+		caseMarkers?: readonly CaseMarker[];
+		indexedFloor?: boolean;
+		guideVisible?: boolean;
+		guideAction?: DetectiveGuideAction;
+		guideScrubTime?: number | null;
+		reviewedWalkPath?: ReturnType<typeof buildTimedWalkPath>;
+		reviewedWalkPtsUs?: number;
+		onGuideClipsReady?: (durations: Record<DetectiveGuideAction, number>) => void;
+		placementPreview?: Vec3 | null;
+		onCaseMarkerSelect?: (id: string) => void;
+		onCaseGroundPoint?: (point: Vec3, evidenceId?: string) => void;
 	}
 
 	let {
@@ -52,7 +80,18 @@
 		trajectoryProgress = 0,
 		onSelectEvidence,
 		onSelectMarker,
-		onSelectScenePrimitive
+		onSelectScenePrimitive,
+		caseMarkers,
+		indexedFloor = false,
+		guideVisible = true,
+		guideAction = 'Idle',
+		guideScrubTime = null,
+		reviewedWalkPath,
+		reviewedWalkPtsUs,
+		onGuideClipsReady,
+		placementPreview = null,
+		onCaseMarkerSelect,
+		onCaseGroundPoint
 	}: Props = $props();
 
 	let containerEl = $state<HTMLDivElement>();
@@ -61,6 +100,10 @@
 	let scene: THREE.Scene | null = null;
 	let camera: THREE.PerspectiveCamera | null = null;
 	let controls: OrbitControls | null = null;
+	// ENG-01: TransformControls gizmo for translate/rotate/scale (suspends OrbitControls during drag)
+	let transformControls: TransformControls | null = null;
+	// ENG-01: Centralized SceneController for CommandHistory (undo/redo) across all object mutations
+	const sceneController = new SceneControllerV1();
 	let animId: number = 0;
 	let raycaster = new THREE.Raycaster();
 	let mouse = new THREE.Vector2();
@@ -83,21 +126,427 @@
 	let measurementsGroup: THREE.Group;
 	let reconstructionGroup: THREE.Group;
 	let environmentGroup: THREE.Group;
-	let groundMesh: THREE.Mesh | null = null;
+	let groundMesh: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardMaterial> | null = null;
+	let solidFloorMaterial: THREE.MeshStandardMaterial | null = null;
+	let blockout: THREE.InstancedMesh<THREE.BoxGeometry, THREE.MeshStandardMaterial> | null = null;
+	let caseMarkerReady = $state(false);
+	let sceneReady = $state(false);
+	let caseMarkerGeometry: THREE.CylinderGeometry | null = null;
+	let caseMarkerMaterial: THREE.MeshBasicMaterial | null = null;
+	let previewMaterial: THREE.MeshBasicMaterial | null = null;
+	let caseMarkerPreview: THREE.Mesh | null = null;
+	const caseMarkerMeshes = new Map<string, THREE.Mesh>();
 
 	// Pickable objects map
 	let pickables: { object: THREE.Object3D; type: string; id: any }[] = [];
 	let detectiveActor: THREE.Group | null = null;
+	let guideLoadState = $state<'procedural' | 'rigged' | 'fallback'>('procedural');
+	let guideLoadIssue = $state<string | null>(null);
+	let guideRigDiagnostic = $state<string | null>(null);
+	let activeGuideClip = $state<DetectiveGuideAction | null>(null);
+	let riggedGuide = $state<{
+		model: THREE.Group;
+		mixer: THREE.AnimationMixer;
+		actions: Map<string, THREE.AnimationAction>;
+		current: THREE.AnimationAction | null;
+		scrubAction: DetectiveGuideAction | null;
+		walkSeconds: number;
+		assetSha256: string | null;
+		animationRegistry: ReturnType<typeof createAnimationClipRegistryV1>;
+		registeredWalkStartUs: number | null;
+	} | null>(null);
+	let guideLoadGeneration = 0;
 	const trajectoryWaypoints: readonly Vec3[] = [
 		{ x: -1.8, y: 0.05, z: 1.6 },
 		{ x: 0.5, y: 0.45, z: 0.0 },
 		{ x: 2.4, y: 0.05, z: -1.2 }
 	];
 	const walkPath = buildWalkPath(trajectoryWaypoints);
+	const guideBoneParents: Readonly<Record<string, string | null>> = {
+		hips: 'Detective Guide Rig', chest: 'hips', head: 'chest',
+		'upper_arm.L': 'chest', 'forearm.L': 'upper_arm.L', 'hand.L': 'forearm.L',
+		'thigh.L': 'hips', 'shin.L': 'thigh.L', 'foot.L': 'shin.L',
+		'upper_arm.R': 'chest', 'forearm.R': 'upper_arm.R', 'hand.R': 'forearm.R',
+		'thigh.R': 'hips', 'shin.R': 'thigh.R', 'foot.R': 'shin.R'
+	};
+	const guideActions: readonly DetectiveGuideAction[] = ['Idle', 'Walk', 'Inspect', 'Interact'];
+	const guideRestPosition = new THREE.Vector3(0.2, 0, -0.5);
+
+	function guideRigMismatch(model: THREE.Object3D): string | null {
+		const bones = new Map<string, THREE.Bone>();
+		model.traverse((object) => {
+			if ((object as THREE.Bone).isBone) bones.set(THREE.PropertyBinding.sanitizeNodeName(object.name), object as THREE.Bone);
+		});
+		if (bones.size !== Object.keys(guideBoneParents).length) return `bone-count:${bones.size}`;
+		for (const [name, parent] of Object.entries(guideBoneParents)) {
+			const bone = bones.get(THREE.PropertyBinding.sanitizeNodeName(name));
+			if (!bone) return `missing:${name}`;
+			const expectedParent = parent === null ? null : THREE.PropertyBinding.sanitizeNodeName(parent);
+			if ((bone.parent?.name ?? null) !== expectedParent) return `parent:${name}:${bone.parent?.name ?? 'none'}!=${expectedParent ?? 'none'}`;
+		}
+		return null;
+	}
+
+	function disposeGuideModel(model: THREE.Object3D) {
+		const materials = new Set<THREE.Material>();
+		const textures = new Set<THREE.Texture>();
+		model.traverse((object) => {
+			if (!(object instanceof THREE.Mesh)) return;
+			object.geometry.dispose();
+			if (object instanceof THREE.SkinnedMesh) object.skeleton.dispose();
+			for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
+				materials.add(material);
+				for (const value of Object.values(material)) {
+					if (value instanceof THREE.Texture) textures.add(value);
+				}
+			}
+		});
+		for (const material of materials) material.dispose();
+		for (const texture of textures) {
+			texture.dispose();
+			if (typeof ImageBitmap !== 'undefined' && texture.image instanceof ImageBitmap) texture.image.close();
+		}
+	}
+
+	async function loadCaseGuide(root: THREE.Group, registeredWalk?: { bytes: ArrayBuffer; startUs: number }) {
+		const generation = ++guideLoadGeneration;
+		try {
+			const modelUrl = '/models/detective-actor-v1.glb';
+			const loader = new GLTFLoader();
+			let assetSha256: string | null = null;
+			const gltf = await (async () => {
+				let bytes: ArrayBuffer;
+				let resourcePath = '/models/';
+				if (registeredWalk) {
+					bytes = registeredWalk.bytes;
+					resourcePath = '/';
+				} else {
+					const response = await fetch(modelUrl, { credentials: 'same-origin' });
+					if (!response.ok) throw new Error('GUIDE_ASSET_UNAVAILABLE');
+					bytes = await response.arrayBuffer();
+				}
+				if (bytes.byteLength === 0 || bytes.byteLength > 64 * 1024 * 1024 || !globalThis.crypto?.subtle) {
+					throw new Error('GUIDE_ASSET_HASH_UNAVAILABLE');
+				}
+				const checksum = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
+				assetSha256 = `sha256:${Array.from(checksum, (byte) => byte.toString(16).padStart(2, '0')).join('')}`;
+				return loader.parseAsync(bytes, resourcePath);
+			})();
+			if (!assetSha256) throw new Error('GUIDE_ASSET_HASH_UNAVAILABLE');
+			const animationRegistry = createAnimationClipRegistryV1(assetSha256, gltf.animations);
+			const clipsByAction = new Map<AnimationClipActionV1, THREE.AnimationClip>(
+				animationRegistry.actions.map(({ action, clipIndex }) => [action, gltf.animations[clipIndex]]),
+			);
+			const validClips = registeredWalk ? (() => {
+				const clip = clipsByAction.get('walk');
+				return !!clip && Number.isFinite(clip.duration) && clip.duration > 0 && clip.tracks.length > 0;
+			})() : guideActions.every((name) => {
+				const clip = clipsByAction.get(name.toLowerCase() as AnimationClipActionV1);
+				return !!clip && Number.isFinite(clip.duration) && clip.duration > 0 && clip.tracks.length > 0;
+			});
+			const rigMismatch = guideRigMismatch(gltf.scene);
+			if (detectiveActor !== root || generation !== guideLoadGeneration || rigMismatch || !validClips) {
+				disposeGuideModel(gltf.scene);
+				if (detectiveActor === root) {
+					guideLoadIssue = rigMismatch ? 'RIG_HIERARCHY_MISMATCH' : !validClips ? 'REQUIRED_CLIP_MISSING_OR_INVALID' : null;
+					guideRigDiagnostic = rigMismatch;
+					guideLoadState = 'fallback';
+				}
+				return;
+			}
+			const mixer = new THREE.AnimationMixer(gltf.scene);
+			riggedGuide = {
+				model: gltf.scene,
+				mixer,
+				actions: registeredWalk
+					? new Map([['Walk', mixer.clipAction(clipsByAction.get('walk')!)]])
+					: new Map(guideActions.map((name) => [name, mixer.clipAction(clipsByAction.get(name.toLowerCase() as AnimationClipActionV1)!)])),
+				current: null,
+				scrubAction: null,
+				walkSeconds: 0,
+				assetSha256,
+				animationRegistry,
+				registeredWalkStartUs: registeredWalk?.startUs ?? null,
+			};
+			const guideDurations = registeredWalk
+				? { Idle: 0, Walk: clipsByAction.get('walk')!.duration, Inspect: 0, Interact: 0 }
+				: Object.fromEntries(guideActions.map((name) => [name, clipsByAction.get(name.toLowerCase() as AnimationClipActionV1)!.duration]));
+			onGuideClipsReady?.(guideDurations as Record<DetectiveGuideAction, number>);
+			for (const child of root.children) child.visible = false;
+			root.add(gltf.scene);
+			root.rotation.y = registeredWalk ? 0 : 0.6;
+			guideLoadState = 'rigged';
+		} catch {
+			if (detectiveActor === root && generation === guideLoadGeneration) {
+				guideLoadIssue = 'MODEL_LOAD_FAILED';
+				guideLoadState = 'fallback';
+			}
+		}
+	}
+
+	export async function loadRegisteredReviewedWalkGlb(bytes: ArrayBuffer, startUs: number) {
+		const root = detectiveActor;
+		if (!root || !Number.isSafeInteger(startUs) || startUs < 0 || bytes.byteLength === 0 || bytes.byteLength > 64 * 1024 * 1024) return false;
+		if (riggedGuide) {
+			riggedGuide.mixer.stopAllAction();
+			riggedGuide.mixer.uncacheRoot(riggedGuide.model);
+			root.remove(riggedGuide.model);
+			disposeGuideModel(riggedGuide.model);
+			riggedGuide = null;
+		}
+		for (const child of [...root.children]) {
+			if (child.userData.isGuideFallback) child.visible = false;
+		}
+		await loadCaseGuide(root, { bytes, startUs });
+		return riggedGuide?.registeredWalkStartUs === startUs;
+	}
+
+	function seekReviewedWalk(root: THREE.Group, path: ReturnType<typeof buildTimedWalkPath>, framePtsUs: number) {
+		const guide = riggedGuide;
+		const walk = guide?.actions.get('Walk');
+		if (!guide || !walk) return null;
+		const sample = path.atSourceTime(framePtsUs);
+		if (guide.scrubAction !== 'Walk') {
+			guide.mixer.stopAllAction();
+			walk.reset().setLoop(THREE.LoopOnce, 1).setEffectiveWeight(1).play();
+			walk.paused = true;
+			guide.scrubAction = 'Walk';
+			activeGuideClip = 'Walk';
+		}
+		walk.time = guide.registeredWalkStartUs === null
+			? sample.localSeconds % walk.getClip().duration
+			: THREE.MathUtils.clamp((framePtsUs - guide.registeredWalkStartUs) / 1_000_000, 0, walk.getClip().duration);
+		guide.mixer.update(0);
+		if (guide.registeredWalkStartUs === null) {
+			root.position.set(sample.x, sample.y, sample.z);
+			root.rotation.y = sample.heading;
+		} else {
+			root.position.set(0, 0, 0);
+			root.rotation.set(0, 0, 0);
+		}
+		return sample;
+	}
+
+	function sampleWalk(times: readonly number[], visit?: (root: THREE.Group, bones: Array<THREE.Object3D | undefined>) => void) {
+		const root = detectiveActor;
+		const guide = riggedGuide;
+		const path = reviewedWalkPath;
+		if (!root || !guide?.assetSha256 || !path || reviewedWalkPtsUs === undefined ||
+			!times.length || times.length > 1_000 ||
+			times.some((time, index) => !Number.isSafeInteger(time) || time < path.startUs || time > path.endUs ||
+				(index > 0 && time <= times[index - 1]))) return null;
+		const jointNames = Object.keys(guideBoneParents);
+		const bones = jointNames.map((name) => guide.model.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(name)));
+		const position = new THREE.Vector3();
+		try {
+			const frames: ReviewedWalkJointSample[] = [];
+			for (const time of times) {
+				const sample = seekReviewedWalk(root, path, time);
+				if (!sample) return null;
+				root.updateWorldMatrix(true, true);
+				frames.push({
+					framePtsUs: sample.framePtsUs, root: [sample.x, sample.y, sample.z], headingRadians: sample.heading,
+					joints: Object.fromEntries(jointNames.map((name, index) => {
+						const bone = bones[index];
+						return [name, bone ? bone.getWorldPosition(position).toArray() : null];
+					})),
+				});
+				visit?.(root, bones);
+			}
+			return { assetSha256: guide.assetSha256, clipName: 'Walk' as const, frames };
+		} finally {
+			seekReviewedWalk(root, path, reviewedWalkPtsUs);
+			root.updateWorldMatrix(true, true);
+		}
+	}
+
+	/** Sample the same loaded rig and evaluator used by the timeline, then restore the visible pose. */
+	export function sampleReviewedWalkJoints(times: readonly number[]) {
+		return sampleWalk(times);
+	}
+
+	export async function exportReviewedWalkGlb(times: readonly number[], provenance: Record<string, unknown>) {
+		const [{ GLTFExporter }, { clone }] = await Promise.all([
+			import('three/addons/exporters/GLTFExporter.js'),
+			import('three/addons/utils/SkeletonUtils.js'),
+		]);
+		const model = riggedGuide?.model;
+		if (!model || times.length < 2) return null;
+		const rootName = 'atlas_reviewed_walk_root';
+		const channels = new Map<string, number[]>();
+		function append(name: string, values: number[]) {
+			const existing = channels.get(name);
+			if (existing) existing.push(...values);
+			else channels.set(name, values);
+		}
+		const sampled = sampleWalk(times, (root, bones) => {
+			append(`${rootName}.position`, root.position.toArray());
+			append(`${rootName}.quaternion`, root.quaternion.toArray());
+			for (const bone of bones) {
+				if (!bone) continue;
+				append(`${bone.name}.position`, bone.position.toArray());
+				append(`${bone.name}.quaternion`, bone.quaternion.toArray());
+				append(`${bone.name}.scale`, bone.scale.toArray());
+			}
+		});
+		if (!sampled) return null;
+		const seconds = times.map((time) => (time - times[0]) / 1_000_000);
+		const tracks = [...channels].map(([name, values]) => name.endsWith('.quaternion')
+			? new THREE.QuaternionKeyframeTrack(name, seconds, values)
+			: new THREE.VectorKeyframeTrack(name, seconds, values));
+		const clip = new THREE.AnimationClip('Reviewed Detective Walk', seconds[seconds.length - 1], tracks);
+		const exportedRoot = new THREE.Group();
+		exportedRoot.name = rootName;
+		exportedRoot.userData = {
+			...provenance, assetSha256: sampled.assetSha256, clipName: sampled.clipName,
+		};
+		exportedRoot.add(clone(model));
+		try {
+			const binary = await new GLTFExporter().parseAsync(exportedRoot, { binary: true, animations: [clip] });
+			return binary instanceof ArrayBuffer ? binary : null;
+		} finally {
+			// Clone owns its skeletons. Geometries, images and materials are shared with the viewer.
+			const skeletons = new Set<THREE.Skeleton>();
+			exportedRoot.traverse((node) => {
+				if (node instanceof THREE.SkinnedMesh) skeletons.add(node.skeleton);
+			});
+			for (const skeleton of skeletons) skeleton.dispose();
+		}
+	}
+
+	function stepCaseGuide(root: THREE.Group, dt: number) {
+		const guide = riggedGuide;
+		if (!guide) return;
+		if (reviewedWalkPath && reviewedWalkPtsUs !== undefined) {
+			seekReviewedWalk(root, reviewedWalkPath, reviewedWalkPtsUs);
+			return;
+		}
+		if (guideScrubTime !== null) {
+			const clip = guide.actions.get(guideAction);
+			if (!clip) return;
+			if (guide.scrubAction !== guideAction) {
+				guide.mixer.stopAllAction();
+				clip.reset().setLoop(THREE.LoopOnce, 1).setEffectiveWeight(1).play();
+				clip.clampWhenFinished = true;
+				clip.paused = true;
+				guide.scrubAction = guideAction;
+				activeGuideClip = guideAction;
+			}
+			const duration = clip.getClip().duration;
+			clip.time = THREE.MathUtils.clamp(Number.isFinite(guideScrubTime) ? guideScrubTime : 0, 0, duration);
+			guide.mixer.update(0);
+			if (guideAction === 'Walk') {
+				const phase = clip.time * 0.85 % (2 * walkPath.length);
+				const reverse = phase > walkPath.length;
+				const point = walkPath.at(reverse ? 2 * walkPath.length - phase : phase);
+				root.position.set(point.x, 0, point.z);
+				root.rotation.y = point.heading + (reverse ? Math.PI : 0);
+			} else {
+				root.position.copy(guideRestPosition);
+				root.rotation.y = 0.6;
+			}
+			return;
+		}
+		if (guide.scrubAction !== null) {
+			guide.mixer.stopAllAction();
+			guide.scrubAction = null;
+			guide.current = null;
+			guide.walkSeconds = 0;
+			root.position.copy(guideRestPosition);
+			root.rotation.y = 0.6;
+		}
+		const action = guide.actions.get(guideAction);
+		if (action && action !== guide.current) {
+			const previous = guide.current;
+			guide.current = action;
+			action.reset().setLoop(THREE.LoopRepeat, Infinity).setEffectiveWeight(1).play();
+			previous?.crossFadeTo(action, 0.16, false);
+			activeGuideClip = guideAction;
+		}
+		if (guideAction === 'Walk') {
+			guide.walkSeconds += dt;
+			const phase = guide.walkSeconds * 0.85 % (2 * walkPath.length);
+			const reverse = phase > walkPath.length;
+			const point = walkPath.at(reverse ? 2 * walkPath.length - phase : phase);
+			root.position.set(point.x, 0, point.z);
+			root.rotation.y = point.heading + (reverse ? Math.PI : 0);
+		}
+		guide.mixer.update(dt);
+	}
 
 	function rebuildPickBvh(): void {
 		pickBvhManager.build(pickables.map((pickable) => pickable.object));
 	}
+
+	$effect(() => {
+		if (!caseMarkerReady || !caseMarkers || !caseMarkerGeometry || !caseMarkerMaterial) return;
+		const ids = new Set(caseMarkers.map((marker) => marker.id));
+		let topologyChanged = false;
+		for (const [id, mesh] of caseMarkerMeshes) {
+			if (ids.has(id)) continue;
+			mesh.removeFromParent();
+			caseMarkerMeshes.delete(id);
+			topologyChanged = true;
+		}
+		for (const marker of caseMarkers) {
+			let mesh = caseMarkerMeshes.get(marker.id);
+			if (!mesh) {
+				mesh = new THREE.Mesh(caseMarkerGeometry, caseMarkerMaterial);
+				caseMarkerMeshes.set(marker.id, mesh);
+				markersGroup.add(mesh);
+				topologyChanged = true;
+			}
+			mesh.position.set(marker.posX, marker.posY, marker.posZ);
+			mesh.updateWorldMatrix(true, false);
+		}
+		if (topologyChanged) {
+			pickables = pickables.filter((item) => item.type !== 'case-marker');
+			for (const [id, object] of caseMarkerMeshes) pickables.push({ object, id, type: 'case-marker' });
+			rebuildPickBvh();
+		} else {
+			pickBvhManager.refit();
+		}
+	});
+
+	$effect(() => {
+		if (!caseMarkerReady || !caseMarkerPreview) return;
+		caseMarkerPreview.visible = placementPreview !== null;
+		if (placementPreview) {
+			caseMarkerPreview.position.set(placementPreview.x, placementPreview.y, placementPreview.z);
+		}
+	});
+
+	$effect(() => {
+		if (!sceneReady || !indexedFloor || !groundMesh || !solidFloorMaterial || !renderer) return;
+		const floor = groundMesh;
+		const solid = solidFloorMaterial;
+		const size = 64;
+		const rgba = new Uint8Array(size * size * 4);
+		for (let y = 0; y < size; y++) {
+			for (let x = 0; x < size; x++) {
+				const grout = x % 8 === 0 || y % 8 === 0;
+				const alternate = ((x >>> 3) + (y >>> 3)) % 2 === 0;
+				const paletteIndex = grout ? 4 : alternate ? 6 : 13;
+				rgba.set(INDEXED_PALETTE16_V1[paletteIndex].rgba, (y * size + x) * 4);
+			}
+		}
+		const indexed = quantizeRgbaToIndexed4BppV1(size, size, rgba);
+		// A one-pixel map enables the standard material's UV map shader chunk.
+		const uvMap = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1);
+		uvMap.needsUpdate = true;
+		const source = solid.clone();
+		source.color.set(0xffffff);
+		source.map = uvMap;
+		const packed = createIndexedPaletteShaderMaterialV1(THREE, source, indexed, renderer.capabilities.maxTextureSize);
+		source.dispose();
+		floor.material = packed.material;
+		return () => {
+			floor.material = solid;
+			packed.material.dispose();
+			packed.textures.dispose();
+			uvMap.dispose();
+		};
+	});
 
 	let isWebGLAvailable = $state(true);
 	let isHoveringObject = $state(false);
@@ -278,7 +727,7 @@
 		);
 		actorHitBox.position.set(0.12, 0.7, 0);
 		actor.add(actorHitBox);
-		pickables.push({ object: actorHitBox, type: 'actor', id: 'INVESTIGATOR_PAWN' });
+		if (!caseMarkers) pickables.push({ object: actorHitBox, type: 'actor', id: 'INVESTIGATOR_PAWN' });
 
 		actor.userData = {
 			torso,
@@ -521,8 +970,9 @@
 		try {
 			// 1. Scene
 			scene = new THREE.Scene();
-			scene.background = new THREE.Color(0x0a0e17);
-			scene.fog = new THREE.FogExp2(0x0a0e17, 0.08);
+			const background = caseMarkers ? 0x4c5257 : 0x0a0e17;
+			scene.background = new THREE.Color(background);
+			scene.fog = new THREE.FogExp2(background, caseMarkers ? 0.045 : 0.08);
 
 			// 2. Camera
 			const w = containerEl.clientWidth || 800;
@@ -539,7 +989,7 @@
 				powerPreference: 'high-performance'
 			});
 			renderer.setSize(w, h);
-			renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+			renderer.setPixelRatio(Math.min(window.devicePixelRatio, caseMarkers ? 1.5 : 2));
 			renderer.toneMapping = THREE.ACESFilmicToneMapping;
 			renderer.toneMappingExposure = 1.1;
 
@@ -547,13 +997,44 @@
 			controls = new OrbitControls(camera, canvasEl);
 			controls.enableDamping = true;
 			controls.dampingFactor = 0.05;
+			controls.zoomToCursor = true;
 			controls.target.set(1.6, 0.4, -0.5);
 			controls.maxPolarAngle = Math.PI / 2 - 0.02; // don't go below asphalt floor
 			controls.minDistance = 1.0;
 			controls.maxDistance = 18.0;
 
+			// ENG-01: TransformControls gizmo (translate/rotate/scale). Suspends OrbitControls
+			// while the user is dragging the gizmo so camera orbit does not interfere.
+			transformControls = new TransformControls(camera, canvasEl);
+			transformControls.setSize(0.85);
+			transformControls.addEventListener('dragging-changed', (event) => {
+				if (controls) controls.enabled = !event.value;
+			});
+			// On drag end: snapshot old + new matrix into a TransformObjectCommand for undo/redo
+			transformControls.addEventListener('mouseUp', () => {
+				const target = transformControls?.object;
+				if (!target || !selectedPrimitiveId) return;
+				target.updateWorldMatrix(true, false);
+				const p = target.position;
+				const q = target.quaternion;
+				const s = target.scale;
+				sceneController.transformObject(selectedPrimitiveId, {
+					position: [p.x, p.y, p.z],
+					rotation: [q.x, q.y, q.z, q.w],
+					scale: [s.x, s.y, s.z]
+				});
+				// Keep BVH and primitive registry in sync
+				const config = scenePrimitiveManager.get(selectedPrimitiveId);
+				if (config) {
+					scenePrimitiveManager.writeMatrixToArena(config.slotIndex, config.mesh.matrixWorld);
+					pickBvhManager.refit();
+					publishPrimitiveSnapshot(selectedPrimitiveId);
+				}
+			});
+			scene.add(transformControls.getHelper());
+
 			// 5. Lighting
-			const ambientLight = new THREE.AmbientLight(0x1e293b, 1.2);
+			const ambientLight = new THREE.AmbientLight(caseMarkers ? 0xe0dad1 : 0x1e293b, 1.2);
 			scene.add(ambientLight);
 
 			// Warm streetlight from high overhead
@@ -582,28 +1063,38 @@
 			// 7. Asphalt Ground Floor
 			const groundGeo = new THREE.PlaneGeometry(32, 32);
 			const groundMat = new THREE.MeshStandardMaterial({
-				color: 0x0f172a,
+				color: caseMarkers ? 0x52504c : 0x0f172a,
 				roughness: 0.75,
 				metalness: 0.15
 			});
 			const ground = new THREE.Mesh(groundGeo, groundMat);
+			solidFloorMaterial = groundMat;
 			ground.rotation.x = -Math.PI / 2;
 			ground.position.y = 0;
 			environmentGroup.add(ground);
 			groundMesh = ground;
 
-			// Optional preflight check for Blender procedural GLB
-			const gltfLoader = new GLTFLoader();
-			gltfLoader.load(
-				'/models/crime-scene-primitives-v1.glb',
-				(gltf) => {
-					console.debug('[CrimeScene3D] Verified crime-scene-primitives-v1.glb ready:', gltf.scene.children.length, 'nodes');
-				},
-				undefined,
-				(err) => {
-					console.debug('[CrimeScene3D] Using procedural primitives pipeline (GLB optional):', err);
-				}
-			);
+			if (caseMarkers) {
+				const blocks = [
+					{ position: [-2.15, 0.13, -3.5], size: [6, 0.26, 1.8], color: 0x756d63 },
+					{ position: [-3.8, 0.95, -4.16], size: [2.6, 1.9, 0.28], color: 0xc5b49d },
+					{ position: [-0.2, 0.95, -4.16], size: [2.7, 1.9, 0.28], color: 0xc5b49d },
+					{ position: [-1.95, 1.82, -4.16], size: [1.1, 0.2, 0.4], color: 0x9c8c7a },
+					{ position: [-4.87, 0.65, -2.9], size: [0.25, 1.3, 0.25], color: 0x777e7f },
+					{ position: [0.52, 0.65, -2.9], size: [0.25, 1.3, 0.25], color: 0x777e7f }
+				] as const;
+				const material = new THREE.MeshStandardMaterial({ roughness: 0.9, flatShading: true });
+				const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(), material, blocks.length);
+				const transform = new THREE.Matrix4();
+				blocks.forEach(({ position, size, color }, index) => {
+					transform.makeScale(size[0], size[1], size[2]).setPosition(position[0], position[1], position[2]);
+					mesh.setMatrixAt(index, transform);
+					mesh.setColorAt(index, new THREE.Color(color));
+				});
+				mesh.name = 'Illustrative platform blockout';
+				environmentGroup.add(mesh);
+				blockout = mesh;
+			}
 
 			// Ground Grid
 			const grid = new THREE.GridHelper(30, 60, 0xc59e2b, 0x1e293b);
@@ -618,6 +1109,7 @@
 			detective.rotation.y = 0.25;
 			environmentGroup.add(detective);
 			detectiveActor = detective;
+			if (caseMarkers) void loadCaseGuide(detective);
 
 			// 9. Cyan Footprints Trail
 			const footprints = createCyanFootsteps();
@@ -633,47 +1125,36 @@
 			boundingBox.position.set(2.4, 0, -1.2);
 			measurementsGroup.add(boundingBox);
 
-			// 12. Yellow Evidence Marker Tents: 1, 2, 3
-			// Marker 1: right next to Bloodstain E-002
-			const marker1 = createEvidenceMarkerTent(1, [1.8, 0, -1.4]);
-			markersGroup.add(marker1);
-
-			// Marker 2: mid-trail near footstep turn
-			const marker2 = createEvidenceMarkerTent(2, [3.2, 0, -0.4]);
-			markersGroup.add(marker2);
-
-			// Marker 3: in background near outer corridor
-			const marker3 = createEvidenceMarkerTent(3, [3.8, 0, -2.4]);
-			markersGroup.add(marker3);
-
-			// Register primitives into N64 16 KB Float32Array Memory Arena (Zero-GC Strides)
+			if (caseMarkers) {
+				caseMarkerGeometry = new THREE.CylinderGeometry(0.18, 0.18, 0.08, 6);
+				caseMarkerGeometry.translate(0, 0.04, 0);
+				caseMarkerMaterial = new THREE.MeshBasicMaterial({ color: 0xf6c65f });
+				previewMaterial = new THREE.MeshBasicMaterial({ color: 0x72e0bf, wireframe: true });
+				caseMarkerPreview = new THREE.Mesh(caseMarkerGeometry, previewMaterial);
+				caseMarkerPreview.visible = false;
+				markersGroup.add(caseMarkerPreview);
+				caseMarkerReady = true;
+			} else {
+				const tentPositions: [number, number, number][] = [[1.8, 0, -1.4], [3.2, 0, -0.4], [3.8, 0, -2.4]];
+				for (const [index, position] of tentPositions.entries()) {
+					const number = index + 1;
+					const tent = createEvidenceMarkerTent(number, position);
+					markersGroup.add(tent);
+					scenePrimitiveManager.register({
+						id: `MARKER_0${number}`,
+						slotIndex: number,
+						type: 'MARKER_TENT',
+						mesh: tent,
+						metadata: { label: `Evidence Tent #${number}` }
+					});
+				}
+			}
 			scenePrimitiveManager.register({
 				id: 'EXHIBIT_E002',
 				slotIndex: 0,
 				type: 'EXHIBIT_OBB',
 				mesh: bloodstain,
 				metadata: { label: 'Bloodstain Decal (E-002)', dimensions: [0.42, 0.28, 0.02] }
-			});
-			scenePrimitiveManager.register({
-				id: 'MARKER_01',
-				slotIndex: 1,
-				type: 'MARKER_TENT',
-				mesh: marker1,
-				metadata: { label: 'Evidence Tent #1' }
-			});
-			scenePrimitiveManager.register({
-				id: 'MARKER_02',
-				slotIndex: 2,
-				type: 'MARKER_TENT',
-				mesh: marker2,
-				metadata: { label: 'Evidence Tent #2' }
-			});
-			scenePrimitiveManager.register({
-				id: 'MARKER_03',
-				slotIndex: 3,
-				type: 'MARKER_TENT',
-				mesh: marker3,
-				metadata: { label: 'Evidence Tent #3' }
 			});
 			scenePrimitiveManager.register({
 				id: 'INVESTIGATOR_PAWN',
@@ -713,7 +1194,17 @@
 				lastTime = now;
 				elapsed += dt;
 
-				if (detectiveActor) {
+				if (detectiveActor && riggedGuide && detectiveActor.visible) {
+					stepCaseGuide(detectiveActor, dt);
+					detectiveActor.updateWorldMatrix(true, false);
+					scenePrimitiveManager.writeMatrixToArena(4, detectiveActor.matrixWorld);
+				} else if (detectiveActor && !riggedGuide && reviewedWalkPath && reviewedWalkPtsUs !== undefined) {
+					const sample = reviewedWalkPath.atSourceTime(reviewedWalkPtsUs);
+					detectiveActor.position.set(sample.x, sample.y, sample.z);
+					detectiveActor.rotation.y = sample.heading;
+					detectiveActor.updateWorldMatrix(true, false);
+					scenePrimitiveManager.writeMatrixToArena(4, detectiveActor.matrixWorld);
+				} else if (detectiveActor && !riggedGuide) {
 					const u = detectiveActor.userData;
 					// 1. Catmull-Rom Trajectory sampling along walk path when reconstruction is enabled
 					if (sceneLayers.reconstruction && trajectoryProgress > 0) {
@@ -763,6 +1254,7 @@
 				renderer?.render(scene!, camera!);
 			};
 			animate();
+			sceneReady = true;
 
 		} catch (err) {
 			console.error('Failed to initialize Three.js WebGL scene:', err);
@@ -776,6 +1268,7 @@
 		if (measurementsGroup) measurementsGroup.visible = sceneLayers.measurements;
 		if (reconstructionGroup) reconstructionGroup.visible = sceneLayers.reconstruction;
 		if (environmentGroup) environmentGroup.visible = sceneLayers.environment;
+		if (detectiveActor) detectiveActor.visible = guideVisible;
 	}
 
 	$effect(() => {
@@ -802,12 +1295,19 @@
 		}
 	});
 
-	function setPointerRay(e: PointerEvent): void {
+	function setPointerRay(e: MouseEvent): void {
 		if (!canvasEl || !camera) return;
 		const rect = canvasEl.getBoundingClientRect();
 		mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
 		mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 		raycaster.setFromCamera(mouse, camera);
+	}
+
+	function selectCaseGroundPoint(event: MouseEvent, evidenceId?: string): void {
+		if (!groundMesh || !camera || !onCaseGroundPoint) return;
+		setPointerRay(event);
+		const point = raycaster.intersectObject(groundMesh, false)[0]?.point;
+		if (point) onCaseGroundPoint({ x: point.x, y: point.y, z: point.z }, evidenceId);
 	}
 
 	function primitiveIdForPick(pick: { type: string; id: any }): string | null {
@@ -828,6 +1328,10 @@
 
 	function handlePointerDown(e: PointerEvent) {
 		if (!canvasEl || !camera || !scene) return;
+		if (transformMode === 'marker' && caseMarkers) {
+			if (e.button === 0) selectCaseGroundPoint(e);
+			return;
+		}
 		setPointerRay(e);
 
 		// Interactive Marker Placement: Click-to-place on ground floor in 'marker' mode
@@ -874,11 +1378,26 @@
 			const hit = intersects[0].object;
 			const pick = pickables.find((p) => p.object === hit);
 			if (pick) {
+				if (pick.type === 'case-marker') {
+					if (sceneLayers.markers) onCaseMarkerSelect?.(pick.id);
+					return;
+				}
 				const primitiveId = primitiveIdForPick(pick);
 				if (primitiveId) {
 					selectedPrimitiveId = primitiveId;
 					scenePrimitiveManager.focusExhibit(primitiveId);
 					publishPrimitiveSnapshot(primitiveId);
+					// ENG-01: Attach TransformControls gizmo to picked mesh when in a transform mode.
+					// The gizmo handles its own pointer capture; suspend OrbitControls via 'dragging-changed'.
+					const primConfig = scenePrimitiveManager.get(primitiveId);
+					if (primConfig && transformControls) {
+						if (transformMode === 'translate' || transformMode === 'rotate' || transformMode === 'scale') {
+							transformControls.attach(primConfig.mesh);
+							transformControls.setMode(transformMode as 'translate' | 'rotate' | 'scale');
+						} else {
+							transformControls.detach();
+						}
+					}
 				}
 				if (pick.type === 'evidence') {
 					onSelectEvidence?.({ id: pick.id, title: 'Bloodstain', type: 'Bloodstain (Image2D)' });
@@ -980,6 +1499,21 @@
 		}
 	}
 
+	// ENG-01: Expose SceneController for undo/redo wiring in DetectiveModeCanvas.
+	export function getSceneController(): SceneControllerV1 {
+		return sceneController;
+	}
+
+	/** Undo the last scene command (TransformObjectCommand, AddObjectCommand, etc.) */
+	export function undoSceneCommand(): boolean {
+		return sceneController.undo();
+	}
+
+	/** Redo the last undone scene command */
+	export function redoSceneCommand(): boolean {
+		return sceneController.redo();
+	}
+
 	onMount(() => {
 		initScene();
 		window.addEventListener('resize', handleResize);
@@ -992,12 +1526,51 @@
 		};
 	});
 
+	// ENG-01: Sync TransformControls gizmo mode whenever the parent changes transformMode prop.
+	// When the tool is not a transform mode, detach the gizmo so OrbitControls takes over.
+	$effect(() => {
+		if (!transformControls) return;
+		if (transformMode === 'translate' || transformMode === 'rotate' || transformMode === 'scale') {
+			transformControls.setMode(transformMode as 'translate' | 'rotate' | 'scale');
+			// Re-attach to current selection if one exists
+			if (selectedPrimitiveId) {
+				const cfg = scenePrimitiveManager.get(selectedPrimitiveId);
+				if (cfg) transformControls.attach(cfg.mesh);
+			}
+		} else {
+			transformControls.detach();
+		}
+	});
+
 	onDestroy(() => {
 		// This viewer owns its registry and transform arena; tearing it down must not
 		// reset the shared inspector FSM used by another active view.
 		scenePrimitiveManager.clear(false);
 		pickBvhManager.dispose();
 		if (animId) cancelAnimationFrame(animId);
+		// ENG-01: Dispose TransformControls gizmo and its helper before OrbitControls
+		if (transformControls) {
+			transformControls.detach();
+			transformControls.dispose();
+			transformControls = null;
+		}
+		controls?.dispose();
+		caseMarkerGeometry?.dispose();
+		caseMarkerMaterial?.dispose();
+		previewMaterial?.dispose();
+		solidFloorMaterial?.dispose();
+		groundMesh?.geometry.dispose();
+		blockout?.geometry.dispose();
+		blockout?.material.dispose();
+		blockout?.dispose();
+		if (riggedGuide) {
+			riggedGuide.mixer.stopAllAction();
+			riggedGuide.mixer.uncacheRoot(riggedGuide.model);
+			disposeGuideModel(riggedGuide.model);
+			riggedGuide = null;
+		}
+		detectiveActor = null;
+		caseMarkerMeshes.clear();
 		renderer?.dispose();
 		renderer = null;
 		scene = null;
@@ -1006,6 +1579,12 @@
 </script>
 
 <div class="crime-scene-3d-wrapper" bind:this={containerEl}>
+	{#if caseMarkers && !sceneReady && isWebGLAvailable}
+		<div class="case-scene-loading" role="status">Preparing the 3D scene…</div>
+	{/if}
+	{#if guideVisible && guideLoadState === 'fallback'}
+		<p class="case-guide-fallback" role="status">Using the static guide. Its animations are unavailable.</p>
+	{/if}
 	{#if isWebGLAvailable}
 		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 		<canvas
@@ -1014,10 +1593,28 @@
 			onpointermove={handlePointerMove}
 			onpointerup={finishPrimitiveDrag}
 			onpointercancel={finishPrimitiveDrag}
+			ondragover={(event) => {
+				if (onCaseGroundPoint && event.dataTransfer?.types.includes(CASE_EXHIBIT_DRAG_TYPE)) event.preventDefault();
+			}}
+			ondrop={(event) => {
+				const id = event.dataTransfer?.getData(CASE_EXHIBIT_DRAG_TYPE);
+				if (!id || !onCaseGroundPoint) return;
+				event.preventDefault();
+				selectCaseGroundPoint(event, id);
+			}}
 			class="three-crime-canvas"
+			data-guide={guideLoadState}
+			data-guide-issue={guideLoadIssue ?? undefined}
+			data-guide-rig-diagnostic={guideRigDiagnostic ?? undefined}
+			data-guide-action={activeGuideClip}
+			data-guide-registered-walk={riggedGuide?.registeredWalkStartUs !== null && riggedGuide?.registeredWalkStartUs !== undefined}
+			data-guide-visible={guideVisible}
+			data-guide-scrub-time={guideScrubTime ?? undefined}
 			class:hovering={isHoveringObject}
 			class:mode-marker={transformMode === 'marker'}
 		></canvas>
+	{:else if caseMarkers}
+		<div class="case-scene-loading" role="status">3D view unavailable. Enter a marker position in the inspector.</div>
 	{:else}
 		<!-- High-fidelity CSS 3D Isometric Fallback -->
 		<div class="isometric-crime-fallback">
@@ -1034,6 +1631,31 @@
 </div>
 
 <style>
+	.case-guide-fallback {
+		position: absolute;
+		z-index: 1;
+		inset: auto 0.75rem 0.75rem;
+		width: max-content;
+		max-width: calc(100% - 1.5rem);
+		margin: 0;
+		padding: 0.4rem 0.65rem;
+		border-radius: 6px;
+		background: var(--dossier-bg-card, #faf6f0);
+		color: var(--dossier-text-main, #141312);
+		font-size: 0.8rem;
+		pointer-events: none;
+	}
+	.case-scene-loading {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		display: grid;
+		place-items: center;
+		padding: 1rem;
+		background: var(--dossier-bg-card, #faf6f0);
+		color: var(--dossier-text-main, #141312);
+		text-align: center;
+	}
 	.crime-scene-3d-wrapper {
 		position: relative;
 		width: 100%;

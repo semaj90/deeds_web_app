@@ -8,14 +8,18 @@
  * only MISSING pages are admitted through the existing writer, and any CONFLICT aborts before a single write. A crash after page N is therefore recoverable by rerunning.
  * No embeddings, no :8081, no Qdrant/Valkey/Neo4j, no Graphify.
  * Run from sveltekit-frontend/:  npx tsx scripts/atlas/run-external-doc-admission-v1.mts [--apply]
+ * Pilot: --envelopes <one-page-json> --normalized-page <markdown> [--plan --query <term>].
+ * Pilot --apply additionally requires --query and ATLAS_DOC_STAGING_DATABASE_URL.
  */
 import 'dotenv/config';
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { parseArgs } from 'node:util';
 import { Pool } from 'pg';
 
 import { admitExternalDocPage } from '../../src/lib/server/atlas/docs/external-doc-admission.js';
+import { searchDocCorpus } from '../../src/lib/server/atlas/docs/doc-intelligence-read-model.js';
 import { classifyPageAdmission, loadLivePageState, runResumableAdmissionV1, summarizePlan } from '../../src/lib/server/atlas/docs/external-doc-admission-plan-v1.js';
 import { toExternalDocAdmissionInputV1, validateExternalDocAdmissionHandoff, type ExternalDocAdmissionEnvelopeV1 } from '../../src/lib/server/atlas/docs/external-doc-intelligence-contracts-v1.js';
 
@@ -25,9 +29,55 @@ const ENVELOPES = resolve(ROOT, 'docs/.okf/pinned/admission-envelopes-v1.json');
 const RECEIPT = resolve(ROOT, 'docs/reports/external-doc-admission-run-v1.json');
 const RESUMABILITY_RECEIPT = resolve(ROOT, 'docs/reports/external-doc-admission-resumability-v1.json');
 const AUTH = 'I_AUTHORIZE_CANONICAL_ADMISSION';
-const apply = process.argv.includes('--apply');
-const planOnly = process.argv.includes('--plan');
-const sha = (t: string) => createHash('sha256').update(t, 'utf8').digest('hex');
+const sha = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
+type AdmissionInput = ReturnType<typeof toExternalDocAdmissionInputV1>;
+
+async function runPilot(input: AdmissionInput, databaseUrl: string, apply: boolean, query?: string) {
+	const pool = new Pool({ connectionString: databaseUrl });
+	const classify = async (candidate: AdmissionInput) => {
+		const client = await pool.connect();
+		try {
+			await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+			return await loadLivePageState(client, candidate);
+		} finally {
+			try { await client.query('ROLLBACK'); } finally { client.release(); }
+		}
+	};
+	try {
+		let live = await classify(input);
+		let result = classifyPageAdmission(input, live);
+		let writerCalls = 0;
+		if (apply && result.classification === 'MISSING') {
+			const run = await runResumableAdmissionV1([input], classify, (page) => admitExternalDocPage(pool, page));
+			writerCalls = run.writerCalls;
+			live = await classify(input);
+			result = classifyPageAdmission(input, live);
+		}
+		let citation = null;
+		if (query && result.classification === 'ALREADY_ADMITTED_EXACT') {
+			const search = await searchDocCorpus({
+				pool, root: ROOT, q: query, limit: 25, product: input.page.product, productVersion: input.page.productVersion
+			});
+			citation = search.mode === 'POSTGRES_FTS' ? search.hits.find((hit) =>
+				hit.sourceClass === 'CANONICAL' && hit.pageId === live.pageId && hit.revision === input.page.evidenceRevision &&
+				input.chunks.some((chunk) => hit.chunkId === chunk.chunkId && hit.chunkEvidenceRevision === chunk.evidenceRevision)
+			) ?? null : null;
+		}
+		console.log(JSON.stringify({
+			mode: apply ? 'STAGING_APPLY' : 'PLAN_READ_ONLY', ...result, writerCalls,
+			pageEvidenceRevision: input.page.evidenceRevision, chunkCount: input.chunks.length,
+			citation: citation && {
+				pageId: citation.pageId, pageEvidenceRevision: citation.revision,
+				chunkId: citation.chunkId, chunkEvidenceRevision: citation.chunkEvidenceRevision,
+				url: citation.url, provider: citation.provider, product: citation.product, productVersion: citation.productVersion
+			}
+		}, null, 2));
+		if (result.classification === 'CONFLICT' || (apply && result.classification !== 'ALREADY_ADMITTED_EXACT') ||
+			(query && result.classification === 'ALREADY_ADMITTED_EXACT' && !citation)) process.exitCode = 1;
+	} finally {
+		await pool.end();
+	}
+}
 
 async function readCorpusSnapshot(client: { query: (sql: string, values?: unknown[]) => Promise<{ rows: Array<Record<string, unknown>> }> }, inputs: Awaited<ReturnType<typeof toExternalDocAdmissionInputV1>>[]) {
 	const pageRows = (await client.query('SELECT provider, product, product_version, url, evidence_revision FROM atlas_external_doc_pages')).rows;
@@ -48,11 +98,45 @@ async function readCorpusSnapshot(client: { query: (sql: string, values?: unknow
 }
 
 async function main(): Promise<void> {
-	const all = JSON.parse(readFileSync(ENVELOPES, 'utf8')) as ExternalDocAdmissionEnvelopeV1[];
+	const { values } = parseArgs({ options: {
+		apply: { type: 'boolean' }, plan: { type: 'boolean' }, envelopes: { type: 'string' },
+		'normalized-page': { type: 'string' }, query: { type: 'string' }
+	} });
+	const { apply, plan: planOnly, envelopes, 'normalized-page': normalizedPage, query } = values;
+	if ((apply && planOnly) || (!envelopes && (normalizedPage || query)) ||
+		(query !== undefined && (query.trim().length < 2 || query.length > 300))) throw new Error('INVALID_ADMISSION_ARGUMENTS');
+	const envelopeBytes = readFileSync(envelopes ? resolve(envelopes) : ENVELOPES);
+	const all = JSON.parse(envelopeBytes.toString('utf8')) as ExternalDocAdmissionEnvelopeV1[];
 	const handoff = validateExternalDocAdmissionHandoff(all);
-	if (handoff.result !== 'EXTERNAL_DOC_ADMISSION_HANDOFF_READY') throw new Error(`HANDOFF_NOT_READY:${handoff.result}`);
+	if (handoff.result !== 'EXTERNAL_DOC_ADMISSION_HANDOFF_READY') throw new Error(`HANDOFF_NOT_READY:${handoff.blockers.map((item) => item.code).join(',')}`);
 	const inputs = all.map((e) => toExternalDocAdmissionInputV1(e));
 	const expected = { pages: inputs.length, chunks: inputs.reduce((n, i) => n + i.chunks.length, 0) };
+	if (envelopes) {
+		if (all.length !== 1 || !normalizedPage) throw new Error('PILOT_REQUIRES_ONE_ENVELOPE_AND_NORMALIZED_PAGE');
+		const [input] = inputs;
+		const pageBytes = readFileSync(resolve(normalizedPage));
+		if (sha(pageBytes) !== input.page.contentHash) throw new Error('PILOT_PAGE_HASH_MISMATCH');
+		const { provider, product, productVersion, url, contentHash } = input.page;
+		// Match the sorted JSON identity in Python DocCoordinateV1.
+		const pageRevision = sha(JSON.stringify({
+			content_hash: contentHash, product, product_version: productVersion, provider, section_anchor: null, url
+		}));
+		if (input.page.evidenceRevision !== `sha256:${pageRevision}`) throw new Error('PILOT_PAGE_REVISION_MISMATCH');
+		for (const chunk of input.chunks) {
+			if (!pageBytes.subarray(chunk.startByte, chunk.endByte).equals(Buffer.from(chunk.text, 'utf8'))) {
+				throw new Error(`PILOT_CHUNK_SPAN_MISMATCH:${chunk.chunkId}`);
+			}
+		}
+		console.log(JSON.stringify({ result: 'PILOT_CAPTURE_MATCH', envelopeSha256: sha(envelopeBytes), pageSha256: contentHash, ...expected }));
+		if (!planOnly && !apply) return;
+		if (apply && (process.env.ATLAS_DOC_ADMISSION_AUTHORIZED !== AUTH || !query)) {
+			throw new Error('PILOT_APPLY_REQUIRES_ADMISSION_AUTHORIZATION_AND_FTS_QUERY');
+		}
+		const databaseUrl = process.env.ATLAS_DOC_STAGING_DATABASE_URL ?? (planOnly ? process.env.DATABASE_URL : undefined);
+		if (!databaseUrl) throw new Error('PILOT_DATABASE_NOT_CONFIGURED');
+		await runPilot(input, databaseUrl, Boolean(apply), query?.trim());
+		return;
+	}
 	if (planOnly && !apply) {
 		if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL not set');
 		const pool = new Pool({ connectionString: process.env.DATABASE_URL });

@@ -9,6 +9,10 @@ const namespace = uuidv5('atlas.video-event-fusion.v1', ATLAS_ROOT_NAMESPACE_V1)
 const sha256Schema = z.string().regex(/^sha256:[a-f0-9]{64}$/);
 const artifactSha256Schema = z.string().regex(/^(?:sha256:)?[a-f0-9]{64}$/);
 
+export function videoDetectionReferenceIdV1(scope: { evidenceId: string; sourceRevision: string; analysisRevision: string }, frameIndex: number, ordinal: number) {
+	return uuidv5(`${scope.evidenceId}\u0000${scope.sourceRevision}\u0000${scope.analysisRevision}\u0000frame\u0000${frameIndex}\u0000detection\u0000${ordinal}`, namespace);
+}
+
 const transcriptInputSchema = z.object({
 	segmentIndex: z.number().int().nonnegative(),
 	startMs: z.number().int().nonnegative(),
@@ -185,7 +189,7 @@ export function fuseVideoEventsV1(input: {
 		for (const [detectionIndex, detection] of frame.objects.entries()) {
 			addSource(frame.timestampMs, {
 				kind: 'frame_detection',
-				referenceId: uuidv5(`${evidenceId}\u0000${sourceRevision}\u0000${analysisRevision}\u0000frame\u0000${frame.frameIndex}\u0000detection\u0000${detectionIndex}`, namespace),
+				referenceId: videoDetectionReferenceIdV1({ evidenceId, sourceRevision, analysisRevision }, frame.frameIndex, detectionIndex),
 				frameIndex: frame.frameIndex,
 				timestampMs: frame.timestampMs,
 				artifactSha256: frame.artifact.sha256,

@@ -1,0 +1,26 @@
+{
+  "likely_cause": "The case has no safe typed location-candidate bridge between original image metadata, OCR text extraction on 8095, and a separately reviewer-confirmed crime location.",
+  "evidence": [
+    "sveltekit-frontend/src/lib/server/evidence/exif-capture-location-candidate-v1.ts parses only supported original image formats and labels GPS as capture-location candidate data.",
+    "sveltekit-frontend/src/lib/server/analysis/case-location-text-candidate-v1.ts calls the existing TypeScript LangExtract transport at /extract and validates exact text spans.",
+    "sveltekit-frontend/src/lib/server/analysis/case-location-candidate-pipeline-v1.ts verifies the original byte hash against the stored evidence hash before combining candidates.",
+    "The pipeline output always sets confirmedCrimeLocation to null and confirmationRequired to true.",
+    "npm run check:fast completed with 0 errors and 7 warnings in 1 file; the warnings were not triaged in this pass."
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/evidence/exif-capture-location-candidate-v1.ts",
+    "sveltekit-frontend/src/lib/server/analysis/case-location-text-candidate-v1.ts",
+    "sveltekit-frontend/src/lib/server/analysis/case-location-candidate-pipeline-v1.ts",
+    "openspec/changes/crime-scene-reconstruction/tasks.md"
+  ],
+  "safe_next_command": "git diff --check",
+  "smoke_command": "cd sveltekit-frontend && npm run check:fast",
+  "report_path": "docs/reports/location-candidate-typescript-20261118.json",
+  "implementation_status": {
+    "created": true,
+    "wired_to_upload_or_analysis_job": false,
+    "persisted_to_revision_history": false,
+    "dossier_ui_added": false,
+    "live_8095_or_storage_proof": false
+  }
+}

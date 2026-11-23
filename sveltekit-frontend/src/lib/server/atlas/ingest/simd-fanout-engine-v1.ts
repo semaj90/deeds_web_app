@@ -14,11 +14,11 @@ import { z } from 'zod';
 import { canonicalSha256V1, sha256HexSchema } from '../prefill/canonical-hash-v1.js';
 import {
   type IngestDomain,
-  type ParsedBatchV1,
+  type ParsedBatchV2,
   type ParsedRecordEntryV1,
   type FanoutOptionsV1,
   FanoutOptionsV1Schema,
-  createParsedBatchV1,
+  createParsedBatchV2,
   sortParsedRecordsDeterministicV1,
 } from './simd-fanout-contract-v1.js';
 
@@ -167,7 +167,7 @@ export async function executeSimdFanoutIngestionV1(input: {
   buffer: Uint8Array;
   options?: Partial<FanoutOptionsV1>;
 }): Promise<{
-  batches: Record<IngestDomain, ParsedBatchV1>;
+  batches: Record<IngestDomain, ParsedBatchV2>;
   receipt: SimdFanoutExecutionReceiptV1;
 }> {
   const options = FanoutOptionsV1Schema.parse(input.options || {});
@@ -214,13 +214,13 @@ export async function executeSimdFanoutIngestionV1(input: {
 
   // 5. Partition sorted records into compact typed batches per domain
   const domains: IngestDomain[] = ['ast', 'graph', 'retrieval'];
-  const batches = {} as Record<IngestDomain, ParsedBatchV1>;
+  const batches = {} as Record<IngestDomain, ParsedBatchV2>;
   const domainBatchCounts = {} as Record<IngestDomain, number>;
   const batchChecksums = {} as Record<IngestDomain, string>;
 
   for (const domain of domains) {
     const domainRecords = sortedRecords.filter((r) => r.domain === domain);
-    const batch = createParsedBatchV1({ domain, records: domainRecords });
+    const batch = createParsedBatchV2({ domain, records: domainRecords });
     batches[domain] = batch;
     domainBatchCounts[domain] = batch.recordCount;
     batchChecksums[domain] = batch.batchChecksum;

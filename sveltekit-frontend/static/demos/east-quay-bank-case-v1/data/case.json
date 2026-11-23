@@ -1,0 +1,1585 @@
+{
+  "schemaVersion": "parent-atlas-case-fixture/v1",
+  "caseId": "PA-DEMO-ROBBERY-001",
+  "title": "State v. Vale et al. — East Quay Bank Robbery (FICTIONAL)",
+  "classification": "SYNTHETIC_TRAINING_NOT_EVIDENCE",
+  "isRealCase": false,
+  "disclaimer": "Fictional city, bank, people, interview excerpts and evidence logs. No real case or evidence.",
+  "location": {
+    "city": "Port Argent (fictional)",
+    "area": "East Quay District",
+    "site": "North Quay Community Bank (fictional)",
+    "geoCoordinates": null,
+    "georeferenceStatus": "UNSPECIFIED",
+    "cityRealWorldVerified": false,
+    "coordinateSpaces": [
+      {
+        "id": "bank_site",
+        "unit": "meters",
+        "axis": "+Y up,+Z forward",
+        "origin": "bank hypothetical world origin",
+        "geoTransform": null
+      },
+      {
+        "id": "interview_A",
+        "unit": "meters",
+        "axis": "+Y up,+Z forward",
+        "origin": "independent interview room A"
+      },
+      {
+        "id": "interview_B",
+        "unit": "meters",
+        "axis": "+Y up,+Z forward",
+        "origin": "independent interview room B"
+      },
+      {
+        "id": "review_space",
+        "unit": "meters",
+        "axis": "+Y up,+Z forward",
+        "origin": "prosecutor virtual room"
+      }
+    ]
+  },
+  "incident": {
+    "date": "2026-10-14",
+    "timeZone": "America/Los_Angeles",
+    "incidentStart": "2026-10-14T15:04:12-07:00",
+    "incidentEnd": "2026-10-14T15:11:23-07:00",
+    "reviewTime": "2026-10-14T19:15:00-07:00",
+    "allegedLossUSD": 86240,
+    "lossStatus": "PRELIMINARY_UNVERIFIED"
+  },
+  "people": [
+    {
+      "personId": "POI-001",
+      "displayName": "Rowan Vale",
+      "fictional": true,
+      "caseRole": "alleged_lead",
+      "custodyStatus": "unknown",
+      "identityLinkStatus": "fictional_fixture_only",
+      "allegedArmedStatus": "witness_allegation_unverified",
+      "portraitAsset": {
+        "path": "portraits/poi-001.svg",
+        "sha256": "9d4478fbd65f31694129983e0ac23cd0ef831a0461f7c5577322f976773eecfc",
+        "classification": "synthetic_illustration",
+        "mediaType": "image/svg+xml",
+        "originalSourceEvidenceId": null
+      },
+      "characterAsset": {
+        "id": "character.poi-001.v1",
+        "format": "procedural_recipe",
+        "baseMesh": "lowpoly_humanoid_v2",
+        "preset": {
+          "body": "neutral",
+          "outfit": "suit",
+          "hair": "short"
+        },
+        "headMeshPart": "face.head",
+        "headAnchor": "joint.head",
+        "textureBinding": {
+          "mode": "portrait_card",
+          "allowedPreviewModes": [
+            "portrait_card",
+            "uv_face"
+          ],
+          "portraitAssetPath": "portraits/poi-001.svg",
+          "requiresCaseAuthorization": true,
+          "previewOnly": true,
+          "preserveSourceImageAspect": true,
+          "evidentiaryIdentification": false
+        },
+        "provenance": "procedural_generated",
+        "reviewStatus": "UNREVIEWED"
+      }
+    },
+    {
+      "personId": "POI-002",
+      "displayName": "Cole Mercer",
+      "fictional": true,
+      "caseRole": "detained_suspect",
+      "custodyStatus": "detained",
+      "identityLinkStatus": "fictional_fixture_only",
+      "allegedArmedStatus": "witness_allegation_unverified",
+      "portraitAsset": {
+        "path": "portraits/poi-002.svg",
+        "sha256": "327e018196f81f0055eb9ba4bb015c00e3ef4a031871ecf72142652f956734f6",
+        "classification": "synthetic_illustration",
+        "mediaType": "image/svg+xml",
+        "originalSourceEvidenceId": null
+      },
+      "characterAsset": {
+        "id": "character.poi-002.v1",
+        "format": "procedural_recipe",
+        "baseMesh": "lowpoly_humanoid_v2",
+        "preset": {
+          "body": "neutral",
+          "outfit": "casual",
+          "hair": "short"
+        },
+        "headMeshPart": "face.head",
+        "headAnchor": "joint.head",
+        "textureBinding": {
+          "mode": "portrait_card",
+          "allowedPreviewModes": [
+            "portrait_card",
+            "uv_face"
+          ],
+          "portraitAssetPath": "portraits/poi-002.svg",
+          "requiresCaseAuthorization": true,
+          "previewOnly": true,
+          "preserveSourceImageAspect": true,
+          "evidentiaryIdentification": false
+        },
+        "provenance": "procedural_generated",
+        "reviewStatus": "UNREVIEWED"
+      }
+    },
+    {
+      "personId": "POI-003",
+      "displayName": "Theo Knox",
+      "fictional": true,
+      "caseRole": "alleged_participant",
+      "custodyStatus": "unknown",
+      "identityLinkStatus": "fictional_fixture_only",
+      "allegedArmedStatus": "witness_allegation_unverified",
+      "portraitAsset": {
+        "path": "portraits/poi-003.svg",
+        "sha256": "2c6c0a51495471ce2c8ee74fd1a0b48d71a32c9aec7e4b5b5fbb83a88bcb97f8",
+        "classification": "synthetic_illustration",
+        "mediaType": "image/svg+xml",
+        "originalSourceEvidenceId": null
+      },
+      "characterAsset": {
+        "id": "character.poi-003.v1",
+        "format": "procedural_recipe",
+        "baseMesh": "lowpoly_humanoid_v2",
+        "preset": {
+          "body": "neutral",
+          "outfit": "casual",
+          "hair": "short"
+        },
+        "headMeshPart": "face.head",
+        "headAnchor": "joint.head",
+        "textureBinding": {
+          "mode": "portrait_card",
+          "allowedPreviewModes": [
+            "portrait_card",
+            "uv_face"
+          ],
+          "portraitAssetPath": "portraits/poi-003.svg",
+          "requiresCaseAuthorization": true,
+          "previewOnly": true,
+          "preserveSourceImageAspect": true,
+          "evidentiaryIdentification": false
+        },
+        "provenance": "procedural_generated",
+        "reviewStatus": "UNREVIEWED"
+      }
+    },
+    {
+      "personId": "POI-004",
+      "displayName": "Mara Solis",
+      "fictional": true,
+      "caseRole": "person_of_interest_disputed_role",
+      "custodyStatus": "detained",
+      "identityLinkStatus": "fictional_fixture_only",
+      "allegedArmedStatus": "none_documented",
+      "portraitAsset": {
+        "path": "portraits/poi-004.svg",
+        "sha256": "62fb7b2f87717272595ab7bcff48a49fc4f9af58def823aeee954a0481997f94",
+        "classification": "synthetic_illustration",
+        "mediaType": "image/svg+xml",
+        "originalSourceEvidenceId": null
+      },
+      "characterAsset": {
+        "id": "character.poi-004.v1",
+        "format": "procedural_recipe",
+        "baseMesh": "lowpoly_humanoid_v2",
+        "preset": {
+          "body": "neutral",
+          "outfit": "casual",
+          "hair": "long"
+        },
+        "headMeshPart": "face.head",
+        "headAnchor": "joint.head",
+        "textureBinding": {
+          "mode": "portrait_card",
+          "allowedPreviewModes": [
+            "portrait_card",
+            "uv_face"
+          ],
+          "portraitAssetPath": "portraits/poi-004.svg",
+          "requiresCaseAuthorization": true,
+          "previewOnly": true,
+          "preserveSourceImageAspect": true,
+          "evidentiaryIdentification": false
+        },
+        "provenance": "procedural_generated",
+        "reviewStatus": "UNREVIEWED"
+      }
+    },
+    {
+      "personId": "WIT-001",
+      "displayName": "Elena Brooks",
+      "fictional": true,
+      "caseRole": "bank_teller",
+      "custodyStatus": "witness",
+      "identityLinkStatus": "fictional_fixture_only",
+      "allegedArmedStatus": "not_applicable",
+      "portraitAsset": {
+        "path": "portraits/wit-001.svg",
+        "sha256": "9fde170fa544a3c786ed7ec315b909c513d0a8b6bb98c74ba0c6281f1c2ca5bb",
+        "classification": "synthetic_illustration",
+        "mediaType": "image/svg+xml",
+        "originalSourceEvidenceId": null
+      },
+      "characterAsset": {
+        "id": "character.wit-001.v1",
+        "format": "procedural_recipe",
+        "baseMesh": "lowpoly_humanoid_v2",
+        "preset": {
+          "body": "neutral",
+          "outfit": "casual",
+          "hair": "long"
+        },
+        "headMeshPart": "face.head",
+        "headAnchor": "joint.head",
+        "textureBinding": {
+          "mode": "portrait_card",
+          "allowedPreviewModes": [
+            "portrait_card",
+            "uv_face"
+          ],
+          "portraitAssetPath": "portraits/wit-001.svg",
+          "requiresCaseAuthorization": true,
+          "previewOnly": true,
+          "preserveSourceImageAspect": true,
+          "evidentiaryIdentification": false
+        },
+        "provenance": "procedural_generated",
+        "reviewStatus": "UNREVIEWED"
+      }
+    },
+    {
+      "personId": "WIT-002",
+      "displayName": "Imani Reed",
+      "fictional": true,
+      "caseRole": "branch_manager",
+      "custodyStatus": "witness",
+      "identityLinkStatus": "fictional_fixture_only",
+      "allegedArmedStatus": "not_applicable",
+      "portraitAsset": {
+        "path": "portraits/wit-002.svg",
+        "sha256": "b4817adaf26e1aa460203736c510ea8c0798852eaadee3170a5d3311ce948656",
+        "classification": "synthetic_illustration",
+        "mediaType": "image/svg+xml",
+        "originalSourceEvidenceId": null
+      },
+      "characterAsset": {
+        "id": "character.wit-002.v1",
+        "format": "procedural_recipe",
+        "baseMesh": "lowpoly_humanoid_v2",
+        "preset": {
+          "body": "neutral",
+          "outfit": "suit",
+          "hair": "short"
+        },
+        "headMeshPart": "face.head",
+        "headAnchor": "joint.head",
+        "textureBinding": {
+          "mode": "portrait_card",
+          "allowedPreviewModes": [
+            "portrait_card",
+            "uv_face"
+          ],
+          "portraitAssetPath": "portraits/wit-002.svg",
+          "requiresCaseAuthorization": true,
+          "previewOnly": true,
+          "preserveSourceImageAspect": true,
+          "evidentiaryIdentification": false
+        },
+        "provenance": "procedural_generated",
+        "reviewStatus": "UNREVIEWED"
+      }
+    },
+    {
+      "personId": "WIT-003",
+      "displayName": "Yusuf Chen",
+      "fictional": true,
+      "caseRole": "customer_witness",
+      "custodyStatus": "witness",
+      "identityLinkStatus": "fictional_fixture_only",
+      "allegedArmedStatus": "not_applicable",
+      "portraitAsset": {
+        "path": "portraits/wit-003.svg",
+        "sha256": "1cb0093c4a57102139bbba1419f55027e9c25ebbd44ab57463ed390046b255b9",
+        "classification": "synthetic_illustration",
+        "mediaType": "image/svg+xml",
+        "originalSourceEvidenceId": null
+      },
+      "characterAsset": {
+        "id": "character.wit-003.v1",
+        "format": "procedural_recipe",
+        "baseMesh": "lowpoly_humanoid_v2",
+        "preset": {
+          "body": "neutral",
+          "outfit": "casual",
+          "hair": "short"
+        },
+        "headMeshPart": "face.head",
+        "headAnchor": "joint.head",
+        "textureBinding": {
+          "mode": "portrait_card",
+          "allowedPreviewModes": [
+            "portrait_card",
+            "uv_face"
+          ],
+          "portraitAssetPath": "portraits/wit-003.svg",
+          "requiresCaseAuthorization": true,
+          "previewOnly": true,
+          "preserveSourceImageAspect": true,
+          "evidentiaryIdentification": false
+        },
+        "provenance": "procedural_generated",
+        "reviewStatus": "UNREVIEWED"
+      }
+    },
+    {
+      "personId": "SEC-001",
+      "displayName": "Leon Park",
+      "fictional": true,
+      "caseRole": "responding_officer",
+      "custodyStatus": "witness",
+      "identityLinkStatus": "fictional_fixture_only",
+      "allegedArmedStatus": "not_applicable",
+      "portraitAsset": {
+        "path": "portraits/sec-001.svg",
+        "sha256": "92ef81651f1ebda893cf60be8bf2bb3ea6a6e4dd331845cc76e96536ab6ac8be",
+        "classification": "synthetic_illustration",
+        "mediaType": "image/svg+xml",
+        "originalSourceEvidenceId": null
+      },
+      "characterAsset": {
+        "id": "character.sec-001.v1",
+        "format": "procedural_recipe",
+        "baseMesh": "lowpoly_humanoid_v2",
+        "preset": {
+          "body": "neutral",
+          "outfit": "forensic",
+          "hair": "short"
+        },
+        "headMeshPart": "face.head",
+        "headAnchor": "joint.head",
+        "textureBinding": {
+          "mode": "portrait_card",
+          "allowedPreviewModes": [
+            "portrait_card",
+            "uv_face"
+          ],
+          "portraitAssetPath": "portraits/sec-001.svg",
+          "requiresCaseAuthorization": true,
+          "previewOnly": true,
+          "preserveSourceImageAspect": true,
+          "evidentiaryIdentification": false
+        },
+        "provenance": "procedural_generated",
+        "reviewStatus": "UNREVIEWED"
+      }
+    }
+  ],
+  "locations": [
+    {
+      "id": "L-01",
+      "name": "Bank facade / main entrance",
+      "sceneId": "SC-01",
+      "xyz": [
+        4,
+        0,
+        -12
+      ],
+      "kind": "entrance"
+    },
+    {
+      "id": "L-02",
+      "name": "Public lobby",
+      "sceneId": "SC-02",
+      "xyz": [
+        4,
+        0,
+        0
+      ],
+      "kind": "room"
+    },
+    {
+      "id": "L-03",
+      "name": "Teller counter",
+      "sceneId": "SC-02",
+      "xyz": [
+        4,
+        0,
+        10
+      ],
+      "kind": "counter"
+    },
+    {
+      "id": "L-04",
+      "name": "Rear service corridor",
+      "sceneId": "SC-03",
+      "xyz": [
+        4,
+        0,
+        17
+      ],
+      "kind": "corridor"
+    },
+    {
+      "id": "L-05",
+      "name": "South exit/plaza",
+      "sceneId": "SC-04",
+      "xyz": [
+        0,
+        0,
+        -19
+      ],
+      "kind": "exit"
+    },
+    {
+      "id": "L-06",
+      "name": "East plaza perimeter",
+      "sceneId": "SC-05",
+      "xyz": [
+        21,
+        0,
+        -15
+      ],
+      "kind": "perimeter"
+    },
+    {
+      "id": "L-07",
+      "name": "Interview room A",
+      "sceneId": "SC-06",
+      "xyz": [
+        0,
+        0,
+        0
+      ],
+      "kind": "interview_room"
+    },
+    {
+      "id": "L-08",
+      "name": "Interview room B",
+      "sceneId": "SC-07",
+      "xyz": [
+        0,
+        0,
+        0
+      ],
+      "kind": "interview_room"
+    },
+    {
+      "id": "L-09",
+      "name": "Prosecutor review board",
+      "sceneId": "SC-08",
+      "xyz": [
+        0,
+        0,
+        0
+      ],
+      "kind": "review_room"
+    }
+  ],
+  "scenes": [
+    {
+      "sceneId": "SC-01",
+      "label": "Exterior approach",
+      "coordinateSpaceId": "bank_site",
+      "anchorId": "L-01",
+      "start": "2026-10-14T15:04:00-07:00",
+      "end": "2026-10-14T15:07:45-07:00",
+      "participantIds": [
+        "POI-001",
+        "POI-002",
+        "POI-003",
+        "POI-004"
+      ],
+      "description": "Approach footage placeholder; four figures enter a fictional bank.",
+      "hypothesisStatus": "ILLUSTRATIVE_ONLY",
+      "sceneRevision": "scene-demo-r1",
+      "geometryRefs": [
+        "character.poi-001.v1",
+        "character.poi-002.v1",
+        "character.poi-003.v1",
+        "character.poi-004.v1"
+      ],
+      "evidenceLinked": true,
+      "objectsAreEvidence": false
+    },
+    {
+      "sceneId": "SC-02",
+      "label": "Lobby confrontation",
+      "coordinateSpaceId": "bank_site",
+      "anchorId": "L-02",
+      "start": "2026-10-14T15:04:12-07:00",
+      "end": "2026-10-14T15:07:20-07:00",
+      "participantIds": [
+        "POI-001",
+        "POI-002",
+        "POI-003",
+        "POI-004",
+        "WIT-001",
+        "WIT-002",
+        "WIT-003"
+      ],
+      "description": "Actors pass civilians; allegations of displayed weapons and demand for cash.",
+      "hypothesisStatus": "ILLUSTRATIVE_ONLY",
+      "sceneRevision": "scene-demo-r1",
+      "geometryRefs": [
+        "character.poi-001.v1",
+        "character.poi-002.v1",
+        "character.poi-003.v1",
+        "character.poi-004.v1",
+        "character.wit-001.v1",
+        "character.wit-002.v1",
+        "character.wit-003.v1"
+      ],
+      "evidenceLinked": true,
+      "objectsAreEvidence": false
+    },
+    {
+      "sceneId": "SC-03",
+      "label": "Service corridor",
+      "coordinateSpaceId": "bank_site",
+      "anchorId": "L-04",
+      "start": "2026-10-14T15:04:47-07:00",
+      "end": "2026-10-14T15:06:45-07:00",
+      "participantIds": [
+        "POI-002",
+        "POI-003",
+        "WIT-002"
+      ],
+      "description": "Several occupants reported being directed toward the back; exact participant assignments unresolved.",
+      "hypothesisStatus": "ILLUSTRATIVE_ONLY",
+      "sceneRevision": "scene-demo-r1",
+      "geometryRefs": [
+        "character.poi-002.v1",
+        "character.poi-003.v1",
+        "character.wit-002.v1"
+      ],
+      "evidenceLinked": true,
+      "objectsAreEvidence": false
+    },
+    {
+      "sceneId": "SC-04",
+      "label": "Alarm and evacuation",
+      "coordinateSpaceId": "bank_site",
+      "anchorId": "L-05",
+      "start": "2026-10-14T15:05:14-07:00",
+      "end": "2026-10-14T15:07:45-07:00",
+      "participantIds": [
+        "WIT-003",
+        "WIT-001",
+        "POI-001",
+        "POI-002",
+        "POI-003",
+        "POI-004"
+      ],
+      "description": "Alarm/door logs and fleeing witness tracks; positions are illustrative.",
+      "hypothesisStatus": "ILLUSTRATIVE_ONLY",
+      "sceneRevision": "scene-demo-r1",
+      "geometryRefs": [
+        "character.wit-003.v1",
+        "character.wit-001.v1",
+        "character.poi-001.v1",
+        "character.poi-002.v1",
+        "character.poi-003.v1",
+        "character.poi-004.v1"
+      ],
+      "evidenceLinked": true,
+      "objectsAreEvidence": false
+    },
+    {
+      "sceneId": "SC-05",
+      "label": "Perimeter encounters",
+      "coordinateSpaceId": "bank_site",
+      "anchorId": "L-06",
+      "start": "2026-10-14T15:07:20-07:00",
+      "end": "2026-10-14T15:11:30-07:00",
+      "participantIds": [
+        "POI-002",
+        "POI-004",
+        "SEC-001"
+      ],
+      "description": "Separate apprehensions of two individuals; not proof of participation.",
+      "hypothesisStatus": "ILLUSTRATIVE_ONLY",
+      "sceneRevision": "scene-demo-r1",
+      "geometryRefs": [
+        "character.poi-002.v1",
+        "character.poi-004.v1",
+        "character.sec-001.v1"
+      ],
+      "evidenceLinked": true,
+      "objectsAreEvidence": false
+    },
+    {
+      "sceneId": "SC-06",
+      "label": "Interview A: Cole",
+      "coordinateSpaceId": "interview_A",
+      "anchorId": "L-07",
+      "start": "2026-10-14T17:10:00-07:00",
+      "end": "2026-10-14T17:20:00-07:00",
+      "participantIds": [
+        "POI-002",
+        "SEC-001"
+      ],
+      "description": "Recorded fictional interview with disputed account.",
+      "hypothesisStatus": "ILLUSTRATIVE_ONLY",
+      "sceneRevision": "scene-demo-r1",
+      "geometryRefs": [
+        "character.poi-002.v1",
+        "character.sec-001.v1"
+      ],
+      "evidenceLinked": true,
+      "objectsAreEvidence": false
+    },
+    {
+      "sceneId": "SC-07",
+      "label": "Interview B: Mara",
+      "coordinateSpaceId": "interview_B",
+      "anchorId": "L-08",
+      "start": "2026-10-14T18:05:00-07:00",
+      "end": "2026-10-14T18:18:00-07:00",
+      "participantIds": [
+        "POI-004",
+        "SEC-001"
+      ],
+      "description": "Recorded fictional interview with expressly disputed intent.",
+      "hypothesisStatus": "ILLUSTRATIVE_ONLY",
+      "sceneRevision": "scene-demo-r1",
+      "geometryRefs": [
+        "character.poi-004.v1",
+        "character.sec-001.v1"
+      ],
+      "evidenceLinked": true,
+      "objectsAreEvidence": false
+    },
+    {
+      "sceneId": "SC-08",
+      "label": "Review workspace",
+      "coordinateSpaceId": "review_space",
+      "anchorId": "L-09",
+      "start": "2026-10-14T19:15:00-07:00",
+      "end": "2026-10-14T19:45:00-07:00",
+      "participantIds": [],
+      "description": "Review-only synthetic legal case workspace.",
+      "hypothesisStatus": "ILLUSTRATIVE_ONLY",
+      "sceneRevision": "scene-demo-r1",
+      "geometryRefs": [],
+      "evidenceLinked": true,
+      "objectsAreEvidence": false
+    }
+  ],
+  "events": [
+    {
+      "eventId": "EV-001",
+      "title": "Four persons enter",
+      "start": "2026-10-14T15:04:12-07:00",
+      "end": "2026-10-14T15:04:29-07:00",
+      "sceneIds": [
+        "SC-01",
+        "SC-02"
+      ],
+      "personIds": [
+        "POI-001",
+        "POI-002",
+        "POI-003",
+        "POI-004"
+      ],
+      "evidenceIds": [
+        "E-01",
+        "E-02"
+      ],
+      "anchorId": "L-01",
+      "claimStatus": "illustrative_observation",
+      "summary": "Four people enter through the public doorway; the identities are fictional registry associations.",
+      "propositions": [],
+      "reviewState": "REVIEW_REQUIRED"
+    },
+    {
+      "eventId": "EV-002",
+      "title": "Walk past customers",
+      "start": "2026-10-14T15:04:23-07:00",
+      "end": "2026-10-14T15:04:54-07:00",
+      "sceneIds": [
+        "SC-02"
+      ],
+      "personIds": [
+        "POI-001",
+        "POI-002",
+        "POI-003",
+        "POI-004",
+        "WIT-003"
+      ],
+      "evidenceIds": [
+        "E-02",
+        "E-06"
+      ],
+      "anchorId": "L-02",
+      "claimStatus": "partly_corrob_or_disputed",
+      "summary": "The group crosses the lobby past roughly eleven customers and workers; exact occupancy is not independently confirmed.",
+      "propositions": [],
+      "reviewState": "REVIEW_REQUIRED"
+    },
+    {
+      "eventId": "EV-003",
+      "title": "Armed confrontation and movement toward rear",
+      "start": "2026-10-14T15:04:47-07:00",
+      "end": "2026-10-14T15:05:26-07:00",
+      "sceneIds": [
+        "SC-02",
+        "SC-03"
+      ],
+      "personIds": [
+        "POI-001",
+        "POI-002",
+        "POI-003",
+        "WIT-002"
+      ],
+      "evidenceIds": [
+        "E-02",
+        "E-03",
+        "E-06"
+      ],
+      "anchorId": "L-04",
+      "claimStatus": "contested_testimony",
+      "summary": "Witnesses allege three men displayed weapons and ordered several people toward the service corridor. No weapon is verified for Mara.",
+      "propositions": [],
+      "reviewState": "REVIEW_REQUIRED"
+    },
+    {
+      "eventId": "EV-004",
+      "title": "Alarm and public evacuation",
+      "start": "2026-10-14T15:05:14-07:00",
+      "end": "2026-10-14T15:06:05-07:00",
+      "sceneIds": [
+        "SC-02",
+        "SC-04"
+      ],
+      "personIds": [
+        "WIT-003",
+        "WIT-002"
+      ],
+      "evidenceIds": [
+        "E-03",
+        "E-04",
+        "E-06"
+      ],
+      "anchorId": "L-05",
+      "claimStatus": "synthetic_log_and_testimony",
+      "summary": "Security alarm log records activation; civilians begin fleeing from public access points.",
+      "propositions": [],
+      "reviewState": "REVIEW_REQUIRED"
+    },
+    {
+      "eventId": "EV-005",
+      "title": "Demand for all cash",
+      "start": "2026-10-14T15:05:32-07:00",
+      "end": "2026-10-14T15:06:34-07:00",
+      "sceneIds": [
+        "SC-02"
+      ],
+      "personIds": [
+        "POI-001",
+        "WIT-001"
+      ],
+      "evidenceIds": [
+        "E-02",
+        "E-05",
+        "E-06"
+      ],
+      "anchorId": "L-03",
+      "claimStatus": "contested_testimony",
+      "summary": "Teller reports an alleged instruction to surrender all available cash; figure of $86,240 is a preliminary internal estimate only.",
+      "propositions": [],
+      "reviewState": "REVIEW_REQUIRED"
+    },
+    {
+      "eventId": "EV-006",
+      "title": "Four people leave bank",
+      "start": "2026-10-14T15:07:08-07:00",
+      "end": "2026-10-14T15:07:40-07:00",
+      "sceneIds": [
+        "SC-01",
+        "SC-04"
+      ],
+      "personIds": [
+        "POI-001",
+        "POI-002",
+        "POI-003",
+        "POI-004"
+      ],
+      "evidenceIds": [
+        "E-01",
+        "E-04"
+      ],
+      "anchorId": "L-05",
+      "claimStatus": "illustrative_observation",
+      "summary": "Exit footage summary depicts four figures leaving at different moments; no verified vehicle or escape-route model.",
+      "propositions": [],
+      "reviewState": "REVIEW_REQUIRED"
+    },
+    {
+      "eventId": "EV-007",
+      "title": "Cole stopped outside",
+      "start": "2026-10-14T15:09:12-07:00",
+      "end": "2026-10-14T15:10:09-07:00",
+      "sceneIds": [
+        "SC-05"
+      ],
+      "personIds": [
+        "POI-002",
+        "SEC-001"
+      ],
+      "evidenceIds": [
+        "E-07"
+      ],
+      "anchorId": "L-06",
+      "claimStatus": "fictional_officer_account",
+      "summary": "Responding officer stops Cole near the outer plaza. There is no assumption that detention proves guilt.",
+      "propositions": [],
+      "reviewState": "REVIEW_REQUIRED"
+    },
+    {
+      "eventId": "EV-008",
+      "title": "Mara stopped outside",
+      "start": "2026-10-14T15:10:34-07:00",
+      "end": "2026-10-14T15:11:23-07:00",
+      "sceneIds": [
+        "SC-05"
+      ],
+      "personIds": [
+        "POI-004",
+        "SEC-001"
+      ],
+      "evidenceIds": [
+        "E-07"
+      ],
+      "anchorId": "L-06",
+      "claimStatus": "fictional_officer_account",
+      "summary": "Mara is detained separately; her reason for being present remains in dispute.",
+      "propositions": [],
+      "reviewState": "REVIEW_REQUIRED"
+    },
+    {
+      "eventId": "EV-009",
+      "title": "Cole recorded interview",
+      "start": "2026-10-14T17:12:02-07:00",
+      "end": "2026-10-14T17:18:30-07:00",
+      "sceneIds": [
+        "SC-06"
+      ],
+      "personIds": [
+        "POI-002",
+        "SEC-001"
+      ],
+      "evidenceIds": [
+        "E-08"
+      ],
+      "anchorId": "L-07",
+      "claimStatus": "interview_claim",
+      "summary": "Cole admits entering the bank but disputes carrying a weapon or handling money.",
+      "propositions": [],
+      "reviewState": "REVIEW_REQUIRED"
+    },
+    {
+      "eventId": "EV-010",
+      "title": "Mara recorded interview",
+      "start": "2026-10-14T18:07:05-07:00",
+      "end": "2026-10-14T18:15:32-07:00",
+      "sceneIds": [
+        "SC-07"
+      ],
+      "personIds": [
+        "POI-004",
+        "SEC-001"
+      ],
+      "evidenceIds": [
+        "E-09"
+      ],
+      "anchorId": "L-08",
+      "claimStatus": "interview_claim",
+      "summary": "Mara states she went inside with the group but denies knowing a robbery would occur.",
+      "propositions": [],
+      "reviewState": "REVIEW_REQUIRED"
+    },
+    {
+      "eventId": "EV-011",
+      "title": "Prosecutor file review",
+      "start": "2026-10-14T19:15:00-07:00",
+      "end": "2026-10-14T19:40:00-07:00",
+      "sceneIds": [
+        "SC-08"
+      ],
+      "personIds": [],
+      "evidenceIds": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-05",
+        "E-06",
+        "E-07",
+        "E-08",
+        "E-09"
+      ],
+      "anchorId": "L-09",
+      "claimStatus": "synthetic_review_note",
+      "summary": "Assigned prosecutor examines conflicting evidence and opens discovery tasks; no guilt determination.",
+      "propositions": [],
+      "reviewState": "REVIEW_REQUIRED"
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceId": "E-01",
+      "title": "Exterior/entry camera synopsis",
+      "type": "camera_log",
+      "artifact": "evidence/e-01.json",
+      "sha256": "ee28a1a59fffdaa21864cc857fcff00006585400f32c1ccb5b0e7be3ed18f508",
+      "classification": "SYNTHETIC_FIXTURE",
+      "caseScoped": true,
+      "requiresAuthorization": true,
+      "mediaPresent": false,
+      "transcripts": [],
+      "reviewState": "UNVERIFIED",
+      "observationOnly": true,
+      "sourceTimeCoverage": {
+        "start": "2026-10-14T15:04:00-07:00",
+        "end": "2026-10-14T15:07:45-07:00",
+        "meaning": "SYNTHETIC_REFERENCED_INTERVAL_NOT_AUTHENTIC_MEDIA"
+      }
+    },
+    {
+      "evidenceId": "E-02",
+      "title": "Lobby camera synopsis",
+      "type": "camera_log",
+      "artifact": "evidence/e-02.json",
+      "sha256": "844179fbc608d5fdeab806f3fa76ccecf71c8c981452c475061181c529018f7d",
+      "classification": "SYNTHETIC_FIXTURE",
+      "caseScoped": true,
+      "requiresAuthorization": true,
+      "mediaPresent": false,
+      "transcripts": [],
+      "reviewState": "UNVERIFIED",
+      "observationOnly": true,
+      "sourceTimeCoverage": {
+        "start": "2026-10-14T15:04:12-07:00",
+        "end": "2026-10-14T15:07:20-07:00",
+        "meaning": "SYNTHETIC_REFERENCED_INTERVAL_NOT_AUTHENTIC_MEDIA"
+      }
+    },
+    {
+      "evidenceId": "E-03",
+      "title": "Rear corridor camera and occupancy synopsis",
+      "type": "camera_log",
+      "artifact": "evidence/e-03.json",
+      "sha256": "1195bac24d121c6e9f4b9eb10d19dc429bc3e2d6b77144a511c7ddd86c96241e",
+      "classification": "SYNTHETIC_FIXTURE",
+      "caseScoped": true,
+      "requiresAuthorization": true,
+      "mediaPresent": false,
+      "transcripts": [],
+      "reviewState": "UNVERIFIED",
+      "observationOnly": true,
+      "sourceTimeCoverage": {
+        "start": "2026-10-14T15:04:47-07:00",
+        "end": "2026-10-14T15:06:45-07:00",
+        "meaning": "SYNTHETIC_REFERENCED_INTERVAL_NOT_AUTHENTIC_MEDIA"
+      }
+    },
+    {
+      "evidenceId": "E-04",
+      "title": "Alarm and door event log",
+      "type": "system_log",
+      "artifact": "evidence/e-04.json",
+      "sha256": "bdd57b9cdfcabe98e306a8e5818743852e8e8b5410a88c48381fbb2c974e6959",
+      "classification": "SYNTHETIC_FIXTURE",
+      "caseScoped": true,
+      "requiresAuthorization": true,
+      "mediaPresent": false,
+      "transcripts": [],
+      "reviewState": "UNVERIFIED",
+      "observationOnly": true,
+      "sourceTimeCoverage": {
+        "start": "2026-10-14T15:05:14-07:00",
+        "end": "2026-10-14T15:07:45-07:00",
+        "meaning": "SYNTHETIC_REFERENCED_INTERVAL_NOT_AUTHENTIC_MEDIA"
+      }
+    },
+    {
+      "evidenceId": "E-05",
+      "title": "Cash audit worksheet",
+      "type": "financial_record",
+      "artifact": "evidence/e-05.json",
+      "sha256": "0ced405aa85585a8772c9d445982ae6a18d12c6acbe3bf7907d015f9bee3190c",
+      "classification": "SYNTHETIC_FIXTURE",
+      "caseScoped": true,
+      "requiresAuthorization": true,
+      "mediaPresent": false,
+      "transcripts": [],
+      "reviewState": "UNVERIFIED",
+      "observationOnly": true,
+      "sourceTimeCoverage": {
+        "start": "2026-10-14T15:05:30-07:00",
+        "end": "2026-10-14T19:10:00-07:00",
+        "meaning": "SYNTHETIC_REFERENCED_INTERVAL_NOT_AUTHENTIC_MEDIA"
+      }
+    },
+    {
+      "evidenceId": "E-06",
+      "title": "Witness statements synopsis",
+      "type": "witness_statement",
+      "artifact": "evidence/e-06.json",
+      "sha256": "f7bc23211424140e3a1ab006b209aa55ceeb49f71a5b196bb64e47007e79206b",
+      "classification": "SYNTHETIC_FIXTURE",
+      "caseScoped": true,
+      "requiresAuthorization": true,
+      "mediaPresent": false,
+      "transcripts": [
+        {
+          "transcriptId": "INT-ELENA",
+          "evidenceId": "E-06",
+          "personId": "WIT-001",
+          "file": "transcripts/int-elena.json",
+          "sha256": "c448bb8250577b55eb2474be716bd866ed982806aa257b4fda550b7fe008a106"
+        },
+        {
+          "transcriptId": "INT-IMANI",
+          "evidenceId": "E-06",
+          "personId": "WIT-002",
+          "file": "transcripts/int-imani.json",
+          "sha256": "3816328db3f2f58708d5e0d9931ce4f4dd7018944a31646fc8e10fc45304d558"
+        },
+        {
+          "transcriptId": "INT-YUSUF",
+          "evidenceId": "E-06",
+          "personId": "WIT-003",
+          "file": "transcripts/int-yusuf.json",
+          "sha256": "ca80489d518eb89879c79df4395eef04b303750da9117db0dbe8baf3473861d6"
+        },
+        {
+          "transcriptId": "INT-ELENA",
+          "evidenceId": "E-06",
+          "personId": "WIT-001",
+          "file": "transcripts/int-elena.json",
+          "sha256": "c448bb8250577b55eb2474be716bd866ed982806aa257b4fda550b7fe008a106"
+        },
+        {
+          "transcriptId": "INT-IMANI",
+          "evidenceId": "E-06",
+          "personId": "WIT-002",
+          "file": "transcripts/int-imani.json",
+          "sha256": "3816328db3f2f58708d5e0d9931ce4f4dd7018944a31646fc8e10fc45304d558"
+        },
+        {
+          "transcriptId": "INT-YUSUF",
+          "evidenceId": "E-06",
+          "personId": "WIT-003",
+          "file": "transcripts/int-yusuf.json",
+          "sha256": "ca80489d518eb89879c79df4395eef04b303750da9117db0dbe8baf3473861d6"
+        }
+      ],
+      "reviewState": "UNVERIFIED",
+      "observationOnly": true,
+      "sourceTimeCoverage": {
+        "start": "2026-10-14T15:04:12-07:00",
+        "end": "2026-10-14T15:07:45-07:00",
+        "meaning": "SYNTHETIC_REFERENCED_INTERVAL_NOT_AUTHENTIC_MEDIA"
+      }
+    },
+    {
+      "evidenceId": "E-07",
+      "title": "Perimeter stop documentation",
+      "type": "officer_note",
+      "artifact": "evidence/e-07.json",
+      "sha256": "904ca41d17bb2192ed398d8104881969811e3b7e41fa77f7f312f61aee16c8f0",
+      "classification": "SYNTHETIC_FIXTURE",
+      "caseScoped": true,
+      "requiresAuthorization": true,
+      "mediaPresent": false,
+      "transcripts": [],
+      "reviewState": "UNVERIFIED",
+      "observationOnly": true,
+      "sourceTimeCoverage": {
+        "start": "2026-10-14T15:09:00-07:00",
+        "end": "2026-10-14T15:11:30-07:00",
+        "meaning": "SYNTHETIC_REFERENCED_INTERVAL_NOT_AUTHENTIC_MEDIA"
+      }
+    },
+    {
+      "evidenceId": "E-08",
+      "title": "Cole interview transcript",
+      "type": "interview",
+      "artifact": "evidence/e-08.json",
+      "sha256": "c8451beb56671fa01b8803b08b508d0a574aac98ad8dc915ffadac0faebf3f2a",
+      "classification": "SYNTHETIC_FIXTURE",
+      "caseScoped": true,
+      "requiresAuthorization": true,
+      "mediaPresent": false,
+      "transcripts": [
+        {
+          "transcriptId": "INT-COLE",
+          "evidenceId": "E-08",
+          "personId": "POI-002",
+          "file": "transcripts/int-cole.json",
+          "sha256": "861f378f9f2565091af82cff080179f0e21c0bdc97a42881d58af88684d83e7f"
+        }
+      ],
+      "reviewState": "UNVERIFIED",
+      "observationOnly": true,
+      "sourceTimeCoverage": {
+        "start": "2026-10-14T17:12:02-07:00",
+        "end": "2026-10-14T17:18:30-07:00",
+        "meaning": "SYNTHETIC_REFERENCED_INTERVAL_NOT_AUTHENTIC_MEDIA"
+      }
+    },
+    {
+      "evidenceId": "E-09",
+      "title": "Mara interview transcript",
+      "type": "interview",
+      "artifact": "evidence/e-09.json",
+      "sha256": "76ab212b71f2fddfc04a55dfe4703903c2acd12d1fa2e24fdd6e9837464a32db",
+      "classification": "SYNTHETIC_FIXTURE",
+      "caseScoped": true,
+      "requiresAuthorization": true,
+      "mediaPresent": false,
+      "transcripts": [
+        {
+          "transcriptId": "INT-MARA",
+          "evidenceId": "E-09",
+          "personId": "POI-004",
+          "file": "transcripts/int-mara.json",
+          "sha256": "de5d807a6085fa20839e72ef995e3e1d7e99aae6d4997029d1b4511acbbdda4a"
+        }
+      ],
+      "reviewState": "UNVERIFIED",
+      "observationOnly": true,
+      "sourceTimeCoverage": {
+        "start": "2026-10-14T18:07:05-07:00",
+        "end": "2026-10-14T18:15:32-07:00",
+        "meaning": "SYNTHETIC_REFERENCED_INTERVAL_NOT_AUTHENTIC_MEDIA"
+      }
+    }
+  ],
+  "transcripts": [
+    {
+      "transcriptId": "INT-COLE",
+      "evidenceId": "E-08",
+      "personId": "POI-002",
+      "file": "transcripts/int-cole.json",
+      "sha256": "861f378f9f2565091af82cff080179f0e21c0bdc97a42881d58af88684d83e7f"
+    },
+    {
+      "transcriptId": "INT-MARA",
+      "evidenceId": "E-09",
+      "personId": "POI-004",
+      "file": "transcripts/int-mara.json",
+      "sha256": "de5d807a6085fa20839e72ef995e3e1d7e99aae6d4997029d1b4511acbbdda4a"
+    },
+    {
+      "transcriptId": "INT-ELENA",
+      "evidenceId": "E-06",
+      "personId": "WIT-001",
+      "file": "transcripts/int-elena.json",
+      "sha256": "c448bb8250577b55eb2474be716bd866ed982806aa257b4fda550b7fe008a106"
+    },
+    {
+      "transcriptId": "INT-IMANI",
+      "evidenceId": "E-06",
+      "personId": "WIT-002",
+      "file": "transcripts/int-imani.json",
+      "sha256": "3816328db3f2f58708d5e0d9931ce4f4dd7018944a31646fc8e10fc45304d558"
+    },
+    {
+      "transcriptId": "INT-YUSUF",
+      "evidenceId": "E-06",
+      "personId": "WIT-003",
+      "file": "transcripts/int-yusuf.json",
+      "sha256": "ca80489d518eb89879c79df4395eef04b303750da9117db0dbe8baf3473861d6"
+    }
+  ],
+  "characterTracks": [
+    {
+      "trackId": "TRACK-POI-001",
+      "personId": "POI-001",
+      "kind": "illustrative_event_bound",
+      "eventIds": [
+        "EV-001",
+        "EV-002",
+        "EV-003",
+        "EV-005",
+        "EV-006"
+      ],
+      "notSourceDerived3D": true,
+      "keyframes": [
+        {
+          "eventId": "EV-001",
+          "time": "2026-10-14T15:04:12-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-01",
+          "positionXYZ": [
+            4,
+            0,
+            -12
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-002",
+          "time": "2026-10-14T15:04:23-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-02",
+          "positionXYZ": [
+            4,
+            0,
+            0
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-003",
+          "time": "2026-10-14T15:04:47-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-04",
+          "positionXYZ": [
+            4,
+            0,
+            17
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-005",
+          "time": "2026-10-14T15:05:32-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-03",
+          "positionXYZ": [
+            4,
+            0,
+            10
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-006",
+          "time": "2026-10-14T15:07:08-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-05",
+          "positionXYZ": [
+            0,
+            0,
+            -19
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        }
+      ]
+    },
+    {
+      "trackId": "TRACK-POI-002",
+      "personId": "POI-002",
+      "kind": "illustrative_event_bound",
+      "eventIds": [
+        "EV-001",
+        "EV-002",
+        "EV-003",
+        "EV-006",
+        "EV-007",
+        "EV-009"
+      ],
+      "notSourceDerived3D": true,
+      "keyframes": [
+        {
+          "eventId": "EV-001",
+          "time": "2026-10-14T15:04:12-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-01",
+          "positionXYZ": [
+            4,
+            0,
+            -12
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-002",
+          "time": "2026-10-14T15:04:23-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-02",
+          "positionXYZ": [
+            4,
+            0,
+            0
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-003",
+          "time": "2026-10-14T15:04:47-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-04",
+          "positionXYZ": [
+            4,
+            0,
+            17
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-006",
+          "time": "2026-10-14T15:07:08-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-05",
+          "positionXYZ": [
+            0,
+            0,
+            -19
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-007",
+          "time": "2026-10-14T15:09:12-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-06",
+          "positionXYZ": [
+            21,
+            0,
+            -15
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-009",
+          "time": "2026-10-14T17:12:02-07:00",
+          "coordinateSpaceId": "interview_A",
+          "anchorId": "L-07",
+          "positionXYZ": [
+            0,
+            0,
+            0
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        }
+      ]
+    },
+    {
+      "trackId": "TRACK-POI-003",
+      "personId": "POI-003",
+      "kind": "illustrative_event_bound",
+      "eventIds": [
+        "EV-001",
+        "EV-002",
+        "EV-003",
+        "EV-006"
+      ],
+      "notSourceDerived3D": true,
+      "keyframes": [
+        {
+          "eventId": "EV-001",
+          "time": "2026-10-14T15:04:12-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-01",
+          "positionXYZ": [
+            4,
+            0,
+            -12
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-002",
+          "time": "2026-10-14T15:04:23-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-02",
+          "positionXYZ": [
+            4,
+            0,
+            0
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-003",
+          "time": "2026-10-14T15:04:47-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-04",
+          "positionXYZ": [
+            4,
+            0,
+            17
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-006",
+          "time": "2026-10-14T15:07:08-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-05",
+          "positionXYZ": [
+            0,
+            0,
+            -19
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        }
+      ]
+    },
+    {
+      "trackId": "TRACK-POI-004",
+      "personId": "POI-004",
+      "kind": "illustrative_event_bound",
+      "eventIds": [
+        "EV-001",
+        "EV-002",
+        "EV-006",
+        "EV-008",
+        "EV-010"
+      ],
+      "notSourceDerived3D": true,
+      "keyframes": [
+        {
+          "eventId": "EV-001",
+          "time": "2026-10-14T15:04:12-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-01",
+          "positionXYZ": [
+            4,
+            0,
+            -12
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-002",
+          "time": "2026-10-14T15:04:23-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-02",
+          "positionXYZ": [
+            4,
+            0,
+            0
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-006",
+          "time": "2026-10-14T15:07:08-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-05",
+          "positionXYZ": [
+            0,
+            0,
+            -19
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-008",
+          "time": "2026-10-14T15:10:34-07:00",
+          "coordinateSpaceId": "bank_site",
+          "anchorId": "L-06",
+          "positionXYZ": [
+            21,
+            0,
+            -15
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        },
+        {
+          "eventId": "EV-010",
+          "time": "2026-10-14T18:07:05-07:00",
+          "coordinateSpaceId": "interview_B",
+          "anchorId": "L-08",
+          "positionXYZ": [
+            0,
+            0,
+            0
+          ],
+          "pathStatus": "ILLUSTRATIVE_NOT_OBSERVED"
+        }
+      ]
+    }
+  ],
+  "legalReview": {
+    "reviewerRole": "PROSECUTOR_TRAINING_SIMULATION",
+    "status": "OPEN_REVIEW",
+    "what": "Multiple people entered a bank; witnesses allege armed demands and movement of civilians; two people were later detained.",
+    "who": "Potential roles differ and must not be inferred from shared arrival or portrait similarity.",
+    "why": "A financial motive is a working allegation; individualized motive and agreement have not been established.",
+    "how": "Witnesses describe intimidation and orders. Detailed means, exact objects and money transfer need corroboration.",
+    "provisionalTheories": [
+      {
+        "id": "TH-01",
+        "claim": "Rowan made a cash demand",
+        "supports": [
+          "E-02",
+          "E-06"
+        ],
+        "limits": "Camera synopsis has no audio or verified identification"
+      },
+      {
+        "id": "TH-02",
+        "claim": "Cole joined armed coercion",
+        "supports": [
+          "E-02",
+          "E-03",
+          "E-06"
+        ],
+        "limits": "Interview disputes weapon and placement; camera identity ambiguous"
+      },
+      {
+        "id": "TH-03",
+        "claim": "Mara intentionally aided the group",
+        "supports": [
+          "E-01",
+          "E-02"
+        ],
+        "limits": "Presence is insufficient; no documented weapon, orders, cash handling or agreement"
+      },
+      {
+        "id": "TH-04",
+        "claim": "Cash loss totals $86,240",
+        "supports": [
+          "E-05"
+        ],
+        "limits": "Preliminary accounting only; no verified reconciliation"
+      }
+    ],
+    "discoveryChecklist": [
+      "Verify original camera clips, hashes and access permissions",
+      "Calibrate camera and alarm clocks before sequencing events",
+      "Request complete recordings, interview rights/consent and original transcripts",
+      "Preserve favorable/contradictory evidence for each person",
+      "Obtain itemized cash reconciliation and chain-of-custody records",
+      "Assess identification quality independently of generated portraits",
+      "Seek exculpatory evidence concerning Mara and Cole",
+      "Review venue-specific elements, admissibility and disclosure obligations with actual counsel"
+    ],
+    "noGuiltDetermination": true
+  },
+  "rendering": {
+    "sceneGoalMiB": 8,
+    "lod": {
+      "sprite": "2.5D texture billboard",
+      "retro": "8-16 ring lowpoly humanoid",
+      "detailed": "full preview GLB with authored rig"
+    },
+    "captureStatus": "SCHEMATIC_NOT_PHOTOGRAMMETRIC",
+    "savePolicy": "Case-scoped revision, authorized review and linked event intervals required"
+  },
+  "sourceRevisions": {
+    "sceneRevision": "scene-demo-r1",
+    "analysisRunId": "synthetic-run-001",
+    "fixtureVersion": "1.0.0",
+    "isEvidenceProvenance": false
+  }
+}

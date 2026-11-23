@@ -1,0 +1,1111 @@
+{
+  "schemaVersion": "parent-atlas-derived-graph/v1",
+  "caseId": "PA-DEMO-ROBBERY-001",
+  "canonical": "data/case.json",
+  "classification": "DERIVED_SYNTHETIC_READ_ONLY",
+  "nodes": [
+    {
+      "id": "PA-DEMO-ROBBERY-001",
+      "kind": "case",
+      "label": "Synthetic robbery case"
+    },
+    {
+      "id": "POI-001",
+      "kind": "person",
+      "label": "Rowan Vale"
+    },
+    {
+      "id": "POI-002",
+      "kind": "person",
+      "label": "Cole Mercer"
+    },
+    {
+      "id": "POI-003",
+      "kind": "person",
+      "label": "Theo Knox"
+    },
+    {
+      "id": "POI-004",
+      "kind": "person",
+      "label": "Mara Solis"
+    },
+    {
+      "id": "WIT-001",
+      "kind": "person",
+      "label": "Elena Brooks"
+    },
+    {
+      "id": "WIT-002",
+      "kind": "person",
+      "label": "Imani Reed"
+    },
+    {
+      "id": "WIT-003",
+      "kind": "person",
+      "label": "Yusuf Chen"
+    },
+    {
+      "id": "SEC-001",
+      "kind": "person",
+      "label": "Leon Park"
+    },
+    {
+      "id": "SC-01",
+      "kind": "scene",
+      "label": "Exterior approach"
+    },
+    {
+      "id": "SC-02",
+      "kind": "scene",
+      "label": "Lobby confrontation"
+    },
+    {
+      "id": "SC-03",
+      "kind": "scene",
+      "label": "Service corridor"
+    },
+    {
+      "id": "SC-04",
+      "kind": "scene",
+      "label": "Alarm and evacuation"
+    },
+    {
+      "id": "SC-05",
+      "kind": "scene",
+      "label": "Perimeter encounters"
+    },
+    {
+      "id": "SC-06",
+      "kind": "scene",
+      "label": "Interview A: Cole"
+    },
+    {
+      "id": "SC-07",
+      "kind": "scene",
+      "label": "Interview B: Mara"
+    },
+    {
+      "id": "SC-08",
+      "kind": "scene",
+      "label": "Review workspace"
+    },
+    {
+      "id": "EV-001",
+      "kind": "event",
+      "label": "Four persons enter"
+    },
+    {
+      "id": "EV-002",
+      "kind": "event",
+      "label": "Walk past customers"
+    },
+    {
+      "id": "EV-003",
+      "kind": "event",
+      "label": "Armed confrontation and movement toward rear"
+    },
+    {
+      "id": "EV-004",
+      "kind": "event",
+      "label": "Alarm and public evacuation"
+    },
+    {
+      "id": "EV-005",
+      "kind": "event",
+      "label": "Demand for all cash"
+    },
+    {
+      "id": "EV-006",
+      "kind": "event",
+      "label": "Four people leave bank"
+    },
+    {
+      "id": "EV-007",
+      "kind": "event",
+      "label": "Cole stopped outside"
+    },
+    {
+      "id": "EV-008",
+      "kind": "event",
+      "label": "Mara stopped outside"
+    },
+    {
+      "id": "EV-009",
+      "kind": "event",
+      "label": "Cole recorded interview"
+    },
+    {
+      "id": "EV-010",
+      "kind": "event",
+      "label": "Mara recorded interview"
+    },
+    {
+      "id": "EV-011",
+      "kind": "event",
+      "label": "Prosecutor file review"
+    },
+    {
+      "id": "E-01",
+      "kind": "exhibit",
+      "label": "Exterior/entry camera synopsis"
+    },
+    {
+      "id": "E-02",
+      "kind": "exhibit",
+      "label": "Lobby camera synopsis"
+    },
+    {
+      "id": "E-03",
+      "kind": "exhibit",
+      "label": "Rear corridor camera and occupancy synopsis"
+    },
+    {
+      "id": "E-04",
+      "kind": "exhibit",
+      "label": "Alarm and door event log"
+    },
+    {
+      "id": "E-05",
+      "kind": "exhibit",
+      "label": "Cash audit worksheet"
+    },
+    {
+      "id": "E-06",
+      "kind": "exhibit",
+      "label": "Witness statements synopsis"
+    },
+    {
+      "id": "E-07",
+      "kind": "exhibit",
+      "label": "Perimeter stop documentation"
+    },
+    {
+      "id": "E-08",
+      "kind": "exhibit",
+      "label": "Cole interview transcript"
+    },
+    {
+      "id": "E-09",
+      "kind": "exhibit",
+      "label": "Mara interview transcript"
+    },
+    {
+      "id": "L-01",
+      "kind": "location",
+      "label": "Bank facade / main entrance"
+    },
+    {
+      "id": "L-02",
+      "kind": "location",
+      "label": "Public lobby"
+    },
+    {
+      "id": "L-03",
+      "kind": "location",
+      "label": "Teller counter"
+    },
+    {
+      "id": "L-04",
+      "kind": "location",
+      "label": "Rear service corridor"
+    },
+    {
+      "id": "L-05",
+      "kind": "location",
+      "label": "South exit/plaza"
+    },
+    {
+      "id": "L-06",
+      "kind": "location",
+      "label": "East plaza perimeter"
+    },
+    {
+      "id": "L-07",
+      "kind": "location",
+      "label": "Interview room A"
+    },
+    {
+      "id": "L-08",
+      "kind": "location",
+      "label": "Interview room B"
+    },
+    {
+      "id": "L-09",
+      "kind": "location",
+      "label": "Prosecutor review board"
+    },
+    {
+      "id": "INT-COLE",
+      "kind": "transcript",
+      "label": "INT-COLE"
+    },
+    {
+      "id": "INT-MARA",
+      "kind": "transcript",
+      "label": "INT-MARA"
+    },
+    {
+      "id": "INT-ELENA",
+      "kind": "transcript",
+      "label": "INT-ELENA"
+    },
+    {
+      "id": "INT-IMANI",
+      "kind": "transcript",
+      "label": "INT-IMANI"
+    },
+    {
+      "id": "INT-YUSUF",
+      "kind": "transcript",
+      "label": "INT-YUSUF"
+    }
+  ],
+  "edges": [
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "SC-01",
+      "type": "HAS_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-01",
+      "to": "L-01",
+      "type": "HAS_LOCAL_ANCHOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-01",
+      "to": "POI-001",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-01",
+      "to": "POI-002",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-01",
+      "to": "POI-003",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-01",
+      "to": "POI-004",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "SC-02",
+      "type": "HAS_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-02",
+      "to": "L-02",
+      "type": "HAS_LOCAL_ANCHOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-02",
+      "to": "POI-001",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-02",
+      "to": "POI-002",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-02",
+      "to": "POI-003",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-02",
+      "to": "POI-004",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-02",
+      "to": "WIT-001",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-02",
+      "to": "WIT-002",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-02",
+      "to": "WIT-003",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "SC-03",
+      "type": "HAS_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-03",
+      "to": "L-04",
+      "type": "HAS_LOCAL_ANCHOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-03",
+      "to": "POI-002",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-03",
+      "to": "POI-003",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-03",
+      "to": "WIT-002",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "SC-04",
+      "type": "HAS_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-04",
+      "to": "L-05",
+      "type": "HAS_LOCAL_ANCHOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-04",
+      "to": "WIT-003",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-04",
+      "to": "WIT-001",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-04",
+      "to": "POI-001",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-04",
+      "to": "POI-002",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-04",
+      "to": "POI-003",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-04",
+      "to": "POI-004",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "SC-05",
+      "type": "HAS_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-05",
+      "to": "L-06",
+      "type": "HAS_LOCAL_ANCHOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-05",
+      "to": "POI-002",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-05",
+      "to": "POI-004",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-05",
+      "to": "SEC-001",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "SC-06",
+      "type": "HAS_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-06",
+      "to": "L-07",
+      "type": "HAS_LOCAL_ANCHOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-06",
+      "to": "POI-002",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-06",
+      "to": "SEC-001",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "SC-07",
+      "type": "HAS_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-07",
+      "to": "L-08",
+      "type": "HAS_LOCAL_ANCHOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-07",
+      "to": "POI-004",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-07",
+      "to": "SEC-001",
+      "type": "ILLUSTRATIVE_ACTOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "SC-08",
+      "type": "HAS_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "SC-08",
+      "to": "L-09",
+      "type": "HAS_LOCAL_ANCHOR",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "EV-001",
+      "type": "HAS_EVENT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-001",
+      "to": "SC-01",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-001",
+      "to": "SC-02",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-001",
+      "to": "POI-001",
+      "type": "PERSON_REFERENCED",
+      "classification": "illustrative_observation"
+    },
+    {
+      "from": "EV-001",
+      "to": "POI-002",
+      "type": "PERSON_REFERENCED",
+      "classification": "illustrative_observation"
+    },
+    {
+      "from": "EV-001",
+      "to": "POI-003",
+      "type": "PERSON_REFERENCED",
+      "classification": "illustrative_observation"
+    },
+    {
+      "from": "EV-001",
+      "to": "POI-004",
+      "type": "PERSON_REFERENCED",
+      "classification": "illustrative_observation"
+    },
+    {
+      "from": "EV-001",
+      "to": "E-01",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-001",
+      "to": "E-02",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "EV-002",
+      "type": "HAS_EVENT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-002",
+      "to": "SC-02",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-002",
+      "to": "POI-001",
+      "type": "PERSON_REFERENCED",
+      "classification": "partly_corrob_or_disputed"
+    },
+    {
+      "from": "EV-002",
+      "to": "POI-002",
+      "type": "PERSON_REFERENCED",
+      "classification": "partly_corrob_or_disputed"
+    },
+    {
+      "from": "EV-002",
+      "to": "POI-003",
+      "type": "PERSON_REFERENCED",
+      "classification": "partly_corrob_or_disputed"
+    },
+    {
+      "from": "EV-002",
+      "to": "POI-004",
+      "type": "PERSON_REFERENCED",
+      "classification": "partly_corrob_or_disputed"
+    },
+    {
+      "from": "EV-002",
+      "to": "WIT-003",
+      "type": "PERSON_REFERENCED",
+      "classification": "partly_corrob_or_disputed"
+    },
+    {
+      "from": "EV-002",
+      "to": "E-02",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-002",
+      "to": "E-06",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "EV-003",
+      "type": "HAS_EVENT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-003",
+      "to": "SC-02",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-003",
+      "to": "SC-03",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-003",
+      "to": "POI-001",
+      "type": "PERSON_REFERENCED",
+      "classification": "contested_testimony"
+    },
+    {
+      "from": "EV-003",
+      "to": "POI-002",
+      "type": "PERSON_REFERENCED",
+      "classification": "contested_testimony"
+    },
+    {
+      "from": "EV-003",
+      "to": "POI-003",
+      "type": "PERSON_REFERENCED",
+      "classification": "contested_testimony"
+    },
+    {
+      "from": "EV-003",
+      "to": "WIT-002",
+      "type": "PERSON_REFERENCED",
+      "classification": "contested_testimony"
+    },
+    {
+      "from": "EV-003",
+      "to": "E-02",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-003",
+      "to": "E-03",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-003",
+      "to": "E-06",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "EV-004",
+      "type": "HAS_EVENT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-004",
+      "to": "SC-02",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-004",
+      "to": "SC-04",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-004",
+      "to": "WIT-003",
+      "type": "PERSON_REFERENCED",
+      "classification": "synthetic_log_and_testimony"
+    },
+    {
+      "from": "EV-004",
+      "to": "WIT-002",
+      "type": "PERSON_REFERENCED",
+      "classification": "synthetic_log_and_testimony"
+    },
+    {
+      "from": "EV-004",
+      "to": "E-03",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-004",
+      "to": "E-04",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-004",
+      "to": "E-06",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "EV-005",
+      "type": "HAS_EVENT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-005",
+      "to": "SC-02",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-005",
+      "to": "POI-001",
+      "type": "PERSON_REFERENCED",
+      "classification": "contested_testimony"
+    },
+    {
+      "from": "EV-005",
+      "to": "WIT-001",
+      "type": "PERSON_REFERENCED",
+      "classification": "contested_testimony"
+    },
+    {
+      "from": "EV-005",
+      "to": "E-02",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-005",
+      "to": "E-05",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-005",
+      "to": "E-06",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "EV-006",
+      "type": "HAS_EVENT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-006",
+      "to": "SC-01",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-006",
+      "to": "SC-04",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-006",
+      "to": "POI-001",
+      "type": "PERSON_REFERENCED",
+      "classification": "illustrative_observation"
+    },
+    {
+      "from": "EV-006",
+      "to": "POI-002",
+      "type": "PERSON_REFERENCED",
+      "classification": "illustrative_observation"
+    },
+    {
+      "from": "EV-006",
+      "to": "POI-003",
+      "type": "PERSON_REFERENCED",
+      "classification": "illustrative_observation"
+    },
+    {
+      "from": "EV-006",
+      "to": "POI-004",
+      "type": "PERSON_REFERENCED",
+      "classification": "illustrative_observation"
+    },
+    {
+      "from": "EV-006",
+      "to": "E-01",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-006",
+      "to": "E-04",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "EV-007",
+      "type": "HAS_EVENT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-007",
+      "to": "SC-05",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-007",
+      "to": "POI-002",
+      "type": "PERSON_REFERENCED",
+      "classification": "fictional_officer_account"
+    },
+    {
+      "from": "EV-007",
+      "to": "SEC-001",
+      "type": "PERSON_REFERENCED",
+      "classification": "fictional_officer_account"
+    },
+    {
+      "from": "EV-007",
+      "to": "E-07",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "EV-008",
+      "type": "HAS_EVENT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-008",
+      "to": "SC-05",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-008",
+      "to": "POI-004",
+      "type": "PERSON_REFERENCED",
+      "classification": "fictional_officer_account"
+    },
+    {
+      "from": "EV-008",
+      "to": "SEC-001",
+      "type": "PERSON_REFERENCED",
+      "classification": "fictional_officer_account"
+    },
+    {
+      "from": "EV-008",
+      "to": "E-07",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "EV-009",
+      "type": "HAS_EVENT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-009",
+      "to": "SC-06",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-009",
+      "to": "POI-002",
+      "type": "PERSON_REFERENCED",
+      "classification": "interview_claim"
+    },
+    {
+      "from": "EV-009",
+      "to": "SEC-001",
+      "type": "PERSON_REFERENCED",
+      "classification": "interview_claim"
+    },
+    {
+      "from": "EV-009",
+      "to": "E-08",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "EV-010",
+      "type": "HAS_EVENT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-010",
+      "to": "SC-07",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-010",
+      "to": "POI-004",
+      "type": "PERSON_REFERENCED",
+      "classification": "interview_claim"
+    },
+    {
+      "from": "EV-010",
+      "to": "SEC-001",
+      "type": "PERSON_REFERENCED",
+      "classification": "interview_claim"
+    },
+    {
+      "from": "EV-010",
+      "to": "E-09",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "EV-011",
+      "type": "HAS_EVENT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-011",
+      "to": "SC-08",
+      "type": "IN_SCENE",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-011",
+      "to": "E-01",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-011",
+      "to": "E-02",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-011",
+      "to": "E-03",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-011",
+      "to": "E-04",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-011",
+      "to": "E-05",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-011",
+      "to": "E-06",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-011",
+      "to": "E-07",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-011",
+      "to": "E-08",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "EV-011",
+      "to": "E-09",
+      "type": "REFERENCES_SYNTHETIC_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "INT-COLE",
+      "type": "HAS_TRANSCRIPT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "INT-COLE",
+      "to": "POI-002",
+      "type": "INTERVIEW_SUBJECT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "INT-COLE",
+      "to": "E-08",
+      "type": "RELATED_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "INT-MARA",
+      "type": "HAS_TRANSCRIPT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "INT-MARA",
+      "to": "POI-004",
+      "type": "INTERVIEW_SUBJECT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "INT-MARA",
+      "to": "E-09",
+      "type": "RELATED_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "INT-ELENA",
+      "type": "HAS_TRANSCRIPT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "INT-ELENA",
+      "to": "WIT-001",
+      "type": "INTERVIEW_SUBJECT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "INT-ELENA",
+      "to": "E-06",
+      "type": "RELATED_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "INT-IMANI",
+      "type": "HAS_TRANSCRIPT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "INT-IMANI",
+      "to": "WIT-002",
+      "type": "INTERVIEW_SUBJECT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "INT-IMANI",
+      "to": "E-06",
+      "type": "RELATED_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "PA-DEMO-ROBBERY-001",
+      "to": "INT-YUSUF",
+      "type": "HAS_TRANSCRIPT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "INT-YUSUF",
+      "to": "WIT-003",
+      "type": "INTERVIEW_SUBJECT",
+      "classification": "SYNTHETIC_LINK"
+    },
+    {
+      "from": "INT-YUSUF",
+      "to": "E-06",
+      "type": "RELATED_EXHIBIT",
+      "classification": "SYNTHETIC_LINK"
+    }
+  ]
+}

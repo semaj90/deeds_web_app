@@ -69,6 +69,24 @@ function cosine(a: Float32Array, b: Float32Array): number {
  * (100× faster than CPU for 50 centroids on RTX 3060 Ti); falls back to CPU cosine.
  * Returns null if no centroids are cached.
  */
+/**
+ * Bounded SCAN over GPU centroid keys. KEYS blocks the Valkey server while it walks
+ * the whole keyspace; SCAN returns in small batches and stops once `limit` keys are found.
+ */
+async function scanCentroidKeys(redis: ReturnType<typeof getRedis>, limit: number): Promise<string[]> {
+  const found: string[] = [];
+  let cursor = '0';
+  do {
+    const [next, batch] = await redis.scan(cursor, 'MATCH', 'taxonomy:clusters:gpu:*', 'COUNT', 500);
+    cursor = next;
+    for (const key of batch) {
+      found.push(key);
+      if (found.length >= limit) return found;
+    }
+  } while (cursor !== '0');
+  return found;
+}
+
 export async function nearestCluster(
   queryVec: Float32Array | number[],
   maxClusters = 50
@@ -83,10 +101,10 @@ export async function nearestCluster(
   const t0 = Date.now();
   try {
     const redis = getRedis();
-    let keys = (await redis.keys('taxonomy:clusters:gpu:*')).slice(0, maxClusters);
+    let keys = await scanCentroidKeys(redis, maxClusters);
     if (!keys.length) {
       await loadCentroidsFromDB();
-      keys = (await redis.keys('taxonomy:clusters:gpu:*')).slice(0, maxClusters);
+      keys = await scanCentroidKeys(redis, maxClusters);
     }
     if (!keys.length) return null;
 

@@ -7,6 +7,8 @@ const mocks = vi.hoisted(() => ({
 	evidenceFindMany: vi.fn(),
 	canvasFindFirst: vi.fn(),
 	connectionsFindMany: vi.fn(),
+	loadSceneSnapshot: vi.fn(),
+	loadBoardDossierContext: vi.fn(),
 }));
 
 vi.mock('$lib/server/db/client', () => ({
@@ -26,7 +28,10 @@ vi.mock('$lib/server/db/schema', () => ({
 	evidenceBoardConnections: { caseId: 'connections.caseId' },
 }));
 
-vi.mock('drizzle-orm', () => ({ and: vi.fn(), eq: vi.fn(), or: vi.fn() }));
+vi.mock('drizzle-orm', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('drizzle-orm')>();
+	return { ...actual, and: vi.fn(), eq: vi.fn(), or: vi.fn() };
+});
 vi.mock('$lib/server/cache.js', () => ({
 	getFromMemoryCache: mocks.getFromMemoryCache,
 	setCache: mocks.setCache,
@@ -36,6 +41,8 @@ vi.mock('$lib/server/cache-keys.js', () => ({
 	TTL: { CLIENT_VIEW: 60 },
 }));
 vi.mock('$lib/server/case-access.js', () => ({ getAuthorizedCase: mocks.getAuthorizedCase }));
+vi.mock('$lib/server/scene-markers/scene-snapshot-v1.js', () => ({ loadSceneSnapshot: mocks.loadSceneSnapshot }));
+vi.mock('$lib/server/evidence/board-dossier-context.js', () => ({ loadBoardDossierContext: mocks.loadBoardDossierContext }));
 
 const CASE_ID = 'b8fbe1be-dad0-4986-b51d-b28338acd71a';
 
@@ -45,17 +52,20 @@ describe('case board loader authorization boundary', () => {
 		mocks.getAuthorizedCase.mockResolvedValue(null);
 		mocks.getFromMemoryCache.mockReturnValue({ found: false, value: null });
 		mocks.setCache.mockResolvedValue(undefined);
+		mocks.loadSceneSnapshot.mockResolvedValue(null);
+		mocks.loadBoardDossierContext.mockResolvedValue({ reports: [], people: [], unavailable: [] });
 	});
 
 	it('returns an empty board to a non-member before cache or evidence access', async () => {
 		const { load } = await import('./+page.server.js');
 		const result = await load({ params: { id: CASE_ID }, locals: { user: { id: 2 } } } as never);
 
-		expect(result).toEqual({ caseId: CASE_ID, initialState: null, evidence: [], connections: [], loadError: null });
+		expect(result).toMatchObject({ caseId: CASE_ID, initialState: null, evidence: [], connections: [], loadError: null, sceneSnapshot: null, dossierContext: null });
 		expect(mocks.getAuthorizedCase).toHaveBeenCalledWith(CASE_ID, 2);
 		expect(mocks.getFromMemoryCache).not.toHaveBeenCalled();
 		expect(mocks.evidenceFindMany).not.toHaveBeenCalled();
 		expect(mocks.canvasFindFirst).not.toHaveBeenCalled();
+		expect(mocks.loadBoardDossierContext).not.toHaveBeenCalled();
 	});
 
 	it('checks case membership before returning a user-scoped cache hit', async () => {
@@ -65,10 +75,11 @@ describe('case board loader authorization boundary', () => {
 		const { load } = await import('./+page.server.js');
 		const result = await load({ params: { id: CASE_ID }, locals: { user: { id: 1 } } } as never);
 
-		expect(result).toEqual({ ...cachedBoard, loadError: null });
+		expect(result).toMatchObject({ ...cachedBoard, loadError: null, sceneSnapshot: null, dossierContext: { reports: [], people: [], unavailable: [] } });
 		expect(mocks.getAuthorizedCase).toHaveBeenCalledWith(CASE_ID, 1);
 		expect(mocks.getFromMemoryCache).toHaveBeenCalledWith('board-cache-key');
 		expect(mocks.evidenceFindMany).not.toHaveBeenCalled();
+		expect(mocks.loadBoardDossierContext).toHaveBeenCalledWith(CASE_ID, 1);
 	});
 
 	it('only creates inline board thumbnails for image MIME types the download route supports', async () => {

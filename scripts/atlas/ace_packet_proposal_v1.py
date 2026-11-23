@@ -314,3 +314,131 @@ def verify_receipt_chain_v1(receipts: Sequence[Mapping[str, Any]]) -> bool:
             return False
         prev = r["receiptChecksum"]
     return True
+
+
+# ---------------------------------------------------------------- bounded adaptive refine loop
+REFINE_MAX_PASSES_CEILING = 2  # RLM-05 (crime-scene-reconstruction): at most two proposal/validation/refinement passes
+
+
+def recommendation_context_v1(ranked: Mapping[str, Any], *, k: int) -> tuple[str, list[str], list[str]]:
+    """Take the first k entries of an owner-ranked `atlas.topk.v1` result (python/atlas_compute/topk_paginator.stable_topk).
+
+    Ordering is NOT re-derived here: this only verifies the owner's invariant (non-increasing finite scores, unique
+    canonicalIds) and slices. Returns (evidence_summary, allowed_evidence_refs, canonical_ids). Raw vectors and hidden
+    state are never included; only ids, scores, ordinals and evidence refs.
+    """
+    if not isinstance(ranked, Mapping) or ranked.get("schema") != "atlas.topk.v1":
+        raise ValueError("ranked must be an atlas.topk.v1 result")
+    if ranked.get("order") != "SCORE_DESC_ORDINAL_ASC_ID_ASC":
+        raise ValueError("ranked.order must be SCORE_DESC_ORDINAL_ASC_ID_ASC")
+    if not isinstance(k, int) or k < 1:
+        raise ValueError("k must be a positive int")
+    candidates = list(ranked.get("candidates") or [])[:k]
+    if not candidates:
+        raise ValueError("ranked result has no candidates")
+    lines: list[str] = []
+    refs: set[str] = set()
+    ids: list[str] = []
+    prev = math.inf
+    for c in candidates:
+        cid = _require_text(c.get("canonicalId"), "candidate.canonicalId")
+        if cid in ids:
+            raise ValueError(f"DUPLICATE_CANONICAL_ID: {cid}")
+        score = c.get("score")
+        if isinstance(score, bool) or not isinstance(score, (int, float)) or not math.isfinite(float(score)):
+            raise ValueError("candidate.score must be finite")
+        if float(score) > prev:
+            raise ValueError("RANKING_NOT_CANONICAL: scores must be non-increasing")
+        prev = float(score)
+        cand_refs = c.get("evidenceRefs")
+        if not isinstance(cand_refs, list) or not cand_refs or any(not isinstance(r, str) or not r.strip() for r in cand_refs):
+            raise ValueError(f"candidate {cid} needs a non-empty evidenceRefs list")
+        refs.update(r.strip() for r in cand_refs)
+        ids.append(cid)
+        lines.append(f"- {cid} score={float(score):.6f} ordinal={int(c['candidateOrdinal'])}")
+    summary = "Ranked recommendations (owner order):\n" + "\n".join(lines)
+    return summary, sorted(refs), ids
+
+
+def recommend_refine_v1(ranked: Mapping[str, Any], *, k: int, packet_key: str, predict: Any, header: Mapping[str, str],
+                        max_passes: int = 2) -> dict[str, Any]:
+    """Top-k recommendation context -> DSPy proposer -> bounded refine loop -> validated advisory proposal + receipts.
+
+    The validator's allowlists are derived from the top-k evidence refs only. A proposal citing anything outside them
+    fails closed and is retried at most `max_passes` times.
+    """
+    summary, allowed_refs, ids = recommendation_context_v1(ranked, k=k)
+    propose = make_proposer_v1(predict, packet_key=packet_key, evidence_summary=summary,
+                               allowed_evidence_refs=allowed_refs, header=header)
+    validate_kwargs = dict(
+        context_manifest_checksum=header["context_manifest_checksum"],
+        allowed_evidence_refs=allowed_refs,
+        allowed_packet_keys=[packet_key],
+        alignment_output_checksum=header["alignment_output_checksum"],
+    )
+    out = refine_proposal_v1(propose, validate_kwargs=validate_kwargs, max_passes=max_passes)
+    return {**out, "topKCanonicalIds": ids, "allowedEvidenceRefs": allowed_refs}
+
+
+def make_proposer_v1(predict: Any, *, packet_key: str, evidence_summary: str, allowed_evidence_refs: Sequence[str],
+                     header: Mapping[str, str]) -> Any:
+    """Adapt an injected DSPy predictor (build_compose_program_v1) to refine_proposal_v1's `propose(prior_error)`.
+
+    The validator error is appended to the evidence summary on retry; nothing else from the prior draft is fed back.
+    `header` must carry workspace_revision, source_revision, context_manifest_checksum, alignment_output_checksum,
+    model_revision and policy_revision. They are passed through unchanged and validated downstream, never defaulted.
+    """
+    required = {"workspace_revision", "source_revision", "context_manifest_checksum", "alignment_output_checksum",
+                "model_revision", "policy_revision"}
+    if set(header) != required:
+        raise ValueError(f"header must contain exactly {sorted(required)}")
+
+    def propose(prior_error: str | None) -> dict[str, Any]:
+        summary = evidence_summary if prior_error is None else f"{evidence_summary}\nVALIDATOR_FEEDBACK: {prior_error}"
+        prediction = predict(packet_key=packet_key, evidence_summary=summary,
+                             allowed_evidence_refs=list(allowed_evidence_refs))
+        return proposal_from_prediction_v1(
+            prediction, packet_key=packet_key, workspace_revision=header["workspace_revision"],
+            source_revision=header["source_revision"], context_manifest_checksum=header["context_manifest_checksum"],
+            alignment_output_checksum=header["alignment_output_checksum"], model_revision=header["model_revision"],
+            policy_revision=header["policy_revision"],
+        )
+
+    return propose
+
+
+def refine_proposal_v1(propose: Any, *, validate_kwargs: Mapping[str, Any], max_passes: int = 2) -> dict[str, Any]:
+    """Bounded propose -> validate -> refine loop. The deterministic validator is the only gate.
+
+    `propose(prior_error)` is injected (for example a DSPy predictor wrapper); it receives None on the first pass and
+    ONLY the validator's error string on later passes. It never receives raw evidence, hidden reasoning or prior drafts.
+    Every attempt writes one hash-chained outcome receipt (writesPerformed=false). Nothing is persisted here.
+    """
+    if not isinstance(max_passes, int) or not 1 <= max_passes <= REFINE_MAX_PASSES_CEILING:
+        raise ValueError(f"max_passes must be an int in [1, {REFINE_MAX_PASSES_CEILING}]")
+    receipts: list[dict[str, Any]] = []
+    prior_error: str | None = None
+    for attempt in range(1, max_passes + 1):
+        proposal = propose(prior_error)
+        proposal_checksum = "sha256:" + sha256_hex(stable(proposal))
+        prev = receipts[-1]["receiptChecksum"] if receipts else None
+        model_revision = proposal.get("modelRevision") if isinstance(proposal, Mapping) else None
+        if not isinstance(model_revision, str) or not model_revision.strip():
+            model_revision = "unrecorded:proposal-missing-modelRevision"  # explicit marker, never a silent default
+        try:
+            validated = validate_ace_packet_proposal_v1(proposal, **validate_kwargs)
+        except ValueError as exc:
+            prior_error = str(exc)
+            receipts.append(build_outcome_receipt_v1(
+                proposal_checksum=proposal_checksum, prompt_plan_checksum=None, model_revision=model_revision,
+                status="REJECTED", validator_verdict=prior_error, previous_receipt_checksum=prev,
+            ))
+            continue
+        receipts.append(build_outcome_receipt_v1(
+            proposal_checksum=proposal_checksum, prompt_plan_checksum=None, model_revision=model_revision,
+            status="SUCCEEDED", validator_verdict="PASS", previous_receipt_checksum=prev,
+        ))
+        return {"status": "VALIDATED", "attempts": attempt, "validated": validated, "receipts": receipts,
+                "chainOk": verify_receipt_chain_v1(receipts)}
+    return {"status": "EXHAUSTED", "attempts": max_passes, "validated": None, "receipts": receipts,
+            "chainOk": verify_receipt_chain_v1(receipts)}

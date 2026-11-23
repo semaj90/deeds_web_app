@@ -1,0 +1,31 @@
+{
+  "report": "case-storybook-multi-image-chapters",
+  "date": "2026-11-19",
+  "likely_cause": "The case-level scene aggregator needed browser-path evidence that separate image chapters append to one revision while preserving separate evidence/source bindings.",
+  "evidence": [
+    "Chromium fixture opened two distinct image exhibits and loaded source-bound observation manifests.",
+    "Each exhibit drafted a storyboard citing its own detection observation and saved through CaseStorybook's scene revision client.",
+    "The second save performed revision 2 readback with both chapters, both evidence bindings, and ORIGINAL_IMAGE_PIXELS coordinate frames preserved.",
+    "Browser errors: 0. Revision store was an in-memory mocked HTTP service; this is not authenticated or durable-storage proof."
+  ],
+  "patch_targets": [
+    "openspec/changes/crime-scene-reconstruction/tasks.md",
+    "sveltekit-frontend/scratch/case-scene-chapters/verify.mjs"
+  ],
+  "safe_next_command": "cd sveltekit-frontend; node scratch/case-scene-chapters/verify.mjs",
+  "smoke_command": "node scratch/case-scene-chapters/verify.mjs",
+  "smoke_result": {
+    "status": "PASS",
+    "caseSceneId": "fb78fde3-9d45-8c60-847d-19b0283b2d08",
+    "revision": 2,
+    "chapters": 2,
+    "readbackChapterCounts": [1, 1, 2],
+    "browserErrors": 0
+  },
+  "remaining_gates": [
+    "authenticated browser session",
+    "scratch PostgreSQL and SeaweedFS durable readback",
+    "shared-coordinate alignment across independent images"
+  ],
+  "report_path": "docs/reports/case-storybook-multi-image-chapters-20261119.json"
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "assetId": "chunk:demo:building:001",
+  "caseId": null,
+  "assetRevision": 1,
+  "assetType": "building_static_mesh",
+  "coordinateSystem": "Y_UP_Z_FORWARD_METERS",
+  "originWorldMeters": [0.0, 0.0, 0.0],
+  "worldAabb": [-5.0, 0.0, -5.0, 5.0, 12.0, 5.0],
+  "lod": "retro",
+  "geometry": {
+    "canonicalFormat": "glb",
+    "canonicalSha256": null,
+    "canonicalArtifactId": null,
+    "derivedPreviewFormat": "atmp_v1",
+    "derivedArtifactId": null,
+    "previewPacketSha256": null
+  },
+  "provenance": {"kind": "procedural_generated", "sourceSha256": null, "reviewStatus": "unreviewed"},
+  "culling": {"mode": "conservative_world_aabb", "treatSkinnedAsDynamic": true},
+  "notes": "Demonstration metadata only. Use actual case authorization and verified asset hashes before persistence."
+}

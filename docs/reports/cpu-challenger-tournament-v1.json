@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.cpu-challenger-tournament.v1",
+  "frozenTensorChecksum": "sha256:1182cc78f158267cfa7b17c485b263bfccc5651a1c37be6208c4e3a152e7b3d3",
+  "trainRows": 14,
+  "evalRows": 6,
+  "challengerCount": 5,
+  "winner": "xgboost_ranker",
+  "standings": [
+    {
+      "name": "xgboost_ranker",
+      "evalMse": 0.000318,
+      "evalNdcg5": 1.0,
+      "elapsedMs": 122.749
+    },
+    {
+      "name": "ewin_tang_low_rank",
+      "evalMse": 0.000372,
+      "evalNdcg5": 1.0,
+      "elapsedMs": 0.364
+    },
+    {
+      "name": "pytorch_mlp",
+      "evalMse": 0.001263,
+      "evalNdcg5": 1.0,
+      "elapsedMs": 4205.549
+    },
+    {
+      "name": "cosine_baseline",
+      "evalMse": 0.026867,
+      "evalNdcg5": 1.0,
+      "elapsedMs": 0.029
+    },
+    {
+      "name": "hybrid_rrf_prior",
+      "evalMse": 0.064457,
+      "evalNdcg5": 0.999466,
+      "elapsedMs": 0.033
+    }
+  ],
+  "identicalFrozenSplit": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

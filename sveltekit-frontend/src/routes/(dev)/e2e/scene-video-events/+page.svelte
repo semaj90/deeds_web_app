@@ -9,5 +9,5 @@
 
 <main class="mx-auto max-w-3xl p-6">
 	<h1>Scene event readback fixture</h1>
-	<SceneVideoEventBindings caseId={data.caseId} bindings={[data.binding]} />
+	<SceneVideoEventBindings caseId={data.caseId} bindings={[data.binding]} groundPlaneTrackProposals={data.groundPlaneTrackProposals} />
 </main>

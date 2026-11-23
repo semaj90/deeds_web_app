@@ -6,6 +6,7 @@ import { readOpenSpecAwarenessSnapshot } from '$lib/server/atlas/openspec-board/
 import { readParentAtlasCapabilityCensus } from '$lib/server/atlas/openspec-board/capability-census';
 import { readOpenSpecEvidenceHealthSnapshot } from '$lib/server/atlas/openspec-board/evidence-health';
 import { readEvidenceReadinessChipsV1 } from '$lib/server/atlas/openspec-board/evidence-readiness';
+import { readOpenSpecTaskReceiptView } from '$lib/server/atlas/openspec-board/task-receipt-view-v1.js';
 import { getRedis } from '$lib/server/redis.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 
@@ -18,26 +19,35 @@ function requireUser(locals: App.Locals) {
   return locals.user;
 }
 
-export const load: PageServerLoad = async ({ locals, depends }) => {
+export const load: PageServerLoad = async ({ locals, depends, url }) => {
   requireUser(locals);
   depends('atlas:openspec-board');
+  const taskKey = url.searchParams.get('task')?.trim() ?? '';
+  // Receipt lookup checks current source bytes on each request, outside the board cache.
+  const taskReceipt = {
+    query: taskKey.slice(0, 512),
+    result: taskKey ? await readOpenSpecTaskReceiptView(taskKey) : null
+  };
+  // An alternate report corpus must not share the default board's Redis snapshot.
+  const useSharedBoardCache = !process.env.ATLAS_REPORTS_DIR;
 
   if (_l0OpenSpecCache && Date.now() < _l0OpenSpecCache.expiresAt) {
     return {
       ..._l0OpenSpecCache.payload,
+      taskReceipt,
       cacheSource: 'l0_memory'
     };
   }
 
   try {
-    const redis = getRedis();
-    const cachedRaw = await redis.get(OPENSPEC_REDIS_KEY);
+    const cachedRaw = useSharedBoardCache ? await getRedis().get(OPENSPEC_REDIS_KEY) : null;
     if (cachedRaw) {
       const parsed = fastJsonParse<Record<string, unknown>>(cachedRaw);
       if (parsed && typeof parsed === 'object' && parsed.board) {
         _l0OpenSpecCache = { payload: parsed, expiresAt: Date.now() + 60_000 };
         return {
           ...parsed,
+          taskReceipt,
           cacheSource: 'l1_redis_valkey'
         };
       }
@@ -85,14 +95,16 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
 
   _l0OpenSpecCache = { payload, expiresAt: Date.now() + 60_000 };
   try {
-    const redis = getRedis();
-    await redis.set(OPENSPEC_REDIS_KEY, JSON.stringify(payload), 'EX', OPENSPEC_REDIS_TTL_SECONDS);
+    if (useSharedBoardCache) {
+      await getRedis().set(OPENSPEC_REDIS_KEY, JSON.stringify(payload), 'EX', OPENSPEC_REDIS_TTL_SECONDS);
+    }
   } catch {
     // Non-fatal
   }
 
   return {
     ...payload,
+    taskReceipt,
     cacheSource: 'fresh_build'
   };
 };

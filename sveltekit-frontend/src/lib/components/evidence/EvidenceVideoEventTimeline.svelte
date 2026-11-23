@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { createSceneDocumentV1, createSceneQualityReceiptV1 } from '$lib/splat/scene-document-v1.js';
-	import { evidenceSceneIdV1, fetchSceneRevisionV1, saveSceneManifestRevisionV1 } from '$lib/splat/scene-persistence-client-v1.js';
+	import { createSceneDocumentV1, createSceneQualityReceiptV1, stableStringifySceneDocumentV1 } from '$lib/splat/scene-document-v1.js';
+	import { storybookSavedChapterHrefV1, storybookVideoChapterV1Schema, type StorybookVideoChapterV1 } from '$lib/shared/storybook-video-chapter-v1.js';
+	import { caseStorybookSceneIdV1, fetchSceneRevisionV1, saveSceneManifestRevisionV1 } from '$lib/splat/scene-persistence-client-v1.js';
+	import { deriveReviewedGroundPlaneTrackFromHistoryV1, groundTrackSnapshotPointsV1, sameGroundTrackSnapshotPointsV1, type ReviewedGroundPlanePointV1 } from '$lib/splat/reviewed-ground-plane-track-v1.js';
 	type EventReference =
 		| { kind: 'transcript_segment'; referenceId: string; transcriptId: string; segmentIndex: number; startMs: number; endMs: number; text: string; modelRevision: string | null }
 		| { kind: 'frame_detection'; referenceId: string; frameIndex: number; timestampMs: number; artifactSha256: string; modelRevision: string | null; label: string; confidence: number; bbox: number[] }
@@ -25,9 +27,21 @@
 	let savingEventId = $state<string | null>(null);
 	let savingSceneEventId = $state<string | null>(null);
 	let sceneSaveMessage = $state<string | null>(null);
+	let savedChapterHref = $state<string | null>(null);
+	let reviewedGroundTracks = $state<Array<{ key: string; trackId: string; trackScopeId: string; calibrationRevisionId: string; points: ReviewedGroundPlanePointV1[] }>>([]);
+	let savingGroundTrackKey = $state<string | null>(null);
+	let localPreview = $state(false);
+	const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 	$effect(() => {
 		const id = evidenceId;
+		localPreview = !UUID_PATTERN.test(id);
+		if (localPreview) {
+			timeline = null;
+			error = null;
+			loading = false;
+			return;
+		}
 		if (id) void load(id);
 	});
 
@@ -41,10 +55,88 @@
 			if (id !== evidenceId) return;
 			timeline = payload.eventTimeline ?? null;
 			reviewEnabled = payload.reviewEnabled === true;
+			reviewedGroundTracks = [];
+			if (timeline) {
+				const historyResponse = await fetch(`/api/evidence/${encodeURIComponent(id)}/versions?limit=200`, { cache: 'no-store' });
+				const history = historyResponse.ok ? await historyResponse.json().catch(() => null) : null;
+				const projected = await deriveReviewedGroundPlaneTrackFromHistoryV1({
+					history, evidenceId: timeline.evidenceId, caseId: timeline.caseId,
+					sourceRevision: timeline.sourceRevision, analysisRevision: timeline.analysisRevision
+				});
+				const groups = new Map<string, ReviewedGroundPlanePointV1[]>();
+				for (const point of projected) {
+					if (!point.trackId || !point.trackScopeId) continue;
+					const key = `${point.trackId}:${point.trackScopeId}:${point.calibrationRevisionId}`;
+					const group = groups.get(key) ?? [];
+					group.push(point);
+					groups.set(key, group);
+				}
+				reviewedGroundTracks = [...groups.entries()].filter(([, points]) => points.length >= 2).map(([key, points]) => ({
+					key, trackId: points[0]!.trackId!, trackScopeId: points[0]!.trackScopeId!,
+					calibrationRevisionId: points[0]!.calibrationRevisionId, points
+				}));
+			}
 		} catch (cause) {
 			if (id === evidenceId) error = cause instanceof Error ? cause.message : 'Could not load events.';
 		} finally {
 			if (id === evidenceId) loading = false;
+		}
+	}
+
+	async function saveGroundTrackToScene(track: (typeof reviewedGroundTracks)[number]) {
+		if (!timeline || savingGroundTrackKey !== null || track.points.length < 2) return;
+		const { caseId, sourceRevision, analysisRevision } = timeline;
+		const sourceEvidenceId = evidenceId;
+		savingGroundTrackKey = track.key;
+		sceneSaveMessage = null;
+		error = null;
+		try {
+			const sceneId = await caseStorybookSceneIdV1(caseId);
+			const current = await fetchSceneRevisionV1({ caseId, sceneId });
+			const prior = current?.manifest.groundPlaneTrackProposals ?? [];
+			const sameTrack = (proposal: (typeof prior)[number]) => proposal.evidenceId === sourceEvidenceId
+				&& proposal.sourceRevision === sourceRevision && proposal.analysisRevision === analysisRevision
+				&& proposal.trackId === track.trackId && proposal.trackScopeId === track.trackScopeId;
+			const points = groundTrackSnapshotPointsV1(track.points);
+			if (prior.some((proposal) => sameTrack(proposal) && proposal.calibrationRevisionId === track.calibrationRevisionId &&
+				sameGroundTrackSnapshotPointsV1(proposal.points, points))) {
+				sceneSaveMessage = 'This reviewed ground-plane track is already on the scene revision.';
+				return;
+			}
+			const proposal = {
+				proposalId: crypto.randomUUID(), evidenceId: sourceEvidenceId, sourceRevision,
+				analysisRevision, calibrationRevisionId: track.calibrationRevisionId,
+				trackId: track.trackId, trackScopeId: track.trackScopeId,
+				status: 'REVIEWED_GROUND_PLANE_PROPOSAL' as const,
+				semantics: 'image_to_measured_plane_only_no_height_or_camera_motion_compensation' as const,
+				points,
+			};
+			const evidenceBinding = { evidenceId: sourceEvidenceId, sourceRevision };
+			const manifest = createSceneDocumentV1(current ? {
+				...current.manifest,
+				revision: current.revision + 1,
+				parentManifestSha256: current.manifestSha256,
+				createdAt: new Date().toISOString(),
+				evidenceBindings: [...(current.manifest.evidenceBindings ?? []).filter((binding) => binding.evidenceId !== sourceEvidenceId), evidenceBinding],
+				groundPlaneTrackProposals: [...prior.filter((saved) => !sameTrack(saved)), proposal]
+			} : {
+				schema: 'parent-atlas.scene-document.v1', sceneId, caseId, status: 'HYPOTHESIS',
+				revision: 1, parentManifestSha256: null, createdAt: new Date().toISOString(), coordinateFrame: 'LOCAL_UNCALIBRATED',
+				objects: [], animations: [], evidenceBindings: [evidenceBinding], groundPlaneTrackProposals: [proposal],
+				evidenceSources: [], assets: [],
+				quality: createSceneQualityReceiptV1({ derivedAssetBytes: 0, triangleCount: 0 })
+			});
+			const receipt = await saveSceneManifestRevisionV1({ caseId, sceneId, expectedRevision: current?.revision ?? 0, commandId: crypto.randomUUID(), manifest });
+			const readback = await fetchSceneRevisionV1({ caseId, sceneId, revision: receipt.revision });
+			const persisted = readback?.manifest.groundPlaneTrackProposals?.some((saved) => saved.proposalId === proposal.proposalId
+				&& sameTrack(saved) && saved.calibrationRevisionId === track.calibrationRevisionId
+				&& sameGroundTrackSnapshotPointsV1(saved.points, points));
+			if (!persisted || !readback || readback.manifestSha256 !== receipt.manifestSha256) throw new Error('Scene revision readback did not match the reviewed ground-track proposal.');
+			sceneSaveMessage = `Saved reviewed 2D ground-plane track as scene revision ${readback.revision}. Height and camera movement remain unknown.`;
+		} catch (cause) {
+			error = cause instanceof Error ? cause.message : 'Could not add the reviewed ground track to the scene.';
+		} finally {
+			savingGroundTrackKey = null;
 		}
 	}
 
@@ -72,56 +164,78 @@
 		}
 	}
 
-	async function saveApprovedEventToScene(event: VideoEvent) {
-		if (!timeline || event.reviewStatus !== 'APPROVED' || event.sceneAdmission !== 'APPROVED_FOR_SCENE_PROPOSAL') return;
+	async function saveApprovedEventToScene(event: VideoEvent, asChapter = false) {
+		const active = timeline;
+		const sourceId = evidenceId;
+		if (!active || active.evidenceId !== sourceId || savingSceneEventId || event.reviewStatus !== 'APPROVED' || event.sceneAdmission !== 'APPROVED_FOR_SCENE_PROPOSAL') return;
 		savingSceneEventId = event.eventId;
 		sceneSaveMessage = null;
+		savedChapterHref = null;
 		error = null;
 		try {
-			const sceneId = await evidenceSceneIdV1(timeline.caseId, evidenceId);
-			const current = await fetchSceneRevisionV1({ caseId: timeline.caseId, sceneId });
-			if (current?.manifest.videoEventBindings?.some((binding) => binding.evidenceId === evidenceId && binding.eventId === event.eventId)) {
+			const sceneId = await caseStorybookSceneIdV1(active.caseId);
+			const current = await fetchSceneRevisionV1({ caseId: active.caseId, sceneId });
+			const existing = current?.manifest.videoEventBindings?.find((binding) => binding.evidenceId === sourceId && binding.eventId === event.eventId);
+			if (existing && !asChapter) {
 				sceneSaveMessage = 'This reviewed event is already on the scene timeline.';
 				return;
 			}
-			const evidenceBinding = { evidenceId, sourceRevision: timeline.sourceRevision };
+			let chapter: StorybookVideoChapterV1 | undefined;
+			if (asChapter) {
+				const response = await fetch(`/api/evidence/${encodeURIComponent(sourceId)}/video-events?${new URLSearchParams({ chapterEvent: event.eventId })}`, { cache: 'no-store' });
+				const payload = await response.json();
+				const parsed = storybookVideoChapterV1Schema.safeParse(payload?.chapter);
+				if (!response.ok || !parsed.success || payload.evidenceId !== sourceId || payload.caseId !== active.caseId ||
+					payload.sourceRevision !== active.sourceRevision || payload.analysisRevision !== active.analysisRevision ||
+					payload.eventId !== event.eventId || payload.startMs !== event.startMs || payload.endMs !== event.endMs) {
+					throw new Error('The reviewed chapter changed or could not be verified. Reload the event timeline.');
+				}
+				chapter = parsed.data;
+				if (current && existing?.chapter && stableStringifySceneDocumentV1(existing.chapter) === stableStringifySceneDocumentV1(chapter)) {
+					sceneSaveMessage = 'This reviewed chapter is already saved.';
+					savedChapterHref = storybookSavedChapterHrefV1({ caseId: active.caseId, sceneId, revision: current.revision, eventId: event.eventId });
+					return;
+				}
+			}
+			const evidenceBinding = { evidenceId: sourceId, sourceRevision: active.sourceRevision };
 			const eventBinding = {
-				evidenceId,
-				sourceRevision: timeline.sourceRevision,
-				analysisRevision: timeline.analysisRevision,
+				evidenceId: sourceId,
+				sourceRevision: active.sourceRevision,
+				analysisRevision: active.analysisRevision,
 				eventId: event.eventId,
 				startMs: event.startMs,
 				endMs: event.endMs,
-				reviewState: 'APPROVED_FOR_SCENE_PROPOSAL' as const
+				reviewState: 'APPROVED_FOR_SCENE_PROPOSAL' as const,
+				...(chapter ? { chapter } : {})
 			};
 			const manifest = createSceneDocumentV1(current ? {
 				...current.manifest,
 				revision: current.revision + 1,
 				parentManifestSha256: current.manifestSha256,
 				createdAt: new Date().toISOString(),
-				evidenceBindings: [...(current.manifest.evidenceBindings ?? []).filter((binding) => binding.evidenceId !== evidenceId), evidenceBinding],
-				videoEventBindings: [...(current.manifest.videoEventBindings ?? []), eventBinding]
+				evidenceBindings: [...(current.manifest.evidenceBindings ?? []).filter((binding) => binding.evidenceId !== sourceId), evidenceBinding],
+				videoEventBindings: [...(current.manifest.videoEventBindings ?? []).filter((binding) => binding !== existing), eventBinding]
 			} : {
-				schema: 'parent-atlas.scene-document.v1', sceneId, caseId: timeline.caseId, status: 'HYPOTHESIS',
+				schema: 'parent-atlas.scene-document.v1', sceneId, caseId: active.caseId, status: 'HYPOTHESIS',
 				revision: 1, parentManifestSha256: null, createdAt: new Date().toISOString(), coordinateFrame: 'LOCAL_UNCALIBRATED',
 				objects: [], animations: [], evidenceBindings: [evidenceBinding], videoEventBindings: [eventBinding],
 				evidenceSources: [], assets: [],
 				quality: createSceneQualityReceiptV1({ derivedAssetBytes: 0, triangleCount: 0 })
 			});
-			await saveSceneManifestRevisionV1({
-				caseId: timeline.caseId,
+			const receipt = await saveSceneManifestRevisionV1({
+				caseId: active.caseId,
 				sceneId,
 				expectedRevision: current?.revision ?? 0,
 				commandId: crypto.randomUUID(),
 				manifest
 			});
-			const readback = await fetchSceneRevisionV1({ caseId: timeline.caseId, sceneId });
+			const readback = await fetchSceneRevisionV1({ caseId: active.caseId, sceneId, revision: receipt.revision });
 			const persisted = readback?.manifest.videoEventBindings?.some((binding) =>
-				binding.evidenceId === evidenceId && binding.eventId === event.eventId
-					&& binding.sourceRevision === timeline.sourceRevision && binding.analysisRevision === timeline.analysisRevision
+				stableStringifySceneDocumentV1(binding) === stableStringifySceneDocumentV1(eventBinding)
 			);
-			if (!persisted || !readback) throw new Error('Scene timeline save did not match an independent revision readback.');
+			if (!persisted || !readback || readback.manifestSha256 !== receipt.manifestSha256) throw new Error('Scene timeline save did not match an independent revision readback.');
 			sceneSaveMessage = `Saved as scene revision ${readback.revision}; source time ${formatTime(event.startMs)}–${formatTime(event.endMs)}.`;
+			if (chapter) savedChapterHref = storybookSavedChapterHrefV1({ caseId: active.caseId, sceneId, revision: readback.revision, eventId: event.eventId });
 		} catch (cause) {
 			error = cause instanceof Error ? cause.message : 'Could not add this event to the scene timeline.';
 		} finally {
@@ -145,6 +259,8 @@
 	</header>
 	{#if loading}
 		<p class="timeline-empty">Loading source-linked events…</p>
+	{:else if localPreview}
+		<p class="timeline-empty">This is a local or synthetic preview. Save the original as case evidence before loading a source-linked event timeline.</p>
 	{:else if error}
 		<p class="timeline-error" role="alert">{error}</p>
 	{:else if !timeline || timeline.events.length === 0}
@@ -188,6 +304,7 @@
 							<button type="button" disabled={savingSceneEventId === event.eventId} onclick={() => saveApprovedEventToScene(event)}>
 								{savingSceneEventId === event.eventId ? 'Saving…' : 'Add to scene timeline'}
 							</button>
+							<button type="button" disabled={savingSceneEventId !== null} onclick={() => saveApprovedEventToScene(event, true)}>Save as chapter</button>
 						</div>
 					{/if}
 				</li>
@@ -195,6 +312,21 @@
 		</ol>
 	{/if}
 	{#if sceneSaveMessage}<p class="timeline-success" role="status">{sceneSaveMessage}</p>{/if}
+	{#if savedChapterHref}<a href={savedChapterHref}>Open saved chapter</a>{/if}
+	{#if reviewedGroundTracks.length}
+		<section class="ground-tracks" aria-label="Reviewed ground-plane motion tracks">
+			<h4>Reviewed motion tracks</h4>
+			<p>Fixed-camera ground-plane proposals derived from manually reviewed contacts. No height or camera-motion correction.</p>
+			{#each reviewedGroundTracks as track (track.key)}
+				<div class="ground-track-row" data-testid="reviewed-ground-track">
+					<span>{track.trackId} · {track.points.length} reviewed contacts · calibration {track.calibrationRevisionId}</span>
+					<button type="button" disabled={savingGroundTrackKey !== null} onclick={() => void saveGroundTrackToScene(track)}>
+						{savingGroundTrackKey === track.key ? 'Saving…' : 'Add reviewed track to scene'}
+					</button>
+				</div>
+			{/each}
+		</section>
+	{/if}
 </section>
 
 <style>
@@ -218,4 +350,10 @@
 	.timeline-empty, .timeline-warning, .timeline-error { margin: 0.8rem 0 0; font-size: 0.85rem; }
 	.timeline-warning, .timeline-error { color: #8c2a20; }
 	.timeline-success { margin: 0.8rem 0 0; color: #17603d; font-size: 0.85rem; }
+	.ground-tracks { display: grid; gap: .5rem; margin-top: .9rem; border-top: 1px solid var(--dossier-hairline, #d8cbbb); padding-top: .75rem; }
+	.ground-tracks h4, .ground-tracks p { margin: 0; }
+	.ground-tracks p { font-size: .8rem; }
+	.ground-track-row { display: flex; justify-content: space-between; align-items: center; gap: .75rem; border: 1px solid var(--dossier-hairline, #d8cbbb); border-radius: .4rem; padding: .55rem; background: #fffaf1; font-size: .75rem; }
+	.ground-track-row button { cursor: pointer; border: 1px solid #35281f; border-radius: .35rem; padding: .3rem .55rem; background: #211810; color: #fffaf1; font: inherit; }
+	.ground-track-row button:disabled { opacity: .6; cursor: wait; }
 </style>

@@ -1,7 +1,9 @@
 import { json } from '@sveltejs/kit';
 import { createHash } from 'node:crypto';
 import type { RequestHandler } from './$types';
-import { and, eq, or, sql } from 'drizzle-orm';
+import { and, eq, isNull, or, sql } from 'drizzle-orm';
+import { z } from 'zod';
+import { parseWholeImageAnalysisRowV1 } from '$lib/server/evidence/whole-image-analysis-readback-v1.js';
 import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
 import { ENV } from '$lib/server/env.server.js';
@@ -10,6 +12,8 @@ import { isUuid } from '$lib/server/validation.js';
 
 const MAX_DEPTH_BYTES = 32 * 1024 * 1024;
 const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+const digest = z.string().regex(/^sha256:[a-f0-9]{64}$/);
+const depthPinSchema = z.object({ sourceRevision: digest, artifactSha256: digest, analysisRevision: z.string().min(1).max(512) });
 
 function parseDepthArtifactLocation(value: unknown): { bucket: string; key: string } | null {
 	if (typeof value !== 'string') return null;
@@ -29,9 +33,13 @@ function asRecord(value: unknown): Record<string, unknown> | null {
 	return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
 }
 
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, url }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
+	const query = url?.searchParams;
+	const pin = query && ['sourceRevision', 'artifactSha256', 'analysisRevision'].some((name) => query.has(name))
+		? depthPinSchema.safeParse(Object.fromEntries(query)) : null;
+	if (pin && !pin.success) return json({ error: 'Invalid depth revision locator' }, { status: 400 });
 
 	try {
 		const userId = Number(locals.user.id);
@@ -48,6 +56,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			.leftJoin(cases, eq(evidence.caseId, cases.id))
 			.where(and(
 				eq(evidence.id, params.id),
+				isNull(evidence.deletedAt),
 				or(
 					eq(evidence.userId, userId),
 					eq(evidence.uploadedBy, userId),
@@ -68,6 +77,9 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		if (!sourceRevision || !/^sha256:[a-f0-9]{64}$/.test(sourceRevision)) {
 			return json({ error: 'Evidence source revision is invalid' }, { status: 409 });
 		}
+		if (pin?.success && pin.data.sourceRevision !== sourceRevision) {
+			return json({ error: 'Depth source revision changed' }, { status: 409 });
+		}
 
 		let bucket: string | null = null;
 		let key: string | null = null;
@@ -77,7 +89,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		let canonicalDepthManifestPresent = false;
 		try {
 			const result = await db.execute(sql`
-				SELECT source_revision, metadata
+				SELECT source_revision, analysis_revision, source_locator, metadata
 				FROM public.evidence_multimodal_vectors
 				WHERE evidence_id = ${item.id}::uuid
 				  AND modality = 'image'
@@ -86,6 +98,13 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				LIMIT 1
 			`);
 			const row = (result.rows as Array<Record<string, unknown>>)[0];
+			if (pin?.success) {
+				const qualified = row && parseWholeImageAnalysisRowV1(row, item.id, sourceRevision);
+				if (!qualified?.relativeDepth || qualified.analysisRevision !== pin.data.analysisRevision ||
+					qualified.relativeDepth.artifactSha256 !== pin.data.artifactSha256) {
+					return json({ error: 'Relative depth revision changed or is unavailable' }, { status: 409 });
+				}
+			}
 			if (row && row.source_revision === sourceRevision) {
 				const metadata = asRecord(row.metadata);
 				const visual = asRecord(metadata?.visualAnalysis);
@@ -103,11 +122,13 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			}
 			}
 		} catch {
+			if (pin?.success) return json({ error: 'Depth analysis is unavailable' }, { status: 503 });
 			// An absent canonical table is possible before its additive migration is applied;
 			// keep legacy readback available while the canonical owner is unavailable.
 		}
 
 		if (!canonicalDepthManifestPresent) {
+			if (pin?.success) return json({ error: 'Canonical relative depth is unavailable' }, { status: 409 });
 			const aiAnalysis = item.aiAnalysis && typeof item.aiAnalysis === 'object'
 				? item.aiAnalysis as Record<string, unknown>
 				: {};

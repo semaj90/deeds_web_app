@@ -1,0 +1,1689 @@
+<#
+.SYNOPSIS
+  Launch llama-server.exe with TurboQuant-style flags for the YorHA legal stack.
+
+.DESCRIPTION
+  Replaces the inline pwsh one-liners that lived under turbo:start* in package.json.
+  Adds three things the inline version was missing:
+
+    1. Pre-flight: free Ollama VRAM via keep_alive:0 if a model is resident
+       (otherwise model load OOMs at ~5.8GB on an 8GB GPU).
+    2. KV-cache type fallback: this build of llama-server does NOT support
+       turbo3/turbo4 (Google ICLR 2026 PolarQuant). If TURBO_KV_K/V are
+       unsupported by the binary, we fall back to q8_0/q8_0 (CLAUDE.md
+       production-stable) and print a one-line note.
+    3. stderr capture: the detached path used to swallow startup errors.
+       We now tee stderr to logs/turboquant/launch-<stamp>.err so post-mortem
+       on a failed launch is one `tail` away.
+
+.PARAMETER Detached
+  Start with -WindowStyle Hidden, poll /health, return after PID is stable.
+  Without this switch, the script execs llama-server in the foreground.
+
+.PARAMETER TextOnly
+  Skip --mmproj. Use when you want the chat-only TurboQuant tier without
+  vision tower memory overhead.
+
+.PARAMETER NoEvict
+  Skip the Ollama keep_alive:0 pre-flight. Use when you've already managed
+  VRAM yourself or Ollama isn't running.
+
+.PARAMETER StartupProfile
+  One of: gemma4-direct (default tool-calling profile), ornith (legacy Ornith 9B,
+  embedded chat template, no override), ornith-1.5 (Ornith 1.5 9B,
+  local template, reasoning off, TEXT/TOOL ONLY - no mmproj), ornith-1.5-vlm
+  (identical to ornith-1.5 but loads the official Ornith 1.5 mmproj for vision -
+  adds ~922MB VRAM), gemma4-thinking (reasoning on, budget 2048). Bundles
+  model + chat-template-file + reasoning mode so you pick ONE coherent config.
+  When omitted (and -SelectProfile isn't passed either), the launcher falls
+  back to legacy env-var resolution (ROTORQUANT_MODEL_PATH / TURBO_MODEL_PATH /
+  auto-discovery) so automated callers like dev-gpu-runtime.mjs are unaffected.
+
+.PARAMETER SelectProfile
+  Show an arrow-key picker (Up/Down + Enter, Esc cancels) over the three
+  named profiles. No-ops to the default profile in non-interactive sessions
+  (redirected stdin) instead of hanging.
+
+.ENV
+  LLAMA_SERVER_PATH    default: bin\llama-server.exe, then vendor\llama-server\llama-server.exe, then system PATH
+  TURBO_MODEL_PATH     default: %USERPROFILE%\.ollama\blobs\sha256-a79de882...
+  ROTORQUANT_MODEL_PATH  optional: path to a RotorQuant GGUF (e.g. gemma-4-E4B-RotorQuant-GGUF-IQ4_XS.gguf
+                           from majentik/gemma-4-E4B-RotorQuant-GGUF-IQ4_XS on HuggingFace).
+                           When set, overrides TURBO_MODEL_PATH. Weight-quantised; runs on the
+                           stock llama-server.exe without any TurboQuant binary.
+  TURBO_MMPROJ_PATH    default: models\mmproj-BF16.gguf (repo-local; see models/model-manifest.json)
+                         Gemma4-family projector only. NEVER resolved for an ornith-1.5* profile -
+                         see ORNITH_MMPROJ_PATH below and the family-keyed resolution note further down.
+  ORNITH_MMPROJ_PATH   default: models\mmproj-Ornith-1.5-9B-BF16.gguf (repo-local; see model-manifest.json
+                         id "ornith-1.5-mmproj"). Only consulted for the ornith-1.5-vlm profile.
+  TURBO_PORT           default: 8090
+  TURBO_PROFILE        default: stock
+                         stock           K=q8_0  V=q8_0   (works on stock llama.cpp)
+                         turboquant      K=q8_0  V=turbo3 (TurboQuant-enabled binary required)
+                         turboquant-safe K=q8_0  V=q8_0   (parity-safe, keep large TURBO_CTX)
+                         atomicbot       K=turbo3 V=turbo3 (AtomicBot binary + Gemma4 assistant drafter;
+                                          download AtomicBot-ai/atomic-llama-cpp-turboquant-binaries,
+                                          set LLAMA_SERVER_PATH; speculative decode lane uses
+                                          --spec-draft-model / --spec-type draft-mtp on current builds)
+  TURBO_KV_K           overrides profile K (must be in the known KV allowlist)
+  TURBO_KV_V           overrides profile V (must be in the known KV allowlist)
+  TURBO_CTX            default: 65536
+  TURBO_NGL            default: 99
+  MTP_HEAD_PATH        legacy/optional: path to a .mtp sidecar file for older AtomicBot builds
+  ENABLE_MTP_DRAFTER   optional: "true" enables speculative decoding benchmark lane when MTP_DRAFT_MODEL exists
+  MTP_DRAFT_MODEL      optional: path to the Gemma4 assistant drafter GGUF used for speculative decoding
+  LEGAL_LORA_PATH      optional: path to legal LoRA adapter GGUF (--lora injection for base-model GGUFs
+                         like majentik/gemma-4-E4B-RotorQuant-GGUF-IQ4_XS that ship without the fine-tune)
+  LEGAL_LORA_SCALE     optional: LoRA strength 0.0-1.0 (default 0.8; lower = more base, higher = more adapter)
+
+  Failure semantics:
+    - If TURBO_KV_K / TURBO_KV_V are set explicitly to an unknown name,
+      the launcher throws BEFORE invoking llama-server.
+    - If turbo* is requested explicitly but the binary lacks TurboQuant support,
+      the launcher throws (so you notice you have the wrong llama-server.exe)
+      rather than silently downgrading to q8_0/q8_0.
+    - Profile-derived defaults still soft-fall-back if the binary is stock,
+      because the user did not assert "I want turbo".
+#>
+[CmdletBinding()]
+param(
+  [switch] $Detached,
+  [switch] $TextOnly,
+  [switch] $NoEvict,
+  [switch] $StatusOnly,
+  [ValidateSet('gemma4-direct', 'gemma4-legal-iq4xs', 'gemma4-legal-iq4xs-vlm', 'ornith', 'ornith-1.5', 'ornith-1.5-vlm', 'gemma4-thinking')]
+  [string] $StartupProfile,
+  [switch] $SelectProfile
+)
+
+$ErrorActionPreference = 'Stop'
+
+# -- Load .env files if present --------------------------------------------
+# Keep the same precedence convention as the app checkout:
+#   .env primary, .env.local override, explicit process env wins
+$initialProcessEnv = [System.Environment]::GetEnvironmentVariables('Process')
+foreach ($envPath in @(
+    (Join-Path $PSScriptRoot "..\.env"),
+    (Join-Path $PSScriptRoot "..\.env.local")
+)) {
+    if (Test-Path $envPath) {
+        Get-Content $envPath |
+            Where-Object { $_ -match '=' -and $_ -notmatch '^#' } |
+            ForEach-Object {
+                $name, $value = $_.Split('=', 2)
+                if ($name -and $value) {
+                    $name = $name.Trim()
+                    $value = $value.Trim().Trim('"').Trim("'")
+                    if (-not [string]::IsNullOrWhiteSpace($name)) {
+                        # Later files intentionally override earlier files, but
+                        # caller-provided process env remains the final override.
+                        if (-not $initialProcessEnv.Contains($name)) {
+                            [System.Environment]::SetEnvironmentVariable($name, $value)
+                        }
+                    }
+                }
+            }
+    }
+}
+
+
+# -- Pre-flight: Check if llama-server is already running on :8090 -----------
+function Test-LlamaServerHealth {
+  $port = $env:TURBO_PORT ?? 8090
+  $url = "http://127.0.0.1:${port}/health"
+
+  try {
+    $response = Invoke-WebRequest -Uri $url -Method Get -TimeoutSec 2 -ErrorAction SilentlyContinue
+    return $response.StatusCode -eq 200
+  } catch {
+    return $false
+  }
+}
+
+function Test-HeadroomProxyHealth {
+  $headroomPort = $env:HEADROOM_PORT ?? 8787
+  $url = "http://127.0.0.1:${headroomPort}/livez"
+  # 1. Probe Windows host loopback first
+  try {
+    $response = Invoke-RestMethod -Uri $url -Method Get -TimeoutSec 2 -ErrorAction Stop
+    if ($response.alive -eq $true -or $response.status -eq 'healthy') {
+      return [PSCustomObject]@{
+        Healthy = $true
+        Version = $response.version
+        Namespace = 'Windows-Host-Loopback'
+        Url = "http://127.0.0.1:${headroomPort}"
+      }
+    }
+  } catch { }
+  # 2. Probe WSL2 Ubuntu loopback (:8787 is official Headroom v0.41.0; :8795 is historical headroom-proxy.mjs)
+  try {
+    $wslRaw = & wsl.exe -d Ubuntu -u james -- curl -4 -s --connect-timeout 2 $url 2>$null
+    if ($wslRaw) {
+      $wslJson = $wslRaw | ConvertFrom-Json -ErrorAction Stop
+      if ($wslJson.alive -eq $true -or $wslJson.status -eq 'healthy') {
+        return [PSCustomObject]@{
+          Healthy = $true
+          Version = $wslJson.version
+          Namespace = 'WSL2-Ubuntu-Loopback'
+          Url = "wsl://127.0.0.1:${headroomPort}"
+        }
+      }
+    }
+  } catch { }
+  return [PSCustomObject]@{
+    Healthy = $false
+    Version = $null
+    Namespace = 'Offline'
+    Url = "http://127.0.0.1:${headroomPort}"
+  }
+}
+
+# -- Single-instance guard: serialize launches on :8090 ---------------------
+# Two launchers (e.g. dev:gpu and a VS Code backend task) can pass the health
+# check at the same moment and both start llama-server. A named mutex makes
+# the second launcher wait for the first, then reuse its healthy server.
+# The lock is released when this process exits.
+if ($Detached -and -not $StatusOnly) {
+  $mutexPort = if ($env:TURBO_PORT) { $env:TURBO_PORT } else { '8090' }
+  $script:TurboLaunchMutex = [System.Threading.Mutex]::new($false, "Local\deeds-llama-server-$mutexPort-launch")
+  $lockHeld = $false
+  try { $lockHeld = $script:TurboLaunchMutex.WaitOne(0) }
+  catch [System.Threading.AbandonedMutexException] { $lockHeld = $true }
+  if (-not $lockHeld) {
+    Write-Host "⏳ Another launcher holds the :$mutexPort launch lock; waiting up to 180s..." -ForegroundColor Yellow
+    try { $lockHeld = $script:TurboLaunchMutex.WaitOne(180000) }
+    catch [System.Threading.AbandonedMutexException] { $lockHeld = $true }
+    if (-not $lockHeld) {
+      Write-Host "❌ Timed out waiting for the other launcher. Not starting a second llama-server." -ForegroundColor Red
+      exit 1
+    }
+    # Continue to full /slots + /props validation after acquiring the mutex.
+    # A 200 /health response is not proof that model/profile/vision match.
+
+  }
+}
+
+# Do not early-return solely on /health. Full configuration verification happens
+# below, after the final model, context, profile and template are resolved.
+
+# -- Startup profiles (arrow-key selectable) -------------------------------
+# Three named profiles bundle model + template + reasoning mode together so
+# the operator picks ONE coherent config instead of composing env vars by hand.
+# `--jinja` is the flag that enables llama.cpp's modern function-calling
+# handlers. A custom --chat-template-file is only appropriate when the GGUF's
+# embedded template is missing/stale/incompatible - otherwise llama.cpp can
+# use tokenizer.chat_template from model metadata directly (Ornith's case).
+# HARD RULE: never pass both --chat-template and --chat-template-file in the
+# same launch - pick one source of template truth.
+function Get-TurboRepoRoot { Resolve-Path (Join-Path $PSScriptRoot '..') }
+
+function Get-TurboStartupProfiles {
+  $repoRoot = Get-TurboRepoRoot
+  $modelRoot = Join-Path $repoRoot 'models'
+  $templateRoot = Join-Path $repoRoot 'configs\templates'
+  @(
+    [pscustomobject]@{
+      Id = 'gemma4-direct'
+      DisplayName = 'Gemma 4 Legal - Direct Tools'
+      Model = Join-Path $modelRoot 'gemma4-legal-iq4xs-direct.gguf'
+      Alias = 'gemma4-legal-iq4xs-direct.gguf'
+      TemplateFile = Join-Path $templateRoot 'custom_pub_chat_template_gemma4.jinja'
+      Reasoning = 'off'
+      ReasoningBudget = 0
+      SpecType = 'none'
+      ModelFamily = 'gemma4'
+      WantsVision = $false
+    },
+    [pscustomobject]@{
+      Id = 'gemma4-legal-iq4xs'
+      DisplayName = 'Gemma 4 Legal IQ4_XS - Direct Tools (smaller VRAM footprint)'
+      Model = Join-Path $modelRoot 'gemma4-legal-iq4xs-direct.gguf'
+      Alias = 'gemma4-legal-iq4xs-direct.gguf'
+      TemplateFile = Join-Path $templateRoot 'custom_pub_chat_template_gemma4.jinja'
+      Reasoning = 'off'
+      ReasoningBudget = 0
+      ContextLength = 65536
+      SpecType = 'none'
+      ModelFamily = 'gemma4'
+      WantsVision = $false
+    },
+    [pscustomobject]@{
+      # Same served alias and model as gemma4-legal-iq4xs; adds the Gemma-family
+      # projector (mmproj-F16.gguf, vision + audio encoders). Untested with this
+      # legal merge: confirm /props modalities.vision=true before relying on it.
+      Id = 'gemma4-legal-iq4xs-vlm'
+      DisplayName = 'Gemma 4 Legal IQ4_XS - Vision (mmproj-F16)'
+      Model = Join-Path $modelRoot 'gemma4-legal-iq4xs-direct.gguf'
+      Alias = 'gemma4-legal-iq4xs-direct.gguf'
+      TemplateFile = Join-Path $templateRoot 'custom_pub_chat_template_gemma4.jinja'
+      Reasoning = 'off'
+      ReasoningBudget = 0
+      ContextLength = 65536
+      SpecType = 'none'
+      ModelFamily = 'gemma4'
+      WantsVision = $true
+    },
+    [pscustomobject]@{
+      Id = 'ornith'
+      DisplayName = 'Ornith 1.0 9B - Embedded Template (legacy)'
+      Model = Join-Path $modelRoot 'hfor\hforf.gguf'
+      Alias = 'ornith-9b'
+      # Ornith's model card does not require a separate custom template file.
+      # Use its embedded tokenizer.chat_template unless a functional template
+      # test proves the Gemma4 override is actually compatible.
+      TemplateFile = $null
+      Reasoning = 'off'
+      ReasoningBudget = 0
+      ContextLength = 65536
+      SpecType = 'none'
+      # Ornith 1.0 has no known/acquired projector in this repo. ModelFamily
+      # 'ornith-1.0' resolves to an empty mmproj candidate list (see $mmproj
+      # resolution below) rather than falling through to the gemma4 family -
+      # never silently substitute a Gemma-family projector for any Ornith model.
+      ModelFamily = 'ornith-1.0'
+      WantsVision = $false
+    },
+    [pscustomobject]@{
+      Id = 'ornith-1.5'
+      DisplayName = 'Ornith 1.5 9B - Text/Tools (no mmproj)'
+      Model = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k\hforf.gguf'
+      Alias = 'ornith-1.5-9b'
+      TemplateFile = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k\chat_template.jinja'
+      Reasoning = 'off'
+      ReasoningBudget = 0
+      ContextLength = 65536
+      SpecType = 'none'
+      ModelFamily = 'ornith-1.5'
+      # Deliberately false: preserves full context/throughput headroom by
+      # default. Use -StartupProfile ornith-1.5-vlm for the vision-enabled
+      # sibling profile (same model, same template, +mmproj).
+      WantsVision = $false
+    },
+    [pscustomobject]@{
+      Id = 'ornith-1.5-vlm'
+      DisplayName = 'Ornith 1.5 9B - Vision (official mmproj)'
+      Model = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k\hforf.gguf'
+      Alias = 'ornith-1.5-9b'
+      TemplateFile = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k\chat_template.jinja'
+      Reasoning = 'off'
+      ReasoningBudget = 0
+      ContextLength = 65536
+      SpecType = 'none'
+      ModelFamily = 'ornith-1.5'
+      # Required: this profile exists specifically to load the vision
+      # projector. If it can't be resolved, the launcher throws rather than
+      # silently starting a text-only server under a "-vlm" name.
+      WantsVision = $true
+    },
+    [pscustomobject]@{
+      Id = 'gemma4-thinking'
+      DisplayName = 'Gemma 4 Legal - Thinking'
+      Model = Join-Path $modelRoot 'gemma4-legal-iq4xs-direct.gguf'
+      Alias = 'gemma4-legal-iq4xs-direct.gguf'
+      TemplateFile = Join-Path $templateRoot 'custom_pub_chat_template_gemma4.jinja'
+      Reasoning = 'on'
+      ReasoningBudget = 2048
+      SpecType = 'none'
+      ModelFamily = 'gemma4'
+      WantsVision = $false
+    }
+  )
+}
+
+function Select-TurboStartupProfile {
+  param([Parameter(Mandatory)][array]$Profiles, [int]$DefaultIndex = 0)
+
+  if (-not $Host.UI.RawUI -or [Console]::IsInputRedirected) {
+    Write-Host "Non-interactive session - defaulting to profile '$($Profiles[$DefaultIndex].Id)'" -ForegroundColor DarkGray
+    return $Profiles[$DefaultIndex]
+  }
+
+  $selected = [Math]::Max(0, [Math]::Min($DefaultIndex, $Profiles.Count - 1))
+  $startTop = $Host.UI.RawUI.CursorPosition.Y
+  try {
+    [Console]::CursorVisible = $false
+    while ($true) {
+      $Host.UI.RawUI.CursorPosition = New-Object System.Management.Automation.Host.Coordinates(0, $startTop)
+      Write-Host "Select llama-server profile:" -ForegroundColor Cyan
+      Write-Host "  (Up/Down to move, Enter to confirm, Esc to cancel)" -ForegroundColor DarkGray
+      for ($i = 0; $i -lt $Profiles.Count; $i++) {
+        $p = $Profiles[$i]
+        $prefix = if ($i -eq $selected) { '>' } else { ' ' }
+        if ($i -eq $selected) {
+          Write-Host "  $prefix $($p.DisplayName)" -ForegroundColor Green
+        } else {
+          Write-Host "  $prefix $($p.DisplayName)"
+        }
+      }
+      $key = [Console]::ReadKey($true)
+      switch ($key.Key) {
+        'UpArrow'   { $selected = ($selected - 1 + $Profiles.Count) % $Profiles.Count }
+        'DownArrow' { $selected = ($selected + 1) % $Profiles.Count }
+        'Enter'     { return $Profiles[$selected] }
+        'Escape'    { throw 'Startup profile selection cancelled' }
+      }
+    }
+  } finally {
+    [Console]::CursorVisible = $true
+  }
+}
+
+# Normalize a model identity down to "basename, lowercased" so comparisons
+# (profile selection, template gating, identity verification) are stable
+# regardless of full path, drive letter casing, or a trailing "llama-server"
+# artifact some callers append to loaded-model strings.
+function Get-NormalizedModelName {
+  param([Parameter(Mandatory)][string]$Value)
+  $normalized = $Value.Trim()
+  # Only strip a LEADING "llama-server" token (e.g. "llama-server hforf.gguf"
+  # -> "hforf.gguf"). A \b-anchored replace anywhere in the string would also
+  # corrupt a legitimate directory or alias containing "llama-server", e.g.
+  # "C:\builds\llama-server\hforf.gguf" or an alias like
+  # "llama-server-8090-hforf.gguf" - GetFileName() below already discards any
+  # directory component, so stripping mid-string is unnecessary and unsafe.
+  $normalized = $normalized -replace '(?i)^llama-server(\.exe)?\s+', ''
+  $normalized = $normalized.Trim()
+  return [System.IO.Path]::GetFileName($normalized).ToLowerInvariant()
+}
+
+$turboProfiles = Get-TurboStartupProfiles
+$activeTurboProfile = $null
+if ($StartupProfile) {
+  $activeTurboProfile = $turboProfiles | Where-Object { $_.Id -eq $StartupProfile } | Select-Object -First 1
+} elseif ($SelectProfile) {
+  $activeTurboProfile = Select-TurboStartupProfile -Profiles $turboProfiles -DefaultIndex 0
+} elseif ($env:TURBO_STARTUP_PROFILE) {
+  # Env-driven equivalent of -StartupProfile, so automated callers
+  # (dev-gpu-runtime.mjs) can select a named profile without a CLI switch.
+  $activeTurboProfile = $turboProfiles | Where-Object { $_.Id -eq $env:TURBO_STARTUP_PROFILE } | Select-Object -First 1
+  if (-not $activeTurboProfile) {
+    throw "Invalid TURBO_STARTUP_PROFILE '$($env:TURBO_STARTUP_PROFILE)' - choose one of: $($turboProfiles.Id -join ', ')"
+  }
+}
+# Resolution precedence (authoritative - do not duplicate this comment
+# elsewhere; update here only):
+#   1. -StartupProfile <id>
+#   2. -SelectProfile (interactive picker)
+#   3. $env:TURBO_STARTUP_PROFILE
+#   4. Legacy model variables, in order: ROTORQUANT_MODEL_PATH >
+#      TURBO_MODEL_PATH > TURBO_MODEL > LOCAL_GEMMA_MODEL
+#   5. Auto-discovery (models/hfor/hforf.gguf > vendor/models/*.gguf >
+#      models/ornith-1.5-9b > Ollama blob store)
+# When none of 1-3 select a profile, $activeTurboProfile stays $null and
+# resolution falls through to tier 4/5 below. Whichever tier resolves $model,
+# the chat-template decision downstream is derived from the FINAL resolved
+# $model basename (Get-NormalizedModelName), never from which tier resolved
+# it - see $isOrnithModel below.
+
+# -- Probe helper: try --help then -h, return $true if flag is advertised -
+function Test-LlamaFlag {
+    param([string]$Exe, [string]$Pattern)
+    $oldPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $h1 = (& $Exe --help 2>&1 | Out-String)
+        if ($h1 -match $Pattern) { return $true }
+        $h2 = (& $Exe -h 2>&1 | Out-String)
+        return $h2 -match $Pattern
+    } catch {
+        return $false
+    } finally {
+        $ErrorActionPreference = $oldPreference
+    }
+}
+
+function Test-TruthyValue {
+    param([object]$Value)
+
+    if ($null -eq $Value) { return $false }
+    if ($Value -is [bool]) { return $Value }
+
+    $normalized = ([string]$Value).Trim().ToLowerInvariant()
+    return @('1', 'true', 'yes', 'on', 'y') -contains $normalized
+}
+
+function Get-TurboLaunchStatusPath {
+    $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..')
+    $statusDir = Join-Path $repoRoot 'logs/turboquant'
+    New-Item -ItemType Directory -Force -Path $statusDir | Out-Null
+    return (Join-Path $statusDir 'latest-launch-status.json')
+}
+
+function Write-TurboLaunchStatus {
+    param([System.Collections.IDictionary]$Payload)
+
+    $statusPath = Get-TurboLaunchStatusPath
+    $Payload['generated_at'] = (Get-Date).ToString('o')
+    $Payload['status_artifact'] = $statusPath
+    ($Payload | ConvertTo-Json -Depth 8) | Set-Content -Path $statusPath -Encoding UTF8
+    return $statusPath
+}
+
+function Remove-TurboDraftArgs {
+    param([string[]]$Args)
+
+    $draftFlagsWithValues = @(
+        '--spec-draft-model',
+        '--spec-type',
+        '--spec-draft-n-max',
+        '--spec-draft-n-min',
+        '--spec-draft-ngl',
+        '-ctkd',
+        '-ctvd',
+        '--model-draft',
+        '--draft-max',
+        '--draft-min',
+        '--draft-p-min',
+        '--n-gpu-layers-draft'
+    )
+
+    $clean = New-Object System.Collections.Generic.List[string]
+    for ($i = 0; $i -lt $Args.Length; $i++) {
+        $arg = $Args[$i]
+        if ($draftFlagsWithValues -contains $arg) {
+            $i++
+            continue
+        }
+        $clean.Add($arg)
+    }
+
+    return ,$clean.ToArray()
+}
+
+
+# -- Resolve paths and ports ----------------------------------------------
+$llama = if ($env:LLAMA_SERVER_PATH) {
+    $env:LLAMA_SERVER_PATH
+} else {
+    # Fallback order: 1. bin/ in workspace, 2. tools/ in workspace,
+    # 3. vendor/ in workspace, 4. system path
+    $localBin = Join-Path $PSScriptRoot "..\bin\llama-server.exe"
+    $localTools = Join-Path $PSScriptRoot "..\tools\llama-server\llama-server.exe"
+    $localVendor = Join-Path $PSScriptRoot "..\vendor\llama-server\llama-server.exe"
+    if (Test-Path $localBin) { $localBin }
+    elseif (Test-Path $localTools) { $localTools }
+    elseif (Test-Path $localVendor) { $localVendor }
+    else { "llama-server.exe" }
+}
+
+# Embedding note: --embeddings is intentionally NOT passed to llama-server.
+# Embeddings are handled by the ONNX DirectML pipeline (embeddinggemma_300m_onnx)
+# via compute-glyph-rewards.mjs and gpu-full-pipeline.mjs. Adding --embeddings
+# here would OOM the 8GB GPU (5.3GB model + KV cache already fills ~7.5GB).
+
+# Model resolution: ROTORQUANT_MODEL_PATH > TURBO_MODEL_PATH > TURBO_MODEL >
+# LOCAL_GEMMA_MODEL > local GGUF search > Ollama blob auto-discovery (scans
+# manifests for gemma4/rotorquant GGUFs). TURBO_MODEL/LOCAL_GEMMA_MODEL accept
+# either a full path or a bare filename resolved against models/.
+# Ollama blobs are raw GGUF files — llama-server reads them directly without Ollama.
+function Resolve-TurboModelRef {
+    param([Parameter(Mandatory)][string]$Value)
+    if (Test-Path $Value) { return $Value }
+    $inModels = Join-Path $PSScriptRoot "..\models\$Value"
+    if (Test-Path $inModels) { return $inModels }
+    $inModelsHfor = Join-Path $PSScriptRoot "..\models\hfor\$Value"
+    if (Test-Path $inModelsHfor) { return $inModelsHfor }
+    return $Value
+}
+
+$model = if ($activeTurboProfile) {
+    $activeTurboProfile.Model
+} elseif ($env:ROTORQUANT_MODEL_PATH) {
+    $env:ROTORQUANT_MODEL_PATH
+} elseif ($env:TURBO_MODEL_PATH) {
+    $env:TURBO_MODEL_PATH
+} elseif ($env:TURBO_MODEL) {
+    Resolve-TurboModelRef $env:TURBO_MODEL
+} elseif ($env:LOCAL_GEMMA_MODEL) {
+    Resolve-TurboModelRef $env:LOCAL_GEMMA_MODEL
+} else {
+    $vendorModel  = Join-Path $PSScriptRoot "..\vendor\models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf"
+    $vendorDirect = Join-Path $PSScriptRoot "..\vendor\models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf"
+    $hforfModel   = Join-Path $PSScriptRoot "..\models\hfor\hforf.gguf"
+    $localModel   = Join-Path $PSScriptRoot "..\models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf"
+    $localLegacy  = Join-Path $PSScriptRoot "..\models\gemma4-turboquant-rotorquant.gguf"
+
+    # Auto-discover RotorQuant/Gemma4 GGUF from Ollama blob store.
+    # Scans manifests for model layers matching known legal/gemma4 tags,
+    # then resolves the sha256 blob path. Works without Ollama running.
+    $ollamaBlob = $null
+    $manifestRoot = Join-Path $env:USERPROFILE '.ollama\models\manifests\registry.ollama.ai\library'
+    $blobRoot     = Join-Path $env:USERPROFILE '.ollama\models\blobs'
+    $preferredTags = @('ornith-1.5-9b', 'ornith-1.5-9b')
+    foreach ($tag in $preferredTags) {
+        $mf = Join-Path $manifestRoot "$tag\latest"
+        if (-not (Test-Path $mf)) { continue }
+        try {
+            $mfData = Get-Content $mf -Raw | ConvertFrom-Json
+            $modelLayer = $mfData.layers | Where-Object { $_.mediaType -eq 'application/vnd.ollama.image.model' } | Select-Object -First 1
+            if ($modelLayer -and $modelLayer.digest) {
+                $blobName = $modelLayer.digest -replace ':', '-'
+                $blobPath = Join-Path $blobRoot $blobName
+                if (Test-Path $blobPath) {
+                    Write-Host ("Auto-discovered model: $tag → $blobPath") -ForegroundColor DarkCyan
+                    $ollamaBlob = $blobPath
+                    break
+                }
+            }
+        } catch {
+            # malformed manifest — skip
+        }
+    }
+
+    if (Test-Path $hforfModel) { $hforfModel }
+    elseif (Test-Path $vendorModel) { $vendorModel }
+    elseif (Test-Path $vendorDirect) { $vendorDirect }
+    elseif (Test-Path $localModel) { $localModel }
+    elseif (Test-Path $localLegacy) { $localLegacy }
+    elseif ($ollamaBlob) { $ollamaBlob }
+    else { $null }
+}
+
+# --alias is REQUIRED whenever a profile is active: multiple profiles can point at
+# files that share a basename (e.g. ornith vs ornith-1.5 both ship a file literally
+# named hforf.gguf in different directories, and llama-server's own GGUF metadata
+# reports the same internal name for both). Without --alias, /props.model_alias and
+# /v1/models both collapse to the same ambiguous string and callers (the health check
+# below, OpenCode, any client) cannot tell which candidate is actually live. Must be
+# resolved here (before the health-check block) so both consumers see the same value.
+$modelAlias = if ($activeTurboProfile -and $activeTurboProfile.Alias) { $activeTurboProfile.Alias } else { $null }
+
+# Diagnostic receipt: which precedence tier actually resolved $model. Mirrors
+# the $model if/elseif chain above exactly - keep both in sync if the chain
+# changes. Printed later alongside NORMALIZED_MODEL / TEMPLATE_SOURCE so a
+# model/template mismatch is visible in the launch log, not just inferable.
+$modelResolutionSource = if ($activeTurboProfile) {
+    "StartupProfile:$($activeTurboProfile.Id)"
+} elseif ($env:ROTORQUANT_MODEL_PATH) {
+    'ROTORQUANT_MODEL_PATH'
+} elseif ($env:TURBO_MODEL_PATH) {
+    'TURBO_MODEL_PATH'
+} elseif ($env:TURBO_MODEL) {
+    'TURBO_MODEL'
+} elseif ($env:LOCAL_GEMMA_MODEL) {
+    'LOCAL_GEMMA_MODEL'
+} else {
+    'auto-discovery'
+}
+# -- Multimodal projector resolution: keyed on model FAMILY, never a single
+# global pointer. ORNITH-VLM-MMPROJ-01 (see
+# openspec/changes/parent-atlas-analysis-pass-ornith-adapter/tasks.md) - a
+# Gemma-family projector must never be silently loaded against an Ornith
+# model, or vice versa. $modelFamily comes from the active profile;
+# no-profile legacy callers (auto-discovery / ROTORQUANT_MODEL_PATH /
+# TURBO_MODEL_PATH) default to 'gemma4', matching this launcher's
+# pre-existing behavior before family-keying was introduced.
+$modelFamily = if ($activeTurboProfile -and $activeTurboProfile.ModelFamily) { $activeTurboProfile.ModelFamily } else { 'gemma4' }
+$wantsVision = [bool]($activeTurboProfile -and $activeTurboProfile.WantsVision)
+
+function Resolve-FamilyMmprojCandidates {
+  param([Parameter(Mandatory)][string]$Family)
+  switch ($Family) {
+    'gemma4' {
+      @(
+        (Join-Path $PSScriptRoot "..\models\mmproj-F16.gguf"),
+        (Join-Path $PSScriptRoot "..\vendor\models\mmproj-gemma4.gguf"),
+        (Join-Path $PSScriptRoot "..\models\mmproj-BF16.gguf")
+      )
+    }
+    'ornith-1.5' {
+      @(
+        (Join-Path $PSScriptRoot "..\models\mmproj-Ornith-1.5-9B-BF16.gguf")
+      )
+    }
+    default { @() }  # e.g. 'ornith-1.0' - no known projector, never fall through to gemma4's
+  }
+}
+
+# Family-scoped env override name, e.g. ORNITH_MMPROJ_PATH for 'ornith-1.5'.
+# Falls back to the legacy global TURBO_MMPROJ_PATH ONLY for the 'gemma4'
+# family (that variable's pre-existing meaning) - it is never treated as a
+# valid override for a non-gemma4 family, closing the exact silent
+# cross-family substitution path this gate exists to prevent.
+$familyEnvVarName = switch ($modelFamily) {
+  'ornith-1.5' { 'ORNITH_MMPROJ_PATH' }
+  default      { $null }
+}
+$familyEnvOverride = if ($familyEnvVarName -and (Get-Item "env:$familyEnvVarName" -ErrorAction SilentlyContinue)) {
+  (Get-Item "env:$familyEnvVarName").Value
+} elseif ($modelFamily -eq 'gemma4' -and $env:TURBO_MMPROJ_PATH) {
+  $env:TURBO_MMPROJ_PATH
+} else {
+  $null
+}
+
+$mmproj = if ($familyEnvOverride) {
+  $familyEnvOverride
+} else {
+  (Resolve-FamilyMmprojCandidates -Family $modelFamily) | Where-Object { Test-Path $_ } | Select-Object -First 1
+}
+
+if ($wantsVision -and -not $mmproj) {
+  throw "StartupProfile '$($activeTurboProfile.Id)' requires vision (WantsVision) but no mmproj could be resolved for model family '$modelFamily'. Expected one of: $((Resolve-FamilyMmprojCandidates -Family $modelFamily) -join ', ')$(if ($familyEnvVarName) { " (or `$env:$familyEnvVarName)" })."
+}
+$port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8090' }
+$ctxLenRequested = if ($env:LLM_CONTEXT_SIZE)  { $env:LLM_CONTEXT_SIZE }
+                   elseif ($env:TURBO_CTX)     { $env:TURBO_CTX }
+                   elseif ($env:LLAMA_SERVER_CTX) { $env:LLAMA_SERVER_CTX }
+                   elseif ($env:OLLAMA_CONTEXT_LENGTH) { $env:OLLAMA_CONTEXT_LENGTH }
+                   elseif ($activeTurboProfile -and $activeTurboProfile.ContextLength) { $activeTurboProfile.ContextLength }
+                   else { '65536' }
+$ctxLen = [int]$ctxLenRequested
+$_allowShortCtxVal = if ($env:TURBO_CTX_ALLOW_SHORT_CONTEXT) { $env:TURBO_CTX_ALLOW_SHORT_CONTEXT } else { '' }; $allowShortCtx = @('1','true','yes','on') -contains $_allowShortCtxVal.ToLower()
+if ($ctxLen -lt 65536 -and -not $allowShortCtx) {
+    Write-Warning "Requested TurboQuant context $ctxLen is below the repo default of 65536. Clamping to 65536. Set TURBO_CTX_ALLOW_SHORT_CONTEXT=true to opt in to a shorter context."
+    $ctxLen = 65536
+}
+$threadsRequested = if ($env:TURBO_CPU_THREADS) {
+    $env:TURBO_CPU_THREADS
+} elseif ($env:TURBO_THREADS) {
+    $env:TURBO_THREADS
+} else {
+    6
+}
+$batchThreadsRequested = if ($env:TURBO_CPU_THREADS_BATCH) {
+    $env:TURBO_CPU_THREADS_BATCH
+} elseif ($env:TURBO_THREADS_BATCH) {
+    $env:TURBO_THREADS_BATCH
+} else {
+    8
+}
+
+$threads = [Math]::Max(1, [int]$threadsRequested)
+$batchThreads = [Math]::Max(1, [int]$batchThreadsRequested)
+if ($batchThreads -lt $threads) {
+    $batchThreads = $threads
+}
+
+$batchSize = if ($env:TURBO_BATCH_SIZE) { $env:TURBO_BATCH_SIZE } else { $null }
+$ubatchSize = if ($env:TURBO_UBATCH_SIZE) { $env:TURBO_UBATCH_SIZE } else { $null }
+
+# -- GPU Offload (NGL) ----------------------------------------------------
+$ngl = if ($env:TURBO_NGL) { $env:TURBO_NGL } else { "99" }
+
+# Handle negative values - warn and normalize
+if ($ngl -match "^-") {
+    $requestedNgl = $ngl
+    $normalizedNgl = $ngl.Replace('-', '')
+    Write-Warning "TURBO_NGL is negative ($requestedNgl). llama.cpp-style --n-gpu-layers usually expects a positive layer count (e.g. 35, 99)."
+    Write-Host "  Requested NGL:  $requestedNgl" -ForegroundColor DarkGray
+    Write-Host "  Normalized NGL: $normalizedNgl" -ForegroundColor Gray
+    $ngl = $normalizedNgl
+}
+
+if ($ngl -eq "0") {
+    Write-Warning "GPU offload (TURBO_NGL) is 0. TurboQuant will run on CPU only."
+}
+
+# -- Profile shortcut: TURBO_PROFILE expands to (kvK, kvV) defaults. ------
+# Explicit TURBO_KV_K / TURBO_KV_V env vars override the profile.
+$kvProfile = if ($env:TURBO_PROFILE) { $env:TURBO_PROFILE.ToLower() } else { 'stock' }
+$validProfiles = @('stock', 'turboquant', 'turboquant-safe', 'atomicbot', 'turbo3', 'turbo4')
+if ($validProfiles -notcontains $kvProfile) {
+  throw "Invalid TURBO_PROFILE '$kvProfile' - choose one of: $($validProfiles -join ', ')"
+}
+switch ($kvProfile) {
+  'stock'           { $kvProfileK = 'q8_0';   $kvProfileV = 'q8_0' }
+  'turboquant'      { $kvProfileK = 'q8_0';   $kvProfileV = 'turbo3' }
+  'turboquant-safe' { $kvProfileK = 'q8_0';   $kvProfileV = 'q8_0' }
+  'atomicbot'       { $kvProfileK = 'turbo3';  $kvProfileV = 'turbo3' }
+  'turbo3'          { $kvProfileK = 'q8_0';   $kvProfileV = 'turbo3' }
+  'turbo4'          { $kvProfileK = 'q8_0';   $kvProfileV = 'turbo4' }
+}
+
+$explicitK = [bool]$env:TURBO_KV_K
+$explicitV = [bool]$env:TURBO_KV_V
+$kvK       = if ($explicitK) { $env:TURBO_KV_K } else { $kvProfileK }
+$kvV       = if ($explicitV) { $env:TURBO_KV_V } else { $kvProfileV }
+
+# -- KV allowlist (early - runs before "already healthy" short-circuit so
+#    a typo in TURBO_KV_V always fails fast, not just on cold launches). --
+$stockKv      = @('f32','f16','bf16','q8_0','q4_0','q4_1','iq4_nl','q5_0','q5_1')
+$turboKv      = @('turbo2','turbo3','turbo4','tbq3_0','tbq4_0')
+$supportedKv  = $stockKv + $turboKv
+if ($supportedKv -notcontains $kvK) {
+  $msg = "Unsupported TURBO_KV_K / cache type: '$kvK'. Allowed: $($supportedKv -join ', ')"
+  if ($explicitK) { throw $msg } else { Write-Host ("$msg - falling back to q8_0") -ForegroundColor Yellow; $kvK = 'q8_0' }
+}
+if ($supportedKv -notcontains $kvV) {
+  $msg = "Unsupported TURBO_KV_V / cache type: '$kvV'. Allowed: $($supportedKv -join ', ')"
+  if ($explicitV) { throw $msg } else { Write-Host ("$msg - falling back to q8_0") -ForegroundColor Yellow; $kvV = 'q8_0' }
+}
+
+if (-not (Test-Path $llama)) {
+  $llamaCmd = Get-Command $llama -CommandType Application -ErrorAction SilentlyContinue
+  if ($llamaCmd) { $llama = $llamaCmd.Source }
+  else { throw "llama-server.exe not found at $llama" }
+}
+if (-not $StatusOnly) {
+  if (-not $model) {
+    throw "No model GGUF found. Set ROTORQUANT_MODEL_PATH=<path to GGUF>, or place ornith-1.5-9b in vendor/models/, or ensure ornith-1.5-9b is pulled in Ollama (~/.ollama/models/)."
+  }
+  if (-not (Test-Path $model)) { throw "TurboQuant model GGUF not found at: $model" }
+}
+
+
+# -- Pre-flight: evict Ollama-resident model so VRAM is free --------------
+if (-not $NoEvict -and -not $StatusOnly) {
+  try {
+    $ps = Invoke-RestMethod 'http://127.0.0.1:11434/api/ps' -TimeoutSec 2
+    if ($ps.models -and $ps.models.Count -gt 0) {
+      $top = $ps.models[0].name
+      Write-Host ('Pre-flight: evicting Ollama model ' + $top + ' (keep_alive:0)') -ForegroundColor DarkCyan
+      Invoke-RestMethod 'http://127.0.0.1:11434/api/generate' `
+        -Method Post `
+        -ContentType 'application/json' `
+        -Body (@{ model = $top; keep_alive = 0; prompt = ''; stream = $false } | ConvertTo-Json -Compress) `
+        -TimeoutSec 10 | Out-Null
+      Start-Sleep -Seconds 2
+    }
+  } catch {
+    # Ollama not running - fine, nothing to evict
+  }
+}
+
+# -- Probe binary for TurboQuant support ----------------------------------
+# Stock llama.cpp accepts: f32, f16, bf16, q8_0, q4_0, q4_1, iq4_nl, q5_0, q5_1
+# TurboQuant forks add:    turbo2, turbo3, turbo4, tbq3_0, tbq4_0
+#   - TheTom/llama-cpp-turboquant releases tqp-v0.1.1 (Win+CUDA12.4 prebuilt,
+#     D=128 only - UNUSABLE on Gemma 4 head_dim 256/512; suits Llama-3 / Qwen)
+#   - test1111/llama-cpp-turboquant-gemma4 (D=256/512 kernels, source build,
+#     the only working path for Gemma 4 today)
+#   - PR #21089 to ggml-org/llama.cpp (still under review as of May 2026)
+# Recommended TurboQuant config per upstream docs: -ctk q8_0 -ctv turbo3
+# (asymmetric - quantize V aggressively, keep K at q8_0). CUDA mixed
+# q8_0  turbo parity is documented as "not yet verified" - if quality
+# regresses on your model, fall back to symmetric q8_0/q8_0 with larger ctx.
+# Allowlist itself was validated above (line ~91), early enough to fail
+# fast on TURBO_KV_* typos even when a server is already healthy.
+
+# Probe binary support for turbo*. When the user explicitly asked for a
+# turbo* type (TURBO_KV_K/V or TURBO_PROFILE=turboquant), throw if the
+# binary doesn't expose it - silent downgrade is exactly the failure mode
+# we want to avoid (it's why -ctk turbo3 -ctv turbo4 looked like it worked
+# for months). When defaults came from a non-turbo profile and somehow
+# resolved to turbo (impossible today, but kept symmetric for future
+# profiles), soft-fallback is acceptable.
+$turboRequested = ($turboKv -contains $kvK) -or ($turboKv -contains $kvV)
+$turboExplicit  = $turboRequested -and ($explicitK -or $explicitV -or $kvProfile -eq 'turboquant' -or $kvProfile -eq 'atomicbot' -or $kvProfile -eq 'turbo3' -or $kvProfile -eq 'turbo4')
+if ($turboRequested) {
+  $help = & $llama -h 2>&1 | Out-String
+  $binaryAcceptsTurbo = $help -match 'turbo[234]|tbq[34]_0'
+  if (-not $binaryAcceptsTurbo) {
+    # NOTE: TheTom's tqp-v0.1.1 prebuilt is D=128 only and CRASHES on Gemma 4
+    # (head_dim 256/512). For Gemma 4 the only working binary today is the
+    # source-built test1111 fork. The hint points at both so the operator
+    # picks the right one for their model.
+    $hint = "For Gemma 4 (head_dim 256/512): source-build https://github.com/test1111111111111112/llama-cpp-turboquant-gemma4 (cmake -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=86). For D=128 models: prebuilt at https://github.com/TheTom/llama-cpp-turboquant/releases. Then set LLAMA_SERVER_PATH to the new exe."
+    if ($turboExplicit) {
+      throw "llama-server at '$llama' does not advertise turbo*/tbq*_0 KV cache support. TURBO_KV_K='$kvK' / TURBO_KV_V='$kvV' explicitly requested. $hint"
+    } else {
+      Write-Host ("TurboQuant KV '$kvK/$kvV' requested by profile but binary is stock - falling back to q8_0/q8_0. $hint") -ForegroundColor Yellow
+      $kvK = 'q8_0'
+      $kvV = 'q8_0'
+    }
+  }
+}
+
+# -- Speculative Draft Model Policy ---------------------------------------
+$TurboDraftModel = $null
+$TurboSpeculative = $false
+$TurboDraftMode = 'disabled'
+$draftRequested = Test-TruthyValue $env:ENABLE_MTP_DRAFTER
+$allowLegacyDraft = Test-TruthyValue $env:TURBO_ALLOW_LEGACY_DRAFT
+$safeProfile = ($kvProfile -eq 'turboquant-safe')
+
+if ($safeProfile) {
+  Write-Host "Speculative decoding disabled by turboquant-safe profile - target-only startup enforced" -ForegroundColor DarkGray
+} elseif ($draftRequested) {
+  if (-not $env:MTP_DRAFT_MODEL) {
+    Write-Host 'Speculative decoding requested but MTP_DRAFT_MODEL is not set - skipping' -ForegroundColor Yellow
+  } elseif (-not (Test-Path $env:MTP_DRAFT_MODEL)) {
+    Write-Host ("Speculative decoding requested but MTP_DRAFT_MODEL not found at '$($env:MTP_DRAFT_MODEL)' - skipping") -ForegroundColor Yellow
+  } else {
+    # Two-gate check before handing the draft model to llama-server:
+    #
+    # Gate 1 — Binary supports --spec-draft-model.
+    #   The AtomicBot fork exposes this flag; stock llama.cpp does not.
+    #   If absent, skip rather than crash.
+    #
+    # Gate 2 — Draft GGUF architecture is loadable by this binary.
+    #   'gemma4_assistant' is an MTP-head-only format that only AtomicBot
+    #   binaries understand. Probe it by running a single-token, zero-context
+    #   dry load (--n-predict 0) and checking whether stderr contains
+    #   "unknown model architecture". This is the same error llama-server
+    #   emits at startup — catching it here lets us skip gracefully.
+
+    $binaryHelp = (& $llama -h 2>&1 | Out-String)
+    $binaryHasSpecDraft = $binaryHelp -match 'spec.draft.model|spec-draft-model'
+    $binaryHasLegacyDraft = $binaryHelp -match 'model-draft|draft-max'
+
+    if (-not $binaryHasSpecDraft -and -not $binaryHasLegacyDraft) {
+      Write-Host ("Speculative decoding skipped: llama-server binary does not advertise draft flags. " +
+        "Use an AtomicBot-compatible binary or keep ENABLE_MTP_DRAFTER=false.") -ForegroundColor Yellow
+    } else {
+      if (-not $binaryHasSpecDraft -and $binaryHasLegacyDraft) {
+        if ($allowLegacyDraft) {
+          Write-Host ("Speculative decoding will use the explicit legacy draft lane (--model-draft / --draft-max). " +
+            "This lane requires TURBO_ALLOW_LEGACY_DRAFT=true and stays off by default.") -ForegroundColor DarkGray
+        } else {
+          Write-Host ("Speculative decoding skipped: binary only advertises legacy draft flags. " +
+            "Set TURBO_ALLOW_LEGACY_DRAFT=true to opt into that lane explicitly, or use an AtomicBot-compatible binary.") -ForegroundColor Yellow
+          $binaryHasLegacyDraft = $false
+        }
+      }
+      # Gate 2a — GGUF header scan: read the first 64 KB of the draft GGUF and
+      # look for MTP-head-only architecture strings (gemma4-assistant, etc.) and
+      # verify embedding dimension compatibility with the target model.
+      $draftGgufArch = $null
+      $draftDim = 0
+      try {
+        $ggufStream = [System.IO.File]::OpenRead($env:MTP_DRAFT_MODEL)
+        $ggufBuf    = New-Object byte[] 65536
+        $ggufRead   = $ggufStream.Read($ggufBuf, 0, $ggufBuf.Length)
+        $ggufStream.Close()
+        $ggufText   = [System.Text.Encoding]::UTF8.GetString($ggufBuf, 0, $ggufRead)
+        # Scan raw bytes for known architecture names
+        $archNames  = @('gemma4-assistant', 'gemma4_assistant', 'llama-assistant', 'llama_assistant', 'qwen2-assistant', 'qwen2_assistant', 'gemma4', 'qwen35', 'qwen2', 'llama')
+        foreach ($a in $archNames) {
+          if ($ggufText -match [regex]::Escape($a)) { $draftGgufArch = $a; break }
+        }
+        $keyDraft = if ($ggufText.IndexOf('.embedding_length_out') -ge 0) { '.embedding_length_out' } else { '.embedding_length' }
+        $idxDraft = $ggufText.IndexOf($keyDraft)
+        if ($idxDraft -ge 0) {
+          $draftDim = [BitConverter]::ToUInt32($ggufBuf, $idxDraft + $keyDraft.Length + 4)
+        }
+      } catch {
+        # Can't read the file — let the binary probe decide.
+      }
+
+      # Target model dimension & architecture preflight check
+      $targetGgufArch = $null
+      $targetDim = 0
+      if ($model -and (Test-Path $model)) {
+        try {
+          $tgtStream = [System.IO.File]::OpenRead($model)
+          $tgtBuf    = New-Object byte[] 65536
+          $tgtRead   = $tgtStream.Read($tgtBuf, 0, $tgtBuf.Length)
+          $tgtStream.Close()
+          $tgtText   = [System.Text.Encoding]::UTF8.GetString($tgtBuf, 0, $tgtRead)
+          $tgtArchs  = @('qwen35', 'qwen2', 'gemma4', 'llama')
+          foreach ($ta in $tgtArchs) {
+            if ($tgtText -match [regex]::Escape($ta)) { $targetGgufArch = $ta; break }
+          }
+          $idxTgt = $tgtText.IndexOf('.embedding_length')
+          if ($idxTgt -ge 0) {
+            $targetDim = [BitConverter]::ToUInt32($tgtBuf, $idxTgt + 17 + 4)
+          }
+        } catch {}
+      }
+
+      $knownMtpOnlyArchs = @('gemma4-assistant', 'gemma4_assistant', 'llama-assistant', 'llama_assistant', 'qwen2-assistant', 'qwen2_assistant')
+      $draftRequiresAtomicBot = ($draftGgufArch -and ($knownMtpOnlyArchs -contains $draftGgufArch))
+
+      if ($draftRequiresAtomicBot -and -not $binaryHasSpecDraft) {
+        Write-Host ("Speculative decoding skipped: draft GGUF has MTP-head-only architecture '$draftGgufArch'. " +
+          "The file '$($env:MTP_DRAFT_MODEL)' requires the AtomicBot llama-server binary. " +
+          "Either set LLAMA_SERVER_PATH to the AtomicBot binary, or set ENABLE_MTP_DRAFTER=false.") -ForegroundColor Yellow
+      } elseif ($draftDim -gt 0 -and $targetDim -gt 0 -and $draftDim -ne $targetDim) {
+        Write-Host ("Speculative decoding skipped: dimension mismatch between target model ($targetDim) and draft model ($draftDim). " +
+          "Target: '$model' ($targetGgufArch, dim=$targetDim) vs Draft: '$($env:MTP_DRAFT_MODEL)' ($draftGgufArch, dim_out=$draftDim). " +
+          "Speculative drafters must match the base model architecture and hidden dimension. Falling back to target-only execution.") -ForegroundColor Yellow
+      } elseif ($targetGgufArch -and $draftGgufArch -and ($targetGgufArch -match 'qwen' -and $draftGgufArch -match 'gemma')) {
+        Write-Host ("Speculative decoding skipped: cross-architecture mismatch between target '$targetGgufArch' and draft '$draftGgufArch'. " +
+          "Target model is Qwen/Ornith while draft model is Gemma. Falling back to target-only execution.") -ForegroundColor Yellow
+      } else {
+        # Gate 2b — Dry-load the draft GGUF with zero predictions and a minimal context.
+        # Redirect stdout to null; capture stderr to detect arch errors.
+        $draftProbeArgs = @(
+          '--model', $env:MTP_DRAFT_MODEL,
+          '--ctx-size', '1',
+          '--n-predict', '0',
+          '--log-disable',
+          '--no-mmap'
+        )
+        $draftProbeOut = & $llama @draftProbeArgs 2>&1 | Out-String
+        $draftArchError = $draftProbeOut -match 'unknown model architecture'
+
+        if ($draftArchError) {
+          # Extract the arch name from the error for a useful message.
+          $archMatch = [regex]::Match($draftProbeOut, "unknown model architecture: '([^']+)'")
+          $badArch = if ($archMatch.Success) { $archMatch.Groups[1].Value } else { 'unknown' }
+          Write-Host ("Speculative decoding skipped: draft model has unsupported architecture '$badArch'. " +
+            "The GGUF at '$($env:MTP_DRAFT_MODEL)' is an MTP-head-only format that requires the AtomicBot " +
+            "llama-server binary. Either set LLAMA_SERVER_PATH to the AtomicBot binary, or set " +
+            "ENABLE_MTP_DRAFTER=false to use the main model without speculative decoding.") -ForegroundColor Yellow
+        } else {
+          $TurboDraftModel = $env:MTP_DRAFT_MODEL
+          $TurboSpeculative = $true
+          if ($binaryHasSpecDraft) {
+            $TurboDraftMode = 'spec-draft-model'
+          } elseif ($binaryHasLegacyDraft -and $allowLegacyDraft) {
+            $TurboDraftMode = 'legacy-draft'
+          }
+        }
+      }
+    }
+  }
+}
+
+if ($env:DRAFT_MODEL_PATH) {
+  Write-Host 'Deprecated DRAFT_MODEL_PATH is ignored by this launcher. Use ENABLE_MTP_DRAFTER=true and MTP_DRAFT_MODEL=<path> instead.' -ForegroundColor Yellow
+}
+
+$TurboFlashAttn = 'on' # Current script hardcodes -fa on
+$TurboDraftModelDisplay = if ($TurboDraftModel) { $TurboDraftModel } else { 'none' }
+$MeasuredTokensPerSecDisplay = if ($env:MEASURED_TOKENS_PER_SEC) { $env:MEASURED_TOKENS_PER_SEC } else { 'not measured' }
+$MeasuredVramDisplay = if ($env:MEASURED_VRAM) { $env:MEASURED_VRAM } else { 'not measured' }
+
+Write-Host "`nTurboQuant resolved config:" -ForegroundColor Gray
+Write-Host "  URL:              http://127.0.0.1:$port"
+Write-Host "  Model:            $model"
+Write-Host "  Draft model:      $TurboDraftModelDisplay"
+Write-Host "  Speculative:      $TurboSpeculative"
+Write-Host "  Context:          $ctxLen"
+Write-Host "  GPU layers:       $ngl"
+Write-Host "  Flash attention:  $TurboFlashAttn"
+Write-Host "  KV cache K:       $kvK"
+Write-Host "  KV cache V:       $kvV"
+Write-Host "  CPU threads:      $threads"
+Write-Host "  Batch size:       $(if ($batchSize) { $batchSize } else { 'default' })"
+Write-Host "  UBatch size:      $(if ($ubatchSize) { $ubatchSize } else { 'default' })"
+Write-Host "  Tokens/sec:       $MeasuredTokensPerSecDisplay"
+Write-Host "  VRAM:             $MeasuredVramDisplay"
+$headroomInfo = Test-HeadroomProxyHealth
+$headroomDisplay = if ($headroomInfo.Healthy) {
+  "$($headroomInfo.Url) (ACTIVE: CCR & AST compression, v$($headroomInfo.Version))"
+} else {
+  "$($headroomInfo.Url) (INACTIVE: CCR proxy offline; start via 'headroom proxy')"
+}
+Write-Host "  Headroom Proxy:   $headroomDisplay"
+
+# Diagnostic Warnings
+if ([string]::IsNullOrWhiteSpace($ngl) -or $ngl -eq "0") {
+    Write-Warning "GPU offload is not configured or set to 0. TurboQuant may run CPU-only."
+}
+if ($ngl -match "^-") {
+    # This block shouldn't be reached if normalized above, but kept for logic safety
+    Write-Warning "TURBO_NGL is negative ($ngl). llama.cpp-style --n-gpu-layers usually expects a positive layer count."
+}
+if (-not $TurboSpeculative) {
+    Write-Host "  Speculative decoding: disabled (set ENABLE_MTP_DRAFTER=true + MTP_DRAFT_MODEL to enable)" -ForegroundColor DarkGray
+}
+Write-Host ""
+
+# -- Existing server check: reuse only a matching, ready instance -----------
+# Never terminate an arbitrary process on the configured port. In particular,
+# a failed endpoint request must not swallow a process-ownership exception.
+function Get-TurboListeningPids {
+    param([Parameter(Mandatory)][int]$Port)
+    @(Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue |
+        Where-Object { $_.OwningProcess -gt 0 } |
+        Select-Object -ExpandProperty OwningProcess -Unique)
+}
+
+function Stop-VerifiedTurboServer {
+    param([Parameter(Mandatory)][int]$Port)
+    $owners = @(Get-TurboListeningPids -Port $Port)
+    if ($owners.Count -eq 0) {
+        throw "Port $Port responded but has no identifiable Windows listening process. Refusing to kill a process or start a duplicate; check WSL/Docker port forwarding."
+    }
+
+    # Validate ALL owners before stopping ANY of them.
+    foreach ($ownerId in $owners) {
+        $owner = Get-Process -Id $ownerId -ErrorAction SilentlyContinue
+        if (-not $owner -or $owner.ProcessName -ne 'llama-server') {
+            $ownerName = if ($owner) { $owner.ProcessName } else { 'unknown' }
+            throw "Port $Port belongs to PID $ownerId ($ownerName), not a verified llama-server. Refusing to terminate it."
+        }
+    }
+    Write-Host "Stopping existing llama-server process(es) on :${Port}: $($owners -join ', ')" -ForegroundColor Cyan
+    foreach ($ownerId in $owners) {
+        Stop-Process -Id $ownerId -Force -ErrorAction Stop
+    }
+    for ($attempt = 0; $attempt -lt 40; $attempt++) {
+        if (@(Get-TurboListeningPids -Port $Port).Count -eq 0) {
+            Start-Sleep -Seconds 1  # allow GPU driver memory cleanup
+            return
+        }
+        Start-Sleep -Milliseconds 250
+    }
+    throw "Port $Port was not released after stopping the existing llama-server. Aborting to avoid a duplicate launch."
+}
+
+$targetReasoningMode = if ($activeTurboProfile) {
+    $activeTurboProfile.Reasoning
+} elseif ($env:TURBO_REASONING) {
+    $env:TURBO_REASONING
+} else {
+    'off'
+}
+$targetModelAlias = if ($modelAlias) { $modelAlias } else { Split-Path -Leaf $model }
+$targetVision = [bool](-not $TextOnly -and ($wantsVision -or $modelFamily -eq 'gemma4') -and $mmproj -and (Test-Path $mmproj))
+
+if (-not $StatusOnly) {
+    $currentOwners = @(Get-TurboListeningPids -Port ([int]$port))
+    $serverResponding = Test-LlamaServerHealth
+    if ($serverResponding -or $currentOwners.Count -gt 0) {
+        $reuseReasons = [System.Collections.Generic.List[string]]::new()
+        $canReuse = $false
+        if ($serverResponding) {
+            try {
+                $props = Invoke-RestMethod "http://127.0.0.1:$port/props" -TimeoutSec 3 -ErrorAction Stop
+                $runningModelAlias = $props.model_alias
+                if (-not $runningModelAlias -and $props.model_path) {
+                    $runningModelAlias = Split-Path -Leaf $props.model_path
+                }
+                $modelOk = ($runningModelAlias -eq $targetModelAlias)
+                $systemRoleOk = ($props.chat_template_caps.supports_system_role -eq $true) -or
+                    ($props.system_prompt.supports_system_role -eq $true) -or
+                    ($props.supports_system_role -eq $true)
+                $toolsOk = ($props.chat_template_caps.supports_tool_calls -eq $true) -or
+                    ($props.chat_template_caps.supports_tools -eq $true) -or
+                    ($props.supports_tool_calls -eq $true)
+                $runningReasoningFormat = $props.default_generation_settings.params.reasoning_format
+                $reasoningOk = if ($targetReasoningMode -eq 'on') {
+                    ($runningReasoningFormat -and $runningReasoningFormat -ne 'none') -or
+                    (($props.chat_template_caps.supports_preserve_reasoning -eq $true) -and ([string]$props.chat_template -match '<think>'))
+                } else {
+                    (-not $runningReasoningFormat) -or ($runningReasoningFormat -in @('none', 'auto'))
+                }
+                $runningVision = ($props.modalities.vision -eq $true)
+                $visionOk = ($runningVision -eq $targetVision)
+
+                # /slots reports effective per-slot context. No silent reuse if
+                # context cannot be verified, because 4K vs 65K is material.
+                $ctxOk = $false
+                $runningCtx = $null
+                try {
+                    $slotsInfo = Invoke-RestMethod "http://127.0.0.1:$port/slots" -TimeoutSec 2 -ErrorAction Stop
+                    if ($slotsInfo -and $slotsInfo.Count -gt 0 -and $null -ne $slotsInfo[0].n_ctx) {
+                        $runningCtx = [int]$slotsInfo[0].n_ctx
+                        $ctxOk = ($runningCtx -eq [int]$ctxLen)
+                    }
+                } catch {
+                    # Some builds disable /slots; use /props if available.
+                }
+                if (-not $ctxOk -and $null -ne $props.n_ctx) {
+                    $runningCtx = [int]$props.n_ctx
+                    $ctxOk = ($runningCtx -eq [int]$ctxLen)
+                }
+
+                if (-not $modelOk) { $reuseReasons.Add("model mismatch: running=$runningModelAlias target=$targetModelAlias") }
+                if (-not $systemRoleOk) { $reuseReasons.Add('system-role capability unavailable') }
+                if (-not $toolsOk) { $reuseReasons.Add('tool-calling capability unavailable') }
+                if (-not $reasoningOk) { $reuseReasons.Add("reasoning mismatch: running=$runningReasoningFormat target=$targetReasoningMode") }
+                if (-not $visionOk) { $reuseReasons.Add("vision mismatch: running=$runningVision target=$targetVision") }
+                if (-not $ctxOk) { $reuseReasons.Add("context mismatch or unknown: running=$runningCtx target=$ctxLen") }
+                $canReuse = ($modelOk -and $systemRoleOk -and $toolsOk -and $reasoningOk -and $visionOk -and $ctxOk)
+            } catch {
+                $reuseReasons.Add("/props or configuration probe failed: $($_.Exception.Message)")
+            }
+        } else {
+            $reuseReasons.Add('port is occupied but /health is not ready')
+        }
+
+        if ($canReuse) {
+            Write-Host "llama-server already matches requested profile on :$port (model=$targetModelAlias, ctx=$ctxLen); reusing PID(s) $($currentOwners -join ', ')" -ForegroundColor Green
+            exit 0
+        }
+        Write-Host ("Existing server on :$port cannot be reused: $($reuseReasons -join '; ')") -ForegroundColor Yellow
+        Stop-VerifiedTurboServer -Port ([int]$port)
+    }
+}
+
+if ($StatusOnly) {
+    $statusExitCode = 0
+    Write-Host "--- Status Check ---" -ForegroundColor Gray
+    $headroomInfo = Test-HeadroomProxyHealth
+    if ($headroomInfo.Healthy) {
+        Write-Host "Headroom: OK (v$($headroomInfo.Version) on $($headroomInfo.Url) — CCR/AST optimization active)" -ForegroundColor Green
+    } else {
+        Write-Host "Headroom: INACTIVE (proxy offline on $($headroomInfo.Url); start via 'headroom proxy')" -ForegroundColor Yellow
+    }
+    try {
+        $health = Invoke-RestMethod ('http://127.0.0.1:' + $port + '/health') -TimeoutSec 2
+        Write-Host "Health: OK (status: $($health.status))" -ForegroundColor Green
+        $null = Write-TurboLaunchStatus ([ordered]@{
+            status = 'ok'
+            port = $port
+            headroom_url = $headroomInfo.Url
+            headroom_healthy = [bool]$headroomInfo.Healthy
+            model = $model
+            draft_model = if ($TurboDraftModel) { $TurboDraftModel } else { '' }
+            speculative = [bool]$TurboSpeculative
+            draft_mode = $TurboDraftMode
+            text_only = [bool]$TextOnly
+            detached = [bool]$Detached
+            turbo_profile = $kvProfile
+            llama_server = $llama
+            launch_mode = 'status-only'
+            server_healthy = $true
+            retry_count = 0
+            retry_reason = ''
+            exit_code = 0
+            error = ''
+            health_url = "http://127.0.0.1:$port/health"
+            stdout_path = ''
+            stderr_path = ''
+        })
+    } catch {
+        $statusExitCode = 1
+        Write-Host "Health: FAILED (server likely down on port $port)" -ForegroundColor Red
+        $null = Write-TurboLaunchStatus ([ordered]@{
+            status = 'failed'
+            port = $port
+            model = $model
+            draft_model = if ($TurboDraftModel) { $TurboDraftModel } else { '' }
+            speculative = [bool]$TurboSpeculative
+            draft_mode = $TurboDraftMode
+            text_only = [bool]$TextOnly
+            detached = [bool]$Detached
+            turbo_profile = $kvProfile
+            llama_server = $llama
+            launch_mode = 'status-only'
+            server_healthy = $false
+            retry_count = 0
+            retry_reason = ''
+            exit_code = 1
+            error = $_.Exception.Message
+            health_url = "http://127.0.0.1:$port/health"
+            stdout_path = ''
+            stderr_path = ''
+        })
+    }
+    exit $statusExitCode
+}
+
+# -- Build argument list --------------------------------------------------
+$baseArgs = @(
+  '-m',      $model,
+  '--host',  '127.0.0.1',
+  '--port',  $port,
+  '-ngl',    $ngl,
+  '-fa',     'on',
+  '-ctk',    $kvK,
+  '-ctv',    $kvV,
+  '-c',      $ctxLen,
+  '-t',      $threads
+)
+
+if ($modelAlias) {
+  if (Test-LlamaFlag $llama '--alias') {
+    $baseArgs = $baseArgs + @('--alias', $modelAlias)
+    Write-Host "Model alias: --alias $modelAlias (disambiguates from other profiles sharing the same GGUF filename)" -ForegroundColor Cyan
+  } else {
+    Write-Host "Model alias: profile '$($activeTurboProfile.Id)' wants alias '$modelAlias' but this llama-server build has no --alias flag — /props.model_alias will stay ambiguous" -ForegroundColor Yellow
+  }
+}
+
+# -- Parallel slots check (Multi-core / Concurrent processing) -------------
+$slots = if ($env:TURBO_PARALLEL) { $env:TURBO_PARALLEL } else { '4' }
+if (Test-LlamaFlag $llama '--parallel') {
+    $baseArgs = $baseArgs + @('--parallel', $slots)
+    Write-Host "Parallel slots: --parallel $slots enabled" -ForegroundColor Cyan
+} elseif (Test-LlamaFlag $llama '-np') {
+    $baseArgs = $baseArgs + @('-np', $slots)
+    Write-Host "Parallel slots: -np $slots enabled" -ForegroundColor Cyan
+}
+
+if ($kvProfile -eq 'atomicbot') {
+    # Enable triattention only if the binary actually advertises it.
+    # Some Atomic builds ship speculative decode but not this extra kernel path.
+    if (Test-LlamaFlag $llama '--triattention-budget') {
+      $baseArgs = $baseArgs + @(
+        '--triattention-budget', '4096',
+        '--triattention-window', '128',
+        '--triattention-mode', 'per-kv-head',
+        '--triattention-normalize'
+      )
+    } else {
+      Write-Host "AtomicBot: triattention flags not advertised by this binary - skipping" -ForegroundColor Yellow
+    }
+}
+# -- Speculative Decoding: inject Atomic/spec-draft flags for accelerated throughput --
+if ($TurboDraftModel -and -not $draftRequiresAtomicBot) {
+    $specDraftFlagsSupported = Test-LlamaFlag $llama '--spec-draft-n-max'
+    Write-Host ("Speculative Decoding: draft model enabled ($TurboDraftModel)") -ForegroundColor Cyan
+    Write-Host ("Speculative Decoding automatically disables vision/multimodal (--mmproj)") -ForegroundColor Yellow
+    $TextOnly = $true
+  if ($specDraftFlagsSupported) {
+    $baseArgs = $baseArgs + @(
+      '--spec-draft-model', $TurboDraftModel,
+      '--spec-type', 'draft-mtp',
+      '--spec-draft-n-max', '3',
+      '--spec-draft-n-min', '0',
+      '--spec-draft-ngl', '99',
+      '-ctkd', $(if ($binaryAcceptsTurbo) { 'turbo3' } else { 'q8_0' }),
+      '-ctvd', $(if ($binaryAcceptsTurbo) { 'turbo3' } else { 'q8_0' })
+    )
+  } else {
+    $baseArgs = $baseArgs + @(
+      '--model-draft', $TurboDraftModel,
+      '--draft-max', '8',
+      '--draft-min', '1',
+      '--draft-p-min', '0.6',
+      '--n-gpu-layers-draft', '99'
+    )
+  }
+}
+
+# Attempt mmproj loading when: the active profile explicitly requires vision
+# (WantsVision, already fail-closed above if unresolved), OR the resolved
+# family is 'gemma4' (that family's mmproj has always been best-effort/
+# opportunistic, matching this launcher's pre-existing default-profile
+# behavior). Any other family (e.g. 'ornith-1.5' text profile, 'ornith-1.0')
+# never opportunistically loads a projector - closing the cross-family
+# substitution risk instead of only special-casing 'ornith-1.5' by name.
+$shouldAttemptMmproj = $wantsVision -or ($modelFamily -eq 'gemma4')
+if (-not $shouldAttemptMmproj) {
+  Write-Host "Multimodal projector: not attempted for model family '$modelFamily' (profile '$($activeTurboProfile.Id)' does not request vision)" -ForegroundColor Cyan
+}
+if (-not $TextOnly -and $shouldAttemptMmproj -and $mmproj -and (Test-Path $mmproj)) {
+  Write-Host "Multimodal projector: loading $mmproj (family '$modelFamily', wantsVision=$wantsVision)" -ForegroundColor Cyan
+  $baseArgs = @('-m', $model, '--mmproj', $mmproj) + $baseArgs[2..($baseArgs.Length - 1)]
+}
+
+# -- Legal LoRA adapter injection (Path A - runtime LoRA over base-model GGUFs) --
+# Use when ROTORQUANT_MODEL_PATH points at a base-model GGUF (e.g. majentik IQ4_XS)
+# that lacks the legal fine-tune. The merged Ollama blob already has the LoRA baked
+# in, so set LEGAL_LORA_PATH only when running a non-merged GGUF.
+# Path B (re-quantize merged model) produces better quality - see memory card.
+if ($env:LEGAL_LORA_PATH) {
+  if (Test-Path $env:LEGAL_LORA_PATH) {
+    $loraExt = [System.IO.Path]::GetExtension($env:LEGAL_LORA_PATH)
+    if ($loraExt -ieq '.safetensors') {
+      Write-Host ("Legal LoRA: skipping $($env:LEGAL_LORA_PATH) (safetensors adapters are not supported by llama-server --lora; use a GGUF LoRA adapter or unset LEGAL_LORA_PATH)") -ForegroundColor Yellow
+    }
+    else {
+    $loraScale = if ($env:LEGAL_LORA_SCALE) { $env:LEGAL_LORA_SCALE } else { '0.8' }
+    $loraHelp = (& $llama -h 2>&1 | Out-String)
+    if ($loraHelp -match '--lora-scaled') {
+      $loraPathForScaled = $env:LEGAL_LORA_PATH
+      if ([System.IO.Path]::IsPathRooted($loraPathForScaled)) {
+        try {
+          $loraPathForScaled = [System.IO.Path]::GetRelativePath((Get-Location).Path, $loraPathForScaled)
+        }
+        catch {
+          # If relative conversion fails, keep original path and let llama-server validate it.
+        }
+      }
+      Write-Host ("Legal LoRA: --lora-scaled ${loraPathForScaled}:$loraScale") -ForegroundColor Cyan
+      $baseArgs = $baseArgs + @('--lora-scaled', "${loraPathForScaled}:$loraScale")
+    }
+    elseif ($loraHelp -match '--lora-scale') {
+      Write-Host ("Legal LoRA: --lora $($env:LEGAL_LORA_PATH) --lora-scale $loraScale") -ForegroundColor Cyan
+      $baseArgs = $baseArgs + @('--lora', $env:LEGAL_LORA_PATH, '--lora-scale', $loraScale)
+    }
+    else {
+      Write-Host ("Legal LoRA: --lora $($env:LEGAL_LORA_PATH) (scale unsupported by this llama-server build)") -ForegroundColor Yellow
+      $baseArgs = $baseArgs + @('--lora', $env:LEGAL_LORA_PATH)
+    }
+    }
+  } else {
+    Write-Host ("Legal LoRA: LEGAL_LORA_PATH set but file not found at $($env:LEGAL_LORA_PATH) - skipping") -ForegroundColor Yellow
+  }
+}
+
+# -- AtomicBot: inject draft-model + MTP speculative decode for Gemma4 assistant --
+# Current Atomic binary exposes --spec-draft-model / --spec-type draft-mtp.
+# This lane is benchmark-only; keep the canonical 8090 summary server separate.
+if ($kvProfile -eq 'atomicbot') {
+  if ($TurboDraftModel -and (Test-Path $TurboDraftModel)) {
+    Write-Host ("AtomicBot: draft assistant active ($TurboDraftModel)") -ForegroundColor Cyan
+  } else {
+    Write-Host ("AtomicBot: no draft assistant path found - running as target-only benchmark") -ForegroundColor Yellow
+  }
+}
+
+
+
+# -- Reasoning: --reasoning on/off (+ --reasoning-budget) and --reasoning-format --
+# `--reasoning-format` controls parsing of emitted thought markers; it does not
+# enable reasoning. The normal Ornith/OpenCode profile omits this optional flag
+# entirely. `auto` or `deepseek` remains an explicit opt-in through
+# TURBO_REASONING_FORMAT for a compatible reasoning profile.
+$reasoningMode = if ($activeTurboProfile) {
+    $activeTurboProfile.Reasoning
+} elseif ($env:TURBO_REASONING) {
+    $env:TURBO_REASONING
+} else {
+    'off'
+}
+$reasoningBudget = if ($activeTurboProfile) {
+    $activeTurboProfile.ReasoningBudget
+} elseif ($env:TURBO_REASONING_BUDGET) {
+    [int]$env:TURBO_REASONING_BUDGET
+} else {
+    0
+}
+$reasoningFormat = if ($env:TURBO_REASONING_FORMAT) { $env:TURBO_REASONING_FORMAT.Trim() } else { $null }
+
+if (Test-LlamaFlag $llama '--reasoning') {
+    $baseArgs = $baseArgs + @('--reasoning', $reasoningMode)
+    Write-Host "Reasoning: --reasoning $reasoningMode" -ForegroundColor Cyan
+    if ($reasoningMode -eq 'on' -and $reasoningBudget -gt 0 -and (Test-LlamaFlag $llama '--reasoning-budget')) {
+        $baseArgs = $baseArgs + @('--reasoning-budget', $reasoningBudget)
+        Write-Host "Reasoning budget: --reasoning-budget $reasoningBudget" -ForegroundColor Cyan
+    }
+} else {
+    Write-Host "Reasoning: --reasoning not supported by this binary - relying on template-based reasoning only" -ForegroundColor DarkYellow
+}
+
+if ($reasoningFormat -and (Test-LlamaFlag $llama '--reasoning-format')) {
+    $baseArgs = $baseArgs + @('--reasoning-format', $reasoningFormat)
+    Write-Host "Reasoning format: --reasoning-format $reasoningFormat" -ForegroundColor Cyan
+} else {
+    Write-Host "Reasoning format: omitted (native template/default; set TURBO_REASONING_FORMAT=auto to opt in)" -ForegroundColor Cyan
+}
+
+# -- Chat template: custom_pub_chat_template_gemma4.jinja for Gemma4-family OpenCode-compatible chat/tool calling --
+# DEFAULT (Gemma4-family models only): custom_pub_chat_template_gemma4.jinja — uses native
+# Gemma 4 DSL (<|tool_call>, <|turn>), fixes 4 known bugs (null→"None", string args corruption,
+# reasoning preservation, turn-tag asymmetry), enables thinking by default (P2 patch improves
+# tool-call accuracy per model card).
+# HARD RULE (Gemma4-family only): when an external template applies at all, always pass
+# --chat-template-file. Never use --chat-template <name>. This rule does NOT apply to models
+# whose profile requires the embedded template (Ornith/hforf.gguf) - see $isOrnithModel below,
+# which must resolve to "no --chat-template-file flag at all", not an empty/default one.
+# To use summary-only mode (no tools) on a Gemma4-family model: set
+# TURBO_CHAT_TEMPLATE_FILE=<path to summary-clean.jinja>
+$defaultTemplate = Join-Path $PSScriptRoot "..\configs\templates\custom_pub_chat_template_gemma4.jinja"
+# Model-aware gate, not just profile-aware: hforf.gguf (Ornith) must never get
+# the Gemma4 override template, whether it was selected via -StartupProfile
+# ornith OR resolved through the legacy env-var path (ROTORQUANT_MODEL_PATH /
+# TURBO_MODEL_PATH / TURBO_MODEL / LOCAL_GEMMA_MODEL / auto-discovery). Before
+# this check existed, the legacy path fell through to $defaultTemplate
+# unconditionally whenever the file existed on disk, silently applying the
+# Gemma4 template to hforf.gguf.
+$isOrnithModel = (Get-NormalizedModelName $model) -eq 'hforf.gguf'
+$chatTemplateFile = if ($activeTurboProfile) {
+    # Profile owns the decision explicitly. $null (Ornith) means "use the
+    # GGUF's embedded tokenizer.chat_template" - do NOT fall back to the
+    # Gemma4 override, that's exactly the untested substitution the profile
+    # spec warns against.
+    $activeTurboProfile.TemplateFile
+} elseif ($env:TURBO_CHAT_TEMPLATE_FILE -and $env:TURBO_CHAT_TEMPLATE_FILE -ne 'none') {
+    # Explicit operator override wins even for hforf.gguf - this is intent,
+    # not an accidental default.
+    $env:TURBO_CHAT_TEMPLATE_FILE
+} elseif ($isOrnithModel) {
+    $null
+} elseif (Test-Path $defaultTemplate) {
+    $defaultTemplate
+} else {
+    $null
+}
+
+if ($chatTemplateFile -and (Test-Path $chatTemplateFile)) {
+    # HARD RULE: never pass both --chat-template and --chat-template-file.
+    # This launcher only ever emits --chat-template-file (or neither) - see
+    # the profile table comment above.
+    $baseArgs = $baseArgs + @('--chat-template-file', $chatTemplateFile)
+    Write-Host "Chat template: --chat-template-file $chatTemplateFile" -ForegroundColor Cyan
+} elseif ($activeTurboProfile -and -not $activeTurboProfile.TemplateFile) {
+    Write-Host "Chat template: profile '$($activeTurboProfile.Id)' uses the GGUF embedded template (tokenizer.chat_template)" -ForegroundColor Cyan
+} elseif ($isOrnithModel) {
+    Write-Host "Chat template: hforf.gguf resolved outside a profile - using the GGUF embedded template (tokenizer.chat_template), not the Gemma4 override" -ForegroundColor Cyan
+} elseif ($env:TURBO_CHAT_TEMPLATE_FILE) {
+    Write-Host "Chat template: TURBO_CHAT_TEMPLATE_FILE set but not found - will use GGUF built-in" -ForegroundColor Yellow
+} else {
+    Write-Host "Chat template: $defaultTemplate not found - will use GGUF built-in (supports_tools may be false)" -ForegroundColor Yellow
+}
+
+# -- Model resolution receipt: makes the resolved-model/template decision
+#    visible in the launch log instead of only inferable from other lines.
+#    If this ever regresses (e.g. hforf.gguf resolved but an external
+#    template applied), the mismatch is immediately visible here.
+$normalizedModelName = Get-NormalizedModelName $model
+$templateSource = if ($chatTemplateFile -and (Test-Path $chatTemplateFile)) {
+    if ($activeTurboProfile) { "profile:$($activeTurboProfile.Id)" }
+    elseif ($env:TURBO_CHAT_TEMPLATE_FILE) { 'environment-override' }
+    else { 'default-gemma4' }
+} else {
+    'embedded'
+}
+# Distinguish WHY no external template is applied: Ornith requiring embedded
+# is a different condition than "nothing configured happened to resolve to
+# nothing" - collapsing both into one label (as an earlier revision did) was
+# misleading during regression triage.
+$externalTemplateStatus = if ($templateSource -ne 'embedded') {
+    'ENABLED'
+} elseif ($isOrnithModel) {
+    'DISABLED_ORNITH_REQUIRES_EMBEDDED'
+} else {
+    'NOT_CONFIGURED'
+}
+Write-Host "MODEL_RESOLUTION_SOURCE=$modelResolutionSource" -ForegroundColor DarkGray
+Write-Host "RESOLVED_MODEL_PATH=$model" -ForegroundColor DarkGray
+Write-Host "NORMALIZED_MODEL=$normalizedModelName" -ForegroundColor DarkGray
+Write-Host "TEMPLATE_SOURCE=$templateSource" -ForegroundColor DarkGray
+Write-Host "EXTERNAL_CHAT_TEMPLATE=$externalTemplateStatus" -ForegroundColor DarkGray
+
+# -- Stop sequences: prevent the model from emitting turn markers into the output.
+# custom_pub_chat_template_gemma4.jinja uses native Gemma 4 DSL tokens (<turn|>, <|turn>).
+if (Test-LlamaFlag $llama '--stop') {
+    $baseArgs = $baseArgs + @('--stop', '<turn|>', '--stop', '<|turn>', '--stop', '<|mask_end|>')
+    Write-Host "Stop sequences: --stop <turn|> / <|turn> / <|mask_end|> enabled" -ForegroundColor Cyan
+} else {
+    Write-Host "Stop sequences: --stop not supported by this binary - leaving template boundary unguarded" -ForegroundColor DarkYellow
+}
+
+# -- Tool-calling: --jinja for OpenAI function-call format ----------------
+if (Test-LlamaFlag $llama '--jinja') {
+    Write-Host "Tool calling: --jinja enabled (OpenCode/TRACE MCP loop)" -ForegroundColor Cyan
+    $baseArgs = $baseArgs + @('--jinja')
+} else {
+    Write-Host "Tool calling: --jinja not in this binary - Gemma4 uses generic tool-call path" -ForegroundColor DarkYellow
+}
+
+# -- Skip chat template parsing only when explicitly requested -----------------
+# The OpenCode template should validate cleanly on a healthy llama-server build.
+# If you need to bypass template validation for a local experiment, set
+# Chat parsing ALWAYS enabled (required for tool-call parsing).
+# Disabling chat parsing breaks Cline/OpenCode tool-call handling.
+Write-Host "Chat parsing: using llama-server template validation (NOT SKIPPED)" -ForegroundColor Green
+
+# -- KV prefix reuse: reduce prefill cost on repeated system prompts -------
+if (Test-LlamaFlag $llama '--cache-prompt') {
+    $baseArgs = $baseArgs + @('--cache-prompt')
+    Write-Host "KV cache: --cache-prompt enabled" -ForegroundColor Cyan
+} else {
+    Write-Host "KV cache: --cache-prompt not supported by this binary - skipping" -ForegroundColor DarkYellow
+}
+if (Test-LlamaFlag $llama '--cache-reuse') {
+    $baseArgs = $baseArgs + @('--cache-reuse', '256')
+    Write-Host "KV cache: --cache-reuse 256 enabled" -ForegroundColor Cyan
+} else {
+    Write-Host "KV cache: --cache-reuse not supported by this binary - skipping" -ForegroundColor DarkYellow
+}
+
+# -- Telemetry: Prometheus metrics + per-request performance timing --------
+# --metrics exposes /metrics (llamacpp:prompt_tokens_total, predicted_tokens, etc.)
+# --perf adds timings.cache_n / prompt_n / predicted_per_second to each response
+# Both are read-only; no effect on model behavior or memory.
+if (Test-LlamaFlag $llama '--metrics') {
+    $baseArgs = $baseArgs + @('--metrics')
+    Write-Host "Telemetry: --metrics enabled (/metrics endpoint active)" -ForegroundColor Cyan
+} else {
+    Write-Host "Telemetry: --metrics not supported by this binary - skipping" -ForegroundColor DarkYellow
+}
+if (Test-LlamaFlag $llama '--perf') {
+    $baseArgs = $baseArgs + @('--perf')
+    Write-Host "Telemetry: --perf enabled (timings.cache_n / prompt_n in responses)" -ForegroundColor Cyan
+} else {
+    Write-Host "Telemetry: --perf not supported by this binary - skipping" -ForegroundColor DarkYellow
+}
+
+if ($batchSize) {
+    if (Test-LlamaFlag $llama '--batch-size') {
+        $baseArgs = $baseArgs + @('--batch-size', $batchSize)
+        Write-Host "Batch size: --batch-size $batchSize enabled" -ForegroundColor Cyan
+    } elseif (Test-LlamaFlag $llama '-b') {
+        $baseArgs = $baseArgs + @('-b', $batchSize)
+        Write-Host "Batch size: -b $batchSize enabled" -ForegroundColor Cyan
+    } else {
+        Write-Host "Batch size: binary does not advertise batch-size support - skipping" -ForegroundColor Yellow
+    }
+}
+
+if ($ubatchSize) {
+    if (Test-LlamaFlag $llama '--ubatch-size') {
+        $baseArgs = $baseArgs + @('--ubatch-size', $ubatchSize)
+        Write-Host "UBatch size: --ubatch-size $ubatchSize enabled" -ForegroundColor Cyan
+    } elseif (Test-LlamaFlag $llama '-ub') {
+        $baseArgs = $baseArgs + @('-ub', $ubatchSize)
+        Write-Host "UBatch size: -ub $ubatchSize enabled" -ForegroundColor Cyan
+    } else {
+        Write-Host "UBatch size: binary does not advertise ubatch-size support - skipping" -ForegroundColor Yellow
+    }
+}
+
+# -- Batch threads check ---------------------------------------------------
+if (Test-LlamaFlag $llama '--threads-batch') {
+    $baseArgs = $baseArgs + @('--threads-batch', $batchThreads)
+    Write-Host "Batch threads: --threads-batch $batchThreads enabled" -ForegroundColor Cyan
+}
+
+# Optional pass-through for experiments, e.g. TURBO_EXTRA_ARGS="--spec-type ngram-simple --draft-max 8".
+# Split on whitespace only (no shell evaluation). Unset or blank = no change.
+if ($env:TURBO_EXTRA_ARGS -and $env:TURBO_EXTRA_ARGS.Trim()) {
+    $extraArgs = $env:TURBO_EXTRA_ARGS.Trim() -split '\s+'
+    $baseArgs = $baseArgs + $extraArgs
+    Write-Host "Extra llama-server args (TURBO_EXTRA_ARGS): $($extraArgs -join ' ')" -ForegroundColor Cyan
+    # Keep the status artifact honest: a speculative flag passed here is speculative decoding.
+    $extraText = $extraArgs -join ' '
+    if ($extraText -match '--spec-type\s+(?!none\b)\S+' -or $extraText -match '--(model-)?draft') {
+        $TurboSpeculative = $true
+        $TurboDraftMode = 'extra-args'
+    }
+}
+
+# -- Foreground branch ----------------------------------------------------
+if (-not $Detached) {
+  & $llama @baseArgs
+  exit $LASTEXITCODE
+}
+
+# -- Detached branch - capture stderr for post-mortem ---------------------
+$logDir   = Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..')) 'logs/turboquant'
+New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+$stamp    = (Get-Date).ToString('yyyy-MM-ddTHH-mm-ss')
+$errPath  = Join-Path $logDir ("launch-$stamp.err")
+$outPath  = Join-Path $logDir ("launch-$stamp.out")
+$launchAttempt = 0
+$retryReason = ''
+$ready = $false
+$proc = $null
+$finalArgs = $baseArgs
+
+while ($launchAttempt -lt 2) {
+  if ($launchAttempt -gt 0) {
+    $finalArgs = Remove-TurboDraftArgs $baseArgs
+    $TurboSpeculative = $false
+    $TurboDraftModel = $null
+    $TurboDraftMode = 'disabled'
+    $retryReason = 'draft-architecture'
+    Write-Host "Retrying TurboQuant once without speculative decoding" -ForegroundColor Yellow
+  }
+
+  $proc = Start-Process -FilePath $llama `
+                        -ArgumentList $finalArgs `
+                        -PassThru -WindowStyle Hidden `
+                        -RedirectStandardError $errPath `
+                        -RedirectStandardOutput $outPath
+
+  # Poll /health AND /props. A different process responding on the port
+  # is not evidence that OUR model started correctly.
+  $ready = $false
+  $lastProbeError = ''
+  for ($i = 0; $i -lt 240; $i++) {
+    if ($proc.HasExited) { break }
+    try {
+      $health = Invoke-RestMethod ("http://127.0.0.1:$port/health") -TimeoutSec 1 -ErrorAction Stop
+      $liveProps = Invoke-RestMethod ("http://127.0.0.1:$port/props") -TimeoutSec 2 -ErrorAction Stop
+      $liveAlias = $liveProps.model_alias
+      if (-not $liveAlias -and $liveProps.model_path) { $liveAlias = Split-Path -Leaf $liveProps.model_path }
+      if ($liveAlias -ne $targetModelAlias) {
+        throw "Server alias '$liveAlias' does not match requested '$targetModelAlias'"
+      }
+      $ready = $true
+      break
+    } catch {
+      $lastProbeError = $_.Exception.Message
+      Start-Sleep -Milliseconds 500
+    }
+  }
+
+  if ($ready) { break }
+
+  $stderrTail = ''
+  if (Test-Path $errPath) {
+    $stderrTail = (Get-Content $errPath -Tail 50 | Out-String)
+  }
+  $draftFailure = $stderrTail -match 'unknown model architecture|unsupported architecture'
+
+  try { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue } catch { }
+
+  if ($draftFailure -and $launchAttempt -eq 0 -and ($TurboSpeculative -or $TurboDraftModel)) {
+    $launchAttempt++
+    continue
+  }
+
+  Write-Host '--- llama-server stderr (tail) ---' -ForegroundColor Red
+  if ($stderrTail) { $stderrTail.TrimEnd().Split("`n") | ForEach-Object { Write-Host $_ -ForegroundColor DarkYellow } }
+  if ($lastProbeError) { Write-Host "Last HTTP verification error: $lastProbeError" -ForegroundColor Yellow }
+  $statusPath = Write-TurboLaunchStatus ([ordered]@{
+      status = 'failed'
+      port = $port
+      model = $model
+      draft_model = if ($TurboDraftModel) { $TurboDraftModel } else { '' }
+      speculative = [bool]$TurboSpeculative
+      draft_mode = $TurboDraftMode
+      text_only = [bool]$TextOnly
+      detached = [bool]$Detached
+      turbo_profile = $kvProfile
+      llama_server = $llama
+      launch_mode = 'detached'
+      server_healthy = $false
+      retry_count = $launchAttempt
+      retry_reason = $retryReason
+      exit_code = if ($proc) { $proc.ExitCode } else { 1 }
+      error = if ($stderrTail) { $stderrTail.Trim() } else { "TurboQuant did not verify as ready: $lastProbeError" }
+      health_url = "http://127.0.0.1:$port/health"
+      stdout_path = $outPath
+      stderr_path = $errPath
+  })
+  throw ("TurboQuant failed to become healthy on :$port - see $errPath (status: $statusPath)")
+}
+
+# Reflects whether a projector was actually loaded this launch, not merely
+# whether -TextOnly was passed - a profile with WantsVision=$false (or a
+# family with no resolvable projector) is text-only in practice even without
+# the -TextOnly switch. Pre-existing bug found while adding ornith-1.5-vlm:
+# this used to say "with VLM" for every launch that didn't pass -TextOnly,
+# even when no --mmproj flag was ever added to $baseArgs.
+$variant = if ($TextOnly -or -not $shouldAttemptMmproj -or -not $mmproj -or -not (Test-Path $mmproj)) { 'text-only' } else { 'with VLM' }
+Write-Host ("TurboQuant ready ($variant, kv=$kvK/$kvV) on http://127.0.0.1:$port (PID $($proc.Id))") -ForegroundColor Green
+Write-Host ("  stderr: $errPath") -ForegroundColor DarkGray
+$statusPath = Write-TurboLaunchStatus ([ordered]@{
+    status = 'healthy'
+    port = $port
+    model = $model
+    draft_model = if ($TurboDraftModel) { $TurboDraftModel } else { '' }
+    speculative = [bool]$TurboSpeculative
+    draft_mode = $TurboDraftMode
+    text_only = [bool]$TextOnly
+    detached = [bool]$Detached
+    turbo_profile = $kvProfile
+    llama_server = $llama
+    launch_mode = 'detached'
+    server_healthy = $true
+    retry_count = $launchAttempt
+    retry_reason = $retryReason
+    exit_code = 0
+    error = ''
+    health_url = "http://127.0.0.1:$port/health"
+    stdout_path = $outPath
+    stderr_path = $errPath
+})

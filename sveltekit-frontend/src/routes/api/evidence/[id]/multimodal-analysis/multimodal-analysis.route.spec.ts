@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { createHash } from 'node:crypto';
+import sharp from 'sharp';
 
 const mocks = vi.hoisted(() => ({
 	select: vi.fn(),
@@ -7,6 +9,7 @@ const mocks = vi.hoisted(() => ({
 	where: vi.fn(),
 	limit: vi.fn(),
 	execute: vi.fn(),
+	getMask: vi.fn(),
 	sources: [] as Array<Record<string, unknown>>,
 }));
 
@@ -14,6 +17,13 @@ vi.mock('$lib/server/db/client', () => ({
 	db: { select: (...args: unknown[]) => mocks.select(...args), execute: (...args: unknown[]) => mocks.execute(...args) },
 }));
 vi.mock('$lib/server/env.server.js', () => ({ ENV: { SEAWEED_ARTIFACTS_BUCKET: 'atlas-artifacts' } }));
+vi.mock('$lib/server/storage/seaweed.js', () => ({ getFileFromSeaweed: mocks.getMask }));
+vi.mock('$lib/server/storage/storage-buckets.js', () => ({
+	storageBuckets: { artifacts: 'atlas-artifacts' },
+	assertArtifactBucket(bucket: string) {
+		if (bucket !== 'atlas-artifacts') throw new Error('Unexpected artifact bucket');
+	},
+}));
 vi.mock('$lib/server/db/schema-postgres.js', () => ({
 	cases: { id: 'cases.id', userId: 'cases.userId', assignedAttorney: 'cases.assignedAttorney' },
 	evidence: {
@@ -37,10 +47,13 @@ const EVIDENCE_ID = '22222222-2222-4222-8222-222222222222';
 const CASE_ID = '11111111-1111-4111-8111-111111111111';
 const SOURCE_REVISION = `sha256:${'a'.repeat(64)}`;
 
-function event(userId: string | null = '7') {
+function event(userId: string | null = '7', query?: Record<string, string>) {
+	const url = new URL(`https://example.test/api/evidence/${EVIDENCE_ID}/multimodal-analysis`);
+	if (query) url.search = new URLSearchParams(query).toString();
 	return {
 		params: { id: EVIDENCE_ID },
 		locals: { user: userId ? { id: userId } : null },
+		url,
 	} as never;
 }
 
@@ -87,7 +100,7 @@ describe('GET /api/evidence/[id]/multimodal-analysis', () => {
 
 	it('returns source-bound saved observations and model provenance without exposing the vector', async () => {
 		mocks.sources = [{ id: EVIDENCE_ID, caseId: CASE_ID, hash: SOURCE_REVISION }];
-		mocks.execute.mockResolvedValue({ rows: [{
+		mocks.execute.mockResolvedValue({ rows: [] }).mockResolvedValueOnce({ rows: [{
 			source_revision: SOURCE_REVISION,
 			analysis_revision: 'analysis-r1',
 			model: 'embeddinggemma2:q8',
@@ -138,6 +151,63 @@ describe('GET /api/evidence/[id]/multimodal-analysis', () => {
 
 		const response = await GET(event());
 		expect(await response.json()).toMatchObject({ status: 'STALE', sourceRevision: SOURCE_REVISION, analysis: null });
+	});
+
+	it('serves only the verified mask for the exact detection and authorized image revision', async () => {
+		const bytes = await sharp({ create: { width: 100, height: 200, channels: 3, background: '#ffffff' } })
+			.greyscale().png().toBuffer();
+		const hash = createHash('sha256').update(bytes).digest('hex');
+		const objectKey = `derived/sam2/${hash}.png`;
+		mocks.sources = [{ id: EVIDENCE_ID, caseId: CASE_ID, hash: SOURCE_REVISION }];
+		const imageRow = {
+			source_revision: SOURCE_REVISION, analysis_revision: 'analysis-r1', model: 'embedding-model',
+			source_locator: { kind: 'whole_image', coordinateSpace: 'original_pixels', width: 100, height: 200 },
+			metadata: { visualAnalysis: {
+				...currentAnalysis(), detectionExecuted: true, silhouetteStageStatus: 'EXECUTED',
+				objectDetections: [
+					{ class: 'person', confidence: 0.25, bbox: [1, 2, 10, 20] },
+					{ class: 'person', confidence: 0.7, bbox: [20, 20, 50, 50] },
+					{ class: 'person', confidence: 0.95, bbox: [50, 60, 90, 170] },
+				],
+				silhouettes: [
+					{ artifactKind: 'sam2_alpha_silhouette', maskObjectKey: objectKey, maskSha256: hash,
+						targetBoxIndex: 0, label: 'person', iouScore: 0.8, is3DReconstruction: false },
+					{ artifactKind: 'sam2_alpha_silhouette', maskObjectKey: objectKey, maskSha256: hash,
+						targetBoxIndex: 1, sourceDetectionIndex: 2, label: 'person', iouScore: 0.8, is3DReconstruction: false },
+					{ artifactKind: 'sam2_alpha_silhouette', maskObjectKey: 'evidence/unrelated.png', maskSha256: hash,
+						targetBoxIndex: 1, sourceDetectionIndex: 1, label: 'person', iouScore: 0.8, is3DReconstruction: false },
+				],
+			} },
+		};
+		mocks.execute.mockResolvedValue({ rows: [imageRow] })
+			.mockResolvedValueOnce({ rows: [imageRow] }).mockResolvedValueOnce({ rows: [] });
+		const metadata = await GET(event());
+		const { storybook } = await metadata.json();
+		expect(storybook).toMatchObject({ detectionCoverage: 'RECORDED', maskCoverage: 'RECORDED', unresolvedMaskCount: 2 });
+		expect(storybook.masks).toEqual([expect.objectContaining({
+			artifactSha256: `sha256:${hash}`, detectionObservationId: storybook.detections[2].observationId, modelRevision: null,
+		})]);
+		expect(storybook.detections[2].modelRevision).toBeNull();
+		expect(JSON.stringify(storybook)).not.toContain(objectKey);
+		const query = {
+			maskObservation: storybook.masks[0].observationId, sourceRevision: SOURCE_REVISION,
+			analysisRevision: 'analysis-r1', observationRevision: storybook.observationRevision,
+		};
+		expect((await GET(event(null, query))).status).toBe(401);
+		const stale = await GET(event('7', { ...query, observationRevision: `sha256:${'f'.repeat(64)}` }));
+		expect(stale.status).toBe(409);
+		expect(mocks.getMask).not.toHaveBeenCalled();
+
+		mocks.getMask.mockResolvedValueOnce(bytes).mockResolvedValueOnce(Buffer.from('not the saved mask'));
+		const mask = await GET(event('7', query));
+		expect(mask.status).toBe(200);
+		expect(mask.headers.get('content-type')).toBe('image/png');
+		expect(mask.headers.get('x-artifact-sha256')).toBe(`sha256:${hash}`);
+		expect(Buffer.from(await mask.arrayBuffer())).toEqual(bytes);
+		expect(mocks.getMask).toHaveBeenLastCalledWith({ bucket: 'atlas-artifacts', objectKey, maximumBytes: 12 * 1024 * 1024 });
+		const corrupt = await GET(event('7', query));
+		expect(corrupt.status).toBe(409);
+		expect(await corrupt.json()).toMatchObject({ error: 'MASK_ARTIFACT_CHECKSUM_MISMATCH' });
 	});
 
 	it('returns a stable unavailable shape until the candidate schema is installed', async () => {

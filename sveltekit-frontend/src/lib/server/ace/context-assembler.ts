@@ -125,7 +125,7 @@ export class ACEContextAssembler {
       this.redis = getValkeyClient().duplicate({
         host: redisHost || process.env.REDIS_HOST || '127.0.0.1',
         port: redisPort || parseInt(process.env.REDIS_PORT || '6379'),
-        password: redisPassword || process.env.REDIS_PASSWORD || 'redis',
+        password: redisPassword || process.env.REDIS_PASSWORD,
       });
       this.ownsRedisConnection = true;
     } else {

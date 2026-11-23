@@ -1136,3 +1136,7 @@ docs/reports/archive/**/openspec-workboard-v1*.json
 !sveltekit-frontend/static/models/courtroom/character_alice_full.glb
 !sveltekit-frontend/static/models/courtroom/character_alice_n64.glb
 !sveltekit-frontend/static/models/courtroom/character_alice_snes.glb
+
+# Local music/audio drop folder (not tracked)
+/music/
+sveltekit-frontend/temp/media/mp4-diag/upload.mp4

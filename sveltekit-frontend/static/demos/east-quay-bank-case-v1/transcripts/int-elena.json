@@ -1,0 +1,78 @@
+{
+  "transcriptId": "INT-ELENA",
+  "evidenceId": "E-06",
+  "caseId": "PA-DEMO-ROBBERY-001",
+  "synthetic": true,
+  "recordingActuallyPresent": false,
+  "sceneId": null,
+  "personIds": [
+    "WIT-001",
+    "SEC-001"
+  ],
+  "start": "2026-10-14T16:20:00-07:00",
+  "end": "2026-10-14T16:28:30-07:00",
+  "admissibilityReviewed": false,
+  "rightsAndConsentVerified": false,
+  "statements": [
+    {
+      "lineId": "INT-ELENA-L001",
+      "time": "2026-10-14T16:20:00-07:00",
+      "speaker": "OFFICER",
+      "text": "What happened at your counter?"
+    },
+    {
+      "lineId": "INT-ELENA-L002",
+      "time": "2026-10-14T16:20:18-07:00",
+      "speaker": "ELENA",
+      "text": "A man wearing a dark jacket came toward me and demanded all the money."
+    },
+    {
+      "lineId": "INT-ELENA-L003",
+      "time": "2026-10-14T16:21:04-07:00",
+      "speaker": "OFFICER",
+      "text": "Could you identify him from the view you had?"
+    },
+    {
+      "lineId": "INT-ELENA-L004",
+      "time": "2026-10-14T16:21:17-07:00",
+      "speaker": "ELENA",
+      "text": "I saw his clothing and heard his voice. I am not sure I could recognize his face later."
+    },
+    {
+      "lineId": "INT-ELENA-L005",
+      "time": "2026-10-14T16:22:20-07:00",
+      "speaker": "OFFICER",
+      "text": "Did you see who moved people toward the rear?"
+    },
+    {
+      "lineId": "INT-ELENA-L006",
+      "time": "2026-10-14T16:22:35-07:00",
+      "speaker": "ELENA",
+      "text": "I saw people go back and someone wave them there, but I was focused on the counter."
+    },
+    {
+      "lineId": "INT-ELENA-L007",
+      "time": "2026-10-14T16:23:21-07:00",
+      "speaker": "OFFICER",
+      "text": "What about the woman?"
+    },
+    {
+      "lineId": "INT-ELENA-L008",
+      "time": "2026-10-14T16:23:36-07:00",
+      "speaker": "ELENA",
+      "text": "I remember a woman near the brochures, but I did not see her carry anything."
+    },
+    {
+      "lineId": "INT-ELENA-L009",
+      "time": "2026-10-14T16:24:11-07:00",
+      "speaker": "OFFICER",
+      "text": "How much money was taken?"
+    },
+    {
+      "lineId": "INT-ELENA-L010",
+      "time": "2026-10-14T16:24:31-07:00",
+      "speaker": "ELENA",
+      "text": "I cannot give an exact amount; the audit team has the records."
+    }
+  ]
+}

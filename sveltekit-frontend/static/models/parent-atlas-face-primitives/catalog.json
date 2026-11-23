@@ -1,0 +1,72 @@
+[
+  {
+    "name": "feminine-head.atmp",
+    "bytes": 6648,
+    "sha256": "177b7e016822e28add6aa3f4442fb5a7555969a768d16f2946deef0250e1a7bc",
+    "provenance": "unreviewed_procedural_fixture",
+    "sourceArchivePath": "Downloads/parent_atlas_mesh_culling_native_starter/parent_atlas_face_primitives/assets/feminine-head.atmp"
+  },
+  {
+    "name": "feminine.glb",
+    "bytes": 22588,
+    "sha256": "6cf612515a5ae777990b7d4890a526b28232726b523b1e4c15456c24d9b76496",
+    "provenance": "unreviewed_procedural_fixture",
+    "sourceArchivePath": "Downloads/parent_atlas_mesh_culling_native_starter/parent_atlas_face_primitives/assets/feminine.glb"
+  },
+  {
+    "name": "feminine.recipe.json",
+    "bytes": 963,
+    "sha256": "2b0b04fe8faa2892b5912f0cc242d212fe6b2b7bc4b819867c864baf1e771472",
+    "provenance": "unreviewed_procedural_fixture",
+    "sourceArchivePath": "Downloads/parent_atlas_mesh_culling_native_starter/parent_atlas_face_primitives/assets/feminine.recipe.json"
+  },
+  {
+    "name": "masculine-head.atmp",
+    "bytes": 6648,
+    "sha256": "2ccc7764dfeecff49cfa3a5e435cbfbf1c1e51899ceb4b33d6fcf4e022f9814b",
+    "provenance": "unreviewed_procedural_fixture",
+    "sourceArchivePath": "Downloads/parent_atlas_mesh_culling_native_starter/parent_atlas_face_primitives/assets/masculine-head.atmp"
+  },
+  {
+    "name": "masculine.glb",
+    "bytes": 22588,
+    "sha256": "dd84871abc667b7fd39850ef2f108aa2ae73ecd0653977cdbad416c5daedc3d9",
+    "provenance": "unreviewed_procedural_fixture",
+    "sourceArchivePath": "Downloads/parent_atlas_mesh_culling_native_starter/parent_atlas_face_primitives/assets/masculine.glb"
+  },
+  {
+    "name": "masculine.recipe.json",
+    "bytes": 963,
+    "sha256": "2fa0d3d04b60d4a924d53e2a9fe1a3702d19aa7f01b4ac2e6f1b4e95aae4da51",
+    "provenance": "unreviewed_procedural_fixture",
+    "sourceArchivePath": "Downloads/parent_atlas_mesh_culling_native_starter/parent_atlas_face_primitives/assets/masculine.recipe.json"
+  },
+  {
+    "name": "neutral-head.atmp",
+    "bytes": 6648,
+    "sha256": "9e4e2bf7f357ac69fac97487f250dc4291f469222e62d7659f5c8098de6b62b3",
+    "provenance": "unreviewed_procedural_fixture",
+    "sourceArchivePath": "Downloads/parent_atlas_mesh_culling_native_starter/parent_atlas_face_primitives/assets/neutral-head.atmp"
+  },
+  {
+    "name": "neutral.glb",
+    "bytes": 22588,
+    "sha256": "cb12a34f9ad3ae64aa2f232dc01dace85753c99eadb93d63f375d234a221109b",
+    "provenance": "unreviewed_procedural_fixture",
+    "sourceArchivePath": "Downloads/parent_atlas_mesh_culling_native_starter/parent_atlas_face_primitives/assets/neutral.glb"
+  },
+  {
+    "name": "neutral.recipe.json",
+    "bytes": 961,
+    "sha256": "eed7750e91057e5c767777f67404d8f2a20c9454eebdc666f7dbfb85e222c226",
+    "provenance": "unreviewed_procedural_fixture",
+    "sourceArchivePath": "Downloads/parent_atlas_mesh_culling_native_starter/parent_atlas_face_primitives/assets/neutral.recipe.json"
+  },
+  {
+    "name": "scene-chunk-example.json",
+    "bytes": 816,
+    "sha256": "a7262db5c32ae815676bbc092159243d0935f97392464b6252e40ac283a33168",
+    "provenance": "unreviewed_procedural_fixture",
+    "sourceArchivePath": "Downloads/parent_atlas_mesh_culling_native_starter/parent_atlas_face_primitives/assets/scene-chunk-example.json"
+  }
+]

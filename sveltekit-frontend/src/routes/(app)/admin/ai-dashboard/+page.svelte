@@ -395,6 +395,31 @@
 			{/if}
 		</section>
 
+		<section class="runtime-error-priorities" aria-labelledby="conflict-free-batch-title">
+			<div class="ledger-head">
+				<div>
+					<h3 id="conflict-free-batch-title">Conflict-free A2A workboard batch</h3>
+					<p class="subtitle compact">Disjoint 2-worker partition from `dispatchConflictFreeWorkboardBatchV1` (`canonicalAuthority: false`, `writesPerformed: false`).</p>
+				</div>
+				<span class="task-status">
+					{data.conflictFreeWorkboardDispatch
+						? `${data.conflictFreeWorkboardDispatch.partition.workerA.length + data.conflictFreeWorkboardDispatch.partition.workerB.length} queued`
+						: 'Unavailable'}
+				</span>
+			</div>
+			{#if data.conflictFreeWorkboardDispatch}
+				{@const dispatch = data.conflictFreeWorkboardDispatch}
+				<p class="runtime-error-count">
+					Worker A: {dispatch.partition.workerA.length} · Worker B: {dispatch.partition.workerB.length} ·
+					Disjoint: {dispatch.partition.disjointVerified ? 'YES' : 'NO'} ·
+					Skipped conflicts: {dispatch.partition.skippedConflicts.length} ·
+					Admitted worker gates: {dispatch.workerGates.length}
+				</p>
+			{:else}
+				<p class="empty-state">No Kanban ACE packet is staged for conflict-free batch dispatch.</p>
+			{/if}
+		</section>
+
 		<section class="task-priority-preview" aria-labelledby="task-priority-title">
 			<div class="ledger-head">
 				<div>

@@ -91,10 +91,20 @@ class AtlasSpatialMctsPipeline:
         num_mcts_sims: int = 32,
         c_puct: float = 1.414,
         device: str = "cpu",
+        projection_artifact_path: Optional[str] = None,
+        projection_artifact_sha256: Optional[str] = None,
+        allow_ephemeral_projection: bool = False,
     ):
         self.dim = dim
         self.device = device
-        self.spatial_index = SpatialCodebaseIndex(dim=dim, j_bits=j_bits, device=device)
+        self.spatial_index = SpatialCodebaseIndex(
+            dim=dim,
+            j_bits=j_bits,
+            device=device,
+            projection_path=projection_artifact_path,
+            projection_sha256=projection_artifact_sha256,
+            allow_ephemeral_projection=allow_ephemeral_projection,
+        )
         self.fsm_router = HmmFsmRouter()
         self.max_fanout = max_fanout
         self.fanout_penalty = fanout_penalty

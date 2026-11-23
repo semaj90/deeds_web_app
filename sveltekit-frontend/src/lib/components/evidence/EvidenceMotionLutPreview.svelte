@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import { decodeVideoMotionLutIndicesV1, buildPackedMotionLodsV1, VIDEO_MOTION_GRAYSCALE_LUT_V1, VIDEO_MOTION_LUT_HEIGHT_V1, VIDEO_MOTION_LUT_WIDTH_V1 } from '$lib/shared/video-motion-lut-v1.js';
+	import {
+		compactPackedMotionLodV1, readPackedVideoMotionLutV1, VIDEO_MOTION_COMPACT_LOD_V1,
+		VIDEO_MOTION_GRAYSCALE_LUT_V1, VIDEO_MOTION_LUT_HEIGHT_V1, VIDEO_MOTION_LUT_WIDTH_V1,
+		type PackedMotionLodV1,
+	} from '$lib/shared/video-motion-lut-v1.js';
 	import { n64TextureLOD } from '$lib/webgpu/N64TextureLODSystem.js';
 
 	let {
@@ -8,12 +12,14 @@
 		sourceRevision,
 		analysisRevision,
 		timestampMs,
+		previousTimestampMs = undefined,
 		motionScore
 	}: {
 		url: string;
 		sourceRevision: string;
 		analysisRevision: string;
 		timestampMs: number;
+		previousTimestampMs?: number | null;
 		motionScore: number;
 	} = $props();
 
@@ -22,6 +28,7 @@
 	let webglCanvas: HTMLCanvasElement;
 	let activeRenderer = $state<'webgpu' | 'webgl2' | 'canvas2d' | null>(null);
 	let status = $state<'loading' | 'ready' | 'unavailable'>('loading');
+	let fullDetail = $state(false);
 	let gpuContext: GPUCanvasContext | null = null;
 	let gpuPipeline: GPURenderPipeline | null = null;
 	let gpuConfigured = false;
@@ -30,7 +37,7 @@
 	let webglProgram: WebGLProgram | null = null;
 	let webglVertexBuffer: WebGLBuffer | null = null;
 	let webglHandlersInstalled = false;
-	let lastWebglIndices: Uint8Array | null = null;
+	let lastWebglTile: PackedMotionLodV1 | null = null;
 	let webglContextLost = false;
 
 	function releaseResidentTexture(textureId = residentTextureId) {
@@ -115,7 +122,7 @@
 				});
 				webglCanvas.addEventListener('webglcontextrestored', () => {
 					webglContextLost = false;
-					if (lastWebglIndices) drawWebglMotionTile(lastWebglIndices);
+					if (lastWebglTile) drawWebglMotionTile(lastWebglTile);
 				});
 				webglHandlersInstalled = true;
 			}
@@ -131,13 +138,10 @@
 		}
 	}
 
-	function drawWebglMotionTile(indices: Uint8Array): boolean {
-		lastWebglIndices = indices;
+	function drawWebglMotionTile(level: PackedMotionLodV1): boolean {
+		lastWebglTile = level;
 		if (!initializeWebgl2() || !webglContext || !webglProgram || !webglVertexBuffer || !webglCanvas) return false;
 		const gl = webglContext;
-		const lods = buildPackedMotionLodsV1(indices);
-		const level = lods[Math.max(0, lods.length - 2)];
-		if (!level) return false;
 		const texture = gl.createTexture();
 		if (!texture) return false;
 		try {
@@ -164,26 +168,24 @@
 		}
 	}
 
-	async function drawWebGpuMotionTile(cacheKey: string, indices: Uint8Array, signal: AbortSignal): Promise<boolean> {
+	async function drawWebGpuMotionTile(cacheKey: string, lod: PackedMotionLodV1, signal: AbortSignal): Promise<boolean> {
 		if (residentTextureId !== cacheKey) releaseResidentTexture();
 		if (typeof navigator === 'undefined' || !navigator.gpu || !gpuCanvas) return false;
 		if (!(await n64TextureLOD.initialize())) return false;
 		if (signal.aborted) return false;
 		const device = n64TextureLOD.getDevice();
 		if (!device) return false;
-		const lods = buildPackedMotionLodsV1(indices);
 		if (!n64TextureLOD.hasTexture(cacheKey)) {
-			n64TextureLOD.registerTexture(cacheKey, cacheKey, lods.map((lod) => ({
+			n64TextureLOD.registerTexture(cacheKey, cacheKey, [{
 				level: lod.level,
 				width: lod.width / 2,
 				height: lod.height,
 				format: 'r8uint' as const,
 				data: lod.data.slice().buffer as ArrayBuffer,
-			})));
+			}]);
 		}
 		residentTextureId = cacheKey;
-		const selectedLod = Math.max(0, lods.length - 2);
-		const texture = await n64TextureLOD.requestTexture(cacheKey, selectedLod);
+		const texture = await n64TextureLOD.requestTexture(cacheKey, lod.level);
 		if (!texture || signal.aborted) {
 			// A newer frame may now own the component's resident texture. Release only
 			// this stale request's cache entry; never evict the newer revision's tile.
@@ -257,7 +259,7 @@
 		}
 		webglProgram = null;
 		webglVertexBuffer = null;
-		lastWebglIndices = null;
+		lastWebglTile = null;
 		webglContext = null;
 	});
 
@@ -266,27 +268,48 @@
 		const expectedSource = sourceRevision;
 		const expectedAnalysis = analysisRevision;
 		const expectedTimestamp = timestampMs;
+		const wantsFullDetail = fullDetail;
 		const controller = new AbortController();
 		// Release the prior frame's GPU allocation as soon as evidence/analysis scope
 		// changes, rather than retaining stale pixels while the next artifact loads.
 		releaseResidentTexture();
+		lastWebglTile = null;
 		status = 'loading';
 		activeRenderer = null;
 
 		void (async () => {
 			try {
-				const response = await fetch(requestUrl, { cache: 'no-store', signal: controller.signal });
+				const request = new URL(requestUrl, window.location.href);
+				if (request.origin !== window.location.origin) throw new Error('Motion preview must be same-origin.');
+				if (wantsFullDetail) request.searchParams.delete('lod');
+				else request.searchParams.set('lod', VIDEO_MOTION_COMPACT_LOD_V1.token);
+				const response = await fetch(request, { cache: 'no-store', signal: controller.signal });
 				if (!response.ok ||
 					response.headers.get('X-Source-Revision') !== expectedSource ||
 					response.headers.get('X-Analysis-Revision') !== expectedAnalysis ||
 					response.headers.get('X-Frame-Timestamp-Ms') !== String(expectedTimestamp)) {
 					throw new Error('Motion preview revision did not match this frame.');
 				}
+				const lod = VIDEO_MOTION_COMPACT_LOD_V1;
+				const responseLod = response.headers.get('X-Motion-LOD');
+				if (responseLod !== null && (wantsFullDetail || responseLod !== lod.token ||
+					response.headers.get('Content-Type') !== lod.contentType)) {
+					throw new Error('Unexpected motion preview detail.');
+				}
 				const bytes = new Uint8Array(await response.arrayBuffer());
-				const indices = decodeVideoMotionLutIndicesV1(bytes);
+				let tile: PackedMotionLodV1;
+				if (responseLod === lod.token) {
+					if (bytes.byteLength !== lod.byteLength) throw new Error('Invalid packed motion preview length.');
+					tile = { level: lod.level, width: lod.width, height: lod.height, data: bytes };
+				} else {
+					const canonical = readPackedVideoMotionLutV1(bytes);
+					tile = wantsFullDetail ? canonical : compactPackedMotionLodV1(canonical);
+				}
 				if (controller.signal.aborted || !canvas) return;
-				const cacheKey = `${requestUrl}|${expectedSource}|${expectedAnalysis}`;
-				const renderedOnGpu = await drawWebGpuMotionTile(cacheKey, indices, controller.signal).catch(() => false);
+				// Each load owns its registration: two viewers (or an A→B→A reload)
+				// must not release a newer viewer's texture when an older request ends.
+				const cacheKey = `${requestUrl}|${expectedSource}|${expectedAnalysis}|${crypto.randomUUID()}`;
+				const renderedOnGpu = await drawWebGpuMotionTile(cacheKey, tile, controller.signal).catch(() => false);
 				if (controller.signal.aborted) return;
 				if (renderedOnGpu) {
 					activeRenderer = 'webgpu';
@@ -294,21 +317,27 @@
 					return;
 				}
 				releaseResidentTexture();
-				if (drawWebglMotionTile(indices)) {
+				if (drawWebglMotionTile(tile)) {
 					activeRenderer = 'webgl2';
 					status = 'ready';
 					return;
 				}
 				const context = canvas.getContext('2d', { alpha: false });
 				if (!context) throw new Error('Canvas is unavailable.');
-				const image = context.createImageData(VIDEO_MOTION_LUT_WIDTH_V1, VIDEO_MOTION_LUT_HEIGHT_V1);
-				for (let pixel = 0; pixel < indices.length; pixel += 1) {
-					const intensity = VIDEO_MOTION_GRAYSCALE_LUT_V1[indices[pixel]!]!;
-					const offset = pixel * 4;
-					image.data[offset] = intensity;
-					image.data[offset + 1] = intensity;
-					image.data[offset + 2] = intensity;
-					image.data[offset + 3] = 255;
+				const image = context.createImageData(canvas.width, canvas.height);
+				for (let y = 0; y < canvas.height; y++) {
+					const sourceRow = Math.floor(y * tile.height / canvas.height) * tile.width;
+					for (let x = 0; x < canvas.width; x++) {
+						const pixel = sourceRow + Math.floor(x * tile.width / canvas.width);
+						const packed = tile.data[pixel >>> 1]!;
+						const index = pixel & 1 ? packed >>> 4 : packed & 15;
+						const intensity = VIDEO_MOTION_GRAYSCALE_LUT_V1[index]!;
+						const offset = (y * canvas.width + x) * 4;
+						image.data[offset] = intensity;
+						image.data[offset + 1] = intensity;
+						image.data[offset + 2] = intensity;
+						image.data[offset + 3] = 255;
+					}
 				}
 				context.putImageData(image, 0, 0);
 				activeRenderer = 'canvas2d';
@@ -331,7 +360,9 @@
 	<canvas class:hidden={activeRenderer !== 'webgl2'} bind:this={webglCanvas} width={VIDEO_MOTION_LUT_WIDTH_V1} height={VIDEO_MOTION_LUT_HEIGHT_V1} aria-label="WebGL2 packed motion tile; not a pose or event finding"></canvas>
 	<figcaption>
 		<strong>Motion cue</strong>
-		<span>{status === 'ready' ? `${Math.round(motionScore * 100)}% change` : status === 'loading' ? 'Loading revision-bound tile…' : 'Preview unavailable'}</span>
+		<span>{status === 'ready' ? previousTimestampMs === null ? 'First sample: no comparison frame' : `Difference intensity: ${Math.round(motionScore * 100)}%${typeof previousTimestampMs === 'number' ? ` · compared with ${(previousTimestampMs / 1000).toFixed(2)}s` : ' · comparison time unavailable'}` : status === 'loading' ? 'Loading revision-bound tile…' : 'Preview unavailable'}</span>
+		<span>Visual cue for review; camera movement and lighting can affect it.</span>
+		<button type="button" aria-pressed={fullDetail} onclick={() => (fullDetail = !fullDetail)}>Full motion detail</button>
 	</figcaption>
 </figure>
 

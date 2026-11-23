@@ -1,0 +1,3058 @@
+{
+  "schema": "atlas.openspec.domain-candidate-ranking-experiment.v2",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "elapsedMs": 7111.43,
+  "runtimes": {
+    "cpuCores": 16,
+    "pythonVersion": "3.13.5",
+    "pytorchVersion": "2.8.0+cu128",
+    "cudaAvailable": true,
+    "cudaDevice": "NVIDIA GeForce RTX 3060 Ti",
+    "napiSimdBridgeBuilt": true,
+    "libtorchDirPresent": false
+  },
+  "computeBackend": "cuda:0",
+  "taskIdentityJoin": {
+    "manifestPath": "docs\\reports\\openspec-local-inventory-20261122\\workboard-join-02.manifest.json",
+    "snapshotPath": ".tmp\\atlas\\openspec-workboard-task-snapshot-local.json",
+    "snapshotSha256": "sha256:0e3863332872110363605785536872a52b2ac57f58bbbb15d0e36d1987844537",
+    "joinSha256": "sha256:2d7c09d00825bd6f924f7e6d219cfaa9fb7c3bf3d3cc1c0c1f2a9d186135f1f6",
+    "exactRows": 14860,
+    "logicalTaskKeys": 6263,
+    "migrationStableKeys": 8597
+  },
+  "okfCorpus": {
+    "totalChunksIndexed": 852,
+    "uniqueSources": 7,
+    "rawDevJsonFiles": 88,
+    "pinnedEnvelopesLoaded": true
+  },
+  "rtxKmeansKnn": {
+    "device": "cuda:0",
+    "numClusters": 8,
+    "vocabDim": 512,
+    "clusterSizes": {
+      "0": 4,
+      "1": 5,
+      "5": 12,
+      "2": 2,
+      "3": 1,
+      "4": 2,
+      "7": 4,
+      "6": 2
+    },
+    "tasksEmbedded": 32,
+    "okfDocsEmbedded": 852,
+    "astGrepSymbolsIndexed": 21,
+    "ewinTangLowRank": {
+      "schema": "atlas.low-rank-comparison-receipt.v1",
+      "method": "full_svd_vs_seeded_svd_lowrank_with_length_square_sampling",
+      "targetRank": 8,
+      "relativeFrobeniusError": 0.173797,
+      "topKOverlap": 0.7,
+      "lengthSquareSampleOrdinals": [
+        0,
+        7,
+        10,
+        4,
+        5,
+        31,
+        19,
+        21,
+        29,
+        19,
+        19,
+        29
+      ],
+      "topRecommendedDocOrdinals": [
+        675,
+        202,
+        20,
+        589,
+        175
+      ]
+    },
+    "featureContract": "atlas.token-hash-l2-512.v1",
+    "semanticEmbeddingUsed": false,
+    "cudaPcaNormalization": {
+      "normalization": [
+        "L2_unit_norm",
+        "Z_score_standardization"
+      ],
+      "pcaMethod": "torch.pca_lowrank",
+      "pcaRank": 8,
+      "varianceExplainedRatio": 0.346062,
+      "singularValues": [
+        25.1029,
+        22.6803,
+        21.1751,
+        20.7923,
+        20.2258,
+        19.3898,
+        18.4867,
+        18.2896
+      ]
+    },
+    "valkeyCentroidDescriptors": [
+      {
+        "clusterId": 0,
+        "centroidChecksum": "sha256:434083d0a8bb3bd9",
+        "proposedCacheKey": "centroid:v1:kmeans_cluster_0:434083d0a8bb3bd9",
+        "proposedTtlSeconds": 604800,
+        "proposedEvictionPolicy": "allkeys-lru",
+        "featureContract": "atlas.token-hash-l2-512.v1",
+        "cacheWritePerformed": false,
+        "persistsRawTensors": false
+      },
+      {
+        "clusterId": 1,
+        "centroidChecksum": "sha256:ba5d8a27be5ee29d",
+        "proposedCacheKey": "centroid:v1:kmeans_cluster_1:ba5d8a27be5ee29d",
+        "proposedTtlSeconds": 604800,
+        "proposedEvictionPolicy": "allkeys-lru",
+        "featureContract": "atlas.token-hash-l2-512.v1",
+        "cacheWritePerformed": false,
+        "persistsRawTensors": false
+      },
+      {
+        "clusterId": 2,
+        "centroidChecksum": "sha256:ea23d1afac6f03ca",
+        "proposedCacheKey": "centroid:v1:kmeans_cluster_2:ea23d1afac6f03ca",
+        "proposedTtlSeconds": 604800,
+        "proposedEvictionPolicy": "allkeys-lru",
+        "featureContract": "atlas.token-hash-l2-512.v1",
+        "cacheWritePerformed": false,
+        "persistsRawTensors": false
+      },
+      {
+        "clusterId": 3,
+        "centroidChecksum": "sha256:7df5fd7dee150786",
+        "proposedCacheKey": "centroid:v1:kmeans_cluster_3:7df5fd7dee150786",
+        "proposedTtlSeconds": 604800,
+        "proposedEvictionPolicy": "allkeys-lru",
+        "featureContract": "atlas.token-hash-l2-512.v1",
+        "cacheWritePerformed": false,
+        "persistsRawTensors": false
+      },
+      {
+        "clusterId": 4,
+        "centroidChecksum": "sha256:96771e8379c3faaf",
+        "proposedCacheKey": "centroid:v1:kmeans_cluster_4:96771e8379c3faaf",
+        "proposedTtlSeconds": 604800,
+        "proposedEvictionPolicy": "allkeys-lru",
+        "featureContract": "atlas.token-hash-l2-512.v1",
+        "cacheWritePerformed": false,
+        "persistsRawTensors": false
+      },
+      {
+        "clusterId": 5,
+        "centroidChecksum": "sha256:effe9ff27fd50f6a",
+        "proposedCacheKey": "centroid:v1:kmeans_cluster_5:effe9ff27fd50f6a",
+        "proposedTtlSeconds": 604800,
+        "proposedEvictionPolicy": "allkeys-lru",
+        "featureContract": "atlas.token-hash-l2-512.v1",
+        "cacheWritePerformed": false,
+        "persistsRawTensors": false
+      },
+      {
+        "clusterId": 6,
+        "centroidChecksum": "sha256:4953ddfc00956da3",
+        "proposedCacheKey": "centroid:v1:kmeans_cluster_6:4953ddfc00956da3",
+        "proposedTtlSeconds": 604800,
+        "proposedEvictionPolicy": "allkeys-lru",
+        "featureContract": "atlas.token-hash-l2-512.v1",
+        "cacheWritePerformed": false,
+        "persistsRawTensors": false
+      },
+      {
+        "clusterId": 7,
+        "centroidChecksum": "sha256:bbe4e381f48d2742",
+        "proposedCacheKey": "centroid:v1:kmeans_cluster_7:bbe4e381f48d2742",
+        "proposedTtlSeconds": 604800,
+        "proposedEvictionPolicy": "allkeys-lru",
+        "featureContract": "atlas.token-hash-l2-512.v1",
+        "cacheWritePerformed": false,
+        "persistsRawTensors": false
+      }
+    ]
+  },
+  "dataStructures": {
+    "taskIdLookupMapSize": 49,
+    "sampleTaskIdLookupMap": {
+      "crime-scene-reconstruction#2eb42e7e5c6d88e6": 0,
+      "CASE-SCENE-E2E-11": 0,
+      "crime-scene-reconstruction#550e8fe10db602fd": 1,
+      "CASE-SCENE-E2E-02c": 30,
+      "crime-scene-reconstruction#73cb6d733ed06dd5": 2,
+      "CASE-SCENE-LIVE-03": 2,
+      "crime-scene-reconstruction#96ec1d3b98b9dcae": 3,
+      "CASE-SCENE-LIVE-01": 27,
+      "crime-scene-reconstruction#af5b7979a6e5b635": 4,
+      "crime-scene-reconstruction#b5017fd33a74b8dd": 5,
+      "crime-scene-reconstruction#de42edf3606772bf": 6,
+      "CASE-SCENE-E2E-09": 6
+    },
+    "orderedTaskRowCount": 32,
+    "orderedTaskRowIds": [
+      "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "crime-scene-reconstruction#550e8fe10db602fd",
+      "crime-scene-reconstruction#73cb6d733ed06dd5",
+      "crime-scene-reconstruction#96ec1d3b98b9dcae",
+      "crime-scene-reconstruction#af5b7979a6e5b635",
+      "crime-scene-reconstruction#b5017fd33a74b8dd",
+      "crime-scene-reconstruction#de42edf3606772bf",
+      "crime-scene-reconstruction#ea3a1f672efbce15",
+      "crime-scene-reconstruction:AUD-07",
+      "crime-scene-reconstruction:CASE-SCENE-LIVE-04",
+      "crime-scene-reconstruction:CASE-SCENE-LIVE-05",
+      "crime-scene-reconstruction:CASE-SCENE-LIVE-08"
+    ],
+    "dependencyAdjacencyListNodes": 32,
+    "sampleDependencyAdjacencyList": {
+      "crime-scene-reconstruction#2eb42e7e5c6d88e6": [
+        "candidate:domain.scene_3d",
+        "pa:kmeans.cluster_0",
+        "crime-scene-reconstruction#550e8fe10db602fd",
+        "crime-scene-reconstruction#73cb6d733ed06dd5",
+        "crime-scene-reconstruction#96ec1d3b98b9dcae",
+        "crime-scene-reconstruction#af5b7979a6e5b635",
+        "crime-scene-reconstruction#b5017fd33a74b8dd",
+        "crime-scene-reconstruction#de42edf3606772bf"
+      ],
+      "crime-scene-reconstruction#550e8fe10db602fd": [
+        "candidate:domain.testing_verification_gan",
+        "pa:kmeans.cluster_1",
+        "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+        "crime-scene-reconstruction#73cb6d733ed06dd5",
+        "crime-scene-reconstruction#96ec1d3b98b9dcae",
+        "crime-scene-reconstruction#af5b7979a6e5b635",
+        "crime-scene-reconstruction#b5017fd33a74b8dd",
+        "crime-scene-reconstruction#de42edf3606772bf"
+      ],
+      "crime-scene-reconstruction#73cb6d733ed06dd5": [
+        "candidate:domain.evidence_media_video",
+        "pa:kmeans.cluster_5",
+        "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+        "crime-scene-reconstruction#550e8fe10db602fd",
+        "crime-scene-reconstruction#96ec1d3b98b9dcae",
+        "crime-scene-reconstruction#af5b7979a6e5b635",
+        "crime-scene-reconstruction#b5017fd33a74b8dd",
+        "crime-scene-reconstruction#de42edf3606772bf"
+      ],
+      "crime-scene-reconstruction#96ec1d3b98b9dcae": [
+        "candidate:domain.testing_verification_gan",
+        "pa:kmeans.cluster_5",
+        "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+        "crime-scene-reconstruction#550e8fe10db602fd",
+        "crime-scene-reconstruction#73cb6d733ed06dd5",
+        "crime-scene-reconstruction#af5b7979a6e5b635",
+        "crime-scene-reconstruction#b5017fd33a74b8dd",
+        "crime-scene-reconstruction#de42edf3606772bf"
+      ],
+      "crime-scene-reconstruction#af5b7979a6e5b635": [
+        "candidate:domain.persistence_pg18",
+        "pa:kmeans.cluster_1",
+        "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+        "crime-scene-reconstruction#550e8fe10db602fd",
+        "crime-scene-reconstruction#73cb6d733ed06dd5",
+        "crime-scene-reconstruction#96ec1d3b98b9dcae",
+        "crime-scene-reconstruction#b5017fd33a74b8dd",
+        "crime-scene-reconstruction#de42edf3606772bf"
+      ],
+      "crime-scene-reconstruction#b5017fd33a74b8dd": [
+        "candidate:domain.evidence_media_video",
+        "pa:kmeans.cluster_1",
+        "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+        "crime-scene-reconstruction#550e8fe10db602fd",
+        "crime-scene-reconstruction#73cb6d733ed06dd5",
+        "crime-scene-reconstruction#96ec1d3b98b9dcae",
+        "crime-scene-reconstruction#af5b7979a6e5b635",
+        "crime-scene-reconstruction#de42edf3606772bf"
+      ],
+      "crime-scene-reconstruction#de42edf3606772bf": [
+        "candidate:domain.evidence_media_video",
+        "pa:kmeans.cluster_1",
+        "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+        "crime-scene-reconstruction#550e8fe10db602fd",
+        "crime-scene-reconstruction#73cb6d733ed06dd5",
+        "crime-scene-reconstruction#96ec1d3b98b9dcae",
+        "crime-scene-reconstruction#af5b7979a6e5b635",
+        "crime-scene-reconstruction#b5017fd33a74b8dd"
+      ],
+      "crime-scene-reconstruction#ea3a1f672efbce15": [
+        "candidate:domain.scene_3d",
+        "pa:kmeans.cluster_0",
+        "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+        "crime-scene-reconstruction#550e8fe10db602fd",
+        "crime-scene-reconstruction#73cb6d733ed06dd5",
+        "crime-scene-reconstruction#96ec1d3b98b9dcae",
+        "crime-scene-reconstruction#af5b7979a6e5b635",
+        "crime-scene-reconstruction#b5017fd33a74b8dd"
+      ]
+    }
+  },
+  "linearRegressionEwinTangFit": {
+    "solver": "torch.linalg.lstsq",
+    "device": "cuda:0",
+    "fitTarget": "same-row-derived-low-rank-knn-reconstruction-score",
+    "evaluationStatus": "IN_SAMPLE_ONLY_NOT_PREDICTIVE_VALIDATION",
+    "heldOutEvaluation": false,
+    "promotionEligible": false,
+    "featureNames": [
+      "bias",
+      "baseScoreNorm",
+      "pagerankCudaScaled",
+      "kmeansCentroidSim",
+      "top1OkfCosine",
+      "pca0",
+      "pca1",
+      "pca2",
+      "pca3"
+    ],
+    "weights": [
+      0.082535,
+      -0.149455,
+      0.105372,
+      -0.009611,
+      1.038825,
+      -0.002756,
+      0.001376,
+      0.00078,
+      0.001236
+    ],
+    "mse": 0.00088673,
+    "r2Score": 0.902112,
+    "sampleCount": 32
+  },
+  "lexicalAstCstMlLangGraph": {
+    "schema": "atlas.lexical-ast-cst-ml-langgraph-helper.v1",
+    "runId": "run-domain-candidate-experiment-v2",
+    "workspaceRevision": "rev:domain-candidate-experiment-v2",
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "retrievalVoteAdded": false,
+    "routerTensorContract": {
+      "revision": "atlas.retrieval-router-tensor.v2",
+      "width": 234,
+      "queryFeatureContract": "atlas.query-feature-projection.v1",
+      "queryFeatureCount": 26,
+      "manifestChecksum": "sha256:9a5da6679e1c48cee7b865774918cc3d76f8bcc65f60e388962616aa6bef279d",
+      "pinnedDimensionCount": 234
+    },
+    "xgboostGroupedDatasetReceipt": {
+      "featureNames": [
+        "semanticRelevance",
+        "lexicalRelevance",
+        "astAffinity",
+        "personalizedPageRank",
+        "domainAffinity"
+      ],
+      "qidGroups": [
+        "candidate:domain.evidence_media_video",
+        "candidate:domain.persistence_pg18",
+        "candidate:domain.runtime_cache_residency",
+        "candidate:domain.scene_3d",
+        "candidate:domain.security_auth_governance",
+        "candidate:domain.testing_verification_gan"
+      ],
+      "rowCount": 32,
+      "featureCount": 5,
+      "datasetChecksum": "sha256:4730efb5d1fae53df38508269988d3a7d775d3ecd57b71ed1a6071e93bfa72ee"
+    },
+    "cppRadixPackingReceipt": {
+      "backend": "cpp_pybind11_native",
+      "candidateCount": 32,
+      "top5RadixKeysHex": [
+        "0x020092140000000c",
+        "0x0200931900000007",
+        "0x020098130000000d",
+        "0x020099110000000f",
+        "0x02009f120000000e"
+      ],
+      "top5ProjectionOrdinals": [
+        12,
+        7,
+        13,
+        15,
+        14
+      ]
+    },
+    "routeDistribution": {
+      "structural_ast_cst": 21,
+      "fusion_graphrag_dense": 11
+    },
+    "langGraphNodeTransitions": [
+      {
+        "node_id": "node_1_lexical_cst_extract",
+        "input_checksum": "sha256:fe2f6c930f2ecede98c7e4397a912ac5a3001870e8fdd12f82a55743b2ce5522",
+        "output_checksum": "sha256:7e243bafb893c759cc7185e4128a1af74224106067ef3f1d576ec30ca3024645",
+        "status": "COMPLETED"
+      },
+      {
+        "node_id": "node_2_ml_classify_and_route",
+        "input_checksum": "sha256:7e243bafb893c759cc7185e4128a1af74224106067ef3f1d576ec30ca3024645",
+        "output_checksum": "sha256:a9688006943c25dae9519893f359753a6c5308aea7e0dd6b38cf59e1d7c2c881",
+        "status": "COMPLETED"
+      },
+      {
+        "node_id": "node_3_grouped_rank_and_radix_pack",
+        "input_checksum": "sha256:a9688006943c25dae9519893f359753a6c5308aea7e0dd6b38cf59e1d7c2c881",
+        "output_checksum": "sha256:0d801c9df69b5f334e566044ce16f9df6d8f876c3a5edbbaa63610c818607a8d",
+        "status": "COMPLETED"
+      },
+      {
+        "node_id": "node_4_emit_recommendation_envelope",
+        "input_checksum": "sha256:0d801c9df69b5f334e566044ce16f9df6d8f876c3a5edbbaa63610c818607a8d",
+        "output_checksum": "sha256:c56e357570291387df5e38d79aa0c7af069b9e9cfeb95f7a5cda02b3e463c664",
+        "status": "COMPLETED"
+      }
+    ],
+    "recommendations": [
+      {
+        "rank": 1,
+        "canonicalId": "crime-scene-reconstruction:CASE-SCENE-LIVE-04",
+        "taskId": "CASE-SCENE-LIVE-04",
+        "domainId": "candidate:domain.runtime_cache_residency",
+        "mlHybridRecommendationScore": 0.705732,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.586948,
+        "astCstSignals": {
+          "extensions": [
+            "js",
+            "svelte",
+            "ts"
+          ],
+          "cstNodeTypes": [
+            "svelte_component",
+            "snippet_statement",
+            "render_tag",
+            "rune_expression",
+            "lexical_declaration",
+            "export_statement",
+            "function_declaration",
+            "call_expression"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 4,
+          "astAffinityScore": 0.743333,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.256301,
+          "lexicalRelevance": 1.0,
+          "astAffinity": 0.743333,
+          "personalizedPageRank": 0.0258,
+          "domainAffinity": 0.586948
+        },
+        "radixResidencyKeyHex": "0x0200b31700000009",
+        "topOkfDocRefs": [
+          "doc:postgresql-18:38d5e74bafb89df8:27",
+          "doc:sveltekit:e650ae13a0841739:27",
+          "doc:bits-ui:c2518c9dc5ebcc35:11"
+        ]
+      },
+      {
+        "rank": 2,
+        "canonicalId": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+        "taskId": "CASE-SCENE-E2E-11",
+        "domainId": "candidate:domain.scene_3d",
+        "mlHybridRecommendationScore": 0.691277,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.505611,
+        "astCstSignals": {
+          "extensions": [
+            "svelte",
+            "ts"
+          ],
+          "cstNodeTypes": [
+            "svelte_component",
+            "snippet_statement",
+            "render_tag",
+            "rune_expression",
+            "lexical_declaration",
+            "export_statement",
+            "function_declaration",
+            "call_expression"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 2,
+          "astAffinityScore": 0.576667,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.375321,
+          "lexicalRelevance": 1.0,
+          "astAffinity": 0.576667,
+          "personalizedPageRank": 0.018293,
+          "domainAffinity": 0.505611
+        },
+        "radixResidencyKeyHex": "0x0200b02000000000",
+        "topOkfDocRefs": [
+          "doc:postgresql-18:38d5e74bafb89df8:39",
+          "doc:sveltekit:5166571dffc19c6d:15",
+          "doc:postgresql-18:c80bd7e95d17f8ae:36"
+        ]
+      },
+      {
+        "rank": 3,
+        "canonicalId": "crime-scene-reconstruction#73cb6d733ed06dd5",
+        "taskId": "CASE-SCENE-LIVE-03",
+        "domainId": "candidate:domain.evidence_media_video",
+        "mlHybridRecommendationScore": 0.689008,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.523095,
+        "astCstSignals": {
+          "extensions": [
+            "js",
+            "ts"
+          ],
+          "cstNodeTypes": [
+            "lexical_declaration",
+            "export_statement",
+            "function_declaration",
+            "call_expression"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 3,
+          "astAffinityScore": 0.626667,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.339511,
+          "lexicalRelevance": 1.0,
+          "astAffinity": 0.626667,
+          "personalizedPageRank": 0.017129,
+          "domainAffinity": 0.523095
+        },
+        "radixResidencyKeyHex": "0x0200af1e00000002",
+        "topOkfDocRefs": [
+          "doc:postgresql-18:c80bd7e95d17f8ae:13",
+          "doc:postgresql-18:70d86642ca56e9b0:26",
+          "doc:postgresql-18:70d86642ca56e9b0:3"
+        ]
+      },
+      {
+        "rank": 4,
+        "canonicalId": "parent-atlas-spz-detective-renderer:10.7",
+        "taskId": "10.7",
+        "domainId": "candidate:domain.persistence_pg18",
+        "mlHybridRecommendationScore": 0.688966,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.527243,
+        "astCstSignals": {
+          "extensions": [
+            "json",
+            "py",
+            "ts",
+            "yaml"
+          ],
+          "cstNodeTypes": [
+            "lexical_declaration",
+            "export_statement",
+            "function_declaration",
+            "call_expression",
+            "function_definition",
+            "call",
+            "attribute",
+            "typed_parameter"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 6,
+          "astAffinityScore": 0.743333,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.183591,
+          "lexicalRelevance": 1.0,
+          "astAffinity": 0.743333,
+          "personalizedPageRank": 0.029572,
+          "domainAffinity": 0.527243
+        },
+        "radixResidencyKeyHex": "0x0200af1000000010",
+        "topOkfDocRefs": [
+          "doc:sveltekit:e650ae13a0841739:7",
+          "doc:sveltekit:e650ae13a0841739:19",
+          "doc:sveltekit:5166571dffc19c6d:23"
+        ]
+      },
+      {
+        "rank": 5,
+        "canonicalId": "crime-scene-reconstruction#96ec1d3b98b9dcae",
+        "taskId": "CASE-SCENE-LIVE-01",
+        "domainId": "candidate:domain.testing_verification_gan",
+        "mlHybridRecommendationScore": 0.68158,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.529473,
+        "astCstSignals": {
+          "extensions": [
+            "svelte",
+            "ts"
+          ],
+          "cstNodeTypes": [
+            "svelte_component",
+            "snippet_statement",
+            "render_tag",
+            "rune_expression",
+            "lexical_declaration",
+            "export_statement",
+            "function_declaration",
+            "call_expression"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 2,
+          "astAffinityScore": 0.576667,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.346272,
+          "lexicalRelevance": 1.0,
+          "astAffinity": 0.576667,
+          "personalizedPageRank": 0.017424,
+          "domainAffinity": 0.529473
+        },
+        "radixResidencyKeyHex": "0x0200ad1d00000003",
+        "topOkfDocRefs": [
+          "doc:postgresql-18:24d9f452d20b88e0:2",
+          "doc:sveltekit:e650ae13a0841739:20",
+          "doc:postgresql-18:0c1f6c86b4bbe623:2"
+        ]
+      },
+      {
+        "rank": 6,
+        "canonicalId": "crime-scene-reconstruction#af5b7979a6e5b635",
+        "taskId": "CASE-SCENE-E2E-02c",
+        "domainId": "candidate:domain.persistence_pg18",
+        "mlHybridRecommendationScore": 0.659258,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.437605,
+        "astCstSignals": {
+          "extensions": [
+            "ts"
+          ],
+          "cstNodeTypes": [
+            "lexical_declaration",
+            "export_statement",
+            "function_declaration",
+            "call_expression"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 3,
+          "astAffinityScore": 0.56,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.373632,
+          "lexicalRelevance": 0.85,
+          "astAffinity": 0.56,
+          "personalizedPageRank": 0.015314,
+          "domainAffinity": 0.437605
+        },
+        "radixResidencyKeyHex": "0x0200a81c00000004",
+        "topOkfDocRefs": [
+          "doc:postgresql-18:24d9f452d20b88e0:2",
+          "doc:postgresql-18:38d5e74bafb89df8:14",
+          "doc:postgresql-18:0c1f6c86b4bbe623:2"
+        ]
+      },
+      {
+        "rank": 7,
+        "canonicalId": "crime-scene-reconstruction:AUD-07",
+        "taskId": "AUD-07",
+        "domainId": "candidate:domain.frontend_svelte5_ui",
+        "mlHybridRecommendationScore": 0.654291,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.394159,
+        "astCstSignals": {
+          "extensions": [
+            "ts"
+          ],
+          "cstNodeTypes": [
+            "lexical_declaration",
+            "export_statement",
+            "function_declaration",
+            "call_expression"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 2,
+          "astAffinityScore": 0.51,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.280357,
+          "lexicalRelevance": 1.0,
+          "astAffinity": 0.51,
+          "personalizedPageRank": 0.018989,
+          "domainAffinity": 0.394159
+        },
+        "radixResidencyKeyHex": "0x0200a61800000008",
+        "topOkfDocRefs": [
+          "doc:postgresql-18:38d5e74bafb89df8:6",
+          "doc:postgresql-18:38d5e74bafb89df8:26",
+          "doc:postgresql-18:70d86642ca56e9b0:21"
+        ]
+      },
+      {
+        "rank": 8,
+        "canonicalId": "crime-scene-reconstruction:CASE-SCENE-LIVE-05",
+        "taskId": "CASE-SCENE-LIVE-05",
+        "domainId": "candidate:domain.runtime_cache_residency",
+        "mlHybridRecommendationScore": 0.647603,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.512005,
+        "astCstSignals": {
+          "extensions": [
+            "js",
+            "ts"
+          ],
+          "cstNodeTypes": [
+            "lexical_declaration",
+            "export_statement",
+            "function_declaration",
+            "call_expression"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 1,
+          "astAffinityScore": 0.526667,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.288521,
+          "lexicalRelevance": 1.0,
+          "astAffinity": 0.526667,
+          "personalizedPageRank": 0.012271,
+          "domainAffinity": 0.512005
+        },
+        "radixResidencyKeyHex": "0x0200a5160000000a",
+        "topOkfDocRefs": [
+          "doc:bits-ui:933224c7e6a17940:9",
+          "doc:bits-ui:c2518c9dc5ebcc35:4",
+          "doc:svelte5-runes:4606958abe2e620d:11"
+        ]
+      },
+      {
+        "rank": 9,
+        "canonicalId": "crime-scene-reconstruction#550e8fe10db602fd",
+        "taskId": "CASE-SCENE-E2E-02c",
+        "domainId": "candidate:domain.testing_verification_gan",
+        "mlHybridRecommendationScore": 0.647236,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.499778,
+        "astCstSignals": {
+          "extensions": [
+            "ts"
+          ],
+          "cstNodeTypes": [
+            "lexical_declaration",
+            "export_statement",
+            "function_declaration",
+            "call_expression"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 3,
+          "astAffinityScore": 0.56,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.234814,
+          "lexicalRelevance": 1.0,
+          "astAffinity": 0.56,
+          "personalizedPageRank": 0.016566,
+          "domainAffinity": 0.499778
+        },
+        "radixResidencyKeyHex": "0x0200a51f00000001",
+        "topOkfDocRefs": [
+          "doc:svelte5-runes:4606958abe2e620d:11",
+          "doc:sveltekit:a96c1d15fd75f782:30",
+          "doc:drizzle-orm:fa0a1af1c2ddb64c:25"
+        ]
+      },
+      {
+        "rank": 10,
+        "canonicalId": "crime-scene-reconstruction#b5017fd33a74b8dd",
+        "taskId": "CASE-SCENE-E2E-02c",
+        "domainId": "candidate:domain.evidence_media_video",
+        "mlHybridRecommendationScore": 0.630393,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.437605,
+        "astCstSignals": {
+          "extensions": [
+            "ts"
+          ],
+          "cstNodeTypes": [
+            "lexical_declaration",
+            "export_statement",
+            "function_declaration",
+            "call_expression"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 3,
+          "astAffinityScore": 0.56,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.265994,
+          "lexicalRelevance": 0.85,
+          "astAffinity": 0.56,
+          "personalizedPageRank": 0.015404,
+          "domainAffinity": 0.437605
+        },
+        "radixResidencyKeyHex": "0x0200a01b00000005",
+        "topOkfDocRefs": [
+          "doc:sveltekit:a96c1d15fd75f782:48",
+          "doc:sveltekit:62e6dd9932a74b58:10",
+          "doc:postgresql-18:c80bd7e95d17f8ae:36"
+        ]
+      },
+      {
+        "rank": 11,
+        "canonicalId": "crime-scene-reconstruction#08cf508badccf34d",
+        "taskId": "CASE-SCENE-E2E-02b",
+        "domainId": "candidate:domain.runtime_cache_residency",
+        "mlHybridRecommendationScore": 0.625522,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.413713,
+        "astCstSignals": {
+          "extensions": [],
+          "cstNodeTypes": [
+            "source_file"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 1,
+          "astAffinityScore": 0.243333,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.482776,
+          "lexicalRelevance": 1.0,
+          "astAffinity": 0.243333,
+          "personalizedPageRank": 0.010255,
+          "domainAffinity": 0.413713
+        },
+        "radixResidencyKeyHex": "0x02019f0d00000013",
+        "topOkfDocRefs": [
+          "doc:postgresql-18:c80bd7e95d17f8ae:36",
+          "doc:postgresql-18:c80bd7e95d17f8ae:13",
+          "doc:postgresql-18:24d9f452d20b88e0:2"
+        ]
+      },
+      {
+        "rank": 12,
+        "canonicalId": "parent-atlas-spz-detective-renderer#0daacf2675707896",
+        "taskId": "10.15",
+        "domainId": "candidate:domain.testing_verification_gan",
+        "mlHybridRecommendationScore": 0.624149,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.439246,
+        "astCstSignals": {
+          "extensions": [
+            "json",
+            "py",
+            "ts"
+          ],
+          "cstNodeTypes": [
+            "lexical_declaration",
+            "export_statement",
+            "function_declaration",
+            "call_expression",
+            "function_definition",
+            "call",
+            "attribute",
+            "typed_parameter"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 6,
+          "astAffinityScore": 0.743333,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.220728,
+          "lexicalRelevance": 0.516667,
+          "astAffinity": 0.743333,
+          "personalizedPageRank": 0.028444,
+          "domainAffinity": 0.439246
+        },
+        "radixResidencyKeyHex": "0x02009f120000000e",
+        "topOkfDocRefs": [
+          "doc:drizzle-orm:fa0a1af1c2ddb64c:3",
+          "doc:bits-ui:6b3cf8151e01df1d:0",
+          "doc:bits-ui:c2518c9dc5ebcc35:0"
+        ]
+      },
+      {
+        "rank": 13,
+        "canonicalId": "crime-scene-reconstruction:CASE-SCENE-LIVE-08",
+        "taskId": "CASE-SCENE-LIVE-08",
+        "domainId": "candidate:domain.testing_verification_gan",
+        "mlHybridRecommendationScore": 0.620361,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.485386,
+        "astCstSignals": {
+          "extensions": [
+            "ts"
+          ],
+          "cstNodeTypes": [
+            "lexical_declaration",
+            "export_statement",
+            "function_declaration",
+            "call_expression"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 1,
+          "astAffinityScore": 0.46,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.247242,
+          "lexicalRelevance": 1.0,
+          "astAffinity": 0.46,
+          "personalizedPageRank": 0.010769,
+          "domainAffinity": 0.485386
+        },
+        "radixResidencyKeyHex": "0x02019e150000000b",
+        "topOkfDocRefs": [
+          "doc:postgresql-18:38d5e74bafb89df8:20",
+          "doc:postgresql-18:24d9f452d20b88e0:2",
+          "doc:postgresql-18:c80bd7e95d17f8ae:12"
+        ]
+      },
+      {
+        "rank": 14,
+        "canonicalId": "crime-scene-reconstruction#de42edf3606772bf",
+        "taskId": "CASE-SCENE-E2E-09",
+        "domainId": "candidate:domain.evidence_media_video",
+        "mlHybridRecommendationScore": 0.615047,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.428595,
+        "astCstSignals": {
+          "extensions": [
+            "ts"
+          ],
+          "cstNodeTypes": [
+            "lexical_declaration",
+            "export_statement",
+            "function_declaration",
+            "call_expression"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 1,
+          "astAffinityScore": 0.46,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.225052,
+          "lexicalRelevance": 1.0,
+          "astAffinity": 0.46,
+          "personalizedPageRank": 0.010935,
+          "domainAffinity": 0.428595
+        },
+        "radixResidencyKeyHex": "0x02019c1a00000006",
+        "topOkfDocRefs": [
+          "doc:postgresql-18:38d5e74bafb89df8:14",
+          "doc:postgresql-18:38d5e74bafb89df8:25",
+          "doc:postgresql-18:70d86642ca56e9b0:9"
+        ]
+      },
+      {
+        "rank": 15,
+        "canonicalId": "parent-atlas-spz-detective-renderer:10.4",
+        "taskId": "10.4",
+        "domainId": "candidate:domain.persistence_pg18",
+        "mlHybridRecommendationScore": 0.600655,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.464828,
+        "astCstSignals": {
+          "extensions": [
+            "json",
+            "mjs",
+            "py"
+          ],
+          "cstNodeTypes": [
+            "function_definition",
+            "call",
+            "attribute",
+            "typed_parameter"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 4,
+          "astAffinityScore": 0.743333,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.132239,
+          "lexicalRelevance": 0.516667,
+          "astAffinity": 0.743333,
+          "personalizedPageRank": 0.028107,
+          "domainAffinity": 0.464828
+        },
+        "radixResidencyKeyHex": "0x020099110000000f",
+        "topOkfDocRefs": [
+          "doc:bits-ui:6b3cf8151e01df1d:7",
+          "doc:drizzle-orm:fa0a1af1c2ddb64c:16",
+          "doc:svelte5-runes:a9f84a9bc441daa2:3"
+        ]
+      },
+      {
+        "rank": 16,
+        "canonicalId": "parent-atlas-ontology-kernel:ORNITH-AUDIT-02",
+        "taskId": "ORNITH-AUDIT-02",
+        "domainId": "candidate:domain.security_auth_governance",
+        "mlHybridRecommendationScore": 0.599499,
+        "selectedRoute": "structural_ast_cst",
+        "routeConfidence": 0.370303,
+        "astCstSignals": {
+          "extensions": [
+            "json",
+            "mjs",
+            "ts"
+          ],
+          "cstNodeTypes": [
+            "lexical_declaration",
+            "export_statement",
+            "function_declaration",
+            "call_expression"
+          ],
+          "astSymbolNames": [
+            "client"
+          ],
+          "svelte5RunesDetected": 0,
+          "svelte5SnippetsDetected": 0,
+          "svelte5SnippetSourceDeclarations": 0,
+          "routeHandlersDetected": 0,
+          "cudaCppKernelsDetected": 0,
+          "sqlDrizzlePatternsDetected": 0,
+          "nlpConceptCount": 2,
+          "astAffinityScore": 0.643333,
+          "canonicalAuthority": false
+        },
+        "mlFeaturesScalar": {
+          "semanticRelevance": 0.251205,
+          "lexicalRelevance": 0.516667,
+          "astAffinity": 0.643333,
+          "personalizedPageRank": 0.021975,
+          "domainAffinity": 0.370303
+        },
+        "radixResidencyKeyHex": "0x020098130000000d",
+        "topOkfDocRefs": [
+          "doc:svelte5-runes:9d3a717d27cb2c0d:36",
+          "doc:sveltekit:62e6dd9932a74b58:28",
+          "doc:svelte5-runes:9d3a717d27cb2c0d:29"
+        ]
+      }
+    ]
+  },
+  "gpuFsmAndCachePlan": {
+    "cacheBackendConnected": false,
+    "cacheWritePerformed": false,
+    "proposedTtlSeconds": 604800,
+    "proposedEvictionPolicy": "allkeys-lru",
+    "featureContract": "atlas.token-hash-l2-512.v1",
+    "fsmExecutionMode": "FIXTURE_ONLY",
+    "titansOrMirasModelExecuted": false,
+    "persistsRawKvOrTensors": false,
+    "swaps": [
+      {
+        "taskIdentityKey": "crime-scene-reconstruction:CASE-SCENE-LIVE-04",
+        "kvSwapFsm": {
+          "visitedStates": [
+            "S0_BIFROST_LOOKUP",
+            "S2_MMAP_HOST_STAGE",
+            "S3_CUTILE_BLOCK_INSERT",
+            "S4_MIRAS_EVICT_OR_PERSIST"
+          ],
+          "bifrostHit": true,
+          "s2HostPinnedVerified": true,
+          "s2StageMode": "PINNED_HOST_TENSOR_VERIFIED",
+          "activeBlocksInserted": 4,
+          "copyBackendUsed": "PYTORCH_CUDA_INDEX_COPY_FALLBACK",
+          "cudaStreamSynchronized": true,
+          "fixtureSurpriseSignal": 0.6038,
+          "fixtureRetentionSignal": 0.8314,
+          "simulatedPersistDecision": true,
+          "simulatedEvictDecision": false,
+          "storageWritePerformed": false
+        },
+        "tileResidency": {
+          "finalState": "PREFILL_BOUND",
+          "descriptorKey": "8bb3c316449505b83cd62df9926623c62f04e2aac5c4e94dcf1c8b0cd94de86c",
+          "proposedCacheKey": "bitfrost:residency:v1:8bb3c316449505b83cd62df9926623c62f04e2aac5c4e94dcf1c8b0cd94de86c",
+          "proposedTtlSeconds": 604800,
+          "proposedEvictionPolicy": "allkeys-lru",
+          "cacheWritePerformed": false,
+          "persistsRawKvOrTensors": false
+        }
+      },
+      {
+        "taskIdentityKey": "parent-atlas-spz-detective-renderer#0daacf2675707896",
+        "kvSwapFsm": {
+          "visitedStates": [
+            "S0_BIFROST_LOOKUP",
+            "S1_TURBOVEC_PREFILTER",
+            "S2_MMAP_HOST_STAGE",
+            "S3_CUTILE_BLOCK_INSERT",
+            "S4_MIRAS_EVICT_OR_PERSIST"
+          ],
+          "bifrostHit": false,
+          "s2HostPinnedVerified": true,
+          "s2StageMode": "PINNED_HOST_TENSOR_VERIFIED",
+          "activeBlocksInserted": 4,
+          "copyBackendUsed": "PYTORCH_CUDA_INDEX_COPY_FALLBACK",
+          "cudaStreamSynchronized": true,
+          "fixtureSurpriseSignal": 0.5824,
+          "fixtureRetentionSignal": 0.8735,
+          "simulatedPersistDecision": true,
+          "simulatedEvictDecision": false,
+          "storageWritePerformed": false
+        },
+        "tileResidency": {
+          "finalState": "PREFILL_BOUND",
+          "descriptorKey": "2b73469f21d50573888737f4b4f8141af8fdf1893aed26788972c1110c830ada",
+          "proposedCacheKey": "bitfrost:residency:v1:2b73469f21d50573888737f4b4f8141af8fdf1893aed26788972c1110c830ada",
+          "proposedTtlSeconds": 604800,
+          "proposedEvictionPolicy": "allkeys-lru",
+          "cacheWritePerformed": false,
+          "persistsRawKvOrTensors": false
+        }
+      },
+      {
+        "taskIdentityKey": "parent-atlas-spz-detective-renderer:10.7",
+        "kvSwapFsm": {
+          "visitedStates": [
+            "S0_BIFROST_LOOKUP",
+            "S2_MMAP_HOST_STAGE",
+            "S3_CUTILE_BLOCK_INSERT",
+            "S4_MIRAS_EVICT_OR_PERSIST"
+          ],
+          "bifrostHit": true,
+          "s2HostPinnedVerified": true,
+          "s2StageMode": "PINNED_HOST_TENSOR_VERIFIED",
+          "activeBlocksInserted": 4,
+          "copyBackendUsed": "PYTORCH_CUDA_INDEX_COPY_FALLBACK",
+          "cudaStreamSynchronized": true,
+          "fixtureSurpriseSignal": 0.5602,
+          "fixtureRetentionSignal": 0.8983,
+          "simulatedPersistDecision": true,
+          "simulatedEvictDecision": false,
+          "storageWritePerformed": false
+        },
+        "tileResidency": {
+          "finalState": "PREFILL_BOUND",
+          "descriptorKey": "2ccdedc241e95c333955b65d9950bb9f974950d9ad13c44560f0d8e0729e5eb3",
+          "proposedCacheKey": "bitfrost:residency:v1:2ccdedc241e95c333955b65d9950bb9f974950d9ad13c44560f0d8e0729e5eb3",
+          "proposedTtlSeconds": 604800,
+          "proposedEvictionPolicy": "allkeys-lru",
+          "cacheWritePerformed": false,
+          "persistsRawKvOrTensors": false
+        }
+      },
+      {
+        "taskIdentityKey": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+        "kvSwapFsm": {
+          "visitedStates": [
+            "S0_BIFROST_LOOKUP",
+            "S1_TURBOVEC_PREFILTER",
+            "S2_MMAP_HOST_STAGE",
+            "S3_CUTILE_BLOCK_INSERT",
+            "S4_MIRAS_EVICT_OR_PERSIST"
+          ],
+          "bifrostHit": false,
+          "s2HostPinnedVerified": true,
+          "s2StageMode": "PINNED_HOST_TENSOR_VERIFIED",
+          "activeBlocksInserted": 4,
+          "copyBackendUsed": "PYTORCH_CUDA_INDEX_COPY_FALLBACK",
+          "cudaStreamSynchronized": true,
+          "fixtureSurpriseSignal": 0.6752,
+          "fixtureRetentionSignal": 0.8344,
+          "simulatedPersistDecision": true,
+          "simulatedEvictDecision": false,
+          "storageWritePerformed": false
+        },
+        "tileResidency": {
+          "finalState": "PREFILL_BOUND",
+          "descriptorKey": "0f14eb1ec2b14f926cdf95da56d666348ef5db220cd1df6f879319016520a6e1",
+          "proposedCacheKey": "bitfrost:residency:v1:0f14eb1ec2b14f926cdf95da56d666348ef5db220cd1df6f879319016520a6e1",
+          "proposedTtlSeconds": 604800,
+          "proposedEvictionPolicy": "allkeys-lru",
+          "cacheWritePerformed": false,
+          "persistsRawKvOrTensors": false
+        }
+      },
+      {
+        "taskIdentityKey": "parent-atlas-spz-detective-renderer:10.4",
+        "kvSwapFsm": {
+          "visitedStates": [
+            "S0_BIFROST_LOOKUP",
+            "S2_MMAP_HOST_STAGE",
+            "S3_CUTILE_BLOCK_INSERT",
+            "S4_MIRAS_EVICT_OR_PERSIST"
+          ],
+          "bifrostHit": true,
+          "s2HostPinnedVerified": true,
+          "s2StageMode": "PINNED_HOST_TENSOR_VERIFIED",
+          "activeBlocksInserted": 4,
+          "copyBackendUsed": "PYTORCH_CUDA_INDEX_COPY_FALLBACK",
+          "cudaStreamSynchronized": true,
+          "fixtureSurpriseSignal": 0.5293,
+          "fixtureRetentionSignal": 0.8983,
+          "simulatedPersistDecision": true,
+          "simulatedEvictDecision": false,
+          "storageWritePerformed": false
+        },
+        "tileResidency": {
+          "finalState": "PREFILL_BOUND",
+          "descriptorKey": "9f6e72c964ff6303554fb86139f31d5bd84be17ccb07938e0f8cd35aa5479760",
+          "proposedCacheKey": "bitfrost:residency:v1:9f6e72c964ff6303554fb86139f31d5bd84be17ccb07938e0f8cd35aa5479760",
+          "proposedTtlSeconds": 604800,
+          "proposedEvictionPolicy": "allkeys-lru",
+          "cacheWritePerformed": false,
+          "persistsRawKvOrTensors": false
+        }
+      },
+      {
+        "taskIdentityKey": "crime-scene-reconstruction#ea3a1f672efbce15",
+        "kvSwapFsm": {
+          "visitedStates": [
+            "S0_BIFROST_LOOKUP",
+            "S1_TURBOVEC_PREFILTER",
+            "S2_MMAP_HOST_STAGE",
+            "S3_CUTILE_BLOCK_INSERT",
+            "S4_MIRAS_EVICT_OR_PERSIST"
+          ],
+          "bifrostHit": false,
+          "s2HostPinnedVerified": true,
+          "s2StageMode": "PINNED_HOST_TENSOR_VERIFIED",
+          "activeBlocksInserted": 4,
+          "copyBackendUsed": "PYTORCH_CUDA_INDEX_COPY_FALLBACK",
+          "cudaStreamSynchronized": true,
+          "fixtureSurpriseSignal": 0.5489,
+          "fixtureRetentionSignal": 0.7725,
+          "simulatedPersistDecision": true,
+          "simulatedEvictDecision": false,
+          "storageWritePerformed": false
+        },
+        "tileResidency": {
+          "finalState": "PREFILL_BOUND",
+          "descriptorKey": "be18edb30bdaed8b50757c0d66e372569dee8d6ea1f4dd8bb5fc6206c39187e6",
+          "proposedCacheKey": "bitfrost:residency:v1:be18edb30bdaed8b50757c0d66e372569dee8d6ea1f4dd8bb5fc6206c39187e6",
+          "proposedTtlSeconds": 604800,
+          "proposedEvictionPolicy": "allkeys-lru",
+          "cacheWritePerformed": false,
+          "persistsRawKvOrTensors": false
+        }
+      },
+      {
+        "taskIdentityKey": "crime-scene-reconstruction#96ec1d3b98b9dcae",
+        "kvSwapFsm": {
+          "visitedStates": [
+            "S0_BIFROST_LOOKUP",
+            "S2_MMAP_HOST_STAGE",
+            "S3_CUTILE_BLOCK_INSERT",
+            "S4_MIRAS_EVICT_OR_PERSIST"
+          ],
+          "bifrostHit": true,
+          "s2HostPinnedVerified": true,
+          "s2StageMode": "PINNED_HOST_TENSOR_VERIFIED",
+          "activeBlocksInserted": 4,
+          "copyBackendUsed": "PYTORCH_CUDA_INDEX_COPY_FALLBACK",
+          "cudaStreamSynchronized": true,
+          "fixtureSurpriseSignal": 0.6578,
+          "fixtureRetentionSignal": 0.8626,
+          "simulatedPersistDecision": true,
+          "simulatedEvictDecision": false,
+          "storageWritePerformed": false
+        },
+        "tileResidency": {
+          "finalState": "PREFILL_BOUND",
+          "descriptorKey": "526411a37fb0cb66f2f25be705f96708b2164afa5cab971c08a75096f0f02d83",
+          "proposedCacheKey": "bitfrost:residency:v1:526411a37fb0cb66f2f25be705f96708b2164afa5cab971c08a75096f0f02d83",
+          "proposedTtlSeconds": 604800,
+          "proposedEvictionPolicy": "allkeys-lru",
+          "cacheWritePerformed": false,
+          "persistsRawKvOrTensors": false
+        }
+      },
+      {
+        "taskIdentityKey": "crime-scene-reconstruction:AUD-07",
+        "kvSwapFsm": {
+          "visitedStates": [
+            "S0_BIFROST_LOOKUP",
+            "S1_TURBOVEC_PREFILTER",
+            "S2_MMAP_HOST_STAGE",
+            "S3_CUTILE_BLOCK_INSERT",
+            "S4_MIRAS_EVICT_OR_PERSIST"
+          ],
+          "bifrostHit": false,
+          "s2HostPinnedVerified": true,
+          "s2StageMode": "PINNED_HOST_TENSOR_VERIFIED",
+          "activeBlocksInserted": 4,
+          "copyBackendUsed": "PYTORCH_CUDA_INDEX_COPY_FALLBACK",
+          "cudaStreamSynchronized": true,
+          "fixtureSurpriseSignal": 0.6182,
+          "fixtureRetentionSignal": 0.8735,
+          "simulatedPersistDecision": true,
+          "simulatedEvictDecision": false,
+          "storageWritePerformed": false
+        },
+        "tileResidency": {
+          "finalState": "PREFILL_BOUND",
+          "descriptorKey": "1ade82b72242fa94d5655d2d582476f481597054caafba60bf034bdd3036b4af",
+          "proposedCacheKey": "bitfrost:residency:v1:1ade82b72242fa94d5655d2d582476f481597054caafba60bf034bdd3036b4af",
+          "proposedTtlSeconds": 604800,
+          "proposedEvictionPolicy": "allkeys-lru",
+          "cacheWritePerformed": false,
+          "persistsRawKvOrTensors": false
+        }
+      }
+    ]
+  },
+  "corpusSummary": {
+    "changesScanned": 131,
+    "encodingDistribution": {
+      "utf-8": 244
+    },
+    "taskCounts": {
+      "done": 8320,
+      "partial": 244,
+      "open": 6296
+    },
+    "unclassifiedOpenTasks": 0,
+    "domainLabelStatusCounts": {
+      "UNREVIEWED_CANDIDATE": 6540,
+      "UNCLASSIFIED_REVIEW_REQUIRED": 0
+    },
+    "reviewedTaskDomainLabels": 0,
+    "domainDistribution": {
+      "candidate:domain.retrieval_graphrag": 1082,
+      "candidate:domain.kanban_a2a_mcp": 996,
+      "candidate:domain.testing_verification_gan": 740,
+      "candidate:domain.security_auth_governance": 699,
+      "candidate:domain.gpu_cuda_tensor": 652,
+      "candidate:domain.persistence_pg18": 553,
+      "candidate:domain.codeintel_ast_routing": 413,
+      "candidate:domain.nlp_okf_docs": 369,
+      "candidate:domain.runtime_cache_residency": 350,
+      "candidate:domain.frontend_svelte5_ui": 269,
+      "candidate:domain.evidence_media_video": 216,
+      "candidate:domain.scene_3d": 201
+    },
+    "extensionDistribution": {
+      "ts": 270,
+      "json": 169,
+      "mjs": 110,
+      "py": 88,
+      "svelte": 27,
+      "sql": 26,
+      "mts": 22,
+      "cpp": 9,
+      "yaml": 6,
+      "proto": 3,
+      "yml": 3,
+      "okf": 2,
+      "rs": 2
+    }
+  },
+  "graphReceipts": {
+    "torchCuda": {
+      "backend": "torch_cuda",
+      "nodeCount": 98,
+      "edgeCount": 402,
+      "tupleCount": 402
+    },
+    "networkx": {
+      "backend": "networkx",
+      "nodeCount": 98,
+      "edgeCount": 402
+    }
+  },
+  "top16PromptCandidates": [
+    {
+      "rank": 1,
+      "taskIdentityKey": "crime-scene-reconstruction:CASE-SCENE-LIVE-04",
+      "taskId": "CASE-SCENE-LIVE-04",
+      "change": "crime-scene-reconstruction",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.runtime_cache_residency",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 5,
+      "kmeansCentroidSim": 0.7035,
+      "pcaCoords": [
+        -2.88823,
+        0.71342,
+        -3.96375,
+        -7.38655
+      ],
+      "ewinTangTargetScore": 0.297642,
+      "predictedTangScore": 0.256301,
+      "residencyDescriptorKey": "8bb3c316449505b83cd62df9926623c62f04e2aac5c4e94dcf1c8b0cd94de86c",
+      "extensions": [
+        "svelte",
+        "ts"
+      ],
+      "combinedScore": 0.790678,
+      "pagerankCuda": 0.0258,
+      "pagerankNetworkx": 0.0258,
+      "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L859",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "LOD",
+          "Three.js",
+          "Morton",
+          "9"
+        ],
+        "entities": [
+          "LOD",
+          "Three.js",
+          "Morton",
+          "9"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:postgresql-18:38d5e74bafb89df8:27",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/release-18.html",
+          "cosineScore": 0.2932,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "Add function\n`PQfullProtocolVersion()`\nto report the full, including minor, protocol version number (Jacob Champion, Jelte Fennema-Nio)\n\u00a7\nAdd libpq connection\nparameters\nand\nenviro"
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:sveltekit:e650ae13a0841739:27",
+          "provider": "sveltejs",
+          "product": "sveltekit",
+          "url": "https://svelte.dev/docs/kit/form-actions",
+          "cosineScore": 0.2901,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "the response, but also make the cookie available via\n`cookies.get`\nor\n`cookies.getAll`\nduring the current request.\nThe\n`httpOnly`\nand\n`secure`\noptions are\n`true`\nby default (except"
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:bits-ui:c2518c9dc5ebcc35:11",
+          "provider": "huntabyte",
+          "product": "bits-ui",
+          "url": "https://bits-ui.com/docs/migration-guide",
+          "cosineScore": 0.2883,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "The\n`*Menu.RadioIndicator`\nand\n`*Menu.CheckboxIndicator`\ncomponents have been removed in favor of using the\n`children`\nsnippet prop to get a reference to the\n`checked`\nor\n`selected"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "CASE-SCENE-LIVE-04",
+        "task_identity_key": "crime-scene-reconstruction:CASE-SCENE-LIVE-04",
+        "domain_candidate": "candidate:domain.runtime_cache_residency",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 5,
+        "okf_doc_refs": [
+          "doc:postgresql-18:38d5e74bafb89df8:27",
+          "doc:sveltekit:e650ae13a0841739:27",
+          "doc:bits-ui:c2518c9dc5ebcc35:11"
+        ],
+        "instruction": "Review and produce a bounded proposal for crime-scene-reconstruction:CASE-SCENE-LIVE-04 at openspec/changes/crime-scene-reconstruction/tasks.md#L859",
+        "summary": "**CASE-SCENE-LIVE-04 \u00b7 Activity-aware memory and LOD \u00b7 CREATED and WIRED (partial).** The case Three.js runtime now consumes the existing Morton cell-residency planner for urban/beach environments, uses a profile-bounded cell cap (retro 9, "
+      }
+    },
+    {
+      "rank": 2,
+      "taskIdentityKey": "parent-atlas-spz-detective-renderer#0daacf2675707896",
+      "taskId": "10.15",
+      "change": "parent-atlas-spz-detective-renderer",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.testing_verification_gan",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 2,
+      "kmeansCentroidSim": 0.8087,
+      "pcaCoords": [
+        8.83536,
+        -0.07619,
+        -3.08004,
+        -2.6342
+      ],
+      "ewinTangTargetScore": 0.215546,
+      "predictedTangScore": 0.220728,
+      "residencyDescriptorKey": "2b73469f21d50573888737f4b4f8141af8fdf1893aed26788972c1110c830ada",
+      "extensions": [
+        "json",
+        "py",
+        "ts"
+      ],
+      "combinedScore": 0.786305,
+      "pagerankCuda": 0.028444,
+      "pagerankNetworkx": 0.028444,
+      "locator": "openspec/changes/parent-atlas-spz-detective-renderer/tasks.md#L213",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "10.15",
+          "domain.testing_verification_gan",
+          "1928",
+          "Rubber-Hose",
+          "Rare",
+          "2026-11-06"
+        ],
+        "entities": [
+          "10.15",
+          "domain.testing_verification_gan",
+          "1928",
+          "Rubber-Hose",
+          "Rare",
+          "2026-11-06"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:drizzle-orm:fa0a1af1c2ddb64c:3",
+          "provider": "drizzle-team",
+          "product": "drizzle-orm",
+          "url": "https://orm.drizzle.team/docs/column-types",
+          "cosineScore": 0.2802,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "`bigint`\n`int8`\nSigned 8-byte integer\nIf you need\n`bigint autoincrement`\nplease refer to\nbigserial.\nIf you\u2019re expecting values above 2^31 but below 2^53, you can utilise\n`mode: 'nu"
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:bits-ui:6b3cf8151e01df1d:0",
+          "provider": "huntabyte",
+          "product": "bits-ui",
+          "url": "https://bits-ui.com/docs/child-snippet",
+          "cosineScore": 0.2612,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "Learn how to use the `child` snippet to render your own elements.\nThis is a documentation section that potentially contains examples, demos, and other\n useful information related t"
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:bits-ui:c2518c9dc5ebcc35:0",
+          "provider": "huntabyte",
+          "product": "bits-ui",
+          "url": "https://bits-ui.com/docs/migration-guide",
+          "cosineScore": 0.2531,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "Learn how to migrate from 0.x to 1.x+\nThis is a documentation section that potentially contains examples, demos, and other\n useful information related to a specific part of Bits UI"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "10.15",
+        "task_identity_key": "parent-atlas-spz-detective-renderer#0daacf2675707896",
+        "domain_candidate": "candidate:domain.testing_verification_gan",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 2,
+        "okf_doc_refs": [
+          "doc:drizzle-orm:fa0a1af1c2ddb64c:3",
+          "doc:bits-ui:6b3cf8151e01df1d:0",
+          "doc:bits-ui:c2518c9dc5ebcc35:0"
+        ],
+        "instruction": "Review and produce a bounded proposal for parent-atlas-spz-detective-renderer#0daacf2675707896 at openspec/changes/parent-atlas-spz-detective-renderer/tasks.md#L213",
+        "summary": "10.15 1928 Rubber-Hose character and Rare-era polygon budget proof (2026-11-06): headless Blender 4.3.2 script `scripts/blender/rubber_hose_character_v1.py` proceduralized geometry into 1,672 triangles (comfortably within the 1,000\u20132,500 ta"
+      }
+    },
+    {
+      "rank": 3,
+      "taskIdentityKey": "parent-atlas-spz-detective-renderer:10.7",
+      "taskId": "10.7",
+      "change": "parent-atlas-spz-detective-renderer",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.persistence_pg18",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 4,
+      "kmeansCentroidSim": 0.8707,
+      "pcaCoords": [
+        8.39738,
+        -12.02678,
+        6.52712,
+        1.59686
+      ],
+      "ewinTangTargetScore": 0.177631,
+      "predictedTangScore": 0.183591,
+      "residencyDescriptorKey": "2ccdedc241e95c333955b65d9950bb9f974950d9ad13c44560f0d8e0729e5eb3",
+      "extensions": [
+        "json",
+        "py",
+        "ts",
+        "yaml"
+      ],
+      "combinedScore": 0.785735,
+      "pagerankCuda": 0.029572,
+      "pagerankNetworkx": 0.029572,
+      "locator": "openspec/changes/parent-atlas-spz-detective-renderer/tasks.md#L196",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "10.7",
+          "domain.persistence_pg18",
+          "2026-11-06",
+          "Blender 4.3.2",
+          "Eevee/AgX",
+          "GLB"
+        ],
+        "entities": [
+          "10.7",
+          "domain.persistence_pg18",
+          "2026-11-06",
+          "Blender 4.3.2",
+          "Eevee/AgX",
+          "GLB"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:sveltekit:e650ae13a0841739:7",
+          "provider": "sveltejs",
+          "product": "sveltekit",
+          "url": "https://svelte.dev/docs/kit/form-actions",
+          "cosineScore": 0.2463,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "Form actions\nDefault actions\nNamed actions\nAnatomy of an action\nValidation errors\nRedirects\nLoading data\nProgressive enhancement\nuse:enhance\nCustomising use:enhance\nCustom event li"
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:sveltekit:e650ae13a0841739:19",
+          "provider": "sveltejs",
+          "product": "sveltekit",
+          "url": "https://svelte.dev/docs/kit/form-actions",
+          "cosineScore": 0.2443,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "fully logged in! Welcome back, {data.user.name}</p>\n{/if}\n```\nLegacy mode\n`PageProps`\nwas added in 2.16.0. In earlier versions, you had to type the\n`data`\nand\n`form`\nproperties ind"
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:sveltekit:5166571dffc19c6d:23",
+          "provider": "sveltejs",
+          "product": "sveltekit",
+          "url": "https://svelte.dev/docs/kit/page-options",
+          "cosineScore": 0.1996,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "Tutorial: Page options\nEdit this page on GitHub\nllms.txt\nprevious\nnext\nForm actions\nState management"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "10.7",
+        "task_identity_key": "parent-atlas-spz-detective-renderer:10.7",
+        "domain_candidate": "candidate:domain.persistence_pg18",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 4,
+        "okf_doc_refs": [
+          "doc:sveltekit:e650ae13a0841739:7",
+          "doc:sveltekit:e650ae13a0841739:19",
+          "doc:sveltekit:5166571dffc19c6d:23"
+        ],
+        "instruction": "Review and produce a bounded proposal for parent-atlas-spz-detective-renderer:10.7 at openspec/changes/parent-atlas-spz-detective-renderer/tasks.md#L196",
+        "summary": "10.7 Shader/material reference refresh (2026-11-06): reran `scripts/blender/material-preset-swatch.py` with Blender 4.3.2; Eevee/AgX render, `.blend` save, GLB export and independent GLB reimport passed (5 meshes, 5 expected materials; GLB "
+      }
+    },
+    {
+      "rank": 4,
+      "taskIdentityKey": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "taskId": "CASE-SCENE-E2E-11",
+      "change": "crime-scene-reconstruction",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.scene_3d",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 0,
+      "kmeansCentroidSim": 0.7111,
+      "pcaCoords": [
+        1.08459,
+        0.03931,
+        -4.02039,
+        -1.89798
+      ],
+      "ewinTangTargetScore": 0.270616,
+      "predictedTangScore": 0.375321,
+      "residencyDescriptorKey": "0f14eb1ec2b14f926cdf95da56d666348ef5db220cd1df6f879319016520a6e1",
+      "extensions": [
+        "svelte",
+        "ts"
+      ],
+      "combinedScore": 0.779732,
+      "pagerankCuda": 0.018293,
+      "pagerankNetworkx": 0.018293,
+      "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L874",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "2026-11-20",
+          "Atlas Character"
+        ],
+        "entities": [
+          "2026-11-20",
+          "Atlas Character"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:postgresql-18:38d5e74bafb89df8:39",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/release-18.html",
+          "cosineScore": 0.4204,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "The following individuals (in alphabetical order) have contributed to this release as patch authors, committers, reviewers, testers, or reporters of issues.\nAbhishek Chanda\nAdam Gu"
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:sveltekit:5166571dffc19c6d:15",
+          "provider": "sveltejs",
+          "product": "sveltekit",
+          "url": "https://svelte.dev/docs/kit/page-options",
+          "cosineScore": 0.2797,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "If you encounter an error like \u2018The following routes were marked as prerenderable, but were not prerendered\u2019 it\u2019s because the route in question (or a parent layout, if it\u2019s a page)"
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:36",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/using-explain.html",
+          "cosineScore": 0.2721,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "he actual row count is only 2 and the run time is less than the cost estimate would suggest. This is not an estimation error, only a discrepancy in the way the estimates and true v"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "CASE-SCENE-E2E-11",
+        "task_identity_key": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+        "domain_candidate": "candidate:domain.scene_3d",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 0,
+        "okf_doc_refs": [
+          "doc:postgresql-18:38d5e74bafb89df8:39",
+          "doc:sveltekit:5166571dffc19c6d:15",
+          "doc:postgresql-18:c80bd7e95d17f8ae:36"
+        ],
+        "instruction": "Review and produce a bounded proposal for crime-scene-reconstruction#2eb42e7e5c6d88e6 at openspec/changes/crime-scene-reconstruction/tasks.md#L874",
+        "summary": "**CASE-SCENE-E2E-11-character-v2-alignment \u00b7 CREATED and WIRED (partial, 2026-11-20).** Reconciled the Parent Atlas Character Creator v2 reference modules (`sveltekit-frontend/src/lib/characters/character-runtime-v2.ts`) into the existing `"
+      }
+    },
+    {
+      "rank": 5,
+      "taskIdentityKey": "parent-atlas-spz-detective-renderer:10.4",
+      "taskId": "10.4",
+      "change": "parent-atlas-spz-detective-renderer",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.persistence_pg18",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 4,
+      "kmeansCentroidSim": 0.8707,
+      "pcaCoords": [
+        7.02723,
+        -8.66234,
+        -1.55184,
+        -4.26186
+      ],
+      "ewinTangTargetScore": 0.157896,
+      "predictedTangScore": 0.132239,
+      "residencyDescriptorKey": "9f6e72c964ff6303554fb86139f31d5bd84be17ccb07938e0f8cd35aa5479760",
+      "extensions": [
+        "json",
+        "mjs",
+        "py"
+      ],
+      "combinedScore": 0.773423,
+      "pagerankCuda": 0.028107,
+      "pagerankNetworkx": 0.028107,
+      "locator": "openspec/changes/parent-atlas-spz-detective-renderer/tasks.md#L195",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "10.4",
+          "domain.persistence_pg18",
+          "2026-11-06",
+          "four"
+        ],
+        "entities": [
+          "10.4",
+          "domain.persistence_pg18",
+          "2026-11-06",
+          "four"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:bits-ui:6b3cf8151e01df1d:7",
+          "provider": "huntabyte",
+          "product": "bits-ui",
+          "url": "https://bits-ui.com/docs/child-snippet",
+          "cosineScore": 0.2033,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "You can apply Svelte-specific features to your custom elements, such as transitions, actions, and scoped styles:\n```\n<Accordion.Trigger>\n  {#snippet child({ props })}\n    <div {..."
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:drizzle-orm:fa0a1af1c2ddb64c:16",
+          "provider": "drizzle-team",
+          "product": "drizzle-orm",
+          "url": "https://orm.drizzle.team/docs/column-types",
+          "cosineScore": 0.1827,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "`json`\nTextual JSON data, as specified in\nRFC 7159.\nFor more info please refer to the official PostgreSQL\ndocs.\n```plaintext\nimport { sql } from \"drizzle-orm\";\nimport { json, pgTab"
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:3",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "url": "https://svelte.dev/docs/svelte/$derived",
+          "cosineScore": 0.1786,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "Scoped styles\nGlobal styles\nCustom properties\nNested <style> elements"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "10.4",
+        "task_identity_key": "parent-atlas-spz-detective-renderer:10.4",
+        "domain_candidate": "candidate:domain.persistence_pg18",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 4,
+        "okf_doc_refs": [
+          "doc:bits-ui:6b3cf8151e01df1d:7",
+          "doc:drizzle-orm:fa0a1af1c2ddb64c:16",
+          "doc:svelte5-runes:a9f84a9bc441daa2:3"
+        ],
+        "instruction": "Review and produce a bounded proposal for parent-atlas-spz-detective-renderer:10.4 at openspec/changes/parent-atlas-spz-detective-renderer/tasks.md#L195",
+        "summary": "10.4 Material/shader authoring proof (2026-11-06): `scripts/blender/material-presets-v1.json` defines four synthetic demonstrative metallic-roughness swatches; `scripts/blender/material-preset-swatch.py` assigns sRGB palette colors through "
+      }
+    },
+    {
+      "rank": 6,
+      "taskIdentityKey": "crime-scene-reconstruction#ea3a1f672efbce15",
+      "taskId": "crime-scene-reconstruction#ea3a1f672efbce15",
+      "change": "crime-scene-reconstruction",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.scene_3d",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 0,
+      "kmeansCentroidSim": 0.5562,
+      "pcaCoords": [
+        16.66001,
+        10.22169,
+        3.42544,
+        4.87428
+      ],
+      "ewinTangTargetScore": 0.180218,
+      "predictedTangScore": 0.164762,
+      "residencyDescriptorKey": "be18edb30bdaed8b50757c0d66e372569dee8d6ea1f4dd8bb5fc6206c39187e6",
+      "extensions": [
+        "ts"
+      ],
+      "combinedScore": 0.771961,
+      "pagerankCuda": 0.023678,
+      "pagerankNetworkx": 0.023678,
+      "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L224",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "15.D1",
+          "one",
+          "1",
+          "10"
+        ],
+        "entities": [
+          "15.D1",
+          "one",
+          "1",
+          "10"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:bits-ui:933224c7e6a17940:48",
+          "provider": "huntabyte",
+          "product": "bits-ui",
+          "url": "https://bits-ui.com/docs/components/dialog",
+          "cosineScore": 0.225,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "-accent-foreground);\n\t--color-destructive: var(--destructive);\n\t--color-tertiary: var(--tertiary);\n\t--color-line: var(--line);\n\t--color-contrast: var(--contrast);\n \n\t--shadow-mini:"
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:bits-ui:933224c7e6a17940:6",
+          "provider": "huntabyte",
+          "product": "bits-ui",
+          "url": "https://bits-ui.com/docs/components/dialog",
+          "cosineScore": 0.2185,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "rtiary);\n\t--color-line: var(--line);\n\t--color-contrast: var(--contrast);\n \n\t--shadow-mini: var(--shadow-mini);\n\t--shadow-mini-inset: var(--shadow-mini-inset);\n\t--shadow-popover: va"
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:sveltekit:62e6dd9932a74b58:84",
+          "provider": "sveltejs",
+          "product": "sveltekit",
+          "url": "https://svelte.dev/docs/kit/load",
+          "cosineScore": 0.2076,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "r a button click, making the load function rerun.\nsrc/routes/+page\nlet count = 0;\nexport async function load({ depends }) {\n\t\ndepends('increase:count');\n\n\t\nreturn { count: count++ "
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "crime-scene-reconstruction#ea3a1f672efbce15",
+        "task_identity_key": "crime-scene-reconstruction#ea3a1f672efbce15",
+        "domain_candidate": "candidate:domain.scene_3d",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 0,
+        "okf_doc_refs": [
+          "doc:bits-ui:933224c7e6a17940:48",
+          "doc:bits-ui:933224c7e6a17940:6",
+          "doc:sveltekit:62e6dd9932a74b58:84"
+        ],
+        "instruction": "Review and produce a bounded proposal for crime-scene-reconstruction#ea3a1f672efbce15 at openspec/changes/crime-scene-reconstruction/tasks.md#L224",
+        "summary": "15.D1 PARTIAL: `src/lib/splat/one-bone-rigid-skin-validator-v1.ts` (per-vertex rigid influence: one bone, weight 1, no blending; bone index range; finite values; optional bone inverses; bounds), 10 tests passing, including `rubber-hose-acto"
+      }
+    },
+    {
+      "rank": 7,
+      "taskIdentityKey": "crime-scene-reconstruction#96ec1d3b98b9dcae",
+      "taskId": "CASE-SCENE-LIVE-01",
+      "change": "crime-scene-reconstruction",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.testing_verification_gan",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 5,
+      "kmeansCentroidSim": 0.7815,
+      "pcaCoords": [
+        -0.7199,
+        -0.05681,
+        3.01226,
+        -3.55337
+      ],
+      "ewinTangTargetScore": 0.37813,
+      "predictedTangScore": 0.346272,
+      "residencyDescriptorKey": "526411a37fb0cb66f2f25be705f96708b2164afa5cab971c08a75096f0f02d83",
+      "extensions": [
+        "svelte",
+        "ts"
+      ],
+      "combinedScore": 0.771094,
+      "pagerankCuda": 0.017424,
+      "pagerankNetworkx": 0.017424,
+      "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L846",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "domain.testing_verification_gan",
+          "ChatSessio"
+        ],
+        "entities": [
+          "domain.testing_verification_gan",
+          "ChatSessio"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:postgresql-18:24d9f452d20b88e0:2",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/indexes-bitmap-scans.html",
+          "cosineScore": 0.386,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "each index with the appropriate query clause and then AND together the index results to identify the result rows.\nTo combine multiple indexes, the system scans each needed index an"
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:sveltekit:e650ae13a0841739:20",
+          "provider": "sveltejs",
+          "product": "sveltekit",
+          "url": "https://svelte.dev/docs/kit/form-actions",
+          "cosineScore": 0.3841,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "If the request couldn\u2019t be processed because of invalid data, you can return validation errors \u2014 along with the previously submitted form values \u2014 back to the user so that they can"
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:postgresql-18:0c1f6c86b4bbe623:2",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/view-pg-aios.html",
+          "cosineScore": 0.3716,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "on relations\nhandle_data_len int2 Length of the data associated with the I/O operation. For I/O to/from shared_buffers and temp_buffers , this indicates the number of buffers the I"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "CASE-SCENE-LIVE-01",
+        "task_identity_key": "crime-scene-reconstruction#96ec1d3b98b9dcae",
+        "domain_candidate": "candidate:domain.testing_verification_gan",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 5,
+        "okf_doc_refs": [
+          "doc:postgresql-18:24d9f452d20b88e0:2",
+          "doc:sveltekit:e650ae13a0841739:20",
+          "doc:postgresql-18:0c1f6c86b4bbe623:2"
+        ],
+        "instruction": "Review and produce a bounded proposal for crime-scene-reconstruction#96ec1d3b98b9dcae at openspec/changes/crime-scene-reconstruction/tasks.md#L846",
+        "summary": "**CASE-SCENE-LIVE-01 \u00b7 Assistant chat and editable proposals \u00b7 CREATED and WIRED (partial).** The case scene builder now sends an explicit user question and a snapshot of the current form through the configured server-generation `ChatSessio"
+      }
+    },
+    {
+      "rank": 8,
+      "taskIdentityKey": "crime-scene-reconstruction:AUD-07",
+      "taskId": "AUD-07",
+      "change": "crime-scene-reconstruction",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.frontend_svelte5_ui",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 2,
+      "kmeansCentroidSim": 0.8087,
+      "pcaCoords": [
+        0.19217,
+        -5.32266,
+        3.17965,
+        -5.50085
+      ],
+      "ewinTangTargetScore": 0.273441,
+      "predictedTangScore": 0.280357,
+      "residencyDescriptorKey": "1ade82b72242fa94d5655d2d582476f481597054caafba60bf034bdd3036b4af",
+      "extensions": [
+        "ts"
+      ],
+      "combinedScore": 0.769376,
+      "pagerankCuda": 0.018989,
+      "pagerankNetworkx": 0.018989,
+      "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L97",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "2026-11-16",
+          "PostgreSQL"
+        ],
+        "entities": [
+          "2026-11-16",
+          "PostgreSQL"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:postgresql-18:38d5e74bafb89df8:6",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/release-18.html",
+          "cosineScore": 0.3328,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "Below you will find a detailed account of the changes between\nPostgreSQL\n18 and the previous major release."
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/release-18.html",
+          "cosineScore": 0.3151,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "Add function\n`casefold()`\nto allow for more sophisticated case-insensitive matching (Jeff Davis)\n\u00a7\nThis allows more accurate comparisons, i.e., a character can have multiple upper "
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:postgresql-18:70d86642ca56e9b0:21",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+          "cosineScore": 0.3074,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "forced writeback, and\n`2MB`\n. The default is\n`512kB`\non Linux,\n`0`\nelsewhere. (If\n`BLCKSZ`\nis not 8kB, the default and maximum values scale proportionally to it.) This parameter ca"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "AUD-07",
+        "task_identity_key": "crime-scene-reconstruction:AUD-07",
+        "domain_candidate": "candidate:domain.frontend_svelte5_ui",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 2,
+        "okf_doc_refs": [
+          "doc:postgresql-18:38d5e74bafb89df8:6",
+          "doc:postgresql-18:38d5e74bafb89df8:26",
+          "doc:postgresql-18:70d86642ca56e9b0:21"
+        ],
+        "instruction": "Review and produce a bounded proposal for crime-scene-reconstruction:AUD-07 at openspec/changes/crime-scene-reconstruction/tasks.md#L97",
+        "summary": "AUD-07 CORRECTED 2026-11-16: a production crime-scene page exists at `src/routes/(app)/cases/[id]/crime-scene/`. Its server load reads `scene_markers`, `scene_assets` and investigation facets and exports from PostgreSQL, scoped to the case "
+      }
+    },
+    {
+      "rank": 9,
+      "taskIdentityKey": "crime-scene-reconstruction#73cb6d733ed06dd5",
+      "taskId": "CASE-SCENE-LIVE-03",
+      "change": "crime-scene-reconstruction",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.evidence_media_video",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 5,
+      "kmeansCentroidSim": 0.7178,
+      "pcaCoords": [
+        -1.46556,
+        1.49718,
+        -1.02759,
+        -1.53961
+      ],
+      "ewinTangTargetScore": 0.355023,
+      "predictedTangScore": 0.339511,
+      "residencyDescriptorKey": null,
+      "extensions": [
+        "ts"
+      ],
+      "combinedScore": 0.768384,
+      "pagerankCuda": 0.017129,
+      "pagerankNetworkx": 0.017129,
+      "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L857",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "worktree",
+          "Range",
+          "Three.js"
+        ],
+        "entities": [
+          "worktree",
+          "Range",
+          "Three.js"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:13",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/using-explain.html",
+          "cosineScore": 0.3758,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "costs of the loop node are then set on the basis of the cost of the outer scan, plus one repetition of the inner scan for each outer row (10 * 7.90, here), plus a little CPU time f"
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:postgresql-18:70d86642ca56e9b0:26",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+          "cosineScore": 0.3678,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "`max_worker_processes`\n(\n`integer`\n)\n#\nSets the maximum number of background processes that the cluster can support. This parameter can only be set at server start. The default is "
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:postgresql-18:70d86642ca56e9b0:3",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+          "cosineScore": 0.3649,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "s`\n(\n`enum`\n)\n#\nControls whether huge pages are requested for the main shared memory area. Valid values are\n`try`\n(the default),\n`on`\n, and\n`off`\n. This parameter can only be set a"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "CASE-SCENE-LIVE-03",
+        "task_identity_key": "crime-scene-reconstruction#73cb6d733ed06dd5",
+        "domain_candidate": "candidate:domain.evidence_media_video",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 5,
+        "okf_doc_refs": [
+          "doc:postgresql-18:c80bd7e95d17f8ae:13",
+          "doc:postgresql-18:70d86642ca56e9b0:26",
+          "doc:postgresql-18:70d86642ca56e9b0:3"
+        ],
+        "instruction": "Review and produce a bounded proposal for crime-scene-reconstruction#73cb6d733ed06dd5 at openspec/changes/crime-scene-reconstruction/tasks.md#L857",
+        "summary": "**CASE-SCENE-LIVE-03-video-clock \u00b7 CREATED and WIRED**, worktree base `4ae8253ab6e`. The scene preview can follow the selected lane's revision-pinned video through the existing authorized evidence Range route. Frame callbacks drive Three.js"
+      }
+    },
+    {
+      "rank": 10,
+      "taskIdentityKey": "crime-scene-reconstruction#af5b7979a6e5b635",
+      "taskId": "CASE-SCENE-E2E-02c",
+      "change": "crime-scene-reconstruction",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.persistence_pg18",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 1,
+      "kmeansCentroidSim": 0.8668,
+      "pcaCoords": [
+        -0.98563,
+        -0.57766,
+        -1.86367,
+        1.24501
+      ],
+      "ewinTangTargetScore": 0.36861,
+      "predictedTangScore": 0.373632,
+      "residencyDescriptorKey": null,
+      "extensions": [
+        "ts"
+      ],
+      "combinedScore": 0.766738,
+      "pagerankCuda": 0.015314,
+      "pagerankNetworkx": 0.015314,
+      "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L818",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "domain.persistence_pg18",
+          "WIRED",
+          "worktree"
+        ],
+        "entities": [
+          "domain.persistence_pg18",
+          "WIRED",
+          "worktree"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:postgresql-18:24d9f452d20b88e0:2",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/indexes-bitmap-scans.html",
+          "cosineScore": 0.4132,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "each index with the appropriate query clause and then AND together the index results to identify the result rows.\nTo combine multiple indexes, the system scans each needed index an"
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:postgresql-18:38d5e74bafb89df8:14",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/release-18.html",
+          "cosineScore": 0.3982,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "`slru_written`\nto report\nSLRU\nbuffers written (Nitin Jadhav)\n\u00a7\nAlso, modify the checkpoint server log message to report separate shared buffer and\nSLRU\nbuffer values.\nAdd columns t"
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:postgresql-18:0c1f6c86b4bbe623:2",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/view-pg-aios.html",
+          "cosineScore": 0.398,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "on relations\nhandle_data_len int2 Length of the data associated with the I/O operation. For I/O to/from shared_buffers and temp_buffers , this indicates the number of buffers the I"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "CASE-SCENE-E2E-02c",
+        "task_identity_key": "crime-scene-reconstruction#af5b7979a6e5b635",
+        "domain_candidate": "candidate:domain.persistence_pg18",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 1,
+        "okf_doc_refs": [
+          "doc:postgresql-18:24d9f452d20b88e0:2",
+          "doc:postgresql-18:38d5e74bafb89df8:14",
+          "doc:postgresql-18:0c1f6c86b4bbe623:2"
+        ],
+        "instruction": "Review and produce a bounded proposal for crime-scene-reconstruction#af5b7979a6e5b635 at openspec/changes/crime-scene-reconstruction/tasks.md#L818",
+        "summary": "CASE-SCENE-E2E-02c-5-procedural-draft CREATED and WIRED at worktree base `4ae8253ab6e`: save and reopen the illustrative plan and event/time/object notes through the existing authorized revision route and feature gate. The writer recomputes"
+      }
+    },
+    {
+      "rank": 11,
+      "taskIdentityKey": "parent-atlas-ontology-kernel:ORNITH-AUDIT-02",
+      "taskId": "ORNITH-AUDIT-02",
+      "change": "parent-atlas-ontology-kernel",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.security_auth_governance",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 0,
+      "kmeansCentroidSim": 0.5987,
+      "pcaCoords": [
+        1.28661,
+        -2.8624,
+        -13.46727,
+        7.54663
+      ],
+      "ewinTangTargetScore": 0.26127,
+      "predictedTangScore": 0.251205,
+      "residencyDescriptorKey": null,
+      "extensions": [
+        "json",
+        "mjs",
+        "ts"
+      ],
+      "combinedScore": 0.762425,
+      "pagerankCuda": 0.021975,
+      "pagerankNetworkx": 0.021975,
+      "locator": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L5561",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "2026-10-17",
+          "1"
+        ],
+        "entities": [
+          "2026-10-17",
+          "1"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:svelte5-runes:9d3a717d27cb2c0d:36",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "url": "https://svelte.dev/docs/svelte/$state",
+          "cosineScore": 0.2935,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "rld, to out\nmyConsole.log('hello %s', 'world');\n// Prints: hello world, to out\nmyConsole.error(new Error('Whoops, something bad happened'));\n// Prints: [Error: Whoops, something ba"
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:sveltekit:62e6dd9932a74b58:28",
+          "provider": "sveltejs",
+          "product": "sveltekit",
+          "url": "https://svelte.dev/docs/kit/load",
+          "cosineScore": 0.2712,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "can be used without importing the node:console module.\n\nWarning: The global console object\u2019s methods are neither consistently\nsynchronous like the browser APIs they resemble, nor a"
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:svelte5-runes:9d3a717d27cb2c0d:29",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "url": "https://svelte.dev/docs/svelte/$state",
+          "cosineScore": 0.2667,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "thods are neither consistently\nsynchronous like the browser APIs they resemble, nor are they consistently\nasynchronous like all other Node.js streams. See the note on process I/O f"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "ORNITH-AUDIT-02",
+        "task_identity_key": "parent-atlas-ontology-kernel:ORNITH-AUDIT-02",
+        "domain_candidate": "candidate:domain.security_auth_governance",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 0,
+        "okf_doc_refs": [
+          "doc:svelte5-runes:9d3a717d27cb2c0d:36",
+          "doc:sveltekit:62e6dd9932a74b58:28",
+          "doc:svelte5-runes:9d3a717d27cb2c0d:29"
+        ],
+        "instruction": "Review and produce a bounded proposal for parent-atlas-ontology-kernel:ORNITH-AUDIT-02 at openspec/changes/parent-atlas-ontology-kernel/tasks.md#L5561",
+        "summary": "ORNITH-AUDIT-02 PARTIAL (2026-10-17, operator chose option 1): migrated the script the npm entries actually run, `sveltekit-frontend/scripts/graphify-audit-gemma4.mjs` (name kept; `graphify:audit:gemma4` stays a legacy alias). Finding: a se"
+      }
+    },
+    {
+      "rank": 12,
+      "taskIdentityKey": "crime-scene-reconstruction:SCENE-20",
+      "taskId": "SCENE-20",
+      "change": "crime-scene-reconstruction",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.scene_3d",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 3,
+      "kmeansCentroidSim": 1.0,
+      "pcaCoords": [
+        -1.19806,
+        9.10514,
+        0.75264,
+        -5.33376
+      ],
+      "ewinTangTargetScore": 0.226348,
+      "predictedTangScore": 0.25624,
+      "residencyDescriptorKey": null,
+      "extensions": [
+        "py",
+        "ts"
+      ],
+      "combinedScore": 0.757965,
+      "pagerankCuda": 0.017685,
+      "pagerankNetworkx": 0.017685,
+      "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L40",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "508"
+        ],
+        "entities": [
+          "508"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:drizzle-orm:e4532e671c881d5f:0",
+          "provider": "drizzle-team",
+          "product": "drizzle-orm",
+          "url": "https://orm.drizzle.team/docs/guides/vector-similarity-search",
+          "cosineScore": 0.2915,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "This guide assumes familiarity with:\nGet started with\nPostgreSQL\nSelect statement\nIndexes\nsql operator\npgvector extension\nDrizzle kit\nYou should have installed the\n`openai`\npackage"
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:pgvector:fe883c75f323441d:90",
+          "provider": "pgvector",
+          "product": "pgvector",
+          "url": "https://github.com/pgvector/pgvector",
+          "cosineScore": 0.2686,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "Thanks to:\nPASE: PostgreSQL Ultra-High-Dimensional Approximate Nearest Neighbor Search Extension\nFaiss: A Library for Efficient Similarity Search and Clustering of Dense Vectors\nUs"
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:drizzle-orm:fa0a1af1c2ddb64c:26",
+          "provider": "drizzle-team",
+          "product": "drizzle-orm",
+          "url": "https://orm.drizzle.team/docs/column-types",
+          "cosineScore": 0.2609,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "`enum`\n`enumerated types`\nEnumerated (enum) types are data types that comprise a static, ordered set of values.\nThey are equivalent to the enum types supported in a number of progr"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "SCENE-20",
+        "task_identity_key": "crime-scene-reconstruction:SCENE-20",
+        "domain_candidate": "candidate:domain.scene_3d",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 3,
+        "okf_doc_refs": [
+          "doc:drizzle-orm:e4532e671c881d5f:0",
+          "doc:pgvector:fe883c75f323441d:90",
+          "doc:drizzle-orm:fa0a1af1c2ddb64c:26"
+        ],
+        "instruction": "Review and produce a bounded proposal for crime-scene-reconstruction:SCENE-20 at openspec/changes/crime-scene-reconstruction/tasks.md#L40",
+        "summary": "SCENE-20 Primitive vocabulary and composition: reuse `scene-primitive-registry-v1.ts`, `scene-prefab-registry-v1.ts`, and the proposed 508-concept ontology vocabulary; keep `scene-catalog-pack-v1.ts` as retrieval/ranking metadata, not geome"
+      }
+    },
+    {
+      "rank": 13,
+      "taskIdentityKey": "crime-scene-reconstruction#550e8fe10db602fd",
+      "taskId": "CASE-SCENE-E2E-02c",
+      "change": "crime-scene-reconstruction",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.testing_verification_gan",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 1,
+      "kmeansCentroidSim": 0.8049,
+      "pcaCoords": [
+        0.09764,
+        -0.16424,
+        -3.63806,
+        2.66223
+      ],
+      "ewinTangTargetScore": 0.246647,
+      "predictedTangScore": 0.234814,
+      "residencyDescriptorKey": null,
+      "extensions": [
+        "ts"
+      ],
+      "combinedScore": 0.751719,
+      "pagerankCuda": 0.016566,
+      "pagerankNetworkx": 0.016566,
+      "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L816",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "CREATED",
+          "WIRED",
+          "worktree"
+        ],
+        "entities": [
+          "CREATED",
+          "WIRED",
+          "worktree"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:svelte5-runes:4606958abe2e620d:11",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "url": "https://svelte.dev/docs/svelte/$effect",
+          "cosineScore": 0.2797,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "Your effects run after the component has been mounted to the DOM, and in a\nmicrotask\nafter state changes. Re-runs are batched (i.e. changing\n`color`\nand\n`size`\nin the same moment w"
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:sveltekit:a96c1d15fd75f782:30",
+          "provider": "sveltejs",
+          "product": "sveltekit",
+          "url": "https://svelte.dev/docs/kit/hooks",
+          "cosineScore": 0.2738,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "equests made with\n`event.fetch`\nfollow the browser\u2019s credentials model \u2014 for same-origin requests,\n`cookie`\nand\n`authorization`\nheaders are forwarded unless the\n`credentials`\noptio"
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:drizzle-orm:fa0a1af1c2ddb64c:25",
+          "provider": "drizzle-team",
+          "product": "drizzle-orm",
+          "url": "https://orm.drizzle.team/docs/column-types",
+          "cosineScore": 0.2644,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "`line`\nGeometric line type\nFor more info please refer to the official PostgreSQL\ndocs.\nType\n`line`\nhas 2 modes for mappings from the database:\n`tuple`\nand\n`abc`\n.\n`tuple`\nwill be a"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "CASE-SCENE-E2E-02c",
+        "task_identity_key": "crime-scene-reconstruction#550e8fe10db602fd",
+        "domain_candidate": "candidate:domain.testing_verification_gan",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 1,
+        "okf_doc_refs": [
+          "doc:svelte5-runes:4606958abe2e620d:11",
+          "doc:sveltekit:a96c1d15fd75f782:30",
+          "doc:drizzle-orm:fa0a1af1c2ddb64c:25"
+        ],
+        "instruction": "Review and produce a bounded proposal for crime-scene-reconstruction#550e8fe10db602fd at openspec/changes/crime-scene-reconstruction/tasks.md#L816",
+        "summary": "CASE-SCENE-E2E-02c-5-edit-reopened CREATED and WIRED at worktree base `4ae8253ab6e`: reopening an editor-compatible draft restores its environment, actors, props, evidence selection and cues. Form changes appear in the viewport only after G"
+      }
+    },
+    {
+      "rank": 14,
+      "taskIdentityKey": "crime-scene-reconstruction#b5017fd33a74b8dd",
+      "taskId": "CASE-SCENE-E2E-02c",
+      "change": "crime-scene-reconstruction",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.evidence_media_video",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 1,
+      "kmeansCentroidSim": 0.818,
+      "pcaCoords": [
+        -2.47478,
+        2.06526,
+        -0.94211,
+        0.23619
+      ],
+      "ewinTangTargetScore": 0.261146,
+      "predictedTangScore": 0.265994,
+      "residencyDescriptorKey": null,
+      "extensions": [
+        "ts"
+      ],
+      "combinedScore": 0.750431,
+      "pagerankCuda": 0.015404,
+      "pagerankNetworkx": 0.015404,
+      "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L817",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "CREATED",
+          "WIRED",
+          "worktree"
+        ],
+        "entities": [
+          "CREATED",
+          "WIRED",
+          "worktree"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:sveltekit:a96c1d15fd75f782:48",
+          "provider": "sveltejs",
+          "product": "sveltekit",
+          "url": "https://svelte.dev/docs/kit/hooks",
+          "cosineScore": 0.3021,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "URL interface represents a location in a hierarchical structure. It is a string constructed from a list of path segments, each of which is prefixed by a / character.\nMDN Reference\n"
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:sveltekit:62e6dd9932a74b58:10",
+          "provider": "sveltejs",
+          "product": "sveltekit",
+          "url": "https://svelte.dev/docs/kit/load",
+          "cosineScore": 0.2752,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "ted\n`$types`\nmodule, we get full type safety.\nA\n`load`\nfunction in a\n`+page.js`\nfile runs both on the server and in the browser (unless combined with\n`export const ssr = false`\n, i"
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:36",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/using-explain.html",
+          "cosineScore": 0.2697,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "he actual row count is only 2 and the run time is less than the cost estimate would suggest. This is not an estimation error, only a discrepancy in the way the estimates and true v"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "CASE-SCENE-E2E-02c",
+        "task_identity_key": "crime-scene-reconstruction#b5017fd33a74b8dd",
+        "domain_candidate": "candidate:domain.evidence_media_video",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 1,
+        "okf_doc_refs": [
+          "doc:sveltekit:a96c1d15fd75f782:48",
+          "doc:sveltekit:62e6dd9932a74b58:10",
+          "doc:postgresql-18:c80bd7e95d17f8ae:36"
+        ],
+        "instruction": "Review and produce a bounded proposal for crime-scene-reconstruction#b5017fd33a74b8dd at openspec/changes/crime-scene-reconstruction/tasks.md#L817",
+        "summary": "CASE-SCENE-E2E-02c-5-reviewed-video CREATED and WIRED at worktree base `4ae8253ab6e`: the case builder imports approved events from selected case videos using the existing event read endpoint. Imported events keep their original evidence cl"
+      }
+    },
+    {
+      "rank": 15,
+      "taskIdentityKey": "crime-scene-reconstruction:CASE-SCENE-LIVE-05",
+      "taskId": "CASE-SCENE-LIVE-05",
+      "change": "crime-scene-reconstruction",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.runtime_cache_residency",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 5,
+      "kmeansCentroidSim": 0.6867,
+      "pcaCoords": [
+        -0.38259,
+        1.58772,
+        0.51203,
+        -6.8713
+      ],
+      "ewinTangTargetScore": 0.300094,
+      "predictedTangScore": 0.288521,
+      "residencyDescriptorKey": null,
+      "extensions": [
+        "ts"
+      ],
+      "combinedScore": 0.743479,
+      "pagerankCuda": 0.012271,
+      "pagerankNetworkx": 0.012271,
+      "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L860",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "750"
+        ],
+        "entities": [
+          "750"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:bits-ui:933224c7e6a17940:9",
+          "provider": "huntabyte",
+          "product": "bits-ui",
+          "url": "https://bits-ui.com/docs/components/dialog",
+          "cosineScore": 0.3393,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "The Dialog component in Bits UI provides a flexible and accessible way to create modal dialogs in your Svelte applications. It follows a compound component pattern, allowing for fi"
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:bits-ui:c2518c9dc5ebcc35:4",
+          "provider": "huntabyte",
+          "product": "bits-ui",
+          "url": "https://bits-ui.com/docs/migration-guide",
+          "cosineScore": 0.2945,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "Bits UI has been completely rewritten for Svelte 5, bringing several key benefits:\nPerformance improvements\n\u2013 Faster rendering and reduced overhead.\nMore flexible APIs\n\u2013 Easier cus"
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:svelte5-runes:4606958abe2e620d:11",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "url": "https://svelte.dev/docs/svelte/$effect",
+          "cosineScore": 0.293,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "Your effects run after the component has been mounted to the DOM, and in a\nmicrotask\nafter state changes. Re-runs are batched (i.e. changing\n`color`\nand\n`size`\nin the same moment w"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "CASE-SCENE-LIVE-05",
+        "task_identity_key": "crime-scene-reconstruction:CASE-SCENE-LIVE-05",
+        "domain_candidate": "candidate:domain.runtime_cache_residency",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 5,
+        "okf_doc_refs": [
+          "doc:bits-ui:933224c7e6a17940:9",
+          "doc:bits-ui:c2518c9dc5ebcc35:4",
+          "doc:svelte5-runes:4606958abe2e620d:11"
+        ],
+        "instruction": "Review and produce a bounded proposal for crime-scene-reconstruction:CASE-SCENE-LIVE-05 at openspec/changes/crime-scene-reconstruction/tasks.md#L860",
+        "summary": "**CASE-SCENE-LIVE-05 \u00b7 Memory and performance modal \u00b7 CREATED and WIRED (partial).** The scene preview dialog samples at 750 ms while open. It reports focus, bounded rolling p95 frame intervals and timeline seek-to-present latency, Three.js"
+      }
+    },
+    {
+      "rank": 16,
+      "taskIdentityKey": "crime-scene-reconstruction#31024cfb3973a5a9",
+      "taskId": "CASE-SCENE-E2E-02b",
+      "change": "crime-scene-reconstruction",
+      "state": "PARTIAL",
+      "domainCandidateId": "candidate:domain.persistence_pg18",
+      "domainLabelStatus": "UNREVIEWED_CANDIDATE",
+      "domainLabelMethod": "TASK_TEXT_KEYWORD_RULE",
+      "kmeansClusterId": 5,
+      "kmeansCentroidSim": 0.7871,
+      "pcaCoords": [
+        -2.98687,
+        0.45084,
+        2.12736,
+        1.91753
+      ],
+      "ewinTangTargetScore": 0.302179,
+      "predictedTangScore": 0.319641,
+      "residencyDescriptorKey": null,
+      "extensions": [],
+      "combinedScore": 0.736719,
+      "pagerankCuda": 0.016957,
+      "pagerankNetworkx": 0.016957,
+      "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L790",
+      "nlp8095": {
+        "status": "OK",
+        "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.",
+        "concepts": [
+          "domain.persistence_pg18",
+          "Readback",
+          "byte"
+        ],
+        "entities": [
+          "domain.persistence_pg18",
+          "Readback",
+          "byte"
+        ]
+      },
+      "topKOkfDocs": [
+        {
+          "rank": 1,
+          "chunkId": "doc:sveltekit:e650ae13a0841739:20",
+          "provider": "sveltejs",
+          "product": "sveltekit",
+          "url": "https://svelte.dev/docs/kit/form-actions",
+          "cosineScore": 0.3426,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "If the request couldn\u2019t be processed because of invalid data, you can return validation errors \u2014 along with the previously submitted form values \u2014 back to the user so that they can"
+        },
+        {
+          "rank": 2,
+          "chunkId": "doc:pgvector:fe883c75f323441d:76",
+          "provider": "pgvector",
+          "product": "pgvector",
+          "url": "https://github.com/pgvector/pgvector",
+          "cosineScore": 0.3423,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "If compilation fails with\n`error C2196: case value '4' already used`\n, make sure you\u2019re using the\n`x64 Native Tools Command Prompt`\n. Then run\n`nmake /F Makefile.win clean`\nand re-"
+        },
+        {
+          "rank": 3,
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:36",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "url": "https://www.postgresql.org/docs/18/using-explain.html",
+          "cosineScore": 0.3323,
+          "sourceFile": "docs/.okf/pinned/admission-envelopes-v1.json",
+          "excerpt": "he actual row count is only 2 and the run time is less than the cost estimate would suggest. This is not an estimation error, only a discrepancy in the way the estimates and true v"
+        }
+      ],
+      "promptCandidate": {
+        "task_id": "CASE-SCENE-E2E-02b",
+        "task_identity_key": "crime-scene-reconstruction#31024cfb3973a5a9",
+        "domain_candidate": "candidate:domain.persistence_pg18",
+        "domain_label_status": "UNREVIEWED_CANDIDATE",
+        "kmeans_cluster": 5,
+        "okf_doc_refs": [
+          "doc:sveltekit:e650ae13a0841739:20",
+          "doc:pgvector:fe883c75f323441d:76",
+          "doc:postgresql-18:c80bd7e95d17f8ae:36"
+        ],
+        "instruction": "Review and produce a bounded proposal for crime-scene-reconstruction#31024cfb3973a5a9 at openspec/changes/crime-scene-reconstruction/tasks.md#L790",
+        "summary": "CASE-SCENE-E2E-02b-5-recipe-read The case jobs route can return the completed recipe after current case/source/review and scene-revision checks. Readback uses the registered derived bucket and scoped key, enforces a byte limit, verifies SHA"
+      }
+    }
+  ],
+  "tournamentWinner": null,
+  "sampleDomainCandidateTuples": [
+    {
+      "subject": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "predicate": "HAS_DOMAIN_CANDIDATE",
+      "object": "candidate:domain.scene_3d",
+      "origin": "TASK_TEXT_KEYWORD_RULE"
+    },
+    {
+      "subject": "candidate:domain.scene_3d",
+      "predicate": "CANDIDATE_FOR_TASK",
+      "object": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "origin": "TASK_TEXT_KEYWORD_RULE"
+    },
+    {
+      "subject": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "predicate": "IN_KMEANS_CLUSTER",
+      "object": "pa:kmeans.cluster_0",
+      "origin": "RTX_KMEANS_CUDA"
+    },
+    {
+      "subject": "pa:kmeans.cluster_0",
+      "predicate": "CLUSTER_MEMBER",
+      "object": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "origin": "RTX_KMEANS_CUDA"
+    },
+    {
+      "subject": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "predicate": "TOUCHES_EXT",
+      "object": "pa:ext.svelte",
+      "origin": "FILE_PICKUP"
+    },
+    {
+      "subject": "pa:ext.svelte",
+      "predicate": "EXT_REFERENCED_BY",
+      "object": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "origin": "FILE_PICKUP"
+    },
+    {
+      "subject": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "predicate": "TOUCHES_EXT",
+      "object": "pa:ext.ts",
+      "origin": "FILE_PICKUP"
+    },
+    {
+      "subject": "pa:ext.ts",
+      "predicate": "EXT_REFERENCED_BY",
+      "object": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "origin": "FILE_PICKUP"
+    },
+    {
+      "subject": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "predicate": "MENTIONS_CONCEPT",
+      "object": "pa:concept.2026-11-20",
+      "origin": "NLP_8095"
+    },
+    {
+      "subject": "pa:concept.2026-11-20",
+      "predicate": "CONCEPT_IN_TASK",
+      "object": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "origin": "NLP_8095"
+    },
+    {
+      "subject": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "predicate": "MENTIONS_CONCEPT",
+      "object": "pa:concept.atlas_character",
+      "origin": "NLP_8095"
+    },
+    {
+      "subject": "pa:concept.atlas_character",
+      "predicate": "CONCEPT_IN_TASK",
+      "object": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "origin": "NLP_8095"
+    },
+    {
+      "subject": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "predicate": "GROUNDED_IN_OKF_DOC",
+      "object": "pa:okf_doc.postgresql",
+      "origin": "RTX_KNN_OKF"
+    },
+    {
+      "subject": "pa:okf_doc.postgresql",
+      "predicate": "DOC_SUPPORTS_TASK",
+      "object": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "origin": "RTX_KNN_OKF"
+    },
+    {
+      "subject": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "predicate": "GROUNDED_IN_OKF_DOC",
+      "object": "pa:okf_doc.sveltekit",
+      "origin": "RTX_KNN_OKF"
+    },
+    {
+      "subject": "pa:okf_doc.sveltekit",
+      "predicate": "DOC_SUPPORTS_TASK",
+      "object": "crime-scene-reconstruction#2eb42e7e5c6d88e6",
+      "origin": "RTX_KNN_OKF"
+    },
+    {
+      "subject": "crime-scene-reconstruction#550e8fe10db602fd",
+      "predicate": "HAS_DOMAIN_CANDIDATE",
+      "object": "candidate:domain.testing_verification_gan",
+      "origin": "TASK_TEXT_KEYWORD_RULE"
+    },
+    {
+      "subject": "candidate:domain.testing_verification_gan",
+      "predicate": "CANDIDATE_FOR_TASK",
+      "object": "crime-scene-reconstruction#550e8fe10db602fd",
+      "origin": "TASK_TEXT_KEYWORD_RULE"
+    },
+    {
+      "subject": "crime-scene-reconstruction#550e8fe10db602fd",
+      "predicate": "IN_KMEANS_CLUSTER",
+      "object": "pa:kmeans.cluster_1",
+      "origin": "RTX_KMEANS_CUDA"
+    },
+    {
+      "subject": "pa:kmeans.cluster_1",
+      "predicate": "CLUSTER_MEMBER",
+      "object": "crime-scene-reconstruction#550e8fe10db602fd",
+      "origin": "RTX_KMEANS_CUDA"
+    },
+    {
+      "subject": "crime-scene-reconstruction#550e8fe10db602fd",
+      "predicate": "TOUCHES_EXT",
+      "object": "pa:ext.ts",
+      "origin": "FILE_PICKUP"
+    },
+    {
+      "subject": "pa:ext.ts",
+      "predicate": "EXT_REFERENCED_BY",
+      "object": "crime-scene-reconstruction#550e8fe10db602fd",
+      "origin": "FILE_PICKUP"
+    },
+    {
+      "subject": "crime-scene-reconstruction#550e8fe10db602fd",
+      "predicate": "MENTIONS_CONCEPT",
+      "object": "pa:concept.created",
+      "origin": "NLP_8095"
+    },
+    {
+      "subject": "pa:concept.created",
+      "predicate": "CONCEPT_IN_TASK",
+      "object": "crime-scene-reconstruction#550e8fe10db602fd",
+      "origin": "NLP_8095"
+    }
+  ],
+  "reportSha256": "c1a632eaa306c7c05aee3d677f2c8c459e110ba1640f629a90109408434d2f7d"
+}

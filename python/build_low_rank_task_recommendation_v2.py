@@ -122,6 +122,15 @@ def main() -> int:
     parser.add_argument("--rank", type=int, default=3)
     parser.add_argument("--seed", type=int, default=0xA71A5)
     parser.add_argument(
+        "--device",
+        choices=("cpu", "cuda", "auto"),
+        default="cpu",
+        help=(
+            "PyTorch device for low-rank shortlist projection. Explicit cuda fails closed "
+            "if CUDA is unavailable; auto uses CUDA only when PyTorch reports it available."
+        ),
+    )
+    parser.add_argument(
         "--include-task-history",
         action="store_true",
         help="include the unvalidated task-block-age ranking signal for shadow experiments only",
@@ -163,6 +172,12 @@ def main() -> int:
             "taskCount": len(tasks),
         },
         "qualifiedBasis": sorted(allowed_basis),
+        "compute": {
+            "requestedDevice": args.device,
+            "usedDevice": None,
+            "algorithm": "torch.linalg.svd_centered_cosine_projection",
+            "canonicalAuthority": False,
+        },
         "featuresUsed": [f["name"] for f in usable],
         "featuresRejected": rejected,
     }
@@ -204,7 +219,7 @@ def main() -> int:
         rank=rank,
         target_count=len(tasks),
         seed=args.seed,
-        device="cpu",
+        device=None if args.device == "auto" else args.device,
     )
 
     ordered = [
@@ -219,6 +234,7 @@ def main() -> int:
         ],
         "missingCellsMeanFilled": missing_filled,
         "targetRank": rank,
+        "compute": {**base["compute"], "usedDevice": receipt.device},
         "receipt": receipt.to_dict(),
         "tasks": ordered,
     }

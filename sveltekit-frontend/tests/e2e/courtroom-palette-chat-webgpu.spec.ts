@@ -17,8 +17,13 @@ test('courtroom OBJ accepts the indexed palette on the WebGPU TSL path and resto
 	page.on('console', (message) => {
 		if (message.type() === 'error' && /shader|WebGL|WebGPU|WGSL|THREE/i.test(message.text())) shaderConsoleErrors.push(message.text());
 	});
-
 	await page.goto('/demos/courtroom-palette-chat');
+	const webgpuCapability = await page.evaluate(async () => {
+		const gpu = (navigator as Navigator & { gpu?: { requestAdapter: () => Promise<unknown> } }).gpu;
+		return { apiPresent: Boolean(gpu), adapterAvailable: gpu ? Boolean(await gpu.requestAdapter()) : false };
+	});
+	expect(webgpuCapability, 'WebGPU must be enabled in the browser project').toEqual({ apiPresent: true, adapterAvailable: true });
+
 	const objectStatus = page.getByTestId('palette-chat-object-status');
 	await expect(objectStatus).toContainText('OBJ groups', { timeout: 90_000 });
 

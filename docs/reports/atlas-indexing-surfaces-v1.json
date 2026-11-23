@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-09-18T15:32:38.978Z",
+  "generatedAt": "2026-11-23T03:44:13.643Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -28,6 +28,7 @@
   },
   "postgres": {
     "reachable": true,
+    "transactionReadOnly": true,
     "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
     "extensions": {
       "pg_search": "0.25.1",
@@ -36,9 +37,9 @@
     },
     "vectorExtension": "0.8.3",
     "lexicalOwner": "UNVERIFIED_PG_SEARCH_AVAILABLE",
-    "denseOwner": "POSTGRES_CODEBASE_CHUNK_INDEX_CONTENT_EMBEDDING_HALFvec_768_ACTIVE_LANE",
+    "denseOwner": "POSTGRES_CODEBASE_CHUNK_INDEX_CONTENT_EMBEDDING_768_CONTRACT_TARGET_OWNER_NOT_PROVEN",
     "canonicalDenseRepresentation": "semantic_768",
-    "canonicalDenseColumn": "codebase_chunk_index.content_embedding",
+    "canonicalDenseColumn": "codebase_chunk_index.content_embedding_768",
     "proposedSearchProjection": {
       "table": "atlas_file_search_index_v1",
       "applied": false,
@@ -60,15 +61,15 @@
       },
       "atlas_ast_nodes": {
         "exists": true,
-        "count": 11223
+        "count": 523271
       },
       "atlas_symbol_registry": {
         "exists": true,
-        "count": 10504
+        "count": 42922
       },
       "atlas_symbol_versions": {
         "exists": true,
-        "count": 479
+        "count": 32897
       },
       "atlas_structural_reference_resolutions": {
         "exists": true,
@@ -327,7 +328,10 @@
         "source_revision",
         "representation_revision",
         "lineage_binding_checksum",
-        "lineage_producer_revision"
+        "lineage_producer_revision",
+        "summary_provenance",
+        "summary_text",
+        "domain_id"
       ],
       "atlas_packet_features": [
         "id",
@@ -456,16 +460,18 @@
         "producer_revision",
         "input_digest",
         "created_at",
-        "updated_at"
+        "updated_at",
+        "source_revision",
+        "registry_revision"
       ]
     },
     "populated": {
-      "codebaseChunkEmbeddingColumn": "content_embedding",
+      "codebaseChunkEmbeddingColumn": "content_embedding_768",
       "codebaseChunkSearchColumn": "search_vector",
       "codebaseChunkQdrantColumn": "qdrant_id",
       "codebaseChunkEmbeddings": {
         "exists": true,
-        "count": 55169
+        "count": 274428
       },
       "codebaseChunkSearchVectors": {
         "exists": true,
@@ -477,11 +483,11 @@
       },
       "codebaseChunk_content_embedding": {
         "exists": true,
-        "count": 55169
+        "count": 57243
       },
       "codebaseChunk_content_embedding_768": {
         "exists": true,
-        "count": 219998
+        "count": 274428
       },
       "codebaseChunk_summary_embedding": {
         "exists": true,
@@ -495,9 +501,21 @@
         "exists": true,
         "count": 274465
       },
+      "codebaseChunkNonEmpty": {
+        "exists": true,
+        "count": 274428
+      },
+      "codebaseChunkEmptyPlaceholdersWithout768": {
+        "exists": true,
+        "count": 37
+      },
+      "codebaseChunk_eg2_embeddings": {
+        "exists": true,
+        "count": 1000
+      },
       "packetAstSymbols": {
         "exists": true,
-        "count": 38302
+        "count": 38304
       },
       "atlasPacketsSemantic768": {
         "exists": true,
@@ -505,11 +523,11 @@
       },
       "astNodesWithSymbols": {
         "exists": true,
-        "count": 11223
+        "count": 523271
       },
       "symbolRegistryActive": {
         "exists": true,
-        "count": 10454
+        "count": 42872
       }
     },
     "bitmapTables": [],
@@ -625,6 +643,16 @@
         "definition": "CREATE INDEX atlas_class_search_index_v1_search_gin ON public.atlas_class_search_index_v1 USING gin (search_vector)"
       },
       {
+        "table": "atlas_concept_tie_v2",
+        "name": "atlas_concept_tie_v2_proposal_gin",
+        "definition": "CREATE INDEX atlas_concept_tie_v2_proposal_gin ON public.atlas_concept_tie_v2 USING gin (proposal jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_concept_tie_v2",
+        "name": "atlas_concept_tie_v2_unknown_gin",
+        "definition": "CREATE INDEX atlas_concept_tie_v2_unknown_gin ON public.atlas_concept_tie_v2 USING gin (unknown_reason jsonb_path_ops)"
+      },
+      {
         "table": "atlas_dynamic_hyperedge_candidates",
         "name": "atlas_dynamic_hyperedge_participants_gin_idx",
         "definition": "CREATE INDEX atlas_dynamic_hyperedge_participants_gin_idx ON public.atlas_dynamic_hyperedge_candidates USING gin (participants jsonb_path_ops)"
@@ -653,6 +681,11 @@
         "table": "atlas_evidence_entities",
         "name": "atlas_evidence_entities_metadata_gin_idx",
         "definition": "CREATE INDEX atlas_evidence_entities_metadata_gin_idx ON public.atlas_evidence_entities USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_external_doc_analyses",
+        "name": "aeda_summary_fts_gin",
+        "definition": "CREATE INDEX aeda_summary_fts_gin ON public.atlas_external_doc_analyses USING gin (to_tsvector('english'::regconfig, COALESCE(summary_text, ''::text)))"
       },
       {
         "table": "atlas_external_doc_chunks",
@@ -818,6 +851,16 @@
         "table": "atlas_ontology_tuples",
         "name": "atlas_ontology_tuples_provenance_gin_idx",
         "definition": "CREATE INDEX atlas_ontology_tuples_provenance_gin_idx ON public.atlas_ontology_tuples USING gin (provenance jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_packet_class_lut_validation_receipts",
+        "name": "atlas_packet_class_lut_validation_evidence_gin",
+        "definition": "CREATE INDEX atlas_packet_class_lut_validation_evidence_gin ON public.atlas_packet_class_lut_validation_receipts USING gin (evidence jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_packet_class_lut_validation_receipts",
+        "name": "atlas_packet_class_lut_validation_search_gin",
+        "definition": "CREATE INDEX atlas_packet_class_lut_validation_search_gin ON public.atlas_packet_class_lut_validation_receipts USING gin (search_document)"
       },
       {
         "table": "atlas_packet_features",
@@ -1015,6 +1058,11 @@
         "definition": "CREATE UNIQUE INDEX atlas_representation_provider_representation_id_runtime_eng_key ON public.atlas_representation_providers USING btree (representation_id, runtime_engine, endpoint_url, api_dialect)"
       },
       {
+        "table": "atlas_retrieval_canary_sequence_v1",
+        "name": "idx_retrieval_canary_sequence_v1_hyper",
+        "definition": "CREATE INDEX idx_retrieval_canary_sequence_v1_hyper ON public.atlas_retrieval_canary_sequence_v1 USING gin (hyperparameters jsonb_path_ops)"
+      },
+      {
         "table": "atlas_retrieval_eval_times",
         "name": "idx_eval_times_payload_gin",
         "definition": "CREATE INDEX idx_eval_times_payload_gin ON public.atlas_retrieval_eval_times USING gin (payload jsonb_path_ops)"
@@ -1038,6 +1086,11 @@
         "table": "atlas_summary_layers",
         "name": "idx_summary_layers_summary_fts",
         "definition": "CREATE INDEX idx_summary_layers_summary_fts ON public.atlas_summary_layers USING gin (to_tsvector('english'::regconfig, COALESCE(summary, summary_text, ''::text)))"
+      },
+      {
+        "table": "atlas_tool_manifest_vectors_v1",
+        "name": "idx_atlas_tool_manifest_vectors_v1_embedding_hnsw",
+        "definition": "CREATE INDEX idx_atlas_tool_manifest_vectors_v1_embedding_hnsw ON public.atlas_tool_manifest_vectors_v1 USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
       },
       {
         "table": "atlas_topology_eval_times",
@@ -1105,6 +1158,11 @@
         "definition": "CREATE INDEX crc_metadata_gin ON public.code_retrieval_chunks USING gin (metadata)"
       },
       {
+        "table": "codebase_chunk_eg2_embeddings",
+        "name": "codebase_chunk_eg2_embeddings_hnsw",
+        "definition": "CREATE INDEX codebase_chunk_eg2_embeddings_hnsw ON public.codebase_chunk_eg2_embeddings USING hnsw (embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+      },
+      {
         "table": "codebase_chunk_index",
         "name": "codebase_chunk_index_cluster_summary_gin",
         "definition": "CREATE INDEX codebase_chunk_index_cluster_summary_gin ON public.codebase_chunk_index USING gin (cluster_summary jsonb_path_ops)"
@@ -1126,11 +1184,6 @@
       },
       {
         "table": "codebase_chunk_index",
-        "name": "codebase_chunk_index_summary_hnsw",
-        "definition": "CREATE INDEX codebase_chunk_index_summary_hnsw ON public.codebase_chunk_index USING hnsw (summary_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
-      },
-      {
-        "table": "codebase_chunk_index",
         "name": "codebase_chunk_index_tags_idx",
         "definition": "CREATE INDEX codebase_chunk_index_tags_idx ON public.codebase_chunk_index USING gin (tags)"
       },
@@ -1146,6 +1199,11 @@
       },
       {
         "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_error_embedding_768_hnsw",
+        "definition": "CREATE INDEX idx_codebase_chunk_error_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='64') WHERE (error_embedding IS NOT NULL)"
+      },
+      {
+        "table": "codebase_chunk_index",
         "name": "idx_codebase_chunk_error_embedding_latent64_hnsw",
         "definition": "CREATE INDEX idx_codebase_chunk_error_embedding_latent64_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_64 vector_cosine_ops) WHERE (error_embedding_latent_64 IS NOT NULL)"
       },
@@ -1158,11 +1216,6 @@
         "table": "codebase_chunk_index",
         "name": "idx_codebase_chunk_error_embedding_latent_256_hnsw",
         "definition": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_256_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_256 halfvec_cosine_ops) WHERE (error_embedding_latent_256 IS NOT NULL)"
-      },
-      {
-        "table": "codebase_chunk_index",
-        "name": "idx_codebase_chunk_index_error_embedding_hnsw",
-        "definition": "CREATE INDEX idx_codebase_chunk_index_error_embedding_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='64')"
       },
       {
         "table": "codebase_chunk_index",
@@ -1191,8 +1244,8 @@
       },
       {
         "table": "codebase_chunk_index",
-        "name": "idx_codebase_chunk_summary_embedding_384_hnsw",
-        "definition": "CREATE INDEX idx_codebase_chunk_summary_embedding_384_hnsw ON public.codebase_chunk_index USING hnsw (summary_embedding_384 vector_cosine_ops) WITH (m='12', ef_construction='48')"
+        "name": "idx_codebase_chunk_summary_embedding_768_hnsw",
+        "definition": "CREATE INDEX idx_codebase_chunk_summary_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (summary_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200') WHERE (summary_embedding IS NOT NULL)"
       },
       {
         "table": "codebase_chunk_index",
@@ -1250,6 +1303,16 @@
         "definition": "CREATE INDEX error_fingerprints_top_symbols_gin_idx ON public.error_fingerprints USING gin (top_symbols)"
       },
       {
+        "table": "error_logs",
+        "name": "error_logs_message_tsv_gin",
+        "definition": "CREATE INDEX error_logs_message_tsv_gin ON public.error_logs USING gin (message_tsv)"
+      },
+      {
+        "table": "error_logs",
+        "name": "idx_error_logs_message_embedding_hnsw",
+        "definition": "CREATE INDEX idx_error_logs_message_embedding_hnsw ON public.error_logs USING hnsw (message_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
         "table": "evidence",
         "name": "evidence_entities_gin_idx",
         "definition": "CREATE INDEX evidence_entities_gin_idx ON public.evidence USING gin (entities)"
@@ -1263,6 +1326,11 @@
         "table": "evidence",
         "name": "evidence_tags_gin_idx",
         "definition": "CREATE INDEX evidence_tags_gin_idx ON public.evidence USING gin (tags)"
+      },
+      {
+        "table": "evidence_multimodal_vectors",
+        "name": "evidence_multimodal_vectors_hnsw_idx",
+        "definition": "CREATE INDEX evidence_multimodal_vectors_hnsw_idx ON public.evidence_multimodal_vectors USING hnsw (embedding vector_cosine_ops)"
       },
       {
         "table": "evidence_vectors",
@@ -1340,6 +1408,21 @@
         "definition": "CREATE INDEX fp_template_trgm_idx ON public.fixer_patterns USING gin (fix_template gin_trgm_ops)"
       },
       {
+        "table": "keyframe_observations",
+        "name": "keyframe_obs_payload_gin_idx",
+        "definition": "CREATE INDEX keyframe_obs_payload_gin_idx ON public.keyframe_observations USING gin (payload jsonb_path_ops)"
+      },
+      {
+        "table": "legal_chunks",
+        "name": "legal_chunks_embedding_hnsw",
+        "definition": "CREATE INDEX legal_chunks_embedding_hnsw ON public.legal_chunks USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='200')"
+      },
+      {
+        "table": "legal_chunks",
+        "name": "legal_chunks_tsv_gin",
+        "definition": "CREATE INDEX legal_chunks_tsv_gin ON public.legal_chunks USING gin (tsv)"
+      },
+      {
         "table": "legal_documents",
         "name": "idx_legal_documents_metadata",
         "definition": "CREATE INDEX idx_legal_documents_metadata ON public.legal_documents USING gin (metadata)"
@@ -1353,6 +1436,26 @@
         "table": "legal_documents",
         "name": "legal_documents_hnsw_idx",
         "definition": "CREATE INDEX legal_documents_hnsw_idx ON public.legal_documents USING hnsw (content_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "legal_nodes",
+        "name": "legal_nodes_citation_trgm",
+        "definition": "CREATE INDEX legal_nodes_citation_trgm ON public.legal_nodes USING gin (citation_label gin_trgm_ops) WHERE (citation_label IS NOT NULL)"
+      },
+      {
+        "table": "legal_nodes",
+        "name": "legal_nodes_tsv_gin",
+        "definition": "CREATE INDEX legal_nodes_tsv_gin ON public.legal_nodes USING gin (tsv)"
+      },
+      {
+        "table": "llm_summaries",
+        "name": "llm_summaries_metadata_gin",
+        "definition": "CREATE INDEX llm_summaries_metadata_gin ON public.llm_summaries USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "table": "llm_summaries",
+        "name": "llm_summaries_tags_gin",
+        "definition": "CREATE INDEX llm_summaries_tags_gin ON public.llm_summaries USING gin (tags)"
       },
       {
         "table": "llm_summary_cache",
@@ -1650,6 +1753,11 @@
         "definition": "CREATE INDEX idx_task_semantic_packets_metadata_gin ON public.task_semantic_packets USING gin (metadata)"
       },
       {
+        "table": "task_semantic_packets",
+        "name": "idx_task_semantic_packets_tags_gin",
+        "definition": "CREATE INDEX idx_task_semantic_packets_tags_gin ON public.task_semantic_packets USING gin (tags)"
+      },
+      {
         "table": "taxonomy_nodes",
         "name": "taxonomy_nodes_metadata_gin_idx",
         "definition": "CREATE INDEX taxonomy_nodes_metadata_gin_idx ON public.taxonomy_nodes USING gin (metadata)"
@@ -1716,8 +1824,55 @@
           "size": 768,
           "distance": "Cosine"
         },
-        "points": 9,
+        "points": 45,
+        "pointsCount": 45,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "cache_key": {
+            "data_type": "keyword",
+            "points": 45
+          },
+          "model": {
+            "data_type": "keyword",
+            "points": 45
+          },
+          "expires_at": {
+            "data_type": "integer",
+            "points": 45
+          },
+          "provider": {
+            "data_type": "keyword",
+            "points": 45
+          },
+          "from_bifrost_semantic_cache_plugin": {
+            "data_type": "bool",
+            "points": 45
+          },
+          "params_hash": {
+            "data_type": "keyword",
+            "points": 45
+          },
+          "response": {
+            "data_type": "keyword",
+            "points": 43
+          },
+          "stream_chunks": {
+            "data_type": "keyword",
+            "points": 4
+          }
+        },
+        "quantizationConfig": null,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1727,7 +1882,82 @@
           "distance": "Cosine"
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "tags": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "ide": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "source": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "source_refs": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "session_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "observation_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "project_path": {
+            "data_type": "keyword",
+            "points": 0
+          }
+        },
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
+        "status": "green"
+      },
+      {
+        "name": "atlas_scratch_content_768_v1",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 1020,
+        "pointsCount": 1020,
+        "vectorsCount": null,
+        "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": null,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1739,7 +1969,27 @@
           }
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1749,7 +1999,27 @@
           "distance": "Cosine"
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1760,8 +2030,37 @@
             "distance": "Cosine"
           }
         },
-        "points": 0,
+        "points": 101,
+        "pointsCount": 101,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "session_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "user_id": {
+            "data_type": "keyword",
+            "points": 0
+          }
+        },
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1773,7 +2072,48 @@
           }
         },
         "points": 11,
+        "pointsCount": 11,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "language": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "subreddit": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "repo": {
+            "data_type": "keyword",
+            "points": 11
+          },
+          "fetched_at": {
+            "data_type": "datetime",
+            "points": 11
+          },
+          "source": {
+            "data_type": "keyword",
+            "points": 11
+          }
+        },
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1785,7 +2125,21 @@
           }
         },
         "points": 18,
+        "pointsCount": 18,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": null,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1795,7 +2149,21 @@
           "distance": "Cosine"
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 64,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": null,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1806,8 +2174,28 @@
             "distance": "Cosine"
           }
         },
-        "points": 1,
+        "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1818,8 +2206,28 @@
             "distance": "Cosine"
           }
         },
-        "points": 10,
+        "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1829,7 +2237,27 @@
           "distance": "Cosine"
         },
         "points": 53380,
-        "indexedVectors": 50149,
+        "pointsCount": 53380,
+        "vectorsCount": null,
+        "indexedVectors": 50145,
+        "indexedVectorsCount": 50145,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 2,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1848,8 +2276,197 @@
             "distance": "Cosine"
           }
         },
-        "points": 328348,
+        "points": 328468,
+        "pointsCount": 328468,
+        "vectorsCount": null,
         "indexedVectors": 328386,
+        "indexedVectorsCount": 328386,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "centroid_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "updated_at": {
+            "data_type": "integer",
+            "points": 0
+          },
+          "source_ref": {
+            "data_type": "keyword",
+            "points": 328348
+          },
+          "file_path": {
+            "data_type": "keyword",
+            "points": 328299
+          },
+          "workspace_revision": {
+            "data_type": "keyword",
+            "points": 30
+          },
+          "representation_id": {
+            "data_type": "keyword",
+            "points": 324981
+          },
+          "symbol_name": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "representation_name": {
+            "data_type": "keyword",
+            "points": 219221
+          },
+          "sourceRefs": {
+            "data_type": "keyword",
+            "points": 106289
+          },
+          "embedding_model": {
+            "data_type": "keyword",
+            "points": 52971
+          },
+          "summary_hash": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "kind": {
+            "data_type": "keyword",
+            "points": 229163
+          },
+          "som_cluster": {
+            "data_type": "integer",
+            "points": 106223
+          },
+          "parent_centroid_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "path": {
+            "data_type": "keyword",
+            "points": 328418
+          },
+          "tags": {
+            "data_type": "keyword",
+            "points": 106482
+          },
+          "cluster_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "feature_id": {
+            "data_type": "keyword",
+            "points": 328332
+          },
+          "packet_key": {
+            "data_type": "keyword",
+            "points": 328348
+          },
+          "error_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "repo": {
+            "data_type": "keyword",
+            "points": 222010
+          },
+          "agent_pickup_ready": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "model_revision_state": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "projection_revision": {
+            "data_type": "keyword",
+            "points": 576
+          },
+          "next_action": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "cluster_key": {
+            "data_type": "keyword",
+            "points": 21046
+          },
+          "workspace_id": {
+            "data_type": "keyword",
+            "points": 52366
+          },
+          "chunk_id": {
+            "data_type": "keyword",
+            "points": 243401
+          },
+          "symbol_version_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "point_kind": {
+            "data_type": "keyword",
+            "points": 1
+          },
+          "semantic_path": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "status": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "language": {
+            "data_type": "keyword",
+            "points": 222035
+          },
+          "qdrant_point_id": {
+            "data_type": "keyword",
+            "points": 106291
+          },
+          "observed_at": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "topo_class": {
+            "data_type": "keyword",
+            "points": 120
+          },
+          "postgres_id": {
+            "data_type": "keyword",
+            "points": 52380
+          },
+          "stable_symbol_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "content_hash": {
+            "data_type": "keyword",
+            "points": 325550
+          },
+          "workspace_task_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "source_revision": {
+            "data_type": "keyword",
+            "points": 30
+          },
+          "representation_revision": {
+            "data_type": "integer",
+            "points": 0
+          }
+        },
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1869,7 +2486,92 @@
           }
         },
         "points": 52816,
-        "indexedVectors": 56419,
+        "pointsCount": 52816,
+        "vectorsCount": null,
+        "indexedVectors": 49867,
+        "indexedVectorsCount": 49867,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "indexed_at": {
+            "data_type": "keyword",
+            "points": 52380
+          },
+          "embedding_model": {
+            "data_type": "keyword",
+            "points": 52380
+          },
+          "projection_revision": {
+            "data_type": "keyword",
+            "points": 52380
+          },
+          "model_revision_state": {
+            "data_type": "keyword",
+            "points": 52380
+          },
+          "qdrant_point_id": {
+            "data_type": "keyword",
+            "points": 52380
+          },
+          "representation_name": {
+            "data_type": "keyword",
+            "points": 52380
+          },
+          "postgres_id": {
+            "data_type": "keyword",
+            "points": 52380
+          },
+          "source_ref": {
+            "data_type": "keyword",
+            "points": 52815
+          },
+          "content_hash": {
+            "data_type": "keyword",
+            "points": 45472
+          },
+          "chunk_id": {
+            "data_type": "keyword",
+            "points": 16805
+          }
+        },
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
+        "status": "green"
+      },
+      {
+        "name": "codebase_chunks_eg2_768_q8",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
+        "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": null,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1879,19 +2581,27 @@
           "distance": "Cosine"
         },
         "points": 55169,
+        "pointsCount": 55169,
+        "vectorsCount": null,
         "indexedVectors": 47000,
-        "status": "green"
-      },
-      {
-        "name": "codebase_chunks_sparse_test_v1",
-        "vectors": {
-          "content": {
-            "size": 768,
-            "distance": "Cosine"
+        "indexedVectorsCount": 47000,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
           }
         },
-        "points": 500,
-        "indexedVectors": 500,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1903,7 +2613,27 @@
           }
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1915,7 +2645,27 @@
           }
         },
         "points": 105761,
+        "pointsCount": 105761,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1925,7 +2675,27 @@
           "distance": "Cosine"
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1936,8 +2706,28 @@
             "distance": "Cosine"
           }
         },
-        "points": 0,
+        "points": 2,
+        "pointsCount": 2,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1947,7 +2737,60 @@
           "distance": "Cosine"
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "kind": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "clusterTags": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "chunkIds": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "sourceRefs": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "status": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "featureLabels": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "cardId": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "topoClass": {
+            "data_type": "keyword",
+            "points": 0
+          }
+        },
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1957,7 +2800,27 @@
           "distance": "Cosine"
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1969,7 +2832,36 @@
           }
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "cache_key": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "expires_at": {
+            "data_type": "integer",
+            "points": 0
+          }
+        },
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1979,7 +2871,21 @@
           "distance": "Cosine"
         },
         "points": 20,
+        "pointsCount": 20,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": null,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1989,7 +2895,21 @@
           "distance": "Cosine"
         },
         "points": 20,
+        "pointsCount": 20,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": null,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -1999,7 +2919,21 @@
           "distance": "Cosine"
         },
         "points": 20,
+        "pointsCount": 20,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": null,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2010,8 +2944,28 @@
             "distance": "Cosine"
           }
         },
-        "points": 13,
+        "points": 334,
+        "pointsCount": 334,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2022,18 +2976,100 @@
             "distance": "Cosine"
           }
         },
-        "points": 0,
+        "points": 394,
+        "pointsCount": 394,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "evidence_id": {
+            "data_type": "keyword",
+            "points": 5
+          },
+          "section_type": {
+            "data_type": "keyword",
+            "points": 5
+          },
+          "case_id": {
+            "data_type": "keyword",
+            "points": 5
+          },
+          "tags": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "cluster_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "entity_labels": {
+            "data_type": "keyword",
+            "points": 0
+          }
+        },
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
-        "name": "evidence_items_clip_512",
+        "name": "evidence_multimodal_semantic_768",
         "vectors": {
-          "size": 512,
-          "distance": "Cosine"
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "model_artifact_sha256": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "modality": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "source_revision": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "case_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "evidence_id": {
+            "data_type": "keyword",
+            "points": 0
+          }
+        },
+        "quantizationConfig": null,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2043,7 +3079,27 @@
           "distance": "Cosine"
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2053,7 +3109,27 @@
           "distance": "Cosine"
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2065,7 +3141,40 @@
           }
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "kind": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "featureId": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "status": {
+            "data_type": "keyword",
+            "points": 0
+          }
+        },
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2077,17 +3186,40 @@
           }
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
-        "status": "green"
-      },
-      {
-        "name": "fixer_memory_768",
-        "vectors": {
-          "size": 768,
-          "distance": "Cosine"
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
         },
-        "points": 0,
-        "indexedVectors": 0,
+        "payloadIndexes": {
+          "jurisdiction": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "category": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "case_id": {
+            "data_type": "keyword",
+            "points": 0
+          }
+        },
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2096,8 +3228,28 @@
           "size": 768,
           "distance": "Cosine"
         },
-        "points": 0,
+        "points": 26,
+        "pointsCount": 26,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2109,7 +3261,44 @@
           }
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "jurisdiction": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "authority_level": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "doc_type": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "semantic_label": {
+            "data_type": "keyword",
+            "points": 0
+          }
+        },
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2120,8 +3309,28 @@
             "distance": "Cosine"
           }
         },
-        "points": 0,
+        "points": 1,
+        "pointsCount": 1,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2132,8 +3341,37 @@
             "distance": "Cosine"
           }
         },
-        "points": 0,
+        "points": 8,
+        "pointsCount": 8,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "document_type": {
+            "data_type": "keyword",
+            "points": 8
+          },
+          "case_id": {
+            "data_type": "keyword",
+            "points": 4
+          }
+        },
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2145,7 +3383,27 @@
           }
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2156,8 +3414,28 @@
             "distance": "Cosine"
           }
         },
-        "points": 9,
+        "points": 14,
+        "pointsCount": 14,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2167,7 +3445,69 @@
           "distance": "Cosine"
         },
         "points": 2467,
+        "pointsCount": 2467,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": null,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
+        "status": "green"
+      },
+      {
+        "name": "phase76_knowledge_base",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
+        "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": null,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
+        "status": "green"
+      },
+      {
+        "name": "phase79_codebase",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 537,
+        "pointsCount": 537,
+        "vectorsCount": null,
+        "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": null,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2179,7 +3519,27 @@
           }
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2191,7 +3551,27 @@
           }
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2203,7 +3583,38 @@
           }
         },
         "points": 1025,
+        "pointsCount": 1025,
+        "vectorsCount": null,
         "indexedVectors": 1025,
+        "indexedVectorsCount": 1025,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "contentHash": {
+            "data_type": "keyword",
+            "points": 1025
+          },
+          "filePath": {
+            "data_type": "keyword",
+            "points": 1025
+          },
+          "language": {
+            "data_type": "keyword",
+            "points": 1025
+          },
+          "relativePath": {
+            "data_type": "keyword",
+            "points": 1025
+          }
+        },
+        "quantizationConfig": null,
+        "segmentsCount": 2,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2213,7 +3624,26 @@
           "distance": "Cosine"
         },
         "points": 1,
+        "pointsCount": 1,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "collectionName": {
+            "data_type": "keyword",
+            "points": 1
+          }
+        },
+        "quantizationConfig": null,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2225,7 +3655,36 @@
           }
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "lens_type": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "stable_key": {
+            "data_type": "keyword",
+            "points": 0
+          }
+        },
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2237,7 +3696,36 @@
           }
         },
         "points": 8,
+        "pointsCount": 8,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {
+          "source": {
+            "data_type": "keyword",
+            "points": 8
+          },
+          "tags": {
+            "data_type": "keyword",
+            "points": 8
+          }
+        },
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2247,7 +3735,21 @@
           "distance": "Cosine"
         },
         "points": 5527,
+        "pointsCount": 5527,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": null,
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       },
       {
@@ -2257,15 +3759,35 @@
           "distance": "Cosine"
         },
         "points": 0,
+        "pointsCount": 0,
+        "vectorsCount": null,
         "indexedVectors": 0,
+        "indexedVectorsCount": 0,
+        "hnswConfig": {
+          "m": 16,
+          "ef_construct": 200,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "payloadIndexes": {},
+        "quantizationConfig": {
+          "scalar": {
+            "type": "int8",
+            "quantile": 0.99,
+            "always_ram": false
+          }
+        },
+        "segmentsCount": 4,
+        "optimizerStatus": "ok",
         "status": "green"
       }
     ]
   },
   "drizzle": {
     "journalEntries": 41,
-    "manualSqlFiles": 297,
-    "declaredSidecars": 65,
+    "manualSqlFiles": 422,
+    "declaredSidecars": 166,
     "untrackedManualFiles": [
       "0009_hybrid_graph_indexes.sql",
       "0010_distilled_table_store.sql",
@@ -2331,12 +3853,13 @@
       ]
     },
     {
-      "id": "POSTGRES_CANONICAL_EMBEDDING_PARTIAL",
-      "severity": "high",
-      "message": "The canonical semantic_768 column is only partially populated; the active halfvec(768) lane must not be promoted as a substitute without a representation receipt.",
+      "id": "POSTGRES_SEMANTIC_768_EMPTY_PLACEHOLDERS_PRESENT",
+      "severity": "low",
+      "message": "All non-empty codebase_chunk_index rows have content_embedding_768; remaining NULL rows are empty-content placeholders that must not be embedded with synthetic vectors.",
       "evidence": [
-        "55169/274465",
-        "codebase_chunk_index.content_embedding"
+        "274428/274428 non-empty",
+        "37 empty placeholders",
+        "codebase_chunk_index.content_embedding_768"
       ]
     },
     {

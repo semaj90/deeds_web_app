@@ -64,6 +64,16 @@
         ]
       },
       {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node c:/Users/james/Videos/deeds-web-app/.claude/hooks/gan-validation-gate.mjs",
+            "timeout": 2
+          }
+        ]
+      },
+      {
         "matcher": "Edit",
         "hooks": [
           {

@@ -13,10 +13,10 @@ export function authorizedCaseFilter(caseId: string, actorId: number) {
 	) ?? null;
 }
 
-export async function getAuthorizedCase(caseId: string, actorId: number) {
+export async function getAuthorizedCase(caseId: string, actorId: number, database: Pick<typeof db, 'select'> = db) {
 	const filter = authorizedCaseFilter(caseId, actorId);
 	if (!filter) return null;
-	const [row] = await db
+	const [row] = await database
 		.select()
 		.from(cases)
 		.where(filter)

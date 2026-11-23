@@ -45,6 +45,23 @@ export declare function manhattanDistance(aPtr: number, bPtr: number, length: nu
  */
 export declare function normalize(vectorPtr: number, length: number): void;
 /**
+ * src/wasm/vector-operations/normalizeWithEpsilon
+ * @param vectorPtr `usize`
+ * @param length `i32`
+ * @param epsilon `f32`
+ * @returns `f32`
+ */
+export declare function normalizeWithEpsilon(vectorPtr: number, length: number, epsilon: number): number;
+/**
+ * src/wasm/vector-operations/l2NormalizeBackwardWithEpsilon
+ * @param inputPtr `usize`
+ * @param gradOutputPtr `usize`
+ * @param gradInputPtr `usize`
+ * @param length `i32`
+ * @param epsilon `f32`
+ */
+export declare function l2NormalizeBackwardWithEpsilon(inputPtr: number, gradOutputPtr: number, gradInputPtr: number, length: number, epsilon: number): void;
+/**
  * src/wasm/vector-operations/zScoreNormalize
  * @param vectorPtr `usize`
  * @param length `i32`

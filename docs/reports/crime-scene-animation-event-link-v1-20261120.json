@@ -1,0 +1,27 @@
+{
+  "report": "crime-scene-animation-event-link-v1",
+  "date": "2026-11-20",
+  "status": "PARTIAL",
+  "likely_cause": "The saved synthesized walk was linked to a reviewed ground-plane proposal but did not explicitly identify the reviewed timeline event it illustrated.",
+  "evidence": [
+    "ReviewedWalkPreview.svelte now requires an explicit event selection from authorized scene event readback before save.",
+    "scene-document-v1.ts validates eventId against an approved event with matching evidence, source revision, analysis revision, and overlapping source interval.",
+    "scene-document-v1.spec.ts and scene-video-event-readback-v1.spec.ts: 33 tests passed.",
+    "scene-document-revisions-v1.ts rejects newly appended animation clips without eventId while retaining old clips; 16 server-admission tests passed.",
+    "ReviewedWalkPreview.svelte and SceneVideoEventBindings.svelte each compiled with svelte/compiler with 0 warnings.",
+    "npm run check:fast failed before diagnostics: TypeScript process exited with fatal Node out-of-memory error."
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/splat/scene-document-v1.ts",
+    "sveltekit-frontend/src/lib/splat/scene-document-v1.spec.ts",
+    "sveltekit-frontend/src/lib/components/evidence/ReviewedWalkPreview.svelte",
+    "sveltekit-frontend/src/lib/components/evidence/SceneVideoEventBindings.svelte",
+    "sveltekit-frontend/src/lib/server/scene-document-revisions-v1.ts",
+    "sveltekit-frontend/src/lib/server/scene-document-revisions-v1.spec.ts",
+    "openspec/changes/crime-scene-reconstruction/tasks.md"
+  ],
+  "safe_next_command": "cd sveltekit-frontend; npm exec vitest run src/lib/server/scene-document-revisions-v1.spec.ts src/lib/splat/scene-document-v1.spec.ts src/lib/splat/scene-video-event-readback-v1.spec.ts",
+  "smoke_command": "In a signed-in case, select a matching approved event, save the walk, reopen the scene revision, verify eventId and GLB hash, then replay at reviewed source timestamps.",
+  "report_path": "docs/reports/crime-scene-animation-event-link-v1-20261120.json",
+  "unverified": ["Full Svelte/TypeScript check due process OOM", "browser interaction", "live PostgreSQL and SeaweedFS readback"]
+}

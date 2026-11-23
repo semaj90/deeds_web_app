@@ -1,0 +1,72 @@
+{
+  "schema": "parent-atlas.tensor-handle-cross-language-parity.v1",
+  "date": "2026-11-22",
+  "scope": "One deterministic 4x4x6 TensorHandleV1 codec fixture, CPU/native byte parity, lossy quantization bound, and residency transition parity.",
+  "status": "PASS",
+  "promotionStatus": "PARTIAL",
+  "revision": {
+    "gitHead": "4fe5ebf63e07d57bcfc3f002c3537215d5011f79",
+    "worktreeWasDirty": true,
+    "workingSourceSha256": {
+      "packages/atlas-native-core/include/tile_assembler.hpp": "4b85dbfd2f105ecdbbd4c343d6b308a3808f8c4265ea06cb41cc757011e676fb",
+      "packages/atlas-native-core/src/atlas_native_addon.cc": "10ae9fa4199c3a1b63e9c518754b583cc4c24c8d08f0f60d6ce70e8953ffbd3b",
+      "packages/atlas-native-core/src/pybind_module.cc": "5f5f7fda0c1dcb91d02b19bda41fb9c17b390772bb99b8b0380638afc7390ff6",
+      "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-handle-4x4x6-v1.ts": "7e6b3bd15d98adefaa4870a95a0f85a2b71f076c5f330603ff09d155b87a0dd0",
+      "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-handle-4x4x6-v1.spec.ts": "2700c019bffa30d538af218eda29a75fe3648379a378a403055e5bb64dc55f6f"
+    }
+  },
+  "runtime": {
+    "windowsNode": "22.23.3",
+    "windowsNapi": "10",
+    "windowsPython": "3.13",
+    "wslEnvironment": "atlas-rapids-cu13",
+    "wslPython": "3.14.6"
+  },
+  "validation": [
+    {
+      "command": "cd sveltekit-frontend && npm exec vitest run src/lib/server/atlas/tensors/tensor-handle-4x4x6-v1.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1 --no-file-parallelism",
+      "output": "Test Files 1 passed (1); Tests 3 passed (3)",
+      "artifact": "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-handle-4x4x6-v1.spec.ts",
+      "assertions": [
+        "TypeScript and Windows Node-API outputs match byte-for-byte for 160 bytes",
+        "Windows pybind11 output matches the TypeScript 160-byte output",
+        "maximum absolute INT4 error is greater than zero and no more than 0.09 for this fixture",
+        "stale workspace revision is rejected",
+        "GPU_READY without transfer completion is rejected",
+        "EVICTABLE with active consumers is rejected",
+        "revision mismatch invalidates residency to ABSENT"
+      ]
+    },
+    {
+      "command": "wsl.exe -d Ubuntu -- bash -lc 'PYTHONPATH=/mnt/c/Users/james/Videos/deeds-web-app/python/atlas_corpus_lib/atlas_corpus_lib /home/james/miniforge3/envs/atlas-rapids-cu13/bin/python -c \"import math, _atlas_native_core as m; vals=[math.sin(i*0.37)*1.25+(i%6)*0.4 for i in range(96)]; aff=[1.5,-0.25,10.0,0.25,1.5,-4.0]; print(m.encode_tensor_handle_4x4x6_v1(vals,42,3,127,0x1122334455667788,0x99aabbccddeeff00,aff,3,2).hex())\"'",
+      "output": "160-byte hex output matched TypeScript; SHA-256 3d99645a9230c7f1901a0cc58a9c6a014ca81910f1c394bdb3e452dbd3db0108",
+      "artifact": "python/atlas_corpus_lib/atlas_corpus_lib/_atlas_native_core.cpython-314-x86_64-linux-gnu.so",
+      "artifactSha256": "b78368e6e699074f088b544b0a0948b04e2e27991b9d7be581352a5f97e3dd4b"
+    },
+    {
+      "command": "wsl.exe -d Ubuntu -- bash -lc 'PYTHONPATH=/mnt/c/Users/james/Videos/deeds-web-app/python/atlas_corpus_lib/atlas_corpus_lib /home/james/miniforge3/envs/atlas-rapids-cu13/bin/python -c \"import _atlas_native_core as m; print(m.transition_safe_tile_residency_v1(0,1,False,0,True)); print(m.transition_safe_tile_residency_v1(2,3,True,0,True)); print(m.transition_safe_tile_residency_v1(3,4,True,0,False))\"'",
+      "output": "1; 3; 0",
+      "scope": "Native pybind transition smoke only; the full 7-state and negative-transition test is the Windows Vitest/N-API test above."
+    }
+  ],
+  "fixtureMetrics": {
+    "elementCount": 96,
+    "encodedBytes": 160,
+    "maximumAbsoluteQuantizationError": 0.08177417516708374,
+    "encodedSha256": "3d99645a9230c7f1901a0cc58a9c6a014ca81910f1c394bdb3e452dbd3db0108"
+  },
+  "windowsArtifactSha256": {
+    "packages/atlas-native-core/build/Release/atlas_native_core.node": "38a68509a41e8a57ac5f469a6e0e3958446b3dd7a4dc53fd7bb749660fa45e2a",
+    "python/atlas_corpus_lib/atlas_corpus_lib/_atlas_native_core.cp313-win_amd64.pyd": "f18e0676de38a8f363e9501371a620262dcd6800c312024306a32c05e938583b"
+  },
+  "notProven": [
+    "full input-domain or property-based quantization coverage",
+    "GPU upload completion callbacks, LRU eviction, or actual device-residency swaps",
+    "cuTile dispatch or a fresh CUDA benchmark",
+    "production artifact admission or promotion"
+  ],
+  "gpuBenchmark": {
+    "status": "NOT_RUN",
+    "reason": "No fresh VRAM reading was taken in this pass; prior supplied status was 815 MiB free, below the stated 1536 MiB gate."
+  }
+}

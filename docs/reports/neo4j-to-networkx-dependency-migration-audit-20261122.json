@@ -1,0 +1,154 @@
+{
+  "schema": "atlas.dependency-graph-migration-audit.v1",
+  "date": "2026-11-22",
+  "mode": "READ_ONLY_SOURCE_AND_ARTIFACT_AUDIT",
+  "scope": {
+    "facade": "sveltekit-frontend/scripts/mcp/atlas-task-kernel-mcp.mjs",
+    "backend": "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
+    "graphRuntime": "python/atlas_graph_runtime",
+    "change": "parent-atlas-pass-fabric",
+    "writesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "taskKernelTrace": [
+    {
+      "tool": "atlas_context",
+      "implementation": "build_agentic_rag_context",
+      "boundary": "Live TRACE query and packet binding return unadmitted candidates; query ranking is not source admission."
+    },
+    {
+      "tool": "atlas_inspect",
+      "implementation": "find_source_refs",
+      "boundary": "Path lookups use packet identity; name search still uses Neo4j and is not a revision-qualified source resolver."
+    },
+    {
+      "tool": "atlas_expand",
+      "implementation": "find_dependencies",
+      "boundary": "Direct dependency lookup remains Neo4j-backed; no admitted custom graph with IMPORTS/CALLS edges is available."
+    },
+    {
+      "tool": "atlas_verify",
+      "implementation": "classify_intent",
+      "boundary": "Local intent/domain classification returns a safe evidence-gathering direction; it does not execute or authorize a repair."
+    },
+    {
+      "tool": "atlas_validate_plan",
+      "implementation": "build_recommendation",
+      "boundary": "Retrieval-backed recommendation can constrain targets to revision-bound sources; it is not execution authorization."
+    },
+    {
+      "tool": "atlas_research",
+      "implementation": "build_agentic_rag_context",
+      "boundary": "Runs one context round; maxRounds is echoed but not applied, and context admission remains a separate gate."
+    }
+  ],
+  "customGraphArtifact": {
+    "manifest": "docs/reports/current-structural-graph-artifact-v2/manifest.json",
+    "mode": "NON_PRODUCTION_DERIVED_ARTIFACT",
+    "graphRevision": "sha256:5fdebed5628a322d9af29069458463c4fb931aaf8f5d1897ac38d65666740008",
+    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "nodes": 2545,
+    "edges": 1334,
+    "edgeTypes": {
+      "DEFINES": 1334
+    },
+    "sourcePlan": "docs/reports/current-structural-edge-artifact-plan-v2.json",
+    "sourcePlanStatus": "CURRENT_STRUCTURAL_EDGE_PLAN_INCOMPLETE",
+    "selectedSourceCount": 0,
+    "writesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "sourceCohortFinding": {
+    "sourcePlan": "docs/reports/current-source-graphify-batch-plan-v1.json",
+    "generatedAt": "2026-09-17T17:30:10.558Z",
+    "status": "CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW",
+    "selectedSourceCount": 5,
+    "currentGraphifyExactCount": 0,
+    "sourceBytesRevalidated": false,
+    "promotionAllowed": false,
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "finding": "The edge planner filters for CURRENT_GRAPHIFY_EXACT rows with source/workspace revisions; none of the five selected rows qualify. The batch plan is stale relative to the checked-out graph artifact and is blocked for review."
+  },
+  "runtimeCapability": {
+    "networkxBfs": "Existing bounded, deterministic traversal helper; appropriate for direct dependency expansion once typed dependency edges and exact source bindings are admitted.",
+    "networkxPageRank": "Existing deterministic ranking helper; advisory ordering only, not dependency discovery or identity.",
+    "cuda": "cuGraph/PageRank parity helpers exist. No live CUDA benchmark or GPU dispatch was run in this audit; CUDA remains optional and resource-gated.",
+    "requiredJoins": [
+      "exact sourceRef and sourceRevision",
+      "workspaceRevision",
+      "graphRevision and ordinal-map checksum",
+      "typed IMPORTS/CALLS edge provenance",
+      "bounded traversal and output",
+      "CPU/GPU parity receipt for an optional accelerator",
+      "fresh authorization and zero-write proof"
+    ]
+  },
+  "implementation": {
+    "mcpDispatcher": "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs findDependencies",
+    "sourceIdentity": "Read-only join of local whole-file SHA-256 to atlas_workspace_source_bindings.content_digest/source_revision and codebase_chunk_index.file_content_hash",
+    "graphResolver": "python/atlas_graph_runtime/dependency_lookup_cli_v1.py validates the current graph artifact and source-plan checksums/revisions before calling dependency_lookup_v1.py",
+    "traversal": "NetworkX directed depth-1 BFS over typed, evidence-backed dependency edges",
+    "ranking": "NetworkX PageRank orders only BFS-discovered dependencies",
+    "neo4jFallback": false,
+    "gpuExecution": "Not wired; optional CUDA remains gated on CPU parity, resource admission, and a live receipt",
+    "writesPerformed": false
+  },
+  "sourceCohortFollowup": {
+    "planner": "scripts/atlas/plan-current-source-graphify-batch-v1.mjs",
+    "change": "Added bounded local byte verification for each selected snapshot source against sourceRevision, contentDigest, and byteLength. Missing, unreadable, outside-workspace, or mismatched files keep the plan blocked and report SOURCE_BYTES_REVALIDATION_REQUIRED.",
+    "authority": false,
+    "admissionCreated": false,
+    "canonicalWrites": false,
+    "liveDatabaseComparison": "NOT_RUN; the available preflight/admission snapshot is historical and the admission tool requires exact operator confirmation bound to the snapshot and preflight checksums.",
+    "tests": "node --check scripts/atlas/plan-current-source-graphify-batch-v1.mjs; node --test scripts/atlas/graphify-source-binding-comparison-v1.test.mjs — 10 passed, 0 failed"
+  },
+  "liveMcpVerification": {
+    "date": "2026-11-22",
+    "tool": "mcp__atlas_tools__find_dependencies",
+    "target": "src/lib/server/atlas/tensors/tensor-handle-4x4x6-v1.ts",
+    "observed": {
+      "authority": "neo4j_projection",
+      "failure": "PROJECTION_MISSING_FILE",
+      "graphRevision": null,
+      "nodesMatched": []
+    },
+    "status": "ACTIVE_MCP_RUNTIME_STILL_OLD_OR_STALE",
+    "traceDatabaseLookup": {
+      "query": "feature_file_edges atlas_graph_edges_v2 graphify_current_source_membership_v1",
+      "traceCount": 0,
+      "scope": "CODE_MAPPING_DISCOVERY_ONLY_NOT_POSTGRES_SCHEMA_OR_ROW_AUDIT"
+    },
+    "postgresGraphAudit": "NOT_RUN_IN_THIS_TURN; user-pasted row counts remain unverified here",
+    "writesPerformed": false
+  },
+  "postgresReadOnlyAuditTool": {
+    "path": "scripts/atlas/audit-graph-sources-readonly-v1.mjs",
+    "purpose": "Inspect allowlisted graph/source table schemas, bounded row counts, snapshot metadata, predicate counts, and basename candidate mappings without promoting edges.",
+    "status": "CREATED_AND_MOCK_TESTED_DATABASE_NOT_RUN",
+    "databaseConnectionAttempted": false,
+    "databaseWritesPerformed": false,
+    "safety": [
+      "REPEATABLE READ READ ONLY transaction is confirmed before any schema/data query",
+      "20 second statement timeout and 2 second lock timeout",
+      "table names are allowlisted and identifiers are syntax-validated",
+      "sample rows use only known identity/provenance columns; no SELECT * fallback",
+      "target basename matches are labeled candidates, not exact file identity"
+    ],
+    "validation": "node --check scripts/atlas/audit-graph-sources-readonly-v1.mjs; node --test scripts/atlas/audit-graph-sources-readonly-v1.test.mjs — 4 passed, 0 failed",
+    "nextOperatorCommand": "node scripts/atlas/audit-graph-sources-readonly-v1.mjs --target=src/lib/server/atlas/tensors/tensor-handle-4x4x6-v1.ts"
+  },
+  "decision": "The find_dependencies route is wired to the Parent Atlas source-index and graph-artifact adapters with no Neo4j fallback. The checked-in structural edge plan is incomplete, contains no admitted IMPORTS/CALLS edge set, and has a mismatched workspace revision; therefore the actual graph lookup remains unresolved until its source cohort and edge producer are refreshed and admitted. Do not claim live dependencies from fixtures. Use PageRank only to order BFS results and CUDA only as an optional parity-checked executor.",
+  "nextGate": "SOURCE_QUALIFIED_STRUCTURAL_IMPORT_CALL_PRODUCER_AND_ADMISSION",
+  "validation": {
+    "artifact_probe": "C:\\Python313\\python.exe read-only PyArrow manifest/Parquet probe",
+    "result": "2,545 node rows; 1,334 edge rows; edge type count DEFINES=1,334; selectedSourceCount=0; plan status CURRENT_STRUCTURAL_EDGE_PLAN_INCOMPLETE",
+    "adapter_probe": "C:\\Python313\\python.exe python/atlas_graph_runtime/dependency_lookup_cli_v1.py with the current artifact returned SOURCE_GRAPH_PLAN_INCOMPLETE_OR_MISMATCHED; no database-backed target lookup was attempted",
+    "focused_tests": {
+      "mcp": "node --check scripts/mcp/atlas-tools-mcp.mjs; node --test scripts/mcp/atlas-tools-mcp.test.mjs — 40 passed, 0 failed",
+      "graphResolver": "C:\\Python313\\python.exe -m pytest python/tests/test_dependency_lookup_v1.py -q — 4 passed",
+      "openspec": "openspec validate parent-atlas-pass-fabric --strict — valid",
+      "ganValidation": "node scripts/atlas/gan-validation-hook.mjs — PASS; 349 rows (69 done, 62 partial, 218 open)",
+      "diffCheck": "git diff --check — exit 0; emitted existing LF-to-CRLF working-tree warnings"
+    }
+  }
+}

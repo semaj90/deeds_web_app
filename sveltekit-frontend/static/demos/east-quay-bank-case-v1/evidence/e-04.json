@@ -1,0 +1,23 @@
+{
+  "exhibitId": "E-04",
+  "caseId": "PA-DEMO-ROBBERY-001",
+  "synthetic": true,
+  "sourceMediaPresent": false,
+  "description": "Alarm and door event log",
+  "kind": "system_log",
+  "observationEntries": [
+    {
+      "time": "2026-10-14T15:05:14-07:00",
+      "text": "Synthetic alarm activation; device and triggering person unknown."
+    },
+    {
+      "time": "2026-10-14T15:05:28-07:00",
+      "text": "Exterior door open."
+    },
+    {
+      "time": "2026-10-14T15:05:54-07:00",
+      "text": "Multiple door activations consistent with exit activity."
+    }
+  ],
+  "warning": "Written synthetic exercise only. No real footage or official alarm source exists."
+}

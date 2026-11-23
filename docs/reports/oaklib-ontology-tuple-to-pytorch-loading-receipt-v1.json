@@ -1,7 +1,7 @@
 {
   "schema": "atlas.oaklib-ontology-tuple-to-pytorch-loading-receipt.v1",
   "generatedAt": "2026-10-24T17:12:00Z",
-  "durationMs": 973.62,
+  "durationMs": 318.28,
   "canonicalAuthority": false,
   "writesPerformed": false,
   "pipelineStatus": {
@@ -108,7 +108,7 @@
     ],
     "tensorDtype": "torch.float32",
     "cudaAvailable": true,
-    "cudaCpuMaxAbsDiff": 6e-08,
+    "cudaCpuMaxAbsDiff": 0.0,
     "allPoincareNormsInsideUnitBall": true
   },
   "alignedTuples": [

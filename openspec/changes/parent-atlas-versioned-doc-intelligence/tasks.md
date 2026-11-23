@@ -872,11 +872,15 @@ extraction call site is added — do not reintroduce the flattened-prompt path.
 
 ## Phase E — Graph relationships
 
-- [ ] **DOC-14** Neo4j/cuGraph doc-relationship projection — `NEW` edges on existing graph infra:
+- [ ] **DOC-14** Parent Atlas documentation-relation projection — `NEW` typed edges on existing graph infra:
   `API_SYMBOL -[DOCUMENTED_BY]-> DOC_SECTION`, `API_SYMBOL -[REQUIRES]-> CUDA_VERSION`,
   `API_SYMBOL -[SUPPORTS]-> ARCHITECTURE`, `EXAMPLE -[USES]-> API_SYMBOL`,
-  `ERROR_PATTERN -[RELATED_TO]-> API_SYMBOL`. Reuses the existing Neo4j mirror + NetworkX/cuGraph
-  owners. A bounded read-only Neo4j → NetworkX export preflight now passes through
+  `ERROR_PATTERN -[RELATED_TO]-> API_SYMBOL`. PostgreSQL remains canonical for admitted source,
+  packet and revision identity. Use the existing Graphify/graph-analysis contracts to build a
+  derived, revision-bound graph; NetworkX CPU is the traversal/PageRank oracle and cuGraph/RTX is
+  an optional challenger after exact input parity and resource admission. Do not require Neo4j or
+  add another canonical graph owner. A bounded read-only historical Neo4j → NetworkX export
+  preflight was recorded through
   `scripts/atlas/export-neo4j-concept-networkx-v1.py` and emits
   `docs/reports/parent-atlas/doc-14-neo4j-networkx-export-v1.json` with a revisioned projection,
   8,540 nodes, 10,000 bounded edges, `canonicalAuthority=false`, and no writes. This does not
@@ -889,8 +893,225 @@ extraction call site is added — do not reintroduce the flattened-prompt path.
   workspace revisions, evidence references, deterministic replay, and `canonicalAuthority=false`
   in `scripts/atlas/prove-doc-14-relationship-admission-fixture-v1.mjs`; report:
   `docs/reports/parent-atlas/doc-14-relationship-admission-fixture-v1.json`. This advances DOC-14
-  to fixture-proven only; live Neo4j admission remains required.
-  parity-oracle pattern already established for code topology — no new graph store.
+  to fixture-proven only; live admission remains required.
+  **2026-11-22 local-corpus alignment:** the existing `scripts/atlas/compile-okf-docs-openspec-relations-v1.py`
+  scans local `.okf/` and `docs/` files; the separately admitted Firecrawl corpus is in PostgreSQL
+  and is not the same index. Its previous report counted 752 `.okf` files, 1,349 eligible `docs/`
+  files, 48 parsed YAML manifests, 142 extracted strings and 4,512 explicit path references. The
+  old report's `PROVEN` / `admittedTopKCount=10` did not mean Graphify admission: relation proposals
+  were `TASK_RELEVANT_TO_DOCUMENT`, `PREDICTED`, and `PENDING`; no Graphify, NetworkX, PageRank,
+  canonical graph write, or ACE injection was performed. The old implementation hashed only the
+  ordered source paths into `graphRevision`, used a whole-file character-count span, and used a
+  stable migration key where a namespaced `logicalTaskKey` was available. Its `dense` lane was
+  YAML-concept token overlap; its `graph` lane was regex path mentions; its low-rank lane was
+  NumPy SVD over the lexical/concept overlap matrix.
+  The compiler now emits a separate review report at
+  `docs/reports/okf-docs-openspec-relations-audit-20261122.json`: graph checksums include source
+  content revisions and exact selected task bindings; task rows require matching current task-file
+  SHA-256 plus `logicalTaskKey` / `taskRevision`; spans are labeled UTF-8 byte offsets and explicitly
+  marked whole-source rather than citation excerpts; lane semantics and `graphifyIntegration=NOT_WIRED`
+  are explicit. The first 16 selected open workboard tasks matched their recorded task-file hashes
+  against the current checkout, but this does not refresh or qualify the entire workboard. The
+  compiler's `LOCAL_CANDIDATES_VALIDATED` status is limited to local source and pre-ACE shape checks.
+  It does not create Graphify edges.
+  A second local-only pass now resolves explicit `DOCUMENT_LINKS_TO` mentions against the exact
+  `.okf/` + `docs/` scan inventory, retains UTF-8 byte spans, and labels references outside that
+  inventory unresolved instead of fabricating targets. The existing `python/atlas_graph_runtime`
+  NetworkX CPU oracle ranked this frozen local graph: 2,101 nodes, 785 resolved directed links,
+  and 3,727 unresolved mentions; the v2 receipt binds graph revision, executor version, and input/
+  output checksums. Sampled edges include source and target SHA-256 revisions and the mention span.
+  Report: `docs/reports/okf-docs-openspec-relations-audit-v2-20261122.json`. This proves local
+  extraction and CPU PageRank execution only; it does not prove Graphify caller integration,
+  canonical ontology mapping, external Firecrawl corpus identity, graph admission, ACE injection,
+  GPU/cuGraph parity, or persistent readback. DOC-14 remains open and no store writes occurred.
+  A non-promoting unresolved-target review queue now groups the 3,727 mentions into 2,325 literal
+  target candidates: 2,832 mentions point to exact files present in the repository but outside
+  this scan, 894 point to missing local paths, and one escapes the repository root. Ranking is
+  deterministic: exact existing file first, then mention frequency, then lexical path; each row
+  retains up to three source hashes and byte spans. The queue never auto-adds a node. Top candidate
+  is `sveltekit-frontend/package.json` (52 mentions). The report records the full bounded review
+  queue and hashes the top 100 only when each target is at most 1 MiB, under a 16 MiB total read
+  budget; 96 candidates were hashed and four exceeded the per-file cap. These are local content
+  hashes, not canonical workspace revisions. Expand a deliberate source cohort from reviewed
+  exact-existing candidates before
+  regenerating; do not crawl every path or treat frequency/PageRank as semantic truth.
+  Remaining DOC-14 gates: map extracted strings to reviewed canonical ontology IDs; produce exact,
+  source-byte evidence for each supported relation; reconcile local source artifacts and admitted
+  external-document chunks without merging their identity domains; route proposals through the
+  existing graph admission owner; then prove the same frozen graph revision through NetworkX CPU
+  and optional cuGraph/RTX parity, resource admission, and independent readback. Keep the task open
+  until these caller, admission, and readback gates are proven. No live Graphify refresh or store
+  write was run in this pass.
+  **Extractor evidence-binding follow-up (2026-11-22):** `stanza_observations()` now emits the
+  predicate and relation-envelope character spans when the parser supplies them, with deterministic
+  token-offset fallback. `chunk_document()` binds a valid envelope to the exact chunk ID, source ID
+  and source revision, normalized document checksum, `NORMALIZED_DOCUMENT_UTF8_BYTES` interval, evidence-text hash,
+  producer/model revisions, and explicit empty `ontology_ids`; unbound candidates are labeled
+  `UNBOUND_EVIDENCE`. These remain `PROPOSAL_ONLY` and noncanonical. This is code-only progress:
+  no focused test or real Firecrawl/Stanza batch was run, and no canonical ontology IDs, graph
+  revision, Graphify incidence, ACE packet, or store write is claimed. These offsets address the
+  persisted normalized document representation, not raw fetched HTML or
+  original response bytes. Adversarial UTF-8/missing-offset tests remain open.
+  `write_source_artifacts()` now writes a URL-disambiguated normalized Markdown artifact and
+  verifies exact page-file and chunk UTF-8 byte slices, source/chunk revisions, span bounds, and
+  evidence checksum before labeling a row
+  `SPAN_READBACK_VERIFIED`; mismatches fail closed as `REJECTED` with a reason code. This code
+  path has focused adversarial unit coverage: 21 tests passed across
+  `python/test_atlas_external_docs.py` and `python/test_atlas_okf_docs_pipeline.py`, including
+  non-ASCII UTF-8 boundaries, distinct pages sharing one source revision, and a corrupted span
+  rejected as `EVIDENCE_SPAN_NOT_UTF8_BOUNDARY`. No bounded Firecrawl/Stanza batch was run, so
+  live producer behavior and relation admission remain open.
+  The existing `write_source_artifacts()` path now also emits deterministic per-source
+  `relation-candidates.jsonl` rows beside `chunks.jsonl`, including source/chunk revisions,
+  chunk checksum, the extracted candidate, span-validation result/reason, bound/unbound/rejected
+  counts, and a checksum from the JSONL file's post-write byte readback. A byte mismatch raises a
+  fail-closed error. This is a local derived proposal artifact only; it is not an ACE packet, Graphify incidence, or
+  PostgreSQL admission record. Focused fixture tests now exercise its writer and readback path;
+  no bounded Firecrawl/Stanza batch was run.
+  **Hypergraph proposal bridge follow-up (2026-11-22):** span-verified candidate rows can now
+  pass through the existing `atlas_external_doc_hypergraph.py` proposal owner using the exact
+  normalized page bytes, matching chunk record, and pinned workspace revision. Participants are
+  deterministic `mention:` IDs scoped to a tuple and ordinal; predicates are `UNMAPPED_VERB:*`;
+  ontology/concept IDs stay empty and mapping remains `UNMAPPED_REVIEW_REQUIRED`. The resulting
+  artifact is `PROPOSAL_ONLY`, has no graph revision, and performs no writes. This is a local
+  proposal handoff only: no reviewed mapping, Graphify admission, ACE/Valkey publication, or live
+  crawl has been demonstrated.
+  **API documentation fact handoff (2026-11-22):** the batch writer also invokes the existing
+  `atlas_graph_runtime.api_document_fact_v1` extractor for chunks with API signatures and writes
+  separate `api-document-facts.jsonl` records with a post-write byte checksum. Facts remain
+  `PENDING_ONTOLOGY_REVIEW`, with `DOCUMENTED_BY`, null ontology revision/object reference, and
+  exact chunk-local UTF-8 spans. Unqualified source revisions retain the extractor's blocking
+  reason instead of being upgraded. This does not complete ontology mapping, ACE/Graphify
+  admission, or persistence.
+  **DOC-14 pre-publication integrity gate (2026-11-22):** `atlas_doc14_span_integrity_v1.py` now
+  validates every relation candidate against the normalized artifact's persisted byte readback and
+  independently captured checksum before `relation-candidates.jsonl` can be replaced. It checks
+  source/chunk/revision identity, chunk bounds and bytes, Stanza character-to-UTF-8-byte mapping,
+  predicate and participant spans/text, evidence text and checksum, and normalized-document
+  coordinate space. Any invalid/unbound row rejects the whole batch; publication uses a same-directory
+  temporary file, readback, and atomic replace, preserving the prior JSONL on validation failure.
+  The focused pipeline/extractor tests pass 22/22, including a corrupted multibyte span and a changed
+  normalized source under the same claimed revision; both fail closed and preserve the prior artifact.
+  GAN hook and strict OpenSpec validation are recorded in
+  `docs/reports/doc14-span-publication-integrity-20261122.md`. This proves fixture-level code wiring
+  only. A real Firecrawl/Stanza batch, independent source-index revision readback, ontology review,
+  Graphify admission, ACE/Valkey write/readback, and centroid publication remain open; DOC-14 stays
+  unchecked and no database or cache writes were performed.
+  **Direct validator regression coverage (2026-11-22):** added
+  `python/tests/test_atlas_doc14_span_integrity_v1.py` for Unicode character-to-byte offsets,
+  independently expected capture checksum rejection, corrupted byte-span rejection with prior
+  artifact preservation, missing chunk-boundary rejection, and valid atomic publication/readback.
+  Windows Python 3.13 and WSL2 `atlas-rapids-cu13` each pass 5/5. These temporary-directory tests
+  strengthen the existing publication gate; they do not admit ontology mappings or close DOC-14.
+  **Typed proposal shape follow-up (2026-11-22):** Stanza extraction records now expose explicit
+  `status=PROPOSED`, source-text subject/object mention candidates by participant role, and an
+  `extractor_version`, while `canonical_authority=false` and empty ontology IDs remain unchanged.
+  The fake-pipeline shape test and related publication/external-doc/pipeline suites pass 28/28 on
+  Windows; the focused proposal-shape plus span suites pass 6/6 on WSL2. This proves contract
+  output shape and byte integrity, not relation semantics, OAK mapping, Graphify admission, or ACE.
+  The pipeline artifact fixture also asserts these proposal fields survive JSONL publication.
+  The capture boundary now also compares the normalized file readback checksum to the checksum
+  supplied by the fetch result before candidate processing. The changed-source fixture is rejected
+  at this earlier boundary and leaves the prior candidate artifact byte-identical. A live producer
+  run could not be performed in the inspected environments: local Python 3.13 and both configured
+  WSL GPU environments lack the `stanza` package; reachable `:8095/health` advertises spaCy POS and
+  LangExtract, not Stanza. No package/model was installed and no Firecrawl call was made. The next
+  live proof therefore needs an approved Stanza runtime/model plus a bounded source manifest.
+  **Bounded live capture-to-publication proof (2026-11-22):** after the prior environment audit,
+  a separate CPU-oriented Python 3.13 environment was created outside the repository with Stanza
+  1.15.1 and the English `tokenize,pos,lemma,depparse` models. Firecrawl MCP captured the official
+  `https://docs.firecrawl.dev/quickstart` page (`scrapeId` `01a20557-513c-7154-944d-3b4a14646c6f`;
+  normalized 77,991 bytes; content hash
+  `21b4f9b4eddf12f9e697204c60078054c255f0489b11f781898da5e019a818c9`). The capture was supplied
+  to the existing `PageArtifact`, `chunk_document()`, `stanza_observations()`, and
+  `write_source_artifacts()` owners; only the first 8 of 56 document chunks were parsed. All 18
+  generated candidates passed the span validator and remained `PROPOSAL_ONLY`. Two runs produced
+  identical JSONL SHA-256 `8b016ef8ea9c6153eefe960b117cee06ca66659257d5ba6691354434d7c1575a`;
+  independent readback confirmed 18 candidates bound to the captured document hash. An adversarial
+  one-byte evidence-offset mutation was rejected with `EVIDENCE_CHARACTER_BYTE_MAPPING_MISMATCH`
+  and preserved the previous artifact byte-for-byte. Receipt:
+  `docs/reports/doc14-live-stanza-proof-20261122.json`. This is bounded live capture and local
+  artifact proof, not the manifest-driven local Firecrawl fetch path: `:8095/evidence/web` returned
+  503 `FIRECRAWL_NOT_CONFIGURED`, so Firecrawl MCP supplied the page. The source revision is a
+  content hash, not a canonical source-index revision; no predicate/ontology review, Graphify
+  admission, ACE/Valkey write/readback, or database mutation occurred. DOC-14 remains open.
+  **Non-promoting semantic review handoff (2026-11-22):** the 18 verified live candidates are
+  re-read into `docs/reports/doc14-relation-review-queue-20261122.json`; the handoff independently
+  rechecked all 18 byte spans against the same captured normalized bytes and retains each source
+  chunk, exact text, and byte interval. It records no ontology/concept IDs, reviewer decision, or
+  admission. Ten of 18 candidates lack an explicit `subject` participant in Stanza's dependency
+  output; the span validator deliberately does not treat participant count as semantic correctness.
+  Review must assess role completeness, predicate meaning, and ontology mapping before any existing
+  Graphify admission gate can run. The review packet is derived/test data only; no Graphify, ACE,
+  cache, or database writes occurred.
+  **Shared tuple proposal adapter (2026-11-22):** added
+  `external-doc-hypergraph-tuple-proposals-v1.ts` to map the existing Python
+  `atlas.hypergraph-fact-proposal.v1` wire record into the shared
+  `OntologyLinkedTupleV1` shape. It rechecks the Python proposal checksum/ID, full source SHA-256,
+  exact UTF-8 byte slice and evidence checksum; only mention-scoped `source_ref` participants
+  with supported dependency roles are projected. Output remains `PROPOSAL_ONLY` /
+  `REFERENCE_ONLY`, with empty ontology/concept IDs, unresolved participant resolution,
+  `canonicalAuthority=false`, and `writesPerformed=false`. Four focused tests pass. This proves
+  fixture-level contract wiring only: no actual Python producer-to-TypeScript invocation, canonical
+  source-index readback, human relation decision, Graphify admission, ACE/Valkey write/readback,
+  or database mutation was performed. DOC-14 remains open.
+
+  **Official-docs MCP/PostgreSQL preflight (2026-11-22):** local `atlas-tools-mcp.mjs`
+  advertises `inspect_postgres_backend` and `find_dependencies` now resolves through the
+  revision-qualified Parent Atlas graph path; its read-only PostgreSQL inspector reports
+  PostgreSQL 18 reachable with the required source/graph tables present. The inspection uses
+  `BEGIN READ ONLY` and reports `writesPerformed=false`. The connected MCP runtime remains stale:
+  its surfaced tool set omits `inspect_postgres_backend`, and live `find_dependencies` and
+  `trace_database` still report `authority=neo4j_projection` / `PROJECTION_MISSING_FILE` or
+  `UNRESOLVED`. Local MCP source now advertises version `0.3.0` with a source SHA-256 build
+  fingerprint so a refreshed process can be identified. Focused local MCP tests pass 42/42,
+  including inspector and fail-closed dependency-resolution contracts. A direct read-only lookup
+  found no exact canonical external-doc row for `https://docs.firecrawl.dev/quickstart`; the
+  earlier bounded Stanza capture remains a local proposal and is not canonical corpus evidence.
+  No MCP process was restarted, no Firecrawl crawl was made, and no database, Graphify, ACE, or
+  Valkey write occurred. **Still open:** refresh/reconnect the approved MCP process, verify its
+  advertised version and fingerprint, then prove canonical official-doc retrieval and top-K
+  evaluation before ACE/cache work. This note records a runtime blocker; it does not close DOC-14
+  or DOC-15 and does not change task checkboxes.
+  **MCP PostgreSQL tool follow-up (2026-11-22):** local `trace_database` now queries the
+  PostgreSQL 18 code index's existing FTS lane and joins the latest unambiguous
+  `atlas_workspace_source_bindings` revision for each candidate source. The response is capped at
+  50, includes source/chunk and source/workspace revisions plus binding observation time, and labels
+  results `LEXICAL_MENTION_CANDIDATE`; it makes no `USES_DB` assertion and performs no write. A
+  live local MCP dispatch returned 50 candidates for `codebase chunk index` with
+  `POSTGRESQL_CODE_INDEX_FTS`, `canonicalAuthority=false`, and `writesPerformed=false`. The focused
+  MCP suite passes 44/44. Each returned candidate is additionally checked against the current
+  workspace file's SHA-256 under a 2 MiB per-file / 16 MiB total read budget; the live result hashed
+  207,372 bytes and excluded six stale or unverifiable raw rows. A true local stdio MCP initialize
+  plus `tools/call` also returned version `0.3.0` and 50 candidates. In the same local checks,
+  `find_dependencies` returned `SOURCE_NOT_INDEXED` for the documentation read-model and MCP server
+  files. A bound file that did match the current source bytes instead failed with
+  `SOURCE_INDEX_REVISION_CONFLICT` across historical workspace revisions. The existing structural
+  edge plan is `CURRENT_STRUCTURAL_EDGE_PLAN_INCOMPLETE` with zero selected sources, nodes, and
+  edges, and null `graphRevision`; therefore no live dependency edges or NetworkX graph answer are
+  proven. The connected MCP process has not been
+  refreshed and still exposes the older Neo4j behavior: a fresh connected `trace_database` call
+  returned zero traces with `authority=neo4j_projection`; connected `find_dependencies` matched a
+  Neo4j node but returned `NO_OUTGOING_EDGES` with a null graph revision. DOC-14/15 remain open; no
+  checkboxes or canonical rows changed.
+
+  **Graph readiness detail (2026-11-22):** local MCP version `0.4.0` extends the existing
+  read-only PostgreSQL inspector with snapshot and edge-type counts. Live readback reports
+  PostgreSQL 18 and present tables, but graph readiness is
+  `SUPERSEDED_OR_REJECTED_ONLY`: 2 snapshots, 0 with graph/workspace/source-inventory revisions,
+  0 non-superseded snapshots. All 224,764 stored edges belong to superseded snapshots and are
+  `CONTAINS` (112,382), `MATERIALIZES` (58,304), or `DERIVED_FROM` (54,078); no active dependency
+  edge set is available. Existing source-plan review is blocked: 0 exact current Graphify sources,
+  39 missing Graphify sources, 8 ambiguous, 81 revision/content mismatches, and 4 local-byte
+  mismatches. The source-authority receipt says `NO_CURRENT_SOURCE_SET`; its workspace revision
+  (`ec542…`) differs from the source-plan (`c636…`) and empty structural-plan (`f476…`) revisions.
+  The existing owner defers another Graphify run until a clean/current bound source pass or an
+  admitted selector run. No source-binding write, graph materialization, or MCP reload was
+  performed. This confirms the blocker is current source authority and graph production, not
+  PostgreSQL table availability or PageRank implementation. The local `find_dependencies` graph
+  resolver still requires its revision-qualified structural artifact; the Postgres snapshot
+  counts are diagnostic only. This pass did not migrate remaining Neo4j-backed `find_feature`,
+  `find_route`, `trace_tool_chain`, or plain-name `find_source_refs` lookups.
 
 ## Phase F — Agentic retrieval and repair loop
 
@@ -994,7 +1215,14 @@ Audit 2026-09-24 (read-only; DOC-19 exact oracle, DOC-20 CAGRA comparison, and D
   `docs/reports/parent-atlas/doc-17-hot-bucket-descriptor-v1.json`; Valkey write/readback remains
   explicitly open.
 - [ ] **DOC-18** centroid routing — `EXTEND` of existing SOM/centroid infrastructure
-  (`karpathy-gpu-enrich.mjs` family), applied to doc-chunk embeddings.
+  (`karpathy-gpu-enrich.mjs` family), applied to doc-chunk embeddings. Batch construction must
+  use only an admitted, frozen document candidate snapshot and its exact `semantic_768` vectors;
+  record the candidate ordinal map, algorithm/configuration, assignments, vector/artifact hashes,
+  and CPU reference result. L2 latent vectors are eligible only when their transform/model revision
+  and source vector lineage are pinned; do not silently slice a 768-vector and call it a trained
+  MRL/L2 representation. Publish only through the existing centroid artifact/manifest owner after
+  independent durable readback. Any Valkey write is a revision-qualified routing descriptor and
+  remains blocked until atomic publication, cache identity, invalidation, and readback gates pass.
 
 ## Phase H — Operations
 
@@ -1541,13 +1769,13 @@ Run this batch only after a published documentation generation has passed DOC-DE
 - **Full SentenceTransformer-versus-ONNX pipeline diagnostic (2026-10-09; local CPU, scratch-only):** executed `scripts/atlas/prove-embeddinggemma-full-pipeline-parity-v1.py` with a 2,987,192,320-byte physical-memory preflight, local-only model loading, six identical retrieval-formatted inputs, tokenizer-ID/mask comparison, all five SentenceTransformer module stages, and independent receipt checksum readback. Token IDs and masks matched for all six. The loaded SentenceTransformer pipeline separated duplicate/paraphrase/related/unrelated pairs at `1.0000/0.8644/0.6199/0.3830/0.3079`; current ONNX masked-mean vectors produced `1.0000/0.9144/0.8336/0.7490/0.7298`. Cross-pipeline cosine ranged `-0.04803` to `0.05805`, so these ONNX outputs are not numerically compatible with the local full SentenceTransformer outputs on this fixture. This does not isolate causality or qualify the reference runtime: metadata expects SentenceTransformers `5.1.0` and Transformers `4.57.0.dev0`, but installed versions were `5.0.0` and `5.5.0`. Receipt `.tmp/atlas/embeddinggemma-full-pipeline-parity-v1-goal-20261009.json`, checksum `sha256:9b560946fc8ac78ba4ee5992777b8de9a14bb24b54a3911a1724b95c7e3301bc`; independent readback `MATCH`. No Q8 calls, embedding-store writes, or admission occurred. Keep ONNX `NOT_ADMITTED`; next use a version-matched source environment and artifact-bound Q8 reference, then compare pooling/projection stages before changing or exporting model artifacts.
 - **Projection-stage isolation follow-up (2026-10-09):** extended the same diagnostic runner to replay ONNX hidden states through the source model's existing pooling, Dense, and normalization modules and record per-stage checksums/cosines; `py_compile` passes. The attempted rerun failed closed at its unchanged memory preflight (`1,872,404,480 < 2,500,000,000` bytes) before model load or inference, and produced no receipt. The prior final-vector incompatibility remains the only executed comparison; stage attribution is still unproven. Retry only when the runner's resource preflight passes, then use a framework-version-matched environment before interpreting parity.
 - [ ] `DOC-BATCH-04` — reuse the existing NetworkX CPU graph-analysis owner as the oracle for document/concept graph metrics, then compare only supported algorithms with the existing RAPIDS/cuGraph executor on the same frozen, admitted graph artifact and relation revision. Record artifact checksums, graph revision, algorithm/configuration, CPU/GPU result parity, resource preflight, and whether a CUDA kernel actually executed. A GPU library import, planner, or cuTile capability result is not GPU-execution proof. Keep cuTile/SIMT work challenger-only until a measured kernel has CPU-oracle parity and an independent execution receipt; do not reinterpret vector ANN topology as typed document or ontology relations.
-- [ ] `DOC-BATCH-05` — finish DOC-17 using the existing BitFrost/Valkey owner: materialize only a bounded `HotBucketDescriptorV1` of admitted IDs/revisions/checksums, never document bodies, vectors, tensors, or canonical evidence. First prove dry-run selection, full-revision cache keying, TTL/invalidation behavior, and cold-versus-warm result equivalence; then require explicit authorization for a Valkey write and independent readback. Cache warming must not alter rank, identity, admission, or retrieval-vote ownership. Keep DOC-18 centroid routing separate and optional.
+- [ ] `DOC-BATCH-05` — finish DOC-17 using the existing BitFrost/Valkey owner: materialize only a bounded `HotBucketDescriptorV1` of admitted IDs/revisions/checksums, never document bodies, vectors, tensors, or canonical evidence. First prove dry-run selection, full-revision cache keying, TTL/invalidation behavior, and cold-versus-warm result equivalence; then require explicit authorization for a Valkey write and independent readback. Cache warming must not alter rank, identity, admission, or retrieval-vote ownership. Keep DOC-18 centroid routing separate and optional. For SSR→CSR expansion, SSR should provide the authorized compact card/manifest; CSR may request L2/L3 payloads on demand through authorized revision/hash-bound loaders, with byte budgets, cancellation on case/query changes, stale-response rejection, and disposal/eviction after the final consumer releases a buffer. Keep vector payloads out of Valkey descriptors and never cache model KV/hidden state.
 - [ ] `DOC-BATCH-06` — compile one bounded, read-only DAG synthesis request from the existing admitted retrieval result through the existing ACE/ContextManifest and Atlas DAG owners. Bind the request to the indexed-document manifest, selected source/chunk evidence, `semantic_768`/graph revisions when used, validated DAG checksum, runtime/tool revisions, and execution receipt. Verify deterministic replay, evidence coverage, token/context budget, no-write state, and independent receipt readback. Do not send raw search results directly to a model; no synthesis or promotion unless the canonicalized ContextManifest is accepted.
 - [ ] `DOC-BATCH-07` — decide whether RabbitMQ is needed for this batch by auditing the existing outbox/queue owner and workload requirements. `amqplib` availability and legacy summarizer scripts do not establish a need for a new queue. If an existing queue is required, reuse it with bounded messages containing immutable manifest/page IDs and checksums, idempotency keys, retry/dead-letter policy, consumer fencing, and receipt-backed completion; never make RabbitMQ canonical state or bypass the durable journal/outbox gate. Otherwise record `NO_NEW_QUEUE_REQUIRED` and keep the batch synchronous/bounded.
 - [ ] `DOC-BATCH-08` — optional, only after DOC-BATCH-01/06 pass: run a bounded source-grounded documentation summary using the runtime-resolved active model from the existing model resolver (verify `/v1/models`; do not assume a model name or start/restart `:8090`). Record model binary/artifact digest, active model ID, prompt/template revision, input ContextManifest checksum, selected source refs, output checksum, latency/token usage, and validator results. Keep the fetched-page record's `llm_synthesis: "No model synthesis was run..."` unchanged; emit a separate summary artifact with explicit model provenance. Summary text is derivative/non-authoritative and must not create local-repository facts, ontology admission, or canonical identity. If the active server is unavailable or resource preflight fails, emit an unavailable receipt rather than silently using a different model or client-side Gemma path.
 - [ ] `DOC-BATCH-09` — end-to-end acceptance: independently replay one bounded indexed batch from published manifest through parser, exact candidate/vector readback, CPU oracle and eligible accelerator comparisons, cache dry-run/readback (only if authorized), ContextManifest, and read-only DAG receipt; include all failure/unavailable states and prove unchanged source generation and zero unauthorized writes. Mark no production-ranking, cache-warming, model-synthesis, or GPU gate complete from fixture-only evidence.
 - [ ] `DOC-BATCH-10` — establish the post-index packet/file boundary using the existing PostgreSQL documentation admission and packet owners. Verify what is stored as immutable source files versus JSON/JSONL packet/control envelopes; envelopes may carry admitted IDs, revisions, checksums, sourceRefs, and bounded metadata, but must not duplicate full page bodies or mint identity from paths, URLs, ordinals, or hashes. Independently read back one admitted document packet and its file/chunk references, then emit a revision-qualified receipt. A published `.okf` generation alone is not PostgreSQL indexing or packet admission.
-- [ ] `DOC-BATCH-11` — define the daily Graphify refresh as a bounded, idempotent pass over PostgreSQL-admitted documentation packets only. Pin the input admission generation, packet/chunk identities, source/documentation revisions, parser/Graphify revisions, and output graph revision/checksum; reconcile additions, unchanged members, stale members, and removals without inferring identity or refreshing canonical Graphify facts from crawler output. Require independent snapshot readback and an unchanged-input deterministic replay before any downstream graph feature use. Keep this separate from the existing code Graphify snapshot and do not promote document-derived edges without the ontology/evidence admission gate.
+- [ ] `DOC-BATCH-11` — define the daily Graphify refresh as a bounded, idempotent pass over PostgreSQL-admitted documentation packets only. Pin the input admission generation, packet/chunk identities, source/documentation revisions, parser/Graphify revisions, and output graph revision/checksum; reconcile additions, unchanged members, stale members, and removals without inferring identity or refreshing canonical Graphify facts from crawler output. Require independent snapshot readback and an unchanged-input deterministic replay before any downstream graph feature use. Keep this separate from the existing code Graphify snapshot and do not promote document-derived edges without the ontology/evidence admission gate. A daily code-Graphify receipt alone is not the document-relation graph revision; join only through a separately pinned document cohort and the existing graph admission owner.
 - [ ] `DOC-BATCH-12` — align repository search helpers and NLP extraction to the same evidence envelope. Use `rg` for bounded lexical discovery, the existing UTF-8 byte reader for exact source spans, Tree-sitter/ast-grep for syntax observations, and the existing FastAPI/LangExtract owner only for source-grounded proposals. `sed` output is diagnostic context, never canonical byte-span evidence. Record producer/extractor revisions and exact source digest/span; reject out-of-range or stale spans. Compare any `trace`/Atlas-tools MCP observations with direct repository and receipt evidence by exact identity/revision; MCP availability or tool output alone cannot establish admission. If MCP tools are unavailable, record `UNAVAILABLE` rather than claiming alignment.
 - [ ] `DOC-BATCH-13` — close the packet-to-execution integration after DOC-BATCH-10..12: feed only independently read-back, admitted packet IDs and checksums to the existing bounded retrieval/ACE/ContextManifest/DAG path; verify SearchRuntime and Trace/Atlas tool identities, selected evidence, revisions, and execution receipt agree. No direct raw crawler JSON, unadmitted NLP facts, cache contents, or model summaries may enter synthesis. Preserve the fetched record's `llm_synthesis: "No model synthesis was run..."`; any later Ornith summary is a separate, runtime-identity-bound derivative artifact under DOC-BATCH-08. <!-- wfu: depends=DOC-BATCH-10,DOC-BATCH-11,DOC-BATCH-12 -->
 - **DOC-DEMAND-03B retained-row publication fix (2026-10-09; fixture-only):** found that append publication validated only newly fetched pages while copying retained corpus rows into the published JSONL without reopening their raw Markdown/sidecars; an entry could also be published with no page readback. The existing publisher now requires a verified page readback for every published row, applies the current exact allowlist to newly selected pages, and independently revalidates retained pages' HTTPS URL, identity, sidecar and content hash. Added regressions for retained rows outside the current fetch allowlist, missing retained artifacts, and unverified entries. Publication and restart/resume integration suites pass 12/12. No live crawl or canonical publication was performed; current alignment verifier still reports `PUBLISHED_GENERATION_MISSING`, so DOC-DEMAND-03B remains open pending a real validated generation and admission-owner readback.
@@ -1610,8 +1838,166 @@ This ledger update is a plan, not completion evidence. The `.okf` cohort remains
 - **DOC-DEMAND-03B published-page independent readback (2026-10-11):** added `verifyOkfDevPageArtifactReadbackV1()` to the existing publication owner and integrated it into the existing admission-alignment verifier. It reopens each referenced Markdown/JSON sidecar under the repository root, validates containment, byte checksums and source/page identity, normalizes contained legacy absolute sidecar paths, and binds each readback to the exact corpus row. Publication regression suite passes 19/19, including post-publication Markdown/sidecar tampering; strict OpenSpec validation passes. Live read-only verification of current generation `20261011T172624437Z-4652ac774e9efacc` independently reads back 79/79 page artifacts with zero byte/identity failures. Admission remains `OKF_ADMISSION_ALIGNMENT_BLOCKED`: 78 published pages lack reviewed envelopes, 56 envelopes are outside this generation, and the single exact oaklib match has a stale content hash. Receipt `.tmp/atlas/okf-dev-publication-readback-current-v1.json`, SHA-256 `b012818f8ff230aa47432de28fde37f072d521e704d5a75be6d640ea74b2c000`. GAN ran last before this ledger update: `ADVERSARIAL_FIXTURES_PROVEN` 16/16, receipt `.tmp/atlas/gan-adversarial-okf-page-readback-v1.json`, SHA-256 `aa4f748f6a16ec0aa1270870985e1033422710bb057928deaedf941c2bb783b5`. The verified publication is still proposal/reference material, not canonical admission; no persistent database/cache/vector writes occurred.
 - **DOC-DEMAND-03B refreshed alignment gate (2026-10-11):** reran the existing read-only publication/envelope verifier against active generation `20261011T194437578Z-b51cff2ae704ad26`. Independent artifact readback is complete at 88/88; exact admission alignment remains `OKF_ADMISSION_ALIGNMENT_BLOCKED` with 88 published pages, 57 reviewed envelopes, 1 exact identity, 1 hash mismatch, 87 published pages without envelopes, and 56 envelopes without published pages. Scratch receipt `.tmp/atlas/okf-dev-admission-alignment-refresh-20261011.json`, SHA-256 `534ad63c5e078b56b55fe09fb09957a743dc097dd3f456e3a3a2f9cab8e7501e`; `canonicalAuthority=false`, persistent-store writes false. Alignment unit tests pass 6/6. Do not fetch pages, regenerate reviewed envelopes, create source aliases, or admit/index this cohort to clear the gate; the reviewed source/admission owner must decide whether to review the current 88-page cohort or republish the matching reviewed cohort.
 
+### DOC-DEMAND-03B one-page Firecrawl admission pilot (2026-11-21)
+
+- **Created and wired:** the Python envelope builder reads the manifest output root, can export a verified normalized UTF-8 page, and checks the captured Markdown checksum and every chunk span. The existing admission command accepts `--envelopes` and `--normalized-page` for one page, validates before connecting, and scopes database reconciliation to that page. Its optional FTS proof emits only canonical citation coordinates for the exact admitted revision.
+- **Proven scope:** at base `d29e4e95149fa0cfddba211a572e00a217e67bf6` with these working copy changes, the Python Firecrawl v2 acquisition produced one official SvelteKit load page and 101 chunks, with zero acquisition failures. Artifacts are in `.tmp/atlas/okf-sveltekit-pilot-15892a0e/` (`manifest.json`, `coordinates.json`, `builder-receipt.json`, `normalized.md`, and `envelopes.json`). The source catalog labels the page current upstream, so the recorded version is a dated upstream snapshot.
+- **Live read-only command** from `sveltekit-frontend`: `node_modules/.bin/tsx.cmd scripts/atlas/run-external-doc-admission-v1.mts --envelopes ../.tmp/atlas/okf-sveltekit-pilot-15892a0e/envelopes.json --normalized-page ../.tmp/atlas/okf-sveltekit-pilot-15892a0e/normalized.md --plan --query load`. `plan.jsonl` records `PILOT_CAPTURE_MATCH`, `MISSING`, `writerCalls: 0`, and `citation: null`. Adding one byte to the normalized page produced `exit=1 output=PILOT_PAGE_HASH_MISMATCH` before database access (`tamper.txt`).
+- **Replay and negative validation:** rebuilding from the saved capture without `--acquire` reproduced both SHA-256 hashes (`PILOT_REPLAY_HASH_MATCH`). Replacing one chunk evidence revision produced `exit=1 output=HANDOFF_NOT_READY:CHUNK_EVIDENCE_REVISION_MISMATCH` (`stale-chunk.txt`). The three focused admission, contract, and read-model Vitest suites passed 61/61.
+- **Open:** the staging database URL and existing admission authorization were absent. Staging apply, independent admitted-row and FTS replay, and ACP context admission remain unproven. The published cohort reconciliation remains open independently of this scratch pilot. No checkbox changed.
+
+### OpenSpec documentation context preview (2026-11-21)
+
+- The read-only `sveltekit-frontend/scripts/atlas/prepare-openspec-doc-context-v1.mts` command resolves an exact open task against the current workboard source hash, queries official PostgreSQL FTS at the requested product version, independently checks each selected chunk's hash/span/revision, and emits a bounded JSON preview pinned to the DSPy workboard contract. A checksum-pinned low rank artifact can supply advisory helper routing through the existing recommender.
+- Local PostgreSQL 18.4 reported 30 admitted pages and 852 chunks with 852 embeddings present. The indexed SvelteKit snapshot `CURRENT_UPSTREAM@2026-09-23` provides live context for this preview. The newer Firecrawl scratch capture remains a separate, unadmitted revision.
+- Use the existing workboard builder with scratch output paths before invoking the preview with `--workboard <snapshot> --task parent-atlas-versioned-doc-intelligence:DOC-DEMAND-03B --product sveltekit --version CURRENT_UPSTREAM@2026-09-23 --query load`. The receipt is `.tmp/atlas/okf-sveltekit-pilot-15892a0e/doc-context.json`. An absent version yields zero citations and a mismatched routing artifact digest is rejected.
+- ACE admission, model execution, GEPA optimization and OaK promotion remain open. This preview supplies documentation context for review and leaves existing task checkboxes unchanged.
+
+### DSPy, GEPA, and upstream ACE capture (2026-11-21)
+
+- Added the bounded source manifest `docs/.okf/dev/dspy-gepa-ace.manifest.json` and its coordinate mirror. The four URLs cover DSPy 3.1.0 JSONAdapter and GEPA overview, standalone GEPA's optimizer API as a dated upstream snapshot (`CURRENT_UPSTREAM@2026-11-22`, capture UTC), and the ACE authors' README at commit `82709de050e1db6e6ef2f07bcb0393560b94992a`.
+- **Proven capture and read-only planning:** at base `d29e4e95149fa0cfddba211a572e00a217e67bf6` with the current working tree, the existing Python Firecrawl builder captured 4 pages and verified 135 UTF-8 chunk spans. Each run used a single-page copy of the manifest with an isolated scratch root. Rebuilding offline produced byte-identical normalized Markdown and envelope JSON for all four. The admission CLI returned `PILOT_CAPTURE_MATCH` and `MISSING` on all four pages, with `writerCalls: 0` and `citation: null`. The per-page manifests, builder/replay receipts, live `plan.jsonl` outputs, and page/envelope hashes are in `.tmp/atlas/okf-dspy-gepa-ace-v1/`; `verification.json` summarizes the four runs.
+- **Reproduction:** use `python scripts/atlas/build-external-doc-admission-envelopes-v1.py --acquire --manifest <scratch-manifest> --coordinates docs/.okf/dev/dspy-gepa-ace.coordinates.json --output <envelopes.json> --receipt <builder-receipt.json> --normalized-page <normalized.md>`. Repeat with separate output paths and without `--acquire` for replay. From `sveltekit-frontend`, run `node_modules/.bin/tsx.cmd scripts/atlas/run-external-doc-admission-v1.mts --envelopes <envelopes.json> --normalized-page <normalized.md> --plan --query <API-term>`.
+- **Still open:** staging URL and admission authorization are absent. Canonical save/readback, a positive FTS hit for this corpus, and ACE admission for `DOC-DEMAND-03B` await staging proof. The upstream ACE capture is reference material. No checkboxes changed.
+
 ## Firecrawl version probe and package-version validation (2026-10-20)
 - Added `probeFirecrawlVersionV1` (read-only, no writes, no installs) in `sveltekit-frontend/src/lib/server/retrieval/optional-firecrawl-provider.ts`. Spec `optional-firecrawl-provider.spec.ts`: 4/4 pass. Live run: `UNAVAILABLE` (client package not installed; configured `http://127.0.0.1:3002/` down). It never claims a service version because no version endpoint is verified in the repo.
 - Did not create a `master_domain_package_version_validation` table. Live `atlas_external_doc_pages` (30 pages, 852 chunks) already has `product`, `product_version`, `source_authority`, and `crawl_revision`.
 - Read-only validation `sveltekit-frontend/scripts/atlas/external-doc-package-version-validation-v1.sql` (run in `BEGIN READ ONLY`): 1 of 8 provider/product/version groups is a concrete version (`postgresql` `18`, 6 pages). 6 are `CURRENT_UPSTREAM@2026-09-23` snapshot labels, which are not releases. 1 is `UNVERSIONED`. Do not cite the other packages as version-qualified until real versions are recorded.
 - Open, not started: MCP tool and skill (need the validation owner decided), README, and any DDL (not approved).
+
+## Firecrawl lexical task recommendation review slice (2026-11-22)
+
+- Repaired the existing read-only recommender and runner. It now resolves exactly one open task from `taskInventory`, pins its `taskRevision`, verifies the workboard's source-file hash against disk, filters canonical documentation to `source_authority='OFFICIAL'`, requires exact page/chunk revisions and checksums plus a valid UTF-8 byte span, and emits API/import mention spans and bounded excerpts with citation coordinates. Weak single-word matches are suppressed; task and document identity remain separate from the advisory score.
+- Focused tests: `python/tests/test_firecrawl_lexical_api_recommender_v1.py`, 6/6 passed. Live read-only run against the freshly built workboard selected `parent-atlas-versioned-doc-intelligence:1644` (`DOC-SEARCH-05`, task revision `sha256:0051b8da6f57084463cadad5793bf90c5b3584c7b51d8fec58c1a115c627c2cb`), read 833 official chunks, skipped 0 for missing citation coordinates, and returned 0 recommendations after the precision threshold. The earlier five weak matches were generic terms and are no longer presented.
+- Receipt: `docs/reports/firecrawl-lexical-task-recommendations-v2.json`. It is a review-only packet (`canonicalAuthority=false`, `writesPerformed=false`); no Firecrawl crawl, database/cache/vector write, RLM/DSPy execution, model training, SearchRuntime rank change, or live assistant integration occurred. The zero-hit result is honest coverage evidence, not proof of recommendation quality. **DOC-SEARCH-05 remains open** pending evaluation on a reviewed frozen cohort and any separate assistant/ACE integration proof.
+- **Positive/negative retrieval controls:** tightened scoring to use explicit technical identifiers and API matches; ordinary word overlap is now diagnostic only, and results are diversified by page. On an open REC-14 task containing `HNSW`, the read-only run returned three official, revision-qualified pgvector/Drizzle references, each with a matching `hnsw` API signal and excerpt span (`docs/reports/firecrawl-lexical-positive-control-v2.json`). DOC-SEARCH-05 still returns zero for its unrelated identifiers. Six focused tests pass, including generic-only/product-only rejection and exact-API acceptance. These controls show expected routing behavior, not a reviewed relevance benchmark; no task was marked complete.
+
+## DOC-14 live canonical citation readback slice (2026-11-22)
+
+- Added `external-doc-citation-readback-v1.ts` as a read-only adapter over the existing canonical `atlas_external_doc_chunks` / `atlas_external_doc_pages` owners. It re-reads selected official chunk IDs from PostgreSQL and verifies page/chunk revisions, authority, UTF-8 byte length, SHA-256, and the existing `chunkEvidenceRevisionV1` contract. Any invalid/missing row blocks the citation set; the FTS headline excerpt is never returned as source evidence.
+- Wired the existing A2A `external-doc-admitted-context` route to expose only verified chunk text and a separate `citationReadbackStatus` / blocker list. It remains a noncanonical read-only artifact: no ContextManifest admission, model inference, ACE/Valkey write, graph admission, or task promotion is implied.
+- Proof: four adapter tests and nine A2A route tests passed; the live PostgreSQL 18.4 DocCorpusPanel read-only test passed with exact official-chunk citation readback, including Unicode byte-length checks. `npm run check` was started but produced no diagnostics before it was interrupted; it is not a passing check. The bounded top-K script remains `DIAGNOSTIC_SELF_MATCH_SMOKE` over 200 code chunks and is explicitly `qualityBenchmarkEligible=false`; it is not the requested reviewed documentation benchmark.
+- Remaining: a frozen reviewed official-doc question/relevance set and real Recall@10/MRR/NDCG/citation-support evaluation; a valid existing ACE candidate snapshot/ContextManifest admission and independent manifest readback for these external-doc chunk IDs; actual DSPy inference (the current helper contains no `dspy.RLM` import/call); answer-claim-to-citation support validation; and any separately authorized Valkey packet write/readback. DOC-14, DOC-SEARCH-05, and DOC-AGENT-06 remain open.
+- Detailed receipt: `docs/reports/doc14-live-citation-readback-20261122.md`. No database, graph, cache, or object-store writes occurred.
+- **DOC-SEARCH-05 evaluator hardening:** `scripts/atlas/eval-doc14-topk-lanes-v1.py` now accepts `--corpus`, `--reviewed-queries`, and `--output`. The reviewed-set contract requires at least 30 unique questions, explicit chunk relevance grades, reviewer reference, an exact candidate-corpus checksum, per-chunk UTF-8 content-hash verification, and a query-set revision checksum. It reports Recall@K, precision@K, MRR, and NDCG@K for the existing exact-ID, lexical, corpus-order diagnostic, and hybrid lanes. Fixture coverage is 3/3 tests. A fixture-shaped review attestation is not independently authenticated, so `qualityBenchmarkEligible` remains false; generated-answer citation support and abstention are not evaluated. No reviewed official-doc cohort or FTS/AST/LSP/semantic/Graphify/SearchRuntime capture was supplied, and the present 200-row corpus is repository code. DOC-SEARCH-05 remains open.
+
+## Graph relation and learning-input integrity correction (2026-11-22)
+
+- `python/atlas_graph_runtime/graphrag_oak_matrix_compiler_v1.py` now rejects relation rows unless the existing admission state is `GRAPH_ADMITTED`, `canonicalAuthority` is true, the row's graph revision matches the selected graph revision, and source/evidence/endpoints are present. Pending proposals cannot affect PageRank or candidate graph features.
+- The CLI no longer feeds `sampleDoc14RelationProposals` into the graph as if admitted, assigns invented OAK concepts to all chunks, or uses a fixed placeholder graph revision. It produces an explicitly noncanonical local input checksum and reports `DERIVED_LOCAL_INPUT_CHECKSUM_NOT_CANONICAL` / `NO_ADMITTED_MAPPINGS`.
+- Heuristic feature-score pairs are now labeled `atlas.doc14-ranking-pair-diagnostic.v1`, `FIXED_FEATURE_HEURISTIC`, and `trainingEligible=false`. The preference diagnostic loader rejects those rows; it accepts only preference pairs with an independent reward receipt, evidence references, and explicit training eligibility. Its output schema is `mcts-preference-diagnostic`, with `trainingRunPerformed=false` and `policyUpdated=false`: this MCTS score diagnostic is not a PPO/GRPO trainer. Heuristic ranking scores therefore cannot be mislabeled as externally verified rewards or policy updates.
+- Focused tests: `python/tests/test_graphrag_oak_matrix_compiler_v1.py` and `python/tests/test_mcts_grpo_array_queue_v1.py`, 6 passed. This is a local contract hardening proof only: no admitted live DOC-14 edge, actual DPO/PPO training, DSPy inference, GEPA optimization, ACE manifest, or datastore write was performed. DOC-14, DOC-SEARCH-05, DOC-AGENT-06, and the separate training gates remain open.
+- Report: `docs/reports/doc14-relation-and-learning-input-integrity-20261122.md`.
+
+## DOC-14 OAK candidate review handoff (2026-11-22)
+- Added `build_doc14_oak_mapping_review_v1` in `python/atlas_graph_runtime/api_document_fact_v1.py`. It consumes the existing `search_oaklib_label_candidates_v1` bundle and a previously extracted API-document fact; verifies the independently supplied document hash, exact UTF-8 byte span, source/document identity, pending `DOCUMENTED_BY` shape, OAK ontology/producer revisions, and matched candidate identities.
+- Output is a checksummed `atlas.doc14-oak-mapping-review.v1` suggestion. Candidate ambiguity is retained; `ontologyIds` stays empty, `reviewRequired=true`, `canonicalAuthority=false`, and `writesPerformed=false`. No graph or database admission occurs.
+- Added a composed producer-to-review test using the existing OAK adapter contract, plus ambiguity, stale source hash, and OAK revision mismatch tests. Focused verification: 11 tests passed across API fact/OAK join, graph matrix admission, and preference-diagnostic guards.
+- Extended the join to consume the exact `atlas.oaklib-label-search-response.v1` sidecar envelope (`candidateBundle` plus top-level `matches`), checking status, authority flags and duplicate revisions. Sanitized the server-pinned ontology selector in both metadata and OAK evidence references; a test first exposed the local path leak, and the corrected service-envelope tests pass.
+- Integration verification: OAK route, API-fact, and OKF pipeline tests: 35 passed. This is mocked/fixture contract proof; the live :8095 endpoint was not called.
+- Live service probe: :8095 `/health` is reachable, but POST `/ontology/oaklib/search` returns 503 `OAKLIB_SOURCE_NOT_CONFIGURED`. The runtime reports OAK search route exists, but the operator-pinned ontology file is not configured. No service configuration was changed; the live proposal/admission gate remains open.
+- Added an optional `make_dspy_predict_synthesizer_v1` adapter to the bounded DOC-14 recommender. It lazily imports DSPy, declares typed question/evidence/answer/supporting-chunk fields, passes only source-span-verified evidence, bounds evidence/output bytes, and rejects model-selected chunk IDs outside the verified set. The historical recommender function name remains for caller compatibility but is now explicitly documented as not executing RLM.
+- Focused fixture verification after this addition: 17 tests passed. DSPy itself is absent in the Windows Python and WSL RAPIDS environments; the tests inject a fake DSPy surface, so actual Predict execution, model connection, current ACE ContextManifest handoff and citation claim-support evaluation remain open. No task checkbox is marked done.
+- This closes only a local proposal-to-review adapter contract. It does not prove live OAK service availability, canonical ontology relation review/admission, Graphify readback, ACE ContextManifest/Valkey publication, actual DSPy inference, GEPA evaluation, or DPO/PPO training. No checkbox is marked done from this test evidence.
+
+## ContextManifestV2 to bounded DSPy handoff adapter (2026-11-22)
+- Added `run_bounded_dspy_recommendation_with_ace_manifest_v1` in `python/atlas_graph_runtime/doc14_bounded_rlm_recommender_v1.py`. It verifies the existing ContextManifestV2 identity checksum using the shared canonical encoding, enforces exact query equality, joins selected manifest node keys to `PROVEN`/`INDEX_ELIGIBLE` chunk rows, checks chunk content hashes, evidence-ref allowlists, source-revision-set checksum, and the manifest token budget before invoking the typed DSPy `Predict` adapter.
+- Tightened the Python-side V1/V2 manifest contract check to require the V1 schema, identifiers, query, producer revision, bounded counts and all six evidence-revision fields before interpreting the manifest. It rejects incomplete manifest bindings rather than treating a structurally similar dict as a valid ACE manifest.
+- Tests: `python/tests/test_doc14_bounded_rlm_recommender_v1.py` passed 6/6, including manifest checksum/query tampering, missing required producer revision, row/evidence join failures, and fixture-injected Predict execution. The manifest checksum fixture was generated by the existing TypeScript canonical encoder, providing one cross-language identity parity case.
+- This is a Python adapter contract, not production caller wiring. `dspy` is absent in the Windows Python environment; Predict execution is faked in tests. No live manifest admission/readback, current Postgres authorization, model call, claim-to-citation entailment check, ACE packet write, Valkey cache write/readback, or task promotion was performed. No task checkbox is marked done.
+- Latest scoped checks: recommender plus API fact/GraphRAG matrix/preference-diagnostic tests, 18 passed; strict OpenSpec validation passed; GAN hook PASS (349 rows: 69 done, 62 partial, 218 open). Repository-wide `git diff --check` is blocked by pre-existing trailing whitespace in `simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml`.
+
+## DSPy claim-to-span guard and runtime review (2026-11-22)
+- DSPy structured output now requires an atomic claim list with a `chunkId` and exact source quote per claim. The adapter derives quote byte offsets from the already verified UTF-8 span, and the recommender independently rechecks the quote, source reference, revision, offsets, and exact claim/answer coverage.
+- Receipts label this `EXACT_QUOTE_MATCH_REVIEW_REQUIRED`: an exact quote match proves text presence, not semantic entailment. No output is represented as a verified finding, and no task checkbox was changed.
+- The pasted runtime trace showed the default XML adapter failing to parse free-form llama-server output. A previous temporary probe used DSPy's LiteLLM engine; no LiteLLM call is being used for current verification. Repo configuration has `LITELLM_ENABLED=false` and Docker Compose identifies Bifrost as the replacement, while `docker/atlas-dspy-repair-worker/requirements.lock.txt` still pins `litellm==1.105.1`; that separate lock remains to be audited before claiming complete removal.
+- Verification: WSL2 `atlas-rapids-cu13` pytest 9.1.1 ran the bounded recommender and API-fact/OAK tests: 13 passed. This uses fixture-injected DSPy, not actual model inference, and does not prove live OAK source configuration, ACE persistence, or relation admission.
+- Follow-up structured-output correction: the DSPy signature had represented `supporting_claims_json` as a string even though the contract requires a list of claim objects. It now declares `supporting_claims: list[Doc14SupportingClaimV1]` with a typed `TypedDict` schema; the adapter accepts parsed mappings and retains the existing exact quote, chunk allowlist, source revision, and UTF-8 offset checks. The typed record lives at module scope so DSPy/Pydantic can resolve the schema under postponed annotations.
+- Verification: the bounded recommender and API-fact/OAK tests passed again in WSL2 `atlas-rapids-cu13` (13 passed). A separate DSPy 3.5.0 + `DummyLM` probe exercised the actual DSPy JSONAdapter and typed signature without making a model/network call; it returned the allowed chunk and expected byte offset. This is parser/signature proof only, not live inference, ACE admission, claim entailment, GEPA, or promotion. No task checkbox changed.
+
+## DSPy repair worker native model wiring (2026-11-22)
+- `python/parent_atlas_dspy_repair.py` now resolves the active model from the configured OpenAI-compatible `/v1/models` endpoint only when a repair is requested, verifies an optional model override against that live list, and constructs `dspy.LM(..., engine="lm15")`. The repair program runs both structured Predict calls in an explicit JSONAdapter context; `/health` remains model-free. The Dockerfile no longer pins the stale `ornith-1.5-9b` model ID.
+- Added tests for dynamic model discovery, strict native-engine selection, and rejection of a stale model override. Exact focused command: WSL2 `atlas-rapids-cu13` Python 3.14.6 pytest 9.1.1, `python/tests/test_parent_atlas_dspy_repair.py`: **70 passed in 2.29s**. GAN hook: **PASS**, census 349 total / 69 done / 62 partial / 218 open.
+- This is source-level wiring and mocked endpoint proof only. The running Docker image was not inspected or rebuilt (Docker is operator-only); actual container package versions, native LM request, response parsing, and a real `/v1/repair` model call remain unproven. Worker lock remains DSPy 3.4.1 with LiteLLM 1.105.1 pending a separately generated and validated lock update. No task checkbox changed.
+- Report: `docs/reports/doc14-dspy-native-worker-wiring-20261122.md`.
+
+## DOC-14 ACE Predict native LM handoff (2026-11-22)
+- Wired `make_dspy_predict_synthesizer_v1` to the existing ACE recommender's live model-discovery/configuration owner. Without an injected test LM, the adapter now resolves the active `/v1/models` ID and explicitly constructs `dspy.LM(..., engine="lm15")`; model discovery is deferred until synthesis runs, after manifest, source-row, and token-budget validation. A resolver injection remains available for deterministic tests.
+- The existing ACE resolver now honors `DSPY_LM_API_BASE`, accepts either a base URL or a `/v1` URL, honors an optional `DSPY_LM_MODEL` only when it matches the served model, and preserves the native `lm15` engine. No worker image, service, database, ACE packet, or cache was changed.
+- Windows Python 3.13 reports DSPy 3.5.0 and LiteLLM 1.78.7 installed; this is the host interpreter only and does not establish the running repair-worker image's package versions. A read-only model discovery/configuration probe returned `gemma4-legal-iq4xs-direct.gguf` and constructed the `lm15` client for `http://127.0.0.1:8090/v1`; no inference request was sent.
+- Verification: `python/tests/test_doc14_bounded_rlm_recommender_v1.py` passed 8/8; `python/tests/test_dspy_predict_ace_recommender_v1.py` passed 3/3; combined 11 passed. Strict OpenSpec validation passed; GAN hook PASS (349 rows: 69 done, 62 partial, 218 open). The read-only indexing audit receipt is `tmp/atlas-indexing-surfaces-live-doc14-20261122.json`.
+- Still open: real inference over an independently admitted, current ACE manifest; semantic claim-support review; live OAK source configuration and reviewed Graphify admission; authorized ACE/Valkey write/readback; reviewed eval labels and utility; GEPA held-out promotion. No task checkbox changed.
+- Reconciled an older ledger statement: Windows `C:\Python313` currently has DSPy 3.5.0 (and LiteLLM 1.78.7); the earlier claim that DSPy was absent from Windows is stale. This does not establish worker-container versions. A fresh read-only index-surface audit confirmed PostgreSQL 18.4, with 274,428/274,465 `content_embedding_768` rows; that does not establish source packet identity or revision bindings. The live `build_agentic_rag_context` query returned `MISSING_SOURCE_REVISION`, `UNADMITTED_RETRIEVAL_CANDIDATES`, and `proofUsable=false`, while exact `find_source_refs` lookups returned `NO_PACKET` for the recommender modules and task ledger. Raw ranked cards were not sent to DSPy. Production inference remains gated on canonical admission.
+- Ran the existing `observe-workspace-source-binding.mts` owner over the current tree in read-only mode. It bound 37,748 sources, skipped 233, and recorded the worktree as dirty. The DOC-14 recommender, ACE resolver, and recommender test are untracked at the base commit; the task ledger is tracked but modified. Their per-file SHA-256 source revisions are in `.tmp/atlas/doc14-ace-source-binding-observation-20261122.json`. This is an origin candidate observation (`canonicalAuthority=false`), not persisted packet identity or admission; it explains why packet lookup cannot yet resolve the working-copy code revision.
+- Report: `docs/reports/doc14-dspy-native-ace-lm15-wiring-20261122.md`.
+
+## DOC-14 repair worker follow-up verification (2026-11-22)
+- Added a focused test that exercises `RepairProgramV1.forward` with an injected resolver and verifies both DSPy `Predict` calls run inside the explicit `lm15` and JSONAdapter context. Windows Python 3.13 focused worker + ACE adapter suites: 75 passed.
+- Re-ran the worker suite in WSL2 `atlas-rapids-cu13`: 71 passed. This verifies the source contract in the existing Linux Python environment; it does not identify the running container's installed package set.
+- Read-only `GET http://127.0.0.1:8122/health` was refused. The repair worker is not reachable at that endpoint, so live `/v1/repair` inference remains unproven; no Docker lifecycle action was taken.
+- This does not close the existing gates for current admitted ACE evidence, claim support review, OAK relation admission, authorized cache readback, or reviewed GEPA/ranker data. No OpenSpec checkbox changed.
+- Report: `docs/reports/doc14-dspy-native-worker-wiring-20261122.md`.
+
+## DOC-14 source-span and proposal contract follow-up (2026-11-22)
+- Hardened pre-publication checks so a relation candidate cannot self-promote: `GRAPH_ADMITTED`, `canonical_authority=true`, missing extractor revision, or swapped subject/object mention roles are rejected. Stanza-shaped outputs remain `PROPOSED` and noncanonical.
+- Latest focused tests: Windows Python 3.13 **32 passed** across span integrity, proposal shape, external-doc extraction, and OKF publication; WSL2 `atlas-rapids-cu13` **10 passed** across span integrity and proposal-shape suites.
+- Existing `lsp_utf16_to_utf8_byte_offset` handles LSP UTF-16 positions and UTF-8 byte offsets, including surrogate-pair boundary rejection. The taxonomy crosswalk is validated (13 top-level + 4 child IDs, conservation passed) but includes unresolved/ambiguous label mappings and is not DOC-14 relation admission.
+- A source-binding observation over source-like files is an origin-candidate inventory, not a canonical index. It does not need to hash every ignored/generated/vendor file in the broad working tree. Canonical status still requires the existing source-index admission and readback path.
+- A bounded Stanza 1.15.1 CPU run is proven separately in `docs/reports/doc14-live-stanza-proof-20261122.json`: 8/56 chunks parsed, 18/18 proposal spans independently read back, deterministic replay, and an adversarial offset mutation rejected while preserving the prior artifact. This used a separate Windows CPU environment and a Firecrawl MCP capture; it does not establish Stanza or Firecrawl configuration in the current :8095 runtime (`/evidence/web` returned `FIRECRAWL_NOT_CONFIGURED`).
+- Configured OAK source, human-reviewed/admitted relation rows, current Graphify structural graph, current admitted ACE ContextManifest, live repair-worker inference, and authorized Valkey write/readback remain open. No checkbox changed and no canonical store was written.
+- Report: `docs/reports/doc14-span-publication-integrity-20261122.md`.
+
+**OAK relation review handoff (2026-11-22):** added `python/atlas_graph_runtime/doc14_relation_oak_review_v1.py` to join the existing OAK label-search envelope to source-span-verified Stanza relation candidates. It binds subject/object mention text to OAK external-ID suggestions, preserves unresolved/ambiguous mappings, and includes matching existing external ontology relations as review context without translating their predicates into Atlas predicates. Parent Atlas `ontologyIds` stays empty; no relation is admitted.
+`write_source_artifacts()` now accepts optional per-chunk OAK responses and writes/readbacks `relation-oak-review.jsonl`; missing/rejected responses remain explicit. The opt-in CLI path queries `/ontology/oaklib/search` and `/ontology/oaklib/candidates` using bounded read-only requests and enforces a single ontology/producer revision. Current :8095 health returned `ok`, but a bounded OAK label query returned HTTP 503 `OAKLIB_SOURCE_NOT_CONFIGURED`, confirming the live resource remains unconfigured. Final focused suites: Windows 39 passed; WSL2 bridge + span suite 18 passed. Tests use fixture OAK responses. No checkbox changed and no canonical write occurred. Report: `docs/reports/doc14-span-publication-integrity-20261122.md`.
+
+## DOC-14 workspace-source observer digest-cache integration (2026-11-22)
+- Updated `sveltekit-frontend/scripts/atlas/observe-workspace-source-binding.mts` to reuse the existing checksummed workspace digest-cache owner. It reuses only unchanged, clean, tracked files; dirty and untracked inputs are re-read and hashed. `ATLAS_WORKSPACE_SOURCE_BINDING_DIGEST_CACHE=off` forces uncached reads. Cache metadata remains derived and noncanonical; source admission still requires independent exact-byte readback.
+- Full-workspace observer cold/warm proof produced the same `workspaceRevision` (`sha256:14a5003b8076e6eae9e1b501e1fb2e7cc04d5dd8e522abfee56af6ca6cb284cc`) and the same 37,765 eligible source count. Cold run rehashed 37,765; warm run reused 37,479 and rehashed 286 dirty/untracked sources. This is the source observer's filtered Git-visible cohort, not the 1.3M ignored/generated filesystem paths.
+- Shared workspace snapshot/cache suite: 16/16 passed. Live Atlas `trace_database` query for the task/source-index identity returned `NO_MATCH` with 0 traces and 0 unqualified rows; this does not constitute a table census. No canonical index, Graphify, ACE, Valkey, or task-status write occurred. No checkbox changed.
+- Current report: `docs/reports/workspace-source-binding-observation.json`; run output was `ORIGIN_CANDIDATE_OBSERVED`, not canonical admission.
+- Fresh task-source census was explicitly diagnostic (`15,839` rows across `157` changes; `6,855` unchecked tasks; `promotionEligible=false`). The existing locator-only publisher's bounded dry run found all `6,855` rows valid, and the exact snapshot `sha256:6b0146ec4adfcb97739133b08eeb52fb2fef9fb9ee7bcb573e079c86c1522fa3` was applied to PostgreSQL 18 with post-commit readback (`SOURCE_INDEX_READBACK_PROVEN`, 6,855 rows). This publishes task locators/hashes only; it does not promote task identities/status or source-code chunks. The independent Atlas packet lookup still returned `NO_PACKET` for the current observer, this task ledger, and the DOC-14 OAK adapter. Source-code indexing/admission and ACE remain open. Receipt: `.tmp/openspec-task-source-index-current/apply-receipt.json` (local, ignored artifact).
+
+## DOC-14 bounded source-scope observer (2026-11-22)
+- Added `ATLAS_WORKSPACE_SOURCE_REFS_FILE` to the existing workspace source observer. The manifest accepts 1–64 exact repository-relative, source-extension paths and uses literal Git pathspecs for file membership, tracked blob IDs, and dirty-state checks. Explicit-scope observations hash only those selected files and bypass the full-workspace digest cache.
+- Scoped output uses `atlas.workspace-source-scope-observation.v1`, `workspaceRevision: null`, `completeWorkspaceInventory: false`, and a separate `sourceScopeRevision`; it cannot be mistaken for a full workspace revision. Full-workspace behavior remains the existing observer path.
+- Smoke on the OAK relation adapter and this task ledger returned two exact source hashes that independently matched disk bytes. A `../AGENTS.md` path was rejected and produced no receipt. The output remains `SOURCE_SCOPE_CANDIDATE_OBSERVED`, canonical authority false; no source-index, graph, ACE, or cache write occurred. Source-index admission and exact readback remain open.
+- Focused command: `ATLAS_WORKSPACE_SOURCE_REFS_FILE=.tmp/atlas/doc14-source-scope-smoke.json ATLAS_WORKSPACE_SOURCE_BINDING_OUT=.tmp/atlas/doc14-source-scope-smoke-receipt.json npx tsx scripts/atlas/observe-workspace-source-binding.mts` (run from `sveltekit-frontend/`).
+
+## DOC-14 bounded Graphify refresh planning (2026-11-22)
+- A fresh full observer pass completed in 48 seconds over the observer's filtered Git-visible source cohort: 37,768 sources, 239 skipped, 37,475 digest-cache hits, and 293 rehashed sources. It returned `ORIGIN_CANDIDATE_OBSERVED`, `dirty: true`, and workspace revision `sha256:8d49623eb0ccd48ab548e268434e18874caee08d475be65057933b2b0cb165dc`. This is a local candidate observation, not canonical admission or the ignored/generated filesystem inventory.
+- The Graphify planner revalidated local bytes for its bounded 52-source cohort: 0 current exact Graphify matches, 52 revision/content mismatches (all workspace-revision mismatches), 0 local byte mismatches, and 0 missing Graphify sources. It returned `CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW` with next gate `EXPLICIT_GRAPHIFY_BATCH_REVIEW`; no Graphify or database writes occurred. Report: `.tmp/atlas/current-source-graphify-batch-plan-current-20261122-rerun.json`.
+- Added planner CLI overrides for an explicit observation/cohort and a custom report path restricted to `.tmp/atlas/`; the default tracked report location remains unchanged. Negative check confirmed an out-of-scratch custom report path exits before creating its target.
+- No task checkbox changed. The next gate is a reviewed, operator-authorized Graphify refresh/reconciliation, followed by a new current structural graph snapshot; the stale revision must not be relabeled current.
+- Follow-up live preflight: `find_source_refs` returned `NO_PACKET` for the task ledger, OAK review adapter, and DSPy ACE recommender; `trace_database` returned PostgreSQL FTS `NO_MATCH` for the task-ledger/source-index query. A bounded read-only POST to `:8095/ontology/oaklib/search` returned HTTP 503 `OAKLIB_SOURCE_NOT_CONFIGURED`. These confirm that current working-copy source chunks and the OAK vocabulary still cannot enter the canonical proposal→ACE path; no rows were written and no relation was admitted.
+- Exact-file indexer dry runs used the existing `index-full-repo-for-search.mjs` owner with database-backed reuse checks: the modified OAK adapter would produce 14 chunks and the 267 KB task ledger 50 paragraph chunks; all 64 were `STORED_ROW_MISSING`. Its apply path writes general `codebase_chunk_index` metadata and Qdrant projections, while the code explicitly says this broad indexer cannot establish admitted workspace/source lineage. Therefore the dry run is useful for bounded chunk planning, but applying it would not close source-index admission; no embeddings, index writes, or Qdrant writes were performed.
+
+## DSPy repair-worker native engine alignment (2026-11-22)
+- Updated `docker/atlas-dspy-repair-worker/requirements.lock.txt` to DSPy 3.5.0 and GEPA 0.1.4, removing LiteLLM and OpenAI SDK from this worker's dependency set. Updated the Dockerfile version comment to match the lock. The repair program already resolves the active model lazily from `/v1/models` and invokes `dspy.LM(..., engine="lm15")` inside the request context, so `/health` remains model-free and no compatibility fallback is needed.
+- Clean Windows Python 3.13 venv installed from the lock-equivalent resolution and verified `dspy=3.5.0`, `gepa=0.1.4`, `litellm_available=False`, successful native `lm15` LM construction, and `pip check` with no broken requirements. Focused repair/recommender tests passed 75/75.
+- This is host/lock/source proof only: no Docker build or container restart was run, and no live `/v1/repair` call was made. The worker's live HTTP availability, admitted ContextManifest, current canonical source chunks, and independent citation-support review remain open. No task checkbox changed and no canonical store was written.
+
+## DOC-14 current-source and graph-revision gate (2026-11-22)
+- Hardened `task-to-ace-vertical-slice-v1.ts` to stop minting `graph:live-pg18-v1` and `semantic_768:embeddinggemma-v1` placeholders. It now requires the current task-source-index row to match exact task source, change ID, line, block hash, and a non-ambiguous declared/derived identity. It then requires a validated `atlas_graph_snapshots_v2` row with exact workspace match, source-inventory revision, graph revision, checksum, and non-empty topology; graph revision is read from that row. All admitted chunks must share a SHA-256 workspace revision and one SHA-256 representation revision before building the ACE manifest. Candidate/feature snapshot revisions are content-derived. Missing or stale lineage returns an explicit blocker and prevents replay/proposal generation.
+- Added pure resolver coverage for stale, mismatched, unsealed, and empty graph snapshots. The focused task-to-ACE Vitest file passed 3/3; it checks the live database path when reachable and otherwise returns no canonical or write claims. Strict OpenSpec validation and scoped `git diff --check` passed.
+- Fresh local audit of `docs/reports/doc14-admitted-chunks.jsonl`: all 200 rows carry `pgReadbackStatus=PROVEN` / `admissionStatus=INDEX_ELIGIBLE`, but only 75 source revisions match current file bytes; among those, only 43 chunk texts occur exactly in the current source file. These rows must be revalidated at request time; the JSONL export alone is not a current ACE context. The current structural-edge report remains `CONTRACT_INCOMPLETE` with 0 nodes, 0 edges, and null graph revision.
+- No OpenSpec checkbox changed. Relation review/admission, a current revision-qualified graph snapshot, a current canonical ACE manifest, live repair-worker availability, and independent citation-support validation remain open. No Postgres, Graphify, Qdrant, Valkey, or Docker writes/restarts occurred.
+
+## DOC-14 DSPy ACE boundary hardening (2026-11-22)
+- Replaced the `canonicalized: true` Boolean trust path in `dspy_predict_ace_recommender_v1.py` with the existing checksum-valid `atlas.context-manifest.v2` owner and exact `PROVEN`/`INDEX_ELIGIBLE` evidence-row join. The call now requires a bounded selected-node set, source revisions, token counter, and explicit/inferred model revision before DSPy Predict can run.
+- The OAK HyperGraphRAG prefill no longer promotes its own sealed prefill manifest into an ACE context. It returns `CANONICAL_ACE_CONTEXT_REQUIRED` until the caller supplies an admitted V2 manifest and exact readback rows; missing source/workspace/graph revisions now return `PREFILL_LINEAGE_REQUIRED` instead of invented defaults. Hydration no longer fabricates `pg18:unversioned` source revisions.
+- Reclassified `prove-doc14-lm15-live-v1.py` as a transport/DSPy capability probe only; removed its hand-built manifest from a stale JSONL chunk and its unsupported citation-verification claim. Live Windows Python verification passed with DSPy 3.5.0, native `lm15`, no LiteLLM, and the active Gemma 4 server; structured `Predict` returned successfully. Receipt `.tmp/atlas/doc14-lm15-capability-v1.json` explicitly records `aceContextProvided=false`, `citationVerified=false`, `canonicalAuthority=false`, and `writesPerformed=false`. This proves model-call capability only, not the DOC-14 ACE/citation path.
+- Adversarial and focused verification: 39 tests passed across span integrity, relation proposals/OAK review, ACE/DSPy recommender, and OAK prefill; Python compilation and scoped `git diff --check` passed. Strict OpenSpec validation passed. No live canonical ACE manifest, Graphify admission, OAK ontology source, database/cache write, or relation review was established; no task checkbox changed.
+- Relation-proposal source-readback follow-up (2026-11-22): `relation_proposal_verifier_v1.py` now distinguishes the parent `contentSha256` from `chunkSha256`, rejects malformed hashes and invalid UTF-8, verifies chunk hashes, and optionally re-reads the current repository file to validate its full content hash and locate a unique chunk occurrence before emitting full-file byte offsets. The production BOW CLI enables that fail-closed mode and now supplies the real parent content hash—not `sourceRevision`—to the feature-matrix identity contract. Read-only evaluation of the current 200-row export accepted 15 import proposals with full-file hash readback and rejected 157 rows (125 stale parent hashes, 32 chunks absent from current file bytes); 28 rows had no import candidate. The report stores all 15 proposals and 157 reindex/review candidates for inspection. Output remains proposal-only, with zero database/Graphify/cache writes. Windows Python focused suites: 9 passed; strict OpenSpec validation passed. Report: `docs/reports/doc14-relation-source-readback-v1-20261122.json`.
+- Live integration recheck (2026-11-22): `POST :8095/ontology/oaklib/search` returned HTTP 503 `OAKLIB_SOURCE_NOT_CONFIGURED`; Atlas `build_agentic_rag_context` returned zero cards with `LIVE_RETRIEVAL_UNAVAILABLE`. Therefore no current OAK suggestions, canonical ACE manifest, relation admission, or cache publication was proven. These live gates remain open; the 15 local source-verified imports are proposal evidence only.
+- Rejected-source reconciliation (2026-11-22): the 157 failed chunk rows reduce to two source files. `sveltekit-frontend/src/lib/server/ace/context-assembler.ts` has 125 records whose stored `sourceRevision` (`9e4e…`) and `contentSha256` differ from current working-copy bytes (`695d…`), so it needs authorized source-revision rebinding. `packages/atlas-core/src/retrieval/feature-registry-search.ts` has 32 records with a matching full-file revision but an 800-character excerpt not found verbatim in the file; these need the canonical chunker/source-span mapping, not guessed offsets. The 15 valid imports originate from three other files. The report groups these actions without applying them; no source index or Graphify writes occurred.
+- Existing indexer diagnostic for `feature-registry-search.ts`: the current `INDEX_FULL_REPO_SLIDING_WINDOW_V1` owner reproduced 11 of its 43 stored text rows exactly; 32 differ, although all 43 carry the matching source revision. Only 11 have a unique source occurrence and none carry a stored source span. `scripts/atlas/lib/chunk-source-attribution-diagnostic-v1.mjs` marks these results `canonicalAuthority=false` and `evidenceAdmitted=false`; reproduction does not establish which producer emitted the historical rows. The detailed counts are in the source-readback report. This confirms the next step is canonical chunk lineage/span reconciliation rather than creating another chunker.
+- Canonical indexer/Postgres dry-run (2026-11-22; `--no-redis`, no `--apply`): `index-full-repo-for-search.mjs` selected 43 chunks for `feature-registry-search.ts` and classified 32 `CHUNK_CONTENT_HASH_MISMATCH` plus 11 `SOURCE_REVISION_MISMATCH`; for `context-assembler.ts` it selected 23 chunks and classified 21 `CHUNK_CONTENT_HASH_MISMATCH` plus 2 `STORED_ROW_MISSING`. This is the existing PostgreSQL reuse classifier's read-only result and a concrete targeted refresh plan. No embedder, Qdrant, PostgreSQL, or Redis/Valkey writes occurred; the explicit backfill authorization gate remains intact. Report records both command receipts.
+
+## DOC-14/15 recommendation admission boundary recheck (2026-11-22)
+- The caller-controlled `canonicalized=true` shortcut is already rejected by `run_dspy_predict_ace_recommender_v1`; raw context returns `REJECTED_RAW_CONTEXT`. Its downstream helper recomputes the ContextManifestV2 identity checksum, binds selected nodes and evidence refs to supplied rows, checks `PROVEN` / `INDEX_ELIGIBLE`, chunk SHA-256, query equality, and the source-revision-set checksum. Focused recommender suites passed 11/11 on Windows Python 3.13.
+- This is not yet an authoritative readback boundary: `context_manifest_v2` and `ace_records` are ordinary caller-supplied mappings. Their self-consistent checksum and status strings do not prove a fresh PostgreSQL read, authorization scope, canonical admission, or current source revision. The positive test uses a fabricated manifest/row and a fake DSPy module; it proves fixture wiring only. `run_sealed_oak_hypergraph_rag_v1` invokes the recommender only when these values are provided by its caller and otherwise fails with `CANONICAL_ACE_CONTEXT_REQUIRED`.
+- Keep DOC-14/15 open. Next implementation gate is to make the serving caller obtain an authenticated/current readback through the existing ACE/PostgreSQL admission owner, then pass a verified server-side result to DSPy. Add adversarial coverage for forged PROVEN rows, scope mismatch, substituted membership, stale source revisions, and failure before any model call. Do not use manifest hashing alone as authorization or admission evidence. No task checkbox or canonical store changed in this recheck.
+- Geometry remains a separate follow-up: PyTorch stabilized normalization and a WASM forward/backward pair exist and their focused checks pass, but neither has a facial-fitting caller. Do not route the 22D physical geometry descriptor through embedding normalization or claim a facial fit from the WASM smoke.
+- Detailed evidence: `docs/reports/doc14-context-admission-and-normalization-audit-20261122.md`.
+- Follow-up implementation (working tree based on `4fe5ebf63e07d57bcfc3f002c3537215d5011f79`): the Python Predict entry point rejects caller-provided rows and obtains the manifest and exact selected rows through a server-bound scoped readback callable. OAK prefill requires that callable for synthesis, and the local AST/regex card CLI explicitly rejects its obsolete live-DSPy flag. Extra nodes and duplicate chunk IDs fail closed in the strict join. Model resolution runs only after the evidence and token checks. Windows PowerShell verification with `$env:PYTHONPATH='python'; C:\Python313\python.exe -m pytest python/tests/test_dspy_predict_ace_recommender_v1.py python/tests/test_doc14_bounded_rlm_recommender_v1.py python/tests/test_oak_hypergraph_rag_pipeline_v1.py python/tests/test_ast_regex_ace_cards_v1.py -q` returned `15 passed in 5.01s`. Adversarial fixtures cover forged row labels, denied readback, mismatched checksum, extra selection rows and a changed source revision. This proves adapter behavior. A deployed authenticated caller still needs to bind the existing PostgreSQL manifest and evidence readers to produce the scoped result. DOC-14/15 remain open.

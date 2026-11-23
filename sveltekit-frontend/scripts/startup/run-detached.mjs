@@ -8,7 +8,7 @@
  * Use for any startup task that must not block the editor.
  */
 import { spawn } from 'node:child_process';
-import { mkdirSync, openSync, writeSync } from 'node:fs';
+import { closeSync, mkdirSync, openSync, readSync, statSync, writeSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -20,8 +20,18 @@ const logDir = resolve(ROOT, 'logs/task-output/pipeline-test');
 mkdirSync(logDir, { recursive: true });
 
 const safeName = script.replace(/[:/\\]/g, '-');
-const out = openSync(resolve(logDir, `${safeName}.out.log`), 'a');
-const err = openSync(resolve(logDir, `${safeName}.err.log`), 'a');
+// Each launch gets its own files. The canonical <name>.{out,err}.log is appended by every
+// launch, including a server started earlier that is still writing to it, so tailing it
+// would show another process's output.
+const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+const launchOutPath = resolve(logDir, `${safeName}.${stamp}.out.log`);
+const launchErrPath = resolve(logDir, `${safeName}.${stamp}.err.log`);
+const canonicalOutPath = resolve(logDir, `${safeName}.out.log`);
+const out = openSync(launchOutPath, 'a');
+const err = openSync(launchErrPath, 'a');
+const canonicalFd = openSync(canonicalOutPath, 'a');
+writeSync(canonicalFd, `[detached] ${new Date().toISOString()} launch logs: ${launchOutPath}\n`);
+closeSync(canonicalFd);
 
 const isWindows = process.platform === 'win32';
 // Windows: run npm's CLI through node directly. A detached `cmd.exe /c npm.cmd`
@@ -62,3 +72,37 @@ child.on('exit', (code, signal) => {
 child.unref();
 
 console.log(startupMessage.trim());
+console.log(`[detached] logs: ${launchOutPath} | ${launchErrPath}`);
+
+// Show what this launch prints during its first seconds, in this terminal.
+// Reads only this launch's own files. DETACHED_TAIL_SECONDS=0 disables it.
+const tailParsed = Number(process.env.DETACHED_TAIL_SECONDS ?? 20);
+const tailSeconds = Number.isFinite(tailParsed) && tailParsed >= 0 ? tailParsed : 20;
+if (tailSeconds > 0) {
+  setTimeout(() => {
+    const printTail = (label, path) => {
+      const size = statSync(path).size;
+      if (size === 0) return;
+      const length = Math.min(size, 64 * 1024);
+      const buffer = Buffer.alloc(length);
+      const fd = openSync(path, 'r');
+      try {
+        readSync(fd, buffer, 0, length, size - length);
+      } finally {
+        closeSync(fd);
+      }
+      const shown = buffer.toString('utf8').split(/\r?\n/).filter(Boolean).slice(-40);
+      console.log(`[detached] --- last ${shown.length} ${label} line(s) ---`);
+      for (const line of shown) console.log(line);
+    };
+    printTail('stdout', launchOutPath);
+    printTail('stderr', launchErrPath);
+    // A launch that finds a server already running writes only its own two lines. The running
+    // server keeps writing to the canonical log, so show that tail too.
+    printTail(`canonical ${safeName}.out.log (all launches; running server output)`, canonicalOutPath);
+    console.log(`[detached] (first ${tailSeconds}s of this launch; full logs at the paths above)`);
+    process.exit(0);
+  }, tailSeconds * 1000);
+} else {
+  process.exit(0);
+}

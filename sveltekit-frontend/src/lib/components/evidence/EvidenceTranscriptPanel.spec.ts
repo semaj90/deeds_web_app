@@ -44,7 +44,7 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 			json: async () => ({
 				ok: true,
 				videoTitle: 'CCTV Corridor Feed',
-				evidenceId: 'ev-video-001',
+				evidenceId: 'f0f0f0f0-1111-4111-8111-111111111111',
 				sourceRevision: 'sha256:fixture-source-revision',
 				analysisRevision: 'video-analysis-v1:fixture-analysis-revision',
 				reviewEnabled: true,
@@ -54,10 +54,19 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 		} as Response);
 	});
 
+	it('does not call the transcript API for a local preview ID', async () => {
+		render(EvidenceTranscriptPanel, { props: { evidenceId: 'local-demo-video', initialOpen: true } });
+
+		await waitFor(() => {
+			expect(screen.getByText(/available after this exhibit is saved to the case/i)).toBeTruthy();
+		});
+		expect(globalThis.fetch).not.toHaveBeenCalled();
+	});
+
 	it('toggles Show transcript / Hide transcript on click and loads cues', async () => {
 		render(EvidenceTranscriptPanel, {
 			props: {
-				evidenceId: 'ev-video-001',
+				evidenceId: 'f0f0f0f0-1111-4111-8111-111111111111',
 				initialOpen: false,
 			},
 		});
@@ -80,7 +89,7 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 		const onSeek = vi.fn();
 		render(EvidenceTranscriptPanel, {
 			props: {
-				evidenceId: 'ev-video-001',
+				evidenceId: 'f0f0f0f0-1111-4111-8111-111111111111',
 				currentTimeMs: 4000, // Matches seg-2 (3500-6000ms)
 				initialOpen: true,
 				onSeek,
@@ -105,7 +114,7 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 	it('seeks to a persisted word timestamp from the authorized transcript response', async () => {
 		const onSeek = vi.fn();
 		render(EvidenceTranscriptPanel, {
-			props: { evidenceId: 'ev-video-001', initialOpen: true, onSeek },
+			props: { evidenceId: 'f0f0f0f0-1111-4111-8111-111111111111', initialOpen: true, onSeek },
 		});
 
 		const wordButton = await screen.findByRole('button', { name: /Seek to 0:01: The/i });
@@ -116,7 +125,7 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 	it('filters cues by text search and speaker without mutating original list', async () => {
 		render(EvidenceTranscriptPanel, {
 			props: {
-				evidenceId: 'ev-video-001',
+				evidenceId: 'f0f0f0f0-1111-4111-8111-111111111111',
 				initialOpen: true,
 			},
 		});
@@ -144,7 +153,7 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 			json: async () => ({
 				ok: true,
 				videoTitle: 'Silent CCTV Feed',
-				evidenceId: 'ev-silent-002',
+				evidenceId: 'f0f0f0f0-2222-4222-8222-222222222222',
 				status: 'no_audio',
 				segments: [],
 			}),
@@ -152,7 +161,7 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 
 		render(EvidenceTranscriptPanel, {
 			props: {
-				evidenceId: 'ev-silent-002',
+				evidenceId: 'f0f0f0f0-2222-4222-8222-222222222222',
 				initialOpen: true,
 			},
 		});
@@ -167,7 +176,7 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 		const onSegmentReviewed = vi.fn();
 		render(EvidenceTranscriptPanel, {
 			props: {
-				evidenceId: 'ev-video-001',
+				evidenceId: 'f0f0f0f0-1111-4111-8111-111111111111',
 				initialOpen: true,
 				onSegmentReviewed,
 			},
@@ -193,7 +202,7 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 	});
 
 	it('saves a transcript correction while retaining the original model text', async () => {
-		render(EvidenceTranscriptPanel, { props: { evidenceId: 'ev-video-001', initialOpen: true } });
+		render(EvidenceTranscriptPanel, { props: { evidenceId: 'f0f0f0f0-1111-4111-8111-111111111111', initialOpen: true } });
 		await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' }).length).toBeGreaterThan(0));
 		(globalThis.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true }) });
 
@@ -203,7 +212,7 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 		await fireEvent.click(screen.getByRole('button', { name: 'Save correction' }));
 
 		await waitFor(() => {
-			expect(globalThis.fetch).toHaveBeenLastCalledWith('/api/evidence/ev-video-001/transcript', expect.objectContaining({
+			expect(globalThis.fetch).toHaveBeenLastCalledWith('/api/evidence/f0f0f0f0-1111-4111-8111-111111111111/transcript', expect.objectContaining({
 				method: 'POST',
 				body: JSON.stringify({ segmentId: 'seg-1', reviewStatus: 'approved', correctedText: 'The witness entered the corridor.' }),
 			}));
@@ -217,7 +226,7 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 
 		render(EvidenceTranscriptPanel, {
 			props: {
-				evidenceId: 'ev-video-001',
+				evidenceId: 'f0f0f0f0-1111-4111-8111-111111111111',
 				initialOpen: true,
 			},
 		});
@@ -227,10 +236,10 @@ describe('EvidenceTranscriptPanel — YouTube-Style Interactive Video Transcript
 		});
 
 		await fireEvent.click(screen.getByRole('button', { name: 'VTT' }));
-		expect(windowOpenSpy).toHaveBeenCalledWith('/api/evidence/ev-video-001/transcript?export=vtt', '_blank');
+		expect(windowOpenSpy).toHaveBeenCalledWith('/api/evidence/f0f0f0f0-1111-4111-8111-111111111111/transcript?export=vtt', '_blank');
 
 		await fireEvent.click(screen.getByRole('button', { name: 'SRT' }));
-		expect(windowOpenSpy).toHaveBeenCalledWith('/api/evidence/ev-video-001/transcript?export=srt', '_blank');
+		expect(windowOpenSpy).toHaveBeenCalledWith('/api/evidence/f0f0f0f0-1111-4111-8111-111111111111/transcript?export=srt', '_blank');
 
 		windowOpenSpy.mockRestore();
 	});

@@ -1,0 +1,78 @@
+{
+  "transcriptId": "INT-YUSUF",
+  "evidenceId": "E-06",
+  "caseId": "PA-DEMO-ROBBERY-001",
+  "synthetic": true,
+  "recordingActuallyPresent": false,
+  "sceneId": null,
+  "personIds": [
+    "WIT-003",
+    "SEC-001"
+  ],
+  "start": "2026-10-14T16:47:00-07:00",
+  "end": "2026-10-14T16:54:22-07:00",
+  "admissibilityReviewed": false,
+  "rightsAndConsentVerified": false,
+  "statements": [
+    {
+      "lineId": "INT-YUSUF-L001",
+      "time": "2026-10-14T16:47:00-07:00",
+      "speaker": "OFFICER",
+      "text": "Where were you standing?"
+    },
+    {
+      "lineId": "INT-YUSUF-L002",
+      "time": "2026-10-14T16:47:16-07:00",
+      "speaker": "YUSUF",
+      "text": "Near the center seating area. I saw a group walk past me."
+    },
+    {
+      "lineId": "INT-YUSUF-L003",
+      "time": "2026-10-14T16:48:03-07:00",
+      "speaker": "OFFICER",
+      "text": "How many were there?"
+    },
+    {
+      "lineId": "INT-YUSUF-L004",
+      "time": "2026-10-14T16:48:20-07:00",
+      "speaker": "YUSUF",
+      "text": "Four, I think. Three men and one woman."
+    },
+    {
+      "lineId": "INT-YUSUF-L005",
+      "time": "2026-10-14T16:49:02-07:00",
+      "speaker": "OFFICER",
+      "text": "Did you see weapons?"
+    },
+    {
+      "lineId": "INT-YUSUF-L006",
+      "time": "2026-10-14T16:49:15-07:00",
+      "speaker": "YUSUF",
+      "text": "I saw an object in one man’s hand, but I was moving and could not make it out."
+    },
+    {
+      "lineId": "INT-YUSUF-L007",
+      "time": "2026-10-14T16:50:17-07:00",
+      "speaker": "OFFICER",
+      "text": "When did you run?"
+    },
+    {
+      "lineId": "INT-YUSUF-L008",
+      "time": "2026-10-14T16:50:38-07:00",
+      "speaker": "YUSUF",
+      "text": "After shouting and an alarm. I ran toward the doors with other people."
+    },
+    {
+      "lineId": "INT-YUSUF-L009",
+      "time": "2026-10-14T16:51:21-07:00",
+      "speaker": "OFFICER",
+      "text": "Did you hear what was said at the counter?"
+    },
+    {
+      "lineId": "INT-YUSUF-L010",
+      "time": "2026-10-14T16:51:37-07:00",
+      "speaker": "YUSUF",
+      "text": "No. I was not close enough to hear the words."
+    }
+  ]
+}

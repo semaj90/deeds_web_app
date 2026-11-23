@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atlas.okf.agentic-documentation-context-pipeline.v1",
+  "title": "Parent Atlas agentic documentation context pipeline",
+  "type": "object",
+  "required": [
+    "schema",
+    "version",
+    "pipeline_id",
+    "status",
+    "authority",
+    "sources",
+    "capture",
+    "chunking",
+    "indexing",
+    "analysis_lanes",
+    "dspy",
+    "ace",
+    "gan_validation",
+    "outputs",
+    "promotion_gates"
+  ],
+  "properties": {
+    "schema": { "const": "atlas.okf.agentic-documentation-context-pipeline.v1" },
+    "version": { "const": 1 },
+    "pipeline_id": { "const": "agentic-documentation-context" },
+    "status": { "enum": ["DESIGN_ONLY", "SHADOW_ONLY", "ACTIVE"] },
+    "owner": { "type": "string", "minLength": 1 },
+    "purpose": { "type": "string", "minLength": 1 },
+    "authority": {
+      "type": "object",
+      "required": ["canonical_authority", "writes_allowed", "model_execution_allowed"],
+      "properties": {
+        "canonical_authority": { "const": false },
+        "writes_allowed": { "const": false },
+        "model_execution_allowed": { "type": "boolean" },
+        "recommendations_are_advisory": { "const": true }
+      },
+      "additionalProperties": false
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["source_id", "publisher", "authority", "topics"],
+        "properties": {
+          "source_id": { "type": "string", "minLength": 1 },
+          "publisher": { "type": "string", "minLength": 1 },
+          "authority": { "const": "OFFICIAL" },
+          "url": { "type": "string", "pattern": "^https://" },
+          "corpus_ref": { "type": "string", "minLength": 1 },
+          "version": { "type": "string" },
+          "version_policy": { "type": "string" },
+          "admission_state": { "type": "string" },
+          "topics": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "capture": { "type": "object", "required": ["discovery", "acquisition", "allowed_domains", "required_provenance", "parsing"] },
+    "chunking": { "type": "object", "required": ["owner", "attach_page_revision_to_every_chunk"] },
+    "indexing": { "type": "object", "required": ["canonical_owner", "admission", "lexical", "dense", "projections"] },
+    "analysis_lanes": {
+      "type": "object",
+      "required": ["rag", "kag", "dag", "recommendations"],
+      "properties": {
+        "rag": { "type": "object", "required": ["fusion_owner", "raw_hits_to_model"] },
+        "kag": { "type": "object", "required": ["relation_status", "identity_from_labels_or_embeddings"] },
+        "dag": { "type": "object", "required": ["execution", "direct_store_writes_from_graph_nodes"] },
+        "recommendations": { "type": "object", "required": ["output", "allow_unqualified_abstention", "create_facts_or_ontology_edges"] }
+      },
+      "additionalProperties": false
+    },
+    "dspy": { "type": "object", "required": ["role", "candidate_optimizers", "evaluation", "proposal_contract"] },
+    "ace": { "type": "object", "required": ["input", "required_fields", "manifest_owner", "verify_manifest_checksum_and_evidence_allowlist"] },
+    "gan_validation": {
+      "type": "object",
+      "required": ["observation_owner", "mcp_adapter", "status_vocabulary", "proof_gates", "raw_hits_to_model", "mutation_authority"],
+      "properties": {
+        "observation_owner": { "type": "string" },
+        "mcp_adapter": { "type": "string" },
+        "status_vocabulary": { "type": "array", "items": { "enum": ["NOT_CREATED", "CREATED", "WIRED", "PROVEN", "DONE"] } },
+        "stages": { "type": "object" },
+        "observation_is_noncanonical": { "const": true },
+        "caller_supplied_revisions_are_unverified": { "const": true },
+        "proof_gates": { "type": "array", "items": { "type": "string" } },
+        "raw_hits_to_model": { "const": false },
+        "mutation_authority": { "const": "none" }
+      },
+      "additionalProperties": false
+    },
+    "outputs": { "type": "object", "required": ["datastore_writes", "embedding_calls", "graph_writes"] },
+    "promotion_gates": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

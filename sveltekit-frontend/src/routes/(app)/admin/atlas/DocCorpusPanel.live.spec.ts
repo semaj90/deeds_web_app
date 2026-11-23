@@ -6,6 +6,7 @@ import { Pool } from 'pg';
 import { describe, expect, it } from 'vitest';
 import DocCorpusPanel from './DocCorpusPanel.svelte';
 import { buildDocIntelligenceStudioSnapshotV1, findRepoRoot, searchDocCorpus } from '$lib/server/atlas/docs/doc-intelligence-read-model.js';
+import { readVerifiedCanonicalDocChunksV1 } from '$lib/server/atlas/docs/external-doc-citation-readback-v1.js';
 
 const live = process.env.ATLAS_LIVE_DOC_DB === '1' && !!process.env.DATABASE_URL;
 
@@ -15,6 +16,11 @@ describe.skipIf(!live)('DocCorpusPanel SSR from live canonical Postgres (read-on
 		try {
 			const snapshot = await buildDocIntelligenceStudioSnapshotV1({ pool });
 			const search = await searchDocCorpus({ pool, root: findRepoRoot(), q: 'hnsw.iterative_scan', limit: 5 });
+			const citations = await readVerifiedCanonicalDocChunksV1({ pool, hits: search.hits });
+			expect(citations.status, JSON.stringify(citations.blockers)).toBe('VERIFIED');
+			expect(citations.citations.length).toBeGreaterThan(0);
+			expect(citations.citations.every((citation) => citation.sourceAuthority === 'OFFICIAL')).toBe(true);
+			expect(citations.citations.every((citation) => Buffer.byteLength(citation.verifiedText, 'utf8') === citation.endByte - citation.startByte)).toBe(true);
 			const { body } = render(DocCorpusPanel, { props: { snapshot, search, query: 'hnsw.iterative_scan', product: '', version: '' } });
 			expect(snapshot.canonicalCorpus.status).toBe('PRESENT');
 			expect(body).not.toContain('DOC_CANONICAL_CORPUS_EMPTY');

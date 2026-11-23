@@ -63,6 +63,39 @@ describe('revision-qualified library citation provenance v1', () => {
 		expect(params).toEqual([[CHUNK_ID], 7, CASE_ID]);
 	});
 
+	it('preserves whole Unicode characters in authority excerpts and verifies the full span', async () => {
+		const prefix = QUOTE.padEnd(999, ' ');
+		const passage = prefix + '🏮';
+		const row = {
+			chunk_id: CHUNK_ID,
+			document_id: CASE_ID,
+			document_revision: CASE_ID,
+			source_hash: 'a'.repeat(64),
+			chunk_hash: createHash('sha256').update(passage).digest('hex'),
+			parser_revision: 'fixture-parser',
+			page_start: null,
+			page_end: null,
+			char_start: 12,
+			char_end: 12 + passage.length,
+			char_offset_unit: 'utf16_code_units',
+			chunk_text: passage,
+			jurisdiction: 'fixture',
+			authority_kind: 'statute',
+			citation_label: 'Fixture § 1',
+		};
+		h.getAuthorizedCase.mockResolvedValue({ id: CASE_ID });
+		const input = {
+			actorId: 7, caseId: CASE_ID, authorityJurisdiction: 'fixture',
+			candidates: [{ ordinal: 1, chunkId: CHUNK_ID }],
+		};
+		h.query.mockResolvedValueOnce({ rows: [row] });
+		expect((await resolveLibraryCitationProvenanceV1(input)).get(1)).toMatchObject({
+			quote: prefix, charEnd: row.char_end, authority: { kind: 'statute', citation: 'Fixture § 1' },
+		});
+		h.query.mockResolvedValueOnce({ rows: [{ ...row, char_end: row.char_end - 1 }] });
+		await expect(resolveLibraryCitationProvenanceV1(input)).resolves.toEqual(new Map());
+	});
+
 	it('does not query chunks when case authorization fails', async () => {
 		h.getAuthorizedCase.mockResolvedValue(null);
 		await expect(resolveLibraryCitationProvenanceV1({

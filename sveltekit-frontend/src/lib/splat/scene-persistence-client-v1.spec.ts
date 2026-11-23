@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { evidenceSceneIdV1, fetchSceneAssetV1, fetchSceneRevisionV1, saveSceneManifestRevisionV1, saveSceneRevisionV1 } from './scene-persistence-client-v1.js';
+import { caseStorybookSceneIdV1, evidenceSceneIdV1, fetchSceneAssetV1, fetchSceneRevisionV1, saveSceneManifestRevisionV1, saveSceneRevisionV1 } from './scene-persistence-client-v1.js';
 import { createSceneCalibrationV1, createSceneQualityReceiptV1, stableStringifySceneDocumentV1 } from './scene-document-v1.js';
 import type { CalibrationAnchor } from './calibration.js';
 import { sha256Hex } from './spz-loader.js';
@@ -36,6 +36,14 @@ describe('scene persistence browser client', () => {
 		expect(await evidenceSceneIdV1(caseId.toUpperCase(), '55555555-5555-4555-8555-555555555555')).toBe(id);
 		expect(await evidenceSceneIdV1('44444444-4444-4444-8444-444444444444', '55555555-5555-4555-8555-555555555555')).not.toBe(id);
 		await expect(evidenceSceneIdV1('not-a-uuid', '55555555-5555-4555-8555-555555555555')).rejects.toThrow('CASE_AND_EVIDENCE_IDS_MUST_BE_UUIDS');
+	});
+
+	it('derives one stable case-scoped scene identity for multi-image storybook chapters', async () => {
+		const id = await caseStorybookSceneIdV1(caseId);
+		expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-8[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+		expect(await caseStorybookSceneIdV1(caseId.toUpperCase())).toBe(id);
+		expect(await caseStorybookSceneIdV1('44444444-4444-4444-8444-444444444444')).not.toBe(id);
+		await expect(caseStorybookSceneIdV1('not-a-uuid')).rejects.toThrow('CASE_ID_MUST_BE_UUID');
 	});
 
 	it('uploads the immutable asset before appending its manifest revision', async () => {

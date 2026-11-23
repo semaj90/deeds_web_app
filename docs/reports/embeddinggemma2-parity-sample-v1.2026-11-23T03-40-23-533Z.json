@@ -1,0 +1,91 @@
+{
+  "schema": "atlas.eg2-parity-sample.v1",
+  "generatedAt": "2026-11-23T03:40:23.533Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "canonicalModel": "embeddinggemma:latest",
+  "challengerModel": "embeddinggemma2:q8_0",
+  "sampleSize": 11,
+  "sampleSource": "openwiki/**/*.md first substantial paragraph per page (sorted)",
+  "dimensions": {
+    "canonical": 768,
+    "challenger": 768
+  },
+  "selfRetrievalTop1": {
+    "canonical": 1,
+    "challenger": 1
+  },
+  "meanTopKOverlap": 0.7999999999999999,
+  "topK": 5,
+  "verdict": "SAMPLE_ONLY_NOT_PARITY_PROOF",
+  "note": "Small in-repo sample through Ollama. Does not use the canonical corpus or Postgres; not a migration receipt.",
+  "perQuery": [
+    {
+      "source": "openwiki/architecture/boundaries-and-authority.md",
+      "canonicalTop1Self": true,
+      "challengerTop1Self": true,
+      "topKOverlap": 0.6
+    },
+    {
+      "source": "openwiki/architecture/overview.md",
+      "canonicalTop1Self": true,
+      "challengerTop1Self": true,
+      "topKOverlap": 0.8
+    },
+    {
+      "source": "openwiki/architecture/system-map.md",
+      "canonicalTop1Self": true,
+      "challengerTop1Self": true,
+      "topKOverlap": 0.6
+    },
+    {
+      "source": "openwiki/concepts/glossary.md",
+      "canonicalTop1Self": true,
+      "challengerTop1Self": true,
+      "topKOverlap": 0.8
+    },
+    {
+      "source": "openwiki/concepts/packet-identity-and-provenance.md",
+      "canonicalTop1Self": true,
+      "challengerTop1Self": true,
+      "topKOverlap": 1
+    },
+    {
+      "source": "openwiki/concepts/packet-registry.md",
+      "canonicalTop1Self": true,
+      "challengerTop1Self": true,
+      "topKOverlap": 0.8
+    },
+    {
+      "source": "openwiki/evidence/status-and-gaps.md",
+      "canonicalTop1Self": true,
+      "challengerTop1Self": true,
+      "topKOverlap": 1
+    },
+    {
+      "source": "openwiki/integrations/protocol-and-service-adapters.md",
+      "canonicalTop1Self": true,
+      "challengerTop1Self": true,
+      "topKOverlap": 0.8
+    },
+    {
+      "source": "openwiki/operations/monitoring.md",
+      "canonicalTop1Self": true,
+      "challengerTop1Self": true,
+      "topKOverlap": 0.8
+    },
+    {
+      "source": "openwiki/quickstart.md",
+      "canonicalTop1Self": true,
+      "challengerTop1Self": true,
+      "topKOverlap": 1
+    },
+    {
+      "source": "openwiki/testing/validation.md",
+      "canonicalTop1Self": true,
+      "challengerTop1Self": true,
+      "topKOverlap": 0.6
+    }
+  ]
+}

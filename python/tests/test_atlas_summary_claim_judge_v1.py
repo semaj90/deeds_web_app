@@ -122,3 +122,24 @@ def test_one_retry_on_transport_failure_but_never_on_parse_failure_and_never_a_p
     def dead(_m):
         raise TimeoutError("down")
     assert judge_claim_v1(TS_INPUT, dead, MODEL)["status"] == "JUDGE_ERROR"
+
+
+@pytest.mark.parametrize(
+    "props,models",
+    [
+        ({"model_alias": "ornith-1.5-9b"}, {"data": [{"id": "ornith-1.5-9b"}]}),
+        ({"model_alias": "ornith-1.5-9b", "model_path": "   "}, {"data": [{"id": "ornith-1.5-9b"}]}),
+        ({"model_alias": "ornith-1.5-9b", "model_path": "C:\\models\\ornith.gguf"}, {"data": [{"id": "other"}]}),
+        ({"model_alias": "llama3", "model_path": "C:\\models\\llama3.gguf"}, {"data": [{"id": "llama3"}]}),
+        ({"model_alias": "hforf", "model_path": "C:\\models\\hforf.gguf"}, {"data": [{"id": "hforf"}]}),
+        ({"model_alias": "gemma4-legal-iq4xs-direct", "model_path": "C:\\models\\gemma4-legal-iq4xs-direct.gguf"}, {"data": [{"id": "gemma4-legal-iq4xs-direct"}]}),
+        ({"model_alias": "ornith-1.5-9b", "model_path": "C:\\models\\ornith.gguf"}, {"data": []}),
+        ({"model_alias": "ornith-1.5-9b", "model_path": "C:\\models\\ornith.gguf"}, {"data": "malformed"}),
+        ({"model_alias": "ornith-1.5-9b", "model_path": "C:\\models\\not-a-gguf.bin"}, {"data": [{"id": "ornith-1.5-9b"}]}),
+        ({"model_alias": "ornith-1.5-9b", "model_path": "C:\\models\\"}, {"data": [{"id": "ornith-1.5-9b"}]}),
+    ],
+)
+def test_model_gate_rejects_missing_path_malformed_list_and_unapproved_aliases(props, models) -> None:
+    payloads = {"/props": props, "/v1/models": models}
+    with pytest.raises(RuntimeError, match="JUDGE_MODEL_NOT_APPROVED"):
+        resolve_model("http://x", lambda p: payloads[p])

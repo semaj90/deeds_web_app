@@ -1,0 +1,227 @@
+{
+  "schema": "atlas.structural-edge-cohort-proof.v1",
+  "generatedAt": "2026-11-22T23:37:04.436Z",
+  "status": "COHORT_GRAPH_ADMISSION_PROVEN",
+  "workspaceRevision": "sha256:548b0e7de0ab590ce8ce51e201d801c9d889d04c1bd644b49cbf066f85dd60a2",
+  "graphRevision": "sha256:e7adb87b9ffc74dadfb7d3c672c22aee254e3f8bfd189bbd6b2e7a655a78fa7b",
+  "cohortFileCount": 5,
+  "nodeCount": 5,
+  "resolvedImportEdgeCount": 5,
+  "unresolvedImportCount": 7,
+  "astReceipts": [
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-handle-4x4x6-v1.ts",
+      "sourceRevision": "sha256:5d2335443609595f260b43d04b31eb09cc0a02389885971fce22e78d4a8fe62b",
+      "chunkCount": 84,
+      "rawEdgeCount": 395,
+      "scanCompleteness": "COMPLETE"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts",
+      "sourceRevision": "sha256:0235e147c63f67e41aaa35c88f2d1fef66ee4ddf0f7291f9ef180bbf261ad28e",
+      "chunkCount": 77,
+      "rawEdgeCount": 566,
+      "scanCompleteness": "COMPLETE"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/tensors/aligned-bitset-blob-v1.ts",
+      "sourceRevision": "sha256:2eb9345cf40aacbd6181cfc2a7f80d8f9a7e525438c9eb723f3f2892fe00e0cf",
+      "chunkCount": 130,
+      "rawEdgeCount": 713,
+      "scanCompleteness": "COMPLETE"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/serialization/packet-msgpack-codec.ts",
+      "sourceRevision": "sha256:2937f91a2a84fc561e06ee9949765a017d94c7175aeb90678ceef6bd5d8b76a6",
+      "chunkCount": 73,
+      "rawEdgeCount": 407,
+      "scanCompleteness": "COMPLETE"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/hyperrag/packet-topology-envelope.ts",
+      "sourceRevision": "sha256:fe6ea7beeff7fcd91d50f533ef5ea07b3588e04bfda0a4904731a68ac080878e",
+      "chunkCount": 1,
+      "rawEdgeCount": 0,
+      "scanCompleteness": "COMPLETE"
+    }
+  ],
+  "unresolvedImports": [
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-handle-4x4x6-v1.ts",
+      "line": 24,
+      "specifier": "node:crypto",
+      "kind": "ExternalModule",
+      "resolvedRef": "node:crypto"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts",
+      "line": 22,
+      "specifier": "node:crypto",
+      "kind": "ExternalModule",
+      "resolvedRef": "node:crypto"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts",
+      "line": 23,
+      "specifier": "zod",
+      "kind": "ExternalModule",
+      "resolvedRef": "zod"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/tensors/aligned-bitset-blob-v1.ts",
+      "line": 30,
+      "specifier": "node:crypto",
+      "kind": "ExternalModule",
+      "resolvedRef": "node:crypto"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/tensors/aligned-bitset-blob-v1.ts",
+      "line": 31,
+      "specifier": "zod",
+      "kind": "ExternalModule",
+      "resolvedRef": "zod"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/serialization/packet-msgpack-codec.ts",
+      "line": 16,
+      "specifier": "@msgpack/msgpack",
+      "kind": "ExternalModule",
+      "resolvedRef": "@msgpack/msgpack"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/hyperrag/packet-topology-envelope.ts",
+      "line": 1,
+      "specifier": "../db/packet-topology-envelope.js",
+      "kind": "CodebaseFile",
+      "resolvedRef": "sveltekit-frontend/src/lib/server/db/packet-topology-envelope.ts"
+    }
+  ],
+  "networkxDependencyResult": {
+    "target": "src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts",
+    "direction": "outgoing",
+    "dependencies": [
+      {
+        "dep": "sveltekit-frontend/src/lib/server/hyperrag/packet-topology-envelope.ts",
+        "depCanonical": "src/lib/server/hyperrag/packet-topology-envelope.ts",
+        "depKind": "CodebaseFile",
+        "depName": "sveltekit-frontend/src/lib/server/hyperrag/packet-topology-envelope.ts",
+        "type": "IMPORTS",
+        "evidenceRefs": [
+          "sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts#L37"
+        ],
+        "edgeId": "imp:sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts#L37->sveltekit-frontend/src/lib/server/hyperrag/packet-topology-envelope.ts",
+        "sourceRevision": "sha256:0235e147c63f67e41aaa35c88f2d1fef66ee4ddf0f7291f9ef180bbf261ad28e",
+        "workspaceRevision": "sha256:548b0e7de0ab590ce8ce51e201d801c9d889d04c1bd644b49cbf066f85dd60a2",
+        "pageRankPrior": 0.32600599602480007
+      },
+      {
+        "dep": "sveltekit-frontend/src/lib/server/atlas/tensors/aligned-bitset-blob-v1.ts",
+        "depCanonical": "src/lib/server/atlas/tensors/aligned-bitset-blob-v1.ts",
+        "depKind": "CodebaseFile",
+        "depName": "sveltekit-frontend/src/lib/server/atlas/tensors/aligned-bitset-blob-v1.ts",
+        "type": "IMPORTS",
+        "evidenceRefs": [
+          "sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts#L24"
+        ],
+        "edgeId": "imp:sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts#L24->sveltekit-frontend/src/lib/server/atlas/tensors/aligned-bitset-blob-v1.ts",
+        "sourceRevision": "sha256:0235e147c63f67e41aaa35c88f2d1fef66ee4ddf0f7291f9ef180bbf261ad28e",
+        "workspaceRevision": "sha256:548b0e7de0ab590ce8ce51e201d801c9d889d04c1bd644b49cbf066f85dd60a2",
+        "pageRankPrior": 0.17621945640704467
+      },
+      {
+        "dep": "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-handle-4x4x6-v1.ts",
+        "depCanonical": "src/lib/server/atlas/tensors/tensor-handle-4x4x6-v1.ts",
+        "depKind": "CodebaseFile",
+        "depName": "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-handle-4x4x6-v1.ts",
+        "type": "IMPORTS",
+        "evidenceRefs": [
+          "sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts#L31"
+        ],
+        "edgeId": "imp:sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts#L31->sveltekit-frontend/src/lib/server/atlas/tensors/tensor-handle-4x4x6-v1.ts",
+        "sourceRevision": "sha256:0235e147c63f67e41aaa35c88f2d1fef66ee4ddf0f7291f9ef180bbf261ad28e",
+        "workspaceRevision": "sha256:548b0e7de0ab590ce8ce51e201d801c9d889d04c1bd644b49cbf066f85dd60a2",
+        "pageRankPrior": 0.17621945640704467
+      },
+      {
+        "dep": "sveltekit-frontend/src/lib/server/serialization/packet-msgpack-codec.ts",
+        "depCanonical": "src/lib/server/serialization/packet-msgpack-codec.ts",
+        "depKind": "CodebaseFile",
+        "depName": "sveltekit-frontend/src/lib/server/serialization/packet-msgpack-codec.ts",
+        "type": "IMPORTS",
+        "evidenceRefs": [
+          "sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts#L38"
+        ],
+        "edgeId": "imp:sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts#L38->sveltekit-frontend/src/lib/server/serialization/packet-msgpack-codec.ts",
+        "sourceRevision": "sha256:0235e147c63f67e41aaa35c88f2d1fef66ee4ddf0f7291f9ef180bbf261ad28e",
+        "workspaceRevision": "sha256:548b0e7de0ab590ce8ce51e201d801c9d889d04c1bd644b49cbf066f85dd60a2",
+        "pageRankPrior": 0.17621945640704467
+      }
+    ],
+    "failure": null,
+    "truncated": false,
+    "rowCap": 500,
+    "graphRevision": "sha256:e7adb87b9ffc74dadfb7d3c672c22aee254e3f8bfd189bbd6b2e7a655a78fa7b",
+    "sourceRevision": "sha256:0235e147c63f67e41aaa35c88f2d1fef66ee4ddf0f7291f9ef180bbf261ad28e",
+    "workspaceRevision": "sha256:548b0e7de0ab590ce8ce51e201d801c9d889d04c1bd644b49cbf066f85dd60a2",
+    "nodesMatched": [
+      {
+        "graphNodeKey": null,
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts",
+        "sourceRevision": "sha256:0235e147c63f67e41aaa35c88f2d1fef66ee4ddf0f7291f9ef180bbf261ad28e",
+        "nodeKind": "CodebaseFile"
+      }
+    ],
+    "pageRank": {
+      "backend": "networkx",
+      "receipt": {
+        "schema": "atlas.graph-execution-receipt.v2",
+        "operation": "GRAPH_PAGERANK",
+        "requested_backend": "networkx",
+        "effective_backend": "networkx",
+        "graph_revision": "sha256:e7adb87b9ffc74dadfb7d3c672c22aee254e3f8bfd189bbd6b2e7a655a78fa7b",
+        "node_count": 5,
+        "edge_count": 5,
+        "status": "PROVEN",
+        "executor_revision": "networkx:3.7:graph_pagerank-v1",
+        "input_checksum": "sha256:080f89d1073b88646b8542133bf0f1f8fa2cc85ce06cf20d9b0657309323e6eb",
+        "output_checksum": "sha256:9825dc7fb1282f3289243dc127f09467818fcc6f98ad04f7ef5b09f8e1623ff2",
+        "canonical_authority": false,
+        "writes_performed": false,
+        "error": null
+      }
+    },
+    "traversalReceipts": [
+      {
+        "schema": "atlas.graph-execution-receipt.v2",
+        "operation": "GRAPH_BFS_NEIGHBORHOOD",
+        "requested_backend": "networkx",
+        "effective_backend": "networkx",
+        "graph_revision": "sha256:e7adb87b9ffc74dadfb7d3c672c22aee254e3f8bfd189bbd6b2e7a655a78fa7b",
+        "node_count": 5,
+        "edge_count": 5,
+        "status": "PROVEN",
+        "executor_revision": "networkx:3.7:graph_bfs_neighborhood-v1",
+        "input_checksum": "sha256:8be320739fb01725aa779b584f643527417c0eed17760d30e65554ef23c22cad",
+        "output_checksum": "sha256:81e567610b89890cf72e36b756803e57b897a2e9ab26695292eaa709660449b3",
+        "canonical_authority": false,
+        "writes_performed": false,
+        "error": null
+      }
+    ],
+    "evidenceRefs": [
+      "sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts#L24",
+      "sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts#L31",
+      "sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts#L37",
+      "sveltekit-frontend/src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts#L38"
+    ],
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "staleRevisionRejection": {
+    "target": "src/lib/server/atlas/tensors/contextual-alignment-compiler-v1.ts",
+    "dependencies": [],
+    "failure": "GRAPH_SOURCE_REVISION_MISMATCH"
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

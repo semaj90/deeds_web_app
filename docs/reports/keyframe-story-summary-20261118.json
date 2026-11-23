@@ -1,0 +1,161 @@
+{
+  "schema": "keyframe-story-summary.v1",
+  "status": "EVIDENCE_CITED_DRAFT__NOT_REVIEWED__NOT_IDENTITY",
+  "sourceReceipt": "docs/reports/keyframe-analysis-run-receipt-20261118.json",
+  "frames": [
+    {
+      "framePtsMs": 0,
+      "facts": [
+        {
+          "statement": "5 detections: 4 person, 1 tie",
+          "evidence": {
+            "framePtsMs": 0,
+            "source": "yolox_boxes"
+          }
+        },
+        {
+          "statement": "Largest person box covers 25.4% of the frame (heuristic: size only, no identity)",
+          "evidence": {
+            "framePtsMs": 0,
+            "bboxXYXY": [
+              361.29,
+              42.73,
+              813.62,
+              560.73
+            ],
+            "source": "yolox_box_area"
+          }
+        }
+      ],
+      "openQuestions": [
+        "No textual role evidence in this frame; roles remain unknown.",
+        "No readable on-screen text; speaker and setting are not determined from text.",
+        "Identity of every person is not determined by the frame itself."
+      ],
+      "review": {
+        "reviewed": false,
+        "reviewer": null,
+        "label": null,
+        "note": null
+      }
+    },
+    {
+      "framePtsMs": 2750,
+      "facts": [
+        {
+          "statement": "6 detections: 1 chair, 4 person, 1 tie",
+          "evidence": {
+            "framePtsMs": 2750,
+            "source": "yolox_boxes"
+          }
+        },
+        {
+          "statement": "Largest person box covers 28.0% of the frame (heuristic: size only, no identity)",
+          "evidence": {
+            "framePtsMs": 2750,
+            "bboxXYXY": [
+              409.42,
+              46.94,
+              913.74,
+              559.09
+            ],
+            "source": "yolox_box_area"
+          }
+        },
+        {
+          "statement": "On-screen text (OCR): \"e NS Sorry to hear this happened to you, we'll get worki } ri\"",
+          "evidence": {
+            "framePtsMs": 2750,
+            "source": "tesseract_enhanced_pass"
+          }
+        }
+      ],
+      "openQuestions": [
+        "No textual role evidence in this frame; roles remain unknown.",
+        "Identity of every person is not determined by the frame itself."
+      ],
+      "review": {
+        "reviewed": false,
+        "reviewer": null,
+        "label": null,
+        "note": null
+      }
+    },
+    {
+      "framePtsMs": 7500,
+      "facts": [
+        {
+          "statement": "6 detections: 2 chair, 4 person",
+          "evidence": {
+            "framePtsMs": 7500,
+            "source": "yolox_boxes"
+          }
+        },
+        {
+          "statement": "Largest person box covers 25.6% of the frame (heuristic: size only, no identity)",
+          "evidence": {
+            "framePtsMs": 7500,
+            "bboxXYXY": [
+              436.22,
+              37.84,
+              858.54,
+              595.41
+            ],
+            "source": "yolox_box_area"
+          }
+        },
+        {
+          "statement": "On-screen text (OCR): \"more details here... >\"",
+          "evidence": {
+            "framePtsMs": 7500,
+            "source": "tesseract_enhanced_pass"
+          }
+        }
+      ],
+      "openQuestions": [
+        "No textual role evidence in this frame; roles remain unknown.",
+        "Identity of every person is not determined by the frame itself."
+      ],
+      "review": {
+        "reviewed": false,
+        "reviewer": null,
+        "label": null,
+        "note": null
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "statement": "Largest person's box centre moves 74 px (5.8% of frame width)",
+      "evidence": {
+        "fromPtsMs": 0,
+        "toPtsMs": 2750,
+        "source": "yolox_box_centre"
+      }
+    },
+    {
+      "statement": "On-screen text changes between keyframes",
+      "evidence": {
+        "fromPtsMs": 0,
+        "toPtsMs": 2750,
+        "source": "ocr"
+      }
+    },
+    {
+      "statement": "Largest person's box centre stays within 1.5% of frame width",
+      "evidence": {
+        "fromPtsMs": 2750,
+        "toPtsMs": 7500,
+        "source": "yolox_box_centre"
+      }
+    },
+    {
+      "statement": "On-screen text changes between keyframes",
+      "evidence": {
+        "fromPtsMs": 2750,
+        "toPtsMs": 7500,
+        "source": "ocr"
+      }
+    }
+  ]
+}

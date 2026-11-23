@@ -1,0 +1,2164 @@
+{
+  "schema": "atlas.openspec-top100-quick-hits-v2",
+  "source": "openspec/changes/crime-scene-reconstruction/tasks.md",
+  "rubric": {
+    "readiness": "0..30 (Partial [~] +22, cites existing file +8)",
+    "leverage": "0..25 (P0/SCENE-01..08/CASE-SCENE-E2E-10 = 25, ENG/MEM = 18, auth/db/playwright = 15, else 5)",
+    "lowFriction": "0..20 (Base 16, +4 TS/Vitest/Playwright/Three.js, -4 media/FFmpeg, -12 heavy GPU/C++/Dawn/QLoRA)",
+    "narrowScope": "0..15 (Base 10, +3 concise <220 chars, -4 >500 chars, -3 multi-service/e2e)",
+    "verificationClarity": "0..10 (Base 2, +8 explicit Test/Acceptance/Assert/Playwright, +4 check/validate)"
+  },
+  "candidateCount": 277,
+  "oldMatched": 100,
+  "oldMismatches": [
+    {
+      "line": 857,
+      "id": "CASE-SCENE-LIVE-03-",
+      "oldScore": 91,
+      "newScore": 76
+    },
+    {
+      "line": 859,
+      "id": "CASE-SCENE-LIVE-04",
+      "oldScore": 91,
+      "newScore": 80
+    },
+    {
+      "line": 860,
+      "id": "CASE-SCENE-LIVE-05",
+      "oldScore": 91,
+      "newScore": 80
+    },
+    {
+      "line": 846,
+      "id": "CASE-SCENE-LIVE-01",
+      "oldScore": 88,
+      "newScore": 76
+    },
+    {
+      "line": 874,
+      "id": "CASE-SCENE-E2E-11-",
+      "oldScore": 88,
+      "newScore": 84
+    },
+    {
+      "line": 816,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 84,
+      "newScore": 80
+    },
+    {
+      "line": 817,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 84,
+      "newScore": 80
+    },
+    {
+      "line": 818,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 84,
+      "newScore": 80
+    },
+    {
+      "line": 40,
+      "id": "SCENE-20",
+      "oldScore": 83,
+      "newScore": 63
+    },
+    {
+      "line": 852,
+      "id": "CASE-SCENE-LIVE-01-",
+      "oldScore": 83,
+      "newScore": 76
+    },
+    {
+      "line": 853,
+      "id": "CASE-SCENE-LIVE-01-",
+      "oldScore": 83,
+      "newScore": 76
+    },
+    {
+      "line": 855,
+      "id": "CASE-SCENE-LIVE-02-",
+      "oldScore": 83,
+      "newScore": 76
+    },
+    {
+      "line": 865,
+      "id": "CASE-SCENE-LIVE-08",
+      "oldScore": 83,
+      "newScore": 76
+    },
+    {
+      "line": 872,
+      "id": "CASE-SCENE-E2E-10-",
+      "oldScore": 83,
+      "newScore": 76
+    },
+    {
+      "line": 794,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 77,
+      "newScore": 80
+    },
+    {
+      "line": 783,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 76,
+      "newScore": 68
+    },
+    {
+      "line": 784,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 76,
+      "newScore": 72
+    },
+    {
+      "line": 788,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 76,
+      "newScore": 68
+    },
+    {
+      "line": 789,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 76,
+      "newScore": 72
+    },
+    {
+      "line": 790,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 76,
+      "newScore": 80
+    },
+    {
+      "line": 801,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 76,
+      "newScore": 80
+    },
+    {
+      "line": 804,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 76,
+      "newScore": 68
+    },
+    {
+      "line": 834,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 76,
+      "newScore": 68
+    },
+    {
+      "line": 835,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 76,
+      "newScore": 68
+    },
+    {
+      "line": 851,
+      "id": "CASE-SCENE-LIVE-01-",
+      "oldScore": 76,
+      "newScore": 68
+    },
+    {
+      "line": 793,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 73,
+      "newScore": 76
+    },
+    {
+      "line": 809,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 73,
+      "newScore": 68
+    },
+    {
+      "line": 810,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 73,
+      "newScore": 68
+    },
+    {
+      "line": 25,
+      "id": "SCENE-13",
+      "oldScore": 73,
+      "newScore": 49
+    },
+    {
+      "line": 779,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 72,
+      "newScore": 68
+    },
+    {
+      "line": 782,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 72,
+      "newScore": 64
+    },
+    {
+      "line": 786,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 72,
+      "newScore": 64
+    },
+    {
+      "line": 791,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 72,
+      "newScore": 68
+    },
+    {
+      "line": 799,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 72,
+      "newScore": 80
+    },
+    {
+      "line": 805,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 72,
+      "newScore": 68
+    },
+    {
+      "line": 830,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 72,
+      "newScore": 80
+    },
+    {
+      "line": 833,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 72,
+      "newScore": 68
+    },
+    {
+      "line": 854,
+      "id": "CASE-SCENE-LIVE-02",
+      "oldScore": 71,
+      "newScore": 64
+    },
+    {
+      "line": 177,
+      "id": "TASK-L177",
+      "oldScore": 69,
+      "newScore": 65
+    },
+    {
+      "line": 769,
+      "id": "CASE-SCENE-E2E-01B",
+      "oldScore": 69,
+      "newScore": 80
+    },
+    {
+      "line": 808,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 69,
+      "newScore": 64
+    },
+    {
+      "line": 877,
+      "id": "CASE-SCENE-E2E-13",
+      "oldScore": 68,
+      "newScore": 76
+    },
+    {
+      "line": 765,
+      "id": "CASE-SCENE-E2E-01",
+      "oldScore": 65,
+      "newScore": 68
+    },
+    {
+      "line": 411,
+      "id": "SWEEP-RESUME-03",
+      "oldScore": 63,
+      "newScore": 59
+    },
+    {
+      "line": 15,
+      "id": "SCENE-06",
+      "oldScore": 61,
+      "newScore": 57
+    },
+    {
+      "line": 856,
+      "id": "CASE-SCENE-LIVE-03",
+      "oldScore": 61,
+      "newScore": 54
+    },
+    {
+      "line": 97,
+      "id": "AUD-07",
+      "oldScore": 59,
+      "newScore": 69
+    },
+    {
+      "line": 17,
+      "id": "SCENE-08",
+      "oldScore": 58,
+      "newScore": 57
+    },
+    {
+      "line": 24,
+      "id": "SCENE-12",
+      "oldScore": 58,
+      "newScore": 41
+    },
+    {
+      "line": 38,
+      "id": "SCENE-18",
+      "oldScore": 58,
+      "newScore": 45
+    },
+    {
+      "line": 95,
+      "id": "AUD-05",
+      "oldScore": 57,
+      "newScore": 37
+    },
+    {
+      "line": 863,
+      "id": "CASE-SCENE-LIVE-07",
+      "oldScore": 57,
+      "newScore": 46
+    },
+    {
+      "line": 192,
+      "id": "TASK-L192",
+      "oldScore": 55,
+      "newScore": 45
+    },
+    {
+      "line": 500,
+      "id": "CASE-01",
+      "oldScore": 55,
+      "newScore": 43
+    },
+    {
+      "line": 26,
+      "id": "SCENE-14",
+      "oldScore": 54,
+      "newScore": 37
+    },
+    {
+      "line": 37,
+      "id": "SCENE-17",
+      "oldScore": 54,
+      "newScore": 37
+    },
+    {
+      "line": 72,
+      "id": "VR-08",
+      "oldScore": 54,
+      "newScore": 36
+    },
+    {
+      "line": 566,
+      "id": "PRX-05",
+      "oldScore": 54,
+      "newScore": 44
+    },
+    {
+      "line": 716,
+      "id": "MEM-07",
+      "oldScore": 54,
+      "newScore": 57
+    },
+    {
+      "line": 866,
+      "id": "CASE-SCENE-E2E-07",
+      "oldScore": 54,
+      "newScore": 46
+    },
+    {
+      "line": 45,
+      "id": "SCENE-21",
+      "oldScore": 53,
+      "newScore": 33
+    },
+    {
+      "line": 861,
+      "id": "CASE-SCENE-LIVE-06",
+      "oldScore": 53,
+      "newScore": 54
+    },
+    {
+      "line": 59,
+      "id": "VR-00",
+      "oldScore": 51,
+      "newScore": 33
+    },
+    {
+      "line": 191,
+      "id": "TASK-L191",
+      "oldScore": 51,
+      "newScore": 37
+    },
+    {
+      "line": 365,
+      "id": "TASK-L365",
+      "oldScore": 51,
+      "newScore": 33
+    },
+    {
+      "line": 482,
+      "id": "SYN-07",
+      "oldScore": 51,
+      "newScore": 33
+    },
+    {
+      "line": 590,
+      "id": "STORYBOOK-04",
+      "oldScore": 51,
+      "newScore": 29
+    },
+    {
+      "line": 21,
+      "id": "SCENE-09",
+      "oldScore": 50,
+      "newScore": 29
+    },
+    {
+      "line": 36,
+      "id": "SCENE-16",
+      "oldScore": 50,
+      "newScore": 47
+    },
+    {
+      "line": 48,
+      "id": "SCENE-24",
+      "oldScore": 50,
+      "newScore": 45
+    },
+    {
+      "line": 796,
+      "id": "CASE-SCENE-E2E-",
+      "oldScore": 50,
+      "newScore": 58
+    }
+  ],
+  "newcomersToGlobalTop100": [
+    "crime-scene-reconstruction#L14",
+    "crime-scene-reconstruction#L13",
+    "crime-scene-reconstruction#L775",
+    "crime-scene-reconstruction#L12",
+    "crime-scene-reconstruction#L674",
+    "crime-scene-reconstruction#L701",
+    "crime-scene-reconstruction#L747",
+    "crime-scene-reconstruction#L829",
+    "crime-scene-reconstruction#L840",
+    "crime-scene-reconstruction#L71",
+    "crime-scene-reconstruction#L521",
+    "crime-scene-reconstruction#L529",
+    "crime-scene-reconstruction#L570",
+    "crime-scene-reconstruction#L582",
+    "crime-scene-reconstruction#L118",
+    "crime-scene-reconstruction#L377",
+    "crime-scene-reconstruction#L400",
+    "crime-scene-reconstruction#L505",
+    "crime-scene-reconstruction#L772"
+  ],
+  "next100": [
+    {
+      "rank": 101,
+      "key": "crime-scene-reconstruction#L14",
+      "line": 14,
+      "id": "SCENE-05",
+      "status": "OPEN",
+      "score": 61,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 25,
+        "friction": 16,
+        "scope": 6,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "SCENE-05 Streamed asset derivation: for a rights-qualified splat admitted to streaming, run pinned SplatTransf…"
+    },
+    {
+      "rank": 102,
+      "key": "crime-scene-reconstruction#L13",
+      "line": 13,
+      "id": "SCENE-04",
+      "status": "OPEN",
+      "score": 57,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 25,
+        "friction": 16,
+        "scope": 6,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "SCENE-04 Reconstruction handoff: use the existing reconstruction lane (`timeline-reconstruction-bridge.ts`, `:…"
+    },
+    {
+      "rank": 103,
+      "key": "crime-scene-reconstruction#L775",
+      "line": 775,
+      "id": "CASE-SCENE-E2E-02c",
+      "status": "OPEN",
+      "score": 54,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 18,
+        "friction": 20,
+        "scope": 6,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "CASE-SCENE-E2E-02c Deliver the complete browser-based HTML5 reconstruction experience in the existing SvelteKi…"
+    },
+    {
+      "rank": 104,
+      "key": "crime-scene-reconstruction#L12",
+      "line": 12,
+      "id": "SCENE-03",
+      "status": "OPEN",
+      "score": 49,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 25,
+        "friction": 12,
+        "scope": 6,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "SCENE-03 Qualified inputs: verify exact source bucket/key, readback, SHA-256, source revision, admission/right…"
+    },
+    {
+      "rank": 105,
+      "key": "crime-scene-reconstruction#L674",
+      "line": 674,
+      "id": "ENG-05",
+      "status": "OPEN",
+      "score": 49,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "ENG-05 Parent Atlas Memory Engine (6-Tier Byte-Budgeted Residency & Shared Asset Manager):…"
+    },
+    {
+      "rank": 106,
+      "key": "crime-scene-reconstruction#L701",
+      "line": 701,
+      "id": "MEM-03",
+      "status": "OPEN",
+      "score": 49,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "MEM-03 Web Worker Decoding & Transferable Texture Streaming:…"
+    },
+    {
+      "rank": 107,
+      "key": "crime-scene-reconstruction#L747",
+      "line": 747,
+      "id": "ENG-09",
+      "status": "OPEN",
+      "score": 49,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "ENG-09 Asset Provenance & Retro Palette Verification:…"
+    },
+    {
+      "rank": 108,
+      "key": "crime-scene-reconstruction#L829",
+      "line": 829,
+      "id": "CASE-SCENE-E2E-06c",
+      "status": "OPEN",
+      "score": 49,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "CASE-SCENE-E2E-06c Wire polygon mesh selection and vertex editing into the existing Detective Mode scene, with…"
+    },
+    {
+      "rank": 109,
+      "key": "crime-scene-reconstruction#L840",
+      "line": 840,
+      "id": "CASE-SCENE-E2E-06e",
+      "status": "OPEN",
+      "score": 49,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "CASE-SCENE-E2E-06e Connect tile/Morton/LOD helpers to the existing scene residency/render path with bounded lo…"
+    },
+    {
+      "rank": 110,
+      "key": "crime-scene-reconstruction#L71",
+      "line": 71,
+      "id": "VR-07",
+      "status": "OPEN",
+      "score": 48,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 20,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "VR-07 Proposed GLB and scene manifest: write a GLB proposal and a manifest that cites the source revision, sam…"
+    },
+    {
+      "rank": 111,
+      "key": "crime-scene-reconstruction#L521",
+      "line": 521,
+      "id": "RND-06",
+      "status": "OPEN",
+      "score": 48,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 20,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "RND-06 Three.js viewer test: load the rendered scene's GLB, place placeholders from the observations, and veri…"
+    },
+    {
+      "rank": 112,
+      "key": "crime-scene-reconstruction#L529",
+      "line": 529,
+      "id": "SHOT-03",
+      "status": "OPEN",
+      "score": 48,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 20,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "SHOT-03 Cutscene modal: shot list from the CSV, play, pause, step to next shot, and a timeline scrubber. It us…"
+    },
+    {
+      "rank": 113,
+      "key": "crime-scene-reconstruction#L570",
+      "line": 570,
+      "id": "MAT-01",
+      "status": "OPEN",
+      "score": 48,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 20,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "MAT-01 Object transforms use 4x4 matrices (translation, rotation, scale) composed in one fixed order. Three.js…"
+    },
+    {
+      "rank": 114,
+      "key": "crime-scene-reconstruction#L582",
+      "line": 582,
+      "id": "STORYBOOK-01",
+      "status": "OPEN",
+      "score": 47,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 15,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "STORYBOOK-01 WIRED: the authorized Crime Scene page lists image and video exhibits as chapters. Video chapters…"
+    },
+    {
+      "rank": 115,
+      "key": "crime-scene-reconstruction#L118",
+      "line": 118,
+      "id": "MARK-05",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 15,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "MARK-05 Verification: a real marker placed on a real image and on a real mesh must read back with its anchor f…"
+    },
+    {
+      "rank": 116,
+      "key": "crime-scene-reconstruction#L377",
+      "line": 377,
+      "id": "LOC-UI-01",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 15,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": true,
+      "summary": "LOC-UI-01 Add a case dossier location panel showing capture/text candidates separately from “Confirmed crime l…"
+    },
+    {
+      "rank": 117,
+      "key": "crime-scene-reconstruction#L400",
+      "line": 400,
+      "id": "REG-INST-02",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 15,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": true,
+      "summary": "REG-INST-02 Persisting instances into `scene_assets` metadata is a live database write and needs explicit appr…"
+    },
+    {
+      "rank": 118,
+      "key": "crime-scene-reconstruction#L505",
+      "line": 505,
+      "id": "CASE-06",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 15,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "CASE-06 Enforce tenant/case authorization in both retrieval and readback. An unauthorized case or cross-tenant…"
+    },
+    {
+      "rank": 119,
+      "key": "crime-scene-reconstruction#L772",
+      "line": 772,
+      "id": "CASE-SCENE-E2E-02",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "CASE-SCENE-E2E-02 Add the optional case-bound Scene Workspace entry after case selection. Offer “Build a block…"
+    },
+    {
+      "rank": 120,
+      "key": "crime-scene-reconstruction#L774",
+      "line": 774,
+      "id": "CASE-SCENE-E2E-02b",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 6,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "CASE-SCENE-E2E-02b Upgrade parameter preparation into a versioned `SceneGenerationPlanV1` using only case-auth…"
+    },
+    {
+      "rank": 121,
+      "key": "crime-scene-reconstruction#L798",
+      "line": 798,
+      "id": "CASE-SCENE-E2E-02c-2",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "CASE-SCENE-E2E-02c-2 Compile seeded city, beach, indoor, and custom recipes into a navigable populated world. …"
+    },
+    {
+      "rank": 122,
+      "key": "crime-scene-reconstruction#L813",
+      "line": 813,
+      "id": "CASE-SCENE-E2E-02c-4",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "CASE-SCENE-E2E-02c-4 Add selection/inspection and authoring controls for actors, props, primitives, polygons, …"
+    },
+    {
+      "rank": 123,
+      "key": "crime-scene-reconstruction#L823",
+      "line": 823,
+      "id": "CASE-SCENE-E2E-03",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "CASE-SCENE-E2E-03 Add a source timeline view that retains each camera, dispatch, alarm, and interview clock do…"
+    },
+    {
+      "rank": 124,
+      "key": "crime-scene-reconstruction#L824",
+      "line": 824,
+      "id": "CASE-SCENE-E2E-04",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "CASE-SCENE-E2E-04 Connect the workspace to Evidence Board uploads and existing source-bound observations/revie…"
+    },
+    {
+      "rank": 125,
+      "key": "crime-scene-reconstruction#L825",
+      "line": 825,
+      "id": "CASE-SCENE-E2E-05",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": true,
+      "summary": "CASE-SCENE-E2E-05 Add a case-scoped actor registry for pseudonymous scene actors and visual placeholders. Pres…"
+    },
+    {
+      "rank": 126,
+      "key": "crime-scene-reconstruction#L826",
+      "line": 826,
+      "id": "CASE-SCENE-E2E-06",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "CASE-SCENE-E2E-06 Complete the blockout edit path: create scene cells/primitives without evidence, then option…"
+    },
+    {
+      "rank": 127,
+      "key": "crime-scene-reconstruction#L867",
+      "line": 867,
+      "id": "CASE-SCENE-E2E-08",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "CASE-SCENE-E2E-08 Add prosecutor/reviewer controls for claims and event proposals: accept, dispute, edit, or l…"
+    },
+    {
+      "rank": 128,
+      "key": "crime-scene-reconstruction#L868",
+      "line": 868,
+      "id": "CASE-SCENE-E2E-09",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": true,
+      "summary": "CASE-SCENE-E2E-09 Export a revision-pinned event report containing scene chapters, source-specific times and o…"
+    },
+    {
+      "rank": 129,
+      "key": "crime-scene-reconstruction#L873",
+      "line": 873,
+      "id": "CASE-SCENE-E2E-11",
+      "status": "OPEN",
+      "score": 46,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "CASE-SCENE-E2E-11 Add versioned animation indexing as an optional presentation capability after the saved bloc…"
+    },
+    {
+      "rank": 130,
+      "key": "crime-scene-reconstruction#L382",
+      "line": 382,
+      "id": "MAP-03",
+      "status": "OPEN",
+      "score": 45,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 20,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "MAP-03 Polygon and proxy helpers: extend the existing Three.js/TypeScript primitive and polygon owners first. …"
+    },
+    {
+      "rank": 131,
+      "key": "crime-scene-reconstruction#L388",
+      "line": 388,
+      "id": "MAP-06",
+      "status": "OPEN",
+      "score": 45,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 20,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "MAP-06 Renderer and rasterizer choice: keep Three.js/WebGL2 as the existing interactive renderer. Treat a CPU …"
+    },
+    {
+      "rank": 132,
+      "key": "crime-scene-reconstruction#L397",
+      "line": 397,
+      "id": "REG-DEQ-01",
+      "status": "OPEN",
+      "score": 44,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "REG-DEQ-01 Dequeue exists only in residency (`server/atlas/residency/residency-controller-v1.ts`) and packet b…"
+    },
+    {
+      "rank": 133,
+      "key": "crime-scene-reconstruction#L412",
+      "line": 412,
+      "id": "SWEEP-RESUME-04",
+      "status": "OPEN",
+      "score": 44,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "SWEEP-RESUME-04 Results to read when done: `.tmp/route-sweep/manifest.json` (HTTP status, page errors, console…"
+    },
+    {
+      "rank": 134,
+      "key": "crime-scene-reconstruction#L418",
+      "line": 418,
+      "id": "SWEEP-NEXT-02",
+      "status": "OPEN",
+      "score": 44,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "SWEEP-NEXT-02 When finished, read `.tmp/route-sweep/manifest.json` and record: visited count, HTTP status coun…"
+    },
+    {
+      "rank": 135,
+      "key": "crime-scene-reconstruction#L459",
+      "line": 459,
+      "id": "PARK-01",
+      "status": "OPEN",
+      "score": 44,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "PARK-01 Start with SWEEP-TRIAGE-01 (effect loop on the graph and cache-monitor routes). Reproduce in Chromium,…"
+    },
+    {
+      "rank": 136,
+      "key": "crime-scene-reconstruction#L480",
+      "line": 480,
+      "id": "SYN-05",
+      "status": "OPEN",
+      "score": 44,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 10
+      },
+      "needsApproval": false,
+      "summary": "SYN-05 Acceptance: detections, masks, and keyframe selection compared with ground truth; false positives and m…"
+    },
+    {
+      "rank": 137,
+      "key": "crime-scene-reconstruction#L531",
+      "line": 531,
+      "id": "SHOT-05",
+      "status": "OPEN",
+      "score": 44,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 10
+      },
+      "needsApproval": false,
+      "summary": "SHOT-05 Test: each shot renders both meshes at the CSV positions, and the modal steps through all shots withou…"
+    },
+    {
+      "rank": 138,
+      "key": "crime-scene-reconstruction#L540",
+      "line": 540,
+      "id": "PUP-06",
+      "status": "OPEN",
+      "score": 44,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 10
+      },
+      "needsApproval": false,
+      "summary": "PUP-06 Test: proximity opens the modal, leaving closes it, a tip without a citation is not shown, and a marker…"
+    },
+    {
+      "rank": 139,
+      "key": "crime-scene-reconstruction#L548",
+      "line": 548,
+      "id": "DET-05",
+      "status": "OPEN",
+      "score": 44,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 10
+      },
+      "needsApproval": false,
+      "summary": "DET-05 Test: load a scene revision, select an object, open its cutscene from a marker, and confirm no evidence…"
+    },
+    {
+      "rank": 140,
+      "key": "crime-scene-reconstruction#L558",
+      "line": 558,
+      "id": "POP-07",
+      "status": "OPEN",
+      "score": 44,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 10
+      },
+      "needsApproval": false,
+      "summary": "POP-07 Test: a shot that exceeds the object or triangle budget hides the expected objects and records which on…"
+    },
+    {
+      "rank": 141,
+      "key": "crime-scene-reconstruction#L126",
+      "line": 126,
+      "id": "TRANSCRIPT-UI-01",
+      "status": "OPEN",
+      "score": 43,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 15,
+        "friction": 16,
+        "scope": 6,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "TRANSCRIPT-UI-01 (2026-11-18) The transcript panel polls the authorized transcript read route with bounded bac…"
+    },
+    {
+      "rank": 142,
+      "key": "crime-scene-reconstruction#L392",
+      "line": 392,
+      "id": "MAP-10",
+      "status": "OPEN",
+      "score": 43,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 15,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "MAP-10 Verification gates: add focused fixtures for deterministic polygon output, transform round-trip, malfor…"
+    },
+    {
+      "rank": 143,
+      "key": "crime-scene-reconstruction#L487",
+      "line": 487,
+      "id": "RLM-01",
+      "status": "OPEN",
+      "score": 43,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 15,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "RLM-01 Define one versioned, bounded JSON prompt/output contract over authorized, revision-bound observations.…"
+    },
+    {
+      "rank": 144,
+      "key": "crime-scene-reconstruction#L501",
+      "line": 501,
+      "id": "CASE-02",
+      "status": "OPEN",
+      "score": 43,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 15,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "CASE-02 Build retrieval from authorized case facts and the existing indexed case/law corpus. Filter by access …"
+    },
+    {
+      "rank": 145,
+      "key": "crime-scene-reconstruction#L595",
+      "line": 595,
+      "id": "STORYBOOK-05",
+      "status": "OPEN",
+      "score": 43,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 15,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": true,
+      "summary": "STORYBOOK-05 Still-image review: allow review of labels, masks, scene context, and source-bound OCR spans with…"
+    },
+    {
+      "rank": 146,
+      "key": "crime-scene-reconstruction#L600",
+      "line": 600,
+      "id": "STORYBOOK-06",
+      "status": "OPEN",
+      "score": 43,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 15,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "STORYBOOK-06 Legal analysis: connect storybook questions to the existing case/statute search and ACE context a…"
+    },
+    {
+      "rank": 147,
+      "key": "crime-scene-reconstruction#L800",
+      "line": 800,
+      "id": "CASE-SCENE-E2E-02c-3",
+      "status": "OPEN",
+      "score": 42,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 18,
+        "friction": 16,
+        "scope": 6,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "CASE-SCENE-E2E-02c-3 Implement the event runtime and timeline lanes. Select an event to focus its scene, actor…"
+    },
+    {
+      "rank": 148,
+      "key": "crime-scene-reconstruction#L83",
+      "line": 83,
+      "id": "DEC-D",
+      "status": "OPEN",
+      "score": 41,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": true,
+      "summary": "DEC-D Pose model and keypoint format: COCO-17 is already defined in the repo (`pose-skeleton-schema-v1.ts`). T…"
+    },
+    {
+      "rank": 149,
+      "key": "crime-scene-reconstruction#L345",
+      "line": 345,
+      "id": "REG-OPT-05",
+      "status": "OPEN",
+      "score": 41,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": true,
+      "summary": "REG-OPT-05 COCO: no COCO dataset is on disk. Repo references are the YOLOX COCO-class label set (`docker/docli…"
+    },
+    {
+      "rank": 150,
+      "key": "crime-scene-reconstruction#L449",
+      "line": 449,
+      "id": "SWEEP-TRIAGE-06",
+      "status": "OPEN",
+      "score": 41,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "SWEEP-TRIAGE-06 Cover the 38 parameterised routes with seeded IDs. Partly done 2026-11-18: read-only visit of …"
+    },
+    {
+      "rank": 151,
+      "key": "crime-scene-reconstruction#L182",
+      "line": 182,
+      "id": "14.2",
+      "status": "OPEN",
+      "score": 40,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 6
+      },
+      "needsApproval": true,
+      "summary": "14.2 Choose and install a SAM 2 runtime and checkpoint (license and model-weight decision).…"
+    },
+    {
+      "rank": 152,
+      "key": "crime-scene-reconstruction#L349",
+      "line": 349,
+      "id": "REG-OPT-09",
+      "status": "OPEN",
+      "score": 40,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "REG-OPT-09 Browser proof of the crime page placeholder button and \"Placeholder · not evidence\" label is not do…"
+    },
+    {
+      "rank": 153,
+      "key": "crime-scene-reconstruction#L404",
+      "line": 404,
+      "id": "UX-TOOLBAR-03",
+      "status": "OPEN",
+      "score": 40,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "UX-TOOLBAR-03 Browser check of the new toolbar in Chromium, including keyboard focus order and the marker-mode…"
+    },
+    {
+      "rank": 154,
+      "key": "crime-scene-reconstruction#L463",
+      "line": 463,
+      "id": "PARK-05",
+      "status": "OPEN",
+      "score": 40,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "PARK-05 Nothing is committed. The working tree is dirty with work from several sessions; check `git status` be…"
+    },
+    {
+      "rank": 155,
+      "key": "crime-scene-reconstruction#L471",
+      "line": 471,
+      "id": "SYN-01",
+      "status": "OPEN",
+      "score": 40,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 6
+      },
+      "needsApproval": true,
+      "summary": "SYN-01 Write a cutscene CSV schema: start_ms, end_ms, actor, action, line, camera, prop. One row per shot. The…"
+    },
+    {
+      "rank": 156,
+      "key": "crime-scene-reconstruction#L520",
+      "line": 520,
+      "id": "RND-05",
+      "status": "OPEN",
+      "score": 40,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "RND-05 Alignment check: project a known 3D object into the frame and compare with its detected box. Record the…"
+    },
+    {
+      "rank": 157,
+      "key": "crime-scene-reconstruction#L522",
+      "line": 522,
+      "id": "RND-07",
+      "status": "OPEN",
+      "score": 40,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "RND-07 Multi-view splat (later): render from several known cameras, then check whether the 2.5D relief and a m…"
+    },
+    {
+      "rank": 158,
+      "key": "crime-scene-reconstruction#L537",
+      "line": 537,
+      "id": "PUP-03",
+      "status": "OPEN",
+      "score": 40,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "PUP-03 AI tips: the summary model may offer tips for the cutscene, but each tip must cite a fact ID from the s…"
+    },
+    {
+      "rank": 159,
+      "key": "crime-scene-reconstruction#L564",
+      "line": 564,
+      "id": "PRX-03",
+      "status": "OPEN",
+      "score": 40,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "PRX-03 Check the converted mesh against the POP-01 triangle budget. Over budget, simplify or reject, and recor…"
+    },
+    {
+      "rank": 160,
+      "key": "crime-scene-reconstruction#L618",
+      "line": 618,
+      "id": "ACE-EXEC-04",
+      "status": "OPEN",
+      "score": 40,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 20,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "ACE-EXEC-04 Run one registered CPU procedure with a TypeScript reference and measure parity before activating …"
+    },
+    {
+      "rank": 161,
+      "key": "crime-scene-reconstruction#L22",
+      "line": 22,
+      "id": "SCENE-10",
+      "status": "OPEN",
+      "score": 39,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 15,
+        "friction": 16,
+        "scope": 6,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "SCENE-10 Contextual Detective Mode assistant: add a compact chat composer that expands without replacing the v…"
+    },
+    {
+      "rank": 162,
+      "key": "crime-scene-reconstruction#L74",
+      "line": 74,
+      "id": "VR-10",
+      "status": "OPEN",
+      "score": 39,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 15,
+        "friction": 16,
+        "scope": 6,
+        "clarity": 2
+      },
+      "needsApproval": true,
+      "summary": "VR-10 PARTIAL (read-only recount 2026-11-16, multi-line parser over `src/lib/server/db`, 224 files): 570 table…"
+    },
+    {
+      "rank": 163,
+      "key": "crime-scene-reconstruction#L389",
+      "line": 389,
+      "id": "MAP-07",
+      "status": "OPEN",
+      "score": 39,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 15,
+        "friction": 16,
+        "scope": 6,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "MAP-07 Transport and compute boundary: inspect current protobuf/gRPC, MessagePack, and Node-API owners before …"
+    },
+    {
+      "rank": 164,
+      "key": "crime-scene-reconstruction#L66",
+      "line": 66,
+      "id": "VR-03",
+      "status": "OPEN",
+      "score": 37,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 6,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "VR-03 Tracking: one stable track ID per person across frames. Partial: `src/lib/server/features/evidence/video…"
+    },
+    {
+      "rank": 165,
+      "key": "crime-scene-reconstruction#L75",
+      "line": 75,
+      "id": "VR-11",
+      "status": "OPEN",
+      "score": 37,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 6
+      },
+      "needsApproval": true,
+      "summary": "VR-11 Verification on investigator-reviewed case evidence. The normal signed-in workflow has synthetic scratch…"
+    },
+    {
+      "rank": 166,
+      "key": "crime-scene-reconstruction#L350",
+      "line": 350,
+      "id": "REG-OPT-10",
+      "status": "OPEN",
+      "score": 37,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "REG-OPT-10 Blender placeholder set via the Blender MCP recipe path is not generated. Memory was low (0.93 GB f…"
+    },
+    {
+      "rank": 167,
+      "key": "crime-scene-reconstruction#L391",
+      "line": 391,
+      "id": "MAP-09",
+      "status": "OPEN",
+      "score": 37,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "MAP-09 Cache and packed-budget proof: reuse the existing byte-budgeted LRU and 8 MiB packed-asset accounting. …"
+    },
+    {
+      "rank": 168,
+      "key": "crime-scene-reconstruction#L448",
+      "line": 448,
+      "id": "SWEEP-TRIAGE-05",
+      "status": "OPEN",
+      "score": 37,
+      "breakdown": {
+        "readiness": 8,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 6,
+        "clarity": 2
+      },
+      "needsApproval": true,
+      "summary": "SWEEP-TRIAGE-05 Decide the `/couchdb-analytics` service (`:8001` is not running). Findings 2026-11-18, decisio…"
+    },
+    {
+      "rank": 169,
+      "key": "crime-scene-reconstruction#L461",
+      "line": 461,
+      "id": "PARK-03",
+      "status": "OPEN",
+      "score": 37,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "PARK-03 Crime-scene items still open: browser check of the placeholder proxy button and the new scene toolbar …"
+    },
+    {
+      "rank": 170,
+      "key": "crime-scene-reconstruction#L490",
+      "line": 490,
+      "id": "RLM-04",
+      "status": "OPEN",
+      "score": 37,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 20,
+        "scope": 10,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "RLM-04 Keep the 2D cell mapping deterministic and outside the model: pass the accepted grid origin, cell size,…"
+    },
+    {
+      "rank": 171,
+      "key": "crime-scene-reconstruction#L492",
+      "line": 492,
+      "id": "RLM-06",
+      "status": "OPEN",
+      "score": 37,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "RLM-06 Add adversarial prompt checks for missing calibration, stale source/run revision, frame-size mismatch, …"
+    },
+    {
+      "rank": 172,
+      "key": "crime-scene-reconstruction#L502",
+      "line": 502,
+      "id": "CASE-03",
+      "status": "OPEN",
+      "score": 37,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 6
+      },
+      "needsApproval": true,
+      "summary": "CASE-03 Rank legal authorities with explicit labels: potentially controlling, persuasive, out-of-jurisdiction,…"
+    },
+    {
+      "rank": 173,
+      "key": "crime-scene-reconstruction#L503",
+      "line": 503,
+      "id": "CASE-04",
+      "status": "OPEN",
+      "score": 37,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "CASE-04 Draft a separate bounded case-research RLM prompt: propose related cases and statutes, explain the cit…"
+    },
+    {
+      "rank": 174,
+      "key": "crime-scene-reconstruction#L584",
+      "line": 584,
+      "id": "STORYBOOK-02",
+      "status": "OPEN",
+      "score": 37,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "STORYBOOK-02 WIRED: the existing SceneIntent route resolves the selected video frame against the current case …"
+    },
+    {
+      "rank": 175,
+      "key": "crime-scene-reconstruction#L615",
+      "line": 615,
+      "id": "ACE-EXEC-01",
+      "status": "OPEN",
+      "score": 37,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 6
+      },
+      "needsApproval": true,
+      "summary": "ACE-EXEC-01 Validate the packet key and preserve zero-valued topology fields. The local assembler now enforces…"
+    },
+    {
+      "rank": 176,
+      "key": "crime-scene-reconstruction#L616",
+      "line": 616,
+      "id": "ACE-EXEC-02",
+      "status": "OPEN",
+      "score": 37,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 6
+      },
+      "needsApproval": false,
+      "summary": "ACE-EXEC-02 Verify versioned packed records. Fanout emits a V2 byte slab with checksummed per-record offsets a…"
+    },
+    {
+      "rank": 177,
+      "key": "crime-scene-reconstruction#L622",
+      "line": 622,
+      "id": "ACE-EXEC-06",
+      "status": "OPEN",
+      "score": 37,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 10,
+        "clarity": 6
+      },
+      "needsApproval": true,
+      "summary": "ACE-EXEC-06 Prove signed-in source → procedure → checksum-verified artifact → reviewer decision → scene save a…"
+    },
+    {
+      "rank": 178,
+      "key": "crime-scene-reconstruction#L65",
+      "line": 65,
+      "id": "VR-02",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "VR-02 Person detection and 2D pose: YOLO for boxes (existing). Pose model not yet admitted (see DEC-D). Output…"
+    },
+    {
+      "rank": 179,
+      "key": "crime-scene-reconstruction#L68",
+      "line": 68,
+      "id": "VR-05",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "VR-05 Motion analysis: displacement, joint angles, velocity, and visibility per track, with uncertainty kept p…"
+    },
+    {
+      "rank": 180,
+      "key": "crime-scene-reconstruction#L79",
+      "line": 79,
+      "id": "VR-12",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "VR-12 Entry point: the video evidence modal gets a \"Generate 3D blockout\" action that creates a run for the cu…"
+    },
+    {
+      "rank": 181,
+      "key": "crime-scene-reconstruction#L84",
+      "line": 84,
+      "id": "DEC-E",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "DEC-E Clip scope: the 10 s pilot is a test input for the reconstruction pipeline. DEC-A (20 s) still governs s…"
+    },
+    {
+      "rank": 182,
+      "key": "crime-scene-reconstruction#L127",
+      "line": 127,
+      "id": "E2E-05",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "E2E-05 FAILED: frames. Zero `evidence_frames` rows for this evidence. The job still reports completed.…"
+    },
+    {
+      "rank": 183,
+      "key": "crime-scene-reconstruction#L128",
+      "line": 128,
+      "id": "E2E-06",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "E2E-06 Gap in the job status: a job can be `completed` while transcription and frame extraction have failed. M…"
+    },
+    {
+      "rank": 184,
+      "key": "crime-scene-reconstruction#L181",
+      "line": 181,
+      "id": "14.1",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": true,
+      "summary": "14.1 Start the VLM server on `:8085`. Human-only under the service-lifecycle rules.…"
+    },
+    {
+      "rank": 185,
+      "key": "crime-scene-reconstruction#L183",
+      "line": 183,
+      "id": "14.3",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "14.3 Choose a pose estimator for COCO-17 keypoints, or confirm manual keypoints for now.…"
+    },
+    {
+      "rank": 186,
+      "key": "crime-scene-reconstruction#L184",
+      "line": 184,
+      "id": "14.4",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": true,
+      "summary": "14.4 Backfill the 9 uncovered image evidence items through the existing writer (live writes; needs approval).…"
+    },
+    {
+      "rank": 187,
+      "key": "crime-scene-reconstruction#L185",
+      "line": 185,
+      "id": "14.5",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": true,
+      "summary": "14.5 Live test uploads of the screenshots (live writes; needs approval and a case choice).…"
+    },
+    {
+      "rank": 188,
+      "key": "crime-scene-reconstruction#L213",
+      "line": 213,
+      "id": "15.A4",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "15.A4 Native-to-Node TypedArray benchmark. Not started.…"
+    },
+    {
+      "rank": 189,
+      "key": "crime-scene-reconstruction#L342",
+      "line": 342,
+      "id": "REG-OPT-02",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "REG-OPT-02 Registry is authoring vocabulary only. It is not a classifier, not evidence, and not object identit…"
+    },
+    {
+      "rank": 190,
+      "key": "crime-scene-reconstruction#L346",
+      "line": 346,
+      "id": "REG-OPT-06",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "REG-OPT-06 Coordinate labeling: the crime page should label image-derived points as image coordinates, not wor…"
+    },
+    {
+      "rank": 191,
+      "key": "crime-scene-reconstruction#L347",
+      "line": 347,
+      "id": "REG-OPT-07",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "REG-OPT-07 Case-event timeline: spline markers for who/what/why/how events need a reviewed-event source. A min…"
+    },
+    {
+      "rank": 192,
+      "key": "crime-scene-reconstruction#L355",
+      "line": 355,
+      "id": "REG-OPT-13",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "REG-OPT-13 Mode-7 is a contract only. The affine floor shader is not written.…"
+    },
+    {
+      "rank": 193,
+      "key": "crime-scene-reconstruction#L396",
+      "line": 396,
+      "id": "REG-LS4Z-01",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "REG-LS4Z-01 \"LS4Z compression\" has no definition or reference in the repo (searched docs, openspec, src). Need…"
+    },
+    {
+      "rank": 194,
+      "key": "crime-scene-reconstruction#L401",
+      "line": 401,
+      "id": "REG-INST-03",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "REG-INST-03 `sequenceId` for animation clips: not added. Only needed if a clip requires one (the Blender DAG i…"
+    },
+    {
+      "rank": 195,
+      "key": "crime-scene-reconstruction#L403",
+      "line": 403,
+      "id": "UX-TOOLBAR-02",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "UX-TOOLBAR-02 The Detective Mode action toolbar (select, link, bounding box, grid, add node, auto-layout, comm…"
+    },
+    {
+      "rank": 196,
+      "key": "crime-scene-reconstruction#L417",
+      "line": 417,
+      "id": "SWEEP-NEXT-01",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "SWEEP-NEXT-01 Wait for the full run to complete (`.tmp/route-sweep/run.log` ends with `exit 0` or `exit 1`). A…"
+    },
+    {
+      "rank": 197,
+      "key": "crime-scene-reconstruction#L419",
+      "line": 419,
+      "id": "SWEEP-NEXT-03",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "SWEEP-NEXT-03 Triage any HTTP 500+ or page errors first; then the console-error routes. Record each finding as…"
+    },
+    {
+      "rank": 198,
+      "key": "crime-scene-reconstruction#L420",
+      "line": 420,
+      "id": "SWEEP-NEXT-04",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "SWEEP-NEXT-04 If the run stopped early, restart with `ROUTE_SWEEP=1 ROUTE_SWEEP_RESUME=1` (see SWEEP-RESUME-03…"
+    },
+    {
+      "rank": 199,
+      "key": "crime-scene-reconstruction#L432",
+      "line": 432,
+      "id": "SWEEP-TRIAGE-01",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": false,
+      "summary": "SWEEP-TRIAGE-01 Fix the Svelte effect loop on `/admin/codebase-graph`, `/command-center/codebase/graph`, `/cac…"
+    },
+    {
+      "rank": 200,
+      "key": "crime-scene-reconstruction#L441",
+      "line": 441,
+      "id": "SWEEP-TRIAGE-03",
+      "status": "OPEN",
+      "score": 36,
+      "breakdown": {
+        "readiness": 0,
+        "leverage": 5,
+        "friction": 16,
+        "scope": 13,
+        "clarity": 2
+      },
+      "needsApproval": true,
+      "summary": "SWEEP-TRIAGE-03 Investigate 500s on `/admin/explorer` and `/command-center/retrieval`. Findings 2026-11-18 (no…"
+    }
+  ]
+}

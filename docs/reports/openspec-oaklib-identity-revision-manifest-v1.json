@@ -1,0 +1,852 @@
+{
+  "schema": "atlas.openspec-oaklib-identity-revision-manifest.v1",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "identityPolicy": "CHANGE_QUALIFIED_ID_REQUIRED (<change>:<taskId>, #Lnn locator only)",
+  "taskboardSummary": {
+    "changeCount": 126,
+    "totalTasks": 14842,
+    "ambiguousBareIdCount": 1220,
+    "topAmbiguousBareIds": [
+      {
+        "bareId": "ACE",
+        "changes": [
+          "agent-branch-review-fanout-ace-centroid-aug22",
+          "atlas-directory-first-analysis-v1",
+          "atlas-feature-intelligence",
+          "inference-wiring-deep-audit-aug22",
+          "parent-atlas-ace-bitfrost-cache-correctness",
+          "parent-atlas-ace-rlm-bitfrost-integration",
+          "parent-atlas-agent-framework-integration-hardening",
+          "parent-atlas-best-fit-score-fabric",
+          "parent-atlas-canonical-directory-ingestion-fabric",
+          "parent-atlas-evidence-agent-proposals",
+          "parent-atlas-governed-compute-fabric",
+          "parent-atlas-gpu-prellm-recommendation-v1",
+          "parent-atlas-graph-analysis-contract",
+          "parent-atlas-graph-retrieval-proof",
+          "parent-atlas-multi-agent-wave-plan",
+          "parent-atlas-native-acceleration-cabi",
+          "parent-atlas-nes-lut-single-owner",
+          "parent-atlas-neural-prefill-encoder",
+          "parent-atlas-onnx-webgpu-embedding-promotion",
+          "parent-atlas-ontology-kernel",
+          "parent-atlas-openspec-workstation-synthesis",
+          "parent-atlas-policy-routing-integration",
+          "parent-atlas-retrieval-executor-compatibility-convergence",
+          "parent-atlas-retrieval-lineage-dag-convergence",
+          "parent-atlas-retrieval-lod-algorithm-taxonomy",
+          "parent-atlas-source-qualified-corpus-admission",
+          "parent-atlas-spz-detective-renderer",
+          "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+          "parent-atlas-tensor-residency-integration",
+          "parent-atlas-workboard-feature-utility-fabric",
+          "parent-atlas-workstation-domain-classifier"
+        ]
+      },
+      {
+        "bareId": "JSON",
+        "changes": [
+          "atlas-directory-first-analysis-v1",
+          "evidence-board-dossier-routing",
+          "evidence-relief-source-bound-annotations",
+          "inference-wiring-deep-audit-aug22",
+          "parent-atlas-ace-rlm-bitfrost-integration",
+          "parent-atlas-agentic-repair-bundle-integration",
+          "parent-atlas-ast-summary-lineage-pipeline",
+          "parent-atlas-candidate-feature-execution-fabric",
+          "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+          "parent-atlas-document-governance-master-index",
+          "parent-atlas-evidence-agent-proposals",
+          "parent-atlas-governed-compute-fabric",
+          "parent-atlas-graph-analysis-contract",
+          "parent-atlas-graph-retrieval-proof",
+          "parent-atlas-kafka-projection-initiative",
+          "parent-atlas-kv-cache-adaptation-research",
+          "parent-atlas-native-acceleration-cabi",
+          "parent-atlas-neural-prefill-encoder",
+          "parent-atlas-nlp-sidecar-feature-compiler",
+          "parent-atlas-okf-knowledge-layers",
+          "parent-atlas-openspec-task-triage-pipeline",
+          "parent-atlas-openspec-tasks-audit-fabric",
+          "parent-atlas-openspec-workstation-synthesis",
+          "parent-atlas-retrieval-lineage-dag-convergence",
+          "parent-atlas-retrieval-lod-algorithm-taxonomy",
+          "parent-atlas-rpc-packet-registry-fabric",
+          "parent-atlas-spz-detective-renderer",
+          "parent-atlas-tensor-residency-integration",
+          "phase79-canonical-workflow-action-wiring"
+        ]
+      },
+      {
+        "bareId": "AST",
+        "changes": [
+          "ace-hyperrag-chr97-graphify-audit",
+          "atlas-directory-first-analysis-v1",
+          "parent-atlas-ace-rlm-bitfrost-integration",
+          "parent-atlas-adaptive-backprop-hll-monitoring",
+          "parent-atlas-agent-framework-integration-hardening",
+          "parent-atlas-ast-summary-lineage-pipeline",
+          "parent-atlas-best-fit-score-fabric",
+          "parent-atlas-candidate-feature-execution-fabric",
+          "parent-atlas-chunk-index-whole-file-hash",
+          "parent-atlas-compiler-semantic-graph-resolution",
+          "parent-atlas-evidence-agent-proposals",
+          "parent-atlas-gpu-prellm-recommendation-v1",
+          "parent-atlas-graph-retrieval-proof",
+          "parent-atlas-graph-validation-fabric",
+          "parent-atlas-nes-lut-single-owner",
+          "parent-atlas-neural-prefill-encoder",
+          "parent-atlas-qdrant-structural-payload-enrichment",
+          "parent-atlas-repair-candidate-feature-matrix",
+          "parent-atlas-retrieval-executor-compatibility-convergence",
+          "parent-atlas-retrieval-lineage-dag-convergence",
+          "parent-atlas-retrieval-lod-algorithm-taxonomy",
+          "parent-atlas-rpc-packet-registry-fabric",
+          "parent-atlas-semantic-768-canonical-contract",
+          "parent-atlas-source-qualified-corpus-admission",
+          "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+          "parent-atlas-workboard-feature-utility-fabric",
+          "parent-atlas-workstation-domain-classifier",
+          "svelte-a11y-warning-remediation"
+        ]
+      },
+      {
+        "bareId": "GPU",
+        "changes": [
+          "ace-hyperrag-chr97-graphify-audit",
+          "atlas-directory-first-analysis-v1",
+          "parent-atlas-ace-rlm-bitfrost-integration",
+          "parent-atlas-agent-framework-integration-hardening",
+          "parent-atlas-autoresearch-fabric",
+          "parent-atlas-best-fit-score-fabric",
+          "parent-atlas-candidate-feature-execution-fabric",
+          "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+          "parent-atlas-governed-compute-fabric",
+          "parent-atlas-gpu-runtime-abi-alignment",
+          "parent-atlas-gpu-sidecar-patch-tournament",
+          "parent-atlas-graph-retrieval-proof",
+          "parent-atlas-multi-agent-wave-plan",
+          "parent-atlas-native-acceleration-cabi",
+          "parent-atlas-neural-prefill-encoder",
+          "parent-atlas-nlp-sidecar-feature-compiler",
+          "parent-atlas-onnx-webgpu-embedding-promotion",
+          "parent-atlas-opencode-replay-proof",
+          "parent-atlas-openspec-task-triage-pipeline",
+          "parent-atlas-pass-fabric",
+          "parent-atlas-query-routing-classifier",
+          "parent-atlas-retrieval-executor-compatibility-convergence",
+          "parent-atlas-retrieval-lineage-dag-convergence",
+          "parent-atlas-source-qualified-corpus-admission",
+          "parent-atlas-spz-detective-renderer",
+          "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+          "parent-atlas-tensor-residency-integration",
+          "parent-atlas-xgboost-cuda-runtime-proof"
+        ]
+      },
+      {
+        "bareId": "CPU",
+        "changes": [
+          "atlas-directory-first-analysis-v1",
+          "atlas-feature-intelligence",
+          "courtroom-upload-story-pipeline",
+          "crime-scene-reconstruction",
+          "evidence-analysis-bdd-pipeline",
+          "parent-atlas-ace-rlm-bitfrost-integration",
+          "parent-atlas-agent-framework-integration-hardening",
+          "parent-atlas-agentic-repair-fabric",
+          "parent-atlas-best-fit-score-fabric",
+          "parent-atlas-candidate-feature-execution-fabric",
+          "parent-atlas-canonical-directory-ingestion-fabric",
+          "parent-atlas-evidence-agent-proposals",
+          "parent-atlas-governed-compute-fabric",
+          "parent-atlas-gpu-runtime-abi-alignment",
+          "parent-atlas-graph-analysis-contract",
+          "parent-atlas-graph-retrieval-proof",
+          "parent-atlas-graph-validation-fabric",
+          "parent-atlas-neural-prefill-encoder",
+          "parent-atlas-onnx-webgpu-embedding-promotion",
+          "parent-atlas-policy-routing-integration",
+          "parent-atlas-retrieval-executor-compatibility-convergence",
+          "parent-atlas-retrieval-lineage-dag-convergence",
+          "parent-atlas-retrieval-lod-algorithm-taxonomy",
+          "parent-atlas-source-qualified-corpus-admission",
+          "parent-atlas-spz-detective-renderer",
+          "parent-atlas-tensor-residency-integration",
+          "parent-atlas-workboard-feature-utility-fabric"
+        ]
+      },
+      {
+        "bareId": "NOT",
+        "changes": [
+          "agent-branch-review-fanout-ace-centroid-aug22",
+          "atlas-directory-first-analysis-v1",
+          "codereview-inference-wiring-followup-aug22",
+          "courtroom-upload-story-pipeline",
+          "inference-wiring-deep-audit-aug22",
+          "manual-migration-reconciliation",
+          "parent-atlas-agent-framework-integration-hardening",
+          "parent-atlas-agentic-repair-bundle-integration",
+          "parent-atlas-agentic-repair-fabric",
+          "parent-atlas-analysis-pass-ornith-adapter",
+          "parent-atlas-best-fit-score-fabric",
+          "parent-atlas-compiler-semantic-graph-resolution",
+          "parent-atlas-gpu-sidecar-patch-tournament",
+          "parent-atlas-graph-retrieval-proof",
+          "parent-atlas-graph-runtime-python-consolidation",
+          "parent-atlas-neural-prefill-encoder",
+          "parent-atlas-okf-knowledge-layers",
+          "parent-atlas-onnx-webgpu-embedding-promotion",
+          "parent-atlas-ontology-kernel",
+          "parent-atlas-ontology-oaklib-fanout-bitmap",
+          "parent-atlas-retrieval-fusion-reachability",
+          "parent-atlas-retrieval-lineage-dag-convergence",
+          "parent-atlas-unordered-execution-contract",
+          "parent-atlas-workboard-feature-utility-fabric",
+          "route-import-infra-isolation"
+        ]
+      },
+      {
+        "bareId": "MCP",
+        "changes": [
+          "local-llm-offload-ownership",
+          "parent-atlas-ace-bitfrost-cache-correctness",
+          "parent-atlas-ace-rlm-bitfrost-integration",
+          "parent-atlas-agent-framework-integration-hardening",
+          "parent-atlas-agentic-run-receipt-binding",
+          "parent-atlas-canonical-directory-ingestion-fabric",
+          "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+          "parent-atlas-governed-compute-fabric",
+          "parent-atlas-gpu-sidecar-patch-tournament",
+          "parent-atlas-graph-retrieval-proof",
+          "parent-atlas-multi-agent-wave-plan",
+          "parent-atlas-native-acceleration-cabi",
+          "parent-atlas-neural-prefill-encoder",
+          "parent-atlas-nlp-sidecar-feature-compiler",
+          "parent-atlas-ontology-kernel",
+          "parent-atlas-opencode-replay-proof",
+          "parent-atlas-retrieval-demand-token-budgeting",
+          "parent-atlas-retrieval-fusion-reachability",
+          "parent-atlas-retrieval-lineage-dag-convergence",
+          "parent-atlas-source-qualified-corpus-admission",
+          "parent-atlas-spz-detective-renderer",
+          "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+          "parent-atlas-workstation-domain-classifier"
+        ]
+      },
+      {
+        "bareId": "LINE-5",
+        "changes": [
+          "ace-hyperrag-chr97-graphify-audit",
+          "agent-branch-review-fanout-ace-centroid-aug22",
+          "evidence-board-dossier-routing",
+          "frontend-component-palette-analyzer",
+          "inference-wiring-deep-audit-aug22",
+          "parent-atlas-agent-framework-integration-hardening",
+          "parent-atlas-agentic-repair-bundle-integration",
+          "parent-atlas-branch-merge-consolidation-aug20",
+          "parent-atlas-graph-analysis-contract",
+          "parent-atlas-graph-retrieval-proof",
+          "parent-atlas-graph-validation-fabric",
+          "parent-atlas-multi-agent-wave-plan",
+          "parent-atlas-neural-prefill-encoder",
+          "parent-atlas-openspec-ledger-reconciliation",
+          "parent-atlas-openspec-task-triage-pipeline",
+          "parent-atlas-openspec-workstation-synthesis",
+          "parent-atlas-repair-candidate-feature-matrix",
+          "parent-atlas-retrieval-demand-token-budgeting",
+          "parent-atlas-spz-detective-renderer",
+          "parent-atlas-topology-representation-admission",
+          "phase79-canonical-workflow-action-wiring",
+          "route-import-infra-isolation"
+        ]
+      },
+      {
+        "bareId": "SHA-256",
+        "changes": [
+          "atlas-directory-first-analysis-v1",
+          "courtroom-upload-story-pipeline",
+          "evidence-relief-source-bound-annotations",
+          "frontend-component-palette-analyzer",
+          "inference-wiring-deep-audit-aug22",
+          "local-llm-offload-ownership",
+          "parent-atlas-agent-framework-integration-hardening",
+          "parent-atlas-ast-summary-lineage-pipeline",
+          "parent-atlas-candidate-feature-execution-fabric",
+          "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+          "parent-atlas-document-governance-master-index",
+          "parent-atlas-evidence-agent-proposals",
+          "parent-atlas-gate2-chunk-lineage-convergence",
+          "parent-atlas-gpu-prellm-recommendation-v1",
+          "parent-atlas-graph-analysis-contract",
+          "parent-atlas-neural-prefill-encoder",
+          "parent-atlas-onnx-webgpu-embedding-promotion",
+          "parent-atlas-openspec-tasks-audit-fabric",
+          "parent-atlas-retrieval-executor-compatibility-convergence",
+          "parent-atlas-retrieval-lineage-dag-convergence",
+          "parent-atlas-spz-detective-renderer",
+          "parent-atlas-workstation-domain-classifier"
+        ]
+      },
+      {
+        "bareId": "SQL",
+        "changes": [
+          "agent-branch-review-fanout-ace-centroid-aug22",
+          "atlas-directory-first-analysis-v1",
+          "atlas-feature-intelligence",
+          "manual-migration-reconciliation",
+          "parent-atlas-ace-rlm-bitfrost-integration",
+          "parent-atlas-agentic-repair-bundle-integration",
+          "parent-atlas-ast-summary-lineage-pipeline",
+          "parent-atlas-best-fit-score-fabric",
+          "parent-atlas-branch-merge-consolidation-aug20",
+          "parent-atlas-candidate-feature-execution-fabric",
+          "parent-atlas-chunk-index-whole-file-hash",
+          "parent-atlas-error-embedding-768-migration",
+          "parent-atlas-evidence-agent-proposals",
+          "parent-atlas-graph-retrieval-proof",
+          "parent-atlas-native-acceleration-cabi",
+          "parent-atlas-neural-prefill-encoder",
+          "parent-atlas-nlp-sidecar-feature-compiler",
+          "parent-atlas-retrieval-lineage-dag-convergence",
+          "parent-atlas-semantic-768-canonical-contract",
+          "parent-atlas-source-qualified-corpus-admission",
+          "parent-atlas-spz-detective-renderer",
+          "parent-atlas-workstation-domain-classifier"
+        ]
+      },
+      {
+        "bareId": "LINE-11",
+        "changes": [
+          "agent-branch-review-fanout-ace-centroid-aug22",
+          "case-investigation-layer",
+          "evidence-analysis-bdd-pipeline",
+          "evidence-board-dossier-routing",
+          "feature-label-semantic-derivation",
+          "manual-migration-reconciliation",
+          "parent-atlas-agent-framework-integration-hardening",
+          "parent-atlas-branch-merge-consolidation-aug20",
+          "parent-atlas-gate2-chunk-lineage-convergence",
+          "parent-atlas-multi-agent-wave-plan",
+          "parent-atlas-native-acceleration-cabi",
+          "parent-atlas-neural-prefill-encoder",
+          "parent-atlas-ontology-oaklib-fanout-bitmap",
+          "parent-atlas-openspec-task-triage-pipeline",
+          "parent-atlas-openspec-workstation-synthesis",
+          "parent-atlas-policy-routing-integration",
+          "parent-atlas-repair-candidate-feature-matrix",
+          "parent-atlas-retrieval-demand-token-budgeting",
+          "parent-atlas-unified-symbol-ranking",
+          "parent-atlas-unordered-execution-contract",
+          "route-import-infra-isolation"
+        ]
+      },
+      {
+        "bareId": "API",
+        "changes": [
+          "case-investigation-layer",
+          "evidence-analysis-bdd-pipeline",
+          "evidence-relief-source-bound-annotations",
+          "parent-atlas-ace-rlm-bitfrost-integration",
+          "parent-atlas-agent-framework-integration-hardening",
+          "parent-atlas-best-fit-score-fabric",
+          "parent-atlas-branch-merge-consolidation-aug20",
+          "parent-atlas-document-governance-master-index",
+          "parent-atlas-evidence-agent-proposals",
+          "parent-atlas-governed-compute-fabric",
+          "parent-atlas-graph-validation-fabric",
+          "parent-atlas-native-acceleration-cabi",
+          "parent-atlas-neural-prefill-encoder",
+          "parent-atlas-nlp-sidecar-feature-compiler",
+          "parent-atlas-retrieval-executor-compatibility-convergence",
+          "parent-atlas-source-qualified-corpus-admission",
+          "parent-atlas-spz-detective-renderer",
+          "parent-atlas-topology-representation-admission",
+          "parent-atlas-workstation-domain-classifier",
+          "parent-atlas-xgboost-cuda-runtime-proof"
+        ]
+      },
+      {
+        "bareId": "HTTP",
+        "changes": [
+          "case-investigation-layer",
+          "courtroom-upload-story-pipeline",
+          "inference-wiring-deep-audit-aug22",
+          "local-llm-offload-ownership",
+          "parent-atlas-ace-rlm-bitfrost-integration",
+          "parent-atlas-candidate-feature-execution-fabric",
+          "parent-atlas-canonical-directory-ingestion-fabric",
+          "parent-atlas-graph-retrieval-proof",
+          "parent-atlas-native-acceleration-cabi",
+          "parent-atlas-neural-prefill-encoder",
+          "parent-atlas-nlp-sidecar-feature-compiler",
+          "parent-atlas-ontology-kernel",
+          "parent-atlas-retrieval-lineage-dag-convergence",
+          "parent-atlas-spz-detective-renderer",
+          "parent-atlas-telemetry-lowrank-recommendation-okf-integration"
+        ]
+      },
+      {
+        "bareId": "LINE-12",
+        "changes": [
+          "agent-branch-review-fanout-ace-centroid-aug22",
+          "case-investigation-layer",
+          "evidence-analysis-bdd-pipeline",
+          "frontend-component-palette-analyzer",
+          "inference-wiring-deep-audit-aug22",
+          "manual-migration-reconciliation",
+          "parent-atlas-agent-framework-integration-hardening",
+          "parent-atlas-agentic-repair-bundle-integration",
+          "parent-atlas-chunk-index-whole-file-hash",
+          "parent-atlas-graph-analysis-contract",
+          "parent-atlas-opencode-replay-proof",
+          "parent-atlas-openspec-ledger-reconciliation",
+          "parent-atlas-openspec-workstation-synthesis",
+          "parent-atlas-repair-candidate-feature-matrix",
+          "phase79-canonical-workflow-action-wiring"
+        ]
+      },
+      {
+        "bareId": "LINE-28",
+        "changes": [
+          "case-detail-hud-dossier-polish",
+          "case-investigation-layer",
+          "evidence-analysis-bdd-pipeline",
+          "evidence-relief-source-bound-annotations",
+          "manual-migration-reconciliation",
+          "parent-atlas-agent-framework-integration-hardening",
+          "parent-atlas-agentic-repair-fabric",
+          "parent-atlas-autoresearch-fabric",
+          "parent-atlas-chunk-index-whole-file-hash",
+          "parent-atlas-compiler-semantic-graph-resolution",
+          "parent-atlas-gpu-prellm-recommendation-v1",
+          "parent-atlas-rpc-packet-registry-fabric",
+          "parent-atlas-topology-representation-admission",
+          "parent-atlas-unordered-execution-contract",
+          "route-import-infra-isolation"
+        ]
+      }
+    ]
+  },
+  "topChangesByRemainingWork": [
+    {
+      "changeId": "parent-atlas-neural-prefill-encoder",
+      "total": 2255,
+      "done": 1555,
+      "partial": 0,
+      "open": 700,
+      "sampleQualifiedKeys": [
+        {
+          "qualifiedIdentity": "parent-atlas-neural-prefill-encoder:LINE-5",
+          "locator": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L5",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-neural-prefill-encoder:LINE-8",
+          "locator": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L8",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-neural-prefill-encoder:LINE-11",
+          "locator": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L11",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-neural-prefill-encoder:RRF",
+          "locator": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L62",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-neural-prefill-encoder:LINE-64",
+          "locator": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L64",
+          "status": "DONE"
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-ace-rlm-bitfrost-integration",
+      "total": 1694,
+      "done": 1063,
+      "partial": 4,
+      "open": 627,
+      "sampleQualifiedKeys": [
+        {
+          "qualifiedIdentity": "parent-atlas-ace-rlm-bitfrost-integration:ACE-FEATURE-SOURCE-QUERY-01",
+          "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L38",
+          "status": "OPEN"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-ace-rlm-bitfrost-integration:AR-01",
+          "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L50",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-ace-rlm-bitfrost-integration:AR-02",
+          "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L52",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-ace-rlm-bitfrost-integration:AR-03",
+          "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L53",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-ace-rlm-bitfrost-integration:BF-01",
+          "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L54",
+          "status": "DONE"
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-retrieval-lineage-dag-convergence",
+      "total": 1188,
+      "done": 865,
+      "partial": 0,
+      "open": 323,
+      "sampleQualifiedKeys": [
+        {
+          "qualifiedIdentity": "parent-atlas-retrieval-lineage-dag-convergence:PACKET-REV-02",
+          "locator": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L118",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-retrieval-lineage-dag-convergence:LINE-125",
+          "locator": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L125",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-retrieval-lineage-dag-convergence:LINE-128",
+          "locator": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L128",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-retrieval-lineage-dag-convergence:LINE-132",
+          "locator": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L132",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-retrieval-lineage-dag-convergence:LINE-135",
+          "locator": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L135",
+          "status": "OPEN"
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-best-fit-score-fabric",
+      "total": 714,
+      "done": 422,
+      "partial": 0,
+      "open": 292,
+      "sampleQualifiedKeys": [
+        {
+          "qualifiedIdentity": "parent-atlas-best-fit-score-fabric:DONE",
+          "locator": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L81",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-best-fit-score-fabric:DONE",
+          "locator": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L89",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-best-fit-score-fabric:DONE",
+          "locator": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L94",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-best-fit-score-fabric:DONE",
+          "locator": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L97",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-best-fit-score-fabric:DONE",
+          "locator": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md#L101",
+          "status": "DONE"
+        }
+      ]
+    },
+    {
+      "changeId": "crime-scene-reconstruction",
+      "total": 348,
+      "done": 69,
+      "partial": 61,
+      "open": 218,
+      "sampleQualifiedKeys": [
+        {
+          "qualifiedIdentity": "crime-scene-reconstruction:SCENE-01",
+          "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L10",
+          "status": "OPEN"
+        },
+        {
+          "qualifiedIdentity": "crime-scene-reconstruction:SCENE-02",
+          "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L11",
+          "status": "OPEN"
+        },
+        {
+          "qualifiedIdentity": "crime-scene-reconstruction:SCENE-03",
+          "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L12",
+          "status": "OPEN"
+        },
+        {
+          "qualifiedIdentity": "crime-scene-reconstruction:SCENE-04",
+          "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L13",
+          "status": "OPEN"
+        },
+        {
+          "qualifiedIdentity": "crime-scene-reconstruction:SCENE-05",
+          "locator": "openspec/changes/crime-scene-reconstruction/tasks.md#L14",
+          "status": "OPEN"
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-spz-detective-renderer",
+      "total": 317,
+      "done": 54,
+      "partial": 165,
+      "open": 98,
+      "sampleQualifiedKeys": [
+        {
+          "qualifiedIdentity": "parent-atlas-spz-detective-renderer:SHARP",
+          "locator": "openspec/changes/parent-atlas-spz-detective-renderer/tasks.md#L3",
+          "status": "OPEN"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-spz-detective-renderer:SHARP",
+          "locator": "openspec/changes/parent-atlas-spz-detective-renderer/tasks.md#L4",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-spz-detective-renderer:LINE-5",
+          "locator": "openspec/changes/parent-atlas-spz-detective-renderer/tasks.md#L5",
+          "status": "OPEN"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-spz-detective-renderer:LINE-9",
+          "locator": "openspec/changes/parent-atlas-spz-detective-renderer/tasks.md#L9",
+          "status": "PARTIAL"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-spz-detective-renderer:LINE-10",
+          "locator": "openspec/changes/parent-atlas-spz-detective-renderer/tasks.md#L10",
+          "status": "OPEN"
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-ml-graph-retrieval-convergence",
+      "total": 254,
+      "done": 72,
+      "partial": 0,
+      "open": 182,
+      "sampleQualifiedKeys": [
+        {
+          "qualifiedIdentity": "parent-atlas-ml-graph-retrieval-convergence:AUDIT-01",
+          "locator": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L7",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-ml-graph-retrieval-convergence:AUDIT-02",
+          "locator": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L8",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-ml-graph-retrieval-convergence:AUDIT-03",
+          "locator": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L9",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-ml-graph-retrieval-convergence:AUDIT-04",
+          "locator": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L10",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-ml-graph-retrieval-convergence:AUDIT-05",
+          "locator": "openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L11",
+          "status": "DONE"
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-governed-compute-fabric",
+      "total": 180,
+      "done": 2,
+      "partial": 0,
+      "open": 178,
+      "sampleQualifiedKeys": [
+        {
+          "qualifiedIdentity": "parent-atlas-governed-compute-fabric:COMPUTE-BACKEND-RECONCILE-01",
+          "locator": "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md#L19",
+          "status": "OPEN"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-governed-compute-fabric:COMPUTE-DEEP-AGENTS-DECISION-01",
+          "locator": "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md#L22",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-governed-compute-fabric:COMPUTE-NESTED-OWNER-01",
+          "locator": "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md#L25",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-governed-compute-fabric:LINE-48",
+          "locator": "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md#L48",
+          "status": "OPEN"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-governed-compute-fabric:LINE-56",
+          "locator": "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md#L56",
+          "status": "OPEN"
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-tensor-residency-integration",
+      "total": 343,
+      "done": 180,
+      "partial": 3,
+      "open": 160,
+      "sampleQualifiedKeys": [
+        {
+          "qualifiedIdentity": "parent-atlas-tensor-residency-integration:LINE-3",
+          "locator": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md#L3",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-tensor-residency-integration:APPLY_PROVEN",
+          "locator": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md#L22",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-tensor-residency-integration:T2-",
+          "locator": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md#L32",
+          "status": "OPEN"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-tensor-residency-integration:LINE-188",
+          "locator": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md#L188",
+          "status": "OPEN"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-tensor-residency-integration:LINE-190",
+          "locator": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md#L190",
+          "status": "DONE"
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-ontology-kernel",
+      "total": 412,
+      "done": 250,
+      "partial": 2,
+      "open": 160,
+      "sampleQualifiedKeys": [
+        {
+          "qualifiedIdentity": "parent-atlas-ontology-kernel:LINE-285",
+          "locator": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L285",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-ontology-kernel:LINE-291",
+          "locator": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L291",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-ontology-kernel:LINE-295",
+          "locator": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L295",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-ontology-kernel:LINE-299",
+          "locator": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L299",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-ontology-kernel:LINE-301",
+          "locator": "openspec/changes/parent-atlas-ontology-kernel/tasks.md#L301",
+          "status": "DONE"
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-candidate-feature-execution-fabric",
+      "total": 471,
+      "done": 311,
+      "partial": 0,
+      "open": 160,
+      "sampleQualifiedKeys": [
+        {
+          "qualifiedIdentity": "parent-atlas-candidate-feature-execution-fabric:CFF-TAXONOMY-01",
+          "locator": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md#L8",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-candidate-feature-execution-fabric:CFF-EXPANSION-01",
+          "locator": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md#L12",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-candidate-feature-execution-fabric:CFF-PLAN-01",
+          "locator": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md#L15",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-candidate-feature-execution-fabric:CFF-RLM-CACHE-01",
+          "locator": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md#L19",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-candidate-feature-execution-fabric:CFF-QUERY-SHADOW-01",
+          "locator": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md#L24",
+          "status": "DONE"
+        }
+      ]
+    },
+    {
+      "changeId": "parent-atlas-pass-fabric",
+      "total": 184,
+      "done": 36,
+      "partial": 0,
+      "open": 148,
+      "sampleQualifiedKeys": [
+        {
+          "qualifiedIdentity": "parent-atlas-pass-fabric:DB-READY-TRISTATE-01",
+          "locator": "openspec/changes/parent-atlas-pass-fabric/tasks.md#L252",
+          "status": "OPEN"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-pass-fabric:LINE-465",
+          "locator": "openspec/changes/parent-atlas-pass-fabric/tasks.md#L465",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-pass-fabric:LINE-466",
+          "locator": "openspec/changes/parent-atlas-pass-fabric/tasks.md#L466",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-pass-fabric:LINE-467",
+          "locator": "openspec/changes/parent-atlas-pass-fabric/tasks.md#L467",
+          "status": "DONE"
+        },
+        {
+          "qualifiedIdentity": "parent-atlas-pass-fabric:LINE-478",
+          "locator": "openspec/changes/parent-atlas-pass-fabric/tasks.md#L478",
+          "status": "OPEN"
+        }
+      ]
+    }
+  ],
+  "postgresRevisionShadowCheck": {
+    "connected": true,
+    "readOnly": true,
+    "phase20DeferralActive": true,
+    "revisionQualified": "NOT_PROVEN",
+    "chunkCounts": {
+      "total_chunks": 274465,
+      "embedded_768_chunks": 274428
+    }
+  },
+  "manifestSha256": "a7e19ed07a2dbeb098fe05eacb8defb672fb49bfd092a35f21c1c8d208a6eedd"
+}

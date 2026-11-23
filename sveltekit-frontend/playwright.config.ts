@@ -124,6 +124,9 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      // This test requires a real WebGPU adapter; do not let the GPU-disabled
+      // default project report WebGPU as unavailable.
+      testIgnore: ['**/courtroom-palette-chat-webgpu.spec.ts'],
       use: {
         ...devices['Desktop Chrome'],
         // Enable features needed for the legal AI platform
@@ -140,7 +143,7 @@ export default defineConfig({
     },
     {
       name: 'chromium-webgpu',
-      testMatch: ['**/client-inference*', '**/e2b-client-inference*'],
+      testMatch: ['**/client-inference*', '**/e2b-client-inference*', '**/courtroom-palette-chat-webgpu.spec.ts'],
       use: {
         ...devices['Desktop Chrome'],
         launchOptions: {

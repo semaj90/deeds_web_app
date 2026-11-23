@@ -197,6 +197,21 @@ export const SceneIntentCitationV1 = z.discriminatedUnion('source', [
     source_revision: z.string().regex(SHA256_REVISION),
     event_ref: z.string().min(1).max(200),
   }),
+  z.object({
+    source: z.literal('image_observation'),
+    evidence_id: z.string().min(1),
+    source_revision: z.string().regex(SHA256_REVISION),
+    analysis_revision: z.string().min(1).max(512).optional(),
+    observation_revision: z.string().regex(SHA256_REVISION).optional(),
+    artifact_sha256: z.string().regex(SHA256_REVISION).optional(),
+    frame_timestamp_s: z.number().nonnegative().optional(),
+    frame_index: z.number().int().nonnegative().optional(),
+    observation_id: z.string().min(1).optional(),
+    observation_kind: z.enum(['detection', 'segmentation_mask', 'relative_depth', 'scene_context', 'image_ocr_span', 'unclassified']).default('detection'),
+    artifact_uri: z.string().optional(),
+    confidence: z.number().min(0).max(1).optional(),
+    model_version: z.string().optional(),
+  }),
 ]);
 export type SceneIntentCitationV1 = z.infer<typeof SceneIntentCitationV1>;
 

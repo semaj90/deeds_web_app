@@ -8,12 +8,13 @@ PageRank-ranked, paginated view of the top open tasks.
 Writes ONLY new report files under --out-dir (default docs/reports/).
 Never edits tasks.md, the workboard, PostgreSQL, Valkey, Qdrant or Neo4j.
 
-Pipeline (CPU, stdlib + networkx; sized for ~7k rows):
-  1. git ls-files -> tasks.md inventory, excluding archive/duplicate copies
-  2. parse "- [ ]" / "- [x]" lines, section headers, task codes, cross-refs
-  3. directed graph: task -> task it cites (networkx PageRank, damping 0.85)
-  4. rank OPEN tasks by PageRank, tie-break by stable id
-  5. emit full JSONL, top-K JSONL with page numbers, and a manifest with sha256
+Pipeline (CPU, stdlib + networkx; task identity before acceleration):
+  1. git ls-files --cached --others --exclude-standard -> local task inventory
+  2. detect UTF-8 / UTF-16 and quarantine invalid encoding instead of replacement decoding
+  3. parse open/partial/done checkboxes, declared task codes and source revisions
+  4. directed graph: task -> task it cites (networkx PageRank, damping 0.85)
+  5. rank OPEN tasks by PageRank, tie-break by stable id
+  6. emit full JSONL, top-K JSONL with page numbers, and a manifest with sha256
 
 Usage (from repo root):
   python scripts/atlas/openspec-task-extract-v1.py --out-dir docs/reports --top 1000 --page-size 100
@@ -26,11 +27,16 @@ import os
 import re
 import subprocess
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 
-CHECKBOX = re.compile(r"^\s*[-*]\s\[( |x|X)\]\s(.*)$")
+CHECKBOX = re.compile(r"^\s*[-*]\s\[( |x|X|~)\]\s(.*)$")
 HEADER = re.compile(r"^(#{1,6})\s+(.*)$")
-TASK_CODE = re.compile(r"^\**\s*([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{1,3}[a-z]?)\b")
+# Mirrors scripts/atlas/lib/wfu-metadata.mjs::WFU_ID so this scan does not
+# silently narrow the workboard's declared-ID syntax. This is still only the
+# literal ID at the start of a checkbox item; it is not a generated task key.
+TASK_CODE = re.compile(
+    r"^(?:\*\*)?`?((?=[A-Z0-9-]*\d)[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+[a-z]?|\d+(?:\.\d+)+[a-z]?)`?\b"
+)
 REF_CODE = re.compile(r"\b([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{2,3}[a-z]?)\b")
 EXCLUDE = re.compile(r"(archive|phase-110|phase_|/v2/|^v2/|parent_atlas_tensor_residency_integration_v2)")
 TEXT_LIMIT = 400
@@ -38,7 +44,8 @@ TEXT_LIMIT = 400
 
 def git_tasks(root):
     out = subprocess.run(
-        ["git", "ls-files"], cwd=root, capture_output=True, text=True, check=True
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard"],
+        cwd=root, capture_output=True, text=True, check=True
     ).stdout.splitlines()
     files = [p.replace("\\", "/") for p in out if re.search(r"(^|/)tasks\.md$", p)]
     return sorted(p for p in files if not EXCLUDE.search(p))
@@ -51,35 +58,92 @@ def change_id(path):
     return os.path.basename(os.path.dirname(path)) or path
 
 
+def decode_task_bytes(raw):
+    """Decode task Markdown without silently replacing bytes or inventing rows."""
+    if raw.startswith(b"\xef\xbb\xbf"):
+        return raw.decode("utf-8-sig", errors="strict"), "utf-8-bom", None
+    if raw.startswith(b"\xff\xfe"):
+        return raw.decode("utf-16-le", errors="strict"), "utf-16-le-bom", None
+    if raw.startswith(b"\xfe\xff"):
+        return raw.decode("utf-16-be", errors="strict"), "utf-16-be-bom", None
+
+    # BOM-less UTF-16 ASCII text has a strong alternating-NUL signal. Detect it
+    # before UTF-8 so it cannot be misreported as malformed UTF-8.
+    if len(raw) >= 8 and len(raw) % 2 == 0:
+        even_nuls = sum(value == 0 for value in raw[0::2])
+        odd_nuls = sum(value == 0 for value in raw[1::2])
+        pairs = len(raw) // 2
+        if odd_nuls / pairs >= 0.25 and even_nuls / pairs < 0.05:
+            return raw.decode("utf-16-le", errors="strict"), "utf-16-le-no-bom", None
+        if even_nuls / pairs >= 0.25 and odd_nuls / pairs < 0.05:
+            return raw.decode("utf-16-be", errors="strict"), "utf-16-be-no-bom", None
+
+    try:
+        return raw.decode("utf-8", errors="strict"), "utf-8", None
+    except UnicodeDecodeError as exc:
+        return None, "invalid-utf8", {"byteStart": exc.start, "byteEnd": exc.end, "reason": exc.reason}
+
+
 def parse_file(root, rel):
     tasks = []
     header = ""
-    with open(os.path.join(root, rel), encoding="utf-8", errors="replace") as fh:
-        for lineno, raw in enumerate(fh, start=1):
-            line = raw.rstrip("\r\n")
-            h = HEADER.match(line)
-            if h:
-                header = h.group(2).strip()[:200]
-                continue
-            c = CHECKBOX.match(line)
-            if not c:
-                continue
-            mark, text = c.group(1), c.group(2).strip()
-            code_m = TASK_CODE.match(text)
-            code = code_m.group(1) if code_m else None
-            refs = sorted({r for r in REF_CODE.findall(text) if r != code})
-            tasks.append({
-                "id": f"{rel}#L{lineno}",
-                "file": rel,
-                "change_id": change_id(rel),
-                "line": lineno,
-                "status": "done" if mark.lower() == "x" else "open",
-                "task_code": code,
-                "section": header,
-                "text": text[:TEXT_LIMIT],
-                "refs": refs,
-            })
-    return tasks
+    path = os.path.join(root, rel)
+    try:
+        with open(path, "rb") as fh:
+            raw_bytes = fh.read()
+    except OSError as exc:
+        return tasks, {"file": rel, "sha256": None, "encoding": "unreadable", "decodeStatus": "READ_ERROR", "errorType": type(exc).__name__, "taskRows": 0}
+
+    file_hash = hashlib.sha256(raw_bytes).hexdigest()
+    try:
+        content, encoding, decode_error = decode_task_bytes(raw_bytes)
+    except UnicodeDecodeError as exc:
+        content, encoding = None, "invalid-utf16"
+        decode_error = {"byteStart": exc.start, "byteEnd": exc.end, "reason": exc.reason}
+
+    if content is None:
+        return tasks, {
+            "file": rel, "sha256": file_hash, "encoding": encoding,
+            "decodeStatus": "INVALID_ENCODING", "decodeError": decode_error, "taskRows": 0,
+        }
+
+    for lineno, raw_line in enumerate(content.splitlines(), start=1):
+        line = raw_line.rstrip("\r")
+        h = HEADER.match(line)
+        if h:
+            header = h.group(2).strip()[:200]
+            continue
+        c = CHECKBOX.match(line)
+        if not c:
+            continue
+        mark, text = c.group(1), c.group(2).strip()
+        code_m = TASK_CODE.match(text)
+        code = code_m.group(1) if code_m else None
+        refs = sorted({r for r in REF_CODE.findall(text) if r != code})
+        tasks.append({
+            # `id` remains a source locator; task_code is the declared ID when present.
+            "id": f"{rel}#L{lineno}",
+            "file": rel,
+            "change_id": change_id(rel),
+            "line": lineno,
+            "sourceFileRevision": f"sha256:{file_hash}",
+            "taskLineChecksum": hashlib.sha256(raw_line.encode("utf-8")).hexdigest(),
+            "status": "done" if mark.lower() == "x" else "partial" if mark == "~" else "open",
+            "task_code": code,
+            "identityState": "DECLARED_TASK_CODE" if code else "NO_DECLARED_TASK_CODE",
+            "section": header,
+            "text": text[:TEXT_LIMIT],
+            "refs": refs,
+        })
+    return tasks, {
+        "file": rel, "sha256": file_hash, "encoding": encoding,
+        "decodeStatus": "OK", "taskRows": len(tasks),
+    }
+
+
+def git_value(root, *args):
+    result = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True)
+    return result.stdout.strip() if result.returncode == 0 else None
 
 
 def build_graph(tasks):
@@ -162,8 +226,27 @@ def main():
 
     files = git_tasks(root)
     tasks = []
+    input_files = []
     for rel in files:
-        tasks.extend(parse_file(root, rel))
+        file_tasks, file_record = parse_file(root, rel)
+        tasks.extend(file_tasks)
+        input_files.append(file_record)
+
+    scoped_declared_ids = Counter(
+        (task["change_id"], task["task_code"])
+        for task in tasks
+        if task["task_code"]
+    )
+    for task in tasks:
+        if task["task_code"] and scoped_declared_ids[(task["change_id"], task["task_code"])] > 1:
+            task["identityState"] = "AMBIGUOUS_DUPLICATE_DECLARED_TASK_CODE"
+
+    source_manifest_bytes = json.dumps(
+        [{"file": item["file"], "sha256": item["sha256"]} for item in input_files],
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    source_manifest_checksum = "sha256:" + hashlib.sha256(source_manifest_bytes).hexdigest()
 
     nodes, out_edges, in_degree, edge_count = build_graph(tasks)
     pr = pagerank(nodes, out_edges, damping=args.damping)
@@ -195,6 +278,15 @@ def main():
         "schema": "atlas.openspec-task-extract.v1",
         "generatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
         "canonicalAuthority": False,
+        "producer": {
+            "path": "scripts/atlas/openspec-task-extract-v1.py",
+            "sha256": sha256_file(__file__),
+        },
+        "invocation": sys.argv,
+        "workspaceHead": git_value(root, "rev-parse", "HEAD"),
+        "workspaceBranch": git_value(root, "branch", "--show-current"),
+        "inputMode": "working-tree tracked plus untracked non-ignored task files",
+        "sourceManifestChecksum": source_manifest_checksum,
         "params": {
             "root": ".",
             "top": args.top,
@@ -205,10 +297,27 @@ def main():
             "excludePattern": EXCLUDE.pattern,
             "rankBy": "pagerank desc, in_degree desc, id asc",
         },
-        "inputs": {"tasksMdFiles": len(files)},
+        "inputs": {
+            "tasksMdFiles": len(files),
+            "files": input_files,
+            "sourceManifestChecksum": source_manifest_checksum,
+            "encodingIssueFiles": sum(1 for item in input_files if item["decodeStatus"] != "OK"),
+            "declaredTaskCodeRows": sum(1 for task in tasks if task["task_code"]),
+            "rowsWithoutDeclaredTaskCode": sum(1 for task in tasks if not task["task_code"]),
+            "openRowsWithoutDeclaredTaskCode": sum(
+                1 for task in tasks if task["status"] == "open" and not task["task_code"]
+            ),
+            "duplicateDeclaredTaskCodeGroupsWithinChange": sum(
+                1 for count in scoped_declared_ids.values() if count > 1
+            ),
+            "rowsWithDuplicateDeclaredTaskCodeWithinChange": sum(
+                count for count in scoped_declared_ids.values() if count > 1
+            ),
+        },
         "counts": {
             "rows": len(tasks),
             "open": status_counts["open"],
+            "partial": status_counts["partial"],
             "done": status_counts["done"],
             "graphNodes": len(nodes),
             "graphEdges": edge_count,
@@ -228,7 +337,13 @@ def main():
     print(json.dumps({"manifest": os.path.relpath(manifest_path, root),
                       "all": os.path.relpath(full_path, root),
                       "top": os.path.relpath(top_path, root),
-                      "counts": manifest["counts"]}, indent=2))
+                      "counts": manifest["counts"],
+                      "workspaceHead": manifest["workspaceHead"],
+                      "sourceManifestChecksum": source_manifest_checksum,
+                      "encodingIssueFiles": manifest["inputs"]["encodingIssueFiles"],
+                      "rowsWithoutDeclaredTaskCode": manifest["inputs"]["rowsWithoutDeclaredTaskCode"],
+                      "openRowsWithoutDeclaredTaskCode": manifest["inputs"]["openRowsWithoutDeclaredTaskCode"],
+                      "duplicateDeclaredTaskCodeGroupsWithinChange": manifest["inputs"]["duplicateDeclaredTaskCodeGroupsWithinChange"]}, indent=2))
     return 0
 
 

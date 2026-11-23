@@ -60,7 +60,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		return json({ success: true, data: result, message: result.replayed ? 'Replayed' : 'Saved' }, { status: result.replayed ? 200 : 201 });
 	} catch (cause) {
 		const message = cause instanceof Error ? cause.message : 'Scene revision save failed';
-		if (message === 'SCENE_REVISION_CONFLICT' || message === 'SCENE_REVISION_PARENT_HASH_MISMATCH' || message === 'SCENE_REVISION_COMMAND_REUSE') {
+		if (message === 'SCENE_REVISION_CONFLICT' || message === 'SCENE_REVISION_PARENT_HASH_MISMATCH' || message === 'SCENE_REVISION_COMMAND_REUSE' || message === 'SCENE_REVISION_IMAGE_CHAPTER_CHANGED') {
 			return json({ success: false, data: null, message }, { status: 409 });
 		}
 		if (message.startsWith('SCENE_REVISION_')) return json({ success: false, data: null, message }, { status: 400 });

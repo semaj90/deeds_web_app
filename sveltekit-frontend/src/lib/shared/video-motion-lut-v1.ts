@@ -8,6 +8,10 @@ export const VIDEO_MOTION_LUT_BIT_DEPTH_V1 = 4;
 export const VIDEO_MOTION_LUT_HEADER_BYTES_V1 = 16;
 export const VIDEO_MOTION_LUT_PIXEL_BYTES_V1 = VIDEO_MOTION_LUT_WIDTH_V1 * VIDEO_MOTION_LUT_HEIGHT_V1 / 2;
 export const VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1 = VIDEO_MOTION_LUT_HEADER_BYTES_V1 + VIDEO_MOTION_LUT_PIXEL_BYTES_V1;
+export const VIDEO_MOTION_COMPACT_LOD_V1 = Object.freeze({
+	level: 3, width: 32, height: 64, byteLength: 1024,
+	token: '32x64', contentType: 'application/vnd.atlas.video-motion-lod-4bpp-v1',
+});
 /** Canonical display lookup: 16 evenly spaced grayscale values for the packed 4-bit motion index. */
 export const VIDEO_MOTION_GRAYSCALE_LUT_V1 = Object.freeze([
 	0, 17, 34, 51, 68, 85, 102, 119, 136, 153, 170, 187, 204, 221, 238, 255,
@@ -40,6 +44,59 @@ export const videoMotionLutManifestV1Schema = z.object({
 });
 
 export type VideoMotionLutManifestV1 = z.infer<typeof videoMotionLutManifestV1Schema>;
+
+/** Separate, denser motion-only sample. It is not a detector/keyframe index. */
+export const videoMotionSampleManifestV1Schema = z.object({
+	schema: z.literal('atlas.video-motion-sample.v1'),
+	processingRevision: z.literal(VIDEO_MOTION_LUT_PROCESSING_REVISION_V1),
+	evidenceId: z.string().uuid(),
+	sourceRevision: z.string().min(1),
+	analysisRevision: z.string().min(1),
+	sampleIndex: z.number().int().nonnegative(),
+	width: z.literal(VIDEO_MOTION_LUT_WIDTH_V1),
+	height: z.literal(VIDEO_MOTION_LUT_HEIGHT_V1),
+	bitDepth: z.literal(VIDEO_MOTION_LUT_BIT_DEPTH_V1),
+	packing: z.literal('row-major-even-pixel-low-nibble-first'),
+	reviewState: z.literal('UNREVIEWED_PIXEL_CHANGE_CUE'),
+	previousTimestampMs: z.number().int().nonnegative().nullable(),
+	timestampMs: z.number().int().nonnegative(),
+	motionScore: z.number().min(0).max(1),
+	artifact: z.object({
+		bucket: z.string().min(1),
+		objectKey: z.string().min(1),
+		sha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+		byteLength: z.literal(VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1),
+		sourceRevision: z.string().min(1),
+		analysisRevision: z.string().min(1),
+	}),
+});
+
+export type VideoMotionSampleManifestV1 = z.infer<typeof videoMotionSampleManifestV1Schema>;
+
+/** A dense motion sample must reference the immediately preceding valid sample. */
+export function hasValidMotionSampleComparisonV1(
+	sample: VideoMotionSampleManifestV1,
+	samples: readonly unknown[],
+): boolean {
+	if (sample.sampleIndex === 0) return sample.previousTimestampMs === null && sample.motionScore === 0;
+	if (sample.previousTimestampMs === null || sample.previousTimestampMs > sample.timestampMs) return false;
+	const previous = samples[sample.sampleIndex - 1];
+	if (!previous || typeof previous !== 'object' || Array.isArray(previous)) return false;
+	const record = previous as Record<string, unknown>;
+	return record.sampleIndex === sample.sampleIndex - 1 && record.timestampMs === sample.previousTimestampMs &&
+		record.sourceRevision === sample.sourceRevision && record.analysisRevision === sample.analysisRevision;
+}
+
+/** Validate the timestamp relationship recorded by the sequential frame sampler. */
+export function hasValidMotionComparisonV1(tile: VideoMotionLutManifestV1, frames: readonly unknown[]): boolean {
+	if (tile.previousTimestampMs === null) return tile.motionScore === 0;
+	if (tile.frameIndex < 1 || tile.previousTimestampMs > tile.timestampMs) return false;
+	const previous = frames[tile.frameIndex - 1];
+	if (!previous || typeof previous !== 'object' || Array.isArray(previous)) return false;
+	const frame = previous as Record<string, unknown>;
+	return frame.frameIndex === tile.frameIndex - 1 && frame.timestampMs === tile.previousTimestampMs
+		&& frame.sourceRevision === tile.sourceRevision && frame.analysisRevision === tile.analysisRevision;
+}
 
 export interface EncodedVideoMotionLutV1 {
 	readonly bytes: Uint8Array;
@@ -92,8 +149,8 @@ export function encodeVideoMotionLutV1(previousLuma: Uint8Array | null, currentL
 	});
 }
 
-/** Decode a checked tile to one 0..15 index per pixel for preview rendering. */
-export function decodeVideoMotionLutIndicesV1(bytes: Uint8Array): Uint8Array {
+/** Read the packed payload from a validated canonical motion artifact. */
+export function readPackedVideoMotionLutV1(bytes: Uint8Array): PackedMotionLodV1 {
 	if (bytes.byteLength !== VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1) throw new RangeError('Invalid motion LUT artifact length.');
 	for (let i = 0; i < MAGIC.length; i += 1) {
 		if (bytes[i] !== MAGIC[i]) throw new RangeError('Invalid motion LUT magic.');
@@ -106,14 +163,46 @@ export function decodeVideoMotionLutIndicesV1(bytes: Uint8Array): Uint8Array {
 		header.getUint8(13) !== 0 ||
 		header.getUint16(14, true) !== 0
 	) throw new RangeError('Unsupported motion LUT header.');
+	return {
+		level: 4,
+		width: VIDEO_MOTION_LUT_WIDTH_V1,
+		height: VIDEO_MOTION_LUT_HEIGHT_V1,
+		data: bytes.subarray(VIDEO_MOTION_LUT_HEADER_BYTES_V1),
+	};
+}
 
+/** Decode a checked tile to one 0..15 index per pixel for preview rendering. */
+export function decodeVideoMotionLutIndicesV1(bytes: Uint8Array): Uint8Array {
+	const { data } = readPackedVideoMotionLutV1(bytes);
 	const pixelCount = VIDEO_MOTION_LUT_WIDTH_V1 * VIDEO_MOTION_LUT_HEIGHT_V1;
 	const indices = new Uint8Array(pixelCount);
 	for (let pixel = 0; pixel < pixelCount; pixel += 1) {
-		const packed = bytes[VIDEO_MOTION_LUT_HEADER_BYTES_V1 + (pixel >>> 1)]!;
+		const packed = data[pixel >>> 1]!;
 		indices[pixel] = pixel & 1 ? packed >>> 4 : packed & 0x0f;
 	}
 	return indices;
+}
+
+/** Max-pool 2×2 cells directly from the packed canonical payload. */
+export function compactPackedMotionLodV1(source: PackedMotionLodV1): PackedMotionLodV1 {
+	if (source.width !== VIDEO_MOTION_LUT_WIDTH_V1 || source.height !== VIDEO_MOTION_LUT_HEIGHT_V1
+		|| source.data.byteLength !== VIDEO_MOTION_LUT_PIXEL_BYTES_V1) {
+		throw new RangeError('Compact motion preview requires a canonical 64×128 packed tile.');
+	}
+	const { level, width, height, byteLength } = VIDEO_MOTION_COMPACT_LOD_V1;
+	const data = new Uint8Array(byteLength);
+	const rowBytes = VIDEO_MOTION_LUT_WIDTH_V1 / 2;
+	for (let y = 0; y < height; y++) {
+		const topOffset = y * 2 * rowBytes;
+		for (let x = 0; x < width; x++) {
+			const top = source.data[topOffset + x]!;
+			const bottom = source.data[topOffset + rowBytes + x]!;
+			const index = Math.max(top & 15, top >>> 4, bottom & 15, bottom >>> 4);
+			const output = (y * width + x) >>> 1;
+			data[output] = data[output]! | (index << ((x & 1) * 4));
+		}
+	}
+	return { level, width, height, data };
 }
 
 /** Build stable max-pooled 4-bit display levels, ordered smallest to largest. */
@@ -149,4 +238,29 @@ export function buildPackedMotionLodsV1(indices: Uint8Array): PackedMotionLodV1[
 		height = nextHeight;
 	}
 	return levels.reverse().map((level, index) => Object.freeze({ ...level, level: index }));
+}
+
+/** Choose the largest packed level that fits the physical display footprint without oversampling. */
+export function selectPackedMotionLodV1(
+	lods: readonly PackedMotionLodV1[],
+	targetWidthPx: number,
+	targetHeightPx: number,
+): PackedMotionLodV1 {
+	if (!Array.isArray(lods) || lods.length === 0) throw new RangeError('At least one packed motion LOD is required.');
+	if (!Number.isFinite(targetWidthPx) || targetWidthPx <= 0 || !Number.isFinite(targetHeightPx) || targetHeightPx <= 0) {
+		throw new RangeError('Motion LOD target dimensions must be positive finite pixel sizes.');
+	}
+	for (const lod of lods) {
+		if (!Number.isSafeInteger(lod.level) || lod.level < 0 || !Number.isSafeInteger(lod.width) || lod.width < 2
+			|| lod.width % 2 !== 0 || !Number.isSafeInteger(lod.height) || lod.height < 1
+			|| lod.data.byteLength !== (lod.width * lod.height) / 2) {
+			throw new RangeError('Packed motion LOD dimensions or payload are invalid.');
+		}
+	}
+	const sorted = [...lods].sort((a, b) => a.width * a.height - b.width * b.height || a.level - b.level);
+	const targetWidth = Math.floor(targetWidthPx);
+	const targetHeight = Math.floor(targetHeightPx);
+	const fitting = sorted.filter((lod) => lod.width <= targetWidth && lod.height <= targetHeight);
+	// Below the smallest level, retain the minimum tile; above the largest, use the source level.
+	return fitting[fitting.length - 1] ?? sorted[0]!;
 }

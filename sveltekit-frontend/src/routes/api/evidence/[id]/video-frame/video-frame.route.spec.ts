@@ -16,8 +16,9 @@ vi.mock('$lib/server/env.server.js', () => ({ ENV: { SEAWEED_ARTIFACTS_BUCKET: '
 
 import { GET } from './[frameIndex]/+server.js';
 
-function event(frameIndex = '0', userId: string | null = '7') {
-	return { params: { id: EVIDENCE_ID, frameIndex }, locals: { user: userId ? { id: userId } : null } } as never;
+function event(frameIndex = '0', userId: string | null = '7', bindings: Record<string, string> = {}) {
+	return { params: { id: EVIDENCE_ID, frameIndex }, locals: { user: userId ? { id: userId } : null },
+		url: new URL(`http://localhost/frame?${new URLSearchParams(bindings)}`) } as never;
 }
 
 describe('GET /api/evidence/[id]/video-frame/[frameIndex]', () => {
@@ -73,5 +74,12 @@ describe('GET /api/evidence/[id]/video-frame/[frameIndex]', () => {
 		const response = await GET(event());
 		expect(response.status).toBe(409);
 		expect(mocks.objectReads).toBe(1);
+	});
+
+	it('rejects a stale storybook frame locator before fetching bytes', async () => {
+		expect((await GET(event('0', '7', { analysisRevision: 'older-run', artifactSha256: FRAME_SHA }))).status).toBe(409);
+		expect((await GET(event('0', '7', { analysisRevision: 'analysis-1', artifactSha256: SOURCE_REVISION }))).status).toBe(409);
+		expect(mocks.objectReads).toBe(0);
+		expect((await GET(event('0', '7', { analysisRevision: 'analysis-1', artifactSha256: FRAME_SHA }))).status).toBe(200);
 	});
 });

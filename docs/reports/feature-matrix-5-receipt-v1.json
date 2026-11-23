@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.feature-matrix-5-arrow-receipt.v1",
+  "arrowPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\feature_matrix_5.arrow",
+  "arrowSha256": "sha256:099455512686b9baaa7b360f41c8050a8de92bebc970e1d55423b3b2a414a5a2",
+  "arrowBytes": 60338,
+  "rowCount": 200,
+  "columns": [
+    "chunk_id",
+    "source_ref",
+    "source_revision",
+    "chunk_sha256",
+    "features",
+    "presence_mask"
+  ],
+  "featureColumns": [
+    "entropy_norm",
+    "ast_signal",
+    "domain_fit",
+    "authority_norm",
+    "execution_utility"
+  ],
+  "executionUtilityMaskedCount": 200,
+  "readbackVerified": true,
+  "canonicalAuthority": false,
+  "dbWritesPerformed": false
+}

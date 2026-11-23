@@ -25,6 +25,8 @@ export type { ArtifactDecision, RankerInput, RankerOutput } from './ranking/supe
 // Validation (Phase 2.5)
 export { executeGanDeepAudit, analyzeTokenSavings, generateAgenticRecommendations, auditProductionHardening } from './validation/gan-deep-audit.js';
 export { GanAuditOrchestrator } from './validation/gan-audit-integration.js';
+export { buildGanMcpHookObservationV1, classifyGanValidationStatusV1 } from './validation/gan-validation-hook-v1.js';
+export type { GanMcpHookObservationV1, GanMcpHookLaneV1, GanProofGateV1, GanValidationProofInputV1, GanValidationStatusV1 } from './validation/gan-validation-hook-v1.js';
 export { createGanAuditDependencies, createMinimalGanAuditDependencies } from './validation/gan-audit-client-factory.js';
 export type { GanDeepAuditConfig, GanDeepAuditResult } from './validation/gan-deep-audit.js';
 export type { GanAuditDependencies } from './validation/gan-audit-integration.js';

@@ -1,0 +1,633 @@
+{
+  "schema": "atlas.doc14-outside-scan-cohort-ace-proof.v1",
+  "cohortCount": 47,
+  "pgMatchedTargetCount": 35,
+  "pgMatchedTargetsSample": [
+    {
+      "sourceRef": "packages/atlas-core/src/index.ts",
+      "matchedPath": "packages/atlas-core/src/index.ts",
+      "relativePath": "packages/atlas-core/src/index.ts",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "fileContentHash": "bee37ef3ef16c30c7ec280c2ba276f225af6a475e85266c9e9461616ab055266",
+      "chunkCount": 4
+    },
+    {
+      "sourceRef": "packages/atlas-core/src/langgraph/worker.ts",
+      "matchedPath": "packages/atlas-core/src/langgraph/worker.ts",
+      "relativePath": "packages/atlas-core/src/langgraph/worker.ts",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "fileContentHash": "853e1d4ef816d056b914378259e1388c92c60d73d389de7818a4b104ba612baa",
+      "chunkCount": 29
+    },
+    {
+      "sourceRef": "packages/atlas-core/src/packet/identity.ts",
+      "matchedPath": "packages/atlas-core/src/packet/identity.ts",
+      "relativePath": "packages/atlas-core/src/packet/identity.ts",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "fileContentHash": "3e5292f067a031d1ac9ffe7a4dcf109516fc9445e6c575186b6611ae425cd296",
+      "chunkCount": 6
+    },
+    {
+      "sourceRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "matchedPath": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "relativePath": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "fileContentHash": "bc71868584a6f32c43f331ac11179670bde75ccd76025809dd99fd59f61d5eb7",
+      "chunkCount": 43
+    },
+    {
+      "sourceRef": "packages/atlas-core/src/telemetry/acp-mcp-telemetry.ts",
+      "matchedPath": "packages/atlas-core/src/telemetry/acp-mcp-telemetry.ts",
+      "relativePath": "packages/atlas-core/src/telemetry/acp-mcp-telemetry.ts",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "fileContentHash": "755aa281695df314cbd7fcf7a5039d01bab907186c586950dad61a559d0041a6",
+      "chunkCount": 8
+    },
+    {
+      "sourceRef": "packages/atlas-core/src/validation/gan-audit-integration.ts",
+      "matchedPath": "packages/atlas-core/src/validation/gan-audit-integration.ts",
+      "relativePath": "packages/atlas-core/src/validation/gan-audit-integration.ts",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "fileContentHash": "96f88b9777f2339cff12d03fd431ce4fa5a9e725421346e8d90761ee608bbbb0",
+      "chunkCount": 28
+    },
+    {
+      "sourceRef": "packages/atlas-duckdb/src/config.ts",
+      "matchedPath": "packages/atlas-duckdb/src/config.ts",
+      "relativePath": "packages/atlas-duckdb/src/config.ts",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "fileContentHash": "c0b1f2eba818347b31ca846582ebe5434d8ae322a3fe3680ab2b266c0069b193",
+      "chunkCount": 3
+    },
+    {
+      "sourceRef": "scripts/atlas-parent-indexing.mjs",
+      "matchedPath": "scripts/atlas-parent-indexing.mjs",
+      "relativePath": "scripts/atlas-parent-indexing.mjs",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "fileContentHash": "505638c7ae206443f45647980b2c905b100bfd4a89460525f63ea7df52ba09c6",
+      "chunkCount": 13
+    },
+    {
+      "sourceRef": "scripts/atlas/audit-concept-evidence-spine.mjs",
+      "matchedPath": "scripts/atlas/audit-concept-evidence-spine.mjs",
+      "relativePath": "scripts/atlas/audit-concept-evidence-spine.mjs",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "fileContentHash": "a631f8165459dd3b0f5f1d05f2652a6873689fc26b92d234b4f9fca33db017c1",
+      "chunkCount": 10
+    },
+    {
+      "sourceRef": "scripts/atlas/audit-error-fixes.mjs",
+      "matchedPath": "scripts/atlas/audit-error-fixes.mjs",
+      "relativePath": "scripts/atlas/audit-error-fixes.mjs",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "fileContentHash": "cf628d33055a9b5cb8c0cda2a4ef78503a9e1a2e440f58ad68cf98e5029bf017",
+      "chunkCount": 12
+    }
+  ],
+  "doc14RelationProposalCount": 35,
+  "sampleDoc14RelationProposals": [
+    {
+      "schema": "atlas.relation-proposal.v1",
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "subject": {
+        "kind": "document",
+        "id": ".okf/systems/opentelemetry-owner.md",
+        "sourceRevision": "sha256:1c744a791d0889b97bd9d3b6f64c1a4b017322f744f60f1dd4e135f988f42c67"
+      },
+      "object": {
+        "kind": "code_file",
+        "id": "sveltekit-frontend/package.json",
+        "sourceRevision": "sha256:8fa8ebecc385138dff2124b290f25fc1cb1f54f7e877ea01e3548089a894ca60"
+      },
+      "relation": {
+        "predicate": "TASK_REFERENCES_DOCUMENT",
+        "assertion": "VERIFIED",
+        "method": "doc14_outside_scan_pg_join_v1"
+      },
+      "evidence": {
+        "sourceRef": ".okf/systems/opentelemetry-owner.md",
+        "contentSha256": "sha256:8fa8ebecc385138dff2124b290f25fc1cb1f54f7e877ea01e3548089a894ca60"
+      },
+      "graphRevision": "sha256:7af168137f7b41ebc7ff36249956f5cfb84d415ee1222e4217d1c656f6c0b27a",
+      "admission": "PENDING"
+    },
+    {
+      "schema": "atlas.relation-proposal.v1",
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "subject": {
+        "kind": "document",
+        "id": ".okf/systems/deep-research.md",
+        "sourceRevision": "sha256:77d46ae9c275ae0f8e4495ec9ed0dc498eeb0c0655682f67919f047f13f12f5a"
+      },
+      "object": {
+        "kind": "code_file",
+        "id": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sourceRevision": "sha256:34c7b3ff6abf22ba5bc45d8ec0eb3290ca1c012a06dcee244dfcf33201e2c713"
+      },
+      "relation": {
+        "predicate": "TASK_REFERENCES_DOCUMENT",
+        "assertion": "VERIFIED",
+        "method": "doc14_outside_scan_pg_join_v1"
+      },
+      "evidence": {
+        "sourceRef": ".okf/systems/deep-research.md",
+        "contentSha256": "sha256:34c7b3ff6abf22ba5bc45d8ec0eb3290ca1c012a06dcee244dfcf33201e2c713"
+      },
+      "graphRevision": "sha256:7af168137f7b41ebc7ff36249956f5cfb84d415ee1222e4217d1c656f6c0b27a",
+      "admission": "PENDING"
+    },
+    {
+      "schema": "atlas.relation-proposal.v1",
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "subject": {
+        "kind": "document",
+        "id": "docs/architecture/local-deep-research-boundary.md",
+        "sourceRevision": "sha256:2c5a6b8428ddfc57eff2853b6da14eaa122006e3f27b9e37bb9406f8b538bc15"
+      },
+      "object": {
+        "kind": "code_file",
+        "id": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+        "sourceRevision": "sha256:e38d327efe2bec572b38c1787fcfceaf2b2312eab972237b24a6d856d9b45ebf"
+      },
+      "relation": {
+        "predicate": "TASK_REFERENCES_DOCUMENT",
+        "assertion": "VERIFIED",
+        "method": "doc14_outside_scan_pg_join_v1"
+      },
+      "evidence": {
+        "sourceRef": "docs/architecture/local-deep-research-boundary.md",
+        "contentSha256": "sha256:e38d327efe2bec572b38c1787fcfceaf2b2312eab972237b24a6d856d9b45ebf"
+      },
+      "graphRevision": "sha256:7af168137f7b41ebc7ff36249956f5cfb84d415ee1222e4217d1c656f6c0b27a",
+      "admission": "PENDING"
+    },
+    {
+      "schema": "atlas.relation-proposal.v1",
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "subject": {
+        "kind": "document",
+        "id": "docs/architecture/kanban-parent-atlas-alignment.md",
+        "sourceRevision": "sha256:8438d20e619894b89eed595d5ce93319bc2ed2e7de4293a6aa9b1fc6de2fbdbb"
+      },
+      "object": {
+        "kind": "code_file",
+        "id": "scripts/atlas/karpathy-gpu-enrich.mjs",
+        "sourceRevision": "sha256:bac1d6d6d21aa4e5af6af2f9ec2b522a7e38f04818a4d9bc341ba14d47bc7589"
+      },
+      "relation": {
+        "predicate": "TASK_REFERENCES_DOCUMENT",
+        "assertion": "VERIFIED",
+        "method": "doc14_outside_scan_pg_join_v1"
+      },
+      "evidence": {
+        "sourceRef": "docs/architecture/kanban-parent-atlas-alignment.md",
+        "contentSha256": "sha256:bac1d6d6d21aa4e5af6af2f9ec2b522a7e38f04818a4d9bc341ba14d47bc7589"
+      },
+      "graphRevision": "sha256:7af168137f7b41ebc7ff36249956f5cfb84d415ee1222e4217d1c656f6c0b27a",
+      "admission": "PENDING"
+    },
+    {
+      "schema": "atlas.relation-proposal.v1",
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "subject": {
+        "kind": "document",
+        "id": "docs/archive/claude-md-stale-status-and-bitfrost-audit-2026-10-03.md",
+        "sourceRevision": "sha256:fcb2273e95dffdd86bddc5af1e4a4a51e3d3f44b949bb674990097fb7f245c5d"
+      },
+      "object": {
+        "kind": "code_file",
+        "id": "packages/atlas-core/src/langgraph/worker.ts",
+        "sourceRevision": "sha256:72aec183a019f1a6c30c0a2d5ab8fb3beee4558b2a8624f5633a8ada78918fd2"
+      },
+      "relation": {
+        "predicate": "TASK_REFERENCES_DOCUMENT",
+        "assertion": "VERIFIED",
+        "method": "doc14_outside_scan_pg_join_v1"
+      },
+      "evidence": {
+        "sourceRef": "docs/archive/claude-md-stale-status-and-bitfrost-audit-2026-10-03.md",
+        "contentSha256": "sha256:72aec183a019f1a6c30c0a2d5ab8fb3beee4558b2a8624f5633a8ada78918fd2"
+      },
+      "graphRevision": "sha256:7af168137f7b41ebc7ff36249956f5cfb84d415ee1222e4217d1c656f6c0b27a",
+      "admission": "PENDING"
+    }
+  ],
+  "retrievalReplay": {
+    "lexicalOnlyTop5": [
+      "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+      "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "docs/architecture/runtime-ownership-registry.json",
+      "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "scripts/atlas/summary-ranking-retrieval-pipeline.mjs"
+    ],
+    "graphOnlyTop5": [
+      "docs/.okf/dev/manifest.json",
+      "docs/DIMENSION-POLICY.md",
+      "docs/architecture/runtime-ownership-registry.json",
+      "docs/reports/atlas-clustering-health.json",
+      "docs/reports/recommendation-merge-key-audit.json"
+    ],
+    "hybridTop5": [
+      "docs/architecture/runtime-ownership-registry.json",
+      "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+      "docs/.okf/dev/manifest.json",
+      "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+    ],
+    "admittedCount": 10,
+    "admittedTop5": [
+      {
+        "chunkId": "docs/architecture/runtime-ownership-registry.json",
+        "taskKey": null,
+        "fusionScore": 0.031746031746031744,
+        "scoreBreakdown": {
+          "fusion": 0.031746031746031744,
+          "laneRanks": {
+            "lexical": 3,
+            "graph": 3
+          }
+        },
+        "relationPaths": [
+          {
+            "subjectId": "docs/architecture/_cuda_rtx_toc.md",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "docs/architecture/runtime-ownership-registry.json",
+            "sourceRef": "docs/architecture/_cuda_rtx_toc.md",
+            "sourceRevision": "sha256:3ae3613c7c04970d4bdb1a5c9ec19835ffcbfa18ac224db9a65af1ab50d59564",
+            "evidenceSpan": {
+              "startByte": 77,
+              "endByte": 126
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          },
+          {
+            "subjectId": "docs/architecture/_topology_classifier_index.md",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "docs/architecture/runtime-ownership-registry.json",
+            "sourceRef": "docs/architecture/_topology_classifier_index.md",
+            "sourceRevision": "sha256:2c6e30665c8c49825b1220cff6c513a4b01222cd3aa5e9002aabdd830137f14f",
+            "evidenceSpan": {
+              "startByte": 112,
+              "endByte": 161
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          },
+          {
+            "subjectId": "docs/architecture/graphify-daily-discovery-helpers-v1.md",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "docs/architecture/runtime-ownership-registry.json",
+            "sourceRef": "docs/architecture/graphify-daily-discovery-helpers-v1.md",
+            "sourceRevision": "sha256:9a5bde382f8c409fded5e79c2e7b349b12044dbfc56ad058ef0d65e421fe340c",
+            "evidenceSpan": {
+              "startByte": 1622,
+              "endByte": 1671
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          }
+        ],
+        "sourceRevision": "sha256:d8188edbfa47ac287cbb8bb2fc26554c290a76520ef62e6838f4109bdfae5bef",
+        "graphRevision": "sha256:7af168137f7b41ebc7ff36249956f5cfb84d415ee1222e4217d1c656f6c0b27a",
+        "admissionStatus": "ADMITTED",
+        "rejectionReason": null,
+        "supportingSpans": [
+          [
+            77,
+            126
+          ],
+          [
+            112,
+            161
+          ],
+          [
+            1622,
+            1671
+          ]
+        ]
+      },
+      {
+        "chunkId": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+        "taskKey": null,
+        "fusionScore": 0.030776515151515152,
+        "scoreBreakdown": {
+          "fusion": 0.030776515151515152,
+          "laneRanks": {
+            "lexical": 4,
+            "graph": 6
+          }
+        },
+        "relationPaths": [
+          {
+            "subjectId": "docs/okf/parent-atlas/domains-identity.md",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+            "sourceRef": "docs/okf/parent-atlas/domains-identity.md",
+            "sourceRevision": "sha256:7e5cab99916d2764e6af3a2f39c93c502ce3d599d957e2f490f99b99ecc29bfa",
+            "evidenceSpan": {
+              "startByte": 128,
+              "endByte": 188
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          },
+          {
+            "subjectId": "docs/okf/parent-atlas/graph-analytics.md",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+            "sourceRef": "docs/okf/parent-atlas/graph-analytics.md",
+            "sourceRevision": "sha256:e42cc33852982287c1bdec360ab2301291884b6b0d36ff9355a10d90ddd88b9f",
+            "evidenceSpan": {
+              "startByte": 123,
+              "endByte": 183
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          },
+          {
+            "subjectId": "docs/okf/parent-atlas/integrations/neo4j.md",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+            "sourceRef": "docs/okf/parent-atlas/integrations/neo4j.md",
+            "sourceRevision": "sha256:ec9d5cef63e3761ef7c51001d4d2ea0e6b6e4ab299ffd811ca9cecf5eb1ce1a2",
+            "evidenceSpan": {
+              "startByte": 125,
+              "endByte": 185
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          }
+        ],
+        "sourceRevision": "sha256:9732820923a09c2c9bc33e4f28b2b350e6636adfa5b36e1aae2aff65e6c6b1f4",
+        "graphRevision": "sha256:7af168137f7b41ebc7ff36249956f5cfb84d415ee1222e4217d1c656f6c0b27a",
+        "admissionStatus": "ADMITTED",
+        "rejectionReason": null,
+        "supportingSpans": [
+          [
+            128,
+            188
+          ],
+          [
+            123,
+            183
+          ],
+          [
+            125,
+            185
+          ]
+        ]
+      },
+      {
+        "chunkId": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+        "taskKey": null,
+        "fusionScore": 0.02964254577157803,
+        "scoreBreakdown": {
+          "fusion": 0.02964254577157803,
+          "laneRanks": {
+            "lexical": 2,
+            "graph": 14
+          }
+        },
+        "relationPaths": [
+          {
+            "subjectId": "docs/DEPLOYMENT-SUMMARY-THREE-TIER-SEARCH.md",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+            "sourceRef": "docs/DEPLOYMENT-SUMMARY-THREE-TIER-SEARCH.md",
+            "sourceRevision": "sha256:1b40c0224260c85bbb390a6bc07ab95cd50eb79faec946e11b70853a63f3025f",
+            "evidenceSpan": {
+              "startByte": 1132,
+              "endByte": 1192
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          },
+          {
+            "subjectId": "docs/SESSION-85-FEATURE-REGISTRY-WIRING.md",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+            "sourceRef": "docs/SESSION-85-FEATURE-REGISTRY-WIRING.md",
+            "sourceRevision": "sha256:990d973bdf8200df06f952fbd5a69bbc6cd0cde4e829903659149e3f754d3ce3",
+            "evidenceSpan": {
+              "startByte": 852,
+              "endByte": 912
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          },
+          {
+            "subjectId": "docs/SESSION-85-INTEGRATION-CHECKLIST.md",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "packages/atlas-core/src/retrieval/feature-registry-search.ts",
+            "sourceRef": "docs/SESSION-85-INTEGRATION-CHECKLIST.md",
+            "sourceRevision": "sha256:3413fa14118ddbf12fce6aafc85bee25cece231a62ad8d0aa26205818e65b4a1",
+            "evidenceSpan": {
+              "startByte": 507,
+              "endByte": 567
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          }
+        ],
+        "sourceRevision": "sha256:bc71868584a6f32c43f331ac11179670bde75ccd76025809dd99fd59f61d5eb7",
+        "graphRevision": "sha256:7af168137f7b41ebc7ff36249956f5cfb84d415ee1222e4217d1c656f6c0b27a",
+        "admissionStatus": "ADMITTED",
+        "rejectionReason": null,
+        "supportingSpans": [
+          [
+            1132,
+            1192
+          ],
+          [
+            852,
+            912
+          ],
+          [
+            507,
+            567
+          ]
+        ]
+      },
+      {
+        "chunkId": "docs/.okf/dev/manifest.json",
+        "taskKey": null,
+        "fusionScore": 0.01639344262295082,
+        "scoreBreakdown": {
+          "fusion": 0.01639344262295082,
+          "laneRanks": {
+            "graph": 1
+          }
+        },
+        "relationPaths": [
+          {
+            "subjectId": "docs/.okf/dev/gsd.md",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "docs/.okf/dev/manifest.json",
+            "sourceRef": "docs/.okf/dev/gsd.md",
+            "sourceRevision": "sha256:5855ed4f71971bd51066288d3af1e0626f347f76988715b230669c671629f0aa",
+            "evidenceSpan": {
+              "startByte": 805,
+              "endByte": 832
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          },
+          {
+            "subjectId": "docs/.okf/dev/local-source-inventory.md",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "docs/.okf/dev/manifest.json",
+            "sourceRef": "docs/.okf/dev/local-source-inventory.md",
+            "sourceRevision": "sha256:a24bf6f062aeda120507ea3fa17a7b1e8f79fd0555782a3fe0bea721df358e73",
+            "evidenceSpan": {
+              "startByte": 308,
+              "endByte": 335
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          },
+          {
+            "subjectId": "docs/.okf/dev/openwiki-dev-corpus-spec.md",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "docs/.okf/dev/manifest.json",
+            "sourceRef": "docs/.okf/dev/openwiki-dev-corpus-spec.md",
+            "sourceRevision": "sha256:682380d32161b2767fd8d67326b2bb0cbd89b441fbc08c29e818d92d462b6bf7",
+            "evidenceSpan": {
+              "startByte": 431,
+              "endByte": 458
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          }
+        ],
+        "sourceRevision": "sha256:1e0a45e2c76ae6184cc0db343712d5e29df6eabbd4c2cedff4a188b844439c53",
+        "graphRevision": "sha256:7af168137f7b41ebc7ff36249956f5cfb84d415ee1222e4217d1c656f6c0b27a",
+        "admissionStatus": "ADMITTED",
+        "rejectionReason": null,
+        "supportingSpans": [
+          [
+            805,
+            832
+          ],
+          [
+            308,
+            335
+          ],
+          [
+            431,
+            458
+          ]
+        ]
+      },
+      {
+        "chunkId": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+        "taskKey": null,
+        "fusionScore": 0.01639344262295082,
+        "scoreBreakdown": {
+          "fusion": 0.01639344262295082,
+          "laneRanks": {
+            "lexical": 1
+          }
+        },
+        "relationPaths": [
+          {
+            "subjectId": ".okf/corpora/keyword-corpus.yaml",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+            "sourceRef": ".okf/corpora/keyword-corpus.yaml",
+            "sourceRevision": "sha256:b3f9ddb1a47552b1dbdbf94aad8966e50593879dafc597f7db931fc2b5d52ab8",
+            "evidenceSpan": {
+              "startByte": 9691,
+              "endByte": 9752
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          },
+          {
+            "subjectId": ".okf/systems/parent-atlas-compute-ownership.md",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+            "sourceRef": ".okf/systems/parent-atlas-compute-ownership.md",
+            "sourceRevision": "sha256:e35904b992dd33814f84f546e017fc7c45bd6071f8a5fdfdadb35934e8ca41b4",
+            "evidenceSpan": {
+              "startByte": 436,
+              "endByte": 497
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          },
+          {
+            "subjectId": "docs/architecture/_cuda_rtx_toc.md",
+            "predicate": "DOCUMENT_LINKS_TO",
+            "objectId": null,
+            "candidateTargetRef": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+            "sourceRef": "docs/architecture/_cuda_rtx_toc.md",
+            "sourceRevision": "sha256:3ae3613c7c04970d4bdb1a5c9ec19835ffcbfa18ac224db9a65af1ab50d59564",
+            "evidenceSpan": {
+              "startByte": 6890,
+              "endByte": 6951
+            },
+            "extractionMethod": "compile_okf_docs_path_ref_v1",
+            "status": "OBSERVED"
+          }
+        ],
+        "sourceRevision": "sha256:1733c424a04d31c900234547c34c69090e59c6fce5013443ac456e0b5863a3e0",
+        "graphRevision": "sha256:7af168137f7b41ebc7ff36249956f5cfb84d415ee1222e4217d1c656f6c0b27a",
+        "admissionStatus": "ADMITTED",
+        "rejectionReason": null,
+        "supportingSpans": [
+          [
+            9691,
+            9752
+          ],
+          [
+            436,
+            497
+          ],
+          [
+            6890,
+            6951
+          ]
+        ]
+      }
+    ]
+  },
+  "jsonlExport": {
+    "jsonlPath": "docs\\reports\\doc14-admitted-chunks.jsonl",
+    "exportedCount": 200,
+    "skippedCounts": {},
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

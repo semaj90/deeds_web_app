@@ -1,0 +1,75 @@
+{
+  "schema": "parent-atlas.doc14-live-stanza-proof.v1",
+  "date": "2026-11-22",
+  "status": "BOUNDED_LIVE_CAPTURE_AND_LOCAL_PUBLICATION_PROVEN",
+  "canonicalAuthority": false,
+  "databaseWrites": false,
+  "graphifyAdmission": false,
+  "aceOrValkeyWrites": false,
+  "capture": {
+    "provider": "Firecrawl MCP",
+    "url": "https://docs.firecrawl.dev/quickstart",
+    "scrapeId": "01a20557-513c-7154-944d-3b4a14646c6f",
+    "httpStatus": 200,
+    "normalizedByteLength": 77991,
+    "normalizedSha256": "21b4f9b4eddf12f9e697204c60078054c255f0489b11f781898da5e019a818c9",
+    "sourceId": "131b9f41b5b130ae4a65c6f561452d61",
+    "sourceRevision": "sha256:21b4f9b4eddf12f9e697204c60078054c255f0489b11f781898da5e019a818c9",
+    "revisionMeaning": "content hash of the captured normalized Markdown; not a canonical source-index revision"
+  },
+  "extractor": {
+    "library": "Stanza",
+    "version": "1.15.1",
+    "processors": ["tokenize", "pos", "lemma", "depparse"],
+    "device": "CPU",
+    "modelPackage": "en/default",
+    "modelFiles": 9,
+    "modelBytes": 341432140,
+    "modelInventorySha256": "c003fa75f14e77aae6305dd0bf34449bfce3e99967ca3fbd65ca96ae697aa583",
+    "parsedChunks": 8,
+    "totalDocumentChunks": 56
+  },
+  "publication": {
+    "owner": "write_source_artifacts -> publish_validated_relation_candidates_jsonl_v1",
+    "candidateCount": 18,
+    "verifiedCandidateCount": 18,
+    "proposalOnlyCount": 18,
+    "failedCandidateCount": 0,
+    "jsonlBytes": 67894,
+    "jsonlSha256FirstRun": "8b016ef8ea9c6153eefe960b117cee06ca66659257d5ba6691354434d7c1575a",
+    "jsonlSha256Replay": "8b016ef8ea9c6153eefe960b117cee06ca66659257d5ba6691354434d7c1575a",
+    "independentReadbackCandidateCount": 18,
+    "independentReadbackAllBoundToNormalizedSha256": true,
+    "localArtifactPath": "%LOCALAPPDATA%/Temp/doc14-live-stanza-output/doc14-live-stanza/relation-candidates.jsonl"
+  },
+  "adversarialProbe": {
+    "mutation": "Incremented one live candidate evidence start_byte by one while retaining the original character span",
+    "result": "DOC14_RELATION_CANDIDATE_BATCH_REJECTED:1:ROW_0:EVIDENCE_CHARACTER_BYTE_MAPPING_MISMATCH",
+    "priorArtifactPreserved": true,
+    "priorArtifactSha256": "8b016ef8ea9c6153eefe960b117cee06ca66659257d5ba6691354434d7c1575a"
+  },
+  "reviewHandoff": {
+    "reportPath": "docs/reports/doc14-relation-review-queue-20261122.json",
+    "reportSha256": "22e6b577d5c9bda9362e1af21dcbeedb05e2127281c756c79dcf1c8e0a4ede25",
+    "sourceSpansRechecked": 18,
+    "candidatesWithExplicitSubject": 8,
+    "candidatesWithoutExplicitSubject": 10,
+    "ontologyMappingsAdded": 0,
+    "humanDecisionsRecorded": 0
+  },
+  "integrationLimitations": [
+    "The local :8095 /evidence/web Firecrawl provider returned 503 FIRECRAWL_NOT_CONFIGURED.",
+    "The official page was captured through Firecrawl MCP, then supplied to the existing PageArtifact, chunk_document, stanza_observations, and write_source_artifacts owners; the local manifest-driven fetch command was not exercised.",
+    "Only the first eight of 56 chunks were parsed to bound CPU work.",
+    "Stanza candidates are unreviewed text-grounded proposals; their predicates and ontology mappings are not established facts.",
+    "No canonical source-index revision readback, ontology review, Graphify admission, ACE packet, Valkey write/readback, PostgreSQL write, centroid generation, or CUDA work was performed."
+  ],
+  "runtimeSetup": {
+    "scope": "Separate CPU-oriented Windows virtual environment outside the repository",
+    "python": "3.13.5",
+    "environmentPath": "%LOCALAPPDATA%/ParentAtlas/doc14-stanza-py313",
+    "modelPath": "%LOCALAPPDATA%/ParentAtlas/doc14-stanza-resources",
+    "sharedGpuEnvironmentsModified": false,
+    "repositoryDependenciesModified": false
+  }
+}

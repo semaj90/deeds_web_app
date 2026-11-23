@@ -1,4 +1,5 @@
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import type { ImageOcrStageV1 } from '$lib/shared/storybook-image-observations-v1.js';
 import sharp from 'sharp';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
@@ -25,6 +26,7 @@ export interface CanonicalImageAnalysisDependenciesV1 {
 	analyze: typeof analyzeEvidenceImageV1;
 	embed: typeof embedEvidenceImageWithEmbeddingGemma2OnnxV1;
 	persist: typeof persistEvidenceMultimodalVectorV1;
+	ocr?: (png: Buffer) => Promise<{ text: string; error?: string }>;
 	modelDir: string | null | undefined;
 	deriveThumbnail: (bytes: Buffer) => Promise<Buffer>;
 	storeThumbnail: (bucket: string, key: string, bytes: Buffer) => Promise<void>;
@@ -105,6 +107,10 @@ const defaultDependencies: CanonicalImageAnalysisDependenciesV1 = {
 	analyze: analyzeEvidenceImageV1,
 	embed: embedEvidenceImageWithEmbeddingGemma2OnnxV1,
 	persist: persistEvidenceMultimodalVectorV1,
+	ocr: async (png) => {
+		const { extractTextFromImage } = await import('$lib/server/ocr/tesseract.js');
+		return extractTextFromImage(png, `storybook-${randomUUID()}.png`, 15_000);
+	},
 	modelDir: ENV.ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR,
 	deriveThumbnail: resizeForThumbnail,
 	thumbnailBucket: ENV.SEAWEED_ARTIFACTS_BUCKET,
@@ -123,6 +129,27 @@ const defaultDependencies: CanonicalImageAnalysisDependenciesV1 = {
 
 function sha256Ref(bytes: Uint8Array): string {
 	return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+}
+
+async function runImageOcr(image: z.infer<typeof ImageInputV1>, ocr: NonNullable<CanonicalImageAnalysisDependenciesV1['ocr']>): Promise<ImageOcrStageV1> {
+	const scope = {
+		sourceRevision: image.sourceRevision, engine: 'tesseract',
+		policyRevision: 'atlas.image-ocr.eng-oriented-png-1280.v1',
+	} as const;
+	let inputSha256: string | undefined;
+	try {
+		const png = await sharp(image.bytes, { limitInputPixels: 40_000_000, failOn: 'error' })
+			.rotate().resize(1280, 1280, { fit: 'inside', withoutEnlargement: true }).png().toBuffer();
+		inputSha256 = sha256Ref(png);
+		const result = await ocr(png);
+		if (result.error || result.text.includes('\0')) return { ...scope, inputSha256, status: 'FAILED' };
+		const raw = result.text.trim();
+		if (!raw) return { ...scope, inputSha256, status: 'EMPTY' };
+		const text = raw.slice(0, 800).replace(/[\uD800-\uDBFF]$/, '');
+		return { ...scope, inputSha256, status: 'COMPLETED', text, truncated: text.length < raw.length };
+	} catch {
+		return { ...scope, inputSha256, status: 'FAILED' };
+	}
 }
 
 function formatMatches(mime: string, format: string | undefined): boolean {
@@ -159,7 +186,7 @@ export async function processEvidenceImageCanonicalV1(
 	const thumbnailBucket = dependencies.thumbnailBucket?.trim();
 	if (!thumbnailBucket) throw new Error('EVIDENCE_IMAGE_DERIVATIVE_BUCKET_UNCONFIGURED');
 
-	const [analysis, embedding, thumbnailBytes] = await Promise.all([
+	const [analysis, embedding, thumbnailBytes, imageOcr] = await Promise.all([
 		dependencies.analyze({
 			evidenceId: image.evidenceId,
 			caseId: image.caseId,
@@ -170,6 +197,7 @@ export async function processEvidenceImageCanonicalV1(
 		}),
 		dependencies.embed({ buffer: image.bytes, modelDir: dependencies.modelDir }),
 		dependencies.deriveThumbnail(image.bytes),
+		dependencies.ocr ? runImageOcr(image, dependencies.ocr) : undefined,
 	]);
 	if (embedding.inputSha256 !== image.sourceRevision) throw new Error('EVIDENCE_IMAGE_EMBEDDING_INPUT_REVISION_MISMATCH');
 	if (!Buffer.isBuffer(thumbnailBytes) || thumbnailBytes.length === 0 || thumbnailBytes.length > 2 * 1024 * 1024) {
@@ -194,7 +222,10 @@ export async function processEvidenceImageCanonicalV1(
 		height: thumbnailMeta.height,
 		preprocessingRevision: EVIDENCE_THUMBNAIL_PREPROCESSING_REVISION_V1,
 	};
-	const analysisRevision = `atlas.evidence-image-analysis.v1:${embedding.modelRevision}:${embedding.preprocessingRevision}:${EVIDENCE_IMAGE_OBJECT_CROP_POLICY_REVISION_V1}`;
+	const baseRevision = `atlas.evidence-image-analysis.v1:${embedding.modelRevision}:${embedding.preprocessingRevision}:${EVIDENCE_IMAGE_OBJECT_CROP_POLICY_REVISION_V1}`;
+	const analysisRevision = imageOcr
+		? `atlas.evidence-image-analysis.ocr.v1:${sha256Ref(Buffer.from(JSON.stringify([baseRevision, imageOcr])))}`
+		: baseRevision;
 	const wholeImagePersisted = await dependencies.persist(db, {
 		evidenceId: image.evidenceId,
 		caseId: image.caseId,
@@ -220,6 +251,7 @@ export async function processEvidenceImageCanonicalV1(
 			analysisStatus: analysis.status,
 			analysisRevision,
 			visualAnalysis: analysis,
+			...(imageOcr ? { imageOcr } : {}),
 			imageDerivatives: { thumbnail },
 			modelOutputReviewState: 'UNREVIEWED_PROPOSAL',
 		},

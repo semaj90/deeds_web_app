@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.okf-openwiki-deep-agent-probe.v1",
+  "generatedAt": "2026-11-23T01:13:09.983Z",
+  "status": "COMPLETED",
+  "failure": null,
+  "question": "Which OKF registries does the manifest declare, and which OpenWiki sections exist? Cite paths.",
+  "model": {
+    "id": "gemma4-legal-iq4xs-direct.gguf",
+    "endpoint": "http://127.0.0.1:8090"
+  },
+  "durationMs": 25128,
+  "toolCallsObserved": [
+    "okf_list_files",
+    "okf_read_file",
+    "openwiki_list_pages"
+  ],
+  "answer": "The OKF manifest declares several registries, and there are several OpenWiki sections available.\n\n### OKF Registries Declared in the Manifest\n\nThe `manifest.yaml` file (`.okf/manifest.yaml`) declares the following registries:\n\n*   **`languages`**: For language-specific AST rules, extensions, and exclusions. It lists several language-specific YAML files as schemas (e.g., `bash.yaml`, `python.yaml`, `typescript.yaml`) and references a catalog file (`languages/tree-sitter-language-pack-catalog-v1.json`).\n*   **`domains`**: For domain classifications with feature evidence paths. It lists files like `feature-intelligence.yaml` and `atlas-domain-taxonomy.yaml`.\n*   **`corpora`**: For keyword corpus, semantic ontology, and NLP-derived feature snapshots. It references `keyword-corpus.yaml`.\n*   **`concepts`**: For evidence-linked gap records. It lists files like `domain-lineage-gap.yaml` and `concept-edge-ledger-gap.yaml`.\n*   **`tools`**: For external tool integrations (though no specific schemas are listed in the provided content).\n*   **`predicates`**: For ontology and relationship classification rules. It references `feature-relationships.yaml`.\n*   **`schemas`**: For structural contracts. It lists several schema files like `domain-taxonomy-v1.schema.json` and `okf-concept-gap-v1.schema.json`.\n*   **`pipelines`**: For bounded, evidence-qualified data and execution pipelines. It lists files like `ast-entity-prefill.yaml`.\n*   **`indexes`**: For canonical store and rebuildable index/executor ownership policies. It lists files like `feature-intelligence.yaml`.\n\n### OpenWiki Sections\n\nThe following OpenWiki sections exist:\n\n*   `openwiki/.claims/architecture/boundaries-and-authority.json`\n*   `openwiki/.claims/architecture/overview.json`\n*   `openwiki/.claims/architecture/system-map.json`\n*   `openwiki/.claims/concepts/glossary.json`\n*   `openwiki/.claims/concepts/packet-identity-and-provenance.json`\n*   `openwiki/.claims/concepts/packet-registry.json`\n*   `openwiki/.claims/evidence/status-and-gaps.json`\n*   `openwiki/.claims/integrations/protocol-and-service-adapters.json`\n*   `openwiki/.claims/operations/monitoring.json`\n*   `openwiki/.claims/quickstart.json`\n*   `openwiki/.claims/testing/validation.json`\n*   `openwiki/.last-update.json`\n*   `openwiki/.page-manifest.json`\n*   `openwiki/.run.json`\n*   `openwiki/architecture/boundaries-and-authority.md`\n*   `openwiki/architecture/overview.md`\n*   `openwiki/architecture/system-map.md`\n*   `openwiki/concepts/glossary.md`\n*   `openwiki/concepts/packet-identity-and-provenance.md`\n*   `openwiki/concepts/packet-registry.md`\n*   `openwiki/evidence/status-and-gaps.md`\n*   `openwiki/INSTRUCTIONS.md`\n*   `openwiki/integrations/protocol-and-service-adapters.md`\n*   `openwiki/operations/monitoring.md`\n*   `openwiki/quickstart.md`\n*   `openwiki/testing/validation.md`",
+  "recursionLimit": 12,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "readScopes": [
+    ".okf/",
+    "openwiki/"
+  ]
+}

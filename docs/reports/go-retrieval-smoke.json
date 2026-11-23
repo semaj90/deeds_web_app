@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-09-20T23:18:59.030Z",
+  "generated_at": "2026-11-22T16:51:34.357Z",
   "http_url": "http://127.0.0.1:8100",
   "grpc_addr": "127.0.0.1:50053",
   "status": "PASS",
   "http": {
     "ok": true,
     "status": 200,
-    "elapsed_ms": 37,
+    "elapsed_ms": 86,
     "body": {
       "dependencies": {
         "embedding_service": {
@@ -32,11 +32,11 @@
       "readiness_state": "READY_FULL",
       "redisConnected": true,
       "status": "healthy",
-      "timestamp": 1789946339056
+      "timestamp": 1795366294401
     }
   },
   "grpc": {
     "ok": true,
-    "elapsed_ms": 1
+    "elapsed_ms": 2
   }
 }

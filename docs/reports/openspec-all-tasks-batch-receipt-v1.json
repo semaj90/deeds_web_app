@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.openspec-all-tasks-batch-receipt.v1",
+  "totalTasksExported": 14617,
+  "doneTasks": 8320,
+  "openTasks": 6297,
+  "analyzedOpenSampleCount": 250,
+  "ndjsonPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\openspec-all-tasks-export-v1.ndjson",
+  "promptsPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\openspec-rlm-context-prompts-v1.jsonl",
+  "promptPacketCount": 250,
+  "keywordCsr": {
+    "shape": [
+      250,
+      2039
+    ],
+    "nnz": 6568,
+    "csrChecksum": "sha256:4185b49fe3c2ba05aa7ce68ce6e78dd2235aab686c95566c32d88fa0d4e935e5"
+  },
+  "domainCsr": {
+    "shape": [
+      250,
+      17
+    ],
+    "nnz": 180,
+    "csrChecksum": "sha256:4bc3f05045c241601cef755c73d99fc061c153d2f88cc652eca23a333dbf6280"
+  },
+  "topology": {
+    "featureShape": [
+      250,
+      5
+    ],
+    "topologyShape": [
+      250,
+      4
+    ],
+    "featureChecksum": "sha256:d59f02b0ff1e1016fa38622baaa626c1f20d19e18714f011b31a96b5a1cd33ff",
+    "topologyChecksum": "sha256:60722e118801cd3ad80d97313746fb13667343755a19cc13ff30278b02a54b23",
+    "topologyBackend": "cpu_svd_4d"
+  },
+  "wsl2RapidsReadyForGpuChallenger": true,
+  "gpuVramAllocated": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

@@ -1,0 +1,825 @@
+{
+  "schema": "parent-atlas.case-scene-demo/v1",
+  "schema_version": 1,
+  "case": {
+    "case_id": "CASE-MB-2026-001",
+    "title": "State v. Unidentified Participants",
+    "jurisdiction": "Morrow Bay (Fictional)",
+    "provenance": "SYNTHETIC_FIXTURE",
+    "admission": "DEMO_ONLY",
+    "epistemic_status": "investigative_hypothesis",
+    "real_case": false
+  },
+  "person_registry": [
+    {
+      "registry_key": "POI-01",
+      "provisional_label": "Person at teller counter",
+      "status": "unidentified_role_disputed",
+      "default_representation": "neutral_lowpoly_generic",
+      "identity_established": false
+    },
+    {
+      "registry_key": "POI-02",
+      "provisional_label": "Person near entrance",
+      "status": "unidentified_role_disputed",
+      "default_representation": "neutral_lowpoly_generic",
+      "identity_established": false
+    },
+    {
+      "registry_key": "POI-03",
+      "provisional_label": "Person near rear corridor",
+      "status": "unidentified_role_disputed",
+      "default_representation": "neutral_lowpoly_generic",
+      "identity_established": false
+    },
+    {
+      "registry_key": "POI-04",
+      "provisional_label": "Fourth person in lobby",
+      "status": "unidentified_role_disputed",
+      "default_representation": "neutral_lowpoly_generic",
+      "identity_established": false
+    },
+    {
+      "registry_key": "DET-01",
+      "provisional_label": "Underpass Detainee 1",
+      "status": "recorded_detention_unlinked",
+      "default_representation": "neutral_lowpoly_generic",
+      "identity_established": false
+    },
+    {
+      "registry_key": "DET-02",
+      "provisional_label": "Underpass Detainee 2",
+      "status": "recorded_detention_unlinked",
+      "default_representation": "neutral_lowpoly_generic",
+      "identity_established": false
+    }
+  ],
+  "reviewed_links": [
+    {
+      "link_id": "LINK-001",
+      "type": "identity_equivalence",
+      "subject_a": "DET-01",
+      "subject_b": "POI-01",
+      "review_status": "unreviewed_open_question",
+      "supporting_evidence": [
+        "CAM-LOBBY-01",
+        "CAM-TRANSIT-07",
+        "INT-DET-01"
+      ],
+      "notes": "Unverified comparison question; no automatic person merge."
+    }
+  ],
+  "evidence_items": [
+    {
+      "evidence_id": "CAM-ENTRY-01",
+      "type": "video",
+      "clock_id": "CLK-BANK-CAM",
+      "materialized": false,
+      "sha256": null,
+      "storage_key": null,
+      "fixture_note": "Synthetic metadata stub only; no media or source bytes exist"
+    },
+    {
+      "evidence_id": "CAM-LOBBY-01",
+      "type": "video",
+      "clock_id": "CLK-BANK-CAM",
+      "materialized": false,
+      "sha256": null,
+      "storage_key": null,
+      "fixture_note": "Synthetic metadata stub only; no media or source bytes exist"
+    },
+    {
+      "evidence_id": "CAM-REAR-02",
+      "type": "video",
+      "clock_id": "CLK-BANK-CAM",
+      "materialized": false,
+      "sha256": null,
+      "storage_key": null,
+      "fixture_note": "Synthetic metadata stub only; no media or source bytes exist"
+    },
+    {
+      "evidence_id": "CAM-TRANSIT-07",
+      "type": "video",
+      "clock_id": "CLK-TRANSIT-07",
+      "materialized": false,
+      "sha256": null,
+      "storage_key": null,
+      "fixture_note": "Synthetic metadata stub only; no media or source bytes exist"
+    },
+    {
+      "evidence_id": "AL-01",
+      "type": "alarm_log",
+      "clock_id": "CLK-BANK-SYS",
+      "materialized": false,
+      "sha256": null,
+      "storage_key": null,
+      "fixture_note": "Synthetic metadata stub only; no media or source bytes exist"
+    },
+    {
+      "evidence_id": "W-02",
+      "type": "witness_statement",
+      "clock_id": null,
+      "materialized": false,
+      "sha256": null,
+      "storage_key": null,
+      "fixture_note": "Synthetic metadata stub only; no media or source bytes exist"
+    },
+    {
+      "evidence_id": "INT-DET-01",
+      "type": "audio",
+      "clock_id": "CLK-INTERVIEW-ROOM-2",
+      "materialized": false,
+      "sha256": null,
+      "storage_key": null,
+      "fixture_note": "Synthetic metadata stub only; no media or source bytes exist"
+    },
+    {
+      "evidence_id": "INT-DET-02",
+      "type": "audio",
+      "clock_id": "CLK-INTERVIEW-ROOM-2",
+      "materialized": false,
+      "sha256": null,
+      "storage_key": null,
+      "fixture_note": "Synthetic metadata stub only; no media or source bytes exist"
+    }
+  ],
+  "transcripts": [
+    {
+      "transcript_id": "TR-DET-01",
+      "derived_from": "INT-DET-01",
+      "source_clock_id": "CLK-INTERVIEW-ROOM-2",
+      "is_synthetic": true,
+      "spans": [
+        {
+          "span_id": "TR-DET-01-S04",
+          "speaker_label": "DET-01",
+          "start_ms": 14000,
+          "end_ms": 29000,
+          "media_start_source_time": "11:08:00",
+          "time_basis": "media_relative_ms",
+          "text": "I walked straight through the underpass from the ferry terminal, never went near the credit union.",
+          "epistemic_tag": "interviewee_claim"
+        }
+      ]
+    },
+    {
+      "transcript_id": "TR-DET-02",
+      "derived_from": "INT-DET-02",
+      "source_clock_id": "CLK-INTERVIEW-ROOM-2",
+      "is_synthetic": true,
+      "spans": [
+        {
+          "span_id": "TR-DET-02-S01",
+          "speaker_label": "DET-02",
+          "start_ms": 20000,
+          "end_ms": 31000,
+          "media_start_source_time": "11:28:00",
+          "time_basis": "media_relative_ms",
+          "text": "I was walking toward the station; I do not know those people.",
+          "epistemic_tag": "interviewee_claim"
+        }
+      ]
+    }
+  ],
+  "clock_offsets": [
+    {
+      "clock_id": "CLK-TRANSIT-07",
+      "reference_clock_id": "CLK-BANK-CAM",
+      "estimated_offset_seconds": -90,
+      "uncertainty_seconds": 10,
+      "review_status": "provisional_unverified",
+      "definition": "aligned_estimate = transit_raw + offset; illustrative only",
+      "approved_for_use": false
+    }
+  ],
+  "clock_registry": [
+    {
+      "clock_id": "CLK-BANK-CAM",
+      "source_type": "bank_camera_recorders",
+      "status": "independent_source_clock"
+    },
+    {
+      "clock_id": "CLK-BANK-SYS",
+      "source_type": "bank_alarm_system",
+      "status": "independent_source_clock"
+    },
+    {
+      "clock_id": "CLK-TRANSIT-07",
+      "source_type": "transit_camera",
+      "status": "independent_source_clock"
+    },
+    {
+      "clock_id": "CLK-INTERVIEW-ROOM-2",
+      "source_type": "interview_recording",
+      "status": "independent_source_clock"
+    }
+  ],
+  "assets": [
+    {
+      "asset_uuid": "00000000-0000-4000-8000-000000000101",
+      "asset_id_scope": "DEMO_FIXTURE_LOCAL_NOT_DATABASE_ID",
+      "kind": "contour_extruded_placeholder",
+      "source_type": "hand_authored_synthetic_contour",
+      "path": "assets/neutral-contour-placeholder.glb",
+      "sha256": "1b504412f5a38abf30a5b7522a203495eb237743b8a4c4a7c451a7e784bef076",
+      "byte_length": 6476,
+      "is_illustrative": true,
+      "is_evidence": false,
+      "registry_state": "fixture_only"
+    }
+  ],
+  "scenes": [
+    {
+      "scene_id": "SCENE-A",
+      "title": "Exterior approach",
+      "coordinate_frame": {
+        "grid_id": "MB-EXTERIOR",
+        "origin": [
+          0,
+          0,
+          0
+        ],
+        "up_axis": "+Y",
+        "forward_axis": "-Z",
+        "unit": "meter",
+        "is_real_world_gps": false,
+        "calibration_status": "not_calibrated"
+      },
+      "timeline_proposals": [
+        {
+          "event_id": "EVT-A-01",
+          "source_timestamp": "10:13:58",
+          "clock_id": "CLK-BANK-CAM",
+          "proposal": "Two generic silhouettes approach a fictional entrance; roles unverified",
+          "evidence_refs": [
+            "CAM-ENTRY-01"
+          ],
+          "status": "provisional",
+          "aligned_time": null,
+          "review_revision": null
+        }
+      ],
+      "actors": [
+        {
+          "actor_id": "ACT-A-POI-01",
+          "registry_key": "POI-01",
+          "label_policy": "display_provisional_tag",
+          "transform": {
+            "position": [
+              0.8,
+              0,
+              -4.5
+            ],
+            "quaternion": [
+              0,
+              0.0,
+              0,
+              1.0
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "mesh_asset_ref": "00000000-0000-4000-8000-000000000101",
+          "portrait_artifact": null,
+          "is_illustrative": true,
+          "identity_established": false
+        },
+        {
+          "actor_id": "ACT-A-POI-02",
+          "registry_key": "POI-02",
+          "label_policy": "display_provisional_tag",
+          "transform": {
+            "position": [
+              -1.1,
+              0,
+              -5
+            ],
+            "quaternion": [
+              0,
+              0.0,
+              0,
+              1.0
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "mesh_asset_ref": "00000000-0000-4000-8000-000000000101",
+          "portrait_artifact": null,
+          "is_illustrative": true,
+          "identity_established": false
+        }
+      ],
+      "render_mode": "illustrative_blockout",
+      "scene_revision": 0,
+      "persistence_status": "fixture_read_only"
+    },
+    {
+      "scene_id": "SCENE-B",
+      "title": "Lobby and teller area",
+      "coordinate_frame": {
+        "grid_id": "MB-LOBBY",
+        "origin": [
+          0,
+          0,
+          0
+        ],
+        "up_axis": "+Y",
+        "forward_axis": "-Z",
+        "unit": "meter",
+        "is_real_world_gps": false,
+        "calibration_status": "not_calibrated"
+      },
+      "timeline_proposals": [
+        {
+          "event_id": "EVT-B-01",
+          "source_timestamp": "10:14:09",
+          "clock_id": "CLK-BANK-CAM",
+          "proposal": "Group of generic actors appears in lobby; association provisional",
+          "evidence_refs": [
+            "CAM-LOBBY-01"
+          ],
+          "status": "provisional",
+          "aligned_time": null,
+          "review_revision": null
+        },
+        {
+          "event_id": "EVT-B-02",
+          "source_timestamp": "10:14:31",
+          "clock_id": "CLK-BANK-CAM",
+          "proposal": "Actor matching POI-01 description approaches window 2; disputed",
+          "evidence_refs": [
+            "CAM-LOBBY-01",
+            "W-02"
+          ],
+          "status": "provisional",
+          "aligned_time": null,
+          "review_revision": null
+        }
+      ],
+      "actors": [
+        {
+          "actor_id": "ACT-B-POI-01",
+          "registry_key": "POI-01",
+          "label_policy": "display_provisional_tag",
+          "transform": {
+            "position": [
+              1.4,
+              0,
+              -3.2
+            ],
+            "quaternion": [
+              0,
+              0.13052619,
+              0,
+              0.99144486
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "mesh_asset_ref": "00000000-0000-4000-8000-000000000101",
+          "portrait_artifact": null,
+          "is_illustrative": true,
+          "identity_established": false
+        },
+        {
+          "actor_id": "ACT-B-POI-02",
+          "registry_key": "POI-02",
+          "label_policy": "display_provisional_tag",
+          "transform": {
+            "position": [
+              -0.5,
+              0,
+              -2.9
+            ],
+            "quaternion": [
+              0,
+              0.0,
+              0,
+              1.0
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "mesh_asset_ref": "00000000-0000-4000-8000-000000000101",
+          "portrait_artifact": null,
+          "is_illustrative": true,
+          "identity_established": false
+        },
+        {
+          "actor_id": "ACT-B-POI-03",
+          "registry_key": "POI-03",
+          "label_policy": "display_provisional_tag",
+          "transform": {
+            "position": [
+              0.2,
+              0,
+              -1.7
+            ],
+            "quaternion": [
+              0,
+              0.0,
+              0,
+              1.0
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "mesh_asset_ref": "00000000-0000-4000-8000-000000000101",
+          "portrait_artifact": null,
+          "is_illustrative": true,
+          "identity_established": false
+        },
+        {
+          "actor_id": "ACT-B-POI-04",
+          "registry_key": "POI-04",
+          "label_policy": "display_provisional_tag",
+          "transform": {
+            "position": [
+              -1.3,
+              0,
+              -3.9
+            ],
+            "quaternion": [
+              0,
+              0.0,
+              0,
+              1.0
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "mesh_asset_ref": "00000000-0000-4000-8000-000000000101",
+          "portrait_artifact": null,
+          "is_illustrative": true,
+          "identity_established": false
+        }
+      ],
+      "render_mode": "illustrative_blockout",
+      "scene_revision": 0,
+      "persistence_status": "fixture_read_only"
+    },
+    {
+      "scene_id": "SCENE-C",
+      "title": "Rear service corridor",
+      "coordinate_frame": {
+        "grid_id": "MB-REAR",
+        "origin": [
+          0,
+          0,
+          0
+        ],
+        "up_axis": "+Y",
+        "forward_axis": "-Z",
+        "unit": "meter",
+        "is_real_world_gps": false,
+        "calibration_status": "not_calibrated"
+      },
+      "timeline_proposals": [
+        {
+          "event_id": "EVT-C-01",
+          "source_timestamp": "10:15:42",
+          "clock_id": "CLK-BANK-SYS",
+          "proposal": "Fictional bank alarm system records activation; relation to separate camera-clock events remains unaligned",
+          "evidence_refs": [
+            "AL-01"
+          ],
+          "status": "provisional",
+          "aligned_time": null,
+          "review_revision": null
+        }
+      ],
+      "actors": [
+        {
+          "actor_id": "ACT-C-POI-03",
+          "registry_key": "POI-03",
+          "label_policy": "display_provisional_tag",
+          "transform": {
+            "position": [
+              1.2,
+              0,
+              -2.8
+            ],
+            "quaternion": [
+              0,
+              0.0,
+              0,
+              1.0
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "mesh_asset_ref": "00000000-0000-4000-8000-000000000101",
+          "portrait_artifact": null,
+          "is_illustrative": true,
+          "identity_established": false
+        },
+        {
+          "actor_id": "ACT-C-POI-04",
+          "registry_key": "POI-04",
+          "label_policy": "display_provisional_tag",
+          "transform": {
+            "position": [
+              -0.7,
+              0,
+              -1.4
+            ],
+            "quaternion": [
+              0,
+              0.0,
+              0,
+              1.0
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "mesh_asset_ref": "00000000-0000-4000-8000-000000000101",
+          "portrait_artifact": null,
+          "is_illustrative": true,
+          "identity_established": false
+        }
+      ],
+      "render_mode": "illustrative_blockout",
+      "scene_revision": 0,
+      "persistence_status": "fixture_read_only"
+    },
+    {
+      "scene_id": "SCENE-D",
+      "title": "Underpass and detentions",
+      "coordinate_frame": {
+        "grid_id": "MB-UNDERPASS",
+        "origin": [
+          0,
+          0,
+          0
+        ],
+        "up_axis": "+Y",
+        "forward_axis": "-Z",
+        "unit": "meter",
+        "is_real_world_gps": false,
+        "calibration_status": "not_calibrated"
+      },
+      "timeline_proposals": [
+        {
+          "event_id": "EVT-D-01",
+          "source_timestamp": "10:17:06",
+          "clock_id": "CLK-TRANSIT-07",
+          "proposal": "Two detained-person placeholders appear in a distinct clock domain",
+          "evidence_refs": [
+            "CAM-TRANSIT-07"
+          ],
+          "status": "provisional",
+          "aligned_time": null,
+          "review_revision": null
+        }
+      ],
+      "actors": [
+        {
+          "actor_id": "ACT-D-DET-01",
+          "registry_key": "DET-01",
+          "label_policy": "display_provisional_tag",
+          "transform": {
+            "position": [
+              -0.4,
+              0,
+              -3.0
+            ],
+            "quaternion": [
+              0,
+              0.0,
+              0,
+              1.0
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "mesh_asset_ref": "00000000-0000-4000-8000-000000000101",
+          "portrait_artifact": null,
+          "is_illustrative": true,
+          "identity_established": false
+        },
+        {
+          "actor_id": "ACT-D-DET-02",
+          "registry_key": "DET-02",
+          "label_policy": "display_provisional_tag",
+          "transform": {
+            "position": [
+              1.1,
+              0,
+              -3.4
+            ],
+            "quaternion": [
+              0,
+              0.0,
+              0,
+              1.0
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "mesh_asset_ref": "00000000-0000-4000-8000-000000000101",
+          "portrait_artifact": null,
+          "is_illustrative": true,
+          "identity_established": false
+        }
+      ],
+      "render_mode": "illustrative_blockout",
+      "scene_revision": 0,
+      "persistence_status": "fixture_read_only"
+    },
+    {
+      "scene_id": "SCENE-E",
+      "title": "Interview and prosecutor review",
+      "coordinate_frame": {
+        "grid_id": "MB-INTERVIEW",
+        "origin": [
+          0,
+          0,
+          0
+        ],
+        "up_axis": "+Y",
+        "forward_axis": "-Z",
+        "unit": "meter",
+        "is_real_world_gps": false,
+        "calibration_status": "not_calibrated"
+      },
+      "timeline_proposals": [
+        {
+          "event_id": "EVT-E-01",
+          "source_timestamp": "11:08:14",
+          "clock_id": "CLK-INTERVIEW-ROOM-2",
+          "proposal": "Recorded account is represented by a synthetic transcript only",
+          "evidence_refs": [
+            "INT-DET-01"
+          ],
+          "status": "provisional",
+          "aligned_time": null,
+          "review_revision": null
+        },
+        {
+          "event_id": "EVT-E-02",
+          "source_timestamp": "11:28:20",
+          "clock_id": "CLK-INTERVIEW-ROOM-2",
+          "proposal": "Second account; no inference of culpability",
+          "evidence_refs": [
+            "INT-DET-02"
+          ],
+          "status": "provisional",
+          "aligned_time": null,
+          "review_revision": null
+        }
+      ],
+      "actors": [
+        {
+          "actor_id": "ACT-E-DET-01",
+          "registry_key": "DET-01",
+          "label_policy": "display_provisional_tag",
+          "transform": {
+            "position": [
+              -0.7,
+              0,
+              -1.5
+            ],
+            "quaternion": [
+              0,
+              0.0,
+              0,
+              1.0
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "mesh_asset_ref": "00000000-0000-4000-8000-000000000101",
+          "portrait_artifact": null,
+          "is_illustrative": true,
+          "identity_established": false
+        },
+        {
+          "actor_id": "ACT-E-DET-02",
+          "registry_key": "DET-02",
+          "label_policy": "display_provisional_tag",
+          "transform": {
+            "position": [
+              0.7,
+              0,
+              -1.5
+            ],
+            "quaternion": [
+              0,
+              0.0,
+              0,
+              1.0
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "mesh_asset_ref": "00000000-0000-4000-8000-000000000101",
+          "portrait_artifact": null,
+          "is_illustrative": true,
+          "identity_established": false
+        }
+      ],
+      "render_mode": "illustrative_blockout",
+      "scene_revision": 0,
+      "persistence_status": "fixture_read_only"
+    }
+  ],
+  "prosecutor_review_questions": [
+    {
+      "id": "RQ-01",
+      "question": "Which figures can be distinguished in the lobby footage?",
+      "status": "unresolved",
+      "refs": [
+        "CAM-LOBBY-01"
+      ]
+    },
+    {
+      "id": "RQ-02",
+      "question": "Does the evidence independently establish any actor carried a weapon?",
+      "status": "unresolved",
+      "refs": [
+        "W-02",
+        "CAM-LOBBY-01"
+      ]
+    },
+    {
+      "id": "RQ-03",
+      "question": "What explains the blocked rear corridor view?",
+      "status": "unresolved",
+      "refs": [
+        "CAM-REAR-02"
+      ]
+    },
+    {
+      "id": "RQ-04",
+      "question": "Can transit and bank clocks be aligned reliably?",
+      "status": "unresolved",
+      "refs": [
+        "CAM-TRANSIT-07",
+        "CAM-LOBBY-01"
+      ]
+    },
+    {
+      "id": "RQ-05",
+      "question": "Does any independent source support DET-01/POI-01 identity equivalence?",
+      "status": "unresolved",
+      "refs": [
+        "CAM-TRANSIT-07",
+        "INT-DET-01",
+        "CAM-LOBBY-01"
+      ]
+    },
+    {
+      "id": "RQ-06",
+      "question": "Which claims conflict with each interview statement, and what exculpatory gaps remain?",
+      "status": "unresolved",
+      "refs": [
+        "INT-DET-01",
+        "INT-DET-02",
+        "W-02"
+      ]
+    }
+  ],
+  "persistence": {
+    "scene_persistence_enabled_required_for_write": true,
+    "current_mode": "fixture_read_only",
+    "requires_authorized_case_scope": true,
+    "writes_performed": false
+  },
+  "disclaimer": "Entire case, people, locations, evidence metadata and interview text are fictional. No originals, GPS or real identity links."
+}

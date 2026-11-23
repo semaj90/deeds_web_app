@@ -1,10 +1,10 @@
 {
   "schema": "atlas.grounded-concept-taxonomy.v1",
-  "generatedAt": "2026-09-02T18:18:37.996Z",
+  "generatedAt": "2026-11-22T17:07:00.615Z",
   "mode": "READ_ONLY",
   "postgresWrites": false,
   "relationshipWrites": false,
-  "groundedCandidateCount": 0,
+  "groundedCandidateCount": 5,
   "authorities": {
     "conceptRecords": {
       "exists": true,
@@ -12,7 +12,7 @@
     },
     "domainTaxonomyV1": {
       "exists": true,
-      "count": 0
+      "count": 17
     },
     "kagDomainTaxonomy": {
       "exists": false,
@@ -20,14 +20,70 @@
     },
     "legacyFeatureOntologyObjectIds": {
       "exists": true,
-      "count": 20674
+      "count": 67185
     }
   },
   "counts": {
     "registeredOrLegacyConceptIds": 0,
-    "taxonomyRegistryUnresolved": 0
+    "taxonomyRegistryUnresolved": 5
   },
-  "candidates": [],
-  "status": "NO_GROUNDED_CANDIDATES_TO_CLASSIFY",
+  "candidates": [
+    {
+      "candidateId": "fresh:7377cfd4c15960ab453d2818122d88f2",
+      "objectId": "concept:database",
+      "objectValue": "PostgreSQL",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRevision": "sha256:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "normalizedConceptId": "database",
+      "taxonomyStatus": "TAXONOMY_REGISTRY_UNRESOLVED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh:7baed3153050cdefc05aadabcc2bfdca",
+      "objectId": "concept:database",
+      "objectValue": "Neo4j",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "normalizedConceptId": "database",
+      "taxonomyStatus": "TAXONOMY_REGISTRY_UNRESOLVED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh:d1590a1e5ad433de595ff6dffae979be",
+      "objectId": "concept:type",
+      "objectValue": "Record",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRevision": "sha256:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "normalizedConceptId": "type",
+      "taxonomyStatus": "TAXONOMY_REGISTRY_UNRESOLVED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh:ee4aaaaba4705bebddb6317d521c4f08",
+      "objectId": "concept:stategraph",
+      "objectValue": "StateGraph",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "normalizedConceptId": "stategraph",
+      "taxonomyStatus": "TAXONOMY_REGISTRY_UNRESOLVED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh:ee4aaaaba4705bebddb6317d521c4f08",
+      "objectId": "concept:langgraph-state-graph",
+      "objectValue": "StateGraph",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "normalizedConceptId": "langgraph-state-graph",
+      "taxonomyStatus": "TAXONOMY_REGISTRY_UNRESOLVED",
+      "canonicalAuthority": false
+    }
+  ],
+  "status": "GROUNDED_TAXONOMY_REGISTRY_GAP",
   "nextGate": "DEFINE_OR_RESTORE_CANONICAL_CONCEPT_REGISTRY"
 }

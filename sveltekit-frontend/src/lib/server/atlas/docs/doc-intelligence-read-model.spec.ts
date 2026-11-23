@@ -337,9 +337,21 @@ describe('dense search', () => {
 			queryRecipeRevision: null, corpusRecipeRevision: null, proofUsable: false
 		});
 		expect(r.queryIdentity).toEqual({ vectorChecksum: `sha256:${sha(JSON.stringify(vec))}`, queryRecipeRevision: null });
-		expect(calls[0].params.slice(1)).toEqual([25, 'x', '1']);
+		expect(calls[0].params.slice(1)).toEqual([25, 'x', '1', 0.45]);
+		expect(r.minSimilarity).toBe(0.45);
+		expect(calls[0].sql).toContain('>= $5');
 		expect(calls[0].sql).toContain('ORDER BY c.content_embedding <=> $1::vector, c.chunk_id');
 		expect(calls[0].sql).not.toMatch(/(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE)/i);
+	});
+
+	it('passes a caller-supplied similarity floor to the query, clamped to [-1, 1]', async () => {
+		const { pool, calls } = poolWith([]);
+		const r = await searchDocCorpusDense({ pool, queryVector: vec, minSimilarity: 0.7 });
+		expect(calls[0].params[4]).toBe(0.7);
+		expect(r.minSimilarity).toBe(0.7);
+		const clamped = await searchDocCorpusDense({ pool, queryVector: vec, minSimilarity: 5 });
+		expect(clamped.minSimilarity).toBe(1);
+		expect(calls[1].params[4]).toBe(1);
 	});
 
 	it('rejects a wrong-length or non-finite vector without touching the database', async () => {

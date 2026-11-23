@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.tensor-handle-4x4x6-fixture.v1",
+  "description": "Shared deterministic cross-language fixture for TensorHandleV1 (160B) parity across TypeScript, C++20 N-API (.node), and Python pybind11 (.pyd/.so). INT4 quantization is lossy; theoretical max abs error per channel is (max_c - min_c) / 30.0.",
+  "candidateOrdinal": 42,
+  "kmeansClusterId": 3,
+  "somBmuId": 127,
+  "workspaceRevisionPrefix64Hex": "1122334455667788",
+  "sourceRevisionPrefix64Hex": "99aabbccddeeff00",
+  "affine2x3": [1.5, -0.25, 10.0, 0.25, 1.5, -4.0],
+  "residencyState": 3,
+  "activeConsumers": 2,
+  "values96Formula": "fround(sin(i * 0.37) * 1.25 + (i % 6) * 0.4)",
+  "expected160ByteMagicLeHex": "31564854",
+  "expectedObservedMaxAbsErrorApprox": 0.0823,
+  "theoreticalMaxChannelErrorRatio": 0.03333333333333333
+}

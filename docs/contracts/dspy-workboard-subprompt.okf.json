@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.dspy_workboard_subprompt.v1",
+  "owner": "python/parent_atlas_dspy_repair.py",
+  "tsBoundary": "sveltekit-frontend/src/lib/server/atlas/agentic/agentic-workboard-runner-v1.ts",
+  "exampleSchema": "atlas.agentic-repair-example.v1",
+  "states": [
+    "PLAN",
+    "PLAN_VALIDATED",
+    "SUBPROMPT_BOUNDED",
+    "READBACK_PENDING",
+    "QUARANTINE"
+  ],
+  "rules": {
+    "require_context_manifest_checksum": true,
+    "require_allowed_evidence_ids": true,
+    "require_vram_lease_guard": true,
+    "require_independent_readback": true,
+    "canonical_authority": false,
+    "auto_promote_allowed": false
+  },
+  "smoke_gates": {
+    "schema_valid": true,
+    "import_safe_without_dspy": true,
+    "quarantine_blocks_promotion": true
+  }
+}

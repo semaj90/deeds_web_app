@@ -1,4 +1,4 @@
-export const VIDEO_TRACK_LINKER_REVISION_V1 = 'greedy-class-and-iou-track-linker-v1' as const;
+export const VIDEO_TRACK_LINKER_REVISION_V1 = 'global-greedy-class-and-iou-track-linker-v2' as const;
 
 export interface TrackableVideoDetectionV1 {
 	label: string;
@@ -80,25 +80,41 @@ export function linkVideoFrameTracksV1<T extends TrackableVideoFrameV1>(
 		previousTimestampMs = frame.timestampMs;
 		const ordered = frame.objects.map((detection, sourceOrder) => ({ detection, sourceOrder, center: centerOf(detection.bbox) }))
 			.sort((a, b) => compareTextOrdinal(a.detection.label, b.detection.label) || a.detection.bbox[1] - b.detection.bbox[1] || a.detection.bbox[0] - b.detection.bbox[0] || a.detection.bbox[3] - b.detection.bbox[3] || a.detection.bbox[2] - b.detection.bbox[2] || b.detection.confidence - a.detection.confidence || a.sourceOrder - b.sourceOrder);
-		const usedTrackIds = new Set<string>();
-		const linked: LinkedVideoFrameV1<T>['objects'] = [];
-		for (const { detection, center } of ordered) {
+		// Build all eligible same-class IoU pairs first, then assign the strongest
+		// pairs globally. Per-detection greedy matching can consume a track that is
+		// the only viable match for a later detection in this same frame.
+		const matchEdges: Array<{ detectionIndex: number; track: ActiveTrackV1; iou: number }> = [];
+		for (let detectionIndex = 0; detectionIndex < ordered.length; detectionIndex += 1) {
+			const detection = ordered[detectionIndex]!.detection;
 			if (!detection.label || !Number.isFinite(detection.confidence) || detection.confidence < 0 || detection.confidence > 1 || detection.bbox.some((value) => !Number.isFinite(value)) || detection.bbox[2] <= detection.bbox[0] || detection.bbox[3] <= detection.bbox[1]) {
 				throw new RangeError('Invalid detection geometry for video track linking.');
 			}
-			const candidates = [...tracks.values()]
-				.filter((track) => track.label === detection.label && frame.frameIndex - track.frameIndex <= maxFrameGap + 1 && !usedTrackIds.has(track.id))
-				.map((track) => ({ track, iou: intersectionOverUnion(track.bbox, detection.bbox) }))
-				.filter(({ iou }) => iou >= minIoU)
-				.sort((a, b) => b.iou - a.iou || compareTextOrdinal(a.track.id, b.track.id));
-			const matched = candidates[0]?.track;
+			for (const track of tracks.values()) {
+				if (track.label !== detection.label || frame.frameIndex - track.frameIndex > maxFrameGap + 1) continue;
+				const iou = intersectionOverUnion(track.bbox, detection.bbox);
+				if (iou >= minIoU) matchEdges.push({ detectionIndex, track, iou });
+			}
+		}
+		matchEdges.sort((a, b) => b.iou - a.iou || compareTextOrdinal(a.track.id, b.track.id) || a.detectionIndex - b.detectionIndex);
+		const usedTrackIds = new Set<string>();
+		const usedDetectionIndexes = new Set<number>();
+		const trackByDetection = new Map<number, ActiveTrackV1>();
+		for (const edge of matchEdges) {
+			if (usedTrackIds.has(edge.track.id) || usedDetectionIndexes.has(edge.detectionIndex)) continue;
+			usedTrackIds.add(edge.track.id);
+			usedDetectionIndexes.add(edge.detectionIndex);
+			trackByDetection.set(edge.detectionIndex, edge.track);
+		}
+		const linked: LinkedVideoFrameV1<T>['objects'] = [];
+		for (let detectionIndex = 0; detectionIndex < ordered.length; detectionIndex += 1) {
+			const { detection, center } = ordered[detectionIndex]!;
+			const matched = trackByDetection.get(detectionIndex);
 			const trackId = matched?.id ?? `track-${String(nextTrackNumber++).padStart(4, '0')}`;
 			const elapsedSeconds = matched ? (frame.timestampMs - matched.timestampMs) / 1000 : 0;
 			const velocityPxPerSecond: [number, number] | null = matched && elapsedSeconds > 0
 				? [(center[0] - matched.centerPx[0]) / elapsedSeconds, (center[1] - matched.centerPx[1]) / elapsedSeconds]
 				: null;
 			tracks.set(trackId, { id: trackId, label: detection.label, bbox: [...detection.bbox], centerPx: center, frameIndex: frame.frameIndex, timestampMs: frame.timestampMs });
-			usedTrackIds.add(trackId);
 			linked.push({ ...detection, trackId, centerPx: center, velocityPxPerSecond, trackState: 'UNREVIEWED_TRACK_HYPOTHESIS' });
 		}
 		return { ...frame, trackScopeId, objects: linked } as LinkedVideoFrameV1<T>;

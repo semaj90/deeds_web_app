@@ -1,0 +1,3283 @@
+{
+  "schema": "parent-atlas.scene-ontology.catalog.v1",
+  "namespace": "pa",
+  "status": "PROPOSED_SCENE_VOCABULARY_NOT_CANONICAL",
+  "codeDomainTaxonomyOwner": "atlas_domain_ontology (13 software domains; intentionally separate)",
+  "concepts": [
+    {
+      "id": "pa:space",
+      "parent": null,
+      "label": "Space",
+      "tier": 0
+    },
+    {
+      "id": "pa:space.site",
+      "parent": "pa:space",
+      "label": "Site",
+      "tier": 1
+    },
+    {
+      "id": "pa:space.site.urban",
+      "parent": "pa:space.site",
+      "label": "Urban",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.site.beach",
+      "parent": "pa:space.site",
+      "label": "Beach",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.site.rural",
+      "parent": "pa:space.site",
+      "label": "Rural",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.site.suburban",
+      "parent": "pa:space.site",
+      "label": "Suburban",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.site.industrial",
+      "parent": "pa:space.site",
+      "label": "Industrial",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.site.park",
+      "parent": "pa:space.site",
+      "label": "Park",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.site.highway",
+      "parent": "pa:space.site",
+      "label": "Highway",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.site.forest",
+      "parent": "pa:space.site",
+      "label": "Forest",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.site.waterfront",
+      "parent": "pa:space.site",
+      "label": "Waterfront",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.site.underground",
+      "parent": "pa:space.site",
+      "label": "Underground",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.building",
+      "parent": "pa:space",
+      "label": "Building",
+      "tier": 1
+    },
+    {
+      "id": "pa:space.building.house",
+      "parent": "pa:space.building",
+      "label": "House",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.building.apartment",
+      "parent": "pa:space.building",
+      "label": "Apartment",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.building.studio",
+      "parent": "pa:space.building",
+      "label": "Studio",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.building.condominium",
+      "parent": "pa:space.building",
+      "label": "Condominium",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.building.townhouse",
+      "parent": "pa:space.building",
+      "label": "Townhouse",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.building.hotel",
+      "parent": "pa:space.building",
+      "label": "Hotel",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.building.motel",
+      "parent": "pa:space.building",
+      "label": "Motel",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.building.warehouse",
+      "parent": "pa:space.building",
+      "label": "Warehouse",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.building.office",
+      "parent": "pa:space.building",
+      "label": "Office",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.building.courthouse",
+      "parent": "pa:space.building",
+      "label": "Courthouse",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.building.shop",
+      "parent": "pa:space.building",
+      "label": "Shop",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.building.restaurant",
+      "parent": "pa:space.building",
+      "label": "Restaurant",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.building.garage",
+      "parent": "pa:space.building",
+      "label": "Garage",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.floor",
+      "parent": "pa:space",
+      "label": "Floor",
+      "tier": 1
+    },
+    {
+      "id": "pa:space.floor.ground",
+      "parent": "pa:space.floor",
+      "label": "Ground",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.floor.upper",
+      "parent": "pa:space.floor",
+      "label": "Upper",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.floor.basement",
+      "parent": "pa:space.floor",
+      "label": "Basement",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.floor.attic",
+      "parent": "pa:space.floor",
+      "label": "Attic",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.floor.mezzanine",
+      "parent": "pa:space.floor",
+      "label": "Mezzanine",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.floor.roof",
+      "parent": "pa:space.floor",
+      "label": "Roof",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room",
+      "parent": "pa:space",
+      "label": "Room",
+      "tier": 1
+    },
+    {
+      "id": "pa:space.room.bedroom",
+      "parent": "pa:space.room",
+      "label": "Bedroom",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room.bathroom",
+      "parent": "pa:space.room",
+      "label": "Bathroom",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room.kitchen",
+      "parent": "pa:space.room",
+      "label": "Kitchen",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room.living-room",
+      "parent": "pa:space.room",
+      "label": "Living Room",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room.dining-room",
+      "parent": "pa:space.room",
+      "label": "Dining Room",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room.hallway",
+      "parent": "pa:space.room",
+      "label": "Hallway",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room.foyer",
+      "parent": "pa:space.room",
+      "label": "Foyer",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room.stairwell",
+      "parent": "pa:space.room",
+      "label": "Stairwell",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room.study",
+      "parent": "pa:space.room",
+      "label": "Study",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room.nursery",
+      "parent": "pa:space.room",
+      "label": "Nursery",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room.laundry",
+      "parent": "pa:space.room",
+      "label": "Laundry",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room.utility",
+      "parent": "pa:space.room",
+      "label": "Utility",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room.balcony",
+      "parent": "pa:space.room",
+      "label": "Balcony",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room.terrace",
+      "parent": "pa:space.room",
+      "label": "Terrace",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.room.closet",
+      "parent": "pa:space.room",
+      "label": "Closet",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.outdoor-zone",
+      "parent": "pa:space",
+      "label": "Outdoor Zone",
+      "tier": 1
+    },
+    {
+      "id": "pa:space.outdoor-zone.sidewalk",
+      "parent": "pa:space.outdoor-zone",
+      "label": "Sidewalk",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.outdoor-zone.intersection",
+      "parent": "pa:space.outdoor-zone",
+      "label": "Intersection",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.outdoor-zone.crosswalk",
+      "parent": "pa:space.outdoor-zone",
+      "label": "Crosswalk",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.outdoor-zone.parking-lot",
+      "parent": "pa:space.outdoor-zone",
+      "label": "Parking Lot",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.outdoor-zone.alley",
+      "parent": "pa:space.outdoor-zone",
+      "label": "Alley",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.outdoor-zone.road",
+      "parent": "pa:space.outdoor-zone",
+      "label": "Road",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.outdoor-zone.plaza",
+      "parent": "pa:space.outdoor-zone",
+      "label": "Plaza",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.outdoor-zone.patio",
+      "parent": "pa:space.outdoor-zone",
+      "label": "Patio",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.outdoor-zone.yard",
+      "parent": "pa:space.outdoor-zone",
+      "label": "Yard",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.outdoor-zone.sand-dune",
+      "parent": "pa:space.outdoor-zone",
+      "label": "Sand Dune",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.outdoor-zone.shore",
+      "parent": "pa:space.outdoor-zone",
+      "label": "Shore",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.outdoor-zone.pier",
+      "parent": "pa:space.outdoor-zone",
+      "label": "Pier",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.outdoor-zone.pool",
+      "parent": "pa:space.outdoor-zone",
+      "label": "Pool",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.outdoor-zone.garden",
+      "parent": "pa:space.outdoor-zone",
+      "label": "Garden",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.structure",
+      "parent": "pa:space",
+      "label": "Structure",
+      "tier": 1
+    },
+    {
+      "id": "pa:space.structure.wall",
+      "parent": "pa:space.structure",
+      "label": "Wall",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.structure.floor-slab",
+      "parent": "pa:space.structure",
+      "label": "Floor Slab",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.structure.ceiling",
+      "parent": "pa:space.structure",
+      "label": "Ceiling",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.structure.roof",
+      "parent": "pa:space.structure",
+      "label": "Roof",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.structure.door",
+      "parent": "pa:space.structure",
+      "label": "Door",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.structure.window",
+      "parent": "pa:space.structure",
+      "label": "Window",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.structure.doorway",
+      "parent": "pa:space.structure",
+      "label": "Doorway",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.structure.stair",
+      "parent": "pa:space.structure",
+      "label": "Stair",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.structure.railing",
+      "parent": "pa:space.structure",
+      "label": "Railing",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.structure.pillar",
+      "parent": "pa:space.structure",
+      "label": "Pillar",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.structure.fence",
+      "parent": "pa:space.structure",
+      "label": "Fence",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.structure.gate",
+      "parent": "pa:space.structure",
+      "label": "Gate",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.structure.canopy",
+      "parent": "pa:space.structure",
+      "label": "Canopy",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.navigation",
+      "parent": "pa:space",
+      "label": "Navigation",
+      "tier": 1
+    },
+    {
+      "id": "pa:space.navigation.exit",
+      "parent": "pa:space.navigation",
+      "label": "Exit",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.navigation.entry",
+      "parent": "pa:space.navigation",
+      "label": "Entry",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.navigation.corridor",
+      "parent": "pa:space.navigation",
+      "label": "Corridor",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.navigation.obstacle",
+      "parent": "pa:space.navigation",
+      "label": "Obstacle",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.navigation.accessible-path",
+      "parent": "pa:space.navigation",
+      "label": "Accessible Path",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.navigation.portal",
+      "parent": "pa:space.navigation",
+      "label": "Portal",
+      "tier": 2
+    },
+    {
+      "id": "pa:space.navigation.threshold",
+      "parent": "pa:space.navigation",
+      "label": "Threshold",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry",
+      "parent": null,
+      "label": "Geometry",
+      "tier": 0
+    },
+    {
+      "id": "pa:geometry.primitive",
+      "parent": "pa:geometry",
+      "label": "Primitive",
+      "tier": 1
+    },
+    {
+      "id": "pa:geometry.primitive.box",
+      "parent": "pa:geometry.primitive",
+      "label": "Box",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.primitive.sphere",
+      "parent": "pa:geometry.primitive",
+      "label": "Sphere",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.primitive.cylinder",
+      "parent": "pa:geometry.primitive",
+      "label": "Cylinder",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.primitive.cone",
+      "parent": "pa:geometry.primitive",
+      "label": "Cone",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.primitive.torus",
+      "parent": "pa:geometry.primitive",
+      "label": "Torus",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.primitive.plane",
+      "parent": "pa:geometry.primitive",
+      "label": "Plane",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.primitive.circle",
+      "parent": "pa:geometry.primitive",
+      "label": "Circle",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.primitive.rectangle",
+      "parent": "pa:geometry.primitive",
+      "label": "Rectangle",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.primitive.line",
+      "parent": "pa:geometry.primitive",
+      "label": "Line",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.primitive.capsule",
+      "parent": "pa:geometry.primitive",
+      "label": "Capsule",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.primitive.polygon-prism",
+      "parent": "pa:geometry.primitive",
+      "label": "Polygon Prism",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.primitive.triangle",
+      "parent": "pa:geometry.primitive",
+      "label": "Triangle",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.primitive.polygon",
+      "parent": "pa:geometry.primitive",
+      "label": "Convex Polygon (fan-triangulated)",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.composite",
+      "parent": "pa:geometry",
+      "label": "Composite",
+      "tier": 1
+    },
+    {
+      "id": "pa:geometry.composite.table",
+      "parent": "pa:geometry.composite",
+      "label": "Table",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.composite.sofa",
+      "parent": "pa:geometry.composite",
+      "label": "Sofa",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.composite.chair",
+      "parent": "pa:geometry.composite",
+      "label": "Chair",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.composite.bed",
+      "parent": "pa:geometry.composite",
+      "label": "Bed",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.composite.cabinet",
+      "parent": "pa:geometry.composite",
+      "label": "Cabinet",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.composite.shelf",
+      "parent": "pa:geometry.composite",
+      "label": "Shelf",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.composite.lamp",
+      "parent": "pa:geometry.composite",
+      "label": "Lamp",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.composite.door-frame",
+      "parent": "pa:geometry.composite",
+      "label": "Door Frame",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.composite.staircase",
+      "parent": "pa:geometry.composite",
+      "label": "Staircase",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.composite.person-proxy",
+      "parent": "pa:geometry.composite",
+      "label": "Person Proxy",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.composite.vehicle-proxy",
+      "parent": "pa:geometry.composite",
+      "label": "Vehicle Proxy",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.composite.beach-umbrella",
+      "parent": "pa:geometry.composite",
+      "label": "Beach Umbrella",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.representation",
+      "parent": "pa:geometry",
+      "label": "Representation",
+      "tier": 1
+    },
+    {
+      "id": "pa:geometry.representation.mesh",
+      "parent": "pa:geometry.representation",
+      "label": "Mesh",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.representation.glb",
+      "parent": "pa:geometry.representation",
+      "label": "Glb",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.representation.skinned-mesh",
+      "parent": "pa:geometry.representation",
+      "label": "Skinned Mesh",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.representation.instanced-mesh",
+      "parent": "pa:geometry.representation",
+      "label": "Instanced Mesh",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.representation.billboard",
+      "parent": "pa:geometry.representation",
+      "label": "Billboard",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.representation.sprite",
+      "parent": "pa:geometry.representation",
+      "label": "Sprite",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.representation.gaussian-splat",
+      "parent": "pa:geometry.representation",
+      "label": "Gaussian Splat",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.representation.spz",
+      "parent": "pa:geometry.representation",
+      "label": "Spz",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.representation.point-cloud",
+      "parent": "pa:geometry.representation",
+      "label": "Point Cloud",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.representation.depth-relief",
+      "parent": "pa:geometry.representation",
+      "label": "Depth Relief",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.representation.source-image-plane",
+      "parent": "pa:geometry.representation",
+      "label": "Source Image Plane",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.shape-operation",
+      "parent": "pa:geometry",
+      "label": "Shape Operation",
+      "tier": 1
+    },
+    {
+      "id": "pa:geometry.shape-operation.translate",
+      "parent": "pa:geometry.shape-operation",
+      "label": "Translate",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.shape-operation.rotate",
+      "parent": "pa:geometry.shape-operation",
+      "label": "Rotate",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.shape-operation.scale",
+      "parent": "pa:geometry.shape-operation",
+      "label": "Scale",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.shape-operation.group",
+      "parent": "pa:geometry.shape-operation",
+      "label": "Group",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.shape-operation.parent-child",
+      "parent": "pa:geometry.shape-operation",
+      "label": "Parent Child",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.shape-operation.union",
+      "parent": "pa:geometry.shape-operation",
+      "label": "Union",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.shape-operation.subtract",
+      "parent": "pa:geometry.shape-operation",
+      "label": "Subtract",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.shape-operation.intersect",
+      "parent": "pa:geometry.shape-operation",
+      "label": "Intersect",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.shape-operation.extrude",
+      "parent": "pa:geometry.shape-operation",
+      "label": "Extrude",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.shape-operation.mirror",
+      "parent": "pa:geometry.shape-operation",
+      "label": "Mirror",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.shape-operation.array",
+      "parent": "pa:geometry.shape-operation",
+      "label": "Array",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.shape-operation.loft",
+      "parent": "pa:geometry.shape-operation",
+      "label": "Loft",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.precision",
+      "parent": "pa:geometry",
+      "label": "Precision",
+      "tier": 1
+    },
+    {
+      "id": "pa:geometry.precision.schematic",
+      "parent": "pa:geometry.precision",
+      "label": "Schematic",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.precision.inferred",
+      "parent": "pa:geometry.precision",
+      "label": "Inferred",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.precision.relative-depth",
+      "parent": "pa:geometry.precision",
+      "label": "Relative Depth",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.precision.calibrated",
+      "parent": "pa:geometry.precision",
+      "label": "Calibrated",
+      "tier": 2
+    },
+    {
+      "id": "pa:geometry.precision.metric",
+      "parent": "pa:geometry.precision",
+      "label": "Metric",
+      "tier": 2
+    },
+    {
+      "id": "pa:object",
+      "parent": null,
+      "label": "Object",
+      "tier": 0
+    },
+    {
+      "id": "pa:object.furniture",
+      "parent": "pa:object",
+      "label": "Furniture",
+      "tier": 1
+    },
+    {
+      "id": "pa:object.furniture.chair",
+      "parent": "pa:object.furniture",
+      "label": "Chair",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.furniture.table",
+      "parent": "pa:object.furniture",
+      "label": "Table",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.furniture.desk",
+      "parent": "pa:object.furniture",
+      "label": "Desk",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.furniture.sofa",
+      "parent": "pa:object.furniture",
+      "label": "Sofa",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.furniture.bed",
+      "parent": "pa:object.furniture",
+      "label": "Bed",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.furniture.dresser",
+      "parent": "pa:object.furniture",
+      "label": "Dresser",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.furniture.stool",
+      "parent": "pa:object.furniture",
+      "label": "Stool",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.furniture.shelf",
+      "parent": "pa:object.furniture",
+      "label": "Shelf",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.furniture.bookcase",
+      "parent": "pa:object.furniture",
+      "label": "Bookcase",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.furniture.bench",
+      "parent": "pa:object.furniture",
+      "label": "Bench",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.furniture.nightstand",
+      "parent": "pa:object.furniture",
+      "label": "Nightstand",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.furniture.counter",
+      "parent": "pa:object.furniture",
+      "label": "Counter",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.fixture",
+      "parent": "pa:object",
+      "label": "Fixture",
+      "tier": 1
+    },
+    {
+      "id": "pa:object.fixture.sink",
+      "parent": "pa:object.fixture",
+      "label": "Sink",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.fixture.toilet",
+      "parent": "pa:object.fixture",
+      "label": "Toilet",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.fixture.bathtub",
+      "parent": "pa:object.fixture",
+      "label": "Bathtub",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.fixture.shower",
+      "parent": "pa:object.fixture",
+      "label": "Shower",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.fixture.faucet",
+      "parent": "pa:object.fixture",
+      "label": "Faucet",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.fixture.switch",
+      "parent": "pa:object.fixture",
+      "label": "Switch",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.fixture.outlet",
+      "parent": "pa:object.fixture",
+      "label": "Outlet",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.fixture.light-fixture",
+      "parent": "pa:object.fixture",
+      "label": "Light Fixture",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.fixture.radiator",
+      "parent": "pa:object.fixture",
+      "label": "Radiator",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.fixture.heater",
+      "parent": "pa:object.fixture",
+      "label": "Heater",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.appliance",
+      "parent": "pa:object",
+      "label": "Appliance",
+      "tier": 1
+    },
+    {
+      "id": "pa:object.appliance.oven",
+      "parent": "pa:object.appliance",
+      "label": "Oven",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.appliance.stove",
+      "parent": "pa:object.appliance",
+      "label": "Stove",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.appliance.refrigerator",
+      "parent": "pa:object.appliance",
+      "label": "Refrigerator",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.appliance.microwave",
+      "parent": "pa:object.appliance",
+      "label": "Microwave",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.appliance.kettle",
+      "parent": "pa:object.appliance",
+      "label": "Kettle",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.appliance.dishwasher",
+      "parent": "pa:object.appliance",
+      "label": "Dishwasher",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.appliance.washer",
+      "parent": "pa:object.appliance",
+      "label": "Washer",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.appliance.dryer",
+      "parent": "pa:object.appliance",
+      "label": "Dryer",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.appliance.television",
+      "parent": "pa:object.appliance",
+      "label": "Television",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.appliance.computer",
+      "parent": "pa:object.appliance",
+      "label": "Computer",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.personal-item",
+      "parent": "pa:object",
+      "label": "Personal Item",
+      "tier": 1
+    },
+    {
+      "id": "pa:object.personal-item.plate",
+      "parent": "pa:object.personal-item",
+      "label": "Plate",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.personal-item.cup",
+      "parent": "pa:object.personal-item",
+      "label": "Cup",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.personal-item.glass",
+      "parent": "pa:object.personal-item",
+      "label": "Glass",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.personal-item.knife",
+      "parent": "pa:object.personal-item",
+      "label": "Knife",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.personal-item.fork",
+      "parent": "pa:object.personal-item",
+      "label": "Fork",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.personal-item.spoon",
+      "parent": "pa:object.personal-item",
+      "label": "Spoon",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.personal-item.bottle",
+      "parent": "pa:object.personal-item",
+      "label": "Bottle",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.personal-item.bag",
+      "parent": "pa:object.personal-item",
+      "label": "Bag",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.personal-item.phone",
+      "parent": "pa:object.personal-item",
+      "label": "Phone",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.personal-item.wallet",
+      "parent": "pa:object.personal-item",
+      "label": "Wallet",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.personal-item.key",
+      "parent": "pa:object.personal-item",
+      "label": "Key",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.personal-item.shoes",
+      "parent": "pa:object.personal-item",
+      "label": "Shoes",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.personal-item.hat",
+      "parent": "pa:object.personal-item",
+      "label": "Hat",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.transport",
+      "parent": "pa:object",
+      "label": "Transport",
+      "tier": 1
+    },
+    {
+      "id": "pa:object.transport.car",
+      "parent": "pa:object.transport",
+      "label": "Car",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.transport.bicycle",
+      "parent": "pa:object.transport",
+      "label": "Bicycle",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.transport.motorcycle",
+      "parent": "pa:object.transport",
+      "label": "Motorcycle",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.transport.bus",
+      "parent": "pa:object.transport",
+      "label": "Bus",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.transport.truck",
+      "parent": "pa:object.transport",
+      "label": "Truck",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.transport.boat",
+      "parent": "pa:object.transport",
+      "label": "Boat",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.transport.scooter",
+      "parent": "pa:object.transport",
+      "label": "Scooter",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.landscape",
+      "parent": "pa:object",
+      "label": "Landscape",
+      "tier": 1
+    },
+    {
+      "id": "pa:object.landscape.tree",
+      "parent": "pa:object.landscape",
+      "label": "Tree",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.landscape.shrub",
+      "parent": "pa:object.landscape",
+      "label": "Shrub",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.landscape.grass",
+      "parent": "pa:object.landscape",
+      "label": "Grass",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.landscape.rock",
+      "parent": "pa:object.landscape",
+      "label": "Rock",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.landscape.sand",
+      "parent": "pa:object.landscape",
+      "label": "Sand",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.landscape.water",
+      "parent": "pa:object.landscape",
+      "label": "Water",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.landscape.lamp-post",
+      "parent": "pa:object.landscape",
+      "label": "Lamp Post",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.landscape.trash-bin",
+      "parent": "pa:object.landscape",
+      "label": "Trash Bin",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.landscape.fire-pit",
+      "parent": "pa:object.landscape",
+      "label": "Fire Pit",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.evidence-proxy",
+      "parent": "pa:object",
+      "label": "Evidence Proxy",
+      "tier": 1
+    },
+    {
+      "id": "pa:object.evidence-proxy.marker",
+      "parent": "pa:object.evidence-proxy",
+      "label": "Marker",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.evidence-proxy.footprint-card",
+      "parent": "pa:object.evidence-proxy",
+      "label": "Footprint Card",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.evidence-proxy.measurement-line",
+      "parent": "pa:object.evidence-proxy",
+      "label": "Measurement Line",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.evidence-proxy.bounding-box",
+      "parent": "pa:object.evidence-proxy",
+      "label": "Bounding Box",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.evidence-proxy.annotation-pin",
+      "parent": "pa:object.evidence-proxy",
+      "label": "Annotation Pin",
+      "tier": 2
+    },
+    {
+      "id": "pa:object.evidence-proxy.trajectory-line",
+      "parent": "pa:object.evidence-proxy",
+      "label": "Trajectory Line",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor",
+      "parent": null,
+      "label": "Actor",
+      "tier": 0
+    },
+    {
+      "id": "pa:actor.representation",
+      "parent": "pa:actor",
+      "label": "Representation",
+      "tier": 1
+    },
+    {
+      "id": "pa:actor.representation.neutral-humanoid",
+      "parent": "pa:actor.representation",
+      "label": "Neutral Humanoid",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.representation.generated-head",
+      "parent": "pa:actor.representation",
+      "label": "Generated Head",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.representation.portrait-card",
+      "parent": "pa:actor.representation",
+      "label": "Portrait Card",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.representation.sprite",
+      "parent": "pa:actor.representation",
+      "label": "Sprite",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.representation.low-poly-body",
+      "parent": "pa:actor.representation",
+      "label": "Low Poly Body",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.representation.rigged-body",
+      "parent": "pa:actor.representation",
+      "label": "Rigged Body",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.representation.glb-actor",
+      "parent": "pa:actor.representation",
+      "label": "Glb Actor",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component",
+      "parent": "pa:actor",
+      "label": "Component",
+      "tier": 1
+    },
+    {
+      "id": "pa:actor.component.head",
+      "parent": "pa:actor.component",
+      "label": "Head",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.torso",
+      "parent": "pa:actor.component",
+      "label": "Torso",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.left-arm",
+      "parent": "pa:actor.component",
+      "label": "Left Arm",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.right-arm",
+      "parent": "pa:actor.component",
+      "label": "Right Arm",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.left-hand",
+      "parent": "pa:actor.component",
+      "label": "Left Hand",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.right-hand",
+      "parent": "pa:actor.component",
+      "label": "Right Hand",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.left-leg",
+      "parent": "pa:actor.component",
+      "label": "Left Leg",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.right-leg",
+      "parent": "pa:actor.component",
+      "label": "Right Leg",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.left-foot",
+      "parent": "pa:actor.component",
+      "label": "Left Foot",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.right-foot",
+      "parent": "pa:actor.component",
+      "label": "Right Foot",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.eye",
+      "parent": "pa:actor.component",
+      "label": "Eye",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.ear",
+      "parent": "pa:actor.component",
+      "label": "Ear",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.mouth",
+      "parent": "pa:actor.component",
+      "label": "Mouth",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.nose",
+      "parent": "pa:actor.component",
+      "label": "Nose",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.hair-card",
+      "parent": "pa:actor.component",
+      "label": "Hair Card",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.component.clothing",
+      "parent": "pa:actor.component",
+      "label": "Clothing",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.role",
+      "parent": "pa:actor",
+      "label": "Role",
+      "tier": 1
+    },
+    {
+      "id": "pa:actor.role.anonymous-person",
+      "parent": "pa:actor.role",
+      "label": "Anonymous Person",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.role.illustrative-participant",
+      "parent": "pa:actor.role",
+      "label": "Illustrative Participant",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.role.nonhuman-animal",
+      "parent": "pa:actor.role",
+      "label": "Nonhuman Animal",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.role.environmental-agent",
+      "parent": "pa:actor.role",
+      "label": "Environmental Agent",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.pose",
+      "parent": "pa:actor",
+      "label": "Pose",
+      "tier": 1
+    },
+    {
+      "id": "pa:actor.pose.standing",
+      "parent": "pa:actor.pose",
+      "label": "Standing",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.pose.sitting",
+      "parent": "pa:actor.pose",
+      "label": "Sitting",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.pose.kneeling",
+      "parent": "pa:actor.pose",
+      "label": "Kneeling",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.pose.lying",
+      "parent": "pa:actor.pose",
+      "label": "Lying",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.pose.crouching",
+      "parent": "pa:actor.pose",
+      "label": "Crouching",
+      "tier": 2
+    },
+    {
+      "id": "pa:actor.pose.idle",
+      "parent": "pa:actor.pose",
+      "label": "Idle",
+      "tier": 2
+    },
+    {
+      "id": "pa:material",
+      "parent": null,
+      "label": "Material",
+      "tier": 0
+    },
+    {
+      "id": "pa:material.surface",
+      "parent": "pa:material",
+      "label": "Surface",
+      "tier": 1
+    },
+    {
+      "id": "pa:material.surface.wood",
+      "parent": "pa:material.surface",
+      "label": "Wood",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.concrete",
+      "parent": "pa:material.surface",
+      "label": "Concrete",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.brick",
+      "parent": "pa:material.surface",
+      "label": "Brick",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.plaster",
+      "parent": "pa:material.surface",
+      "label": "Plaster",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.tile",
+      "parent": "pa:material.surface",
+      "label": "Tile",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.glass",
+      "parent": "pa:material.surface",
+      "label": "Glass",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.stone",
+      "parent": "pa:material.surface",
+      "label": "Stone",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.carpet",
+      "parent": "pa:material.surface",
+      "label": "Carpet",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.fabric",
+      "parent": "pa:material.surface",
+      "label": "Fabric",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.leather",
+      "parent": "pa:material.surface",
+      "label": "Leather",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.metal",
+      "parent": "pa:material.surface",
+      "label": "Metal",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.plastic",
+      "parent": "pa:material.surface",
+      "label": "Plastic",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.skin",
+      "parent": "pa:material.surface",
+      "label": "Skin",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.hair",
+      "parent": "pa:material.surface",
+      "label": "Hair",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.water",
+      "parent": "pa:material.surface",
+      "label": "Water",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.surface.sand",
+      "parent": "pa:material.surface",
+      "label": "Sand",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.render",
+      "parent": "pa:material",
+      "label": "Render",
+      "tier": 1
+    },
+    {
+      "id": "pa:material.render.pbr",
+      "parent": "pa:material.render",
+      "label": "Pbr",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.render.unlit",
+      "parent": "pa:material.render",
+      "label": "Unlit",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.render.flat",
+      "parent": "pa:material.render",
+      "label": "Flat",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.render.toon",
+      "parent": "pa:material.render",
+      "label": "Toon",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.render.cel-outline",
+      "parent": "pa:material.render",
+      "label": "Cel Outline",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.render.wireframe",
+      "parent": "pa:material.render",
+      "label": "Wireframe",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.render.vertex-color",
+      "parent": "pa:material.render",
+      "label": "Vertex Color",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.render.texture-atlas",
+      "parent": "pa:material.render",
+      "label": "Texture Atlas",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.light-color",
+      "parent": "pa:material",
+      "label": "Light Color",
+      "tier": 1
+    },
+    {
+      "id": "pa:material.light-color.red",
+      "parent": "pa:material.light-color",
+      "label": "Red",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.light-color.green",
+      "parent": "pa:material.light-color",
+      "label": "Green",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.light-color.blue",
+      "parent": "pa:material.light-color",
+      "label": "Blue",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.light-color.yellow",
+      "parent": "pa:material.light-color",
+      "label": "Yellow",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.light-color.cyan",
+      "parent": "pa:material.light-color",
+      "label": "Cyan",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.light-color.magenta",
+      "parent": "pa:material.light-color",
+      "label": "Magenta",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.light-color.white",
+      "parent": "pa:material.light-color",
+      "label": "White",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.light-color.black",
+      "parent": "pa:material.light-color",
+      "label": "Black",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.color-model",
+      "parent": "pa:material",
+      "label": "Color Model",
+      "tier": 1
+    },
+    {
+      "id": "pa:material.color-model.rgb-additive",
+      "parent": "pa:material.color-model",
+      "label": "Rgb Additive",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.color-model.cmy-subtractive",
+      "parent": "pa:material.color-model",
+      "label": "Cmy Subtractive",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.color-model.pigment-mix",
+      "parent": "pa:material.color-model",
+      "label": "Pigment Mix",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.color-model.alpha-compositing",
+      "parent": "pa:material.color-model",
+      "label": "Alpha Compositing",
+      "tier": 2
+    },
+    {
+      "id": "pa:material.color-model.additive-blending",
+      "parent": "pa:material.color-model",
+      "label": "Additive Blending",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation",
+      "parent": null,
+      "label": "Observation",
+      "tier": 0
+    },
+    {
+      "id": "pa:observation.image-region",
+      "parent": "pa:observation",
+      "label": "Image Region",
+      "tier": 1
+    },
+    {
+      "id": "pa:observation.image-region.bounding-box",
+      "parent": "pa:observation.image-region",
+      "label": "Bounding Box",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.image-region.segmentation-mask",
+      "parent": "pa:observation.image-region",
+      "label": "Segmentation Mask",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.image-region.keypoint",
+      "parent": "pa:observation.image-region",
+      "label": "Keypoint",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.image-region.pixel-point",
+      "parent": "pa:observation.image-region",
+      "label": "Pixel Point",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.image-region.polygon-region",
+      "parent": "pa:observation.image-region",
+      "label": "Polygon Region",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.model-output",
+      "parent": "pa:observation",
+      "label": "Model Output",
+      "tier": 1
+    },
+    {
+      "id": "pa:observation.model-output.object-detection",
+      "parent": "pa:observation.model-output",
+      "label": "Object Detection",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.model-output.caption",
+      "parent": "pa:observation.model-output",
+      "label": "Caption",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.model-output.optical-flow",
+      "parent": "pa:observation.model-output",
+      "label": "Optical Flow",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.model-output.depth-estimate",
+      "parent": "pa:observation.model-output",
+      "label": "Depth Estimate",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.model-output.person-proposal",
+      "parent": "pa:observation.model-output",
+      "label": "Person Proposal",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.model-output.text-extraction",
+      "parent": "pa:observation.model-output",
+      "label": "Text Extraction",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.model-output.audio-transcript",
+      "parent": "pa:observation.model-output",
+      "label": "Audio Transcript",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.source",
+      "parent": "pa:observation",
+      "label": "Source",
+      "tier": 1
+    },
+    {
+      "id": "pa:observation.source.photo",
+      "parent": "pa:observation.source",
+      "label": "Photo",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.source.video",
+      "parent": "pa:observation.source",
+      "label": "Video",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.source.frame",
+      "parent": "pa:observation.source",
+      "label": "Frame",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.source.audio",
+      "parent": "pa:observation.source",
+      "label": "Audio",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.source.pdf",
+      "parent": "pa:observation.source",
+      "label": "Pdf",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.source.prompt",
+      "parent": "pa:observation.source",
+      "label": "Prompt",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.source.witness-account",
+      "parent": "pa:observation.source",
+      "label": "Witness Account",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.status",
+      "parent": "pa:observation",
+      "label": "Status",
+      "tier": 1
+    },
+    {
+      "id": "pa:observation.status.raw",
+      "parent": "pa:observation.status",
+      "label": "Raw",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.status.candidate",
+      "parent": "pa:observation.status",
+      "label": "Candidate",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.status.extracted",
+      "parent": "pa:observation.status",
+      "label": "Extracted",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.status.reviewed",
+      "parent": "pa:observation.status",
+      "label": "Reviewed",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.status.rejected",
+      "parent": "pa:observation.status",
+      "label": "Rejected",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.status.unresolved",
+      "parent": "pa:observation.status",
+      "label": "Unresolved",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.coordinate",
+      "parent": "pa:observation",
+      "label": "Coordinate",
+      "tier": 1
+    },
+    {
+      "id": "pa:observation.coordinate.image-pixel",
+      "parent": "pa:observation.coordinate",
+      "label": "Image Pixel",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.coordinate.normalized-uv",
+      "parent": "pa:observation.coordinate",
+      "label": "Normalized Uv",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.coordinate.image-depth",
+      "parent": "pa:observation.coordinate",
+      "label": "Image Depth",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.coordinate.camera-ray",
+      "parent": "pa:observation.coordinate",
+      "label": "Camera Ray",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.coordinate.world-uncalibrated",
+      "parent": "pa:observation.coordinate",
+      "label": "World Uncalibrated",
+      "tier": 2
+    },
+    {
+      "id": "pa:observation.coordinate.world-calibrated",
+      "parent": "pa:observation.coordinate",
+      "label": "World Calibrated",
+      "tier": 2
+    },
+    {
+      "id": "pa:event",
+      "parent": null,
+      "label": "Event",
+      "tier": 0
+    },
+    {
+      "id": "pa:event.cue",
+      "parent": "pa:event",
+      "label": "Cue",
+      "tier": 1
+    },
+    {
+      "id": "pa:event.cue.presence",
+      "parent": "pa:event.cue",
+      "label": "Presence",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.cue.dialogue",
+      "parent": "pa:event.cue",
+      "label": "Dialogue",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.cue.gesture",
+      "parent": "pa:event.cue",
+      "label": "Gesture",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.cue.interact",
+      "parent": "pa:event.cue",
+      "label": "Interact",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.cue.move",
+      "parent": "pa:event.cue",
+      "label": "Move",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.cue.impact",
+      "parent": "pa:event.cue",
+      "label": "Impact",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.cue.inspect",
+      "parent": "pa:event.cue",
+      "label": "Inspect",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.cue.approach",
+      "parent": "pa:event.cue",
+      "label": "Approach",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.cue.exit",
+      "parent": "pa:event.cue",
+      "label": "Exit",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.cue.enter",
+      "parent": "pa:event.cue",
+      "label": "Enter",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.cue.dispute",
+      "parent": "pa:event.cue",
+      "label": "Dispute",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.cue.conflict",
+      "parent": "pa:event.cue",
+      "label": "Conflict",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.cue.uncertainty",
+      "parent": "pa:event.cue",
+      "label": "Uncertainty",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.temporal",
+      "parent": "pa:event",
+      "label": "Temporal",
+      "tier": 1
+    },
+    {
+      "id": "pa:event.temporal.start-time",
+      "parent": "pa:event.temporal",
+      "label": "Start Time",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.temporal.end-time",
+      "parent": "pa:event.temporal",
+      "label": "End Time",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.temporal.duration",
+      "parent": "pa:event.temporal",
+      "label": "Duration",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.temporal.source-interval",
+      "parent": "pa:event.temporal",
+      "label": "Source Interval",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.temporal.replay-clock",
+      "parent": "pa:event.temporal",
+      "label": "Replay Clock",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.review",
+      "parent": "pa:event",
+      "label": "Review",
+      "tier": 1
+    },
+    {
+      "id": "pa:event.review.unreviewed",
+      "parent": "pa:event.review",
+      "label": "Unreviewed",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.review.proposed",
+      "parent": "pa:event.review",
+      "label": "Proposed",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.review.accepted",
+      "parent": "pa:event.review",
+      "label": "Accepted",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.review.rejected",
+      "parent": "pa:event.review",
+      "label": "Rejected",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.review.disputed",
+      "parent": "pa:event.review",
+      "label": "Disputed",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.motion",
+      "parent": "pa:event",
+      "label": "Motion",
+      "tier": 1
+    },
+    {
+      "id": "pa:event.motion.static-preview",
+      "parent": "pa:event.motion",
+      "label": "Static Preview",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.motion.proposed-trajectory",
+      "parent": "pa:event.motion",
+      "label": "Proposed Trajectory",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.motion.reviewed-animation",
+      "parent": "pa:event.motion",
+      "label": "Reviewed Animation",
+      "tier": 2
+    },
+    {
+      "id": "pa:event.motion.path-spline",
+      "parent": "pa:event.motion",
+      "label": "Path Spline",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance",
+      "parent": null,
+      "label": "Provenance",
+      "tier": 0
+    },
+    {
+      "id": "pa:provenance.origin",
+      "parent": "pa:provenance",
+      "label": "Origin",
+      "tier": 1
+    },
+    {
+      "id": "pa:provenance.origin.source-evidence",
+      "parent": "pa:provenance.origin",
+      "label": "Source Evidence",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.origin.derived-model-output",
+      "parent": "pa:provenance.origin",
+      "label": "Derived Model Output",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.origin.hand-authored",
+      "parent": "pa:provenance.origin",
+      "label": "Hand Authored",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.origin.generated-fixture",
+      "parent": "pa:provenance.origin",
+      "label": "Generated Fixture",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.origin.reviewed-reconstruction",
+      "parent": "pa:provenance.origin",
+      "label": "Reviewed Reconstruction",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.trace",
+      "parent": "pa:provenance",
+      "label": "Trace",
+      "tier": 1
+    },
+    {
+      "id": "pa:provenance.trace.case-id",
+      "parent": "pa:provenance.trace",
+      "label": "Case Id",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.trace.scene-id",
+      "parent": "pa:provenance.trace",
+      "label": "Scene Id",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.trace.scene-revision",
+      "parent": "pa:provenance.trace",
+      "label": "Scene Revision",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.trace.evidence-id",
+      "parent": "pa:provenance.trace",
+      "label": "Evidence Id",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.trace.evidence-revision",
+      "parent": "pa:provenance.trace",
+      "label": "Evidence Revision",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.trace.source-sha256",
+      "parent": "pa:provenance.trace",
+      "label": "Source Sha256",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.trace.artifact-sha256",
+      "parent": "pa:provenance.trace",
+      "label": "Artifact Sha256",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.trace.model-name",
+      "parent": "pa:provenance.trace",
+      "label": "Model Name",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.trace.model-version",
+      "parent": "pa:provenance.trace",
+      "label": "Model Version",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.trace.model-sha256",
+      "parent": "pa:provenance.trace",
+      "label": "Model Sha256",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.trace.run-id",
+      "parent": "pa:provenance.trace",
+      "label": "Run Id",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.review",
+      "parent": "pa:provenance",
+      "label": "Review",
+      "tier": 1
+    },
+    {
+      "id": "pa:provenance.review.unreviewed",
+      "parent": "pa:provenance.review",
+      "label": "Unreviewed",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.review.human-reviewed",
+      "parent": "pa:provenance.review",
+      "label": "Human Reviewed",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.review.rejected",
+      "parent": "pa:provenance.review",
+      "label": "Rejected",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.review.unknown",
+      "parent": "pa:provenance.review",
+      "label": "Unknown",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.authority",
+      "parent": "pa:provenance",
+      "label": "Authority",
+      "tier": 1
+    },
+    {
+      "id": "pa:provenance.authority.illustrative-hypothesis",
+      "parent": "pa:provenance.authority",
+      "label": "Illustrative Hypothesis",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.authority.measured-source",
+      "parent": "pa:provenance.authority",
+      "label": "Measured Source",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.authority.verified-artifact",
+      "parent": "pa:provenance.authority",
+      "label": "Verified Artifact",
+      "tier": 2
+    },
+    {
+      "id": "pa:provenance.authority.unauthorized",
+      "parent": "pa:provenance.authority",
+      "label": "Unauthorized",
+      "tier": 2
+    },
+    {
+      "id": "pa:render",
+      "parent": null,
+      "label": "Render",
+      "tier": 0
+    },
+    {
+      "id": "pa:render.camera",
+      "parent": "pa:render",
+      "label": "Camera",
+      "tier": 1
+    },
+    {
+      "id": "pa:render.camera.orthographic-topdown",
+      "parent": "pa:render.camera",
+      "label": "Orthographic Topdown",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.camera.orthographic-isometric",
+      "parent": "pa:render.camera",
+      "label": "Orthographic Isometric",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.camera.perspective",
+      "parent": "pa:render.camera",
+      "label": "Perspective",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.camera.orbit",
+      "parent": "pa:render.camera",
+      "label": "Orbit",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.camera.follow-actor",
+      "parent": "pa:render.camera",
+      "label": "Follow Actor",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.camera.photo-frustum",
+      "parent": "pa:render.camera",
+      "label": "Photo Frustum",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.lod",
+      "parent": "pa:render",
+      "label": "Lod",
+      "tier": 1
+    },
+    {
+      "id": "pa:render.lod.retro",
+      "parent": "pa:render.lod",
+      "label": "Retro",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.lod.balanced",
+      "parent": "pa:render.lod",
+      "label": "Balanced",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.lod.detailed",
+      "parent": "pa:render.lod",
+      "label": "Detailed",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.lod.impostor",
+      "parent": "pa:render.lod",
+      "label": "Impostor",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.visibility",
+      "parent": "pa:render",
+      "label": "Visibility",
+      "tier": 1
+    },
+    {
+      "id": "pa:render.visibility.visible",
+      "parent": "pa:render.visibility",
+      "label": "Visible",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.visibility.hidden",
+      "parent": "pa:render.visibility",
+      "label": "Hidden",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.visibility.selected",
+      "parent": "pa:render.visibility",
+      "label": "Selected",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.visibility.ghosted",
+      "parent": "pa:render.visibility",
+      "label": "Ghosted",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.visibility.faded",
+      "parent": "pa:render.visibility",
+      "label": "Faded",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.streaming",
+      "parent": "pa:render",
+      "label": "Streaming",
+      "tier": 1
+    },
+    {
+      "id": "pa:render.streaming.cell",
+      "parent": "pa:render.streaming",
+      "label": "Cell",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.streaming.morton-key",
+      "parent": "pa:render.streaming",
+      "label": "Morton Key",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.streaming.resident",
+      "parent": "pa:render.streaming",
+      "label": "Resident",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.streaming.evicted",
+      "parent": "pa:render.streaming",
+      "label": "Evicted",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.streaming.pending-loading",
+      "parent": "pa:render.streaming",
+      "label": "Pending Loading",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.streaming.scene-root",
+      "parent": "pa:render.streaming",
+      "label": "Scene Root",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.streaming.transform-arena",
+      "parent": "pa:render.streaming",
+      "label": "Transform Arena",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.interaction",
+      "parent": "pa:render",
+      "label": "Interaction",
+      "tier": 1
+    },
+    {
+      "id": "pa:render.interaction.select",
+      "parent": "pa:render.interaction",
+      "label": "Select",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.interaction.move",
+      "parent": "pa:render.interaction",
+      "label": "Move",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.interaction.rotate",
+      "parent": "pa:render.interaction",
+      "label": "Rotate",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.interaction.scale",
+      "parent": "pa:render.interaction",
+      "label": "Scale",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.interaction.drag",
+      "parent": "pa:render.interaction",
+      "label": "Drag",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.interaction.orbit",
+      "parent": "pa:render.interaction",
+      "label": "Orbit",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.interaction.scrub",
+      "parent": "pa:render.interaction",
+      "label": "Scrub",
+      "tier": 2
+    },
+    {
+      "id": "pa:render.interaction.timeline",
+      "parent": "pa:render.interaction",
+      "label": "Timeline",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow",
+      "parent": null,
+      "label": "Workflow",
+      "tier": 0
+    },
+    {
+      "id": "pa:workflow.stage",
+      "parent": "pa:workflow",
+      "label": "Stage",
+      "tier": 1
+    },
+    {
+      "id": "pa:workflow.stage.draft",
+      "parent": "pa:workflow.stage",
+      "label": "Draft",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.stage.classify",
+      "parent": "pa:workflow.stage",
+      "label": "Classify",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.stage.propose",
+      "parent": "pa:workflow.stage",
+      "label": "Propose",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.stage.preview",
+      "parent": "pa:workflow.stage",
+      "label": "Preview",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.stage.review",
+      "parent": "pa:workflow.stage",
+      "label": "Review",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.stage.authorize",
+      "parent": "pa:workflow.stage",
+      "label": "Authorize",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.stage.save",
+      "parent": "pa:workflow.stage",
+      "label": "Save",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.stage.readback",
+      "parent": "pa:workflow.stage",
+      "label": "Readback",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.stage.reopen",
+      "parent": "pa:workflow.stage",
+      "label": "Reopen",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.stage.archive",
+      "parent": "pa:workflow.stage",
+      "label": "Archive",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.job",
+      "parent": "pa:workflow",
+      "label": "Job",
+      "tier": 1
+    },
+    {
+      "id": "pa:workflow.job.queued",
+      "parent": "pa:workflow.job",
+      "label": "Queued",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.job.processing",
+      "parent": "pa:workflow.job",
+      "label": "Processing",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.job.completed",
+      "parent": "pa:workflow.job",
+      "label": "Completed",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.job.failed",
+      "parent": "pa:workflow.job",
+      "label": "Failed",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.job.source-missing",
+      "parent": "pa:workflow.job",
+      "label": "Source Missing",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.job.cancelled",
+      "parent": "pa:workflow.job",
+      "label": "Cancelled",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.compute",
+      "parent": "pa:workflow",
+      "label": "Compute",
+      "tier": 1
+    },
+    {
+      "id": "pa:workflow.compute.node-typescript",
+      "parent": "pa:workflow.compute",
+      "label": "Node Typescript",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.compute.browser-worker",
+      "parent": "pa:workflow.compute",
+      "label": "Browser Worker",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.compute.n-api-cpp",
+      "parent": "pa:workflow.compute",
+      "label": "N Api Cpp",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.compute.python-worker",
+      "parent": "pa:workflow.compute",
+      "label": "Python Worker",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.compute.onnx-inference",
+      "parent": "pa:workflow.compute",
+      "label": "Onnx Inference",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.compute.gpu-render",
+      "parent": "pa:workflow.compute",
+      "label": "Gpu Render",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.storage",
+      "parent": "pa:workflow",
+      "label": "Storage",
+      "tier": 1
+    },
+    {
+      "id": "pa:workflow.storage.postgres",
+      "parent": "pa:workflow.storage",
+      "label": "Postgres",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.storage.scene-asset-revision",
+      "parent": "pa:workflow.storage",
+      "label": "Scene Asset Revision",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.storage.seaweedfs",
+      "parent": "pa:workflow.storage",
+      "label": "Seaweedfs",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.storage.valkey",
+      "parent": "pa:workflow.storage",
+      "label": "Valkey",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.storage.transient-hashmap",
+      "parent": "pa:workflow.storage",
+      "label": "Transient Hashmap",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.storage.qdrant-projection",
+      "parent": "pa:workflow.storage",
+      "label": "Qdrant Projection",
+      "tier": 2
+    },
+    {
+      "id": "pa:workflow.storage.neo4j-projection",
+      "parent": "pa:workflow.storage",
+      "label": "Neo4J Projection",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context",
+      "parent": null,
+      "label": "Scene Context",
+      "tier": 0
+    },
+    {
+      "id": "pa:scene-context.setting",
+      "parent": "pa:scene-context",
+      "label": "Setting",
+      "tier": 1
+    },
+    {
+      "id": "pa:scene-context.setting.indoor",
+      "parent": "pa:scene-context.setting",
+      "label": "Indoor",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.setting.urban",
+      "parent": "pa:scene-context.setting",
+      "label": "Urban",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.setting.beach",
+      "parent": "pa:scene-context.setting",
+      "label": "Beach",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.setting.coastal",
+      "parent": "pa:scene-context.setting",
+      "label": "Coastal",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.setting.rural",
+      "parent": "pa:scene-context.setting",
+      "label": "Rural",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.setting.transit",
+      "parent": "pa:scene-context.setting",
+      "label": "Transit",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.setting.commercial",
+      "parent": "pa:scene-context.setting",
+      "label": "Commercial",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.setting.residential",
+      "parent": "pa:scene-context.setting",
+      "label": "Residential",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.setting.public-space",
+      "parent": "pa:scene-context.setting",
+      "label": "Public Space",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.case-category",
+      "parent": "pa:scene-context",
+      "label": "Case Category",
+      "tier": 1
+    },
+    {
+      "id": "pa:scene-context.case-category.unclassified",
+      "parent": "pa:scene-context.case-category",
+      "label": "Unclassified",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.case-category.allegation",
+      "parent": "pa:scene-context.case-category",
+      "label": "Allegation",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.case-category.incident",
+      "parent": "pa:scene-context.case-category",
+      "label": "Incident",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.case-category.disputed-event",
+      "parent": "pa:scene-context.case-category",
+      "label": "Disputed Event",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.case-category.recorded-event",
+      "parent": "pa:scene-context.case-category",
+      "label": "Recorded Event",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.case-category.reconstructed-hypothesis",
+      "parent": "pa:scene-context.case-category",
+      "label": "Reconstructed Hypothesis",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.purpose",
+      "parent": "pa:scene-context",
+      "label": "Purpose",
+      "tier": 1
+    },
+    {
+      "id": "pa:scene-context.purpose.illustration",
+      "parent": "pa:scene-context.purpose",
+      "label": "Illustration",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.purpose.investigation",
+      "parent": "pa:scene-context.purpose",
+      "label": "Investigation",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.purpose.training",
+      "parent": "pa:scene-context.purpose",
+      "label": "Training",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.purpose.review",
+      "parent": "pa:scene-context.purpose",
+      "label": "Review",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.purpose.comparison",
+      "parent": "pa:scene-context.purpose",
+      "label": "Comparison",
+      "tier": 2
+    },
+    {
+      "id": "pa:scene-context.purpose.storyboard",
+      "parent": "pa:scene-context.purpose",
+      "label": "Storyboard",
+      "tier": 2
+    },
+    {
+      "id": "pa:safety",
+      "parent": null,
+      "label": "Safety",
+      "tier": 0
+    },
+    {
+      "id": "pa:safety.claim",
+      "parent": "pa:safety",
+      "label": "Claim",
+      "tier": 1
+    },
+    {
+      "id": "pa:safety.claim.not-an-identity",
+      "parent": "pa:safety.claim",
+      "label": "Not An Identity",
+      "tier": 2
+    },
+    {
+      "id": "pa:safety.claim.not-a-measurement",
+      "parent": "pa:safety.claim",
+      "label": "Not A Measurement",
+      "tier": 2
+    },
+    {
+      "id": "pa:safety.claim.not-an-observed-action",
+      "parent": "pa:safety.claim",
+      "label": "Not An Observed Action",
+      "tier": 2
+    },
+    {
+      "id": "pa:safety.claim.requires-review",
+      "parent": "pa:safety.claim",
+      "label": "Requires Review",
+      "tier": 2
+    },
+    {
+      "id": "pa:safety.claim.uncertain-source",
+      "parent": "pa:safety.claim",
+      "label": "Uncertain Source",
+      "tier": 2
+    },
+    {
+      "id": "pa:safety.claim.synthetic-only",
+      "parent": "pa:safety.claim",
+      "label": "Synthetic Only",
+      "tier": 2
+    },
+    {
+      "id": "pa:safety.gate",
+      "parent": "pa:safety",
+      "label": "Gate",
+      "tier": 1
+    },
+    {
+      "id": "pa:safety.gate.case-membership",
+      "parent": "pa:safety.gate",
+      "label": "Case Membership",
+      "tier": 2
+    },
+    {
+      "id": "pa:safety.gate.hash-match",
+      "parent": "pa:safety.gate",
+      "label": "Hash Match",
+      "tier": 2
+    },
+    {
+      "id": "pa:safety.gate.source-revision-match",
+      "parent": "pa:safety.gate",
+      "label": "Source Revision Match",
+      "tier": 2
+    },
+    {
+      "id": "pa:safety.gate.rights-qualified",
+      "parent": "pa:safety.gate",
+      "label": "Rights Qualified",
+      "tier": 2
+    },
+    {
+      "id": "pa:safety.gate.human-approval",
+      "parent": "pa:safety.gate",
+      "label": "Human Approval",
+      "tier": 2
+    },
+    {
+      "id": "pa:safety.gate.cross-case-deny",
+      "parent": "pa:safety.gate",
+      "label": "Cross Case Deny",
+      "tier": 2
+    }
+  ],
+  "relations": [
+    {
+      "id": "IS_A",
+      "subjectKind": "node",
+      "objectKind": "concept"
+    },
+    {
+      "id": "PART_OF",
+      "subjectKind": "entity",
+      "objectKind": "entity"
+    },
+    {
+      "id": "CONTAINS",
+      "subjectKind": "entity",
+      "objectKind": "entity"
+    },
+    {
+      "id": "LOCATED_IN",
+      "subjectKind": "entity",
+      "objectKind": "entity"
+    },
+    {
+      "id": "CONNECTS_TO",
+      "subjectKind": "entity",
+      "objectKind": "entity"
+    },
+    {
+      "id": "HAS_GEOMETRY",
+      "subjectKind": "entity",
+      "objectKind": "recipe"
+    },
+    {
+      "id": "USES_MATERIAL",
+      "subjectKind": "entity",
+      "objectKind": "concept"
+    },
+    {
+      "id": "INSTANCE_OF",
+      "subjectKind": "entity",
+      "objectKind": "recipe"
+    },
+    {
+      "id": "USES_RECIPE",
+      "subjectKind": "recipe",
+      "objectKind": "concept"
+    },
+    {
+      "id": "HAS_RENDER_STYLE",
+      "subjectKind": "entity",
+      "objectKind": "concept"
+    },
+    {
+      "id": "HAS_APPEARANCE",
+      "subjectKind": "entity",
+      "objectKind": "entity"
+    },
+    {
+      "id": "DETECTED_IN",
+      "subjectKind": "observation",
+      "objectKind": "source"
+    },
+    {
+      "id": "OBSERVES",
+      "subjectKind": "observation",
+      "objectKind": "entity"
+    },
+    {
+      "id": "HAS_PIXEL_REGION",
+      "subjectKind": "observation",
+      "objectKind": "region"
+    },
+    {
+      "id": "PROPOSES_PROXY",
+      "subjectKind": "observation",
+      "objectKind": "entity"
+    },
+    {
+      "id": "PROPOSES_PLACEMENT",
+      "subjectKind": "observation",
+      "objectKind": "entity"
+    },
+    {
+      "id": "CUE_TARGETS",
+      "subjectKind": "cue",
+      "objectKind": "entity"
+    },
+    {
+      "id": "CUE_SOURCE",
+      "subjectKind": "cue",
+      "objectKind": "source"
+    },
+    {
+      "id": "CUE_CLASSIFIED_AS",
+      "subjectKind": "cue",
+      "objectKind": "concept"
+    },
+    {
+      "id": "REVIEWED_BY",
+      "subjectKind": "cue",
+      "objectKind": "review"
+    },
+    {
+      "id": "DERIVED_FROM",
+      "subjectKind": "entity",
+      "objectKind": "source"
+    },
+    {
+      "id": "SUPPORTED_BY",
+      "subjectKind": "cue",
+      "objectKind": "source"
+    },
+    {
+      "id": "CONTRADICTS",
+      "subjectKind": "cue",
+      "objectKind": "cue"
+    },
+    {
+      "id": "SCOPED_TO",
+      "subjectKind": "entity",
+      "objectKind": "scope"
+    },
+    {
+      "id": "RENDERS_AS",
+      "subjectKind": "entity",
+      "objectKind": "entity"
+    },
+    {
+      "id": "HAS_ARTIFACT",
+      "subjectKind": "entity",
+      "objectKind": "source"
+    },
+    {
+      "id": "SHARES_GEOMETRY_WITH",
+      "subjectKind": "entity",
+      "objectKind": "entity"
+    },
+    {
+      "id": "PARTICIPATES_IN",
+      "subjectKind": "entity",
+      "objectKind": "cue"
+    }
+  ],
+  "note": "Labels are scene authoring concepts, not asserted facts about evidence or alleged conduct.",
+  "n64PrimitiveBudgets": {
+    "status": "PROPOSED_DESIGN_BUDGET_NOT_MEASURED",
+    "basis": {
+      "rdramBaseBytes": 4194304,
+      "rdramWithExpansionPakBytes": 8388608,
+      "tmemBytes": 4096,
+      "rspVertexCacheEntries": 32,
+      "vertexRecordBytes": 16,
+      "note": "Hardware figures from N64 documentation as commonly cited; confirm against the target toolchain before use. All per-primitive limits below are design proposals."
+    },
+    "perPrimitive": {
+      "pa:geometry.primitive.triangle": {
+        "maxVerts": 3,
+        "maxTris": 1
+      },
+      "pa:geometry.primitive.polygon": {
+        "maxVerts": 8,
+        "maxTris": 6,
+        "maxSides": 8,
+        "convexOnly": true
+      },
+      "pa:geometry.primitive.rectangle": {
+        "maxVerts": 4,
+        "maxTris": 2
+      },
+      "pa:geometry.primitive.plane": {
+        "maxVerts": 4,
+        "maxTris": 2
+      },
+      "pa:geometry.primitive.circle": {
+        "maxVerts": 9,
+        "maxTris": 8,
+        "maxSegments": 8
+      },
+      "pa:geometry.primitive.line": {
+        "maxVerts": 4,
+        "maxTris": 2
+      },
+      "pa:geometry.primitive.box": {
+        "maxVerts": 8,
+        "maxTris": 12
+      },
+      "pa:geometry.primitive.sphere": {
+        "maxVerts": 64,
+        "maxTris": 96,
+        "maxSegments": 8,
+        "maxRings": 6
+      },
+      "pa:geometry.primitive.capsule": {
+        "maxVerts": 64,
+        "maxTris": 96,
+        "maxSegments": 8,
+        "maxRings": 6
+      },
+      "pa:geometry.primitive.cylinder": {
+        "maxVerts": 32,
+        "maxTris": 32,
+        "maxSegments": 8
+      },
+      "pa:geometry.primitive.cone": {
+        "maxVerts": 16,
+        "maxTris": 16,
+        "maxSegments": 8
+      },
+      "pa:geometry.primitive.torus": {
+        "maxVerts": 64,
+        "maxTris": 96,
+        "maxSegments": 8,
+        "maxRings": 6
+      },
+      "pa:geometry.primitive.polygon-prism": {
+        "maxVerts": 16,
+        "maxTris": 24,
+        "maxSides": 8,
+        "convexOnly": true
+      }
+    },
+    "sceneLimits": {
+      "vertsPerDrawBatch": 32,
+      "textureBytesPerTile": 2048,
+      "textureNote": "32x32 16-bit fits TMEM; larger textures must be tiled or 4bpp",
+      "primitivesPerScene": 512
+    }
+  }
+}

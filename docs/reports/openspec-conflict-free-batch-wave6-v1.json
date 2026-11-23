@@ -1,0 +1,108 @@
+{
+  "schema": "atlas.openspec-conflict-free-batch.v1",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "maxConcurrentWorkers": 2,
+  "workerA": {
+    "role": "a2a-worker-a",
+    "ownedFiles": [
+      "cartridge-tensor-bridge.ts",
+      "graph-projection-manifest.ts",
+      "hooks.server.ts",
+      "src/mcp/server.ts",
+      "vector-cache.ts"
+    ],
+    "tasks": [
+      {
+        "durableKey": "parent-atlas-gpu-graph-vector-substrate:TASK-L84:1",
+        "locator": "openspec/changes/parent-atlas-gpu-graph-vector-substrate/tasks.md#L84",
+        "score": 80.0,
+        "ownedFiles": [
+          "graph-projection-manifest.ts"
+        ],
+        "summary": "4.1 Add `atlas_test_v1` to `graph-projection-manifest.ts`'s"
+      },
+      {
+        "durableKey": "parent-atlas-graph-retrieval-proof:ACQ10:1",
+        "locator": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L376",
+        "score": 80.0,
+        "ownedFiles": [
+          "hooks.server.ts"
+        ],
+        "summary": "ACQ10 NOT_PROVEN \u2014 no OTel spans added yet; bootstrap exists and is invoked from `hooks.server.ts` but nothing in the acquisition path em..."
+      },
+      {
+        "durableKey": "parent-atlas-kv-cache-adaptation-research:KV-02:1",
+        "locator": "openspec/changes/parent-atlas-kv-cache-adaptation-research/tasks.md#L245",
+        "score": 80.0,
+        "ownedFiles": [
+          "src/mcp/server.ts"
+        ],
+        "summary": "KV-02 Fixture E: measure `selectMcpToolSubset` (`src/mcp/server.ts`) prompt tokens for the same query and compare with D2."
+      },
+      {
+        "durableKey": "parent-atlas-kv-cache-adaptation-research:OPS-:12",
+        "locator": "openspec/changes/parent-atlas-kv-cache-adaptation-research/tasks.md#L487",
+        "score": 80.0,
+        "ownedFiles": [
+          "cartridge-tensor-bridge.ts",
+          "vector-cache.ts"
+        ],
+        "summary": "OPS-05h Decide: point `cartridge-tensor-bridge.ts` and `vector-cache.ts` at the shared `getRedis()`, or retire them as dead code (archive..."
+      }
+    ]
+  },
+  "workerB": {
+    "role": "a2a-worker-b",
+    "ownedFiles": [
+      "ace-context-manifest.ts",
+      "fanout-context-compiler-v1.ts",
+      "feature-extraction.ts",
+      "packet-class-lut-v1.ts",
+      "repair-lut-v1.mjs",
+      "scope:parent-atlas-graph-retrieval-proof:TASK-L295"
+    ],
+    "tasks": [
+      {
+        "durableKey": "parent-atlas-graph-retrieval-proof:TASK-L295:1",
+        "locator": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L295",
+        "score": 80.0,
+        "ownedFiles": [
+          "scope:parent-atlas-graph-retrieval-proof:TASK-L295"
+        ],
+        "summary": "`LDR_LLM_BASE_URL`/`LDR_LLM_MODEL` env-driven endpoint selection (vs. any hardcoded model id) \u2014 not yet audited against the live `ldr-orc..."
+      },
+      {
+        "durableKey": "parent-atlas-kafka-projection-initiative:KAFKA-18:1",
+        "locator": "openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md#L73",
+        "score": 80.0,
+        "ownedFiles": [
+          "packet-class-lut-v1.ts",
+          "repair-lut-v1.mjs"
+        ],
+        "summary": "KAFKA-18 LUT owner consolidation. Several LUTs exist (`packet-class-lut-v1.ts`, `repair-lut-v1.mjs`, plus ad hoc maps in many scripts). N..."
+      },
+      {
+        "durableKey": "parent-atlas-kv-cache-adaptation-research:ACE-V4-:1",
+        "locator": "openspec/changes/parent-atlas-kv-cache-adaptation-research/tasks.md#L341",
+        "score": 80.0,
+        "ownedFiles": [
+          "ace-context-manifest.ts",
+          "fanout-context-compiler-v1.ts"
+        ],
+        "summary": "ACE-V4-01a finish this census against `ace-context-manifest.ts`, `fanout-context-compiler-v1.ts`, `atlas_representations` (read them; thi..."
+      },
+      {
+        "durableKey": "parent-atlas-kv-cache-adaptation-research:OPS-:15",
+        "locator": "openspec/changes/parent-atlas-kv-cache-adaptation-research/tasks.md#L504",
+        "score": 80.0,
+        "ownedFiles": [
+          "feature-extraction.ts"
+        ],
+        "summary": "OPS-06a Decide whether to wire `feature-extraction.ts` into a route or archive it (dead per this census)."
+      }
+    ]
+  },
+  "disjointVerified": true,
+  "skippedConflicts": []
+}

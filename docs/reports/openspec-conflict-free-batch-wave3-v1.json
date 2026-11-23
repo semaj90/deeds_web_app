@@ -1,0 +1,103 @@
+{
+  "schema": "atlas.openspec-conflict-free-batch.v1",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "maxConcurrentWorkers": 2,
+  "workerA": {
+    "role": "a2a-worker-a",
+    "ownedFiles": [
+      "ace-wiki.ts",
+      "atlas_policy_value.py",
+      "candidate_concept_tile_v1.py",
+      "low_rank_feature_scorer.py",
+      "packet-lod-manifest.ts"
+    ],
+    "tasks": [
+      {
+        "durableKey": "parent-atlas-ace-rlm-bitfrost-integration:TASK-L7217:1",
+        "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L7217",
+        "score": 80.0,
+        "ownedFiles": [
+          "ace-wiki.ts"
+        ],
+        "summary": "Reconcile `ace-wiki.ts` with the HEVAL raw-trace/wiki/skill separation"
+      },
+      {
+        "durableKey": "parent-atlas-ace-rlm-bitfrost-integration:PIPE-LUT-01:1",
+        "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L14619",
+        "score": 80.0,
+        "ownedFiles": [
+          "packet-lod-manifest.ts"
+        ],
+        "summary": "PIPE-LUT-01 Map the \"Pokemon ROM-bank\" LUT frame (compressed-packets + LOD scripts, freeze Addendum 9) onto `packet-lod-manifest.ts` /"
+      },
+      {
+        "durableKey": "parent-atlas-ace-rlm-bitfrost-integration:ALIGN-GEMM-GAP-01:1",
+        "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16594",
+        "score": 80.0,
+        "ownedFiles": [
+          "atlas_policy_value.py",
+          "candidate_concept_tile_v1.py"
+        ],
+        "summary": "ALIGN-GEMM-GAP-01 Decide the owner of a real GPU feature-tile scorer (extend `atlas_policy_value.py` + `candidate_concept_tile_v1.py` und..."
+      },
+      {
+        "durableKey": "parent-atlas-ace-rlm-bitfrost-integration:S3-5:1",
+        "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16846",
+        "score": 80.0,
+        "ownedFiles": [
+          "low_rank_feature_scorer.py"
+        ],
+        "summary": "S3-5 Nonlinear challenger: run `low_rank_feature_scorer.py` only through an explicit adapter from the 6 channels (its contract is 8 featu..."
+      }
+    ]
+  },
+  "workerB": {
+    "role": "a2a-worker-b",
+    "ownedFiles": [
+      "ace-4x6-routing-matrix.ts",
+      "ace-materializer.ts",
+      "patch-tournament.ts"
+    ],
+    "tasks": [
+      {
+        "durableKey": "parent-atlas-ace-rlm-bitfrost-integration:ACE-MATERIALIZER-DOMAIN-09:1",
+        "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L13018",
+        "score": 80.0,
+        "ownedFiles": [
+          "ace-materializer.ts"
+        ],
+        "summary": "ACE-MATERIALIZER-DOMAIN-09: extend the existing read/join step in `ace-materializer.ts` to"
+      },
+      {
+        "durableKey": "parent-atlas-ace-rlm-bitfrost-integration:RECEIPT-RESOLVE-01:1",
+        "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16537",
+        "score": 80.0,
+        "ownedFiles": [
+          "patch-tournament.ts"
+        ],
+        "summary": "RECEIPT-RESOLVE-01 change `patch-tournament.ts` to resolve `evidenceRef` through the verification table once it exists (builds on TOURN-E..."
+      },
+      {
+        "durableKey": "parent-atlas-ace-rlm-bitfrost-integration:TASK-L16646:1",
+        "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16646",
+        "score": 80.0,
+        "ownedFiles": [
+          "ace-4x6-routing-matrix.ts"
+        ],
+        "summary": "4X6-TILE-01-B Name the two conflicting uses apart in docs/code (`ace-4x6-routing-matrix.ts` = lanes x signals; `AtlasPolicyValue` input c..."
+      },
+      {
+        "durableKey": "parent-atlas-ace-rlm-bitfrost-integration:RECEIPT-RESOLVE-01:2",
+        "locator": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L16653",
+        "score": 80.0,
+        "ownedFiles": [
+          "patch-tournament.ts"
+        ],
+        "summary": "RECEIPT-RESOLVE-01 `patch-tournament.ts` still takes a free-string `evidenceRef`; resolving it through `atlas_receipt_verifier_results_v1..."
+      }
+    ]
+  },
+  "disjointVerified": true,
+  "skippedConflicts": []
+}

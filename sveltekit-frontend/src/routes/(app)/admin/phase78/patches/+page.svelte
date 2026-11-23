@@ -19,6 +19,28 @@ mediumRisk: number;
 suggestionsByRisk: Record<string, Suggestion[]>;
 	}
 
+	// /api/system/phase78/status returns { suggestions: { stats, recent }, routes, clusters, ... }.
+	// This page reads a flat { stats, suggestions[], suggestionsByRisk }. Map what exists and default
+	// the rest, so the page renders zeros instead of throwing. The contract mismatch is still open.
+	function normalizeStatus(raw: unknown): StatusData {
+		const r = (raw ?? {}) as Record<string, any>;
+		const sugg = r.suggestions;
+		const list: Suggestion[] = Array.isArray(sugg) ? sugg : (Array.isArray(sugg?.recent) ? sugg.recent : []);
+		const byRisk: Record<string, Suggestion[]> = r.suggestionsByRisk ?? {};
+		return {
+			timestamp: r.timestamp ?? '',
+			stats: {
+				totalSuggestions: Number(r.stats?.totalSuggestions ?? 0),
+				pendingSuggestions: Number(r.stats?.pendingSuggestions ?? 0),
+				highRisk: Number(r.stats?.highRisk ?? 0),
+				mediumRisk: Number(r.stats?.mediumRisk ?? 0),
+				lowRisk: Number(r.stats?.lowRisk ?? 0)
+			},
+			suggestions: list,
+			suggestionsByRisk: byRisk
+		};
+	}
+
 	let data = $state<StatusData | null>(null);
 	let isLoading = $state(true);
 	let errorMsg = $state<string | null>(null);
@@ -30,7 +52,7 @@ suggestionsByRisk: Record<string, Suggestion[]>;
 		try {
 			const res = await fetch('/api/system/phase78/status');
 			if (!res.ok) throw new Error('Failed to fetch data');
-			data = await res.json();
+			data = normalizeStatus(await res.json());
 		} catch (e) {
 			errorMsg = e instanceof Error ? e.message : 'Unknown error';
 		} finally {

@@ -1,0 +1,109 @@
+{
+  "schema": "atlas.taxonomy-crosswalk.v1",
+  "status": "CROSSWALK_VALIDATED",
+  "failure": null,
+  "taxonomyRevision": "sha256:8e412738344f35371dc57d1babb4d1409607999ce8cd6652b4428bb8bd27a952",
+  "topLevelCount": 13,
+  "childCount": 4,
+  "counts": {
+    "total": 7,
+    "exact": 1,
+    "caseOnly": 1,
+    "proposed": 0,
+    "unresolved": 4,
+    "ambiguous": 1
+  },
+  "conservationPassed": true,
+  "proposals": [
+    {
+      "originalLabel": "frontend.sveltekit",
+      "normalizedLabel": null,
+      "status": "EXACT_MATCH",
+      "targetDomainId": "frontend.sveltekit",
+      "nesOrdinal": 16,
+      "candidates": [],
+      "sourceTable": "domain_taxonomy_v1",
+      "rowId": "1",
+      "evidence": [],
+      "taxonomyRevision": "sha256:8e412738344f35371dc57d1babb4d1409607999ce8cd6652b4428bb8bd27a952"
+    },
+    {
+      "originalLabel": "Database.PostgreSQL",
+      "normalizedLabel": "database.postgresql",
+      "status": "CASE_ONLY",
+      "targetDomainId": "database.postgresql",
+      "nesOrdinal": 13,
+      "candidates": [],
+      "sourceTable": "legacy_packets",
+      "rowId": "2",
+      "evidence": [],
+      "taxonomyRevision": "sha256:8e412738344f35371dc57d1babb4d1409607999ce8cd6652b4428bb8bd27a952"
+    },
+    {
+      "originalLabel": "documentation",
+      "normalizedLabel": null,
+      "status": "UNRESOLVED",
+      "targetDomainId": null,
+      "nesOrdinal": null,
+      "candidates": [],
+      "sourceTable": "legacy_packets",
+      "rowId": "3",
+      "evidence": [],
+      "taxonomyRevision": "sha256:8e412738344f35371dc57d1babb4d1409607999ce8cd6652b4428bb8bd27a952"
+    },
+    {
+      "originalLabel": "tool",
+      "normalizedLabel": null,
+      "status": "UNRESOLVED",
+      "targetDomainId": null,
+      "nesOrdinal": null,
+      "candidates": [],
+      "sourceTable": "legacy_packets",
+      "rowId": "4",
+      "evidence": [],
+      "taxonomyRevision": "sha256:8e412738344f35371dc57d1babb4d1409607999ce8cd6652b4428bb8bd27a952"
+    },
+    {
+      "originalLabel": "agent",
+      "normalizedLabel": null,
+      "status": "UNRESOLVED",
+      "targetDomainId": null,
+      "nesOrdinal": null,
+      "candidates": [],
+      "sourceTable": "legacy_packets",
+      "rowId": "5",
+      "evidence": [],
+      "taxonomyRevision": "sha256:8e412738344f35371dc57d1babb4d1409607999ce8cd6652b4428bb8bd27a952"
+    },
+    {
+      "originalLabel": "Other",
+      "normalizedLabel": null,
+      "status": "UNRESOLVED",
+      "targetDomainId": null,
+      "nesOrdinal": null,
+      "candidates": [],
+      "sourceTable": "legacy_packets",
+      "rowId": "6",
+      "evidence": [],
+      "taxonomyRevision": "sha256:8e412738344f35371dc57d1babb4d1409607999ce8cd6652b4428bb8bd27a952"
+    },
+    {
+      "originalLabel": "ui_or_api",
+      "normalizedLabel": null,
+      "status": "AMBIGUOUS",
+      "targetDomainId": null,
+      "nesOrdinal": null,
+      "candidates": [
+        "frontend",
+        "api"
+      ],
+      "sourceTable": "legacy_packets",
+      "rowId": "7",
+      "evidence": [],
+      "taxonomyRevision": "sha256:8e412738344f35371dc57d1babb4d1409607999ce8cd6652b4428bb8bd27a952"
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "receiptChecksum": "sha256:c5ec83f8457ef8c8e5ddae01b2449b39f781635e81f3f83cb43e6955ba225c4a"
+}

@@ -135,4 +135,56 @@ export class ToolSessionContextManager {
 /**
  * Global session context manager (shared across tool invocations in the MCP server)
  */
+/**
+ * Global session context manager (shared across tool invocations in the MCP server)
+ */
 export const globalSessionContextManager = new ToolSessionContextManager();
+
+/**
+ * Wrap an MCP tool handler with fail-closed phase-alignment verification.
+ * Blocks `QUARANTINE` state paths before invoking the underlying handler,
+ * strips `phase_alignment` from the forwarded input, and attaches `phase_alignment_receipt`.
+ */
+export function createPhaseAlignedToolWithDispatcher(
+  middleware: DispatcherMiddleware | undefined,
+  toolName: string,
+  sessionId: string,
+  handler: (input: any) => Promise<any>
+) {
+  const baseHandler = middleware
+    ? createToolWithDispatcher(middleware, toolName, sessionId, handler)
+    : handler;
+
+  return async (input: any) => {
+    const { phase_alignment, ...forwardedInput } = input ?? {};
+    const statePath: string[] = Array.isArray(phase_alignment?.state_path)
+      ? phase_alignment.state_path
+      : ['UNKNOWN'];
+
+    if (statePath.includes('QUARANTINE')) {
+      return {
+        isError: true,
+        content: [{ type: 'text', text: `BLOCKED: ${toolName} quarantined by phase alignment gate` }],
+        phase_alignment_receipt: {
+          toolName,
+          sessionId,
+          requestId: phase_alignment?.request_id ?? null,
+          statePath,
+          decision: { action: 'BLOCK', reason: 'PHASE_ALIGNMENT_QUARANTINE' },
+        },
+      };
+    }
+
+    const result = await baseHandler(forwardedInput);
+    return {
+      ...(result && typeof result === 'object' ? result : { content: [{ type: 'text', text: String(result) }] }),
+      phase_alignment_receipt: {
+        toolName,
+        sessionId,
+        requestId: phase_alignment?.request_id ?? null,
+        statePath,
+        decision: { action: 'VALIDATE', reason: 'PHASE_ALIGNMENT_OK' },
+      },
+    };
+  };
+}

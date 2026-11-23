@@ -1,0 +1,86 @@
+{
+  "schema": "atlas.openspec-pilot-batch-plan.v1",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "status": "PLAN_ONLY_NO_IMPLEMENTATION_STARTED",
+  "pilot": [
+    {
+      "lane": "A-ui-integration",
+      "owner": "single agent (shared canvas file)",
+      "tasks": [
+        "ENG-03",
+        "ENG-04",
+        "CASE-SCENE-E2E-13"
+      ],
+      "taskStatusInTasksMd": {
+        "ENG-03": "CHECKED (DONE 2026-11-20)",
+        "ENG-04": "CHECKED (DONE 2026-11-20)",
+        "CASE-SCENE-E2E-13": "PARTIAL"
+      },
+      "writePaths": [
+        "sveltekit-frontend/src/lib/components/reconstruction/SceneRuntimeRecipeCanvas.svelte"
+      ],
+      "readPaths": [
+        "sveltekit-frontend/src/lib/components/reconstruction/TimelineEngine.svelte",
+        "sveltekit-frontend/src/lib/reconstruction/dual-clock-timeline-v1.ts",
+        "sveltekit-frontend/src/lib/scene/scene-deformation-brush-v1.ts",
+        "sveltekit-frontend/src/lib/splat/scene-goap-planner-v1.ts"
+      ],
+      "unitProof": {
+        "command": "npx vitest run (5 specs)",
+        "result": "5 files, 20 tests passed"
+      },
+      "wiringFinding": "SceneRuntimeRecipeCanvas.svelte imports none of TimelineEngine, the deformation brush or the GOAP planner. Status CREATED, not WIRED.",
+      "gan": "CREATED (unit-tested); ENG-03/ENG-04 are checked DONE in tasks.md but not wired into the canvas, so their DONE status should be reviewed"
+    },
+    {
+      "lane": "B-cpu-parity",
+      "owner": "single agent",
+      "tasks": [
+        "CASE-SCENE-E2E-12"
+      ],
+      "taskStatusInTasksMd": {
+        "CASE-SCENE-E2E-12": "OPEN"
+      },
+      "writePaths": [],
+      "readPaths": [
+        "sveltekit-frontend/src/lib/reconstruction/geometry-kernel-v1.ts",
+        "simd-bridge/cpp/test_nes_lut_filter_avx2.cpp"
+      ],
+      "duplicateOwnerFlag": "GeometryKernelV1 has specs in two places: src/lib/reconstruction/geometry-kernel-v1.spec.ts and src/lib/splat/geometry-kernel-v1.spec.ts. Confirm one owner before benchmarking.",
+      "gan": "OPEN"
+    },
+    {
+      "lane": "C-browser",
+      "owner": "after lane A",
+      "tasks": [
+        "CASE-SCENE-E2E-10"
+      ],
+      "taskStatusInTasksMd": {
+        "CASE-SCENE-E2E-10": "OPEN"
+      },
+      "blockedBy": [
+        "staging write approval",
+        "PW_SCENE_CASE_ID / PW_SCENE_STORAGE_STATE / PW_SCENE_VERIFY_STAGING_WRITE=1",
+        "live Postgres :5434 and SeaweedFS :8333"
+      ],
+      "gan": "NOT_RUN"
+    }
+  ],
+  "excludedFromBatch": [
+    "Phase 20 source_revision deferral",
+    "Graphify apply-capable refresh",
+    "Valkey centroid/BitFrost writes",
+    "database migrations",
+    "GPU workloads"
+  ],
+  "validationLadder": [
+    "targeted vitest per file",
+    "npx svelte-check (native) after lane A",
+    "targeted Playwright (dev server :5173 is up; not run yet)"
+  ],
+  "resourceLimits": {
+    "concurrentImplementationAgents": 1,
+    "note": "two lanes only after RAM headroom measured (about 3.5 GiB free)"
+  }
+}

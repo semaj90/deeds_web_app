@@ -21,15 +21,19 @@ import {
   SCENE_INTENT_SHAPE_HINT,
   SCENE_INTENT_DISCLAIMER,
   buildSceneIntentUserPrompt,
+  STORYBOOK_IMAGE_SYSTEM_PROMPT,
 } from './scene-intent-prompt.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { BIFROST_CHAT_MODEL } from '$lib/ai/model-ids.js';
+import { buildStorybookImageIntentV1, type StorybookImagePrefillV1 } from './storybook-image-prefill-v1.js';
 
 export interface SceneIntentExtractInput {
   narrative:     string;
   caseId?:       string;
   evidenceIds?:  string[];
   aceContext?:   string;
+  storybookPrefill?: string;
+  storybookImagePrefill?: StorybookImagePrefillV1;
   aestheticHint?: 'ps1' | 'n64' | 'modern-low-poly';
   model?:        string;     // default: ornith-1.5-9b
   temperature?:  number;     // default: 0.2 — deterministic intent extraction
@@ -135,8 +139,10 @@ export async function extractSceneIntent(
   const model = input.model ?? BIFROST_CHAT_MODEL;
 
   const messages = [
-    { role: 'system' as const, content: `${SCENE_INTENT_SYSTEM_PROMPT}\n\n${SCENE_INTENT_SHAPE_HINT}` },
-    { role: 'user'   as const, content: buildSceneIntentUserPrompt(input) },
+    { role: 'system' as const, content: input.storybookImagePrefill ? STORYBOOK_IMAGE_SYSTEM_PROMPT : `${SCENE_INTENT_SYSTEM_PROMPT}\n\n${SCENE_INTENT_SHAPE_HINT}` },
+    { role: 'user'   as const, content: buildSceneIntentUserPrompt(input.storybookImagePrefill ? {
+      ...input, storybookSource: 'still_image', storybookPrefill: JSON.stringify(input.storybookImagePrefill),
+    } : input) },
   ];
 
   let raw = '';
@@ -180,7 +186,8 @@ export async function extractSceneIntent(
     };
   }
 
-  const validated = SceneIntentSchema.safeParse(parsedUnknown);
+  const validated = SceneIntentSchema.safeParse(input.storybookImagePrefill
+    ? buildStorybookImageIntentV1(parsedUnknown, input.storybookImagePrefill, input.aestheticHint) : parsedUnknown);
   if (!validated.success) {
     return {
       ok: false,

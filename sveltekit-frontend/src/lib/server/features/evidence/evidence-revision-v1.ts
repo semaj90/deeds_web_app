@@ -22,6 +22,10 @@ import {
 	type PoseObservationV1,
 	type PoseSkeletonSchemaV1,
 } from '$lib/shared/pose-skeleton-schema-v1.js';
+import { planarCameraCalibrationV1Schema } from '$lib/splat/planar-camera-calibration-v1.js';
+import { reviewableImageObservationsV1, storybookRegionReviewV1Schema, type StorybookRegionReviewV1 } from '$lib/shared/storybook-region-review-v1.js';
+import { matchesCurrentStorybookReviewFrameV1 } from './video/video-storybook-coverage-v1.js';
+import { parseWholeImageAnalysisRowV1, readLatestWholeImageAnalysisRowV1 } from '$lib/server/evidence/whole-image-analysis-readback-v1.js';
 
 export const EVIDENCE_REVISION_SCHEMA_V1 = 'atlas.evidence-revision.v1' as const;
 export const EVIDENCE_ANNOTATION_REVISION_SCHEMA_V1 = 'atlas.evidence-annotation-revision.v1' as const;
@@ -49,6 +53,8 @@ export const evidenceAnnotationDocumentV1Schema = z.object({
   }).strict()).max(200),
 	poseSchemas: z.array(poseSkeletonSchemaV1Schema).max(32).optional(),
 	poseObservations: z.array(z.unknown()).max(200).optional(),
+	planarCameraCalibrations: z.array(z.unknown()).max(8).optional(),
+	storybookRegionReview: storybookRegionReviewV1Schema.optional(),
 }).strict();
 export type EvidenceAnnotationDocumentV1 = z.infer<typeof evidenceAnnotationDocumentV1Schema>;
 
@@ -99,7 +105,9 @@ export class EvidenceRevisionErrorV1 extends Error {
       | 'EVIDENCE_NOT_FOUND'
       | 'EVIDENCE_CASE_MISMATCH'
       | 'PARENT_HASH_UNAVAILABLE'
-      | 'PARENT_HASH_MISMATCH',
+      | 'PARENT_HASH_MISMATCH'
+      | 'STORYBOOK_REVIEW_FRAME_CHANGED'
+      | 'STORYBOOK_REVIEW_ID_CONFLICT',
     message: string,
   ) {
     super(message);
@@ -117,10 +125,12 @@ export interface EvidenceRevisionPortsV1 {
   insertRevision(args: { evidenceId: string; caseId: string; parentSha256: string; sha256: string; metadata: Record<string, unknown>; changeReason: string | null }): Promise<{ id: string; version: number; created: boolean }>;
   findAnnotationRevision(evidenceId: string, annotationSha256: string): Promise<{ id: string; version: number } | null>;
   /** Must lock the source row, recheck its hash/case, dedupe, and append evidence_versions in one transaction. */
-  insertAnnotationRevision(args: { evidenceId: string; caseId: string; parentSha256: string; annotationSha256: string; actorUserId: number; metadata: Record<string, unknown>; changeReason: string | null }): Promise<{ id: string; version: number; created: boolean }>;
+  insertAnnotationRevision(args: { evidenceId: string; caseId: string; parentSha256: string; annotationSha256: string; actorUserId: number; metadata: Record<string, unknown>; changeReason: string | null; storybookRegionReview?: StorybookRegionReviewV1 }): Promise<{ id: string; version: number; created: boolean }>;
   loadAnnotationRevision(evidenceId: string, revisionId: string): Promise<{ id: string; version: number; metadata: unknown } | null>;
   /** Lock/recheck the current evidence row and append the review decision under evidence_versions. */
   insertPoseReviewDecision(args: { evidenceId: string; caseId: string; parentSha256: string; decisionSha256: string; metadata: Record<string, unknown>; changeReason: string | null }): Promise<{ id: string; version: number; created: boolean }>;
+  /** Lock/recheck the current evidence row and append the calibration review under evidence_versions. */
+  insertCalibrationReviewDecision(args: { evidenceId: string; caseId: string; parentSha256: string; decisionSha256: string; metadata: Record<string, unknown>; changeReason: string | null }): Promise<{ id: string; version: number; created: boolean }>;
 }
 
 export interface SavePoseReviewDecisionInputV1 {
@@ -164,14 +174,15 @@ export async function savePoseReviewDecisionV1(input: SavePoseReviewDecisionInpu
   const skeletonRow = annotationRecord.poseSchemas.find((row) => typeof row === 'object' && row !== null && (row as Record<string, unknown>).schemaId === input.skeletonSchemaId);
   const skeleton = poseSkeletonSchemaV1Schema.safeParse(skeletonRow);
   if (!skeleton.success) throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'The referenced pose schema is invalid.');
-  const matchingPose = annotationRecord.poseObservations.find((raw) => {
+  const matchingPose = annotationRecord.poseObservations.map((raw) => {
     try {
       const pose = parsePoseObservationV1(raw, skeleton.data);
       return pose.evidenceId === input.evidenceId && pose.sourceSha256 === parentSha256 && pose.sourceRevision === parentSha256 &&
         pose.analysisRevision === input.analysisRevision && pose.frameIndex === input.frameIndex && pose.framePtsUs === input.framePtsUs &&
-        pose.skeletonSchemaId === input.skeletonSchemaId && pose.trackId === input.trackId && pose.trackScopeId === input.trackScopeId;
-    } catch { return false; }
-  });
+        pose.skeletonSchemaId === input.skeletonSchemaId && pose.trackId === input.trackId && pose.trackScopeId === input.trackScopeId
+        ? pose : null;
+    } catch { return null; }
+  }).find((pose) => pose !== null);
   if (!matchingPose) throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'The selected pose does not match the source revision and frame.');
 
   const decisionPayload = {
@@ -188,6 +199,8 @@ export async function savePoseReviewDecisionV1(input: SavePoseReviewDecisionInpu
     trackId: input.trackId,
     trackScopeId: input.trackScopeId,
     decision: input.decision,
+    groundContactReviewed: Boolean(matchingPose.groundContact),
+    groundContactDecision: matchingPose.groundContact ? input.decision : 'NOT_PRESENT',
     reviewerUserId: input.actorUserId,
     notes: input.notes?.trim().slice(0, 1000) ?? '',
     canonicalAuthority: false,
@@ -204,6 +217,104 @@ export async function savePoseReviewDecisionV1(input: SavePoseReviewDecisionInpu
   });
   return {
     schema: 'atlas.pose-review-decision.v1' as const,
+    committed: true as const,
+    idempotent: !row.created,
+    decisionId: row.id,
+    revision: row.version,
+    sourceSha256: parentSha256,
+    decision: input.decision,
+    sceneAdmission: decisionPayload.sceneAdmission,
+    canonicalAuthority: false as const,
+  };
+}
+
+export interface SavePlanarCalibrationReviewInputV1 {
+  caseId: string;
+  evidenceId: string;
+  actorUserId: number;
+  parentSha256: string;
+  annotationRevisionId: string;
+  calibrationSha256: string;
+  analysisRevision: string;
+  calibrationFrameIndex: number;
+  calibrationFramePtsUs: number;
+  decision: 'ACCEPTED_FOR_SCENE_PROPOSAL' | 'REJECTED';
+  /** Required for ACCEPTED decisions: the reviewer-confirmed fixed-camera window. */
+  cameraFixedWindow?: { startPtsUs: number; endPtsUs: number };
+  notes?: string;
+}
+
+export async function savePlanarCalibrationReviewDecisionV1(input: SavePlanarCalibrationReviewInputV1, ports: EvidenceRevisionPortsV1) {
+  const parentSha256 = normalizeSha256(input.parentSha256);
+  if (!parentSha256) throw new EvidenceRevisionErrorV1('INVALID_PARENT_SHA256', 'parentSha256 must be sha256:<64 hex>.');
+  const parent = await ports.loadEvidence(input.evidenceId);
+  if (!parent || parent.deletedAt) throw new EvidenceRevisionErrorV1('EVIDENCE_NOT_FOUND', 'Evidence not found.');
+  if (parent.caseId !== input.caseId) throw new EvidenceRevisionErrorV1('EVIDENCE_CASE_MISMATCH', 'Evidence does not belong to the stated case.');
+  if (normalizeSha256(parent.hash) !== parentSha256) throw new EvidenceRevisionErrorV1('PARENT_HASH_MISMATCH', 'Source evidence changed before calibration review.');
+
+  const sourceRevision = await ports.loadAnnotationRevision(input.evidenceId, input.annotationRevisionId);
+  const sourceMetadata = sourceRevision?.metadata;
+  if (!sourceRevision || !sourceMetadata || typeof sourceMetadata !== 'object' || Array.isArray(sourceMetadata)) {
+    throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'The referenced calibration annotation revision was not found.');
+  }
+  const metadata = sourceMetadata as Record<string, unknown>;
+  const annotation = metadata.annotation;
+  if (metadata.schema !== EVIDENCE_ANNOTATION_REVISION_SCHEMA_V1 || metadata.parentSha256 !== parentSha256 || !annotation || typeof annotation !== 'object' || Array.isArray(annotation)) {
+    throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'The referenced revision is not a matching annotation revision.');
+  }
+  const annotationRecord = annotation as Record<string, unknown>;
+  if (!Array.isArray(annotationRecord.planarCameraCalibrations)) throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'The referenced revision has no planar calibration proposals.');
+  const calibration = annotationRecord.planarCameraCalibrations.find((candidate) => {
+    const parsed = planarCameraCalibrationV1Schema.safeParse(candidate);
+    if (!parsed.success) return false;
+    const value = parsed.data;
+    const digest = `sha256:${crypto.createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex')}`;
+    return value.evidenceId === input.evidenceId && value.sourceRevision === parentSha256 && value.analysisRevision === input.analysisRevision &&
+      value.calibrationFrameIndex === input.calibrationFrameIndex && value.calibrationFramePtsUs === input.calibrationFramePtsUs && digest === input.calibrationSha256;
+  });
+  if (!calibration) throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'The selected calibration does not match this source, run, frame and revision.');
+  const storedCalibration = planarCameraCalibrationV1Schema.parse(calibration);
+  if (input.decision === 'ACCEPTED_FOR_SCENE_PROPOSAL') {
+    if (!storedCalibration.calibratedRegionPx) {
+      throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'This calibration has no stored calibrated region. Re-create it before accepting it for scene use.');
+    }
+    const window = input.cameraFixedWindow;
+    if (!window || !Number.isSafeInteger(window.startPtsUs) || !Number.isSafeInteger(window.endPtsUs)
+      || window.startPtsUs < 0 || window.startPtsUs > window.endPtsUs) {
+      throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'Accepting a calibration requires a valid fixed-camera window (startPtsUs <= endPtsUs).');
+    }
+  }
+
+  const decisionPayload = {
+    schema: 'atlas.planar-camera-calibration-review.v1',
+    evidenceId: input.evidenceId,
+    caseId: input.caseId,
+    sourceSha256: parentSha256,
+    analysisRevision: input.analysisRevision,
+    annotationRevisionId: sourceRevision.id,
+    annotationRevision: sourceRevision.version,
+    calibrationSha256: input.calibrationSha256,
+    calibrationFrameIndex: input.calibrationFrameIndex,
+    calibrationFramePtsUs: input.calibrationFramePtsUs,
+    decision: input.decision,
+    reviewerUserId: input.actorUserId,
+    notes: input.notes?.trim().slice(0, 1000) ?? '',
+    canonicalAuthority: false,
+    cameraFixedWindow: input.decision === 'ACCEPTED_FOR_SCENE_PROPOSAL' ? input.cameraFixedWindow ?? null : null,
+    calibratedRegionPx: storedCalibration.calibratedRegionPx ?? null,
+    sceneAdmission: input.decision === 'ACCEPTED_FOR_SCENE_PROPOSAL' ? 'APPROVED_FOR_SCENE_PROPOSAL' : 'NOT_ADMITTED',
+  };
+  const decisionSha256 = `sha256:${crypto.createHash('sha256').update(JSON.stringify(decisionPayload), 'utf8').digest('hex')}`;
+  const row = await ports.insertCalibrationReviewDecision({
+    evidenceId: input.evidenceId,
+    caseId: input.caseId,
+    parentSha256,
+    decisionSha256,
+    metadata: { ...decisionPayload, decisionSha256 },
+    changeReason: `Planar calibration review: ${input.decision}`,
+  });
+  return {
+    schema: 'atlas.planar-camera-calibration-review.v1' as const,
     committed: true as const,
     idempotent: !row.created,
     decisionId: row.id,
@@ -267,9 +378,15 @@ export async function saveEvidenceAnnotationRevisionV1(input: {
   if (!parentSha256) throw new EvidenceRevisionErrorV1('INVALID_PARENT_SHA256', 'parentSha256 must be sha256:<64 hex>.');
   const annotation = evidenceAnnotationDocumentV1Schema.safeParse(input.annotation);
   if (!annotation.success) throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'Annotation document is invalid.');
+	const regionReview = annotation.data.storybookRegionReview;
+	if (regionReview && (annotation.data.modality !== ('observationRevision' in regionReview ? 'image' : 'video') || annotation.data.annotations.length || annotation.data.notes ||
+		annotation.data.poseSchemas || annotation.data.poseObservations || annotation.data.planarCameraCalibrations)) {
+		throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'Record each region review on its own using the matching evidence modality.');
+	}
 
   let canonicalPoseSchemas: PoseSkeletonSchemaV1[] | undefined;
   let canonicalPoseObservations: PoseObservationV1[] | undefined;
+  let canonicalPlanarCameraCalibrations: Array<z.infer<typeof planarCameraCalibrationV1Schema>> | undefined;
   try {
     if (annotation.data.poseSchemas || annotation.data.poseObservations) {
       const schemaRows = annotation.data.poseSchemas ?? [];
@@ -315,6 +432,11 @@ export async function saveEvidenceAnnotationRevisionV1(input: {
           origin: pose.origin,
           modelRevision: pose.modelRevision,
           reviewState: pose.reviewState,
+          ...(pose.groundContact ? { groundContact: {
+            imagePx: [pose.groundContact.imagePx[0], pose.groundContact.imagePx[1]],
+            footSide: pose.groundContact.footSide,
+            label: pose.groundContact.label,
+          } } : {}),
           keypoints: pose.keypoints.map((point) => ({
             index: point.index,
             x: point.x,
@@ -325,8 +447,37 @@ export async function saveEvidenceAnnotationRevisionV1(input: {
         };
       });
     }
+		if (annotation.data.planarCameraCalibrations) {
+			if (annotation.data.modality !== 'video') throw new RangeError('Planar camera calibration requires video evidence.');
+			canonicalPlanarCameraCalibrations = annotation.data.planarCameraCalibrations.map((rawCalibration) => {
+				const calibration = planarCameraCalibrationV1Schema.parse(rawCalibration);
+				if (calibration.evidenceId !== input.evidenceId || calibration.sourceRevision !== parentSha256) {
+					throw new RangeError('Planar camera calibration must match the evidence and exact source hash being revised.');
+				}
+				return {
+					schema: calibration.schema,
+					evidenceId: calibration.evidenceId,
+					sourceRevision: calibration.sourceRevision,
+					analysisRevision: calibration.analysisRevision,
+					calibrationFrameIndex: calibration.calibrationFrameIndex,
+					calibrationFramePtsUs: calibration.calibrationFramePtsUs,
+					frameWidth: calibration.frameWidth,
+					frameHeight: calibration.frameHeight,
+					plane: calibration.plane,
+					operatorConfirmedFixedCamera: calibration.operatorConfirmedFixedCamera,
+					imageToPlaneHomography: [...calibration.imageToPlaneHomography] as typeof calibration.imageToPlaneHomography,
+					fitResidualsMeters: calibration.fitResidualsMeters.map((item) => ({ anchorId: item.anchorId, residualMeters: item.residualMeters })),
+					validationResidualsMeters: calibration.validationResidualsMeters.map((item) => ({ anchorId: item.anchorId, residualMeters: item.residualMeters })),
+					...(calibration.calibratedRegionPx ? { calibratedRegionPx: calibration.calibratedRegionPx } : {}),
+					toleranceMeters: calibration.toleranceMeters,
+					validationStatus: calibration.validationStatus,
+					status: calibration.status,
+					semantics: calibration.semantics,
+				};
+			});
+		}
   } catch {
-    throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'Pose annotation data is invalid or does not match its source.');
+    throw new EvidenceRevisionErrorV1('INVALID_MARKUP', 'Annotation data is invalid or does not match its source.');
   }
 
   const parent = await ports.loadEvidence(input.evidenceId);
@@ -349,14 +500,17 @@ export async function saveEvidenceAnnotationRevisionV1(input: {
     })),
     ...(canonicalPoseSchemas ? { poseSchemas: canonicalPoseSchemas } : {}),
     ...(canonicalPoseObservations ? { poseObservations: canonicalPoseObservations } : {}),
+	...(canonicalPlanarCameraCalibrations ? { planarCameraCalibrations: canonicalPlanarCameraCalibrations } : {}),
+	...(regionReview ? { storybookRegionReview: regionReview } : {}),
   };
   const annotationSha256 = `sha256:${crypto.createHash('sha256').update(JSON.stringify({
     evidenceId: input.evidenceId,
     caseId: input.caseId,
     parentSha256,
     annotation: canonicalAnnotation,
+	...(regionReview ? { reviewerUserId: input.actorUserId } : {}),
   }), 'utf8').digest('hex')}`;
-  const existing = await ports.findAnnotationRevision(input.evidenceId, annotationSha256);
+  const existing = regionReview ? null : await ports.findAnnotationRevision(input.evidenceId, annotationSha256);
   if (existing) return {
     schema: EVIDENCE_ANNOTATION_REVISION_SCHEMA_V1,
     committed: true,
@@ -375,6 +529,7 @@ export async function saveEvidenceAnnotationRevisionV1(input: {
     parentSha256,
     annotationSha256,
     actorUserId: input.actorUserId,
+	...(regionReview ? { storybookRegionReview: regionReview } : {}),
     changeReason: input.revisionNotes?.trim() ? input.revisionNotes.trim().slice(0, 1000) : null,
     metadata: {
       schema: EVIDENCE_ANNOTATION_REVISION_SCHEMA_V1,
@@ -566,13 +721,56 @@ export async function createDrizzleRevisionPortsV1(override?: { db: (typeof impo
         return { ...row, created: true };
       });
     },
-    async insertAnnotationRevision({ evidenceId, caseId, parentSha256, annotationSha256, metadata, changeReason }) {
+    async insertCalibrationReviewDecision({ evidenceId, caseId, parentSha256, decisionSha256, metadata, changeReason }) {
+      return db.transaction(async (tx) => {
+        await tx.execute(sql`SELECT 1 FROM ${evidence} WHERE ${evidence.id} = ${evidenceId} FOR UPDATE`);
+        const [parent] = await tx.select({ id: evidence.id, caseId: evidence.caseId, hash: evidence.hash, deletedAt: evidence.deletedAt })
+          .from(evidence).where(eq(evidence.id, evidenceId)).limit(1);
+        if (!parent || parent.deletedAt) throw new EvidenceRevisionErrorV1('EVIDENCE_NOT_FOUND', 'Evidence not found.');
+        if (parent.caseId !== caseId) throw new EvidenceRevisionErrorV1('EVIDENCE_CASE_MISMATCH', 'Evidence does not belong to the stated case.');
+        if (normalizeSha256(parent.hash) !== parentSha256) throw new EvidenceRevisionErrorV1('PARENT_HASH_MISMATCH', 'Source evidence changed while recording calibration review.');
+        const duplicateFilter = and(eq(evidenceVersions.evidenceId, evidenceId), sql`${evidenceVersions.metadata}->>'schema' = 'atlas.planar-camera-calibration-review.v1'`, sql`${evidenceVersions.metadata}->>'decisionSha256' = ${decisionSha256}`);
+        const [duplicate] = await tx.select({ id: evidenceVersions.id, version: evidenceVersions.version }).from(evidenceVersions).where(duplicateFilter).limit(1);
+        if (duplicate) return { ...duplicate, created: false };
+        const [max] = await tx.select({ m: sql<number>`coalesce(max(${evidenceVersions.version}), 0)` }).from(evidenceVersions).where(eq(evidenceVersions.evidenceId, evidenceId));
+        const [row] = await tx.insert(evidenceVersions).values({ evidenceId, version: Number(max?.m ?? 0) + 1, title: null, description: null, metadata, changedBy: null, changeReason })
+          .returning({ id: evidenceVersions.id, version: evidenceVersions.version });
+        if (!row) throw new Error('EVIDENCE_CALIBRATION_REVIEW_INSERT_NO_ROW');
+        return { ...row, created: true };
+      });
+    },
+    async insertAnnotationRevision({ evidenceId, caseId, parentSha256, annotationSha256, metadata, changeReason, storybookRegionReview }) {
       return db.transaction(async (tx) => {
         await tx.execute(sql`SELECT 1 FROM ${evidence} WHERE ${evidence.id} = ${evidenceId} FOR UPDATE`);
         const [parent] = await tx.select({ id: evidence.id, caseId: evidence.caseId, hash: evidence.hash, deletedAt: evidence.deletedAt }).from(evidence).where(eq(evidence.id, evidenceId)).limit(1);
         if (!parent || parent.deletedAt) throw new EvidenceRevisionErrorV1('EVIDENCE_NOT_FOUND', 'Evidence not found.');
         if (parent.caseId !== caseId) throw new EvidenceRevisionErrorV1('EVIDENCE_CASE_MISMATCH', 'Evidence does not belong to the stated case.');
         if (normalizeSha256(parent.hash) !== parentSha256) throw new EvidenceRevisionErrorV1('PARENT_HASH_MISMATCH', 'Source evidence changed while saving annotations.');
+		if (storybookRegionReview) {
+		  if ('observationRevision' in storybookRegionReview) {
+			const row = await readLatestWholeImageAnalysisRowV1(evidenceId, tx);
+			const manifest = row && parseWholeImageAnalysisRowV1(row, evidenceId, parentSha256)?.storybook?.manifest;
+			if (!manifest || manifest.analysisRevision !== storybookRegionReview.analysisRevision ||
+				manifest.observationRevision !== storybookRegionReview.observationRevision ||
+				manifest.width !== storybookRegionReview.width || manifest.height !== storybookRegionReview.height ||
+				('observationId' in storybookRegionReview && !reviewableImageObservationsV1(manifest)
+					.some((observation) => observation.observationId === storybookRegionReview.observationId))) {
+			  throw new EvidenceRevisionErrorV1('STORYBOOK_REVIEW_FRAME_CHANGED', 'The image analysis changed. Reload the chapter before reviewing.');
+			}
+		  } else {
+			const [current] = await tx.select({ videoAnalysis: sql<unknown>`${evidence.aiAnalysis}->'videoAnalysis'` })
+			  .from(evidence).where(eq(evidence.id, evidenceId)).limit(1);
+			if (!matchesCurrentStorybookReviewFrameV1({ sourceRevision: parentSha256, videoAnalysis: current?.videoAnalysis, review: storybookRegionReview })) {
+			  throw new EvidenceRevisionErrorV1('STORYBOOK_REVIEW_FRAME_CHANGED', 'The sampled frame changed. Reload the chapter before reviewing.');
+			}
+		  }
+		  const [previous] = await tx.select({ sha256: sql<string>`${evidenceVersions.metadata}->>'annotationSha256'` })
+			.from(evidenceVersions).where(and(eq(evidenceVersions.evidenceId, evidenceId),
+			  sql`${evidenceVersions.metadata}#>>'{annotation,storybookRegionReview,reviewId}' = ${storybookRegionReview.reviewId}`)).limit(1);
+		  if (previous && previous.sha256 !== annotationSha256) {
+			throw new EvidenceRevisionErrorV1('STORYBOOK_REVIEW_ID_CONFLICT', 'This review ID already belongs to another saved decision.');
+		  }
+		}
         const [dup] = await tx.select({ id: evidenceVersions.id, version: evidenceVersions.version }).from(evidenceVersions).where(byAnnotationFilter(evidenceId, annotationSha256)).limit(1);
         if (dup) return { ...dup, created: false };
         const [max] = await tx.select({ m: sql<number>`coalesce(max(${evidenceVersions.version}), 0)` }).from(evidenceVersions).where(eq(evidenceVersions.evidenceId, evidenceId));

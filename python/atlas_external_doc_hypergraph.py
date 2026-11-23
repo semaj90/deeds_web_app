@@ -297,3 +297,124 @@ def build_grounded_fact_bridge_from_external_doc_chunk_v1(
         confidence=confidence,
         canonical_authority=False,
     )
+
+
+def build_external_doc_relation_proposal_v1(
+    *,
+    candidate_row: Mapping[str, Any],
+    chunk: Mapping[str, Any],
+    normalized_page_bytes: bytes,
+    workspace_revision: str,
+) -> HypergraphFactProposalV1:
+    """Adapt one readback-verified lexical candidate to the existing proposal owner.
+
+    Participant IDs are deliberately mention-scoped, not canonical entity IDs.
+    The raw predicate is explicitly marked unmapped; ontology/concept IDs remain
+    empty until a reviewed mapping exists. This helper never admits or persists.
+    """
+
+    if candidate_row.get("schema") != "atlas.external-doc-relation-candidate.v1":
+        raise ValueError("EXTERNAL_DOC_RELATION_CANDIDATE_SCHEMA_MISMATCH")
+    if candidate_row.get("span_validation") != "SPAN_READBACK_VERIFIED":
+        raise ValueError("EXTERNAL_DOC_RELATION_SPAN_NOT_VERIFIED")
+    if candidate_row.get("admission_state") != "PROPOSAL_ONLY" or candidate_row.get("canonical_authority") is not False:
+        raise ValueError("EXTERNAL_DOC_RELATION_NOT_PROPOSAL_ONLY")
+    if not workspace_revision.strip():
+        raise ValueError("WORKSPACE_REVISION_REQUIRED")
+
+    candidate = candidate_row.get("candidate")
+    if not isinstance(candidate, Mapping):
+        raise ValueError("EXTERNAL_DOC_RELATION_CANDIDATE_MISSING")
+    binding = candidate.get("evidence_binding")
+    if not isinstance(binding, Mapping):
+        raise ValueError("EXTERNAL_DOC_RELATION_EVIDENCE_BINDING_MISSING")
+    if (
+        candidate_row.get("source_id") != chunk.get("source_id")
+        or candidate_row.get("source_revision") != chunk.get("source_revision")
+        or candidate_row.get("chunk_id") != chunk.get("chunk_id")
+        or candidate_row.get("chunk_checksum") != _sha256_hex(str(chunk.get("text") or ""))
+        or binding.get("chunk_id") != chunk.get("chunk_id")
+        or binding.get("source_ref") != chunk.get("source_id")
+        or binding.get("source_url") != chunk.get("source_url")
+        or binding.get("source_revision") != chunk.get("source_revision")
+        or binding.get("document_checksum") != chunk.get("document_checksum")
+        or binding.get("coordinate_space") != "NORMALIZED_DOCUMENT_UTF8_BYTES"
+    ):
+        raise ValueError("EXTERNAL_DOC_RELATION_CHUNK_IDENTITY_MISMATCH")
+
+    absolute_start = binding.get("start_byte")
+    absolute_end = binding.get("end_byte")
+    evidence_text = binding.get("evidence_text")
+    if (
+        not isinstance(absolute_start, int) or isinstance(absolute_start, bool)
+        or not isinstance(absolute_end, int) or isinstance(absolute_end, bool)
+        or not isinstance(evidence_text, str)
+        or absolute_start < int(chunk.get("start_byte", -1))
+        or absolute_end > int(chunk.get("end_byte", -1))
+        or absolute_end <= absolute_start
+        or absolute_end > len(normalized_page_bytes)
+    ):
+        raise ValueError("EXTERNAL_DOC_RELATION_SPAN_INVALID")
+    try:
+        source_surface = normalized_page_bytes[absolute_start:absolute_end].decode("utf-8", errors="strict")
+    except UnicodeDecodeError as error:
+        raise ValueError("EXTERNAL_DOC_RELATION_SPAN_NOT_UTF8_BOUNDARY") from error
+    if (
+        source_surface != evidence_text
+        or _sha256_hex(source_surface) != binding.get("evidence_checksum")
+        or _sha256_hex(normalized_page_bytes) != chunk.get("document_checksum")
+    ):
+        raise ValueError("EXTERNAL_DOC_RELATION_SOURCE_READBACK_MISMATCH")
+
+    raw_participants = candidate.get("participants")
+    if not isinstance(raw_participants, (list, tuple)) or len(raw_participants) < 2:
+        raise ValueError("EXTERNAL_DOC_RELATION_PARTICIPANTS_INCOMPLETE")
+    tuple_id = str(candidate.get("tuple_id") or "")
+    if not tuple_id:
+        raise ValueError("EXTERNAL_DOC_RELATION_TUPLE_ID_REQUIRED")
+    participants: list[GroundedFactParticipantV1] = []
+    for ordinal, raw in enumerate(raw_participants):
+        if not isinstance(raw, Mapping):
+            raise ValueError("EXTERNAL_DOC_RELATION_PARTICIPANT_INVALID")
+        normalized = str(raw.get("normalized_text") or "").strip().lower()
+        role = str(raw.get("role") or "").strip()
+        label = str(raw.get("text") or "").strip()
+        if not normalized or not role or not label:
+            raise ValueError("EXTERNAL_DOC_RELATION_PARTICIPANT_UNGROUNDED")
+        mention_digest = _sha256_hex(f"{tuple_id}|{ordinal}|{normalized}")[:24]
+        participants.append(GroundedFactParticipantV1(
+            entity_id=f"mention:{mention_digest}",
+            entity_kind="external_doc_mention",
+            role=role,
+            label=label,
+        ))
+
+    predicate_lemma = str(candidate.get("predicate_lemma") or candidate.get("predicate") or "").strip().lower()
+    if not predicate_lemma:
+        raise ValueError("EXTERNAL_DOC_RELATION_PREDICATE_MISSING")
+    chunk_text = str(chunk.get("text") or "")
+    chunk_bytes = chunk_text.encode("utf-8")
+    relative_start = absolute_start - int(chunk["start_byte"])
+    relative_end = absolute_end - int(chunk["start_byte"])
+    fact = build_grounded_fact_bridge_from_external_doc_chunk_v1(
+        chunk=chunk,
+        workspace_revision=workspace_revision,
+        producer_revision=(
+            f"{candidate.get('producer_revision') or 'extractor:unknown'}"
+            f"|{candidate.get('model_revision') or 'model:unknown'}"
+        ),
+        fact_id=tuple_id,
+        predicate=f"UNMAPPED_VERB:{predicate_lemma}",
+        evidence_start_byte_in_chunk=relative_start,
+        evidence_end_byte_in_chunk=relative_end,
+        evidence_text=evidence_text,
+        participants=participants,
+        ontology_ids=(),
+        concept_ids=(),
+        confidence=0.0,
+    )
+    # Keep the local variable use explicit: the bridge has independently sliced
+    # the chunk, while the check above independently sliced the source artifact.
+    if chunk_bytes[relative_start:relative_end].decode("utf-8", errors="strict") != source_surface:
+        raise ValueError("EXTERNAL_DOC_RELATION_CHUNK_SOURCE_PARITY_MISMATCH")
+    return build_hypergraph_fact_proposal_v1(fact)

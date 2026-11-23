@@ -1,17 +1,20 @@
 {
   "schema": "atlas.external-doc-admission-envelopes.v1",
-  "generatedAt": "2026-09-23T19:46:27.344635+00:00",
+  "generatedAt": "2026-11-22T06:38:02.145096+00:00",
   "manifestRevision": "okf-pinned-docs-r3",
+  "priorManifestRevision": null,
+  "recrawlPlan": null,
   "acquired": false,
+  "nlp8095Stamped": 60,
   "acquisitionFailures": [],
   "pages": 30,
   "chunks": 852,
-  "envelopesDigest": "sha256:037b641abd0691a114970cfe0e4fed6fc7b6f6f5634b381f5d6cf4d5ad950b36",
+  "envelopesDigest": "sha256:095a5cedac49ec5fe10dceb3d7b15f957cc5256c38ff581ea30cf0b17b077268",
   "envelopesFile": "docs/.okf/pinned/admission-envelopes-v1.json",
   "native": {
     "nativeChunks": 852,
     "nativeChunksWithoutDocCoordinate": 0,
-    "pageNormalizationDiffersFromStoredText": 0,
+    "pageNormalizationDiffersFromStoredText": 30,
     "uniquePageEvidenceRevisionCount": 30,
     "duplicatePageEvidenceRevision": {
       "groups": 0,
@@ -43,7 +46,7 @@
         "sourceAuthority": "OFFICIAL",
         "fetcher": "BEAUTIFULSOUP_HTTP",
         "crawlRevision": "sveltekit-2-2026-09-23",
-        "parserRevision": "beautifulsoup4==4.15.0/html.parser",
+        "parserRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.9.0|chunker=4.0.0",
         "contentHash": "e650ae13a08417392fa9cb09b0823c058cc04b0d6a79f6bb7c67f4c53c4e703e",
         "evidenceRevision": "sha256:1bdc50767090c39b908226c036df74789ee1da28bf8f94275675de740b102688",
         "retrievedAt": "2026-09-23T17:14:46.680949Z"
@@ -85,7 +88,8 @@
           "text": "Routing\nLoading data\nForm actions\nPage options\nState management\nRemote functions\nEnvironment variables",
           "domainClass": "api",
           "ontologyClasses": [
-            "CONCEPT"
+            "CONCEPT",
+            "State"
           ],
           "codeBlocks": [],
           "apiSignatures": [],
@@ -112,7 +116,7 @@
         "sourceAuthority": "OFFICIAL",
         "fetcher": "BEAUTIFULSOUP_HTTP",
         "crawlRevision": "sveltekit-2-2026-09-23",
-        "parserRevision": "beautifulsoup4==4.15.0/html.parser",
+        "parserRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.9.0|chunker=4.0.0",
         "contentHash": "a96c1d15fd75f782fb56a8c89e2871b6a97e02566ca7585b37903d38070618bf",
         "evidenceRevision": "sha256:4f8200be9e774d78211b635402ac017b1780d8f079cf597c00e7fde4c2c67456",
         "retrievedAt": "2026-09-23T17:14:46.679602Z"
@@ -154,7 +158,8 @@
           "text": "Routing\nLoading data\nForm actions\nPage options\nState management\nRemote functions\nEnvironment variables",
           "domainClass": "api",
           "ontologyClasses": [
-            "CONCEPT"
+            "CONCEPT",
+            "State"
           ],
           "codeBlocks": [],
           "apiSignatures": [],
@@ -181,7 +186,7 @@
         "sourceAuthority": "OFFICIAL",
         "fetcher": "BEAUTIFULSOUP_HTTP",
         "crawlRevision": "sveltekit-2-2026-09-23",
-        "parserRevision": "beautifulsoup4==4.15.0/html.parser",
+        "parserRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.9.0|chunker=4.0.0",
         "contentHash": "62e6dd9932a74b58fed956607f84f28f2f14057bdc8b4882ce6a2b9ceaf699e6",
         "evidenceRevision": "sha256:d67110cf1f8d74ddb90e606f4a7fa95f7070f3af0efdfcbf37f6ccf0d6d188d1",
         "retrievedAt": "2026-09-23T17:14:46.675342Z"
@@ -223,7 +228,8 @@
           "text": "Routing\nLoading data\nForm actions\nPage options\nState management\nRemote functions\nEnvironment variables",
           "domainClass": "api",
           "ontologyClasses": [
-            "CONCEPT"
+            "CONCEPT",
+            "State"
           ],
           "codeBlocks": [],
           "apiSignatures": [],

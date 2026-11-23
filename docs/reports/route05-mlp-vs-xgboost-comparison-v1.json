@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.route05-mlp-vs-xgboost.v1",
+  "frozenTensorChecksum": "sha256:1182cc78f158267cfa7b17c485b263bfccc5651a1c37be6208c4e3a152e7b3d3",
+  "trainRows": 14,
+  "evalRows": 6,
+  "pytorchMlp": {
+    "evalMse": 0.001263,
+    "evalNdcg5": 1.0,
+    "elapsedMs": 5367.183
+  },
+  "xgboost": {
+    "evalMse": 0.000318,
+    "evalNdcg5": 1.0,
+    "elapsedMs": 192.534
+  },
+  "identicalFrozenSplit": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

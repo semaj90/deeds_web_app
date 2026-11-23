@@ -1,12 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import { calibrationForEvidenceV1, createSceneCalibrationV1, createSceneDocumentV1, createSceneQualityReceiptV1, DERIVED_SCENE_ASSET_BYTE_BUDGET } from './scene-document-v1.js';
+import { evaluateSceneTimelineV1, sceneTimelineCueToRuntimeV1 } from './scene-event-visibility-v1.js';
 import type { CalibrationAnchor } from './calibration.js';
 
 const sceneId = 'f3c63bb4-50c9-4b13-8d52-5b144de1ae15';
 const objectId = 'ddc8f82f-8d53-4ee9-a25f-2448a9c74637';
 const parentId = '29394dc3-ea18-4a61-a0e6-7197ecfe1917';
 const localSourceId = '3217dcf2-5900-46a3-9ac3-2e3bcf263a2f';
+const secondSourceId = '4217dcf2-5900-46a3-9ac3-2e3bcf263a2f';
 const hash = 'a'.repeat(64);
+
+function imageChapter(input: { chapterId: string; evidenceId: string; sourceRevision: string; observationId: string; title: string }) {
+	return {
+		schema: 'atlas.storybook-image-chapter.v1', chapterId: input.chapterId, prefillSha256: `sha256:${'e'.repeat(64)}`,
+		title: input.title, beats: [{ what: 'A reviewed still image', how: 'The scene is shown in its original image coordinates.', observationIds: [`sha256:${input.observationId}`] }],
+		reviewState: 'REVIEWED_HYPOTHESIS', evidenceId: input.evidenceId, sourceRevision: input.sourceRevision,
+		analysisRevision: 'analysis-v1', observationRevision: `sha256:${'f'.repeat(64)}`, coordinateSpace: 'ORIGINAL_IMAGE_PIXELS',
+		width: 640, height: 480, coverage: { detection: 'NOT_RECORDED', mask: 'NOT_RECORDED', sceneContext: 'NOT_RECORDED', unresolvedMaskCount: 0 },
+		citations: [{ kind: 'scene_context', observationId: `sha256:${input.observationId}`, description: 'Unreviewed room context proposal', modelId: null, reviewState: 'UNREVIEWED_PROPOSAL' }]
+	};
+}
 
 function fixture(overrides: Record<string, unknown> = {}) {
 	return {
@@ -28,6 +41,23 @@ describe('scene document v1', () => {
 		expect(manifest.objects[0].transform.translation).toEqual([0, 0, 0]);
 		expect(Object.isFrozen(manifest)).toBe(true);
 		expect(Object.isFrozen(manifest.objects[0].transform)).toBe(true);
+	});
+
+	it('keeps multiple still-image chapters in one case scene while preserving their separate image frames', () => {
+		const firstRevision = `sha256:${'b'.repeat(64)}`;
+		const secondRevision = `sha256:${'c'.repeat(64)}`;
+		const chapters = [
+			imageChapter({ chapterId: parentId, evidenceId: localSourceId, sourceRevision: firstRevision, observationId: '1'.repeat(64), title: 'Exhibit A' }),
+			imageChapter({ chapterId: objectId, evidenceId: secondSourceId, sourceRevision: secondRevision, observationId: '2'.repeat(64), title: 'Exhibit B' })
+		];
+		const manifest = createSceneDocumentV1(fixture({ caseId: sceneId,
+			evidenceBindings: [{ evidenceId: localSourceId, sourceRevision: firstRevision }, { evidenceId: secondSourceId, sourceRevision: secondRevision }],
+			imageStorybookChapters: chapters }));
+		expect(manifest.imageStorybookChapters).toHaveLength(2);
+		expect(manifest.imageStorybookChapters?.map((chapter) => chapter.coordinateSpace)).toEqual(['ORIGINAL_IMAGE_PIXELS', 'ORIGINAL_IMAGE_PIXELS']);
+		expect(() => createSceneDocumentV1(fixture({ caseId: sceneId,
+			evidenceBindings: [{ evidenceId: localSourceId, sourceRevision: firstRevision }, { evidenceId: secondSourceId, sourceRevision: secondRevision }],
+			imageStorybookChapters: [chapters[0], { ...chapters[1], sourceRevision: firstRevision }] }))).toThrow(/Every image chapter must match a source revision/);
 	});
 
 	it('keeps scene classification distinct from lifecycle status and blocks unsupported measured claims', () => {
@@ -103,6 +133,48 @@ describe('scene document v1', () => {
 		expect(manifest.assets[1]?.modelGeneration?.source.sourceRevision).toBe(`sha256:${sourceHash}`);
 		expect(manifest.assets[1]?.modelGeneration?.outputSha256).toBe(outputHash);
 		expect(manifest.assets[1]?.modelGeneration?.claimKind).toBe('MODEL_GENERATED_HYPOTHESIS');
+	});
+
+	it('binds a synthesized walk clip to its registered GLB, reviewed track, and absolute source interval', () => {
+		const sourceRevision = `sha256:${hash}`;
+		const assetSha256 = 'b'.repeat(64);
+		const points = [1_000_000, 6_000_000, 11_000_000].map((framePtsUs, index) => ({
+			frameIndex: index, framePtsUs, imagePx: [index, index] as [number, number], planeM: [index, 0] as [number, number],
+			poseAnnotationRevisionId: '44444444-4444-4444-8444-444444444444', status: 'REVIEWED_GROUND_PLANE_PROPOSAL' as const
+		}));
+		const proposal = {
+			proposalId: '11111111-1111-4111-8111-111111111111', evidenceId: objectId, sourceRevision, analysisRevision: 'analysis-v1',
+			calibrationRevisionId: '22222222-2222-4222-8222-222222222222', trackId: 'track-1', trackScopeId: 'scope-1',
+			status: 'REVIEWED_GROUND_PLANE_PROPOSAL' as const,
+			semantics: 'image_to_measured_plane_only_no_height_or_camera_motion_compensation' as const, points
+		};
+		const clipId = '55555555-5555-4555-8555-555555555555';
+		const animationAssetId = '66666666-6666-4666-8666-666666666666';
+		const eventId = '77777777-7777-4777-8777-777777777777';
+		const animationBinding = {
+			clipId, assetId: animationAssetId, assetSha256, assetBytes: 300,
+			claimKind: 'SYNTHESIZED_ANIMATION' as const, reviewStatus: 'UNREVIEWED_ILLUSTRATION' as const,
+			pathAlgorithm: 'atlas.timed-walk-path.v1' as const, coordinateSpace: 'PREVIEW_LOCAL_Y_UP_METERS' as const,
+			eventId, proposalId: proposal.proposalId, evidenceId: proposal.evidenceId, sourceRevision, analysisRevision: proposal.analysisRevision,
+			calibrationRevisionId: proposal.calibrationRevisionId, startPtsUs: 1_000_000, endPtsUs: 11_000_000, frameRate: 24
+		};
+		const assets = [
+			{ assetId: parentId, format: 'GLB' as const, sha256: hash, bytes: 256, role: 'DERIVED' as const },
+			{ assetId: animationAssetId, format: 'GLB' as const, sha256: assetSha256, bytes: 300, role: 'DERIVED' as const }
+		];
+		const valid = fixture({
+			caseId: sceneId, status: 'HYPOTHESIS',
+			evidenceBindings: [{ evidenceId: objectId, sourceRevision }], groundPlaneTrackProposals: [proposal],
+			videoEventBindings: [{ evidenceId: objectId, sourceRevision, analysisRevision: proposal.analysisRevision, eventId, startMs: 2_000, endMs: 3_000, reviewState: 'APPROVED_FOR_SCENE_PROPOSAL' as const }],
+			animations: [{ clipId, name: 'Reviewed Detective Walk · synthesized', durationSeconds: 10, frameRate: 24 }],
+			sceneAnimationBindings: [animationBinding], assets,
+			quality: createSceneQualityReceiptV1({ derivedAssetBytes: 556, triangleCount: 12 })
+		});
+		expect(createSceneDocumentV1(valid).sceneAnimationBindings?.[0]).toEqual(animationBinding);
+		expect(() => createSceneDocumentV1({ ...valid, videoEventBindings: [] })).toThrow(/approved source event/);
+		expect(() => createSceneDocumentV1({ ...valid, videoEventBindings: [{ ...valid.videoEventBindings![0], sourceRevision: `sha256:${'c'.repeat(64)}` }] })).toThrow(/approved source event/);
+		expect(() => createSceneDocumentV1({ ...valid, sceneAnimationBindings: [{ ...animationBinding, assetSha256: 'c'.repeat(64) }] })).toThrow(/registered derived GLB asset/);
+		expect(() => createSceneDocumentV1({ ...valid, sceneAnimationBindings: [{ ...animationBinding, endPtsUs: 10_000_000 }] })).toThrow(/exact reviewed source-time track/);
 	});
 
 	it('rejects generated assets with a mismatched evidence revision or output digest', () => {
@@ -183,6 +255,48 @@ describe('scene document v1', () => {
 		expect(() => createSceneDocumentV1(fixture({
 			caseId: sceneId, status: 'HYPOTHESIS', evidenceBindings: [sourceBinding], videoEventBindings: [{ ...eventBinding, endMs: 1200 }]
 		}))).toThrow(/interval must be positive/);
+	});
+
+	it('persists generic actor/prop cues while keeping authored blockouts evidence-free and evidence cues event-qualified', () => {
+		const authoredCue = {
+			cueId: localSourceId, eventId: parentId, clockId: 'SCENE-RELATIVE-01', timeBasis: 'SCENE_RELATIVE' as const,
+			startMs: 10_000, endMs: 20_000, uncertaintyMs: 0, visualizationStatus: 'UNREVIEWED_ILLUSTRATION' as const,
+			source: { kind: 'AUTHORING' as const }, targets: [{ objectId, role: 'PROP' as const }],
+			action: { type: 'visible_during_interval' as const, visible: true }
+		};
+		const authored = createSceneDocumentV1(fixture({ sceneTimelineCues: [authoredCue] }));
+		expect(authored.sceneTimelineCues?.[0]).toEqual(authoredCue);
+		expect(authored.evidenceBindings).toEqual([]);
+		const runtimeCue = sceneTimelineCueToRuntimeV1(authoredCue);
+		const target = { kind: 'primitive' as const, targetId: objectId, visible: false, positionMeters: [0, 0, 0] as [number, number, number] };
+		expect(evaluateSceneTimelineV1([target], [runtimeCue], 'SCENE-RELATIVE-01', 15_000)[0]?.visible).toBe(true);
+		expect(evaluateSceneTimelineV1([target], [runtimeCue], 'OTHER-LANE', 15_000)[0]?.visible).toBe(false);
+		expect(() => createSceneDocumentV1(fixture({ sceneTimelineCues: [{ ...authoredCue, timeBasis: 'SOURCE_WALL_CLOCK' }] }))).toThrow(/Evidence-free authoring cues must use the scene-relative clock/);
+		expect(() => createSceneDocumentV1(fixture({ sceneTimelineCues: [{ ...authoredCue, targets: [{ objectId: parentId, role: 'PROP' }] }] }))).toThrow(/target must exist in this manifest/);
+
+		const sourceRevision = `sha256:${hash}`;
+		const eventCue = {
+			...authoredCue, clockId: 'BANK-CAMERA-01', timeBasis: 'MEDIA_ELAPSED' as const,
+			source: { kind: 'EVIDENCE' as const, evidenceId: localSourceId, sourceRevision, analysisRevision: 'video-analysis-v1' }
+		};
+		const eventBinding = {
+			evidenceId: localSourceId, sourceRevision, analysisRevision: 'video-analysis-v1', eventId: parentId,
+			startMs: 5_000, endMs: 25_000, reviewState: 'APPROVED_FOR_SCENE_PROPOSAL' as const,
+			sourceClock: { clockId: 'BANK-CAMERA-01', timeBasis: 'MEDIA_ELAPSED' as const, uncertaintyMs: 0 }
+		};
+		const evidenceBacked = createSceneDocumentV1(fixture({
+			caseId: sceneId, status: 'HYPOTHESIS', evidenceBindings: [{ evidenceId: localSourceId, sourceRevision }],
+			videoEventBindings: [eventBinding], sceneTimelineCues: [eventCue]
+		}));
+		expect(evidenceBacked.sceneTimelineCues?.[0]?.source.kind).toBe('EVIDENCE');
+		expect(() => createSceneDocumentV1(fixture({
+			caseId: sceneId, status: 'HYPOTHESIS', evidenceBindings: [{ evidenceId: localSourceId, sourceRevision }],
+			sceneTimelineCues: [eventCue]
+		}))).toThrow(/must fit an approved event interval/);
+		expect(() => createSceneDocumentV1(fixture({
+			caseId: sceneId, status: 'HYPOTHESIS', evidenceBindings: [{ evidenceId: localSourceId, sourceRevision }],
+			videoEventBindings: [{ ...eventBinding, sourceClock: { ...eventBinding.sourceClock, clockId: 'OTHER-CAMERA' } }], sceneTimelineCues: [eventCue]
+		}))).toThrow(/must fit an approved event interval/);
 	});
 
 	it('stores recomputable SPZ-to-local-meter calibration bound to an admitted source hash', () => {

@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import type { AnalysisPipelineResult } from '$lib/server/analysis/evidence-analysis-pipeline.js';
 import type { VLMAnalysisResult } from '$lib/server/analysis/vlm-evidence-analyzer.js';
+import sharp from 'sharp';
+import type { Sam2SilhouetteResultV1, YoloBoxV1 } from './sam2-silhouette-adapter-v1.js';
 
 const imageMimeSchema = z.enum([
 	'image/png',
@@ -26,6 +28,15 @@ const depthResponseSchema = z.object({
 	width: z.number().int().min(1).max(8192),
 	height: z.number().int().min(1).max(8192),
 	processing_time_ms: z.number().finite().nonnegative().optional(),
+	source_sha256: z.string().regex(/^sha256:[a-f0-9]{64}$/i).optional(),
+	depth_sha256: z.string().regex(/^sha256:[a-f0-9]{64}$/i).optional(),
+	model_id: z.string().min(1).max(256).optional(),
+	model_revision: z.string().min(1).max(128).optional(),
+	model_revision_status: z.enum(['VERIFIED', 'UNVERIFIED']).optional(),
+	model_license: z.string().min(1).max(64).optional(),
+	weights_sha256: z.string().regex(/^sha256:[a-f0-9]{64}$/i).optional(),
+	depth_type: z.literal('relative_monocular').optional(),
+	device: z.enum(['cpu', 'cuda']).optional(),
 }).passthrough();
 
 const depthConfigSchema = z.object({ endpoint: z.string().url(), bucket: z.string().trim().min(1).max(63) });
@@ -36,6 +47,8 @@ export interface EvidenceVisualAnalysisDependenciesV1 {
 	getDepthConfig(): { endpoint: string; bucket: string } | null;
 	fetchDepth(url: string, imageBase64: string): Promise<unknown>;
 	uploadDepth(bucket: string, key: string, bytes: Buffer): Promise<void>;
+	/** Optional SAM 2 silhouette stage. Absent unless enabled; see sam2-production-deps-v1.ts. */
+	runSam2Silhouettes?(input: { buffer: Buffer; mimeType: string; boxes: YoloBoxV1[] }): Promise<Sam2SilhouetteResultV1>;
 }
 
 export interface EvidenceVisualAnalysisV1 {
@@ -43,9 +56,12 @@ export interface EvidenceVisualAnalysisV1 {
 	authority: 'OBSERVATION_ONLY';
 	sourceRevision: string;
 	status: 'COMPLETE' | 'PARTIAL' | 'UNAVAILABLE';
+	detectionExecuted?: boolean;
+	silhouetteStageStatus?: Sam2SilhouetteResultV1['status'] | 'NOT_RUN';
 	objectDetections: Array<{ class: string; confidence: number; bbox: number[] }>;
 	layoutRegions: Array<{ type: string; confidence: number; bbox: number[] }>;
 	visionSummary: string | null;
+	visionModelId?: string;
 	visionFindings: string[];
 	visionTags: string[];
 	depthMap: {
@@ -56,7 +72,16 @@ export interface EvidenceVisualAnalysisV1 {
 		width: number;
 		height: number;
 		processingTimeMs: number | null;
+		depthType: 'relative_monocular';
+		modelId: string | null;
+		modelRevision: string | null;
+		modelRevisionStatus: 'VERIFIED' | 'UNVERIFIED';
+		modelLicense: string;
+		weightsSha256: string | null;
+		device: 'cpu' | 'cuda' | null;
 	} | null;
+	/** Derivative 2D silhouette masks (SAM 2). Present only when the stage ran. Never canonical evidence. */
+	silhouettes?: Sam2SilhouetteResultV1['masks'];
 	stageErrors: string[];
 }
 
@@ -92,6 +117,13 @@ const defaultDependencies: EvidenceVisualAnalysisDependenciesV1 = {
 	analyzeVlm: async (input) => {
 		const { analyzeEvidenceImage } = await import('$lib/server/analysis/vlm-evidence-analyzer.js');
 		return analyzeEvidenceImage(input);
+	},
+	// Off unless SAM2_ENABLED=1. The disabled path never loads the storage module.
+	runSam2Silhouettes: async (input) => {
+		if (process.env.SAM2_ENABLED !== '1') return { status: 'MODEL_UNAVAILABLE_SKIPPED' as const, masks: [] };
+		const { createSam2SilhouetteStageFromEnvV1 } = await import('./sam2-production-deps-v1.js');
+		const stage = createSam2SilhouetteStageFromEnvV1();
+		return stage ? stage(input) : { status: 'MODEL_UNAVAILABLE_SKIPPED' as const, masks: [] };
 	},
 	getDepthConfig: () => ENV.IMAGE_SYNTHESIS_URL && ENV.SEAWEED_ARTIFACTS_BUCKET
 		? { endpoint: ENV.IMAGE_SYNTHESIS_URL, bucket: ENV.SEAWEED_ARTIFACTS_BUCKET }
@@ -177,6 +209,32 @@ export async function analyzeEvidenceImageV1(
 			throw new Error('DEPTH_MAP_PNG_SIGNATURE_INVALID');
 		}
 		const artifactSha256 = createHash('sha256').update(bytes).digest('hex');
+		if (response.depth_sha256 && response.depth_sha256.replace(/^sha256:/i, '').toLowerCase() !== artifactSha256) {
+			throw new Error('DEPTH_SERVICE_ARTIFACT_HASH_MISMATCH');
+		}
+		if (response.source_sha256 && response.source_sha256.toLowerCase() !== image.sourceRevision.toLowerCase()) {
+			throw new Error('DEPTH_SERVICE_SOURCE_REVISION_MISMATCH');
+		}
+		// The versioned local worker returns both hashes. For that receipt-bearing contract,
+		// verify the decoded PNG and source dimensions before writing the derived artifact.
+		if (response.depth_sha256 || response.source_sha256) {
+			if (!response.depth_sha256 || !response.source_sha256) throw new Error('DEPTH_WORKER_RECEIPT_INCOMPLETE');
+			if (!response.weights_sha256 || !response.model_id || !response.model_revision) throw new Error('DEPTH_WORKER_MODEL_RECEIPT_INCOMPLETE');
+			if (response.model_revision_status !== 'VERIFIED' || response.depth_type !== 'relative_monocular') {
+				throw new Error('DEPTH_WORKER_MODEL_RECEIPT_UNVERIFIED');
+			}
+			const sourceMetadata = await sharp(image.buffer, { limitInputPixels: 40_000_000, failOn: 'error' }).metadata();
+			const swapsExifAxes = sourceMetadata.orientation !== undefined && sourceMetadata.orientation >= 5 && sourceMetadata.orientation <= 8;
+			const orientedWidth = swapsExifAxes ? sourceMetadata.height : sourceMetadata.width;
+			const orientedHeight = swapsExifAxes ? sourceMetadata.width : sourceMetadata.height;
+			if (!orientedWidth || !orientedHeight || response.width !== orientedWidth || response.height !== orientedHeight) {
+				throw new Error('DEPTH_SOURCE_DIMENSIONS_MISMATCH');
+			}
+			const depthPng = await sharp(bytes, { limitInputPixels: 40_000_000, failOn: 'error' }).metadata();
+			if (depthPng.format !== 'png' || depthPng.width !== response.width || depthPng.height !== response.height) {
+				throw new Error('DEPTH_OUTPUT_DIMENSIONS_MISMATCH');
+			}
+		}
 		const sourceHash = image.sourceRevision.slice('sha256:'.length);
 		const key = `evidence/${image.caseId ?? 'default'}/${image.evidenceId}/${sourceHash}/depth-${artifactSha256}.png`;
 		await dependencies.uploadDepth(config.bucket, key, bytes);
@@ -188,6 +246,13 @@ export async function analyzeEvidenceImageV1(
 			width: response.width,
 			height: response.height,
 			processingTimeMs: response.processing_time_ms ?? null,
+			depthType: 'relative_monocular' as const,
+			modelId: response.model_id ?? null,
+			modelRevision: response.model_revision ?? null,
+			modelRevisionStatus: response.model_revision_status ?? 'UNVERIFIED',
+			modelLicense: response.model_license ?? 'UNVERIFIED',
+			weightsSha256: response.weights_sha256 ?? null,
+			device: response.device ?? null,
 		};
 	};
 
@@ -223,18 +288,50 @@ export async function analyzeEvidenceImageV1(
 	const layoutRegions = pipeline?.success ? pipeline.data.yolo?.layout.regions ?? [] : [];
 	const vision = vlm?.success ? vlm.data : null;
 	const depthMap = depthSettled.status === 'fulfilled' ? depthSettled.value : null;
+	// Optional SAM 2 silhouette stage: runs only when a dependency is supplied and YOLO found objects.
+	// Boxes are normalized from source pixels (xyxy) using the source dimensions.
+	let silhouettes: Sam2SilhouetteResultV1['masks'] | undefined;
+	let silhouetteStageStatus: NonNullable<EvidenceVisualAnalysisV1['silhouetteStageStatus']> = 'NOT_RUN';
+	if (dependencies.runSam2Silhouettes && objectDetections.length > 0) {
+		try {
+			const meta = await sharp(image.buffer).metadata();
+			if (!meta.width || !meta.height || !meta.format) throw new Error('SAM2_SOURCE_DIMENSIONS_UNKNOWN');
+			const boxes: YoloBoxV1[] = objectDetections.map((detection) => ({
+				label: detection.class,
+				confidence: detection.confidence,
+				bboxNormalized: [
+					detection.bbox[0]! / meta.width!,
+					detection.bbox[1]! / meta.height!,
+					detection.bbox[2]! / meta.width!,
+					detection.bbox[3]! / meta.height!,
+				] as [number, number, number, number],
+			}));
+			const result = await dependencies.runSam2Silhouettes({ buffer: image.buffer, mimeType: `image/${meta.format}`, boxes });
+			silhouetteStageStatus = result.status;
+			if (result.status === 'EXECUTED') silhouettes = result.masks;
+			else if (result.status === 'FAILED') stageErrors.push('silhouette:SAM2_FAILED');
+		} catch (error) {
+			silhouetteStageStatus = 'FAILED';
+			stageErrors.push(`silhouette:${boundedError(error)}`);
+		}
+	}
+
 	const completedStages = Number(pipeline?.success && pipeline.data.yolo !== null) + Number(vision !== null) + Number(depthMap !== null);
 	return {
 		schema: 'atlas.evidence-visual-analysis.v1',
 		authority: 'OBSERVATION_ONLY',
 		sourceRevision: image.sourceRevision,
 		status: completedStages === 3 ? 'COMPLETE' : completedStages > 0 ? 'PARTIAL' : 'UNAVAILABLE',
+		detectionExecuted: Boolean(pipeline?.success && pipeline.data.yolo !== null),
+		silhouetteStageStatus,
 		objectDetections,
 		layoutRegions,
 		visionSummary: vision?.summary ?? null,
+		...(typeof vision?.model === 'string' && vision.model.length > 0 && vision.model.length <= 256 ? { visionModelId: vision.model } : {}),
 		visionFindings: vision?.keyFindings ?? [],
 		visionTags: vision?.suggestedTags ?? [],
 		depthMap,
+			...(silhouettes ? { silhouettes } : {}),
 		stageErrors,
 	};
 }

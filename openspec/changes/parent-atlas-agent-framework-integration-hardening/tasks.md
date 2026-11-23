@@ -17,7 +17,7 @@
 - [ ] 3.2 Audit and test A2A agent discovery/dispatch only for independently deployable owners; keep local calls local absent an isolation requirement.
 - [ ] 3.3 Verify MCP `tools/list` and authorized `tools/call` for selected read-only Atlas tools, including stable schemas, bounded inputs, structured outputs, and rejection before handler execution when unauthorized.
 - [ ] 3.4 Add adapter contract tests for existing LangChain/LangGraph and Mastra owners; preserve framework-neutral workflow and evidence contracts.
-- [ ] 3.5 Determine whether Deep Agents and Hermes have actual installed/runtime owners; leave them `NOT_PRESENT` or `UNVERIFIED` when absent and add no dependency solely for visibility.
+- [ ] 3.5 Determine whether Deep Agents and we were copying hermes, paperclip logic from their official github for deep agents langchain, mastra durable agents, have actual installed/runtime owners; leave them `NOT_PRESENT` or `UNVERIFIED` when absent and add no dependency solely for visibility.
 - [ ] 3.6 Verify OpenWiki/TOC discovery links cannot register, authorize, invoke, or promote a tool.
 
 ## 4. Preserve Retrieval and Context Authority
@@ -26,6 +26,7 @@
 - [ ] 4.2 Verify candidate identity, logical lane, source/workspace revision, evidence references, and degraded status survive each adapter boundary.
 - [ ] 4.3 Require the existing ACE/ContextManifest admission before framework context injection; reject raw retrieval hits, stale framework memory, and LUT-only references as admitted evidence.
 - [ ] 4.4 Replay one read-only request through at least two adapter paths and compare canonical IDs, revisions, evidence checksums, authorization outcomes, and logical retrieval votes.
+- [ ] 4.5 Add the noncanonical GAN MCP observation hook for KAG/RAG/DAG/ACE calls; keep caller revisions unverified and require adversarial, replay, cache-identity, provenance, and reviewer gates before `PROVEN`/`DONE`.
 
 ## 5. Build the Studio Readiness Projection
 

@@ -555,7 +555,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "AUTO-STARTS on folder open — spawns npm run dev:gpu detached so VS Code returns immediately. Uses scripts/startup/run-detached.mjs and writes logs to logs/task-output/pipeline-test/dev-gpu.{out,err}.log."
+      "detail": "AUTO-STARTS on folder open — spawns npm run dev:gpu detached so VS Code returns immediately. Uses scripts/startup/run-detached.mjs: prints the first 20s of this launch's output here, and writes each launch's full output to logs/task-output/pipeline-test/dev-gpu.<timestamp>.{out,err}.log. A second launch while Vite is already answering on :5173 exits 0 without starting a second instance."
     },
     {
       "label": "🚀 LiteRT Dev Startup (GPU + LiteRT.js Mocap)",

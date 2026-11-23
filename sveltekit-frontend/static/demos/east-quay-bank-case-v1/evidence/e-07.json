@@ -1,0 +1,23 @@
+{
+  "exhibitId": "E-07",
+  "caseId": "PA-DEMO-ROBBERY-001",
+  "synthetic": true,
+  "sourceMediaPresent": false,
+  "description": "Perimeter stop documentation",
+  "kind": "officer_note",
+  "observationEntries": [
+    {
+      "time": "2026-10-14T15:09:12-07:00",
+      "text": "Officer reports Cole stopped at east plaza perimeter."
+    },
+    {
+      "time": "2026-10-14T15:10:34-07:00",
+      "text": "Officer reports Mara stopped separately; she was cooperative according to fictional note."
+    },
+    {
+      "time": "2026-10-14T15:11:23-07:00",
+      "text": "No conclusive link from the stop alone to armed conduct."
+    }
+  ],
+  "warning": "Written synthetic exercise only. No real footage or official alarm source exists."
+}

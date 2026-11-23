@@ -1,0 +1,176 @@
+schema: atlas.okf.agentic-documentation-context-pipeline.v1
+version: 1
+pipeline_id: agentic-documentation-context
+status: DESIGN_ONLY
+owner: parent-atlas
+
+authority:
+  canonical_authority: false
+  writes_allowed: false
+  model_execution_allowed: false
+  recommendations_are_advisory: true
+
+purpose: >-
+  Capture official developer documentation as immutable, revision-bound source
+  material, then route qualified chunks through existing retrieval, ranking,
+  graph-proposal, and ACE context owners.
+
+sources:
+  - source_id: google-gemini-structured-output
+    publisher: Google AI for Developers
+    authority: OFFICIAL
+    url: https://ai.google.dev/gemini-api/docs/structured-output
+    version_policy: resolve_and_record_page_revision_at_capture
+    topics: [structured-output, json-schema, extraction, classification]
+  - source_id: google-gemini-function-calling
+    publisher: Google AI for Developers
+    authority: OFFICIAL
+    url: https://ai.google.dev/gemini-api/docs/function-calling
+    version_policy: resolve_and_record_page_revision_at_capture
+    topics: [tool-use, function-calling, agent-workflows]
+  - source_id: dspy-3-4-0
+    publisher: DSPy
+    authority: OFFICIAL
+    corpus_ref: .okf/docs/dspy/snapshots/20260928T205007Z-9bd30a9471d9/manifest.json
+    version: 3.4.0
+    admission_state: LOCAL_UNADMITTED
+    topics: [signatures, modules, optimizers, evaluation, tool-use]
+  - source_id: beautiful-soup-4
+    publisher: Beautiful Soup
+    authority: OFFICIAL
+    url: https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+    version_policy: resolve_and_record_page_revision_at_capture
+    topics: [html-parsing, document-normalization]
+
+capture:
+  discovery: firecrawl_map_or_bounded_search
+  acquisition: firecrawl_scrape_or_bounded_crawl
+  allowed_domains:
+    - ai.google.dev
+    - dspy.ai
+    - www.crummy.com
+  external_links: false
+  preserve_raw_bytes: true
+  snapshot_storage: LOCAL_IMMUTABLE_SNAPSHOT
+  required_provenance:
+    - requested_url
+    - resolved_url
+    - publisher
+    - source_authority
+    - retrieved_at
+    - content_type
+    - raw_sha256
+    - normalized_sha256
+    - fetcher_revision
+    - parser_revision
+  parsing:
+    engine: BeautifulSoup
+    library: beautifulsoup4
+    input: captured_html_only
+    network_fetch_allowed: false
+    javascript_execution: false
+    output: normalized_text_with_heading_paths_and_source_spans
+  failure_policy: retain_failed_attempt_receipt_and_do_not_emit_empty_chunks
+
+chunking:
+  owner: existing_external_doc_chunker
+  preserve_heading_paths: true
+  preserve_code_blocks_and_api_signatures: true
+  attach_page_revision_to_every_chunk: true
+  chunk_identity: content_hash_plus_page_revision_plus_ordinal
+
+indexing:
+  canonical_owner: PostgreSQL_atlas_external_doc_pages_and_atlas_external_doc_chunks
+  admission: explicit_external_doc_admission_required
+  lexical: PostgreSQL_FTS_and_existing_GIN_indexes
+  dense:
+    representation: semantic_768
+    authority: EmbeddingGemma
+    require_exact_source_chunk_binding: true
+    optional_until_representation_gate_passes: true
+  projections:
+    qdrant: rebuildable_mirror_only
+    valkey: revision_and_checksum_keyed_cache_only
+    graph: derived_projection_only
+
+analysis_lanes:
+  rag:
+    purpose: retrieve_bounded_source_chunks_for_a_query
+    fusion_owner: SearchRuntime
+    cite_source_revision_and_chunk_span: true
+    raw_hits_to_model: forbidden
+  kag:
+    purpose: propose_entity_and_relation_candidates_from_admitted_chunks
+    relation_status: proposal_only_until_tuple_admission
+    identity_from_labels_or_embeddings: forbidden
+  dag:
+    purpose: order_validated_work_steps_and_dependencies
+    execution: bounded_and_capability_gated
+    direct_store_writes_from_graph_nodes: forbidden
+  recommendations:
+    output: ranked_advisory_candidates_with_supporting_source_refs
+    allow_unqualified_abstention: true
+    create_facts_or_ontology_edges: false
+
+dspy:
+  role: offline_program_and_prompt_optimizer
+  candidate_optimizers: [GEPA, MIPROv2, BootstrapFewShot]
+  evaluation:
+    frozen_train_dev_test_splits: required
+    held_out_regression_suite: required
+    source_revision_and_optimizer_config_receipt: required
+    live_request_time_optimization: forbidden
+    promotion: explicit_review_and_versioned_receipt
+  proposal_contract: atlas.dspy-repair-output.v1
+
+ace:
+  input: canonicalized_and_ranked_candidates_only
+  required_fields:
+    - sourceRef
+    - ConceptID
+    - ConfidenceScore
+    - ContextBlob
+  manifest_owner: existing_ContextManifest_contract
+  verify_manifest_checksum_and_evidence_allowlist: true
+  inject_raw_search_or_crawl_results: false
+
+gan_validation:
+  observation_owner: packages/atlas-core/src/validation/gan-validation-hook-v1.ts
+  mcp_adapter: sveltekit-frontend/src/lib/server/atlas/atlas-semantic-tools.ts
+  status_vocabulary: [NOT_CREATED, CREATED, WIRED, PROVEN, DONE]
+  stages:
+    atlas.discover: DISCOVERY
+    atlas.retrieve: KAG_RAG
+    atlas.inspect_runtime: DAG_POLICY
+    atlas.validate_change: DAG_POLICY
+    atlas.build_context: ACE_CONTEXT
+    other_atlas_tools: ACTION_SURFACE
+  observation_is_noncanonical: true
+  caller_supplied_revisions_are_unverified: true
+  proof_gates:
+    - adversarial_probe
+    - deterministic_replay
+    - cache_identity
+    - source_and_workspace_provenance
+    - exact_command_and_output
+    - report_reference
+    - reviewer_acceptance_for_done
+  raw_hits_to_model: false
+  mutation_authority: none
+
+outputs:
+  local_reference_export: .okf/docs/agentic-documentation/
+  datastore_writes: false
+  embedding_calls: 0
+  graph_writes: 0
+  recommendation_authority: none
+
+promotion_gates:
+  - exact_source_revision_and_hash_readback
+  - parser_and_chunker_revision_receipt
+  - canonical_external_doc_admission
+  - lexical_and_embedding_representation_parity
+  - source_cited_retrieval_replay
+  - held_out_dspy_evaluation_and_review
+  - ACE_ContextManifest_checksum_and_allowlist_readback
+  - GAN_hook_call_path_and_adversarial-rejection_proof

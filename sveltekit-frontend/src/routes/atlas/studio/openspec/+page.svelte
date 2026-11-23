@@ -18,6 +18,7 @@
   );
 
   const missingReports = $derived(data.board.reports.filter((report) => !report.exists));
+  const lookup = $derived(data.taskReceipt.result);
 
   onMount(() => {
     const source = new EventSource('/atlas/studio/openspec/events');
@@ -154,6 +155,57 @@
     </section>
   {/if}
 
+  <section class="panel receipt-panel" aria-labelledby="task-receipt-title">
+    <h2 id="task-receipt-title">Task receipts</h2>
+    <form method="GET" action="/atlas/studio/openspec">
+      <label for="task-receipt-key">Exact OpenSpec task key</label>
+      <div class="receipt-search">
+        <input id="task-receipt-key" name="task" value={data.taskReceipt.query} maxlength="512"
+          placeholder="parent-atlas-versioned-doc-intelligence:DOC-DEMAND-03B" required />
+        <button type="submit">Find task</button>
+      </div>
+    </form>
+    {#if lookup?.status === 'FOUND'}
+      <h3>{lookup.task.text}</h3>
+      <dl class="receipt-details">
+        <dt>Task key</dt><dd>{lookup.task.key}</dd>
+        <dt>Ledger status</dt><dd>{lookup.task.checkboxState}</dd>
+        <dt>Source</dt><dd><code>{lookup.task.sourceRef}</code></dd>
+        <dt>Task revision</dt><dd><code>{lookup.task.revision}</code></dd>
+      </dl>
+      {#if lookup.current}
+        <h3>Latest attempt for this revision</h3>
+        <p>{lookup.current.result}{lookup.current.blockerClass !== 'NONE' ? ` · ${lookup.current.blockerClass}` : ''}</p>
+        {#if lookup.current.validationsPassed.length}
+          <h4>Reported validations</h4>
+          <ul>{#each lookup.current.validationsPassed as validation}<li>{validation}</li>{/each}</ul>
+        {/if}
+        {#if lookup.current.evidenceRefs.length}
+          <h4>Reported evidence references</h4>
+          <ul>{#each lookup.current.evidenceRefs as ref}<li><code>{ref}</code></li>{/each}</ul>
+        {/if}
+        {#if lookup.current.missingPreconditions.length}
+          <h4>Missing preconditions</h4>
+          <ul>{#each lookup.current.missingPreconditions as prerequisite}<li>{prerequisite}</li>{/each}</ul>
+        {/if}
+      {:else}
+        <p>No validation attempt recorded for this revision.</p>
+      {/if}
+      {#if lookup.staleCount}
+        <p>{lookup.staleCount} stale {lookup.staleCount === 1 ? 'attempt from another revision' : 'attempts from other revisions'}.</p>
+      {/if}
+    {:else if lookup}
+      <p role="status">
+        {#if lookup.status === 'STALE_SNAPSHOT'}
+          The workboard snapshot is stale. Refresh it to look up receipts for the latest task revision.
+        {:else if lookup.status === 'NOT_FOUND'}No task matches that exact key.
+        {:else if lookup.status === 'AMBIGUOUS'}More than one task matches that key.
+        {:else if lookup.status === 'INVALID_KEY'}Enter a valid task key.
+        {:else}The workboard or task source is unavailable.{/if}
+      </p>
+    {/if}
+  </section>
+
   <Tabs.Root value="actionable" class="tabs">
     <Tabs.List class="tab-list" aria-label="OpenSpec board views">
       <Tabs.Trigger value="actionable">Actionable</Tabs.Trigger>
@@ -230,6 +282,13 @@
 </div>
 
 <style>
+  .receipt-panel{padding:16px;margin-bottom:16px;overflow-wrap:anywhere}
+  .receipt-search{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .receipt-search input,.receipt-search button{border:1px solid var(--line);border-radius:8px;background:#142334;color:#eaf5ff;padding:.6rem}
+  .receipt-search input{flex:1;min-width:min(100%,18rem)}
+  .receipt-search button{cursor:pointer}
+  .receipt-details{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 12px}
+  .receipt-details dd{margin:0}
   :global(body){margin:0;background:#070d14;color:#eaf5ff;font-family:Inter,system-ui,sans-serif}:global(*){box-sizing:border-box}:global(:root){--line:#8bcfff25;--panel:#0d1824;--muted:#8399aa;--cyan:#4ae5ff;--green:#65ed83;--red:#ff8d98;--amber:#f2d46c;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
   .board-shell{max-width:1680px;margin:auto;padding:24px}.hero{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:18px}.eyebrow{margin:0;color:#7890a3;font:800 .65rem var(--mono);letter-spacing:.12em}.hero h1{font-size:clamp(2.4rem,5vw,5rem);line-height:.95;margin:.3rem 0}.lede{max-width:900px;color:#91a6b7}.hero-actions{display:flex;gap:8px;align-items:center}.hero-actions a{border:1px solid var(--line);border-radius:9px;background:#142334;color:#eaf5ff;padding:.65rem .8rem;text-decoration:none}.stream{font:700 .7rem var(--mono);color:var(--amber)}.stream.live{color:var(--green)}
   .summary{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:12px}.summary article,.panel,.notice{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#0e1a27,#0a141e)}.summary article{padding:13px}.summary small{display:block;color:var(--muted);font:.58rem var(--mono)}.summary strong{display:block;margin-top:5px;font-size:1.25rem}.summary .action-card{border-color:#4ae5ff55;box-shadow:inset 0 0 30px #4ae5ff08}

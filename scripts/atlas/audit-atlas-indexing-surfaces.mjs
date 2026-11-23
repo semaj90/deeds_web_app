@@ -154,6 +154,16 @@ async function auditPostgres() {
         }
       }
     }
+    if (tables.codebase_chunk_index.exists) {
+      populated.codebaseChunkNonEmpty = await tableCount('codebase_chunk_index', "WHERE length(coalesce(content, '')) > 0");
+      populated.codebaseChunkEmptyPlaceholdersWithout768 = await tableCount(
+        'codebase_chunk_index',
+        "WHERE content_embedding_768 IS NULL AND length(coalesce(content, '')) = 0",
+      );
+    }
+    if (await tableExists('codebase_chunk_eg2_embeddings')) {
+      populated.codebaseChunk_eg2_embeddings = await tableCount('codebase_chunk_eg2_embeddings', 'WHERE embedding IS NOT NULL');
+    }
     if (tables.atlas_packet_features.exists) {
       populated.packetAstSymbols = await tableCount('atlas_packet_features', 'WHERE COALESCE(cardinality(ast_symbols), 0) > 0');
     }
@@ -216,7 +226,19 @@ async function auditPostgres() {
       finding('POSTGRES_SEMANTIC_768_COLUMN_EMPTY', 'high', 'The declared semantic_768 contract target exists but is empty; column presence does not prove per-row representation provenance or admission.', ['codebase_chunk_index.content_embedding_768', 'codebase_chunk_index.content_embedding']);
     }
     if (tables.codebase_chunk_index.exists && populated.codebaseChunk_content_embedding_768?.count > 0 && populated.codebaseChunk_content_embedding_768.count < tables.codebase_chunk_index.count) {
-      finding('POSTGRES_SEMANTIC_768_COLUMN_PARTIAL', 'high', 'The declared semantic_768 contract target is only partially populated; populated rows still require their representation receipts and exact source binding.', [`${populated.codebaseChunk_content_embedding_768.count}/${tables.codebase_chunk_index.count}`, 'codebase_chunk_index.content_embedding_768']);
+      const nonEmptyCount = populated.codebaseChunkNonEmpty?.count ?? tables.codebase_chunk_index.count;
+      const missingTotal = tables.codebase_chunk_index.count - populated.codebaseChunk_content_embedding_768.count;
+      const emptyPlaceholderCount = populated.codebaseChunkEmptyPlaceholdersWithout768?.count ?? 0;
+      if (emptyPlaceholderCount === missingTotal && populated.codebaseChunk_content_embedding_768.count >= nonEmptyCount) {
+        finding(
+          'POSTGRES_SEMANTIC_768_EMPTY_PLACEHOLDERS_PRESENT',
+          'low',
+          'All non-empty codebase_chunk_index rows have content_embedding_768; remaining NULL rows are empty-content placeholders that must not be embedded with synthetic vectors.',
+          [`${populated.codebaseChunk_content_embedding_768.count}/${nonEmptyCount} non-empty`, `${emptyPlaceholderCount} empty placeholders`, 'codebase_chunk_index.content_embedding_768'],
+        );
+      } else {
+        finding('POSTGRES_SEMANTIC_768_COLUMN_PARTIAL', 'high', 'The declared semantic_768 contract target is only partially populated; populated rows still require their representation receipts and exact source binding.', [`${populated.codebaseChunk_content_embedding_768.count}/${tables.codebase_chunk_index.count}`, 'codebase_chunk_index.content_embedding_768']);
+      }
     }
     // BitmapAnd/BitmapOr are PostgreSQL planner strategies, not a required
     // schema object. Keep the inventory for diagnostics, but do not report an

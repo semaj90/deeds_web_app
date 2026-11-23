@@ -1,0 +1,11 @@
+{
+  "schema": "atlas.reviewed-task-eval-receipt.v1",
+  "totalTaskGroups": 36,
+  "trainTaskGroups": 24,
+  "heldOutTaskGroups": 12,
+  "sourceLeakageCount": 0,
+  "datasetChecksum": "sha256:61abdb98ea544a57582b774ab765c4a676b3f8c0c5f8ce0d0c458257a56b6d6e",
+  "reviewCompleted": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

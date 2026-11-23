@@ -6,7 +6,7 @@
 
 export const SCENE_PRIMITIVE_REGISTRY_REVISION_V1 = 'scene-primitive-registry-v1' as const;
 
-export const SCENE_PRIMITIVE_KINDS_V1 = ['box', 'sphere', 'cylinder', 'cone', 'torus', 'circle', 'rectangle'] as const;
+export const SCENE_PRIMITIVE_KINDS_V1 = ['box', 'sphere', 'cylinder', 'cone', 'torus', 'circle', 'hexagon', 'rectangle'] as const;
 export type ScenePrimitiveKindV1 = (typeof SCENE_PRIMITIVE_KINDS_V1)[number];
 
 export const SCENE_ASSEMBLY_KINDS_V1 = ['sword', 'justice-scales'] as const;
@@ -77,6 +77,7 @@ export const SCENE_PRIMITIVE_REGISTRY_V1: Readonly<Record<ScenePrimitiveKindV1, 
 	cone: def({ kind: 'cone', dimensionsMeters: [0.6, 0.65, 0.6] as const, collider: { shape: 'convex-hull', fidelity: 'approximate' } as const }),
 	torus: def({ kind: 'torus', dimensionsMeters: [0.76, 0.16, 0.76] as const, collider: { shape: 'convex-hull', fidelity: 'approximate' } as const }),
 	circle: def({ kind: 'circle', dimensionsMeters: [0.5, 0, 0.5] as const, collider: { shape: 'none', fidelity: 'exact' } as const }),
+	hexagon: def({ kind: 'hexagon', dimensionsMeters: [0.5, 0.433, 0.08] as const, collider: { shape: 'convex-hull', fidelity: 'approximate' } as const }),
 	rectangle: def({ kind: 'rectangle', dimensionsMeters: [0.6, 0.4, 0] as const, collider: { shape: 'none', fidelity: 'exact' } as const })
 });
 
@@ -109,6 +110,7 @@ function triangleEstimate(kind: ScenePrimitiveKindV1, segments: { radial: number
 		case 'cone': return 4 * segments.radial;
 		case 'torus': return 2 * (segments.radial * 2) * segments.tube;
 		case 'circle': return segments.radial;
+		case 'hexagon': return 20;
 		case 'rectangle': return 2;
 	}
 }
@@ -132,7 +134,9 @@ export function resolveScenePrimitiveV1(kind: ScenePrimitiveKindV1, detail: Prim
 						? { kind: 'torus', radius: 0.3, tube: 0.08, radialSegments: segments.tube, tubularSegments: segments.radial * 2 }
 						: kind === 'circle'
 							? { kind: 'circle', radius: 0.25, segments: segments.radial }
-							: { kind: 'rectangle', width: 0.6, height: 0.4 };
+							: kind === 'hexagon'
+								? { kind: 'polygon-prism', points: [[0.25, 0], [0.125, 0.2165], [-0.125, 0.2165], [-0.25, 0], [-0.125, -0.2165], [0.125, -0.2165]] as const, depth: 0.08 }
+								: { kind: 'rectangle', width: 0.6, height: 0.4 };
 
 	return Object.freeze({
 		...definition,

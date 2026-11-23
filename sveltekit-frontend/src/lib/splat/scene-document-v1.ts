@@ -1,10 +1,21 @@
 import { z } from 'zod';
 import { calibrate, type CalibrationAnchor } from './calibration.js';
 import { generatedSceneAssetProvenanceV1Schema } from './generated-scene-asset-provenance-v1.js';
+import { storybookVideoChapterV1Schema } from '$lib/shared/storybook-video-chapter-v1.js';
+import { storybookImageChapterV1Schema } from '$lib/shared/storybook-image-chapter-v1.js';
+import { scenePreviewDraftV1Schema } from '$lib/reconstruction/scene-preview-draft-v1.js';
+import { applyScenePolygonEditV1, collectSceneReviewedPolygonsV1, matchesSceneContourBindingV1 } from '$lib/reconstruction/scene-reviewed-polygons-v1.js';
+import { sceneLinkedTupleV1Schema, validateSceneOntologyGraphV1 } from '$lib/reconstruction/scene-ontology-bridge-v1.js';
+import { sceneGeometryRecipeV1Schema, sceneObjectInstanceV1Schema } from '$lib/reconstruction/scene-object-contract-v1.js';
 
 const finite = z.number().finite();
 const digest = z.string().regex(/^[a-f0-9]{64}$/i, 'Expected SHA-256 hex');
 const sourceRevision = z.string().regex(/^sha256:[a-f0-9]{64}$/, 'Expected canonical source revision');
+const sceneClockV1Schema = z.object({
+	clockId: z.string().min(1).max(128),
+	timeBasis: z.enum(['SOURCE_WALL_CLOCK', 'MEDIA_ELAPSED', 'SCENE_RELATIVE']),
+	uncertaintyMs: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER)
+}).strict();
 export const SPZ_DECODER_REVISION_V1 = 'spz-v4-decoder-core-v1';
 export const SPZ_GAUSSIAN_REPRESENTATION_REVISION_V1 = 'three-gaussian-splat-v1';
 export const DERIVED_SCENE_ASSET_BYTE_BUDGET = 8 * 1024 * 1024;
@@ -123,10 +134,111 @@ export const sceneVideoEventBindingV1Schema = z.object({
 	eventId: z.string().uuid(),
 	startMs: z.number().int().nonnegative(),
 	endMs: z.number().int().positive(),
-	reviewState: z.literal('APPROVED_FOR_SCENE_PROPOSAL')
+	reviewState: z.literal('APPROVED_FOR_SCENE_PROPOSAL'),
+	// Optional for older revisions. Event-bound cues require this explicit clock metadata.
+	sourceClock: sceneClockV1Schema.optional(),
+	chapter: storybookVideoChapterV1Schema.optional(),
 }).strict().superRefine((binding, context) => {
 	if (binding.endMs <= binding.startMs) {
 		context.addIssue({ code: 'custom', message: 'Scene event interval must be positive', path: ['endMs'] });
+	}
+});
+
+/**
+ * A revision-pinned visual cue bound to one clock lane and one or more existing
+ * scene objects. AUTHORING cues are evidence-free blockout controls; EVIDENCE
+ * cues must point to the approved event binding below. The cue is a rendering
+ * instruction, never the canonical event or evidence record.
+ */
+export const sceneTimelineCueV1Schema = z.object({
+	cueId: z.string().uuid(),
+	eventId: z.string().uuid(),
+	clockId: sceneClockV1Schema.shape.clockId,
+	timeBasis: sceneClockV1Schema.shape.timeBasis,
+	startMs: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+	endMs: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+	uncertaintyMs: sceneClockV1Schema.shape.uncertaintyMs,
+	visualizationStatus: z.literal('UNREVIEWED_ILLUSTRATION'),
+	source: z.discriminatedUnion('kind', [
+		z.object({ kind: z.literal('AUTHORING') }).strict(),
+		z.object({
+			kind: z.literal('EVIDENCE'),
+			evidenceId: z.string().uuid(),
+			sourceRevision,
+			analysisRevision: z.string().min(1).max(256)
+		}).strict()
+	]),
+	targets: z.array(z.object({ objectId: z.string().uuid(), role: z.enum(['ACTOR', 'PROP']) }).strict()).min(1).max(256),
+	action: z.discriminatedUnion('type', [
+		z.object({ type: z.literal('visible_during_interval'), visible: z.boolean() }).strict(),
+		z.object({ type: z.literal('move_during_interval'), fromMeters: z.tuple([finite, finite, finite]), toMeters: z.tuple([finite, finite, finite]) }).strict()
+	])
+}).strict().superRefine((cue, context) => {
+	if (cue.endMs <= cue.startMs) context.addIssue({ code: 'custom', message: 'Scene timeline cue interval must be positive', path: ['endMs'] });
+	if (cue.source.kind === 'AUTHORING' && cue.timeBasis !== 'SCENE_RELATIVE') {
+		context.addIssue({ code: 'custom', message: 'Evidence-free authoring cues must use the scene-relative clock', path: ['timeBasis'] });
+	}
+	if (cue.source.kind === 'EVIDENCE' && cue.timeBasis === 'SCENE_RELATIVE') {
+		context.addIssue({ code: 'custom', message: 'Evidence-backed cues must retain a source clock basis', path: ['timeBasis'] });
+	}
+	const targetIds = new Set<string>();
+	for (const [index, target] of cue.targets.entries()) {
+		if (targetIds.has(target.objectId)) context.addIssue({ code: 'custom', message: 'Scene timeline cue targets must be unique', path: ['targets', index, 'objectId'] });
+		targetIds.add(target.objectId);
+	}
+});
+
+/** A reviewed fixed-camera ground-plane trajectory. It is still a proposal, not a 3D body track. */
+export const sceneGroundPlaneTrackProposalV1Schema = z.object({
+	proposalId: z.string().uuid(),
+	evidenceId: z.string().uuid(),
+	sourceRevision,
+	analysisRevision: z.string().min(1).max(256),
+	calibrationRevisionId: z.string().uuid(),
+	trackId: z.string().min(1).max(256),
+	trackScopeId: z.string().min(1).max(256),
+	status: z.literal('REVIEWED_GROUND_PLANE_PROPOSAL'),
+	semantics: z.literal('image_to_measured_plane_only_no_height_or_camera_motion_compensation'),
+	points: z.array(z.object({
+		frameIndex: z.number().int().nonnegative().max(0xffffffff),
+		framePtsUs: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+		imagePx: z.tuple([finite, finite]),
+		planeM: z.tuple([finite, finite]),
+		poseAnnotationRevisionId: z.string().uuid(),
+		status: z.literal('REVIEWED_GROUND_PLANE_PROPOSAL')
+	}).strict()).min(2).max(4096)
+}).strict().superRefine((track, context) => {
+	const frames = new Set<string>();
+	for (const [index, point] of track.points.entries()) {
+		const key = `${point.frameIndex}:${point.framePtsUs}`;
+		if (frames.has(key)) context.addIssue({ code: 'custom', message: 'Ground-plane track frame identities must be unique', path: ['points', index] });
+		frames.add(key);
+	}
+});
+
+/** A deterministic, explicitly synthesized GLB animation derived from one reviewed ground-plane path. */
+export const sceneAnimationBindingV1Schema = z.object({
+	clipId: z.string().uuid(),
+	assetId: z.string().uuid(),
+	assetSha256: digest,
+	assetBytes: z.number().int().positive().max(64 * 1024 * 1024),
+	claimKind: z.literal('SYNTHESIZED_ANIMATION'),
+	reviewStatus: z.literal('UNREVIEWED_ILLUSTRATION'),
+	pathAlgorithm: z.literal('atlas.timed-walk-path.v1'),
+	coordinateSpace: z.literal('PREVIEW_LOCAL_Y_UP_METERS'),
+	// Optional for older manifests; newly saved animations select an explicit reviewed event.
+	eventId: z.string().uuid().optional(),
+	proposalId: z.string().uuid(),
+	evidenceId: z.string().uuid(),
+	sourceRevision,
+	analysisRevision: z.string().min(1).max(256),
+	calibrationRevisionId: z.string().uuid(),
+	startPtsUs: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+	endPtsUs: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+	frameRate: z.number().positive().max(120)
+}).strict().superRefine((binding, context) => {
+	if (binding.endPtsUs <= binding.startPtsUs) {
+		context.addIssue({ code: 'custom', message: 'Synthesized animation interval must be positive', path: ['endPtsUs'] });
 	}
 });
 
@@ -159,6 +271,8 @@ export type SurfaceMarkerV1 = {
 	label: string;
 };
 
+export type SceneTimelineCueV1 = z.infer<typeof sceneTimelineCueV1Schema>;
+
 export const sceneDocumentV1Schema = z.object({
 	schema: z.literal('parent-atlas.scene-document.v1'),
 	sceneId: z.string().uuid(),
@@ -166,18 +280,33 @@ export const sceneDocumentV1Schema = z.object({
 	status: z.enum(['FIXTURE', 'HYPOTHESIS', 'MEASURED']),
 	// Additive classification keeps old v1 manifest hashes readable while new
 	// revisions label the evidentiary meaning of their geometry explicitly.
-	sceneClassification: z.enum(['MEASURED_MULTI_IMAGE', 'SINGLE_IMAGE_HYPOTHESIS', 'SYNTHETIC_FIXTURE']).optional(),
+	sceneClassification: z.enum(['MEASURED_MULTI_IMAGE', 'SINGLE_IMAGE_HYPOTHESIS', 'UNLINKED_SCENE_HYPOTHESIS', 'SYNTHETIC_FIXTURE']).optional(),
 	revision: z.number().int().positive(),
 	parentManifestSha256: digest.nullable(),
 	createdAt: z.string().datetime(),
 	coordinateFrame: z.enum(['GLTF_Y_UP_METERS', 'SPZ_RUB', 'LOCAL_UNCALIBRATED']),
 	objects: z.array(sceneDocumentObjectV1Schema).max(10_000),
 	animations: z.array(z.object({ clipId: z.string().uuid(), name: z.string().min(1).max(200), durationSeconds: finite.nonnegative(), frameRate: finite.positive().nullable() }).strict()).max(1_000),
+	// Optional additive provenance for clips generated from reviewed source-time paths.
+	sceneAnimationBindings: z.array(sceneAnimationBindingV1Schema).max(1_000).optional(),
 	evidenceBindings: z.array(z.object({ evidenceId: z.string().uuid(), sourceRevision }).strict()).max(10_000).optional(),
 	// Optional additive source-time links preserve earlier v1 scene manifests.
 	videoEventBindings: z.array(sceneVideoEventBindingV1Schema).max(10_000).optional(),
+	// General actor/prop presentation cues; this stays optional for old v1 hashes.
+	sceneTimelineCues: z.array(sceneTimelineCueV1Schema).max(10_000).optional(),
+	proceduralPreviewDraft: scenePreviewDraftV1Schema.optional(),
+	imageStorybookChapter: storybookImageChapterV1Schema.optional(),
+	// Case-level storyboards can contain multiple still-image chapters. Each chapter
+	// remains in ORIGINAL_IMAGE_PIXELS until a separately reviewed alignment exists.
+	imageStorybookChapters: z.array(storybookImageChapterV1Schema).max(256).optional(),
+	// Optional reviewed 2D ground-plane proposals; they do not assert height or a 3D pose.
+	groundPlaneTrackProposals: z.array(sceneGroundPlaneTrackProposalV1Schema).max(1_000).optional(),
 	// Optional to preserve canonical hashes for existing v1 scene manifests.
 	surfaceMarkers: z.array(surfaceMarkerV1Schema).max(10_000).optional(),
+	// Additive scene ontology and geometry recipe persistence (preserves historical v1 manifest hashes)
+	sceneOntologyTuples: z.array(sceneLinkedTupleV1Schema).max(50_000).optional(),
+	geometryRecipes: z.array(sceneGeometryRecipeV1Schema).max(10_000).optional(),
+	authoredSceneObjects: z.array(sceneObjectInstanceV1Schema).max(10_000).optional(),
 	evidenceSources: z.array(z.object({
 		evidenceId: z.string().uuid(),
 		sourceRevision,
@@ -212,11 +341,59 @@ export const sceneDocumentV1Schema = z.object({
 		status: z.enum(['NOT_ASSESSED', 'PASSED', 'FAILED'])
 	}).strict()
 }).strict().superRefine((document, context) => {
+	const plan = document.proceduralPreviewDraft?.plan;
+	if (plan) {
+		const evidence = new Map(document.evidenceBindings?.map((source) => [source.evidenceId, source.sourceRevision]));
+		if (document.status !== 'HYPOTHESIS' || document.coordinateFrame !== 'LOCAL_UNCALIBRATED' ||
+			plan.caseId !== document.caseId || plan.sceneId !== document.sceneId || plan.expectedSceneRevision >= document.revision ||
+			plan.sources.some((source) => evidence.get(source.evidenceId) !== source.sourceRevision)) {
+			context.addIssue({ code: 'custom', path: ['proceduralPreviewDraft'], message: 'Draft scope, revision and evidence must match its scene document' });
+		}
+		const edits = document.proceduralPreviewDraft?.polygonEdits ?? [];
+		const notes = document.proceduralPreviewDraft?.contourNotes ?? [];
+		if (edits.length || notes.length) {
+			const bases = collectSceneReviewedPolygonsV1([
+				...(document.imageStorybookChapter ? [document.imageStorybookChapter] : []), ...(document.imageStorybookChapters ?? [])
+			], plan.sources);
+			const noteIds = new Set<string>();
+			for (const [index, note] of notes.entries()) {
+				const matches = bases.filter((base) => base.objectId === note.objectId);
+				if (noteIds.has(note.id) || matches.length !== 1 || !matchesSceneContourBindingV1(matches[0]!, note)) {
+					context.addIssue({ code: 'custom', path: ['proceduralPreviewDraft', 'contourNotes', index], message: 'Contour notes require a unique ID and the exact reviewed contour binding' });
+				}
+				noteIds.add(note.id);
+			}
+			const vertices = edits.reduce((count, { polygon }) =>
+				count + polygon.outer.length + polygon.holes.reduce((sum, ring) => sum + ring.length, 0), 0);
+			const path = ['proceduralPreviewDraft', 'polygonEdits'];
+			if (vertices > 4096 || new Set(edits.map((edit) => edit.objectId)).size !== edits.length) {
+				context.addIssue({ code: 'custom', path, message: 'Polygon edits exceed the vertex budget or contain duplicate objects' });
+			} else {
+				for (const [index, edit] of edits.entries()) {
+					const base = bases.filter((item) => item.objectId === edit.objectId);
+					try {
+						if (base.length !== 1) throw new Error('Unknown or ambiguous reviewed contour');
+						applyScenePolygonEditV1(base[0]!, edit);
+					} catch {
+						context.addIssue({ code: 'custom', path: [...path, index], message: 'Polygon edit must preserve its exact reviewed base and valid source-pixel topology' });
+					}
+				}
+			}
+		}
+	}
 	if (document.sceneClassification === 'SYNTHETIC_FIXTURE' && document.status !== 'FIXTURE') {
 		context.addIssue({ code: 'custom', message: 'Synthetic fixture classification requires FIXTURE lifecycle status', path: ['sceneClassification'] });
 	}
 	if (document.sceneClassification === 'SINGLE_IMAGE_HYPOTHESIS' && document.status !== 'HYPOTHESIS') {
 		context.addIssue({ code: 'custom', message: 'Single-image hypothesis classification requires HYPOTHESIS lifecycle status', path: ['sceneClassification'] });
+	}
+	if (document.sceneClassification === 'UNLINKED_SCENE_HYPOTHESIS') {
+		if (document.status !== 'HYPOTHESIS') {
+			context.addIssue({ code: 'custom', message: 'Unlinked scene hypothesis classification requires HYPOTHESIS lifecycle status', path: ['sceneClassification'] });
+		}
+		if ((document.evidenceBindings?.length ?? 0) > 0) {
+			context.addIssue({ code: 'custom', message: 'Unlinked scene hypotheses cannot claim evidence bindings', path: ['evidenceBindings'] });
+		}
 	}
 	if (document.sceneClassification === 'MEASURED_MULTI_IMAGE') {
 		const distinctSources = new Set([
@@ -248,6 +425,23 @@ export const sceneDocumentV1Schema = z.object({
 	const sourceRevisions = new Map<string, string>();
 	for (const binding of (document.evidenceBindings ?? [])) sourceRevisions.set(binding.evidenceId, binding.sourceRevision);
 	for (const source of document.evidenceSources) sourceRevisions.set(source.evidenceId, source.sourceRevision);
+	if (document.imageStorybookChapter && sourceRevisions.get(document.imageStorybookChapter.evidenceId) !== document.imageStorybookChapter.sourceRevision) {
+		context.addIssue({ code: 'custom', message: 'Image chapter must match an evidence revision in this scene', path: ['imageStorybookChapter', 'sourceRevision'] });
+	}
+	const imageChapters = [
+		...(document.imageStorybookChapter ? [document.imageStorybookChapter] : []),
+		...(document.imageStorybookChapters ?? [])
+	];
+	const imageChapterIds = new Set<string>();
+	for (const [index, chapter] of imageChapters.entries()) {
+		if (imageChapterIds.has(chapter.chapterId)) {
+			context.addIssue({ code: 'custom', message: 'Image chapter IDs must be unique in a scene revision', path: ['imageStorybookChapters', index, 'chapterId'] });
+		}
+		imageChapterIds.add(chapter.chapterId);
+		if (sourceRevisions.get(chapter.evidenceId) !== chapter.sourceRevision) {
+			context.addIssue({ code: 'custom', message: 'Every image chapter must match a source revision bound to this scene', path: ['imageStorybookChapters', index, 'sourceRevision'] });
+		}
+	}
 	const linkedVideoEvents = new Set<string>();
 	for (const [index, binding] of (document.videoEventBindings ?? []).entries()) {
 		const identity = `${binding.evidenceId}:${binding.eventId}`;
@@ -257,6 +451,47 @@ export const sceneDocumentV1Schema = z.object({
 		linkedVideoEvents.add(identity);
 		if (sourceRevisions.get(binding.evidenceId) !== binding.sourceRevision) {
 			context.addIssue({ code: 'custom', message: 'Video event binding must match an evidence revision in this scene', path: ['videoEventBindings', index, 'sourceRevision'] });
+		}
+	}
+	const groundTrackIds = new Set<string>();
+	for (const [index, track] of (document.groundPlaneTrackProposals ?? []).entries()) {
+		if (groundTrackIds.has(track.proposalId)) context.addIssue({ code: 'custom', message: 'Duplicate ground-plane track proposal ID', path: ['groundPlaneTrackProposals', index, 'proposalId'] });
+		groundTrackIds.add(track.proposalId);
+		if (sourceRevisions.get(track.evidenceId) !== track.sourceRevision) {
+			context.addIssue({ code: 'custom', message: 'Ground-plane track must match an evidence revision in this scene', path: ['groundPlaneTrackProposals', index, 'sourceRevision'] });
+		}
+	}
+	const animationIds = new Set<string>();
+	for (const [index, binding] of (document.sceneAnimationBindings ?? []).entries()) {
+		if (animationIds.has(binding.clipId)) context.addIssue({ code: 'custom', message: 'Duplicate synthesized animation clip binding', path: ['sceneAnimationBindings', index, 'clipId'] });
+		animationIds.add(binding.clipId);
+		const animation = document.animations.find((candidate) => candidate.clipId === binding.clipId);
+		if (!animation || animation.frameRate !== binding.frameRate || Math.abs(animation.durationSeconds - (binding.endPtsUs - binding.startPtsUs) / 1_000_000) > 1e-6) {
+			context.addIssue({ code: 'custom', message: 'Animation registry entry must match its source-time binding', path: ['sceneAnimationBindings', index, 'clipId'] });
+		}
+		const asset = document.assets.find((candidate) => candidate.assetId === binding.assetId);
+		if (!asset || asset.format !== 'GLB' || asset.role !== 'DERIVED' || asset.sha256 !== binding.assetSha256 || asset.bytes !== binding.assetBytes) {
+			context.addIssue({ code: 'custom', message: 'Synthesized animation must reference its registered derived GLB asset', path: ['sceneAnimationBindings', index, 'assetId'] });
+		}
+		const proposal = (document.groundPlaneTrackProposals ?? []).find((candidate) => candidate.proposalId === binding.proposalId);
+		const orderedPoints = proposal ? [...proposal.points].sort((a, b) => a.framePtsUs - b.framePtsUs) : [];
+		if (!proposal || proposal.evidenceId !== binding.evidenceId || proposal.sourceRevision !== binding.sourceRevision ||
+			proposal.analysisRevision !== binding.analysisRevision || proposal.calibrationRevisionId !== binding.calibrationRevisionId ||
+			orderedPoints[0]?.framePtsUs !== binding.startPtsUs || orderedPoints.at(-1)?.framePtsUs !== binding.endPtsUs) {
+			context.addIssue({ code: 'custom', message: 'Synthesized animation must match the exact reviewed source-time track', path: ['sceneAnimationBindings', index, 'proposalId'] });
+		}
+		if (sourceRevisions.get(binding.evidenceId) !== binding.sourceRevision) {
+			context.addIssue({ code: 'custom', message: 'Synthesized animation must match an evidence revision in this scene', path: ['sceneAnimationBindings', index, 'sourceRevision'] });
+		}
+		if (binding.eventId) {
+			const event = (document.videoEventBindings ?? []).find((candidate) => candidate.eventId === binding.eventId
+				&& candidate.evidenceId === binding.evidenceId && candidate.sourceRevision === binding.sourceRevision
+				&& candidate.analysisRevision === binding.analysisRevision && candidate.reviewState === 'APPROVED_FOR_SCENE_PROPOSAL');
+			const animationStartMs = binding.startPtsUs / 1_000;
+			const animationEndMs = binding.endPtsUs / 1_000;
+			if (!event || animationEndMs <= event.startMs || animationStartMs >= event.endMs) {
+				context.addIssue({ code: 'custom', message: 'Animation event link must match an approved source event and overlap its source interval', path: ['sceneAnimationBindings', index, 'eventId'] });
+			}
 		}
 	}
 	const admittedSourceHashes = new Set(document.assets.map((asset) => asset.sha256));
@@ -327,6 +562,29 @@ export const sceneDocumentV1Schema = z.object({
 				}
 			}
 		}
+	}
+	const cueIds = new Set<string>();
+	const cueEventIds = new Set<string>();
+	for (const [index, cue] of (document.sceneTimelineCues ?? []).entries()) {
+		if (cueIds.has(cue.cueId)) context.addIssue({ code: 'custom', message: 'Scene timeline cue IDs must be unique', path: ['sceneTimelineCues', index, 'cueId'] });
+		cueIds.add(cue.cueId);
+		if (cueEventIds.has(cue.eventId)) context.addIssue({ code: 'custom', message: 'Each scene event may have only one timeline cue per revision', path: ['sceneTimelineCues', index, 'eventId'] });
+		cueEventIds.add(cue.eventId);
+		for (const [targetIndex, target] of cue.targets.entries()) {
+			if (!objectIds.has(target.objectId)) context.addIssue({ code: 'custom', message: 'Scene timeline cue target must exist in this manifest', path: ['sceneTimelineCues', index, 'targets', targetIndex, 'objectId'] });
+		}
+		const evidenceSource = cue.source;
+		if (evidenceSource.kind !== 'EVIDENCE') continue;
+		if (sourceRevisions.get(evidenceSource.evidenceId) !== evidenceSource.sourceRevision) {
+			context.addIssue({ code: 'custom', message: 'Evidence-backed cue must match an evidence revision in this scene', path: ['sceneTimelineCues', index, 'source'] });
+		}
+		const approvedEvent = (document.videoEventBindings ?? []).find((event) => event.eventId === cue.eventId
+			&& event.evidenceId === evidenceSource.evidenceId && event.sourceRevision === evidenceSource.sourceRevision
+			&& event.analysisRevision === evidenceSource.analysisRevision && event.reviewState === 'APPROVED_FOR_SCENE_PROPOSAL'
+			&& event.sourceClock?.clockId === cue.clockId && event.sourceClock?.timeBasis === cue.timeBasis
+			&& event.sourceClock?.uncertaintyMs === cue.uncertaintyMs
+			&& cue.startMs >= event.startMs && cue.endMs <= event.endMs);
+		if (!approvedEvent) context.addIssue({ code: 'custom', message: 'Evidence-backed cue must fit an approved event interval in this scene', path: ['sceneTimelineCues', index, 'eventId'] });
 	}
 	for (const [index, object] of document.objects.entries()) {
 		if (object.parentObjectId && !objectIds.has(object.parentObjectId)) context.addIssue({ code: 'custom', message: 'Parent object is not in this manifest', path: ['objects', index, 'parentObjectId'] });

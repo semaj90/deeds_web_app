@@ -524,7 +524,16 @@
 						</thead>
 						<tbody>
 							{#each filtered as poi (poi.id)}
-								<tr class="table-row" tabindex="0">
+								<tr
+									class="table-row"
+									tabindex="0"
+									onkeydown={(e) => {
+										if (e.key === 'Enter' || e.key === ' ') {
+											e.preventDefault();
+											openPreview(poi);
+										}
+									}}
+								>
 									<td class="name-cell">
 										<a href="/persons-of-interest/{poi.id}" class="name-link">
 											{poi.name}

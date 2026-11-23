@@ -150,7 +150,7 @@
 <div class="intake-container">
 	<header class="intake-header">
 		<h1>New Case Intake</h1>
-		<p>Describe what happened. AI will extract persons, charges, and structure a prosecutable case.</p>
+		<p>Describe the case and the questions to investigate. These intake answers can seed a scene draft, but remain unverified until linked to reviewed evidence.</p>
 	</header>
 
 	<div class="form-mode-toggle">
@@ -294,19 +294,19 @@
 			<!-- Guided W-prompts -->
 			<div class="form-section guided-prompts">
 				<h2>Guided Questions</h2>
-				<p>Answer these to help AI structure the case:</p>
+				<p>Use provisional descriptions. Leave motive unknown when the evidence does not support a hypothesis.</p>
 
 				<div class="prompt-group">
-					<label for="who"><strong>WHO</strong> — Who is involved?</label>
+					<label for="who"><strong>WHO</strong> — Who appears or is described?</label>
 					<input id="who" name="who" type="text" bind:value={$form.who}
 						aria-invalid={!!$errors.who?.length}
 						aria-describedby={$errors.who?.length ? 'intake-who-error' : undefined}
-						placeholder="Suspect: John Doe. Victim: Jane Smith. Witness: Officer Johnson." />
+						placeholder="Person A (identity and role unverified); Witness 1" />
 					{@render intakeErrors('who')}
 				</div>
 
 				<div class="prompt-group">
-					<label for="what"><strong>WHAT</strong> — What happened?</label>
+					<label for="what"><strong>WHAT</strong> — What is alleged or observed?</label>
 					<input id="what" name="what" type="text" bind:value={$form.what}
 						aria-invalid={!!$errors.what?.length}
 						aria-describedby={$errors.what?.length ? 'intake-what-error' : undefined}
@@ -333,20 +333,20 @@
 				</div>
 
 				<div class="prompt-group">
-					<label for="why"><strong>WHY</strong> — Why is this conduct criminal?</label>
+					<label for="why"><strong>WHY</strong> — What motive hypothesis, if any, should be reviewed?</label>
 					<input id="why" name="why" type="text" bind:value={$form.why}
 						aria-invalid={!!$errors.why?.length}
 						aria-describedby={$errors.why?.length ? 'intake-why-error' : undefined}
-						placeholder="Suspect needed money for drug habit" />
+						placeholder="Unknown, or an unverified hypothesis to compare with evidence" />
 					{@render intakeErrors('why')}
 				</div>
 
 				<div class="prompt-group">
-					<label for="how"><strong>HOW</strong> — How did the suspect act?</label>
+					<label for="how"><strong>HOW</strong> — What sequence or method is alleged?</label>
 					<input id="how" name="how" type="text" bind:value={$form.how}
 						aria-invalid={!!$errors.how?.length}
 						aria-describedby={$errors.how?.length ? 'intake-how-error' : undefined}
-						placeholder="Displayed firearm, demanded cash, fled in vehicle" />
+						placeholder="Describe a proposed sequence; link each event to evidence before scene playback" />
 					{@render intakeErrors('how')}
 				</div>
 			</div>

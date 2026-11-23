@@ -1,0 +1,368 @@
+{
+  "schema": "atlas-yolox-keyframe-run.v1",
+  "status": "CPU_RUN_PASSED__NOT_EVIDENCE__WEIGHTS_EVAL_ONLY",
+  "model": {
+    "file": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\models\\yolox_nano.onnx",
+    "sha256": "sha256:c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+    "inputSize": 416,
+    "executionProvider": "CPUExecutionProvider"
+  },
+  "source": {
+    "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+    "sha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+    "codec": "h264",
+    "resolution": "1280x720"
+  },
+  "frames": [
+    {
+      "framePtsMs": 0,
+      "detections": 5,
+      "labels": [
+        "person",
+        "tie"
+      ]
+    },
+    {
+      "framePtsMs": 2750,
+      "detections": 6,
+      "labels": [
+        "chair",
+        "person",
+        "tie"
+      ]
+    },
+    {
+      "framePtsMs": 7500,
+      "detections": 6,
+      "labels": [
+        "chair",
+        "person"
+      ]
+    }
+  ],
+  "observations": [
+    {
+      "observationId": "c2107b7b-50a7-40aa-92e0-15973420069d",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 0,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "person",
+      "detectionConfidence": 0.8246,
+      "bboxXYXY": [
+        361.29,
+        42.73,
+        813.62,
+        560.73
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "75264dee-924b-486d-9b81-6252e177ab69",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 0,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "person",
+      "detectionConfidence": 0.6942,
+      "bboxXYXY": [
+        1065.16,
+        265.17,
+        1173.09,
+        459.7
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "bc2a1f15-5ef3-4230-9a64-b2920bd509f5",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 0,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "tie",
+      "detectionConfidence": 0.6294,
+      "bboxXYXY": [
+        632.02,
+        251.74,
+        691.62,
+        433.98
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "b607caa4-d84a-4824-b4a5-f1a19aff48e9",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 0,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "person",
+      "detectionConfidence": 0.6263,
+      "bboxXYXY": [
+        1119.5,
+        451.33,
+        1257.16,
+        638.06
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "694ab8fe-60c0-4dac-a5f1-7de7d7153e96",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 0,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "person",
+      "detectionConfidence": 0.5521,
+      "bboxXYXY": [
+        966.4,
+        294.16,
+        1063.79,
+        461.25
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "aa9927c9-554a-4c75-92f3-8fec70b8b356",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 2750,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "person",
+      "detectionConfidence": 0.8371,
+      "bboxXYXY": [
+        409.42,
+        46.94,
+        913.74,
+        559.09
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "4c17e6fa-90a0-494f-8d31-be88abb910f8",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 2750,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "person",
+      "detectionConfidence": 0.6855,
+      "bboxXYXY": [
+        1118.43,
+        453.17,
+        1255.2,
+        639.74
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "1602b977-3694-42d9-b379-a93a4aef7785",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 2750,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "person",
+      "detectionConfidence": 0.6566,
+      "bboxXYXY": [
+        1063.67,
+        264.35,
+        1172.62,
+        458.19
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "e47090be-3971-4510-a182-d8df885cdebb",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 2750,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "person",
+      "detectionConfidence": 0.6389,
+      "bboxXYXY": [
+        965.62,
+        292.55,
+        1064.91,
+        461.87
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "6efb9e6f-ff2c-48e8-bb9b-08944caaaed5",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 2750,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "tie",
+      "detectionConfidence": 0.6359,
+      "bboxXYXY": [
+        579.71,
+        251.12,
+        638.11,
+        422.93
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "49824034-e089-496b-bd71-fccb8027cdfc",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 2750,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "chair",
+      "detectionConfidence": 0.3219,
+      "bboxXYXY": [
+        1075.93,
+        647.69,
+        1193.89,
+        717.16
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "80b82ab1-0043-41d6-b27b-8926e62d69e9",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 7500,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "person",
+      "detectionConfidence": 0.8796,
+      "bboxXYXY": [
+        436.22,
+        37.84,
+        858.54,
+        595.41
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "e7d6cf52-1e88-4d82-8d99-46ad7ef9e299",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 7500,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "person",
+      "detectionConfidence": 0.6938,
+      "bboxXYXY": [
+        1115.85,
+        449.01,
+        1254.77,
+        640.78
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "cc1b5808-3d99-4c7c-afc5-195ae4226ac8",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 7500,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "person",
+      "detectionConfidence": 0.6889,
+      "bboxXYXY": [
+        1062.36,
+        266.04,
+        1175.0,
+        458.25
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "2c15a64c-b49a-4d24-a24f-486223ce7c24",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 7500,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "person",
+      "detectionConfidence": 0.6411,
+      "bboxXYXY": [
+        964.63,
+        292.52,
+        1064.96,
+        455.06
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "17fae0fc-2f3a-4f48-b713-bd824cf44f0f",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 7500,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "chair",
+      "detectionConfidence": 0.4313,
+      "bboxXYXY": [
+        1074.39,
+        649.21,
+        1194.21,
+        717.15
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    },
+    {
+      "observationId": "16e32cc9-a5d2-4fde-8d05-fca25b763973",
+      "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+      "sourceSha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+      "framePtsMs": 7500,
+      "imageWidth": 1280,
+      "imageHeight": 720,
+      "classLabel": "chair",
+      "detectionConfidence": 0.2583,
+      "bboxXYXY": [
+        1011.11,
+        503.48,
+        1121.11,
+        619.73
+      ],
+      "depthType": null,
+      "coordinateFrame": "image",
+      "status": "observed"
+    }
+  ]
+}

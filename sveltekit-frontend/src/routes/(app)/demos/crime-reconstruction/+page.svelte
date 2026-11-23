@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { env as publicEnv } from '$env/dynamic/public';
   import Icon from '$lib/components/ui/Icon.svelte';
+  import { buildPlaceholderProxyV1 } from '$lib/splat/scene-placeholder-proxy-v1.js';
   import DepthReliefViewer from '$lib/components/evidence/DepthReliefViewer.svelte';
   import { makeSampleReliefPair } from '$lib/components/evidence/relief-sample.js';
 
@@ -79,6 +80,8 @@
     gpuVBuf: GPUBuffer | null;
     gpuIBuf: GPUBuffer | null;
     keyframes: Array<{ t: number; x: number; y: number; z: number; ry: number }>;
+    /** 'source-obj' = imported from a user file; 'illustrative-placeholder' = generated stand-in, never evidence. */
+    provenance: 'source-obj' | 'illustrative-placeholder';
   };
   let sceneObjects = $state<SceneObject[]>([]);
   let selectedId   = $state<string | null>(null);
@@ -400,9 +403,26 @@
         vertices, indices,
         gpuVBuf: null, gpuIBuf: null,
         keyframes: [{ t: 0, x: 0, y: 0, z: 0, ry: 0 }],
+        provenance: 'source-obj',
       }];
     };
     reader.readAsText(file);
+  }
+
+  // Flat-shaded hexagonal prism, same footprint as the spz-renderer registry proxy (r 0.25 m, depth 0.08 m).
+  // It is a stand-in for placing an object in the scene. Its size is NOT derived from the uploaded image.
+  function addPlaceholderProxy() {
+    const { vertices, indices } = buildPlaceholderProxyV1();
+    const id = crypto.randomUUID();
+    const count = sceneObjects.filter(o => o.provenance === 'illustrative-placeholder').length + 1;
+    sceneObjects = [...sceneObjects, {
+      id, name: `placeholder-proxy-${count}`,
+      vertices, indices,
+      gpuVBuf: null, gpuIBuf: null,
+      keyframes: [{ t: 0, x: 0, y: 0, z: 0, ry: 0 }],
+      provenance: 'illustrative-placeholder',
+    }];
+    selectedId = id;
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -687,6 +707,11 @@
       >
         Drop .obj files here
       </div>
+      <button
+        type="button"
+        class="mt-2 w-full px-2 py-1 rounded border border-[#3a3a3a] text-[11px] text-[#c4a35a] hover:border-[#c4a35a]"
+        onclick={addPlaceholderProxy}
+      >+ Placeholder proxy (fixed size, not from image depth)</button>
       {#each sceneObjects as obj}
         <div
           class="mt-1 px-2 py-1 rounded text-[11px] cursor-pointer {selectedId === obj.id ? 'bg-[#c4a35a]/20 text-[#c4a35a]' : 'bg-[#181a1c] text-[#888]'}"
@@ -695,6 +720,9 @@
           onkeydown={(e) => e.key === 'Enter' && (selectedId = obj.id)}
         >
           {obj.name} — {obj.vertices.length / 8 | 0} verts
+          {#if obj.provenance === 'illustrative-placeholder'}
+            <span class="block text-[9px] uppercase tracking-widest text-[#c4a35a]">Placeholder · not evidence</span>
+          {/if}
         </div>
       {/each}
     </div>

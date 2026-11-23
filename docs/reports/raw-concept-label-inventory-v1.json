@@ -1,6 +1,6 @@
 {
   "schema": "atlas.raw-concept-label-inventory.v1",
-  "generatedAt": "2026-09-02T18:19:18.754Z",
+  "generatedAt": "2026-11-22T17:07:03.232Z",
   "mode": "READ_ONLY",
   "postgresWrites": false,
   "neo4jWrites": false,

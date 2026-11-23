@@ -1,0 +1,27 @@
+{
+  "status": "DEMO_FIXTURE_WIRED",
+  "likely_cause": "The scene-intent demo had no concrete multi-scene case fixture to exercise participant, evidence, timeline, and uncertainty boundaries together.",
+  "evidence": [
+    "A synthetic six-scene case seed validates eight separate mock evidence sources, clock domains, local coordinate frames, four unidentified POIs, two unlinked detained participants, and explicitly non-evidentiary placeholder head cards.",
+    "The existing scene-intent demo loads the seed and allows scene timeline selection and registry inspection.",
+    "Focused Vitest result: 5 tests passed.",
+    "npm run check:native: no diagnostics in the changed scene-intent demo; command exits 1 with 11 unrelated errors in StorybookAuthorities.svelte and storybook-authorities/+server.ts."
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/reconstruction/fixtures/fictional-bank-case-seed-v1.ts",
+    "sveltekit-frontend/src/lib/server/reconstruction/fixtures/fictional-bank-case-seed-v1.spec.ts",
+    "sveltekit-frontend/src/routes/(app)/demos/scene-intent-2d/+page.server.ts",
+    "sveltekit-frontend/src/routes/(app)/demos/scene-intent-2d/+page.svelte",
+    "openspec/changes/crime-scene-reconstruction/tasks.md"
+  ],
+  "safe_next_command": "cd sveltekit-frontend; npm exec vitest run src/lib/server/reconstruction/fixtures/fictional-bank-case-seed-v1.spec.ts",
+  "smoke_command": "Open the scene-intent demo, select each fictional scene, inspect source clocks and participant registry, and confirm person head cards remain labeled synthetic and no POI is linked to a detained person.",
+  "report_path": "docs/reports/fictional-bank-case-seed-v1-20261120.json",
+  "not_proven": [
+    "No database case/evidence writes or authorized save/reopen path.",
+    "No generated mesh or GLB artifact creation.",
+    "No real-world coordinate or camera calibration.",
+    "No authenticated browser E2E.",
+    "No full workspace check pass because of the unrelated existing errors listed above."
+  ]
+}

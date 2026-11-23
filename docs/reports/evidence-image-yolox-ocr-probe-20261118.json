@@ -1,0 +1,245 @@
+{
+  "schema": "evidence-image-yolox-ocr-probe.v1",
+  "status": "READ_ONLY_PROBE__NOT_EVIDENCE__TEST_UPLOADS_LIKELY",
+  "images": [
+    {
+      "file": "18631556-a20",
+      "sizePx": [
+        768,
+        576
+      ],
+      "yoloxLabels": [
+        "bicycle",
+        "car",
+        "dog"
+      ],
+      "ocrWords": [
+        "\u201ca7",
+        "\u201cer"
+      ],
+      "ocrWordCount": 2
+    },
+    {
+      "file": "1bee4a42-80c",
+      "sizePx": [
+        1920,
+        1080
+      ],
+      "yoloxLabels": [
+        "person"
+      ],
+      "ocrWords": [
+        "google.com/search?num",
+        "1C1UEAD_enUS1153US1",
+        "1fS&udm",
+        "=2&sxsrf=AH",
+        "Tn8z07",
+        "charizard&stick",
+        "=H4s|AAAAAAAAA...",
+        "gle",
+        "anime",
+        "leon",
+        "charizard",
+        "(+3)",
+        "DeviantArt",
+        "International",
+        "Pok\u00e9"
+      ],
+      "ocrWordCount": 140
+    },
+    {
+      "file": "253837d4-05b",
+      "sizePx": [
+        735,
+        951
+      ],
+      "yoloxLabels": [
+        "bed",
+        "person"
+      ],
+      "ocrWords": [
+        "ARE",
+        "YOU",
+        "FOR",
+        "THE",
+        "DAY?!"
+      ],
+      "ocrWordCount": 5
+    },
+    {
+      "file": "8d8fed88-f78",
+      "sizePx": [
+        1152,
+        648
+      ],
+      "yoloxLabels": [
+        "person"
+      ],
+      "ocrWords": [
+        "Yo,",
+        "16689"
+      ],
+      "ocrWordCount": 2
+    },
+    {
+      "file": "9cf65ab9-bb4",
+      "sizePx": [
+        1200,
+        947
+      ],
+      "yoloxLabels": [],
+      "ocrWords": [
+        "USERNAME",
+        "(\u00ab+",
+        "hello",
+        "twitch",
+        "chat,",
+        "how",
+        "USERNAME",
+        "this",
+        "gradient",
+        "chat",
+        "edit",
+        "you",
+        "like.",
+        "CHAT",
+        "USERNAME"
+      ],
+      "ocrWordCount": 30
+    },
+    {
+      "file": "a4dd1d15-2e4",
+      "sizePx": [
+        735,
+        736
+      ],
+      "yoloxLabels": [
+        "cell_phone",
+        "stop_sign"
+      ],
+      "ocrWords": [
+        "494",
+        "Pome,",
+        "anels",
+        "PANEL",
+        "DESIGN",
+        "SET",
+        "Mee",
+        "ore",
+        "18x",
+        "Small",
+        "Panels",
+        "About",
+        "Profile",
+        "ras",
+        "Emotes"
+      ],
+      "ocrWordCount": 36
+    },
+    {
+      "file": "ac301aba-8f2",
+      "sizePx": [
+        1920,
+        1080
+      ],
+      "yoloxLabels": [
+        "cat",
+        "clock",
+        "person",
+        "potted_plant"
+      ],
+      "ocrWords": [
+        "@Bs",
+        "BNO",
+        "ALF",
+        "ALF",
+        "ALE",
+        "midjourney.com/explore?tab=video_top",
+        "Midjourney",
+        "Explore",
+        "(D,",
+        "Personalize",
+        "New!",
+        "Organize",
+        "Surveys",
+        "uerth",
+        "Updates"
+      ],
+      "ocrWordCount": 24
+    },
+    {
+      "file": "ad452926-5ca",
+      "sizePx": [
+        1920,
+        1080
+      ],
+      "yoloxLabels": [
+        "laptop"
+      ],
+      "ocrWords": [
+        "rey",
+        "(>)",
+        "Screenshot",
+        "(10888).png",
+        "rey",
+        "(>)",
+        "Screenshot",
+        "(10887).png",
+        "ope",
+        "app",
+        "com",
+        "@ac-",
+        "poke:",
+        "poke",
+        "FugiutiveDex"
+      ],
+      "ocrWordCount": 112
+    },
+    {
+      "file": "c577cb33-9e2",
+      "sizePx": [
+        1024,
+        1024
+      ],
+      "yoloxLabels": [],
+      "ocrWords": [],
+      "ocrWordCount": 0
+    },
+    {
+      "file": "d4d28394-6ff",
+      "sizePx": [
+        510,
+        510
+      ],
+      "yoloxLabels": [
+        "book"
+      ],
+      "ocrWords": [],
+      "ocrWordCount": 0
+    },
+    {
+      "file": "d78e0a17-ff3",
+      "sizePx": [
+        1600,
+        900
+      ],
+      "yoloxLabels": [],
+      "ocrWords": [
+        "Fairy",
+        "Fencer",
+        "Advent",
+        "Dark",
+        "Force",
+        "(Switch)",
+        "Review",
+        "The",
+        "Goddess4",
+        "drawing",
+        "strength",
+        "hopes",
+        "and"
+      ],
+      "ocrWordCount": 13
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "exhibitId": "E-09",
+  "caseId": "PA-DEMO-ROBBERY-001",
+  "synthetic": true,
+  "sourceMediaPresent": false,
+  "description": "Mara interview transcript",
+  "kind": "interview",
+  "observationEntries": [],
+  "warning": "Written synthetic exercise only. No real footage or official alarm source exists."
+}

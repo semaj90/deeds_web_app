@@ -67,6 +67,8 @@ describe('processEvidenceImageCanonicalV1', () => {
 	});
 
 	it('validates the admitted image, analyzes it, and persists a source-bound 768-D vector plus proposal metadata', async () => {
+		const ocr = vi.fn(async (_image: Buffer) => ({ text: '  EXIT ONLY  ' }));
+		dependencies.ocr = ocr;
 		const result = await processEvidenceImageCanonicalV1({
 			evidenceId: '00000000-0000-4000-8000-000000000001',
 			caseId: '00000000-0000-4000-8000-000000000002',
@@ -107,6 +109,10 @@ describe('processEvidenceImageCanonicalV1', () => {
 				modelOutputReviewState: 'UNREVIEWED_PROPOSAL',
 				visualAnalysis: expect.objectContaining({ authority: 'OBSERVATION_ONLY' }),
 				imageDerivatives: { thumbnail: result.thumbnail },
+				imageOcr: expect.objectContaining({
+					sourceRevision: sourceSha256, engine: 'tesseract', status: 'COMPLETED',
+					inputSha256: sourceRevision(ocr.mock.calls[0]![0]), text: 'EXIT ONLY', truncated: false,
+				}),
 			}),
 		}));
 		expect(dependencies.deriveObjectCrop).toHaveBeenCalledWith(bytes, { left: 8, top: 8, width: 32, height: 28 });

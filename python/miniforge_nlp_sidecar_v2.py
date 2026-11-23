@@ -1870,6 +1870,12 @@ def analyze(req: legacy.AnalyzeRequest) -> legacy.AnalyzeResponse:
     return legacy._analyze(req)
 
 
+@app.post("/classify")
+def classify(req: legacy.ClassificationRequestV1) -> dict[str, Any]:
+    """Expose the existing read-only classification proposal through the v2 facade."""
+    return legacy.classify(req)
+
+
 @app.post("/extract", response_model=legacy.ExtractResponse)
 def extract(req: legacy.AnalyzeRequest) -> legacy.ExtractResponse:
     return legacy._extract(req)

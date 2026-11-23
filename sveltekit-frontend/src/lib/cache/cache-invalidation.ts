@@ -37,7 +37,13 @@ export const CacheMonitoring = {
 		try {
 			const res = await fetch('/api/cache/stats');
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
-			return await res.json();
+			// /api/cache/stats does not return { status, layers }. Keep the declared shape so
+			// callers can read layers without throwing; an absent list is an empty list.
+			const body = (await res.json()) as Partial<{ status: string; success: boolean; layers: unknown }>;
+			return {
+				status: typeof body.status === 'string' ? body.status : body.success === true ? 'ok' : 'unavailable',
+				layers: Array.isArray(body.layers) ? (body.layers as Array<{ name: string; healthy: boolean; hitRate: number }>) : []
+			};
 		} catch {
 			return {
 				status: 'unavailable',

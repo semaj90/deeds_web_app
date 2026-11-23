@@ -11,6 +11,10 @@
 import { assign, createActor, fromPromise, setup } from 'xstate';
 
 export type MarkerPosition = { x: number; y: number; z: number };
+export type MarkerAnchorV1 =
+	| { kind: 'IMAGE_UV'; u: number; v: number }
+	| { kind: 'MESH_SURFACE'; meshId: string; triangleIndex: number; barycentric: [number, number, number] };
+export type MarkerAnchorProvenanceV1 = { sourceRevision: string | null; sourceSha256: string | null };
 
 export type MarkerSaveCommand = {
 	kind: 'create' | 'move';
@@ -22,6 +26,8 @@ export type MarkerSaveCommand = {
 	/** Required for 'move'; ignored for 'create' (the server sets revision 1). */
 	expectedRevision: number;
 	position: MarkerPosition;
+	anchor?: MarkerAnchorV1 | null;
+	provenance?: MarkerAnchorProvenanceV1;
 	label?: string | null;
 };
 
@@ -169,13 +175,17 @@ export function makeClientMarkerSaver(fetchFn: typeof fetch = fetch): MarkerSave
 					commandId: command.commandId,
 					evidenceId: command.evidenceId,
 					label: command.label ?? null,
-					position: command.position
+					position: command.position,
+					anchor: command.anchor ?? null,
+					provenance: command.provenance ?? { sourceRevision: null, sourceSha256: null }
 				}
 			: {
 					commandId: command.commandId,
 					evidenceId: command.evidenceId,
 					expectedRevision: command.expectedRevision,
-					position: command.position
+					position: command.position,
+					...(command.anchor !== undefined ? { anchor: command.anchor } : {}),
+					...(command.provenance !== undefined ? { provenance: command.provenance } : {})
 				};
 		const response = await fetchFn(url, {
 			method: isCreate ? 'POST' : 'PATCH',
@@ -185,13 +195,15 @@ export function makeClientMarkerSaver(fetchFn: typeof fetch = fetch): MarkerSave
 		});
 		const body = (await response.json().catch(() => null)) as {
 			data?: MarkerSaveResult | { currentRevision?: number | null } | null;
+			message?: string;
 		} | null;
-		if (!response.ok) {
+		if (!response.ok || !body?.data || !('revision' in body.data) || body.data.markerId !== command.markerId) {
 			const currentRevision =
 				body?.data && 'currentRevision' in body.data ? (body.data.currentRevision ?? null) : null;
-			throw new MarkerSaveError(response.status, currentRevision);
+			throw new MarkerSaveError(response.status, currentRevision,
+				response.ok ? 'The server did not confirm the marker save.' : body?.message);
 		}
-		return body!.data as MarkerSaveResult;
+		return body.data;
 	};
 }
 
@@ -230,17 +242,21 @@ export type SavedMarkerView = {
 	label: string | null;
 	revision: number;
 	position: MarkerPosition;
+	anchor: MarkerAnchorV1 | null;
+	anchorStatus: string;
+	provenance: MarkerAnchorProvenanceV1;
 };
 
 /** Hydration: the saved markers for one scene (GET). Throws on any non-OK response. */
 export async function fetchSavedMarkers(
 	caseId: string,
 	sceneKey: string,
-	fetchFn: typeof fetch = fetch
+	fetchFn: typeof fetch = fetch,
+	signal?: AbortSignal
 ): Promise<SavedMarkerView[]> {
 	const url =
 		`/api/cases/${encodeURIComponent(caseId)}/scenes/${encodeURIComponent(sceneKey)}/markers`;
-	const response = await fetchFn(url, { headers: { accept: 'application/json' } });
+	const response = await fetchFn(url, { headers: { accept: 'application/json' }, signal });
 	const body = (await response.json().catch(() => null)) as {
 		success?: boolean;
 		data?: { markers?: SavedMarkerView[] } | null;

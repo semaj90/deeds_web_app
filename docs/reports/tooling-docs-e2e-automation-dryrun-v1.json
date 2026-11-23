@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.tooling-docs-e2e-automation-dryrun.v1",
+  "generatedAt": "2026-11-22T20:06:21.921Z",
+  "artifactsPresent": {
+    "docs/.okf/dev/tooling-docs.manifest.json": true,
+    "docs/.okf/dev/pinned-plus-tooling-docs.manifest.json": true,
+    "docs/reports/doc-26-pinned-plus-tooling-delta-plan-v1.json": true,
+    "docs/reports/doc-26-pinned-plus-tooling-plan-only-v1.json": true,
+    "docs/.okf/dev/pinned-plus-tooling-tooling-docs.admission-envelopes-v2.json": true
+  },
+  "postgresCounts": {
+    "atlas_external_doc_pages": 30,
+    "atlas_external_doc_chunks": 852,
+    "atlas_ontology_concepts": 0,
+    "atlas_ontology_relations": 0
+  },
+  "doc26PlanOnly": {
+    "present": true,
+    "result": "DOC_26_VERSIONED_RECRAWL_PLAN_PROVEN",
+    "safeToAdmit": null
+  },
+  "semanticDoc01DryRun": {
+    "result": "SEMANTIC_DOC_01_DRY_RUN_READY",
+    "executor": {
+      "kind": "ollama",
+      "url": "http://127.0.0.1:11434"
+    },
+    "before": {
+      "total": 852,
+      "embedded": 852
+    },
+    "considered": 0,
+    "prepared": 0,
+    "written": 0,
+    "tooLong": 0,
+    "failures": [],
+    "readback": null
+  },
+  "oaklibWire01Checks": {
+    "atlasOntologyConcepts": 0,
+    "atlasOntologyRelations": 0,
+    "defaultPasswordInCompose": true
+  },
+  "operatorGatedNextSteps": [
+    {
+      "step": "TOOLING-DOCS-ADMIT-01 / DOC-26-APPLY",
+      "envRequired": "ATLAS_DOC_VERSIONED_RECRAWL_AUTHORIZED=I_AUTHORIZE_DOC_VERSIONED_RECRAWL",
+      "command": "cd sveltekit-frontend && npx tsx scripts/atlas/run-external-doc-versioned-recrawl-v2.mts --delta-plan ../docs/reports/doc-26-pinned-plus-tooling-delta-plan-v1.json --prior-envelopes ../docs/.okf/dev/pinned-plus-tooling-tooling-docs.admission-envelopes-v2.json --current-envelopes ../docs/.okf/dev/pinned-plus-tooling-tooling-docs.admission-envelopes-v2.json --apply"
+    },
+    {
+      "step": "TOOLING-DOCS-EMBED-01",
+      "envRequired": "ATLAS_DOC_EMBED_AUTHORIZED=I_AUTHORIZE_SEMANTIC_DOC_01 (plus executor parity receipt for selected executor)",
+      "command": "cd sveltekit-frontend && npx tsx scripts/atlas/populate-external-doc-embeddings-v1.mts --apply"
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

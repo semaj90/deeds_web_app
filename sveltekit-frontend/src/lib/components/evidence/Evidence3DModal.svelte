@@ -39,7 +39,10 @@
 	let busy = $state<'' | 'analyze' | 'upscale'>('');
 	let actionError = $state('');
 	const effectiveUrl = $derived(upscaledUrl ?? imageUrl);
-	type EvidenceMarker = { id: string; number: number; x: number; y: number; label: string; note: string; revision: number | null };
+	type EvidenceMarker = {
+		id: string; number: number; x: number; y: number; label: string; note: string; revision: number | null;
+		sourceRevision: string | null;
+	};
 	let toolMode = $state<'orbit' | 'marker' | 'segment'>('orbit');
 	let sceneView = $state<'relief' | 'spz'>('relief');
 	let samplingMode = $state<ReliefSamplingMode>('native');
@@ -235,9 +238,10 @@
 		}
 	}
 
-	// Durable persistence is on only when the case and exhibit are both known. Otherwise
-	// markers stay temporary, as before. One save runs at a time, in order (queue).
-	const persistenceOn = $derived(Boolean(caseId && evidenceId));
+	const imageSourceRevision = $derived(/^sha256:[a-f0-9]{64}$/.test(sourceRevision ?? '') ? sourceRevision : null);
+	const persistenceOn = $derived(Boolean(caseId && evidenceId && imageSourceRevision));
+	const savedMarkerCount = $derived(markers.filter((marker) => marker.revision !== null).length);
+	const pendingMarkerCount = $derived(markers.length - savedMarkerCount);
 	let saveStatus = $state('');
 	let saveFailed = $state(false);
 	let dragOrigin: { x: number; y: number } | null = null;
@@ -260,6 +264,8 @@
 				commandId: crypto.randomUUID(),
 				expectedRevision: marker.revision ?? 1,
 				position: { x: marker.x, y: marker.y, z: 0 },
+				anchor: { kind: 'IMAGE_UV', u: marker.x, v: marker.y },
+				provenance: { sourceRevision: marker.sourceRevision, sourceSha256: marker.sourceRevision },
 				label: marker.label
 			};
 			saveActor.send({ type: 'DROP', command });
@@ -275,36 +281,54 @@
 	}
 
 	/** Hydration: restore saved markers on open. Merges by id, so it never clobbers local work. */
-	async function hydrateSavedMarkers() {
-		if (!persistenceOn || !caseId || !evidenceId) return;
+	async function hydrateSavedMarkers(caseId: string, evidenceId: string, revision: string, signal: AbortSignal) {
 		try {
-			const saved = await fetchSavedMarkers(caseId, `evidence:${evidenceId}`);
+			const saved = await fetchSavedMarkers(caseId, `evidence:${evidenceId}`, fetch, signal);
+			if (signal.aborted) return;
 			const known = new Set(markers.map((m) => m.id));
 			let number = markers.reduce((max, m) => Math.max(max, m.number), 0);
 			const added: EvidenceMarker[] = [];
+			let hiddenCount = 0;
 			for (const s of saved) {
 				if (known.has(s.markerId)) continue;
+				const boundToImage = s.evidenceId === evidenceId && s.anchor?.kind === 'IMAGE_UV' &&
+					s.provenance?.sourceRevision === revision && s.provenance?.sourceSha256 === revision;
+				if (!boundToImage || s.anchor?.kind !== 'IMAGE_UV') {
+					hiddenCount++;
+					continue;
+				}
 				number += 1;
 				added.push({
 					id: s.markerId,
 					number,
-					x: s.position.x,
-					y: s.position.y,
+					x: s.anchor.u,
+					y: s.anchor.v,
 					label: s.label ?? `Marker ${number}`,
 					note: '',
-					revision: s.revision
+					revision: s.revision,
+					sourceRevision: revision
 				});
 			}
 			if (added.length) markers = [...markers, ...added];
-			saveStatus = saved.length ? `Loaded ${saved.length} saved marker${saved.length === 1 ? '' : 's'}` : '';
+			if (hiddenCount > 0) {
+				saveStatus = `${hiddenCount} saved marker(s) lack a matching image anchor. See the Crime Scene marker history.`;
+			} else if (added.length > 0) {
+				saveStatus = `Loaded ${added.length} saved marker${added.length === 1 ? '' : 's'}`;
+			}
 		} catch {
-			saveStatus = 'Could not load saved markers. New markers will still save.';
+			if (!signal.aborted) saveStatus = 'Could not load saved markers. New markers will still save.';
 		}
 	}
 
 	$effect(() => {
+		if (!open || !caseId || !evidenceId || !imageSourceRevision) return;
+		const request = new AbortController();
+		void hydrateSavedMarkers(caseId, evidenceId, imageSourceRevision, request.signal);
+		return () => request.abort();
+	});
+
+	$effect(() => {
 		saveActor.start();
-		void hydrateSavedMarkers();
 		const sub = saveActor.subscribe((snap) => {
 			saveFailed = snap.value === 'failed';
 			if (snap.value === 'conflict') {
@@ -343,7 +367,8 @@
 			y,
 			label: `Marker ${number}`,
 			note: '',
-			revision: null
+			revision: null,
+			sourceRevision: imageSourceRevision
 		};
 		markers = [...markers, marker];
 		selectedMarkerId = marker.id;
@@ -583,7 +608,7 @@
 
 {#snippet reliefWorkspace()}
 			<div class="e3d-annotation-bar" role="toolbar" aria-label="Image annotation tools">
-				{#if persistenceOn && spzSourceEligible}
+				{#if caseId && evidenceId && spzSourceEligible}
 					<div class="e3d-tool-group" role="group" aria-label="Evidence scene view">
 						<button class="e3d-btn" aria-pressed={sceneView === 'relief'} onclick={() => (sceneView = 'relief')}>Image relief</button>
 						<button class="e3d-btn" aria-pressed={sceneView === 'spz'} onclick={() => (sceneView = 'spz')}>3D SPZ</button>
@@ -605,7 +630,7 @@
 					<button class="e3d-btn" aria-pressed={samplingMode === 'half'} onclick={() => (samplingMode = 'half')}>Half</button>
 					<button class="e3d-btn" aria-pressed={samplingMode === 'retro'} title="Lower display resolution with nearest-neighbor sampling; visual preview only" onclick={() => (samplingMode = 'retro')}>Retro</button>
 				</div>
-				<span class="e3d-marker-count" aria-live="polite"><span class="e3d-count-dot"></span>{markers.length} {markers.length === 1 ? 'marker' : 'markers'} <span>{persistenceOn ? '· saved to case' : '· temporary'}</span></span>
+				<span class="e3d-marker-count" aria-live="polite"><span class="e3d-count-dot"></span>{markers.length} {markers.length === 1 ? 'marker' : 'markers'} <span>{persistenceOn ? `· ${savedMarkerCount} saved${pendingMarkerCount ? ` · ${pendingMarkerCount} pending` : ''}` : '· temporary only'}</span></span>
 				{#if saveStatus}<span class="e3d-save-status" role="status" data-testid="e3d-save-status">{saveStatus}{#if saveFailed} <button class="e3d-btn" onclick={retrySave}>Retry</button>{/if}</span>{/if}
 				<div class="e3d-tool-group" aria-label="Marker history">
 					<button class="e3d-btn" disabled={markers.length === 0} title="Remove the most recently placed pin" onclick={undoMarker}>Undo</button>

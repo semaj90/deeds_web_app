@@ -80,8 +80,8 @@ import { searchQdrantCodeStrictV1 } from '../lib/server/search/qdrant-search.js'
 import { normalizeSemanticSearchHitsV1 } from '../../../scripts/atlas/lib/semantic-search-hits-v1.mjs';
 import {
   acpKanbanErrorTaskInputV1Schema,
-  buildAcpKanbanErrorTaskV1,
 } from '../lib/server/atlas/kanban-acp-dag-contracts.js';
+import { buildAcpErrorFixProposalWithReceiptV1 } from '../lib/server/atlas/openspec-board/error-fix-task-receipt-v1.js';
 import { EngramMemoryBridge } from './memory-bridge.js';
 import type { LangGraphBridge } from './langgraph-bridge.js';
 import { extractKeywordsFromState } from './langgraph-bridge.js';
@@ -11659,22 +11659,17 @@ server.registerTool(
 );
 
 // ── acp.kanban_prefill_error_task ─────────────────────────────────────────────
-// Synthesizes a Zod+Pydantic validated ACP/A2A Kanban error-fixing task with
-// :8095 AST extractions, Atlas DAG neighborhood prefill, and prompt cards.
-// Read-only (writesPerformed=false).
+// Builds a read-only proposal and an optional revision-checked workboard receipt summary.
 
 server.registerTool(
   'acp.kanban_prefill_error_task',
   {
     description:
-      'Returns a proposal-only Kanban prefill. This tool does not read source bytes, run LangExtract, verify database schema, or dispatch work.',
+      'Returns a proposal-only Kanban prefill with an optional revision-checked OpenSpec receipt summary. It does not read repair target bytes or dispatch work.',
     inputSchema: acpKanbanErrorTaskInputV1Schema,
   },
-  async ({ relativePath, errorSignature, targetAgent = 'a2a-error-fixer' }) => {
-    const taskPayload = buildAcpKanbanErrorTaskV1(
-      { relativePath, errorSignature, targetAgent },
-      { sourceAgent: 'trace-mcp-8788' },
-    );
+  async (input) => {
+    const taskPayload = await buildAcpErrorFixProposalWithReceiptV1(input, 'trace-mcp-8788');
 
     return {
       content: [{ type: 'text' as const, text: JSON.stringify(taskPayload, null, 2) }],

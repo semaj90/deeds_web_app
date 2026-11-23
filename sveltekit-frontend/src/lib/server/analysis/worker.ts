@@ -40,6 +40,7 @@ import type { AnalysisPassLedgerInput } from '$lib/server/db/schema/analysis-pas
 import type { ExtractedFeature } from './ast-langextract-bridge.js';
 import { classifyPostgresError } from '$lib/server/db/readiness.js';
 import { getDatabaseUrl as getConfiguredDatabaseUrl } from '$lib/config/env.server.js';
+import { ENV } from '$lib/server/env.server.js';
 import {
 	recordAnalysisJobProgressStageV1,
 	type AnalysisJobProgressStageV1,
@@ -309,6 +310,15 @@ type AnalysisStageConfig = {
 };
 
 const stageConfig: Record<string, AnalysisStageConfig> = {
+	scene_palette: {
+		gate: entityGate, concurrency: 1, family: 'structural',
+		passName: 'scene_palette', passRevision: 'scene-palette-pack-v1',
+		backend: 'native-ts', backendVersion: ANALYSIS_WORKER_REVISION, device: 'cpu',
+		run: async (evidenceId, metadata, jobId) => {
+			const { executeScenePaletteJobV1 } = await import('./scene-palette-job-v1.js');
+			return executeScenePaletteJobV1(evidenceId, metadata, jobId);
+		},
+	},
 	upload_pipeline: {
 		gate: entityGate,
 		concurrency: 1,
@@ -415,6 +425,7 @@ if (process.env.ATLAS_LEXICAL_PASS_ENABLED === 'true') {
 let workerInterval: ReturnType<typeof setInterval> | null = null;
 let notificationClient: Client | null = null;
 let polling = false;
+let sceneDispatchInFlight = false;
 const POLL_MS = 30_000;
 
 // Error tracking for exponential backoff
@@ -425,6 +436,14 @@ const DB_ERROR_LOG_INTERVAL = 60_000; // Log once per minute max
 async function pollOnce(): Promise<void> {
 	if (polling) return;
 	polling = true;
+
+	if (ENV.SCENE_GENERATION_JOBS_ENABLED && !sceneDispatchInFlight) {
+		sceneDispatchInFlight = true;
+		void import('$lib/server/reconstruction/dispatch-scene-generation-jobs-v1.js')
+			.then(({ dispatchSceneGenerationJobsV1 }) => dispatchSceneGenerationJobsV1())
+			.catch((error) => console.error('[Worker] Scene generation dispatch failed:', error instanceof Error ? error.name : 'UnknownError'))
+			.finally(() => { sceneDispatchInFlight = false; });
+	}
 
 	try {
 		for (const jobType of Object.keys(stageConfig) as JobType[]) {
@@ -474,7 +493,7 @@ async function pollOnce(): Promise<void> {
 							});
 							return;
 						}
-						if (jobType === 'lexical_feature_registry') {
+						if (jobType === 'lexical_feature_registry' || jobType === 'scene_palette') {
 							await completeAnalysisJob(job.id, { ...result, durationMs: Date.now() - t0 });
 							return;
 						}
@@ -656,18 +675,20 @@ async function startNotificationListener(): Promise<void> {
 			application_name: 'parent-atlas-analysis-worker-listener',
 			connectionTimeoutMillis: 3000,
 		});
+		// A dedicated pg.Client emits `error` when PostgreSQL drops its socket.
+		// Register handlers before connect/LISTEN: either awaited operation can
+		// be interrupted, and an unhandled EventEmitter `error` terminates Node.
+		client.on('error', (err) => {
+			console.warn('[Worker] analysis notify listener error:', err);
+			if (notificationClient === client) notificationClient = null;
+		});
+		client.on('end', () => {
+			if (notificationClient === client) notificationClient = null;
+		});
 		await client.connect();
 		await client.query(`LISTEN ${ANALYSIS_JOBS_NOTIFY_CHANNEL}`);
 		client.on('notification', () => {
 			void pollOnce();
-		});
-		client.on('error', (err) => {
-			console.warn('[Worker] analysis notify listener error:', err);
-		});
-		client.on('end', () => {
-			if (notificationClient === client) {
-				notificationClient = null;
-			}
 		});
 		notificationClient = client;
 		console.log(`[Worker] Listening on ${ANALYSIS_JOBS_NOTIFY_CHANNEL}`);

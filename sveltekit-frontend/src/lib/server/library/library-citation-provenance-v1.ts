@@ -24,6 +24,7 @@ export interface VerifiedLibraryCitationV1 extends LibraryCitationCandidateV1 {
 	charOffsetUnit: 'utf16_code_units';
 	chunkHash: string;
 	quote: string;
+	authority?: { jurisdiction: string; kind: 'statute' | 'case' | 'constitution' | 'regulation'; citation: string };
 }
 
 export interface LibraryCitationContextManifestV1 {
@@ -56,6 +57,7 @@ function libraryCitationManifestDigestV1(
 			charOffsetUnit: entry.charOffsetUnit,
 			chunkHash: entry.chunkHash.toLowerCase(),
 			quote: entry.quote,
+			...(entry.authority ? { authority: entry.authority } : {}),
 		}));
 	return createHash('sha256')
 		.update(JSON.stringify({ schema: 'atlas.library-citation-context.v1', actorId, caseId, entries: stableEntries }), 'utf8')
@@ -67,9 +69,11 @@ export async function resolveLibraryCitationProvenanceV1(input: {
 	actorId: unknown;
 	caseId?: string | null;
 	candidates: readonly LibraryCitationCandidateV1[];
+	authorityJurisdiction?: string;
 }): Promise<Map<number, VerifiedLibraryCitationV1>> {
 	const actorId = normalizeLibraryActorIdV1(input.actorId);
 	if (actorId === null || input.candidates.length === 0) return new Map();
+	if (input.authorityJurisdiction && !input.caseId) return new Map();
 	if (input.caseId) {
 		if (!UUID_RE.test(input.caseId)) return new Map();
 		const authorizedCase = await getAuthorizedCase(input.caseId, actorId).catch(() => null);
@@ -81,15 +85,22 @@ export async function resolveLibraryCitationProvenanceV1(input: {
 	const chunkIds = [...new Set(candidates.map((candidate) => candidate.chunkId))];
 	if (!chunkIds.length) return new Map();
 	const params: unknown[] = [chunkIds, actorId];
-	const caseFilter = input.caseId ? 'AND EXISTS (SELECT 1 FROM case_library_links cl WHERE cl.document_id = ld.id AND cl.case_id = $3::uuid)' : '';
+	const nodeFilter = input.authorityJurisdiction ? ' AND (cl.node_id IS NULL OR cl.node_id = ln.id)' : '';
+	const caseFilter = input.caseId ? `AND EXISTS (SELECT 1 FROM case_library_links cl WHERE cl.document_id = ld.id AND cl.case_id = $3::uuid${nodeFilter})` : '';
 	if (input.caseId) params.push(input.caseId);
+	const authority = input.authorityJurisdiction;
+	if (authority) params.push(authority);
+	const authorityFilter = authority ? `AND j.code = $4 AND ld.is_official IS TRUE
+		AND ld.corpus_type IN ('statute', 'case', 'constitution', 'regulation')` : '';
 	const result = await pool.query(
 		`SELECT lc.id::text AS chunk_id, lc.chunk_hash, ld.id::text AS document_id, ld.source_hash,
 		        ldv.id::text AS document_revision, lc.parser_revision,
 		        lc.page_start, lc.page_end, lc.char_start, lc.char_end, lc.char_offset_unit, lc.chunk_text, ld.title
+		        ${authority ? ", j.code AS jurisdiction, ld.corpus_type AS authority_kind, coalesce(nullif(trim(ln.citation_label), ''), ld.citation) AS citation_label" : ''}
 		 FROM legal_chunks lc
 		 JOIN legal_nodes ln ON ln.id = lc.legal_node_id
 		 JOIN library_documents ld ON ld.id = ln.document_id
+		 ${authority ? 'JOIN jurisdictions j ON j.id = ld.jurisdiction_id' : ''}
 	 JOIN library_document_versions ldv
 	   ON ldv.id = ln.version_id AND ldv.document_id = ld.id
 	  AND ldv.source_hash = ld.source_hash AND ldv.is_current IS TRUE
@@ -97,7 +108,8 @@ export async function resolveLibraryCitationProvenanceV1(input: {
 		   AND (ld.uploaded_by IS NULL OR ld.uploaded_by = $2::integer)
 		   AND lc.parser_revision IS NOT NULL
 		   AND ld.source_hash ~ '^[a-fA-F0-9]{64}$'
-		   ${caseFilter}`,
+		   ${caseFilter}
+		   ${authorityFilter}`,
 		params,
 	);
 	const rowById = new Map<string, Record<string, unknown>>();
@@ -118,6 +130,18 @@ export async function resolveLibraryCitationProvenanceV1(input: {
 		const actualChunkHash = createHash('sha256').update(quote, 'utf8').digest('hex');
 		if (!SHA256_RE.test(sourceHash) || !SHA256_RE.test(chunkHash) || chunkHash !== actualChunkHash || !parserRevision || charOffsetUnit !== 'utf16_code_units' || !Number.isSafeInteger(charStart) || !Number.isSafeInteger(charEnd) || charStart < 0 || charEnd <= charStart || !quote) continue;
 		if ((pageStart !== null && (!Number.isSafeInteger(pageStart) || pageStart < 1)) || (pageEnd !== null && (!Number.isSafeInteger(pageEnd) || pageEnd < (pageStart ?? 1)))) continue;
+		const kind = row['authority_kind'];
+		const citation = typeof row['citation_label'] === 'string' ? row['citation_label'].trim() : '';
+		if (authority && (row['jurisdiction'] !== authority || !citation || row['char_start'] == null ||
+			charEnd - charStart !== quote.length ||
+			(kind !== 'statute' && kind !== 'case' && kind !== 'constitution' && kind !== 'regulation'))) continue;
+		const verifiedAuthority: VerifiedLibraryCitationV1['authority'] = authority && (kind === 'statute' || kind === 'case' || kind === 'constitution' || kind === 'regulation')
+			? { jurisdiction: authority, kind, citation } : undefined;
+		const excerptLimit = 1000;
+		const boundaryCodeUnit = quote.charCodeAt(excerptLimit - 1);
+		const excerptEnd = verifiedAuthority && quote.length > excerptLimit &&
+			boundaryCodeUnit >= 0xd800 && boundaryCodeUnit <= 0xdbff
+			? excerptLimit - 1 : excerptLimit;
 		verified.set(candidate.ordinal, {
 			ordinal: candidate.ordinal,
 			chunkId: candidate.chunkId,
@@ -132,7 +156,8 @@ export async function resolveLibraryCitationProvenanceV1(input: {
 			charEnd,
 			charOffsetUnit: 'utf16_code_units',
 			chunkHash,
-			quote: quote.slice(0, 1000),
+			quote: quote.slice(0, excerptEnd),
+			...(verifiedAuthority ? { authority: verifiedAuthority } : {}),
 		});
 	}
 	return verified;
@@ -143,6 +168,7 @@ export async function createLibraryCitationContextManifestV1(input: {
 	actorId: unknown;
 	caseId?: string | null;
 	candidates: readonly LibraryCitationCandidateV1[];
+	authorityJurisdiction?: string;
 }): Promise<LibraryCitationContextManifestV1 | null> {
 	const actorId = normalizeLibraryActorIdV1(input.actorId);
 	if (actorId === null) return null;

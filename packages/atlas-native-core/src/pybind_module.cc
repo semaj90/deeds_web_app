@@ -74,6 +74,38 @@ PYBIND11_MODULE(_atlas_native_core, module) {
         for (const auto& entry : entries) sorted_indices.push_back(entry.source_index);
         return sorted_indices;
     }, "kmeans_cluster_ids"_a, "som_bmu_ids"_a, "candidate_ordinals"_a);
+    module.def("pack_residency_glyph_key_v1", [](
+        std::uint8_t residency_tier,
+        std::uint8_t lod,
+        std::uint16_t pagerank_quantized,
+        std::uint16_t recency,
+        std::uint32_t projection_ordinal) {
+        return atlas::native::pack_residency_glyph_key_v1(
+            residency_tier, lod, pagerank_quantized, recency, projection_ordinal);
+    }, "residency_tier"_a, "lod"_a, "pagerank_quantized"_a, "recency"_a, "projection_ordinal"_a);
+    module.def("radix_sort_u64_keys", [](const std::vector<std::uint64_t>& keys) {
+        if (keys.size() > atlas::native::MAX_SOM_RADIX_CANDIDATES_V1) {
+            throw py::value_error("RADIX_U64_CANDIDATE_LIMIT_EXCEEDED");
+        }
+        std::vector<atlas::native::ResidencyRadixKeyEntry> entries;
+        entries.reserve(keys.size());
+        for (std::size_t i = 0; i < keys.size(); ++i) {
+            entries.push_back({keys[i], static_cast<std::uint32_t>(i)});
+        }
+        {
+            py::gil_scoped_release release;
+            atlas::native::radix_sort_u64_entries(entries);
+        }
+        std::vector<std::uint64_t> sorted_keys;
+        std::vector<std::uint32_t> sorted_indices;
+        sorted_keys.reserve(entries.size());
+        sorted_indices.reserve(entries.size());
+        for (const auto& entry : entries) {
+            sorted_keys.push_back(entry.composite_key);
+            sorted_indices.push_back(entry.source_index);
+        }
+        return py::make_tuple(sorted_keys, sorted_indices);
+    }, "keys"_a);
     module.def("pack_turbovec_mrl128", [](const std::vector<float>& values) {
         if (values.size() < atlas::native::TURBOVEC_MRL_DIM) {
             throw py::value_error("TURBOVEC_MRL_PREFIX_MUST_HAVE_128_VALUES");
@@ -203,4 +235,87 @@ PYBIND11_MODULE(_atlas_native_core, module) {
         }
         return std::vector<float>(output.begin(), output.end());
     });
+    module.def("encode_tensor_handle_4x4x6_v1", [](
+        const std::vector<float>& values_96,
+        std::uint32_t candidate_ordinal,
+        std::uint16_t kmeans_cluster_id,
+        std::uint16_t som_bmu_id,
+        std::uint64_t workspace_revision_prefix64,
+        std::uint64_t source_revision_prefix64,
+        const std::vector<float>& affine_2x3,
+        std::uint8_t residency_state,
+        std::uint16_t active_consumers) {
+        if (values_96.size() != atlas::native::TENSOR_HANDLE_V1_ELEMENT_COUNT) {
+            throw py::value_error("TENSOR_HANDLE_V1_REQUIRES_96_VALUES");
+        }
+        if (affine_2x3.size() != 6) {
+            throw py::value_error("TENSOR_HANDLE_V1_REQUIRES_6_AFFINE_COEFFS");
+        }
+        if (residency_state > 6) {
+            throw py::value_error("SAFE_RESIDENCY_STATE_OUT_OF_RANGE");
+        }
+        std::array<float, 6> aff{};
+        for (std::size_t i = 0; i < 6; ++i) aff[i] = affine_2x3[i];
+        std::array<std::uint8_t, atlas::native::TENSOR_HANDLE_V1_TOTAL_BYTES> encoded{};
+        {
+            py::gil_scoped_release release;
+            encoded = atlas::native::encode_tensor_handle_4x4x6_v1(
+                values_96.data(),
+                candidate_ordinal,
+                kmeans_cluster_id,
+                som_bmu_id,
+                workspace_revision_prefix64,
+                source_revision_prefix64,
+                aff,
+                static_cast<atlas::native::SafeTileResidencyStateV1>(residency_state),
+                active_consumers);
+        }
+        return py::bytes(reinterpret_cast<const char*>(encoded.data()), encoded.size());
+    }, "values_96"_a, "candidate_ordinal"_a, "kmeans_cluster_id"_a, "som_bmu_id"_a,
+       "workspace_revision_prefix64"_a, "source_revision_prefix64"_a, "affine_2x3"_a,
+       "residency_state"_a = 1, "active_consumers"_a = 0);
+    module.def("decode_tensor_handle_4x4x6_v1", [](
+        const py::bytes& raw_bytes,
+        std::uint64_t expected_workspace_revision_prefix64) {
+        const std::string raw = raw_bytes;
+        std::array<float, atlas::native::TENSOR_HANDLE_V1_ELEMENT_COUNT> decoded{};
+        {
+            py::gil_scoped_release release;
+            decoded = atlas::native::decode_tensor_handle_4x4x6_v1(
+                reinterpret_cast<const std::uint8_t*>(raw.data()),
+                raw.size(),
+                expected_workspace_revision_prefix64);
+        }
+        return std::vector<float>(decoded.begin(), decoded.end());
+    }, "raw_bytes"_a, "expected_workspace_revision_prefix64"_a);
+    module.def("transition_safe_tile_residency_v1", [](
+        std::uint8_t current_state,
+        std::uint8_t target_state,
+        bool transfer_completed,
+        std::uint32_t active_consumers,
+        bool revision_matched) {
+        if (current_state > 6 || target_state > 6) {
+            throw py::value_error("SAFE_RESIDENCY_STATE_OUT_OF_RANGE");
+        }
+        const auto next = atlas::native::transition_safe_tile_residency_v1(
+            static_cast<atlas::native::SafeTileResidencyStateV1>(current_state),
+            static_cast<atlas::native::SafeTileResidencyStateV1>(target_state),
+            transfer_completed,
+            active_consumers,
+            revision_matched);
+        return static_cast<std::uint8_t>(next);
+    }, "current_state"_a, "target_state"_a, "transfer_completed"_a,
+       "active_consumers"_a, "revision_matched"_a = true);
+    module.def("project_mode7_affine_2x3_v1", [](
+        const std::vector<float>& affine_2x3,
+        float u,
+        float v) {
+        if (affine_2x3.size() != 6) {
+            throw py::value_error("TENSOR_HANDLE_V1_REQUIRES_6_AFFINE_COEFFS");
+        }
+        std::array<float, 6> aff{};
+        for (std::size_t i = 0; i < 6; ++i) aff[i] = affine_2x3[i];
+        const auto pt = atlas::native::project_mode7_affine_2x3_v1(aff, u, v);
+        return py::make_tuple(pt[0], pt[1]);
+    }, "affine_2x3"_a, "u"_a, "v"_a);
 }

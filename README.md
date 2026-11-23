@@ -6,11 +6,23 @@ The active web app in this repository lives in `sveltekit-frontend`.
 
 - [INSTALL.md](INSTALL.md) explains the fresh-clone install and local startup flow.
 - [REQUIREMENTS.md](REQUIREMENTS.md) lists the minimum and recommended machine requirements.
-- [CODEBASE_MAP.md](CODEBASE_MAP.md) summarizes the top-level directory layout for repo navigation.
-- [sveltekit-frontend/CODEBASE_MAP.md](sveltekit-frontend/CODEBASE_MAP.md) is the deeper application-specific map for the SvelteKit app.
+- [docs/reports/sessions/CODEBASE_MAP.md](docs/reports/sessions/CODEBASE_MAP.md) is the root-level navigation map. It summarizes each top-level directory, and links to the app map below.
+- [sveltekit-frontend/CODEBASE_MAP.md](sveltekit-frontend/CODEBASE_MAP.md) is the deeper map for the SvelteKit app.
 - [ACE Startup & CUDA Bridge Guide](sveltekit-frontend/docs/ACE_STARTUP_CUDA_BRIDGE.md) covers high-performance serialization, native bridge wiring, and service sequencing.
 - [Parent Atlas Hybrid Retrieval & Compute Architecture](docs/architecture/atlas-hybrid-retrieval-rpc-fabric-v1.md) — canonical PostgreSQL 18 + N-API C++ bridges + PyTorch ATen + RPC sidecars.
  - [Universal App Readiness Checklist](docs/UNIVERSAL_APP_READINESS_CHECKLIST.md) — product & engineering checklist for releases and audits.
+
+## Codebase Layout
+
+| Path | Purpose |
+|---|---|
+| `sveltekit-frontend/` | The web app (SvelteKit 2, Svelte 5) |
+| `services/` | Standalone Go and Python services |
+| `docker/` | Compose and runtime stacks |
+| `drizzle/` | Migrations and schema assets |
+| `scripts/` | Repo-level tooling |
+| `docs/` | Architecture docs and reports |
+| `music/` | Local audio drop folder for transcription tests. Gitignored; not tracked. |
 
 ## Fresh Install
 

@@ -1,7 +1,6 @@
 import crypto from 'node:crypto';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, extname } from 'node:path';
-import { tmpdir } from 'node:os';
 import { and, eq, or, sql } from 'drizzle-orm';
 import { db } from '$lib/server/db/client';
 import {
@@ -212,7 +211,9 @@ export async function ingestVideoEvidence(request: VideoIngestRequest, ownerId: 
   createJob(jobId, ownerId);
   updateJob(jobId, { step: 'uploading', progress: 3, message: 'Starting video ingestion...' });
 
-  const workDir = join(tmpdir(), `deeds-video-ingest-${jobId}`);
+  // Work under temp/media: the ASR worker (ASR_ALLOWED_ROOTS) only reads files in its allowed roots,
+  // so audio written to the OS temp directory is rejected with HTTP 403 and marked FAILED.
+  const workDir = join(process.cwd(), 'temp', 'media', 'video-ingest', jobId);
   await mkdir(workDir, { recursive: true });
 
   let sourceCleanupDir: string | undefined;

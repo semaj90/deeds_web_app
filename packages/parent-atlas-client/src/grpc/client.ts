@@ -66,6 +66,7 @@ export interface GrpcCodebaseSearchRequest {
   includeDebug?: boolean;
   packetKeys?: string[];
   representationId?: string;
+  atlasContext?: Record<string, unknown>;
 }
 
 export interface GrpcCodebaseChunk {
@@ -257,6 +258,7 @@ export class GrpcRetrievalClient implements RetrievalFacade {
         includeDebug: request.includeDebug ?? false,
         packetKeys: request.packetKeys ?? [],
         representationId: request.representationId ?? '',
+        atlasContext: request.atlasContext,
       }, deadline) as GrpcCodebaseSearchResponse;
     } catch (error) {
       throw new GrpcTransportError(error instanceof Error ? error.message : 'gRPC SearchCodebase failed',
@@ -303,6 +305,7 @@ export class GrpcRetrievalClient implements RetrievalFacade {
         includeDebug: request.includeDebug ?? false,
         packetKeys: request.packetKeys ?? [],
         representationId: request.representationId ?? '',
+        atlasContext: request.atlasContext,
       }, deadline));
     } catch (error) {
       throw new GrpcTransportError(error instanceof Error ? error.message : 'gRPC StreamCodebase failed', undefined, error);

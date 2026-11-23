@@ -1,0 +1,43 @@
+{
+  "schema": "depth-wrapper-smoke-receipt.v1",
+  "status": "PLAN_ONLY_PASSED__NOT_PERSISTED__NOT_EVIDENCE",
+  "generatedAt": "2026-11-18",
+  "path": "sveltekit-frontend/src/lib/server/evidence/depth-producer-v1.ts -> python/atlas_depth_anything_v1.py",
+  "source": {
+    "description": "operator screenshot, scratch-only; not authorized evidence",
+    "sha256": "sha256:f8f967fd971c2939b2cfb804d782e43f697fd6f259789eec85c0ad87d4e1b78c",
+    "width": 1920,
+    "height": 1080
+  },
+  "model": {
+    "id": "depth-anything/Depth-Anything-V2-Small-hf",
+    "revision": "5426e4f0f36572d16453bbda7a8389317b1bef99",
+    "weightsSha256": "sha256:3152477ce0d8d6978d76b995120de97cb5b928701fd0f817769f59e249a16b70",
+    "license": "UNVERIFIED (model card not checked; planner accepts UNVERIFIED only)"
+  },
+  "plan": {
+    "planOnly": true,
+    "writesPerformed": false,
+    "depthSha256": "sha256:4febe71e7d635524cc44d6fb506fb06b8fcfc26e8ea6ab89ee1533f3c6021c30",
+    "dimensions": { "width": 1920, "height": 1080 },
+    "objectKey": "evidence/default/11111111-1111-4111-8111-111111111111-depth-4febe71e7d635524cc44d6fb506fb06b8fcfc26e8ea6ab89ee1533f3c6021c30.png",
+    "depthType": "relative_monocular",
+    "is3DReconstruction": false
+  },
+  "checks": {
+    "sourceRevisionMatch": "PASS",
+    "receiptSourceMatch": "PASS",
+    "receiptModelIdentity": "PASS",
+    "pngHashMatch": "PASS",
+    "sourceDimensionAlignment": "PASS",
+    "exifOrientationApplied": "PASS (python tests; screenshot has no EXIF tag)"
+  },
+  "notDone": [
+    "SeaweedFS storage of the depth PNG",
+    "PostgreSQL derivative/attachment record (needs manual SQL + approval)",
+    "readback through GET /api/evidence/[id]/depth-map",
+    "Three.js DepthReliefViewer display of a stored attachment",
+    "authorized evidence source (this run used a screenshot)",
+    "model license verification"
+  ]
+}

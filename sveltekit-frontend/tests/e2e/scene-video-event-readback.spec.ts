@@ -1,7 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { createHash } from 'node:crypto';
 import sharp from 'sharp';
+
+// The app service worker can otherwise handle requests before Playwright's fixture routes.
+test.use({ serviceWorkers: 'block' });
 
 const caseId = '11111111-1111-4111-8111-111111111111';
 const evidenceId = '33333333-3333-4333-8333-333333333333';
@@ -21,17 +25,23 @@ const poseObservation = (frameIndex: number, framePtsUs: number, hipX: number) =
 		y: index === 0 ? 30 : index === 11 || index === 12 ? 90 : null,
 		confidence: index === 0 || index === 11 || index === 12 ? 1 : 0,
 		visibility: index === 0 || index === 11 || index === 12 ? 'visible' : 'not_labeled'
-	}))
+	})),
+	groundContact: { imagePx: [hipX, 150], footSide: 'left', label: 'operator-marked-ground-contact-candidate' }
 });
 
 test('scene event panel verifies the current source and links to its source timestamp', async ({ page }) => {
 	const pageErrors: string[] = [];
+	const failedRequests: string[] = [];
 	page.on('pageerror', (cause) => pageErrors.push(cause.message));
+	page.on('response', (response) => { if (response.status() >= 400) failedRequests.push(`${response.status()} ${new URL(response.url()).pathname}`); });
 	const casesResponse = await page.request.get('/api/cases?status=open&limit=100');
 	expect(casesResponse.ok()).toBe(true);
 	const casesPayload = await casesResponse.json() as { data?: { cases?: Array<{ id: string; title?: string }> } };
-	const caseId = casesPayload.data?.cases?.find((item) => item.title?.startsWith('[PW-TEST]'))?.id;
-	expect(caseId, 'global setup should provide a case fixture for the authorized route layout').toBeTruthy();
+	const existingCaseId = process.env.PLAYWRIGHT_EXISTING_CASE_ID;
+	const caseId = existingCaseId
+		? casesPayload.data?.cases?.find((item) => item.id === existingCaseId)?.id
+		: casesPayload.data?.cases?.find((item) => item.title?.startsWith('[PW-TEST]'))?.id;
+	expect(caseId, 'an accessible existing case or seeded test case is required for the authorized route layout').toBeTruthy();
 	if (!caseId) throw new Error('No seeded Playwright case is available.');
 	await page.route('**/api/analytics/events', (route) => route.fulfill({ status: 204, body: '' }));
 	await page.route('**/api/errors/client-report', (route) => route.fulfill({ status: 204, body: '' }));
@@ -45,6 +55,7 @@ test('scene event panel verifies the current source and links to its source time
 			error: null,
 			eventTimeline: {
 				evidenceId,
+				caseId,
 				sourceRevision,
 				analysisRevision,
 				events: [{
@@ -59,10 +70,49 @@ test('scene event panel verifies the current source and links to its source time
 			}
 		})
 	}));
+	const annotationRevisionId = '44444444-4444-4444-8444-444444444444';
+	const calibration = {
+		schema: 'atlas.planar-camera-calibration.v1', evidenceId, sourceRevision, analysisRevision,
+		calibrationFrameIndex: 0, calibrationFramePtsUs: 0, frameWidth: 320, frameHeight: 180,
+		plane: 'operator-defined-ground-plane', operatorConfirmedFixedCamera: true,
+		imageToPlaneHomography: [0.01, 0, 0, 0, 0.01, 0, 0, 0, 1],
+		fitResidualsMeters: ['a', 'b', 'c', 'd'].map((anchorId) => ({ anchorId, residualMeters: 0 })),
+		validationResidualsMeters: ['v1', 'v2', 'v3', 'v4'].map((anchorId) => ({ anchorId, residualMeters: 0 })),
+		calibratedRegionPx: { minX: 0, minY: 0, maxX: 320, maxY: 180 },
+		toleranceMeters: 0.05, validationStatus: 'CHECKS_PASSED', status: 'UNREVIEWED_CALIBRATION_PROPOSAL',
+		semantics: 'image_to_measured_plane_only_no_height_or_camera_motion_compensation'
+	};
+	const calibrationSha256 = `sha256:${createHash('sha256').update(JSON.stringify(calibration), 'utf8').digest('hex')}`;
+	const poseRows = [poseObservation(1, 1_250_000, 40), poseObservation(2, 1_500_000, 70)];
+	const outsideWindowPose = poseObservation(3, 3_000_000, 100);
+	const reviewRows = [...poseRows, outsideWindowPose].map((pose) => ({
+		version: 4, metadata: {
+			schema: 'atlas.pose-review-decision.v1', evidenceId, caseId, sourceSha256: sourceRevision, analysisRevision,
+			annotationRevisionId, framePtsUs: pose.framePtsUs, skeletonSchemaId: 'human.coco17.v1', trackId: pose.trackId, trackScopeId: pose.trackScopeId,
+			decision: 'ACCEPTED_FOR_SCENE_PROPOSAL', sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false,
+			groundContactReviewed: true, groundContactDecision: 'ACCEPTED_FOR_SCENE_PROPOSAL'
+		}
+	}));
+	const versionsPayload = {
+		evidenceId,
+		versions: [
+			...reviewRows,
+			{ version: 3, metadata: {
+				schema: 'atlas.planar-camera-calibration-review.v1', evidenceId, caseId, sourceSha256: sourceRevision, analysisRevision,
+				annotationRevisionId, calibrationSha256, calibrationFrameIndex: 0, calibrationFramePtsUs: 0,
+				cameraFixedWindow: { startPtsUs: 0, endPtsUs: 4_000_000 },
+				decision: 'ACCEPTED_FOR_SCENE_PROPOSAL', sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false
+			} },
+			{ id: annotationRevisionId, version: 2, metadata: {
+				schema: 'atlas.evidence-annotation-revision.v1', parentSha256: sourceRevision,
+				annotation: { poseObservations: [...poseRows, outsideWindowPose], planarCameraCalibrations: [calibration] }
+			} }
+		]
+	};
 	await page.route(`**/api/evidence/${evidenceId}/versions**`, (route) => route.fulfill({
 		status: 200,
 		contentType: 'application/json',
-		body: JSON.stringify({ evidenceId, versions: [{ version: 2, metadata: { annotation: { poseObservations: [poseObservation(1, 1_250_000, 40), poseObservation(2, 1_500_000, 70)] } } }] })
+		body: JSON.stringify(versionsPayload)
 	}));
 	let frameReadbackMatches = true;
 	await page.route(`**/api/evidence/${evidenceId}/video-frame/*`, (route) => {
@@ -74,7 +124,7 @@ test('scene event panel verifies the current source and links to its source time
 				'X-Source-Revision': frameReadbackMatches ? sourceRevision : `sha256:${'b'.repeat(64)}`,
 				'X-Analysis-Revision': analysisRevision,
 				'X-Frame-Index': String(frameIndex),
-				'X-Frame-Timestamp-Ms': frameIndex === 1 ? '1250' : '1500',
+				'X-Frame-Timestamp-Ms': frameIndex === 1 ? '1250' : frameIndex === 2 ? '1500' : '3000',
 			},
 			body: frameFixture,
 		});
@@ -90,33 +140,66 @@ test('scene event panel verifies the current source and links to its source time
 	await page.route(`**/api/evidence/${evidenceId}/transcript?limit=500`, (route) => route.fulfill({
 		status: 200, contentType: 'application/json', body: JSON.stringify({ status: 'completed', segments: [], sourceRevision, analysisRevision })
 	}));
-	await page.route(`**/api/evidence/${evidenceId}/download**`, (route) => route.fulfill({
-		status: 200, contentType: 'video/webm', headers: { 'Accept-Ranges': 'bytes' }, body: videoFixture
-	}));
+	await page.route(`**/api/evidence/${evidenceId}/download**`, (route) => {
+		const range = route.request().headers().range;
+		if (!range) return route.fulfill({ status: 200, contentType: 'video/webm', headers: { 'Accept-Ranges': 'bytes' }, body: videoFixture });
+		const match = /^bytes=(\d+)-(\d*)$/.exec(range);
+		if (!match) return route.fulfill({ status: 416, headers: { 'Content-Range': `bytes */${videoFixture.byteLength}` } });
+		const start = Number(match[1]);
+		const end = Math.min(match[2] ? Number(match[2]) : videoFixture.byteLength - 1, videoFixture.byteLength - 1);
+		if (start > end || start >= videoFixture.byteLength) return route.fulfill({ status: 416, headers: { 'Content-Range': `bytes */${videoFixture.byteLength}` } });
+		const body = videoFixture.subarray(start, end + 1);
+		return route.fulfill({ status: 206, contentType: 'video/webm', headers: {
+			'Accept-Ranges': 'bytes', 'Content-Range': `bytes ${start}-${end}/${videoFixture.byteLength}`, 'Content-Length': String(body.byteLength),
+		}, body });
+	});
 
 	await page.goto(`/e2e/scene-video-events?caseId=${encodeURIComponent(caseId)}`);
 	const panel = page.getByTestId('scene-video-event-bindings');
 	await expect(panel.getByText('Subject crosses doorway')).toBeVisible();
 	const posePanel = page.getByTestId('scene-pose-observations');
-	const frame2Row = posePanel.getByRole('listitem').filter({ hasText: 'Frame 2 ·' });
-	await expect(frame2Row.getByText(/Frame 2 · 3\/17 landmarks · unreviewed · revision 2 · track hypothesis track-fixture/)).toBeVisible();
-	await expect(frame2Row.getByText('Hip-center image trail · camera motion not corrected · no world scale')).toBeVisible();
-	await expect(frame2Row.locator('.hip-trail')).toHaveAttribute('points', '45,90 75,90');
-	await expect(frame2Row.getByRole('img', { name: 'Source-frame skeleton preview, frame 2' })).toBeVisible();
-	const sourceFramePreview = frame2Row.locator('.pose-source-preview img');
+	const frame3Row = posePanel.getByRole('listitem').filter({ hasText: 'Frame 3 ·' });
+	await expect(frame3Row.getByText(/Frame 3 · 3\/17 landmarks · accepted proposal · revision 2 · track hypothesis track-fixture/)).toBeVisible();
+	await expect(frame3Row.getByText('Hip-center image trail · camera motion not corrected · no world scale')).toBeVisible();
+	await expect(frame3Row.getByText(/Reviewed ground-plane proposal: X 0\.700 m, Y 1\.500 m/)).toBeVisible();
+	await expect(frame3Row.locator('.ground-contact-marker')).toHaveClass(/ground-contact-reviewed/);
+	await expect(frame3Row.locator('.hip-trail')).toHaveAttribute('points', '45,90 75,90');
+	const outsideWindowRow = posePanel.getByRole('listitem').filter({ hasText: 'Frame 4 ·' });
+	await expect(outsideWindowRow).toBeVisible();
+	await expect(outsideWindowRow.locator('.hip-trail')).toHaveCount(0);
+	await expect(frame3Row.getByRole('img', { name: 'Source-frame skeleton preview, frame 3' })).toBeVisible();
+	const sourceFramePreview = frame3Row.locator('.pose-source-preview img');
 	await expect(sourceFramePreview).toBeVisible();
 	await expect.poll(() => sourceFramePreview.evaluate((element) => (element as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
 	await expect(sourceFramePreview).toHaveAttribute('src', /^blob:/);
-	await expect(frame2Row.getByRole('link', { name: 'Open source at 0:01' })).toHaveAttribute('href', `/cases/${caseId}/evidence/${evidenceId}?timeMs=1500`);
+	await expect(frame3Row.getByRole('link', { name: 'Open source at 0:01' })).toHaveAttribute('href', `/cases/${caseId}/evidence/${evidenceId}?timeMs=1500`);
+	const groundPlot = page.getByTestId('scene-ground-plane-tracks').getByRole('img', { name: 'Top-down measured ground-plane path for track-fixture' });
+	await expect(groundPlot).toBeVisible();
+	await expect(groundPlot.locator('polyline')).toHaveAttribute('points', /,/);
+	const plotPoints = groundPlot.locator('a');
+	await expect(plotPoints).toHaveCount(2);
+	await expect(plotPoints.nth(0)).toHaveAttribute('href', `/cases/${caseId}/evidence/${evidenceId}?timeMs=1250`);
+	await expect(plotPoints.nth(1).locator('circle')).toHaveAttribute('fill', '#c9593e');
+	const scrubber = page.getByRole('slider', { name: 'Scrub reviewed samples for track-fixture' });
+	await expect(scrubber).toHaveValue('0');
+	await scrubber.focus();
+	await scrubber.press('ArrowRight');
+	await expect(scrubber).toHaveValue('1');
+	await expect(panel.getByText(/Frame 3 · 0:01 · X 0\.700 m, Y 1\.500 m · discrete reviewed sample/)).toBeVisible();
+	await expect(plotPoints.nth(1)).toHaveClass(/active/);
+	await expect(page.getByRole('link', { name: 'Open selected source frame at 0:01' })).toHaveAttribute('href', `/cases/${caseId}/evidence/${evidenceId}?timeMs=1500`);
 	frameReadbackMatches = false;
 	await page.reload();
-	await expect(page.getByTestId('scene-pose-observations').getByText('Frame preview does not match this pose revision and timestamp.').first()).toBeVisible();
+	await expect(page.getByTestId('scene-pose-observations').getByText('Frame preview does not match this pose revision and timestamp.').first()).toBeVisible().catch((error) => { throw new Error(`${String(error)}\nFailed requests: ${failedRequests.join(', ')}`); });
 	const sourceLink = panel.getByRole('link', { name: 'Open source at 0:01–0:01' });
 	await expect(sourceLink).toHaveAttribute('href', `/cases/${caseId}/evidence/${evidenceId}?timeMs=1250`);
 	await sourceLink.click();
 	const sourceVideo = page.locator('video[aria-label="Original evidence video"]');
 	await expect(sourceVideo).toBeVisible();
-	await expect.poll(() => sourceVideo.evaluate((element) => (element as HTMLVideoElement).readyState)).toBeGreaterThanOrEqual(1);
+	await expect.poll(() => sourceVideo.evaluate((element) => (element as HTMLVideoElement).readyState)).toBeGreaterThanOrEqual(1).catch(async (error) => {
+		const media = await sourceVideo.evaluate((element) => ({ src: (element as HTMLVideoElement).currentSrc, error: (element as HTMLVideoElement).error?.code ?? null }));
+		throw new Error(`${String(error)}\nMedia: ${JSON.stringify(media)}\nFailed requests: ${failedRequests.join(', ')}`);
+	});
 	await expect.poll(() => sourceVideo.evaluate((element) => (element as HTMLVideoElement).currentTime)).toBeGreaterThanOrEqual(1.2);
 	expect(pageErrors).toEqual([]);
 });

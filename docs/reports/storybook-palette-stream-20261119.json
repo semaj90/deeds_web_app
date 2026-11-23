@@ -1,0 +1,44 @@
+{
+  "baseRevision": "b283b7436c1",
+  "likely_cause": "The worker could return packed palette bytes but the saved Storybook scene had no verified path to its relief material.",
+  "scope": "Local workspace, synthetic 5 by 3 image and depth image, actual Three.js relief component, headless Chromium with fixture HTTP",
+  "created": ["Shared packed texture receipt and bounded binary reader"],
+  "wired": ["Saved image chapter texture job readback to the Three.js relief material and backplate"],
+  "proven": [
+    {
+      "status": "PASS",
+      "cwd": "sveltekit-frontend",
+      "command": "Get-Content -Raw -LiteralPath ../scratch/storybook-palette-stream/verify.mjs | node --input-type=module",
+      "output": "{\"renderer\":\"Chromium WebGL2\",\"bytes\":8,\"top\":[210,120,52],\"bottom\":[53,163,214],\"anchor\":{\"left\":42.05504631418439,\"top\":43.17262291960603},\"sourceRestored\":true,\"badDigestRejected\":true,\"consoleErrors\":0}",
+      "artifact": "scratch/storybook-palette-stream/webgl/verification.json"
+    },
+    {
+      "status": "PARTIAL",
+      "cwd": "sveltekit-frontend",
+      "command": "$env:ATLAS_PALETTE_TEST_BACKEND='webgpu'; Get-Content -Raw -LiteralPath ../scratch/storybook-palette-stream/verify.mjs | node --input-type=module",
+      "output": "{\"requested\":\"WebGPU\",\"actual\":\"WebGL2\",\"status\":\"PARTIAL\",\"cause\":\"Headless Chromium did not select a WebGPU adapter\"}"
+    }
+  ],
+  "savedRevisionAdmission": {
+    "created": ["Manifest digest pin on the existing analysis job"],
+    "wired": ["Canonical saved-chapter readback at enqueue, execution and authorized download"],
+    "testCommand": "npm exec -- vitest run src/lib/server/analysis/scene-palette-job-v1.spec.ts src/lib/server/scene-document-revisions-v1.spec.ts",
+    "testOutput": "Test Files  2 passed (2)\nTests  20 passed (20)",
+    "adversarialProbe": "A changed manifest digest between the first and final readback returned STALE_SOURCE after artifact bytes were read and before delivery.",
+    "replayCommand": "Get-Content -Raw -LiteralPath ../scratch/storybook-palette-stream/verify-saved-scene.mjs | node --input-type=module",
+    "replayStatus": "PARTIAL",
+    "replayOutput": "Error: connect ECONNREFUSED 127.0.0.1:5434",
+    "replayScope": "Scratch PostgreSQL 18 transaction and fixture artifact storage. Connection failed before staging fixture data."
+  },
+  "done": [],
+  "evidence": ["The browser downloaded eight indexed bytes on demand, switched the rendered surface map and left the projected annotation anchor unchanged. Rejecting a bad digest preserved the source view."],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/splat/indexed-palette-artifact-v1.ts",
+    "sveltekit-frontend/src/lib/components/evidence/StorybookScenePalette.svelte",
+    "sveltekit-frontend/src/lib/components/evidence/DepthReliefViewer.svelte"
+  ],
+  "safe_next_command": "git diff --check",
+  "smoke_command": "Get-Content -Raw -LiteralPath ../scratch/storybook-palette-stream/verify.mjs | node --input-type=module",
+  "report_path": "docs/reports/storybook-palette-stream-20261119.json",
+  "pending": ["Live authorized SeaweedFS round trip", "Packed GPU material parity for this route", "WebGPU and target WebView proof", "Imported mesh UV bake and scene-revision binding", "Canonical ACE packet and dependency admission"]
+}

@@ -17,11 +17,12 @@ const mocks = vi.hoisted(() => ({
 		mimeType: 'application/pdf',
 		fileType: 'application/pdf',
 		fileSize: 4,
+		hash: 'ab'.repeat(32),
 		caseId: null,
 	},
 }));
 
-vi.mock('$lib/server/db/client', () => ({
+vi.mock('$lib/server/db/client.js', () => ({
 	db: { select: mocks.select },
 }));
 
@@ -34,6 +35,7 @@ vi.mock('$lib/server/db/schema-postgres.js', () => ({
 		mimeType: 'mimeType',
 		fileType: 'fileType',
 		fileSize: 'fileSize',
+		hash: 'hash',
 		caseId: 'caseId',
 		userId: 'userId',
 		uploadedBy: 'uploadedBy',
@@ -128,6 +130,28 @@ describe('GET /api/evidence/[id]/download', () => {
 		expect(response.headers.get('content-type')).toBe('video/webm');
 		expect(response.headers.get('content-disposition')).toContain('inline;');
 		expect(await response.text()).toBe('test');
+	});
+
+	it.each([
+		[`sha256:${mocks.row.hash}`, 200],
+		[`sha256:${'cd'.repeat(32)}`, 409],
+		['invalid', 400],
+	] as const)('checks revision-qualified preview %s before reading storage', async (revision, status) => {
+		const caseId = 'fc0277ba-9d09-4d52-8d74-f16db1a678ce';
+		const query = new URLSearchParams({ inline: '1', caseId, sourceRevision: revision });
+		const url = new URL(`http://localhost/api/evidence/example/download?${query}`);
+		const { GET } = await import('./+server.js');
+		const response = await GET({
+			params: { id: mocks.row.id }, locals: { user: { id: 2 } }, url, request: new Request(url),
+		} as any);
+		expect(response.status).toBe(status);
+		if (status === 200) {
+			await expect(response.text()).resolves.toBe('test');
+		} else {
+			expect(mocks.statObject).not.toHaveBeenCalled();
+			expect(mocks.getStream).not.toHaveBeenCalled();
+			expect(mocks.getPartialStream).not.toHaveBeenCalled();
+		}
 	});
 
 	it('keeps the default response as an attachment', async () => {

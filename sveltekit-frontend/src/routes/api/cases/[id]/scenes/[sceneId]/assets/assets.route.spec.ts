@@ -40,6 +40,22 @@ describe('case scene asset route', () => {
 		expect(mocks.storeSceneGlbV1).not.toHaveBeenCalled();
 	});
 
+	it('rejects synthetic fixture identifiers before authorization or storage', async () => {
+		const response = await POST(event('POST', { params: { id: 'PA-DEMO-ROBBERY-001', sceneId: 'SC-01' } }));
+		expect(response.status).toBe(400);
+		expect(await response.json()).toEqual({ success: false, data: null, message: 'Invalid identifiers' });
+		expect(mocks.getAuthorizedCase).not.toHaveBeenCalled();
+		expect(mocks.storeSceneGlbV1).not.toHaveBeenCalled();
+	});
+
+	it('rejects cross-case writes when the authenticated user lacks case access', async () => {
+		mocks.env.SCENE_PERSISTENCE_ENABLED = true;
+		mocks.getAuthorizedCase.mockResolvedValue(null);
+		const response = await POST(event('POST'));
+		expect(response.status).toBe(404);
+		expect(mocks.storeSceneGlbV1).not.toHaveBeenCalled();
+	});
+
 	it('returns a stable JSON failure when case authorization throws', async () => {
 		mocks.getAuthorizedCase.mockRejectedValue(new Error('database unavailable'));
 		for (const method of ['GET', 'POST'] as const) {

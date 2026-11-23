@@ -1,6 +1,6 @@
 # Concept Temperature Report
 
-**Generated**: 2026-06-11T21:31:53.690Z
+**Generated**: 2026-11-22T17:09:55.407Z
 
 ## Lifecycle Distribution
 
@@ -23,7 +23,15 @@
 
 ## Top 10 Hot Concepts
 
-### native_accelerators
+### general_abstractions
+- **Temp**: 0.414 | **Retrievals**: 15 | **Success**: 93.5%
+- **Discovered via**: fusion (10), vector_only (2), lexical_only (2), cold_neschrom (1)
+
+### observability_telemetry
+- **Temp**: 0.414 | **Retrievals**: 15 | **Success**: 93.5%
+- **Discovered via**: fusion (10), vector_only (2), lexical_only (2), cold_neschrom (1)
+
+### agent_intelligence
 - **Temp**: 0.414 | **Retrievals**: 15 | **Success**: 93.5%
 - **Discovered via**: fusion (10), vector_only (2), lexical_only (2), cold_neschrom (1)
 
@@ -39,19 +47,11 @@
 - **Temp**: 0.414 | **Retrievals**: 15 | **Success**: 93.5%
 - **Discovered via**: fusion (10), vector_only (2), lexical_only (2), cold_neschrom (1)
 
-### agent_intelligence
-- **Temp**: 0.414 | **Retrievals**: 15 | **Success**: 93.5%
-- **Discovered via**: fusion (10), vector_only (2), lexical_only (2), cold_neschrom (1)
-
-### general_abstractions
+### native_accelerators
 - **Temp**: 0.414 | **Retrievals**: 15 | **Success**: 93.5%
 - **Discovered via**: fusion (10), vector_only (2), lexical_only (2), cold_neschrom (1)
 
 ### emergent_topology
-- **Temp**: 0.414 | **Retrievals**: 15 | **Success**: 93.5%
-- **Discovered via**: fusion (10), vector_only (2), lexical_only (2), cold_neschrom (1)
-
-### observability_telemetry
 - **Temp**: 0.414 | **Retrievals**: 15 | **Success**: 93.5%
 - **Discovered via**: fusion (10), vector_only (2), lexical_only (2), cold_neschrom (1)
 

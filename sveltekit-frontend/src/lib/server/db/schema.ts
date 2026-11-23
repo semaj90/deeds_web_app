@@ -9,6 +9,8 @@ export * from './schema/evidence-multi-modal';
 export * from './schema/scene-document-revisions.js';
 export * from './schema/scene-assets.js';
 export * from './schema/scene-asset-files.js';
+export * from './schema/scene-generation-jobs.js';
+export * from './schema/character-assets.js';
 export * from './schema/atlas-render-material-presets.js';
 export * from './schema/investigation.js';
 

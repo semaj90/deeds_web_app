@@ -1,0 +1,2394 @@
+{
+  "schema": "atlas.graph-sources-readonly-audit.v1",
+  "generatedAt": "2026-11-23T00:34:03.000Z",
+  "mode": "READ_ONLY_POSTGRES_DISCOVERY",
+  "target": "src/lib/server/atlas/tensors/tensor-handle-4x4x6-v1.ts",
+  "readOnlyTransaction": true,
+  "databaseWritesPerformed": false,
+  "canonicalAuthority": false,
+  "database": {
+    "connected": true,
+    "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)"
+  },
+  "schemas": {
+    "atlas_graph_nodes_v2": [
+      {
+        "table_name": "atlas_graph_nodes_v2",
+        "ordinal_position": 1,
+        "column_name": "snapshot_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "atlas_graph_nodes_v2",
+        "ordinal_position": 2,
+        "column_name": "node_key",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_nodes_v2",
+        "ordinal_position": 3,
+        "column_name": "node_type",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_nodes_v2",
+        "ordinal_position": 4,
+        "column_name": "packet_key",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_nodes_v2",
+        "ordinal_position": 5,
+        "column_name": "tree_node_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "atlas_graph_nodes_v2",
+        "ordinal_position": 6,
+        "column_name": "source_ref",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_nodes_v2",
+        "ordinal_position": 7,
+        "column_name": "content_hash",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_nodes_v2",
+        "ordinal_position": 8,
+        "column_name": "properties",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "atlas_graph_nodes_v2",
+        "ordinal_position": 9,
+        "column_name": "source_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      }
+    ],
+    "atlas_graph_edges_v2": [
+      {
+        "table_name": "atlas_graph_edges_v2",
+        "ordinal_position": 1,
+        "column_name": "snapshot_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "atlas_graph_edges_v2",
+        "ordinal_position": 2,
+        "column_name": "edge_key",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_edges_v2",
+        "ordinal_position": 3,
+        "column_name": "source_node_key",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_edges_v2",
+        "ordinal_position": 4,
+        "column_name": "target_node_key",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_edges_v2",
+        "ordinal_position": 5,
+        "column_name": "edge_type",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_edges_v2",
+        "ordinal_position": 6,
+        "column_name": "weight",
+        "data_type": "double precision",
+        "udt_name": "float8"
+      },
+      {
+        "table_name": "atlas_graph_edges_v2",
+        "ordinal_position": 7,
+        "column_name": "confidence",
+        "data_type": "double precision",
+        "udt_name": "float8"
+      },
+      {
+        "table_name": "atlas_graph_edges_v2",
+        "ordinal_position": 8,
+        "column_name": "provenance",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_edges_v2",
+        "ordinal_position": 9,
+        "column_name": "properties",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      }
+    ],
+    "atlas_graph_snapshots_v2": [
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 1,
+        "column_name": "snapshot_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 2,
+        "column_name": "schema_version",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 3,
+        "column_name": "status",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 4,
+        "column_name": "source_manifest",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 5,
+        "column_name": "projection_policy",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 6,
+        "column_name": "node_count",
+        "data_type": "bigint",
+        "udt_name": "int8"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 7,
+        "column_name": "edge_count",
+        "data_type": "bigint",
+        "udt_name": "int8"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 8,
+        "column_name": "relation_event_count",
+        "data_type": "bigint",
+        "udt_name": "int8"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 9,
+        "column_name": "excluded_count",
+        "data_type": "bigint",
+        "udt_name": "int8"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 10,
+        "column_name": "unresolved_count",
+        "data_type": "bigint",
+        "udt_name": "int8"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 11,
+        "column_name": "source_hash",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 12,
+        "column_name": "topology_hash",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 13,
+        "column_name": "policy_hash",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 14,
+        "column_name": "eligibility_predicate",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 15,
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 16,
+        "column_name": "finalized_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 17,
+        "column_name": "workspace_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 18,
+        "column_name": "source_inventory_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 19,
+        "column_name": "graph_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 20,
+        "column_name": "identity_contract_version",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 21,
+        "column_name": "parser_contract_version",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_snapshots_v2",
+        "ordinal_position": 22,
+        "column_name": "revision_checksum",
+        "data_type": "text",
+        "udt_name": "text"
+      }
+    ],
+    "code_features": [
+      {
+        "table_name": "code_features",
+        "ordinal_position": 1,
+        "column_name": "feature_id",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 2,
+        "column_name": "source_ref",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 3,
+        "column_name": "symbol",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 4,
+        "column_name": "kind",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 5,
+        "column_name": "language",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 6,
+        "column_name": "line_start",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 7,
+        "column_name": "line_end",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 8,
+        "column_name": "packet_key",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 9,
+        "column_name": "domain_class",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 10,
+        "column_name": "ontology_label",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 11,
+        "column_name": "static_tags",
+        "data_type": "ARRAY",
+        "udt_name": "_text"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 12,
+        "column_name": "summary",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 13,
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 14,
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 15,
+        "column_name": "page_rank_score",
+        "data_type": "real",
+        "udt_name": "float4"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 16,
+        "column_name": "page_rank_updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 17,
+        "column_name": "topology_summary",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 18,
+        "column_name": "provenance_summary",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 19,
+        "column_name": "noun_terms",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 20,
+        "column_name": "som_cell",
+        "data_type": "character varying",
+        "udt_name": "varchar"
+      },
+      {
+        "table_name": "code_features",
+        "ordinal_position": 21,
+        "column_name": "topology_weight",
+        "data_type": "real",
+        "udt_name": "float4"
+      }
+    ],
+    "feature_file_edges": [
+      {
+        "table_name": "feature_file_edges",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "feature_file_edges",
+        "ordinal_position": 2,
+        "column_name": "feature_key",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "feature_file_edges",
+        "ordinal_position": 3,
+        "column_name": "file_path",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "feature_file_edges",
+        "ordinal_position": 4,
+        "column_name": "entry_export",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "feature_file_edges",
+        "ordinal_position": 5,
+        "column_name": "role",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "feature_file_edges",
+        "ordinal_position": 6,
+        "column_name": "line_start",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "feature_file_edges",
+        "ordinal_position": 7,
+        "column_name": "line_end",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "feature_file_edges",
+        "ordinal_position": 8,
+        "column_name": "stable_key",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "feature_file_edges",
+        "ordinal_position": 9,
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "feature_file_edges",
+        "ordinal_position": 10,
+        "column_name": "packet_key",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "feature_file_edges",
+        "ordinal_position": 11,
+        "column_name": "source_ref",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "feature_file_edges",
+        "ordinal_position": 12,
+        "column_name": "content_hash",
+        "data_type": "text",
+        "udt_name": "text"
+      }
+    ],
+    "code_feature_edges": [
+      {
+        "table_name": "code_feature_edges",
+        "ordinal_position": 1,
+        "column_name": "from_feature_id",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_feature_edges",
+        "ordinal_position": 2,
+        "column_name": "to_feature_id",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_feature_edges",
+        "ordinal_position": 3,
+        "column_name": "relation",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_feature_edges",
+        "ordinal_position": 4,
+        "column_name": "evidence_ref",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "code_feature_edges",
+        "ordinal_position": 5,
+        "column_name": "confidence",
+        "data_type": "real",
+        "udt_name": "float4"
+      },
+      {
+        "table_name": "code_feature_edges",
+        "ordinal_position": 6,
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      }
+    ],
+    "cpg_edges": [
+      {
+        "table_name": "cpg_edges",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "cpg_edges",
+        "ordinal_position": 2,
+        "column_name": "source_id",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "cpg_edges",
+        "ordinal_position": 3,
+        "column_name": "target_id",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "cpg_edges",
+        "ordinal_position": 4,
+        "column_name": "edge_type",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "cpg_edges",
+        "ordinal_position": 5,
+        "column_name": "properties",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "cpg_edges",
+        "ordinal_position": 6,
+        "column_name": "created_at",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp"
+      }
+    ],
+    "cpg_nodes": [
+      {
+        "table_name": "cpg_nodes",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "cpg_nodes",
+        "ordinal_position": 2,
+        "column_name": "node_type",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "cpg_nodes",
+        "ordinal_position": 3,
+        "column_name": "file_path",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "cpg_nodes",
+        "ordinal_position": 4,
+        "column_name": "name",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "cpg_nodes",
+        "ordinal_position": 5,
+        "column_name": "properties",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "cpg_nodes",
+        "ordinal_position": 6,
+        "column_name": "created_at",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp"
+      }
+    ],
+    "graphify_edges": [
+      {
+        "table_name": "graphify_edges",
+        "ordinal_position": 1,
+        "column_name": "edge_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "graphify_edges",
+        "ordinal_position": 2,
+        "column_name": "workspace_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "graphify_edges",
+        "ordinal_position": 3,
+        "column_name": "subject_symbol_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "graphify_edges",
+        "ordinal_position": 4,
+        "column_name": "predicate",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_edges",
+        "ordinal_position": 5,
+        "column_name": "object_symbol_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "graphify_edges",
+        "ordinal_position": 6,
+        "column_name": "unresolved_target",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_edges",
+        "ordinal_position": 7,
+        "column_name": "evidence_kind",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_edges",
+        "ordinal_position": 8,
+        "column_name": "evidence_span",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "graphify_edges",
+        "ordinal_position": 9,
+        "column_name": "confidence",
+        "data_type": "real",
+        "udt_name": "float4"
+      },
+      {
+        "table_name": "graphify_edges",
+        "ordinal_position": 10,
+        "column_name": "source_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      }
+    ],
+    "graphify_files": [
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 1,
+        "column_name": "file_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 2,
+        "column_name": "workspace_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 3,
+        "column_name": "source_ref",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 4,
+        "column_name": "source_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 5,
+        "column_name": "content_hash",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 6,
+        "column_name": "byte_length",
+        "data_type": "bigint",
+        "udt_name": "int8"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 7,
+        "column_name": "language",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 8,
+        "column_name": "parser_name",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 9,
+        "column_name": "parser_version",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 10,
+        "column_name": "parse_status",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 11,
+        "column_name": "parse_error",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 12,
+        "column_name": "first_seen_run_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 13,
+        "column_name": "last_seen_run_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 14,
+        "column_name": "code_source_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 15,
+        "column_name": "workspace_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 16,
+        "column_name": "source_revision_authority",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 17,
+        "column_name": "producer_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 18,
+        "column_name": "git_blob_oid",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 19,
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "graphify_files",
+        "ordinal_position": 20,
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      }
+    ],
+    "graphify_current_source_membership_v1": [
+      {
+        "table_name": "graphify_current_source_membership_v1",
+        "ordinal_position": 1,
+        "column_name": "repository_id",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_current_source_membership_v1",
+        "ordinal_position": 2,
+        "column_name": "source_ref",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_current_source_membership_v1",
+        "ordinal_position": 3,
+        "column_name": "workspace_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "graphify_current_source_membership_v1",
+        "ordinal_position": 4,
+        "column_name": "workspace_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_current_source_membership_v1",
+        "ordinal_position": 5,
+        "column_name": "last_seen_execution_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "graphify_current_source_membership_v1",
+        "ordinal_position": 6,
+        "column_name": "last_seen_code_source_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_current_source_membership_v1",
+        "ordinal_position": 7,
+        "column_name": "last_seen_completed_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "graphify_current_source_membership_v1",
+        "ordinal_position": 8,
+        "column_name": "latest_workspace_execution_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "graphify_current_source_membership_v1",
+        "ordinal_position": 9,
+        "column_name": "latest_workspace_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_current_source_membership_v1",
+        "ordinal_position": 10,
+        "column_name": "active",
+        "data_type": "boolean",
+        "udt_name": "bool"
+      }
+    ],
+    "graphify_execution_file_membership_v2": [
+      {
+        "table_name": "graphify_execution_file_membership_v2",
+        "ordinal_position": 1,
+        "column_name": "execution_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "graphify_execution_file_membership_v2",
+        "ordinal_position": 2,
+        "column_name": "repository_id",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_execution_file_membership_v2",
+        "ordinal_position": 3,
+        "column_name": "repository_relative_path",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_execution_file_membership_v2",
+        "ordinal_position": 4,
+        "column_name": "source_ref",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_execution_file_membership_v2",
+        "ordinal_position": 5,
+        "column_name": "workspace_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_execution_file_membership_v2",
+        "ordinal_position": 6,
+        "column_name": "code_source_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_execution_file_membership_v2",
+        "ordinal_position": 7,
+        "column_name": "content_hash",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "graphify_execution_file_membership_v2",
+        "ordinal_position": 8,
+        "column_name": "byte_length",
+        "data_type": "bigint",
+        "udt_name": "int8"
+      },
+      {
+        "table_name": "graphify_execution_file_membership_v2",
+        "ordinal_position": 9,
+        "column_name": "observed_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      }
+    ],
+    "atlas_typed_edges": [
+      {
+        "table_name": "atlas_typed_edges",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "bigint",
+        "udt_name": "int8"
+      },
+      {
+        "table_name": "atlas_typed_edges",
+        "ordinal_position": 2,
+        "column_name": "src_packet_key",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_typed_edges",
+        "ordinal_position": 3,
+        "column_name": "dst_packet_key",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_typed_edges",
+        "ordinal_position": 4,
+        "column_name": "edge_type",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_typed_edges",
+        "ordinal_position": 5,
+        "column_name": "edge_version",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "atlas_typed_edges",
+        "ordinal_position": 6,
+        "column_name": "weight",
+        "data_type": "real",
+        "udt_name": "float4"
+      },
+      {
+        "table_name": "atlas_typed_edges",
+        "ordinal_position": 7,
+        "column_name": "metadata",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "atlas_typed_edges",
+        "ordinal_position": 8,
+        "column_name": "exported_parquet",
+        "data_type": "boolean",
+        "udt_name": "bool"
+      },
+      {
+        "table_name": "atlas_typed_edges",
+        "ordinal_position": 9,
+        "column_name": "snapshot_id",
+        "data_type": "bigint",
+        "udt_name": "int8"
+      },
+      {
+        "table_name": "atlas_typed_edges",
+        "ordinal_position": 10,
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      }
+    ],
+    "atlas_graph_facts": [
+      {
+        "table_name": "atlas_graph_facts",
+        "ordinal_position": 1,
+        "column_name": "graph_fact_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "atlas_graph_facts",
+        "ordinal_position": 2,
+        "column_name": "subject_id",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_facts",
+        "ordinal_position": 3,
+        "column_name": "predicate",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_facts",
+        "ordinal_position": 4,
+        "column_name": "object_id",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_facts",
+        "ordinal_position": 5,
+        "column_name": "subject_type",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_facts",
+        "ordinal_position": 6,
+        "column_name": "object_type",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_facts",
+        "ordinal_position": 7,
+        "column_name": "source_ref_key",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_facts",
+        "ordinal_position": 8,
+        "column_name": "evidence_hash",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_facts",
+        "ordinal_position": 9,
+        "column_name": "extractor_version",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_graph_facts",
+        "ordinal_position": 10,
+        "column_name": "confidence",
+        "data_type": "real",
+        "udt_name": "float4"
+      },
+      {
+        "table_name": "atlas_graph_facts",
+        "ordinal_position": 11,
+        "column_name": "valid_from",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "atlas_graph_facts",
+        "ordinal_position": 12,
+        "column_name": "valid_to",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "atlas_graph_facts",
+        "ordinal_position": 13,
+        "column_name": "metadata",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      }
+    ],
+    "phase89_import_edges": [
+      {
+        "table_name": "phase89_import_edges",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "phase89_import_edges",
+        "ordinal_position": 2,
+        "column_name": "source_file",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "phase89_import_edges",
+        "ordinal_position": 3,
+        "column_name": "target_file",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "phase89_import_edges",
+        "ordinal_position": 4,
+        "column_name": "import_type",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "phase89_import_edges",
+        "ordinal_position": 5,
+        "column_name": "created_at",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp"
+      }
+    ],
+    "atlas_workspace_source_bindings": [
+      {
+        "table_name": "atlas_workspace_source_bindings",
+        "ordinal_position": 1,
+        "column_name": "repo_id",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_workspace_source_bindings",
+        "ordinal_position": 2,
+        "column_name": "workspace_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_workspace_source_bindings",
+        "ordinal_position": 3,
+        "column_name": "canonical_source_ref",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_workspace_source_bindings",
+        "ordinal_position": 4,
+        "column_name": "source_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_workspace_source_bindings",
+        "ordinal_position": 5,
+        "column_name": "content_digest",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_workspace_source_bindings",
+        "ordinal_position": 6,
+        "column_name": "byte_length",
+        "data_type": "bigint",
+        "udt_name": "int8"
+      },
+      {
+        "table_name": "atlas_workspace_source_bindings",
+        "ordinal_position": 7,
+        "column_name": "source_manifest_ordinal",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "atlas_workspace_source_bindings",
+        "ordinal_position": 8,
+        "column_name": "git_blob_oid",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_workspace_source_bindings",
+        "ordinal_position": 9,
+        "column_name": "tracked_at_base_commit",
+        "data_type": "boolean",
+        "udt_name": "bool"
+      },
+      {
+        "table_name": "atlas_workspace_source_bindings",
+        "ordinal_position": 10,
+        "column_name": "dirty_relative_to_base",
+        "data_type": "boolean",
+        "udt_name": "bool"
+      },
+      {
+        "table_name": "atlas_workspace_source_bindings",
+        "ordinal_position": 11,
+        "column_name": "producer_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_workspace_source_bindings",
+        "ordinal_position": 12,
+        "column_name": "binding_checksum",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "atlas_workspace_source_bindings",
+        "ordinal_position": 13,
+        "column_name": "observed_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      }
+    ],
+    "codebase_chunk_index": [
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 2,
+        "column_name": "qdrant_id",
+        "data_type": "character varying",
+        "udt_name": "varchar"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 3,
+        "column_name": "relative_path",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 4,
+        "column_name": "symbol",
+        "data_type": "character varying",
+        "udt_name": "varchar"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 5,
+        "column_name": "kind",
+        "data_type": "character varying",
+        "udt_name": "varchar"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 6,
+        "column_name": "line_start",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 7,
+        "column_name": "line_end",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 8,
+        "column_name": "content_embedding",
+        "data_type": "USER-DEFINED",
+        "udt_name": "halfvec"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 9,
+        "column_name": "gpu_cluster",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 10,
+        "column_name": "som_cluster",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 11,
+        "column_name": "page_rank_score",
+        "data_type": "real",
+        "udt_name": "float4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 12,
+        "column_name": "community_id",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 13,
+        "column_name": "tags",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 14,
+        "column_name": "neo4j_meta",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 15,
+        "column_name": "indexed_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 16,
+        "column_name": "enriched_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 17,
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 18,
+        "column_name": "content",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 19,
+        "column_name": "cluster_summary",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 20,
+        "column_name": "summary_embedding",
+        "data_type": "USER-DEFINED",
+        "udt_name": "halfvec"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 21,
+        "column_name": "signature_embedding",
+        "data_type": "USER-DEFINED",
+        "udt_name": "halfvec"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 22,
+        "column_name": "domain",
+        "data_type": "character varying",
+        "udt_name": "varchar"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 23,
+        "column_name": "language",
+        "data_type": "character varying",
+        "udt_name": "varchar"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 24,
+        "column_name": "extension",
+        "data_type": "character varying",
+        "udt_name": "varchar"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 25,
+        "column_name": "embedding_model",
+        "data_type": "character varying",
+        "udt_name": "varchar"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 26,
+        "column_name": "summary_model",
+        "data_type": "character varying",
+        "udt_name": "varchar"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 27,
+        "column_name": "summary",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 28,
+        "column_name": "metadata",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 29,
+        "column_name": "semantic_tags",
+        "data_type": "ARRAY",
+        "udt_name": "_text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 30,
+        "column_name": "som_bmu_row",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 31,
+        "column_name": "som_bmu_col",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 32,
+        "column_name": "manifold4",
+        "data_type": "ARRAY",
+        "udt_name": "_float4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 33,
+        "column_name": "chunk_id",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 34,
+        "column_name": "repo_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 35,
+        "column_name": "content_hash",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 36,
+        "column_name": "token_count",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 37,
+        "column_name": "neo4j_gpu_cluster",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 38,
+        "column_name": "output_meta",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 40,
+        "column_name": "summary_embedding_384",
+        "data_type": "USER-DEFINED",
+        "udt_name": "vector"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 41,
+        "column_name": "embedding_dimension",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 42,
+        "column_name": "embedding_normalized",
+        "data_type": "boolean",
+        "udt_name": "bool"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 43,
+        "column_name": "error_embedding",
+        "data_type": "USER-DEFINED",
+        "udt_name": "halfvec"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 45,
+        "column_name": "source_ref",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 46,
+        "column_name": "latent_64",
+        "data_type": "USER-DEFINED",
+        "udt_name": "vector"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 47,
+        "column_name": "latent64_model",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 48,
+        "column_name": "latent64_meta",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 49,
+        "column_name": "latent64_validated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 50,
+        "column_name": "latent64_msgpack",
+        "data_type": "bytea",
+        "udt_name": "bytea"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 51,
+        "column_name": "embedding_eligible",
+        "data_type": "boolean",
+        "udt_name": "bool"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 52,
+        "column_name": "summary_hash",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 53,
+        "column_name": "embedding_version",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 54,
+        "column_name": "embedding_dtype",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 55,
+        "column_name": "embedding_created_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 56,
+        "column_name": "encoder_id",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 57,
+        "column_name": "latent_embedding_valid",
+        "data_type": "boolean",
+        "udt_name": "bool"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 58,
+        "column_name": "latent_embedding_validated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 59,
+        "column_name": "search_vector",
+        "data_type": "tsvector",
+        "udt_name": "tsvector"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 60,
+        "column_name": "ast_symbols",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 61,
+        "column_name": "ast_imports",
+        "data_type": "ARRAY",
+        "udt_name": "_text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 62,
+        "column_name": "ast_exports",
+        "data_type": "ARRAY",
+        "udt_name": "_text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 63,
+        "column_name": "ast_facts_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 64,
+        "column_name": "kmeans_cluster",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 65,
+        "column_name": "centroid_distance",
+        "data_type": "real",
+        "udt_name": "float4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 66,
+        "column_name": "second_cluster_id",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 67,
+        "column_name": "second_distance",
+        "data_type": "real",
+        "udt_name": "float4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 68,
+        "column_name": "cluster_margin",
+        "data_type": "real",
+        "udt_name": "float4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 69,
+        "column_name": "kmeans_model_version",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 70,
+        "column_name": "kmeans_assigned_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 71,
+        "column_name": "kmeans_vector_contract",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 72,
+        "column_name": "kmeans384_cluster",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 73,
+        "column_name": "kmeans384_distance",
+        "data_type": "real",
+        "udt_name": "float4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 74,
+        "column_name": "kmeans384_second_id",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 75,
+        "column_name": "kmeans384_second_dist",
+        "data_type": "real",
+        "udt_name": "float4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 76,
+        "column_name": "kmeans384_margin",
+        "data_type": "real",
+        "udt_name": "float4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 77,
+        "column_name": "kmeans384_model_version",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 78,
+        "column_name": "kmeans384_assigned_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 79,
+        "column_name": "kmeans_distance",
+        "data_type": "real",
+        "udt_name": "float4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 80,
+        "column_name": "content_embedding_768",
+        "data_type": "USER-DEFINED",
+        "udt_name": "vector"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 82,
+        "column_name": "centroid_id",
+        "data_type": "uuid",
+        "udt_name": "uuid"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 83,
+        "column_name": "reconstruction_error",
+        "data_type": "real",
+        "udt_name": "float4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 84,
+        "column_name": "routing_tier",
+        "data_type": "character varying",
+        "udt_name": "varchar"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 85,
+        "column_name": "latent_256",
+        "data_type": "USER-DEFINED",
+        "udt_name": "halfvec"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 86,
+        "column_name": "latent_256_checkpoint_revision",
+        "data_type": "character varying",
+        "udt_name": "varchar"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 87,
+        "column_name": "error_embedding_latent_256",
+        "data_type": "USER-DEFINED",
+        "udt_name": "halfvec"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 88,
+        "column_name": "error_embedding_latent_256_checkpoint_revision",
+        "data_type": "character varying",
+        "udt_name": "varchar"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 89,
+        "column_name": "error_embedding_latent_64",
+        "data_type": "USER-DEFINED",
+        "udt_name": "vector"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 90,
+        "column_name": "error_embedding_latent64_model",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 91,
+        "column_name": "error_embedding_latent_valid",
+        "data_type": "boolean",
+        "udt_name": "bool"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 92,
+        "column_name": "error_embedding_latent_validated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 93,
+        "column_name": "latent_128",
+        "data_type": "USER-DEFINED",
+        "udt_name": "halfvec"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 94,
+        "column_name": "error_embedding_latent_128",
+        "data_type": "USER-DEFINED",
+        "udt_name": "halfvec"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 95,
+        "column_name": "file_content_hash",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 96,
+        "column_name": "content_hash_scope",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 97,
+        "column_name": "content_hash_algorithm",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 98,
+        "column_name": "content_hash_length",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 99,
+        "column_name": "content_hash_version",
+        "data_type": "integer",
+        "udt_name": "int4"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 100,
+        "column_name": "workspace_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 101,
+        "column_name": "source_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 102,
+        "column_name": "representation_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 103,
+        "column_name": "lineage_binding_checksum",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 104,
+        "column_name": "lineage_producer_revision",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 105,
+        "column_name": "summary_provenance",
+        "data_type": "jsonb",
+        "udt_name": "jsonb"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 106,
+        "column_name": "summary_text",
+        "data_type": "text",
+        "udt_name": "text"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "ordinal_position": 107,
+        "column_name": "domain_id",
+        "data_type": "text",
+        "udt_name": "text"
+      }
+    ]
+  },
+  "counts": {
+    "atlas_graph_nodes_v2": {
+      "status": "COUNTED",
+      "rows": "483801"
+    },
+    "atlas_graph_edges_v2": {
+      "status": "COUNTED",
+      "rows": "224764"
+    },
+    "atlas_graph_snapshots_v2": {
+      "status": "COUNTED",
+      "rows": "2"
+    },
+    "code_features": {
+      "status": "COUNTED",
+      "rows": "1477"
+    },
+    "feature_file_edges": {
+      "status": "COUNTED",
+      "rows": "95995"
+    },
+    "code_feature_edges": {
+      "status": "COUNTED",
+      "rows": "6558"
+    },
+    "cpg_edges": {
+      "status": "COUNTED",
+      "rows": "0"
+    },
+    "cpg_nodes": {
+      "status": "COUNTED",
+      "rows": "0"
+    },
+    "graphify_edges": {
+      "status": "COUNTED",
+      "rows": "0"
+    },
+    "graphify_files": {
+      "status": "COUNTED",
+      "rows": "26014"
+    },
+    "graphify_current_source_membership_v1": {
+      "status": "COUNTED",
+      "rows": "30318"
+    },
+    "graphify_execution_file_membership_v2": {
+      "status": "COUNTED",
+      "rows": "411195"
+    },
+    "atlas_typed_edges": {
+      "status": "COUNTED",
+      "rows": "0"
+    },
+    "atlas_graph_facts": {
+      "status": "COUNTED",
+      "rows": "0"
+    },
+    "phase89_import_edges": {
+      "status": "COUNTED",
+      "rows": "0"
+    }
+  },
+  "snapshots": {
+    "rows": [
+      {
+        "snapshot_id": "382c8dc6-a115-40d9-a3a5-034fa44d2e71",
+        "status": "SUPERSEDED",
+        "graph_revision": null,
+        "source_inventory_revision": null,
+        "workspace_revision": null,
+        "created_at": "2026-08-09T03:21:52.492Z"
+      },
+      {
+        "snapshot_id": "58d9da79-8d77-478e-8bcc-0c3bde74ae5d",
+        "status": "SUPERSEDED",
+        "graph_revision": null,
+        "source_inventory_revision": null,
+        "workspace_revision": null,
+        "created_at": "2026-08-02T12:14:14.775Z"
+      }
+    ],
+    "edgeTypeCounts": [
+      {
+        "snapshot_id": "382c8dc6-a115-40d9-a3a5-034fa44d2e71",
+        "edge_type": "CONTAINS",
+        "row_count": "54078"
+      },
+      {
+        "snapshot_id": "382c8dc6-a115-40d9-a3a5-034fa44d2e71",
+        "edge_type": "DERIVED_FROM",
+        "row_count": "54078"
+      },
+      {
+        "snapshot_id": "58d9da79-8d77-478e-8bcc-0c3bde74ae5d",
+        "edge_type": "CONTAINS",
+        "row_count": "58304"
+      },
+      {
+        "snapshot_id": "58d9da79-8d77-478e-8bcc-0c3bde74ae5d",
+        "edge_type": "MATERIALIZES",
+        "row_count": "58304"
+      }
+    ],
+    "error": null,
+    "edgeTypeCountError": null
+  },
+  "targetMatches": {
+    "atlas_graph_nodes_v2": {
+      "status": "QUERIED",
+      "matchMode": "BASENAME_CANDIDATE_NOT_EXACT_IDENTITY",
+      "referenceColumn": "source_ref",
+      "rows": [],
+      "error": null
+    },
+    "code_features": {
+      "status": "QUERIED",
+      "matchMode": "BASENAME_CANDIDATE_NOT_EXACT_IDENTITY",
+      "referenceColumn": "source_ref",
+      "rows": [],
+      "error": null
+    },
+    "graphify_files": {
+      "status": "QUERIED",
+      "matchMode": "BASENAME_CANDIDATE_NOT_EXACT_IDENTITY",
+      "referenceColumn": "source_ref",
+      "rows": [],
+      "error": null
+    },
+    "graphify_current_source_membership_v1": {
+      "status": "QUERIED",
+      "matchMode": "BASENAME_CANDIDATE_NOT_EXACT_IDENTITY",
+      "referenceColumn": "source_ref",
+      "rows": [],
+      "error": null
+    },
+    "graphify_execution_file_membership_v2": {
+      "status": "QUERIED",
+      "matchMode": "BASENAME_CANDIDATE_NOT_EXACT_IDENTITY",
+      "referenceColumn": "source_ref",
+      "rows": [],
+      "error": null
+    },
+    "codebase_chunk_index": {
+      "status": "QUERIED",
+      "matchMode": "BASENAME_CANDIDATE_NOT_EXACT_IDENTITY",
+      "referenceColumn": "source_ref",
+      "rows": [],
+      "error": null
+    }
+  },
+  "edgeSamples": {
+    "feature_file_edges": {
+      "status": "QUERIED",
+      "predicateCounts": [],
+      "predicateCountError": null,
+      "rows": [
+        {
+          "source_ref": null,
+          "line_start": null,
+          "line_end": null,
+          "packet_key": null,
+          "content_hash": null,
+          "created_at": "2026-05-10T03:36:16.766Z"
+        },
+        {
+          "source_ref": null,
+          "line_start": null,
+          "line_end": null,
+          "packet_key": null,
+          "content_hash": null,
+          "created_at": "2026-05-10T03:36:16.766Z"
+        },
+        {
+          "source_ref": null,
+          "line_start": null,
+          "line_end": null,
+          "packet_key": null,
+          "content_hash": null,
+          "created_at": "2026-05-10T03:36:16.766Z"
+        },
+        {
+          "source_ref": null,
+          "line_start": null,
+          "line_end": null,
+          "packet_key": null,
+          "content_hash": null,
+          "created_at": "2026-05-10T03:36:16.766Z"
+        },
+        {
+          "source_ref": null,
+          "line_start": null,
+          "line_end": null,
+          "packet_key": null,
+          "content_hash": null,
+          "created_at": "2026-05-10T03:36:16.766Z"
+        }
+      ],
+      "error": null
+    },
+    "code_feature_edges": {
+      "status": "QUERIED",
+      "predicateColumn": "relation",
+      "predicateCounts": [
+        {
+          "predicate": "SAME_SYMBOL",
+          "row_count": "3018"
+        },
+        {
+          "predicate": "SUPPORTS_IN_FILE",
+          "row_count": "2072"
+        },
+        {
+          "predicate": "NEXT_IN_FILE",
+          "row_count": "1358"
+        },
+        {
+          "predicate": "DEPENDS_ON",
+          "row_count": "110"
+        }
+      ],
+      "predicateCountError": null,
+      "rows": [
+        {
+          "relation": "DEPENDS_ON",
+          "from_feature_id": "src/lib/components/modals/EvidenceCRUDModal.svelte:EvidenceCRUDModal.svelte:component",
+          "to_feature_id": "src/routes/api/reports/generate/__tests__/generate-schema.test.ts:generate-schema.test.ts:unknown",
+          "evidence_ref": null,
+          "confidence": 0.1,
+          "created_at": "2026-07-01T23:28:00.234Z"
+        },
+        {
+          "relation": "DEPENDS_ON",
+          "from_feature_id": "src/routes/api/reports/generate/__tests__/generate-schema.test.ts:generate-schema.test.ts:unknown",
+          "to_feature_id": "src/lib/components/modals/EvidenceCRUDModal.svelte:EvidenceCRUDModal.svelte:component",
+          "evidence_ref": null,
+          "confidence": 0.1,
+          "created_at": "2026-07-01T23:28:00.258Z"
+        },
+        {
+          "relation": "DEPENDS_ON",
+          "from_feature_id": "src/lib/components/modals/EvidenceCRUDModal.svelte:EvidenceCRUDModal.svelte:component",
+          "to_feature_id": "src/routes/(app)/command-center/+page.ts:ssr:const",
+          "evidence_ref": null,
+          "confidence": 0.1,
+          "created_at": "2026-07-01T23:28:00.261Z"
+        },
+        {
+          "relation": "DEPENDS_ON",
+          "from_feature_id": "src/routes/(app)/command-center/+page.ts:ssr:const",
+          "to_feature_id": "src/lib/components/modals/EvidenceCRUDModal.svelte:EvidenceCRUDModal.svelte:component",
+          "evidence_ref": null,
+          "confidence": 0.1,
+          "created_at": "2026-07-01T23:28:00.263Z"
+        },
+        {
+          "relation": "DEPENDS_ON",
+          "from_feature_id": "src/lib/components/modals/EvidenceCRUDModal.svelte:EvidenceCRUDModal.svelte:component",
+          "to_feature_id": "src/lib/server/ai/caching-layer.ts:CacheOptions:type",
+          "evidence_ref": null,
+          "confidence": 0.1,
+          "created_at": "2026-07-01T23:28:00.265Z"
+        }
+      ],
+      "error": null
+    },
+    "cpg_edges": {
+      "status": "QUERIED",
+      "predicateColumn": "edge_type",
+      "predicateCounts": [],
+      "predicateCountError": null,
+      "rows": [],
+      "error": null
+    },
+    "graphify_edges": {
+      "status": "QUERIED",
+      "predicateColumn": "predicate",
+      "predicateCounts": [],
+      "predicateCountError": null,
+      "rows": [],
+      "error": null
+    },
+    "atlas_typed_edges": {
+      "status": "QUERIED",
+      "predicateColumn": "edge_type",
+      "predicateCounts": [],
+      "predicateCountError": null,
+      "rows": [],
+      "error": null
+    },
+    "phase89_import_edges": {
+      "status": "QUERIED",
+      "predicateCounts": [],
+      "predicateCountError": null,
+      "rows": [],
+      "error": null
+    },
+    "atlas_graph_facts": {
+      "status": "QUERIED",
+      "predicateColumn": "predicate",
+      "predicateCounts": [],
+      "predicateCountError": null,
+      "rows": [],
+      "error": null
+    }
+  },
+  "relationQuality": {
+    "codeFeatureEdges": {
+      "status": "QUERIED",
+      "rows": [
+        {
+          "relation": "DEPENDS_ON",
+          "row_count": "110",
+          "source_count": "11",
+          "target_count": "11",
+          "min_confidence": 0.10000000149011612,
+          "max_confidence": 0.10000000149011612,
+          "evidence_ref_count": "0"
+        },
+        {
+          "relation": "NEXT_IN_FILE",
+          "row_count": "1358",
+          "source_count": "1358",
+          "target_count": "1358",
+          "min_confidence": 0.800000011920929,
+          "max_confidence": 0.800000011920929,
+          "evidence_ref_count": "0"
+        },
+        {
+          "relation": "SAME_SYMBOL",
+          "row_count": "3018",
+          "source_count": "339",
+          "target_count": "339",
+          "min_confidence": 0.699999988079071,
+          "max_confidence": 0.699999988079071,
+          "evidence_ref_count": "0"
+        },
+        {
+          "relation": "SUPPORTS_IN_FILE",
+          "row_count": "2072",
+          "source_count": "366",
+          "target_count": "374",
+          "min_confidence": 0.6000000238418579,
+          "max_confidence": 0.6000000238418579,
+          "evidence_ref_count": "0"
+        }
+      ],
+      "error": null
+    }
+  },
+  "errors": []
+}

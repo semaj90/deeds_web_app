@@ -91,6 +91,7 @@ def test_pipeline_execution_end_to_end(mock_pipeline_data):
         num_mcts_sims=16,
         c_puct=1.414,
         device="cpu",
+        allow_ephemeral_projection=True,
     )
 
     final_state = pipeline.run(mock_pipeline_data)

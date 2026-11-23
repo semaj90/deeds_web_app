@@ -1,0 +1,105 @@
+{
+  "schema": "atlas.firecrawl-lexical-task-recommendations.v1",
+  "liveExternalChunkCount": 852,
+  "chunksWithDbDomainTags": 0,
+  "chunksWithAdvisoryDomainTags": 852,
+  "lexicalVocabSize": 1639,
+  "tasksEvaluated": 5,
+  "concurrentRgKeywordsSearched": 6,
+  "samplePackets": [
+    {
+      "schema": "atlas.rlm-dspy-self-prompt.v1",
+      "taskId": "parent-atlas-retrieval-lineage-dag-convergence#1fa8c6d192dfc267",
+      "taskTitle": "",
+      "taskKeywords": [
+        "parent-atlas-retrieval-lineage-dag-convergence"
+      ],
+      "recommendedSearchQueries": [
+        "rg -F parent-atlas-retrieval-lineage-dag-convergence"
+      ],
+      "officialApiRefs": [],
+      "importTargets": [],
+      "codeHitSpans": [],
+      "recommendedDocChunks": [],
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "packetChecksum": "sha256:c622e8d6373b20ca3be04967f53bbd810fbf5c34fe043788496ed0575efa0876"
+    },
+    {
+      "schema": "atlas.rlm-dspy-self-prompt.v1",
+      "taskId": "parent-atlas-gate2-chunk-lineage-convergence#4b700838a892a1a2",
+      "taskTitle": "",
+      "taskKeywords": [
+        "parent-atlas-gate2-chunk-lineage-convergence"
+      ],
+      "recommendedSearchQueries": [
+        "rg -F parent-atlas-gate2-chunk-lineage-convergence"
+      ],
+      "officialApiRefs": [],
+      "importTargets": [],
+      "codeHitSpans": [],
+      "recommendedDocChunks": [],
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "packetChecksum": "sha256:f191d5f8085da3c28ecb26b304b96649b00f82951e975fce72bc03c57ddc9aea"
+    },
+    {
+      "schema": "atlas.rlm-dspy-self-prompt.v1",
+      "taskId": "parent-atlas-graph-retrieval-proof#bde6f53b308e65cb",
+      "taskTitle": "",
+      "taskKeywords": [
+        "parent-atlas-graph-retrieval-proof",
+        "bde6f53b308e65cb"
+      ],
+      "recommendedSearchQueries": [
+        "rg -F parent-atlas-graph-retrieval-proof",
+        "rg -F bde6f53b308e65cb"
+      ],
+      "officialApiRefs": [],
+      "importTargets": [],
+      "codeHitSpans": [],
+      "recommendedDocChunks": [],
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "packetChecksum": "sha256:f00b3382c6d3ab89c81946b8a81f0c6c5c39120ea6588c84f84e6d79e995ba04"
+    },
+    {
+      "schema": "atlas.rlm-dspy-self-prompt.v1",
+      "taskId": "parent-atlas-prefill-routing-residency-convergence#25888523f8ffb5ec",
+      "taskTitle": "",
+      "taskKeywords": [
+        "parent-atlas-prefill-routing-residency-convergence"
+      ],
+      "recommendedSearchQueries": [
+        "rg -F parent-atlas-prefill-routing-residency-convergence"
+      ],
+      "officialApiRefs": [],
+      "importTargets": [],
+      "codeHitSpans": [],
+      "recommendedDocChunks": [],
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "packetChecksum": "sha256:b3b066a66a1ac3e27ab3bb2bbbfd49fb7793b90647a3b0090521183fce7983ec"
+    },
+    {
+      "schema": "atlas.rlm-dspy-self-prompt.v1",
+      "taskId": "parent-atlas-rpc-packet-registry-fabric#9a10128a1248ce3b",
+      "taskTitle": "",
+      "taskKeywords": [
+        "parent-atlas-rpc-packet-registry-fabric"
+      ],
+      "recommendedSearchQueries": [
+        "rg -F parent-atlas-rpc-packet-registry-fabric"
+      ],
+      "officialApiRefs": [],
+      "importTargets": [],
+      "codeHitSpans": [],
+      "recommendedDocChunks": [],
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "packetChecksum": "sha256:debd2d6e57f80311640253b0319a767f44b4e9d50187f96929432b80b87f8f52"
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

@@ -30,4 +30,4 @@ export const couchdb = {
   createDb: createMockAsyncFn('createDb'),
 };
 
-export default { couchdb };
+export { couchdb };

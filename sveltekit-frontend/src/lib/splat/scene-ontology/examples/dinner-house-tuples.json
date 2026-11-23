@@ -1,0 +1,228 @@
+{
+  "schema": "parent-atlas.scene-ontology.v1",
+  "nodes": [
+    {
+      "id": "scope:case",
+      "kind": "scope",
+      "conceptId": "pa:scene-context.setting.residential",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:dinner-house"
+    },
+    {
+      "id": "source:prompt",
+      "kind": "source",
+      "conceptId": "pa:observation.source.prompt",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:dinner-house",
+      "source": {
+        "sourceKind": "PROMPT",
+        "sourceId": "demo.dinner.prompt.v1"
+      }
+    },
+    {
+      "id": "entity:house",
+      "kind": "entity",
+      "conceptId": "pa:space.building.house",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:dinner-house"
+    },
+    {
+      "id": "entity:diningroom",
+      "kind": "entity",
+      "conceptId": "pa:space.room.dining-room",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:dinner-house"
+    },
+    {
+      "id": "entity:table",
+      "kind": "entity",
+      "conceptId": "pa:object.furniture.table",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:dinner-house"
+    },
+    {
+      "id": "entity:chair1",
+      "kind": "entity",
+      "conceptId": "pa:object.furniture.chair",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:dinner-house"
+    },
+    {
+      "id": "entity:chair2",
+      "kind": "entity",
+      "conceptId": "pa:object.furniture.chair",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:dinner-house"
+    },
+    {
+      "id": "entity:plate",
+      "kind": "entity",
+      "conceptId": "pa:object.personal-item.plate",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:dinner-house"
+    },
+    {
+      "id": "entity:actor1",
+      "kind": "entity",
+      "conceptId": "pa:actor.representation.neutral-humanoid",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:dinner-house"
+    },
+    {
+      "id": "entity:actor2",
+      "kind": "entity",
+      "conceptId": "pa:actor.representation.neutral-humanoid",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:dinner-house"
+    },
+    {
+      "id": "recipe:box",
+      "kind": "recipe",
+      "conceptId": "pa:geometry.primitive.box",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:dinner-house",
+      "recipeKey": "box:unit"
+    },
+    {
+      "id": "recipe:humanoid",
+      "kind": "recipe",
+      "conceptId": "pa:actor.representation.neutral-humanoid",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:dinner-house",
+      "recipeKey": "neutral-avatar-v1"
+    },
+    {
+      "id": "concept:dispute",
+      "kind": "concept",
+      "conceptId": "pa:event.cue.dispute",
+      "origin": "SYNTHETIC",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:dinner-house"
+    },
+    {
+      "id": "cue:dialogue",
+      "kind": "cue",
+      "conceptId": "pa:event.cue.dialogue",
+      "origin": "PROMPT_PROPOSAL",
+      "caseId": "synthetic-demo",
+      "sceneId": "scene:dinner-house"
+    }
+  ],
+  "tuples": [
+    {
+      "subject": "entity:diningroom",
+      "predicate": "PART_OF",
+      "object": "entity:house",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "entity:table",
+      "predicate": "LOCATED_IN",
+      "object": "entity:diningroom",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "entity:chair1",
+      "predicate": "LOCATED_IN",
+      "object": "entity:diningroom",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "entity:chair2",
+      "predicate": "LOCATED_IN",
+      "object": "entity:diningroom",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "entity:plate",
+      "predicate": "LOCATED_IN",
+      "object": "entity:diningroom",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "entity:actor1",
+      "predicate": "LOCATED_IN",
+      "object": "entity:diningroom",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "entity:actor2",
+      "predicate": "LOCATED_IN",
+      "object": "entity:diningroom",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "entity:table",
+      "predicate": "HAS_GEOMETRY",
+      "object": "recipe:box",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "entity:chair1",
+      "predicate": "HAS_GEOMETRY",
+      "object": "recipe:box",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "entity:chair2",
+      "predicate": "HAS_GEOMETRY",
+      "object": "recipe:box",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "entity:chair1",
+      "predicate": "SHARES_GEOMETRY_WITH",
+      "object": "entity:chair2",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "entity:actor1",
+      "predicate": "INSTANCE_OF",
+      "object": "recipe:humanoid",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "entity:actor2",
+      "predicate": "INSTANCE_OF",
+      "object": "recipe:humanoid",
+      "origin": "SYNTHETIC"
+    },
+    {
+      "subject": "cue:dialogue",
+      "predicate": "CUE_TARGETS",
+      "object": "entity:actor1",
+      "origin": "PROMPT_PROPOSAL"
+    },
+    {
+      "subject": "cue:dialogue",
+      "predicate": "CUE_TARGETS",
+      "object": "entity:actor2",
+      "origin": "PROMPT_PROPOSAL"
+    },
+    {
+      "subject": "cue:dialogue",
+      "predicate": "CUE_SOURCE",
+      "object": "source:prompt",
+      "origin": "PROMPT_PROPOSAL"
+    },
+    {
+      "subject": "cue:dialogue",
+      "predicate": "CUE_CLASSIFIED_AS",
+      "object": "concept:dispute",
+      "origin": "PROMPT_PROPOSAL"
+    }
+  ],
+  "sceneNote": "SYNTHETIC and PROMPT_PROPOSAL only. Static actors; no observed fight, measured geometry or person identification."
+}

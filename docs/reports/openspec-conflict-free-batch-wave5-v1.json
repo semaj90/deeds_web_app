@@ -1,0 +1,106 @@
+{
+  "schema": "atlas.openspec-conflict-free-batch.v1",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "maxConcurrentWorkers": 2,
+  "workerA": {
+    "role": "a2a-worker-a",
+    "ownedFiles": [
+      "ace-packet-reader.ts",
+      "ace-packet-validator.ts",
+      "ace-packet-writer.ts",
+      "cross_store_identity_verifier.ts",
+      "domain-classifier.ts",
+      "packages/atlas-core/src/cli.ts"
+    ],
+    "tasks": [
+      {
+        "durableKey": "parent-atlas-branch-merge-consolidation-aug20:TASK-L122:1",
+        "locator": "openspec/changes/parent-atlas-branch-merge-consolidation-aug20/tasks.md#L122",
+        "score": 80.0,
+        "ownedFiles": [
+          "ace-packet-reader.ts",
+          "ace-packet-validator.ts",
+          "ace-packet-writer.ts"
+        ],
+        "summary": "`ace-packet-reader.ts` / `ace-packet-validator.ts` / `ace-packet-writer.ts`"
+      },
+      {
+        "durableKey": "parent-atlas-branch-merge-consolidation-aug20:TASK-L125:1",
+        "locator": "openspec/changes/parent-atlas-branch-merge-consolidation-aug20/tasks.md#L125",
+        "score": 80.0,
+        "ownedFiles": [
+          "cross_store_identity_verifier.ts"
+        ],
+        "summary": "`cross_store_identity_verifier.ts`"
+      },
+      {
+        "durableKey": "parent-atlas-branch-merge-consolidation-aug20:TASK-L127:1",
+        "locator": "openspec/changes/parent-atlas-branch-merge-consolidation-aug20/tasks.md#L127",
+        "score": 80.0,
+        "ownedFiles": [
+          "domain-classifier.ts"
+        ],
+        "summary": "`domain-classifier.ts` (classifier/ variant only \u2014 indexing/ re-export already archived)"
+      },
+      {
+        "durableKey": "parent-atlas-canonical-directory-ingestion-fabric:TASK-L281:1",
+        "locator": "openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/tasks.md#L281",
+        "score": 80.0,
+        "ownedFiles": [
+          "packages/atlas-core/src/cli.ts"
+        ],
+        "summary": "Continue `AST_NODE_ADMISSION_READINESS` under its existing owner. The bounded `packages/atlas-core/src/cli.ts` span match proves one pars..."
+      }
+    ]
+  },
+  "workerB": {
+    "role": "a2a-worker-b",
+    "ownedFiles": [
+      "atlas-kernel-session.ts",
+      "feature-tracking-layer.ts",
+      "runtime-lease-manager.ts",
+      "topology-ontology.ts"
+    ],
+    "tasks": [
+      {
+        "durableKey": "parent-atlas-branch-merge-consolidation-aug20:TASK-L124:1",
+        "locator": "openspec/changes/parent-atlas-branch-merge-consolidation-aug20/tasks.md#L124",
+        "score": 80.0,
+        "ownedFiles": [
+          "feature-tracking-layer.ts"
+        ],
+        "summary": "`feature-tracking-layer.ts` (sveltekit-frontend's Drizzle version likely wins)"
+      },
+      {
+        "durableKey": "parent-atlas-branch-merge-consolidation-aug20:TASK-L126:1",
+        "locator": "openspec/changes/parent-atlas-branch-merge-consolidation-aug20/tasks.md#L126",
+        "score": 80.0,
+        "ownedFiles": [
+          "runtime-lease-manager.ts"
+        ],
+        "summary": "`runtime-lease-manager.ts`"
+      },
+      {
+        "durableKey": "parent-atlas-branch-merge-consolidation-aug20:TASK-L130:1",
+        "locator": "openspec/changes/parent-atlas-branch-merge-consolidation-aug20/tasks.md#L130",
+        "score": 80.0,
+        "ownedFiles": [
+          "topology-ontology.ts"
+        ],
+        "summary": "3.5 Port `topology-ontology.ts`'s 4 missing array entries"
+      },
+      {
+        "durableKey": "parent-atlas-governed-compute-fabric:TASK-L100:1",
+        "locator": "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md#L100",
+        "score": 80.0,
+        "ownedFiles": [
+          "atlas-kernel-session.ts"
+        ],
+        "summary": "2.1 Review the existing `atlas-kernel-session.ts` scaffold against the final specs;"
+      }
+    ]
+  },
+  "disjointVerified": true,
+  "skippedConflicts": []
+}

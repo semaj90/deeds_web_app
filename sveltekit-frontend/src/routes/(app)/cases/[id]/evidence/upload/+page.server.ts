@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ params, locals, parent }) => {
 };
 
 export const actions: Actions = {
-  upload: async ({ request, params, locals }) => {
+  upload: async ({ request, params, locals, fetch: eventFetch }) => {
     if (!locals.user) {
       return fail(401, { success: false, error: 'Unauthorized' });
     }
@@ -55,7 +55,9 @@ export const actions: Actions = {
       formData.set('evidenceType', 'document');
 
       const origin = new URL(request.url).origin;
-      const res = await fetch(`${origin}/api/evidence/upload`, {
+      // SvelteKit's event fetch forwards same-origin cookies. Global fetch would
+      // call the endpoint without the browser's Lucia session and return 401.
+      const res = await eventFetch(`${origin}/api/evidence/upload`, {
         method: 'POST',
         body: formData,
       });

@@ -16,6 +16,7 @@ export interface PathSample extends Vec3 {
 
 export interface WalkPath {
 	length: number;
+	waypointDistances: readonly number[];
 	at(distance: number): PathSample;
 }
 
@@ -29,6 +30,7 @@ function catmull(p0: Vec3, p1: Vec3, p2: Vec3, p3: Vec3, t: number): Vec3 {
 
 export function buildWalkPath(waypoints: readonly Vec3[], samplesPerSegment = 12): WalkPath {
 	if (waypoints.length < 2) throw new Error('WALK_PATH_NEEDS_TWO_WAYPOINTS');
+	if (!Number.isSafeInteger(samplesPerSegment) || samplesPerSegment < 1) throw new Error('WALK_PATH_INVALID_SAMPLE_COUNT');
 	for (const w of waypoints) {
 		if (![w.x, w.y, w.z].every(Number.isFinite)) throw new Error('WALK_PATH_NON_FINITE_WAYPOINT');
 	}
@@ -38,7 +40,10 @@ export function buildWalkPath(waypoints: readonly Vec3[], samplesPerSegment = 12
 		const p1 = waypoints[i];
 		const p2 = waypoints[i + 1];
 		const p3 = waypoints[Math.min(waypoints.length - 1, i + 2)];
-		for (let s = 0; s < samplesPerSegment; s++) pts.push(catmull(p0, p1, p2, p3, s / samplesPerSegment));
+		const stationary = p1.x === p2.x && p1.y === p2.y && p1.z === p2.z;
+		for (let s = 0; s < samplesPerSegment; s++) {
+			pts.push(stationary ? p1 : catmull(p0, p1, p2, p3, s / samplesPerSegment));
+		}
 	}
 	pts.push({ ...waypoints[waypoints.length - 1] });
 
@@ -47,22 +52,60 @@ export function buildWalkPath(waypoints: readonly Vec3[], samplesPerSegment = 12
 		cumulative.push(cumulative[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y, pts[i].z - pts[i - 1].z));
 	}
 	const length = cumulative[cumulative.length - 1];
-	let lastHeading = 0;
+	let heading = 0;
+	const headings = pts.slice(1).map((point, index) => {
+		const dx = point.x - pts[index].x;
+		const dz = point.z - pts[index].z;
+		if (dx * dx + dz * dz > 1e-10) heading = Math.atan2(dx, dz);
+		return heading;
+	});
 
 	return {
 		length,
+		waypointDistances: waypoints.map((_, index) => cumulative[index * samplesPerSegment]),
 		at(distance: number): PathSample {
 			const d = Math.min(Math.max(distance, 0), length);
 			let i = 1;
-			while (i < cumulative.length - 1 && cumulative[i] < d) i++;
+			let hi = cumulative.length - 1;
+			while (i < hi) {
+				const midpoint = Math.floor((i + hi) / 2);
+				if (cumulative[midpoint] < d) i = midpoint + 1;
+				else hi = midpoint;
+			}
 			const seg = cumulative[i] - cumulative[i - 1];
 			const t = seg > 0 ? (d - cumulative[i - 1]) / seg : 0;
 			const a = pts[i - 1];
 			const b = pts[i];
-			const dx = b.x - a.x;
-			const dz = b.z - a.z;
-			if (dx * dx + dz * dz > 1e-10) lastHeading = Math.atan2(dx, dz);
-			return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, z: a.z + (b.z - a.z) * t, heading: lastHeading };
+			return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, z: a.z + (b.z - a.z) * t, heading: headings[i - 1] };
+		},
+	};
+}
+
+/** Map each interval of absolute source time to its own spline segment. */
+export function buildTimedWalkPath(points: readonly (Vec3 & { framePtsUs: number })[]) {
+	const path = buildWalkPath(points);
+	const times = points.map(({ framePtsUs }) => framePtsUs);
+	if (times.some((time, index) => !Number.isSafeInteger(time) || time < 0 || (index > 0 && time <= times[index - 1]))) {
+		throw new Error('WALK_PATH_INVALID_SOURCE_TIME');
+	}
+	const startUs = times[0];
+	const endUs = times[times.length - 1];
+	return {
+		startUs, endUs,
+		atSourceTime(framePtsUs: number) {
+			if (!Number.isSafeInteger(framePtsUs)) throw new Error('WALK_PATH_INVALID_SOURCE_TIME');
+			const time = Math.min(endUs, Math.max(startUs, framePtsUs));
+			let lo = 0;
+			let hi = times.length - 1;
+			while (lo + 1 < hi) {
+				const midpoint = Math.floor((lo + hi) / 2);
+				if (times[midpoint] <= time) lo = midpoint;
+				else hi = midpoint;
+			}
+			const fraction = (time - times[lo]) / (times[hi] - times[lo]);
+			const from = path.waypointDistances[lo];
+			const distance = from + (path.waypointDistances[hi] - from) * fraction;
+			return { ...path.at(distance), framePtsUs: time, localSeconds: (time - startUs) / 1_000_000 };
 		},
 	};
 }

@@ -45,7 +45,9 @@
 	let cacheHits = $state(0);
 	let isPolling = $state(true);
 	let pollIntervalMs = $state(3000); // 3 seconds
-	let pollInterval: number | null = $state(null);
+	// Not $state: the $effect below starts and stops polling, and a reactive handle
+	// it both reads and writes re-triggers the effect (effect_update_depth_exceeded).
+	let pollInterval: number | null = null;
 
 	// Derived health status
 	let healthStatus = $derived.by<'healthy' | 'warning' | 'critical'>(() => {

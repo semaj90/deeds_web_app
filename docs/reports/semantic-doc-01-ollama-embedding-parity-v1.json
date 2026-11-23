@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.semantic-doc-01-embedding-parity.v1",
+  "generatedAt": "2026-11-22T20:15:13.351981+00:00",
+  "gate": "SEMANTIC-DOC-01 parity (Ollama embeddinggemma:latest vs stored :8081)",
+  "executor": {
+    "url": "http://127.0.0.1:11434",
+    "kind": "Ollama embeddinggemma:latest (/api/embed, truncate:false)"
+  },
+  "sampleCount": 24,
+  "measured": {
+    "mean_cosine": 0.999656,
+    "min_cosine": 0.999531
+  },
+  "thresholds": {
+    "mean_cosine_min": 0.98,
+    "min_cosine_min": 0.95
+  },
+  "result": "EMBEDDING_PARITY_PROVEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

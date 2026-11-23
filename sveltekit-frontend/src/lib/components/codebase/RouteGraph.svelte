@@ -130,7 +130,9 @@
 
 		// Prepare data for simulation
 		const nodeMap = new Map(nodes.map(n => [n.id, { ...n }]));
-		const simNodes = nodes.map(n => ({ ...n }));
+		// /api/codebase-index/graph omits errorCount on every node. Math.min(undefined, 10) is NaN,
+		// which made every radius NaN (~70-90k console errors per load). Default to 0 here.
+		const simNodes = nodes.map(n => ({ ...n, errorCount: Number.isFinite(n.errorCount) ? n.errorCount : 0 }));
 		const simEdges = edges
 			.filter(e => nodeMap.has(e.source) && nodeMap.has(e.target))
 			.map(e => ({ ...e, source: e.source, target:e.target }));

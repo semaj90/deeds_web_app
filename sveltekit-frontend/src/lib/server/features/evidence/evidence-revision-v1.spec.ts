@@ -1,18 +1,23 @@
 // @vitest-environment node
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import crypto from 'node:crypto';
 import { humanCoco17PoseSchemaV1 } from '$lib/shared/pose-skeleton-schema-v1.js';
+import { createPlanarCameraCalibrationV1 } from '$lib/splat/planar-camera-calibration-v1.js';
 import {
   EVIDENCE_REVISION_SCHEMA_V1,
   EvidenceRevisionErrorV1,
+  createDrizzleRevisionPortsV1,
   MAX_REVISION_IMAGE_BYTES,
   normalizeSha256,
   saveEvidenceMarkupRevisionV1,
   saveEvidenceAnnotationRevisionV1,
   savePoseReviewDecisionV1,
+  savePlanarCalibrationReviewDecisionV1,
   sniffImage,
   type EvidenceRevisionPortsV1,
 } from './evidence-revision-v1.js';
+import type { StorybookRegionReviewV1 } from '$lib/shared/storybook-region-review-v1.js';
+import { parseWholeImageAnalysisRowV1 } from '$lib/server/evidence/whole-image-analysis-readback-v1.js';
 
 const CASE_ID = '11111111-1111-4111-8111-111111111111';
 const EV_ID = '22222222-2222-4222-8222-222222222222';
@@ -59,6 +64,15 @@ function fakePorts(over: Partial<EvidenceRevisionPortsV1> = {}) {
       log.insert.push(a as unknown as Record<string, unknown>);
       return { ...row, created: true };
     },
+    insertCalibrationReviewDecision: async (a) => {
+      const key = `calibration-review:${a.decisionSha256}`;
+      const dup = rows.get(key);
+      if (dup) return { ...dup, created: false };
+      const row = { id: `ver-${++version}`, version };
+      rows.set(key, row);
+      log.insert.push(a as unknown as Record<string, unknown>);
+      return { ...row, created: true };
+    },
     ...over,
   };
   return { ports, log };
@@ -67,6 +81,80 @@ const base = () => ({ caseId: CASE_ID, evidenceId: EV_ID, actorUserId: 7, parent
 const code = async (p: Promise<unknown>) => { try { await p; return 'NO_ERROR'; } catch (e) { return e instanceof EvidenceRevisionErrorV1 ? e.code : `OTHER:${(e as Error).message}`; } };
 
 describe('evidence-revision-v1', () => {
+  const regionReview: StorybookRegionReviewV1 = {
+    schema: 'atlas.storybook-region-review.v1', reviewId: CASE_ID, analysisRevision: 'analysis-1',
+    artifactSha256: `sha256:${'b'.repeat(64)}`, frameIndex: 0, timestampMs: 250, width: 100, height: 80,
+    column: 7, row: 4, decision: 'NOT_REVIEWED', notes: '',
+  };
+
+  it('records each region decision on its own and sends retries through locked validation', async () => {
+    const { ports, log } = fakePorts({ findAnnotationRevision: vi.fn(async () => { throw new Error('must check current frame before dedupe'); }) });
+    const input = { ...base(), annotation: { schema: 'atlas.evidence-annotation.v1', modality: 'video', annotations: [], storybookRegionReview: regionReview } };
+    const saved = await saveEvidenceAnnotationRevisionV1(input, ports);
+    const retry = await saveEvidenceAnnotationRevisionV1(input, ports);
+    expect(retry).toMatchObject({ versionId: saved.versionId, idempotent: true });
+    expect(log.put).toHaveLength(0);
+    expect(log.insert).toHaveLength(1);
+    expect(log.insert[0]).toMatchObject({ storybookRegionReview: regionReview, metadata: {
+      actorUserId: 7, parentSha256: PARENT, annotation: { storybookRegionReview: regionReview }, canonicalAuthority: false,
+    } });
+    await expect(saveEvidenceAnnotationRevisionV1({ ...input, annotation: { ...input.annotation, modality: 'image' } }, ports))
+      .rejects.toMatchObject({ code: 'INVALID_MARKUP' });
+  });
+
+  it('checks the current frame while holding the evidence lock, before dedupe or insert', async () => {
+    const parent = { id: EV_ID, caseId: CASE_ID, hash: PARENT, deletedAt: null };
+    const selects = [[parent], [{ videoAnalysis: null }]];
+    const execute = vi.fn();
+    const insert = vi.fn();
+    const select = vi.fn(() => ({ from: () => ({ where: () => ({ limit: async () => selects.shift() }) }) }));
+    const transactionalDb = { transaction: (body: (tx: unknown) => unknown) => body({ execute, insert, select }) };
+    const ports = await createDrizzleRevisionPortsV1({ db: transactionalDb as never });
+    await expect(ports.insertAnnotationRevision({ evidenceId: EV_ID, caseId: CASE_ID, parentSha256: PARENT,
+      annotationSha256: PARENT, actorUserId: 7, metadata: {}, changeReason: null, storybookRegionReview: regionReview,
+    })).rejects.toMatchObject({ code: 'STORYBOOK_REVIEW_FRAME_CHANGED' });
+    expect(execute.mock.invocationCallOrder[0]).toBeLessThan(select.mock.invocationCallOrder[0]!);
+    expect(select).toHaveBeenCalledTimes(2);
+    expect(insert).not.toHaveBeenCalled();
+  });
+
+  it('saves an image cell and rejects its replay after the canonical analysis changes', async () => {
+    const row = {
+      source_revision: PARENT, analysis_revision: 'image-analysis-1',
+      source_locator: { kind: 'whole_image', coordinateSpace: 'original_pixels', width: 100, height: 80 },
+      metadata: { visualAnalysis: {
+        schema: 'atlas.evidence-visual-analysis.v1', authority: 'OBSERVATION_ONLY', status: 'PARTIAL',
+        sourceRevision: PARENT, detectionExecuted: true, objectDetections: [], layoutRegions: [],
+        visionSummary: null, visionFindings: [], visionTags: [], depthMap: null, stageErrors: [],
+      } },
+    };
+    const manifest = parseWholeImageAnalysisRowV1(row, EV_ID, PARENT)?.storybook?.manifest;
+    expect(manifest).toBeDefined();
+    const review: StorybookRegionReviewV1 = {
+      schema: 'atlas.storybook-region-review.v1', reviewId: CASE_ID, analysisRevision: row.analysis_revision,
+      observationRevision: manifest!.observationRevision, width: 100, height: 80,
+      column: 2, row: 4, decision: 'UNCLASSIFIED', notes: 'Detail is obscured.',
+    };
+    const parent = { id: EV_ID, caseId: CASE_ID, hash: PARENT, deletedAt: null };
+    let latestRow = row;
+    const execute = vi.fn().mockResolvedValueOnce({ rows: [] }).mockImplementationOnce(async () => ({ rows: [latestRow] }))
+      .mockResolvedValueOnce({ rows: [] }).mockImplementationOnce(async () => ({ rows: [latestRow] }));
+    const selects = [[parent], [], [], [{ m: 0 }], [parent]];
+    const select = vi.fn(() => ({ from: () => ({ where: () => {
+      const pending = Promise.resolve(selects.shift());
+      return Object.assign(pending, { limit: () => pending });
+    } }) }));
+    const insert = vi.fn(() => ({ values: () => ({ returning: async () => [{ id: CASE_ID, version: 1 }] }) }));
+    const transactionalDb = { transaction: (body: (tx: unknown) => unknown) => body({ execute, insert, select }) };
+    const ports = await createDrizzleRevisionPortsV1({ db: transactionalDb as never });
+    const command = { evidenceId: EV_ID, caseId: CASE_ID, parentSha256: PARENT,
+      annotationSha256: PARENT, actorUserId: 7, metadata: {}, changeReason: null, storybookRegionReview: review };
+    await expect(ports.insertAnnotationRevision(command)).resolves.toMatchObject({ version: 1, created: true });
+    latestRow = { ...row, metadata: { visualAnalysis: { ...row.metadata.visualAnalysis, detectionExecuted: false } } };
+    await expect(ports.insertAnnotationRevision(command)).rejects.toMatchObject({ code: 'STORYBOOK_REVIEW_FRAME_CHANGED' });
+    expect(insert).toHaveBeenCalledTimes(1);
+  });
+
   it('normalizes sha256 and sniffs image bytes', () => {
     expect(normalizeSha256(PARENT_HEX.toUpperCase())).toBe(PARENT);
     expect(normalizeSha256('sha256:xyz')).toBeNull();
@@ -214,6 +302,7 @@ describe('evidence-revision-v1', () => {
       origin: 'manual',
       modelRevision: null,
       reviewState: 'UNREVIEWED',
+      groundContact: { imagePx: [319.75, 479.5], footSide: 'left', label: 'operator-marked-ground-contact-candidate' },
       keypoints: humanCoco17PoseSchemaV1.joints.map(({ index }) => ({
         index,
         x: index === 0 ? 320.125 : null,
@@ -237,7 +326,127 @@ describe('evidence-revision-v1', () => {
     expect((savedAnnotation?.poseSchemas?.[0] as { joints?: unknown[] })?.joints?.[0]).toMatchObject({ index: 0, name: 'nose' });
     expect(savedAnnotation?.poseObservations?.[0]).toMatchObject({ evidenceId: EV_ID, sourceSha256: PARENT, framePtsUs: 1_250_000 });
     expect(savedAnnotation?.poseObservations?.[0]?.keypoints?.[0]).toMatchObject({ index: 0, x: 320.125, y: 240.75 });
+    expect(savedAnnotation?.poseObservations?.[0]).toMatchObject({ groundContact: { imagePx: [319.75, 479.5], footSide: 'left', label: 'operator-marked-ground-contact-candidate' } });
     expect(log.put).toHaveLength(0);
+  });
+
+  it('persists a validated planar calibration as an unreviewed source-bound annotation proposal', async () => {
+    const { ports, log } = fakePorts();
+    const calibration = createPlanarCameraCalibrationV1({
+      evidenceId: EV_ID,
+      sourceRevision: PARENT,
+      analysisRevision: 'analysis-rev-1',
+      calibrationFrameIndex: 37,
+      calibrationFramePtsUs: 1_250_000,
+      frameWidth: 640,
+      frameHeight: 480,
+      operatorConfirmedFixedCamera: true,
+      fitAnchors: [
+        { id: 'a', imagePx: [0, 0], planeM: [0, 0] },
+        { id: 'b', imagePx: [640, 0], planeM: [6.4, 0] },
+        { id: 'c', imagePx: [640, 480], planeM: [6.4, 4.8] },
+        { id: 'd', imagePx: [0, 480], planeM: [0, 4.8] },
+      ],
+      validationAnchors: [
+        { id: 'v1', imagePx: [160, 120], planeM: [1.6, 1.2] },
+        { id: 'v2', imagePx: [480, 120], planeM: [4.8, 1.2] },
+        { id: 'v3', imagePx: [480, 360], planeM: [4.8, 3.6] },
+        { id: 'v4', imagePx: [160, 360], planeM: [1.6, 3.6] },
+      ],
+      toleranceMeters: 0.001,
+    });
+    const receipt = await saveEvidenceAnnotationRevisionV1({
+      caseId: CASE_ID,
+      evidenceId: EV_ID,
+      actorUserId: 7,
+      parentSha256: PARENT,
+      annotation: { schema: 'atlas.evidence-annotation.v1', modality: 'video', notes: '', annotations: [], planarCameraCalibrations: [calibration] },
+    }, ports);
+    expect(receipt).toMatchObject({ committed: true, parentSha256: PARENT, canonicalAuthority: false });
+    const savedAnnotation = (log.insert[0]?.metadata as { annotation?: { planarCameraCalibrations?: Array<Record<string, unknown>> } }).annotation;
+    expect(savedAnnotation?.planarCameraCalibrations?.[0]).toMatchObject({
+      evidenceId: EV_ID,
+      sourceRevision: PARENT,
+      analysisRevision: 'analysis-rev-1',
+      validationStatus: 'CHECKS_PASSED',
+      status: 'UNREVIEWED_CALIBRATION_PROPOSAL',
+    });
+    expect(log.put).toHaveLength(0);
+  });
+
+  it('rejects a planar calibration bound to another source revision', async () => {
+    const calibration = createPlanarCameraCalibrationV1({
+      evidenceId: EV_ID,
+      sourceRevision: PARENT,
+      analysisRevision: 'analysis-rev-1',
+      calibrationFrameIndex: 37,
+      calibrationFramePtsUs: 1_250_000,
+      frameWidth: 640,
+      frameHeight: 480,
+      operatorConfirmedFixedCamera: true,
+      fitAnchors: [
+        { id: 'a', imagePx: [0, 0], planeM: [0, 0] },
+        { id: 'b', imagePx: [640, 0], planeM: [6.4, 0] },
+        { id: 'c', imagePx: [640, 480], planeM: [6.4, 4.8] },
+        { id: 'd', imagePx: [0, 480], planeM: [0, 4.8] },
+      ],
+      validationAnchors: [
+        { id: 'v1', imagePx: [160, 120], planeM: [1.6, 1.2] },
+        { id: 'v2', imagePx: [480, 120], planeM: [4.8, 1.2] },
+        { id: 'v3', imagePx: [480, 360], planeM: [4.8, 3.6] },
+        { id: 'v4', imagePx: [160, 360], planeM: [1.6, 3.6] },
+      ],
+      toleranceMeters: 0.001,
+    });
+    const result = await code(saveEvidenceAnnotationRevisionV1({
+      caseId: CASE_ID,
+      evidenceId: EV_ID,
+      actorUserId: 7,
+      parentSha256: `sha256:${'b'.repeat(64)}`,
+      annotation: { schema: 'atlas.evidence-annotation.v1', modality: 'video', notes: '', annotations: [], planarCameraCalibrations: [calibration] },
+    }, fakePorts().ports));
+    expect(result).toBe('INVALID_MARKUP');
+  });
+
+  it('records a calibration review only for the exact saved proposal and supports idempotent readback identity', async () => {
+    const calibration = createPlanarCameraCalibrationV1({
+      evidenceId: EV_ID, sourceRevision: PARENT, analysisRevision: 'analysis-rev-1',
+      calibrationFrameIndex: 37, calibrationFramePtsUs: 1_250_000, frameWidth: 640, frameHeight: 480,
+      operatorConfirmedFixedCamera: true,
+      fitAnchors: [
+        { id: 'a', imagePx: [0, 0], planeM: [0, 0] }, { id: 'b', imagePx: [640, 0], planeM: [6.4, 0] },
+        { id: 'c', imagePx: [640, 480], planeM: [6.4, 4.8] }, { id: 'd', imagePx: [0, 480], planeM: [0, 4.8] },
+      ],
+      validationAnchors: [
+        { id: 'v1', imagePx: [160, 120], planeM: [1.6, 1.2] }, { id: 'v2', imagePx: [480, 120], planeM: [4.8, 1.2] },
+        { id: 'v3', imagePx: [480, 360], planeM: [4.8, 3.6] }, { id: 'v4', imagePx: [160, 360], planeM: [1.6, 3.6] },
+      ],
+      toleranceMeters: 0.001,
+    });
+    const annotationRevisionId = '33333333-3333-4333-8333-333333333333';
+    const { ports, log } = fakePorts({
+      loadAnnotationRevision: async () => ({
+        id: annotationRevisionId, version: 2,
+        metadata: { schema: 'atlas.evidence-annotation-revision.v1', parentSha256: PARENT, annotation: {
+          schema: 'atlas.evidence-annotation.v1', modality: 'video', notes: '', annotations: [], planarCameraCalibrations: [calibration],
+        } },
+      }),
+    });
+    const canonical = JSON.parse(JSON.stringify(calibration));
+    const calibrationSha256 = `sha256:${crypto.createHash('sha256').update(JSON.stringify(canonical), 'utf8').digest('hex')}`;
+    const input = {
+      caseId: CASE_ID, evidenceId: EV_ID, actorUserId: 7, parentSha256: PARENT, annotationRevisionId,
+      calibrationSha256, analysisRevision: 'analysis-rev-1', calibrationFrameIndex: 37, calibrationFramePtsUs: 1_250_000,
+      decision: 'ACCEPTED_FOR_SCENE_PROPOSAL' as const,
+      cameraFixedWindow: { startPtsUs: 0, endPtsUs: 2_000_000 },
+    };
+    const first = await savePlanarCalibrationReviewDecisionV1(input, ports);
+    const replay = await savePlanarCalibrationReviewDecisionV1(input, ports);
+    expect(first).toMatchObject({ committed: true, idempotent: false, decision: 'ACCEPTED_FOR_SCENE_PROPOSAL', sceneAdmission: 'APPROVED_FOR_SCENE_PROPOSAL', canonicalAuthority: false });
+    expect(replay).toMatchObject({ idempotent: true, decisionId: first.decisionId });
+    expect(log.insert).toHaveLength(1);
+    expect(log.insert[0]).toMatchObject({ metadata: { schema: 'atlas.planar-camera-calibration-review.v1', annotationRevisionId, calibrationSha256, sourceSha256: PARENT, decision: 'ACCEPTED_FOR_SCENE_PROPOSAL', canonicalAuthority: false } });
+    expect(await code(savePlanarCalibrationReviewDecisionV1({ ...input, calibrationSha256: `sha256:${'b'.repeat(64)}` }, ports))).toBe('INVALID_MARKUP');
   });
 
   it('rejects pose annotations with a mismatched source or client-asserted review state', async () => {
@@ -274,6 +483,7 @@ describe('evidence-revision-v1', () => {
       analysisRevision: 'analysis-rev-1', framePtsUs: 1_250_000, frameIndex: 37, frameWidth: 640, frameHeight: 480,
       skeletonSchemaId: humanCoco17PoseSchemaV1.schemaId, trackId: 'track-0001', trackScopeId: 'sha256:run-scoped-track',
       origin: 'manual', modelRevision: null, reviewState: 'UNREVIEWED',
+      groundContact: { imagePx: [321, 470], footSide: 'unknown', label: 'operator-marked-ground-contact-candidate' },
       keypoints: humanCoco17PoseSchemaV1.joints.map(({ index }) => ({ index, x: index === 0 ? 320.125 : null, y: index === 0 ? 240.75 : null, confidence: index === 0 ? 1 : 0, visibility: index === 0 ? 'visible' : 'not_labeled' })),
     };
     const savedAnnotation = {
@@ -298,7 +508,7 @@ describe('evidence-revision-v1', () => {
     expect(replay).toMatchObject({ idempotent: true, decisionId: first.decisionId, revision: first.revision });
     expect(log.insert).toHaveLength(1);
     expect(log.insert[0]).toMatchObject({
-      metadata: { schema: 'atlas.pose-review-decision.v1', annotationRevisionId: input.annotationRevisionId, sourceSha256: PARENT, framePtsUs: 1_250_000, decision: 'ACCEPTED_FOR_SCENE_PROPOSAL', reviewerUserId: 7, canonicalAuthority: false },
+      metadata: { schema: 'atlas.pose-review-decision.v1', annotationRevisionId: input.annotationRevisionId, sourceSha256: PARENT, framePtsUs: 1_250_000, decision: 'ACCEPTED_FOR_SCENE_PROPOSAL', reviewerUserId: 7, groundContactReviewed: true, groundContactDecision: 'ACCEPTED_FOR_SCENE_PROPOSAL', canonicalAuthority: false },
     });
   });
 

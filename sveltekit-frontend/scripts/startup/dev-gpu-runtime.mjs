@@ -26,6 +26,7 @@ import { appendFileSync, createWriteStream, existsSync, mkdirSync } from 'node:f
 import { loadRepoEnv } from '../../../scripts/atlas/connection-config.mjs';
 import { isMiniforgeNlpRunning } from './miniforge-nlp-health.mjs';
 import { isGraphifyStartupEnabled } from './graphify-startup-gate.mjs';
+import { publishActiveServerWhenReady } from '../qa/active-server-manifest.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND_ROOT = path.resolve(__dirname, '../..');
@@ -171,11 +172,12 @@ const CHAT_PROFILE_ALIAS = {
   'gemma4-thinking': 'ornith-1.5-9b',
   'ornith-1.5': 'ornith-1.5-9b',
   'ornith-1.5-vlm': 'ornith-1.5-9b',
+  'gemma4-legal-iq4xs-vlm': 'gemma4-legal-iq4xs-direct.gguf',
   'ornith': 'ornith-9b',
 };
 
 function devGpuChatProfile() {
-  return envFromFiles.TURBO_STARTUP_PROFILE || process.env.TURBO_STARTUP_PROFILE || (isDevGpuVisionEnabled() ? 'ornith-1.5-vlm' : 'gemma4-legal-iq4xs');
+  return envFromFiles.TURBO_STARTUP_PROFILE || process.env.TURBO_STARTUP_PROFILE || (isDevGpuVisionEnabled() ? 'gemma4-legal-iq4xs-vlm' : 'gemma4-legal-iq4xs');
 }
 
 function devGpuChatAlias() {
@@ -573,7 +575,22 @@ async function main() {
   // another port (previously 5174) broke bookmarks, PUBLIC_API_URL and OAuth callbacks.
   const fixedVitePort = parseInt(process.env.VITE_PORT ?? '5173', 10);
   if (await isTcpPortOpen(fixedVitePort)) {
-    console.error(`[dev:gpu] ❌ :${fixedVitePort} is already in use. dev:gpu keeps Vite on :${fixedVitePort} and will not fall back.`);
+    // A second launch (VS Code folder-open plus a manual run) finds a live dev server.
+    // That is success, not an error: nothing new is needed, so exit 0 without starting
+    // a second set of launchers. Any HTTP response counts as the server being up.
+    let answering = false;
+    try {
+      await fetch(`http://127.0.0.1:${fixedVitePort}/`, { signal: AbortSignal.timeout(3000) });
+      answering = true;
+    } catch {
+      answering = false;
+    }
+    if (answering) {
+      console.log(`[dev:gpu] ✅ Dev server already running on :${fixedVitePort}; not starting a second instance.`);
+      console.log(`[dev:gpu]    Open http://localhost:${fixedVitePort}. To restart, stop the owning node process and rerun.`);
+      process.exit(0);
+    }
+    console.error(`[dev:gpu] ❌ :${fixedVitePort} is open but not answering HTTP. dev:gpu keeps Vite on :${fixedVitePort} and will not fall back.`);
     console.error(`[dev:gpu]    Find the owner: netstat -ano | findstr :${fixedVitePort}   then stop that process and rerun.`);
     process.exit(1);
   }
@@ -751,7 +768,7 @@ async function main() {
     // In-process evidence embeddings on CPU. No :8081 server and no GPU session. /api/embed
     // keeps its Ollama provider; the evidence adapter uses text, vision and audio encoders.
     const onnxDir = onnxCpuEvidenceEnv({ ...process.env, ...envFromFiles }).ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR;
-    console.log('[dev:gpu] ✅ Embedding backend: onnx_cpu — EmbeddingGemma 2 ONNX on CPU (text, vision, audio encoders)');
+    console.log('[dev:gpu] ✅ Embedding backend: onnx_cpu — EmbeddingGemma 2 ONNX on CPU (text, vision, audio graphs; used by evidence image, document and video analysis paths)');
     console.log(`[dev:gpu]    Model dir: ${onnxDir}`);
     console.log('[dev:gpu]    No :8081 server and no GPU session; /api/embed keeps its Ollama provider');
   } else if (await isLlamaServerRunning(embedPort)) {
@@ -827,7 +844,7 @@ async function main() {
     console.log('[dev:gpu]   Execution provider: DirectML (D3D12) → CPU fallback');
   } else if (embeddingBackend === 'onnx_cpu') {
     console.log('[dev:gpu] Embedding backend: onnx_cpu');
-    console.log('[dev:gpu]   Model:              EmbeddingGemma 2 Q8 ONNX (text, vision, audio encoders)');
+    console.log('[dev:gpu]   Model:              EmbeddingGemma 2 Q8 ONNX (text, vision, audio graphs; loaded together by the adapter)');
     console.log(`[dev:gpu]   Model dir:          ${onnxCpuEvidenceEnv({ ...process.env, ...envFromFiles }).ATLAS_EMBEDDINGGEMMA2_ONNX_MODEL_DIR}`);
     console.log('[dev:gpu]   Endpoint:           in-process evidence adapter (no port)');
     console.log('[dev:gpu]   Execution provider: ONNX Runtime CPU');
@@ -925,7 +942,17 @@ async function main() {
     FRONTEND_ROOT, 'logs', 'startup',
     `vite-${new Date().toISOString().replace(/[:.]/g, '-')}.log`,
   );
-  spawnForeground(npx, ['vite', 'dev', '--port', String(vitePort)], {
+  // This launch starts Vite, so it owns the active-server manifest. The already-running
+  // branch above exits before this point and never rewrites it.
+  publishActiveServerWhenReady({
+    port: vitePort,
+    logPath: viteLogPath,
+    repoRoot: REPO_ROOT,
+    manifestPath: path.join(FRONTEND_ROOT, 'logs', 'qa', 'active-server.json'),
+    service: 'dev-gpu',
+  });
+  // --strictPort: fail instead of silently moving to 5174 if the port is taken in the race window.
+  spawnForeground(npx, ['vite', 'dev', '--port', String(vitePort), '--strictPort'], {
     cwd: FRONTEND_ROOT,
     // Keep server-side callbacks and telemetry aligned with the port Vite
     // actually claimed when the default port is occupied.

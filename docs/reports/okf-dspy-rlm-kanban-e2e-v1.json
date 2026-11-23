@@ -1,6 +1,6 @@
 {
   "schema": "atlas.okf-dspy-rlm-kanban-e2e-proof.v1",
-  "generatedAt": "2026-11-11T19:37:06.552Z",
+  "generatedAt": "2026-11-22T07:37:02.637Z",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "workspaceRevision": "git:fdd5c4970d409b664318ab7e45cc433261a0e368",
@@ -66,8 +66,9 @@
       }
     },
     "ornithTurn3Probe": {
-      "mode": "DETERMINISTIC_OFFLINE_FALLBACK",
-      "reason": "fetch failed"
+      "mode": "LIVE_ORNITH_8090_GROUNDED",
+      "model": "gemma4-legal-iq4xs-direct.gguf",
+      "excerpt": "The user is asking me to identify the content of a specific chunk document, `chunk doc:oaklib:d704414534ab8cec:109`, based on the provided context: \"Task parent-atlas-governed-compute-fabric#0043a825d1a1c80b (Tasks — Par"
     },
     "sequentialTurns": [
       {
@@ -110,7 +111,7 @@
           "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md#L495"
         ],
         "validationCommand": "node --test scripts/atlas/reconcile-cohort-6527-kanban-authority-v1.test.mjs",
-        "synthesisMode": "DETERMINISTIC_OFFLINE_FALLBACK"
+        "synthesisMode": "LIVE_ORNITH_8090_GROUNDED"
       },
       {
         "turn": 4,

@@ -1,7 +1,6 @@
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { tmpdir } from 'node:os';
 import { and, eq, isNull, sql } from 'drizzle-orm';
 import { db } from '$lib/server/db/client.js';
 import { createAudioWindowLedgerIfAvailableV1, type AudioWindowLedgerDatabaseV1 } from './audio-window-ledger-v1.js';
@@ -17,10 +16,10 @@ import { fuseVideoEventsV1, videoEventTimelineV1Schema } from './video-event-fus
 import { linkVideoFrameTracksV1, VIDEO_TRACK_LINKER_REVISION_V1 } from './video-track-linker-v1.js';
 import {
 	encodeVideoMotionLutV1,
-	VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1,
 	VIDEO_MOTION_LUT_HEIGHT_V1,
 	VIDEO_MOTION_LUT_PROCESSING_REVISION_V1,
 	VIDEO_MOTION_LUT_WIDTH_V1,
+	type VideoMotionSampleManifestV1,
 	type VideoMotionLutManifestV1,
 } from '$lib/shared/video-motion-lut-v1.js';
 import type { AnalysisJobProgressStageV1 } from '$lib/server/analysis/analysis-job-progress-events-v1.js';
@@ -60,12 +59,14 @@ import {
 
 const MAX_VIDEO_BYTES_V1 = 2 * 1024 * 1024 * 1024;
 const MAX_FRAME_SAMPLES_V1 = 60;
+const MAX_MOTION_FRAME_SAMPLES_V1 = 300;
 const MAX_AUDIO_ARTIFACT_BYTES_V1 = 512 * 1024 * 1024;
 const MAX_VIDEO_TRANSCRIPT_EMBEDDINGS_V1 = 32;
 const MAX_FRAME_OCR_CHARS_V1 = 4000;
 const MAX_VIDEO_AUDIO_EMBEDDINGS_V1 = 8;
 const VIDEO_ANALYSIS_REVISION_V1 = 'video-analysis-v1';
-export const VIDEO_FRAME_SAMPLING_POLICY_V1 = 'ffmpeg-evenly-spaced-max-60-pts-v1' as const;
+export const VIDEO_FRAME_SAMPLING_POLICY_V1 = 'ffmpeg-evenly-spaced-max-60-target-2fps-v1' as const;
+export const VIDEO_MOTION_SAMPLING_POLICY_V1 = 'ffmpeg-evenly-spaced-motion-max-300-target-2fps-v1' as const;
 export const VIDEO_AUDIO_EMBEDDING_SAMPLING_POLICY_V1 = 'pcm16-16khz-nonoverlap-even-windows-max-8x30s-v1' as const;
 
 /** Explicit audio coverage of the bounded sampling policy; a sample is never reported as full-recording coverage. */
@@ -84,7 +85,14 @@ export function computeVideoFrameSampleRateV1(durationSeconds: number, maxFrames
 	if (!Number.isFinite(durationSeconds) || durationSeconds <= 0 || !Number.isSafeInteger(maxFrames) || maxFrames < 1) {
 		throw new Error('VIDEO_FRAME_SAMPLING_INPUT_INVALID');
 	}
-	return Math.max(1 / 3600, Math.min(1, maxFrames / durationSeconds));
+	return Math.max(1 / 3600, Math.min(2, maxFrames / durationSeconds));
+}
+
+export function computeVideoMotionSampleRateV1(durationSeconds: number, maxFrames = MAX_MOTION_FRAME_SAMPLES_V1): number {
+	if (!Number.isFinite(durationSeconds) || durationSeconds <= 0 || !Number.isSafeInteger(maxFrames) || maxFrames < 1) {
+		throw new Error('VIDEO_MOTION_SAMPLING_INPUT_INVALID');
+	}
+	return Math.max(1 / 3600, Math.min(2, maxFrames / durationSeconds));
 }
 
 export interface VideoDerivedArtifactV1 {
@@ -123,6 +131,7 @@ export interface VideoFrameProposalV1 {
 	}>;
 	trackScopeId?: string;
 	modelRevision: string | null;
+	detectionStatus?: 'COMPLETED' | 'FAILED' | 'UNAVAILABLE';
 	artifact: VideoDerivedArtifactV1;
 	motionLut?: VideoMotionLutManifestV1;
 	ocr?: VideoFrameOcrV1;
@@ -175,6 +184,9 @@ export interface CanonicalVideoAnalysisV1Receipt {
 		embeddedVectorCount?: number;
 	frameSamplingPolicy: typeof VIDEO_FRAME_SAMPLING_POLICY_V1;
 	frameSampleRateFps: number;
+		motionSampleStatus: 'COMPLETED' | 'FAILED' | 'UNAVAILABLE';
+		motionSampleCount: number;
+		motionSampleRateFps: number;
 		substages: {
 			probe: { status: 'COMPLETED'; hasVideoStream: boolean; hasAudioStream: boolean };
 			keyframes: { status: 'COMPLETED' | 'FAILED'; count: number; bucket: string };
@@ -222,7 +234,7 @@ export interface VideoAnalysisDependenciesV1 {
 	audioEmbeddingsEnabled: boolean;
 	audioWindowLedger?: AudioWindowLedgerV1;
 	probe(path: string): ReturnType<typeof detectVideoAndAudioStreamsV1>;
-	extractFrames(bytes: Buffer, options: { fps: number; maxFrames: number }): Promise<Array<{ timestampMs: number; buffer: Buffer }>>;
+	extractFrames(bytes: Buffer, options: { fps: number; maxFrames: number; scaleWidth?: number }): Promise<Array<{ timestampMs: number; buffer: Buffer }>>;
 	extractSkimPreview?(input: {
 		videoPath: string;
 		durationSeconds: number;
@@ -257,6 +269,10 @@ export interface VideoAnalysisDependenciesV1 {
 		transcript: Awaited<ReturnType<typeof transcribeVideoAudio>> | null;
 		audioArtifact: VideoDerivedArtifactV1 | null;
 		frames: VideoFrameProposalV1[];
+		motionSamples: VideoMotionSampleManifestV1[];
+		motionSampleFps: number;
+		motionSamplingPolicy: typeof VIDEO_MOTION_SAMPLING_POLICY_V1;
+		motionSampleStatus: 'COMPLETED' | 'FAILED' | 'UNAVAILABLE';
 		transcriptionStatus: 'COMPLETED' | 'SKIPPED_NO_AUDIO' | 'TRANSCRIPTION_BINARY_UNAVAILABLE' | 'FAILED';
 		transcriptionError?: string;
 		detectorStatus: 'COMPLETED' | 'UNAVAILABLE' | 'FAILED';
@@ -312,9 +328,11 @@ function selectEvenly<T>(items: T[], limit: number): T[] {
 	return Array.from({ length: limit }, (_, index) => items[Math.round(index * (items.length - 1) / (limit - 1))]);
 }
 
-function derivedObjectKey(input: CanonicalVideoAnalysisV1Input, kind: 'audio' | 'frame' | 'motion', index?: number): string {
+function derivedObjectKey(input: CanonicalVideoAnalysisV1Input, kind: 'audio' | 'frame' | 'motion' | 'motion-sample', index?: number): string {
 	const sourceHash = input.sourceRevision.slice('sha256:'.length);
-	const name = kind === 'audio' ? 'audio.wav' : kind === 'motion'
+	const name = kind === 'audio' ? 'audio.wav' : kind === 'motion-sample'
+		? `motion-sample-${String(index ?? 0).padStart(4, '0')}.atm`
+		: kind === 'motion'
 		? `motion-${String(index ?? 0).padStart(4, '0')}.atm`
 		: `frame-${String(index ?? 0).padStart(4, '0')}.jpg`;
 	return `evidence/${input.caseId}/${input.evidenceId}/${sourceHash}/${input.analysisJobId}/${name}`;
@@ -322,7 +340,7 @@ function derivedObjectKey(input: CanonicalVideoAnalysisV1Input, kind: 'audio' | 
 
 async function storeDerivedArtifactV1(input: {
 	job: CanonicalVideoAnalysisV1Input;
-	kind: 'audio' | 'frame' | 'motion';
+	kind: 'audio' | 'frame' | 'motion' | 'motion-sample';
 	index?: number;
 	bytes: Buffer;
 	contentType: string;
@@ -534,6 +552,14 @@ export async function persistCanonicalVideoAnalysisV1(
 				sampledStartMs: input.frames[0]?.timestampMs ?? null,
 				sampledEndMs: input.frames.at(-1)?.timestampMs ?? null,
 			},
+			motionSampling: {
+				policy: input.motionSamplingPolicy,
+				status: input.motionSampleStatus,
+				maxSamples: MAX_MOTION_FRAME_SAMPLES_V1,
+				fps: input.motionSampleFps,
+				sampleCount: input.motionSamples.length,
+				coverage: 'BOUNDED_PIXEL_CHANGE_CUES_NOT_OBJECT_MOTION',
+			},
 			transcriptionStatus: input.transcriptionStatus,
 			embeddingStatus: input.embeddingStatus,
 			...(input.embeddingError ? { embeddingError: input.embeddingError } : {}),
@@ -545,6 +571,7 @@ export async function persistCanonicalVideoAnalysisV1(
 			detectorStatus: input.detectorStatus,
 			...(input.detectorError ? { detectorError: input.detectorError } : {}),
 			frames: input.frames,
+			motionSamples: input.motionSamples,
 			eventTimeline,
 			eventTimelineStatus: eventTimeline.status,
 			skimPreview: input.skimPreview,
@@ -589,6 +616,7 @@ export async function persistCanonicalVideoAnalysisV1(
 	const aiAnalysis = evidenceReadback?.aiAnalysis as Record<string, unknown> | null | undefined;
 	const videoAnalysis = aiAnalysis?.videoAnalysis as Record<string, unknown> | undefined;
 	const storedFrames = Array.isArray(videoAnalysis?.frames) ? videoAnalysis.frames : [];
+	const storedMotionSamples = Array.isArray(videoAnalysis?.motionSamples) ? videoAnalysis.motionSamples : [];
 	const parsedStoredSkimPreview = videoSkimPreviewManifestV1Schema.safeParse(videoAnalysis?.skimPreview);
 	const storedSkimPreview = parsedStoredSkimPreview.success ? parsedStoredSkimPreview.data : null;
 	const parsedStoredEventTimeline = videoEventTimelineV1Schema.safeParse(videoAnalysis?.eventTimeline);
@@ -605,11 +633,14 @@ export async function persistCanonicalVideoAnalysisV1(
 		stableStringify(storedEventTimeline) !== stableStringify(eventTimeline) ||
 		videoAnalysis.skimPreviewStatus !== input.skimPreviewStatus ||
 		storedFrames.length !== input.frames.length ||
+		storedMotionSamples.length !== input.motionSamples.length ||
+		stableStringify(storedMotionSamples) !== stableStringify(input.motionSamples) ||
 		storedFrames.some((value, index) => {
 			if (!value || typeof value !== 'object') return true;
 			const frame = value as Record<string, unknown>;
 			const expected = input.frames[index];
 			return frame.sourceRevision !== input.sourceRevision || frame.analysisRevision !== input.analysisRevision ||
+				frame.detectionStatus !== expected?.detectionStatus ||
 				frame.reviewState !== 'UNREVIEWED_PROPOSAL' || stableStringify(frame.motionLut ?? null) !== stableStringify(expected?.motionLut ?? null);
 		})
 	) {
@@ -691,7 +722,7 @@ const defaultDependencies: VideoAnalysisDependenciesV1 = {
 	probe: detectVideoAndAudioStreamsV1,
 		extractFrames: async (bytes, options) => {
 		const { VisionService } = await import('$lib/server/evidence/video/vision-service.js');
-			return new VisionService().extractFrames(bytes, { fps: options.fps, maxFrames: options.maxFrames, scaleWidth: 768 });
+			return new VisionService().extractFrames(bytes, { fps: options.fps, maxFrames: options.maxFrames, scaleWidth: options.scaleWidth ?? 768 });
 	},
 	frameDimensions: async (buffer) => {
 		const sharpModule = await import('sharp');
@@ -747,15 +778,13 @@ export async function processCanonicalVideoAnalysisV1(
 		.limit(1);
 	if (!currentSource) throw new Error('EVIDENCE_VIDEO_SOURCE_REVISION_STALE');
 
-	const workDir = join(tmpdir(), `atlas-video-${input.analysisJobId}`);
-	await mkdir(workDir, { recursive: true });
-	const sourcePath = join(workDir, input.fileName.replace(/[^a-zA-Z0-9._-]/g, '_'));
+	// The faster-whisper worker only reads files staged under its allowed media root.
+	const mediaDir = join(process.cwd(), 'temp', 'media');
+	await mkdir(mediaDir, { recursive: true });
+	const workDir = await mkdtemp(join(mediaDir, 'atlas-video-'));
+	const sourcePath = join(workDir, `source-${input.fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`);
 	try {
-		await writeFile(sourcePath, input.bytes, { flag: 'wx' }).catch(async (error: NodeJS.ErrnoException) => {
-			if (error.code !== 'EEXIST') throw error;
-			await rm(sourcePath, { force: true });
-			await writeFile(sourcePath, input.bytes, { flag: 'wx' });
-		});
+		await writeFile(sourcePath, input.bytes, { flag: 'wx' });
 		await input.onProgress?.('content_analysis');
 		const probe = await dependencies.probe(sourcePath);
 		if (!probe.hasVideoStream) throw new Error('VIDEO_STREAM_NOT_FOUND');
@@ -811,6 +840,62 @@ export async function processCanonicalVideoAnalysisV1(
 
 		const samplingFps = computeVideoFrameSampleRateV1(probe.durationSeconds, MAX_FRAME_SAMPLES_V1);
 		const extractedFrames = await dependencies.extractFrames(input.bytes, { fps: samplingFps, maxFrames: MAX_FRAME_SAMPLES_V1 });
+		const motionSampleFps = computeVideoMotionSampleRateV1(probe.durationSeconds);
+		let motionSampleStatus: 'COMPLETED' | 'FAILED' | 'UNAVAILABLE' = 'UNAVAILABLE';
+		let motionSamples: Array<Omit<VideoMotionSampleManifestV1, 'analysisRevision' | 'artifact'> & {
+			artifact: Omit<VideoMotionSampleManifestV1['artifact'], 'analysisRevision'>;
+		}> = [];
+		try {
+			const extractedMotionFrames = await dependencies.extractFrames(input.bytes, {
+				fps: motionSampleFps,
+				maxFrames: MAX_MOTION_FRAME_SAMPLES_V1,
+				scaleWidth: VIDEO_MOTION_LUT_WIDTH_V1,
+			});
+			if (extractedMotionFrames.length > 0) {
+				const sharpModule = await import('sharp');
+				let previous: { luma: Uint8Array; timestampMs: number } | null = null;
+				for (let sampleIndex = 0; sampleIndex < extractedMotionFrames.length && sampleIndex < MAX_MOTION_FRAME_SAMPLES_V1; sampleIndex += 1) {
+					const sampleFrame = extractedMotionFrames[sampleIndex]!;
+					if (!Number.isSafeInteger(sampleFrame.timestampMs) || sampleFrame.timestampMs < 0 || (previous && sampleFrame.timestampMs <= previous.timestampMs)) {
+						throw new Error('VIDEO_MOTION_SAMPLE_TIMESTAMPS_INVALID');
+					}
+					const luma = await sharpModule.default(sampleFrame.buffer, { failOn: 'error', limitInputPixels: 16_777_216 })
+						.resize(VIDEO_MOTION_LUT_WIDTH_V1, VIDEO_MOTION_LUT_HEIGHT_V1, {
+							fit: 'contain', position: 'centre', background: { r: 0, g: 0, b: 0, alpha: 1 }, kernel: 'lanczos3',
+						})
+						.greyscale().raw().toBuffer();
+					const currentLuma = new Uint8Array(luma.buffer, luma.byteOffset, luma.byteLength);
+					const encoded = encodeVideoMotionLutV1(previous?.luma ?? null, currentLuma);
+					const artifact = await storeDerivedArtifactV1({
+						job: input, kind: 'motion-sample', index: sampleIndex, bytes: Buffer.from(encoded.bytes),
+						contentType: 'application/vnd.atlas.video-motion-lut-v1', width: VIDEO_MOTION_LUT_WIDTH_V1,
+						height: VIDEO_MOTION_LUT_HEIGHT_V1, upload: dependencies.uploadArtifact, stat: dependencies.statArtifact,
+					});
+					motionSamples.push({
+						schema: 'atlas.video-motion-sample.v1',
+						processingRevision: VIDEO_MOTION_LUT_PROCESSING_REVISION_V1,
+						evidenceId: input.evidenceId,
+						sourceRevision: input.sourceRevision,
+						sampleIndex,
+						width: VIDEO_MOTION_LUT_WIDTH_V1,
+						height: VIDEO_MOTION_LUT_HEIGHT_V1,
+						bitDepth: 4,
+						packing: 'row-major-even-pixel-low-nibble-first',
+						reviewState: 'UNREVIEWED_PIXEL_CHANGE_CUE',
+						previousTimestampMs: previous?.timestampMs ?? null,
+						timestampMs: sampleFrame.timestampMs,
+						motionScore: encoded.motionScore,
+						artifact,
+					});
+					previous = { luma: Uint8Array.from(currentLuma), timestampMs: sampleFrame.timestampMs };
+				}
+				motionSampleStatus = 'COMPLETED';
+			}
+		} catch (error) {
+			motionSamples = [];
+			motionSampleStatus = 'FAILED';
+			console.warn('[VideoAnalysis] separate motion sampling unavailable:', error instanceof Error ? error.message : String(error));
+		}
 		const skimPreviewAssets: VideoSkimPreviewTileV1[] = [];
 		let skimPreviewTimesMs: number[] = [];
 		let skimPreviewIntervalMs = 0;
@@ -863,11 +948,11 @@ export async function processCanonicalVideoAnalysisV1(
 		let detectorError: string | undefined;
 		const ocrTotal = Math.min(extractedFrames.length, MAX_FRAME_SAMPLES_V1);
 			const ocrStartedAt = Date.now();
-			let previousMotionLuma: { luma: Uint8Array; timestampMs: number } | null = null;
 			for (let frameIndex = 0; frameIndex < extractedFrames.length && frameIndex < MAX_FRAME_SAMPLES_V1; frameIndex += 1) {
 			const frame = extractedFrames[frameIndex];
 			const { width: resizedWidth, height: resizedHeight } = await dependencies.frameDimensions(frame.buffer);
 			const objects: VideoFrameProposalV1['objects'] = [];
+			let detectionStatus: VideoFrameProposalV1['detectionStatus'] = 'UNAVAILABLE';
 			if (detector) {
 				try {
 					const detection = await detector.analyze(frame.buffer, `${frameIndex}.jpg`);
@@ -877,7 +962,9 @@ export async function processCanonicalVideoAnalysisV1(
 							objects.push({ label: object.class, confidence: object.confidence, bbox });
 						}
 					}
+					detectionStatus = 'COMPLETED';
 				} catch (error) {
+					detectionStatus = 'FAILED';
 					detectorStatus = 'FAILED';
 					detectorError = (error instanceof Error ? error.message : String(error)).slice(0, 180);
 				}
@@ -893,57 +980,6 @@ export async function processCanonicalVideoAnalysisV1(
 				upload: dependencies.uploadArtifact,
 				stat: dependencies.statArtifact,
 			});
-			let motionLut: VideoMotionLutManifestV1 | undefined;
-			try {
-				const sharpModule = await import('sharp');
-				const luma = await sharpModule.default(frame.buffer, { failOn: 'error', limitInputPixels: 16_777_216 })
-					.resize(VIDEO_MOTION_LUT_WIDTH_V1, VIDEO_MOTION_LUT_HEIGHT_V1, { fit: 'fill', kernel: 'lanczos3' })
-					.greyscale()
-					.raw()
-					.toBuffer();
-				const currentLuma = new Uint8Array(luma.buffer, luma.byteOffset, luma.byteLength);
-				const prior = previousMotionLuma;
-				const encoded = encodeVideoMotionLutV1(prior?.luma ?? null, currentLuma);
-				const motionArtifact = await storeDerivedArtifactV1({
-					job: input,
-					kind: 'motion',
-					index: frameIndex,
-					bytes: Buffer.from(encoded.bytes),
-					contentType: 'application/vnd.atlas.video-motion-lut-v1',
-					width: VIDEO_MOTION_LUT_WIDTH_V1,
-					height: VIDEO_MOTION_LUT_HEIGHT_V1,
-					upload: dependencies.uploadArtifact,
-					stat: dependencies.statArtifact,
-				});
-				motionLut = {
-					schema: 'atlas.video-motion-lut.v1',
-					processingRevision: VIDEO_MOTION_LUT_PROCESSING_REVISION_V1,
-					evidenceId: input.evidenceId,
-					sourceRevision: input.sourceRevision,
-					analysisRevision: 'pending-analysis-revision',
-					frameIndex,
-					width: VIDEO_MOTION_LUT_WIDTH_V1,
-					height: VIDEO_MOTION_LUT_HEIGHT_V1,
-					bitDepth: 4,
-					packing: 'row-major-even-pixel-low-nibble-first',
-					previousTimestampMs: prior?.timestampMs ?? null,
-					timestampMs: frame.timestampMs,
-					motionScore: encoded.motionScore,
-					artifact: {
-						bucket: motionArtifact.bucket,
-						objectKey: motionArtifact.objectKey,
-						sha256: motionArtifact.sha256,
-						byteLength: VIDEO_MOTION_LUT_ARTIFACT_BYTES_V1,
-						sourceRevision: input.sourceRevision,
-						analysisRevision: 'pending-analysis-revision',
-					},
-				};
-				previousMotionLuma = { luma: Uint8Array.from(currentLuma), timestampMs: frame.timestampMs };
-			} catch (error) {
-				// Motion is a review/LOD cue; it must not fail source-frame detections or transcription.
-				console.warn('[VideoAnalysis] motion LUT unavailable for sampled frame:', error instanceof Error ? error.message : String(error));
-				previousMotionLuma = null;
-			}
 			let ocr: VideoFrameOcrV1 | undefined;
 				if (dependencies.ocrFrame) {
 					try {
@@ -965,8 +1001,8 @@ export async function processCanonicalVideoAnalysisV1(
 				height: probe.height ?? resizedHeight,
 				objects,
 				modelRevision: detector?.modelRevision ?? null,
+				detectionStatus,
 				artifact,
-				...(motionLut ? { motionLut } : {}),
 				reviewState: 'UNREVIEWED_PROPOSAL',
 			});
 		}
@@ -977,6 +1013,10 @@ export async function processCanonicalVideoAnalysisV1(
 			sourceRevision: input.sourceRevision,
 			jobId: input.analysisJobId,
 			frameCount: frames.length,
+			motionSampleCount: motionSamples.length,
+			motionSampleFps,
+			motionSamplingPolicy: VIDEO_MOTION_SAMPLING_POLICY_V1,
+			motionSampleStatus,
 			skimProcessingRevision: VIDEO_SKIM_PREVIEW_PROCESSING_REVISION_V1,
 			skimSampleCount: skimPreviewTimesMs.length,
 			skimSampleIntervalMs: skimPreviewIntervalMs,
@@ -995,20 +1035,19 @@ export async function processCanonicalVideoAnalysisV1(
 			transcriptEmbeddingLimit: MAX_VIDEO_TRANSCRIPT_EMBEDDINGS_V1,
 		})))}`;
 		const revisionBoundFrames = trackedFrames.map((frame) => {
-			const motionLut = frame.motionLut ? {
-				...frame.motionLut,
-				analysisRevision,
-				artifact: { ...frame.motionLut.artifact, analysisRevision },
-			} : undefined;
 			return {
 				...frame,
 				trackScopeId,
 				sourceRevision: input.sourceRevision,
 				analysisRevision,
 				artifact: { ...frame.artifact, analysisRevision },
-				...(motionLut ? { motionLut } : {}),
 			};
 		});
+		const revisionBoundMotionSamples: VideoMotionSampleManifestV1[] = motionSamples.map((sample) => ({
+			...sample,
+			analysisRevision,
+			artifact: { ...sample.artifact, analysisRevision },
+		}));
 		const revisionBoundAudioArtifact = audioArtifact ? { ...audioArtifact, analysisRevision } : null;
 		const skimPreview: VideoSkimPreviewManifestV1 | null = skimPreviewStatus === 'COMPLETED' ? {
 			schema: VIDEO_SKIM_PREVIEW_SCHEMA_V1,
@@ -1200,6 +1239,10 @@ export async function processCanonicalVideoAnalysisV1(
 			transcript: transcription,
 			audioArtifact: revisionBoundAudioArtifact,
 			frames: revisionBoundFrames,
+			motionSamples: revisionBoundMotionSamples,
+			motionSampleFps,
+			motionSamplingPolicy: VIDEO_MOTION_SAMPLING_POLICY_V1,
+			motionSampleStatus,
 			skimPreview,
 			skimPreviewStatus,
 			...(skimPreviewError ? { skimPreviewError } : {}),
@@ -1239,7 +1282,7 @@ export async function processCanonicalVideoAnalysisV1(
 				: 'postgresql.evidence+audio_transcripts+whisper_segments',
 			readback: canonicalReadback,
 			analysis: {
-				status: transcriptionStatus === 'FAILED' || transcriptionStatus === 'TRANSCRIPTION_BINARY_UNAVAILABLE' || detectorStatus !== 'COMPLETED' || embeddingStatus === 'UNAVAILABLE' || audioEmbeddingStatus === 'UNAVAILABLE' || skimPreviewStatus === 'FAILED' ? 'PARTIAL' : 'COMPLETE',
+				status: transcriptionStatus === 'FAILED' || transcriptionStatus === 'TRANSCRIPTION_BINARY_UNAVAILABLE' || detectorStatus !== 'COMPLETED' || embeddingStatus === 'UNAVAILABLE' || audioEmbeddingStatus === 'UNAVAILABLE' || skimPreviewStatus === 'FAILED' || motionSampleStatus === 'FAILED' ? 'PARTIAL' : 'COMPLETE',
 				transcriptionStatus,
 				transcriptSegmentCount: transcription?.chunks.length ?? 0,
 				detectorStatus,
@@ -1249,6 +1292,9 @@ export async function processCanonicalVideoAnalysisV1(
 				skimPreviewSampleCount: skimPreview?.sampleTimestampsMs.length ?? 0,
 				frameSamplingPolicy: VIDEO_FRAME_SAMPLING_POLICY_V1,
 				frameSampleRateFps: samplingFps,
+				motionSampleStatus,
+				motionSampleCount: revisionBoundMotionSamples.length,
+				motionSampleRateFps: motionSampleFps,
 				embeddingStatus,
 				...(embeddingError ? { embeddingError } : {}),
 				audioEmbeddingStatus,

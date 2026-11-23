@@ -13,6 +13,7 @@
  */
 
 import Redis, { type RedisOptions } from 'ioredis';
+import { logger } from '../logger.js';
 
 // ── env resolution (safe for both Vite and standalone Node) ──────────────────
 
@@ -184,6 +185,42 @@ export function getValkeyPublisher(): Redis {
 }
 
 let _lastError = '';
+
+/**
+ * Fail-fast breaker for cache callers. When Valkey stops answering commands, every
+ * request would otherwise wait the full commandTimeout (5 s) before falling back.
+ * While open, callers skip Valkey and use their non-cache path. After the window
+ * the next call is allowed through (half-open); a failure re-opens it.
+ * Transitions are logged once, not per request.
+ */
+const VALKEY_BREAKER_OPEN_MS = 30_000;
+let _breakerOpenUntil = 0;
+let _breakerReason = '';
+
+/** False while the breaker is open. Check before a Valkey command. */
+export function isValkeyAvailable(now: number = Date.now()): boolean {
+  return now >= _breakerOpenUntil;
+}
+
+/** Call when a Valkey command or connect fails. Opens the breaker. */
+export function recordValkeyFailure(err: unknown, now: number = Date.now()): void {
+  const reason = (err as Error)?.message ?? String(err);
+  const wasOpen = !isValkeyAvailable(now);
+  _breakerOpenUntil = now + VALKEY_BREAKER_OPEN_MS;
+  if (!wasOpen || reason !== _breakerReason) {
+    logger.warn(`[valkey-breaker] open for ${VALKEY_BREAKER_OPEN_MS / 1000}s: ${reason}`);
+  }
+  _breakerReason = reason;
+}
+
+/** Call when a Valkey command succeeds. Closes the breaker and logs recovery once. */
+export function recordValkeySuccess(): void {
+  if (_breakerOpenUntil !== 0) {
+    _breakerOpenUntil = 0;
+    _breakerReason = '';
+    logger.info('[valkey-breaker] closed: Valkey answering again');
+  }
+}
 
 /**
  * PING the Valkey server via the shared client.

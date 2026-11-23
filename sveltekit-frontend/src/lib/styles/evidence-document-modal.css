@@ -432,6 +432,9 @@
 	.evidence-document-modal .media-wrap {
 		display: flex;
 		flex-direction: column;
+		/* Keep the filmstrip inside its scrollable body instead of letting the
+		   flex item shrink while its children overlap later modal sections. */
+		flex-shrink: 0;
 	}
 	.evidence-document-modal .video-player {
 		width: 100%;
@@ -550,10 +553,22 @@
 	}
 	.evidence-document-modal .filmstrip-header {
 		display: flex;
+		flex-wrap: wrap;
 		justify-content: space-between;
 		align-items: center;
+		gap: 0.4rem;
 		font-size: 0.75rem;
 	}
+	.evidence-document-modal .motion-cue-action {
+		border: 1px solid rgba(201, 168, 106, 0.55);
+		border-radius: 4px;
+		padding: 0.2rem 0.4rem;
+		background: rgba(201, 168, 106, 0.12);
+		color: #f3d79e;
+		font: inherit;
+		cursor: pointer;
+	}
+	.evidence-document-modal .motion-cue-action:disabled { cursor: wait; opacity: 0.55; }
 	.evidence-document-modal .filmstrip-title {
 		font-weight: 600;
 		color: #e6dfce;
@@ -633,6 +648,14 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+	.evidence-document-modal .motion-score-badge {
+		font-size: 0.58rem;
+		padding: 0.08rem 0.25rem;
+		border-radius: 3px;
+		background: rgba(201, 168, 106, 0.15);
+		color: #f3d79e;
+		font-family: monospace;
 	}
 	.evidence-document-modal .selected-frame-detail {
 		display: flex;

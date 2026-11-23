@@ -55,6 +55,8 @@ test('audit gates and a timed-out pipeline stage retain distinct evidence in the
     assert.ok(!JSON.stringify(plan).includes('secret-value'));
     assert.equal(plan.candidates.find((candidate) => candidate.gateId === 'PGVECTOR_EXACT_HNSW_REPLAY')?.kind, 'RETRIEVAL_OR_PROJECTION');
     assert.equal(plan.candidates.find((candidate) => candidate.gateId === 'GRAPHIFY_LIFECYCLE_STALE')?.kind, 'GRAPH_OR_GPU');
+    assert.equal(plan.candidates.find((candidate) => candidate.gateId === 'GRAPHIFY_LIFECYCLE_STALE')?.lanePhase, 'PHASE_1_INTAKE_AND_STALENESS_GATE');
+    assert.equal(plan.candidates.find((candidate) => candidate.gateId === 'GRAPHIFY_LIFECYCLE_STALE')?.blockedByStaleness, true);
     assert.equal(plan.candidates.find((candidate) => candidate.gateId === 'TURBOVEC_RUNTIME_ALIGNMENT')?.kind, 'RETRIEVAL_OR_PROJECTION');
     assert.equal(plan.candidates.find((candidate) => candidate.gateId === 'TURBOVEC_CANDIDATE_ORDINAL_BRIDGE')?.kind, 'RETRIEVAL_OR_PROJECTION');
 

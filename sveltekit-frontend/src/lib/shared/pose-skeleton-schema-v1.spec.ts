@@ -50,6 +50,13 @@ describe('pose skeleton schema v1', () => {
 		expect(() => parsePoseObservationV1(unpinnedModel, humanCoco17PoseSchemaV1)).toThrow(/exact model revision/i);
 	});
 
+	it('accepts a bounded manual ground-contact candidate and rejects an out-of-frame or model-authored point', () => {
+		const candidate = { ...observation, groundContact: { imagePx: [320, 470], footSide: 'left', label: 'operator-marked-ground-contact-candidate' } };
+		expect(parsePoseObservationV1(candidate, humanCoco17PoseSchemaV1).groundContact?.imagePx).toEqual([320, 470]);
+		expect(() => parsePoseObservationV1({ ...candidate, groundContact: { ...candidate.groundContact, imagePx: [320, 481] } }, humanCoco17PoseSchemaV1)).toThrow(/inside the source frame/i);
+		expect(() => parsePoseObservationV1({ ...candidate, origin: 'model', modelRevision: 'model@sha256:rev' }, humanCoco17PoseSchemaV1)).toThrow(/manually marked/i);
+	});
+
 	it('requires species-specific, uniquely indexed animal schemas', () => {
 		const animal = { ...humanCoco17PoseSchemaV1, schemaId: 'animal.example.v1', subjectKind: 'animal' as const, species: null };
 		expect(poseSkeletonSchemaV1Schema.safeParse(animal).success).toBe(false);

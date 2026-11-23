@@ -28,7 +28,8 @@ function sanitizeFilename(filename: string): string {
  */
 export async function extractTextFromImage(
     imageBuffer: Buffer,
-    filename: string
+    filename: string,
+    timeoutMs?: number,
 ): Promise<OcrResult> {
     const tempDir = tmpdir();
     const safeFilename = sanitizeFilename(filename);
@@ -40,7 +41,7 @@ export async function extractTextFromImage(
         await fs.writeFile(tempFile, imageBuffer);
 
         // Run Tesseract OCR
-        const text = await runTesseract(tempFile, outputFile);
+        const text = await runTesseract(tempFile, outputFile, timeoutMs);
 
         // Clean up temp files
         await Promise.all([
@@ -68,7 +69,7 @@ export async function extractTextFromImage(
 /**
  * Run Tesseract command and return extracted text
  */
-function runTesseract(inputPath: string, outputPath: string): Promise<string> {
+function runTesseract(inputPath: string, outputPath: string, timeoutMs?: number): Promise<string> {
     return new Promise((resolve, reject) => {
         const tesseract = spawn('tesseract', [
             inputPath,
@@ -80,18 +81,24 @@ function runTesseract(inputPath: string, outputPath: string): Promise<string> {
             'txt' // Output format
         ]);
 
-        let stdout = '';
+        let timedOut = false;
+        const timeout = timeoutMs === undefined ? undefined : setTimeout(() => {
+            timedOut = true;
+            tesseract.kill('SIGKILL');
+        }, timeoutMs);
+        tesseract.stdout.resume();
         let stderr = '';
-
-        tesseract.stdout.on('data', (data) => {
-            stdout += data.toString();
-        });
 
         tesseract.stderr.on('data', (data) => {
             stderr += data.toString();
         });
 
         tesseract.on('close', (code) => {
+            clearTimeout(timeout);
+            if (timedOut) {
+                reject(new Error('Tesseract exceeded its time limit'));
+                return;
+            }
             if (code === 0) {
                 // Read the output text file
                 fs.readFile(`${outputPath}.txt`, 'utf8').then(resolve).catch(reject);
@@ -101,6 +108,7 @@ function runTesseract(inputPath: string, outputPath: string): Promise<string> {
         });
 
         tesseract.on('error', (error) => {
+            clearTimeout(timeout);
             reject(new Error(`Failed to start Tesseract: ${error.message}`));
         });
     });

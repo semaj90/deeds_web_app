@@ -3,6 +3,11 @@ import {
 	INDEXED_PALETTE_TEXTURE_REVISION_V1,
 	type IndexedTexture4BppV1
 } from './indexed-palette-texture-v1.js';
+import {
+	IDENTITY_MODE7_UV_AFFINE_V1,
+	parseMode7UvAffineV1,
+	type Mode7UvAffineV1,
+} from './mode7-uv-affine-v1.js';
 
 export const INDEXED_PALETTE_SHADER_REVISION_V1 = 'atlas-indexed-palette-shader-v1' as const;
 
@@ -119,9 +124,11 @@ export function createIndexedPaletteShaderMaterialV1(
 	sourceMaterial: any,
 	indexed: IndexedTexture4BppV1,
 	maxTextureSize = 4096,
-	sharedTextures?: IndexedPaletteShaderTexturesV1
+	sharedTextures?: IndexedPaletteShaderTexturesV1,
+	uvAffine: Mode7UvAffineV1 = IDENTITY_MODE7_UV_AFFINE_V1,
 ): IndexedPaletteShaderMaterialV1 {
 	if (!sourceMaterial?.map) throw new Error('INDEXED_PALETTE_SHADER_REQUIRES_UV_MAPPED_SOURCE_MATERIAL');
+	const [a, b, tx, c, d, ty] = parseMode7UvAffineV1(uvAffine);
 	const textures = sharedTextures ?? createIndexedPaletteShaderTexturesV1(three, indexed, maxTextureSize);
 	const material = sourceMaterial.clone();
 	const priorCompile = material.onBeforeCompile;
@@ -136,20 +143,25 @@ export function createIndexedPaletteShaderMaterialV1(
 		shader.uniforms.uAtlasPalette = { value: textures.paletteTexture };
 		shader.uniforms.uAtlasSourceSize = { value: new three.Vector2(indexed.width, indexed.height) };
 		shader.uniforms.uAtlasPackedSize = { value: new three.Vector2(textures.packedTextureWidth, textures.packedTextureHeight) };
+		shader.uniforms.uAtlasUvAffine0 = { value: new three.Vector3(a, b, tx) };
+		shader.uniforms.uAtlasUvAffine1 = { value: new three.Vector3(c, d, ty) };
 		shader.fragmentShader = shader.fragmentShader.replace(
 			'#include <common>',
 			`#include <common>\n` +
 			'uniform sampler2D uAtlasPackedIndices;\n' +
 			'uniform sampler2D uAtlasPalette;\n' +
 			'uniform vec2 uAtlasSourceSize;\n' +
-			'uniform vec2 uAtlasPackedSize;'
+			'uniform vec2 uAtlasPackedSize;\n' +
+			'uniform vec3 uAtlasUvAffine0;\n' +
+			'uniform vec3 uAtlasUvAffine1;'
 		);
 		shader.fragmentShader = shader.fragmentShader.replace(
 			'#include <map_fragment>',
 			`#ifdef USE_MAP
+	vec2 atlasUv = vec2(dot(uAtlasUvAffine0, vec3(vMapUv, 1.0)), dot(uAtlasUvAffine1, vec3(vMapUv, 1.0)));
 	vec2 atlasPixel = vec2(
-		floor(clamp(vMapUv.x, 0.0, 0.999999) * uAtlasSourceSize.x),
-		floor(clamp(1.0 - vMapUv.y, 0.0, 0.999999) * uAtlasSourceSize.y)
+		floor(clamp(atlasUv.x, 0.0, 0.999999) * uAtlasSourceSize.x),
+		floor(clamp(1.0 - atlasUv.y, 0.0, 0.999999) * uAtlasSourceSize.y)
 	);
 	float atlasPixelOrdinal = atlasPixel.y * uAtlasSourceSize.x + atlasPixel.x;
 	float atlasByteOrdinal = floor(atlasPixelOrdinal * 0.5);
@@ -176,7 +188,8 @@ export function createIndexedPaletteShaderMaterialV1(
 		...material.userData,
 		atlasIndexedPaletteShaderRevision: INDEXED_PALETTE_SHADER_REVISION_V1,
 		atlasIndexedPaletteFormat: indexed.format,
-		atlasIndexedPaletteRevision: indexed.paletteRevision
+		atlasIndexedPaletteRevision: indexed.paletteRevision,
+		atlasIndexedPaletteUvAffine: [a, b, tx, c, d, ty],
 	};
 	material.needsUpdate = true;
 	return { material, textures };
@@ -199,11 +212,13 @@ export function createIndexedPaletteTslMaterialV1(
 	sourceMaterial: any,
 	indexed: IndexedTexture4BppV1,
 	maxTextureSize = 4096,
-	sharedTextures?: IndexedPaletteShaderTexturesV1
+	sharedTextures?: IndexedPaletteShaderTexturesV1,
+	uvAffine: Mode7UvAffineV1 = IDENTITY_MODE7_UV_AFFINE_V1,
 ): IndexedPaletteTslMaterialV1 {
 	if (!sourceMaterial?.map) throw new Error('INDEXED_PALETTE_TSL_REQUIRES_UV_MAPPED_SOURCE_MATERIAL');
 	const tsl = three?.TSL;
 	if (!tsl || !three.MeshStandardNodeMaterial) throw new Error('INDEXED_PALETTE_TSL_UNAVAILABLE');
+	const [a, b, tx, c, d, ty] = parseMode7UvAffineV1(uvAffine);
 	const textures = sharedTextures ?? createIndexedPaletteShaderTexturesV1(three, indexed, maxTextureSize);
 	const { texture, uv, uniform, vec2, vec3, float, select, mod, floor, clamp } = tsl;
 
@@ -213,8 +228,10 @@ export function createIndexedPaletteTslMaterialV1(
 	const paletteTexture = texture(textures.paletteTexture);
 
 	const coord = uv();
-	const pixelX = floor(clamp(coord.x, float(0), float(0.999999)).mul(sourceSize.x));
-	const pixelY = floor(clamp(float(1).sub(coord.y), float(0), float(0.999999)).mul(sourceSize.y));
+	const atlasU = coord.x.mul(a).add(coord.y.mul(b)).add(tx);
+	const atlasV = coord.x.mul(c).add(coord.y.mul(d)).add(ty);
+	const pixelX = floor(clamp(atlasU, float(0), float(0.999999)).mul(sourceSize.x));
+	const pixelY = floor(clamp(float(1).sub(atlasV), float(0), float(0.999999)).mul(sourceSize.y));
 	const ordinal = pixelY.mul(sourceSize.x).add(pixelX);
 	const byteOrdinal = floor(ordinal.mul(0.5));
 	const byteU = mod(byteOrdinal, packedSize.x).add(0.5).div(packedSize.x);
@@ -241,7 +258,8 @@ export function createIndexedPaletteTslMaterialV1(
 		atlasIndexedPaletteShaderRevision: INDEXED_PALETTE_SHADER_REVISION_V1,
 		atlasIndexedPaletteFormat: indexed.format,
 		atlasIndexedPaletteRevision: indexed.paletteRevision,
-		atlasIndexedPaletteRendererPath: 'webgpu-tsl-packed'
+		atlasIndexedPaletteRendererPath: 'webgpu-tsl-packed',
+		atlasIndexedPaletteUvAffine: [a, b, tx, c, d, ty],
 	};
 	material.needsUpdate = true;
 	return { material, textures };

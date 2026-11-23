@@ -1,0 +1,37 @@
+{
+  "schema": "parent_atlas_primitive_math_v2_review.v1",
+  "status": "PARTIAL",
+  "date": "2026-11-19",
+  "worktreeRevision": "b283b7436c1ecc5d8a380784a8ec974b64f6c7ab",
+  "package": "C:/Users/james/Downloads/parent_atlas_primitive_math_v2",
+  "packageMainSha256": "24F1A3E16EB1151A46362FA91114C6C8B17FC84FDCF3F1D771CD83FDDA778F5B",
+  "likely_cause": "The download is a standalone helper package, while the app already owns its primitive recipes, renderer, scene transform arena, identity, and retrieval representations.",
+  "review": {
+    "adopted": "Ported bounded simple-polygon validation and ear-clipping math into the SvelteKit primitive library, then invoked validation at the existing SPZ renderer polygon-prism construction boundary.",
+    "already_present": "The canonical scene primitive registry already defines polygon-prism geometry and the demo already renders it with Three.js Shape and ExtrudeGeometry; no second polygon primitive registry was added.",
+    "deferred": [
+      "32-byte instance packet: no cryptographic checksum, transport schema or manifest binding; keep out of persisted/authenticated artifact flow until separately versioned and qualified.",
+      "Morton tile keys and screen-size LOD: no demonstrated residency owner or measured performance need in this integration.",
+      "MRL truncation and cosine helper: do not wire until tied to the pinned EmbeddingGemma producer and existing vector representation/index owner.",
+      "ACE retrieval card: package projection is not canonical ACE schema or authority."
+    ]
+  },
+  "verification": {
+    "adversarial_command": "node --import tsx --input-type=module -e \"import { triangulateSimplePolygonV1, estimatePolygonPrismTrianglesV1 } from './src/lib/splat/polygon-prism-validation-v1.ts'; const concave=[[0,0],[3,0],[3,2],[1.5,1],[0,2]]; const tris=triangulateSimplePolygonV1(concave); let rejected=false; try { triangulateSimplePolygonV1([[0,0],[2,2],[0,2],[2,0]]); } catch { rejected=true; } if(tris.length!==9||estimatePolygonPrismTrianglesV1(5)!==16||!rejected) process.exit(1); console.log(JSON.stringify({concaveTriangleCount:tris.length/3,prismTriangleCount:estimatePolygonPrismTrianglesV1(5),selfIntersectingRejected:rejected}));\"",
+    "adversarial_output": "{\"concaveTriangleCount\":3,\"prismTriangleCount\":16,\"selfIntersectingRejected\":true}",
+    "adversarial_exit_code": 0,
+    "native_check_command": "npm run check:native",
+    "native_check_output": "COMPLETED 2167 FILES 11 ERRORS 0 WARNINGS 2 FILES_WITH_PROBLEMS; diagnostics only in src/lib/components/evidence/StorybookAuthorities.svelte and src/routes/api/cases/[id]/storybook-authorities/+server.ts; no diagnostics in the changed files.",
+    "native_check_exit_code": 1,
+    "diff_check": "git diff --check passed."
+  },
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/splat/polygon-prism-validation-v1.ts",
+    "sveltekit-frontend/src/routes/(app)/demos/spz-renderer/+page.svelte",
+    "openspec/changes/crime-scene-reconstruction/tasks.md"
+  ],
+  "safe_next_command": "cd sveltekit-frontend; npm run check:native",
+  "smoke_command": "The focused adversarial geometry probe recorded above; passed for a concave polygon and rejected a self-intersecting polygon.",
+  "report_path": "docs/reports/parent-atlas-primitive-math-v2-review-20261119.json",
+  "scope_limit": "This is a helper integration in the existing demo geometry path. Compact packet persistence, saved scene revisions, browser rendering, and production scene editing are not proven by this receipt."
+}

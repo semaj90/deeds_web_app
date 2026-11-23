@@ -27,7 +27,7 @@ const frontendRoot = path.join(repoRoot, 'sveltekit-frontend');
 const args = process.argv.slice(2);
 const verifyDb = args.includes('--verify-db');
 const routeRel = (args.find((a) => !a.startsWith('--')) ?? 'src/routes/api/ace/summarize/+server.ts').replace(/\\/g, '/');
-if (!/^src\/routes\/[A-Za-z0-9_.\-/()[\]+]+\/\+server\.ts$/.test(routeRel) || routeRel.includes('..')) {
+if (!/^src\/routes\/[A-Za-z0-9_.\-/()[\]+%]+\/\+server\.ts$/.test(routeRel) || routeRel.split('/').includes('..')) {
   throw new Error(`REFUSING: not a frontend-relative +server.ts route path: ${routeRel}`);
 }
 const WORKSPACE_ID = 'repo:deeds-web-app'; // caller-supplied, not derived; workspace_revision stays NULL (not an admitted snapshot)

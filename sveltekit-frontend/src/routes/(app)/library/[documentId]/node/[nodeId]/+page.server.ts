@@ -68,6 +68,13 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	if (!locals.user?.id) throw redirect(303, '/login');
 	const { documentId, nodeId } = params;
 
+	// legal_nodes.id, legal_nodes.document_id and library_documents.id are uuid columns. A malformed
+	// ID cannot match a row, so return 404 instead of letting Postgres reject the cast as a 500.
+	const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+	if (!UUID_RE.test(nodeId) || !UUID_RE.test(documentId)) {
+		throw error(404, 'Legal node not found');
+	}
+
 	try {
 		// 1. Fetch the node and its document
 		const nodeRes = await pool.query(

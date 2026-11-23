@@ -1,0 +1,3553 @@
+{
+  "@context": {
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "pa": "urn:parent-atlas:scene-ontology:v1:",
+    "prefLabel": "skos:prefLabel",
+    "broader": {
+      "@id": "skos:broader",
+      "@type": "@id"
+    },
+    "inScheme": {
+      "@id": "skos:inScheme",
+      "@type": "@id"
+    }
+  },
+  "@graph": [
+    {
+      "@id": "pa:scheme",
+      "@type": "skos:ConceptScheme",
+      "prefLabel": "Parent Atlas spatial scene ontology v1 (PROPOSED; non-canonical)"
+    },
+    {
+      "@id": "pa:space",
+      "@type": "skos:Concept",
+      "prefLabel": "Space",
+      "inScheme": "pa:scheme"
+    },
+    {
+      "@id": "pa:space.site",
+      "@type": "skos:Concept",
+      "prefLabel": "Site",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space"
+    },
+    {
+      "@id": "pa:space.site.urban",
+      "@type": "skos:Concept",
+      "prefLabel": "Urban",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.site"
+    },
+    {
+      "@id": "pa:space.site.beach",
+      "@type": "skos:Concept",
+      "prefLabel": "Beach",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.site"
+    },
+    {
+      "@id": "pa:space.site.rural",
+      "@type": "skos:Concept",
+      "prefLabel": "Rural",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.site"
+    },
+    {
+      "@id": "pa:space.site.suburban",
+      "@type": "skos:Concept",
+      "prefLabel": "Suburban",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.site"
+    },
+    {
+      "@id": "pa:space.site.industrial",
+      "@type": "skos:Concept",
+      "prefLabel": "Industrial",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.site"
+    },
+    {
+      "@id": "pa:space.site.park",
+      "@type": "skos:Concept",
+      "prefLabel": "Park",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.site"
+    },
+    {
+      "@id": "pa:space.site.highway",
+      "@type": "skos:Concept",
+      "prefLabel": "Highway",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.site"
+    },
+    {
+      "@id": "pa:space.site.forest",
+      "@type": "skos:Concept",
+      "prefLabel": "Forest",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.site"
+    },
+    {
+      "@id": "pa:space.site.waterfront",
+      "@type": "skos:Concept",
+      "prefLabel": "Waterfront",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.site"
+    },
+    {
+      "@id": "pa:space.site.underground",
+      "@type": "skos:Concept",
+      "prefLabel": "Underground",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.site"
+    },
+    {
+      "@id": "pa:space.building",
+      "@type": "skos:Concept",
+      "prefLabel": "Building",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space"
+    },
+    {
+      "@id": "pa:space.building.house",
+      "@type": "skos:Concept",
+      "prefLabel": "House",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.building"
+    },
+    {
+      "@id": "pa:space.building.apartment",
+      "@type": "skos:Concept",
+      "prefLabel": "Apartment",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.building"
+    },
+    {
+      "@id": "pa:space.building.studio",
+      "@type": "skos:Concept",
+      "prefLabel": "Studio",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.building"
+    },
+    {
+      "@id": "pa:space.building.condominium",
+      "@type": "skos:Concept",
+      "prefLabel": "Condominium",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.building"
+    },
+    {
+      "@id": "pa:space.building.townhouse",
+      "@type": "skos:Concept",
+      "prefLabel": "Townhouse",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.building"
+    },
+    {
+      "@id": "pa:space.building.hotel",
+      "@type": "skos:Concept",
+      "prefLabel": "Hotel",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.building"
+    },
+    {
+      "@id": "pa:space.building.motel",
+      "@type": "skos:Concept",
+      "prefLabel": "Motel",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.building"
+    },
+    {
+      "@id": "pa:space.building.warehouse",
+      "@type": "skos:Concept",
+      "prefLabel": "Warehouse",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.building"
+    },
+    {
+      "@id": "pa:space.building.office",
+      "@type": "skos:Concept",
+      "prefLabel": "Office",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.building"
+    },
+    {
+      "@id": "pa:space.building.courthouse",
+      "@type": "skos:Concept",
+      "prefLabel": "Courthouse",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.building"
+    },
+    {
+      "@id": "pa:space.building.shop",
+      "@type": "skos:Concept",
+      "prefLabel": "Shop",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.building"
+    },
+    {
+      "@id": "pa:space.building.restaurant",
+      "@type": "skos:Concept",
+      "prefLabel": "Restaurant",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.building"
+    },
+    {
+      "@id": "pa:space.building.garage",
+      "@type": "skos:Concept",
+      "prefLabel": "Garage",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.building"
+    },
+    {
+      "@id": "pa:space.floor",
+      "@type": "skos:Concept",
+      "prefLabel": "Floor",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space"
+    },
+    {
+      "@id": "pa:space.floor.ground",
+      "@type": "skos:Concept",
+      "prefLabel": "Ground",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.floor"
+    },
+    {
+      "@id": "pa:space.floor.upper",
+      "@type": "skos:Concept",
+      "prefLabel": "Upper",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.floor"
+    },
+    {
+      "@id": "pa:space.floor.basement",
+      "@type": "skos:Concept",
+      "prefLabel": "Basement",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.floor"
+    },
+    {
+      "@id": "pa:space.floor.attic",
+      "@type": "skos:Concept",
+      "prefLabel": "Attic",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.floor"
+    },
+    {
+      "@id": "pa:space.floor.mezzanine",
+      "@type": "skos:Concept",
+      "prefLabel": "Mezzanine",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.floor"
+    },
+    {
+      "@id": "pa:space.floor.roof",
+      "@type": "skos:Concept",
+      "prefLabel": "Roof",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.floor"
+    },
+    {
+      "@id": "pa:space.room",
+      "@type": "skos:Concept",
+      "prefLabel": "Room",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space"
+    },
+    {
+      "@id": "pa:space.room.bedroom",
+      "@type": "skos:Concept",
+      "prefLabel": "Bedroom",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.room.bathroom",
+      "@type": "skos:Concept",
+      "prefLabel": "Bathroom",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.room.kitchen",
+      "@type": "skos:Concept",
+      "prefLabel": "Kitchen",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.room.living-room",
+      "@type": "skos:Concept",
+      "prefLabel": "Living Room",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.room.dining-room",
+      "@type": "skos:Concept",
+      "prefLabel": "Dining Room",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.room.hallway",
+      "@type": "skos:Concept",
+      "prefLabel": "Hallway",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.room.foyer",
+      "@type": "skos:Concept",
+      "prefLabel": "Foyer",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.room.stairwell",
+      "@type": "skos:Concept",
+      "prefLabel": "Stairwell",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.room.study",
+      "@type": "skos:Concept",
+      "prefLabel": "Study",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.room.nursery",
+      "@type": "skos:Concept",
+      "prefLabel": "Nursery",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.room.laundry",
+      "@type": "skos:Concept",
+      "prefLabel": "Laundry",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.room.utility",
+      "@type": "skos:Concept",
+      "prefLabel": "Utility",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.room.balcony",
+      "@type": "skos:Concept",
+      "prefLabel": "Balcony",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.room.terrace",
+      "@type": "skos:Concept",
+      "prefLabel": "Terrace",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.room.closet",
+      "@type": "skos:Concept",
+      "prefLabel": "Closet",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.room"
+    },
+    {
+      "@id": "pa:space.outdoor-zone",
+      "@type": "skos:Concept",
+      "prefLabel": "Outdoor Zone",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space"
+    },
+    {
+      "@id": "pa:space.outdoor-zone.sidewalk",
+      "@type": "skos:Concept",
+      "prefLabel": "Sidewalk",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.outdoor-zone"
+    },
+    {
+      "@id": "pa:space.outdoor-zone.intersection",
+      "@type": "skos:Concept",
+      "prefLabel": "Intersection",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.outdoor-zone"
+    },
+    {
+      "@id": "pa:space.outdoor-zone.crosswalk",
+      "@type": "skos:Concept",
+      "prefLabel": "Crosswalk",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.outdoor-zone"
+    },
+    {
+      "@id": "pa:space.outdoor-zone.parking-lot",
+      "@type": "skos:Concept",
+      "prefLabel": "Parking Lot",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.outdoor-zone"
+    },
+    {
+      "@id": "pa:space.outdoor-zone.alley",
+      "@type": "skos:Concept",
+      "prefLabel": "Alley",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.outdoor-zone"
+    },
+    {
+      "@id": "pa:space.outdoor-zone.road",
+      "@type": "skos:Concept",
+      "prefLabel": "Road",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.outdoor-zone"
+    },
+    {
+      "@id": "pa:space.outdoor-zone.plaza",
+      "@type": "skos:Concept",
+      "prefLabel": "Plaza",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.outdoor-zone"
+    },
+    {
+      "@id": "pa:space.outdoor-zone.patio",
+      "@type": "skos:Concept",
+      "prefLabel": "Patio",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.outdoor-zone"
+    },
+    {
+      "@id": "pa:space.outdoor-zone.yard",
+      "@type": "skos:Concept",
+      "prefLabel": "Yard",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.outdoor-zone"
+    },
+    {
+      "@id": "pa:space.outdoor-zone.sand-dune",
+      "@type": "skos:Concept",
+      "prefLabel": "Sand Dune",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.outdoor-zone"
+    },
+    {
+      "@id": "pa:space.outdoor-zone.shore",
+      "@type": "skos:Concept",
+      "prefLabel": "Shore",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.outdoor-zone"
+    },
+    {
+      "@id": "pa:space.outdoor-zone.pier",
+      "@type": "skos:Concept",
+      "prefLabel": "Pier",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.outdoor-zone"
+    },
+    {
+      "@id": "pa:space.outdoor-zone.pool",
+      "@type": "skos:Concept",
+      "prefLabel": "Pool",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.outdoor-zone"
+    },
+    {
+      "@id": "pa:space.outdoor-zone.garden",
+      "@type": "skos:Concept",
+      "prefLabel": "Garden",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.outdoor-zone"
+    },
+    {
+      "@id": "pa:space.structure",
+      "@type": "skos:Concept",
+      "prefLabel": "Structure",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space"
+    },
+    {
+      "@id": "pa:space.structure.wall",
+      "@type": "skos:Concept",
+      "prefLabel": "Wall",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.structure"
+    },
+    {
+      "@id": "pa:space.structure.floor-slab",
+      "@type": "skos:Concept",
+      "prefLabel": "Floor Slab",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.structure"
+    },
+    {
+      "@id": "pa:space.structure.ceiling",
+      "@type": "skos:Concept",
+      "prefLabel": "Ceiling",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.structure"
+    },
+    {
+      "@id": "pa:space.structure.roof",
+      "@type": "skos:Concept",
+      "prefLabel": "Roof",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.structure"
+    },
+    {
+      "@id": "pa:space.structure.door",
+      "@type": "skos:Concept",
+      "prefLabel": "Door",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.structure"
+    },
+    {
+      "@id": "pa:space.structure.window",
+      "@type": "skos:Concept",
+      "prefLabel": "Window",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.structure"
+    },
+    {
+      "@id": "pa:space.structure.doorway",
+      "@type": "skos:Concept",
+      "prefLabel": "Doorway",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.structure"
+    },
+    {
+      "@id": "pa:space.structure.stair",
+      "@type": "skos:Concept",
+      "prefLabel": "Stair",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.structure"
+    },
+    {
+      "@id": "pa:space.structure.railing",
+      "@type": "skos:Concept",
+      "prefLabel": "Railing",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.structure"
+    },
+    {
+      "@id": "pa:space.structure.pillar",
+      "@type": "skos:Concept",
+      "prefLabel": "Pillar",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.structure"
+    },
+    {
+      "@id": "pa:space.structure.fence",
+      "@type": "skos:Concept",
+      "prefLabel": "Fence",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.structure"
+    },
+    {
+      "@id": "pa:space.structure.gate",
+      "@type": "skos:Concept",
+      "prefLabel": "Gate",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.structure"
+    },
+    {
+      "@id": "pa:space.structure.canopy",
+      "@type": "skos:Concept",
+      "prefLabel": "Canopy",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.structure"
+    },
+    {
+      "@id": "pa:space.navigation",
+      "@type": "skos:Concept",
+      "prefLabel": "Navigation",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space"
+    },
+    {
+      "@id": "pa:space.navigation.exit",
+      "@type": "skos:Concept",
+      "prefLabel": "Exit",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.navigation"
+    },
+    {
+      "@id": "pa:space.navigation.entry",
+      "@type": "skos:Concept",
+      "prefLabel": "Entry",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.navigation"
+    },
+    {
+      "@id": "pa:space.navigation.corridor",
+      "@type": "skos:Concept",
+      "prefLabel": "Corridor",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.navigation"
+    },
+    {
+      "@id": "pa:space.navigation.obstacle",
+      "@type": "skos:Concept",
+      "prefLabel": "Obstacle",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.navigation"
+    },
+    {
+      "@id": "pa:space.navigation.accessible-path",
+      "@type": "skos:Concept",
+      "prefLabel": "Accessible Path",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.navigation"
+    },
+    {
+      "@id": "pa:space.navigation.portal",
+      "@type": "skos:Concept",
+      "prefLabel": "Portal",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.navigation"
+    },
+    {
+      "@id": "pa:space.navigation.threshold",
+      "@type": "skos:Concept",
+      "prefLabel": "Threshold",
+      "inScheme": "pa:scheme",
+      "broader": "pa:space.navigation"
+    },
+    {
+      "@id": "pa:geometry",
+      "@type": "skos:Concept",
+      "prefLabel": "Geometry",
+      "inScheme": "pa:scheme"
+    },
+    {
+      "@id": "pa:geometry.primitive",
+      "@type": "skos:Concept",
+      "prefLabel": "Primitive",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry"
+    },
+    {
+      "@id": "pa:geometry.primitive.box",
+      "@type": "skos:Concept",
+      "prefLabel": "Box",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.primitive"
+    },
+    {
+      "@id": "pa:geometry.primitive.sphere",
+      "@type": "skos:Concept",
+      "prefLabel": "Sphere",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.primitive"
+    },
+    {
+      "@id": "pa:geometry.primitive.cylinder",
+      "@type": "skos:Concept",
+      "prefLabel": "Cylinder",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.primitive"
+    },
+    {
+      "@id": "pa:geometry.primitive.cone",
+      "@type": "skos:Concept",
+      "prefLabel": "Cone",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.primitive"
+    },
+    {
+      "@id": "pa:geometry.primitive.torus",
+      "@type": "skos:Concept",
+      "prefLabel": "Torus",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.primitive"
+    },
+    {
+      "@id": "pa:geometry.primitive.plane",
+      "@type": "skos:Concept",
+      "prefLabel": "Plane",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.primitive"
+    },
+    {
+      "@id": "pa:geometry.primitive.circle",
+      "@type": "skos:Concept",
+      "prefLabel": "Circle",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.primitive"
+    },
+    {
+      "@id": "pa:geometry.primitive.rectangle",
+      "@type": "skos:Concept",
+      "prefLabel": "Rectangle",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.primitive"
+    },
+    {
+      "@id": "pa:geometry.primitive.line",
+      "@type": "skos:Concept",
+      "prefLabel": "Line",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.primitive"
+    },
+    {
+      "@id": "pa:geometry.primitive.capsule",
+      "@type": "skos:Concept",
+      "prefLabel": "Capsule",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.primitive"
+    },
+    {
+      "@id": "pa:geometry.primitive.polygon-prism",
+      "@type": "skos:Concept",
+      "prefLabel": "Polygon Prism",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.primitive"
+    },
+    {
+      "@id": "pa:geometry.composite",
+      "@type": "skos:Concept",
+      "prefLabel": "Composite",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry"
+    },
+    {
+      "@id": "pa:geometry.composite.table",
+      "@type": "skos:Concept",
+      "prefLabel": "Table",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.composite"
+    },
+    {
+      "@id": "pa:geometry.composite.sofa",
+      "@type": "skos:Concept",
+      "prefLabel": "Sofa",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.composite"
+    },
+    {
+      "@id": "pa:geometry.composite.chair",
+      "@type": "skos:Concept",
+      "prefLabel": "Chair",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.composite"
+    },
+    {
+      "@id": "pa:geometry.composite.bed",
+      "@type": "skos:Concept",
+      "prefLabel": "Bed",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.composite"
+    },
+    {
+      "@id": "pa:geometry.composite.cabinet",
+      "@type": "skos:Concept",
+      "prefLabel": "Cabinet",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.composite"
+    },
+    {
+      "@id": "pa:geometry.composite.shelf",
+      "@type": "skos:Concept",
+      "prefLabel": "Shelf",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.composite"
+    },
+    {
+      "@id": "pa:geometry.composite.lamp",
+      "@type": "skos:Concept",
+      "prefLabel": "Lamp",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.composite"
+    },
+    {
+      "@id": "pa:geometry.composite.door-frame",
+      "@type": "skos:Concept",
+      "prefLabel": "Door Frame",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.composite"
+    },
+    {
+      "@id": "pa:geometry.composite.staircase",
+      "@type": "skos:Concept",
+      "prefLabel": "Staircase",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.composite"
+    },
+    {
+      "@id": "pa:geometry.composite.person-proxy",
+      "@type": "skos:Concept",
+      "prefLabel": "Person Proxy",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.composite"
+    },
+    {
+      "@id": "pa:geometry.composite.vehicle-proxy",
+      "@type": "skos:Concept",
+      "prefLabel": "Vehicle Proxy",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.composite"
+    },
+    {
+      "@id": "pa:geometry.composite.beach-umbrella",
+      "@type": "skos:Concept",
+      "prefLabel": "Beach Umbrella",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.composite"
+    },
+    {
+      "@id": "pa:geometry.representation",
+      "@type": "skos:Concept",
+      "prefLabel": "Representation",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry"
+    },
+    {
+      "@id": "pa:geometry.representation.mesh",
+      "@type": "skos:Concept",
+      "prefLabel": "Mesh",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.representation"
+    },
+    {
+      "@id": "pa:geometry.representation.glb",
+      "@type": "skos:Concept",
+      "prefLabel": "Glb",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.representation"
+    },
+    {
+      "@id": "pa:geometry.representation.skinned-mesh",
+      "@type": "skos:Concept",
+      "prefLabel": "Skinned Mesh",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.representation"
+    },
+    {
+      "@id": "pa:geometry.representation.instanced-mesh",
+      "@type": "skos:Concept",
+      "prefLabel": "Instanced Mesh",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.representation"
+    },
+    {
+      "@id": "pa:geometry.representation.billboard",
+      "@type": "skos:Concept",
+      "prefLabel": "Billboard",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.representation"
+    },
+    {
+      "@id": "pa:geometry.representation.sprite",
+      "@type": "skos:Concept",
+      "prefLabel": "Sprite",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.representation"
+    },
+    {
+      "@id": "pa:geometry.representation.gaussian-splat",
+      "@type": "skos:Concept",
+      "prefLabel": "Gaussian Splat",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.representation"
+    },
+    {
+      "@id": "pa:geometry.representation.spz",
+      "@type": "skos:Concept",
+      "prefLabel": "Spz",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.representation"
+    },
+    {
+      "@id": "pa:geometry.representation.point-cloud",
+      "@type": "skos:Concept",
+      "prefLabel": "Point Cloud",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.representation"
+    },
+    {
+      "@id": "pa:geometry.representation.depth-relief",
+      "@type": "skos:Concept",
+      "prefLabel": "Depth Relief",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.representation"
+    },
+    {
+      "@id": "pa:geometry.representation.source-image-plane",
+      "@type": "skos:Concept",
+      "prefLabel": "Source Image Plane",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.representation"
+    },
+    {
+      "@id": "pa:geometry.shape-operation",
+      "@type": "skos:Concept",
+      "prefLabel": "Shape Operation",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry"
+    },
+    {
+      "@id": "pa:geometry.shape-operation.translate",
+      "@type": "skos:Concept",
+      "prefLabel": "Translate",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.shape-operation"
+    },
+    {
+      "@id": "pa:geometry.shape-operation.rotate",
+      "@type": "skos:Concept",
+      "prefLabel": "Rotate",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.shape-operation"
+    },
+    {
+      "@id": "pa:geometry.shape-operation.scale",
+      "@type": "skos:Concept",
+      "prefLabel": "Scale",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.shape-operation"
+    },
+    {
+      "@id": "pa:geometry.shape-operation.group",
+      "@type": "skos:Concept",
+      "prefLabel": "Group",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.shape-operation"
+    },
+    {
+      "@id": "pa:geometry.shape-operation.parent-child",
+      "@type": "skos:Concept",
+      "prefLabel": "Parent Child",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.shape-operation"
+    },
+    {
+      "@id": "pa:geometry.shape-operation.union",
+      "@type": "skos:Concept",
+      "prefLabel": "Union",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.shape-operation"
+    },
+    {
+      "@id": "pa:geometry.shape-operation.subtract",
+      "@type": "skos:Concept",
+      "prefLabel": "Subtract",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.shape-operation"
+    },
+    {
+      "@id": "pa:geometry.shape-operation.intersect",
+      "@type": "skos:Concept",
+      "prefLabel": "Intersect",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.shape-operation"
+    },
+    {
+      "@id": "pa:geometry.shape-operation.extrude",
+      "@type": "skos:Concept",
+      "prefLabel": "Extrude",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.shape-operation"
+    },
+    {
+      "@id": "pa:geometry.shape-operation.mirror",
+      "@type": "skos:Concept",
+      "prefLabel": "Mirror",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.shape-operation"
+    },
+    {
+      "@id": "pa:geometry.shape-operation.array",
+      "@type": "skos:Concept",
+      "prefLabel": "Array",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.shape-operation"
+    },
+    {
+      "@id": "pa:geometry.shape-operation.loft",
+      "@type": "skos:Concept",
+      "prefLabel": "Loft",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.shape-operation"
+    },
+    {
+      "@id": "pa:geometry.precision",
+      "@type": "skos:Concept",
+      "prefLabel": "Precision",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry"
+    },
+    {
+      "@id": "pa:geometry.precision.schematic",
+      "@type": "skos:Concept",
+      "prefLabel": "Schematic",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.precision"
+    },
+    {
+      "@id": "pa:geometry.precision.inferred",
+      "@type": "skos:Concept",
+      "prefLabel": "Inferred",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.precision"
+    },
+    {
+      "@id": "pa:geometry.precision.relative-depth",
+      "@type": "skos:Concept",
+      "prefLabel": "Relative Depth",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.precision"
+    },
+    {
+      "@id": "pa:geometry.precision.calibrated",
+      "@type": "skos:Concept",
+      "prefLabel": "Calibrated",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.precision"
+    },
+    {
+      "@id": "pa:geometry.precision.metric",
+      "@type": "skos:Concept",
+      "prefLabel": "Metric",
+      "inScheme": "pa:scheme",
+      "broader": "pa:geometry.precision"
+    },
+    {
+      "@id": "pa:object",
+      "@type": "skos:Concept",
+      "prefLabel": "Object",
+      "inScheme": "pa:scheme"
+    },
+    {
+      "@id": "pa:object.furniture",
+      "@type": "skos:Concept",
+      "prefLabel": "Furniture",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object"
+    },
+    {
+      "@id": "pa:object.furniture.chair",
+      "@type": "skos:Concept",
+      "prefLabel": "Chair",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.furniture"
+    },
+    {
+      "@id": "pa:object.furniture.table",
+      "@type": "skos:Concept",
+      "prefLabel": "Table",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.furniture"
+    },
+    {
+      "@id": "pa:object.furniture.desk",
+      "@type": "skos:Concept",
+      "prefLabel": "Desk",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.furniture"
+    },
+    {
+      "@id": "pa:object.furniture.sofa",
+      "@type": "skos:Concept",
+      "prefLabel": "Sofa",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.furniture"
+    },
+    {
+      "@id": "pa:object.furniture.bed",
+      "@type": "skos:Concept",
+      "prefLabel": "Bed",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.furniture"
+    },
+    {
+      "@id": "pa:object.furniture.dresser",
+      "@type": "skos:Concept",
+      "prefLabel": "Dresser",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.furniture"
+    },
+    {
+      "@id": "pa:object.furniture.stool",
+      "@type": "skos:Concept",
+      "prefLabel": "Stool",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.furniture"
+    },
+    {
+      "@id": "pa:object.furniture.shelf",
+      "@type": "skos:Concept",
+      "prefLabel": "Shelf",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.furniture"
+    },
+    {
+      "@id": "pa:object.furniture.bookcase",
+      "@type": "skos:Concept",
+      "prefLabel": "Bookcase",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.furniture"
+    },
+    {
+      "@id": "pa:object.furniture.bench",
+      "@type": "skos:Concept",
+      "prefLabel": "Bench",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.furniture"
+    },
+    {
+      "@id": "pa:object.furniture.nightstand",
+      "@type": "skos:Concept",
+      "prefLabel": "Nightstand",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.furniture"
+    },
+    {
+      "@id": "pa:object.furniture.counter",
+      "@type": "skos:Concept",
+      "prefLabel": "Counter",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.furniture"
+    },
+    {
+      "@id": "pa:object.fixture",
+      "@type": "skos:Concept",
+      "prefLabel": "Fixture",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object"
+    },
+    {
+      "@id": "pa:object.fixture.sink",
+      "@type": "skos:Concept",
+      "prefLabel": "Sink",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.fixture"
+    },
+    {
+      "@id": "pa:object.fixture.toilet",
+      "@type": "skos:Concept",
+      "prefLabel": "Toilet",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.fixture"
+    },
+    {
+      "@id": "pa:object.fixture.bathtub",
+      "@type": "skos:Concept",
+      "prefLabel": "Bathtub",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.fixture"
+    },
+    {
+      "@id": "pa:object.fixture.shower",
+      "@type": "skos:Concept",
+      "prefLabel": "Shower",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.fixture"
+    },
+    {
+      "@id": "pa:object.fixture.faucet",
+      "@type": "skos:Concept",
+      "prefLabel": "Faucet",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.fixture"
+    },
+    {
+      "@id": "pa:object.fixture.switch",
+      "@type": "skos:Concept",
+      "prefLabel": "Switch",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.fixture"
+    },
+    {
+      "@id": "pa:object.fixture.outlet",
+      "@type": "skos:Concept",
+      "prefLabel": "Outlet",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.fixture"
+    },
+    {
+      "@id": "pa:object.fixture.light-fixture",
+      "@type": "skos:Concept",
+      "prefLabel": "Light Fixture",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.fixture"
+    },
+    {
+      "@id": "pa:object.fixture.radiator",
+      "@type": "skos:Concept",
+      "prefLabel": "Radiator",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.fixture"
+    },
+    {
+      "@id": "pa:object.fixture.heater",
+      "@type": "skos:Concept",
+      "prefLabel": "Heater",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.fixture"
+    },
+    {
+      "@id": "pa:object.appliance",
+      "@type": "skos:Concept",
+      "prefLabel": "Appliance",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object"
+    },
+    {
+      "@id": "pa:object.appliance.oven",
+      "@type": "skos:Concept",
+      "prefLabel": "Oven",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.appliance"
+    },
+    {
+      "@id": "pa:object.appliance.stove",
+      "@type": "skos:Concept",
+      "prefLabel": "Stove",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.appliance"
+    },
+    {
+      "@id": "pa:object.appliance.refrigerator",
+      "@type": "skos:Concept",
+      "prefLabel": "Refrigerator",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.appliance"
+    },
+    {
+      "@id": "pa:object.appliance.microwave",
+      "@type": "skos:Concept",
+      "prefLabel": "Microwave",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.appliance"
+    },
+    {
+      "@id": "pa:object.appliance.kettle",
+      "@type": "skos:Concept",
+      "prefLabel": "Kettle",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.appliance"
+    },
+    {
+      "@id": "pa:object.appliance.dishwasher",
+      "@type": "skos:Concept",
+      "prefLabel": "Dishwasher",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.appliance"
+    },
+    {
+      "@id": "pa:object.appliance.washer",
+      "@type": "skos:Concept",
+      "prefLabel": "Washer",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.appliance"
+    },
+    {
+      "@id": "pa:object.appliance.dryer",
+      "@type": "skos:Concept",
+      "prefLabel": "Dryer",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.appliance"
+    },
+    {
+      "@id": "pa:object.appliance.television",
+      "@type": "skos:Concept",
+      "prefLabel": "Television",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.appliance"
+    },
+    {
+      "@id": "pa:object.appliance.computer",
+      "@type": "skos:Concept",
+      "prefLabel": "Computer",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.appliance"
+    },
+    {
+      "@id": "pa:object.personal-item",
+      "@type": "skos:Concept",
+      "prefLabel": "Personal Item",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object"
+    },
+    {
+      "@id": "pa:object.personal-item.plate",
+      "@type": "skos:Concept",
+      "prefLabel": "Plate",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.personal-item"
+    },
+    {
+      "@id": "pa:object.personal-item.cup",
+      "@type": "skos:Concept",
+      "prefLabel": "Cup",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.personal-item"
+    },
+    {
+      "@id": "pa:object.personal-item.glass",
+      "@type": "skos:Concept",
+      "prefLabel": "Glass",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.personal-item"
+    },
+    {
+      "@id": "pa:object.personal-item.knife",
+      "@type": "skos:Concept",
+      "prefLabel": "Knife",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.personal-item"
+    },
+    {
+      "@id": "pa:object.personal-item.fork",
+      "@type": "skos:Concept",
+      "prefLabel": "Fork",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.personal-item"
+    },
+    {
+      "@id": "pa:object.personal-item.spoon",
+      "@type": "skos:Concept",
+      "prefLabel": "Spoon",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.personal-item"
+    },
+    {
+      "@id": "pa:object.personal-item.bottle",
+      "@type": "skos:Concept",
+      "prefLabel": "Bottle",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.personal-item"
+    },
+    {
+      "@id": "pa:object.personal-item.bag",
+      "@type": "skos:Concept",
+      "prefLabel": "Bag",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.personal-item"
+    },
+    {
+      "@id": "pa:object.personal-item.phone",
+      "@type": "skos:Concept",
+      "prefLabel": "Phone",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.personal-item"
+    },
+    {
+      "@id": "pa:object.personal-item.wallet",
+      "@type": "skos:Concept",
+      "prefLabel": "Wallet",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.personal-item"
+    },
+    {
+      "@id": "pa:object.personal-item.key",
+      "@type": "skos:Concept",
+      "prefLabel": "Key",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.personal-item"
+    },
+    {
+      "@id": "pa:object.personal-item.shoes",
+      "@type": "skos:Concept",
+      "prefLabel": "Shoes",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.personal-item"
+    },
+    {
+      "@id": "pa:object.personal-item.hat",
+      "@type": "skos:Concept",
+      "prefLabel": "Hat",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.personal-item"
+    },
+    {
+      "@id": "pa:object.transport",
+      "@type": "skos:Concept",
+      "prefLabel": "Transport",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object"
+    },
+    {
+      "@id": "pa:object.transport.car",
+      "@type": "skos:Concept",
+      "prefLabel": "Car",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.transport"
+    },
+    {
+      "@id": "pa:object.transport.bicycle",
+      "@type": "skos:Concept",
+      "prefLabel": "Bicycle",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.transport"
+    },
+    {
+      "@id": "pa:object.transport.motorcycle",
+      "@type": "skos:Concept",
+      "prefLabel": "Motorcycle",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.transport"
+    },
+    {
+      "@id": "pa:object.transport.bus",
+      "@type": "skos:Concept",
+      "prefLabel": "Bus",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.transport"
+    },
+    {
+      "@id": "pa:object.transport.truck",
+      "@type": "skos:Concept",
+      "prefLabel": "Truck",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.transport"
+    },
+    {
+      "@id": "pa:object.transport.boat",
+      "@type": "skos:Concept",
+      "prefLabel": "Boat",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.transport"
+    },
+    {
+      "@id": "pa:object.transport.scooter",
+      "@type": "skos:Concept",
+      "prefLabel": "Scooter",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.transport"
+    },
+    {
+      "@id": "pa:object.landscape",
+      "@type": "skos:Concept",
+      "prefLabel": "Landscape",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object"
+    },
+    {
+      "@id": "pa:object.landscape.tree",
+      "@type": "skos:Concept",
+      "prefLabel": "Tree",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.landscape"
+    },
+    {
+      "@id": "pa:object.landscape.shrub",
+      "@type": "skos:Concept",
+      "prefLabel": "Shrub",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.landscape"
+    },
+    {
+      "@id": "pa:object.landscape.grass",
+      "@type": "skos:Concept",
+      "prefLabel": "Grass",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.landscape"
+    },
+    {
+      "@id": "pa:object.landscape.rock",
+      "@type": "skos:Concept",
+      "prefLabel": "Rock",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.landscape"
+    },
+    {
+      "@id": "pa:object.landscape.sand",
+      "@type": "skos:Concept",
+      "prefLabel": "Sand",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.landscape"
+    },
+    {
+      "@id": "pa:object.landscape.water",
+      "@type": "skos:Concept",
+      "prefLabel": "Water",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.landscape"
+    },
+    {
+      "@id": "pa:object.landscape.lamp-post",
+      "@type": "skos:Concept",
+      "prefLabel": "Lamp Post",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.landscape"
+    },
+    {
+      "@id": "pa:object.landscape.trash-bin",
+      "@type": "skos:Concept",
+      "prefLabel": "Trash Bin",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.landscape"
+    },
+    {
+      "@id": "pa:object.landscape.fire-pit",
+      "@type": "skos:Concept",
+      "prefLabel": "Fire Pit",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.landscape"
+    },
+    {
+      "@id": "pa:object.evidence-proxy",
+      "@type": "skos:Concept",
+      "prefLabel": "Evidence Proxy",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object"
+    },
+    {
+      "@id": "pa:object.evidence-proxy.marker",
+      "@type": "skos:Concept",
+      "prefLabel": "Marker",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.evidence-proxy"
+    },
+    {
+      "@id": "pa:object.evidence-proxy.footprint-card",
+      "@type": "skos:Concept",
+      "prefLabel": "Footprint Card",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.evidence-proxy"
+    },
+    {
+      "@id": "pa:object.evidence-proxy.measurement-line",
+      "@type": "skos:Concept",
+      "prefLabel": "Measurement Line",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.evidence-proxy"
+    },
+    {
+      "@id": "pa:object.evidence-proxy.bounding-box",
+      "@type": "skos:Concept",
+      "prefLabel": "Bounding Box",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.evidence-proxy"
+    },
+    {
+      "@id": "pa:object.evidence-proxy.annotation-pin",
+      "@type": "skos:Concept",
+      "prefLabel": "Annotation Pin",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.evidence-proxy"
+    },
+    {
+      "@id": "pa:object.evidence-proxy.trajectory-line",
+      "@type": "skos:Concept",
+      "prefLabel": "Trajectory Line",
+      "inScheme": "pa:scheme",
+      "broader": "pa:object.evidence-proxy"
+    },
+    {
+      "@id": "pa:actor",
+      "@type": "skos:Concept",
+      "prefLabel": "Actor",
+      "inScheme": "pa:scheme"
+    },
+    {
+      "@id": "pa:actor.representation",
+      "@type": "skos:Concept",
+      "prefLabel": "Representation",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor"
+    },
+    {
+      "@id": "pa:actor.representation.neutral-humanoid",
+      "@type": "skos:Concept",
+      "prefLabel": "Neutral Humanoid",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.representation"
+    },
+    {
+      "@id": "pa:actor.representation.generated-head",
+      "@type": "skos:Concept",
+      "prefLabel": "Generated Head",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.representation"
+    },
+    {
+      "@id": "pa:actor.representation.portrait-card",
+      "@type": "skos:Concept",
+      "prefLabel": "Portrait Card",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.representation"
+    },
+    {
+      "@id": "pa:actor.representation.sprite",
+      "@type": "skos:Concept",
+      "prefLabel": "Sprite",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.representation"
+    },
+    {
+      "@id": "pa:actor.representation.low-poly-body",
+      "@type": "skos:Concept",
+      "prefLabel": "Low Poly Body",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.representation"
+    },
+    {
+      "@id": "pa:actor.representation.rigged-body",
+      "@type": "skos:Concept",
+      "prefLabel": "Rigged Body",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.representation"
+    },
+    {
+      "@id": "pa:actor.representation.glb-actor",
+      "@type": "skos:Concept",
+      "prefLabel": "Glb Actor",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.representation"
+    },
+    {
+      "@id": "pa:actor.component",
+      "@type": "skos:Concept",
+      "prefLabel": "Component",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor"
+    },
+    {
+      "@id": "pa:actor.component.head",
+      "@type": "skos:Concept",
+      "prefLabel": "Head",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.torso",
+      "@type": "skos:Concept",
+      "prefLabel": "Torso",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.left-arm",
+      "@type": "skos:Concept",
+      "prefLabel": "Left Arm",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.right-arm",
+      "@type": "skos:Concept",
+      "prefLabel": "Right Arm",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.left-hand",
+      "@type": "skos:Concept",
+      "prefLabel": "Left Hand",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.right-hand",
+      "@type": "skos:Concept",
+      "prefLabel": "Right Hand",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.left-leg",
+      "@type": "skos:Concept",
+      "prefLabel": "Left Leg",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.right-leg",
+      "@type": "skos:Concept",
+      "prefLabel": "Right Leg",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.left-foot",
+      "@type": "skos:Concept",
+      "prefLabel": "Left Foot",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.right-foot",
+      "@type": "skos:Concept",
+      "prefLabel": "Right Foot",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.eye",
+      "@type": "skos:Concept",
+      "prefLabel": "Eye",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.ear",
+      "@type": "skos:Concept",
+      "prefLabel": "Ear",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.mouth",
+      "@type": "skos:Concept",
+      "prefLabel": "Mouth",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.nose",
+      "@type": "skos:Concept",
+      "prefLabel": "Nose",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.hair-card",
+      "@type": "skos:Concept",
+      "prefLabel": "Hair Card",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.component.clothing",
+      "@type": "skos:Concept",
+      "prefLabel": "Clothing",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.component"
+    },
+    {
+      "@id": "pa:actor.role",
+      "@type": "skos:Concept",
+      "prefLabel": "Role",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor"
+    },
+    {
+      "@id": "pa:actor.role.anonymous-person",
+      "@type": "skos:Concept",
+      "prefLabel": "Anonymous Person",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.role"
+    },
+    {
+      "@id": "pa:actor.role.illustrative-participant",
+      "@type": "skos:Concept",
+      "prefLabel": "Illustrative Participant",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.role"
+    },
+    {
+      "@id": "pa:actor.role.nonhuman-animal",
+      "@type": "skos:Concept",
+      "prefLabel": "Nonhuman Animal",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.role"
+    },
+    {
+      "@id": "pa:actor.role.environmental-agent",
+      "@type": "skos:Concept",
+      "prefLabel": "Environmental Agent",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.role"
+    },
+    {
+      "@id": "pa:actor.pose",
+      "@type": "skos:Concept",
+      "prefLabel": "Pose",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor"
+    },
+    {
+      "@id": "pa:actor.pose.standing",
+      "@type": "skos:Concept",
+      "prefLabel": "Standing",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.pose"
+    },
+    {
+      "@id": "pa:actor.pose.sitting",
+      "@type": "skos:Concept",
+      "prefLabel": "Sitting",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.pose"
+    },
+    {
+      "@id": "pa:actor.pose.kneeling",
+      "@type": "skos:Concept",
+      "prefLabel": "Kneeling",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.pose"
+    },
+    {
+      "@id": "pa:actor.pose.lying",
+      "@type": "skos:Concept",
+      "prefLabel": "Lying",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.pose"
+    },
+    {
+      "@id": "pa:actor.pose.crouching",
+      "@type": "skos:Concept",
+      "prefLabel": "Crouching",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.pose"
+    },
+    {
+      "@id": "pa:actor.pose.idle",
+      "@type": "skos:Concept",
+      "prefLabel": "Idle",
+      "inScheme": "pa:scheme",
+      "broader": "pa:actor.pose"
+    },
+    {
+      "@id": "pa:material",
+      "@type": "skos:Concept",
+      "prefLabel": "Material",
+      "inScheme": "pa:scheme"
+    },
+    {
+      "@id": "pa:material.surface",
+      "@type": "skos:Concept",
+      "prefLabel": "Surface",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material"
+    },
+    {
+      "@id": "pa:material.surface.wood",
+      "@type": "skos:Concept",
+      "prefLabel": "Wood",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.concrete",
+      "@type": "skos:Concept",
+      "prefLabel": "Concrete",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.brick",
+      "@type": "skos:Concept",
+      "prefLabel": "Brick",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.plaster",
+      "@type": "skos:Concept",
+      "prefLabel": "Plaster",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.tile",
+      "@type": "skos:Concept",
+      "prefLabel": "Tile",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.glass",
+      "@type": "skos:Concept",
+      "prefLabel": "Glass",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.stone",
+      "@type": "skos:Concept",
+      "prefLabel": "Stone",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.carpet",
+      "@type": "skos:Concept",
+      "prefLabel": "Carpet",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.fabric",
+      "@type": "skos:Concept",
+      "prefLabel": "Fabric",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.leather",
+      "@type": "skos:Concept",
+      "prefLabel": "Leather",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.metal",
+      "@type": "skos:Concept",
+      "prefLabel": "Metal",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.plastic",
+      "@type": "skos:Concept",
+      "prefLabel": "Plastic",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.skin",
+      "@type": "skos:Concept",
+      "prefLabel": "Skin",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.hair",
+      "@type": "skos:Concept",
+      "prefLabel": "Hair",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.water",
+      "@type": "skos:Concept",
+      "prefLabel": "Water",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.surface.sand",
+      "@type": "skos:Concept",
+      "prefLabel": "Sand",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.surface"
+    },
+    {
+      "@id": "pa:material.render",
+      "@type": "skos:Concept",
+      "prefLabel": "Render",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material"
+    },
+    {
+      "@id": "pa:material.render.pbr",
+      "@type": "skos:Concept",
+      "prefLabel": "Pbr",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.render"
+    },
+    {
+      "@id": "pa:material.render.unlit",
+      "@type": "skos:Concept",
+      "prefLabel": "Unlit",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.render"
+    },
+    {
+      "@id": "pa:material.render.flat",
+      "@type": "skos:Concept",
+      "prefLabel": "Flat",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.render"
+    },
+    {
+      "@id": "pa:material.render.toon",
+      "@type": "skos:Concept",
+      "prefLabel": "Toon",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.render"
+    },
+    {
+      "@id": "pa:material.render.cel-outline",
+      "@type": "skos:Concept",
+      "prefLabel": "Cel Outline",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.render"
+    },
+    {
+      "@id": "pa:material.render.wireframe",
+      "@type": "skos:Concept",
+      "prefLabel": "Wireframe",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.render"
+    },
+    {
+      "@id": "pa:material.render.vertex-color",
+      "@type": "skos:Concept",
+      "prefLabel": "Vertex Color",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.render"
+    },
+    {
+      "@id": "pa:material.render.texture-atlas",
+      "@type": "skos:Concept",
+      "prefLabel": "Texture Atlas",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.render"
+    },
+    {
+      "@id": "pa:material.light-color",
+      "@type": "skos:Concept",
+      "prefLabel": "Light Color",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material"
+    },
+    {
+      "@id": "pa:material.light-color.red",
+      "@type": "skos:Concept",
+      "prefLabel": "Red",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.light-color"
+    },
+    {
+      "@id": "pa:material.light-color.green",
+      "@type": "skos:Concept",
+      "prefLabel": "Green",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.light-color"
+    },
+    {
+      "@id": "pa:material.light-color.blue",
+      "@type": "skos:Concept",
+      "prefLabel": "Blue",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.light-color"
+    },
+    {
+      "@id": "pa:material.light-color.yellow",
+      "@type": "skos:Concept",
+      "prefLabel": "Yellow",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.light-color"
+    },
+    {
+      "@id": "pa:material.light-color.cyan",
+      "@type": "skos:Concept",
+      "prefLabel": "Cyan",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.light-color"
+    },
+    {
+      "@id": "pa:material.light-color.magenta",
+      "@type": "skos:Concept",
+      "prefLabel": "Magenta",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.light-color"
+    },
+    {
+      "@id": "pa:material.light-color.white",
+      "@type": "skos:Concept",
+      "prefLabel": "White",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.light-color"
+    },
+    {
+      "@id": "pa:material.light-color.black",
+      "@type": "skos:Concept",
+      "prefLabel": "Black",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.light-color"
+    },
+    {
+      "@id": "pa:material.color-model",
+      "@type": "skos:Concept",
+      "prefLabel": "Color Model",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material"
+    },
+    {
+      "@id": "pa:material.color-model.rgb-additive",
+      "@type": "skos:Concept",
+      "prefLabel": "Rgb Additive",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.color-model"
+    },
+    {
+      "@id": "pa:material.color-model.cmy-subtractive",
+      "@type": "skos:Concept",
+      "prefLabel": "Cmy Subtractive",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.color-model"
+    },
+    {
+      "@id": "pa:material.color-model.pigment-mix",
+      "@type": "skos:Concept",
+      "prefLabel": "Pigment Mix",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.color-model"
+    },
+    {
+      "@id": "pa:material.color-model.alpha-compositing",
+      "@type": "skos:Concept",
+      "prefLabel": "Alpha Compositing",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.color-model"
+    },
+    {
+      "@id": "pa:material.color-model.additive-blending",
+      "@type": "skos:Concept",
+      "prefLabel": "Additive Blending",
+      "inScheme": "pa:scheme",
+      "broader": "pa:material.color-model"
+    },
+    {
+      "@id": "pa:observation",
+      "@type": "skos:Concept",
+      "prefLabel": "Observation",
+      "inScheme": "pa:scheme"
+    },
+    {
+      "@id": "pa:observation.image-region",
+      "@type": "skos:Concept",
+      "prefLabel": "Image Region",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation"
+    },
+    {
+      "@id": "pa:observation.image-region.bounding-box",
+      "@type": "skos:Concept",
+      "prefLabel": "Bounding Box",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.image-region"
+    },
+    {
+      "@id": "pa:observation.image-region.segmentation-mask",
+      "@type": "skos:Concept",
+      "prefLabel": "Segmentation Mask",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.image-region"
+    },
+    {
+      "@id": "pa:observation.image-region.keypoint",
+      "@type": "skos:Concept",
+      "prefLabel": "Keypoint",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.image-region"
+    },
+    {
+      "@id": "pa:observation.image-region.pixel-point",
+      "@type": "skos:Concept",
+      "prefLabel": "Pixel Point",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.image-region"
+    },
+    {
+      "@id": "pa:observation.image-region.polygon-region",
+      "@type": "skos:Concept",
+      "prefLabel": "Polygon Region",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.image-region"
+    },
+    {
+      "@id": "pa:observation.model-output",
+      "@type": "skos:Concept",
+      "prefLabel": "Model Output",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation"
+    },
+    {
+      "@id": "pa:observation.model-output.object-detection",
+      "@type": "skos:Concept",
+      "prefLabel": "Object Detection",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.model-output"
+    },
+    {
+      "@id": "pa:observation.model-output.caption",
+      "@type": "skos:Concept",
+      "prefLabel": "Caption",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.model-output"
+    },
+    {
+      "@id": "pa:observation.model-output.optical-flow",
+      "@type": "skos:Concept",
+      "prefLabel": "Optical Flow",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.model-output"
+    },
+    {
+      "@id": "pa:observation.model-output.depth-estimate",
+      "@type": "skos:Concept",
+      "prefLabel": "Depth Estimate",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.model-output"
+    },
+    {
+      "@id": "pa:observation.model-output.person-proposal",
+      "@type": "skos:Concept",
+      "prefLabel": "Person Proposal",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.model-output"
+    },
+    {
+      "@id": "pa:observation.model-output.text-extraction",
+      "@type": "skos:Concept",
+      "prefLabel": "Text Extraction",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.model-output"
+    },
+    {
+      "@id": "pa:observation.model-output.audio-transcript",
+      "@type": "skos:Concept",
+      "prefLabel": "Audio Transcript",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.model-output"
+    },
+    {
+      "@id": "pa:observation.source",
+      "@type": "skos:Concept",
+      "prefLabel": "Source",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation"
+    },
+    {
+      "@id": "pa:observation.source.photo",
+      "@type": "skos:Concept",
+      "prefLabel": "Photo",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.source"
+    },
+    {
+      "@id": "pa:observation.source.video",
+      "@type": "skos:Concept",
+      "prefLabel": "Video",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.source"
+    },
+    {
+      "@id": "pa:observation.source.frame",
+      "@type": "skos:Concept",
+      "prefLabel": "Frame",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.source"
+    },
+    {
+      "@id": "pa:observation.source.audio",
+      "@type": "skos:Concept",
+      "prefLabel": "Audio",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.source"
+    },
+    {
+      "@id": "pa:observation.source.pdf",
+      "@type": "skos:Concept",
+      "prefLabel": "Pdf",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.source"
+    },
+    {
+      "@id": "pa:observation.source.prompt",
+      "@type": "skos:Concept",
+      "prefLabel": "Prompt",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.source"
+    },
+    {
+      "@id": "pa:observation.source.witness-account",
+      "@type": "skos:Concept",
+      "prefLabel": "Witness Account",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.source"
+    },
+    {
+      "@id": "pa:observation.status",
+      "@type": "skos:Concept",
+      "prefLabel": "Status",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation"
+    },
+    {
+      "@id": "pa:observation.status.raw",
+      "@type": "skos:Concept",
+      "prefLabel": "Raw",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.status"
+    },
+    {
+      "@id": "pa:observation.status.candidate",
+      "@type": "skos:Concept",
+      "prefLabel": "Candidate",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.status"
+    },
+    {
+      "@id": "pa:observation.status.extracted",
+      "@type": "skos:Concept",
+      "prefLabel": "Extracted",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.status"
+    },
+    {
+      "@id": "pa:observation.status.reviewed",
+      "@type": "skos:Concept",
+      "prefLabel": "Reviewed",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.status"
+    },
+    {
+      "@id": "pa:observation.status.rejected",
+      "@type": "skos:Concept",
+      "prefLabel": "Rejected",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.status"
+    },
+    {
+      "@id": "pa:observation.status.unresolved",
+      "@type": "skos:Concept",
+      "prefLabel": "Unresolved",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.status"
+    },
+    {
+      "@id": "pa:observation.coordinate",
+      "@type": "skos:Concept",
+      "prefLabel": "Coordinate",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation"
+    },
+    {
+      "@id": "pa:observation.coordinate.image-pixel",
+      "@type": "skos:Concept",
+      "prefLabel": "Image Pixel",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.coordinate"
+    },
+    {
+      "@id": "pa:observation.coordinate.normalized-uv",
+      "@type": "skos:Concept",
+      "prefLabel": "Normalized Uv",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.coordinate"
+    },
+    {
+      "@id": "pa:observation.coordinate.image-depth",
+      "@type": "skos:Concept",
+      "prefLabel": "Image Depth",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.coordinate"
+    },
+    {
+      "@id": "pa:observation.coordinate.camera-ray",
+      "@type": "skos:Concept",
+      "prefLabel": "Camera Ray",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.coordinate"
+    },
+    {
+      "@id": "pa:observation.coordinate.world-uncalibrated",
+      "@type": "skos:Concept",
+      "prefLabel": "World Uncalibrated",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.coordinate"
+    },
+    {
+      "@id": "pa:observation.coordinate.world-calibrated",
+      "@type": "skos:Concept",
+      "prefLabel": "World Calibrated",
+      "inScheme": "pa:scheme",
+      "broader": "pa:observation.coordinate"
+    },
+    {
+      "@id": "pa:event",
+      "@type": "skos:Concept",
+      "prefLabel": "Event",
+      "inScheme": "pa:scheme"
+    },
+    {
+      "@id": "pa:event.cue",
+      "@type": "skos:Concept",
+      "prefLabel": "Cue",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event"
+    },
+    {
+      "@id": "pa:event.cue.presence",
+      "@type": "skos:Concept",
+      "prefLabel": "Presence",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.cue"
+    },
+    {
+      "@id": "pa:event.cue.dialogue",
+      "@type": "skos:Concept",
+      "prefLabel": "Dialogue",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.cue"
+    },
+    {
+      "@id": "pa:event.cue.gesture",
+      "@type": "skos:Concept",
+      "prefLabel": "Gesture",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.cue"
+    },
+    {
+      "@id": "pa:event.cue.interact",
+      "@type": "skos:Concept",
+      "prefLabel": "Interact",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.cue"
+    },
+    {
+      "@id": "pa:event.cue.move",
+      "@type": "skos:Concept",
+      "prefLabel": "Move",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.cue"
+    },
+    {
+      "@id": "pa:event.cue.impact",
+      "@type": "skos:Concept",
+      "prefLabel": "Impact",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.cue"
+    },
+    {
+      "@id": "pa:event.cue.inspect",
+      "@type": "skos:Concept",
+      "prefLabel": "Inspect",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.cue"
+    },
+    {
+      "@id": "pa:event.cue.approach",
+      "@type": "skos:Concept",
+      "prefLabel": "Approach",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.cue"
+    },
+    {
+      "@id": "pa:event.cue.exit",
+      "@type": "skos:Concept",
+      "prefLabel": "Exit",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.cue"
+    },
+    {
+      "@id": "pa:event.cue.enter",
+      "@type": "skos:Concept",
+      "prefLabel": "Enter",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.cue"
+    },
+    {
+      "@id": "pa:event.cue.dispute",
+      "@type": "skos:Concept",
+      "prefLabel": "Dispute",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.cue"
+    },
+    {
+      "@id": "pa:event.cue.conflict",
+      "@type": "skos:Concept",
+      "prefLabel": "Conflict",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.cue"
+    },
+    {
+      "@id": "pa:event.cue.uncertainty",
+      "@type": "skos:Concept",
+      "prefLabel": "Uncertainty",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.cue"
+    },
+    {
+      "@id": "pa:event.temporal",
+      "@type": "skos:Concept",
+      "prefLabel": "Temporal",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event"
+    },
+    {
+      "@id": "pa:event.temporal.start-time",
+      "@type": "skos:Concept",
+      "prefLabel": "Start Time",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.temporal"
+    },
+    {
+      "@id": "pa:event.temporal.end-time",
+      "@type": "skos:Concept",
+      "prefLabel": "End Time",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.temporal"
+    },
+    {
+      "@id": "pa:event.temporal.duration",
+      "@type": "skos:Concept",
+      "prefLabel": "Duration",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.temporal"
+    },
+    {
+      "@id": "pa:event.temporal.source-interval",
+      "@type": "skos:Concept",
+      "prefLabel": "Source Interval",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.temporal"
+    },
+    {
+      "@id": "pa:event.temporal.replay-clock",
+      "@type": "skos:Concept",
+      "prefLabel": "Replay Clock",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.temporal"
+    },
+    {
+      "@id": "pa:event.review",
+      "@type": "skos:Concept",
+      "prefLabel": "Review",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event"
+    },
+    {
+      "@id": "pa:event.review.unreviewed",
+      "@type": "skos:Concept",
+      "prefLabel": "Unreviewed",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.review"
+    },
+    {
+      "@id": "pa:event.review.proposed",
+      "@type": "skos:Concept",
+      "prefLabel": "Proposed",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.review"
+    },
+    {
+      "@id": "pa:event.review.accepted",
+      "@type": "skos:Concept",
+      "prefLabel": "Accepted",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.review"
+    },
+    {
+      "@id": "pa:event.review.rejected",
+      "@type": "skos:Concept",
+      "prefLabel": "Rejected",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.review"
+    },
+    {
+      "@id": "pa:event.review.disputed",
+      "@type": "skos:Concept",
+      "prefLabel": "Disputed",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.review"
+    },
+    {
+      "@id": "pa:event.motion",
+      "@type": "skos:Concept",
+      "prefLabel": "Motion",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event"
+    },
+    {
+      "@id": "pa:event.motion.static-preview",
+      "@type": "skos:Concept",
+      "prefLabel": "Static Preview",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.motion"
+    },
+    {
+      "@id": "pa:event.motion.proposed-trajectory",
+      "@type": "skos:Concept",
+      "prefLabel": "Proposed Trajectory",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.motion"
+    },
+    {
+      "@id": "pa:event.motion.reviewed-animation",
+      "@type": "skos:Concept",
+      "prefLabel": "Reviewed Animation",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.motion"
+    },
+    {
+      "@id": "pa:event.motion.path-spline",
+      "@type": "skos:Concept",
+      "prefLabel": "Path Spline",
+      "inScheme": "pa:scheme",
+      "broader": "pa:event.motion"
+    },
+    {
+      "@id": "pa:provenance",
+      "@type": "skos:Concept",
+      "prefLabel": "Provenance",
+      "inScheme": "pa:scheme"
+    },
+    {
+      "@id": "pa:provenance.origin",
+      "@type": "skos:Concept",
+      "prefLabel": "Origin",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance"
+    },
+    {
+      "@id": "pa:provenance.origin.source-evidence",
+      "@type": "skos:Concept",
+      "prefLabel": "Source Evidence",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.origin"
+    },
+    {
+      "@id": "pa:provenance.origin.derived-model-output",
+      "@type": "skos:Concept",
+      "prefLabel": "Derived Model Output",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.origin"
+    },
+    {
+      "@id": "pa:provenance.origin.hand-authored",
+      "@type": "skos:Concept",
+      "prefLabel": "Hand Authored",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.origin"
+    },
+    {
+      "@id": "pa:provenance.origin.generated-fixture",
+      "@type": "skos:Concept",
+      "prefLabel": "Generated Fixture",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.origin"
+    },
+    {
+      "@id": "pa:provenance.origin.reviewed-reconstruction",
+      "@type": "skos:Concept",
+      "prefLabel": "Reviewed Reconstruction",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.origin"
+    },
+    {
+      "@id": "pa:provenance.trace",
+      "@type": "skos:Concept",
+      "prefLabel": "Trace",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance"
+    },
+    {
+      "@id": "pa:provenance.trace.case-id",
+      "@type": "skos:Concept",
+      "prefLabel": "Case Id",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.trace"
+    },
+    {
+      "@id": "pa:provenance.trace.scene-id",
+      "@type": "skos:Concept",
+      "prefLabel": "Scene Id",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.trace"
+    },
+    {
+      "@id": "pa:provenance.trace.scene-revision",
+      "@type": "skos:Concept",
+      "prefLabel": "Scene Revision",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.trace"
+    },
+    {
+      "@id": "pa:provenance.trace.evidence-id",
+      "@type": "skos:Concept",
+      "prefLabel": "Evidence Id",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.trace"
+    },
+    {
+      "@id": "pa:provenance.trace.evidence-revision",
+      "@type": "skos:Concept",
+      "prefLabel": "Evidence Revision",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.trace"
+    },
+    {
+      "@id": "pa:provenance.trace.source-sha256",
+      "@type": "skos:Concept",
+      "prefLabel": "Source Sha256",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.trace"
+    },
+    {
+      "@id": "pa:provenance.trace.artifact-sha256",
+      "@type": "skos:Concept",
+      "prefLabel": "Artifact Sha256",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.trace"
+    },
+    {
+      "@id": "pa:provenance.trace.model-name",
+      "@type": "skos:Concept",
+      "prefLabel": "Model Name",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.trace"
+    },
+    {
+      "@id": "pa:provenance.trace.model-version",
+      "@type": "skos:Concept",
+      "prefLabel": "Model Version",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.trace"
+    },
+    {
+      "@id": "pa:provenance.trace.model-sha256",
+      "@type": "skos:Concept",
+      "prefLabel": "Model Sha256",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.trace"
+    },
+    {
+      "@id": "pa:provenance.trace.run-id",
+      "@type": "skos:Concept",
+      "prefLabel": "Run Id",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.trace"
+    },
+    {
+      "@id": "pa:provenance.review",
+      "@type": "skos:Concept",
+      "prefLabel": "Review",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance"
+    },
+    {
+      "@id": "pa:provenance.review.unreviewed",
+      "@type": "skos:Concept",
+      "prefLabel": "Unreviewed",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.review"
+    },
+    {
+      "@id": "pa:provenance.review.human-reviewed",
+      "@type": "skos:Concept",
+      "prefLabel": "Human Reviewed",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.review"
+    },
+    {
+      "@id": "pa:provenance.review.rejected",
+      "@type": "skos:Concept",
+      "prefLabel": "Rejected",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.review"
+    },
+    {
+      "@id": "pa:provenance.review.unknown",
+      "@type": "skos:Concept",
+      "prefLabel": "Unknown",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.review"
+    },
+    {
+      "@id": "pa:provenance.authority",
+      "@type": "skos:Concept",
+      "prefLabel": "Authority",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance"
+    },
+    {
+      "@id": "pa:provenance.authority.illustrative-hypothesis",
+      "@type": "skos:Concept",
+      "prefLabel": "Illustrative Hypothesis",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.authority"
+    },
+    {
+      "@id": "pa:provenance.authority.measured-source",
+      "@type": "skos:Concept",
+      "prefLabel": "Measured Source",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.authority"
+    },
+    {
+      "@id": "pa:provenance.authority.verified-artifact",
+      "@type": "skos:Concept",
+      "prefLabel": "Verified Artifact",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.authority"
+    },
+    {
+      "@id": "pa:provenance.authority.unauthorized",
+      "@type": "skos:Concept",
+      "prefLabel": "Unauthorized",
+      "inScheme": "pa:scheme",
+      "broader": "pa:provenance.authority"
+    },
+    {
+      "@id": "pa:render",
+      "@type": "skos:Concept",
+      "prefLabel": "Render",
+      "inScheme": "pa:scheme"
+    },
+    {
+      "@id": "pa:render.camera",
+      "@type": "skos:Concept",
+      "prefLabel": "Camera",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render"
+    },
+    {
+      "@id": "pa:render.camera.orthographic-topdown",
+      "@type": "skos:Concept",
+      "prefLabel": "Orthographic Topdown",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.camera"
+    },
+    {
+      "@id": "pa:render.camera.orthographic-isometric",
+      "@type": "skos:Concept",
+      "prefLabel": "Orthographic Isometric",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.camera"
+    },
+    {
+      "@id": "pa:render.camera.perspective",
+      "@type": "skos:Concept",
+      "prefLabel": "Perspective",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.camera"
+    },
+    {
+      "@id": "pa:render.camera.orbit",
+      "@type": "skos:Concept",
+      "prefLabel": "Orbit",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.camera"
+    },
+    {
+      "@id": "pa:render.camera.follow-actor",
+      "@type": "skos:Concept",
+      "prefLabel": "Follow Actor",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.camera"
+    },
+    {
+      "@id": "pa:render.camera.photo-frustum",
+      "@type": "skos:Concept",
+      "prefLabel": "Photo Frustum",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.camera"
+    },
+    {
+      "@id": "pa:render.lod",
+      "@type": "skos:Concept",
+      "prefLabel": "Lod",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render"
+    },
+    {
+      "@id": "pa:render.lod.retro",
+      "@type": "skos:Concept",
+      "prefLabel": "Retro",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.lod"
+    },
+    {
+      "@id": "pa:render.lod.balanced",
+      "@type": "skos:Concept",
+      "prefLabel": "Balanced",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.lod"
+    },
+    {
+      "@id": "pa:render.lod.detailed",
+      "@type": "skos:Concept",
+      "prefLabel": "Detailed",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.lod"
+    },
+    {
+      "@id": "pa:render.lod.impostor",
+      "@type": "skos:Concept",
+      "prefLabel": "Impostor",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.lod"
+    },
+    {
+      "@id": "pa:render.visibility",
+      "@type": "skos:Concept",
+      "prefLabel": "Visibility",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render"
+    },
+    {
+      "@id": "pa:render.visibility.visible",
+      "@type": "skos:Concept",
+      "prefLabel": "Visible",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.visibility"
+    },
+    {
+      "@id": "pa:render.visibility.hidden",
+      "@type": "skos:Concept",
+      "prefLabel": "Hidden",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.visibility"
+    },
+    {
+      "@id": "pa:render.visibility.selected",
+      "@type": "skos:Concept",
+      "prefLabel": "Selected",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.visibility"
+    },
+    {
+      "@id": "pa:render.visibility.ghosted",
+      "@type": "skos:Concept",
+      "prefLabel": "Ghosted",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.visibility"
+    },
+    {
+      "@id": "pa:render.visibility.faded",
+      "@type": "skos:Concept",
+      "prefLabel": "Faded",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.visibility"
+    },
+    {
+      "@id": "pa:render.streaming",
+      "@type": "skos:Concept",
+      "prefLabel": "Streaming",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render"
+    },
+    {
+      "@id": "pa:render.streaming.cell",
+      "@type": "skos:Concept",
+      "prefLabel": "Cell",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.streaming"
+    },
+    {
+      "@id": "pa:render.streaming.morton-key",
+      "@type": "skos:Concept",
+      "prefLabel": "Morton Key",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.streaming"
+    },
+    {
+      "@id": "pa:render.streaming.resident",
+      "@type": "skos:Concept",
+      "prefLabel": "Resident",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.streaming"
+    },
+    {
+      "@id": "pa:render.streaming.evicted",
+      "@type": "skos:Concept",
+      "prefLabel": "Evicted",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.streaming"
+    },
+    {
+      "@id": "pa:render.streaming.pending-loading",
+      "@type": "skos:Concept",
+      "prefLabel": "Pending Loading",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.streaming"
+    },
+    {
+      "@id": "pa:render.streaming.scene-root",
+      "@type": "skos:Concept",
+      "prefLabel": "Scene Root",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.streaming"
+    },
+    {
+      "@id": "pa:render.streaming.transform-arena",
+      "@type": "skos:Concept",
+      "prefLabel": "Transform Arena",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.streaming"
+    },
+    {
+      "@id": "pa:render.interaction",
+      "@type": "skos:Concept",
+      "prefLabel": "Interaction",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render"
+    },
+    {
+      "@id": "pa:render.interaction.select",
+      "@type": "skos:Concept",
+      "prefLabel": "Select",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.interaction"
+    },
+    {
+      "@id": "pa:render.interaction.move",
+      "@type": "skos:Concept",
+      "prefLabel": "Move",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.interaction"
+    },
+    {
+      "@id": "pa:render.interaction.rotate",
+      "@type": "skos:Concept",
+      "prefLabel": "Rotate",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.interaction"
+    },
+    {
+      "@id": "pa:render.interaction.scale",
+      "@type": "skos:Concept",
+      "prefLabel": "Scale",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.interaction"
+    },
+    {
+      "@id": "pa:render.interaction.drag",
+      "@type": "skos:Concept",
+      "prefLabel": "Drag",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.interaction"
+    },
+    {
+      "@id": "pa:render.interaction.orbit",
+      "@type": "skos:Concept",
+      "prefLabel": "Orbit",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.interaction"
+    },
+    {
+      "@id": "pa:render.interaction.scrub",
+      "@type": "skos:Concept",
+      "prefLabel": "Scrub",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.interaction"
+    },
+    {
+      "@id": "pa:render.interaction.timeline",
+      "@type": "skos:Concept",
+      "prefLabel": "Timeline",
+      "inScheme": "pa:scheme",
+      "broader": "pa:render.interaction"
+    },
+    {
+      "@id": "pa:workflow",
+      "@type": "skos:Concept",
+      "prefLabel": "Workflow",
+      "inScheme": "pa:scheme"
+    },
+    {
+      "@id": "pa:workflow.stage",
+      "@type": "skos:Concept",
+      "prefLabel": "Stage",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow"
+    },
+    {
+      "@id": "pa:workflow.stage.draft",
+      "@type": "skos:Concept",
+      "prefLabel": "Draft",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.stage"
+    },
+    {
+      "@id": "pa:workflow.stage.classify",
+      "@type": "skos:Concept",
+      "prefLabel": "Classify",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.stage"
+    },
+    {
+      "@id": "pa:workflow.stage.propose",
+      "@type": "skos:Concept",
+      "prefLabel": "Propose",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.stage"
+    },
+    {
+      "@id": "pa:workflow.stage.preview",
+      "@type": "skos:Concept",
+      "prefLabel": "Preview",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.stage"
+    },
+    {
+      "@id": "pa:workflow.stage.review",
+      "@type": "skos:Concept",
+      "prefLabel": "Review",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.stage"
+    },
+    {
+      "@id": "pa:workflow.stage.authorize",
+      "@type": "skos:Concept",
+      "prefLabel": "Authorize",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.stage"
+    },
+    {
+      "@id": "pa:workflow.stage.save",
+      "@type": "skos:Concept",
+      "prefLabel": "Save",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.stage"
+    },
+    {
+      "@id": "pa:workflow.stage.readback",
+      "@type": "skos:Concept",
+      "prefLabel": "Readback",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.stage"
+    },
+    {
+      "@id": "pa:workflow.stage.reopen",
+      "@type": "skos:Concept",
+      "prefLabel": "Reopen",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.stage"
+    },
+    {
+      "@id": "pa:workflow.stage.archive",
+      "@type": "skos:Concept",
+      "prefLabel": "Archive",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.stage"
+    },
+    {
+      "@id": "pa:workflow.job",
+      "@type": "skos:Concept",
+      "prefLabel": "Job",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow"
+    },
+    {
+      "@id": "pa:workflow.job.queued",
+      "@type": "skos:Concept",
+      "prefLabel": "Queued",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.job"
+    },
+    {
+      "@id": "pa:workflow.job.processing",
+      "@type": "skos:Concept",
+      "prefLabel": "Processing",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.job"
+    },
+    {
+      "@id": "pa:workflow.job.completed",
+      "@type": "skos:Concept",
+      "prefLabel": "Completed",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.job"
+    },
+    {
+      "@id": "pa:workflow.job.failed",
+      "@type": "skos:Concept",
+      "prefLabel": "Failed",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.job"
+    },
+    {
+      "@id": "pa:workflow.job.source-missing",
+      "@type": "skos:Concept",
+      "prefLabel": "Source Missing",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.job"
+    },
+    {
+      "@id": "pa:workflow.job.cancelled",
+      "@type": "skos:Concept",
+      "prefLabel": "Cancelled",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.job"
+    },
+    {
+      "@id": "pa:workflow.compute",
+      "@type": "skos:Concept",
+      "prefLabel": "Compute",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow"
+    },
+    {
+      "@id": "pa:workflow.compute.node-typescript",
+      "@type": "skos:Concept",
+      "prefLabel": "Node Typescript",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.compute"
+    },
+    {
+      "@id": "pa:workflow.compute.browser-worker",
+      "@type": "skos:Concept",
+      "prefLabel": "Browser Worker",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.compute"
+    },
+    {
+      "@id": "pa:workflow.compute.n-api-cpp",
+      "@type": "skos:Concept",
+      "prefLabel": "N Api Cpp",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.compute"
+    },
+    {
+      "@id": "pa:workflow.compute.python-worker",
+      "@type": "skos:Concept",
+      "prefLabel": "Python Worker",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.compute"
+    },
+    {
+      "@id": "pa:workflow.compute.onnx-inference",
+      "@type": "skos:Concept",
+      "prefLabel": "Onnx Inference",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.compute"
+    },
+    {
+      "@id": "pa:workflow.compute.gpu-render",
+      "@type": "skos:Concept",
+      "prefLabel": "Gpu Render",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.compute"
+    },
+    {
+      "@id": "pa:workflow.storage",
+      "@type": "skos:Concept",
+      "prefLabel": "Storage",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow"
+    },
+    {
+      "@id": "pa:workflow.storage.postgres",
+      "@type": "skos:Concept",
+      "prefLabel": "Postgres",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.storage"
+    },
+    {
+      "@id": "pa:workflow.storage.scene-asset-revision",
+      "@type": "skos:Concept",
+      "prefLabel": "Scene Asset Revision",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.storage"
+    },
+    {
+      "@id": "pa:workflow.storage.seaweedfs",
+      "@type": "skos:Concept",
+      "prefLabel": "Seaweedfs",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.storage"
+    },
+    {
+      "@id": "pa:workflow.storage.valkey",
+      "@type": "skos:Concept",
+      "prefLabel": "Valkey",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.storage"
+    },
+    {
+      "@id": "pa:workflow.storage.transient-hashmap",
+      "@type": "skos:Concept",
+      "prefLabel": "Transient Hashmap",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.storage"
+    },
+    {
+      "@id": "pa:workflow.storage.qdrant-projection",
+      "@type": "skos:Concept",
+      "prefLabel": "Qdrant Projection",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.storage"
+    },
+    {
+      "@id": "pa:workflow.storage.neo4j-projection",
+      "@type": "skos:Concept",
+      "prefLabel": "Neo4J Projection",
+      "inScheme": "pa:scheme",
+      "broader": "pa:workflow.storage"
+    },
+    {
+      "@id": "pa:scene-context",
+      "@type": "skos:Concept",
+      "prefLabel": "Scene Context",
+      "inScheme": "pa:scheme"
+    },
+    {
+      "@id": "pa:scene-context.setting",
+      "@type": "skos:Concept",
+      "prefLabel": "Setting",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context"
+    },
+    {
+      "@id": "pa:scene-context.setting.indoor",
+      "@type": "skos:Concept",
+      "prefLabel": "Indoor",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.setting"
+    },
+    {
+      "@id": "pa:scene-context.setting.urban",
+      "@type": "skos:Concept",
+      "prefLabel": "Urban",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.setting"
+    },
+    {
+      "@id": "pa:scene-context.setting.beach",
+      "@type": "skos:Concept",
+      "prefLabel": "Beach",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.setting"
+    },
+    {
+      "@id": "pa:scene-context.setting.coastal",
+      "@type": "skos:Concept",
+      "prefLabel": "Coastal",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.setting"
+    },
+    {
+      "@id": "pa:scene-context.setting.rural",
+      "@type": "skos:Concept",
+      "prefLabel": "Rural",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.setting"
+    },
+    {
+      "@id": "pa:scene-context.setting.transit",
+      "@type": "skos:Concept",
+      "prefLabel": "Transit",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.setting"
+    },
+    {
+      "@id": "pa:scene-context.setting.commercial",
+      "@type": "skos:Concept",
+      "prefLabel": "Commercial",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.setting"
+    },
+    {
+      "@id": "pa:scene-context.setting.residential",
+      "@type": "skos:Concept",
+      "prefLabel": "Residential",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.setting"
+    },
+    {
+      "@id": "pa:scene-context.setting.public-space",
+      "@type": "skos:Concept",
+      "prefLabel": "Public Space",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.setting"
+    },
+    {
+      "@id": "pa:scene-context.case-category",
+      "@type": "skos:Concept",
+      "prefLabel": "Case Category",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context"
+    },
+    {
+      "@id": "pa:scene-context.case-category.unclassified",
+      "@type": "skos:Concept",
+      "prefLabel": "Unclassified",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.case-category"
+    },
+    {
+      "@id": "pa:scene-context.case-category.allegation",
+      "@type": "skos:Concept",
+      "prefLabel": "Allegation",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.case-category"
+    },
+    {
+      "@id": "pa:scene-context.case-category.incident",
+      "@type": "skos:Concept",
+      "prefLabel": "Incident",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.case-category"
+    },
+    {
+      "@id": "pa:scene-context.case-category.disputed-event",
+      "@type": "skos:Concept",
+      "prefLabel": "Disputed Event",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.case-category"
+    },
+    {
+      "@id": "pa:scene-context.case-category.recorded-event",
+      "@type": "skos:Concept",
+      "prefLabel": "Recorded Event",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.case-category"
+    },
+    {
+      "@id": "pa:scene-context.case-category.reconstructed-hypothesis",
+      "@type": "skos:Concept",
+      "prefLabel": "Reconstructed Hypothesis",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.case-category"
+    },
+    {
+      "@id": "pa:scene-context.purpose",
+      "@type": "skos:Concept",
+      "prefLabel": "Purpose",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context"
+    },
+    {
+      "@id": "pa:scene-context.purpose.illustration",
+      "@type": "skos:Concept",
+      "prefLabel": "Illustration",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.purpose"
+    },
+    {
+      "@id": "pa:scene-context.purpose.investigation",
+      "@type": "skos:Concept",
+      "prefLabel": "Investigation",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.purpose"
+    },
+    {
+      "@id": "pa:scene-context.purpose.training",
+      "@type": "skos:Concept",
+      "prefLabel": "Training",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.purpose"
+    },
+    {
+      "@id": "pa:scene-context.purpose.review",
+      "@type": "skos:Concept",
+      "prefLabel": "Review",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.purpose"
+    },
+    {
+      "@id": "pa:scene-context.purpose.comparison",
+      "@type": "skos:Concept",
+      "prefLabel": "Comparison",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.purpose"
+    },
+    {
+      "@id": "pa:scene-context.purpose.storyboard",
+      "@type": "skos:Concept",
+      "prefLabel": "Storyboard",
+      "inScheme": "pa:scheme",
+      "broader": "pa:scene-context.purpose"
+    },
+    {
+      "@id": "pa:safety",
+      "@type": "skos:Concept",
+      "prefLabel": "Safety",
+      "inScheme": "pa:scheme"
+    },
+    {
+      "@id": "pa:safety.claim",
+      "@type": "skos:Concept",
+      "prefLabel": "Claim",
+      "inScheme": "pa:scheme",
+      "broader": "pa:safety"
+    },
+    {
+      "@id": "pa:safety.claim.not-an-identity",
+      "@type": "skos:Concept",
+      "prefLabel": "Not An Identity",
+      "inScheme": "pa:scheme",
+      "broader": "pa:safety.claim"
+    },
+    {
+      "@id": "pa:safety.claim.not-a-measurement",
+      "@type": "skos:Concept",
+      "prefLabel": "Not A Measurement",
+      "inScheme": "pa:scheme",
+      "broader": "pa:safety.claim"
+    },
+    {
+      "@id": "pa:safety.claim.not-an-observed-action",
+      "@type": "skos:Concept",
+      "prefLabel": "Not An Observed Action",
+      "inScheme": "pa:scheme",
+      "broader": "pa:safety.claim"
+    },
+    {
+      "@id": "pa:safety.claim.requires-review",
+      "@type": "skos:Concept",
+      "prefLabel": "Requires Review",
+      "inScheme": "pa:scheme",
+      "broader": "pa:safety.claim"
+    },
+    {
+      "@id": "pa:safety.claim.uncertain-source",
+      "@type": "skos:Concept",
+      "prefLabel": "Uncertain Source",
+      "inScheme": "pa:scheme",
+      "broader": "pa:safety.claim"
+    },
+    {
+      "@id": "pa:safety.claim.synthetic-only",
+      "@type": "skos:Concept",
+      "prefLabel": "Synthetic Only",
+      "inScheme": "pa:scheme",
+      "broader": "pa:safety.claim"
+    },
+    {
+      "@id": "pa:safety.gate",
+      "@type": "skos:Concept",
+      "prefLabel": "Gate",
+      "inScheme": "pa:scheme",
+      "broader": "pa:safety"
+    },
+    {
+      "@id": "pa:safety.gate.case-membership",
+      "@type": "skos:Concept",
+      "prefLabel": "Case Membership",
+      "inScheme": "pa:scheme",
+      "broader": "pa:safety.gate"
+    },
+    {
+      "@id": "pa:safety.gate.hash-match",
+      "@type": "skos:Concept",
+      "prefLabel": "Hash Match",
+      "inScheme": "pa:scheme",
+      "broader": "pa:safety.gate"
+    },
+    {
+      "@id": "pa:safety.gate.source-revision-match",
+      "@type": "skos:Concept",
+      "prefLabel": "Source Revision Match",
+      "inScheme": "pa:scheme",
+      "broader": "pa:safety.gate"
+    },
+    {
+      "@id": "pa:safety.gate.rights-qualified",
+      "@type": "skos:Concept",
+      "prefLabel": "Rights Qualified",
+      "inScheme": "pa:scheme",
+      "broader": "pa:safety.gate"
+    },
+    {
+      "@id": "pa:safety.gate.human-approval",
+      "@type": "skos:Concept",
+      "prefLabel": "Human Approval",
+      "inScheme": "pa:scheme",
+      "broader": "pa:safety.gate"
+    },
+    {
+      "@id": "pa:safety.gate.cross-case-deny",
+      "@type": "skos:Concept",
+      "prefLabel": "Cross Case Deny",
+      "inScheme": "pa:scheme",
+      "broader": "pa:safety.gate"
+    }
+  ]
+}

@@ -613,8 +613,12 @@ function canonicalDocHit(r: Record<string, unknown>): DocSearchHit {
  * recipe/executor stamp yet, so `representationCaveat` is always reported. A vector lane has no local fallback: an invalid vector, absent pool or
  * database failure returns zero hits with a typed note.
  */
-export async function searchDocCorpusDense(opts: { pool: Pool | null; queryVector: readonly number[]; limit?: number; product?: string | null; productVersion?: string | null; queryRecipeRevision?: string | null }): Promise<DocSearchResult & { representationCaveat: string; representationAdmission: DenseDocRepresentationAdmissionV1; queryIdentity: DenseDocQueryIdentityV1 }> {
+/** Default similarity floor (cosine, 1 - distance). Below it a hit is weak evidence, so it is dropped instead of returned as an answer. */
+export const DOC_DENSE_MIN_SIMILARITY_DEFAULT = 0.45;
+
+export async function searchDocCorpusDense(opts: { pool: Pool | null; queryVector: readonly number[]; limit?: number; product?: string | null; productVersion?: string | null; queryRecipeRevision?: string | null; minSimilarity?: number }): Promise<DocSearchResult & { representationCaveat: string; representationAdmission: DenseDocRepresentationAdmissionV1; queryIdentity: DenseDocQueryIdentityV1; minSimilarity: number }> {
 	const limit = Math.min(Math.max(opts.limit ?? 10, 1), 25);
+	const minSimilarity = Math.min(Math.max(opts.minSimilarity ?? DOC_DENSE_MIN_SIMILARITY_DEFAULT, -1), 1);
 	const product = opts.product?.trim().slice(0, 100) || null;
 	const productVersion = opts.productVersion?.trim().slice(0, 100) || null;
 	const representationAdmission: DenseDocRepresentationAdmissionV1 = {
@@ -622,7 +626,7 @@ export async function searchDocCorpusDense(opts: { pool: Pool | null; queryVecto
 		queryRecipeRevision: opts.queryRecipeRevision ?? null, corpusRecipeRevision: null, proofUsable: false
 	};
 	const base = {
-		query: '', mode: 'POSTGRES_DENSE' as const, filters: { product, productVersion }, hits: [] as DocSearchHit[],
+		query: '', mode: 'POSTGRES_DENSE' as const, filters: { product, productVersion }, hits: [] as DocSearchHit[], minSimilarity,
 		representationCaveat: 'CORPUS_EXECUTOR_PARITY_UNPROVEN: corpus vectors carry no recipe/executor stamp; cosine order is indicative only',
 		representationAdmission,
 		queryIdentity: {
@@ -640,9 +644,10 @@ export async function searchDocCorpusDense(opts: { pool: Pool | null; queryVecto
 			        p.product_version, p.url, p.source_authority, p.evidence_revision AS page_evidence_revision, left(c.text, 300) AS excerpt
 			   FROM atlas_external_doc_chunks c JOIN atlas_external_doc_pages p ON p.id = c.page_id
 			  WHERE c.content_embedding IS NOT NULL AND ($3::text IS NULL OR p.product = $3) AND ($4::text IS NULL OR p.product_version = $4)
+			  AND (1 - (c.content_embedding <=> $1::vector)) >= $5
 			  ORDER BY c.content_embedding <=> $1::vector, c.chunk_id
 			  LIMIT $2`,
-			[`[${opts.queryVector.join(',')}]`, limit, product, productVersion]
+			[`[${opts.queryVector.join(',')}]`, limit, product, productVersion, minSimilarity]
 		);
 		return { ...base, postgresNote: null, hits: rows.map(canonicalDocHit) };
 	} catch (error) {
@@ -650,7 +655,7 @@ export async function searchDocCorpusDense(opts: { pool: Pool | null; queryVecto
 	}
 }
 
-export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q: string; limit?: number; runtime?: RuntimeVersions; product?: string | null; productVersion?: string | null }): Promise<DocSearchResult> {
+export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q: string; limit?: number; runtime?: RuntimeVersions; product?: string | null; productVersion?: string | null; canonicalOfficialOnly?: boolean }): Promise<DocSearchResult> {
 	const limit = Math.min(Math.max(opts.limit ?? 10, 1), 25);
 	const q = opts.q.trim().slice(0, 300);
 	let postgresNote: string | null = null;
@@ -670,6 +675,7 @@ export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q
 					  WHERE c.search_vector @@ query
 					    AND ($3::text IS NULL OR p.product = $3)
 					    AND ($4::text IS NULL OR p.product_version = $4)
+					    ${opts.canonicalOfficialOnly ? "AND p.source_authority = 'OFFICIAL'" : ''}
 					  ORDER BY ts_rank(c.search_vector, query) DESC, c.chunk_id
 					  LIMIT $2`,
 					[q, limit, product, productVersion]
@@ -683,6 +689,9 @@ export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q
 		} catch (error) {
 			postgresNote = `POSTGRES_UNAVAILABLE:${error instanceof Error ? error.message : String(error)}`;
 		}
+	}
+	if (opts.canonicalOfficialOnly) {
+		return { query: q, mode: 'POSTGRES_FTS', postgresNote: postgresNote ?? 'POSTGRES_FTS_UNAVAILABLE', filters: { product, productVersion }, hits: [] };
 	}
 	const runtime = opts.runtime ?? { postgres: null, pgvector: null, drizzleOrm: null, drizzleKit: null, pg: null, svelte: null, svelteKit: null, bitsUi: null };
 	const { sources } = collectLocalCaptures(opts.root, runtime);

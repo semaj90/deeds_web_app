@@ -1,4 +1,11 @@
 import math
+import hashlib
+import json
+import os
+import struct
+import sys
+import tempfile
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import torch
 import torch.nn.functional as F
@@ -26,18 +33,303 @@ class OkfAstNodeSchema(BaseModel):
     fan_out_cap: int = Field(default=32, ge=1, le=200)
 
 
+# J-Space projections are immutable, revisioned artifacts. The file format is
+# a small JSON manifest followed by little-endian float32 matrix bytes; it
+# deliberately avoids pickle/torch.load for untrusted artifact inputs.
+_JSPACE_MAGIC_V1 = b"PAJSP1\x00"
+_JSPACE_MAX_MANIFEST_BYTES = 4096
+_JSPACE_MAX_MATRIX_BYTES = 64 * 1024 * 1024
+
+
+def _jspace_sha256(data: bytes) -> str:
+    return f"sha256:{hashlib.sha256(data).hexdigest()}"
+
+
+def build_hamming_projection_artifact_v1(
+    dim: int = 4096,
+    j_bits: int = 64,
+    seed: int = 42,
+) -> tuple[bytes, dict[str, object]]:
+    """Build a portable CPU-generated projection artifact deterministically."""
+    if not isinstance(dim, int) or isinstance(dim, bool) or dim < 1:
+        raise ValueError("JSPACE_DIM_INVALID")
+    if not isinstance(j_bits, int) or isinstance(j_bits, bool) or j_bits < 1:
+        raise ValueError("JSPACE_BITS_INVALID")
+    if not isinstance(seed, int) or isinstance(seed, bool) or seed < 0 or seed > 0x7FFF_FFFF_FFFF_FFFF:
+        raise ValueError("JSPACE_SEED_INVALID")
+    byte_length = dim * j_bits * 4
+    if byte_length > _JSPACE_MAX_MATRIX_BYTES:
+        raise ValueError("JSPACE_MATRIX_BYTE_LIMIT_EXCEEDED")
+    if sys.byteorder != "little":
+        raise ValueError("JSPACE_LITTLE_ENDIAN_HOST_REQUIRED")
+
+    generator = torch.Generator(device="cpu")
+    generator.manual_seed(seed)
+    matrix = torch.randn((dim, j_bits), generator=generator, dtype=torch.float32, device="cpu")
+    matrix_bytes = matrix.contiguous().numpy().tobytes(order="C")
+    manifest: dict[str, object] = {
+        "schema": "parent-atlas.jspace-projection.v1",
+        "seed": seed,
+        "rows": dim,
+        "columns": j_bits,
+        "dtype": "float32-le",
+        "bitOrder": "least-significant-bit-first",
+        "generationDevice": "cpu",
+        "generator": "torch.Generator(cpu)+torch.randn(float32)",
+        "torchVersion": str(torch.__version__),
+        "matrixByteLength": len(matrix_bytes),
+        "matrixSha256": _jspace_sha256(matrix_bytes),
+    }
+    manifest_bytes = json.dumps(manifest, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    if len(manifest_bytes) > _JSPACE_MAX_MANIFEST_BYTES:
+        raise ValueError("JSPACE_MANIFEST_BYTE_LIMIT_EXCEEDED")
+    artifact = _JSPACE_MAGIC_V1 + struct.pack(">I", len(manifest_bytes)) + manifest_bytes + matrix_bytes
+    return artifact, {**manifest, "artifactSha256": _jspace_sha256(artifact)}
+
+
+def decode_hamming_projection_artifact_v1(
+    artifact: bytes | bytearray | memoryview,
+    *,
+    expected_artifact_sha256: Optional[str] = None,
+) -> tuple[torch.Tensor, dict[str, object]]:
+    """Decode and verify a J-Space projection artifact before tensor creation."""
+    raw = bytes(artifact)
+    artifact_sha = _jspace_sha256(raw)
+    if expected_artifact_sha256 is not None:
+        expected = str(expected_artifact_sha256).strip().lower()
+        if not expected.startswith("sha256:"):
+            expected = f"sha256:{expected}"
+        if expected != artifact_sha:
+            raise ValueError("JSPACE_ARTIFACT_SHA256_MISMATCH")
+    header_size = len(_JSPACE_MAGIC_V1) + 4
+    if len(raw) < header_size or not raw.startswith(_JSPACE_MAGIC_V1):
+        raise ValueError("JSPACE_ARTIFACT_MAGIC_INVALID")
+    manifest_length = struct.unpack(">I", raw[len(_JSPACE_MAGIC_V1):header_size])[0]
+    if manifest_length < 2 or manifest_length > _JSPACE_MAX_MANIFEST_BYTES:
+        raise ValueError("JSPACE_MANIFEST_LENGTH_INVALID")
+    manifest_end = header_size + manifest_length
+    if manifest_end > len(raw):
+        raise ValueError("JSPACE_MANIFEST_TRUNCATED")
+    try:
+        manifest = json.loads(raw[header_size:manifest_end].decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("JSPACE_MANIFEST_INVALID") from exc
+    if not isinstance(manifest, dict) or manifest.get("schema") != "parent-atlas.jspace-projection.v1":
+        raise ValueError("JSPACE_SCHEMA_UNSUPPORTED")
+    rows, columns = manifest.get("rows"), manifest.get("columns")
+    if any(not isinstance(v, int) or isinstance(v, bool) or v < 1 for v in (rows, columns)):
+        raise ValueError("JSPACE_SHAPE_INVALID")
+    seed = manifest.get("seed")
+    if not isinstance(seed, int) or isinstance(seed, bool) or seed < 0 or seed > 0x7FFF_FFFF_FFFF_FFFF:
+        raise ValueError("JSPACE_SEED_INVALID")
+    matrix_length = rows * columns * 4
+    matrix_bytes = raw[manifest_end:]
+    if matrix_length > _JSPACE_MAX_MATRIX_BYTES or len(matrix_bytes) != matrix_length:
+        raise ValueError("JSPACE_MATRIX_LENGTH_INVALID")
+    if manifest.get("dtype") != "float32-le" or manifest.get("bitOrder") != "least-significant-bit-first":
+        raise ValueError("JSPACE_ENCODING_UNSUPPORTED")
+    if manifest.get("generationDevice") != "cpu" or sys.byteorder != "little":
+        raise ValueError("JSPACE_GENERATION_DEVICE_UNSUPPORTED")
+    if manifest.get("matrixByteLength") != matrix_length or manifest.get("matrixSha256") != _jspace_sha256(matrix_bytes):
+        raise ValueError("JSPACE_MATRIX_CHECKSUM_MISMATCH")
+    matrix = torch.frombuffer(bytearray(matrix_bytes), dtype=torch.float32).clone().reshape(rows, columns)
+    if not bool(torch.isfinite(matrix).all().item()):
+        raise ValueError("JSPACE_MATRIX_NONFINITE")
+    return matrix, {**manifest, "artifactSha256": artifact_sha}
+
+
+def write_hamming_projection_artifact_v1(
+    path: str | os.PathLike[str],
+    *,
+    dim: int = 4096,
+    j_bits: int = 64,
+    seed: int = 42,
+) -> dict[str, object]:
+    """Explicitly write one immutable projection artifact without overwriting it."""
+    artifact, manifest = build_hamming_projection_artifact_v1(dim, j_bits, seed)
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists():
+        existing = target.read_bytes()
+        if existing != artifact:
+            raise ValueError("JSPACE_ARTIFACT_PATH_IMMUTABLE")
+        decode_hamming_projection_artifact_v1(existing, expected_artifact_sha256=manifest["artifactSha256"])
+        return {**manifest, "path": str(target)}
+    fd, temporary_name = tempfile.mkstemp(prefix=f".{target.name}.", suffix=".tmp", dir=target.parent)
+    try:
+        with os.fdopen(fd, "wb") as stream:
+            stream.write(artifact)
+            stream.flush()
+            os.fsync(stream.fileno())
+        # Hard-link creation is atomic and fails if another writer already
+        # published this content-addressed path; it cannot replace a winner.
+        os.link(temporary_name, target)
+        os.unlink(temporary_name)
+    except FileExistsError:
+        try:
+            os.unlink(temporary_name)
+        except FileNotFoundError:
+            pass
+        existing = target.read_bytes()
+        if existing != artifact:
+            raise ValueError("JSPACE_ARTIFACT_PATH_IMMUTABLE")
+        decode_hamming_projection_artifact_v1(existing, expected_artifact_sha256=manifest["artifactSha256"])
+    except BaseException:
+        try:
+            os.unlink(temporary_name)
+        except FileNotFoundError:
+            pass
+        raise
+    return {**manifest, "path": str(target)}
+
+
+def tie_aware_recall_at_k_v1(
+    exact_scores: torch.Tensor,
+    approximate_order: torch.Tensor,
+    k: int,
+    *,
+    tie_atol: float = 1e-7,
+) -> float:
+    """Compute recall@k while crediting any exact-score tie at the kth boundary."""
+    if exact_scores.ndim != 1 or approximate_order.ndim != 1 or exact_scores.numel() != approximate_order.numel():
+        raise ValueError("JSPACE_RECALL_VECTOR_SHAPE_INVALID")
+    count = exact_scores.numel()
+    if not isinstance(k, int) or isinstance(k, bool) or k < 1 or k > count:
+        raise ValueError("JSPACE_RECALL_K_INVALID")
+    if not math.isfinite(tie_atol) or tie_atol < 0.0:
+        raise ValueError("JSPACE_RECALL_TOLERANCE_INVALID")
+    scores = exact_scores.detach().to(device="cpu", dtype=torch.float64)
+    order = approximate_order.detach().to(device="cpu", dtype=torch.int64)
+    if not bool(torch.isfinite(scores).all().item()):
+        raise ValueError("JSPACE_RECALL_EXACT_SCORE_NONFINITE")
+    if bool(((order < 0) | (order >= count)).any().item()) or torch.unique(order).numel() != count:
+        raise ValueError("JSPACE_RECALL_APPROXIMATE_ORDER_INVALID")
+    threshold = torch.sort(scores, descending=True, stable=True).values[k - 1]
+    tied_exact_topk = scores >= threshold - tie_atol
+    selected = order[:k]
+    return float(tied_exact_topk[selected].to(torch.float64).sum().item() / k)
+
+
+def evaluate_hamming_topk_recall_v1(
+    index: "SpatialCodebaseIndex",
+    corpus_embeddings: torch.Tensor,
+    query_embeddings: torch.Tensor,
+    *,
+    k_values: Tuple[int, ...] = (1, 5, 10),
+    tie_atol: float = 1e-7,
+    max_pairwise_comparisons: int = 2_000_000,
+) -> dict[str, object]:
+    """Compare Hamming shortlist order to exact cosine on a bounded frozen cohort."""
+    if corpus_embeddings.ndim != 2 or query_embeddings.ndim != 2:
+        raise ValueError("JSPACE_RECALL_INPUT_RANK_INVALID")
+    if corpus_embeddings.shape[0] < 1 or query_embeddings.shape[0] < 1:
+        raise ValueError("JSPACE_RECALL_INPUT_EMPTY")
+    if corpus_embeddings.shape[1] != index.dim or query_embeddings.shape[1] != index.dim:
+        raise ValueError("JSPACE_RECALL_DIMENSION_MISMATCH")
+    pair_count = int(corpus_embeddings.shape[0]) * int(query_embeddings.shape[0])
+    if not isinstance(max_pairwise_comparisons, int) or max_pairwise_comparisons < 1 or pair_count > max_pairwise_comparisons:
+        raise ValueError("JSPACE_RECALL_PAIR_BUDGET_EXCEEDED")
+    if not k_values or len(set(k_values)) != len(k_values) or any(
+        not isinstance(k, int) or isinstance(k, bool) or k < 1 or k > corpus_embeddings.shape[0]
+        for k in k_values
+    ):
+        raise ValueError("JSPACE_RECALL_K_VALUES_INVALID")
+    corpus = corpus_embeddings.detach().to(device="cpu", dtype=torch.float32).contiguous()
+    queries = query_embeddings.detach().to(device="cpu", dtype=torch.float32).contiguous()
+    if not bool(torch.isfinite(corpus).all().item()) or not bool(torch.isfinite(queries).all().item()):
+        raise ValueError("JSPACE_RECALL_INPUT_NONFINITE")
+    corpus_bytes = corpus.numpy().tobytes(order="C")
+    query_bytes = queries.numpy().tobytes(order="C")
+    corpus_l2 = F.normalize(corpus, p=2.0, dim=-1)
+    query_l2 = F.normalize(queries, p=2.0, dim=-1)
+    corpus_bits = (corpus_l2 @ index.hamming_proj.detach().to(device="cpu", dtype=torch.float32) > 0).to(torch.uint8)
+    query_bits = (query_l2 @ index.hamming_proj.detach().to(device="cpu", dtype=torch.float32) > 0).to(torch.uint8)
+    exact_scores = query_l2 @ corpus_l2.T
+    hamming_distances = (query_bits[:, None, :] != corpus_bits[None, :, :]).sum(dim=-1)
+    approximate_orders = torch.argsort(hamming_distances, dim=1, stable=True)
+    metrics: dict[str, dict[str, float]] = {}
+    per_query: list[dict[str, object]] = []
+    for k in k_values:
+        recalls = [
+            tie_aware_recall_at_k_v1(exact_scores[row], approximate_orders[row], k, tie_atol=tie_atol)
+            for row in range(query_l2.shape[0])
+        ]
+        metrics[str(k)] = {"meanRecall": sum(recalls) / len(recalls), "minRecall": min(recalls)}
+    for row in range(query_l2.shape[0]):
+        per_query.append({
+            "queryOrdinal": row,
+            "hammingOrderPrefix": approximate_orders[row, : min(max(k_values), corpus.shape[0])].tolist(),
+            "recallAtK": {
+                str(k): tie_aware_recall_at_k_v1(exact_scores[row], approximate_orders[row], k, tie_atol=tie_atol)
+                for k in k_values
+            },
+        })
+    return {
+        "schema": "parent-atlas.jspace-recall-evaluation.v1",
+        "status": "FIXTURE_OR_CALLER_SUPPLIED_COHORT_ONLY",
+        "cohort": {
+            "corpusCount": int(corpus.shape[0]),
+            "queryCount": int(queries.shape[0]),
+            "embeddingDimension": int(corpus.shape[1]),
+            "corpusSha256": _jspace_sha256(corpus_bytes),
+            "queriesSha256": _jspace_sha256(query_bytes),
+            "pairwiseComparisonCount": pair_count,
+        },
+        "projectionSha256": index.projection_manifest.get("artifactSha256"),
+        "projectionArtifactBacked": index.projection_artifact_backed,
+        "exactMetric": "cosine_similarity",
+        "approximateMetric": "hamming_distance",
+        "tieRule": f"exact scores within {tie_atol} of kth score are eligible hits; denominator remains k",
+        "recallAtK": metrics,
+        "perQuery": per_query,
+        "canonicalAuthority": False,
+        "writesPerformed": False,
+    }
+
+
 # ============================================================================
 # 2. Spatial Indexing: L2 Norm + Hilbert Key + Hamming J-Space + NVIDIA cuVS
 # ============================================================================
 class SpatialCodebaseIndex:
-    def __init__(self, dim: int = 4096, j_bits: int = 64, num_voronoi_cells: int = 64, device: str = "cpu"):
+    def __init__(
+        self,
+        dim: int = 4096,
+        j_bits: int = 64,
+        num_voronoi_cells: int = 64,
+        device: str = "cpu",
+        *,
+        seed: int = 42,
+        projection_path: Optional[str] = None,
+        projection_sha256: Optional[str] = None,
+        allow_ephemeral_projection: bool = False,
+    ):
         self.dim = dim
         self.j_bits = j_bits
         self.num_voronoi_cells = num_voronoi_cells
         self.device = device
-        # Fixed Gaussian projection matrix for Hamming J-Space
-        torch.manual_seed(42)
-        self.hamming_proj = torch.randn(dim, j_bits, device=device)
+        if projection_path is not None:
+            if allow_ephemeral_projection:
+                raise ValueError("JSPACE_ARTIFACT_AND_EPHEMERAL_MODES_CONFLICT")
+            if projection_sha256 is None:
+                raise ValueError("JSPACE_ARTIFACT_HASH_REQUIRED")
+            raw_artifact = Path(projection_path).read_bytes()
+            matrix, manifest = decode_hamming_projection_artifact_v1(
+                raw_artifact,
+                expected_artifact_sha256=projection_sha256,
+            )
+            if tuple(matrix.shape) != (dim, j_bits):
+                raise ValueError("JSPACE_ARTIFACT_SHAPE_MISMATCH")
+            self.projection_manifest = manifest
+            self.projection_artifact_backed = True
+        else:
+            if not allow_ephemeral_projection:
+                raise ValueError("JSPACE_ARTIFACT_PATH_REQUIRED")
+            if projection_sha256 is not None:
+                raise ValueError("JSPACE_EXPECTED_HASH_REQUIRES_ARTIFACT_PATH")
+            raw_artifact, _ = build_hamming_projection_artifact_v1(dim, j_bits, seed)
+            matrix, self.projection_manifest = decode_hamming_projection_artifact_v1(raw_artifact)
+            self.projection_artifact_backed = False
+        self.hamming_proj = matrix.to(device=device)
 
     def normalize_and_hash(self, embeddings: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """

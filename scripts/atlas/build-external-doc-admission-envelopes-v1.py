@@ -21,6 +21,7 @@ import hashlib
 import json
 import sys
 import time
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -46,7 +47,7 @@ def stable(value) -> str:
 
 
 def acquire(manifest) -> list[dict]:
-    root = Path(manifest.output_root).resolve()
+    root = (ROOT / manifest.output_root).resolve()
     failures: list[dict] = []
     for source in manifest.sources:
         pages = []
@@ -82,16 +83,26 @@ def duplicates(values: list[str]) -> dict:
     return {"groups": len(groups), "rows": sum(groups.values())}
 
 
-def build(manifest, coords: dict) -> tuple[list[dict], dict]:
+def build(manifest, coords: dict, *, verified_pages: list[bytes] | None = None) -> tuple[list[dict], dict]:
     envelopes: list[dict] = []
     native_total = native_null = normalization_differs = 0
     for source in manifest.sources:
-        raw_dir = ROOT / source.output_namespace / "raw"
+        raw_dir = (ROOT / manifest.output_root).resolve() / source.output_namespace / "raw"
         authority = coords["sources"][source.source_id]["authorityClass"]
         for receipt_path in sorted(raw_dir.glob("*.json")):
             receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
-            text = receipt_path.with_suffix(".md").read_text(encoding="utf-8").replace("\r\n", "\n")
+            captured_bytes = receipt_path.with_suffix(".md").read_bytes()
+            text = captured_bytes.decode("utf-8")
             url = receipt["resolved_url"]
+            if verified_pages is not None:
+                if (
+                    receipt.get("source_id") != source.source_id
+                    or receipt.get("source_revision") != source.source_revision
+                    or receipt.get("requested_url") != url
+                    or url not in source.pages
+                    or receipt.get("normalized_checksum") != hashlib.sha256(captured_bytes).hexdigest()
+                ):
+                    raise ValueError("PILOT_CAPTURE_READBACK_MISMATCH")
             override = coords["sources"][source.source_id].get("urlOverrides", {}).get(url, {})
             authority_class = override.get("authorityClass", authority)
             artifact = P.PageArtifact(
@@ -104,6 +115,11 @@ def build(manifest, coords: dict) -> tuple[list[dict], dict]:
             chunks = P.compile_chunks([artifact], stanza_pipeline=None, stanza_model_revision="none", maximum_chars=MAX_CHARS,
                                       overlap_chars=OVERLAP, coordinate_for=lambda page, source=source: P.build_page_coordinate(source, page),
                                       chunk_identity_version=source.chunk_identity_version)
+            if verified_pages is not None:
+                normalized_bytes = _normalize_ws(text).encode("utf-8")
+                if not chunks or any(normalized_bytes[c.start_byte:c.end_byte] != c.text.encode("utf-8") for c in chunks):
+                    raise ValueError("PILOT_CHUNK_SPAN_MISMATCH")
+                verified_pages.append(normalized_bytes)
             native_total += len(chunks)
             native_null += sum(1 for c in chunks if c.doc_coordinate is None)
             normalization_differs += 1 if _normalize_ws(text) != text else 0
@@ -119,7 +135,11 @@ def build(manifest, coords: dict) -> tuple[list[dict], dict]:
                     "architecture": coordinate.architecture, "language": coordinate.language, "url": coordinate.url, "title": receipt["title"],
                     "publisher": source.publisher, "sourceAuthority": "OFFICIAL" if authority_class == "OFFICIAL_PRIMARY" else "COMMUNITY",
                     "fetcher": receipt["fetcher"], "crawlRevision": source.source_revision,
-                    "parserRevision": f"beautifulsoup4=={receipt.get('metadata', {}).get('parserVersion', 'unknown')}/html.parser",
+                    "parserRevision": (
+                        f"firecrawl-v2-markdown/{manifest.producer_revision}"
+                        if receipt["fetcher"] == "FIRECRAWL_V2"
+                        else f"beautifulsoup4=={receipt.get('metadata', {}).get('parserVersion', 'unknown')}/html.parser"
+                    ),
                     "contentHash": coordinate.content_hash, "evidenceRevision": coordinate.evidence_revision, "retrievedAt": receipt["fetched_at"],
                 },
                 "chunks": [{
@@ -148,6 +168,8 @@ def main() -> int:
     parser.add_argument("--coordinates", type=Path, default=COORDS, help="Manifest-coordinate sidecar")
     parser.add_argument("--output", type=Path, default=ENVELOPES, help="Admission envelope output path")
     parser.add_argument("--receipt", type=Path, default=RECEIPT, help="Builder receipt output path")
+    parser.add_argument("--normalized-page", type=Path, help="Export the verified UTF-8 byte source for a one-page admission pilot")
+    parser.add_argument("--nlp8095", action="store_true", help="Stamp chunks with live :8095 /analyze domain_class and extraction revision (read-only)")
     args = parser.parse_args()
     manifest = P.load_manifest(args.manifest)
     prior_manifest = P.load_manifest(args.prior_manifest) if args.prior_manifest else None
@@ -156,7 +178,35 @@ def main() -> int:
     selected_sources, recrawl_plan = P._sources_selected_by_recrawl_plan(manifest, prior_manifest)
     selected_manifest = replace(manifest, sources=selected_sources)
     failures = acquire(selected_manifest) if args.acquire else []
-    envelopes, native = build(selected_manifest, coords)
+    verified_pages = [] if args.normalized_page else None
+    envelopes, native = build(selected_manifest, coords, verified_pages=verified_pages)
+    nlp8095_stamped = 0
+    if args.nlp8095:
+        for env in envelopes:
+            for chunk in env["chunks"][:2]:
+                req = urllib.request.Request(
+                    "http://127.0.0.1:8095/analyze",
+                    data=json.dumps({"text": chunk["text"][:2000]}).encode("utf-8"),
+                    headers={"content-type": "application/json"},
+                    method="POST",
+                )
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    analyzed = json.loads(resp.read().decode("utf-8"))
+                prop = analyzed.get("classification_proposal") or {}
+                domain = prop.get("domain") if isinstance(prop, dict) else None
+                if isinstance(domain, str) and domain:
+                    chunk["domainClass"] = domain
+                concepts = [c for c in analyzed.get("concepts", []) if isinstance(c, str) and c][:5]
+                if concepts:
+                    chunk["ontologyClasses"] = sorted(set(list(chunk["ontologyClasses"]) + concepts))
+                if analyzed.get("provider_revision"):
+                    env["page"]["parserRevision"] = str(analyzed["provider_revision"])[:120]
+                    nlp8095_stamped += 1
+    if args.normalized_page:
+        if failures or len(envelopes) != 1 or len(verified_pages or []) != 1:
+            raise SystemExit("PILOT_REQUIRES_ONE_VERIFIED_CAPTURE")
+        args.normalized_page.parent.mkdir(parents=True, exist_ok=True)
+        args.normalized_page.write_bytes(verified_pages[0])
     output_path = args.output.resolve()
     receipt_path = args.receipt.resolve()
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -169,6 +219,7 @@ def main() -> int:
         "priorManifestRevision": prior_manifest.manifest_revision if prior_manifest else None,
         "recrawlPlan": recrawl_plan,
         "acquired": args.acquire,
+        "nlp8095Stamped": nlp8095_stamped,
         "acquisitionFailures": failures,
         "pages": len(envelopes),
         "chunks": sum(len(e["chunks"]) for e in envelopes),

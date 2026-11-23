@@ -522,14 +522,150 @@ import json as _json  # noqa: E402
 import threading  # noqa: E402
 import http.client  # noqa: E402
 from http.server import HTTPServer  # noqa: E402
+import python.parent_atlas_dspy_repair as repair_module  # noqa: E402
 
 from python.parent_atlas_dspy_repair import (  # noqa: E402
     make_repair_worker_handler_v1,
+    resolve_native_dspy_lm_v1,
     run_repair_request_v1,
     serve_repair_worker_v1,
 )
 
 _CHECKSUM = "sha256:" + "a" * 64
+
+
+def test_native_dspy_lm_uses_live_model_discovery_and_forces_lm15(monkeypatch):
+    calls = {}
+
+    class FakeDspy:
+        @staticmethod
+        def LM(**kwargs):
+            calls.update(kwargs)
+            return SimpleNamespace(**kwargs)
+
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self):
+            return b'{"data":[{"id":"gemma4-legal-iq4xs-direct.gguf"}]}'
+
+    def fake_urlopen(request, timeout):
+        assert request.full_url == "http://model.local/v1/models"
+        assert timeout == 5.0
+        return FakeResponse()
+
+    monkeypatch.setattr(repair_module, "dspy", FakeDspy)
+    monkeypatch.setattr(repair_module.urllib.request, "urlopen", fake_urlopen)
+    lm = resolve_native_dspy_lm_v1(api_base="http://model.local/v1")
+
+    assert lm.model == "openai/gemma4-legal-iq4xs-direct.gguf"
+    assert calls["engine"] == "lm15"
+    assert calls["api_base"] == "http://model.local/v1"
+    assert calls["temperature"] == 0.0
+
+
+def test_native_dspy_lm_rejects_stale_configured_model(monkeypatch):
+    class FakeDspy:
+        @staticmethod
+        def LM(**_kwargs):
+            raise AssertionError("must reject before constructing an LM")
+
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self):
+            return b'{"data":[{"id":"gemma4-legal-iq4xs-direct.gguf"}]}'
+
+    monkeypatch.setattr(repair_module, "dspy", FakeDspy)
+    monkeypatch.setattr(repair_module.urllib.request, "urlopen", lambda *_args, **_kwargs: FakeResponse())
+    with pytest.raises(RuntimeError, match="DSPY_CONFIGURED_MODEL_NOT_AVAILABLE"):
+        resolve_native_dspy_lm_v1(
+            api_base="http://model.local/v1",
+            requested_model_id="ornith-1.5-9b",
+        )
+
+
+def test_repair_program_runs_both_predictors_inside_native_lm15_context(monkeypatch):
+    from contextlib import contextmanager
+
+    calls = {"predict": [], "contexts": [], "resolver": 0}
+    fake_lm = object()
+
+    class FakeSignature:
+        pass
+
+    class FakeModule:
+        pass
+
+    class FakeDspy:
+        Signature = FakeSignature
+        Module = FakeModule
+
+        @staticmethod
+        def InputField(**_kwargs):
+            return object()
+
+        @staticmethod
+        def OutputField(**_kwargs):
+            return object()
+
+        @staticmethod
+        def Predict(signature):
+            def predict(**kwargs):
+                calls["predict"].append((signature.__name__, kwargs))
+                if signature.__name__ == "DiagnoseRepair":
+                    return SimpleNamespace(diagnosis="diagnosis", target_candidates=["task:1"])
+                return SimpleNamespace(
+                    patch_plan="patch proposal",
+                    validation_plan="run focused checks",
+                    evidence_refs=["source:1#bytes=0:5"],
+                )
+
+            return predict
+
+        @staticmethod
+        def JSONAdapter(**kwargs):
+            return SimpleNamespace(**kwargs)
+
+        @staticmethod
+        @contextmanager
+        def context(**kwargs):
+            calls["contexts"].append(kwargs)
+            yield
+
+        @staticmethod
+        def Prediction(**kwargs):
+            return SimpleNamespace(**kwargs)
+
+    def resolve_lm():
+        calls["resolver"] += 1
+        return fake_lm
+
+    monkeypatch.setattr(repair_module, "dspy", FakeDspy)
+    program = repair_module.build_repair_program_v1(lm_resolver=resolve_lm)
+
+    result = program.forward(
+        failure="bounded test failure",
+        context_manifest="verified manifest fixture",
+        constraints="proposal only",
+    )
+
+    assert calls["resolver"] == 1
+    assert len(calls["contexts"]) == 1
+    assert calls["contexts"][0]["lm"] is fake_lm
+    assert calls["contexts"][0]["adapter"].use_native_function_calling is False
+    assert [name for name, _ in calls["predict"]] == ["DiagnoseRepair", "ProposeRepair"]
+    assert result.patch_plan == "patch proposal"
+    assert result.validation_plan == "run focused checks"
+    assert result.evidence_refs == ["source:1#bytes=0:5"]
 
 
 def _repair_request(**overrides):

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.domain-challenger-calibration.v1",
-  "generatedAt": "2026-10-25T00:04:10.246910+00:00",
+  "generatedAt": "2026-11-22T17:04:41.664191+00:00",
   "authority": "SHADOW_ONLY",
   "canonicalAuthority": false,
   "writesPerformed": false,
@@ -3496,5 +3496,5 @@
       "writesPerformed": false
     }
   ],
-  "receiptChecksum": "sha256:50dedcf077cab61ccefbfb30948dff648c5cf61e387f455e74dbf1a9ab843b4a"
+  "receiptChecksum": "sha256:111cc1b28119f109962f834c2e532354dbad8ad883da522e8ec5a8ea8911a3c1"
 }

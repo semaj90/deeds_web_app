@@ -1,0 +1,321 @@
+{
+  "schema": "keyframe-role-proposals.v1",
+  "status": "PROPOSALS_ONLY__NOT_IDENTITY__NOT_PERSISTED",
+  "source": {
+    "evidenceId": "a7c2e801-d3a9-42e3-ad2c-ac0cc8c20778",
+    "sha256": "sha256:c0de138233fc0cea82695f9d83ebd31b6f30892d78974f53ad14f65c91b12587",
+    "codec": "h264",
+    "resolution": "1280x720"
+  },
+  "vocabulary": [
+    "main_character",
+    "poi",
+    "victim",
+    "suspect",
+    "witness",
+    "officer",
+    "judge",
+    "paramedic",
+    "doctor",
+    "employee",
+    "bystander",
+    "npc",
+    "unknown_person",
+    "furniture",
+    "object"
+  ],
+  "rule": "roles from appearance are hypotheses; accept only with textual evidence or operator review",
+  "proposals": [
+    {
+      "observationId": "c2107b7b-50a7-40aa-92e0-15973420069d",
+      "framePtsMs": 0,
+      "classLabel": "person",
+      "bboxXYXY": [
+        361.29,
+        42.73,
+        813.62,
+        560.73
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "main_character",
+        "basis": "largest person box in frame, central position (heuristic)"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "75264dee-924b-486d-9b81-6252e177ab69",
+      "framePtsMs": 0,
+      "classLabel": "person",
+      "bboxXYXY": [
+        1065.16,
+        265.17,
+        1173.09,
+        459.7
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "unknown_person",
+        "basis": "smaller background figure; no identifying text"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "bc2a1f15-5ef3-4230-9a64-b2920bd509f5",
+      "framePtsMs": 0,
+      "classLabel": "tie",
+      "bboxXYXY": [
+        632.02,
+        251.74,
+        691.62,
+        433.98
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "object",
+        "basis": "object class"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "b607caa4-d84a-4824-b4a5-f1a19aff48e9",
+      "framePtsMs": 0,
+      "classLabel": "person",
+      "bboxXYXY": [
+        1119.5,
+        451.33,
+        1257.16,
+        638.06
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "unknown_person",
+        "basis": "smaller background figure; no identifying text"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "694ab8fe-60c0-4dac-a5f1-7de7d7153e96",
+      "framePtsMs": 0,
+      "classLabel": "person",
+      "bboxXYXY": [
+        966.4,
+        294.16,
+        1063.79,
+        461.25
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "unknown_person",
+        "basis": "smaller background figure; no identifying text"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "aa9927c9-554a-4c75-92f3-8fec70b8b356",
+      "framePtsMs": 2750,
+      "classLabel": "person",
+      "bboxXYXY": [
+        409.42,
+        46.94,
+        913.74,
+        559.09
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "main_character",
+        "basis": "largest person box in frame, central position (heuristic)"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "4c17e6fa-90a0-494f-8d31-be88abb910f8",
+      "framePtsMs": 2750,
+      "classLabel": "person",
+      "bboxXYXY": [
+        1118.43,
+        453.17,
+        1255.2,
+        639.74
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "unknown_person",
+        "basis": "smaller background figure; no identifying text"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "1602b977-3694-42d9-b379-a93a4aef7785",
+      "framePtsMs": 2750,
+      "classLabel": "person",
+      "bboxXYXY": [
+        1063.67,
+        264.35,
+        1172.62,
+        458.19
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "unknown_person",
+        "basis": "smaller background figure; no identifying text"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "e47090be-3971-4510-a182-d8df885cdebb",
+      "framePtsMs": 2750,
+      "classLabel": "person",
+      "bboxXYXY": [
+        965.62,
+        292.55,
+        1064.91,
+        461.87
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "unknown_person",
+        "basis": "smaller background figure; no identifying text"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "6efb9e6f-ff2c-48e8-bb9b-08944caaaed5",
+      "framePtsMs": 2750,
+      "classLabel": "tie",
+      "bboxXYXY": [
+        579.71,
+        251.12,
+        638.11,
+        422.93
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "object",
+        "basis": "object class"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "49824034-e089-496b-bd71-fccb8027cdfc",
+      "framePtsMs": 2750,
+      "classLabel": "chair",
+      "bboxXYXY": [
+        1075.93,
+        647.69,
+        1193.89,
+        717.16
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "furniture",
+        "basis": "object class, not a person"
+      },
+      "evidenceText": [
+        "ome"
+      ]
+    },
+    {
+      "observationId": "80b82ab1-0043-41d6-b27b-8926e62d69e9",
+      "framePtsMs": 7500,
+      "classLabel": "person",
+      "bboxXYXY": [
+        436.22,
+        37.84,
+        858.54,
+        595.41
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "main_character",
+        "basis": "largest person box in frame, central position (heuristic)"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "e7d6cf52-1e88-4d82-8d99-46ad7ef9e299",
+      "framePtsMs": 7500,
+      "classLabel": "person",
+      "bboxXYXY": [
+        1115.85,
+        449.01,
+        1254.77,
+        640.78
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "unknown_person",
+        "basis": "smaller background figure; no identifying text"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "cc1b5808-3d99-4c7c-afc5-195ae4226ac8",
+      "framePtsMs": 7500,
+      "classLabel": "person",
+      "bboxXYXY": [
+        1062.36,
+        266.04,
+        1175.0,
+        458.25
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "unknown_person",
+        "basis": "smaller background figure; no identifying text"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "2c15a64c-b49a-4d24-a24f-486223ce7c24",
+      "framePtsMs": 7500,
+      "classLabel": "person",
+      "bboxXYXY": [
+        964.63,
+        292.52,
+        1064.96,
+        455.06
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "unknown_person",
+        "basis": "smaller background figure; no identifying text"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "17fae0fc-2f3a-4f48-b713-bd824cf44f0f",
+      "framePtsMs": 7500,
+      "classLabel": "chair",
+      "bboxXYXY": [
+        1074.39,
+        649.21,
+        1194.21,
+        717.15
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "furniture",
+        "basis": "object class, not a person"
+      },
+      "evidenceText": []
+    },
+    {
+      "observationId": "16e32cc9-a5d2-4fde-8d05-fca25b763973",
+      "framePtsMs": 7500,
+      "classLabel": "chair",
+      "bboxXYXY": [
+        1011.11,
+        503.48,
+        1121.11,
+        619.73
+      ],
+      "status": "proposed",
+      "proposal": {
+        "candidateRole": "furniture",
+        "basis": "object class, not a person"
+      },
+      "evidenceText": []
+    }
+  ]
+}

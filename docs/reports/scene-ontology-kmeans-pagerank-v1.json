@@ -1,0 +1,91 @@
+{
+  "schema": "atlas.scene-ontology-kmeans-pagerank.v1",
+  "authorityLabel": "RETRIEVAL_PROPOSAL",
+  "nonCanonical": true,
+  "conceptCount": 506,
+  "edgeCount": 494,
+  "clusterCount": 12,
+  "query": "four bedroom house door actor walk",
+  "topRecommendations": [
+    {
+      "conceptId": "pa:actor",
+      "label": "Actor",
+      "clusterId": 6,
+      "cosineSim": 0.39736,
+      "pageRank": 0.003551,
+      "score": 0.364391
+    },
+    {
+      "conceptId": "pa:space.room.bedroom",
+      "label": "Bedroom",
+      "clusterId": 1,
+      "cosineSim": 0.340733,
+      "pageRank": 0.001085,
+      "score": 0.297759
+    },
+    {
+      "conceptId": "pa:space.room",
+      "label": "Room",
+      "clusterId": 1,
+      "cosineSim": 0.190885,
+      "pageRank": 0.014831,
+      "score": 0.273489
+    },
+    {
+      "conceptId": "pa:actor.representation.glb-actor",
+      "label": "Glb Actor",
+      "clusterId": 6,
+      "cosineSim": 0.277459,
+      "pageRank": 0.00111,
+      "score": 0.244163
+    },
+    {
+      "conceptId": "pa:render.camera.follow-actor",
+      "label": "Follow Actor",
+      "clusterId": 10,
+      "cosineSim": 0.251312,
+      "pageRank": 0.00111,
+      "score": 0.221943
+    },
+    {
+      "conceptId": "pa:space.outdoor-zone",
+      "label": "Outdoor Zone",
+      "clusterId": 0,
+      "cosineSim": 0.134976,
+      "pageRank": 0.013921,
+      "score": 0.219136
+    },
+    {
+      "conceptId": "pa:space.structure.door",
+      "label": "Door",
+      "clusterId": 0,
+      "cosineSim": 0.243332,
+      "pageRank": 0.001087,
+      "score": 0.214983
+    },
+    {
+      "conceptId": "pa:space.building.house",
+      "label": "House",
+      "clusterId": 0,
+      "cosineSim": 0.233786,
+      "pageRank": 0.001087,
+      "score": 0.206869
+    },
+    {
+      "conceptId": "pa:space.floor",
+      "label": "Floor",
+      "clusterId": 0,
+      "cosineSim": 0.177705,
+      "pageRank": 0.006615,
+      "score": 0.200658
+    },
+    {
+      "conceptId": "pa:space.building.courthouse",
+      "label": "Courthouse",
+      "clusterId": 0,
+      "cosineSim": 0.211194,
+      "pageRank": 0.001087,
+      "score": 0.187666
+    }
+  ]
+}

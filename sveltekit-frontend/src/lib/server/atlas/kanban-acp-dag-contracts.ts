@@ -177,4 +177,89 @@ export function buildA2AErrorFixProposalResultV1(input: {
 export type ResearchParameterArtifactV1 = z.infer<typeof researchParameterArtifactV1Schema>;
 export type DagPrefillNodeV1 = z.infer<typeof dagPrefillNodeV1Schema>;
 export type AcpKanbanErrorTaskV1 = z.infer<typeof acpKanbanErrorTaskV1Schema>;
+
+export const a2aConflictFreeBatchProposalRequestV1Schema = z
+  .object({
+    tasks: z
+      .array(
+        z
+          .object({
+            durableKey: z.string().trim().min(1).max(256),
+            locator: z.string().trim().min(1).max(512),
+            ownedFiles: z.array(z.string().trim().min(1).max(256)).min(1),
+            score: z.number().finite().min(0).max(100),
+          })
+          .strict(),
+      )
+      .min(1)
+      .max(50),
+    maxPerWorker: z.number().int().min(1).max(8).default(4),
+  })
+  .strict();
+
+export function buildA2AConflictFreeBatchProposalResultV1(input: {
+  requestId: string;
+  batch: z.input<typeof a2aConflictFreeBatchProposalRequestV1Schema>;
+  sourceAgent?: string;
+}) {
+  const requestId = z.string().trim().min(1).max(256).parse(input.requestId);
+  const parsed = a2aConflictFreeBatchProposalRequestV1Schema.parse(input.batch);
+  const workerA: typeof parsed.tasks = [];
+  const workerB: typeof parsed.tasks = [];
+  const filesA = new Set<string>();
+  const filesB = new Set<string>();
+  const skippedConflicts: string[] = [];
+
+  for (const t of parsed.tasks) {
+    const overlapA = t.ownedFiles.some((f) => filesA.has(f));
+    const overlapB = t.ownedFiles.some((f) => filesB.has(f));
+    if (workerA.length <= workerB.length && workerA.length < parsed.maxPerWorker && !overlapB) {
+      workerA.push(t);
+      for (const f of t.ownedFiles) filesA.add(f);
+    } else if (workerB.length < parsed.maxPerWorker && !overlapA) {
+      workerB.push(t);
+      for (const f of t.ownedFiles) filesB.add(f);
+    } else {
+      skippedConflicts.push(t.durableKey);
+    }
+  }
+
+  let disjointVerified = true;
+  for (const f of filesA) {
+    if (filesB.has(f)) {
+      disjointVerified = false;
+      break;
+    }
+  }
+
+  return {
+    id: requestId,
+    status: { state: 'completed' as const },
+    artifacts: [
+      {
+        name: 'conflict-free-batch-proposal',
+        parts: [
+          {
+            data: {
+              schema: 'atlas.a2a-conflict-free-batch-proposal.v1',
+              sourceAgent: input.sourceAgent ?? 'a2a-agent-endpoint',
+              workerA,
+              workerB,
+              disjointVerified,
+              skippedConflicts,
+              canonicalAuthority: false,
+              writesPerformed: false,
+            },
+          },
+        ],
+      },
+    ],
+    metadata: {
+      skill: 'agentic-conflict-free-batch-proposal',
+      proposalOnly: true,
+      canonicalAuthority: false,
+      writesPerformed: false,
+    },
+  };
+}
 export type AcpKanbanErrorTaskInputV1 = z.infer<typeof acpKanbanErrorTaskInputV1Schema>;

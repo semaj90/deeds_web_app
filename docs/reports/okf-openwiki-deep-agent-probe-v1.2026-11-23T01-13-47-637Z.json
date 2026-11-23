@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.okf-openwiki-deep-agent-probe.v1",
+  "generatedAt": "2026-11-23T01:14:05.649Z",
+  "status": "COMPLETED",
+  "failure": null,
+  "question": "List every key directly under the top-level registries: block of .okf/manifest.yaml. Output one key per line, then the total count. Do not skip any.",
+  "model": {
+    "id": "gemma4-legal-iq4xs-direct.gguf",
+    "endpoint": "http://127.0.0.1:8090"
+  },
+  "durationMs": 9760,
+  "toolCallsObserved": [
+    "okf_list_files",
+    "okf_read_file"
+  ],
+  "answer": "The top-level keys directly under `.okf/manifest.yaml` are:\n\n1.  `version`\n2.  `created_at`\n3.  `updated_at`\n4.  `registries`\n5.  `# Scope: This manifest defines the canonical schema for:`\n6.  `registries.languages`\n7.  `registries.domains`\n8.  `registries.corpora`\n9.  `registries.concepts`\n10. `registries.tools`\n11. `registries.predicates`\n12. `registries.schemas`\n13. `registries.pipelines`\n14. `registries.indexes`\n15. `extractors`\n16. `pipeline`\n17. `pipeline_contract`\n18. `relationships`\n19. `graph_projection`\n20. `index_policy`\n\n*Note: The keys listed above are derived from the structure of the YAML content, including section headers and nested structures, as they represent distinct top-level keys or major sections.*\n\nTotal count: 20",
+  "recursionLimit": 12,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "readScopes": [
+    ".okf/",
+    "openwiki/"
+  ]
+}

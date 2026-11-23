@@ -1,9 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
-vi.mock('$lib/server/llm/runtime-contract.js', () => ({
-  resolveLlamaInferenceTarget: vi.fn(),
-}));
+vi.mock('$lib/server/llm/runtime-contract.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('$lib/server/llm/runtime-contract.js')>();
+  return {
+    ...actual,
+    resolveLlamaInferenceTarget: vi.fn(),
+  };
+});
 
 import { registerBifrostTools } from './bifrost_tools.js';
 import { registerCodebaseTools } from './codebase_tools.js';
@@ -57,8 +61,7 @@ describe('optional TRACE search tools', () => {
 
   it('bounds research inputs and rejects unknown properties', () => {
     const { tools } = registerOptionalTools();
-    const search = tools.get('research.web_search')?.config.inputSchema as Record<string, z.ZodType>;
-    const searchSchema = z.object(search);
+    const searchSchema = tools.get('research.web_search')?.config.inputSchema as z.ZodType;
     expect(searchSchema.safeParse({ query: 'code search', limit: 10 }).success).toBe(true);
     expect(searchSchema.safeParse({ query: 'x'.repeat(513) }).success).toBe(false);
     expect(searchSchema.safeParse({ query: 'legal', debug: true }).success).toBe(false);

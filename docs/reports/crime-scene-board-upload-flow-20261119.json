@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.crime-scene-workflow-progress.v1",
+  "date": "2026-11-19",
+  "status": "IMPLEMENTED_BROWSER_FIXTURE_REQUIRED",
+  "likely_cause": "The case-board upload success callback explicitly switched to Detective Mode and opened the uploaded exhibit viewer, even though the scene placement selector already supports case-linked exhibits.",
+  "evidence": [
+    "sveltekit-frontend/src/routes/(app)/cases/[id]/board/+page.svelte: upload success callback now refreshes case evidence, keeps the current board view, and queues the uploaded ID for later selection in Detective Mode.",
+    "sveltekit-frontend/src/lib/components/evidence/DetectiveModeCanvas.svelte: placeableEvidence is derived from the case evidence list; initialPlaceEvidenceId selects an item but does not save a marker.",
+    "The focused Playwright case is present in the chromium project; its environment-gated case and evidence IDs were not configured, so browser execution was not attempted.",
+    "npm run check:native completed without OOM and reported no diagnostics in the changed case board or Detective Mode files. Eleven unrelated diagnostics remain in StorybookAuthorities.svelte and the storybook-authorities API route.",
+    "Four focused animation, registry, palette-job, and scene-revision suites passed 27 tests; the walk-path suite passed 4 tests including exact PTS anchors and T-R-S matrix composition."
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/routes/(app)/cases/[id]/board/+page.svelte",
+    "sveltekit-frontend/tests/e2e/evidence-upload-scene-placement.spec.ts",
+    "sveltekit-frontend/src/lib/components/evidence/CaseStorybook.svelte",
+    "sveltekit-frontend/src/lib/components/evidence/CrimeSceneViewer3D.svelte",
+    "sveltekit-frontend/src/routes/api/cases/[id]/evidence/[evidenceId]/scene-palette/+server.ts",
+    "sveltekit-frontend/src/lib/courtroom/walk-path-v1.spec.ts",
+    "openspec/changes/crime-scene-reconstruction/tasks.md"
+  ],
+  "safe_next_command": "git diff --check",
+  "smoke_command": "$env:PLAYWRIGHT_SKIP_GLOBAL_SETUP='true'; npx playwright test tests/e2e/evidence-upload-scene-placement.spec.ts --grep \"case board upload stays\" --project chromium --workers=1",
+  "smoke_status": "NOT_RUN: configure SCENE_PLACEMENT_TEST_CASE_ID and SCENE_PLACEMENT_TEST_EVIDENCE_ID for an authorized fixture first",
+  "report_path": "docs/reports/crime-scene-board-upload-flow-20261119.json"
+}

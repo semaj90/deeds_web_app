@@ -149,9 +149,15 @@ export class RabbitMQManager extends EventEmitter {
    * callers share one run. Without this, every dev reload opened a new
    * connection/channel set until the broker answered "No channels left to allocate".
    */
+  /** After a failed init, no retry (and no log) until this time. Stops a per-request retry storm. */
+  private initRetryAt = 0;
+  private lastInitFailure = '';
+  private readonly initRetryMs = 60_000;
+
   async initialize(): Promise<boolean> {
     if (this.isInitialized && this.connection && this.channel) return true;
     if (this.initPromise) return this.initPromise;
+    if (Date.now() < this.initRetryAt) return false;
     this.initPromise = this.runInitialize().finally(() => {
       this.initPromise = null;
     });
@@ -167,6 +173,8 @@ export class RabbitMQManager extends EventEmitter {
       await this.startConsumers();
       this.isInitialized = true;
       this.reconnectAttempts = 0; // Reset on successful connect
+      this.initRetryAt = 0;
+      this.lastInitFailure = '';
       this.emit('initialized');
       console.log('🚀 RabbitMQ Manager initialized successfully');
       return true;
@@ -176,7 +184,17 @@ export class RabbitMQManager extends EventEmitter {
         console.warn('[RabbitMQ] Initialization aborted during dev reload');
         return false;
       }
-      console.error(`❌ RabbitMQ initialization failed (${this.describeEndpoint()}):`, message);
+      this.initRetryAt = Date.now() + this.initRetryMs;
+      const endpoint = this.describeEndpoint();
+      const failure = `${endpoint}: ${message}`;
+      if (failure !== this.lastInitFailure) {
+        this.lastInitFailure = failure;
+        console.error(
+          `❌ RabbitMQ initialization failed (${endpoint}):`,
+          message,
+          `— next attempt in ${this.initRetryMs / 1000}s`
+        );
+      }
       return false;
     }
   }
