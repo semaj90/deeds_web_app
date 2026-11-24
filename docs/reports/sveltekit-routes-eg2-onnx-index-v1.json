@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.sveltekit-routes-eg2-onnx-index.v1",
+  "collection": "codebase_chunks_eg2_768_q8",
+  "upsertedRouteCount": 100,
+  "collectionPointsCount": 774,
+  "filteredRouteKind": "+server.ts",
+  "filteredHitsCount": 3,
+  "topHit": {
+    "id": "2b54e59a-5c6e-5a3a-8754-cc18332219f5",
+    "version": 8,
+    "score": 0.8664372,
+    "payload": {
+      "source_ref": "sveltekit-frontend/src/routes/.well-known/appspecific/com.chrome.devtools.json/+server.ts",
+      "relative_path": "src/routes/.well-known/appspecific/com.chrome.devtools.json/+server.ts",
+      "source_revision": "sha256:ef243b7a0423fef37490c2482090a027071d6f0e183f87758745be32cf0d2402",
+      "route_kind": "+server.ts",
+      "encoder_profile": "eg2-onnx-q8-mrl-768",
+      "model_id": "onnx-community/embeddinggemma2-q8:onnx/model_quantized.onnx",
+      "provisional_domain_class": "api",
+      "canonical_authority": false
+    }
+  }
+}

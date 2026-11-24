@@ -26,11 +26,19 @@ import { builtinModules } from 'node:module';
 import path from 'node:path';
 import { REPO_ROOT } from './connection-config.mjs';
 import { createCompilerSemanticResolver, classifyModuleSpecifier } from './lib/compiler-semantic-resolver-v1.mjs';
+import { resolveRepoImportTargetV1 } from './lib/repo-import-target-resolver-v1.mjs';
 
 const root = REPO_ROOT;
 const frontendRoot = path.join(root, 'sveltekit-frontend');
-const inputPath = path.join(root, 'docs/reports/current-structural-edge-artifact-plan-v2.json');
-const outputPath = path.join(root, 'docs/reports/current-structural-edge-resolution-v1.json');
+const inputPath = path.resolve(root, process.env.ATLAS_CSGR2_INPUT ?? 'docs/reports/current-structural-edge-artifact-plan-v2.json');
+const outputPath = path.resolve(root, process.env.ATLAS_CSGR2_OUTPUT ?? 'docs/reports/current-structural-edge-resolution-v1.json');
+for (const [label, target] of [['input', inputPath], ['output', outputPath]]) {
+  const relativeTarget = path.relative(path.join(root, '.tmp', 'atlas'), target);
+  if (process.env[`ATLAS_CSGR2_${label.toUpperCase()}`]
+      && (!relativeTarget || path.isAbsolute(relativeTarget) || relativeTarget.split(path.sep)[0] === '..')) {
+    throw new Error(`CUSTOM_${label.toUpperCase()}_MUST_BE_UNDER_REPO_TMP_ATLAS`);
+  }
+}
 const unresolvedTargetLimit = Math.max(0, Number(process.env.ATLAS_CSGR2_UNRESOLVED_TARGET_LIMIT ?? 200));
 
 function readDependencySet() {
@@ -154,8 +162,24 @@ async function main() {
 
     // IMPORTS-typed: classify directly where possible, defer sibling-derived ones to a second pass.
     const specifier = extractSpecifier(edge.toEvidenceKey ?? '');
-    const classification = specifier ? classifyModuleSpecifier(specifier, { packageJsonDependencies: dependencySet }) : null;
+    let classification = specifier ? classifyModuleSpecifier(specifier, { packageJsonDependencies: dependencySet }) : null;
     const result = { sourceRef: edge.sourceRef, type: edge.type, toEvidenceKey: edge.toEvidenceKey, specifier, classification, siblingDerived: false };
+    if (edge.type === 'IMPORTS' && classification === 'REPO_RESOLVABLE' && specifier) {
+      const targetResolution = resolveRepoImportTargetV1({
+        workspaceRoot: root,
+        sourceRef: edge.sourceRef,
+        sourceRevision: edge.sourceRevision,
+        workspaceRevision: artifact.workspaceRevision,
+        specifier,
+      });
+      result.targetResolution = targetResolution;
+      result.lexicalClassification = classification;
+      classification = targetResolution.status === 'UNIQUE_LOCAL_TARGET'
+        ? 'REPO_TARGET_RESOLVED_LOCAL_ONLY'
+        : 'REPO_TARGET_UNVERIFIED';
+      result.classification = classification;
+      if (classification === 'REPO_TARGET_UNVERIFIED') result.resolutionFailure = targetResolution.status;
+    }
     syntaxOnlyResults.push(result);
 
     const groupKey = `${edge.fromEvidenceKey}|${edge.sourceRef}`;
@@ -172,6 +196,8 @@ async function main() {
       if (r.classification === null) {
         r.classification = resolved.classification;
         r.siblingDerived = true;
+        if (resolved.targetResolution) r.targetResolution = resolved.targetResolution;
+        if (resolved.resolutionFailure) r.resolutionFailure = resolved.resolutionFailure;
         siblingResolvedCount += 1;
       }
     }
@@ -183,6 +209,11 @@ async function main() {
 
   const syntaxOnlyCounts = {};
   for (const r of syntaxOnlyResults) syntaxOnlyCounts[r.classification] = (syntaxOnlyCounts[r.classification] ?? 0) + 1;
+  const targetResolutionCounts = {};
+  for (const r of syntaxOnlyResults) {
+    const status = r.targetResolution?.status;
+    if (status) targetResolutionCounts[status] = (targetResolutionCounts[status] ?? 0) + 1;
+  }
 
   // --- unresolved_target: use the edge's own evidenceStartLine/Column directly (no node join —
   // see header comment; a node-join approach was tried first and only covered ~5% of edges live). ---
@@ -357,7 +388,16 @@ async function main() {
     canonicalAuthority: false,
     inputWorkspaceRevision: artifact.workspaceRevision,
     totalUnresolvedEdges: unresolvedEdges.length,
-    syntaxOnly: { total: syntaxOnlyEdges.length, sampled: syntaxOnlyResults.length, counts: syntaxOnlyCounts, siblingResolvedCount },
+    syntaxOnly: {
+      total: syntaxOnlyEdges.length,
+      sampled: syntaxOnlyResults.length,
+      counts: syntaxOnlyCounts,
+      targetResolutionCounts,
+      targetResolutionSamples: syntaxOnlyResults
+        .filter((r) => r.targetResolution)
+        .slice(0, 25),
+      siblingResolvedCount,
+    },
     unresolvedTarget: {
       total: unresolvedTargetEdges.length,
       sampled: sampled.length,
@@ -388,6 +428,7 @@ async function main() {
   console.log(JSON.stringify({
     status: 'CSGR2_SAMPLE_COMPLETE',
     syntaxOnlyCounts,
+    targetResolutionCounts,
     unresolvedTargetSampleSize: sampled.length,
     unresolvedTargetTotal: unresolvedTargetEdges.length,
     unresolvedTargetCounts,

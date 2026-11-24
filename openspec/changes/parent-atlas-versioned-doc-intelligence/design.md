@@ -107,7 +107,7 @@ endByte: number                // authoritative offset into canonical UTF-8 byte
 alignmentStatus: 'MATCH_EXACT' | 'MATCH_FUZZY' | 'MATCH_LESSER'
 productVersion: string
 confidence: number
-extractionMethod: 'LANGEXTRACT_ORNITH'
+extractionMethod: 'LANGEXTRACT_OPENAI_COMPATIBLE'
 ```
 
 Span validated against canonical UTF-8 source bytes before admission — exact alignment first,

@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.eg2-mrl-benchmark.v1",
+  "table": "codebase_chunk_eg2_embeddings",
+  "corpus_rows": 1000,
+  "query_count": 100,
+  "top_k": 10,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "dims": {
+    "768": {
+      "recall_at_10_vs_768": 1.0,
+      "halfvec_bytes_per_vec": 1536,
+      "fp32_bytes_per_vec": 3072,
+      "batch_100q_ms": 1.97
+    },
+    "512": {
+      "recall_at_10_vs_768": 0.878,
+      "halfvec_bytes_per_vec": 1024,
+      "fp32_bytes_per_vec": 2048,
+      "batch_100q_ms": 1.81
+    },
+    "256": {
+      "recall_at_10_vs_768": 0.755,
+      "halfvec_bytes_per_vec": 512,
+      "fp32_bytes_per_vec": 1024,
+      "batch_100q_ms": 1.59
+    },
+    "128": {
+      "recall_at_10_vs_768": 0.605,
+      "halfvec_bytes_per_vec": 256,
+      "fp32_bytes_per_vec": 512,
+      "batch_100q_ms": 1.61
+    }
+  }
+}

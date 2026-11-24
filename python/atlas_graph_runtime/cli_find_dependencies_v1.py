@@ -50,15 +50,19 @@ def _resolve_repo_file(repo_root: Path, target: str) -> tuple[str | None, Path |
     return None, None
 
 
-def _resolve_import_target(repo_root: Path, source_rel: str, specifier: str) -> tuple[str, str]:
-    """Return (resolved_ref, node_kind) for a TS/JS import specifier."""
+def _resolve_import_target(repo_root: Path, source_rel: str, specifier: str) -> tuple[str, str, str]:
+    """Resolve an import only when exactly one workspace-local file matches.
+
+    The third value is an observation status. External packages and unresolved or
+    ambiguous local paths are deliberately not promoted to file dependency edges.
+    """
     if specifier.startswith("$lib/"):
         sub = specifier[len("$lib/"):]
         base = repo_root / "sveltekit-frontend" / "src" / "lib" / sub
     elif specifier.startswith("."):
         base = (repo_root / source_rel).parent / specifier
     else:
-        return specifier, "ExternalModule"
+        return specifier, "ExternalModule", "EXTERNAL_MODULE"
 
     candidates = [base]
     stem_str = str(base)
@@ -72,14 +76,22 @@ def _resolve_import_target(repo_root: Path, source_rel: str, specifier: str) -> 
         candidates.append(base / "index.ts")
         candidates.append(base / "index.js")
 
+    root = repo_root.resolve()
+    resolved: dict[str, Path] = {}
     for cand in candidates:
-        if cand.is_file():
-            try:
-                rel = cand.resolve().relative_to(repo_root.resolve()).as_posix()
-                return rel, "CodebaseFile"
-            except ValueError:
-                pass
-    return specifier, "UnresolvedImport"
+        try:
+            actual = cand.resolve(strict=True)
+            actual.relative_to(root)
+        except (OSError, ValueError):
+            continue
+        if actual.is_file():
+            resolved[actual.as_posix().lower()] = actual
+    if len(resolved) == 1:
+        actual = next(iter(resolved.values()))
+        return actual.relative_to(root).as_posix(), "CodebaseFile", "UNIQUE_REPO_TARGET"
+    if len(resolved) > 1:
+        return specifier, "UnresolvedImport", "AMBIGUOUS_REPO_TARGET"
+    return specifier, "UnresolvedImport", "REPO_TARGET_NOT_FOUND"
 
 
 def _maybe_torch_cuda_pagerank(
@@ -186,6 +198,7 @@ def run_find_dependencies_cli(
             },
             "canonicalAuthority": False,
             "writesPerformed": False,
+            "importObservations": [],
         }
 
     rel_path, abs_path = _resolve_repo_file(repo_root, target)
@@ -212,12 +225,15 @@ def run_find_dependencies_cli(
             },
             "canonicalAuthority": False,
             "writesPerformed": False,
+            "importObservations": [],
         }
 
     source_bytes = abs_path.read_bytes()
     source_text = source_bytes.decode("utf-8", errors="replace")
     source_revision = _sha256_bytes(source_bytes)
-    ws_rev = workspace_revision or _sha256_bytes(str(repo_root).encode("utf-8"))
+    # A hash of the root path is not a workspace revision. Without the
+    # canonical caller-supplied revision, keep import observations lexical-only.
+    ws_rev = workspace_revision if isinstance(workspace_revision, str) and re.fullmatch(r"sha256:[0-9a-f]{64}", workspace_revision) else None
 
     # Parse real static imports with exact line numbers
     nodes: list[dict[str, Any]] = [
@@ -232,6 +248,8 @@ def run_find_dependencies_cli(
     ]
     edges: list[dict[str, Any]] = []
     seen_targets: dict[str, int] = {}
+    import_observations: list[dict[str, Any]] = []
+    revision_blocked = False
 
     if direction == "incoming":
         target_canonical = rel_path.lower()
@@ -244,10 +262,16 @@ def run_find_dependencies_cli(
             cand_rev = _sha256_bytes(cand_bytes)
             for match in _IMPORT_RE.finditer(cand_text):
                 specifier = match.group(1)
-                dep_ref, _dep_kind = _resolve_import_target(repo_root, cand_rel, specifier)
-                if dep_ref.lower() != target_canonical:
-                    continue
+                dep_ref, dep_kind, resolution = _resolve_import_target(repo_root, cand_rel, specifier)
                 line_no = cand_text[: match.start()].count("\n") + 1
+                if dep_kind != "CodebaseFile" or dep_ref.lower() != target_canonical:
+                    continue
+                import_observations.append({"sourceRef": cand_rel, "line": line_no, "specifier": specifier,
+                                            "targetRef": dep_ref,
+                                            "resolution": resolution if ws_rev else "WORKSPACE_REVISION_REQUIRED"})
+                if ws_rev is None:
+                    revision_blocked = True
+                    continue
                 if cand_rel not in seen_targets:
                     node_id = len(nodes)
                     seen_targets[cand_rel] = node_id
@@ -279,7 +303,17 @@ def run_find_dependencies_cli(
         for match in _IMPORT_RE.finditer(source_text):
             specifier = match.group(1)
             line_no = source_text[: match.start()].count("\n") + 1
-            dep_ref, dep_kind = _resolve_import_target(repo_root, rel_path, specifier)
+            dep_ref, dep_kind, resolution = _resolve_import_target(repo_root, rel_path, specifier)
+            observation = {"sourceRef": rel_path, "line": line_no, "specifier": specifier,
+                           "resolution": resolution}
+            if dep_kind == "CodebaseFile":
+                observation["targetRef"] = dep_ref
+            if ws_rev is None and dep_kind == "CodebaseFile":
+                observation["resolution"] = "WORKSPACE_REVISION_REQUIRED"
+                revision_blocked = True
+            import_observations.append(observation)
+            if dep_kind != "CodebaseFile" or ws_rev is None:
+                continue
             if dep_ref not in seen_targets:
                 node_id = len(nodes)
                 seen_targets[dep_ref] = node_id
@@ -313,7 +347,7 @@ def run_find_dependencies_cli(
                 }
             )
 
-    graph_revision = _sha256_json({"nodes": nodes, "edges": edges})
+    graph_revision = _sha256_json({"nodes": nodes, "edges": edges}) if ws_rev else None
 
     if not edges:
         return {
@@ -324,7 +358,8 @@ def run_find_dependencies_cli(
                 "canonical": rel_path.lower(),
                 "phase": "ATLAS_GRAPH",
                 "nodesMatched": [{"family": "source_ref", "key": rel_path, "flagged": False}],
-                "failure": "NO_INCOMING_EDGES" if direction == "incoming" else "NO_OUTGOING_EDGES",
+                "failure": ("WORKSPACE_REVISION_REQUIRED" if revision_blocked else
+                            ("NO_INCOMING_EDGES" if direction == "incoming" else "NO_OUTGOING_EDGES")),
                 "truncated": False,
                 "rowCap": 500,
             },
@@ -334,11 +369,12 @@ def run_find_dependencies_cli(
                 "graphRevision": graph_revision,
                 "sourceRevision": source_revision,
                 "evidenceRefs": [rel_path],
-                "status": "IDENTITY_BOUND_REVISION_QUALIFIED",
+                "status": "IDENTITY_BOUND_REVISION_QUALIFIED" if ws_rev else "UNRESOLVED",
                 "subject": rel_path,
             },
             "canonicalAuthority": False,
             "writesPerformed": False,
+            "importObservations": import_observations,
         }
 
     resolver = resolve_dependents_v1 if direction == "incoming" else resolve_dependencies_v1
@@ -390,6 +426,7 @@ def run_find_dependencies_cli(
         },
         "canonicalAuthority": False,
         "writesPerformed": False,
+        "importObservations": import_observations,
     }
 
 

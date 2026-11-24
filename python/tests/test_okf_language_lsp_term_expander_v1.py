@@ -73,10 +73,12 @@ def test_build_and_load_expanded_obo_in_oaklib_and_sidecar(tmp_path, monkeypatch
     assert "ATLASISA:ptx" in entities
     assert "ATLASEXT:svelte.ts" in entities
     assert "ATLASEXT:ptx" in entities
-    result = oaklib_label_search(OaklibLabelSearchRequestV1(terms=[".cu", "missing-test-term"]))
+    result = oaklib_label_search(OaklibLabelSearchRequestV1(terms=[".cu", "PTX Virtual ISA", "missing-test-term"]))
     response = result.model_dump(mode="json", by_alias=True)
     assert response["ontologyRevision"] == digest
     assert response["status"] == "PROPOSAL_ONLY"
+    ptx_matches = next(item for item in response["matches"] if item["searchText"] == "PTX Virtual ISA")
+    assert "ATLASISA:ptx" in ptx_matches["externalIds"]
     assert response["canonicalAuthority"] is False
     matches = {row["searchText"]: row["externalIds"] for row in response["matches"]}
     assert matches[".cu"] == ["ATLASEXT:cu"]

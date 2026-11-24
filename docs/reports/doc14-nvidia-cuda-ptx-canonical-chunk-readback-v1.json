@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.doc14-canonical-chunk-readback.v1",
+  "readOnly": true,
+  "writesPerformed": false,
+  "totalChunksForPage": 12,
+  "reviewId": "doc14-review-cuda-cpp-compiles-to-ptx-20261123-v1",
+  "reviewedTriple": {
+    "subjectId": "ATLASLANG:cuda_cpp",
+    "predicateId": "compiles_to",
+    "objectId": "ATLASISA:ptx",
+    "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c"
+  },
+  "matchedChunks": [
+    {
+      "pageId": "f6049944-3904-4c87-a353-3393ffb08d59",
+      "provider": "nvidia",
+      "product": "cuda-programming-guide",
+      "productVersion": "CURRENT_UPSTREAM@2026-11-23",
+      "url": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+      "pageContentHash": "494ef3b6ef26440375c9861ce7b02c363d9c01856630d8a009490c7a3cceca35",
+      "pageEvidenceRevision": "sha256:5717bf7d99d40696ec8916935bc458500a1023c21b305f558a42f39ee16cfb17",
+      "chunkId": "doc:nvidia-cuda-guide-doc14:494ef3b6ef264403:8",
+      "ordinal": 8,
+      "chunkStartByte": 7958,
+      "chunkEndByte": 9466,
+      "chunkChecksum": "d579216777d85a9fe790a6d676e81bb12081757ad97ce301c73d1adcc01b2c2d",
+      "chunkEvidenceRevision": "sha256:2138948c5db0c551394d5474b357b0bf063bab48ea2a1c2d19793288a5302ca0",
+      "chunkTextSha256": "d579216777d85a9fe790a6d676e81bb12081757ad97ce301c73d1adcc01b2c2d",
+      "sentenceOffsetInChunkBytes": [
+        1332,
+        1400
+      ],
+      "sentenceVerified": true
+    }
+  ],
+  "status": "CANONICAL_CHUNK_REBOUND_AND_VERIFIED",
+  "graphAdmitted": false,
+  "aceProofUsable": false
+}

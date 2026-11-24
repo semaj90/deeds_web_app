@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-lifecycle-owner.v1",
-  "generatedAt": "2026-10-19T07:17:50.819Z",
+  "generatedAt": "2026-11-23T22:05:15.726Z",
   "mode": "READ_ONLY_LIFECYCLE_OWNER_AUDIT",
   "databaseError": null,
   "lifecycleOwner": null,
@@ -19,17 +19,18 @@
     "singleLifecycleWriterClaimed": false
   },
   "receiptConsistency": {
-    "status": "CONFLICTING_RECEIPTS",
-    "selectedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
-    "dailyExecutionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
-    "authorityRows": 1,
-    "selectedAuthorityRows": 0,
-    "reasonCodes": [
-      "DECISION_DAILY_EXECUTION_ID_MISMATCH",
-      "AUTHORITY_TABLE_DOES_NOT_CONFIRM_DECISION_RECEIPT"
-    ]
+    "status": "RECEIPTS_CONSISTENT",
+    "selectedExecutionId": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
+    "dailyExecutionId": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
+    "authorityRows": 2,
+    "selectedAuthorityRows": 1,
+    "reasonCodes": []
   },
   "authorityRows": [
+    {
+      "execution_id": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
+      "authority_state": "SELECTED"
+    },
     {
       "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
       "authority_state": "LEGACY_IMPORTED"
@@ -39,410 +40,321 @@
     "COMPLETED",
     "SUPERSEDED"
   ],
-  "transitionPrimitiveExists": false,
+  "transitionPrimitiveExists": true,
+  "transitionPrimitives": [
+    "completeExecution",
+    "completeGraphifyRunInTransactionV2",
+    "completeGraphifyRunV2"
+  ],
   "lifecyclePaths": [
+    {
+      "path": "scripts/atlas/apply-current-graphify-execution-owner-decision-v1.mjs",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/apply-current-execution-workspace-bindings-v1.mjs",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/apply-packet-key-v2-admission-v1.mts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/apply-graphify-execution-authority-import-v1.mts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
     {
       "path": "scripts/atlas/apply-graphify-stale-run-reconciliation-v1.mjs",
       "classification": "STALE_RUN_MAINTENANCE_WRITER",
       "mutationSignals": [
         "UPDATE graphify_runs",
         "UPDATE graphify_runs"
-      ]
+      ],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/atlas/apply-graphify-execution-run-bridge-v1.mjs",
       "classification": "EXECUTION_RUN_BRIDGE_WRITER",
       "mutationSignals": [
         "UPDATE public.graphify_executions"
-      ]
-    },
-    {
-      "path": "scripts/atlas/apply-graphify-execution-authority-import-v1.mts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/apply-current-graphify-execution-owner-decision-v1.mjs",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/apply-current-execution-workspace-bindings-v1.mjs",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
+      ],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/atlas/audit-ast-source-authority-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-current-source-owner-reconciliation-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-current-source-authority-v1.mts",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-current-packet-chunk-lineage-bridge-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-current-packet-chunk-identity-reconciliation-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-current-graphify-source-revision-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-current-graphify-source-bridge-reconciliation-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-current-graphify-run-owner-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-critical-lineage-migration-dispositions-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-critical-lineage-live-readback-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/atlas/audit-chunk-workspace-binding-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
-      "path": "scripts/atlas/audit-graphify-workspace-owner-v1.mjs",
+      "path": "scripts/atlas/audit-current-source-authority-v1.mts",
       "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-current-packet-chunk-lineage-bridge-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-current-packet-chunk-identity-reconciliation-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-current-graphify-source-revision-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-current-graphify-source-bridge-reconciliation-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-current-graphify-run-owner-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-critical-lineage-migration-dispositions-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-critical-lineage-live-readback-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-current-source-owner-reconciliation-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/atlas/audit-function-ast-writer-consumer-v1.mts",
       "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-symbol-source-gaps-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-stale-run-reconciliation-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-completed-legacy-coverage-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-snapshot-native-readback-v1.mts",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-authority-read-parity-v1.mts",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-completed-differential-replay-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-authority-observation-v1.mts",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-run-file-binding-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-authority-reader-shadow-census-v1.mts",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-authority-reader-cutover-preflight-v1.mts",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/atlas/audit-graphify-git-source-authority-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-completed-legacy-coverage-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-completed-differential-replay-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-authority-reader-shadow-census-v1.mts",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-authority-reader-cutover-preflight-v1.mts",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-authority-read-parity-v1.mts",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-authority-observation-v1.mts",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/atlas/audit-graphify-workspace-snapshot-binding-v1.mts",
       "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-workspace-owner-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-symbol-source-gaps-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-stale-run-reconciliation-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-snapshot-native-readback-v1.mts",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-run-file-binding-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": [
+        "completeExecution",
+        "completeGraphifyRunInTransactionV2",
+        "completeGraphifyRunV2"
+      ]
     },
     {
       "path": "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.server.ts",
       "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/admission/workspace-admission-panel-v1.ts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/admission/graphify-authority-shadow-read-v1.ts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/admission/graphify-authority-read-parity-v1.ts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/routes/(app)/admin/graphify-readiness/+page.svelte",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/routes/(app)/admin/graphify-readiness/+page.server.ts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/embedding/source-namespace-v1.ts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/atlas/audit-migration-inventory-classification-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/atlas/audit-pipeline-router-matrix-surfaces-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/atlas/audit-selected-graphify-structural-lineage-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/atlas/audit-selected-graphify-execution-owner-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/audit-svelte5-template-parity-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/atlas/audit-temporal-schema-surfaces-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/atlas/audit-workspace-source-namespace-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/build-packet-key-v2-admission-manifest-v1.mts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/admission/workspace-admission-panel-v1.ts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/admission/graphify-authority-shadow-read-v1.ts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/admission/graphify-authority-read-parity-v1.ts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/embedding/source-namespace-v1.ts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "sveltekit-frontend/src/routes/(app)/admin/graphify-readiness/+page.svelte",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "sveltekit-frontend/src/routes/(app)/admin/graphify-readiness/+page.server.ts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/atlas/daily-graphify-mastra-workflow.mjs",
       "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/atlas/test-graphify-execution-ledger-schema-02.mjs",
       "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/inspect-graphify-schema-v1.mjs",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/graphify-daily-snapshot-native-open-v1.mts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/graphify-daily-snapshot-native-complete-run-v1.mts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/graphify-daily-lifecycle-open-v1.mjs",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/graphify-daily-lifecycle-file-inventory-v1.mjs",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/graphify-daily-lifecycle-complete-v1.mjs",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/materialize-bridged-candidate-ordinal-v1.mts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/select-current-source-evidence-authority-v1.mts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/lib/graphify-owner-role-audit-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/lib/graphify-owner-decision-v1.mjs",
-      "classification": "EXECUTION_AUTHORITY_WRITER",
-      "mutationSignals": [
-        "update public.graphify_executions",
-        "insert into public.graphify_execution_authority",
-        "update public.graphify_executions"
-      ]
-    },
-    {
-      "path": "scripts/atlas/lib/graphify-source-evidence.mjs",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/run-karpathy-gpu-admitted-v1.mjs",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/register-orphaned-chunks.mjs",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/reconcile-openspec-portfolio-v2.mjs",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/board/graphify-current-workspace-revision.ts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/prove-graphify-run-completion-primitive-v1.mjs",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/prove-graphify-open-bind-complete-lifecycle-v1.mjs",
-      "classification": "LIFECYCLE_TEST_HARNESS",
-      "mutationSignals": [
-        "DELETE FROM graphify_runs"
-      ]
-    },
-    {
-      "path": "scripts/atlas/prove-exact-promotion-live-dry-run.mts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/prove-current-packet-chunk-seed-v1.mjs",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/prove-code-source-revision-packet-live-dry-run.mts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/preview-graphify-input-identity-backfill-v1.mts",
-      "classification": "REFERENCE_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/plan-sealed-graphify-inventory-v1.mts",
-      "classification": "PLANNER_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs",
-      "classification": "PLANNER_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/plan-graphify-run-completion-v1.mjs",
-      "classification": "PLANNER_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/plan-graphify-execution-run-bridge-v1.mjs",
-      "classification": "PLANNER_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/plan-current-structural-edge-resolution-v1.mjs",
-      "classification": "PLANNER_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/plan-current-source-authority-repair-v1.mts",
-      "classification": "PLANNER_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/plan-current-graphify-execution-owner-resolution-v1.mjs",
-      "classification": "PLANNER_ONLY",
-      "mutationSignals": [
-        "update graphify_executions"
-      ]
-    },
-    {
-      "path": "scripts/atlas/plan-current-execution-source-refs-v1.mjs",
-      "classification": "PLANNER_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/plan-atlas-pipeline-promotion-v1.mjs",
-      "classification": "PLANNER_ONLY",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
       "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts",
@@ -453,6 +365,13 @@
         "INSERT INTO public.graphify_runs",
         "UPDATE public.graphify_runs",
         "UPDATE public.graphify_runs"
+      ],
+      "transitionPrimitives": [
+        "completeGraphifyRunV2",
+        "completeGraphifyRunInTransactionV2",
+        "completeGraphifyRunV2",
+        "completeGraphifyRunInTransactionV2",
+        "completeGraphifyRunInTransactionV2"
       ]
     },
     {
@@ -463,19 +382,248 @@
         "UPDATE public.graphify_executions",
         "UPDATE public.graphify_executions",
         "UPDATE public.graphify_executions"
+      ],
+      "transitionPrimitives": [
+        "completeExecution",
+        "completeExecution"
       ]
+    },
+    {
+      "path": "scripts/atlas/graphify-daily-snapshot-native-open-v1.mts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/graphify-daily-snapshot-native-complete-run-v1.mts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": [
+        "completeGraphifyRunV2",
+        "completeGraphifyRunV2"
+      ]
+    },
+    {
+      "path": "scripts/atlas/graphify-daily-lifecycle-open-v1.mjs",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/graphify-daily-lifecycle-file-inventory-v1.mjs",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": [
+        "completeGraphifyRunV2",
+        "completeGraphifyRunV2"
+      ]
+    },
+    {
+      "path": "scripts/atlas/graphify-daily-lifecycle-complete-v1.mjs",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": [
+        "completeGraphifyRunV2",
+        "completeGraphifyRunInTransactionV2",
+        "completeExecution",
+        "completeExecution",
+        "completeGraphifyRunV2",
+        "completeGraphifyRunV2"
+      ]
+    },
+    {
+      "path": "scripts/atlas/inspect-graphify-schema-v1.mjs",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/select-current-source-evidence-authority-v1.mts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/board/graphify-current-workspace-revision.ts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/run-karpathy-gpu-admitted-v1.mjs",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/register-orphaned-chunks.mjs",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/reconcile-openspec-portfolio-v2.mjs",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/lib/graphify-owner-role-audit-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": [],
+      "transitionPrimitives": [
+        "completeExecution",
+        "completeGraphifyRunInTransactionV2",
+        "completeGraphifyRunV2"
+      ]
+    },
+    {
+      "path": "scripts/atlas/lib/graphify-owner-decision-v1.mjs",
+      "classification": "EXECUTION_AUTHORITY_WRITER",
+      "mutationSignals": [
+        "update public.graphify_executions",
+        "insert into public.graphify_execution_authority",
+        "update public.graphify_executions"
+      ],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/lib/graphify-source-evidence.mjs",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/materialize-bridged-candidate-ordinal-v1.mts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/prove-graphify-run-completion-primitive-v1.mjs",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": [
+        "completeGraphifyRunInTransactionV2",
+        "completeGraphifyRunInTransactionV2",
+        "completeGraphifyRunInTransactionV2"
+      ]
+    },
+    {
+      "path": "scripts/atlas/prove-graphify-open-bind-complete-lifecycle-v1.mjs",
+      "classification": "LIFECYCLE_TEST_HARNESS",
+      "mutationSignals": [
+        "DELETE FROM graphify_runs"
+      ],
+      "transitionPrimitives": [
+        "completeGraphifyRunInTransactionV2",
+        "completeGraphifyRunInTransactionV2"
+      ]
+    },
+    {
+      "path": "scripts/atlas/prove-exact-promotion-live-dry-run.mts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/prove-current-packet-chunk-seed-v1.mjs",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/prove-code-source-revision-packet-live-dry-run.mts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/plan-current-structural-edge-resolution-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/plan-current-source-graphify-batch-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/plan-current-source-authority-repair-v1.mts",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/plan-current-graphify-execution-owner-resolution-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": [
+        "update graphify_executions"
+      ],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/plan-current-execution-source-refs-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/plan-atlas-pipeline-promotion-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/plan-graphify-run-completion-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/plan-graphify-execution-run-bridge-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/plan-sealed-graphify-inventory-v1.mts",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
+    },
+    {
+      "path": "scripts/atlas/preview-graphify-input-identity-backfill-v1.mts",
+      "classification": "REFERENCE_ONLY",
+      "mutationSignals": [],
+      "transitionPrimitives": []
     },
     {
       "path": "scripts/startup/run-graphify-daily-startup.mjs",
       "classification": "DAILY_WORKFLOW_ORCHESTRATOR",
-      "mutationSignals": []
+      "mutationSignals": [],
+      "transitionPrimitives": []
     }
   ],
   "runningRunCount": 0,
   "staleRunCount": 19,
   "currentRunCount": 0,
-  "repositoryHeadRevision": "5ae2e388f85c285bd476cf2cd354754e021d3caa",
+  "repositoryHeadRevision": "f07c0410d080f8144ce9bfcc2d9d0cbc1f43d7f1",
   "writesPerformed": false,
   "canonicalAuthority": false,
-  "reportChecksum": "sha256:cc089852837201a44b6daa553a6a24bc1c405a646c43c8dbde65cd7d28c10af1"
+  "reportChecksum": "sha256:055c33173c244b37848acd4f7a1cfeb6a5d3c428fd47656250411362e4a67e01"
 }

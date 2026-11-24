@@ -14,6 +14,9 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from hashlib import sha256
+from itertools import islice
+from inspect import Parameter, signature
+import math
 from typing import Iterable, Protocol, Sequence
 import unicodedata
 
@@ -32,7 +35,7 @@ class OakOntologyAdapterProtocol(Protocol):
 
     def relationships(self, subjects: Sequence[str]) -> Iterable[tuple[str, str, str]]: ...
 
-    def basic_search(self, search_term: str) -> Iterable[str]: ...
+    def basic_search(self, search_term: str, config: object | None = None) -> Iterable[str]: ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -87,6 +90,26 @@ class OaklibRelationCandidateV1:
 
 
 @dataclass(frozen=True, slots=True)
+class OaklibMappingCandidateV1:
+    schema: str
+    candidateId: str
+    subjectId: str
+    predicateId: str
+    objectId: str
+    mappingJustification: str | None
+    subjectSource: str | None
+    objectSource: str | None
+    subjectSourceVersion: str | None
+    objectSourceVersion: str | None
+    confidence: float | None
+    ontologyRevision: str
+    producerRevision: str
+    evidenceRefs: tuple[str, ...]
+    status: str = "PROPOSED"
+    canonicalAuthority: bool = False
+
+
+@dataclass(frozen=True, slots=True)
 class OaklibCandidateBundleV1:
     schema: str
     sourceSelector: str
@@ -94,6 +117,8 @@ class OaklibCandidateBundleV1:
     producerRevision: str
     concepts: tuple[OaklibConceptCandidateV1, ...]
     relations: tuple[OaklibRelationCandidateV1, ...]
+    mappingProviderStatus: str
+    mappingCandidates: tuple[OaklibMappingCandidateV1, ...]
     canonicalAuthority: bool = False
 
     def to_dict(self) -> dict[str, object]:
@@ -116,6 +141,81 @@ def _safe_definition(adapter: OakOntologyAdapterProtocol, entity_id: str) -> str
         return None
     value = value.strip()
     return value or None
+
+
+def _mapping_text(value: object) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text or len(text) > 512 or any(ord(char) < 32 for char in text):
+        return None
+    return text
+
+
+def _mapping_candidates(
+    adapter: OakOntologyAdapterProtocol,
+    *,
+    external_ids: Sequence[str],
+    source_selector: str,
+    ontology_revision: str,
+    producer_revision: str,
+    max_mappings: int = 256,
+) -> tuple[str, tuple[OaklibMappingCandidateV1, ...]]:
+    """Read bounded, revision-bound SSSOM suggestions when OAK supports them."""
+    mapping_reader = getattr(adapter, "sssom_mappings", None)
+    if not callable(mapping_reader):
+        return "UNAVAILABLE", ()
+    if not 1 <= max_mappings <= 1024:
+        raise ValueError("OAKLIB_MAPPING_RESULT_LIMIT_OUT_OF_RANGE")
+
+    normalized_ids = tuple(sorted({value.strip() for value in external_ids if value.strip()}))
+    if not normalized_ids:
+        return "AVAILABLE", ()
+
+    raw_rows = list(islice(mapping_reader(normalized_ids), max_mappings + 1))
+    if len(raw_rows) > max_mappings:
+        raise ValueError("OAKLIB_MAPPING_RESULT_LIMIT_EXCEEDED")
+
+    rows: dict[tuple[str, str, str], OaklibMappingCandidateV1] = {}
+    for row in raw_rows:
+        subject = _mapping_text(getattr(row, "subject_id", None))
+        predicate = _mapping_text(getattr(row, "predicate_id", None))
+        obj = _mapping_text(getattr(row, "object_id", None))
+        if not subject or not predicate or not obj:
+            raise ValueError("OAKLIB_MAPPING_CANDIDATE_INVALID")
+        if subject not in normalized_ids and obj not in normalized_ids:
+            raise ValueError("OAKLIB_MAPPING_CANDIDATE_UNBOUND")
+
+        raw_confidence = getattr(row, "confidence", None)
+        confidence: float | None = None
+        if raw_confidence is not None:
+            if isinstance(raw_confidence, bool) or not isinstance(raw_confidence, (int, float)):
+                raise ValueError("OAKLIB_MAPPING_CONFIDENCE_INVALID")
+            confidence = float(raw_confidence)
+            if not math.isfinite(confidence) or not 0.0 <= confidence <= 1.0:
+                raise ValueError("OAKLIB_MAPPING_CONFIDENCE_INVALID")
+
+        key = (subject, predicate, obj)
+        rows[key] = OaklibMappingCandidateV1(
+            schema="atlas.oaklib-mapping-candidate.v1",
+            candidateId=_stable_id(
+                "oaklib-mapping-candidate", source_selector, subject, predicate, obj,
+                ontology_revision, producer_revision,
+            ),
+            subjectId=subject,
+            predicateId=predicate,
+            objectId=obj,
+            mappingJustification=_mapping_text(getattr(row, "mapping_justification", None)),
+            subjectSource=_mapping_text(getattr(row, "subject_source", None)),
+            objectSource=_mapping_text(getattr(row, "object_source", None)),
+            subjectSourceVersion=_mapping_text(getattr(row, "subject_source_version", None)),
+            objectSourceVersion=_mapping_text(getattr(row, "object_source_version", None)),
+            confidence=confidence,
+            ontologyRevision=ontology_revision,
+            producerRevision=producer_revision,
+            evidenceRefs=(f"oaklib:{source_selector}:sssom:{subject}|{predicate}|{obj}",),
+        )
+    return "AVAILABLE", tuple(rows[key] for key in sorted(rows))
 
 
 def _concept_candidate(
@@ -155,6 +255,7 @@ def build_oaklib_candidate_bundle_v1(
     ontology_revision: str,
     producer_revision: str,
     namespace: str = "external-oaklib",
+    max_relationships: int = 512,
 ) -> OaklibCandidateBundleV1:
     """Normalize OAK entities/relationships into non-canonical Atlas candidates.
 
@@ -166,6 +267,10 @@ def build_oaklib_candidate_bundle_v1(
     normalized_subjects = tuple(sorted({subject.strip() for subject in subjects if subject.strip()}))
     if not normalized_subjects:
         raise ValueError("OAKLIB_ADAPTER_REQUIRES_AT_LEAST_ONE_SUBJECT")
+    if len(normalized_subjects) > 32:
+        raise ValueError("OAKLIB_ADAPTER_SUBJECT_COUNT_OUT_OF_RANGE")
+    if not 1 <= max_relationships <= 4096:
+        raise ValueError("OAKLIB_ADAPTER_RELATIONSHIP_LIMIT_OUT_OF_RANGE")
     if not source_selector.strip():
         raise ValueError("OAKLIB_ADAPTER_REQUIRES_SOURCE_SELECTOR")
     if not ontology_revision.strip():
@@ -173,10 +278,16 @@ def build_oaklib_candidate_bundle_v1(
     if not producer_revision.strip():
         raise ValueError("OAKLIB_ADAPTER_REQUIRES_PRODUCER_REVISION")
 
+    # OAK exposes relationship results as an iterable. Consume one sentinel row
+    # beyond the public cap so large/remote ontologies fail closed instead of
+    # returning a silently incomplete relation set or materializing everything.
+    raw_relation_rows = list(islice(adapter.relationships(normalized_subjects), max_relationships + 1))
+    if len(raw_relation_rows) > max_relationships:
+        raise ValueError("OAKLIB_RELATION_RESULT_LIMIT_EXCEEDED")
     relation_rows = sorted(
         {
             (str(subject).strip(), str(predicate).strip(), str(obj).strip())
-            for subject, predicate, obj in adapter.relationships(normalized_subjects)
+            for subject, predicate, obj in raw_relation_rows
             if str(subject).strip() and str(predicate).strip() and str(obj).strip()
         }
     )
@@ -196,6 +307,14 @@ def build_oaklib_candidate_bundle_v1(
             producer_revision=producer_revision,
         )
         for external_id in sorted(concept_ids)
+    )
+
+    mapping_provider_status, mapping_candidates = _mapping_candidates(
+        adapter,
+        external_ids=sorted(concept_ids),
+        source_selector=source_selector,
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
     )
 
     relations = tuple(
@@ -230,6 +349,8 @@ def build_oaklib_candidate_bundle_v1(
         producerRevision=producer_revision,
         concepts=concepts,
         relations=relations,
+        mappingProviderStatus=mapping_provider_status,
+        mappingCandidates=mapping_candidates,
     )
 
 
@@ -269,15 +390,37 @@ def search_oaklib_label_candidates_v1(
     if not callable(basic_search):
         raise RuntimeError("OAKLIB_SEARCH_INTERFACE_UNAVAILABLE")
 
+    try:
+        from oaklib.datamodels.search import SearchConfiguration
+        search_config = SearchConfiguration(
+            limit=max_candidates_per_term * 8,
+        )
+    except ImportError:  # Keep the protocol usable with dependency-free test adapters.
+        search_config = None
+
+    supports_search_config = False
+    if search_config is not None:
+        try:
+            parameters = signature(basic_search).parameters.values()
+            supports_search_config = any(parameter.kind == Parameter.VAR_POSITIONAL for parameter in parameters) or len([
+                parameter for parameter in parameters
+                if parameter.kind in (Parameter.POSITIONAL_ONLY, Parameter.POSITIONAL_OR_KEYWORD)
+            ]) >= 2
+        except (TypeError, ValueError):
+            # Some extension-backed callables do not expose signatures; the OAK
+            # SearchInterface contract accepts SearchConfiguration.
+            supports_search_config = True
+
     matches: list[dict[str, object]] = []
     candidate_ids: set[str] = set()
     for term in normalized_terms:
         found: set[str] = set()
-        inspected = 0
-        for result in basic_search(term):
-            inspected += 1
-            if inspected > max_candidates_per_term * 8:
-                break
+        result_iterator = (
+            basic_search(term, search_config)
+            if search_config is not None and supports_search_config
+            else basic_search(term)
+        )
+        for result in islice(result_iterator, max_candidates_per_term * 8):
             external_id = str(result).strip()
             if external_id and len(external_id) <= 256 and not any(ord(char) < 32 for char in external_id):
                 found.add(external_id)
@@ -296,6 +439,13 @@ def search_oaklib_label_candidates_v1(
         ))
         for external_id in sorted(candidate_ids)
     ]
+    mapping_provider_status, mapping_candidates = _mapping_candidates(
+        adapter,
+        external_ids=sorted(candidate_ids),
+        source_selector=source_selector,
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
+    )
     return {
         "schema": "atlas.oaklib-candidate-bundle.v1",
         "sourceSelector": source_selector,
@@ -303,6 +453,11 @@ def search_oaklib_label_candidates_v1(
         "producerRevision": producer_revision,
         "concepts": concepts,
         "relations": [],
+        "mappingProviderStatus": mapping_provider_status,
+        "mappingCandidates": [
+            {**asdict(row), "evidenceRefs": list(row.evidenceRefs)}
+            for row in mapping_candidates
+        ],
         "canonicalAuthority": False,
         "matches": matches,
     }
@@ -316,6 +471,7 @@ def load_oaklib_candidate_bundle_v1(
     producer_revision: str = "oaklib-adapter-v1",
     namespace: str = "external-oaklib",
     source_selector: str | None = None,
+    max_relationships: int = 512,
 ) -> OaklibCandidateBundleV1:
     """Load a real oaklib adapter lazily and return reviewable candidates.
 
@@ -339,6 +495,7 @@ def load_oaklib_candidate_bundle_v1(
         ontology_revision=ontology_revision,
         producer_revision=producer_revision,
         namespace=namespace,
+        max_relationships=max_relationships,
     )
 
 

@@ -1,4 +1,5 @@
 import unittest
+import hashlib
 
 from atlas_domain_classifier_eval_v1 import (
     evaluate,
@@ -39,10 +40,30 @@ class MetricTests(unittest.TestCase):
 
 
 class EvaluateTests(unittest.TestCase):
+    def evidence(self, text="verified source excerpt"):
+        raw = text.encode("utf-8")
+        digest = "a" * 64
+        return {
+            "sourceRevision": "sha256:" + digest,
+            "workspaceRevision": "sha256:" + "b" * 64,
+            "textEvidence": text,
+            "domainReviewSourceEvidenceV1": {
+                "evidenceStatus": "SOURCE_EXCERPT_BINDINGS_MATCHED",
+                "revisionStatus": "SOURCE_BINDINGS_MATCH_WORKTREE",
+                "currentSourceSha256": "sha256:" + digest,
+                "expectedBindingContentDigest": digest,
+                "workspaceRevision": "sha256:" + "b" * 64,
+                "startByte": 0,
+                "endByte": len(raw),
+                "excerptText": text,
+                "excerptSha256": hashlib.sha256(raw).hexdigest(),
+            },
+        }
+
     def rows(self, reviewed):
         return [
-            {"sourceRef": "x.ts", "originalLabel": "ui", "reviewedGroup": "ui" if reviewed else None, "reviewer": "human-reviewer-1" if reviewed else None, "reviewedAt": "2026-10-27T12:00:00Z" if reviewed else None, "sourceRevision": "r1"},
-            {"sourceRef": "y.ts", "originalLabel": "db", "reviewedGroup": "db" if reviewed else None, "reviewer": "human-reviewer-2" if reviewed else None, "reviewedAt": "2026-10-27T12:01:00Z" if reviewed else None, "sourceRevision": None},
+            {"sourceRef": "x.ts", "originalLabel": "ui", "reviewedGroup": "ui" if reviewed else None, "reviewStatus": "REVIEWED" if reviewed else None, "reviewMethod": "BLIND_HUMAN_REVIEW_V1" if reviewed else None, "reviewer": "human-reviewer-1" if reviewed else None, "reviewedAt": "2026-10-27T12:00:00Z" if reviewed else None, "sourceRevision": "sha256:" + "a" * 64, "workspaceRevision": "sha256:" + "b" * 64, **self.evidence()},
+            {"sourceRef": "y.ts", "originalLabel": "db", "reviewedGroup": "db" if reviewed else None, "reviewStatus": "REVIEWED" if reviewed else None, "reviewMethod": "BLIND_HUMAN_REVIEW_V1" if reviewed else None, "reviewer": "human-reviewer-2" if reviewed else None, "reviewedAt": "2026-10-27T12:01:00Z" if reviewed else None, "sourceRevision": None},
         ]
 
     def test_no_gold_refuses_accuracy_and_labels_weak_agreement_as_non_accuracy(self):
@@ -81,8 +102,29 @@ class EvaluateTests(unittest.TestCase):
         self.assertEqual(rep["goldRows"], 0)
         self.assertEqual(rep["unverifiedReviewRows"], 4)
 
+    def test_legacy_reviewed_timestamp_without_blind_decision_is_not_gold(self):
+        rows = [{
+            "reviewedGroup": "ui", "reviewStatus": "REVIEWED", "reviewer": "human-reviewer",
+            "reviewedAt": "2026-10-27T12:00:00Z", "note": "human must confirm weak label",
+        }]
+        rep = evaluate(rows, lambda r: ("ui", 0.9, None))
+        self.assertEqual(rep["status"], "NO_GOLD_LABELS")
+        self.assertEqual(rep["goldRows"], 0)
+        self.assertEqual(rep["unverifiedReviewRows"], 1)
+
+    def test_blind_decision_without_verified_source_excerpt_is_not_gold(self):
+        rows = [{
+            "reviewedGroup": "ui", "reviewStatus": "REVIEWED", "reviewMethod": "BLIND_HUMAN_REVIEW_V1",
+            "reviewer": "human-reviewer", "reviewedAt": "2026-10-27T12:00:00Z", "textEvidence": "Generated summary: likely UI",
+            "sourceRevision": "sha256:" + "a" * 64, "workspaceRevision": "sha256:" + "b" * 64,
+        }]
+        rep = evaluate(rows, lambda r: ("ui", 0.9, None))
+        self.assertEqual(rep["status"], "NO_GOLD_LABELS")
+        self.assertEqual(rep["goldRows"], 0)
+        self.assertEqual(rep["unverifiedReviewRows"], 1)
+
     def test_large_sample_without_independent_review_cannot_be_scored(self):
-        rows = [{"reviewedGroup": "a" if i % 2 else "b", "reviewer": f"human-{i}", "reviewedAt": "2026-10-27T12:00:00Z"} for i in range(240)]
+        rows = [{"reviewedGroup": "a" if i % 2 else "b", "reviewStatus": "REVIEWED", "reviewMethod": "BLIND_HUMAN_REVIEW_V1", "reviewer": f"human-{i}", "reviewedAt": "2026-10-27T12:00:00Z", **self.evidence()} for i in range(240)]
         rep = evaluate(rows, lambda r: (r["reviewedGroup"], 1.0, None))
         self.assertEqual(rep["status"], "INSUFFICIENT_REVIEWER_COVERAGE")
         self.assertEqual(rep["minimumDoubleReviewRows"], 24)
@@ -91,8 +133,13 @@ class EvaluateTests(unittest.TestCase):
         rows = [
             {
                 "reviewedGroup": "a" if i % 2 else "b",
+                "reviewStatus": "REVIEWED",
+                "reviewMethod": "BLIND_HUMAN_REVIEW_V1",
                 "reviewer": f"human-{i}",
                 "reviewedAt": "2026-10-27T12:00:00Z",
+                **self.evidence(),
+                "secondReviewStatus": "REVIEWED" if i < 24 else None,
+                "secondReviewMethod": "BLIND_HUMAN_REVIEW_V1" if i < 24 else None,
                 "secondReviewer": f"second-{i}" if i < 24 else (f"human-{i}" if i == 24 else None),
                 "secondReviewedAt": "2026-10-27T13:00:00Z" if i < 24 or i == 24 else None,
             }
@@ -105,8 +152,11 @@ class EvaluateTests(unittest.TestCase):
     def test_second_reviewer_without_timestamp_does_not_count(self):
         rows = [{
             "reviewedGroup": "a" if i % 2 else "b",
+            "reviewStatus": "REVIEWED",
+            "reviewMethod": "BLIND_HUMAN_REVIEW_V1",
             "reviewer": f"human-{i}",
             "reviewedAt": "2026-10-27T12:00:00Z",
+            **self.evidence(),
             "secondReviewer": f"second-{i}" if i < 24 else None,
         } for i in range(240)]
         rep = evaluate(rows, lambda r: (r["reviewedGroup"], 1.0, None))
@@ -116,8 +166,11 @@ class EvaluateTests(unittest.TestCase):
     def test_naive_review_timestamp_is_not_human_review_provenance(self):
         rows = [{
             "reviewedGroup": "ui",
+            "reviewStatus": "REVIEWED",
+            "reviewMethod": "BLIND_HUMAN_REVIEW_V1",
             "reviewer": "human-reviewer",
             "reviewedAt": "2026-10-27T12:00:00",
+            **self.evidence(),
         }]
         rep = evaluate(rows, lambda r: ("ui", 0.9, None))
         self.assertEqual(rep["status"], "NO_GOLD_LABELS")
@@ -131,9 +184,14 @@ class EvaluateTests(unittest.TestCase):
     def test_large_balanced_gold_can_reach_scored(self):
         rows = [{
             "reviewedGroup": "a" if i % 2 else "b",
+            "reviewStatus": "REVIEWED",
+            "reviewMethod": "BLIND_HUMAN_REVIEW_V1",
             "originalLabel": "a",
             "reviewer": f"human-{i}",
             "reviewedAt": "2026-10-27T12:00:00Z",
+            **self.evidence(),
+            "secondReviewStatus": "REVIEWED" if i < 24 else None,
+            "secondReviewMethod": "BLIND_HUMAN_REVIEW_V1" if i < 24 else None,
             "secondReviewer": f"second-{i}" if i < 24 else None,
             "secondReviewedAt": "2026-10-27T13:00:00Z" if i < 24 else None,
         } for i in range(240)]

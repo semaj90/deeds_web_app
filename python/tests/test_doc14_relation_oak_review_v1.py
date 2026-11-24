@@ -133,6 +133,91 @@ def test_verified_mentions_join_to_oak_suggestions_without_promotion_or_path_lea
     assert len(result["reviewChecksum"]) == 71
 
 
+def test_oak_sssom_mapping_candidates_are_surfaced_only_as_review_suggestions():
+    relation, source, chunk, oak = _inputs()
+    oak["candidateBundle"]["mappingProviderStatus"] = "AVAILABLE"
+    oak["candidateBundle"]["mappingCandidates"] = [{
+        "schema": "atlas.oaklib-mapping-candidate.v1",
+        "candidateId": "oaklib-mapping-candidate:fixture",
+        "subjectId": "api:Foo",
+        "predicateId": "skos:exactMatch",
+        "objectId": "EXT:Foo",
+        "mappingJustification": "semapv:ManualMappingCuration",
+        "subjectSource": "api",
+        "objectSource": "EXT",
+        "subjectSourceVersion": "1",
+        "objectSourceVersion": "2",
+        "confidence": 0.9,
+        "ontologyRevision": oak["ontologyRevision"],
+        "producerRevision": oak["producerRevision"],
+        "evidenceRefs": ["oaklib:sqlite:/private/parent-atlas.obo:sssom:api:Foo|skos:exactMatch|EXT:Foo"],
+        "status": "PROPOSED",
+        "canonicalAuthority": False,
+    }]
+
+    result = build_doc14_relation_oak_review_v1(
+        relation=relation, source_readback=source, chunk=chunk, oak_response=oak,
+    )
+
+    assert result["oakMappingProviderStatus"] == "AVAILABLE"
+    assert result["existingOAKMappings"] == [{
+        "candidateId": "oaklib-mapping-candidate:fixture",
+        "subjectId": "api:Foo",
+        "predicateId": "skos:exactMatch",
+        "objectId": "EXT:Foo",
+        "mappingJustification": "semapv:ManualMappingCuration",
+        "subjectSource": "api",
+        "objectSource": "EXT",
+        "subjectSourceVersion": "1",
+        "objectSourceVersion": "2",
+        "confidence": 0.9,
+        "evidenceRefs": [f"oaklib:sha256:{hashlib.sha256(b'sqlite:/private/parent-atlas.obo').hexdigest()}:sssom:api:Foo|skos:exactMatch|EXT:Foo"],
+        "status": "SUGGESTED_REQUIRES_REVIEW",
+        "canonicalAuthority": False,
+    }]
+    assert result["canonicalAuthority"] is False
+    assert result["writesPerformed"] is False
+
+
+def test_oak_sssom_mapping_candidates_cannot_cross_ontology_revision():
+    relation, source, chunk, oak = _inputs()
+    oak["candidateBundle"]["mappingCandidates"] = [{
+        "schema": "atlas.oaklib-mapping-candidate.v1",
+        "candidateId": "mapping:stale",
+        "subjectId": "api:Foo",
+        "predicateId": "skos:exactMatch",
+        "objectId": "EXT:Foo",
+        "ontologyRevision": "sha256:stale",
+        "producerRevision": oak["producerRevision"],
+        "status": "PROPOSED",
+        "canonicalAuthority": False,
+    }]
+    with pytest.raises(ValueError, match="DOC14_OAK_MAPPING_AUTHORITY_OR_REVISION_INVALID"):
+        build_doc14_relation_oak_review_v1(
+            relation=relation, source_readback=source, chunk=chunk, oak_response=oak,
+        )
+
+
+def test_oak_sssom_mapping_confidence_must_be_finite_and_bounded():
+    relation, source, chunk, oak = _inputs()
+    oak["candidateBundle"]["mappingCandidates"] = [{
+        "schema": "atlas.oaklib-mapping-candidate.v1",
+        "candidateId": "mapping:bad-confidence",
+        "subjectId": "api:Foo",
+        "predicateId": "skos:exactMatch",
+        "objectId": "EXT:Foo",
+        "confidence": float("nan"),
+        "ontologyRevision": oak["ontologyRevision"],
+        "producerRevision": oak["producerRevision"],
+        "status": "PROPOSED",
+        "canonicalAuthority": False,
+    }]
+    with pytest.raises(ValueError, match="DOC14_OAK_MAPPING_CONFIDENCE_INVALID"):
+        build_doc14_relation_oak_review_v1(
+            relation=relation, source_readback=source, chunk=chunk, oak_response=oak,
+        )
+
+
 def test_ambiguous_and_missing_oak_matches_remain_reviewable():
     relation, source, chunk, oak = _inputs()
     oak["candidateBundle"]["concepts"].append({

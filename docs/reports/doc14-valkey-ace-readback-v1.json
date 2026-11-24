@@ -1,6 +1,6 @@
 {
   "schema": "atlas.doc14-valkey-ace-readback.v1",
-  "generatedAt": "2026-11-22T21:48:47.197Z",
+  "generatedAt": "2026-11-23T20:23:32.267Z",
   "chunkId": "card:src/lib/server/ace/context-assembler.ts:0046a5745d5d9e09",
   "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
   "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",

@@ -13,7 +13,11 @@ from atlas_symbol_nb_lane_v1 import (
 
 
 def row(name, domain, *, path="src/x", kind="function", reviewer="reviewer_a", at="2026-10-28T10:00:00+00:00", **extra):
-    return {"name": name, "kind": kind, "directoryPath": path, "reviewedGroup": domain, "reviewer": reviewer, "reviewedAt": at, **extra}
+    text = f"source evidence for {name}"
+    raw = text.encode("utf-8")
+    import hashlib
+    evidence = {"evidenceStatus": "SOURCE_EXCERPT_BINDINGS_MATCHED", "revisionStatus": "SOURCE_BINDINGS_MATCH_WORKTREE", "currentSourceSha256": "sha256:" + "a" * 64, "expectedBindingContentDigest": "a" * 64, "workspaceRevision": "sha256:" + "b" * 64, "startByte": 0, "endByte": len(raw), "excerptText": text, "excerptSha256": hashlib.sha256(raw).hexdigest()}
+    return {"name": name, "kind": kind, "directoryPath": path, "reviewedGroup": domain, "reviewStatus": "REVIEWED", "reviewMethod": "BLIND_HUMAN_REVIEW_V1", "reviewer": reviewer, "reviewedAt": at, "sourceRevision": "sha256:" + "a" * 64, "workspaceRevision": "sha256:" + "b" * 64, "textEvidence": text, "domainReviewSourceEvidenceV1": evidence, **extra}
 
 
 # SYNTHETIC mechanics fixtures only: they prove the lane's behaviour, not any accuracy.

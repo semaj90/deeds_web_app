@@ -2644,6 +2644,49 @@ except Exception:  # pragma: no cover - mirrors the optional classifier import p
 DOMAIN_CLASSIFIER_CHECKPOINT_PATH = Path(
     os.getenv("DOMAIN_CLASSIFIER_CHECKPOINT_PATH", "/models/domain-classifier/checkpoint.joblib")
 )
+EG2_ONNX_CLASSIFIER_CHECKPOINT_PATH = Path(
+    os.getenv("EG2_ONNX_CLASSIFIER_CHECKPOINT_PATH", "/models/domain-classifier/eg2-onnx-checkpoint.joblib")
+)
+GEMMA2_ONNX_URL = os.getenv("GEMMA2_ONNX_URL", "http://127.0.0.1:8094").rstrip("/")
+
+_eg2_onnx_checkpoint: Optional[dict[str, Any]] = None
+_eg2_onnx_checkpoint_loaded = False
+_eg2_onnx_checkpoint_mtime_ns: Optional[int] = None
+
+
+def _resolve_eg2_model_dir() -> Path:
+    env_dir = os.getenv("EG2_ONNX_MODEL_DIR")
+    if env_dir and Path(env_dir).is_dir():
+        return Path(env_dir)
+    ws_dir = Path("/workspace/models/embeddinggemma2/onnx-q8")
+    if ws_dir.is_dir():
+        return ws_dir
+    return Path(__file__).resolve().parents[1] / "models" / "embeddinggemma2" / "onnx-q8"
+
+
+def _load_eg2_onnx_classifier_checkpoint() -> Optional[dict[str, Any]]:
+    global _eg2_onnx_checkpoint, _eg2_onnx_checkpoint_loaded, _eg2_onnx_checkpoint_mtime_ns
+    try:
+        mtime_ns = EG2_ONNX_CLASSIFIER_CHECKPOINT_PATH.stat().st_mtime_ns
+    except OSError:
+        mtime_ns = None
+    if _eg2_onnx_checkpoint_loaded and mtime_ns == _eg2_onnx_checkpoint_mtime_ns:
+        return _eg2_onnx_checkpoint
+    _eg2_onnx_checkpoint_loaded = True
+    _eg2_onnx_checkpoint_mtime_ns = mtime_ns
+    if not (SKLEARN_AVAILABLE and JOBLIB_AVAILABLE) or mtime_ns is None:
+        _eg2_onnx_checkpoint = None
+        return None
+    try:
+        loaded = joblib.load(EG2_ONNX_CLASSIFIER_CHECKPOINT_PATH)
+    except Exception:
+        _eg2_onnx_checkpoint = None
+        return None
+    if not isinstance(loaded, dict) or "labels" not in loaded:
+        _eg2_onnx_checkpoint = None
+        return None
+    _eg2_onnx_checkpoint = loaded
+    return _eg2_onnx_checkpoint
 
 _domain_classifier_checkpoint: Optional[dict[str, Any]] = None
 _domain_classifier_checkpoint_loaded = False
@@ -2679,15 +2722,59 @@ def _load_domain_classifier_checkpoint() -> Optional[dict[str, Any]]:
     return _domain_classifier_checkpoint
 
 
-def _fetch_ollama_embedding(text: str, *, timeout_seconds: float = 10.0) -> Optional[list[float]]:
-    """Real network call to the canonical embedding path (Ollama embeddinggemma).
-    Returns None on any failure — the classify pass degrades to 'unavailable',
-    never raises past this boundary."""
-    if not text.strip():
+try:
+    from atlas_graph_runtime.ollama_embed_adapter_v1 import (
+        EncoderProfile as _OllamaEncoderProfile,
+        LEGACY_EMBEDDINGGEMMA_768 as _LEGACY_EMBEDDINGGEMMA_768,
+        OllamaEmbedAdapterV1 as _OllamaEmbedAdapterV1,
+    )
+except Exception:
+    _OllamaEncoderProfile = None  # type: ignore[assignment]
+    _LEGACY_EMBEDDINGGEMMA_768 = None  # type: ignore[assignment]
+    _OllamaEmbedAdapterV1 = None  # type: ignore[assignment]
+
+
+def _legacy_classifier_embed_profile() -> Any:
+    if _OllamaEncoderProfile is None:
         return None
-    payload = json.dumps({"model": DOMAIN_CLASSIFIER_EMBED_MODEL, "prompt": text[:2000]}).encode("utf-8")
+    if DOMAIN_CLASSIFIER_EMBED_MODEL == _LEGACY_EMBEDDINGGEMMA_768.model:
+        return _LEGACY_EMBEDDINGGEMMA_768
+    return _OllamaEncoderProfile(
+        profile_id="legacy-embeddinggemma-768",
+        space_id=f"{DOMAIN_CLASSIFIER_EMBED_MODEL}-768",
+        model=DOMAIN_CLASSIFIER_EMBED_MODEL,
+        dimensions=768,
+        supports_dimensions_param=False,
+        apply_task_prefix=False,
+        default_truncate=True,
+        legacy_max_chars=2000,
+    )
+
+
+def _fetch_ollama_embeddings_batch(
+    texts: list[str], *, timeout_seconds: float = 15.0
+) -> tuple[list[list[float]], Optional[str]]:
+    """Batch /api/embed call using the legacy-embeddinggemma-768 profile for checkpoint.joblib parity.
+    Returns (vectors, structured_failure_code)."""
+    cleaned = [t.strip() for t in texts if t and t.strip()]
+    if not cleaned:
+        return [], "EMPTY_INPUT_TEXT"
+    if _OllamaEmbedAdapterV1 is not None:
+        try:
+            adapter = _OllamaEmbedAdapterV1(ollama_url=OLLAMA_URL, timeout_seconds=timeout_seconds)
+            profile = _legacy_classifier_embed_profile()
+            result = adapter.embed_batch(
+                cleaned,
+                profile=profile,
+                truncate=True,
+                require_normalized=False,
+            )
+            return (result.vectors, None) if result.vectors else ([], "EMBEDDING_EMPTY_RESPONSE")
+        except Exception as exc:
+            return [], f"EMBEDDING_TRANSPORT_FAILED:{type(exc).__name__}"
+    payload = json.dumps({"model": DOMAIN_CLASSIFIER_EMBED_MODEL, "input": [t[:2000] for t in cleaned]}).encode("utf-8")
     request = urllib.request.Request(
-        f"{OLLAMA_URL}/api/embeddings",
+        f"{OLLAMA_URL}/api/embed",
         data=payload,
         headers={"Content-Type": "application/json"},
         method="POST",
@@ -2695,10 +2782,17 @@ def _fetch_ollama_embedding(text: str, *, timeout_seconds: float = 10.0) -> Opti
     try:
         with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
             body = json.loads(response.read())
-    except Exception:
-        return None
-    embedding = body.get("embedding")
-    return embedding if isinstance(embedding, list) and embedding else None
+    except Exception as exc:
+        return [], f"EMBEDDING_TRANSPORT_FAILED:{type(exc).__name__}"
+    embeddings = body.get("embeddings")
+    valid = [v for v in embeddings if isinstance(v, list) and v] if isinstance(embeddings, list) else []
+    return (valid, None) if valid else ([], "EMBEDDING_EMPTY_RESPONSE")
+
+
+def _fetch_ollama_embedding(text: str, *, timeout_seconds: float = 10.0) -> Optional[list[float]]:
+    """Real network call to the canonical /api/embed path (preserving legacy checkpoint space)."""
+    vectors, _ = _fetch_ollama_embeddings_batch([text], timeout_seconds=timeout_seconds)
+    return vectors[0] if vectors else None
 
 
 def _chunk_text_for_clustering(text: str, max_chunks: int = 8) -> list[str]:
@@ -2712,50 +2806,126 @@ def _chunk_text_for_clustering(text: str, max_chunks: int = 8) -> list[str]:
     return sentences[:max_chunks]
 
 
-def _extract_cluster_features(text: str, checkpoint: dict[str, Any]) -> Optional[dict[str, float]]:
-    """KMeans distance-to-centroid features over embedded text chunks. The KMeans
-    model itself is fit offline (train_domain_classifier.py) and only predicts here."""
+def _extract_cluster_features_with_reason(
+    text: str, checkpoint: dict[str, Any]
+) -> tuple[Optional[dict[str, float]], Optional[str]]:
+    """KMeans distance-to-centroid features over embedded text chunks with structured failure codes."""
     kmeans = checkpoint.get("kmeans")
-    if kmeans is None or np is None or cluster_distance_features is None:
-        return None
+    if kmeans is None:
+        return None, "CHECKPOINT_MISSING_KMEANS"
+    if np is None:
+        return None, "NUMPY_UNAVAILABLE"
+    if cluster_distance_features is None:
+        return None, "CLUSTER_DISTANCE_IMPORT_FAILED"
     chunks = _chunk_text_for_clustering(text)
     if not chunks:
-        return None
-    embeddings: list[list[float]] = []
-    for chunk in chunks:
-        vector = _fetch_ollama_embedding(chunk)
-        if vector:
-            embeddings.append(vector)
+        return None, "EMPTY_INPUT_TEXT"
+    embeddings, embed_err = _fetch_ollama_embeddings_batch(chunks, timeout_seconds=15.0)
     if not embeddings:
-        return None
+        return None, embed_err or "EMBEDDING_EMPTY_RESPONSE"
     try:
         # Preserve the checkpoint's training feature recipe; the count is the
         # successfully embedded rows, not requested chunks that failed embedding.
-        return cluster_distance_features(kmeans, np.asarray(embeddings, dtype=np.float32))
+        return cluster_distance_features(kmeans, np.asarray(embeddings, dtype=np.float32)), None
+    except Exception as exc:
+        return None, f"CLUSTER_FEATURE_EXTRACTION_FAILED:{type(exc).__name__}"
+
+
+def _extract_cluster_features(text: str, checkpoint: dict[str, Any]) -> Optional[dict[str, float]]:
+    features, _ = _extract_cluster_features_with_reason(text, checkpoint)
+    return features
+
+
+def _extract_eg2_onnx_cluster_features_with_reason(
+    text: str, checkpoint: dict[str, Any]
+) -> tuple[Optional[dict[str, float]], Optional[str]]:
+    kmeans = checkpoint.get("kmeans")
+    if kmeans is None:
+        return None, "EG2_CHECKPOINT_MISSING_KMEANS"
+    if np is None:
+        return None, "NUMPY_UNAVAILABLE"
+    if cluster_distance_features is None:
+        return None, "CLUSTER_DISTANCE_IMPORT_FAILED"
+    try:
+        from atlas_graph_runtime.eg2_onnx_adapter_v1 import Eg2OnnxClientV1, chunk_text_by_tokens
+    except Exception as exc:
+        return None, f"EG2_ONNX_ADAPTER_IMPORT_FAILED:{type(exc).__name__}"
+    model_dir = _resolve_eg2_model_dir()
+    tok_path = model_dir / "tokenizer.json"
+    try:
+        if tok_path.is_file():
+            chunks = chunk_text_by_tokens(text, tokenizer_path=tok_path, max_tokens=256, overlap_tokens=32, max_chunks=8)
+        else:
+            chunks = _chunk_text_for_clustering(text)
     except Exception:
-        return None
+        chunks = _chunk_text_for_clustering(text)
+    if not chunks:
+        return None, "EMPTY_INPUT_TEXT"
+    try:
+        client = Eg2OnnxClientV1(base_url=GEMMA2_ONNX_URL, model_dir=model_dir, timeout_seconds=20.0)
+        res = client.embed(chunks, dim=768, task_prompt_name="Classification")
+        embeddings = res.vectors
+    except Exception as exc:
+        return None, f"EG2_ONNX_EMBED_FAILED:{type(exc).__name__}"
+    if not embeddings:
+        return None, "EG2_ONNX_EMPTY_RESPONSE"
+    try:
+        return cluster_distance_features(kmeans, np.asarray(embeddings, dtype=np.float32)), None
+    except Exception as exc:
+        return None, f"EG2_CLUSTER_FEATURE_EXTRACTION_FAILED:{type(exc).__name__}"
 
 
-def _classify_domain_pass(text: str) -> tuple[str, dict[str, Any], dict[str, Any], list[str]]:
+def _classify_domain_pass(
+    text: str, *, encoder_profile: Optional[str] = None
+) -> tuple[str, dict[str, Any], dict[str, Any], list[str]]:
     """Returns (backend, features_map, artifacts, warnings) for the classify AnalysisPassResult.
-    backend is 'sklearn-nb', 'sklearn-lr', or 'unavailable' — never 'pytorch' (no trained
-    PyTorch model exists yet; see design.md for the documented future upgrade path)."""
-    checkpoint = _load_domain_classifier_checkpoint()
-    if checkpoint is None:
-        return (
-            "unavailable",
-            {},
-            {},
-            ["no trained domain-classifier checkpoint present; run train_domain_classifier.py"],
-        )
+    Supports isolated 'legacy-embeddinggemma-768' (checkpoint.joblib) and
+    'eg2-onnx-q8-mrl-768' (eg2-onnx-checkpoint.joblib via :8094 ONNX, zero Ollama)."""
+    use_eg2 = (encoder_profile or "").strip().lower() in {
+        "eg2-onnx-q8-mrl-768",
+        "eg2-onnx",
+        "embeddinggemma2-onnx",
+    }
+    if use_eg2:
+        checkpoint = _load_eg2_onnx_classifier_checkpoint()
+        if checkpoint is None:
+            return (
+                "unavailable",
+                {},
+                {
+                    "failureCode": "EG2_CHECKPOINT_UNAVAILABLE",
+                    "encoderProfile": "eg2-onnx-q8-mrl-768",
+                },
+                ["no EG2 ONNX domain-classifier checkpoint present; run scripts/atlas/train-eg2-onnx-domain-classifier-v1.py"],
+            )
+        cluster_features, cluster_err = _extract_eg2_onnx_cluster_features_with_reason(text, checkpoint)
+        active_profile = "eg2-onnx-q8-mrl-768"
+    else:
+        checkpoint = _load_domain_classifier_checkpoint()
+        if checkpoint is None:
+            return (
+                "unavailable",
+                {},
+                {
+                    "failureCode": "LEGACY_CHECKPOINT_UNAVAILABLE",
+                    "encoderProfile": "legacy-embeddinggemma-768",
+                },
+                ["no trained domain-classifier checkpoint present; run train_domain_classifier.py"],
+            )
+        cluster_features, cluster_err = _extract_cluster_features_with_reason(text, checkpoint)
+        active_profile = "legacy-embeddinggemma-768"
 
-    cluster_features = _extract_cluster_features(text, checkpoint)
     if cluster_features is None:
         return (
             "unavailable",
             {},
-            {},
-            ["failed to compute cluster features (embedding service unreachable or empty text)"],
+            {
+                "failureCode": cluster_err or "CLUSTER_FEATURE_EXTRACTION_FAILED",
+                "encoderProfile": active_profile,
+                "embedModel": checkpoint.get("embed_model") or DOMAIN_CLASSIFIER_EMBED_MODEL,
+                "model_revision": checkpoint.get("model_revision", "unknown"),
+            },
+            [f"failed to compute cluster features: {cluster_err or 'UNKNOWN'}"],
         )
 
     labels = checkpoint.get("labels") or []
@@ -2823,6 +2993,9 @@ def _classify_domain_pass(text: str) -> tuple[str, dict[str, Any], dict[str, Any
         "naive_bayes_domain_probabilities": nb_probabilities,
         "logistic_regression_domain_probabilities": lr_probabilities,
         "model_revision": checkpoint.get("model_revision", "unknown"),
+        "encoderProfile": active_profile,
+        "embedModel": checkpoint.get("embed_model") or DOMAIN_CLASSIFIER_EMBED_MODEL,
+        "checkpointBaselineOnly": active_profile == "legacy-embeddinggemma-768",
     }
     warnings = [] if final_label else ["checkpoint present but produced no confident label"]
     return backend, features_map, artifacts, warnings
@@ -3629,7 +3802,9 @@ def classify(req: ClassificationRequestV1) -> dict[str, Any]:
         raise HTTPException(503, "NLP_CLASSIFICATION_HELPER_UNAVAILABLE")
     result = classify_request(req)
     if req.run_model_challenger:
-        backend, features_map, artifacts, warnings = _classify_domain_pass(req.text)
+        backend, features_map, artifacts, warnings = _classify_domain_pass(
+            req.text, encoder_profile=req.encoder_profile
+        )
         result["trainedClassifier"] = {
             "status": "SHADOW_ONLY" if backend != "unavailable" else "UNAVAILABLE",
             "backend": backend,

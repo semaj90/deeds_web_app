@@ -19,11 +19,12 @@ from atlas_graph_runtime.gepa_frozen_corpus_adapter_v1 import (
 def _mk_bundle_and_env(
     qid: str,
     src_file: str,
+    shared_candidate_ref: str | None = None,
 ) -> tuple[dict, dict[str, str], dict[str, str], dict[str, bytes], dict[str, tuple[int, int]]]:
     raw = f"hello {qid} source text".encode("utf-8")
     c0_sha = "sha256:" + hashlib.sha256(raw).hexdigest()
     q_sha = "sha256:" + hashlib.sha256(raw[:5]).hexdigest()
-    alt_ref = f"scripts/atlas/other_{qid}.mjs"
+    alt_ref = shared_candidate_ref or f"scripts/atlas/other_{qid}.mjs"
     alt_raw = b"distractor text"
     alt_sha = "sha256:" + hashlib.sha256(alt_raw).hexdigest()
     bundle = build_versioned_replay_bundle_v1(
@@ -81,6 +82,7 @@ def test_build_frozen_gepa_corpus_full_context_and_group_split() -> None:
 
     gate_small = check_gepa_corpus_and_promotion_ready_v1(
         corpus,
+        expected_corpus_checksum=corpus["corpusChecksum"],
         program_version="gepa-prog-v1",
         metric_version="doc14-gepa-metric-v1",
         before_held_out_score=0.5,
@@ -107,13 +109,116 @@ def test_build_frozen_gepa_corpus_full_context_and_group_split() -> None:
     )
     gate_ok = check_gepa_corpus_and_promotion_ready_v1(
         big_corpus,
+        expected_corpus_checksum=big_corpus["corpusChecksum"],
         program_version="gepa-prog-v1",
         metric_version="doc14-gepa-metric-v1",
         before_held_out_score=0.5,
         after_held_out_score=0.8,
-        approved_by="human-op",
+        approval_receipt={
+            "schema": "atlas.gepa-promotion-approval.v1",
+            "decision": "APPROVE",
+            "reviewerRef": "reviewer:human-op",
+            "approvalEvidenceRef": "review-record:gepa-v1",
+            "datasetChecksum": big_corpus["corpusChecksum"],
+            "programVersion": "gepa-prog-v1",
+            "metricVersion": "doc14-gepa-metric-v1",
+            "beforeHeldOutScore": 0.5,
+            "afterHeldOutScore": 0.8,
+        },
+        approval_verifier=lambda receipt, claim: receipt.get("reviewerRef") == "reviewer:human-op",
     )
     assert gate_ok["promotionAllowed"] is True
+
+
+def test_gepa_gate_does_not_trust_reviewer_string_without_independent_verifier() -> None:
+    bundles, revs, hashes, bytes_map, spans = [], {}, {}, {}, {}
+    for qid, source_ref in (("q1", "scripts/atlas/f1.mjs"), ("q2", "scripts/atlas/f2.mjs"), ("q3", "scripts/atlas/f3.mjs")):
+        bundle, row_revs, row_hashes, row_bytes, row_spans = _mk_bundle_and_env(qid, source_ref)
+        bundles.append(bundle)
+        revs.update(row_revs)
+        hashes.update(row_hashes)
+        bytes_map.update(row_bytes)
+        spans.update(row_spans)
+    corpus = build_frozen_gepa_corpus_from_replays_v1(
+        bundles,
+        expected_source_revisions=revs,
+        expected_chunk_hashes=hashes,
+        source_bytes_by_ref=bytes_map,
+        expected_chunk_spans=spans,
+    )
+    receipt = {
+        "schema": "atlas.gepa-promotion-approval.v1",
+        "decision": "APPROVE",
+        "reviewerRef": "reviewer:human-op",
+        "approvalEvidenceRef": "review-record:gepa-v1",
+        "datasetChecksum": corpus["corpusChecksum"],
+        "programVersion": "gepa-prog-v1",
+        "metricVersion": "doc14-gepa-metric-v1",
+        "beforeHeldOutScore": 0.5,
+        "afterHeldOutScore": 0.8,
+    }
+    denied = check_gepa_corpus_and_promotion_ready_v1(
+        corpus,
+        expected_corpus_checksum=corpus["corpusChecksum"],
+        program_version="gepa-prog-v1",
+        metric_version="doc14-gepa-metric-v1",
+        before_held_out_score=0.5,
+        after_held_out_score=0.8,
+        approval_receipt=receipt,
+        approval_verifier=lambda _receipt, _claim: False,
+    )
+    assert denied["promotionAllowed"] is False
+    assert "AWAITING_INDEPENDENT_PROMOTION_APPROVAL" in denied["reasons"]
+
+
+def test_gepa_gate_rejects_candidate_context_source_leakage_across_splits() -> None:
+    bundles, revs, hashes, bytes_map, spans = [], {}, {}, {}, {}
+    for qid, source_ref in (("q1", "scripts/atlas/f1.mjs"), ("q2", "scripts/atlas/f2.mjs")):
+        bundle, row_revs, row_hashes, row_bytes, row_spans = _mk_bundle_and_env(
+            qid, source_ref, shared_candidate_ref="scripts/atlas/shared-distractor.mjs"
+        )
+        bundles.append(bundle)
+        revs.update(row_revs)
+        hashes.update(row_hashes)
+        bytes_map.update(row_bytes)
+        spans.update(row_spans)
+
+    with pytest.raises(ValueError, match="GEPA_HELD_OUT_SPLIT_EMPTY"):
+        build_frozen_gepa_corpus_from_replays_v1(
+            bundles,
+            expected_source_revisions=revs,
+            expected_chunk_hashes=hashes,
+            source_bytes_by_ref=bytes_map,
+            expected_chunk_spans=spans,
+        )
+
+
+def test_gepa_promotion_gate_rechecks_frozen_checksum_and_counts() -> None:
+    bundles, revs, hashes, bytes_map, spans = [], {}, {}, {}, {}
+    for qid, source_ref in (("q1", "scripts/atlas/f1.mjs"), ("q2", "scripts/atlas/f2.mjs"), ("q3", "scripts/atlas/f3.mjs")):
+        bundle, row_revs, row_hashes, row_bytes, row_spans = _mk_bundle_and_env(qid, source_ref)
+        bundles.append(bundle)
+        revs.update(row_revs)
+        hashes.update(row_hashes)
+        bytes_map.update(row_bytes)
+        spans.update(row_spans)
+    corpus = build_frozen_gepa_corpus_from_replays_v1(
+        bundles,
+        expected_source_revisions=revs,
+        expected_chunk_hashes=hashes,
+        source_bytes_by_ref=bytes_map,
+        expected_chunk_spans=spans,
+    )
+    corpus["splits"]["held_out"][0]["queryText"] = "tampered after freeze"
+    with pytest.raises(ValueError, match="GEPA_CORPUS_CHECKSUM_MISMATCH"):
+        check_gepa_corpus_and_promotion_ready_v1(
+            corpus,
+            expected_corpus_checksum=corpus["corpusChecksum"],
+            program_version="gepa-prog-v1",
+            metric_version="doc14-gepa-metric-v1",
+            before_held_out_score=0.5,
+            after_held_out_score=0.8,
+        )
 
 
 def test_build_frozen_gepa_corpus_rejects_same_source_group_or_duplicate() -> None:

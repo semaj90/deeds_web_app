@@ -1,112 +1,156 @@
 {
   "schema": "atlas.ace-producer-trace-01.v1",
   "task": "ACE-PRODUCER-TRACE-01",
-  "generatedAt": "2026-10-18T00:58:56.956Z",
-  "mode": "READ_ONLY_REAL_ARTIFACT_TRACE",
+  "generatedAt": "2026-11-24T05:35:53.327Z",
+  "mode": "READ_ONLY_LIVE_PG18_AND_NEGATIVE_REPLAY",
   "writesPerformed": false,
   "canonicalAuthority": false,
-  "cohortSize": 3,
-  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-  "sourceMatrixDir": ".tmp\\atlas\\candidate-feature-matrix-v1\\20260926T174833Z",
-  "sourcePacketsDir": ".tmp\\atlas\\ace-packets-v3\\20260929T024243Z",
+  "cohortSize": 5,
+  "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+  "manifestPath": ".tmp/atlas/ace-producer-manifest-current.json",
   "steps": [
     {
-      "name": "READ_REAL_ORDINAL_MAP",
+      "name": "READ_LIVE_PG18_COHORT",
       "ok": true,
       "detail": {
-        "total": 16151,
-        "revisionQualified": 15732
-      }
-    },
-    {
-      "name": "SELECT_COHORT",
-      "ok": true,
-      "detail": {
-        "requested": 3,
-        "selected": 3,
+        "requested": 5,
+        "selected": 5,
+        "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
         "packetKeys": [
-          "packet:c2c38f66a746",
-          "packet:dd80875ceeed",
-          "packet:262930548162"
+          "ace:packet:0051e908c9be",
+          "ace:packet:014b1c91aa72",
+          "ace:packet:02dae66923a3",
+          "ace:packet:04518e5714ed",
+          "ace:packet:04abe0bfe254"
         ]
       }
     },
     {
-      "name": "LOCATE_REAL_COMPOSED_PACKETS",
+      "name": "COMPOSE_AND_VERIFY_PACKETS",
       "ok": true,
       "detail": {
-        "found": 3,
-        "requested": 3,
-        "missing": []
-      }
-    },
-    {
-      "name": "INDEPENDENT_PACKET_VERIFY",
-      "ok": true,
-      "detail": {
-        "verified": 3
+        "verified": 5
       }
     },
     {
       "name": "MATERIALIZE_ORDINAL_MAP",
       "ok": true,
       "detail": {
-        "rowCount": 3,
-        "ordinalMapChecksum": "7e967378d1cb30e4884b9e54df9d949cd017a425328eaa80caebdfa6e56813ff"
+        "rowCount": 5,
+        "ordinalMapChecksum": "966f802aa0f9222240d1a13d92373d0b76b9f325c8caf132fbdd379e36e3575b"
       }
     },
     {
       "name": "MATERIALIZE_FEATURE_SNAPSHOT",
       "ok": true,
       "detail": {
-        "rowCount": 3,
-        "snapshotChecksum": "7df8de3bdcb42602089ae7a12f68e127417278ccdd2d882ea62c68ddcc6e5d01"
+        "rowCount": 5,
+        "snapshotChecksum": "843b343a1479a872d0744b103cb16707e9a2b75eccd6586bfdd07d25926707f6"
       }
     },
     {
       "name": "BRIDGE_PACKETS_TO_CONTEXT_MANIFEST",
       "ok": true,
       "detail": {
-        "error": null,
         "receipt": {
           "schema": "atlas.ace-packet-context-manifest-bridge.v1",
-          "candidateSnapshotRevision": "sha256:83973c160ed40341c9948e74fdebe443f56ab4318f350cc5c0e2b5f1e3c66f1e",
-          "ordinalMapChecksum": "7e967378d1cb30e4884b9e54df9d949cd017a425328eaa80caebdfa6e56813ff",
-          "featureRevision": "sha256:1e0093581330f9eb9a1e352600db8e43b5c01cb633349f869271f9f7979bf620",
+          "candidateSnapshotRevision": "sha256:2fb9f7fa8d1b7c56fc8de8ffbf490e687ff41b611a3722cb626257507847fb03",
+          "ordinalMapChecksum": "966f802aa0f9222240d1a13d92373d0b76b9f325c8caf132fbdd379e36e3575b",
+          "featureRevision": "sha256:bf7f1eb9c2b4a6076d83fc2ecec4f8a57349b293e65206dcfd5f768e9f8dba2b",
           "selectedOrdinals": [
             0,
             1,
-            2
+            2,
+            3,
+            4
           ],
-          "selectedPacketSetChecksum": "2794381980d5e9b68482538ba79efd5e4d9ea2ddd0490e781a28cf1ef70fd913",
-          "contextManifestIdentityChecksum": "d8ee1eb7d7d2e5b7bad182ad3a214b1970d27bd78c8427dbf8907b80a05fc0ae",
+          "selectedPacketSetChecksum": "fc239637cc9f44471c2bcfbbfcc5d1486c420ea3e5980f88a46df55272daac35",
+          "contextManifestIdentityChecksum": "2c6bfaaf073199d2263e57236f62ac28c6c3102e1c8cdb53b98eaf56eb90f847",
           "representationRevision": null,
           "graphRevision": null,
-          "packetCount": 3,
+          "packetCount": 5,
           "canonicalAuthority": false,
           "writesPerformed": false
         }
       }
+    },
+    {
+      "name": "NEGATIVE_REPLAY_PROOFS",
+      "ok": true,
+      "detail": {
+        "bad_checksum": {
+          "rejected": true,
+          "error": "[\n  {\n    \"code\": \"custom\",\n    \"message\": \"integrity.packet_checksum does not match the packet body\",\n    \"path\": [\n      \"integrity\",\n      \"packet_checksum\"\n    ]\n  }\n]"
+        },
+        "stale_revision": {
+          "rejected": true,
+          "error": "[\n  {\n    \"code\": \"custom\",\n    \"message\": \"identity.source_revision must equal base.envelope.source_revision\",\n    \"path\": [\n      \"identity\",\n      \"source_revision\"\n    ]\n  },\n  {\n    \"code\": \"custom\",\n    \"message\": \"integrity.packet_checksum does not match the packet body\",\n    \"path\": [\n      \"integrity\",\n      \"packet_checksum\"\n    ]\n  }\n]"
+        },
+        "bad_ordinal": {
+          "rejected": true,
+          "error": "ACE3_BRIDGE_ORDINAL_NOT_IN_SNAPSHOT:999999"
+        },
+        "unauthorized_source_ref": {
+          "rejected": true,
+          "error": "[\n  {\n    \"code\": \"custom\",\n    \"message\": \"integrity.packet_checksum does not match the packet body\",\n    \"path\": [\n      \"integrity\",\n      \"packet_checksum\"\n    ]\n  }\n]"
+        },
+        "forged_citation": {
+          "rejected": true,
+          "error": "[\n  {\n    \"code\": \"custom\",\n    \"message\": \"integrity.packet_checksum does not match the packet body\",\n    \"path\": [\n      \"integrity\",\n      \"packet_checksum\"\n    ]\n  }\n]"
+        },
+        "missing_encoder": {
+          "rejected": true,
+          "error": "[\n  {\n    \"code\": \"custom\",\n    \"message\": \"a CURRENT section must name its producing revision\",\n    \"path\": [\n      \"semantic\",\n      \"data\",\n      \"embedding\",\n      \"revision\"\n    ]\n  },\n  {\n    \"code\": \"custom\",\n    \"message\": \"a CURRENT embedding needs input_digest and embedding_digest\",\n    \"path\": [\n      \"semantic\",\n      \"data\",\n      \"embedding\",\n      \"data\"\n    ]\n  },\n  {\n    \"code\": \"custom\",\n    \"message\": \"a CURRENT embedding needs a vector_ref (vectors are referenced, not inlined)\",\n    \"path\": [\n      \"semantic\",\n      \"data\",\n      \"embedding\",\n      \"data\",\n      \"vector_ref\"\n    ]\n  },\n  {\n    \"code\": \"custom\",\n    \"message\": \"a CURRENT embedding requires identity.representation_revision\",\n    \"path\": [\n      \"identity\",\n      \"representation_revision\"\n    ]\n  },\n  {\n    \"code\": \"custom\",\n    \"message\": \"integrity.packet_checksum does not match the packet body\",\n    \"path\": [\n      \"integrity\",\n      \"packet_checksum\"\n    ]\n  }\n]"
+        }
+      }
     }
   ],
+  "negativeProofs": {
+    "bad_checksum": {
+      "rejected": true,
+      "error": "[\n  {\n    \"code\": \"custom\",\n    \"message\": \"integrity.packet_checksum does not match the packet body\",\n    \"path\": [\n      \"integrity\",\n      \"packet_checksum\"\n    ]\n  }\n]"
+    },
+    "stale_revision": {
+      "rejected": true,
+      "error": "[\n  {\n    \"code\": \"custom\",\n    \"message\": \"identity.source_revision must equal base.envelope.source_revision\",\n    \"path\": [\n      \"identity\",\n      \"source_revision\"\n    ]\n  },\n  {\n    \"code\": \"custom\",\n    \"message\": \"integrity.packet_checksum does not match the packet body\",\n    \"path\": [\n      \"integrity\",\n      \"packet_checksum\"\n    ]\n  }\n]"
+    },
+    "bad_ordinal": {
+      "rejected": true,
+      "error": "ACE3_BRIDGE_ORDINAL_NOT_IN_SNAPSHOT:999999"
+    },
+    "unauthorized_source_ref": {
+      "rejected": true,
+      "error": "[\n  {\n    \"code\": \"custom\",\n    \"message\": \"integrity.packet_checksum does not match the packet body\",\n    \"path\": [\n      \"integrity\",\n      \"packet_checksum\"\n    ]\n  }\n]"
+    },
+    "forged_citation": {
+      "rejected": true,
+      "error": "[\n  {\n    \"code\": \"custom\",\n    \"message\": \"integrity.packet_checksum does not match the packet body\",\n    \"path\": [\n      \"integrity\",\n      \"packet_checksum\"\n    ]\n  }\n]"
+    },
+    "missing_encoder": {
+      "rejected": true,
+      "error": "[\n  {\n    \"code\": \"custom\",\n    \"message\": \"a CURRENT section must name its producing revision\",\n    \"path\": [\n      \"semantic\",\n      \"data\",\n      \"embedding\",\n      \"revision\"\n    ]\n  },\n  {\n    \"code\": \"custom\",\n    \"message\": \"a CURRENT embedding needs input_digest and embedding_digest\",\n    \"path\": [\n      \"semantic\",\n      \"data\",\n      \"embedding\",\n      \"data\"\n    ]\n  },\n  {\n    \"code\": \"custom\",\n    \"message\": \"a CURRENT embedding needs a vector_ref (vectors are referenced, not inlined)\",\n    \"path\": [\n      \"semantic\",\n      \"data\",\n      \"embedding\",\n      \"data\",\n      \"vector_ref\"\n    ]\n  },\n  {\n    \"code\": \"custom\",\n    \"message\": \"a CURRENT embedding requires identity.representation_revision\",\n    \"path\": [\n      \"identity\",\n      \"representation_revision\"\n    ]\n  },\n  {\n    \"code\": \"custom\",\n    \"message\": \"integrity.packet_checksum does not match the packet body\",\n    \"path\": [\n      \"integrity\",\n      \"packet_checksum\"\n    ]\n  }\n]"
+    }
+  },
   "bridgeReceipt": {
     "schema": "atlas.ace-packet-context-manifest-bridge.v1",
-    "candidateSnapshotRevision": "sha256:83973c160ed40341c9948e74fdebe443f56ab4318f350cc5c0e2b5f1e3c66f1e",
-    "ordinalMapChecksum": "7e967378d1cb30e4884b9e54df9d949cd017a425328eaa80caebdfa6e56813ff",
-    "featureRevision": "sha256:1e0093581330f9eb9a1e352600db8e43b5c01cb633349f869271f9f7979bf620",
+    "candidateSnapshotRevision": "sha256:2fb9f7fa8d1b7c56fc8de8ffbf490e687ff41b611a3722cb626257507847fb03",
+    "ordinalMapChecksum": "966f802aa0f9222240d1a13d92373d0b76b9f325c8caf132fbdd379e36e3575b",
+    "featureRevision": "sha256:bf7f1eb9c2b4a6076d83fc2ecec4f8a57349b293e65206dcfd5f768e9f8dba2b",
     "selectedOrdinals": [
       0,
       1,
-      2
+      2,
+      3,
+      4
     ],
-    "selectedPacketSetChecksum": "2794381980d5e9b68482538ba79efd5e4d9ea2ddd0490e781a28cf1ef70fd913",
-    "contextManifestIdentityChecksum": "d8ee1eb7d7d2e5b7bad182ad3a214b1970d27bd78c8427dbf8907b80a05fc0ae",
+    "selectedPacketSetChecksum": "fc239637cc9f44471c2bcfbbfcc5d1486c420ea3e5980f88a46df55272daac35",
+    "contextManifestIdentityChecksum": "2c6bfaaf073199d2263e57236f62ac28c6c3102e1c8cdb53b98eaf56eb90f847",
     "representationRevision": null,
     "graphRevision": null,
-    "packetCount": 3,
+    "packetCount": 5,
     "canonicalAuthority": false,
     "writesPerformed": false
   },
-  "contextManifestIdentityChecksum": "d8ee1eb7d7d2e5b7bad182ad3a214b1970d27bd78c8427dbf8907b80a05fc0ae",
+  "contextManifestIdentityChecksum": "2c6bfaaf073199d2263e57236f62ac28c6c3102e1c8cdb53b98eaf56eb90f847",
   "verdict": "ACE_PRODUCER_CHAIN_REAL_TRACE_PROVEN"
 }

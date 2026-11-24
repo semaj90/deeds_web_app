@@ -31,6 +31,8 @@ describe('server-registered VerifiedContext runtime', () => {
       refusalCode: 'VERIFIED_CONTEXT_PROVIDERS_NOT_CONFIGURED', firstFailingBoundary: 'SERVICE_CONFIGURATION',
       receipt: { receiptChecksum: expect.stringMatching(/^[a-f0-9]{64}$/), details: {
         missingProviders: VERIFIED_CONTEXT_MISSING_PROVIDERS_V1,
+        searchRuntimeInputRequirements: ['ordinalMap', 'columnar', 'snapshot', 'sourceFetchPort', 'graphifyLifecycle'],
+        finalHandoffGaps: ['immutableContextPacketHydrator'],
         serviceHealth: 'REGISTERED_FAIL_CLOSED', agentExecutionStatus: 'NOT_STARTED',
         canonicalEvidenceValidity: 'NOT_ADMITTED',
       } },

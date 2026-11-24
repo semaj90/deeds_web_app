@@ -1,0 +1,129 @@
+{
+  "schema": "atlas.parent-atlas-live-runtime-asset-audit.v1",
+  "auditDate": "2026-11-23",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "sidecar": {
+    "container": "miniforge-nlp-sidecar",
+    "status": "UP_HEALTHY",
+    "port": "127.0.0.1:8095",
+    "image": "deeds-miniforge-nlp-sidecar:latest",
+    "packages": {
+      "fastapi": "0.141.1",
+      "pydantic": "2.13.5",
+      "oaklib": "0.7.4",
+      "langextract": "1.6.0",
+      "scikit-learn": "1.7.2",
+      "joblib": "1.5.2"
+    },
+    "readOnlyHostMounts": [
+      { "host": "C:\\Users\\james\\Videos\\deeds-web-app", "container": "/workspace" },
+      { "host": "C:\\Users\\james\\Videos\\deeds-web-app\\python", "container": "/app/python" },
+      { "host": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\domain-classifier", "container": "/models/domain-classifier" }
+    ],
+    "runtimeCapabilities": {
+      "spacy": true,
+      "spacyPos": true,
+      "langextract": true,
+      "treeSitter": true,
+      "astGrep": true,
+      "networkx": true,
+      "classificationHelper": true,
+      "torch": false,
+      "cugraph": false,
+      "cuvs": false,
+      "cupy": false
+    },
+    "moduleDigests": {
+      "v2Live": "sha256:5c2a08fd7606b6472072f43ab284f8b7c9e6cc4ae9f3eecdbc15561e85c6ada7",
+      "v2Checkout": "sha256:86456802af82c71442bd303f886a92988d8f2a317e1a29cf905878dbc69b07e6",
+      "v2MatchesCheckout": false,
+      "v1Live": "sha256:db9d6aeeaaf70ede2662d2f6cbb3b2d2772e6d8a4929f87903ecf55ccbaef9b5",
+      "v1Checkout": "sha256:db9d6aeeaaf70ede2662d2f6cbb3b2d2772e6d8a4929f87903ecf55ccbaef9b5",
+      "v1MatchesCheckout": true
+    },
+    "ontology": {
+      "status": "SOURCE_CONFIGURED",
+      "liveRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+      "checkoutRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+      "matches": true,
+      "boundedSearchStatus": "PROPOSAL_ONLY",
+      "boundedSearchLabels": ["CUDA C++", "PTX", "CUDA C++ device code"],
+      "boundedSearchMatchCount": 3,
+      "matchedConceptIds": ["ATLASLANG:cuda_cpp"],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "langExtractProbe": {
+      "status": "SUCCEEDED",
+      "modelId": "gemma4-legal-iq4xs-direct.gguf",
+      "providerRuntime": "official",
+      "reportedExtractionMethod": "LANGEXTRACT_ORNITH",
+      "sourceUrl": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+      "probeInput": "NVRTC can be used to compile CUDA C++ device code to PTX at runtime.",
+      "inputSha256": "sha256:28f8798192674c204a313503920c77b0439659ca45227097ede45640b5737953",
+      "factCount": 1,
+      "span": { "startChar": 0, "endChar": 68, "startByte": 0, "endByte": 68, "alignmentStatus": "MATCH_EXACT" },
+      "canonicalSourceReadback": false,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "domainClassificationProbe": {
+      "result": "gpu",
+      "producer": "atlas-nlp-classification-helper-v1",
+      "linkedTupleStatus": "PROPOSAL_ONLY",
+      "modelCheckpoint": "models/domain-classifier/checkpoint.joblib",
+      "checkpointAvailable": true,
+      "checkpointLoaded": false,
+      "trainedPredictionProven": false,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "liveRagContextProbe": {
+      "source": "TRACE_MCP_LIVE",
+      "rankingTool": "search.hybrid",
+      "identityTool": "atlas.packet_search",
+      "candidateSetBasis": "LIVE_TRACE_RANKED_SEARCH",
+      "searchHitCount": 5,
+      "contextCardCount": 4,
+      "identityBoundCount": 4,
+      "revisionStatus": "MISSING_SOURCE_REVISION",
+      "admissionStatus": "UNADMITTED_RETRIEVAL_CANDIDATES",
+      "proofUsable": false,
+      "domainFilterApplied": false,
+      "writesPerformed": false,
+      "fallbackUsed": false
+    },
+    "writableLayer": {
+      "pyStowReadmePresent": true,
+      "oaklibDirectoryPresent": true,
+      "oaklibDirectoryFiles": 0,
+      "oaklibDirectoryBytes": 4096,
+      "note": "Container recreation discards this layer. Inspected OAK data directory was empty; no model/checkpoint files were found in the container layer."
+    }
+  },
+  "llamaServer": {
+    "modelId": "gemma4-legal-iq4xs-direct.gguf",
+    "buildInfo": "b8757-a29e4c0b7",
+    "speculativeType": "none",
+    "mtpActive": false
+  },
+  "modelArtifacts": [
+    { "path": "models/atlas-gemma-rank-v1/standalone-init-bf16/model.safetensors", "bytes": 154686042, "sha256": "sha256:afcce712ce00e6a74068995d7dca831c15eb3647fa690e8ffcc506b69e4206f4" },
+    { "path": "models/atlas-gemma-rank-v1-donor-b/standalone-init-bf16/model.safetensors", "bytes": 154686042, "sha256": "sha256:06a26a9a36a591d7b284cff59d0c27f0ac0a2db192d6f743a2f574ad0d435bce" },
+    { "path": "models/domain-classifier/checkpoint.joblib", "bytes": 101160, "sha256": "sha256:707a8f6f40a339be531099e6c2eacc16ac57d49028dadbfeb81946560eb2b5b1" },
+    { "path": "models/embeddinggemma2/onnx-q8/onnx/audio_encoder_quantized.onnx", "bytes": 249330, "sha256": "sha256:04a9a9094ba76fb169e4c69be45a4b621580188654d6be59eab860eadcd42d3c" },
+    { "path": "models/embeddinggemma2/onnx-q8/onnx/model_quantized.onnx", "bytes": 495165, "sha256": "sha256:d06edd601f851c633a2519304cbeb8dc6170d7ceb61b436625c17fb9b6e74953" },
+    { "path": "models/embeddinggemma2/onnx-q8/onnx/vision_encoder_quantized.onnx", "bytes": 162495, "sha256": "sha256:bb0de2df53a2448a32dc7908a187c168c8afd514d4d6f674f7f46024875fa4e3" },
+    { "path": "models/gemma4_assistant_huggingface_7_3_26/model.safetensors", "bytes": 159138208, "sha256": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16" },
+    { "path": "models/gemma4-e4b-qat-assistant-2026-07-20/model.safetensors", "bytes": 159138208, "sha256": "sha256:9d0e2053067590cae9a8f4fcc57eefbe20dff90599360458ebd451e5cb5c947d" },
+    { "path": "models/nested-semantic-autoencoder/nested_semantic_autoencoder_v3_full01.pt", "bytes": 5825981, "sha256": "sha256:ac5c069d714bd1b07efdbe5abb1aea993c11b3851d427c508ce76e4eebb616c5" },
+    { "path": "models/packet-jepa/packet-jepa.pt", "bytes": 533447, "sha256": "sha256:1be2eef890274d4a02f2f0c0fc24f681ff0960e497804e75ac2b778fdbd401cc" },
+    { "path": "models/sam2/sam2.1_hiera_tiny.pt", "bytes": 156008466, "sha256": "sha256:7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69" },
+    { "path": "models/policy-reranker.pt", "bytes": 195954, "sha256": "sha256:6b6c86b026807a48942a3387356f20310a470da4ed4c4ec5dd62e352d3a277f6" }
+  ],
+  "gitDeletionAudit": {
+    "scope": ["python", "models", "docker/miniforge-nlp-sidecar"],
+    "deletedPaths": []
+  }
+}

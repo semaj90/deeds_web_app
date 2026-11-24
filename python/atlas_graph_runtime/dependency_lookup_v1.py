@@ -166,6 +166,7 @@ def resolve_dependencies_v1(
                     "evidenceRefs": list(evidence_by_edge[edge_key].get("evidenceRefs", [])),
                     "edgeId": evidence_by_edge[edge_key].get("edgeId"),
                     "sourceRevision": source_revision,
+                    "dependencySourceRevision": dep_node.get("source_revision"),
                     "workspaceRevision": workspace_revision,
                 }
 

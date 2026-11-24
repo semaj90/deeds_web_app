@@ -25,13 +25,19 @@ services:
       MINIFORGE_SIDECAR_URL: http://127.0.0.1:8095
       NLP_SIDECAR_URL: http://127.0.0.1:8095
       LANGEXTRACT_RUNTIME: official
+      # Explicit, local, read-only OBO source for DOC-14 concept suggestions.
+      # This sidecar route remains proposal-only; PostgreSQL admission is separate.
+      ATLAS_OAKLIB_ONTOLOGY_ROOT: /workspace/.okf/ontologies
+      ATLAS_OAKLIB_ONTOLOGY_FILE: atlas-domain-and-language-terms-v1.obo
       # The embedding model server runs on the Windows host, same as LLAMA_SERVER_URL below —
       # 127.0.0.1 inside this container would NOT reach the host's Ollama instance.
       OLLAMA_URL: http://host.docker.internal:11434
+      GEMMA2_ONNX_URL: http://host.docker.internal:8094
       DOMAIN_CLASSIFIER_CHECKPOINT_PATH: /models/domain-classifier/checkpoint.joblib
+      EG2_ONNX_CLASSIFIER_CHECKPOINT_PATH: /models/domain-classifier/eg2-onnx-checkpoint.joblib
       LANGEXTRACT_PROVIDER: ${LANGEXTRACT_PROVIDER:-openai}
-      LANGEXTRACT_MODEL: ${LANGEXTRACT_MODEL_ID:-ornith-1.5-9b}
-      LANGEXTRACT_MODEL_ID: ${LANGEXTRACT_MODEL_ID:-ornith-1.5-9b}
+      LANGEXTRACT_MODEL: ${LANGEXTRACT_MODEL_ID:?Set LANGEXTRACT_MODEL_ID from the active llama-server /v1/models response}
+      LANGEXTRACT_MODEL_ID: ${LANGEXTRACT_MODEL_ID:?Set LANGEXTRACT_MODEL_ID from the active llama-server /v1/models response}
       # The model server runs on the Windows host. Do not allow a .env value
       # of 127.0.0.1 to redirect container-local LangExtract inference back to
       # the NLP sidecar itself.

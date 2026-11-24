@@ -1,14 +1,13 @@
 # Error-Fix DAG Report
-_Generated: 2026-11-19T21:51:35.076Z_
+_Generated: 2026-11-24T05:15:38.909Z_
 
-**Total findings:** 41  |  **Active error states:** 2
+**Total findings:** 38  |  **Active error states:** 1
 
 ## Recommended Fix Order
 
 | Order | State | Severity | Findings | Root Score | Downstream |
 |-------|-------|----------|----------|------------|------------|
-| 5 | **Schema Mismatch** | medium | 38 | 0.25 | route_contract_mismatch |
-| 7 | **Route Contract Mismatch** | low | 3 | 0.2 | — |
+| 5 | **Schema Mismatch** | medium | 38 | 0.2 | — |
 
 ## HMM States
 
@@ -22,23 +21,9 @@ Drizzle schema column type does not match the live Postgres column type.
 - `npm run test:network-contracts`
 
 **Findings (38):**
-- `contract:drizzle-meta-stale_migration-030-6f4602d2`
-- `contract:drizzle-meta-stale_migration-031-68651803`
-- `contract:drizzle-meta-stale_migration-032-a99f92ab`
-- `contract:drizzle-meta-stale_migration-033-ee4af613`
-- `contract:drizzle-meta-stale_migration-034-4ee9f3c7`
+- `contract:drizzle-meta-stale_migration-027-6f4602d2`
+- `contract:drizzle-meta-stale_migration-028-68651803`
+- `contract:drizzle-meta-stale_migration-029-a99f92ab`
+- `contract:drizzle-meta-stale_migration-030-ee4af613`
+- `contract:drizzle-meta-stale_migration-031-4ee9f3c7`
 - _… 33 more_
-
-### 7. Route Contract Mismatch
-
-SvelteKit route or Superforms v2 contract is incomplete or incorrectly wired.
-
-**Validation commands:**
-- `npm run audit:forms`
-- `npm run test:network-contracts`
-
-**Findings (3):**
-- `contract:sveltekit-route-route_contract_mismatch-001-86cb947b`
-- `contract:sveltekit-route-route_contract_mismatch-002-86cb947b`
-- `contract:sveltekit-route-route_contract_mismatch-003-86cb947b`
-

@@ -1,6 +1,11 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { WebGPUAutoencoder } from '$lib/webgpu/webgpu-autoencoder';
+  import {
+    createHypergraphVertexWorker,
+    streamHypergraphVerticesToWorker,
+  } from '$lib/gpu/hypergraph-vertex-client';
+  import { WGSL_UNIFORM_ALIGNMENT } from '$lib/gpu/arpc-envelope-v1';
 
   interface Node {
     id: string;
@@ -12,10 +17,19 @@
     color: [number, number, number, number];
   }
 
-  let { nodes = [], width = 800, height = 600, onSelectNode = () => {} } = $props<{
+  let {
+    nodes = [],
+    width = 800,
+    height = 600,
+    charProgress = 1.0,
+    vertexStreamPayload = null,
+    onSelectNode = () => {},
+  } = $props<{
     nodes: Node[];
     width?: number;
     height?: number;
+    charProgress?: number;
+    vertexStreamPayload?: ArrayBuffer | null;
     onSelectNode?: (node: Node) => void;
   }>();
 
@@ -25,16 +39,20 @@
   let pipeline: GPURenderPipeline;
   let vertexBuffer: GPUBuffer;
   let uniformBuffer: GPUBuffer;
-  
+  let vertexWorker: Worker | null = null;
+  let activeVertexCount = 0;
+
   let animationFrame: number;
   let rotation = { x: 0, y: 0 };
   let zoom = 1.0;
 
-  // Shaders
+  // Shaders (80B Uniforms = 16-byte aligned: 64B mat4x4 + 4B pointSize + 4B charProgress + 8B pad)
+  const UNIFORM_BUFFER_BYTES = 80;
   const vertexShader = `
     struct Uniforms {
       matrix: mat4x4<f32>,
       pointSize: f32,
+      charProgress: f32,
     };
     @group(0) @binding(0) var<uniform> uniforms: Uniforms;
 
@@ -47,7 +65,7 @@
     fn main(@location(0) pos: vec4<f32>, @location(1) color: vec4<f32>) -> VertexOutput {
       var output: VertexOutput;
       output.position = uniforms.matrix * vec4<f32>(pos.xyz, 1.0);
-      output.color = color;
+      output.color = vec4<f32>(color.rgb, color.a * clamp(uniforms.charProgress, 0.0, 1.0));
       return output;
     }
   `;
@@ -93,16 +111,65 @@
       primitive: { topology: 'point-list' },
     });
 
-    updateBuffers();
+    if (vertexStreamPayload && typeof Worker !== 'undefined') {
+      vertexWorker = createHypergraphVertexWorker();
+      const unpacked = await streamHypergraphVerticesToWorker(vertexWorker, vertexStreamPayload);
+      uploadUnpackedVertices(unpacked.positions, unpacked.manifoldWeights, unpacked.charProgress, unpacked.vertexCount);
+    } else {
+      updateBuffers();
+    }
     render();
   });
 
   onDestroy(() => {
     if (animationFrame) cancelAnimationFrame(animationFrame);
+    vertexWorker?.terminate();
   });
+
+  function ensureUniformBuffer() {
+    if (!uniformBuffer) {
+      const alignedSize = Math.ceil(UNIFORM_BUFFER_BYTES / WGSL_UNIFORM_ALIGNMENT) * WGSL_UNIFORM_ALIGNMENT;
+      uniformBuffer = device.createBuffer({
+        size: alignedSize,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      });
+    }
+  }
+
+  function uploadUnpackedVertices(
+    positions: Float32Array,
+    weights: Float32Array,
+    progress: Float32Array,
+    count: number
+  ) {
+    if (!device || count === 0) return;
+    activeVertexCount = count;
+    const data = new Float32Array(count * 8);
+    for (let i = 0; i < count; i++) {
+      const idx = i * 8;
+      data[idx] = positions[i * 3 + 0];
+      data[idx + 1] = positions[i * 3 + 1];
+      data[idx + 2] = positions[i * 3 + 2];
+      data[idx + 3] = weights[i];
+      data[idx + 4] = 0.25;
+      data[idx + 5] = 0.85;
+      data[idx + 6] = 0.65;
+      data[idx + 7] = progress[i];
+    }
+    if (vertexBuffer) vertexBuffer.destroy();
+    vertexBuffer = device.createBuffer({
+      size: data.byteLength,
+      usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+      mappedAtCreation: true,
+    });
+    new Float32Array(vertexBuffer.getMappedRange()).set(data);
+    vertexBuffer.unmap();
+    ensureUniformBuffer();
+  }
 
   function updateBuffers() {
     if (!device || nodes.length === 0) return;
+    activeVertexCount = nodes.length;
 
     const data = new Float32Array(nodes.length * 8);
     nodes.forEach((node, i) => {
@@ -125,24 +192,21 @@
     });
     new Float32Array(vertexBuffer.getMappedRange()).set(data);
     vertexBuffer.unmap();
-
-    if (!uniformBuffer) {
-      uniformBuffer = device.createBuffer({
-        size: 64 + 4, // 4x4 matrix + float pointSize
-        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-      });
-    }
+    ensureUniformBuffer();
   }
 
   function render() {
     if (!device || !pipeline || !vertexBuffer) return;
 
-    // Simple rotation matrix
-    const matrix = new Float32Array(16);
-    // Identity for now
-    matrix[0] = zoom; matrix[5] = zoom; matrix[10] = zoom; matrix[15] = 1.0;
-    
-    device.queue.writeBuffer(uniformBuffer, 0, matrix);
+    const uniformFloats = new Float32Array(UNIFORM_BUFFER_BYTES / 4);
+    uniformFloats[0] = zoom;
+    uniformFloats[5] = zoom;
+    uniformFloats[10] = zoom;
+    uniformFloats[15] = 1.0;
+    uniformFloats[16] = 4.0; // pointSize
+    uniformFloats[17] = Math.max(0, Math.min(1, charProgress));
+
+    device.queue.writeBuffer(uniformBuffer, 0, uniformFloats);
     device.queue.writeBuffer(uniformBuffer, 64, new Float32Array([10.0])); // pointSize
 
     const commandEncoder = device.createCommandEncoder();
@@ -163,7 +227,7 @@
     passEncoder.setPipeline(pipeline);
     passEncoder.setBindGroup(0, bindGroup);
     passEncoder.setVertexBuffer(0, vertexBuffer);
-    passEncoder.draw(nodes.length);
+    passEncoder.draw(activeVertexCount || nodes.length);
     passEncoder.end();
 
     device.queue.submit([commandEncoder.finish()]);

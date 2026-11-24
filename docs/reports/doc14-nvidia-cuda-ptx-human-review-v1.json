@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.doc14-relation-human-review.v1",
+  "reviewId": "doc14-review-cuda-cpp-compiles-to-ptx-20261123-v1",
+  "reviewedAt": "2026-11-23T19:07:28Z",
+  "reviewerRef": "explicit-user-response-in-current-session",
+  "decision": "APPROVED_FOR_REVIEW_WORKFLOW",
+  "reviewScope": "SEMANTIC_RELATION_AND_LOCAL_ONTOLOGY_TERM_SELECTION",
+  "proposal": {
+    "path": "docs/reports/doc14-nvidia-cuda-ptx-relation-proposal-v1.json",
+    "sha256": "c608f93429a19eb43ffecc5344a36e384d30a237174b6657c4f103ee1fbe9025",
+    "sourceRef": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+    "sourceRevision": "sha256:494ef3b6ef26440375c9861ce7b02c363d9c01856630d8a009490c7a3cceca35",
+    "sourceContentSha256": "63e6666baf0636441e32186ab7cbd7a4618c997fade769b6ffdd01d0aa92e48a",
+    "startByte": 9290,
+    "endByte": 9358,
+    "exactText": "NVRTC can be used to compile CUDA C++ device code to PTX at runtime.",
+    "subjectId": "ATLASLANG:cuda_cpp",
+    "predicateId": "compiles_to",
+    "objectId": "ATLASISA:ptx",
+    "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c"
+  },
+  "authority": {
+    "reviewed": true,
+    "sourceIndexAdmitted": false,
+    "graphAdmitted": false,
+    "graphRevision": null,
+    "aceProofUsable": false,
+    "canonicalAuthority": false,
+    "admissionAuthorized": false,
+    "writesPerformed": false
+  }
+}

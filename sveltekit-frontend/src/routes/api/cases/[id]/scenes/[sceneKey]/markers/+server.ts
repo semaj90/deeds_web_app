@@ -50,7 +50,7 @@ export const GET: RequestHandler = async ({ locals, params }) => {
 		return json({ success: true, data: { markers }, message: 'OK' });
 	} catch {
 		console.error('[scene-markers] list failed', { caseId: caseId.data });
-		return json({ success: false, data: null, message: 'Load failed' }, { status: 500 });
+		return json({ success: false, data: { markers: [] }, message: 'Load failed' });
 	}
 };
 

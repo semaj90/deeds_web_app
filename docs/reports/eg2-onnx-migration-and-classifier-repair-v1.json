@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.eg2-onnx-migration-and-classifier-repair.v1",
+  "generatedAt": "2026-11-24T02:30:00Z",
+  "liveSidecarClassifyLegacy": {
+    "endpoint": "http://127.0.0.1:8095/classify",
+    "encoderProfile": "legacy-embeddinggemma-768",
+    "trainedClassifierStatus": "SHADOW_ONLY",
+    "backend": "sklearn-lr",
+    "embedModel": "embeddinggemma:latest",
+    "modelRevision": "domain-classifier-nblr-v1-1788454983",
+    "ruleFallbackConfidence": 0.25,
+    "ruleMatched": false,
+    "ruleFallback": true
+  },
+  "liveSidecarClassifyEg2Onnx": {
+    "endpoint": "http://127.0.0.1:8095/classify",
+    "encoderProfile": "eg2-onnx-q8-mrl-768",
+    "trainedClassifierStatus": "SHADOW_ONLY",
+    "backend": "sklearn-lr",
+    "embedModel": "onnx-community/embeddinggemma2-q8:onnx/model_quantized.onnx",
+    "modelRevision": "eg2-onnx-nblr-v1-405e2cebef",
+    "checkpointPath": "models/domain-classifier/eg2-onnx-checkpoint.joblib",
+    "ollamaUsed": false,
+    "warnings": []
+  },
+  "eg2OnnxRuntime": {
+    "endpoint": "http://127.0.0.1:8094",
+    "modelId": "onnx-community/embeddinggemma2-q8:onnx/model_quantized.onnx",
+    "modelDir": "models/embeddinggemma2/onnx-q8",
+    "architectures": ["EmbeddingGemma2Model"],
+    "mrlDimensionsVerified": [768, 512, 256, 128],
+    "tokenAwareChunking": "tokenizers.Tokenizer(models/embeddinggemma2/onnx-q8/tokenizer.json)"
+  },
+  "rapidsParityTests": {
+    "command": "pytest python/tests/test_cuml_executor_v1.py python/tests/test_ppr_parity.py python/tests/test_atlas_gpu_kmeans_endpoint.py -v",
+    "result": "10 passed"
+  },
+  "remainingGaps": [
+    "legal-ai-go-retrieval (:8100) is in status NOT_READY (pgvector=false, qdrant=false, redis=false) and docker-compose.yml lacks EXPECTED_REPRESENTATION_REVISION / QDRANT_BM25_BRANCH_ACTIVE for Go retrieval + EG2 ONNX/Qdrant payload domain metadata indexing.",
+    "4-feature scalar cluster-distance NB/LR baseline on EG2 ONNX achieved 0.1579 held-out accuracy on 6 domains; full-vector PyTorch DualHeadMlpChallenger training on real PG18 EG2 embeddings + AST/LSP features + TensorRT-RTX 1.7 evaluation remains to be wired into an offline GPU job.",
+    "Live WSL2 atlas-rapids-cu13 (:8098) GPU execution still requires human-operated VRAM release when :8090 is active (CPU parity tests passed 10/10).",
+    "Relevant OpenSpec tasks.md checkmarks have not yet been reconciled."
+  ]
+}

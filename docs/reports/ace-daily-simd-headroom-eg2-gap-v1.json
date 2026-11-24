@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.ace-daily-simd-headroom-eg2-gap.v1",
+  "multiCorePfb1Analysis": {
+    "workers": 4,
+    "rowsProcessed": 455,
+    "featureCountPerRow": 7,
+    "parseAndExtractMs": 10.13,
+    "pfb1EncodeDecodeMs": 0.86,
+    "pfb1TotalBytes": 2096,
+    "pfb1HeaderBytes": 104,
+    "pfb1DecodedCandidateCount": 455,
+    "pfb1Verified": true,
+    "averageCompletenessPct": 52.63
+  },
+  "sveltekitRouteCoverage": {
+    "totalRouteFilesOnDisk": 1334,
+    "semantic768CoveredRoutes": 972,
+    "semantic768MissingRoutes": 362,
+    "eg2CoveredRoutes": 71,
+    "eg2MissingRoutes": 1263,
+    "eg2CoveragePct": 5.32,
+    "sampleMissingEg2Routes": [
+      "src/routes/(analysis)/+layout.server.ts",
+      "src/routes/(analysis)/+layout.svelte",
+      "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(analysis)/audio-analysis/[evidenceId]/+page.svelte",
+      "src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(analysis)/document-analysis/[evidenceId]/+page.svelte",
+      "src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(analysis)/video-analysis/[evidenceId]/+page.svelte",
+      "src/routes/(analysis)@/+layout.server.ts",
+      "src/routes/(analysis)@/+layout.svelte",
+      "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.svelte",
+      "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.svelte",
+      "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
+      "src/routes/(app)/+layout.server.ts",
+      "src/routes/(app)/+layout.svelte",
+      "src/routes/(app)/acp/+page.svelte",
+      "src/routes/(app)/active-cases/+page.server.ts",
+      "src/routes/(app)/admin/+layout.svelte"
+    ]
+  }
+}

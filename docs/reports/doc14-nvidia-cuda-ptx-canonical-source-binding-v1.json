@@ -1,0 +1,84 @@
+{
+  "canonicalAuthority": false,
+  "capture": {
+    "fetcher": "BEAUTIFULSOUP_HTTP",
+    "normalizedTextSha256": "494ef3b6ef26440375c9861ce7b02c363d9c01856630d8a009490c7a3cceca35",
+    "normalizedUtf8ByteLength": 12893,
+    "rawHtmlSha256": "63e6666baf0636441e32186ab7cbd7a4618c997fade769b6ffdd01d0aa92e48a"
+  },
+  "chunk": {
+    "chunkEvidenceRevision": "sha256:2138948c5db0c551394d5474b357b0bf063bab48ea2a1c2d19793288a5302ca0",
+    "chunkId": "doc:nvidia-cuda-guide-doc14:494ef3b6ef264403:8",
+    "chunkSha256": "d579216777d85a9fe790a6d676e81bb12081757ad97ce301c73d1adcc01b2c2d",
+    "endByte": 9466,
+    "ordinal": 8,
+    "startByte": 7958
+  },
+  "evidence": {
+    "chunkEndByte": 1400,
+    "chunkStartByte": 1332,
+    "endByte": 9358,
+    "exactText": "NVRTC can be used to compile CUDA C++ device code to PTX at runtime.",
+    "spanSha256": "28f8798192674c204a313503920c77b0439659ca45227097ede45640b5737953",
+    "startByte": 9290
+  },
+  "graphReadback": {
+    "anyGraphRevisionPresent": false,
+    "nonNullGraphRevisionCount": 0,
+    "ontologyRelationRows": 0,
+    "ontologyTupleRows": 0
+  },
+  "langextractProbe": {
+    "canonicalAuthority": false,
+    "canonicalChunkContentSha256": "d579216777d85a9fe790a6d676e81bb12081757ad97ce301c73d1adcc01b2c2d",
+    "chunkEvidenceRevision": "sha256:2138948c5db0c551394d5474b357b0bf063bab48ea2a1c2d19793288a5302ca0",
+    "chunkId": "doc:nvidia-cuda-guide-doc14:494ef3b6ef264403:8",
+    "error": null,
+    "exactFactCount": 0,
+    "facts": [],
+    "inputHash": "2e6099b951553e1c99f6563c5c2ddc5fd5b50a7ed2cb27ea7adac192b112c424",
+    "modelId": "gemma4-legal-iq4xs-direct.gguf",
+    "outputHash": "d5f449767f385677e6179255bce510ede15d934cb4816ef37cf9abe6e252a65b",
+    "pageContentSha256": "494ef3b6ef26440375c9861ce7b02c363d9c01856630d8a009490c7a3cceca35",
+    "pageEvidenceRevision": "sha256:5717bf7d99d40696ec8916935bc458500a1023c21b305f558a42f39ee16cfb17",
+    "pageReviewedQuoteByteSpan": [
+      9290,
+      9358
+    ],
+    "producerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.25.2|tree-sitter-language-pack=0.9.0|chunker=4.0.0",
+    "returnedFactCount": 0,
+    "reviewedQuoteByteSpan": [
+      204,
+      272
+    ],
+    "reviewedQuoteCoveredByExactFact": false,
+    "status": "LIVE_LANGEXTRACT_NO_EXACT_FACTS",
+    "windowSha256": "2e6099b951553e1c99f6563c5c2ddc5fd5b50a7ed2cb27ea7adac192b112c424",
+    "windowSourceRevision": "sha256:2e6099b951553e1c99f6563c5c2ddc5fd5b50a7ed2cb27ea7adac192b112c424",
+    "windowStartByteInChunk": 1128,
+    "writesPerformed": false
+  },
+  "relation": {
+    "objectId": "ATLASISA:ptx",
+    "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+    "predicateId": "compiles_to",
+    "semanticReviewDecisionBound": true,
+    "subjectId": "ATLASLANG:cuda_cpp"
+  },
+  "review": {
+    "admissionAuthorized": false,
+    "decision": "APPROVED_FOR_REVIEW_WORKFLOW",
+    "proposalFileSha256": "c608f93429a19eb43ffecc5344a36e384d30a237174b6657c4f103ee1fbe9025",
+    "reviewId": "doc14-review-cuda-cpp-compiles-to-ptx-20261123-v1",
+    "semanticReviewDecisionBound": true
+  },
+  "schema": "atlas.doc14-canonical-source-binding.v1",
+  "source": {
+    "contentSha256": "494ef3b6ef26440375c9861ce7b02c363d9c01856630d8a009490c7a3cceca35",
+    "pageEvidenceRevision": "sha256:5717bf7d99d40696ec8916935bc458500a1023c21b305f558a42f39ee16cfb17",
+    "pageId": "f6049944-3904-4c87-a353-3393ffb08d59",
+    "sourceRef": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html"
+  },
+  "status": "CANONICAL_SOURCE_BINDING_VERIFIED",
+  "writesPerformed": false
+}

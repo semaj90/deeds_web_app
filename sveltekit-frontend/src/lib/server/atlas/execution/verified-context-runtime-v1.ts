@@ -6,14 +6,25 @@ import {
 import { resolveTrustedWorkspaceAuthorityV1 } from '$lib/server/retrieval/trusted-workspace-authority-v1.js';
 
 export const VERIFIED_CONTEXT_MISSING_PROVIDERS_V1 = [
-  'authorized_workspace_scope',
-  'query_representation',
-  'search_runtime_topk_input',
-  'source_byte_span_reader',
-  'current_feature_snapshot_admission',
-  'context_manifest_admission',
-  'prompt_plan_tokenizer_and_revisions',
-  'immutable_context_packet_hydrator',
+  'authorizeWorkspaceScope',
+  'resolveQueryRepresentation',
+  'retrieveTopKInput',
+  'resolveFeatureSnapshot',
+  'tokenizer',
+  'promptTemplateRevision',
+  'instructionRevision',
+] as const;
+
+export const VERIFIED_CONTEXT_TOPK_INPUT_REQUIREMENTS_V1 = [
+  'ordinalMap',
+  'columnar',
+  'snapshot',
+  'sourceFetchPort',
+  'graphifyLifecycle',
+] as const;
+
+export const VERIFIED_CONTEXT_FINAL_HANDOFF_GAPS_V1 = [
+  'immutableContextPacketHydrator',
 ] as const;
 
 function runtimeStatusDetails(requestId: string, missingProviders: readonly string[] = []) {
@@ -25,6 +36,8 @@ function runtimeStatusDetails(requestId: string, missingProviders: readonly stri
     agentRunId: null,
     traceId: null,
     missingProviders,
+    searchRuntimeInputRequirements: VERIFIED_CONTEXT_TOPK_INPUT_REQUIREMENTS_V1,
+    finalHandoffGaps: VERIFIED_CONTEXT_FINAL_HANDOFF_GAPS_V1,
   };
 }
 

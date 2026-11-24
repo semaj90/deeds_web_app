@@ -1,55 +1,160 @@
 {
   "schema": "atlas.current-workspace-source-binding-classification.v1",
-  "generatedAt": "2026-09-18T22:13:46.717Z",
+  "generatedAt": "2026-11-23T22:01:38.384Z",
   "mode": "READ_ONLY_CLASSIFICATION",
-  "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-  "planWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-  "inputPlanRevisionMatches": true,
+  "admittedWorkspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+  "planWorkspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+  "inputPlanRevisionMatches": false,
   "inputPlan": "docs/reports/current-source-graphify-batch-plan-v1.json",
-  "sourcePlanChecksum": "b83b2616f6192a59dad0a5d658a4d96dfc72796d4cd7f114c29aac23e5099df9",
-  "candidateCount": 5,
+  "sourcePlanChecksum": "64f48fc3e674ca65db460c4701fb917b433343160a762b2e3a9a84feb20f692f",
+  "candidateCount": 20,
   "counts": {
-    "REVISION_BOUND": 1,
-    "WORKSPACE_IDENTITY_ONLY": 0,
+    "REVISION_BOUND": 19,
+    "WORKSPACE_IDENTITY_ONLY": 1,
     "WRONG_WORKSPACE_REVISION": 0,
     "SOURCE_CONTENT_MISMATCH": 0,
-    "AMBIGUOUS": 4
+    "AMBIGUOUS": 0
   },
   "rows": [
     {
-      "sourceRef": ".clarity/ff1-plan.md",
-      "sourceRevision": "sha256:a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
-      "contentDigest": "a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
-      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-      "classification": "REVISION_BOUND"
+      "sourceRef": "$lib/utils/file-reader.ts",
+      "sourceRevision": "sha256:c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
+      "contentDigest": "c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "WORKSPACE_IDENTITY_ONLY"
     },
     {
       "sourceRef": ".claude/AGENT_CONSTITUTION.md",
       "sourceRevision": "sha256:2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
       "contentDigest": "2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
-      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-      "classification": "AMBIGUOUS"
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
     },
     {
       "sourceRef": ".claude/AGENT_RECOMMENDATIONS.md",
       "sourceRevision": "sha256:427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
       "contentDigest": "427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
-      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-      "classification": "AMBIGUOUS"
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
     },
     {
       "sourceRef": ".claude/ATLAS-ENGINEERING-PROMPT.md",
       "sourceRevision": "sha256:9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
       "contentDigest": "9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
-      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-      "classification": "AMBIGUOUS"
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
     },
     {
       "sourceRef": ".claude/CLAUDE.md",
       "sourceRevision": "sha256:13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
       "contentDigest": "13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
-      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-      "classification": "AMBIGUOUS"
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/DISTILLED_MEMORY.md",
+      "sourceRevision": "sha256:e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
+      "contentDigest": "e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/FORBIDDEN.md",
+      "sourceRevision": "sha256:cb5b755463c0a137380ab259758f6631e073d983fa1a90b230c7b7880b640e74",
+      "contentDigest": "cb5b755463c0a137380ab259758f6631e073d983fa1a90b230c7b7880b640e74",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/GPU_RULES.md",
+      "sourceRevision": "sha256:bc021939cc0f8c620e0121de3ce0be4eb5584d13b61d9a42eba7f51ab716f447",
+      "contentDigest": "bc021939cc0f8c620e0121de3ce0be4eb5584d13b61d9a42eba7f51ab716f447",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/LLMS.md",
+      "sourceRevision": "sha256:341aee025916941e13d32882273243b1b6518a607e69951d3fb196c137c64a46",
+      "contentDigest": "341aee025916941e13d32882273243b1b6518a607e69951d3fb196c137c64a46",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/MEMORY_RULES.md",
+      "sourceRevision": "sha256:0d0fb14fc4c89664df72347e8ff8d6a92c060abbdf5db9b33f36f8a8b5a5fb66",
+      "contentDigest": "0d0fb14fc4c89664df72347e8ff8d6a92c060abbdf5db9b33f36f8a8b5a5fb66",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/ONTOLOGY_RULES.md",
+      "sourceRevision": "sha256:e491ff80aa6f43d9606eafcbbb0a803e645036ed2f7f7f1be016460f23513b5c",
+      "contentDigest": "e491ff80aa6f43d9606eafcbbb0a803e645036ed2f7f7f1be016460f23513b5c",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/PROMPT_BLOCKS.md",
+      "sourceRevision": "sha256:8b71146dcac6d5cc5be43c639bb2951c89c7a0188d9a52b9f1fc64e47640d8b7",
+      "contentDigest": "8b71146dcac6d5cc5be43c639bb2951c89c7a0188d9a52b9f1fc64e47640d8b7",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/REPLAY_PROOF_RULES.md",
+      "sourceRevision": "sha256:0b84d6e2c7de6121922960da1eac67bfc9c1b6a1ad7791c318a28f6c63a0712f",
+      "contentDigest": "0b84d6e2c7de6121922960da1eac67bfc9c1b6a1ad7791c318a28f6c63a0712f",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/RETRIEVAL-20-STEP-TODO.md",
+      "sourceRevision": "sha256:d65b4571d985d49c5c5010a899b8d19f9b473b0a395e6a14b51407ba983d4833",
+      "contentDigest": "d65b4571d985d49c5c5010a899b8d19f9b473b0a395e6a14b51407ba983d4833",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/TELEMETRY_SCHEMA.md",
+      "sourceRevision": "sha256:68c3892c4326362d6279d04cfca4ba3f578d16aae5799ceb1cfcce328e77e8d4",
+      "contentDigest": "68c3892c4326362d6279d04cfca4ba3f578d16aae5799ceb1cfcce328e77e8d4",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/TOPOLOGY_RULES.md",
+      "sourceRevision": "sha256:e19f5c5a1cba05f38e28d70897eb4cbc52b4553b79e83102fddde47c8ffe725e",
+      "contentDigest": "e19f5c5a1cba05f38e28d70897eb4cbc52b4553b79e83102fddde47c8ffe725e",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/TRAVERSAL_RULES.md",
+      "sourceRevision": "sha256:4b69371437c734fadd9cc150cab105b8b5e77093ce87c78974c9c2557377bbc0",
+      "contentDigest": "4b69371437c734fadd9cc150cab105b8b5e77093ce87c78974c9c2557377bbc0",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/TRICUBIC_SEARCH.md",
+      "sourceRevision": "sha256:4cd1c05206aebf61c2c5ca88fa04291988a0397128c69192472d7cc171b3ac2a",
+      "contentDigest": "4cd1c05206aebf61c2c5ca88fa04291988a0397128c69192472d7cc171b3ac2a",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/VALIDATION_RULES.md",
+      "sourceRevision": "sha256:ac2c1337c4ef05dac979eeead2d7bff56c522afe6d31493b2ccce45d0424ce1b",
+      "contentDigest": "ac2c1337c4ef05dac979eeead2d7bff56c522afe6d31493b2ccce45d0424ce1b",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
+    },
+    {
+      "sourceRef": ".claude/agents/drizzle-inspector.md",
+      "sourceRevision": "sha256:14f3954b456e2b64a82e7dacf5eeaf1c530a267fcddefe0af182ed8c47660bcd",
+      "contentDigest": "14f3954b456e2b64a82e7dacf5eeaf1c530a267fcddefe0af182ed8c47660bcd",
+      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "classification": "REVISION_BOUND"
     }
   ],
   "databaseError": null,
@@ -57,6 +162,6 @@
   "canonicalAuthority": false,
   "safeToApply": false,
   "writesPerformed": false,
-  "nextGate": "RECONCILE_SOURCE_BINDINGS_BEFORE_PACKET_CHUNK_JOIN",
-  "reportChecksum": "60ba6a37e26b20f33f0428651032a8a40609f4702023c3f5f286b79eaf41355b"
+  "nextGate": "REBUILD_SOURCE_PLAN_FROM_ADMITTED_SNAPSHOT",
+  "reportChecksum": "af98e59caf1d439b0db366ed696aa100a882a7eb9d6944cb168d76ddf7cf4ac1"
 }

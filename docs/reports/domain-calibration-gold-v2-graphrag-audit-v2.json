@@ -1,0 +1,7 @@
+{
+  "schema": "atlas.domain-calibration-gold-v2-graphrag-audit.v2",
+  "totalRows": 455,
+  "rowsWithGraphRagNeighbors": 39,
+  "missingOnDiskWithRecommendations": 61,
+  "outputJsonl": "docs/reports/domain-calibration-gold-v2-graphrag-v2.jsonl"
+}

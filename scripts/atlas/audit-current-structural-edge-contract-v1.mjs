@@ -11,7 +11,12 @@ import crypto from 'node:crypto';
 
 const root = process.cwd();
 const inputPath = path.join(root, 'docs/reports/current-structural-edge-artifact-plan-v2.json');
-const reportPath = path.join(root, 'docs/reports/current-structural-edge-contract-v1.json');
+const outputArg = process.argv.slice(2).find((arg) => arg.startsWith('--output='));
+const reportPath = path.resolve(root, outputArg ? outputArg.slice('--output='.length) : 'docs/reports/current-structural-edge-contract-v1.json');
+const outputRelative = path.relative(root, reportPath);
+if (!outputRelative || outputRelative === '..' || outputRelative.startsWith(`..${path.sep}`) || path.isAbsolute(outputRelative)) {
+  throw new Error('REPORT_PATH_OUTSIDE_REPOSITORY');
+}
 
 const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
 const sha256 = (value) => crypto.createHash('sha256').update(value, 'utf8').digest('hex');
@@ -96,6 +101,7 @@ const report = {
   },
 };
 
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify({
   schema: report.schema,

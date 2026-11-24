@@ -94,6 +94,7 @@ type config struct {
 	QdrantPort                        int
 	QdrantCollection                  string
 	QdrantVectorName                  string
+	QdrantBM25BranchActive            bool
 	RedisURL                          string
 	EmbeddingBaseURL                  string
 	EmbeddingRepresentation           string
@@ -147,6 +148,7 @@ func loadConfig() config {
 		// `semantic_768` is the representation id; the active collection stores
 		// that vector under the named Qdrant vector key `content`.
 		QdrantVectorName:                  envOr("QDRANT_VECTOR_NAME", "content"),
+		QdrantBM25BranchActive:            strings.EqualFold(envOr("QDRANT_BM25_BRANCH_ACTIVE", "false"), "true"),
 		RedisURL:                          envOrAny("REDIS_URL", "VALKEY_URL", "redis://localhost:6379"),
 		EmbeddingBaseURL:                  embeddingBaseURL,
 		EmbeddingRepresentation:           envOr("EMBEDDING_REPRESENTATION", "semantic_768"),
@@ -323,12 +325,16 @@ func validateEmbeddingVector(vec []float32, expected int) error {
 	return nil
 }
 
+func embeddingReceiptPolicyConfigured(cfg config) bool {
+	return strings.TrimSpace(cfg.EmbeddingContentSelectionRevision) != "" &&
+		strings.TrimSpace(cfg.EmbeddingInputPolicyRevision) != "" &&
+		isSHA256Revision(cfg.EmbeddingRepresentationRevision) &&
+		cfg.EmbeddingRepresentation == "semantic_768"
+}
+
 // embedViaService calls the receipt-bearing strict embedding boundary.
 func (s *retrievalServer) embedViaService(ctx context.Context, text string) ([]float32, error) {
-	if strings.TrimSpace(s.cfg.EmbeddingContentSelectionRevision) == "" ||
-		strings.TrimSpace(s.cfg.EmbeddingInputPolicyRevision) == "" ||
-		!isSHA256Revision(s.cfg.EmbeddingRepresentationRevision) ||
-		s.cfg.EmbeddingRepresentation != "semantic_768" {
+	if !embeddingReceiptPolicyConfigured(s.cfg) {
 		return nil, fmt.Errorf("embedding receipt policy or expected representation revision is not configured")
 	}
 	inputChecksum := sha256Revision([]byte(text))
@@ -735,7 +741,34 @@ func (s *retrievalServer) qdrantSearchEvidence(ctx context.Context, vec []float3
 	return qdrantPointsToChunks(points, false), nil
 }
 
-func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float32, kinds []string, pathPrefixes []string, extraFilters []*qdrantclient.Condition, limit int) ([]qdrantChunk, error) {
+func buildCodebasePrefetchQueries(contentVec string, sigVec string, vec []float32, queryText string, bm25Active bool, prefetchLimit uint64) []*qdrantclient.PrefetchQuery {
+	prefetches := []*qdrantclient.PrefetchQuery{
+		{
+			Query: qdrantclient.NewQuery(vec...),
+			Using: &contentVec,
+			Limit: &prefetchLimit,
+		},
+		{
+			Query: qdrantclient.NewQuery(vec...),
+			Using: &sigVec,
+			Limit: &prefetchLimit,
+		},
+	}
+	if bm25Active && strings.TrimSpace(queryText) != "" {
+		bm25Field := "code_text"
+		prefetches = append(prefetches, &qdrantclient.PrefetchQuery{
+			Query: qdrantclient.NewQueryDocument(&qdrantclient.Document{
+				Text:  queryText,
+				Model: "Qdrant/bm25",
+			}),
+			Using: &bm25Field,
+			Limit: &prefetchLimit,
+		})
+	}
+	return prefetches
+}
+
+func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float32, queryText string, kinds []string, pathPrefixes []string, extraFilters []*qdrantclient.Condition, limit int) ([]qdrantChunk, error) {
 	contentVec := s.cfg.QdrantVectorName
 	sigVec := "signature"
 	prefetchLimit := uint64(limit * 3)
@@ -743,21 +776,10 @@ func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float3
 
 	queryReq := &qdrantclient.QueryPoints{
 		CollectionName: s.cfg.QdrantCollection,
-		Prefetch: []*qdrantclient.PrefetchQuery{
-			{
-				Query: qdrantclient.NewQuery(vec...),
-				Using: &contentVec,
-				Limit: &prefetchLimit,
-			},
-			{
-				Query: qdrantclient.NewQuery(vec...),
-				Using: &sigVec,
-				Limit: &prefetchLimit,
-			},
-		},
-		Query:       qdrantclient.NewQueryFusion(qdrantclient.Fusion_RRF),
-		Limit:       &qlimit,
-		WithPayload: qdrantclient.NewWithPayload(true),
+		Prefetch:       buildCodebasePrefetchQueries(contentVec, sigVec, vec, queryText, s.cfg.QdrantBM25BranchActive, prefetchLimit),
+		Query:          qdrantclient.NewQueryFusion(qdrantclient.Fusion_RRF),
+		Limit:          &qlimit,
+		WithPayload:    qdrantclient.NewWithPayload(true),
 	}
 
 	var mustConds []*qdrantclient.Condition
@@ -2110,7 +2132,7 @@ func codebaseReceipt(ctx *sharedpb.AtlasRequestContextV2, succeeded bool, eviden
 		RunId: ctx.GetRunId(), WorkspaceId: ctx.GetWorkspaceId(), WorkspaceRevision: ctx.GetWorkspaceRevision(),
 		PacketKey: ctx.GetPacketKey(), PacketRevision: ctx.GetPacketRevision(), Succeeded: succeeded,
 		SourceRevision: ctx.GetSourceRevision(),
-		EvidenceCount: int32(evidenceCount), ValidationStatus: validationStatus, CanonicalAuthority: false, WritesPerformed: false,
+		EvidenceCount:  int32(evidenceCount), ValidationStatus: validationStatus, CanonicalAuthority: false, WritesPerformed: false,
 	}
 	if confidence >= 0 && confidence <= 1 {
 		receipt.RetrievalConfidence = &confidence
@@ -2259,7 +2281,7 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 		extraFilters = append(extraFilters, sourceFilter)
 	}
 
-	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.Kinds, req.PathPrefixes, extraFilters, limit)
+	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.GetQuery(), req.Kinds, req.PathPrefixes, extraFilters, limit)
 	if err != nil {
 		slog.Warn("[retrieval] codebase search failed", "err", err)
 		return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason, Receipt: codebaseReceipt(req.GetAtlasContext(), false, 0, -1, "FAIL", "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE", "")}, nil
@@ -2492,7 +2514,7 @@ func (s *retrievalServer) SearchChunks(ctx context.Context, req *pb.SearchChunks
 		}
 	}
 
-	chunks, err := s.qdrantSearchCodebase(ctx, vec, nil, nil, extraFilters, int(req.Limit))
+	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.GetQuery(), nil, nil, extraFilters, int(req.Limit))
 	if err != nil {
 		return nil, err
 	}
@@ -2685,6 +2707,11 @@ func (s *retrievalServer) GetResearchContext(ctx context.Context, req *pb.Resear
 
 func (s *retrievalServer) httpHealth(w http.ResponseWriter, r *http.Request) {
 	h, _ := s.Health(r.Context(), &pb.HealthRequest{})
+	codebaseSearchReady := embeddingReceiptPolicyConfigured(s.cfg)
+	codebaseSearchReason := "READY"
+	if !codebaseSearchReady {
+		codebaseSearchReason = "EMBEDDING_RECEIPT_POLICY_NOT_CONFIGURED"
+	}
 	readinessState := "READY_DEGRADED"
 	switch {
 	case !h.GetPgvectorConnected():
@@ -2708,6 +2735,11 @@ func (s *retrievalServer) httpHealth(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]any{
 		"status":          h.GetStatus(),
 		"readiness_state": readinessState,
+		"codebase_search": map[string]any{
+			"ready":          codebaseSearchReady,
+			"reason":         codebaseSearchReason,
+			"representation": s.cfg.EmbeddingRepresentation,
+		},
 		"dependencies": map[string]any{
 			"postgres": map[string]any{
 				"connected": h.GetPgvectorConnected(),
@@ -2818,6 +2850,34 @@ func (s *retrievalServer) httpSearchResearch(w http.ResponseWriter, r *http.Requ
 	})
 }
 
+type queryStageTrace struct {
+	QdrantCollection       string   `json:"qdrant_collection"`
+	DensePrefetchVectors   []string `json:"dense_prefetch_vectors"`
+	QdrantCandidateCount   int      `json:"qdrant_candidate_count"`
+	QdrantBM25BranchActive bool     `json:"qdrant_bm25_branch_active"`
+	RRFUsed                bool     `json:"rrf_used"`
+	PGReconciledCount      int      `json:"pg_reconciled_count"`
+	GraphExpansionCount    int      `json:"graph_expansion_count"`
+}
+
+func buildCodebaseStageTrace(collection string, primaryVector string, chunkCount int, bm25Active bool) queryStageTrace {
+	vecName := primaryVector
+	if vecName == "" {
+		vecName = "content"
+	}
+	return queryStageTrace{
+		QdrantCollection:       collection,
+		DensePrefetchVectors:   []string{vecName, "signature"},
+		QdrantCandidateCount:   chunkCount,
+		QdrantBM25BranchActive: bm25Active,
+		// Go Retrieval emits candidates; SearchRuntime owns cross-lane fusion
+		// and canonical PostgreSQL rejoin is reported by that later boundary.
+		RRFUsed:             false,
+		PGReconciledCount:   0,
+		GraphExpansionCount: 0,
+	}
+}
+
 func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "POST only", http.StatusMethodNotAllowed)
@@ -2858,7 +2918,16 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	chunks := resp.GetChunks()
+	if chunks == nil {
+		chunks = []*pb.CodebaseChunk{}
+	}
+	json.NewEncoder(w).Encode(map[string]any{
+		"chunks":              chunks,
+		"representation_used": resp.GetRepresentationUsed(),
+		"total_ms":            resp.GetTotalMs(),
+		"query_stage_trace":   buildCodebaseStageTrace(s.cfg.QdrantCollection, s.cfg.QdrantVectorName, len(resp.GetChunks()), s.cfg.QdrantBM25BranchActive),
+	})
 }
 
 // httpSearchBM25 retains the historical route name while exposing the

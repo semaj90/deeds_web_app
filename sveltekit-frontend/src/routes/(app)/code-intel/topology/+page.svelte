@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import WebGPUTopologyRenderer from '$lib/components/webgpu/WebGPUTopologyRenderer.svelte';
 
 	// Topo class IDs match topology-byte-mapper.ts TOPO_CLASS enum (bits 0-3 of topo_byte)
 	const TOPO_LABELS: Record<number, string> = {
@@ -40,6 +41,39 @@
 	let selectedNode = $state<any>(null);
 	let loading = $state(true);
 	let colorMode = $state<'type' | 'topo' | 'authority'>('topo');
+	let useWebGpuStream = $state(false);
+	let vertexStreamPayload = $state<ArrayBuffer | null>(null);
+	let streamError = $state<string | null>(null);
+
+	async function toggleWebGpuStream() {
+		useWebGpuStream = !useWebGpuStream;
+		if (!useWebGpuStream || displayNodes.length === 0) return;
+		streamError = null;
+		try {
+			const vertices = displayNodes.slice(0, 2048).map((n: any, idx: number) => ({
+				worldX: Number(n.x ?? 0) * 2 - 1,
+				worldY: -(Number(n.y ?? 0) * 2 - 1),
+				manifoldZ: Number(n.z ?? 0),
+				manifoldW: Math.max(0, Math.min(1, Number(n.authority_score ?? 0.5))),
+				tileU: (idx % 16) / 16,
+				tileV: Math.floor(idx / 16) / 16,
+				featureBitmask: Number(n.topo_class ?? 0) >>> 0,
+				charProgress: 1.0,
+			}));
+			const res = await fetch('/api/atlas/hypergraph/vertex-stream', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					workspaceRevision: String(snapshot?.workspace_revision ?? '74ac7d8983e'),
+					vertices,
+				}),
+			});
+			if (!res.ok) throw new Error(`VERTEX_STREAM_HTTP_${res.status}`);
+			vertexStreamPayload = await res.arrayBuffer();
+		} catch (err) {
+			streamError = err instanceof Error ? err.message : String(err);
+		}
+	}
 
 	// Neighborhood search state
 	let filteredView = $state<any[] | null>(null);
@@ -258,6 +292,11 @@
 					>Topo Class</button>
 					<button
 						class="mode-btn"
+						class:active={useWebGpuStream}
+						onclick={toggleWebGpuStream}
+					>{useWebGpuStream ? '2D Canvas' : 'WebGPU 4D Stream'}</button>
+					<button
+						class="mode-btn"
 						class:active={colorMode === 'authority'}
 						onclick={() => { colorMode = 'authority'; }}
 					>Authority Heat</button>
@@ -307,6 +346,12 @@
 					</div>
 				{/if}
 
+				{#if useWebGpuStream}
+					{#if streamError}
+						<div class="filter-bar"><span class="filter-label">Stream error: {streamError}</span></div>
+					{/if}
+					<WebGPUTopologyRenderer nodes={[]} {vertexStreamPayload} charProgress={1.0} width={800} height={600} />
+				{:else}
 				<div class="canvas">
 					{#if showClusters}
 						{#each clusters as c}
@@ -341,6 +386,7 @@
 						</button>
 					{/each}
 				</div>
+				{/if}
 			</div>
 
 			<aside class="inspector card">

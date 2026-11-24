@@ -9,7 +9,7 @@
  * `CurrentWorkspaceFrameReceiptV1` shape recorded in
  * openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md (Gate 1).
  *
- * Writes nothing. Does not rerun the cohort lineage audit itself (that script talks to
+ * Writes only its JSON report artifact; it does not write canonical stores. Does not rerun the cohort lineage audit itself (that script talks to
  * Postgres); this script reads its most recent persisted receipt
  * (docs/reports/current-source-cohort-lineage-v1.json) and the workspace-frame selector inputs,
  * and classifies. Re-run `node scripts/atlas/audit-current-source-cohort-lineage-v1.mjs` first
@@ -22,6 +22,12 @@ import { resolveCurrentWorkspaceFrameV1 } from './lib/current-workspace-frame-se
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const reportPath = (name) => path.resolve(root, 'docs/reports', name);
+const outputArg = process.argv.slice(2).find((arg) => arg.startsWith('--output='));
+const outputPath = path.resolve(root, outputArg ? outputArg.slice('--output='.length) : 'docs/reports/current-workspace-frame-admission-v1.json');
+const outputRelative = path.relative(root, outputPath);
+if (!outputRelative || outputRelative === '..' || outputRelative.startsWith(`..${path.sep}`) || path.isAbsolute(outputRelative)) {
+  throw new Error('REPORT_PATH_OUTSIDE_REPOSITORY');
+}
 const readJson = (filePath) => {
   try {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -108,7 +114,8 @@ const receipt = {
 
 console.log(JSON.stringify(receipt, null, 2));
 
-const outPath = reportPath('current-workspace-frame-admission-v1.json');
+const outPath = outputPath;
+fs.mkdirSync(path.dirname(outPath), { recursive: true });
 const tempPath = `${outPath}.${process.pid}.${Date.now()}.tmp`;
 try {
   fs.writeFileSync(tempPath, JSON.stringify(receipt, null, 2) + '\n');

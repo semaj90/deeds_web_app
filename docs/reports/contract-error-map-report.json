@@ -1,76 +1,16 @@
 {
-  "generatedAt": "2026-11-19T21:51:34.681Z",
-  "elapsedMs": 15594,
-  "totalFindings": 67,
+  "generatedAt": "2026-11-24T05:15:38.735Z",
+  "elapsedMs": 10925,
+  "totalFindings": 64,
   "bySeverity": {
     "high": 0,
     "medium": 38,
-    "low": 3,
+    "low": 0,
     "info": 26
   },
   "findings": [
     {
-      "findingId": "contract:sveltekit-route-route_contract_mismatch-001-86cb947b",
-      "severity": "low",
-      "layer": "sveltekit-route",
-      "hmmState": "route_contract_mismatch",
-      "localSourceRefs": [
-        "sveltekit-frontend\\src\\routes\\api\\evidence\\[id]\\video-events\\+server.ts"
-      ],
-      "externalSourceRefs": [],
-      "problem": "GET route returns 500 status code. The degraded-path contract prefers 200 with { data: [], error: msg }.",
-      "expected": "GET routes return 200 with empty arrays/nulls matching success shape.",
-      "suggestedFix": "Replace `return json({ error }, { status: 500 })` with `return json({ data: [], error: msg })` (status 200).",
-      "validationCommands": [
-        "npm run audit:contracts"
-      ],
-      "agentCommandKeys": [
-        "contract.audit"
-      ],
-      "trustTier": "canonical_local_code_plus_official_docs"
-    },
-    {
-      "findingId": "contract:sveltekit-route-route_contract_mismatch-002-86cb947b",
-      "severity": "low",
-      "layer": "sveltekit-route",
-      "hmmState": "route_contract_mismatch",
-      "localSourceRefs": [
-        "sveltekit-frontend\\src\\routes\\api\\cases\\[id]\\scenes\\[sceneKey]\\markers\\+server.ts"
-      ],
-      "externalSourceRefs": [],
-      "problem": "GET route returns 500 status code. The degraded-path contract prefers 200 with { data: [], error: msg }.",
-      "expected": "GET routes return 200 with empty arrays/nulls matching success shape.",
-      "suggestedFix": "Replace `return json({ error }, { status: 500 })` with `return json({ data: [], error: msg })` (status 200).",
-      "validationCommands": [
-        "npm run audit:contracts"
-      ],
-      "agentCommandKeys": [
-        "contract.audit"
-      ],
-      "trustTier": "canonical_local_code_plus_official_docs"
-    },
-    {
-      "findingId": "contract:sveltekit-route-route_contract_mismatch-003-86cb947b",
-      "severity": "low",
-      "layer": "sveltekit-route",
-      "hmmState": "route_contract_mismatch",
-      "localSourceRefs": [
-        "sveltekit-frontend\\src\\routes\\api\\cases\\[id]\\scenes\\[sceneId]\\revisions\\+server.ts"
-      ],
-      "externalSourceRefs": [],
-      "problem": "GET route returns 500 status code. The degraded-path contract prefers 200 with { data: [], error: msg }.",
-      "expected": "GET routes return 200 with empty arrays/nulls matching success shape.",
-      "suggestedFix": "Replace `return json({ error }, { status: 500 })` with `return json({ data: [], error: msg })` (status 200).",
-      "validationCommands": [
-        "npm run audit:contracts"
-      ],
-      "agentCommandKeys": [
-        "contract.audit"
-      ],
-      "trustTier": "canonical_local_code_plus_official_docs"
-    },
-    {
-      "findingId": "contract:drizzle-meta-documented_sidecar-004-26dda09a",
+      "findingId": "contract:drizzle-meta-documented_sidecar-001-26dda09a",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -93,7 +33,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-005-6c8a6ec1",
+      "findingId": "contract:drizzle-meta-documented_sidecar-002-6c8a6ec1",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -116,7 +56,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-006-c908a1c7",
+      "findingId": "contract:drizzle-meta-documented_sidecar-003-c908a1c7",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -139,7 +79,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-007-5bd90b15",
+      "findingId": "contract:drizzle-meta-documented_sidecar-004-5bd90b15",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -162,7 +102,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-008-2a5fba98",
+      "findingId": "contract:drizzle-meta-documented_sidecar-005-2a5fba98",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -185,7 +125,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-009-88d9df2d",
+      "findingId": "contract:drizzle-meta-documented_sidecar-006-88d9df2d",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -208,7 +148,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-010-5dfeeab7",
+      "findingId": "contract:drizzle-meta-documented_sidecar-007-5dfeeab7",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -231,7 +171,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-011-8d068f3d",
+      "findingId": "contract:drizzle-meta-documented_sidecar-008-8d068f3d",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -254,7 +194,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-012-d328ecc9",
+      "findingId": "contract:drizzle-meta-documented_sidecar-009-d328ecc9",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -277,7 +217,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-013-edb3459e",
+      "findingId": "contract:drizzle-meta-documented_sidecar-010-edb3459e",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -300,7 +240,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-014-f00af80a",
+      "findingId": "contract:drizzle-meta-documented_sidecar-011-f00af80a",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -323,7 +263,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-015-c6be2170",
+      "findingId": "contract:drizzle-meta-documented_sidecar-012-c6be2170",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -346,7 +286,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-016-70f6f462",
+      "findingId": "contract:drizzle-meta-documented_sidecar-013-70f6f462",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -369,7 +309,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-017-829576e4",
+      "findingId": "contract:drizzle-meta-documented_sidecar-014-829576e4",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -392,7 +332,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-018-4e5035ec",
+      "findingId": "contract:drizzle-meta-documented_sidecar-015-4e5035ec",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -415,7 +355,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-019-57b36a33",
+      "findingId": "contract:drizzle-meta-documented_sidecar-016-57b36a33",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -438,7 +378,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-020-a4c26a2c",
+      "findingId": "contract:drizzle-meta-documented_sidecar-017-a4c26a2c",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -461,7 +401,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-021-0d28dc7e",
+      "findingId": "contract:drizzle-meta-documented_sidecar-018-0d28dc7e",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -484,7 +424,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-022-a7bc4005",
+      "findingId": "contract:drizzle-meta-documented_sidecar-019-a7bc4005",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -507,7 +447,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-023-49ac0ced",
+      "findingId": "contract:drizzle-meta-documented_sidecar-020-49ac0ced",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -530,7 +470,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-024-42de1f0f",
+      "findingId": "contract:drizzle-meta-documented_sidecar-021-42de1f0f",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -553,7 +493,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-025-29dd4cfe",
+      "findingId": "contract:drizzle-meta-documented_sidecar-022-29dd4cfe",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -576,7 +516,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-026-55c708c4",
+      "findingId": "contract:drizzle-meta-documented_sidecar-023-55c708c4",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -599,7 +539,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-027-75067054",
+      "findingId": "contract:drizzle-meta-documented_sidecar-024-75067054",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -622,7 +562,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-028-ea5ba189",
+      "findingId": "contract:drizzle-meta-documented_sidecar-025-ea5ba189",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -645,7 +585,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-029-d08c1dbd",
+      "findingId": "contract:drizzle-meta-documented_sidecar-026-d08c1dbd",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -668,7 +608,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-030-6f4602d2",
+      "findingId": "contract:drizzle-meta-stale_migration-027-6f4602d2",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -693,7 +633,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-031-68651803",
+      "findingId": "contract:drizzle-meta-stale_migration-028-68651803",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -718,7 +658,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-032-a99f92ab",
+      "findingId": "contract:drizzle-meta-stale_migration-029-a99f92ab",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -743,7 +683,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-033-ee4af613",
+      "findingId": "contract:drizzle-meta-stale_migration-030-ee4af613",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -768,7 +708,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-034-4ee9f3c7",
+      "findingId": "contract:drizzle-meta-stale_migration-031-4ee9f3c7",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -793,7 +733,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-035-a3dd36d9",
+      "findingId": "contract:drizzle-meta-stale_migration-032-a3dd36d9",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -818,7 +758,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-036-3c91523d",
+      "findingId": "contract:drizzle-meta-stale_migration-033-3c91523d",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -843,7 +783,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-037-76cbbc9f",
+      "findingId": "contract:drizzle-meta-stale_migration-034-76cbbc9f",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -868,7 +808,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-038-c47e2d28",
+      "findingId": "contract:drizzle-meta-stale_migration-035-c47e2d28",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -893,7 +833,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-039-5e8aea15",
+      "findingId": "contract:drizzle-meta-stale_migration-036-5e8aea15",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -918,7 +858,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-040-c59f32b4",
+      "findingId": "contract:drizzle-meta-stale_migration-037-c59f32b4",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -943,7 +883,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-041-4efb57ff",
+      "findingId": "contract:drizzle-meta-stale_migration-038-4efb57ff",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -968,7 +908,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-042-72e7a41b",
+      "findingId": "contract:drizzle-meta-stale_migration-039-72e7a41b",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -993,7 +933,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-043-af1f87b6",
+      "findingId": "contract:drizzle-meta-stale_migration-040-af1f87b6",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1018,7 +958,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-044-32b1cdcb",
+      "findingId": "contract:drizzle-meta-stale_migration-041-32b1cdcb",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1043,7 +983,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-045-74a5420c",
+      "findingId": "contract:drizzle-meta-stale_migration-042-74a5420c",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1068,7 +1008,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-046-0245a68c",
+      "findingId": "contract:drizzle-meta-stale_migration-043-0245a68c",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1093,7 +1033,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-047-28e56da9",
+      "findingId": "contract:drizzle-meta-stale_migration-044-28e56da9",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1118,7 +1058,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-048-d39fcc7f",
+      "findingId": "contract:drizzle-meta-stale_migration-045-d39fcc7f",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1143,7 +1083,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-049-940cc3c1",
+      "findingId": "contract:drizzle-meta-stale_migration-046-940cc3c1",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1168,7 +1108,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-050-b0385748",
+      "findingId": "contract:drizzle-meta-stale_migration-047-b0385748",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1193,7 +1133,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-051-46f3de7d",
+      "findingId": "contract:drizzle-meta-stale_migration-048-46f3de7d",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1218,7 +1158,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-052-6098bbe6",
+      "findingId": "contract:drizzle-meta-stale_migration-049-6098bbe6",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1243,7 +1183,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-053-2f5f929b",
+      "findingId": "contract:drizzle-meta-stale_migration-050-2f5f929b",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1268,7 +1208,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-054-abef4507",
+      "findingId": "contract:drizzle-meta-stale_migration-051-abef4507",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1293,7 +1233,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-055-417bb94e",
+      "findingId": "contract:drizzle-meta-stale_migration-052-417bb94e",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1318,7 +1258,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-056-9c3cf80b",
+      "findingId": "contract:drizzle-meta-stale_migration-053-9c3cf80b",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1343,7 +1283,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-057-a8285aab",
+      "findingId": "contract:drizzle-meta-stale_migration-054-a8285aab",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1368,7 +1308,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-058-4e4547ba",
+      "findingId": "contract:drizzle-meta-stale_migration-055-4e4547ba",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1393,7 +1333,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-059-8a1c16a6",
+      "findingId": "contract:drizzle-meta-stale_migration-056-8a1c16a6",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1418,7 +1358,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-060-d45c7e28",
+      "findingId": "contract:drizzle-meta-stale_migration-057-d45c7e28",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1443,7 +1383,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-061-b73075a3",
+      "findingId": "contract:drizzle-meta-stale_migration-058-b73075a3",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1468,7 +1408,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-062-d189a482",
+      "findingId": "contract:drizzle-meta-stale_migration-059-d189a482",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1493,7 +1433,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-063-114571fd",
+      "findingId": "contract:drizzle-meta-stale_migration-060-114571fd",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1518,7 +1458,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-064-51cc2f78",
+      "findingId": "contract:drizzle-meta-stale_migration-061-51cc2f78",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1543,7 +1483,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-065-6d3c89f5",
+      "findingId": "contract:drizzle-meta-stale_migration-062-6d3c89f5",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1568,7 +1508,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-066-a1d61cf5",
+      "findingId": "contract:drizzle-meta-stale_migration-063-a1d61cf5",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",
@@ -1593,7 +1533,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-stale_migration-067-3efe2517",
+      "findingId": "contract:drizzle-meta-stale_migration-064-3efe2517",
       "severity": "medium",
       "layer": "drizzle-meta",
       "hmmState": "stale_migration",

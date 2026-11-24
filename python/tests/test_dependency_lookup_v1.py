@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 from atlas_graph_runtime.cli_find_dependencies_v1 import run_find_dependencies_cli
@@ -140,20 +141,26 @@ def test_cli_find_dependencies_supports_outgoing_and_incoming_directions(tmp_pat
     src_dir = tmp_path / "sveltekit-frontend" / "src" / "lib"
     src_dir.mkdir(parents=True)
     (src_dir / "leaf.ts").write_text("export const x = 1;\n", encoding="utf-8")
-    (src_dir / "caller.ts").write_text("import { x } from './leaf';\nexport const y = x;\n", encoding="utf-8")
+    (src_dir / "caller.ts").write_text("import { x } from './leaf';\nimport 'react';\nexport const y = x;\n", encoding="utf-8")
 
     outgoing = run_find_dependencies_cli(
         target="sveltekit-frontend/src/lib/caller.ts",
         repo_root=tmp_path,
+        workspace_revision=WORKSPACE,
         direction="outgoing",
     )
     assert outgoing["lookup"]["failure"] is None
     assert outgoing["direction"] == "outgoing"
     assert [row["dep"] for row in outgoing["dependencies"]] == ["sveltekit-frontend/src/lib/leaf.ts"]
+    assert outgoing["dependencies"][0]["dependencySourceRevision"] == (
+        "sha256:" + hashlib.sha256((src_dir / "leaf.ts").read_bytes()).hexdigest()
+    )
+    assert outgoing["dependencies"][0]["workspaceRevision"] == WORKSPACE
 
     incoming = run_find_dependencies_cli(
         target="sveltekit-frontend/src/lib/leaf.ts",
         repo_root=tmp_path,
+        workspace_revision=WORKSPACE,
         direction="incoming",
     )
     assert incoming["lookup"]["failure"] is None
@@ -161,6 +168,35 @@ def test_cli_find_dependencies_supports_outgoing_and_incoming_directions(tmp_pat
     assert [row["dep"] for row in incoming["dependencies"]] == ["sveltekit-frontend/src/lib/caller.ts"]
     assert incoming["canonicalAuthority"] is False
     assert incoming["writesPerformed"] is False
+
+    # Without a canonical caller-supplied workspace revision, the import stays
+    # visible as an observation and cannot become a revision-qualified edge.
+    unpinned = run_find_dependencies_cli(
+        target="sveltekit-frontend/src/lib/caller.ts",
+        repo_root=tmp_path,
+    )
+    assert unpinned["lookup"]["failure"] == "WORKSPACE_REVISION_REQUIRED"
+    assert unpinned["dependencies"] == []
+    assert unpinned["provenance"]["graphRevision"] is None
+    assert unpinned["provenance"]["status"] == "UNRESOLVED"
+    assert unpinned["importObservations"][0]["resolution"] == "WORKSPACE_REVISION_REQUIRED"
+
+    # Multiple existing extension matches must not be resolved by arbitrary
+    # suffix order and must never produce an IMPORTS graph edge.
+    (src_dir / "ambiguous.ts").write_text("export const ts = 1;\n", encoding="utf-8")
+    (src_dir / "ambiguous.js").write_text("export const js = 1;\n", encoding="utf-8")
+    (src_dir / "ambiguous-caller.ts").write_text("import './ambiguous';\n", encoding="utf-8")
+    ambiguous = run_find_dependencies_cli(
+        target="sveltekit-frontend/src/lib/ambiguous-caller.ts",
+        repo_root=tmp_path,
+        workspace_revision=WORKSPACE,
+    )
+    assert ambiguous["dependencies"] == []
+    assert ambiguous["lookup"]["failure"] == "NO_OUTGOING_EDGES"
+    assert ambiguous["importObservations"][0]["resolution"] == "AMBIGUOUS_REPO_TARGET"
+
+    assert any(row["specifier"] == "react" and row["resolution"] == "EXTERNAL_MODULE"
+               for row in outgoing["importObservations"])
 
     bad_dir = run_find_dependencies_cli(
         target="sveltekit-frontend/src/lib/leaf.ts",

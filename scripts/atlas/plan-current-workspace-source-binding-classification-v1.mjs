@@ -7,6 +7,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { classifyWorkspaceSourceBindingV1 } from './lib/workspace-source-binding-classification-v1.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const planPath = resolve(root, 'docs/reports/current-source-graphify-batch-plan-v1.json');
@@ -52,25 +53,11 @@ try {
   await pool.end();
 }
 
-const byRef = new Map();
-for (const row of bindings) {
-  const key = String(row.canonical_source_ref ?? '').replaceAll('\\', '/');
-  const list = byRef.get(key) ?? [];
-  list.push(row);
-  byRef.set(key, list);
-}
-const classify = (expected) => {
-  const rows = byRef.get(expected.sourceRef) ?? [];
-  if (rows.length > 1) return 'AMBIGUOUS';
-  if (rows.length === 0) return 'WORKSPACE_IDENTITY_ONLY';
-  const actual = rows[0];
-  if (String(actual.workspace_revision ?? '') !== workspaceRevision) return 'WRONG_WORKSPACE_REVISION';
-  const actualSource = String(actual.source_revision ?? '').trim();
-  const actualDigest = String(actual.content_digest ?? '').trim().toLowerCase().replace(/^sha256:/, '');
-  if (actualSource !== expected.sourceRevision || actualDigest !== expected.contentDigest) return 'SOURCE_CONTENT_MISMATCH';
-  return 'REVISION_BOUND';
-};
-const rows = records.map((expected) => ({ ...expected, workspaceRevision, classification: classify(expected) }));
+const rows = records.map((expected) => ({
+  ...expected,
+  workspaceRevision,
+  classification: classifyWorkspaceSourceBindingV1({ expected, bindings, workspaceRevision }),
+}));
 const counts = Object.fromEntries(['REVISION_BOUND', 'WORKSPACE_IDENTITY_ONLY', 'WRONG_WORKSPACE_REVISION', 'SOURCE_CONTENT_MISMATCH', 'AMBIGUOUS']
   .map((classification) => [classification, rows.filter((row) => row.classification === classification).length]));
 const report = {
