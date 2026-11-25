@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-cohort-lineage.v1",
-  "generatedAt": "2026-10-23T19:13:16.822Z",
+  "generatedAt": "2026-11-25T03:30:28.639Z",
   "mode": "READ_ONLY_LINEAGE_AUDIT",
   "inputs": {
     "cohortChecksum": "fd88703ca428261206575d95204c31795f956645dd46dc4607a2b3048d464151",
@@ -10,7 +10,7 @@
   },
   "workspaceFrame": {
     "status": "CURRENT_WORKSPACE_FRAME_SELECTED",
-    "selectedWorkspaceRevision": "sha256:2ecdd4ffc1ab9940023f10cd621affcf18e253c0a8d4a9e90be4b554bb88814a",
+    "selectedWorkspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
     "selectedSource": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT",
     "selectedAuthority": true,
     "authorityConflict": false,
@@ -19,7 +19,7 @@
     "canonicalAuthority": false,
     "promotionEligible": false
   },
-  "observationWorkspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+  "observationWorkspaceRevision": "sha256:cc11863abedab66c0bedae960039c5df23457020cb80d9419607704d288f582e",
   "observationMatchesSelectedFrame": false,
   "sourceAuthority": {
     "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
@@ -31,8 +31,10 @@
     "cohortRows": 52,
     "currentWorkspaceRevision": null,
     "liveBindingWorkspaceRevisions": [
+      "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5",
       "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
       "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
       "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
     ],
     "workspaceRevisionSourceAligned": false,
@@ -627,5 +629,5 @@
   "qdrantWrites": false,
   "status": "WORKSPACE_REVISION_SOURCE_MISMATCH",
   "nextGate": "CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED",
-  "reportChecksum": "fd764dd351037325f76f3c94692917adb0b6321b37704a57095b1510f8dd79e7"
+  "reportChecksum": "9949180b4824e18e47e9b12772571e72a94924ae791958d7a16bf864d1688c79"
 }

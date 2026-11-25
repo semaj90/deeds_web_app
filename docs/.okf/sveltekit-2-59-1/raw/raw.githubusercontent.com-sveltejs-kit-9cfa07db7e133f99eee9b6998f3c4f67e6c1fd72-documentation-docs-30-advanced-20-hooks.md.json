@@ -1,0 +1,21 @@
+{
+  "canonical_authority": false,
+  "fetched_at": "2026-11-25T02:17:57.244140Z",
+  "fetcher": "DIRECT_MARKDOWN",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\sveltekit-2-59-1\\raw\\raw.githubusercontent.com-sveltejs-kit-9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72-documentation-docs-30-advanced-20-hooks.md.md",
+  "metadata": {
+    "parserRevision": "direct-markdown-utf8-v1"
+  },
+  "normalized_artifact_checksum": "50692467f13533d5b6437b9f927d39dad6e93397e881fbfa345c8533b67f857c",
+  "normalized_checksum": "50692467f13533d5b6437b9f927d39dad6e93397e881fbfa345c8533b67f857c",
+  "normalized_markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\sveltekit-2-59-1\\raw\\raw.githubusercontent.com-sveltejs-kit-9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72-documentation-docs-30-advanced-20-hooks.md.eeffc4032411.normalized.md",
+  "outgoing_urls": [],
+  "raw_checksum": "84aa44c20df5f52e366183809af37416d8e3e61ea61963344545a63c1752ecbc",
+  "requested_url": "https://raw.githubusercontent.com/sveltejs/kit/9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72/documentation/docs/30-advanced/20-hooks.md",
+  "resolved_url": "https://raw.githubusercontent.com/sveltejs/kit/9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72/documentation/docs/30-advanced/20-hooks.md",
+  "retrieved_at": "2026-11-25T02:17:57.244140Z",
+  "source_id": "sveltekit-2-59-1",
+  "source_revision": "sha256:f69007a56a7015a81ec12ddb0d31890da3953ba8d5505cedaf3b200b375b091c",
+  "text": null,
+  "title": "Hooks"
+}

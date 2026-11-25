@@ -70,7 +70,9 @@ const status = classify(frame, cohortLineage);
 const counts = cohortLineage?.counts ?? null;
 const sourceAuthorityReady = sourceOwner?.admission?.safeToPromote === true
   && sourceOwner?.workspace?.admittedSnapshotDelta?.requiresSnapshotRefresh !== true;
-const nextGate = !sourceAuthorityReady
+const nextGate = counts?.currentWorkspaceRevision == null
+  ? 'WORKSPACE_CURRENTNESS_READBACK_REQUIRED'
+  : !sourceAuthorityReady
   ? 'CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED'
   : status === 'CURRENT_WORKSPACE_FRAME_PROVEN'
     ? 'CURRENT_WORKSPACE_FRAME_PROVEN'
@@ -89,15 +91,17 @@ const receipt = {
   selectorAuthorityConflict: frame.authorityConflict,
   selectorBlockers: frame.blockers,
   cohortLineageReportGeneratedAt: cohortLineage?.generatedAt ?? null,
-  cohortLineageWorkspaceRevisionMatchesSelector: counts
-    ? counts.currentWorkspaceRevision === frame.selectedWorkspaceRevision
-    : null,
+  cohortLineageWorkspaceRevisionMatchesSelector: counts?.currentWorkspaceRevision == null
+    ? null
+    : counts.currentWorkspaceRevision === frame.selectedWorkspaceRevision,
   cohortRows: counts?.cohortRows ?? null,
   distinctCohortWorkspaceRevisions: counts?.liveBindingWorkspaceRevisions ?? null,
   exactSourceRevisionMatches: counts?.sourceRevisionQualified ?? null,
-  currentWorkspaceMatches: counts?.currentWorkspaceMatched ?? null,
-  workspaceMismatches: counts?.workspaceMismatchAfterSourceQualification ?? null,
-  staleProjectionCandidates: status === 'STALE_WORKSPACE_PROJECTION' ? (counts?.workspaceMismatchAfterSourceQualification ?? null) : 0,
+  currentWorkspaceMatches: counts?.currentWorkspaceRevision == null ? null : (counts?.currentWorkspaceMatched ?? null),
+  workspaceMismatches: counts?.currentWorkspaceRevision == null ? null : (counts?.workspaceMismatchAfterSourceQualification ?? null),
+  staleProjectionCandidates: counts?.currentWorkspaceRevision == null
+    ? null
+    : status === 'STALE_WORKSPACE_PROJECTION' ? (counts?.workspaceMismatchAfterSourceQualification ?? null) : 0,
   conflictingSourceRows: (counts?.mismatched ?? 0) + (counts?.missing ?? 0),
   sourceAuthority: {
     status: sourceOwner?.admission?.status ?? 'NOT_PROVEN',

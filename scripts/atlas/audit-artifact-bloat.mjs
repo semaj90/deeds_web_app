@@ -35,6 +35,7 @@ const OUT_JSON = path.join(REPORTS_DIR, 'artifact-bloat-report.json');
 const OUT_MD = path.join(REPORTS_DIR, 'artifact-bloat-report.md');
 const JSON_OUT = process.argv.includes('--json');
 const DRY_RUN = process.argv.includes('--dry-run');
+const STDOUT_REPORT = process.argv.includes('--stdout-report');
 const LARGE_BYTES = 10 * 1024 * 1024;
 const FILE_STAT_CONCURRENCY = 16;
 const SAMPLE_READ_CONCURRENCY = 16;
@@ -71,6 +72,9 @@ const KIND_ORDER = [
   'som_checkpoint',
   'report',
   'report_large',
+  'backup_artifact',
+  'database_backup',
+  'source_text',
   'evidence_run',
   'arrow_artifact',
   'tensor_bin',
@@ -84,7 +88,10 @@ function classifyKind(relPath, sizeBytes) {
   const ext = path.extname(lower);
 
   if (/\.tmp-\d+$/.test(lower)) return 'tmp_artifact';
-  if (ext === '.f32bin') return 'tensor_bin';
+  if (ext === '.f32bin' || ext === '.npy') return 'tensor_bin';
+  if (lower.endsWith('.onnx.data')) return 'model_binary';
+  if (ext === '.bak' || ext === '.backup') return 'backup_artifact';
+  if (ext === '.sql') return lower.includes('/backups/') ? 'database_backup' : 'source_text';
   if (lower.includes('/openspec-evidence/') && sizeBytes > LARGE_BYTES) return 'evidence_run';
   if (lower.includes('/docs/reports/') || lower.includes('/reports/')) return sizeBytes > LARGE_BYTES ? 'report_large' : 'report';
   if (lower.includes('checkpoint') || lower.includes('embeddinggemma') || lower.includes('model') && sizeBytes > 5 * 1024 * 1024) {
@@ -105,6 +112,8 @@ function recommendAction(kind, sizeBytes, relPath, duplicate = false) {
   if (duplicate) return 'ignore_generated';
   const lower = relPath.toLowerCase();
   const sizeMB = sizeBytes / 1048576;
+  if (kind === 'backup_artifact' || kind === 'database_backup') return 'review_backup_integrity';
+  if (kind === 'source_text') return 'keep_source';
   if (kind === 'report') return 'keep_canonical';
   if (kind === 'report_large') return 'review_large_report';
   if (kind === 'evidence_run') return 'dedupe_then_cold';
@@ -134,6 +143,8 @@ async function fileSha256(filePath) {
 }
 
 async function main() {
+  if (STDOUT_REPORT && !DRY_RUN) throw new Error('STDOUT_REPORT_REQUIRES_DRY_RUN');
+  if (STDOUT_REPORT && PERSIST_DRY_RUN_CACHE) throw new Error('STDOUT_REPORT_FORBIDS_CACHE_WRITE');
   const startedAt = new Date().toISOString();
   let fingerprintCache = emptyArtifactFingerprintCacheV1();
   if (FINGERPRINT_CACHE_PATH) {
@@ -310,7 +321,44 @@ async function main() {
     await rename(temporaryCachePath, FINGERPRINT_CACHE_PATH);
   }
   if (DRY_RUN) {
-    console.log(JSON.stringify(summary, null, 2));
+    if (STDOUT_REPORT) {
+      const artifactByPath = new Map(withHashes.map((item) => [item.relPath, item]));
+      const duplicateGroups = report.duplicateGroups.map((group) => {
+        const first = artifactByPath.get(group.paths[0]);
+        const perFile = first?.sizeBytes ?? 0;
+        return {
+          sha256: group.sha256,
+          fileCount: group.paths.length,
+          reclaimableBytes: String(BigInt(perFile) * BigInt(Math.max(0, group.paths.length - 1))),
+          samplePaths: group.paths.slice(0, 8),
+          omittedPathCount: Math.max(0, group.paths.length - 8),
+        };
+      }).sort((a, b) => BigInt(a.reclaimableBytes) === BigInt(b.reclaimableBytes)
+        ? b.fileCount - a.fileCount
+        : BigInt(a.reclaimableBytes) > BigInt(b.reclaimableBytes) ? -1 : 1).slice(0, 25);
+      console.log(JSON.stringify({
+        schema: 'atlas.artifact-bloat-dry-run.v1',
+        generatedAt: startedAt,
+        writesPerformed: false,
+        summary,
+        largeArtifactCandidates: withHashes
+          .filter((item) => item.sizeBytes >= LARGE_BYTES)
+          .sort((a, b) => b.sizeBytes - a.sizeBytes || a.relPath.localeCompare(b.relPath))
+          .slice(0, 25)
+          .map(({ relPath, sizeBytes, kind, sha256, duplicate, duplicateCheckStatus, recommendation }) => ({
+            path: relPath,
+            sizeBytes,
+            kind,
+            sha256,
+            duplicate,
+            duplicateCheckStatus,
+            recommendation,
+          })),
+        duplicateGroups,
+      }, null, 2));
+    } else {
+      console.log(JSON.stringify(summary, null, 2));
+    }
     return;
   }
   await mkdir(REPORTS_DIR, { recursive: true });

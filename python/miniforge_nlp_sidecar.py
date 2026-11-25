@@ -2879,13 +2879,16 @@ def _classify_domain_pass(
     text: str, *, encoder_profile: Optional[str] = None
 ) -> tuple[str, dict[str, Any], dict[str, Any], list[str]]:
     """Returns (backend, features_map, artifacts, warnings) for the classify AnalysisPassResult.
-    Supports isolated 'legacy-embeddinggemma-768' (checkpoint.joblib) and
-    'eg2-onnx-q8-mrl-768' (eg2-onnx-checkpoint.joblib via :8094 ONNX, zero Ollama)."""
-    use_eg2 = (encoder_profile or "").strip().lower() in {
-        "eg2-onnx-q8-mrl-768",
-        "eg2-onnx",
-        "embeddinggemma2-onnx",
-    }
+    Defaults to 'eg2-onnx-q8-mrl-768' (via :8094 ONNX, zero Ollama) when the EG2 ONNX
+    checkpoint is present; 'legacy-embeddinggemma-768' remains available explicitly as
+    the historical baseline."""
+    requested = (encoder_profile or "").strip().lower()
+    if requested in {"legacy-embeddinggemma-768", "legacy", "embeddinggemma"}:
+        use_eg2 = False
+    elif requested in {"eg2-onnx-q8-mrl-768", "eg2-onnx", "embeddinggemma2-onnx"}:
+        use_eg2 = True
+    else:
+        use_eg2 = EG2_ONNX_CLASSIFIER_CHECKPOINT_PATH.is_file()
     if use_eg2:
         checkpoint = _load_eg2_onnx_classifier_checkpoint()
         if checkpoint is None:
@@ -2971,6 +2974,11 @@ def _classify_domain_pass(
     else:
         backend = "unavailable"
 
+    # These estimators are uncalibrated shadow challengers. A label is usable as a
+    # consensus proposal only when both independent heads agree; preserve the
+    # historical LR-first label below for response compatibility.
+    consensus_label = nb_label if nb_label is not None and nb_label == lr_label else None
+    classification_bin = "CONSENSUS_PROPOSAL" if consensus_label is not None else "UNKNOWN"
     final_label = lr_label or nb_label
     # BEST-FIT-SCORE-SEMANTICS-02 (openspec/changes/parent-atlas-best-fit-score-fabric task 1.4):
     # these are real sklearn predict_proba() domain-class probabilities -- P(domain=label |
@@ -2988,6 +2996,9 @@ def _classify_domain_pass(
     }
     artifacts: dict[str, Any] = {
         "label": final_label,
+        "consensus_label": consensus_label,
+        "classification_bin": classification_bin,
+        "guess_authority": "SHADOW_ONLY_UNCALIBRATED",
         "naive_bayes_label": nb_label,
         "logistic_regression_label": lr_label,
         "naive_bayes_domain_probabilities": nb_probabilities,
@@ -2997,7 +3008,7 @@ def _classify_domain_pass(
         "embedModel": checkpoint.get("embed_model") or DOMAIN_CLASSIFIER_EMBED_MODEL,
         "checkpointBaselineOnly": active_profile == "legacy-embeddinggemma-768",
     }
-    warnings = [] if final_label else ["checkpoint present but produced no confident label"]
+    warnings = [] if consensus_label else ["classifier heads did not agree; consensus classification is UNKNOWN"]
     return backend, features_map, artifacts, warnings
 
 

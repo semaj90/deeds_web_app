@@ -10,10 +10,12 @@ CREATE TABLE IF NOT EXISTS "query_cache_metrics" (
 	"payload" jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 --> statement-breakpoint
-CREATE INDEX "idx_qcm_last_accessed" ON "query_cache_metrics" USING btree ("last_accessed");
+CREATE INDEX IF NOT EXISTS "idx_qcm_last_accessed" ON "query_cache_metrics" USING btree ("last_accessed");
 --> statement-breakpoint
-CREATE INDEX "idx_qcm_avg_latency" ON "query_cache_metrics" USING btree ("avg_latency_ms");
+CREATE INDEX IF NOT EXISTS "idx_qcm_avg_latency" ON "query_cache_metrics" USING btree ("avg_latency_ms");
 --> statement-breakpoint
-CREATE INDEX "idx_qcm_namespace" ON "query_cache_metrics" USING btree ("cache_namespace");
+CREATE INDEX IF NOT EXISTS "idx_qcm_namespace" ON "query_cache_metrics" USING btree ("cache_namespace");
 --> statement-breakpoint
-CREATE INDEX "idx_qcm_hit_source" ON "query_cache_metrics" USING btree ("cache_hit_source");
+CREATE INDEX IF NOT EXISTS "idx_qcm_hit_source" ON "query_cache_metrics" USING btree ("cache_hit_source");
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "idx_qcm_namespace_hit_source_accessed" ON "query_cache_metrics" USING btree ("cache_namespace", "cache_hit_source", "last_accessed" DESC);

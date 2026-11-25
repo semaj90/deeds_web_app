@@ -5,12 +5,15 @@
  * Run: powershell -Command '$env:PATH = "C:\libtorch-...\lib;" + $env:PATH; node test-addon.cjs'
  */
 
+const fs = require('fs');
 const path = require('path');
 const { strict: assert } = require('assert');
 
+const cudaAddonPath = path.join(__dirname, 'build-x64-cuda', 'Release', 'tensorrt_bridge.node');
+const legacyAddonPath = path.join(__dirname, 'build', 'Release', 'tensorrt_bridge.node');
 const addonPath = process.env.ATLAS_ADDON_PATH
   ? path.resolve(process.env.ATLAS_ADDON_PATH)
-  : path.join(__dirname, 'build', 'Release', 'tensorrt_bridge.node');
+  : (fs.existsSync(cudaAddonPath) ? cudaAddonPath : legacyAddonPath);
 const a = require(addonPath);
 
 let passed = 0;

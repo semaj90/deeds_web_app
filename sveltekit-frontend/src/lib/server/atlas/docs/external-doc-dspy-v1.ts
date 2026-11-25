@@ -3,6 +3,9 @@ import { resolve } from 'node:path';
 import { z } from 'zod';
 import { buildExternalDocContextManifestV1 } from './external-doc-context-manifest-v1.js';
 import type { ExternalDocCitationReadbackV1 } from './external-doc-citation-readback-v1.js';
+import type { ContextManifestTaskBindingV1Schema } from '../graph/context-manifest-v2.js';
+
+type DocumentationTaskBindingV1 = z.infer<typeof ContextManifestTaskBindingV1Schema>;
 
 const resultSchema = z.object({
   schema: z.literal('atlas.doc14-ace-dspy-predict-recommendation.v1'),
@@ -27,6 +30,7 @@ export async function recommendFromOfficialDocReadbackV1(input: {
   requestId: string;
   query: string;
   readback: ExternalDocCitationReadbackV1;
+  taskBinding?: DocumentationTaskBindingV1;
   python: string | undefined;
   llamaUrl: string | undefined;
   repoRoot: string;
@@ -63,6 +67,16 @@ export async function recommendFromOfficialDocReadbackV1(input: {
       child.stdin?.end(payload, 'utf8');
     });
     const output: unknown = JSON.parse(stdout);
+    const transportRefusal = z.object({
+      schema: z.literal('atlas.dspy-predict-ace-recommendation.v1'),
+      status: z.literal('ACE_VERIFIED_READBACK_TRANSPORT_NOT_CONFIGURED'),
+      requestedIdentityChecksum: z.literal(manifest.identityChecksum),
+      citationVerified: z.literal(false),
+      canonicalAuthority: z.literal(false),
+      writesPerformed: z.literal(false),
+    }).safeParse(output);
+    if (transportRefusal.success) return blocked(transportRefusal.data.status);
+
     const failure = z.object({ bridgeFailure: z.string().regex(/^[A-Za-z][A-Za-z0-9_]{0,63}$/) }).safeParse(output);
     if (failure.success) return blocked(`DOC14_DSPY_RUNTIME_${failure.data.bridgeFailure}`);
     const rejection = z.object({

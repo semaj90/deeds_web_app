@@ -1,0 +1,373 @@
+{
+  "schema": "parent-atlas.low-rank-helper-artifact.v1",
+  "artifactRevision": "sha256:b7017a1b301a393e85c2c635a3d23bab1a254cf9a1bba4b3f17526b56c41f97b",
+  "rank": 10,
+  "taskFactors": [
+    {
+      "taskFamily": "trace-retrieval",
+      "factors": [
+        0.902065,
+        0.057169,
+        -0.005921,
+        0.095637,
+        0.103876,
+        0.191854,
+        -0.169699,
+        -0.063301,
+        0.292032,
+        -0.090242
+      ]
+    },
+    {
+      "taskFamily": "graph-gpu-topology",
+      "factors": [
+        0.840428,
+        -0.09623,
+        -0.130751,
+        -0.1522,
+        0.278325,
+        -0.164027,
+        -0.121488,
+        -0.108093,
+        -0.283509,
+        0.181576
+      ]
+    },
+    {
+      "taskFamily": "mcp-agent-tool",
+      "factors": [
+        0.792669,
+        0.056428,
+        -0.132717,
+        0.544309,
+        0.107459,
+        -0.001181,
+        0.11485,
+        -0.047112,
+        -0.1625,
+        0.035216
+      ]
+    },
+    {
+      "taskFamily": "ontology-taxonomy",
+      "factors": [
+        0.821496,
+        -0.229891,
+        -0.048244,
+        -0.146634,
+        -0.124422,
+        0.053335,
+        0.447577,
+        -0.000215,
+        -0.018659,
+        -0.171655
+      ]
+    },
+    {
+      "taskFamily": "database-schema",
+      "factors": [
+        0.832038,
+        -0.120596,
+        -0.170694,
+        0.056603,
+        -0.421753,
+        0.038161,
+        -0.178297,
+        -0.173271,
+        -0.113468,
+        -0.082518
+      ]
+    },
+    {
+      "taskFamily": "legal-evidence",
+      "factors": [
+        0.800567,
+        0.304205,
+        0.070822,
+        -0.109566,
+        -0.153887,
+        0.090753,
+        0.079671,
+        -0.1422,
+        0.208725,
+        0.38403
+      ]
+    },
+    {
+      "taskFamily": "ui-component",
+      "factors": [
+        0.735045,
+        0.478807,
+        0.102291,
+        -0.154443,
+        -0.116602,
+        -0.419896,
+        0.06008,
+        0.040674,
+        0.013344,
+        -0.02802
+      ]
+    },
+    {
+      "taskFamily": "api-route",
+      "factors": [
+        0.700444,
+        0.413018,
+        0.175516,
+        -0.208293,
+        0.238587,
+        0.355445,
+        0.049047,
+        -0.159211,
+        -0.175,
+        -0.151526
+      ]
+    },
+    {
+      "taskFamily": "openspec-governance",
+      "factors": [
+        0.741589,
+        -0.380094,
+        0.53899,
+        -0.000708,
+        0.009911,
+        -0.08255,
+        -0.069725,
+        0.049104,
+        -0.014845,
+        0.025621
+      ]
+    },
+    {
+      "taskFamily": "test-audit-devtool",
+      "factors": [
+        0.93638,
+        0.095607,
+        0.235788,
+        0.021331,
+        0.049694,
+        0.194596,
+        -0.101553,
+        0.055974,
+        0.064872,
+        -0.002967
+      ]
+    }
+  ],
+  "helperFactors": [
+    {
+      "helperId": "atlas_context",
+      "factors": [
+        0.899728,
+        0.131893,
+        -0.104139,
+        0.285523,
+        0.132598,
+        0.143276,
+        0.003022,
+        0.167679,
+        0.054457,
+        -0.107351
+      ],
+      "successRate": 0.94,
+      "validationRate": 0.92,
+      "medianLatencyMs": 420.0,
+      "medianContextTokens": 1800
+    },
+    {
+      "helperId": "atlas_inspect",
+      "factors": [
+        0.805968,
+        -0.166892,
+        -0.155074,
+        -0.213989,
+        -0.176858,
+        0.179696,
+        0.194778,
+        0.369051,
+        -0.065512,
+        0.103563
+      ],
+      "successRate": 0.97,
+      "validationRate": 0.96,
+      "medianLatencyMs": 140.0,
+      "medianContextTokens": 600
+    },
+    {
+      "helperId": "atlas_expand",
+      "factors": [
+        0.842196,
+        -0.102382,
+        -0.227755,
+        -0.208942,
+        0.134912,
+        -0.087463,
+        -0.251165,
+        0.101611,
+        -0.274229,
+        0.10116
+      ],
+      "successRate": 0.93,
+      "validationRate": 0.91,
+      "medianLatencyMs": 260.0,
+      "medianContextTokens": 1100
+    },
+    {
+      "helperId": "codebase.context_for_file",
+      "factors": [
+        0.939752,
+        -0.133222,
+        0.00285,
+        -0.005769,
+        -0.047479,
+        0.092577,
+        0.079014,
+        0.275557,
+        -0.077961,
+        -0.000276
+      ],
+      "successRate": 0.98,
+      "validationRate": 0.95,
+      "medianLatencyMs": 45.0,
+      "medianContextTokens": 750
+    },
+    {
+      "helperId": "codebase.rg_search",
+      "factors": [
+        0.822776,
+        0.14216,
+        -0.13252,
+        0.49696,
+        0.04149,
+        -0.107307,
+        0.120925,
+        0.011415,
+        0.00426,
+        0.101446
+      ],
+      "successRate": 0.99,
+      "validationRate": 0.98,
+      "medianLatencyMs": 85.0,
+      "medianContextTokens": 900
+    },
+    {
+      "helperId": "trace.kag_search",
+      "factors": [
+        0.857557,
+        0.051922,
+        -0.179152,
+        -0.075227,
+        0.023784,
+        0.124198,
+        -0.300616,
+        0.202659,
+        0.265256,
+        0.079705
+      ],
+      "successRate": 0.92,
+      "validationRate": 0.9,
+      "medianLatencyMs": 520.0,
+      "medianContextTokens": 2200
+    },
+    {
+      "helperId": "atlas.embedding_neighbors",
+      "factors": [
+        0.822048,
+        -0.153827,
+        -0.201859,
+        -0.086138,
+        0.191425,
+        -0.258502,
+        -0.084893,
+        0.044679,
+        0.198008,
+        -0.317066
+      ],
+      "successRate": 0.95,
+      "validationRate": 0.94,
+      "medianLatencyMs": 190.0,
+      "medianContextTokens": 950
+    },
+    {
+      "helperId": "atlas.kanban_dag_prefill_recommendation",
+      "factors": [
+        0.783412,
+        -0.348141,
+        0.484903,
+        0.152076,
+        0.015934,
+        -0.059075,
+        -0.0323,
+        -0.036987,
+        0.004613,
+        0.02507
+      ],
+      "successRate": 0.96,
+      "validationRate": 0.97,
+      "medianLatencyMs": 110.0,
+      "medianContextTokens": 680
+    },
+    {
+      "helperId": "universal_directory_gpu_search",
+      "factors": [
+        0.749343,
+        -0.370797,
+        -0.222633,
+        -0.174736,
+        0.201202,
+        -0.054393,
+        0.195818,
+        -0.311617,
+        0.183666,
+        0.090955
+      ],
+      "successRate": 0.97,
+      "validationRate": 0.96,
+      "medianLatencyMs": 280.0,
+      "medianContextTokens": 850
+    },
+    {
+      "helperId": "inspect_postgres_backend",
+      "factors": [
+        0.824001,
+        -0.048261,
+        -0.090996,
+        0.024371,
+        -0.446913,
+        0.065078,
+        -0.164177,
+        -0.241785,
+        -0.08019,
+        -0.118354
+      ],
+      "successRate": 0.96,
+      "validationRate": 0.95,
+      "medianLatencyMs": 130.0,
+      "medianContextTokens": 700
+    },
+    {
+      "helperId": "svelte_runes_component_inspector",
+      "factors": [
+        0.851922,
+        0.411172,
+        0.13715,
+        -0.077622,
+        -0.051983,
+        -0.254562,
+        0.072692,
+        0.053317,
+        0.010551,
+        -0.067736
+      ],
+      "successRate": 0.94,
+      "validationRate": 0.93,
+      "medianLatencyMs": 175.0,
+      "medianContextTokens": 920
+    }
+  ],
+  "trainingReceiptRefs": [
+    "docs/reports/universal-repo-directory-cards-v1.json",
+    "docs/reports/eg2-obo-classifier-comparison-v1.json",
+    "docs/reports/production-readiness-fusion-recommendations-v1.json"
+  ]
+}

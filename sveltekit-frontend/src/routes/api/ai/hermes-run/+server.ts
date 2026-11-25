@@ -27,6 +27,7 @@ import { refuseVerifiedContextV1, type VerifiedContextServiceV1 } from '$lib/ser
 
 const requestSchema = z.object({
   query: z.string().min(1).max(4000),
+  workspaceId: z.string().uuid(),
   intent: z.enum(['analyze', 'search', 'plan', 'summarize', 'rank', 'auto']).optional(),
   fileContext: z.string().optional(),
   caseId: z.string().uuid().optional(),
@@ -40,11 +41,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   try {
     const body = await request.json();
-    const { query } = requestSchema.parse(body);
+    const { query, workspaceId } = requestSchema.parse(body);
     const requestId = globalThis.crypto.randomUUID();
     const verifiedContextService = (locals as typeof locals & { verifiedContextService?: VerifiedContextServiceV1 }).verifiedContextService;
     const context = verifiedContextService
-      ? await verifiedContextService.execute(locals.user.id, { requestId, query, topK: 5 })
+      ? await verifiedContextService.execute(locals.user.id, { requestId, query, workspaceId, topK: 5 })
       : refuseVerifiedContextV1(requestId, 'VERIFIED_CONTEXT_SERVICE_NOT_CONFIGURED', 'SERVICE_CONFIGURATION');
 
     if (context.status === 'REFUSED') {

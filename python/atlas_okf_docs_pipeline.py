@@ -45,6 +45,7 @@ from atlas_external_docs import (
     embed_llama_server_768,
     enforce_allowed_domain,
     fetch_beautifulsoup,
+    fetch_direct_markdown,
     fetch_firecrawl_v2,
     low_rank_sample_query_features,
     qdrant_points,
@@ -677,6 +678,8 @@ def _fetch_single(source: SourceConfig, url: str) -> PageArtifact:
         if not api_key:
             raise RuntimeError("FIRECRAWL_API_KEY_REQUIRED")
         fetched = fetch_firecrawl_v2(url, api_key=api_key)
+    elif source.default_fetcher == "DIRECT_MARKDOWN":
+        fetched = fetch_direct_markdown(url)
     else:
         fetched = fetch_beautifulsoup(url)
     enforce_allowed_domain(fetched.resolved_url, source.allowed_domains)

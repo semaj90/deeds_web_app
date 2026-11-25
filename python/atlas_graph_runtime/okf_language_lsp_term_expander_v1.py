@@ -224,3 +224,67 @@ def build_expanded_domain_and_language_obo_v1(
         "extensionCount": ext_count,
         "totalTerms": term_count,
     }
+
+
+def emit_codebase_semantic_terms_obo_v1(
+    proposal_path: Path | str = Path(".okf/ontologies/proposals/atlas-codebase-semantic-terms-v1.proposal.obo"),
+    out_path: Path | str = Path(".okf/ontologies/atlas-codebase-semantic-terms-v1.obo"),
+) -> dict[str, Any]:
+    """Validate and emit the companion codebase semantic-terms OBO without mutating the frozen domain OBO."""
+    import hashlib
+
+    src = Path(proposal_path)
+    raw = src.read_text(encoding="utf-8")
+    term_ids: list[str] = []
+    rel_targets: list[str] = []
+    typedef_count = 0
+    in_term = False
+    out_lines: list[str] = []
+
+    for line in raw.splitlines():
+        stripped = line.strip()
+        if stripped == "[Term]":
+            in_term = True
+        elif stripped == "[Typedef]":
+            in_term = False
+            typedef_count += 1
+        elif stripped.startswith("id:") and in_term:
+            tid = stripped.split("id:", 1)[1].strip()
+            if tid in term_ids:
+                raise ValueError(f"DUPLICATE_OBO_TERM_ID:{tid}")
+            term_ids.append(tid)
+        elif stripped.startswith("relationship:") and in_term:
+            parts = stripped.split()
+            if len(parts) >= 3:
+                rel_targets.append(parts[2])
+
+        if stripped.startswith("ontology:"):
+            out_lines.append("ontology: atlas-codebase-semantic-terms-v1")
+        elif stripped.startswith("remark:"):
+            out_lines.append(
+                "remark: Companion OBO emitted by okf_language_lsp_term_expander_v1.py from proposal; "
+                "canonical_authority=false. Does not alter atlas-domain-and-language-terms-v1.obo."
+            )
+        else:
+            out_lines.append(line)
+
+    term_id_set = set(term_ids)
+    missing_targets = sorted({t for t in rel_targets if t not in term_id_set})
+    if missing_targets:
+        raise ValueError(f"DANGLING_OBO_RELATIONSHIP_TARGETS:{','.join(missing_targets)}")
+
+    rendered = "\n".join(out_lines) + "\n"
+    dest = Path(out_path)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_text(rendered, encoding="utf-8")
+    digest = hashlib.sha256(rendered.encode("utf-8")).hexdigest()
+    return {
+        "schema": "atlas.okf-semantic-terms-obo-receipt.v1",
+        "canonicalAuthority": False,
+        "writesPerformed": True,
+        "sourceProposal": str(src),
+        "outPath": str(dest),
+        "typedefCount": typedef_count,
+        "termCount": len(term_ids),
+        "sha256": f"sha256:{digest}",
+    }

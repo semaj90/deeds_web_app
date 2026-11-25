@@ -83,8 +83,8 @@ def main() -> int:
         and str(p.relative_to(REPO_ROOT / "sveltekit-frontend")).replace("\\", "/") not in eg2_routes
     )[args.offset : args.offset + args.limit]
 
-    onnx_client = Eg2OnnxClientV1()
-    points: list[dict] = []
+    onnx_client = Eg2OnnxClientV1(timeout_seconds=60.0)
+    prepared: list[tuple[str, str, str]] = []
     for rel in missing:
         full = REPO_ROOT / "sveltekit-frontend" / rel
         raw_bytes = full.read_bytes()
@@ -95,24 +95,31 @@ def main() -> int:
         chunks = chunk_text_by_tokens(f"// route: {rel}\n{text}", max_tokens=256, overlap_tokens=32, max_chunks=1)
         if not chunks:
             continue
-        emb = onnx_client.embed(chunks, dim=768, task_prompt_name="CodeRetrieval")
-        pt_id = str(uuid.uuid5(uuid.NAMESPACE_URL, f"eg2-route:{rel}:{src_rev}"))
-        points.append(
-            {
-                "id": pt_id,
-                "vector": emb.vectors[0],
-                "payload": {
-                    "source_ref": f"sveltekit-frontend/{rel}",
-                    "relative_path": rel,
-                    "source_revision": src_rev,
-                    "route_kind": Path(rel).name,
-                    "encoder_profile": "eg2-onnx-q8-mrl-768",
-                    "model_id": emb.model_id,
-                    "provisional_domain_class": "frontend.sveltekit" if rel.endswith(".svelte") else "api",
-                    "canonical_authority": False,
-                },
-            }
-        )
+        prepared.append((rel, src_rev, chunks[0]))
+
+    points: list[dict] = []
+    embed_batch_size = 16
+    for i in range(0, len(prepared), embed_batch_size):
+        batch = prepared[i : i + embed_batch_size]
+        emb = onnx_client.embed([b[2] for b in batch], dim=768, task_prompt_name="CodeRetrieval")
+        for (rel, src_rev, _), vec in zip(batch, emb.vectors):
+            pt_id = str(uuid.uuid5(uuid.NAMESPACE_URL, f"eg2-route:{rel}:{src_rev}"))
+            points.append(
+                {
+                    "id": pt_id,
+                    "vector": vec,
+                    "payload": {
+                        "source_ref": f"sveltekit-frontend/{rel}",
+                        "relative_path": rel,
+                        "source_revision": src_rev,
+                        "route_kind": Path(rel).name,
+                        "encoder_profile": "eg2-onnx-q8-mrl-768",
+                        "model_id": emb.model_id,
+                        "provisional_domain_class": "frontend.sveltekit" if rel.endswith(".svelte") else "api",
+                        "canonical_authority": False,
+                    },
+                }
+            )
 
     _qdrant_json("PUT", f"/collections/{COLLECTION}/points?wait=true", {"points": points})
     info = _qdrant_json("GET", f"/collections/{COLLECTION}")["result"]

@@ -1,0 +1,210 @@
+{
+  "schema": "atlas.domain-crosswalk-unresolved-review.v1",
+  "generatedAt": "2026-11-25T05:04:37.193Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "unresolvedCount": 40,
+  "totalUnresolvedRows": 176798,
+  "rows": [
+    {
+      "source_vocab": "codebase_chunk_index.domain",
+      "source_value": "backend",
+      "source_row_count": 63394
+    },
+    {
+      "source_vocab": "codebase_chunk_index.domain",
+      "source_value": "infrastructure",
+      "source_row_count": 37185
+    },
+    {
+      "source_vocab": "codebase_chunk_index.domain",
+      "source_value": "utility",
+      "source_row_count": 32245
+    },
+    {
+      "source_vocab": "codebase_chunk_index.domain",
+      "source_value": "",
+      "source_row_count": 6800
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "documentation",
+      "source_row_count": 6782
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "Other",
+      "source_row_count": 5441
+    },
+    {
+      "source_vocab": "codebase_chunk_index.domain",
+      "source_value": "agent",
+      "source_row_count": 5241
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "UI",
+      "source_row_count": 4365
+    },
+    {
+      "source_vocab": "codebase_chunk_index.domain",
+      "source_value": "documentation",
+      "source_row_count": 4189
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "tool",
+      "source_row_count": 3695
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "rag_retrieval",
+      "source_row_count": 1805
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "agent",
+      "source_row_count": 1536
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "backend",
+      "source_row_count": 1495
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "Utility",
+      "source_row_count": 525
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "agent_orchestration",
+      "source_row_count": 406
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "evidence_upload_storage",
+      "source_row_count": 236
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "Library",
+      "source_row_count": 221
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "case_management",
+      "source_row_count": 180
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "infrastructure",
+      "source_row_count": 138
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "graph_topology",
+      "source_row_count": 112
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "cache_layer",
+      "source_row_count": 106
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "repair_workflow",
+      "source_row_count": 100
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "embedding_indexing",
+      "source_row_count": 81
+    },
+    {
+      "source_vocab": "codebase_chunk_index.domain",
+      "source_value": "mcp",
+      "source_row_count": 68
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "mcp_agents",
+      "source_row_count": 61
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "document_processing",
+      "source_row_count": 57
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "Authentication",
+      "source_row_count": 52
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "citation_engine",
+      "source_row_count": 52
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "auth_login_register",
+      "source_row_count": 49
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "cluster_analysis",
+      "source_row_count": 42
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "legal_reports",
+      "source_row_count": 34
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "memory_optimization",
+      "source_row_count": 28
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "Classification failed",
+      "source_row_count": 21
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "Embedding",
+      "source_row_count": 16
+    },
+    {
+      "source_vocab": "codebase_chunk_index.domain",
+      "source_value": "embedding",
+      "source_row_count": 13
+    },
+    {
+      "source_vocab": "codebase_chunk_index.domain",
+      "source_value": "infra",
+      "source_row_count": 9
+    },
+    {
+      "source_vocab": "codebase_chunk_index.domain",
+      "source_value": "legal",
+      "source_row_count": 8
+    },
+    {
+      "source_vocab": "feature_domain.domain_class",
+      "source_value": "trace_mcp",
+      "source_row_count": 6
+    },
+    {
+      "source_vocab": "codebase_chunk_index.domain",
+      "source_value": "state",
+      "source_row_count": 2
+    },
+    {
+      "source_vocab": "codebase_chunk_index.domain",
+      "source_value": "ui",
+      "source_row_count": 2
+    }
+  ]
+}

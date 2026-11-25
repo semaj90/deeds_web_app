@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { canonicalErrorJoinKeyV1 } from '../../../features/ai/ace/error-fingerprint.js';
 import { buildLearningOutcomeV1, type LearningOutcomeV1, type TaskEpisodeIdentityV1 } from './learning-outcome-v1.js';
 
 /**
@@ -49,6 +50,10 @@ export function repairErrorFingerprintV1(e: { file: string; code: string | numbe
   const file = e.file.replaceAll('\\', '/').replace(/^\.\//, '');
   const message = e.message.replace(/\s+/g, ' ').trim();
   return `tsfp:${sha({ file, code: String(e.code), message }).slice(0, 32)}`;
+}
+
+export function repairCanonicalErrorKeyV1(e: { file: string; code?: string | number; message: string }): string {
+  return canonicalErrorJoinKeyV1({ file: e.file, code: e.code, message: e.message });
 }
 
 export function verifyRepairEpisodeV1(input: { before: RepairEvidenceSnapshotV1; after: RepairEvidenceSnapshotV1; targetFingerprints: string[] }): RepairVerificationV1 {

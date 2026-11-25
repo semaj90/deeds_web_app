@@ -1,0 +1,80 @@
+{
+  "schema": "atlas.eg2-onnx-encoder-inspection.v1",
+  "modelDir": "models/embeddinggemma2/onnx-q8",
+  "providers": [
+    "CPUExecutionProvider"
+  ],
+  "artifacts": {
+    "model_quantized.onnx": {
+      "present": true,
+      "bytes": 495165,
+      "sha256": "sha256:d06edd601f851c633a2519304cbeb8dc6170d7ceb61b436625c17fb9b6e74953",
+      "externalDataPresent": true,
+      "externalDataBytes": 313724928,
+      "externalDataSha256": "sha256:278a7ff1248c3618e4bd11a607fc54f7bdc7778854230f3956d3f86bd9db4f3b"
+    },
+    "vision_encoder_quantized.onnx": {
+      "present": true,
+      "bytes": 162495,
+      "sha256": "sha256:bb0de2df53a2448a32dc7908a187c168c8afd514d4d6f674f7f46024875fa4e3",
+      "externalDataPresent": true,
+      "externalDataBytes": 195228672,
+      "externalDataSha256": "sha256:3dabd69c0a36e9a8771ad82030dde74daa5a0e02b7047a5d3f3382b1137bab89"
+    },
+    "audio_encoder_quantized.onnx": {
+      "present": true,
+      "bytes": 249330,
+      "sha256": "sha256:04a9a9094ba76fb169e4c69be45a4b621580188654d6be59eab860eadcd42d3c",
+      "externalDataPresent": true,
+      "externalDataBytes": 340058624,
+      "externalDataSha256": "sha256:aa6361d898e1f1d6303f8dd2b5fabf4fd3629e15fd709e9cb06ac5cb9416a030"
+    }
+  },
+  "sequenceLengthBenchmarks": [
+    {
+      "seqLen": 512,
+      "ok": true,
+      "dim": 768,
+      "finite": true,
+      "l2Norm": 1.0,
+      "elapsedMs": 1249.47,
+      "error": null
+    },
+    {
+      "seqLen": 1024,
+      "ok": true,
+      "dim": 768,
+      "finite": true,
+      "l2Norm": 1.0,
+      "elapsedMs": 2876.85,
+      "error": null
+    },
+    {
+      "seqLen": 2048,
+      "ok": true,
+      "dim": 768,
+      "finite": true,
+      "l2Norm": 1.0,
+      "elapsedMs": 5529.64,
+      "error": null
+    },
+    {
+      "seqLen": 4096,
+      "ok": true,
+      "dim": 768,
+      "finite": true,
+      "l2Norm": 1.0,
+      "elapsedMs": 18323.43,
+      "error": null
+    },
+    {
+      "seqLen": 8192,
+      "ok": true,
+      "dim": 768,
+      "finite": true,
+      "l2Norm": 1.0,
+      "elapsedMs": 77943.39,
+      "error": null
+    }
+  ]
+}

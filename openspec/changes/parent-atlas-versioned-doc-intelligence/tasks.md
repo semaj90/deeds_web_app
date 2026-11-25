@@ -697,6 +697,19 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   is reported as `NOT_OBSERVED` rather than fabricated. Keep the gate open for broader live
   ambiguity coverage and downstream index admission.
 
+  **Documentation repair pilot (2026-11-24):** Captured one official PostgreSQL 18 text search
+  page and five Markdown pages from the SvelteKit 2.59.1 release commit using the existing .okf
+  acquisition pipeline. Independent local readback matched all 114 chunk spans and the ten requested
+  PostgreSQL signature spans. The admission planner matched the PostgreSQL page bytes and 14 chunks,
+  then classified the page as `MISSING` in PostgreSQL with zero writer calls. The 8095 AST and ast-grep
+  stages ran on ten selected working-tree files with per-file digests. Individual comparison
+  disagreements are retained in their receipts. The admin runtime-error export uses the existing
+  diagnostic ranking at limits 10, 100, and 1,000. A read-only database probe preserved order across
+  all three limits. A separate live pgvector corpus replay reached ACE using already admitted
+  documentation. The new error-to-citation path remains blocked on canonical documentation admission
+  and current diagnostic source and task binding. Pilot receipt:
+  `.tmp/atlas/doc-repair-pilot-v1/pilot-review.json`.
+
   **DOC-13 status decomposition (ledger-only, 2026-09-23 audit; verdict `MULTIPLE_GATES_COLLAPSED_INTO_ONE_TASK`; acceptance
   semantics unchanged, checkbox stays open; artifacts below re-verified present).** Only the DOC-13 bullet itself (up to the
   "DOC-10/DOC-12 root cause found" paragraph) is DOC-13; the long DOC-10/DOC-12 notes that follow (before Phase E) are separate history, not DOC-13 work.

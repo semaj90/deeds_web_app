@@ -23,8 +23,9 @@ CREATE TABLE IF NOT EXISTS semantic_top_k (
 -- Indexes for retrieval queries
 CREATE INDEX IF NOT EXISTS idx_semantic_top_k_query_id ON semantic_top_k(query_id);
 CREATE INDEX IF NOT EXISTS idx_semantic_top_k_packet_key ON semantic_top_k(packet_key);
-CREATE INDEX IF NOT EXISTS idx_semantic_top_k_score DESC ON semantic_top_k(rerank_score DESC);
-CREATE INDEX IF NOT EXISTS idx_semantic_top_k_created_at DESC ON semantic_top_k(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_semantic_top_k_score ON semantic_top_k(rerank_score DESC);
+CREATE INDEX IF NOT EXISTS idx_semantic_top_k_created_at ON semantic_top_k(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_semantic_top_k_query_rank_score ON semantic_top_k(query_id, reranked_rank ASC, rerank_score DESC);
 
 -- GIN index for component_scores filtering (e.g., "semantic > 0.8")
 CREATE INDEX IF NOT EXISTS idx_semantic_top_k_component_scores ON semantic_top_k USING GIN (component_scores);
@@ -52,8 +53,9 @@ CREATE TABLE IF NOT EXISTS retrieval_decision_log (
 -- Indexes for analytics & monitoring
 CREATE INDEX IF NOT EXISTS idx_retrieval_decision_log_query_id ON retrieval_decision_log(query_id);
 CREATE INDEX IF NOT EXISTS idx_retrieval_decision_log_decision_type ON retrieval_decision_log(decision_type);
-CREATE INDEX IF NOT EXISTS idx_retrieval_decision_log_created_at DESC ON retrieval_decision_log(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_retrieval_decision_log_confidence DESC ON retrieval_decision_log(confidence DESC);
+CREATE INDEX IF NOT EXISTS idx_retrieval_decision_log_created_at ON retrieval_decision_log(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_retrieval_decision_log_confidence ON retrieval_decision_log(confidence DESC);
+CREATE INDEX IF NOT EXISTS idx_retrieval_decision_log_type_created_conf ON retrieval_decision_log(decision_type, created_at DESC, confidence DESC);
 
 -- v_packet_topology_scores: Materialized view for PageRank-based topology scoring
 -- Fallback source when Neo4j unavailable, computed from Postgres graph data

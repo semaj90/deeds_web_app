@@ -27,6 +27,7 @@ import { findRepoRoot, searchDocCorpus } from '$lib/server/atlas/docs/doc-intell
 import { readVerifiedCanonicalDocChunksV1 } from '$lib/server/atlas/docs/external-doc-citation-readback-v1.js';
 import { buildExternalDocContextManifestV1 } from '$lib/server/atlas/docs/external-doc-context-manifest-v1.js';
 import { recommendFromOfficialDocReadbackV1 } from '$lib/server/atlas/docs/external-doc-dspy-v1.js';
+import { readOpenSpecTaskReceiptView } from '$lib/server/atlas/openspec-board/task-receipt-view-v1.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
 
 const a2aAdmittedDocContextRequestSchema = z.object({
@@ -35,7 +36,11 @@ const a2aAdmittedDocContextRequestSchema = z.object({
   productVersion: z.string().min(1).max(100).optional(),
   limit: z.number().int().min(1).max(10).default(5),
   recommend: z.boolean().default(false),
-  canonicalOfficialOnly: z.boolean().default(true)
+  canonicalOfficialOnly: z.boolean().default(true),
+  taskRef: z.object({
+    logicalTaskKey: z.string().min(1).max(512),
+    taskRevision: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+  }).strict(),
 }).strict();
 import { getRedis }       from '$lib/server/redis.js';
 import { recordSearchQuery, type HitPipeline } from '$lib/server/features/observability/index.js';
@@ -244,6 +249,25 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
         { status: 400 },
       );
     }
+    const taskLookup = await readOpenSpecTaskReceiptView(parsed.data.taskRef.logicalTaskKey);
+    if (taskLookup.status !== 'FOUND' || taskLookup.task.checkboxState !== 'Open'
+      || taskLookup.task.key !== parsed.data.taskRef.logicalTaskKey
+      || taskLookup.task.revision !== parsed.data.taskRef.taskRevision
+      || !taskLookup.identity.logicalTaskKey
+      || taskLookup.identity.logicalTaskKey !== parsed.data.taskRef.logicalTaskKey) {
+      return json({
+        jsonrpc: '2.0', id: task.id,
+        error: { code: -32009, message: 'Open workboard task reference is missing, stale, or not open' },
+      }, { status: 409 });
+    }
+    const taskBinding = {
+      schema: 'atlas.documentation-task-binding.v1' as const,
+      logicalTaskKey: taskLookup.identity.logicalTaskKey,
+      taskRevision: taskLookup.task.revision,
+      sourceRef: taskLookup.task.sourceRef,
+      sourceFileSha256: taskLookup.identity.sourceFileSha256,
+      workboardSnapshotSha256: taskLookup.identity.workboardSnapshotSha256,
+    };
     const docResult = await searchDocCorpus({
       pool,
       root: process.cwd(),
@@ -259,6 +283,7 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
       query: parsed.data.query,
       tokenBudget: 2048,
       readback: citationReadback,
+      taskBinding,
     });
     const citations = contextManifest ? citationReadback.citations : [];
     const recommendation = parsed.data.recommend
@@ -266,6 +291,7 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
           requestId: task.id,
           query: parsed.data.query,
           readback: citationReadback,
+          taskBinding,
           python: ENV.PYTHON_PATH,
           llamaUrl: ENV.LLAMA_SERVER_URL,
           repoRoot: findRepoRoot(),

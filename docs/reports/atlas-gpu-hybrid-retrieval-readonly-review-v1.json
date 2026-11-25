@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.gpu-hybrid-retrieval-readonly-review.v1",
+  "gitRevision": "b7fc1b73c10",
+  "status": "PARTIAL",
+  "scope": "Local code inspection, CPU oracle fixture and loopback HTTP checks.",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "cpuOracle": {
+    "status": "PASS",
+    "command": "C:\\Python313\\python.exe -B -",
+    "stdin": [
+      "from python.atlas_graph_runtime.contracts import TypedGraphEdge",
+      "from python.atlas_graph_runtime.networkx_executor import run_topological_order",
+      "a = TypedGraphEdge(1, 2, \"IMPORTS\")",
+      "b = TypedGraphEdge(2, 1, \"IMPORTS\")",
+      "order, _ = run_topological_order(graph_revision=\"fixture\", node_ordinals=[2,1], edges=[a])",
+      "assert order == (1, 2)",
+      "try:",
+      "    run_topological_order(graph_revision=\"fixture\", node_ordinals=[1,2], edges=[a,b])",
+      "except ValueError as e:",
+      "    assert str(e) == \"ATLAS_TOPOLOGICAL_GRAPH_CYCLIC\"",
+      "    print(\"PASS order=(1, 2); rejected=ATLAS_TOPOLOGICAL_GRAPH_CYCLIC\")",
+      "else:",
+      "    raise AssertionError(\"cycle accepted\")"
+    ],
+    "observedOutput": "PASS order=(1, 2); rejected=ATLAS_TOPOLOGICAL_GRAPH_CYCLIC"
+  },
+  "liveHttp": {
+    "commandTemplate": "Invoke-WebRequest -Uri $uri -TimeoutSec 3 -SkipHttpErrorCheck",
+    "uris": [
+      "http://127.0.0.1:8098/health",
+      "http://127.0.0.1:8098/v1/graph/capabilities",
+      "http://127.0.0.1:8098/v1/capabilities",
+      "http://127.0.0.1:8100/health",
+      "http://127.0.0.1:6333/"
+    ],
+    "observedOutputForEach": "The request was canceled due to the configured HttpClient.Timeout of 3 seconds elapsing."
+  },
+  "firstLiveGate": "Establish a revision-qualified CPU retrieval and ACE citation baseline before GPU dispatch or fusion tuning.",
+  "existingGpuOrdinalProofOwner": "scripts/atlas/prove-8098-candidate-ordinal-roundtrip-v1.mjs"
+}

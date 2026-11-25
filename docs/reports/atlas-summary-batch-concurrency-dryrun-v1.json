@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.summary-batch-concurrency-dryrun.v1",
+  "status": "PLAN_ONLY_READONLY_PASS",
+  "generatedAt": "2026-11-24",
+  "scope": {
+    "limit": 50,
+    "batchSize": 10,
+    "requestedWorkers": 4,
+    "databaseSelection": "atlas_packets rows with missing summaries, ordered by domain/path/packet key"
+  },
+  "observed": {
+    "eligiblePackets": 50,
+    "plannedJobs": 5,
+    "cpuCoresReported": 16,
+    "llamaSlotsProbed": false,
+    "gemmaRequests": 0,
+    "valkeyConnectionsOrRequests": 0,
+    "databaseWrites": 0,
+    "gpuJobs": 0,
+    "exitCode": 0,
+    "defaultWithoutApplyProbe": {
+      "arguments": ["--limit=3", "--batch-size=2", "--concurrency=4"],
+      "eligiblePackets": 3,
+      "plannedJobs": 2,
+      "dryRun": true,
+      "exitCode": 0
+    }
+  },
+  "implementation": {
+    "file": "scripts/atlas/summarize-indexed-packets-dual-llm.mjs",
+    "change": "Persistence now requires --apply (the existing package apply command already supplies it). No --apply, or an explicit --dry-run, exits after the read-only cohort and job plan. Planning does not probe model slots, connect to Valkey, send text to Gemma, write summaries, or queue GPU jobs.",
+    "liveConcurrency": "The existing shared-queue worker pool remains bounded by the resolved llama-server slot count plus one, with a hard maximum of eight workers. Live summarization still requires the explicit --apply flag; no live summarization workers were started."
+  },
+  "limitations": [
+    "The observed worker count is a planned concurrency setting, not a throughput benchmark.",
+    "The 5,000-row feature matrix remains provenance-blocked and has sparse GA plus empty age/hit signals; CPU threading that trivial five-scalar-per-row calculation would not address those missing inputs.",
+    "The stale native addon was not rebuilt; build artifacts and disk headroom were not modified."
+  ],
+  "writesPerformed": {
+    "postgres": false,
+    "valkey": false,
+    "qdrant": false,
+    "gpuQueue": false
+  },
+  "nextGate": "Authorize a bounded summary persistence run only after packet identity/provenance and destination write policy are reviewed; measure throughput and failure/retry behavior before increasing concurrency."
+}

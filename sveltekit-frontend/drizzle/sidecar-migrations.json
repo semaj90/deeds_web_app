@@ -2,6 +2,62 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "0048_query_cache_metrics.sql",
+      "status": "applied",
+      "reason": "Creates query_cache_metrics + composite index (cache_namespace, cache_hit_source, last_accessed DESC)",
+      "appliedBy": "manual-pg-tx",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0110_dispatcher_audit_log.sql",
+      "status": "applied",
+      "reason": "Creates dispatcher_audit_log + composite indexes (created_at/status, packet_key/status/created_at, identity_lane/dispatch_decision/created_at)",
+      "appliedBy": "manual-pg-tx",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0113_packet_jepa_metrics.sql",
+      "status": "applied",
+      "reason": "Adds Packet-JEPA columns and indexes to atlas_packet_metrics",
+      "appliedBy": "manual-pg-tx",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0150_unified_cross_ranker.sql",
+      "status": "applied",
+      "reason": "Creates semantic_top_k, retrieval_decision_log, v_packet_topology_scores + composite indexes",
+      "appliedBy": "manual-pg-tx",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0151_feature_label_mutation_audit.sql",
+      "status": "applied",
+      "reason": "Creates atlas_feature_label_audit + composite index (feature_id, mutation_type, repair_date DESC)",
+      "appliedBy": "manual-pg-tx",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0152_atlas_representations_registry.sql",
+      "status": "applied",
+      "reason": "Canonical bounded schema for public.atlas_representations (23 columns verified live in legal_ai_db)",
+      "appliedBy": "manual-psql",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0152_atlas_representations_registry_revised.sql",
+      "status": "superseded",
+      "reason": "Alternate revised draft not applied to live public.atlas_representations; 0152_atlas_representations_registry.sql matches live 23-column table",
+      "appliedBy": "none",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "0154_atlas_packet_features_ast_provenance_columns.sql",
+      "status": "applied",
+      "reason": "Additive nullable/defaulted AST provenance columns on atlas_packet_features (source_ref, ast_coverage, ast_language, ast_extraction_method, ast_hash). Verified all 5 columns present in live legal_ai_db.",
+      "appliedBy": "verified live in legal_ai_db 2026-11-24 (sha256 87ed80ec41b11a0063953db5a260d5d55bdf519652df143c237abf99d1272312)",
+      "requiresJournalEntry": false
+    },
+    {
       "file": "manual/20261115_evidence_video_metadata_columns_v1.sql",
       "status": "applied",
       "reason": "Adds nullable video_codec, audio_codec, duration_seconds and frame_count to evidence. Additive; no rows rewritten or backfilled. Writer and backfill are separate steps.",
@@ -437,7 +493,7 @@
     {
       "file": "0013_codeintel_indexes.sql",
       "status": "manual_sidecar",
-      "reason": "Code-intelligence GIN/trgm and B-tree indexes. Drizzle ORM cannot express GIN trgm ops (USING gin(col gin_trgm_ops)) natively — must live outside the journal.",
+      "reason": "Code-intelligence GIN/trgm and B-tree indexes. Drizzle ORM cannot express GIN trgm ops (USING gin(col gin_trgm_ops)) natively \u2014 must live outside the journal.",
       "appliedBy": "operator",
       "appliedAt": "2026-05-10",
       "requiresJournalEntry": false,
@@ -1381,6 +1437,13 @@
       "status": "applied",
       "reason": "Three read-path indexes for GET /api/video/analysis: whisper_segments(evidence_id,start_ms), whisper_segments(transcript_id,segment_index), audio_transcripts(evidence_id). Live tables had only primary keys. Not applied; live run should use CREATE INDEX CONCURRENTLY outside a transaction after approval.",
       "appliedBy": "applied 2026-11-16 to legal_ai_db (operator-approved in chat). CREATE INDEX CONCURRENTLY, one statement per command outside a transaction. Pre-check: none existed. Readback: 3 indexes, indisvalid=t, definitions match the file. Live route re-read: real video still returns 200 with 90 transcript segments.",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261124_atlas_actor_workspace_source_grants_v1.sql",
+      "status": "proposal_only",
+      "reason": "Explicit user/workspace/repository/workspace-revision/source-reference grant ledger and lookup indexes. An admin-only issuer/revoker route now exists but has not been verified against this schema. Not applied; keep verified-context runtime fail-closed until review, disposable rehearsal, route verification, and independent readback are complete.",
+      "appliedBy": "none",
       "requiresJournalEntry": false
     }
   ]

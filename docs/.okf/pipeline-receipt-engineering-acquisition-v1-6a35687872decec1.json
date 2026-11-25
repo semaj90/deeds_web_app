@@ -1,0 +1,55 @@
+{
+  "canonical_authority": false,
+  "chunk_count": 14,
+  "embedding_performed": false,
+  "external_projection_writes": false,
+  "local_artifacts_written": true,
+  "manifest_revision": "engineering-acquisition-v1-6a35687872decec1",
+  "page_count": 1,
+  "producer_revision": "build-engineering-acquisition-manifest-v1",
+  "qdrant": {
+    "write": false
+  },
+  "receipt_checksum": "51800b62c23218510ada2c551334e53868e0f56eb19f7578acdf9c77bdb34875",
+  "schema": "atlas.okf-docs-pipeline-receipt.v1",
+  "source_receipts": [
+    {
+      "api_document_fact_blocked_count": 0,
+      "api_document_fact_pending_count": 11,
+      "api_document_fact_record_count": 11,
+      "api_document_facts_checksum": "4947c3a5c575d1130f56ffc90a162ea77cc3fb4487eae1e7b0a98098212bb278",
+      "api_document_facts_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2-sigfix\\postgresql-18-fts-functions\\api-document-facts.jsonl",
+      "chunks": 14,
+      "chunks_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2-sigfix\\postgresql-18-fts-functions\\chunks.jsonl",
+      "page_receipt_checksum": "9fb9e5909f9ff46bb20c339dca7584144b96f9c401a78ac48f9b233ccf5d9a61",
+      "pages": 1,
+      "relation_candidate_bound_count": 0,
+      "relation_candidate_count": 0,
+      "relation_candidate_publication": {
+        "byteLength": 0,
+        "canonicalAuthority": false,
+        "failedCount": 0,
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2-sigfix\\postgresql-18-fts-functions\\relation-candidates.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "validatedCount": 0,
+        "writesPerformed": true
+      },
+      "relation_candidate_rejected_count": 0,
+      "relation_candidate_unbound_count": 0,
+      "relation_candidates_checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "relation_candidates_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2-sigfix\\postgresql-18-fts-functions\\relation-candidates.jsonl",
+      "relation_oak_review_admission_count": 0,
+      "relation_oak_review_checksum": null,
+      "relation_oak_review_count": 0,
+      "relation_oak_review_path": null,
+      "relation_proposal_bridge_blocked_count": 0,
+      "relation_proposal_bridged_count": 0,
+      "source_id": "postgresql-18-fts-functions",
+      "source_namespace": null
+    }
+  ],
+  "source_snapshot_revision": "atlas-library-docs-source-manifest-fts-svelte-v1-2026-11-24",
+  "status": "ACQUISITION_ONLY",
+  "workspace_revision": "UNBOUND_EXTERNAL_SOURCE_CATALOG",
+  "writes_performed": true
+}

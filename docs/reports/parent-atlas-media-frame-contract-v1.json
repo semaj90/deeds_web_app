@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.media-frame-contract-implementation-report.v1",
+  "status": "CONTRACT_IMPLEMENTED_INTEGRATION_OPEN",
+  "writesPerformed": false,
+  "implementation": {
+    "descriptor": "atlas.video-frame-descriptor.v1",
+    "wireBytes": 64,
+    "endianness": "little",
+    "formats": ["GRAY8", "RGB8", "RGBA8", "NV12"],
+    "validation": ["dimensions", "stride", "planes", "exact-buffer-length", "arena-bounds", "flags", "reserved-versioned-wire-fields"],
+    "resolutionPolicy": "atlas.video-resolution-policy.v1",
+    "integratedWithDecoder": false,
+    "integratedWithViewer": false
+  },
+  "verification": {
+    "typescriptFocusedTests": "5/5 passed",
+    "cppAbiCompile": "passed with MSVC 2022 x64 cl /std:c++17 /Zs /TP",
+    "gitDiffCheck": "passed"
+  },
+  "remaining": [
+    "Compile the C++ layout assertions in a configured MSVC or LLVM toolchain.",
+    "Add a producer/consumer parity test for serialized descriptors.",
+    "Integrate bounded frame extraction, object-crop, texture upload, and Three.js/WebGPU consumers.",
+    "Prove the full upload-to-authorized-viewer path before updating media OpenSpec task status."
+  ],
+  "patchTargets": [
+    "sveltekit-frontend/src/lib/shared/video-frame-layout-v1.ts",
+    "sveltekit-frontend/src/lib/shared/video-frame-layout-v1.spec.ts",
+    "simd-bridge/cpp/atlas_video_frame_descriptor_v1.h"
+  ]
+}

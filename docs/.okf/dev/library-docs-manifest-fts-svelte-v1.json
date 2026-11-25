@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.library-docs-source-manifest.v1",
+  "revision": "atlas-library-docs-source-manifest-fts-svelte-v1-2026-11-24",
+  "canonicalAuthority": false,
+  "acquisitionStatus": "PLANNED_NOT_FETCHED_IN_THIS_MANIFEST",
+  "note": "Additive catalog; leaves atlas-library-docs-source-manifest-v1-2026-10-23 untouched so its source_revision digests stay valid. SvelteKit llms.txt is the live site copy; installed @sveltejs/kit is 2.59.1 (node_modules, 2026-11-24) and the file carries no version header, so it is NOT version-matched until pinned.",
+  "rules": {
+    "officialSourcesOnly": true,
+    "versionBounded": true,
+    "immutableRunOutput": true,
+    "overwriteExistingCorpus": false,
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "mcpWriteTools": 0
+  },
+  "sources": [
+    { "id": "postgresql-18-fts-functions", "languages": ["sql"], "priority": "P0", "urls": ["https://www.postgresql.org/docs/18/functions-textsearch.html"] },
+    { "id": "sveltekit-llms-txt", "languages": ["typescript"], "priority": "P1", "urls": ["https://svelte.dev/docs/kit/llms.txt"] }
+  ]
+}

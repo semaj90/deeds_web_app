@@ -20,6 +20,9 @@ import { Pool } from 'pg';
 
 import { admitExternalDocPage } from '../../src/lib/server/atlas/docs/external-doc-admission.js';
 import { searchDocCorpus } from '../../src/lib/server/atlas/docs/doc-intelligence-read-model.js';
+import { readVerifiedCanonicalDocChunksV1 } from '../../src/lib/server/atlas/docs/external-doc-citation-readback-v1.js';
+import { buildExternalDocContextManifestV1 } from '../../src/lib/server/atlas/docs/external-doc-context-manifest-v1.js';
+import { verifyContextManifestV2Selection } from '../../src/lib/server/atlas/graph/context-manifest-v2.js';
 import { classifyPageAdmission, loadLivePageState, runResumableAdmissionV1, summarizePlan } from '../../src/lib/server/atlas/docs/external-doc-admission-plan-v1.js';
 import { toExternalDocAdmissionInputV1, validateExternalDocAdmissionHandoff, type ExternalDocAdmissionEnvelopeV1 } from '../../src/lib/server/atlas/docs/external-doc-intelligence-contracts-v1.js';
 
@@ -32,51 +35,85 @@ const AUTH = 'I_AUTHORIZE_CANONICAL_ADMISSION';
 const sha = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
 type AdmissionInput = ReturnType<typeof toExternalDocAdmissionInputV1>;
 
-async function runPilot(input: AdmissionInput, databaseUrl: string, apply: boolean, query?: string) {
-	const pool = new Pool({ connectionString: databaseUrl });
+async function runPilot(input: AdmissionInput, pageBytes: Buffer, databaseUrl: string, apply: boolean, query?: string) {
+	const pool = new Pool({ connectionString: databaseUrl, max: 1, connectionTimeoutMillis: 5000 });
 	const classify = async (candidate: AdmissionInput) => {
 		const client = await pool.connect();
 		try {
 			await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+			await client.query("SET LOCAL statement_timeout = '15s'");
 			return await loadLivePageState(client, candidate);
 		} finally {
 			try { await client.query('ROLLBACK'); } finally { client.release(); }
 		}
 	};
 	try {
-		let live = await classify(input);
-		let result = classifyPageAdmission(input, live);
 		let writerCalls = 0;
-		if (apply && result.classification === 'MISSING') {
+		let applyConflict = false;
+		if (apply) {
 			const run = await runResumableAdmissionV1([input], classify, (page) => admitExternalDocPage(pool, page));
 			writerCalls = run.writerCalls;
-			live = await classify(input);
-			result = classifyPageAdmission(input, live);
+			applyConflict = run.result === 'CONFLICT';
 		}
-		let citation = null;
-		if (query && result.classification === 'ALREADY_ADMITTED_EXACT') {
-			const search = await searchDocCorpus({
-				pool, root: ROOT, q: query, limit: 25, product: input.page.product, productVersion: input.page.productVersion
-			});
-			citation = search.mode === 'POSTGRES_FTS' ? search.hits.find((hit) =>
-				hit.sourceClass === 'CANONICAL' && hit.pageId === live.pageId && hit.revision === input.page.evidenceRevision &&
-				input.chunks.some((chunk) => hit.chunkId === chunk.chunkId && hit.chunkEvidenceRevision === chunk.evidenceRevision)
-			) ?? null : null;
+		const client = await pool.connect();
+		try {
+			await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+			await client.query("SET LOCAL statement_timeout = '15s'");
+			const live = await loadLivePageState(client, input);
+			const result = classifyPageAdmission(input, live);
+			const proof = query && result.classification === 'ALREADY_ADMITTED_EXACT'
+				? await readPilotCitation(input, pageBytes, query, live.pageId ?? null, client)
+				: { citation: null, contextManifestChecksum: null, citationStatus: query ? 'BLOCKED_PAGE_NOT_ADMITTED_EXACT' : 'NOT_REQUESTED' };
+			console.log(JSON.stringify({
+				mode: apply ? 'STAGING_APPLY' : 'PLAN_READ_ONLY', ...result, writerCalls,
+				pageEvidenceRevision: input.page.evidenceRevision, chunkCount: input.chunks.length,
+				...proof,
+			}, null, 2));
+			if (applyConflict || result.classification === 'CONFLICT' || (apply && result.classification !== 'ALREADY_ADMITTED_EXACT') ||
+				(query && result.classification === 'ALREADY_ADMITTED_EXACT' && !proof.citation)) process.exitCode = 1;
+		} finally {
+			try { await client.query('ROLLBACK'); } finally { client.release(); }
 		}
-		console.log(JSON.stringify({
-			mode: apply ? 'STAGING_APPLY' : 'PLAN_READ_ONLY', ...result, writerCalls,
-			pageEvidenceRevision: input.page.evidenceRevision, chunkCount: input.chunks.length,
-			citation: citation && {
-				pageId: citation.pageId, pageEvidenceRevision: citation.revision,
-				chunkId: citation.chunkId, chunkEvidenceRevision: citation.chunkEvidenceRevision,
-				url: citation.url, provider: citation.provider, product: citation.product, productVersion: citation.productVersion
-			}
-		}, null, 2));
-		if (result.classification === 'CONFLICT' || (apply && result.classification !== 'ALREADY_ADMITTED_EXACT') ||
-			(query && result.classification === 'ALREADY_ADMITTED_EXACT' && !citation)) process.exitCode = 1;
 	} finally {
 		await pool.end();
 	}
+}
+
+async function readPilotCitation(
+	input: AdmissionInput, pageBytes: Buffer, query: string, pageId: string | null, client: Pick<Pool, 'query'>
+) {
+	const blocked = (citationStatus: string) => ({ citationStatus, citation: null, contextManifestChecksum: null });
+	const search = await searchDocCorpus({
+		pool: client, root: ROOT, q: query, limit: 25,
+		product: input.page.product, productVersion: input.page.productVersion, canonicalOfficialOnly: true,
+	});
+	const hit = search.mode === 'POSTGRES_FTS' ? search.hits.find((candidate) =>
+		candidate.sourceClass === 'CANONICAL' && candidate.pageId === pageId &&
+		candidate.revision === input.page.evidenceRevision &&
+		input.chunks.some((chunk) => candidate.chunkId === chunk.chunkId && candidate.chunkEvidenceRevision === chunk.evidenceRevision)
+	) : undefined;
+	if (!hit) return blocked('PILOT_FTS_EXACT_HIT_MISSING');
+
+	const readback = await readVerifiedCanonicalDocChunksV1({ pool: client, hits: [hit] });
+	const [citation] = readback.citations;
+	if (readback.status !== 'VERIFIED' || !citation) return blocked('PILOT_CANONICAL_CITATION_READBACK_BLOCKED');
+	const bytes = pageBytes.subarray(citation.startByte, citation.endByte);
+	if (!bytes.equals(Buffer.from(citation.verifiedText, 'utf8')) || sha(bytes) !== citation.chunkChecksum) {
+		return blocked('PILOT_CITATION_CAPTURE_SPAN_MISMATCH');
+	}
+	const manifest = buildExternalDocContextManifestV1({
+		requestId: `pilot:${citation.chunkId}`, query, tokenBudget: 2048, readback,
+	});
+	if (!manifest) return blocked('PILOT_ACE_MANIFEST_BLOCKED');
+	verifyContextManifestV2Selection(manifest, {
+		snapshotId: manifest.v1.snapshotId, ordinalMapChecksum: manifest.identityInput.ordinalMapChecksum, selectedOrdinals: [0],
+	});
+	const { verifiedText: _text, sourceRevision, ...identity } = citation;
+	return {
+		citationStatus: 'VERIFIED_CAPTURE_AND_ACE',
+		citation: { ...identity, pageEvidenceRevision: sourceRevision },
+		contextManifestChecksum: manifest.identityChecksum,
+	};
 }
 
 async function readCorpusSnapshot(client: { query: (sql: string, values?: unknown[]) => Promise<{ rows: Array<Record<string, unknown>> }> }, inputs: Awaited<ReturnType<typeof toExternalDocAdmissionInputV1>>[]) {
@@ -134,7 +171,7 @@ async function main(): Promise<void> {
 		}
 		const databaseUrl = process.env.ATLAS_DOC_STAGING_DATABASE_URL ?? (planOnly ? process.env.DATABASE_URL : undefined);
 		if (!databaseUrl) throw new Error('PILOT_DATABASE_NOT_CONFIGURED');
-		await runPilot(input, databaseUrl, Boolean(apply), query?.trim());
+		await runPilot(input, pageBytes, databaseUrl, Boolean(apply), query?.trim());
 		return;
 	}
 	if (planOnly && !apply) {

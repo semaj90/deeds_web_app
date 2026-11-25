@@ -12,6 +12,7 @@
  */
 
 import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { createInterface } from 'node:readline';
 
@@ -58,10 +59,10 @@ export interface BuildRecommendationResult {
 
 // ── Client ────────────────────────────────────────────────────────────────────
 
-const MCP_SERVER = path.resolve(
-  process.cwd(),
-  'scripts/mcp/atlas-tools-mcp.mjs',
-);
+const MCP_SERVER_CANDIDATE = path.resolve(process.cwd(), 'scripts/mcp/atlas-tools-mcp.mjs');
+const MCP_SERVER = existsSync(MCP_SERVER_CANDIDATE)
+  ? MCP_SERVER_CANDIDATE
+  : path.resolve(process.cwd(), 'sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs');
 
 /** One call = one child process. Cheap, stateless, safe for concurrent requests. */
 async function callTool<T>(toolName: string, args: Record<string, unknown>): Promise<T> {

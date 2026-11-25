@@ -1,0 +1,11 @@
+{
+  "schema": "atlas.postgres-fts-replay.v1",
+  "generatedAt": "2026-11-24T22:36:34.369Z",
+  "mode": "READ_ONLY",
+  "queryText": "bindRecommendationEvidenceToTopKV1",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "status": "POSTGRES_FTS_REPLAY_ERROR",
+  "error": "connect ECONNREFUSED 127.0.0.1:5434",
+  "receiptChecksum": "sha256:e944ed8c2d24b01842360d7de9ef889551270393496705272bd61f51d8a59957"
+}

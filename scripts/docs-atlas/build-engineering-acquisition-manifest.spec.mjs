@@ -65,3 +65,26 @@ test('selects only requested source IDs and rejects unknown IDs', async () => {
 		outputPrefix: 'docs/.okf/../outside',
 	}), /OUTPUT_PREFIX_MUST_STAY_UNDER_DOCS_OKF/);
 });
+
+test('accepts DIRECT_MARKDOWN for plain-text/Markdown sources and still rejects unknown fetchers', () => {
+	const catalog = {
+		schema: 'atlas.library-docs-source-manifest.v1',
+		canonicalAuthority: false,
+		revision: 'catalog-direct-markdown-test',
+		rules: { officialSourcesOnly: true },
+		sources: [{ id: 'sveltekit-llms-txt', urls: ['https://svelte.dev/docs/kit/llms.txt'], languages: ['typescript'], priority: 'P1' }],
+	};
+	const manifest = buildEngineeringAcquisitionManifestV1(catalog, {
+		outputRoot: 'C:/temp/out',
+		fetcher: 'DIRECT_MARKDOWN',
+		maximumPagesPerSource: 1,
+	});
+	assert.equal(manifest.sources[0].default_fetcher, 'DIRECT_MARKDOWN');
+	assert.deepEqual(manifest.sources[0].allowed_domains, ['svelte.dev']);
+	assert.equal(manifest.sources[0].maximum_depth, 0);
+	assert.throws(() => buildEngineeringAcquisitionManifestV1(catalog, { outputRoot: 'C:/temp/out', fetcher: 'DIRECT_HTML' }), /UNSUPPORTED_FETCHER/);
+	assert.throws(() => buildEngineeringAcquisitionManifestV1({
+		...catalog,
+		sources: [{ ...catalog.sources[0], urls: ['http://svelte.dev/docs/kit/llms.txt'] }],
+	}, { outputRoot: 'C:/temp/out', fetcher: 'DIRECT_MARKDOWN' }), /HTTPS_REQUIRED/);
+});

@@ -19,6 +19,15 @@ import { ContextManifestV1Schema, type ContextManifestV1 } from './graph-runtime
 
 const revisionOrNull = z.union([z.string().min(1), z.null()]);
 
+export const ContextManifestTaskBindingV1Schema = z.object({
+  schema: z.literal('atlas.documentation-task-binding.v1'),
+  logicalTaskKey: z.string().min(1).max(512),
+  taskRevision: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+  sourceRef: z.string().min(1).max(1024),
+  sourceFileSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+  workboardSnapshotSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+}).strict();
+
 export const ContextManifestV2IdentityInputSchema = z.object({
   selectedOrdinalSetChecksum: z.string().min(1),
   evidenceRevisions: z.object({
@@ -34,6 +43,8 @@ export const ContextManifestV2IdentityInputSchema = z.object({
   acePlaybookRevision: z.string().min(1),
   // Optional so manifests built before ordered-selection binding keep their identity checksum.
   orderedSelectionChecksum: z.string().min(1).optional(),
+  // Optional for backward compatibility; task-bound documentation flows include this in identity.
+  taskBinding: ContextManifestTaskBindingV1Schema.optional(),
 }).strict();
 
 export type ContextManifestV2IdentityInput = z.infer<typeof ContextManifestV2IdentityInputSchema>;

@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.obo-eg2-low-rank-helper-artifact-receipt.v1",
+  "generatedAt": "2026-11-24T21:51:03Z",
+  "artifactPath": "sveltekit-frontend/memory/atlas/low-rank-helper-artifact-v1.json",
+  "artifactRevision": "sha256:b7017a1b301a393e85c2c635a3d23bab1a254cf9a1bba4b3f17526b56c41f97b",
+  "sourceEmbeddingSha256": "sha256:6684b5e88fe58bd0088f27989615b9b78cbc40b827b8cb15ec5040f5b62ce1ed",
+  "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+  "svdReceipt": {
+    "backend": "cuda:0",
+    "deviceName": "NVIDIA GeForce RTX 3060 Ti",
+    "rank": 10,
+    "svdMs": 508.805,
+    "cpuParityMaxAbsDiff": 1.37e-06
+  },
+  "taskFamilyCount": 10,
+  "helperCount": 11,
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

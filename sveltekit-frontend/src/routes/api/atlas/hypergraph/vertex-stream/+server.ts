@@ -49,8 +49,9 @@ const PostVertexStreamRequestSchema = z.object({
  * Returns stable JSON contract metadata, or streams PG18 atlas_topology_features
  * as 32-byte little-endian binary vertices when `?source=pg18` is passed.
  */
-export const GET: RequestHandler = async ({ url }) => {
-	if (url.searchParams.get('source') === 'pg18') {
+export const GET: RequestHandler = async (event) => {
+	const url = event?.url;
+	if (url?.searchParams?.get('source') === 'pg18') {
 		const rawLimit = Number(url.searchParams.get('limit') ?? 128);
 		const limit = Number.isFinite(rawLimit) ? Math.max(1, Math.min(512, Math.trunc(rawLimit))) : 128;
 		try {

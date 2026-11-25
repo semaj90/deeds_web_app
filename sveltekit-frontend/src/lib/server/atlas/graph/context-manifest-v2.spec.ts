@@ -64,6 +64,23 @@ describe('CM-02: ContextManifestV2', () => {
     expect(rePlanned.v1.selectedNodeKeys).toEqual(original.v1.selectedNodeKeys);
   });
 
+  it('binds a task revision and workboard snapshot into the manifest identity', () => {
+    const base = buildContextManifestV2(V1, IDENTITY_INPUT);
+    const taskBound = buildContextManifestV2(V1, {
+      ...IDENTITY_INPUT,
+      taskBinding: {
+        schema: 'atlas.documentation-task-binding.v1',
+        logicalTaskKey: 'parent-atlas-versioned-doc-intelligence:DOC-15',
+        taskRevision: `sha256:${'a'.repeat(64)}`,
+        sourceRef: 'openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L1118',
+        sourceFileSha256: `sha256:${'b'.repeat(64)}`,
+        workboardSnapshotSha256: `sha256:${'c'.repeat(64)}`,
+      },
+    });
+    expect(taskBound.identityChecksum).not.toBe(base.identityChecksum);
+    expect(taskBound.identityInput.taskBinding?.logicalTaskKey).toContain('DOC-15');
+  });
+
   it('changes the checksum when the underlying V1 requestId/snapshotId changes, even with identical revision inputs', () => {
     const original = buildContextManifestV2(V1, IDENTITY_INPUT);
     const differentSnapshot = buildContextManifestV2({ ...V1, snapshotId: 'snap:2' }, IDENTITY_INPUT);

@@ -17,10 +17,10 @@ func TestBuildCodebaseStageTrace(t *testing.T) {
 	if trace.QdrantBM25BranchActive {
 		t.Fatal("expected QdrantBM25BranchActive=false")
 	}
-	if !trace.RRFUsed {
-		t.Fatal("expected RRFUsed=true")
+	if trace.RRFUsed {
+		t.Fatal("expected RRFUsed=false (SearchRuntime owns cross-lane RRF fusion)")
 	}
-	if trace.PGReconciledCount != 3 || trace.GraphExpansionCount != 0 {
+	if trace.PGReconciledCount != 0 || trace.GraphExpansionCount != 0 {
 		t.Fatalf("unexpected counts: %+v", trace)
 	}
 

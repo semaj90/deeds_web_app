@@ -1,0 +1,15 @@
+{
+  "schema": "atlas.postgres-fts-replay.v1",
+  "generatedAt": "2026-11-24T22:36:54.255Z",
+  "mode": "READ_ONLY",
+  "queryText": "bindRecommendationEvidenceToTopKV1",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "status": "POSTGRES_FTS_REPLAY_ERROR",
+  "blockers": [
+    "POSTGRES_UNAVAILABLE"
+  ],
+  "errorCode": "ECONNREFUSED",
+  "error": "PostgreSQL connection/query failed (ECONNREFUSED)",
+  "receiptChecksum": "sha256:b118b20e8fc3e54603c18524dbc226d22baa47a2de2499c37eff25a319eda3cd"
+}

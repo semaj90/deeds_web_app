@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.hybrid-topk-anchor-continuation.v1",
+  "generatedAt": "2026-11-24T22:37:00.000Z",
+  "status": "PARTIAL_LIVE_DEPENDENCIES_UNAVAILABLE",
+  "query": "bindRecommendationEvidenceToTopKV1",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "localChanges": [
+    {
+      "path": "scripts/atlas/prove-postgres-fts-replay-v1.mjs",
+      "change": "Fail the process unless FTS replay is explicitly proven; classify unavailable PostgreSQL as POSTGRES_UNAVAILABLE; omit connection details from error text."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/execution/search-runtime-topk-caller-v1.ts",
+      "change": "Recompute and validate the candidate ordinal-map checksum before binding recommendation evidence."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/execution/search-runtime-recommendation-binding-v1.spec.ts",
+      "change": "Cover swapped ordinal assignments retaining the old declared checksum and stale workspace binding."
+    }
+  ],
+  "verification": {
+    "ordinalBindingTests": {
+      "status": "PASS",
+      "passed": 12,
+      "command": "cd sveltekit-frontend && .\\node_modules\\.bin\\vitest.cmd run --config vitest.lane-contracts.config.ts src/lib/server/atlas/execution/search-runtime-recommendation-binding-v1.spec.ts"
+    },
+    "ftsReplay": {
+      "status": "BLOCKED",
+      "observedStatus": "POSTGRES_FTS_REPLAY_ERROR",
+      "blocker": "POSTGRES_UNAVAILABLE",
+      "errorCode": "ECONNREFUSED",
+      "planCaptured": false,
+      "receiptPath": "docs/reports/postgres-fts-topk-anchor-replay-continued-v2.json",
+      "commandExitCode": 1
+    },
+    "syntaxCheck": "PASS",
+    "diffCheck": "PASS"
+  },
+  "unprovenGates": [
+    "Live PostgreSQL FTS plan and hybrid candidate result",
+    "Matching semantic representation and model/tokenizer attestation",
+    "PG18 UUID/revision/source-byte reconciliation",
+    "Authenticated VerifiedContextService admission and ACE citation readback",
+    "Live stale-revision and swapped-ordinal rejection at the integrated endpoint",
+    "Frozen cohort representation benchmarks and routing ablations"
+  ],
+  "nextGate": "Restore operator-managed PostgreSQL 18 connectivity, then rerun the bounded FTS replay and continue the same frozen-seed ACE contract only if it proves."
+}

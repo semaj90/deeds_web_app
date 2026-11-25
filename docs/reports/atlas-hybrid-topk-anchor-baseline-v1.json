@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.hybrid-topk-anchor-baseline.v1",
+  "gitRevision": "b7fc1b73c10e9b6e0fb143b7e043df12a475a41c plus local changes",
+  "query": "bindRecommendationEvidenceToTopKV1",
+  "status": "PARTIAL",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "baselineFrozen": false,
+  "fts": {
+    "command": "node scripts/atlas/prove-postgres-fts-replay-v1.mjs --query=bindRecommendationEvidenceToTopKV1 --explain --output=docs/reports/postgres-fts-topk-anchor-replay-v1.json",
+    "observedStatus": "POSTGRES_FTS_REPLAY_ERROR",
+    "observedError": "connect ECONNREFUSED 127.0.0.1:5434",
+    "reportPath": "docs/reports/postgres-fts-topk-anchor-replay-v1.json",
+    "planCaptured": false
+  },
+  "semanticDependencies": {
+    "commandTemplate": "curl.exe --noproxy \"*\" --max-time 3 -sS --output NUL --write-out \"$uri HTTP %{http_code}\" $uri",
+    "observed": [
+      "http://127.0.0.1:6333/ HTTP 000; curl: (28) Operation timed out after 3009 milliseconds with 0 bytes received",
+      "http://127.0.0.1:8100/health HTTP 000; curl: (28) Operation timed out after 3005 milliseconds with 0 bytes received"
+    ]
+  },
+  "aceRoute": {
+    "command": "curl.exe --noproxy \"*\" --max-time 3 -sS -H 'content-type: application/json' --data-binary '{\"query\":\"bindRecommendationEvidenceToTopKV1\"}' 'http://127.0.0.1:5173/api/atlas/mastra-agent'",
+    "httpStatus": 409,
+    "firstFailingBoundary": "WORKSPACE_AUTHORITY",
+    "refusalCode": "TRUSTED_WORKSPACE_AUTHORITY_UNAVAILABLE",
+    "requestId": "322469e1-7be1-4382-88c4-3b8cd9dd2b5d",
+    "receiptChecksum": "8f321728ecc97033906000801bc9d1e7a4a14ebbddf2e21a64ea78db1c1a0eb1",
+    "agentExecutionStatus": "NOT_STARTED",
+    "canonicalEvidenceValidity": "NOT_ADMITTED",
+    "reportedFinalHandoffGap": "immutableContextPacketHydrator"
+  },
+  "recommendationBinding": {
+    "scope": "Local fixture suite",
+    "status": "PASS",
+    "commandFromFrontend": ".\\node_modules\\.bin\\vitest.cmd run --config vitest.lane-contracts.config.ts src/lib/server/atlas/execution/search-runtime-recommendation-binding-v1.spec.ts",
+    "observedOutput": "Test Files  1 passed (1); Tests  12 passed (12)",
+    "negativeCases": {
+      "swappedAssignmentsWithOriginalChecksum": "CANDIDATE_ORDINAL_MAP_CHECKSUM_MISMATCH",
+      "resealedStaleWorkspace": "RECOMMENDATION_BINDING_WORKSPACE_MISMATCH",
+      "staleSourceRevision": "RECOMMENDATION_BINDING_SOURCE_REVISION_MISMATCH:0"
+    }
+  }
+}

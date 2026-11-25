@@ -1,0 +1,107 @@
+{
+  "schema": "atlas.gpu-hybrid-retrieval-current-gap-review.v1",
+  "status": "PARTIAL_BASELINE_BLOCKED",
+  "generatedAt": "2026-11-24",
+  "mode": "READ_ONLY_DIAGNOSTIC",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "scope": "Go Retrieval / SearchRuntime / PG18 reconciliation / ACE citation / 8098 GPU executor handoff",
+  "liveServices": {
+    "postgres5434": "TCP_REACHABLE",
+    "goRetrieval8100": "READY_FULL",
+    "qdrant6333": { "status": "REACHABLE", "version": "1.20.2" },
+    "gpu8098": { "status": "HEALTHY", "cudaAvailable": true, "device": "NVIDIA GeForce RTX 3060 Ti", "torchAvailable": false, "storeWrites": false }
+  },
+  "retrievalBaseline": {
+    "postgresFtsPhrase": {
+      "query": "recommendation evidence",
+      "unqualifiedHits": 951,
+      "revisionQualifiedHits": 0,
+      "ginIndexCount": 6,
+      "explainAnalyzeCaptured": true,
+      "status": "POSTGRES_FTS_BLOCKED_SOURCE_REVISION",
+      "receipt": "docs/reports/postgres-fts-recommendation-evidence-current-review-v1.json"
+    },
+    "exactIdentifier": {
+      "query": "bindRecommendationEvidenceToTopKV1",
+      "unqualifiedHits": 0,
+      "revisionQualifiedHits": 0,
+      "status": "POSTGRES_FTS_REPLAY_UNPROVEN",
+      "receipt": "docs/reports/postgres-fts-candidate-anchor-review-v1.json"
+    },
+    "goSemanticProbe": {
+      "httpStatus": 200,
+      "returnedCandidateCount": 0,
+      "representation": "semantic_768",
+      "qdrantCollection": "codebase_chunks_768",
+      "qdrantBm25BranchActive": false,
+      "reportedRrfUsed": true,
+      "pgReconciledCount": 0,
+      "workspaceAndSourceRevisionAdversarialProbe": {
+        "requestedRevision": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "unfilteredCandidates": 0,
+        "staleRevisionCandidates": 0,
+        "status": "INCONCLUSIVE_NO_UNFILTERED_BASELINE_HITS"
+      }
+    },
+    "traceSemantics": {
+      "checkoutCode": "services/go-retrieval-service/main.go buildCodebaseStageTrace sets rrf_used=false and pg_reconciled_count=0 because Go emits candidates and SearchRuntime owns cross-executor fusion/rejoin",
+      "liveCode": "The running endpoint reported rrf_used=true and pg_reconciled_count=0",
+      "status": "RUNTIME_CHECKOUT_TRACE_SEMANTICS_DIFFER; RECONCILE_BUILD_OR_FIELD_MEANING_BEFORE_USING_AS_PROOF"
+    }
+  },
+  "qdrantCollections": [
+    { "name": "codebase_chunks_768", "status": "green", "points": 328468, "indexed": 328386 },
+    { "name": "codebase_chunks_768_turbo16", "status": "green", "points": 76000, "indexed": 68419 },
+    { "name": "codebase_chunks_768_v2", "status": "green", "points": 52816, "indexed": 49867 },
+    { "name": "codebase_chunks_eg2_768_q8", "status": "green", "points": 1271, "indexed": 0 }
+  ],
+  "gpuExecutor": {
+    "sourceRoutes": [
+      "/health",
+      "/v1/semantic512/kmeans",
+      "/v1/tile-artifact/inspect",
+      "/v1/tile-artifact/enrich",
+      "/v1/tile-artifact/exact-scan",
+      "/v1/tile-artifact/cuvs-exact-scan"
+    ],
+    "liveCagraRoute": "NOT_FOUND_IN_CHECKED_OUT_FASTAPI_ROUTE_TABLE",
+    "cuvsEndpointMeaning": "BRUTE_FORCE_EXACT_SCAN, not CAGRA",
+    "ordinalProof": "Existing script calls PyTorch exact scan and cuVS brute-force exact scan on a pre-existing Arrow tile artifact; it does not call CAGRA or rejoin candidate IDs to PG18/ACE.",
+    "gpuExecutionInvoked": false
+  },
+  "tests": {
+    "command": "go test ./... -run 'TestCodebaseSourceRevisionFilter|TestFTSIdentityStatusRequiresRevisionQualifiedFields' -count=1",
+    "result": "passed",
+    "matchingTests": 3
+  },
+  "mcpDiscovery": {
+    "contextCards": 5,
+    "identityBoundCards": 5,
+    "proofUsableCards": 0,
+    "revisionStatus": "MISSING_SOURCE_REVISION",
+    "admissionStatus": "UNADMITTED_RETRIEVAL_CANDIDATES",
+    "use": "DISCOVERY_ONLY"
+  },
+  "nextGates": [
+    "Repair source_ref/source_revision/workspace_revision lineage through canonical PG18 ingest for the FTS cohort; never infer revisions from current path names.",
+    "Select a source-qualified known-symbol query and prove exact PG18 byte-span readback before using ACE.",
+    "Resolve the live-versus-checkout query_stage_trace RRF semantic/build mismatch and distinguish Qdrant-internal fusion from SearchRuntime fusion.",
+    "Freeze and checksum one revision-qualified ordinal cohort; reconcile its candidate IDs and revisions to PG18 before GPU execution.",
+    "If CAGRA remains a target, add/use a bounded :8098 CAGRA RPC executor behind the existing execution interface; current cuVS endpoint is exact brute force.",
+    "Only then compare HNSW/CAGRA, CPU/cuGraph, and routing ablations on identical inputs and include queue/transfer time in latency."
+  ],
+  "patchTargets": [],
+  "likely_cause": "The retrieval services are reachable, but FTS candidates have no qualified source revision and the current GPU sidecar exposes exact scans rather than a live CAGRA route.",
+  "evidence": [
+    "POSTGRES_FTS_BLOCKED_SOURCE_REVISION: 951 unqualified, 0 revision-qualified hits",
+    "Exact symbol FTS replay: 0 hits",
+    "Go semantic probe: HTTP 200, 0 candidates, pg_reconciled_count=0",
+    "Live stage trace says rrf_used=true while checked-out Go stage trace sets it false",
+    "8098 health: CUDA true, Torch false; route table contains cuVS brute-force, no CAGRA endpoint",
+    "Go source-revision filter and FTS identity focused tests passed (3 tests)"
+  ],
+  "safe_next_command": "node scripts/atlas/prove-postgres-fts-replay-v1.mjs --query=\"recommendation evidence\" --explain --output=docs/reports/postgres-fts-after-source-lineage-refresh-v1.json",
+  "smoke_command": "cd services/go-retrieval-service; go test ./... -run 'TestCodebaseSourceRevisionFilter|TestFTSIdentityStatusRequiresRevisionQualifiedFields' -count=1",
+  "report_path": "docs/reports/atlas-gpu-hybrid-retrieval-current-gap-review-v1.json"
+}

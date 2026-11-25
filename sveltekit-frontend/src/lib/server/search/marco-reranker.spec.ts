@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { rerankWithMarco, scorePair } from './marco-reranker.js';
+import { rerankWithEg2Mrl8094, rerankWithMarco, scorePair } from './marco-reranker.js';
 
 describe('marco-reranker mixedbread backend smoke', () => {
   afterEach(() => {
@@ -38,5 +38,25 @@ describe('marco-reranker mixedbread backend smoke', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     await expect(scorePair('q', 'doc')).resolves.toBe(0.91);
+  });
+
+  it('reranks via :8094 EG2 ONNX MRL dims (768/512/256/128)', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        embeddings: {
+          '256': [
+            [1, 0, ...Array(254).fill(0)],
+            [1, 0, ...Array(254).fill(0)],
+            [0, 1, ...Array(254).fill(0)],
+          ],
+        },
+      }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const scores = await rerankWithEg2Mrl8094('q', ['match', 'orth'], 256);
+    expect(scores[0]).toBeCloseTo(1, 5);
+    expect(scores[1]).toBeCloseTo(0, 5);
   });
 });

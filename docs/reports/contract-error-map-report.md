@@ -1,6 +1,6 @@
 # Cross-Layer Contract Error Map
 
-Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Low: 0  Info: 26
+Generated: 2026-11-25T02:27:43.313Z  |  Findings: 64  |  High: 0  Medium: 35  Low: 0  Info: 29
 
 ## Findings
 
@@ -316,7 +316,33 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-025-ea5ba189
+### contract:drizzle-meta-documented_sidecar-025-02452c49
+**Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
+
+**Problem:** Documented sidecar "0152_atlas_representations_registry.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
+
+**Expected:** Sidecar migrations are applied manually and excluded from the journal by design.
+
+**Suggested Fix:** No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.
+
+**Files:** `sveltekit-frontend\drizzle\0152_atlas_representations_registry.sql`
+
+**Validation:** `npm run audit:drizzle-meta`
+
+### contract:drizzle-meta-documented_sidecar-026-7f57b070
+**Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
+
+**Problem:** Documented sidecar "0152_atlas_representations_registry_revised.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
+
+**Expected:** Sidecar migrations are applied manually and excluded from the journal by design.
+
+**Suggested Fix:** No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.
+
+**Files:** `sveltekit-frontend\drizzle\0152_atlas_representations_registry_revised.sql`
+
+**Validation:** `npm run audit:drizzle-meta`
+
+### contract:drizzle-meta-documented_sidecar-027-ea5ba189
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0153_atlas_context_manifests.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -329,7 +355,20 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-026-d08c1dbd
+### contract:drizzle-meta-documented_sidecar-028-94ac9fd5
+**Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
+
+**Problem:** Documented sidecar "0154_atlas_packet_features_ast_provenance_columns.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
+
+**Expected:** Sidecar migrations are applied manually and excluded from the journal by design.
+
+**Suggested Fix:** No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.
+
+**Files:** `sveltekit-frontend\drizzle\0154_atlas_packet_features_ast_provenance_columns.sql`
+
+**Validation:** `npm run audit:drizzle-meta`
+
+### contract:drizzle-meta-documented_sidecar-029-d08c1dbd
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0999_cluster_cards.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -342,7 +381,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-stale_migration-027-6f4602d2
+### contract:drizzle-meta-stale_migration-030-6f4602d2
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0019_atlas_packet_indexes_gin.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -355,7 +394,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-028-68651803
+### contract:drizzle-meta-stale_migration-031-68651803
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0020_fix_packet_feature_metrics_schema.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -368,7 +407,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-029-a99f92ab
+### contract:drizzle-meta-stale_migration-032-a99f92ab
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0020_phase10_packet_ontology.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -381,7 +420,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-030-ee4af613
+### contract:drizzle-meta-stale_migration-033-ee4af613
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0020_promotion_outbox.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -394,7 +433,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-031-4ee9f3c7
+### contract:drizzle-meta-stale_migration-034-4ee9f3c7
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0045_phase_108e_schema_alignment.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -407,7 +446,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-032-a3dd36d9
+### contract:drizzle-meta-stale_migration-035-a3dd36d9
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0048_query_cache_metrics.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -420,7 +459,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-033-3c91523d
+### contract:drizzle-meta-stale_migration-036-3c91523d
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0053_evaluation_corpus_queries.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -433,7 +472,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-034-76cbbc9f
+### contract:drizzle-meta-stale_migration-037-76cbbc9f
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0057_evaluation_relevance.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -446,7 +485,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-035-c47e2d28
+### contract:drizzle-meta-stale_migration-038-c47e2d28
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0099_agentic_identity_recovery.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -459,7 +498,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-036-5e8aea15
+### contract:drizzle-meta-stale_migration-039-5e8aea15
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0099_unified_id_hierarchy.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -472,7 +511,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-037-c59f32b4
+### contract:drizzle-meta-stale_migration-040-c59f32b4
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0100_identity_lane_recovery.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -485,7 +524,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-038-4efb57ff
+### contract:drizzle-meta-stale_migration-041-4efb57ff
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0100_retrieval_events_schema.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -498,7 +537,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-039-72e7a41b
+### contract:drizzle-meta-stale_migration-042-72e7a41b
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0101_encoder_provenance_gate2.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -511,7 +550,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-040-af1f87b6
+### contract:drizzle-meta-stale_migration-043-af1f87b6
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0101_packet_ast_keyword_features.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -524,7 +563,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-041-32b1cdcb
+### contract:drizzle-meta-stale_migration-044-32b1cdcb
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0101_packet_ontology_tuples.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -537,7 +576,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-042-74a5420c
+### contract:drizzle-meta-stale_migration-045-74a5420c
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0101_spec_control_plane_phase1.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -550,7 +589,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-043-0245a68c
+### contract:drizzle-meta-stale_migration-046-0245a68c
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0102_feature_statistics_and_potentials.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -563,7 +602,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-044-28e56da9
+### contract:drizzle-meta-stale_migration-047-28e56da9
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0102_restore_weight_column.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -576,7 +615,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-045-d39fcc7f
+### contract:drizzle-meta-stale_migration-048-d39fcc7f
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0104_packet_lineage_ulid_title.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -589,7 +628,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-046-940cc3c1
+### contract:drizzle-meta-stale_migration-049-940cc3c1
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0105_latent64_vectors.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -602,7 +641,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-047-b0385748
+### contract:drizzle-meta-stale_migration-050-b0385748
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0107_f_pagerank_topology_schema.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -615,7 +654,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-048-46f3de7d
+### contract:drizzle-meta-stale_migration-051-46f3de7d
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0110_dispatcher_audit_log.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -628,7 +667,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-049-6098bbe6
+### contract:drizzle-meta-stale_migration-052-6098bbe6
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0110_phase109a_audit_trail.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -641,7 +680,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-050-2f5f929b
+### contract:drizzle-meta-stale_migration-053-2f5f929b
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0111_phase109a_soft_delete_safeguards.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -654,7 +693,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-051-abef4507
+### contract:drizzle-meta-stale_migration-054-abef4507
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0111_phase111_evidence_ledgers.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -667,7 +706,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-052-417bb94e
+### contract:drizzle-meta-stale_migration-055-417bb94e
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0111_tool_call_runtime_contract.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -680,7 +719,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-053-9c3cf80b
+### contract:drizzle-meta-stale_migration-056-9c3cf80b
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0112_proposed_tool_calls.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -693,7 +732,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-054-a8285aab
+### contract:drizzle-meta-stale_migration-057-a8285aab
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0113_packet_jepa_metrics.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -706,7 +745,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-055-4e4547ba
+### contract:drizzle-meta-stale_migration-058-4e4547ba
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0114_execution_reviews.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -719,7 +758,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-056-8a1c16a6
+### contract:drizzle-meta-stale_migration-059-8a1c16a6
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0115_phase109a_workspace_revision_and_purge_audit.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -732,7 +771,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-057-d45c7e28
+### contract:drizzle-meta-stale_migration-060-d45c7e28
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0116_phase109a_recommendation_supersession.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -745,7 +784,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-058-b73075a3
+### contract:drizzle-meta-stale_migration-061-b73075a3
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0117_recommendation_log_updated_by_trigger_fix.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -758,7 +797,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-059-d189a482
+### contract:drizzle-meta-stale_migration-062-d189a482
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0118_semantic_lifecycle_events_recommendation_status.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -771,7 +810,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-060-114571fd
+### contract:drizzle-meta-stale_migration-063-114571fd
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0150_unified_cross_ranker.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -784,7 +823,7 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
 
-### contract:drizzle-meta-stale_migration-061-51cc2f78
+### contract:drizzle-meta-stale_migration-064-51cc2f78
 **Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
 
 **Problem:** "0151_feature_label_mutation_audit.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
@@ -794,44 +833,5 @@ Generated: 2026-11-24T05:15:38.735Z  |  Findings: 64  |  High: 0  Medium: 38  Lo
 **Suggested Fix:** Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/0151_feature_label_mutation_audit.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.
 
 **Files:** `sveltekit-frontend\drizzle\0151_feature_label_mutation_audit.sql`
-
-**Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
-
-### contract:drizzle-meta-stale_migration-062-6d3c89f5
-**Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
-
-**Problem:** "0152_atlas_representations_registry.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
-
-**Expected:** Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.
-
-**Suggested Fix:** Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/0152_atlas_representations_registry.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.
-
-**Files:** `sveltekit-frontend\drizzle\0152_atlas_representations_registry.sql`
-
-**Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
-
-### contract:drizzle-meta-stale_migration-063-a1d61cf5
-**Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
-
-**Problem:** "0152_atlas_representations_registry_revised.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
-
-**Expected:** Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.
-
-**Suggested Fix:** Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/0152_atlas_representations_registry_revised.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.
-
-**Files:** `sveltekit-frontend\drizzle\0152_atlas_representations_registry_revised.sql`
-
-**Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
-
-### contract:drizzle-meta-stale_migration-064-3efe2517
-**Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
-
-**Problem:** "0154_atlas_packet_features_ast_provenance_columns.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
-
-**Expected:** Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.
-
-**Suggested Fix:** Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/0154_atlas_packet_features_ast_provenance_columns.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.
-
-**Files:** `sveltekit-frontend\drizzle\0154_atlas_packet_features_ast_provenance_columns.sql`
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`

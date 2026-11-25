@@ -1,0 +1,98 @@
+format-version: 1.2
+ontology: atlas-codebase-semantic-terms-v1
+remark: Companion OBO emitted by okf_language_lsp_term_expander_v1.py from proposal; canonical_authority=false. Does not alter atlas-domain-and-language-terms-v1.obo.
+
+[Typedef]
+id: mirrors
+name: mirrors
+
+[Typedef]
+id: not_interchangeable_with
+name: not interchangeable with
+
+[Term]
+id: ATLASTECH:postgresql_truth_store
+name: PostgreSQL canonical store
+def: "The canonical truth store for packet and chunk identity, revisions, eligibility and canonical embeddings. All other stores are derived." [file:AGENTS.md]
+comment: Existing domain concept ATLASDOM:database.postgresql is the coarse label; this term is the role.
+
+[Term]
+id: ATLASTECH:pgvector
+name: pgvector
+def: "PostgreSQL extension holding the canonical dense vectors; HNSW over codebase_chunk_index.content_embedding_768 is the semantic ANN executor." [file:CLAUDE.md]
+relationship: mirrors ATLASTECH:postgresql_truth_store
+
+[Term]
+id: ATLASTECH:qdrant
+name: Qdrant
+def: "Rebuildable vector-search mirror of Postgres vectors. Point IDs are projection IDs, never packet, source or candidate identity." [file:sveltekit-frontend/src/lib/server/search/qdrant-search.ts]
+relationship: mirrors ATLASTECH:postgresql_truth_store
+
+[Term]
+id: ATLASTECH:valkey
+name: Valkey
+synonym: "Redis" RELATED []
+def: "Disposable cache and residency layer on :6379 (Redis drop-in). Holds revision- and checksum-addressed manifests and cards; never canonical identity, source bodies, vectors or hidden state." [file:sveltekit-frontend/src/lib/server/redis.ts]
+
+[Term]
+id: ATLASALG:hnsw
+name: HNSW
+def: "Hierarchical navigable small world graph index for approximate nearest-neighbor search. The pgvector HNSW index is the semantic ANN executor." [file:CLAUDE.md]
+
+[Term]
+id: ATLASALG:bm25
+name: BM25
+def: "Probabilistic lexical ranking function. pg_search BM25 is an installed, unpromoted challenger. The Bm25Lane routing key in search-lanes.ts actually runs pg_trgm similarity, not BM25." [file:CLAUDE.md]
+
+[Term]
+id: ATLASALG:pagerank
+name: PageRank
+def: "Link-analysis authority score over the code graph. A derived feature only; it never creates identity or an extra retrieval vote. NetworkX is the CPU oracle, cuGraph the accelerator." [file:CLAUDE.md]
+
+[Term]
+id: ATLASALG:centroid
+name: centroid
+def: "Cluster centre used as a routing and cache key (for example Valkey atlas:centroid keys). A routing aid, not retrieval truth." [file:CLAUDE.md]
+
+[Term]
+id: ATLASMODEL:embeddinggemma
+name: EmbeddingGemma
+def: "Canonical embedding model behind the semantic_768 representation. Same dimension does not mean same representation; lineage must be bound per embedding." [file:AGENTS.md]
+
+[Term]
+id: ATLASTECH:mcp
+name: MCP
+synonym: "Model Context Protocol" EXACT []
+def: "Tool-calling protocol. A model reaches infrastructure only through named typed MCP tools (TRACE on :8788), never directly to Postgres, Qdrant or Docker." [file:CLAUDE.md]
+
+[Term]
+id: ATLASCTX:ace_context
+name: ACE context
+def: "The bounded, revision-qualified evidence packet or ContextManifest built after retrieval and handed to the model. Raw retrieval hits are never passed to the model directly." [file:AGENTS.md]
+
+[Term]
+id: ATLASTECH:graphify
+name: Graphify
+def: "Repository graph-building and structural-analysis pipeline feeding graph and topology projections. Projection admission is gated; a healthy run is not a promotion." [file:CLAUDE.md]
+
+[Term]
+id: ATLASID:source_revision
+name: sourceRevision
+def: "sha256:<64 lowercase hex> over the exact UTF-8 bytes of one source file. Empty, non-UTF-8 or unreadable files have none." [file:sveltekit-frontend/src/lib/server/atlas/identity/code-source-revision-v1.ts]
+relationship: not_interchangeable_with ATLASID:workspace_revision
+
+[Term]
+id: ATLASID:workspace_revision
+name: workspaceRevision
+def: "sha256 over a sorted manifest of (sourceRef, sourceRevision, contentDigest, byteLength, gitBlobOid) for the indexed source set. Git state is provenance only. Skipped files are not digested yet." [file:sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts]
+relationship: not_interchangeable_with ATLASID:source_revision
+
+[Term]
+id: ATLASID:packet_key
+name: packet_key
+def: "Primary packet identity. Join by packet_key and verify source_ref and feature_id; never join on feature_id alone." [file:AGENTS.md]
+
+[Term]
+id: ATLASID:source_ref
+name: source_ref
+def: "Reference to the source file or task a packet derives from. Values are mixed (file paths, task: refs, feature: aggregation refs), so feature:* must not be trusted as a file path." [file:CLAUDE.md]

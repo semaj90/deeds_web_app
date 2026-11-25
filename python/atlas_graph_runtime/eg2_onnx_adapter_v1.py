@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import json
 import math
 import os
@@ -95,6 +96,13 @@ def load_task_prompts(model_dir: str | Path = DEFAULT_EG2_ONNX_DIR) -> dict[str,
     return {str(k): str(v) for k, v in prompts.items()} if isinstance(prompts, dict) else {}
 
 
+@functools.lru_cache(maxsize=4)
+def _load_cached_tokenizer(tokenizer_path_str: str) -> Any:
+    from tokenizers import Tokenizer
+
+    return Tokenizer.from_file(tokenizer_path_str)
+
+
 def chunk_text_by_tokens(
     text: str,
     *,
@@ -103,7 +111,7 @@ def chunk_text_by_tokens(
     overlap_tokens: int = 64,
     max_chunks: int = 16,
 ) -> list[str]:
-    """Token-aware chunking using EG2's tokenizer.json (replaces arbitrary text[:2000])."""
+    """Token-aware chunking using cached EG2 tokenizer.json (replaces arbitrary text[:2000])."""
     cleaned = text.strip()
     if not cleaned:
         return []
@@ -112,9 +120,7 @@ def chunk_text_by_tokens(
     if overlap_tokens < 0 or overlap_tokens >= max_tokens:
         raise ValueError("overlap_tokens must satisfy 0 <= overlap_tokens < max_tokens")
 
-    from tokenizers import Tokenizer
-
-    tok = Tokenizer.from_file(str(tokenizer_path))
+    tok = _load_cached_tokenizer(str(Path(tokenizer_path).resolve()))
     encoded = tok.encode(cleaned, add_special_tokens=False)
     ids = encoded.ids
     if not ids:

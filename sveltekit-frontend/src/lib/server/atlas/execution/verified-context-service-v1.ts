@@ -8,10 +8,13 @@ import { executeSearchRuntimeTopKV1, type SearchRuntimeTopKCallerInputV1, type S
 import { renderAceProposalContextAndPlanV1 } from '../context/ace-context-proposal-renderer-v1.js';
 import { buildPromptPlanV1, PromptPlanV1Schema } from '../prefill/prompt-plan-v1.js';
 import type { DspyRepairOutputV1 } from '../evals/dspy-repair-output-v1.js';
+import { AceContextPacketV1Schema } from '../agentic/hermes-adaptive-pipeline-v1.js';
 
 export const VerifiedContextRequestV1Schema = z.object({
   requestId: z.string().trim().min(1).max(128),
   query: z.string().trim().min(1).max(16_000),
+  /** Untrusted workspace selector; authorization must resolve an explicit matching grant before retrieval. */
+  workspaceId: z.string().uuid().optional(),
   topK: z.number().int().min(1).max(10).default(5),
   /** Optional received recommendation evidence bundle. External input: verified and bound inside executeSearchRuntimeTopKV1, fail closed. */
   recommendationEvidence: z.unknown().optional(),
@@ -26,6 +29,8 @@ const VerifiedContextAdmittedResponseV1Schema = z.object({
     contextManifestChecksum: z.string().regex(/^[a-f0-9]{64}$/),
     promptPlanChecksum: z.string().regex(/^[a-f0-9]{64}$/),
     promptPlan: z.unknown(),
+    /** In-memory packet for the authenticated server-side model handoff; never persisted here. */
+    aceContextPacket: AceContextPacketV1Schema,
     receipt: z.unknown(),
     canonicalAuthority: z.literal(false),
     writesPerformed: z.literal(false),
@@ -91,7 +96,7 @@ export interface VerifiedQueryRepresentationV1 {
 
 export interface VerifiedContextServicePortsV1 {
   resolveWorkspaceAuthority?: () => Promise<TrustedWorkspaceAuthorityV1>;
-  authorizeWorkspaceScope: (input: { actorId: string; authority: Extract<TrustedWorkspaceAuthorityV1, { status: 'TRUSTED' }> }) => Promise<VerifiedContextWorkspaceScopeV1 | { status: 'BLOCKED'; reason: string }>;
+  authorizeWorkspaceScope: (input: { actorId: string; request: VerifiedContextRequestV1; authority: Extract<TrustedWorkspaceAuthorityV1, { status: 'TRUSTED' }> }) => Promise<VerifiedContextWorkspaceScopeV1 | { status: 'BLOCKED'; reason: string }>;
   resolveQueryRepresentation: (input: { request: VerifiedContextRequestV1; scope: VerifiedContextWorkspaceScopeV1 }) => Promise<VerifiedQueryRepresentationV1 | null>;
   retrieveTopKInput: (input: { request: VerifiedContextRequestV1; scope: VerifiedContextWorkspaceScopeV1 }) => Promise<SearchRuntimeTopKCallerInputV1 | null>;
   resolveFeatureSnapshot: (input: { request: VerifiedContextRequestV1; scope: VerifiedContextWorkspaceScopeV1; ordinalMapChecksum: string }) => Promise<VerifiedContextFeatureSnapshotResultV1>;
@@ -127,7 +132,7 @@ export function createVerifiedContextServiceV1(ports: VerifiedContextServicePort
       const authority = await (ports.resolveWorkspaceAuthority ?? resolveTrustedWorkspaceAuthorityV1)();
       if (authority.status !== 'TRUSTED') return blocked(request.requestId, 'TRUSTED_WORKSPACE_AUTHORITY_UNAVAILABLE', 'WORKSPACE_AUTHORITY', { reason: authority.reason });
       let scopeResult: VerifiedContextWorkspaceScopeV1 | { status: 'BLOCKED'; reason: string };
-      try { scopeResult = await ports.authorizeWorkspaceScope({ actorId, authority }); }
+      try { scopeResult = await ports.authorizeWorkspaceScope({ actorId, request, authority }); }
       catch { return blocked(request.requestId, 'WORKSPACE_MEMBERSHIP_UNAVAILABLE', 'AUTHORIZED_SOURCE_SCOPE'); }
       if (scopeResult.status === 'BLOCKED') {
         return blocked(request.requestId, scopeResult.reason, 'AUTHORIZED_SOURCE_SCOPE');
@@ -269,7 +274,8 @@ export function createVerifiedContextServiceV1(ports: VerifiedContextServicePort
         schema: 'atlas.verified-context-result.v1', status: 'ADMITTED', requestId: request.requestId,
         contextPacketRef: `verified-context:sha256:${contextPacketDigest}`, contextPacketDigest,
         contextManifestChecksum: manifest.identityChecksum, promptPlanChecksum: rendered.promptPlan.checksumSha256,
-        promptPlan: rendered.promptPlan, receipt, canonicalAuthority: false, writesPerformed: false,
+        promptPlan: rendered.promptPlan, aceContextPacket: rendered.aceContextPacket,
+        receipt, canonicalAuthority: false, writesPerformed: false,
       });
     },
   };
@@ -281,6 +287,20 @@ export function verifyVerifiedContextMastraReadbackV1(result: VerifiedContextRes
   if (result.status !== 'ADMITTED') return result;
   if (typeof result.receipt !== 'object' || result.receipt === null || Array.isArray(result.receipt)) {
     return blocked(result.requestId, 'VERIFIED_CONTEXT_RECEIPT_INVALID', 'MASTRA_READBACK');
+  }
+  let aceContextPacket;
+  try { aceContextPacket = AceContextPacketV1Schema.parse(result.aceContextPacket); }
+  catch { return blocked(result.requestId, 'VERIFIED_CONTEXT_PACKET_INVALID', 'MASTRA_READBACK'); }
+  const packetPayload = {
+    runId: aceContextPacket.runId,
+    sourceRef: aceContextPacket.sourceRef,
+    conceptId: aceContextPacket.conceptId,
+    confidenceScore: aceContextPacket.confidenceScore,
+    contextBlob: aceContextPacket.contextBlob,
+  };
+  if (!aceContextPacket.injectionSanitized
+    || aceContextPacket.packetChecksum !== `sha256:${createHash('sha256').update(JSON.stringify(packetPayload), 'utf8').digest('hex')}`) {
+    return blocked(result.requestId, 'VERIFIED_CONTEXT_PACKET_CHECKSUM_MISMATCH', 'MASTRA_READBACK');
   }
   const { receiptChecksum, ...originalReceiptBody } = result.receipt as Record<string, unknown>;
   if (typeof receiptChecksum !== 'string' || !/^[a-f0-9]{64}$/.test(receiptChecksum)
@@ -323,6 +343,15 @@ export function verifyVerifiedContextMastraReadbackV1(result: VerifiedContextRes
     || result.contextPacketRef !== `verified-context:sha256:${result.contextPacketDigest}`
     || plan.checksumSha256 !== result.promptPlanChecksum) {
     return blocked(result.requestId, 'MASTRA_PROMPT_PLAN_READBACK_MISMATCH', 'MASTRA_READBACK');
+  }
+  const packetDigest = sha({
+    requestId: result.requestId,
+    manifestChecksum: result.contextManifestChecksum,
+    aceContextPacket,
+    promptPlan: plan,
+  });
+  if (packetDigest !== result.contextPacketDigest) {
+    return blocked(result.requestId, 'VERIFIED_CONTEXT_PACKET_DIGEST_MISMATCH', 'MASTRA_READBACK');
   }
   const priorReceipt = { ...(result.receipt as Record<string, unknown>) };
   delete priorReceipt.receiptChecksum;

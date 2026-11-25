@@ -1,0 +1,147 @@
+{
+  "schema": "atlas.production-readiness-fusion-ranker.v1",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "concurrency": {
+    "asyncSemaphore": 8,
+    "cpuWorkers": 4
+  },
+  "timingMs": {
+    "asyncProbesMs": 2670.78,
+    "multicoreFusionMs": 2.52
+  },
+  "pfb1Telemetry": {
+    "bytes": 127,
+    "sha256": "sha256:9b6222b1b143ef3b96aadd92f23d2e99aa6e796349077ae3fbf88116d42deda4"
+  },
+  "totalCandidates": 7,
+  "order": "SCORE_DESC_ORDINAL_ASC_ID_ASC",
+  "recommendations": [
+    {
+      "rank": 1,
+      "candidate_ordinal": 0,
+      "canonical_id": "readiness:reclaim-disk-headroom",
+      "title": "Reclaim C: disk headroom (6.02 GiB free vs 8.00 GiB floor; ~31.2 GB safe in .venv*/node_modules/.tmp)",
+      "lane": "infrastructure.storage",
+      "fusion_score": 0.973503,
+      "rrf_score": 0.988281,
+      "weighted_signal_score": 0.961412,
+      "readiness_pct": 75.13,
+      "status_gate": "ACTIONABLE_NEXT_STEP",
+      "recommended_command": "node scripts/atlas/assert-resource-headroom-v1.mjs",
+      "source_revision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "evidence_refs": [
+        "scripts/atlas/assert-resource-headroom-v1.mjs",
+        "scripts/atlas/audit-artifact-bloat.mjs"
+      ]
+    },
+    {
+      "rank": 2,
+      "candidate_ordinal": 4,
+      "canonical_id": "readiness:human-domain-calibration-200",
+      "title": "Complete human domain calibration reviews to 200+ trust floor (4 saved on current reviewer)",
+      "lane": "evaluation.gold-labels",
+      "fusion_score": 0.910521,
+      "rrf_score": 0.964472,
+      "weighted_signal_score": 0.86638,
+      "readiness_pct": 55.45,
+      "status_gate": "ACTIONABLE_NEXT_STEP",
+      "recommended_command": "node scripts/atlas/audit-domain-calibration-pg18-source-bindings-v1.mjs",
+      "source_revision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "evidence_refs": [
+        "docs/reports/domain-calibration-gold-v2-review-sheet-v2.html",
+        "python/atlas_graph_runtime/golden_label_workbench_v1.py"
+      ]
+    },
+    {
+      "rank": 3,
+      "candidate_ordinal": 2,
+      "canonical_id": "readiness:complete-eg2-route-projection",
+      "title": "Finish indexing remaining SvelteKit routes into Qdrant codebase_chunks_eg2_768_q8 (0/1334 points)",
+      "lane": "retrieval.eg2-onnx",
+      "fusion_score": 0.86034,
+      "rrf_score": 0.961178,
+      "weighted_signal_score": 0.777837,
+      "readiness_pct": 51.29,
+      "status_gate": "ACTIONABLE_NEXT_STEP",
+      "recommended_command": "C:\\Python313\\python.exe scripts/atlas/index-sveltekit-routes-eg2-onnx-v1.py --offset 1050 --limit 250",
+      "source_revision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "evidence_refs": [
+        "scripts/atlas/index-sveltekit-routes-eg2-onnx-v1.py",
+        "docs/reports/sveltekit-routes-eg2-onnx-index-v1.json"
+      ]
+    },
+    {
+      "rank": 4,
+      "candidate_ordinal": 5,
+      "canonical_id": "readiness:wsl2-rapids-8098-gpu-parity",
+      "title": "Release :8090 VRAM via manage-llama-8090-vram.ps1, run WSL2 atlas-rapids-cu13 (:8098) cuML/cuGraph parity, and restore :8090",
+      "lane": "gpu.rapids-8098",
+      "fusion_score": 0.850895,
+      "rrf_score": 0.93915,
+      "weighted_signal_score": 0.778687,
+      "readiness_pct": 78.64,
+      "status_gate": "ACTIONABLE_NEXT_STEP",
+      "recommended_command": "pwsh -NoProfile -File scripts/manage-llama-8090-vram.ps1 -Action status",
+      "source_revision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "evidence_refs": [
+        "scripts/manage-llama-8090-vram.ps1",
+        ".agents/skills/llama-server-vram-manager/SKILL.md"
+      ]
+    },
+    {
+      "rank": 5,
+      "candidate_ordinal": 1,
+      "canonical_id": "readiness:restart-8095-eg2-default",
+      "title": "Restart miniforge-nlp-sidecar (:8095) so PID 1 switches default /classify to :8094 EG2 ONNX (zero Ollama)",
+      "lane": "nlp.classification",
+      "fusion_score": 0.820124,
+      "rrf_score": 0.950259,
+      "weighted_signal_score": 0.71365,
+      "readiness_pct": 80.0,
+      "status_gate": "OPERATOR_GATE_REQUIRED",
+      "recommended_command": "docker restart miniforge-nlp-sidecar",
+      "source_revision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "evidence_refs": [
+        "python/miniforge_nlp_sidecar.py",
+        "docs/reports/ollama-retirement-inventory-v1.json"
+      ]
+    },
+    {
+      "rank": 6,
+      "candidate_ordinal": 3,
+      "canonical_id": "readiness:go-retrieval-onnx-receipt-wiring",
+      "title": "Rebuild :8097 (/embed/v2) or wire :8100 Go Retrieval to :8094 ONNX receipt + QDRANT_BM25_BRANCH_ACTIVE=true",
+      "lane": "retrieval.go-8100",
+      "fusion_score": 0.793132,
+      "rrf_score": 0.94281,
+      "weighted_signal_score": 0.670667,
+      "readiness_pct": 60.58,
+      "status_gate": "OPERATOR_GATE_REQUIRED",
+      "recommended_command": "cd services/go-retrieval-service && go test -v ./...",
+      "source_revision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "evidence_refs": [
+        "services/go-retrieval-service/main.go",
+        "services/go-embedding-service/provenance_v2.go"
+      ]
+    },
+    {
+      "rank": 7,
+      "candidate_ordinal": 6,
+      "canonical_id": "readiness:qdrant-turbo16-274k-projection",
+      "title": "Scale Qdrant codebase_chunks_768_turbo16 projection (0/274,428 points) after C: >= 8 GiB free",
+      "lane": "retrieval.qdrant-turbo16",
+      "fusion_score": 0.750284,
+      "rrf_score": 0.932252,
+      "weighted_signal_score": 0.6014,
+      "readiness_pct": 38.25,
+      "status_gate": "BLOCKED_HEADROOM",
+      "recommended_command": ".venv-qdrant120\\Scripts\\python.exe scripts/atlas/project_pg18_to_qdrant_turbo16_v1.py --limit 2560 --batch-size 256",
+      "source_revision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "evidence_refs": [
+        "scripts/atlas/project_pg18_to_qdrant_turbo16_v1.py",
+        ".tmp/turbo16-projection-checkpoint.json"
+      ]
+    }
+  ]
+}

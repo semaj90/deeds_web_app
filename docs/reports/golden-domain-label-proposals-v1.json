@@ -1,0 +1,572 @@
+{
+  "schema": "atlas.golden-domain-label-proposals.v1",
+  "generatedAt": "2026-11-25T05:13:31.801Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "note": "PROPOSAL_ONLY: goldDomainId remains null until human approval on /admin/domain-calibration (target 200+ reviewed rows, 30+ per class).",
+  "totalProposals": 40,
+  "mappedProposals": 27,
+  "unmappedProposals": 13,
+  "proposals": [
+    {
+      "sourceVocab": "codebase_chunk_index.domain",
+      "sourceValue": "backend",
+      "sourceRowCount": 63394,
+      "proposedTaxonomyId": "ATLASDOM:api-backend",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "codebase_chunk_index.domain",
+      "sourceValue": "infrastructure",
+      "sourceRowCount": 37185,
+      "proposedTaxonomyId": "ATLASTECH:infrastructure",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "codebase_chunk_index.domain",
+      "sourceValue": "utility",
+      "sourceRowCount": 32245,
+      "proposedTaxonomyId": "ATLASDOM:utilities",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "codebase_chunk_index.domain",
+      "sourceValue": "",
+      "sourceRowCount": 6800,
+      "proposedTaxonomyId": null,
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "documentation",
+      "sourceRowCount": 6782,
+      "proposedTaxonomyId": "ATLASDOM:documentation",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "Other",
+      "sourceRowCount": 5441,
+      "proposedTaxonomyId": null,
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "codebase_chunk_index.domain",
+      "sourceValue": "agent",
+      "sourceRowCount": 5241,
+      "proposedTaxonomyId": "ATLASDOM:agentic-workflows",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "UI",
+      "sourceRowCount": 4365,
+      "proposedTaxonomyId": "ATLASDOM:frontend",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "codebase_chunk_index.domain",
+      "sourceValue": "documentation",
+      "sourceRowCount": 4189,
+      "proposedTaxonomyId": "ATLASDOM:documentation",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "tool",
+      "sourceRowCount": 3695,
+      "proposedTaxonomyId": "ATLASDOM:agentic-tools",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "rag_retrieval",
+      "sourceRowCount": 1805,
+      "proposedTaxonomyId": "ATLASDOM:retrieval",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "agent",
+      "sourceRowCount": 1536,
+      "proposedTaxonomyId": "ATLASDOM:agentic-workflows",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "backend",
+      "sourceRowCount": 1495,
+      "proposedTaxonomyId": "ATLASDOM:api-backend",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "Utility",
+      "sourceRowCount": 525,
+      "proposedTaxonomyId": null,
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "agent_orchestration",
+      "sourceRowCount": 406,
+      "proposedTaxonomyId": "ATLASDOM:agentic-workflows",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "evidence_upload_storage",
+      "sourceRowCount": 236,
+      "proposedTaxonomyId": "ATLASDOM:evidence-storage",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "Library",
+      "sourceRowCount": 221,
+      "proposedTaxonomyId": "ATLASDOM:documentation",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "case_management",
+      "sourceRowCount": 180,
+      "proposedTaxonomyId": "ATLASDOM:case-management",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "infrastructure",
+      "sourceRowCount": 138,
+      "proposedTaxonomyId": "ATLASTECH:infrastructure",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "graph_topology",
+      "sourceRowCount": 112,
+      "proposedTaxonomyId": "ATLASDOM:graph",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "cache_layer",
+      "sourceRowCount": 106,
+      "proposedTaxonomyId": "ATLASDOM:cache",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "repair_workflow",
+      "sourceRowCount": 100,
+      "proposedTaxonomyId": "ATLASDOM:diagnostics-repair",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "embedding_indexing",
+      "sourceRowCount": 81,
+      "proposedTaxonomyId": "ATLASDOM:retrieval",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "codebase_chunk_index.domain",
+      "sourceValue": "mcp",
+      "sourceRowCount": 68,
+      "proposedTaxonomyId": "ATLASTECH:mcp",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "mcp_agents",
+      "sourceRowCount": 61,
+      "proposedTaxonomyId": "ATLASTECH:mcp",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "document_processing",
+      "sourceRowCount": 57,
+      "proposedTaxonomyId": "ATLASDOM:documentation",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "Authentication",
+      "sourceRowCount": 52,
+      "proposedTaxonomyId": "ATLASDOM:auth",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "citation_engine",
+      "sourceRowCount": 52,
+      "proposedTaxonomyId": "ATLASDOM:citations",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "auth_login_register",
+      "sourceRowCount": 49,
+      "proposedTaxonomyId": "ATLASDOM:auth",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "cluster_analysis",
+      "sourceRowCount": 42,
+      "proposedTaxonomyId": "ATLASDOM:clustering",
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "legal_reports",
+      "sourceRowCount": 34,
+      "proposedTaxonomyId": null,
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "memory_optimization",
+      "sourceRowCount": 28,
+      "proposedTaxonomyId": null,
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "Classification failed",
+      "sourceRowCount": 21,
+      "proposedTaxonomyId": null,
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "Embedding",
+      "sourceRowCount": 16,
+      "proposedTaxonomyId": null,
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "codebase_chunk_index.domain",
+      "sourceValue": "embedding",
+      "sourceRowCount": 13,
+      "proposedTaxonomyId": null,
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "codebase_chunk_index.domain",
+      "sourceValue": "infra",
+      "sourceRowCount": 9,
+      "proposedTaxonomyId": null,
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "codebase_chunk_index.domain",
+      "sourceValue": "legal",
+      "sourceRowCount": 8,
+      "proposedTaxonomyId": null,
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "feature_domain.domain_class",
+      "sourceValue": "trace_mcp",
+      "sourceRowCount": 6,
+      "proposedTaxonomyId": null,
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "codebase_chunk_index.domain",
+      "sourceValue": "state",
+      "sourceRowCount": 2,
+      "proposedTaxonomyId": null,
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    },
+    {
+      "sourceVocab": "codebase_chunk_index.domain",
+      "sourceValue": "ui",
+      "sourceRowCount": 2,
+      "proposedTaxonomyId": null,
+      "reviewStatus": "PENDING_HUMAN_REVIEW",
+      "goldDomainId": null,
+      "canonicalAuthority": false,
+      "eligibleFor": [
+        "domain_classifier",
+        "golden_retrieval",
+        "qlora_sft"
+      ]
+    }
+  ]
+}

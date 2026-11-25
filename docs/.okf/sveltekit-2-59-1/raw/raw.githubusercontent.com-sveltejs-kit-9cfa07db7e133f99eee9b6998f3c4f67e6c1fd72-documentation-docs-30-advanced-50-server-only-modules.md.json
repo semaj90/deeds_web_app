@@ -1,0 +1,21 @@
+{
+  "canonical_authority": false,
+  "fetched_at": "2026-11-25T02:17:57.453206Z",
+  "fetcher": "DIRECT_MARKDOWN",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\sveltekit-2-59-1\\raw\\raw.githubusercontent.com-sveltejs-kit-9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72-documentation-docs-30-advanced-50-server-only-modules.md.md",
+  "metadata": {
+    "parserRevision": "direct-markdown-utf8-v1"
+  },
+  "normalized_artifact_checksum": "45ee6521e3d6bd347f8061c62566a2fb8beadce1c94c0998173ad35dd55ddbe2",
+  "normalized_checksum": "45ee6521e3d6bd347f8061c62566a2fb8beadce1c94c0998173ad35dd55ddbe2",
+  "normalized_markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\sveltekit-2-59-1\\raw\\raw.githubusercontent.com-sveltejs-kit-9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72-documentation-docs-30-advanced-50-server-only-modules.md.546fa7e12556.normalized.md",
+  "outgoing_urls": [],
+  "raw_checksum": "643ff1a1657b632a294a14858a5b4bc830b5e3a8c7d066ae95337e04bebb0426",
+  "requested_url": "https://raw.githubusercontent.com/sveltejs/kit/9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72/documentation/docs/30-advanced/50-server-only-modules.md",
+  "resolved_url": "https://raw.githubusercontent.com/sveltejs/kit/9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72/documentation/docs/30-advanced/50-server-only-modules.md",
+  "retrieved_at": "2026-11-25T02:17:57.453206Z",
+  "source_id": "sveltekit-2-59-1",
+  "source_revision": "sha256:f69007a56a7015a81ec12ddb0d31890da3953ba8d5505cedaf3b200b375b091c",
+  "text": null,
+  "title": "Server-only modules"
+}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  loadLowRankHelperArtifactFromFileV1,
   recommendHelpersWithinContextBudgetV1,
   recommendHelpersV1,
   type LowRankHelperArtifactV1,
@@ -48,5 +49,21 @@ describe('Parent Atlas low-rank advisory recommendations', () => {
     expect(() => recommendHelpersWithinContextBudgetV1({ artifact, taskFamily: 'atlas-navigation', allowedHelpers: [], tokenBudget: -1 })).toThrow('LOW_RANK_TOKEN_BUDGET_INVALID');
     const result = recommendHelpersWithinContextBudgetV1({ artifact, taskFamily: 'atlas-navigation', allowedHelpers: ['unrelated'], tokenBudget: 100 });
     expect(result.recommendations.map((item) => item.helperId)).toEqual(['unrelated']);
+  });
+
+  it('loads and validates the exported OBO+EG2 LowRankHelperArtifactV1 bridge artifact', () => {
+    const exported = loadLowRankHelperArtifactFromFileV1();
+    expect(exported.schema).toBe('parent-atlas.low-rank-helper-artifact.v1');
+    expect(exported.artifactRevision).toMatch(/^sha256:[0-9a-f]{64}$/);
+    expect(exported.rank).toBeGreaterThanOrEqual(8);
+    const budgetReceipt = recommendHelpersWithinContextBudgetV1({
+      artifact: exported,
+      taskFamily: 'trace-retrieval',
+      allowedHelpers: ['atlas_context', 'codebase.context_for_file', 'universal_directory_gpu_search'],
+      tokenBudget: 3000,
+      maxHelpers: 3,
+    });
+    expect(budgetReceipt.recommendations.length).toBeGreaterThan(0);
+    expect(budgetReceipt.canonicalAuthority).toBe(false);
   });
 });

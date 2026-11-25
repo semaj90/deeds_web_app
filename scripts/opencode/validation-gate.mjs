@@ -7,6 +7,8 @@
  */
 
 // --- DEPENDENCY IMPORT ---
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 import { resolveAliases } from './alias-card-mapper.mjs';
 
 /**
@@ -101,4 +103,8 @@ async function runGate() {
     console.log('=====================================================\n');
 }
 
-runGate();
+export { validateRecommendation, checkSchemaReadAccess, runGate };
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+    runGate();
+}

@@ -1,0 +1,120 @@
+{
+  "schema": "atlas.p1-p2-directory-and-storage-proof.v1",
+  "generatedAt": "2026-11-25T01:17:06Z",
+  "canonicalAuthority": false,
+  "p1DirectoryAdmission": {
+    "readbackOk": true,
+    "totalHints": 4312,
+    "defectCount": 0,
+    "directoriesBoundToPgBindings": 3034,
+    "directoriesWithProvenLineage": 1999,
+    "directoriesLinkedToOpenSpecTasks": 408,
+    "directoriesWithOboConcepts": 4100,
+    "sampleTaskAndOboLinkedDirs": [
+      {
+        "dirPath": "packages/atlas-core/docs",
+        "memberCount": 3,
+        "taskIds": [
+          "parent-atlas-agentic-run-receipt-binding:RUN-CHECKPOINT-BINDING-01",
+          "parent-atlas-agentic-run-receipt-binding:RUN-EXPERIENCE-OWNER-01"
+        ],
+        "oboConceptIds": [
+          "ATLASDOM:gpu",
+          "ATLASDOM:graph",
+          "ATLASDOM:test"
+        ],
+        "evidenceDigest": "sha256:efd0e5c0af1a6f98651d724c93c7139e325d89c7f9ece336b3799b1a9bcec86a"
+      },
+      {
+        "dirPath": "packages/atlas-core/src",
+        "memberCount": 6,
+        "taskIds": [
+          "parent-atlas-ace-rlm-bitfrost-integration:ACE-FEATURE-SOURCE-QUERY-01",
+          "parent-atlas-ace-rlm-bitfrost-integration:AR-01",
+          "parent-atlas-ace-rlm-bitfrost-integration:AR-02"
+        ],
+        "oboConceptIds": [
+          "ATLASDOM:test"
+        ],
+        "evidenceDigest": "sha256:846a82a340d59934316c2fc5492e707e1fa8a9a27ef5acdf37c1adc04141f342"
+      },
+      {
+        "dirPath": "packages/atlas-core/src/evidence",
+        "memberCount": 7,
+        "taskIds": [
+          "parent-atlas-graph-retrieval-proof:GS1-10-IDENTITY-CONTRACTS-01"
+        ],
+        "oboConceptIds": [
+          "ATLASDOM:retrieval",
+          "ATLASDOM:test"
+        ],
+        "evidenceDigest": "sha256:a3bc02e3770126fb77bc12969a82c3dce1ee6c4733203e39364cfe59e86f34ad"
+      },
+      {
+        "dirPath": "packages/atlas-core/src/evidence/lanes",
+        "memberCount": 8,
+        "taskIds": [
+          "parent-atlas-graph-retrieval-proof:GS1-10-IDENTITY-CONTRACTS-01"
+        ],
+        "oboConceptIds": [
+          "ATLASDOM:database",
+          "ATLASDOM:gpu",
+          "ATLASDOM:graph",
+          "ATLASDOM:retrieval"
+        ],
+        "evidenceDigest": "sha256:8d2eea8614366b2e3c2c04aae47fd34edf3a159c0b8c6776799a2f4d1a8ce1ef"
+      },
+      {
+        "dirPath": "packages/atlas-core/src/identity",
+        "memberCount": 6,
+        "taskIds": [
+          "parent-atlas-graph-retrieval-proof:GS1-10-IDENTITY-CONTRACTS-01",
+          "parent-atlas-repair-candidate-feature-matrix:ACE-FSO-02-NULLABILITY-AND-PRESENCE-01",
+          "parent-atlas-repair-candidate-feature-matrix:CEI-01"
+        ],
+        "oboConceptIds": [
+          "ATLASDOM:test"
+        ],
+        "evidenceDigest": "sha256:95b8e0b0d35c219c20df496e3596157592f3df6a62b44532fe2a912408f571fd"
+      }
+    ],
+    "expansionBenchmark": {
+      "directoryCount": 4312,
+      "dimensions": 768,
+      "cpuMs": 158.22,
+      "cudaGpuMs": 289.87,
+      "speedup": 0.55,
+      "cpuGpuParityMaxAbsDiff": 1.07e-06
+    }
+  },
+  "p2PerformanceAndStorage": {
+    "qdrantCollectionComparison": {
+      "codebase_chunks_768_v2_int8": {
+        "collection": "codebase_chunks_768_v2",
+        "ok": true,
+        "elapsedMs": 422.67,
+        "hits": 5,
+        "topScore": 0.1188
+      },
+      "codebase_chunks_768_turbo16": {
+        "collection": "codebase_chunks_768_turbo16",
+        "ok": true,
+        "elapsedMs": 569.19,
+        "hits": 5,
+        "topScore": 0.1304
+      },
+      "codebase_chunks_eg2_768_q8_f32": {
+        "collection": "codebase_chunks_eg2_768_q8",
+        "ok": true,
+        "elapsedMs": 16.49,
+        "hits": 5,
+        "topScore": 0.8249
+      }
+    },
+    "bitfrostValkeyLifecycle": {
+      "setexReadbackMatch": true,
+      "ttlRemainingSec": 30,
+      "deletedCleanly": true
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schema": "atlas.directory-card-projection-safety-review.v1",
+  "status": "PARTIAL",
+  "canonicalAuthority": false,
+  "writesPerformed": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0
+  },
+  "existingProposalIndex": {
+    "report": "docs/reports/universal-repo-directory-cards-v1.json",
+    "directories": 4312,
+    "files": 35580,
+    "embeddingDimensions": 768,
+    "embeddingBackend": "inprocess-ort-eg2-onnx-q8",
+    "graphBackend": "cuda:0",
+    "gpuCpuParityRows": 64,
+    "gpuCpuParityMaxAbsDiff": 0.00000107,
+    "historicalQdrantStatus": "QUEUED_OFFLINE_DOCKER_PAUSED"
+  },
+  "qualification": {
+    "status": "STALE_COHORT_AND_SOURCE_AUTHORITY_NOT_PROVEN",
+    "selectedWorkspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+    "cohortLineageGeneratedAt": "2026-10-23T19:13:16.822Z",
+    "cohortRows": 52,
+    "exactSourceRevisionMatches": 52,
+    "currentWorkspaceMatches": 0,
+    "workspaceMismatches": 52,
+    "sourceAuthorityStatus": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
+    "requiresSnapshotRefresh": true,
+    "inventoryDigest": "sha256:2a6a0e4d8765a164f9bf261b50263bd9e34b97c90484a755e104a2772ff61503",
+    "memberSourceDigestsPresent": true,
+    "cardContentHashCoversSourceBytes": true,
+    "liveProjectionEligible": false
+  },
+  "revisionContract": {
+    "status": "DEFINED_NOT_BOUND",
+    "consumerShape": "atlas.directory-enrichment-hint.v2",
+    "fields": {
+      "workspace_revision": "Copy only from a workspace-frame receipt whose selected revision matches the cohort and whose sourceAuthority.safeToPromote is true with requiresSnapshotRefresh false.",
+      "source_revision": "For each member source, sha256:<hex> of its exact raw bytes; require byte length and digest readback.",
+      "inventory_manifest_digest": "sha256 of stableJsonV1 over schema, repository scope, workspace_revision, sorted sourceIdentityKey/sourceRef/sourceRevision/contentDigest/byteLength rows, and sorted path+reason exclusions.",
+      "evidence_digest": "sha256 of stableJsonV1 over directory_path, workspace_revision, inventory_manifest_digest, sorted exact member source bindings, producer_revision, and the structural card content digest.",
+      "producer_revision": "sha256 of exact producer source bytes plus extraction and exclusion policy/config revisions; do not substitute current Git HEAD.",
+      "embedding_representation_revision": "Separate identifier binding model artifact, tokenizer, task prompt, dimensions, normalization, and encoding recipe; never use it as a source or workspace revision."
+    },
+    "identityRule": "A directory path is a stable locator, not a revision. Revisions bind its exact member set and derived evidence at one admitted workspace snapshot.",
+    "digestImplementationOwner": "packages/parent-atlas/src/core/knowledge/stable-json-v1.ts",
+    "memberBindingReadback": "Wired in packages/parent-atlas/src/core/knowledge/directory-enrichment-hint-v2.ts (verifyDirectoryHintReadbackV2 / verifyDirectoryHintsBatchV2) and python/atlas_compute/directory_inventory_manifest_v2.py. Cross-language readback verified 4,312/4,312 directory hints against 35,587 member raw-byte digests (defectCount=0, proposalUnboundCount=4,312).",
+    "readerWired": true
+  },
+  "changes": [
+    {
+      "path": "scripts/atlas/build-universal-directory-cards-qdrant-v1.py",
+      "effect": "Builder now reports Qdrant projection as blocked and never creates or upserts a live collection. Cached manifests are normalized to the same fail-closed status."
+    },
+    {
+      "path": "python/atlas_compute/repo_directory_card_qdrant_helper_v1.py",
+      "effect": "Direct helper calls may prepare a local JSONL payload, but a reachable Qdrant now receives no collection-create or point-upsert requests unless a future qualified v2 writer is implemented."
+    }
+  ],
+  "workspaceFrameAudit": {
+    "path": ".tmp/review/current-workspace-frame-admission-v1.json",
+    "status": "EXECUTION_AUTHORITY_UNAVAILABLE",
+    "nextGate": "CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED",
+    "promotionEligible": false,
+    "writesPerformed": false
+  },
+  "nextGate": "Refresh source authority and cohort lineage for the selected workspace revision. Only then populate workspace_revision and digest fields from exact source bytes; current cards remain unbound.",
+  "directoryVerifier": {
+    "revision": "b7fc1b73c10 plus local changes",
+    "implementationStatus": "CREATED",
+    "path": "packages/parent-atlas/src/core/directory-enrichment-ace-link-v1.ts",
+    "probe": {
+      "status": "PASS",
+      "command": "<inline fixture> | node --import ./sveltekit-frontend/node_modules/tsx/dist/loader.mjs --input-type=module",
+      "observedOutput": "PASS: stable order, metadata bound, altered digest/duplicate/stale revision refused",
+      "scope": "Local digest fixture. Production inventory loading and ACE citation readback remain open."
+    }
+  },
+  "validation": {
+    "testsRun": false,
+    "liveServicesProbed": false,
+    "reason": "The workspace-frame audit read persisted receipts and wrote a local report only; no live datastore or service was changed."
+  }
+}

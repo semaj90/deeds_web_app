@@ -15,6 +15,7 @@ class KBIngestTool:
     def __init__(self):
         self.minio_endpoint = os.getenv('MINIO_ENDPOINT', 'localhost:9000')
         self.qdrant_url = os.getenv('QDRANT_URL', 'http://localhost:6333')
+        self.eg2_onnx_url = os.getenv('GEMMA2_ONNX_URL', 'http://127.0.0.1:8094').rstrip('/')
         self.ollama_url = os.getenv('OLLAMA_URL', 'http://localhost:11434')
         self.bucket = 'knowledge-base'
 
@@ -105,10 +106,24 @@ class KBIngestTool:
         return chunks
 
     async def _generate_embeddings(self, chunks: List[str]) -> List[List[float]]:
-        """Generate embeddings via Ollama"""
-        embeddings = []
+        """Generate embeddings via :8094 EG2 ONNX first, falling back to Ollama."""
+        if not chunks:
+            return []
 
         async with httpx.AsyncClient(timeout=30.0) as client:
+            try:
+                eg2_resp = await client.post(
+                    f"{self.eg2_onnx_url}/embed",
+                    json={"texts": chunks, "dims": [768]}
+                )
+                if eg2_resp.status_code == 200:
+                    vecs = eg2_resp.json().get("embeddings", {}).get("768", [])
+                    if isinstance(vecs, list) and len(vecs) == len(chunks):
+                        return vecs
+            except Exception as e:
+                print(f"⚠️ EG2 ONNX :8094 unavailable, falling back to Ollama: {e}")
+
+            embeddings = []
             for chunk in chunks:
                 try:
                     response = await client.post(
@@ -130,7 +145,7 @@ class KBIngestTool:
                     print(f"❌ Embedding error: {e}")
                     embeddings.append([0.0] * 768)
 
-        return embeddings
+            return embeddings
 
     async def _store_in_minio(
         self,

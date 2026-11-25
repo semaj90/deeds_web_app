@@ -1,0 +1,90 @@
+{
+  "schema": "atlas.docker-restored-hybrid-baseline-review.v1",
+  "generatedAt": "2026-11-24T16:30:00-08:00",
+  "status": "BLOCKED_SOURCE_REVISION_AND_PG_RECONCILIATION",
+  "mode": "READ_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "docker": {
+    "engine": "28.5.1",
+    "project": "deeds-web-app",
+    "runningAndHealthy": ["legal-ai-postgres", "legal-ai-qdrant", "legal-ai-valkey", "legal-ai-go-retrieval", "legal-ai-go-embedding", "miniforge-nlp-sidecar", "atlas-gemma2-onnx-embed"],
+    "degraded": {
+      "legal-ai-bifrost": "restarting; restart count 10",
+      "legal-ai-neo4j": "health starting"
+    },
+    "hostProcess": {
+      "8090": "not listening"
+    },
+    "containersChanged": false
+  },
+  "postgresFts": {
+    "anchorQuery": "bindRecommendationEvidenceToTopKV1",
+    "anchorStatus": "POSTGRES_FTS_REPLAY_UNPROVEN",
+    "anchorHits": 0,
+    "anchorPlanCaptured": true,
+    "anchorPlanIndex": "idx_codebase_chunk_index_source_revision",
+    "naturalQuery": "recommendation evidence",
+    "naturalQueryHits": 951,
+    "revisionQualifiedHits": 0,
+    "revisionNullHits": 951,
+    "sourceRefMissingHits": 29,
+    "contentHashMissingHits": 0,
+    "naturalQueryPlanIndex": "idx_codebase_chunk_index_source_revision",
+    "ginIndexUsedByCapturedQualifiedPlans": false,
+    "directGoFts": {
+      "candidateCount": 5,
+      "identityPassCount": 0,
+      "identityStatus": "REVIEW_REQUIRED",
+      "identityReason": "ATLAS_FTS_REVISION_INCOMPLETE"
+    },
+    "receipts": [
+      "docs/reports/postgres-fts-topk-anchor-replay-docker-restored-v1.json",
+      "docs/reports/postgres-fts-anchor-natural-terms-v1.json",
+      "docs/reports/postgres-fts-anchor-expanded-terms-v1.json"
+    ]
+  },
+  "qdrant": {
+    "version": "qdrant/qdrant:v1.20.2 (container image tag verified by docker inspect)",
+    "codebase_chunks_768": {
+      "points": 328468,
+      "indexedVectors": 328386,
+      "vectors": "content/signature/error: 768D cosine",
+      "quantization": "scalar INT8, quantile 0.99, always_ram=false"
+    },
+    "codebase_chunks_768_turbo16": {
+      "points": 76000,
+      "indexedVectors": 68419,
+      "vectors": "content/signature/error: 768D cosine, datatype turbo16",
+      "quantization": null
+    },
+    "codebase_chunks_eg2_768_q8": {
+      "points": 1074,
+      "indexedVectors": 0,
+      "vectors": "768D cosine",
+      "quantization": null
+    }
+  },
+  "goRetrieval": {
+    "health": "healthy",
+    "boundedSemanticProbe": {
+      "query": "bindRecommendationEvidenceToTopKV1",
+      "returnedChunkCount": 0,
+      "collection": "codebase_chunks_768",
+      "rrfUsed": true,
+      "qdrantBm25BranchActive": false,
+      "pgReconciledCount": 0,
+      "graphExpansionCount": 0,
+      "status": "NOT_CANONICALLY_REJOINED"
+    }
+  },
+  "gates": {
+    "liveFtsPlan": "PARTIAL_NO_REVISION_QUALIFIED_ROWS",
+    "liveHybridRetrieval": "BLOCKED_PG_RECONCILED_COUNT_ZERO_AND_BM25_DISABLED",
+    "sourceByteAndRevisionReadback": "BLOCKED_NO_QUALIFIED_FTS_ROWS",
+    "verifiedContextAndAce": "NOT_RUN_NO_QUALIFIED_CANDIDATE",
+    "staleRevisionAndSwappedOrdinalLiveCases": "NOT_RUN",
+    "representationBenchmark": "NOT_RUN"
+  },
+  "nextAction": "Repair or refresh source_revision and source_ref provenance for the current workspace through the canonical ingest/admission owner; then rerun FTS, establish nonzero PG18 rejoin on the semantic lane, and continue only with exact source-byte readback. Do not start Turbo or ranking ablations yet."
+}

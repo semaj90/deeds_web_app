@@ -26,6 +26,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "python"))
 
 import atlas_okf_docs_pipeline as P  # noqa: E402
@@ -93,6 +94,7 @@ def build(manifest, coords: dict, *, verified_pages: list[bytes] | None = None) 
             receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
             captured_bytes = receipt_path.with_suffix(".md").read_bytes()
             text = captured_bytes.decode("utf-8")
+            normalized_bytes = _normalize_ws(text).encode("utf-8")
             url = receipt["resolved_url"]
             if verified_pages is not None:
                 if (
@@ -100,7 +102,11 @@ def build(manifest, coords: dict, *, verified_pages: list[bytes] | None = None) 
                     or receipt.get("source_revision") != source.source_revision
                     or receipt.get("requested_url") != url
                     or url not in source.pages
-                    or receipt.get("normalized_checksum") != hashlib.sha256(captured_bytes).hexdigest()
+                    or receipt.get("normalized_checksum") != hashlib.sha256(normalized_bytes).hexdigest()
+                    or (
+                        receipt["fetcher"] == "DIRECT_MARKDOWN"
+                        and receipt.get("raw_checksum") != hashlib.sha256(captured_bytes).hexdigest()
+                    )
                 ):
                     raise ValueError("PILOT_CAPTURE_READBACK_MISMATCH")
             override = coords["sources"][source.source_id].get("urlOverrides", {}).get(url, {})
@@ -116,7 +122,6 @@ def build(manifest, coords: dict, *, verified_pages: list[bytes] | None = None) 
                                       overlap_chars=OVERLAP, coordinate_for=lambda page, source=source: P.build_page_coordinate(source, page),
                                       chunk_identity_version=source.chunk_identity_version)
             if verified_pages is not None:
-                normalized_bytes = _normalize_ws(text).encode("utf-8")
                 if not chunks or any(normalized_bytes[c.start_byte:c.end_byte] != c.text.encode("utf-8") for c in chunks):
                     raise ValueError("PILOT_CHUNK_SPAN_MISMATCH")
                 verified_pages.append(normalized_bytes)
@@ -136,7 +141,9 @@ def build(manifest, coords: dict, *, verified_pages: list[bytes] | None = None) 
                     "publisher": source.publisher, "sourceAuthority": "OFFICIAL" if authority_class == "OFFICIAL_PRIMARY" else "COMMUNITY",
                     "fetcher": receipt["fetcher"], "crawlRevision": source.source_revision,
                     "parserRevision": (
-                        f"firecrawl-v2-markdown/{manifest.producer_revision}"
+                        receipt["metadata"]["parserRevision"]
+                        if receipt["fetcher"] == "DIRECT_MARKDOWN"
+                        else f"firecrawl-v2-markdown/{manifest.producer_revision}"
                         if receipt["fetcher"] == "FIRECRAWL_V2"
                         else f"beautifulsoup4=={receipt.get('metadata', {}).get('parserVersion', 'unknown')}/html.parser"
                     ),
@@ -169,6 +176,7 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=ENVELOPES, help="Admission envelope output path")
     parser.add_argument("--receipt", type=Path, default=RECEIPT, help="Builder receipt output path")
     parser.add_argument("--normalized-page", type=Path, help="Export the verified UTF-8 byte source for a one-page admission pilot")
+    parser.add_argument("--verify-capture", action="store_true", help="Require exact readback of every manifest page and chunk")
     parser.add_argument("--nlp8095", action="store_true", help="Stamp chunks with live :8095 /analyze domain_class and extraction revision (read-only)")
     args = parser.parse_args()
     manifest = P.load_manifest(args.manifest)
@@ -178,8 +186,13 @@ def main() -> int:
     selected_sources, recrawl_plan = P._sources_selected_by_recrawl_plan(manifest, prior_manifest)
     selected_manifest = replace(manifest, sources=selected_sources)
     failures = acquire(selected_manifest) if args.acquire else []
-    verified_pages = [] if args.normalized_page else None
+    verified_pages = [] if args.normalized_page or args.verify_capture else None
     envelopes, native = build(selected_manifest, coords, verified_pages=verified_pages)
+    if args.verify_capture:
+        expected = {(source.source_id, url) for source in selected_sources for url in source.pages}
+        actual = {(envelope["sourceId"], envelope["page"]["url"]) for envelope in envelopes}
+        if failures or not expected or actual != expected or len(actual) != len(envelopes):
+            raise SystemExit("CAPTURE_READBACK_REQUIRES_COMPLETE_MANIFEST_COVERAGE")
     nlp8095_stamped = 0
     if args.nlp8095:
         for env in envelopes:
@@ -221,6 +234,7 @@ def main() -> int:
         "acquired": args.acquire,
         "nlp8095Stamped": nlp8095_stamped,
         "acquisitionFailures": failures,
+        "exactCaptureReadback": args.verify_capture,
         "pages": len(envelopes),
         "chunks": sum(len(e["chunks"]) for e in envelopes),
         "envelopesDigest": "sha256:" + sha(stable(envelopes)),

@@ -23,9 +23,8 @@ export const VERIFIED_CONTEXT_TOPK_INPUT_REQUIREMENTS_V1 = [
   'graphifyLifecycle',
 ] as const;
 
-export const VERIFIED_CONTEXT_FINAL_HANDOFF_GAPS_V1 = [
-  'immutableContextPacketHydrator',
-] as const;
+// The route now performs in-memory checksum validation and hydration before model inference.
+export const VERIFIED_CONTEXT_FINAL_HANDOFF_GAPS_V1 = [] as const;
 
 function runtimeStatusDetails(requestId: string, missingProviders: readonly string[] = []) {
   return {

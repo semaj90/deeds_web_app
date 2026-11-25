@@ -25,7 +25,8 @@ const digest = (value) => `sha256:${crypto.createHash('sha256').update(value, 'u
 const text = (value) => (value === null || value === undefined ? null : String(value));
 const qualifiedRevision = (value) => /^sha256:[0-9a-f]{64}$/i.test(String(value ?? '').trim())
   || (typeof value === 'string' && value.trim().length > 0 && !/^workspace:\d+$/i.test(value.trim()));
-const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, statement_timeout: 30_000, application_name: 'atlas-postgres-fts-replay-v1' });
+const capturePlan = process.argv.includes('--explain');
+const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, connectionTimeoutMillis: 5_000, statement_timeout: 30_000, application_name: 'atlas-postgres-fts-replay-v1' });
 const report = {
   schema: 'atlas.postgres-fts-replay.v1',
   generatedAt: new Date().toISOString(),
@@ -84,8 +85,7 @@ try {
         has('source_ref') ? `ci.source_ref IS NOT NULL AND btrim(ci.source_ref::text) <> ''` : 'FALSE',
         has('content_hash') ? "ci.content_hash IS NOT NULL AND btrim(ci.content_hash::text) <> ''" : 'TRUE',
       ].join(' AND ');
-      const rows = hasSearchVector
-        ? (await client.query(`
+      const rankedQuery = `
             SELECT ${baseSelect.split(', ').map((column) => `ci.${column}`).join(', ')},
                    ts_rank_cd(ci.search_vector, q.tsq, 32)::float8 AS rank
               FROM public.codebase_chunk_index AS ci
@@ -94,8 +94,12 @@ try {
                AND ${qualifiedFilters}
              ORDER BY rank DESC, ci.${orderColumn}
              LIMIT 25
-          `, [queryText])).rows
-        : [];
+          `;
+      const rows = hasSearchVector ? (await client.query(rankedQuery, [queryText])).rows : [];
+      if (hasSearchVector && capturePlan) {
+        const planResult = await client.query(`EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) ${rankedQuery}`, [queryText]);
+        report.rankedQueryPlan = planResult.rows[0]['QUERY PLAN'];
+      }
       const stableRows = rows.map((row) => Object.fromEntries(Object.entries(row).sort(([a], [b]) => a.localeCompare(b))));
       report.database = { relation: table, columns, textColumns, identityColumns, ginIndexes, indexCount: indexes.length };
       report.replay = {
@@ -123,7 +127,11 @@ try {
   }
 } catch (error) {
   report.status = 'POSTGRES_FTS_REPLAY_ERROR';
-  report.error = error instanceof Error ? error.message : String(error);
+  const code = error && typeof error === 'object' && 'code' in error ? String(error.code) : null;
+  report.blockers = [code === 'ECONNREFUSED' || code === 'ETIMEDOUT' ? 'POSTGRES_UNAVAILABLE' : 'POSTGRES_FTS_QUERY_FAILED'];
+  report.errorCode = code;
+  // Keep the receipt useful without recording connection strings or driver internals.
+  report.error = code ? `PostgreSQL connection/query failed (${code})` : 'PostgreSQL connection/query failed';
 } finally {
   await pool.end();
 }
@@ -137,3 +145,7 @@ fs.writeFileSync(
   outputArg ? { encoding: 'utf8', flag: 'wx' } : 'utf8',
 );
 console.log(JSON.stringify({ status: report.status, blockers: report.blockers ?? [], replay: report.replay ?? null, writesPerformed: false, reportPath: path.relative(root, reportPath).replaceAll('\\', '/') }, null, 2));
+// A saved receipt is useful even when PostgreSQL is unavailable, but callers
+// must not treat that diagnostic as a successful proof merely because the
+// process exited cleanly. Only the explicit proven status is a successful gate.
+if (report.status !== 'POSTGRES_FTS_REPLAY_PROVEN') process.exitCode = 1;

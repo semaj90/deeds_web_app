@@ -98,16 +98,14 @@ describe('POST /api/atlas/mastra-agent', () => {
     });
   });
 
-  it('does not synthesize until an immutable packet hydrator exists', async () => {
+  it('refuses an admitted result without a valid server-owned ACE packet', async () => {
     const execute = vi.fn().mockResolvedValue(admitted);
     const response = await post({ query: 'find route helpers' }, { user: { id: 'actor-1' }, requestId: 'server-request-1', verifiedContextService: { execute } });
-    expect(response.status).toBe(503);
+    expect(response.status).toBe(409);
     expect(await response.json()).toMatchObject({
       success: false,
-      error: 'VERIFIED_CONTEXT_PACKET_HYDRATOR_NOT_CONFIGURED',
-      contextPacketRef: admitted.contextPacketRef,
-      contextPacketDigest: admitted.contextPacketDigest,
-      promptPlanChecksum: admitted.promptPlanChecksum,
+      error: 'VERIFIED_CONTEXT_PACKET_INVALID',
+      firstFailingBoundary: 'MASTRA_READBACK',
       writesPerformed: false,
     });
   });

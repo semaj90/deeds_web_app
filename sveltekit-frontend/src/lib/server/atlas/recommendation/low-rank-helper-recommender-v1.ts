@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { z } from 'zod';
 
 export const LOW_RANK_HELPER_RECOMMENDER_V1_SCHEMA =
@@ -176,4 +178,22 @@ export function recommendHelpersWithinContextBudgetV1(input: {
     canonicalAuthority: false,
     writesPerformed: false,
   });
+}
+
+export function loadLowRankHelperArtifactFromFileV1(filePath?: string): LowRankHelperArtifactV1 {
+  const candidates = filePath
+    ? [filePath]
+    : [
+        resolve(process.cwd(), 'memory/atlas/low-rank-helper-artifact-v1.json'),
+        resolve(process.cwd(), 'sveltekit-frontend/memory/atlas/low-rank-helper-artifact-v1.json'),
+      ];
+  for (const candidate of candidates) {
+    try {
+      const parsed = JSON.parse(readFileSync(candidate, 'utf8'));
+      return LowRankHelperArtifactV1Schema.parse(parsed);
+    } catch {
+      // Try next candidate path
+    }
+  }
+  throw new Error('LOW_RANK_HELPER_ARTIFACT_NOT_FOUND_OR_INVALID');
 }

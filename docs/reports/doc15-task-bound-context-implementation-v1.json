@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.doc15-task-bound-context-implementation.v1",
+  "status": "LOCAL_TASK_BOUND_CONTEXT_IMPLEMENTED",
+  "selectedTask": {
+    "logicalTaskKey": "parent-atlas-versioned-doc-intelligence:DOC-15",
+    "revision": "sha256:66677c2ec1259eacd06e8928de077154c4c7582a378e65ac33809b6403ed1f48",
+    "selectionStatus": "OPEN_AT_IMPLEMENTATION_START"
+  },
+  "changes": [
+    "The external documentation A2A request now requires a logical task key and task revision.",
+    "The route re-reads the workboard receipt and refuses missing, stale, non-open, or mismatched tasks before PostgreSQL document search.",
+    "The ContextManifestV2 identity optionally binds the task key, task revision, task source reference, task-file digest, and workboard snapshot digest; the external documentation route always supplies this binding.",
+    "A pure DocumentationFactV1 binder now validates proposed fact spans against already read-back official chunk UTF-8 bytes and records absolute source byte offsets plus a quote digest.",
+    "Legacy ContextManifestV2 callers remain compatible when taskBinding is absent."
+  ],
+  "verification": {
+    "focusedTests": "20 passed across 3 suites",
+    "focusedCommand": "npm exec vitest run src/routes/api/ai/agent/a2a-error-fix-proposal.route.spec.ts src/lib/server/atlas/graph/context-manifest-v2.spec.ts src/lib/server/atlas/docs/documentation-fact-span-v1.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1 --no-file-parallelism",
+    "fullSvelteCheck": "svelte-check-native 1.11.1 passed full tsconfig project with 0 errors and 0 warnings; the earlier Node checker run was stopped after sustained multi-gigabyte memory use",
+    "canonicalStoreWrites": 0,
+    "openSpecTaskCheckboxChanged": false
+  },
+  "remainingBlockers": [
+    "The scoped Python DSPy entry point explicitly refuses because an authenticated independent canonical ACE readback transport is not configured; a task-bound manifest alone must not be treated as a generated recommendation.",
+    "The fact-span binder is implemented and fixture-tested but is not yet connected to a production extractor response or persisted review/admission flow.",
+    "No live task-bound retrieval-to-ACE recommendation or validated receipt was produced in this implementation pass.",
+    "DOC-15 also separately requires documentation-specific version/authority filtering in the existing retrieval orchestrator and live filtered same-query fan-out; this route change does not close those acceptance criteria."
+  ],
+  "authority": {
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "promotionAuthorized": false
+  }
+}

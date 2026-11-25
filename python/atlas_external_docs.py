@@ -19,7 +19,7 @@ from pathlib import PurePosixPath
 import re
 from typing import Any, Callable, Iterable, Mapping, Sequence
 from urllib.parse import urljoin, urlparse
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener, urlopen
 
 Json = dict[str, Any]
 
@@ -202,6 +202,11 @@ _API_SIGNATURE_LINE_RES: tuple[re.Pattern[str], ...] = (
 # `foo(bar)` or `cutile.tile_load(ptr, shape)`, produced by extract_structured_text()'s
 # inline <code> handling.
 _INLINE_CODE_CALL_RE = re.compile(r"`([\w][\w.]*\([^`\n]*\))`")
+# Not anchored to line start: reference pages (e.g. PostgreSQL) can render several overloads
+# on one line ("f ( ... json ) -> t f ( ... jsonb ) -> t"), and a ^ anchor kept only the first.
+_SQL_FUNCTION_TABLE_SIGNATURE_RE = re.compile(
+    r"(?<![\w])([a-zA-Z_]\w*[ \t]+\((?:[^()\n]|\[[^\]\n]*\])*\))(?=[ \t]*→)", re.M
+)
 
 
 def extract_code_blocks_and_signatures(text: str) -> tuple[tuple[Json, ...], tuple[str, ...]]:
@@ -225,6 +230,11 @@ def extract_code_blocks_and_signatures(text: str) -> tuple[tuple[Json, ...], tup
     for match in _INLINE_CODE_CALL_RE.finditer(text):
         candidate = match.group(1).strip()
         if candidate and candidate not in seen:
+            seen.add(candidate)
+            signatures.append(candidate)
+    for match in _SQL_FUNCTION_TABLE_SIGNATURE_RE.finditer(text):
+        candidate = match.group(1)
+        if candidate not in seen:
             seen.add(candidate)
             signatures.append(candidate)
     return code_blocks, tuple(signatures)
@@ -442,9 +452,44 @@ def fetch_beautifulsoup(url: str, *, timeout_seconds: int = 30, user_agent: str 
         title=title,
         markdown=text,
         raw_checksum=_sha(raw),
-        normalized_checksum=_sha(text),
+        normalized_checksum=_sha(_normalize_ws(text)),
         outgoing_urls=outgoing_urls,
         metadata={"parser": "html.parser", "parserVersion": parser_version, "structured": True},
+    )
+
+
+def fetch_direct_markdown(url: str, *, timeout_seconds: int = 30) -> FetchResult:
+    """Capture a pinned HTTPS Markdown page and retain its original UTF-8 bytes."""
+    if urlparse(url).scheme != "https":
+        raise ValueError("DIRECT_MARKDOWN_HTTPS_REQUIRED")
+
+    class NoRedirect(HTTPRedirectHandler):
+        def redirect_request(self, req, fp, code, msg, headers, newurl):
+            return None
+
+    byte_limit = 2 * 1024 * 1024
+    request = Request(url, headers={"User-Agent": "Parent-Atlas-OKF/1.0"})
+    with build_opener(NoRedirect()).open(request, timeout=timeout_seconds) as response:
+        if response.headers.get_content_type() not in {"text/plain", "text/markdown", "text/x-markdown"}:
+            raise ValueError("DIRECT_MARKDOWN_CONTENT_TYPE_INVALID")
+        raw = response.read(byte_limit + 1)
+    if len(raw) > byte_limit:
+        raise ValueError("DIRECT_MARKDOWN_BYTE_LIMIT_EXCEEDED")
+    markdown = raw.decode("utf-8", errors="strict")
+    normalized = _normalize_ws(markdown)
+    if not normalized:
+        raise ValueError("DIRECT_MARKDOWN_EMPTY")
+    title = re.search(r"^title:[ \t]+([^\r\n]+)", markdown, re.M) if markdown.startswith("---\n") else None
+    return FetchResult(
+        fetcher="DIRECT_MARKDOWN",
+        url=url,
+        resolved_url=url,
+        title=title.group(1) if title else PurePosixPath(urlparse(url).path).name,
+        markdown=markdown,
+        raw_checksum=_sha(raw),
+        normalized_checksum=_sha(normalized),
+        outgoing_urls=(),
+        metadata={"parserRevision": "direct-markdown-utf8-v1"},
     )
 
 
