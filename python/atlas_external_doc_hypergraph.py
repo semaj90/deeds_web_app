@@ -305,7 +305,8 @@ def build_external_doc_relation_proposal_v1(
     *,
     candidate_row: Mapping[str, Any],
     chunk: Mapping[str, Any],
-    source_readback: Mapping[str, Any],
+    source_readback: Mapping[str, Any] | None = None,
+    normalized_page_bytes: bytes | None = None,
     workspace_revision: str,
 ) -> HypergraphFactProposalV1:
     """Adapt one readback-verified lexical candidate to the existing proposal owner.
@@ -313,7 +314,19 @@ def build_external_doc_relation_proposal_v1(
     Participant IDs are deliberately mention-scoped, not canonical entity IDs.
     The raw predicate is explicitly marked unmapped; ontology/concept IDs remain
     empty until a reviewed mapping exists. This helper never admits or persists.
+    Accepts either source_readback dict or raw normalized_page_bytes for full backward compatibility.
     """
+    if source_readback is None:
+        if not isinstance(normalized_page_bytes, bytes):
+            raise ValueError("SOURCE_READBACK_OR_NORMALIZED_BYTES_REQUIRED")
+        doc_sha = str(chunk.get("document_checksum") or _sha256_hex(normalized_page_bytes))
+        source_readback = {
+            "source_id": chunk.get("source_id"),
+            "source_revision": chunk.get("source_revision"),
+            "source_url": chunk.get("source_url"),
+            "content_bytes": normalized_page_bytes,
+            "content_sha256": doc_sha,
+        }
 
     if candidate_row.get("schema") != "atlas.external-doc-relation-candidate.v1":
         raise ValueError("EXTERNAL_DOC_RELATION_CANDIDATE_SCHEMA_MISMATCH")

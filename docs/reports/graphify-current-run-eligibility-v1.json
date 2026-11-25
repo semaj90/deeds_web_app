@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-current-run-eligibility.v1",
-  "generatedAt": "2026-10-19T07:17:50.819Z",
+  "generatedAt": "2026-11-23T22:05:15.726Z",
   "mode": "READ_ONLY_CURRENT_RUN_ELIGIBILITY",
   "runningRunCount": 0,
   "staleRunCount": 19,
@@ -21,17 +21,18 @@
     "singleLifecycleWriterClaimed": false
   },
   "receiptConsistency": {
-    "status": "CONFLICTING_RECEIPTS",
-    "selectedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
-    "dailyExecutionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
-    "authorityRows": 1,
-    "selectedAuthorityRows": 0,
-    "reasonCodes": [
-      "DECISION_DAILY_EXECUTION_ID_MISMATCH",
-      "AUTHORITY_TABLE_DOES_NOT_CONFIRM_DECISION_RECEIPT"
-    ]
+    "status": "RECEIPTS_CONSISTENT",
+    "selectedExecutionId": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
+    "dailyExecutionId": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
+    "authorityRows": 2,
+    "selectedAuthorityRows": 1,
+    "reasonCodes": []
   },
   "authorityRows": [
+    {
+      "execution_id": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
+      "authority_state": "SELECTED"
+    },
     {
       "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
       "authority_state": "LEGACY_IMPORTED"
@@ -41,21 +42,24 @@
     "COMPLETED",
     "SUPERSEDED"
   ],
-  "transitionPrimitiveExists": false,
+  "transitionPrimitiveExists": true,
+  "transitionPrimitives": [
+    "completeExecution",
+    "completeGraphifyRunInTransactionV2",
+    "completeGraphifyRunV2"
+  ],
   "staleRunsReconciled": true,
   "namespaceOwner": "workspace-source-namespace-audit (authority unresolved)",
   "namespaceAuthorityStatus": "PROVEN",
-  "repositoryRevision": "5ae2e388f85c285bd476cf2cd354754e021d3caa",
+  "repositoryRevision": "f07c0410d080f8144ce9bfcc2d9d0cbc1f43d7f1",
   "workspaceRevision": null,
   "inputSnapshotChecksum": null,
   "eligibleForFreshRun": false,
   "blockers": [
-    "DECISION_DAILY_EXECUTION_ID_MISMATCH",
-    "AUTHORITY_TABLE_DOES_NOT_CONFIRM_DECISION_RECEIPT",
     "CURRENT_RUN_NOT_ESTABLISHED",
     "REPOSITORY_REVISION_NOT_CURRENT"
   ],
   "writesPerformed": false,
   "canonicalAuthority": false,
-  "reportChecksum": "sha256:bd289ac5979c12e3f25354f7c87bff66a707ddb795cb580c0a52f6c7fc3fb30e"
+  "reportChecksum": "sha256:b8543b59bbcca2fb7e33865f5e0d9701f27c0ed7f3577cdb42c5c22c0377e22f"
 }

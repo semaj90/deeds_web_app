@@ -1,0 +1,21 @@
+{
+  "canonical_authority": false,
+  "fetched_at": "2026-11-25T02:17:56.842920Z",
+  "fetcher": "DIRECT_MARKDOWN",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\sveltekit-2-59-1\\raw\\raw.githubusercontent.com-sveltejs-kit-9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72-documentation-docs-20-core-concepts-20-load.md.md",
+  "metadata": {
+    "parserRevision": "direct-markdown-utf8-v1"
+  },
+  "normalized_artifact_checksum": "510187f91b7f5fea1f07b2208fbc7f763e35f2541404d6a77eaf14ea6fcdbc9c",
+  "normalized_checksum": "510187f91b7f5fea1f07b2208fbc7f763e35f2541404d6a77eaf14ea6fcdbc9c",
+  "normalized_markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\sveltekit-2-59-1\\raw\\raw.githubusercontent.com-sveltejs-kit-9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72-documentation-docs-20-core-concepts-20-load.md.c97ae17dbb07.normalized.md",
+  "outgoing_urls": [],
+  "raw_checksum": "57bc8e539f4c06147adc611310e2eb2e4f1f1d325b2269052b065f183ac22381",
+  "requested_url": "https://raw.githubusercontent.com/sveltejs/kit/9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72/documentation/docs/20-core-concepts/20-load.md",
+  "resolved_url": "https://raw.githubusercontent.com/sveltejs/kit/9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72/documentation/docs/20-core-concepts/20-load.md",
+  "retrieved_at": "2026-11-25T02:17:56.842920Z",
+  "source_id": "sveltekit-2-59-1",
+  "source_revision": "sha256:f69007a56a7015a81ec12ddb0d31890da3953ba8d5505cedaf3b200b375b091c",
+  "text": null,
+  "title": "Loading data"
+}

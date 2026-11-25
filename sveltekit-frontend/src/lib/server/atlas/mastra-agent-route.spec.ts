@@ -20,6 +20,8 @@ const admitted = {
   writesPerformed: false as const,
 };
 
+const WORKSPACE_ID = '11111111-1111-4111-8111-111111111111';
+
 function post(body: unknown, locals: Record<string, unknown> = { user: { id: 'actor-1' }, requestId: 'server-request-1' }) {
   return POST({
     request: new Request('https://app.fixture/api/atlas/mastra-agent', {
@@ -31,9 +33,17 @@ function post(body: unknown, locals: Record<string, unknown> = { user: { id: 'ac
 
 describe('POST /api/atlas/mastra-agent', () => {
   it('rejects caller-assembled admission and PromptPlan fields', async () => {
-    const response = await post({ query: 'find route helpers', admission: {}, promptPlan: {}, segmentContent: [] });
+    const response = await post({ query: 'find route helpers', workspaceId: WORKSPACE_ID, admission: {}, promptPlan: {}, segmentContent: [] });
     expect(response.status).toBe(400);
     expect(await response.json()).toEqual({ success: false, error: 'INVALID_REQUEST', writesPerformed: false });
+  });
+
+  it('rejects a missing workspace selector before invoking the service', async () => {
+    const execute = vi.fn();
+    const response = await post({ query: 'find route helpers' }, { user: { id: 'actor-1' }, verifiedContextService: { execute } });
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({ success: false, error: 'INVALID_REQUEST', writesPerformed: false });
+    expect(execute).not.toHaveBeenCalled();
   });
 
   it('requires authentication before invoking the service', async () => {
@@ -44,7 +54,7 @@ describe('POST /api/atlas/mastra-agent', () => {
   });
 
   it('fails closed when the server-owned service is unconfigured', async () => {
-    const response = await post({ query: 'find route helpers' });
+    const response = await post({ query: 'find route helpers', workspaceId: WORKSPACE_ID });
     expect(response.status).toBe(503);
     expect(await response.json()).toMatchObject({
       success: false,
@@ -60,7 +70,7 @@ describe('POST /api/atlas/mastra-agent', () => {
       status: 'UNAVAILABLE', workspaceRevision: null, reason: 'LIVE_READBACK_NOT_PROVEN',
       resolverRevision: 'atlas.trusted-workspace-resolver.v1',
     }));
-    const response = await post({ query: 'find route helpers' }, {
+    const response = await post({ query: 'find route helpers', workspaceId: WORKSPACE_ID }, {
       user: { id: 'actor-1' }, requestId: 'server-request-1', verifiedContextService: service,
     });
 
@@ -87,8 +97,8 @@ describe('POST /api/atlas/mastra-agent', () => {
       refusalCode: 'FEATURE_SNAPSHOT_READBACK_NOT_ADMITTED', firstFailingBoundary: 'FEATURE_SNAPSHOT',
       receipt: { refusalCode: 'FEATURE_SNAPSHOT_READBACK_NOT_ADMITTED' }, canonicalAuthority: false, writesPerformed: false,
     });
-    const response = await post({ query: 'find route helpers', topK: 3 }, { user: { id: 'actor-1' }, requestId: 'server-request-1', verifiedContextService: { execute } });
-    expect(execute).toHaveBeenCalledWith('actor-1', { query: 'find route helpers', topK: 3, requestId: 'server-request-1' });
+    const response = await post({ query: 'find route helpers', workspaceId: WORKSPACE_ID, topK: 3 }, { user: { id: 'actor-1' }, requestId: 'server-request-1', verifiedContextService: { execute } });
+    expect(execute).toHaveBeenCalledWith('actor-1', { query: 'find route helpers', workspaceId: WORKSPACE_ID, topK: 3, requestId: 'server-request-1' });
     expect(response.status).toBe(409);
     expect(await response.json()).toMatchObject({
       success: false,
@@ -98,16 +108,14 @@ describe('POST /api/atlas/mastra-agent', () => {
     });
   });
 
-  it('does not synthesize until an immutable packet hydrator exists', async () => {
+  it('refuses an admitted result without a valid server-owned ACE packet', async () => {
     const execute = vi.fn().mockResolvedValue(admitted);
-    const response = await post({ query: 'find route helpers' }, { user: { id: 'actor-1' }, requestId: 'server-request-1', verifiedContextService: { execute } });
-    expect(response.status).toBe(503);
+    const response = await post({ query: 'find route helpers', workspaceId: WORKSPACE_ID }, { user: { id: 'actor-1' }, requestId: 'server-request-1', verifiedContextService: { execute } });
+    expect(response.status).toBe(409);
     expect(await response.json()).toMatchObject({
       success: false,
-      error: 'VERIFIED_CONTEXT_PACKET_HYDRATOR_NOT_CONFIGURED',
-      contextPacketRef: admitted.contextPacketRef,
-      contextPacketDigest: admitted.contextPacketDigest,
-      promptPlanChecksum: admitted.promptPlanChecksum,
+      error: 'VERIFIED_CONTEXT_PACKET_INVALID',
+      firstFailingBoundary: 'MASTRA_READBACK',
       writesPerformed: false,
     });
   });

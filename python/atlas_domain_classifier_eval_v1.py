@@ -102,7 +102,46 @@ def _human_reviewer_id(row: dict[str, Any], *, second: bool = False) -> Optional
     return normalized
 
 
+def _has_source_evidence_provenance(row: dict[str, Any]) -> bool:
+    evidence = row.get("domainReviewSourceEvidenceV1")
+    if not isinstance(evidence, dict) or evidence.get("evidenceStatus") != "SOURCE_EXCERPT_BINDINGS_MATCHED":
+        return False
+    if evidence.get("revisionStatus") != "SOURCE_BINDINGS_MATCH_WORKTREE":
+        return False
+    source_revision = row.get("sourceRevision")
+    workspace_revision = row.get("workspaceRevision")
+    if not isinstance(source_revision, str) or not source_revision.startswith("sha256:"):
+        return False
+    if evidence.get("currentSourceSha256") != source_revision:
+        return False
+    if not isinstance(workspace_revision, str) or not workspace_revision.strip() or evidence.get("workspaceRevision") != workspace_revision:
+        return False
+    digest = evidence.get("expectedBindingContentDigest")
+    if not isinstance(digest, str) or digest.removeprefix("sha256:").lower() != source_revision.removeprefix("sha256:").lower():
+        return False
+    start = evidence.get("startByte")
+    end = evidence.get("endByte")
+    excerpt = evidence.get("excerptText")
+    excerpt_sha = evidence.get("excerptSha256")
+    if not isinstance(start, int) or not isinstance(end, int) or start < 0 or end <= start:
+        return False
+    if not isinstance(excerpt, str) or not excerpt or row.get("textEvidence") != excerpt:
+        return False
+    excerpt_bytes = excerpt.encode("utf-8")
+    if len(excerpt_bytes) != end - start or not isinstance(excerpt_sha, str):
+        return False
+    return hashlib.sha256(excerpt_bytes).hexdigest() == excerpt_sha.removeprefix("sha256:").lower()
+
+
 def _has_human_review_provenance(row: dict[str, Any], *, second: bool = False) -> bool:
+    status_key = "secondReviewStatus" if second else "reviewStatus"
+    method_key = "secondReviewMethod" if second else "reviewMethod"
+    if row.get(status_key) != "REVIEWED":
+        return False
+    if row.get(method_key) != "BLIND_HUMAN_REVIEW_V1":
+        return False
+    if not _has_source_evidence_provenance(row):
+        return False
     if _human_reviewer_id(row, second=second) is None:
         return False
     timestamp_keys = ("secondReviewedAt", "second_reviewed_at") if second else ("reviewedAt", "reviewed_at")
@@ -118,7 +157,7 @@ def _has_human_review_provenance(row: dict[str, Any], *, second: bool = False) -
 
 def evaluate(rows: list[dict[str, Any]], predictor: Predictor, *, revision_qualified_only: bool = False) -> dict[str, Any]:
     considered = [r for r in rows if not revision_qualified_only or r.get("sourceRevision")]
-    # Escape-hatch labels and labels without a verified human reviewer are never gold.
+    # Escape-hatch labels and labels without an explicit blind-review receipt are never gold.
     non_gold = [r for r in considered if r.get("reviewedGroup") in NON_GOLD_CHOICES]
     labeled_rows = [r for r in considered if r.get("reviewedGroup") and r.get("reviewedGroup") not in NON_GOLD_CHOICES]
     unverified_review_rows = [r for r in labeled_rows if not _has_human_review_provenance(r)]
@@ -147,7 +186,7 @@ def evaluate(rows: list[dict[str, Any]], predictor: Predictor, *, revision_quali
     }
     if not gold_rows:
         report["status"] = "NO_GOLD_LABELS"
-        warnings.append("No row has a non-test human reviewer and reviewedGroup; accuracy is NOT computable. Weak-label agreement below is a diagnostic only.")
+        warnings.append("No row has an explicit BLIND_HUMAN_REVIEW_V1 decision with valid reviewer provenance; accuracy is NOT computable. Weak-label agreement below is a diagnostic only.")
     else:
         gold = [r["reviewedGroup"] for r in gold_rows]
         preds = [predictor(r) for r in gold_rows]

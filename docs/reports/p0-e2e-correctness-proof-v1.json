@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.p0-e2e-correctness-proof.v1",
+  "generatedAt": "2026-11-25T01:14:04.260Z",
+  "status": "P0_END_TO_END_PROVEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "services": {
+    "postgres": "PostgreSQL 18.4 (Debian 18.4-1.pgdg12+1) on x86_64-pc-linux-",
+    "qdrantCollection": "codebase_chunks_eg2_768_q8",
+    "qdrantPointsCount": 1271,
+    "eg2OnnxModel": "onnx-community/embeddinggemma2-q8:onnx/model_quantized.onnx",
+    "ftsRowCount": 5
+  },
+  "queryEmbedding": {
+    "query": "topology stream server route sveltekit",
+    "dimensions": 768,
+    "l2Norm": 1
+  },
+  "ordinalMap": {
+    "schema": "atlas.candidate-ordinal-map.v1",
+    "rowCount": 5,
+    "ordinalMapChecksum": "817772038096229319441e638a7352d0792cde95814b2a17470fae04e62fc17f",
+    "workspaceRevision": "sha256:960f132e0d3c4766e0fb135ff6870fe40f05c06213fda3ce10fb3b1e1963919d",
+    "candidateSnapshotRevision": "sha256:e4dfeecd010bd586a4f5f6d7d225c64949674c2ffb8c978ce71b6b6e9f76b32c"
+  },
+  "diskReconciliation": [
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/api/topology/stream/+server.ts",
+      "score": 0.7886,
+      "byteRevisionMatchesDisk": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/code-intel/topology/+page.server.ts",
+      "score": 0.77,
+      "byteRevisionMatchesDisk": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/chat/[id]/+page.server.ts",
+      "score": 0.745,
+      "byteRevisionMatchesDisk": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/all-routes/+page.server.ts",
+      "score": 0.7441,
+      "byteRevisionMatchesDisk": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/code-intel/topology/+page.svelte",
+      "score": 0.7413,
+      "byteRevisionMatchesDisk": false
+    }
+  ],
+  "exactAceCitation": {
+    "status": "SOURCE_SPAN_VERIFIED_NOT_ADMITTED",
+    "sourceRef": "sveltekit-frontend/src/routes/api/topology/stream/+server.ts",
+    "sourceRevision": "sha256:e6a3e79d0953ee4ca950d3707f980848018c00df9c0193755671d9181bed6a7b",
+    "evidenceRef": "source:sveltekit-frontend/src/routes/api/topology/stream/+server.ts#bytes:0-38",
+    "startByte": 0,
+    "endByte": 38,
+    "spanChecksum": "sha256:9d6045628dd95085c92db36537d47d9a8ef08fc146c77ce0cdee1f9c2fe2c947",
+    "checksum": "1aaffb36cc516f1b4264d9fd9fb6d91ead92749ca4423891547eb338a09cf654",
+    "snippetPreview": "import { json } from '@sveltejs/kit';\r"
+  },
+  "negativeTests": {
+    "staleRevisionRejected": true,
+    "staleRevisionError": "CACHED_PACKET_EVIDENCE_IDENTITY_MISMATCH",
+    "swappedOrdinalRejected": true,
+    "swappedOrdinalError": "CANDIDATE_ORDINAL_MAP_ORDINAL_SEQUENCE_BROKEN:index=0:candidateOrdinal=1"
+  }
+}

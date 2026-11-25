@@ -234,6 +234,28 @@ async function embedTextsOnnx(texts) {
 }
 
 async function embedTexts(texts) {
+  // Tier 0: Local EmbeddingGemma 2 ONNX server (:8094/embed — preferred non-Ollama path)
+  const eg2OnnxUrl = (process.env.GEMMA2_ONNX_URL || 'http://127.0.0.1:8094').replace(/\/+$/, '');
+  try {
+    const res = await fetch(`${eg2OnnxUrl}/embed`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texts, dims: [EMBED_DIM] }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const bucket = data?.embeddings?.[String(EMBED_DIM)];
+      if (Array.isArray(bucket) && bucket[0]?.length === EMBED_DIM) {
+        return {
+          vectors: bucket,
+          source: 'eg2-onnx-8094',
+          model: data.model_id || 'onnx-community/embeddinggemma2-q8:onnx/model_quantized.onnx',
+        };
+      }
+    }
+  } catch { /* fall through */ }
+
   // Tier 1: Dedicated llama-server (OpenAI compatible batch /v1/embeddings)
   if (llamaEmbedUrl) {
     try {
@@ -337,7 +359,7 @@ const TOOLS = {
         chunk_id: { type: 'string' },
         text: { type: 'string' },
         labels: { type: 'object', description: 'Structural label metadata to attach' },
-        collection: { type: 'string', default: 'codebase_chunks_768' },
+        collection: { type: 'string', default: 'codebase_chunks_768_v2' },
       },
       required: ['chunk_id', 'text'],
     },
@@ -348,7 +370,7 @@ const TOOLS = {
         return { ok: false, error: 'Embedding failed or wrong dimension', source: embedResult.source };
       }
 
-      const collection = args.collection ?? 'codebase_chunks_768';
+      const collection = args.collection ?? 'codebase_chunks_768_v2';
       const pointId = createHash('sha1').update(args.chunk_id).digest('hex').slice(0, 16);
 
       try {

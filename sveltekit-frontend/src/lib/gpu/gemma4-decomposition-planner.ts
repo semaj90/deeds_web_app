@@ -171,7 +171,7 @@ Respond with ONLY valid JSON, no other text.`;
 /**
  * Naive fallback: extract nouns and significant words from query
  */
-function extractKeywordsNaive(query: string): string[] {
+export function extractKeywordsNaive(query: string): string[] {
   // Remove common words
   const stopwords = new Set([
     'a',

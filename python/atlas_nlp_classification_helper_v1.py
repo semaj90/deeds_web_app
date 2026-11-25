@@ -15,7 +15,7 @@ import os
 from pathlib import Path
 from typing import Any, Optional
 
-from atlas_external_docs import classify_domain, classify_ontology
+from atlas_external_docs import DOMAIN_RULES, classify_domain, classify_ontology
 from parent_atlas_ontology.domain_mapping import admit_domain_classification, mapping_revision
 
 from pydantic import BaseModel, Field
@@ -52,6 +52,7 @@ class ClassificationRequestV1(BaseModel):
     language: Optional[str] = Field(default=None, max_length=64)
     title: str = Field(default="", max_length=512)
     model_checkpoint: Optional[str] = Field(default=None, alias="modelCheckpoint", max_length=2_000)
+    encoder_profile: Optional[str] = Field(default=None, alias="encoderProfile", max_length=128)
     run_model_challenger: bool = Field(default=False, alias="runModelChallenger")
 
     model_config = {"populate_by_name": True}
@@ -81,8 +82,11 @@ def classify_request(request: ClassificationRequestV1) -> dict[str, Any]:
     text = request.text.strip()
     title = request.title.strip()
     domain = classify_domain(title, text)
+    haystack = f"{title}\n{text}"
+    rule_matched = any(pattern.search(haystack) for _, pattern in DOMAIN_RULES)
+    rule_confidence = 1.0 if rule_matched else 0.25
     ontology_labels = list(classify_ontology(text))
-    admission = admit_domain_classification(domain, confidence=1.0)
+    admission = admit_domain_classification(domain, confidence=rule_confidence)
 
     evidence_ref = f"source:{source_ref}#text:0-{len(text.encode('utf-8'))}"
     if request.tree_node_id:
@@ -101,7 +105,9 @@ def classify_request(request: ClassificationRequestV1) -> dict[str, Any]:
         "mappingRevision": admission.mappingRevision,
         "ontologyRevision": mapping_revision(),
         "label": domain,
-        "probability": 1.0,
+        "probability": rule_confidence,
+        "ruleMatched": rule_matched,
+        "ruleFallback": not rule_matched,
         "ontologyLabels": ontology_labels,
         "evidenceRefs": [evidence_ref],
         "producerRevision": PRODUCER_REVISION,

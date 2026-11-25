@@ -52,6 +52,7 @@ describe('runtime error priority projection', () => {
 		const report = await loadRuntimeErrorPriorities();
 
 		expect(report.top100[0]?.firstAppFrame).toBe('src/routes/+page.svelte');
+		expect(report.top100[0]?.canonicalErrorKey).toMatch(/^errkey:[a-f0-9]{32}$/);
 		expect(report.top100[1]?.firstAppFrame).toBeNull();
 	});
 

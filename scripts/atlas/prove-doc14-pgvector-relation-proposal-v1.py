@@ -2,6 +2,7 @@
 
 import argparse
 import hashlib
+import importlib.metadata
 import json
 from pathlib import Path
 import sys
@@ -110,14 +111,51 @@ def build():
             raise
     else:
         raise RuntimeError("DOC14_MUTATED_CAPTURE_ACCEPTED")
+
+    ontology_path = ROOT / ".okf/ontologies/atlas-domain-and-language-terms-v1.obo"
+    ontology_bytes = ontology_path.read_bytes()
+    ontology_revision = "sha256:" + sha(ontology_bytes)
+    oak_adapter_path = ROOT / "python/parent_atlas_ontology/oaklib_external_adapter.py"
+    oak_producer_revision = "sha256:" + sha(oak_adapter_path.read_bytes())
+    from parent_atlas_ontology.oaklib_external_adapter import load_oaklib_label_candidates_v1
+
+    oak_candidates = load_oaklib_label_candidates_v1(
+        resource_selector=str(ontology_path),
+        source_selector="atlas-local-ontology",
+        ontology_revision=ontology_revision,
+        producer_revision=oak_producer_revision,
+        terms=[participant["text"] for participant in participants],
+        max_candidates_per_term=8,
+    )
+    matched_ids = sorted({
+        external_id
+        for match in oak_candidates.get("matches", [])
+        for external_id in match.get("externalIds", [])
+    })
+    oak_review = {
+        "schema": "atlas.doc14-oak-local-relation-review.v1",
+        "backend": "LOCAL_READ_ONLY_OBO",
+        "oaklibVersion": importlib.metadata.version("oaklib"),
+        "ontologyRevision": ontology_revision,
+        "producerRevision": oak_producer_revision,
+        "candidateBundle": oak_candidates,
+        "relationLookupStatus": "NOT_RUN_NO_CONCEPT_MATCH" if not matched_ids else "REQUIRES_BOUNDED_RELATION_READ",
+        "unresolvedParticipantTerms": [
+            match["searchText"] for match in oak_candidates.get("matches", [])
+            if not match.get("externalIds")
+        ],
+        "canonicalAuthority": False,
+        "writesPerformed": False,
+    }
     return {
-        "schema": "atlas.doc14-pgvector-relation-review.v1",
+        "schema": "atlas.doc14-pgvector-relation-review.v2",
         "status": "PENDING_HUMAN_AND_ONTOLOGY_REVIEW",
         "capture": {"sourceRef": CAPTURE, "rawSha256": sha(raw), "normalizedSha256": sha(document)},
         "snapshot": {"kind": "PINNED_DOC_ADMISSION_ENVELOPES", "sha256": workspace,
                      "postgresReviewPoolSha256": "sha256:" + sha(pool_bytes)},
         "sourceCandidate": row,
         "proposal": proposal.to_dict(),
+        "oakReview": oak_review,
         "adversarialReadback": "NORMALIZED_CAPTURE_READBACK_CHECKSUM_MISMATCH",
         "reviewDecision": None, "graphRevision": None, "writesPerformed": False,
     }

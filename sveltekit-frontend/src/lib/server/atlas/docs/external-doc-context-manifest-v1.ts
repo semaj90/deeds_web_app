@@ -5,7 +5,11 @@ import {
 } from '../graph/context-manifest-v2.js';
 import { chooseCandidateBucket } from '../graph/graph-runtime-contracts.js';
 import { canonicalSha256V1 } from '../prefill/canonical-hash-v1.js';
+import type { ContextManifestTaskBindingV1Schema } from '../graph/context-manifest-v2.js';
 import type { ExternalDocCitationReadbackV1 } from './external-doc-citation-readback-v1.js';
+import type { z } from 'zod';
+
+type DocumentationTaskBindingV1 = z.infer<typeof ContextManifestTaskBindingV1Schema>;
 
 /** Bind the evidence verified within this authenticated request to the existing ACE manifest. */
 export function buildExternalDocContextManifestV1(input: {
@@ -13,6 +17,7 @@ export function buildExternalDocContextManifestV1(input: {
   query: string;
   tokenBudget: number;
   readback: ExternalDocCitationReadbackV1;
+  taskBinding?: DocumentationTaskBindingV1;
 }) {
   if (input.readback.status !== 'VERIFIED' || input.readback.blockers.length) return null;
   const citations = input.readback.citations;
@@ -28,6 +33,7 @@ export function buildExternalDocContextManifestV1(input: {
     query: input.query,
     tokenBudget: input.tokenBudget,
     ordinalMapChecksum,
+    ...(input.taskBinding ? { taskBinding: input.taskBinding } : {}),
   });
   return buildContextManifestV2({
     schema: 'atlas.context-manifest.v1',
@@ -60,5 +66,6 @@ export function buildExternalDocContextManifestV1(input: {
     },
     retrievalPolicyRevision: 'atlas.external-doc-citation-readback.v1',
     acePlaybookRevision: 'atlas.external-doc-context-manifest.v1',
+    ...(input.taskBinding ? { taskBinding: input.taskBinding } : {}),
   });
 }

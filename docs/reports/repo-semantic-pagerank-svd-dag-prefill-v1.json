@@ -1,0 +1,183 @@
+{
+  "schema": "atlas.repo-semantic-pagerank-svd-dag-prefill.v1",
+  "query": "valkey cache readback and drizzle postgresql query",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "hiddenStatePersisted": false,
+  "pgvectorCandidateCount": 11,
+  "eg2OnnxQdrantHitsCount": 6,
+  "inducedGraphEdgesCount": 0,
+  "svdExplainedVarianceRatio": [
+    0.207,
+    0.1945,
+    0.1303,
+    0.1075,
+    0.0956,
+    0.0896,
+    0.0764,
+    0.0396
+  ],
+  "prefillDagStages": [
+    {
+      "stage": 0,
+      "id": "stage_0_seed_retrieval",
+      "nodes": [
+        "sveltekit-frontend.vector-operations",
+        "sveltekit-frontend.vector-operations"
+      ]
+    },
+    {
+      "stage": 1,
+      "id": "stage_1_pagerank_hubs",
+      "nodes": [
+        "sveltekit-frontend.vector-operations",
+        "sveltekit-frontend.vector-operations",
+        "sveltekit-frontend.client",
+        "docs.CANONICAL-PACKET-REGISTRY-DESIGN"
+      ]
+    },
+    {
+      "stage": 2,
+      "id": "stage_2_svd_cluster_fanout",
+      "nodes": [
+        "sveltekit-frontend.vector-operations",
+        "sveltekit-frontend.vector-operations"
+      ]
+    },
+    {
+      "stage": 3,
+      "id": "stage_3_ace_context_manifest",
+      "nodes": [
+        "sveltekit-frontend.vector-operations",
+        "sveltekit-frontend.vector-operations",
+        "sveltekit-frontend.client",
+        "docs.CANONICAL-PACKET-REGISTRY-DESIGN",
+        "sveltekit-frontend.drizzle-cache",
+        "sveltekit-frontend.kag-dag"
+      ]
+    }
+  ],
+  "dagRecommendations": [
+    {
+      "nodeId": "sveltekit-frontend.vector-operations",
+      "relativePath": "src/lib/server/db/vector-operations.ts",
+      "packetKey": "packet:a94f71390cf6",
+      "featureId": "sveltekit-frontend.vector-operations",
+      "cosineSim": 0.0,
+      "storedPagerank": 0.265057,
+      "communityId": 39075,
+      "personalizedPagerank": 0.096023,
+      "svdLowRankAlignment": 0.9265,
+      "prefillPriorityScore": 0.3533,
+      "dagRole": "SVD_CLUSTER_FANOUT"
+    },
+    {
+      "nodeId": "sveltekit-frontend.vector-operations",
+      "relativePath": "sveltekit-frontend/src/lib/server/db/vector-operations.ts",
+      "packetKey": "packet:a94f71390cf6",
+      "featureId": "sveltekit-frontend.vector-operations",
+      "cosineSim": 0.0,
+      "storedPagerank": 0.265057,
+      "communityId": 39075,
+      "personalizedPagerank": 0.096023,
+      "svdLowRankAlignment": 0.9196,
+      "prefillPriorityScore": 0.352,
+      "dagRole": "SVD_CLUSTER_FANOUT"
+    },
+    {
+      "nodeId": "sveltekit-frontend.client",
+      "relativePath": "src/lib/server/db/client.ts",
+      "packetKey": "packet:8155cc558298",
+      "featureId": "sveltekit-frontend.client",
+      "cosineSim": 0.0,
+      "storedPagerank": 0.195321,
+      "communityId": 35860,
+      "personalizedPagerank": 0.096023,
+      "svdLowRankAlignment": 0.0303,
+      "prefillPriorityScore": 0.1741,
+      "dagRole": "SEED_HUB"
+    },
+    {
+      "nodeId": "docs.CANONICAL-PACKET-REGISTRY-DESIGN",
+      "relativePath": "docs/CANONICAL-PACKET-REGISTRY-DESIGN.md",
+      "packetKey": "packet:b8c65b14e284",
+      "featureId": "docs.CANONICAL-PACKET-REGISTRY-DESIGN",
+      "cosineSim": 0.0,
+      "storedPagerank": 0.0,
+      "communityId": 0,
+      "personalizedPagerank": 0.096023,
+      "svdLowRankAlignment": -0.3684,
+      "prefillPriorityScore": 0.168,
+      "dagRole": "SEED_HUB"
+    },
+    {
+      "nodeId": "sveltekit-frontend.drizzle-cache",
+      "relativePath": "src/lib/server/db/drizzle-cache.ts",
+      "packetKey": "packet:1608f369cef3",
+      "featureId": "sveltekit-frontend.drizzle-cache",
+      "cosineSim": 0.0,
+      "storedPagerank": 0.15,
+      "communityId": 37046,
+      "personalizedPagerank": 0.096023,
+      "svdLowRankAlignment": -0.0589,
+      "prefillPriorityScore": 0.168,
+      "dagRole": "CONTEXT_TAIL"
+    },
+    {
+      "nodeId": "sveltekit-frontend.kag-dag",
+      "relativePath": "src/lib/server/db/schema/kag-dag.ts",
+      "packetKey": "packet:3653e2ac93d2",
+      "featureId": "sveltekit-frontend.kag-dag",
+      "cosineSim": 0.0,
+      "storedPagerank": 0.15,
+      "communityId": 14994,
+      "personalizedPagerank": 0.096023,
+      "svdLowRankAlignment": -0.1159,
+      "prefillPriorityScore": 0.168,
+      "dagRole": "CONTEXT_TAIL"
+    },
+    {
+      "nodeId": "sveltekit-frontend.tensor-analysis-cache",
+      "relativePath": "src/lib/server/tensor/tensor-analysis-cache.ts",
+      "packetKey": "packet:cf3c9162c427",
+      "featureId": "sveltekit-frontend.tensor-analysis-cache",
+      "cosineSim": 0.0,
+      "storedPagerank": 0.15,
+      "communityId": 16231,
+      "personalizedPagerank": 0.096023,
+      "svdLowRankAlignment": -0.1525,
+      "prefillPriorityScore": 0.168,
+      "dagRole": "CONTEXT_TAIL"
+    },
+    {
+      "nodeId": "sveltekit-frontend.gpu-cache-schema",
+      "relativePath": "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/schema/gpu-cache-schema.ts",
+      "packetKey": "packet:19398e8349dd",
+      "featureId": "sveltekit-frontend.gpu-cache-schema",
+      "cosineSim": 0.0,
+      "storedPagerank": 0.15,
+      "communityId": 46563,
+      "personalizedPagerank": 0.096023,
+      "svdLowRankAlignment": -0.2015,
+      "prefillPriorityScore": 0.168,
+      "dagRole": "CONTEXT_TAIL"
+    }
+  ],
+  "eg2TopHits": [
+    {
+      "id": "79ad0daf-3d92-549b-8706-a2cc537f2382",
+      "score": 0.7101379,
+      "sourceRef": "data/external-docs/raw/drizzle/queries.md"
+    },
+    {
+      "id": "60fd709b-29e7-5e16-91f9-0926c5c827f2",
+      "score": 0.6460502,
+      "sourceRef": "data/external-docs/raw/postgres/postgres17-reference.md"
+    },
+    {
+      "id": "062436c0-e731-5633-bf93-b28caca8df47",
+      "score": 0.63802034,
+      "sourceRef": "ATLAS-STABLE-BASELINES.md"
+    }
+  ]
+}

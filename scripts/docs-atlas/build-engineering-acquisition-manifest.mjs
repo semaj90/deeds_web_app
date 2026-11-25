@@ -39,7 +39,7 @@ export function buildEngineeringAcquisitionManifestV1(catalog, {
 	if (!/^docs\/\.okf\/[A-Za-z0-9._/-]+$/.test(outputPrefix) || outputPrefix.split('/').some((part) => part === '.' || part === '..')) {
 		throw new Error('OUTPUT_PREFIX_MUST_STAY_UNDER_DOCS_OKF');
 	}
-	if (!['BEAUTIFULSOUP_HTTP', 'FIRECRAWL_V2'].includes(fetcher)) {
+	if (!['BEAUTIFULSOUP_HTTP', 'FIRECRAWL_V2', 'DIRECT_MARKDOWN'].includes(fetcher)) {
 		throw new Error('UNSUPPORTED_FETCHER');
 	}
 	const selectedSources = sourceIds === null
@@ -123,7 +123,7 @@ function parseArgs(argv) {
 async function main(argv) {
 	const options = parseArgs(argv);
 	if (options.help) {
-		process.stdout.write('Build a bounded fetch manifest from the reviewed library-docs catalog.\n--catalog PATH --output PATH --output-root PATH [--fetcher BEAUTIFULSOUP_HTTP|FIRECRAWL_V2] [--maximum-pages-per-source N] [--source-id ID ...] [--output-prefix docs/.okf/PATH]\n');
+		process.stdout.write('Build a bounded fetch manifest from the reviewed library-docs catalog.\n--catalog PATH --output PATH --output-root PATH [--fetcher BEAUTIFULSOUP_HTTP|FIRECRAWL_V2|DIRECT_MARKDOWN] [--maximum-pages-per-source N] [--source-id ID ...] [--output-prefix docs/.okf/PATH]\n');
 		return 0;
 	}
 	const catalog = JSON.parse(await readFile(options.catalog, 'utf8'));

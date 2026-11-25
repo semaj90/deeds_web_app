@@ -94,6 +94,7 @@ type config struct {
 	QdrantPort                        int
 	QdrantCollection                  string
 	QdrantVectorName                  string
+	QdrantBM25BranchActive            bool
 	RedisURL                          string
 	EmbeddingBaseURL                  string
 	EmbeddingRepresentation           string
@@ -147,6 +148,7 @@ func loadConfig() config {
 		// `semantic_768` is the representation id; the active collection stores
 		// that vector under the named Qdrant vector key `content`.
 		QdrantVectorName:                  envOr("QDRANT_VECTOR_NAME", "content"),
+		QdrantBM25BranchActive:            strings.EqualFold(envOr("QDRANT_BM25_BRANCH_ACTIVE", "false"), "true"),
 		RedisURL:                          envOrAny("REDIS_URL", "VALKEY_URL", "redis://localhost:6379"),
 		EmbeddingBaseURL:                  embeddingBaseURL,
 		EmbeddingRepresentation:           envOr("EMBEDDING_REPRESENTATION", "semantic_768"),
@@ -323,12 +325,16 @@ func validateEmbeddingVector(vec []float32, expected int) error {
 	return nil
 }
 
+func embeddingReceiptPolicyConfigured(cfg config) bool {
+	return strings.TrimSpace(cfg.EmbeddingContentSelectionRevision) != "" &&
+		strings.TrimSpace(cfg.EmbeddingInputPolicyRevision) != "" &&
+		isSHA256Revision(cfg.EmbeddingRepresentationRevision) &&
+		cfg.EmbeddingRepresentation == "semantic_768"
+}
+
 // embedViaService calls the receipt-bearing strict embedding boundary.
 func (s *retrievalServer) embedViaService(ctx context.Context, text string) ([]float32, error) {
-	if strings.TrimSpace(s.cfg.EmbeddingContentSelectionRevision) == "" ||
-		strings.TrimSpace(s.cfg.EmbeddingInputPolicyRevision) == "" ||
-		!isSHA256Revision(s.cfg.EmbeddingRepresentationRevision) ||
-		s.cfg.EmbeddingRepresentation != "semantic_768" {
+	if !embeddingReceiptPolicyConfigured(s.cfg) {
 		return nil, fmt.Errorf("embedding receipt policy or expected representation revision is not configured")
 	}
 	inputChecksum := sha256Revision([]byte(text))
@@ -735,7 +741,34 @@ func (s *retrievalServer) qdrantSearchEvidence(ctx context.Context, vec []float3
 	return qdrantPointsToChunks(points, false), nil
 }
 
-func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float32, kinds []string, pathPrefixes []string, extraFilters []*qdrantclient.Condition, limit int) ([]qdrantChunk, error) {
+func buildCodebasePrefetchQueries(contentVec string, sigVec string, vec []float32, queryText string, bm25Active bool, prefetchLimit uint64) []*qdrantclient.PrefetchQuery {
+	prefetches := []*qdrantclient.PrefetchQuery{
+		{
+			Query: qdrantclient.NewQuery(vec...),
+			Using: &contentVec,
+			Limit: &prefetchLimit,
+		},
+		{
+			Query: qdrantclient.NewQuery(vec...),
+			Using: &sigVec,
+			Limit: &prefetchLimit,
+		},
+	}
+	if bm25Active && strings.TrimSpace(queryText) != "" {
+		bm25Field := "code_text"
+		prefetches = append(prefetches, &qdrantclient.PrefetchQuery{
+			Query: qdrantclient.NewQueryDocument(&qdrantclient.Document{
+				Text:  queryText,
+				Model: "Qdrant/bm25",
+			}),
+			Using: &bm25Field,
+			Limit: &prefetchLimit,
+		})
+	}
+	return prefetches
+}
+
+func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float32, queryText string, kinds []string, pathPrefixes []string, extraFilters []*qdrantclient.Condition, limit int) ([]qdrantChunk, error) {
 	contentVec := s.cfg.QdrantVectorName
 	sigVec := "signature"
 	prefetchLimit := uint64(limit * 3)
@@ -743,21 +776,10 @@ func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float3
 
 	queryReq := &qdrantclient.QueryPoints{
 		CollectionName: s.cfg.QdrantCollection,
-		Prefetch: []*qdrantclient.PrefetchQuery{
-			{
-				Query: qdrantclient.NewQuery(vec...),
-				Using: &contentVec,
-				Limit: &prefetchLimit,
-			},
-			{
-				Query: qdrantclient.NewQuery(vec...),
-				Using: &sigVec,
-				Limit: &prefetchLimit,
-			},
-		},
-		Query:       qdrantclient.NewQueryFusion(qdrantclient.Fusion_RRF),
-		Limit:       &qlimit,
-		WithPayload: qdrantclient.NewWithPayload(true),
+		Prefetch:       buildCodebasePrefetchQueries(contentVec, sigVec, vec, queryText, s.cfg.QdrantBM25BranchActive, prefetchLimit),
+		Query:          qdrantclient.NewQueryFusion(qdrantclient.Fusion_RRF),
+		Limit:          &qlimit,
+		WithPayload:    qdrantclient.NewWithPayload(true),
 	}
 
 	var mustConds []*qdrantclient.Condition
@@ -2110,7 +2132,7 @@ func codebaseReceipt(ctx *sharedpb.AtlasRequestContextV2, succeeded bool, eviden
 		RunId: ctx.GetRunId(), WorkspaceId: ctx.GetWorkspaceId(), WorkspaceRevision: ctx.GetWorkspaceRevision(),
 		PacketKey: ctx.GetPacketKey(), PacketRevision: ctx.GetPacketRevision(), Succeeded: succeeded,
 		SourceRevision: ctx.GetSourceRevision(),
-		EvidenceCount: int32(evidenceCount), ValidationStatus: validationStatus, CanonicalAuthority: false, WritesPerformed: false,
+		EvidenceCount:  int32(evidenceCount), ValidationStatus: validationStatus, CanonicalAuthority: false, WritesPerformed: false,
 	}
 	if confidence >= 0 && confidence <= 1 {
 		receipt.RetrievalConfidence = &confidence
@@ -2259,7 +2281,7 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 		extraFilters = append(extraFilters, sourceFilter)
 	}
 
-	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.Kinds, req.PathPrefixes, extraFilters, limit)
+	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.GetQuery(), req.Kinds, req.PathPrefixes, extraFilters, limit)
 	if err != nil {
 		slog.Warn("[retrieval] codebase search failed", "err", err)
 		return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason, Receipt: codebaseReceipt(req.GetAtlasContext(), false, 0, -1, "FAIL", "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE", "")}, nil
@@ -2492,7 +2514,7 @@ func (s *retrievalServer) SearchChunks(ctx context.Context, req *pb.SearchChunks
 		}
 	}
 
-	chunks, err := s.qdrantSearchCodebase(ctx, vec, nil, nil, extraFilters, int(req.Limit))
+	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.GetQuery(), nil, nil, extraFilters, int(req.Limit))
 	if err != nil {
 		return nil, err
 	}
@@ -2685,6 +2707,11 @@ func (s *retrievalServer) GetResearchContext(ctx context.Context, req *pb.Resear
 
 func (s *retrievalServer) httpHealth(w http.ResponseWriter, r *http.Request) {
 	h, _ := s.Health(r.Context(), &pb.HealthRequest{})
+	codebaseSearchReady := embeddingReceiptPolicyConfigured(s.cfg)
+	codebaseSearchReason := "READY"
+	if !codebaseSearchReady {
+		codebaseSearchReason = "EMBEDDING_RECEIPT_POLICY_NOT_CONFIGURED"
+	}
 	readinessState := "READY_DEGRADED"
 	switch {
 	case !h.GetPgvectorConnected():
@@ -2708,6 +2735,11 @@ func (s *retrievalServer) httpHealth(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]any{
 		"status":          h.GetStatus(),
 		"readiness_state": readinessState,
+		"codebase_search": map[string]any{
+			"ready":          codebaseSearchReady,
+			"reason":         codebaseSearchReason,
+			"representation": s.cfg.EmbeddingRepresentation,
+		},
 		"dependencies": map[string]any{
 			"postgres": map[string]any{
 				"connected": h.GetPgvectorConnected(),
@@ -2818,6 +2850,34 @@ func (s *retrievalServer) httpSearchResearch(w http.ResponseWriter, r *http.Requ
 	})
 }
 
+type queryStageTrace struct {
+	QdrantCollection       string   `json:"qdrant_collection"`
+	DensePrefetchVectors   []string `json:"dense_prefetch_vectors"`
+	QdrantCandidateCount   int      `json:"qdrant_candidate_count"`
+	QdrantBM25BranchActive bool     `json:"qdrant_bm25_branch_active"`
+	RRFUsed                bool     `json:"rrf_used"`
+	PGReconciledCount      int      `json:"pg_reconciled_count"`
+	GraphExpansionCount    int      `json:"graph_expansion_count"`
+}
+
+func buildCodebaseStageTrace(collection string, primaryVector string, chunkCount int, bm25Active bool) queryStageTrace {
+	vecName := primaryVector
+	if vecName == "" {
+		vecName = "content"
+	}
+	return queryStageTrace{
+		QdrantCollection:       collection,
+		DensePrefetchVectors:   []string{vecName, "signature"},
+		QdrantCandidateCount:   chunkCount,
+		QdrantBM25BranchActive: bm25Active,
+		// Go Retrieval emits candidates; SearchRuntime owns cross-lane fusion
+		// and canonical PostgreSQL rejoin is reported by that later boundary.
+		RRFUsed:             false,
+		PGReconciledCount:   0,
+		GraphExpansionCount: 0,
+	}
+}
+
 func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "POST only", http.StatusMethodNotAllowed)
@@ -2858,7 +2918,16 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	chunks := resp.GetChunks()
+	if chunks == nil {
+		chunks = []*pb.CodebaseChunk{}
+	}
+	json.NewEncoder(w).Encode(map[string]any{
+		"chunks":              chunks,
+		"representation_used": resp.GetRepresentationUsed(),
+		"total_ms":            resp.GetTotalMs(),
+		"query_stage_trace":   buildCodebaseStageTrace(s.cfg.QdrantCollection, s.cfg.QdrantVectorName, len(resp.GetChunks()), s.cfg.QdrantBM25BranchActive),
+	})
 }
 
 // httpSearchBM25 retains the historical route name while exposing the
@@ -2886,22 +2955,46 @@ func (s *retrievalServer) httpSearchBM25(w http.ResponseWriter, r *http.Request)
 	started := time.Now()
 	queryChecksum := fmt.Sprintf("sha256:%x", sha256.Sum256([]byte(strings.TrimSpace(body.Query))))
 	rows, err := s.pool.Query(r.Context(), `
-		SELECT id::text AS id,
-		       COALESCE(chunk_id, relative_path) AS source_ref,
-		       relative_path AS file_path,
-		       COALESCE(summary, '') AS summary,
-		       COALESCE(content_hash, '') AS content_hash,
-		       COALESCE(workspace_revision, '') AS workspace_revision,
-		       COALESCE(source_revision, '') AS source_revision,
-		       COALESCE(representation_revision, '') AS representation_revision,
-		       COALESCE(lineage_binding_checksum, '') AS lineage_binding_checksum,
-		       COALESCE(lineage_producer_revision, '') AS lineage_producer_revision,
-		       ts_rank_cd(search_vector, websearch_to_tsquery('english', $1), 32)::float4 AS score,
-		       ts_headline('english', COALESCE(content, ''), websearch_to_tsquery('english', $1),
+		SELECT c.id::text AS id,
+		       COALESCE(CASE WHEN lineage.proven_lineage_count = 1 AND lineage.bound_lineage_count = 1 THEN lineage.source_ref END, '') AS source_ref,
+		       c.relative_path AS file_path,
+		       COALESCE(c.summary, '') AS summary,
+		       COALESCE(c.content_hash, '') AS content_hash,
+		       COALESCE(CASE WHEN lineage.proven_lineage_count = 1 AND lineage.bound_lineage_count = 1 THEN lineage.workspace_revision END, '') AS workspace_revision,
+		       COALESCE(CASE WHEN lineage.proven_lineage_count = 1 AND lineage.bound_lineage_count = 1 THEN lineage.source_revision END, '') AS source_revision,
+		       COALESCE(c.representation_revision, '') AS representation_revision,
+		       COALESCE(c.lineage_binding_checksum, '') AS lineage_binding_checksum,
+		       COALESCE(CASE WHEN lineage.proven_lineage_count = 1 AND lineage.bound_lineage_count = 1 THEN lineage.lineage_producer_revision END, '') AS lineage_producer_revision,
+		       COALESCE(CASE WHEN lineage.proven_lineage_count = 1 AND lineage.bound_lineage_count = 1 THEN lineage.packet_key END, '') AS packet_key,
+		       COALESCE(CASE WHEN lineage.proven_lineage_count = 1 AND lineage.bound_lineage_count = 1 THEN lineage.canonical_chunk_id END, '') AS canonical_chunk_id,
+		       COALESCE(lineage.proven_lineage_count, 0)::int AS proven_lineage_count,
+		       COALESCE(lineage.bound_lineage_count, 0)::int AS bound_lineage_count,
+		       CASE WHEN lineage.proven_lineage_count = 1 AND lineage.bound_lineage_count = 1 THEN COALESCE(lineage.evidence_refs, '{}'::text[]) ELSE '{}'::text[] END AS evidence_refs,
+		       ts_rank_cd(c.search_vector, websearch_to_tsquery('english', $1), 32)::float4 AS score,
+		       ts_headline('english', COALESCE(c.content, ''), websearch_to_tsquery('english', $1),
 		         'MaxFragments=2,MaxWords=30,MinWords=10') AS snippet
-		FROM codebase_chunk_index
-		WHERE search_vector @@ websearch_to_tsquery('english', $1)
-		ORDER BY score DESC, indexed_at DESC NULLS LAST
+		FROM codebase_chunk_index c
+		LEFT JOIN LATERAL (
+		  SELECT
+		    count(DISTINCT l.id) FILTER (WHERE l.revision_status = 'PROVEN')::int AS proven_lineage_count,
+		    count(DISTINCT l.id) FILTER (WHERE l.revision_status = 'PROVEN' AND b.canonical_source_ref IS NOT NULL)::int AS bound_lineage_count,
+		    (array_agg(l.packet_key ORDER BY l.packet_key) FILTER (WHERE l.revision_status = 'PROVEN' AND b.canonical_source_ref IS NOT NULL))[1] AS packet_key,
+		    (array_agg(l.canonical_chunk_id ORDER BY l.packet_key) FILTER (WHERE l.revision_status = 'PROVEN' AND b.canonical_source_ref IS NOT NULL))[1] AS canonical_chunk_id,
+		    (array_agg(b.canonical_source_ref ORDER BY l.packet_key) FILTER (WHERE l.revision_status = 'PROVEN' AND b.canonical_source_ref IS NOT NULL))[1] AS source_ref,
+		    (array_agg(l.source_revision ORDER BY l.packet_key) FILTER (WHERE l.revision_status = 'PROVEN' AND b.canonical_source_ref IS NOT NULL))[1] AS source_revision,
+		    (array_agg(b.workspace_revision ORDER BY l.packet_key) FILTER (WHERE l.revision_status = 'PROVEN' AND b.canonical_source_ref IS NOT NULL))[1] AS workspace_revision,
+		    (array_agg(l.lineage_producer_revision ORDER BY l.packet_key) FILTER (WHERE l.revision_status = 'PROVEN' AND b.canonical_source_ref IS NOT NULL))[1] AS lineage_producer_revision,
+		    (array_agg(l.evidence_refs ORDER BY l.packet_key) FILTER (WHERE l.revision_status = 'PROVEN' AND b.canonical_source_ref IS NOT NULL))[1] AS evidence_refs
+		  FROM public.atlas_packet_chunk_lineage l
+		  LEFT JOIN public.atlas_workspace_source_bindings b
+		    ON b.repo_id = 'deeds-web-app'
+		   AND b.canonical_source_ref = l.source_ref
+		   AND b.source_revision = l.source_revision
+		   AND b.workspace_revision = c.workspace_revision
+		  WHERE l.chunk_row_id = c.id
+		) lineage ON TRUE
+		WHERE c.search_vector @@ websearch_to_tsquery('english', $1)
+		ORDER BY score DESC, c.indexed_at DESC NULLS LAST
 		LIMIT $2`, body.Query, body.Limit)
 	if err != nil {
 		json.NewEncoder(w).Encode(map[string]any{"results": []any{}, "error": "postgres fts unavailable", "detail": err.Error()})
@@ -2910,17 +3003,21 @@ func (s *retrievalServer) httpSearchBM25(w http.ResponseWriter, r *http.Request)
 	defer rows.Close()
 	results := make([]map[string]any, 0, body.Limit)
 	for rows.Next() {
-		var id, sourceRef, filePath, summary, contentHash, workspaceRevision, sourceRevision, representationRevision, lineageBindingChecksum, lineageProducerRevision, snippet string
+		var id, sourceRef, filePath, summary, contentHash, workspaceRevision, sourceRevision, representationRevision, lineageBindingChecksum, lineageProducerRevision, packetKey, canonicalChunkID, snippet string
+		var provenLineageCount, boundLineageCount int
+		var evidenceRefs []string
 		var score float32
-		if err := rows.Scan(&id, &sourceRef, &filePath, &summary, &contentHash, &workspaceRevision, &sourceRevision, &representationRevision, &lineageBindingChecksum, &lineageProducerRevision, &score, &snippet); err != nil {
+		if err := rows.Scan(&id, &sourceRef, &filePath, &summary, &contentHash, &workspaceRevision, &sourceRevision, &representationRevision, &lineageBindingChecksum, &lineageProducerRevision, &packetKey, &canonicalChunkID, &provenLineageCount, &boundLineageCount, &evidenceRefs, &score, &snippet); err != nil {
 			continue
 		}
-		identityStatus, identityReason := ftsIdentityStatus(id, contentHash, workspaceRevision, sourceRevision)
+		identityStatus, identityReason := ftsIdentityStatus(id, canonicalChunkID, packetKey, sourceRef, contentHash, workspaceRevision, sourceRevision, provenLineageCount, boundLineageCount)
 		results = append(results, map[string]any{
 			"id": id, "source_ref": sourceRef, "file_path": filePath, "summary": summary, "snippet": snippet,
 			"content_hash": contentHash, "workspace_revision": workspaceRevision, "source_revision": sourceRevision,
 			"representation_revision": representationRevision, "lineage_binding_checksum": lineageBindingChecksum,
-			"lineage_producer_revision": lineageProducerRevision, "identity_status": identityStatus,
+			"lineage_producer_revision": lineageProducerRevision, "packet_key": packetKey, "canonical_chunk_id": canonicalChunkID,
+			"evidence_refs": evidenceRefs, "proven_lineage_count": provenLineageCount, "bound_lineage_count": boundLineageCount,
+			"identity_status": identityStatus,
 			"identity_reason": identityReason, "score": score, "score_type": "PG_TS_RANK_CD",
 			"scorer_revision": "postgres-18-ts-rank-cd-v1", "text_search_config": "english", "rank": len(results) + 1,
 		})
@@ -2972,8 +3069,14 @@ func (s *retrievalServer) httpSearchBM25(w http.ResponseWriter, r *http.Request)
 // minimum revision-qualified envelope required by downstream normalization.
 // It deliberately does not infer packet_key, source_revision, or workspace
 // revision from path text or projection metadata.
-func ftsIdentityStatus(id, contentHash, workspaceRevision, sourceRevision string) (string, string) {
-	if id != "" && contentHash != "" && workspaceRevision != "" && sourceRevision != "" {
+func ftsIdentityStatus(id, canonicalChunkID, packetKey, sourceRef, contentHash, workspaceRevision, sourceRevision string, provenLineageCount, boundLineageCount int) (string, string) {
+	if provenLineageCount != 1 {
+		return "REVIEW_REQUIRED", "PROVEN_LINEAGE_MISSING_OR_AMBIGUOUS"
+	}
+	if boundLineageCount != 1 {
+		return "REVIEW_REQUIRED", "SOURCE_BINDING_MISSING_OR_AMBIGUOUS"
+	}
+	if id != "" && canonicalChunkID != "" && packetKey != "" && sourceRef != "" && isSHA256Revision(contentHash) && isSHA256Revision(workspaceRevision) && isSHA256Revision(sourceRevision) {
 		return "PASS", ""
 	}
 	return "REVIEW_REQUIRED", "ATLAS_FTS_REVISION_INCOMPLETE"

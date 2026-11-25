@@ -1,0 +1,55 @@
+{
+  "canonical_authority": false,
+  "chunk_count": 910,
+  "embedding_performed": false,
+  "external_projection_writes": false,
+  "local_artifacts_written": true,
+  "manifest_revision": "engineering-acquisition-v1-886f61944722dc98",
+  "page_count": 1,
+  "producer_revision": "build-engineering-acquisition-manifest-v1",
+  "qdrant": {
+    "write": false
+  },
+  "receipt_checksum": "ad01664b0af3becf71770f7c5fe21154eb6f6f1839fdf02e1504311e552d608a",
+  "schema": "atlas.okf-docs-pipeline-receipt.v1",
+  "source_receipts": [
+    {
+      "api_document_fact_blocked_count": 0,
+      "api_document_fact_pending_count": 243,
+      "api_document_fact_record_count": 243,
+      "api_document_facts_checksum": "8cc79487b51be6d6730ddd44a6c0b24d76597f250371a62cd8487c82d11c3c69",
+      "api_document_facts_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2-direct\\sveltekit-llms-txt\\api-document-facts.jsonl",
+      "chunks": 910,
+      "chunks_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2-direct\\sveltekit-llms-txt\\chunks.jsonl",
+      "page_receipt_checksum": "e8ca33f53411288e029a8d549290a701857cd56e5c5126175b748269685b1029",
+      "pages": 1,
+      "relation_candidate_bound_count": 0,
+      "relation_candidate_count": 0,
+      "relation_candidate_publication": {
+        "byteLength": 0,
+        "canonicalAuthority": false,
+        "failedCount": 0,
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2-direct\\sveltekit-llms-txt\\relation-candidates.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "validatedCount": 0,
+        "writesPerformed": true
+      },
+      "relation_candidate_rejected_count": 0,
+      "relation_candidate_unbound_count": 0,
+      "relation_candidates_checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "relation_candidates_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2-direct\\sveltekit-llms-txt\\relation-candidates.jsonl",
+      "relation_oak_review_admission_count": 0,
+      "relation_oak_review_checksum": null,
+      "relation_oak_review_count": 0,
+      "relation_oak_review_path": null,
+      "relation_proposal_bridge_blocked_count": 0,
+      "relation_proposal_bridged_count": 0,
+      "source_id": "sveltekit-llms-txt",
+      "source_namespace": null
+    }
+  ],
+  "source_snapshot_revision": "atlas-library-docs-source-manifest-fts-svelte-v1-2026-11-24",
+  "status": "ACQUISITION_ONLY",
+  "workspace_revision": "UNBOUND_EXTERNAL_SOURCE_CATALOG",
+  "writes_performed": true
+}

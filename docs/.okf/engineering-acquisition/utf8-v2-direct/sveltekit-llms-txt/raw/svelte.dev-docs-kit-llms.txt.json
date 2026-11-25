@@ -1,0 +1,21 @@
+{
+  "canonical_authority": false,
+  "fetched_at": "2026-11-25T02:01:28.565332Z",
+  "fetcher": "DIRECT_MARKDOWN",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2-direct\\sveltekit-llms-txt\\raw\\svelte.dev-docs-kit-llms.txt.md",
+  "metadata": {
+    "parserRevision": "direct-markdown-utf8-v1"
+  },
+  "normalized_artifact_checksum": "f771441a2615120590b1660351abfe3888f08439bb3b124881e8cf71c1ad7293",
+  "normalized_checksum": "f771441a2615120590b1660351abfe3888f08439bb3b124881e8cf71c1ad7293",
+  "normalized_markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2-direct\\sveltekit-llms-txt\\raw\\svelte.dev-docs-kit-llms.txt.83f10876b72f.normalized.md",
+  "outgoing_urls": [],
+  "raw_checksum": "a290364baabf966041b09bbd8474e3e9abcc8e3eeb7ae871424d72a3bb42fe54",
+  "requested_url": "https://svelte.dev/docs/kit/llms.txt",
+  "resolved_url": "https://svelte.dev/docs/kit/llms.txt",
+  "retrieved_at": "2026-11-25T02:01:28.565332Z",
+  "source_id": "sveltekit-llms-txt",
+  "source_revision": "sha256:ad759791b71a11a93b1e00c6fc57c7a824354a27734f2a85287b24af5b2b7457",
+  "text": null,
+  "title": "llms.txt"
+}

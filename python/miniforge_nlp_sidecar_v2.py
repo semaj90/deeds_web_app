@@ -832,7 +832,7 @@ class DocumentationFactV1(BaseModel):
     )
     product_version: str = Field(alias="productVersion")
     confidence: float = Field(ge=0.0, le=1.0)
-    extraction_method: str = Field(default="LANGEXTRACT_ORNITH", alias="extractionMethod")
+    extraction_method: str = Field(default="LANGEXTRACT_OPENAI_COMPATIBLE", alias="extractionMethod")
     custom_attributes_version: Literal["atlas.langextract-custom-attributes.v1"] = Field(
         default=CUSTOM_ATTRIBUTES_SCHEMA, alias="customAttributesVersion"
     )
@@ -1683,6 +1683,19 @@ def health() -> dict[str, Any]:
     result["contract"] = "provenance-v2"
     result["processId"] = os.getpid()
     result["processStartedMonotonicNs"] = _PROCESS_STARTED_MONOTONIC_NS
+    try:
+        _oak_resource, oak_revision = _configured_oaklib_resource()
+        result["oaklibSource"] = {
+            "status": "SOURCE_CONFIGURED",
+            "ontologyRevision": oak_revision,
+            "canonicalAuthority": False,
+        }
+    except HTTPException as exc:
+        result["oaklibSource"] = {
+            "status": str(exc.detail),
+            "ontologyRevision": None,
+            "canonicalAuthority": False,
+        }
     grounded_parameters = inspect.signature(_native_grounded_extractions).parameters
     result["runtimeSourceBindings"] = {
         "modules": {

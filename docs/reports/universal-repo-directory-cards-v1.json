@@ -1,0 +1,4594 @@
+{
+  "schema": "atlas.universal-directory-index.v1",
+  "generatedAt": "2026-11-24T21:40:08Z",
+  "canonicalAuthority": false,
+  "writesToCanonicalStores": false,
+  "totalElapsedMs": 458380.07,
+  "structuralStats": {
+    "totalDirectories": 4312,
+    "totalFiles": 35580,
+    "missingInLegacyAtlasDirs": 1803,
+    "withOboConcepts": 4100,
+    "withContextDocs": 872,
+    "withMcpTools": 124,
+    "withRoutes": 1224,
+    "workers": 16,
+    "structuralBuildMs": 13880.2,
+    "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c"
+  },
+  "embeddingReceipt": {
+    "count": 4312,
+    "dim": 768,
+    "backend": "inprocess-ort-eg2-onnx-q8",
+    "intraThreads": 12,
+    "maxTokens": 96,
+    "elapsedMs": 431596.35
+  },
+  "gpuGraphReceipt": {
+    "backend": "cuda:0",
+    "deviceName": "NVIDIA GeForce RTX 3060 Ti",
+    "vramFreeBeforeMiB": 7126,
+    "vramTotalMiB": 8191,
+    "directoryCount": 4312,
+    "topKNeighbors": 5,
+    "computeMs": 700.601,
+    "cpuParityCheckedRows": 64,
+    "cpuParityMaxAbsDiff": 1.07e-06
+  },
+  "llama8090SummaryReceipt": {
+    "enabled": true,
+    "enriched": 0,
+    "endpoint": "http://127.0.0.1:8090"
+  },
+  "qdrantSyncReceipt": {
+    "qdrantStatus": "QUEUED_OFFLINE_DOCKER_PAUSED",
+    "collection": "atlas_directory_cards_eg2_768",
+    "preparedPoints": 4312,
+    "offlineJsonlPath": ".tmp\\atlas\\universal-directory-cards-v1\\qdrant_points_ready.jsonl",
+    "detail": "TimeoutError: timed out"
+  },
+  "missingFromLegacyDirsByRoot": {
+    "tools": 649,
+    "sveltekit-frontend": 300,
+    "openspec": 294,
+    "mcp-server-mcp": 55,
+    "src": 50,
+    "packages": 46,
+    "docs": 39,
+    "simd-bridge": 36,
+    "docker": 28,
+    "scripts": 26,
+    "data": 19,
+    "python": 19,
+    "memory": 14,
+    "next_steps": 13,
+    "parent-atlas-tensor-residency-integration": 13,
+    "parent_atlas_tensor_residency_integration_v2": 13,
+    "parent-atlas-graph-runtime-enhancement": 11,
+    "atlas-openspec-awareness-v2": 10,
+    "native": 9,
+    "sites": 9,
+    "tests": 9,
+    "parent-atlas-gpu-math-bundle": 8,
+    "reports": 8,
+    "openwiki": 7,
+    "parent-atlas-rtx-gpu-lab": 7
+  },
+  "topoDistribution": {
+    "test-audit-devtool": 1792,
+    "trace-retrieval": 1380,
+    "api-route": 1372,
+    "graph-gpu-topology": 643,
+    "legal-evidence": 561,
+    "openspec-governance": 454,
+    "ui-component": 437,
+    "core-infrastructure": 385,
+    "mcp-agent-tool": 186,
+    "database-schema": 141,
+    "ontology-taxonomy": 100,
+    "documentation-hub": 52,
+    "python-compute": 22,
+    "go-service": 2
+  },
+  "topRankedDirectories": [
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-server",
+      "dir_path": "sveltekit-frontend/src/lib/server",
+      "frontend_alias_path": "src/lib/server",
+      "parent_dir": "sveltekit-frontend/src/lib",
+      "top_root": "sveltekit-frontend",
+      "title": "Lib / Server",
+      "file_count": 114,
+      "source_file_count": 113,
+      "extensions": {
+        ".ts": 107,
+        ".js": 6,
+        ".md": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "00ac0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "DispatcherMiddleware",
+        "DispatcherMiddlewareDependencies",
+        "AceIngestStep",
+        "AceIngestJob",
+        "createAceIngestJob",
+        "updateAceIngestJob",
+        "getAceIngestJob",
+        "AgentSkillArgs",
+        "runAgentSkill",
+        "RouteEndpoint",
+        "RouteCategory",
+        "RouteStats"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [
+        "auth_session"
+      ],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/server/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/server/DispatcherMiddleware.ts",
+        "sveltekit-frontend/src/lib/server/DispatcherMiddlewareDependencies.ts",
+        "sveltekit-frontend/src/lib/server/ace-ingest-progress.ts",
+        "sveltekit-frontend/src/lib/server/agent-executor.ts",
+        "sveltekit-frontend/src/lib/server/api-metadata-extractor.ts",
+        "sveltekit-frontend/src/lib/server/api-registry.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/server` (114 files, 113 code; domains: trace-retrieval, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/server` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| \u2014 | `timeouts.ts` | 0.000 | 0x8 | Key symbols: DispatcherMiddleware, DispatcherMiddlewareDependencies, AceIngestStep, AceIngestJob, createAceIngestJob, updateAceIngestJob, getAceIngestJob, AgentSkillArgs, runAgentSkill, RouteEndpoint. MCP tools: auth_session. Representative files: DispatcherMiddleware.ts, DispatcherMiddlewareDependencies.ts, ace-ingest-progress.ts, agent-executor.ts, api-metadata-extractor.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.59508,
+      "fusion_rank": 0.80828,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/llm",
+          "score": 0.9681,
+          "topo": [
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/services",
+          "score": 0.9678,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/ace",
+          "score": 0.9674,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/ai",
+          "score": 0.9627,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/analysis",
+          "score": 0.9613,
+          "topo": [
+            "test-audit-devtool"
+          ]
+        }
+      ],
+      "content_hash": "sha256:afe549c0c6aed3465306ad91e7c12afef09d60aef2b94edda528e334896b3789",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-tests-routes-auto-api-routes",
+      "dir_path": "sveltekit-frontend/tests/routes/auto/api/routes",
+      "frontend_alias_path": "tests/routes/auto/api/routes",
+      "parent_dir": "sveltekit-frontend/tests/routes/auto/api",
+      "top_root": "sveltekit-frontend",
+      "title": "Api / Routes",
+      "file_count": 3,
+      "source_file_count": 2,
+      "extensions": {
+        ".ts": 2,
+        ".md": 1
+      },
+      "topo_classes": [
+        "api-route",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:api",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:test"
+      ],
+      "obo_bitset_hex_64b": "011c0100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/tests/routes/auto/api/routes/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/tests/routes/auto/api/routes/events.test.ts",
+        "sveltekit-frontend/tests/routes/auto/api/routes/metadata.test.ts",
+        "sveltekit-frontend/tests/routes/auto/api/routes/LLMS.md"
+      ],
+      "summary": "Directory `sveltekit-frontend/tests/routes/auto/api/routes` (3 files, 2 code; domains: api-route, test-audit-devtool). Context: AGENTS.md \u2014 `sveltekit-frontend/tests/routes/auto/api/routes` \u2014 > Directory: sveltekit-frontend/tests/routes/auto/api/routes \u2014 Snapshot \u2014 - 2 file(s), 0 handler(s) \u2014 - Audit score: _(no GPU audit)_ \u2014 - no audit signals \u2014 Files (2) \u2014 - `events.test.ts` \u2014 - `metadata.test.ts` \u2014 Tools \u2014 > MCP tools the Gemma4 agent should reach for inside this directory. Representative files: events.test.ts, metadata.test.ts, LLMS.md.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 1.0,
+      "fusion_rank": 0.71985,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/tests/routes/auto/api/web",
+          "score": 0.9808,
+          "topo": [
+            "trace-retrieval",
+            "api-route"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/routes/auto/api/contextual",
+          "score": 0.9797,
+          "topo": [
+            "api-route",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/routes/auto/api/phase72",
+          "score": 0.9779,
+          "topo": [
+            "api-route",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/routes/auto/api/documents",
+          "score": 0.9777,
+          "topo": [
+            "api-route",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/routes/auto/api/tools",
+          "score": 0.9775,
+          "topo": [
+            "api-route",
+            "test-audit-devtool"
+          ]
+        }
+      ],
+      "content_hash": "sha256:72acac95134578fe93f5a7f2d06c21df5c0e3a4a3ce59100f83a6b887eabca89",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-server-ai",
+      "dir_path": "sveltekit-frontend/src/lib/server/ai",
+      "frontend_alias_path": "src/lib/server/ai",
+      "parent_dir": "sveltekit-frontend/src/lib/server",
+      "top_root": "sveltekit-frontend",
+      "title": "Server / Ai",
+      "file_count": 155,
+      "source_file_count": 154,
+      "extensions": {
+        ".ts": 153,
+        ".js": 1,
+        ".md": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "008c0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "AbVariant",
+        "AbExperiment",
+        "BucketResult",
+        "WinRateRow",
+        "registerExperiment",
+        "getExperiment",
+        "listExperiments",
+        "getVariant",
+        "recordImpression",
+        "WinMetrics",
+        "recordWin",
+        "getWinRates"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [
+        "ace.prompt_preflight",
+        "ace__prompt_preflight"
+      ],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/server/ai/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/server/ai/ab-test-ornith-authority.spec.ts",
+        "sveltekit-frontend/src/lib/server/ai/ab-test.ts",
+        "sveltekit-frontend/src/lib/server/ai/accelerator-capabilities.ts",
+        "sveltekit-frontend/src/lib/server/ai/ace-builder.ts",
+        "sveltekit-frontend/src/lib/server/ai/ace-cartridge.ts",
+        "sveltekit-frontend/src/lib/server/ai/ace-prompt-preflight-tool.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/server/ai` (155 files, 154 code; domains: trace-retrieval, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ai` \u2014 Audit Gates \u2014 AI Service Layer \u2014 > Auto-mapped from CLAUDE.md \u00a7\"Unified Audit Gate System\". Last enriched Key symbols: AbVariant, AbExperiment, BucketResult, WinRateRow, registerExperiment, getExperiment, listExperiments, getVariant, recordImpression, WinMetrics. MCP tools: ace.prompt_preflight, ace__prompt_preflight. Representative files: ab-test-ornith-authority.spec.ts, ab-test.ts, accelerator-capabilities.ts, ace-builder.ts, ace-cartridge.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.2924,
+      "fusion_rank": 0.70234,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/ai",
+          "score": 0.9677,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/ai",
+          "score": 0.9637,
+          "topo": [
+            "graph-gpu-topology",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server",
+          "score": 0.9627,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/ace",
+          "score": 0.9581,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/llm",
+          "score": 0.9558,
+          "topo": [
+            "test-audit-devtool"
+          ]
+        }
+      ],
+      "content_hash": "sha256:71020d9e41ad9c55aafe4752290bfb96cec3a6f9591372a9c3d98556d5c19d0b",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-server-ace",
+      "dir_path": "sveltekit-frontend/src/lib/server/ace",
+      "frontend_alias_path": "src/lib/server/ace",
+      "parent_dir": "sveltekit-frontend/src/lib/server",
+      "top_root": "sveltekit-frontend",
+      "title": "Server / Ace",
+      "file_count": 143,
+      "source_file_count": 142,
+      "extensions": {
+        ".ts": 141,
+        ".js": 1,
+        ".md": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "008c0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "ACE_TOOLS",
+        "deriveProcessPacketsFromACEContext",
+        "ACEContextManifestOptions",
+        "deriveFeaturePresenceFromACE",
+        "buildContextManifestFromACE",
+        "attachContextManifestToACE",
+        "ErrorKagInput",
+        "ErrorSummary",
+        "ErrorKagResult",
+        "summarizeErrorToKag",
+        "AceHitSummary",
+        "tagAceHits"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [
+        "search_codebase",
+        "get_cluster_summary",
+        "lookup_research_summary",
+        "get_system_health",
+        "web_search",
+        "error_summary"
+      ],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/server/ace/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/server/ace/index.ts",
+        "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
+        "sveltekit-frontend/src/lib/server/ace/ace-context-assembler.ts",
+        "sveltekit-frontend/src/lib/server/ace/ace-context-manifest.spec.ts",
+        "sveltekit-frontend/src/lib/server/ace/ace-context-manifest.ts",
+        "sveltekit-frontend/src/lib/server/ace/ace-error-kag.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/server/ace` (143 files, 142 code; domains: trace-retrieval, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ace` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ace` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ace` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ace` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ace` \u2014 Audit Gates \u2014 ACE Context Assembler + Glyph + Search Intelligence \u2014 > Auto-mapped from CLAUDE.md \u00a7\"U Key symbols: ACE_TOOLS, deriveProcessPacketsFromACEContext, ACEContextManifestOptions, deriveFeaturePresenceFromACE, buildContextManifestFromACE, attachContextManifestToACE, ErrorKagInput, ErrorSummary, ErrorKagResult, summarizeErrorToKag. MCP tools: search_codebase, get_cluster_summary, lookup_research_summary, get_system_health, web_search, error_summary. Representative files: index.ts, ace-agent.ts, ace-context-assembler.ts, ace-context-manifest.spec.ts, ace-context-manifest.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.19276,
+      "fusion_rank": 0.66747,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server",
+          "score": 0.9674,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/ai",
+          "score": 0.9581,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/llm",
+          "score": 0.9484,
+          "topo": [
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/services",
+          "score": 0.9457,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/analysis",
+          "score": 0.9432,
+          "topo": [
+            "test-audit-devtool"
+          ]
+        }
+      ],
+      "content_hash": "sha256:4630c8d881dba253d6c5b0e19b24605e71d71f38b71eb6499b408ff655712e02",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-server-analysis",
+      "dir_path": "sveltekit-frontend/src/lib/server/analysis",
+      "frontend_alias_path": "src/lib/server/analysis",
+      "parent_dir": "sveltekit-frontend/src/lib/server",
+      "top_root": "sveltekit-frontend",
+      "title": "Server / Analysis",
+      "file_count": 101,
+      "source_file_count": 100,
+      "extensions": {
+        ".ts": 100,
+        ".md": 1
+      },
+      "topo_classes": [
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:graph",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "002c0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "AblationRunSchema",
+        "AblationRun",
+        "AblationResultSchema",
+        "AblationResult",
+        "AgenticFixProposalInput",
+        "AgenticFixProposalResult",
+        "AgenticProposalTimelineRow",
+        "normalizeAgenticProposalTimelineRow",
+        "ANALYSIS_JOB_PROGRESS_STAGES_V1",
+        "AnalysisJobProgressStageV1",
+        "createAnalysisJobProgressEventWriterV1",
+        "recordAnalysisJobProgressStageV1"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [
+        "context_timeline",
+        "engram_cards",
+        "intent_eval_runs",
+        "memory_registry"
+      ],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/server/analysis/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/server/analysis/index.ts",
+        "sveltekit-frontend/src/lib/server/analysis/ablation-contract.ts",
+        "sveltekit-frontend/src/lib/server/analysis/agentic-fix-proposal.ts",
+        "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts",
+        "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-timeline.ts",
+        "sveltekit-frontend/src/lib/server/analysis/analysis-contracts.spec.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/server/analysis` (101 files, 100 code; domains: test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/server/analysis` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/analysis` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/analysis` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/analysis` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/analysis` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | Key symbols: AblationRunSchema, AblationRun, AblationResultSchema, AblationResult, AgenticFixProposalInput, AgenticFixProposalResult, AgenticProposalTimelineRow, normalizeAgenticProposalTimelineRow, ANALYSIS_JOB_PROGRESS_STAGES_V1, AnalysisJobProgressStageV1. MCP tools: context_timeline, engram_cards, intent_eval_runs, memory_registry. Representative files: index.ts, ablation-contract.ts, agentic-fix-proposal.ts, agentic-proposal-join-spine.spec.ts, agentic-proposal-timeline.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.19167,
+      "fusion_rank": 0.66708,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server",
+          "score": 0.9613,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/analysis",
+          "score": 0.9536,
+          "topo": [
+            "ui-component"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/analytics",
+          "score": 0.9503,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/services/error-analysis",
+          "score": 0.9496,
+          "topo": [
+            "core-infrastructure"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/llm",
+          "score": 0.9487,
+          "topo": [
+            "test-audit-devtool"
+          ]
+        }
+      ],
+      "content_hash": "sha256:15bfcc5219bdb0b46ac115be6cf976b8567e207381eabe9c3a73e372ded00377",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-server-mcp",
+      "dir_path": "sveltekit-frontend/src/lib/server/mcp",
+      "frontend_alias_path": "src/lib/server/mcp",
+      "parent_dir": "sveltekit-frontend/src/lib/server",
+      "top_root": "sveltekit-frontend",
+      "title": "Server / Mcp",
+      "file_count": 22,
+      "source_file_count": 21,
+      "extensions": {
+        ".ts": 20,
+        ".md": 1,
+        ".mjs": 1
+      },
+      "topo_classes": [
+        "mcp-agent-tool",
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "legal-evidence"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "00bc0000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "ClassifyIntentResult",
+        "RagCard",
+        "BuildAgenticRagContextResult",
+        "BuildRecommendationResult",
+        "classifyIntent",
+        "buildAgenticRagContext",
+        "buildRecommendation",
+        "buildStreamPreamble",
+        "initialize",
+        "list",
+        "call",
+        "EvidenceCanvasDhashMcpToolName"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [
+        "local_tool"
+      ],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/server/mcp/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/server/mcp/atlas-tools-client.ts",
+        "sveltekit-frontend/src/lib/server/mcp/client.spec.ts",
+        "sveltekit-frontend/src/lib/server/mcp/client.ts",
+        "sveltekit-frontend/src/lib/server/mcp/evidence-canvas-dhash-mcp-tools-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/mcp/evidence-canvas-dhash-mcp-tools-v1.ts",
+        "sveltekit-frontend/src/lib/server/mcp/langgraph-bridge.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/server/mcp` (22 files, 21 code; domains: mcp-agent-tool, trace-retrieval, graph-gpu-topology, legal-evidence). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/server/mcp` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/mcp` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/mcp` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/mcp` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/mcp` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| Key symbols: ClassifyIntentResult, RagCard, BuildAgenticRagContextResult, BuildRecommendationResult, classifyIntent, buildAgenticRagContext, buildRecommendation, buildStreamPreamble, initialize, list. MCP tools: local_tool. Representative files: atlas-tools-client.ts, client.spec.ts, client.ts, evidence-canvas-dhash-mcp-tools-v1.spec.ts, evidence-canvas-dhash-mcp-tools-v1.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.30843,
+      "fusion_rank": 0.65449,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/mcp/tools",
+          "score": 0.9743,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/config",
+          "score": 0.9682,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src",
+          "score": 0.9526,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/research",
+          "score": 0.9451,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/config",
+          "score": 0.9448,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        }
+      ],
+      "content_hash": "sha256:c10dab1329ec2887d9f87b1cdd95e86a9980cfa820ef8c955720434244673ef7",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-server-agent",
+      "dir_path": "sveltekit-frontend/src/lib/server/agent",
+      "frontend_alias_path": "src/lib/server/agent",
+      "parent_dir": "sveltekit-frontend/src/lib/server",
+      "top_root": "sveltekit-frontend",
+      "title": "Server / Agent",
+      "file_count": 24,
+      "source_file_count": 23,
+      "extensions": {
+        ".ts": 23,
+        ".md": 1
+      },
+      "topo_classes": [
+        "mcp-agent-tool",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:graph",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "002c0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "ActionRequest",
+        "ActionWriteResult",
+        "CanonicalActionRequestV1",
+        "writeActionAtomically",
+        "writeCanonicalWorkflowActionAtomically",
+        "ActionStatus",
+        "advanceActionStatus",
+        "ERROR_FIX_BITS",
+        "ErrorFixBitKey",
+        "ErrorFixStage",
+        "ERROR_FIX_STAGES",
+        "hasStageBit"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [
+        "evidence_analyze",
+        "multimodal_analyze",
+        "detect_objects",
+        "transcribe_audio",
+        "search_similar",
+        "web_search"
+      ],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/server/agent/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/server/agent/action-writer.spec.ts",
+        "sveltekit-frontend/src/lib/server/agent/action-writer.ts",
+        "sveltekit-frontend/src/lib/server/agent/agent-error-pipeline-machine.spec.ts",
+        "sveltekit-frontend/src/lib/server/agent/agent-error-pipeline-machine.ts",
+        "sveltekit-frontend/src/lib/server/agent/agent-exp-tracker.spec.ts",
+        "sveltekit-frontend/src/lib/server/agent/agent-exp-tracker.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/server/agent` (24 files, 23 code; domains: mcp-agent-tool, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/server/agent` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/agent` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/agent` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/agent` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/agent` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| Key symbols: ActionRequest, ActionWriteResult, CanonicalActionRequestV1, writeActionAtomically, writeCanonicalWorkflowActionAtomically, ActionStatus, advanceActionStatus, ERROR_FIX_BITS, ErrorFixBitKey, ErrorFixStage. MCP tools: evidence_analyze, multimodal_analyze, detect_objects, transcribe_audio, search_similar, web_search. Representative files: action-writer.spec.ts, action-writer.ts, agent-error-pipeline-machine.spec.ts, agent-error-pipeline-machine.ts, agent-exp-tracker.spec.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.28566,
+      "fusion_rank": 0.65205,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/agents",
+          "score": 0.9714,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/agent/tools",
+          "score": 0.9662,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/ff1/agent",
+          "score": 0.9558,
+          "topo": [
+            "core-infrastructure"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/admin",
+          "score": 0.9526,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/agents-md",
+          "score": 0.9479,
+          "topo": [
+            "core-infrastructure"
+          ]
+        }
+      ],
+      "content_hash": "sha256:c096170e6b70ac3acdee60090b524f60e480414f1ff43899e2e438a7d6a86473",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-tests",
+      "dir_path": "sveltekit-frontend/tests",
+      "frontend_alias_path": "tests",
+      "parent_dir": "sveltekit-frontend",
+      "top_root": "sveltekit-frontend",
+      "title": "Sveltekit Frontend / Tests",
+      "file_count": 308,
+      "source_file_count": 300,
+      "extensions": {
+        ".ts": 296,
+        ".js": 2,
+        ".json": 2,
+        ".md": 2,
+        ".pdf": 2,
+        ".1778413151674": 1,
+        ".1778415619105": 1,
+        ".mjs": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:cache",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test"
+      ],
+      "obo_bitset_hex_64b": "049c0100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [],
+      "schema_tables": [],
+      "mcp_tools": [
+        "notes.txt",
+        "case.pdf"
+      ],
+      "context_docs": [
+        "sveltekit-frontend/tests/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/tests/ace-code-cache.spec.ts",
+        "sveltekit-frontend/tests/ace-context-glossary.spec.ts",
+        "sveltekit-frontend/tests/ace-hit-tagger.spec.ts",
+        "sveltekit-frontend/tests/ace-hits-cache.spec.ts",
+        "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
+        "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/tests` (308 files, 300 code; domains: trace-retrieval, test-audit-devtool). Context: AGENTS.md \u2014 `sveltekit-frontend/tests` \u2014 > Directory: sveltekit-frontend/tests \u2014 Snapshot \u2014 - 217 file(s), 0 handler(s) \u2014 - Audit score: _(no GPU audit)_ \u2014 - \ud83d\udfe0 hardcoded localhost: 1 \u2014 Files (217) \u2014 - `ace-code-cache.spec.ts` \u2014 - `ace-context-glossary.spec.ts` \u2014 - `ace-hit-tagger.spec.ts` \u2014 - `ace-hits-cache.spec.ts` \u2014 - `ace-ingest-route.spec.ts` \u2014 - `ace-p MCP tools: notes.txt, case.pdf. Representative files: ace-code-cache.spec.ts, ace-context-glossary.spec.ts, ace-hit-tagger.spec.ts, ace-hits-cache.spec.ts, ace-ingest-route.spec.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.13365,
+      "fusion_rank": 0.64678,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/tests/helpers",
+          "score": 0.9591,
+          "topo": [
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/scripts",
+          "score": 0.9565,
+          "topo": [
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/reports",
+          "score": 0.9519,
+          "topo": [
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/fixtures",
+          "score": 0.9478,
+          "topo": [
+            "legal-evidence",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/accessibility",
+          "score": 0.9455,
+          "topo": [
+            "test-audit-devtool"
+          ]
+        }
+      ],
+      "content_hash": "sha256:e550296f7364880004812234c37921c9fe02e2775fec47f2a783016a6c5d2bcb",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-server-gpu",
+      "dir_path": "sveltekit-frontend/src/lib/server/gpu",
+      "frontend_alias_path": "src/lib/server/gpu",
+      "parent_dir": "sveltekit-frontend/src/lib/server",
+      "top_root": "sveltekit-frontend",
+      "title": "Server / Gpu",
+      "file_count": 37,
+      "source_file_count": 36,
+      "extensions": {
+        ".ts": 32,
+        ".mjs": 3,
+        ".md": 1,
+        ".mts": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:api",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "01bc0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "encode",
+        "decode",
+        "projectPCA",
+        "isGpuAvailable",
+        "getAutoencoderSession",
+        "autoencoderEncode",
+        "autoencoderDecode",
+        "isAutoencoderWarm",
+        "isAutoencoderCudaAvailable",
+        "AutoencoderWeights",
+        "loadAutoencoderWeights",
+        "getCachedAutoencoderWeights"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/server/gpu/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts",
+        "sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
+        "sveltekit-frontend/src/lib/server/gpu/autoencoder-session.ts",
+        "sveltekit-frontend/src/lib/server/gpu/autoencoder-weights.ts",
+        "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
+        "sveltekit-frontend/src/lib/server/gpu/background-analyzer.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/server/gpu` (37 files, 36 code; domains: trace-retrieval, graph-gpu-topology, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/server/gpu` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/gpu` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/gpu` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/gpu` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/gpu` \u2014 Audit Gates \u2014 GPU / N-API / LibTorch \u2014 > Auto-mapped from CLAUDE.md \u00a7\"Unified Audit Gate System\". La Key symbols: encode, decode, projectPCA, isGpuAvailable, getAutoencoderSession, autoencoderEncode, autoencoderDecode, isAutoencoderWarm, isAutoencoderCudaAvailable, AutoencoderWeights. Representative files: autoencoder-bridge.ts, autoencoder-scripts.test.ts, autoencoder-session.ts, autoencoder-weights.ts, autoencoder.test.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.33313,
+      "fusion_rank": 0.64619,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/gpu",
+          "score": 0.9893,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/webgpu",
+          "score": 0.9671,
+          "topo": [
+            "graph-gpu-topology",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/ml",
+          "score": 0.962,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/types",
+          "score": 0.9572,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/cache",
+          "score": 0.956,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        }
+      ],
+      "content_hash": "sha256:9a8af755b902138de8cfc4343f2cd08bb3b44ada6f46bfabe2a8682a7a51af3d",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-components-evidence",
+      "dir_path": "sveltekit-frontend/src/lib/components/evidence",
+      "frontend_alias_path": "src/lib/components/evidence",
+      "parent_dir": "sveltekit-frontend/src/lib/components",
+      "top_root": "sveltekit-frontend",
+      "title": "Components / Evidence",
+      "file_count": 92,
+      "source_file_count": 91,
+      "extensions": {
+        ".svelte": 66,
+        ".ts": 25,
+        ".md": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "legal-evidence",
+        "ui-component",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "00ac0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "CASE_EXHIBIT_DRAG_TYPE",
+        "DetectiveGuideAction",
+        "ReviewedWalkJointSample",
+        "loadRegisteredReviewedWalkGlb",
+        "Tier",
+        "ViewerStatus",
+        "DepthSourceMode",
+        "ReliefSamplingMode",
+        "ReliefAnnotationPoint",
+        "ReliefSegmentMask",
+        "AnnotationScreenPositions"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/components/evidence/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/components/evidence/BoardDossierDetails.svelte",
+        "sveltekit-frontend/src/lib/components/evidence/BoardMinimap.svelte",
+        "sveltekit-frontend/src/lib/components/evidence/BoardSearchOverlay.svelte",
+        "sveltekit-frontend/src/lib/components/evidence/BoardTopToolbar.svelte",
+        "sveltekit-frontend/src/lib/components/evidence/CaseEvidenceOrganizer.svelte",
+        "sveltekit-frontend/src/lib/components/evidence/CaseInvestigationPanel.svelte"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/components/evidence` (92 files, 91 code; domains: trace-retrieval, legal-evidence, ui-component, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/components/evidence` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components/evidence` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components/evidence` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components/evidence` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components/evidence` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | Key symbols: CASE_EXHIBIT_DRAG_TYPE, DetectiveGuideAction, ReviewedWalkJointSample, loadRegisteredReviewedWalkGlb, Tier, ViewerStatus, DepthSourceMode, ReliefSamplingMode, ReliefAnnotationPoint, ReliefSegmentMask. Representative files: BoardDossierDetails.svelte, BoardMinimap.svelte, BoardSearchOverlay.svelte, BoardTopToolbar.svelte, CaseEvidenceOrganizer.svelte.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.24934,
+      "fusion_rank": 0.63727,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/evidence",
+          "score": 0.9791,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components",
+          "score": 0.9663,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/routes/(app)/evidence",
+          "score": 0.962,
+          "topo": [
+            "legal-evidence",
+            "api-route"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/legal-ai",
+          "score": 0.9601,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/ai",
+          "score": 0.9521,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        }
+      ],
+      "content_hash": "sha256:8ae09de2ed3f1569383083798a6fda63477ac499e53dfa3c643538322c6f5371",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-webgpu",
+      "dir_path": "sveltekit-frontend/src/lib/webgpu",
+      "frontend_alias_path": "src/lib/webgpu",
+      "parent_dir": "sveltekit-frontend/src/lib",
+      "top_root": "sveltekit-frontend",
+      "title": "Lib / Webgpu",
+      "file_count": 39,
+      "source_file_count": 31,
+      "extensions": {
+        ".ts": 29,
+        ".wgsl": 6,
+        ".js": 2,
+        "(no-ext)": 1,
+        ".md": 1
+      },
+      "topo_classes": [
+        "graph-gpu-topology",
+        "legal-evidence",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:test",
+        "ATLASEXT:lib",
+        "ATLASEXT:node"
+      ],
+      "obo_bitset_hex_64b": "003c0100008040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "N64TextureFormatV1",
+        "LODLevelV1",
+        "N64TextureLODSystem",
+        "n64TextureLOD",
+        "BITNET_LUT_NODE_SIZE",
+        "BITNET_LUT_TRANSITION_SIZE",
+        "DEFAULT_BITNET_LUT_FILE",
+        "BitNetOPFSConfig",
+        "cacheBitNetLUTToNVMe",
+        "readBitNetLUTFromNVMe",
+        "queryBitNetNodeOPFS",
+        "computeBatchJaccardCpu"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [
+        "test_bitnet_lut.bin"
+      ],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/webgpu/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/webgpu/N64TextureLODSystem.spec.ts",
+        "sveltekit-frontend/src/lib/webgpu/N64TextureLODSystem.ts",
+        "sveltekit-frontend/src/lib/webgpu/bitnet-opfs-store.spec.ts",
+        "sveltekit-frontend/src/lib/webgpu/bitnet-opfs-store.ts",
+        "sveltekit-frontend/src/lib/webgpu/bitset-webgpu-engine.spec.ts",
+        "sveltekit-frontend/src/lib/webgpu/bitset-webgpu-engine.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/webgpu` (39 files, 31 code; domains: graph-gpu-topology, legal-evidence, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/webgpu` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/webgpu` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/webgpu` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/webgpu` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/webgpu` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| \u2014 | `webgpu-rag-service.ts` | 0.000 Key symbols: N64TextureFormatV1, LODLevelV1, N64TextureLODSystem, n64TextureLOD, BITNET_LUT_NODE_SIZE, BITNET_LUT_TRANSITION_SIZE, DEFAULT_BITNET_LUT_FILE, BitNetOPFSConfig, cacheBitNetLUTToNVMe, readBitNetLUTFromNVMe. MCP tools: test_bitnet_lut.bin. Representative files: N64TextureLODSystem.spec.ts, N64TextureLODSystem.ts, bitnet-opfs-store.spec.ts, bitnet-opfs-store.ts, bitset-webgpu-engine.spec.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.17662,
+      "fusion_rank": 0.63218,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/gpu",
+          "score": 0.9722,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/gpu",
+          "score": 0.9671,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/webgpu",
+          "score": 0.9614,
+          "topo": [
+            "graph-gpu-topology",
+            "ui-component"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/ai",
+          "score": 0.9468,
+          "topo": [
+            "graph-gpu-topology",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/graph",
+          "score": 0.9398,
+          "topo": [
+            "graph-gpu-topology",
+            "ui-component"
+          ]
+        }
+      ],
+      "content_hash": "sha256:63df230c7fa1d838569b25a8496b761e383fa539bf69978beed8f6a4d599dd3c",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-gpu",
+      "dir_path": "sveltekit-frontend/src/lib/gpu",
+      "frontend_alias_path": "src/lib/gpu",
+      "parent_dir": "sveltekit-frontend/src/lib",
+      "top_root": "sveltekit-frontend",
+      "title": "Lib / Gpu",
+      "file_count": 40,
+      "source_file_count": 39,
+      "extensions": {
+        ".ts": 38,
+        ".js": 1,
+        ".md": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "00bc0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "ARPC_MAGIC_BYTES",
+        "ARPC_VERSION",
+        "ARPC_HEADER_BYTES",
+        "ARPC_DIGEST_BYTES",
+        "WEBGPU_TEXTURE_ROW_PITCH_ALIGNMENT",
+        "WGSL_UNIFORM_ALIGNMENT",
+        "ArpcCodecId",
+        "FORBIDDEN_HOT_PATH_KEYS",
+        "ParsedArpcHeaderV1",
+        "parseAndVerifyArpcEnvelopeV1",
+        "alignWebGpuBytesPerRow",
+        "assertPixelFilingAlignmentV1"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/gpu/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/gpu/index.ts",
+        "sveltekit-frontend/src/lib/gpu/arpc-envelope-v1.spec.ts",
+        "sveltekit-frontend/src/lib/gpu/arpc-envelope-v1.ts",
+        "sveltekit-frontend/src/lib/gpu/attention-scoring.ts",
+        "sveltekit-frontend/src/lib/gpu/autoencoder-compression.ts",
+        "sveltekit-frontend/src/lib/gpu/cuda-graph-rerank-hook.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/gpu` (40 files, 39 code; domains: trace-retrieval, graph-gpu-topology, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/gpu` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/gpu` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/gpu` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/gpu` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/gpu` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| \u2014 | `webgpu-palace-core.ts` | 0.000 | 0xb | Key symbols: ARPC_MAGIC_BYTES, ARPC_VERSION, ARPC_HEADER_BYTES, ARPC_DIGEST_BYTES, WEBGPU_TEXTURE_ROW_PITCH_ALIGNMENT, WGSL_UNIFORM_ALIGNMENT, ArpcCodecId, FORBIDDEN_HOT_PATH_KEYS, ParsedArpcHeaderV1, parseAndVerifyArpcEnvelopeV1. Representative files: index.ts, arpc-envelope-v1.spec.ts, arpc-envelope-v1.ts, attention-scoring.ts, autoencoder-compression.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.27297,
+      "fusion_rank": 0.63009,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/gpu",
+          "score": 0.9893,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/webgpu",
+          "score": 0.9722,
+          "topo": [
+            "graph-gpu-topology",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/webgpu",
+          "score": 0.9504,
+          "topo": [
+            "graph-gpu-topology",
+            "ui-component"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/graph",
+          "score": 0.949,
+          "topo": [
+            "graph-gpu-topology",
+            "ui-component"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/ml",
+          "score": 0.947,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        }
+      ],
+      "content_hash": "sha256:ffd03fe6575ac2293e1283e6d91f4570d5e2ce35fecb14f0ba99465abfd6f09d",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-server-ml",
+      "dir_path": "sveltekit-frontend/src/lib/server/ml",
+      "frontend_alias_path": "src/lib/server/ml",
+      "parent_dir": "sveltekit-frontend/src/lib/server",
+      "top_root": "sveltekit-frontend",
+      "title": "Server / Ml",
+      "file_count": 22,
+      "source_file_count": 21,
+      "extensions": {
+        ".ts": 21,
+        ".md": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "00bc0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "FeedbackStore",
+        "feedbackStore",
+        "MLSidecarRankRequest",
+        "MLSidecarRankResponse",
+        "MLSidecarClassifyRequest",
+        "MLSidecarClassifyResponse",
+        "MLSidecarClusterRequest",
+        "MLSidecarClusterResponse",
+        "checkMiniforgeSidecarHealth",
+        "rankCandidates",
+        "classifyText",
+        "clusterVectors"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/server/ml/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/server/ml/feedback-store.ts",
+        "sveltekit-frontend/src/lib/server/ml/miniforge-ml-sidecar.ts",
+        "sveltekit-frontend/src/lib/server/ml/multi-modal-ranker.ts",
+        "sveltekit-frontend/src/lib/server/ml/phase17-advanced-features.ts",
+        "sveltekit-frontend/src/lib/server/ml/phase17-feature-extractor.ts",
+        "sveltekit-frontend/src/lib/server/ml/phase17-integration.spec.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/server/ml` (22 files, 21 code; domains: trace-retrieval, graph-gpu-topology, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ml` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ml` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ml` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ml` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/ml` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| \u2014 | `user-history.ts Key symbols: FeedbackStore, feedbackStore, MLSidecarRankRequest, MLSidecarRankResponse, MLSidecarClassifyRequest, MLSidecarClassifyResponse, MLSidecarClusterRequest, MLSidecarClusterResponse, checkMiniforgeSidecarHealth, rankCandidates. Representative files: feedback-store.ts, miniforge-ml-sidecar.ts, multi-modal-ranker.ts, phase17-advanced-features.ts, phase17-feature-extractor.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.37031,
+      "fusion_rank": 0.62615,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/types",
+          "score": 0.9651,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/gpu",
+          "score": 0.962,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/analytics",
+          "score": 0.9596,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server",
+          "score": 0.9589,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/inference",
+          "score": 0.9588,
+          "topo": [
+            "graph-gpu-topology",
+            "test-audit-devtool"
+          ]
+        }
+      ],
+      "content_hash": "sha256:235e5b2e870404682d82f1d1ef1c33a40ee35e68c7647dfe95335938df4e4625",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-components-ai",
+      "dir_path": "sveltekit-frontend/src/lib/components/ai",
+      "frontend_alias_path": "src/lib/components/ai",
+      "parent_dir": "sveltekit-frontend/src/lib/components",
+      "top_root": "sveltekit-frontend",
+      "title": "Components / Ai",
+      "file_count": 51,
+      "source_file_count": 50,
+      "extensions": {
+        ".svelte": 47,
+        ".ts": 3,
+        ".md": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "legal-evidence",
+        "ui-component",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "00ac0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/components/ai/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/components/ai/index.ts",
+        "sveltekit-frontend/src/lib/components/ai/ACEContextBubble.svelte",
+        "sveltekit-frontend/src/lib/components/ai/AIAssistantButton.svelte",
+        "sveltekit-frontend/src/lib/components/ai/AIAssistantPanel.svelte",
+        "sveltekit-frontend/src/lib/components/ai/AIButton.svelte",
+        "sveltekit-frontend/src/lib/components/ai/AIChatWidget.svelte"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/components/ai` (51 files, 50 code; domains: trace-retrieval, legal-evidence, ui-component, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/components/ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components/ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components/ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components/ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components/ai` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| Representative files: index.ts, ACEContextBubble.svelte, AIAssistantButton.svelte, AIAssistantPanel.svelte, AIButton.svelte.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.20919,
+      "fusion_rank": 0.62322,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/ai",
+          "score": 0.9696,
+          "topo": [
+            "graph-gpu-topology",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/legal-ai",
+          "score": 0.9693,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/ai",
+          "score": 0.9677,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components",
+          "score": 0.9621,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/evidence",
+          "score": 0.9521,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        }
+      ],
+      "content_hash": "sha256:dda75cfd503e6895747c648bf8f26d0859e789f5115dbb4f4eb818cd6286a92a",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-server-evidence",
+      "dir_path": "sveltekit-frontend/src/lib/server/evidence",
+      "frontend_alias_path": "src/lib/server/evidence",
+      "parent_dir": "sveltekit-frontend/src/lib/server",
+      "top_root": "sveltekit-frontend",
+      "title": "Server / Evidence",
+      "file_count": 93,
+      "source_file_count": 91,
+      "extensions": {
+        ".ts": 91,
+        ".example": 1,
+        ".md": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "legal-evidence",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "00ac0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "buildAnalysisUploadEvidencePayloadV1",
+        "executeAnalysisUploadPipelineV1",
+        "BatchEmbedResult",
+        "batchEmbedAndStoreEntities",
+        "loadBoardDossierContext",
+        "createDepthAttachmentPlanV1",
+        "DEPTH_MODEL_ID_V1",
+        "DEPTH_MODEL_REVISION_V1",
+        "DepthWorkerRequest",
+        "DepthWorkerRunner",
+        "spawnDepthWorker",
+        "DepthProducerInputV1"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/server/evidence/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/server/evidence/analysis-upload-pipeline-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/evidence/analysis-upload-pipeline-v1.ts",
+        "sveltekit-frontend/src/lib/server/evidence/audit.ts",
+        "sveltekit-frontend/src/lib/server/evidence/batch-entity-embedder.ts",
+        "sveltekit-frontend/src/lib/server/evidence/board-dossier-context.ts",
+        "sveltekit-frontend/src/lib/server/evidence/canary-live-outbox-qdrant-e2e.spec.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/server/evidence` (93 files, 91 code; domains: trace-retrieval, legal-evidence, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/server/evidence` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/evidence` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/evidence` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/evidence` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/evidence` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | Key symbols: buildAnalysisUploadEvidencePayloadV1, executeAnalysisUploadPipelineV1, BatchEmbedResult, batchEmbedAndStoreEntities, loadBoardDossierContext, createDepthAttachmentPlanV1, DEPTH_MODEL_ID_V1, DEPTH_MODEL_REVISION_V1, DepthWorkerRequest, DepthWorkerRunner. Representative files: analysis-upload-pipeline-v1.spec.ts, analysis-upload-pipeline-v1.ts, audit.ts, batch-entity-embedder.ts, board-dossier-context.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.191,
+      "fusion_rank": 0.61685,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/evidence",
+          "score": 0.9791,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/evidence/services",
+          "score": 0.965,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/legal",
+          "score": 0.962,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/routes/(app)/evidence",
+          "score": 0.957,
+          "topo": [
+            "legal-evidence",
+            "api-route"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/evidence/video",
+          "score": 0.9567,
+          "topo": [
+            "legal-evidence",
+            "test-audit-devtool"
+          ]
+        }
+      ],
+      "content_hash": "sha256:d0b17e6386e3bcbb07b4135f47898fded606c64f6c741dda7b4724d8f8b92a0c",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-mcp",
+      "dir_path": "sveltekit-frontend/src/mcp",
+      "frontend_alias_path": "src/mcp",
+      "parent_dir": "sveltekit-frontend/src",
+      "top_root": "sveltekit-frontend",
+      "title": "Src / Mcp",
+      "file_count": 69,
+      "source_file_count": 67,
+      "extensions": {
+        ".ts": 65,
+        ".md": 2,
+        ".mjs": 2
+      },
+      "topo_classes": [
+        "mcp-agent-tool",
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:bash",
+        "ATLASEXT:svelte",
+        "ATLASEXT:svelte.ts"
+      ],
+      "obo_bitset_hex_64b": "008c050000000000000c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "registerAdminTools",
+        "afcRadixShadowInputSchema",
+        "AfcRadixShadowArtifactReader",
+        "AfcRadixShadowToolOptions",
+        "registerAfcRadixShadowTools",
+        "atlasActionsServer",
+        "atlasContextServer",
+        "registerAtlasKeywordCorpusTools",
+        "AtlasSemanticMcpDomain",
+        "ATLAS_CONTEXT_TOOL_NAMES",
+        "ATLAS_ACTION_TOOL_NAMES",
+        "getAtlasSemanticDomainTools"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [
+        "ui.analyze_view",
+        "admin.log_event",
+        "ops.execute_graphify",
+        "atlas.afc_radix_shadow",
+        "atlas.keyword_corpus_search",
+        "atlas.todo_inverse_dag"
+      ],
+      "context_docs": [
+        "sveltekit-frontend/src/mcp/AGENTS.md",
+        "sveltekit-frontend/src/mcp/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/mcp/index.ts",
+        "sveltekit-frontend/src/mcp/admin_tools.ts",
+        "sveltekit-frontend/src/mcp/afc-radix-shadow-tools.spec.ts",
+        "sveltekit-frontend/src/mcp/afc-radix-shadow-tools.ts",
+        "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+        "sveltekit-frontend/src/mcp/atlas-context-server.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/mcp` (69 files, 67 code; domains: mcp-agent-tool, trace-retrieval, test-audit-devtool). Context: LLMS.md \u2014 `src/mcp` \u2014 Audit Gates \u2014 MCP Tool Surface (TRACE) \u2014 > Auto-mapped from CLAUDE.md \u00a7\"Unified Audit Gate System\". Last enriched: 2026-05-09 \u2014 > Run each check from the **sveltekit-frontend/** root. \u2014 Tier A \u2014 Code Connectivity \u2014 **G1** Static ESM imports \u2014 ```bash \u2014 rg \"from.*MODULE\" src/ --type ts --type svelte \u2014 ``` \u2014 **G2** Dynamic ESM imports Key symbols: registerAdminTools, afcRadixShadowInputSchema, AfcRadixShadowArtifactReader, AfcRadixShadowToolOptions, registerAfcRadixShadowTools, atlasActionsServer, atlasContextServer, registerAtlasKeywordCorpusTools, AtlasSemanticMcpDomain, ATLAS_CONTEXT_TOOL_NAMES. MCP tools: ui.analyze_view, admin.log_event, ops.execute_graphify, atlas.afc_radix_shadow, atlas.keyword_corpus_search, atlas.todo_inverse_dag. Representative files: index.ts, admin_tools.ts, afc-radix-shadow-tools.spec.ts, afc-radix-shadow-tools.ts, atlas-actions-server.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.04798,
+      "fusion_rank": 0.61679,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/tests/routes/auto/sveltekit-frontend/src/routes/api/mcp",
+          "score": 0.9377,
+          "topo": [
+            "mcp-agent-tool",
+            "api-route"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/mcp",
+          "score": 0.9323,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/agents",
+          "score": 0.9288,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/agent",
+          "score": 0.9283,
+          "topo": [
+            "mcp-agent-tool",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/mcp/tools",
+          "score": 0.9239,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        }
+      ],
+      "content_hash": "sha256:bff19b0b457a6cbff8a2727684889b8f1f2017931ac9ca0bbe6eeae6229c1db3",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-components",
+      "dir_path": "sveltekit-frontend/src/lib/components",
+      "frontend_alias_path": "src/lib/components",
+      "parent_dir": "sveltekit-frontend/src/lib",
+      "top_root": "sveltekit-frontend",
+      "title": "Lib / Components",
+      "file_count": 60,
+      "source_file_count": 57,
+      "extensions": {
+        ".svelte": 54,
+        ".md": 3,
+        ".ts": 3
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "legal-evidence",
+        "ui-component",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "00ac0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/components/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/components/AIChatAssistant.svelte",
+        "sveltekit-frontend/src/lib/components/APITesterModal.svelte",
+        "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+        "sveltekit-frontend/src/lib/components/ArchivedRoutesPanel.svelte",
+        "sveltekit-frontend/src/lib/components/CanvasEditor.svelte",
+        "sveltekit-frontend/src/lib/components/CaseOutcomePrediction.svelte"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/components` (60 files, 57 code; domains: trace-retrieval, legal-evidence, ui-component, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/components` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| Representative files: AIChatAssistant.svelte, APITesterModal.svelte, ActionPopup.svelte, ArchivedRoutesPanel.svelte, CanvasEditor.svelte.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.18642,
+      "fusion_rank": 0.61525,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/evidence",
+          "score": 0.9663,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/ai",
+          "score": 0.9621,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib",
+          "score": 0.9612,
+          "topo": [
+            "trace-retrieval",
+            "ui-component"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/legal-ai",
+          "score": 0.9557,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/admin",
+          "score": 0.9539,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        }
+      ],
+      "content_hash": "sha256:2e9bd89ee81a51990eb61ce4b0d9824da2da98557886e2c03cde1434b2501980",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-tests-e2e",
+      "dir_path": "sveltekit-frontend/tests/e2e",
+      "frontend_alias_path": "tests/e2e",
+      "parent_dir": "sveltekit-frontend/tests",
+      "top_root": "sveltekit-frontend",
+      "title": "Tests / E2E",
+      "file_count": 96,
+      "source_file_count": 95,
+      "extensions": {
+        ".ts": 95,
+        ".md": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "legal-evidence",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:auth",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test"
+      ],
+      "obo_bitset_hex_64b": "02bc0100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [],
+      "schema_tables": [],
+      "mcp_tools": [
+        "auth_session",
+        "playwright-local-preview.png"
+      ],
+      "context_docs": [
+        "sveltekit-frontend/tests/e2e/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/tests/e2e/ace-chat-dag-journey.spec.ts",
+        "sveltekit-frontend/tests/e2e/admin-atlas-ace-packets.spec.ts",
+        "sveltekit-frontend/tests/e2e/admin-atlas-daily-gates.spec.ts",
+        "sveltekit-frontend/tests/e2e/admin-atlas-runtime-health.spec.ts",
+        "sveltekit-frontend/tests/e2e/all-routes-admin-demos.spec.ts",
+        "sveltekit-frontend/tests/e2e/all-routes-sse.spec.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/tests/e2e` (96 files, 95 code; domains: trace-retrieval, graph-gpu-topology, legal-evidence, test-audit-devtool). Context: AGENTS.md \u2014 `sveltekit-frontend/tests/e2e` \u2014 > Directory: sveltekit-frontend/tests/e2e \u2014 Snapshot \u2014 - 28 file(s), 0 handler(s) \u2014 - Audit score: _(no GPU audit)_ \u2014 - no audit signals \u2014 Files (28) \u2014 - `all-routes-sse.spec.ts` \u2014 - `auth-login-db.spec.ts` \u2014 - `cases-real-data.spec.ts` \u2014 - `chat-inference-routing.spec.ts` \u2014 - `chat-rag-sse.spec.ts` \u2014 - `chat.spec MCP tools: auth_session, playwright-local-preview.png. Representative files: ace-chat-dag-journey.spec.ts, admin-atlas-ace-packets.spec.ts, admin-atlas-daily-gates.spec.ts, admin-atlas-runtime-health.spec.ts, all-routes-admin-demos.spec.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.03716,
+      "fusion_rank": 0.61301,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/tests/e2e/route-forensic",
+          "score": 0.9583,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/routes",
+          "score": 0.9512,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/routes/auto/api/evidence",
+          "score": 0.9365,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/routes/auto/api/evidence/__id",
+          "score": 0.9363,
+          "topo": [
+            "graph-gpu-topology",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/routes/auto/api/codebase-index",
+          "score": 0.9359,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        }
+      ],
+      "content_hash": "sha256:36db2df75e13bfc3ee408b918e34bda55b8d556abe4e8561ba7bc9cfe76a9eac",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src",
+      "dir_path": "sveltekit-frontend/src",
+      "frontend_alias_path": "src",
+      "parent_dir": "sveltekit-frontend",
+      "top_root": "sveltekit-frontend",
+      "title": "Sveltekit Frontend / Src",
+      "file_count": 24,
+      "source_file_count": 21,
+      "extensions": {
+        ".ts": 20,
+        ".html": 1,
+        ".js": 1,
+        ".md": 1,
+        ".postcss": 1
+      },
+      "topo_classes": [
+        "mcp-agent-tool",
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "database-schema"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:database",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval"
+      ],
+      "obo_bitset_hex_64b": "10bc0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "marked",
+        "parse",
+        "lexer",
+        "parser",
+        "AuthUser",
+        "Session",
+        "UserSession",
+        "authStore",
+        "VideoMetadata",
+        "evidenceUploadSchema",
+        "EvidenceUploadData",
+        "Duration"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/ambient-legacy.d.ts",
+        "sveltekit-frontend/src/app.d.ts",
+        "sveltekit-frontend/src/auth-store.svelte.ts",
+        "sveltekit-frontend/src/custom-modules.d.ts",
+        "sveltekit-frontend/src/env.d.ts",
+        "sveltekit-frontend/src/global.d.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src` (24 files, 21 code; domains: mcp-agent-tool, trace-retrieval, graph-gpu-topology, database-schema). Context: LLMS.md \u2014 `sveltekit-frontend/src` \u2014 LLMS.md \u2014 `sveltekit-frontend/src` \u2014 LLMS.md \u2014 `sveltekit-frontend/src` \u2014 LLMS.md \u2014 `sveltekit-frontend/src` \u2014 LLMS.md \u2014 `sveltekit-frontend/src` \u2014 Audit Gates \u2014 General \u2014 > Auto-mapped from CLAUDE.md \u00a7\"Unified Audit Gate System\". Last enriched: 2026-05-11 \u2014 > Run each check from the **sveltekit-frontend/** root. Key symbols: marked, parse, lexer, parser, AuthUser, Session, UserSession, authStore, VideoMetadata, evidenceUploadSchema. Representative files: ambient-legacy.d.ts, app.d.ts, auth-store.svelte.ts, custom-modules.d.ts, env.d.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.33108,
+      "fusion_rank": 0.61242,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/config",
+          "score": 0.9721,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/mcp",
+          "score": 0.9526,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/types",
+          "score": 0.9501,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/mcp/tools",
+          "score": 0.95,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/db/schema",
+          "score": 0.9445,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        }
+      ],
+      "content_hash": "sha256:9c827e760c810527a4a5d66c449572065325a2f48fcb1b2141b53a7eebcf0138",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-server-db-schema",
+      "dir_path": "sveltekit-frontend/src/lib/server/db/schema",
+      "frontend_alias_path": "src/lib/server/db/schema",
+      "parent_dir": "sveltekit-frontend/src/lib/server/db",
+      "top_root": "sveltekit-frontend",
+      "title": "Db / Schema",
+      "file_count": 156,
+      "source_file_count": 155,
+      "extensions": {
+        ".ts": 155,
+        ".md": 1
+      },
+      "topo_classes": [
+        "mcp-agent-tool",
+        "trace-retrieval",
+        "database-schema",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:database",
+        "ATLASDOM:frontend",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "10ac0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "webCrawlJobs",
+        "userAnalytics",
+        "aiChatSessions",
+        "WebCrawlJob",
+        "NewWebCrawlJob",
+        "UserAnalytic",
+        "NewUserAnalytic",
+        "AIChatSession",
+        "NewAIChatSession",
+        "adminAiSkills",
+        "adminAiSubagentRuns",
+        "adminAiChatSessions"
+      ],
+      "schema_tables": [
+        "web_crawl_jobs",
+        "user_analytics",
+        "ai_chat_sessions",
+        "admin_ai_skills",
+        "admin_ai_subagent_runs",
+        "admin_ai_chat_sessions",
+        "admin_ai_chat_messages",
+        "admin_model_weights"
+      ],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/server/db/schema/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/server/db/schema/index.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/ace-web-crawl.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/admin-ai-skills.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/admin-chat.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/admin-model-weights.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/admin-raptor-summaries.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/server/db/schema` (156 files, 155 code; domains: mcp-agent-tool, trace-retrieval, database-schema, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/server/db/schema` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/db/schema` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/db/schema` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/db/schema` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/db/schema` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | Key symbols: webCrawlJobs, userAnalytics, aiChatSessions, WebCrawlJob, NewWebCrawlJob, UserAnalytic, NewUserAnalytic, AIChatSession, NewAIChatSession, adminAiSkills. Tables: web_crawl_jobs, user_analytics, ai_chat_sessions, admin_ai_skills, admin_ai_subagent_runs, admin_ai_chat_sessions. Representative files: index.ts, ace-web-crawl.ts, admin-ai-skills.ts, admin-chat.ts, admin-model-weights.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.16692,
+      "fusion_rank": 0.60842,
+      "semantic_neighbors": [
+        {
+          "dirPath": "gsd_archives/phase-2f1-baseline/schema-backup",
+          "score": 0.9538,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src",
+          "score": 0.9445,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/agents",
+          "score": 0.9412,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/config",
+          "score": 0.9406,
+          "topo": [
+            "mcp-agent-tool",
+            "trace-retrieval"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/services/knowledge-search",
+          "score": 0.9385,
+          "topo": [
+            "trace-retrieval",
+            "database-schema"
+          ]
+        }
+      ],
+      "content_hash": "sha256:71f83a71b9d58bcb83a1d45a386e77d76a1492760bec9d9979d5c937339a81ae",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-server-queue",
+      "dir_path": "sveltekit-frontend/src/lib/server/queue",
+      "frontend_alias_path": "src/lib/server/queue",
+      "parent_dir": "sveltekit-frontend/src/lib/server",
+      "top_root": "sveltekit-frontend",
+      "title": "Server / Queue",
+      "file_count": 56,
+      "source_file_count": 55,
+      "extensions": {
+        ".ts": 55,
+        ".md": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "legal-evidence",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "00ac0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "actionLeaseSchema",
+        "ActionLeaseV1",
+        "actionExecutionReceiptSchema",
+        "ActionExecutionReceiptV1",
+        "ActionClaimV1",
+        "getActionExecutionReceipt",
+        "claimActionWork",
+        "completeActionWork",
+        "expireActionLease",
+        "ArtifactLifecycleEventV1",
+        "ArtifactFailureDispositionV1",
+        "classifyArtifactFailureDisposition"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [
+        "artifact_id",
+        "artifact_hash",
+        "workflow_artifacts"
+      ],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/server/queue/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/server/queue/action-single-flight-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/queue/action-single-flight-v1.ts",
+        "sveltekit-frontend/src/lib/server/queue/artifact-event-processing.spec.ts",
+        "sveltekit-frontend/src/lib/server/queue/artifact-event-processing.ts",
+        "sveltekit-frontend/src/lib/server/queue/artifact-lifecycle-outbox.ts",
+        "sveltekit-frontend/src/lib/server/queue/artifact-materialization-verification.spec.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/server/queue` (56 files, 55 code; domains: trace-retrieval, legal-evidence, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/server/queue` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/queue` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/queue` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/queue` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/queue` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| Key symbols: actionLeaseSchema, ActionLeaseV1, actionExecutionReceiptSchema, ActionExecutionReceiptV1, ActionClaimV1, getActionExecutionReceipt, claimActionWork, completeActionWork, expireActionLease, ArtifactLifecycleEventV1. MCP tools: artifact_id, artifact_hash, workflow_artifacts. Representative files: action-single-flight-v1.spec.ts, action-single-flight-v1.ts, artifact-event-processing.spec.ts, artifact-event-processing.ts, artifact-lifecycle-outbox.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.00886,
+      "fusion_rank": 0.6031,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server",
+          "score": 0.9433,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/evidence",
+          "score": 0.9352,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/utils",
+          "score": 0.9318,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/workers",
+          "score": 0.9312,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/services",
+          "score": 0.9301,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        }
+      ],
+      "content_hash": "sha256:20c7770942ed69b461bb1115d0084237cfe0a6a3daa308752f32fa64cd8d1edc",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-tests-routes",
+      "dir_path": "sveltekit-frontend/tests/routes",
+      "frontend_alias_path": "tests/routes",
+      "parent_dir": "sveltekit-frontend/tests",
+      "top_root": "sveltekit-frontend",
+      "title": "Tests / Routes",
+      "file_count": 34,
+      "source_file_count": 33,
+      "extensions": {
+        ".ts": 33,
+        ".md": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "legal-evidence",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:cache",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test"
+      ],
+      "obo_bitset_hex_64b": "04bc0100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [],
+      "schema_tables": [],
+      "mcp_tools": [
+        "ornith-1.5-9b"
+      ],
+      "context_docs": [
+        "sveltekit-frontend/tests/routes/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/tests/routes/ace-wiki-graph-index.test.ts",
+        "sveltekit-frontend/tests/routes/ai-models.test.ts",
+        "sveltekit-frontend/tests/routes/all-routes-page-server.test.ts",
+        "sveltekit-frontend/tests/routes/all-routes-page.test.ts",
+        "sveltekit-frontend/tests/routes/cache-stats.test.ts",
+        "sveltekit-frontend/tests/routes/cases-canvas.test.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/tests/routes` (34 files, 33 code; domains: trace-retrieval, graph-gpu-topology, legal-evidence, test-audit-devtool). Context: AGENTS.md \u2014 `sveltekit-frontend/tests/routes` \u2014 > Directory: sveltekit-frontend/tests/routes \u2014 Snapshot \u2014 - 31 file(s), 0 handler(s) \u2014 - Audit score: _(no GPU audit)_ \u2014 - no audit signals \u2014 Files (31) \u2014 - `ace-wiki-graph-index.test.ts` \u2014 - `ai-models.test.ts` \u2014 - `all-routes-page-server.test.ts` \u2014 - `all-routes-page.test.ts` \u2014 - `cache-stats.test.ts` \u2014 - `ca MCP tools: ornith-1.5-9b. Representative files: ace-wiki-graph-index.test.ts, ai-models.test.ts, all-routes-page-server.test.ts, all-routes-page.test.ts, cache-stats.test.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.077,
+      "fusion_rank": 0.60117,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/tests/routes/auto/api/codebase-index",
+          "score": 0.9696,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/routes/auto/api/graph",
+          "score": 0.9669,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/routes/auto/api",
+          "score": 0.9652,
+          "topo": [
+            "mcp-agent-tool",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/routes/auto/api/test",
+          "score": 0.9634,
+          "topo": [
+            "graph-gpu-topology",
+            "api-route"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/tests/routes/auto/api/health",
+          "score": 0.9594,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        }
+      ],
+      "content_hash": "sha256:0328a3453628af44ba1117f058e027126f3f8cc218ce8cd0824048d39e58b9e1",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-server-llm",
+      "dir_path": "sveltekit-frontend/src/lib/server/llm",
+      "frontend_alias_path": "src/lib/server/llm",
+      "parent_dir": "sveltekit-frontend/src/lib/server",
+      "top_root": "sveltekit-frontend",
+      "title": "Server / Llm",
+      "file_count": 15,
+      "source_file_count": 14,
+      "extensions": {
+        ".ts": 14,
+        ".md": 1
+      },
+      "topo_classes": [
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:graph",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "002c0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "ContextChatRequest",
+        "Suggestion",
+        "ContextChatResponse",
+        "contextualChat",
+        "summarizeWithGemma4",
+        "summarizeBatchPackets",
+        "ToolParameterSchema",
+        "ChatToolDef",
+        "ChatToolCall",
+        "ChatMessage",
+        "ChatCompletionResponse",
+        "ToolHandler"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/server/llm/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/server/llm/contextual-chat.ts",
+        "sveltekit-frontend/src/lib/server/llm/gemma4-summary-wrapper.spec.ts",
+        "sveltekit-frontend/src/lib/server/llm/gemma4-summary-wrapper.ts",
+        "sveltekit-frontend/src/lib/server/llm/gemma4-tool-loop.ts",
+        "sveltekit-frontend/src/lib/server/llm/gemmaIntake.ts",
+        "sveltekit-frontend/src/lib/server/llm/gemmaReports.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/server/llm` (15 files, 14 code; domains: test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/server/llm` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/llm` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/llm` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/llm` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/llm` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| Key symbols: ContextChatRequest, Suggestion, ContextChatResponse, contextualChat, summarizeWithGemma4, summarizeBatchPackets, ToolParameterSchema, ChatToolDef, ChatToolCall, ChatMessage. Representative files: contextual-chat.ts, gemma4-summary-wrapper.spec.ts, gemma4-summary-wrapper.ts, gemma4-tool-loop.ts, gemmaIntake.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.36816,
+      "fusion_rank": 0.60104,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server",
+          "score": 0.9681,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/middleware",
+          "score": 0.9577,
+          "topo": [
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/models",
+          "score": 0.9565,
+          "topo": [
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/ai",
+          "score": 0.9558,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/cartridge",
+          "score": 0.9557,
+          "topo": [
+            "test-audit-devtool"
+          ]
+        }
+      ],
+      "content_hash": "sha256:8d710ad1dea95a6862b64581bc14f335e05ae2f00d648dfcf68b8a386d3444fb",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:scripts",
+      "dir_path": "scripts",
+      "frontend_alias_path": null,
+      "parent_dir": ".",
+      "top_root": "scripts",
+      "title": "Scripts",
+      "file_count": 461,
+      "source_file_count": 436,
+      "extensions": {
+        ".mjs": 199,
+        ".ps1": 79,
+        ".py": 57,
+        ".cjs": 43,
+        ".sh": 30,
+        ".ts": 12,
+        ".md": 9,
+        ".bat": 7
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "legal-evidence",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:api",
+        "ATLASDOM:gpu",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:mjs",
+        "ATLASEXT:obj"
+      ],
+      "obo_bitset_hex_64b": "01900100000008010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "iter_matches",
+        "patch_file",
+        "main",
+        "fix_set_obj_colons"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "scripts/LLMS.md"
+      ],
+      "top_files": [
+        "scripts/10-layer-audit-cli.mjs",
+        "scripts/Audit-ParentAtlas-Branches.ps1",
+        "scripts/Test-ParentAtlasAlignment.ps1",
+        "scripts/_check_glossary.cjs",
+        "scripts/_check_glossary_db.cjs",
+        "scripts/ace-daily-todo-summary.mjs"
+      ],
+      "summary": "Directory `scripts` (461 files, 436 code; domains: trace-retrieval, legal-evidence, test-audit-devtool). Context: AGENTS.md \u2014 `scripts` \u2014 > Directory: scripts \u2014 Snapshot \u2014 - 256 file(s), 0 handler(s) \u2014 - Audit score: _(no GPU audit)_ \u2014 - \ud83d\udfe0 hardcoded localhost: 54 \u00b7 TODOs: 6 \u2014 Files (256) \u2014 - `10-layer-audit-cli.mjs` \u2014 - `aggregate-failures.js` \u2014 - `analyze-consolidation.mjs` \u2014 - `analyze-current-errors.mjs` \u2014 - `apply-syntax-fixes.mjs` \u2014 - `audit-api-endpoints.mjs` \u2014 -  Key symbols: iter_matches, patch_file, main, fix_set_obj_colons. Representative files: 10-layer-audit-cli.mjs, Audit-ParentAtlas-Branches.ps1, Test-ParentAtlasAlignment.ps1, _check_glossary.cjs, _check_glossary_db.cjs.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.14371,
+      "fusion_rank": 0.6003,
+      "semantic_neighbors": [
+        {
+          "dirPath": "scripts/tests",
+          "score": 0.953,
+          "topo": [
+            "mcp-agent-tool",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "scripts/audit",
+          "score": 0.9389,
+          "topo": [
+            "graph-gpu-topology",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "scripts/api-cleanup",
+          "score": 0.9353,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "scripts/error-resolution",
+          "score": 0.9332,
+          "topo": [
+            "core-infrastructure"
+          ]
+        },
+        {
+          "dirPath": "scripts/eval/data",
+          "score": 0.9314,
+          "topo": [
+            "core-infrastructure"
+          ]
+        }
+      ],
+      "content_hash": "sha256:9bcba4b920093379f22266496e726bdaba3d534dfd8651f1b6354d7aa840255a",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-ai",
+      "dir_path": "sveltekit-frontend/src/lib/ai",
+      "frontend_alias_path": "src/lib/ai",
+      "parent_dir": "sveltekit-frontend/src/lib",
+      "top_root": "sveltekit-frontend",
+      "title": "Lib / Ai",
+      "file_count": 58,
+      "source_file_count": 56,
+      "extensions": {
+        ".ts": 52,
+        ".mjs": 4,
+        ".md": 2
+      },
+      "topo_classes": [
+        "graph-gpu-topology",
+        "legal-evidence",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "003c0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "FrozenFixtureV1",
+        "ExecutorPortV1",
+        "E2EReceiptV1",
+        "runOfflineComparisonE2EV1",
+        "LifecycleBackendV1",
+        "ExecutorLifecyclePortV1",
+        "LifecycleResultV1",
+        "runSequentialLifecycleFixtureV1",
+        "LifecyclePortV1",
+        "LifecycleReceiptV1",
+        "runSequentialLifecycleV1",
+        "FrozenPromptContractV1"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/ai/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/ai/atlas-browser-comparison-e2e-v1.test.ts",
+        "sveltekit-frontend/src/lib/ai/atlas-browser-comparison-e2e-v1.ts",
+        "sveltekit-frontend/src/lib/ai/atlas-browser-executor-lifecycle-v1.test.ts",
+        "sveltekit-frontend/src/lib/ai/atlas-browser-executor-lifecycle-v1.ts",
+        "sveltekit-frontend/src/lib/ai/atlas-browser-lifecycle-v1.test.ts",
+        "sveltekit-frontend/src/lib/ai/atlas-browser-lifecycle-v1.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/ai` (58 files, 56 code; domains: graph-gpu-topology, legal-evidence, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/ai` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| \u2014 | `base64-fp32-quantizer.ts` | 0.000 | 0x8 | Key symbols: FrozenFixtureV1, ExecutorPortV1, E2EReceiptV1, runOfflineComparisonE2EV1, LifecycleBackendV1, ExecutorLifecyclePortV1, LifecycleResultV1, runSequentialLifecycleFixtureV1, LifecyclePortV1, LifecycleReceiptV1. Representative files: atlas-browser-comparison-e2e-v1.test.ts, atlas-browser-comparison-e2e-v1.ts, atlas-browser-executor-lifecycle-v1.test.ts, atlas-browser-executor-lifecycle-v1.ts, atlas-browser-lifecycle-v1.test.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.13889,
+      "fusion_rank": 0.59861,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/ai",
+          "score": 0.9696,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/ai",
+          "score": 0.9637,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/webgpu",
+          "score": 0.9468,
+          "topo": [
+            "graph-gpu-topology",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/gpu",
+          "score": 0.9442,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/legal-ai",
+          "score": 0.943,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        }
+      ],
+      "content_hash": "sha256:2cab88c1cd3a727287240dc76ec6077fd7d91b79b2b3465c02354e2c910fb6a1",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-routes-app",
+      "dir_path": "sveltekit-frontend/src/routes/(app)",
+      "frontend_alias_path": "src/routes/(app)",
+      "parent_dir": "sveltekit-frontend/src/routes",
+      "top_root": "sveltekit-frontend",
+      "title": "Routes / (App)",
+      "file_count": 3,
+      "source_file_count": 2,
+      "extensions": {
+        ".md": 1,
+        ".svelte": 1,
+        ".ts": 1
+      },
+      "topo_classes": [
+        "ui-component"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:graph"
+      ],
+      "obo_bitset_hex_64b": "002c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [
+        "sveltekit-frontend/src/routes/(app)/+layout.server.ts",
+        "sveltekit-frontend/src/routes/(app)/+layout.svelte"
+      ],
+      "top_symbols": [
+        "load"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/routes/(app)/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/routes/(app)/+layout.server.ts",
+        "sveltekit-frontend/src/routes/(app)/+layout.svelte",
+        "sveltekit-frontend/src/routes/(app)/LLMS.md"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/routes/(app)` (3 files, 2 code; domains: ui-component). Context: LLMS.md \u2014 `sveltekit-frontend/src/routes/(app)` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/routes/(app)` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/routes/(app)` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/routes/(app)` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/routes/(app)` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| \u2014 | `+layout.server.ts` | Key symbols: load. Routes: +layout.server.ts, +layout.svelte. Representative files: +layout.server.ts, +layout.svelte, LLMS.md.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.73666,
+      "fusion_rank": 0.59768,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/routes/(app)/library",
+          "score": 0.9793,
+          "topo": [
+            "ui-component"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/routes/(app)/demos/svelte5-components",
+          "score": 0.9788,
+          "topo": [
+            "ui-component"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/routes/(app)/code-intel",
+          "score": 0.9765,
+          "topo": [
+            "ui-component"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/routes/(app)/demos/nes-routes",
+          "score": 0.9764,
+          "topo": [
+            "ui-component"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/routes",
+          "score": 0.9762,
+          "topo": [
+            "ui-component"
+          ]
+        }
+      ],
+      "content_hash": "sha256:11dbc7f1c5410b721c1319c641a25e7fe1c015d5f2ed846e40ef55843d5991bd",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-server-types",
+      "dir_path": "sveltekit-frontend/src/lib/server/types",
+      "frontend_alias_path": "src/lib/server/types",
+      "parent_dir": "sveltekit-frontend/src/lib/server",
+      "top_root": "sveltekit-frontend",
+      "title": "Server / Types",
+      "file_count": 15,
+      "source_file_count": 14,
+      "extensions": {
+        ".ts": 14,
+        ".md": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "00bc0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "ACEContextChunk",
+        "ACEPolicyTier",
+        "ACEPolicy",
+        "ACEContextResult",
+        "ACE_POLICIES",
+        "selectACEPolicy",
+        "ContentIdentityKind",
+        "ContentHashAlgorithm",
+        "ContentInputContract",
+        "ContentIdentity",
+        "resolveContentIdentity",
+        "generateMigrationFingerprint"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/server/types/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/server/types/index.ts",
+        "sveltekit-frontend/src/lib/server/types/ace.ts",
+        "sveltekit-frontend/src/lib/server/types/content-identity.ts",
+        "sveltekit-frontend/src/lib/server/types/field-resolution.ts",
+        "sveltekit-frontend/src/lib/server/types/globals.d.ts",
+        "sveltekit-frontend/src/lib/server/types/glyph.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/server/types` (15 files, 14 code; domains: trace-retrieval, graph-gpu-topology, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/server/types` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/types` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/types` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/types` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/types` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| Key symbols: ACEContextChunk, ACEPolicyTier, ACEPolicy, ACEContextResult, ACE_POLICIES, selectACEPolicy, ContentIdentityKind, ContentHashAlgorithm, ContentInputContract, ContentIdentity. Representative files: index.ts, ace.ts, content-identity.ts, field-resolution.ts, globals.d.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.35233,
+      "fusion_rank": 0.5955,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/ml",
+          "score": 0.9651,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/types",
+          "score": 0.9597,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/gpu",
+          "score": 0.9572,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server",
+          "score": 0.9568,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/hypergraph",
+          "score": 0.9565,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        }
+      ],
+      "content_hash": "sha256:c299dd9dfc9b8a52fc6667c968a4752922d96a3bd30f2285abec6355ecf54bff",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-components-legal-ai",
+      "dir_path": "sveltekit-frontend/src/lib/components/legal-ai",
+      "frontend_alias_path": "src/lib/components/legal-ai",
+      "parent_dir": "sveltekit-frontend/src/lib/components",
+      "top_root": "sveltekit-frontend",
+      "title": "Components / Legal Ai",
+      "file_count": 21,
+      "source_file_count": 20,
+      "extensions": {
+        ".svelte": 18,
+        ".ts": 2,
+        ".md": 1
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "legal-evidence",
+        "ui-component",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "00ac0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/components/legal-ai/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/components/legal-ai/AttachToCaseModal.svelte",
+        "sveltekit-frontend/src/lib/components/legal-ai/CaseChatPanel.svelte",
+        "sveltekit-frontend/src/lib/components/legal-ai/CaseDocumentWriter.svelte",
+        "sveltekit-frontend/src/lib/components/legal-ai/CaseStatuteLinks.svelte",
+        "sveltekit-frontend/src/lib/components/legal-ai/CitationCollections.svelte",
+        "sveltekit-frontend/src/lib/components/legal-ai/CitationDetail.svelte"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/components/legal-ai` (21 files, 20 code; domains: trace-retrieval, legal-evidence, ui-component, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/components/legal-ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components/legal-ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components/legal-ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components/legal-ai` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/components/legal-ai` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | Representative files: AttachToCaseModal.svelte, CaseChatPanel.svelte, CaseDocumentWriter.svelte, CaseStatuteLinks.svelte, CitationCollections.svelte.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.28171,
+      "fusion_rank": 0.59218,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/ai",
+          "score": 0.9693,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/legal",
+          "score": 0.9658,
+          "topo": [
+            "legal-evidence",
+            "ui-component"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/legal",
+          "score": 0.9649,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/evidence",
+          "score": 0.9601,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/components/courtroom",
+          "score": 0.9588,
+          "topo": [
+            "trace-retrieval",
+            "legal-evidence"
+          ]
+        }
+      ],
+      "content_hash": "sha256:47d85af19cc1ad3f07d6c987952dcaf4ae01cb916bcfa9c4e5f65939437125f5",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-lib-server-cache",
+      "dir_path": "sveltekit-frontend/src/lib/server/cache",
+      "frontend_alias_path": "src/lib/server/cache",
+      "parent_dir": "sveltekit-frontend/src/lib/server",
+      "top_root": "sveltekit-frontend",
+      "title": "Server / Cache",
+      "file_count": 56,
+      "source_file_count": 54,
+      "extensions": {
+        ".ts": 54,
+        ".md": 2
+      },
+      "topo_classes": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "test-audit-devtool"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:cache",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "obo_bitset_hex_64b": "04bc0100008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [],
+      "top_symbols": [
+        "AceContextPack",
+        "buildAceContextCacheKey",
+        "buildAceContextPack",
+        "getAceContextPackPointer",
+        "setAceContextPackPointer",
+        "writeAceContextPackSnapshot",
+        "readAceContextPackSnapshot",
+        "ACECursorSchema",
+        "ACECursor",
+        "validateACECursor",
+        "getCursorKey",
+        "getSessionCursorKey"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/lib/server/cache/LLMS.md",
+        "sveltekit-frontend/src/lib/server/cache/README.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/lib/server/cache/ace-context-cache-metrics.ts",
+        "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.spec.ts",
+        "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
+        "sveltekit-frontend/src/lib/server/cache/ace-cursor-cache.ts",
+        "sveltekit-frontend/src/lib/server/cache/ace-packet-cache-roundtrip-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/cache/ace-packet-cache-v1.spec.ts"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/lib/server/cache` (56 files, 54 code; domains: trace-retrieval, graph-gpu-topology, test-audit-devtool). Context: LLMS.md \u2014 `sveltekit-frontend/src/lib/server/cache` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/cache` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/cache` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/cache` \u2014 LLMS.md \u2014 `sveltekit-frontend/src/lib/server/cache` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| Key symbols: AceContextPack, buildAceContextCacheKey, buildAceContextPack, getAceContextPackPointer, setAceContextPackPointer, writeAceContextPackSnapshot, readAceContextPackSnapshot, ACECursorSchema, ACECursor, validateACECursor. Representative files: ace-context-cache-metrics.ts, ace-context-pack-cache.spec.ts, ace-context-pack-cache.ts, ace-cursor-cache.ts, ace-packet-cache-roundtrip-v1.spec.ts.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.11799,
+      "fusion_rank": 0.5913,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/gpu",
+          "score": 0.956,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/ml",
+          "score": 0.9555,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/types",
+          "score": 0.9551,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server",
+          "score": 0.9536,
+          "topo": [
+            "trace-retrieval",
+            "test-audit-devtool"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/lib/server/retrieval",
+          "score": 0.9534,
+          "topo": [
+            "trace-retrieval",
+            "graph-gpu-topology"
+          ]
+        }
+      ],
+      "content_hash": "sha256:5f72b832dca3eccebebe5c5a3e1b366efd5c5c04850ec6d8bc8daf519cf605c0",
+      "canonical_authority": false
+    },
+    {
+      "schema": "atlas.universal-directory-card.v1",
+      "card_id": "agents:dir:sveltekit-frontend-src-routes-app-demos",
+      "dir_path": "sveltekit-frontend/src/routes/(app)/demos",
+      "frontend_alias_path": "src/routes/(app)/demos",
+      "parent_dir": "sveltekit-frontend/src/routes/(app)",
+      "top_root": "sveltekit-frontend",
+      "title": "(App) / Demos",
+      "file_count": 4,
+      "source_file_count": 3,
+      "extensions": {
+        ".ts": 2,
+        ".md": 1,
+        ".svelte": 1
+      },
+      "topo_classes": [
+        "ui-component"
+      ],
+      "obo_concept_ids": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:graph",
+        "ATLASEXT:svelte",
+        "ATLASEXT:svelte.ts"
+      ],
+      "obo_bitset_hex_64b": "002c000000000000000c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "route_surfaces": [
+        "sveltekit-frontend/src/routes/(app)/demos/+page.svelte"
+      ],
+      "top_symbols": [
+        "ssr"
+      ],
+      "schema_tables": [],
+      "mcp_tools": [],
+      "context_docs": [
+        "sveltekit-frontend/src/routes/(app)/demos/LLMS.md"
+      ],
+      "top_files": [
+        "sveltekit-frontend/src/routes/(app)/demos/+page.svelte",
+        "sveltekit-frontend/src/routes/(app)/demos/+layout.ts",
+        "sveltekit-frontend/src/routes/(app)/demos/+page.ts",
+        "sveltekit-frontend/src/routes/(app)/demos/LLMS.md"
+      ],
+      "summary": "Directory `sveltekit-frontend/src/routes/(app)/demos` (4 files, 3 code; domains: ui-component). Context: LLMS.md \u2014 `sveltekit-frontend/src/routes/(app)/demos` \u2014 Enhanced Graph Context \u2014 | File | Authority | Flags | \u2014 |------|-----------|-------| \u2014 | `+page.svelte` | 0.000 | 0x20b | \u2014 | `+page.ts` | 0.000 | 0x208 | \u2014 Audit Gates \u2014 General \u2014 > Auto-mapped from CLAUDE.md \u00a7\"Unified Audit Gate System\". Last enriched: 2026-06-01 \u2014 > Run each check from the **svelteki Key symbols: ssr. Routes: +page.svelte. Representative files: +page.svelte, +layout.ts, +page.ts, LLMS.md.",
+      "llm_summary": null,
+      "in_legacy_atlas_dirs": true,
+      "semantic_pagerank": 0.43302,
+      "fusion_rank": 0.5897,
+      "semantic_neighbors": [
+        {
+          "dirPath": "sveltekit-frontend/src/routes/(app)/demos/ui-components",
+          "score": 0.9891,
+          "topo": [
+            "ui-component"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/routes/(app)/demos/bits-ui",
+          "score": 0.9813,
+          "topo": [
+            "ui-component"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/routes/(app)/demos/cache",
+          "score": 0.9789,
+          "topo": [
+            "ui-component"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/routes/(app)/demos/ask-ai",
+          "score": 0.9787,
+          "topo": [
+            "ui-component"
+          ]
+        },
+        {
+          "dirPath": "sveltekit-frontend/src/routes/(app)/demos/ai-assistant",
+          "score": 0.9781,
+          "topo": [
+            "ui-component"
+          ]
+        }
+      ],
+      "content_hash": "sha256:bc495d3a5396388f6764f33d0f0446e7d35a1c7c37efc12edb870b4abb8ed55b",
+      "canonical_authority": false
+    }
+  ],
+  "newlyDiscoveredHelperDirectories": [
+    {
+      "dirPath": "tools/agentic-research/src/local-deep-research/tests",
+      "cardId": "agents:dir:tools-agentic-research-src-local-deep-research-tests",
+      "fileCount": 53,
+      "topoClasses": [
+        "trace-retrieval",
+        "legal-evidence",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:database",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:bash",
+        "ATLASLANG:python"
+      ],
+      "topSymbols": [
+        "generate_unique_test_username",
+        "reset_all_singletons",
+        "database_operation_timeout",
+        "pytest_configure",
+        "skip_if_no_real_llm",
+        "skip_integration_in_mock_mode"
+      ],
+      "topFiles": [
+        "tools/agentic-research/src/local-deep-research/tests/__init__.py",
+        "tools/agentic-research/src/local-deep-research/tests/conftest.py",
+        "tools/agentic-research/src/local-deep-research/tests/download_stuff_for_local.py",
+        "tools/agentic-research/src/local-deep-research/tests/mock_fixtures.py"
+      ],
+      "fusionRank": 0.58251
+    },
+    {
+      "dirPath": "gsd_archives/phase-2f1-baseline/schema-backup",
+      "cardId": "agents:dir:gsd-archives-phase-2f1-baseline-schema-backup",
+      "fileCount": 114,
+      "topoClasses": [
+        "mcp-agent-tool",
+        "trace-retrieval"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASEXT:lib"
+      ],
+      "topSymbols": [
+        "webCrawlJobs",
+        "userAnalytics",
+        "aiChatSessions",
+        "WebCrawlJob",
+        "NewWebCrawlJob",
+        "UserAnalytic"
+      ],
+      "topFiles": [
+        "gsd_archives/phase-2f1-baseline/schema-backup/index.ts",
+        "gsd_archives/phase-2f1-baseline/schema-backup/ace-web-crawl.ts",
+        "gsd_archives/phase-2f1-baseline/schema-backup/admin-ai-skills.ts",
+        "gsd_archives/phase-2f1-baseline/schema-backup/admin-chat.ts"
+      ],
+      "fusionRank": 0.56392
+    },
+    {
+      "dirPath": "sveltekit-frontend/src/lib/splat",
+      "cardId": "agents:dir:sveltekit-frontend-src-lib-splat",
+      "fileCount": 106,
+      "topoClasses": [
+        "graph-gpu-topology",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:test"
+      ],
+      "topSymbols": [
+        "AdmissionLimits",
+        "AdmissionInput",
+        "AdmittedScene",
+        "AdmissionCode",
+        "AdmissionError",
+        "admitSpzSource"
+      ],
+      "topFiles": [
+        "sveltekit-frontend/src/lib/splat/admission.test.ts",
+        "sveltekit-frontend/src/lib/splat/admission.ts",
+        "sveltekit-frontend/src/lib/splat/calibration.test.ts",
+        "sveltekit-frontend/src/lib/splat/calibration.ts"
+      ],
+      "fusionRank": 0.5558
+    },
+    {
+      "dirPath": ".",
+      "cardId": "agents:dir:",
+      "fileCount": 483,
+      "topoClasses": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "legal-evidence",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:gguf"
+      ],
+      "topSymbols": [
+        "normalize_relpath",
+        "is_external_link",
+        "clean_link_target",
+        "parse_markdown_links",
+        "main"
+      ],
+      "topFiles": [
+        "CONSOLIDATION-COMMANDS.sh",
+        "NEXT_COMMANDS.ps1",
+        "SAFE_NEXT_COMMANDS.ps1",
+        "ace-pipeline-audit.mjs"
+      ],
+      "fusionRank": 0.5531
+    },
+    {
+      "dirPath": "experiments/atlas-helper-proofs",
+      "cardId": "agents:dir:experiments-atlas-helper-proofs",
+      "fileCount": 73,
+      "topoClasses": [
+        "graph-gpu-topology",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:cache",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test"
+      ],
+      "topSymbols": [
+        "probe",
+        "main",
+        "SymbolMembership",
+        "verify_membership",
+        "load_snapshot",
+        "RepairStage"
+      ],
+      "topFiles": [
+        "experiments/atlas-helper-proofs/agentic_fix_end_to_end_probe.py",
+        "experiments/atlas-helper-proofs/agentic_fix_membership_gate.py",
+        "experiments/atlas-helper-proofs/agentic_fix_pipeline.py",
+        "experiments/atlas-helper-proofs/agentic_fix_preflight.py"
+      ],
+      "fusionRank": 0.5531
+    },
+    {
+      "dirPath": "python/atlas_graph_runtime",
+      "cardId": "agents:dir:python-atlas-graph-runtime",
+      "fileCount": 55,
+      "topoClasses": [
+        "trace-retrieval",
+        "graph-gpu-topology"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:api",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASLANG:python"
+      ],
+      "topSymbols": [
+        "canonical_sha256_hex",
+        "pack_cutile_ace_residency_key_v1",
+        "AceBitfrostReadbackResultV1",
+        "to_dict",
+        "verify_manifest_row_v1",
+        "read_context_manifest_v2_readonly_v1"
+      ],
+      "topFiles": [
+        "python/atlas_graph_runtime/__init__.py",
+        "python/atlas_graph_runtime/ace_bitfrost_caller_v1.py",
+        "python/atlas_graph_runtime/api_document_fact_v1.py",
+        "python/atlas_graph_runtime/batch_l2_centroid_topk_recs_v1.py"
+      ],
+      "fusionRank": 0.5531
+    },
+    {
+      "dirPath": "tools/agentic-research/src/local-deep-research/tests/api_tests",
+      "cardId": "agents:dir:tools-agentic-research-src-local-deep-research-tests-api-tests",
+      "fileCount": 29,
+      "topoClasses": [
+        "trace-retrieval",
+        "legal-evidence",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:error-handling",
+        "ATLASDOM:api",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASLANG:python"
+      ],
+      "topSymbols": [
+        "sample_source_type_data",
+        "sample_collection_data",
+        "sample_document_data",
+        "create_test_collection",
+        "delete_test_collection",
+        "create_collection_helper"
+      ],
+      "topFiles": [
+        "tools/agentic-research/src/local-deep-research/tests/api_tests/__init__.py",
+        "tools/agentic-research/src/local-deep-research/tests/api_tests/conftest.py",
+        "tools/agentic-research/src/local-deep-research/tests/api_tests/fix_search_engines.py",
+        "tools/agentic-research/src/local-deep-research/tests/api_tests/migrate_research_mode.py"
+      ],
+      "fusionRank": 0.54813
+    },
+    {
+      "dirPath": "tools/agentic-research/src/local-deep-research/tests/ui_tests",
+      "cardId": "agents:dir:tools-agentic-research-src-local-deep-research-tests-ui-tests",
+      "fileCount": 162,
+      "topoClasses": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:auth",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:bash"
+      ],
+      "topSymbols": [],
+      "topFiles": [
+        "tools/agentic-research/src/local-deep-research/tests/ui_tests/DEBUG_metrics_thread_fix.js",
+        "tools/agentic-research/src/local-deep-research/tests/ui_tests/DEBUG_mobile_debug.js",
+        "tools/agentic-research/src/local-deep-research/tests/ui_tests/DEBUG_news_features_fixed.js",
+        "tools/agentic-research/src/local-deep-research/tests/ui_tests/DEBUG_research_submit_debug.js"
+      ],
+      "fusionRank": 0.53664
+    },
+    {
+      "dirPath": "tools/agentic-research/src/local-deep-research/tests/api_tests_with_login",
+      "cardId": "agents:dir:tools-agentic-research-src-local-deep-research-tests-api-tests-with-login",
+      "fileCount": 11,
+      "topoClasses": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:api",
+        "ATLASDOM:auth",
+        "ATLASDOM:database",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test"
+      ],
+      "topSymbols": [
+        "AuthHelper",
+        "get_auth_cookies",
+        "auth_session",
+        "TestResearchAPI",
+        "test_research_without_required_fields"
+      ],
+      "topFiles": [
+        "tools/agentic-research/src/local-deep-research/tests/api_tests_with_login/auth_helper.js",
+        "tools/agentic-research/src/local-deep-research/tests/api_tests_with_login/base_api_test.js",
+        "tools/agentic-research/src/local-deep-research/tests/api_tests_with_login/puppeteer_config.js",
+        "tools/agentic-research/src/local-deep-research/tests/api_tests_with_login/run_pytest_tests.py"
+      ],
+      "fusionRank": 0.50921
+    },
+    {
+      "dirPath": "sveltekit-frontend/scripts/mcp/blender",
+      "cardId": "agents:dir:sveltekit-frontend-scripts-mcp-blender",
+      "fileCount": 10,
+      "topoClasses": [
+        "mcp-agent-tool",
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:json"
+      ],
+      "topSymbols": [
+        "EMBEDDING_BITS_PER_ELEMENT",
+        "embeddingPayloadBytes",
+        "embedding_payload_bytes",
+        "scene_triangle_count",
+        "scene_geometry_stats",
+        "scene_mesh_bounds"
+      ],
+      "topFiles": [
+        "sveltekit-frontend/scripts/mcp/blender/embedding-payload-formats.mjs",
+        "sveltekit-frontend/scripts/mcp/blender/embedding-payload-formats.test.mjs",
+        "sveltekit-frontend/scripts/mcp/blender/import-model-smoke.mjs",
+        "sveltekit-frontend/scripts/mcp/blender/memory-fabric-smoke.mjs"
+      ],
+      "fusionRank": 0.50081
+    },
+    {
+      "dirPath": "tests",
+      "cardId": "agents:dir:tests",
+      "fileCount": 25,
+      "topoClasses": [
+        "mcp-agent-tool",
+        "graph-gpu-topology",
+        "openspec-governance",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:test"
+      ],
+      "topSymbols": [],
+      "topFiles": [
+        "tests/acp-end-to-end-integration.spec.ts",
+        "tests/acp-grpc-quic-integration.spec.ts",
+        "tests/ae-train-contract.spec.ts",
+        "tests/ae-train-manifest.spec.ts"
+      ],
+      "fusionRank": 0.49919
+    },
+    {
+      "dirPath": "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/src/lib/server/atlas/tensors",
+      "cardId": "agents:dir:parent-atlas-tensor-residency-integration-v2-sveltekit-frontend-src-lib-server-atlas-tensors",
+      "fileCount": 28,
+      "topoClasses": [
+        "trace-retrieval",
+        "graph-gpu-topology"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval"
+      ],
+      "topSymbols": [
+        "LodPromotionDecision",
+        "planLodPromotion",
+        "AceTileSignals",
+        "AceWeights",
+        "DEFAULT_ACE_WEIGHTS",
+        "tileUtility"
+      ],
+      "topFiles": [
+        "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/src/lib/server/atlas/tensors/ace-lod-promoter.ts",
+        "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/src/lib/server/atlas/tensors/ace-residency-policy.ts",
+        "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/src/lib/server/atlas/tensors/ann-route-cache.ts",
+        "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/src/lib/server/atlas/tensors/bitfrost-valkey-contract.ts"
+      ],
+      "fusionRank": 0.49135
+    },
+    {
+      "dirPath": "tools/agentic-research/src/local-deep-research/tests/advanced_search_system",
+      "cardId": "agents:dir:tools-agentic-research-src-local-deep-research-tests-advanced-search-system",
+      "fileCount": 15,
+      "topoClasses": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "legal-evidence",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test"
+      ],
+      "topSymbols": [
+        "mock_llm",
+        "invoke_side_effect",
+        "sample_search_results",
+        "sample_query",
+        "ConcreteQuestionGenerator",
+        "generate_questions"
+      ],
+      "topFiles": [
+        "tools/agentic-research/src/local-deep-research/tests/advanced_search_system/__init__.py",
+        "tools/agentic-research/src/local-deep-research/tests/advanced_search_system/conftest.py",
+        "tools/agentic-research/src/local-deep-research/tests/advanced_search_system/test_base_class_coverage.py",
+        "tools/agentic-research/src/local-deep-research/tests/advanced_search_system/test_base_classes.py"
+      ],
+      "fusionRank": 0.48739
+    },
+    {
+      "dirPath": "drizzle",
+      "cardId": "agents:dir:drizzle",
+      "fileCount": 28,
+      "topoClasses": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "database-schema",
+        "legal-evidence"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:database",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval"
+      ],
+      "topSymbols": [],
+      "topFiles": [
+        "drizzle/0000_add_evidence_observations_ledger.sql",
+        "drizzle/0000_rainy_domino.sql",
+        "drizzle/0001_lame_luke_cage.sql",
+        "drizzle/0001_vector_search.sql"
+      ],
+      "fusionRank": 0.48009
+    },
+    {
+      "dirPath": "tools/agentic-research/src/firecrawl/apps/go-sdk",
+      "cardId": "agents:dir:tools-agentic-research-src-firecrawl-apps-go-sdk",
+      "fileCount": 13,
+      "topoClasses": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:api",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:bash"
+      ],
+      "topSymbols": [
+        "Client",
+        "NewClient",
+        "Scrape",
+        "Interact",
+        "StopInteractiveBrowser",
+        "StartCrawl"
+      ],
+      "topFiles": [
+        "tools/agentic-research/src/firecrawl/apps/go-sdk/firecrawl.go",
+        "tools/agentic-research/src/firecrawl/apps/go-sdk/firecrawl_error.go",
+        "tools/agentic-research/src/firecrawl/apps/go-sdk/http_client.go",
+        "tools/agentic-research/src/firecrawl/apps/go-sdk/models.go"
+      ],
+      "fusionRank": 0.46903
+    },
+    {
+      "dirPath": "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/python/parent_atlas_tensor",
+      "cardId": "agents:dir:parent-atlas-tensor-residency-integration-v2-sveltekit-frontend-python-parent-atlas-tensor",
+      "fileCount": 18,
+      "topoClasses": [
+        "trace-retrieval",
+        "graph-gpu-topology"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval"
+      ],
+      "topSymbols": [
+        "fixed_f32",
+        "feature_batch",
+        "semantic_batch",
+        "write_ipc_file",
+        "open_mmap",
+        "batch_matrix"
+      ],
+      "topFiles": [
+        "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/python/parent_atlas_tensor/__init__.py",
+        "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/python/parent_atlas_tensor/arrow_ipc.py",
+        "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/python/parent_atlas_tensor/cagra_adapter.py",
+        "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/python/parent_atlas_tensor/cli.py"
+      ],
+      "fusionRank": 0.46584
+    },
+    {
+      "dirPath": "tools/agentic-research/src/firecrawl/apps/python-sdk",
+      "cardId": "agents:dir:tools-agentic-research-src-firecrawl-apps-python-sdk",
+      "fileCount": 11,
+      "topoClasses": [
+        "trace-retrieval"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:api",
+        "ATLASDOM:retrieval",
+        "ATLASEXT:markdown",
+        "ATLASLANG:markdown",
+        "ATLASLANG:python"
+      ],
+      "topSymbols": [
+        "main",
+        "async_example",
+        "ExtractSchema",
+        "on_document",
+        "on_error",
+        "on_done"
+      ],
+      "topFiles": [
+        "tools/agentic-research/src/firecrawl/apps/python-sdk/example.py",
+        "tools/agentic-research/src/firecrawl/apps/python-sdk/example_aio.py",
+        "tools/agentic-research/src/firecrawl/apps/python-sdk/example_pagination.py",
+        "tools/agentic-research/src/firecrawl/apps/python-sdk/example_v1.py"
+      ],
+      "fusionRank": 0.46405
+    },
+    {
+      "dirPath": "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/tests/atlas/tensor-residency",
+      "cardId": "agents:dir:parent-atlas-tensor-residency-integration-v2-sveltekit-frontend-tests-atlas-tensor-residency",
+      "fileCount": 8,
+      "topoClasses": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval"
+      ],
+      "topSymbols": [],
+      "topFiles": [
+        "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/tests/atlas/tensor-residency/ace-residency-policy.spec.ts",
+        "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/tests/atlas/tensor-residency/packet-assembler.spec.ts",
+        "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/tests/atlas/tensor-residency/reranker-cache.spec.ts",
+        "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/tests/atlas/tensor-residency/runtime-policy-manifest.spec.ts"
+      ],
+      "fusionRank": 0.4626
+    },
+    {
+      "dirPath": "tools/agentic-research/src/local-deep-research/tests/ui_tests/playwright/tests/notes",
+      "cardId": "agents:dir:tools-agentic-research-src-local-deep-research-tests-ui-tests-playwright-tests-notes",
+      "fileCount": 34,
+      "topoClasses": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:bash"
+      ],
+      "topSymbols": [],
+      "topFiles": [
+        "tools/agentic-research/src/local-deep-research/tests/ui_tests/playwright/tests/notes/note-detail.spec.js",
+        "tools/agentic-research/src/local-deep-research/tests/ui_tests/playwright/tests/notes/notes-a11y.spec.js",
+        "tools/agentic-research/src/local-deep-research/tests/ui_tests/playwright/tests/notes/notes-ai-error-paths.spec.js",
+        "tools/agentic-research/src/local-deep-research/tests/ui_tests/playwright/tests/notes/notes-ai-mocked.spec.js"
+      ],
+      "fusionRank": 0.46163
+    },
+    {
+      "dirPath": "parent-atlas-tensor-residency-integration/sveltekit-frontend/src/lib/server/atlas/tensors",
+      "cardId": "agents:dir:parent-atlas-tensor-residency-integration-sveltekit-frontend-src-lib-server-atlas-tensors",
+      "fileCount": 20,
+      "topoClasses": [
+        "trace-retrieval",
+        "graph-gpu-topology"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval"
+      ],
+      "topSymbols": [
+        "AceTileSignals",
+        "AceWeights",
+        "DEFAULT_ACE_WEIGHTS",
+        "tileUtility",
+        "rankEvictionCandidates",
+        "AnnRouteCacheKeyInput"
+      ],
+      "topFiles": [
+        "parent-atlas-tensor-residency-integration/sveltekit-frontend/src/lib/server/atlas/tensors/ace-residency-policy.ts",
+        "parent-atlas-tensor-residency-integration/sveltekit-frontend/src/lib/server/atlas/tensors/ann-route-cache.ts",
+        "parent-atlas-tensor-residency-integration/sveltekit-frontend/src/lib/server/atlas/tensors/bitfrost-valkey-contract.ts",
+        "parent-atlas-tensor-residency-integration/sveltekit-frontend/src/lib/server/atlas/tensors/control-json-parser.ts"
+      ],
+      "fusionRank": 0.4567
+    },
+    {
+      "dirPath": "tools/agentic-research/src/local-deep-research/examples/api_usage/programmatic",
+      "cardId": "agents:dir:tools-agentic-research-src-local-deep-research-examples-api-usage-programmatic",
+      "fileCount": 10,
+      "topoClasses": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:api",
+        "ATLASDOM:database",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:markdown"
+      ],
+      "topSymbols": [
+        "demonstrate_report_generation",
+        "demonstrate_export_formats",
+        "demonstrate_result_analysis",
+        "demonstrate_keyword_extraction",
+        "format_as_markdown",
+        "extract_citations"
+      ],
+      "topFiles": [
+        "tools/agentic-research/src/local-deep-research/examples/api_usage/programmatic/advanced_features_example.py",
+        "tools/agentic-research/src/local-deep-research/examples/api_usage/programmatic/api_public_contract_guardrail.py",
+        "tools/agentic-research/src/local-deep-research/examples/api_usage/programmatic/custom_llm_retriever_example.py",
+        "tools/agentic-research/src/local-deep-research/examples/api_usage/programmatic/hybrid_search_example.py"
+      ],
+      "fusionRank": 0.45462
+    },
+    {
+      "dirPath": "python/tests",
+      "cardId": "agents:dir:python-tests",
+      "fileCount": 185,
+      "topoClasses": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "legal-evidence",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASLANG:python"
+      ],
+      "topSymbols": [
+        "test_cutile_ace_residency_key_and_fail_closed_gates",
+        "test_sequence_is_deterministic_and_preserves_aligned_identity",
+        "test_feature_matrix_is_deterministic_identity_ordered_and_marks_missing_lanes",
+        "test_graph_feature_is_snapshot_qualified_and_does_not_fill_other_lanes",
+        "test_sequence_rejects_unvalidated_okf_and_missing_lineage",
+        "test_sequence_rejects_duplicate_ordinals_and_over_capacity_queue"
+      ],
+      "topFiles": [
+        "python/tests/conftest.py",
+        "python/tests/test_ace_bitfrost_caller_v1.py",
+        "python/tests/test_advisory_candidate_sequence_v1.py",
+        "python/tests/test_agent_control_plane_v1.py"
+      ],
+      "fusionRank": 0.45363
+    },
+    {
+      "dirPath": "python",
+      "cardId": "agents:dir:python",
+      "fileCount": 295,
+      "topoClasses": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASLANG:python"
+      ],
+      "topSymbols": [
+        "AstChunkKeyValueV1",
+        "AstChunkFeatureRowV1",
+        "AstChunkSequenceLinkV1",
+        "AstChunkTensorFeaturesV1",
+        "AstChunkDomainRoutingProposalV1",
+        "AstChunkHelperAnalysisV1"
+      ],
+      "topFiles": [
+        "python/atlas_ast_chunk_helpers_v1.py",
+        "python/atlas_community_parity.py",
+        "python/atlas_contextual_feature_reference.py",
+        "python/atlas_cuda_cutile_simt_gemm_probe_v1.py"
+      ],
+      "fusionRank": 0.4531
+    },
+    {
+      "dirPath": "sveltekit-frontend/src/lib/server/atlas/workspace",
+      "cardId": "agents:dir:sveltekit-frontend-src-lib-server-atlas-workspace",
+      "fileCount": 23,
+      "topoClasses": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "database-schema",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:database",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph"
+      ],
+      "topSymbols": [
+        "GraphifyDailyIncrementalPlanV1Schema",
+        "GraphifyDailyIncrementalPlanV1",
+        "buildGraphifyDailyIncrementalPlanV1",
+        "GraphifySourceDeltaKindSchema",
+        "GraphifySourceDeltaKind",
+        "GraphifySourceStateSchema"
+      ],
+      "topFiles": [
+        "sveltekit-frontend/src/lib/server/atlas/workspace/graphify-daily-incremental-plan-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/workspace/graphify-daily-incremental-plan-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/workspace/graphify-delta-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/workspace/graphify-delta-v1.ts"
+      ],
+      "fusionRank": 0.44639
+    },
+    {
+      "dirPath": "tools/agentic-research/src/firecrawl/apps/api/src/__tests__/snips/v2",
+      "cardId": "agents:dir:tools-agentic-research-src-firecrawl-apps-api-src-tests-snips-v2",
+      "fileCount": 49,
+      "topoClasses": [
+        "trace-retrieval",
+        "legal-evidence",
+        "api-route",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:api",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test"
+      ],
+      "topSymbols": [],
+      "topFiles": [
+        "tools/agentic-research/src/firecrawl/apps/api/src/__tests__/snips/v2/agent-auth-discovery.test.ts",
+        "tools/agentic-research/src/firecrawl/apps/api/src/__tests__/snips/v2/audio-routing.test.ts",
+        "tools/agentic-research/src/firecrawl/apps/api/src/__tests__/snips/v2/batch-scrape.test.ts",
+        "tools/agentic-research/src/firecrawl/apps/api/src/__tests__/snips/v2/billing.test.ts"
+      ],
+      "fusionRank": 0.44023
+    },
+    {
+      "dirPath": "tools/agentic-research/src/firecrawl/apps/api/src/lib",
+      "cardId": "agents:dir:tools-agentic-research-src-firecrawl-apps-api-src-lib",
+      "fileCount": 93,
+      "topoClasses": [
+        "trace-retrieval",
+        "api-route",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:api",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "topSymbols": [
+        "handleIntegrationAdminCreateUserProxy",
+        "handleIntegrationAdminValidateProxy",
+        "handleIntegrationAdminRotateProxy",
+        "getAgentAuthResourceMetadataUrl",
+        "shouldEmitAgentAuthDiscoveryHeader",
+        "applyAgentAuthDiscoveryHeader"
+      ],
+      "topFiles": [
+        "tools/agentic-research/src/firecrawl/apps/api/src/lib/admin-integration-integrations-proxy.ts",
+        "tools/agentic-research/src/firecrawl/apps/api/src/lib/agent-auth-discovery.test.ts",
+        "tools/agentic-research/src/firecrawl/apps/api/src/lib/agent-auth-discovery.ts",
+        "tools/agentic-research/src/firecrawl/apps/api/src/lib/api-key-concurrency.ts"
+      ],
+      "fusionRank": 0.44004
+    },
+    {
+      "dirPath": "tools/agentic-research/src/local-deep-research/tests/infrastructure_tests",
+      "cardId": "agents:dir:tools-agentic-research-src-local-deep-research-tests-infrastructure-tests",
+      "fileCount": 11,
+      "topoClasses": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:api",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASLANG:python"
+      ],
+      "topSymbols": [
+        "TestRouteRegistry",
+        "test_route_registry_structure",
+        "test_get_all_routes",
+        "test_get_routes_by_blueprint",
+        "test_find_route",
+        "test_route_uniqueness"
+      ],
+      "topFiles": [
+        "tools/agentic-research/src/local-deep-research/tests/infrastructure_tests/__init__.py",
+        "tools/agentic-research/src/local-deep-research/tests/infrastructure_tests/test_csrf_api.test.js",
+        "tools/agentic-research/src/local-deep-research/tests/infrastructure_tests/test_rerun_config.test.js",
+        "tools/agentic-research/src/local-deep-research/tests/infrastructure_tests/test_route_registry.py"
+      ],
+      "fusionRank": 0.43253
+    },
+    {
+      "dirPath": "sveltekit-frontend/src/lib/server/atlas/agentic/contracts",
+      "cardId": "agents:dir:sveltekit-frontend-src-lib-server-atlas-agentic-contracts",
+      "fileCount": 30,
+      "topoClasses": [
+        "graph-gpu-topology",
+        "legal-evidence",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:test"
+      ],
+      "topSymbols": [
+        "AgentRuntimeKindV1",
+        "AgentRunInputV1",
+        "AgentRunHandleV1",
+        "AgentRuntimeEventV1",
+        "AgentRuntimeAdapter",
+        "FakeAgentRuntimeAdapter"
+      ],
+      "topFiles": [
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/agent-runtime-adapter-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/agentic-action-feature-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/agentic-action-feature-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/agentic-action-v1.ts"
+      ],
+      "fusionRank": 0.42711
+    },
+    {
+      "dirPath": "python/parent_atlas_ontology",
+      "cardId": "agents:dir:python-parent-atlas-ontology",
+      "fileCount": 33,
+      "topoClasses": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "ontology-taxonomy",
+        "legal-evidence"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASEXT:json",
+        "ATLASLANG:python"
+      ],
+      "topSymbols": [
+        "OntologyLinkedTupleAdapter",
+        "validate",
+        "to_arrow",
+        "to_rdf",
+        "to_graph_projection",
+        "to_arrow_table"
+      ],
+      "topFiles": [
+        "python/parent_atlas_ontology/__init__.py",
+        "python/parent_atlas_ontology/adapter.py",
+        "python/parent_atlas_ontology/arrow_adapter.py",
+        "python/parent_atlas_ontology/checksum.py"
+      ],
+      "fusionRank": 0.42454
+    },
+    {
+      "dirPath": "tools/agentic-research/src/local-deep-research/tests/ui_tests/mobile",
+      "cardId": "agents:dir:tools-agentic-research-src-local-deep-research-tests-ui-tests-mobile",
+      "fileCount": 11,
+      "topoClasses": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:bash",
+        "ATLASEXT:node"
+      ],
+      "topSymbols": [],
+      "topFiles": [
+        "tools/agentic-research/src/local-deep-research/tests/ui_tests/mobile/test_all_pages_mobile.js",
+        "tools/agentic-research/src/local-deep-research/tests/ui_tests/mobile/test_layout_bugs_ci.js",
+        "tools/agentic-research/src/local-deep-research/tests/ui_tests/mobile/test_mobile_all_pages_ci.js",
+        "tools/agentic-research/src/local-deep-research/tests/ui_tests/mobile/test_mobile_diagnostic.js"
+      ],
+      "fusionRank": 0.42407
+    },
+    {
+      "dirPath": "python/atlas_compute",
+      "cardId": "agents:dir:python-atlas-compute",
+      "fileCount": 95,
+      "topoClasses": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "ontology-taxonomy"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval",
+        "ATLASLANG:python"
+      ],
+      "topSymbols": [
+        "run_advisory_candidate_sequence_v1",
+        "main",
+        "StageStatus",
+        "RetrievalMetric",
+        "SparseDenseBenchmark",
+        "AlignedSnapshotExperimentReceipt"
+      ],
+      "topFiles": [
+        "python/atlas_compute/__init__.py",
+        "python/atlas_compute/advisory_candidate_sequence_v1.py",
+        "python/atlas_compute/aligned_snapshot_experiment.py",
+        "python/atlas_compute/aligned_snapshot_experiment_v2.py"
+      ],
+      "fusionRank": 0.4202
+    },
+    {
+      "dirPath": "sveltekit-frontend/src/lib/reconstruction",
+      "cardId": "agents:dir:sveltekit-frontend-src-lib-reconstruction",
+      "fileCount": 51,
+      "topoClasses": [
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "topSymbols": [
+        "CaseSceneFetchParametersInputV1Schema",
+        "CaseSceneFetchParametersInputV1",
+        "CaseSceneIntakeContextV1Schema",
+        "CaseSceneIntakeContextV1",
+        "buildCaseSceneFetchRequestV1",
+        "SceneDraftActorV1"
+      ],
+      "topFiles": [
+        "sveltekit-frontend/src/lib/reconstruction/case-scene-fetch-contract-v1.ts",
+        "sveltekit-frontend/src/lib/reconstruction/case-scene-plan-draft-v1.spec.ts",
+        "sveltekit-frontend/src/lib/reconstruction/case-scene-plan-draft-v1.ts",
+        "sveltekit-frontend/src/lib/reconstruction/dual-clock-timeline-v1.spec.ts"
+      ],
+      "fusionRank": 0.41881
+    },
+    {
+      "dirPath": "drizzle/manual",
+      "cardId": "agents:dir:drizzle-manual",
+      "fileCount": 59,
+      "topoClasses": [
+        "trace-retrieval",
+        "graph-gpu-topology",
+        "ontology-taxonomy",
+        "database-schema"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:database",
+        "ATLASDOM:gpu",
+        "ATLASDOM:graph",
+        "ATLASDOM:retrieval"
+      ],
+      "topSymbols": [],
+      "topFiles": [
+        "drizzle/manual/0000_create_embeddings_if_missing.sql",
+        "drizzle/manual/0007_court_opinions.sql",
+        "drizzle/manual/0010_model_registry_and_service_capabilities.sql",
+        "drizzle/manual/0025_align_grpc_proto_metadata_fields.sql"
+      ],
+      "fusionRank": 0.41457
+    },
+    {
+      "dirPath": "sveltekit-frontend/drizzle/archived",
+      "cardId": "agents:dir:sveltekit-frontend-drizzle-archived",
+      "fileCount": 47,
+      "topoClasses": [
+        "trace-retrieval",
+        "database-schema",
+        "legal-evidence"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:database",
+        "ATLASDOM:frontend",
+        "ATLASDOM:retrieval"
+      ],
+      "topSymbols": [],
+      "topFiles": [
+        "sveltekit-frontend/drizzle/archived/0001_abandoned_satana.sql",
+        "sveltekit-frontend/drizzle/archived/0001_add_evidence_schema.sql",
+        "sveltekit-frontend/drizzle/archived/0001_case_reporter_schema.sql",
+        "sveltekit-frontend/drizzle/archived/0001_create_documents.sql"
+      ],
+      "fusionRank": 0.41406
+    },
+    {
+      "dirPath": "sveltekit-frontend/src/lib/server/atlas/openspec-board",
+      "cardId": "agents:dir:sveltekit-frontend-src-lib-server-atlas-openspec-board",
+      "fileCount": 21,
+      "topoClasses": [
+        "trace-retrieval",
+        "legal-evidence",
+        "openspec-governance",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:frontend",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "topSymbols": [
+        "AtlasControlPacketV1",
+        "AtlasWarmHintV1",
+        "AcePacketDraftV1",
+        "AcePrefillReadinessV1",
+        "assessAcePrefillReadiness",
+        "AtlasAwarenessGateV1"
+      ],
+      "topFiles": [
+        "sveltekit-frontend/src/lib/server/atlas/openspec-board/ace-prefill-readiness.ts",
+        "sveltekit-frontend/src/lib/server/atlas/openspec-board/awareness.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/openspec-board/awareness.ts",
+        "sveltekit-frontend/src/lib/server/atlas/openspec-board/capability-census.ts"
+      ],
+      "fusionRank": 0.4061
+    },
+    {
+      "dirPath": "tools/agentic-research/src/firecrawl/apps/js-sdk/firecrawl/src/__tests__/unit/v2",
+      "cardId": "agents:dir:tools-agentic-research-src-firecrawl-apps-js-sdk-firecrawl-src-tests-unit-v2",
+      "fileCount": 22,
+      "topoClasses": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test"
+      ],
+      "topSymbols": [],
+      "topFiles": [
+        "tools/agentic-research/src/firecrawl/apps/js-sdk/firecrawl/src/__tests__/unit/v2/agent.test.ts",
+        "tools/agentic-research/src/firecrawl/apps/js-sdk/firecrawl/src/__tests__/unit/v2/audit-metadata.unit.test.ts",
+        "tools/agentic-research/src/firecrawl/apps/js-sdk/firecrawl/src/__tests__/unit/v2/branding.test.ts",
+        "tools/agentic-research/src/firecrawl/apps/js-sdk/firecrawl/src/__tests__/unit/v2/clientOptions.test.ts"
+      ],
+      "fusionRank": 0.40275
+    },
+    {
+      "dirPath": "tools/agentic-research/src/local-deep-research/tests/search_engines",
+      "cardId": "agents:dir:tools-agentic-research-src-local-deep-research-tests-search-engines",
+      "fileCount": 35,
+      "topoClasses": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:json"
+      ],
+      "topSymbols": [
+        "mock_settings_snapshot",
+        "MockResponse",
+        "json",
+        "text",
+        "content",
+        "raise_for_status"
+      ],
+      "topFiles": [
+        "tools/agentic-research/src/local-deep-research/tests/search_engines/__init__.py",
+        "tools/agentic-research/src/local-deep-research/tests/search_engines/conftest.py",
+        "tools/agentic-research/src/local-deep-research/tests/search_engines/test_base_helpers.py",
+        "tools/agentic-research/src/local-deep-research/tests/search_engines/test_base_search_engine.py"
+      ],
+      "fusionRank": 0.40228
+    },
+    {
+      "dirPath": "tools/agentic-research/src/firecrawl/apps/js-sdk/firecrawl",
+      "cardId": "agents:dir:tools-agentic-research-src-firecrawl-apps-js-sdk-firecrawl",
+      "fileCount": 9,
+      "topoClasses": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:api",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test",
+        "ATLASEXT:markdown",
+        "ATLASEXT:node"
+      ],
+      "topSymbols": [],
+      "topFiles": [
+        "tools/agentic-research/src/firecrawl/apps/js-sdk/firecrawl/jest.config.js",
+        "tools/agentic-research/src/firecrawl/apps/js-sdk/firecrawl/tsup.config.ts",
+        "tools/agentic-research/src/firecrawl/apps/js-sdk/firecrawl/LICENSE",
+        "tools/agentic-research/src/firecrawl/apps/js-sdk/firecrawl/README.md"
+      ],
+      "fusionRank": 0.40131
+    },
+    {
+      "dirPath": "sveltekit-frontend/src/lib/server/atlas/fsm",
+      "cardId": "agents:dir:sveltekit-frontend-src-lib-server-atlas-fsm",
+      "fileCount": 9,
+      "topoClasses": [
+        "database-schema",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:frontend.sveltekit",
+        "ATLASDOM:database",
+        "ATLASDOM:frontend",
+        "ATLASDOM:test",
+        "ATLASEXT:lib"
+      ],
+      "topSymbols": [
+        "NES_FSM_STATES",
+        "NesFsmState",
+        "FeatureClassificationUnavailableError",
+        "FORBIDDEN_STORAGE_KEYS",
+        "EwinTangSampleResult",
+        "sampleEwinTangLowRank"
+      ],
+      "topFiles": [
+        "sveltekit-frontend/src/lib/server/atlas/fsm/nes-feature-fsm.ts",
+        "sveltekit-frontend/src/lib/server/atlas/fsm/nes-feature-token-pipeline.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/fsm/nes-feature-token-pipeline.ts",
+        "sveltekit-frontend/src/lib/server/atlas/fsm/nes-fsm-binary-packet-v1.spec.ts"
+      ],
+      "fusionRank": 0.40028
+    },
+    {
+      "dirPath": "tools/agentic-research/src/local-deep-research/tests/news",
+      "cardId": "agents:dir:tools-agentic-research-src-local-deep-research-tests-news",
+      "fileCount": 118,
+      "topoClasses": [
+        "trace-retrieval",
+        "test-audit-devtool"
+      ],
+      "oboConceptIds": [
+        "ATLASDOM:database",
+        "ATLASDOM:retrieval",
+        "ATLASDOM:test"
+      ],
+      "topSymbols": [
+        "TestGetNewsFeedExceptions",
+        "test_invalid_limit_raises_exception",
+        "test_negative_limit_raises_exception",
+        "test_database_error_raises_exception",
+        "TestSubscriptionExceptions",
+        "test_get_subscription_not_found"
+      ],
+      "topFiles": [
+        "tools/agentic-research/src/local-deep-research/tests/news/conftest.py",
+        "tools/agentic-research/src/local-deep-research/tests/news/test_api_exceptions.py",
+        "tools/agentic-research/src/local-deep-research/tests/news/test_api_functions.py",
+        "tools/agentic-research/src/local-deep-research/tests/news/test_api_functions_extended.py"
+      ],
+      "fusionRank": 0.39886
+    }
+  ],
+  "files": {
+    "cards.jsonl": {
+      "bytes": 9866688,
+      "sha256": "sha256:da9c2d27d6cedf418f78e3acc56a3459c061255fa64cf579c4c400f8e34f886c"
+    },
+    "embeddings.f32le": {
+      "bytes": 13246464,
+      "shape": [
+        4312,
+        768
+      ],
+      "sha256": "sha256:6684b5e88fe58bd0088f27989615b9b78cbc40b827b8cb15ec5040f5b62ce1ed"
+    }
+  },
+  "sampleSemanticSearchQueries": [
+    {
+      "schema": "atlas.universal-directory-search.v1",
+      "query": "qdrant codebase semantic search hydration projection",
+      "computeBackend": "cuda:0",
+      "encoder": {
+        "count": 1,
+        "dim": 768,
+        "backend": "inprocess-ort-eg2-onnx-q8",
+        "intraThreads": 12,
+        "maxTokens": 128,
+        "elapsedMs": 2974.3
+      },
+      "qdrantChunkLaneStatus": "UNREACHABLE_SKIPPED",
+      "qdrantChunkHits": [],
+      "matchedOboConcepts": [],
+      "rgMatchedFilesInTopDirs": [
+        "sveltekit-frontend/src/lib/server/search/codebase-ann-backend.ts",
+        "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+        "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+        "sveltekit-frontend/src/lib/server/search/engram-bigram.ts",
+        "sveltekit-frontend/src/lib/server/atlas/projections/hyperrag-packet-projection.ts",
+        "sveltekit-frontend/src/lib/server/atlas/projections/index.ts",
+        "sveltekit-frontend/src/lib/server/atlas/projections/postgres-packet-projection.ts",
+        "sveltekit-frontend/src/lib/server/search/hydrate-canonical-candidates.ts",
+        "sveltekit-frontend/src/lib/server/semantic-contracts/qdrant-staging-mirror.ts",
+        "sveltekit-frontend/src/lib/server/search/hydrate-canonical-candidates.spec.ts",
+        "sveltekit-frontend/src/lib/server/search/LLMS.md",
+        "sveltekit-frontend/src/lib/server/search/hydrate-revision-qualified-candidates-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/projections/qdrant-packet-projection.ts",
+        "sveltekit-frontend/src/lib/server/atlas/projections/redis-packet-projection.ts",
+        "sveltekit-frontend/src/lib/server/search/hybrid-search.ts",
+        "sveltekit-frontend/src/lib/server/search/index.ts",
+        "sveltekit-frontend/src/lib/server/search/hydrate-revision-qualified-candidates-v1.ts",
+        "sveltekit-frontend/openspec/changes/parent-atlas-trace-search-joinback-proof/design.md",
+        "sveltekit-frontend/src/lib/server/search/mla-kv-compress.ts",
+        "sveltekit-frontend/src/lib/server/search/postgres-fts-strict.spec.ts"
+      ],
+      "results": [
+        {
+          "rank": 1,
+          "dirPath": "sveltekit-frontend/src/lib/server/search",
+          "cardId": "agents:dir:sveltekit-frontend-src-lib-server-search",
+          "fusedScore": 0.659,
+          "denseCosine": 0.7604,
+          "lexicalScore": 0.6667,
+          "authorityFusionRank": 0.54205,
+          "inLegacyAtlasDirs": true,
+          "topoClasses": [
+            "trace-retrieval",
+            "graph-gpu-topology",
+            "database-schema",
+            "test-audit-devtool"
+          ],
+          "oboConceptIds": [
+            "ATLASDOM:frontend.sveltekit",
+            "ATLASDOM:cache",
+            "ATLASDOM:database",
+            "ATLASDOM:frontend",
+            "ATLASDOM:gpu"
+          ],
+          "topFiles": [
+            "sveltekit-frontend/src/lib/server/search/index.ts",
+            "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+            "sveltekit-frontend/src/lib/server/search/codebase-ann-backend.ts",
+            "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+            "sveltekit-frontend/src/lib/server/search/engram-bigram.ts"
+          ],
+          "topSymbols": [
+            "tokenizeBowQuery",
+            "weightedBowOverlapScore",
+            "boundedBowBoost",
+            "CodebaseAnnBackend",
+            "getCodebaseAnnBackend",
+            "SearchBackendConfig"
+          ],
+          "summary": "Directory `sveltekit-frontend/src/lib/server/search` (40 files, 39 code; domains: trace-retrieval, graph-gpu-topology, database-schema, test-audit-devtool). Context: LLMS.md \u2014 `src/lib/server/search` \u2014 Scope \u2014 KAG / ACE retrieval layer \u2014 hybrid search (Postgres FTS + Qdrant vector), MLA attention rerank, SOM proximity "
+        },
+        {
+          "rank": 2,
+          "dirPath": "sveltekit-frontend/schemas/atlas/qdrant-projection",
+          "cardId": "agents:dir:sveltekit-frontend-schemas-atlas-qdrant-projection",
+          "fusedScore": 0.6233,
+          "denseCosine": 0.8239,
+          "lexicalScore": 0.5,
+          "authorityFusionRank": 0.12422,
+          "inLegacyAtlasDirs": true,
+          "topoClasses": [
+            "trace-retrieval",
+            "ontology-taxonomy"
+          ],
+          "oboConceptIds": [
+            "ATLASDOM:frontend.sveltekit",
+            "ATLASDOM:frontend",
+            "ATLASDOM:retrieval"
+          ],
+          "topFiles": [
+            "sveltekit-frontend/schemas/atlas/qdrant-projection/codebase-384-hybrid.v1.okf",
+            "sveltekit-frontend/schemas/atlas/qdrant-projection/codebase-384-hybrid.v1.schema.json"
+          ],
+          "topSymbols": [],
+          "summary": "Directory `sveltekit-frontend/schemas/atlas/qdrant-projection` (2 files, 0 code; domains: trace-retrieval, ontology-taxonomy). Representative files: codebase-384-hybrid.v1.okf, codebase-384-hybrid.v1.schema.json."
+        },
+        {
+          "rank": 3,
+          "dirPath": "sveltekit-frontend/src/lib/server/semantic-contracts",
+          "cardId": "agents:dir:sveltekit-frontend-src-lib-server-semantic-contracts",
+          "fusedScore": 0.6148,
+          "denseCosine": 0.7963,
+          "lexicalScore": 0.5,
+          "authorityFusionRank": 0.21039,
+          "inLegacyAtlasDirs": true,
+          "topoClasses": [
+            "trace-retrieval",
+            "ontology-taxonomy"
+          ],
+          "oboConceptIds": [
+            "ATLASDOM:frontend.sveltekit",
+            "ATLASDOM:frontend",
+            "ATLASDOM:retrieval",
+            "ATLASEXT:lib"
+          ],
+          "topFiles": [
+            "sveltekit-frontend/src/lib/server/semantic-contracts/qdrant-staging-mirror.ts"
+          ],
+          "topSymbols": [
+            "StagingPoint",
+            "mirrorPredictionToQdrant",
+            "mirrorProposalToQdrant",
+            "searchStagingPredictions",
+            "searchStagingProposals"
+          ],
+          "summary": "Directory `sveltekit-frontend/src/lib/server/semantic-contracts` (1 files, 1 code; domains: trace-retrieval, ontology-taxonomy). Key symbols: StagingPoint, mirrorPredictionToQdrant, mirrorProposalToQdrant, searchStagingPredictions, searchStagingProposals. Representative files: qdrant-staging-mirror.ts."
+        },
+        {
+          "rank": 4,
+          "dirPath": "sveltekit-frontend/openspec/changes/parent-atlas-trace-search-joinback-proof",
+          "cardId": "agents:dir:sveltekit-frontend-openspec-changes-parent-atlas-trace-search-joinback-proof",
+          "fusedScore": 0.6134,
+          "denseCosine": 0.7248,
+          "lexicalScore": 0.6667,
+          "authorityFusionRank": 0.30682,
+          "inLegacyAtlasDirs": true,
+          "topoClasses": [
+            "trace-retrieval",
+            "openspec-governance",
+            "test-audit-devtool"
+          ],
+          "oboConceptIds": [
+            "ATLASDOM:frontend.sveltekit",
+            "ATLASDOM:frontend",
+            "ATLASDOM:retrieval",
+            "ATLASDOM:test"
+          ],
+          "topFiles": [
+            "sveltekit-frontend/openspec/changes/parent-atlas-trace-search-joinback-proof/design.md",
+            "sveltekit-frontend/openspec/changes/parent-atlas-trace-search-joinback-proof/proposal.md",
+            "sveltekit-frontend/openspec/changes/parent-atlas-trace-search-joinback-proof/tasks.md"
+          ],
+          "topSymbols": [],
+          "summary": "Directory `sveltekit-frontend/openspec/changes/parent-atlas-trace-search-joinback-proof` (3 files, 0 code; domains: trace-retrieval, openspec-governance, test-audit-devtool). Context: Context \u2014 The repository already treats `codebase_chunks_768` as the active semantic lane in the vector registry. The remaining defect i"
+        },
+        {
+          "rank": 5,
+          "dirPath": "sveltekit-frontend/src/lib/server/atlas/projections",
+          "cardId": "agents:dir:sveltekit-frontend-src-lib-server-atlas-projections",
+          "fusedScore": 0.6109,
+          "denseCosine": 0.7708,
+          "lexicalScore": 0.5,
+          "authorityFusionRank": 0.33071,
+          "inLegacyAtlasDirs": true,
+          "topoClasses": [
+            "trace-retrieval",
+            "database-schema"
+          ],
+          "oboConceptIds": [
+            "ATLASDOM:frontend.sveltekit",
+            "ATLASDOM:database",
+            "ATLASDOM:frontend",
+            "ATLASDOM:retrieval",
+            "ATLASEXT:lib"
+          ],
+          "topFiles": [
+            "sveltekit-frontend/src/lib/server/atlas/projections/index.ts",
+            "sveltekit-frontend/src/lib/server/atlas/projections/hyperrag-packet-projection.ts",
+            "sveltekit-frontend/src/lib/server/atlas/projections/mapreduce-view-v1.ts",
+            "sveltekit-frontend/src/lib/server/atlas/projections/postgres-packet-projection.ts",
+            "sveltekit-frontend/src/lib/server/atlas/projections/qdrant-packet-projection.ts"
+          ],
+          "topSymbols": [
+            "HyperRagFactResponse",
+            "HyperRagProjection",
+            "SemanticPacketDomainObject",
+            "AdapterViolation",
+            "AdapterResult",
+            "fromHyperRagResponse"
+          ],
+          "summary": "Directory `sveltekit-frontend/src/lib/server/atlas/projections` (6 files, 6 code; domains: trace-retrieval, database-schema). Key symbols: HyperRagFactResponse, HyperRagProjection, SemanticPacketDomainObject, AdapterViolation, AdapterResult, fromHyperRagResponse, fromHyperRagRpcPacket, toHyperRagRequest, toHyperRagRequ"
+        }
+      ],
+      "elapsedMs": 4892.68,
+      "canonicalAuthority": false
+    }
+  ]
+}

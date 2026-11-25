@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.eg2-onnx-domain-classifier-train.v1",
+  "checkpointPath": "models/domain-classifier/eg2-onnx-checkpoint.joblib",
+  "modelRevision": "eg2-onnx-nblr-v1-405e2cebef",
+  "encoderProfile": "eg2-onnx-q8-mrl-768",
+  "embedModel": "onnx-community/embeddinggemma2-q8:onnx/model_quantized.onnx",
+  "dimensions": 768,
+  "sklearnVersion": "1.7.0",
+  "nClusters": 15,
+  "totalDocs": 150,
+  "trainDocs": 112,
+  "valDocs": 38,
+  "totalEmbeddedChunks": 151,
+  "valNbAccuracy": 0.1579,
+  "valLrAccuracy": 0.1579,
+  "centroidSha256": "sha256:405e2cebefa73b00500f0456957ed9c41821bd65dec9df6596c5e4b81705d262",
+  "labels": [
+    "Graph",
+    "UI",
+    "database",
+    "documentation",
+    "gpu",
+    "test"
+  ]
+}

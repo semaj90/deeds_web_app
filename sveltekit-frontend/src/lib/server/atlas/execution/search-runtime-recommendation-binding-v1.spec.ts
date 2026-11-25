@@ -172,6 +172,29 @@ describe('SearchRuntime top-K recommendation evidence binding', () => {
     })).toThrow('RECOMMENDATION_BINDING_ORDINAL_MAP_MISMATCH');
   });
 
+  it('rejects swapped ordinal assignments even with the original declared checksum', () => {
+    const { input, ordinalMap } = buildFixture();
+    const [first, second] = ordinalMap.candidates;
+    const swappedMap = {
+      ...ordinalMap,
+      candidates: [
+        { ...second!, candidateOrdinal: 0 },
+        { ...first!, candidateOrdinal: 1 },
+      ],
+    };
+    expect(() => executeSearchRuntimeTopKV1({
+      ...input, ordinalMap: swappedMap, candidateOrdinals: [0], recommendationEvidence: bundleFor(ordinalMap),
+    })).toThrow('CANDIDATE_ORDINAL_MAP_CHECKSUM_MISMATCH');
+  });
+
+  it('rejects a resealed bundle from a stale workspace', () => {
+    const { input, ordinalMap } = buildFixture();
+    const bundle = bundleFor(ordinalMap, { workspaceRevision: `sha256:${'f'.repeat(64)}` });
+    expect(() => executeSearchRuntimeTopKV1({
+      ...input, candidateOrdinals: [0], recommendationEvidence: bundle,
+    })).toThrow('RECOMMENDATION_BINDING_WORKSPACE_MISMATCH');
+  });
+
   it('rejects a requested ordinal the bundle does not cover', () => {
     const { input, ordinalMap } = buildFixture();
     const bundle = bundleFor(ordinalMap);

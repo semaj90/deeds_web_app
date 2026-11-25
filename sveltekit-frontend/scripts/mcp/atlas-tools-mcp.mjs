@@ -1370,11 +1370,28 @@ export async function buildLiveAtlasContext(
   let cards = files.map((file, index) => {
     const { packets, matchingPacketCount, error } = bindings[index];
     const packetKeys = [...new Set(packets.map((p) => p.packet_key).filter(Boolean))];
-    const identityBound = packetKeys.length === 1;
-    const identityConflict = packetKeys.length > 1;
-    const sourceRevisionKnown = packets.some((p) =>
+    const identityConflictReasons = [];
+    if (packetKeys.length > 1) identityConflictReasons.push('MULTIPLE_PACKET_KEYS');
+    for (const [field, reason] of [
+      ['source_revision', 'MULTIPLE_SOURCE_REVISIONS'],
+      ['workspace_revision', 'MULTIPLE_WORKSPACE_REVISIONS'],
+      ['sha256', 'MULTIPLE_CONTENT_CHECKSUMS'],
+    ]) {
+      const values = [...new Set(packets.map((packet) => packet[field] ?? packet[
+        field.replace(/_([a-z])/g, (_match, letter) => letter.toUpperCase())
+      ]).filter((value) => typeof value === 'string' && value.trim()))];
+      if (values.length > 1) identityConflictReasons.push(reason);
+    }
+    if (packets.length > 0 && packetKeys.length === 0) identityConflictReasons.push('MISSING_PACKET_KEY');
+    const identityConflict = identityConflictReasons.length > 0;
+    const identityBound = packetKeys.length === 1 && !identityConflict;
+    const sourceRevisionKnown = packets.length > 0 && packets.every((p) =>
       typeof (p.source_revision ?? p.sourceRevision) === 'string' &&
       (p.source_revision ?? p.sourceRevision).trim().length > 0,
+    );
+    const workspaceRevisionKnown = packets.length > 0 && packets.every((p) =>
+      typeof (p.workspace_revision ?? p.workspaceRevision) === 'string' &&
+      (p.workspace_revision ?? p.workspaceRevision).trim().length > 0,
     );
     const packetBindings = packets.map((packet) => ({
       packetKey: packet.packet_key ?? packet.packetKey ?? null,
@@ -1387,6 +1404,8 @@ export async function buildLiveAtlasContext(
     const rejectionReasons = [
       'NON_CANONICAL',
       ...(sourceRevisionKnown ? [] : ['MISSING_SOURCE_REVISION']),
+      ...(workspaceRevisionKnown ? [] : ['MISSING_WORKSPACE_REVISION']),
+      ...identityConflictReasons,
       ...(identityBound ? [] : [identityConflict ? 'IDENTITY_CONFLICT' : matchingPacketCount > 0 ? 'NO_CANONICAL_PACKET' : 'IDENTITY_UNBOUND']),
     ];
     return {
@@ -1406,6 +1425,7 @@ export async function buildLiveAtlasContext(
       featureId: packets[0]?.feature_id ?? null,
       identityBound,
       identityConflict,
+      identityConflictReasons,
       identityLookupError: error,
       retrievalUsable: true,
       retrievalSources: file.retrievalSources ?? [],
@@ -1420,16 +1440,9 @@ export async function buildLiveAtlasContext(
   let payloadBytes = 0;
   do {
     sourceRefs = [...new Set(cards.map((c) => c.sourceRef).filter(Boolean))];
-    promptPacket = [
-      `[ACE CONTEXT — ${cards.length} live ranked cards, query: "${queryText}"]`,
-      ...cards.slice(0, 10).map(
-        (c, i) =>
-          `${i + 1}. ${c.title} (score: ${c.score.toFixed(3)})` +
-          (c.summary ? `\n   ${c.summary.slice(0, 120)}` : '') +
-          `\n   sourceRef: ${c.sourceRef}` +
-          (c.packetKey ? ` packet: ${c.packetKey}` : ' packet: unbound')
-      ),
-    ].join('\n');
+    // Live search cards are unadmitted candidates. Do not render them as an LLM-ready ACE prompt;
+    // only the canonical ContextManifest owner may produce injectable context.
+    promptPacket = '';
     payloadBytes = Buffer.byteLength(JSON.stringify({ query: queryText, cards, sourceRefs, promptPacket }), 'utf8');
     if (payloadBytes <= payloadBudget || cards.length === 0) break;
     cards.pop();
@@ -2298,8 +2311,18 @@ export async function findSourceRefs({ query, refs } = {}, { trace = (name, args
       const found = await trace('atlas.packet_search', { source_ref: workspaceRelativeDisplay(input), limit: 5 });
       const packets = (found?.packets ?? []).filter((p) => canonicalWorkspaceRef(p.source_ref) === canonical).map(packetIdentityView);
       const packetKeys = [...new Set(packets.map((p) => p.packetKey).filter(Boolean))];
-      const status = packets.length === 0 ? 'NO_PACKET' : packetKeys.length === 1 ? 'IDENTITY_BOUND' : 'IDENTITY_CONFLICT';
-      return { ref: input, kind, canonical, status, packets, packetKeys, failure: null };
+      const identityConflictReasons = [];
+      if (packetKeys.length > 1) identityConflictReasons.push('MULTIPLE_PACKET_KEYS');
+      for (const [field, reason] of [
+        ['sourceRevision', 'MULTIPLE_SOURCE_REVISIONS'],
+        ['workspaceRevision', 'MULTIPLE_WORKSPACE_REVISIONS'],
+        ['sha256', 'MULTIPLE_CONTENT_CHECKSUMS'],
+      ]) {
+        const values = [...new Set(packets.map((packet) => packet[field]).filter((value) => typeof value === 'string' && value.trim()))];
+        if (values.length > 1) identityConflictReasons.push(reason);
+      }
+      const status = packets.length === 0 ? 'NO_PACKET' : identityConflictReasons.length === 0 && packetKeys.length === 1 ? 'IDENTITY_BOUND' : 'IDENTITY_CONFLICT';
+      return { ref: input, kind, canonical, status, packets, packetKeys, identityConflictReasons, failure: null };
     } catch (error) {
       return { ref: input, kind, canonical, status: 'LOOKUP_FAILED', packets: [], packetKeys: [], failure: error.code ?? 'LOOKUP_FAILED' };
     }
@@ -2328,7 +2351,10 @@ export async function findSourceRefs({ query, refs } = {}, { trace = (name, args
 
   const pathItems = inspected.filter((item) => item.kind === 'PATH');
   const allBound = pathItems.length > 0 && pathItems.every((item) => item.status === 'IDENTITY_BOUND');
-  const allRevisioned = allBound && pathItems.every((item) => item.packets.every((p) => typeof p.sourceRevision === 'string' && p.sourceRevision.trim()));
+  const allRevisioned = allBound && pathItems.every((item) => item.packets.every((p) =>
+    typeof p.sourceRevision === 'string' && p.sourceRevision.trim() &&
+    typeof p.workspaceRevision === 'string' && p.workspaceRevision.trim()
+  ));
   return {
     ...base,
     sourceRefs: [...new Set(sourceRefs)],

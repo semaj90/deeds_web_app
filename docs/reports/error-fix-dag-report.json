@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-11-19T21:51:35.076Z",
-  "inputFindings": 41,
-  "activeStates": 2,
+  "generatedAt": "2026-11-25T02:27:43.714Z",
+  "inputFindings": 35,
+  "activeStates": 1,
   "topoOrder": [
     "env_url_mismatch",
     "ssr_safety_violation",
@@ -18,12 +18,10 @@
       "hmmState": "schema_mismatch",
       "hmmLabel": "Schema Mismatch",
       "hmmDescription": "Drizzle schema column type does not match the live Postgres column type.",
-      "rootCauseScore": 0.25,
-      "findingCount": 38,
+      "rootCauseScore": 0.2,
+      "findingCount": 35,
       "severity": "medium",
-      "downstreamErrors": [
-        "contract:route_contract_mismatch"
-      ],
+      "downstreamErrors": [],
       "kagRecall": [],
       "recommendedOrder": 5,
       "validationCommands": [
@@ -71,53 +69,18 @@
         "contract:drizzle-meta-stale_migration-061-b73075a3",
         "contract:drizzle-meta-stale_migration-062-d189a482",
         "contract:drizzle-meta-stale_migration-063-114571fd",
-        "contract:drizzle-meta-stale_migration-064-51cc2f78",
-        "contract:drizzle-meta-stale_migration-065-6d3c89f5",
-        "contract:drizzle-meta-stale_migration-066-a1d61cf5",
-        "contract:drizzle-meta-stale_migration-067-3efe2517"
-      ],
-      "trustTier": "canonical_local_code_plus_official_docs"
-    },
-    {
-      "errorId": "contract:route_contract_mismatch",
-      "hmmState": "route_contract_mismatch",
-      "hmmLabel": "Route Contract Mismatch",
-      "hmmDescription": "SvelteKit route or Superforms v2 contract is incomplete or incorrectly wired.",
-      "rootCauseScore": 0.2,
-      "findingCount": 3,
-      "severity": "low",
-      "downstreamErrors": [],
-      "kagRecall": [],
-      "recommendedOrder": 7,
-      "validationCommands": [
-        "npm run audit:forms",
-        "npm run test:network-contracts"
-      ],
-      "agentCommandKeys": [
-        "forms.audit",
-        "contract.audit"
-      ],
-      "findings": [
-        "contract:sveltekit-route-route_contract_mismatch-001-86cb947b",
-        "contract:sveltekit-route-route_contract_mismatch-002-86cb947b",
-        "contract:sveltekit-route-route_contract_mismatch-003-86cb947b"
+        "contract:drizzle-meta-stale_migration-064-51cc2f78"
       ],
       "trustTier": "canonical_local_code_plus_official_docs"
     }
   ],
-  "dagEdges": [
-    {
-      "from": "schema_mismatch",
-      "to": "route_contract_mismatch",
-      "weight": 0.85
-    }
-  ],
+  "dagEdges": [],
   "redisKagAvailable": false,
   "summary": {
     "high": 0,
     "medium": 1,
-    "low": 1,
-    "totalFindings": 41
+    "low": 0,
+    "totalFindings": 35
   },
   "status": "ok"
 }

@@ -49,6 +49,14 @@ export interface PacketDenseSearchRequest extends PacketBitmapPrefilterFilters {
   denseLimit?: number;
   scoreThreshold?: number;
   expandTopK?: number;
+  /** Optional page size for deterministic cursor pagination over sorted results. */
+  pageLimit?: number;
+  /** Optional opaque cursor from a previous PacketDenseSearchResponse.pagination.nextCursor. */
+  cursor?: string;
+  /** Optional soft-boost domain_class labels (never a hard prefilter). */
+  softBoostDomainLabels?: string[];
+  /** Soft-boost delta added to cosine score when row.domain_class matches softBoostDomainLabels (default 0.03). */
+  softBoostWeight?: number;
 }
 
 export interface PacketDenseSearchResult {
@@ -418,7 +426,7 @@ export async function runPacketDenseSearch(
   if (qdrantSourceRefDriftCount > 0) degradedReasons.push('QDRANT_SOURCE_REF_DRIFT');
   const scoredPacketKeys: Array<{ packetKey: string; score: number; winner: QualifiedChunkLineageRow; matchedChunkRowIds: string[] }> = [...packetEvidenceByKey.entries()]
     .map(([packetKey, evidence]) => ({ packetKey, score: evidence.score, winner: evidence.winner, matchedChunkRowIds: [...evidence.matchedChunkRowIds].sort() }))
-    .sort((a, b) => b.score - a.score);
+    .sort((a, b) => b.score - a.score || a.packetKey.localeCompare(b.packetKey));
 
   if (scoredPacketKeys.length === 0) {
     return {
@@ -455,8 +463,11 @@ export async function runPacketDenseSearch(
   const joinResult = await deps.db.query<JoinBackRow>(joinSql, [packetKeys]);
   const byPacketKey = new Map<string, JoinBackRow>(joinResult.rows.map((row) => [row.packet_key, row]));
 
-  const results: PacketDenseSearchResult[] = scoredPacketKeys
-    .map((scored, index) => {
+  const softBoostSet = new Set((req.softBoostDomainLabels ?? []).map((s) => s.trim()).filter(Boolean));
+  const softBoostWeight = softBoostSet.size > 0 ? Math.max(0, Math.min(0.25, req.softBoostWeight ?? 0.03)) : 0;
+
+  const fullResults: PacketDenseSearchResult[] = scoredPacketKeys
+    .map((scored) => {
       const row = byPacketKey.get(scored.packetKey);
       if (!row) return null; // no matching canonical row — drop rather than fabricate identity
       const candidate = prefilter.candidates.find((item) => item.packetKey === row.packet_key);
@@ -468,6 +479,9 @@ export async function runPacketDenseSearch(
       const missingLineageFields: PacketDenseSearchResult['missingLineageFields'] = [];
       if (!workspaceRevision) missingLineageFields.push('workspace_revision_key');
       if (!sourceRevision) missingLineageFields.push('source_revision');
+      const boostedScore = softBoostWeight > 0 && row.domain_class && softBoostSet.has(row.domain_class)
+        ? scored.score + softBoostWeight
+        : scored.score;
       const result: PacketDenseSearchResult = {
         packetKey: row.packet_key,
         titleId: row.title_id,
@@ -480,31 +494,52 @@ export async function runPacketDenseSearch(
         winningChunkRowId: scored.winner.postgres_id,
         winningCanonicalChunkId: scored.winner.canonical_chunk_id,
         matchedChunkRowIds: scored.matchedChunkRowIds,
-        score: scored.score,
+        score: boostedScore,
         controlWord: deriveControlWord(row),
-      };
-      if (index < expandTopK) {
-        result.payload = {
+        payload: {
           summary: row.summary,
           rewardPrior: row.reward_prior,
           communityId: row.community_id,
           pageRankScore: row.page_rank_score,
           sourceRefHint: row.source_ref,
           featureId: row.feature_id,
-        };
-      }
+        },
+      };
       return result;
     })
-    .filter((r): r is PacketDenseSearchResult => r !== null);
+    .filter((r): r is PacketDenseSearchResult => r !== null)
+    .sort((a, b) => b.score - a.score || a.packetKey.localeCompare(b.packetKey))
+    .map((r, index) => {
+      if (index < expandTopK) return r;
+      const { payload: _omit, ...compact } = r;
+      return compact;
+    });
 
-  if (results.length < scoredPacketKeys.length) {
+  if (fullResults.length < scoredPacketKeys.length) {
     degradedReasons.push('IDENTITY_BRIDGE_UNAVAILABLE');
   }
+
+  let offset = 0;
+  if (req.cursor) {
+    try {
+      const decoded = JSON.parse(Buffer.from(req.cursor, 'base64url').toString('utf8')) as { offset?: number };
+      if (Number.isInteger(decoded.offset) && (decoded.offset ?? 0) >= 0) offset = decoded.offset as number;
+    } catch { /* ignore malformed cursor, start at 0 */ }
+  }
+  const pageLimit = typeof req.pageLimit === 'number' && Number.isFinite(req.pageLimit) && req.pageLimit > 0
+    ? Math.floor(req.pageLimit)
+    : null;
+  const results = pageLimit !== null ? fullResults.slice(offset, offset + pageLimit) : fullResults;
+  const hasMore = pageLimit !== null && offset + results.length < fullResults.length;
+  const nextCursor = hasMore
+    ? Buffer.from(JSON.stringify({ offset: offset + results.length }), 'utf8').toString('base64url')
+    : null;
 
   return {
     status: results.length > 0 ? 'OK' : 'IDENTITY_BRIDGE_UNAVAILABLE',
     degradedReasons,
     results,
+    ...(pageLimit !== null ? { pagination: { offset, limit: pageLimit, total: fullResults.length, hasMore, nextCursor } } : {}),
     unresolvedHits,
     candidateSetTruncated: prefilter.candidateSetTruncated,
     candidateCount,
@@ -516,7 +551,7 @@ export async function runPacketDenseSearch(
       candidateCount,
       candidateSetTruncated: prefilter.candidateSetTruncated,
       qdrantHitCount: hits.length,
-      joinedResultCount: results.length,
+      joinedResultCount: fullResults.length,
       degradedReasons,
     },
   };

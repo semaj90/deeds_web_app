@@ -41,6 +41,7 @@ def test_documentation_fact_route_preserves_custom_attributes(monkeypatch):
 
     assert response["facts"][0]["customAttributesVersion"] == sidecar.CUSTOM_ATTRIBUTES_SCHEMA
     assert response["facts"][0]["customAttributes"] == attributes
+    assert response["facts"][0]["extractionMethod"] == "LANGEXTRACT_OPENAI_COMPATIBLE"
     assert response["outputHash"] == hashlib.sha256(
         __import__("json").dumps(
             {"facts": response["facts"], "apiRules": response["apiRules"]},

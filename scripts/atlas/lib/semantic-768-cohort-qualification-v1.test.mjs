@@ -21,14 +21,40 @@ const row = {
   encoder_id: 'encoder-7',
 };
 
-test('qualifies only row-bound canonical semantic_768 evidence', () => {
+test('qualifies only row-bound semantic_768 representation evidence', () => {
   assert.equal(evaluateSemantic768Candidate(candidate, row, true).qualified, true);
 });
 
-test('rejects a non-authoritative candidate map even when row fields match', () => {
+test('accepts a full pinned embedding_version without duplicating the model prefix', () => {
+  const fullRevision = 'semantic_768:embeddinggemma:latest:a5f000000000000000000000000000000000000000000000000000000000036a';
+  const observedRow = {
+    ...row,
+    embedding_model: 'embeddinggemma:latest',
+    embedding_version: fullRevision,
+    encoder_id: null,
+  };
+  const observedCandidate = {
+    ...candidate,
+    representationBindings: [{ representationId: 'semantic_768', modelRevision: fullRevision }],
+  };
+
+  const result = evaluateSemantic768Candidate(observedCandidate, observedRow, true);
+  assert.equal(result.actualModelRevision, fullRevision);
+  assert.equal(result.checks.modelRevision, true);
+  // Missing encoder metadata remains a separate hard qualification failure.
+  assert.equal(result.checks.producerMetadata, false);
+  assert.equal(result.qualified, false);
+});
+
+test('rejects an unbound candidate row even when semantic fields match', () => {
   const result = evaluateSemantic768Candidate(candidate, row, false);
   assert.equal(result.qualified, false);
-  assert.equal(result.checks.identityAuthority, false);
+  assert.equal(result.checks.candidateIdentityBound, false);
+});
+
+test('does not treat the derived ordinal map as canonical authority', () => {
+  assert.equal(evaluateSemantic768Candidate(candidate, row, true).checks.candidateIdentityBound, true);
+  // Qualification means row-bound vector readiness only; canonical admission remains separate.
 });
 
 test('rejects revisions copied from the map when row revisions disagree', () => {

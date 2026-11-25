@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.eg2-onnx-pytorch-mlp-train.v1",
+  "encoderProfile": "eg2-onnx-q8-mrl-512",
+  "labels": [
+    "Graph",
+    "UI",
+    "database",
+    "documentation",
+    "gpu",
+    "test"
+  ],
+  "receipt": {
+    "schema": "atlas.pytorch-mlp-domain-ranker-challenger.v1",
+    "input_dim": 512,
+    "hidden_dim": 128,
+    "activation": "gelu",
+    "num_domains": 6,
+    "device": "cpu",
+    "train_count": 112,
+    "val_count": 38,
+    "train_groups": 112,
+    "val_groups": 38,
+    "group_leakage_count": 0,
+    "epochs": 40,
+    "final_train_loss": 0.012087184935808182,
+    "val_domain_accuracy": 0.6842105263157895,
+    "val_pairwise_auc": 0.9711538461538461,
+    "val_mrr": 1.0,
+    "calibration_ece": 0.21758437940948883,
+    "final_grad_norm_l2": 0.045923285962665386,
+    "canonical_authority": false,
+    "writes_performed": false,
+    "hidden_state_persisted": false,
+    "promotion_authorized": false
+  },
+  "onnxPath": "models/domain-classifier/eg2-onnx-mlp-512.onnx",
+  "ptPath": "models/domain-classifier/eg2-onnx-mlp-512.pt",
+  "onnxParity": {
+    "schema": "atlas.pytorch-onnx-parity.v1",
+    "onnxPath": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\domain-classifier\\eg2-onnx-mlp-512.onnx",
+    "providers": [
+      "CPUExecutionProvider"
+    ],
+    "batchSize": 8,
+    "inputDim": 512,
+    "maxLogitsAbsDiff": 1.430511474609375e-06,
+    "maxRankAbsDiff": 1.430511474609375e-06,
+    "atol": 0.0001,
+    "passed": true
+  }
+}

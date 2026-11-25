@@ -1,0 +1,55 @@
+{
+  "canonical_authority": false,
+  "chunk_count": 100,
+  "embedding_performed": false,
+  "external_projection_writes": false,
+  "local_artifacts_written": true,
+  "manifest_revision": "sveltekit-2-59-1-acquisition-20261124",
+  "page_count": 5,
+  "producer_revision": "atlas-doc-repair-pilot-v1",
+  "qdrant": {
+    "write": false
+  },
+  "receipt_checksum": "46c26babc69e569700e09032e62729433294ca3cde0818fafe49b5e34eea8030",
+  "schema": "atlas.okf-docs-pipeline-receipt.v1",
+  "source_receipts": [
+    {
+      "api_document_fact_blocked_count": 0,
+      "api_document_fact_pending_count": 20,
+      "api_document_fact_record_count": 20,
+      "api_document_facts_checksum": "feafac7d57e1181bb1713799f15e423d4e04c15247d336bab0c1d81810bae4d6",
+      "api_document_facts_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\sveltekit-2-59-1\\api-document-facts.jsonl",
+      "chunks": 100,
+      "chunks_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\sveltekit-2-59-1\\chunks.jsonl",
+      "page_receipt_checksum": "ba83a55bec913e0ce7ee2e1114dfdead34743a0a74fa1078059a05bf09fa9589",
+      "pages": 5,
+      "relation_candidate_bound_count": 0,
+      "relation_candidate_count": 0,
+      "relation_candidate_publication": {
+        "byteLength": 0,
+        "canonicalAuthority": false,
+        "failedCount": 0,
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\sveltekit-2-59-1\\relation-candidates.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "validatedCount": 0,
+        "writesPerformed": true
+      },
+      "relation_candidate_rejected_count": 0,
+      "relation_candidate_unbound_count": 0,
+      "relation_candidates_checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "relation_candidates_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\sveltekit-2-59-1\\relation-candidates.jsonl",
+      "relation_oak_review_admission_count": 0,
+      "relation_oak_review_checksum": null,
+      "relation_oak_review_count": 0,
+      "relation_oak_review_path": null,
+      "relation_proposal_bridge_blocked_count": 0,
+      "relation_proposal_bridged_count": 0,
+      "source_id": "sveltekit-2-59-1",
+      "source_namespace": null
+    }
+  ],
+  "source_snapshot_revision": "atlas-doc-repair-pilot-source-selection-v1",
+  "status": "ACQUISITION_ONLY",
+  "workspace_revision": "UNBOUND_EXTERNAL_SOURCE_CATALOG",
+  "writes_performed": true
+}

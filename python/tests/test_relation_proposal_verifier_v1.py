@@ -139,6 +139,72 @@ def test_rejects_missing_or_malformed_source_content_hash():
     assert malformed["failure"] == "INVALID_CONTENT_SHA256"
 
 
+def test_compiles_to_relation_suggests_both_ontology_endpoints_and_stays_proposed():
+    source_bytes = b"NVRTC compiles CUDA C++ device code to PTX."
+    exact_text = source_bytes.decode("utf-8")
+    suggestions = {
+        "CUDA C++": [{"conceptId": "ATLASLANG:cuda_cpp"}],
+        "PTX": [{"conceptId": "ATLASISA:ptx"}],
+    }
+    result = verify_relation_proposal_v1(
+        {
+            "chunkId": "official-capture:cuda-ptx-sentence",
+            "sourceRef": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+            "sourceRevision": SRC_REV,
+            "contentSha256": CONTENT_SHA,
+            "chunkSha256": hashlib.sha256(source_bytes).hexdigest(),
+            "predicate": "COMPILES_TO",
+            "subject": "CUDA C++",
+            "object": "PTX",
+            "startByte": 0,
+            "endByte": len(source_bytes),
+            "exactText": exact_text,
+            "extractorVersion": "official-doc-sentence-rule-v1",
+            "status": "PROPOSED",
+        },
+        source_bytes=source_bytes,
+        oak_suggest_fn=lambda term: suggestions[term],
+    )
+    assert result["accepted"] is True
+    assert result["proposal"]["mappingStatus"] == "OAK_ENDPOINTS_SUGGESTED_PENDING_REVIEW"
+    assert result["proposal"]["subjectOakSuggestions"] == suggestions["CUDA C++"]
+    assert result["proposal"]["objectOakSuggestions"] == suggestions["PTX"]
+    assert result["proposal"]["predicate"] == "COMPILES_TO"
+    assert result["proposal"]["status"] == "PROPOSED"
+    assert result["canonicalAuthority"] is False
+    assert result["writesPerformed"] is False
+
+
+def test_oak_empty_match_does_not_count_as_resolved_endpoint():
+    source_bytes = b"CUDA C++ device code to PTX."
+    result = verify_relation_proposal_v1(
+        {
+            "chunkId": "capture:ptx",
+            "sourceRef": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+            "sourceRevision": SRC_REV,
+            "contentSha256": CONTENT_SHA,
+            "chunkSha256": hashlib.sha256(source_bytes).hexdigest(),
+            "predicate": "COMPILES_TO",
+            "subject": "CUDA C++",
+            "object": "PTX",
+            "startByte": 0,
+            "endByte": len(source_bytes),
+            "exactText": source_bytes.decode(),
+            "extractorVersion": "test-v1",
+            "status": "PROPOSED",
+        },
+        source_bytes=source_bytes,
+        oak_suggest_fn=lambda term: (
+            [{"conceptId": "ATLASLANG:cuda_cpp"}]
+            if term == "CUDA C++"
+            else [{"matches": [{"searchText": "PTX", "externalIds": []}], "candidateBundle": {"concepts": []}}]
+        ),
+    )
+    assert result["accepted"] is True
+    assert result["proposal"]["mappingStatus"] == "PARTIAL_OAK_SUGGESTIONS"
+    assert result["proposal"]["objectOakSuggestions"][0]["candidateBundle"]["concepts"] == []
+
+
 def test_batch_source_readback_rehashes_parent_and_emits_full_file_offsets():
     parent_bytes = b"header\nimport x from './x';\nfooter\n"
     chunk_bytes = b"import x from './x';"

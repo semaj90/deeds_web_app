@@ -1,7 +1,9 @@
 import { pool } from '$lib/server/db/client.js';
+import { canonicalErrorJoinKeyV1 } from '$lib/server/features/ai/ace/error-fingerprint.js';
 
 export interface RuntimeErrorPriority {
 	fingerprint: string;
+	canonicalErrorKey: string;
 	source: 'error_events' | 'error_logs';
 	routePath: string;
 	kind: string;
@@ -17,6 +19,8 @@ export interface RuntimeErrorPriority {
 	 * (typically dependency-only frames such as Vite pre-bundled Svelte internals).
 	 */
 	firstAppFrame: string | null;
+	affectedFiles: string[];
+	affectedFileCount: number;
 }
 
 export interface RuntimeErrorPriorityReport {
@@ -26,14 +30,18 @@ export interface RuntimeErrorPriorityReport {
 	top100: RuntimeErrorPriority[];
 }
 
-const emptyReport: RuntimeErrorPriorityReport = {
-	status: 'UNAVAILABLE',
-	total: 0,
-	top10: [],
-	top100: [],
-};
+export type RuntimeErrorExportLimit = 10 | 100 | 1000;
 
 export async function loadRuntimeErrorPriorities(): Promise<RuntimeErrorPriorityReport> {
+	const { status, total, records } = await loadRankedRuntimeErrors(100);
+	return { status, total, top10: records.slice(0, 10), top100: records };
+}
+
+export async function loadRankedRuntimeErrors(limit: RuntimeErrorExportLimit): Promise<{
+	status: RuntimeErrorPriorityReport['status'];
+	total: number;
+	records: RuntimeErrorPriority[];
+}> {
 	try {
 		const result = await pool.query<{
 			fingerprint: string;
@@ -46,6 +54,8 @@ export async function loadRuntimeErrorPriorities(): Promise<RuntimeErrorPriority
 			last_seen: Date | string;
 			priority_score: number | string;
 			first_app_frame: string | null;
+			affected_files: string[] | null;
+			affected_file_count: number;
 			total_count: number | string;
 		}>(`
 			WITH source_events AS (
@@ -83,7 +93,11 @@ export async function loadRuntimeErrorPriorities(): Promise<RuntimeErrorPriority
 					left(min(message), 400) AS message,
 					count(*)::integer AS occurrences,
 					max(occurred_at) AS last_seen,
-						(array_agg(first_app_frame ORDER BY occurred_at DESC) FILTER (WHERE first_app_frame IS NOT NULL))[1] AS first_app_frame
+					(array_agg(first_app_frame ORDER BY occurred_at DESC, first_app_frame ASC)
+						FILTER (WHERE first_app_frame IS NOT NULL))[1] AS first_app_frame,
+					(array_agg(DISTINCT first_app_frame ORDER BY first_app_frame)
+						FILTER (WHERE first_app_frame IS NOT NULL))[1:25] AS affected_files,
+					count(DISTINCT first_app_frame)::integer AS affected_file_count
 				FROM source_events
 				GROUP BY 1, 2, 3, 4, 5,
 					regexp_replace(lower(message), '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9]+', '#', 'g')
@@ -96,14 +110,21 @@ export async function loadRuntimeErrorPriorities(): Promise<RuntimeErrorPriority
 				FROM grouped
 			)
 			SELECT fingerprint, source, route_path, kind, severity, message, occurrences,
-				last_seen, priority_score, first_app_frame, count(*) OVER ()::integer AS total_count
+				last_seen, priority_score, first_app_frame, affected_files, affected_file_count,
+				count(*) OVER ()::integer AS total_count
 			FROM scored
 			ORDER BY priority_score DESC, occurrences DESC, last_seen DESC, fingerprint ASC
-			LIMIT 100
-		`);
+			LIMIT $1
+		`, [limit]);
 
-		const top100 = result.rows.map((row) => ({
+		const records = result.rows.map((row) => ({
 			fingerprint: row.fingerprint,
+			canonicalErrorKey: canonicalErrorJoinKeyV1({
+				file: row.first_app_frame,
+				routePath: row.route_path,
+				kind: row.kind,
+				message: row.message,
+			}),
 			source: row.source,
 			routePath: row.route_path,
 			kind: row.kind,
@@ -113,15 +134,16 @@ export async function loadRuntimeErrorPriorities(): Promise<RuntimeErrorPriority
 			lastSeen: new Date(row.last_seen).toISOString(),
 			priorityScore: Number(row.priority_score),
 			firstAppFrame: row.first_app_frame ?? null,
+			affectedFiles: row.affected_files ?? [],
+			affectedFileCount: Number(row.affected_file_count ?? 0),
 		}));
 		return {
 			status: 'AVAILABLE',
 			total: Number(result.rows[0]?.total_count ?? 0),
-			top10: top100.slice(0, 10),
-			top100,
+			records,
 		};
 	} catch (error) {
 		console.error('[daily-graphify-board] runtime error ranking unavailable:', error);
-		return emptyReport;
+		return { status: 'UNAVAILABLE', total: 0, records: [] };
 	}
 }

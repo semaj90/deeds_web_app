@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.media-pipeline-inventory.v1",
+  "generatedAt": "2026-11-24T22:40:00.000Z",
+  "status": "INVENTORY_COMPLETE_IMPLEMENTATION_NOT_STARTED",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "inventory": [
+    {
+      "area": "durable video analysis",
+      "owner": "sveltekit-frontend/src/lib/server/features/evidence/video/durable-video-analysis-v1.ts",
+      "present": ["source-byte SHA-256 verification", "bounded FFmpeg frame sampling", "YOLO proposals with inverse source-coordinate mapping", "OCR and motion-LUT analysis", "artifact size/readback checks", "EmbeddingGemma multimodal stages"],
+      "qualification": "The implementation has focused and rollback-only integration coverage recorded in the existing OpenSpec ledger; live upload-to-authorized-viewer completion is not proven."
+    },
+    {
+      "area": "browser decode and cache",
+      "owners": ["sveltekit-frontend/src/lib/client/video-editor/webcodecs-decoder.ts", "sveltekit-frontend/src/lib/client/video-editor/opfs-video-cache.ts"],
+      "present": ["HTMLVideoElement/canvas thumbnail path", "OPFS cache with in-memory fallback"],
+      "gap": "WebCodecsVideoDecoder advertises hardware VideoDecoder support but generateLODThumbnails uses HTMLVideoElement/canvas and emits data URLs; repository search found no caller or demuxer integration for this helper."
+    },
+    {
+      "area": "WASM and palette processing",
+      "owners": ["sveltekit-frontend/src/lib/client/atlas-video-wasm-v1.ts", "sveltekit-frontend/src/lib/client/video-editor/snes-quantizer-webgpu.ts", "simd-bridge/cpp/indexed_palette_4bpp.h"],
+      "present": ["WASM dHash and Filmcraft time conversion", "CPU 4-bit palette quantizer and WGSL source", "C++ indexed-palette helper"],
+      "gap": "No shared versioned frame descriptor/arena ABI or connected video-to-object-crop-to-CI4-to-Three.js caller was found in the scoped source search."
+    },
+    {
+      "area": "OpenSpec media acceptance",
+      "owner": "openspec/changes/evidence-analysis-bdd-pipeline/tasks.md",
+      "openTasks": ["5.1 revision-checked durable upload worker", "5.2 idempotent transcript persistence", "5.3 canonical frame findings", "5.4 authorized timeline/transcript reads", "5.5 synthetic job through durable store readback and authorized viewer"]
+    }
+  ],
+  "recommendedFirstImplementation": {
+    "name": "frame descriptor and consumer-specific resolution contract",
+    "scope": "Versioned descriptor and bounds/stride validation, plus explicit analysis, preview, evidence-inspection, and texture-LOD profiles; preserve original source-coordinate mapping and existing FFmpeg/YOLO owners.",
+    "acceptance": ["malformed/overflowing layouts rejected", "consumer policies do not alter canonical analysis sampling", "odd dimensions and stride padding covered", "existing scalar implementation remains the oracle"],
+    "defer": ["AVX-512 dispatch", "Dawn/native GPU sharing", "new durable queues", "model-stage expansion"]
+  },
+  "environment": {
+    "wslGpuExecution": "NOT_CHECKED; prior user-provided Docker Desktop/WSL bootstrap failure means no GPU execution is claimed",
+    "servicesChanged": false,
+    "canonicalStoresChanged": false,
+    "openspecTasksChanged": false
+  }
+}

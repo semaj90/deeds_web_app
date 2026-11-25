@@ -1,0 +1,91 @@
+{
+  "schema": "atlas.doc14-live-ace-context-gate.v1",
+  "status": "VERTICAL_PARTIAL",
+  "tool": "atlas-tools.build_agentic_rag_context",
+  "query": "NVIDIA CUDA Programming Guide CUDA C++ uses SIMT GPU kernels, CUDA platform and PTX virtual ISA relation",
+  "contextSource": {
+    "kind": "TRACE_MCP_LIVE",
+    "rankingTool": "search.hybrid",
+    "identityTool": "atlas.packet_search",
+    "hitCount": 10,
+    "fileCount": 9,
+    "returnedCardCount": 7,
+    "identityBoundCount": 7,
+    "retrievalUsable": true,
+    "proofUsable": false,
+    "revisionStatus": "MISSING_SOURCE_REVISION",
+    "admissionStatus": "UNADMITTED_RETRIEVAL_CANDIDATES",
+    "warnings": [
+      "UNADMITTED_RETRIEVAL_CANDIDATES",
+      "MISSING_SOURCE_REVISION"
+    ]
+  },
+  "cards": [
+    {
+      "sourceRef": "simd-bridge/cpp/build-x64-cuda-cublas/CMakeFiles/CheckCUDA/CMakeFiles/CMakeConfigureLog.yaml",
+      "packetKey": "packet:c798bc033a74",
+      "sourceRevision": "sha256:ad8fb2ddfced3da2ec717ae4993b7343355c2f614aec4e4e4481f7003997f16d",
+      "workspaceRevision": 0,
+      "byteStart": null,
+      "byteEnd": null,
+      "proofUsable": false
+    },
+    {
+      "sourceRef": "simd-bridge/cpp/build-x64-cuda-cuvs/CMakeFiles/CheckCUDA/CMakeFiles/CMakeConfigureLog.yaml",
+      "packetKey": "packet:3f05eb014ef0",
+      "sourceRevision": "sha256:b38ca08ab9cf1b7f577423991718be572201c85c8d78bb163114994bcb9a978c",
+      "workspaceRevision": 0,
+      "byteStart": null,
+      "byteEnd": null,
+      "proofUsable": false
+    },
+    {
+      "sourceRef": "src/lib/types/webgpu-navigator.d.ts",
+      "packetKey": "packet:6dc8d8d4d0f9",
+      "sourceRevision": "sha256:7419f26487d2504b9d6754309bc199dd3eb94cb03dddd0de7335151a3c4e97a7",
+      "workspaceRevision": 0,
+      "byteStart": null,
+      "byteEnd": null,
+      "proofUsable": false
+    },
+    {
+      "sourceRef": "src/lib/webgpu/gaussian-splat-renderer.ts",
+      "packetKey": "packet:7bdb227c5113",
+      "sourceRevision": "sha256:edcbbd103319b008d9167e4aa959c29750662812f349525ab21d2f7a3c1f6a70",
+      "workspaceRevision": 0,
+      "byteStart": null,
+      "byteEnd": null,
+      "proofUsable": false
+    },
+    {
+      "sourceRef": "src/routes/api/health/gpu/+server.ts",
+      "packetKey": "packet:5a18a83f28a0",
+      "sourceRevision": "sha256:66f6c2d7b8231550c4ff399ca14edb3b1ce20338434d9ead1e01ad8734443df8",
+      "workspaceRevision": 0,
+      "byteStart": null,
+      "byteEnd": null,
+      "proofUsable": false
+    },
+    {
+      "sourceRef": "src/lib/db/migrations/create-gpu-inference-tables.sql",
+      "packetKey": "packet:a0985f59be7b",
+      "sourceRevision": "sha256:05294ba23c5402b63f6766e5a618326e513ab9638d101277c343db09974a71ca",
+      "workspaceRevision": 0,
+      "byteStart": null,
+      "byteEnd": null,
+      "proofUsable": false
+    },
+    {
+      "sourceRef": "src/lib/gpu/gpu-search-reranker.ts",
+      "packetKey": "packet:95fefc062bbf",
+      "sourceRevision": "sha256:9fae1628f8887ea1969416bf9e47f45547e7f40a4557c066a829955ab9dc9393",
+      "workspaceRevision": 0,
+      "byteStart": null,
+      "byteEnd": null,
+      "proofUsable": false
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "nextGate": "Resolve the source/workspace revision and exact evidence-span binding through the existing canonical owners before using any card in an ACE ContextManifest."
+}

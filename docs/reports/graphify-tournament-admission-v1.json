@@ -1,38 +1,45 @@
 {
   "schema": "atlas.graphify-tournament-admission.v1",
-  "generatedAt": "2026-09-25T00:21:15.623Z",
+  "generatedAt": "2026-11-25T01:27:41.722Z",
   "mode": "READ_ONLY",
   "status": "TOURNAMENT_ADMISSION_AUDIT_BLOCKED",
   "proofLevel": "PARTIAL_PROVEN",
   "authority": false,
   "workspaceRevision": null,
-  "workspaceRevisionCandidate": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "workspaceRevisionCandidate": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
   "writesPerformed": false,
   "datastoreWritesPerformed": false,
   "sourceSelectionPlan": {
     "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graphify-source-selection-plan-v1.json",
     "status": "SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED",
-    "snapshotRevision": "sha256:ea55977b06a465969fda405ee5ef1aa72396dd254a5176076b316e6ebaab01e4",
-    "workspaceRevisionCandidate": "sha256:d521f7f10b4918a7c83b82cdc123cb31c039720d03df8e15348e9dcc1b0cdeb7",
-    "sourceCount": 25266,
-    "sourceSelectionChecksum": "sha256:8f279291047a8ba9ccb47b0f499c04396481cca4f9f09ab1ca70874fb42dc1b7"
+    "snapshotRevision": "sha256:891a8d9c8a8f656bb4bc553ae77b188f043263b1b8323bbc43f1784010e9c258",
+    "workspaceRevisionCandidate": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+    "snapshotSourceCount": 30327,
+    "sourceCount": 30105,
+    "sourceInventoryRevision": "atlas.canonical-source-inventory-hygiene-policy.2026-10-12.v2",
+    "sourceInventoryChecksum": "sha256:f29251a2737d492973b16e959b539b910743f85689ee87f49f352baf8ad88264",
+    "sourceSelectionChecksum": "sha256:7c0c36d079a4a115e0157d2db53d1429f2a5805301bc1d35998bbb1773643131"
   },
   "admissionReceipt": {
     "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-revision-tournament-admission-v1.json",
     "status": "WORKSPACE_REVISION_TOURNAMENT_ADMITTED",
-    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-    "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
-    "sourceCount": 25542,
+    "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+    "snapshotRevision": "sha256:891a8d9c8a8f656bb4bc553ae77b188f043263b1b8323bbc43f1784010e9c258",
+    "snapshotSourceCount": 30327,
+    "sourceCount": 30105,
     "repositoryCount": 7,
+    "sourceInventoryRevision": "atlas.canonical-source-inventory-hygiene-policy.2026-10-12.v2",
+    "sourceInventoryChecksum": "sha256:f29251a2737d492973b16e959b539b910743f85689ee87f49f352baf8ad88264",
+    "sourceSelectionChecksum": "sha256:7c0c36d079a4a115e0157d2db53d1429f2a5805301bc1d35998bbb1773643131",
     "graphifyExecutionAuthorized": false,
     "projectionWritesAuthorized": false
   },
   "workspaceRevisionDerivation": {
     "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-revision-from-sealed-multi-repo-snapshot-v1.json",
     "status": "WORKSPACE_REVISION_CANDIDATE_READY_FOR_ADMISSION",
-    "snapshotRevision": "sha256:1078418eb36e16f84ab913b64c45ffdbf8e70859a675ed86a9ee31cbc0049224",
-    "workspaceRevisionCandidate": "sha256:dc05165afa0e89a168807bd5097459a8709844a806b67c04d0fd61f76091a7d9",
-    "sourceCount": 26185,
+    "snapshotRevision": "sha256:4a550ae5b5cec9db0e1986972df05977d854a96d8c6a03de0457324059d51f7f",
+    "workspaceRevisionCandidate": "sha256:e935f3232b0b81e34c5bca530af8dbc318fece0af4207be4579ebdf93e8a4e13",
+    "sourceCount": 30314,
     "repositoryCount": 7
   },
   "tournamentContract": {
@@ -45,14 +52,14 @@
   "compatibility": {
     "planRevisionNull": true,
     "tournamentCanAcceptPlan": false,
-    "reason": "Existing tournament request schema requires a non-null workspaceRevision; null is preserved until source-authority admission."
+    "reason": "Existing tournament request schema requires a non-null admitted workspaceRevision and a checksum-bound canonical source selection."
   },
   "blockers": [
     "ADMISSION_DERIVATION_WORKSPACE_REVISION_MISMATCH",
     "ADMISSION_DERIVATION_SNAPSHOT_MISMATCH",
-    "ADMISSION_DERIVATION_SCOPE_MISMATCH"
+    "ADMISSION_DERIVATION_SNAPSHOT_SCOPE_MISMATCH"
   ],
-  "firstBlockingInvariant": "TOURNAMENT_REQUIRES_BOUND_WORKSPACE_REVISION",
+  "firstBlockingInvariant": "ADMISSION_DERIVATION_WORKSPACE_REVISION_MISMATCH",
   "nextGate": "WORKSPACE-REVISION-TOURNAMENT-SOURCE-AUTHORITY-01",
   "safeNextCommand": "npm run atlas:graphify:source-selection:plan"
 }

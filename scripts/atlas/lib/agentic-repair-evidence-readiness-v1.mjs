@@ -32,11 +32,20 @@ const DEFERRED = Object.freeze({
   modelInventory: 'TODO: checkpoint paths, sha256, training cohort and inference caller for XGBoost/MLP/cross-encoder/safetensors',
   retrievalBenchmark: 'TODO: real first-stage Qdrant/pgvector/exact search on frozen relevance labels; account for missed candidates',
   dimensionParity: 'TODO: distinguish native EmbeddingGemma MRL 768/256/128 from learned latent 256/128/64',
-  longMemEval: 'TODO: official dataset/scorer, leakage isolation, retrieval/generation metrics and latency',
+  longMemEval: 'TODO: LongMemEval official dataset/scorer, leakage isolation, retrieval/generation metrics and latency',
   documentation: 'TODO: exact approved .okf URLs + hashes; generated corpus is noncanonical',
   orchestration: 'TODO: current request caller, task/evidence receipt, approved repair tournament and independent validator',
 });
 const nonblank = (value) => typeof value === 'string' && value.trim().length > 0;
+const present = (stage, key, value) => {
+  if (stage === 'source' && (key === 'byteStart' || key === 'byteEnd')) {
+    return Number.isSafeInteger(value) && value >= 0;
+  }
+  if (stage === 'synthesis' && key === 'answerEvidenceRefs') {
+    return Array.isArray(value) && value.length > 0 && value.every(nonblank);
+  }
+  return nonblank(value);
+};
 const stable = (value) => JSON.stringify(value, (_key, val) => {
   if (val && typeof val === 'object' && !Array.isArray(val)) {
     return Object.fromEntries(Object.entries(val).sort(([a], [b]) => a.localeCompare(b)));
@@ -51,12 +60,14 @@ export function evaluateRepairEvidenceReadiness(manifest) {
   const todos = [];
   for (const [stage, keys] of Object.entries(REQUIRED)) {
     const record = manifest[stage];
-    const absent = keys.filter(key => !nonblank(record?.[key]) && !(key === 'answerEvidenceRefs' && Array.isArray(record?.[key]) && record[key].length > 0));
+    const absent = keys.filter(key => !present(stage, key, record?.[key]));
     checks[stage] = { status: absent.length ? 'BLOCKED' : 'FIELDS_PRESENT_UNVERIFIED', missing: absent };
     if (absent.length) todos.push(`TODO(${stage}): fetch existing owner receipt fields: ${absent.join(', ')}`);
   }
   const src = manifest.source;
-  if (Number.isInteger(src?.byteStart) && Number.isInteger(src?.byteEnd) && src.byteEnd < src.byteStart) {
+  if (src?.byteStart !== undefined && src?.byteEnd !== undefined &&
+      (!Number.isSafeInteger(src.byteStart) || !Number.isSafeInteger(src.byteEnd) ||
+       src.byteStart < 0 || src.byteEnd <= src.byteStart)) {
     checks.source = { status:'BLOCKED', missing:['VALID_BYTE_RANGE'] };
     todos.push('TODO(source): verify nonnegative exact source-byte range against frozen bytes');
   }

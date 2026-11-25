@@ -164,7 +164,7 @@ services:
 
   # Qdrant — vector search (72 INT8-quantized collections)
   qdrant:
-    image: qdrant/qdrant:v1.19.0@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc
+    image: qdrant/qdrant:v1.20.2
     container_name: legal-ai-qdrant
     restart: unless-stopped
     deploy:
@@ -997,6 +997,16 @@ services:
       REDIS_URL: redis://:redis@valkey:6379
       EMBEDDING_BASE_URL: http://legal-ai-go-embedding:8097
       EMBED_MODEL: "embeddinggemma:latest"
+      # Strict /embed/v2 receipt pins must match the embedding service's
+      # runtime-attested capability. Empty revision defaults intentionally
+      # keep codebase search fail-closed until an operator supplies them.
+      EMBEDDING_REPRESENTATION: ${EMBEDDING_REPRESENTATION:-semantic_768}
+      EMBEDDING_REPRESENTATION_REVISION: ${EMBEDDING_REPRESENTATION_REVISION:-}
+      EMBEDDING_CONTENT_SELECTION_REVISION: ${EMBEDDING_CONTENT_SELECTION_REVISION:-}
+      EMBEDDING_INPUT_POLICY_REVISION: ${EMBEDDING_INPUT_POLICY_REVISION:-}
+      QDRANT_COLLECTION: ${QDRANT_COLLECTION:-codebase_chunks_768}
+      QDRANT_VECTOR_NAME: ${QDRANT_VECTOR_NAME:-content}
+      QDRANT_BM25_BRANCH_ACTIVE: ${QDRANT_BM25_BRANCH_ACTIVE:-false}
       GRPC_PORT: "50053"
       HTTP_PORT: "8100"
     extra_hosts:

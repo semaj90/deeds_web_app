@@ -220,6 +220,17 @@ describe('A2A agentic error-fix proposal skill', () => {
   });
 
   it('returns non-canonical A2A admitted doc artifact for external-doc-admitted-context', async () => {
+    const docTaskKey = 'parent-atlas-versioned-doc-intelligence:DOC-15';
+    const docTaskRevision = `sha256:${'d'.repeat(64)}`;
+    readTaskReceipt.mockResolvedValueOnce({
+      status: 'FOUND',
+      task: { key: docTaskKey, text: 'Prove versioned documentation retrieval.', sourceRef: 'openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L15', revision: docTaskRevision, checkboxState: 'Open' },
+      identity: {
+        logicalTaskKey: docTaskKey,
+        sourceFileSha256: `sha256:${'e'.repeat(64)}`,
+        workboardSnapshotSha256: `sha256:${'f'.repeat(64)}`,
+      },
+    });
     searchDocCorpus.mockResolvedValueOnce({
       query: '$state runes',
       mode: 'POSTGRES_FTS',
@@ -247,7 +258,8 @@ describe('A2A agentic error-fix proposal skill', () => {
       message: { role: 'user', parts: [{ text: 'query admitted docs' }] },
       metadata: {
         skill: 'external-doc-admitted-context',
-        docQuery: { query: '$state runes', product: 'svelte', productVersion: '5.0', limit: 5 }
+        docQuery: { query: '$state runes', product: 'svelte', productVersion: '5.0', limit: 5,
+          taskRef: { logicalTaskKey: docTaskKey, taskRevision: docTaskRevision } }
       }
     }));
 
@@ -271,6 +283,12 @@ describe('A2A agentic error-fix proposal skill', () => {
         identityChecksum: expect.stringMatching(/^[a-f0-9]{64}$/),
       },
     });
+    expect(result.result.artifacts[0].parts[0].data.contextManifest.identityInput.taskBinding).toMatchObject({
+      logicalTaskKey: docTaskKey,
+      taskRevision: docTaskRevision,
+      sourceFileSha256: `sha256:${'e'.repeat(64)}`,
+      workboardSnapshotSha256: `sha256:${'f'.repeat(64)}`,
+    });
     expect(result.result.artifacts[0].parts[0].data.citations[0]).toMatchObject({
       chunkId: 'chunk-svelte-state-0',
       url: 'https://svelte.dev/docs/svelte/$state',
@@ -283,6 +301,15 @@ describe('A2A agentic error-fix proposal skill', () => {
   });
 
   it('never exposes a manifest or partial citation bodies when official readback is blocked', async () => {
+    const docTaskKey = 'parent-atlas-versioned-doc-intelligence:DOC-15';
+    const docTaskRevision = `sha256:${'d'.repeat(64)}`;
+    readTaskReceipt.mockResolvedValueOnce({ status: 'FOUND', task: {
+      key: docTaskKey, revision: docTaskRevision, checkboxState: 'Open',
+      sourceRef: 'openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L15',
+    }, identity: {
+      logicalTaskKey: docTaskKey, sourceFileSha256: `sha256:${'e'.repeat(64)}`,
+      workboardSnapshotSha256: `sha256:${'f'.repeat(64)}`,
+    } });
     searchDocCorpus.mockResolvedValueOnce({ query: 'test', mode: 'POSTGRES_FTS', hits: [] });
     readVerifiedCanonicalDocChunks.mockResolvedValueOnce({
       status: 'BLOCKED',
@@ -292,7 +319,9 @@ describe('A2A agentic error-fix proposal skill', () => {
     const response = await POST(event({
       id: 'a2a-blocked-doc',
       message: { role: 'user', parts: [{ text: 'test' }] },
-      metadata: { skill: 'external-doc-admitted-context', docQuery: { query: 'test' } },
+      metadata: { skill: 'external-doc-admitted-context', docQuery: { query: 'test', taskRef: {
+        logicalTaskKey: docTaskKey, taskRevision: docTaskRevision,
+      } } },
     }));
     expect(response.status).toBe(200);
     const body = await response.json();
@@ -300,5 +329,20 @@ describe('A2A agentic error-fix proposal skill', () => {
       citationReadbackStatus: 'BLOCKED', contextManifest: null, citations: [],
     });
     expect(runGemma4Agent).not.toHaveBeenCalled();
+  });
+
+  it('rejects a stale or closed task before documentation search', async () => {
+    readTaskReceipt.mockResolvedValueOnce({ status: 'FOUND', task: {
+      key: 'parent-atlas-versioned-doc-intelligence:DOC-15', revision: `sha256:${'1'.repeat(64)}`, checkboxState: 'Checked complete',
+    }, identity: { logicalTaskKey: 'parent-atlas-versioned-doc-intelligence:DOC-15' } });
+    const response = await POST(event({
+      id: 'a2a-stale-doc-task', message: { role: 'user', parts: [{ text: 'find docs' }] },
+      metadata: { skill: 'external-doc-admitted-context', docQuery: { query: 'find docs', taskRef: {
+        logicalTaskKey: 'parent-atlas-versioned-doc-intelligence:DOC-15', taskRevision: `sha256:${'d'.repeat(64)}`,
+      } } },
+    }));
+    expect(response.status).toBe(409);
+    expect(searchDocCorpus).not.toHaveBeenCalled();
+    expect(readVerifiedCanonicalDocChunks).not.toHaveBeenCalled();
   });
 });

@@ -14,9 +14,12 @@
  */
 
 import fs from 'node:fs/promises';
+import { createWriteStream } from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import pg from 'pg';
 import {
   Binary,
@@ -25,6 +28,7 @@ import {
   Float32,
   Int32,
   List,
+  RecordBatchFileWriter,
   Table,
   Utf8,
   tableToIPC,
@@ -39,6 +43,7 @@ const argv = process.argv.slice(2);
 const APPLY = argv.includes('--apply');
 const LIMIT = parseIntegerFlag('--limit', 10_000);
 const OFFSET = parseIntegerFlag('--offset', 0);
+const BATCH_SIZE = Math.max(1, Math.min(2000, parseIntegerFlag('--batch-size', 500)));
 const DEFAULT_OUTPUT = path.join(REPO_ROOT, 'scripts', 'atlas', 'export', 'packets.arrow');
 const OUTPUT_FILE = path.resolve(REPO_ROOT, parseStringFlag('--output', DEFAULT_OUTPUT));
 const INDEX_FILE = replaceExtension(OUTPUT_FILE, '.index.json');
@@ -143,7 +148,7 @@ function selectIf(columns, alias, column, outputAlias = column, cast = '') {
   return `${alias}.${column}${cast} AS ${outputAlias}`;
 }
 
-async function loadRows() {
+async function loadRows(batchLimit = LIMIT, batchOffset = OFFSET) {
   const client = await pool.connect();
   try {
     const packetColumns = await getColumns(client, 'atlas_packets');
@@ -222,7 +227,7 @@ async function loadRows() {
       LIMIT $1 OFFSET $2
     `;
 
-    const result = await client.query(sql, [LIMIT, OFFSET]);
+    const result = await client.query(sql, [batchLimit, batchOffset]);
     return result.rows.map((row) => {
       const embedding768 = parsePgVector(row.embedding_768);
       const semantic768 = embedding768.length === 768 ? embedding768 : [];
@@ -344,43 +349,143 @@ function coverage(rows, predicate) {
 }
 
 async function main() {
-  const rows = await loadRows();
-  const duplicatePacketKeys = rows.length - new Set(rows.map((row) => row.packet_key)).size;
-  const table = makeTable(rows);
-  const ipc = tableToIPC(table, 'file');
-  const splits = Object.fromEntries(['train', 'eval', 'test'].map((split) => [split, coverage(rows, (row) => row.split === split)]));
+  // loadRows orders by packet_key, so a single previous key detects duplicate
+  // joined rows without retaining every key in memory.
+  let previousPacketKey = null;
+  const splits = { train: 0, eval: 0, test: 0 };
+  const coverageCounts = {
+    source_ref: 0,
+    feature_id: 0,
+    feature_label: 0,
+    title_id: 0,
+    tree_node_id: 0,
+    domain_class: 0,
+    feature_evidence: 0,
+    embedding_vector: 0,
+    semantic_768_vector: 0,
+    latent64_blob: 0,
+    topology: 0,
+  };
+  let totalRows = 0;
+  let numCols = 0;
+  let ipcBytes = 0;
+  let duplicatePacketKeys = 0;
+  let indexHandle = null;
+  let indexEntriesWritten = 0;
+  let pendingIndexEntries = [];
+
+  async function flushIndexEntries() {
+    if (!indexHandle || pendingIndexEntries.length === 0) return;
+    const prefix = indexEntriesWritten === 0 ? '' : ',';
+    await indexHandle.write(`${prefix}${pendingIndexEntries.join(',')}`);
+    indexEntriesWritten += pendingIndexEntries.length;
+    pendingIndexEntries = [];
+  }
+
+  async function* generateBatches() {
+    for (let fetched = 0; fetched < LIMIT; ) {
+      const batchLimit = Math.min(BATCH_SIZE, LIMIT - fetched);
+      const batchRows = await loadRows(batchLimit, OFFSET + fetched);
+      if (batchRows.length === 0) break;
+
+      for (const row of batchRows) {
+        if (row.packet_key === previousPacketKey) {
+          duplicatePacketKeys += 1;
+        }
+        previousPacketKey = row.packet_key;
+        if (row.split === 'train' || row.split === 'eval' || row.split === 'test') {
+          splits[row.split] += 1;
+        }
+        if (row.source_ref) coverageCounts.source_ref += 1;
+        if (row.feature_id) coverageCounts.feature_id += 1;
+        if (row.feature_label) coverageCounts.feature_label += 1;
+        if (row.title_id) coverageCounts.title_id += 1;
+        if (row.tree_node_id) coverageCounts.tree_node_id += 1;
+        if (row.domain_class) coverageCounts.domain_class += 1;
+        if (row.used_concepts.length > 0 || row.lexical_features.length > 0 || row.ast_symbols.length > 0) {
+          coverageCounts.feature_evidence += 1;
+        }
+        if (row.primaryVector.length > 0) coverageCounts.embedding_vector += 1;
+        if (row.vectorKind === 'semantic_768') coverageCounts.semantic_768_vector += 1;
+        if (row.latent64?.byteLength) coverageCounts.latent64_blob += 1;
+        if (Number.isFinite(Number(row.som_row)) && Number.isFinite(Number(row.som_col))) {
+          coverageCounts.topology += 1;
+        }
+        if (APPLY) {
+          const indexEntry = {
+            row_index: totalRows,
+            dataset_split: row.split,
+            feature_id: row.feature_id || null,
+            tree_node_id: row.tree_node_id || null,
+            representation_id: row.representation_id || null,
+          };
+          pendingIndexEntries.push(`${JSON.stringify(row.packet_key)}:${JSON.stringify(indexEntry)}`);
+          if (pendingIndexEntries.length >= 256) await flushIndexEntries();
+        }
+        totalRows += 1;
+      }
+
+      if (duplicatePacketKeys > 0) {
+        throw new Error(`Refusing export: ${duplicatePacketKeys} duplicate packet_key rows after joins`);
+      }
+
+      const batchTable = makeTable(batchRows);
+      numCols = batchTable.numCols;
+      if (APPLY) {
+        yield* batchTable.batches;
+      } else {
+        ipcBytes += tableToIPC(batchTable, 'file').byteLength;
+      }
+
+      fetched += batchRows.length;
+      if (batchRows.length < batchLimit) break;
+    }
+  }
+
+  if (APPLY) {
+    await fs.mkdir(path.dirname(OUTPUT_FILE), { recursive: true });
+    indexHandle = await fs.open(INDEX_FILE, 'w');
+    try {
+      await indexHandle.write(`{"version":2,"arrow_file":${JSON.stringify(path.basename(OUTPUT_FILE))},"entries":{`);
+      const arrowWriter = RecordBatchFileWriter.throughNode();
+      await pipeline(
+        Readable.from(generateBatches()),
+        arrowWriter,
+        createWriteStream(OUTPUT_FILE),
+      );
+      await flushIndexEntries();
+      await indexHandle.write(`},"total_rows":${totalRows}}\n`);
+    } finally {
+      await indexHandle.close();
+      indexHandle = null;
+    }
+    ipcBytes = (await fs.stat(OUTPUT_FILE)).size;
+  } else {
+    for await (const _ of generateBatches()) {
+      // dry-run accumulates counts and byte estimates batch-by-batch
+    }
+  }
+
   const report = {
     generated_at: new Date().toISOString(),
     mode: APPLY ? 'apply' : 'dry-run',
-    inputs: { limit: LIMIT, offset: OFFSET },
+    inputs: { limit: LIMIT, offset: OFFSET, batch_size: BATCH_SIZE },
     outputs: {
       arrow_ipc: path.relative(REPO_ROOT, OUTPUT_FILE).replace(/\\/g, '/'),
       row_index: path.relative(REPO_ROOT, INDEX_FILE).replace(/\\/g, '/'),
       report_json: path.relative(REPO_ROOT, REPORT_FILE).replace(/\\/g, '/'),
     },
-      summary: {
-        rows: rows.length,
-        columns: table.numCols,
-        ipc_bytes: ipc.byteLength,
+    summary: {
+      rows: totalRows,
+      columns: numCols,
+      ipc_bytes: ipcBytes,
       duplicate_packet_keys: duplicatePacketKeys,
       splits,
-      coverage: {
-        source_ref: coverage(rows, (row) => Boolean(row.source_ref)),
-        feature_id: coverage(rows, (row) => Boolean(row.feature_id)),
-        feature_label: coverage(rows, (row) => Boolean(row.feature_label)),
-        title_id: coverage(rows, (row) => Boolean(row.title_id)),
-        tree_node_id: coverage(rows, (row) => Boolean(row.tree_node_id)),
-        domain_class: coverage(rows, (row) => Boolean(row.domain_class)),
-        feature_evidence: coverage(rows, (row) => row.used_concepts.length > 0 || row.lexical_features.length > 0 || row.ast_symbols.length > 0),
-        embedding_vector: coverage(rows, (row) => row.primaryVector.length > 0),
-        semantic_768_vector: coverage(rows, (row) => row.vectorKind === 'semantic_768'),
-        latent64_blob: coverage(rows, (row) => Boolean(row.latent64?.byteLength)),
-        topology: coverage(rows, (row) => Number.isFinite(Number(row.som_row)) && Number.isFinite(Number(row.som_col))),
-      },
+      coverage: coverageCounts,
     },
     contract: {
       canonical_store: 'postgres',
-      batch_transport: 'apache_arrow_ipc_file',
+      batch_transport: 'apache_arrow_ipc_file_streaming',
       hot_packet_transport: 'msgpack_mmap_registry',
       semantic_representation: 'semantic_768',
       vector_encoding: 'little_endian_float32',
@@ -388,28 +493,6 @@ async function main() {
       split_semantics: 'sha256_packet_key_80_10_10',
     },
   };
-
-  if (duplicatePacketKeys > 0) {
-    throw new Error(`Refusing export: ${duplicatePacketKeys} duplicate packet_key rows after joins`);
-  }
-
-  if (APPLY) {
-    await fs.mkdir(path.dirname(OUTPUT_FILE), { recursive: true });
-    await fs.writeFile(OUTPUT_FILE, Buffer.from(ipc));
-    const index = {
-      version: 2,
-      arrow_file: path.basename(OUTPUT_FILE),
-      total_rows: rows.length,
-      entries: Object.fromEntries(rows.map((row, rowIndex) => [row.packet_key, {
-        row_index: rowIndex,
-        dataset_split: row.split,
-        feature_id: row.feature_id || null,
-        tree_node_id: row.tree_node_id || null,
-        representation_id: row.representation_id || null,
-      }])),
-    };
-    await fs.writeFile(INDEX_FILE, `${JSON.stringify(index, null, 2)}\n`, 'utf8');
-  }
 
   await fs.mkdir(path.dirname(REPORT_FILE), { recursive: true });
   await fs.writeFile(REPORT_FILE, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
@@ -421,4 +504,6 @@ main()
     console.error('[arrow-batch-export] failed:', error?.stack || error?.message || String(error));
     process.exitCode = 1;
   })
-  .finally(() => pool.end());
+  .finally(async () => {
+    await pool.end();
+  });

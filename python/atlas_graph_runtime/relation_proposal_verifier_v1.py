@@ -17,7 +17,10 @@ from typing import Any, Callable, Mapping, Sequence
 
 _SHA256_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 _SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
-ALLOWED_PREDICATES = frozenset({"IMPORTS", "CALLS", "EXTENDS", "USES_API", "CONFIGURES", "TESTS"})
+ALLOWED_PREDICATES = frozenset({
+    "IMPORTS", "CALLS", "EXTENDS", "USES_API", "CONFIGURES", "TESTS",
+    "COMPILES_TO", "TARGETS_PLATFORM",
+})
 
 
 def verify_relation_proposal_v1(
@@ -83,11 +86,36 @@ def verify_relation_proposal_v1(
     if actual_slice != exact_text:
         return {"accepted": False, "failure": "SPAN_BYTE_MISMATCH", "proposal": None, "canonicalAuthority": False, "writesPerformed": False}
 
-    suggestions: list[dict[str, Any]] = []
+    subject_suggestions: list[dict[str, Any]] = []
+    object_suggestions: list[dict[str, Any]] = []
     if oak_suggest_fn is not None:
-        suggestions = list(oak_suggest_fn(obj) or [])
+        subject_suggestions = list(oak_suggest_fn(subject) or [])
+        object_suggestions = list(oak_suggest_fn(obj) or [])
 
-    mapping_status = "OAK_SUGGESTED_PENDING_REVIEW" if suggestions else "UNRESOLVED"
+    def has_concept_candidate(items: Sequence[Mapping[str, Any]]) -> bool:
+        for item in items:
+            bundle = item.get("candidateBundle")
+            if isinstance(bundle, Mapping) and isinstance(bundle.get("concepts"), list) and bundle["concepts"]:
+                return True
+            matches = item.get("matches")
+            if isinstance(matches, list) and any(
+                isinstance(match, Mapping) and bool(match.get("externalIds"))
+                for match in matches
+            ):
+                return True
+            if item.get("conceptId") or item.get("externalId"):
+                return True
+        return False
+
+    subject_has_candidate = has_concept_candidate(subject_suggestions)
+    object_has_candidate = has_concept_candidate(object_suggestions)
+    mapping_status = (
+        "OAK_ENDPOINTS_SUGGESTED_PENDING_REVIEW"
+        if subject_has_candidate and object_has_candidate
+        else "PARTIAL_OAK_SUGGESTIONS"
+        if subject_has_candidate or object_has_candidate
+        else "UNRESOLVED"
+    )
     out_proposal = {
         "chunkId": chunk_id,
         "sourceRef": source_ref,
@@ -105,7 +133,9 @@ def verify_relation_proposal_v1(
         "extractorVersion": extractor_ver,
         "status": "PROPOSED",
         "mappingStatus": mapping_status,
-        "oakSuggestions": suggestions,
+        "oakSuggestions": object_suggestions,
+        "subjectOakSuggestions": subject_suggestions,
+        "objectOakSuggestions": object_suggestions,
         "spanVerified": True,
         "spanVerificationBasis": "EXACT_CHUNK_BYTES",
         "sourceContentHashStatus": source_hash_status,

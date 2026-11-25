@@ -1,11 +1,11 @@
 # Parent Atlas Training Readiness
 
-Generated: 2026-11-02T00:27:11.668Z
+Generated: 2026-11-24T00:54:43.450Z
 Overall: READY_WITH_BLOCKERS
 
 ## Executive Summary
 
-- Snapshot: 2026-11-02T00:27:11.668Z; these are recorded counts, not a live refresh.
+- Snapshot: 2026-11-24T00:54:43.450Z; these are recorded counts, not a live refresh.
 - Packets: 61,718 total; summaries 6,886 (11.1572%), versus the 95% summary gate.
 - Embeddings: 61,659 of 61,718 (99.9044%); feature labels 61,660 of 61,718.
 - AST: active-code gate PASS (96.3061% (9125/9475) [raw: 62.0629%]); raw corpus coverage 62.0629%.

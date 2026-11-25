@@ -4,18 +4,32 @@
 // Baseline: canonical content_embedding_768 on the SAME chunk subset, queried with the
 // canonical Ollama embeddinggemma:latest path (no prefixes), so both sides see the same corpus.
 // Usage (from sveltekit-frontend/): npx tsx ../scripts/atlas/eval-eg2-known-item-v1.mts [queries=100]
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { createEmbeddingGemma2ChallengerExecutorV1, EMBEDDINGGEMMA2_CHALLENGER_MODEL_REVISION } from '../../sveltekit-frontend/src/lib/server/atlas/embedding/embeddinggemma2-challenger-executor-v1.ts';
 
 const require = createRequire(path.resolve('package.json'));
 const { Client } = require('pg');
-const queryCount = Number(process.argv[2] ?? 100);
+const args = process.argv.slice(2);
+const queryCount = Number(args.find((arg) => !arg.startsWith('--')) ?? 100);
+if (!Number.isSafeInteger(queryCount) || queryCount < 1 || queryCount > 1_000) {
+  throw new Error('QUERY_COUNT_OUT_OF_RANGE: expected an integer from 1 to 1000');
+}
 const repoRoot = path.resolve('..');
+const outputArg = args.find((arg) => arg.startsWith('--output='))?.slice('--output='.length);
+const out = path.resolve(repoRoot, outputArg ?? path.join('docs', 'reports', `eg2-known-item-eval-${new Date().toISOString().slice(0, 10)}.json`));
+const outputRelative = path.relative(repoRoot, out);
+if (!outputRelative || outputRelative === '..' || outputRelative.startsWith(`..${path.sep}`) || path.isAbsolute(outputRelative)) {
+  throw new Error('REPORT_PATH_OUTSIDE_REPOSITORY');
+}
+if (outputArg && outputRelative !== '.tmp' && !outputRelative.startsWith(`.tmp${path.sep}`)) {
+  throw new Error('CUSTOM_REPORT_PATH_MUST_BE_UNDER_TMP');
+}
 const envLine = readFileSync(path.join(repoRoot, '.env'), 'utf8').split('\n').find((l) => l.startsWith('DATABASE_URL='));
 const client = new Client({ connectionString: envLine!.slice('DATABASE_URL='.length).trim() });
 await client.connect();
+await client.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
 
 const cosine = (a: number[], b: number[]) => {
   let dot = 0, na = 0, nb = 0;
@@ -85,9 +99,10 @@ try {
     canonical: { model: 'embeddinggemma:latest', column: 'codebase_chunk_index.content_embedding_768', recallAt1Pct: pct(tally.canon.r1), recallAt5Pct: pct(tally.canon.r5), recallAt10Pct: pct(tally.canon.r10) },
     canonicalDefaultChanged: false,
   };
-  const out = path.join(repoRoot, 'docs', 'reports', `eg2-known-item-eval-${new Date().toISOString().slice(0, 10)}.json`);
+  mkdirSync(path.dirname(out), { recursive: true });
   writeFileSync(out, JSON.stringify(receipt, null, 2) + '\n');
   console.log(JSON.stringify({ ...receipt, receipt: path.relative(repoRoot, out) }, null, 2));
 } finally {
+  await client.query('ROLLBACK');
   await client.end();
 }

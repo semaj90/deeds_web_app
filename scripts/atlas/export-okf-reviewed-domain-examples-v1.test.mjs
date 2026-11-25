@@ -21,7 +21,7 @@ const rev = `sha256:${crypto.createHash('sha256').update(sourceBytes).digest('he
 
 const good = (over = {}) => ({
   sourceRef: 'src/auth.ts', featureLabel: 'Session guard', textEvidence: 'guards user sessions', sourceRevision: rev,
-  workspaceRevision: 'ws:rev1', reviewedGroup: 'auth', reviewStatus: 'REVIEWED', reviewer: 'a.reviewer', reviewedAt: '2026-11-08T00:00:00Z', ...over,
+  workspaceRevision: 'ws:rev1', reviewedGroup: 'auth', reviewStatus: 'REVIEWED', reviewMethod: 'BLIND_HUMAN_REVIEW_V1', reviewer: 'a.reviewer', reviewedAt: '2026-11-08T00:00:00Z', ...over,
 });
 const run = (rows, extra = {}) => buildReviewedExport({ inputRows: rows, palette, root, ...extra });
 
@@ -40,6 +40,12 @@ test('no reviewed rows -> BLOCKED_NO_REVIEWED_INPUT', () => {
   const { receipt } = run([good({ reviewStatus: 'PROPOSED' })]);
   assert.equal(receipt.status, 'BLOCKED_NO_REVIEWED_INPUT');
   assert.equal(receipt.rejected.NOT_HUMAN_REVIEWED_STATUS, 1);
+});
+
+test('legacy or visible-mode labels are excluded from gold export', () => {
+  const { rows, receipt } = run([good({ reviewMethod: undefined }), good({ reviewMethod: 'VISIBLE_HUMAN_REVIEW' })]);
+  assert.equal(rows.length, 0);
+  assert.equal(receipt.rejected.NOT_BLINDLY_REVIEWED, 2);
 });
 
 test('rejects bot, test and missing reviewers', () => {

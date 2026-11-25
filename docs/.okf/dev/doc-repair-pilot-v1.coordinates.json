@@ -1,0 +1,18 @@
+{
+  "sources": {
+    "postgresql-18-textsearch-functions": {
+      "provider": "postgresql",
+      "product": "postgresql",
+      "productVersion": "18",
+      "versionQualification": "MAJOR_VERSION",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    "sveltekit-2-59-1": {
+      "provider": "svelte",
+      "product": "sveltekit",
+      "productVersion": "2.59.1",
+      "versionQualification": "EXACT_VERSION",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    }
+  }
+}

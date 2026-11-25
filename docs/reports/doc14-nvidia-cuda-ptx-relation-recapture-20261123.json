@@ -1,0 +1,222 @@
+{
+  "ace": {
+    "proofUsable": false,
+    "status": "NOT_ELIGIBLE"
+  },
+  "canonicalAuthority": false,
+  "capture": {
+    "canonicalIndexStatus": "NOT_ADMITTED",
+    "normalizedTextSha256": "494ef3b6ef26440375c9861ce7b02c363d9c01856630d8a009490c7a3cceca35",
+    "normalizedUtf8ByteLength": 12893,
+    "rawHtmlSha256": "63e6666baf0636441e32186ab7cbd7a4618c997fade769b6ffdd01d0aa92e48a",
+    "representation": "BEAUTIFULSOUP_NORMALIZED_HTML_TEXT",
+    "sourceRef": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html"
+  },
+  "existingOntologyRelations": {
+    "canonicalAuthority": false,
+    "mappingCandidates": [],
+    "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+    "producerRevision": "miniforge-nlp-sidecar-v2:sha256:5c2a08fd7606b6472072f43ab284f8b7c9e6cc4ae9f3eecdbc15561e85c6ada7",
+    "relations": [
+      {
+        "candidateId": "oaklib-relation-candidate:ecaebd726ae67ad6d961aaad6f6d5a40",
+        "canonicalAuthority": false,
+        "evidenceRefs": [
+          "oaklib:atlas-local-ontology:relation:ATLASLANG:cuda_cpp|compiles_to|ATLASISA:ptx"
+        ],
+        "objectExternalId": "ATLASISA:ptx",
+        "objectLabel": "PTX Virtual ISA",
+        "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+        "predicateExternalId": "compiles_to",
+        "predicateLabel": "compiles to",
+        "producerRevision": "miniforge-nlp-sidecar-v2:sha256:5c2a08fd7606b6472072f43ab284f8b7c9e6cc4ae9f3eecdbc15561e85c6ada7",
+        "promotionTarget": "HyperedgeV1",
+        "schema": "atlas.oaklib-relation-candidate.v1",
+        "status": "PROPOSED",
+        "subjectExternalId": "ATLASLANG:cuda_cpp",
+        "subjectLabel": "CUDA C++"
+      }
+    ],
+    "status": "OAK_RELATION_PRESENT_PENDING_CANONICAL_REVIEW",
+    "writesPerformed": false
+  },
+  "graphAdmission": {
+    "graphRevision": null,
+    "status": "NOT_ADMITTED"
+  },
+  "ontologyReview": {
+    "objectTermResolutionCandidate": {
+      "candidateConcept": {
+        "candidateId": "oaklib-concept-candidate:edde771b80328dce8324b3ce3c92f904",
+        "canonicalAuthority": false,
+        "description": null,
+        "evidenceRefs": [
+          "oaklib:atlas-local-ontology:entity:ATLASISA:ptx"
+        ],
+        "externalId": "ATLASISA:ptx",
+        "label": "PTX Virtual ISA",
+        "namespace": "external-oaklib",
+        "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+        "producerRevision": "miniforge-nlp-sidecar-v2:sha256:5c2a08fd7606b6472072f43ab284f8b7c9e6cc4ae9f3eecdbc15561e85c6ada7",
+        "schema": "atlas.oaklib-concept-candidate.v1",
+        "status": "PROPOSED"
+      },
+      "canonicalAuthority": false,
+      "evidenceSpans": [
+        {
+          "endByte": 3535,
+          "evidenceKey": "acronym_expansion",
+          "exactText": "Parallel Thread Execution\n(PTX)",
+          "spanSha256": "ce12122e0632685e736bd579b215ff60d5c00a00100397ecc1f92e3def6374ff",
+          "startByte": 3504
+        },
+        {
+          "endByte": 3578,
+          "evidenceKey": "concept_definition",
+          "exactText": "virtual instruction set architecture (ISA)",
+          "spanSha256": "edef3e49aba0aed2724a3a12220b7712d16ac7e101bdd55b600a5e63e2c41411",
+          "startByte": 3536
+        }
+      ],
+      "mentionText": "PTX",
+      "searchLabel": "PTX Virtual ISA",
+      "status": "SUGGESTED_REQUIRES_HUMAN_REVIEW",
+      "writesPerformed": false
+    },
+    "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+    "predicateId": "compiles_to",
+    "reviewRevision": null,
+    "reviewerId": null,
+    "revisionConflict": false,
+    "status": "PARTIAL_SUGGESTIONS_PENDING_HUMAN_MAPPING"
+  },
+  "proposalVerification": {
+    "accepted": true,
+    "canonicalAuthority": false,
+    "failure": null,
+    "proposal": {
+      "canonicalAuthority": false,
+      "chunkId": "external-capture:494ef3b6ef26440375c9861c:cuda-ptx-sentence",
+      "chunkSha256": "28f8798192674c204a313503920c77b0439659ca45227097ede45640b5737953",
+      "contentSha256": "63e6666baf0636441e32186ab7cbd7a4618c997fade769b6ffdd01d0aa92e48a",
+      "endByte": 9358,
+      "exactText": "NVRTC can be used to compile CUDA C++ device code to PTX at runtime.",
+      "extractorVersion": "official-doc-sentence-rule-v1",
+      "mappingStatus": "PARTIAL_OAK_SUGGESTIONS",
+      "oakSuggestions": [
+        {
+          "candidateBundle": {
+            "canonicalAuthority": false,
+            "concepts": [],
+            "mappingCandidates": [],
+            "mappingProviderStatus": "AVAILABLE",
+            "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+            "producerRevision": "miniforge-nlp-sidecar-v2:sha256:5c2a08fd7606b6472072f43ab284f8b7c9e6cc4ae9f3eecdbc15561e85c6ada7",
+            "relations": [],
+            "schema": "atlas.oaklib-candidate-bundle.v1",
+            "sourceSelector": "atlas-local-ontology"
+          },
+          "canonicalAuthority": false,
+          "matches": [
+            {
+              "externalIds": [],
+              "searchText": "PTX"
+            }
+          ],
+          "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+          "producerRevision": "miniforge-nlp-sidecar-v2:sha256:5c2a08fd7606b6472072f43ab284f8b7c9e6cc4ae9f3eecdbc15561e85c6ada7",
+          "searchText": "PTX",
+          "status": "PROPOSAL_ONLY",
+          "writesPerformed": false
+        }
+      ],
+      "object": "PTX",
+      "objectOakSuggestions": [
+        {
+          "candidateBundle": {
+            "canonicalAuthority": false,
+            "concepts": [],
+            "mappingCandidates": [],
+            "mappingProviderStatus": "AVAILABLE",
+            "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+            "producerRevision": "miniforge-nlp-sidecar-v2:sha256:5c2a08fd7606b6472072f43ab284f8b7c9e6cc4ae9f3eecdbc15561e85c6ada7",
+            "relations": [],
+            "schema": "atlas.oaklib-candidate-bundle.v1",
+            "sourceSelector": "atlas-local-ontology"
+          },
+          "canonicalAuthority": false,
+          "matches": [
+            {
+              "externalIds": [],
+              "searchText": "PTX"
+            }
+          ],
+          "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+          "producerRevision": "miniforge-nlp-sidecar-v2:sha256:5c2a08fd7606b6472072f43ab284f8b7c9e6cc4ae9f3eecdbc15561e85c6ada7",
+          "searchText": "PTX",
+          "status": "PROPOSAL_ONLY",
+          "writesPerformed": false
+        }
+      ],
+      "predicate": "COMPILES_TO",
+      "sourceContentHashStatus": "REHASHED_MATCH",
+      "sourceRef": "https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html",
+      "sourceRevision": "sha256:494ef3b6ef26440375c9861ce7b02c363d9c01856630d8a009490c7a3cceca35",
+      "spanVerificationBasis": "EXACT_CHUNK_BYTES",
+      "spanVerified": true,
+      "startByte": 9290,
+      "status": "PROPOSED",
+      "subject": "CUDA C++",
+      "subjectOakSuggestions": [
+        {
+          "candidateBundle": {
+            "canonicalAuthority": false,
+            "concepts": [
+              {
+                "candidateId": "oaklib-concept-candidate:acdb030bfeccca2027c608cdac05c190",
+                "canonicalAuthority": false,
+                "description": null,
+                "evidenceRefs": [
+                  "oaklib:atlas-local-ontology:entity:ATLASLANG:cuda_cpp"
+                ],
+                "externalId": "ATLASLANG:cuda_cpp",
+                "label": "CUDA C++",
+                "namespace": "external-oaklib",
+                "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+                "producerRevision": "miniforge-nlp-sidecar-v2:sha256:5c2a08fd7606b6472072f43ab284f8b7c9e6cc4ae9f3eecdbc15561e85c6ada7",
+                "schema": "atlas.oaklib-concept-candidate.v1",
+                "status": "PROPOSED"
+              }
+            ],
+            "mappingCandidates": [],
+            "mappingProviderStatus": "AVAILABLE",
+            "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+            "producerRevision": "miniforge-nlp-sidecar-v2:sha256:5c2a08fd7606b6472072f43ab284f8b7c9e6cc4ae9f3eecdbc15561e85c6ada7",
+            "relations": [],
+            "schema": "atlas.oaklib-candidate-bundle.v1",
+            "sourceSelector": "atlas-local-ontology"
+          },
+          "canonicalAuthority": false,
+          "matches": [
+            {
+              "externalIds": [
+                "ATLASLANG:cuda_cpp"
+              ],
+              "searchText": "CUDA C++"
+            }
+          ],
+          "ontologyRevision": "sha256:8e651ef5bd4d0f8c702a7dd751687bf912fdbe470f198ae6e41b5248517cb14c",
+          "producerRevision": "miniforge-nlp-sidecar-v2:sha256:5c2a08fd7606b6472072f43ab284f8b7c9e6cc4ae9f3eecdbc15561e85c6ada7",
+          "searchText": "CUDA C++",
+          "status": "PROPOSAL_ONLY",
+          "writesPerformed": false
+        }
+      ],
+      "writesPerformed": false
+    },
+    "writesPerformed": false
+  },
+  "schema": "atlas.doc14-relation-review-candidate.v1",
+  "status": "PROPOSAL_ONLY",
+  "writesPerformed": false
+}

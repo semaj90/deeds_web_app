@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-02T00:27:11.668Z",
+  "generated_at": "2026-11-24T00:54:43.450Z",
   "overall_status": "READY_WITH_BLOCKERS",
   "database": {
     "packets": {
@@ -158,12 +158,12 @@
     {
       "lane": "QLoRA semantic training corpus",
       "status": "WIRED_BLOCKED",
-      "evidence": "summary gate FAIL (11.1572%); active-code AST gate PASS (96.3061% (9125/9475) [raw: 62.0629%]); dataset readiness only, not training completion"
+      "evidence": "summary gate FAIL (11.1572%); active-code AST gate PASS (96.3061% active, 62.0629% raw); dataset readiness only"
     },
     {
       "lane": "Packet-JEPA",
       "status": "BLOCKED",
-      "evidence": "evaluation missing"
+      "evidence": "evaluation missing; promotion unverified"
     },
     {
       "lane": "native CUDA addon",

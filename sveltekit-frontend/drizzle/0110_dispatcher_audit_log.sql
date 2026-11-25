@@ -54,6 +54,12 @@ CREATE INDEX IF NOT EXISTS idx_dispatcher_audit_status
 CREATE INDEX IF NOT EXISTS idx_dispatcher_audit_created_status
   ON dispatcher_audit_log(created_at DESC, status);
 
+CREATE INDEX IF NOT EXISTS idx_dispatcher_audit_packet_status_created
+  ON dispatcher_audit_log(packet_key, status, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_dispatcher_audit_lane_decision_created
+  ON dispatcher_audit_log(identity_lane, dispatch_decision, created_at DESC);
+
 -- JSONB index for mirror_syncs queries
 CREATE INDEX IF NOT EXISTS idx_dispatcher_audit_mirror_syncs
   ON dispatcher_audit_log USING GIN(mirror_syncs);

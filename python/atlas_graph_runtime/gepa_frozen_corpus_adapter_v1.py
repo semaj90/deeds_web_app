@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Callable, Mapping
 from typing import Any
 
 import dspy
@@ -26,6 +27,49 @@ from atlas_graph_runtime.dspy_predict_ace_recommender_v1 import (
 def _sha256_json(obj: Any) -> str:
     raw = json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
     return "sha256:" + hashlib.sha256(raw).hexdigest()
+
+
+def _group_by_candidate_source_overlap_v1(
+    records: list[dict[str, Any]],
+) -> dict[str, list[dict[str, Any]]]:
+    """Keep any two queries sharing a candidate source in the same split group."""
+    parents = list(range(len(records)))
+
+    def find(index: int) -> int:
+        while parents[index] != index:
+            parents[index] = parents[parents[index]]
+            index = parents[index]
+        return index
+
+    def union(left: int, right: int) -> None:
+        left_root, right_root = find(left), find(right)
+        if left_root != right_root:
+            parents[max(left_root, right_root)] = min(left_root, right_root)
+
+    source_owner: dict[str, int] = {}
+    for index, record in enumerate(records):
+        source_refs = {
+            str(candidate.get("sourceRef", "")).strip()
+            for candidate in record.get("candidateContext", [])
+            if str(candidate.get("sourceRef", "")).strip()
+        }
+        if not source_refs:
+            raise ValueError(f"GEPA_CANDIDATE_SOURCE_MISSING:{record.get('queryId', '')}")
+        for source_ref in source_refs:
+            if source_ref in source_owner:
+                union(index, source_owner[source_ref])
+            else:
+                source_owner[source_ref] = index
+
+    components: dict[int, list[dict[str, Any]]] = {}
+    for index, record in enumerate(records):
+        components.setdefault(find(index), []).append(record)
+
+    # The key depends only on sorted query IDs, not input order or DSU roots.
+    return {
+        "\0".join(sorted(str(record["queryId"]) for record in component)): component
+        for component in components.values()
+    }
 
 
 def build_frozen_gepa_corpus_from_replays_v1(
@@ -97,10 +141,9 @@ def build_frozen_gepa_corpus_from_replays_v1(
             }
         )
 
-    # Group by primarySourceRef so chunks from the same file never leak across splits.
-    groups: dict[str, list[dict[str, Any]]] = {}
-    for rec in verified_records:
-        groups.setdefault(rec["primarySourceRef"], []).append(rec)
+    # Group by every source present in candidate context, not only the gold
+    # primary source. Otherwise a distractor file can leak across train/held-out.
+    groups = _group_by_candidate_source_overlap_v1(verified_records)
     sorted_group_keys = sorted(groups.keys())
     if len(sorted_group_keys) < 2:
         raise ValueError("GEPA_HELD_OUT_SPLIT_EMPTY")
@@ -153,20 +196,78 @@ def to_dspy_examples_v1(records: list[dict[str, Any]]) -> list[dspy.Example]:
 def check_gepa_corpus_and_promotion_ready_v1(
     frozen_corpus: dict[str, Any],
     *,
+    expected_corpus_checksum: str,
     program_version: str,
     metric_version: str,
     before_held_out_score: float,
     after_held_out_score: float,
-    approved_by: str | None = None,
+    approval_receipt: Mapping[str, Any] | None = None,
+    approval_verifier: Callable[[Mapping[str, Any], Mapping[str, Any]], bool] | None = None,
 ) -> dict[str, Any]:
     """Check both frozen-split integrity and offline GEPA promotion gate."""
-    counts = frozen_corpus.get("counts") or {}
+    if frozen_corpus.get("schema") != "atlas.gepa-frozen-corpus.v1":
+        raise ValueError("GEPA_CORPUS_SCHEMA_INVALID")
+    if frozen_corpus.get("canonicalAuthority") is not False or frozen_corpus.get("writesPerformed") is not False:
+        raise ValueError("GEPA_CORPUS_AUTHORITY_INVALID")
+    if frozen_corpus.get("hiddenStatePersisted") is not False:
+        raise ValueError("GEPA_HIDDEN_STATE_POLICY_INVALID")
+    splits = frozen_corpus.get("splits")
+    if not isinstance(splits, dict) or set(splits) != {"train", "val", "held_out"}:
+        raise ValueError("GEPA_CORPUS_SPLITS_INVALID")
+    if not isinstance(expected_corpus_checksum, str) or not expected_corpus_checksum.startswith("sha256:"):
+        raise ValueError("GEPA_EXPECTED_CORPUS_CHECKSUM_REQUIRED")
+    actual_checksum = _sha256_json(splits)
+    if (actual_checksum != expected_corpus_checksum
+            or frozen_corpus.get("corpusChecksum") != expected_corpus_checksum):
+        raise ValueError("GEPA_CORPUS_CHECKSUM_MISMATCH")
+
+    split_for_source: dict[str, str] = {}
+    seen_query_ids: set[str] = set()
+    for split_name, records in splits.items():
+        if not isinstance(records, list):
+            raise ValueError("GEPA_CORPUS_SPLIT_ROWS_INVALID")
+        for record in records:
+            query_id = str(record.get("queryId", "")).strip()
+            if not query_id or query_id in seen_query_ids:
+                raise ValueError("GEPA_CORPUS_QUERY_ID_INVALID_OR_DUPLICATE")
+            seen_query_ids.add(query_id)
+            refs = {
+                str(candidate.get("sourceRef", "")).strip()
+                for candidate in record.get("candidateContext", [])
+                if str(candidate.get("sourceRef", "")).strip()
+            }
+            if not refs:
+                raise ValueError("GEPA_CANDIDATE_SOURCE_MISSING")
+            for source_ref in refs:
+                previous_split = split_for_source.setdefault(source_ref, split_name)
+                if previous_split != split_name:
+                    raise ValueError("GEPA_SOURCE_LEAKAGE_DETECTED")
+
+    counts = {name: len(rows) for name, rows in splits.items()}
+    if frozen_corpus.get("counts") != counts:
+        raise ValueError("GEPA_CORPUS_COUNTS_MISMATCH")
+    approval_claim = {
+        "datasetChecksum": expected_corpus_checksum,
+        "programVersion": program_version,
+        "metricVersion": metric_version,
+        "beforeHeldOutScore": before_held_out_score,
+        "afterHeldOutScore": after_held_out_score,
+    }
+    approved_by: str | None = None
+    if (approval_receipt is not None and approval_verifier is not None
+            and approval_receipt.get("schema") == "atlas.gepa-promotion-approval.v1"
+            and approval_receipt.get("decision") == "APPROVE"
+            and approval_receipt.get("reviewerRef")
+            and approval_receipt.get("approvalEvidenceRef")
+            and all(approval_receipt.get(key) == value for key, value in approval_claim.items())
+            and approval_verifier(approval_receipt, approval_claim) is True):
+        approved_by = str(approval_receipt["reviewerRef"])
     return evaluate_gepa_offline_promotion_gate_v1(
         dataset_checksum=str(frozen_corpus["corpusChecksum"]),
         program_version=program_version,
         metric_version=metric_version,
-        train_count=int(counts.get("train", 0)),
-        held_out_count=int(counts.get("held_out", 0)),
+        train_count=counts["train"],
+        held_out_count=counts["held_out"],
         before_held_out_score=before_held_out_score,
         after_held_out_score=after_held_out_score,
         approved_by=approved_by,

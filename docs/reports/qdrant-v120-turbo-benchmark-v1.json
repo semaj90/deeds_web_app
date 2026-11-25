@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.qdrant-v120-turbo-benchmark.v1",
+  "corpus_size": 200,
+  "query_count": 50,
+  "top_k": 10,
+  "canonical_authority": false,
+  "writes_performed": false,
+  "results": {
+    "float32": {
+      "recall_at_10": 1.0,
+      "mrr": 1.0,
+      "p50_ms": 15.363,
+      "p95_ms": 24.676
+    },
+    "turbo16": {
+      "recall_at_10": 1.0,
+      "mrr": 1.0,
+      "p50_ms": 3.661,
+      "p95_ms": 23.705
+    },
+    "turbo8": {
+      "recall_at_10": 0.998,
+      "mrr": 1.0,
+      "p50_ms": 15.355,
+      "p95_ms": 25.301
+    }
+  }
+}

@@ -3,7 +3,10 @@ import {
   EMBEDDINGGEMMA2_CHALLENGER_EXECUTOR_ID,
   EMBEDDINGGEMMA2_CHALLENGER_MODEL,
   EMBEDDINGGEMMA2_CHALLENGER_MODEL_REVISION,
+  EMBEDDINGGEMMA2_ONNX_8094_EXECUTOR_ID,
+  EMBEDDINGGEMMA2_ONNX_8094_MODEL_REVISION,
   createEmbeddingGemma2ChallengerExecutorV1,
+  createEmbeddingGemma2Onnx8094ExecutorV1,
 } from './embeddinggemma2-challenger-executor-v1.js';
 import { embedEmbeddingGemmaTaskV1 } from './embeddinggemma-task-runtime-v1.js';
 
@@ -91,6 +94,30 @@ describe('EmbeddingGemma 2 challenger executor (Ollama Q8_0)', () => {
     expect(result.persistencePerformed).toBe(false);
     expect(result.canonicalDefaultChanged).toBe(false);
     expect(JSON.stringify(result.lineage)).not.toContain('"representationId":"semantic_768"');
+  });
+});
+
+describe('EmbeddingGemma 2 ONNX :8094 executor', () => {
+  it('posts texts + dims:[768] to :8094/embed and normalizes the 768D vector', async () => {
+    const calls: { url: string; body: unknown }[] = [];
+    const raw = Array.from({ length: 768 }, (_, i) => (i === 0 ? 3 : i === 1 ? 4 : 0));
+    const fetchImpl = (async (url: string | URL | Request, init?: RequestInit) => {
+      calls.push({ url: String(url), body: JSON.parse(String(init?.body ?? '{}')) });
+      return new Response(JSON.stringify({ embeddings: { '768': [raw] } }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    }) as typeof fetch;
+
+    const executor = createEmbeddingGemma2Onnx8094ExecutorV1({ endpoint: 'http://onnx8094.test', fetchImpl });
+    const res = await executor.embedNative768('search_runtime_fusion');
+    expect(calls).toHaveLength(1);
+    expect(calls[0].url).toBe('http://onnx8094.test/embed');
+    expect(calls[0].body).toEqual({ texts: ['search_runtime_fusion'], dims: [768] });
+    expect(res.executor).toBe(EMBEDDINGGEMMA2_ONNX_8094_EXECUTOR_ID);
+    expect(res.modelRevision).toBe(EMBEDDINGGEMMA2_ONNX_8094_MODEL_REVISION);
+    expect(res.vector[0]).toBeCloseTo(0.6, 5);
+    expect(res.vector[1]).toBeCloseTo(0.8, 5);
   });
 });
 

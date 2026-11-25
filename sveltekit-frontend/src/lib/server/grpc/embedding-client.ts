@@ -67,7 +67,7 @@ export interface EmbeddingOptions {
 // `onnx-local` remains a legacy receipt/cache label only. This canonical
 // generator no longer emits it; ONNX is available through the explicit
 // non-canonical challenger API in canonical-embed.ts.
-type EmbeddingSource = 'grpc' | 'quic' | 'http-ollama' | 'http-ollama-sequential' | 'http-openai-compatible' | 'onnx-local' | 'cache';
+type EmbeddingSource = 'grpc' | 'quic' | 'http-ollama' | 'http-ollama-sequential' | 'http-openai-compatible' | 'onnx-8094' | 'onnx-local' | 'cache';
 
 export type EmbeddingAttemptStatus = 'success' | 'failed' | 'skipped' | 'cache-hit';
 
@@ -433,6 +433,38 @@ async function generateViaLlamaEmbed(
     const vectors = data.data.map((d) => d.embedding ?? []);
     // Fail-closed: wrong dimension, non-finite values, or a zero/degenerate
     // norm all disqualify — not just the plain dimension check.
+    if (vectors.some((v) => !checkVectorShapeV1(v).ok)) return null;
+    return vectors;
+  } catch {
+    return null;
+  }
+}
+
+async function generateViaEg2Onnx8094(
+  texts: string[],
+): Promise<number[][] | null> {
+  const explicitUrl = process.env.GEMMA2_ONNX_URL?.trim();
+  const preferEg2 =
+    Boolean(explicitUrl) ||
+    process.env.PREFER_EG2_ONNX_8094 === 'true' ||
+    (!process.env.VITEST && !ENV.OLLAMA_BASE_URL?.includes('.invalid'));
+  if (!preferEg2 || process.env.PREFER_EG2_ONNX_8094 === 'false') return null;
+
+  const endpoint = (explicitUrl || 'http://127.0.0.1:8094').replace(/\/+$/, '');
+  try {
+    const { checkVectorShapeV1 } = await import(
+      '$lib/server/embedding/embedding-provider-v1.js'
+    );
+    const res = await fetch(`${endpoint}/embed`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texts, dims: [768] }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { embeddings?: Record<string, number[][]> };
+    const vectors = data.embeddings?.['768'];
+    if (!Array.isArray(vectors) || vectors.length !== texts.length) return null;
     if (vectors.some((v) => !checkVectorShapeV1(v).ok)) return null;
     return vectors;
   } catch {
@@ -943,6 +975,23 @@ export async function generateEmbeddings(
           durationMs: Math.round(performance.now() - llamaStart),
         });
       }
+    }
+  }
+
+  // Tier 0.5: :8094 EmbeddingGemma 2 ONNX service (fast local 768-dim batch)
+  if (!newVectors) {
+    const eg2Start = performance.now();
+    const eg2Vecs = await generateViaEg2Onnx8094(uncachedTexts);
+    if (eg2Vecs) {
+      newVectors = eg2Vecs;
+      source = 'onnx-8094';
+      model = 'onnx-community/embeddinggemma2-q8';
+      attempts.push({
+        transport: 'onnx-8094',
+        status: 'success',
+        detail: 'EG2 ONNX :8094 /embed',
+        durationMs: Math.round(performance.now() - eg2Start),
+      });
     }
   }
 

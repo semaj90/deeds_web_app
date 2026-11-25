@@ -1,0 +1,36 @@
+{
+  "canonical_authority": false,
+  "fetched_at": "2026-11-25T01:51:26.411233Z",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2\\sveltekit-llms-txt\\raw\\svelte.dev-docs-kit-llms.txt.md",
+  "metadata": {
+    "parser": "html.parser",
+    "parserVersion": "4.15.0",
+    "structured": true
+  },
+  "normalized_artifact_checksum": "d866b2f49b60a5d4e3f27f5e590c75f6e6bf9fcf067f2d10e75c5b631290718e",
+  "normalized_checksum": "d866b2f49b60a5d4e3f27f5e590c75f6e6bf9fcf067f2d10e75c5b631290718e",
+  "normalized_markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2\\sveltekit-llms-txt\\raw\\svelte.dev-docs-kit-llms.txt.83f10876b72f.normalized.md",
+  "outgoing_urls": [
+    "https://svelte.dev/",
+    "https://svelte.dev/about",
+    "https://svelte.dev/blog/hello-world",
+    "https://svelte.dev/blog/{next.slug}",
+    "https://svelte.dev/blog/{post.slug}",
+    "https://svelte.dev/blog/{slug}",
+    "https://svelte.dev/docs/",
+    "https://svelte.dev/docs/kit/...",
+    "https://svelte.dev/photos/{thumbnail.id}",
+    "https://svelte.dev/projects/{project.id}",
+    "https://svelte.dev/settings",
+    "https://svelte.dev/settings/{section.slug}"
+  ],
+  "raw_checksum": "a290364baabf966041b09bbd8474e3e9abcc8e3eeb7ae871424d72a3bb42fe54",
+  "requested_url": "https://svelte.dev/docs/kit/llms.txt",
+  "resolved_url": "https://svelte.dev/docs/kit/llms.txt",
+  "retrieved_at": "2026-11-25T01:51:26.411233Z",
+  "source_id": "sveltekit-llms-txt",
+  "source_revision": "sha256:ad759791b71a11a93b1e00c6fc57c7a824354a27734f2a85287b24af5b2b7457",
+  "text": null,
+  "title": "{page.data.title}"
+}

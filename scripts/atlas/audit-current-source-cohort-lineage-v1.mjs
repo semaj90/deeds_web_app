@@ -117,7 +117,9 @@ const resultRows = rows.map((row) => {
   const ref = String(row.relativePath ?? '').replaceAll('\\', '/').toLowerCase();
   const matches = [...(byRef.get(ref) ?? []), ...(byRef.get(`sveltekit-frontend/${ref}`) ?? [])];
   const unique = [...new Map(matches.map((match) => [JSON.stringify(match), match])).values()];
-  const current = unique.filter((match) => match.workspace_revision === currentWorkspaceRevision && String(match.workspace_revision ?? '').startsWith('sha256:'));
+  const current = currentWorkspaceRevision === null
+    ? null
+    : unique.filter((match) => match.workspace_revision === currentWorkspaceRevision && String(match.workspace_revision ?? '').startsWith('sha256:'));
   const expectedSourceRevision = String(row.sourceRevision ?? '').trim();
   const expectedContentHash = String(row.filesystemHash ?? '').trim().toLowerCase().replace(/^sha256:/, '');
   const qualified = unique.filter((match) => {
@@ -127,23 +129,27 @@ const resultRows = rows.map((row) => {
       && (!expectedSourceRevision || actualRevision === expectedSourceRevision)
       && (!expectedContentHash || actualHash === expectedContentHash);
   });
-  const workspaceQualified = qualified.filter((match) => match.workspace_revision === currentWorkspaceRevision && String(match.workspace_revision ?? '').startsWith('sha256:'));
+  const workspaceQualified = currentWorkspaceRevision === null
+    ? null
+    : qualified.filter((match) => match.workspace_revision === currentWorkspaceRevision && String(match.workspace_revision ?? '').startsWith('sha256:'));
   return {
     relativePath: row.relativePath,
     graphifyRows: unique.length,
-    currentWorkspaceRows: current.length,
+    currentWorkspaceRows: current?.length ?? null,
     sourceRevisionQualifiedRows: qualified.length,
     revisionQualifiedRows: qualified.length,
-    workspaceRevisionQualifiedRows: workspaceQualified.length,
+    workspaceRevisionQualifiedRows: workspaceQualified?.length ?? null,
     sourceRevision: qualified[0]?.code_source_revision ?? qualified[0]?.source_revision ?? row.sourceRevision ?? null,
     workspaceRevision: qualified[0]?.workspace_revision ?? null,
-    classification: qualified.length === 1 && workspaceQualified.length === 1
+    classification: qualified.length === 1 && workspaceQualified?.length === 1
       ? 'CURRENT_REVISION_QUALIFIED'
-      : qualified.length === 1
-        ? 'SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH'
+      : qualified.length === 1 && currentWorkspaceRevision === null
+        ? 'SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN'
+        : qualified.length === 1
+          ? 'SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH'
         : unique.length === 0
           ? 'GRAPHIFY_SOURCE_MISSING'
-          : current.length === 0
+          : currentWorkspaceRevision !== null && current.length === 0
             ? 'WORKSPACE_REVISION_MISMATCH'
             : 'AMBIGUOUS_REVISION_BINDING',
   };
@@ -152,19 +158,29 @@ const counts = {
   cohortRows: resultRows.length,
   currentWorkspaceRevision,
   liveBindingWorkspaceRevisions,
-  workspaceRevisionSourceAligned: liveBindingWorkspaceRevisions.length === 1
-    && liveBindingWorkspaceRevisions[0] === currentWorkspaceRevision,
+  workspaceRevisionSourceAligned: currentWorkspaceRevision === null
+    ? null
+    : liveBindingWorkspaceRevisions.length === 1 && liveBindingWorkspaceRevisions[0] === currentWorkspaceRevision,
   graphifyMatched: resultRows.filter((row) => row.graphifyRows > 0).length,
-  currentWorkspaceMatched: resultRows.filter((row) => row.currentWorkspaceRows > 0).length,
+  currentWorkspaceMatched: currentWorkspaceRevision === null
+    ? null
+    : resultRows.filter((row) => row.currentWorkspaceRows > 0).length,
+  workspaceCurrentnessUnknown: currentWorkspaceRevision === null
+    ? resultRows.filter((row) => row.sourceRevisionQualifiedRows > 0).length
+    : 0,
   sourceRevisionQualified: resultRows.filter((row) => row.sourceRevisionQualifiedRows > 0).length,
   revisionQualified: resultRows.filter((row) => row.classification === 'CURRENT_REVISION_QUALIFIED').length,
-  workspaceMismatchAfterSourceQualification: resultRows.filter((row) => row.classification === 'SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH').length,
+  workspaceMismatchAfterSourceQualification: currentWorkspaceRevision === null
+    ? null
+    : resultRows.filter((row) => row.classification === 'SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH').length,
   missing: resultRows.filter((row) => row.classification === 'GRAPHIFY_SOURCE_MISSING').length,
   mismatched: resultRows.filter((row) => row.classification === 'WORKSPACE_REVISION_MISMATCH').length,
   ambiguous: resultRows.filter((row) => row.classification === 'AMBIGUOUS_REVISION_BINDING').length,
 };
 const laterStatus = earlyStatus ?? (error
   ? 'LINEAGE_AUDIT_ERROR'
+  : currentWorkspaceRevision === null
+    ? 'WORKSPACE_CURRENTNESS_UNAVAILABLE'
   : !counts.workspaceRevisionSourceAligned
     ? 'WORKSPACE_REVISION_SOURCE_MISMATCH'
   : counts.revisionQualified > 0
@@ -178,6 +194,8 @@ const laterNextGate = earlyStatus === 'CURRENT_WORKSPACE_FRAME_UNRESOLVED'
     ? 'CURRENT_WORKSPACE_FRAME_CONFLICT_RECONCILIATION_REQUIRED'
       : earlyStatus === 'CURRENT_WORKSPACE_FRAME_NON_AUTHORITATIVE'
       ? 'CURRENT_WORKSPACE_FRAME_AUTHORITATIVE_RECEIPT_REQUIRED'
+      : currentWorkspaceRevision === null
+        ? 'WORKSPACE_CURRENTNESS_READBACK_REQUIRED'
       : sourceOwner?.workspace?.admittedSnapshotDelta?.requiresSnapshotRefresh === true
         ? 'CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED'
       : !counts.workspaceRevisionSourceAligned

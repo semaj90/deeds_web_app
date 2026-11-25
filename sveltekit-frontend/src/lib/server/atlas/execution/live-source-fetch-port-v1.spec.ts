@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { createLiveSourceFetchPortV1, LiveSourceFetchPortV1 } from './live-source-fetch-port-v1.js';
 import {
   resolveTopKEvidenceV1,
@@ -25,6 +28,22 @@ describe('LiveSourceFetchPortV1', () => {
     expect(port.readBytes('foo\0bar.ts')).toBeNull();
     expect(port.readBytes('C:/Windows/System32/cmd.exe')).toBeNull();
     expect(port.readBytes('/etc/passwd')).toBeNull();
+  });
+
+  it('rejects a symlink that resolves outside the configured repository root', () => {
+    const tempRoot = mkdtempSync(join(tmpdir(), 'atlas-source-fetch-'));
+    const repositoryRoot = join(tempRoot, 'repo');
+    const siblingRoot = join(tempRoot, 'repo-sibling');
+    mkdirSync(repositoryRoot);
+    mkdirSync(siblingRoot);
+    writeFileSync(join(siblingRoot, 'secret.ts'), 'outside repository');
+    try {
+      symlinkSync(siblingRoot, join(repositoryRoot, 'linked'), process.platform === 'win32' ? 'junction' : 'dir');
+      const port = new LiveSourceFetchPortV1({ baseDirectories: [repositoryRoot] });
+      expect(port.readBytes('linked/secret.ts')).toBeNull();
+    } finally {
+      rmSync(tempRoot, { recursive: true, force: true });
+    }
   });
 
   it('returns null for missing files without throwing', () => {

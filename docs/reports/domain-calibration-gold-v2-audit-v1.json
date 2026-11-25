@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.domain-calibration-gold-v2-audit.v1",
+  "totalRows": 455,
+  "revisionResolution": {
+    "UNRESOLVED": 341,
+    "BINDING_EXACT": 114
+  },
+  "pathCategories": {
+    "EXISTING_SOURCE_FILE": 242,
+    "NOISE_OR_EPHEMERAL": 152,
+    "MISSING_ON_DISK": 61
+  },
+  "evidenceQuality": {
+    "missingEvidence": 313,
+    "scaffoldContaminated": 36,
+    "cleanEvidence": 106
+  },
+  "enrichmentCoverage": {
+    "rgSymbolSupported": 240,
+    "oaklibOboSupported": 386,
+    "oboTermsLoaded": 110,
+    "semantic768VectorPresent": 169,
+    "eg2VectorPresent": 6
+  },
+  "completenessRanker": {
+    "averageScorePct": 52.63,
+    "buckets": {
+      "0_to_25": 189,
+      "26_to_50": 23,
+      "51_to_75": 116,
+      "76_to_100": 127
+    }
+  },
+  "enrichedJsonlPath": "docs/reports/domain-calibration-gold-v2-enriched-v1.jsonl"
+}

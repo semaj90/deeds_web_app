@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { resolve, normalize, isAbsolute } from 'node:path';
+import { readFileSync, realpathSync } from 'node:fs';
+import { resolve, normalize, isAbsolute, relative, sep } from 'node:path';
 import type { CandidateSourceSpanV1, SourceFetchPortV1 } from './topk-evidence-fetch-v1.js';
 
 export interface LiveSourceFetchOptionsV1 {
@@ -47,17 +47,17 @@ export class LiveSourceFetchPortV1 implements SourceFetchPortV1 {
     const normalizedRelative = normalize(sourceRef).replace(/^(\.[\/\\])+/, '');
 
     for (const root of this.searchRoots) {
-      const fullPath = resolve(root, normalizedRelative);
-      // Ensure resolved path stays inside root directory
-      if (!fullPath.startsWith(root)) continue;
-
-      if (existsSync(fullPath)) {
-        try {
-          const buffer = readFileSync(fullPath);
-          return new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-        } catch {
-          return null;
-        }
+      try {
+        const canonicalRoot = realpathSync(root);
+        const canonicalPath = realpathSync(resolve(canonicalRoot, normalizedRelative));
+        const relativePath = relative(canonicalRoot, canonicalPath);
+        // Compare canonical paths so prefix collisions and symlinks cannot escape the root.
+        if (!relativePath || relativePath === '..' || relativePath.startsWith(`..${sep}`) || isAbsolute(relativePath)) continue;
+        const buffer = readFileSync(canonicalPath);
+        return new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+      } catch {
+        // Missing roots/files and non-file targets are not source evidence.
+        continue;
       }
     }
 

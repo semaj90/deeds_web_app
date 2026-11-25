@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS atlas_feature_label_audit (
 
 CREATE INDEX IF NOT EXISTS idx_audit_packet_key ON atlas_feature_label_audit(packet_key);
 CREATE INDEX IF NOT EXISTS idx_audit_mutation_type ON atlas_feature_label_audit(mutation_type);
+CREATE INDEX IF NOT EXISTS idx_audit_feature_mutation_date ON atlas_feature_label_audit(feature_id, mutation_type, repair_date DESC);
 
 -- Record statistics about the mutation for audit trail
 -- (If you have access to the old state, populate this with historical data)

@@ -516,8 +516,7 @@ test('live cards are query-specific, deduplicated per file, ordered by score and
   assert.equal(result.admissionStatus, 'UNADMITTED_RETRIEVAL_CANDIDATES');
   assert.equal(result.retrievalAdmission.proofUsable, false);
   assert.ok(result.warnings.includes('SOME_CARDS_IDENTITY_UNBOUND'));
-  assert.match(result.promptPacket, /packet: packet:aaa/);
-  assert.match(result.promptPacket, /packet: unbound/);
+  assert.equal(result.promptPacket, ''); // unadmitted live hits cannot be formatted as model context
 });
 
 test('live cards retain Qdrant provenance when a lower-scoring semantic hit follows an FTS hit', async () => {
@@ -560,6 +559,22 @@ test('build_recommendation queries live retrieval and only returns revision-boun
   assert.ok(!JSON.stringify(result).includes('caller supplied unverified claim'));
 });
 
+test('build_recommendation rejects source-revision-only packets without a workspace revision', async () => {
+  const trace = fakeTrace({
+    'search.hybrid': () => ({ results: [hit('chunk-1', 'scripts/atlas/owner.mjs', 0.91, 'unqualified snippet', ['postgres_fts'])] }),
+    'atlas.packet_search': ({ source_ref }) => ({ packets: [{
+      packet_key: 'packet:grounded1', source_ref, source_revision: 'sha256:' + 'a'.repeat(64),
+      identity_lane: 'canonical',
+    }] }),
+  });
+  const result = await buildRecommendation({
+    intent: 'repair', domain: 'retrieval', errorSummary: 'repair lookup',
+  }, { trace });
+  assert.deepEqual(result.evidence, []);
+  assert.deepEqual(result.patch_targets, []);
+  assert.equal(result.retrievalEvidenceCount, 0);
+});
+
 test('live binding ignores Qdrant chunk locators when one exact canonical packet is present', async () => {
   const canonical = { ...packet('packet:canonical', 'src/owner.ts', 'a'.repeat(64)), source_revision: `sha256:${'a'.repeat(64)}` };
   const retrievalLocator = { packet_key: 'ace:packet:qdrant', source_ref: 'src/owner.ts', identity_lane: 'qdrant_chunk' };
@@ -574,6 +589,22 @@ test('live binding ignores Qdrant chunk locators when one exact canonical packet
   assert.deepEqual(result.cards[0].packetKeys, ['packet:canonical']);
   assert.deepEqual(result.cards[0].retrievalSources, ['qdrant']);
   assert.ok(!result.cards[0].rejectionReasons.includes('IDENTITY_CONFLICT'));
+});
+
+test('live binding rejects contradictory revisions even when packet keys match', async () => {
+  const trace = fakeTrace({
+    'search.hybrid': () => ({ results: [hit('qdrant:chunk-1', 'src/owner.ts', 0.9, 'candidate', ['qdrant'])] }),
+    'atlas.packet_search': () => ({ packets: [
+      { packet_key: 'packet:owner', source_ref: 'src/owner.ts', identity_lane: 'canonical', source_revision: 'sha256:rev1', workspace_revision: 'sha256:workspace' },
+      { packet_key: 'packet:owner', source_ref: 'src/owner.ts', identity_lane: 'canonical', source_revision: 'sha256:rev2', workspace_revision: 'sha256:workspace' },
+    ] }),
+  });
+  const result = await buildLiveAtlasContext({ query: 'owner', maxCards: 1 }, { trace });
+  assert.equal(result.cards[0].identityBound, false);
+  assert.equal(result.cards[0].identityConflict, true);
+  assert.deepEqual(result.cards[0].identityConflictReasons, ['MULTIPLE_SOURCE_REVISIONS']);
+  assert.equal(result.cards[0].packetKey, null);
+  assert.equal(result.promptPacket, '');
 });
 
 test('different queries produce different candidate sets (the 01B failure no longer reproduces)', async () => {
@@ -762,12 +793,34 @@ test('a path resolves to exactly one packet and is identity-bound but revision-u
 });
 
 test('only an explicit source revision on every packet qualifies the result', async () => {
-  const trace = fakeTrace({ 'atlas.packet_search': () => ({ packets: [inspectPacket('packet:aaa', 'src/a.ts', { source_revision: 'sha256:rev1' })] }) });
+  const trace = fakeTrace({ 'atlas.packet_search': () => ({ packets: [inspectPacket('packet:aaa', 'src/a.ts', { source_revision: 'sha256:rev1', workspace_revision: 'sha256:workspace1' })] }) });
   const result = await findSourceRefs({ refs: ['src/a.ts'] }, { trace });
   assert.equal(result.provenance.status, 'IDENTITY_BOUND_REVISION_QUALIFIED');
   const withChecksumOnly = fakeTrace({ 'atlas.packet_search': () => ({ packets: [inspectPacket('packet:aaa', 'src/a.ts', { sha256: 'abc' })] }) });
   const second = await findSourceRefs({ refs: ['src/a.ts'] }, { trace: withChecksumOnly });
   assert.equal(second.provenance.status, 'IDENTITY_BOUND_REVISION_UNQUALIFIED');
+  const withoutWorkspaceRevision = fakeTrace({ 'atlas.packet_search': () => ({ packets: [inspectPacket('packet:aaa', 'src/a.ts', { source_revision: 'sha256:rev1' })] }) });
+  const third = await findSourceRefs({ refs: ['src/a.ts'] }, { trace: withoutWorkspaceRevision });
+  assert.equal(third.provenance.status, 'IDENTITY_BOUND_REVISION_UNQUALIFIED');
+});
+
+test('same packet key with contradictory revisions is an identity conflict', async () => {
+  const trace = fakeTrace({ 'atlas.packet_search': () => ({ packets: [
+    inspectPacket('packet:aaa', 'src/a.ts', { source_revision: 'sha256:rev1', workspace_revision: 'sha256:workspace1' }),
+    inspectPacket('packet:aaa', 'src/a.ts', { source_revision: 'sha256:rev2', workspace_revision: 'sha256:workspace1' }),
+  ] }) });
+  const result = await findSourceRefs({ refs: ['src/a.ts'] }, { trace });
+  assert.equal(result.inspected[0].status, 'IDENTITY_CONFLICT');
+  assert.deepEqual(result.inspected[0].identityConflictReasons, ['MULTIPLE_SOURCE_REVISIONS']);
+  assert.equal(result.provenance.status, 'UNRESOLVED');
+});
+
+test('identical repeated packet readbacks remain bound and revision-qualified', async () => {
+  const packet = inspectPacket('packet:aaa', 'src/a.ts', { source_revision: 'sha256:rev1', workspace_revision: 'sha256:workspace1' });
+  const trace = fakeTrace({ 'atlas.packet_search': () => ({ packets: [packet, { ...packet }] }) });
+  const result = await findSourceRefs({ refs: ['src/a.ts'] }, { trace });
+  assert.equal(result.inspected[0].status, 'IDENTITY_BOUND');
+  assert.equal(result.provenance.status, 'IDENTITY_BOUND_REVISION_QUALIFIED');
 });
 
 test('two packets for one file is a conflict that is reported, never resolved by picking one', async () => {

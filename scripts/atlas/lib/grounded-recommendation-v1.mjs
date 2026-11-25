@@ -17,8 +17,8 @@ export function buildGroundedRecommendationV1({ intent = 'planning', domain = 'g
     card && card.retrievalUsable === true && card.identityBound === true && !card.identityConflict &&
     typeof card.sourceRef === 'string' && card.sourceRef.length > 0 &&
     Array.isArray(card.packetBindings) && card.packetBindings.length === 1 &&
-    typeof (card.packetBindings[0].sourceRevision ?? card.packetBindings[0].workspaceRevision) === 'string' &&
-    (card.packetBindings[0].sourceRevision ?? card.packetBindings[0].workspaceRevision).length > 0
+    typeof card.packetBindings[0].sourceRevision === 'string' && card.packetBindings[0].sourceRevision.trim().length > 0 &&
+    typeof card.packetBindings[0].workspaceRevision === 'string' && card.packetBindings[0].workspaceRevision.trim().length > 0
   ).slice(0, 8);
 
   const evidence = groundedCards.map((card) => {
@@ -27,7 +27,8 @@ export function buildGroundedRecommendationV1({ intent = 'planning', domain = 'g
       title: String(card.title ?? 'Retrieved source').slice(0, 240),
       summary: String(card.summary ?? '').slice(0, 500),
       source_ref: card.sourceRef,
-      source_revision: binding.sourceRevision ?? binding.workspaceRevision,
+      source_revision: binding.sourceRevision,
+      workspace_revision: binding.workspaceRevision,
       source_sha256: typeof binding.sha256 === 'string' ? binding.sha256 : null,
       packet_key: typeof binding.packetKey === 'string' ? binding.packetKey : null,
       retrieval_sources: Array.isArray(card.retrievalSources) ? card.retrievalSources.slice(0, 4) : [],

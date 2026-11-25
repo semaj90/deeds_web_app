@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import WebGPUTopologyRenderer from '$lib/components/webgpu/WebGPUTopologyRenderer.svelte';
 
 	// Topo class IDs match topology-byte-mapper.ts TOPO_CLASS enum (bits 0-3 of topo_byte)
 	const TOPO_LABELS: Record<number, string> = {
@@ -40,6 +41,68 @@
 	let selectedNode = $state<any>(null);
 	let loading = $state(true);
 	let colorMode = $state<'type' | 'topo' | 'authority'>('topo');
+	let useWebGpuStream = $state(false);
+	let vertexStreamPayload = $state<ArrayBuffer | null>(null);
+	let streamError = $state<string | null>(null);
+	let charProgress = $state(1.0);
+	let revealRafId: number | null = null;
+
+	function replayCharProgress() {
+		if (revealRafId !== null) cancelAnimationFrame(revealRafId);
+		charProgress = 0.0;
+		const start = performance.now();
+		const durationMs = 1200;
+		const step = (now: number) => {
+			const t = Math.min(1, (now - start) / durationMs);
+			charProgress = Number(t.toFixed(3));
+			if (t < 1) {
+				revealRafId = requestAnimationFrame(step);
+			} else {
+				revealRafId = null;
+			}
+		};
+		revealRafId = requestAnimationFrame(step);
+	}
+
+	async function toggleWebGpuStream() {
+		useWebGpuStream = !useWebGpuStream;
+		if (!useWebGpuStream) {
+			if (revealRafId !== null) {
+				cancelAnimationFrame(revealRafId);
+				revealRafId = null;
+			}
+			return;
+		}
+		if (displayNodes.length === 0) return;
+		streamError = null;
+		try {
+			const slice = displayNodes.slice(0, 2048);
+			const total = Math.max(slice.length, 1);
+			const vertices = slice.map((n: any, idx: number) => ({
+				worldX: Number(n.x ?? 0) * 2 - 1,
+				worldY: -(Number(n.y ?? 0) * 2 - 1),
+				manifoldZ: Number(n.z ?? 0),
+				manifoldW: Math.max(0, Math.min(1, Number(n.authority_score ?? 0.5))),
+				tileU: (idx % 16) / 16,
+				tileV: Math.floor(idx / 16) / 16,
+				featureBitmask: Number(n.topo_class ?? 0) >>> 0,
+				charProgress: Math.max(0.1, Math.min(1, (idx + 1) / total)),
+			}));
+			const res = await fetch('/api/atlas/hypergraph/vertex-stream', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					workspaceRevision: String(snapshot?.workspace_revision ?? '74ac7d8983e'),
+					vertices,
+				}),
+			});
+			if (!res.ok) throw new Error(`VERTEX_STREAM_HTTP_${res.status}`);
+			vertexStreamPayload = await res.arrayBuffer();
+			replayCharProgress();
+		} catch (err) {
+			streamError = err instanceof Error ? err.message : String(err);
+		}
+	}
 
 	// Neighborhood search state
 	let filteredView = $state<any[] | null>(null);
@@ -258,6 +321,11 @@
 					>Topo Class</button>
 					<button
 						class="mode-btn"
+						class:active={useWebGpuStream}
+						onclick={toggleWebGpuStream}
+					>{useWebGpuStream ? '2D Canvas' : 'WebGPU 4D Stream'}</button>
+					<button
+						class="mode-btn"
 						class:active={colorMode === 'authority'}
 						onclick={() => { colorMode = 'authority'; }}
 					>Authority Heat</button>
@@ -307,6 +375,17 @@
 					</div>
 				{/if}
 
+				{#if useWebGpuStream}
+					{#if streamError}
+						<div class="filter-bar"><span class="filter-label">Stream error: {streamError}</span></div>
+					{/if}
+					<div class="filter-bar">
+						<span class="filter-label">Stream Reveal (`charProgress`): {Math.round(charProgress * 100)}%</span>
+						<input type="range" min="0" max="1" step="0.01" bind:value={charProgress} aria-label="Topology stream reveal progress" />
+						<button class="filter-clear" onclick={replayCharProgress}>↻ Replay</button>
+					</div>
+					<WebGPUTopologyRenderer nodes={[]} {vertexStreamPayload} {charProgress} width={800} height={600} />
+				{:else}
 				<div class="canvas">
 					{#if showClusters}
 						{#each clusters as c}
@@ -341,6 +420,7 @@
 						</button>
 					{/each}
 				</div>
+				{/if}
 			</div>
 
 			<aside class="inspector card">

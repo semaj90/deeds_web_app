@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.fts-lineage-join-implementation.v1",
+  "status": "LOCAL_IMPLEMENTATION_TESTED_LIVE_DEPLOYMENT_PENDING",
+  "canonicalWritesPerformed": false,
+  "serviceLifecycleActionsPerformed": false,
+  "change": {
+    "owner": "services/go-retrieval-service/main.go:httpSearchBM25",
+    "description": "PostgreSQL FTS results now resolve source identity through atlas_packet_chunk_lineage and atlas_workspace_source_bindings, using the exact chunk-row, repo, source revision, and workspace revision join. The response exposes lineage counts and canonical IDs; identity_status is PASS only for exactly one proven lineage and exactly one exact source binding with SHA-256 content/source/workspace digests.",
+    "failClosedReasons": [
+      "PROVEN_LINEAGE_MISSING_OR_AMBIGUOUS",
+      "SOURCE_BINDING_MISSING_OR_AMBIGUOUS",
+      "ATLAS_FTS_REVISION_INCOMPLETE"
+    ],
+    "citationBoundary": "FTS snippets remain search previews. Exact source-byte and span verification must still run through the existing evidence fetch and ACE ContextManifest path."
+  },
+  "verification": {
+    "command": "go test ./... -run 'TestFTSIdentityStatusRequiresCanonicalLineage|TestCodebaseSourceRevisionFilter' -count=1",
+    "result": "PASS",
+    "goTestExitCode": 0,
+    "gitDiffCheck": "PASS"
+  },
+  "liveState": {
+    "previousReadOnlyBaseline": "951 FTS hits for recommendation evidence; zero had source_revision; 29 also lacked source_ref; Go FTS had zero identity-qualified candidates.",
+    "updatedRuntimeVerified": false,
+    "reason": "The Go service was not rebuilt or restarted; current live endpoint behavior is not claimed to include this local change."
+  },
+  "patchTargets": [
+    "services/go-retrieval-service/main.go",
+    "services/go-retrieval-service/fts_identity_test.go"
+  ],
+  "nextGate": "After operator-controlled deployment of the reviewed Go change, rerun the bounded FTS query and require canonical identity readback, then verify exact source bytes/spans through the existing ACE evidence path."
+}

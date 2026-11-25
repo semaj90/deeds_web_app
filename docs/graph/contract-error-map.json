@@ -1,32 +1,16 @@
 {
-  "generatedAt": "2026-11-19T21:51:35.075Z",
-  "totalFindings": 41,
+  "generatedAt": "2026-11-25T02:27:43.713Z",
+  "totalFindings": 35,
   "nodes": [
     {
       "id": "contract:schema_mismatch",
       "label": "Schema Mismatch",
       "state": "schema_mismatch",
       "severity": "medium",
-      "findingCount": 38,
-      "rootCauseScore": 0.25,
-      "fixOrder": 5
-    },
-    {
-      "id": "contract:route_contract_mismatch",
-      "label": "Route Contract Mismatch",
-      "state": "route_contract_mismatch",
-      "severity": "low",
-      "findingCount": 3,
+      "findingCount": 35,
       "rootCauseScore": 0.2,
-      "fixOrder": 7
+      "fixOrder": 5
     }
   ],
-  "edges": [
-    {
-      "from": "contract:schema_mismatch",
-      "to": "contract:route_contract_mismatch",
-      "weight": 0.85,
-      "label": "85% cascade"
-    }
-  ]
+  "edges": []
 }

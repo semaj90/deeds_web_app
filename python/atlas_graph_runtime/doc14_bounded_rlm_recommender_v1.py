@@ -111,8 +111,20 @@ def _validate_context_manifest_v2(manifest: Mapping[str, Any]) -> dict[str, Any]
         "selectedOrdinalSetChecksum", "evidenceRevisions", "ordinalMapChecksum",
         "retrievalPolicyRevision", "acePlaybookRevision",
     }
-    if not identity_keys.issubset(identity) or set(identity) - identity_keys - {"orderedSelectionChecksum"}:
+    if not identity_keys.issubset(identity) or set(identity) - identity_keys - {"orderedSelectionChecksum", "taskBinding"}:
         raise ValueError("ACE_CONTEXT_MANIFEST_IDENTITY_SHAPE_INVALID")
+    if "taskBinding" in identity:
+        task = identity["taskBinding"]
+        revision_fields = {"taskRevision", "sourceFileSha256", "workboardSnapshotSha256"}
+        if (
+            not isinstance(task, Mapping)
+            or set(task) != revision_fields | {"schema", "logicalTaskKey", "sourceRef"}
+            or task["schema"] != "atlas.documentation-task-binding.v1"
+            or not isinstance(task["logicalTaskKey"], str) or not 1 <= len(task["logicalTaskKey"]) <= 512
+            or not isinstance(task["sourceRef"], str) or not 1 <= len(task["sourceRef"]) <= 1024
+            or any(not isinstance(task[key], str) or not re.fullmatch(r"sha256:[a-f0-9]{64}", task[key]) for key in revision_fields)
+        ):
+            raise ValueError("ACE_CONTEXT_MANIFEST_TASK_BINDING_INVALID")
     revisions = identity.get("evidenceRevisions")
     revision_keys = {
         "sourceRevision", "representationRevision", "featureRevision",

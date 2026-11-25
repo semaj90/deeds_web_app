@@ -21,10 +21,16 @@ import json
 import math
 import sqlite3
 import struct
+import zlib
 from pathlib import Path
 from typing import Any
 
 import pyarrow.ipc as ipc
+
+try:
+    import lz4.frame as _lz4_frame  # type: ignore
+except ImportError:
+    _lz4_frame = None
 
 try:
     import duckdb as _duckdb  # type: ignore
@@ -56,15 +62,38 @@ def _assert_no_forbidden_keys(obj: Any) -> None:
             _assert_no_forbidden_keys(item)
 
 
-def encode_rpc_packet_v1(payload: dict[str, Any]) -> bytes:
-    """Encode a bounded payload into an `ARPC` BYTEA/BLOB packet with SHA-256 checksum."""
+def encode_rpc_packet_v1(payload: dict[str, Any], *, compression: str = "none") -> bytes:
+    """Encode a bounded payload into an `ARPC` BYTEA/BLOB packet with SHA-256 checksum.
+
+    codec_id:
+      0 = raw JSON
+      1 = raw MsgPack
+      2 = zlib-compressed (1B inner codec_id + raw bytes)
+      3 = lz4.frame-compressed (1B inner codec_id + raw bytes) -- requires `lz4` package
+    """
     _assert_no_forbidden_keys(payload)
     if _msgpack is not None:
-        codec_id = 1
-        body = _msgpack.packb(payload, use_bin_type=True)
+        inner_codec = 1
+        raw_body = _msgpack.packb(payload, use_bin_type=True)
     else:
-        codec_id = 0
-        body = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
+        inner_codec = 0
+        raw_body = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
+
+    if compression == "none":
+        codec_id = inner_codec
+        body = raw_body
+    elif compression == "zlib":
+        codec_id = 2
+        body = zlib.compress(bytes([inner_codec]) + raw_body, level=6)
+    elif compression == "lz4":
+        if _lz4_frame is None:
+            # NEXT STEP: `pip install lz4` to enable native LZ4 frame compression on ARPC packets.
+            raise RuntimeError("RPC_LZ4_CODEC_UNAVAILABLE")
+        codec_id = 3
+        body = _lz4_frame.compress(bytes([inner_codec]) + raw_body)
+    else:
+        raise ValueError(f"RPC_COMPRESSION_UNSUPPORTED:{compression}")
+
     digest = hashlib.sha256(body).digest()
     header = struct.pack("<4sBBI", RPC_MAGIC, RPC_VERSION, codec_id, len(body))
     return header + body + digest
@@ -83,14 +112,30 @@ def decode_rpc_packet_v1(blob: bytes) -> dict[str, Any]:
     expected_digest = blob[10 + body_len :]
     if hashlib.sha256(body).digest() != expected_digest:
         raise ValueError("RPC_PACKET_CHECKSUM_MISMATCH")
-    if codec_id == 1:
+
+    if codec_id == 2:
+        decompressed = zlib.decompress(body)
+        if not decompressed:
+            raise ValueError("RPC_ZLIB_BODY_EMPTY")
+        inner_codec, raw_body = decompressed[0], decompressed[1:]
+    elif codec_id == 3:
+        if _lz4_frame is None:
+            raise RuntimeError("RPC_LZ4_CODEC_UNAVAILABLE")
+        decompressed = _lz4_frame.decompress(body)
+        if not decompressed:
+            raise ValueError("RPC_LZ4_BODY_EMPTY")
+        inner_codec, raw_body = decompressed[0], decompressed[1:]
+    else:
+        inner_codec, raw_body = codec_id, body
+
+    if inner_codec == 1:
         if _msgpack is None:
             raise RuntimeError("RPC_MSGPACK_CODEC_UNAVAILABLE")
-        decoded = _msgpack.unpackb(body, raw=False)
-    elif codec_id == 0:
-        decoded = json.loads(body.decode("utf-8"))
+        decoded = _msgpack.unpackb(raw_body, raw=False)
+    elif inner_codec == 0:
+        decoded = json.loads(raw_body.decode("utf-8"))
     else:
-        raise ValueError(f"RPC_CODEC_UNKNOWN:{codec_id}")
+        raise ValueError(f"RPC_CODEC_UNKNOWN:{inner_codec}")
     _assert_no_forbidden_keys(decoded)
     return decoded
 

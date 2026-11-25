@@ -17,6 +17,9 @@
 	let runtimeErrorsRefreshing = $state(false);
 	let runtimeErrorsRefreshFailed = $state(false);
 	let runtimeErrorsUpdatedAt = $state(new Date().toISOString());
+	let runtimeErrorsExporting = $state(false);
+	let runtimeErrorsExportFailed = $state(false);
+	const runtimeErrorExportLimits = [10, 100, 1000] as const;
 
 	$effect(() => {
 		if (data.runtimeErrorPriorities.status) runtimeErrorOverride = null;
@@ -66,37 +69,38 @@
 		window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
 	}
 
-	function exportRuntimeErrorTop100() {
-		const exportedAt = new Date().toISOString();
-		const payload = {
-			schema: 'atlas.runtime-error-priority-batch-export.v1',
-			exportedAt,
-			metadata: {
-				status: runtimeErrorPriorities.status,
-				windowDays: 30,
-				limit: 100,
-				totalRankedGroups: runtimeErrorPriorities.total,
-				exportedGroups: runtimeErrorPriorities.top100.length,
-				sourceTables: ['error_events', 'error_logs'],
-				ordering: ['priorityScore DESC', 'occurrences DESC', 'lastSeen DESC', 'fingerprint ASC'],
-				scoring: 'severity × logarithmic repeat count × 14-day exponential recency decay; diagnostic heuristic only',
-				fullStackTracesIncluded: false,
-				applicationFramesIncluded: true,
-				refreshedAt: runtimeErrorsUpdatedAt,
-			},
-			records: runtimeErrorPriorities.top100.map((record, index) => ({ rank: index + 1, ...record })),
-		};
-		const objectUrl = URL.createObjectURL(
-			new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }),
-		);
-		const link = document.createElement('a');
-		link.href = objectUrl;
-		link.download = `runtime-errors-top100-${exportedAt.replace(/[:.]/g, '-')}.json`;
-		link.hidden = true;
-		document.body.append(link);
-		link.click();
-		link.remove();
-		window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+	async function exportRuntimeErrors(limit: 10 | 100 | 1000) {
+		if (runtimeErrorsExporting) return;
+		runtimeErrorsExporting = true;
+		runtimeErrorsExportFailed = false;
+		try {
+			const response = await fetch(`/api/admin/ai-dashboard/runtime-errors?export=${limit}`, {
+				cache: 'no-store',
+			});
+			if (!response.ok) throw new Error('Runtime error export unavailable');
+			const { export: payload } = await response.json();
+			if (payload?.schema !== 'atlas.runtime-error-priority-batch-export.v1'
+				|| payload.metadata?.limit !== limit
+				|| !Array.isArray(payload.records)
+				|| payload.records.length > limit) {
+				throw new Error('Invalid runtime error export');
+			}
+			const objectUrl = URL.createObjectURL(
+				new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }),
+			);
+			const link = document.createElement('a');
+			link.href = objectUrl;
+			link.download = `runtime-errors-top${limit}-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+			link.hidden = true;
+			document.body.append(link);
+			link.click();
+			link.remove();
+			window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+		} catch {
+			runtimeErrorsExportFailed = true;
+		} finally {
+			runtimeErrorsExporting = false;
+		}
 	}
 
 	function exportSvelteEslintReceipt() {
@@ -264,7 +268,9 @@
 				<div class="runtime-error-controls" aria-label="Runtime error ranking size">
 					<button type="button" aria-pressed={!showAllRuntimeErrors} onclick={() => (showAllRuntimeErrors = false)}>Top 10</button>
 					<button type="button" aria-pressed={showAllRuntimeErrors} onclick={() => (showAllRuntimeErrors = true)}>Top 100</button>
-					<button type="button" disabled={runtimeErrorPriorities.status !== 'AVAILABLE' || runtimeErrorPriorities.top100.length === 0} onclick={exportRuntimeErrorTop100}>Export Top 100 JSON</button>
+					{#each runtimeErrorExportLimits as limit (limit)}
+						<button type="button" disabled={runtimeErrorsExporting} onclick={() => exportRuntimeErrors(limit)}>Export Top {limit} JSON</button>
+					{/each}
 					<button type="button" disabled={runtimeErrorsRefreshing} onclick={() => void refreshRuntimeErrors()}>
 						{runtimeErrorsRefreshing ? 'Refreshing…' : 'Refresh'}
 					</button>
@@ -273,6 +279,9 @@
 			<p class="runtime-error-refresh" aria-live="polite">
 				{runtimeErrorsRefreshFailed ? 'Refresh failed; showing last loaded results.' : `Updated ${new Date(runtimeErrorsUpdatedAt).toLocaleTimeString()} · auto-refresh 15s`}
 			</p>
+			{#if runtimeErrorsExportFailed}
+				<p role="status">Could not export runtime errors. Try again.</p>
+			{/if}
 			{#if runtimeErrorPriorities.status === 'UNAVAILABLE'}
 				<p class="empty-state">Runtime error ranking is unavailable; the task board remains usable.</p>
 			{:else if runtimeErrorPriorities.top100.length === 0}

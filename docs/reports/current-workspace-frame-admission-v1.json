@@ -1,15 +1,15 @@
 {
   "schema": "atlas.current-workspace-frame-receipt.v1",
-  "generatedAt": "2026-10-06T02:54:20.136Z",
+  "generatedAt": "2026-11-23T22:05:12.677Z",
   "mode": "READ_ONLY_GATE_1_ADMISSION",
   "admittedExecutionId": null,
-  "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admittedWorkspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
   "admittedSource": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT",
   "admittedAuthority": true,
   "selectorAuthorityConflict": false,
   "selectorBlockers": [],
-  "cohortLineageReportGeneratedAt": "2026-10-05T17:30:21.789Z",
-  "cohortLineageWorkspaceRevisionMatchesSelector": true,
+  "cohortLineageReportGeneratedAt": "2026-10-23T19:13:16.822Z",
+  "cohortLineageWorkspaceRevisionMatchesSelector": false,
   "cohortRows": 52,
   "distinctCohortWorkspaceRevisions": [
     "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
@@ -19,17 +19,17 @@
   "exactSourceRevisionMatches": 52,
   "currentWorkspaceMatches": 0,
   "workspaceMismatches": 52,
-  "staleProjectionCandidates": 52,
+  "staleProjectionCandidates": 0,
   "conflictingSourceRows": 0,
   "sourceAuthority": {
     "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
     "safeToPromote": false,
     "requiresSnapshotRefresh": true,
-    "deltaChecksum": "sha256:3e91052e8ec5db65de3401a6af3869f88528dd1a6cd789b2c0cb91e69f737c1a"
+    "deltaChecksum": "sha256:5dd13c20dbec655de36abc21274c1c741f1c3acaaa3af6e32c38f87a04c2d664"
   },
   "nextGate": "CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED",
   "canonicalAuthority": false,
   "promotionEligible": false,
   "writesPerformed": false,
-  "status": "STALE_WORKSPACE_PROJECTION"
+  "status": "EXECUTION_AUTHORITY_UNAVAILABLE"
 }

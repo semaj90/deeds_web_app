@@ -58,6 +58,7 @@ export function buildReviewedExport({ inputRows, palette, root, allowUnverifiedS
     const label = r.reviewedGroup;
     if (typeof label === 'string' && NON_GOLD.has(label)) { bump(nonGold, label); continue; }
     if (!REVIEWED_STATUSES.has(r.reviewStatus)) { bump(rejected, 'NOT_HUMAN_REVIEWED_STATUS'); continue; }
+    if (r.reviewMethod !== 'BLIND_HUMAN_REVIEW_V1') { bump(rejected, 'NOT_BLINDLY_REVIEWED'); continue; }
     if (typeof r.reviewer !== 'string' || !r.reviewer.trim() || NOT_HUMAN_REVIEWER.test(r.reviewer.trim()) || !r.reviewedAt) { bump(rejected, 'REVIEWER_MISSING_OR_NOT_HUMAN'); continue; }
     if (typeof label !== 'string' || !domains.has(label)) { bump(rejected, 'DOMAIN_NOT_IN_NES_PALETTE'); bump(unmappedLabels, String(label)); continue; }
     if (!SHA_REVISION.test(String(r.sourceRevision ?? ''))) { bump(rejected, 'SOURCE_REVISION_MISSING_OR_INVALID'); continue; }

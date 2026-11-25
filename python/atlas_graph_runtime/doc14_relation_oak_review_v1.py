@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import unicodedata
 from typing import Any, Mapping
 
@@ -74,10 +75,14 @@ def build_doc14_relation_oak_review_v1(
 
     concepts = bundle.get("concepts")
     relation_rows = bundle.get("relations", [])
-    if not isinstance(concepts, list) or not isinstance(relation_rows, list):
+    oak_mapping_candidates = bundle.get("mappingCandidates", [])
+    mapping_provider_status = bundle.get("mappingProviderStatus", "NOT_REPORTED")
+    if not isinstance(concepts, list) or not isinstance(relation_rows, list) or not isinstance(oak_mapping_candidates, list):
         raise ValueError("DOC14_OAK_CANDIDATE_LISTS_INVALID")
     # The pipeline merges up to four bounded 16-term sidecar responses per chunk.
-    if len(matches) > 64 or len(concepts) > 256 or len(relation_rows) > 4_096:
+    if (len(matches) > 64 or len(concepts) > 256 or len(relation_rows) > 4_096
+            or len(oak_mapping_candidates) > 256
+            or mapping_provider_status not in {"AVAILABLE", "UNAVAILABLE", "NOT_REPORTED"}):
         raise ValueError("DOC14_OAK_RESPONSE_LIMIT_EXCEEDED")
     concepts_by_id: dict[str, Mapping[str, Any]] = {}
     for candidate in concepts:
@@ -175,6 +180,71 @@ def build_doc14_relation_oak_review_v1(
                 "objectExternalId": obj,
             })
 
+    # OAK SSSOM rows are mapping suggestions, not identity equivalence or
+    # admission. Surface only rows bound to one of the reviewed participant IDs.
+    existing_oak_mappings: list[dict[str, Any]] = []
+    mapping_candidate_ids: set[str] = set()
+    for item in oak_mapping_candidates:
+        if not isinstance(item, Mapping):
+            raise ValueError("DOC14_OAK_MAPPING_CANDIDATE_INVALID")
+        subject = item.get("subjectId")
+        predicate = item.get("predicateId")
+        obj = item.get("objectId")
+        candidate_id = item.get("candidateId")
+        if not all(isinstance(value, str) and value.strip() for value in (subject, predicate, obj, candidate_id)):
+            raise ValueError("DOC14_OAK_MAPPING_CANDIDATE_INVALID")
+        if (item.get("schema") != "atlas.oaklib-mapping-candidate.v1"
+                or item.get("status") != "PROPOSED"
+                or item.get("canonicalAuthority") is not False
+                or item.get("ontologyRevision") != ontology_revision
+                or item.get("producerRevision") != producer_revision):
+            raise ValueError("DOC14_OAK_MAPPING_AUTHORITY_OR_REVISION_INVALID")
+        if candidate_id in mapping_candidate_ids:
+            raise ValueError("DOC14_OAK_MAPPING_CANDIDATE_DUPLICATE")
+        mapping_candidate_ids.add(candidate_id)
+        if subject in selected_ids or obj in selected_ids:
+            refs = item.get("evidenceRefs", [])
+            if not isinstance(refs, (list, tuple)) or len(refs) > 32:
+                raise ValueError("DOC14_OAK_MAPPING_EVIDENCE_INVALID")
+            if any(not isinstance(ref, str) or len(ref) > 1024 for ref in refs):
+                raise ValueError("DOC14_OAK_MAPPING_EVIDENCE_INVALID")
+
+            def optional_text(field: str) -> str | None:
+                value = item.get(field)
+                if value is None:
+                    return None
+                if (not isinstance(value, str) or len(value) > 512
+                        or any(ord(char) < 32 for char in value)):
+                    raise ValueError("DOC14_OAK_MAPPING_CANDIDATE_INVALID")
+                return value
+
+            confidence = item.get("confidence")
+            if confidence is not None and (
+                isinstance(confidence, bool)
+                or not isinstance(confidence, (int, float))
+                or not math.isfinite(float(confidence))
+                or not 0.0 <= float(confidence) <= 1.0
+            ):
+                raise ValueError("DOC14_OAK_MAPPING_CONFIDENCE_INVALID")
+            existing_oak_mappings.append({
+                "candidateId": candidate_id,
+                "subjectId": subject,
+                "predicateId": predicate,
+                "objectId": obj,
+                "mappingJustification": optional_text("mappingJustification"),
+                "subjectSource": optional_text("subjectSource"),
+                "objectSource": optional_text("objectSource"),
+                "subjectSourceVersion": optional_text("subjectSourceVersion"),
+                "objectSourceVersion": optional_text("objectSourceVersion"),
+                "confidence": float(confidence) if confidence is not None else None,
+                "evidenceRefs": [
+                    ref.replace(source_selector, source_selector_checksum)
+                    for ref in refs
+                ],
+                "status": "SUGGESTED_REQUIRES_REVIEW",
+                "canonicalAuthority": False,
+            })
+
     binding = relation["evidence_binding"]
     body = {
         "schema": "atlas.doc14-relation-oak-review.v1",
@@ -203,6 +273,8 @@ def build_doc14_relation_oak_review_v1(
         },
         "participantMappings": mapping_rows,
         "existingOntologyRelations": related_relations,
+        "existingOAKMappings": existing_oak_mappings,
+        "oakMappingProviderStatus": mapping_provider_status,
         "reviewRequired": True,
         "canonicalAuthority": False,
         "writesPerformed": False,

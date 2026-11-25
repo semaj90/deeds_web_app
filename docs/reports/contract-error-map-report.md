@@ -1,49 +1,10 @@
 # Cross-Layer Contract Error Map
 
-Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Low: 3  Info: 26
+Generated: 2026-11-25T02:27:43.313Z  |  Findings: 64  |  High: 0  Medium: 35  Low: 0  Info: 29
 
 ## Findings
 
-### contract:sveltekit-route-route_contract_mismatch-001-86cb947b
-**Severity:** low  |  **Layer:** sveltekit-route  |  **HMM State:** `route_contract_mismatch`
-
-**Problem:** GET route returns 500 status code. The degraded-path contract prefers 200 with { data: [], error: msg }.
-
-**Expected:** GET routes return 200 with empty arrays/nulls matching success shape.
-
-**Suggested Fix:** Replace `return json({ error }, { status: 500 })` with `return json({ data: [], error: msg })` (status 200).
-
-**Files:** `sveltekit-frontend\src\routes\api\evidence\[id]\video-events\+server.ts`
-
-**Validation:** `npm run audit:contracts`
-
-### contract:sveltekit-route-route_contract_mismatch-002-86cb947b
-**Severity:** low  |  **Layer:** sveltekit-route  |  **HMM State:** `route_contract_mismatch`
-
-**Problem:** GET route returns 500 status code. The degraded-path contract prefers 200 with { data: [], error: msg }.
-
-**Expected:** GET routes return 200 with empty arrays/nulls matching success shape.
-
-**Suggested Fix:** Replace `return json({ error }, { status: 500 })` with `return json({ data: [], error: msg })` (status 200).
-
-**Files:** `sveltekit-frontend\src\routes\api\cases\[id]\scenes\[sceneKey]\markers\+server.ts`
-
-**Validation:** `npm run audit:contracts`
-
-### contract:sveltekit-route-route_contract_mismatch-003-86cb947b
-**Severity:** low  |  **Layer:** sveltekit-route  |  **HMM State:** `route_contract_mismatch`
-
-**Problem:** GET route returns 500 status code. The degraded-path contract prefers 200 with { data: [], error: msg }.
-
-**Expected:** GET routes return 200 with empty arrays/nulls matching success shape.
-
-**Suggested Fix:** Replace `return json({ error }, { status: 500 })` with `return json({ data: [], error: msg })` (status 200).
-
-**Files:** `sveltekit-frontend\src\routes\api\cases\[id]\scenes\[sceneId]\revisions\+server.ts`
-
-**Validation:** `npm run audit:contracts`
-
-### contract:drizzle-meta-documented_sidecar-004-26dda09a
+### contract:drizzle-meta-documented_sidecar-001-26dda09a
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0019_bm25_search_vector.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -56,7 +17,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-005-6c8a6ec1
+### contract:drizzle-meta-documented_sidecar-002-6c8a6ec1
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0023_vector_index_registry.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -69,7 +30,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-006-c908a1c7
+### contract:drizzle-meta-documented_sidecar-003-c908a1c7
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0035_create_atlas_feature_packets.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -82,7 +43,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-007-5bd90b15
+### contract:drizzle-meta-documented_sidecar-004-5bd90b15
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0042_unified_registry_enrichment_projections.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -95,7 +56,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-008-2a5fba98
+### contract:drizzle-meta-documented_sidecar-005-2a5fba98
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0043_atlas_packet_features_schema.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -108,7 +69,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-009-88d9df2d
+### contract:drizzle-meta-documented_sidecar-006-88d9df2d
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0043_feature_extraction_tables.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -121,7 +82,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-010-5dfeeab7
+### contract:drizzle-meta-documented_sidecar-007-5dfeeab7
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0044_phase_107_feature_layer_schema.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -134,7 +95,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-011-8d068f3d
+### contract:drizzle-meta-documented_sidecar-008-8d068f3d
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0046_phase_109_unknown_packets.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -147,7 +108,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-012-d328ecc9
+### contract:drizzle-meta-documented_sidecar-009-d328ecc9
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0052_evaluation_corpus.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -160,7 +121,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-013-edb3459e
+### contract:drizzle-meta-documented_sidecar-010-edb3459e
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0054_evaluation_corpora.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -173,7 +134,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-014-f00af80a
+### contract:drizzle-meta-documented_sidecar-011-f00af80a
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0055_evaluation_results.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -186,7 +147,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-015-c6be2170
+### contract:drizzle-meta-documented_sidecar-012-c6be2170
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0056_evaluation_evidence.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -199,7 +160,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-016-70f6f462
+### contract:drizzle-meta-documented_sidecar-013-70f6f462
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0058_evaluation_relevance_corrected.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -212,7 +173,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-017-829576e4
+### contract:drizzle-meta-documented_sidecar-014-829576e4
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0059_qdrant_point_id_backfill_tables.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -225,7 +186,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-018-4e5035ec
+### contract:drizzle-meta-documented_sidecar-015-4e5035ec
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0060_feature_envelope_column.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -238,7 +199,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-019-57b36a33
+### contract:drizzle-meta-documented_sidecar-016-57b36a33
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0099_atlas_svg_glyphs.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -251,7 +212,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-020-a4c26a2c
+### contract:drizzle-meta-documented_sidecar-017-a4c26a2c
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0100_atlas_feature_vectors.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -264,7 +225,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-021-0d28dc7e
+### contract:drizzle-meta-documented_sidecar-018-0d28dc7e
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0102_packet_source_features.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -277,7 +238,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-022-a7bc4005
+### contract:drizzle-meta-documented_sidecar-019-a7bc4005
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0103_add_topology_and_noun_summaries.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -290,7 +251,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-023-49ac0ced
+### contract:drizzle-meta-documented_sidecar-020-49ac0ced
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0103_unified_packet_source_features.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -303,7 +264,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-024-42de1f0f
+### contract:drizzle-meta-documented_sidecar-021-42de1f0f
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0109_phase109a_semantic_signals.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -316,7 +277,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-025-29dd4cfe
+### contract:drizzle-meta-documented_sidecar-022-29dd4cfe
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0109_phase109a_semantic_signals_repair.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -329,7 +290,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-026-55c708c4
+### contract:drizzle-meta-documented_sidecar-023-55c708c4
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0112_parent_atlas_graph_v2.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -342,7 +303,7 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-027-75067054
+### contract:drizzle-meta-documented_sidecar-024-75067054
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0114_semantic_topk_rerank_ledger.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -355,7 +316,33 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 
 **Validation:** `npm run audit:drizzle-meta`
 
-### contract:drizzle-meta-documented_sidecar-028-ea5ba189
+### contract:drizzle-meta-documented_sidecar-025-02452c49
+**Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
+
+**Problem:** Documented sidecar "0152_atlas_representations_registry.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
+
+**Expected:** Sidecar migrations are applied manually and excluded from the journal by design.
+
+**Suggested Fix:** No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.
+
+**Files:** `sveltekit-frontend\drizzle\0152_atlas_representations_registry.sql`
+
+**Validation:** `npm run audit:drizzle-meta`
+
+### contract:drizzle-meta-documented_sidecar-026-7f57b070
+**Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
+
+**Problem:** Documented sidecar "0152_atlas_representations_registry_revised.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
+
+**Expected:** Sidecar migrations are applied manually and excluded from the journal by design.
+
+**Suggested Fix:** No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.
+
+**Files:** `sveltekit-frontend\drizzle\0152_atlas_representations_registry_revised.sql`
+
+**Validation:** `npm run audit:drizzle-meta`
+
+### contract:drizzle-meta-documented_sidecar-027-ea5ba189
 **Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
 
 **Problem:** Documented sidecar "0153_atlas_context_manifests.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
@@ -365,6 +352,19 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 **Suggested Fix:** No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.
 
 **Files:** `sveltekit-frontend\drizzle\0153_atlas_context_manifests.sql`
+
+**Validation:** `npm run audit:drizzle-meta`
+
+### contract:drizzle-meta-documented_sidecar-028-94ac9fd5
+**Severity:** info  |  **Layer:** drizzle-meta  |  **HMM State:** `documented_sidecar`
+
+**Problem:** Documented sidecar "0154_atlas_packet_features_ast_provenance_columns.sql" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).
+
+**Expected:** Sidecar migrations are applied manually and excluded from the journal by design.
+
+**Suggested Fix:** No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.
+
+**Files:** `sveltekit-frontend\drizzle\0154_atlas_packet_features_ast_provenance_columns.sql`
 
 **Validation:** `npm run audit:drizzle-meta`
 
@@ -833,44 +833,5 @@ Generated: 2026-11-19T21:51:34.681Z  |  Findings: 67  |  High: 0  Medium: 38  Lo
 **Suggested Fix:** Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/0151_feature_label_mutation_audit.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.
 
 **Files:** `sveltekit-frontend\drizzle\0151_feature_label_mutation_audit.sql`
-
-**Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
-
-### contract:drizzle-meta-stale_migration-065-6d3c89f5
-**Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
-
-**Problem:** "0152_atlas_representations_registry.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
-
-**Expected:** Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.
-
-**Suggested Fix:** Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/0152_atlas_representations_registry.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.
-
-**Files:** `sveltekit-frontend\drizzle\0152_atlas_representations_registry.sql`
-
-**Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
-
-### contract:drizzle-meta-stale_migration-066-a1d61cf5
-**Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
-
-**Problem:** "0152_atlas_representations_registry_revised.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
-
-**Expected:** Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.
-
-**Suggested Fix:** Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/0152_atlas_representations_registry_revised.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.
-
-**Files:** `sveltekit-frontend\drizzle\0152_atlas_representations_registry_revised.sql`
-
-**Validation:** `npm run audit:drizzle-meta`, `npm run db:check`
-
-### contract:drizzle-meta-stale_migration-067-3efe2517
-**Severity:** medium  |  **Layer:** drizzle-meta  |  **HMM State:** `stale_migration`
-
-**Problem:** "0154_atlas_packet_features_ast_provenance_columns.sql" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.
-
-**Expected:** Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.
-
-**Suggested Fix:** Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/0154_atlas_packet_features_ast_provenance_columns.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.
-
-**Files:** `sveltekit-frontend\drizzle\0154_atlas_packet_features_ast_provenance_columns.sql`
 
 **Validation:** `npm run audit:drizzle-meta`, `npm run db:check`

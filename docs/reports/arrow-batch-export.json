@@ -1,41 +1,43 @@
 {
-  "generated_at": "2026-10-13T04:00:11.009Z",
-  "mode": "dry-run",
+  "generated_at": "2026-11-25T03:49:10.795Z",
+  "mode": "apply",
   "inputs": {
-    "limit": 200,
-    "offset": 0
+    "limit": 100,
+    "offset": 0,
+    "batch_size": 50
   },
   "outputs": {
-    "arrow_ipc": "scripts/atlas/export/packets.arrow",
-    "row_index": "scripts/atlas/export/packets.index.json"
+    "arrow_ipc": ".tmp/atlas/packets-stream-test.arrow",
+    "row_index": ".tmp/atlas/packets-stream-test.index.json",
+    "report_json": "docs/reports/arrow-batch-export.json"
   },
   "summary": {
-    "rows": 200,
+    "rows": 100,
     "columns": 51,
-    "ipc_bytes": 1217466,
+    "ipc_bytes": 577666,
     "duplicate_packet_keys": 0,
     "splits": {
-      "train": 168,
-      "eval": 18,
-      "test": 14
+      "train": 84,
+      "eval": 9,
+      "test": 7
     },
     "coverage": {
-      "source_ref": 200,
-      "feature_id": 200,
-      "feature_label": 200,
-      "title_id": 200,
-      "tree_node_id": 200,
-      "domain_class": 200,
-      "feature_evidence": 200,
-      "embedding_vector": 200,
-      "semantic_768_vector": 200,
-      "latent64_blob": 159,
-      "topology": 200
+      "source_ref": 100,
+      "feature_id": 100,
+      "feature_label": 100,
+      "title_id": 100,
+      "tree_node_id": 100,
+      "domain_class": 100,
+      "feature_evidence": 100,
+      "embedding_vector": 100,
+      "semantic_768_vector": 100,
+      "latent64_blob": 59,
+      "topology": 100
     }
   },
   "contract": {
     "canonical_store": "postgres",
-    "batch_transport": "apache_arrow_ipc_file",
+    "batch_transport": "apache_arrow_ipc_file_streaming",
     "hot_packet_transport": "msgpack_mmap_registry",
     "semantic_representation": "semantic_768",
     "vector_encoding": "little_endian_float32",

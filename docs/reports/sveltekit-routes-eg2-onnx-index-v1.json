@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.sveltekit-routes-eg2-onnx-index.v1",
+  "collection": "codebase_chunks_eg2_768_q8",
+  "upsertedRouteCount": 197,
+  "collectionPointsCount": 1271,
+  "filteredRouteKind": "+server.ts",
+  "filteredHitsCount": 3,
+  "topHit": {
+    "id": "4a2f90c9-47e6-5907-b194-3d83839903ab",
+    "version": 14,
+    "score": 0.87001777,
+    "payload": {
+      "source_ref": "sveltekit-frontend/src/routes/api/topology/stream/+server.ts",
+      "relative_path": "src/routes/api/topology/stream/+server.ts",
+      "source_revision": "sha256:e6a3e79d0953ee4ca950d3707f980848018c00df9c0193755671d9181bed6a7b",
+      "route_kind": "+server.ts",
+      "encoder_profile": "eg2-onnx-q8-mrl-768",
+      "model_id": "onnx-community/embeddinggemma2-q8:onnx/model_quantized.onnx",
+      "provisional_domain_class": "api",
+      "canonical_authority": false
+    }
+  }
+}

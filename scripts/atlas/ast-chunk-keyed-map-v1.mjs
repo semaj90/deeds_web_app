@@ -103,8 +103,11 @@ async function loadLanguageAuthority(url) {
   const map = new Map();
   for (const b of bindings) {
     if (b.fromNamespace !== 'FILE_EXTENSION' || b.toNamespace !== 'SIDECAR_LANGUAGE') continue;
-    if (!/^\.[a-z]{1,8}$/.test(b.fromLabel) || !SIDECAR_LANGUAGE_TO_AST_GREP.has(b.toLabel)) {
-      throw new Error(`unrecognised binding: ${b.fromLabel} -> ${b.toLabel}`);
+    if (!/^\.[a-z0-9]{1,16}$/.test(b.fromLabel) || !/^[a-z][a-z0-9_-]{0,31}$/.test(b.toLabel)) {
+      throw new Error(`invalid binding: ${b.fromLabel} -> ${b.toLabel}`);
+    }
+    if (map.has(b.fromLabel) && map.get(b.fromLabel) !== b.toLabel) {
+      throw new Error(`conflicting bindings for ${b.fromLabel}`);
     }
     map.set(b.fromLabel, b.toLabel);
   }

@@ -1,0 +1,359 @@
+{
+  "schema": "atlas.backup-superseded-inventory.v1",
+  "generatedAt": "2026-11-23T19:58:54.844Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "totalCandidatesFound": 46,
+  "auditedCount": 46,
+  "safeArchiveCandidates": 39,
+  "retainedActiveRefs": 7,
+  "items": [
+    {
+      "path": "python/atlas_graph_runtime/batch_staleness_superseded_check_v1.py",
+      "stem": "batch_staleness_superseded_check_v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "python/tests/test_batch_staleness_superseded_check_v1.py",
+      "stem": "test_batch_staleness_superseded_check_v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/admit-legacy-summary-cosine-max-rf04-v2.mts",
+      "stem": "admit-legacy-summary-cosine-max-rf04-v2",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-completed-legacy-coverage-v1.mjs",
+      "stem": "audit-graphify-completed-legacy-coverage-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/audit-legacy-embedding-lineage-bridge-v1.mjs",
+      "stem": "audit-legacy-embedding-lineage-bridge-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/audit-legacy-summary-cei23-alignment-v1.mjs",
+      "stem": "audit-legacy-summary-cei23-alignment-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/audit-packet-key-v2-legacy-population-v1.mts",
+      "stem": "audit-packet-key-v2-legacy-population-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/audit-structural-legacy-coverage-v1.mjs",
+      "stem": "audit-structural-legacy-coverage-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/build-all-legacy-summary-hint-vectors-v1.mjs",
+      "stem": "build-all-legacy-summary-hint-vectors-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/build-legacy-summary-cosine-mmr-canary-v1.mjs",
+      "stem": "build-legacy-summary-cosine-mmr-canary-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/build-legacy-summary-hint-embedding-canary-v1.mjs",
+      "stem": "build-legacy-summary-hint-embedding-canary-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/build-legacy-summary-hint-feature-alignment-v1.mjs",
+      "stem": "build-legacy-summary-hint-feature-alignment-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/build-legacy-summary-hint-feature-alignment-v1.test.mjs",
+      "stem": "build-legacy-summary-hint-feature-alignment-v1.test",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/census-legacy-chunk-summaries-v1.mjs",
+      "stem": "census-legacy-chunk-summaries-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/debug-qdrant-legacy-ambiguous-slice.mjs",
+      "stem": "debug-qdrant-legacy-ambiguous-slice",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/dryrun-qdrant-legacy-payload-backfill-v1.mjs",
+      "stem": "dryrun-qdrant-legacy-payload-backfill-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/embed-all-legacy-summary-hints-v1.mjs",
+      "stem": "embed-all-legacy-summary-hints-v1",
+      "externalRefCount": 1,
+      "sampleRefs": [
+        "scripts/atlas/compare-summary-hint-topk-v1.mjs"
+      ],
+      "recommendedAction": "RETAIN_ACTIVE_REFS"
+    },
+    {
+      "path": "scripts/atlas/export-legacy-summary-evidence-v1.mts",
+      "stem": "export-legacy-summary-evidence-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/fix-backfill-legacy-packet-keys.mjs",
+      "stem": "fix-backfill-legacy-packet-keys",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/join-legacy-summary-hints-to-candidate-ordinals-v1.mts",
+      "stem": "join-legacy-summary-hints-to-candidate-ordinals-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/legacy-384-qdrant-policy.spec.mjs",
+      "stem": "legacy-384-qdrant-policy.spec",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/lib/legacy-summary-cei23-alignment-v1.mjs",
+      "stem": "legacy-summary-cei23-alignment-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/lib/legacy-summary-cei23-alignment-v1.test.mjs",
+      "stem": "legacy-summary-cei23-alignment-v1.test",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/lib/legacy-summary-feature-alignment-v1.mjs",
+      "stem": "legacy-summary-feature-alignment-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/plan-legacy-summary-carry-forward-v1.mjs",
+      "stem": "plan-legacy-summary-carry-forward-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/produce-legacy-summary-hint-feature-v2.mts",
+      "stem": "produce-legacy-summary-hint-feature-v2",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/repair-qdrant-legacy-ambiguous-slice.mjs",
+      "stem": "repair-qdrant-legacy-ambiguous-slice",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/score-superseded-originals.mjs",
+      "stem": "score-superseded-originals",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/shard-legacy-summary-census-v1.mjs",
+      "stem": "shard-legacy-summary-census-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/test-legacy-ast-producer-contract-v1.mjs",
+      "stem": "test-legacy-ast-producer-contract-v1",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/atlas/verify-qdrant-legacy-ambiguous-slice.mjs",
+      "stem": "verify-qdrant-legacy-ambiguous-slice",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/audit-legacy-atlas-fields.mjs",
+      "stem": "audit-legacy-atlas-fields",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/operator/backup-atlas-state.mjs",
+      "stem": "backup-atlas-state",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "scripts/packets/score-superseded-originals.mjs",
+      "stem": "score-superseded-originals",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "sveltekit-frontend/src/ambient-legacy.d.ts",
+      "stem": "ambient-legacy.d",
+      "externalRefCount": 1,
+      "sampleRefs": [
+        "sveltekit-frontend/src/LLMS.md"
+      ],
+      "recommendedAction": "RETAIN_ACTIVE_REFS"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/features/legacy-summary-cosine-hint-v1.spec.ts",
+      "stem": "legacy-summary-cosine-hint-v1.spec",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/features/legacy-summary-cosine-hint-v1.ts",
+      "stem": "legacy-summary-cosine-hint-v1",
+      "externalRefCount": 1,
+      "sampleRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/features/legacy-summary-cosine-hint-v1.spec.ts"
+      ],
+      "recommendedAction": "RETAIN_ACTIVE_REFS"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/features/legacy-summary-hint-feature-v2.spec.ts",
+      "stem": "legacy-summary-hint-feature-v2.spec",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/features/legacy-summary-hint-feature-v2.ts",
+      "stem": "legacy-summary-hint-feature-v2",
+      "externalRefCount": 1,
+      "sampleRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/features/legacy-summary-hint-feature-v2.spec.ts"
+      ],
+      "recommendedAction": "RETAIN_ACTIVE_REFS"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-legacy-alias-v1.ts",
+      "stem": "packet-key-legacy-alias-v1",
+      "externalRefCount": 4,
+      "sampleRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-resolution-v2.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts",
+        "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-resolution-v2.ts"
+      ],
+      "recommendedAction": "RETAIN_ACTIVE_REFS"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/db/legacy-read-detector.ts",
+      "stem": "legacy-read-detector",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/db/unified-client-backup.ts",
+      "stem": "unified-client-backup",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/hmm-tool-selector.deprecated-filter.spec.ts",
+      "stem": "hmm-tool-selector.deprecated-filter.spec",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/types/missing-modules.d.ts.bullmq-backup",
+      "stem": "missing-modules.d.ts",
+      "externalRefCount": 0,
+      "sampleRefs": [],
+      "recommendedAction": "SAFE_ARCHIVE_CANDIDATE"
+    },
+    {
+      "path": "sveltekit-frontend/src/routes/api/auth/debug/+server.ts.minified-backup",
+      "stem": "+server.ts",
+      "externalRefCount": 340,
+      "sampleRefs": [
+        "sveltekit-frontend/src/LLMS.md",
+        "sveltekit-frontend/src/lib/agent/register-tools.ts",
+        "sveltekit-frontend/src/routes/(admin)/error-brain/components/LLMS.md",
+        "sveltekit-frontend/src/routes/(dev)/voice-chat-demo/LLMS.md",
+        "sveltekit-frontend/src/routes/(analysis)/LLMS.md"
+      ],
+      "recommendedAction": "RETAIN_ACTIVE_REFS"
+    },
+    {
+      "path": "sveltekit-frontend/src/routes/api/auth/demo-login/+server.ts.minified-backup",
+      "stem": "+server.ts",
+      "externalRefCount": 340,
+      "sampleRefs": [
+        "sveltekit-frontend/src/LLMS.md",
+        "sveltekit-frontend/src/lib/cache/LLMS.md",
+        "sveltekit-frontend/src/routes/(dev)/voice-chat-demo/LLMS.md",
+        "sveltekit-frontend/src/routes/(dev)/tts-demo/LLMS.md",
+        "sveltekit-frontend/src/routes/register/LLMS.md"
+      ],
+      "recommendedAction": "RETAIN_ACTIVE_REFS"
+    }
+  ]
+}

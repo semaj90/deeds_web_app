@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.eg2-onnx-qdrant-domain-index.v1",
+  "collection": "codebase_chunks_eg2_768_q8",
+  "upsertedCount": 24,
+  "collectionPointsCount": 24,
+  "filteredQueryDomain": "database",
+  "filteredHitsCount": 2,
+  "topHit": {
+    "id": "79ad0daf-3d92-549b-8706-a2cc537f2382",
+    "version": 1,
+    "score": 0.7927257,
+    "payload": {
+      "packet_key": "packet:002461508185",
+      "source_ref": "data/external-docs/raw/drizzle/queries.md",
+      "source_revision": "sha256:20f7b92ab8dd2fc4885d1f0f3c88e17c4d912092f85468566a7ad99c316f356c",
+      "encoder_profile": "eg2-onnx-q8-mrl-768",
+      "model_id": "onnx-community/embeddinggemma2-q8:onnx/model_quantized.onnx",
+      "provisional_domain_class": "database",
+      "provisional_domain_authority": false,
+      "canonical_authority": false
+    }
+  }
+}

@@ -42,7 +42,16 @@ class NumpyCentroidKMeans:
 
 def cluster_distance_features(kmeans: object, embeddings: np.ndarray) -> dict[str, float]:
     """Build the shared training/serving feature row from successfully embedded chunks."""
-    values = np.asarray(embeddings, dtype=np.float32)
+    # sklearn KMeans keeps the dtype used during fit. The mounted legacy
+    # checkpoint has float64 centroids, while the current portable/CUDA path
+    # uses float32. Preserve the estimator's trained dtype so predict() does
+    # not raise a Cython buffer mismatch and so training/serving arithmetic
+    # follows the checkpoint's actual feature recipe.
+    centers = getattr(kmeans, "cluster_centers_", None)
+    feature_dtype = np.asarray(centers).dtype if centers is not None else np.dtype(np.float32)
+    if feature_dtype not in (np.dtype(np.float32), np.dtype(np.float64)):
+        raise ValueError("kmeans centroid dtype must be float32 or float64")
+    values = np.ascontiguousarray(embeddings, dtype=feature_dtype)
     if values.ndim != 2 or values.shape[0] < 1:
         raise ValueError("embeddings must be a non-empty 2D matrix")
     transform = getattr(kmeans, "transform", None)

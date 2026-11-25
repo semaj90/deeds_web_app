@@ -23,7 +23,7 @@ import {
   type SourceFetchPortV1,
   type TopKContextAdmissionV1,
 } from './topk-evidence-fetch-v1.js';
-import type { CandidateOrdinalMapV1 } from '../features/canonical-candidate-v1.js';
+import { assertCandidateOrdinalMapIntegrityV1, type CandidateOrdinalMapV1 } from '../features/canonical-candidate-v1.js';
 import { CANDIDATE_SCALAR_FEATURES, type CandidateFeatureColumnarV1 } from '../features/candidate-feature-columnar-v1.js';
 import type { CandidateFeatureSnapshotV1 } from '../features/candidate-feature-snapshot-v1.js';
 import { TILE_CHANNEL_CANONICAL_INDEX } from './atlas-feature-matrix-4x6-v1.js';
@@ -73,6 +73,7 @@ export function bindRecommendationEvidenceToTopKV1(params: {
 }): RecommendationEvidenceBundleV1 {
   const bundle = RecommendationEvidenceBundleV1Schema.parse(params.recommendationEvidence);
   verifyRecommendationEvidenceBundleV1(bundle);
+  assertCandidateOrdinalMapIntegrityV1(params.ordinalMap);
   if (bundle.requestId !== params.requestId) throw new Error('RECOMMENDATION_BINDING_REQUEST_MISMATCH');
   if (bundle.workspaceRevision !== params.ordinalMap.workspaceRevision) {
     throw new Error('RECOMMENDATION_BINDING_WORKSPACE_MISMATCH');

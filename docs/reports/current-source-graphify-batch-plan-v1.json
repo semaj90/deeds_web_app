@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-graphify-batch-plan.v1",
-  "generatedAt": "2026-11-22T19:02:08.793Z",
+  "generatedAt": "2026-11-23T20:37:53.405Z",
   "status": "CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW",
   "readOnly": true,
   "canonicalAuthority": false,
@@ -15,638 +15,80 @@
     "neo4j": false,
     "valkey": false
   },
-  "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-  "snapshotRevision": "sha256:891a8d9c8a8f656bb4bc553ae77b188f043263b1b8323bbc43f1784010e9c258",
-  "sourceSelectionChecksum": "sha256:7c0c36d079a4a115e0157d2db53d1429f2a5805301bc1d35998bbb1773643131",
-  "inputSource": "docs/reports/workspace-revision-tournament-admission-v1.json -> admitted snapshot manifest",
+  "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+  "membershipReadback": "LEGACY_FILE_INVENTORY",
+  "snapshotRevision": null,
+  "sourceSelectionChecksum": null,
+  "inputSource": "docs/reports/graphify-lifecycle-entrypoint-v1.json",
   "cohortReport": "docs/reports/current-source-projection-cohort-v1.json",
-  "cohortEligibleSources": 30327,
+  "cohortEligibleSources": 24181,
   "requestedLimit": 128,
   "selectedSourceCount": 128,
-  "selectionChecksum": "3439be46c96e27590e0f3706e8e805760c75716b5a201343fccac86836173c65",
+  "selectionChecksum": "64f48fc3e674ca65db460c4701fb917b433343160a762b2e3a9a84feb20f692f",
   "counts": {
     "currentGraphifyExact": 0,
-    "missingGraphifySource": 39,
+    "missingGraphifySource": 1,
     "missingWorkspaceObservation": 0,
-    "ambiguousGraphifySource": 8,
-    "graphifyRevisionOrContentMismatch": 81,
-    "localSourceBytesMismatch": 4
+    "ambiguousGraphifySource": 17,
+    "graphifyRevisionOrContentMismatch": 110,
+    "localSourceBytesMismatch": 9
   },
   "databaseError": null,
   "mismatchFieldCounts": {
-    "workspaceRevision": 89,
-    "sourceRevision": 11,
-    "contentDigest": 11,
-    "byteLength": 11
+    "workspaceRevision": 127,
+    "sourceRevision": 18,
+    "contentDigest": 18,
+    "byteLength": 18
   },
   "nextGate": "SOURCE_BYTES_REVALIDATION_REQUIRED",
   "records": [
     {
-      "sourceRef": ".archive/2026-10-06-workboard-backup/OPENSPEC-WORKBOARD.md",
-      "sourceRevision": "sha256:acf368d0aab0d89831450788eb314b909d3283f1899a95c015a92d48283c019d",
-      "contentDigest": "acf368d0aab0d89831450788eb314b909d3283f1899a95c015a92d48283c019d",
-      "byteLength": 80584,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "sourceRef": "$lib/utils/file-reader.ts",
+      "sourceRevision": "sha256:c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
+      "contentDigest": "c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
+      "byteLength": 737,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
-        "available": true,
-        "byteLength": 80584,
-        "contentDigest": "acf368d0aab0d89831450788eb314b909d3283f1899a95c015a92d48283c019d",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
+        "available": false,
+        "exact": false,
+        "mismatchedFields": [
+          "sourceFile"
+        ],
+        "failure": "LOCAL_SOURCE_FILE_MISSING"
       },
-      "graphifyRows": 0,
+      "graphifyRows": 1,
       "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/2026-10-06-workspace-reseal-historical/workspace-snapshot-reseal-v1.2026-09-18.json",
-      "sourceRevision": "sha256:02342c38e10235b650c62844f849ebee87362ca7e590d910e8cb916a92dcdad0",
-      "contentDigest": "02342c38e10235b650c62844f849ebee87362ca7e590d910e8cb916a92dcdad0",
-      "byteLength": 581,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 581,
-        "contentDigest": "02342c38e10235b650c62844f849ebee87362ca7e590d910e8cb916a92dcdad0",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
-      "sourceRevision": "sha256:ee400f842bcc37235a1f1fe3665b9c7c15f7443888ac3dc3cba5645ad6587a6a",
-      "contentDigest": "ee400f842bcc37235a1f1fe3665b9c7c15f7443888ac3dc3cba5645ad6587a6a",
-      "byteLength": 7173,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 7173,
-        "contentDigest": "ee400f842bcc37235a1f1fe3665b9c7c15f7443888ac3dc3cba5645ad6587a6a",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.ts",
-      "sourceRevision": "sha256:86ce87ab6d0ad49c8ae7b8abfd7800ada57cb919fb2a8c057b8a270dde384b53",
-      "contentDigest": "86ce87ab6d0ad49c8ae7b8abfd7800ada57cb919fb2a8c057b8a270dde384b53",
-      "byteLength": 6331,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 6331,
-        "contentDigest": "86ce87ab6d0ad49c8ae7b8abfd7800ada57cb919fb2a8c057b8a270dde384b53",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/2026-10-18-4x6-tile/execution.atlas-feature-matrix-4x6-v1.ts",
-      "sourceRevision": "sha256:0d472e86506e81b6d831aa2264265af28db799b10167f2b08522444752163306",
-      "contentDigest": "0d472e86506e81b6d831aa2264265af28db799b10167f2b08522444752163306",
-      "byteLength": 3259,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 3259,
-        "contentDigest": "0d472e86506e81b6d831aa2264265af28db799b10167f2b08522444752163306",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/2026-10-18-4x6-tile/execution.atlas-rank-input-adapter-v1.spec.ts",
-      "sourceRevision": "sha256:82aaead2c761c5b2394e3df174daa49bf4930e811913aa450501d109bf7122ca",
-      "contentDigest": "82aaead2c761c5b2394e3df174daa49bf4930e811913aa450501d109bf7122ca",
-      "byteLength": 9320,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 9320,
-        "contentDigest": "82aaead2c761c5b2394e3df174daa49bf4930e811913aa450501d109bf7122ca",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/2026-10-18-4x6-tile/execution.atlas-rank-input-adapter-v1.ts",
-      "sourceRevision": "sha256:90405730ba5dda88e170431f1142d462b214c822d6e2a7664b1adea6ff4e9612",
-      "contentDigest": "90405730ba5dda88e170431f1142d462b214c822d6e2a7664b1adea6ff4e9612",
-      "byteLength": 13514,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 13514,
-        "contentDigest": "90405730ba5dda88e170431f1142d462b214c822d6e2a7664b1adea6ff4e9612",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/duplicates-2026-10-13/manifest.json",
-      "sourceRevision": "sha256:f34b7aac47c8206e097bc77608bd801cb4cb34fad196ed07a55c98f297cb1058",
-      "contentDigest": "f34b7aac47c8206e097bc77608bd801cb4cb34fad196ed07a55c98f297cb1058",
-      "byteLength": 1186,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 1186,
-        "contentDigest": "f34b7aac47c8206e097bc77608bd801cb4cb34fad196ed07a55c98f297cb1058",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/duplicates-2026-10-13/python_atlas_cuda_cutile_vecadd_smoke_v1.py",
-      "sourceRevision": "sha256:38d892e4c24f9966063f9f53f3ca2817ab23a3328f293207e4d394bbed5de7e8",
-      "contentDigest": "38d892e4c24f9966063f9f53f3ca2817ab23a3328f293207e4d394bbed5de7e8",
-      "byteLength": 3165,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 3165,
-        "contentDigest": "38d892e4c24f9966063f9f53f3ca2817ab23a3328f293207e4d394bbed5de7e8",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/duplicates-2026-10-13/python_atlas_rff_features_v1.py",
-      "sourceRevision": "sha256:2df6c70a9ea94f2f040882c9f07e6a9cd5c2509731332d7db690fa0108916986",
-      "contentDigest": "2df6c70a9ea94f2f040882c9f07e6a9cd5c2509731332d7db690fa0108916986",
-      "byteLength": 2339,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 2339,
-        "contentDigest": "2df6c70a9ea94f2f040882c9f07e6a9cd5c2509731332d7db690fa0108916986",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/duplicates-2026-10-13/python_test_atlas_rff_features_v1.py",
-      "sourceRevision": "sha256:4c117ff1171e3a51b1d9e39379e256340d4e40e3c57bde5241c3d74d80a1a12c",
-      "contentDigest": "4c117ff1171e3a51b1d9e39379e256340d4e40e3c57bde5241c3d74d80a1a12c",
-      "byteLength": 2412,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 2412,
-        "contentDigest": "4c117ff1171e3a51b1d9e39379e256340d4e40e3c57bde5241c3d74d80a1a12c",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/duplicates-2026-10-13/scripts_atlas_graph_stream_batch_v1.py",
-      "sourceRevision": "sha256:4c9a0de1f664c07467b265ca28a5790c35bade57f3d495b5cb8492aa9ebfbb8e",
-      "contentDigest": "4c9a0de1f664c07467b265ca28a5790c35bade57f3d495b5cb8492aa9ebfbb8e",
-      "byteLength": 4199,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 4199,
-        "contentDigest": "4c9a0de1f664c07467b265ca28a5790c35bade57f3d495b5cb8492aa9ebfbb8e",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/duplicates-2026-10-13/tests_test_graph_stream_batch_v1.py",
-      "sourceRevision": "sha256:cdc08eb115a40ef3b3cad3e125de4289769b5fcb7426cecb65f70076c6c751d1",
-      "contentDigest": "cdc08eb115a40ef3b3cad3e125de4289769b5fcb7426cecb65f70076c6c751d1",
-      "byteLength": 1926,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 1926,
-        "contentDigest": "cdc08eb115a40ef3b3cad3e125de4289769b5fcb7426cecb65f70076c6c751d1",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/knn-contract-move-2026-10-12/knn_contract.py",
-      "sourceRevision": "sha256:75f220eb409163b685d660e5ca0d11b400ebfb939fcd52993cb5b77266293892",
-      "contentDigest": "75f220eb409163b685d660e5ca0d11b400ebfb939fcd52993cb5b77266293892",
-      "byteLength": 3272,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 3272,
-        "contentDigest": "75f220eb409163b685d660e5ca0d11b400ebfb939fcd52993cb5b77266293892",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/knn-contract-move-2026-10-12/services-original/knn_contract.py",
-      "sourceRevision": "sha256:75f220eb409163b685d660e5ca0d11b400ebfb939fcd52993cb5b77266293892",
-      "contentDigest": "75f220eb409163b685d660e5ca0d11b400ebfb939fcd52993cb5b77266293892",
-      "byteLength": 3272,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 3272,
-        "contentDigest": "75f220eb409163b685d660e5ca0d11b400ebfb939fcd52993cb5b77266293892",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/knn-contract-move-2026-10-12/services-original/test_knn_contract.py",
-      "sourceRevision": "sha256:738e114a8853692884507c12d8264e0c4912ae313382873f1558f160f48785e2",
-      "contentDigest": "738e114a8853692884507c12d8264e0c4912ae313382873f1558f160f48785e2",
-      "byteLength": 2172,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 2172,
-        "contentDigest": "738e114a8853692884507c12d8264e0c4912ae313382873f1558f160f48785e2",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/knn-contract-move-2026-10-12/test_knn_contract.py",
-      "sourceRevision": "sha256:738e114a8853692884507c12d8264e0c4912ae313382873f1558f160f48785e2",
-      "contentDigest": "738e114a8853692884507c12d8264e0c4912ae313382873f1558f160f48785e2",
-      "byteLength": 2172,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 2172,
-        "contentDigest": "738e114a8853692884507c12d8264e0c4912ae313382873f1558f160f48785e2",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/production-hardening-2026-10-12/.opencode/candidates/ace-packet-2026-10-12T05-48-24-210Z.json",
-      "sourceRevision": "sha256:8ce7e51aff07f98381f102fa167c614636414ab08e6eea95e1b4c4320e1fc027",
-      "contentDigest": "8ce7e51aff07f98381f102fa167c614636414ab08e6eea95e1b4c4320e1fc027",
-      "byteLength": 205,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 205,
-        "contentDigest": "8ce7e51aff07f98381f102fa167c614636414ab08e6eea95e1b4c4320e1fc027",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/production-hardening-2026-10-12/.opencode/production/ace-packet-2026-06-12.json",
-      "sourceRevision": "sha256:534f494fd0bd66fbdfbcc73576a648f005d2ee4fe1833a929e47e0233e5cc29f",
-      "contentDigest": "534f494fd0bd66fbdfbcc73576a648f005d2ee4fe1833a929e47e0233e5cc29f",
-      "byteLength": 146882,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 146882,
-        "contentDigest": "534f494fd0bd66fbdfbcc73576a648f005d2ee4fe1833a929e47e0233e5cc29f",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/production-hardening-2026-10-12/.opencode/production/ace-packet-summary-2026-06-12.md",
-      "sourceRevision": "sha256:d180a74e2c4dc46868351a6f3be7a246e75837d659d0ab5e320724866aa7c3ef",
-      "contentDigest": "d180a74e2c4dc46868351a6f3be7a246e75837d659d0ab5e320724866aa7c3ef",
-      "byteLength": 1108,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 1108,
-        "contentDigest": "d180a74e2c4dc46868351a6f3be7a246e75837d659d0ab5e320724866aa7c3ef",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/production-hardening-2026-10-12/.opencode/production/manifest.json",
-      "sourceRevision": "sha256:618b3402074ba0e991d60a1726af5f037d059f3156a47bdcee6fd08e751e58c3",
-      "contentDigest": "618b3402074ba0e991d60a1726af5f037d059f3156a47bdcee6fd08e751e58c3",
-      "byteLength": 1021,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 1021,
-        "contentDigest": "618b3402074ba0e991d60a1726af5f037d059f3156a47bdcee6fd08e751e58c3",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/production-hardening-2026-10-12/SNAPSHOT-MANIFEST.json",
-      "sourceRevision": "sha256:a5757ee9d33a6880f8c747a3aa24e738ade5e4f5bfaec18d2be1adf2447ad1b4",
-      "contentDigest": "a5757ee9d33a6880f8c747a3aa24e738ade5e4f5bfaec18d2be1adf2447ad1b4",
-      "byteLength": 2676,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 2676,
-        "contentDigest": "a5757ee9d33a6880f8c747a3aa24e738ade5e4f5bfaec18d2be1adf2447ad1b4",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/production-hardening-2026-10-12/docs/MASTER-TOC.md",
-      "sourceRevision": "sha256:8b4357db9de50b35ced055cdee0dce62fbdbbfc75f648bbf6ea8779c6db22e4b",
-      "contentDigest": "8b4357db9de50b35ced055cdee0dce62fbdbbfc75f648bbf6ea8779c6db22e4b",
-      "byteLength": 27569,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 27569,
-        "contentDigest": "8b4357db9de50b35ced055cdee0dce62fbdbbfc75f648bbf6ea8779c6db22e4b",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".archive/production-hardening-2026-10-12/docs/architecture/ARCH-TOC.md",
-      "sourceRevision": "sha256:3e5b6b198388308ad2afc71ba07b1f9e9c7c659d0156a818f513e81ee97a51a5",
-      "contentDigest": "3e5b6b198388308ad2afc71ba07b1f9e9c7c659d0156a818f513e81ee97a51a5",
-      "byteLength": 10780,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 10780,
-        "contentDigest": "3e5b6b198388308ad2afc71ba07b1f9e9c7c659d0156a818f513e81ee97a51a5",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".clarity/ff1-plan.md",
-      "sourceRevision": "sha256:a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
-      "contentDigest": "a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
-      "byteLength": 1722,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 1722,
-        "contentDigest": "a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": "$lib/utils/file-reader.ts",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
+            "contentDigest": "c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
+            "byteLength": "737"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": ".claude/AGENT_CONSTITUTION.md",
       "sourceRevision": "sha256:2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
       "contentDigest": "2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
       "byteLength": 251,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -691,7 +133,7 @@
       "sourceRevision": "sha256:427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
       "contentDigest": "427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
       "byteLength": 507,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -736,7 +178,7 @@
       "sourceRevision": "sha256:9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
       "contentDigest": "9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
       "byteLength": 28338,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -781,7 +223,7 @@
       "sourceRevision": "sha256:13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
       "contentDigest": "13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
       "byteLength": 111,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -826,7 +268,7 @@
       "sourceRevision": "sha256:e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
       "contentDigest": "e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
       "byteLength": 508,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -871,7 +313,7 @@
       "sourceRevision": "sha256:cb5b755463c0a137380ab259758f6631e073d983fa1a90b230c7b7880b640e74",
       "contentDigest": "cb5b755463c0a137380ab259758f6631e073d983fa1a90b230c7b7880b640e74",
       "byteLength": 763,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -916,7 +358,7 @@
       "sourceRevision": "sha256:bc021939cc0f8c620e0121de3ce0be4eb5584d13b61d9a42eba7f51ab716f447",
       "contentDigest": "bc021939cc0f8c620e0121de3ce0be4eb5584d13b61d9a42eba7f51ab716f447",
       "byteLength": 243,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -961,7 +403,7 @@
       "sourceRevision": "sha256:341aee025916941e13d32882273243b1b6518a607e69951d3fb196c137c64a46",
       "contentDigest": "341aee025916941e13d32882273243b1b6518a607e69951d3fb196c137c64a46",
       "byteLength": 1829,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1006,7 +448,7 @@
       "sourceRevision": "sha256:0d0fb14fc4c89664df72347e8ff8d6a92c060abbdf5db9b33f36f8a8b5a5fb66",
       "contentDigest": "0d0fb14fc4c89664df72347e8ff8d6a92c060abbdf5db9b33f36f8a8b5a5fb66",
       "byteLength": 198,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1051,7 +493,7 @@
       "sourceRevision": "sha256:e491ff80aa6f43d9606eafcbbb0a803e645036ed2f7f7f1be016460f23513b5c",
       "contentDigest": "e491ff80aa6f43d9606eafcbbb0a803e645036ed2f7f7f1be016460f23513b5c",
       "byteLength": 415,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1096,7 +538,7 @@
       "sourceRevision": "sha256:8b71146dcac6d5cc5be43c639bb2951c89c7a0188d9a52b9f1fc64e47640d8b7",
       "contentDigest": "8b71146dcac6d5cc5be43c639bb2951c89c7a0188d9a52b9f1fc64e47640d8b7",
       "byteLength": 442,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1141,7 +583,7 @@
       "sourceRevision": "sha256:0b84d6e2c7de6121922960da1eac67bfc9c1b6a1ad7791c318a28f6c63a0712f",
       "contentDigest": "0b84d6e2c7de6121922960da1eac67bfc9c1b6a1ad7791c318a28f6c63a0712f",
       "byteLength": 198,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1186,7 +628,7 @@
       "sourceRevision": "sha256:d65b4571d985d49c5c5010a899b8d19f9b473b0a395e6a14b51407ba983d4833",
       "contentDigest": "d65b4571d985d49c5c5010a899b8d19f9b473b0a395e6a14b51407ba983d4833",
       "byteLength": 4074,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1231,7 +673,7 @@
       "sourceRevision": "sha256:68c3892c4326362d6279d04cfca4ba3f578d16aae5799ceb1cfcce328e77e8d4",
       "contentDigest": "68c3892c4326362d6279d04cfca4ba3f578d16aae5799ceb1cfcce328e77e8d4",
       "byteLength": 160,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1276,7 +718,7 @@
       "sourceRevision": "sha256:e19f5c5a1cba05f38e28d70897eb4cbc52b4553b79e83102fddde47c8ffe725e",
       "contentDigest": "e19f5c5a1cba05f38e28d70897eb4cbc52b4553b79e83102fddde47c8ffe725e",
       "byteLength": 309,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1321,7 +763,7 @@
       "sourceRevision": "sha256:4b69371437c734fadd9cc150cab105b8b5e77093ce87c78974c9c2557377bbc0",
       "contentDigest": "4b69371437c734fadd9cc150cab105b8b5e77093ce87c78974c9c2557377bbc0",
       "byteLength": 768,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1366,7 +808,7 @@
       "sourceRevision": "sha256:4cd1c05206aebf61c2c5ca88fa04291988a0397128c69192472d7cc171b3ac2a",
       "contentDigest": "4cd1c05206aebf61c2c5ca88fa04291988a0397128c69192472d7cc171b3ac2a",
       "byteLength": 300,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1411,7 +853,7 @@
       "sourceRevision": "sha256:ac2c1337c4ef05dac979eeead2d7bff56c522afe6d31493b2ccce45d0424ce1b",
       "contentDigest": "ac2c1337c4ef05dac979eeead2d7bff56c522afe6d31493b2ccce45d0424ce1b",
       "byteLength": 735,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1456,7 +898,7 @@
       "sourceRevision": "sha256:14f3954b456e2b64a82e7dacf5eeaf1c530a267fcddefe0af182ed8c47660bcd",
       "contentDigest": "14f3954b456e2b64a82e7dacf5eeaf1c530a267fcddefe0af182ed8c47660bcd",
       "byteLength": 3538,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1501,7 +943,7 @@
       "sourceRevision": "sha256:d2a56441921f791e79501c3bbd887c44fb548233883be1c95b5b798e8464020e",
       "contentDigest": "d2a56441921f791e79501c3bbd887c44fb548233883be1c95b5b798e8464020e",
       "byteLength": 4090,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1546,7 +988,7 @@
       "sourceRevision": "sha256:36476366b0a80a505b1067200cd8e29fc2850250686b05a01815023c2582fed2",
       "contentDigest": "36476366b0a80a505b1067200cd8e29fc2850250686b05a01815023c2582fed2",
       "byteLength": 3386,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1591,7 +1033,7 @@
       "sourceRevision": "sha256:dd61cdc14cc3070059170cdb852e50863fdfe529aa207ee001564b3d2535e534",
       "contentDigest": "dd61cdc14cc3070059170cdb852e50863fdfe529aa207ee001564b3d2535e534",
       "byteLength": 3789,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1636,7 +1078,7 @@
       "sourceRevision": "sha256:20da50cb9ca2142a0cd5416c15ec73f03e10592de19ff1e14960bfd8d0b5e9d0",
       "contentDigest": "20da50cb9ca2142a0cd5416c15ec73f03e10592de19ff1e14960bfd8d0b5e9d0",
       "byteLength": 17844,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1681,7 +1123,7 @@
       "sourceRevision": "sha256:ffdbf1b07df2eb194c3c3289abc6bdb67144232c487945412d2bd90de1bde0b1",
       "contentDigest": "ffdbf1b07df2eb194c3c3289abc6bdb67144232c487945412d2bd90de1bde0b1",
       "byteLength": 5787,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1723,10 +1165,10 @@
     },
     {
       "sourceRef": ".claude/commands/deep-audit.md",
-      "sourceRevision": "sha256:47f13b0c3df2e8aefde546cd6c42ec85b8295e02ced311d69fcc69b522b49d9e",
-      "contentDigest": "47f13b0c3df2e8aefde546cd6c42ec85b8295e02ced311d69fcc69b522b49d9e",
-      "byteLength": 17705,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "sourceRevision": "sha256:8e05620ca9ab287727697fd9cae0b806308539c56eb25a8b84fe941336cedc59",
+      "contentDigest": "8e05620ca9ab287727697fd9cae0b806308539c56eb25a8b84fe941336cedc59",
+      "byteLength": 11487,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1758,15 +1200,12 @@
           "matches": {
             "sourceRef": true,
             "workspaceRevision": false,
-            "sourceRevision": false,
-            "contentDigest": false,
-            "byteLength": false
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
           },
           "mismatchedFields": [
-            "workspaceRevision",
-            "sourceRevision",
-            "contentDigest",
-            "byteLength"
+            "workspaceRevision"
           ],
           "exact": false
         }
@@ -1778,7 +1217,7 @@
       "sourceRevision": "sha256:0ab93b91186a49f2517a09dc1132c924a230964c20eeb3ebebeaf44b31f8e0d3",
       "contentDigest": "0ab93b91186a49f2517a09dc1132c924a230964c20eeb3ebebeaf44b31f8e0d3",
       "byteLength": 11693,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1823,7 +1262,7 @@
       "sourceRevision": "sha256:552cebcc155ec1e8de1c60a033c50cdae7cebc01a7b9def961201c6ad4dafbf8",
       "contentDigest": "552cebcc155ec1e8de1c60a033c50cdae7cebc01a7b9def961201c6ad4dafbf8",
       "byteLength": 6481,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1868,7 +1307,7 @@
       "sourceRevision": "sha256:89d7cee95f269936adfa3b38e19acca09dc1780d6b448968e3315fc87f5222f4",
       "contentDigest": "89d7cee95f269936adfa3b38e19acca09dc1780d6b448968e3315fc87f5222f4",
       "byteLength": 5287,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1913,7 +1352,7 @@
       "sourceRevision": "sha256:fd18d7258de6002efbed97ab32e9ce61f2b7d899e3be6843dd64f6f2b5d88108",
       "contentDigest": "fd18d7258de6002efbed97ab32e9ce61f2b7d899e3be6843dd64f6f2b5d88108",
       "byteLength": 5916,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -1958,7 +1397,7 @@
       "sourceRevision": "sha256:8ed0cb6e9933a71f676ef94a5b865e5681155b04ceafbe0171160791673da156",
       "contentDigest": "8ed0cb6e9933a71f676ef94a5b865e5681155b04ceafbe0171160791673da156",
       "byteLength": 7450,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2003,7 +1442,7 @@
       "sourceRevision": "sha256:b6f40402553e7348172fae8e154aa65284f49308a90d79209d2bdaae35059023",
       "contentDigest": "b6f40402553e7348172fae8e154aa65284f49308a90d79209d2bdaae35059023",
       "byteLength": 5237,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2048,7 +1487,7 @@
       "sourceRevision": "sha256:df2c3ba5ad9bc4d6ecc8b35427285ad6355fc12fe1574cbca7bed165396075b1",
       "contentDigest": "df2c3ba5ad9bc4d6ecc8b35427285ad6355fc12fe1574cbca7bed165396075b1",
       "byteLength": 5058,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2093,7 +1532,7 @@
       "sourceRevision": "sha256:47e6a73cd047b00416a19b212b8378d67220d377640c065c0a6e2074e4095a68",
       "contentDigest": "47e6a73cd047b00416a19b212b8378d67220d377640c065c0a6e2074e4095a68",
       "byteLength": 26280,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2138,7 +1577,7 @@
       "sourceRevision": "sha256:32c11e87a52d9b538ce8f8d980977822a1168fd9ca751425a99de6c48b8565d4",
       "contentDigest": "32c11e87a52d9b538ce8f8d980977822a1168fd9ca751425a99de6c48b8565d4",
       "byteLength": 14019,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2183,7 +1622,7 @@
       "sourceRevision": "sha256:07ac2c997aebe19e2e6c52b06ff1aa11446e72fe7b870f744606ee6f8f0ff2f2",
       "contentDigest": "07ac2c997aebe19e2e6c52b06ff1aa11446e72fe7b870f744606ee6f8f0ff2f2",
       "byteLength": 9213,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2228,7 +1667,7 @@
       "sourceRevision": "sha256:2d1d24785db94024f0ddf5e42c13acbe64587d41b50db684333951261061f26d",
       "contentDigest": "2d1d24785db94024f0ddf5e42c13acbe64587d41b50db684333951261061f26d",
       "byteLength": 1846,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2273,7 +1712,7 @@
       "sourceRevision": "sha256:4397bb89877c25b89203b3fa8e5999894202b331b9babc5c5dba0cfca44e839e",
       "contentDigest": "4397bb89877c25b89203b3fa8e5999894202b331b9babc5c5dba0cfca44e839e",
       "byteLength": 2285,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2318,7 +1757,7 @@
       "sourceRevision": "sha256:09f8a67945e52bfa12c82a0b4a90016cfee4680863c9ffcd5ff0358b0bcd399c",
       "contentDigest": "09f8a67945e52bfa12c82a0b4a90016cfee4680863c9ffcd5ff0358b0bcd399c",
       "byteLength": 6258,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2386,7 +1825,7 @@
       "sourceRevision": "sha256:c6ea0532b66f20faf339ce8301d5f9db9f9da75415664ab45ede91fa9423c328",
       "contentDigest": "c6ea0532b66f20faf339ce8301d5f9db9f9da75415664ab45ede91fa9423c328",
       "byteLength": 4418,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2431,7 +1870,7 @@
       "sourceRevision": "sha256:fc05beb3229dcdc2c80cff11bf80844048173b4fd649cc58367db2f54f8a12f1",
       "contentDigest": "fc05beb3229dcdc2c80cff11bf80844048173b4fd649cc58367db2f54f8a12f1",
       "byteLength": 13194,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2476,7 +1915,7 @@
       "sourceRevision": "sha256:25dd595543db60b1b47fdf7391b34b64bf9f25a11f77c03679bc127d40bae821",
       "contentDigest": "25dd595543db60b1b47fdf7391b34b64bf9f25a11f77c03679bc127d40bae821",
       "byteLength": 7459,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2521,7 +1960,7 @@
       "sourceRevision": "sha256:10a5dcd2dd79ee6b7aed97f422564328dce03e45f2b87526d4bbf22a00cc4e4f",
       "contentDigest": "10a5dcd2dd79ee6b7aed97f422564328dce03e45f2b87526d4bbf22a00cc4e4f",
       "byteLength": 9451,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2566,7 +2005,7 @@
       "sourceRevision": "sha256:be9bacb14c80dcda9e8b529493f692c638c0b99bb7bce20eb4cdcfdd6226196e",
       "contentDigest": "be9bacb14c80dcda9e8b529493f692c638c0b99bb7bce20eb4cdcfdd6226196e",
       "byteLength": 8488,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2608,10 +2047,10 @@
     },
     {
       "sourceRef": ".claude/settings.json",
-      "sourceRevision": "sha256:c07ce5ce24a33603a8517d984188de044a1bdfc3905e2db438cd3cc929a3a14e",
-      "contentDigest": "c07ce5ce24a33603a8517d984188de044a1bdfc3905e2db438cd3cc929a3a14e",
-      "byteLength": 10166,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "sourceRevision": "sha256:1d6bac968abfb68db993c7aebab7de81fd939a909a24ac59eeb7aae257e05dc2",
+      "contentDigest": "1d6bac968abfb68db993c7aebab7de81fd939a909a24ac59eeb7aae257e05dc2",
+      "byteLength": 9450,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2660,10 +2099,10 @@
     },
     {
       "sourceRef": ".claude/settings.local.json",
-      "sourceRevision": "sha256:becd204a759563b235038f18910d6d0e3fd6ebd899f1328c5aa12cedf257d7de",
-      "contentDigest": "becd204a759563b235038f18910d6d0e3fd6ebd899f1328c5aa12cedf257d7de",
-      "byteLength": 48619,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "sourceRevision": "sha256:32fed5fa33dd50cb46383382fb7ddd27ede23ccff49b4738df2d1ad0a9c11e2c",
+      "contentDigest": "32fed5fa33dd50cb46383382fb7ddd27ede23ccff49b4738df2d1ad0a9c11e2c",
+      "byteLength": 46173,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2761,7 +2200,7 @@
       "sourceRevision": "sha256:671d6513d83a3cc915edd67cd8c85d5a8932a0a8bf7cab9d9b556cc13c2fbe11",
       "contentDigest": "671d6513d83a3cc915edd67cd8c85d5a8932a0a8bf7cab9d9b556cc13c2fbe11",
       "byteLength": 6675,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2785,7 +2224,7 @@
       "sourceRevision": "sha256:e9dc4ab640ddf6924dbc525745f4df81b593ee308f6bae2faa8770b7cc2a2be6",
       "contentDigest": "e9dc4ab640ddf6924dbc525745f4df81b593ee308f6bae2faa8770b7cc2a2be6",
       "byteLength": 3539,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2830,7 +2269,7 @@
       "sourceRevision": "sha256:3224764997eb483b3784685fa8adc9379e46338b7b28e06badf3923c3dfcf392",
       "contentDigest": "3224764997eb483b3784685fa8adc9379e46338b7b28e06badf3923c3dfcf392",
       "byteLength": 7529,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2898,7 +2337,7 @@
       "sourceRevision": "sha256:23e34b2d4eb21332ec45df8f43b06aa4c0ebb8e4b9376fb762f13fbee4d621b1",
       "contentDigest": "23e34b2d4eb21332ec45df8f43b06aa4c0ebb8e4b9376fb762f13fbee4d621b1",
       "byteLength": 13200,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2943,7 +2382,7 @@
       "sourceRevision": "sha256:5f851277425539c0d2faa0094c585dce30944dca8f7f0f5a8e5c5b26324ea4be",
       "contentDigest": "5f851277425539c0d2faa0094c585dce30944dca8f7f0f5a8e5c5b26324ea4be",
       "byteLength": 7642,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -2985,22 +2424,26 @@
     },
     {
       "sourceRef": ".claude/skills/drizzle-schema-review/SKILL.md",
-      "sourceRevision": "sha256:d59a18e766a86e3d3d5a3d6a544d335bb879b387ba6d393fbd2b11e24ef209a6",
-      "contentDigest": "d59a18e766a86e3d3d5a3d6a544d335bb879b387ba6d393fbd2b11e24ef209a6",
-      "byteLength": 6019,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "sourceRevision": "sha256:ace0002a04ae2ee4f43476c8d277202271e62f5f36a7bcedfe24b6f833fdf615",
+      "contentDigest": "ace0002a04ae2ee4f43476c8d277202271e62f5f36a7bcedfe24b6f833fdf615",
+      "byteLength": 4103,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
         "byteLength": 6019,
         "contentDigest": "d59a18e766a86e3d3d5a3d6a544d335bb879b387ba6d393fbd2b11e24ef209a6",
         "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
+          "sourceRevision": false,
+          "contentDigest": false,
+          "byteLength": false
         },
-        "mismatchedFields": [],
-        "exact": true
+        "mismatchedFields": [
+          "sourceRevision",
+          "contentDigest",
+          "byteLength"
+        ],
+        "exact": false
       },
       "graphifyRows": 1,
       "exactCurrentRows": 0,
@@ -3016,15 +2459,12 @@
           "matches": {
             "sourceRef": true,
             "workspaceRevision": false,
-            "sourceRevision": false,
-            "contentDigest": false,
-            "byteLength": false
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
           },
           "mismatchedFields": [
-            "workspaceRevision",
-            "sourceRevision",
-            "contentDigest",
-            "byteLength"
+            "workspaceRevision"
           ],
           "exact": false
         }
@@ -3036,7 +2476,7 @@
       "sourceRevision": "sha256:19e7ba3b8bb880ce4f4b0c3ab9d876384a351062fd70050060dac7dd6d7aea80",
       "contentDigest": "19e7ba3b8bb880ce4f4b0c3ab9d876384a351062fd70050060dac7dd6d7aea80",
       "byteLength": 2098,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -3104,7 +2544,7 @@
       "sourceRevision": "sha256:83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
       "contentDigest": "83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
       "byteLength": 5465,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -3149,7 +2589,7 @@
       "sourceRevision": "sha256:85c8764715a18fbd11d16ca04bd9e15d8644bf5e4203176ad34eee192b546472",
       "contentDigest": "85c8764715a18fbd11d16ca04bd9e15d8644bf5e4203176ad34eee192b546472",
       "byteLength": 4965,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -3194,7 +2634,7 @@
       "sourceRevision": "sha256:79249f798ad0d69bf95f08f3c7a29d44d982e4c1645f1a12a21dfcd488f4ba0d",
       "contentDigest": "79249f798ad0d69bf95f08f3c7a29d44d982e4c1645f1a12a21dfcd488f4ba0d",
       "byteLength": 11428,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -3239,7 +2679,7 @@
       "sourceRevision": "sha256:a666b2381a7d5e982d8e32183484020f518da2b795c0f387c5ff4b3cb47be0fd",
       "contentDigest": "a666b2381a7d5e982d8e32183484020f518da2b795c0f387c5ff4b3cb47be0fd",
       "byteLength": 5465,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -3280,39 +2720,11 @@
       "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
-      "sourceRef": ".claude/skills/openspec-quickhit/SKILL.md",
-      "sourceRevision": "sha256:f056ffd88288fc750fa8777056af31ae1fe5ae8ba85698e11387c37d696dd31f",
-      "contentDigest": "f056ffd88288fc750fa8777056af31ae1fe5ae8ba85698e11387c37d696dd31f",
-      "byteLength": 5406,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 9751,
-        "contentDigest": "448af1abb9a0f3465e7e8254f47ac490681903161c803294aaedc3aafb94e8ed",
-        "matches": {
-          "sourceRevision": false,
-          "contentDigest": false,
-          "byteLength": false
-        },
-        "mismatchedFields": [
-          "sourceRevision",
-          "contentDigest",
-          "byteLength"
-        ],
-        "exact": false
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
       "sourceRef": ".claude/skills/openspec-sync-specs/SKILL.md",
       "sourceRevision": "sha256:420e5815eee33ebd642b9d038f0a5307b176923a5c1a837c4873e51de085aae3",
       "contentDigest": "420e5815eee33ebd642b9d038f0a5307b176923a5c1a837c4873e51de085aae3",
       "byteLength": 5187,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -3353,47 +2765,27 @@
       "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
-      "sourceRef": ".claude/skills/parent-atlas-workstation/SKILL.md",
-      "sourceRevision": "sha256:8b8bd26af5080852672f123dc8a46d6769651620f7ff9980a01482ee2ef7b630",
-      "contentDigest": "8b8bd26af5080852672f123dc8a46d6769651620f7ff9980a01482ee2ef7b630",
-      "byteLength": 5201,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 5201,
-        "contentDigest": "8b8bd26af5080852672f123dc8a46d6769651620f7ff9980a01482ee2ef7b630",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
       "sourceRef": ".claude/skills/trace-mcp-tooling/SKILL.md",
-      "sourceRevision": "sha256:05c78c6f54deafbba8cc3bfd61922fcac091e90560523bbb2787669e4f8717db",
-      "contentDigest": "05c78c6f54deafbba8cc3bfd61922fcac091e90560523bbb2787669e4f8717db",
-      "byteLength": 3954,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "sourceRevision": "sha256:7407473d0dcd2fe07746b3bdd7dfee8d3acdebaac513172bcea1f05835f887c5",
+      "contentDigest": "7407473d0dcd2fe07746b3bdd7dfee8d3acdebaac513172bcea1f05835f887c5",
+      "byteLength": 3968,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
         "byteLength": 3954,
         "contentDigest": "05c78c6f54deafbba8cc3bfd61922fcac091e90560523bbb2787669e4f8717db",
         "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
+          "sourceRevision": false,
+          "contentDigest": false,
+          "byteLength": false
         },
-        "mismatchedFields": [],
-        "exact": true
+        "mismatchedFields": [
+          "sourceRevision",
+          "contentDigest",
+          "byteLength"
+        ],
+        "exact": false
       },
       "graphifyRows": 2,
       "exactCurrentRows": 0,
@@ -3432,15 +2824,12 @@
           "matches": {
             "sourceRef": true,
             "workspaceRevision": false,
-            "sourceRevision": false,
-            "contentDigest": false,
-            "byteLength": false
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
           },
           "mismatchedFields": [
-            "workspaceRevision",
-            "sourceRevision",
-            "contentDigest",
-            "byteLength"
+            "workspaceRevision"
           ],
           "exact": false
         }
@@ -3452,7 +2841,7 @@
       "sourceRevision": "sha256:91b9393daeeff1cd6a598072e393524197cc5ee41d293a6a17b3233865dc6a37",
       "contentDigest": "91b9393daeeff1cd6a598072e393524197cc5ee41d293a6a17b3233865dc6a37",
       "byteLength": 2743,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -3493,179 +2882,11 @@
       "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
-      "sourceRef": ".claude/skills/validating-parent-atlas/SKILL.md",
-      "sourceRevision": "sha256:a2e8c0c68a26e8032fd5f4557e41dce31950751c2097013bd59fe23ef45684b9",
-      "contentDigest": "a2e8c0c68a26e8032fd5f4557e41dce31950751c2097013bd59fe23ef45684b9",
-      "byteLength": 4774,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 4774,
-        "contentDigest": "a2e8c0c68a26e8032fd5f4557e41dce31950751c2097013bd59fe23ef45684b9",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".claude/skills/validating-parent-atlas/reference/adversarial-probes.md",
-      "sourceRevision": "sha256:4f717d07e292522e0221745685bfd9512370c68dff3ae80675935c845285f36a",
-      "contentDigest": "4f717d07e292522e0221745685bfd9512370c68dff3ae80675935c845285f36a",
-      "byteLength": 2415,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 2415,
-        "contentDigest": "4f717d07e292522e0221745685bfd9512370c68dff3ae80675935c845285f36a",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".claude/skills/validating-parent-atlas/reference/identity-and-lineage.md",
-      "sourceRevision": "sha256:d4a73f3ef64bea114b1c1280233305c9af33c6ac5f1cd07eb4100e770488f2c0",
-      "contentDigest": "d4a73f3ef64bea114b1c1280233305c9af33c6ac5f1cd07eb4100e770488f2c0",
-      "byteLength": 2361,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 2361,
-        "contentDigest": "d4a73f3ef64bea114b1c1280233305c9af33c6ac5f1cd07eb4100e770488f2c0",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".claude/skills/validating-parent-atlas/reference/proof-levels.md",
-      "sourceRevision": "sha256:a8cd8d1c03e79ca5ebf911fc21f1dfc96cc6e21917d30cd32b6a36efc495acd7",
-      "contentDigest": "a8cd8d1c03e79ca5ebf911fc21f1dfc96cc6e21917d30cd32b6a36efc495acd7",
-      "byteLength": 1341,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 1341,
-        "contentDigest": "a8cd8d1c03e79ca5ebf911fc21f1dfc96cc6e21917d30cd32b6a36efc495acd7",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".claude/skills/validating-parent-atlas/reference/runtime-side-effects.md",
-      "sourceRevision": "sha256:5f6d3112b3f240e891961c55c15638815c44e91649eb1c7b989372089e039035",
-      "contentDigest": "5f6d3112b3f240e891961c55c15638815c44e91649eb1c7b989372089e039035",
-      "byteLength": 867,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 867,
-        "contentDigest": "5f6d3112b3f240e891961c55c15638815c44e91649eb1c7b989372089e039035",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".claude/skills/validating-parent-atlas/reference/semantic-projection.md",
-      "sourceRevision": "sha256:fcca0f810b06d8d67f98bfaead253b515e7e64707e4939fbc28aae352a0470d3",
-      "contentDigest": "fcca0f810b06d8d67f98bfaead253b515e7e64707e4939fbc28aae352a0470d3",
-      "byteLength": 1118,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 1118,
-        "contentDigest": "fcca0f810b06d8d67f98bfaead253b515e7e64707e4939fbc28aae352a0470d3",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".claude/skills/validating-parent-atlas/reference/structural-lineage.md",
-      "sourceRevision": "sha256:9e168c47e4bb183ed2faa634142886df4425466de7a22ae84da5e1818e2705e2",
-      "contentDigest": "9e168c47e4bb183ed2faa634142886df4425466de7a22ae84da5e1818e2705e2",
-      "byteLength": 1411,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 1411,
-        "contentDigest": "9e168c47e4bb183ed2faa634142886df4425466de7a22ae84da5e1818e2705e2",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
       "sourceRef": ".cline-config.json",
       "sourceRevision": "sha256:3d6100b8c6d3392160d2382f59f5ced4c460ec373544830ccd9eeab502518963",
       "contentDigest": "3d6100b8c6d3392160d2382f59f5ced4c460ec373544830ccd9eeab502518963",
       "byteLength": 1855,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -3710,7 +2931,7 @@
       "sourceRevision": "sha256:e469069cf6be5e3fd6dceee4d0caf9598e436e9494b575b5b414c153354d55c6",
       "contentDigest": "e469069cf6be5e3fd6dceee4d0caf9598e436e9494b575b5b414c153354d55c6",
       "byteLength": 1136,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -3755,7 +2976,7 @@
       "sourceRevision": "sha256:e0572894e8a84ddda9853225196f72a0b547446c7aa92ac7ff9136ff6ff16a89",
       "contentDigest": "e0572894e8a84ddda9853225196f72a0b547446c7aa92ac7ff9136ff6ff16a89",
       "byteLength": 573,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -3800,7 +3021,7 @@
       "sourceRevision": "sha256:4bc1d531a8a7b2240d81cc4544487803242ea95d557d470738b0d03a080c71d2",
       "contentDigest": "4bc1d531a8a7b2240d81cc4544487803242ea95d557d470738b0d03a080c71d2",
       "byteLength": 1622,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -3868,7 +3089,7 @@
       "sourceRevision": "sha256:8627cf96fb692d991b343e7fc6a96866d7502a14747607d8c14ff3b18f239280",
       "contentDigest": "8627cf96fb692d991b343e7fc6a96866d7502a14747607d8c14ff3b18f239280",
       "byteLength": 1535,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -3913,7 +3134,7 @@
       "sourceRevision": "sha256:9f9037e53355b56cf5729cc1a1231375bcbeee31d9ebf46abe7013bc0e233bf4",
       "contentDigest": "9f9037e53355b56cf5729cc1a1231375bcbeee31d9ebf46abe7013bc0e233bf4",
       "byteLength": 1670,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -3958,7 +3179,7 @@
       "sourceRevision": "sha256:01768d5af2dbe85602e2653e2921aa26175441a22d6d049aa3934c7f2ac0f7ff",
       "contentDigest": "01768d5af2dbe85602e2653e2921aa26175441a22d6d049aa3934c7f2ac0f7ff",
       "byteLength": 5358,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4003,7 +3224,7 @@
       "sourceRevision": "sha256:83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
       "contentDigest": "83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
       "byteLength": 5465,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4048,7 +3269,7 @@
       "sourceRevision": "sha256:85c8764715a18fbd11d16ca04bd9e15d8644bf5e4203176ad34eee192b546472",
       "contentDigest": "85c8764715a18fbd11d16ca04bd9e15d8644bf5e4203176ad34eee192b546472",
       "byteLength": 4965,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4093,7 +3314,7 @@
       "sourceRevision": "sha256:79249f798ad0d69bf95f08f3c7a29d44d982e4c1645f1a12a21dfcd488f4ba0d",
       "contentDigest": "79249f798ad0d69bf95f08f3c7a29d44d982e4c1645f1a12a21dfcd488f4ba0d",
       "byteLength": 11428,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4138,7 +3359,7 @@
       "sourceRevision": "sha256:a666b2381a7d5e982d8e32183484020f518da2b795c0f387c5ff4b3cb47be0fd",
       "contentDigest": "a666b2381a7d5e982d8e32183484020f518da2b795c0f387c5ff4b3cb47be0fd",
       "byteLength": 5465,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4183,7 +3404,7 @@
       "sourceRevision": "sha256:420e5815eee33ebd642b9d038f0a5307b176923a5c1a837c4873e51de085aae3",
       "contentDigest": "420e5815eee33ebd642b9d038f0a5307b176923a5c1a837c4873e51de085aae3",
       "byteLength": 5187,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4228,7 +3449,7 @@
       "sourceRevision": "sha256:857cdc93695eb13ec0530bc1e9b86c2b7ee35cc1b4d543989992c0c571c737e2",
       "contentDigest": "857cdc93695eb13ec0530bc1e9b86c2b7ee35cc1b4d543989992c0c571c737e2",
       "byteLength": 1484,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4273,7 +3494,7 @@
       "sourceRevision": "sha256:4bc1d531a8a7b2240d81cc4544487803242ea95d557d470738b0d03a080c71d2",
       "contentDigest": "4bc1d531a8a7b2240d81cc4544487803242ea95d557d470738b0d03a080c71d2",
       "byteLength": 1622,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4341,7 +3562,7 @@
       "sourceRevision": "sha256:8a3e7d5674a9fedc847cefca7265b4b0328d84226a1082d68df3a39bc7ffb346",
       "contentDigest": "8a3e7d5674a9fedc847cefca7265b4b0328d84226a1082d68df3a39bc7ffb346",
       "byteLength": 3566,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4409,7 +3630,7 @@
       "sourceRevision": "sha256:93dc73a48d3892f5dc9cccaeddde3d0bd666e08135003147b5de602575804f7d",
       "contentDigest": "93dc73a48d3892f5dc9cccaeddde3d0bd666e08135003147b5de602575804f7d",
       "byteLength": 2248,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4454,7 +3675,7 @@
       "sourceRevision": "sha256:7e54f06a0dc00327c7516373d011b2a7266fc4702ffc787c922c1980118b8150",
       "contentDigest": "7e54f06a0dc00327c7516373d011b2a7266fc4702ffc787c922c1980118b8150",
       "byteLength": 2618,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4499,7 +3720,7 @@
       "sourceRevision": "sha256:55528112d2cc94fe447912d288fea41173ec5a46fcaf91f329553239580d86b3",
       "contentDigest": "55528112d2cc94fe447912d288fea41173ec5a46fcaf91f329553239580d86b3",
       "byteLength": 5168,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4544,7 +3765,7 @@
       "sourceRevision": "sha256:9f05d6bc80f2ef5bb997cd09204fbbcce1a91d9997e8d037bb05d47cd62546bf",
       "contentDigest": "9f05d6bc80f2ef5bb997cd09204fbbcce1a91d9997e8d037bb05d47cd62546bf",
       "byteLength": 5799,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4589,7 +3810,7 @@
       "sourceRevision": "sha256:f08b7e27c97cc10ac71557f185a22231aebca2c810f2a4bfdfa770e3b0fc87bb",
       "contentDigest": "f08b7e27c97cc10ac71557f185a22231aebca2c810f2a4bfdfa770e3b0fc87bb",
       "byteLength": 7321,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4634,7 +3855,7 @@
       "sourceRevision": "sha256:59366239b5418dbc8c6abb6279c955d84599c1dc4107b4c3074810589f4ee1f5",
       "contentDigest": "59366239b5418dbc8c6abb6279c955d84599c1dc4107b4c3074810589f4ee1f5",
       "byteLength": 5118,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4679,7 +3900,7 @@
       "sourceRevision": "sha256:1dd1468adc5545513f9e86edfcf554092467f65274a57eb958d563529c28aba6",
       "contentDigest": "1dd1468adc5545513f9e86edfcf554092467f65274a57eb958d563529c28aba6",
       "byteLength": 4943,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4720,59 +3941,11 @@
       "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
-      "sourceRef": ".codex/skills/graphify-lineage-e2e/SKILL.md",
-      "sourceRevision": "sha256:5aec0a1e663fe3988463dc8c0d4e97c8c065c1cd2a4d1819bf93fd47c228743e",
-      "contentDigest": "5aec0a1e663fe3988463dc8c0d4e97c8c065c1cd2a4d1819bf93fd47c228743e",
-      "byteLength": 12850,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 12850,
-        "contentDigest": "5aec0a1e663fe3988463dc8c0d4e97c8c065c1cd2a4d1819bf93fd47c228743e",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".codex/skills/graphify-pipeline-gap-audit/SKILL.md",
-      "sourceRevision": "sha256:fe6bfe5f7e3b2db72dd0aa75c62a1c698ca7766b6c866d8c48546a4125e6bffd",
-      "contentDigest": "fe6bfe5f7e3b2db72dd0aa75c62a1c698ca7766b6c866d8c48546a4125e6bffd",
-      "byteLength": 12047,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 12047,
-        "contentDigest": "fe6bfe5f7e3b2db72dd0aa75c62a1c698ca7766b6c866d8c48546a4125e6bffd",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
       "sourceRef": ".codex/skills/openspec-apply-change/SKILL.md",
       "sourceRevision": "sha256:83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
       "contentDigest": "83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
       "byteLength": 5465,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4817,7 +3990,7 @@
       "sourceRevision": "sha256:85c8764715a18fbd11d16ca04bd9e15d8644bf5e4203176ad34eee192b546472",
       "contentDigest": "85c8764715a18fbd11d16ca04bd9e15d8644bf5e4203176ad34eee192b546472",
       "byteLength": 4965,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4862,7 +4035,7 @@
       "sourceRevision": "sha256:79249f798ad0d69bf95f08f3c7a29d44d982e4c1645f1a12a21dfcd488f4ba0d",
       "contentDigest": "79249f798ad0d69bf95f08f3c7a29d44d982e4c1645f1a12a21dfcd488f4ba0d",
       "byteLength": 11428,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4907,7 +4080,7 @@
       "sourceRevision": "sha256:a666b2381a7d5e982d8e32183484020f518da2b795c0f387c5ff4b3cb47be0fd",
       "contentDigest": "a666b2381a7d5e982d8e32183484020f518da2b795c0f387c5ff4b3cb47be0fd",
       "byteLength": 5465,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4952,7 +4125,7 @@
       "sourceRevision": "sha256:420e5815eee33ebd642b9d038f0a5307b176923a5c1a837c4873e51de085aae3",
       "contentDigest": "420e5815eee33ebd642b9d038f0a5307b176923a5c1a837c4873e51de085aae3",
       "byteLength": 5187,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -4993,59 +4166,11 @@
       "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
-      "sourceRef": ".codex/skills/parent-atlas-openspec-progress/SKILL.md",
-      "sourceRevision": "sha256:0d9f158345f468007406b6c04b82f0a6922d354afc88eb171bb9599243200c38",
-      "contentDigest": "0d9f158345f468007406b6c04b82f0a6922d354afc88eb171bb9599243200c38",
-      "byteLength": 9425,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 9425,
-        "contentDigest": "0d9f158345f468007406b6c04b82f0a6922d354afc88eb171bb9599243200c38",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
-      "sourceRef": ".codex/skills/parent-atlas-production-hardening-audit/SKILL.md",
-      "sourceRevision": "sha256:de68b4d9d145659e62eb3378d9d3b4782c6075d470c81d38288697f38f7a6c67",
-      "contentDigest": "de68b4d9d145659e62eb3378d9d3b4782c6075d470c81d38288697f38f7a6c67",
-      "byteLength": 6526,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-      "bindingPresent": true,
-      "localSourceBytes": {
-        "available": true,
-        "byteLength": 6526,
-        "contentDigest": "de68b4d9d145659e62eb3378d9d3b4782c6075d470c81d38288697f38f7a6c67",
-        "matches": {
-          "sourceRevision": true,
-          "contentDigest": true,
-          "byteLength": true
-        },
-        "mismatchedFields": [],
-        "exact": true
-      },
-      "graphifyRows": 0,
-      "exactCurrentRows": 0,
-      "comparisons": [],
-      "classification": "MISSING_GRAPHIFY_SOURCE"
-    },
-    {
       "sourceRef": ".couchdb-state-report-2026-05-29.md",
       "sourceRevision": "sha256:f11ce42bee5f27bf7acf1904487b3ff0f9fde6abacba9316b89141f423b906ec",
       "contentDigest": "f11ce42bee5f27bf7acf1904487b3ff0f9fde6abacba9316b89141f423b906ec",
       "byteLength": 7892,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -5090,7 +4215,7 @@
       "sourceRevision": "sha256:57ace7434a0586ec7e2cfd8c24cc5a17fde2057c6e4640f57a0388b08385d065",
       "contentDigest": "57ace7434a0586ec7e2cfd8c24cc5a17fde2057c6e4640f57a0388b08385d065",
       "byteLength": 269,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -5135,7 +4260,7 @@
       "sourceRevision": "sha256:3038e7699b81fdfbab561c35f8f008ae6a545d8cf0a77c7a3e1db69ff1585c53",
       "contentDigest": "3038e7699b81fdfbab561c35f8f008ae6a545d8cf0a77c7a3e1db69ff1585c53",
       "byteLength": 306,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -5180,7 +4305,7 @@
       "sourceRevision": "sha256:357ac4061fb36e8fccbe82d3cbb2ae7da2fde845fa41e363d7d8a72c72be6f44",
       "contentDigest": "357ac4061fb36e8fccbe82d3cbb2ae7da2fde845fa41e363d7d8a72c72be6f44",
       "byteLength": 1985,
-      "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
       "bindingPresent": true,
       "localSourceBytes": {
         "available": true,
@@ -5204,6 +4329,1916 @@
             "sourceRevision": "sha256:357ac4061fb36e8fccbe82d3cbb2ae7da2fde845fa41e363d7d8a72c72be6f44",
             "contentDigest": "357ac4061fb36e8fccbe82d3cbb2ae7da2fde845fa41e363d7d8a72c72be6f44",
             "byteLength": "1985"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/agents/chat-attachment-engineer.agent.md",
+      "sourceRevision": "sha256:c188f332b5dabc78999001a4cff2837543e844ff0ff379fc97c890f4efe660f4",
+      "contentDigest": "c188f332b5dabc78999001a4cff2837543e844ff0ff379fc97c890f4efe660f4",
+      "byteLength": 2027,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 2027,
+        "contentDigest": "c188f332b5dabc78999001a4cff2837543e844ff0ff379fc97c890f4efe660f4",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/agents/chat-attachment-engineer.agent.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:c188f332b5dabc78999001a4cff2837543e844ff0ff379fc97c890f4efe660f4",
+            "contentDigest": "c188f332b5dabc78999001a4cff2837543e844ff0ff379fc97c890f4efe660f4",
+            "byteLength": "2027"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/agents/design-system-steward.agent.md",
+      "sourceRevision": "sha256:c97425261ce972a4ef5d0e215b925f9a4f572e1c36d23fd6a9a5aff212299ba2",
+      "contentDigest": "c97425261ce972a4ef5d0e215b925f9a4f572e1c36d23fd6a9a5aff212299ba2",
+      "byteLength": 1981,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 1981,
+        "contentDigest": "c97425261ce972a4ef5d0e215b925f9a4f572e1c36d23fd6a9a5aff212299ba2",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/agents/design-system-steward.agent.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:c97425261ce972a4ef5d0e215b925f9a4f572e1c36d23fd6a9a5aff212299ba2",
+            "contentDigest": "c97425261ce972a4ef5d0e215b925f9a4f572e1c36d23fd6a9a5aff212299ba2",
+            "byteLength": "1981"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/agents/evidence-pipeline-engineer.agent.md",
+      "sourceRevision": "sha256:db28cc1eedce356ff504f3079ec41b3b7919172f2d6b02af8b19e081e8893d67",
+      "contentDigest": "db28cc1eedce356ff504f3079ec41b3b7919172f2d6b02af8b19e081e8893d67",
+      "byteLength": 2125,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 2125,
+        "contentDigest": "db28cc1eedce356ff504f3079ec41b3b7919172f2d6b02af8b19e081e8893d67",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/agents/evidence-pipeline-engineer.agent.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:db28cc1eedce356ff504f3079ec41b3b7919172f2d6b02af8b19e081e8893d67",
+            "contentDigest": "db28cc1eedce356ff504f3079ec41b3b7919172f2d6b02af8b19e081e8893d67",
+            "byteLength": "2125"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/agents/import-audit-engineer.agent.md",
+      "sourceRevision": "sha256:e4f88d1794f750391e42ce53c501c963b1027887cedb1fd41e7913a1cbca7098",
+      "contentDigest": "e4f88d1794f750391e42ce53c501c963b1027887cedb1fd41e7913a1cbca7098",
+      "byteLength": 6277,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 6277,
+        "contentDigest": "e4f88d1794f750391e42ce53c501c963b1027887cedb1fd41e7913a1cbca7098",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/agents/import-audit-engineer.agent.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:e4f88d1794f750391e42ce53c501c963b1027887cedb1fd41e7913a1cbca7098",
+            "contentDigest": "e4f88d1794f750391e42ce53c501c963b1027887cedb1fd41e7913a1cbca7098",
+            "byteLength": "6277"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/agents/legal-library-engineer.agent.md",
+      "sourceRevision": "sha256:0268185c9aa78fb9d2c985a470a4b5c30ac3fae34d507ece8c948978f5851449",
+      "contentDigest": "0268185c9aa78fb9d2c985a470a4b5c30ac3fae34d507ece8c948978f5851449",
+      "byteLength": 6874,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 6874,
+        "contentDigest": "0268185c9aa78fb9d2c985a470a4b5c30ac3fae34d507ece8c948978f5851449",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/agents/legal-library-engineer.agent.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:0268185c9aa78fb9d2c985a470a4b5c30ac3fae34d507ece8c948978f5851449",
+            "contentDigest": "0268185c9aa78fb9d2c985a470a4b5c30ac3fae34d507ece8c948978f5851449",
+            "byteLength": "6874"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/agents/performance-caching-engineer.agent.md",
+      "sourceRevision": "sha256:d2a357b99aa53e1a9a2248d2835079e75720137812ce5085181ad34d0fe77b01",
+      "contentDigest": "d2a357b99aa53e1a9a2248d2835079e75720137812ce5085181ad34d0fe77b01",
+      "byteLength": 1976,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 1976,
+        "contentDigest": "d2a357b99aa53e1a9a2248d2835079e75720137812ce5085181ad34d0fe77b01",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/agents/performance-caching-engineer.agent.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:d2a357b99aa53e1a9a2248d2835079e75720137812ce5085181ad34d0fe77b01",
+            "contentDigest": "d2a357b99aa53e1a9a2248d2835079e75720137812ce5085181ad34d0fe77b01",
+            "byteLength": "1976"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/agents/playwright-feature-engineer.agent.md",
+      "sourceRevision": "sha256:83a8ee27b878c8c4866503af4f948415c1d65e3540ee0e69b4ea7f93e257c886",
+      "contentDigest": "83a8ee27b878c8c4866503af4f948415c1d65e3540ee0e69b4ea7f93e257c886",
+      "byteLength": 2022,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 2022,
+        "contentDigest": "83a8ee27b878c8c4866503af4f948415c1d65e3540ee0e69b4ea7f93e257c886",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/agents/playwright-feature-engineer.agent.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:83a8ee27b878c8c4866503af4f948415c1d65e3540ee0e69b4ea7f93e257c886",
+            "contentDigest": "83a8ee27b878c8c4866503af4f948415c1d65e3540ee0e69b4ea7f93e257c886",
+            "byteLength": "2022"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/agents/playwright-ui-ux.agent.md",
+      "sourceRevision": "sha256:3f0b55ba6b6b1ef41e4cfe0b5c9757d3b3e68836866962367768f9244342be37",
+      "contentDigest": "3f0b55ba6b6b1ef41e4cfe0b5c9757d3b3e68836866962367768f9244342be37",
+      "byteLength": 2835,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 2835,
+        "contentDigest": "3f0b55ba6b6b1ef41e4cfe0b5c9757d3b3e68836866962367768f9244342be37",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/agents/playwright-ui-ux.agent.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:3f0b55ba6b6b1ef41e4cfe0b5c9757d3b3e68836866962367768f9244342be37",
+            "contentDigest": "3f0b55ba6b6b1ef41e4cfe0b5c9757d3b3e68836866962367768f9244342be37",
+            "byteLength": "2835"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/agents/rag-retrieval-engineer.agent.md",
+      "sourceRevision": "sha256:2e0038c0a6c6631e96f2f07441ec60b07b35963386f0b73ab7827b38ac735904",
+      "contentDigest": "2e0038c0a6c6631e96f2f07441ec60b07b35963386f0b73ab7827b38ac735904",
+      "byteLength": 2029,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 2029,
+        "contentDigest": "2e0038c0a6c6631e96f2f07441ec60b07b35963386f0b73ab7827b38ac735904",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/agents/rag-retrieval-engineer.agent.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:2e0038c0a6c6631e96f2f07441ec60b07b35963386f0b73ab7827b38ac735904",
+            "contentDigest": "2e0038c0a6c6631e96f2f07441ec60b07b35963386f0b73ab7827b38ac735904",
+            "byteLength": "2029"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/agents/route-triage-engineer.agent.md",
+      "sourceRevision": "sha256:ec19ca32320c08f486bc1bd37f3079928d0bfa515e24bdbfaaef48d8d4bc702f",
+      "contentDigest": "ec19ca32320c08f486bc1bd37f3079928d0bfa515e24bdbfaaef48d8d4bc702f",
+      "byteLength": 2108,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 2108,
+        "contentDigest": "ec19ca32320c08f486bc1bd37f3079928d0bfa515e24bdbfaaef48d8d4bc702f",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/agents/route-triage-engineer.agent.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:ec19ca32320c08f486bc1bd37f3079928d0bfa515e24bdbfaaef48d8d4bc702f",
+            "contentDigest": "ec19ca32320c08f486bc1bd37f3079928d0bfa515e24bdbfaaef48d8d4bc702f",
+            "byteLength": "2108"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/agents/search-platform-engineer.agent.md",
+      "sourceRevision": "sha256:3fd320ecaa5772f6ec50d12c3a3b7a9a5de2beaa9b65d20b299cafdc83749339",
+      "contentDigest": "3fd320ecaa5772f6ec50d12c3a3b7a9a5de2beaa9b65d20b299cafdc83749339",
+      "byteLength": 9573,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 9573,
+        "contentDigest": "3fd320ecaa5772f6ec50d12c3a3b7a9a5de2beaa9b65d20b299cafdc83749339",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/agents/search-platform-engineer.agent.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:3fd320ecaa5772f6ec50d12c3a3b7a9a5de2beaa9b65d20b299cafdc83749339",
+            "contentDigest": "3fd320ecaa5772f6ec50d12c3a3b7a9a5de2beaa9b65d20b299cafdc83749339",
+            "byteLength": "9573"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/agents/svelte5-migration-engineer.agent.md",
+      "sourceRevision": "sha256:f806d36db6eb16563a0ca33fefaced8be5d0a6ec508a4a2e595a4aacfa1f98f2",
+      "contentDigest": "f806d36db6eb16563a0ca33fefaced8be5d0a6ec508a4a2e595a4aacfa1f98f2",
+      "byteLength": 1978,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 1978,
+        "contentDigest": "f806d36db6eb16563a0ca33fefaced8be5d0a6ec508a4a2e595a4aacfa1f98f2",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/agents/svelte5-migration-engineer.agent.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:f806d36db6eb16563a0ca33fefaced8be5d0a6ec508a4a2e595a4aacfa1f98f2",
+            "contentDigest": "f806d36db6eb16563a0ca33fefaced8be5d0a6ec508a4a2e595a4aacfa1f98f2",
+            "byteLength": "1978"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/agents/trace-audit.agent.md",
+      "sourceRevision": "sha256:d1104cd948899b7aee8d9815fd0cda5e2856ee06c44be9eabd366955dba7e669",
+      "contentDigest": "d1104cd948899b7aee8d9815fd0cda5e2856ee06c44be9eabd366955dba7e669",
+      "byteLength": 470,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 470,
+        "contentDigest": "d1104cd948899b7aee8d9815fd0cda5e2856ee06c44be9eabd366955dba7e669",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/agents/trace-audit.agent.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:d1104cd948899b7aee8d9815fd0cda5e2856ee06c44be9eabd366955dba7e669",
+            "contentDigest": "d1104cd948899b7aee8d9815fd0cda5e2856ee06c44be9eabd366955dba7e669",
+            "byteLength": "470"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/agents/ui-polish-engineer.agent.md",
+      "sourceRevision": "sha256:e87e3f292c5b3739f14b81e7641e03a9093f4dc7e108e7fd9f43f83fcdc254ca",
+      "contentDigest": "e87e3f292c5b3739f14b81e7641e03a9093f4dc7e108e7fd9f43f83fcdc254ca",
+      "byteLength": 1974,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 1974,
+        "contentDigest": "e87e3f292c5b3739f14b81e7641e03a9093f4dc7e108e7fd9f43f83fcdc254ca",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/agents/ui-polish-engineer.agent.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:e87e3f292c5b3739f14b81e7641e03a9093f4dc7e108e7fd9f43f83fcdc254ca",
+            "contentDigest": "e87e3f292c5b3739f14b81e7641e03a9093f4dc7e108e7fd9f43f83fcdc254ca",
+            "byteLength": "1974"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/copilot-instructions.md",
+      "sourceRevision": "sha256:48f96c459772a195e9ac4b99194115c8135b912ba2e3841953510fa13f725400",
+      "contentDigest": "48f96c459772a195e9ac4b99194115c8135b912ba2e3841953510fa13f725400",
+      "byteLength": 719,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 719,
+        "contentDigest": "48f96c459772a195e9ac4b99194115c8135b912ba2e3841953510fa13f725400",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/copilot-instructions.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:48f96c459772a195e9ac4b99194115c8135b912ba2e3841953510fa13f725400",
+            "contentDigest": "48f96c459772a195e9ac4b99194115c8135b912ba2e3841953510fa13f725400",
+            "byteLength": "719"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".github/instructions/opencode-context-prefetch.instructions.md",
+      "sourceRevision": "sha256:2db1fc1c354720534aeae49dc6e8e00302ec1649162af092645a7c7978ad2ded",
+      "contentDigest": "2db1fc1c354720534aeae49dc6e8e00302ec1649162af092645a7c7978ad2ded",
+      "byteLength": 3287,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 3287,
+        "contentDigest": "2db1fc1c354720534aeae49dc6e8e00302ec1649162af092645a7c7978ad2ded",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".github/instructions/opencode-context-prefetch.instructions.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:2db1fc1c354720534aeae49dc6e8e00302ec1649162af092645a7c7978ad2ded",
+            "contentDigest": "2db1fc1c354720534aeae49dc6e8e00302ec1649162af092645a7c7978ad2ded",
+            "byteLength": "3287"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".gpu-rerank-11976-1782023627227.json",
+      "sourceRevision": "sha256:756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
+      "contentDigest": "756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
+      "byteLength": 130411,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 130411,
+        "contentDigest": "756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".gpu-rerank-11976-1782023627227.json",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
+            "contentDigest": "756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
+            "byteLength": "130411"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".gpu-rerank-44384-1782059518577.json",
+      "sourceRevision": "sha256:756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
+      "contentDigest": "756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
+      "byteLength": 130411,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 130411,
+        "contentDigest": "756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".gpu-rerank-44384-1782059518577.json",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
+            "contentDigest": "756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
+            "byteLength": "130411"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".headroom-memory.json",
+      "sourceRevision": "sha256:5d49c0ac9d2b8f01aa60b008b3dd831c1a79efa383a2a03a74c98875a48820ad",
+      "contentDigest": "5d49c0ac9d2b8f01aa60b008b3dd831c1a79efa383a2a03a74c98875a48820ad",
+      "byteLength": 454,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 454,
+        "contentDigest": "5d49c0ac9d2b8f01aa60b008b3dd831c1a79efa383a2a03a74c98875a48820ad",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".headroom-memory.json",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:5d49c0ac9d2b8f01aa60b008b3dd831c1a79efa383a2a03a74c98875a48820ad",
+            "contentDigest": "5d49c0ac9d2b8f01aa60b008b3dd831c1a79efa383a2a03a74c98875a48820ad",
+            "byteLength": "454"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".mcp.json",
+      "sourceRevision": "sha256:9305941ce4ce8759a60d5e064b67d77787c9c35586d832a6121be441926e93d6",
+      "contentDigest": "9305941ce4ce8759a60d5e064b67d77787c9c35586d832a6121be441926e93d6",
+      "byteLength": 1366,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 1839,
+        "contentDigest": "d8cf8a2d55da1737f70cf85083ebadd99a75159081306021f216037125840d45",
+        "matches": {
+          "sourceRevision": false,
+          "contentDigest": false,
+          "byteLength": false
+        },
+        "mismatchedFields": [
+          "sourceRevision",
+          "contentDigest",
+          "byteLength"
+        ],
+        "exact": false
+      },
+      "graphifyRows": 3,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".mcp.json",
+            "workspaceRevision": null,
+            "sourceRevision": "sha256:0241858968e1c0107b31103ce056da53514fbd2de167fdf4fd093fe04d147deb",
+            "contentDigest": "0241858968e1c0107b31103ce056da53514fbd2de167fdf4fd093fe04d147deb",
+            "byteLength": "1086"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": false,
+            "contentDigest": false,
+            "byteLength": false
+          },
+          "mismatchedFields": [
+            "workspaceRevision",
+            "sourceRevision",
+            "contentDigest",
+            "byteLength"
+          ],
+          "exact": false
+        },
+        {
+          "observed": {
+            "sourceRef": ".mcp.json",
+            "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+            "sourceRevision": "sha256:cdb8240d7c1851ecf85dcfbedb90e98a8547385d50e87b975e7102ec89024e84",
+            "contentDigest": "cdb8240d7c1851ecf85dcfbedb90e98a8547385d50e87b975e7102ec89024e84",
+            "byteLength": "1092"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": false,
+            "contentDigest": false,
+            "byteLength": false
+          },
+          "mismatchedFields": [
+            "workspaceRevision",
+            "sourceRevision",
+            "contentDigest",
+            "byteLength"
+          ],
+          "exact": false
+        },
+        {
+          "observed": {
+            "sourceRef": ".mcp.json",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:d93f190a37b27f5a2cb4adf7b1f5938993add435d232e366d1fcd42defedfae7",
+            "contentDigest": "d93f190a37b27f5a2cb4adf7b1f5938993add435d232e366d1fcd42defedfae7",
+            "byteLength": "1232"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": false,
+            "contentDigest": false,
+            "byteLength": false
+          },
+          "mismatchedFields": [
+            "workspaceRevision",
+            "sourceRevision",
+            "contentDigest",
+            "byteLength"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "AMBIGUOUS_GRAPHIFY_SOURCE"
+    },
+    {
+      "sourceRef": ".okf/concepts/cluster-run-lineage-gap.yaml",
+      "sourceRevision": "sha256:9ddb43d71efc1a91b76fe558137a703ae88d6dc955ae58f7d866d1231bb105ad",
+      "contentDigest": "9ddb43d71efc1a91b76fe558137a703ae88d6dc955ae58f7d866d1231bb105ad",
+      "byteLength": 608,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 608,
+        "contentDigest": "9ddb43d71efc1a91b76fe558137a703ae88d6dc955ae58f7d866d1231bb105ad",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 2,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/concepts/cluster-run-lineage-gap.yaml",
+            "workspaceRevision": null,
+            "sourceRevision": "sha256:862f4a5c3fbb8cf484b69d7db829a29da012c7b294b09c38bfde4874eed91f8f",
+            "contentDigest": "862f4a5c3fbb8cf484b69d7db829a29da012c7b294b09c38bfde4874eed91f8f",
+            "byteLength": "594"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": false,
+            "contentDigest": false,
+            "byteLength": false
+          },
+          "mismatchedFields": [
+            "workspaceRevision",
+            "sourceRevision",
+            "contentDigest",
+            "byteLength"
+          ],
+          "exact": false
+        },
+        {
+          "observed": {
+            "sourceRef": ".okf/concepts/cluster-run-lineage-gap.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:9ddb43d71efc1a91b76fe558137a703ae88d6dc955ae58f7d866d1231bb105ad",
+            "contentDigest": "9ddb43d71efc1a91b76fe558137a703ae88d6dc955ae58f7d866d1231bb105ad",
+            "byteLength": "608"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "AMBIGUOUS_GRAPHIFY_SOURCE"
+    },
+    {
+      "sourceRef": ".okf/concepts/concept-edge-ledger-gap.yaml",
+      "sourceRevision": "sha256:40dbd8b77fda97dccd6dfb9c56faa6d77d353a867a9cf6f94827fc85680ddf39",
+      "contentDigest": "40dbd8b77fda97dccd6dfb9c56faa6d77d353a867a9cf6f94827fc85680ddf39",
+      "byteLength": 576,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 576,
+        "contentDigest": "40dbd8b77fda97dccd6dfb9c56faa6d77d353a867a9cf6f94827fc85680ddf39",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 2,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/concepts/concept-edge-ledger-gap.yaml",
+            "workspaceRevision": null,
+            "sourceRevision": "sha256:2b145ce6b82214951087dbc9bb6e530b92b395c8a43dca9b6d8ad86c67a85bce",
+            "contentDigest": "2b145ce6b82214951087dbc9bb6e530b92b395c8a43dca9b6d8ad86c67a85bce",
+            "byteLength": "562"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": false,
+            "contentDigest": false,
+            "byteLength": false
+          },
+          "mismatchedFields": [
+            "workspaceRevision",
+            "sourceRevision",
+            "contentDigest",
+            "byteLength"
+          ],
+          "exact": false
+        },
+        {
+          "observed": {
+            "sourceRef": ".okf/concepts/concept-edge-ledger-gap.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:40dbd8b77fda97dccd6dfb9c56faa6d77d353a867a9cf6f94827fc85680ddf39",
+            "contentDigest": "40dbd8b77fda97dccd6dfb9c56faa6d77d353a867a9cf6f94827fc85680ddf39",
+            "byteLength": "576"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "AMBIGUOUS_GRAPHIFY_SOURCE"
+    },
+    {
+      "sourceRef": ".okf/concepts/domain-lineage-gap.yaml",
+      "sourceRevision": "sha256:23eda6e778e0867f13df45657bea313dced6e3056b15e8cca7835b925272eac9",
+      "contentDigest": "23eda6e778e0867f13df45657bea313dced6e3056b15e8cca7835b925272eac9",
+      "byteLength": 547,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 547,
+        "contentDigest": "23eda6e778e0867f13df45657bea313dced6e3056b15e8cca7835b925272eac9",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 2,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/concepts/domain-lineage-gap.yaml",
+            "workspaceRevision": null,
+            "sourceRevision": "sha256:c0f7acdf23eabdd0ef12e4ff54c2aa33513e944548e2b999cc824544da5eacef",
+            "contentDigest": "c0f7acdf23eabdd0ef12e4ff54c2aa33513e944548e2b999cc824544da5eacef",
+            "byteLength": "534"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": false,
+            "contentDigest": false,
+            "byteLength": false
+          },
+          "mismatchedFields": [
+            "workspaceRevision",
+            "sourceRevision",
+            "contentDigest",
+            "byteLength"
+          ],
+          "exact": false
+        },
+        {
+          "observed": {
+            "sourceRef": ".okf/concepts/domain-lineage-gap.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:23eda6e778e0867f13df45657bea313dced6e3056b15e8cca7835b925272eac9",
+            "contentDigest": "23eda6e778e0867f13df45657bea313dced6e3056b15e8cca7835b925272eac9",
+            "byteLength": "547"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "AMBIGUOUS_GRAPHIFY_SOURCE"
+    },
+    {
+      "sourceRef": ".okf/concepts/representation-fragmentation-gap.yaml",
+      "sourceRevision": "sha256:e27097b4debd0ccf34a143923cdbc6787bd6edba69bcb802c69a5cf65449d107",
+      "contentDigest": "e27097b4debd0ccf34a143923cdbc6787bd6edba69bcb802c69a5cf65449d107",
+      "byteLength": 805,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 805,
+        "contentDigest": "e27097b4debd0ccf34a143923cdbc6787bd6edba69bcb802c69a5cf65449d107",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 2,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/concepts/representation-fragmentation-gap.yaml",
+            "workspaceRevision": null,
+            "sourceRevision": "sha256:02858778b10ecd8ac5464d668dff530d8be1f90b1904e787386ef046855b538a",
+            "contentDigest": "02858778b10ecd8ac5464d668dff530d8be1f90b1904e787386ef046855b538a",
+            "byteLength": "789"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": false,
+            "contentDigest": false,
+            "byteLength": false
+          },
+          "mismatchedFields": [
+            "workspaceRevision",
+            "sourceRevision",
+            "contentDigest",
+            "byteLength"
+          ],
+          "exact": false
+        },
+        {
+          "observed": {
+            "sourceRef": ".okf/concepts/representation-fragmentation-gap.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:e27097b4debd0ccf34a143923cdbc6787bd6edba69bcb802c69a5cf65449d107",
+            "contentDigest": "e27097b4debd0ccf34a143923cdbc6787bd6edba69bcb802c69a5cf65449d107",
+            "byteLength": "805"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "AMBIGUOUS_GRAPHIFY_SOURCE"
+    },
+    {
+      "sourceRef": ".okf/concepts/som-run-lineage-gap.yaml",
+      "sourceRevision": "sha256:7b354f0ac0da445f6a01452eee268a9eef6169a78e1dba570666f751f9770de6",
+      "contentDigest": "7b354f0ac0da445f6a01452eee268a9eef6169a78e1dba570666f751f9770de6",
+      "byteLength": 562,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 562,
+        "contentDigest": "7b354f0ac0da445f6a01452eee268a9eef6169a78e1dba570666f751f9770de6",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 2,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/concepts/som-run-lineage-gap.yaml",
+            "workspaceRevision": null,
+            "sourceRevision": "sha256:ba81c1421ae2fe88be3c47ddd2b8d3b8e3aa7de2c0f1ce67aa36c5614487cf8c",
+            "contentDigest": "ba81c1421ae2fe88be3c47ddd2b8d3b8e3aa7de2c0f1ce67aa36c5614487cf8c",
+            "byteLength": "548"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": false,
+            "contentDigest": false,
+            "byteLength": false
+          },
+          "mismatchedFields": [
+            "workspaceRevision",
+            "sourceRevision",
+            "contentDigest",
+            "byteLength"
+          ],
+          "exact": false
+        },
+        {
+          "observed": {
+            "sourceRef": ".okf/concepts/som-run-lineage-gap.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:7b354f0ac0da445f6a01452eee268a9eef6169a78e1dba570666f751f9770de6",
+            "contentDigest": "7b354f0ac0da445f6a01452eee268a9eef6169a78e1dba570666f751f9770de6",
+            "byteLength": "562"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "AMBIGUOUS_GRAPHIFY_SOURCE"
+    },
+    {
+      "sourceRef": ".okf/concepts/topology-schema-drift-gap.yaml",
+      "sourceRevision": "sha256:cbdda2d548d0c657217c5df79a31c12eafb7ec20b3104dd8d9a6c5f40503c23b",
+      "contentDigest": "cbdda2d548d0c657217c5df79a31c12eafb7ec20b3104dd8d9a6c5f40503c23b",
+      "byteLength": 639,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 639,
+        "contentDigest": "cbdda2d548d0c657217c5df79a31c12eafb7ec20b3104dd8d9a6c5f40503c23b",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 2,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/concepts/topology-schema-drift-gap.yaml",
+            "workspaceRevision": null,
+            "sourceRevision": "sha256:b7be6697f7725a3273358966d746c1418b88c6559610c2b10337edee772d5ae1",
+            "contentDigest": "b7be6697f7725a3273358966d746c1418b88c6559610c2b10337edee772d5ae1",
+            "byteLength": "625"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": false,
+            "contentDigest": false,
+            "byteLength": false
+          },
+          "mismatchedFields": [
+            "workspaceRevision",
+            "sourceRevision",
+            "contentDigest",
+            "byteLength"
+          ],
+          "exact": false
+        },
+        {
+          "observed": {
+            "sourceRef": ".okf/concepts/topology-schema-drift-gap.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:cbdda2d548d0c657217c5df79a31c12eafb7ec20b3104dd8d9a6c5f40503c23b",
+            "contentDigest": "cbdda2d548d0c657217c5df79a31c12eafb7ec20b3104dd8d9a6c5f40503c23b",
+            "byteLength": "639"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "AMBIGUOUS_GRAPHIFY_SOURCE"
+    },
+    {
+      "sourceRef": ".okf/domains/feature-intelligence.yaml",
+      "sourceRevision": "sha256:e851fb9263f2ce513a578a870643c032283d70e3be7fa915aaffa0f2c67d9164",
+      "contentDigest": "e851fb9263f2ce513a578a870643c032283d70e3be7fa915aaffa0f2c67d9164",
+      "byteLength": 3357,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 3357,
+        "contentDigest": "e851fb9263f2ce513a578a870643c032283d70e3be7fa915aaffa0f2c67d9164",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/domains/feature-intelligence.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:e851fb9263f2ce513a578a870643c032283d70e3be7fa915aaffa0f2c67d9164",
+            "contentDigest": "e851fb9263f2ce513a578a870643c032283d70e3be7fa915aaffa0f2c67d9164",
+            "byteLength": "3357"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".okf/domains/parent-atlas-execution.yaml",
+      "sourceRevision": "sha256:91f3921558921db151ecd456bb6d00022265cd5ec3a69bc7aff10979758703ec",
+      "contentDigest": "91f3921558921db151ecd456bb6d00022265cd5ec3a69bc7aff10979758703ec",
+      "byteLength": 5167,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 5167,
+        "contentDigest": "91f3921558921db151ecd456bb6d00022265cd5ec3a69bc7aff10979758703ec",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/domains/parent-atlas-execution.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:91f3921558921db151ecd456bb6d00022265cd5ec3a69bc7aff10979758703ec",
+            "contentDigest": "91f3921558921db151ecd456bb6d00022265cd5ec3a69bc7aff10979758703ec",
+            "byteLength": "5167"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".okf/domains/structured-value.yaml",
+      "sourceRevision": "sha256:46f481bb2774088a87f0fdac1c986c2a8f7cdd39ae4c22ed8e2c898705817d01",
+      "contentDigest": "46f481bb2774088a87f0fdac1c986c2a8f7cdd39ae4c22ed8e2c898705817d01",
+      "byteLength": 4516,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 4516,
+        "contentDigest": "46f481bb2774088a87f0fdac1c986c2a8f7cdd39ae4c22ed8e2c898705817d01",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/domains/structured-value.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:46f481bb2774088a87f0fdac1c986c2a8f7cdd39ae4c22ed8e2c898705817d01",
+            "contentDigest": "46f481bb2774088a87f0fdac1c986c2a8f7cdd39ae4c22ed8e2c898705817d01",
+            "byteLength": "4516"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".okf/index.md",
+      "sourceRevision": "sha256:1edfbcd988a90c7c18a6604cf2a98d5a97e70cc6be159e4debd751ada4388062",
+      "contentDigest": "1edfbcd988a90c7c18a6604cf2a98d5a97e70cc6be159e4debd751ada4388062",
+      "byteLength": 2296,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 5799,
+        "contentDigest": "ce0ba0e2a66b7cac6568d02fc2491ee2943cc46e3009826b0e382a49f01bee31",
+        "matches": {
+          "sourceRevision": false,
+          "contentDigest": false,
+          "byteLength": false
+        },
+        "mismatchedFields": [
+          "sourceRevision",
+          "contentDigest",
+          "byteLength"
+        ],
+        "exact": false
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/index.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:1edfbcd988a90c7c18a6604cf2a98d5a97e70cc6be159e4debd751ada4388062",
+            "contentDigest": "1edfbcd988a90c7c18a6604cf2a98d5a97e70cc6be159e4debd751ada4388062",
+            "byteLength": "2296"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".okf/indexes/code-exploration.yaml",
+      "sourceRevision": "sha256:8256cb4674b9b2e5fd2493ee5ea6cf4329fd18591fcb98cff9c3aead7caea53c",
+      "contentDigest": "8256cb4674b9b2e5fd2493ee5ea6cf4329fd18591fcb98cff9c3aead7caea53c",
+      "byteLength": 2012,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 2012,
+        "contentDigest": "8256cb4674b9b2e5fd2493ee5ea6cf4329fd18591fcb98cff9c3aead7caea53c",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/indexes/code-exploration.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:8256cb4674b9b2e5fd2493ee5ea6cf4329fd18591fcb98cff9c3aead7caea53c",
+            "contentDigest": "8256cb4674b9b2e5fd2493ee5ea6cf4329fd18591fcb98cff9c3aead7caea53c",
+            "byteLength": "2012"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".okf/indexes/feature-intelligence.yaml",
+      "sourceRevision": "sha256:f5e74a352ffcf0015a004864af3bd6552488169a82a0ccc962c626ec2a74d684",
+      "contentDigest": "f5e74a352ffcf0015a004864af3bd6552488169a82a0ccc962c626ec2a74d684",
+      "byteLength": 10199,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 10199,
+        "contentDigest": "f5e74a352ffcf0015a004864af3bd6552488169a82a0ccc962c626ec2a74d684",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/indexes/feature-intelligence.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:f5e74a352ffcf0015a004864af3bd6552488169a82a0ccc962c626ec2a74d684",
+            "contentDigest": "f5e74a352ffcf0015a004864af3bd6552488169a82a0ccc962c626ec2a74d684",
+            "byteLength": "10199"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".okf/indexes/parent-atlas-code-explore.yaml",
+      "sourceRevision": "sha256:233fac574a9d9e60fbaa97456d0bbb16d4d4a2a46150e29e8256a8928a24eab3",
+      "contentDigest": "233fac574a9d9e60fbaa97456d0bbb16d4d4a2a46150e29e8256a8928a24eab3",
+      "byteLength": 2909,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 2909,
+        "contentDigest": "233fac574a9d9e60fbaa97456d0bbb16d4d4a2a46150e29e8256a8928a24eab3",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/indexes/parent-atlas-code-explore.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:233fac574a9d9e60fbaa97456d0bbb16d4d4a2a46150e29e8256a8928a24eab3",
+            "contentDigest": "233fac574a9d9e60fbaa97456d0bbb16d4d4a2a46150e29e8256a8928a24eab3",
+            "byteLength": "2909"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".okf/languages/typescript.yaml",
+      "sourceRevision": "sha256:1e9d12307da1d4fe9a2c7d32ff89aea0e3e693de3f63c629f3f8fec452cea25a",
+      "contentDigest": "1e9d12307da1d4fe9a2c7d32ff89aea0e3e693de3f63c629f3f8fec452cea25a",
+      "byteLength": 5398,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 5398,
+        "contentDigest": "1e9d12307da1d4fe9a2c7d32ff89aea0e3e693de3f63c629f3f8fec452cea25a",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/languages/typescript.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:1e9d12307da1d4fe9a2c7d32ff89aea0e3e693de3f63c629f3f8fec452cea25a",
+            "contentDigest": "1e9d12307da1d4fe9a2c7d32ff89aea0e3e693de3f63c629f3f8fec452cea25a",
+            "byteLength": "5398"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".okf/manifest.yaml",
+      "sourceRevision": "sha256:e60d8d4cea5595a05feecf40525f236226c9046b6e4b52a40e67d9da03879156",
+      "contentDigest": "e60d8d4cea5595a05feecf40525f236226c9046b6e4b52a40e67d9da03879156",
+      "byteLength": 6962,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 8474,
+        "contentDigest": "3fb62f42408a89b577fbe4d703e5962f08faffa51267a7e3451d4f076225b349",
+        "matches": {
+          "sourceRevision": false,
+          "contentDigest": false,
+          "byteLength": false
+        },
+        "mismatchedFields": [
+          "sourceRevision",
+          "contentDigest",
+          "byteLength"
+        ],
+        "exact": false
+      },
+      "graphifyRows": 2,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/manifest.yaml",
+            "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+            "sourceRevision": "sha256:09965014c694909e0769408f4ce5ef19fd7d115102a6c8471ef80cbc060e8778",
+            "contentDigest": "09965014c694909e0769408f4ce5ef19fd7d115102a6c8471ef80cbc060e8778",
+            "byteLength": "5619"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": false,
+            "contentDigest": false,
+            "byteLength": false
+          },
+          "mismatchedFields": [
+            "workspaceRevision",
+            "sourceRevision",
+            "contentDigest",
+            "byteLength"
+          ],
+          "exact": false
+        },
+        {
+          "observed": {
+            "sourceRef": ".okf/manifest.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:e60d8d4cea5595a05feecf40525f236226c9046b6e4b52a40e67d9da03879156",
+            "contentDigest": "e60d8d4cea5595a05feecf40525f236226c9046b6e4b52a40e67d9da03879156",
+            "byteLength": "6962"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "AMBIGUOUS_GRAPHIFY_SOURCE"
+    },
+    {
+      "sourceRef": ".okf/pipelines/ast-entity-prefill.yaml",
+      "sourceRevision": "sha256:f1bd8576efce58ba479cb8ec2429248c3682af49a7f7ffe6aed062786227a16f",
+      "contentDigest": "f1bd8576efce58ba479cb8ec2429248c3682af49a7f7ffe6aed062786227a16f",
+      "byteLength": 1082,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 1082,
+        "contentDigest": "f1bd8576efce58ba479cb8ec2429248c3682af49a7f7ffe6aed062786227a16f",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 2,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/pipelines/ast-entity-prefill.yaml",
+            "workspaceRevision": null,
+            "sourceRevision": "sha256:e72e9a5ae78bd95deaf9df4b3e3a82d3f4edb8411f4b4479186a094c15e074fc",
+            "contentDigest": "e72e9a5ae78bd95deaf9df4b3e3a82d3f4edb8411f4b4479186a094c15e074fc",
+            "byteLength": "1042"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": false,
+            "contentDigest": false,
+            "byteLength": false
+          },
+          "mismatchedFields": [
+            "workspaceRevision",
+            "sourceRevision",
+            "contentDigest",
+            "byteLength"
+          ],
+          "exact": false
+        },
+        {
+          "observed": {
+            "sourceRef": ".okf/pipelines/ast-entity-prefill.yaml",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:f1bd8576efce58ba479cb8ec2429248c3682af49a7f7ffe6aed062786227a16f",
+            "contentDigest": "f1bd8576efce58ba479cb8ec2429248c3682af49a7f7ffe6aed062786227a16f",
+            "byteLength": "1082"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "AMBIGUOUS_GRAPHIFY_SOURCE"
+    },
+    {
+      "sourceRef": ".okf/pipelines/retrieval-ranking-synthesis.md",
+      "sourceRevision": "sha256:e516d3a943d9862898dc062bc96b1d13678fcb25a146ea8470c93d387ea4a8ad",
+      "contentDigest": "e516d3a943d9862898dc062bc96b1d13678fcb25a146ea8470c93d387ea4a8ad",
+      "byteLength": 9357,
+      "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+      "bindingPresent": true,
+      "localSourceBytes": {
+        "available": true,
+        "byteLength": 9357,
+        "contentDigest": "e516d3a943d9862898dc062bc96b1d13678fcb25a146ea8470c93d387ea4a8ad",
+        "matches": {
+          "sourceRevision": true,
+          "contentDigest": true,
+          "byteLength": true
+        },
+        "mismatchedFields": [],
+        "exact": true
+      },
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".okf/pipelines/retrieval-ranking-synthesis.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:e516d3a943d9862898dc062bc96b1d13678fcb25a146ea8470c93d387ea4a8ad",
+            "contentDigest": "e516d3a943d9862898dc062bc96b1d13678fcb25a146ea8470c93d387ea4a8ad",
+            "byteLength": "9357"
           },
           "matches": {
             "sourceRef": true,

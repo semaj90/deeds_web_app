@@ -1,0 +1,63 @@
+{
+  "manifest_revision": "atlas-doc-repair-pilot-v1",
+  "workspace_revision": "UNBOUND_EXTERNAL_SOURCE_CATALOG",
+  "source_snapshot_revision": "atlas-doc-repair-pilot-source-selection-v1",
+  "producer_revision": "atlas-doc-repair-pilot-v1",
+  "output_root": ".tmp/atlas/doc-repair-pilot-v1",
+  "sources": [
+    {
+      "source_id": "postgresql-18-textsearch-functions",
+      "title": "PostgreSQL 18 Text Search Functions and Operators",
+      "base_urls": ["https://www.postgresql.org/docs/18/"],
+      "allowed_domains": [
+        "www.postgresql.org"
+      ],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "BEAUTIFULSOUP_HTTP",
+      "output_namespace": "docs/.okf/postgresql-18-textsearch-functions",
+      "maximum_pages": 1,
+      "maximum_depth": 0,
+      "follow_sitemap": false,
+      "pages": [
+        "https://www.postgresql.org/docs/18/functions-textsearch.html"
+      ],
+      "provider": "postgresql",
+      "product": "postgresql",
+      "product_version": "18",
+      "version_qualification": "MAJOR_VERSION",
+      "language": "en",
+      "publisher": "PostgreSQL Global Development Group",
+      "chunk_identity_version": "V2",
+      "source_revision": "sha256:2f24ad1938d94e2d63c961c1a6a2e514d7324fea5e0f1a3078c09b805e44d3fa"
+    },
+    {
+      "source_id": "sveltekit-2-59-1",
+      "title": "SvelteKit 2.59.1 core and server documentation",
+      "base_urls": ["https://raw.githubusercontent.com/sveltejs/kit/9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72/documentation/docs/"],
+      "allowed_domains": [
+        "raw.githubusercontent.com"
+      ],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "DIRECT_MARKDOWN",
+      "output_namespace": "docs/.okf/sveltekit-2-59-1",
+      "maximum_pages": 5,
+      "maximum_depth": 0,
+      "follow_sitemap": false,
+      "pages": [
+        "https://raw.githubusercontent.com/sveltejs/kit/9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72/documentation/docs/20-core-concepts/10-routing.md",
+        "https://raw.githubusercontent.com/sveltejs/kit/9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72/documentation/docs/20-core-concepts/20-load.md",
+        "https://raw.githubusercontent.com/sveltejs/kit/9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72/documentation/docs/20-core-concepts/30-form-actions.md",
+        "https://raw.githubusercontent.com/sveltejs/kit/9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72/documentation/docs/30-advanced/20-hooks.md",
+        "https://raw.githubusercontent.com/sveltejs/kit/9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72/documentation/docs/30-advanced/50-server-only-modules.md"
+      ],
+      "provider": "svelte",
+      "product": "sveltekit",
+      "product_version": "2.59.1",
+      "version_qualification": "EXACT_VERSION",
+      "language": "en",
+      "publisher": "Svelte",
+      "chunk_identity_version": "V2",
+      "source_revision": "sha256:f69007a56a7015a81ec12ddb0d31890da3953ba8d5505cedaf3b200b375b091c"
+    }
+  ]
+}

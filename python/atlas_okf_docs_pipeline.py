@@ -45,6 +45,7 @@ from atlas_external_docs import (
     embed_llama_server_768,
     enforce_allowed_domain,
     fetch_beautifulsoup,
+    fetch_direct_markdown,
     fetch_firecrawl_v2,
     low_rank_sample_query_features,
     qdrant_points,
@@ -433,6 +434,10 @@ class PageArtifact:
 QDRANT_PAYLOAD_INDEXES: tuple[tuple[str, Any], ...] = (
     ("source_id", "keyword"),
     ("source_revision", "keyword"),
+    ("provider", "keyword"),
+    ("product", "keyword"),
+    ("product_version", "keyword"),
+    ("architecture", "keyword"),
     ("domain_class", "keyword"),
     ("ontology_classes", "keyword"),
     ("language", "keyword"),
@@ -673,6 +678,8 @@ def _fetch_single(source: SourceConfig, url: str) -> PageArtifact:
         if not api_key:
             raise RuntimeError("FIRECRAWL_API_KEY_REQUIRED")
         fetched = fetch_firecrawl_v2(url, api_key=api_key)
+    elif source.default_fetcher == "DIRECT_MARKDOWN":
+        fetched = fetch_direct_markdown(url)
     else:
         fetched = fetch_beautifulsoup(url)
     enforce_allowed_domain(fetched.resolved_url, source.allowed_domains)
@@ -924,6 +931,20 @@ def build_qdrant_points(
         point["payload"]["qdrant_point_id"] = point["id"]
         point["payload"]["qdrant_point_id_is_canonical"] = False
         point["payload"].setdefault("language", "en")
+        coordinate = chunk.doc_coordinate
+        if coordinate is not None:
+            coordinate_payload = (
+                coordinate.to_json_dict()
+                if callable(getattr(coordinate, "to_json_dict", None))
+                else coordinate
+            )
+            if not isinstance(coordinate_payload, Mapping):
+                raise ValueError("DOC_COORDINATE_PAYLOAD_INVALID")
+            for field_name in ("provider", "product", "product_version", "architecture", "language", "evidence_revision"):
+                value = coordinate_payload.get(field_name)
+                if isinstance(value, str) and value.strip():
+                    target_name = "document_evidence_revision" if field_name == "evidence_revision" else field_name
+                    point["payload"][target_name] = value
     return points
 
 
@@ -991,17 +1012,31 @@ def qdrant_query_body(
     exact_refine_k: int,
     source_revision: str | None = None,
     domain_class: str | None = None,
+    provider: str | None = None,
+    product: str | None = None,
+    product_version: str | None = None,
+    architecture: str | None = None,
 ) -> Json:
     if exact_refine_k <= 0 or prefetch_k < exact_refine_k:
         raise ValueError("INVALID_QDRANT_REFINEMENT_LIMITS")
     query = list(float(value) for value in query_vector)
     if len(query) != 768:
         raise ValueError("QUERY_VECTOR_MUST_BE_768D")
+    if (product_version or architecture) and not product:
+        raise ValueError("PRODUCT_REQUIRED_FOR_VERSION_OR_ARCHITECTURE_FILTER")
     must = []
     if source_revision:
         must.append({"key": "source_revision", "match": {"value": source_revision}})
     if domain_class:
         must.append({"key": "domain_class", "match": {"value": domain_class}})
+    for field_name, value in (
+        ("provider", provider),
+        ("product", product),
+        ("product_version", product_version),
+        ("architecture", architecture),
+    ):
+        if value:
+            must.append({"key": field_name, "match": {"value": value}})
     query_filter = {"must": must} if must else None
     body: Json = {
         "prefetch": {
@@ -1029,6 +1064,10 @@ def qdrant_smoke_query(
     exact_refine_k: int = 8,
     source_revision: str | None = None,
     domain_class: str | None = None,
+    provider: str | None = None,
+    product: str | None = None,
+    product_version: str | None = None,
+    architecture: str | None = None,
 ) -> Json:
     base = manifest.qdrant_url.rstrip("/")
     collection = quote(manifest.qdrant_collection, safe="")
@@ -1038,6 +1077,10 @@ def qdrant_smoke_query(
         exact_refine_k=exact_refine_k,
         source_revision=source_revision,
         domain_class=domain_class,
+        provider=provider,
+        product=product,
+        product_version=product_version,
+        architecture=architecture,
     )
     response = _http_json(
         f"{base}/collections/{collection}/points/query",
@@ -1054,10 +1097,62 @@ def qdrant_smoke_query(
         "collection": manifest.qdrant_collection,
         "prefetch_k": prefetch_k,
         "exact_refine_k": exact_refine_k,
+        "filters": {
+            key: value for key, value in {
+                "source_revision": source_revision,
+                "domain_class": domain_class,
+                "provider": provider,
+                "product": product,
+                "product_version": product_version,
+                "architecture": architecture,
+            }.items() if value is not None
+        },
         "result_count": len(points),
         "result_ids": [str(point.get("id")) for point in points if isinstance(point, dict)],
         "response_checksum": _sha(_stable(response)),
         "canonical_authority": False,
+        "writes_performed": False,
+    }
+
+
+def qdrant_query_only(
+    manifest: PipelineManifest,
+    query: str,
+    *,
+    maximum_chars: int = 1600,
+    provider: str | None = None,
+    product: str | None = None,
+    product_version: str | None = None,
+    architecture: str | None = None,
+) -> Json:
+    """Embed one bounded query and perform a read-only Qdrant lookup without crawling or upserting."""
+    normalized_query = query.strip()
+    if not normalized_query:
+        raise ValueError("QUERY_REQUIRED")
+    embedding = embed_llama_server_768(
+        [normalized_query],
+        base_url=manifest.embedding_url,
+        model=manifest.embedding_model,
+        max_chars_per_request=maximum_chars,
+    )[0]
+    result = qdrant_smoke_query(
+        manifest,
+        embedding,
+        provider=provider,
+        product=product,
+        product_version=product_version,
+        architecture=architecture,
+    )
+    return {
+        "schema": "atlas.external-doc-query-only-receipt.v1",
+        "status": "EXECUTED_READ_ONLY",
+        "query_sha256": _sha(normalized_query),
+        "embedding_model": manifest.embedding_model,
+        "embedding_dimension": int(embedding.shape[0]),
+        "embedding_sha256": _sha(np.ascontiguousarray(embedding, dtype=np.float32).tobytes()),
+        "retrieval": result,
+        "canonical_authority": False,
+        "writes_performed": False,
     }
 
 
@@ -1333,6 +1428,10 @@ def run_pipeline(
     overlap_chars: int = 200,
     oak_review: bool = False,
     oak_sidecar_url: str | None = None,
+    smoke_provider: str | None = None,
+    smoke_product: str | None = None,
+    smoke_product_version: str | None = None,
+    smoke_architecture: str | None = None,
 ) -> Json:
     if oak_review and not oak_sidecar_url:
         raise ValueError("OAK_REVIEW_REQUIRES_EXPLICIT_SIDECAR_URL")
@@ -1454,15 +1553,14 @@ def run_pipeline(
             model=manifest.embedding_model,
             max_chars_per_request=maximum_chars,
         )[0]
-        if write_qdrant:
-            smoke_receipt = qdrant_smoke_query(manifest, query_embedding)
-        else:
-            smoke_receipt = {
-                "schema": "atlas.external-doc-retrieval-smoke-receipt.v1",
-                "status": "PLANNED_NOT_EXECUTED",
-                "query_body_checksum": _sha(_stable(qdrant_query_body(query_embedding, prefetch_k=64, exact_refine_k=8))),
-                "canonical_authority": False,
-            }
+        smoke_receipt = qdrant_smoke_query(
+            manifest,
+            query_embedding,
+            provider=smoke_provider,
+            product=smoke_product,
+            product_version=smoke_product_version,
+            architecture=smoke_architecture,
+        )
 
     receipt = {
         "schema": "atlas.okf-docs-pipeline-receipt.v1",
@@ -1504,26 +1602,57 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--clusters", action="store_true", help="Run existing cuVS KMeans + deterministic SOM stages")
     parser.add_argument("--write-qdrant", action="store_true", help="Create payload indexes and upsert external_programming_docs_768")
     parser.add_argument("--smoke-query")
+    parser.add_argument("--query-only", action="store_true", help="Run one read-only filtered Qdrant query without crawling or writing the collection; requires --smoke-query")
+    parser.add_argument("--smoke-provider")
+    parser.add_argument("--smoke-product")
+    parser.add_argument("--smoke-product-version")
+    parser.add_argument("--smoke-architecture")
     parser.add_argument("--maximum-chars", type=int, default=1600)
     parser.add_argument("--overlap-chars", type=int, default=200)
     args = parser.parse_args(argv)
 
     manifest = load_manifest(args.manifest)
+    if args.query_only:
+        if not args.smoke_query:
+            parser.error("--query-only requires --smoke-query")
+        if (args.prior_manifest or args.plan_only or args.acquire_only or args.stanza or args.clusters
+                or args.write_qdrant or args.oak_review or args.oak_sidecar_url):
+            parser.error("--query-only cannot be combined with crawl, extraction, projection, or OAK flags")
+        if (args.smoke_product_version or args.smoke_architecture) and not args.smoke_product:
+            parser.error("--smoke-product is required with --smoke-product-version or --smoke-architecture")
+        receipt = qdrant_query_only(
+            manifest,
+            args.smoke_query,
+            maximum_chars=args.maximum_chars,
+            provider=args.smoke_provider,
+            product=args.smoke_product,
+            product_version=args.smoke_product_version,
+            architecture=args.smoke_architecture,
+        )
+        print(json.dumps(receipt, indent=2, sort_keys=True))
+        return 0
     prior_manifest = load_manifest(args.prior_manifest) if args.prior_manifest else None
     if args.plan_only:
         if prior_manifest is None:
             parser.error("--plan-only requires --prior-manifest")
-        if args.stanza or args.clusters or args.write_qdrant or args.smoke_query:
+        if (args.stanza or args.clusters or args.write_qdrant or args.smoke_query
+                or args.smoke_provider or args.smoke_product or args.smoke_product_version or args.smoke_architecture):
             parser.error("--plan-only cannot be combined with execution/projection flags")
         plan = plan_manifest_recrawl_delta_v1(prior_manifest, manifest)
         print(json.dumps(plan, indent=2, sort_keys=True))
         return 0 if plan["canAcquire"] else 2
-    if args.acquire_only and (args.stanza or args.clusters or args.write_qdrant or args.smoke_query or args.oak_review or args.oak_sidecar_url):
+    if args.acquire_only and (args.stanza or args.clusters or args.write_qdrant or args.smoke_query
+                              or args.smoke_provider or args.smoke_product or args.smoke_product_version
+                              or args.smoke_architecture or args.oak_review or args.oak_sidecar_url):
         parser.error("--acquire-only cannot be combined with extraction, OAK review, clustering, projection, or smoke-query flags")
     if args.oak_review and not args.oak_sidecar_url:
         parser.error("--oak-review requires --oak-sidecar-url")
     if not args.oak_review and args.oak_sidecar_url:
         parser.error("--oak-sidecar-url requires --oak-review")
+    if any((args.smoke_provider, args.smoke_product, args.smoke_product_version, args.smoke_architecture)) and not args.smoke_query:
+        parser.error("documentation smoke filters require --smoke-query")
+    if (args.smoke_product_version or args.smoke_architecture) and not args.smoke_product:
+        parser.error("--smoke-product is required with --smoke-product-version or --smoke-architecture")
     receipt = run_pipeline(
         manifest,
         prior_manifest=prior_manifest,
@@ -1536,6 +1665,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         overlap_chars=args.overlap_chars,
         oak_review=args.oak_review,
         oak_sidecar_url=args.oak_sidecar_url,
+        smoke_provider=args.smoke_provider,
+        smoke_product=args.smoke_product,
+        smoke_product_version=args.smoke_product_version,
+        smoke_architecture=args.smoke_architecture,
     )
     print(json.dumps(receipt, indent=2, sort_keys=True))
     return 0

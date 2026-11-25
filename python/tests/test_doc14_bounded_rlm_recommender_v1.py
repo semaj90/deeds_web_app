@@ -8,6 +8,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from python.atlas_graph_runtime.doc14_bounded_rlm_recommender_v1 import (
+    _canonical_sha256_v1,
+    _validate_context_manifest_v2,
     make_dspy_predict_synthesizer_v1,
     read_verified_source_span,
     select_bounded_evidence_span_v1,
@@ -209,6 +211,35 @@ class Doc14BoundedRlmRecommenderTests(unittest.TestCase):
             },
             "identityChecksum": "7deb3130585e97f61356a2dacb5aff34de5a79a9028dfc61ebb9c98e69724d63",
         }
+
+    def test_manifest_keeps_task_binding_inside_identity_checksum(self) -> None:
+        manifest = self._ace_manifest_fixture()
+        task = {
+            "schema": "atlas.documentation-task-binding.v1",
+            "logicalTaskKey": "parent-atlas-versioned-doc-intelligence:DOC-15",
+            "taskRevision": "sha256:" + "1" * 64,
+            "sourceRef": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#L1131",
+            "sourceFileSha256": "sha256:" + "2" * 64,
+            "workboardSnapshotSha256": "sha256:" + "3" * 64,
+        }
+        manifest["identityInput"]["taskBinding"] = task
+        identity = {
+            "schema": "atlas.context-manifest-v2-identity.v1",
+            "v1RequestId": manifest["v1"]["requestId"],
+            "v1SnapshotId": manifest["v1"]["snapshotId"],
+            "v1CandidateBucket": manifest["v1"]["candidateBucket"],
+            **manifest["identityInput"],
+        }
+        manifest["identityChecksum"] = _canonical_sha256_v1(identity)
+        verified = _validate_context_manifest_v2(manifest)
+        self.assertEqual(verified["identityInput"]["taskBinding"], task)
+
+        task["taskRevision"] = "sha256:" + "4" * 64
+        with self.assertRaisesRegex(ValueError, "ACE_CONTEXT_MANIFEST_CHECKSUM_MISMATCH"):
+            _validate_context_manifest_v2(manifest)
+        task["taskRevision"] = "invalid"
+        with self.assertRaisesRegex(ValueError, "ACE_CONTEXT_MANIFEST_TASK_BINDING_INVALID"):
+            _validate_context_manifest_v2(manifest)
 
     def test_dspy_path_requires_verified_ace_manifest_and_exact_row_joins(self) -> None:
         class FakeSignature:

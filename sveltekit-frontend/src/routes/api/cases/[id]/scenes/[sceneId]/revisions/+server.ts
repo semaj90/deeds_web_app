@@ -21,7 +21,7 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 	try {
 		authorized = await getAuthorizedCase(scope.caseId, actorId);
 	} catch {
-		return json({ success: false, data: null, message: 'Case authorization failed' }, { status: 500 });
+		return json({ success: false, data: null, message: 'Case authorization failed' });
 	}
 	if (!authorized) return json({ success: false, data: null, message: 'Case not found' }, { status: 404 });
 	if (!ENV.SCENE_PERSISTENCE_ENABLED) return json({ success: false, data: null, message: 'Scene persistence is disabled pending schema admission' }, { status: 503 });
@@ -34,7 +34,7 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 		const row = await readSceneDocumentRevisionV1({ ...scope, revision });
 		return json({ success: true, data: row ? { revision: row.revision, manifestSha256: row.manifestSha256, manifest: row.manifest } : null, message: row ? 'OK' : 'No scene revision' });
 	} catch {
-		return json({ success: false, data: null, message: 'Scene revision load failed' }, { status: 500 });
+		return json({ success: false, data: null, message: 'Scene revision load failed' });
 	}
 };
 

@@ -171,27 +171,42 @@ async def kb_vector_search(
     import httpx
 
     qdrant_url = os.getenv('QDRANT_URL', 'http://localhost:6333')
+    eg2_onnx_url = os.getenv('GEMMA2_ONNX_URL', 'http://127.0.0.1:8094').rstrip('/')
     ollama_url = os.getenv('OLLAMA_URL', 'http://localhost:11434')
 
     try:
         start_time = time.time()
 
-        # 1. Generate query embedding
+        # 1. Generate query embedding (prefer :8094 EG2 ONNX, fallback to Ollama)
         async with httpx.AsyncClient(timeout=10.0) as client:
-            embed_resp = await client.post(
-                f"{ollama_url}/api/embeddings",
-                json={
-                    "model": "nomic-embed-text:latest",
-                    "prompt": query
-                }
-            )
+            embedding = None
+            try:
+                eg2_resp = await client.post(
+                    f"{eg2_onnx_url}/embed",
+                    json={"texts": [query], "dims": [768]}
+                )
+                if eg2_resp.status_code == 200:
+                    vec = eg2_resp.json().get('embeddings', {}).get('768', [None])[0]
+                    if isinstance(vec, list) and len(vec) == 768:
+                        embedding = vec
+            except Exception:
+                embedding = None
 
-            if embed_resp.status_code != 200:
-                log_llm_call("kb_vector_search", "ollama", query, "", 0, 0,
-                           (time.time() - start_time) * 1000, False, "Embedding failed")
-                return {'results': [], 'error': 'Embedding generation failed'}
+            if embedding is None:
+                embed_resp = await client.post(
+                    f"{ollama_url}/api/embeddings",
+                    json={
+                        "model": "nomic-embed-text:latest",
+                        "prompt": query
+                    }
+                )
 
-            embedding = embed_resp.json().get('embedding', [])
+                if embed_resp.status_code != 200:
+                    log_llm_call("kb_vector_search", "ollama", query, "", 0, 0,
+                               (time.time() - start_time) * 1000, False, "Embedding failed")
+                    return {'results': [], 'error': 'Embedding generation failed'}
+
+                embedding = embed_resp.json().get('embedding', [])
 
             # 2. Search Qdrant
             search_resp = await client.post(

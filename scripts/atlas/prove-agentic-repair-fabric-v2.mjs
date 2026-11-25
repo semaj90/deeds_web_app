@@ -56,12 +56,17 @@ try {
 
 const passedFiles = Number(output.match(/Test Files\s+(\d+) passed/)?.[1] ?? 0);
 const passedTests = Number(output.match(/Tests\s+(\d+) passed/)?.[1] ?? 0);
+// The focused repair-fabric contract suite grew from 25 to 26 tests; keep the
+// acceptance receipt aligned with the checked-in suite rather than reporting
+// a successful run as REVIEW_REQUIRED.
+const expectedTests = 26;
 const body = {
   schema: 'atlas.agentic-repair-fabric-v2-proof',
   mode: 'READ_ONLY_CONTRACT_PROOF',
   owners,
   focusedSpecs: specs,
   testResult: { passedFiles, passedTests, error },
+  expectedTestCount: expectedTests,
   boundaries: {
     canonicalAuthority: false,
     writesPerformed: false,
@@ -72,7 +77,7 @@ const body = {
     cacheWrites: false,
     graphWrites: false,
   },
-  proven: passedFiles === specs.length && passedTests === 25,
+  proven: error === null && passedFiles === specs.length && passedTests === expectedTests,
   open: [
     'Live Go Retrieval is reachable, but sampled results lack chunk_id/source_revision lineage and remain non-promotable.',
     'Live OAK transport is reachable in READ_ONLY_SHADOW mode, but the bounded fixture returned no ontology matches.',

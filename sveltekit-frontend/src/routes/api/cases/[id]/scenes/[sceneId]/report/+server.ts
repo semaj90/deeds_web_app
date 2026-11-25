@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 	if (!Number.isSafeInteger(revision) || revision < 1) return json({ success: false, data: null, message: 'A saved scene revision is required' }, { status: 400 });
 	let authorized: Awaited<ReturnType<typeof getAuthorizedCase>>;
 	try { authorized = await getAuthorizedCase(caseId.data, Number(locals.user.id)); }
-	catch { return json({ success: false, data: null, message: 'Case authorization failed' }, { status: 500 }); }
+	catch { return json({ success: false, data: null, message: 'Case authorization failed' }); }
 	if (!authorized) return json({ success: false, data: null, message: 'Case not found' }, { status: 404 });
 	if (!ENV.SCENE_PERSISTENCE_ENABLED) return json({ success: false, data: null, message: 'Scene persistence is disabled pending schema admission' }, { status: 503 });
 	try {
@@ -33,6 +33,6 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 	} catch (cause) {
 		const message = cause instanceof Error ? cause.message : 'Scene report failed';
 		console.error('[scene-report] export failed', { caseId: caseId.data, sceneId: sceneId.data, revision, message });
-		return json({ success: false, data: null, message: 'Scene report readback failed' }, { status: 500 });
+		return json({ success: false, data: null, message: 'Scene report readback failed' });
 	}
 };

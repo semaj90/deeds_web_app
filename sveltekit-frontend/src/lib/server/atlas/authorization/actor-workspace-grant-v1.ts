@@ -22,6 +22,7 @@ export const GrantDenialReasonSchema = z.enum([
 	'ACTOR_NOT_AUTHENTICATED',
 	'WORKSPACE_NOT_PERMITTED',
 	'SOURCE_REF_OUT_OF_SCOPE',
+	'WORKSPACE_REVISION_MISMATCH',
 	'GRANT_REVISION_EXPIRED',
 	'GRANT_REVOKED',
 	'STALE_GRANT_CACHE',
@@ -35,6 +36,7 @@ export const ActorWorkspaceGrantV1Schema = z.object({
 	actorType: ActorTypeSchema,
 	tenantId: z.string().min(1).optional(),
 	workspaceId: z.string().min(1),
+	workspaceRevision: z.string().min(1).optional(),
 	repositoryId: z.string().min(1),
 	permittedSourceRefs: z.array(z.string().min(1)).optional(),
 	permittedPrefixes: z.array(z.string().min(1)).optional(),
@@ -55,6 +57,7 @@ export const AccessVerificationRequestSchema = z.object({
 	workspaceId: z.string().min(1),
 	repositoryId: z.string().min(1),
 	sourceRef: z.string().min(1),
+	requiredWorkspaceRevision: z.string().min(1).optional(),
 	requiredGrantRevision: z.string().min(1).optional(),
 }).strict();
 
@@ -273,6 +276,23 @@ export async function verifyActorWorkspaceAccessV1(
 			sourceRef: request.sourceRef,
 			grantRevision: parsedGrant.grantRevision,
 			denialReason: parsedGrant.denialReason ?? 'WORKSPACE_NOT_PERMITTED',
+			authoritativeOwner: parsedGrant.authoritativeOwner,
+			verifiedAt: nowIso,
+			canonicalAuthority: false,
+			writesPerformed: false,
+		});
+	}
+
+	// A grant for another source snapshot cannot authorize this workspace view.
+	if (request.requiredWorkspaceRevision && parsedGrant.workspaceRevision !== request.requiredWorkspaceRevision) {
+		return AccessVerificationResultSchema.parse({
+			schema: 'atlas.access-verification-result.v1',
+			authorized: false,
+			actorId: request.actorId,
+			workspaceId: request.workspaceId,
+			sourceRef: request.sourceRef,
+			grantRevision: parsedGrant.grantRevision,
+			denialReason: 'WORKSPACE_REVISION_MISMATCH',
 			authoritativeOwner: parsedGrant.authoritativeOwner,
 			verifiedAt: nowIso,
 			canonicalAuthority: false,

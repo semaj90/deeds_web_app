@@ -1,76 +1,16 @@
 {
-  "generatedAt": "2026-11-19T21:51:34.681Z",
-  "elapsedMs": 15594,
-  "totalFindings": 67,
+  "generatedAt": "2026-11-25T02:27:43.313Z",
+  "elapsedMs": 17464,
+  "totalFindings": 64,
   "bySeverity": {
     "high": 0,
-    "medium": 38,
-    "low": 3,
-    "info": 26
+    "medium": 35,
+    "low": 0,
+    "info": 29
   },
   "findings": [
     {
-      "findingId": "contract:sveltekit-route-route_contract_mismatch-001-86cb947b",
-      "severity": "low",
-      "layer": "sveltekit-route",
-      "hmmState": "route_contract_mismatch",
-      "localSourceRefs": [
-        "sveltekit-frontend\\src\\routes\\api\\evidence\\[id]\\video-events\\+server.ts"
-      ],
-      "externalSourceRefs": [],
-      "problem": "GET route returns 500 status code. The degraded-path contract prefers 200 with { data: [], error: msg }.",
-      "expected": "GET routes return 200 with empty arrays/nulls matching success shape.",
-      "suggestedFix": "Replace `return json({ error }, { status: 500 })` with `return json({ data: [], error: msg })` (status 200).",
-      "validationCommands": [
-        "npm run audit:contracts"
-      ],
-      "agentCommandKeys": [
-        "contract.audit"
-      ],
-      "trustTier": "canonical_local_code_plus_official_docs"
-    },
-    {
-      "findingId": "contract:sveltekit-route-route_contract_mismatch-002-86cb947b",
-      "severity": "low",
-      "layer": "sveltekit-route",
-      "hmmState": "route_contract_mismatch",
-      "localSourceRefs": [
-        "sveltekit-frontend\\src\\routes\\api\\cases\\[id]\\scenes\\[sceneKey]\\markers\\+server.ts"
-      ],
-      "externalSourceRefs": [],
-      "problem": "GET route returns 500 status code. The degraded-path contract prefers 200 with { data: [], error: msg }.",
-      "expected": "GET routes return 200 with empty arrays/nulls matching success shape.",
-      "suggestedFix": "Replace `return json({ error }, { status: 500 })` with `return json({ data: [], error: msg })` (status 200).",
-      "validationCommands": [
-        "npm run audit:contracts"
-      ],
-      "agentCommandKeys": [
-        "contract.audit"
-      ],
-      "trustTier": "canonical_local_code_plus_official_docs"
-    },
-    {
-      "findingId": "contract:sveltekit-route-route_contract_mismatch-003-86cb947b",
-      "severity": "low",
-      "layer": "sveltekit-route",
-      "hmmState": "route_contract_mismatch",
-      "localSourceRefs": [
-        "sveltekit-frontend\\src\\routes\\api\\cases\\[id]\\scenes\\[sceneId]\\revisions\\+server.ts"
-      ],
-      "externalSourceRefs": [],
-      "problem": "GET route returns 500 status code. The degraded-path contract prefers 200 with { data: [], error: msg }.",
-      "expected": "GET routes return 200 with empty arrays/nulls matching success shape.",
-      "suggestedFix": "Replace `return json({ error }, { status: 500 })` with `return json({ data: [], error: msg })` (status 200).",
-      "validationCommands": [
-        "npm run audit:contracts"
-      ],
-      "agentCommandKeys": [
-        "contract.audit"
-      ],
-      "trustTier": "canonical_local_code_plus_official_docs"
-    },
-    {
-      "findingId": "contract:drizzle-meta-documented_sidecar-004-26dda09a",
+      "findingId": "contract:drizzle-meta-documented_sidecar-001-26dda09a",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -93,7 +33,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-005-6c8a6ec1",
+      "findingId": "contract:drizzle-meta-documented_sidecar-002-6c8a6ec1",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -116,7 +56,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-006-c908a1c7",
+      "findingId": "contract:drizzle-meta-documented_sidecar-003-c908a1c7",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -139,7 +79,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-007-5bd90b15",
+      "findingId": "contract:drizzle-meta-documented_sidecar-004-5bd90b15",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -162,7 +102,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-008-2a5fba98",
+      "findingId": "contract:drizzle-meta-documented_sidecar-005-2a5fba98",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -185,7 +125,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-009-88d9df2d",
+      "findingId": "contract:drizzle-meta-documented_sidecar-006-88d9df2d",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -208,7 +148,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-010-5dfeeab7",
+      "findingId": "contract:drizzle-meta-documented_sidecar-007-5dfeeab7",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -231,7 +171,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-011-8d068f3d",
+      "findingId": "contract:drizzle-meta-documented_sidecar-008-8d068f3d",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -254,7 +194,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-012-d328ecc9",
+      "findingId": "contract:drizzle-meta-documented_sidecar-009-d328ecc9",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -277,7 +217,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-013-edb3459e",
+      "findingId": "contract:drizzle-meta-documented_sidecar-010-edb3459e",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -300,7 +240,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-014-f00af80a",
+      "findingId": "contract:drizzle-meta-documented_sidecar-011-f00af80a",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -323,7 +263,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-015-c6be2170",
+      "findingId": "contract:drizzle-meta-documented_sidecar-012-c6be2170",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -346,7 +286,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-016-70f6f462",
+      "findingId": "contract:drizzle-meta-documented_sidecar-013-70f6f462",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -369,7 +309,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-017-829576e4",
+      "findingId": "contract:drizzle-meta-documented_sidecar-014-829576e4",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -392,7 +332,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-018-4e5035ec",
+      "findingId": "contract:drizzle-meta-documented_sidecar-015-4e5035ec",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -415,7 +355,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-019-57b36a33",
+      "findingId": "contract:drizzle-meta-documented_sidecar-016-57b36a33",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -438,7 +378,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-020-a4c26a2c",
+      "findingId": "contract:drizzle-meta-documented_sidecar-017-a4c26a2c",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -461,7 +401,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-021-0d28dc7e",
+      "findingId": "contract:drizzle-meta-documented_sidecar-018-0d28dc7e",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -484,7 +424,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-022-a7bc4005",
+      "findingId": "contract:drizzle-meta-documented_sidecar-019-a7bc4005",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -507,7 +447,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-023-49ac0ced",
+      "findingId": "contract:drizzle-meta-documented_sidecar-020-49ac0ced",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -530,7 +470,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-024-42de1f0f",
+      "findingId": "contract:drizzle-meta-documented_sidecar-021-42de1f0f",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -553,7 +493,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-025-29dd4cfe",
+      "findingId": "contract:drizzle-meta-documented_sidecar-022-29dd4cfe",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -576,7 +516,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-026-55c708c4",
+      "findingId": "contract:drizzle-meta-documented_sidecar-023-55c708c4",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -599,7 +539,7 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-027-75067054",
+      "findingId": "contract:drizzle-meta-documented_sidecar-024-75067054",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -622,7 +562,53 @@
       "trustTier": "canonical_local_code_plus_official_docs"
     },
     {
-      "findingId": "contract:drizzle-meta-documented_sidecar-028-ea5ba189",
+      "findingId": "contract:drizzle-meta-documented_sidecar-025-02452c49",
+      "severity": "info",
+      "layer": "drizzle-meta",
+      "hmmState": "documented_sidecar",
+      "localSourceRefs": [
+        "sveltekit-frontend\\drizzle\\0152_atlas_representations_registry.sql"
+      ],
+      "externalSourceRefs": [
+        "drizzle-kit:journal",
+        "drizzle-sidecar-migrations.json"
+      ],
+      "problem": "Documented sidecar \"0152_atlas_representations_registry.sql\" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).",
+      "expected": "Sidecar migrations are applied manually and excluded from the journal by design.",
+      "suggestedFix": "No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.",
+      "validationCommands": [
+        "npm run audit:drizzle-meta"
+      ],
+      "agentCommandKeys": [
+        "drizzle.meta.check"
+      ],
+      "trustTier": "canonical_local_code_plus_official_docs"
+    },
+    {
+      "findingId": "contract:drizzle-meta-documented_sidecar-026-7f57b070",
+      "severity": "info",
+      "layer": "drizzle-meta",
+      "hmmState": "documented_sidecar",
+      "localSourceRefs": [
+        "sveltekit-frontend\\drizzle\\0152_atlas_representations_registry_revised.sql"
+      ],
+      "externalSourceRefs": [
+        "drizzle-kit:journal",
+        "drizzle-sidecar-migrations.json"
+      ],
+      "problem": "Documented sidecar \"0152_atlas_representations_registry_revised.sql\" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).",
+      "expected": "Sidecar migrations are applied manually and excluded from the journal by design.",
+      "suggestedFix": "No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.",
+      "validationCommands": [
+        "npm run audit:drizzle-meta"
+      ],
+      "agentCommandKeys": [
+        "drizzle.meta.check"
+      ],
+      "trustTier": "canonical_local_code_plus_official_docs"
+    },
+    {
+      "findingId": "contract:drizzle-meta-documented_sidecar-027-ea5ba189",
       "severity": "info",
       "layer": "drizzle-meta",
       "hmmState": "documented_sidecar",
@@ -634,6 +620,29 @@
         "drizzle-sidecar-migrations.json"
       ],
       "problem": "Documented sidecar \"0153_atlas_context_manifests.sql\" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).",
+      "expected": "Sidecar migrations are applied manually and excluded from the journal by design.",
+      "suggestedFix": "No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.",
+      "validationCommands": [
+        "npm run audit:drizzle-meta"
+      ],
+      "agentCommandKeys": [
+        "drizzle.meta.check"
+      ],
+      "trustTier": "canonical_local_code_plus_official_docs"
+    },
+    {
+      "findingId": "contract:drizzle-meta-documented_sidecar-028-94ac9fd5",
+      "severity": "info",
+      "layer": "drizzle-meta",
+      "hmmState": "documented_sidecar",
+      "localSourceRefs": [
+        "sveltekit-frontend\\drizzle\\0154_atlas_packet_features_ast_provenance_columns.sql"
+      ],
+      "externalSourceRefs": [
+        "drizzle-kit:journal",
+        "drizzle-sidecar-migrations.json"
+      ],
+      "problem": "Documented sidecar \"0154_atlas_packet_features_ast_provenance_columns.sql\" not in _journal.json (intentional — see drizzle/sidecar-migrations.json).",
       "expected": "Sidecar migrations are applied manually and excluded from the journal by design.",
       "suggestedFix": "No action required — verify it was applied, or promote it into drizzle/meta/_journal.json if it should become a first-class migration.",
       "validationCommands": [
@@ -1532,81 +1541,6 @@
       "problem": "\"0151_feature_label_mutation_audit.sql\" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.",
       "expected": "Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.",
       "suggestedFix": "Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/0151_feature_label_mutation_audit.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.",
-      "validationCommands": [
-        "npm run audit:drizzle-meta",
-        "npm run db:check"
-      ],
-      "agentCommandKeys": [
-        "drizzle.meta.check",
-        "db.check"
-      ],
-      "trustTier": "canonical_local_code_plus_official_docs"
-    },
-    {
-      "findingId": "contract:drizzle-meta-stale_migration-065-6d3c89f5",
-      "severity": "medium",
-      "layer": "drizzle-meta",
-      "hmmState": "stale_migration",
-      "localSourceRefs": [
-        "sveltekit-frontend\\drizzle\\0152_atlas_representations_registry.sql"
-      ],
-      "externalSourceRefs": [
-        "drizzle-kit:journal",
-        "drizzle-sidecar-migrations.json"
-      ],
-      "problem": "\"0152_atlas_representations_registry.sql\" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.",
-      "expected": "Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.",
-      "suggestedFix": "Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/0152_atlas_representations_registry.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.",
-      "validationCommands": [
-        "npm run audit:drizzle-meta",
-        "npm run db:check"
-      ],
-      "agentCommandKeys": [
-        "drizzle.meta.check",
-        "db.check"
-      ],
-      "trustTier": "canonical_local_code_plus_official_docs"
-    },
-    {
-      "findingId": "contract:drizzle-meta-stale_migration-066-a1d61cf5",
-      "severity": "medium",
-      "layer": "drizzle-meta",
-      "hmmState": "stale_migration",
-      "localSourceRefs": [
-        "sveltekit-frontend\\drizzle\\0152_atlas_representations_registry_revised.sql"
-      ],
-      "externalSourceRefs": [
-        "drizzle-kit:journal",
-        "drizzle-sidecar-migrations.json"
-      ],
-      "problem": "\"0152_atlas_representations_registry_revised.sql\" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.",
-      "expected": "Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.",
-      "suggestedFix": "Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/0152_atlas_representations_registry_revised.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.",
-      "validationCommands": [
-        "npm run audit:drizzle-meta",
-        "npm run db:check"
-      ],
-      "agentCommandKeys": [
-        "drizzle.meta.check",
-        "db.check"
-      ],
-      "trustTier": "canonical_local_code_plus_official_docs"
-    },
-    {
-      "findingId": "contract:drizzle-meta-stale_migration-067-3efe2517",
-      "severity": "medium",
-      "layer": "drizzle-meta",
-      "hmmState": "stale_migration",
-      "localSourceRefs": [
-        "sveltekit-frontend\\drizzle\\0154_atlas_packet_features_ast_provenance_columns.sql"
-      ],
-      "externalSourceRefs": [
-        "drizzle-kit:journal",
-        "drizzle-sidecar-migrations.json"
-      ],
-      "problem": "\"0154_atlas_packet_features_ast_provenance_columns.sql\" is not in drizzle/meta/_journal.json and is not listed in drizzle/sidecar-migrations.json — drizzle-kit migrate will skip it.",
-      "expected": "Every numbered .sql in drizzle/ must be journaled OR listed as a documented sidecar.",
-      "suggestedFix": "Either apply manually (docker exec -i legal-ai-postgres psql ... < sveltekit-frontend/drizzle/0154_atlas_packet_features_ast_provenance_columns.sql) and add to sidecar-migrations.json, or regenerate with drizzle-kit generate.",
       "validationCommands": [
         "npm run audit:drizzle-meta",
         "npm run db:check"

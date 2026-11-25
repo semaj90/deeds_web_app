@@ -5,7 +5,10 @@ from fastapi import HTTPException
 from pydantic import ValidationError
 
 import miniforge_nlp_sidecar_v2 as sidecar
-from parent_atlas_ontology.oaklib_external_adapter import search_oaklib_label_candidates_v1
+from parent_atlas_ontology.oaklib_external_adapter import (
+    build_oaklib_candidate_bundle_v1,
+    search_oaklib_label_candidates_v1,
+)
 
 
 def test_candidate_route_refuses_when_source_is_not_configured(monkeypatch):
@@ -20,6 +23,32 @@ def test_candidate_route_refuses_when_source_is_not_configured(monkeypatch):
         assert exc.detail == "OAKLIB_SOURCE_NOT_CONFIGURED"
     else:
         raise AssertionError("unconfigured ontology source must be refused")
+
+
+def test_health_reports_oak_source_readiness_without_promoting_it(tmp_path, monkeypatch):
+    ontology_root = tmp_path / "ontology"
+    ontology_root.mkdir()
+    ontology_file = ontology_root / "fixture.obo"
+    ontology_file.write_text(
+        "format-version: 1.2\n\n[Term]\nid: EX:1\nname: fixture entity\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("ATLAS_OAKLIB_ONTOLOGY_ROOT", str(ontology_root))
+    monkeypatch.setenv("ATLAS_OAKLIB_ONTOLOGY_FILE", ontology_file.name)
+
+    configured = sidecar.health()["oaklibSource"]
+    assert configured["status"] == "SOURCE_CONFIGURED"
+    assert configured["ontologyRevision"] == "sha256:" + hashlib.sha256(ontology_file.read_bytes()).hexdigest()
+    assert configured["canonicalAuthority"] is False
+
+    monkeypatch.delenv("ATLAS_OAKLIB_ONTOLOGY_ROOT")
+    monkeypatch.delenv("ATLAS_OAKLIB_ONTOLOGY_FILE")
+    unavailable = sidecar.health()["oaklibSource"]
+    assert unavailable == {
+        "status": "OAKLIB_SOURCE_NOT_CONFIGURED",
+        "ontologyRevision": None,
+        "canonicalAuthority": False,
+    }
 
 
 def test_candidate_route_uses_server_pinned_local_source_and_returns_proposals(tmp_path, monkeypatch):
@@ -187,7 +216,7 @@ def test_label_search_route_is_registered_in_openapi_and_capabilities():
 
 
 class FakeOakAdapter:
-    def basic_search(self, search_term):
+    def basic_search(self, search_term, config=None):
         return iter(["EX:2", "EX:1", "EX:2"])
 
     def label(self, entity_id):
@@ -198,6 +227,34 @@ class FakeOakAdapter:
 
     def relationships(self, subjects):
         return iter(())
+
+    def sssom_mappings(self, curies=None, source=None):
+        return iter(())
+
+
+def test_oaklib_relationship_read_fails_closed_after_bounded_iterator_sentinel():
+    observed = {"consumed": 0}
+
+    class CountingRelationshipAdapter(FakeOakAdapter):
+        def relationships(self, subjects):
+            def rows():
+                for index in range(1000):
+                    observed["consumed"] += 1
+                    yield ("EX:subject", "EX:related_to", f"EX:{index}")
+
+            return rows()
+
+    with pytest.raises(ValueError, match="OAKLIB_RELATION_RESULT_LIMIT_EXCEEDED"):
+        build_oaklib_candidate_bundle_v1(
+            CountingRelationshipAdapter(),
+            subjects=["EX:subject"],
+            source_selector="atlas-local-ontology",
+            ontology_revision="sha256:ontology",
+            producer_revision="sidecar:test",
+            max_relationships=2,
+        )
+
+    assert observed["consumed"] == 3
 
 
 def test_oaklib_label_search_normalizes_deduplicates_and_caps_results():
@@ -213,6 +270,109 @@ def test_oaklib_label_search_normalizes_deduplicates_and_caps_results():
     assert [candidate["externalId"] for candidate in result["concepts"]] == ["EX:1"]
     assert result["relations"] == []
     assert result["canonicalAuthority"] is False
+
+
+def test_oaklib_label_search_consumes_only_the_bounded_iterator_prefix():
+    observed = {"consumed": 0, "search_config_limit": None}
+
+    class CountingOakAdapter(FakeOakAdapter):
+        def basic_search(self, search_term, config=None):
+            observed["search_config_limit"] = getattr(config, "limit", None)
+
+            def results():
+                for index in range(1000):
+                    observed["consumed"] += 1
+                    yield f"EX:{index:04d}"
+
+            return results()
+
+    result = search_oaklib_label_candidates_v1(
+        CountingOakAdapter(),
+        terms=["bounded"],
+        source_selector="atlas-local-ontology",
+        ontology_revision="sha256:ontology",
+        producer_revision="sidecar:test",
+        max_candidates_per_term=2,
+    )
+
+    # The producer-side SearchConfiguration and consumer-side islice must agree:
+    # no adapter may force an unbounded iterator to be materialized.
+    assert observed["consumed"] == 16
+    if observed["search_config_limit"] is not None:
+        assert observed["search_config_limit"] == 16
+    assert result["matches"][0]["externalIds"] == ["EX:0000", "EX:0001"]
+
+
+def test_oaklib_label_search_returns_bounded_sssom_mapping_suggestions():
+    from types import SimpleNamespace
+
+    class MappingOakAdapter(FakeOakAdapter):
+        def sssom_mappings(self, curies=None, source=None):
+            assert tuple(curies) == ("EX:1", "EX:2")
+            return iter([SimpleNamespace(
+                subject_id="EX:1", predicate_id="skos:exactMatch", object_id="EXT:1",
+                mapping_justification="semapv:ManualMappingCuration",
+                subject_source="EX", object_source="EXT", subject_source_version="1",
+                object_source_version="2", confidence=0.9,
+            )])
+
+    result = search_oaklib_label_candidates_v1(
+        MappingOakAdapter(), terms=["continuant"], source_selector="atlas-local-ontology",
+        ontology_revision="sha256:ontology", producer_revision="sidecar:test",
+    )
+
+    assert result["mappingProviderStatus"] == "AVAILABLE"
+    assert result["mappingCandidates"] == [{
+        "schema": "atlas.oaklib-mapping-candidate.v1",
+        "candidateId": result["mappingCandidates"][0]["candidateId"],
+        "subjectId": "EX:1", "predicateId": "skos:exactMatch", "objectId": "EXT:1",
+        "mappingJustification": "semapv:ManualMappingCuration",
+        "subjectSource": "EX", "objectSource": "EXT",
+        "subjectSourceVersion": "1", "objectSourceVersion": "2", "confidence": 0.9,
+        "ontologyRevision": "sha256:ontology", "producerRevision": "sidecar:test",
+        "evidenceRefs": ["oaklib:atlas-local-ontology:sssom:EX:1|skos:exactMatch|EXT:1"],
+        "status": "PROPOSED", "canonicalAuthority": False,
+    }]
+
+
+def test_oaklib_mapping_iterator_fails_closed_at_result_limit():
+    observed = {"consumed": 0}
+
+    class CountingMappingAdapter(FakeOakAdapter):
+        def sssom_mappings(self, curies=None, source=None):
+            def rows():
+                for index in range(300):
+                    observed["consumed"] += 1
+                    yield type("Mapping", (), {
+                        "subject_id": "EX:1", "predicate_id": "skos:exactMatch",
+                        "object_id": f"EXT:{index}",
+                    })()
+            return rows()
+
+    with pytest.raises(ValueError, match="OAKLIB_MAPPING_RESULT_LIMIT_EXCEEDED"):
+        search_oaklib_label_candidates_v1(
+            CountingMappingAdapter(), terms=["continuant"], source_selector="local",
+            ontology_revision="r1", producer_revision="p1",
+        )
+    assert observed["consumed"] == 257
+
+
+@pytest.mark.parametrize("confidence", [True, 1.1, float("nan"), "0.8"])
+def test_oaklib_mapping_confidence_must_be_finite_unit_interval_number(confidence):
+    from types import SimpleNamespace
+
+    class InvalidConfidenceAdapter(FakeOakAdapter):
+        def sssom_mappings(self, curies=None, source=None):
+            return iter([SimpleNamespace(
+                subject_id="EX:1", predicate_id="skos:exactMatch", object_id="EXT:1",
+                confidence=confidence,
+            )])
+
+    with pytest.raises(ValueError, match="OAKLIB_MAPPING_CONFIDENCE_INVALID"):
+        search_oaklib_label_candidates_v1(
+            InvalidConfidenceAdapter(), terms=["continuant"], source_selector="local",
+            ontology_revision="r1", producer_revision="p1",
+        )
 
 
 def test_oaklib_label_search_rejects_invalid_bounds_and_missing_search_owner():

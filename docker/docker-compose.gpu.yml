@@ -332,7 +332,7 @@ services:
   # Qdrant Vector Database
   # ========================================================================
   qdrant:
-    image: qdrant/qdrant:v1.19.0@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc
+    image: qdrant/qdrant:v1.20.2
     container_name: legal-ai-qdrant
     environment:
       QDRANT_API_KEY: qdrant_key

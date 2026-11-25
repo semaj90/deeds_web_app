@@ -35,6 +35,30 @@ export function fingerprintError(raw: string): string {
 	return createHash('sha256').update(normalized).digest('hex').slice(0, 16);
 }
 
+const UUID_OR_INT_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\b\d+\b/g;
+
+/**
+ * Canonical cross-lane error join key shared by runtime-error-priorities,
+ * error-fingerprint, and repair-episode-verifier-v1.
+ */
+export function canonicalErrorJoinKeyV1(input: {
+	file?: string | null;
+	routePath?: string | null;
+	code?: string | number | null;
+	kind?: string | null;
+	message: string;
+}): string {
+	const rawLocation = input.file?.trim() || input.routePath?.split('?')[0]?.trim() || '';
+	const location = rawLocation.replaceAll('\\', '/').replace(/^\.\//, '').toLowerCase();
+	const category = String(input.code ?? input.kind ?? '').trim().toLowerCase();
+	const message = normalizeError(input.message).replace(UUID_OR_INT_RE, '#');
+	const digest = createHash('sha256')
+		.update(JSON.stringify({ location, category, message }), 'utf8')
+		.digest('hex')
+		.slice(0, 32);
+	return `errkey:${digest}`;
+}
+
 export function extractSymbols(text: string): string[] {
 	const matches = new Set<string>();
 	const patterns = [
