@@ -34,7 +34,18 @@ import { logError, categorizeError, categorizeSeverity } from '$lib/server/error
 import { sql } from 'drizzle-orm';
 import fs from 'node:fs';
 import path from 'node:path';
-import { verifiedContextRuntimeV1 } from '$lib/server/atlas/execution/verified-context-runtime-v1.js';
+import { createVerifiedContextRuntimeV1 } from '$lib/server/atlas/execution/verified-context-runtime-v1.js';
+import { createVerifiedContextPostgresAuthorizerV1 } from '$lib/server/atlas/authorization/verified-context-postgres-authorizer-v1.js';
+import { PostgresActorWorkspaceGrantProviderV1 } from '$lib/server/atlas/authorization/postgres-actor-workspace-grant-provider-v1.js';
+
+// The workspace grant table is still proposal-only in some environments. This
+// read-only provider is invoked only after trusted workspace authority exists;
+// missing schema or grants are handled as structured, fail-closed refusals.
+const verifiedContextRuntimeV1 = createVerifiedContextRuntimeV1(undefined, {
+  authorizeWorkspaceScope: createVerifiedContextPostgresAuthorizerV1(
+    new PostgresActorWorkspaceGrantProviderV1(pool),
+  ),
+});
 
 // ── Vite API JSONL log (feeds repair-loop agent) ─────────────────────────
 const VITE_API_LOG = path.resolve(process.cwd(), '..', 'logs', 'vite-api.jsonl');

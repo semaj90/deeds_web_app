@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createVerifiedContextRuntimeV1, VERIFIED_CONTEXT_MISSING_PROVIDERS_V1 } from './verified-context-runtime-v1.js';
 
 const request = { requestId: 'server-request-1', query: 'find a route helper', topK: 3 };
+const workspaceId = '11111111-1111-4111-8111-111111111111';
 
 describe('server-registered VerifiedContext runtime', () => {
   it('refuses when current workspace authority is unavailable and preserves the request id', async () => {
@@ -49,5 +50,83 @@ describe('server-registered VerifiedContext runtime', () => {
       refusalCode: 'AUTHENTICATED_ACTOR_REQUIRED', firstFailingBoundary: 'WORKSPACE_AUTHORITY',
     });
     expect(resolveAuthority).not.toHaveBeenCalled();
+  });
+
+  it('blocks unauthorized workspace scope before reporting remaining missing providers', async () => {
+    const resolveAuthority = vi.fn().mockResolvedValue({
+      status: 'TRUSTED', workspaceRevision: `sha256:${'a'.repeat(64)}`, source: 'OPERATOR_PIN',
+      receiptCrossCheck: 'MATCHES_ADMISSION_RECEIPT', resolverRevision: 'atlas.trusted-workspace-resolver.v1',
+    });
+    const authorizeWorkspaceScope = vi.fn().mockResolvedValue({ status: 'BLOCKED', reason: 'WORKSPACE_GRANT_NOT_FOUND_FOR_REVISION' });
+    const result = await createVerifiedContextRuntimeV1(resolveAuthority, { authorizeWorkspaceScope }).execute('actor-1', request);
+
+    expect(authorizeWorkspaceScope).toHaveBeenCalledOnce();
+    expect(result).toMatchObject({
+      status: 'REFUSED', requestId: request.requestId,
+      refusalCode: 'WORKSPACE_GRANT_NOT_FOUND_FOR_REVISION', firstFailingBoundary: 'WORKSPACE_AUTHORIZATION',
+      canonicalAuthority: false, writesPerformed: false,
+    });
+  });
+
+  it('omits authorizeWorkspaceScope from missingProviders once wired and authorized', async () => {
+    const workspaceRevision = `sha256:${'a'.repeat(64)}`;
+    const resolveAuthority = vi.fn().mockResolvedValue({
+      status: 'TRUSTED', workspaceRevision, source: 'OPERATOR_PIN',
+      receiptCrossCheck: 'MATCHES_ADMISSION_RECEIPT', resolverRevision: 'atlas.trusted-workspace-resolver.v1',
+    });
+    const authorizeWorkspaceScope = vi.fn().mockResolvedValue({
+      status: 'AUTHORIZED',
+      actorId: 'actor-1',
+      workspaceId,
+      workspaceRevision,
+      repositoryIds: ['deeds-web-app'],
+      allowedSourceRefs: ['sveltekit-frontend/src/routes/+page.svelte'],
+      authorityRef: 'postgresql:atlas_actor_workspace_source_grants_v1:test',
+    });
+    const result = await createVerifiedContextRuntimeV1(resolveAuthority, { authorizeWorkspaceScope }).execute('actor-1', { ...request, workspaceId });
+
+    expect(result).toMatchObject({
+      status: 'REFUSED', requestId: request.requestId,
+      refusalCode: 'VERIFIED_CONTEXT_PROVIDERS_NOT_CONFIGURED', firstFailingBoundary: 'SERVICE_CONFIGURATION',
+      receipt: { details: {
+        missingProviders: VERIFIED_CONTEXT_MISSING_PROVIDERS_V1.filter((p) => p !== 'authorizeWorkspaceScope'),
+      } },
+    });
+  });
+
+  it('fails closed when workspace grant readback throws', async () => {
+    const resolveAuthority = vi.fn().mockResolvedValue({
+      status: 'TRUSTED', workspaceRevision: `sha256:${'a'.repeat(64)}`, source: 'OPERATOR_PIN',
+      receiptCrossCheck: 'MATCHES_ADMISSION_RECEIPT', resolverRevision: 'atlas.trusted-workspace-resolver.v1',
+    });
+    const authorizeWorkspaceScope = vi.fn().mockRejectedValue(new Error('relation does not exist'));
+    const result = await createVerifiedContextRuntimeV1(resolveAuthority, { authorizeWorkspaceScope })
+      .execute('actor-1', { ...request, workspaceId });
+
+    expect(result).toMatchObject({
+      status: 'REFUSED', requestId: request.requestId,
+      refusalCode: 'WORKSPACE_GRANT_READBACK_UNAVAILABLE', firstFailingBoundary: 'WORKSPACE_AUTHORIZATION',
+      canonicalAuthority: false, writesPerformed: false,
+    });
+    expect(JSON.stringify(result)).not.toContain('relation does not exist');
+  });
+
+  it('rejects a scope bound to another actor, workspace, or revision', async () => {
+    const workspaceRevision = `sha256:${'a'.repeat(64)}`;
+    const resolveAuthority = vi.fn().mockResolvedValue({
+      status: 'TRUSTED', workspaceRevision, source: 'OPERATOR_PIN',
+      receiptCrossCheck: 'MATCHES_ADMISSION_RECEIPT', resolverRevision: 'atlas.trusted-workspace-resolver.v1',
+    });
+    const authorizeWorkspaceScope = vi.fn().mockResolvedValue({
+      status: 'AUTHORIZED', actorId: 'actor-other', workspaceId, workspaceRevision,
+      repositoryIds: ['deeds-web-app'], allowedSourceRefs: ['src/routes/+page.svelte'], authorityRef: 'grant:test',
+    });
+    const result = await createVerifiedContextRuntimeV1(resolveAuthority, { authorizeWorkspaceScope })
+      .execute('actor-1', { ...request, workspaceId });
+
+    expect(result).toMatchObject({
+      status: 'REFUSED', refusalCode: 'WORKSPACE_SCOPE_BINDING_MISMATCH',
+      firstFailingBoundary: 'WORKSPACE_AUTHORIZATION', writesPerformed: false,
+    });
   });
 });
