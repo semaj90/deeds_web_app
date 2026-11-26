@@ -6545,6 +6545,11 @@ const BATCH_DENYLIST = new Set([
   'ops.record_fix_attempt',
   'ops.run_quality_gate',
   'tools.batch_call',
+  // Model lifecycle changes must be called directly. Listed explicitly so that registration
+  // order is not the only thing keeping them out of batch dispatch.
+  'llama_server.start',
+  'llama_server.unload',
+  'llama_server.switch',
 ]);
 const BATCH_MAX_CALLS = 8;
 const BATCH_TIMEOUT_MS = 30_000;
