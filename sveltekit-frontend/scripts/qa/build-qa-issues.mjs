@@ -16,6 +16,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { groupIssues, redact, CODES } from './error-fingerprint.mjs';
+import { collectServerLogEvents } from './server-log-events.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND_ROOT = path.resolve(__dirname, '../..');
@@ -42,7 +43,7 @@ function featureLabelOf(tags) {
   return tag ? tag.slice('feature:'.length) : 'unlabeled';
 }
 
-export function buildIssues(report, { runId, serverManifest = null, revision = null }) {
+export function buildIssues(report, { runId, serverManifest = null, revision = null, serverLog = null }) {
   const events = [];
   const tests = [];
 
@@ -78,6 +79,9 @@ export function buildIssues(report, { runId, serverManifest = null, revision = n
     }
   }
 
+  if (serverLog) {
+    for (const event of serverLog.events) events.push({ ...event, run_id: runId });
+  }
   const issues = groupIssues(events);
   return {
     schema_version: 1,
@@ -85,6 +89,12 @@ export function buildIssues(report, { runId, serverManifest = null, revision = n
     generated_at: new Date().toISOString(),
     revision,
     server: serverManifest,
+    ...(serverLog ? { server_log: {
+      status: serverLog.status,
+      events: serverLog.events.length,
+      undated_errors: serverLog.undatedErrors,
+      omitted_events: serverLog.omittedEvents,
+    } } : {}),
     totals: {
       tests: tests.length,
       passed: tests.filter((t) => t.status === 'passed').length,
@@ -101,7 +111,7 @@ export function buildIssues(report, { runId, serverManifest = null, revision = n
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const runId = process.argv[2];
-  if (!runId) {
+  if (!runId || !/^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/.test(runId)) {
     console.error('usage: node scripts/qa/build-qa-issues.mjs <runId>');
     process.exit(2);
   }
@@ -112,10 +122,16 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(2);
   }
   const manifestPath = path.join(FRONTEND_ROOT, 'logs', 'qa', 'active-server.json');
-  const serverManifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : null;
+  let serverManifest = null;
+  try {
+    serverManifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  } catch {
+    // Browser evidence remains available when the server manifest is missing or malformed.
+  }
   const report = JSON.parse(readFileSync(reportPath, 'utf8'));
-  const output = buildIssues(report, { runId, serverManifest, revision: serverManifest?.revision ?? null });
+  const serverLog = await collectServerLogEvents(report, { frontendRoot: FRONTEND_ROOT, serverManifest });
+  const output = buildIssues(report, { runId, serverManifest, revision: serverManifest?.revision ?? null, serverLog });
   const outPath = path.join(runDir, 'issues.json');
   writeFileSync(outPath, `${JSON.stringify(output, null, 2)}\n`, 'utf8');
-  console.log(JSON.stringify({ out: outPath, totals: output.totals }));
+  console.log(JSON.stringify({ out: outPath, totals: output.totals, server_log: output.server_log }));
 }

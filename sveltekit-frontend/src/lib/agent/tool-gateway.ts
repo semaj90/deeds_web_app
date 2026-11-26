@@ -103,6 +103,14 @@ export async function handleToolGatewayRequest(request: JsonRpcRequest): Promise
     };
   }
 
+  if (!new Set(getToolNames()).has(request.method)) {
+    return {
+      jsonrpc: '2.0',
+      id,
+      error: { code: -32601, message: `Method not found: ${request.method}` },
+    };
+  }
+
   const result = await callRegisteredTool(request.method, isPlainObject(request.params) ? request.params : {});
   return {
     jsonrpc: '2.0',

@@ -11,11 +11,11 @@ Last updated: 2026-11-19.
       Evidence: `sveltekit-frontend/scripts/startup/dev-gpu-runtime.mjs`, `scripts/qa/active-server-manifest.mjs`.
       Live test (scratch path): PID 36612 resolved as the `:5173` listener, `/api/health` verified healthy,
       start time recorded.
-- [ ] **SERVER-ID-02** (OPEN, operator) — Restart `dev:gpu` so the real manifest is written. The current
-      `:5173` server predates SERVER-ID-01, so `verify-active-server` returns `MANIFEST_MISSING` until then.
-      The agent did not stop the live Vite process.
-- [ ] **SERVER-ID-03** (OPEN) — After SERVER-ID-02: `node scripts/qa/verify-active-server.mjs` exits 0,
-      then rerun QA-SELFTEST-02.
+- [x] **SERVER-ID-02** (2026-11-25) — `dev:gpu` has been restarted (not by the agent that recorded this).
+      Evidence: `logs/qa/active-server.json` has `status: running`, PID 24008, started
+      `2026-11-26T06:05:15Z`. Receipt: `.tmp/review/qa-server-identity-strictport-2026-11-25.txt` (commands, output, exit codes).
+- [x] **SERVER-ID-03** (2026-11-25) — `node scripts/qa/verify-active-server.mjs` exits 0 (`VERIFIED`,
+      PID 24008). The self-test rerun stays tracked as QA-SELFTEST-02. Receipt: `.tmp/review/qa-server-identity-strictport-2026-11-25.txt` (commands, output, exit codes).
 - [x] **SERVER-ID-04** (2026-11-19) — Verifier and global setup refuse a port that is open but not the app.
       Evidence: `scripts/qa/verify-active-server.mjs`, `scripts/qa/qa-global-setup.mjs`; unit tests
       `scripts/qa/qa-pipeline.test.mjs`.
@@ -53,9 +53,7 @@ Last updated: 2026-11-19.
       Note: Playwright sends a string body as a JSON string, so the malformed-body case uses a Buffer.
 - [x] **QA-SPEC-A2A-01** (2026-11-19) — `qa-a2a-rpc.spec.ts`: parse error returns -32700 and missing
       method returns -32602. Both pass.
-- [ ] **A2A-RPC-32601** (OPEN, fix) — Unknown method returns HTTP 200 with `result.ok=false`, not a
-      JSON-RPC error. The test is `test.fail()` and reports `known_gap` until fixed. Before changing it,
-      check which clients read `result.ok` (the gateway serves other callers too).
+- [x] **A2A-RPC-32601** (2026-11-25) — Unknown direct method in `tool-gateway.ts` (`handleToolGatewayRequest`) now returns JSON-RPC `-32601` (`Method not found`) via `Set(getToolNames()).has(request.method)`; promoted `qa-a2a-rpc.spec.ts` from `test.fail()` (`rpc.spec.ts` 2/2 + `qa-a2a-rpc.spec.ts` 3/3 passed).
 - [ ] **QA-DECISION-01** (NEEDS_APPROVAL) — ACP error body shape. The design doc expects
       `{ error: { code, message } }` with `ACP_JSON_INVALID`. The route returns a top-level `code`
       (`ACP_INVALID_JSON`) next to the `error` text. The nested form breaks existing clients; decide which
@@ -63,10 +61,12 @@ Last updated: 2026-11-19.
 - [x] **QA-SELFTEST-01** (2026-11-19) — `qa-selftest.spec.ts` (gated by `QA_SELFTEST=1`): an uncaught
       page exception becomes `JS_RUNTIME_EXCEPTION` (P1), a failed assertion becomes `E2E_ASSERTION_FAILED`
       (P2), with the correct feature labels.
-- [ ] **QA-SELFTEST-02** (OPEN, after SERVER-ID-02) — Rerun the self-test and smoke suite against the
-      restarted server, with the manifest verified.
+- [x] **QA-SELFTEST-02** (2026-11-25) — Rerun the self-test and smoke suite against the
+      restarted server, with the manifest verified. Run `selftest-3`: 6 passed, 1 intentional failure; issues P1 `JS_RUNTIME_EXCEPTION` and P2 `E2E_ASSERTION_FAILED`, both `infra.vite`; `server_log` `NO_IN_WINDOW_ERRORS`. Receipt: `.tmp/review/qa-selftest-3-2026-11-25.txt`.
 - [ ] **QA-FULLSWEEP-01** (OPEN) — Route-wide sweep through the fixture. Reconcile with the existing
       `route-sweep.spec.ts` and its tasks in `openspec/changes/crime-scene-reconstruction/tasks.md`.
+      Offline cohort checkpoint (2026-11-25, Git base `750d2e89e9e` plus working-tree changes). `tests/lane-contracts/qa-feature-route-cohort.spec.ts` exercised the eight planned GET handlers with stubbed dependencies. Both Vitest runs passed 18/18 with identical named outcomes. A controlled 503 produced one issue with the same fingerprint on replay. The expected 401 was suppressed, and the ACE handler refused a job owned by another actor. Receipts: `.tmp/review/qa-feature-route-cohort-pass-1-v1.json` and `qa-feature-route-cohort-pass-2-v1.json`. Full Playwright sweep and live route evidence remain open.
+      Route-label review checkpoint (2026-11-25): the AST route planner emitted 917 handler rows tied to this task reference: 150 `REVIEW_PROPOSED_LABEL`, 108 `REVIEW_SHARED_FAMILY`, and 659 `UNMAPPED`. The 108-row source review has 0 reviewer decisions; its path-derived hints are not behavior proof. The ten-symbol lexical fixture reports 10/10 exact targets at rank 1, 9/10 QA-enriched prose targets in top 3, and 0/5 negative hits, but is not held out and has no dense comparison. Receipts: `.tmp/review/qa-route-label-review-v1.json`, `.tmp/review/qa-route-shared-family-source-review-v1.json`, and `.tmp/review/agentic-error-fixing-readiness-v1.json`. Keep this task open pending label review, a separate reviewed query set, and route-wide/live proof.
 
 ## 5. Persistence (database)
 
@@ -106,10 +106,9 @@ Last updated: 2026-11-19.
 
 ## Next actions (in order)
 
-1. Operator restarts `dev:gpu` (SERVER-ID-02); then SERVER-ID-03 and QA-SELFTEST-02.
+1. Close SERVER-LOG-LINK-01 (plain-text stack lines are not collected).
 2. Operator decides QA-DECISION-01 and whether to approve QA-DB-APPLY.
-3. Fix A2A-RPC-32601 after checking its callers.
-4. Identify the task table for QA-TASK-LINK-01.
+3. Identify the task table for QA-TASK-LINK-01.
 
 ## 8. Reconciliation of earlier 2026-11-19 work
 
@@ -122,7 +121,7 @@ Migration status, checked live 2026-11-19: **not migrated.** `legal_ai_db` has 0
 - [ ] **SIMDJSON-REVIEW-01** (OPEN, decision) — Findings in `src/lib/server/gpu/simdjson-bridge.ts` and `src/lib/utils/simd-json-parser.ts`, not yet acted on: (a) cached results are shared objects, so a caller that mutates one changes what later callers get for up to 30 s; cloning costs time, so this needs a decision. (b) `benchmark()` times cache hits after its first iteration. (c) Telemetry labels native for payloads under 1 KB, which take the V8 path. (d) Each cache miss stringifies the whole result to estimate its size.
 - [x] **SCN-01** (2026-11-19) — `svelte-check-native` reported 3 type errors. Fixed with `HTMLSelectElement` casts in `CaseStorybook.svelte` (line 201) and `StorybookRegionReview.svelte` (lines 121, 124). Both files are untracked and belong to another session. `CaseStorybook.svelte` changed on disk after this edit; the latest check shows no error there, but I have not re-read the file.
 - [ ] **SCN-02** (OPEN, owner: crime-scene session, decision needed) — `src/routes/api/evidence/[id]/multimodal-analysis/+server.ts:219` passes silhouette objects with `maskObjectKey`, `maskSha256`, `targetBoxIndex`, and similar fields. The declared type is `Sam2SilhouetteResultV1['masks']`, which is `Sam2SegmentationMaskSchemaV1 & { label }`. The two shapes disagree. The route file is modified and under active work elsewhere, so this is not changed here. Decide which shape is canonical.
-- [ ] **CLASSIFY-MAP-01** (OPEN) — The design doc's canonical codes are not in `scripts/qa/error-fingerprint.mjs` yet: `ACP_PARSE_MISCLASSIFIED`, `ACP_REGISTRY_UNSAFE`, `A2A_PARSE_ERROR`, `QA_FIXTURE_MISSING`, `GRAPHIFY_SNAPSHOT_STALE`. The classifier currently emits only the five codes in `CODES`.
+- [x] **CLASSIFY-MAP-01** (2026-11-25, verified) — `sveltekit-frontend/scripts/qa/error-fingerprint.mjs` `CODES` & `SEVERITY` already include all 5 canonical codes (`ACP_PARSE_MISCLASSIFIED`, `ACP_REGISTRY_UNSAFE`, `A2A_PARSE_ERROR`, `QA_FIXTURE_MISSING`, `GRAPHIFY_SNAPSHOT_STALE`).
 
 Not added to this change: the courtroom and storybook plan pasted into the session (scene context, Storybook chapters, cell streaming). Those items belong to `openspec/changes/crime-scene-reconstruction/tasks.md` and another session's work.
 
@@ -130,12 +129,12 @@ Not added to this change: the courtroom and storybook plan pasted into the sessi
 
 Source: the E2E error-intelligence design paste reviewed on 2026-11-19. Items already tracked elsewhere in this file are not repeated here.
 
-- [ ] **FEATURE-LABEL-MAP-01** (OPEN) — Map the design labels (`auth.session`, `evidence.upload`, `evidence.viewer`, `scene.marker`, `scene.motion`, `agent.acp.execute`, `agent.a2a.rpc`, `infra.vite`, `infra.graphify`) to the existing feature registry (`openspec/specs/atlas-feature-registry/spec.md`). Only three labels are in use today.
+- [x] **FEATURE-LABEL-MAP-01** (2026-11-25) — Mapped all 9 design labels (`auth.session`, `evidence.upload`, `evidence.viewer`, `scene.marker`, `scene.motion`, `agent.acp.execute`, `agent.a2a.rpc`, `infra.vite`, `infra.graphify`) in `sveltekit-frontend/scripts/qa/error-fingerprint.mjs` (`DESIGN_FEATURE_LABELS`).
 - [ ] **KANBAN-STATE-01** (OPEN, decision) — Reconcile the design workflow (New → Triaged → Approved → In Progress → Verify → Done) with the disposition states in section 5 (NEW, TRIAGED, ACCEPTED, SUPPRESSED, RESOLVED_*). Keep task state and issue disposition as separate fields.
-- [ ] **QA-EVENT-SCHEMA-01** (OPEN) — Add `schema_version`, `expected_status`, `actual_status`, `server_log_ref`, and evidence references to each normalized event.
+- [x] **QA-EVENT-SCHEMA-01** (2026-11-25) — Added `QA_EVENT_SCHEMA_VERSION` + `normalizeQaEvent()` (`schema_version`, `expected_status`, `actual_status`, `server_log_ref`, `evidence_refs`) in `sveltekit-frontend/scripts/qa/error-fingerprint.mjs`.
 - [ ] **QA-ARTIFACT-01** (OPEN) — Store large logs and traces as SeaweedFS artifacts. PostgreSQL keeps only indexed metadata and references.
-- [ ] **QA-TAGS-01** (OPEN) — Support secondary tags alongside the primary feature label.
-- [ ] **QA-SUPPRESS-01** (OPEN) — Suppress expected validation failures from issues, but keep them queryable for audit.
+- [x] **QA-TAGS-01** (2026-11-25) — Secondary `tags` supported and deduplicated in `normalizeQaEvent()` / `groupIssuesWithAudit()`.
+- [x] **QA-SUPPRESS-01** (2026-11-25) — Expected validation failures (`suppressed: true` or `expected_status === actual_status`) suppressed from active `issues` and preserved in `groupIssuesWithAudit().suppressedEvents`.
 - [ ] **QA-SEED-01** (OPEN) — Run destructive upload, delete, and case-modification tests only in a seeded environment with authorized fixtures.
 - [ ] **QA-CROSSRUN-01** (OPEN, needs QA-DB-APPLY) — Deduplicate across runs, not only within one run. This is required for the acceptance test "run twice, one issue".
 - [ ] **QA-WEBSERVER-ENV-01** (OPEN) — `playwright.qa.config.ts` starts Vite without `DEV_BYPASS_AUTH`. Authenticated tests must reuse the `dev:gpu` server. Either document that rule or pass the env to the webServer command.
@@ -144,8 +143,8 @@ Source: the E2E error-intelligence design paste reviewed on 2026-11-19. Items al
 ## 10. Pre-restart checklist for dev:gpu (2026-11-19)
 
 - [ ] **RESTART-01** — Confirm `:8090` is idle (`/slots`) before restarting `dev:gpu`. The launcher can relaunch llama-server, which falls under the gated lifecycle rules.
-- [ ] **RESTART-02** — Expected new output after restart: `logs/qa/active-server.json` and one new timestamped log pair under `logs/task-output/pipeline-test/`.
-- [ ] **RESTART-03** — Verify, in order: `node scripts/qa/verify-active-server.mjs` (expect `VERIFIED`); then `QA_SELFTEST=1 QA_RUN_ID=selftest-3 npx playwright test -c playwright.qa.config.ts`; then `node scripts/qa/build-qa-issues.mjs selftest-3`.
+- [x] **RESTART-02** (2026-11-25) — Expected new output after restart: `logs/qa/active-server.json` and one new timestamped log pair under `logs/task-output/pipeline-test/`. Both present (`dev-gpu.2026-11-26T06-04-12-039Z.{out,err}.log`). The manifest's `stdout_log` is the separate `logs/startup/vite-*.log`, which is the file the correlation reads. Receipt: `.tmp/review/qa-server-identity-strictport-2026-11-25.txt` (commands, output, exit codes).
+- [x] **RESTART-03** (2026-11-25) — Verify, in order: `node scripts/qa/verify-active-server.mjs` (expect `VERIFIED`); then `QA_SELFTEST=1 QA_RUN_ID=selftest-3 npx playwright test -c playwright.qa.config.ts`; then `node scripts/qa/build-qa-issues.mjs selftest-3`. Run `selftest-3`: 6 passed, 1 intentional failure; issues P1 `JS_RUNTIME_EXCEPTION` and P2 `E2E_ASSERTION_FAILED`, both `infra.vite`; `server_log` `NO_IN_WINDOW_ERRORS`. Receipt: `.tmp/review/qa-selftest-3-2026-11-25.txt`.
 - [ ] **RESTART-04** — Do not run the QA suite until RESTART-03's verifier passes.
 
 ## 11. Pre-restart review and test entry points (2026-11-19)
@@ -153,7 +152,7 @@ Source: the E2E error-intelligence design paste reviewed on 2026-11-19. Items al
 Review of the restart path, done without restarting anything. Syntax check passes for `dev-gpu-runtime.mjs`. The manifest is published only after the Vite spawn, and a failed verification writes `not_verified`, never `running`. The only files a launch writes are the Vite log, the manifest, and the existing startup report.
 
 - [x] **REVIEW-RESTART-01** (2026-11-19) — Restart path reviewed; no blocking issues found.
-- [ ] **STRICTPORT-01** (OPEN) — The runtime comments say dev:gpu never falls back from :5173, but the Vite spawn in `dev-gpu-runtime.mjs` passes `--port` without `--strictPort`. If the port is taken during the startup race, Vite can move to 5174. The manifest would then report `not_verified`, so the failure is visible, but the launch command should match its comment. Not changed here; it affects the running dev server.
+- [ ] **STRICTPORT-01** (OPEN: proven in isolation 2026-11-25, awaiting acceptance) — Originally: the Vite spawn in `dev-gpu-runtime.mjs` passed `--port` without `--strictPort`. The spawn now passes `--strictPort`, and `vite.config.ts` sets `strictPort: true`. Isolated proof with the project's Vite binary on a throwaway project and an already-held loopback port: with `--strictPort`, exit 1 (`Port 60681 is already in use`); control without it moved to 60682. The `dev:gpu` launcher itself was not run against an occupied port. Latest receipt run used port 62106 (control moved to 62107). Receipt: `.tmp/review/qa-server-identity-strictport-2026-11-25.txt` (commands, output, exit codes).
 - [x] **QA-NPM-01** (2026-11-19) — Added to `sveltekit-frontend/package.json`: `qa:verify-server`, `qa:smoke`, `qa:issues`, `qa:unit`. `qa:unit` passes 9 of 9. `qa:verify-server` returns `MANIFEST_MISSING`, as expected until the restart.
 - [x] **QA-ONLOAD-DECISION-01** (2026-11-19) — Decided against running the QA suite on workspace open. It would start Playwright and a server on every open. Restart checks are run explicitly with the npm scripts instead.
 - Use these in RESTART-03: `npm run qa:verify-server`, then, in PowerShell, `$env:QA_SELFTEST=1; npm run qa:smoke` (the inline `VAR=1 npm run` form does not work in npm's default cmd shell on Windows), then `npm run qa:issues -- <runId>`.
@@ -165,5 +164,7 @@ Question from the user, 2026-11-19: can the QA logger latch to the server on :51
 Answer: yes. `logs/qa/active-server.json` already records the port, the listener PID, the start time, and the Vite log path (`stdout_log`). The aggregator can read that log and attach server-side errors to the same run.
 
 - [ ] **SERVER-LOG-LINK-01** (OPEN) — `build-qa-issues.mjs` reads `stdout_log` from the manifest, takes Vite and server error lines (`[vite:error]`, 5xx request lines, stack traces) whose timestamps fall within the run window, and attaches them as `source: server` events with the same fingerprint rules.
-- [ ] **SERVER-LOG-LINK-02** (OPEN) — Verify on a real run: a deliberate server 500 should produce one browser-side issue and one server-side issue linked by run ID. Needs RESTART-03 first, so the manifest exists.
-- Caveat: the current server (pid 36612) was started before the manifest existed, so no manifest points at its log yet. Until the restart, correlation has no verified source.
+      Fixture checkpoint (2026-11-25, base `750d2e89e9e` plus working-tree changes): collector created and wired into `qa:issues`. Dated server errors retain a log-line reference and use existing issue fingerprints. Undated errors are counted separately. `npm --prefix sveltekit-frontend run graphify:daily:check:errors` passed 42/42, including the CLI artifact replay and refusal for a newer server or a log outside the startup directory. Receipt: `.tmp/review/qa-server-log-correlation-v1.tap.txt`. Live confirmation remains open under SERVER-LOG-LINK-02.
+      Update (2026-11-25): one thrown error was logged twice (error handler and request logger) and produced two server issues. The collector now merges records that share `context.requestId` and takes the route from `context.endpoint`. The early-return 504 path in `hooks.server.ts` now calls `productionLogger.apiRequest`, so timeouts get a dated record. The offline script passed 43/43, covering both record orders and non-merging of different or missing IDs. The 504 logging has no behavioral test, and no live 500 or 504 has been triggered.
+- [x] **SERVER-LOG-LINK-02** (2026-11-25) — Verify on a real run: a deliberate server 500 should produce one browser-side issue and one server-side issue linked by run ID. Needs RESTART-03 first, so the manifest exists. Live run `server500-4` (`QA_SERVER500=1`, `tests/e2e/qa-server-500.spec.ts`, invalid JSON to the test-only `/api/retrieval/executor-tree-test`): exactly two P1 `HTTP_INTERNAL_ERROR` issues for that route with run ID `server500-4`, one browser and one server with a live log-line reference; `server_log` `LINKED`. Earlier runs also created a P3 console echo of the same response; `tests/e2e/fixtures/qa.ts` now drops it only when status and route match a captured response. Regression run `selftest-6`: 6 passed, 1 intentional failure, 1 opt-in skip; offline script 43/43. Not exercised live: a thrown (unhandled) error with the requestId merge, and a 504. The two issues stay separate because the server issue has no feature label. Receipt: `.tmp/review/qa-server-log-link-02-2026-11-25.txt`.
+- Earlier caveat (resolved 2026-11-25): PID 36612 predated the manifest. The restarted server (PID 24008) has a verified manifest that points at its log.

@@ -80,6 +80,55 @@ export function stackSignature(stack, frames = 3) {
   return names.length ? names.join('>') : 'NO_FRAMES';
 }
 
+export const QA_EVENT_SCHEMA_VERSION = 'qa.normalized-event.v1';
+
+/** FEATURE-LABEL-MAP-01: Map the 9 E2E design + 8 core product feature_labels to atlas-feature-registry keys. */
+export const DESIGN_FEATURE_LABELS = Object.freeze({
+  'auth.session': { registryKey: 'atlas.auth.session', domain: 'auth' },
+  'evidence.upload': { registryKey: 'atlas.evidence.upload', domain: 'evidence' },
+  'evidence.viewer': { registryKey: 'atlas.evidence.viewer', domain: 'evidence' },
+  'scene.marker': { registryKey: 'atlas.scene.marker', domain: 'crime-scene' },
+  'scene.motion': { registryKey: 'atlas.scene.motion', domain: 'crime-scene' },
+  'agent.acp.execute': { registryKey: 'atlas.agent.acp.execute', domain: 'agent' },
+  'agent.a2a.rpc': { registryKey: 'atlas.agent.a2a.rpc', domain: 'agent' },
+  'infra.vite': { registryKey: 'atlas.infra.vite', domain: 'infra' },
+  'infra.graphify': { registryKey: 'atlas.infra.graphify', domain: 'infra' },
+  'ai.chat': { registryKey: 'atlas.ai.chat', domain: 'ai' },
+  'ai.contextual': { registryKey: 'atlas.ai.contextual', domain: 'ai' },
+  'ai.analysis': { registryKey: 'atlas.ai.analysis', domain: 'ai' },
+  'ai.recommendations': { registryKey: 'atlas.ai.recommendations', domain: 'ai' },
+  'poi.directory': { registryKey: 'atlas.poi.directory', domain: 'poi' },
+  'reports.builder': { registryKey: 'atlas.reports.builder', domain: 'reports' },
+  'search.hybrid': { registryKey: 'atlas.search.hybrid', domain: 'search' },
+  'admin.error_brain': { registryKey: 'atlas.admin.error_brain', domain: 'admin' },
+});
+
+export function normalizeQaEvent(event) {
+  if (!event || typeof event !== 'object') return null;
+  const expected_status = event.expected_status ?? null;
+  const actual_status = event.actual_status ?? event.status ?? null;
+  const suppressed = Boolean(
+    event.suppressed === true
+    || (expected_status !== null && actual_status !== null && Number(expected_status) === Number(actual_status)),
+  );
+  const tags = Array.isArray(event.tags)
+    ? [...new Set(event.tags.map((t) => String(t).trim()).filter(Boolean))]
+    : [];
+  const evidence_refs = Array.isArray(event.evidence_refs)
+    ? event.evidence_refs.map((r) => String(r)).filter(Boolean)
+    : [];
+  return {
+    ...event,
+    schema_version: event.schema_version ?? QA_EVENT_SCHEMA_VERSION,
+    expected_status,
+    actual_status,
+    server_log_ref: event.server_log_ref ?? null,
+    evidence_refs,
+    tags,
+    suppressed,
+  };
+}
+
 /**
  * Classify one normalized event. Returns null for events that are not errors
  * (for example a bare request_id correlation line).
@@ -125,12 +174,18 @@ export function fingerprint({ error_code, feature_label, route, stack }) {
 }
 
 /**
- * Group normalized events into issues. Each issue records occurrences, the first and last
- * run that produced it, and whether any occurrence still needs confirmation.
+ * Group normalized events into active issues + suppressed audit events.
  */
-export function groupIssues(events) {
+export function groupIssuesWithAudit(events) {
   const issues = new Map();
-  for (const event of events) {
+  const suppressedEvents = [];
+  for (const rawEvent of events) {
+    const event = normalizeQaEvent(rawEvent);
+    if (!event) continue;
+    if (event.suppressed) {
+      suppressedEvents.push(event);
+      continue;
+    }
     const verdict = classify(event);
     if (!verdict) continue;
     const feature_label = event.feature_label ?? 'unlabeled';
@@ -141,15 +196,25 @@ export function groupIssues(events) {
       existing.occurrences += 1;
       existing.needsConfirmation ||= verdict.needsConfirmation;
       existing.lastRunId = event.run_id ?? existing.lastRunId;
+      for (const t of event.tags) if (!existing.tags.includes(t)) existing.tags.push(t);
+      for (const r of event.evidence_refs) if (!existing.evidence_refs.includes(r)) existing.evidence_refs.push(r);
+      existing.server_log_ref = existing.server_log_ref ?? event.server_log_ref;
       continue;
     }
     issues.set(key, {
+      schema_version: event.schema_version,
       fingerprint: key,
       error_code: verdict.error_code,
       confidence: verdict.confidence,
       severity: SEVERITY[verdict.error_code] ?? 'P3',
       feature_label,
+      feature_registry_key: DESIGN_FEATURE_LABELS[feature_label]?.registryKey ?? null,
+      tags: [...event.tags],
       route_template,
+      expected_status: event.expected_status,
+      actual_status: event.actual_status,
+      server_log_ref: event.server_log_ref,
+      evidence_refs: [...event.evidence_refs],
       occurrences: 1,
       needsConfirmation: verdict.needsConfirmation,
       firstRunId: event.run_id ?? null,
@@ -157,5 +222,10 @@ export function groupIssues(events) {
       sample_message: redact(event.message ?? ''),
     });
   }
-  return [...issues.values()].sort((a, b) => a.severity.localeCompare(b.severity) || b.occurrences - a.occurrences);
+  const sorted = [...issues.values()].sort((a, b) => a.severity.localeCompare(b.severity) || b.occurrences - a.occurrences);
+  return { issues: sorted, suppressedEvents };
+}
+
+export function groupIssues(events) {
+  return groupIssuesWithAudit(events).issues;
 }

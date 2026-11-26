@@ -901,6 +901,11 @@ export const handle: Handle = async ({ event, resolve }) => {
       clearTimeout(timer);
       const msg = err instanceof Error ? err.message : 'Request timeout';
       console.warn(`[Timeout] ${event.request.method} ${event.url.pathname} — ${msg}`);
+      // This path returns early, so record the 504 here (dated, with requestId) for log correlation.
+      productionLogger.apiRequest(event.request.method, event.url.pathname, 504, Date.now() - startTime, {
+        requestId,
+        userId: event.locals.user?.id,
+      });
       return new Response(JSON.stringify({ error: 'Request timeout', timeout }), {
         status: 504,
         headers: {
