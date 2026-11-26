@@ -80,6 +80,21 @@ function parseOpenAIModelList(baseUrl: string, body: unknown): OpenAiModelListEn
 }
 
 /**
+ * The model llama-server has loaded right now, for records and labels. Never throws and never
+ * substitutes a configured name: returns null when the server cannot say.
+ */
+export async function observeServedChatModelIdV1(
+  baseUrl: string = process.env.LLAMA_SERVER_URL ?? process.env.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090',
+  timeoutMs = 2_000
+): Promise<string | null> {
+  try {
+    return (await resolveLoadedLlamaModel(normalizeLlamaServerBaseUrlV1(baseUrl), null, timeoutMs)).resolvedModel;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Discover the model llama-server actually has loaded via GET /v1/models,
  * and reconcile it against a configured model name (if any). Never treats
  * a GGUF's on-disk existence as availability — only a real HTTP response

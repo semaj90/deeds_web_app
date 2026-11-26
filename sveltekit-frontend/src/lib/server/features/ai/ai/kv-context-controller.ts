@@ -24,6 +24,7 @@
  *   formatKvPacketForPrompt() — render packet as prompt text
  */
 
+import { observeServedChatModelIdV1 } from '$lib/server/ai/llama-server-model-resolver.js';
 import { createHash } from 'node:crypto';
 import { getRedis }   from '$lib/server/redis.js';
 import {
@@ -180,7 +181,7 @@ export async function buildKvContextPacket(opts: {
     taskId,
     stablePrefixHash,
     level1Runtime: {
-      model:       'ornith-1.5-9b',
+      model:       (await observeServedChatModelIdV1()) ?? 'unidentified',
       cachePolicy: 'reuse-stable-prefix',
       cacheTypeK:  'q8_0',
       cacheTypeV:  'q8_0',

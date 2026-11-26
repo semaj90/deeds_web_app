@@ -40,7 +40,7 @@ import { inferLLM, healthCheck as trtHealthCheck, streamLLM as streamTrtLLM } fr
 import { inferLLM as inferTritonLLM, healthCheck as tritonHealthCheck, streamLLM as streamTritonLLM } from '$lib/server/triton-llm.js';
 import { bifrostChat, embedOrChatFetch, type OllamaMessage } from '$lib/server/ollama.js';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL, getActiveLocalVlmModel } from '$lib/server/ai/local-llama-provider.js';
-import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
+import { resolveLoadedLlamaModel, observeServedChatModelIdV1 } from '$lib/server/ai/llama-server-model-resolver.js';
 import { getGpuStats, type GpuMemory } from '$lib/server/gpu/gpu-monitor.js';
 import {
   TURBOQUANT_BASE_URL,
@@ -138,7 +138,7 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
     }
     return {
       text: '',
-      model: 'ornith-1.5-9b',
+      model: 'unidentified',
       backend: 'vlm-hf',
       latencyMs: Math.round(performance.now() - start),
       error:
@@ -211,7 +211,7 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
       const cartridgePayload = {
         kvProfile: 'turbo3/4',
         backend: 'turboquant',
-        model: TURBOQUANT_MODEL,
+        model: tqResult.model,
         stabilityTestPassed: true,
         promotedAt,
         grpoReward: 1.0,
@@ -328,7 +328,7 @@ async function tryTensorRT(request: InferenceRequest): Promise<InferenceResponse
 
 		return {
 			text: result.text,
-			model: 'ornith-1.5-9b',
+			model: 'unidentified',
 			backend: 'tensorrt',
 			usage: result.usage,
 			latencyMs: 0
@@ -433,7 +433,12 @@ async function tryTurboQuant(request: InferenceRequest, startTime: number): Prom
     if (!res.ok) return null;
 
     const data = await res.json();
-    recordLlamaPromptCacheTelemetry(TURBOQUANT_MODEL, data, 'turboquant');
+    // llama-server names the model that answered in the response body.
+    const servedModel: string =
+      typeof data.model === 'string' && data.model
+        ? data.model
+        : ((await observeServedChatModelIdV1(TURBOQUANT_BASE_URL)) ?? 'unidentified');
+    recordLlamaPromptCacheTelemetry(servedModel, data, 'turboquant');
     const msg = data.choices?.[0]?.message;
     const content = msg?.content ?? '';
     const reasoning = msg?.reasoning_content ?? '';
@@ -443,7 +448,7 @@ async function tryTurboQuant(request: InferenceRequest, startTime: number): Prom
 
     return {
       text,
-		model: TURBOQUANT_MODEL,
+		model: servedModel,
       backend: 'turboquant',
       kvProfile: 'turbo3/4',
       usage: data.usage
@@ -461,7 +466,7 @@ async function tryTurboQuant(request: InferenceRequest, startTime: number): Prom
 }
 
 async function tryBifrost(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
-	const model = SERVER_CHAT_MODEL;
+	const model = (await observeServedChatModelIdV1()) ?? 'unidentified';
 	const messages: Array<OllamaMessage> = [];
 	if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
 	messages.push({ role: 'user', content: request.prompt });
@@ -479,7 +484,7 @@ async function tryBifrost(request: InferenceRequest, startTime: number): Promise
 
 		return {
 			text,
-			model: SERVER_CHAT_MODEL,
+			model,
 			backend: 'bifrost',
 			latencyMs: Math.round(performance.now() - startTime)
 		};
@@ -879,7 +884,7 @@ export async function* routeStreamingInference(
 						if (payload === '[DONE]') break;
 						try {
 							const parsed = JSON.parse(payload);
-							recordLlamaPromptCacheTelemetry(TURBOQUANT_MODEL, parsed, 'turboquant');
+							recordLlamaPromptCacheTelemetry(typeof parsed.model === 'string' ? parsed.model : 'unidentified', parsed, 'turboquant');
 							const delta = parsed.choices?.[0]?.delta;
 							// llama-server b8757: streaming thinking in delta.reasoning_content, answer in delta.content
 							const chunk = delta?.content ?? delta?.reasoning_content ?? '';

@@ -688,7 +688,6 @@ export async function getClusterSummaryViaGrpc(
         await recordKagAnswer(`cluster:${clusterType}:${clusterId}`, mapped.summary, {
           glyphClusterId: clusterId,
           tokensUsed:     Math.ceil(mapped.summary.length / 4),
-          model:          'ornith-1.5-9b',
         });
       } catch { /* non-fatal */ }
     })();

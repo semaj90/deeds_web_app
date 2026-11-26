@@ -21,7 +21,7 @@ import Fuse from 'fuse.js';
 import { building } from '$app/environment';
 import { collectBoundedMetadataSnapshot } from './metadata-cache-snapshot-v1.mjs';
 import { ENV } from '$lib/server/env.server.js';
-import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
+import { observeServedChatModelIdV1 } from '$lib/server/ai/llama-server-model-resolver.js';
 import { pool } from '$lib/server/db/client';
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
 import { rerankWithCrossEncoder } from '$lib/server/retrieval/cross-encoder-reranker.js';
@@ -748,10 +748,10 @@ export async function loadCodebaseContext(query: string): Promise<{
     }
 
     // -- Stage E: Trace Persistence (ace_retrieval_runs) ---------------------
-    import('$lib/server/retrieval/ace-retrieval-logger').then(({ logAceRun }) => {
+    import('$lib/server/retrieval/ace-retrieval-logger').then(async ({ logAceRun }) => {
         logAceRun({
             query,
-            model: SERVER_CHAT_MODEL,
+            model: (await observeServedChatModelIdV1()) ?? 'unidentified',
             mode: 'multi-vector-rerank',
             metadata: {
                 recallMs: recall.recallMs,
