@@ -9,7 +9,6 @@ const PUBLIC_API_PREFIXES = [
 	'/api/docs',
 	'/api/glossary',
 	'/api/statutes',
-	'/api/opencode-dispatch',
 ] as const;
 
 const ADMIN_API_PREFIXES = [

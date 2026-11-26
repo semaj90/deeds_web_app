@@ -25,9 +25,9 @@ export const GET: RequestHandler = ({ url }) => {
       organization: 'Deeds Legal AI',
       url: base,
     },
-    // A2A authentication — API key passed as Bearer token
+    // A2A authentication — signed-in session cookie; no Bearer token is accepted
     authentication: {
-      schemes: ['Bearer'],
+      schemes: ['Cookie'],
     },
     defaultInputModes: ['text/plain', 'application/json'],
     defaultOutputModes: ['application/json', 'text/event-stream'],
