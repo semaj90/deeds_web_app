@@ -12,5 +12,7 @@ services:
     volumes:
       - ../../models/embeddinggemma2/onnx-q8:/models/embeddinggemma2/onnx-q8:ro
     environment:
-      ORT_INTRA_THREADS: "8"
+      ORT_WORKERS: "4"
+      ORT_INTRA_THREADS: "4"
+      GEMMA2_MAX_TOKENS: "1024"
     restart: unless-stopped
