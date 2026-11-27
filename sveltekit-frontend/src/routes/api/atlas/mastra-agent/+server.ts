@@ -82,7 +82,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   const hydrated = hydrateVerifiedContextPacketForGemmaV1(context, body.query);
-  if (hydrated.status === 'REFUSED') {
+  if ('result' in hydrated) {
     recordVerifiedContextOutcomeV1({
       requestId: context.requestId, serviceHealth: 'AVAILABLE', evidenceValidity: 'NOT_ADMITTED',
       firstFailingBoundary: hydrated.result.firstFailingBoundary, refusalCode: hydrated.result.refusalCode,

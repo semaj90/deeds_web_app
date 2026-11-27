@@ -294,6 +294,20 @@ def cmd_run_e2e(args: argparse.Namespace) -> int:
     return 0
 
 
+def compute_tie_aware_mrr_at_k(
+    ordered_sims: Any,
+    exact_top1_sim: float,
+    eps: float = 1e-6,
+    k: int = 10,
+) -> float:
+    """Reciprocal rank (1-based, 0.0 if absent) of the first top-k item within eps of exact NN1."""
+    floor = float(exact_top1_sim) - float(eps)
+    for rank_i, sim in enumerate(list(ordered_sims)[:k]):
+        if float(sim) >= floor:
+            return 1.0 / float(rank_i + 1)
+    return 0.0
+
+
 def cmd_run_tieaware(args: argparse.Namespace) -> int:
     """Tie-aware recall over the FROZEN query set. A returned chunk is a hit when its exact cosine similarity is
     >= the query's 10th-best exact similarity - 1e-6 (so duplicate/near-duplicate chunks at the boundary count).
@@ -322,8 +336,8 @@ def cmd_run_tieaware(args: argparse.Namespace) -> int:
     pos = {cid: i for i, cid in enumerate(ids)}
     ks = [int(x) for x in args.ks.split(",")]
     efs = [int(x) for x in args.ef_search.split(",")]
-    tv = {k: {"hits": 0, "lat": []} for k in ks}
-    pg = {e: {"hits": 0, "lat": []} for e in efs}
+    tv = {k: {"hits": 0, "rr": 0.0, "lat": []} for k in ks}
+    pg = {e: {"hits": 0, "rr": 0.0, "lat": []} for e in efs}
     ties = 0
     errors = 0
     pgcur = conn.cursor()
@@ -332,6 +346,7 @@ def cmd_run_tieaware(args: argparse.Namespace) -> int:
         qi = pos[qid]
         sims = matrix @ matrix[qi]
         sims[qi] = -np.inf
+        top1_sim = float(np.max(sims))
         t10 = float(np.partition(sims, -10)[-10])
         if abs(t10 - float(np.partition(sims, -11)[-11])) < eps:
             ties += 1
@@ -349,6 +364,7 @@ def cmd_run_tieaware(args: argparse.Namespace) -> int:
                 cs = sims[[pos[c] for c in cands]]
                 top = np.sort(cs)[::-1][:10]
                 tv[k]["hits"] += int((top >= floor).sum())
+                tv[k]["rr"] += compute_tie_aware_mrr_at_k(top, top1_sim, eps=eps, k=10)
             except Exception:
                 errors += 1
         for e in efs:
@@ -359,7 +375,9 @@ def cmd_run_tieaware(args: argparse.Namespace) -> int:
                               (json.dumps(qvec),))
                 got = [r[0] for r in pgcur.fetchall() if r[0] != qid][:10]
                 pg[e]["lat"].append((time.time() - t) * 1000)
-                pg[e]["hits"] += int((sims[[pos[g] for g in got]] >= floor).sum())
+                pg_sims = sims[[pos[g] for g in got]]
+                pg[e]["hits"] += int((pg_sims >= floor).sum())
+                pg[e]["rr"] += compute_tie_aware_mrr_at_k(pg_sims, top1_sim, eps=eps, k=10)
             except Exception:
                 errors += 1
                 conn.rollback()
@@ -374,9 +392,11 @@ def cmd_run_tieaware(args: argparse.Namespace) -> int:
             "oracle": "tie-aware exact cosine over all canonical content_embedding_768 rows (hit if sim >= 10th-best sim - 1e-6)",
             "tie_queries_rank10_vs_11": ties, "tie_eps": eps, "writesPerformed": False}
     tv_out = [{"retrieve_k": k, "recall_top10_after_exact_rescore": round(tv[k]["hits"] / (nq * 10), 4),
-               "mrr_exact_nn1": None, "p50_ms": lat(tv[k]["lat"])[0], "p95_ms": lat(tv[k]["lat"])[1]} for k in ks]
+               "mrr_exact_nn1": round(tv[k]["rr"] / nq, 4), "mrr_at_10": round(tv[k]["rr"] / nq, 4),
+               "p50_ms": lat(tv[k]["lat"])[0], "p95_ms": lat(tv[k]["lat"])[1]} for k in ks]
     pg_out = [{"sweep": {"ef_search": e}, "retrieve_k": 10, "recall_top10_after_exact_rescore": round(pg[e]["hits"] / (nq * 10), 4),
-               "mrr_exact_nn1": None, "p50_ms": lat(pg[e]["lat"])[0], "p95_ms": lat(pg[e]["lat"])[1]} for e in efs]
+               "mrr_exact_nn1": round(pg[e]["rr"] / nq, 4), "mrr_at_10": round(pg[e]["rr"] / nq, 4),
+               "p50_ms": lat(pg[e]["lat"])[0], "p95_ms": lat(pg[e]["lat"])[1]} for e in efs]
     with open(args.out_prefix + "-turbovec.json", "w", encoding="utf-8") as fh:
         json.dump({**base, "latency_definition": "TurboVec HTTP search only; exact rescore done in-process (Postgres rescore stage ~50 ms p50 measured separately)",
                    "results": tv_out,
@@ -536,15 +556,23 @@ def cmd_run_precision(args: argparse.Namespace) -> int:
         tv = time.time()
         av, ai, cos_mean, cos_min = run_pass(quant, rescore_k)
         hits_direct = hits_rescore = 0
+        rr_direct = rr_rescore = 0.0
         for q in range(nq):
+            top1_sim = float(ev[q, 0])
             d10 = ai[q, :10]
-            hits_direct += int((matrix[d10] @ Q[q] >= floor[q]).sum())
+            d10_sims = matrix[d10] @ Q[q]
+            hits_direct += int((d10_sims >= floor[q]).sum())
+            rr_direct += compute_tie_aware_mrr_at_k(d10_sims, top1_sim, eps=args.eps, k=10)
             exact = matrix[ai[q]] @ Q[q]
-            hits_rescore += int((np.sort(exact)[::-1][:10] >= floor[q]).sum())
+            exact_sorted = np.sort(exact)[::-1][:10]
+            hits_rescore += int((exact_sorted >= floor[q]).sum())
+            rr_rescore += compute_tie_aware_mrr_at_k(exact_sorted, top1_sim, eps=args.eps, k=10)
         results.append({"variant": name, "bytes_per_vector": nbytes,
                         "compression_vs_fp32": round(768 * 4 / nbytes, 2),
                         "recall_top10_tie_aware": round(hits_direct / (nq * 10), 4),
+                        "mrr_at_10_tie_aware_direct": round(rr_direct / nq, 4),
                         f"recall_top10_after_fp32_rescore_of_top{rescore_k}": round(hits_rescore / (nq * 10), 4),
+                        f"mrr_at_10_after_fp32_rescore_of_top{rescore_k}": round(rr_rescore / nq, 4),
                         "mean_cosine_original_vs_dequantized": round(cos_mean, 6),
                         "min_cosine_original_vs_dequantized": round(cos_min, 6),
                         "seconds": round(time.time() - tv, 1)})

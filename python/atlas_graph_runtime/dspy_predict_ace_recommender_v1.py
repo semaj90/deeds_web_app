@@ -9,6 +9,7 @@ Per AGENTS.md:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import time
@@ -17,7 +18,11 @@ from typing import Any, Callable, Mapping, Sequence
 
 import dspy
 from .doc14_bounded_rlm_recommender_v1 import (
+    read_verified_source_span,
     run_bounded_dspy_recommendation_with_ace_manifest_v1,
+    search_admitted_chunks,
+    select_bounded_evidence_span_v1,
+    validate_ace_context_readback_rows_v1,
 )
 
 
@@ -227,50 +232,301 @@ def evaluate_gepa_offline_promotion_gate_v1(
     }
 
 
-def build_bounded_rlm_tools_v1(context_manifest: Mapping[str, Any]) -> dict[str, Any]:
-    """Reject the legacy RLM scaffold until it can bind verified ACE readback rows.
+def build_bounded_rlm_tools_v1(
+    context_manifest: Mapping[str, Any],
+    *,
+    scoped_readback: ScopedAceReadbackV1 | None = None,
+    task_query: str | None = None,
+    token_counter: Any | None = None,
+    max_chunks: int = 4,
+    max_tool_results: int = 4,
+    max_span_bytes: int = 1200,
+    max_tool_output_bytes: int = 8192,
+) -> dict[str, Any]:
+    """Build read-only RLM tools over rows returned by the scoped ACE owner.
 
-    ContextManifestV2 contains identities and checksums, not the authorized chunk
-    bodies required for RLM tools. A Boolean or attached ``chunks`` field is not
-    sufficient evidence to expose retrieval tools to an interpreter.
+    The request manifest supplies only the identity checksum. Chunk bodies must
+    come from ``scoped_readback`` and pass the shared ContextManifest/row checks
+    before either tool is exposed to DSPy's interpreter.
     """
     if context_manifest.get("schema") != "atlas.context-manifest.v2":
         raise ValueError("ACE_CONTEXT_MANIFEST_V2_REQUIRED")
-    raise ValueError("RLM_VERIFIED_ACE_READBACK_TOOL_BINDING_NOT_IMPLEMENTED")
+    if scoped_readback is None:
+        raise ValueError("ACE_VERIFIED_READBACK_ROWS_REQUIRED")
+    if not 1 <= max_chunks <= 4 or not 1 <= max_tool_results <= 4:
+        raise ValueError("INVALID_RLM_RESULT_BUDGET")
+    if not 1 <= max_span_bytes <= 1200 or not 512 <= max_tool_output_bytes <= 8192:
+        raise ValueError("INVALID_RLM_BYTE_BUDGET")
+
+    checksum = context_manifest.get("identityChecksum")
+    if not isinstance(checksum, str) or len(checksum) != 64 or any(c not in "0123456789abcdef" for c in checksum):
+        raise ValueError("ACE_CONTEXT_MANIFEST_CHECKSUM_MISMATCH")
+    readback = scoped_readback(checksum)
+    if readback is None:
+        raise ValueError("CANONICAL_ADMISSION_UNVERIFIED")
+    owner_manifest, owner_rows = readback
+    if not isinstance(owner_manifest, Mapping) or owner_manifest.get("identityChecksum") != checksum:
+        raise ValueError("ACE_CONTEXT_READBACK_MISMATCH")
+    manifest, records = validate_ace_context_readback_rows_v1(
+        records=owner_rows,
+        context_manifest=owner_manifest,
+        max_chunks=max_chunks,
+    )
+    if manifest["identityChecksum"] != checksum:
+        raise ValueError("ACE_CONTEXT_READBACK_MISMATCH")
+    if not isinstance(task_query, str) or not task_query.strip() or task_query.strip() != str(manifest["v1"].get("query") or "").strip():
+        raise ValueError("ACE_CONTEXT_QUERY_MISMATCH")
+    if not callable(token_counter):
+        raise ValueError("MODEL_TOKEN_COUNTER_REQUIRED")
+
+    context_manifest_json = json.dumps(manifest, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    token_budget = int(manifest["v1"]["tokenBudget"])
+    used_tokens = token_counter(task_query + "\n" + context_manifest_json)
+    if not isinstance(used_tokens, int) or isinstance(used_tokens, bool) or used_tokens < 0:
+        raise ValueError("MODEL_TOKEN_COUNTER_INVALID")
+    if used_tokens > token_budget:
+        raise ValueError("ACE_CONTEXT_TOKEN_BUDGET_EXCEEDED")
+    token_state = {"used": used_tokens}
+
+    records_by_id = {str(row["chunkId"]): row for row in records}
+    readback_rows_checksum = hashlib.sha256(
+        json.dumps(
+            {"manifest": manifest, "records": records},
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        ).encode("utf-8")
+    ).hexdigest()
+
+    def encode_tool_result(value: Mapping[str, Any]) -> str:
+        nonlocal used_tokens
+        encoded = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        if len(encoded.encode("utf-8")) > max_tool_output_bytes:
+            raise ValueError("RLM_TOOL_OUTPUT_BUDGET_EXCEEDED")
+        added_tokens = token_counter(encoded)
+        if not isinstance(added_tokens, int) or isinstance(added_tokens, bool) or added_tokens < 0:
+            raise ValueError("MODEL_TOKEN_COUNTER_INVALID")
+        if used_tokens + added_tokens > token_budget:
+            raise ValueError("ACE_CONTEXT_TOKEN_BUDGET_EXCEEDED")
+        used_tokens += added_tokens
+        token_state["used"] = used_tokens
+        return encoded
+
+    def search_manifest_chunks(query: str, limit: int = 4) -> str:
+        """Search only this admitted manifest and return byte-verified excerpts."""
+        if not isinstance(query, str) or not query.strip() or len(query) > 512:
+            raise ValueError("RLM_SEARCH_QUERY_INVALID")
+        if isinstance(limit, bool) or not isinstance(limit, int) or limit < 1:
+            raise ValueError("RLM_SEARCH_LIMIT_INVALID")
+        hits = search_admitted_chunks(records, query.strip(), limit=min(limit, max_tool_results))
+        excerpts: list[dict[str, Any]] = []
+        used_bytes = 0
+        for hit in hits:
+            row = records_by_id[str(hit["chunkId"])]
+            start, end, expected = select_bounded_evidence_span_v1(
+                str(row["text"]), query.strip(), max_span_bytes=max_span_bytes,
+            )
+            citation = read_verified_source_span(records_by_id, str(hit["chunkId"]), start, end, expected)
+            used_bytes += len(expected.encode("utf-8"))
+            if used_bytes > max_tool_output_bytes // 2:
+                break
+            excerpts.append({
+                **citation,
+                "manifestNodeKey": row["manifestNodeKey"],
+                "evidenceRefs": row["evidenceRefs"],
+                "chunkSha256": row["chunkSha256"],
+                "score": hit["score"],
+            })
+        return encode_tool_result({"status": "OK", "results": excerpts})
+
+    def verify_utf8_span(chunk_id: str, start_byte: int, end_byte: int, expected_text: str) -> str:
+        """Verify a proposed span against the admitted chunk's exact UTF-8 bytes."""
+        if not isinstance(chunk_id, str) or chunk_id not in records_by_id:
+            raise ValueError("CHUNK_NOT_ADMITTED")
+        if (isinstance(start_byte, bool) or not isinstance(start_byte, int)
+                or isinstance(end_byte, bool) or not isinstance(end_byte, int)
+                or start_byte < 0 or end_byte <= start_byte
+                or end_byte - start_byte > max_span_bytes):
+            raise ValueError("RLM_SPAN_BOUNDS_INVALID")
+        if not isinstance(expected_text, str) or len(expected_text.encode("utf-8")) > max_span_bytes:
+            raise ValueError("RLM_SPAN_TEXT_INVALID")
+        citation = read_verified_source_span(records_by_id, chunk_id, start_byte, end_byte, expected_text)
+        row = records_by_id[chunk_id]
+        return encode_tool_result({
+            **citation,
+            "manifestNodeKey": row["manifestNodeKey"],
+            "evidenceRefs": row["evidenceRefs"],
+            "chunkSha256": row["chunkSha256"],
+        })
+
+    return {
+        "search_manifest_chunks": search_manifest_chunks,
+        "verify_utf8_span": verify_utf8_span,
+        "context_manifest": manifest,
+        "records": records,
+        "readbackRowsChecksum": readback_rows_checksum,
+        "tokenBudget": token_budget,
+        "initialTokens": used_tokens,
+        "tokenState": token_state,
+        "canonicalAuthority": False,
+        "writesPerformed": False,
+    }
 
 
 def create_bounded_dspy_rlm_v1(
     *,
+    task_query: str | None = None,
     context_manifest: Mapping[str, Any],
+    scoped_readback: ScopedAceReadbackV1 | None = None,
+    token_counter: Any | None = None,
     max_iterations: int = 3,
     max_llm_calls: int = 4,
     max_output_chars: int = 2048,
+    max_chunks: int = 4,
 ) -> dict[str, Any]:
-    """Instantiate a strictly bounded read-only dspy.RLM module over ContextManifest."""
-    tools_bundle = build_bounded_rlm_tools_v1(context_manifest)
-    bounded_iters = max(1, min(4, int(max_iterations)))
-    bounded_calls = max(1, min(6, int(max_llm_calls)))
-    bounded_chars = max(256, min(4096, int(max_output_chars)))
-
+    """Instantiate a bounded DSPy RLM after scoped ACE rows pass readback checks."""
+    if not 1 <= max_iterations <= 4 or not 1 <= max_llm_calls <= 6 or not 256 <= max_output_chars <= 4096:
+        raise ValueError("INVALID_RLM_BUDGET")
+    tools_bundle = build_bounded_rlm_tools_v1(
+        context_manifest,
+        scoped_readback=scoped_readback,
+        task_query=task_query,
+        token_counter=token_counter,
+        max_chunks=max_chunks,
+    )
     rlm = dspy.RLM(
         AceGroundedRecommendationSignature,
-        max_iters=bounded_iters,
-        max_llm_calls=bounded_calls,
-        max_output_chars=bounded_chars,
+        max_iters=max_iterations,
+        max_llm_calls=max_llm_calls,
+        max_output_chars=max_output_chars,
         tools=[tools_bundle["search_manifest_chunks"], tools_bundle["verify_utf8_span"]],
     )
     return {
         "rlm": rlm,
         "tools": tools_bundle,
+        "contextManifestJson": json.dumps(tools_bundle["context_manifest"], sort_keys=True, separators=(",", ":"), ensure_ascii=False),
         "budgets": {
-            "maxIterations": bounded_iters,
-            "maxLlmCalls": bounded_calls,
-            "maxOutputChars": bounded_chars,
+            "maxIterations": max_iterations,
+            "maxSubLlmCalls": max_llm_calls,
+            "maxOutputChars": max_output_chars,
+            "maxChunks": max_chunks,
+            "maxEvidenceTokens": tools_bundle["tokenBudget"],
+            "initialEvidenceTokens": tools_bundle["initialTokens"],
+            "maxToolOutputBytes": 8192,
             "readOnlyToolsOnly": True,
         },
         "canonicalAuthority": False,
         "writesPerformed": False,
     }
+
+
+def run_bounded_dspy_rlm_v1(
+    *,
+    runtime: Mapping[str, Any],
+    task_query: str,
+    lm: Any | None = None,
+    base_url: str = "http://127.0.0.1:8090",
+    model_revision: str | None = None,
+    max_output_chars: int = 2048,
+) -> dict[str, Any]:
+    """Run the bounded RLM and accept only a citation replayed against its readback rows."""
+    def refuse(reason: str) -> dict[str, Any]:
+        return {
+            "schema": "atlas.dspy-rlm-ace-recommendation.v1",
+            "status": "REFUSED",
+            "reason": reason,
+            "citationVerified": False,
+            "canonicalAuthority": False,
+            "writesPerformed": False,
+        }
+
+    tools = runtime.get("tools")
+    if not isinstance(tools, Mapping) or runtime.get("rlm") is None:
+        return refuse("BOUNDED_RLM_RUNTIME_REQUIRED")
+    manifest = tools.get("context_manifest")
+    records = tools.get("records")
+    if not isinstance(manifest, Mapping) or not isinstance(records, list):
+        return refuse("ACE_VERIFIED_READBACK_ROWS_REQUIRED")
+    if not isinstance(task_query, str) or not task_query.strip():
+        return refuse("TASK_QUERY_REQUIRED")
+    v1 = manifest.get("v1")
+    if not isinstance(v1, Mapping) or task_query.strip() != str(v1.get("query") or "").strip():
+        return refuse("ACE_CONTEXT_QUERY_MISMATCH")
+    try:
+        validated_manifest, validated_records = validate_ace_context_readback_rows_v1(
+            records=records,
+            context_manifest=manifest,
+            max_chunks=int((runtime.get("budgets") or {}).get("maxChunks", 4)),
+        )
+        current_rows_checksum = hashlib.sha256(
+            json.dumps(
+                {"manifest": validated_manifest, "records": validated_records},
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=False,
+            ).encode("utf-8")
+        ).hexdigest()
+        if current_rows_checksum != tools.get("readbackRowsChecksum"):
+            return refuse("ACE_VERIFIED_READBACK_MUTATED")
+    except Exception:
+        return refuse("ACE_VERIFIED_READBACK_INVALID")
+    if not 1 <= max_output_chars <= 4096:
+        return refuse("INVALID_RLM_OUTPUT_BUDGET")
+
+    active_lm = lm
+    active_model_id = model_revision
+    try:
+        if active_lm is None:
+            active_model_id = resolve_live_model_id_v1(base_url=base_url)
+            active_lm = build_native_dspy_lm_v1(base_url=base_url, requested_model_id=active_model_id)
+        if not active_model_id:
+            return refuse("MODEL_REVISION_REQUIRED_FOR_INJECTED_LM")
+        with dspy.context(lm=active_lm):
+            prediction = runtime["rlm"](
+                task_query=task_query,
+                context_manifest_json=runtime.get("contextManifestJson", ""),
+            )
+        get_value = lambda name: prediction.get(name) if isinstance(prediction, Mapping) else getattr(prediction, name, None)
+        recommendation = get_value("recommendation")
+        cited_chunk_id = get_value("cited_chunk_id")
+        exact_quote = get_value("exact_quote")
+        if (not isinstance(recommendation, str) or not recommendation.strip()
+                or not isinstance(cited_chunk_id, str) or not isinstance(exact_quote, str)
+                or len(recommendation) + len(exact_quote) > max_output_chars
+                or not exact_quote or len(exact_quote.encode("utf-8")) > 1200):
+            return refuse("RLM_OUTPUT_INVALID_OR_OVER_BUDGET")
+        by_chunk = {str(row["chunkId"]): row for row in records}
+        row = by_chunk.get(cited_chunk_id)
+        if row is None:
+            return refuse("RLM_CITATION_OUTSIDE_ADMITTED_CONTEXT")
+        char_start = str(row["text"]).find(exact_quote)
+        if char_start < 0:
+            return refuse("RLM_QUOTE_NOT_IN_ADMITTED_CHUNK")
+        start_byte = len(str(row["text"])[:char_start].encode("utf-8"))
+        end_byte = start_byte + len(exact_quote.encode("utf-8"))
+        citation = read_verified_source_span(by_chunk, cited_chunk_id, start_byte, end_byte, exact_quote)
+        evidence = {"recommendation": recommendation.strip(), "citation": citation}
+        receipt = {
+            "schema": "atlas.dspy-rlm-ace-recommendation.v1",
+            "status": "CITATION_VERIFIED",
+            "taskQuery": task_query,
+            "modelId": active_model_id,
+            "contextManifestChecksum": manifest["identityChecksum"],
+            "evidenceTokensUsed": (tools.get("tokenState") or {}).get("used"),
+            "recommendation": recommendation.strip(),
+            "citation": citation,
+            "budgets": dict(runtime.get("budgets") or {}),
+            "citationVerified": True,
+            "canonicalAuthority": False,
+            "writesPerformed": False,
+        }
+        receipt["receiptChecksum"] = "sha256:" + hashlib.sha256(
+            json.dumps(receipt, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+        ).hexdigest()
+        return receipt
+    except Exception as error:
+        # Keep model/interpreter exception text out of the receipt; it may contain prompts or private traces.
+        return refuse(f"RLM_EXECUTION_FAILED:{type(error).__name__}")
 
 
 def doc14_gepa_metric_v1(

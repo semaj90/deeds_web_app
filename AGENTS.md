@@ -243,6 +243,8 @@ Every streamed event must remain bounded, revision-qualified where applicable, a
 - `docs/ai-os/` — OpenCode context window, MCP atlas, skill routing
 - `memory/` — architecture references, session history
 - `CLAUDE.md` — full project instructions (loaded separately)
+- For Parent Atlas verified retrieval or agentic error repair, start with `docs/reports/agentic-error-fixing-commands-helpers-acp-a2a-kanban-v1.md` and `.okf/pipelines/feature-label-agentic-error-fixing-v1.yaml`. Treat them as a handoff and proposal. Check the current workspace and projection receipts before making readiness claims.
+- For a read-only Daily Graphify status check, run `node scripts/atlas/graphify-daily-discovery-v1.mjs status` from the repo root. Use `npm --prefix sveltekit-frontend run graphify:daily:inspect` for a local inventory. The frontend `graphify:daily` and `graphify:daily:chain` scripts are operational workflows gated by projection admission.
 
 ## Retrieval Abstraction Boundary (ENFORCED)
 

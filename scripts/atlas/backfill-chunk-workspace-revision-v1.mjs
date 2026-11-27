@@ -24,12 +24,20 @@ import pg from 'pg';
 import { REPO_ROOT, loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const TARGET_WORKSPACE_REVISION = 'sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc';
+const PRODUCER_REVISION = 'backfill-chunk-workspace-revision-v1';
 const BATCH_SIZE = 5000;
-const REPORT_PATH = path.join(REPO_ROOT, 'docs/reports/workspace-revision-backfill-receipt-v1.json');
-
 const args = process.argv.slice(2);
 const isApply = args.includes('--apply');
 const isConfirmed = args.includes('--confirm-apply');
+const expectedRevisionArg = args.find((arg) => arg.startsWith('--expected-revision='))?.slice('--expected-revision='.length);
+const reportArg = args.find((arg) => arg.startsWith('--report='));
+const DEFAULT_REPORT_PATH = isApply
+  ? 'docs/reports/workspace-revision-backfill-receipt-v1.json'
+  : '.tmp/atlas/workspace-revision-backfill-dryrun-latest.json';
+const REPORT_PATH = path.resolve(REPO_ROOT, reportArg?.slice('--report='.length) ?? DEFAULT_REPORT_PATH);
+if (reportArg && !REPORT_PATH.startsWith(path.join(REPO_ROOT, '.tmp') + path.sep)) {
+  throw new Error('EXPLICIT_REPORT_PATH_MUST_BE_UNDER_REPOSITORY_TMP');
+}
 
 async function main() {
   const env = loadRepoEnv();
@@ -88,6 +96,9 @@ async function main() {
       if (!isConfirmed) {
         throw new Error('APPLY_REFUSED: --apply requires explicit --confirm-apply flag.');
       }
+      if (expectedRevisionArg !== TARGET_WORKSPACE_REVISION) {
+        throw new Error('APPLY_REFUSED: --expected-revision must match target workspace revision.');
+      }
       console.log(`\nExecuting batched UPDATE in chunks of ${BATCH_SIZE}...`);
       const totalBatches = Math.ceil(eligibleCount / BATCH_SIZE);
 
@@ -106,10 +117,11 @@ async function main() {
           SET
             workspace_revision = to_update.workspace_revision,
             source_revision = to_update.source_revision,
-            lineage_binding_checksum = to_update.binding_checksum
+            lineage_binding_checksum = to_update.binding_checksum,
+            lineage_producer_revision = $3
           FROM to_update
           WHERE target.id = to_update.id
-        `, [TARGET_WORKSPACE_REVISION, BATCH_SIZE]);
+        `, [TARGET_WORKSPACE_REVISION, BATCH_SIZE, PRODUCER_REVISION]);
 
         const rowsAffected = updateRes.rowCount || 0;
         if (rowsAffected === 0) break;

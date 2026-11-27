@@ -7,6 +7,10 @@ id: mirrors
 name: mirrors
 
 [Typedef]
+id: part_of
+name: part of
+
+[Typedef]
 id: not_interchangeable_with
 name: not interchangeable with
 
@@ -20,12 +24,12 @@ comment: Existing domain concept ATLASDOM:database.postgresql is the coarse labe
 id: ATLASTECH:pgvector
 name: pgvector
 def: "PostgreSQL extension holding the canonical dense vectors; HNSW over codebase_chunk_index.content_embedding_768 is the semantic ANN executor." [file:CLAUDE.md]
-relationship: mirrors ATLASTECH:postgresql_truth_store
+relationship: part_of ATLASTECH:postgresql_truth_store
 
 [Term]
 id: ATLASTECH:qdrant
 name: Qdrant
-def: "Rebuildable vector-search mirror of Postgres vectors. Point IDs are projection IDs, never packet, source or candidate identity." [file:sveltekit-frontend/src/lib/server/search/qdrant-search.ts]
+def: "Rebuildable vector-search mirror of Postgres vectors (stores semantic_768 under vector key content). Point IDs are projection IDs, never packet, source or candidate identity." [file:sveltekit-frontend/src/lib/server/search/qdrant-search.ts]
 relationship: mirrors ATLASTECH:postgresql_truth_store
 
 [Term]
@@ -57,7 +61,7 @@ def: "Cluster centre used as a routing and cache key (for example Valkey atlas:c
 [Term]
 id: ATLASMODEL:embeddinggemma
 name: EmbeddingGemma
-def: "Canonical embedding model behind the semantic_768 representation. Same dimension does not mean same representation; lineage must be bound per embedding." [file:AGENTS.md]
+def: "Canonical embedding model family behind semantic_768 and :8094 EG2 ONNX MRL (768/512/256/128); not interchangeable with latent256/128/64 bytea projections or :8090 Gemma 4 synthesis. Same dimension does not mean same representation; lineage must be bound per embedding." [file:AGENTS.md]
 
 [Term]
 id: ATLASTECH:mcp

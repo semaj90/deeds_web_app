@@ -6,9 +6,13 @@ import { fileURLToPath } from 'node:url';
 import { buildGraphifyCanaryExpectationV1 } from '../../sveltekit-frontend/src/lib/server/atlas/graph/graphify-canary-expectation-v1.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const ADMISSION = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
+const admissionArgument = process.argv.find((value) => value.startsWith('--admission='))?.slice('--admission='.length);
+const ADMISSION = resolve(ROOT, admissionArgument ?? 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const reportArgument = process.argv.find((value) => value.startsWith('--report='))?.slice('--report='.length);
 const REPORT = resolve(ROOT, reportArgument ?? 'docs/reports/graphify-canary-expectation-v1.json');
+if (admissionArgument && !reportArgument) {
+  throw new Error('EXPLICIT_ADMISSION_REQUIRES_SCRATCH_REPORT');
+}
 if (reportArgument) {
   const relativeReport = relative(resolve(ROOT, '.tmp'), REPORT);
   if (!relativeReport || relativeReport.startsWith('..') || isAbsolute(relativeReport)) {
@@ -43,7 +47,7 @@ const report = {
   ...expectation,
   generatedAt: new Date().toISOString(),
   mode: 'READ_ONLY_EXPECTATION_DERIVATION',
-  admissionReceiptPath: 'docs/reports/workspace-revision-tournament-admission-v1.json',
+  admissionReceiptPath: relative(ROOT, ADMISSION).replaceAll('\\', '/'),
   writesPerformed: false,
   datastoreWritesPerformed: false,
   nextGate: 'SNAPSHOT-BOUND-GRAPHIFY-CANARY-01',

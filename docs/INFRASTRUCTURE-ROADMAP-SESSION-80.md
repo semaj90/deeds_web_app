@@ -129,7 +129,7 @@ SeaweedFS ← DuckDB ← Bifrost
 - [ ] Create materialized views (cache audit, health audit)
 
 ### Week 2: Service Wiring
-- [ ] Wire EmbeddingGemma to update embedding_768d + embedding_status
+- [ ] Wire EmbeddingGemma2 to update embedding_768d + embedding_status
 - [ ] Wire Qdrant indexer to update qdrant_point_id + cache_state
 - [ ] Wire Neo4j sync to update neo4j_node_id + kag_edges
 - [ ] Wire Valkey cache to update valkey_cache_key + cache_state

@@ -16,6 +16,8 @@
  */
 
 import { analyzeWithVlm } from './ai/vlm-document-analyzer.js';
+import { analyzeTextHeuristics, planDocumentRoute, type DocumentRoutingPlan } from './document-routing-policy-v1.js';
+import { countEg2DocumentTokens } from './eg2-token-counter.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -52,6 +54,8 @@ export interface ProcessDocumentResult {
   usedVlm: boolean;
   /** PNG embedded legal metadata (if .png file with embedded YorHA data) */
   pngLegalMetadata?: Record<string, unknown>;
+  /** Observe-only routing plan (exact EG2 tokens). Does not change chunking or embedding. */
+  routingPlan?: DocumentRoutingPlan;
 }
 
 // ─── MIME helpers ─────────────────────────────────────────────────────────────
@@ -302,6 +306,22 @@ export async function processDocument(input: ProcessDocumentInput): Promise<Proc
   // ── Step 3: Embed (optional) ──
   const embeddings = skipEmbedding ? undefined : await embedChunks(chunks);
 
+  // ── Observe-only routing plan (exact EG2 tokens, canonical recipe) ──
+  let routingPlan: DocumentRoutingPlan | undefined;
+  try {
+    const heuristics = analyzeTextHeuristics(rawText);
+    routingPlan = planDocumentRoute({
+      mimeType,
+      fileName,
+      tokenCount: countEg2DocumentTokens(fileName, rawText),
+      // For PDFs, the extracted text length stands in for the text-layer size.
+      pdfTextCharacters: isPdf(mimeType, fileName) ? heuristics.characterCount : null,
+      heuristics,
+    });
+  } catch (err) {
+    console.warn('[DocumentProcessor] routing plan skipped:', err instanceof Error ? err.message : err);
+  }
+
   return {
     rawText,
     chunks,
@@ -310,5 +330,6 @@ export async function processDocument(input: ProcessDocumentInput): Promise<Proc
     extractionMethod,
     usedVlm,
     pngLegalMetadata,
+    routingPlan,
   };
 }

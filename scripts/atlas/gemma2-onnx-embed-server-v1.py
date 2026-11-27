@@ -24,11 +24,12 @@ from pydantic import BaseModel, Field, field_validator
 from tokenizers import Tokenizer
 
 MODEL_DIR = Path(os.environ.get("GEMMA2_ONNX_DIR", "/models/embeddinggemma2/onnx-q8"))
-MODEL_FILE = MODEL_DIR / "onnx" / "model_quantized.onnx"
+MODEL_FILE = Path(os.environ.get("GEMMA2_ONNX_FILE", str(MODEL_DIR / "onnx" / "model_quantized.onnx")))
 TOKENIZER_FILE = MODEL_DIR / "tokenizer.json"
 INTRA_THREADS = max(1, int(os.environ.get("ORT_INTRA_THREADS", "4")))
 ORT_WORKERS = max(1, int(os.environ.get("ORT_WORKERS", "2")))
-ORT_PROVIDER_MODE = os.environ.get("ORT_PROVIDER_MODE", "cpu").strip().lower()
+ORT_PROVIDER_MODE = os.environ.get("ORT_PROVIDER_MODE", "auto").strip().lower()
+ORT_FALLBACK_TO_CPU = os.environ.get("ORT_FALLBACK_TO_CPU", "1").strip().lower() not in ("0", "false", "no")
 TRT_RTX_TARGET_VERSION = "1.7"
 TRT_CACHE_DIR = os.environ.get("ORT_TRT_CACHE_DIR", "/tmp/trt-rtx-cache")
 MAX_BATCH = int(os.environ.get("GEMMA2_MAX_BATCH", "32"))
@@ -42,11 +43,24 @@ app = FastAPI(title="gemma2-onnx-embed", version="1.2.0")
 _session_pool: queue.Queue[ort.InferenceSession] = queue.Queue(maxsize=ORT_WORKERS)
 _providers: List[str] = []
 _tokenizer: Tokenizer | None = None
+_count_tokenizer: Tokenizer | None = None
 _load_error: str | None = None
 
 
+def _register_trt_rtx_plugin() -> str | None:
+    try:
+        import onnxruntime_ep_nv_tensorrt_rtx as trt_ep  # type: ignore
+
+        ep_name = trt_ep.get_ep_name()
+        if ep_name not in ort.get_available_providers():
+            ort.register_execution_provider_library(ep_name, trt_ep.get_library_path())
+        return ep_name
+    except Exception:
+        return None
+
+
 def _detect_trt_rtx_version() -> str | None:
-    for pkg in ("tensorrt-rtx", "tensorrt_rtx", "tensorrt"):
+    for pkg in ("onnxruntime-ep-nv-tensorrt-rtx-cu13", "tensorrt-rtx", "tensorrt_rtx", "tensorrt"):
         try:
             return importlib.metadata.version(pkg)
         except importlib.metadata.PackageNotFoundError:
@@ -54,20 +68,26 @@ def _detect_trt_rtx_version() -> str | None:
     return None
 
 
-def _resolve_providers(mode: str, available: List[str]) -> List[object]:
+def _trt_rtx_ep_name(available: List[str]) -> str | None:
+    for candidate in ("NvTensorRTRTXExecutionProvider", "NvTensorRtRtxExecutionProvider"):
+        if candidate in available:
+            return candidate
+    return None
+
+
+def _resolve_providers(mode: str, available: List[str], fallback_to_cpu: bool = ORT_FALLBACK_TO_CPU) -> List[object]:
+    trt_rtx_ep = _trt_rtx_ep_name(available)
     if mode == "cpu":
         return ["CPUExecutionProvider"]
     if mode == "cuda":
         if "CUDAExecutionProvider" not in available:
+            if fallback_to_cpu:
+                return ["CPUExecutionProvider"]
             raise RuntimeError(f"ORT_PROVIDER_MODE=cuda requested, available={available}")
         return ["CUDAExecutionProvider", "CPUExecutionProvider"]
     if mode in ("tensorrt_rtx", "trt_rtx", "trt-rtx"):
-        if "NvTensorRtRtxExecutionProvider" in available:
-            return [
-                ("NvTensorRtRtxExecutionProvider", {"nv_trt_rtx_runtime_cache_path": TRT_CACHE_DIR}),
-                "CUDAExecutionProvider",
-                "CPUExecutionProvider",
-            ]
+        if trt_rtx_ep:
+            return [trt_rtx_ep, "CPUExecutionProvider"]
         if "TensorrtExecutionProvider" in available:
             return [
                 ("TensorrtExecutionProvider", {"trt_engine_cache_enable": True, "trt_engine_cache_path": TRT_CACHE_DIR}),
@@ -75,34 +95,35 @@ def _resolve_providers(mode: str, available: List[str]) -> List[object]:
                 "CPUExecutionProvider",
             ]
         raise RuntimeError(
-            f"ORT_PROVIDER_MODE={mode} requested, but NvTensorRtRtxExecutionProvider/TensorrtExecutionProvider not in {available}"
+            f"ORT_PROVIDER_MODE={mode} requested, but NvTensorRTRTXExecutionProvider/TensorrtExecutionProvider not in {available}"
         )
-    if mode == "auto":
-        if "NvTensorRtRtxExecutionProvider" in available:
-            return [
-                ("NvTensorRtRtxExecutionProvider", {"nv_trt_rtx_runtime_cache_path": TRT_CACHE_DIR}),
-                "CUDAExecutionProvider",
-                "CPUExecutionProvider",
-            ]
+    if mode in ("tensorrt_rtx_or_cpu", "auto"):
+        if trt_rtx_ep:
+            return [trt_rtx_ep, "CPUExecutionProvider"]
         if "TensorrtExecutionProvider" in available:
             return [
                 ("TensorrtExecutionProvider", {"trt_engine_cache_enable": True, "trt_engine_cache_path": TRT_CACHE_DIR}),
                 "CUDAExecutionProvider",
                 "CPUExecutionProvider",
             ]
-        if "CUDAExecutionProvider" in available:
+        if mode == "auto" and "CUDAExecutionProvider" in available:
             return ["CUDAExecutionProvider", "CPUExecutionProvider"]
+        if mode == "tensorrt_rtx_or_cpu" and not fallback_to_cpu:
+            raise RuntimeError(f"ORT_PROVIDER_MODE=tensorrt_rtx_or_cpu with ORT_FALLBACK_TO_CPU=0, available={available}")
         return ["CPUExecutionProvider"]
-    raise ValueError(f"Unsupported ORT_PROVIDER_MODE={mode!r} (expected cpu|auto|cuda|tensorrt_rtx)")
+    raise ValueError(f"Unsupported ORT_PROVIDER_MODE={mode!r} (expected cpu|auto|cuda|tensorrt_rtx|tensorrt_rtx_or_cpu)")
 
 
 def _load() -> None:
-    global _providers, _tokenizer, _load_error
+    global _providers, _tokenizer, _count_tokenizer, _load_error
     try:
         if not MODEL_FILE.is_file():
             raise FileNotFoundError(f"missing model: {MODEL_FILE}")
+        _register_trt_rtx_plugin()
         tok = Tokenizer.from_file(str(TOKENIZER_FILE))
         tok.enable_truncation(max_length=MAX_TOKENS)
+        count_tok = Tokenizer.from_file(str(TOKENIZER_FILE))
+        count_tok.no_truncation()
         so = ort.SessionOptions()
         so.intra_op_num_threads = INTRA_THREADS
         so.inter_op_num_threads = 1
@@ -116,6 +137,7 @@ def _load() -> None:
             if not _providers:
                 _providers = sess.get_providers()
         _tokenizer = tok
+        _count_tokenizer = count_tok
     except Exception as exc:  # fail closed: health reports the error
         _load_error = f"{type(exc).__name__}: {exc}"
 
@@ -147,6 +169,20 @@ class EmbedRequest(BaseModel):
         return v
 
 
+class TokenizeRequest(BaseModel):
+    texts: List[str] = Field(min_length=1)
+
+    @field_validator("texts")
+    @classmethod
+    def _check_tokenize_texts(cls, v: List[str]) -> List[str]:
+        if len(v) > MAX_BATCH:
+            raise ValueError(f"batch exceeds {MAX_BATCH}")
+        for t in v:
+            if not t.strip():
+                raise ValueError("empty text not allowed")
+        return v
+
+
 def _mrl(vecs: np.ndarray, dim: int) -> np.ndarray:
     """Matryoshka prefix + L2 renormalize (derived lane, not a new model)."""
     if dim == NATIVE_DIM:
@@ -158,11 +194,14 @@ def _mrl(vecs: np.ndarray, dim: int) -> np.ndarray:
 @app.get("/health")
 def health() -> dict:
     trt_version = _detect_trt_rtx_version()
+    fallback_used = _providers == ["CPUExecutionProvider"] and ORT_PROVIDER_MODE != "cpu"
     return {
         "status": "ok" if _tokenizer is not None and _load_error is None else "unavailable",
         "model_id": MODEL_ID,
         "model_dir": str(MODEL_DIR),
         "provider_mode": ORT_PROVIDER_MODE,
+        "fallback_to_cpu": ORT_FALLBACK_TO_CPU,
+        "fallback_used": fallback_used,
         "providers": _providers,
         "available_providers": ort.get_available_providers(),
         "trt_rtx_target": TRT_RTX_TARGET_VERSION,
@@ -176,6 +215,23 @@ def health() -> dict:
         "max_tokens": MAX_TOKENS,
         "ownership": "EXPERIMENT",
         "load_error": _load_error,
+    }
+
+
+@app.post("/tokenize")
+def tokenize(req: TokenizeRequest) -> dict:
+    if _count_tokenizer is None or _load_error is not None:
+        raise HTTPException(status_code=503, detail=_load_error or "model not loaded")
+    t0 = time.perf_counter()
+    encs = _count_tokenizer.encode_batch(req.texts)
+    token_counts = [len(e.ids) for e in encs]
+    return {
+        "model_id": MODEL_ID,
+        "count": len(req.texts),
+        "max_tokens": MAX_TOKENS,
+        "token_counts": token_counts,
+        "would_truncate": [c > MAX_TOKENS for c in token_counts],
+        "elapsed_ms": round((time.perf_counter() - t0) * 1000, 2),
     }
 
 

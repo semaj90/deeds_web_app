@@ -362,7 +362,11 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
  * Primary: codebase_chunks_768 (declared dense 768-dim lane)
  */
 export async function retrieveQdrant(query: string): Promise<Candidate[]> {
-  const dense768 = await embedQueryForLane(query, 'dense_768').catch(() => null);
+  const dense768 = await embedQueryForLane(query, 'dense_768').catch((error: unknown) => {
+    const reason = error instanceof Error ? error.message : String(error);
+    console.warn(`[retrieveQdrant] query embedding failed; dense lane returns no candidates: ${reason}`);
+    return null;
+  });
   const queryVectors = {
     dense768: dense768?.vector ?? null,
   };
@@ -486,9 +490,11 @@ export async function retrieveExactMatches(query: string): Promise<Candidate[]> 
 
     if (identifiers.length === 0) return [];
 
-    // Use the first identifier for simple search
+    // Use the first identifier with indexed predicates (packet_key btree, metadata GIN, search_vector GIN)
+    // to avoid a 274k-row sequential scan and PG 57014 statement timeouts.
     const firstIdentifier = identifiers[0];
-    const searchPattern = `%${firstIdentifier}%`;
+    const prefixPattern = `${firstIdentifier}%`;
+    const containsPattern = `%${firstIdentifier}%`;
 
     const db = await getDb();
     const result = await db.execute(sql`
@@ -500,12 +506,15 @@ export async function retrieveExactMatches(query: string): Promise<Candidate[]> 
         content,
         1.0 as score
       FROM codebase_chunk_index
-      WHERE COALESCE(metadata->>'function_symbol', symbol) IS NOT NULL
-        AND (
-          COALESCE(metadata->>'function_symbol', symbol) ILIKE ${searchPattern}
-          OR COALESCE(metadata->>'packet_key', id::text) ILIKE ${searchPattern}
-        )
-      ORDER BY id ASC
+      WHERE (metadata->>'packet_key') = ${firstIdentifier}
+         OR metadata @> jsonb_build_object('function_symbol', ${firstIdentifier}::text)
+         OR (
+           search_vector @@ plainto_tsquery('english', ${firstIdentifier})
+           AND (
+             symbol ILIKE ${prefixPattern}
+             OR source_ref ILIKE ${containsPattern}
+           )
+         )
       LIMIT ${EXACT_LIMIT}
     `);
 

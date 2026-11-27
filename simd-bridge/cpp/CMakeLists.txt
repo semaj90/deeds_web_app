@@ -372,7 +372,14 @@ set(ADDON_SOURCES
   graph_search.cc
   tree_ensemble.cc
   manifold_interpolate.cc
+  nes_lut_avx2.cc
 )
+
+if(MSVC)
+  set_source_files_properties(nes_lut_avx2.cc PROPERTIES COMPILE_OPTIONS "/arch:AVX2")
+else()
+  set_source_files_properties(nes_lut_avx2.cc PROPERTIES COMPILE_OPTIONS "-mavx2")
+endif()
 
 if(EXISTS "${SIMDJSON_SRC}")
   list(APPEND ADDON_SOURCES vendor/simdjson.cpp)

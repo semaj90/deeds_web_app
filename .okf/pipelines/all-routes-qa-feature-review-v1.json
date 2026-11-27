@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.all-routes-qa-feature-review.v1",
+  "status": "PROPOSAL_ONLY",
+  "task": "e2e-error-intelligence-kanban:QA-FULLSWEEP-01",
+  "families": {
+    "ai.chat": ["chat", "conversations", "sse", "llm"],
+    "ai.contextual": ["contextual", "browser-context", "ace", "rag", "hyperrag"],
+    "ai.analysis": ["analysis", "analyze-file", "analyze-tag", "summarize", "vlm", "audio"],
+    "ai.recommendations": ["recommendations", "feedback", "evaluation"],
+    "poi.directory": ["persons-of-interest", "persons"],
+    "reports.builder": ["reports", "citations", "case-theory", "cases", "courtroom"],
+    "search.hybrid": ["search", "vector-search", "retrieval", "glossary", "statutes", "precedents"],
+    "admin.error_brain": ["error-brain", "errors", "tasks", "atlas", "health"]
+  },
+  "sharedFamilies": {
+    "atlas": "Contains search, context, indexing, and diagnostics. Review the exact endpoint.",
+    "cases": "Contains case lifecycle and reporting. Review each method.",
+    "feedback": "Contains feedback across product capabilities.",
+    "health": "Operational checks span services and may perform active probes.",
+    "llm": "Contains runtime controls as well as chat capabilities.",
+    "tasks": "Contains workflow and task management across capabilities."
+  },
+  "fixtureCohort": [
+    { "label": "ai.chat", "method": "GET", "route": "/api/llm/runtime-status", "check": "Unauthenticated request returns 401. Use a stub for any authenticated runtime probe." },
+    { "label": "ai.contextual", "method": "GET", "route": "/api/ace/status", "check": "An authenticated fixture without the job identifier returns 400. Use a fixture job for ownership checks." },
+    { "label": "ai.analysis", "method": "GET", "route": "/api/vlm/status", "check": "Unauthenticated request returns 401. Stub the sidecar for the authenticated status case." },
+    { "label": "ai.recommendations", "method": "GET", "route": "/api/recommendations", "check": "Unauthenticated request returns 401. Stub the cache and recommendation source for the authenticated list." },
+    { "label": "poi.directory", "method": "GET", "route": "/api/persons-of-interest", "check": "Use seeded records to assert ownership filtering and the response shape." },
+    { "label": "reports.builder", "method": "GET", "route": "/api/reports", "check": "Use seeded records to assert caller ownership and list response shape." },
+    { "label": "search.hybrid", "method": "GET", "route": "/api/search", "check": "Stub retrieval and analytics for the authenticated query. The handler records search analytics." },
+    { "label": "admin.error_brain", "method": "GET", "route": "/api/errors/summary", "check": "Unauthenticated request returns 401. Use seeded error summaries for the authenticated case." }
+  ],
+  "existingControls": [
+    { "label": "agent.acp.execute", "method": "POST", "route": "/api/acp/execute", "test": "sveltekit-frontend/tests/e2e/qa-acp-contract.spec.ts" },
+    { "label": "agent.a2a.rpc", "method": "POST", "route": "/api/agent/rpc", "test": "sveltekit-frontend/tests/e2e/qa-a2a-rpc.spec.ts" }
+  ]
+}

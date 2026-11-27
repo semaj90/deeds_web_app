@@ -135,3 +135,72 @@ export function createEmbeddingGemma2ChallengerExecutorV1(input: {
     },
   };
 }
+
+export interface Eg2TokenizeResultV1 {
+  modelId: string;
+  maxTokens: number;
+  tokenCounts: number[];
+  wouldTruncate: boolean[];
+}
+
+/**
+ * Query exact EmbeddingGemma 2 token counts from :8094 `POST /tokenize`
+ * without running ONNX inference. Fails closed on invalid/non-finite payloads.
+ */
+export async function countEmbeddingGemma2TokensOnnx8094V1(
+  texts: string[],
+  input: { endpoint?: string; fetchImpl?: FetchLike } = {},
+): Promise<Eg2TokenizeResultV1> {
+  if (texts.length === 0) {
+    throw new Error('EMBEDDINGGEMMA2_ONNX_8094_TOKENIZE_EMPTY_INPUT');
+  }
+  const endpoint = (
+    input.endpoint ??
+    process.env.GEMMA2_ONNX_URL ??
+    'http://127.0.0.1:8094'
+  ).replace(/\/+$/, '');
+  const fetchImpl = input.fetchImpl ?? fetch;
+
+  const response = await fetchImpl(`${endpoint}/tokenize`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ texts }),
+  });
+  if (!response.ok) {
+    throw new Error(`EMBEDDINGGEMMA2_ONNX_8094_TOKENIZE_HTTP_${response.status}`);
+  }
+
+  const payload = (await response.json()) as {
+    model_id?: unknown;
+    max_tokens?: unknown;
+    token_counts?: unknown;
+    would_truncate?: unknown;
+  };
+  if (
+    typeof payload.model_id !== 'string' ||
+    typeof payload.max_tokens !== 'number' ||
+    !Number.isSafeInteger(payload.max_tokens) ||
+    !Array.isArray(payload.token_counts) ||
+    payload.token_counts.length !== texts.length ||
+    !Array.isArray(payload.would_truncate) ||
+    payload.would_truncate.length !== texts.length
+  ) {
+    throw new Error('EMBEDDINGGEMMA2_ONNX_8094_TOKENIZE_INVALID_RESPONSE');
+  }
+  for (let i = 0; i < texts.length; i += 1) {
+    if (
+      typeof payload.token_counts[i] !== 'number' ||
+      !Number.isSafeInteger(payload.token_counts[i]) ||
+      (payload.token_counts[i] as number) < 0 ||
+      typeof payload.would_truncate[i] !== 'boolean'
+    ) {
+      throw new Error(`EMBEDDINGGEMMA2_ONNX_8094_TOKENIZE_INVALID_ITEM index=${i}`);
+    }
+  }
+  return {
+    modelId: payload.model_id,
+    maxTokens: payload.max_tokens,
+    tokenCounts: payload.token_counts as number[],
+    wouldTruncate: payload.would_truncate as boolean[],
+  };
+}

@@ -2720,6 +2720,8 @@ func (s *retrievalServer) httpHealth(w http.ResponseWriter, r *http.Request) {
 		readinessState = "NOT_READY"
 	case !h.GetEmbeddingServiceUp():
 		readinessState = "NOT_READY"
+	case !codebaseSearchReady:
+		readinessState = "READY_DEGRADED"
 	case !h.GetRedisConnected():
 		readinessState = "READY_DEGRADED"
 	default:

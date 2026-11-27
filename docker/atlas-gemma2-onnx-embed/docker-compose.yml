@@ -12,6 +12,8 @@ services:
     volumes:
       - ../../models/embeddinggemma2/onnx-q8:/models/embeddinggemma2/onnx-q8:ro
     environment:
+      ORT_PROVIDER_MODE: "auto"
+      ORT_FALLBACK_TO_CPU: "1"
       ORT_WORKERS: "4"
       ORT_INTRA_THREADS: "4"
       GEMMA2_MAX_TOKENS: "1024"

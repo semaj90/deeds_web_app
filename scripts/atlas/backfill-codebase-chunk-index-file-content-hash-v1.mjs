@@ -37,7 +37,12 @@ const { Pool } = require('pg');
 const APPLY = process.argv.includes('--apply');
 const BATCH_SIZE = 2000;
 const root = path.resolve(import.meta.dirname, '..', '..');
-const reportPath = path.join(root, 'docs/reports/backfill-codebase-chunk-index-file-content-hash-v1.json');
+const reportArg = process.argv.find((arg) => arg.startsWith('--report='));
+const reportPath = path.resolve(root, reportArg?.slice('--report='.length)
+  ?? 'docs/reports/backfill-codebase-chunk-index-file-content-hash-v1.json');
+if (reportArg && !reportPath.startsWith(path.join(root, '.tmp') + path.sep)) {
+  throw new Error('EXPLICIT_REPORT_PATH_MUST_BE_UNDER_REPOSITORY_TMP');
+}
 
 // codebase_chunk_index.relative_path mixes TWO root conventions across rows written by different
 // crawls/writers over this project's history: some rows (e.g. packages/*, docs/*, services/*) are
@@ -79,7 +84,7 @@ try {
     const batch = await pool.query(
       `SELECT id::text, relative_path, file_content_hash
          FROM public.codebase_chunk_index
-        WHERE id::text > $1
+        WHERE id > $1::uuid
         ORDER BY id
         LIMIT $2`,
       [lastId, BATCH_SIZE],
@@ -147,7 +152,7 @@ try {
     }
 
     console.log(
-      `  batch ${batchNum}: processed ${batch.rows.length} rows (cumulative: ${counts.totalRows}/${counts.totalRows >= 55853 ? counts.totalRows : '~55853'})`,
+      `  batch ${batchNum}: processed ${batch.rows.length} rows (cumulative: ${counts.totalRows})`,
     );
   }
 } finally {
@@ -166,7 +171,8 @@ const report = {
   postgresWrites: APPLY,
 };
 report.reportChecksum = crypto.createHash('sha256').update(JSON.stringify(report)).digest('hex');
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
 
 console.log('\n=== Final result ===');
-console.log(JSON.stringify({ mode: report.mode, counts, distinctFilesHashed: fileHashCache.size, reportPath: 'docs/reports/backfill-codebase-chunk-index-file-content-hash-v1.json' }, null, 2));
+console.log(JSON.stringify({ mode: report.mode, counts, distinctFilesHashed: fileHashCache.size, reportPath: path.relative(root, reportPath).replaceAll('\\', '/') }, null, 2));
