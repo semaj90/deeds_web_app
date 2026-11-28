@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-tournament-admission.v1",
-  "generatedAt": "2026-11-25T01:27:41.722Z",
+  "generatedAt": "2026-11-25T19:17:32.188Z",
   "mode": "READ_ONLY",
   "status": "TOURNAMENT_ADMISSION_AUDIT_BLOCKED",
   "proofLevel": "PARTIAL_PROVEN",

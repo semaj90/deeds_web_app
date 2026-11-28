@@ -175,6 +175,42 @@ class AtlasComputeReferenceTests(unittest.TestCase):
         self.assertEqual(report["receipt"]["device"], "cpu")
         self.assertFalse(report["compute"]["canonicalAuthority"])
 
+    def test_shortlist_receipt_binds_ordinals_and_rejects_nonfinite_input(self) -> None:
+        matrix = [[1.0, 1.0], [1.0, 1.0]]
+        query = [2.0, 1.0]
+        tied, first = shortlist_candidate_ordinals(matrix, [9, 2], query, rank=1, target_count=2, device="cpu")
+        _, rebound = shortlist_candidate_ordinals(matrix, [2, 9], query, rank=1, target_count=2, device="cpu")
+        self.assertEqual(tied, [2, 9])
+        self.assertNotEqual(first.input_checksum, rebound.input_checksum)
+        with self.assertRaisesRegex(ValueError, "finite"):
+            shortlist_candidate_ordinals(matrix, [9, 2], [float("nan"), 0], rank=1, target_count=2, device="cpu")
+        with self.assertRaisesRegex(ValueError, "integers"):
+            shortlist_candidate_ordinals(matrix, [9, 2.5], query, rank=1, target_count=2, device="cpu")
+
+    def test_task_recommendation_exactly_rescores_a_bounded_shortlist(self) -> None:
+        tasks = [
+            self._feature_task(i, goalRank=(i % 4, "DERIVED"), estimatedMinutes=(10 + i, "OBSERVED"))
+            for i in range(20)
+        ]
+        projected = self._run_task_recommendation(tasks)
+        report = self._run_task_recommendation(tasks, "--shortlist-size", "5")
+        self.assertEqual(report["status"], "OK")
+        self.assertEqual(report["exactRescore"]["candidateCount"], 5)
+        self.assertEqual(report["exactRescore"]["metric"], "cosine")
+        self.assertEqual(report["exactRescore"]["device"], "cpu")
+        self.assertEqual({r["id"] for r in report["tasks"]}, {r["id"] for r in projected["tasks"][:5]})
+        raw = np.array([[-(i % 4), -(10 + i)] for i in range(20)], dtype=np.float64)
+        standardized = (raw - raw.mean(axis=0)) / raw.std(axis=0)
+        query = standardized.max(axis=0)
+        rows_by_id = {task["id"]: standardized[i] for i, task in enumerate(tasks)}
+        for hit in report["tasks"]:
+            row = rows_by_id[hit["id"]]
+            expected = np.dot(row, query) / (np.linalg.norm(row) * np.linalg.norm(query))
+            self.assertAlmostEqual(hit["score"], float(expected), places=6)
+        scores = [row["score"] for row in report["tasks"]]
+        self.assertEqual(scores, sorted(scores, reverse=True))
+        self.assertFalse(report["canonicalAuthority"])
+
     def test_task_recommendation_refuses_single_varying_feature(self) -> None:
         tasks = [
             self._feature_task(i, goalRank=((i % 3) * 10, "DERIVED"), estimatedMinutes=(15, "OBSERVED"), risk=None)

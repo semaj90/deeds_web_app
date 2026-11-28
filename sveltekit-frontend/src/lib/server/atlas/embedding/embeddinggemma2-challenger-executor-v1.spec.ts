@@ -5,6 +5,7 @@ import {
   EMBEDDINGGEMMA2_CHALLENGER_MODEL_REVISION,
   EMBEDDINGGEMMA2_ONNX_8094_EXECUTOR_ID,
   EMBEDDINGGEMMA2_ONNX_8094_MODEL_REVISION,
+  countEmbeddingGemma2TokensOnnx8094V1,
   createEmbeddingGemma2ChallengerExecutorV1,
   createEmbeddingGemma2Onnx8094ExecutorV1,
 } from './embeddinggemma2-challenger-executor-v1.js';
@@ -149,5 +150,49 @@ describe.skipIf(!liveAvailable)('EmbeddingGemma 2 challenger executor (live Olla
     const related = (await executor.embedNative768('function graphBFS(rowPtr, colIndices, startNode) { /* BFS over CSR */ }')).vector;
     const unrelated = (await executor.embedNative768('Recipe: whisk two eggs with sugar and butter.')).vector;
     expect(cosine(query, related)).toBeGreaterThan(cosine(query, unrelated));
+  });
+});
+
+describe('countEmbeddingGemma2TokensOnnx8094V1 (/tokenize seam)', () => {
+  it('posts texts to /tokenize and returns exact counts and truncation flags', async () => {
+    const fetchImpl = (async (url: string | URL | Request, init?: RequestInit) => {
+      expect(String(url)).toBe('http://eg2.test:8094/tokenize');
+      expect(JSON.parse(String(init?.body ?? '{}'))).toEqual({ texts: ['a', 'b'] });
+      return new Response(
+        JSON.stringify({
+          model_id: 'onnx-community/embeddinggemma2-q8:onnx/model_quantized.onnx',
+          count: 2,
+          max_tokens: 1024,
+          token_counts: [12, 1400],
+          would_truncate: [false, true],
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      );
+    }) as typeof fetch;
+
+    const result = await countEmbeddingGemma2TokensOnnx8094V1(['a', 'b'], {
+      endpoint: 'http://eg2.test:8094',
+      fetchImpl,
+    });
+    expect(result.maxTokens).toBe(1024);
+    expect(result.tokenCounts).toEqual([12, 1400]);
+    expect(result.wouldTruncate).toEqual([false, true]);
+  });
+
+  it('fails closed on mismatched or non-integer token_counts', async () => {
+    const fetchImpl = (async () =>
+      new Response(
+        JSON.stringify({
+          model_id: 'eg2',
+          max_tokens: 1024,
+          token_counts: [12],
+          would_truncate: [false],
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      )) as typeof fetch;
+
+    await expect(
+      countEmbeddingGemma2TokensOnnx8094V1(['a', 'b'], { endpoint: 'http://eg2.test:8094', fetchImpl }),
+    ).rejects.toThrow('TOKENIZE_INVALID_RESPONSE');
   });
 });

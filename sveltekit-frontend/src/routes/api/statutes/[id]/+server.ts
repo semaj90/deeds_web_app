@@ -3,6 +3,7 @@
  * PUT    /api/statutes/[id] — Update statute
  * DELETE /api/statutes/[id] — Delete statute
  */
+import { isAdminRole } from '$lib/server/auth-utils.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
@@ -41,6 +42,7 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 
 export const PUT: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!isAdminRole(locals.user.role)) return json({ error: 'Admin access required' }, { status: 403 });
 	if (!isUuid(params.id)) return json({ error: 'Invalid ID' }, { status: 400 });
 
 	let body;
@@ -85,6 +87,7 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 
 export const DELETE: RequestHandler = async ({ params, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!isAdminRole(locals.user.role)) return json({ error: 'Admin access required' }, { status: 403 });
 	if (!isUuid(params.id)) return json({ error: 'Invalid ID' }, { status: 400 });
 
 	try {

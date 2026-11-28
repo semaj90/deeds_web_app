@@ -110,7 +110,7 @@ export const GET: RequestHandler = async () => {
 	const fallback = {
 		ok: false,
 		endpoint: ':8090',
-		model: 'ornith-1.5-9b',
+		model: 'unidentified',
 		healthy: false,
 		visionProjectorLoaded: false,
 		mode: 'offline' as 'vlm-multimodal' | 'ornith-dom-recon' | 'offline',

@@ -211,7 +211,8 @@ export interface QueryVectorBundle {
 
 export async function embedQueryForLane(
   query: string,
-  lane: QueryEmbeddingLane
+  lane: QueryEmbeddingLane,
+  options: { signal?: AbortSignal } = {},
 ): Promise<EmbeddingResult> {
   const start = performance.now();
 
@@ -224,13 +225,13 @@ export async function embedQueryForLane(
     // passes every downstream check (Qdrant's own vector-size validation included)
     // while being cosine-scored against real 768-dim embeddings as if legitimate.
     if (ENV.ATLAS_CANONICAL_EMBEDDING_STRICT) {
-      return embedViaCanonicalRuntime(query, ENV.EMBEDDING_SERVER_MODEL ?? model, start);
+      return embedViaCanonicalRuntime(query, ENV.EMBEDDING_SERVER_MODEL ?? model, start, options.signal);
     }
     // Keep the chat-only llama-server URL out of this compatibility path. The
     // Ollama-shaped endpoint below is selected only from OLLAMA_BASE_URL; a
     // LLAMA_SERVER_URL-only environment must not turn into
     // `${llamaServer}/api/embeddings`.
-    return embedViaOllama(query, 768, model, start, true);
+    return embedViaOllama(query, 768, model, start, true, options.signal);
   }
 
   if (lane === 'dense_384') {
@@ -244,6 +245,7 @@ async function embedViaCanonicalRuntime(
   query: string,
   model: string,
   startTime: number,
+  signal?: AbortSignal,
 ): Promise<EmbeddingResult> {
   const modelArtifactRevision = ENV.EMBEDDING_MODEL_ARTIFACT_REVISION;
   const tokenizerRevision = ENV.EMBEDDING_TOKENIZER_REVISION;
@@ -259,6 +261,7 @@ async function embedViaCanonicalRuntime(
     // EMB-PROV-01: dedicated strict-lane URL, not the shared EMBEDDING_BASE_URL
     // (see env.server.ts's field comment for why these must stay distinct).
     baseUrl: ENV.EMBEDDING_STRICT_BASE_URL ?? 'http://127.0.0.1:8081',
+    signal,
     timeoutMs: config.timeout_ms,
   });
   return {
@@ -365,6 +368,7 @@ async function embedViaOllama(
   modelOverride = config.embed_model,
   startTime = performance.now(),
   requireExact768 = false,
+  signal?: AbortSignal,
 ): Promise<EmbeddingResult> {
   const url = `${config.ollama_url}/api/embeddings`;
   const requestEmbedding = async (prompt: string): Promise<number[]> => {
@@ -372,7 +376,9 @@ async function embedViaOllama(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: modelOverride, prompt }),
-      signal: AbortSignal.timeout(config.timeout_ms),
+      signal: signal
+        ? AbortSignal.any([signal, AbortSignal.timeout(config.timeout_ms)])
+        : AbortSignal.timeout(config.timeout_ms),
     });
 
     if (!res.ok) {
@@ -399,6 +405,7 @@ async function embedViaOllama(
               modelId: modelOverride,
             },
             timeoutMs: config.timeout_ms,
+            signal,
           });
           const rawEmbedding = await requestSemantic768Embedding(formattedText) as number[];
           assertSemantic768(rawEmbedding);

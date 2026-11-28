@@ -24,7 +24,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { TTL } from '$lib/server/cache-keys.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
-import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
+import { observeServedChatModelIdV1 } from '$lib/server/ai/llama-server-model-resolver.js';
 
 export interface SomCellSummary {
   x: number;
@@ -128,7 +128,7 @@ Focus on structural patterns and data-flow, not individual files.`;
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model:       SERVER_CHAT_MODEL,
+            model:       (await observeServedChatModelIdV1(turbo)) ?? undefined,
             messages:    [{ role: 'user', content: prompt }],
             temperature: 0.2,
             max_tokens:  180,

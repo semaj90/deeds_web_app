@@ -87,14 +87,14 @@ export function loadServiceEnvironment(): ServiceEnvironment {
       gpuLayers: parseInt(privateEnv.OLLAMA_GPU_LAYERS || '30', 10),
       timeout: 60000,
     },
-    // SeaweedFS via legacy MinIO-compatible config
+    // SeaweedFS primary S3 gateway (with legacy MinIO env fallback)
     minioConfig: {
-      endPoint: ENV.MINIO_ENDPOINT,
-      port: Number(ENV.MINIO_PORT),
-      accessKey: ENV.MINIO_ACCESS_KEY,
-      secretKey: ENV.MINIO_SECRET_KEY,
+      endPoint: ENV.SEAWEED_S3_ENDPOINT ?? ENV.SEAWEED_ENDPOINT ?? ENV.MINIO_ENDPOINT,
+      port: Number(ENV.SEAWEED_S3_PORT ?? ENV.MINIO_PORT),
+      accessKey: ENV.SEAWEED_ACCESS_KEY ?? ENV.MINIO_ACCESS_KEY,
+      secretKey: ENV.SEAWEED_SECRET_KEY ?? ENV.MINIO_SECRET_KEY,
       useSSL: Boolean(ENV.MINIO_USE_SSL),
-      region: 'us-east-1',
+      region: ENV.SEAWEED_S3_REGION ?? 'us-east-1',
     },
     // Neo4j
     neo4jConfig: {

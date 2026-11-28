@@ -1066,3 +1066,20 @@ Earlier triage marked these as possibly code-only. Source review shows the code 
 | Audit-ParentAtlasBranches.ps1: read-only audit of remote branches | TODO | Produces JSON and CSV reports containing: each remote-tracking branch; commits ahead and behind `origin/main`; latest commit (hash, author, date, subject); repository status; PR metadata when `gh` is signed in, otherwise a clear "PR metadata unavailable" marker | Read-only git commands only. Runs `git fetch origin` first, which updates remote-tracking refs only. Writes reports under `docs/reports/branch-audit/` with a dated filename. Does not push, merge, delete branches, or change any branch |
 | Sign in to GitHub CLI | TODO (you) | `gh auth status` reports a logged-in host | Run `"C:\Users\james\AppData\Local\gh-cli\bin\gh.exe" auth login --web`. The script needs this only for PR metadata |
 | Review the 130 branches ahead of `origin/main` | TODO after the audit | Triage list of active, stale, and merged branches, with recommendations | Do not delete or merge anything from this list without your approval |
+
+## Needs list: media to 3D (2026-11-28, repo check by rg + read-only PG18; features not run)
+
+Reuse (exists; do not rebuild or duplicate):
+- Storage tables `scene_assets`, `scene_asset_files`, `scene_markers`, `scene_document_revisions` (case_id, sha256, bucket/object_key, anchors, chained manifest). All 0 rows. Writer found: `lib/server/scene-assets-v1.ts`. Do not add `scene_evidence_assets`; keep 3D data out of `codebase_chunk_index`. `evidence_media_assets` also exists.
+- Compilers: `server/reconstruction/scene-compiler.ts` (`compileCrimeScene`), `scene-generation-worker-v1.ts`, `compile-scene-generation-job-v1.ts`. `InstancedMesh` already used in `CrimeSceneViewer3D.svelte` for one block mesh.
+- `three-mesh-bvh` (2 viewers), SPZ decoder + worker, OpenCV in keyframe/enhance scripts, `sharp`, ffmpeg (`FFMPEG_PATH` -> `.stacher`; second copy `tools/ffmpeg/ffmpeg.exe`, gitignored, no references found), Blender 4.3 + bpy GLB export scripts.
+
+Needed:
+- [ ] SCENE-NEED-01: prove one write + readback through `scene-assets-v1.ts` -> object store -> `scene_assets` (needs write approval).
+- [ ] SCENE-NEED-02: metric scale calibration. No ArUco/checkerboard code found; check overlap with `lib/splat/calibration.ts` first.
+- [ ] SCENE-NEED-03: extend `scene-compiler.ts` for forensic primitives (marker, trajectory cone, FOV frustum) as instanced buffers; confirm what it already emits first. LUT colour via `atlas_nes_lut_v1` join, not a new column.
+- [ ] SCENE-NEED-04: `video-vlm-processor.ts` spawns bare `ffprobe`, ignoring `FFMPEG_PATH`; verify it resolves in the app environment, else add `FFPROBE_PATH`.
+- [ ] SCENE-NEED-05: no SAM2/YOLOX/pyannote model-loading or TRELLIS runner found (Python search only for the first three). Only Depth-Anything has a worker (`:8092`, not checked running); `depth-producer-v1.ts` has no importer found. One-model-at-a-time VRAM queue is required before adding GPU stages.
+- [ ] SCENE-NEED-06: no own-WASM build found; defer until a measured main-thread stall justifies it.
+- Deferred: `scene_evidence_768` Qdrant collection (no vectors to store yet), GLB LOD/decimation (not confirmed either way), new bytecode compiler, HMM.
+- LangChain/LangGraph are already dependencies with 6 importing files; "do not add" applies to this path only, not removal.

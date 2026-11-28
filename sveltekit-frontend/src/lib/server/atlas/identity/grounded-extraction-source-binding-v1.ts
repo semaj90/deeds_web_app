@@ -76,6 +76,7 @@ export function validateGroundedExtractionSourceBindingV1(input: {
   packetResolution: PacketKeyResolutionV2;
   packetRows: Array<{ packetKey: string | null; sourceRef: string; sourceRevision: string | null }>;
   admittedSource: AdmittedSourceRevisionV1;
+  expectedRepositoryId?: string;
 }): GroundedExtractionSourceBindingReceiptV1 {
   const submittedBytes = Buffer.from(input.submittedText, 'utf8');
   const submittedTextChecksum = `sha256:${createHash('sha256').update(submittedBytes).digest('hex')}`;
@@ -86,6 +87,9 @@ export function validateGroundedExtractionSourceBindingV1(input: {
   }
   if (packet.sourceRef !== input.sourceRef || input.admittedSource.sourceRef !== input.sourceRef) {
     throw new GroundedExtractionSourceBindingError('PACKET_SOURCE_REF_MISMATCH');
+  }
+  if (input.expectedRepositoryId !== undefined && input.admittedSource.repoId !== input.expectedRepositoryId) {
+    throw new GroundedExtractionSourceBindingError('SOURCE_BINDING_REPOSITORY_MISMATCH');
   }
   if (
     !input.sourceRevision
@@ -126,6 +130,7 @@ export async function resolveGroundedExtractionSourceBindingV1(input: {
   sourceRevision: string;
   workspaceRevision: string;
   submittedText: string;
+  expectedRepositoryId?: string;
 }): Promise<GroundedExtractionSourceBindingReceiptV1> {
   const [packetResolution, admittedSource] = await Promise.all([
     resolvePacketKeyResolutionV2(input.packetKey),

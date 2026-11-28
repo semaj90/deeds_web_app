@@ -1042,6 +1042,7 @@ export class QdrantManager {
                 filter: params.filter,
                 skipCache: params.skipCache,
               });
+              if (params.timeoutSeconds) (searchRequest as unknown as Record<string, unknown>).timeout = params.timeoutSeconds;
 
               if (params.filter) {
                 searchRequest.filter = this.buildQdrantFilter(params.filter);
@@ -1120,6 +1121,7 @@ export class QdrantManager {
             with_payload: true,
             with_vector: false,
           };
+          if (params.timeoutSeconds) searchRequest.timeout = params.timeoutSeconds;
 
           if (params.filter) {
             searchRequest.filter = this.buildQdrantFilter(params.filter);
@@ -1298,7 +1300,6 @@ export class QdrantManager {
       filter: filters,
       with_payload: true,
     };
-
     const results = (await this.client.query(
       this.collections.chat_history,
       toQdrantQueryRequest(searchRequest),

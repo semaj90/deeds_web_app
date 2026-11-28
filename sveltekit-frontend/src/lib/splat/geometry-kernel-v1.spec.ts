@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import {
 	createTypeScriptGeometryKernelV1,
@@ -69,5 +70,79 @@ describe('BackendCapabilityRegistry & GeometryKernelV1', () => {
 		await expect(kernel.matchNesLutMask(lut, new Uint8Array([7, 7]))).rejects.toThrow(
 			/NES_LUT_ALLOWED_DUPLICATE/
 		);
+	});
+
+	it('verifies bit-identical N-API tensorrt_bridge.node matchNesLutMask parity with TypeScript oracle', async () => {
+		const addonCandidates = [
+			resolve(process.cwd(), '../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+			resolve(process.cwd(), '../simd-bridge/cpp/build-x64-fallback/Release/tensorrt_bridge.node'),
+			resolve(process.cwd(), '../simd-bridge/build/Release/tensorrt_bridge.node')
+		];
+		const addonPath = addonCandidates.find((p) => existsSync(p));
+		expect(addonPath).toBeTruthy();
+
+		const require = createRequire(import.meta.url);
+		const addon = require(addonPath!) as {
+			nesLutSupportsAvx2?: () => number;
+			matchNesLutMask?: (
+				lut: Uint8Array,
+				allowed: Uint8Array,
+				forceScalar?: number,
+				out?: Uint32Array
+			) => Uint32Array;
+			batchCosineTopKMasked?: (
+				query: Float32Array,
+				corpus: Float32Array,
+				n: number,
+				dim: number,
+				k: number,
+				activeMask: Uint32Array,
+				outIndices?: Int32Array,
+				outScores?: Float32Array
+			) => {
+				indices: Int32Array;
+				scores: Float32Array;
+				count: number;
+				evaluatedCount: number;
+				backend: string;
+			};
+		};
+		expect(typeof addon.nesLutSupportsAvx2).toBe('function');
+		expect(typeof addon.matchNesLutMask).toBe('function');
+		expect(typeof addon.batchCosineTopKMasked).toBe('function');
+
+		const kernel = createTypeScriptGeometryKernelV1();
+		const lut = new Uint8Array(103);
+		for (let i = 0; i < lut.length; i++) lut[i] = (i * 7 + 3) & 0x1f;
+		const allowed = new Uint8Array([3, 10, 17, 24, 31]);
+
+		const tsMask = await kernel.matchNesLutMask(lut, allowed);
+		const nativeMask = addon.matchNesLutMask!(lut, allowed, 0);
+		const nativeScalar = addon.matchNesLutMask!(lut, allowed, 1);
+		const preallocOut = new Uint32Array(tsMask.length);
+		const returnedOut = addon.matchNesLutMask!(lut, allowed, 0, preallocOut);
+
+		expect(returnedOut).toBe(preallocOut);
+		expect(Array.from(preallocOut)).toEqual(Array.from(tsMask));
+		expect(Array.from(nativeMask)).toEqual(Array.from(tsMask));
+		expect(Array.from(nativeScalar)).toEqual(Array.from(tsMask));
+		expect(() => addon.matchNesLutMask!(lut, new Uint8Array([]))).toThrow(/NES_LUT_ALLOWED_COUNT_INVALID/);
+		expect(() => addon.matchNesLutMask!(lut, new Uint8Array([7, 7]))).toThrow(/NES_LUT_ALLOWED_DUPLICATE/);
+
+		// Bitset-filtered Top-K with caller-owned output buffers (zero-alloc fast path)
+		const query = new Float32Array([1, 0, 0]);
+		// 4 candidates: idx 0=[1,0,0] (masked OUT), idx 1=[0.6,0.8,0], idx 2=[0.9,0.1,0], idx 3=[0,1,0] (masked OUT)
+		const corpus = new Float32Array([1, 0, 0, 0.6, 0.8, 0, 0.9, 0.1, 0, 0, 1, 0]);
+		const activeMask = new Uint32Array([(1 << 1) | (1 << 2)]);
+		const outIdx = new Int32Array(2);
+		const outScores = new Float32Array(2);
+		const topk = addon.batchCosineTopKMasked!(query, corpus, 4, 3, 2, activeMask, outIdx, outScores);
+		expect(topk.backend).toBe('cpu_masked_bitset');
+		expect(topk.evaluatedCount).toBe(2);
+		expect(topk.count).toBe(2);
+		expect(topk.indices).toBe(outIdx);
+		expect(topk.scores).toBe(outScores);
+		expect(Array.from(outIdx)).toEqual([2, 1]);
+		expect(outScores[0]!).toBeGreaterThan(outScores[1]!);
 	});
 });

@@ -4,11 +4,14 @@ import dspy
 import pytest
 
 from atlas_graph_runtime.dspy_predict_ace_recommender_v1 import (
+    build_bounded_rlm_tools_v1,
     create_bounded_dspy_rlm_v1,
     doc14_gepa_metric_v1,
     evaluate_gepa_offline_promotion_gate_v1,
+    run_bounded_dspy_rlm_v1,
     run_dspy_predict_ace_recommender_v1,
 )
+from atlas_graph_runtime.doc14_bounded_rlm_recommender_v1 import _canonical_sha256_v1
 
 
 def test_dspy_predict_rejects_caller_boolean_and_requires_verified_ace_rows():
@@ -37,7 +40,7 @@ def test_predict_uses_only_scoped_readback_and_rejects_before_model_resolution(m
     monkeypatch.setattr(adapter, "run_bounded_dspy_recommendation_with_ace_manifest_v1", unexpected_call)
     checksum = "a" * 64
     request = {"schema": "atlas.context-manifest.v2", "identityChecksum": checksum}
-    rows = [{"pgReadbackStatus": "PROVEN", "admissionStatus": "INDEX_ELIGIBLE"}]
+    rows = [{"pgReadbackStatus": "PROVEN", "lineageMembershipStatus": "EXACT_SINGLE_MEMBER", "lineageRevisionStatus": "PROVEN"}]
     options = {"task_query": "question", "context_manifest": request}
     assert adapter.run_dspy_predict_ace_recommender_v1(
         **options, records=rows, scoped_readback=unexpected_call,
@@ -136,3 +139,210 @@ def test_doc14_gepa_metric_emits_actionable_feedback_and_scores_grounded_citatio
     )
     assert good.score == 1.0
     assert good.feedback is None
+
+
+def _make_verified_rlm_fixture(text: str = "export const guard = 'ContextManifest é';", token_budget: int = 4096):
+    import hashlib
+
+    src_rev = "sha256:" + "e" * 64
+    ws_rev = "sha256:" + "f" * 64
+    chunk_sha = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    src_rev_set = _canonical_sha256_v1({"schema": "atlas.ace-context-source-revision-set.v1", "revisions": [src_rev]})
+    v1 = {
+        "schema": "atlas.context-manifest.v1",
+        "requestId": "req-rlm-1",
+        "snapshotId": "snap-1",
+        "query": "How does ContextManifest guard work?",
+        "candidateBucket": 1,
+        "candidateCount": 1,
+        "tokenBudget": token_budget,
+        "selectedNodeKeys": ["chunk-1"],
+        "evidenceRefs": ["src/guard.ts"],
+        "producerRevision": "ace-producer-v1",
+        "workspaceRevision": ws_rev,
+    }
+    identity_input = {
+        "selectedOrdinalSetChecksum": "1" * 64,
+        "ordinalMapChecksum": "2" * 64,
+        "retrievalPolicyRevision": "policy-v1",
+        "acePlaybookRevision": "playbook-v1",
+        "evidenceRevisions": {
+            "sourceRevision": src_rev_set,
+            "representationRevision": "rep-v1",
+            "featureRevision": "feat-v1",
+            "ontologyRevision": "onto-v1",
+            "modelRevision": "gemma4-legal-iq4xs-direct.gguf",
+            "promptTemplateRevision": "tmpl-v1",
+        },
+    }
+    identity_checksum = _canonical_sha256_v1({
+        "schema": "atlas.context-manifest-v2-identity.v1",
+        "v1RequestId": v1["requestId"],
+        "v1SnapshotId": v1["snapshotId"],
+        "v1CandidateBucket": v1["candidateBucket"],
+        **identity_input,
+    })
+    manifest = {
+        "schema": "atlas.context-manifest.v2",
+        "identityChecksum": identity_checksum,
+        "identityInput": identity_input,
+        "v1": v1,
+    }
+    rows = [
+        {
+            "chunkId": "chunk-1",
+            "manifestNodeKey": "chunk-1",
+            "sourceRef": "src/guard.ts",
+            "sourceRevision": src_rev,
+            "workspaceRevision": ws_rev,
+            "text": text,
+            "chunkSha256": chunk_sha,
+            "pgReadbackStatus": "PROVEN",
+            "lineageMembershipStatus": "EXACT_SINGLE_MEMBER",
+            "lineageRevisionStatus": "PROVEN",
+            "evidenceRefs": ["src/guard.ts"],
+        }
+    ]
+    return manifest, rows, identity_checksum
+
+
+def test_bounded_rlm_five_failure_modes_and_authorized_replay():
+    manifest, rows, checksum = _make_verified_rlm_fixture()
+
+    # 1. Stale revision: sourceRevision mismatch between manifest and readback row -> refuse
+    stale_rows = [{**rows[0], "sourceRevision": "sha256:" + "0" * 64}]
+    with pytest.raises(ValueError, match="ACE_CONTEXT_SOURCE_REVISION_SET_MISMATCH"):
+        build_bounded_rlm_tools_v1(
+            task_query=manifest["v1"]["query"],
+            context_manifest=manifest,
+            scoped_readback=lambda k: (manifest, stale_rows),
+            token_counter=len,
+        )
+
+    # 2. Altered row: chunk bytes do not match chunkSha256 -> refuse
+    altered_rows = [{**rows[0], "text": rows[0]["text"] + " tampered"}]
+    with pytest.raises(ValueError, match="ACE_CONTEXT_ROW_CHECKSUM_MISMATCH"):
+        build_bounded_rlm_tools_v1(
+            task_query=manifest["v1"]["query"],
+            context_manifest=manifest,
+            scoped_readback=lambda k: (manifest, altered_rows),
+            token_counter=len,
+        )
+
+    # 3. Bad UTF-8 span: out-of-bounds or mid-codepoint byte slice -> reject cleanly
+    tools = build_bounded_rlm_tools_v1(
+        task_query=manifest["v1"]["query"],
+        context_manifest=manifest,
+        scoped_readback=lambda k: (manifest, rows),
+        token_counter=len,
+    )
+    with pytest.raises(ValueError, match="RLM_SPAN_BOUNDS_INVALID"):
+        tools["verify_utf8_span"]("chunk-1", 0, 99999, "bad")
+    raw_bytes = rows[0]["text"].encode("utf-8")
+    e_acute_idx = raw_bytes.index("é".encode("utf-8"))
+    with pytest.raises(ValueError):
+        tools["verify_utf8_span"]("chunk-1", e_acute_idx, e_acute_idx + 1, "x")
+
+    # 4. Citation mismatch: final RLM output cites a span/chunk not in admitted rows -> REFUSED
+    runtime_bad_cite = create_bounded_dspy_rlm_v1(
+        task_query=manifest["v1"]["query"],
+        context_manifest=manifest,
+        scoped_readback=lambda k: (manifest, rows),
+        token_counter=len,
+    )
+    runtime_bad_cite["rlm"] = lambda **kw: dspy.Prediction(
+        recommendation="Use guard", cited_chunk_id="forged-chunk", exact_quote="ContextManifest",
+    )
+    bad_res = run_bounded_dspy_rlm_v1(
+        runtime=runtime_bad_cite,
+        task_query=manifest["v1"]["query"],
+        lm=object(),
+        model_revision="gemma4-legal-iq4xs-direct.gguf",
+    )
+    assert bad_res["status"] == "REFUSED"
+    assert bad_res["reason"] == "RLM_CITATION_OUTSIDE_ADMITTED_CONTEXT"
+    assert bad_res["citationVerified"] is False
+
+    # 5a. Budget exhaustion: hit evidence-token cap -> ACE_CONTEXT_TOKEN_BUDGET_EXCEEDED
+    tight_manifest, tight_rows, _ = _make_verified_rlm_fixture(token_budget=10)
+    with pytest.raises(ValueError, match="ACE_CONTEXT_TOKEN_BUDGET_EXCEEDED"):
+        build_bounded_rlm_tools_v1(
+            task_query=tight_manifest["v1"]["query"],
+            context_manifest=tight_manifest,
+            scoped_readback=lambda k: (tight_manifest, tight_rows),
+            token_counter=len,
+        )
+
+    # 5b. Wall-time / cancellation timeout inside rlm(...) -> abort cleanly without partial receipt
+    runtime_timeout = create_bounded_dspy_rlm_v1(
+        task_query=manifest["v1"]["query"],
+        context_manifest=manifest,
+        scoped_readback=lambda k: (manifest, rows),
+        token_counter=len,
+    )
+    def _raise_timeout(**kw):
+        raise TimeoutError("WALL_TIME_EXCEEDED")
+    runtime_timeout["rlm"] = _raise_timeout
+    timeout_res = run_bounded_dspy_rlm_v1(
+        runtime=runtime_timeout,
+        task_query=manifest["v1"]["query"],
+        lm=object(),
+        model_revision="gemma4-legal-iq4xs-direct.gguf",
+    )
+    assert timeout_res["status"] == "REFUSED"
+    assert timeout_res["citationVerified"] is False
+
+    # 2b. Swapped evidence bindings -> refuse
+    swapped_rows = [{**rows[0], "evidenceRefs": ["src/other-file.ts"]}]
+    with pytest.raises(ValueError, match="ACE_CONTEXT_EVIDENCE_OUTSIDE_MANIFEST"):
+        build_bounded_rlm_tools_v1(
+            task_query=manifest["v1"]["query"],
+            context_manifest=manifest,
+            scoped_readback=lambda k: (manifest, swapped_rows),
+            token_counter=len,
+        )
+
+    # 2c. Extra/duplicate selected nodes -> refuse
+    extra_rows = [rows[0], {**rows[0], "chunkId": "chunk-2", "manifestNodeKey": "chunk-2"}]
+    with pytest.raises(ValueError, match="ACE_CONTEXT_ROW_OUTSIDE_SELECTION"):
+        build_bounded_rlm_tools_v1(
+            task_query=manifest["v1"]["query"],
+            context_manifest=manifest,
+            scoped_readback=lambda k: (manifest, extra_rows),
+            token_counter=len,
+        )
+
+    # 5c. Iteration & sub-LLM-call ceiling enforcement -> INVALID_RLM_BUDGET
+    with pytest.raises(ValueError, match="INVALID_RLM_BUDGET"):
+        create_bounded_dspy_rlm_v1(
+            task_query=manifest["v1"]["query"],
+            context_manifest=manifest,
+            scoped_readback=lambda k: (manifest, rows),
+            token_counter=len,
+            max_iterations=5,
+            max_llm_calls=7,
+        )
+
+    # 6. Authorized replay -> CITATION_VERIFIED receipt with canonicalAuthority=False, writesPerformed=False
+    runtime_ok = create_bounded_dspy_rlm_v1(
+        task_query=manifest["v1"]["query"],
+        context_manifest=manifest,
+        scoped_readback=lambda k: (manifest, rows),
+        token_counter=len,
+    )
+    runtime_ok["rlm"] = lambda **kw: dspy.Prediction(
+        recommendation="Keep ContextManifest verification fail-closed.",
+        cited_chunk_id="chunk-1",
+        exact_quote="ContextManifest é",
+    )
+    ok_res = run_bounded_dspy_rlm_v1(
+        runtime=runtime_ok,
+        task_query=manifest["v1"]["query"],
+        lm=object(),
+        model_revision="gemma4-legal-iq4xs-direct.gguf",
+    )
+    assert ok_res["status"] == "CITATION_VERIFIED"
+    assert ok_res["citationVerified"] is True
+    assert ok_res["canonicalAuthority"] is False
+    assert ok_res["writesPerformed"] is False
+    assert ok_res["contextManifestChecksum"] == checksum

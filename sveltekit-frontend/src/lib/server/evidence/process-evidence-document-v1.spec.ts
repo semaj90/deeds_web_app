@@ -6,9 +6,14 @@ const mocks = vi.hoisted(() => ({
   processDocument: vi.fn(),
   indexEvidenceDocumentCanonicalV1: vi.fn(),
   synthesizeEvidenceClaimsV1: vi.fn(),
+  dbUpdate: vi.fn(),
+  dbSet: vi.fn(),
+  dbWhere: vi.fn(),
 }));
 
-vi.mock('$lib/server/db/client.js', () => ({ db: {} }));
+vi.mock('$lib/server/db/client.js', () => ({
+  db: { update: mocks.dbUpdate },
+}));
 vi.mock('$lib/server/env.server.js', () => ({
   // SEAWEED_EVIDENCE_BUCKET must match the fixture's object_bucket; the production check stays fail-closed.
   ENV: { LANGEXTRACT_ENABLED: true, EMBEDDING_STRICT_BASE_URL: 'http://embedding.invalid', SEAWEED_EVIDENCE_BUCKET: 'legal-evidence' },
@@ -24,6 +29,9 @@ vi.mock('./synthesis/evidence-synthesis-v1.js', () => ({ synthesizeEvidenceClaim
 describe('processEvidenceDocumentCanonicalV1 synthesis integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.dbUpdate.mockReturnValue({ set: mocks.dbSet });
+    mocks.dbSet.mockReturnValue({ where: mocks.dbWhere });
+    mocks.dbWhere.mockResolvedValue(undefined);
     mocks.getSeaweedFile.mockResolvedValue(Buffer.from([0x25, 0x50, 0x44, 0x46, 0x00, 0xff]));
     mocks.processDocument.mockResolvedValue({ rawText: 'Extracted witness statement.', extractionMethod: 'fixture-pdf-text' });
     mocks.indexEvidenceDocumentCanonicalV1.mockResolvedValue({ chunkCount: 1, persistedCount: 1 });
@@ -58,10 +66,66 @@ describe('processEvidenceDocumentCanonicalV1 synthesis integration', () => {
       caseId,
       enabled: true,
     }, originalBytes);
+    const { evidence } = await import('$lib/server/db/schema-postgres.js');
+    const { eq } = await import('drizzle-orm');
+    expect(mocks.dbUpdate).toHaveBeenCalledTimes(1);
+    expect(mocks.dbUpdate).toHaveBeenCalledWith(evidence);
+    expect(mocks.dbSet).toHaveBeenCalledWith({
+      extractedText: 'Extracted witness statement.',
+      aiSummary: 'Extracted witness statement.',
+    });
+    expect(mocks.dbWhere).toHaveBeenCalledWith(eq(evidence.id, evidenceId));
     expect(result).toMatchObject({
       sourceRevision,
       synthesis: { schema: 'atlas.evidence-synthesis.v1', status: 'DISABLED', claims: [] },
     });
+  });
+
+  it('stores full extracted text and bounds the board summary to 240 normalized characters', async () => {
+    const text = `  ${'Evidence line with repeated whitespace.\n'.repeat(12)}  `;
+    const bytes = Buffer.from('bounded summary fixture');
+    const sourceRevision = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+    const evidenceId = '44444444-4444-4444-8444-444444444444';
+    mocks.getSeaweedFile.mockResolvedValueOnce(bytes);
+    mocks.processDocument.mockResolvedValueOnce({ rawText: text, extractionMethod: 'fixture-text' });
+
+    const { processEvidenceDocumentCanonicalV1 } = await import('./process-evidence-document-v1.js');
+    await processEvidenceDocumentCanonicalV1({
+      evidenceId,
+      text: 'queued placeholder only',
+      contentType: 'text/plain',
+      metadata: {
+        object_bucket: 'legal-evidence',
+        object_name: 'evidence/5/summary.txt',
+        source_revision: sourceRevision,
+        caseId: '55555555-5555-4555-8555-555555555555',
+        fileName: 'summary.txt',
+      },
+    });
+
+    expect(mocks.dbSet).toHaveBeenCalledWith({
+      extractedText: text.slice(0, 200_000),
+      aiSummary: text.replace(/\s+/g, ' ').slice(0, 240),
+    });
+    const { evidence } = await import('$lib/server/db/schema-postgres.js');
+    const { eq } = await import('drizzle-orm');
+    expect(mocks.dbUpdate).toHaveBeenCalledWith(evidence);
+    expect(mocks.dbWhere).toHaveBeenCalledWith(eq(evidence.id, evidenceId));
+  });
+
+  it('propagates an evidence-row update failure after the existing indexer returns', async () => {
+    const failure = new Error('EVIDENCE_ROW_UPDATE_FAILED');
+    mocks.dbWhere.mockRejectedValueOnce(failure);
+
+    const { processEvidenceDocumentCanonicalV1 } = await import('./process-evidence-document-v1.js');
+    await expect(processEvidenceDocumentCanonicalV1({
+      evidenceId: '66666666-6666-4666-8666-666666666666',
+      text: 'Retry-safe fixture text.',
+      metadata: { caseId: '77777777-7777-4777-8777-777777777777' },
+    })).rejects.toBe(failure);
+
+    // Indexer persistence is a preceding owner and is not rolled back by this later row update.
+    expect(mocks.indexEvidenceDocumentCanonicalV1).toHaveBeenCalledTimes(1);
   });
 });
 

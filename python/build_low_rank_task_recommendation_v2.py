@@ -8,6 +8,8 @@ scripts/atlas/build-openspec-challenger-tournament-v1.mjs.
 Reuses atlas_compute.low_rank.shortlist_candidate_ordinals (TANG_INSPIRED nomination);
 it does not add a second low-rank implementation. The output is advisory only:
 upstream execution state and the deterministic critical-path rank remain authority.
+With --shortlist-size, only the nominated rows are rescored using cosine on
+their original standardized features. The default still emits the full challenger ordering.
 
 Inputs are the per-task ``featureVector`` (atlas.workboard-feature-vector.v1, WFU-09), never the
 legacy scalar fields, which carry adapter defaults (estimatedMinutes=15, lowRankScore=0.5, ...).
@@ -26,11 +28,14 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
 
+from atlas_compute.exact_semantic import exact_semantic_search
 from atlas_compute.low_rank import shortlist_candidate_ordinals
 
 # (feature name in featureVector.features, sign): +1 higher is better, -1 lower is better.
@@ -91,13 +96,18 @@ def _select_features(
         cells = [_cell(task, name) for task in tasks]
         present = [c for c in cells if c.get("present") is True]
         bases = sorted({str(c.get("basis")) for c in present})
-        numeric = [float(c["value"]) for c in present if isinstance(c.get("value"), (int, float))]
+        numeric = [
+            float(c["value"]) for c in present
+            if type(c.get("value")) in (int, float) and math.isfinite(c["value"])
+        ]
         values = set(numeric)
-        modal = max((numeric.count(v) for v in values), default=0)
+        modal = max(Counter(numeric).values(), default=0)
         minority = (1 - modal / len(numeric)) if numeric else 0.0
         reason = None
         if not present:
             reason = "ABSENT_EVERYWHERE"
+        elif len(numeric) != len(present):
+            reason = "NON_FINITE_OR_NON_NUMERIC_FEATURE"
         elif len(present) / total < MIN_PRESENT_FRACTION:
             reason = "PRESENT_ON_TOO_FEW_TASKS"
         elif not set(bases) <= allowed_basis:
@@ -122,6 +132,11 @@ def main() -> int:
     parser.add_argument("--rank", type=int, default=3)
     parser.add_argument("--seed", type=int, default=0xA71A5)
     parser.add_argument(
+        "--shortlist-size",
+        type=int,
+        help="nominate at most this many rows with SVD, then rank them with exact CPU cosine",
+    )
+    parser.add_argument(
         "--device",
         choices=("cpu", "cuda", "auto"),
         default="cpu",
@@ -142,10 +157,18 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    workboard = json.loads(args.input.read_text(encoding="utf-8"))
+    workboard_bytes = args.input.read_bytes()
+    workboard = json.loads(workboard_bytes)
     tasks = workboard.get("tasks", [])
     if not tasks:
         raise SystemExit("workboard has no tasks")
+    task_ids = [task.get("id") for task in tasks]
+    if any(not isinstance(task_id, str) or not task_id.strip() for task_id in task_ids):
+        parser.error("workboard task IDs must be nonempty strings")
+    if len(set(task_ids)) != len(tasks):
+        parser.error("workboard task IDs must be unique")
+    if args.shortlist_size is not None and not 1 <= args.shortlist_size <= len(tasks):
+        parser.error("--shortlist-size must be between 1 and the workboard task count")
 
     allowed_basis = set(QUALIFIED_BASIS)
     if args.include_weak_basis:
@@ -167,6 +190,7 @@ def main() -> int:
         "writesPerformed": False,
         "source": {
             "file": _display_path(args.input, repo_root),
+            "inputSha256": hashlib.sha256(workboard_bytes).hexdigest(),
             "semanticChecksum": workboard.get("semanticChecksum"),
             "featureVectorSchema": workboard.get("featureVectorSchema"),
             "taskCount": len(tasks),
@@ -207,25 +231,49 @@ def main() -> int:
             missing_filled[feature["name"]] = missing
         std = raw.std()
         columns.append(((raw - raw.mean()) / std) * feature["sign"])  # higher is better on every column
-    signed = np.stack(columns, axis=1)
+    signed = np.stack(columns, axis=1).astype(np.float32)
     query = signed.max(axis=0)  # ideal candidate profile
 
     rank = min(args.rank, len(usable), len(tasks))
     ordinals = np.arange(len(tasks), dtype=np.int64)
     selected, receipt = shortlist_candidate_ordinals(
-        signed.astype(np.float32),
+        signed,
         ordinals,
-        query.astype(np.float32),
+        query,
         rank=rank,
-        target_count=len(tasks),
+        target_count=args.shortlist_size or len(tasks),
         seed=args.seed,
         device=None if args.device == "auto" else args.device,
     )
 
-    ordered = [
-        {"id": str(tasks[ordinal].get("id")), "rank": position + 1}
-        for position, ordinal in enumerate(selected)
-    ]
+    rescore_fields = {}
+    if args.shortlist_size is None:
+        ordered = [
+            {"id": task_ids[ordinal], "rank": position + 1}
+            for position, ordinal in enumerate(selected)
+        ]
+    else:
+        # The exact scorer breaks ties by its input row order. Feed nominees in
+        # frozen workboard order so SVD ordering cannot decide exact-score ties.
+        shortlist_rows = sorted(selected)
+        shortlist_ids = [task_ids[ordinal] for ordinal in shortlist_rows]
+        exact = exact_semantic_search(
+            signed[shortlist_rows], query[np.newaxis, :], shortlist_ids,
+            metric="cosine", top_k=len(shortlist_rows), device="cpu", seed=args.seed,
+        )
+        ordered = [
+            {"id": hit.canonical_id, "rank": hit.rank, "score": hit.score}
+            for hit in exact.hits[0]
+        ]
+        rescore_fields = {
+            "exactRescore": {
+                "device": exact.device,
+                "metric": exact.metric,
+                "candidateCount": exact.corpus_rows,
+                "tieBreak": "WORKBOARD_ROW_ASC",
+                "resultChecksum": exact.result_checksum,
+            }
+        }
     report = {
         **base,
         "status": "OK",
@@ -237,6 +285,7 @@ def main() -> int:
         "compute": {**base["compute"], "usedDevice": receipt.device},
         "receipt": receipt.to_dict(),
         "tasks": ordered,
+        **rescore_fields,
     }
     report["outputChecksum"] = "sha256:" + hashlib.sha256(
         json.dumps(ordered, sort_keys=True, separators=(",", ":")).encode("utf-8")

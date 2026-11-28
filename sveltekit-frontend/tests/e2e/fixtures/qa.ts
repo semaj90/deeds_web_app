@@ -48,9 +48,16 @@ export const test = base.extend<{ qaEvents: QaEvent[] }>({
       });
     });
 
+    // The browser also logs each failed resource to the console. Remember which status and route
+    // such a message refers to, so it can be dropped when the response event captured the same one.
+    const resourceEchoes = new Map<QaEvent, string>();
+
     page.on('console', (message) => {
       if (message.type() !== 'error') return;
-      events.push({ ...common, source: 'console', message: redact(message.text()) });
+      const event: QaEvent = { ...common, source: 'console', message: redact(message.text()) };
+      const echo = /^Failed to load resource: .* status of (5\d\d)\b/.exec(message.text());
+      if (echo) resourceEchoes.set(event, `${echo[1]} ${pathOf(message.location().url)}`);
+      events.push(event);
     });
 
     page.on('requestfailed', (request) => {
@@ -69,10 +76,13 @@ export const test = base.extend<{ qaEvents: QaEvent[] }>({
 
     await use(events);
 
+    const captured = new Set(events.filter((e) => e.source === 'http').map((e) => `${e.status} ${e.route}`));
+    const reported = events.filter((e) => !captured.has(resourceEchoes.get(e) ?? ''));
+
     // Write a file and attach its path: the Playwright JSON report keeps only paths, not
     // in-memory bodies, so an attachment created from a body is unreadable by the aggregator.
     const file = testInfo.outputPath('qa-browser-events.json');
-    writeFileSync(file, JSON.stringify(events, null, 2), 'utf8');
+    writeFileSync(file, JSON.stringify(reported, null, 2), 'utf8');
     await testInfo.attach('qa-browser-events.json', { path: file, contentType: 'application/json' });
   }, { auto: true }],
 });

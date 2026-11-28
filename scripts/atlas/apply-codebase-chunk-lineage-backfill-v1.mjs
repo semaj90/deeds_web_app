@@ -27,7 +27,12 @@ if (limit !== null && (!Number.isInteger(limit) || limit < 1 || limit > 5000)) t
 if (apply && limit === null) throw new Error('BACKFILL_REQUIRES_EXPLICIT_LIMIT');
 if (apply && !confirmed) throw new Error('BACKFILL_CONFIRMATION_REQUIRED');
 
-const reportPath = path.join(root, 'docs/reports/codebase-chunk-lineage-backfill-v1.json');
+const reportArg = process.argv.find((arg) => arg.startsWith('--report='));
+const reportPath = path.resolve(root, reportArg?.slice('--report='.length)
+  ?? 'docs/reports/codebase-chunk-lineage-backfill-v1.json');
+if (reportArg && !reportPath.startsWith(path.join(root, '.tmp') + path.sep)) {
+  throw new Error('EXPLICIT_REPORT_PATH_MUST_BE_UNDER_REPOSITORY_TMP');
+}
 const pool = new pg.Pool({
   connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)),
   max: 1,

@@ -4,11 +4,15 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { isAbsolute, relative, resolve, sep } from 'node:path';
 
 const ROOT = resolve(import.meta.dirname, '../..');
-const ADMISSION_PATH = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
+const admissionArgument = process.argv.find((value) => value.startsWith('--admission='))?.slice('--admission='.length);
+const ADMISSION_PATH = resolve(ROOT, admissionArgument ?? 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const planArgument = process.argv.find((value) => value.startsWith('--plan='))?.slice('--plan='.length);
 const PLAN_PATH = resolve(ROOT, planArgument ?? 'docs/reports/graphify-source-selection-plan-v1.json');
 const reportArgument = process.argv.find((value) => value.startsWith('--report='))?.slice('--report='.length);
 const REPORT_PATH = resolve(ROOT, reportArgument ?? 'docs/reports/graphify-snapshot-consumer-preflight-v1.json');
+if (admissionArgument && !reportArgument) {
+  throw new Error('EXPLICIT_ADMISSION_REQUIRES_SCRATCH_REPORT');
+}
 for (const [argumentName, pathValue] of [['report', reportArgument], ['plan', planArgument]] as const) {
   if (!pathValue) continue;
   const scratchRoot = resolve(ROOT, '.tmp');
@@ -138,6 +142,7 @@ async function main() {
     proofLevel: blockers.length === 0 ? 'BOUNDED_LIVE_PROVEN' : 'PARTIAL_PROVEN',
     readOnly: true,
     sourceKind,
+    admissionReceiptPath: relative(ROOT, ADMISSION_PATH).replaceAll('\\', '/'),
     workspaceRevision: admission.workspaceRevision ?? null,
     snapshotRevision: admission.snapshotRevision ?? null,
     materializedRoot: materializedRoot || null,

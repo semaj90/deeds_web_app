@@ -18,10 +18,13 @@ export function resolveOpenSpecWorkboardTaskRefV1(taskKey, {
   }
   const bytes = readFileSync(workboardPath);
   const workboard = JSON.parse(bytes.toString('utf8'));
-  if (workboard?.schema !== 'atlas.openspec.workboard.v1' || !Array.isArray(workboard.taskInventory)) {
+  const taskInventory = workboard?.schema === 'atlas.openspec.workboard.v1' ? workboard.taskInventory
+    : workboard?.schema === 'atlas.openspec.workboard-task-snapshot.v1' ? workboard.tasks
+    : null;
+  if (!Array.isArray(taskInventory)) {
     throw new Error('WORKBOARD_SNAPSHOT_SCHEMA_INVALID');
   }
-  const matches = workboard.taskInventory.filter((task) =>
+  const matches = taskInventory.filter((task) =>
     task.taskKey === taskKey || task.stableKey === taskKey || task.logicalTaskKey === taskKey);
   if (matches.length !== 1) throw new Error(matches.length ? 'WORKBOARD_TASK_KEY_AMBIGUOUS' : 'WORKBOARD_TASK_KEY_NOT_FOUND');
   const task = matches[0];

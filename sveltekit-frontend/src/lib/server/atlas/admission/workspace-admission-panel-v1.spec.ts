@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
-import { buildWorkspaceAdmissionPanelV1, deriveCurrentnessV1, type AdmissionPanelInputs } from './workspace-admission-panel-v1.js';
+import { buildWorkspaceAdmissionPanelV1, deriveCurrentnessV1, isVerifiedScratchReadbackV1, type AdmissionPanelInputs } from './workspace-admission-panel-v1.js';
 
 const okReceipt = { ok: true, value: null, error: null };
 const base: AdmissionPanelInputs = {
@@ -99,5 +99,46 @@ describe('independent live currentness', () => {
     expect(deriveCurrentnessV1(undefined, ADMITTED).current).toBeNull();
     expect(deriveCurrentnessV1({ ...LIVE_OK, proven: false }, ADMITTED).current).toBeNull();
     expect(deriveCurrentnessV1(LIVE_OK, null).current).toBeNull();
+  });
+});
+
+describe('verified scratch workspace readback', () => {
+  const makeSummary = (overrides: Record<string, unknown> = {}) => ({
+    admitted: false,
+    databaseWrites: 0,
+    captureAttempts: 2,
+    transientDriftObserved: true,
+    snapshotRevision: `sha256:${'a'.repeat(64)}`,
+    readback: {
+      status: 'SNAPSHOT_BYTES_READBACK_PROVEN',
+      violations: [],
+      sourceCount: 10,
+      exactMatches: 10,
+    },
+    ...overrides,
+  });
+
+  it('accepts a retry after transient drift when the final frame reads back exactly', () => {
+    expect(isVerifiedScratchReadbackV1(makeSummary())).toBe(true);
+  });
+
+  it('rejects incomplete byte readback even when capture metadata is valid', () => {
+    expect(isVerifiedScratchReadbackV1(makeSummary({
+      readback: {
+        status: 'SNAPSHOT_BYTES_READBACK_PROVEN',
+        violations: [],
+        sourceCount: 10,
+        exactMatches: 9,
+      },
+    }))).toBe(false);
+  });
+
+  it('rejects admitted or mutating snapshots as a scratch readback', () => {
+    expect(isVerifiedScratchReadbackV1(makeSummary({ admitted: true }))).toBe(false);
+    expect(isVerifiedScratchReadbackV1(makeSummary({ databaseWrites: 1 }))).toBe(false);
+  });
+
+  it('rejects out-of-contract capture retry counts', () => {
+    expect(isVerifiedScratchReadbackV1(makeSummary({ captureAttempts: 4 }))).toBe(false);
   });
 });

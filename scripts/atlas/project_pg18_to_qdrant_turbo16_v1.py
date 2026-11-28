@@ -17,6 +17,7 @@ import pathlib
 import sys
 import time
 import urllib.parse
+import urllib.request
 import uuid
 from typing import Any
 
@@ -56,33 +57,73 @@ def _make_client(qdrant_url: str, grpc_port: int, prefer_grpc: bool, timeout: in
     )
 
 
-def ensure_turbo16_collection(client: QdrantClient, collection: str) -> None:
+def ensure_turbo_collection(
+    client: QdrantClient,
+    collection: str,
+    datatype: str = "turbo16",
+    qdrant_url: str = "http://127.0.0.1:6333",
+) -> None:
     if client.collection_exists(collection):
         return
     spec = build_turboquant_code_bm25_collection_spec_v1(
         collection_name=collection,
         vector_size=768,
-        datatype="turbo16",
+        datatype=datatype,
         vector_name="content",
     )
-    vectors_config = {
-        name: models.VectorParams(
-            size=768,
-            distance=models.Distance.COSINE,
-            datatype=models.Datatype.TURBO16,
+    if datatype == "turbo8":
+        # qdrant-client 1.14.3 lacks Datatype.TURBO8 enum; create via Qdrant v1.20.2 HTTP REST.
+        body = json.dumps(
+            {
+                "vectors": {
+                    name: {"size": 768, "distance": "Cosine", "datatype": "turbo8"}
+                    for name in ("content", "signature", "error")
+                }
+            }
+        ).encode("utf-8")
+        req = urllib.request.Request(
+            f"{qdrant_url.rstrip('/')}/collections/{collection}",
+            data=body,
+            headers={"Content-Type": "application/json"},
+            method="PUT",
         )
-        for name in ("content", "signature", "error")
-    }
-    client.create_collection(collection_name=collection, vectors_config=vectors_config)
-    client.create_payload_index(
-        collection_name=collection,
-        field_name="code_text",
-        field_schema=models.TextIndexParams(
-            type=models.TextIndexType.TEXT,
-            tokenizer=models.TokenizerType.CODE,
-            lowercase=True,
-        ),
-    )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            resp.read()
+    else:
+        vectors_config = {
+            name: models.VectorParams(
+                size=768,
+                distance=models.Distance.COSINE,
+                datatype=models.Datatype.TURBO16,
+            )
+            for name in ("content", "signature", "error")
+        }
+        client.create_collection(collection_name=collection, vectors_config=vectors_config)
+    if not hasattr(models.TokenizerType, "CODE"):
+        idx_body = json.dumps(
+            {
+                "field_name": "code_text",
+                "field_schema": {"type": "text", "tokenizer": "code", "lowercase": True},
+            }
+        ).encode("utf-8")
+        idx_req = urllib.request.Request(
+            f"{qdrant_url.rstrip('/')}/collections/{collection}/index",
+            data=idx_body,
+            headers={"Content-Type": "application/json"},
+            method="PUT",
+        )
+        with urllib.request.urlopen(idx_req, timeout=30) as resp:
+            resp.read()
+    else:
+        client.create_payload_index(
+            collection_name=collection,
+            field_name="code_text",
+            field_schema=models.TextIndexParams(
+                type=models.TextIndexType.TEXT,
+                tokenizer=models.TokenizerType.CODE,
+                lowercase=True,
+            ),
+        )
     for kw in ("workspace_revision", "domain_id", "language"):
         client.create_payload_index(
             collection_name=collection,
@@ -121,6 +162,7 @@ def _save_checkpoint(path: pathlib.Path, collection: str, last_id: str, total_pr
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--collection", default="codebase_chunks_768_turbo16")
+    parser.add_argument("--datatype", choices=("turbo16", "turbo8"), default="turbo16")
     parser.add_argument("--qdrant-url", default="http://127.0.0.1:6333")
     parser.add_argument("--grpc-port", type=int, default=6334)
     parser.add_argument("--batch-size", type=int, default=128)
@@ -131,10 +173,13 @@ def main() -> int:
     args = parser.parse_args()
 
     dsn = _load_dsn()
-    with psycopg.connect(dsn, options="-c default_transaction_read_only=on") as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT COUNT(*) FROM codebase_chunk_index WHERE content_embedding_768 IS NOT NULL")
-            total_eligible = int(cur.fetchone()[0])
+    if args.limit > 0:
+        total_eligible = args.limit
+    else:
+        with psycopg.connect(dsn, options="-c default_transaction_read_only=on") as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*) FROM codebase_chunk_index WHERE content_embedding_768 IS NOT NULL")
+                total_eligible = int(cur.fetchone()[0])
 
     ckpt_path = pathlib.Path(args.checkpoint)
     last_id = "00000000-0000-0000-0000-000000000000"
@@ -166,7 +211,7 @@ def main() -> int:
         return 0
 
     client = _make_client(args.qdrant_url, args.grpc_port, prefer_grpc=True, timeout=120)
-    ensure_turbo16_collection(client, args.collection)
+    ensure_turbo_collection(client, args.collection, datatype=args.datatype, qdrant_url=args.qdrant_url)
 
     t0 = time.perf_counter()
     projected = 0

@@ -14,6 +14,11 @@ from .strict_checker import check_episode
 from .advisory_ranker import AdvisoryRanker, to_feature_matrix, train_advisory_step
 from .episode_runner import run_episode_group_rollout
 from .ace_compiler import compile_ace_packet_from_proposal
+from .task_prefill_ace_qlora_packet_v1 import (
+    build_task_prefill_ace_qlora_packet_v1,
+    make_human_reviewed_qlora_sample_v1,
+    verify_task_prefill_ace_qlora_packet_v1,
+)
 
 __all__ = [
     "CandidateFeature",
@@ -28,4 +33,7 @@ __all__ = [
     "train_advisory_step",
     "run_episode_group_rollout",
     "compile_ace_packet_from_proposal",
+    "build_task_prefill_ace_qlora_packet_v1",
+    "make_human_reviewed_qlora_sample_v1",
+    "verify_task_prefill_ace_qlora_packet_v1",
 ]

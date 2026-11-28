@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Human-run wrapper: unload :8090 -> run ONE repo job -> ALWAYS start :8090 again.
+  Human-run wrapper: unload :8090 -> run ONE repo job -> ALWAYS restore the model that was running.
 .DESCRIPTION
   Delegates every service mutation to the canonical typed controller
   scripts/atlas/llama-server-control.ps1 (scoped to --port 8090, idle-slot check, single
@@ -9,7 +9,8 @@
     1. -Action unload -ConfirmControl   (refuses if slots busy/unknown or ownership ambiguous)
     2. verify measured free VRAM >= -MinFreeMiB from the controller receipt
     3. run the job (.ps1/.mjs/.py under this repo)
-    4. finally: -Action start -Profile ornith-1.5-vlm -ConfirmControl (only if step 1 stopped it)
+    4. finally: -Action start with the profile step 1 observed (only if step 1 stopped it).
+       -RestoreProfile overrides it. Both steps show a progress bar; the load percentage is an estimate.
   Receipt: .tmp/atlas/gpu-vram-window-receipt-v1.json. Human/VS Code entry point only; do not expose via MCP.
 #>
 [CmdletBinding()]
@@ -17,7 +18,7 @@ param(
   [Parameter(Mandatory = $true)][string]$JobScript,
   [string[]]$JobArgs = @(),
   [int]$MinFreeMiB = 1536,
-  [ValidateSet('ornith-1.5', 'ornith-1.5-vlm')][string]$RestoreProfile = 'ornith-1.5-vlm'
+  [ValidateSet('gemma4-legal-iq4xs', 'gemma4-legal-iq4xs-vlm', 'ornith-1.5', 'ornith-1.5-vlm')][string]$RestoreProfile
 )
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -27,7 +28,7 @@ if (-not $jobPath.StartsWith($repo, [StringComparison]::OrdinalIgnoreCase)) { th
 if ($jobPath -notmatch '\.(ps1|mjs|py)$') { throw 'Job must be .ps1, .mjs or .py.' }
 
 function Invoke-Control([string[]]$ControlArgs) {
-  $json = (& pwsh -NoProfile -File $control @ControlArgs | Select-Object -Last 1)
+  $json = (& pwsh -NoProfile -File $control @ControlArgs -ShowProgress | Select-Object -Last 1)
   $r = $json | ConvertFrom-Json
   return $r
 }
@@ -35,7 +36,7 @@ function Invoke-Control([string[]]$ControlArgs) {
 $receipt = [ordered]@{
   schema = 'atlas.gpu-vram-window.v1'; startedAt = (Get-Date).ToString('o'); job = $JobScript
   unloadStatus = $null; unloadMutated = $false; freeMiBAfterUnload = $null
-  jobExit = $null; restoreStatus = $null; error = $null
+  jobExit = $null; restoreProfile = $null; restoreStatus = $null; error = $null
 }
 $mutated = $false
 try {
@@ -43,6 +44,7 @@ try {
   $receipt.unloadStatus = $u.status
   $mutated = [bool]$u.serviceMutationPerformed
   $receipt.unloadMutated = $mutated
+  $receipt.restoreProfile = if ($RestoreProfile) { $RestoreProfile } else { $u.restoreProfile }
   if ($u.status -ne 'STOPPED') { throw "unload refused or failed: $($u.error)" }
   $receipt.freeMiBAfterUnload = ($u.after.gpus | Select-Object -First 1).freeMiB
   if ($null -eq $receipt.freeMiBAfterUnload -or $receipt.freeMiBAfterUnload -lt $MinFreeMiB) {
@@ -58,10 +60,10 @@ try {
   $receipt.error = $_.Exception.Message
 } finally {
   if ($mutated) {
-    $s = Invoke-Control @('-Action', 'start', '-Profile', $RestoreProfile, '-ConfirmControl')
+    $s = Invoke-Control @('-Action', 'start', '-Profile', $receipt.restoreProfile, '-ConfirmControl')
     $receipt.restoreStatus = $s.status
     if ($s.status -ne 'RUNNING' -and $s.status -ne 'ALREADY_RUNNING') {
-      Write-Warning ":8090 was NOT restored ($($s.error)). Run the task 'TurboQuant: Start (vision, CPU projector, :8090)'."
+      Write-Warning ":8090 was NOT restored ($($s.error)). Run: pwsh -NoProfile -File scripts/gpu/free-gpu-vram.ps1 -Restore"
     } else { Write-Host "RESTORED: :8090 $($s.status)." }
   }
   $receipt.finishedAt = (Get-Date).ToString('o')

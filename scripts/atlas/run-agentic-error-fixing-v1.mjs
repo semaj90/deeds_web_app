@@ -15,6 +15,8 @@
  *   node scripts/atlas/run-agentic-error-fixing-v1.mjs --file report.txt --validate
  *   node scripts/atlas/run-agentic-error-fixing-v1.mjs --file report.txt --synthesize
  *   node scripts/atlas/run-agentic-error-fixing-v1.mjs --file report.txt --workboard-task-key <exact-open-task-key>
+ *   Use --workboard-snapshot <path> to resolve bindings against a compact stdout snapshot.
+ *   For a batch, pass --workboard-task-binding <bindingFingerprint>=<exact-open-task-key> per diagnostic.
  */
 
 import { existsSync, readFileSync, realpathSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -137,8 +139,10 @@ function buildStructuredGraphifyEligibilityPlan(text) {
     .sort()
     .map((gateId) => {
       const diagnostic = `GRAPHIFY_LIFECYCLE_BLOCKER=${gateId}; ${details}`;
+      const bindingFingerprint = sha256(`GRAPHIFY_CURRENT_RUN_ELIGIBILITY|${gateId}`);
       return {
-        fingerprint: sha256(`GRAPHIFY_CURRENT_RUN_ELIGIBILITY|${gateId}`).slice(0, 23),
+        fingerprint: bindingFingerprint.slice(0, 23),
+        bindingFingerprint,
         errorCode: null,
         gateId,
         kind: 'GRAPH_OR_GPU',
@@ -183,11 +187,14 @@ function buildPlan(text) {
     const kind = classify(line);
     const file = extractFile(line);
     const gateId = extractGateId(line);
-    const fingerprint = sha256(`${kind}|${extractCode(line) ?? ''}|${file ?? ''}|${line.replace(/\s+/g, ' ').slice(0, 500)}`).slice(0, 23);
-    if (seen.has(fingerprint)) continue;
-    seen.add(fingerprint);
+    const identityPrefix = `${kind}|${extractCode(line) ?? ''}|${file ?? ''}|`;
+    const normalizedLine = line.replace(/\s+/g, ' ');
+    const bindingFingerprint = sha256(identityPrefix + normalizedLine);
+    if (seen.has(bindingFingerprint)) continue;
+    seen.add(bindingFingerprint);
     candidates.push({
-      fingerprint,
+      fingerprint: sha256(identityPrefix + normalizedLine.slice(0, 500)).slice(0, 23),
+      bindingFingerprint,
       ...(nativeDiagnostic ? { diagnosticFingerprint: nativeDiagnostic.fingerprint } : {}),
       errorCode: extractCode(line),
       gateId,
@@ -278,10 +285,11 @@ function buildReviewedSourceFindingsPlan(text) {
     const findingId = sha256(identity);
     if (seen.has(findingId)) throw new Error('DUPLICATE_REVIEWED_FINDING');
     seen.add(findingId);
-    const fingerprint = sha256(`REVIEWED_SOURCE_FINDING|${identity}`).slice(0, 23);
+    const bindingFingerprint = sha256(`REVIEWED_SOURCE_FINDING|${identity}`);
     return {
       findingId,
-      fingerprint,
+      fingerprint: bindingFingerprint.slice(0, 23),
+      bindingFingerprint,
       errorCode: null,
       gateId: null,
       kind: finding.kind,
@@ -387,15 +395,19 @@ const workboardTaskBindings = args.flatMap((argument, index) => argument === '--
     return { diagnosticFingerprint: raw.slice(0, separator), taskKey: raw.slice(separator + 1) };
   });
 const workboardTaskKey = getArg('--workboard-task-key');
+const workboardSnapshot = getArg('--workboard-snapshot');
+if (args.includes('--workboard-snapshot') && (!workboardSnapshot || workboardSnapshot.startsWith('--'))) {
+  throw new Error('WORKBOARD_SNAPSHOT_ARGUMENT_INVALID');
+}
 if (workboardTaskKey && workboardTaskBindings.length > 0) throw new Error('WORKBOARD_TASK_BINDING_OPTIONS_CONFLICT');
 if (workboardTaskKey) {
   if (candidates.length !== 1) throw new Error('WORKBOARD_TASK_KEY_REQUIRES_SINGLE_DIAGNOSTIC');
-  workboardTaskBindings.push({ diagnosticFingerprint: candidates[0].fingerprint, taskKey: workboardTaskKey });
+  workboardTaskBindings.push({ diagnosticFingerprint: candidates[0].bindingFingerprint, taskKey: workboardTaskKey });
 }
 const workboardTaskRefs = resolveOpenSpecDiagnosticTaskBindingsV1(
   workboardTaskBindings,
-  candidates.map((candidate) => candidate.fingerprint),
-  { currentHead },
+  candidates.map((candidate) => candidate.bindingFingerprint),
+  { currentHead, ...(workboardSnapshot ? { workboardPath: path.resolve(ROOT, workboardSnapshot) } : {}) },
 );
 const validation = validate ? runValidation() : null;
 const modelResolution = offline
@@ -406,7 +418,11 @@ const modelResolution = offline
 const deterministicBody = {
   schema: 'atlas.agentic-error-fixing.v1',
   inputChecksum: sha256(diagnostics),
-  candidates: candidates.map(({ findingId, fingerprint, diagnosticFingerprint, errorCode, gateId, kind, file, sourceRevision, workspaceRevision, evidenceDigest, sourceSpan, evidenceRefs, verificationMethod, verificationRef, owner, diagnostic, proposedAction, recommendedMcpTools, status, mutationAllowed }) => ({ findingId, fingerprint, ...(diagnosticFingerprint ? { diagnosticFingerprint } : {}), errorCode, gateId, kind, file, sourceRevision, workspaceRevision, evidenceDigest, sourceSpan, evidenceRefs, verificationMethod, verificationRef, owner, diagnostic, proposedAction, recommendedMcpTools, ...classifyLanePhaseForCandidate(kind, diagnostic), status, mutationAllowed, ...(workboardTaskRefs.has(fingerprint) ? { workboardTaskRef: workboardTaskRefs.get(fingerprint) } : {}) })),
+  candidates: candidates.map((candidate) => {
+    const taskRef = workboardTaskRefs.get(candidate.bindingFingerprint);
+    return { ...candidate, ...classifyLanePhaseForCandidate(candidate.kind, candidate.diagnostic),
+      ...(taskRef ? { workboardTaskRef: taskRef } : {}) };
+  }),
   validation: validation ? { command: validation.command, exitCode: validation.exitCode, timedOut: validation.timedOut, outputChecksum: validation.outputChecksum } : null,
   modelResolution: {
     status: modelResolution.status,

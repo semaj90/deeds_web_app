@@ -6,7 +6,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from atlas_retrieval_canary_v1 import choose_k, receipt_checksum, receipt_to_rows, validate_receipt
+from atlas_retrieval_canary_v1 import (
+    choose_k,
+    compute_tie_aware_mrr_at_k,
+    receipt_checksum,
+    receipt_to_rows,
+    validate_receipt,
+)
 
 RECEIPT = {
     "queries": 1000, "heldout_self_excluded": True, "corpus_rows": 219998, "errors": 0,
@@ -57,6 +63,11 @@ class TestCanary(unittest.TestCase):
     def test_checksum_is_key_order_independent(self):
         reordered = dict(reversed(list(RECEIPT.items())))
         self.assertEqual(receipt_checksum(RECEIPT), receipt_checksum(reordered))
+
+    def test_compute_tie_aware_mrr_at_k(self):
+        self.assertEqual(compute_tie_aware_mrr_at_k([0.95, 0.80, 0.70], 0.95), 1.0)
+        self.assertAlmostEqual(compute_tie_aware_mrr_at_k([0.80, 0.9499995, 0.70], 0.95, eps=1e-6), 0.5)
+        self.assertEqual(compute_tie_aware_mrr_at_k([0.80, 0.70, 0.60], 0.95), 0.0)
 
 
 if __name__ == "__main__":

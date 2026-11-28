@@ -7,7 +7,11 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const SOURCE_ROOT = resolve(ROOT, 'sveltekit-frontend/src');
-const REPORT = resolve(ROOT, 'docs/reports/rrf-lane-weight-census-v1.json');
+// --output=<path> writes elsewhere (e.g. .tmp/review) so a re-run does not overwrite the tracked report.
+const outputArg = process.argv.find((arg) => arg.startsWith('--output='))?.slice('--output='.length);
+const REPORT = resolve(ROOT, outputArg || 'docs/reports/rrf-lane-weight-census-v1.json');
+// Offline benchmark scoring multipliers: not RRF votes, routing priors or rerank features.
+const benchmarkPattern = /[\\/]atlas[\\/]tournament[\\/]/i;
 const patterns = /RRF_LANE_WEIGHTS|FUSION_WEIGHTS|RRF_WEIGHTS_BY_LANE_KIND|RRF_DEFAULT_WEIGHTS|laneConfig\.weight|weightsOrOptions|laneWeight|rrfK/i;
 const executorPattern = /qdrant|cuvs|cagra|turbovec|turbo_vec/i;
 const fusionPattern = /rrf|fusion|reciprocal/i;
@@ -26,6 +30,7 @@ async function files(directory) {
   return result;
 }
 function classify(file, line) {
+  if (benchmarkPattern.test(file)) return ['EVALUATION_ONLY', 'BENCHMARK_SCORE_WEIGHT'];
   if (executorPattern.test(line) || executorPattern.test(file)) return ['EXECUTOR_NAME_NOT_LANE', 'EXECUTOR_LOCAL_WEIGHT'];
   if (rerankPattern.test(file) || /feature|score/i.test(line) && !fusionPattern.test(line)) return ['RERANK_FEATURE_ONLY', 'RERANK_FEATURE'];
   if (routingPattern.test(file) || /route|prior|hotness/i.test(line)) return ['ROUTING_WEIGHT', 'ROUTING_PRIOR'];
@@ -33,6 +38,7 @@ function classify(file, line) {
   return ['UNCLASSIFIED', 'UNKNOWN'];
 }
 function applicationStage(file, line) {
+  if (benchmarkPattern.test(file)) return 'OFFLINE_BENCHMARK';
   if (rerankPattern.test(file)) return 'POST_FUSION_RERANK';
   if (routingPattern.test(file)) return 'LANE_ROUTING';
   if (fusionPattern.test(file) || /rrf/i.test(line)) return 'RRF_FUSION';

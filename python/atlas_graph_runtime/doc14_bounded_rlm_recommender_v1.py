@@ -155,7 +155,77 @@ def _validate_context_manifest_v2(manifest: Mapping[str, Any]) -> dict[str, Any]
     checksum = _canonical_sha256_v1(payload)
     if manifest.get("identityChecksum") != checksum:
         raise ValueError("ACE_CONTEXT_MANIFEST_CHECKSUM_MISMATCH")
-    return {"v1": dict(v1), "identityInput": dict(identity), "identityChecksum": checksum}
+    return {"schema": "atlas.context-manifest.v2", "v1": dict(v1), "identityInput": dict(identity), "identityChecksum": checksum}
+
+
+def validate_ace_context_readback_rows_v1(
+    *,
+    records: Sequence[dict[str, Any]],
+    context_manifest: Mapping[str, Any],
+    max_chunks: int | None = None,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """Validate server-readback rows against the exact selected ContextManifest nodes.
+
+    This checks the owner-supplied admission markers, evidence allowlist, chunk
+    digest, and source-revision-set binding. It does not fetch or authorize data;
+    callers must obtain ``records`` through their scoped readback owner first.
+    """
+    manifest = _validate_context_manifest_v2(context_manifest)
+    v1 = manifest["v1"]
+    identity = manifest["identityInput"]
+    node_allowlist = set(v1["selectedNodeKeys"])
+    evidence_allowlist = set(v1["evidenceRefs"])
+    if max_chunks is not None and len(node_allowlist) > max_chunks:
+        raise ValueError("ACE_CONTEXT_CHUNK_LIMIT_EXCEEDED")
+
+    by_node: dict[str, dict[str, Any]] = {}
+    chunk_ids: set[str] = set()
+    for row in records:
+        if not isinstance(row, dict):
+            raise ValueError("ACE_CONTEXT_READBACK_ROW_INVALID")
+        node_key = row.get("manifestNodeKey")
+        if not isinstance(node_key, str) or node_key not in node_allowlist:
+            raise ValueError("ACE_CONTEXT_ROW_OUTSIDE_SELECTION")
+        if node_key in by_node:
+            raise ValueError(f"ACE_CONTEXT_DUPLICATE_NODE_BINDING:{node_key}")
+        chunk_id = row.get("chunkId")
+        if not isinstance(chunk_id, str) or not chunk_id or chunk_id in chunk_ids:
+            raise ValueError(f"ACE_CONTEXT_CHUNK_ID_INVALID_OR_DUPLICATE:{node_key}")
+        chunk_ids.add(chunk_id)
+        source_ref = row.get("sourceRef")
+        if not isinstance(source_ref, str) or not source_ref.strip():
+            raise ValueError(f"ACE_CONTEXT_SOURCE_REF_REQUIRED:{node_key}")
+        row_evidence = row.get("evidenceRefs")
+        if not isinstance(row_evidence, list) or not row_evidence:
+            raise ValueError(f"ACE_CONTEXT_EVIDENCE_BINDING_REQUIRED:{node_key}")
+        if any(not isinstance(ref, str) or ref not in evidence_allowlist for ref in row_evidence):
+            raise ValueError(f"ACE_CONTEXT_EVIDENCE_OUTSIDE_MANIFEST:{node_key}")
+        if row.get("pgReadbackStatus") != "PROVEN":
+            raise ValueError(f"ACE_CONTEXT_ROW_NOT_VERIFIED:{node_key}")
+        if (row.get("lineageRevisionStatus") != "PROVEN"
+                or row.get("lineageMembershipStatus") not in ("EXACT_SINGLE_MEMBER", "EXACT_MULTI_MEMBER")):
+            raise ValueError(f"ACE_CONTEXT_ROW_LINEAGE_UNPROVEN:{node_key}")
+        text = row.get("text")
+        if not isinstance(text, str) or hashlib.sha256(text.encode("utf-8")).hexdigest() != row.get("chunkSha256"):
+            raise ValueError(f"ACE_CONTEXT_ROW_CHECKSUM_MISMATCH:{node_key}")
+        source_revision = row.get("sourceRevision")
+        if not isinstance(source_revision, str) or not source_revision:
+            raise ValueError("ACE_CONTEXT_SOURCE_REVISION_REQUIRED")
+        by_node[node_key] = dict(row)
+
+    if set(by_node) != node_allowlist:
+        raise ValueError("ACE_CONTEXT_SELECTED_NODE_BINDING_INCOMPLETE")
+    observed_refs = {ref for row in by_node.values() for ref in row["evidenceRefs"]}
+    if observed_refs != evidence_allowlist:
+        raise ValueError("ACE_CONTEXT_EVIDENCE_SET_MISMATCH")
+    source_revisions = sorted({str(row["sourceRevision"]) for row in by_node.values()})
+    expected_source_revision_set = _canonical_sha256_v1({
+        "schema": "atlas.ace-context-source-revision-set.v1",
+        "revisions": source_revisions,
+    })
+    if identity["evidenceRevisions"]["sourceRevision"] != expected_source_revision_set:
+        raise ValueError("ACE_CONTEXT_SOURCE_REVISION_SET_MISMATCH")
+    return manifest, [by_node[node] for node in v1["selectedNodeKeys"]]
 
 
 def search_admitted_chunks(
@@ -169,7 +239,9 @@ def search_admitted_chunks(
     q_tokens = {t.lower() for t in _TOKEN_RE.findall(query)}
     scored: list[tuple[int, dict[str, Any]]] = []
     for rec in records:
-        if rec.get("pgReadbackStatus") != "PROVEN" or rec.get("admissionStatus") != "INDEX_ELIGIBLE":
+        if (rec.get("pgReadbackStatus") != "PROVEN"
+                or rec.get("lineageRevisionStatus") != "PROVEN"
+                or rec.get("lineageMembershipStatus") not in ("EXACT_SINGLE_MEMBER", "EXACT_MULTI_MEMBER")):
             continue
         haystack = f"{rec.get('sourceRef', '')} {rec.get('text', '')}".lower()
         hits = sum(1 for t in q_tokens if t in haystack)
@@ -602,8 +674,11 @@ def run_bounded_dspy_recommendation_with_ace_manifest_v1(
             raise ValueError(f"ACE_CONTEXT_EVIDENCE_BINDING_REQUIRED:{node_key}")
         if any(not isinstance(ref, str) or ref not in evidence_allowlist for ref in row_evidence):
             raise ValueError(f"ACE_CONTEXT_EVIDENCE_OUTSIDE_MANIFEST:{node_key}")
-        if row.get("pgReadbackStatus") != "PROVEN" or row.get("admissionStatus") != "INDEX_ELIGIBLE":
-            raise ValueError(f"ACE_CONTEXT_ROW_NOT_ADMITTED:{node_key}")
+        if row.get("pgReadbackStatus") != "PROVEN":
+            raise ValueError(f"ACE_CONTEXT_ROW_NOT_VERIFIED:{node_key}")
+        if (row.get("lineageRevisionStatus") != "PROVEN"
+                or row.get("lineageMembershipStatus") not in ("EXACT_SINGLE_MEMBER", "EXACT_MULTI_MEMBER")):
+            raise ValueError(f"ACE_CONTEXT_ROW_LINEAGE_UNPROVEN:{node_key}")
         text = row.get("text")
         if not isinstance(text, str) or hashlib.sha256(text.encode("utf-8")).hexdigest() != row.get("chunkSha256"):
             raise ValueError(f"ACE_CONTEXT_ROW_CHECKSUM_MISMATCH:{node_key}")

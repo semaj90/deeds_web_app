@@ -24,7 +24,7 @@ import { z } from 'zod';
 import { randomUUID } from 'crypto';
 import { warmUpCache, warmUpDomain, type WarmUpReport } from '$lib/server/cache/warm-up.js';
 import { couchdb } from '$lib/server/services/couchdb-client.js';
-import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
+import { observeServedChatModelIdV1 } from '$lib/server/ai/llama-server-model-resolver.js';
 
 const COUCH_DB = 'evidence_analysis';
 
@@ -80,16 +80,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	};
 	jobs.set(jobId, job);
 
+	const servedModel = (await observeServedChatModelIdV1()) ?? 'unidentified';
+
 	// Start analysis in background
 	const analysisPromise = opts.domain === 'all'
 		? warmUpCache({
 				batchSize: opts.batchSize,
-				model: SERVER_CHAT_MODEL,
+				model: servedModel,
 				delayMs: 1000,
 		  })
 		: warmUpDomain(opts.domain, {
 				batchSize: opts.batchSize,
-				model: SERVER_CHAT_MODEL,
+				model: servedModel,
 				delayMs: 1000,
 		  });
 
@@ -121,7 +123,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				await couchdb.put(COUCH_DB, docId, {
 					jobId,
 					domain: opts.domain,
-					model: SERVER_CHAT_MODEL,
+					model: servedModel,
 					batchSize: opts.batchSize,
 					totalQueries: report.totalQueries,
 					successful: report.successful,
@@ -146,12 +148,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	return json({
 		jobId,
 		status: 'started',
-		message: `Evidence analysis started (domain: ${opts.domain}, queries: ${opts.domain === 'all' ? 120 : 20}, model: ${SERVER_CHAT_MODEL}). Poll GET /api/codebase-index/evidence-analyze?jobId=${jobId}`,
+		message: `Evidence analysis started (domain: ${opts.domain}, queries: ${opts.domain === 'all' ? 120 : 20}, model: ${servedModel}). Poll GET /api/codebase-index/evidence-analyze?jobId=${jobId}`,
 		config: {
 			domain: opts.domain,
 			totalQueries: opts.domain === 'all' ? 120 : 20,
 			batchSize: opts.batchSize,
-			model: SERVER_CHAT_MODEL,
+			model: servedModel,
 		},
 	});
 };

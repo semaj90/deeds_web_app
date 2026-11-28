@@ -1,7 +1,7 @@
 {
   "schema": "atlas.oaklib-ontology-tuple-to-pytorch-loading-receipt.v1",
   "generatedAt": "2026-10-24T17:12:00Z",
-  "durationMs": 318.28,
+  "durationMs": 2308.89,
   "canonicalAuthority": false,
   "writesPerformed": false,
   "pipelineStatus": {

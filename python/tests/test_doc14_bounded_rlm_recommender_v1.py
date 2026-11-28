@@ -29,7 +29,8 @@ class Doc14BoundedRlmRecommenderTests(unittest.TestCase):
             "chunkSha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
             "text": text,
             "pgReadbackStatus": "PROVEN",
-            "admissionStatus": "INDEX_ELIGIBLE",
+            "lineageMembershipStatus": "EXACT_SINGLE_MEMBER",
+            "lineageRevisionStatus": "PROVEN",
         }
 
     def test_bounded_rlm_returns_verified_utf8_citations(self) -> None:
@@ -344,16 +345,15 @@ class Doc14BoundedRlmRecommenderTests(unittest.TestCase):
                     lm_resolver=lambda: self.fail("rejected rows must not reach the model"),
                 )
 
-    def test_runs_against_live_200_proven_chunks_jsonl(self) -> None:
+    def test_legacy_chunk_jsonl_without_lineage_status_is_not_admitted(self) -> None:
         jsonl_path = REPO_ROOT / "docs" / "reports" / "doc14-admitted-chunks.jsonl"
         records = [json.loads(l) for l in jsonl_path.read_text(encoding="utf-8").splitlines() if l.strip()]
         out = run_bounded_rlm_recommendation_v1(
             question="Where is ContextAssembler or search-runtime implemented?",
             records=records,
         )
-        self.assertEqual(out["status"], "VERIFIED_CITATIONS_READY")
-        self.assertGreaterEqual(len(out["citations"]), 1)
-        self.assertTrue(out["receiptChecksum"].startswith("sha256:"))
+        self.assertEqual(out["status"], "NO_ADMITTED_EVIDENCE")
+        self.assertEqual(out["citations"], [])
 
 
 if __name__ == "__main__":

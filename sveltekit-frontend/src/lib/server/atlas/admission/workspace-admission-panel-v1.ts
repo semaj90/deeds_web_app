@@ -424,13 +424,35 @@ export async function readLatestLiveReadbackV1(root: string | null): Promise<Non
     const latest = dirs[dirs.length - 1];
     if (!latest) return { ok: false, snapshotRevision: null, proven: false, error: 'NO_LIVE_CAPTURE' };
     const summary = JSON.parse(await fs.readFile(path.join(base, latest, 'summary.json'), 'utf8'));
-    const readback = summary?.readback ?? {};
-    const proven = readback.status === 'SNAPSHOT_BYTES_READBACK_PROVEN'
-      && Array.isArray(readback.violations) && readback.violations.length === 0
-      && readback.exactMatches === readback.sourceCount
-      && summary.transientDriftObserved === false;
+    const proven = isVerifiedScratchReadbackV1(summary);
     return { ok: true, snapshotRevision: typeof summary.snapshotRevision === 'string' ? summary.snapshotRevision : null, proven, error: null };
   } catch (error) {
     return { ok: false, snapshotRevision: null, proven: false, error: error instanceof Error ? error.message : String(error) };
   }
+}
+
+/**
+ * A recovered capture retry is valid only for its final sealed frame. The
+ * transientDriftObserved bit records that an earlier attempt was discarded;
+ * it does not invalidate a later zero-violation exact byte readback. Currentness
+ * is still decided separately by comparing snapshotRevision to the admitted
+ * snapshot revision.
+ */
+export function isVerifiedScratchReadbackV1(summary: unknown): boolean {
+  if (!summary || typeof summary !== 'object') return false;
+  const value = summary as Record<string, unknown>;
+  const readback = value.readback && typeof value.readback === 'object'
+    ? value.readback as Record<string, unknown>
+    : null;
+  const attempts = value.captureAttempts;
+  const sourceCount = readback?.sourceCount;
+  return value.admitted === false
+    && value.databaseWrites === 0
+    && Number.isInteger(attempts) && Number(attempts) >= 1 && Number(attempts) <= 3
+    && typeof value.transientDriftObserved === 'boolean'
+    && typeof value.snapshotRevision === 'string' && /^sha256:[a-f0-9]{64}$/.test(value.snapshotRevision)
+    && readback?.status === 'SNAPSHOT_BYTES_READBACK_PROVEN'
+    && Array.isArray(readback.violations) && readback.violations.length === 0
+    && Number.isInteger(sourceCount) && Number(sourceCount) > 0
+    && readback.exactMatches === sourceCount;
 }

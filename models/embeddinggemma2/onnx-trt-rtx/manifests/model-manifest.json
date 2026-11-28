@@ -1,0 +1,26 @@
+{
+  "repoId": "onnx-community/embeddinggemma-2-ONNX",
+  "pinnedRevision": "daa72c51243991dfcaf9f9137d2c573d8f7790c0",
+  "files": {
+    "onnx/model.onnx": {
+      "sizeBytes": 421421,
+      "sha256": "bc47de15f81208a5c99e5ab10f746d5e33b51ea228b7dc0bef9c133a94f1c1c3"
+    },
+    "onnx/model.onnx_data": {
+      "sizeBytes": 1084170240,
+      "sha256": "compute_stream"
+    },
+    "tokenizer.json": {
+      "sizeBytes": 32170510,
+      "sha256": "compute_stream"
+    },
+    "tokenizer_config.json": {
+      "sizeBytes": 1599,
+      "sha256": "17bd5d6e9364ca49a534e1502076593317c298d4a663623091ed45388f004874"
+    },
+    "config.json": {
+      "sizeBytes": 5031,
+      "sha256": "8d011bfe08b5e345bbe0b81e5c6fd02c381920b345b986047bc2a33ce7b90d1d"
+    }
+  }
+}

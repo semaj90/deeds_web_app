@@ -41,4 +41,14 @@ describe('Atlas SearchRuntime graph expansion ownership', () => {
     expect(result.graphExpansionStatus).toBe('BLOCKED_TRUSTED_WORKSPACE_REVISION_MISSING');
     expect(result).not.toHaveProperty('graphExpanded');
   });
+
+  it('passes the server execution context into SearchRuntime when provided', async () => {
+    const signal = new AbortController().signal;
+    const runtimeSearch = vi.fn().mockResolvedValue({ packets: [], metadata: {}, provenance: {} });
+    const adapter = createAtlasSearchAdapter({ runtime: { search: runtimeSearch } as never });
+
+    await adapter.search({ query: 'cancellable retrieval' }, { signal });
+
+    expect(runtimeSearch).toHaveBeenCalledWith(expect.objectContaining({ text: 'cancellable retrieval' }), { signal });
+  });
 });

@@ -15,7 +15,7 @@ import { validateCandidate } from '../lane-contracts.js';
 export interface QdrantDenseRetrieverConfig {
   collection: string;
   vectorName: CodebaseVectorName;
-  embedFn: (text: string) => Promise<DenseEmbedding>;
+  embedFn: (text: string, signal?: AbortSignal) => Promise<DenseEmbedding>;
   expectedDimension?: number;
 }
 
@@ -43,26 +43,24 @@ export function createQdrantDenseRetriever(config: QdrantDenseRetrieverConfig): 
     lane: 'dense' as const,
 
     async retrieve(input: RetrievalInput): Promise<LaneCandidate[]> {
-      const embedding = await config.embedFn(input.query);
+      input.signal?.throwIfAborted();
+      const embedding = await config.embedFn(input.query, input.signal);
+      input.signal?.throwIfAborted();
 
       const dim = config.expectedDimension ?? embedding.dimension;
       assertDenseEmbedding(embedding, dim);
 
       const qdrant = getQdrantManager();
 
-      let rawResponse: unknown;
-      try {
-        rawResponse = await qdrant._denseSearch({
-          query: input.query,
-          queryVector: embedding.values,
-          vectorName: config.vectorName,
-          collection: config.collection,
-          limit: input.limit,
-        });
-      } catch (err) {
-        console.warn(`[qdrant-dense-retriever] ${config.collection} search failed:`, (err as Error).message);
-        return [];
-      }
+      const rawResponse: unknown = await qdrant._denseSearch({
+        query: input.query,
+        queryVector: embedding.values,
+        vectorName: config.vectorName,
+        collection: config.collection,
+        limit: input.limit,
+        timeoutSeconds: 5,
+      });
+      input.signal?.throwIfAborted();
 
       const points = normalizeQdrantPoints(rawResponse);
 

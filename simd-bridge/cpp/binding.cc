@@ -38,7 +38,7 @@ using napi_finalize        = void(*)(napi_env env, void* finalize_data, void* fi
 
 enum : uint8_t { napi_ok = 0, napi_generic_failure = 1 };
 enum : uint8_t { napi_string = 1 };
-enum : uint8_t { napi_float32_array = 0, napi_int32_array = 4 };
+enum : uint8_t { napi_int8_array = 0, napi_uint8_array = 1, napi_int32_array = 5, napi_uint32_array = 6, napi_float32_array = 7 };
 
 #define NAPI_AUTO_LENGTH ((size_t)-1)
 
@@ -70,6 +70,8 @@ napi_status napi_create_object(napi_env, napi_value*);
 #include <vector>
 #include <string>
 #include <cstring>
+#include <algorithm>
+#include <cmath>
 #include <initializer_list>
 
 #include "gpu_error_codes.h"
@@ -77,6 +79,39 @@ napi_status napi_create_object(napi_env, napi_value*);
 #include "graph_search.h"
 #include "tree_ensemble.h"
 #include "manifold_interpolate.h"
+#include "nes_lut_filter.h"
+#if defined(_MSC_VER)
+#include <intrin.h>
+#endif
+
+extern "C" bool nes_lut_match_mask_avx2_tu(
+    const std::uint8_t* lut,
+    std::size_t n,
+    const std::uint8_t* allowed,
+    std::size_t k,
+    std::uint32_t* out);
+
+static bool nes_lut_runtime_supports_avx2() {
+  static const bool supported = []() -> bool {
+#if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86))
+    int info[4] = {0, 0, 0, 0};
+    __cpuid(info, 0);
+    if (info[0] < 7) return false;
+    __cpuid(info, 1);
+    const bool osxsave = (info[2] & (1 << 27)) != 0;
+    const bool avx     = (info[2] & (1 << 28)) != 0;
+    if (!osxsave || !avx) return false;
+    if ((_xgetbv(0) & 0x6) != 0x6) return false;
+    __cpuidex(info, 7, 0);
+    return (info[1] & (1 << 5)) != 0;
+#elif defined(__x86_64__) || defined(__i386__)
+    return __builtin_cpu_supports("avx2");
+#else
+    return false;
+#endif
+  }();
+  return supported;
+}
 
 extern "C" napi_callback atlas_core_napi_page_rank_callback(void);
 
@@ -119,7 +154,7 @@ static ExportBackendClassification classifyExportBackend(
     return {"cpu_fallback", "host_counter_control_only"};
   }
 
-  if (exportNameIn(name, {"graphBFS", "graphBFSExtended", "graphAStar", "graphGreedySearch", "traverseAstLinkedList", "forestPredict", "slerpEmbeddings", "manifoldInterpolate4D"})) {
+  if (exportNameIn(name, {"graphBFS", "graphBFSExtended", "graphAStar", "graphGreedySearch", "traverseAstLinkedList", "forestPredict", "slerpEmbeddings", "manifoldInterpolate4D", "matchNesLutMask", "nesLutSupportsAvx2", "batchCosineTopKMasked"})) {
     return {"cpu_reference", "bounded_graph_search_and_manifold_interpolation"};
   }
 
@@ -871,6 +906,168 @@ static napi_value BatchCosineTopKWrapper(napi_env env, napi_callback_info info) 
   napi_set_named_property(env, result, "indices", indices);
   napi_set_named_property(env, result, "scores", scores);
   napi_set_named_property(env, result, "backend", backend_value);
+  return result;
+}
+
+// ── batchCosineTopKMasked(query, corpus, n, dim, k, activeMask, outIndices?, outScores?) ──
+// Zero-copy bitset-filtered cosine Top-K: evaluates only candidates whose bit is set
+// in activeMask (LSB-first Uint32Array matching matchNesLutMask / PFB1), skipping
+// intermediate gathered Float32Array copies and optionally reusing caller buffers.
+static napi_value BatchCosineTopKMaskedWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 8;
+  napi_value argv[8];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 6) {
+    return throw_type_error(env, "batchCosineTopKMasked(query, corpus, n, dim, k, activeMask, outIndices?, outScores?)");
+  }
+
+  napi_typedarray_type query_type, corpus_type, mask_type;
+  size_t query_len = 0, corpus_len = 0, mask_len = 0;
+  void *query_data = nullptr, *corpus_data = nullptr, *mask_data = nullptr;
+  if (napi_get_typedarray_info(env, argv[0], &query_type, &query_len, &query_data, nullptr, nullptr) != napi_ok ||
+      napi_get_typedarray_info(env, argv[1], &corpus_type, &corpus_len, &corpus_data, nullptr, nullptr) != napi_ok ||
+      query_type != napi_float32_array || corpus_type != napi_float32_array) {
+    return throw_type_error(env, "query and corpus must be Float32Array");
+  }
+  if (napi_get_typedarray_info(env, argv[5], &mask_type, &mask_len, &mask_data, nullptr, nullptr) != napi_ok ||
+      mask_type != napi_uint32_array) {
+    return throw_type_error(env, "activeMask must be Uint32Array");
+  }
+
+  const auto read_positive_int32 = [env](napi_value value, int32_t* output) {
+    double number = 0.0;
+    if (napi_get_value_double(env, value, &number) != napi_ok ||
+        !std::isfinite(number) || number < 1.0 ||
+        number > static_cast<double>(INT32_MAX) || std::floor(number) != number) {
+      return false;
+    }
+    *output = static_cast<int32_t>(number);
+    return true;
+  };
+
+  int32_t n = 0, dim = 0, k = 0;
+  if (!read_positive_int32(argv[2], &n) ||
+      !read_positive_int32(argv[3], &dim) ||
+      !read_positive_int32(argv[4], &k) ||
+      query_len < static_cast<size_t>(dim) ||
+      static_cast<size_t>(n) > SIZE_MAX / static_cast<size_t>(dim) ||
+      corpus_len < static_cast<size_t>(n) * static_cast<size_t>(dim) ||
+      mask_len < (static_cast<size_t>(n) + 31u) / 32u) {
+    return throw_type_error(env, "invalid batchCosineTopKMasked dimensions or mask length");
+  }
+
+  const auto* q = static_cast<const float*>(query_data);
+  const auto* corpus = static_cast<const float*>(corpus_data);
+  const auto* mask = static_cast<const std::uint32_t*>(mask_data);
+
+  double q_norm_sq = 0.0;
+  for (int32_t d = 0; d < dim; ++d) {
+    if (!std::isfinite(q[d])) return throw_type_error(env, "query and active corpus values must be finite");
+    q_norm_sq += static_cast<double>(q[d]) * q[d];
+  }
+  const double q_norm = std::sqrt(q_norm_sq);
+  if (!std::isfinite(q_norm) || q_norm <= 0.0) {
+    return throw_type_error(env, "query vector must have a finite non-zero norm");
+  }
+
+  struct ScoredIdx { int32_t idx; float score; };
+  constexpr size_t kStackTopKCapacity = 64;
+  const size_t topk_capacity = std::min(static_cast<size_t>(k), static_cast<size_t>(n));
+  ScoredIdx stack_topk[kStackTopKCapacity];
+  std::vector<ScoredIdx> heap_topk;
+  ScoredIdx* topk = stack_topk;
+  if (topk_capacity > kStackTopKCapacity) {
+    heap_topk.resize(topk_capacity);
+    topk = heap_topk.data();
+  }
+  // With this comparator, the heap root is the worst retained result:
+  // lowest score first, then highest index for deterministic ties.
+  const auto worse_first = [](const ScoredIdx& a, const ScoredIdx& b) {
+    if (a.score != b.score) return a.score > b.score;
+    return a.idx < b.idx;
+  };
+  size_t topk_count = 0;
+  int32_t evaluated = 0;
+
+  for (int32_t i = 0; i < n; ++i) {
+    if (((mask[i >> 5] >> (i & 31)) & 1u) == 0u) continue;
+    ++evaluated;
+    const float* row = corpus + static_cast<size_t>(i) * static_cast<size_t>(dim);
+    double dot = 0.0, r_norm_sq = 0.0;
+    for (int32_t d = 0; d < dim; ++d) {
+      const double rv = row[d];
+      if (!std::isfinite(rv)) return throw_type_error(env, "query and active corpus values must be finite");
+      dot += static_cast<double>(q[d]) * rv;
+      r_norm_sq += rv * rv;
+    }
+    if (!std::isfinite(r_norm_sq) || r_norm_sq <= 0.0) {
+      return throw_type_error(env, "active corpus vector must have a finite non-zero norm");
+    }
+    const double denom = q_norm * std::sqrt(r_norm_sq);
+    const float score = denom > 0.0 ? static_cast<float>(dot / denom) : 0.0f;
+    const ScoredIdx candidate{i, score};
+    if (topk_count < topk_capacity) {
+      topk[topk_count++] = candidate;
+      std::push_heap(topk, topk + topk_count, worse_first);
+    } else if (topk_capacity > 0 &&
+        (candidate.score > topk[0].score ||
+         (candidate.score == topk[0].score && candidate.idx < topk[0].idx))) {
+      std::pop_heap(topk, topk + topk_count, worse_first);
+      topk[topk_count - 1] = candidate;
+      std::push_heap(topk, topk + topk_count, worse_first);
+    }
+  }
+  const size_t out_count = topk_count;
+  if (out_count > 1) std::sort_heap(topk, topk + out_count, worse_first);
+
+  napi_value indices_val = nullptr, scores_val = nullptr;
+  int32_t* indices_ptr = nullptr;
+  float* scores_ptr = nullptr;
+
+  if (argc >= 8) {
+    napi_typedarray_type idx_t, sc_t;
+    size_t idx_len = 0, sc_len = 0;
+    void *idx_d = nullptr, *sc_d = nullptr;
+    if (napi_get_typedarray_info(env, argv[6], &idx_t, &idx_len, &idx_d, nullptr, nullptr) == napi_ok &&
+        idx_t == napi_int32_array && idx_len >= out_count &&
+        napi_get_typedarray_info(env, argv[7], &sc_t, &sc_len, &sc_d, nullptr, nullptr) == napi_ok &&
+        sc_t == napi_float32_array && sc_len >= out_count) {
+      indices_val = argv[6];
+      scores_val = argv[7];
+      indices_ptr = static_cast<int32_t*>(idx_d);
+      scores_ptr = static_cast<float*>(sc_d);
+    }
+  }
+
+  if (!indices_ptr || !scores_ptr) {
+    void *idx_buf = nullptr, *sc_buf = nullptr;
+    napi_value idx_ab, sc_ab;
+    const size_t alloc_count = out_count > 0 ? out_count : 1;
+    if (create_pooled_ab(env, alloc_count * sizeof(int32_t), &idx_buf, &idx_ab) != napi_ok ||
+        create_pooled_ab(env, alloc_count * sizeof(float), &sc_buf, &sc_ab) != napi_ok) {
+      return throw_error(env, "batchCosineTopKMasked output allocation failed");
+    }
+    napi_create_typedarray(env, napi_int32_array, out_count, idx_ab, 0, &indices_val);
+    napi_create_typedarray(env, napi_float32_array, out_count, sc_ab, 0, &scores_val);
+    indices_ptr = static_cast<int32_t*>(idx_buf);
+    scores_ptr = static_cast<float*>(sc_buf);
+  }
+
+  for (size_t j = 0; j < out_count; ++j) {
+    indices_ptr[j] = topk[j].idx;
+    scores_ptr[j] = topk[j].score;
+  }
+
+  napi_value result, count_val, eval_val, backend_val;
+  napi_create_object(env, &result);
+  napi_create_int32(env, static_cast<int32_t>(out_count), &count_val);
+  napi_create_int32(env, evaluated, &eval_val);
+  napi_create_string_utf8(env, "cpu_masked_bitset", NAPI_AUTO_LENGTH, &backend_val);
+  napi_set_named_property(env, result, "indices", indices_val);
+  napi_set_named_property(env, result, "scores", scores_val);
+  napi_set_named_property(env, result, "count", count_val);
+  napi_set_named_property(env, result, "evaluatedCount", eval_val);
+  napi_set_named_property(env, result, "backend", backend_val);
   return result;
 }
 
@@ -2294,6 +2491,104 @@ static napi_value ManifoldInterpolate4DWrapper(napi_env env, napi_callback_info 
   return result;
 }
 
+// ── NES LUT Filter (NLUT-07 / CPU-AVX2-01) ───────────────────────────
+
+static napi_value NesLutSupportsAvx2Wrapper(napi_env env, napi_callback_info info) {
+  (void)info;
+  napi_value result;
+  napi_create_int32(env, nes_lut_runtime_supports_avx2() ? 1 : 0, &result);
+  return result;
+}
+
+static napi_value MatchNesLutMaskWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 4;
+  napi_value argv[4];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 2) {
+    return throw_type_error(env, "Expected (lut: Uint8Array, allowed: Uint8Array, forceScalar?: number, out?: Uint32Array)");
+  }
+
+  napi_typedarray_type lut_type, allowed_type;
+  size_t lut_len = 0, allowed_len = 0;
+  void* lut_data = nullptr;
+  void* allowed_data = nullptr;
+  if (napi_get_typedarray_info(env, argv[0], &lut_type, &lut_len, &lut_data, nullptr, nullptr) != napi_ok ||
+      lut_type != napi_uint8_array) {
+    return throw_type_error(env, "lut must be a Uint8Array");
+  }
+  if (napi_get_typedarray_info(env, argv[1], &allowed_type, &allowed_len, &allowed_data, nullptr, nullptr) != napi_ok ||
+      allowed_type != napi_uint8_array) {
+    return throw_type_error(env, "allowed must be a Uint8Array");
+  }
+
+  if (allowed_len == 0 || allowed_len > nes_lut::kMaxAllowed) {
+    return throw_type_error(env, "NES_LUT_ALLOWED_COUNT_INVALID");
+  }
+  const auto* allowed_ptr = reinterpret_cast<const std::uint8_t*>(allowed_data);
+  if (!nes_lut::valid_allowed(allowed_ptr, allowed_len)) {
+    return throw_type_error(env, "NES_LUT_ALLOWED_DUPLICATE");
+  }
+
+  int32_t force_scalar = 0;
+  if (argc >= 3) {
+    napi_valuetype t3;
+    if (napi_typeof(env, argv[2], &t3) == napi_ok && t3 == 2 /* napi_number */) {
+      napi_get_value_int32(env, argv[2], &force_scalar);
+    }
+  }
+
+  const size_t words = (lut_len + 31) / 32;
+  std::uint32_t* out_ptr = nullptr;
+  napi_value result = nullptr;
+  bool has_caller_out = false;
+
+  if (argc >= 4) {
+    napi_typedarray_type out_type;
+    size_t out_len = 0;
+    void* caller_out = nullptr;
+    if (napi_get_typedarray_info(env, argv[3], &out_type, &out_len, &caller_out, nullptr, nullptr) == napi_ok &&
+        out_type == napi_uint32_array && out_len >= words) {
+      has_caller_out = true;
+      out_ptr = reinterpret_cast<std::uint32_t*>(caller_out);
+      result = argv[3];
+    }
+  }
+
+  if (words == 0) {
+    if (has_caller_out) return result;
+    void* dummy_out = nullptr;
+    napi_value ab;
+    if (create_pooled_ab(env, sizeof(std::uint32_t), &dummy_out, &ab) != napi_ok) {
+      return throw_error(env, "matchNesLutMask: allocation failed");
+    }
+    napi_create_typedarray(env, napi_uint32_array, 0, ab, 0, &result);
+    return result;
+  }
+
+  if (!has_caller_out) {
+    const size_t alloc_bytes = words * sizeof(std::uint32_t);
+    void* out_data = nullptr;
+    napi_value ab;
+    if (create_pooled_ab(env, alloc_bytes, &out_data, &ab) != napi_ok) {
+      return throw_error(env, "matchNesLutMask: allocation failed");
+    }
+    out_ptr = reinterpret_cast<std::uint32_t*>(out_data);
+    napi_create_typedarray(env, napi_uint32_array, words, ab, 0, &result);
+  }
+
+  const auto* lut_ptr = reinterpret_cast<const std::uint8_t*>(lut_data);
+  const bool use_avx2 = !force_scalar && (lut_len >= 1024) && nes_lut_runtime_supports_avx2();
+  const bool ok = use_avx2
+    ? nes_lut_match_mask_avx2_tu(lut_ptr, lut_len, allowed_ptr, allowed_len, out_ptr)
+    : nes_lut::match_mask_scalar(lut_ptr, lut_len, allowed_ptr, allowed_len, out_ptr);
+
+  if (!ok) {
+    return throw_error(env, "matchNesLutMask failed");
+  }
+
+  return result;
+}
+
 // ── Module Init ──────────────────────────────────────────────────────
 
 static napi_value Init(napi_env env, napi_value exports) {
@@ -2312,6 +2607,7 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "getCudaMemory", GetCudaMemoryWrapper);
   registerFn(env, exports, "batchCosineSimilarity", BatchCosineSimilarityWrapper);
   registerFn(env, exports, "batchCosineTopK", BatchCosineTopKWrapper);
+  registerFn(env, exports, "batchCosineTopKMasked", BatchCosineTopKMaskedWrapper);
   registerFn(env, exports, "graphCandidateGatherGPU", GraphCandidateGatherGPUWrapper);
   registerFn(env, exports, "graphSimilarityHalf", GraphSimilarityHalfWrapper);
   // pytorch_graph: graph analysis + ML ops
@@ -2354,6 +2650,8 @@ static napi_value Init(napi_env env, napi_value exports) {
   // Manifold interpolation helpers
   registerFn(env, exports, "slerpEmbeddings", SlerpEmbeddingsWrapper);
   registerFn(env, exports, "manifoldInterpolate4D", ManifoldInterpolate4DWrapper);
+  registerFn(env, exports, "nesLutSupportsAvx2", NesLutSupportsAvx2Wrapper);
+  registerFn(env, exports, "matchNesLutMask", MatchNesLutMaskWrapper);
   registerFn(env, exports, "getExecutionCounters", GetExecutionCountersWrapper);
   registerFn(env, exports, "resetExecutionCounters", ResetExecutionCountersWrapper);
   // Register last so getBackendInfo can enumerate every other native export.

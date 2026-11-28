@@ -24,6 +24,10 @@ import {
   handleToolGatewayRequest,
   type JsonRpcRequest,
 } from '$lib/agent/tool-gateway';
+import { getToolNames } from '$lib/agent/tool-registry';
+import { requiredA2aToolPermission } from '$lib/agent/tool-permissions';
+import { derivePermissionGrant, hasPermission } from '$lib/server/auth/tool-authorization';
+import { isAdminRole } from '$lib/server/auth-utils.js';
 import { ToolDiagnostics } from '$lib/agent/tool-diagnostic';
 import { recordAgentTrace } from '$lib/server/observability/agent-trace-recorder';
 import { ENV } from '$lib/server/env.server';
@@ -47,10 +51,17 @@ function stableStringify(value: unknown): string {
   return `{${entries.map(([key, entry]) => `${JSON.stringify(key)}:${stableStringify(entry)}`).join(',')}}`;
 }
 
+const rpcDenied = (status: 401 | 403, message: string, id: string | number | null) =>
+  Response.json({ jsonrpc: '2.0', id, error: { code: status === 401 ? -32001 : -32003, message } }, { status });
+
 /**
  * Handle POST requests: tools/list, tools/call, or direct tool method names
  */
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async (event) => {
+  const { request, locals } = event;
+  // The global API guard also requires a user; this keeps the route closed if that list changes.
+  if (!locals.user) return rpcDenied(401, 'Authentication required', null);
+
   let rawBody: unknown;
 
   try {
@@ -81,6 +92,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const body = parsed.data;
   const method = String(body.method ?? '');
   const params = (body.params as Record<string, unknown> | undefined) ?? {};
+
+  // Diagnostics expose and can erase other callers' request logs.
+  if (method === 'tools/diagnostics' && !isAdminRole(locals.user.role)) {
+    return rpcDenied(403, 'Admin access required', body.id ?? null);
+  }
+  // Checked for any request that would execute a registered tool, however it is addressed.
+  const toolName = method === 'tools/call' ? String(params.name ?? '').trim() : method;
+  if (getToolNames().includes(toolName)) {
+    const required = requiredA2aToolPermission(toolName);
+    if (!hasPermission(derivePermissionGrant(event), required)) {
+      return rpcDenied(403, `Permission denied: '${required}' is required for tool '${toolName}'`, body.id ?? null);
+    }
+  }
 
   // Log incoming request for diagnostics
   ToolDiagnostics.logRequest(method, params);
@@ -165,8 +189,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 /**
  * Handle GET requests: return tools/list manifest or diagnostics
  */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+  if (!locals.user) return rpcDenied(401, 'Authentication required', null);
   const diagnostic = url.searchParams.get('diagnostic');
+  if (diagnostic && !isAdminRole(locals.user.role)) return rpcDenied(403, 'Admin access required', null);
 
   // Diagnostic endpoints
   if (diagnostic === 'summary') {

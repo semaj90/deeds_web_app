@@ -219,6 +219,9 @@ describe('/api/search/hyperrag', () => {
       text: 'Find SvelteKit 2 route functions that use Drizzle ORM',
       topK: 7,
       lexicalExpansion: expect.arrayContaining(['drizzle-orm', '@sveltejs/kit']),
+    }), expect.objectContaining({
+      signal: expect.any(AbortSignal),
+      runId: 'req-plan-1',
     }));
     expect(mocks.oakEnrichment).toHaveBeenCalledWith(expect.objectContaining({
       packageCandidates: expect.arrayContaining(['drizzle-orm', '@sveltejs/kit']),
@@ -257,6 +260,9 @@ describe('/api/search/hyperrag', () => {
     expect(response.status).toBe(200);
     expect(mocks.search).toHaveBeenCalledWith(expect.objectContaining({
       workspaceRevision: trustedRevision,
+    }), expect.objectContaining({
+      signal: expect.any(AbortSignal),
+      runId: expect.stringMatching(/^hyperrag:/),
     }));
     expect(mocks.search.mock.calls[0]?.[0].workspaceRevision).not.toBe(`sha256:${'f'.repeat(64)}`);
     expect(body.workspaceAuthority).toEqual(expect.objectContaining({
@@ -295,6 +301,9 @@ describe('/api/search/hyperrag', () => {
       text: 'Find SvelteKit 2 route functions that use Drizzle ORM',
       topK: 7,
       lexicalExpansion: expect.arrayContaining(['Drizzle ORM']),
+    }), expect.objectContaining({
+      signal: expect.any(AbortSignal),
+      runId: expect.stringMatching(/^hyperrag:/),
     }));
     expect(mocks.search.mock.calls[0]?.[0].lexicalExpansion).not.toContain('SvelteKit');
     expect(body.ontologyQueryEvidence).toEqual(expect.arrayContaining([

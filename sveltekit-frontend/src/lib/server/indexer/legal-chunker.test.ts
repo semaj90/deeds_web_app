@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import {
 	chunkLegalDocument,
 	classifyLegalSection,
+	estimateEg2Tokens,
 	LEGAL_SECTION_BOOST,
 	type LegalSection,
 } from './legal-chunker.js';
@@ -173,6 +174,20 @@ describe('simple chunk offsets preserve original source positions', () => {
 		expect(chunks.length).toBeGreaterThan(1);
 		for (const chunk of chunks) {
 			expect(text.slice(chunk.startOffset, chunk.endOffset)).toBe(chunk.text);
+		}
+	});
+
+	it('respects eg2_estimated token budget for dense long-word text', () => {
+		const denseText = Array.from({ length: 120 }, (_, i) => `superlongidentifier_${i}_abcdef`).join(' ');
+		expect(estimateEg2Tokens(denseText)).toBeGreaterThan(120);
+		const chunks = chunkLegalDocument(denseText, {
+			maxTokens: 256,
+			overlap: 32,
+			tokenBudgetMode: 'eg2_estimated',
+		});
+		expect(chunks.length).toBeGreaterThan(1);
+		for (const chunk of chunks) {
+			expect(chunk.estimatedModelTokens ?? 0).toBeLessThanOrEqual(270);
 		}
 	});
 });

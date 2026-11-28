@@ -57,7 +57,7 @@ describe('retrieveQdrant', () => {
 
     const results = await retrieveQdrant('exact symbol proof');
 
-    expect(mockEmbedQueryForLane).toHaveBeenCalledWith('exact symbol proof', 'dense_768');
+    expect(mockEmbedQueryForLane).toHaveBeenCalledWith('exact symbol proof', 'dense_768', { signal: undefined });
     expect(mockDenseSearch).toHaveBeenCalledTimes(1);
     expect(mockDenseSearch).toHaveBeenCalledWith(
       expect.objectContaining({

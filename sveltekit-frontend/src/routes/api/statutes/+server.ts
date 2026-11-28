@@ -2,6 +2,7 @@
  * GET  /api/statutes — List statutes (paginated)
  * POST /api/statutes — Create a statute
  */
+import { isAdminRole } from '$lib/server/auth-utils.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
@@ -100,6 +101,7 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	if (!isAdminRole(locals.user.role)) return json({ error: 'Admin access required' }, { status: 403 });
 
 	let body;
 	try {

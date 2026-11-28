@@ -199,6 +199,30 @@ describe('embedSemantic768Canonical', () => {
     vi.restoreAllMocks();
   });
 
+  it('keeps the timeout bound when a caller also passes a signal that never aborts', async () => {
+    // A hung strict embedding server must not hang the query: the caller's signal
+    // is combined with the timeout, not substituted for it.
+    const fetchMock = vi.fn((_input: RequestInfo | URL, init?: RequestInit) =>
+      new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => reject(init.signal?.reason ?? new Error('aborted')));
+      }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { embedSemantic768Canonical } = await import('./canonical-embed.js');
+    const started = Date.now();
+    await expect(embedSemantic768Canonical('strict semantic proof', {
+      model: 'embeddinggemma',
+      modelArtifactRevision: 'artifact-revision',
+      tokenizerRevision: 'tokenizer-revision',
+      inputPolicyRevision: 'input-policy-revision',
+      baseUrl: 'http://127.0.0.1:8081',
+      signal: new AbortController().signal,
+      timeoutMs: 50,
+    })).rejects.toBeDefined();
+    expect(Date.now() - started).toBeLessThan(5_000);
+  });
+
   it('rejects a non-normalized 768-vector before it can enter canonical retrieval', async () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);

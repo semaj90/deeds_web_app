@@ -61,14 +61,17 @@ export interface RuntimeModelSelectionPolicyV1 {
 	allowedModelFamilies: readonly string[];
 }
 
-/** Workstation follows the loaded model, but only within the Ornith 1.5 family. */
+/**
+ * Workstation follows whatever model llama-server has loaded. An empty family list means no family
+ * restriction; set LLAMA_MODEL_SELECTION_MODE=CONFIGURED_VERIFY to require the configured model.
+ */
 export const RUNTIME_MODEL_SELECTION_POLICY: RuntimeModelSelectionPolicyV1 = {
 	schema: 'atlas.runtime-model-selection-policy.v1',
 	mode: process.env.LLAMA_MODEL_SELECTION_MODE === 'CONFIGURED_VERIFY'
 		? 'CONFIGURED_VERIFY'
 		: 'LOADED_ACTIVE',
 	endpoint: LLM_BASE_URL,
-	allowedModelFamilies: ['ornith-1.5'],
+	allowedModelFamilies: [],
 };
 
 /**
@@ -85,7 +88,8 @@ export async function resolveLlamaInferenceTarget(timeoutMs = 3_000): Promise<{
 	selectionReceiptChecksum: string;
 }> {
 	const resolved = await resolveLoadedLlamaModel(LLM_BASE_URL, LLM_MODEL_ID, timeoutMs);
-	const modelAllowed = RUNTIME_MODEL_SELECTION_POLICY.allowedModelFamilies.some((family) =>
+	const families = RUNTIME_MODEL_SELECTION_POLICY.allowedModelFamilies;
+	const modelAllowed = families.length === 0 || families.some((family) =>
 		resolved.resolvedModel === family || resolved.resolvedModel.startsWith(`${family}-`)
 	);
 	if (!modelAllowed) {

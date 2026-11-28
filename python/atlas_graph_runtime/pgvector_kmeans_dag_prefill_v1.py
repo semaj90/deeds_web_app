@@ -100,10 +100,9 @@ def fetch_pgvector_kmeans_dag_prefill_v1(
     )
     exec_params: list[Any] = [vec_literal, *filter_params, vec_literal, int(top_k)]
 
-    db_url = dsn or os.environ.get(
-        "DATABASE_URL",
-        "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db",
-    )
+    db_url = dsn or os.environ.get("DATABASE_URL")
+    if not db_url:
+        raise RuntimeError("DATABASE_URL environment variable or explicit dsn is required")
     with psycopg.connect(db_url, options="-c default_transaction_read_only=on") as conn:
         with conn.cursor() as cur:
             cur.execute(f"SET LOCAL hnsw.ef_search = {int(ef_search)}")

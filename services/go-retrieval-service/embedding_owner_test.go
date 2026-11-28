@@ -67,6 +67,54 @@ func strictEmbeddingFixture(text string, vector []float32) map[string]any {
 	}
 }
 
+func TestHTTPCodebaseSearchDistinguishesUnconfiguredBackendFromEmptyResults(t *testing.T) {
+	srv := &retrievalServer{cfg: config{EmbeddingRepresentation: "semantic_768"}}
+	request := httptest.NewRequest(http.MethodPost, "/search/codebase", strings.NewReader(`{"query":"find handler","task_id":"task-fixture","request_id":"request-fixture","representation_id":"semantic_768","representation_revision":2}`))
+	result := httptest.NewRecorder()
+	srv.httpSearchCodebase(result, request)
+
+	var body struct {
+		Chunks                 []json.RawMessage `json:"chunks"`
+		ErrorCode              string            `json:"error_code"`
+		TaskID                 string            `json:"task_id"`
+		RequestID              string            `json:"request_id"`
+		RepresentationRevision int32             `json:"representation_revision"`
+	}
+	if err := json.Unmarshal(result.Body.Bytes(), &body); err != nil {
+		t.Fatal(err)
+	}
+	if result.Code != http.StatusServiceUnavailable || body.Chunks == nil || len(body.Chunks) != 0 ||
+		body.ErrorCode != "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE" {
+		t.Fatalf("expected structured backend failure, got HTTP %d %s", result.Code, result.Body.String())
+	}
+	if body.TaskID != "task-fixture" || body.RequestID != "request-fixture" || body.RepresentationRevision != 2 {
+		t.Fatalf("request identity was not echoed, got %s", result.Body.String())
+	}
+}
+
+func TestHTTPCodebaseSearchRejectsEmbeddingModelRevisionMismatchBeforeSearch(t *testing.T) {
+	srv := &retrievalServer{cfg: config{EmbedModel: "embeddinggemma:latest", EmbeddingRepresentationRevision: "sha256:" + strings.Repeat("b", 64)}}
+	requestJSON := `{"query":"find handler","task_id":"task-fixture","request_id":"request-fixture","embedding_model_id":"embeddinggemma2-trt-rtx","embedding_model_revision":"sha256:` + strings.Repeat("a", 64) + `"}`
+	request := httptest.NewRequest(http.MethodPost, "/search/codebase", strings.NewReader(requestJSON))
+	result := httptest.NewRecorder()
+	srv.httpSearchCodebase(result, request)
+	var body struct {
+		ErrorCode              string `json:"error_code"`
+		TaskID                 string `json:"task_id"`
+		RequestID              string `json:"request_id"`
+		EmbeddingModelID       string `json:"embedding_model_id"`
+		EmbeddingModelRevision string `json:"embedding_model_revision"`
+	}
+	if err := json.Unmarshal(result.Body.Bytes(), &body); err != nil {
+		t.Fatal(err)
+	}
+	if result.Code != http.StatusConflict || body.ErrorCode != "EG2_QUERY_MODEL_REVISION_MISMATCH" ||
+		body.TaskID != "task-fixture" || body.RequestID != "request-fixture" ||
+		body.EmbeddingModelID != "embeddinggemma:latest" || body.EmbeddingModelRevision != "sha256:"+strings.Repeat("b", 64) {
+		t.Fatalf("expected explicit model identity mismatch, got HTTP %d %s", result.Code, result.Body.String())
+	}
+}
+
 func TestEmbedRejectsEmptyInputWithoutServiceCall(t *testing.T) {
 	var serviceCalls atomic.Int64
 	service := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {

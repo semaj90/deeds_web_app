@@ -62,8 +62,10 @@ export interface LegalChunk {
   /** Character offsets in the full text */
   startOffset: number;
   endOffset: number;
-  /** Approximate token count */
+  /** Approximate word-based token count */
   tokenCount: number;
+  /** Conservative EG2 model-token estimate (max(words, ceil(chars / 2.8))) */
+  estimatedModelTokens?: number;
   /** Citation candidates found in this chunk */
   citations: string[];
   /** Extraction method for the parent document */
@@ -118,6 +120,14 @@ export interface LegalChunkerOptions {
   overlap?: number;
   /** Min section text length to create a chunk (default: 30 chars) */
   minSectionLength?: number;
+  /** Token budget mode: 'words' (legacy default) or 'eg2_estimated' (2.8 chars/token guard) */
+  tokenBudgetMode?: 'words' | 'eg2_estimated';
+  /**
+   * Exact token counter (e.g. the EG2 tokenizer, including the recipe prefix).
+   * When supplied, the simple-window path packs whole words against this count
+   * instead of the word-count budget. Omitted = legacy behavior, unchanged.
+   */
+  countTokens?: TokenCounter;
   /** DocTags blocks from Granite-Docling for structure-aware chunking */
   doclingBlocks?: Array<{
     type: string;
@@ -167,14 +177,143 @@ const CITATION_PATTERNS = [
  * for precise section splits and preserves tables as whole units.
  * Otherwise falls back to heading detection + simple token windowing.
  */
+export const EG2_CHARS_PER_TOKEN_ESTIMATE = 2.8;
+
+/** Conservative EG2 model-token estimate (never below whitespace word count). */
+export function estimateEg2Tokens(text: string): number {
+  const trimmed = text.trim();
+  if (!trimmed) return 0;
+  const words = trimmed.split(/\s+/).length;
+  return Math.max(words, Math.ceil(trimmed.length / EG2_CHARS_PER_TOKEN_ESTIMATE));
+}
+
+function attachEstimatedTokens(chunks: LegalChunk[]): LegalChunk[] {
+  return chunks.map((chunk) => ({
+    ...chunk,
+    estimatedModelTokens: estimateEg2Tokens(chunk.text),
+  }));
+}
+
+function resolveWordBudget(text: string, maxTokens: number, overlap: number, mode: 'words' | 'eg2_estimated'): { maxWords: number; wordOverlap: number } {
+  if (mode !== 'eg2_estimated' || !text.trim()) {
+    return { maxWords: maxTokens, wordOverlap: overlap };
+  }
+  const words = text.trim().split(/\s+/).length;
+  const estTokens = estimateEg2Tokens(text);
+  const tokensPerWord = Math.max(1, estTokens / Math.max(1, words));
+  const maxWords = Math.max(1, Math.floor(maxTokens / tokensPerWord));
+  const wordOverlap = Math.min(Math.max(0, maxWords - 1), Math.floor(overlap / tokensPerWord));
+  return { maxWords, wordOverlap };
+}
+
+/** Exact token counter over a text (EG2 tokenizer in production). */
+export type TokenCounter = (text: string) => number;
+
+export interface CountedWindow {
+  /** Offsets are relative to the text passed to countedTokenWindows. */
+  startOffset: number;
+  endOffset: number;
+  tokenCount: number;
+  /** True when a single whitespace word already exceeds the budget. It is kept, never dropped. */
+  oversize: boolean;
+}
+
+/**
+ * Greedy token-budget windows over whitespace words, using an exact counter.
+ * Every window is kept (no silent discard) and the last window always reaches
+ * the end of the text. Overlap is measured in counted tokens.
+ */
+export function countedTokenWindows(
+  text: string,
+  countTokens: TokenCounter,
+  maxTokens: number,
+  overlapTokens: number,
+): CountedWindow[] {
+  if (!Number.isSafeInteger(maxTokens) || maxTokens < 1) throw new Error('LEGAL_CHUNK_BUDGET_INVALID');
+  if (!Number.isSafeInteger(overlapTokens) || overlapTokens < 0 || overlapTokens >= maxTokens) {
+    throw new Error('LEGAL_CHUNK_OVERLAP_INVALID');
+  }
+  const words = [...text.matchAll(/\S+/g)].map((m) => {
+    const start = m.index ?? 0;
+    return { start, end: start + m[0].length };
+  });
+  if (words.length === 0) return [];
+  const span = (a: number, b: number) => text.slice(words[a].start, words[b].end);
+  const measure = (value: string): number => {
+    const count = countTokens(value);
+    if (!Number.isSafeInteger(count) || count < 0) throw new Error('LEGAL_CHUNK_TOKEN_COUNT_INVALID');
+    return count;
+  };
+
+  const windows: CountedWindow[] = [];
+  let s = 0;
+  while (s < words.length) {
+    let e = s;
+    let count = measure(span(s, s));
+    const oversize = count > maxTokens;
+    while (!oversize && e + 1 < words.length) {
+      const next = measure(span(s, e + 1));
+      if (next > maxTokens) break;
+      e++;
+      count = next;
+    }
+    windows.push({ startOffset: words[s].start, endOffset: words[e].end, tokenCount: count, oversize });
+    if (e === words.length - 1) break;
+    // Step the next start back over the tail that fits the overlap budget, but always advance.
+    let k = e + 1;
+    while (k - 1 > s && measure(span(k - 1, e)) <= overlapTokens) k--;
+    s = Math.max(s + 1, k);
+  }
+  return windows;
+}
+
+/** Exact-admission variant: a single unbreakable token over budget is a refusal. */
+function countedAdmissionWindows(
+  text: string,
+  countTokens: TokenCounter,
+  maxTokens: number,
+  overlapTokens: number
+): CountedWindow[] {
+  const windows = countedTokenWindows(text, countTokens, maxTokens, overlapTokens);
+  if (windows.some((window) => window.oversize || window.tokenCount > maxTokens)) {
+    throw new Error('LEGAL_CHUNK_TOKEN_LIMIT_EXCEEDED');
+  }
+  return windows;
+}
+
+function countedSimpleChunks(fullText: string, countTokens: TokenCounter, maxTokens: number, overlap: number): LegalChunk[] {
+  const windows = countedAdmissionWindows(fullText, countTokens, maxTokens, overlap);
+  const chunks: LegalChunk[] = windows.map((w, idx) => {
+    const chunkText = fullText.slice(w.startOffset, w.endOffset);
+    const citations = extractCitations(chunkText);
+    return {
+      text: chunkText,
+      chunkIndex: idx,
+      sectionPath: [],
+      heading: '',
+      startOffset: w.startOffset,
+      endOffset: w.endOffset,
+      tokenCount: w.tokenCount,
+      citations,
+      ...buildLegalMetadata(chunkText, '', citations),
+    };
+  });
+  return bindChunksToExactSource(fullText, chunks);
+}
+
 export function chunkLegalDocument(fullText: string, opts?: LegalChunkerOptions): LegalChunk[] {
   const maxTokens = opts?.maxTokens ?? 512;
   const overlap = opts?.overlap ?? 128;
   const minLen = opts?.minSectionLength ?? 30;
+  const mode = opts?.tokenBudgetMode ?? 'words';
 
   // If DocTags blocks available, use block-aware chunking
   if (opts?.doclingBlocks && opts.doclingBlocks.length > 0) {
-    return chunkFromDoclingBlocks(opts.doclingBlocks, maxTokens, overlap, minLen);
+    if (opts.countTokens) {
+      return chunkFromDoclingBlocks(opts.doclingBlocks, maxTokens, overlap, minLen, opts.countTokens);
+    }
+    const budget = resolveWordBudget(fullText, maxTokens, overlap, mode);
+    return attachEstimatedTokens(chunkFromDoclingBlocks(opts.doclingBlocks, budget.maxWords, budget.wordOverlap, minLen));
   }
 
   // 1. Try to split by structural headings
@@ -182,7 +321,11 @@ export function chunkLegalDocument(fullText: string, opts?: LegalChunkerOptions)
 
   // 2. If no structure found, fall back to simple windowing
   if (sections.length <= 1 && !sections[0]?.heading) {
-    return bindChunksToExactSource(fullText, simpleChunk(fullText, maxTokens, overlap));
+    if (opts?.countTokens) {
+      return countedSimpleChunks(fullText, opts.countTokens, maxTokens, overlap);
+    }
+    const budget = resolveWordBudget(fullText, maxTokens, overlap, mode);
+    return attachEstimatedTokens(bindChunksToExactSource(fullText, simpleChunk(fullText, budget.maxWords, budget.wordOverlap)));
   }
 
   // 3. Flatten sections and chunk each one
@@ -201,10 +344,31 @@ export function chunkLegalDocument(fullText: string, opts?: LegalChunkerOptions)
     }
     if (sectionText.trim().length < minLen) continue;
 
+    if (opts?.countTokens) {
+      const windows = countedAdmissionWindows(sectionText, opts.countTokens, maxTokens, overlap);
+      for (const w of windows) {
+        const windowText = sectionText.slice(w.startOffset, w.endOffset);
+        const chunkCits = extractCitations(windowText);
+        chunks.push({
+          text: windowText,
+          chunkIndex: globalChunkIndex++,
+          sectionPath: section.path,
+          heading: section.heading,
+          startOffset: sectionBaseOffset + w.startOffset,
+          endOffset: sectionBaseOffset + w.endOffset,
+          tokenCount: w.tokenCount,
+          citations: chunkCits,
+          ...buildLegalMetadata(windowText, section.heading, chunkCits),
+        });
+      }
+      continue;
+    }
+
+    const budget = resolveWordBudget(sectionText, maxTokens, overlap, mode);
     const sectionChunks = chunkSectionText(
       sectionText,
-      maxTokens,
-      overlap,
+      budget.maxWords,
+      budget.wordOverlap,
       section.path,
       section.heading,
       sectionBaseOffset,
@@ -217,7 +381,8 @@ export function chunkLegalDocument(fullText: string, opts?: LegalChunkerOptions)
     }
   }
 
-  return bindChunksToExactSource(fullText, chunks);
+  const bound = bindChunksToExactSource(fullText, chunks);
+  return opts?.countTokens ? bound : attachEstimatedTokens(bound);
 }
 
 /** Keeps chunk text byte-for-byte equivalent to its canonical UTF-16 source span. */
@@ -592,7 +757,8 @@ function chunkFromDoclingBlocks(
   blocks: DoclingBlockInput[],
   maxTokens: number,
   overlap: number,
-  minLen: number
+  minLen: number,
+  countTokens?: TokenCounter
 ): LegalChunk[] {
   const chunks: LegalChunk[] = [];
   let chunkIndex = 0;
@@ -618,9 +784,10 @@ function chunkFromDoclingBlocks(
     const pageEnd = pages.length > 0 ? Math.max(...pages) : undefined;
 
     const words = combinedText.split(/\s+/).filter(Boolean);
+    const trimmed = combinedText.trim();
+    const measuredTokens = countTokens ? countTokens(trimmed) : words.length;
 
-    if (words.length <= maxTokens) {
-      const trimmed = combinedText.trim();
+    if (measuredTokens <= maxTokens) {
       const cits = extractCitations(combinedText);
       chunks.push({
         text: trimmed,
@@ -631,12 +798,33 @@ function chunkFromDoclingBlocks(
         pageEnd,
         startOffset: charOffset,
         endOffset: charOffset + combinedText.length,
-        tokenCount: words.length,
+        tokenCount: measuredTokens,
         citations: cits,
         doctagTypes,
         isTable: doctagTypes.length === 1 && doctagTypes[0] === 'table',
         ...buildLegalMetadata(trimmed, pendingHeading, cits),
       });
+      charOffset += combinedText.length + 2;
+    } else if (countTokens) {
+      const windows = countedAdmissionWindows(combinedText, countTokens, maxTokens, overlap);
+      for (const w of windows) {
+        const windowText = combinedText.slice(w.startOffset, w.endOffset);
+        const chunkCits = extractCitations(windowText);
+        chunks.push({
+          text: windowText,
+          chunkIndex: chunkIndex++,
+          sectionPath: [...currentSectionPath],
+          heading: pendingHeading,
+          pageStart,
+          pageEnd,
+          startOffset: charOffset + w.startOffset,
+          endOffset: charOffset + w.endOffset,
+          tokenCount: w.tokenCount,
+          citations: chunkCits,
+          doctagTypes,
+          ...buildLegalMetadata(windowText, pendingHeading, chunkCits),
+        });
+      }
       charOffset += combinedText.length + 2;
     } else {
       // Split oversized block group with token windowing
@@ -683,23 +871,28 @@ function chunkFromDoclingBlocks(
       const tableText = block.text.trim();
       if (tableText.length < minLen) continue;
 
-      const words = tableText.split(/\s+/).filter(Boolean);
-      const tblCits = extractCitations(tableText);
-      chunks.push({
-        text: tableText,
-        chunkIndex: chunkIndex++,
-        sectionPath: [...currentSectionPath],
-        heading: pendingHeading,
-        pageStart: block.page || undefined,
-        pageEnd: block.page || undefined,
-        startOffset: charOffset,
-        endOffset: charOffset + tableText.length,
-        tokenCount: words.length,
-        citations: tblCits,
-        doctagTypes: ['table'],
-        isTable: true,
-        ...buildLegalMetadata(tableText, pendingHeading, tblCits),
-      });
+      const tableWindows = countTokens
+        ? countedAdmissionWindows(tableText, countTokens, maxTokens, overlap)
+        : [{ startOffset: 0, endOffset: tableText.length, tokenCount: tableText.split(/\s+/).filter(Boolean).length, oversize: false }];
+      for (const window of tableWindows) {
+        const windowText = tableText.slice(window.startOffset, window.endOffset);
+        const tblCits = extractCitations(windowText);
+        chunks.push({
+          text: windowText,
+          chunkIndex: chunkIndex++,
+          sectionPath: [...currentSectionPath],
+          heading: pendingHeading,
+          pageStart: block.page || undefined,
+          pageEnd: block.page || undefined,
+          startOffset: charOffset + window.startOffset,
+          endOffset: charOffset + window.endOffset,
+          tokenCount: window.tokenCount,
+          citations: tblCits,
+          doctagTypes: ['table'],
+          isTable: true,
+          ...buildLegalMetadata(windowText, pendingHeading, tblCits),
+        });
+      }
       charOffset += tableText.length + 2;
       continue;
     }

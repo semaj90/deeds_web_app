@@ -1,0 +1,112 @@
+{
+  "schema": "atlas.search-runtime-domain10-reference-eval.v1",
+  "status": "BLOCKED_EVALUATION_SELF_REFERENCE",
+  "generatedAt": "2026-11-26T21:56:57.755Z",
+  "mode": "READ_ONLY_SEARCH_RUNTIME_REPLAY",
+  "gitHead": "a0069da1c0dfaaae47a29fa10199c84056c262c1",
+  "inputs": {
+    "fixturePath": "scripts/atlas/fixtures/golden-retrieval-stability-v1.json",
+    "fixtureChecksum": "sha256:f39a4f4277c40ee958592be739a760d5ada2233fb5cd49861fbfc03af51695cc",
+    "fixtureType": "DETERMINISTIC_REPLAY_NOT_HUMAN_RELEVANCE",
+    "queryId": "parent-atlas-lineage-canary",
+    "queryChecksum": "sha256:c49e90ce0ac873216bba37f38b2e66e39d44c884912f1165682b98e7a5b327e3",
+    "expectedCanonicalIdsChecksum": "sha256:8f9c38e5cb0b9ad28d362e5a76ebb1ea293d710fbb5b5efb957b7b01c1b5beba",
+    "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+    "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+    "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+    "expectedReferenceCount": 15,
+    "searchRuntimeSourceChecksum": "sha256:1733c424a04d31c900234547c34c69090e59c6fce5013443ac456e0b5863a3e0",
+    "harnessSourceChecksum": "sha256:6a3a8f61a8010ebea38972bf08d46213a1a5739980ed0d6a21864465ceb45458"
+  },
+  "evaluation": {
+    "kind": "TRACE_REFERENCE_AGREEMENT_NOT_HUMAN_RELEVANCE",
+    "humanRelevanceJudgments": false,
+    "metricsInterpretation": "Agreement with a deterministic historical Top-K reference set; not relevance quality or promotion evidence.",
+    "adversarialChecks": {
+      "duplicateReferenceIdsRejected": true,
+      "missingCanonicalIdentityRejected": true,
+      "unknownKeyRejected": true,
+      "selfReferenceRejected": true,
+      "knownKeyAccepted": true
+    },
+    "referenceSetOutcome": "NOT_COMPUTED_IDENTITY_GUARD",
+    "acceptance": "BASELINE_CAPTURE_ONLY_NOT_PROMOTION"
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "runtime": {
+    "identityGuard": {
+      "unresolvedPacketKeys": [
+        "3fb77a5c-d6ce-4170-bcb8-5427ebbd4031"
+      ],
+      "selfReferences": [
+        {
+          "packetKey": "3fb77a5c-d6ce-4170-bcb8-5427ebbd4031",
+          "sourceRef": "scripts/atlas/fixtures/golden-retrieval-stability-v1.json"
+        }
+      ],
+      "blockedStatus": "BLOCKED_EVALUATION_SELF_REFERENCE"
+    },
+    "readOnly": true,
+    "query": "Parent Atlas semantic retrieval lineage canary",
+    "durationMs": 24903,
+    "candidatesRetrieved": 6,
+    "candidatesFused": 6,
+    "candidatesReranked": 4,
+    "returnedPacketCount": 1,
+    "canonicalPacketIds": [
+      "3fb77a5c-d6ce-4170-bcb8-5427ebbd4031"
+    ],
+    "diagnostics": [
+      {
+        "level": "warn",
+        "message": "[search-runtime] declared dense collection codebase_chunks_768 is not active. Using codebase_chunks_768_v2 as fallback.",
+        "codes": []
+      },
+      {
+        "level": "error",
+        "message": "📡 [DB] Canonical target: 127.0.0.1:5434/legal_ai_db",
+        "codes": []
+      },
+      {
+        "level": "warn",
+        "message": "[hydrate:ambiguous_source_ref]",
+        "codes": []
+      },
+      {
+        "level": "warn",
+        "message": "[hydrate:ambiguous_source_ref]",
+        "codes": []
+      },
+      {
+        "level": "error",
+        "message": "[rerankCanonicalFeatureEnvelopes] reranker threw:",
+        "codes": []
+      }
+    ],
+    "metrics": null,
+    "proof": {
+      "canonicalJoinedCount": 4,
+      "canonicalJoinMissingCount": 0,
+      "workspaceRejectedCount": 0,
+      "workspaceRevisionRejectedCount": 0,
+      "sourceRevisionRejectedCount": 0,
+      "pagerankLaneCount": 1,
+      "graphScoreAttachedCount": 4,
+      "graphScoreMissingCount": 0
+    },
+    "provenance": {
+      "readOnly": true,
+      "fusionMethod": "rrf",
+      "retrievalSources": [
+        "postgres_fts",
+        "exact_symbol"
+      ],
+      "rerankerUsed": true
+    }
+  },
+  "error": null,
+  "resourceCleanup": {
+    "postgresPoolsClosed": true
+  }
+}

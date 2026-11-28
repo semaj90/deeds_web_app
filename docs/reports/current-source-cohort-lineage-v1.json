@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-cohort-lineage.v1",
-  "generatedAt": "2026-11-25T03:30:28.639Z",
+  "generatedAt": "2026-11-28T00:01:09.061Z",
   "mode": "READ_ONLY_LINEAGE_AUDIT",
   "inputs": {
     "cohortChecksum": "fd88703ca428261206575d95204c31795f956645dd46dc4607a2b3048d464151",
@@ -10,7 +10,7 @@
   },
   "workspaceFrame": {
     "status": "CURRENT_WORKSPACE_FRAME_SELECTED",
-    "selectedWorkspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+    "selectedWorkspaceRevision": "sha256:09e1d40886a982f66a17ec1e068774559d12f012dde412228d909dca49247590",
     "selectedSource": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT",
     "selectedAuthority": true,
     "authorityConflict": false,
@@ -25,7 +25,7 @@
     "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
     "safeToPromote": false,
     "requiresSnapshotRefresh": true,
-    "deltaChecksum": "sha256:5dd13c20dbec655de36abc21274c1c741f1c3acaaa3af6e32c38f87a04c2d664"
+    "deltaChecksum": "sha256:66a87651996df60e3dd86b61ac21ae1884e0f419c7f4039989828c8f9d006627"
   },
   "counts": {
     "cohortRows": 52,
@@ -37,12 +37,13 @@
       "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
       "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
     ],
-    "workspaceRevisionSourceAligned": false,
+    "workspaceRevisionSourceAligned": null,
     "graphifyMatched": 52,
-    "currentWorkspaceMatched": 0,
+    "currentWorkspaceMatched": null,
+    "workspaceCurrentnessUnknown": 52,
     "sourceRevisionQualified": 52,
     "revisionQualified": 0,
-    "workspaceMismatchAfterSourceQualification": 52,
+    "workspaceMismatchAfterSourceQualification": null,
     "missing": 0,
     "mismatched": 0,
     "ambiguous": 0
@@ -51,574 +52,574 @@
     {
       "relativePath": "sveltekit-frontend/docs/design/2026-05-11_agents-directory-card-regen.md",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:57a4837b0c7a57ee8c790abbf9d11c5b08801c1952e2d6cee9e0ec80dc83022b",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/lib/server/services/error-analysis/ToolInvoker.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:ed076cdbcfa3d4542e62d750767a63a3770dbb5c1310b05476e849c7c673caa2",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/admin/cache/+page.server.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:e02678aef7c7579be7c1ba9441464b098a65d4eefe471e43250e9b4e474330e8",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:028a65cfda7baee19b14dfb3b8f9728612e4cb2d552faa0d23011bfb34c7e935",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/cases/[id]/chat/+page.server.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:57c99034d0c22587fe18d6b595be5e3ca15745c825afc1ed5e46da3dc97c8e27",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/citations/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:3449a47c95f7647b70222aaea11253d323c34bbf4cd742b335a43bb7780bcc8d",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/agent-chat/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/ai-assistant/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/ai-chat-test/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/ai-file-upload/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/ask-ai/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/cache/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/case-form/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/chat-messages/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/citation-tools/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/client-ai-chat/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/client-inference/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/collab-canvas/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/context-menu/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/contextual-chat/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/courtroom-sim/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/embedding-stream/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/enhanced-upload/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/evidence-dashboard/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/hover-card/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/keyboard-shortcuts/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/legal-layout/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/legal-spellbook/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/modals/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/modular-upload/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/nes-toast/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/notifications/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/phantom-code-lab/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/rich-text-editor/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/search-tools/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/source-drawer/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/streaming/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/synthesis-chat/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/theory-board/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/toc-reader/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/ui-components/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/webgpu-showcase/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/yorha-assistant/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/yorha-icons/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/yorha-terminal/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/evidence/analyze/+page.server.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/evidence/hash/+page.server.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/global-search/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/persons-of-interest/[id]/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:90adca11bf6dc5c942620de748a8d5c92f2c4d08d7acc19d956af7482b8bb17a",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/terminal/+page.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/yorha-home/+page.server.ts",
       "graphifyRows": 1,
-      "currentWorkspaceRows": 0,
+      "currentWorkspaceRows": null,
       "sourceRevisionQualifiedRows": 1,
       "revisionQualifiedRows": 1,
-      "workspaceRevisionQualifiedRows": 0,
+      "workspaceRevisionQualifiedRows": null,
       "sourceRevision": "sha256:d866f6facd9f8375969a150a0a064df86349db40f0ce4fc57b015f2507897a3c",
       "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH"
+      "classification": "SOURCE_REVISION_QUALIFIED_WORKSPACE_CURRENTNESS_UNKNOWN"
     }
   ],
   "databaseError": null,
@@ -627,7 +628,7 @@
   "postgresWrites": false,
   "graphifyWrites": false,
   "qdrantWrites": false,
-  "status": "WORKSPACE_REVISION_SOURCE_MISMATCH",
-  "nextGate": "CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED",
-  "reportChecksum": "9949180b4824e18e47e9b12772571e72a94924ae791958d7a16bf864d1688c79"
+  "status": "WORKSPACE_CURRENTNESS_UNAVAILABLE",
+  "nextGate": "WORKSPACE_CURRENTNESS_READBACK_REQUIRED",
+  "reportChecksum": "5275f6dc02f6521a9b510f9aff702120b937069485ba254a7e8648b978fcf8ff"
 }

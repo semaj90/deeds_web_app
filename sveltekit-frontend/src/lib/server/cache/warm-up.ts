@@ -12,7 +12,7 @@
  *   node scripts/cache-warmup.mjs
  */
 
-import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
+import { observeServedChatModelIdV1 } from '$lib/server/ai/llama-server-model-resolver.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 
 /**
@@ -175,7 +175,7 @@ const COMMON_QUERIES = [
  *
  * @param options.batchSize - Number of queries to process in parallel (default: 5)
  * @param options.delayMs - Delay between batches in milliseconds (default: 1000)
- * @param options.model - LLM model to use (default: ornith-1.5-9b)
+ * @param options.model - LLM model to use (default: the model llama-server reports)
  * @param options.dryRun - If true, only log queries without calling LLM (default: false)
  */
 export async function warmUpCache(options: {
@@ -187,7 +187,7 @@ export async function warmUpCache(options: {
 	const {
 		batchSize = 5,
 		delayMs = 1000,
-		model = SERVER_CHAT_MODEL,
+		model = (await observeServedChatModelIdV1()) ?? 'unidentified',
 		dryRun = false,
 	} = options;
 

@@ -104,6 +104,8 @@ type config struct {
 	EmbeddingDimension                int
 	EmbedServiceURL                   string
 	EmbedModel                        string
+	EG2EmbedServiceURL                string
+	EG2QdrantCollection               string
 	GRPCPort                          string
 	HTTPPort                          string
 	CacheTTL                          time.Duration
@@ -158,6 +160,8 @@ func loadConfig() config {
 		EmbeddingDimension:                embedDim,
 		EmbedServiceURL:                   embeddingBaseURL,
 		EmbedModel:                        envOr("EMBED_MODEL", "embeddinggemma:latest"),
+		EG2EmbedServiceURL:                envOr("EG2_EMBED_SERVICE_URL", "http://127.0.0.1:8094"),
+		EG2QdrantCollection:               envOr("EG2_QDRANT_COLLECTION", "codebase_chunks_768_eg2"),
 		GRPCPort:                          envOr("GRPC_PORT", "50053"),
 		HTTPPort:                          envOr("HTTP_PORT", "8100"),
 		CacheTTL:                          time.Duration(cacheTTL) * time.Second,
@@ -267,8 +271,10 @@ type representationEntry struct {
 const defaultRepresentationID = "semantic_768"
 
 var representationRegistry = map[string]representationEntry{
-	defaultRepresentationID: {dimension: 768, collection: collectionCodebase, queryEncoder: true},
-	"latent_256":            {dimension: 256, collection: "codebase_chunks_latent256", queryEncoder: false},
+	defaultRepresentationID:                         {dimension: 768, collection: collectionCodebase, queryEncoder: true},
+	"embeddinggemma2_768":                           {dimension: 768, collection: "codebase_chunks_768_eg2", queryEncoder: true},
+	"embeddinggemma2-trt-rtx-code-retrieval-doc-v1": {dimension: 768, collection: "codebase_chunks_768_eg2", queryEncoder: true},
+	"latent_256":                                    {dimension: 256, collection: "codebase_chunks_latent256", queryEncoder: false},
 }
 
 // resolveRepresentation never silently substitutes: if the caller's requested representation
@@ -308,6 +314,60 @@ func (s *retrievalServer) embed(ctx context.Context, text string) ([]float32, er
 		return nil, fmt.Errorf("configured embedding service failed; unqualified fallbacks are disabled: %w", err)
 	}
 	if err := validateEmbeddingVector(vec, s.cfg.EmbeddingDimension); err != nil {
+		return nil, err
+	}
+	return vec, nil
+}
+
+// embedEG2 calls the isolated EmbeddingGemma 2 ONNX/TensorRT-RTX /embed endpoint (:8094 or :18094).
+func (s *retrievalServer) embedEG2(ctx context.Context, text string) ([]float32, error) {
+	if strings.TrimSpace(text) == "" {
+		return nil, fmt.Errorf("embedding query is empty")
+	}
+	baseURL := strings.TrimRight(strings.TrimSpace(s.cfg.EG2EmbedServiceURL), "/")
+	if baseURL == "" {
+		return nil, fmt.Errorf("EG2_EMBED_SERVICE_URL is not configured")
+	}
+	ctx, cancel := context.WithTimeout(ctx, embedTimeout)
+	defer cancel()
+
+	queryInput := strings.TrimSpace(text)
+	if !strings.HasPrefix(queryInput, "task: ") {
+		queryInput = "task: code retrieval | query: " + queryInput
+	}
+	payload, err := json.Marshal(map[string]any{
+		"texts": []string{queryInput},
+		"dims":  []int{768},
+	})
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, baseURL+"/embed", bytes.NewReader(payload))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("eg2 embed service: status %d", resp.StatusCode)
+	}
+	var parsed struct {
+		Embeddings map[string][][]float32 `json:"embeddings"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&parsed); err != nil {
+		return nil, fmt.Errorf("decode eg2 embed response: %w", err)
+	}
+	bucket := parsed.Embeddings["768"]
+	if len(bucket) == 0 {
+		return nil, fmt.Errorf("eg2 embed response missing 768D vector")
+	}
+	vec := bucket[0]
+	if err := validateEmbeddingVector(vec, 768); err != nil {
 		return nil, err
 	}
 	return vec, nil
@@ -769,13 +829,20 @@ func buildCodebasePrefetchQueries(contentVec string, sigVec string, vec []float3
 }
 
 func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float32, queryText string, kinds []string, pathPrefixes []string, extraFilters []*qdrantclient.Condition, limit int) ([]qdrantChunk, error) {
+	return s.qdrantSearchCodebaseWithCollection(ctx, s.cfg.QdrantCollection, vec, queryText, kinds, pathPrefixes, extraFilters, limit)
+}
+
+func (s *retrievalServer) qdrantSearchCodebaseWithCollection(ctx context.Context, collectionName string, vec []float32, queryText string, kinds []string, pathPrefixes []string, extraFilters []*qdrantclient.Condition, limit int) ([]qdrantChunk, error) {
+	if strings.TrimSpace(collectionName) == "" {
+		collectionName = s.cfg.QdrantCollection
+	}
 	contentVec := s.cfg.QdrantVectorName
 	sigVec := "signature"
 	prefetchLimit := uint64(limit * 3)
 	qlimit := uint64(limit)
 
 	queryReq := &qdrantclient.QueryPoints{
-		CollectionName: s.cfg.QdrantCollection,
+		CollectionName: collectionName,
 		Prefetch:       buildCodebasePrefetchQueries(contentVec, sigVec, vec, queryText, s.cfg.QdrantBM25BranchActive, prefetchLimit),
 		Query:          qdrantclient.NewQueryFusion(qdrantclient.Fusion_RRF),
 		Limit:          &qlimit,
@@ -2240,10 +2307,13 @@ func codebaseSourceRevisionFilter(ctx *sharedpb.AtlasRequestContextV2) *qdrantcl
 }
 
 func (s *retrievalServer) SearchCodebase(ctx context.Context, req *pb.CodebaseSearchRequest) (*pb.CodebaseSearchResponse, error) {
-	return s.searchCodebase(ctx, req, nil)
+	resp, _ := s.searchCodebase(ctx, req, nil)
+	return resp, nil
 }
 
-func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSearchRequest, extraFilters []*qdrantclient.Condition) (*pb.CodebaseSearchResponse, error) {
+// The internal status is independent of the optional identity-bound tool receipt.
+// Legacy HTTP callers do not pass Atlas context, including on backend failures.
+func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSearchRequest, extraFilters []*qdrantclient.Condition) (*pb.CodebaseSearchResponse, string) {
 	atomic.AddInt64(&s.totalRequests, 1)
 	atomic.AddInt64(&s.codebaseSearches, 1)
 
@@ -2259,20 +2329,27 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 		limit = maxLimit
 	}
 
-	representationUsed, _, representationFallbackReason := resolveRepresentation(req.RepresentationId)
+	representationUsed, repEntry, representationFallbackReason := resolveRepresentation(req.RepresentationId)
 	if representationFallbackReason != "" {
 		slog.Warn("[retrieval] representation fallback", "requested", req.RepresentationId, "used", representationUsed, "reason", representationFallbackReason)
 	}
 
-	vec, err := s.embed(ctx, req.Query)
+	isEG2 := strings.HasPrefix(representationUsed, "embeddinggemma2")
+	var vec []float32
+	var err error
+	if isEG2 {
+		vec, err = s.embedEG2(ctx, req.Query)
+	} else {
+		vec, err = s.embed(ctx, req.Query)
+	}
 	if err != nil {
 		slog.Warn("[retrieval] codebase embed failed", "err", err)
-		return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason, Receipt: codebaseReceipt(req.GetAtlasContext(), false, 0, -1, "FAIL", "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE", "")}, nil
+		return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason, Receipt: codebaseReceipt(req.GetAtlasContext(), false, 0, -1, "FAIL", "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE", "")}, "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE"
 	}
 
 	if len(req.PacketKeys) > 0 {
 		if len(req.PacketKeys) > 768 {
-			return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason, Receipt: codebaseReceipt(req.GetAtlasContext(), false, 0, -1, "FAIL", "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE", "")}, nil
+			return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason, Receipt: codebaseReceipt(req.GetAtlasContext(), false, 0, -1, "FAIL", "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE", "")}, "PACKET_KEY_FILTER_LIMIT_EXCEEDED"
 		}
 		extraFilters = append(extraFilters, qdrantclient.NewMatchKeywords("packet_key", req.PacketKeys...))
 	}
@@ -2281,10 +2358,18 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 		extraFilters = append(extraFilters, sourceFilter)
 	}
 
-	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.GetQuery(), req.Kinds, req.PathPrefixes, extraFilters, limit)
+	targetCollection := s.cfg.QdrantCollection
+	if isEG2 {
+		if strings.TrimSpace(s.cfg.EG2QdrantCollection) != "" {
+			targetCollection = s.cfg.EG2QdrantCollection
+		} else {
+			targetCollection = repEntry.collection
+		}
+	}
+	chunks, err := s.qdrantSearchCodebaseWithCollection(ctx, targetCollection, vec, req.GetQuery(), req.Kinds, req.PathPrefixes, extraFilters, limit)
 	if err != nil {
 		slog.Warn("[retrieval] codebase search failed", "err", err)
-		return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason, Receipt: codebaseReceipt(req.GetAtlasContext(), false, 0, -1, "FAIL", "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE", "")}, nil
+		return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason, Receipt: codebaseReceipt(req.GetAtlasContext(), false, 0, -1, "FAIL", "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE", "")}, "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE"
 	}
 
 	// HTTP method filter
@@ -2345,7 +2430,7 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 		RepresentationUsed:           representationUsed,
 		RepresentationFallbackReason: representationFallbackReason,
 		Receipt:                      codebaseReceipt(req.GetAtlasContext(), true, len(protoChunks), confidence, validationStatus, identityError, codebaseOutputChecksum(chunks)),
-	}, nil
+	}, ""
 }
 
 // ── StreamCodebase ─────────────────────────────────────────────────────────
@@ -2720,6 +2805,8 @@ func (s *retrievalServer) httpHealth(w http.ResponseWriter, r *http.Request) {
 		readinessState = "NOT_READY"
 	case !h.GetEmbeddingServiceUp():
 		readinessState = "NOT_READY"
+	case !codebaseSearchReady:
+		readinessState = "READY_DEGRADED"
 	case !h.GetRedisConnected():
 		readinessState = "READY_DEGRADED"
 	default:
@@ -2884,15 +2971,20 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	var body struct {
-		Query            string                          `json:"query"`
-		Limit            int32                           `json:"limit"`
-		Kinds            []string                        `json:"kinds"`
-		PathPrefixes     []string                        `json:"path_prefixes"`
-		HTTPMethod       string                          `json:"http_method"`
-		PacketKeys       []string                        `json:"packet_keys"`
-		Tags             []string                        `json:"tags"`
-		RepresentationID string                          `json:"representation_id"`
-		AtlasContext     *sharedpb.AtlasRequestContextV2 `json:"atlas_context"`
+		Query                  string                          `json:"query"`
+		Limit                  int32                           `json:"limit"`
+		Kinds                  []string                        `json:"kinds"`
+		PathPrefixes           []string                        `json:"path_prefixes"`
+		HTTPMethod             string                          `json:"http_method"`
+		PacketKeys             []string                        `json:"packet_keys"`
+		Tags                   []string                        `json:"tags"`
+		RepresentationID       string                          `json:"representation_id"`
+		RepresentationRevision int32                           `json:"representation_revision"`
+		EmbeddingModelID       string                          `json:"embedding_model_id"`
+		EmbeddingModelRevision string                          `json:"embedding_model_revision"`
+		TaskID                 string                          `json:"task_id"`
+		RequestID              string                          `json:"request_id"`
+		AtlasContext           *sharedpb.AtlasRequestContextV2 `json:"atlas_context"`
 	}
 	if err := json.NewDecoder(io.LimitReader(r.Body, 1<<20)).Decode(&body); err != nil {
 		http.Error(w, "bad request", http.StatusBadRequest)
@@ -2902,8 +2994,23 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "too many tags", http.StatusBadRequest)
 		return
 	}
+	if body.EmbeddingModelID != "" || body.EmbeddingModelRevision != "" {
+		if body.EmbeddingModelID != s.cfg.EmbedModel || body.EmbeddingModelRevision != s.cfg.EmbeddingRepresentationRevision {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusConflict)
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"chunks":                   []any{},
+				"error_code":               "EG2_QUERY_MODEL_REVISION_MISMATCH",
+				"embedding_model_id":       s.cfg.EmbedModel,
+				"embedding_model_revision": s.cfg.EmbeddingRepresentationRevision,
+				"task_id":                  body.TaskID,
+				"request_id":               body.RequestID,
+			})
+			return
+		}
+	}
 	tagFilters := buildCodebaseTagFilters(body.Tags)
-	resp, err := s.searchCodebase(r.Context(), &pb.CodebaseSearchRequest{
+	resp, failureCode := s.searchCodebase(r.Context(), &pb.CodebaseSearchRequest{
 		Query:            body.Query,
 		Limit:            body.Limit,
 		Kinds:            body.Kinds,
@@ -2913,20 +3020,32 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 		RepresentationId: body.RepresentationID,
 		AtlasContext:     body.AtlasContext,
 	}, tagFilters)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 	w.Header().Set("Content-Type", "application/json")
+	var errorCode *string
+	if failureCode != "" {
+		errorCode = &failureCode
+		status := http.StatusServiceUnavailable
+		if failureCode == "PACKET_KEY_FILTER_LIMIT_EXCEEDED" {
+			status = http.StatusBadRequest
+		}
+		w.WriteHeader(status)
+	}
 	chunks := resp.GetChunks()
 	if chunks == nil {
 		chunks = []*pb.CodebaseChunk{}
 	}
 	json.NewEncoder(w).Encode(map[string]any{
-		"chunks":              chunks,
-		"representation_used": resp.GetRepresentationUsed(),
-		"total_ms":            resp.GetTotalMs(),
-		"query_stage_trace":   buildCodebaseStageTrace(s.cfg.QdrantCollection, s.cfg.QdrantVectorName, len(resp.GetChunks()), s.cfg.QdrantBM25BranchActive),
+		"chunks":                         chunks,
+		"representation_used":            resp.GetRepresentationUsed(),
+		"representation_fallback_reason": resp.GetRepresentationFallbackReason(),
+		"representation_revision":        body.RepresentationRevision,
+		"embedding_model_id":             s.cfg.EmbedModel,
+		"embedding_model_revision":       s.cfg.EmbeddingRepresentationRevision,
+		"request_id":                     body.RequestID,
+		"task_id":                        body.TaskID,
+		"total_ms":                       resp.GetTotalMs(),
+		"query_stage_trace":              buildCodebaseStageTrace(s.cfg.QdrantCollection, s.cfg.QdrantVectorName, len(resp.GetChunks()), s.cfg.QdrantBM25BranchActive),
+		"error_code":                     errorCode,
 	})
 }
 

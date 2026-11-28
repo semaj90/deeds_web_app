@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRetrieveAllCandidates } = vi.hoisted(() => ({
+const { mockRetrieveAllCandidates, mockRetrieveAllCandidatesWithReceipts } = vi.hoisted(() => ({
   mockRetrieveAllCandidates: vi.fn(),
+  mockRetrieveAllCandidatesWithReceipts: vi.fn(),
 }));
 
 const { mockRerankCanonicalFeatureEnvelopes } = vi.hoisted(() => ({
@@ -35,9 +36,14 @@ const { mockExecuteGraphV2BoundedTraversalV1 } = vi.hoisted(() => ({
   mockExecuteGraphV2BoundedTraversalV1: vi.fn(),
 }));
 
-vi.mock('./retrieve-candidates.js', () => ({
-  retrieveAllCandidates: mockRetrieveAllCandidates,
-}));
+vi.mock('./retrieve-candidates.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./retrieve-candidates.js')>();
+  return {
+    ...actual,
+    retrieveAllCandidates: mockRetrieveAllCandidates,
+    retrieveAllCandidatesWithReceipts: mockRetrieveAllCandidatesWithReceipts,
+  };
+});
 
 vi.mock('./canonical-rerank-executor.js', () => ({
   rerankCanonicalFeatureEnvelopes: mockRerankCanonicalFeatureEnvelopes,
@@ -115,6 +121,11 @@ describe('search runtime bridge', () => {
       vi.fn(async () => new Response('ok', { status: 200 }))
     );
     mockRetrieveAllCandidates.mockReset();
+    mockRetrieveAllCandidatesWithReceipts.mockReset();
+    mockRetrieveAllCandidatesWithReceipts.mockImplementation(async (...args: unknown[]) => ({
+      candidates: await mockRetrieveAllCandidates(...args),
+      laneReceipts: [],
+    }));
     mockRerankCanonicalFeatureEnvelopes.mockReset();
     mockHydrateCandidates.mockReset();
     mockHydrateCandidatesWithProof.mockReset();
@@ -134,6 +145,70 @@ describe('search runtime bridge', () => {
       matchedHyperedges: 0,
       neighbors: [],
     });
+  });
+
+  it('uses the receipt adapter and binds its diagnostics to the task and requested revisions', async () => {
+    mockRetrieveAllCandidatesWithReceipts.mockResolvedValue({
+      candidates: [],
+      laneReceipts: [{ lane: 'bm25', logicalLane: 'lexical', status: 'empty', hitCount: 0, elapsedMs: 3, deadlineMs: 5000 }],
+    });
+    const workspaceId = '11111111-1111-4111-8111-111111111111';
+    const runtime = createSearchRuntime({ userId: 'actor-1', readOnly: true });
+    const result = await runtime.search({
+      text: 'no-match-query',
+      workspaceId,
+      workspaceRevision: 'sha256:workspace',
+      sourceRevision: 'sha256:source',
+      representationId: 'semantic_768',
+      representationRevision: 1,
+      topK: 1,
+    }, {
+      runId: 'run-1',
+      taskId: 'task-1',
+      embeddingModelId: 'embeddinggemma2-fixture',
+      embeddingModelRevision: `sha256:${'a'.repeat(64)}`,
+      actorGrant: {
+        status: 'AUTHORIZED',
+        actorId: 'actor-1',
+        workspaceId,
+        workspaceRevision: 'sha256:workspace',
+        repositoryIds: ['repository-1'],
+        allowedSourceRefs: ['src/example.ts'],
+        authorityRef: 'fixture-grant-1',
+      },
+    });
+
+    expect(mockRetrieveAllCandidatesWithReceipts).toHaveBeenCalledOnce();
+    expect(mockRetrieveAllCandidatesWithReceipts.mock.calls[0]?.[3]).toEqual(expect.objectContaining({
+      goRetrievalContext: expect.objectContaining({
+        requestId: 'run-1:go-retrieval',
+        taskId: 'task-1',
+        runId: 'run-1',
+        workspaceId,
+        workspaceRevision: 'sha256:workspace',
+        sourceRevision: 'sha256:source',
+        representationId: 'semantic_768',
+        representationRevision: 1,
+        embeddingModelId: 'embeddinggemma2-fixture',
+        embeddingModelRevision: `sha256:${'a'.repeat(64)}`,
+      }),
+    }));
+    expect(mockRetrieveAllCandidates).not.toHaveBeenCalled();
+    expect(result.proof.laneReceipts).toEqual([expect.objectContaining({
+      lane: 'bm25',
+      status: 'empty',
+      binding: expect.objectContaining({
+        runId: 'run-1',
+        taskId: 'task-1',
+        workspaceId,
+        workspaceRevision: 'sha256:workspace',
+        sourceRevision: 'sha256:source',
+        representationId: 'semantic_768',
+        representationRevision: 1,
+        bindingStatus: 'complete',
+        authorizationBindingStatus: 'validated_actor_grant',
+      }),
+    })]);
   });
 
   it('uses the injected reranker order without allowing candidate identity or revision changes', async () => {
@@ -352,7 +427,7 @@ describe('search runtime bridge', () => {
       'canonical rerank spine',
       { includeGenerated: false, includeLegacy: false },
       undefined,
-      { includeVectorLanes: true }
+      expect.objectContaining({ includeVectorLanes: true, globalTimeoutMs: 8000 })
     );
     expect(mockRerankCanonicalFeatureEnvelopes).toHaveBeenCalledTimes(1);
     expect(mockAppendSearchRuntimeTrainingRow).not.toHaveBeenCalled();
@@ -848,7 +923,7 @@ describe('search runtime bridge', () => {
         query,
         { includeGenerated: false, includeLegacy: false },
         undefined,
-        { includeVectorLanes: true }
+        expect.objectContaining({ includeVectorLanes: true, globalTimeoutMs: 8000 })
       );
     }
   });
@@ -1307,5 +1382,196 @@ describe('Function Registry final Top-K proof identity', () => {
     expect(proof.qualifiedFinalCandidateCount).toBe(0);
     expect(proof.candidates[0].presentInFinalTopK).toBe(false);
     expect(proof.candidates[0].dropStage).toBe('HYDRATION');
+  });
+
+  it('executes native NES-LUT + masked Top-K via scoreHydratedCandidatesWithNlut and enforces workspace/representation eligibility', async () => {
+    const runtime = new SearchRuntime({ readOnly: true });
+    const candidates = [
+      { packet_key: 'p0', source_ref: 'src/a.ts', workspace_id: 'ws:1', representation_id: 'semantic_768' },
+      { packet_key: 'p1', source_ref: 'src/b.ts', workspace_id: 'ws:foreign', representation_id: 'semantic_768' },
+      { packet_key: 'p2', source_ref: 'src/c.ts', workspace_id: 'ws:1', representation_id: 'semantic_768' },
+      { packet_key: 'p3', source_ref: 'src/missing-workspace.ts', representation_id: 'semantic_768' },
+      { packet_key: 'p4', source_ref: 'src/missing-representation.ts', workspace_id: 'ws:1' },
+    ] as any[];
+
+    const q = new Float32Array([1, 0, 0, 0]);
+    const mat = new Float32Array([
+      0.92, 0.391918, 0, 0,
+      0.99, 0.141067, 0, 0,
+      0.85, 0.526783, 0, 0,
+      0.96, 0.28, 0, 0,
+      0.94, 0.341174, 0, 0,
+    ]);
+    const lut = new Uint8Array([1, 1, 1, 1, 1]);
+    // 0xff is an allowed LUT code here; out-of-scope rows must still be masked.
+    const allowed = new Uint8Array([1, 255]);
+
+    const { ranked, nlutStageReceipt } = await runtime.scoreHydratedCandidatesWithNlut({
+      candidates,
+      queryVector: q,
+      corpusMatrix: mat,
+      dim: 4,
+      k: 3,
+      lutBytes: lut,
+      allowedBytes: allowed,
+      expectedWorkspaceId: 'ws:1',
+      expectedRepresentationId: 'semantic_768',
+    });
+
+    expect(ranked.map((r) => r.packet_key)).toEqual(['p0', 'p2']);
+    expect(nlutStageReceipt.eligibleOrdinalsCount).toBe(2);
+    expect(nlutStageReceipt.rejectedIneligibleCount).toBe(3);
+    expect(nlutStageReceipt.evaluatedCount).toBe(2);
+    expect(nlutStageReceipt.backend.length).toBeGreaterThan(0);
+
+    await expect(runtime.scoreHydratedCandidatesWithNlut({
+      candidates,
+      queryVector: q,
+      corpusMatrix: mat,
+      dim: 4,
+      k: 3,
+      lutBytes: lut,
+      allowedBytes: allowed,
+      expectedRepresentationId: 'semantic_768',
+    })).rejects.toThrow('NLUT_EXPECTED_SCOPE_AND_REPRESENTATION_REQUIRED');
+  });
+
+  it('wires nativeDenseTopK into SearchRuntime.search() while preserving non-dense tail candidates', async () => {
+    const denseCandidate = {
+      id: 'pkt-dense',
+      packetKey: 'pkt-dense',
+      sourceRef: 'src/dense.ts',
+      sourceType: 'code',
+      score: 0.9,
+      scoreSource: 'qdrant_768',
+      payload: {},
+    };
+    const lexicalCandidate = {
+      id: 'pkt-lex',
+      packetKey: 'pkt-lex',
+      sourceRef: 'src/lex.ts',
+      sourceType: 'code',
+      score: 0.75,
+      scoreSource: 'postgres_trigram',
+      payload: {},
+    };
+    mockRetrieveAllCandidatesWithReceipts.mockResolvedValueOnce({
+      candidates: [denseCandidate, lexicalCandidate],
+      laneReceipts: [],
+    });
+    mockHydrateCandidatesWithProof.mockResolvedValueOnce({
+      envelopes: [
+        { chunk_id: 'pkt-dense', packet_key: 'pkt-dense', source_ref: 'src/dense.ts', created_at: new Date(), workspace_id: 'ws:1', representation_id: 'semantic_768' },
+        { chunk_id: 'pkt-lex', packet_key: 'pkt-lex', source_ref: 'src/lex.ts', created_at: new Date() },
+      ],
+      proof: {
+        canonicalJoinedCount: 2, canonicalJoinMissingCount: 0, workspaceRejectedCount: 0,
+        workspaceRevisionRejectedCount: 0, sourceRevisionRejectedCount: 0,
+        representationRejectedCount: 0, representationRevisionRejectedCount: 0,
+        graphScoreAttachedCount: 0, graphScoreMissingCount: 2,
+        summaryResolvedCount: 2, summaryStaleRejectedCount: 0,
+        validationReasons: {}, candidateResolutions: [],
+      },
+    });
+    mockRerankCanonicalFeatureEnvelopes.mockImplementationOnce(async (_q: unknown, envs: any[]) => ({
+      results: envs,
+      provenance: { modelVersion: 'test-reranker', cacheStatus: 'miss' },
+    }));
+
+    const runtime = new SearchRuntime({ readOnly: true });
+    const res = await runtime.search(
+      { text: 'dense plus lexical', topK: 5, workspaceId: 'ws:1', representationId: 'semantic_768' },
+      {
+        nativeDenseTopK: {
+          queryVector: new Float32Array([1, 0, 0, 0]),
+          corpusMatrix: new Float32Array([0.9, 0.43589, 0, 0]),
+          dim: 4,
+          lutBytes: new Uint8Array([1]),
+          allowedBytes: new Uint8Array([1]),
+        },
+      },
+    );
+
+    expect(res.proof.nlutStageReceipt).toBeDefined();
+    expect(res.proof.nlutStageReceipt!.evaluatedCount).toBe(1);
+    expect(res.packets.map((p) => p.packet_key)).toEqual(['pkt-dense', 'pkt-lex']);
+  });
+
+  it('enforces validated actor-grant scope (missing, expired, revoked, foreign-workspace, and allowedSourceRefs)', async () => {
+    const wsId = '11111111-1111-4111-8111-111111111111';
+    const foreignWsId = '22222222-2222-4222-8222-222222222222';
+    const validGrant = {
+      status: 'AUTHORIZED' as const,
+      actorId: 'actor-1',
+      workspaceId: wsId,
+      workspaceRevision: 'ws-rev:1',
+      repositoryIds: ['deeds-web-app'],
+      allowedSourceRefs: ['src/allowed.ts'],
+      authorityRef: 'postgresql:atlas_actor_workspace_source_grants_v1:g1',
+    };
+
+    const runtime = new SearchRuntime({ userId: 'actor-1', readOnly: true });
+
+    await expect(
+      runtime.search({ text: 'grant check', workspaceId: wsId, workspaceRevision: 'ws-rev:1' }, { requireActorGrant: true }),
+    ).rejects.toThrow('ACTOR_GRANT_REQUIRED');
+
+    await expect(
+      runtime.search(
+        { text: 'grant check', workspaceId: wsId, workspaceRevision: 'ws-rev:1' },
+        { actorGrant: { ...validGrant, revoked: true } },
+      ),
+    ).rejects.toThrow('ACTOR_GRANT_REVOKED');
+
+    await expect(
+      runtime.search(
+        { text: 'grant check', workspaceId: wsId, workspaceRevision: 'ws-rev:1' },
+        { actorGrant: { ...validGrant, expiresAt: '2020-01-01T00:00:00.000Z' } },
+      ),
+    ).rejects.toThrow('ACTOR_GRANT_EXPIRED');
+
+    await expect(
+      runtime.search(
+        { text: 'grant check', workspaceId: wsId, workspaceRevision: 'ws-rev:1' },
+        { actorGrant: { ...validGrant, workspaceId: foreignWsId } },
+      ),
+    ).rejects.toThrow('ACTOR_GRANT_WORKSPACE_MISMATCH');
+
+    mockRetrieveAllCandidatesWithReceipts.mockResolvedValueOnce({
+      candidates: [
+        { id: 'c1', packetKey: 'p-allowed', sourceRef: 'src/allowed.ts', sourceType: 'code', score: 0.9, scoreSource: 'postgres_trigram', payload: {} },
+        { id: 'c2', packetKey: 'p-denied', sourceRef: 'src/secret.ts', sourceType: 'code', score: 0.99, scoreSource: 'postgres_trigram', payload: {} },
+      ],
+      laneReceipts: [],
+    });
+    mockHydrateCandidatesWithProof.mockResolvedValueOnce({
+      envelopes: [{ chunk_id: 'p-allowed', packet_key: 'p-allowed', source_ref: 'src/allowed.ts', created_at: new Date() }],
+      proof: {
+        canonicalJoinedCount: 1, canonicalJoinMissingCount: 0, workspaceRejectedCount: 0,
+        workspaceRevisionRejectedCount: 0, sourceRevisionRejectedCount: 0,
+        representationRejectedCount: 0, representationRevisionRejectedCount: 0,
+        graphScoreAttachedCount: 0, graphScoreMissingCount: 1,
+        summaryResolvedCount: 1, summaryStaleRejectedCount: 0,
+        validationReasons: {}, candidateResolutions: [],
+      },
+    });
+    mockRerankCanonicalFeatureEnvelopes.mockImplementationOnce(async (_q: unknown, envs: any[]) => ({
+      results: envs,
+      provenance: { modelVersion: 'test-reranker', cacheStatus: 'miss' },
+    }));
+
+    const okRes = await runtime.search(
+      { text: 'grant check', topK: 5, workspaceId: wsId, workspaceRevision: 'ws-rev:1' },
+      { actorGrant: validGrant },
+    );
+    expect(okRes.packets.map((p) => p.packet_key)).toEqual(['p-allowed']);
+    expect(okRes.proof.actorGrantReceipt).toEqual({
+      validated: true,
+      actorId: 'actor-1',
+      workspaceId: wsId,
+      workspaceRevision: 'ws-rev:1',
+      authorityRef: 'postgresql:atlas_actor_workspace_source_grants_v1:g1',
+      allowedSourceRefCount: 1,
+    });
   });
 });

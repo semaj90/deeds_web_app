@@ -1,0 +1,278 @@
+schema: atlas.okf.feature-label-agentic-error-fixing.v1
+version: 1
+pipeline_id: feature-label-agentic-error-fixing
+status: DESIGN_ONLY
+owner: parent-atlas
+updated: 2026-11-26
+
+authority:
+  canonical_authority: false
+  writes_allowed: false
+  model_execution_allowed: false
+  recommendations_are_advisory: true
+  feature_labels_are_identity: false
+  workspace_id_is_sandbox: false
+  git_worktree_is_mutation_boundary: true
+
+purpose: >-
+  Connect advisory feature-label routing and canonical runtime-error fingerprints to
+  existing Kanban task identities, bounded verified-context retrieval, and isolated
+  repair proposals. PostgreSQL 18, owning OpenSpec ledgers, and independent receipts
+  retain authority; this file is a workflow proposal, not executable permission.
+
+identity_contract:
+  task_id_owner: existing_kanban_and_openspec_owners
+  workspace_id_role: postgres_authorization_and_namespace
+  mutation_sandbox: git_worktree
+  worktree_receipt_fields:
+    - worktree_id
+    - branch
+    - base_commit
+    - preimage_sha256
+  feature_label_role: advisory_routing_and_display
+  required_candidate_bindings:
+    - packet_key
+    - source_ref
+    - source_revision
+    - workspace_revision
+  optional_candidate_bindings:
+    - feature_id
+    - feature_label
+    - representation_revision
+    - graph_revision
+  unresolved_task_marker: UNRESOLVED_TASK_ID
+  rules:
+    - Never infer task_id from feature_label, file proximity, or model output.
+    - Never join on feature_id or feature_label alone.
+    - Keep workspace_id separate from worktree identity and filesystem isolation.
+    - Missing source or workspace revision is a refusal, not a value to synthesize.
+
+error_identity:
+  join_key: canonicalErrorJoinKeyV1
+  format: errkey:<sha256>
+  owner: sveltekit-frontend/src/lib/server/features/ai/ace/error-fingerprint.ts
+  consumers:
+    - runtime-error-priorities.ts
+    - repair-episode-verifier-v1.ts
+  acp_a2a_codes:
+    completed_in_ledger:
+      - ACP_PARSE_MISCLASSIFIED
+      - ACP_REGISTRY_UNSAFE
+      - A2A_PARSE_ERROR
+      - QA_FIXTURE_MISSING
+      - GRAPHIFY_SNAPSHOT_STALE
+      - A2A-RPC-32601
+    still_review:
+      - QA-DECISION-01
+      - QA-SCHED-01
+      - qa_issues.kanban_task_id
+  note: >-
+    Completion above reflects the current e2e-error-intelligence-kanban task ledger;
+    it does not establish a complete production agent-repair path.
+
+search_and_evidence:
+  fusion_owner: SearchRuntime
+  existing_owners:
+    - id: search_runtime
+      path: sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts
+      role: Normalize and fuse logical retrieval lanes once.
+    - id: dense_candidate_executor
+      path: sveltekit-frontend/src/lib/server/retrieval/packet-dense-search.ts
+      role: Dense candidate discovery; not evidence admission.
+    - id: pg18_chunk_readback
+      path: python/atlas_graph_runtime/ace_bitfrost_caller_v1.py
+      symbol: build_pg18_chunk_body_scoped_readback_v1
+      role: Unit-tested scoped canonical chunk-body readback contract.
+    - id: bounded_rlm
+      path: python/atlas_graph_runtime/dspy_predict_ace_recommender_v1.py
+      symbols:
+        - create_bounded_dspy_rlm_v1
+        - run_bounded_dspy_rlm_v1
+      tools:
+        - search_manifest_chunks
+        - verify_utf8_span
+      limits:
+        iterations: 3
+        sub_llm_calls: 4
+        output_characters: 2048
+      role: Read-only tools over already admitted manifest evidence.
+  evidence_gate:
+    require_authenticated_actor: true
+    require_active_workspace_grant: true
+    require_current_source_and_workspace_revisions: true
+    require_canonical_chunk_identity: true
+    require_exact_utf8_bytes_and_digest: true
+    require_exact_selected_node_cardinality: true
+    reject_missing_duplicate_stale_or_extra_rows: true
+    raw_search_hits_to_model: false
+  runtime_status:
+    scoped_readback_contract: UNIT_PROVEN_PER_PRIOR_REPORTED_TESTS
+    live_pg18_readback: NOT_PROVEN
+    production_rlm_caller: NOT_PROVEN
+    verified_context_runtime: FAIL_CLOSED_SIX_PROVIDERS_PENDING
+    remaining_provider_names:
+      - resolveQueryRepresentation
+      - retrieveTopKInput
+      - resolveFeatureSnapshot
+      - tokenizer
+      - promptTemplateRevision
+      - instructionRevision
+    immutable_packet_hydrator: ROUTE_CODE_PRESENT_LIVE_HANDOFF_NOT_PROVEN
+
+feature_label_and_task_proposals:
+  feature_label_owner: existing_packet_and_feature_registry_owners
+  feature_label_is_not:
+    - task_id
+    - packet_key
+    - source_ref
+    - taxonomy_id
+    - authorization_scope
+    - retrieval_vote
+  task_link_policy:
+    source_of_truth: owning_kanban_task_and_openspec_identity
+    association_evidence:
+      - exact_openspec_task_reference
+      - verified_source_or_packet_binding
+    uncertain_association: UNRESOLVED_TASK_ID
+    prohibit_nearest_title_or_semantic_guess: true
+  proposal_scores:
+    allowed_inputs:
+      - exact_error_join_key
+      - lexical_or_ast_match_metadata
+      - dense_similarity_metadata
+      - reviewed_task_link
+      - current_admitted_graph_context
+      - feature_label_advisory
+      - optional_pca_svd_or_cluster_feature
+    scores_are_calibrated_probabilities: false
+    promotion_requires_reviewed_repair_outcomes: true
+
+worktree_repair_boundary:
+  worktree_per_candidate: true
+  must_record_preimage_sha256: true
+  rlm_filesystem_access: false
+  rlm_shell_access: false
+  rlm_network_access: false
+  rlm_database_access: false
+  independent_host_validation:
+    - targeted_test_command
+    - regression_check
+    - diff_and_preimage_review
+    - source_and_workspace_revision_readback
+    - immutable_repair_receipt
+  patch_auto_apply: false
+  ledger_or_receipt_mutation_by_rlm: false
+
+framework_alignment:
+  local_sveltekit_calls: keep_local
+  acp: server_tool_registry_and_authorization_boundary
+  a2a: use_only_for_independently_deployable_agents
+  mcp: typed_tool_transport_not_identity_or_authority
+  mastra: optional_adapter_name; not a prerequisite for verified retrieval
+  python_repl: bounded_in_memory_execution_only_after_verified_manifest
+  repl_toml: DEFERRED
+  kanban_board: operational_projection_of_canonical_task_and_receipt
+  openspec: owning_implementation_and_acceptance_ledger
+
+compute_lanes:
+  lexical_ast_cst:
+    role: deterministic candidate discovery and structural observations
+    promotion: require exact source bytes, parser revision, and source binding
+  embedding:
+    reference: EmbeddingGemma semantic_768 through existing CPU ONNX :8094
+    rtx_worker: NOT_INSTALLED_OR_PROVEN
+    role: one retrieval lane; keep model/tokenizer/pooling/normalization revisions pinned
+  pg18:
+    role: canonical identity, source authority, eligibility, evidence, and vector owner
+  qdrant_neo4j_valkey:
+    role: rebuildable projections or cache hints, never canonical identity
+  cutile_cuvs_cugraph:
+    status: DEFERRED_CHALLENGER
+    gate: frozen inputs, resource lease, bounded memory, CPU-oracle parity, and receipt
+  kmeans_som_pca_svd_4d:
+    role: advisory grouping, navigation, candidate generation only
+    retrieval_vote: false
+  qlora_gepa_xgboost_mlp_rl:
+    status: DEFERRED
+    prerequisites:
+      - verified repair episodes
+      - reviewed labels and held-out split
+      - pinned base model, tokenizer, data, and training recipe
+      - authorized artifact registry and promotion receipt
+  airflow:
+    status: NOT_REQUIRED_FOR_CURRENT_VERTICAL_SLICE
+    note: Use current PG18 jobs/outbox and existing scheduler owners until a measured orchestration gap exists.
+  training_artifact_formats:
+    examples:
+      - .safetensors
+      - .pth
+    rule: >-
+      Format names do not establish training provenance, safety, or promotion; use only
+      the authorized versioned training-artifact registry.
+
+open_spec_owners:
+  ledgers:
+    - path: openspec/changes/e2e-error-intelligence-kanban/tasks.md
+      scope: ACP/A2A error classification, RPC contracts, QA issues, Kanban linkage
+    - path: openspec/changes/parent-atlas-agentic-repair-fabric/tasks.md
+      scope: repair runtime ownership; KANBAN-RUNTIME-PROOF-01 remains open
+    - path: openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md
+      scope: repair-bundle integration gates
+    - path: openspec/changes/feature-label-semantic-derivation/tasks.md
+      scope: advisory label derivation and promotion safeguards
+    - path: openspec/changes/parent-atlas-agent-framework-integration-hardening/tasks.md
+      scope: ACP/A2A/MCP/framework routing and verified ACE handoff
+  kanban_rule: Cards reference owning OpenSpec task IDs and proof receipts; no second authority.
+
+next_gates:
+  - id: SOURCE_SELECTION_CURRENTNESS
+    status: BLOCKED
+    reason: >-
+      Reseal proved 32819/32819 snapshot bytes, but source selection and inventory
+      hygiene then blocked; workspace revision candidate is not admitted authority.
+  - id: SCOPED_PG18_REPLAY
+    status: BLOCKED
+    reason: Current workspace authority, live grant and revision-bound target chunk are not proven together.
+  - id: NONPRODUCTION_RLM_REPLAY
+    status: NOT_RUN
+    depends_on: SCOPED_PG18_REPLAY
+  - id: VERIFIED_CONTEXT_ROUTE
+    status: BLOCKED
+    depends_on:
+      - NONPRODUCTION_RLM_REPLAY
+      - all six runtime providers
+      - live verified packet hydration and model handoff
+  - id: REPAIR_TOURNAMENT
+    status: DEFERRED
+    depends_on:
+      - VERIFIED_CONTEXT_ROUTE
+      - isolated git worktree harness
+      - independent test and readback receipts
+
+keywords:
+  - feature_label
+  - canonicalErrorJoinKeyV1
+  - errkey
+  - KernelDagCandidate
+  - task_id
+  - UNRESOLVED_TASK_ID
+  - workspaceId
+  - workspaceRevision
+  - SearchRuntime
+  - ContextManifest
+  - build_pg18_chunk_body_scoped_readback_v1
+  - run_bounded_dspy_rlm_v1
+  - ACP
+  - A2A
+  - MCP
+  - git worktree
+  - source selection
+  - tournament admission
+
+change_controls:
+  writes_performed: false
+  migration_created: false
+  live_grant_issued: false
+  service_restarted: false
+  model_invoked: false
+  production_route_changed: false

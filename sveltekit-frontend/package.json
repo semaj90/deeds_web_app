@@ -792,6 +792,7 @@
     "graphify:daily:search": "node ../scripts/atlas/graphify-daily-discovery-v1.mjs search",
     "graphify:daily:helpers:test": "node --test ../scripts/atlas/lib/graphify-daily-discovery-v1.test.mjs",
     "graphify:daily:gates:test": "node --test ../scripts/atlas/canonical-projection-admission-summary-v1.spec.mjs ../scripts/atlas/graphify-daily-failure-guard-v1.test.mjs ../scripts/atlas/lib/graphify-daily-discovery-v1.test.mjs ../scripts/atlas/graphify-daily-lifecycle-open-v1.test.mjs",
+    "graphify:daily:check:errors": "node --test --test-concurrency=2 ../scripts/atlas/canonical-projection-admission-summary-v1.spec.mjs ../scripts/atlas/graphify-daily-failure-guard-v1.test.mjs ../scripts/atlas/lib/graphify-daily-discovery-v1.test.mjs ../scripts/atlas/graphify-daily-lifecycle-open-v1.test.mjs scripts/qa/qa-pipeline.test.mjs",
     "atlas:simdjson:tensor:cpu": "node ../scripts/atlas/prove-simdjson-graph-gather-v1.mjs",
     "atlas:simdjson:tensor:gpu": "node ../scripts/atlas/prove-simdjson-graph-gather-v1.mjs --gpu",
     "atlas:simdjson:tensor:test": "node --test ../scripts/atlas/lib/simdjson-graph-gather-v1.test.mjs",

@@ -78,6 +78,8 @@ export async function fetchAuthorityScores(
     .map(([sourceRef, revisions]) => [sourceRef, [...revisions][0]]));
 
   try {
+    const toTextArraySql = (values: string[]) =>
+      sql`ARRAY[${sql.join(values.map((v) => sql`${v}`), sql`, `)}]::text[]`;
     const db = await getDb();
     const result = await db.execute(sql`
       SELECT p.packet_key AS matched_packet_key, p.source_ref AS matched_source_ref,
@@ -107,10 +109,10 @@ export async function fetchAuthorityScores(
        AND n.properties->>'workspaceRevision' = snap.source_manifest->>'workspaceRevision'
        AND (s.packet_key IS NULL OR s.packet_key = p.packet_key)
        AND (
-         p.packet_key = ANY(${packetKeys}::text[])
-         OR p.source_ref = ANY(${sourceRefs}::text[])
+         p.packet_key = ANY(${toTextArraySql(packetKeys)})
+         OR p.source_ref = ANY(${toTextArraySql(sourceRefs)})
        )
-      WHERE p.source_revision = ANY(${sourceRevisions}::text[])
+      WHERE p.source_revision = ANY(${toTextArraySql(sourceRevisions)})
     `);
 
     type AuthorityRow = {

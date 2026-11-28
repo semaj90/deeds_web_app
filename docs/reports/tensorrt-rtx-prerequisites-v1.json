@@ -1,6 +1,6 @@
 {
   "schema": "atlas.tensorrt-rtx-prerequisites.v1",
-  "capturedAt": "2026-11-23T22:58:54.237Z",
+  "capturedAt": "2026-11-27T01:23:10.554Z",
   "gpu": {
     "available": true,
     "output": "NVIDIA GeForce RTX 3060 Ti, 8.6, 580.88, 8192 MiB"

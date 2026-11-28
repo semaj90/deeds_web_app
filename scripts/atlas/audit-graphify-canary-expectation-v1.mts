@@ -1,12 +1,13 @@
 #!/usr/bin/env tsx
 
 import { readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { verifyGraphifyCanaryExpectationV1 } from '../../sveltekit-frontend/src/lib/server/atlas/graph/graphify-canary-expectation-v1.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const ADMISSION = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
+const admissionArgument = process.argv.find((value) => value.startsWith('--admission='))?.slice('--admission='.length);
+const ADMISSION = resolve(ROOT, admissionArgument ?? 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const expectationArgument = process.argv.find((value) => value.startsWith('--expectation='))?.slice('--expectation='.length);
 const EXPECTATION = resolve(ROOT, expectationArgument ?? 'docs/reports/graphify-canary-expectation-v1.json');
 
@@ -31,6 +32,8 @@ const expectationContract = {
 };
 
 const checks = {
+  admissionIsAdmitted: admission.status === 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED'
+    && admission.authority === true,
   schemaValidAndChecksumMatches: verifyGraphifyCanaryExpectationV1(expectationContract as never),
   workspaceRevisionMatchesAdmission: expectation.workspaceRevision === admission.workspaceRevision,
   snapshotRevisionMatchesAdmission: expectation.snapshotRevision === admission.snapshotRevision,
@@ -58,6 +61,7 @@ console.log(JSON.stringify({
   schema: 'atlas.graphify-canary-expectation-audit.v1',
   status,
   mode: 'READ_ONLY',
+  admissionReceiptPath: relative(ROOT, ADMISSION).replaceAll('\\', '/'),
   checks,
   violations,
   workspaceRevision: expectation.workspaceRevision ?? null,
