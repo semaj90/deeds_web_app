@@ -1242,6 +1242,16 @@ suite re-run after all of this — still 31/31 pass. No database/Qdrant/Valkey/N
       `LOGICAL_LANE`, `EXECUTOR_NAME_NOT_LANE`, `RERANK_FEATURE_ONLY`,
       `ROUTING_WEIGHT`, `LEGACY_ALIAS`, and `DIAGNOSTIC_ONLY`; a common numeric
       type or name is not evidence of equivalent semantics.
+  - 2026-11-28: the 6 `UNCLASSIFIED` entries were all `laneWeight` literals in
+    `atlas/tournament/retrieval-tournament-evaluator-v1.ts` (only its spec imports
+    it). Classified as `EVALUATION_ONLY` / `OFFLINE_BENCHMARK` (not a fusion vote).
+    Census re-run: 85 sources, 0 unclassified, 0 conflicts
+    (`.tmp/review/rrf-lane-weight-census-classified-20261128T063944Z.json`; the
+    tracked report was not overwritten; the script now accepts `--output=`).
+    Open finding: line 336 multiplies each fighter's `qualityScore` by
+    `laneWeight`, so the hybrid-RRF fighter (1.3) is favoured over lexical (1.0)
+    before any measurement. Do not use that tournament's ranking as promotion
+    evidence until this is removed or justified.
 - [x] **RWC-CENSUS-02A — Caller baseline inventory.** Implemented
       `scripts/atlas/audit-rrf-caller-baseline-v1.mjs` and
       `npm run atlas:rrf:caller-baseline` as a production-source-only,
@@ -1920,3 +1930,114 @@ Evidence: `sveltekit-frontend/src/routes/api/rag/search-fused/+server.ts`,
 `sveltekit-frontend/src/mcp/tools/repair_tools.ts`,
 `sveltekit-frontend/src/lib/server/retrieval/fusion-core-v1.ts`, and the open
 identity-envelope tasks above. No caller was changed in this preflight.
+
+## Read-only recommendation loop: needs (2026-11-28)
+
+Script `scripts/atlas/e2e-turbovec-recommendation-readonly-v1.mts` (uncommitted; unverified output; no datastore writes).
+Receipts `.tmp/review/e2e-turbovec-recommendation-*.json`; latest `...20261128T080901151Z.json` (`--code-only --live-files`).
+- 10 questions, corpus-oracle tie-aware recall@10: PG18 HNSW 0.98, TurboVec k=100 + rescore 0.78. Latency is cache-dependent. Keep PG18 HNSW as default candidate; the script still feeds TurboVec into evidence.
+- Index stale: newest `indexed_at` 2026-09-15; 39,029/274,428 embedded chunks point to missing files.
+- Two model security recommendations on the upload path were false (one from a deleted file; one from a page action that forwards to an API enforcing `getAuthorizedCase`, 404 on no access).
+
+- [ ] RECO-NEED-01: feed evidence from PG18 HNSW by default (or sweep TurboVec shortlist size first).
+- [ ] RECO-NEED-02: live-file lane picks one 40-line window per file; it missed the auth call at line 188. Chunk by symbol or allow two windows.
+- [ ] RECO-NEED-03: add caller/forwarding context before any "missing check" claim; label such claims unconfirmed.
+- [ ] RECO-NEED-04: sentence-level citation support check (today: ID membership only). `<channel|>` still leaks with `enable_thinking:false`; strip is script-side.
+- [ ] RECO-NEED-05: label 10+ expected files per question to measure evidence quality, not just ANN recall.
+- [ ] RECO-NEED-06: reindex (writes; needs approval; must not write `source_revision` before Phase 20).
+- [ ] RECO-NEED-07: API endpoint. Six `/api/*recommend*` routes already exist (`ace`, `admin`, `codebase-index`, `graph`, `recommendations/[userId]`, `.../track`); audit them and extend an owner instead of adding `/api/recommendations`.
+- [ ] RECO-NEED-08: static prompt prefix + whole-chunk token budget; reuse `ace/token-aware-context-packer.ts` / `context-prompt-streamer.ts`; measure prefill reuse before claiming it.
+
+### Handoff (2026-11-28, late session)
+
+Latest receipt `.tmp/review/e2e-turbovec-recommendation-20261128T082716976Z.json` (PG18 HNSW evidence, code-only, live files; no degradations; unverified).
+- Upload question: answer matches source (`getAuthorizedCase` via `resolveEvidenceCaseId`, 404). Line 188 came from the forwarded-route block; two-window live search alone missed it (RECO-NEED-02 still open).
+- Only this one answer was checked against source (RECO-NEED-03/04 stay open). Retired 384-lane code still appears as evidence; `candidate-fusion.ts` still not retrieved.
+- Next: RECO-NEED-05 (expected files per question) before more ranking changes.
+
+Operator component list to audit next (not audited in this pass; no claim of wiring):
+EmbeddingGemma 2 768 + MRL 512/256/128; latent 256/128 (and "latent512"); Qdrant + RRF (operator wrote "rff"; confirm it is not random Fourier features); msgpack, bytea, CouchDB map/reduce, DuckDB; fusion; RPC packet builder; Arrow IPC + mmap to PyTorch/ATen tensors; WASM, hex registry, `title_id` lookup; retrieval assembler/materializer; OpenAI facade; validator.
+Constraints for that audit:
+- Operator states "we're using embeddinggemma2". Measured 2026-11-28: Go Retrieval container uses `:8097` `embeddinggemma:latest`; `codebase_chunk_eg2_embeddings` held 1,000 rows against 274,428 EG1 vectors. Treat EG2 as target/challenger until the corpus is re-embedded (writes; needs approval). Never score EG2 queries against EG1 vectors, including MRL prefixes.
+- Bulk vectors go in Arrow IPC/mmap/tensors, not JSON or msgpack.
+- 2026-11-28 RECO-NEED-05 (labels created, provisional, not human-reviewed): `scripts/atlas/e2e-recommendation-expected-files-v1.json` (5 clear, 5 ambiguous). Any-expected-file-in-top-5 over saved receipts: unfiltered TurboVec 3/10; code-only 4/10; code-only + disk guard 4/10; + live files 8/10 (clear 5/5), same 8/10 with PG18 HNSW or TurboVec evidence; misses q2, q5 (both ambiguous). Related routes did not change the score. Caveats: labels were found by `git grep` (favours the lexical lane) and the lane was built after seeing these questions; a held-out set is still needed. Leave RECO-NEED-05 open until labels are reviewed.
+
+### Pre-compaction review (2026-11-28; read-only; nothing below was run)
+
+TensorRT-RTX (web search summaries of NVIDIA / ONNX Runtime docs; pages not opened):
+- `nv_runtime_cache_path` stores run-time compiled kernels, not model structure or weights; pair it with an `EPContext` model. Plugin package needs ONNX Runtime >= 1.24.
+- 1.7 notes list lower-memory, faster runtime caching and weights offloading. Offloading is not confirmed as exposed by the ORT plugin; do not plan on it.
+- Existing owners: `scripts/atlas/gemma2-onnx-embed-server-v1.py`, `scripts/atlas/compile-eg2-rtx-ep-context-v1.py`. Recorded fresh-process EPContext replay start 14.7 s; earlier uncompiled HTTP tests 65-80 s (different setups). Untested: EPContext served over HTTP, long inputs, sustained batches.
+- `simd-bridge/cpp/binding.cc`: simdjson and TensorRT names matched by search only; TensorRT functions not inspected. simdjson affects JSON parsing, not embedding. No simdjson web search was run.
+
+Directory, ETA and task-tracking reuse (rg-level; not run):
+- ETA: `sveltekit-frontend/src/lib/utils/progress-eta.ts` (percent complete); `scripts/atlas/lib/phase8_progress.mjs` (`eta_seconds`; fit unchecked).
+- Directory: `scripts/atlas/build-directory-metadata-summaries-v1.mjs` (Arrow; needs run id plus feature, package and rollup manifests; input currency unchecked), `build-directory-manifest.mjs`, `lib/directory-intelligence-rollup-v1.mjs`.
+- `task_id`: `scripts/agentic/claim-task.mjs`, `release-task-claim.mjs`, `packages/atlas-core/src/queue/coding-task.ts`; owner not established. `kanban_tasks` ~4,514, `analysis_jobs` ~167; tracking the run in either is a write that needs approval.
+- Stale, do not embed as directory text: `directory_cluster_checkpoints` (2026-05-17), `file_summaries` (05-17), `directory_context_bindings` (05-14).
+
+- [x] EG2-ETA-01: time ~2,000 current chunks on the TRT EG2 worker, no datastore writes; check free VRAM, leave `:8090` running, reuse an ETA helper, stop the worker. Current estimate for all current chunks (~235k) is ~1-5 h GPU, up to ~20 h, from tiny fixtures; excludes re-chunking, writes and indexing.
+  - Result (2026-11-28, EXPERIMENT; no datastore writes): `node scripts/atlas/time-eg2-rtx-epcontext-readonly-v1.mjs` exit 0, HEAD `d3bc3906c29` plus uncommitted script. Receipt `.tmp/review/eg2-rtx-timing-20261128T085226367Z/receipt.json`, sha256 `b8e3d658c3f870610ae0eb59cad953a36618b5ce0337366b8b0333f23e10e7e1`. 2,000 text-matched chunks (2,477 examined: 32 file missing, 445 text changed), batch 8, 42.35 s, 47.23 chunks/s, p95 request 253 ms, 11 truncated at 512 tokens. Profile: 343 RTX node events, 0 CPU. Parity vs CPU `:8094` q8 on 16 inputs (95-4,070 chars): min cosine 0.99993 (not same-graph FP32). Worker ready 20.1 s; min free VRAM 700 MiB (whole GPU, 2 s samples); `:8090` idle at all 10 samples; `:18094` released.
+  - Projection for 235,399 chunks: about 1.4 h embedding only; excludes re-chunking, writes, indexing, startup, retries. Not measured: runs longer than 42 s, concurrent `:8090` load, batch > 8, retrieval quality vs EG1.
+- Operator decision (2026-11-28): do not run the EG2 vs EG1 comparison. This supersedes earlier "next step" notes that propose it. Retrieval quality of EG2 stays unmeasured. This decision does not approve re-embedding, database writes or a search cutover.
+- Update (2026-11-28): the comparison is deferred, not dropped. Proposed timing: after EG2 vectors exist for the current chunks, before search switches to EG2. Do not run it earlier.
+
+### Correction to EG2-ETA-01 sample (2026-11-28; read-only recheck of the same 2,477 rows)
+`time-eg2-rtx-epcontext-readonly-v1.mjs` fell back to `sveltekit-frontend/<path>` when a path was absent, so "2,000 text-matched, 32 missing, 445 changed" is wrong. Exact indexed path: 1,780 match (71.9%), 343 present but chunk text not found, 354 absent (14.3%; of those, 220 match under the fallback, 100 do not, 32 have no fallback file). 2 changed-at-exact rows also matched the fallback. So about 11% of the timed inputs came from paths that do not exist as indexed. Throughput is still a measure on real chunk text; it is not a measure on a strictly current cohort. Whether fallback matches duplicate `sveltekit-frontend/` rows is unchecked. Exact-path estimate: ~197k eligible of 274,428 (sample estimate), ~1.2 h at 47.23/s.
+
+## EG2 re-embed plan (2026-11-28; PLAN ONLY, nothing applied)
+
+Scope: 768-d EG2 document vectors for chunks whose exact indexed path still contains the chunk text. Not in scope: re-chunking, new files, any `codebase_chunk_index` or `source_revision` write, Qdrant, MRL/latent lanes, search cutover.
+
+Existing owners: table `codebase_chunk_eg2_embeddings` (1,000 GGUF-Q8 rows, `embeddinggemma2-q8-challenger`, PK `source_id`), writer `scripts/atlas/build-eg2-index-batch-v1.mts`, preflight `scripts/atlas/audit-eg2-onnx-cohort-preflight-v1.mjs` (last status `BLOCKED_NOT_ADMITTED`), prompt `encodeRetrievalDocument` / `encodeCodeRetrievalQuery`. Earlier gate notes: `parent-atlas-gpu-graph-vector-substrate/tasks.md` (EG2 ONNX cohort preflight).
+
+- [ ] EG2-RE-00 (operator): decide (a) whether a disk-text-match cohort is acceptable for this non-canonical challenger, given the preflight gate asks for workspace currentness and a source-qualified cohort and `source_revision` writes are deferred past Phase 20; (b) storage identity; (c) embed before or after a reindex. Do not edit the preflight to make it pass; record the waiver if given.
+- [ ] EG2-RE-01 manifest (read-only): exact path only. Per row: chunk id, chunk `content_hash`, sha256 of formatted input, character count, truncation flag; fallback matches listed separately, excluded. Checksummed manifest under `.tmp/review/`. Confirm `encodeRetrievalDocument` output equals the timed recipe.
+- [ ] EG2-RE-02 storage (DDL; approval): proposed: keep one table; PK -> `(source_id, representation_id, model_revision)`; add nullable `input_sha256`, `input_truncated`; new representation id for FP32 TensorRT EPContext, `model_revision` pinning graph, weights, tokenizer and engine sha256. SQL in `drizzle/manual/`, pre-image of the 1,000 rows, rehearse with ROLLBACK, post-check. Search every reader and `ON CONFLICT (source_id)` writer first and change them together.
+- [ ] EG2-RE-03 writer (implementation WIRED; overall gate OPEN): `build-eg2-index-batch-v1.mts` now defaults to dry-run, requires an exact manifest digest and explicit recipe identity, validates exact-path disk text/content/input hashes, uses batch-8 ONNX worker requests only under `--apply`, checks truncation/vector shape/norm, uses short transactions and manifest-bound resume checkpoints, and refuses apply until the recipe-key migration and checksum-pinned exclusive TensorRT-RTX operator profile are supplied. Focused refusal tests and an 8-row read-only dry run passed. Remaining: finalize/pin the complete model identity (graph, weights, tokenizer, EPContext/engine, prompt), verify the ONNX query-vector producer is wired for this same revision, and obtain separate approval for DDL and row writes. No apply run occurred.
+- [ ] EG2-RE-04 canary (writes; approval): 1,000 rows; readback count, 768 dims, finite, unit norm, digest match; second run inserts 0; same-input parity sample.
+- [ ] EG2-RE-05 full load (writes; separate approval): progress/ETA; pause when `:8090` slots are busy; stop on free VRAM < 500 MiB, parity < 0.999 in periodic samples, or worker CPU node events; stop worker afterwards. Check free disk before (C: 37 GB free; existing table+index ~4 KB/row, so ~0.8 GB plus WAL, extrapolated).
+- [ ] EG2-RE-06 index (DDL; approval): partial HNSW for the new recipe, built after load; `maintenance_work_mem` is 64MB, set a session value after checking container memory. Decide on the existing unfiltered HNSW (it slows the load and mixes recipes). Measure recall vs exact.
+- [ ] EG2-RE-07 comparison (deferred to here by operator): shared current chunks, held-out questions written by the operator, same filters and k, live-file lane off, pass rule fixed beforehand. Queries use `encodeCodeRetrievalQuery`; record the query executor (CPU Q8 `:8094` differs from the FP32 document artifact).
+- [ ] EG2-RE-08 cutover: separate approval and its own plan (query service hosting, new-chunk writes, rollback). EG1 stays canonical until then.
+
+### EG2 re-embed: decisions and step 1 (2026-11-28)
+- [x] EG2-RE-00 operator accepted the three recommendations ("accept it"): (a) disk-text-match cohort allowed for this non-canonical challenger only; not source-authority proof, no promotion, preflight not edited; (b) composite identity `(source_id, representation_id, model_revision)`; (c) embed unchanged chunks before any reindex. No DDL or datastore write is approved by this.
+- [x] EG2-RE-01 PROVEN (read-only): `npx tsx scripts/atlas/build-eg2-reembed-manifest-readonly-v1.mts` exit 0 (first run exit 1 on newline-only content; fixed), HEAD `d3bc3906c29` plus uncommitted script. Receipt `.tmp/review/eg2-reembed-manifest-20261128T090207640Z/receipt.json`, sha256 `d64776e2caefafd9f2344968ad1c4fec77a2777051d2bd7977e6f7e8405184b2`. 274,428 nonempty rows: **201,587 eligible** (24,012 files), 33,796 chunk text not found, 39,029 absent at exact path, 16 blank. Shared prompt recipe mismatches: 0. Over 8,000 chars: 0. Token truncation NOT measured (`:8094 /tokenize` returned 404); loader must record `truncated_indices`. About 1.2 h embedding at 47.23/s.
+- Path finding: `src/...` rows (3,201 files, indexed 2026-04-20..08-29) are largely an older frontend-relative indexing run; 2,819 of those files also have `sveltekit-frontend/` rows. 25,642 absent-path chunks match under `sveltekit-frontend/`; 25,473 belong to files that also have a prefixed row (file-level, not chunk equivalence); 169 chunks in 34 files have none and are excluded. Earlier "deleted files" wording for this population is wrong for those matches; they are stale old-path rows.
+
+### EG2-RE-02 draft and rehearsal (2026-11-28; NOT APPLIED)
+- DRY_RUN_PROVEN (rolled back): `sveltekit-frontend/drizzle/manual/20261128_eg2_embeddings_recipe_key_v1.sql` (sha256 52a65c5fbe76ff2c...) and `..._down.sql`. Log, `rehearse.sql`, row pre-image (1,000 rows) and schema pre-image in `.tmp/review/eg2-storage-rehearsal-20261128T090646Z/`. Checks passed: second recipe accepted; rerun inserts 0; old `ON CONFLICT (source_id)` rejected; missing `representation_id` rejected; malformed digest rejected; view per recipe; down refused with two recipes. State lines (row digest, PK, columns/defaults, owner/ACL, view hash) after down and after ROLLBACK equal the starting state. Pre-image loaded into a rolled-back temp table: 1,000 rows, 0 differing on id, vector, model revision, created_at.
+- No dependent function, trigger, publication or incoming FK; one view; no other session query on the table at check time. Lock timing under concurrent load not tested. HNSW index untouched.
+- [ ] Apply DDL and row writes (separate approval). Writer and read-only challenger query now filter by `(source_id, representation_id, model_revision)`; the writer conflict target is the composite key. The table migration is still only drafted/rehearsed and has not been applied. Before any new-recipe row is loaded, pin the complete ONNX/EPContext artifact identity, prove the matching query-vector producer and pass an exclusive TensorRT-RTX profile with its SHA-256. Then obtain explicit approval for permanent DDL and a bounded canary; no approval is implied by this code preparation.
+- Follow-up: path-coverage readers (`analyze-ace-daily-simd-headroom-eg2-v1.py`, `audit-and-enrich-gold-evidence-v1.py`, `index-sveltekit-routes-eg2-onnx-v1.py`) would count any recipe; count-only audits would total both.
+- Security note: the working-tree change removes the hardcoded default database URL; it now requires `DATABASE_URL` or an explicit DSN. Keep this as uncommitted code until reviewed with the rest of the EG2 work.
+
+### EG2-RE-03 code-only follow-up (2026-11-28; no data writes)
+- Focused Node contract tests: 5/5 passed, including refusal of mixed CPU/TensorRT operator profiles.
+- Python challenger-lane tests: 5/5 passed; legacy Q8 query encoding is restricted to its exact recipe, and other recipes require an explicitly matching query-vector revision.
+- 8-row writer DRY_RUN: exact manifest SHA `d88ee86fb7932fb7d10d45c0a6b2ea5bd17b6f06a192614c17e0f9b99a0af6f1`; 8/8 source rows and exact disk text matched; inserted 0; embeddings performed 0; receipt `.tmp/review/eg2-index-batch-dryrun-1795858302940.json`.
+- Existing timing profile `.tmp/review/eg2-rtx-timing-20261128T085226367Z/ort-profile_2026-11-28_00-52-55_970.json` SHA-256 `53187ca2b63d99f21ffdb21d8946ef2776d868daf433e886f56b2bb8d2e01a20`: 343 TensorRT-RTX node events, 0 CPU node events. This is placement evidence for that timing run, not same-model parity against CPU Q8 and not a recipe identity manifest.
+- No schema change, embedding request, canonical/index write, Qdrant write, model comparison, or commit was performed. The timing receipt’s 11 inputs truncated at 512 tokens; the manifest did not premeasure tokenizer counts, so full-load truncation disposition remains open.
+
+### Read-only review (2026-11-28 ~01:31-01:36; another session was editing EG2, eval and live-runner files, so none were edited)
+- Eligibility re-run: `.tmp/review/eg2-reembed-manifest-20261128T093133656Z/` vs frozen `...090207640Z`: 201,587 = 201,587; 0 dropped, 0 changed inputs, 0 added. 274,428 differs because 33,796 chunk text not found, 39,029 absent at exact path, 16 blank.
+- Frozen trial cohort (first 1,000 manifest rows; 948 files; all still eligible): `.tmp/review/eg2-reembed-manifest-20261128T090207640Z/tournament-cohort-1000.ndjson`, sha256 `0e95f3c412d08b4b90cf38493ee2e503170ff3abdf0d4f0a01c1c6899248fe08`. No tournament run. `.venv-eg2-gpu` lists only CPU/Azure providers before plugin registration (no CUDA EP there; other envs unchecked).
+- Tests at 01:33: 18 pytest (label + EG2 lane) and 5 loader helper tests passed; files kept changing afterwards.
+- Migration SQL unchanged since rehearsal (up `52a65c5f...`, down `a4118fec...`). Not tested in a separate scratch database; second apply fails the precheck by design (not exercised).
+- `e2e-fixture-request-receipt-v1.mjs` is a two-Vitest fixture runner (no services). The live runner is `e2e-live-services-fixture-receipt-v1.mjs` (read, not run; modified 01:34:38). In that version, receipt `.tmp/review/e2e-live-services-fixture-receipt-v1.json` (01:24) supports only: EG1 `:8097` embed, direct Qdrant turbo8 query (5), PG18 hydration (5) + grant row count (0), a non-empty `:8090` reply. It overstates: Go Retrieval health only (no search); SearchRuntime never called (`fusionOwner`, `singleSemanticVote` hardcoded); Neo4j HTTP root only (`streamOnly` hardcoded); `:8095` health only; no EG2; BitFrost is an in-memory hash; `contractVerified` hardcoded; EG1 `numericalParity` is a length check; Headroom failed yet `degraded` is empty; reply cited no source; grant count is not actor/active scoped; fixed output path is overwritten.
+- [ ] E2E-LIVE-01: derive every stage status from an executed operation; call Go search, SearchRuntime, a GDS stream and `:8095` routing; add EG2 lane; require a resolved citation; list Headroom failure as degraded; unique output path.
+- Code-only follow-up (2026-11-28): Go Retrieval HTTP adapter now carries request/task/run/workspace/source/representation/model identity and deadline/cancellation, reports structured lane outcomes, and rejects server model-revision mismatch before searching. SearchRuntime passes this only with a validated grant and trusted model identity. Go unit suite passed; focused Vitest passed 34/34. This is contract proof only: no service was called/restarted, current Go container still needs an EG2-configured query embedder and aligned EG2 collection, and live grant/source authority are absent. E2E-LIVE-01 remains open.
+- Not done: loader changes, live runner changes, writer provenance and 384 `ROUTING_PRODUCTION` caller audit, feature-matrix contract, numeric/DAG tournaments, trainer early stopping/regularization.
+
+### EG2 loader re-review (2026-11-28 ~01:38-01:41; 10 files unchanged during checks, checksums compared)
+- Tests: 18 pytest + 5 loader helper pass. Frozen 1,000-cohort preview: 1,000/1,000 source-matched, 0 writes (62 s). Table still 1,000 rows, PK `(source_id)`.
+- Now present: manifest + digest checks, exact-path disk text check at load and again inside the write transaction, tokenizer-verified truncation, batch 8, per-batch transaction with readback, checkpoint after commit, PK query fixed. Write path never executed.
+- Still open before the 1,000 trial: (1) `--gpu-profile` is any caller-supplied file: the earlier timing-run profile and a hand-written one-event JSON both pass `validateExecutionProfileV1`; it is not bound to the running worker, session or model (ORT writes the profile only at worker shutdown, so verify after the run and gate acceptance on it). (2) `fallback_to_cpu=false` from `/health` not required. (3) no ONNX/weights/tokenizer/engine hash check; model revision is free text, worker id is a self-reported string. Before full run: no `:8090` busy pause, VRAM floor or parity check.
+
+### EG2 loader: gates and run safeguards (2026-11-28 ~01:42-01:56; no database writes, migration not applied)
+- WIRED, fixture-tested: (1) GPU run record + `--verify-gpu-run` (one profile under the worker's own prefix, newer than run start, TensorRT-RTX-only node events >= embed requests); resume from a checkpoint requires the previous run accepted. (2) `/health` must report `fallback_to_cpu=false`. (3) worker-reported model/tokenizer/engine sha256 must match the checksum-pinned compile receipt; source graph and weights hashed locally; model revision derived. Worker adds `instance_id` and opt-in hashes (`GEMMA2_REPORT_ARTIFACT_HASHES=1`).
+- Run safeguards (fixed thresholds): pause while `:8090` slots are processing (15 min timeout); free VRAM >= 500 MiB checked every 8 batches (not every batch); parity >= 0.999 vs CPU `:8094` q8 (different artifact) on the longest text of every 128th batch, before insert; unreadable probes fail closed; guard URLs loopback only. A busy slot or VRAM drop between checks is not caught mid-batch.
+- Final-revision tests: 13 node helper, 18 pytest (13 label + 5 EG2 lane) pass. Frozen 1,000 preview 1,000/1,000, 0 inserted, files unchanged during preview; EG2 table 1,000 rows. sha256: loader `91fff0a634b5215d...`, helper `fc4b2ae1616acb15...`, worker `6b1dc75c6f7ff841...`. Preview does not exercise guards or worker gates.
+- Not proven: live worker gates and guards (`--check-worker`, waiting for >= 2,000 MiB free VRAM); write path, resume and idempotency never run. Limits: guards against mistakes, not tampering; a different checkpoint path bypasses the accepted-run requirement; rows commit before the run is accepted.
+- Reported bugs checked by source read only (specs not rerun): live runner `pg` import uses `pathToFileURL`; `feature-matrix.ts` now binds `ARRAY[...]::text[]`.

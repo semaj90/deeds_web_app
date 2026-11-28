@@ -127,7 +127,9 @@ export async function embedSemantic768Canonical(
     }
   }
   const baseUrl = (opts.baseUrl ?? process.env.EMBEDDING_SERVER_URL ?? 'http://127.0.0.1:8081').replace(/\/+$/, '');
-  const signal = opts.signal ?? AbortSignal.timeout(opts.timeoutMs ?? 20_000);
+  // Combine, never replace: a caller's signal must not disable the timeout bound.
+  const timeout = AbortSignal.timeout(opts.timeoutMs ?? 20_000);
+  const signal = opts.signal ? AbortSignal.any([opts.signal, timeout]) : timeout;
   const tokenize = await fetch(`${baseUrl}/tokenize`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -200,7 +202,10 @@ export async function tryEmbedCanonical(
         // The route's schema only accepts 'embeddinggemma' | 'mock'; a tagged name such as
         // 'embeddinggemma:latest' is rejected with 400.
         body: JSON.stringify(payload),
-        signal: opts?.signal ?? AbortSignal.timeout(opts?.timeoutMs ?? 10_000),
+        // Combine, never replace: a caller's signal must not disable the timeout bound.
+        signal: opts?.signal
+          ? AbortSignal.any([opts.signal, AbortSignal.timeout(opts?.timeoutMs ?? 10_000)])
+          : AbortSignal.timeout(opts?.timeoutMs ?? 10_000),
       });
 
       if (response.ok) {

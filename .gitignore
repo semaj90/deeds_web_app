@@ -1140,3 +1140,6 @@ docs/reports/archive/**/openspec-workboard-v1*.json
 # Local music/audio drop folder (not tracked)
 /music/
 sveltekit-frontend/temp/media/mp4-diag/upload.mp4
+
+# ONNX Runtime profiler dumps written to repo root; keep under .tmp/atlas/ort-profiles-v1 instead.
+/onnxruntime_profile__*.json

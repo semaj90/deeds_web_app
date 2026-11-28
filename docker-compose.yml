@@ -492,9 +492,8 @@ services:
         max-size: "20m"
         max-file: "3"
     environment:
-      - NEO4J_AUTH=neo4j/neo4j123
+      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD:?set NEO4J_PASSWORD in .env}
       - NEO4J_PLUGINS=["apoc", "graph-data-science"]
-      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
       - NEO4J_dbms_security_procedures_allowlist=apoc.*,gds.*
       - NEO4J_dbms_memory_heap_initial__size=1g
       - NEO4J_dbms_memory_heap_max__size=2g
@@ -515,11 +514,11 @@ services:
     networks:
       - legal-ai-network
     healthcheck:
-      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "neo4j123", "MATCH () RETURN count(*) limit 1"]
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p \"$$(echo $$NEO4J_AUTH | cut -d/ -f2-)\" 'MATCH () RETURN count(*) limit 1'"]
       interval: 30s
-      timeout: 10s
+      timeout: 30s
       retries: 3
-      start_period: 30s
+      start_period: 120s
 
   # SearXNG — privacy-respecting metasearch engine for agent web search
   searxng:

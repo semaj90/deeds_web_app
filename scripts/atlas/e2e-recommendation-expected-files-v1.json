@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.e2e-recommendation-expected-files.v1",
+  "querySetVersion": "atlas.e2e-recommendation-queries.v1",
+  "labelStatus": "PROVISIONAL_AGENT_LABELS_NOT_HUMAN_REVIEWED",
+  "labelledAt": "2026-11-28",
+  "method": "git grep for owner symbols in current files; a query is a hit when any listed file appears in its evidence",
+  "queries": [
+    { "q": 0, "confidence": "ambiguous", "note": "several fusion implementations exist", "expected": ["src/lib/server/atlas/retrieval/candidate-fusion.ts", "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts", "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts"] },
+    { "q": 1, "confidence": "clear", "expected": ["sveltekit-frontend/src/lib/server/case-access.ts", "sveltekit-frontend/src/lib/server/evidence-case-admission-v1.ts", "sveltekit-frontend/src/routes/api/evidence/upload/+server.ts"] },
+    { "q": 2, "confidence": "ambiguous", "note": "many writers; list is not exhaustive", "expected": ["scripts/atlas/project-graphify-embeddings-qdrant.mjs", "scripts/atlas/project_pg18_to_qdrant_turbo16_v1.py", "scripts/atlas/apply-lineage-qualified-semantic-768-backfill-v1.mjs"] },
+    { "q": 3, "confidence": "clear", "expected": ["sveltekit-frontend/src/lib/server/cache/redis-exact-match.ts"] },
+    { "q": 4, "confidence": "ambiguous", "note": "chat stream and evidence job stream both resume", "expected": ["sveltekit-frontend/src/lib/server/streaming/sse-cursor.ts", "sveltekit-frontend/src/routes/api/sse/[id]/+server.ts", "sveltekit-frontend/src/routes/api/cases/[caseId]/evidence/jobs/[jobId]/events/+server.ts", "sveltekit-frontend/src/lib/components/evidence/evidence-progress-event-client-v1.ts"] },
+    { "q": 5, "confidence": "ambiguous", "note": "many PageRank scripts; list is not exhaustive", "expected": ["scripts/atlas/compute-pagerank-neo4j-v2.mjs", "scripts/atlas/compute-p4-pagerank.mjs", "scripts/atlas/neo4j-gds-pagerank-fixed.mjs", "scripts/atlas/export-neo4j-gds-scores.mjs"] },
+    { "q": 6, "confidence": "clear", "expected": ["sveltekit-frontend/src/lib/server/indexer/legal-chunker.ts"] },
+    { "q": 7, "confidence": "ambiguous", "note": "several MCP servers and registries", "expected": ["sveltekit-frontend/src/mcp/server.ts", "sveltekit-frontend/src/mcp/trace-mcp-server.ts", "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts"] },
+    { "q": 8, "confidence": "clear", "expected": ["sveltekit-frontend/src/lib/server/atlas/identity/code-source-revision-v1.ts"] },
+    { "q": 9, "confidence": "clear", "expected": ["sveltekit-frontend/src/lib/server/ai/llama-server-model-resolver.ts"] }
+  ]
+}

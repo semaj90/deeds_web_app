@@ -31,3 +31,8 @@ mmproj*.gguf
 
 # EmbeddingGemma 2 Q8 ONNX export (pinned in embeddinggemma2-onnx-image-v1.ts): local weights, tokenizer and configs.
 /embeddinggemma2/onnx-q8/
+
+# EmbeddingGemma 2 TRT-RTX export: ONNX graphs, external weights, tokenizer, TRT engine/JIT cache.
+# Only the receipts under manifests/ are tracked (they carry sha256 pins for every payload).
+/embeddinggemma2/onnx-trt-rtx/*
+!/embeddinggemma2/onnx-trt-rtx/manifests/

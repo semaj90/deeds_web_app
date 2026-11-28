@@ -16,6 +16,11 @@ from typing import Any
 
 DEFAULT_OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434").rstrip("/")
 EG2_CHALLENGER_MODEL = "embeddinggemma2:q8_0"
+EG2_Q8_REPRESENTATION_ID = "embeddinggemma2-q8-challenger"
+EG2_Q8_MODEL_REVISION = (
+    "unsloth/embeddinggemma-2-GGUF:embeddinggemma-2-Q8_0.gguf@sha256:"
+    "6f1bd4ac6c5df7444f9cca7ca36cafe6cfa34cd6f49fefb1e0b4be8143aed8bc"
+)
 CANONICAL_MODEL = "embeddinggemma:latest"
 EXPECTED_DIM = 768
 
@@ -68,6 +73,36 @@ def embed_texts_ollama_v1(
     return [[float(v) for v in vec] for vec in embeddings]
 
 
+def resolve_query_vector_v1(
+    q8_vector: list[float],
+    *,
+    representation_id: str,
+    model_revision: str,
+    query_vector: list[float] | None,
+    query_vector_model_revision: str | None,
+) -> tuple[list[float] | None, str]:
+    """Reject recipe mixing before a database query; None means use the legacy Q8 encoder."""
+    if not representation_id.strip() or not model_revision.strip():
+        raise ValueError("EG2_RECIPE_IDENTITY_REQUIRED")
+    if query_vector is None:
+        if representation_id != EG2_Q8_REPRESENTATION_ID or model_revision != EG2_Q8_MODEL_REVISION:
+            raise ValueError("EG2_QUERY_ENCODER_RECIPE_MISMATCH")
+        if len(q8_vector) != EXPECTED_DIM or not all(math.isfinite(v) for v in q8_vector):
+            raise ValueError("EG2_QUERY_VECTOR_INVALID")
+        norm = math.sqrt(sum(v * v for v in q8_vector))
+        if not math.isfinite(norm) or norm <= 0 or abs(norm - 1.0) > 0.02:
+            raise ValueError("EG2_QUERY_VECTOR_NOT_UNIT_NORMALIZED")
+        return None, EG2_Q8_MODEL_REVISION
+    if query_vector_model_revision != model_revision:
+        raise ValueError("EG2_QUERY_VECTOR_REVISION_MISMATCH")
+    if len(query_vector) != EXPECTED_DIM or not all(math.isfinite(v) for v in query_vector):
+        raise ValueError("EG2_QUERY_VECTOR_INVALID")
+    norm = math.sqrt(sum(v * v for v in query_vector))
+    if not math.isfinite(norm) or norm <= 0 or abs(norm - 1.0) > 0.02:
+        raise ValueError("EG2_QUERY_VECTOR_NOT_UNIT_NORMALIZED")
+    return [float(v) for v in query_vector], model_revision
+
+
 def probe_eg2_space_orthogonality_v1(
     text: str = "drizzle postgres schema migration",
     *,
@@ -94,29 +129,56 @@ def query_eg2_challenger_readonly_v1(
     *,
     dsn: str | None = None,
     top_k: int = 5,
+    representation_id: str,
+    model_revision: str,
+    query_vector: list[float] | None = None,
+    query_vector_model_revision: str | None = None,
     ollama_url: str = DEFAULT_OLLAMA_URL,
 ) -> dict[str, Any]:
-    """Run a read-only nearest-neighbor query against codebase_chunk_eg2_embeddings."""
+    """Query one exact EG2 recipe; never fuse or mix recipe/model revisions.
+
+    The default Ollama query encoder is only compatible with the historical Q8
+    recipe. Other recipes must supply a query vector produced by the matching
+    model revision and identify that revision explicitly.
+    """
     import psycopg
 
-    db_url = dsn or os.environ.get(
-        "DATABASE_URL",
-        "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db",
+    if not 1 <= top_k <= 100:
+        raise ValueError("EG2_TOP_K_OUT_OF_RANGE")
+    if query_vector is None:
+        if representation_id != EG2_Q8_REPRESENTATION_ID or model_revision != EG2_Q8_MODEL_REVISION:
+            raise ValueError("EG2_QUERY_ENCODER_RECIPE_MISMATCH: provide a matching query_vector and revision")
+        q8_vector = embed_texts_ollama_v1([query_text], model=EG2_CHALLENGER_MODEL, ollama_url=ollama_url)[0]
+    else:
+        q8_vector = []
+    resolved_vector, query_model_revision = resolve_query_vector_v1(
+        q8_vector,
+        representation_id=representation_id,
+        model_revision=model_revision,
+        query_vector=query_vector,
+        query_vector_model_revision=query_vector_model_revision,
     )
-    vec = embed_texts_ollama_v1([query_text], model=EG2_CHALLENGER_MODEL, ollama_url=ollama_url)[0]
+    vec = q8_vector if resolved_vector is None else resolved_vector
+
+    db_url = dsn or os.environ.get("DATABASE_URL")
+    if not db_url:
+        raise RuntimeError("DATABASE_URL environment variable or explicit dsn is required")
     literal = "[" + ",".join(f"{v:.7f}" for v in vec) + "]"
     with psycopg.connect(db_url, options="-c default_transaction_read_only=on") as conn:
         with conn.cursor() as cur:
             cur.execute(
                 """
                 SELECT e.source_id::text, c.relative_path, c.symbol,
+                       e.representation_id, e.model_revision,
                        1.0 - (e.embedding <=> %s::halfvec) AS cosine_sim
                 FROM codebase_chunk_eg2_embeddings e
                 JOIN codebase_chunk_index c ON c.id = e.source_id
+                WHERE e.representation_id = %s::text
+                  AND e.model_revision = %s::text
                 ORDER BY e.embedding <=> %s::halfvec
                 LIMIT %s
                 """,
-                (literal, literal, top_k),
+                (literal, representation_id, model_revision, literal, top_k),
             )
             rows = cur.fetchall()
     return {
@@ -124,7 +186,10 @@ def query_eg2_challenger_readonly_v1(
         "canonicalAuthority": False,
         "writesPerformed": False,
         "transactionReadOnly": True,
-        "model": EG2_CHALLENGER_MODEL,
+        "model": EG2_CHALLENGER_MODEL if resolved_vector is None else None,
+        "queryModelRevision": query_model_revision,
+        "representationId": representation_id,
+        "modelRevision": model_revision,
         "table": "codebase_chunk_eg2_embeddings",
         "query": query_text,
         "hits": [
@@ -132,7 +197,9 @@ def query_eg2_challenger_readonly_v1(
                 "sourceId": r[0],
                 "relativePath": r[1],
                 "symbol": r[2],
-                "cosineSimilarity": round(float(r[3]), 6),
+                "representationId": r[3],
+                "modelRevision": r[4],
+                "cosineSimilarity": round(float(r[5]), 6),
             }
             for r in rows
         ],
