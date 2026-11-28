@@ -2041,3 +2041,32 @@ Existing owners: table `codebase_chunk_eg2_embeddings` (1,000 GGUF-Q8 rows, `emb
 - Final-revision tests: 13 node helper, 18 pytest (13 label + 5 EG2 lane) pass. Frozen 1,000 preview 1,000/1,000, 0 inserted, files unchanged during preview; EG2 table 1,000 rows. sha256: loader `91fff0a634b5215d...`, helper `fc4b2ae1616acb15...`, worker `6b1dc75c6f7ff841...`. Preview does not exercise guards or worker gates.
 - Not proven: live worker gates and guards (`--check-worker`, waiting for >= 2,000 MiB free VRAM); write path, resume and idempotency never run. Limits: guards against mistakes, not tampering; a different checkpoint path bypasses the accepted-run requirement; rows commit before the run is accepted.
 - Reported bugs checked by source read only (specs not rerun): live runner `pg` import uses `pathToFileURL`; `feature-matrix.ts` now binds `ARRAY[...]::text[]`.
+
+---
+
+## HANDOFF (2026-11-28 02:00) — start here; where earlier sections differ, this one is current
+
+**Git:** commit `13d884e31f9` on `session/2026-11-08-verified-context-live-shadow`, ahead 1, **not pushed**; 32 files, none over 10 MB. ~116 other entries stay uncommitted (several sessions): never `git add -A`. Not committed: `domain_representation_tournament_v1.py`, both e2e receipt runners, the `feature-matrix.ts` fix. This handoff note is uncommitted.
+
+**Pending now:** live check of the three loader gates and run safeguards. At 02:00 it had not started (free VRAM 1,212 MiB; needs >= 2,000; `:18094` closed). A background waiter in the old session gives up after ~40 min and dies with that session. Re-run from the repo root once memory is free (no database writes; leaves `:8090` running):
+`node .tmp/review/eg2-loader-livecheck.mjs`
+Expected: strict `--check-worker` passes on 8 chunks with 1 parity and 1 VRAM check; verify before worker stop fails, after stop `ACCEPTED`; second verify refused; `ORT_FALLBACK_TO_CPU=1` worker refused with `EG2_WORKER_CPU_FALLBACK_NOT_DISABLED`. Record the actual result here.
+
+**EG2 re-embed state:** `codebase_chunk_eg2_embeddings` 1,000 rows, PK `(source_id)`; migration NOT applied.
+- Eligible list 201,587: `.tmp/review/eg2-reembed-manifest-20261128T090207640Z/eligible.ndjson` (sha256 `d88ee86fb7932fb7d10d45c0a6b2ea5bd17b6f06a192614c17e0f9b99a0af6f1`). Trial 1,000: `tournament-cohort-1000.ndjson` beside it (sha256 `0e95f3c412d08b4b90cf38493ee2e503170ff3abdf0d4f0a01c1c6899248fe08`). Compile receipt: `.tmp/review/eg2-rtx-ep-context-20261127/receipt.json`. These are under gitignored `.tmp/`: not in the commit, do not clean.
+- Preview (needs `--manifest --manifest-sha256 --representation-id --compile-receipt --compile-receipt-sha256`) passed 1,000/1,000 on the committed loader.
+- [ ] Live check above. [ ] Operator approval, stated explicitly, before: fresh backup, DDL apply, 1,000-chunk `--apply` trial, stop worker, `--verify-gpu-run`, rerun expecting 0 inserted. A rerun with the same checkpoint resumes after the last id, so test idempotency with a separate checkpoint path (this skips the accepted-run requirement; verify the first run first). [ ] Full backfill is a separate approval.
+- [ ] CPU vs RTX inference-only tournament on the 1,000 cohort. [ ] EG1 vs EG2 quality comparison deferred by operator to after EG2 vectors exist, before any search cutover.
+- Throughput ~47 chunks/s (about 1.2 h for 201,587) came from a sample with ~11% fallback-path text; embedding only. CPU figures conflict (0.46/s vs 10.5-13.9/s saved benchmark).
+
+**Labels (operator task):** `py -3.13 scripts/eval/review_domain_labels.py` (default queue `.tmp/review/domain-label-queue-20261128-current-v2.jsonl`, 432 rows). No labels saved yet. Floor 200 distinct, 30 per class, 6 classes; does not satisfy the 13-group evaluation. Do not rerun the exporter over existing queues.
+
+**Search / E2E:** read-only recommendation script scored 8/10 with provisional agent labels (optimistic; RECO-NEED-05 open: operator review + ~10 held-out questions). Index rows are from <= 2026-09-15. E2E-LIVE-01 open: `e2e-live-services-fixture-receipt-v1.mjs` overstates execution (see 01:31-01:36 review). Do not run the pasted `bench-turbovec-vs-pg18-e2e` script (EG2 queries against EG1 vectors, wrong routes/columns).
+
+**Security follow-ups (operator):** change the Neo4j password: both a value from `.env` and the old hardcoded healthcheck value were printed to the session transcript, and the old one is in git history. An old default database password in `eg2_challenger_lane_v1.py` was also printed (removed from the committed file). Neo4j has not been confirmed recreated with the final compose fix.
+
+**Also open:** historical topology/KMeans writer lineage (candidates only); callers of the 384-D `ROUTING_PRODUCTION` cluster model; crime-scene needs live in `crime-scene-reconstruction/tasks.md`.
+
+**Handoff review (02:01; found by reading the code, not run):**
+- [ ] BUG (loader, committed in `13d884e31f9`): an `--apply` run in which every row already exists still opens a GPU run with `embedRequests=0` and stores its `gpuRunPath` in the checkpoint (line 380). Verification refuses such a run (`EG2_GPU_RUN_HAS_NO_EMBED_REQUESTS`), so later applies with that checkpoint are blocked. Fix before the trial: save `gpuRunPath` only when the run has embed requests (keep any still-pending earlier one), add a test. The write path has no test coverage.
+- Correction to the idempotency advice above: same cohort manifest + same checkpoint selects 0 entries, so "0 inserted" there proves nothing. A separate checkpoint exercises skip-existing (`target_present`), not the `ON CONFLICT` clause, needs a fresh-profile worker, and hits the bug above.

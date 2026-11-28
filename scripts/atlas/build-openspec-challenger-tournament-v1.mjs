@@ -16,6 +16,7 @@ const lowrankRaw=read('low-rank-task-recommendation-v2.json');
 const lowrankDegenerate=Boolean(lowrankRaw)&&String(lowrankRaw.status??'OK').startsWith('DEGENERATE');
 const lowrank=lowrankDegenerate?null:lowrankRaw;
 const det=tasksOf(deterministic), lr=tasksOf(lowrank);
+const boundedShortlist=lowrank?.exactRescore != null;
 const detRank=new Map(det.map((t,i)=>[idOf(t),i+1]).filter(([id])=>id));
 const lrRank=new Map(lr.map((t,i)=>[idOf(t),i+1]).filter(([id])=>id));
 const ids=[...new Set([...detRank.keys(),...lrRank.keys()])];
@@ -30,7 +31,15 @@ const report={
   schema:'atlas.openspec-challenger-tournament.v1',
   generatedAt:new Date().toISOString(),
   participants:{deterministic:Boolean(deterministic),lowRank:Boolean(lowrank),humanFeedback:false},
-  comparisonStatus: lowrankDegenerate ? 'LOW_RANK_CHALLENGER_DEGENERATE_INSUFFICIENT_FEATURE_VARIANCE' : lowrank ? 'COMPARISON_AVAILABLE' : (deterministic ? 'LOW_RANK_CHALLENGER_REPORT_MISSING' : 'RANKING_INPUTS_MISSING'),
+  comparisonStatus: boundedShortlist
+    ? 'BOUNDED_SHORTLIST_COMPARISON_AVAILABLE'
+    : lowrankDegenerate ? 'LOW_RANK_CHALLENGER_DEGENERATE_INSUFFICIENT_FEATURE_VARIANCE' : lowrank ? 'COMPARISON_AVAILABLE' : (deterministic ? 'LOW_RANK_CHALLENGER_REPORT_MISSING' : 'RANKING_INPUTS_MISSING'),
+  ...(boundedShortlist ? { lowRankCoverage: {
+    nominatedTaskCount: lr.length,
+    sourceTaskCount: lowrank.source?.taskCount ?? null,
+    exactMetric: lowrank.exactRescore.metric,
+    sourceInputSha256: lowrank.source?.inputSha256 ?? null,
+  } } : {}),
   deterministicSource: read('openspec-next-actions-v2.json') ? 'openspec-next-actions-v2.json' : (deterministic ? 'actionable-workboard-v3.json' : null),
   lowRankSource: lowrank ? 'low-rank-task-recommendation-v2.json' : null,
   comparisons:rows,

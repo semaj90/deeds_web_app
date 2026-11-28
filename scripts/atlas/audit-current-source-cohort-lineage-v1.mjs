@@ -21,13 +21,21 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { resolveCurrentWorkspaceFrameV1, computeWorkspaceFrameAuthorityV1 } from './lib/current-workspace-frame-selector-v1.mjs';
+import { compareCurrentSourceToHistoricalBindingsV1, validateCurrentSourceAuthorityInputsV1 } from './lib/current-source-lineage-readback-v1.mjs';
 
 const require = createRequire(import.meta.url);
 const { Pool } = require('pg');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const cohortPath = path.join(root, 'docs/reports/current-source-projection-cohort-v1.json');
 const observationPath = path.join(root, 'docs/reports/workspace-source-binding-observation.json');
-const reportPath = path.join(root, 'docs/reports/current-source-cohort-lineage-v1.json');
+const argValue = (name) => {
+  const prefix = `--${name}=`;
+  const inline = process.argv.slice(2).find((arg) => arg.startsWith(prefix));
+  if (inline) return inline.slice(prefix.length);
+  const index = process.argv.indexOf(`--${name}`);
+  return index >= 0 ? process.argv[index + 1] : undefined;
+};
+const reportPath = path.resolve(root, argValue('output') ?? 'docs/reports/current-source-cohort-lineage-v1.json');
 const sourceOwnerPath = path.join(root, 'docs/reports/current-source-owner-reconciliation-v1.json');
 const cohort = JSON.parse(fs.readFileSync(cohortPath, 'utf8'));
 let sourceOwner = null;
@@ -52,6 +60,43 @@ if (explicitWorkspaceRevisionArg !== undefined && !/^sha256:[0-9a-f]{64}$/i.test
 const workspaceFrame = resolveCurrentWorkspaceFrameV1({ root, argv: process.argv.slice(2), env: process.env });
 const workspaceFrameAuthority = computeWorkspaceFrameAuthorityV1(workspaceFrame);
 
+let sourceAuthorityInputs = null;
+let sourceAuthorityInputPaths = null;
+const admissionArg = argValue('admission-receipt');
+if (admissionArg) {
+  const admissionPath = path.resolve(root, admissionArg);
+  const admissionBytes = fs.readFileSync(admissionPath);
+  const admission = JSON.parse(admissionBytes.toString('utf8'));
+  const preflightPath = path.resolve(root, admission.preflightPath ?? '');
+  const manifestPath = path.resolve(root, argValue('manifest') ?? admission.manifestPath ?? '');
+  const preflightBytes = fs.readFileSync(preflightPath);
+  const manifestBytes = fs.readFileSync(manifestPath);
+  const preflight = JSON.parse(preflightBytes.toString('utf8'));
+  const manifest = JSON.parse(manifestBytes.toString('utf8'));
+  const sha256 = (bytes) => `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`;
+  sourceAuthorityInputs = validateCurrentSourceAuthorityInputsV1({
+    admission, preflight, manifest,
+    admissionReceiptSha256: sha256(admissionBytes),
+    preflightSha256: sha256(preflightBytes),
+    manifestSha256: sha256(manifestBytes),
+  });
+  sourceAuthorityInputs.manifest = manifest;
+  sourceAuthorityInputPaths = {
+    admission: path.relative(root, admissionPath).replaceAll('\\', '/'),
+    preflight: path.relative(root, preflightPath).replaceAll('\\', '/'),
+    manifest: path.relative(root, manifestPath).replaceAll('\\', '/'),
+  };
+}
+const auditImplementation = [
+  'scripts/atlas/audit-current-source-cohort-lineage-v1.mjs',
+  'scripts/atlas/lib/current-source-lineage-readback-v1.mjs',
+].map((sourceRef) => {
+  const bytes = fs.readFileSync(path.join(root, sourceRef));
+  const contentDigest = crypto.createHash('sha256').update(bytes).digest('hex');
+  const manifestRow = sourceAuthorityInputs?.manifest?.sources?.find((row) => row.repositoryId === 'repo:root' && row.sourceRef === sourceRef);
+  return { sourceRef, contentDigest, manifestContentDigest: manifestRow?.contentDigest ?? null, matchesAdmittedManifest: manifestRow?.contentDigest === contentDigest };
+});
+
 const observationWorkspaceRevision = observation.workspaceRevision
   ?? observation.workspace_revision
   ?? observation.record?.workspaceRevision
@@ -64,45 +109,98 @@ const observationMatchesSelectedFrame = observationWorkspaceRevision !== null
 // couldn't be selected, wasn't authoritative, or was authoritative-but-conflicted must not
 // silently fall through to a cohort comparison against a non-canonical revision.
 let earlyStatus = null;
-if (workspaceFrame.status !== 'CURRENT_WORKSPACE_FRAME_SELECTED') {
+if (sourceAuthorityInputs && !sourceAuthorityInputs.valid) {
+  earlyStatus = 'SOURCE_AUTHORITY_INPUTS_INVALID';
+} else if (!sourceAuthorityInputs && workspaceFrame.status !== 'CURRENT_WORKSPACE_FRAME_SELECTED') {
   earlyStatus = 'CURRENT_WORKSPACE_FRAME_UNRESOLVED';
-} else if (workspaceFrame.authorityConflict) {
+} else if (!sourceAuthorityInputs && workspaceFrame.authorityConflict) {
   earlyStatus = 'CURRENT_WORKSPACE_FRAME_CONFLICT';
-} else if (!workspaceFrameAuthority.frameAuthoritative) {
+} else if (!sourceAuthorityInputs && !workspaceFrameAuthority.frameAuthoritative) {
   earlyStatus = 'CURRENT_WORKSPACE_FRAME_NON_AUTHORITATIVE';
 }
 
-// No live workspace readback is wired into this audit. The previous value was the selected frame's own revision,
-// which made every 'current' comparison self-referential. Until a readback supplies it, currentness is unknown and fails closed.
-const currentWorkspaceRevision = null;
+// A current revision is selected only from an exact-byte-bound, source-only admission receipt.
+// Without that independent evidence the legacy selector is diagnostic, not currentness proof.
+const currentWorkspaceRevision = sourceAuthorityInputs?.valid ? sourceAuthorityInputs.workspaceRevision : null;
 const rows = cohort.cohort ?? [];
 const refs = rows.map((row) => String(row.relativePath ?? '').trim()).filter(Boolean);
 const prefixedRefs = refs.map((ref) => ref.startsWith('sveltekit-frontend/') ? ref : `sveltekit-frontend/${ref}`);
 let graphifyRows = [];
 let liveBindingWorkspaceRevisions = [];
+let currentBindings = [];
+let historicalBindings = [];
+let historicalWorkspaceRevision = null;
+let historicalFrameAmbiguous = false;
+let sourceDelta = null;
 let error = null;
-if (earlyStatus === null) {
+if (earlyStatus === null && currentWorkspaceRevision !== null) {
   // Only query Postgres once the workspace frame is resolved, authoritative, and conflict-free —
   // a comparison run against an unresolved/non-authoritative/conflicted frame would produce a
   // misleading cohort verdict, per CURRENT-WORKSPACE-FRAME-AUTHORITY-SEMANTICS-01.
   const pool = new Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv()), max: 1, statement_timeout: 120000 });
+  const client = await pool.connect();
   try {
-    liveBindingWorkspaceRevisions = (await pool.query(
+    await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+    liveBindingWorkspaceRevisions = (await client.query(
       `select distinct workspace_revision::text as workspace_revision
        from public.atlas_workspace_source_bindings
        where repo_id = 'deeds-web-app'
        order by workspace_revision::text`,
     )).rows.map((row) => String(row.workspace_revision ?? '').trim()).filter(Boolean);
-    graphifyRows = (await pool.query(
+    currentBindings = (await client.query(
+      `select repo_id, workspace_revision, canonical_source_ref, source_revision, content_digest, byte_length::text as byte_length, observed_at
+       from public.atlas_workspace_source_bindings
+       where repo_id = 'deeds-web-app' and workspace_revision = $1
+       order by canonical_source_ref`,
+      [currentWorkspaceRevision],
+    )).rows;
+    const historicalCandidates = (await client.query(
+      `select workspace_revision, max(observed_at) as last_observed_at, count(*)::int as row_count
+       from public.atlas_workspace_source_bindings
+       where repo_id = 'deeds-web-app' and workspace_revision <> $1
+       group by workspace_revision
+       order by max(observed_at) desc, workspace_revision
+       limit 2`,
+      [currentWorkspaceRevision],
+    )).rows;
+    if (historicalCandidates.length > 0) {
+      const latestAt = new Date(historicalCandidates[0].last_observed_at).getTime();
+      const tied = historicalCandidates.filter((candidate) => new Date(candidate.last_observed_at).getTime() === latestAt);
+      historicalFrameAmbiguous = tied.length > 1;
+      if (!historicalFrameAmbiguous) {
+        historicalWorkspaceRevision = String(historicalCandidates[0].workspace_revision);
+        historicalBindings = (await client.query(
+          `select repo_id, workspace_revision, canonical_source_ref, source_revision, content_digest, byte_length::text as byte_length, observed_at
+           from public.atlas_workspace_source_bindings
+           where repo_id = 'deeds-web-app' and workspace_revision = $1
+           order by canonical_source_ref`,
+          [historicalWorkspaceRevision],
+        )).rows;
+      }
+    }
+    graphifyRows = (await client.query(
       `select source_ref, content_hash, workspace_revision, code_source_revision, source_revision
        from public.graphify_files
        where source_ref = any($1::text[]) or source_ref = any($2::text[])
        order by source_ref`,
       [refs, prefixedRefs],
     )).rows;
+    if (!historicalFrameAmbiguous && historicalWorkspaceRevision && sourceAuthorityInputs?.valid) {
+      sourceDelta = compareCurrentSourceToHistoricalBindingsV1({
+        snapshotSources: sourceAuthorityInputs.manifest.sources,
+        historicalBindings,
+        currentBindings,
+        workspaceRevision: currentWorkspaceRevision,
+      });
+      sourceDelta.historicalWorkspaceRevision = historicalWorkspaceRevision;
+      sourceDelta.historicalFrameAmbiguous = false;
+    }
+    await client.query('COMMIT');
   } catch (err) {
+    try { await client.query('ROLLBACK'); } catch {}
     error = err instanceof Error ? err.message : String(err);
   } finally {
+    client.release();
     await pool.end();
   }
 }
@@ -181,6 +279,10 @@ const laterStatus = earlyStatus ?? (error
   ? 'LINEAGE_AUDIT_ERROR'
   : currentWorkspaceRevision === null
     ? 'WORKSPACE_CURRENTNESS_UNAVAILABLE'
+  : historicalFrameAmbiguous
+    ? 'HISTORICAL_BINDING_FRAME_AMBIGUOUS'
+  : !historicalWorkspaceRevision
+    ? 'HISTORICAL_BINDING_FRAME_MISSING'
   : !counts.workspaceRevisionSourceAligned
     ? 'WORKSPACE_REVISION_SOURCE_MISMATCH'
   : counts.revisionQualified > 0
@@ -196,6 +298,8 @@ const laterNextGate = earlyStatus === 'CURRENT_WORKSPACE_FRAME_UNRESOLVED'
       ? 'CURRENT_WORKSPACE_FRAME_AUTHORITATIVE_RECEIPT_REQUIRED'
       : currentWorkspaceRevision === null
         ? 'WORKSPACE_CURRENTNESS_READBACK_REQUIRED'
+      : historicalFrameAmbiguous || !historicalWorkspaceRevision
+        ? 'HISTORICAL_BINDING_FRAME_REVIEW_REQUIRED'
       : sourceOwner?.workspace?.admittedSnapshotDelta?.requiresSnapshotRefresh === true
         ? 'CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED'
       : !counts.workspaceRevisionSourceAligned
@@ -212,13 +316,14 @@ const report = {
     cohortChecksum: cohort.cohortChecksum ?? null,
     observationPath: path.relative(root, observationPath).replaceAll('\\', '/'),
     sourceOwnerPath: path.relative(root, sourceOwnerPath).replaceAll('\\', '/'),
-    workspaceRevisionSource: workspaceFrame.selectedSource,
+    workspaceRevisionSource: sourceAuthorityInputs?.valid ? 'EXACT_HASH_BOUND_TOURNAMENT_ADMISSION' : workspaceFrame.selectedSource,
+    sourceAuthorityInputPaths,
   },
   workspaceFrame: {
     status: workspaceFrame.status,
-    selectedWorkspaceRevision: workspaceFrame.selectedWorkspaceRevision,
-    selectedSource: workspaceFrame.selectedSource,
-    selectedAuthority: workspaceFrame.selectedAuthority,
+    selectedWorkspaceRevision: currentWorkspaceRevision ?? workspaceFrame.selectedWorkspaceRevision,
+    selectedSource: sourceAuthorityInputs?.valid ? 'EXACT_HASH_BOUND_TOURNAMENT_ADMISSION' : workspaceFrame.selectedSource,
+    selectedAuthority: sourceAuthorityInputs?.valid ? true : workspaceFrame.selectedAuthority,
     authorityConflict: workspaceFrame.authorityConflict,
     blockers: workspaceFrame.blockers,
     frameAuthoritative: workspaceFrameAuthority.frameAuthoritative,
@@ -233,6 +338,20 @@ const report = {
     requiresSnapshotRefresh: sourceOwner?.workspace?.admittedSnapshotDelta?.requiresSnapshotRefresh === true,
     deltaChecksum: sourceOwner?.workspace?.admittedSnapshotDelta?.deltaChecksum ?? null,
   },
+  currentSourceReadback: {
+    admissionScope: sourceAuthorityInputs?.admissionScope ?? null,
+    inputValidation: sourceAuthorityInputs ? { valid: sourceAuthorityInputs.valid, reasons: sourceAuthorityInputs.reasons } : null,
+    inputPaths: sourceAuthorityInputPaths,
+    currentWorkspaceRevision,
+    currentBindingRows: currentBindings.length,
+    historicalWorkspaceRevision,
+    historicalBindingRows: historicalBindings.length,
+    historicalFrameAmbiguous,
+    delta: sourceDelta,
+    canonicalAuthority: false,
+    writesPerformed: false,
+  },
+  auditImplementation,
   counts,
   rows: resultRows,
   databaseError: error,
@@ -256,4 +375,4 @@ try {
 } finally {
   try { fs.unlinkSync(reportTempPath); } catch {}
 }
-console.log(JSON.stringify({ status: report.status, counts, reportPath: 'docs/reports/current-source-cohort-lineage-v1.json' }, null, 2));
+console.log(JSON.stringify({ status: report.status, counts, reportPath: path.relative(root, reportPath).replaceAll('\\', '/') }, null, 2));

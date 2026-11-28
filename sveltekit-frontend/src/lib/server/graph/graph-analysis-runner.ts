@@ -26,6 +26,11 @@ export interface GraphAnalysisRequest {
   maxIterations?: number;
   dampingFactor?: number;
   limit?: number;
+  k?: number;
+  maxDepth?: number;
+  sourcePacketKey?: string;
+  targetPacketKey?: string;
+  maxEstimatedBytes?: number;
   sidecarUrl?: string | null;
   /**
    * Which backend computes the result for algorithms with more than one
@@ -475,6 +480,32 @@ export async function runGraphAnalysis(
       limit: request.limit,
     });
     return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys, excludedPacketKeys: result.excludedPacketKeys };
+  }
+
+  if (
+    request.algorithm === 'knn'
+    || request.algorithm === 'bfs'
+    || request.algorithm === 'dijkstra'
+    || request.algorithm === 'astar'
+  ) {
+    const result = await (await import('./stream-gds-analysis-adapter.js')).runStreamGdsAnalysis({
+      algorithm: request.algorithm,
+      projectionName,
+      limit: request.limit,
+      k: request.k,
+      maxDepth: request.maxDepth,
+      sourcePacketKey: request.sourcePacketKey,
+      targetPacketKey: request.targetPacketKey,
+      maxEstimatedBytes: request.maxEstimatedBytes,
+    });
+    return {
+      run: result.run,
+      metricsWritten: 0,
+      communitiesWritten: 0,
+      unresolvedPacketKeys: 0,
+      excludedPacketKeys: 0,
+      ...(result.skippedReason ? { skippedReason: result.skippedReason } : {}),
+    };
   }
 
   return runSkippedAnalysis(request.algorithm, projectionName, 0, 0, `Unsupported graph algorithm: ${request.algorithm}`);

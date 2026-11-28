@@ -348,7 +348,10 @@ export function createAtlasSearchAdapter(config?: {
 }) {
   const runtime = config?.runtime ?? new SearchRuntime(config ?? {});
   return {
-    async search(req: AtlasSearchRequest): Promise<AtlasSearchResponse> {
+    async search(
+      req: AtlasSearchRequest,
+      executionContext?: Parameters<SearchRuntime['search']>[1],
+    ): Promise<AtlasSearchResponse> {
       const query: SearchQuery = {
         text: req.query,
         lexicalExpansion: req.lexicalExpansion,
@@ -360,7 +363,9 @@ export function createAtlasSearchAdapter(config?: {
         filters: SearchMetadataFilterSchema.parse(req.filters ?? {}),
         spanContext: req.traceId ? { traceId: req.traceId } : undefined,
       };
-      const result = await runtime.search(query);
+      const result = executionContext
+        ? await runtime.search(query, executionContext)
+        : await runtime.search(query);
 
       const topPacketKeys = result.packets
         .map(p => (p as Record<string, unknown>).packet_key ?? (p as Record<string, unknown>).chunk_id ?? '')

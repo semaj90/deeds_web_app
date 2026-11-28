@@ -54,7 +54,8 @@ export interface BuildTextUnitCandidateInputV1 {
 
 export function buildTextUnitCandidateV1(input: BuildTextUnitCandidateInputV1): TextUnitCandidateV1 {
 	if (!UUID.test(input.repositoryId)) throw new TextUnitCandidateErrorV1('REPOSITORY_ID_INVALID', input.repositoryId);
-	if (!input.sourceRef || input.sourceRef !== input.sourceRef.trim() || input.sourceRef.startsWith('/') || input.sourceRef.includes('..')) {
+	if (!input.sourceRef || input.sourceRef !== input.sourceRef.trim() || input.sourceRef.startsWith('/')
+		|| input.sourceRef.includes('..') || /[:\\\0]/u.test(input.sourceRef)) {
 		throw new TextUnitCandidateErrorV1('SOURCE_REF_INVALID', input.sourceRef);
 	}
 	if (!SHA256.test(input.boundSourceRevision)) throw new TextUnitCandidateErrorV1('SOURCE_REVISION_INVALID', input.boundSourceRevision);
@@ -63,7 +64,7 @@ export function buildTextUnitCandidateV1(input: BuildTextUnitCandidateInputV1): 
 	}
 	let fullText: string;
 	try {
-		fullText = new TextDecoder('utf-8', { fatal: true }).decode(input.sourceBytes);
+		fullText = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(input.sourceBytes);
 	} catch {
 		throw new TextUnitCandidateErrorV1('NOT_UTF8', input.sourceRef);
 	}
@@ -76,7 +77,7 @@ export function buildTextUnitCandidateV1(input: BuildTextUnitCandidateInputV1): 
 		}
 		bytes = input.sourceBytes.subarray(byteStart, byteEnd);
 		try {
-			fullText = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+			fullText = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes);
 		} catch {
 			throw new TextUnitCandidateErrorV1('SPAN_SPLITS_UTF8_CODEPOINT', `${byteStart}-${byteEnd}`);
 		}
@@ -84,7 +85,9 @@ export function buildTextUnitCandidateV1(input: BuildTextUnitCandidateInputV1): 
 	}
 	if (fullText.length === 0) throw new TextUnitCandidateErrorV1('TEXT_EMPTY', input.sourceRef);
 	return {
-		candidateId: `tu:${input.boundSourceRevision.slice(7, 23)}:${span ? `${span.byteStart}-${span.byteEnd}` : '0'}`,
+		candidateId: `tu:${sha256(JSON.stringify([
+			input.repositoryId, input.sourceRef, input.boundSourceRevision, span,
+		])).slice('sha256:'.length)}`,
 		repositoryId: input.repositoryId,
 		sourceRef: input.sourceRef,
 		sourceRevision: input.boundSourceRevision,

@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.eg2-trt-rtx-conversion.v1",
+  "sourceGraph": "onnx/model.onnx",
+  "targetGraph": "onnx/model_trt.onnx",
+  "externalWeights": "onnx/model.onnx_data",
+  "replacedOps": {
+    "com.microsoft::RotaryEmbedding": 48
+  },
+  "onnxCheckerOriginal": {
+    "passed": false,
+    "error": "ValidationError: No Op registered for SimplifiedLayerNormalization with domain_version of 21"
+  },
+  "onnxCheckerConverted": {
+    "passed": false,
+    "error": "ValidationError: No Op registered for SimplifiedLayerNormalization with domain_version of 21"
+  },
+  "targetGraphSha256": "sha256:adfeef968ff78ff49bcdea5b850ed98b0cc640b0a610a22fe5a1154a16ba8b1b",
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

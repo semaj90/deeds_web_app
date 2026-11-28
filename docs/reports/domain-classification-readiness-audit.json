@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-10T20:23:06.597Z",
+  "generated_at": "2026-11-28T09:05:55.057Z",
   "overall_status": "READY_WITH_GAPS",
   "tables": {
     "atlas_packets": true,
@@ -13,16 +13,16 @@
     "title_id": 99.91,
     "tree_node_id": 99.9,
     "domain_class": 100,
-    "qdrant_point_id": 10.45,
-    "summary": 11.16,
+    "qdrant_point_id": 37.7,
+    "summary": 25.61,
     "pagerank": 99.9,
     "som": 99.91,
     "latent_64": 12.19,
-    "used_concepts": 96.55,
-    "lexical_features": 99.98,
-    "ast_symbols": 20.27,
-    "entities": 19.45,
-    "content_embedding": 98.78,
+    "used_concepts": 95.96,
+    "lexical_features": 99.89,
+    "ast_symbols": 62.06,
+    "entities": 23.28,
+    "content_embedding_768": 99.99,
     "naive_bayes_predictions": 100,
     "jepa_similarity": 1.48,
     "kmeans_cluster": 100
@@ -51,7 +51,7 @@
     {
       "name": "feature envelope",
       "status": "FAIL",
-      "evidence": "used_concepts=96.55%, lexical=99.98%, ast=20.27%",
+      "evidence": "used_concepts=95.96%, lexical=99.89%, ast=62.06%",
       "target": ">=95%"
     },
     {
@@ -63,13 +63,13 @@
     {
       "name": "embedding corpus",
       "status": "PASS",
-      "evidence": "98.78% content_embedding",
+      "evidence": "99.99% content_embedding_768",
       "target": ">=95%"
     },
     {
       "name": "retrieval mirror",
       "status": "FAIL",
-      "evidence": "10.45% qdrant_point_id",
+      "evidence": "37.7% qdrant_point_id",
       "target": ">=95%"
     },
     {

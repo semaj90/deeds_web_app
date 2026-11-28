@@ -17,7 +17,7 @@
 
 import { analyzeWithVlm } from './ai/vlm-document-analyzer.js';
 import { analyzeTextHeuristics, planDocumentRoute, type DocumentRoutingPlan } from './document-routing-policy-v1.js';
-import { countEg2DocumentTokens } from './eg2-token-counter.js';
+import { countEg2DocumentTokens, countEg2Tokens } from './eg2-token-counter.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -213,27 +213,23 @@ async function chunkText(
   text: string,
   doclingBlocks?: Record<string, unknown>[]
 ): Promise<ExtractedChunk[]> {
-  try {
-    const { chunkLegalDocument } = await import(
-      '$lib/server/indexer/legal-chunker.js'
-    );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const chunks = await chunkLegalDocument(text, { doclingBlocks: doclingBlocks as any });
-    return chunks.map((c: any, i: number) => ({
-      text: c.text ?? c.content ?? '',
-      index: i,
-      tokenCount: c.tokenCount ?? 0,
-      sectionPath: c.sectionPath,
-      citations: c.citations,
-      pageNumber: c.pageNumber,
-    }));
-  } catch {
-    // Fallback: split by double newline, ~512 char windows
-    const paragraphs = text.split(/\n{2,}/);
-    return paragraphs
-      .filter(p => p.trim().length > 0)
-      .map((p, i) => ({ text: p.trim(), index: i, tokenCount: Math.ceil(p.length / 4) }));
-  }
+  const { chunkLegalDocument } = await import('$lib/server/indexer/legal-chunker.js');
+  // This caller sends bare chunk text through generateEmbeddings with its
+  // default unprompted recipe, so count exactly that payload plus tokenizer
+  // special tokens. Tokenizer failures and over-budget words propagate; an
+  // estimate fallback must never make a chunk eligible for embedding.
+  const chunks = chunkLegalDocument(text, {
+    doclingBlocks: doclingBlocks as any,
+    countTokens: countEg2Tokens,
+  });
+  return chunks.map((c: any, i: number) => ({
+    text: c.text ?? c.content ?? '',
+    index: i,
+    tokenCount: c.tokenCount,
+    sectionPath: c.sectionPath,
+    citations: c.citations,
+    pageNumber: c.pageNumber,
+  }));
 }
 
 // ─── Embedding ────────────────────────────────────────────────────────────────

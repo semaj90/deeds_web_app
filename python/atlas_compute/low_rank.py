@@ -214,6 +214,11 @@ def shortlist_candidate_ordinals(
     import torch
 
     source = np.asarray(matrix, dtype=np.float32)
+    if any(
+        not isinstance(ordinal, (int, np.integer)) or isinstance(ordinal, (bool, np.bool_))
+        for ordinal in candidate_ordinals
+    ):
+        raise ValueError("candidate_ordinals must be integers")
     ordinals = np.asarray(candidate_ordinals, dtype=np.int64)
     query = np.asarray(query_features, dtype=np.float32)
     if source.ndim != 2 or source.shape[0] == 0 or source.shape[1] == 0:
@@ -222,6 +227,10 @@ def shortlist_candidate_ordinals(
         raise ValueError("candidate_ordinals must match matrix rows")
     if query.ndim != 1 or query.shape[0] != source.shape[1]:
         raise ValueError("query_features must match matrix columns")
+    if not np.isfinite(source).all() or not np.isfinite(query).all():
+        raise ValueError("matrix and query_features must be finite")
+    if np.any(ordinals < 0):
+        raise ValueError("candidate_ordinals must be nonnegative")
     if len(set(ordinals.tolist())) != len(ordinals):
         raise ValueError("candidate_ordinals must be unique")
     max_rank = min(source.shape)
@@ -246,10 +255,17 @@ def shortlist_candidate_ordinals(
         scores = (candidate_latent @ query_latent.squeeze(0)) / (candidate_norm * query_norm)
 
     score_values = scores.detach().cpu().numpy().astype(np.float64, copy=False)
-    row_indices = np.arange(source.shape[0], dtype=np.int64)
-    order = np.lexsort((ordinals, row_indices, -score_values))[:target_count]
+    if not np.isfinite(score_values).all():
+        raise ValueError("projected cosine scores must be finite")
+    order = np.lexsort((ordinals, -score_values))[:target_count]
     selected = [int(ordinals[index]) for index in order.tolist()]
-    input_checksum = _sha256_bytes(np.ascontiguousarray(source).tobytes() + np.ascontiguousarray(query).tobytes())
+    # Include execution row order and durable ordinal coordinates in the digest.
+    input_checksum = _sha256_bytes(
+        np.asarray(source.shape, dtype="<i8").tobytes()
+        + ordinals.astype("<i8", copy=False).tobytes()
+        + source.astype("<f4", copy=False).tobytes()
+        + query.astype("<f4", copy=False).tobytes()
+    )
     output_checksum = _sha256_bytes(",".join(map(str, selected)).encode("utf-8"))
     receipt = CandidateShortlistReceipt(
         schema="atlas.candidate-shortlist-receipt.v1",

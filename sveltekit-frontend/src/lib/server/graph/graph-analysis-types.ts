@@ -35,6 +35,10 @@ export const GraphAlgorithmSchema = z.enum([
 	'leiden',
 	'kcore',
 	'betweenness',
+	'knn',
+	'bfs',
+	'dijkstra',
+	'astar',
 ]);
 export type GraphAlgorithm = z.infer<typeof GraphAlgorithmSchema>;
 

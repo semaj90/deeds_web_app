@@ -11,7 +11,7 @@
  */
 
 import { z } from 'zod';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import type { FeatureEnvelope } from './feature-envelope.js';
 import type { ScorerOptions } from './candidate-scorer.js';
 import type { PostProcessConfig } from './post-process-reranker.js';
@@ -36,7 +36,8 @@ let embeddingHealthCache:
     }
   | null = null;
 
-async function isEmbeddingHealthy(): Promise<boolean> {
+async function isEmbeddingHealthy(signal?: AbortSignal): Promise<boolean> {
+  signal?.throwIfAborted();
   const cached = embeddingHealthCache;
   if (cached && Date.now() - cached.checkedAt < EMBEDDING_HEALTH_CACHE_MS) {
     return cached.healthy;
@@ -44,7 +45,9 @@ async function isEmbeddingHealthy(): Promise<boolean> {
 
   try {
     const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, {
-      signal: AbortSignal.timeout(1500),
+      signal: signal
+        ? AbortSignal.any([signal, AbortSignal.timeout(1500)])
+        : AbortSignal.timeout(1500),
     });
     const healthy = res.ok;
     embeddingHealthCache = {
@@ -53,6 +56,7 @@ async function isEmbeddingHealthy(): Promise<boolean> {
     };
     return healthy;
   } catch {
+    if (signal?.aborted) throw signal.reason ?? new Error('REQUEST_CANCELLED');
     embeddingHealthCache = {
       checkedAt: Date.now(),
       healthy: false,
@@ -456,6 +460,23 @@ export interface RetrievalProofSummary {
   finalContextCount: number;
   validationReasons: Record<string, number>;
   hydrationCandidateResolutions?: HydrationProofSummary['candidateResolutions'];
+  laneReceipts?: import('./retrieve-candidates.js').RetrievalLaneReceipt[];
+  actorGrantReceipt?: {
+    validated: true;
+    actorId: string;
+    workspaceId: string;
+    workspaceRevision: string;
+    authorityRef: string;
+    allowedSourceRefCount: number;
+  };
+  nlutStageReceipt?: {
+    backend: string;
+    evaluatedCount: number;
+    rejectedBelowTau: number;
+    calibratedTau: number;
+    elapsedMs: number;
+    eligibleOrdinalsCount: number;
+  };
   functionRegistry: FunctionRegistryRetrievalProofV1;
 }
 
@@ -693,8 +714,31 @@ export class SearchRuntime {
    * Unified search entrypoint
    * Orchestrates: query → retrieve → fuse → rerank → render → return
    */
-  async search(queryInput: SearchQuery): Promise<SearchResult> {
+  async search(
+    queryInput: SearchQuery,
+    executionContext: {
+      signal?: AbortSignal;
+      runId?: string;
+      taskId?: string;
+      embeddingModelId?: string;
+      embeddingModelRevision?: string;
+      actorGrant?: import('../atlas/execution/verified-context-service-v1.js').VerifiedContextWorkspaceScopeV1 & {
+        expiresAt?: string;
+        revoked?: boolean;
+      };
+      requireActorGrant?: boolean;
+      nativeDenseTopK?: {
+        queryVector: Float32Array;
+        corpusMatrix: Float32Array;
+        dim: number;
+        lutBytes: Uint8Array;
+        allowedBytes: Uint8Array;
+        cosineFloorTau?: number;
+      };
+    } = {},
+  ): Promise<SearchResult> {
     const startTime = Date.now();
+    const runId = executionContext.runId?.trim() || randomUUID();
     const stageTiming: StageTiming = {
       retrieve: 0,
       fuse: 0,
@@ -705,9 +749,51 @@ export class SearchRuntime {
     };
 
     try {
+      executionContext.signal?.throwIfAborted();
       // Validate query
       const query = SearchQuerySchema.parse(queryInput);
-      const embeddingHealthy = await isEmbeddingHealthy();
+      let validatedGrant: (import('../atlas/execution/verified-context-service-v1.js').VerifiedContextWorkspaceScopeV1 & { expiresAt?: string; revoked?: boolean }) | undefined;
+      if (executionContext.requireActorGrant || executionContext.actorGrant !== undefined) {
+        if (!executionContext.actorGrant) {
+          throw new Error('ACTOR_GRANT_REQUIRED');
+        }
+        if (executionContext.actorGrant.revoked === true) {
+          throw new Error('ACTOR_GRANT_REVOKED');
+        }
+        if (executionContext.actorGrant.expiresAt) {
+          const expMs = Date.parse(executionContext.actorGrant.expiresAt);
+          if (!Number.isFinite(expMs) || expMs <= Date.now()) {
+            throw new Error('ACTOR_GRANT_EXPIRED');
+          }
+        }
+        const { VerifiedContextWorkspaceScopeV1Schema } = await import('../atlas/execution/verified-context-service-v1.js');
+        const { expiresAt: _exp, revoked: _rev, ...scopeFields } = executionContext.actorGrant;
+        const parsedGrant = VerifiedContextWorkspaceScopeV1Schema.safeParse(scopeFields);
+        if (!parsedGrant.success) {
+          throw new Error('ACTOR_GRANT_INVALID');
+        }
+        if (this.userId && parsedGrant.data.actorId !== this.userId) {
+          throw new Error('ACTOR_GRANT_ACTOR_MISMATCH');
+        }
+        if (query.workspaceId && parsedGrant.data.workspaceId !== query.workspaceId) {
+          throw new Error('ACTOR_GRANT_WORKSPACE_MISMATCH');
+        }
+        if (query.workspaceRevision && parsedGrant.data.workspaceRevision !== query.workspaceRevision) {
+          throw new Error('ACTOR_GRANT_REVISION_MISMATCH');
+        }
+        validatedGrant = executionContext.actorGrant;
+      }
+      const embeddingHealthy = await isEmbeddingHealthy(executionContext.signal);
+      const actorGrantReceipt = validatedGrant
+        ? {
+            validated: true as const,
+            actorId: validatedGrant.actorId,
+            workspaceId: validatedGrant.workspaceId,
+            workspaceRevision: validatedGrant.workspaceRevision,
+            authorityRef: validatedGrant.authorityRef,
+            allowedSourceRefCount: validatedGrant.allowedSourceRefs.length,
+          }
+        : undefined;
       const proofContext = {
         workspaceId: query.workspaceId ?? null,
         workspaceRevision: query.workspaceRevision ?? null,
@@ -718,9 +804,57 @@ export class SearchRuntime {
 
       // Stage 1: Retrieve candidates from multiple sources
       const retrieveStart = Date.now();
-      const candidates = await this.retrieveCandidates(query, { includeVectorLanes: embeddingHealthy });
+      const goWorkspaceId = validatedGrant?.workspaceId ?? query.workspaceId;
+      const goWorkspaceRevision = validatedGrant?.workspaceRevision ?? query.workspaceRevision;
+      const goRetrievalContext = validatedGrant && executionContext.taskId && goWorkspaceId && goWorkspaceRevision &&
+        query.sourceRevision && query.representationId && query.representationRevision &&
+        executionContext.embeddingModelId && executionContext.embeddingModelRevision
+        ? {
+            requestId: `${runId}:go-retrieval`,
+            taskId: executionContext.taskId,
+            runId,
+            workspaceId: goWorkspaceId,
+            workspaceRevision: goWorkspaceRevision,
+            sourceRevision: query.sourceRevision,
+            representationId: query.representationId,
+            representationRevision: query.representationRevision,
+            embeddingModelId: executionContext.embeddingModelId,
+            embeddingModelRevision: executionContext.embeddingModelRevision,
+          }
+        : undefined;
+      const { candidates, laneReceipts: rawLaneReceipts } = await this.retrieveCandidatesWithReceipts(query, {
+        includeVectorLanes: embeddingHealthy,
+        ...(embeddingHealthy ? {} : { vectorLaneUnavailableReason: 'EMBEDDING_SERVICE_UNAVAILABLE' }),
+        signal: executionContext.signal,
+        ...(goRetrievalContext ? { goRetrievalContext } : {}),
+      });
+      executionContext.signal?.throwIfAborted();
+      const bindingComplete = Boolean(executionContext.taskId && query.workspaceId && query.workspaceRevision
+        && query.sourceRevision && query.representationId && query.representationRevision);
+      const laneReceipts = rawLaneReceipts.map((receipt) => ({
+        ...receipt,
+        binding: {
+          runId,
+          taskId: executionContext.taskId?.trim() || null,
+          workspaceId: query.workspaceId ?? null,
+          workspaceRevision: query.workspaceRevision ?? null,
+          sourceRevision: query.sourceRevision ?? null,
+          representationId: query.representationId ?? null,
+          representationRevision: query.representationRevision ?? null,
+          bindingStatus: bindingComplete ? 'complete' as const : 'incomplete' as const,
+          authorizationBindingStatus: validatedGrant ? 'validated_actor_grant' as const : 'not_carried_by_search_runtime' as const,
+        },
+      }));
       const graphExpandedCandidates = await this.expandGraphCandidates(candidates, query);
       candidates.push(...graphExpandedCandidates);
+      if (validatedGrant) {
+        const allowedRefs = new Set(validatedGrant.allowedSourceRefs);
+        for (let i = candidates.length - 1; i >= 0; i--) {
+          if (!allowedRefs.has(candidates[i]!.sourceRef)) {
+            candidates.splice(i, 1);
+          }
+        }
+      }
       stageTiming.retrieve = Date.now() - retrieveStart;
       const denseSeedPacketKeys = selectDenseSearchSeedPacketKeys(candidates);
 
@@ -759,6 +893,8 @@ export class SearchRuntime {
             finalPackets: [],
             postProcessedCount: 0,
             rerankedCount: 0,
+            laneReceipts,
+            actorGrantReceipt,
           }),
           provenance: {
             retrievalSources: [],
@@ -849,6 +985,8 @@ export class SearchRuntime {
             finalPackets: topPackets,
             postProcessedCount: topPackets.length,
             rerankedCount: 0,
+            laneReceipts,
+            actorGrantReceipt,
           }),
           provenance: {
             retrievalSources: this.getRetrievalSources(candidates),
@@ -992,9 +1130,35 @@ export class SearchRuntime {
         })),
       });
 
+      // Stage 3b: Optional native NES-LUT + masked Top-K over dense-compatible envelopes
+      let nlutStageReceipt: RetrievalProofSummary['nlutStageReceipt'] | undefined;
+      let envelopesForRerank = envelopes;
+      if (executionContext.nativeDenseTopK && envelopes.length > 0) {
+        const cfg = executionContext.nativeDenseTopK;
+        const denseCount = Math.min(envelopes.length, Math.floor(cfg.corpusMatrix.length / cfg.dim), cfg.lutBytes.length);
+        if (denseCount > 0) {
+          const denseSlice = envelopes.slice(0, denseCount);
+          const preservedTail = envelopes.slice(denseCount);
+          const nlutOut = await this.scoreHydratedCandidatesWithNlut({
+            candidates: denseSlice,
+            queryVector: cfg.queryVector,
+            corpusMatrix: cfg.corpusMatrix.subarray(0, denseCount * cfg.dim),
+            dim: cfg.dim,
+            k: Math.min(query.topK, denseCount),
+            lutBytes: cfg.lutBytes.subarray(0, denseCount),
+            allowedBytes: cfg.allowedBytes,
+            cosineFloorTau: cfg.cosineFloorTau,
+            expectedWorkspaceId: query.workspaceId,
+            expectedRepresentationId: query.representationId,
+          });
+          nlutStageReceipt = nlutOut.nlutStageReceipt;
+          envelopesForRerank = [...nlutOut.ranked, ...preservedTail];
+        }
+      }
+
       // Stage 4: Rerank with the canonical executor
       const rerankStart = Date.now();
-      const reranked = await this.rerankCandidates(envelopes, query);
+      const reranked = await this.rerankCandidates(envelopesForRerank, query);
       stageTiming.rerank = Date.now() - rerankStart;
 
       // Stage 4b: Post-process — business-rule adjustments (freshness, dislike, diversity)
@@ -1120,6 +1284,9 @@ export class SearchRuntime {
           finalPackets,
           postProcessedCount: postProcessed.length,
           rerankedCount: reranked.length,
+          laneReceipts,
+          nlutStageReceipt,
+          actorGrantReceipt,
         }),
         provenance: {
           retrievalSources: this.getRetrievalSources(candidates),
@@ -1153,16 +1320,132 @@ export class SearchRuntime {
    * parallel and their LaneCandidates are projected into the Candidate shape.
    * When no retrievers are injected, falls back to the production singleton path.
    */
-  private async retrieveCandidates(
+  /**
+   * Execute native NES-LUT + masked cosine Top-K over canonically hydrated candidates
+   * using `runNlutMaskedTopKStageV1` (`tensorrt_bridge.node` when available, scalar fallback otherwise).
+   */
+  async scoreHydratedCandidatesWithNlut(params: {
+    candidates: readonly FeatureEnvelope[];
+    queryVector: Float32Array;
+    corpusMatrix: Float32Array;
+    dim: number;
+    k: number;
+    lutBytes: Uint8Array;
+    allowedBytes: Uint8Array;
+    cosineFloorTau?: number;
+    expectedWorkspaceId?: string;
+    expectedRepresentationId?: string;
+  }): Promise<{
+    ranked: FeatureEnvelope[];
+    nlutStageReceipt: {
+      backend: string;
+      evaluatedCount: number;
+      rejectedBelowTau: number;
+      rejectedIneligibleCount: number;
+      calibratedTau: number;
+      elapsedMs: number;
+      eligibleOrdinalsCount: number;
+    };
+  }> {
+    const started = Date.now();
+    const { runNlutMaskedTopKStageV1 } = await import('../atlas/execution/nlut-masked-topk-stage-v1.js');
+    const n = params.candidates.length;
+    if (!params.expectedWorkspaceId?.trim() || !params.expectedRepresentationId?.trim()) {
+      throw new Error('NLUT_EXPECTED_SCOPE_AND_REPRESENTATION_REQUIRED');
+    }
+    if (n === 0) {
+      return {
+        ranked: [],
+        nlutStageReceipt: {
+          backend: 'none',
+          evaluatedCount: 0,
+          rejectedBelowTau: 0,
+          rejectedIneligibleCount: 0,
+          calibratedTau: params.cosineFloorTau ?? 0.6172,
+          elapsedMs: 0,
+          eligibleOrdinalsCount: 0,
+        },
+      };
+    }
+
+    const maskedLut = new Uint8Array(params.lutBytes);
+    const allowedCodes = new Set(params.allowedBytes);
+    if (allowedCodes.size !== params.allowedBytes.length || allowedCodes.size === 0 || allowedCodes.size > 16) {
+      throw new Error('NLUT_ALLOWED_CODES_INVALID');
+    }
+    // Never use 0xff as an ineligible sentinel: callers may legitimately allow that byte value.
+    // Pick a code outside the validated allowlist so the native equality mask cannot admit it.
+    let ineligibleCode = 0;
+    while (ineligibleCode <= 0xff && allowedCodes.has(ineligibleCode)) ineligibleCode++;
+    if (ineligibleCode > 0xff) throw new Error('NLUT_INELIGIBLE_CODE_UNAVAILABLE');
+    let eligibleOrdinalsCount = 0;
+    let rejectedIneligibleCount = 0;
+    for (let ordinal = 0; ordinal < n; ordinal++) {
+      const c = params.candidates[ordinal]! as FeatureEnvelope & { workspace_id?: string | null; representation_id?: string | null };
+      const wsOk = c.workspace_id === params.expectedWorkspaceId;
+      const repOk = c.representation_id === params.expectedRepresentationId;
+      if (!wsOk || !repOk) {
+        maskedLut[ordinal] = ineligibleCode;
+      } else if (params.allowedBytes.includes(maskedLut[ordinal]!)) {
+        eligibleOrdinalsCount++;
+      } else {
+        rejectedIneligibleCount++;
+      }
+      if (!wsOk || !repOk) rejectedIneligibleCount++;
+    }
+
+    const outMask = new Uint32Array(Math.ceil(n / 32));
+    const outIndices = new Int32Array(params.k);
+    const outScores = new Float32Array(params.k);
+
+    const stage = runNlutMaskedTopKStageV1({
+      queryVector: params.queryVector,
+      corpusMatrix: params.corpusMatrix,
+      n,
+      dim: params.dim,
+      k: params.k,
+      lutBytes: maskedLut,
+      allowedBytes: params.allowedBytes,
+      cosineFloorTau: params.cosineFloorTau,
+      outMask,
+      outIndices,
+      outScores,
+    });
+
+    const ranked = stage.hits
+      .filter((hit) => hit.index >= 0 && hit.index < n)
+      .map((hit) => ({
+        ...params.candidates[hit.index]!,
+        retrieval_score: hit.score,
+      }));
+
+    return {
+      ranked,
+      nlutStageReceipt: {
+        backend: stage.backend,
+        evaluatedCount: stage.evaluatedCount,
+        rejectedBelowTau: stage.rejectedBelowTau,
+        rejectedIneligibleCount,
+        calibratedTau: stage.calibratedTau,
+        elapsedMs: Date.now() - started,
+        eligibleOrdinalsCount,
+      },
+    };
+  }
+
+  private async retrieveCandidatesWithReceipts(
     query: SearchQuery,
-    options?: { includeVectorLanes?: boolean }
-  ): Promise<Candidate[]> {
+    options?: { includeVectorLanes?: boolean; vectorLaneUnavailableReason?: string; signal?: AbortSignal }
+  ): Promise<{ candidates: Candidate[]; laneReceipts: import('./retrieve-candidates.js').RetrievalLaneReceipt[] }> {
     if (!this.injectedRetrievers || this.injectedRetrievers.length === 0) {
-      const { retrieveAllCandidates } = await import('./retrieve-candidates.js');
-      const baseCandidates = await retrieveAllCandidates(query.text, query.filters, undefined, {
+      const mod = await import('./retrieve-candidates.js');
+      const res = await mod.retrieveAllCandidatesWithReceipts(query.text, query.filters, undefined, {
         ...options,
         lexicalExpansion: query.lexicalExpansion,
+        globalTimeoutMs: 8000,
       });
+      const baseCandidates = res.candidates;
+      const laneReceipts = res.laneReceipts;
       const functionCandidates = await this.retrieveFunctionRegistryCandidates(query);
       const candidatesWithGraphRevision = baseCandidates.map((candidate) => {
         const raw = candidate as Candidate & { graph_revision?: unknown };
@@ -1173,7 +1456,10 @@ export class SearchRuntime {
             : typeof raw.graph_revision === 'string' ? raw.graph_revision : undefined,
         };
       });
-      return applySearchMetadataFilter([...candidatesWithGraphRevision, ...functionCandidates], query.filters);
+      return {
+        candidates: applySearchMetadataFilter([...candidatesWithGraphRevision, ...functionCandidates], query.filters),
+        laneReceipts,
+      };
     }
 
     const input = {
@@ -1182,21 +1468,50 @@ export class SearchRuntime {
       filters: query.filters as Record<string, unknown>,
       ...(query.workspaceRevision ? { workspaceRevision: query.workspaceRevision } : {}),
     };
-    const perLane = await Promise.all(
-      this.injectedRetrievers.map(r => r.retrieve(input).catch(err => {
-        console.warn(`[search-runtime] retriever(${r.lane}) failed:`, (err as Error).message);
-        return [];
-      }))
+    const { executeLaneWithDeadline } = await import('./retrieve-candidates.js');
+    const globalTimeoutMs = 8000;
+    const laneTimeoutMs = 5000;
+    const startedAt = Date.now();
+    const requestController = new AbortController();
+    const abortFromParent = () => requestController.abort(options?.signal?.reason ?? new Error('REQUEST_CANCELLED'));
+    if (options?.signal?.aborted) abortFromParent();
+    else options?.signal?.addEventListener('abort', abortFromParent, { once: true });
+    const globalTimer = setTimeout(
+      () => requestController.abort(new Error(`REQUEST_DEADLINE_EXCEEDED:${globalTimeoutMs}ms`)),
+      globalTimeoutMs,
     );
+    let laneOutcomes: Awaited<ReturnType<typeof executeLaneWithDeadline<LaneCandidate>>>[];
+    try {
+      laneOutcomes = await Promise.all(this.injectedRetrievers.map((r) => {
+        const logicalLane = r.lane === 'dense' ? 'dense'
+          : r.lane === 'exact' ? 'exact'
+            : r.lane === 'ast' ? 'ast'
+              : r.lane === 'rg' ? 'rg'
+                : r.lane === 'go-retrieval' ? 'multi'
+                  : 'lexical';
+        const remainingMs = Math.max(1, globalTimeoutMs - (Date.now() - startedAt));
+        const receiptLane = r.lane === 'dense' ? 'qdrant' : r.lane;
+        return executeLaneWithDeadline<LaneCandidate>(
+          receiptLane,
+          logicalLane,
+          Math.min(laneTimeoutMs, remainingMs),
+          (signal) => r.retrieve({ ...input, signal }),
+          { signal: requestController.signal },
+        );
+      }));
+    } finally {
+      clearTimeout(globalTimer);
+      options?.signal?.removeEventListener('abort', abortFromParent);
+    }
 
-    // Stamp each lane candidate before projecting — allows fusion-stage tracking
-    // and prevents accidental double-fusion detection downstream.
-    const stamped = perLane.flat().map(lc => ({
+    const laneReceipts = laneOutcomes.map((entry) => entry.receipt);
+    const stamped = laneOutcomes.flatMap((entry) => entry.candidates).map(lc => ({
       ...lc,
       fusionStage: 'lane' as const,
     }));
 
-    return applySearchMetadataFilter(stamped.map(lc => ({
+    return {
+      candidates: applySearchMetadataFilter(stamped.map(lc => ({
       id: lc.qdrantPointId ?? lc.packetId ?? lc.packetKey,
       packetKey: lc.packetKey,
       packetId: lc.packetId ?? null,
@@ -1235,7 +1550,17 @@ export class SearchRuntime {
           : lc.metadata?.['embedding_lane'] === 'bm42'
             ? 'bm42'
             : undefined,
-    })), query.filters);
+    })), query.filters),
+      laneReceipts,
+    };
+  }
+
+  private async retrieveCandidates(
+    query: SearchQuery,
+    options?: { includeVectorLanes?: boolean }
+  ): Promise<Candidate[]> {
+    const res = await this.retrieveCandidatesWithReceipts(query, options);
+    return res.candidates;
   }
 
   private async expandGraphCandidates(candidates: Candidate[], query: SearchQuery): Promise<Candidate[]> {
@@ -1764,6 +2089,9 @@ export class SearchRuntime {
     finalPackets: FeatureEnvelope[];
     postProcessedCount: number;
     rerankedCount: number;
+    laneReceipts?: import('./retrieve-candidates.js').RetrievalLaneReceipt[];
+    nlutStageReceipt?: RetrievalProofSummary['nlutStageReceipt'];
+    actorGrantReceipt?: RetrievalProofSummary['actorGrantReceipt'];
   }): RetrievalProofSummary {
     const { query, rawCandidates, fusedCandidates, hydrationProof, finalPackets } = input;
     const rawQdrantCount = rawCandidates.filter((candidate) => candidate.scoreSource === 'qdrant' || candidate.scoreSource === 'qdrant_768').length;
@@ -1815,6 +2143,9 @@ export class SearchRuntime {
       finalContextCount: finalPackets.length,
       validationReasons: hydrationProof.validationReasons,
       hydrationCandidateResolutions: hydrationProof.candidateResolutions,
+      ...(input.laneReceipts ? { laneReceipts: input.laneReceipts } : {}),
+      ...(input.nlutStageReceipt ? { nlutStageReceipt: input.nlutStageReceipt } : {}),
+      ...(input.actorGrantReceipt ? { actorGrantReceipt: input.actorGrantReceipt } : {}),
       functionRegistry: buildFunctionRegistryRetrievalProofV1({
         enabled: this.functionRegistry !== undefined,
         readOnly: this.readOnly,

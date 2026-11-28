@@ -246,13 +246,37 @@ function normalizeResponse(data: Record<string, unknown>, endpoint: string): GoR
   };
 }
 
-export async function searchViaGoRetrieval(
-  params: GoRetrievalSearchParams,
-  timeoutMs = 8_000
-): Promise<GoRetrievalSearchResponse | null> {
-  if (!(ENV.RAG_USE_GO_RETRIEVAL || ENV.GO_RETRIEVAL_HTTP_ENABLED)) return null;
+export type GoRetrievalClientStatus = 'SUCCESS' | 'ZERO_HITS' | 'DISABLED' | 'TIMEOUT' | 'CANCELLED' | 'BACKEND_UNAVAILABLE';
 
-  const baseUrl = normalizeBaseUrl(ENV.GO_RETRIEVAL_HTTP_URL ?? ENV.RETRIEVAL_HTTP_URL ?? '');
+export interface GoRetrievalClientResult {
+  status: GoRetrievalClientStatus;
+  response: GoRetrievalSearchResponse | null;
+  endpoint?: string;
+  error?: string;
+}
+
+export async function searchViaGoRetrievalWithStatus(
+  params: GoRetrievalSearchParams & {
+    requestId?: string;
+    taskId?: string;
+    workspaceId?: string;
+    workspaceRevision?: string;
+    representationId?: string;
+  },
+  timeoutMs = 8_000,
+  opts?: { baseUrl?: string; signal?: AbortSignal; forceEnabled?: boolean }
+): Promise<GoRetrievalClientResult> {
+  if (!opts?.forceEnabled && !(ENV.RAG_USE_GO_RETRIEVAL || ENV.GO_RETRIEVAL_HTTP_ENABLED)) {
+    return { status: 'DISABLED', response: null };
+  }
+  if (opts?.signal?.aborted) {
+    return { status: 'CANCELLED', response: null, error: 'REQUEST_ABORTED' };
+  }
+
+  const baseUrl = normalizeBaseUrl(opts?.baseUrl ?? ENV.GO_RETRIEVAL_HTTP_URL ?? ENV.RETRIEVAL_HTTP_URL ?? '');
+  if (!baseUrl) {
+    return { status: 'BACKEND_UNAVAILABLE', response: null, error: 'GO_RETRIEVAL_URL_EMPTY' };
+  }
   const endpoints = [
     '/search/research',
     '/api/retrieval/search',
@@ -261,11 +285,20 @@ export async function searchViaGoRetrieval(
     '/search/codebase',
   ];
 
-  for (const endpoint of endpoints) {
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeoutMs);
+  let sawZeroHits = false;
+  let lastError: string | undefined;
+  let timedOut = false;
 
+  for (const endpoint of endpoints) {
+    const controller = new AbortController();
+    const onAbort = () => controller.abort(opts?.signal?.reason ?? new Error('REQUEST_ABORTED'));
+    opts?.signal?.addEventListener('abort', onAbort, { once: true });
+    const timer = setTimeout(() => {
+      timedOut = true;
+      controller.abort(new Error('REQUEST_TIMEOUT'));
+    }, timeoutMs);
+
+    try {
       const res = await fetch(`${baseUrl}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -280,6 +313,11 @@ export async function searchViaGoRetrieval(
           score_threshold: params.scoreThreshold ?? params.minScore ?? 0,
           caseId: params.caseId ?? '',
           case_id: params.caseId ?? '',
+          requestId: params.requestId,
+          taskId: params.taskId,
+          workspaceId: params.workspaceId,
+          workspaceRevision: params.workspaceRevision,
+          representationId: params.representationId,
           sectionTypes: params.sectionTypes ?? [],
           section_types: params.sectionTypes ?? [],
           filters: params.filters ?? {},
@@ -293,20 +331,47 @@ export async function searchViaGoRetrieval(
           },
         }),
       });
-      clearTimeout(timer);
 
-      if (!res.ok) continue;
+      if (!res.ok) {
+        lastError = `HTTP_${res.status}`;
+        continue;
+      }
 
       const data = (await res.json()) as Record<string, unknown>;
       const normalized = normalizeResponse(data, endpoint);
-      if (!normalized.results.length) continue;
-      return normalized;
-    } catch (err) {
-      if ((err as Error).name !== 'AbortError') {
-        console.warn('[go-retrieval-client] search failed:', (err as Error).message);
+      if (!normalized.results.length) {
+        sawZeroHits = true;
+        continue;
       }
+      return { status: 'SUCCESS', response: normalized, endpoint };
+    } catch (err) {
+      if (opts?.signal?.aborted) {
+        return { status: 'CANCELLED', response: null, error: 'REQUEST_ABORTED' };
+      }
+      if (timedOut) {
+        return { status: 'TIMEOUT', response: null, error: `TIMEOUT_${timeoutMs}ms` };
+      }
+      lastError = err instanceof Error ? err.message : String(err);
+      if ((err as Error).name !== 'AbortError') {
+        console.warn('[go-retrieval-client] search failed:', lastError);
+      }
+    } finally {
+      clearTimeout(timer);
+      opts?.signal?.removeEventListener('abort', onAbort);
     }
   }
 
-  return null;
+  if (sawZeroHits) {
+    return { status: 'ZERO_HITS', response: { results: [], source: 'go-retrieval' } };
+  }
+  return { status: 'BACKEND_UNAVAILABLE', response: null, error: lastError ?? 'ALL_ENDPOINTS_FAILED' };
+}
+
+export async function searchViaGoRetrieval(
+  params: GoRetrievalSearchParams,
+  timeoutMs = 8_000,
+  opts?: { baseUrl?: string; signal?: AbortSignal }
+): Promise<GoRetrievalSearchResponse | null> {
+  const res = await searchViaGoRetrievalWithStatus(params, timeoutMs, opts);
+  return res.status === 'SUCCESS' ? res.response : null;
 }

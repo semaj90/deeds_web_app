@@ -229,8 +229,9 @@ if DSPY_AVAILABLE:
 
 
     class AtlasAgenticRepairPipeline(dspy.Module):
-        def __init__(self):
+        def __init__(self, api_base: str = "http://127.0.0.1:8090/v1"):
             super().__init__()
+            self.api_base = api_base
             self.repair_predictor = dspy.Predict(ProsecutorDagErrorFixSignature)
 
         def forward(

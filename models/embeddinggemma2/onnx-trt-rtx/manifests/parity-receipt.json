@@ -1,0 +1,231 @@
+{
+  "schema": "atlas.p4-trt-rtx-parity-profile.v1",
+  "generatedAt": "2026-11-28T02:29:36.393043+00:00",
+  "status": "PROVEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "artifacts": {
+    "modelFile": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\embeddinggemma2\\onnx-trt-rtx\\onnx\\model_trt.onnx",
+    "modelGraphSha256": "sha256:adfeef968ff78ff49bcdea5b850ed98b0cc640b0a610a22fe5a1154a16ba8b1b",
+    "externalWeightsFile": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\embeddinggemma2\\onnx-trt-rtx\\onnx\\model.onnx_data",
+    "externalWeightsSha256": "sha256:9fd452bfc6916e5a92f080f8dada35598ca4512b21c65897d4c5974d5f9630a2",
+    "tokenizerFile": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\embeddinggemma2\\onnx-trt-rtx\\tokenizer.json",
+    "tokenizerSha256": "sha256:4d777ef5bdc1aa36227abdfb77c3e49e7b9c892d16e1b6bda41c393504828be4"
+  },
+  "runtime": {
+    "python": "3.13.5",
+    "ortVersion": "1.32.0",
+    "epPackageVersion": "0.5.0"
+  },
+  "jitCache": {
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\embeddinggemma2\\onnx-trt-rtx\\cache\\sm86\\fp32-trt1.7-ep0.5.0-20261128T022936392123Z-13564",
+    "preExistingCachePreserved": true
+  },
+  "vram": {
+    "baseline": {
+      "gpuName": "NVIDIA GeForce RTX 3060 Ti",
+      "usedMb": 5801,
+      "freeMb": 2224,
+      "totalMb": 8192
+    },
+    "run1Active": {
+      "gpuName": "NVIDIA GeForce RTX 3060 Ti",
+      "usedMb": 6789,
+      "freeMb": 1236,
+      "totalMb": 8192
+    },
+    "afterRun1Teardown": {
+      "gpuName": "NVIDIA GeForce RTX 3060 Ti",
+      "usedMb": 5575,
+      "freeMb": 2450,
+      "totalMb": 8192
+    },
+    "afterRun2Teardown": {
+      "gpuName": "NVIDIA GeForce RTX 3060 Ti",
+      "usedMb": 5754,
+      "freeMb": 2271,
+      "totalMb": 8192
+    },
+    "finalAfterProfile": {
+      "gpuName": "NVIDIA GeForce RTX 3060 Ti",
+      "usedMb": 5911,
+      "freeMb": 2114,
+      "totalMb": 8192
+    }
+  },
+  "cpu8094Health": {
+    "status": "ok",
+    "model_id": "onnx-community/embeddinggemma2-q8:onnx/model_quantized.onnx",
+    "model_dir": "/models/embeddinggemma2/onnx-q8",
+    "providers": [
+      "CPUExecutionProvider"
+    ],
+    "native_dim": 768,
+    "dims": [
+      768,
+      512,
+      256,
+      128
+    ],
+    "max_batch": 32,
+    "max_tokens": 512,
+    "ownership": "EXPERIMENT",
+    "load_error": null
+  },
+  "gpu18094Health": {
+    "status": "ok",
+    "model_id": "onnx-community/embeddinggemma-2-ONNX@daa72c51243991dfcaf9f9137d2c573d8f7790c0:onnx/model_trt.onnx",
+    "model_dir": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\embeddinggemma2\\onnx-trt-rtx",
+    "ort_version": "1.32.0",
+    "provider_mode": "tensorrt_rtx",
+    "fallback_to_cpu": false,
+    "fallback_used": false,
+    "mixed_provider_session": true,
+    "requested_providers": [
+      "NvTensorRTRTXExecutionProvider"
+    ],
+    "providers": [
+      "NvTensorRTRTXExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "available_providers": [
+      "AzureExecutionProvider",
+      "CPUExecutionProvider",
+      "NvTensorRTRTXExecutionProvider"
+    ],
+    "trt_cache_dir": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\embeddinggemma2\\onnx-trt-rtx\\cache\\sm86\\fp32-trt1.7-ep0.5.0-20261128T022936392123Z-13564",
+    "ort_profile_prefix": null,
+    "trt_rtx_target": "1.7",
+    "trt_rtx_installed_version": "0.5.0",
+    "ep_package_version": "0.5.0",
+    "trt_rtx_engine_version": "1.7",
+    "workers": 1,
+    "intra_threads": 4,
+    "graph_optimization": "ORT_ENABLE_ALL",
+    "native_dim": 768,
+    "dims": [
+      768,
+      512,
+      256,
+      128
+    ],
+    "max_batch": 32,
+    "max_tokens": 512,
+    "ownership": "EXPERIMENT",
+    "load_error": null
+  },
+  "workerPidRun1": 39512,
+  "task1Parity": {
+    "fixtureCount": 12,
+    "dims": [
+      768,
+      512,
+      256,
+      128
+    ],
+    "cpuElapsedMs": 26027.14,
+    "gpuWarmElapsedMs": [
+      738.36,
+      179.84
+    ],
+    "cpuThroughputTextsPerSec": 0.46,
+    "gpuWarmThroughputTextsPerSec": 66.73,
+    "cpuModelId": "onnx-community/embeddinggemma2-q8:onnx/model_quantized.onnx",
+    "gpuModelId": "onnx-community/embeddinggemma-2-ONNX@daa72c51243991dfcaf9f9137d2c573d8f7790c0:onnx/model_trt.onnx",
+    "cpuRepeatMinCosine": 0.999999,
+    "gpuRepeatMinCosine": 0.9999999,
+    "mrlParity": {
+      "768": {
+        "cpuGpuCosineMin": 0.999924,
+        "cpuGpuCosineMean": 0.999949,
+        "cpuGpuCosineMax": 0.999964,
+        "exactNeighborRecallAt3": 1.0
+      },
+      "512": {
+        "cpuGpuCosineMin": 0.999925,
+        "cpuGpuCosineMean": 0.999951,
+        "cpuGpuCosineMax": 0.999965,
+        "exactNeighborRecallAt3": 1.0
+      },
+      "256": {
+        "cpuGpuCosineMin": 0.999942,
+        "cpuGpuCosineMean": 0.999958,
+        "cpuGpuCosineMax": 0.999972,
+        "exactNeighborRecallAt3": 1.0
+      },
+      "128": {
+        "cpuGpuCosineMin": 0.999954,
+        "cpuGpuCosineMean": 0.999972,
+        "cpuGpuCosineMax": 0.999982,
+        "exactNeighborRecallAt3": 1.0
+      }
+    },
+    "cpuGpuCosineMin": 0.999924,
+    "cpuGpuCosineMean": 0.999949,
+    "cpuGpuCosineMax": 0.999964,
+    "exactNeighborRecallAt3": 1.0
+  },
+  "currentStep": "task4_post_cancel_health",
+  "task4VramAdmission": {
+    "batchTimings": {
+      "batch_1_ms": 41.6,
+      "batch_4_ms": 1256.65,
+      "batch_8_ms": 559.2
+    },
+    "concurrent2xBatch4Statuses": [
+      200,
+      200
+    ],
+    "clientCancellationObserved": true,
+    "postCancelHealthy": true,
+    "peakActiveVram": {
+      "gpuName": "NVIDIA GeForce RTX 3060 Ti",
+      "usedMb": 6929,
+      "freeMb": 1096,
+      "totalMb": 8192
+    }
+  },
+  "run1Teardown": {
+    "terminated": true,
+    "returncode": 1,
+    "portReleased": true
+  },
+  "workerPidRun2": 50592,
+  "run2Teardown": {
+    "terminated": true,
+    "returncode": 1,
+    "portReleased": true
+  },
+  "task3JitCache": {
+    "cacheDir": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\embeddinggemma2\\onnx-trt-rtx\\cache\\sm86\\fp32-trt1.7-ep0.5.0-20261128T022936392123Z-13564",
+    "run1Cold": {
+      "startupToReadyMs": 66458.54,
+      "firstRequestMs": 1060.47,
+      "warmBatch12Ms": 738.36
+    },
+    "run2WarmReuse": {
+      "startupToReadyMs": 53829.75,
+      "firstRequestMs": 1214.14,
+      "warmRequestMs": 144.74
+    },
+    "cacheFileCount": 0,
+    "cacheFiles": []
+  },
+  "task2OperatorProfile": {
+    "sessionProviders": [
+      "NvTensorRTRTXExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "profileFile": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\ort-profiles-v1\\trt_rtx_op_profile_2026-11-27_18-32-20_203.json",
+    "providerBreakdown": {
+      "NvTensorRTRTXExecutionProvider": {
+        "nodeEvents": 1,
+        "totalDurMs": 1200.172,
+        "sampleOps": [
+          "NvTensorRTRTXExecutionProvider_759942358158680665_0"
+        ]
+      }
+    }
+  },
+  "receiptSha256": "db390a723f89903f0a416185287994b1de639ea5ece4c4816eae9a85e01df9b3"
+}

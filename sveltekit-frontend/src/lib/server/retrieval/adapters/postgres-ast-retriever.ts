@@ -31,6 +31,7 @@ export function createPostgresAstRetriever(): Retriever {
 
     async retrieve(input: RetrievalInput): Promise<LaneCandidate[]> {
       try {
+        input.signal?.throwIfAborted();
         // Extract identifier tokens suitable for symbol matching
         const symbols = (input.query.match(/\b[a-zA-Z_][a-zA-Z0-9_]{2,}\b/g) ?? [])
           .slice(0, 8);
@@ -49,6 +50,7 @@ export function createPostgresAstRetriever(): Retriever {
           : sql``;
 
         const db = await getDb();
+        input.signal?.throwIfAborted();
         const result = await db.execute(sql`
           SELECT
             ap.id,
@@ -73,6 +75,7 @@ export function createPostgresAstRetriever(): Retriever {
           ORDER BY ap.source_ref ASC, ap.function_symbol ASC
           LIMIT ${input.limit}
         `);
+        input.signal?.throwIfAborted();
 
         type ASTRow = {
           id: string;
@@ -114,8 +117,8 @@ export function createPostgresAstRetriever(): Retriever {
         }
         return candidates;
       } catch (err) {
-        console.warn('[postgres-ast-retriever] failed:', (err as Error).message);
-        return [];
+        if (input.signal?.aborted) throw input.signal.reason ?? err;
+        throw err;
       }
     },
   };

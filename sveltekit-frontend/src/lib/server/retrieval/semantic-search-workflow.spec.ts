@@ -192,6 +192,21 @@ describe('semantic search workflow', () => {
     expect(searchMock).not.toHaveBeenCalled();
   });
 
+  it('propagates only the server request signal through the workflow adapter', async () => {
+    const controller = new AbortController();
+    await runSemanticSearchWorkflow({
+      query: 'bounded retrieval request',
+      topK: 2,
+      includeWorkflowPreamble: false,
+      includeAcePacket: false,
+      compareRustShadow: false,
+      withGraphExpansion: false,
+      persistReport: false,
+    }, { signal: controller.signal });
+
+    expect(searchMock).toHaveBeenCalledWith(expect.any(Object), { signal: controller.signal });
+  });
+
   it('suppresses SearchRuntime, KAG audit, and report writes in diagnostic read-only mode', async () => {
     await runSemanticSearchWorkflow({
       query: 'read-only search workflow',

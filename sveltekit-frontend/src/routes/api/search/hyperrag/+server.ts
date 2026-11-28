@@ -139,7 +139,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         includeGenerated: false,
         includeLegacy: false,
       },
-    });
+    }, { signal: request.signal, runId: requestId });
 
     const hypergraph: HyperRagFusionRuntimeResultV1 = {
       status: 'UNAVAILABLE',

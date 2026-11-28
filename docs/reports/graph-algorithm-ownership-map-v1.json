@@ -82,7 +82,7 @@
       "boundFeatureKey": "neo4j_traversal_path"
     }
   },
-  "generatedAt": "2026-10-18T19:55:44.980Z",
+  "generatedAt": "2026-11-28T09:16:12.729Z",
   "status": "SPECIFIED_AND_ENFORCED",
   "summary": {
     "totalAlgorithmsMapped": 7,
@@ -92,5 +92,5 @@
     "gpuSafeModeActive": true,
     "databaseMutationsAllowed": false
   },
-  "checksum": "sha256:4f9c103ba11406c1dfe94c82474f92c79859a9b7c4aeae0e0a8019e5998954a2"
+  "checksum": "sha256:2ba73a5a490a29952f3084d27e2f4f9bd97d4d1dbba7ad57653680712cfe1e39"
 }

@@ -9,6 +9,7 @@ export type GraphDispatcherKind =
 	| 'cheirank-adapter'
 	| 'kcore-adapter'
 	| 'betweenness-adapter'
+	| 'stream-gds-adapter'
 	| 'fail-closed';
 
 export interface GraphDispatcherRegistryEntry {
@@ -41,6 +42,7 @@ const GraphDispatcherRegistryEntrySchema = z
 			'cheirank-adapter',
 			'kcore-adapter',
 			'betweenness-adapter',
+			'stream-gds-adapter',
 			'fail-closed',
 		]),
 		algorithmRevision: z.string().min(1),
@@ -96,6 +98,34 @@ const GRAPH_DISPATCHER_REGISTRY: readonly GraphDispatcherRegistryEntry[] = [
 		algorithm: 'betweenness',
 		dispatchKind: 'betweenness-adapter',
 		algorithmRevision: graphAlgorithmRevision('betweenness'),
+		proofState: 'wired',
+		skipReason: null,
+	},
+	{
+		algorithm: 'knn',
+		dispatchKind: 'stream-gds-adapter',
+		algorithmRevision: graphAlgorithmRevision('knn'),
+		proofState: 'wired',
+		skipReason: null,
+	},
+	{
+		algorithm: 'bfs',
+		dispatchKind: 'stream-gds-adapter',
+		algorithmRevision: graphAlgorithmRevision('bfs'),
+		proofState: 'wired',
+		skipReason: null,
+	},
+	{
+		algorithm: 'dijkstra',
+		dispatchKind: 'stream-gds-adapter',
+		algorithmRevision: graphAlgorithmRevision('dijkstra'),
+		proofState: 'wired',
+		skipReason: null,
+	},
+	{
+		algorithm: 'astar',
+		dispatchKind: 'stream-gds-adapter',
+		algorithmRevision: graphAlgorithmRevision('astar'),
 		proofState: 'wired',
 		skipReason: null,
 	},

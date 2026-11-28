@@ -1,6 +1,6 @@
 # Domain Classification Readiness Audit
 
-Generated: 2026-09-10T20:23:06.597Z
+Generated: 2026-11-28T09:05:55.057Z
 Status: READY_WITH_GAPS
 
 ## Coverage
@@ -8,10 +8,10 @@ Status: READY_WITH_GAPS
 | Lane | Coverage | Threshold | Status |
 |---|---:|---:|---|
 | identity spine | 100% source_ref, 99.9% tree_node_id | >=95% | PASS |
-| feature envelope | used_concepts=96.55%, lexical=99.98%, ast=20.27% | >=95% | FAIL |
+| feature envelope | used_concepts=95.96%, lexical=99.89%, ast=62.06% | >=95% | FAIL |
 | metric lane | nb=100%, jepa=1.48%, kmeans=100%, som=100% | >=95% | PASS |
-| embedding corpus | 98.78% content_embedding | >=95% | PASS |
-| retrieval mirror | 10.45% qdrant_point_id | >=95% | FAIL |
+| embedding corpus | 99.99% content_embedding_768 | >=95% | PASS |
+| retrieval mirror | 37.7% qdrant_point_id | >=95% | FAIL |
 | topology readiness | som=99.91%, latent_64=12.19%, pagerank=99.9% | >=95% | FAIL |
 | Naive Bayes lane | model present; report=present | train + apply | PASS |
 | XGBoost lane | csv=present, meta=present, report=present, model=present | export + train + serve | PASS |

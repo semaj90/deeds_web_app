@@ -115,4 +115,69 @@ describe('chunkLegalDocument with countTokens', () => {
 		const again = chunkLegalDocument(text, { maxTokens: 512, overlap: 0 });
 		expect(legacy.map((c) => c.text)).toEqual(again.map((c) => c.text));
 	});
+
+	it('uses countTokens for structured legal sections and preserves exact source spans', () => {
+		const body = wordsDoc(80);
+		const text = `ARTICLE I — DEFINITIONS\n${body}\n\nARTICLE II — REMEDIES\n${body}`;
+		const chunks = chunkLegalDocument(text, { maxTokens: 30, overlap: 5, countTokens: wordCount, minSectionLength: 10 });
+		expect(chunks.length).toBeGreaterThan(2);
+		for (const c of chunks) {
+			expect(c.tokenCount).toBeLessThanOrEqual(30);
+			expect(text.slice(c.startOffset, c.endOffset)).toBe(c.text);
+		}
+	});
+
+	it('uses countTokens for Docling blocks including oversized block splitting', () => {
+		const longPara = wordsDoc(65);
+		const chunks = chunkLegalDocument('ignored', {
+			maxTokens: 25,
+			overlap: 5,
+			minSectionLength: 10,
+			countTokens: wordCount,
+			doclingBlocks: [
+				{ type: 'heading', text: 'Section 1. Scope', page: 1 },
+				{ type: 'paragraph', text: longPara, page: 1 },
+			],
+		});
+		expect(chunks.length).toBeGreaterThan(2);
+		for (const c of chunks) {
+			expect(c.tokenCount).toBeLessThanOrEqual(25);
+			expect(c.heading).toBe('Section 1. Scope');
+		}
+	});
+
+	it('counts Docling tables with the exact counter and splits them within budget', () => {
+		const tableText = wordsDoc(40, 'cell');
+		const chunks = chunkLegalDocument('ignored', {
+			maxTokens: 12,
+			overlap: 2,
+			minSectionLength: 1,
+			countTokens: wordCount,
+			doclingBlocks: [{ type: 'table', text: tableText, page: 2 }],
+		});
+		expect(chunks.length).toBeGreaterThan(1);
+		expect(chunks.every((chunk) => chunk.isTable && chunk.tokenCount <= 12)).toBe(true);
+		expect(chunks.every((chunk) => chunk.doctagTypes?.includes('table'))).toBe(true);
+	});
+
+	it('fails exact admission when the tokenizer fails or a single token exceeds budget', () => {
+		const tokenizerFailure = () => { throw new Error('TOKENIZER_UNAVAILABLE'); };
+		expect(() => chunkLegalDocument('one two three', {
+			countTokens: tokenizerFailure,
+		})).toThrow('TOKENIZER_UNAVAILABLE');
+
+		expect(() => chunkLegalDocument('x'.repeat(40), {
+			maxTokens: 10,
+			overlap: 0,
+			countTokens: (text) => text.length,
+		})).toThrow('LEGAL_CHUNK_TOKEN_LIMIT_EXCEEDED');
+	});
+
+	it('rejects invalid token-count results instead of treating them as admitted', () => {
+		for (const invalidCount of [Number.NaN, Number.POSITIVE_INFINITY, -1, 1.5]) {
+			expect(() => chunkLegalDocument('one two', {
+				countTokens: () => invalidCount,
+			})).toThrow('LEGAL_CHUNK_TOKEN_COUNT_INVALID');
+		}
+	});
 });

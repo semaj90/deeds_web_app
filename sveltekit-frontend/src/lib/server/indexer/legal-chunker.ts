@@ -239,15 +239,20 @@ export function countedTokenWindows(
   });
   if (words.length === 0) return [];
   const span = (a: number, b: number) => text.slice(words[a].start, words[b].end);
+  const measure = (value: string): number => {
+    const count = countTokens(value);
+    if (!Number.isSafeInteger(count) || count < 0) throw new Error('LEGAL_CHUNK_TOKEN_COUNT_INVALID');
+    return count;
+  };
 
   const windows: CountedWindow[] = [];
   let s = 0;
   while (s < words.length) {
     let e = s;
-    let count = countTokens(span(s, s));
+    let count = measure(span(s, s));
     const oversize = count > maxTokens;
     while (!oversize && e + 1 < words.length) {
-      const next = countTokens(span(s, e + 1));
+      const next = measure(span(s, e + 1));
       if (next > maxTokens) break;
       e++;
       count = next;
@@ -256,14 +261,28 @@ export function countedTokenWindows(
     if (e === words.length - 1) break;
     // Step the next start back over the tail that fits the overlap budget, but always advance.
     let k = e + 1;
-    while (k - 1 > s && countTokens(span(k - 1, e)) <= overlapTokens) k--;
+    while (k - 1 > s && measure(span(k - 1, e)) <= overlapTokens) k--;
     s = Math.max(s + 1, k);
   }
   return windows;
 }
 
+/** Exact-admission variant: a single unbreakable token over budget is a refusal. */
+function countedAdmissionWindows(
+  text: string,
+  countTokens: TokenCounter,
+  maxTokens: number,
+  overlapTokens: number
+): CountedWindow[] {
+  const windows = countedTokenWindows(text, countTokens, maxTokens, overlapTokens);
+  if (windows.some((window) => window.oversize || window.tokenCount > maxTokens)) {
+    throw new Error('LEGAL_CHUNK_TOKEN_LIMIT_EXCEEDED');
+  }
+  return windows;
+}
+
 function countedSimpleChunks(fullText: string, countTokens: TokenCounter, maxTokens: number, overlap: number): LegalChunk[] {
-  const windows = countedTokenWindows(fullText, countTokens, maxTokens, overlap);
+  const windows = countedAdmissionWindows(fullText, countTokens, maxTokens, overlap);
   const chunks: LegalChunk[] = windows.map((w, idx) => {
     const chunkText = fullText.slice(w.startOffset, w.endOffset);
     const citations = extractCitations(chunkText);
@@ -290,6 +309,9 @@ export function chunkLegalDocument(fullText: string, opts?: LegalChunkerOptions)
 
   // If DocTags blocks available, use block-aware chunking
   if (opts?.doclingBlocks && opts.doclingBlocks.length > 0) {
+    if (opts.countTokens) {
+      return chunkFromDoclingBlocks(opts.doclingBlocks, maxTokens, overlap, minLen, opts.countTokens);
+    }
     const budget = resolveWordBudget(fullText, maxTokens, overlap, mode);
     return attachEstimatedTokens(chunkFromDoclingBlocks(opts.doclingBlocks, budget.maxWords, budget.wordOverlap, minLen));
   }
@@ -322,6 +344,26 @@ export function chunkLegalDocument(fullText: string, opts?: LegalChunkerOptions)
     }
     if (sectionText.trim().length < minLen) continue;
 
+    if (opts?.countTokens) {
+      const windows = countedAdmissionWindows(sectionText, opts.countTokens, maxTokens, overlap);
+      for (const w of windows) {
+        const windowText = sectionText.slice(w.startOffset, w.endOffset);
+        const chunkCits = extractCitations(windowText);
+        chunks.push({
+          text: windowText,
+          chunkIndex: globalChunkIndex++,
+          sectionPath: section.path,
+          heading: section.heading,
+          startOffset: sectionBaseOffset + w.startOffset,
+          endOffset: sectionBaseOffset + w.endOffset,
+          tokenCount: w.tokenCount,
+          citations: chunkCits,
+          ...buildLegalMetadata(windowText, section.heading, chunkCits),
+        });
+      }
+      continue;
+    }
+
     const budget = resolveWordBudget(sectionText, maxTokens, overlap, mode);
     const sectionChunks = chunkSectionText(
       sectionText,
@@ -339,7 +381,8 @@ export function chunkLegalDocument(fullText: string, opts?: LegalChunkerOptions)
     }
   }
 
-  return attachEstimatedTokens(bindChunksToExactSource(fullText, chunks));
+  const bound = bindChunksToExactSource(fullText, chunks);
+  return opts?.countTokens ? bound : attachEstimatedTokens(bound);
 }
 
 /** Keeps chunk text byte-for-byte equivalent to its canonical UTF-16 source span. */
@@ -714,7 +757,8 @@ function chunkFromDoclingBlocks(
   blocks: DoclingBlockInput[],
   maxTokens: number,
   overlap: number,
-  minLen: number
+  minLen: number,
+  countTokens?: TokenCounter
 ): LegalChunk[] {
   const chunks: LegalChunk[] = [];
   let chunkIndex = 0;
@@ -740,9 +784,10 @@ function chunkFromDoclingBlocks(
     const pageEnd = pages.length > 0 ? Math.max(...pages) : undefined;
 
     const words = combinedText.split(/\s+/).filter(Boolean);
+    const trimmed = combinedText.trim();
+    const measuredTokens = countTokens ? countTokens(trimmed) : words.length;
 
-    if (words.length <= maxTokens) {
-      const trimmed = combinedText.trim();
+    if (measuredTokens <= maxTokens) {
       const cits = extractCitations(combinedText);
       chunks.push({
         text: trimmed,
@@ -753,12 +798,33 @@ function chunkFromDoclingBlocks(
         pageEnd,
         startOffset: charOffset,
         endOffset: charOffset + combinedText.length,
-        tokenCount: words.length,
+        tokenCount: measuredTokens,
         citations: cits,
         doctagTypes,
         isTable: doctagTypes.length === 1 && doctagTypes[0] === 'table',
         ...buildLegalMetadata(trimmed, pendingHeading, cits),
       });
+      charOffset += combinedText.length + 2;
+    } else if (countTokens) {
+      const windows = countedAdmissionWindows(combinedText, countTokens, maxTokens, overlap);
+      for (const w of windows) {
+        const windowText = combinedText.slice(w.startOffset, w.endOffset);
+        const chunkCits = extractCitations(windowText);
+        chunks.push({
+          text: windowText,
+          chunkIndex: chunkIndex++,
+          sectionPath: [...currentSectionPath],
+          heading: pendingHeading,
+          pageStart,
+          pageEnd,
+          startOffset: charOffset + w.startOffset,
+          endOffset: charOffset + w.endOffset,
+          tokenCount: w.tokenCount,
+          citations: chunkCits,
+          doctagTypes,
+          ...buildLegalMetadata(windowText, pendingHeading, chunkCits),
+        });
+      }
       charOffset += combinedText.length + 2;
     } else {
       // Split oversized block group with token windowing
@@ -805,23 +871,28 @@ function chunkFromDoclingBlocks(
       const tableText = block.text.trim();
       if (tableText.length < minLen) continue;
 
-      const words = tableText.split(/\s+/).filter(Boolean);
-      const tblCits = extractCitations(tableText);
-      chunks.push({
-        text: tableText,
-        chunkIndex: chunkIndex++,
-        sectionPath: [...currentSectionPath],
-        heading: pendingHeading,
-        pageStart: block.page || undefined,
-        pageEnd: block.page || undefined,
-        startOffset: charOffset,
-        endOffset: charOffset + tableText.length,
-        tokenCount: words.length,
-        citations: tblCits,
-        doctagTypes: ['table'],
-        isTable: true,
-        ...buildLegalMetadata(tableText, pendingHeading, tblCits),
-      });
+      const tableWindows = countTokens
+        ? countedAdmissionWindows(tableText, countTokens, maxTokens, overlap)
+        : [{ startOffset: 0, endOffset: tableText.length, tokenCount: tableText.split(/\s+/).filter(Boolean).length, oversize: false }];
+      for (const window of tableWindows) {
+        const windowText = tableText.slice(window.startOffset, window.endOffset);
+        const tblCits = extractCitations(windowText);
+        chunks.push({
+          text: windowText,
+          chunkIndex: chunkIndex++,
+          sectionPath: [...currentSectionPath],
+          heading: pendingHeading,
+          pageStart: block.page || undefined,
+          pageEnd: block.page || undefined,
+          startOffset: charOffset + window.startOffset,
+          endOffset: charOffset + window.endOffset,
+          tokenCount: window.tokenCount,
+          citations: tblCits,
+          doctagTypes: ['table'],
+          isTable: true,
+          ...buildLegalMetadata(windowText, pendingHeading, tblCits),
+        });
+      }
       charOffset += tableText.length + 2;
       continue;
     }

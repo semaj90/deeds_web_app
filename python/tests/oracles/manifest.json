@@ -1,0 +1,8 @@
+{
+  "schema": "atlas.test-oracle-manifest.v1",
+  "oracleId": "parent-atlas-reference-oracle",
+  "version": "1.0.0",
+  "scope": "test-only",
+  "sourceFile": "atlas_reference_v1.py",
+  "sourceSha256": "7ff66e7c8f4376e4452d82455e7bcd5f1215087ec44493d0ee92c97fa4559c58"
+}

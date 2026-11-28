@@ -1,118 +1,192 @@
 /**
- * Go Retrieval is best-effort; SearchRuntime remains the canonical search authority.
- *
- * This adapter wraps the existing searchViaGoRetrieval function from the Go retrieval
- * client and normalises its hits into the common retriever output shape used by the
- * Atlas retrieval pipeline. Failures are caught and logged — the adapter never throws.
+ * Bounded read-only adapter for the Go Retrieval codebase endpoint.
+ * SearchRuntime remains the sole cross-lane fusion owner.
  */
+import { randomUUID } from 'node:crypto';
+import { ENV } from '$lib/server/env.server.js';
+
+export type GoRetrievalExecutionStatus =
+  | 'SUCCESS'
+  | 'ZERO_HITS'
+  | 'DISABLED'
+  | 'TIMEOUT'
+  | 'CANCELLED'
+  | 'BACKEND_UNAVAILABLE'
+  | 'AUTHORIZATION_BLOCKED'
+  | 'REPRESENTATION_MISMATCH';
 
 export interface GoRetrievalRetrieverOptions {
   enabled?: boolean;
   httpUrl?: string;
   timeoutMs?: number;
+  fetchImpl?: typeof fetch;
+}
+
+export interface GoRetrievalRequestContext {
+  requestId: string;
+  taskId: string;
+  runId: string;
+  workspaceId: string;
+  workspaceRevision: string;
+  sourceRevision: string;
+  representationId: string;
+  representationRevision: number;
+  embeddingModelId: string;
+  embeddingModelRevision: string;
 }
 
 export interface GoRetrievalHit {
   packetKey: string;
   sourceRef: string;
+  contentHash: string;
   score: number;
+  workspaceRevision: string;
+  sourceRevision: string;
+  representationId: string;
+  representationRevision: number;
   lane: 'go-retrieval';
   metadata?: Record<string, unknown>;
 }
 
-/**
- * Create a best-effort retriever backed by the Go retrieval service.
- * Returns an empty array when disabled or when the service is unavailable.
- */
-import { ENV } from '$lib/server/env.server.js';
+export interface GoRetrievalOutcome {
+  status: GoRetrievalExecutionStatus;
+  requestId: string;
+  hits: GoRetrievalHit[];
+  elapsedMs: number;
+  errorCode?: string;
+  representationUsed?: string;
+}
 
-export function createGoRetrievalRetriever(opts?: GoRetrievalRetrieverOptions): {
-  lane: 'go-retrieval';
-  retrieve(input: { query: string; limit: number }): Promise<GoRetrievalHit[]>;
-} {
-  const enabled =
-    opts?.enabled ??
-    (process.env.GO_RETRIEVAL_ENABLED === 'true' || process.env.GO_RETRIEVAL_ENABLED === '1');
-
-  const httpUrl = opts?.httpUrl ?? ENV.GO_RETRIEVAL_HTTP_URL;
+export function createGoRetrievalRetriever(opts?: GoRetrievalRetrieverOptions) {
+  const enabled = opts?.enabled ?? (process.env.GO_RETRIEVAL_ENABLED === 'true' || process.env.GO_RETRIEVAL_ENABLED === '1');
+  const baseUrl = (opts?.httpUrl ?? ENV.GO_RETRIEVAL_HTTP_URL ?? '').replace(/\/+$/, '');
   const timeoutMs = opts?.timeoutMs ?? 8_000;
+  const fetchImpl = opts?.fetchImpl ?? fetch;
 
   return {
-    lane: 'go-retrieval',
+    lane: 'go-retrieval' as const,
 
-    async retrieve(input: { query: string; limit: number }): Promise<GoRetrievalHit[]> {
-      if (!enabled) {
-        console.info('[go-retrieval-retriever] disabled — returning empty result set');
-        return [];
+    async retrieve(input: {
+      query: string;
+      limit: number;
+      context?: Partial<GoRetrievalRequestContext>;
+      signal?: AbortSignal;
+    }): Promise<GoRetrievalOutcome> {
+      const requestId = input.context?.requestId?.trim() || randomUUID();
+      const startedAt = Date.now();
+      const empty = (status: GoRetrievalExecutionStatus, errorCode?: string, representationUsed?: string): GoRetrievalOutcome => ({
+        status,
+        requestId,
+        hits: [],
+        elapsedMs: Date.now() - startedAt,
+        ...(errorCode ? { errorCode } : {}),
+        ...(representationUsed ? { representationUsed } : {}),
+      });
+
+      if (!enabled) return empty('DISABLED', 'GO_RETRIEVAL_DISABLED');
+      if (!baseUrl) return empty('BACKEND_UNAVAILABLE', 'GO_RETRIEVAL_HTTP_URL_MISSING');
+      if (input.signal?.aborted) return empty('CANCELLED', 'REQUEST_CANCELLED');
+
+      const context = input.context;
+      if (!context || ![
+        context.requestId, context.taskId, context.runId, context.workspaceId,
+        context.workspaceRevision, context.sourceRevision, context.representationId,
+        context.embeddingModelId, context.embeddingModelRevision,
+      ].every((value) => typeof value === 'string' && value.trim().length > 0) ||
+        !Number.isSafeInteger(context.representationRevision) || context.representationRevision! < 1) {
+        return empty('AUTHORIZATION_BLOCKED', 'GO_RETRIEVAL_REVISION_CONTEXT_INCOMPLETE');
       }
 
+      const timeoutSignal = AbortSignal.timeout(timeoutMs);
+      const signal = input.signal ? AbortSignal.any([input.signal, timeoutSignal]) : timeoutSignal;
       try {
-        // Dynamic import so the module can be absent in environments that
-        // do not have the Go retrieval service wired (e.g. browser builds).
-        const mod = await import('$lib/server/retrieval/go-retrieval-client.js');
-        const { searchViaGoRetrieval } = mod as {
-          searchViaGoRetrieval: (
-            params: { query: string; topK?: number },
-            timeoutMs?: number
-          ) => Promise<{ results: Record<string, unknown>[] } | null>;
-        };
+        const response = await fetchImpl(`${baseUrl}/search/codebase`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          signal,
+          body: JSON.stringify({
+            query: input.query,
+            limit: Math.max(1, Math.min(100, Math.floor(input.limit))),
+            representation_id: context.representationId,
+            representation_revision: context.representationRevision,
+            embedding_model_id: context.embeddingModelId,
+            embedding_model_revision: context.embeddingModelRevision,
+            task_id: context.taskId,
+            request_id: context.requestId,
+            atlas_context: {
+              tool_call_id: context.requestId,
+              run_id: context.runId,
+              workspace_id: context.workspaceId,
+              workspace_revision: context.workspaceRevision,
+              source_revision: context.sourceRevision,
+              // Search does not yet know a seed packet identity. Never invent one.
+              packet_key: '',
+              packet_revision: '',
+            },
+          }),
+        });
 
-        const response = await searchViaGoRetrieval(
-          { query: input.query, topK: input.limit },
-          timeoutMs
-        );
+        const data = await response.json().catch(() => ({})) as Record<string, any>;
+        const backendCode = typeof data.error_code === 'string' ? data.error_code : undefined;
+        if (backendCode === 'EG2_QUERY_MODEL_REVISION_MISMATCH') {
+          return empty('REPRESENTATION_MISMATCH', backendCode, typeof data.representation_used === 'string' ? data.representation_used : undefined);
+        }
+        if (response.status === 401 || response.status === 403) return empty('AUTHORIZATION_BLOCKED', backendCode ?? `HTTP_${response.status}`);
+        if (!response.ok || backendCode) return empty('BACKEND_UNAVAILABLE', backendCode ?? `HTTP_${response.status}`);
 
-        if (!response || !Array.isArray(response.results)) {
-          return [];
+        const representationUsed = typeof data.representation_used === 'string' ? data.representation_used : '';
+        const responseRequestId = typeof data.request_id === 'string' ? data.request_id : '';
+        const responseTaskId = typeof data.task_id === 'string' ? data.task_id : '';
+        if (representationUsed !== context.representationId ||
+          responseRequestId !== context.requestId || responseTaskId !== context.taskId ||
+          data.embedding_model_id !== context.embeddingModelId ||
+          data.embedding_model_revision !== context.embeddingModelRevision ||
+          (typeof data.representation_revision === 'number' && data.representation_revision !== context.representationRevision) ||
+          (typeof data.representation_fallback_reason === 'string' && data.representation_fallback_reason.length > 0)) {
+          return empty('REPRESENTATION_MISMATCH', 'GO_RETRIEVAL_RESPONSE_BINDING_MISMATCH', representationUsed || undefined);
         }
 
+        const chunks = Array.isArray(data.chunks) ? data.chunks : [];
         const hits: GoRetrievalHit[] = [];
-
-        for (const hit of response.results) {
-          const raw = hit as Record<string, unknown>;
-
-          const packetKey =
-            (raw.packet_key as string | undefined) ??
-            (raw.chunk_id as string | undefined) ??
-            (raw.id as string | undefined) ??
-            '';
-
-          if (!packetKey) continue;
-
-          const sourceRef =
-            (raw.source_ref as string | undefined) ??
-            (raw.sourceRef as string | undefined) ??
-            (raw.file_path as string | undefined) ??
-            '';
-
-          const score =
-            typeof raw.rerank_score === 'number'
-              ? raw.rerank_score
-              : typeof raw.rerankScore === 'number'
-              ? raw.rerankScore
-              : typeof raw.score === 'number'
-              ? raw.score
-              : 0;
-
-          const metadata =
-            raw.metadata && typeof raw.metadata === 'object'
-              ? (raw.metadata as Record<string, unknown>)
-              : undefined;
-
-          hits.push({ packetKey, sourceRef, score, lane: 'go-retrieval', metadata });
+        for (const raw of chunks) {
+          if (!raw || typeof raw !== 'object') continue;
+          const row = raw as Record<string, any>;
+          const packetKey = typeof row.packet_key === 'string' ? row.packet_key.trim() : '';
+          const sourceRef = typeof row.source_ref === 'string' ? row.source_ref.trim() : '';
+          const contentHash = typeof row.content_hash === 'string' ? row.content_hash.trim() : '';
+          const workspaceRevision = typeof row.workspace_revision === 'string' ? row.workspace_revision : '';
+          const sourceRevision = typeof row.source_revision === 'string' ? row.source_revision : '';
+          const representationId = typeof row.representation_id === 'string' ? row.representation_id : '';
+          const representationRevision = Number(row.representation_revision);
+          if (!packetKey || !sourceRef || !contentHash || !workspaceRevision || !sourceRevision ||
+            workspaceRevision !== context.workspaceRevision || sourceRevision !== context.sourceRevision ||
+            representationId !== context.representationId || representationRevision !== context.representationRevision) {
+            return empty('REPRESENTATION_MISMATCH', 'GO_RETRIEVAL_CANDIDATE_IDENTITY_MISMATCH', representationUsed);
+          }
+          hits.push({
+            packetKey,
+            sourceRef,
+            contentHash,
+            score: typeof row.score === 'number' && Number.isFinite(row.score) ? row.score : 0,
+            workspaceRevision,
+            sourceRevision,
+            representationId,
+            representationRevision,
+            lane: 'go-retrieval',
+            metadata: { candidateId: typeof row.chunk_id === 'string' ? row.chunk_id : undefined },
+          });
         }
-
-        // Inject the resolved httpUrl into ENV override if provided, so the
-        // underlying client picks it up when ENV.GO_RETRIEVAL_HTTP_URL is not set.
-        void httpUrl; // acknowledged — consumed via process.env fallback in the client
-
-        return hits;
-      } catch (err) {
-        console.warn(
-          '[go-retrieval-retriever] retrieve failed, returning empty result set:',
-          (err as Error).message
-        );
-        return [];
+        return {
+          status: hits.length > 0 ? 'SUCCESS' : 'ZERO_HITS',
+          requestId,
+          hits,
+          elapsedMs: Date.now() - startedAt,
+          representationUsed,
+        };
+      } catch (error) {
+        if (input.signal?.aborted) return empty('CANCELLED', 'REQUEST_CANCELLED');
+        if (signal.aborted) return empty('TIMEOUT', 'GO_RETRIEVAL_DEADLINE_EXCEEDED');
+        return empty('BACKEND_UNAVAILABLE', error instanceof Error ? error.name : 'GO_RETRIEVAL_BACKEND_ERROR');
       }
     },
   };

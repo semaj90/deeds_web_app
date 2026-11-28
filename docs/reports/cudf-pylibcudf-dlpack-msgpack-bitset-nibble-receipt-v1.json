@@ -1,7 +1,7 @@
 {
   "schema": "atlas.cudf-pylibcudf-dlpack-msgpack-bitset-nibble-receipt.v1",
-  "generatedAt": "2026-11-22T17:04:42.575344Z",
-  "durationMs": 362.85,
+  "generatedAt": "2026-11-28T03:50:55.290990Z",
+  "durationMs": 2910.7,
   "canonicalAuthority": false,
   "writesPerformed": false,
   "msgpackByteaProof": {

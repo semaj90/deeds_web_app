@@ -8,6 +8,10 @@ export const GRAPH_ALGORITHM_REVISION = {
   personalized_pagerank: 'unsupported-personalized-pagerank-v1',
   kcore: 'neo4j-gds-kcore-mutate-v1',
   betweenness: 'neo4j-gds-betweenness-exact-v1',
+  knn: 'neo4j-gds-knn-stream-v1',
+  bfs: 'neo4j-gds-bfs-stream-v1',
+  dijkstra: 'neo4j-gds-dijkstra-stream-v1',
+  astar: 'neo4j-gds-astar-stream-v1',
 } as const satisfies Record<GraphAlgorithm, string>;
 
 export function graphAlgorithmRevision(algorithm: GraphAlgorithm): string {

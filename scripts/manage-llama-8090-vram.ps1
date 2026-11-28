@@ -22,7 +22,6 @@ $ErrorActionPreference = 'Stop'
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 $ReceiptPath = Join-Path $RepoRoot '.tmp\atlas\vram-release-receipt-latest.json'
 $LeasePath = Join-Path $RepoRoot '.tmp\atlas\gpu-vram-lease.json'
-New-Item -ItemType Directory -Force -Path (Split-Path -Parent $ReceiptPath) | Out-Null
 . (Join-Path $PSScriptRoot 'lib\llama-8090-vram-guards.ps1')
 
 function Get-VramSnapshot {
@@ -107,6 +106,10 @@ if ($Action -eq 'status') {
     slots = $slots
     vram = $vramBefore
     gpuLease = $activeLease
+    releaseCapability = @{
+      supported = $false
+      blocker = 'INFERENCE_DRAIN_AND_GRACEFUL_SHUTDOWN_NOT_IMPLEMENTED'
+    }
   }
   $out | ConvertTo-Json -Depth 6
   exit 0
@@ -136,7 +139,6 @@ if ($Action -eq 'release') {
     # drain gate in this checkout, so a second idle sample still cannot prevent
     # a new request from arriving before shutdown. Keep release fail-closed.
     Assert-LlamaVramReleasePreconditionsV1 -Slots $slots -ListenerIdentityVerified $true -InferenceDrainGateVerified $false
-    throw 'REFUSED_GRACEFUL_SHUTDOWN_NOT_IMPLEMENTED: no supported llama-server drain/shutdown control exists; no process was stopped and no GPU lease was issued.'
   } finally {
     $releaseMutex.ReleaseMutex()
     $releaseMutex.Dispose()
@@ -170,6 +172,9 @@ if ($Action -eq 'restore') {
     $activeLease.restoredPid = $procAfter.pid
     $activeLease.restoredModelId = $modelId
     $activeLease | ConvertTo-Json -Depth 6 | Set-Content -Path $LeasePath -Encoding UTF8
+  }
+  if (-not $DryRun) {
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $ReceiptPath) | Out-Null
   }
   $vramAfter = Get-VramSnapshot
   $receipt = @{

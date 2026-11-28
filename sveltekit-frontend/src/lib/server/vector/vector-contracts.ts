@@ -70,6 +70,8 @@ export interface DenseSearchParams {
   skipCache?: boolean;
   suppressObservability?: boolean;
   efSearch?: number;
+  /** Qdrant server-side query timeout. This bounds work but is not client cancellation. */
+  timeoutSeconds?: number;
 }
 
 export function assertVectorDimension(vectorName: CodebaseVectorName, vector: number[]): void {

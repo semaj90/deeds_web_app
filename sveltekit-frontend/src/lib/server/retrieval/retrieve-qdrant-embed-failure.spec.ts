@@ -10,13 +10,7 @@ import { retrieveQdrant } from './retrieve-candidates';
 describe('retrieveQdrant query embedding failure', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('returns no candidates and reports why', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-    await expect(retrieveQdrant('any query')).resolves.toEqual([]);
-
-    expect(warn).toHaveBeenCalledWith(
-      '[retrieveQdrant] query embedding failed; dense lane returns no candidates: connect ECONNREFUSED 127.0.0.1:8081',
-    );
+  it('propagates embedding-service failure so the lane receipt is unavailable, not empty', async () => {
+    await expect(retrieveQdrant('any query')).rejects.toThrow('connect ECONNREFUSED 127.0.0.1:8081');
   });
 });

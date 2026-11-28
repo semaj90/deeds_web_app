@@ -934,15 +934,25 @@ static napi_value BatchCosineTopKMaskedWrapper(napi_env env, napi_callback_info 
     return throw_type_error(env, "activeMask must be Uint32Array");
   }
 
+  const auto read_positive_int32 = [env](napi_value value, int32_t* output) {
+    double number = 0.0;
+    if (napi_get_value_double(env, value, &number) != napi_ok ||
+        !std::isfinite(number) || number < 1.0 ||
+        number > static_cast<double>(INT32_MAX) || std::floor(number) != number) {
+      return false;
+    }
+    *output = static_cast<int32_t>(number);
+    return true;
+  };
+
   int32_t n = 0, dim = 0, k = 0;
-  if (napi_get_value_int32(env, argv[2], &n) != napi_ok ||
-      napi_get_value_int32(env, argv[3], &dim) != napi_ok ||
-      napi_get_value_int32(env, argv[4], &k) != napi_ok ||
-      n <= 0 || dim <= 0 || k <= 0 ||
+  if (!read_positive_int32(argv[2], &n) ||
+      !read_positive_int32(argv[3], &dim) ||
+      !read_positive_int32(argv[4], &k) ||
       query_len < static_cast<size_t>(dim) ||
       static_cast<size_t>(n) > SIZE_MAX / static_cast<size_t>(dim) ||
       corpus_len < static_cast<size_t>(n) * static_cast<size_t>(dim) ||
-      mask_len < static_cast<size_t>((n + 31) / 32)) {
+      mask_len < (static_cast<size_t>(n) + 31u) / 32u) {
     return throw_type_error(env, "invalid batchCosineTopKMasked dimensions or mask length");
   }
 
@@ -956,6 +966,9 @@ static napi_value BatchCosineTopKMaskedWrapper(napi_env env, napi_callback_info 
     q_norm_sq += static_cast<double>(q[d]) * q[d];
   }
   const double q_norm = std::sqrt(q_norm_sq);
+  if (!std::isfinite(q_norm) || q_norm <= 0.0) {
+    return throw_type_error(env, "query vector must have a finite non-zero norm");
+  }
 
   struct ScoredIdx { int32_t idx; float score; };
   constexpr size_t kStackTopKCapacity = 64;
@@ -986,6 +999,9 @@ static napi_value BatchCosineTopKMaskedWrapper(napi_env env, napi_callback_info 
       if (!std::isfinite(rv)) return throw_type_error(env, "query and active corpus values must be finite");
       dot += static_cast<double>(q[d]) * rv;
       r_norm_sq += rv * rv;
+    }
+    if (!std::isfinite(r_norm_sq) || r_norm_sq <= 0.0) {
+      return throw_type_error(env, "active corpus vector must have a finite non-zero norm");
     }
     const double denom = q_norm * std::sqrt(r_norm_sq);
     const float score = denom > 0.0 ? static_cast<float>(dot / denom) : 0.0f;

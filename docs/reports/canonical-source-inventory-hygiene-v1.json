@@ -1,21 +1,21 @@
 {
   "schema": "atlas.canonical-source-inventory-hygiene.v1",
-  "generatedAt": "2026-11-26T06:03:19.442Z",
+  "generatedAt": "2026-11-27T23:55:18.472Z",
   "mode": "READ_ONLY",
-  "status": "SOURCE_INVENTORY_HYGIENE_BLOCKED",
-  "proofLevel": "BLOCKED",
+  "status": "SOURCE_INVENTORY_HYGIENE_PASS",
+  "proofLevel": "BOUNDED_LIVE_PROVEN",
   "authority": false,
   "canonicalAuthority": false,
   "writesPerformed": false,
   "datastoreWritesPerformed": false,
-  "snapshotPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\001fa4071615924881105ae8b67c819d30921a83a322350ea957e56a0d2ed106.json",
-  "snapshotRevision": "sha256:001fa4071615924881105ae8b67c819d30921a83a322350ea957e56a0d2ed106",
+  "snapshotPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\e1935eb379baad528022a19720c4a5af6f45f60952c480a30319ca3b5b078017.json",
+  "snapshotRevision": "sha256:e1935eb379baad528022a19720c4a5af6f45f60952c480a30319ca3b5b078017",
   "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
   "workspaceRevision": null,
-  "snapshotMembershipChecksum": "sha256:456daa62e53a5a36418c66f869b6384ee8cfe2033bd0cf33ea8b2a64f32165e9",
+  "snapshotMembershipChecksum": "sha256:cd639a398e48e828cdf7363e80dbfae3e073fbc718d926bec20a9b3335c6e16a",
   "inventoryRevision": "atlas.canonical-source-inventory-hygiene-policy.2026-10-12.v2",
-  "sourceInventoryChecksum": "sha256:9c51710ebff073e4a3850e7b11820aff1e90f47b4ae1c0c84ca729a7c7d42822",
-  "sourceSelectionChecksum": "sha256:b2577a4ab5c85092eb8560994f08f708ca0ac76a5ab4fe03edbd00ae5627b90e",
+  "sourceInventoryChecksum": "sha256:cc34bd26cdceef006345602e693161d9e5f6629749b471a65fef9be2dcc55d0c",
+  "sourceSelectionChecksum": "sha256:0a5f674f76a0e9951ec13d892b932ec7497d046e5f991f04f6f4da9d3272f4fc",
   "writerPath": "scripts/atlas/upsert-whole-codebase-atlas-packets.mjs",
   "writerRevisionChecksum": "sha256:961de84e84d2576810b0c974a665af82be9b7f92ffd76b69f00d40ab6281006a",
   "writerExclusionPolicyRevision": "atlas.whole-codebase-source-exclusions.2026-09-16.v4",
@@ -33,8 +33,8 @@
       "liveServiceStorage": true
     }
   },
-  "candidatePathCount": 32819,
-  "canonicalSourceCount": 32597,
+  "candidatePathCount": 32871,
+  "canonicalSourceCount": 32649,
   "excludedCountsByReason": {
     "GENERATED_DERIVED_ARTIFACT": 29,
     "BUILD_OUTPUT": 9,
@@ -6669,9 +6669,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:.okf/docs/dspy/postgres-index-contract.md",
-      "sourceRevision": "sha256:3607ff5b30d89ca216933143c6d338904ae828d36a7fd048ce540a4cea21514b",
-      "contentDigest": "3607ff5b30d89ca216933143c6d338904ae828d36a7fd048ce540a4cea21514b",
-      "byteLength": 3072
+      "sourceRevision": "sha256:b1e83ab62a939102e269fc0d7f33538e0bd76752e93c0fcc0b9a6d68bd117d39",
+      "contentDigest": "b1e83ab62a939102e269fc0d7f33538e0bd76752e93c0fcc0b9a6d68bd117d39",
+      "byteLength": 4477
     },
     {
       "sourceIdentityKey": "repo:root:.okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/indexes/firecrawl-map.json",
@@ -8930,10 +8930,22 @@
       "byteLength": 5979
     },
     {
+      "sourceIdentityKey": "repo:root:.okf/pipelines/all-routes-qa-feature-review-v1.json",
+      "sourceRevision": "sha256:d5c4701a85759e3f30e8ee0b2a87328f1582c2703505dfb01b4ad7715c46b69f",
+      "contentDigest": "d5c4701a85759e3f30e8ee0b2a87328f1582c2703505dfb01b4ad7715c46b69f",
+      "byteLength": 3088
+    },
+    {
       "sourceIdentityKey": "repo:root:.okf/pipelines/ast-entity-prefill.yaml",
       "sourceRevision": "sha256:f1bd8576efce58ba479cb8ec2429248c3682af49a7f7ffe6aed062786227a16f",
       "contentDigest": "f1bd8576efce58ba479cb8ec2429248c3682af49a7f7ffe6aed062786227a16f",
       "byteLength": 1082
+    },
+    {
+      "sourceIdentityKey": "repo:root:.okf/pipelines/feature-label-agentic-error-fixing-v1.yaml",
+      "sourceRevision": "sha256:05b936e1a1365532786084b647014e209a34b29a7342f7468f14577902b02de1",
+      "contentDigest": "05b936e1a1365532786084b647014e209a34b29a7342f7468f14577902b02de1",
+      "byteLength": 9983
     },
     {
       "sourceIdentityKey": "repo:root:.okf/pipelines/hmm-api-recommendation-v1.yaml",
@@ -9483,9 +9495,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:.vscode/tasks.json",
-      "sourceRevision": "sha256:23cdb51db04c3abeefd49797bd0bf71f87fe4f78c93fa271d5336cb4c49d697d",
-      "contentDigest": "23cdb51db04c3abeefd49797bd0bf71f87fe4f78c93fa271d5336cb4c49d697d",
-      "byteLength": 531255
+      "sourceRevision": "sha256:771be7db31abfb1eb1612d821933da3987d4472ac04e0e7c53735e33d4024a64",
+      "contentDigest": "771be7db31abfb1eb1612d821933da3987d4472ac04e0e7c53735e33d4024a64",
+      "byteLength": 530729
     },
     {
       "sourceIdentityKey": "repo:root:.woodpecker/cheap-ci.yml",
@@ -9609,9 +9621,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:AGENTS.md",
-      "sourceRevision": "sha256:1a4c1d61aad4830bb344ccb3c385229310bd44dabbbcfa5e82ece0b58077fbc3",
-      "contentDigest": "1a4c1d61aad4830bb344ccb3c385229310bd44dabbbcfa5e82ece0b58077fbc3",
-      "byteLength": 34155
+      "sourceRevision": "sha256:cff8b4224db41b5094638dee72c1e8e10563e0847d8d7de5612f65d8f492ecdf",
+      "contentDigest": "cff8b4224db41b5094638dee72c1e8e10563e0847d8d7de5612f65d8f492ecdf",
+      "byteLength": 34833
     },
     {
       "sourceIdentityKey": "repo:root:agentsv2.md",
@@ -10083,9 +10095,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:claude.md",
-      "sourceRevision": "sha256:ae859fb7450a580416f218bae3c66191a1e4bb46da7ec4ef1c2dee3d3b5ca350",
-      "contentDigest": "ae859fb7450a580416f218bae3c66191a1e4bb46da7ec4ef1c2dee3d3b5ca350",
-      "byteLength": 207699
+      "sourceRevision": "sha256:62c942fa8e45fb31c69f9a7645f2ff363d42776b2f11ce820e6a4cc3dceb70e4",
+      "contentDigest": "62c942fa8e45fb31c69f9a7645f2ff363d42776b2f11ce820e6a4cc3dceb70e4",
+      "byteLength": 208655
     },
     {
       "sourceIdentityKey": "repo:root:CLINE-QUICK-SETUP.md",
@@ -10869,9 +10881,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:docker/atlas-gemma2-onnx-embed/docker-compose.yml",
-      "sourceRevision": "sha256:6afe315ca7c8a3299bc8254a4b93fcd40c4d2e1ed0fcaf679ef13c761ae6fcb6",
-      "contentDigest": "6afe315ca7c8a3299bc8254a4b93fcd40c4d2e1ed0fcaf679ef13c761ae6fcb6",
-      "byteLength": 624
+      "sourceRevision": "sha256:f1bc9585a705f92cb347431afcd1cadbc44ed3699cfd4b90206727801c4b03ac",
+      "contentDigest": "f1bc9585a705f92cb347431afcd1cadbc44ed3699cfd4b90206727801c4b03ac",
+      "byteLength": 742
     },
     {
       "sourceIdentityKey": "repo:root:docker/bifrost/config.json",
@@ -14786,6 +14798,12 @@
       "byteLength": 3705
     },
     {
+      "sourceIdentityKey": "repo:root:docs/.okf/schemas/frozen-symbol-corpus-v1.schema.json",
+      "sourceRevision": "sha256:6adc1afdee6bc357baf829985353d8ac8da38b3c62a2eed33c2ef92d72f1daee",
+      "contentDigest": "6adc1afdee6bc357baf829985353d8ac8da38b3c62a2eed33c2ef92d72f1daee",
+      "byteLength": 2504
+    },
+    {
       "sourceIdentityKey": "repo:root:docs/.okf/sveltekit-2-59-1/raw/raw.githubusercontent.com-sveltejs-kit-9cfa07db7e133f99eee9b6998f3c4f67e6c1fd72-documentation-docs-20-core-concepts-10-routing.md.16753546a8bc.normalized.md",
       "sourceRevision": "sha256:bca62bf556fb2125044b97653261fbaac99b02e76b6a6d0aea30607babaed311",
       "contentDigest": "bca62bf556fb2125044b97653261fbaac99b02e76b6a6d0aea30607babaed311",
@@ -18075,9 +18093,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:docs/INFRASTRUCTURE-ROADMAP-SESSION-80.md",
-      "sourceRevision": "sha256:af870f6c09895c9a4b4fd85353375d7e58dc6c39716e75674f7c271a189d6407",
-      "contentDigest": "af870f6c09895c9a4b4fd85353375d7e58dc6c39716e75674f7c271a189d6407",
-      "byteLength": 8384
+      "sourceRevision": "sha256:fcb035cb716c1349f323ca13db3dcf629a65685bf5ecf9325a0ee4f88bdabb5f",
+      "contentDigest": "fcb035cb716c1349f323ca13db3dcf629a65685bf5ecf9325a0ee4f88bdabb5f",
+      "byteLength": 8385
     },
     {
       "sourceIdentityKey": "repo:root:docs/INFRASTRUCTURE-UPDATE-SUMMARY-JUL29.md",
@@ -26222,6 +26240,36 @@
       "byteLength": 9605
     },
     {
+      "sourceIdentityKey": "repo:root:onnxruntime_profile__2026-11-26_19-51-03_539.json",
+      "sourceRevision": "sha256:5a05d0a24e1d6a12c36492549261eda11eee43de4b0668b1a79b506a18fc955f",
+      "contentDigest": "5a05d0a24e1d6a12c36492549261eda11eee43de4b0668b1a79b506a18fc955f",
+      "byteLength": 2511480
+    },
+    {
+      "sourceIdentityKey": "repo:root:onnxruntime_profile__2026-11-26_19-52-52_061.json",
+      "sourceRevision": "sha256:8ab0164f4b3b3c2811293a670c3b4fe2f4214514412a94447f7455a35d2868d5",
+      "contentDigest": "8ab0164f4b3b3c2811293a670c3b4fe2f4214514412a94447f7455a35d2868d5",
+      "byteLength": 1694
+    },
+    {
+      "sourceIdentityKey": "repo:root:onnxruntime_profile__2026-11-26_20-03-33_201.json",
+      "sourceRevision": "sha256:9f2d4a442114ce59f72614be1570d27a62b513720e5324d433cd4149fa96798e",
+      "contentDigest": "9f2d4a442114ce59f72614be1570d27a62b513720e5324d433cd4149fa96798e",
+      "byteLength": 3391
+    },
+    {
+      "sourceIdentityKey": "repo:root:onnxruntime_profile__2026-11-26_20-04-42_447.json",
+      "sourceRevision": "sha256:c27fbf559a4fef10812262cf702c8cb2563d5f5bf7d29ab00518895d1d704e64",
+      "contentDigest": "c27fbf559a4fef10812262cf702c8cb2563d5f5bf7d29ab00518895d1d704e64",
+      "byteLength": 4975
+    },
+    {
+      "sourceIdentityKey": "repo:root:onnxruntime_profile__2026-11-26_20-08-08_672.json",
+      "sourceRevision": "sha256:c41272b368a7298d659520ed53ff873fe1d4466e7be718501185130977485f80",
+      "contentDigest": "c41272b368a7298d659520ed53ff873fe1d4466e7be718501185130977485f80",
+      "byteLength": 311924
+    },
+    {
       "sourceIdentityKey": "repo:root:opencode_behavior_rules.md",
       "sourceRevision": "sha256:850ade84b88488da48c80d825fcf37782aac20ec6ea70649c19becbf8197231e",
       "contentDigest": "850ade84b88488da48c80d825fcf37782aac20ec6ea70649c19becbf8197231e",
@@ -26409,9 +26457,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:openspec/changes/atlas-directory-first-analysis-v1/tasks.md",
-      "sourceRevision": "sha256:ba5c90d1aeda821aeb4dc2a3ec5d7b8b0f287753091d86a260301b3930b91913",
-      "contentDigest": "ba5c90d1aeda821aeb4dc2a3ec5d7b8b0f287753091d86a260301b3930b91913",
-      "byteLength": 484965
+      "sourceRevision": "sha256:b383e90e980784cdc846ae55c22b22a8045e62f13bd4d623d4f94057d8e4aef3",
+      "contentDigest": "b383e90e980784cdc846ae55c22b22a8045e62f13bd4d623d4f94057d8e4aef3",
+      "byteLength": 485523
     },
     {
       "sourceIdentityKey": "repo:root:openspec/changes/atlas-feature-intelligence/agentic-workflow-next-steps.md",
@@ -26679,9 +26727,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:openspec/changes/e2e-error-intelligence-kanban/tasks.md",
-      "sourceRevision": "sha256:f262029a5be6bf7da49dc9d43b19be8680f757aed3d07881e90c20bc6372bb75",
-      "contentDigest": "f262029a5be6bf7da49dc9d43b19be8680f757aed3d07881e90c20bc6372bb75",
-      "byteLength": 17446
+      "sourceRevision": "sha256:88224e8e870dee5c4e131c4afdb5bfd98487ef25735c897c6b206ac73582c17a",
+      "contentDigest": "88224e8e870dee5c4e131c4afdb5bfd98487ef25735c897c6b206ac73582c17a",
+      "byteLength": 22041
     },
     {
       "sourceIdentityKey": "repo:root:openspec/changes/evidence-analysis-bdd-pipeline/design.md",
@@ -27909,9 +27957,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:openspec/changes/parent-atlas-gpu-graph-vector-substrate/tasks.md",
-      "sourceRevision": "sha256:129bef56051880619355093e85cbdbb9fe84ae4000c8a5ce6334458dd1ac87d7",
-      "contentDigest": "129bef56051880619355093e85cbdbb9fe84ae4000c8a5ce6334458dd1ac87d7",
-      "byteLength": 235297
+      "sourceRevision": "sha256:e5ca2f17be0ab5ec9895f68160a7396b2a6ba5d28144f9b9b771c9ca2ce0987f",
+      "contentDigest": "e5ca2f17be0ab5ec9895f68160a7396b2a6ba5d28144f9b9b771c9ca2ce0987f",
+      "byteLength": 248692
     },
     {
       "sourceIdentityKey": "repo:root:openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/.openspec.yaml",
@@ -28371,9 +28419,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:openspec/changes/parent-atlas-nes-lut-single-owner/tasks.md",
-      "sourceRevision": "sha256:e99f7fc0e61137bdfa5c0b899fb1225f72dd425bd645a41c2c5853632719661c",
-      "contentDigest": "e99f7fc0e61137bdfa5c0b899fb1225f72dd425bd645a41c2c5853632719661c",
-      "byteLength": 10107
+      "sourceRevision": "sha256:4c520039b49a5b0e9d12947609bb1f662cf7a64a3a44da0f2aa4e534641cf1c6",
+      "contentDigest": "4c520039b49a5b0e9d12947609bb1f662cf7a64a3a44da0f2aa4e534641cf1c6",
+      "byteLength": 12772
     },
     {
       "sourceIdentityKey": "repo:root:openspec/changes/parent-atlas-neural-prefill-encoder/design.md",
@@ -28911,9 +28959,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md",
-      "sourceRevision": "sha256:42a0840135c3c4f271d1813972e22fd174c003f21b5eb6d286f019d2aee1c9d9",
-      "contentDigest": "42a0840135c3c4f271d1813972e22fd174c003f21b5eb6d286f019d2aee1c9d9",
-      "byteLength": 349118
+      "sourceRevision": "sha256:03fe00bbcd18535eec8e7696fe6d337946c59139ddd9fcf66eb463a5bf29495c",
+      "contentDigest": "03fe00bbcd18535eec8e7696fe6d337946c59139ddd9fcf66eb463a5bf29495c",
+      "byteLength": 350669
     },
     {
       "sourceIdentityKey": "repo:root:openspec/changes/parent-atlas-resource-ledger-procedure-registry/tasks.md",
@@ -29103,9 +29151,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
-      "sourceRevision": "sha256:8578ea22db325e373257124b607cd15d60a6419a08cb96561e117018ed2f6d22",
-      "contentDigest": "8578ea22db325e373257124b607cd15d60a6419a08cb96561e117018ed2f6d22",
-      "byteLength": 189774
+      "sourceRevision": "sha256:09e3a8df1e742939c9ba1e942800337e062a54d4087819f3bcd3045cb83638bc",
+      "contentDigest": "09e3a8df1e742939c9ba1e942800337e062a54d4087819f3bcd3045cb83638bc",
+      "byteLength": 234873
     },
     {
       "sourceIdentityKey": "repo:root:openspec/changes/parent-atlas-retrieval-logic-convergence/proposal.md",
@@ -37923,9 +37971,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:python/atlas_compute/low_rank.py",
-      "sourceRevision": "sha256:5e73ee47d1ddd327f7525b59ea4bce730c92b3f737548f99bee25fd1283e9dc9",
-      "contentDigest": "5e73ee47d1ddd327f7525b59ea4bce730c92b3f737548f99bee25fd1283e9dc9",
-      "byteLength": 10920
+      "sourceRevision": "sha256:b61603fd9e290dfc5ab8d51b01c390c6a6b9c7eddd2397e6eb4762668dafb825",
+      "contentDigest": "b61603fd9e290dfc5ab8d51b01c390c6a6b9c7eddd2397e6eb4762668dafb825",
+      "byteLength": 11649
     },
     {
       "sourceIdentityKey": "repo:root:python/atlas_compute/lowrank_stage3_compare_v1.py",
@@ -38852,6 +38900,12 @@
       "byteLength": 9420
     },
     {
+      "sourceIdentityKey": "repo:root:python/atlas_graph_runtime/mrl_ae_bytea_codec_v1.py",
+      "sourceRevision": "sha256:de13dcf1aced16f3ef24a319497255c1d01b2ba88d46460897598b523a907e94",
+      "contentDigest": "de13dcf1aced16f3ef24a319497255c1d01b2ba88d46460897598b523a907e94",
+      "byteLength": 10549
+    },
+    {
       "sourceIdentityKey": "repo:root:python/atlas_graph_runtime/neo4j_bounded_expansion_v1.py",
       "sourceRevision": "sha256:6c75d35ef7f858f69b222c6e5432c41233cf542d4a2df8fa6edeceb9101a1a7f",
       "contentDigest": "6c75d35ef7f858f69b222c6e5432c41233cf542d4a2df8fa6edeceb9101a1a7f",
@@ -38943,9 +38997,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:python/atlas_graph_runtime/qdrant_v120_turbo_benchmark_v1.py",
-      "sourceRevision": "sha256:f85bc5ea8308aba63642c0caa1929ee7bc423ca406721f01ea8814cb45f13f38",
-      "contentDigest": "f85bc5ea8308aba63642c0caa1929ee7bc423ca406721f01ea8814cb45f13f38",
-      "byteLength": 6389
+      "sourceRevision": "sha256:36ec257b09d6f967be7f5d6915b148f4d63c752760f1b224fd5a81ae87af5bea",
+      "contentDigest": "36ec257b09d6f967be7f5d6915b148f4d63c752760f1b224fd5a81ae87af5bea",
+      "byteLength": 9079
     },
     {
       "sourceIdentityKey": "repo:root:python/atlas_graph_runtime/rank_metrics.py",
@@ -39147,9 +39201,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:python/atlas_retrieval_canary_v1.py",
-      "sourceRevision": "sha256:9ef5715b66c2e065cd2631c9c2541c7ca1760c04bf5d7bf7f14a572b90c2fe2d",
-      "contentDigest": "9ef5715b66c2e065cd2631c9c2541c7ca1760c04bf5d7bf7f14a572b90c2fe2d",
-      "byteLength": 36045
+      "sourceRevision": "sha256:d54b1ba618de8e8a2ecb41d9c4f937f5e24679a44daa872cf65523fb3145bb8f",
+      "contentDigest": "d54b1ba618de8e8a2ecb41d9c4f937f5e24679a44daa872cf65523fb3145bb8f",
+      "byteLength": 37454
     },
     {
       "sourceIdentityKey": "repo:root:python/atlas_roadmap_owner_census_v1.py",
@@ -39453,9 +39507,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:python/build_low_rank_task_recommendation_v2.py",
-      "sourceRevision": "sha256:4e216887abc2579379d45f2682ba2982c8107412c1271da0be47185bc730c10a",
-      "contentDigest": "4e216887abc2579379d45f2682ba2982c8107412c1271da0be47185bc730c10a",
-      "byteLength": 10486
+      "sourceRevision": "sha256:81e4d6940c16c77636539a18bed3113eaf13c0c4e9f713d540439e595b785dc7",
+      "contentDigest": "81e4d6940c16c77636539a18bed3113eaf13c0c4e9f713d540439e595b785dc7",
+      "byteLength": 12711
     },
     {
       "sourceIdentityKey": "repo:root:python/build_structural_proxy_golden_set_v1.py",
@@ -40125,9 +40179,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:python/test_atlas_compute.py",
-      "sourceRevision": "sha256:67604f7dd8b42156a4ec4a7e1db0f6b5eeb81a90a3fadcc5b215b97c32e44e24",
-      "contentDigest": "67604f7dd8b42156a4ec4a7e1db0f6b5eeb81a90a3fadcc5b215b97c32e44e24",
-      "byteLength": 14273
+      "sourceRevision": "sha256:fd53e58aa5d1b4ddc659efe1b8dad679f882dd4c07f553843f7b1b38b8d7259f",
+      "contentDigest": "fd53e58aa5d1b4ddc659efe1b8dad679f882dd4c07f553843f7b1b38b8d7259f",
+      "byteLength": 16541
     },
     {
       "sourceIdentityKey": "repo:root:python/test_atlas_contextual_feature_reference.py",
@@ -40694,6 +40748,24 @@
       "byteLength": 10079
     },
     {
+      "sourceIdentityKey": "repo:root:python/tests/oracles/__init__.py",
+      "sourceRevision": "sha256:7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+      "contentDigest": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+      "byteLength": 2
+    },
+    {
+      "sourceIdentityKey": "repo:root:python/tests/oracles/atlas_reference_v1.py",
+      "sourceRevision": "sha256:7ff66e7c8f4376e4452d82455e7bcd5f1215087ec44493d0ee92c97fa4559c58",
+      "contentDigest": "7ff66e7c8f4376e4452d82455e7bcd5f1215087ec44493d0ee92c97fa4559c58",
+      "byteLength": 14220
+    },
+    {
+      "sourceIdentityKey": "repo:root:python/tests/oracles/manifest.json",
+      "sourceRevision": "sha256:a6125b825d19655a885336380dca236345b905866519fe76e5ba10a9305a3362",
+      "contentDigest": "a6125b825d19655a885336380dca236345b905866519fe76e5ba10a9305a3362",
+      "byteLength": 268
+    },
+    {
       "sourceIdentityKey": "repo:root:python/tests/test_ace_bitfrost_caller_v1.py",
       "sourceRevision": "sha256:aa33fe67050cf990a3899fb25867562a03335bcb23639c4d73da64692c279434",
       "contentDigest": "aa33fe67050cf990a3899fb25867562a03335bcb23639c4d73da64692c279434",
@@ -40851,9 +40923,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:python/tests/test_atlas_retrieval_canary_v1.py",
-      "sourceRevision": "sha256:5c7230ad695a5a68be7d3aa5ed64e9b814fec462d0e3851c4884a989a2aef77c",
-      "contentDigest": "5c7230ad695a5a68be7d3aa5ed64e9b814fec462d0e3851c4884a989a2aef77c",
-      "byteLength": 3011
+      "sourceRevision": "sha256:6655e8e16ade259c28df22e059cccd21dd74b4d50894794da060ca8e0e907a8e",
+      "contentDigest": "6655e8e16ade259c28df22e059cccd21dd74b4d50894794da060ca8e0e907a8e",
+      "byteLength": 3385
     },
     {
       "sourceIdentityKey": "repo:root:python/tests/test_atlas_semantic512_reconcile.py",
@@ -41126,6 +41198,12 @@
       "byteLength": 938
     },
     {
+      "sourceIdentityKey": "repo:root:python/tests/test_eg2_context_length_gate_v1.py",
+      "sourceRevision": "sha256:0c8a780fceb3a3f97ba59bd8e63fc55e9a437edfacd801f1d06ff5d60859b521",
+      "contentDigest": "0c8a780fceb3a3f97ba59bd8e63fc55e9a437edfacd801f1d06ff5d60859b521",
+      "byteLength": 6776
+    },
+    {
       "sourceIdentityKey": "repo:root:python/tests/test_eg2_onnx_adapter_v1.py",
       "sourceRevision": "sha256:593b991387c970922d88ca2a72f17d117bd240a871ddaddf96d29146ec335532",
       "contentDigest": "593b991387c970922d88ca2a72f17d117bd240a871ddaddf96d29146ec335532",
@@ -41190,6 +41268,12 @@
       "sourceRevision": "sha256:45663515307829042957df303b24cddc9829d708eab5e84ce585bdd7d8efc532",
       "contentDigest": "45663515307829042957df303b24cddc9829d708eab5e84ce585bdd7d8efc532",
       "byteLength": 969
+    },
+    {
+      "sourceIdentityKey": "repo:root:python/tests/test_golden_graph_v1.py",
+      "sourceRevision": "sha256:c567a2c3cb84e919fe7c9b13a80570a2de3d7b57041f174eeacef5556742e9ff",
+      "contentDigest": "c567a2c3cb84e919fe7c9b13a80570a2de3d7b57041f174eeacef5556742e9ff",
+      "byteLength": 4713
     },
     {
       "sourceIdentityKey": "repo:root:python/tests/test_golden_label_workbench_v1.py",
@@ -41340,6 +41424,12 @@
       "sourceRevision": "sha256:7a5aec864b3f15495afd1303978cae1cad80a52d91323a311dab1ad8a57868c6",
       "contentDigest": "7a5aec864b3f15495afd1303978cae1cad80a52d91323a311dab1ad8a57868c6",
       "byteLength": 2956
+    },
+    {
+      "sourceIdentityKey": "repo:root:python/tests/test_mrl_ae_bytea_codec_v1.py",
+      "sourceRevision": "sha256:1b18cf420990e27075203bdd1be4db30dde94480d025ed533519e131294f9518",
+      "contentDigest": "1b18cf420990e27075203bdd1be4db30dde94480d025ed533519e131294f9518",
+      "byteLength": 3250
     },
     {
       "sourceIdentityKey": "repo:root:python/tests/test_mrl_gpu_fanout_evaluation_v1.py",
@@ -41514,6 +41604,12 @@
       "sourceRevision": "sha256:924af8ff0a26d04987a337a6e98b8adbd2ece2f253fbd51bf82adc824de91c22",
       "contentDigest": "924af8ff0a26d04987a337a6e98b8adbd2ece2f253fbd51bf82adc824de91c22",
       "byteLength": 4416
+    },
+    {
+      "sourceIdentityKey": "repo:root:python/tests/test_oracle_parity_v1.py",
+      "sourceRevision": "sha256:0844408cfb683290b608444d4720de163869084da121b809ea61733da07e8684",
+      "contentDigest": "0844408cfb683290b608444d4720de163869084da121b809ea61733da07e8684",
+      "byteLength": 19673
     },
     {
       "sourceIdentityKey": "repo:root:python/tests/test_orf_ast_grep_mapping_proof_v1.py",
@@ -43227,9 +43323,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs",
-      "sourceRevision": "sha256:1678ea7598b01fee84eee80c3fe8a0c479ce766ccd2ed9316c48184cdb9a6383",
-      "contentDigest": "1678ea7598b01fee84eee80c3fe8a0c479ce766ccd2ed9316c48184cdb9a6383",
-      "byteLength": 5674
+      "sourceRevision": "sha256:4c22913ce37642a04aa411a38ae0a3ee9555cba018b9495aa1351420241077c9",
+      "contentDigest": "4c22913ce37642a04aa411a38ae0a3ee9555cba018b9495aa1351420241077c9",
+      "byteLength": 5947
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
@@ -43569,9 +43665,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/atlas-packets-content-hash-backfill-v1.mjs",
-      "sourceRevision": "sha256:c254ffe91ee018fa9f32903066f656b4cc32540c5ffd78f515612c23bac79521",
-      "contentDigest": "c254ffe91ee018fa9f32903066f656b4cc32540c5ffd78f515612c23bac79521",
-      "byteLength": 12965
+      "sourceRevision": "sha256:52b48b368244fa17f9f895e734824fa634656d4724e0a605857ca4d24eead78d",
+      "contentDigest": "52b48b368244fa17f9f895e734824fa634656d4724e0a605857ca4d24eead78d",
+      "byteLength": 14448
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/atlas-parent-indexing.mjs",
@@ -43692,6 +43788,12 @@
       "sourceRevision": "sha256:98b721e16a0a4e8839527610ff2cbf0247d463ede39158c1c2009ebfc3a43f0b",
       "contentDigest": "98b721e16a0a4e8839527610ff2cbf0247d463ede39158c1c2009ebfc3a43f0b",
       "byteLength": 2983
+    },
+    {
+      "sourceIdentityKey": "repo:root:scripts/atlas/audit-agentic-error-fixing-readiness-v1.mjs",
+      "sourceRevision": "sha256:a34982e90db8ac16fb6f6e82cf522493e0ce9adda4dfb7a15af05edb480ac9f2",
+      "contentDigest": "a34982e90db8ac16fb6f6e82cf522493e0ce9adda4dfb7a15af05edb480ac9f2",
+      "byteLength": 12402
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/audit-agentic-receipt-live-schema-v1.mjs",
@@ -44162,6 +44264,12 @@
       "byteLength": 4119
     },
     {
+      "sourceIdentityKey": "repo:root:scripts/atlas/audit-cuda-runtime-matrix-crosswalk-v1.py",
+      "sourceRevision": "sha256:12bee68c89d7f4af931df45fcd92b092d73641559b9b4878c275ebcbb65c488c",
+      "contentDigest": "12bee68c89d7f4af931df45fcd92b092d73641559b9b4878c275ebcbb65c488c",
+      "byteLength": 7287
+    },
+    {
       "sourceIdentityKey": "repo:root:scripts/atlas/audit-current-ast-nomination-span-sample-v1.mts",
       "sourceRevision": "sha256:c3b75d9503eac4f8a8ded7ada511cb853b3737f166f2b093f03f289a7fe67ed1",
       "contentDigest": "c3b75d9503eac4f8a8ded7ada511cb853b3737f166f2b093f03f289a7fe67ed1",
@@ -44466,6 +44574,12 @@
       "sourceRevision": "sha256:9debae04150b06078121f8a6b3f20ddfee48c21ac2948c827f1e2f1e3e635ede",
       "contentDigest": "9debae04150b06078121f8a6b3f20ddfee48c21ac2948c827f1e2f1e3e635ede",
       "byteLength": 1236
+    },
+    {
+      "sourceIdentityKey": "repo:root:scripts/atlas/audit-eg2-onnx-cohort-preflight-v1.mjs",
+      "sourceRevision": "sha256:ab5d8ff7629be9e447906bc40791032dd7cd5b3fbbb9db5eef279d609bda3120",
+      "contentDigest": "ab5d8ff7629be9e447906bc40791032dd7cd5b3fbbb9db5eef279d609bda3120",
+      "byteLength": 10101
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/audit-emb3a-qdrant-writer-lineage.mjs",
@@ -44961,9 +45075,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/audit-graphify-canary-expectation-v1.mts",
-      "sourceRevision": "sha256:d9de9e874e9ffb62008814d1c3df17139427c37c7977f988eb770a9b9cbb7d69",
-      "contentDigest": "d9de9e874e9ffb62008814d1c3df17139427c37c7977f988eb770a9b9cbb7d69",
-      "byteLength": 4073
+      "sourceRevision": "sha256:5d353bcead86bf701a36dbe5c521a5a4c34866b39b70d8d205198d89c4a329ce",
+      "contentDigest": "5d353bcead86bf701a36dbe5c521a5a4c34866b39b70d8d205198d89c4a329ce",
+      "byteLength": 4423
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/audit-graphify-completed-differential-replay-v1.mjs",
@@ -45039,9 +45153,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/audit-graphify-snapshot-consumer-preflight-v1.mts",
-      "sourceRevision": "sha256:4324f48d8828a4990a848c8c460e7bf13d422fb05dcbe52eb41cac8ad9ff0ba3",
-      "contentDigest": "4324f48d8828a4990a848c8c460e7bf13d422fb05dcbe52eb41cac8ad9ff0ba3",
-      "byteLength": 9440
+      "sourceRevision": "sha256:6bd1df34f04f1e08b010a8f147f161d5e8f805a6c35cd4bad9bdc30ea68914a8",
+      "contentDigest": "6bd1df34f04f1e08b010a8f147f161d5e8f805a6c35cd4bad9bdc30ea68914a8",
+      "byteLength": 9777
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/audit-graphify-snapshot-native-readback-v1.mts",
@@ -47487,15 +47601,15 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/backfill-chunk-workspace-revision-v1.mjs",
-      "sourceRevision": "sha256:97798365d7400fcb5fcef51eb49737a7f8fd69b0f5fcb7295a3b24ff4a6ef77d",
-      "contentDigest": "97798365d7400fcb5fcef51eb49737a7f8fd69b0f5fcb7295a3b24ff4a6ef77d",
-      "byteLength": 6705
+      "sourceRevision": "sha256:3aaa70a7950fc704c8fb165c39e0f501214ded45718ffd1cf839dbe0a114caff",
+      "contentDigest": "3aaa70a7950fc704c8fb165c39e0f501214ded45718ffd1cf839dbe0a114caff",
+      "byteLength": 6490
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/backfill-chunk-workspace-revision-v1.test.mjs",
-      "sourceRevision": "sha256:df240c04544ce2dc028a7319e46b9b7630d6411fa9db47ed7eea7c28b64528cc",
-      "contentDigest": "df240c04544ce2dc028a7319e46b9b7630d6411fa9db47ed7eea7c28b64528cc",
-      "byteLength": 1868
+      "sourceRevision": "sha256:12591a1effb0cecbc41cffb0ec34900293010498bbe82df1d8084aa7b51d3443",
+      "contentDigest": "12591a1effb0cecbc41cffb0ec34900293010498bbe82df1d8084aa7b51d3443",
+      "byteLength": 2662
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/backfill-class-search-index.mjs",
@@ -47511,9 +47625,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/backfill-codebase-chunk-index-file-content-hash-v1.mjs",
-      "sourceRevision": "sha256:b24fdcfd21012ac105dd1ca5f76b1687ecabc5ff17e0222ca269a1b0d1e89ae8",
-      "contentDigest": "b24fdcfd21012ac105dd1ca5f76b1687ecabc5ff17e0222ca269a1b0d1e89ae8",
-      "byteLength": 6552
+      "sourceRevision": "sha256:a8ea1f1d821aad0a90cc8d2645530fb26a84c88ab6c2433028a47a2600ba2021",
+      "contentDigest": "a8ea1f1d821aad0a90cc8d2645530fb26a84c88ab6c2433028a47a2600ba2021",
+      "byteLength": 6810
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/backfill-codebase-chunk-summaries-gemma4.mjs",
@@ -48513,9 +48627,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/build-graphify-canary-expectation-v1.mts",
-      "sourceRevision": "sha256:e1ff4cccbaad1f3a17cd1f21083a6c21d1e932c9ce5df4202de3c063e4dcfeab",
-      "contentDigest": "e1ff4cccbaad1f3a17cd1f21083a6c21d1e932c9ce5df4202de3c063e4dcfeab",
-      "byteLength": 3263
+      "sourceRevision": "sha256:634a699e6cd78a345520c8a2dda206fb0b3c9e8c19c886e90639c923f7d9c2dd",
+      "contentDigest": "634a699e6cd78a345520c8a2dda206fb0b3c9e8c19c886e90639c923f7d9c2dd",
+      "byteLength": 3504
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/build-graphify-daily-feature-alignment.mjs",
@@ -48723,9 +48837,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/build-openspec-challenger-tournament-v1.mjs",
-      "sourceRevision": "sha256:f639c4594fb980688c480559305dac78f12893ea465bc7ebde37480a3d8390a0",
-      "contentDigest": "f639c4594fb980688c480559305dac78f12893ea465bc7ebde37480a3d8390a0",
-      "byteLength": 3061
+      "sourceRevision": "sha256:7587557cc2b683f5e8dc60a482b69004d0caed9e9dcf38e0c2ef1aca4d06a0e8",
+      "contentDigest": "7587557cc2b683f5e8dc60a482b69004d0caed9e9dcf38e0c2ef1aca4d06a0e8",
+      "byteLength": 3441
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/build-openspec-dependency-graph-v1.mjs",
@@ -50601,9 +50715,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/dspy_agentic_error_fixer.py",
-      "sourceRevision": "sha256:8e54164fdcffaab2dc9039a98157206de255472aeb572bdd1433c9f710416c8f",
-      "contentDigest": "8e54164fdcffaab2dc9039a98157206de255472aeb572bdd1433c9f710416c8f",
-      "byteLength": 14351
+      "sourceRevision": "sha256:56964c2dcb432f38e793f881fe3fd1464f923711be6c6e2e6f41f5c0df29926c",
+      "contentDigest": "56964c2dcb432f38e793f881fe3fd1464f923711be6c6e2e6f41f5c0df29926c",
+      "byteLength": 14432
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/duckdb-batch-extract-proof-v1.mjs",
@@ -50736,6 +50850,12 @@
       "sourceRevision": "sha256:185e5539900dea468c4936a6f55b5fa8fbdca4a26997f9018a3d21297efad3eb",
       "contentDigest": "185e5539900dea468c4936a6f55b5fa8fbdca4a26997f9018a3d21297efad3eb",
       "byteLength": 10101
+    },
+    {
+      "sourceIdentityKey": "repo:root:scripts/atlas/eg2-context-length-gate-v1.py",
+      "sourceRevision": "sha256:014df5e9c449e2f131496276af031fdc1c35770d9446802a40f79cc5f66434f6",
+      "contentDigest": "014df5e9c449e2f131496276af031fdc1c35770d9446802a40f79cc5f66434f6",
+      "byteLength": 8835
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/eg2-parity-sample-v1.mjs",
@@ -51032,10 +51152,28 @@
       "byteLength": 2697
     },
     {
+      "sourceIdentityKey": "repo:root:scripts/atlas/evaluate-eg2-8094-document-vs-query-v1.py",
+      "sourceRevision": "sha256:fbfde9f07a715e2bae47f91ebb9c1ddb46725044425b9921b4f3ff80f42f6589",
+      "contentDigest": "fbfde9f07a715e2bae47f91ebb9c1ddb46725044425b9921b4f3ff80f42f6589",
+      "byteLength": 6241
+    },
+    {
       "sourceIdentityKey": "repo:root:scripts/atlas/evaluate-embedding-isoquant-so4-v1.mjs",
       "sourceRevision": "sha256:5206ae8c4980c67b52022cb9300fa46eccabc549d51bef0b91b0d2d3e641238d",
       "contentDigest": "5206ae8c4980c67b52022cb9300fa46eccabc549d51bef0b91b0d2d3e641238d",
       "byteLength": 12004
+    },
+    {
+      "sourceIdentityKey": "repo:root:scripts/atlas/evaluate-frozen-qa-ab-nlut-knn-v1.mjs",
+      "sourceRevision": "sha256:bcb375a227e3623b964ec6d8e3c8b57785a8a39d7aede5030cc0d8fc797fc278",
+      "contentDigest": "bcb375a227e3623b964ec6d8e3c8b57785a8a39d7aede5030cc0d8fc797fc278",
+      "byteLength": 7410
+    },
+    {
+      "sourceIdentityKey": "repo:root:scripts/atlas/evaluate-frozen-qa-symbol-lookup-v1.mjs",
+      "sourceRevision": "sha256:0237bfec9f18bd793f359bde7fb4a880134ae0d353c7b6822f46d41aeaed5305",
+      "contentDigest": "0237bfec9f18bd793f359bde7fb4a880134ae0d353c7b6822f46d41aeaed5305",
+      "byteLength": 10163
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/evaluate-ontology-kag-readiness.mjs",
@@ -51048,6 +51186,12 @@
       "sourceRevision": "sha256:36016f6bd2be7aecc1973f95c28a596ecf25fa6b4151b5e58ae8a616116eaa9b",
       "contentDigest": "36016f6bd2be7aecc1973f95c28a596ecf25fa6b4151b5e58ae8a616116eaa9b",
       "byteLength": 3952
+    },
+    {
+      "sourceIdentityKey": "repo:root:scripts/atlas/evaluate-search-runtime-topk-reference-v1.mts",
+      "sourceRevision": "sha256:72b2cdf87eee5bca2071508af7fc997cabdd1c4fe417628019cfd6af19202417",
+      "contentDigest": "72b2cdf87eee5bca2071508af7fc997cabdd1c4fe417628019cfd6af19202417",
+      "byteLength": 30741
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/evaluate-xgboost-shadow-receipts.mjs",
@@ -51794,6 +51938,12 @@
       "byteLength": 6276
     },
     {
+      "sourceIdentityKey": "repo:root:scripts/atlas/freeze-qa-symbol-corpus-v1.py",
+      "sourceRevision": "sha256:f34a32d2bd97cef885c73c4202152ea20a2b81d4555ef211b3885acc066146f3",
+      "contentDigest": "f34a32d2bd97cef885c73c4202152ea20a2b81d4555ef211b3885acc066146f3",
+      "byteLength": 8590
+    },
+    {
       "sourceIdentityKey": "repo:root:scripts/atlas/freeze-retrieval-01l-08a-qdrant-projection-proposal-v1.mjs",
       "sourceRevision": "sha256:2491ceeb6d3e587e7b844601d3e36e8616490d7f33aabc9f244fa206b7dc1d7f",
       "contentDigest": "2491ceeb6d3e587e7b844601d3e36e8616490d7f33aabc9f244fa206b7dc1d7f",
@@ -51885,9 +52035,15 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/gemma2-onnx-embed-server-v1.py",
-      "sourceRevision": "sha256:ea75c0a2abf4b9d94b0a072d882dd5c3e1390b6f2e8466d8d553e74eb90d58b0",
-      "contentDigest": "ea75c0a2abf4b9d94b0a072d882dd5c3e1390b6f2e8466d8d553e74eb90d58b0",
-      "byteLength": 5158
+      "sourceRevision": "sha256:45f035bc28221d797ea75730feb300a6c0a9d20b98269b1471fd42fb4ec79ff0",
+      "contentDigest": "45f035bc28221d797ea75730feb300a6c0a9d20b98269b1471fd42fb4ec79ff0",
+      "byteLength": 11678
+    },
+    {
+      "sourceIdentityKey": "repo:root:scripts/atlas/gemma2-onnx-pool-bench-v1.py",
+      "sourceRevision": "sha256:1cf264a7af89b5afa0f0066156a5bc6e26c093c690985a203fb642a1e2a8251a",
+      "contentDigest": "1cf264a7af89b5afa0f0066156a5bc6e26c093c690985a203fb642a1e2a8251a",
+      "byteLength": 5016
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/gemma4-batch-summarize-qdrant.mjs",
@@ -52236,6 +52392,12 @@
       "sourceRevision": "sha256:21a726d66b2a37cbd72d862c1a6deba1f13934b6f2d14e7832e6c22b75fe0be3",
       "contentDigest": "21a726d66b2a37cbd72d862c1a6deba1f13934b6f2d14e7832e6c22b75fe0be3",
       "byteLength": 13521
+    },
+    {
+      "sourceIdentityKey": "repo:root:scripts/atlas/grant-llama-lifecycle.ps1",
+      "sourceRevision": "sha256:d509a1e24db11fd996dc01ee9fdbf0b1314d0aa13bc940333dbb4cae9053907d",
+      "contentDigest": "d509a1e24db11fd996dc01ee9fdbf0b1314d0aa13bc940333dbb4cae9053907d",
+      "byteLength": 1942
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/graph-algorithm-ownership-v1.mjs",
@@ -56115,9 +56277,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/lib/openspec-workboard-task-ref-v1.mjs",
-      "sourceRevision": "sha256:6e2880316720ff3beaca3f0538b923c838899aa73284c3fae2a2e69cd9c1b8b0",
-      "contentDigest": "6e2880316720ff3beaca3f0538b923c838899aa73284c3fae2a2e69cd9c1b8b0",
-      "byteLength": 5172
+      "sourceRevision": "sha256:31ef62a676af3d11437e2f41c435feefcb27079754e7c276890657da077eeefa",
+      "contentDigest": "31ef62a676af3d11437e2f41c435feefcb27079754e7c276890657da077eeefa",
+      "byteLength": 5301
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/lib/orf-ast-feature-definition-proposal-v1.mjs",
@@ -57819,9 +57981,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/llama-server-control.ps1",
-      "sourceRevision": "sha256:30e85f979954748baed3a912f7cf8c0056c68b6fb793c430de8ecc45402a049a",
-      "contentDigest": "30e85f979954748baed3a912f7cf8c0056c68b6fb793c430de8ecc45402a049a",
-      "byteLength": 7097
+      "sourceRevision": "sha256:8707cce2b4aa1123c417e0d6ebae7e4079f1c6c7ae79f374814d8a1f454b1881",
+      "contentDigest": "8707cce2b4aa1123c417e0d6ebae7e4079f1c6c7ae79f374814d8a1f454b1881",
+      "byteLength": 17938
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/load-atlas-env.mjs",
@@ -58209,9 +58371,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/materialize-workspace-source-snapshot-v1.mts",
-      "sourceRevision": "sha256:3b6d6e2f46b49c9793eb4551d51b0236cd490fe38cb4daccce1722c0993eee73",
-      "contentDigest": "3b6d6e2f46b49c9793eb4551d51b0236cd490fe38cb4daccce1722c0993eee73",
-      "byteLength": 2823
+      "sourceRevision": "sha256:77fd1fb92873f26f65400a135dd02e9e8190a5898ea27e29ba8a91420c507af3",
+      "contentDigest": "77fd1fb92873f26f65400a135dd02e9e8190a5898ea27e29ba8a91420c507af3",
+      "byteLength": 3781
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/mcp-opencode-health-probe.mjs",
@@ -60000,6 +60162,12 @@
       "sourceRevision": "sha256:4fe46849eff19b0c10ffa3131356fc19f1c389f115627393a3c95ac06db98741",
       "contentDigest": "4fe46849eff19b0c10ffa3131356fc19f1c389f115627393a3c95ac06db98741",
       "byteLength": 13224
+    },
+    {
+      "sourceIdentityKey": "repo:root:scripts/atlas/plan-all-routes-qa-features-v1.mjs",
+      "sourceRevision": "sha256:8cdcdbdc23a18e28c92e58971b31b320869d870a5ca9c987f908b2b65a81dcc2",
+      "contentDigest": "8cdcdbdc23a18e28c92e58971b31b320869d870a5ca9c987f908b2b65a81dcc2",
+      "byteLength": 6578
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/plan-analysis-pass-current-reconciliation-v1.mjs",
@@ -64293,9 +64461,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/reseal-current-workspace-snapshot-v1.mts",
-      "sourceRevision": "sha256:1cfe168865222c61449ed04e7fea0c32e754e69162ef593bf2ce847164b62498",
-      "contentDigest": "1cfe168865222c61449ed04e7fea0c32e754e69162ef593bf2ce847164b62498",
-      "byteLength": 1776
+      "sourceRevision": "sha256:8d1589b324e998f071914d4d7e279441122aab77aea7a3778294b4eea82d453a",
+      "contentDigest": "8d1589b324e998f071914d4d7e279441122aab77aea7a3778294b4eea82d453a",
+      "byteLength": 2693
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/research-error-fixes.mjs",
@@ -64479,9 +64647,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/run-agentic-error-fixing-v1.mjs",
-      "sourceRevision": "sha256:bf8aa98bac37a99eea8692fd26e89b8d48a1b72906effa508c9595ba0b673390",
-      "contentDigest": "bf8aa98bac37a99eea8692fd26e89b8d48a1b72906effa508c9595ba0b673390",
-      "byteLength": 23227
+      "sourceRevision": "sha256:a796ae578bb80955d633b4069581f307327819262f47bf3e7f8125b65ed7e550",
+      "contentDigest": "a796ae578bb80955d633b4069581f307327819262f47bf3e7f8125b65ed7e550",
+      "byteLength": 23575
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/run-agentic-repair-readiness-v1.mjs",
@@ -66651,9 +66819,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/test-llama-server-control.ps1",
-      "sourceRevision": "sha256:dde70831e80a4ca452463256916dd70a7729e249c906012597883ccba2a2b5d5",
-      "contentDigest": "dde70831e80a4ca452463256916dd70a7729e249c906012597883ccba2a2b5d5",
-      "byteLength": 5045
+      "sourceRevision": "sha256:1526b031fec732649304f40689d1703c4b3154f85206b26256ff6b406439f256",
+      "contentDigest": "1526b031fec732649304f40689d1703c4b3154f85206b26256ff6b406439f256",
+      "byteLength": 13512
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/test-lowrank-task-rpc-decode-v1.py",
@@ -67850,6 +68018,12 @@
       "byteLength": 4509
     },
     {
+      "sourceIdentityKey": "repo:root:scripts/atlas/verify-live-pg18-scoped-readback-v1.py",
+      "sourceRevision": "sha256:c74d23a08bbbbb8e5a9226522b904cd008950208e1657447ec42d032fccd270e",
+      "contentDigest": "c74d23a08bbbbb8e5a9226522b904cd008950208e1657447ec42d032fccd270e",
+      "byteLength": 7087
+    },
+    {
       "sourceIdentityKey": "repo:root:scripts/atlas/verify-lowrank-task-rpc-v1.mjs",
       "sourceRevision": "sha256:c130893d3290f1882741fd3240383a9629561ce4c7b1bd08976a33bb360b11a2",
       "contentDigest": "c130893d3290f1882741fd3240383a9629561ce4c7b1bd08976a33bb360b11a2",
@@ -67914,6 +68088,12 @@
       "sourceRevision": "sha256:a8cc633f4e00b44b832bcd6015c45c726e90389fe22ec5960ff01b51e97d5ff3",
       "contentDigest": "a8cc633f4e00b44b832bcd6015c45c726e90389fe22ec5960ff01b51e97d5ff3",
       "byteLength": 4189
+    },
+    {
+      "sourceIdentityKey": "repo:root:scripts/atlas/verify-nlut-knn-parity-v1.mjs",
+      "sourceRevision": "sha256:d0bda48cb4ab2a96bf87f3a5f204f973f3a051d374d2ce1db1b287fc193900c9",
+      "contentDigest": "d0bda48cb4ab2a96bf87f3a5f204f973f3a051d374d2ce1db1b287fc193900c9",
+      "byteLength": 6988
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/verify-obj-threejs-multi-bvh-rag-flow-v1.mjs",
@@ -68088,6 +68268,12 @@
       "sourceRevision": "sha256:7f39d863e038143c10ee7206ce43290f90af692059142693eefddeab8c1e14fd",
       "contentDigest": "7f39d863e038143c10ee7206ce43290f90af692059142693eefddeab8c1e14fd",
       "byteLength": 8008
+    },
+    {
+      "sourceIdentityKey": "repo:root:scripts/atlas/verify-tensorrt-bridge-nlut07-receipt-v1.mjs",
+      "sourceRevision": "sha256:fbf08c9103bb04364358451eaeecd3850fcebc360793ca276a511ea1a8bbb29b",
+      "contentDigest": "fbf08c9103bb04364358451eaeecd3850fcebc360793ca276a511ea1a8bbb29b",
+      "byteLength": 7463
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/verify-test-receipts.mjs",
@@ -69956,6 +70142,12 @@
       "byteLength": 3980
     },
     {
+      "sourceIdentityKey": "repo:root:scripts/gpu/free-gpu-vram.ps1",
+      "sourceRevision": "sha256:7241f9485d6c95b13571a40a48626982afa84e20d585f900274684f63ae123eb",
+      "contentDigest": "7241f9485d6c95b13571a40a48626982afa84e20d585f900274684f63ae123eb",
+      "byteLength": 1589
+    },
+    {
       "sourceIdentityKey": "repo:root:scripts/gpu/networkx-backend-smoke.py",
       "sourceRevision": "sha256:7a82c051e73aeefe3a1c25c4af5a843a886339bfefaca0d0207fec90fde0699e",
       "contentDigest": "7a82c051e73aeefe3a1c25c4af5a843a886339bfefaca0d0207fec90fde0699e",
@@ -70041,9 +70233,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/gpu/run-with-vram-window.ps1",
-      "sourceRevision": "sha256:e89c2ffeb8a1f92ef1356289ef7e676a77acf49b23e7886ea2444e136a8b0971",
-      "contentDigest": "e89c2ffeb8a1f92ef1356289ef7e676a77acf49b23e7886ea2444e136a8b0971",
-      "byteLength": 3522
+      "sourceRevision": "sha256:7b7d54f1158f0c934f6c96b9870bfa6a5077e130696f3ec3d34afc90a87b3fbb",
+      "contentDigest": "7b7d54f1158f0c934f6c96b9870bfa6a5077e130696f3ec3d34afc90a87b3fbb",
+      "byteLength": 3810
     },
     {
       "sourceIdentityKey": "repo:root:scripts/gpu/test-batch-rerank-integration.mjs",
@@ -75609,9 +75801,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:services/go-retrieval-service/embedding_owner_test.go",
-      "sourceRevision": "sha256:f85958a53c5e23954069238182ee76e6f54a0786d13f26cd26b2175249e15226",
-      "contentDigest": "f85958a53c5e23954069238182ee76e6f54a0786d13f26cd26b2175249e15226",
-      "byteLength": 8182
+      "sourceRevision": "sha256:e9d83b030f922426f91a7401b0fd6fe9bf512a77ed27205d7abfbad9a5df7d64",
+      "contentDigest": "e9d83b030f922426f91a7401b0fd6fe9bf512a77ed27205d7abfbad9a5df7d64",
+      "byteLength": 8810
     },
     {
       "sourceIdentityKey": "repo:root:services/go-retrieval-service/fts_identity_test.go",
@@ -75663,9 +75855,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:services/go-retrieval-service/main.go",
-      "sourceRevision": "sha256:e9d0b1c961a7ee61ea044decc9999e5bd121cb0f7dd00f970807b0feed43b4f6",
-      "contentDigest": "e9d0b1c961a7ee61ea044decc9999e5bd121cb0f7dd00f970807b0feed43b4f6",
-      "byteLength": 119323
+      "sourceRevision": "sha256:169c8c5ffed23d998531e542feb842d6d4d19dccb4ad39924746f99548ff671d",
+      "contentDigest": "169c8c5ffed23d998531e542feb842d6d4d19dccb4ad39924746f99548ff671d",
+      "byteLength": 119864
     },
     {
       "sourceIdentityKey": "repo:root:services/go-retrieval-service/proto/retrieval/retrieval_grpc.pb.go",
@@ -76863,9 +77055,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:simd-bridge/cpp/binding.cc",
-      "sourceRevision": "sha256:0a31ecf0300ce927a596f8f5953b551e773e0305b4b3630e905021f968d8f544",
-      "contentDigest": "0a31ecf0300ce927a596f8f5953b551e773e0305b4b3630e905021f968d8f544",
-      "byteLength": 107744
+      "sourceRevision": "sha256:f72139b4bde103d3c07c8cf7ec13fdf70de0f3ad435c24fea86684b90ef3d523",
+      "contentDigest": "f72139b4bde103d3c07c8cf7ec13fdf70de0f3ad435c24fea86684b90ef3d523",
+      "byteLength": 120090
     },
     {
       "sourceIdentityKey": "repo:root:simd-bridge/cpp/build_som_cache.sh",
@@ -77091,9 +77283,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml",
-      "sourceRevision": "sha256:64ca241e5c007a81bb17eb81df299b5df3802550930a4973fb53ba36f0982fff",
-      "contentDigest": "64ca241e5c007a81bb17eb81df299b5df3802550930a4973fb53ba36f0982fff",
-      "byteLength": 2417460
+      "sourceRevision": "sha256:7d5eb75ecc40ed90ef94dedec5fad248f5cbfb6f2d76452db07e8215ed00bab3",
+      "contentDigest": "7d5eb75ecc40ed90ef94dedec5fad248f5cbfb6f2d76452db07e8215ed00bab3",
+      "byteLength": 2430567
     },
     {
       "sourceIdentityKey": "repo:root:simd-bridge/cpp/build-x64-cuda/CMakeFiles/InstallScripts.json",
@@ -77139,9 +77331,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:simd-bridge/cpp/CMakePresets.json",
-      "sourceRevision": "sha256:3956fdb5eb3612eebb97356c8d142421ff31e347957ed0393d59c4fff3089689",
-      "contentDigest": "3956fdb5eb3612eebb97356c8d142421ff31e347957ed0393d59c4fff3089689",
-      "byteLength": 11568
+      "sourceRevision": "sha256:046457e011d7b8b348a45395698ab13ff276b56a8859e9bc3009b2307cbef32c",
+      "contentDigest": "046457e011d7b8b348a45395698ab13ff276b56a8859e9bc3009b2307cbef32c",
+      "byteLength": 11524
     },
     {
       "sourceIdentityKey": "repo:root:simd-bridge/cpp/cuvs_bridge.cc",
@@ -77244,6 +77436,12 @@
       "sourceRevision": "sha256:844dd75f0797f1d6dad7f9276dc9bfd4a9232cddf69583abfdb0e26d54640979",
       "contentDigest": "844dd75f0797f1d6dad7f9276dc9bfd4a9232cddf69583abfdb0e26d54640979",
       "byteLength": 424
+    },
+    {
+      "sourceIdentityKey": "repo:root:simd-bridge/cpp/nes_lut_avx2.cc",
+      "sourceRevision": "sha256:9c0f11b65fae96cc24224eb18f5f1e9e992d18fa1e7d469c8498f96ea5a2dba1",
+      "contentDigest": "9c0f11b65fae96cc24224eb18f5f1e9e992d18fa1e7d469c8498f96ea5a2dba1",
+      "byteLength": 634
     },
     {
       "sourceIdentityKey": "repo:root:simd-bridge/cpp/nes_lut_filter_avx2.cpp",
@@ -118671,9 +118869,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/package.json",
-      "sourceRevision": "sha256:8fa8ebecc385138dff2124b290f25fc1cb1f54f7e877ea01e3548089a894ca60",
-      "contentDigest": "8fa8ebecc385138dff2124b290f25fc1cb1f54f7e877ea01e3548089a894ca60",
-      "byteLength": 183425
+      "sourceRevision": "sha256:2737f3258d9a6041735ad234d63094a821f96ce72abf61e6ce330b51abb4ce6a",
+      "contentDigest": "2737f3258d9a6041735ad234d63094a821f96ce72abf61e6ce330b51abb4ce6a",
+      "byteLength": 183771
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/packetize-grpc-services.mjs",
@@ -130833,9 +131031,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/scripts/qa/build-qa-issues.mjs",
-      "sourceRevision": "sha256:b0fc2b81fa00a72af171bf86177e9ac02dd190fa2c9ca6b6b820cebe852d8392",
-      "contentDigest": "b0fc2b81fa00a72af171bf86177e9ac02dd190fa2c9ca6b6b820cebe852d8392",
-      "byteLength": 5040
+      "sourceRevision": "sha256:95978d6a288aed396a8913e772e79b712b90d8c9e83072b42e3d01406ce94bf2",
+      "contentDigest": "95978d6a288aed396a8913e772e79b712b90d8c9e83072b42e3d01406ce94bf2",
+      "byteLength": 5750
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/scripts/qa/error-fingerprint.d.mts",
@@ -130845,9 +131043,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/scripts/qa/error-fingerprint.mjs",
-      "sourceRevision": "sha256:ef34945fea0feb7d31b985fe35e77e14f7fb432fde14608a10f14f86dc6e994a",
-      "contentDigest": "ef34945fea0feb7d31b985fe35e77e14f7fb432fde14608a10f14f86dc6e994a",
-      "byteLength": 6842
+      "sourceRevision": "sha256:d663547a90fd1a1afa3953b82046d49d889b8ecd2aec425d73d0c4a8485fd92e",
+      "contentDigest": "d663547a90fd1a1afa3953b82046d49d889b8ecd2aec425d73d0c4a8485fd92e",
+      "byteLength": 10162
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/scripts/qa/qa-global-setup.mjs",
@@ -130857,9 +131055,15 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/scripts/qa/qa-pipeline.test.mjs",
-      "sourceRevision": "sha256:2e4a781bd8f2ef0d183d82fc85d2a5a5ee671a2144c0a61db36d055f620530dd",
-      "contentDigest": "2e4a781bd8f2ef0d183d82fc85d2a5a5ee671a2144c0a61db36d055f620530dd",
-      "byteLength": 4556
+      "sourceRevision": "sha256:10a9f0e04e239d35827df55829ac3aa7e0796f6306d92d502b6c5ae146e6311a",
+      "contentDigest": "10a9f0e04e239d35827df55829ac3aa7e0796f6306d92d502b6c5ae146e6311a",
+      "byteLength": 13668
+    },
+    {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/scripts/qa/server-log-events.mjs",
+      "sourceRevision": "sha256:a50e04b4328ad5340845cae904fa99b445d5c2a0f3debd172b2643dfb7577917",
+      "contentDigest": "a50e04b4328ad5340845cae904fa99b445d5c2a0f3debd172b2643dfb7577917",
+      "byteLength": 6722
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/scripts/qa/verify-active-server.mjs",
@@ -134037,9 +134241,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/hooks.server.ts",
-      "sourceRevision": "sha256:902d07e28f9cff00c5bdc0cb5b29e095d1c91451e1c235c878a36a9a471fe775",
-      "contentDigest": "902d07e28f9cff00c5bdc0cb5b29e095d1c91451e1c235c878a36a9a471fe775",
-      "byteLength": 45883
+      "sourceRevision": "sha256:79aee3b3119ea936e5194294418c07970378846c8498ea07343dc42b95c53322",
+      "contentDigest": "79aee3b3119ea936e5194294418c07970378846c8498ea07343dc42b95c53322",
+      "byteLength": 46165
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/instrumentation.server.ts",
@@ -134079,15 +134283,21 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/agent/tool-gateway.ts",
-      "sourceRevision": "sha256:71b5787e73a75715b807faabe3981145c89a1e0d5a9c69177e2d62c8d76b36c7",
-      "contentDigest": "71b5787e73a75715b807faabe3981145c89a1e0d5a9c69177e2d62c8d76b36c7",
-      "byteLength": 2702
+      "sourceRevision": "sha256:9d0a459ceb5813c13e79faa2aa23f8e6e185ad12206ccbb056e94ae09e00ace3",
+      "contentDigest": "9d0a459ceb5813c13e79faa2aa23f8e6e185ad12206ccbb056e94ae09e00ace3",
+      "byteLength": 2892
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/agent/tool-manifest.ts",
       "sourceRevision": "sha256:040532006635b9bd073107f075d1805ff70b8d6c1d847ef6650b558bb45c43b2",
       "contentDigest": "040532006635b9bd073107f075d1805ff70b8d6c1d847ef6650b558bb45c43b2",
       "byteLength": 3338
+    },
+    {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/agent/tool-permissions.ts",
+      "sourceRevision": "sha256:8e6a73757c2f3a8742bbe2fb94a72b717ed7d3e29429c0ba3f02402180f605e1",
+      "contentDigest": "8e6a73757c2f3a8742bbe2fb94a72b717ed7d3e29429c0ba3f02402180f605e1",
+      "byteLength": 805
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/agent/tool-registry.ts",
@@ -143349,9 +143559,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/adapters/service-integrations.ts",
-      "sourceRevision": "sha256:43334421e2d31d44ed280a5f8dc35720218a7b1a0b6143ea1233d28c8f4dd3fe",
-      "contentDigest": "43334421e2d31d44ed280a5f8dc35720218a7b1a0b6143ea1233d28c8f4dd3fe",
-      "byteLength": 19727
+      "sourceRevision": "sha256:b6feb4a530cddc02ac60c59bf73515b2664c2dd25d6906a824eb345035df258f",
+      "contentDigest": "b6feb4a530cddc02ac60c59bf73515b2664c2dd25d6906a824eb345035df258f",
+      "byteLength": 19895
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/admin/ai-chat-context.ts",
@@ -144495,9 +144705,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/ai/llama-server-model-resolver.ts",
-      "sourceRevision": "sha256:85dd915e069b3d304cdeae16b40df3c7a7fb29edbfd07abad66bbe760230446f",
-      "contentDigest": "85dd915e069b3d304cdeae16b40df3c7a7fb29edbfd07abad66bbe760230446f",
-      "byteLength": 5218
+      "sourceRevision": "sha256:3f19cee66d82672b5536043246d0de1dd81cd18400014ebff4ce2b488bfa30d9",
+      "contentDigest": "3f19cee66d82672b5536043246d0de1dd81cd18400014ebff4ce2b488bfa30d9",
+      "byteLength": 5780
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts",
@@ -149049,15 +149259,15 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/atlas/embedding/embeddinggemma2-challenger-executor-v1.spec.ts",
-      "sourceRevision": "sha256:b74666be9b078a3aafb6bbf6339fde0a5afe0daa236c9392127c0e0c24b13582",
-      "contentDigest": "b74666be9b078a3aafb6bbf6339fde0a5afe0daa236c9392127c0e0c24b13582",
-      "byteLength": 7781
+      "sourceRevision": "sha256:ddd5a1085ceb6458b10927a186f3cb14ddf2d637f9cb84869057eda1e9df729d",
+      "contentDigest": "ddd5a1085ceb6458b10927a186f3cb14ddf2d637f9cb84869057eda1e9df729d",
+      "byteLength": 9476
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/atlas/embedding/embeddinggemma2-challenger-executor-v1.ts",
-      "sourceRevision": "sha256:1788142181049f4ee8738d64e51e8e78a181e62156b7caa28c9715cd629dbddc",
-      "contentDigest": "1788142181049f4ee8738d64e51e8e78a181e62156b7caa28c9715cd629dbddc",
-      "byteLength": 5856
+      "sourceRevision": "sha256:359110d1e2e90d9b88b8160431981eb52fa0e4e8c06077d69c7e647bc2621b63",
+      "contentDigest": "359110d1e2e90d9b88b8160431981eb52fa0e4e8c06077d69c7e647bc2621b63",
+      "byteLength": 8108
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/atlas/embedding/feature-token-binding-v1.ts",
@@ -149324,6 +149534,12 @@
       "byteLength": 19004
     },
     {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/atlas/execution/e2e-eg2-nlut-graph-materializer-v1.spec.ts",
+      "sourceRevision": "sha256:9483499f6b13ecb5f36d283aca43ae63e44ab0e5a0088e4e35406ee0f83af22c",
+      "contentDigest": "9483499f6b13ecb5f36d283aca43ae63e44ab0e5a0088e4e35406ee0f83af22c",
+      "byteLength": 11286
+    },
+    {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/atlas/execution/executor-capability-receipt-v1.spec.ts",
       "sourceRevision": "sha256:682cac6624af1e0503a4babb094a9e6b28a3d08fa1718984afacff3d8b996d68",
       "contentDigest": "682cac6624af1e0503a4babb094a9e6b28a3d08fa1718984afacff3d8b996d68",
@@ -149394,6 +149610,18 @@
       "sourceRevision": "sha256:e4f06c4ff8d690a56ab65c2fd6f8496245aca5d584973cb4d8b7910592054d7b",
       "contentDigest": "e4f06c4ff8d690a56ab65c2fd6f8496245aca5d584973cb4d8b7910592054d7b",
       "byteLength": 1758
+    },
+    {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/atlas/execution/nlut-masked-topk-stage-v1.spec.ts",
+      "sourceRevision": "sha256:eb0366afba8bade739a6e70daeb82bc0e4b708feae25ee4a5e5716c157bb459e",
+      "contentDigest": "eb0366afba8bade739a6e70daeb82bc0e4b708feae25ee4a5e5716c157bb459e",
+      "byteLength": 2534
+    },
+    {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/atlas/execution/nlut-masked-topk-stage-v1.ts",
+      "sourceRevision": "sha256:03d86d151a70ad5ce2d5d9349f208895c62c05fd60421873c6cc6915726fff21",
+      "contentDigest": "03d86d151a70ad5ce2d5d9349f208895c62c05fd60421873c6cc6915726fff21",
+      "byteLength": 6351
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/atlas/execution/patch-check-receipt-v1.spec.ts",
@@ -156975,9 +157203,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/auth/api-route-access.ts",
-      "sourceRevision": "sha256:2a822081ad0b608e68f76b3fb852cba94c34c19ada216c6af8058d3dd0b33bbb",
-      "contentDigest": "2a822081ad0b608e68f76b3fb852cba94c34c19ada216c6af8058d3dd0b33bbb",
-      "byteLength": 1719
+      "sourceRevision": "sha256:0ff3eb71801c598ce0370d98b98def3302082d967ec08bf11d516febc0219fdd",
+      "contentDigest": "0ff3eb71801c598ce0370d98b98def3302082d967ec08bf11d516febc0219fdd",
+      "byteLength": 1692
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/auth/password.ts",
@@ -157395,9 +157623,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/cache/warm-up.ts",
-      "sourceRevision": "sha256:fcb4fb7ed37c24ce18babb3ba4f20847cd209b820fe8f5030f66c7db278641ff",
-      "contentDigest": "fcb4fb7ed37c24ce18babb3ba4f20847cd209b820fe8f5030f66c7db278641ff",
-      "byteLength": 14684
+      "sourceRevision": "sha256:06d8a490d65793c5399dea000d4ee98969d048468fb264400e2621dcddeb82d5",
+      "contentDigest": "06d8a490d65793c5399dea000d4ee98969d048468fb264400e2621dcddeb82d5",
+      "byteLength": 14772
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/cartridge/chr97-builder.ts",
@@ -159674,10 +159902,40 @@
       "byteLength": 9349
     },
     {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/document-processor.routing-plan.test.ts",
+      "sourceRevision": "sha256:a9c198d395370297788a7ed4b484be0943aedd6a6878046465a549edb8880e0e",
+      "contentDigest": "a9c198d395370297788a7ed4b484be0943aedd6a6878046465a549edb8880e0e",
+      "byteLength": 1606
+    },
+    {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/document-processor.ts",
-      "sourceRevision": "sha256:d9af7e56b8ad953cf486ed75d64ff898bb90b5b22de2d975ca50a3649f1d770e",
-      "contentDigest": "d9af7e56b8ad953cf486ed75d64ff898bb90b5b22de2d975ca50a3649f1d770e",
-      "byteLength": 11749
+      "sourceRevision": "sha256:6690147f865d4bdae65d948520105859c5d23887a818ea803f133f0bf69d6d60",
+      "contentDigest": "6690147f865d4bdae65d948520105859c5d23887a818ea803f133f0bf69d6d60",
+      "byteLength": 12709
+    },
+    {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/document-routing-policy-v1.test.ts",
+      "sourceRevision": "sha256:729a7558b6e6d4cd7c8574e13577c7f6f6ebd56f5a205f476320ba1330a15b08",
+      "contentDigest": "729a7558b6e6d4cd7c8574e13577c7f6f6ebd56f5a205f476320ba1330a15b08",
+      "byteLength": 7506
+    },
+    {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/document-routing-policy-v1.ts",
+      "sourceRevision": "sha256:906a5d7b870c62af16d73c58e73ff4bcb027e69c44e80e35651eef641b3d246e",
+      "contentDigest": "906a5d7b870c62af16d73c58e73ff4bcb027e69c44e80e35651eef641b3d246e",
+      "byteLength": 9737
+    },
+    {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/eg2-token-counter.test.ts",
+      "sourceRevision": "sha256:34c66059babd70e9a437f04e4b80e8114bd4f05d4936b4049c50587fc99650fb",
+      "contentDigest": "34c66059babd70e9a437f04e4b80e8114bd4f05d4936b4049c50587fc99650fb",
+      "byteLength": 661
+    },
+    {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/eg2-token-counter.ts",
+      "sourceRevision": "sha256:c8450817b308a147eae06cbe016671f2a60161374c08a7c05aa0c1a42b933a0c",
+      "contentDigest": "c8450817b308a147eae06cbe016671f2a60161374c08a7c05aa0c1a42b933a0c",
+      "byteLength": 1415
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/embedding-cache-service.ts",
@@ -160647,9 +160905,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/evidence/process-evidence-document-v1.spec.ts",
-      "sourceRevision": "sha256:44c8dc64554e9a79755bbc6599b524aec4d0e9054e7994ee3f9922fc13fbc74a",
-      "contentDigest": "44c8dc64554e9a79755bbc6599b524aec4d0e9054e7994ee3f9922fc13fbc74a",
-      "byteLength": 7063
+      "sourceRevision": "sha256:176e2f5196e9778d2a4221583f3bba77cdb52448564cf93e2ba70aa7521cb215",
+      "contentDigest": "176e2f5196e9778d2a4221583f3bba77cdb52448564cf93e2ba70aa7521cb215",
+      "byteLength": 10005
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/evidence/process-evidence-document-v1.ts",
@@ -161127,9 +161385,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/features/ai/ai/kv-context-controller.ts",
-      "sourceRevision": "sha256:0dbba6739bcfb25967bb1fb1f9ccdbc1a3c6b58ee0db57d339898b864257f3ac",
-      "contentDigest": "0dbba6739bcfb25967bb1fb1f9ccdbc1a3c6b58ee0db57d339898b864257f3ac",
-      "byteLength": 15102
+      "sourceRevision": "sha256:182f22ac87d224a39696c6d70da9a694bff65b273f0c54608c141939baf3c12d",
+      "contentDigest": "182f22ac87d224a39696c6d70da9a694bff65b273f0c54608c141939baf3c12d",
+      "byteLength": 15233
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/features/ai/ai/model-security.ts",
@@ -161745,9 +162003,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/features/rag/codebase-context.ts",
-      "sourceRevision": "sha256:e511e7e8d53fdf8e26e19248c9555cea2cc2d3efba233cffc8a163365b721603",
-      "contentDigest": "e511e7e8d53fdf8e26e19248c9555cea2cc2d3efba233cffc8a163365b721603",
-      "byteLength": 32612
+      "sourceRevision": "sha256:3a35c0f74e4714f34a5db98b940b58b4913507df199fd78df3628d7ea9c8a03f",
+      "contentDigest": "3a35c0f74e4714f34a5db98b940b58b4913507df199fd78df3628d7ea9c8a03f",
+      "byteLength": 32689
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/features/rag/cold-storage-retrieval-service.integration.spec.ts",
@@ -162801,9 +163059,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/grpc/retrieval-client.ts",
-      "sourceRevision": "sha256:e5bf5ef49a300a20fee4a42caff79d0beb2daaaa87fa318095a3ff610d20b90c",
-      "contentDigest": "e5bf5ef49a300a20fee4a42caff79d0beb2daaaa87fa318095a3ff610d20b90c",
-      "byteLength": 37615
+      "sourceRevision": "sha256:b694254aeed4e3185332a9ef7e39b2e665e6c06ce6cf51342fd092662b89d47b",
+      "contentDigest": "b694254aeed4e3185332a9ef7e39b2e665e6c06ce6cf51342fd092662b89d47b",
+      "byteLength": 37572
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/grpc/retrieval-delivery-telemetry.spec.ts",
@@ -163052,16 +163310,22 @@
       "byteLength": 69
     },
     {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/indexer/legal-chunker.counted.test.ts",
+      "sourceRevision": "sha256:c0ab71475d16120539b48cd28df79cdf7629ecdbe4a756a6d2649f34f4d091ad",
+      "contentDigest": "c0ab71475d16120539b48cd28df79cdf7629ecdbe4a756a6d2649f34f4d091ad",
+      "byteLength": 7453
+    },
+    {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/indexer/legal-chunker.test.ts",
-      "sourceRevision": "sha256:e44de07d94373fb51d79b0d32e952bbab2dfc2f16b4c11547e3f478839cfa4d3",
-      "contentDigest": "e44de07d94373fb51d79b0d32e952bbab2dfc2f16b4c11547e3f478839cfa4d3",
-      "byteLength": 8801
+      "sourceRevision": "sha256:34ac38a77f2ec02faa2ee65afc4b7e7c4a4cb5a8dcd3c6deb0792797af6078cd",
+      "contentDigest": "34ac38a77f2ec02faa2ee65afc4b7e7c4a4cb5a8dcd3c6deb0792797af6078cd",
+      "byteLength": 9344
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/indexer/legal-chunker.ts",
-      "sourceRevision": "sha256:bf548b480c965cacf9325c06f4ba1e8b367e58322e040194ccc5060f95a95fbe",
-      "contentDigest": "bf548b480c965cacf9325c06f4ba1e8b367e58322e040194ccc5060f95a95fbe",
-      "byteLength": 30109
+      "sourceRevision": "sha256:7d7cd3d3d2782d1b5a306eb9fcb806a6703e1d76f31bc1d09d088af5d159fa9c",
+      "contentDigest": "7d7cd3d3d2782d1b5a306eb9fcb806a6703e1d76f31bc1d09d088af5d159fa9c",
+      "byteLength": 38267
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/indexer/LLMS.md",
@@ -163107,9 +163371,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/indexer/som-summary.ts",
-      "sourceRevision": "sha256:af436767454b78b0af0409ec010912d7446b7cf2f1af00b68e972f33634a1ad8",
-      "contentDigest": "af436767454b78b0af0409ec010912d7446b7cf2f1af00b68e972f33634a1ad8",
-      "byteLength": 6866
+      "sourceRevision": "sha256:ef8d263d22ac1f4cfc305fcff37d2c1b830e534018da390a4aa66b2c817b6b82",
+      "contentDigest": "ef8d263d22ac1f4cfc305fcff37d2c1b830e534018da390a4aa66b2c817b6b82",
+      "byteLength": 6937
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/indexer/summary-freshness-checker.ts",
@@ -163119,9 +163383,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/indexer/summary-lens-generator.ts",
-      "sourceRevision": "sha256:09c2d21ae10827205440aad769894b315ade48b479a01cdc9081d0f18bf2997f",
-      "contentDigest": "09c2d21ae10827205440aad769894b315ade48b479a01cdc9081d0f18bf2997f",
-      "byteLength": 4625
+      "sourceRevision": "sha256:0fa864ababe138dda55f7045af9c028055c2d53fd294c4887c0c01949108c8f2",
+      "contentDigest": "0fa864ababe138dda55f7045af9c028055c2d53fd294c4887c0c01949108c8f2",
+      "byteLength": 4733
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/indexer/synthesis-memory-archiver.ts",
@@ -163185,9 +163449,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/inference/inference-router.ts",
-      "sourceRevision": "sha256:8dd5977703af92ef4058ab7cadcad7fba3d3a3e52fa759ec255b098a71139891",
-      "contentDigest": "8dd5977703af92ef4058ab7cadcad7fba3d3a3e52fa759ec255b098a71139891",
-      "byteLength": 37033
+      "sourceRevision": "sha256:9b58fb5d1f5c12597c44dbea097353620c44a137ee85f2752130097683f6f4f7",
+      "contentDigest": "9b58fb5d1f5c12597c44dbea097353620c44a137ee85f2752130097683f6f4f7",
+      "byteLength": 37376
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/inference/kv-compression-backend-v1.spec.ts",
@@ -163892,6 +164156,12 @@
       "byteLength": 5027
     },
     {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/llm/runtime-contract-loaded-model.spec.ts",
+      "sourceRevision": "sha256:cab916e144104cc71ecb6993411e9513cefc683fe76a7f7d0a143cfc882d005b",
+      "contentDigest": "cab916e144104cc71ecb6993411e9513cefc683fe76a7f7d0a143cfc882d005b",
+      "byteLength": 1413
+    },
+    {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/llm/runtime-contract.spec.ts",
       "sourceRevision": "sha256:9006a8335282bc41036d3205cbaedfb40c5e461f7901d8d0635b861f51f77bd6",
       "contentDigest": "9006a8335282bc41036d3205cbaedfb40c5e461f7901d8d0635b861f51f77bd6",
@@ -163899,9 +164169,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/llm/runtime-contract.ts",
-      "sourceRevision": "sha256:faa8fd916cfc7243198432867032105a5e9cf8242856178961041935cc86a939",
-      "contentDigest": "faa8fd916cfc7243198432867032105a5e9cf8242856178961041935cc86a939",
-      "byteLength": 5924
+      "sourceRevision": "sha256:caf34917a28c20b6c39b4d9b3c0289072d7b924b196afe9f4012efc0fc0f3690",
+      "contentDigest": "caf34917a28c20b6c39b4d9b3c0289072d7b924b196afe9f4012efc0fc0f3690",
+      "byteLength": 6092
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/llm/sanitize-gemma4-output.ts",
@@ -165957,15 +166227,15 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
-      "sourceRevision": "sha256:3186286609077d0f4658546557fa5da826160274070af94ccd56228ef7be71b4",
-      "contentDigest": "3186286609077d0f4658546557fa5da826160274070af94ccd56228ef7be71b4",
-      "byteLength": 3976
+      "sourceRevision": "sha256:9ee97ecaad6d1a34517ee211e8529c3392bfffaa18568be2cdb8893edb084ab1",
+      "contentDigest": "9ee97ecaad6d1a34517ee211e8529c3392bfffaa18568be2cdb8893edb084ab1",
+      "byteLength": 4083
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
-      "sourceRevision": "sha256:fcf37e9e044724494f13cf3e6ab28449eded7ce939a07affcce64f0511caa573",
-      "contentDigest": "fcf37e9e044724494f13cf3e6ab28449eded7ce939a07affcce64f0511caa573",
-      "byteLength": 5288
+      "sourceRevision": "sha256:a181678b079f645c93ec9f0cc671d60abb4d64070af8899f3571c3f4bccebea2",
+      "contentDigest": "a181678b079f645c93ec9f0cc671d60abb4d64070af8899f3571c3f4bccebea2",
+      "byteLength": 5393
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/adapters/qdrant-bm42-retriever.ts",
@@ -165975,9 +166245,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/adapters/qdrant-dense-retriever.ts",
-      "sourceRevision": "sha256:1d058015fb25cb5e79928ee0d9bdb95a857592ba55cebee9db1939ef5e82185c",
-      "contentDigest": "1d058015fb25cb5e79928ee0d9bdb95a857592ba55cebee9db1939ef5e82185c",
-      "byteLength": 3312
+      "sourceRevision": "sha256:36e665156f52de27c516e326ddf42642c77a444d24ee19e892bf90774872d93c",
+      "contentDigest": "36e665156f52de27c516e326ddf42642c77a444d24ee19e892bf90774872d93c",
+      "byteLength": 3287
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/adapters/structural-lane-retriever.spec.ts",
@@ -166383,9 +166653,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/embedding-service.ts",
-      "sourceRevision": "sha256:776c83dbde18e735cb1398ad4cad5ce5637a9316e15aeb8405a3ee05e7ae3e89",
-      "contentDigest": "776c83dbde18e735cb1398ad4cad5ce5637a9316e15aeb8405a3ee05e7ae3e89",
-      "byteLength": 14430
+      "sourceRevision": "sha256:8a056ef0ce8a3e0437e4d3e3c5a12c56263ee4ad97f3ab94a6b1d3c74985de7e",
+      "contentDigest": "8a056ef0ce8a3e0437e4d3e3c5a12c56263ee4ad97f3ab94a6b1d3c74985de7e",
+      "byteLength": 14685
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/encoded-cluster-prefilter.ts",
@@ -166713,9 +166983,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/lane-contracts.ts",
-      "sourceRevision": "sha256:dde6c4380f105d4f5013455f5c593da9e6e8f898633453c08f3c6fa1a6c75f90",
-      "contentDigest": "dde6c4380f105d4f5013455f5c593da9e6e8f898633453c08f3c6fa1a6c75f90",
-      "byteLength": 2628
+      "sourceRevision": "sha256:40a7c8c8fc3e1df833bc0e5c6ede58b60cc6526880db101cc37175e24dee43d2",
+      "contentDigest": "40a7c8c8fc3e1df833bc0e5c6ede58b60cc6526880db101cc37175e24dee43d2",
+      "byteLength": 2756
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
@@ -167343,9 +167613,21 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/retrieve-candidates.ts",
-      "sourceRevision": "sha256:3d64b00b5db3b37df6ce61b7bdbc24053cf8b62c7271185fa5eb3fa37ec3452d",
-      "contentDigest": "3d64b00b5db3b37df6ce61b7bdbc24053cf8b62c7271185fa5eb3fa37ec3452d",
-      "byteLength": 28057
+      "sourceRevision": "sha256:d7422aea3621a8e75c6fdb1fbe306879c24035aa815ce677965ed7dcb8724a5d",
+      "contentDigest": "d7422aea3621a8e75c6fdb1fbe306879c24035aa815ce677965ed7dcb8724a5d",
+      "byteLength": 41157
+    },
+    {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/retrieve-lane-receipts.spec.ts",
+      "sourceRevision": "sha256:edce541c45de7a6e17f6be8b7cf5009f0f47a15575518ec50e05af21c0b89b0f",
+      "contentDigest": "edce541c45de7a6e17f6be8b7cf5009f0f47a15575518ec50e05af21c0b89b0f",
+      "byteLength": 4980
+    },
+    {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/retrieve-qdrant-embed-failure.spec.ts",
+      "sourceRevision": "sha256:e151b5733ffa353e828f162b1af32b32fbcc6df84b8eec386f4cd1379ac23104",
+      "contentDigest": "e151b5733ffa353e828f162b1af32b32fbcc6df84b8eec386f4cd1379ac23104",
+      "byteLength": 613
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/revision-qualified-shadow-provider-v1.spec.ts",
@@ -167535,15 +167817,15 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/search-runtime.spec.ts",
-      "sourceRevision": "sha256:c38981c247dd2fe7f797ca743ce24edc941c25ef81a9f7e531ed7a6fd78643ac",
-      "contentDigest": "c38981c247dd2fe7f797ca743ce24edc941c25ef81a9f7e531ed7a6fd78643ac",
-      "byteLength": 53337
+      "sourceRevision": "sha256:f5d9fa9bc26263a8a19197f15bc88af616986591df3d7607842867c168941155",
+      "contentDigest": "f5d9fa9bc26263a8a19197f15bc88af616986591df3d7607842867c168941155",
+      "byteLength": 63584
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
-      "sourceRevision": "sha256:1733c424a04d31c900234547c34c69090e59c6fce5013443ac456e0b5863a3e0",
-      "contentDigest": "1733c424a04d31c900234547c34c69090e59c6fce5013443ac456e0b5863a3e0",
-      "byteLength": 93606
+      "sourceRevision": "sha256:22de36d87662b8ac5b5564cb024f6f1a292cb92ac7a2659445880547a1c587e0",
+      "contentDigest": "22de36d87662b8ac5b5564cb024f6f1a292cb92ac7a2659445880547a1c587e0",
+      "byteLength": 106776
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/retrieval/semantic-768-shadow-receipt-v1.spec.ts",
@@ -169809,9 +170091,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts",
-      "sourceRevision": "sha256:4e7edc45f9c46b8a88dd3337ac163d99e9900e12b2455fb28b1ee6cd49e17f8b",
-      "contentDigest": "4e7edc45f9c46b8a88dd3337ac163d99e9900e12b2455fb28b1ee6cd49e17f8b",
-      "byteLength": 85816
+      "sourceRevision": "sha256:851e5aa382a85c79dce54a32c2c6ea7fbab982d181cfe79e7542fd806dea4033",
+      "contentDigest": "851e5aa382a85c79dce54a32c2c6ea7fbab982d181cfe79e7542fd806dea4033",
+      "byteLength": 86028
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/vector/qdrant-multivector-schema.retirement.spec.ts",
@@ -169881,9 +170163,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/vector/vector-contracts.ts",
-      "sourceRevision": "sha256:08f40d152c4cfe4d8685b328ba11383aa6630f74ab273ec07e183ef393f1d566",
-      "contentDigest": "08f40d152c4cfe4d8685b328ba11383aa6630f74ab273ec07e183ef393f1d566",
-      "byteLength": 9918
+      "sourceRevision": "sha256:765a569543c126fab4434daeb140120c5263809b32401b227b6c3d7f595a35b7",
+      "contentDigest": "765a569543c126fab4434daeb140120c5263809b32401b227b6c3d7f595a35b7",
+      "byteLength": 10039
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/vector/vector-index-registry.test.ts",
@@ -170469,9 +170751,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/splat/geometry-kernel-v1.spec.ts",
-      "sourceRevision": "sha256:56b5db5d51f24b32677253f1e1735ff2061601824840e264384a26d8d57f18f1",
-      "contentDigest": "56b5db5d51f24b32677253f1e1735ff2061601824840e264384a26d8d57f18f1",
-      "byteLength": 2852
+      "sourceRevision": "sha256:a6f45d562168eb7ed6bcf38d1ab5ed1025bebe283b47d9cc4ddec948d5af8ed7",
+      "contentDigest": "a6f45d562168eb7ed6bcf38d1ab5ed1025bebe283b47d9cc4ddec948d5af8ed7",
+      "byteLength": 6064
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/splat/geometry-kernel-v1.ts",
@@ -172580,16 +172862,28 @@
       "byteLength": 5400
     },
     {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/mcp/llama-runtime-contracts.ts",
+      "sourceRevision": "sha256:938e2b5ec7cde345dc8393d1e56c4b25a11dfcb803205684b3df93af3e1572dc",
+      "contentDigest": "938e2b5ec7cde345dc8393d1e56c4b25a11dfcb803205684b3df93af3e1572dc",
+      "byteLength": 4266
+    },
+    {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/mcp/llama-runtime-gate.ts",
+      "sourceRevision": "sha256:abb4d433833625ae925c548909e8001c0067def50fefc141e67448b54bafbaf5",
+      "contentDigest": "abb4d433833625ae925c548909e8001c0067def50fefc141e67448b54bafbaf5",
+      "byteLength": 4688
+    },
+    {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/mcp/llama-runtime-tools.spec.ts",
-      "sourceRevision": "sha256:8d9d68c044da1060d4094b45816d62844123cf6df49a4ef07f88ad00b3d942af",
-      "contentDigest": "8d9d68c044da1060d4094b45816d62844123cf6df49a4ef07f88ad00b3d942af",
-      "byteLength": 4593
+      "sourceRevision": "sha256:0ffcffb94e0543b11799e4b7fcfcb85fe6affa0f18be0163cfafd7adc0be9beb",
+      "contentDigest": "0ffcffb94e0543b11799e4b7fcfcb85fe6affa0f18be0163cfafd7adc0be9beb",
+      "byteLength": 11510
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/mcp/llama-runtime-tools.ts",
-      "sourceRevision": "sha256:274b51d52bb5cf45bb582be6c3b4cf886d3d5b0cdc811c869984d19cc9b6cf92",
-      "contentDigest": "274b51d52bb5cf45bb582be6c3b4cf886d3d5b0cdc811c869984d19cc9b6cf92",
-      "byteLength": 5056
+      "sourceRevision": "sha256:cbdffa55b0db33766b6177ebf8f54eef5be2f9d2f75ca027412885dd485622df",
+      "contentDigest": "cbdffa55b0db33766b6177ebf8f54eef5be2f9d2f75ca027412885dd485622df",
+      "byteLength": 7486
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/mcp/LLMS.md",
@@ -172821,9 +173115,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "sourceRevision": "sha256:062a4fe7219f47385a7e3f9b2ed8679af89d13e7c2fb70dd6fb1a897cef6fad1",
-      "contentDigest": "062a4fe7219f47385a7e3f9b2ed8679af89d13e7c2fb70dd6fb1a897cef6fad1",
-      "byteLength": 467111
+      "sourceRevision": "sha256:544de01376cfeaa9338f1ef9a22b18aad377ae40b1272191219732bc56d95703",
+      "contentDigest": "544de01376cfeaa9338f1ef9a22b18aad377ae40b1272191219732bc56d95703",
+      "byteLength": 467352
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/mcp/zod-to-json-schema-bridge/index.js",
@@ -172893,9 +173187,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/.well-known/agent.json/+server.ts",
-      "sourceRevision": "sha256:6e0d3516f31fbc0045b62ded7aae25f3c25af08f116bb40310285b511e795d5b",
-      "contentDigest": "6e0d3516f31fbc0045b62ded7aae25f3c25af08f116bb40310285b511e795d5b",
-      "byteLength": 6006
+      "sourceRevision": "sha256:0bbd67a8681045cb6ad90246c9709cc2c9436585e15176883a1805ab3ac54654",
+      "contentDigest": "0bbd67a8681045cb6ad90246c9709cc2c9436585e15176883a1805ab3ac54654",
+      "byteLength": 6047
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/.well-known/appspecific/com.chrome.devtools.json/+server.ts",
@@ -178346,6 +178640,12 @@
       "byteLength": 5804
     },
     {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/agent/rpc-access.spec.ts",
+      "sourceRevision": "sha256:680635096032dbc20c70a13654f649d4fdcbea5fa9610a2d04e32a61fdfd289d",
+      "contentDigest": "680635096032dbc20c70a13654f649d4fdcbea5fa9610a2d04e32a61fdfd289d",
+      "byteLength": 6248
+    },
+    {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/agent/rpc.spec.ts",
       "sourceRevision": "sha256:5d908f6b8cb3e5eb844f2d32e2da3c8d254fa6663a7b186f16c6af54088d40a2",
       "contentDigest": "5d908f6b8cb3e5eb844f2d32e2da3c8d254fa6663a7b186f16c6af54088d40a2",
@@ -178353,9 +178653,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/agent/rpc/+server.ts",
-      "sourceRevision": "sha256:ab3ee58bf8d8f04f0c5a40a74dc6fd978255627e347792ebf3669aa0ff0a575f",
-      "contentDigest": "ab3ee58bf8d8f04f0c5a40a74dc6fd978255627e347792ebf3669aa0ff0a575f",
-      "byteLength": 6210
+      "sourceRevision": "sha256:6618412295bb5f6ae15978dbdf621758d8e4998f228cd57d3baed5d098a9232e",
+      "contentDigest": "6618412295bb5f6ae15978dbdf621758d8e4998f228cd57d3baed5d098a9232e",
+      "byteLength": 7792
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/agent/rpc/test/+server.ts",
@@ -178599,9 +178899,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/ai/screen-analysis/+server.ts",
-      "sourceRevision": "sha256:480147a09ce4e0c4bcbadbd020e9048c6d27fcf45ea7dc1cd6eff7ca8db7b2e7",
-      "contentDigest": "480147a09ce4e0c4bcbadbd020e9048c6d27fcf45ea7dc1cd6eff7ca8db7b2e7",
-      "byteLength": 12769
+      "sourceRevision": "sha256:5fd61a2c86c6554e1176557a561ef7f51fd22abc939ff97207e8b2b9c9e8f463",
+      "contentDigest": "5fd61a2c86c6554e1176557a561ef7f51fd22abc939ff97207e8b2b9c9e8f463",
+      "byteLength": 12768
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/ai/screen-analysis/screen-analysis.route.spec.ts",
@@ -180285,9 +180585,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/codebase-index/evidence-analyze/+server.ts",
-      "sourceRevision": "sha256:ec8dc8d5a7ab126552aeedad8cd98e9d338894b8e5dba67f3b6b0e4ea1278329",
-      "contentDigest": "ec8dc8d5a7ab126552aeedad8cd98e9d338894b8e5dba67f3b6b0e4ea1278329",
-      "byteLength": 6840
+      "sourceRevision": "sha256:3e08475da023d9e3ef2ed65c0474d0e9401b68de1bfc454bb8f33e30e3fe9a25",
+      "contentDigest": "3e08475da023d9e3ef2ed65c0474d0e9401b68de1bfc454bb8f33e30e3fe9a25",
+      "byteLength": 6922
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/codebase-index/export/bundle/+server.ts",
@@ -181359,9 +181659,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/glossary/+server.ts",
-      "sourceRevision": "sha256:7815b40add2b316e544fb9b0842b51f295d021d3a8b6cc6487be0625e5bebac1",
-      "contentDigest": "7815b40add2b316e544fb9b0842b51f295d021d3a8b6cc6487be0625e5bebac1",
-      "byteLength": 4225
+      "sourceRevision": "sha256:2dbba1bd1db2d6c30711d59f797096cdc5143098e378418ffab2d301bc24983f",
+      "contentDigest": "2dbba1bd1db2d6c30711d59f797096cdc5143098e378418ffab2d301bc24983f",
+      "byteLength": 4387
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/glossary/search/+server.ts",
@@ -182631,9 +182931,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/rag/hyperrag/+server.ts",
-      "sourceRevision": "sha256:acb6d36514dc2af1f579a03076b7fbc44f33517009953cc701393d0b2ce7cd62",
-      "contentDigest": "acb6d36514dc2af1f579a03076b7fbc44f33517009953cc701393d0b2ce7cd62",
-      "byteLength": 4461
+      "sourceRevision": "sha256:76ee9abe2f211c4d8e55cbc150e6a4477e8c1e779d574884bc4d6645cf1d2c4d",
+      "contentDigest": "76ee9abe2f211c4d8e55cbc150e6a4477e8c1e779d574884bc4d6645cf1d2c4d",
+      "byteLength": 4489
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/rag/hyperrag/LLMS.md",
@@ -183081,9 +183381,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/search/hyperrag/+server.ts",
-      "sourceRevision": "sha256:0e389158bd3fc7623bb9d87178e9a05d82908e3ed01b829d22e529572f700d34",
-      "contentDigest": "0e389158bd3fc7623bb9d87178e9a05d82908e3ed01b829d22e529572f700d34",
-      "byteLength": 9723
+      "sourceRevision": "sha256:4695c0cd233d8291894115390cce4327e092112fd05d4088138be2826fd74bc5",
+      "contentDigest": "4695c0cd233d8291894115390cce4327e092112fd05d4088138be2826fd74bc5",
+      "byteLength": 9769
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/search/hyperrag/LLMS.md",
@@ -183201,9 +183501,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/statutes/[id]/+server.ts",
-      "sourceRevision": "sha256:c0c9a3dde490f2dee66181420ecc09356f97135e8bdcf5b31cdaa471156cb6bd",
-      "contentDigest": "c0c9a3dde490f2dee66181420ecc09356f97135e8bdcf5b31cdaa471156cb6bd",
-      "byteLength": 4028
+      "sourceRevision": "sha256:2b8defd870332b5143535d242e33e2c4ad4625552ff850319f05e03e6e8fd17d",
+      "contentDigest": "2b8defd870332b5143535d242e33e2c4ad4625552ff850319f05e03e6e8fd17d",
+      "byteLength": 4294
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/statutes/[id]/summary/+server.ts",
@@ -183213,9 +183513,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/statutes/+server.ts",
-      "sourceRevision": "sha256:4e42a31285b76a353f9f6b97540c634681522a8f770c0459fb661310591ff569",
-      "contentDigest": "4e42a31285b76a353f9f6b97540c634681522a8f770c0459fb661310591ff569",
-      "byteLength": 4518
+      "sourceRevision": "sha256:3de437ebc21b678211c4699d5e5b35268fa3e2bb6f5e315d624e4429a9bda06b",
+      "contentDigest": "3de437ebc21b678211c4699d5e5b35268fa3e2bb6f5e315d624e4429a9bda06b",
+      "byteLength": 4680
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/api/statutes/search/+server.ts",
@@ -186357,9 +186657,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/tests/e2e/fixtures/qa.ts",
-      "sourceRevision": "sha256:e6593d57d62706552f818e38f25de8bcecb45ad7d153ee9a9ca70a14da035770",
-      "contentDigest": "e6593d57d62706552f818e38f25de8bcecb45ad7d153ee9a9ca70a14da035770",
-      "byteLength": 2787
+      "sourceRevision": "sha256:0973e69c00cc3ad49d3e6fd9bcd62cf77242159145e44d09e0963a4a061352b3",
+      "contentDigest": "0973e69c00cc3ad49d3e6fd9bcd62cf77242159145e44d09e0963a4a061352b3",
+      "byteLength": 3461
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/tests/e2e/gate-a-browser-renderer.spec.ts",
@@ -186471,9 +186771,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/tests/e2e/qa-a2a-rpc.spec.ts",
-      "sourceRevision": "sha256:4fd576ba919e213ab494bd25fb8cb5281c17b79b463cdd180120cd13833d50b1",
-      "contentDigest": "4fd576ba919e213ab494bd25fb8cb5281c17b79b463cdd180120cd13833d50b1",
-      "byteLength": 1717
+      "sourceRevision": "sha256:224b519625c74ce9024900554b04cfead74527041a122ea36ab2e4e43db77dcd",
+      "contentDigest": "224b519625c74ce9024900554b04cfead74527041a122ea36ab2e4e43db77dcd",
+      "byteLength": 1358
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/tests/e2e/qa-acp-contract.spec.ts",
@@ -186486,6 +186786,12 @@
       "sourceRevision": "sha256:d6986d240be8b0c19f942c9ff037c5d2d4e6df90e42b941c2c2fab15bafc5a74",
       "contentDigest": "d6986d240be8b0c19f942c9ff037c5d2d4e6df90e42b941c2c2fab15bafc5a74",
       "byteLength": 867
+    },
+    {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/tests/e2e/qa-server-500.spec.ts",
+      "sourceRevision": "sha256:d35d5db263b8fd2cf9762c36b2ab7f7938c1429220fd6a27ce1bf0048c4bedfb",
+      "contentDigest": "d35d5db263b8fd2cf9762c36b2ab7f7938c1429220fd6a27ce1bf0048c4bedfb",
+      "byteLength": 936
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/tests/e2e/qa-smoke.spec.ts",
@@ -187398,6 +187704,12 @@
       "sourceRevision": "sha256:d60502e5ed883e899520b544f709eefdfcf7f78006814af419417cf232cb0065",
       "contentDigest": "d60502e5ed883e899520b544f709eefdfcf7f78006814af419417cf232cb0065",
       "byteLength": 1796
+    },
+    {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/tests/lane-contracts/qa-feature-route-cohort.spec.ts",
+      "sourceRevision": "sha256:f8b02a254cfe3237f94570b2c8d93872844c50e51d1340e8e3f32901de497735",
+      "contentDigest": "f8b02a254cfe3237f94570b2c8d93872844c50e51d1340e8e3f32901de497735",
+      "byteLength": 11581
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/tests/lane-latency-benchmark.spec.ts",
@@ -196750,9 +197062,7 @@
       "classification": "WORKTREE_DUPLICATE"
     }
   ],
-  "blockers": [
-    "SNAPSHOT_BYTES_READBACK_NOT_PROVEN"
-  ],
-  "firstBlockingInvariant": "SNAPSHOT_BYTES_READBACK_NOT_PROVEN",
-  "nextGate": "SOURCE-INVENTORY-HYGIENE-01"
+  "blockers": [],
+  "firstBlockingInvariant": null,
+  "nextGate": "PROMOTION-RECEIPT-COHORT-01"
 }

@@ -49,6 +49,8 @@ export interface RetrievalInput {
   limit: number;
   filters?: Record<string, unknown>;
   workspaceRevision?: string;
+  /** Per-lane cancellation. Adapters must pass it to supported clients and check it between stages. */
+  signal?: AbortSignal;
 }
 
 export interface RerankInput {

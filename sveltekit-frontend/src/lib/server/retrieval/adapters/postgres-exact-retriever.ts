@@ -63,6 +63,7 @@ export function createPostgresExactRetriever(): Retriever {
 
     async retrieve(input: RetrievalInput): Promise<LaneCandidate[]> {
       try {
+        input.signal?.throwIfAborted();
         const signals = extractQuerySignals(input.query);
         const tokens = [
           ...signals.identifiers,
@@ -88,6 +89,7 @@ export function createPostgresExactRetriever(): Retriever {
         });
 
         const db = await getDb();
+        input.signal?.throwIfAborted();
         const result = await db.execute(sql`
           SELECT
             ap.id,
@@ -114,6 +116,7 @@ export function createPostgresExactRetriever(): Retriever {
           ORDER BY score DESC, ap.source_ref ASC
           LIMIT ${input.limit}
         `);
+        input.signal?.throwIfAborted();
 
         type ExactRow = {
           id: string;
@@ -153,8 +156,8 @@ export function createPostgresExactRetriever(): Retriever {
         }
         return candidates;
       } catch (err) {
-        console.warn('[postgres-exact-retriever] failed:', (err as Error).message);
-        return [];
+        if (input.signal?.aborted) throw input.signal.reason ?? err;
+        throw err;
       }
     },
   };

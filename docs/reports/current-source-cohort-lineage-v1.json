@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-cohort-lineage.v1",
-  "generatedAt": "2026-11-25T19:06:10.898Z",
+  "generatedAt": "2026-11-28T00:01:09.061Z",
   "mode": "READ_ONLY_LINEAGE_AUDIT",
   "inputs": {
     "cohortChecksum": "fd88703ca428261206575d95204c31795f956645dd46dc4607a2b3048d464151",
@@ -10,7 +10,7 @@
   },
   "workspaceFrame": {
     "status": "CURRENT_WORKSPACE_FRAME_SELECTED",
-    "selectedWorkspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+    "selectedWorkspaceRevision": "sha256:09e1d40886a982f66a17ec1e068774559d12f012dde412228d909dca49247590",
     "selectedSource": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT",
     "selectedAuthority": true,
     "authorityConflict": false,
@@ -25,7 +25,7 @@
     "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
     "safeToPromote": false,
     "requiresSnapshotRefresh": true,
-    "deltaChecksum": "sha256:5dd13c20dbec655de36abc21274c1c741f1c3acaaa3af6e32c38f87a04c2d664"
+    "deltaChecksum": "sha256:66a87651996df60e3dd86b61ac21ae1884e0f419c7f4039989828c8f9d006627"
   },
   "counts": {
     "cohortRows": 52,
@@ -630,5 +630,5 @@
   "qdrantWrites": false,
   "status": "WORKSPACE_CURRENTNESS_UNAVAILABLE",
   "nextGate": "WORKSPACE_CURRENTNESS_READBACK_REQUIRED",
-  "reportChecksum": "d1e72db5fba617aca2c9cca3eaabd68af0b2386d94f90377fe8315ecabb38dc8"
+  "reportChecksum": "5275f6dc02f6521a9b510f9aff702120b937069485ba254a7e8648b978fcf8ff"
 }

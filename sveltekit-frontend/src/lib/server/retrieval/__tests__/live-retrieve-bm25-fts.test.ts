@@ -23,8 +23,11 @@ describe('retrieveBM25 live PostgreSQL proof', () => {
     expect(emptyResults).toEqual([]);
   });
 
-  it('handles zero-hit queries gracefully without unhandled exception', async () => {
+  it('returns a fast successful empty result without launching a substring table scan', async () => {
+    const startedAt = performance.now();
     const results = await retrieveBM25('xyznonexistenttoken999999');
-    expect(Array.isArray(results)).toBe(true);
+    const elapsedMs = performance.now() - startedAt;
+    expect(results).toEqual([]);
+    expect(elapsedMs).toBeLessThan(50);
   });
 });

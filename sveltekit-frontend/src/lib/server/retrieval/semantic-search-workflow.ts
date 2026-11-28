@@ -168,6 +168,11 @@ export async function runSemanticSearchWorkflow(
   runtimeOptions?: {
     userId?: string | null;
     caseId?: string | null;
+    /** Propagated from the server request; never accepted from the request body. */
+    taskId?: string | null;
+    actorGrant?: Parameters<ReturnType<typeof createAtlasSearchAdapter>['search']>[1] extends infer C ? (C extends { actorGrant?: infer G } ? G : never) : never;
+    requireActorGrant?: boolean;
+    signal?: AbortSignal;
     diagnosticReadOnly?: boolean;
     contextManifestShadow?: SearchRuntimeContextManifestShadowConfigV1;
   },
@@ -201,8 +206,8 @@ export async function runSemanticSearchWorkflow(
     query,
     lexicalExpansion: [...new Set([...queryClassification.ngrams, ...queryClassification.packageCandidates])].slice(0, 32),
     topK: validated.topK,
-    userId: validated.userId ?? runtimeOptions?.userId ?? undefined,
-    caseId: validated.caseId ?? runtimeOptions?.caseId ?? undefined,
+    userId: runtimeOptions?.userId ?? validated.userId ?? undefined,
+    caseId: runtimeOptions?.caseId ?? undefined,
     filters: validated.filters,
     withGraphExpansion: validated.withGraphExpansion || queryClassification.retrievalNeeds.graph,
     traceId: validated.traceId ?? validated.spanContext?.traceId ?? undefined,
@@ -229,7 +234,7 @@ export async function runSemanticSearchWorkflow(
       ? {}
       : { readOnly: runtimeOptions.diagnosticReadOnly }),
   });
-  const adapterResult = await adapter.search({
+  const atlasSearchRequest = {
     query: searchRequest.query,
     lexicalExpansion: searchRequest.lexicalExpansion,
     topK: searchRequest.topK,
@@ -238,7 +243,16 @@ export async function runSemanticSearchWorkflow(
     filters: searchRequest.filters,
     traceId: searchRequest.traceId,
     withGraphExpansion: searchRequest.withGraphExpansion,
-  });
+  };
+  const executionContext = {
+    ...(runtimeOptions?.signal ? { signal: runtimeOptions.signal } : {}),
+    ...(runtimeOptions?.taskId ? { taskId: runtimeOptions.taskId } : {}),
+    ...(runtimeOptions?.actorGrant ? { actorGrant: runtimeOptions.actorGrant } : {}),
+    ...(runtimeOptions?.requireActorGrant !== undefined ? { requireActorGrant: runtimeOptions.requireActorGrant } : {}),
+  };
+  const adapterResult = Object.keys(executionContext).length > 0
+    ? await adapter.search(atlasSearchRequest, executionContext)
+    : await adapter.search(atlasSearchRequest);
   addStep('canonical_search', 'completed', searchStarted);
 
   const ace = validated.includeAcePacket

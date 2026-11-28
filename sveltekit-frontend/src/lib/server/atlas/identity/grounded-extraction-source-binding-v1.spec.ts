@@ -55,6 +55,7 @@ describe('grounded extraction source binding', () => {
     ['wrong packet source ref', { packetRows: [{ ...baseInput().packetRows[0]!, sourceRef: 'src/other.ts' }] }, 'PACKET_SOURCE_REF_MISMATCH'],
     ['stale packet source revision', { packetRows: [{ ...baseInput().packetRows[0]!, sourceRevision: `sha256:${'d'.repeat(64)}` }] }, 'SOURCE_REVISION_BINDING_MISMATCH'],
     ['wrong workspace binding', { admittedSource: { ...baseInput().admittedSource, workspaceRevision: `sha256:${'e'.repeat(64)}` } }, 'WORKSPACE_REVISION_BINDING_MISMATCH'],
+    ['wrong repository binding', { expectedRepositoryId: 'other-repository' }, 'SOURCE_BINDING_REPOSITORY_MISMATCH'],
     ['submitted bytes differ', { submittedText: `${text}\n` }, 'SOURCE_REVISION_BINDING_MISMATCH'],
   ])('rejects %s', (_label, override, code) => {
     expect(() => validateGroundedExtractionSourceBindingV1({ ...baseInput(), ...override }))

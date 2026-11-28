@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import http from 'node:http';
 import test from 'node:test';
 
@@ -18,20 +19,16 @@ test('live :8090 status reports valid /slots, llama processIdentity, and idle st
 	assert.equal(parsed.slots.reachable, true);
 	assert.equal(parsed.slots.valid, true);
 	assert.equal(typeof parsed.slots.busy, 'number');
+	assert.equal(parsed.releaseCapability.supported, false);
+	assert.equal(parsed.releaseCapability.blocker, 'INFERENCE_DRAIN_AND_GRACEFUL_SHUTDOWN_NOT_IMPLEMENTED');
 });
 
-test('DryRun release on idle :8090 succeeds without stopping process or writing lease', () => {
-	const out = execFileSync(
-		'powershell',
-		['-NoProfile', '-File', SCRIPT, '-Action', 'release', '-DryRun'],
-		{ encoding: 'utf8' },
-	);
-	const parsed = JSON.parse(out);
-	assert.equal(parsed.schema, 'atlas.llama-8090-vram-receipt.v1');
-	assert.equal(parsed.action, 'release');
-	assert.equal(parsed.dryRun, true);
-	assert.equal(parsed.stoppedPortScopedPid, null);
-	assert.equal(parsed.processIdentity.isLlamaServer, true);
+test('release remains fail-closed until drain and shutdown are implemented', () => {
+	const manager = readFileSync(SCRIPT, 'utf8');
+	const guards = readFileSync('scripts/lib/llama-8090-vram-guards.ps1', 'utf8');
+	assert.match(manager, /InferenceDrainGateVerified\s+\$false/);
+	assert.match(guards, /REFUSED_INFERENCE_DRAIN_GATE_UNAVAILABLE/);
+	assert.doesNotMatch(manager, /Stop-Process\s+-Id\s+\$listenPid/);
 });
 
 test('release refuses non-llama process identity on ephemeral port (fail-closed)', async () => {

@@ -7,11 +7,12 @@
  * Nothing else handles search. Everything flows through here.
  */
 
+import { randomUUID } from 'node:crypto';
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
 import { SemanticSearchWorkflowRequestSchema, runSemanticSearchWorkflow } from '$lib/server/retrieval/semantic-search-workflow.js';
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ request, url, locals }) => {
   const q = url.searchParams.get('q');
   const topK = url.searchParams.get('topK') ? parseInt(url.searchParams.get('topK')!) : 20;
 
@@ -40,6 +41,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     }, {
       userId: locals.user?.id !== undefined ? String(locals.user.id) : null,
       caseId: null,
+      signal: request.signal,
     });
 
     return json(result);
@@ -67,15 +69,23 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 export const POST: RequestHandler = async ({ request, locals }) => {
   try {
     const body = await request.json();
+    const serverUserId = locals.user?.id !== undefined ? String(locals.user.id) : null;
+    const serverTaskId = randomUUID();
+    const serverLocals = locals as Record<string, unknown>;
+    const serverActorGrant = (serverLocals.actorGrant as Parameters<typeof runSemanticSearchWorkflow>[1] extends infer O
+      ? O extends { actorGrant?: infer G }
+        ? G
+        : undefined
+      : undefined) ?? undefined;
+
     const query = SemanticSearchWorkflowRequestSchema.parse({
       query: body.query ?? body.text ?? '',
       topK: body.topK ?? 20,
-      userId: locals.user?.id !== undefined ? String(locals.user.id) : undefined,
+      userId: serverUserId ?? undefined,
       includeWorkflowPreamble: false,
       includeAcePacket: true,
       compareRustShadow: false,
       withGraphExpansion: Boolean(body.withGraphExpansion),
-      caseId: body.caseId ?? undefined,
       traceId: body.traceId ?? undefined,
       shadowTopK: body.shadowTopK ?? 20,
       filters: body.filters ?? {
@@ -85,8 +95,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     });
 
     const result = await runSemanticSearchWorkflow(query, {
-      userId: locals.user?.id !== undefined ? String(locals.user.id) : null,
+      userId: serverUserId,
       caseId: null,
+      taskId: serverTaskId,
+      ...(serverActorGrant ? { actorGrant: serverActorGrant } : {}),
+      signal: request.signal,
     });
 
     return json(result);
